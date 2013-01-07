@@ -1,15 +1,17 @@
-# JourneyMap for Minecraft
+# [JourneyMap for Minecraft][1]
+
+Source code and build resources for [JourneyMap][2] ([http://journeymap.techbrew.net])
 
 ## Requirements
 
 * Java 6 or later
-* Minecraft
-* ModLoader : http://www.minecraftforum.net/topic/75440-v146-risugamis-mods-updated/
-* Minecraft Coder Pack (MCP) : http://mcp.ocean-labs.de/index.php/Main_Page
+* [Minecraft][3]
+* [ModLoader][4] (Must match the version of Minecraft you have)
+* [Minecraft Coder Pack (MCP)][5] (Must match the version of Minecraft you have)
 
 ## Environment Setup
 
-### 1. Download JourneyMap source
+### 1. Git the JourneyMap source
 
 Check out the JourneyMap GIT repo to what will become your MCP workspace.  For example:
 
@@ -19,7 +21,7 @@ Note: The 'mcp' directory name at the end of the git clone command is just to av
     
 ### 2. Patch Minecraft with Modloader
 
-* Patch your `minecraft.jar` with ModLoader per the ModLoader instructions
+* Patch your `minecraft.jar` with ModLoader per ModLoader's instructions
 
 ### 3. Setup MCP
 
@@ -31,7 +33,7 @@ Note: The 'mcp' directory name at the end of the git clone command is just to av
 
 ### 4. Update Eclipse Project
 
-Add the jars in `mcp/lib` to the `eclipse/Client/.classpath` :
+Add the jars in `mcp/lib` to the Eclipse client project.  You can either use Eclipse to modify the build path, or you can add these lines in the `eclipse/Client/.classpath` file:
 
     <classpathentry kind="lib" path="lib/servlet.jar"/>
     <classpathentry kind="lib" path="lib/servlet-2-3.jar"/>
@@ -61,3 +63,9 @@ The result will be in `journeymap/dist/JourneyMap*.zip`
 * Use a ModLoader-patched `minecraft.jar` in Minecraft
 * Copy the `JourneyMap*.zip` to your `.minecraft/mods` folder
 * Run Minecraft.  You should see an announcement in the chat window that JourneyMap is running.
+
+[1]: https://bitbucket.org/mwoodman/journeymap
+[2]: http://journeymap.techbrew.net
+[3]: http://minecraft.net
+[4]: http://www.minecraftforum.net/topic/75440-v146-risugamis-mods-updated/
+[5]: http://mcp.ocean-labs.de/index.php/Main_Page
