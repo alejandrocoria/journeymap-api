@@ -18,6 +18,7 @@
 * Check out the JourneyMap GIT repo into your MCP directory.  For example:
 
     `cd mcp`
+    
     `git clone https://mwoodman@bitbucket.org/mwoodman/journeymap.git`
 
 ## Compile in Eclipse (for development)
@@ -25,10 +26,15 @@
 * Add the jars in mcp/lib to the eclipse/Client/.classpath
 
     `<classpathentry kind="lib" path="lib/servlet.jar"/>`
+    
     `<classpathentry kind="lib" path="lib/servlet-2-3.jar"/>`
+    
     `<classpathentry kind="lib" path="lib/war.jar"/>`
+    
     `<classpathentry kind="lib" path="lib/webserver.jar"/>`
+    
     `<classpathentry kind="lib" path="lib/YUIAnt.jar"/>`
+    
     `<classpathentry kind="lib" path="lib/yuicompressor-2.4.6.jar"/>`
     
 
