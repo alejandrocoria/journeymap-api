@@ -17,15 +17,13 @@
 
 * Check out the JourneyMap GIT repo into your MCP directory.  For example:
 
-    :::coffeescript
     cd mcp
     git clone https://mwoodman@bitbucket.org/mwoodman/journeymap.git
-		
+    
 ## Compile in Eclipse (for development)
 
 * Add the jars in mcp/lib to the eclipse/Client/.classpath
 
-    :::coffeescript
     <classpathentry kind="lib" path="lib/servlet.jar"/>            
     <classpathentry kind="lib" path="lib/servlet-2-3.jar"/>        
     <classpathentry kind="lib" path="lib/war.jar"/>                
@@ -47,13 +45,12 @@
 
 * The Ant build script will invoke MCP scripts and do the assembly magic:
 
-    :::coffeescript
     ant -f journeymap/build.xml
-		
-* The result will be in journeymap/dist/JourneyMap*.zip
+    
+* The result will be in `journeymap/dist/JourneyMap*.zip`
 
 ### Test it in Minecraft
 
 * Use a ModLoader-patched minecraft.jar
-* Copy the JourneyMap.zip to your .minecraft/mods folder
+* Copy the JourneyMap.zip to your `.minecraft/mods` folder
 * Run Minecraft.  You should see an announcement in the chat window that JourneyMap is running.
