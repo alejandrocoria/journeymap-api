@@ -17,8 +17,8 @@
 
 * Check out the JourneyMap GIT repo into your MCP directory.  For example:
 
-    cd mcp
-    git clone https://mwoodman@bitbucket.org/mwoodman/journeymap.git
+    'cd mcp'
+    'git clone https://mwoodman@bitbucket.org/mwoodman/journeymap.git'
 
 ## Compile in Eclipse (for development)
 
