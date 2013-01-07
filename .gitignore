@@ -1,7 +1,12 @@
 bin/
 conf/
 docs/
-eclipse/
+eclipse/.metadata
+eclipse/Client/.settings/
+eclipse/Client/bin/
+eclipse/Client/*.*
+!eclipse/Client/build.xml
+eclipse/Server*/
 jars/
 journeymap/build/
 journeymap/dist/

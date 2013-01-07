@@ -1,6 +1,6 @@
 # [JourneyMap for Minecraft][1]
 
-Source code and build resources for [JourneyMap][2] ([http://journeymap.techbrew.net])
+Source code and build resources for [JourneyMap][2] ([http://journeymap.techbrew.net][2])
 
 ## Requirements
 
@@ -50,13 +50,11 @@ Add the jars in `mcp/lib` to the Eclipse client project.  You can either use Ecl
 * Update `src/minecraft/net/techbrew/mcjm/JourneyMap.java` version info
 * Update `src/minecraft/net/techbrew/changelog.txt`
 
-### 2. Build using Ant
+### 2. Build using Ant from Eclipse
 
-The Ant build script will invoke MCP scripts and do the assembly magic:
+Using Eclipse, run the build.xml script in the Client project.  It will invoke the MCP recompile scripts and do the assembly magic to package the mod into a .zip file for distrobution.
 
-    ant -f journeymap/build.xml
-
-The result will be in `journeymap/dist/JourneyMap*.zip`
+The end result will be in `journeymap/dist/JourneyMap*.zip`
 
 ### 3. Test it in Minecraft
 
