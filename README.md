@@ -9,20 +9,29 @@
 
 ## Environment Setup
 
+### 1. Download JourneyMap source
+
+Check out the JourneyMap GIT repo to what will become your MCP workspace.  For example:
+
+    git clone https://mwoodman@bitbucket.org/mwoodman/journeymap.git mcp
+    
+Note: The 'mcp' directory name at the end of the git clone command is just to avoid having 'journeymap/journeymap' in your project structure, and serves as a reminder where the MCP files need to go.
+    
+### 2. Patch Minecraft with Modloader
+
 * Patch your `minecraft.jar` with ModLoader per the ModLoader instructions
-* Get a working MCP environment running using a ModLoader-patched `minecraft.jar`
-* Run the MCP decompile script
 
-## Download JourneyMap source
+### 3. Setup MCP
 
-Check out the JourneyMap GIT repo into your MCP directory.  For example:
+* Download and unzip the MCP zip.  
+* Put the contents of the MCP root directory (like mcp795) into the `mcp` directory where you cloned the Git repo
+* Copy the minecraft jars in `mcp/jars` per the usual MCP instructions
+* Run `mcp/update.bat' (or .sh)
+* Run `mcp/decompile.bat' (or .sh)
 
-    cd mcp
-    git clone https://mwoodman@bitbucket.org/mwoodman/journeymap.git
+### 4. Update Eclipse Project
 
-## Compile in Eclipse (for development)
-
-Add the jars in mcp/lib to the eclipse/Client/.classpath
+Add the jars in `mcp/lib` to the `eclipse/Client/.classpath` :
 
     <classpathentry kind="lib" path="lib/servlet.jar"/>
     <classpathentry kind="lib" path="lib/servlet-2-3.jar"/>
@@ -33,13 +42,13 @@ Add the jars in mcp/lib to the eclipse/Client/.classpath
 
 ## Build the distributable JourneyMap.zip mod
 
-### Checklist before you build
+### 1. Checklist before you build
 
 * Update `journeymap/build.xml` version info
 * Update `src/minecraft/net/techbrew/mcjm/JourneyMap.java` version info
 * Update `src/minecraft/net/techbrew/changelog.txt`
 
-### Build using Ant
+### 2. Build using Ant
 
 The Ant build script will invoke MCP scripts and do the assembly magic:
 
@@ -47,7 +56,7 @@ The Ant build script will invoke MCP scripts and do the assembly magic:
 
 The result will be in `journeymap/dist/JourneyMap*.zip`
 
-### Test it in Minecraft
+### 3. Test it in Minecraft
 
 * Use a ModLoader-patched `minecraft.jar` in Minecraft
 * Copy the `JourneyMap*.zip` to your `.minecraft/mods` folder
