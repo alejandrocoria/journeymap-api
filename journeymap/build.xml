@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JourneyMap" basedir="." default="all">
+   <property name="mcp.dir" location="../" />
+   <property name="dist.dir" location="dist" />
+   <property name="build.dir" location="build" />
+   <property name="version" value="1.9.1_MC1.4.6" />
+
+   <property name="python" location="${mcp.dir}/runtime/bin/python/python_mcp.exe" />
+
+   <target name="init">
+      <echo message="Cleaning old build and dist, reobf" />
+      <delete dir="${build.dir}" />
+      <delete dir="${dist.dir}" />
+      <delete dir="${mcp.dir}/reobf" />
+      
+      <echo message="Creating build and dist dirs" />
+      <mkdir dir="${build.dir}" />
+      <mkdir dir="${dist.dir}" />
+      
+   </target>
+   
+   <target name="recompile" >
+      <exec executable="${python}" dir="${mcp.dir}">
+          <arg value="runtime/recompile.py"/>
+          <arg value="%*"/>
+      </exec>
+   </target>
+   
+   <target name="reobfuscate">
+      <exec executable="${python}" dir="${mcp.dir}">
+          <arg value="runtime/reobfuscate.py"/>
+          <arg value="%*"/>
+      </exec>
+   </target>
+   
+   <target name="stage">
+      <copy todir="${build.dir}" failonerror="false">
+         <fileset dir="${mcp.dir}/reobf/minecraft" excludes=".svn/**, *.txt" />
+      </copy>
+      <copy todir="${build.dir}" failonerror="true" verbose="true">
+	 <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/" includes="changelog.txt" />
+      </copy>
+      <copy todir="${build.dir}/net/techbrew/mcjm" failonerror="true" verbose="true">
+         <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/mcjm" includes="*.properties" />
+      </copy>
+      <copy todir="${build.dir}/net/techbrew/mcjm/web" failonerror="true">
+         <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/mcjm/web" excludes=".svn/**" />
+      </copy>
+   </target>
+   
+   <target name="all" description="All" depends="init, recompile, reobfuscate, stage, minify, jarzip">
+      <echo message="Done!" />
+      <input/>
+   </target>
+
+   <target name="minify" description="Minifiy a set of files">
+      <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
+         <classpath>
+            <pathelement path="${mcp.dir}/lib/yuicompressor-2.4.6.jar" />
+            <pathelement path="${mcp.dir}/lib/YUIAnt.jar" />
+         </classpath>
+      </taskdef>
+      <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
+         outputfolder="${build.dir}/net/techbrew/mcjm/web">
+         <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/mcjm/web" >
+            <include name="journeyMap.js" />
+            <include name="default.css" />
+         </fileset>
+      </yuicompress>
+   </target>
+
+   <target name="jarzip">
+      <mkdir dir="${dist.dir}" />
+      <delete dir="${dist.dir}/JourneyMap${version}.zip" />
+      <jar destfile="${dist.dir}/JourneyMap${version}.zip" duplicate="preserve" index="true" manifestencoding="UTF-8">
+         <manifest>
+            <attribute name="Built-By" value="Mark Woodman"/>
+            <attribute name="Implementation-Vendor" value="TechBrew.net"/>
+            <attribute name="Implementation-Title" value="JourneyMap"/>
+            <attribute name="Implementation-Version" value="${version}"/>
+         </manifest>
+         <fileset dir="${build.dir}" />
+         <zipfileset src="lib/servlet-2-3.jar" />
+         <zipfileset src="lib/servlet.jar" />         
+         <zipfileset src="lib/war.jar" />
+         <zipfileset src="lib/webserver.jar" />
+      </jar>
+   </target>
+</project>

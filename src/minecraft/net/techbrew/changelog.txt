@@ -1,0 +1,28 @@
+JourneyMap 1.9.1 for Minecraft 1.4.6 (December 22, 2012)
+http://journeymap.techbrew.net
+
+Requirements:
+
+- Minecraft 1.4.6
+- ModLoader 1.4.6
+
+Changes since JourneyMap 1.9 for Minecraft 1.9:
+
+- Recompiled for newer Minecraft version
+- Added support for technical biomes (edges, frozen, etc.) 
+- Added support for blocks: netherbrick slabs, command blocks, beacon blocks, anvils, flower pots, cobblestone walls, all upside-down slabs
+- Wood colors now correctly differentiated when rotated
+- Jungle wood (logs) is now slightly darker than oak
+
+Known issues:
+
+- Changing the cave lighting property has no effect
+- Beacon blocks are not shown
+- Not fully compatible with some custom block mods
+- Bug (Tracking ID AW2-6EE-Z3QB): Maps overwrite on multi-world servers because the world seed is no longer provided by the MC server
+
+Translations added: 
+
+- None
+
+  Can you provide a new translation for JourneyMap?  http://journeymap.techbrew.net/news/translation-volunteers-needed/

@@ -1,0 +1,92 @@
+<html>
+  <head>
+   <title>JourneyMap</title>
+   <link rel="stylesheet" type="text/css" href="default.css">
+   <script type="text/javascript" src="jquery.tools.min.js"></script>
+   <script type="text/javascript" src="jquery-ui-1.8.16.custom.min.js"></script>
+   <script type="text/javascript" src="/msg"></script>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <script type="text/javascript">
+	   $('<link>',{
+		    rel: 'alternate',
+		    type: 'application/rss+xml',
+		    title: JML10N.rss_feed_title,
+		    href: 'http://feeds.feedburner.com/JourneyMap'
+		}).appendTo('head');
+   </script>
+   </head>
+  <body>
+     
+   <!--[if IE]>
+   <script type="text/javascript">
+   document.write("<h1>" + JML10N.bad_browser_title + "</h1>");
+   document.write(JML10N.bad_browser);
+   var badBrowser=true
+   </script>
+   <![endif]-->
+   <noscript>
+   <h1>JavaScript Disabled?</h1>
+   Your browser doesn't support JavaScript or you have disabled JavaScript. 
+   Please use the latest version of Chrome, Firefox, or Safari with JavaScript enabled.
+   </noscript>
+   
+   <canvas id="mapCanvas"></canvas>
+   
+   <div id="menuBarBg"></div>
+   <div id="menuBar">     
+     
+     <div id="logo"></div>
+     
+     <div id="toolbar">
+        <img id="dayButton" src="sun.png" onclick="setMapType('day',true)" />
+        <img id="nightButton" src="moon.png" onclick="setMapType('night',true)" />
+        <img src="pixel.png" width="10px;" height="48px;">
+        <img id="caveButton" src="cave.png" onclick="setShowCaves(!showCaves);" />
+        <img id="monstersButton" src="Ghast.png" height="40px;" onclick="setShowMonsters(!showMonsters);" /> 
+        <img src="pixel.png" width="10px;" height="48px;">
+        <img id="followButton" src="follow.png" onclick="setCenterOnPlayer(!centerOnPlayer);refreshData();" />
+               
+     </div> 
+
+     <div id="infoBar">
+        <a target="_new" href="http://journeymap.techbrew.net/download/" style="visibility:hidden;text-decoration:none">
+            <img id="versionButton" style="height:32px" src="alert.png"  />
+        </a>  
+        <a onclick="saveMapImage();" style="text-decoration:none">
+            <img id="saveButton" style="height:32px" src="save.png"  />
+        </a>  
+        <a href="http://journeymap.techbrew.net/about/credits/" target="_new" style="text-decoration:none">
+            <img id="aboutButton" style="height:32px" src="about.png"  />
+        </a>               
+     </div>  
+     
+   </div>
+    
+   <div id="worldNameHeader"></div>
+   <div id="worldInfo"></div>   
+    
+   <div id="footer">
+    <div>
+        <a target="_new" href="http://journeymap.techbrew.net">JourneyMap <span id="version"></span></a> &copy; 2011-2012 <a href="http://techbrew.net">TechBrew.net</a> &nbsp; &nbsp;
+		<script type="text/javascript">
+		   document.write('<a target="_blank" title="' + JML10N.rss_feed_desc + '" href="http://feeds.feedburner.com/JourneyMap">');
+	       document.write('<img src="feed-icon16x16.png" alt=""></a>');
+	       document.write('<a target="_blank" title="' + JML10N.email_sub_desc + '" href="http://feedburner.google.com/fb/a/mailverify?uri=Journeymap">');
+           document.write('<img src="email.gif" alt=""></a>');
+           document.write('<a target="_blank" title="' + JML10N.follow_twitter + '" href="https://twitter.com/intent/follow?original_referer=localhost&region=follow_link&screen_name=JourneyMapMod&source=followbutton&variant=2.0">');
+           document.write('<img src="twitter.png" alt=""></a>');
+		</script></div>
+   </div>
+   
+   <div class="apple_overlay" id="overlay">
+        <div class="contentWrap"></div>
+   </div>
+   
+   <script type="text/javascript">
+           document.write('<div id="slider-vertical" title="' + JML10N.zoom_slider_name + '"></div>');
+   </script>
+    
+   <script type="text/javascript" src="journeyMap.js"></script>
+
+  </body>
+</html>
