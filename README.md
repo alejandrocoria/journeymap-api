@@ -33,14 +33,9 @@ Note: The 'mcp' directory name at the end of the git clone command is just to av
 
 ### 4. Update Eclipse Project
 
-Add the jars in `mcp/lib` to the Eclipse client project.  You can either use Eclipse to modify the build path, or you can add these lines in the `eclipse/Client/.classpath` file:
-
-    <classpathentry kind="lib" path="lib/servlet.jar"/>
-    <classpathentry kind="lib" path="lib/servlet-2-3.jar"/>
-    <classpathentry kind="lib" path="lib/war.jar"/>
-    <classpathentry kind="lib" path="lib/webserver.jar"/>
-    <classpathentry kind="lib" path="lib/YUIAnt.jar"/>
-    <classpathentry kind="lib" path="lib/yuicompressor-2.4.6.jar"/>
+* Open Eclipse using `mcp/eclipse` as your workspace.
+* Open the Client Project and select "Build Path -> Configure Build Path ..."
+* In the Libraries section, add the External JARS located in `mcp/lib`.
 
 ## Build the distributable JourneyMap.zip mod
 
