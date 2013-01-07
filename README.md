@@ -17,21 +17,21 @@
 
 * Check out the JourneyMap GIT repo into your MCP directory.  For example:
 
-	:::python
-		cd mcp
-		git clone https://mwoodman@bitbucket.org/mwoodman/journeymap.git
+    :::python
+        cd mcp
+        git clone https://mwoodman@bitbucket.org/mwoodman/journeymap.git
 		
 ## Compile in Eclipse (for development)
 
 * Add the jars in mcp/lib to the eclipse/Client/.classpath
 
-	:::python
-		<classpathentry kind="lib" path="lib/servlet.jar"/>            
-		<classpathentry kind="lib" path="lib/servlet-2-3.jar"/>        
-		<classpathentry kind="lib" path="lib/war.jar"/>                
-		<classpathentry kind="lib" path="lib/webserver.jar"/>          
-		<classpathentry kind="lib" path="lib/YUIAnt.jar"/>             
-		<classpathentry kind="lib" path="lib/yuicompressor-2.4.6.jar"/>
+    :::python
+        <classpathentry kind="lib" path="lib/servlet.jar"/>            
+        <classpathentry kind="lib" path="lib/servlet-2-3.jar"/>        
+        <classpathentry kind="lib" path="lib/war.jar"/>                
+        <classpathentry kind="lib" path="lib/webserver.jar"/>          
+        <classpathentry kind="lib" path="lib/YUIAnt.jar"/>             
+        <classpathentry kind="lib" path="lib/yuicompressor-2.4.6.jar"/>
 
 * Update JourneyMap source files as needed to compile with latest decompiled Minecraft + Modloader code
 
@@ -47,8 +47,8 @@
 
 * The Ant build script will invoke MCP scripts and do the assembly magic:
 
-	:::python
-		ant -f journeymap/build.xml
+    :::python
+        ant -f journeymap/build.xml
 		
 * The result will be in journeymap/dist/JourneyMap*.zip
 
