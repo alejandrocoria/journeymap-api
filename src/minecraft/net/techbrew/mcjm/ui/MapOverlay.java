@@ -58,6 +58,7 @@ import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.io.ChunkFileHandler;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
+import net.techbrew.mcjm.io.PlayerDataFileHandler;
 import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.render.MapBlocks;
@@ -862,11 +863,7 @@ public class MapOverlay extends GuiScreen {
 			lastEntityUpdate = System.currentTimeMillis();
 
 			// Update data
-			String biomeName = "?";
-			ChunkStub playerChunk = JourneyMap.getLastPlayerChunk();
-			if(playerChunk!=null) {
-				biomeName = playerChunk.getBiomeGenForWorldCoords((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, mc.theWorld.getWorldChunkManager()).biomeName;
-			}
+			String biomeName = PlayerDataFileHandler.getPlayerBiome(mc);
 			
 			long vslice = Math.round(mc.thePlayer.posY) >> 4;
 			String playerPos = Constants.getString("MapOverlay.player_location", 

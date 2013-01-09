@@ -62,6 +62,24 @@ public class PlayerDataFileHandler {
 		
 	}
 	
+	/**
+	 * Get the biome name where the player is standing.
+	 * 
+	 * @param player
+	 * @return
+	 */
+	public static String getPlayerBiome(Minecraft mc) {
+		EntityPlayerSP player = mc.thePlayer;
+		int x = ((int) Math.floor(player.posX) % 16) & 15;
+		int z = ((int) Math.floor(player.posZ) % 16) & 15;
+		String biomeName = "?";
+		ChunkStub playerChunk = JourneyMap.getLastPlayerChunk();
+		if(playerChunk!=null) {
+			biomeName = playerChunk.getBiomeGenForWorldCoords(x,z, mc.theWorld.getWorldChunkManager()).biomeName;
+		}
+		return biomeName;
+	}
+	
 	private static String getPlayerData(Minecraft mc, String worldDirName, boolean underground) {
 		
 		EntityPlayerSP player = mc.thePlayer;
@@ -117,11 +135,7 @@ public class PlayerDataFileHandler {
 		sb.append("worldTime='").append(ticks).append("';").append('\n'); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// biome
-		String biomeName = "?";
-		ChunkStub playerChunk = JourneyMap.getLastPlayerChunk();
-		if(playerChunk!=null) {
-			biomeName = playerChunk.getBiomeGenForWorldCoords((int) player.serverPosX, (int) player.serverPosZ, mc.theWorld.getWorldChunkManager()).biomeName;
-		}
+		String biomeName = getPlayerBiome(mc);
 		
 		// player
 		sb.append("player={chunkCoordX:").append(Integer.toString(player.chunkCoordX)) //$NON-NLS-1$
