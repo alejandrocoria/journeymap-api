@@ -4,20 +4,30 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLDecoder;
+import java.nio.channels.Channel;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.Map;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import se.rupy.http.Event;
+import se.rupy.http.Output;
+import se.rupy.http.Query;
+import se.rupy.http.Service;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.ModLoader;
@@ -34,17 +44,13 @@ import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.render.ChunkRenderer;
 import net.techbrew.mcjm.ui.ZoomLevel;
-import Acme.Utils;
 
-// Referenced classes of package Acme.Serve:
-//            ThrottleItem, ThrottledOutputStream
 
-public class ChunkServlet extends HttpServlet {
+public class ChunkServlet extends BaseService {
 
 	private static final long serialVersionUID = 4412225358529161454L;
 
-	public static final String CHARACTER_ENCODING = "UTF-8"; //$NON-NLS-1$
-	public static final String JSON_CONTENT_TYPE = "application/json"; //$NON-NLS-1$
+	public static final String CHARACTER_ENCODING = "UTF-8"; //$NON-NLS-1$	
 
 	/**
 	 * Serves chunk data and player info.
@@ -52,208 +58,117 @@ public class ChunkServlet extends HttpServlet {
 	public ChunkServlet() {
 		super();
 	}
-
+	
 	@Override
-	public String getServletInfo() {
-		return "Serves chunk data for JourneyMap"; //$NON-NLS-1$
+	public String path() {
+		return "/jm"; //$NON-NLS-1$
 	}
+	
+	
+	
+	@Override
+	public void filter(Event event) throws Event, Exception {
 
-	/**
-	 * Handle all HTTP request method types.
-	 * Only GET and HEAD are used.
-	 */
-	public void service(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {		
-		
-		try {
-			String method = request.getMethod().toLowerCase();
-			if(method.equals("head")) { //$NON-NLS-1$
-				serveData(request, response, true);
-			} else if(method.equals("get")) { //$NON-NLS-1$
-				serveData(request, response, false);
-			} else {
-				String error = Constants.getMessageJMERR14(method); //$NON-NLS-1$
-				JourneyMap.announce(error);
-				JourneyMap.getLogger().warning(error);
-				response.addHeader("Allow", "GET,HEAD"); //$NON-NLS-1$ //$NON-NLS-2$
-				response.sendError(405, error);
-			}
-		} catch(Throwable t) {
-			JourneyMap.getLogger().severe(LogFormatter.toString(t));
-		}
-	}
-
-	/**
-	 * Serves chunk data and/or player data.
-	 * 
-	 * @param request
-	 * @param response
-	 * @param onlyHeaders
-	 * @throws IOException
-	 */
-	private void serveData(HttpServletRequest request,
-			HttpServletResponse response, boolean onlyHeaders)
-			throws IOException {
-
-		response.setCharacterEncoding(CHARACTER_ENCODING);
-		Map<String, String[]> pMap = request.getParameterMap();
+		// Parse query for parameters
+		Query query = event.query();
+		query.parse();
 
 		Minecraft minecraft = Minecraft.getMinecraft();
 		World theWorld = minecraft.theWorld;
 		if (theWorld == null) {
-			response.sendError(503, Constants.getMessageJMERR09());
-			JourneyMap.getLogger().finer(Constants.getMessageJMERR09());
-			return;
+			throwEventException(503, Constants.getMessageJMERR09(), event, false);
 		}
 		
 		// Ensure world is loaded
 		if(!JourneyMap.isRunning()) {
-			response.sendError(503, Constants.getMessageJMERR02());
-			JourneyMap.getLogger().finer(Constants.getMessageJMERR02());
-			return;
+			throwEventException(503, Constants.getMessageJMERR02(), event, false);
 		}
-		
 		
 		File worldDir = FileHandler.getWorldDir(minecraft);
 
 		// Check world requested
-		String worldName = getParameter(pMap, "worldName", null); //$NON-NLS-1$
+		String worldName = getParameter(query, "worldName", null); //$NON-NLS-1$
 		if (worldName == null) {
-			servePlayerData(request, response, worldDir, onlyHeaders);
+			servePlayerData(event, worldDir);
 			if(JourneyMap.getLogger().isLoggable(Level.FINER)) {
-				JourneyMap.getLogger().finer("Request: " + request.getRequestURL()); //$NON-NLS-1$
+				JourneyMap.getLogger().finer("Request: " + event.query().path()); //$NON-NLS-1$
 			}
 			return;
 		}
 		worldName = URLDecoder.decode(worldName, "UTF-8"); //$NON-NLS-1$
 		
 		// Check world type
-		String worldTypeString = getParameter(pMap, "worldType", Constants.WorldType.sp.name()); //$NON-NLS-1$
-		Constants.WorldType worldType;
+		String worldTypeString = getParameter(query, "worldType", Constants.WorldType.sp.name()); //$NON-NLS-1$
+		Constants.WorldType worldType = null;
 		try {
 			worldType = Constants.WorldType.valueOf(worldTypeString);
 		} catch (Exception e) {			
 			String error = Constants.getMessageJMERR05("worldType=" + worldTypeString); //$NON-NLS-1$
-			JourneyMap.announce(error);
-			response.sendError(400, error);
-			JourneyMap.getLogger().warning(error);
-			return;
+			throwEventException(400, Constants.getMessageJMERR09(), event, true);
 		}
 		
 		// Check depth (for underground maps)
-		int depth = getParameter(pMap, "depth", 4); //$NON-NLS-1$
+		int depth = getParameter(event.query(), "depth", 4); //$NON-NLS-1$
 		
 		if(!worldName.equals(URLDecoder.decode(FileHandler.getSafeName(ModLoader.getMinecraftInstance())))) {
 			String error = Constants.getMessageJMERR10("worldType=" + worldType); //$NON-NLS-1$
-			response.sendError(503, error);
-			JourneyMap.announce(error);
-			JourneyMap.getLogger().warning(error);
-			return;
+			throwEventException(503, Constants.getMessageJMERR09(), event, true);
 
 		}  else if (!worldDir.exists() || !worldDir.isDirectory()) {
 			String error = Constants.getMessageJMERR06("worldDir=" + worldDir.getAbsolutePath()); //$NON-NLS-1$
-			response.sendError(400, error);
-			JourneyMap.announce(error);
-			JourneyMap.getLogger().warning(error);
-			return;
+			throwEventException(400, Constants.getMessageJMERR09(), event, true);
 		}
 		
 		// Read coordinate pairs
 		try {
-			int x1 = getParameter(pMap, "x1", 0); //$NON-NLS-1$
-			int z1 = getParameter(pMap, "z1", 0); //$NON-NLS-1$
-			int x2 = getParameter(pMap, "x2", x1); //$NON-NLS-1$
-			int z2 = getParameter(pMap, "z2", z1); //$NON-NLS-1$
-			int width = getParameter(pMap, "width", 100); //$NON-NLS-1$
-			int height = getParameter(pMap, "height", 100); //$NON-NLS-1$
-			int worldProviderType = getParameter(pMap, "worldProviderType", 0);  //$NON-NLS-1$
-			String mapTypeString = getParameter(pMap, "mapType", Constants.MapType.day.name()); //$NON-NLS-1$
+			int x1 = getParameter(query, "x1", 0); //$NON-NLS-1$
+			int z1 = getParameter(query, "z1", 0); //$NON-NLS-1$
+			int x2 = getParameter(query, "x2", x1); //$NON-NLS-1$
+			int z2 = getParameter(query, "z2", z1); //$NON-NLS-1$
+			int width = getParameter(query, "width", 100); //$NON-NLS-1$
+			int height = getParameter(query, "height", 100); //$NON-NLS-1$
+			int worldProviderType = getParameter(query, "worldProviderType", 0);  //$NON-NLS-1$
+			String mapTypeString = getParameter(query, "mapType", Constants.MapType.day.name()); //$NON-NLS-1$
 			Constants.MapType mapType = null;
 			try {
 				mapType = Constants.MapType.valueOf(mapTypeString);
 			} catch (Exception e) {
 				String error = Constants.getMessageJMERR05("mapType=" + mapType); //$NON-NLS-1$
-				JourneyMap.announce(error);
-				response.sendError(400, error);
-				JourneyMap.getLogger().warning(error);
-				return;
+				throwEventException(400, Constants.getMessageJMERR09(), event, true);
 			}
 			
 			if (x1 >= x2 || z1 >= z2) {
 				String error = Constants.getMessageJMERR05("coordinates=" + x1 + "," + z1 + "," + x2 + "," + z2); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-				JourneyMap.announce(error);
-				response.sendError(400, error);
-				JourneyMap.getLogger().warning(error);
-				return;
+				throwEventException(400, Constants.getMessageJMERR09(), event, true);
 			} else {
-				response.setHeader("Cache-Control","no-cache"); //HTTP 1.1 //$NON-NLS-1$ //$NON-NLS-2$
-				response.setHeader("Pragma","no-cache"); //HTTP 1.0 //$NON-NLS-1$ //$NON-NLS-2$
-				response.setDateHeader ("Expires", 0); //prevents caching at the proxy server				 //$NON-NLS-1$
-				response.setContentType("image/png"); //$NON-NLS-1$
-				mergeImageChunks(request, response, worldDir, x1, z1, x2, z2, mapType, depth, worldProviderType, width, height);
+				ResponseHeader.on(event).noCache().contentType(ContentType.png);
+				mergeImageChunks(event, worldDir, x1, z1, x2, z2, mapType, depth, worldProviderType, width, height);
 			}
 		} catch (NumberFormatException e) {
-			reportMalformedRequest(request, response);
+			reportMalformedRequest(event);
 		} finally {
 
 		}
 
-		
-
 	}
 
-	private void reportMalformedRequest(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-		String error = Constants.getMessageJMERR05("queryString=" + request.getQueryString()); //$NON-NLS-1$
-		JourneyMap.announce(error);
-		JourneyMap.getLogger().severe(error);
-		response.sendError(400, error);
-	}
-
-	private String getParameter(Map<String, String[]> map, String key,
-			String defaultValue) {
-		if (map.containsKey(key)) {
-			return map.get(key)[0];
-		} else {
-			return defaultValue;
-		}
-	}
-
-	private int getParameter(Map<String, String[]> map, String key,
-			int defaultValue) {
-		if (map.containsKey(key)) {
-			return Integer.parseInt(map.get(key)[0]);
-		} else {
-			return defaultValue;
-		}
-	}
-
-	private void servePlayerData(HttpServletRequest request,
-			HttpServletResponse response, File worldDir, boolean onlyHeaders) throws IOException {
-
+	/**
+	 * Respond with the player data file.
+	 * @param event
+	 * @param worldDir
+	 * @throws Event
+	 * @throws IOException
+	 */
+	private void servePlayerData(Event event, File worldDir) throws Event, IOException {
 		File playerFile = PlayerDataFileHandler.getPlayerFile(ModLoader.getMinecraftInstance());
-		if (playerFile!=null && playerFile.exists() && playerFile.canRead()) {
-			response.setStatus(200);
-			response.setContentType(JSON_CONTENT_TYPE);
-			response.setHeader("Cache-Control", "no-cache"); //$NON-NLS-1$ //$NON-NLS-2$
-			response.addDateHeader("Last-Modified", playerFile.lastModified()); //$NON-NLS-1$
-			response.setHeader("Content-Length", Long.toString(playerFile.length())); //$NON-NLS-1$
-			if(!onlyHeaders) {
-				FileInputStream fs = new FileInputStream(playerFile);
-				Utils.copyStream(fs, response.getOutputStream(), 0);
-				fs.close();
-			}
+		if (playerFile!=null && playerFile.exists() && playerFile.canRead()) {			
+			ResponseHeader.on(event).noCache();
+			FileServlet.serveFile(playerFile, event);
 		} else {
-			String error = Constants.getMessageJMERR11(playerFile);
-			//JourneyMap.announce(error);
-			JourneyMap.getLogger().log(Level.WARNING, error);
-			response.sendError(400, error);
-			return;
+			throwEventException(400, Constants.getMessageJMERR11(playerFile), event, false);
 		}
-
-		response.getOutputStream().flush();
-		response.getOutputStream().close();
 	}
+	
 
 	/**
 	 * Used by ChunkServlet to put chunk images together into what the browser needs.
@@ -268,8 +183,7 @@ public class ChunkServlet extends HttpServlet {
 	 * @param depth
 	 * @throws IOException
 	 */
-	private static synchronized void mergeImageChunks(HttpServletRequest request,
-			HttpServletResponse response, File worldDir, int x1, int z1,
+	private static synchronized void mergeImageChunks(Event event, File worldDir, int x1, int z1,
 			int x2, int z2, Constants.MapType mapType, int depth, int worldProviderType, int canvasWidth, int canvasHeight)
 			throws IOException {
 		
@@ -281,12 +195,10 @@ public class ChunkServlet extends HttpServlet {
 		}
 		
 		// Headers
-		response.setStatus(200);
-		response.setContentType("image/png"); //$NON-NLS-1$
-		response.setHeader("Content-Disposition", "inline; filename=\"jm.png\"");	 //$NON-NLS-1$ //$NON-NLS-2$
+		event.reply().header("Content-Type:","image/png"); //$NON-NLS-1$
+		event.reply().header("Content-Disposition", "inline; filename=\"jm.png\"");	 //$NON-NLS-1$ //$NON-NLS-2$
 
-		OutputStream out = response.getOutputStream();
-		ImageOutputStream ios = ImageIO.createImageOutputStream(out);
+		ImageOutputStream ios = ImageIO.createImageOutputStream(event.output());
 		BufferedImage mergedImg = RegionFileHandler.getMergedChunks(worldDir, x1, z1, x2, z2, mapType, depth, cType, false, 
 				new ZoomLevel(1F, 1, false, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
 		

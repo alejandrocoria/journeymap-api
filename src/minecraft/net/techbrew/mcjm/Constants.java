@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.TimeZone;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.ModLoader;
@@ -20,18 +21,23 @@ public class Constants {
 	public static String DATA_DIR = JOURNEYMAP_DIR + "data" + File.separator; //$NON-NLS-1$
 	public static String SP_DATA_DIR = DATA_DIR + WorldType.sp + File.separator;
 	public static String MP_DATA_DIR = DATA_DIR + WorldType.mp + File.separator;
-	public static String PLAYER_LOC_FILE = "player.data"; //$NON-NLS-1$
+	public static String PLAYER_LOC_FILE = "player.js"; //$NON-NLS-1$
 	public static String CHUNK_FILE_EXT = "chunk"; //$NON-NLS-1$
 	
 	private static final String BUNDLE_NAME = "net.techbrew.mcjm.messages"; //$NON-NLS-1$
 	
-
-	private static ResourceBundle getResourceBundle() {
+	public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
+	
+	public static Locale getLocale() {
 		String language = Minecraft.getMinecraft().gameSettings.language;
 		if(language==null) {
 			language = Locale.getDefault().toString();
 		}
-		return ResourceBundle.getBundle(BUNDLE_NAME, new Locale(language));
+		return new Locale(language);
+	}
+
+	private static ResourceBundle getResourceBundle() {
+		return ResourceBundle.getBundle(BUNDLE_NAME, getLocale());
 	}
 	
 	public static Set<String> getBundleKeys() {

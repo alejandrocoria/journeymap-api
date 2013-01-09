@@ -2,7 +2,7 @@
 <project name="JourneyMap" basedir="../.." default="all">
 
   <!-- Update when new version is going to be released -->
-  <property name="version" value="1.9.1_MC1.4.6" />
+  <property name="version" value="2.0_MC1.4.6" />
 
   <property name="mcp.dir" location="${basedir}" />
   <property name="journeymap.dir" location="${mcp.dir}/journeymap" />
@@ -85,10 +85,6 @@
         <attribute name="Implementation-Version" value="${version}"/>
       </manifest>
       <fileset dir="${build.dir}" />
-      <zipfileset src="lib/servlet-2-3.jar" />
-      <zipfileset src="lib/servlet.jar" />
-      <zipfileset src="lib/war.jar" />
-      <zipfileset src="lib/webserver.jar" />
     </jar>
   </target>
 </project>

@@ -56,11 +56,11 @@ import org.lwjgl.input.Keyboard;
  */
 public class JourneyMap extends BaseMod {
 
-	/** http://dl.dropbox.com/u/38077766/JourneyMap/journeymap-version.js?client-version=JM1.9.1_MC1.4.6 */
-	static final String VERSION_URL = "http://goo.gl/jnI62"; //$NON-NLS-1$
+	/** http://dl.dropbox.com/u/38077766/JourneyMap/journeymap-version.js?client-version=JM2.0_MC1.4.6 */
+	static final String VERSION_URL = "http://goo.gl/xo4CR"; //$NON-NLS-1$
 	
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-	public static final String JM_VERSION = "1.9.1"; //$NON-NLS-1$
+	public static final String JM_VERSION = "2.0"; //$NON-NLS-1$
 	public static final String ML_VERSION = "ModLoader 1.4.6"; //$NON-NLS-1$
 	public static final String MC_VERSION = "1.4.6"; //$NON-NLS-1$
 
@@ -258,7 +258,9 @@ public class JourneyMap extends BaseMod {
 				getLogger().finer("Player chunk not known: " + (player.chunkCoordX) + "," +(player.chunkCoordZ));
 				return true;
 			} else {
-				lastPlayerChunk = new ChunkStub(pChunk, true, minecraft.theWorld, lastHash);
+				if(lastPlayerChunk==null || (player.chunkCoordX!=lastPlayerChunk.xPosition || player.chunkCoordZ!=lastPlayerChunk.zPosition)) {
+					lastPlayerChunk = new ChunkStub(pChunk, true, minecraft.theWorld, lastHash);
+				}				
 			}
 			
 			// We got this far
