@@ -121,6 +121,23 @@ public class ChunkStub {
             return 0;
         }
     }
+    
+    /**
+     * This method retrieves the biome at a set of coordinates
+     */
+    public BiomeGenBase getBiomeGenForWorldCoords(int par1, int par2, WorldChunkManager par3WorldChunkManager)
+    {
+        int var4 = this.blockBiomeArray[par2 << 4 | par1] & 255;
+
+        if (var4 == 255)
+        {
+            BiomeGenBase var5 = par3WorldChunkManager.getBiomeGenAt((this.xPosition << 4) + par1, (this.zPosition << 4) + par2);
+            var4 = var5.biomeID;
+            this.blockBiomeArray[par2 << 4 | par1] = (byte)(var4 & 255);
+        }
+
+        return BiomeGenBase.biomeList[var4] == null ? BiomeGenBase.plains : BiomeGenBase.biomeList[var4];
+    }
 	
 	/**
      * Return the metadata corresponding to the given coordinates inside a chunk.

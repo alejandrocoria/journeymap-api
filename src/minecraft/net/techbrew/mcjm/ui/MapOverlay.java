@@ -46,6 +46,7 @@ import net.minecraft.src.GuiSmallButton;
 import net.minecraft.src.MathHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.Tessellator;
+import net.techbrew.mcjm.ChunkStub;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.EntityHelper;
 import net.techbrew.mcjm.JourneyMap;
@@ -861,14 +862,19 @@ public class MapOverlay extends GuiScreen {
 			lastEntityUpdate = System.currentTimeMillis();
 
 			// Update data
-			String playerLastBiome = JourneyMap.getLastPlayerChunk().biomeName;
+			String biomeName = "?";
+			ChunkStub playerChunk = JourneyMap.getLastPlayerChunk();
+			if(playerChunk!=null) {
+				biomeName = playerChunk.getBiomeGenForWorldCoords((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, mc.theWorld.getWorldChunkManager()).biomeName;
+			}
+			
 			long vslice = Math.round(mc.thePlayer.posY) >> 4;
 			String playerPos = Constants.getString("MapOverlay.player_location", 
-					Long.toString((long)Math.floor(mc.thePlayer.posX)), 
-					Long.toString((long)Math.floor(mc.thePlayer.posZ)), 
-					Long.toString((long)Math.floor(mc.thePlayer.posY)), 
+					Integer.toString((int) mc.thePlayer.posX), 
+					Integer.toString((int) mc.thePlayer.posZ), 
+					Integer.toString((int) mc.thePlayer.posY), 
 					vslice, 
-					playerLastBiome); //$NON-NLS-1$ 
+					biomeName); //$NON-NLS-1$ 
 			if(!playerPos.equals(playerLastPos)) {
 				playerLastPos = playerPos;
 			}

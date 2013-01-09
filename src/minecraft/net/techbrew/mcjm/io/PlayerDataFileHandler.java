@@ -119,8 +119,8 @@ public class PlayerDataFileHandler {
 		String biomeName = "?";
 		ChunkStub playerChunk = JourneyMap.getLastPlayerChunk();
 		if(playerChunk!=null) {
-			biomeName = playerChunk.biomeName;
-		}		
+			biomeName = playerChunk.getBiomeGenForWorldCoords((int) player.serverPosX, (int) player.serverPosZ, mc.theWorld.getWorldChunkManager()).biomeName;
+		}
 		
 		// player
 		sb.append("player={chunkCoordX:").append(Integer.toString(player.chunkCoordX)) //$NON-NLS-1$
@@ -145,9 +145,9 @@ public class PlayerDataFileHandler {
 					Entity mob = (Entity)mobIter.next();
 					if(EntityHelper.entityMap.containsKey(mob.getClass())) {
 						sb.append("{type:'").append(EntityHelper.entityMap.get(mob.getClass())).append("',") //$NON-NLS-1$ //$NON-NLS-2$
-						    .append("posX:").append(Integer.toString((int) mob.posX)) //$NON-NLS-1$
+						    .append("posX:").append(Integer.toString(mob.serverPosX)) //$NON-NLS-1$
 							.append(",").append("posZ:") //$NON-NLS-1$ //$NON-NLS-2$
-							.append(Integer.toString((int) mob.posZ)).append("}"); //$NON-NLS-1$
+							.append(Integer.toString(mob.serverPosZ)).append("}"); //$NON-NLS-1$
 						if(mobIter.hasNext()) sb.append(","); //$NON-NLS-1$
 						sb.append("\n"); //$NON-NLS-1$
 					}
