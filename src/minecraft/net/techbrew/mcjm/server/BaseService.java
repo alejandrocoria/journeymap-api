@@ -83,7 +83,7 @@ public abstract class BaseService extends Service {
 			JourneyMap.announce(message);
 			JourneyMap.getLogger().warning(out);
 		} else {
-			JourneyMap.getLogger().info(out);
+			JourneyMap.getLogger().finer(out);
 		}
 		
 		// Set the error code on the response
