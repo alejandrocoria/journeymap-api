@@ -99,15 +99,16 @@ public class PlayerDataFileHandler {
 		Boolean hardcore = worldInfo.isHardcoreModeEnabled();
 		
 		// world
-		String worldName;		
-		if(!mc.isSingleplayer() && mc.getServerData()!=null) {
+		String worldName = "Minecraft";	//$NON-NLS-1$
+		if(mc.isSingleplayer()) {
+			worldName = mc.getIntegratedServer().getWorldName();
+		} else if(mc.getServerData()!=null) {
 			worldName = mc.getServerData().serverName; 
-		} else {		
-			try {
-				worldName = URLEncoder.encode(mc.theWorld.getWorldInfo().getWorldName(), "UTF-8").replaceAll("\\+", " "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			} catch (UnsupportedEncodingException e) {
-				worldName = mc.theWorld.getWorldInfo().getWorldName();
-			}
+		} 
+		try {
+			worldName = URLEncoder.encode(worldName, "UTF-8").replaceAll("\\+", " "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		} catch (UnsupportedEncodingException e) {
+			// Oh well.
 		}
 		sb.append("worldName='"); //$NON-NLS-1$
 		sb.append(worldName).append("';").append('\n'); //$NON-NLS-1$
