@@ -42,19 +42,6 @@ var playerLastPos = "0,0";
 var clientRefreshRate = 1500;
 
 
-/** Before OnLoad **/
-   $(function() {
-        // Init about box
-        $("a[rel]").overlay({
-            mask: 'darkred',
-            effect: 'apple',
-            onBeforeLoad: function() {
-                var wrap = this.getOverlay().find(".contentWrap");
-                wrap.load(this.getTrigger().attr("href"));
-            }
-        });
-    });
-    
 /** OnLoad **/
 $(document).ready(init);
 
@@ -130,6 +117,7 @@ function initImages() {
 
     // Init toolbar button tooltips
     $("#dayButton").attr("title", "<b>" + JML10N.day_button_title + "</b><br/>" + JML10N.day_button_desc);
+    
     $("#nightButton").attr("title", "<b>" + JML10N.night_button_title + "</b><br/>" + JML10N.night_button_desc);
     $("#followButton").attr("title", "<b>" + JML10N.follow_button_title + "</b><br/>" + JML10N.follow_button_desc);
     $("#caveButton").attr("title", "<b>" + JML10N.cave_button_title + "</b><br/>" + JML10N.cave_button_desc);
@@ -137,16 +125,6 @@ function initImages() {
     $("#saveButton").attr("title", "<b>" + JML10N.save_button_title + "</b><br/>" + JML10N.save_button_desc);
     $("#aboutButton").attr("title", "<b>" + JML10N.about_button_title + "</b><br/>" + JML10N.about_button_desc);
 
-    $("#toolbar img[title]").tooltip({
-       effect: 'slide',
-       opacity: .9,
-    }).dynamic({ bottom: { direction: 'down', bounce: true } });
-    
-    
-    $("#infobar img[title]").tooltip({
-       effect: 'slide',
-       opacity: .9,
-    }).dynamic({ bottom: { direction: 'down', bounce: true } });
 
    // Init player marker
    playerImage=document.createElement("img");
@@ -155,7 +133,7 @@ function initImages() {
    playerImage.style.height = "32px";
    playerImage.style.width = "32px";
    playerImage.style.cursor = "hand";
-   playerImage.src="arrow.png";
+   playerImage.src="/img/arrow.png";
    playerImage.onclick=function(){
         setCenterOnPlayer(true);
         refreshData();
@@ -163,26 +141,16 @@ function initImages() {
    document.body.appendChild(playerImage);
    
    // Init mob images
-   initMobImage("Creeper");
-   initMobImage("Skeleton");
-   initMobImage("Zombie");
-   initMobImage("PigZombie");
-   initMobImage("Spider");
-   initMobImage("Enderman");
-   initMobImage("Silverfish");
-   initMobImage("Ghast");
-   initMobImage("Dragon");
-   initMobImage("Slime");
-   initMobImage("MagmaCube");
-   initMobImage("Blaze");
-   initMobImage("Wolf");
-}
-
-function initMobImage(name) {
-   var img =new Image();
-   img['class']='mobImage';
-   img.src=name +'.png';
-   mobImages[name] = img;
+   var mobNames = ["Blaze","CaveSpider","Chicken","Cow","Creeper","Dragon","Enderman","Ghast","MagmaCube",
+                   "Ocelot","Pig","PigZombie","Sheep","Silverfish","Skeleton","Slime","Spider","SpiderJockey",
+                   "Squid","Wither","Wolf","Zombie"];
+   
+   $.each(mobNames, function(index, name) { 
+		var img =new Image();
+		img['class']='mobImage';
+		img.src='img/entity/' + name +'.png';
+		mobImages[name] = img;
+	});
 }
 
 function saveMapImage() {
@@ -195,38 +163,30 @@ function saveMapImage() {
 
 function initWorld() {
 
-   // Get initial settings
-   $.ajax({
-           url: "/jm",
-           dataType: "script",
-           success : function() {          
-               
-               if(worldName!=null) {
-            	   $("#worldNameHeader").attr("innerHTML",unescape(worldName).replace("\\+"," "));            	   
-                    setCenterOnPlayer(true);
-               }
-               // Auto-refresh the map once per N seconds
-               if(mapScale>minMapScale) {
-            	   var refreshRate = clientRefreshRate;
-               } else {
-            	   var refreshRate = clientRefreshRate * 2;
-               }
-               refreshDataTimer = setInterval(function() {
-                  if(autoRefresh && !isScroll) {
-                     refreshData();
-                  }
-                  //console.log("Refreshed");
-               }, refreshRate);
-               sizeMap();
-               refreshData();
-               // Check version
-               checkVersion();
-   
-           },
-           error : function(jqXHR, textStatus, errorThrown) {
-                     handleError(errorThrown);
-                  }
-         });   
+	$.ajax({url: "/data/world", dataType: "jsonp"})
+		.fail(handleError)
+    	.done(function(data, textStatus, jqXHR) { 
+    		 if(worldName!=null) {
+          	   $("#worldNameHeader").attr("innerHTML",unescape(worldName).replace("\\+"," "));            	   
+                  setCenterOnPlayer(true);
+             }
+             // Auto-refresh the map once per N seconds
+             if(mapScale>minMapScale) {
+          	   var refreshRate = clientRefreshRate;
+             } else {
+          	   var refreshRate = clientRefreshRate * 2;
+             }
+             refreshDataTimer = setInterval(function() {
+                if(autoRefresh && !isScroll) {
+                   refreshData();
+                }
+                //console.log("Refreshed");
+             }, refreshRate);
+             sizeMap();
+             refreshData();
+             // Check version
+             checkVersion();
+    	});    	
 }
 
 var delay = (function(){
@@ -416,31 +376,30 @@ function refreshData() {
 }
 
 function refreshImageData() {
-   $.ajax({
-        url: "/jm",
-        dataType: "script",
-        success : function() {          
-            
-            if(centerOnPlayer) {    
-               centerMapOnPlayer();                
-            } else {
-               checkBounds();
-            }
-            lastChunksImage = new Image();
-            lastChunksImage.onload = function () {          
-                // Draw the image on the canvas
-                var ctx = getContext();         
-                updateUI();
-            }    
-            lastChunksImage.src=getMapDataUrl();
-        },
-        error : function(jqXHR, textStatus, errorThrown) {
-                  handleError(errorThrown);
-               }
-      });
+	
+
+	$.ajax( "/map.png" )
+		.fail(handleError)
+    	.done(function(data, textStatus, jqXHR) { 
+			 if(centerOnPlayer) {    
+	             centerMapOnPlayer();                
+	          } else {
+	             checkBounds();
+	          }
+	          lastChunksImage = new Image();
+	          lastChunksImage.onload = function () {          
+	              // Draw the image on the canvas
+	              var ctx = getContext();         
+	              updateUI();
+	          }    
+	          lastChunksImage.src=getMapDataUrl();
+    	});
 }
 
-function handleError(error) {
+function handleError(data, error, jqXHR) {
+	
+	console.log("Bad response: " + data.responseText);
+	
     if(error=="" || error==null) {
        error = JML10N.error_world_not_connected;
     } else if(error.substring && error.substring(1,8)=="JMERR09") {
@@ -449,12 +408,12 @@ function handleError(error) {
     document.body.style.backgroundColor = "#000";
     clearInterval(refreshDataTimer);
     sizeMap();
-    var creeper = new Image();
-    creeper.onload=function() {
-        ctx.drawImage(creeper, getCanvasWidth()/2-68, getCanvasHeight()/2-110);
-        creeper.onload=null;
+    var icon = new Image();
+    icon.onload=function() {
+        ctx.drawImage(icon, getCanvasWidth()/2-72, getCanvasHeight()/2-160);
+        icon.onload=null;
     };
-    creeper.src="/creeper.jpg";
+    icon.src="/ico/apple-touch-icon-144x144-precomposed.png";
     var ctx = getContext();
     ctx.globalAlpha=1;
     ctx.fillStyle = "red";
