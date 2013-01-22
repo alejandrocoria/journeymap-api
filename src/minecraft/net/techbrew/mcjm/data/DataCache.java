@@ -114,6 +114,19 @@ public class DataCache {
     public String getJson(Class<? extends IDataProvider> dpClass) {    	
     	return internalGet(dpClass).getJsonData();
     }
+    
+    /**
+     * Appends the JSON data string to the provided StringBuffer,
+     * returns the expiration timestamp in millis.
+     * @param dpClass
+     * @param sb
+     * @return
+     */
+    public long appendJson(Class<? extends IDataProvider> dpClass, StringBuffer sb) {    	
+    	DataHolder dh = internalGet(dpClass);
+    	sb.append(dh.getJsonData());
+    	return dh.getExpires();
+    }
 
     /**
      * Holds the map of values and an expiration timestamp.

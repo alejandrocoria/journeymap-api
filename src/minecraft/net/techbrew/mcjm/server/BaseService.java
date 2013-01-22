@@ -1,15 +1,20 @@
 package net.techbrew.mcjm.server;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 
 import net.techbrew.mcjm.Constants;
@@ -25,6 +30,8 @@ import se.rupy.http.Service;
  *
  */
 public abstract class BaseService extends Service {
+	
+	public static final String CHARACTER_ENCODING = "UTF-8"; //$NON-NLS-1$
 	
 	protected String path;
 	
@@ -44,6 +51,7 @@ public abstract class BaseService extends Service {
 		html("text/html"), //$NON-NLS-1$
 		js("application/javascript"), //$NON-NLS-1$
 		json("application/json"), //$NON-NLS-1$
+		jsonp("application/javascript"), //$NON-NLS-1$
 		png("image/png"), //$NON-NLS-1$
 		jpeg("image/jpeg"), //$NON-NLS-1$
 		jpg("image/jpeg"), //$NON-NLS-1$
@@ -77,22 +85,30 @@ public abstract class BaseService extends Service {
 	 * @param message
 	 * @param event
 	 */
-	protected void throwEventException(int code, String message, Event event, boolean isError) throws Event {
+	protected void throwEventException(int code, String message, Event event, boolean isError) throws Event, Exception {
+		
+		Logger logger = JourneyMap.getLogger();
 		
 		// Log the issue depending on severity
-		String out = code + " " + message; //$NON-NLS-1$
+		String out = code + " " + message; //$NON-NLS-1$ //$NON-NLS-2$
 		if(isError) {
-			JourneyMap.announce(message);
-			JourneyMap.getLogger().warning(out);
-		} else {
+			logger.warning( this.getClass().getName() + ": " + out); //$NON-NLS-1$
+			if(code!=404) {
+				logger.warning(debugRequestHeaders(event)); 
+			}
+		} else if(logger.isLoggable(Level.FINER)) {
 			JourneyMap.getLogger().finer(out);
 		}
 		
 		// Set the error code on the response
 		try {
-			event.reply().code(out);
+			if(code==404) {
+				event.reply().code("404 Not Found"); //$NON-NLS-1$
+			} else {
+				event.reply().code(out);
+			}
 		} catch (IOException e) {
-			JourneyMap.getLogger().warning("Can't set response code: " + out); //$NON-NLS-1$
+			logger.warning("Can't set response code: " + out); //$NON-NLS-1$
 		}
 		throw event;
 	}
@@ -102,14 +118,20 @@ public abstract class BaseService extends Service {
 	 * @param event
 	 * @return
 	 */
-	protected String debugRequestHeaders(Event event) {
-		StringBuffer sb = new StringBuffer("HTTP Request headers:"); //$NON-NLS-1$		
+	protected String debugRequestHeaders(Event event) throws Exception {
+		StringBuffer sb = new StringBuffer("HTTP Request:"); //$NON-NLS-1$
+
+		sb.append("\n request=").append(event.query().path());
+		if(event.query().parameters().length()>0){
+			sb.append("?").append(event.query().parameters());
+		}
 		HashMap headers = event.query().header();
 	    for(Object name : headers.keySet()) {
 	      Object value = headers.get(name);
-	      sb.append("\n\t").append(name).append("=").append(value); //$NON-NLS-1$ //$NON-NLS-2$
+	      sb.append("\n ").append(name).append("=").append(value); //$NON-NLS-1$ //$NON-NLS-2$
 	    }
-	    sb.append("\n\tRemote Address:").append(event.remote());
+	    sb.append("\n Remote Address:").append(event.remote());
+
 	    return sb.toString();
 	}
 	
@@ -118,7 +140,7 @@ public abstract class BaseService extends Service {
 	 * @param event
 	 * @throws Event
 	 */
-	protected void reportMalformedRequest(Event event) throws Event {
+	protected void reportMalformedRequest(Event event) throws Event, Exception {
 		String error = Constants.getMessageJMERR05("queryString=" + event.query().path()); //$NON-NLS-1$
 		throwEventException(400, Constants.getMessageJMERR02(), event, false);
 	}
@@ -154,6 +176,48 @@ public abstract class BaseService extends Service {
 		}
 		return (intVal!=null) ? intVal : defaultValue;
 	}
+	
+	/**
+	 * Attempt to output the data in gzip format, setting headers accordingly.
+	 * Falls back to sending plain text otherwise.
+	 * 
+	 * @param event
+	 * @param data
+	 */
+	protected void gzipResponse(Event event, String data) throws Exception {
+		
+		byte[] bytes = gzip(data);
+		if(bytes!=null) {
+			ResponseHeader.on(event).setHeader("Content-encoding", "gzip");	//$NON-NLS-1$ //$NON-NLS-2$
+		} else {
+			bytes = data.getBytes(CHARACTER_ENCODING);
+		}
+		
+		ResponseHeader.on(event).contentLength(bytes.length);
+		event.output().write(bytes); 
+	}
+	
+	/**
+	 * Gzip encode a string and return the byte array.  
+	 * 
+	 * @param data
+	 * @return
+	 */
+	protected byte[] gzip(String data) {
+        ByteArrayOutputStream bout = null;
+        try {
+            bout = new ByteArrayOutputStream();
+            GZIPOutputStream output = new GZIPOutputStream(bout);
+            output.write(data.getBytes());
+            output.flush();
+            output.close();
+            bout.close();
+            return bout.toByteArray();
+        } catch (Exception ex) {
+        	JourneyMap.getLogger().warning("Failed to gzip encode: " + data);
+        	return null;
+        }
+    }
 	
 	/**
 	 * Encapsulate knowledge about setting HTTP headers
@@ -257,6 +321,15 @@ public abstract class BaseService extends Service {
 		 */
 		ResponseHeader contentLength(long fileSize) {
 			return setHeader("Content-Length", Long.toString(fileSize)); //$NON-NLS-1$
+		}
+		
+		/**
+		 * Set expires of data to be returned.
+		 * @param file
+		 * @return
+		 */
+		ResponseHeader expires(long timestamp) {
+			return setHeader("Expires",  dateFormat.format(new Date(timestamp))); //$NON-NLS-1$
 		}
 		
 		/**

@@ -81,37 +81,15 @@ public class ChunkServlet extends BaseService {
 			throwEventException(503, Constants.getMessageJMERR02(), event, false);
 		}
 		
+		// Ensure world dir is found
 		File worldDir = FileHandler.getWorldDir(minecraft);
-
-		// Check world requested
-		String worldName = getParameter(query, "worldName", null); //$NON-NLS-1$
-		if (worldName == null) {
-			String error = Constants.getMessageJMERR05("worldName=null"); //$NON-NLS-1$
-			throwEventException(400, Constants.getMessageJMERR09(), event, true);
-		}
-		worldName = URLDecoder.decode(worldName, "UTF-8"); //$NON-NLS-1$
-		
-		// Check world type
-		String worldTypeString = getParameter(query, "worldType", Constants.WorldType.sp.name()); //$NON-NLS-1$
-		Constants.WorldType worldType = null;
-		try {
-			worldType = Constants.WorldType.valueOf(worldTypeString);
-		} catch (Exception e) {			
-			String error = Constants.getMessageJMERR05("worldType=" + worldTypeString); //$NON-NLS-1$
-			throwEventException(400, Constants.getMessageJMERR09(), event, true);
+		if (!worldDir.exists() || !worldDir.isDirectory()) {
+			String error = Constants.getMessageJMERR06("worldDir=" + worldDir.getAbsolutePath()); //$NON-NLS-1$
+			throwEventException(400, error, event, true);
 		}
 		
 		// Check depth (for underground maps)
 		int depth = getParameter(event.query(), "depth", 4); //$NON-NLS-1$
-		
-		if(!worldName.equals(URLDecoder.decode(FileHandler.getSafeName(ModLoader.getMinecraftInstance())))) {
-			String error = Constants.getMessageJMERR10("worldType=" + worldType); //$NON-NLS-1$
-			throwEventException(503, Constants.getMessageJMERR09(), event, true);
-
-		}  else if (!worldDir.exists() || !worldDir.isDirectory()) {
-			String error = Constants.getMessageJMERR06("worldDir=" + worldDir.getAbsolutePath()); //$NON-NLS-1$
-			throwEventException(400, Constants.getMessageJMERR09(), event, true);
-		}
 		
 		// Read coordinate pairs
 		try {
@@ -119,30 +97,33 @@ public class ChunkServlet extends BaseService {
 			int z1 = getParameter(query, "z1", 0); //$NON-NLS-1$
 			int x2 = getParameter(query, "x2", x1); //$NON-NLS-1$
 			int z2 = getParameter(query, "z2", z1); //$NON-NLS-1$
+			
+			if (x1 >= x2 || z1 >= z2) {
+				String error = Constants.getMessageJMERR05("coordinates=" + x1 + "," + z1 + "," + x2 + "," + z2); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				throwEventException(400, error, event, true);
+			}
+			
 			int width = getParameter(query, "width", 100); //$NON-NLS-1$
 			int height = getParameter(query, "height", 100); //$NON-NLS-1$
 			int worldProviderType = getParameter(query, "worldProviderType", 0);  //$NON-NLS-1$
+			
+			// Map type
 			String mapTypeString = getParameter(query, "mapType", Constants.MapType.day.name()); //$NON-NLS-1$
 			Constants.MapType mapType = null;
 			try {
 				mapType = Constants.MapType.valueOf(mapTypeString);
 			} catch (Exception e) {
 				String error = Constants.getMessageJMERR05("mapType=" + mapType); //$NON-NLS-1$
-				throwEventException(400, Constants.getMessageJMERR09(), event, true);
+				throwEventException(400, error, event, true);
 			}
 			
-			if (x1 >= x2 || z1 >= z2) {
-				String error = Constants.getMessageJMERR05("coordinates=" + x1 + "," + z1 + "," + x2 + "," + z2); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-				throwEventException(400, Constants.getMessageJMERR09(), event, true);
-			} else {
-				ResponseHeader.on(event).noCache().contentType(ContentType.png);
-				mergeImageChunks(event, worldDir, x1, z1, x2, z2, mapType, depth, worldProviderType, width, height);
-			}
+			// Return the images
+			ResponseHeader.on(event).noCache().contentType(ContentType.png);
+			mergeImageChunks(event, worldDir, x1, z1, x2, z2, mapType, depth, worldProviderType, width, height);
+			
 		} catch (NumberFormatException e) {
 			reportMalformedRequest(event);
-		} finally {
-
-		}
+		} 
 
 	}
 	

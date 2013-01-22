@@ -1,10 +1,12 @@
 package net.techbrew.mcjm.server;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
@@ -16,6 +18,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.logging.Level;
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -41,10 +44,45 @@ public class FileServlet extends BaseService {
 	
 	private static final long serialVersionUID = 1L;
 	
+	private static final String CLASSPATH_ROOT = "/";
+	private static final String CLASSPATH_WEBROOT = "web";
+	private static final String IDE_TEST = "eclipse/Client/bin/";	
+	private static final String IDE_SOURCEPATH = "../../../src/minecraft/net/techbrew/mcjm/web";
+	
+	private String resourcePath;
+	private final boolean useZipEntry;
+	
 	/**
 	 * Default constructor
 	 */
 	public FileServlet() {
+		
+		URL resourceDir = null;
+		
+		// Check if in IDE.  If so, use source path to serve files.	
+		URL cpRoot = JourneyMap.class.getResource(CLASSPATH_ROOT); //$NON-NLS-1$
+		String cpRootPath = cpRoot.getPath();
+		if(cpRootPath.contains(IDE_TEST)) { //$NON-NLS-1$
+			try {
+				String srcPath = cpRootPath + IDE_SOURCEPATH;
+				resourceDir = new File(srcPath).getCanonicalFile().toURI().toURL();
+			} catch (Exception e) {				
+				JourneyMap.getLogger().severe(e.getMessage());
+			} 
+		} 
+		if(resourceDir==null) {
+			resourceDir = JourneyMap.class.getResource(CLASSPATH_WEBROOT);
+		}
+				
+		// Format reusable resourcePath
+		resourcePath = resourceDir.getPath();
+		if(resourcePath.endsWith("/")) { //$NON-NLS-1$
+			resourcePath = resourcePath.substring(0, resourcePath.length()-1);
+		}
+		
+		// Check whether operating out of a zip/jar
+		useZipEntry = resourceDir.getProtocol().equals("file") && resourcePath.contains("!/"); //$NON-NLS-1$	//$NON-NLS-2$
+		
 	}
 	
 	@Override
@@ -61,22 +99,19 @@ public class FileServlet extends BaseService {
 		try {
 			
 			// Determine request path
-			path = "web" + event.query().path(); //$NON-NLS-1$
-			if("web/".equals(path)) { //$NON-NLS-1$
-				path = "web/index.html"; //$NON-NLS-1$
-			} 
+			String requestPath = null;
+			path = event.query().path(); //$NON-NLS-1$
 			
-			// Determine file system context for running application
-			URL pathRes = JourneyMap.class.getResource(path);			
-			if(pathRes==null) {
-				throwEventException(500, "Could not get resource for " + path + " from location " + JourneyMap.class.getResource("web"), event, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$				
+			if("/".equals(path)) { //$NON-NLS-1$
+				// Default to index
+				requestPath = resourcePath + "/index.html"; //$NON-NLS-1$
+			} else {
+				requestPath = resourcePath + path;
 			}
-			String pathURL = pathRes.getPath();
-			boolean useZipEntry = pathRes.getProtocol().equals("file") && pathURL.contains("!/"); //$NON-NLS-1$	//$NON-NLS-2$
-			
+
 			if(useZipEntry) { 				
 				// Running out of a Zip archive or jar
-				String[] tokens = pathURL.split("file:/")[1].split("!/"); //$NON-NLS-1$ //$NON-NLS-2$
+				String[] tokens = requestPath.split("file:/")[1].split("!/"); //$NON-NLS-1$ //$NON-NLS-2$
 				ZipFile zipFile = new ZipFile(new File( URLDecoder.decode(tokens[0], "utf-8") )); //$NON-NLS-1$
 				ZipEntry zipEntry = zipFile.getEntry(tokens[1]);
 				
@@ -87,27 +122,29 @@ public class FileServlet extends BaseService {
 					// Set content headers
 					ResponseHeader.on(event).content(zipEntry);
 					serveStream(in, event);
+				} else {
+					throwEventException(404, Constants.getMessageJMERR13(requestPath), event, true);
 				}
 				
 			} else {
 				// Running out of a directory
-				in = JourneyMap.class.getResourceAsStream(path);
-				
-				if(in!=null) {					
-					File file = new File(pathRes.toURI()); 
+				File file = new File(requestPath); 				
+				if(file.exists()) {					
 					serveFile(file, event);
+				} else {
+					throwEventException(404, Constants.getMessageJMERR13(requestPath), event, true);
 				}
 			}
 			
 			// Return 404 if not found
 			if(in == null) {
-				throwEventException(404, Constants.getMessageJMERR13(pathURL), event, false);
+				
 			}
 
 		} catch(Event eventEx) {
 			throw eventEx;
-		} catch(Throwable t) {			
-			JourneyMap.getLogger().info(debugRequestHeaders(event));
+		} catch(Throwable t) {				
+			JourneyMap.getLogger().severe(LogFormatter.toString(t));			
 			throwEventException(500, Constants.getMessageJMERR12(path), event, true);
 		} 
 	}
@@ -120,7 +157,7 @@ public class FileServlet extends BaseService {
 	 * @throws Event
 	 * @throws IOException
 	 */
-	public static void serveFile(File sourceFile, Event event) throws Event, IOException {
+	public void serveFile(File sourceFile, Event event) throws Event, IOException {
 		
 		// Set content headers
 		ResponseHeader.on(event).content(sourceFile);
@@ -137,28 +174,65 @@ public class FileServlet extends BaseService {
 	 * @throws Event
 	 * @throws IOException
 	 */
-	public static void serveStream(final InputStream input, Event event) throws Event, IOException {
+	public void serveStream(final InputStream input, Event event) throws Event, IOException {
 		
 		// Transfer inputstream to event outputstream
 		ReadableByteChannel inputChannel = null;
 		WritableByteChannel outputChannel = null;
 		try {
 			inputChannel = Channels.newChannel(input);
-			outputChannel = Channels.newChannel(event.output());			
+			
+			ByteArrayOutputStream bout = new ByteArrayOutputStream();
+            GZIPOutputStream output = new GZIPOutputStream(bout);
+            
+			outputChannel = Channels.newChannel(output);			
 			ByteBuffer buffer = ByteBuffer.allocate(65536); 
 			while (inputChannel.read(buffer) != -1) { 
 				buffer.flip( ); 
 				outputChannel.write(buffer); 
 				buffer.clear( ); 
 			}		
+			
+			output.flush();
+            output.close();
+            bout.close();
+            
+            byte[] gzbytes = bout.toByteArray();
+            
+            ResponseHeader.on(event).contentLength(gzbytes.length).setHeader("Content-encoding", "gzip");	//$NON-NLS-1$ //$NON-NLS-2$
+            event.output().write(gzbytes);
+            
+		} catch (IOException e) {
+			JourneyMap.getLogger().severe(LogFormatter.toString(e));
+			throw event;
 		} finally {
 			if (input != null) {
 				input.close();
 			}
-			event.output().flush();
 		}
+
 	}
 
-
+	/**
+	 * Gzip encode a string and return the byte array.  
+	 * 
+	 * @param data
+	 * @return
+	 */
+	protected byte[] gzip(String data) {
+        ByteArrayOutputStream bout = null;
+        try {
+            bout = new ByteArrayOutputStream();
+            GZIPOutputStream output = new GZIPOutputStream(bout);
+            output.write(data.getBytes());
+            output.flush();
+            output.close();
+            bout.close();
+            return bout.toByteArray();
+        } catch (Exception ex) {
+        	JourneyMap.getLogger().warning("Failed to gzip encode: " + data);
+        	return null;
+        }
+    }
 
 }

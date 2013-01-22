@@ -19,7 +19,7 @@ import net.techbrew.mcjm.io.FileHandler;
  */
 public class WorldData implements IDataProvider {
 	
-	private static long TTL = TimeUnit.SECONDS.toMillis(10);
+	private static long TTL = TimeUnit.HOURS.toMillis(1);
 	
 	public static enum Key {
 		dirName,

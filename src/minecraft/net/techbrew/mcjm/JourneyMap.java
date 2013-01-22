@@ -33,6 +33,7 @@ import net.minecraft.src.NetClientHandler;
 import net.minecraft.src.Packet250CustomPayload;
 import net.minecraft.src.SoundManager;
 import net.minecraft.src.World;
+import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -264,10 +265,8 @@ public class JourneyMap extends BaseMod {
 			
 			// We got this far
 			if(!running) {
-				running = true;
-//				if(!minecraft.isSingleplayer()) {	
-//					channelClient.sendHello();
-//				}
+				DataCache.instance().purge();
+				running = true;				
 				if(enableAnnounceMod) announceMod();
 			}
 			

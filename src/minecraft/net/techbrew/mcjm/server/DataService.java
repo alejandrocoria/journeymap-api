@@ -18,6 +18,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -39,6 +40,7 @@ import net.techbrew.mcjm.Constants.WorldType;
 import net.techbrew.mcjm.data.AnimalsData;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.GameData;
+import net.techbrew.mcjm.data.IDataProvider;
 import net.techbrew.mcjm.data.MobsData;
 import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.data.PlayersData;
@@ -64,8 +66,30 @@ public class DataService extends BaseService {
 
 	private static final long serialVersionUID = 4412225358529161454L;
 
-	public static final String CHARACTER_ENCODING = "UTF-8"; //$NON-NLS-1$	
-
+	public static final String CALLBACK_PARAM = "callback";  //$NON-NLS-1$	
+	
+	public static final String combinedPath;
+	
+	public static final HashMap<String,Class<? extends IDataProvider>> providerMap;
+	static {
+		providerMap = new HashMap<String,Class<? extends IDataProvider>>(7);
+		providerMap.put("/data/game", GameData.class);  //$NON-NLS-1$
+		providerMap.put("/data/player", PlayerData.class);  //$NON-NLS-1$
+		providerMap.put("/data/time", TimeData.class);  //$NON-NLS-1$
+		providerMap.put("/data/world", WorldData.class);  //$NON-NLS-1$
+		providerMap.put("/data/animals", AnimalsData.class);  //$NON-NLS-1$
+		providerMap.put("/data/mobs", MobsData.class);  //$NON-NLS-1$
+		providerMap.put("/data/players", PlayersData.class);  //$NON-NLS-1$
+		
+		StringBuffer sb = new StringBuffer();
+		for(String key : providerMap.keySet()) {
+			sb.append(key).append(":");
+		}
+		combinedPath = sb.toString();
+	}
+	
+	
+	
 	/**
 	 * Serves chunk data and player info.
 	 */
@@ -75,7 +99,7 @@ public class DataService extends BaseService {
 	
 	@Override
 	public String path() {
-		return "/data/game:/data/player:/data/time:/data/world:/data/animals:/data/mobs:/data/players"; //$NON-NLS-1$
+		return combinedPath;
 	}
 	
 	@Override
@@ -90,33 +114,35 @@ public class DataService extends BaseService {
 
 		// Parse query for parameters
 		Query query = event.query();
+		query.parse();
 		String path = query.path();
 		
-		String jsonData = null;
+		// Buffer the output
+		StringBuffer jsonData = new StringBuffer();
 		
-		if(path.endsWith("game")) {
-			jsonData = DataCache.instance().getJson(GameData.class);
-		} else if(path.endsWith("player")) {
-			jsonData = DataCache.instance().getJson(PlayerData.class);
-		} else if(path.endsWith("time")) {
-			jsonData = DataCache.instance().getJson(TimeData.class);
-		} else if(path.endsWith("world")) {
-			jsonData = DataCache.instance().getJson(WorldData.class);
-		} else if(path.endsWith("mobs")) {
-			jsonData = DataCache.instance().getJson(MobsData.class);
-		} else if(path.endsWith("animals")) {
-			jsonData = DataCache.instance().getJson(AnimalsData.class);
-		} else if(path.endsWith("players")) {
-			jsonData = DataCache.instance().getJson(PlayersData.class);
+		// Check for callback
+		if(query.containsKey(CALLBACK_PARAM)) {
+			jsonData.append(query.get(CALLBACK_PARAM).toString()); 
 		} else {
-			throw new IllegalArgumentException("Couldn't handle path: " + path);
-		}
+			jsonData.append(CALLBACK_PARAM);
+		}		
+		jsonData.append("("); //$NON-NLS-1$	
 		
-		byte[] jsonBytes = jsonData.getBytes();		
+		// Get cached data provider keyed by the path
+		Class<? extends IDataProvider> dpClass = providerMap.get(path);
+				
+		// Get data expiration time and append data from cache
+		long expires = DataCache.instance().appendJson(dpClass, jsonData);	
 		
-		// TODO: Use TTL for expiring data
-		ResponseHeader.on(event).noCache().contentType(ContentType.json).contentLength(jsonBytes.length);		
-		event.output().write(jsonBytes); 
+		jsonData.append(")"); //$NON-NLS-1$	
+		
+		// Optimize headers
+		ResponseHeader.on(event).noCache().contentType(ContentType.jsonp);
+				
+		// Gzip response
+		gzipResponse(event, jsonData.toString());
 	}
+	
+	
 	
 }
