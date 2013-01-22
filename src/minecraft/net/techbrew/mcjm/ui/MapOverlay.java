@@ -16,9 +16,12 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.BufferOverflowException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -55,10 +58,14 @@ import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.VersionCheck;
 import net.techbrew.mcjm.Constants.CoordType;
 import net.techbrew.mcjm.Constants.MapType;
+import net.techbrew.mcjm.data.AnimalsData;
+import net.techbrew.mcjm.data.DataCache;
+import net.techbrew.mcjm.data.MobsData;
+import net.techbrew.mcjm.data.PlayerData;
+import net.techbrew.mcjm.data.PlayersData;
 import net.techbrew.mcjm.io.ChunkFileHandler;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
-import net.techbrew.mcjm.io.PlayerDataFileHandler;
 import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.render.MapBlocks;
@@ -105,7 +112,6 @@ public class MapOverlay extends GuiScreen {
 
 	MapButton buttonDay,buttonNight,buttonCaves,buttonFollow,buttonZoomIn,buttonZoomOut;
 	MapButton buttonSave,buttonClose,buttonAlert,buttonBrowser,buttonMonsters;
-	EntityHelper entityHelper = new EntityHelper();
 
 	public MapOverlay(JourneyMap journeyMap) {
 		super();
@@ -169,7 +175,7 @@ public class MapOverlay extends GuiScreen {
 		case 2: { // caves
 			setShowCaves(!showCaves);
 			buttonCaves.toggle = showCaves;	
-			boolean underground = EntityHelper.playerIsUnderground(mc.thePlayer);
+			boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(PlayerData.Key.underground);
 			if(underground) {
 				lastMapImg = null;
 			}
@@ -617,7 +623,7 @@ public class MapOverlay extends GuiScreen {
 
 			// Maptype
 			Constants.MapType tempMapType = null;
-			final boolean underground = EntityHelper.playerIsUnderground(mc.thePlayer);
+			final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(PlayerData.Key.underground);
 			if(underground && showCaves && !hardcore) {
 				tempMapType = Constants.MapType.underground;
 			} else {
@@ -696,6 +702,13 @@ public class MapOverlay extends GuiScreen {
 		return (chunkX>=mapBounds[0].chunkXPos && chunkX<=mapBounds[1].chunkXPos && 
 				chunkZ>=mapBounds[0].chunkZPos && chunkZ<=mapBounds[1].chunkZPos);
 	}
+	
+	boolean inBounds(Map animalsDataMap) {
+		int chunkX = (Integer) animalsDataMap.get("chunkCoordX");
+		int chunkZ = (Integer) animalsDataMap.get("chunkCoordZ");
+		return (chunkX>=mapBounds[0].chunkXPos && chunkX<=mapBounds[1].chunkXPos && 
+				chunkZ>=mapBounds[0].chunkZPos && chunkZ<=mapBounds[1].chunkZPos);
+	}
 
 	void drawEntityLayer() {
 
@@ -730,40 +743,46 @@ public class MapOverlay extends GuiScreen {
 			int ccX = mc.thePlayer.chunkCoordX;
 			int ccZ = mc.thePlayer.chunkCoordZ;
 
+			// TODO: Tottle animals, pets
 			if(showMonsters && !hardcore) {
 				// Draw nearby mobs
-				BasicStroke circleStroke = new BasicStroke(2F);
-				Iterator<Entity> mobIter = EntityHelper.getEntitiesNearby(mc).iterator();
-				if(mobIter!=null) {
-					while(mobIter.hasNext()) {
-						Entity mob = (Entity)mobIter.next();
-						if(EntityHelper.entityMap.containsKey(mob.getClass())) {
-							if(inBounds(mob)) {
-	
-								int iconHeight = (mob instanceof EntityDragon || mob instanceof EntityGhast) ? 56 : 48;
-								int iconWidth = iconHeight;
-								int circleRadius = (int) Math.round(iconWidth * .6);
-	
-								int mobX = Math.round(getScaledChunkX((float) (mob.posX/16))*overlayScale);
-								int mobY = Math.round(getScaledChunkZ((float) (mob.posZ/16))*overlayScale);
-	
-								g2D.setPaint(Color.red);
-								g2D.setStroke(circleStroke);
-								
-								// Player underlay
-								g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .6F));													
-								g2D.fillArc(mobX - circleRadius, mobY - circleRadius, circleRadius*2, circleRadius*2, 0, 360);
-	
-								int offsetWidth = mobX - (iconWidth/2);
-								int offsetHeight = mobY - (iconHeight/2);
-	
-	
-								// Player icon
-								BufferedImage mobImage = entityHelper.getEntityImage(mob.getClass());		
-								g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,1F));	
-								g2D.drawImage(mobImage, offsetWidth, offsetHeight, offsetWidth + iconWidth, offsetHeight + iconHeight, 0, 0, mobImage.getWidth(), mobImage.getHeight(), null);
-							}
-						}
+				BasicStroke circleStroke = new BasicStroke(2F);				
+				List<Map> hostiles = (List<Map>) DataCache.instance().get(MobsData.class).get(MobsData.Key.mobs);
+				List<Map> animals = (List<Map>) DataCache.instance().get(AnimalsData.class).get(AnimalsData.Key.animals);
+				
+				List<Map> critters = new ArrayList<Map>(hostiles.size() + animals.size());
+				critters.addAll(hostiles);
+				critters.addAll(animals);
+				
+				for(Map critter : critters) {
+					if(inBounds(critter)) {
+
+						String type = (String) critter.get("type");
+						int x = (Integer) critter.get("posX");
+						int z = (Integer) critter.get("posZ");
+						
+						int iconHeight = (type.equals("Dragon") || type.equals("Ghast")) ? 56 : 48;
+						int iconWidth = iconHeight;
+						int circleRadius = (int) Math.round(iconWidth * .6);
+
+						int mobX = Math.round(getScaledChunkX((float) (x/16))*overlayScale);
+						int mobY = Math.round(getScaledChunkZ((float) (z/16))*overlayScale);
+
+						g2D.setPaint(Color.red);
+						g2D.setStroke(circleStroke);
+						
+						// Player underlay
+						g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .6F));													
+						g2D.fillArc(mobX - circleRadius, mobY - circleRadius, circleRadius*2, circleRadius*2, 0, 360);
+
+						int offsetWidth = mobX - (iconWidth/2);
+						int offsetHeight = mobY - (iconHeight/2);
+
+
+						// Player icon
+						BufferedImage mobImage = EntityHelper.getEntityImage(type);		
+						g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,1F));	
+						g2D.drawImage(mobImage, offsetWidth, offsetHeight, offsetWidth + iconWidth, offsetHeight + iconHeight, 0, 0, mobImage.getWidth(), mobImage.getHeight(), null);
 					}
 				}
 	
@@ -771,10 +790,10 @@ public class MapOverlay extends GuiScreen {
 				if(!Minecraft.getMinecraft().isSingleplayer() && !hardcore) {
 					g2D.setFont(new Font("Arial", Font.PLAIN, 20)); //$NON-NLS-1$
 					FontMetrics fm = g2D.getFontMetrics();
-					Iterator others = mc.theWorld.playerEntities.iterator();
-					while(others.hasNext()) {
-						EntityPlayer other = (EntityPlayer) others.next();
-						if(!mc.thePlayer.username.equals(other.username) && inBounds(other)) {
+					
+					List<EntityPlayer> others = (List<EntityPlayer>) DataCache.instance().get(PlayersData.class).get(PlayersData.Key.players);
+					for(EntityPlayer other : others) {
+						if(inBounds(other)) {
 	
 							int iconHeight = 32;
 							int iconWidth = iconHeight;
@@ -791,7 +810,7 @@ public class MapOverlay extends GuiScreen {
 							int offsetHeight = mobY - (iconHeight/2);
 	
 							// Other icon
-							BufferedImage otherImage = entityHelper.getOtherImage();				   				  
+							BufferedImage otherImage = EntityHelper.getOtherImage();				   				  
 							g2D.drawImage(otherImage, offsetWidth, offsetHeight, offsetWidth + iconWidth, offsetHeight + iconHeight, 0, 0, otherImage.getWidth(), otherImage.getHeight(), null);
 							
 							// Label							
@@ -839,7 +858,7 @@ public class MapOverlay extends GuiScreen {
 
 				// Player icon
 				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F));
-				BufferedImage playerImage = entityHelper.getPlayerImage();
+				BufferedImage playerImage = EntityHelper.getPlayerImage();
 				Graphics2D g2Dplayer = entityImg.createGraphics();
 				//g2D.translate(playerX, playerY);
 				g2D.rotate(Math.toRadians(degrees), playerX, playerY);
@@ -863,7 +882,7 @@ public class MapOverlay extends GuiScreen {
 			lastEntityUpdate = System.currentTimeMillis();
 
 			// Update data
-			String biomeName = PlayerDataFileHandler.getPlayerBiome(mc);
+			String biomeName = (String) DataCache.instance().get(PlayerData.class).get(PlayerData.Key.biome);
 			
 			long vslice = Math.round(mc.thePlayer.posY) >> 4;
 			String playerPos = Constants.getString("MapOverlay.player_location", 
@@ -952,7 +971,7 @@ public class MapOverlay extends GuiScreen {
 		final File worldDir = FileHandler.getWorldDir(mc);
 		final File saveDir = FileHandler.getJourneyMapDir();
 
-		final boolean underground = EntityHelper.playerIsUnderground(mc.thePlayer);
+		final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(PlayerData.Key.underground);
 		Constants.MapType checkMapType = mapType;
 		if(underground && showCaves) {
 			checkMapType = Constants.MapType.underground;

@@ -39,7 +39,6 @@ import net.techbrew.mcjm.Constants.WorldType;
 import net.techbrew.mcjm.io.ChunkFileHandler;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
-import net.techbrew.mcjm.io.PlayerDataFileHandler;
 import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.render.ChunkRenderer;
@@ -61,11 +60,9 @@ public class ChunkServlet extends BaseService {
 	
 	@Override
 	public String path() {
-		return "/jm"; //$NON-NLS-1$
+		return "/map.png"; //$NON-NLS-1$
 	}
-	
-	
-	
+		
 	@Override
 	public void filter(Event event) throws Event, Exception {
 
@@ -89,11 +86,8 @@ public class ChunkServlet extends BaseService {
 		// Check world requested
 		String worldName = getParameter(query, "worldName", null); //$NON-NLS-1$
 		if (worldName == null) {
-			servePlayerData(event, worldDir);
-			if(JourneyMap.getLogger().isLoggable(Level.FINER)) {
-				JourneyMap.getLogger().finer("Request: " + event.query().path()); //$NON-NLS-1$
-			}
-			return;
+			String error = Constants.getMessageJMERR05("worldName=null"); //$NON-NLS-1$
+			throwEventException(400, Constants.getMessageJMERR09(), event, true);
 		}
 		worldName = URLDecoder.decode(worldName, "UTF-8"); //$NON-NLS-1$
 		
@@ -150,23 +144,6 @@ public class ChunkServlet extends BaseService {
 
 		}
 
-	}
-
-	/**
-	 * Respond with the player data file.
-	 * @param event
-	 * @param worldDir
-	 * @throws Event
-	 * @throws IOException
-	 */
-	private void servePlayerData(Event event, File worldDir) throws Event, IOException {
-		File playerFile = PlayerDataFileHandler.getPlayerFile(ModLoader.getMinecraftInstance());
-		if (playerFile!=null && playerFile.exists() && playerFile.canRead()) {			
-			ResponseHeader.on(event).noCache();
-			FileServlet.serveFile(playerFile, event);
-		} else {
-			throwEventException(400, Constants.getMessageJMERR11(playerFile), event, false);
-		}
 	}
 	
 

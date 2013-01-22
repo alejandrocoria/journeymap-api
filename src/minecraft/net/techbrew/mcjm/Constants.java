@@ -21,7 +21,6 @@ public class Constants {
 	public static String DATA_DIR = JOURNEYMAP_DIR + "data" + File.separator; //$NON-NLS-1$
 	public static String SP_DATA_DIR = DATA_DIR + WorldType.sp + File.separator;
 	public static String MP_DATA_DIR = DATA_DIR + WorldType.mp + File.separator;
-	public static String PLAYER_LOC_FILE = "player.js"; //$NON-NLS-1$
 	public static String CHUNK_FILE_EXT = "chunk"; //$NON-NLS-1$
 	
 	private static final String BUNDLE_NAME = "net.techbrew.mcjm.messages"; //$NON-NLS-1$

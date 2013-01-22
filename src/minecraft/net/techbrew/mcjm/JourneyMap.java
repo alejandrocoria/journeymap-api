@@ -33,7 +33,6 @@ import net.minecraft.src.NetClientHandler;
 import net.minecraft.src.Packet250CustomPayload;
 import net.minecraft.src.SoundManager;
 import net.minecraft.src.World;
-import net.techbrew.mcjm.client.ChannelClient;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -157,7 +156,7 @@ public class JourneyMap extends BaseMod {
 		}
 		
 		// Register custom packet channel
-		ModLoader.registerPacketChannel(this, ChannelClient.CHANNEL_NAME);
+		//ModLoader.registerPacketChannel(this, ChannelClient.CHANNEL_NAME);
 		
 		// Register listener for events which signal possible world change
 		//

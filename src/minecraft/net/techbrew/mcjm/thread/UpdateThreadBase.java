@@ -12,6 +12,8 @@ import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.EntityHelper;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
+import net.techbrew.mcjm.data.DataCache;
+import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -51,7 +53,9 @@ public abstract class UpdateThreadBase implements Runnable {
 				playerChunkX = player.chunkCoordX;				
 				playerChunkZ = player.chunkCoordZ;
 				playerChunkY = player.chunkCoordY;
-				underground = EntityHelper.playerIsUnderground(mc.thePlayer);
+				
+				// TODO:  Decide whether the cached value is sufficient.  May not be.
+				underground = (Boolean) DataCache.instance().get(PlayerData.class).get(PlayerData.Key.underground);
 
 				// Do the real task
 				doTask();	

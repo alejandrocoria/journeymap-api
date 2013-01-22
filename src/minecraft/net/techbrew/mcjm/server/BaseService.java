@@ -26,6 +26,8 @@ import se.rupy.http.Service;
  */
 public abstract class BaseService extends Service {
 	
+	protected String path;
+	
 	/**
 	 * Enum to encapsulate knowledge of the
 	 * MIME types for given file extensions.
@@ -264,7 +266,7 @@ public abstract class BaseService extends Service {
 		 */
 		ResponseHeader contentType(ContentType type) {
 			if(type!=null) {
-				setHeader("Content-Type", type.getMime()); //$NON-NLS-1$
+				reply.type(type.getMime());
 			} 
 			return this;
 		}

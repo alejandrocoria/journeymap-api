@@ -33,6 +33,9 @@ public class JMServer {
 	
 	public void start() throws Exception {		
 		
+		// Alias /player to PlayerService
+		rupy.add(new DataService());
+				
 		// Alias /jm to ChunkServlet
 		rupy.add(new ChunkServlet());
 		
