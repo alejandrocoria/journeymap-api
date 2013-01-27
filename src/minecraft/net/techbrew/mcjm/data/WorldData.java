@@ -19,7 +19,7 @@ import net.techbrew.mcjm.io.FileHandler;
  */
 public class WorldData implements IDataProvider {
 	
-	private static long TTL = TimeUnit.HOURS.toMillis(1);
+	private static long TTL = TimeUnit.MINUTES.toMillis(1);
 	
 	public static enum Key {
 		dirName,
@@ -57,7 +57,7 @@ public class WorldData implements IDataProvider {
 		props.put(Key.gameType, worldInfo.getGameType().toString());
 		props.put(Key.worldType, worldInfo.getTerrainType().getWorldTypeName());
 
-		return Collections.unmodifiableMap(props);		
+		return props;		
 	}
 	
 	/**
@@ -80,7 +80,7 @@ public class WorldData implements IDataProvider {
 	 * @param mc
 	 * @return
 	 */
-	private String getWorldName(Minecraft mc) {
+	public static String getWorldName(Minecraft mc) {
 		
 		// Get the name
 		String worldName = null;

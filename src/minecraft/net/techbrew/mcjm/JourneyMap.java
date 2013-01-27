@@ -34,6 +34,7 @@ import net.minecraft.src.Packet250CustomPayload;
 import net.minecraft.src.SoundManager;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.data.DataCache;
+import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -278,7 +279,7 @@ public class JourneyMap extends BaseMod {
 			// Start executors
 			if(!executorsStarted) {
 				
-				getLogger().info("Starting up JourneyMap threads for " + minecraft.theWorld.getWorldInfo().getWorldName()); //$NON-NLS-1$
+				getLogger().info("Starting up JourneyMap threads for " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
 				executorsStarted = true;
 				// Start playerDataExecutor
 				playerDataExecutor = new ScheduledThreadPoolExecutor(1, JMThreadFactory.getInstance());
@@ -342,11 +343,11 @@ public class JourneyMap extends BaseMod {
 		if(minecraft.isSingleplayer()==false) {
 			if(minecraft.getServerData()!=null) {
 				announceReady = true;
-				logger.info("Mapping in multiplayer world: " + minecraft.getServerData().serverName + " , " + minecraft.theWorld.getWorldInfo().getWorldName()); //$NON-NLS-1$ //$NON-NLS-2$
+				logger.info("Mapping in multiplayer world: " + minecraft.getServerData().serverName + " , " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		} else {
 			announceReady = true;
-			logger.info("Mapping in singleplayer world: " + minecraft.theWorld.getWorldInfo().getWorldName()); //$NON-NLS-1$
+			logger.info("Mapping in singleplayer world: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
 		}	
 		if(enableAnnounceMod && announceReady) {
 			announcements.add(Constants.getString("JourneyMap.ready", JM_VERSION)); //$NON-NLS-1$ 
@@ -412,6 +413,10 @@ public class JourneyMap extends BaseMod {
 		return chunkExecutor;
 	}
 	
+	/**
+	 * TODO: Make threadsafe
+	 * @return
+	 */
 	public static Logger getLogger() {
 		if(logger==null) {
 			synchronized(JourneyMap.class) {
@@ -421,14 +426,26 @@ public class JourneyMap extends BaseMod {
 		return logger;
 	}
 	
+	/**
+	 * TODO: Make threadsafe
+	 * @return
+	 */
 	public static long getLastWorldHash() {
 		return lastHash;
 	}
 	
+	/**
+	 * TODO: Make threadsafe
+	 * @return
+	 */
 	public static ChunkStub getLastPlayerChunk() {
 		return lastPlayerChunk;
 	}
 	
+	/**
+	 * TODO: Make threadsafe
+	 * @return
+	 */
 	public static Boolean isRunning() {
 		return running;
 	}
