@@ -205,7 +205,9 @@ public class RegionFileHandler {
 					image = ImageIO.read(fis);					
 					break;
 				} catch (Exception e) {
-					if(tries+1==maxTries) {
+					if(tries+1==maxTries) {						
+//						regionFile.deleteOnExit();
+//						regionFile.delete();
 						String error = Constants.getMessageJMERR21(regionFile, LogFormatter.toString(e));
 						JourneyMap.getLogger().warning(error);
 					}
