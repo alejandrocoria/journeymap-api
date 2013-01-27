@@ -44,8 +44,12 @@ import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.render.ChunkRenderer;
 import net.techbrew.mcjm.ui.ZoomLevel;
 
-
-public class ChunkServlet extends BaseService {
+/**
+ * Provides a map image by combining region files.
+ * @author mwoodman
+ *
+ */
+public class MapService extends BaseService {
 
 	private static final long serialVersionUID = 4412225358529161454L;
 
@@ -54,7 +58,7 @@ public class ChunkServlet extends BaseService {
 	/**
 	 * Serves chunk data and player info.
 	 */
-	public ChunkServlet() {
+	public MapService() {
 		super();
 	}
 	
