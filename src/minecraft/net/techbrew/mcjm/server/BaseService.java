@@ -6,9 +6,11 @@ import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -31,7 +33,7 @@ import se.rupy.http.Service;
  */
 public abstract class BaseService extends Service {
 	
-	public static final String CHARACTER_ENCODING = "UTF-8"; //$NON-NLS-1$
+	public static final Charset UTF8 = Charset.forName("UTF-8"); //$NON-NLS-1$
 	
 	protected String path;
 	
@@ -44,19 +46,20 @@ public abstract class BaseService extends Service {
 	 */
 	enum ContentType {
 		
-		css("text/css"), //$NON-NLS-1$
+		css("text/css; charset=utf-8"), //$NON-NLS-1$
 		gif("image/gif"), //$NON-NLS-1$
 		ico("image/x-icon"), //$NON-NLS-1$
-		htm("text/html"), //$NON-NLS-1$
-		html("text/html"), //$NON-NLS-1$
-		js("application/javascript"), //$NON-NLS-1$
-		json("application/json"), //$NON-NLS-1$
-		jsonp("application/javascript"), //$NON-NLS-1$
+		htm("text/html; charset=utf-8"), //$NON-NLS-1$
+		html("text/html; charset=utf-8"), //$NON-NLS-1$
+		js("application/javascript; charset=utf-8"), //$NON-NLS-1$
+		json("application/json; charset=utf-8"), //$NON-NLS-1$
+		jsonp("application/javascript; charset=utf-8"), //$NON-NLS-1$
 		png("image/png"), //$NON-NLS-1$
 		jpeg("image/jpeg"), //$NON-NLS-1$
 		jpg("image/jpeg"), //$NON-NLS-1$
-		txt("text/plain"); //$NON-NLS-1$
-		
+		log("text/plain; charset=utf-8"), //$NON-NLS-1$
+		txt("text/plain; charset=utf-8"); //$NON-NLS-1$
+				
 		private String mime;
 		
 		private ContentType(String mime) {
@@ -74,10 +77,13 @@ public abstract class BaseService extends Service {
 			}
 		}
 		
+		static final EnumSet htmlTypes = EnumSet.of(ContentType.htm, ContentType.html, ContentType.txt);
+		
 		String getMime() {
 			return mime;
 		}
 	}
+	
 	
 	/**
 	 * Log and throw a Rupy Event exception.
@@ -119,18 +125,22 @@ public abstract class BaseService extends Service {
 	 * @return
 	 */
 	protected String debugRequestHeaders(Event event) throws Exception {
+		
 		StringBuffer sb = new StringBuffer("HTTP Request:"); //$NON-NLS-1$
 
-		sb.append("\n request=").append(event.query().path());
-		if(event.query().parameters().length()>0){
-			sb.append("?").append(event.query().parameters());
+		if(event.query()!=null) {
+			event.query().parse();
+			sb.append("\n request=").append(event.query().path());
+			if(event.query().parameters()!=null){
+				sb.append("?").append(event.query().parameters());
+			}
+			HashMap headers = event.query().header();
+		    for(Object name : headers.keySet()) {
+		      Object value = headers.get(name);
+		      sb.append("\n ").append(name).append("=").append(value); //$NON-NLS-1$ //$NON-NLS-2$
+		    }
+		    sb.append("\n Remote Address:").append(event.remote());
 		}
-		HashMap headers = event.query().header();
-	    for(Object name : headers.keySet()) {
-	      Object value = headers.get(name);
-	      sb.append("\n ").append(name).append("=").append(value); //$NON-NLS-1$ //$NON-NLS-2$
-	    }
-	    sb.append("\n Remote Address:").append(event.remote());
 
 	    return sb.toString();
 	}
@@ -190,7 +200,7 @@ public abstract class BaseService extends Service {
 		if(bytes!=null) {
 			ResponseHeader.on(event).setHeader("Content-encoding", "gzip");	//$NON-NLS-1$ //$NON-NLS-2$
 		} else {
-			bytes = data.getBytes(CHARACTER_ENCODING);
+			bytes = data.getBytes(UTF8);
 		}
 		
 		ResponseHeader.on(event).contentLength(bytes.length);
@@ -208,7 +218,7 @@ public abstract class BaseService extends Service {
         try {
             bout = new ByteArrayOutputStream();
             GZIPOutputStream output = new GZIPOutputStream(bout);
-            output.write(data.getBytes());
+            output.write(data.getBytes(UTF8));
             output.flush();
             output.close();
             bout.close();
@@ -333,14 +343,28 @@ public abstract class BaseService extends Service {
 		}
 		
 		/**
-		 * Set MIME content type for the file to be returned.
+		 * Set MIME content type for the file to be returned. Also sets the language if
+		 * the type is HTML or TEXT.
 		 * @param file
 		 * @return
 		 */
 		ResponseHeader contentType(ContentType type) {
 			if(type!=null) {
 				reply.type(type.getMime());
+				if(ContentType.htmlTypes.contains(type)) {
+					contentLanguage(Constants.getLocale());
+				}
 			} 
+			return this;
+		}
+		
+		/**
+		 * Set language for the file to be returned.
+		 * @param file
+		 * @return
+		 */
+		ResponseHeader contentLanguage(Locale locale) {
+			setHeader("Content-Language", locale.toString());
 			return this;
 		}
 		
