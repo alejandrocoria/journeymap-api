@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -22,12 +23,19 @@ import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.Constants.WorldType;
+import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.ChunkFileHandler;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
+import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.render.ChunkRenderer;
 
-public class SaveMapServlet extends BaseService {
+/**
+ * Provides a map of the entire world
+ * @author mwoodman
+ *
+ */
+public class SaveMapService extends BaseService {
 
 	private static final long serialVersionUID = 4412225358529161454L;
 
@@ -38,7 +46,7 @@ public class SaveMapServlet extends BaseService {
 	/**
 	 * Serves chunk data and player info.
 	 */
-	public SaveMapServlet() {
+	public SaveMapService() {
 		super();
 	}
 
@@ -66,36 +74,14 @@ public class SaveMapServlet extends BaseService {
 			throwEventException(503, Constants.getMessageJMERR02(), event, false);
 		}
 		
+		// Ensure world dir available
 		File worldDir = FileHandler.getWorldDir(minecraft);
-		
-		// Check for hardcore
-		Boolean hardcore = !minecraft.isSingleplayer() && theWorld.getWorldInfo().isHardcoreModeEnabled();
-
-		// Check world requested
-		String worldName = getParameter(query, "worldName", null); //$NON-NLS-1$
-		worldName = URLDecoder.decode(worldName, "UTF-8"); //$NON-NLS-1$
-		
-		// Check world type
-		String worldTypeString = getParameter(query, "worldType", Constants.WorldType.sp.name()); //$NON-NLS-1$
-		Constants.WorldType worldType;
-		try {
-			worldType = Constants.WorldType.valueOf(worldTypeString);
-		} catch (Exception e) {
-			String error = Constants.getMessageJMERR05("worldType=" + worldTypeString); //$NON-NLS-1$
-			throwEventException(400, error, event, false);
+		if (!worldDir.exists() || !worldDir.isDirectory()) {
+			String error = Constants.getMessageJMERR10(worldDir.getAbsolutePath());			
 		}
 		
 		// Check depth (for underground maps)
 		int depth = getParameter(query, "depth", 4); //$NON-NLS-1$
-		
-		if(!worldName.equals(URLDecoder.decode(FileHandler.getSafeName(ModLoader.getMinecraftInstance())))) {
-			String error = Constants.getMessageJMERR10("worldType=" + worldTypeString); //$NON-NLS-1$
-			throwEventException(503, error, event, true);
-
-		}  else if (!worldDir.exists() || !worldDir.isDirectory()) {
-			String error = Constants.getMessageJMERR10(worldDir.getAbsolutePath());
-			
-		}
 		
 		try {
 			int worldProviderType = getParameter(query, "worldProviderType", 0);  //$NON-NLS-1$
@@ -109,6 +95,8 @@ public class SaveMapServlet extends BaseService {
 			}
 			
 			// Validate cave mapping allowed
+			// Check for hardcore
+			Boolean hardcore = !minecraft.isSingleplayer() && theWorld.getWorldInfo().isHardcoreModeEnabled();
 			if(mapType.equals(Constants.MapType.underground) && hardcore) {
 				String error = "Cave mapping on hardcore servers is not allowed"; //$NON-NLS-1$
 				throwEventException(403, error, event, false);
@@ -118,15 +106,26 @@ public class SaveMapServlet extends BaseService {
 			final Constants.CoordType cType = Constants.CoordType.convert(mapType, worldProviderType);
 			BufferedImage mapImg = MapSaver.saveMap(worldDir, mapType, depth, cType);
 			
+			// Get save-as name
+			StringBuffer sb = new StringBuffer(WorldData.getWorldName(minecraft));
+			sb.append("_").append(mapType).append("_"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(cType).append(ContentType.png);
+			String saveName = URLEncoder.encode(sb.toString(), CHARACTER_ENCODING);
+					
 			// Set response headers
-			ResponseHeader.on(event).noCache().contentType(ContentType.png);
+			ResponseHeader.on(event).noCache().inlineFilename(saveName).contentType(ContentType.png);
 			
 			// Write image to output
 			ImageIO.write(mapImg, "png", event.output()); //$NON-NLS-1$
 			
 		} catch (NumberFormatException e) {
 			reportMalformedRequest(event);
-		} 
+		} catch (Event eventEx ) {
+			throw eventEx;
+		} catch(Throwable t) {				
+			JourneyMap.getLogger().severe(LogFormatter.toString(t));			
+			throwEventException(500, Constants.getMessageJMERR19(path), event, true);
+		}
 	}
 
 }
