@@ -27,7 +27,7 @@ public class JMLogger extends Logger {
 		
 		// File logging
 		try {
-			File logFile = new File(FileHandler.getJourneyMapDir(), LOG_FILE);
+			File logFile = getLogFile();
 			if(logFile.exists()) {
 				logFile.delete();
 			} else {
@@ -79,6 +79,14 @@ public class JMLogger extends Logger {
 			consoleHandler.setLevel(level);
 			logHandler.setLevel(level);
 		}
+	}
+	
+	/**
+	 * Return a handle to the log file used.
+	 * @return
+	 */
+	public File getLogFile() {
+		return new File(FileHandler.getJourneyMapDir(), LOG_FILE);
 	}
 	
 	
