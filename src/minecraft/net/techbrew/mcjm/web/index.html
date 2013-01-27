@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="utf-8">
 <title>JourneyMap</title>
@@ -7,13 +7,8 @@
 <meta name="description" content="">
 <meta name="author" content="Mark Woodman - Techbrew.net">
 
+<link href="http://feeds.feedburner.com/JourneyMap" id="rssfeed" rel="alternate" type="application/rss+xml" />                
 <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-<style type="text/css">
-body {
-	padding-top: 60px;
-	padding-bottom: 40px;
-}
-</style>
 <link href="css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css" />
 <link href="css/default.css" rel="stylesheet" type="text/css" />
 
@@ -33,110 +28,91 @@ body {
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/jquery-ui-1.10.0.custom.min.js"></script>
-<script type="text/javascript" src="/msg"></script>
-<script type="text/javascript">
-   $('<link>',{
-	    rel: 'alternate',
-	    type: 'application/rss+xml',
-	    title: JML10N.rss_feed_title,
-	    href: 'http://feeds.feedburner.com/JourneyMap'
-	}).appendTo('head');
- </script>
-
 </head>
 
 <body>
 
-	<div class="navbar navbar-fixed-top">
+	<div id="header" class="navbar navbar-static-top">
 		<div class="navbar-inner">
 			<div class="container">
+			
 			     <a class="brand" href="#"><img src="img/journeymap.png" alt="JourneyMap"></a>
 			     
 			      <ul class="nav">
-                        <li id="dayButton"><a href="#">[day]</a></li>
+                        <li class="active" id="dayButton"><a href="#">[day]</a></li>
                         <li id="nightButton"><a href="#night">[night]</a></li>
                         <li id="caveButton"><a href="#caves">[cave]</a></li>
                         <li id="followButton"><a href="#"><i class="icon-map-marker"></i></a></li>
                     </ul>
                     
+			       <div class="btn-toolbar visible-tablet visible-desktop">
+					   <div class="btn-group">
+					
+							<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+								Show... <span class="caret"></span>
+							</a>
+							<ul class="dropdown-menu">
+								<li>
+	                              <label>
+	                                <input type="checkbox" name="optionsCheckboxes" value="option1">
+	                                <span>Animals</span>
+	                              </label>
+	                            </li>
+	                            <li>
+	                              <label>
+	                                <input type="checkbox" name="optionsCheckboxes" value="option1">
+	                                <span>Pets</span>
+	                              </label>
+	                            </li>	
+	                            <li>
+                                  <label>
+                                    <input type="checkbox" name="optionsCheckboxes" value="option1">
+                                    <span>Mobs</span>
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="optionsCheckboxes" value="option1">
+                                    <span>Villagers</span>
+                                  </label>
+                                </li>
+	                            <li>
+	                              <label>
+	                                <input type="checkbox" name="optionsCheckboxes" value="option1">
+	                                <span>Players</span>
+	                              </label>
+	                            </li>						
+							</ul>
+					   </div>
+					   <span id="worldNameHeader">[JM.world.name]</span>
+					   <div class="btn-group">							
+							<button class="btn active">
+								<i class="icon-picture"></i>
+							</button>
+					   </div>
+					
+					   <div class="btn-group">
+							<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                               <i class="icon-info-sign"></i><span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><em>JourneyMap 2.0</em></li>
+                                <li><a target="_blank" title="" href="http://feeds.feedburner.com/JourneyMap"><img src="img/feed-icon16x16.png" alt=""></a></li>
+                                <li><a target="_blank" title="" href="http://feedburner.google.com/fb/a/mailverify?uri=Journeymap"><img src="img/email.png" alt=""></a></li>
+                                <li><a target="_blank" title="" href="https://twitter.com/intent/follow?original_referer=localhost&region=follow_link&screen_name=JourneyMapMod&source=followbutton&variant=2.0"><img src="img/twitter.png" alt=""></a></li>
+                            </ul>
+			             </div>
 
-			       
-					<div class="pull-right btn-group">
-						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-							Show... <span class="caret"></span>
-						</a>
-						<ul class="dropdown-menu">
-							<li>
-							  <label>
-		                        <input type="checkbox" name="optionsCheckboxes" value="option1">
-		                        <span>Mobs</span>
-		                      </label>
-							</li>
-							<li>
-                              <label>
-                                <input type="checkbox" name="optionsCheckboxes" value="option1">
-                                <span>Animals</span>
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="optionsCheckboxes" value="option1">
-                                <span>Pets</span>
-                              </label>
-                            </li>	
-                            <li>
-                              <label>
-                                <input type="checkbox" name="optionsCheckboxes" value="option1">
-                                <span>Players</span>
-                              </label>
-                            </li>						
-						</ul>
-						
-						
-						<button class="btn">
-							<i class="icon-picture"></i>
-						</button>
-						<button class="btn">
-							<i class="icon-info-sign"></i>
-						</button>
-					</div>
-				
-	
-
+				</div>
 				
 
 			</div>
 		</div>
 	</div>
 
-	<div class="container">
-		<canvas id="mapCanvas" style="background-color: #222"></canvas>
-	</div>
-	
-	<script type="text/javascript">
-           document.write('<div id="slider-vertical" title="' + JML10N.zoom_slider_name + '"></div>');
-    </script>
-
-	<div class="navbar navbar-fixed-bottom">
-		<div class="navbar-inner">
-			<div class="container">
-				<p>
-					<a target="_blank" href="http://journeymap.techbrew.net">JourneyMap
-						<span id="version"></span>
-					</a> &copy; 2011-2012 <a href="http://techbrew.net">TechBrew.net</a>
-					&nbsp; &nbsp;
-<script type="text/javascript">						 
-document.write('<a target="_blank" title="' + JML10N.rss_feed_desc + '" href="http://feeds.feedburner.com/JourneyMap">');
-document.write('<img src="img/feed-icon16x16.png" alt=""></a>');
-document.write('<a target="_blank" title="' + JML10N.email_sub_desc + '" href="http://feedburner.google.com/fb/a/mailverify?uri=Journeymap">');
-document.write('<img src="img/email.gif" alt=""></a>');
-document.write('<a target="_blank" title="' + JML10N.follow_twitter + '" href="https://twitter.com/intent/follow?original_referer=localhost&region=follow_link&screen_name=JourneyMapMod&source=followbutton&variant=2.0">');
-document.write('<img src="img/twitter.png" alt=""></a>');
-</script>
-				</p>
-			</div>
-		</div>
-	</div>
+	<canvas id="mapCanvas"></canvas>
+    <div class="container-fluid"><div id="slider-vertical" title=""></div></div>
+   
 <script type="text/javascript" src="/js/journeymap.js"></script>
 </body>
 </html>
