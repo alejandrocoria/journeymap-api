@@ -9,13 +9,16 @@ import java.util.concurrent.TimeUnit;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.Entity;
+import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityMob;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerSP;
+import net.minecraft.src.IMob;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.ChunkStub;
 import net.techbrew.mcjm.EntityHelper;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.data.VillagersData.Key;
 import net.techbrew.mcjm.render.MapBlocks;
 
 /**
@@ -29,7 +32,13 @@ public class MobsData implements IDataProvider {
 	private static long TTL = TimeUnit.SECONDS.toMillis(3);
 	
 	public static enum Key {
-		mobs;
+		mobs,
+		type,
+		posX,
+		posZ,
+		chunkCoordX,
+		chunkCoordZ,
+		heading;
 	}
 
 	/**
@@ -53,17 +62,18 @@ public class MobsData implements IDataProvider {
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayerSP player = mc.thePlayer;			
 	   
-		List<EntityMob> mobs = EntityHelper.getMobsNearby();
+		List<IMob> mobs = EntityHelper.getMobsNearby();
 		List<Map> list = new ArrayList<Map>(mobs.size());
-		for(EntityMob mob : mobs) {
-			LinkedHashMap mobProps = new LinkedHashMap();
-			mobProps.put("type", mob.getEntityName()); //$NON-NLS-1$
-			mobProps.put("posX", mob.serverPosX); //$NON-NLS-1$
-			mobProps.put("posZ", mob.serverPosZ); //$NON-NLS-1$
-			mobProps.put("chunkCoordX", mob.chunkCoordX); //$NON-NLS-1$
-			mobProps.put("chunkCoordZ", mob.chunkCoordZ); //$NON-NLS-1$
-			mobProps.put("heading", EntityHelper.getHeading(mob)); //$NON-NLS-1$
-			list.add(mobProps);
+		for(IMob mob : mobs) {
+			EntityLiving entity = (EntityLiving) mob;
+			LinkedHashMap eProps = new LinkedHashMap();
+			eProps.put(Key.type, entity.getEntityName()); 
+			eProps.put(Key.posX, (int) entity.posX); 
+			eProps.put(Key.posZ, (int) entity.posZ); 
+			eProps.put(Key.chunkCoordX, entity.chunkCoordX); 
+			eProps.put(Key.chunkCoordZ, entity.chunkCoordZ); 
+			eProps.put(Key.heading, EntityHelper.getHeading(entity));
+			list.add(eProps);
 		}
 					
 		LinkedHashMap props = new LinkedHashMap();

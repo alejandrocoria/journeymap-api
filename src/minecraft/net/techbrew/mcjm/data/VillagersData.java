@@ -10,12 +10,11 @@ import java.util.concurrent.TimeUnit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityAnimal;
-import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityMob;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.EntityTameable;
-import net.minecraft.src.IAnimals;
+import net.minecraft.src.EntityVillager;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.ChunkStub;
 import net.techbrew.mcjm.EntityHelper;
@@ -29,43 +28,27 @@ import net.techbrew.mcjm.render.MapBlocks;
  * @author mwoodman
  *
  */
-public class AnimalsData implements IDataProvider {
+public class VillagersData implements IDataProvider {
 	
-	private static long TTL = TimeUnit.SECONDS.toMillis(3);
-	
-	private final boolean includeNonPets;
-	private final boolean includePets;
+	private static long TTL = TimeUnit.SECONDS.toMillis(5);
 	
 	public static enum Key {
-		animals,
+		villagers,
 		type,
 		posX,
 		posZ,
 		chunkCoordX,
 		chunkCoordZ,
 		heading,
-		owner;
+		profession
 	}
 
 	/**
 	 * Constructor.
 	 */
-	public AnimalsData() {
-		includeNonPets = true;
-		includePets = true;
+	public VillagersData() {
 	}
 	
-	/**
-	 * Constructor with specific inclusions.
-	 * @param includeNonPets
-	 * @param includePets
-	 */
-	public AnimalsData(boolean includeNonPets, boolean includePets) {
-		super();
-		this.includeNonPets = includeNonPets;
-		this.includePets = includePets;
-	}
-
 	/**
 	 * Provides all possible keys.
 	 */
@@ -81,29 +64,23 @@ public class AnimalsData implements IDataProvider {
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayerSP player = mc.thePlayer;			
 	   
-		List<IAnimals> animals = EntityHelper.getAnimalsNearby(includeNonPets, includePets);
-		List<Map> list = new ArrayList<Map>(animals.size());
+		List<EntityVillager> villagers = EntityHelper.getVillagersNearby();
+		List<Map> list = new ArrayList<Map>(villagers.size());
 		
-		for(IAnimals animal : animals) {
-			EntityLiving entity = (EntityLiving) animal;
+		for(EntityVillager entity : villagers) {
 			LinkedHashMap eProps = new LinkedHashMap();
 			eProps.put(Key.type, entity.getEntityName()); 
 			eProps.put(Key.posX, (int) entity.posX); 
 			eProps.put(Key.posZ, (int) entity.posZ); 
 			eProps.put(Key.chunkCoordX, entity.chunkCoordX); 
-			eProps.put(Key.chunkCoordZ, entity.chunkCoordZ); 
-			eProps.put(Key.heading, EntityHelper.getHeading(entity));
-			if(entity instanceof EntityTameable) {
-				String owner = ((EntityTameable) entity).getOwnerName();
-				if(owner!=null) {
-					eProps.put(Key.owner, owner);
-				}
-			}
+			eProps.put(Key.chunkCoordZ, entity.chunkCoordZ); 	
+			eProps.put(Key.heading, EntityHelper.getHeading(entity)); 
+			eProps.put(Key.profession, entity.getProfession()); 
 			list.add(eProps);
 		}
 					
 		LinkedHashMap props = new LinkedHashMap();
-		props.put(Key.animals, list);
+		props.put(Key.villagers, list);
 		
 		return props;		
 	}	

@@ -35,8 +35,11 @@ import net.minecraft.src.EntitySkeleton;
 import net.minecraft.src.EntitySlime;
 import net.minecraft.src.EntitySpider;
 import net.minecraft.src.EntityTameable;
+import net.minecraft.src.EntityVillager;
 import net.minecraft.src.EntityWolf;
 import net.minecraft.src.EntityZombie;
+import net.minecraft.src.IAnimals;
+import net.minecraft.src.IMob;
 import net.minecraft.src.MathHelper;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -53,35 +56,41 @@ public class EntityHelper {
 	private static int lateralDistance = 32;
 	private static int verticalDistance = 16;
 	
-	public static List<EntityMob> getMobsNearby() {
+	public static List<IMob> getMobsNearby() {
 		Minecraft mc = Minecraft.getMinecraft();
-		return mc.theWorld.getEntitiesWithinAABB(EntityMob.class, getBB(mc.thePlayer));
+		
+		return mc.theWorld.getEntitiesWithinAABB(IMob.class, getBB(mc.thePlayer));
 	}
 	
-	public static List<EntityAnimal> getAnimalsNearby(boolean includeUntamed, boolean includeTamed) {
+	public static List<EntityVillager> getVillagersNearby() {
+		Minecraft mc = Minecraft.getMinecraft();
+		return mc.theWorld.getEntitiesWithinAABB(EntityVillager.class, getBB(mc.thePlayer));
+	}
+	
+	public static List<IAnimals> getAnimalsNearby(boolean includeUntamed, boolean includeTamed) {
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayerSP player = mc.thePlayer;
 		AxisAlignedBB bb = getBB(player);
 		
-		List<EntityAnimal> animals = null;
+		List<IAnimals> animals = null;
 		
 		if(!includeUntamed && !includeTamed) {
-			animals = new ArrayList<EntityAnimal>(0);
+			animals = new ArrayList<IAnimals>(0);
 		} else if(includeUntamed && includeTamed) {		
-			animals = mc.theWorld.getEntitiesWithinAABB(EntityAnimal.class, bb);
+			animals = mc.theWorld.getEntitiesWithinAABB(IAnimals.class, bb);
 		} else if(includeTamed) {			
 			List<EntityTameable> tameable = mc.theWorld.getEntitiesWithinAABB(EntityTameable.class, bb);
-			animals = new ArrayList<EntityAnimal>(tameable.size());
+			animals = new ArrayList<IAnimals>(tameable.size());
 			for(EntityTameable animal : tameable) {
 				if(isPetOf(animal, player)) {
 					animals.add(animal);
 				}
 			}
 		} else {
-			animals = mc.theWorld.getEntitiesWithinAABB(EntityAnimal.class, bb);
-			List<EntityAnimal> pets = new ArrayList<EntityAnimal>(animals.size());
-			for(EntityAnimal animal : animals) {
+			animals = mc.theWorld.getEntitiesWithinAABB(IAnimals.class, bb);
+			List<IAnimals> pets = new ArrayList<IAnimals>(animals.size());
+			for(IAnimals animal : animals) {
 				if(isPetOf(animal, player)) {
 					pets.add(animal);
 				}
@@ -127,7 +136,7 @@ public class EntityHelper {
 	 * @param player
 	 * @return
 	 */
-	public static boolean isPetOf(EntityAnimal animal, EntityPlayer player) {
+	public static boolean isPetOf(IAnimals animal, EntityPlayer player) {
 		if(animal instanceof EntityTameable) {
 			return player.equals(((EntityTameable) animal).getOwner());
 		} else {
@@ -144,7 +153,7 @@ public class EntityHelper {
 		if(img==null) {
 			img = getUnknownImage(); // backup plan
 			try {
-				String png = "/net/techbrew/mcjm/web/" + entityName + ".png";	//$NON-NLS-1$ //$NON-NLS-2$
+				String png = "/net/techbrew/mcjm/web/img/entity/" + entityName + ".png";	//$NON-NLS-1$ //$NON-NLS-2$
 				InputStream is = EntityHelper.class.getResourceAsStream(png);
 				img = ImageIO.read(is);
 				is.close();		
@@ -164,7 +173,7 @@ public class EntityHelper {
 	public static BufferedImage getPlayerImage() {
 		if(playerImg==null) {
 			 try {
-				String png = "/net/techbrew/mcjm/web/arrow.png";						 //$NON-NLS-1$
+				String png = "/net/techbrew/mcjm/web/img/arrow.png";						 //$NON-NLS-1$
 				InputStream is = EntityHelper.class.getResourceAsStream(png);
 				playerImg = ImageIO.read(is);
 				is.close();
@@ -184,7 +193,7 @@ public class EntityHelper {
 	public static BufferedImage getOtherImage() {
 		if(otherImg==null) {
 			 try {
-				String png = "/net/techbrew/mcjm/web/other.png";						 //$NON-NLS-1$
+				String png = "/net/techbrew/mcjm/web/img/entity/other.png";						 //$NON-NLS-1$
 				InputStream is = EntityHelper.class.getResourceAsStream(png);
 				otherImg = ImageIO.read(is);
 				is.close();
@@ -204,7 +213,7 @@ public class EntityHelper {
 	public static BufferedImage getUnknownImage() {
 		BufferedImage img = null;
 		try {
-			String png = "/net/techbrew/mcjm/web/alert.png";						 //$NON-NLS-1$
+			String png = "/net/techbrew/mcjm/web/img/alert.png";						 //$NON-NLS-1$
 			InputStream is = EntityHelper.class.getResourceAsStream(png);
 			img = ImageIO.read(is);
 			is.close();
