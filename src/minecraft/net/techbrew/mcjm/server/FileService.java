@@ -40,7 +40,7 @@ import net.techbrew.mcjm.server.BaseService.ResponseHeader;
  * @author mwoodman
  *
  */
-public class FileServlet extends BaseService {
+public class FileService extends BaseService {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -55,7 +55,7 @@ public class FileServlet extends BaseService {
 	/**
 	 * Default constructor
 	 */
-	public FileServlet() {
+	public FileService() {
 		
 		URL resourceDir = null;
 		
