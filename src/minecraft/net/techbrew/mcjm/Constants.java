@@ -29,13 +29,18 @@ public class Constants {
 	
 	public static Locale getLocale() {
 		String language = Minecraft.getMinecraft().gameSettings.language;
+		Locale locale = null;
 		if(language==null) {
-			language = Locale.getDefault().toString();
+			locale = Locale.getDefault();
+		} else if(language.equals("en_PT")) {
+			locale = new Locale("en", "PT");
+		} else {
+			locale = new Locale(language);
 		}
-		return new Locale(language);
+		return locale;
 	}
 
-	private static ResourceBundle getResourceBundle() {
+	public static ResourceBundle getResourceBundle() {
 		return ResourceBundle.getBundle(BUNDLE_NAME, getLocale());
 	}
 	
@@ -49,8 +54,12 @@ public class Constants {
 	}
 	
 	public static String getString(String key) {
+		return getString(key, getResourceBundle());
+	}
+	
+	public static String getString(String key, ResourceBundle bundle) {
 		try {
-			return getResourceBundle().getString(key);
+			return bundle.getString(key);
 		} catch (MissingResourceException e) {
 			return '!' + key + '!';
 		}
