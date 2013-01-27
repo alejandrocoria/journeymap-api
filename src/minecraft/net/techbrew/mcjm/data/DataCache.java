@@ -22,7 +22,7 @@ public class DataCache {
 	
 	// Private constructor
 	private DataCache() {
-		 cache = new ConcurrentHashMap<Class<? extends IDataProvider>, DataHolder>(7); // adjust size for # of IDataProvider impl classes
+		 cache = new ConcurrentHashMap<Class<? extends IDataProvider>, DataHolder>(8); // adjust size for # of IDataProvider impl classes
 	}
 	
 	// On-demand-holder for instance
@@ -126,6 +126,15 @@ public class DataCache {
     	DataHolder dh = internalGet(dpClass);
     	sb.append(dh.getJsonData());
     	return dh.getExpires();
+    }
+    
+    /**
+     * Convenience method
+     * @param key
+     * @return
+     */
+    public static Object playerDataValue(PlayerData.Key key) {
+    	return instance().get(PlayerData.class).get(key);
     }
 
     /**
