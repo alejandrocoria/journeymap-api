@@ -623,7 +623,7 @@ public class MapOverlay extends GuiScreen {
 
 			// Maptype
 			Constants.MapType tempMapType = null;
-			final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(PlayerData.Key.underground);
+			final boolean underground = (Boolean) DataCache.playerDataValue(PlayerData.Key.underground);
 			if(underground && showCaves && !hardcore) {
 				tempMapType = Constants.MapType.underground;
 			} else {
@@ -703,9 +703,9 @@ public class MapOverlay extends GuiScreen {
 				chunkZ>=mapBounds[0].chunkZPos && chunkZ<=mapBounds[1].chunkZPos);
 	}
 	
-	boolean inBounds(Map animalsDataMap) {
-		int chunkX = (Integer) animalsDataMap.get("chunkCoordX");
-		int chunkZ = (Integer) animalsDataMap.get("chunkCoordZ");
+	boolean inBounds(Map entityMap) {
+		int chunkX = (Integer) entityMap.get(MobsData.Key.chunkCoordX);
+		int chunkZ = (Integer) entityMap.get(MobsData.Key.chunkCoordZ);
 		return (chunkX>=mapBounds[0].chunkXPos && chunkX<=mapBounds[1].chunkXPos && 
 				chunkZ>=mapBounds[0].chunkZPos && chunkZ<=mapBounds[1].chunkZPos);
 	}
@@ -757,9 +757,9 @@ public class MapOverlay extends GuiScreen {
 				for(Map critter : critters) {
 					if(inBounds(critter)) {
 
-						String type = (String) critter.get("type");
-						int x = (Integer) critter.get("posX");
-						int z = (Integer) critter.get("posZ");
+						String type = (String) critter.get(MobsData.Key.type);
+						int x = (Integer) critter.get(MobsData.Key.posX);
+						int z = (Integer) critter.get(MobsData.Key.posZ);
 						
 						int iconHeight = (type.equals("Dragon") || type.equals("Ghast")) ? 56 : 48;
 						int iconWidth = iconHeight;
