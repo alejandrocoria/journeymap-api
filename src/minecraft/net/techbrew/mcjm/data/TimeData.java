@@ -48,7 +48,7 @@ public class TimeData implements IDataProvider {
 		props.put(Key.worldCurrentTime, mc.theWorld.getWorldTime() % 24000L);
 		props.put(Key.worldTotalTime, mc.theWorld.getTotalWorldTime());
 
-		return Collections.unmodifiableMap(props);	
+		return props;
 	}
 	
 	/**

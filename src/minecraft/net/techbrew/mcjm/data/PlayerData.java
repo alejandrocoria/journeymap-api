@@ -21,7 +21,7 @@ import net.techbrew.mcjm.render.MapBlocks;
  */
 public class PlayerData implements IDataProvider {
 	
-	private static long TTL = TimeUnit.SECONDS.toMillis(1);
+	private static long TTL = TimeUnit.MINUTES.toMillis(1);
 	
 	public static enum Key {
 		username,
@@ -71,7 +71,7 @@ public class PlayerData implements IDataProvider {
 		props.put(Key.biome, getPlayerBiome()); 
 		props.put(Key.underground, playerIsUnderground());		
 				
-		return Collections.unmodifiableMap(props);		
+		return props;	
 	}	
 	
 	/**
