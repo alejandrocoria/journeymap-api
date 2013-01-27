@@ -1,3 +1,4 @@
+var headerSize = 0;
 var mapScale = 2;
 var minMapScale = 1;
 var maxMapScale = 8;
@@ -8,7 +9,7 @@ var showCaves = true;
 var showMonsters = true;
 var centerOnPlayer = true;
 var autoRefresh = true;
-var mapBackground = "#252";
+var mapBackground = "#222";
 var chunks = new Object();
 var canvas;
 var ctx;
@@ -21,19 +22,9 @@ var playerCanvas;
 var useTempCanvas = false;
 var lastChunksImage;
 var playerImage;
-var worldPath;
-var worldProviderType;
-var worldName;
-var worldTime;
-var worldSeed;
-var player;
-var jm_version;
-var mc_version;
-var latest_journeymap_version;
-var latest_minecraft_version;
+
 var refreshDataTimer;
-var mobs;
-var others;
+
 var mobImages = new Object();
 var otherImages = new Array();
 var chunks = new Object();
@@ -41,66 +32,123 @@ var chunkScale = mapScale*16;
 var playerLastPos = "0,0";
 var clientRefreshRate = 1500;
 
+var JmIcon;
+var halted = false;
+
+var JML10N = {};
+
+var JM = {
+    mobs:[],
+    animals:[],
+    players:[]
+};
+
 
 /** OnLoad **/
 $(document).ready(init);
 
 function init() {
 	
-   // IE check
-   if(!(window.badBrowser===undefined)) {
-        return;
-   }
-   
-   // Check for l10n messages
-   if(typeof JML10N === "undefined") {
-	   alert('There was a problem getting localized messages for your locale. Please report this error on the JourneyMap helpdesk:\nhttp://journeymap.techbrew.net/helpdesk/');
-	   return;
-   }
-
-   // Set window size for iPhone
-   if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))) {
-      window.scrollTo(0, 1);
-   }
-   
-   // Init mob images
-   initImages();
-   
-   // Init canvases
-   canvas = $("#mapCanvas")[0];
-   tempCanvas = document.createElement("canvas");
-   playerCanvas = document.createElement("canvas");
-   
-   // Init slider
-   $(function() {
-        $( "#slider-vertical" ).slider({
-            orientation: "vertical",
-            range: "min",
-            min: minMapScale,
-            max: maxMapScale,
-            value: 2,
-            step:1,
-            slide: function( event, ui ) {
-                setZoom(ui.value);
-            }
+    // Offset canvas
+    $("#mapCanvas").offset({ top: headerSize, left: 0});
+    
+    // Init canvases
+    canvas = $("#mapCanvas")[0];
+    tempCanvas = document.createElement("canvas");
+    playerCanvas = document.createElement("canvas");
+        
+	// Get L10N messages, set strings on success
+    $.ajax({
+        url: "/data/messages", 
+        dataType: "jsonp",
+        contentType: "application/javascript; charset=utf-8",
+        async: false})
+    .fail(handleError)
+	.done(function(data, textStatus, jqXHR) { 
+		
+        JML10N = data;
+        
+        // Set page language, although at this point it may be too late to matter.
+        $('html').attr('lang', JML10N.locale.split('_')[0]);
+        
+        // Set RSS feed title
+        $("link #rssfeed").attr("title", JML10N.rss_feed_title);
+        
+        // Init toolbar button tooltips
+        $("#dayButton").html("<a href='#' title='" + JML10N.day_button_desc +"'>" + JML10N.day_button_title + "</a>");
+        
+        $("#nightButton").html("<a href='#' title='" + JML10N.night_button_desc +"'>" + JML10N.night_button_title + "</a>");
+        $("#followButton").html("<a href='#' title='" + JML10N.follow_button_desc +"'>" + JML10N.follow_button_title + "</a>");
+        $("#caveButton").html("<a href='#' title='" + JML10N.cave_button_desc +"'>" + JML10N.cave_button_title + "</a>");
+        
+        $("#monstersButton").attr("title", "<b>" + JML10N.monsters_button_title + "</b><br/>" + JML10N.monsters_button_desc);
+        $("#saveButton").attr("title", JML10N.save_button_title);
+        $("#aboutButton").attr("title", JML10N.about_button_title);
+        
+        // TODO:
+        // JML10N.rss_feed_desc 
+        //JML10N.email_sub_desc
+        //JML10N.follow_twitter
+        //JML10N.zoom_slider_name
+        
+        // Init mob images
+        initImages();
+        
+        // Get header height
+        //headerSize = $("#header").height();
+        
+        // Init slider
+        $(function() {
+             $( "#slider-vertical" ).slider({
+                 orientation: "vertical",
+                 range: "min",
+                 title: JML10N.zoom_slider_name,
+                 min: minMapScale,
+                 max: maxMapScale,
+                 value: 2,
+                 slide: function( event, ui ) {
+                     setZoom(ui.value);
+                 }
+             });
+         });
+        
+        // Init buttons
+        $("#dayButton").click(function() {
+     	   setMapType('day');
+     	   refreshData();
         });
-    });
-   
-   // Init map type
-   setMapType('day');
-   
-   // Size the canvases and setup for custom event handling
-   registerEvents();   
-   
-   // Init world info   
-   initWorld();  
+        
+        $("#nightButton").click(function() {
+     	   setMapType('night');
+     	   refreshData();
+        });
+        
+        $("#caveButton").click(function() {
+     	   setShowCaves(!showCaves);
+        });
+        
+        $("#followButton").click(function() {
+     	   setCenterOnPlayer(!centerOnPlayer);
+     	   refreshData();
+        });
+                
+        // Init map type
+        setMapType('day');
+        
+        // Size the canvases and setup for custom event handling
+        registerEvents();   
+        
+        // Init world info   
+        initWorld();  
+   });
 }
+
 
 function checkVersion() {
 
-   $("#version").attr("innerHTML", jm_version + " for Minecraft " + mc_version);
-   if(latest_journeymap_version>jm_version) {
-       $("#versionButton").attr("title", "<b>" + JML10N.update_available + "</b><br/>JourneyMap " + latest_journeymap_version + " for Minecraft " + latest_minecraft_version);
+   $("#version").attr("innerHTML", JM.world.jm_version + " for Minecraft " + JM.world.mc_version);
+   if(JM.world.latest_journeymap_version>JM.world.jm_version) {
+       $("#versionButton").attr("title", "<b>" + JML10N.update_available + "</b><br/>JourneyMap " + JM.world.latest_journeymap_version + " for Minecraft " + JM.world.latest_minecraft_version);
        $("#versionButton").css("visibility", "visible");
        $("#versionButton").tooltip({
            effect: 'slide',
@@ -109,22 +157,11 @@ function checkVersion() {
        //$("#versionButton").tooltip.show();
    }
    
-   _gaq.push(['_setCustomVar', 1, 'jm_version', jm_version, 2]);
-   _gaq.push(['_trackEvent', 'Client', 'CheckVersion', jm_version]);
+   _gaq.push(['_setCustomVar', 1, 'jm_version', JM.world.jm_version, 2]);
+   _gaq.push(['_trackEvent', 'Client', 'CheckVersion', JM.world.jm_version]);
 }
 
 function initImages() {
-
-    // Init toolbar button tooltips
-    $("#dayButton").attr("title", "<b>" + JML10N.day_button_title + "</b><br/>" + JML10N.day_button_desc);
-    
-    $("#nightButton").attr("title", "<b>" + JML10N.night_button_title + "</b><br/>" + JML10N.night_button_desc);
-    $("#followButton").attr("title", "<b>" + JML10N.follow_button_title + "</b><br/>" + JML10N.follow_button_desc);
-    $("#caveButton").attr("title", "<b>" + JML10N.cave_button_title + "</b><br/>" + JML10N.cave_button_desc);
-    $("#monstersButton").attr("title", "<b>" + JML10N.monsters_button_title + "</b><br/>" + JML10N.monsters_button_desc);
-    $("#saveButton").attr("title", "<b>" + JML10N.save_button_title + "</b><br/>" + JML10N.save_button_desc);
-    $("#aboutButton").attr("title", "<b>" + JML10N.about_button_title + "</b><br/>" + JML10N.about_button_desc);
-
 
    // Init player marker
    playerImage=document.createElement("img");
@@ -139,18 +176,7 @@ function initImages() {
         refreshData();
    };
    document.body.appendChild(playerImage);
-   
-   // Init mob images
-   var mobNames = ["Blaze","CaveSpider","Chicken","Cow","Creeper","Dragon","Enderman","Ghast","MagmaCube",
-                   "Ocelot","Pig","PigZombie","Sheep","Silverfish","Skeleton","Slime","Spider","SpiderJockey",
-                   "Squid","Wither","Wolf","Zombie"];
-   
-   $.each(mobNames, function(index, name) { 
-		var img =new Image();
-		img['class']='mobImage';
-		img.src='img/entity/' + name +'.png';
-		mobImages[name] = img;
-	});
+
 }
 
 function saveMapImage() {
@@ -162,31 +188,53 @@ function saveMapImage() {
 }
 
 function initWorld() {
-
-	$.ajax({url: "/data/world", dataType: "jsonp"})
+	
+	// Clear the refresh interval, if any
+    if(refreshDataTimer) {
+    	clearInterval(refreshDataTimer); 
+    }
+	
+	// Start with the time data
+	$.ajax({url: "/data/time", dataType: "jsonp"})
+	.fail(handleError)
+	.done(function(data, textStatus, jqXHR) { 		
+		JM.time = data;
+		
+		// Now get the world data
+		$.ajax({url: "/data/world", dataType: "jsonp"})
 		.fail(handleError)
-    	.done(function(data, textStatus, jqXHR) { 
-    		 if(worldName!=null) {
-          	   $("#worldNameHeader").attr("innerHTML",unescape(worldName).replace("\\+"," "));            	   
-                  setCenterOnPlayer(true);
-             }
-             // Auto-refresh the map once per N seconds
-             if(mapScale>minMapScale) {
-          	   var refreshRate = clientRefreshRate;
-             } else {
-          	   var refreshRate = clientRefreshRate * 2;
-             }
-             refreshDataTimer = setInterval(function() {
-                if(autoRefresh && !isScroll) {
-                   refreshData();
-                }
-                //console.log("Refreshed");
-             }, refreshRate);
-             sizeMap();
-             refreshData();
-             // Check version
-             checkVersion();
-    	});    	
+		.done(function(data, textStatus, jqXHR) { 
+			
+			JM.world = data;
+			
+			 if(JM.world.name!=null) {
+		  	   $("#worldNameHeader").html(unescape(JM.world.name).replace("\\+"," "));            	   		          
+		     }
+			 
+			 setCenterOnPlayer(true);
+			 
+		     // Auto-refresh the data once per N seconds
+		     if(mapScale>minMapScale) {
+		  	   var refreshRate = clientRefreshRate;
+		     } else {
+		  	   var refreshRate = clientRefreshRate * 2;
+		     }		    
+		     
+		     refreshDataTimer = setInterval(function() {
+		        if(autoRefresh && !isScroll) {
+		           refreshData();
+		        }		        
+		     }, refreshRate);
+	     		     
+		     sizeMap();
+		     refreshData();
+		     
+		     // Check version
+		     checkVersion();
+		});    
+		
+	}); 
+
 }
 
 var delay = (function(){
@@ -205,7 +253,7 @@ function setScale(newScale) {
 function sizeMap() {
    // Update canvas size   
    setCanvasWidth($(window).width());
-   setCanvasHeight($(window).height());
+   setCanvasHeight($(window).height()-headerSize);
    document.body.style.backgroundColor = mapBackground;
 }
 
@@ -246,7 +294,9 @@ function setCanvasHeight(height) {
 }
 
 function centerMapOnPlayer() {
-   centerMapOnChunk(Math.round(player.chunkCoordX), Math.round(player.chunkCoordZ));
+	if(JM.player) {
+		centerMapOnChunk(Math.round(JM.player.chunkCoordX), Math.round(JM.player.chunkCoordZ));
+	}
 }
 
 function centerMapOnChunk(chunkX, chunkZ) {
@@ -275,15 +325,15 @@ function setMapType(mapType, refresh) {
    //console.log('SetMapType: ' + mapType);
    if(mapType=="day") {
       showLight = false;
-      mapBackground = "#252";     
-      $("#dayButton").removeClass("imgButton").addClass("imgButtonSelected");
-      $("#nightButton").removeClass("imgButtonSelected").addClass("imgButton");
+      mapBackground = "#222";     
+      $("#dayButton").addClass("active");
+      $("#nightButton").removeClass("active");
       
    } else if(mapType=="night") {
       showLight = true;
       mapBackground = "#000";
-      $("#dayButton").removeClass("imgButtonSelected").addClass("imgButton");
-      $("#nightButton").removeClass("imgButton").addClass("imgButtonSelected");
+      $("#dayButton").removeClass("active");
+      $("#nightButton").addClass("active");
    } else {
       console.log("Error: Can't set mapType: " + mapType);
       return;  
@@ -301,18 +351,18 @@ function setCenterOnPlayer(onPlayer) {
    centerOnPlayer = onPlayer;
    if(onPlayer==true) {
       centerMapOnPlayer();
-      $("#followButton").removeClass("imgButton").addClass("imgButtonToggle");
+      $("#followButton").addClass("active");
    } else {
-      $("#followButton").removeClass("imgButtonToggle").addClass("imgButton");
+      $("#followButton").removeClass("active");
    }
 }
 
 function setShowCaves(show) {	   
    showCaves = show;
    if(showCaves==true) {
-      $("#caveButton").removeClass("imgButton").addClass("imgButtonToggle");
+      $("#caveButton").addClass("active");
    } else {
-      $("#caveButton").removeClass("imgButtonToggle").addClass("imgButton");
+      $("#caveButton").removeClass("active");
    }
    if(player.underground==true) {
 	   refreshData();
@@ -322,14 +372,14 @@ function setShowCaves(show) {
 function setShowMonsters(show) {	   
    showMonsters = show;
    if(showMonsters==true) {
-      $("#monstersButton").removeClass("imgButton").addClass("imgButtonToggle");
+      $("#monstersButton").addClass("active");
    } else {
-      $("#monstersButton").removeClass("imgButtonToggle").addClass("imgButton");
+      $("#monstersButton").removeClass("active");
    }
 }
 
 function checkShowCaves() {
-   if(player.underground==true && showCaves) {
+   if(JM.player.underground==true && showCaves) {
 	   mapBackground = "#000";
    } else {
 	   if(showLight) {
@@ -360,74 +410,130 @@ function getMapDataUrl() {
    var ctx = getContext();
    var width = getCanvasWidth();
    var height = getCanvasHeight();
-   var mapType = (player.underground && showCaves) ? "underground" : (showLight ? "night" : "day") ;  
-   var depth = player.chunkCoordY;
-   var request = worldPath + "&mapType=" + mapType + "&depth=" + depth + "&x1=" + mapBounds.x1+ "&z1=" + mapBounds.z1 + 
-                             "&x2=" + mapBounds.x2 + "&z2=" + mapBounds.z2 + "&width=" + width + "&height=" + height +
-                             "&t=" + new Date().getTime();
+   var mapType = (JM.player.underground && showCaves) ? "underground" : (showLight ? "night" : "day") ;  
+   var depth = JM.player.chunkCoordY;
+   var request = "/map.png?mapType=" + mapType + "&depth=" + depth + "&x1=" + mapBounds.x1+ "&z1=" + mapBounds.z1 + 
+                             "&x2=" + mapBounds.x2 + "&z2=" + mapBounds.z2 + "&width=" + width + "&height=" + height;
    return request;
 }
 
 
 function refreshData() {  
+	
+	$.ajax({url: "/data/time", dataType: "jsonp"})
+	.fail(handleError)
+	.done(function(data, textStatus, jqXHR) { 		
+		JM.time = data;
+	}); 
+	
    if(isScroll==false) {
-	  refreshImageData();
+	   
+	   $.ajax({url: "/data/player", dataType: "jsonp"})
+		.fail(handleError)
+	   	.done(function(data, textStatus, jqXHR) { 
+			JM.player = data;
+			
+			// With the player data updated, we can get the map data			
+			// Update bounds first
+			checkBounds();			
+			
+			if(centerOnPlayer) {
+				centerMapOnPlayer();
+			}
+			
+			// Update the lastChunksImage with the map data
+			lastChunksImage = new Image();
+			lastChunksImage.onload = function () {          
+			    // Draw the image on the canvas
+			    var ctx = getContext();         
+			    updateUI();
+			}    
+			lastChunksImage.src=getMapDataUrl();
+	   	});
+	   
+	   $.ajax({url: "/data/players", dataType: "jsonp"})
+		.fail(handleError)
+	   	.done(function(data, textStatus, jqXHR) { 
+	   		JM.players = data.players;
+	   	});
+	   
+	   $.ajax({url: "/data/mobs", dataType: "jsonp"})
+		.fail(handleError)
+	   	.done(function(data, textStatus, jqXHR) { 
+	   		JM.mobs = data.mobs;
+	   	});
+	   
+	   $.ajax({url: "/data/animals", dataType: "jsonp"})
+		.fail(handleError)
+	   	.done(function(data, textStatus, jqXHR) { 
+	   		JM.animals = data.animals;
+	   	});
+	   
+	   $.ajax({url: "/data/villagers", dataType: "jsonp"})
+		.fail(handleError)
+	   	.done(function(data, textStatus, jqXHR) { 
+	   		JM.villagers = data.villagers;
+	   	});
+	   
+	   
    }
 }
 
-function refreshImageData() {
-	
 
-	$.ajax( "/map.png" )
-		.fail(handleError)
-    	.done(function(data, textStatus, jqXHR) { 
-			 if(centerOnPlayer) {    
-	             centerMapOnPlayer();                
-	          } else {
-	             checkBounds();
-	          }
-	          lastChunksImage = new Image();
-	          lastChunksImage.onload = function () {          
-	              // Draw the image on the canvas
-	              var ctx = getContext();         
-	              updateUI();
-	          }    
-	          lastChunksImage.src=getMapDataUrl();
-    	});
-}
-
+// Ajax request got an error from the server
 function handleError(data, error, jqXHR) {
 	
-	console.log("Bad response: " + data.responseText);
+	console.log("Server returned error: " + data.status + ": " + jqXHR);
 	
-    if(error=="" || error==null) {
-       error = JML10N.error_world_not_connected;
-    } else if(error.substring && error.substring(1,8)=="JMERR09") {
-       error = JML10N.error_world_not_opened;
-    }
+	clearInterval(refreshDataTimer);
+	refreshDataTimer = null;
+	
+	var displayError;
+	if(data.status==503 || data.status==0) {
+		if(JML10N.error_world_not_opened) {
+			displayError = JML10N.error_world_not_opened;
+		} else {
+			displayError = data.statusText;
+		}
+	}	
+
+	// Format UI
     document.body.style.backgroundColor = "#000";
-    clearInterval(refreshDataTimer);
     sizeMap();
-    var icon = new Image();
-    icon.onload=function() {
-        ctx.drawImage(icon, getCanvasWidth()/2-72, getCanvasHeight()/2-160);
-        icon.onload=null;
-    };
-    icon.src="/ico/apple-touch-icon-144x144-precomposed.png";
+    
     var ctx = getContext();
+    
+    if(!JmIcon) {
+    	JmIcon = new Image();
+    	JmIcon.onload=function() {
+	        ctx.drawImage(JmIcon, getCanvasWidth()/2-72, getCanvasHeight()/2-160);
+	        JmIcon.onload=null;
+	    };
+	    JmIcon.src="/ico/apple-touch-icon-144x144-precomposed.png";
+	} else {
+		ctx.drawImage(JmIcon, getCanvasWidth()/2-72, getCanvasHeight()/2-160);
+    }
+    
     ctx.globalAlpha=1;
     ctx.fillStyle = "red";
     ctx.font = "bold 16px Arial";
     ctx.textAlign="center";
-    ctx.fillText(error, getCanvasWidth()/2, (getCanvasHeight()/2) + 10);
-    
-    
+    ctx.fillText(displayError, getCanvasWidth()/2, (getCanvasHeight()/2) + 10);
+        
     // Remove others
 	$.each(otherImages, function(index, img) { 
 		document.body.removeChild(img);
 	});
 	
-    setTimeout(initWorld,5000);
+    // Restart in 5 seconds
+	if(!halted) {
+		halted = true;
+		setTimeout(function(){
+			console.log("Trying to re-initialize");
+			halted = false;
+			init();
+		},5000);
+	}
 }
 
 
@@ -445,9 +551,6 @@ function updateUI() {
    
    // map data
    drawImageChunks();
-   
-   // update world info
-   updateWorldInfo();
    
    // player position
    drawPlayer();
@@ -489,21 +592,21 @@ function drawBackground() {
 function updateWorldInfo() {
 	
 	var table = "<table><tbody>";
-    if(worldProviderType==-1) {
+    if(JM.world.dimension==-1) {
  	   table +="<tr><th colspan='2' style='color:#a00;font-weight:bold;text-align:center'>"+ JML10N.world_name_nether +"</th></tr>";
-    } else if(worldProviderType==1) {
+    } else if(JM.world.dimension==1) {
  	   table +="<tr><th colspan='2' style='color:#a00;font-weight:bold;text-align:center'>"+ JML10N.world_name_end +"</th></tr>";
     } 
     
     table += "<tr><th colspan='2'>";
-    if(worldProviderType==0) {
-       if(worldTime<12000) {
+    if(JM.world.dimension==0) {
+       if(JM.time.worldCurrentTime<12000) {
      	  table += JML10N.sunset_begins;
-       } else if(worldTime<13800) {
+       } else if(JM.time.worldCurrentTime<13800) {
      	  table += JML10N.night_begins;
-       } else if(worldTime<22200) {
+       } else if(JM.time.worldCurrentTime<22200) {
      	  table += JML10N.sunrise_begins;
-       } else if(worldTime<23999) {
+       } else if(JM.time.worldCurrentTime<23999) {
      	  table += JML10N.day_begins;
        } 
     }
@@ -512,7 +615,7 @@ function updateWorldInfo() {
     /*
     0 is the start of daytime, 12000 is the start of sunset, 13800 is the start of nighttime, 22200 is the start of sunrise, and 24000 is daytime again. 
    */
-   var allsecs = worldTime/20;
+   var allsecs = JM.time.worldCurrentTime/20;
    var mins = Math.floor(allsecs / 60);
    var secs = Math.ceil(allsecs % 60);
    if(mins<10) mins = "0"+mins;
@@ -528,7 +631,7 @@ function updateWorldInfo() {
    table += "<tr><th>" + JML10N.location_title + "</th><td>" + playerPos + "</td></tr>"; 
    table += "<tr><th title='" + JML10N.location_title + " " + (player.posY>>4) + "'>" + JML10N.elevation_title + "</th><td>" + player.posY + "&nbsp;(" + (player.posY>>4) + ")</td></tr>"; 
    
-   if(worldProviderType==0) {
+   if(JM.world.dimension==0) {
 	   table += "<tr><th>" + JML10N.biome_title + "</th><td>" + player.biome + "</td></tr>";
    }
    
@@ -541,6 +644,7 @@ function updateWorldInfo() {
 // Draw the player location
 function drawPlayer() {
 
+   var player = JM.player;
    var x = getScaledChunkX(player.posX/16);
    var z = getScaledChunkZ(player.posZ/16);
    
@@ -584,43 +688,79 @@ function drawPlayer() {
 // Draw the location of mobs
 function drawMobs() {
 	
-	if(showMonsters==false) return;
+	if(showMonsters==false) return; // TODO
 
-    $.each(mobs, function(index, mob) { 
-       var x = getScaledChunkX(mob.posX/16);
-       var z = getScaledChunkZ(mob.posZ/16);
+	var mobs = JM.mobs;
+	var mobs = mobs.concat(JM.animals); // TODO
+	
+	var canvasWidth = getCanvasWidth();
+	var canvasHeight = getCanvasHeight();
+	var func = 
+	
+    $.each(JM.mobs, function(index, mob) {
+		drawEntity(mob, canvasWidth, canvasHeight, false);
+	});
+    $.each(JM.animals, function(index, mob) {
+		drawEntity(mob, canvasWidth, canvasHeight, true);
+	});
+    $.each(JM.villagers, function(index, mob) {
+		drawEntity(mob, canvasWidth, canvasHeight, true);
+	});
+    
+}
+
+//Draw the location of an entity
+function drawEntity(mob, canvasWidth, canvasHeight, friendly) {
+	
+   var x = getScaledChunkX(mob.posX/16);
+   var z = getScaledChunkZ(mob.posZ/16);
+   
+   if(x>=0 &&
+      x<=canvasWidth &&  
+      z>=0 &&
+      z<=canvasHeight) {
+  
+       var ctx = getContext();
+       ctx.globalAlpha=.85;
+       ctx.strokeStyle = friendly ? "#ccc" : "#f00";
+       ctx.lineWidth = 2;
+       ctx.beginPath();
+       var radius = 16;
+       var type = mob.type; 
+       if(type=='Ghast' || type=='Dragon' || type=='Wither') {
+    	   radius = 24;
+       } 
+       ctx.arc(x, z, radius, 0, Math.PI*2, true); 
+       ctx.stroke();
+       ctx.globalAlpha=1.0;
        
-       if(x>=0 &&
-          x<=getCanvasWidth() &&  
-          z>=0 &&
-          z<=getCanvasWidth()) {
-      
-           var ctx = getContext();
-           ctx.globalAlpha=.85;
-           ctx.strokeStyle = "#f00";
-           ctx.lineWidth = 2;
-           ctx.beginPath();
-           var radius = 16;
-           if(mob.type=='Ghast' || mob.type=='Dragon') {
-        	   radius = 24;
-           } 
-           ctx.arc(x, z, radius, 0, Math.PI*2, true); 
-           ctx.stroke();
-           ctx.globalAlpha=1.0;
-           
-           var type = mob.type;       
-           var mobImage = mobImages[mob.type];
-           if(mobImage) {
-                ctx.drawImage(mobImage, x-radius, z-radius, radius*2,radius*2);
-           }
+
+       // Get pre-loaded image, or lazy-load as needed
+       var mobImage = mobImages[type];
+       if(!mobImage) {
+    	   mobImage =new Image();    	   
+    	   mobImage['class']='mobImage';
+    	   mobImage.onload = function () {  
+    		   // Draw after loaded
+    		   ctx.drawImage(mobImage, x-radius, z-radius, radius*2,radius*2);
+		   }        	   
+    	   mobImage.src='img/entity/' + type +'.png';
+    	   mobImages[type] = mobImage;
+	   	   console.log("Inited image for mob type: " + type);	   	   
+       } else {
+    	   // Draw now
+    	   ctx.drawImage(mobImage, x-radius, z-radius, radius*2,radius*2);
        }
-    });
+   }
     
 }
 
 //Draw the location of other players
 function drawOthers() {
 
+	var others = JM.players;
+	if(!others) return;
+	
 	// Remove old
 	$.each(otherImages, function(index, img) { 
 		document.body.removeChild(img);
@@ -716,13 +856,6 @@ function registerEvents() {
    }
    window.onmousewheel = document.onmousewheel = myMouseWheel;
    
-   // Touch events
-   if(document.addEventListener) {
-       document.addEventListener("touchstart", touchHandler, true);
-       document.addEventListener("touchmove", touchHandler, true);
-       document.addEventListener("touchend", touchHandler, true);
-       document.addEventListener("touchcancel", touchHandler, true);
-   } 
    
    // Keyboard events
   document.onkeypress=myKeyPress;
@@ -909,30 +1042,7 @@ function moveCanvas(dir){
    refreshData();
 }
 
-// From http://ross.posterous.com/2008/08/19/iphone-touch-events-in-javascript/
-function touchHandler(event)
-{
-    var touches = event.changedTouches,
-        first = touches[0],
-        type = "";
-         switch(event.type)
-    {
-        case "touchstart": type="mousedown"; break;
-        case "touchmove":  type="mousemove"; break;        
-        case "touchend":   type="mouseup";   break;
-        default: return;
-    }
-
-    var simulatedEvent = document.createEvent("MouseEvent");
-    simulatedEvent.initMouseEvent(type, true, true, window, 1, 
-                              first.screenX, first.screenY, 
-                              first.clientX, first.clientY, false, 
-                              false, false, false, 0/*left*/, null);
-
-    first.target.dispatchEvent(simulatedEvent);
-    event.preventDefault();
-}
-
+// Google Analytics
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-28839029-1']);
 _gaq.push(['_setDomainName', 'none']);
