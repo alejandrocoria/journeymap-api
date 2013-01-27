@@ -33,20 +33,11 @@ public class JMServer {
 	
 	public void start() throws Exception {		
 		
-		// Alias /player to PlayerService
 		rupy.add(new DataService());
-				
-		// Alias /jm to ChunkServlet
-		rupy.add(new ChunkServlet());
-		
-		// Alias /save to MapServlet
-		rupy.add(new SaveMapServlet()); 
-		
-		// Alias /msg to MessagesServlet
-		rupy.add(new MessagesServlet()); 
-		
-		// Default everything else to FileServlet
-		rupy.add(new FileServlet());
+		rupy.add(new LogService());
+		rupy.add(new MapService());
+		rupy.add(new SaveMapService()); 
+		rupy.add(new FileService());
 		
 		// Initialize daemon
 		rupy.init();
