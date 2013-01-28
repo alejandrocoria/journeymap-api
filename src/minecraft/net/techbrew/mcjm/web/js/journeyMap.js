@@ -433,12 +433,11 @@ function refreshData() {
 	   	.done(function(data, textStatus, jqXHR) { 
 			JM.player = data;
 			
-			// With the player data updated, we can get the map data			
-			// Update bounds first
-			checkBounds();			
-			
-			if(centerOnPlayer) {
+			// With the player data updated, we can get the map data						
+			if(centerOnPlayer==true) {
 				centerMapOnPlayer();
+			} else {
+				checkBounds();
 			}
 			
 			// Update the lastChunksImage with the map data
@@ -689,20 +688,18 @@ function drawPlayer() {
 function drawMobs() {
 	
 	if(showMonsters==false) return; // TODO
-
-	var mobs = JM.mobs;
-	var mobs = mobs.concat(JM.animals); // TODO
 	
 	var canvasWidth = getCanvasWidth();
 	var canvasHeight = getCanvasHeight();
-	var func = 
 	
     $.each(JM.mobs, function(index, mob) {
 		drawEntity(mob, canvasWidth, canvasHeight, false);
 	});
+    
     $.each(JM.animals, function(index, mob) {
 		drawEntity(mob, canvasWidth, canvasHeight, true);
 	});
+    
     $.each(JM.villagers, function(index, mob) {
 		drawEntity(mob, canvasWidth, canvasHeight, true);
 	});
@@ -719,10 +716,10 @@ function drawEntity(mob, canvasWidth, canvasHeight, friendly) {
       x<=canvasWidth &&  
       z>=0 &&
       z<=canvasHeight) {
+	   
   
-       var ctx = getContext();
+       var ctx = getContext(); 
        ctx.globalAlpha=.85;
-       ctx.strokeStyle = friendly ? "#ccc" : "#f00";
        ctx.lineWidth = 2;
        ctx.beginPath();
        var radius = 16;
@@ -731,28 +728,33 @@ function drawEntity(mob, canvasWidth, canvasHeight, friendly) {
     	   radius = 24;
        } 
        ctx.arc(x, z, radius, 0, Math.PI*2, true); 
-       ctx.stroke();
+       
+	   if(friendly==true && mob.owner && mob.owner==JM.player.username) {
+		   ctx.strokeStyle = "#0000ff";
+	   } else if(friendly==true) {
+		   ctx.strokeStyle = "#cccccc";
+	   } else {
+		   ctx.strokeStyle = "#ff0000";		   
+	   }
+	   
+	   ctx.stroke();
        ctx.globalAlpha=1.0;
        
-
        // Get pre-loaded image, or lazy-load as needed
        var mobImage = mobImages[type];
        if(!mobImage) {
     	   mobImage =new Image();    	   
     	   mobImage['class']='mobImage';
-    	   mobImage.onload = function () {  
-    		   // Draw after loaded
-    		   ctx.drawImage(mobImage, x-radius, z-radius, radius*2,radius*2);
-		   }        	   
+    	   $(mobImage).one('error', function() { this.src = 'img/entity/unknown.png'; }); 
     	   mobImage.src='img/entity/' + type +'.png';
-    	   mobImages[type] = mobImage;
-	   	   console.log("Inited image for mob type: " + type);	   	   
-       } else {
-    	   // Draw now
+    	   mobImages[type] = mobImage;   	   
+       } 
+       
+	   // Draw if image exists
+       if(mobImage.height>0) {
     	   ctx.drawImage(mobImage, x-radius, z-radius, radius*2,radius*2);
        }
-   }
-    
+    }    
 }
 
 //Draw the location of other players
