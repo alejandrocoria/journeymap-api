@@ -18,10 +18,12 @@ import net.minecraft.src.Entity;
 import net.minecraft.src.EntityAnimal;
 import net.minecraft.src.EntityBlaze;
 import net.minecraft.src.EntityCaveSpider;
+import net.minecraft.src.EntityCreature;
 import net.minecraft.src.EntityCreeper;
 import net.minecraft.src.EntityDragon;
 import net.minecraft.src.EntityEnderman;
 import net.minecraft.src.EntityGhast;
+import net.minecraft.src.EntityGolem;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityList;
 import net.minecraft.src.EntityLiving;
@@ -36,6 +38,7 @@ import net.minecraft.src.EntitySlime;
 import net.minecraft.src.EntitySpider;
 import net.minecraft.src.EntityTameable;
 import net.minecraft.src.EntityVillager;
+import net.minecraft.src.EntityWaterMob;
 import net.minecraft.src.EntityWolf;
 import net.minecraft.src.EntityZombie;
 import net.minecraft.src.IAnimals;
@@ -54,7 +57,7 @@ public class EntityHelper {
 	static HashMap<String, BufferedImage> entityImageMap = new HashMap<String, BufferedImage>();
 
 	private static int lateralDistance = 32;
-	private static int verticalDistance = 16;
+	private static int verticalDistance = 8;
 	
 	public static List<IMob> getMobsNearby() {
 		Minecraft mc = Minecraft.getMinecraft();
@@ -67,38 +70,30 @@ public class EntityHelper {
 		return mc.theWorld.getEntitiesWithinAABB(EntityVillager.class, getBB(mc.thePlayer));
 	}
 	
-	public static List<IAnimals> getAnimalsNearby(boolean includeUntamed, boolean includeTamed) {
+	public static List<IAnimals> getAnimalsNearby() {
+		return getAnimalsNearby(false);
+	}
+	
+	public static List<IAnimals> getAnimalsNearby(boolean excludePets) {
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayerSP player = mc.thePlayer;
 		AxisAlignedBB bb = getBB(player);
 		
-		List<IAnimals> animals = null;
+		List<EntityCreature> animals = mc.theWorld.getEntitiesWithinAABB(EntityAnimal.class, bb);
+		animals.addAll(mc.theWorld.getEntitiesWithinAABB(EntityGolem.class, bb));
+		animals.addAll(mc.theWorld.getEntitiesWithinAABB(EntityWaterMob.class, bb));
 		
-		if(!includeUntamed && !includeTamed) {
-			animals = new ArrayList<IAnimals>(0);
-		} else if(includeUntamed && includeTamed) {		
-			animals = mc.theWorld.getEntitiesWithinAABB(IAnimals.class, bb);
-		} else if(includeTamed) {			
-			List<EntityTameable> tameable = mc.theWorld.getEntitiesWithinAABB(EntityTameable.class, bb);
-			animals = new ArrayList<IAnimals>(tameable.size());
-			for(EntityTameable animal : tameable) {
-				if(isPetOf(animal, player)) {
-					animals.add(animal);
-				}
+		List<IAnimals> keep = new ArrayList<IAnimals>(animals.size());
+		for(EntityLiving animal : animals) {
+			if(!excludePets) {
+				keep.add((IAnimals) animal);
+			} else if(!isPetOf((IAnimals) animal, player)) {
+				keep.add((IAnimals) animal);
 			}
-		} else {
-			animals = mc.theWorld.getEntitiesWithinAABB(IAnimals.class, bb);
-			List<IAnimals> pets = new ArrayList<IAnimals>(animals.size());
-			for(IAnimals animal : animals) {
-				if(isPetOf(animal, player)) {
-					pets.add(animal);
-				}
-			}
-			animals.removeAll(pets);
 		}
-		
-		return animals;
+
+		return keep;
 	}
 	
 	/**

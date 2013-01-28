@@ -81,7 +81,7 @@ public class AnimalsData implements IDataProvider {
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayerSP player = mc.thePlayer;			
 	   
-		List<IAnimals> animals = EntityHelper.getAnimalsNearby(includeNonPets, includePets);
+		List<IAnimals> animals = EntityHelper.getAnimalsNearby();
 		List<Map> list = new ArrayList<Map>(animals.size());
 		
 		for(IAnimals animal : animals) {
