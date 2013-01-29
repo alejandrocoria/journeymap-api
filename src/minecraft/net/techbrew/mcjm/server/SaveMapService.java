@@ -109,7 +109,7 @@ public class SaveMapService extends BaseService {
 			// Get save-as name
 			StringBuffer sb = new StringBuffer(WorldData.getWorldName(minecraft));
 			sb.append("_").append(mapType).append("_"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append(cType).append(ContentType.png);
+			sb.append(cType).append(".").append(ContentType.png); //$NON-NLS-1$
 			String saveName = URLEncoder.encode(sb.toString(), CHARACTER_ENCODING);
 					
 			// Set response headers
