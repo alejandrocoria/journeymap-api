@@ -43,6 +43,21 @@ public class PropertyManager {
 	public static final String BROWSER_POLL_PROP = "browser.poll"; //$NON-NLS-1$
 	private static final String BROWSER_POLL_VALUE = "1900"; //$NON-NLS-1$
 	
+	public static final String BROWSER_TIMEDATA_POLL_PROP = "browser.timedata.poll"; //$NON-NLS-1$
+	private static final String BROWSER_TIMEDATA_POLL_VALUE = "2000"; //$NON-NLS-1$
+	
+	public static final String BROWSER_ANIMALSDATA_POLL_PROP = "browser.animalsdata.poll"; //$NON-NLS-1$
+	private static final String BROWSER_ANIMALSDATA_POLL_VALUE = "5000"; //$NON-NLS-1$
+	
+	public static final String BROWSER_MOBSDATA_POLL_PROP = "browser.mobsdata.poll"; //$NON-NLS-1$
+	private static final String BROWSER_MOBSDATA_POLL_VALUE = "5000"; //$NON-NLS-1$
+	
+	public static final String BROWSER_PLAYERSDATA_POLL_PROP = "browser.playersdata.poll"; //$NON-NLS-1$
+	private static final String BROWSER_PLAYERSDATA_POLL_VALUE = "2000"; //$NON-NLS-1$
+	
+	public static final String BROWSER_VILLAGERSDATA_POLL_PROP = "browser.villagersdata.poll"; //$NON-NLS-1$
+	private static final String BROWSER_VILLAGERSDATA_POLL_VALUE = "5000"; //$NON-NLS-1$
+	
 	public static final String MAPGUI_KEYCODE_PROP = "mapgui.keycode"; //$NON-NLS-1$
 	private static final String MAPGUI_KEYCODE_VALUE = "36"; //$NON-NLS-1$
 	
@@ -54,6 +69,8 @@ public class PropertyManager {
 	
 	public static final String ANNOUNCE_MODLOADED_PROP = "announce.modloaded"; //$NON-NLS-1$
 	private static final String ANNOUNCE_MODLOADED_VALUE = "true"; //$NON-NLS-1$
+	
+
 	
 	private final Properties properties;
 	private Boolean writeNeeded = false;
@@ -85,7 +102,14 @@ public class PropertyManager {
 		defaults.put(CHUNK_OFFSET_PROP, CHUNK_OFFSET_VALUE);
 		defaults.put(UPDATETIMER_PLAYER_PROP, UPDATETIMER_PLAYER_VALUE);
 		defaults.put(UPDATETIMER_CHUNKS_PROP, UPDATETIMER_CHUNKS_VALUE);
+		
 		defaults.put(BROWSER_POLL_PROP, BROWSER_POLL_VALUE);
+		defaults.put(BROWSER_ANIMALSDATA_POLL_PROP, BROWSER_ANIMALSDATA_POLL_VALUE);
+		defaults.put(BROWSER_MOBSDATA_POLL_PROP, BROWSER_MOBSDATA_POLL_VALUE);
+		defaults.put(BROWSER_PLAYERSDATA_POLL_PROP, BROWSER_PLAYERSDATA_POLL_VALUE);
+		defaults.put(BROWSER_TIMEDATA_POLL_PROP, BROWSER_TIMEDATA_POLL_VALUE);
+		defaults.put(BROWSER_VILLAGERSDATA_POLL_PROP, BROWSER_VILLAGERSDATA_POLL_VALUE);
+		
 		defaults.put(MAPGUI_KEYCODE_PROP, MAPGUI_KEYCODE_VALUE);
 		defaults.put(LOGGING_LEVEL_PROP, LOGGING_LEVEL_VALUE);
 		defaults.put(CAVE_LIGHTING_PROP, CAVE_LIGHTING_VALUE);

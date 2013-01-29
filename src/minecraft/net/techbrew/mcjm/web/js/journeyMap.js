@@ -8,7 +8,7 @@ var showLight = false;
 var showCaves = true;
 var showMonsters = true;
 var centerOnPlayer = true;
-var autoRefresh = true;
+
 var mapBackground = "#222";
 var chunks = new Object();
 var canvas;
@@ -23,24 +23,25 @@ var useTempCanvas = false;
 var lastChunksImage;
 var playerImage;
 
-var refreshDataTimer;
-
 var mobImages = new Object();
 var otherImages = new Array();
 var chunks = new Object();
 var chunkScale = mapScale*16;
 var playerLastPos = "0,0";
-var clientRefreshRate = 1500;
 
 var JmIcon;
 var halted = false;
 
+var timers = [];
+
 var JML10N = {};
 
 var JM = {
+	game:{},
     mobs:[],
     animals:[],
-    players:[]
+    players:[],
+    villagers:[]
 };
 
 
@@ -78,7 +79,7 @@ function init() {
         $("#dayButton").html("<a href='#' title='" + JML10N.day_button_desc +"'>" + JML10N.day_button_title + "</a>");
         
         $("#nightButton").html("<a href='#' title='" + JML10N.night_button_desc +"'>" + JML10N.night_button_title + "</a>");
-        $("#followButton").html("<a href='#' title='" + JML10N.follow_button_desc +"'>" + JML10N.follow_button_title + "</a>");
+        $("#followButton").attr("title", JML10N.follow_button_desc);
         $("#caveButton").html("<a href='#' title='" + JML10N.cave_button_desc +"'>" + JML10N.cave_button_title + "</a>");
         
         $("#monstersButton").attr("title", "<b>" + JML10N.monsters_button_title + "</b><br/>" + JML10N.monsters_button_desc);
@@ -131,6 +132,10 @@ function init() {
      	   setCenterOnPlayer(!centerOnPlayer);
      	   refreshData();
         });
+        
+        $("#saveButton").click(function() {
+        	saveMapImage();
+         });
                 
         // Init map type
         setMapType('day');
@@ -146,9 +151,9 @@ function init() {
 
 function checkVersion() {
 
-   $("#version").attr("innerHTML", JM.world.jm_version + " for Minecraft " + JM.world.mc_version);
-   if(JM.world.latest_journeymap_version>JM.world.jm_version) {
-       $("#versionButton").attr("title", "<b>" + JML10N.update_available + "</b><br/>JourneyMap " + JM.world.latest_journeymap_version + " for Minecraft " + JM.world.latest_minecraft_version);
+   $("#version").attr("innerHTML", JM.game.jm_version + " for Minecraft " + JM.game.mc_version);
+   if(JM.game.latest_journeymap_version>JM.game.jm_version) {
+       $("#versionButton").attr("title", "<b>" + JML10N.update_available + "</b><br/>JourneyMap " + JM.game.latest_journeymap_version + " for Minecraft " + JM.world.latest_minecraft_version);
        $("#versionButton").css("visibility", "visible");
        $("#versionButton").tooltip({
            effect: 'slide',
@@ -157,8 +162,8 @@ function checkVersion() {
        //$("#versionButton").tooltip.show();
    }
    
-   _gaq.push(['_setCustomVar', 1, 'jm_version', JM.world.jm_version, 2]);
-   _gaq.push(['_trackEvent', 'Client', 'CheckVersion', JM.world.jm_version]);
+   _gaq.push(['_setCustomVar', 1, 'jm_version', JM.game.jm_version, 2]);
+   _gaq.push(['_trackEvent', 'Client', 'CheckVersion', JM.game.jm_version]);
 }
 
 function initImages() {
@@ -180,25 +185,28 @@ function initImages() {
 }
 
 function saveMapImage() {
-	var mapType = (player.underground && showCaves) ? "underground" : (showLight ? "night" : "day") ;  
-    var depth = player.chunkCoordY;
-    var path = worldPath.replace("/jm", "/save");
-    var request = path + "&mapType=" + mapType + "&depth=" + depth + "&t=" + new Date().getTime();
+    var request = getMapDataUrl().replace("/map.png", "/save");
 	window.open(request);
+}
+
+function clearTimers() {
+	
+	// Clear existing timers (if any)
+	$.each(timers, function(index, timer) { 
+		clearInterval(timer);
+	});
 }
 
 function initWorld() {
 	
-	// Clear the refresh interval, if any
-    if(refreshDataTimer) {
-    	clearInterval(refreshDataTimer); 
-    }
+	// Clear existing timers (if any)
+	clearTimers();
 	
-	// Start with the time data
-	$.ajax({url: "/data/time", dataType: "jsonp"})
+	// Start with the game data
+	$.ajax({url: "/data/game", dataType: "jsonp"})
 	.fail(handleError)
 	.done(function(data, textStatus, jqXHR) { 		
-		JM.time = data;
+		JM.game = data;
 		
 		// Now get the world data
 		$.ajax({url: "/data/world", dataType: "jsonp"})
@@ -211,30 +219,31 @@ function initWorld() {
 		  	   $("#worldNameHeader").html(unescape(JM.world.name).replace("\\+"," "));            	   		          
 		     }
 			 
+			 sizeMap();
 			 setCenterOnPlayer(true);
-			 
-		     // Auto-refresh the data once per N seconds
-		     if(mapScale>minMapScale) {
-		  	   var refreshRate = clientRefreshRate;
-		     } else {
-		  	   var refreshRate = clientRefreshRate * 2;
-		     }		    
+			 			 			 
+		    // Auto-refresh data at prescribed rates, nothing below 1000
+			addTimer(refreshData, JM.game.browser_poll);
+			addTimer(refreshTimeData, JM.game.browser_timedata_poll);
+			addTimer(refreshAnimalsData, JM.game.browser_animalsdata_poll);
+			addTimer(refreshMobsData, JM.game.browser_mobsdata_poll);
+			addTimer(refreshPlayersData, JM.game.browser_playersdata_poll);
+			addTimer(refreshVillagersData, JM.game.browser_villagersdata_poll);		     
 		     
-		     refreshDataTimer = setInterval(function() {
-		        if(autoRefresh && !isScroll) {
-		           refreshData();
-		        }		        
-		     }, refreshRate);
-	     		     
-		     sizeMap();
-		     refreshData();
+		    // Get world and player data
+			refreshData();
 		     
-		     // Check version
-		     checkVersion();
+		    // Check version
+		    checkVersion();
 		});    
 		
 	}); 
 
+}
+
+// Add an interval timer, minimum being 1000
+function addTimer(func, timespan) {
+	setInterval(func, Math.max(JM.game.browser_poll, 1000))
 }
 
 var delay = (function(){
@@ -364,7 +373,7 @@ function setShowCaves(show) {
    } else {
       $("#caveButton").removeClass("active");
    }
-   if(player.underground==true) {
+   if(JM.player.underground==true) {
 	   refreshData();
    }
 }
@@ -418,13 +427,59 @@ function getMapDataUrl() {
 }
 
 
-function refreshData() {  
+function refreshTimeData() {
+	if(isScroll==true) return;
 	
 	$.ajax({url: "/data/time", dataType: "jsonp"})
 	.fail(handleError)
 	.done(function(data, textStatus, jqXHR) { 		
 		JM.time = data;
 	}); 
+}
+
+function refreshPlayersData() {
+	if(isScroll==true) return;
+	if(JM.world.singlePlayer) return;
+	
+	$.ajax({url: "/data/players", dataType: "jsonp"})
+	.fail(handleError)
+   	.done(function(data, textStatus, jqXHR) { 
+   		JM.players = data.players;
+   	});
+}
+
+function refreshMobsData() {
+	if(isScroll==true) return;
+	
+	$.ajax({url: "/data/mobs", dataType: "jsonp"})
+	.fail(handleError)
+   	.done(function(data, textStatus, jqXHR) { 
+   		JM.mobs = data.mobs;
+   	});
+}
+
+function refreshAnimalsData() {
+	if(isScroll==true) return;
+	
+	$.ajax({url: "/data/animals", dataType: "jsonp"})
+	.fail(handleError)
+   	.done(function(data, textStatus, jqXHR) { 
+   		JM.animals = data.animals;
+   	});
+}
+
+function refreshVillagersData() {
+	if(isScroll==true) return;
+	
+	$.ajax({url: "/data/villagers", dataType: "jsonp"})
+	.fail(handleError)
+   	.done(function(data, textStatus, jqXHR) { 
+   		JM.villagers = data.villagers;
+   	});
+}
+
+
+function refreshData() {  	
 	
    if(isScroll==false) {
 	   
@@ -448,33 +503,7 @@ function refreshData() {
 			    updateUI();
 			}    
 			lastChunksImage.src=getMapDataUrl();
-	   	});
-	   
-	   $.ajax({url: "/data/players", dataType: "jsonp"})
-		.fail(handleError)
-	   	.done(function(data, textStatus, jqXHR) { 
-	   		JM.players = data.players;
-	   	});
-	   
-	   $.ajax({url: "/data/mobs", dataType: "jsonp"})
-		.fail(handleError)
-	   	.done(function(data, textStatus, jqXHR) { 
-	   		JM.mobs = data.mobs;
-	   	});
-	   
-	   $.ajax({url: "/data/animals", dataType: "jsonp"})
-		.fail(handleError)
-	   	.done(function(data, textStatus, jqXHR) { 
-	   		JM.animals = data.animals;
-	   	});
-	   
-	   $.ajax({url: "/data/villagers", dataType: "jsonp"})
-		.fail(handleError)
-	   	.done(function(data, textStatus, jqXHR) { 
-	   		JM.villagers = data.villagers;
-	   	});
-	   
-	   
+	   	});	  
    }
 }
 
@@ -484,8 +513,12 @@ function handleError(data, error, jqXHR) {
 	
 	console.log("Server returned error: " + data.status + ": " + jqXHR);
 	
-	clearInterval(refreshDataTimer);
-	refreshDataTimer = null;
+	clearTimers();
+	
+	$("#playerImage").css("visibility","hidden");
+    $("#playerImage").css("left", -32);
+    $("#playerImage").css("top", -32);
+    $("#playerImage").css("zIndex", 2);
 	
 	var displayError;
 	if(data.status==503 || data.status==0) {
@@ -692,17 +725,23 @@ function drawMobs() {
 	var canvasWidth = getCanvasWidth();
 	var canvasHeight = getCanvasHeight();
 	
-    $.each(JM.mobs, function(index, mob) {
-		drawEntity(mob, canvasWidth, canvasHeight, false);
-	});
+	if(JM.mobs) {
+	    $.each(JM.mobs, function(index, mob) {
+			drawEntity(mob, canvasWidth, canvasHeight, false);
+		});
+	}
     
-    $.each(JM.animals, function(index, mob) {
-		drawEntity(mob, canvasWidth, canvasHeight, true);
-	});
+    if(JM.animals) {
+	    $.each(JM.animals, function(index, mob) {
+			drawEntity(mob, canvasWidth, canvasHeight, true);
+		});
+    }
     
-    $.each(JM.villagers, function(index, mob) {
-		drawEntity(mob, canvasWidth, canvasHeight, true);
-	});
+    if(JM.villagers) {
+	    $.each(JM.villagers, function(index, mob) {
+			drawEntity(mob, canvasWidth, canvasHeight, true);
+		});
+    }
     
 }
 
