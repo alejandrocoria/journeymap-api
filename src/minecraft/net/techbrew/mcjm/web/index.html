@@ -41,13 +41,16 @@
 			      <ul class="nav">
                         <li class="active" id="dayButton"><a href="#">[day]</a></li>
                         <li id="nightButton"><a href="#night">[night]</a></li>
-                        <li id="caveButton"><a href="#caves">[cave]</a></li>
-                        <li id="followButton"><a href="#"><i class="icon-map-marker"></i></a></li>
+                        <li id="caveButton"><a href="#caves">[cave]</a></li>                        
                     </ul>
                     
 			       <div class="btn-toolbar visible-tablet visible-desktop">
+			           <div class="btn-group">
+                            <a id="followButton" class="btn" href="#"><i class="icon-map-marker"></i></a>
+                       </div>
+                            
 					   <div class="btn-group">
-					
+
 							<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
 								Show... <span class="caret"></span>
 							</a>
@@ -84,9 +87,9 @@
 	                            </li>						
 							</ul>
 					   </div>
-					   <span id="worldNameHeader">[JM.world.name]</span>
+					  
 					   <div class="btn-group">							
-							<button class="btn active">
+							<button id="saveButton" class="btn">
 								<i class="icon-picture"></i>
 							</button>
 					   </div>
@@ -111,7 +114,7 @@
 	</div>
 
 	<canvas id="mapCanvas"></canvas>
-    <div class="container-fluid"><div id="slider-vertical" title=""></div></div>
+    <div class="container-fluid"> <span id="worldNameHeader">[JM.world.name]</span><div id="slider-vertical" title=""></div></div>
    
 <script type="text/javascript" src="/js/journeymap.js"></script>
 </body>
