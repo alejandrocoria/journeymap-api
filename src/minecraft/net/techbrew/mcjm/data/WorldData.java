@@ -27,6 +27,7 @@ public class WorldData implements IDataProvider {
 		dimension,
 		time,
 		hardcore,
+		singlePlayer,
 		worldType,
 		gameType
 	}
@@ -54,6 +55,7 @@ public class WorldData implements IDataProvider {
 		props.put(Key.name, getWorldName(mc)); 
 		props.put(Key.dimension, worldInfo.getDimension()); 
 		props.put(Key.hardcore,  worldInfo.isHardcoreModeEnabled());
+		props.put(Key.singlePlayer, mc.isSingleplayer()); 
 		props.put(Key.gameType, worldInfo.getGameType().toString());
 		props.put(Key.worldType, worldInfo.getTerrainType().getWorldTypeName());
 
