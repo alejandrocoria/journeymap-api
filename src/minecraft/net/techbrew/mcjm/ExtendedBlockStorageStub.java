@@ -303,7 +303,7 @@ public class ExtendedBlockStorageStub
         return this.blockLSBArray;
     }
 
-    public void func_76676_h()
+    public void clearMSBArray()
     {
         this.blockMSBArray = null;
     }
