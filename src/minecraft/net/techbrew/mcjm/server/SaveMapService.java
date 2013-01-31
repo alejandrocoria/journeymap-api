@@ -28,7 +28,7 @@ import net.techbrew.mcjm.io.ChunkFileHandler;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.render.ChunkRenderer;
+import net.techbrew.mcjm.render.OldChunkRenderer;
 
 /**
  * Provides a map of the entire world

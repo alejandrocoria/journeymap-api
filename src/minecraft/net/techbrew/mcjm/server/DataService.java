@@ -54,7 +54,7 @@ import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.render.ChunkRenderer;
+import net.techbrew.mcjm.render.OldChunkRenderer;
 import net.techbrew.mcjm.server.BaseService.ContentType;
 import net.techbrew.mcjm.server.BaseService.ResponseHeader;
 import net.techbrew.mcjm.ui.ZoomLevel;
