@@ -18,6 +18,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -41,7 +42,7 @@ import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.render.ChunkRenderer;
+import net.techbrew.mcjm.render.OldChunkRenderer;
 import net.techbrew.mcjm.ui.ZoomLevel;
 
 /**
@@ -69,6 +70,8 @@ public class MapService extends BaseService {
 		
 	@Override
 	public void filter(Event event) throws Event, Exception {
+		
+		long start=System.currentTimeMillis();
 
 		// Parse query for parameters
 		Query query = event.query();
@@ -125,6 +128,11 @@ public class MapService extends BaseService {
 			ResponseHeader.on(event).noCache().contentType(ContentType.png);
 			mergeImageChunks(event, worldDir, x1, z1, x2, z2, mapType, depth, worldProviderType, width, height);
 			
+			long stop=System.currentTimeMillis();
+			if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+				JourneyMap.getLogger().info((stop-start) + "ms to serve map.png");
+			}
+			
 		} catch (NumberFormatException e) {
 			reportMalformedRequest(event);
 		} 
@@ -152,34 +160,24 @@ public class MapService extends BaseService {
 		long start = 0, stop = 0;
 		final Constants.CoordType cType = Constants.CoordType.convert(mapType, worldProviderType);
 		
-		if(JourneyMap.getLogger().isLoggable(Level.FINEST)) {
-			start = System.currentTimeMillis();
-		}
+		start = System.currentTimeMillis();
 		
 		// Headers
 		event.reply().header("Content-Type:","image/png"); //$NON-NLS-1$
 		event.reply().header("Content-Disposition", "inline; filename=\"jm.png\"");	 //$NON-NLS-1$ //$NON-NLS-2$
 
 		ImageOutputStream ios = ImageIO.createImageOutputStream(event.output());
-		BufferedImage mergedImg = RegionFileHandler.getMergedChunks(worldDir, x1, z1, x2, z2, mapType, depth, cType, false, 
+		BufferedImage mergedImg = RegionFileHandler.getMergedChunks(worldDir, x1, z1, x2, z2, mapType, depth, cType, true, 
 				new ZoomLevel(1F, 1, false, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
-		
-//		if(mergedImg.getWidth()!=canvasWidth) {
-//			Image scaled = mergedImg.getScaledInstance(canvasWidth, -1, Image.SCALE_SMOOTH);					
-//			BufferedImage temp = new BufferedImage(mergedImg.getWidth(null), mergedImg.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-//			Graphics2D g = temp.createGraphics();
-//			g.drawImage(scaled, 0, 0, null);
-//			mergedImg = temp;
-//		} 
-		
+
 		ImageIO.write(mergedImg, "png", ios); //$NON-NLS-1$
 		
 		ios.flush();
 		ios.close();
 		
-		if(JourneyMap.getLogger().isLoggable(Level.FINEST)) {
+		if(JourneyMap.getLogger().isLoggable(Level.INFO)) {
 			stop = System.currentTimeMillis();
-			JourneyMap.getLogger().finest("mergeImageChunks time: "  + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
+			//JourneyMap.getLogger().info("mergeImageChunks time: "  + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 	}
