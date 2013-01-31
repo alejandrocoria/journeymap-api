@@ -25,6 +25,7 @@ public class GameData implements IDataProvider {
 		latest_journeymap_version,
 		mc_version,
 		browser_poll,
+		browser_mapimg_poll,
 		browser_timedata_poll,
 		browser_animalsdata_poll,
 		browser_mobsdata_poll,
@@ -55,6 +56,7 @@ public class GameData implements IDataProvider {
 		props.put(Key.mc_version, Display.getTitle().split("\\s(?=\\d)")[1]); //$NON-NLS-1$ 
 		
 		props.put(Key.browser_poll, pm.getInteger(PropertyManager.BROWSER_POLL_PROP));
+		props.put(Key.browser_mapimg_poll, pm.getInteger(PropertyManager.BROWSER_MAPIMG_POLL_PROP));
 		props.put(Key.browser_timedata_poll, pm.getInteger(PropertyManager.BROWSER_TIMEDATA_POLL_PROP));
 		props.put(Key.browser_animalsdata_poll, pm.getInteger(PropertyManager.BROWSER_ANIMALSDATA_POLL_PROP));
 		props.put(Key.browser_mobsdata_poll, pm.getInteger(PropertyManager.BROWSER_MOBSDATA_POLL_PROP));

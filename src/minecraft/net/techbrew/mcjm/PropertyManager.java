@@ -43,6 +43,9 @@ public class PropertyManager {
 	public static final String BROWSER_POLL_PROP = "browser.poll"; //$NON-NLS-1$
 	private static final String BROWSER_POLL_VALUE = "1900"; //$NON-NLS-1$
 	
+	public static final String BROWSER_MAPIMG_POLL_PROP = "browser.mapimg.poll"; //$NON-NLS-1$
+	private static final String BROWSER_MAPIMG_POLL_VALUE = "5000"; //$NON-NLS-1$
+	
 	public static final String BROWSER_TIMEDATA_POLL_PROP = "browser.timedata.poll"; //$NON-NLS-1$
 	private static final String BROWSER_TIMEDATA_POLL_VALUE = "2000"; //$NON-NLS-1$
 	
@@ -104,6 +107,7 @@ public class PropertyManager {
 		defaults.put(UPDATETIMER_CHUNKS_PROP, UPDATETIMER_CHUNKS_VALUE);
 		
 		defaults.put(BROWSER_POLL_PROP, BROWSER_POLL_VALUE);
+		defaults.put(BROWSER_MAPIMG_POLL_PROP, BROWSER_MAPIMG_POLL_VALUE);
 		defaults.put(BROWSER_ANIMALSDATA_POLL_PROP, BROWSER_ANIMALSDATA_POLL_VALUE);
 		defaults.put(BROWSER_MOBSDATA_POLL_PROP, BROWSER_MOBSDATA_POLL_VALUE);
 		defaults.put(BROWSER_PLAYERSDATA_POLL_PROP, BROWSER_PLAYERSDATA_POLL_VALUE);
