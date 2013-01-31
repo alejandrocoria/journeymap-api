@@ -18,6 +18,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 
 import net.minecraft.client.Minecraft;
@@ -39,7 +41,11 @@ import net.techbrew.mcjm.io.RegionCoord;
 import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.io.RegionImageCache;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.render.ChunkRenderer;
+import net.techbrew.mcjm.render.ChunkFlatRenderer;
+import net.techbrew.mcjm.render.ChunkHeightMapRenderer;
+import net.techbrew.mcjm.render.OldChunkRenderer;
+import net.techbrew.mcjm.render.ChunkTerrainRenderer;
+import net.techbrew.mcjm.render.IChunkRenderer;
 
 public class ChunkUpdateThread extends UpdateThreadBase {
 
@@ -51,12 +57,16 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 	public volatile static int lastChunkY = -1;
 	public volatile static int lastChunkZ = -1;
 	
+	public volatile AtomicInteger updateCounter = new AtomicInteger(0);
+	public volatile AtomicLong updateTime = new AtomicLong(0);
+	
 	public static CyclicBarrier getBarrier() {
 		return barrier;
 	}
 	
 	private volatile ConcurrentHashMap<Integer,ChunkStub> chunkStubs = new ConcurrentHashMap<Integer,ChunkStub>();
 	private ChunkImageCache chunkImageCache;
+	private IChunkRenderer chunkRenderer = new ChunkTerrainRenderer();
 	
 	public ChunkUpdateThread(JourneyMap journeyMap, World world) {
 		super(journeyMap, world);
@@ -67,29 +77,40 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 	 * Map the chunks around the player.
 	 */
 	protected void doTask() {
+		
+		boolean finestLogging = JourneyMap.getLogger().isLoggable(Level.FINEST);
+		
 		try {
 				Boolean flush = true;
 				currentThread = this;
-				
+										
 				// Wait for main thread to make ChunkStubs available
-				try {					
-					JourneyMap.getLogger().finer("Waiting... barrier: " + barrier.getNumberWaiting()); //$NON-NLS-1$
+				try {			
+					if(finestLogging) {
+						JourneyMap.getLogger().finest("Waiting... barrier: " + barrier.getNumberWaiting()); //$NON-NLS-1$
+					}
 
 					barrier.await();		
 				} catch(BrokenBarrierException e) {
+					
+					if(finestLogging) {
+						JourneyMap.getLogger().finest("Barrier Broken: " + barrier.getNumberWaiting()); //$NON-NLS-1$
+					}
+					
 					barrier.reset();
 				} catch (Throwable e) {
-					// TODO Auto-generated catch block
 					JourneyMap.getLogger().warning(LogFormatter.toString(e));
 					barrier.reset();
 					return;
 				}
 				
-				JourneyMap.getLogger().finer("Continuing..."); //$NON-NLS-1$
+				if(finestLogging) {
+					JourneyMap.getLogger().finest("Barrier done waiting: " + barrier.getNumberWaiting()); //$NON-NLS-1$
+				}
 				
 				// If there aren't ChunkStubs, we're done.
 				if(chunkStubs.isEmpty()) {
-					if(JourneyMap.getLogger().isLoggable(Level.FINER)) {
+					if(finestLogging) {
 						JourneyMap.getLogger().finer("No ChunkStubs to process"); //$NON-NLS-1$
 					}
 					return;
@@ -114,7 +135,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 				}
 		
 				// Push chunk cache to region cache
-				if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+				if(finestLogging) {
 					JourneyMap.getLogger().fine("Chunks updated: " + chunkImageCache.getEntries().size()); //$NON-NLS-1$
 				}
 				RegionImageCache.getInstance().putAll(chunkImageCache.getEntries());
@@ -123,18 +144,31 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 				if(flush) {
 					RegionImageCache.getInstance().flushToDisk();
 				}
-				if(JourneyMap.getLogger().isLoggable(Level.FINER)) {		
+				if(finestLogging) {		
 					JourneyMap.getLogger().finer("Map regions updated: " + (System.currentTimeMillis()-start) + "ms elapsed"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			} finally {
 				chunkStubs.clear();
 				chunkImageCache.clear();
 				currentThread = null;
-				if(JourneyMap.getLogger().isLoggable(Level.FINEST)) {
+				if(finestLogging) {
 					long total = Runtime.getRuntime().totalMemory()/1024/1024;
 					long free = Runtime.getRuntime().freeMemory()/1024/1024;
 					long used = total-free;
 					JourneyMap.getLogger().finest("Memory: total/free/used= " + total + " / " + free + " / " + used + " MB"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				}
+				
+				if(JourneyMap.getLogger().isLoggable(Level.INFO)) {
+					double counter = (double) updateCounter.get();
+					double time = (double) updateTime.get();
+					double avg = time/counter;
+					
+					//System.out.println("*** Chunks rendered with " + chunkRenderer.getClass().getSimpleName() + ": " + (int) counter + " / Average: " + avg + " ms each");
+					
+					if(counter==100) {
+						updateCounter.set(0);
+						updateTime.set(0);
+					}
 				}
 			}
 		
@@ -267,7 +301,14 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 		}
 		
 		Minecraft minecraft = Minecraft.getMinecraft();
-		BufferedImage chunkImage = ChunkRenderer.getChunkImage(chunkStub, underground, chunkY, chunkStubs);
+		long start = System.currentTimeMillis();
+		long stop;
+		BufferedImage chunkImage = chunkRenderer.getChunkImage(chunkStub, underground, chunkY, chunkStubs);
+		stop = System.currentTimeMillis();
+		
+		updateCounter.incrementAndGet();
+		updateTime.addAndGet(stop-start);
+		
 		if(chunkImage!=null  && minecraft.theWorld!=null) {
 			File worldDir = FileHandler.getWorldDir(minecraft);
 			Constants.CoordType cType = Constants.CoordType.convert(underground, minecraft.theWorld.provider.dimensionId);
