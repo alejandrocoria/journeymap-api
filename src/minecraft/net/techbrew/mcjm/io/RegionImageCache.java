@@ -191,19 +191,25 @@ public class RegionImageCache  {
 			if(!purge) return false;
 			Boolean remove = size() > capacity;
 			if(remove) {
-				if(dirty.contains(entry.getKey())) {
-					JourneyMap.getLogger().info("RegionImageCache purging " + entry.getKey()); //$NON-NLS-1$
-					try {
-						RegionFileHandler.getInstance().writeRegionFile(entry.getKey(), entry.getValue());
-					} catch(Throwable t) {
-						JourneyMap.getLogger().severe("RegionImageCache failed to flush purging entry: " + entry.getKey()); //$NON-NLS-1$
-						JourneyMap.getLogger().severe(LogFormatter.toString(t));
+				RegionCoord rc = entry.getKey();
+				if(dirty.contains(rc)) {
+					BufferedImage image = entry.getValue();
+					if(image!=null && image.getWidth()>0) {
+						if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+							JourneyMap.getLogger().fine("RegionImageCache purging " + rc); //$NON-NLS-1$
+						}
+						try {
+							RegionFileHandler.getInstance().writeRegionFile(rc, image);
+						} catch(Throwable t) {
+							JourneyMap.getLogger().severe("RegionImageCache failed to flush purging entry: " + entry.getKey()); //$NON-NLS-1$
+							JourneyMap.getLogger().severe(LogFormatter.toString(t));
+						}
 					}
 				}
-				dirty.remove(entry.getKey());
+				dirty.remove(rc);
 			}
 			if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
-				System.out.println("RegionImageCache size: " + (this.size()-1)); //$NON-NLS-1$
+				JourneyMap.getLogger().fine("RegionImageCache size: " + (this.size()-1)); //$NON-NLS-1$
 			}
 			return remove;
 	    }
