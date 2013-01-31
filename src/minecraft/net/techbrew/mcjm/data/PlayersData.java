@@ -50,29 +50,23 @@ public class PlayersData implements IDataProvider {
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayerSP player = mc.thePlayer;			
-	   
-		// Nearby mobs
-//					EntityHelper helper = new EntityHelper(mc, true, true, true); // TODO: Toggle hostile/passive/pets
-//					List<Entity> mobs = helper.getEntitiesNearby();
-//					for(Entity mob : mobs) {
-//						LinkedHashMap mobProps = new LinkedHashMap();
-//						mobProps.put("type", mob.getEntityName()); //$NON-NLS-1$
-//						mobProps.put("posX", mob.serverPosX); //$NON-NLS-1$
-//						mobProps.put("posZ", mob.serverPosZ); //$NON-NLS-1$
-//						hmobList.add(mobProps);
-//					}
-
-		// Nearby players		
-		List<EntityPlayer> others = EntityHelper.getPlayersNearby();
-		List<Map> list = new ArrayList<Map>(others.size());
-		for(EntityPlayer other : others) {
-			LinkedHashMap otherProps = new LinkedHashMap();
-			otherProps.put("username", other.username); //$NON-NLS-1$
-			otherProps.put("posX", other.posX); //$NON-NLS-1$
-			otherProps.put("posY", other.posY); //$NON-NLS-1$
-			otherProps.put("posZ", other.posZ); //$NON-NLS-1$
-			otherProps.put("heading", EntityHelper.getHeading(other));
-			list.add(otherProps);
+		List<Map> list;
+		
+		if(!mc.isSingleplayer()) {
+			// Nearby players		
+			List<EntityPlayer> others = EntityHelper.getPlayersNearby();
+			list = new ArrayList<Map>(others.size());
+			for(EntityPlayer other : others) {
+				LinkedHashMap otherProps = new LinkedHashMap();
+				otherProps.put("username", other.username); //$NON-NLS-1$
+				otherProps.put("posX", other.posX); //$NON-NLS-1$
+				otherProps.put("posY", other.posY); //$NON-NLS-1$
+				otherProps.put("posZ", other.posZ); //$NON-NLS-1$
+				otherProps.put("heading", EntityHelper.getHeading(other));
+				list.add(otherProps);
+			}
+		} else {
+			list =  new ArrayList<Map>(0);
 		}
 					
 		LinkedHashMap props = new LinkedHashMap();
