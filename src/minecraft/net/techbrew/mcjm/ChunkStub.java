@@ -1,19 +1,35 @@
 package net.techbrew.mcjm;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.BiomeGenBase;
 import net.minecraft.src.Block;
+import net.minecraft.src.BlockContainer;
 import net.minecraft.src.Chunk;
+import net.minecraft.src.ChunkCoordIntPair;
+import net.minecraft.src.ChunkPosition;
+import net.minecraft.src.Entity;
+import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.EnumSkyBlock;
 import net.minecraft.src.ExtendedBlockStorage;
+import net.minecraft.src.IChunkProvider;
+import net.minecraft.src.IEntitySelector;
 import net.minecraft.src.Material;
+import net.minecraft.src.MathHelper;
 import net.minecraft.src.NibbleArray;
+import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldChunkManager;
 
 public class ChunkStub {
 
+	public volatile float[][] slopes; // Added for JourneyMap
+	
 	public final int heightMap[];
 	public final byte[] blockBiomeArray;
 	public final int xPosition;
@@ -23,6 +39,7 @@ public class ChunkStub {
 	public final int worldType;
 	public final long worldHash;
 	public final World worldObj;
+    public int[] precipitationHeightMap;
 	public final ExtendedBlockStorageStub storageArrays[];
 	//public final NibbleArray blocklightMap;
 	//public final byte blocks[];
@@ -33,6 +50,7 @@ public class ChunkStub {
 	//public final int grassColor;
 	//public final int foliageColor;
 	public Boolean doMap;
+	public boolean isModified;
 	
 	
 	public ChunkStub(ChunkStub original) {
@@ -47,6 +65,8 @@ public class ChunkStub {
 		this.doMap = original.doMap;
 		this.biomeName = original.biomeName;
 		this.hasNoSky = original.hasNoSky;
+		this.isModified = original.isModified;
+		this.precipitationHeightMap = original.precipitationHeightMap;
 		this.storageArrays = new ExtendedBlockStorageStub[original.storageArrays.length];
 		for(int i=0;i<storageArrays.length;i++) {
 			ExtendedBlockStorageStub ebs = original.storageArrays[i];
@@ -54,9 +74,12 @@ public class ChunkStub {
 				this.storageArrays[i] = new ExtendedBlockStorageStub(ebs);
 			}
 		}
+		
+		generateHeightMap();
 	}
 	
 	public ChunkStub(Chunk chunk, Boolean doMap, World worldObj, long worldHash) {
+		
 		this.heightMap = Arrays.copyOf(chunk.heightMap, chunk.heightMap.length);
 		this.blockBiomeArray = Arrays.copyOf(chunk.getBiomeArray(), chunk.getBiomeArray().length);
 		this.xPosition = chunk.xPosition;
@@ -66,6 +89,8 @@ public class ChunkStub {
 		this.worldObj = worldObj;
 		this.worldHeight = worldObj.getHeight();
 		this.doMap = doMap;
+		this.isModified = chunk.isModified;
+		this.precipitationHeightMap = chunk.precipitationHeightMap;
 		this.storageArrays = new ExtendedBlockStorageStub[chunk.getBlockStorageArray().length];
 		for(int i=0;i<storageArrays.length;i++) {
 			ExtendedBlockStorage ebs = chunk.getBlockStorageArray()[i];
@@ -103,23 +128,239 @@ public class ChunkStub {
 		//this.grassColor = biome.getGrassColorAtCoords(chunk.worldObj, chunk.xPosition, chunk.worldObj.getSeaLevel(), chunk.zPosition);
 		//this.foliageColor = biome.getFoliageColorAtCoords(chunk.worldObj, chunk.xPosition,  chunk.worldObj.getSeaLevel(), chunk.zPosition);
 		this.hasNoSky = chunk.worldObj.provider.hasNoSky;
+		
+		generateHeightMap();
 	}
 	
 	/**
+     * Checks whether the chunk is at the X/Z location specified
+     */
+    public boolean isAtLocation(int par1, int par2)
+    {
+        return par1 == this.xPosition && par2 == this.zPosition;
+    }
+
+    /**
+     * Returns the value in the height map at this x, z coordinate in the chunk
+     */
+    public int _getHeightValue(int par1, int par2)
+    {
+        return this.heightMap[par2 << 4 | par1];
+    }
+    
+    /**
+     * Added for JourneyMap because getHeightValue() sometimes returns an air block.
+     * 
+     * Returns the value in the height map at this x, z coordinate in the chunk
+     */
+    public int getSafeHeightValue(int x, int z)
+    {
+    	int y = 0;
+    	int id = 0;
+    	y = this.heightMap[z << 4 | x];
+    	while(id==0) {    		
+    		id = getBlockID(x,y,z); 
+    		if(id==0||id==31||id==32||id==83||id==141||id==142) {
+    			y=y-1;
+    		}
+    		if(y==0) {
+    			break;
+    		}
+    	}
+    	return y;        
+    }
+
+
+    /**
+     * Returns the topmost ExtendedBlockStorage instance for this Chunk that actually contains a block.
+     */
+    public int getTopFilledSegment()
+    {
+        for (int var1 = this.storageArrays.length - 1; var1 >= 0; --var1)
+        {
+            if (this.storageArrays[var1] != null)
+            {
+                return this.storageArrays[var1].getYLocation();
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * Returns the ExtendedBlockStorage array for this Chunk.
+     */
+    public ExtendedBlockStorageStub[] getBlockStorageArray()
+    {
+        return this.storageArrays;
+    }
+
+    /**
+     * Generates the height map for a chunk from scratch
+     */
+    public void generateHeightMap()
+    {
+        int var1 = this.getTopFilledSegment();
+
+        for (int var2 = 0; var2 < 16; ++var2)
+        {
+            int var3 = 0;
+
+            while (var3 < 16)
+            {
+                this.precipitationHeightMap[var2 + (var3 << 4)] = -999;
+                int var4 = var1 + 16 - 1;
+
+                while (true)
+                {
+                    if (var4 > 0)
+                    {
+                        int var5 = this.getBlockID(var2, var4 - 1, var3);
+
+                        if (Block.lightOpacity[var5] == 0)
+                        {
+                            --var4;
+                            continue;
+                        }
+
+                        this.heightMap[var3 << 4 | var2] = var4;
+                    }
+
+                    ++var3;
+                    break;
+                }
+            }
+        }
+
+        this.isModified = true;
+    }
+
+
+    public int getBlockLightOpacity(int par1, int par2, int par3)
+    {
+        return Block.lightOpacity[this.getBlockID(par1, par2, par3)];
+    }
+
+    /**
      * Return the ID of a block in the chunk.
      */
     public int getBlockID(int par1, int par2, int par3)
     {
-        ExtendedBlockStorageStub extendedblockstorage = storageArrays[par2 >> 4];
-
-        if (extendedblockstorage != null)
-        {
-            return extendedblockstorage.getExtBlockID(par1, par2 & 0xf, par3);
-        }
-        else
+        if (par2 >> 4 >= this.storageArrays.length)
         {
             return 0;
         }
+        else
+        {
+            ExtendedBlockStorageStub var4 = this.storageArrays[par2 >> 4];
+            return var4 != null ? var4.getExtBlockID(par1, par2 & 15, par3) : 0;
+        }
+    }
+
+    /**
+     * Return the metadata corresponding to the given coordinates inside a chunk.
+     */
+    public int getBlockMetadata(int par1, int par2, int par3)
+    {
+        if (par2 >> 4 >= this.storageArrays.length)
+        {
+            return 0;
+        }
+        else
+        {
+        	ExtendedBlockStorageStub var4 = this.storageArrays[par2 >> 4];
+            return var4 != null ? var4.getExtBlockMetadata(par1, par2 & 15, par3) : 0;
+        }
+    }
+
+    /**
+     * Gets the amount of light saved in this block (doesn't adjust for daylight)
+     */
+    public int getSavedLightValue(EnumSkyBlock par1EnumSkyBlock, int par2, int par3, int par4)
+    {
+    	ExtendedBlockStorageStub var5 = this.storageArrays[par3 >> 4];
+        return var5 == null ? (this.canBlockSeeTheSky(par2, par3, par4) ? par1EnumSkyBlock.defaultLightValue : 0) : (par1EnumSkyBlock == EnumSkyBlock.Sky ? (this.worldObj.provider.hasNoSky ? 0 : var5.getExtSkylightValue(par2, par3 & 15, par4)) : (par1EnumSkyBlock == EnumSkyBlock.Block ? var5.getExtBlocklightValue(par2, par3 & 15, par4) : par1EnumSkyBlock.defaultLightValue));
+    }
+
+
+    /**
+     * Returns whether is not a block above this one blocking sight to the sky (done via checking against the heightmap)
+     */
+    public boolean canBlockSeeTheSky(int par1, int par2, int par3)
+    {
+        return par2 >= this.heightMap[par3 << 4 | par1];
+    }
+
+
+    /**
+     * Gets the height to which rain/snow will fall. Calculates it if not already stored.
+     */
+    public int getPrecipitationHeight(int par1, int par2)
+    {
+        int var3 = par1 | par2 << 4;
+        int var4 = this.precipitationHeightMap[var3];
+
+        if (var4 == -999)
+        {
+            int var5 = this.getTopFilledSegment() + 15;
+            var4 = -1;
+
+            while (var5 > 0 && var4 == -1)
+            {
+                int var6 = this.getBlockID(par1, var5, par2);
+                Material var7 = var6 == 0 ? Material.air : Block.blocksList[var6].blockMaterial;
+
+                if (!var7.blocksMovement() && !var7.isLiquid())
+                {
+                    --var5;
+                }
+                else
+                {
+                    var4 = var5 + 1;
+                }
+            }
+
+            this.precipitationHeightMap[var3] = var4;
+        }
+
+        return var4;
+    }
+
+    /**
+     * Gets a ChunkCoordIntPair representing the Chunk's position.
+     */
+    public ChunkCoordIntPair getChunkCoordIntPair()
+    {
+        return new ChunkCoordIntPair(this.xPosition, this.zPosition);
+    }
+
+    /**
+     * Returns whether the ExtendedBlockStorages containing levels (in blocks) from arg 1 to arg 2 are fully empty
+     * (true) or not (false).
+     */
+    public boolean getAreLevelsEmpty(int par1, int par2)
+    {
+        if (par1 < 0)
+        {
+            par1 = 0;
+        }
+
+        if (par2 >= 256)
+        {
+            par2 = 255;
+        }
+
+        for (int var3 = par1; var3 <= par2; var3 += 16)
+        {
+        	ExtendedBlockStorageStub var4 = this.storageArrays[var3 >> 4];
+
+            if (var4 != null && !var4.isEmpty())
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
     
     /**
@@ -138,115 +379,27 @@ public class ChunkStub {
 
         return BiomeGenBase.biomeList[var4] == null ? BiomeGenBase.plains : BiomeGenBase.biomeList[var4];
     }
-	
-	/**
-     * Return the metadata corresponding to the given coordinates inside a chunk.
-     */
-    public int getBlockMetadata(int par1, int par2, int par3)
-    {
-    	ExtendedBlockStorageStub extendedblockstorage = storageArrays[par2 >> 4];
 
-        if (extendedblockstorage != null)
-        {
-            return extendedblockstorage.getExtBlockMetadata(par1, par2 & 0xf, par3);
-        }
-        else
-        {
-            return 0;
-        }
+    /**
+     * Returns an array containing a 16x16 mapping on the X/Z of block positions in this Chunk to biome IDs.
+     */
+    public byte[] getBiomeArray()
+    {
+        return this.blockBiomeArray;
     }
+
     
     /**
-     * Returns the value in the height map at this x, z coordinate in the chunk
+     * JourneyMap addition
      */
-    public int getHeightValue(int par1, int par2)
-    {
-        return heightMap[par2 << 4 | par1];
-    }
-	
-	public int getTopSolidOrLiquidBlock()
-    {
-		int i = xPosition;
-		int j = zPosition;
-        int k = worldHeight - 1;
-        i &= 0xf;
-        j &= 0xf;
-        while (k > 0)
-        {
-            int l = getBlockID(i, k, j);
-            if (l == 0 || !Block.blocksList[l].blockMaterial.isSolid() || Block.blocksList[l].blockMaterial == Material.leaves)
-            {
-                k--;
-            }
-            else
-            {
-                return k + 1;
-            }
-        }
-        return -1;
-    }
-	
-	 /**
-     * Gets the amount of light saved in this block (doesn't adjust for daylight)
-     */
-    public int getSavedLightValue(EnumSkyBlock par1EnumSkyBlock, int par2, int par3, int par4)
-    {
-    	ExtendedBlockStorageStub extendedblockstorage = storageArrays[par3 >> 4];
-
-        if (extendedblockstorage == null)
-        {
-            return par1EnumSkyBlock.defaultLightValue;
-        }
-
-        if (par1EnumSkyBlock == EnumSkyBlock.Sky)
-        {
-            return extendedblockstorage.getExtSkylightValue(par2, par3 & 0xf, par4);
-        }
-
-        if (par1EnumSkyBlock == EnumSkyBlock.Block)
-        {
-            return extendedblockstorage.getExtBlocklightValue(par2, par3 & 0xf, par4);
-        }
-        else
-        {
-            return par1EnumSkyBlock.defaultLightValue;
-        }
-    }
-    
-    /**
-     * Gets biome for block in chunk
-     * @param par1
-     * @param par2
-     * @param par3WorldChunkManager
-     * @return
-     */
-    //public BiomeGenBase func_48490_a(int par1, int par2, WorldChunkManager par3WorldChunkManager)
-    public BiomeGenBase getBlockBiome(int x, int z)
-    {
-        int i = blockBiomeArray[z << 4 | x] & 0xff;
-
-        if (i == 255)
-        {
-            BiomeGenBase biomegenbase = worldObj.getWorldChunkManager().getBiomeGenAt((xPosition << 4) + x, (zPosition << 4) + z);
-            i = biomegenbase.biomeID;
-            blockBiomeArray[z << 4 | x] = (byte)(i & 0xff);
-        }
-
-        if (BiomeGenBase.biomeList[i] == null)
-        {
-            return BiomeGenBase.plains;
-        }
-        else
-        {
-            return BiomeGenBase.biomeList[i];
-        }
-    }
-
 	@Override
 	public int hashCode() {
 		return toHashCode(xPosition, zPosition);
 	}
 	
+	/**
+     * JourneyMap addition
+     */
 	public static int toHashCode(final int x, final int z) {
 		final int prime = 31;
 		int result = 1;
@@ -255,6 +408,9 @@ public class ChunkStub {
 		return result;
 	}
 
+	/**
+     * JourneyMap addition
+     */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -271,6 +427,9 @@ public class ChunkStub {
 		return true;
 	}
 
+	/**
+     * JourneyMap addition
+     */
 	@Override
 	public String toString() {
 		return "ChunkStub [" + xPosition + ", " + zPosition //$NON-NLS-1$ //$NON-NLS-2$
