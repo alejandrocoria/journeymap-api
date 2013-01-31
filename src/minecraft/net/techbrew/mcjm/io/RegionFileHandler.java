@@ -28,23 +28,25 @@ import net.minecraft.src.Chunk;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.render.ChunkRenderer;
+import net.techbrew.mcjm.render.OldChunkRenderer;
 import net.techbrew.mcjm.ui.ZoomLevel;
 
 public class RegionFileHandler {
 	
-	private static RegionFileHandler instance;
-	
 	private final Object lock;
-
-	public synchronized static RegionFileHandler getInstance() {
-		if(instance==null) {
-			instance = new RegionFileHandler();
-		}
-		return instance;
-	}
 	
+	// On-demand-holder for instance
+	private static class Holder {
+        private static final RegionFileHandler INSTANCE = new RegionFileHandler();
+    }
+
+	// Get singleton instance.  Concurrency-safe.
+    public static RegionFileHandler getInstance() {
+        return Holder.INSTANCE;
+    }
+
 	private RegionFileHandler() {
 		lock = new Object();
 	}
@@ -192,62 +194,73 @@ public class RegionFileHandler {
 				writeRegionFile(rCoord, image);
 			}
 		} else if (regionFile != null && regionFile.canRead()) {
-			final int maxTries = 5;
-			int tries = 1;
-			while(tries<maxTries) {
-				try {
-					fis = new FileInputStream(regionFile);
-					FileChannel fc = fis.getChannel();
-					ImageIO.setUseCache(false);
-					ImageReader reader = ImageIO.getImageReadersBySuffix("png").next(); //$NON-NLS-1$
-					ImageReadParam param = new ImageReadParam();
-					param.setSourceSubsampling(sampling, sampling, 0, 0);
-					image = ImageIO.read(fis);					
-					break;
-				} catch (Exception e) {
-					if(tries+1==maxTries) {						
-//						regionFile.deleteOnExit();
-//						regionFile.delete();
+			
+				final int maxTries = 5;
+				int tries = 1;
+				while(tries<=maxTries) {
+					try {
+						fis = new FileInputStream(regionFile);
+						FileChannel fc = fis.getChannel();
+						ImageIO.setUseCache(false);
+						ImageReader reader = ImageIO.getImageReadersBySuffix("png").next(); //$NON-NLS-1$
+						ImageReadParam param = new ImageReadParam();
+						param.setSourceSubsampling(sampling, sampling, 0, 0);
+						image = ImageIO.read(fis);					
+						break;
+					} catch (Exception e) {
+						tries++;
 						String error = Constants.getMessageJMERR21(regionFile, LogFormatter.toString(e));
 						JourneyMap.getLogger().warning(error);
+					} finally {
+				    	if(fis!=null) {
+							try {								
+								fis.close();
+							} catch (IOException e) {
+								JourneyMap.getLogger().severe(LogFormatter.toString(e));
+							}
+				    	}
 					}
-				} finally {
-			    	if(fis!=null) {
-						try {
-							fis.close();
-						} catch (IOException e) {
-							JourneyMap.getLogger().severe(LogFormatter.toString(e));
-						}
-			    	}
+				}
+				if(tries==maxTries) {
+					JourneyMap.getLogger().severe("Deleting unusable region file: " + regionFile);
+					regionFile.delete();
 				}
 			}
 			
-		} 
-
 		if(image==null) {
 			image = createBlankImage();
 		}
 		return image;
 	}
 	
+	/**
+	 * Write region image to file.
+	 * 
+	 * @param rCoord
+	 * @param regionImage
+	 */
 	public void writeRegionFile(RegionCoord rCoord, BufferedImage regionImage) {
 
-		File regionFile = getRegionFile(rCoord);
-		//System.out.println("File for " + rCoord + " = " + regionFile.getName());
-
 		FileOutputStream fos = null;
-		FileLock fileLock = null;
+		FileLock fileLock = null;		
+		FileOutputStream outputFile = null;
 		
-		FileOutputStream outputFile = null; 
+		if(regionImage==null) {
+			return;
+		}
+		
+		File regionFile = getRegionFile(rCoord);
 	    try {
 	    	if(!regionFile.exists()) {
 	    		regionFile.createNewFile();	
 	    	}
 	    	fos = new FileOutputStream(regionFile);
 			FileChannel fc = fos.getChannel();
-			//fileLock = fc.lock();
+			fileLock = fc.lock();
 			ImageIO.setUseCache(false);
     		ImageIO.write(regionImage, "png", fos); //$NON-NLS-1$
+    		fos.flush();
+    		
 	    } catch (Exception e) {
 	    	String error = Constants.getMessageJMERR22(regionFile, LogFormatter.toString(e));
 			JourneyMap.getLogger().severe(error);
@@ -256,14 +269,14 @@ public class RegionFileHandler {
 				try {
 					fileLock.release();
 				} catch (IOException e) {
-					//JourneyMap.getLogger().severe(LogFormatter.toString(e));
+					JourneyMap.getLogger().severe("Error releasing file lock: " + LogFormatter.toString(e));
 				}
 	    	}
 	    	if(fos!=null) {
 				try {
 					fos.close();
 				} catch (IOException e) {
-					//JourneyMap.getLogger().severe(LogFormatter.toString(e));
+					JourneyMap.getLogger().severe("Error closing file lock: " + LogFormatter.toString(e));
 				}
 	    	}
 	    }
