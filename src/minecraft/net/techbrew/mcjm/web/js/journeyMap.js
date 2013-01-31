@@ -30,7 +30,7 @@ var chunkScale = mapScale*16;
 var playerLastPos = "0,0";
 
 var JmIcon;
-var halted = false;
+var halted = true;
 
 var timers = [];
 
@@ -169,18 +169,20 @@ function checkVersion() {
 function initImages() {
 
    // Init player marker
-   playerImage=document.createElement("img");
-   playerImage.id="playerImage";
-   playerImage.style.position = "absolute";
-   playerImage.style.height = "32px";
-   playerImage.style.width = "32px";
-   playerImage.style.cursor = "hand";
-   playerImage.src="/img/arrow.png";
-   playerImage.onclick=function(){
-        setCenterOnPlayer(true);
-        refreshData();
-   };
-   document.body.appendChild(playerImage);
+	if(!playerImage) {
+	   playerImage=document.createElement("img");
+	   playerImage.id="playerImage";
+	   playerImage.style.position = "absolute";
+	   playerImage.style.height = "32px";
+	   playerImage.style.width = "32px";
+	   playerImage.style.cursor = "hand";
+	   playerImage.src="/img/arrow.png";
+	   playerImage.onclick=function(){
+	        setCenterOnPlayer(true);
+	        refreshData();
+	   };
+	   document.body.appendChild(playerImage);
+	}
 
 }
 
@@ -201,12 +203,13 @@ function initWorld() {
 	
 	// Clear existing timers (if any)
 	clearTimers();
+	halted = false;
 	
 	// Start with the game data
 	$.ajax({url: "/data/game", dataType: "jsonp"})
 	.fail(handleError)
 	.done(function(data, textStatus, jqXHR) { 		
-		JM.game = data;
+		JM.game = data;		
 		
 		// Now get the world data
 		$.ajax({url: "/data/world", dataType: "jsonp"})
@@ -221,16 +224,18 @@ function initWorld() {
 			 
 			 sizeMap();
 			 setCenterOnPlayer(true);
+			 checkBounds();
 			 			 			 
 		    // Auto-refresh data at prescribed rates, nothing below 1000
 			addTimer(refreshData, JM.game.browser_poll);
+			//addTimer(refreshMapImage, JM.game.browser_mapimg_poll);
 			addTimer(refreshTimeData, JM.game.browser_timedata_poll);
 			addTimer(refreshAnimalsData, JM.game.browser_animalsdata_poll);
 			addTimer(refreshMobsData, JM.game.browser_mobsdata_poll);
 			addTimer(refreshPlayersData, JM.game.browser_playersdata_poll);
-			addTimer(refreshVillagersData, JM.game.browser_villagersdata_poll);		     
-		     
-		    // Get world and player data
+			addTimer(refreshVillagersData, JM.game.browser_villagersdata_poll);		     		     			
+			
+		    // Get player data
 			refreshData();
 		     
 		    // Check version
@@ -241,9 +246,11 @@ function initWorld() {
 
 }
 
-// Add an interval timer, minimum being 1000
+// Add an interval timer to the timers array, minimum being 1000
 function addTimer(func, timespan) {
-	setInterval(func, Math.max(JM.game.browser_poll, 1000))
+	if(!timers) timers = [];
+	var timerId = setInterval(func, Math.max(JM.game.browser_poll, 1000));
+	timers.push(timerId);
 }
 
 var delay = (function(){
@@ -419,8 +426,8 @@ function getMapDataUrl() {
    var ctx = getContext();
    var width = getCanvasWidth();
    var height = getCanvasHeight();
-   var mapType = (JM.player.underground && showCaves) ? "underground" : (showLight ? "night" : "day") ;  
-   var depth = JM.player.chunkCoordY;
+   var mapType = (JM.player && JM.player.underground && showCaves) ? "underground" : (showLight ? "night" : "day") ;  
+   var depth = (JM.player && JM.player.chunkCoordY) ? JM.player.chunkCoordY : 4;
    var request = "/map.png?mapType=" + mapType + "&depth=" + depth + "&x1=" + mapBounds.x1+ "&z1=" + mapBounds.z1 + 
                              "&x2=" + mapBounds.x2 + "&z2=" + mapBounds.z2 + "&width=" + width + "&height=" + height;
    return request;
@@ -478,6 +485,20 @@ function refreshVillagersData() {
    	});
 }
 
+function refreshMapImage() {
+	if(isScroll==true) return;
+	
+//	var tempImage = $("<img />").attr('src', getMapDataUrl())
+//    .load(function() {
+//        if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
+//            console.log('Map image incomplete');
+//        } else {
+//        	console.log('Map image complete');
+//        	lastChunksImage = tempImage[0];
+//        }
+//    });
+}
+
 
 function refreshData() {  	
 	
@@ -495,14 +516,20 @@ function refreshData() {
 				checkBounds();
 			}
 			
-			// Update the lastChunksImage with the map data
-			lastChunksImage = new Image();
-			lastChunksImage.onload = function () {          
-			    // Draw the image on the canvas
-			    var ctx = getContext();         
-			    updateUI();
-			}    
-			lastChunksImage.src=getMapDataUrl();
+			// Calculate Map URL
+			var mapUrl = getMapDataUrl();
+			
+			// Get new map image
+			var newChunksImage = $(document.createElement('img')).attr('src', mapUrl)
+		    .load(function() {
+		        if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
+		            console.log('Map image incomplete!');
+		        } else {
+		        	lastChunksImage = newChunksImage[0];
+				    updateUI();
+		        }
+		    });
+			
 	   	});	  
    }
 }
@@ -511,14 +538,17 @@ function refreshData() {
 // Ajax request got an error from the server
 function handleError(data, error, jqXHR) {
 	
-	console.log("Server returned error: " + data.status + ": " + jqXHR);
-	
 	clearTimers();
 	
+	// Secondary errors will be ignored
+	if(halted==true) return;
+	
+	console.log("Server returned error: " + data.status + ": " + jqXHR);
+	
 	$("#playerImage").css("visibility","hidden");
-    $("#playerImage").css("left", -32);
-    $("#playerImage").css("top", -32);
-    $("#playerImage").css("zIndex", 2);
+    $("#playerImage").css("left", -1000);
+    $("#playerImage").css("top", -1000);
+    $("#playerImage").css("zIndex", -100);
 	
 	var displayError;
 	if(data.status==503 || data.status==0) {
@@ -560,8 +590,9 @@ function handleError(data, error, jqXHR) {
     // Restart in 5 seconds
 	if(!halted) {
 		halted = true;
+		console.log("Will attempt to re-connect in 5 seconds.");
 		setTimeout(function(){
-			console.log("Trying to re-initialize");
+			
 			halted = false;
 			init();
 		},5000);
@@ -863,8 +894,9 @@ function drawImageChunks() {
    var key;
    
    // draw the png to the canvas
-   var ctx = getContext();
-   ctx.drawImage(lastChunksImage, 0, 0, lastChunksImage.width*mapScale, lastChunksImage.height*mapScale);
+   if(lastChunksImage) {
+	   getContext().drawImage(lastChunksImage, 0, 0, lastChunksImage.width*mapScale, lastChunksImage.height*mapScale);
+   }
 }
 
 function getScaledChunkX(chunkX) {
