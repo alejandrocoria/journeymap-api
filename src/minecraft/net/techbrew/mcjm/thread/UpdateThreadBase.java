@@ -17,7 +17,7 @@ import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.render.ChunkRenderer;
+import net.techbrew.mcjm.render.OldChunkRenderer;
 
 public abstract class UpdateThreadBase implements Runnable {
 
