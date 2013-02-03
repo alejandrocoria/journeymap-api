@@ -96,9 +96,9 @@ public class ChunkTerrainRenderer implements IChunkRenderer {
 				hNW = (x==0 || y==0) ? getBlockHeight(x, y, -1, -1, chunkStub, neighbors, h) : chunkStub.getSafeHeightValue(x-1, y-1);
 				hW = (x==0) ? getBlockHeight(x, y, -1, 0, chunkStub, neighbors, h) : chunkStub.getSafeHeightValue(x-1, y);
 				float avgH = (hN + hNW + hW) / 3.0f;
-				
-				s = h/avgH;				
-				
+
+				s = (h/avgH);	
+								
 				if(s!=1f) {
 					
 					sN = (y==0) ? getBlockSlope(x, y, 0, -1, chunkStub, neighbors, s) : chunkStub.slopes[x][y-1];
@@ -106,23 +106,19 @@ public class ChunkTerrainRenderer implements IChunkRenderer {
 					sW = (x==0) ? getBlockSlope(x, y, -1, 0, chunkStub, neighbors, s) : chunkStub.slopes[x-1][y];
 					float avgS = (sN + sNW + sW) / 3.0f;
 					
-					if(h<avgH) {
+					if(s<1) {
 						
-						s = Math.min(s, h/hN);
-						s = Math.min(s, h/hNW);
-						s = Math.min(s, h/hW);
+						s = (float) (s + Math.log(s*.8f));
+						s = Math.min(s, avgS*.92f);
+						s = Math.max(s, .3f);						
 						
-						s = Math.min(s, sN);
-						s = Math.min(s, sNW);
-						s = Math.min(s, sW);
-						s = Math.max(s*.9f, .4f);						
+					} else if(s>1) {
 						
-					} else if(h>avgH) {
-						
+						s = (float) (s + Math.log(s));
 						s = Math.min(s, Math.max(sN, 1.0f));
 						s = Math.min(s, Math.max(sNW, 1.0f));
 						s = Math.min(s, Math.max(sW, 1.0f));
-						s = s*1.05f;
+						s = s*1.1f;
 					}				
 					
 				}
