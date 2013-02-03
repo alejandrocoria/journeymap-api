@@ -129,7 +129,7 @@ public class MapService extends BaseService {
 			mergeImageChunks(event, worldDir, x1, z1, x2, z2, mapType, depth, worldProviderType, width, height);
 			
 			long stop=System.currentTimeMillis();
-			if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+			if(JourneyMap.getLogger().isLoggable(Level.INFO)) {
 				JourneyMap.getLogger().info((stop-start) + "ms to serve map.png");
 			}
 			

@@ -19,17 +19,18 @@ import net.techbrew.mcjm.io.FileHandler;
  */
 public class WorldData implements IDataProvider {
 	
-	private static long TTL = TimeUnit.MINUTES.toMillis(1);
+	private static long TTL = TimeUnit.SECONDS.toMillis(1);
 	
 	public static enum Key {
-		dirName,
+		dirName, // TODO: Remove?
 		name,
 		dimension,
 		time,
+//		totalTime,
 		hardcore,
 		singlePlayer,
-		worldType,
-		gameType
+//		worldType,
+//		gameType
 	}
 
 	/**
@@ -51,31 +52,33 @@ public class WorldData implements IDataProvider {
 		WorldInfo worldInfo = mc.theWorld.getWorldInfo();
 
 		LinkedHashMap props = new LinkedHashMap();
-		props.put(Key.dirName, getWorldDirName(mc));
+		// props.put(Key.dirName, getWorldDirName(mc));
 		props.put(Key.name, getWorldName(mc)); 
 		props.put(Key.dimension, worldInfo.getDimension()); 
 		props.put(Key.hardcore,  worldInfo.isHardcoreModeEnabled());
 		props.put(Key.singlePlayer, mc.isSingleplayer()); 
-		props.put(Key.gameType, worldInfo.getGameType().toString());
-		props.put(Key.worldType, worldInfo.getTerrainType().getWorldTypeName());
+		props.put(Key.time, mc.theWorld.getWorldTime() % 24000L);
+//		props.put(Key.totalTime, mc.theWorld.getTotalWorldTime());
+//		props.put(Key.gameType, worldInfo.getGameType().toString());
+//		props.put(Key.worldType, worldInfo.getTerrainType().getWorldTypeName());
 
 		return props;		
 	}
 	
-	/**
-	 * Get the current world data directory name.
-	 * @param mc
-	 * @return
-	 */
-	private String getWorldDirName(Minecraft mc) {
-		String worldDirName = null;
-		try {
-			worldDirName = FileHandler.getSafeName(mc);
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
-		return worldDirName;
-	}
+//	/**
+//	 * Get the current world data directory name.
+//	 * @param mc
+//	 * @return
+//	 */
+//	private String getWorldDirName(Minecraft mc) {
+//		String worldDirName = null;
+//		try {
+//			worldDirName = FileHandler.getSafeName(mc);
+//		} catch (UnsupportedEncodingException e) {
+//			throw new RuntimeException(e);
+//		}
+//		return worldDirName;
+//	}
 	
 	/**
 	 * Get the current world name.

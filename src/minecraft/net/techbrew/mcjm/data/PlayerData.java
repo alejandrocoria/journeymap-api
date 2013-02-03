@@ -11,6 +11,7 @@ import net.minecraft.src.World;
 import net.techbrew.mcjm.ChunkStub;
 import net.techbrew.mcjm.EntityHelper;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.data.WorldData.Key;
 import net.techbrew.mcjm.render.MapBlocks;
 
 /**
@@ -27,6 +28,7 @@ public class PlayerData implements IDataProvider {
 		username,
 		heading,
 		biome,
+		dimension,
 		underground,
 		posX, 
 		posY, 
@@ -68,6 +70,7 @@ public class PlayerData implements IDataProvider {
 		props.put(Key.posY, (int) Math.floor(player.posY));
 		props.put(Key.posZ, (int) Math.floor(player.posZ));
 		
+		props.put(Key.dimension, mc.theWorld.getWorldInfo().getDimension()); 
 		props.put(Key.biome, getPlayerBiome()); 
 		props.put(Key.underground, playerIsUnderground());		
 				

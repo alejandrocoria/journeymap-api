@@ -46,7 +46,6 @@ import net.techbrew.mcjm.data.MessagesData;
 import net.techbrew.mcjm.data.MobsData;
 import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.data.PlayersData;
-import net.techbrew.mcjm.data.TimeData;
 import net.techbrew.mcjm.data.VillagersData;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.ChunkFileHandler;
@@ -82,7 +81,6 @@ public class DataService extends BaseService {
 		providerMap.put("/data/messages", MessagesData.class);  //$NON-NLS-1$
 		providerMap.put("/data/player", PlayerData.class);  //$NON-NLS-1$
 		providerMap.put("/data/players", PlayersData.class);  //$NON-NLS-1$
-		providerMap.put("/data/time", TimeData.class);  //$NON-NLS-1$
 		providerMap.put("/data/world", WorldData.class);  //$NON-NLS-1$
 		providerMap.put("/data/villagers", VillagersData.class);  //$NON-NLS-1$
 		
