@@ -3,6 +3,7 @@ package net.techbrew.mcjm.io;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.MediaTracker;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.awt.image.RasterFormatException;
@@ -85,6 +86,11 @@ public class RegionImageCache  {
 	
 	private Boolean insertChunk(ChunkCoord cCoord, BufferedImage chunkImage, BufferedImage regionImage) {
 		Graphics2D g2d = regionImage.createGraphics();
+		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		
 		Boolean regionAltered = false;
 		
 		int x,z;
@@ -95,13 +101,13 @@ public class RegionImageCache  {
 			x = cCoord.getXOffsetDay();
 			z = cCoord.getZOffsetDay();
 			
-			g2d.drawImage(chunkImage, x, z, x+16, z+16, 0,0,15,15, null);
+			g2d.drawImage(chunkImage, x, z, x+16, z+16, 0,0,16,16, null);
 	
 			// Insert night image
 			x = cCoord.getXOffsetNight();
 			z = cCoord.getZOffsetNight();
 			
-			g2d.drawImage(chunkImage, x, z, x+16, z+16, 16,0,32,15, null);
+			g2d.drawImage(chunkImage, x, z, x+16, z+16, 16,0,32,16, null);
 				
 		} else {
 			
@@ -109,7 +115,7 @@ public class RegionImageCache  {
 			x = cCoord.getXOffsetUnderground();
 			z = cCoord.getZOffsetUnderground();
 			
-			g2d.drawImage(chunkImage, x, z, x+16,z+16, 0,0,15,15,  null);
+			g2d.drawImage(chunkImage, x, z, x+16,z+16, 0,0,16,16,  null);
 		}
 		
 		//regionAltered = !rastersEqual(originalData, newData);
