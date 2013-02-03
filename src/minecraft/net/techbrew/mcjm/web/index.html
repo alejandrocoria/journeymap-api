@@ -26,6 +26,7 @@
 
 <!-- Javascript -->
 <script src="js/jquery.min.js"></script>
+<script src="js/jquery.mousewheel.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/jquery-ui-1.10.0.custom.min.js"></script>
 </head>
@@ -38,18 +39,18 @@
 			
 			     <a class="brand" href="#"><img src="img/journeymap.png" alt="JourneyMap"></a>
 			     
-			      <ul class="nav">
+			      <ul class="nav jmtoggle">
                         <li class="active" id="dayButton"><a href="#">[day]</a></li>
                         <li id="nightButton"><a href="#night">[night]</a></li>
                         <li id="caveButton"><a href="#caves">[cave]</a></li>                        
                     </ul>
                     
 			       <div class="btn-toolbar visible-tablet visible-desktop">
-			           <div class="btn-group">
+			           <div class="btn-group jmtoggle">
                             <a id="followButton" class="btn" href="#"><i class="icon-map-marker"></i></a>
                        </div>
                             
-					   <div class="btn-group">
+					   <div class="btn-group jmtoggle">
 
 							<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
 								Show... <span class="caret"></span>
@@ -88,7 +89,7 @@
 							</ul>
 					   </div>
 					  
-					   <div class="btn-group">							
+					   <div class="btn-group jmtoggle">							
 							<button id="saveButton" class="btn">
 								<i class="icon-picture"></i>
 							</button>
@@ -116,8 +117,26 @@
 	<canvas id="mapCanvas"></canvas>
 	
     <div class="container-fluid">
-        <span id="worldNameHeader">[JM.world.name]</span>
-        <div id="slider-vertical" title=""></div>
+        <span id="worldInfo">
+            <div id="worldName"></div>
+            <div>
+                <span id="worldTimeTitle"></span>
+                <span id="worldTime"></span>
+            </div>
+            <div>
+                <span id="playerBiomeTitle"></span>
+                <span id="playerBiome"></span>
+            </div>
+            <div>
+                <span id="playerLocationTitle"></span>
+                <span id="playerLocation"></span>
+            </div>
+            <div>
+                <span id="playerElevationTitle"></span>
+                <span id="playerElevation"></span>
+            </div>
+        </span>
+        <div id="slider-vertical"></div>
     </div>
    
 <script type="text/javascript" src="/js/journeymap.js"></script>

@@ -1,16 +1,16 @@
-var headerSize = 0;
+
 var mapScale = 2;
 var minMapScale = 1;
 var maxMapScale = 8;
 var mapBounds = {x1:0,z1:0,x2:0,z2:0};
-var mapDataMode = "png";
+
 var showLight = false;
 var showCaves = true;
 var showMonsters = true;
 var centerOnPlayer = true;
 
 var mapBackground = "#222";
-var chunks = new Object();
+
 var canvas;
 var ctx;
 var isScroll=false;
@@ -18,47 +18,73 @@ var mx,my;
 var msx,msy;
 var tempCanvasImage;
 var tempCanvas;
-var playerCanvas;
+
 var useTempCanvas = false;
+var tempChunksImage;
 var lastChunksImage;
 var playerImage;
 
 var mobImages = new Object();
 var otherImages = new Array();
-var chunks = new Object();
 var chunkScale = mapScale*16;
-var playerLastPos = "0,0";
 
 var JmIcon;
-var halted = true;
+var halted = false;
+var uiInitialized = false;
+var versionChecked = false;
+var updatingMap = false;
 
-var timers = [];
+var timers = {};
 
-var JML10N = {};
+var playerOverrideMap = false;
 
 var JM = {
-	game:{},
+	debug: false,
+	messages: null,
+	game: null,
     mobs:[],
     animals:[],
     players:[],
     villagers:[]
 };
 
+/**
+ * JQuery add-on for disableSelection
+ */
+(function($){
+    $.fn.disableSelection = function() {
+        return this
+	         .attr('unselectable', 'on')
+	         .css('user-select', 'none')
+	         .on('selectstart', false); // ie
+    };
+})(jQuery);
 
-/** OnLoad **/
-$(document).ready(init);
 
-function init() {
+/** Debug helper **/
+var logEntry = function(name) {
+	if(JM.debug) {
+		console.log(">>> " + name);
+	}
+}
+
+/** Delay helper **/
+var delay = (function(){
+	  var timer = 0;
+	  return function(callback, ms){
+	    clearTimeout (timer);
+	    timer = setTimeout(callback, ms);
+	  };
+	})();
+
+
+/**
+ * Load I18N messages once.
+ * @returns
+ */
+var initMessages = function() {
+	logEntry("initMessages");	
 	
-    // Offset canvas
-    $("#mapCanvas").offset({ top: headerSize, left: 0});
-    
-    // Init canvases
-    canvas = $("#mapCanvas")[0];
-    tempCanvas = document.createElement("canvas");
-    playerCanvas = document.createElement("canvas");
-        
-	// Get L10N messages, set strings on success
     $.ajax({
         url: "/data/messages", 
         dataType: "jsonp",
@@ -66,211 +92,290 @@ function init() {
         async: false})
     .fail(handleError)
 	.done(function(data, textStatus, jqXHR) { 
-		
-        JML10N = data;
-        
-        // Set page language, although at this point it may be too late to matter.
-        $('html').attr('lang', JML10N.locale.split('_')[0]);
-        
-        // Set RSS feed title
-        $("link #rssfeed").attr("title", JML10N.rss_feed_title);
-        
-        // Init toolbar button tooltips
-        $("#dayButton").html("<a href='#' title='" + JML10N.day_button_desc +"'>" + JML10N.day_button_title + "</a>");
-        
-        $("#nightButton").html("<a href='#' title='" + JML10N.night_button_desc +"'>" + JML10N.night_button_title + "</a>");
-        $("#followButton").attr("title", JML10N.follow_button_desc);
-        $("#caveButton").html("<a href='#' title='" + JML10N.cave_button_desc +"'>" + JML10N.cave_button_title + "</a>");
-        
-        $("#monstersButton").attr("title", "<b>" + JML10N.monsters_button_title + "</b><br/>" + JML10N.monsters_button_desc);
-        $("#saveButton").attr("title", JML10N.save_button_title);
-        $("#aboutButton").attr("title", JML10N.about_button_title);
-        
-        // TODO:
-        // JML10N.rss_feed_desc 
-        //JML10N.email_sub_desc
-        //JML10N.follow_twitter
-        //JML10N.zoom_slider_name
-        
-        // Init mob images
-        initImages();
-        
-        // Get header height
-        //headerSize = $("#header").height();
-        
-        // Init slider
-        $(function() {
-             $( "#slider-vertical" ).slider({
-                 orientation: "vertical",
-                 range: "min",
-                 title: JML10N.zoom_slider_name,
-                 min: minMapScale,
-                 max: maxMapScale,
-                 value: 2,
-                 slide: function( event, ui ) {
-                     setZoom(ui.value);
-                 }
-             });
-         });
-        
-        // Init buttons
-        $("#dayButton").click(function() {
-     	   setMapType('day');
-     	   refreshData();
-        });
-        
-        $("#nightButton").click(function() {
-     	   setMapType('night');
-     	   refreshData();
-        });
-        
-        $("#caveButton").click(function() {
-     	   setShowCaves(!showCaves);
-        });
-        
-        $("#followButton").click(function() {
-     	   setCenterOnPlayer(!centerOnPlayer);
-     	   refreshData();
-        });
-        
-        $("#saveButton").click(function() {
-        	saveMapImage();
-         });
-                
-        // Init map type
-        setMapType('day');
-        
-        // Size the canvases and setup for custom event handling
-        registerEvents();   
-        
-        // Init world info   
-        initWorld();  
-   });
+		JM.messages = data;
+		initUI();
+	});
 }
 
-
-function checkVersion() {
-
-   $("#version").attr("innerHTML", JM.game.jm_version + " for Minecraft " + JM.game.mc_version);
-   if(JM.game.latest_journeymap_version>JM.game.jm_version) {
-       $("#versionButton").attr("title", "<b>" + JML10N.update_available + "</b><br/>JourneyMap " + JM.game.latest_journeymap_version + " for Minecraft " + JM.world.latest_minecraft_version);
-       $("#versionButton").css("visibility", "visible");
-       $("#versionButton").tooltip({
-           effect: 'slide',
-           opacity: .9,
-        }).dynamic({ bottom: { direction: 'down', bounce: true } });
-       //$("#versionButton").tooltip.show();
-   }
+/**
+ * Initialize UI once.
+ * @returns
+ */
+var initUI = function() {
+	logEntry("initUI");
+	
+	// Ensure messages are loaded first.
+	if(!JM.messages) {
+		console.log("initUI called without JM.messages"); // shouldn't happen
+		loadMessages();
+		return;
+	}
+	
+    // Init canvas
+    $("#mapCanvas").offset({ top: 0, left: 0})
+    	.mousedown(myDown)
+    	.mouseup(myUp)
+    	.dblclick(myDblClick)
+    	.disableSelection();
+        
+    // Init canvases
+    canvas = $("#mapCanvas")[0];
+    tempCanvas = document.createElement("canvas");    
+    sizeMap();
+        
+    // Set page language, although at this point it may be too late to matter.
+    $('html').attr('lang', JM.messages.locale.split('_')[0]);
+    
+    // Set RSS feed title
+    $("link #rssfeed").attr("title", JM.messages.rss_feed_title);
+    
+    // Init toolbar button tooltips
+    $("#dayButton").html("<a href='#' title='" + JM.messages.day_button_desc +"'>" + JM.messages.day_button_title + "</a>")
+	    .click(function() {
+	       playerOverrideMap = true;
+	 	   setMapType('day');
+	 	  drawMap();
+	    });
+    
+    $("#nightButton").html("<a href='#' title='" + JM.messages.night_button_desc +"'>" + JM.messages.night_button_title + "</a>")
+	    .click(function() {
+	       playerOverrideMap = true;
+	 	   setMapType('night');
+	 	  drawMap();
+	    });
+    
+    $("#followButton").attr("title", JM.messages.follow_button_desc)
+	    .click(function() {
+	 	   setCenterOnPlayer(!centerOnPlayer);
+	 	  drawMap();
+	    });
+    
+    $("#caveButton").html("<a href='#' title='" + JM.messages.cave_button_desc +"'>" + JM.messages.cave_button_title + "</a>")
+	    .click(function() {
+	 	   setShowCaves(!showCaves);
+	    });
+    
+    $("#monstersButton").attr("title", "<b>" + JM.messages.monsters_button_title + "</b><br/>" + JM.messages.monsters_button_desc);
+    
+    $("#saveButton").attr("title", JM.messages.save_button_title)
+	    .click(function() {
+	    	saveMapImage();
+	     });
+    
+    $("#aboutButton").attr("title", JM.messages.about_button_title);
+    
+    $("#slider-vertical" ).slider({
+        orientation: "vertical",
+        range: "min",
+        title: JM.messages.zoom_slider_name,
+        min: minMapScale,
+        max: maxMapScale,
+        value: 2,
+        slide: function( event, ui ) {
+            setZoom(ui.value);
+        }
+    });
+    
+    $("#worldInfo").hide();
+    $("#worldTimeTitle").html(JM.messages.worldtime_title);
+    $("#playerBiomeTitle").html(JM.messages.biome_title);
+    $("#playerLocationTitle").html(JM.messages.location_title);
+    $("#playerElevationTitle").html(JM.messages.elevation_title);
+    
+    // Init images
+    initImages();
+    
+	// Disable selection events by default
+	$("*").live('selectstart dragstart', function(evt){ evt.preventDefault(); return false; });
    
-   _gaq.push(['_setCustomVar', 1, 'jm_version', JM.game.jm_version, 2]);
-   _gaq.push(['_trackEvent', 'Client', 'CheckVersion', JM.game.jm_version]);
+	// Mouse events for canvas
+	$(window).mousewheel(myMouseWheel);
+	
+	// Keyboard events
+	$(document).keypress(myKeyPress);
+	
+	// Get game data
+	$.ajax({url: "/data/game", dataType: "jsonp"})
+	.fail(handleError)
+	.done(function(data, textStatus, jqXHR) { 		
+		
+		JM.game = data;			
+		
+		logEntry("initUI() -> /data/game");
+		
+		// Update UI with game info
+		$("#version").attr("innerHTML", JM.game.jm_version + " for Minecraft " + JM.game.mc_version);
+		if(JM.game.latest_journeymap_version>JM.game.jm_version) {
+			// TODO: This is sloppy L10N
+			$("#versionButton").attr("title", JM.messages.update_available + " : JourneyMap " + JM.game.latest_journeymap_version + " for Minecraft " + JM.world.latest_minecraft_version);
+			$("#versionButton").css("visibility", "visible");
+		}
+	   
+		// GA event
+		if(versionChecked!=true) {
+			_gaq.push(['_setCustomVar', 1, 'jm_version', JM.game.jm_version, 2]);
+			_gaq.push(['_trackEvent', 'Client', 'CheckVersion', JM.game.jm_version]);
+			versionChecked = true;
+		}
+			
+		// Set flag so this function doesn't get called twice
+		uiInitialized = true;
+			
+		// Continue with initialization
+		initWorld();
+   	});
+	
 }
 
-function initImages() {
+	
+/**
+ * Initialize World.
+ * @returns
+ */
+var initWorld = function() {
+	
+	logEntry("initWorld");
+	
+	console.log("Initializing world...");
+    
+    // Clear existing timers (if any)
+	clearTimers();
+	
+	// Reset state
+	halted = false;
+	updatingMap = false;
+	setCenterOnPlayer(true);
+	
+	// Turn on UI elements that may have been hidden
+	$(".jmtoggle").each(function(){$(this).show()});
+	$("#slider-vertical").show();
+	
+	// Ensure the map is sized
+	sizeMap();
+	
+	// Get world data once
+	refreshWorldData(function(){
+		
+		// Update the map first
+		updateMap();
+		
+		// Let the other data auto-refresh
+		refreshMobsData();
+		refreshPlayersData();
+		refreshAnimalsData();
+		refreshVillagersData();
+		refreshWorldData(); 
+	});
+	 
+	// Resize events can now update the map
+	$(window).resize(function() {
+		$("#playerImage").hide();
+	    delay(function(){
+	    	updateMap();
+	    }, 200);
+	});
+		
+}
+
+/**
+ * Preload any images as needed.
+ */
+var initImages = function() {
+	
+	logEntry("initImages");
 
    // Init player marker
 	if(!playerImage) {
 	   playerImage=document.createElement("img");
 	   playerImage.id="playerImage";
 	   playerImage.style.position = "absolute";
-	   playerImage.style.height = "32px";
-	   playerImage.style.width = "32px";
+	   playerImage.style.height = "60px";
+	   playerImage.style.width = "60px";
 	   playerImage.style.cursor = "hand";
-	   playerImage.src="/img/arrow.png";
+	   playerImage.src="/img/locator-blue.png";
 	   playerImage.onclick=function(){
 	        setCenterOnPlayer(true);
-	        refreshData();
+	        drawMap();
 	   };
 	   document.body.appendChild(playerImage);
 	}
 
 }
 
-function saveMapImage() {
+/**
+ * Invoke saving map file
+ */
+var saveMapImage = function() {
     var request = getMapDataUrl().replace("/map.png", "/save");
 	window.open(request);
 }
 
-function clearTimers() {
+/**
+ * Clear existing timers
+ */
+var clearTimers = function() {
+	
+	logEntry("clearTimers");
 	
 	// Clear existing timers (if any)
-	$.each(timers, function(index, timer) { 
-		clearInterval(timer);
-	});
-}
-
-function initWorld() {
+	if(timers.ids && timers.ids.length) {
+		$.each(timers.ids, function(index, id) { 
+			clearTimeout(id);
+		});
+	}
 	
-	// Clear existing timers (if any)
-	clearTimers();
-	halted = false;
+	timers = {};
+}
+
+
+/**
+ * Add a named timeout timer to the timers array, minimum being 500.
+ * If there is a previous timeout already in place, the later one
+ * replaces it.
+ */
+var addTimer = function(name, func, timespan) {
 	
-	// Start with the game data
-	$.ajax({url: "/data/game", dataType: "jsonp"})
-	.fail(handleError)
-	.done(function(data, textStatus, jqXHR) { 		
-		JM.game = data;		
-		
-		// Now get the world data
-		$.ajax({url: "/data/world", dataType: "jsonp"})
-		.fail(handleError)
-		.done(function(data, textStatus, jqXHR) { 
-			
-			JM.world = data;
-			
-			 if(JM.world.name!=null) {
-		  	   $("#worldNameHeader").html(unescape(JM.world.name).replace("\\+"," "));            	   		          
-		     }
-			 
-			 sizeMap();
-			 setCenterOnPlayer(true);
-			 checkBounds();
-			 			 			 
-		    // Auto-refresh data at prescribed rates, nothing below 1000
-			addTimer(refreshData, JM.game.browser_poll);
-			//addTimer(refreshMapImage, JM.game.browser_mapimg_poll);
-			addTimer(refreshTimeData, JM.game.browser_timedata_poll);
-			addTimer(refreshAnimalsData, JM.game.browser_animalsdata_poll);
-			addTimer(refreshMobsData, JM.game.browser_mobsdata_poll);
-			addTimer(refreshPlayersData, JM.game.browser_playersdata_poll);
-			addTimer(refreshVillagersData, JM.game.browser_villagersdata_poll);		     		     			
-			
-		    // Get player data
-			refreshData();
-		     
-		    // Check version
-		    checkVersion();
-		});    
-		
-	}); 
-
+	logEntry("addTimer: " + name + " = " + timespan);
+	
+	if(halted==true) return;
+	
+	if(!timers.ids) timers.ids = [];
+	
+	if(timers[name]) {
+		logEntry("!! overriding timer: " + name);
+		clearTimeout(timers[name]);
+		delete timers[name];
+	}
+	
+	var wrapper = function() {
+		delete timers[name];
+		func();
+	}
+	
+	var timerId = setTimeout(wrapper, Math.max(timespan, 500));
+	timers.ids.push(timerId);
+	timers[name] = timerId;
 }
 
-// Add an interval timer to the timers array, minimum being 1000
-function addTimer(func, timespan) {
-	if(!timers) timers = [];
-	var timerId = setInterval(func, Math.max(JM.game.browser_poll, 1000));
-	timers.push(timerId);
-}
-
-var delay = (function(){
-   var timer = 0;
-   return function(callback, ms){
-      clearTimeout (timer);
-      timer = setTimeout(callback, ms);
-   };
-})();
-
-function setScale(newScale) {
+/**
+ * Set map scale
+ */
+var setScale = function(newScale) {
    mapScale = newScale;
    chunkScale = mapScale*16;
 }
 
-function sizeMap() {
+/**
+ * Ensure canvas is sized as needed
+ */
+var sizeMap = function() {
+	
+   logEntry("sizeMap");
+	
    // Update canvas size   
    setCanvasWidth($(window).width());
-   setCanvasHeight($(window).height()-headerSize);
-   document.body.style.backgroundColor = mapBackground;
+   setCanvasHeight($(window).height());
+
 }
 
 function getCanvasWidth() {
@@ -336,29 +441,22 @@ function checkBounds() {
    mapBounds.z2 = mapBounds.z1 + maxChunksHigh;  
 }
 
-function setMapType(mapType, refresh) {
+function setMapType(mapType) {
    
-   //console.log('SetMapType: ' + mapType);
    if(mapType=="day") {
       showLight = false;
-      mapBackground = "#222";     
+      $('body').css('backgroundColor','#222');   
       $("#dayButton").addClass("active");
       $("#nightButton").removeClass("active");
       
    } else if(mapType=="night") {
       showLight = true;
-      mapBackground = "#000";
+      $('body').css('backgroundColor','#000');
       $("#dayButton").removeClass("active");
       $("#nightButton").addClass("active");
    } else {
       console.log("Error: Can't set mapType: " + mapType);
-      return;  
    }
-   
-   document.body.style.backgroundColor = mapBackground;   
-   if(refresh==true) {
-     refreshData();
-   } 
    
 }
 
@@ -381,7 +479,7 @@ function setShowCaves(show) {
       $("#caveButton").removeClass("active");
    }
    if(JM.player.underground==true) {
-	   refreshData();
+	   drawMap();
    }
 }
 
@@ -406,129 +504,228 @@ function checkShowCaves() {
    }
 }
 
-////////////// DRAW ////////////////////
 
-// Get the context of the current canvas
-function getContext() {
-   
-   // Which canvas to use
-   var theCanvas;
-   if(useTempCanvas) {
-      theCanvas = tempCanvas;
-   } else {
-      theCanvas = canvas;
-   }
-   return theCanvas.getContext("2d");
-   
+////////////// DATA ////////////////////
+
+/**
+ * Fetch JsonP data.  Generic error handling,
+ * callback invoked on success
+ */
+var fetchData = function(dataUrl, callback) {
+
+	logEntry("fetchData " + dataUrl);
+	
+	$.ajax({url: dataUrl, dataType: "jsonp"})
+	.fail(handleError)
+   	.done(callback);
 }
 
-function getMapDataUrl() {
+var refreshPlayersData = function(callback) {
+
+	if(JM.world && JM.world.singlePlayer==true) return;
+	
+	fetchData("/data/players", function(data){
+		JM.players = data.players;	
+   		addTimer("refreshPlayersData", refreshPlayersData, JM.game.browser_playersdata_poll);
+   		if(callback) callback();
+	});
+
+}
+
+var refreshMobsData = function(callback) {
+	
+	fetchData("/data/mobs", function(data){
+   		JM.mobs = data.mobs;
+   		addTimer("refreshMobsData", refreshMobsData, JM.game.browser_mobsdata_poll);		
+   		if(callback) callback();
+   	});
+}
+
+var refreshAnimalsData = function(callback) {
+	
+	fetchData("/data/animals", function(data){
+   		JM.animals = data.animals;
+		addTimer("refreshAnimalsData", refreshAnimalsData, JM.game.browser_animalsdata_poll);	
+		if(callback) callback();
+   	});
+}
+
+var refreshVillagersData = function(callback) {
+	
+	fetchData("/data/villagers", function(data){
+   		JM.villagers = data.villagers;
+   		addTimer("refreshVillagersData", refreshVillagersData, JM.game.browser_villagersdata_poll);
+   		if(callback) callback();
+   	});
+}
+
+/**
+ * Refresh the world data.
+ * 
+ * @param callback Optional function to call when this is complete.
+ */
+var refreshWorldData = function(callback) {
+	
+	logEntry("refreshWorldData");
+
+	fetchData("/data/world", function(data){
+		
+		JM.world = data;
+		
+		// Interpret data
+		var dimensionName = "";
+		if(JM.world.dimension==-1) {
+			dimensionName = JM.messages.world_name_nether;
+	    } else if(JM.world.dimension==1) {
+	    	dimensionName = JM.messages.world_name_end;
+	    }
+		
+		var timeCycleInfo = "";
+		if(JM.world.dimension==0) {
+	       if(JM.world.time<12000) {
+	    	   timeInfo = JM.messages.sunset_begins;
+	       } else if(JM.world.time<13800) {
+	    	   timeInfo = JM.messages.night_begins;
+	       } else if(JM.world.time<22200) {
+	    	   timeInfo = JM.messages.sunrise_begins;
+	       } else if(JM.world.time<23999) {
+	    	   timeInfo = JM.messages.day_begins;
+	       } 
+	    }
+	
+		 
+	   // 0 is the start of daytime, 12000 is the start of sunset, 13800 is the start of nighttime, 22200 is the start of sunrise, and 24000 is daytime again. 
+	   var allsecs = JM.world.time/20;
+	   var mins = Math.floor(allsecs / 60);
+	   var secs = Math.ceil(allsecs % 60);
+	   if(mins<10) mins = "0"+mins;
+	   if(secs<10) secs = "0"+secs;
+	   var currentTime = mins + ":" + secs;
+	   	   
+		// Update UI elements
+	   	$("#worldName").html(unescape(JM.world.name).replace("\\+"," "));        		
+		$("#worldTime").html(currentTime);		
+		$("#worldInfo").show();
+
+		// Set map based on time
+		if(playerOverrideMap != true) {
+			if(JM.world.dimension==0 && JM.player && JM.player.underground!=true) {
+		       if(JM.world.time<13800) {
+		    	   setMapType('day');
+		       } else {
+		    	   setMapType('night');
+		       }
+			}
+		}
+
+		// Do callback
+		if(callback) {
+        	callback();
+        } else {
+        	addTimer("refreshWorldData", refreshWorldData, JM.game.browser_mapimg_poll);
+        }
+
+	}); 
+	
+}
+
+/**
+ * Get the url for the current map state
+ */
+var getMapDataUrl = function() {
    var ctx = getContext();
    var width = getCanvasWidth();
    var height = getCanvasHeight();
-   var mapType = (JM.player && JM.player.underground && showCaves) ? "underground" : (showLight ? "night" : "day") ;  
+   var mapType = (JM.player && JM.player.underground==true && showCaves==true) ? "underground" : (showLight==true ? "night" : "day") ;  
    var depth = (JM.player && JM.player.chunkCoordY) ? JM.player.chunkCoordY : 4;
    var request = "/map.png?mapType=" + mapType + "&depth=" + depth + "&x1=" + mapBounds.x1+ "&z1=" + mapBounds.z1 + 
                              "&x2=" + mapBounds.x2 + "&z2=" + mapBounds.z2 + "&width=" + width + "&height=" + height;
    return request;
 }
 
-
-function refreshTimeData() {
-	if(isScroll==true) return;
+/**
+ * Refresh the map image.
+ * 
+ * @param callback Optional function to call when this is complete.
+ */
+var refreshMapImage = function(callback) {
 	
-	$.ajax({url: "/data/time", dataType: "jsonp"})
-	.fail(handleError)
-	.done(function(data, textStatus, jqXHR) { 		
-		JM.time = data;
-	}); 
+	logEntry("refreshMapImage");
+
+	var mapUrl = getMapDataUrl();
+	var newChunksImage = $(document.createElement('img')).attr('src', mapUrl)
+		.error(handleError) // TODO: check whether this will ever be called
+	    .load(function() {
+	        if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
+	            console.log('Map image incomplete!');
+	        }       
+	        lastChunksImage = newChunksImage[0];
+	        $(newChunksImage).remove();
+	                
+	        if(callback) {
+	        	callback();
+	        } 
+	    });
 }
 
-function refreshPlayersData() {
-	if(isScroll==true) return;
-	if(JM.world.singlePlayer) return;
-	
-	$.ajax({url: "/data/players", dataType: "jsonp"})
-	.fail(handleError)
-   	.done(function(data, textStatus, jqXHR) { 
-   		JM.players = data.players;
-   	});
-}
 
-function refreshMobsData() {
-	if(isScroll==true) return;
+/**
+ * Refresh the player data.
+ * 
+ * @param callback Optional function to call when this is complete.
+ */
+var refreshPlayerData = function(callback) {
 	
-	$.ajax({url: "/data/mobs", dataType: "jsonp"})
-	.fail(handleError)
-   	.done(function(data, textStatus, jqXHR) { 
-   		JM.mobs = data.mobs;
-   	});
-}
+	logEntry("refreshPlayerData");
 
-function refreshAnimalsData() {
-	if(isScroll==true) return;
-	
-	$.ajax({url: "/data/animals", dataType: "jsonp"})
-	.fail(handleError)
-   	.done(function(data, textStatus, jqXHR) { 
-   		JM.animals = data.animals;
-   	});
-}
-
-function refreshVillagersData() {
-	if(isScroll==true) return;
-	
-	$.ajax({url: "/data/villagers", dataType: "jsonp"})
+	$.ajax({url: "/data/player", dataType: "jsonp"})
 	.fail(handleError)
    	.done(function(data, textStatus, jqXHR) { 
-   		JM.villagers = data.villagers;
+		JM.player = data;
+		
+   		// Update UI
+		$("#playerBiome").html(JM.player.biome);
+		$("#playerLocation").html(JM.player.posX + "," + JM.player.posZ);
+		
+		$("#playerElevationTitle").attr('title', JM.messages.elevation_title + " " + (JM.player.posY>>4));
+		$("#playerElevation").html(JM.player.posY + "&nbsp;(" + (JM.player.posY>>4) + ")");				
+				
+		// Do callback
+		if(callback) {
+        	callback();
+        } 		
    	});
-}
 
-function refreshMapImage() {
-	if(isScroll==true) return;
-	
-//	var tempImage = $("<img />").attr('src', getMapDataUrl())
-//    .load(function() {
-//        if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
-//            console.log('Map image incomplete');
-//        } else {
-//        	console.log('Map image complete');
-//        	lastChunksImage = tempImage[0];
-//        }
-//    });
 }
 
 
-function refreshData() {  	
+
+var updateMap = function() {  	
 	
-   if(isScroll==false) {
+   logEntry("updateMap");
+	
+   if(isScroll==false && updatingMap==false) {
 	   
-	   $.ajax({url: "/data/player", dataType: "jsonp"})
-		.fail(handleError)
-	   	.done(function(data, textStatus, jqXHR) { 
-			JM.player = data;
-			
+	   updatingMap = true;
+	   $("#mapCanvas").css('cursor', 'wait');
+	   
+	   refreshPlayerData(function() { 
+						
 			// With the player data updated, we can get the map data						
 			if(centerOnPlayer==true) {
 				centerMapOnPlayer();
 			} else {
 				checkBounds();
 			}
-			
-			// Calculate Map URL
-			var mapUrl = getMapDataUrl();
-			
-			// Get new map image
-			var newChunksImage = $(document.createElement('img')).attr('src', mapUrl)
-		    .load(function() {
-		        if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
-		            console.log('Map image incomplete!');
-		        } else {
-		        	lastChunksImage = newChunksImage[0];
-				    updateUI();
-		        }
-		    });
+						
+			// Update the map image, then draw it
+			refreshMapImage(function() {
+				
+				drawMap();
+				updatingMap = false;
+				$("#mapCanvas").css('cursor', 'auto');
+				addTimer("updateMap", updateMap, JM.game.browser_poll);
+			});	   
 			
 	   	});	  
    }
@@ -536,7 +733,9 @@ function refreshData() {
 
 
 // Ajax request got an error from the server
-function handleError(data, error, jqXHR) {
+var handleError = function(data, error, jqXHR) {
+	
+	logEntry("handleError");
 	
 	clearTimers();
 	
@@ -545,22 +744,22 @@ function handleError(data, error, jqXHR) {
 	
 	console.log("Server returned error: " + data.status + ": " + jqXHR);
 	
-	$("#playerImage").css("visibility","hidden");
-    $("#playerImage").css("left", -1000);
-    $("#playerImage").css("top", -1000);
-    $("#playerImage").css("zIndex", -100);
+	$(".jmtoggle").each(function(){$(this).hide()});
+	$("#worldInfo").hide();
+	$("#playerImage").hide();
+	$("#slider-vertical").hide();
 	
 	var displayError;
 	if(data.status==503 || data.status==0) {
-		if(JML10N.error_world_not_opened) {
-			displayError = JML10N.error_world_not_opened;
+		if(JM.messages.error_world_not_opened) {
+			displayError = JM.messages.error_world_not_opened;
 		} else {
 			displayError = data.statusText;
 		}
 	}	
 
 	// Format UI
-    document.body.style.backgroundColor = "#000";
+	$('body').css('backgroundColor',mapBackground); 
     sizeMap();
     
     var ctx = getContext();
@@ -590,19 +789,47 @@ function handleError(data, error, jqXHR) {
     // Restart in 5 seconds
 	if(!halted) {
 		halted = true;
-		console.log("Will attempt to re-connect in 5 seconds.");
+		console.log("Will re-check game state in 5 seconds.");
 		setTimeout(function(){
 			
 			halted = false;
-			init();
+			
+			if(!JM.messages) {
+				initMessages();
+			} else if(uiInitialized!=true) {
+				initUI();
+			} else {
+				initWorld();
+			}
+			
 		},5000);
 	}
 }
 
+//////////////DRAW ////////////////////
+
+/**
+ * Get the context of the current canvas
+ */
+var getContext = function() {
+
+	// Which canvas to use
+	var theCanvas;
+	if(useTempCanvas) {
+	   theCanvas = tempCanvas;
+	} else {
+	   theCanvas = canvas;
+	}
+	return theCanvas.getContext("2d");
+
+}
 
 // Draw the map
-function updateUI() {
-   document.body.style.cursor = "wait";
+var drawMap = function() {
+	
+   logEntry("drawMap");
+	
+   $('body').css('cursor', 'wait');
    useTempCanvas = true;
    
    // init canvas dimensions
@@ -622,7 +849,9 @@ function updateUI() {
    drawMobs();
    
    // other players
-   drawOthers();
+   if(JM.world.singlePlayer!=true) {
+	   drawMultiplayers();
+   }
    
    // Copy the result
    if(ctx.getImageData) {
@@ -640,72 +869,14 @@ function updateUI() {
    //getContext().drawImage(tempCanvas, 0,0,getCanvasWidth(), getCanvasHeight());
    
    // Cursor reset
-   document.body.style.cursor = "default";
+   $('body').css('cursor', 'default');
 }
 
-// Fill in the background of the canvas
-function drawBackground() {
-   var ctx = getContext();
-   ctx.globalAlpha = 1;
-   ctx.fillStyle = mapBackground;
-   ctx.fillRect(0, 0, getCanvasWidth(), getCanvasHeight());
-}
-
-// Show world name, type, player coords, etc.
-function updateWorldInfo() {
-	
-	var table = "<table><tbody>";
-    if(JM.world.dimension==-1) {
- 	   table +="<tr><th colspan='2' style='color:#a00;font-weight:bold;text-align:center'>"+ JML10N.world_name_nether +"</th></tr>";
-    } else if(JM.world.dimension==1) {
- 	   table +="<tr><th colspan='2' style='color:#a00;font-weight:bold;text-align:center'>"+ JML10N.world_name_end +"</th></tr>";
-    } 
-    
-    table += "<tr><th colspan='2'>";
-    if(JM.world.dimension==0) {
-       if(JM.time.worldCurrentTime<12000) {
-     	  table += JML10N.sunset_begins;
-       } else if(JM.time.worldCurrentTime<13800) {
-     	  table += JML10N.night_begins;
-       } else if(JM.time.worldCurrentTime<22200) {
-     	  table += JML10N.sunrise_begins;
-       } else if(JM.time.worldCurrentTime<23999) {
-     	  table += JML10N.day_begins;
-       } 
-    }
-    table += "</th></tr>";
-    
-    /*
-    0 is the start of daytime, 12000 is the start of sunset, 13800 is the start of nighttime, 22200 is the start of sunrise, and 24000 is daytime again. 
-   */
-   var allsecs = JM.time.worldCurrentTime/20;
-   var mins = Math.floor(allsecs / 60);
-   var secs = Math.ceil(allsecs % 60);
-   if(mins<10) mins = "0"+mins;
-   if(secs<10) secs = "0"+secs;
-   var currentTime = mins + ":" + secs;
-   table += "<tr><th>" + JML10N.worldtime_title + "</th><td>" + currentTime + "</td></tr>";
-   
-   var playerPos = player.posX + "," + player.posZ;
-   if(playerPos!=playerLastPos) {
-        playerLastPos = playerPos;
-   }
-   
-   table += "<tr><th>" + JML10N.location_title + "</th><td>" + playerPos + "</td></tr>"; 
-   table += "<tr><th title='" + JML10N.location_title + " " + (player.posY>>4) + "'>" + JML10N.elevation_title + "</th><td>" + player.posY + "&nbsp;(" + (player.posY>>4) + ")</td></tr>"; 
-   
-   if(JM.world.dimension==0) {
-	   table += "<tr><th>" + JML10N.biome_title + "</th><td>" + player.biome + "</td></tr>";
-   }
-   
-   table+="</tbody></table>";
-   //console.log(table);
-   
-   $("#worldInfo").attr("innerHTML", table);
-}
 
 // Draw the player location
-function drawPlayer() {
+var drawPlayer = function() {
+	
+   logEntry("drawPlayer");
 
    var player = JM.player;
    var x = getScaledChunkX(player.posX/16);
@@ -717,39 +888,38 @@ function drawPlayer() {
       z<=getCanvasWidth()) {     
 
        var ctx = getContext();
-       ctx.globalAlpha=.4;
-       if(showLight==false) {
-          ctx.fillStyle = "#000000";
-       } else {
-          ctx.fillStyle = "#ffffff";
-       }
-       ctx.beginPath();
-       ctx.arc(x, z, 20, 0, Math.PI*2, true); 
-       ctx.closePath();
-       ctx.fill();
-
-       $("#playerImage").css("visibility","visible");
-       $("#playerImage").css("left", x-16);
-       $("#playerImage").css("top", z-16);
-       $("#playerImage").css("zIndex", 2);
+//       ctx.globalAlpha=.4;
+//       if(showLight==false) {
+//          ctx.fillStyle = "#000000";
+//       } else {
+//          ctx.fillStyle = "#ffffff";
+//       }
+//       ctx.beginPath();
+//       ctx.arc(x, z, 20, 0, Math.PI*2, true); 
+//       ctx.closePath();
+//       ctx.fill();
        
+       // Update player image
        var rotate = "rotate(" + player.heading + "deg)";
-       $("#playerImage").css("-webkit-transform", rotate);
-       $("#playerImage").css("-moz-transform", rotate);
-       $("#playerImage").css("-o-transform", rotate);
-       $("#playerImage").css("-ms-transform", rotate);
-       $("#playerImage").css("transform", rotate);
-       
-       $("#playerImage").attr("title",player.name);        
-          
-   } else {
-        //console.log("Player offscreen");
-   }
+       $("#playerImage")
+       		.css("left", x-24)
+       		.css("top", z-32)
+       		.css("zIndex", 2)
+       		.css("-webkit-transform", rotate)
+       		.css("-moz-transform", rotate)
+       		.css("-o-transform", rotate)
+       		.css("-ms-transform", rotate)
+       		.css("transform", rotate);
+       $("#playerImage").show();
+     
+   } 
 
 }
 
 // Draw the location of mobs
-function drawMobs() {
+var drawMobs = function() {
+	
+	logEntry("drawMobs");
 	
 	if(showMonsters==false) return; // TODO
 	
@@ -828,8 +998,10 @@ function drawEntity(mob, canvasWidth, canvasHeight, friendly) {
 }
 
 //Draw the location of other players
-function drawOthers() {
+var drawMultiplayers = function() {
 
+	logEntry("drawMultiplayers");
+	
 	var others = JM.players;
 	if(!others) return;
 	
@@ -887,8 +1059,10 @@ function drawOthers() {
 }
 
 // Draw the chunks
-function drawImageChunks() {
+var drawImageChunks = function() {
 
+   logEntry("drawImageChunks");
+	
    var maxHeight = 0;
    var minHeight = 128;
    var key;
@@ -910,36 +1084,6 @@ function getScaledChunkZ(chunkZ) {
 }
 
 /**
- * Register for user events
- */
-function registerEvents() {
-
-    // Disable selection events by default
-    $("*").live('selectstart dragstart', function(evt){ evt.preventDefault(); return false; });
-
-   // Disable edit cursor
-   canvas.onselectstart = function () { return false; } // ie 
-   
-   // Mouse events
-   canvas.onmousedown=myDown;
-   canvas.onmouseup=myUp;
-   canvas.ondblclick=myDblClick;
-   if (window.addEventListener) {
-      window.addEventListener('DOMMouseScroll', myMouseWheel, false);
-   }
-   window.onmousewheel = document.onmousewheel = myMouseWheel;
-   
-   
-   // Keyboard events
-  document.onkeypress=myKeyPress;
-   
-   // Resize events
-   window.onresize = function(event) {
-      delay(refreshData, 200);
-   }
-}
-
-/**
  * Update mouse coordinates based on the last event.
  */
 function getMouse(event){
@@ -955,7 +1099,6 @@ function myDown(e){
 }
 
 function myUp(e){
-   //console.log("myUp");
    getMouse(e);
    
    var mouseDragX = (mx-msx);
@@ -975,18 +1118,17 @@ function myUp(e){
       mapBounds.z1 = mapBounds.z1 - zOffset -1;
       isScroll=false;
       
-      refreshData();
+      updateMap();
    }
 }
 
 function myDblClick(e){
-   //console.log("myDblClick");
    getMouse(e);
 }
 
 
 function myKeyPress(e){
-   //console.log("myKeyPress");
+   
    var key=(e)?e.which:e.keyCode;
    switch(String.fromCharCode(key)){
       case'-':
@@ -1010,29 +1152,16 @@ function myKeyPress(e){
    }
 }
 
-function myMouseWheel(event){
-   //console.log("myMouseWheel");
+function myMouseWheel(event, delta){
+	
+   if(halted==true) return;
 
-   var delta = 0;
-
-   if (!event) { /* For IE. */
-      event = window.event;
-   }
-   if (event.wheelDelta) { /* IE/Opera. */
-      delta = event.wheelDelta/120;
-      if (window.opera) delta = -delta;
-   } else if (event.detail) { /** Mozilla case. */
-      delta = -event.detail/3;
+   if(delta>0) {
+	   zoom('in');
+   } else if(delta<0) {
+	   zoom('out');
    }
 
-   if(delta>0) zoom('in');
-   if(delta<0) zoom('out');
-
-   if (event.preventDefault) {
-      event.preventDefault();
-   }
-   event.returnValue = false;
-   event.cancelBubble = true;
 }
 
 function zoom(dir){
@@ -1051,10 +1180,14 @@ function setZoom(scale) {
    $( "#slider-vertical" ).slider( "value", scale );
    setScale(scale);
    centerMapOnChunk(centerChunkX, centerChunkZ);
-   refreshData();
+   updateMap();
 }
 
 function scrollCanvas(e){
+	
+   if(halted==true) return;
+   
+   $('body').css('cursor', 'move');
    isScroll=true;
    getMouse(e);
    msx=mx;
@@ -1064,13 +1197,15 @@ function scrollCanvas(e){
    var ctx = tempCanvas.getContext("2d");
    ctx.globalAlpha=.5;
    ctx.drawImage(canvas,0,0);
-   playerImage.style.visibility="hidden";
+   $("#playerImage").hide();
    document.onmousemove = scrollingCanvas;
 }
 
-function scrollingCanvas(e){
+var scrollingCanvas = function(e){
+   
    if(isScroll) {
-      document.body.style.cursor = "move";
+	   $('body').css('cursor', 'move');
+	  $("#playerImage").hide();
       getMouse(e);
 
       var mouseDragX = (mx-msx);
@@ -1082,16 +1217,23 @@ function scrollingCanvas(e){
         setCenterOnPlayer(false);
       } 
 
-      drawBackground();
       var ctx = getContext();
-      ctx.globalAlpha=1;
+      
+      // Draw background
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = mapBackground;
+      ctx.fillRect(0, 0, getCanvasWidth(), getCanvasHeight());
+      
+      // Draw temp canvas
       ctx.drawImage(tempCanvas,(xOffset*chunkScale), (zOffset*chunkScale));
       //console.log("Scrolling: " + xOffset + "," + zOffset);
       
    } else {
-      tempCanvasImage = null;
+	  logEntry("scrollingCanvas done");
+	   
+      tempCanvasImage = null; // why?
       document.onmousemove = null;
-      document.body.style.cursor = "default";
+      $('body').css('cursor', 'default');      
    }
 }
 
@@ -1112,8 +1254,15 @@ function moveCanvas(dir){
       break;
    }
    setCenterOnPlayer(false);
-   refreshData();
+   drawMap();
 }
+
+var getURLParameter = function(name) {
+    return decodeURI(
+        (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+    );
+}
+JM.debug = 'true'==getURLParameter('debug');
 
 // Google Analytics
 var _gaq = _gaq || [];
@@ -1127,3 +1276,6 @@ _gaq.push(['_trackPageview']);
   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
+
+/** OnLoad **/
+$(document).ready(initMessages);
