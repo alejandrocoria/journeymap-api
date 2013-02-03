@@ -3,17 +3,26 @@ package net.techbrew.mcjm.render;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import javax.imageio.ImageIO;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.src.EnumSkyBlock;
 import net.techbrew.mcjm.ChunkStub;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.PropertyManager;
+import net.techbrew.mcjm.io.ChunkFileHandler;
+import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 
 public class ChunkFlatRenderer implements IChunkRenderer {
@@ -45,6 +54,9 @@ public class ChunkFlatRenderer implements IChunkRenderer {
 			// Get data from chunk, then stop using it directly
 			chunkImage = new BufferedImage(underground ? 16 : 32, 16, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2D = chunkImage.createGraphics();
+			g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+			g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 
 			renderloop: if (underground) {
 				// Underground / interior map
@@ -86,6 +98,7 @@ public class ChunkFlatRenderer implements IChunkRenderer {
 
 			} else {
 				// Surface map
+				//System.out.println("---------------");
 				for (int x = 0; x < 16; x++) {
 					for (int z = 0; z < 16; z++) {
 						int y = chunkStub.getSafeHeightValue(x, z);
@@ -112,7 +125,7 @@ public class ChunkFlatRenderer implements IChunkRenderer {
 							String error = Constants.getMessageJMERR07(LogFormatter.toString(t));
 							JourneyMap.getLogger().severe(error);
 							return null;
-						}
+						} 
 					}
 				}
 			}
@@ -130,6 +143,7 @@ public class ChunkFlatRenderer implements IChunkRenderer {
 			boolean checkDepth, Map<Integer,ChunkStub> neighbors) {
 		
 		int[] blockInfo = MapBlocks.getBlockInfo(chunkStub, x, y, z);
+		
 		if (blockInfo == null) {
 			paintBadBlock(x, y, z, g2D);
 			return;
