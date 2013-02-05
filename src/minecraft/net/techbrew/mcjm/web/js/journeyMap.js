@@ -2,12 +2,18 @@
 var mapScale = 2;
 var minMapScale = 1;
 var maxMapScale = 8;
+var smoothScale = false;
 var mapBounds = {x1:0,z1:0,x2:0,z2:0};
 
 var showLight = false;
 var showCaves = true;
-var showMonsters = true;
 var centerOnPlayer = true;
+
+var showAnimals = true;
+var showPets = true;
+var showMobs = true;
+var showVillagers = true;
+var showPlayers = true;
 
 var mapBackground = "#222";
 
@@ -130,27 +136,31 @@ var initUI = function() {
     $("link #rssfeed").attr("title", JM.messages.rss_feed_title);
     
     // Init toolbar button tooltips
-    $("#dayButton").html("<a href='#' title='" + JM.messages.day_button_desc +"'>" + JM.messages.day_button_title + "</a>")
+    $("#dayButton").html(JM.messages.day_button_title)
+    	.attr("title", JM.messages.day_button_desc)
 	    .click(function() {
 	       playerOverrideMap = true;
 	 	   setMapType('day');
 	 	  drawMap();
 	    });
     
-    $("#nightButton").html("<a href='#' title='" + JM.messages.night_button_desc +"'>" + JM.messages.night_button_title + "</a>")
+    $("#nightButton").html(JM.messages.night_button_title)
+    	.attr("title", JM.messages.night_button_desc)
 	    .click(function() {
 	       playerOverrideMap = true;
 	 	   setMapType('night');
 	 	  drawMap();
 	    });
     
-    $("#followButton").attr("title", JM.messages.follow_button_desc)
+    $("#followButton").html(JM.messages.follow_button_title)
+    	.attr("title", JM.messages.follow_button_desc)
 	    .click(function() {
 	 	   setCenterOnPlayer(!centerOnPlayer);
-	 	  drawMap();
+	 	   drawMap();
 	    });
     
-    $("#caveButton").html("<a href='#' title='" + JM.messages.cave_button_desc +"'>" + JM.messages.cave_button_title + "</a>")
+    $("#caveButton").html(JM.messages.cave_button_title)
+    	.attr("title", JM.messages.cave_button_desc)
 	    .click(function() {
 	 	   setShowCaves(!showCaves);
 	    });
@@ -181,6 +191,42 @@ var initUI = function() {
     $("#playerBiomeTitle").html(JM.messages.biome_title);
     $("#playerLocationTitle").html(JM.messages.location_title);
     $("#playerElevationTitle").html(JM.messages.elevation_title);
+    
+    $("#checkSmoothScale").prop('checked', smoothScale)
+    .click(function() {
+    	smoothScale = (this.checked===true);    	
+    	drawMap();
+    });
+    
+    $("#checkShowAnimals").prop('checked', showAnimals)
+    $("#checkShowAnimals").click(function() {
+    	showAnimals = (this.checked===true);    	
+    	drawMap();
+    });
+    
+    $("#checkShowPets").prop('checked', showPets)
+    $("#checkShowPets").click(function() {
+    	showPets = (this.checked===true);    	
+    	drawMap();
+    });
+    
+    $("#checkShowMobs").prop('checked', showMobs)
+    $("#checkShowMobs").click(function() {
+    	showMobs = (this.checked===true);    	
+    	drawMap();
+    });
+    
+    $("#checkShowVillagers").prop('checked', showVillagers)
+    $("#checkShowVillagers").click(function() {
+    	showVillagers = (this.checked===true);    	
+    	drawMap();
+    });
+    
+    $("#checkShowPlayers").prop('checked', showPlayers)
+    $("#checkShowPlayers").click(function() {
+    	showPlayers = (this.checked===true);    	
+    	drawMap();
+    });
     
     // Init images
     initImages();
@@ -289,8 +335,8 @@ var initImages = function() {
 	   playerImage=document.createElement("img");
 	   playerImage.id="playerImage";
 	   playerImage.style.position = "absolute";
-	   playerImage.style.height = "60px";
-	   playerImage.style.width = "60px";
+	   playerImage.style.height = "64px";
+	   playerImage.style.width = "64px";
 	   playerImage.style.cursor = "hand";
 	   playerImage.src="/img/locator-blue.png";
 	   playerImage.onclick=function(){
@@ -306,8 +352,7 @@ var initImages = function() {
  * Invoke saving map file
  */
 var saveMapImage = function() {
-    var request = getMapDataUrl().replace("/map.png", "/save");
-	window.open(request);
+    document.location = getMapDataUrl().replace("/map.png", "/save");
 }
 
 /**
@@ -337,7 +382,7 @@ var addTimer = function(name, func, timespan) {
 	
 	logEntry("addTimer: " + name + " = " + timespan);
 	
-	if(halted==true) return;
+	if(halted===true) return;
 	
 	if(!timers.ids) timers.ids = [];
 	
@@ -443,27 +488,29 @@ function checkBounds() {
 
 function setMapType(mapType) {
    
-   if(mapType=="day") {
+   if(mapType==="day") {
       showLight = false;
-      $('body').css('backgroundColor','#222');   
+      mapBackground = '#222';      
       $("#dayButton").addClass("active");
       $("#nightButton").removeClass("active");
       
-   } else if(mapType=="night") {
+   } else if(mapType==="night") {
       showLight = true;
-      $('body').css('backgroundColor','#000');
+      mapBackground = '#000';
       $("#dayButton").removeClass("active");
       $("#nightButton").addClass("active");
    } else {
       console.log("Error: Can't set mapType: " + mapType);
    }
    
+   $('body').css('backgroundColor',mapBackground);   
+   
 }
 
 function setCenterOnPlayer(onPlayer) {
    
    centerOnPlayer = onPlayer;
-   if(onPlayer==true) {
+   if(onPlayer===true) {
       centerMapOnPlayer();
       $("#followButton").addClass("active");
    } else {
@@ -473,27 +520,20 @@ function setCenterOnPlayer(onPlayer) {
 
 function setShowCaves(show) {	   
    showCaves = show;
-   if(showCaves==true) {
+   if(showCaves===true) {
       $("#caveButton").addClass("active");
    } else {
       $("#caveButton").removeClass("active");
    }
-   if(JM.player.underground==true) {
+   if(JM.player.underground===true) {
+	   checkShowCaves();
 	   drawMap();
    }
 }
 
-function setShowMonsters(show) {	   
-   showMonsters = show;
-   if(showMonsters==true) {
-      $("#monstersButton").addClass("active");
-   } else {
-      $("#monstersButton").removeClass("active");
-   }
-}
 
 function checkShowCaves() {
-   if(JM.player.underground==true && showCaves) {
+   if(JM.player.underground===true && showCaves) {
 	   mapBackground = "#000";
    } else {
 	   if(showLight) {
@@ -522,7 +562,7 @@ var fetchData = function(dataUrl, callback) {
 
 var refreshPlayersData = function(callback) {
 
-	if(JM.world && JM.world.singlePlayer==true) return;
+	if(JM.world && JM.world.singlePlayer===true) return;
 	
 	fetchData("/data/players", function(data){
 		JM.players = data.players;	
@@ -534,6 +574,8 @@ var refreshPlayersData = function(callback) {
 
 var refreshMobsData = function(callback) {
 	
+	if(showMobs!==true) return;
+	
 	fetchData("/data/mobs", function(data){
    		JM.mobs = data.mobs;
    		addTimer("refreshMobsData", refreshMobsData, JM.game.browser_mobsdata_poll);		
@@ -543,7 +585,9 @@ var refreshMobsData = function(callback) {
 
 var refreshAnimalsData = function(callback) {
 	
-	fetchData("/data/animals", function(data){
+	if(showAnimals!==true && showPets!==true) return;
+	
+	fetchData("/data/animals?pets=" + showPets, function(data){
    		JM.animals = data.animals;
 		addTimer("refreshAnimalsData", refreshAnimalsData, JM.game.browser_animalsdata_poll);	
 		if(callback) callback();
@@ -551,6 +595,8 @@ var refreshAnimalsData = function(callback) {
 }
 
 var refreshVillagersData = function(callback) {
+	
+	if(showVillagers!==true) return;
 	
 	fetchData("/data/villagers", function(data){
    		JM.villagers = data.villagers;
@@ -574,14 +620,14 @@ var refreshWorldData = function(callback) {
 		
 		// Interpret data
 		var dimensionName = "";
-		if(JM.world.dimension==-1) {
+		if(JM.world.dimension===-1) {
 			dimensionName = JM.messages.world_name_nether;
-	    } else if(JM.world.dimension==1) {
+	    } else if(JM.world.dimension===1) {
 	    	dimensionName = JM.messages.world_name_end;
 	    }
 		
 		var timeCycleInfo = "";
-		if(JM.world.dimension==0) {
+		if(JM.world.dimension===0) {
 	       if(JM.world.time<12000) {
 	    	   timeInfo = JM.messages.sunset_begins;
 	       } else if(JM.world.time<13800) {
@@ -609,7 +655,7 @@ var refreshWorldData = function(callback) {
 
 		// Set map based on time
 		if(playerOverrideMap != true) {
-			if(JM.world.dimension==0 && JM.player && JM.player.underground!=true) {
+			if(JM.world.dimension===0 && JM.player && JM.player.underground!=true) {
 		       if(JM.world.time<13800) {
 		    	   setMapType('day');
 		       } else {
@@ -636,7 +682,7 @@ var getMapDataUrl = function() {
    var ctx = getContext();
    var width = getCanvasWidth();
    var height = getCanvasHeight();
-   var mapType = (JM.player && JM.player.underground==true && showCaves==true) ? "underground" : (showLight==true ? "night" : "day") ;  
+   var mapType = (JM.player && JM.player.underground===true && showCaves===true) ? "underground" : (showLight===true ? "night" : "day") ;  
    var depth = (JM.player && JM.player.chunkCoordY) ? JM.player.chunkCoordY : 4;
    var request = "/map.png?mapType=" + mapType + "&depth=" + depth + "&x1=" + mapBounds.x1+ "&z1=" + mapBounds.z1 + 
                              "&x2=" + mapBounds.x2 + "&z2=" + mapBounds.z2 + "&width=" + width + "&height=" + height;
@@ -656,7 +702,7 @@ var refreshMapImage = function(callback) {
 	var newChunksImage = $(document.createElement('img')).attr('src', mapUrl)
 		.error(handleError) // TODO: check whether this will ever be called
 	    .load(function() {
-	        if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
+	        if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth === 0) {
 	            console.log('Map image incomplete!');
 	        }       
 	        lastChunksImage = newChunksImage[0];
@@ -704,7 +750,7 @@ var updateMap = function() {
 	
    logEntry("updateMap");
 	
-   if(isScroll==false && updatingMap==false) {
+   if(isScroll===false && updatingMap===false) {
 	   
 	   updatingMap = true;
 	   $("#mapCanvas").css('cursor', 'wait');
@@ -712,7 +758,7 @@ var updateMap = function() {
 	   refreshPlayerData(function() { 
 						
 			// With the player data updated, we can get the map data						
-			if(centerOnPlayer==true) {
+			if(centerOnPlayer===true) {
 				centerMapOnPlayer();
 			} else {
 				checkBounds();
@@ -740,7 +786,7 @@ var handleError = function(data, error, jqXHR) {
 	clearTimers();
 	
 	// Secondary errors will be ignored
-	if(halted==true) return;
+	if(halted===true) return;
 	
 	console.log("Server returned error: " + data.status + ": " + jqXHR);
 	
@@ -750,7 +796,7 @@ var handleError = function(data, error, jqXHR) {
 	$("#slider-vertical").hide();
 	
 	var displayError;
-	if(data.status==503 || data.status==0) {
+	if(data.status===503 || data.status===0) {
 		if(JM.messages.error_world_not_opened) {
 			displayError = JM.messages.error_world_not_opened;
 		} else {
@@ -889,7 +935,7 @@ var drawPlayer = function() {
 
        var ctx = getContext();
 //       ctx.globalAlpha=.4;
-//       if(showLight==false) {
+//       if(showLight===false) {
 //          ctx.fillStyle = "#000000";
 //       } else {
 //          ctx.fillStyle = "#ffffff";
@@ -902,7 +948,7 @@ var drawPlayer = function() {
        // Update player image
        var rotate = "rotate(" + player.heading + "deg)";
        $("#playerImage")
-       		.css("left", x-24)
+       		.css("left", x-32)
        		.css("top", z-32)
        		.css("zIndex", 2)
        		.css("-webkit-transform", rotate)
@@ -921,24 +967,22 @@ var drawMobs = function() {
 	
 	logEntry("drawMobs");
 	
-	if(showMonsters==false) return; // TODO
-	
 	var canvasWidth = getCanvasWidth();
 	var canvasHeight = getCanvasHeight();
 	
-	if(JM.mobs) {
+	if(showMobs===true && JM.mobs) {
 	    $.each(JM.mobs, function(index, mob) {
 			drawEntity(mob, canvasWidth, canvasHeight, false);
 		});
 	}
     
-    if(JM.animals) {
+    if((showAnimals===true || showPets===true) && JM.animals) {
 	    $.each(JM.animals, function(index, mob) {
 			drawEntity(mob, canvasWidth, canvasHeight, true);
 		});
     }
     
-    if(JM.villagers) {
+    if(showVillagers===true && JM.villagers) {
 	    $.each(JM.villagers, function(index, mob) {
 			drawEntity(mob, canvasWidth, canvasHeight, true);
 		});
@@ -947,7 +991,7 @@ var drawMobs = function() {
 }
 
 //Draw the location of an entity
-function drawEntity(mob, canvasWidth, canvasHeight, friendly) {
+var drawEntity = function(mob, canvasWidth, canvasHeight, friendly) {
 	
    var x = getScaledChunkX(mob.posX/16);
    var z = getScaledChunkZ(mob.posZ/16);
@@ -957,26 +1001,26 @@ function drawEntity(mob, canvasWidth, canvasHeight, friendly) {
       z>=0 &&
       z<=canvasHeight) {
 	   
-  
-       var ctx = getContext(); 
-       ctx.globalAlpha=.85;
-       ctx.lineWidth = 2;
-       ctx.beginPath();
-       var radius = 16;
-       var type = mob.type; 
-       if(type=='Ghast' || type=='Dragon' || type=='Wither') {
-    	   radius = 24;
-       } 
-       ctx.arc(x, z, radius, 0, Math.PI*2, true); 
-       
-	   if(friendly==true && mob.owner && mob.owner==JM.player.username) {
+       var ctx = getContext();        
+	   if(friendly===true && mob.owner && mob.owner===JM.player.username) {
+		   if(showPets===false) return;
 		   ctx.strokeStyle = "#0000ff";
-	   } else if(friendly==true) {
+	   } else if(friendly===true) {
+		   if(showAnimals===false && !(mob.type==='Villager')) return;
 		   ctx.strokeStyle = "#cccccc";
 	   } else {
 		   ctx.strokeStyle = "#ff0000";		   
 	   }
 	   
+       ctx.globalAlpha=.85;
+       ctx.lineWidth = 2;
+       ctx.beginPath();
+       var radius = 16;
+       var type = mob.type; 
+       if(type==='Ghast' || type==='Dragon' || type==='Wither') {
+    	   radius = 24;
+       } 
+       ctx.arc(x, z, radius, 0, Math.PI*2, true); 	   
 	   ctx.stroke();
        ctx.globalAlpha=1.0;
        
@@ -1059,17 +1103,42 @@ var drawMultiplayers = function() {
 }
 
 // Draw the chunks
+// scaled image code via phrogz.net/tmp/canvas_image_zoom.html
 var drawImageChunks = function() {
 
    logEntry("drawImageChunks");
-	
-   var maxHeight = 0;
-   var minHeight = 128;
-   var key;
    
    // draw the png to the canvas
    if(lastChunksImage) {
-	   getContext().drawImage(lastChunksImage, 0, 0, lastChunksImage.width*mapScale, lastChunksImage.height*mapScale);
+	   
+	    
+		var zoom = mapScale;
+	    var width = lastChunksImage.width;
+	    var height = lastChunksImage.height;
+	    
+	    var ctx = getContext();
+	    
+	    if(smoothScale===true) {
+	    	ctx.drawImage(lastChunksImage, 0, 0, width*mapScale, height*mapScale);
+	    } else {
+	    
+		    ctx.clearRect(0,0,width,height);
+		    ctx.drawImage(lastChunksImage,0,0);
+			var imgData = ctx.getImageData(0,0,width,height).data;
+			ctx.clearRect(0,0,width,height);
+			
+			for (var x=0;x<width;++x){
+				for (var y=0;y<height;++y){
+					var i = (y*width + x)*4;
+					var r = imgData[i  ];
+					var g = imgData[i+1];
+					var b = imgData[i+2];
+					var a = imgData[i+3];
+					ctx.fillStyle = "rgba("+r+","+g+","+b+","+(a/255)+")";
+					ctx.fillRect(x*zoom,y*zoom,zoom,zoom);
+				}
+			}
+	    }	   
    }
 }
 
@@ -1103,7 +1172,7 @@ function myUp(e){
    
    var mouseDragX = (mx-msx);
    var mouseDragY = (my-msy);
-   if(mouseDragX==0 && mouseDragY==0) 
+   if(mouseDragX===0 && mouseDragY===0) 
    {
       isScroll=false;
    }
@@ -1154,7 +1223,7 @@ function myKeyPress(e){
 
 function myMouseWheel(event, delta){
 	
-   if(halted==true) return;
+   if(halted===true) return;
 
    if(delta>0) {
 	   zoom('in');
@@ -1165,9 +1234,9 @@ function myMouseWheel(event, delta){
 }
 
 function zoom(dir){
-   if(dir=='in' && mapScale<maxMapScale){
+   if(dir==='in' && mapScale<maxMapScale){
       setZoom(mapScale+1);
-   }else if(dir=='out' && mapScale>minMapScale){
+   }else if(dir==='out' && mapScale>minMapScale){
       setZoom(mapScale-1);
    }
 }
@@ -1185,7 +1254,7 @@ function setZoom(scale) {
 
 function scrollCanvas(e){
 	
-   if(halted==true) return;
+   if(halted===true) return;
    
    $('body').css('cursor', 'move');
    isScroll=true;
@@ -1262,7 +1331,7 @@ var getURLParameter = function(name) {
         (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
     );
 }
-JM.debug = 'true'==getURLParameter('debug');
+JM.debug = 'true'===getURLParameter('debug');
 
 // Google Analytics
 var _gaq = _gaq || [];
@@ -1273,7 +1342,7 @@ _gaq.push(['_trackPageview']);
 
 (function() {
   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  ga.src = ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
 
