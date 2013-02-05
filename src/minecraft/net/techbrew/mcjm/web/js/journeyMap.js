@@ -18,16 +18,15 @@ var showPlayers = true;
 var mapBackground = "#222";
 
 var canvas;
-var ctx;
+var bgCanvas;
+var fgCanvas;
+
 var isScroll=false;
 var mx,my;
 var msx,msy;
-var tempCanvasImage;
-var tempCanvas;
 
-var useTempCanvas = false;
-var tempChunksImage;
-var lastChunksImage;
+var tempMapImage;
+var latestMapImage;
 var playerImage;
 
 var mobImages = new Object();
@@ -38,7 +37,9 @@ var JmIcon;
 var halted = false;
 var uiInitialized = false;
 var versionChecked = false;
+var immediateUpdateMap = false;
 var updatingMap = false;
+var drawingMap = false;
 
 var timers = {};
 
@@ -126,7 +127,9 @@ var initUI = function() {
         
     // Init canvases
     canvas = $("#mapCanvas")[0];
-    tempCanvas = document.createElement("canvas");    
+    bgCanvas = $(document.createElement("canvas")).attr('id','bgCanvas')[0];
+    fgCanvas = $(document.createElement("canvas")).attr('id','fgCanvas')[0];
+    
     sizeMap();
         
     // Set page language, although at this point it may be too late to matter.
@@ -141,7 +144,6 @@ var initUI = function() {
 	    .click(function() {
 	       playerOverrideMap = true;
 	 	   setMapType('day');
-	 	  drawMap();
 	    });
     
     $("#nightButton").html(JM.messages.night_button_title)
@@ -149,14 +151,13 @@ var initUI = function() {
 	    .click(function() {
 	       playerOverrideMap = true;
 	 	   setMapType('night');
-	 	  drawMap();
 	    });
     
     $("#followButton").html(JM.messages.follow_button_title)
     	.attr("title", JM.messages.follow_button_desc)
 	    .click(function() {
 	 	   setCenterOnPlayer(!centerOnPlayer);
-	 	   drawMap();
+	 	   updateMap();
 	    });
     
     $("#caveButton").html(JM.messages.cave_button_title)
@@ -302,8 +303,11 @@ var initWorld = function() {
 	// Get world data once
 	refreshWorldData(function(){
 		
-		// Update the map first
-		updateMap();
+		// Update the player data and map first
+		refreshPlayerData(function(){
+			updateMap();
+			refreshPlayerData(); // auto refresh
+		});
 		
 		// Let the other data auto-refresh
 		refreshMobsData();
@@ -317,6 +321,7 @@ var initWorld = function() {
 	$(window).resize(function() {
 		$("#playerImage").hide();
 	    delay(function(){
+			sizeMap();
 	    	updateMap();
 	    }, 200);
 	});
@@ -330,20 +335,22 @@ var initImages = function() {
 	
 	logEntry("initImages");
 
-   // Init player marker
+	// Init player marker
 	if(!playerImage) {
-	   playerImage=document.createElement("img");
-	   playerImage.id="playerImage";
-	   playerImage.style.position = "absolute";
-	   playerImage.style.height = "64px";
-	   playerImage.style.width = "64px";
-	   playerImage.style.cursor = "hand";
-	   playerImage.src="/img/locator-blue.png";
-	   playerImage.onclick=function(){
-	        setCenterOnPlayer(true);
-	        drawMap();
-	   };
-	   document.body.appendChild(playerImage);
+		playerImage=$(document.createElement('img'))
+			.attr("id", "playerImage")
+			.attr("src", "/img/locator-blue.png")
+			.css("position", "absolute")
+			.css("height", "64px")
+			.css("width", "64px")
+			.css("cursor", "hand")
+			.click(function(){
+				if(centerOnPlayer===false) {
+			        setCenterOnPlayer(true);
+			        updateMap();
+				}
+			})
+			.appendTo('body');
 	}
 
 }
@@ -423,43 +430,23 @@ var sizeMap = function() {
 
 }
 
-function getCanvasWidth() {
-   var ctx = getContext();
-   if(ctx.canvas.width) {
-       return ctx.canvas.width; // Chrome, FF
-   } else {
-       return ctx.canvas.style.pixelWidth;  // IE
-   }
+var getCanvasWidth = function() {
+	return $(canvas).attr('width');
 }
 
-function setCanvasWidth(width) {
-   var ctx = getContext();
-   if(ctx.canvas.width) {
-       ctx.canvas.width  = width; // Chrome, FF
-   } else {
-       ctx.canvas.style.pixelWidth  = width;  // IE
-   }
+var setCanvasWidth = function(width) {
+	$(canvas).attr('width', width);
 }
 
-function getCanvasHeight() {
-   var ctx = getContext();
-   if(ctx.canvas.height) {
-       return ctx.canvas.height; // Chrome, FF
-   } else {
-       return ctx.canvas.style.pixelHeight;  // IE
-   }
+var getCanvasHeight = function() {
+	return $(canvas).attr('height');
 }
 
-function setCanvasHeight(height) {
-   var ctx = getContext();
-   if(ctx.canvas.height) {
-       ctx.canvas.height  = height; // Chrome, FF
-   } else {
-       ctx.canvas.style.pixelHeight  = height;  // IE
-   }
+var setCanvasHeight = function(height) {
+	$(canvas).attr('height', height);
 }
 
-function centerMapOnPlayer() {
+var centerMapOnPlayer = function() {
 	if(JM.player) {
 		centerMapOnChunk(Math.round(JM.player.chunkCoordX), Math.round(JM.player.chunkCoordZ));
 	}
@@ -467,7 +454,6 @@ function centerMapOnPlayer() {
 
 function centerMapOnChunk(chunkX, chunkZ) {
  
-   var ctx = getContext();
    var maxChunksWide = Math.ceil(getCanvasWidth()/mapScale/16);
    var maxChunksHigh = Math.ceil(getCanvasHeight()/mapScale/16);  
    
@@ -479,7 +465,6 @@ function centerMapOnChunk(chunkX, chunkZ) {
 
 function checkBounds() {
    // determine how many chunks we can display
-   var ctx = getContext();
    var maxChunksWide = Math.ceil(getCanvasWidth()/mapScale/16);
    var maxChunksHigh = Math.ceil(getCanvasHeight()/mapScale/16);
    mapBounds.x2 = mapBounds.x1 + maxChunksWide;
@@ -489,22 +474,24 @@ function checkBounds() {
 function setMapType(mapType) {
    
    if(mapType==="day") {
-      showLight = false;
-      mapBackground = '#222';      
+	  if(showLight===false) return;
+      showLight = false;    
       $("#dayButton").addClass("active");
       $("#nightButton").removeClass("active");
       
    } else if(mapType==="night") {
+	   if(showLight===true) return;
       showLight = true;
-      mapBackground = '#000';
       $("#dayButton").removeClass("active");
       $("#nightButton").addClass("active");
    } else {
       console.log("Error: Can't set mapType: " + mapType);
    }
    
-   $('body').css('backgroundColor',mapBackground);   
-   
+   if(JM.player.underground!==true) {
+	   updateMap();
+   }
+
 }
 
 function setCenterOnPlayer(onPlayer) {
@@ -518,32 +505,22 @@ function setCenterOnPlayer(onPlayer) {
    }
 }
 
-function setShowCaves(show) {	   
-   showCaves = show;
-   if(showCaves===true) {
-      $("#caveButton").addClass("active");
-   } else {
-      $("#caveButton").removeClass("active");
-   }
-   if(JM.player.underground===true) {
-	   checkShowCaves();
-	   drawMap();
-   }
+function setShowCaves(show) {
+	
+	if(show===showCaves) return;
+	showCaves = show;
+	
+	if(showCaves===true) {
+		$("#caveButton").addClass("active");
+	} else {
+		$("#caveButton").removeClass("active");
+	}
+	
+    if(JM.player.underground===true) {
+  	  updateMap();
+    }
+  
 }
-
-
-function checkShowCaves() {
-   if(JM.player.underground===true && showCaves) {
-	   mapBackground = "#000";
-   } else {
-	   if(showLight) {
-		   setMapType('night');
-	   } else {
-		   setMapType('day');
-	   }
-   }
-}
-
 
 ////////////// DATA ////////////////////
 
@@ -679,7 +656,6 @@ var refreshWorldData = function(callback) {
  * Get the url for the current map state
  */
 var getMapDataUrl = function() {
-   var ctx = getContext();
    var width = getCanvasWidth();
    var height = getCanvasHeight();
    var mapType = (JM.player && JM.player.underground===true && showCaves===true) ? "underground" : (showLight===true ? "night" : "day") ;  
@@ -698,20 +674,23 @@ var refreshMapImage = function(callback) {
 	
 	logEntry("refreshMapImage");
 
-	var mapUrl = getMapDataUrl();
-	var newChunksImage = $(document.createElement('img')).attr('src', mapUrl)
-		.error(handleError) // TODO: check whether this will ever be called
-	    .load(function() {
-	        if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth === 0) {
-	            console.log('Map image incomplete!');
-	        }       
-	        lastChunksImage = newChunksImage[0];
-	        $(newChunksImage).remove();
-	                
-	        if(callback) {
-	        	callback();
-	        } 
-	    });
+	if(!tempMapImage) {
+		tempMapImage = $(document.createElement('img'))
+			.error(handleError); // TODO: check whether error will ever be called			
+	}
+	
+	$(tempMapImage).load(function() {
+        if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth === 0) {
+            console.log('Map image incomplete!');
+        } else {
+        	latestMapImage = $(tempMapImage)[0];
+        }             
+        if(callback) {
+        	callback();
+        } 
+    }).attr('src', getMapDataUrl());
+		
+	    
 }
 
 
@@ -729,6 +708,9 @@ var refreshPlayerData = function(callback) {
    	.done(function(data, textStatus, jqXHR) { 
 		JM.player = data;
 		
+		// Update Player Image location
+		drawPlayer();
+		
    		// Update UI
 		$("#playerBiome").html(JM.player.biome);
 		$("#playerLocation").html(JM.player.posX + "," + JM.player.posZ);
@@ -739,7 +721,9 @@ var refreshPlayerData = function(callback) {
 		// Do callback
 		if(callback) {
         	callback();
-        } 		
+        } else {
+        	addTimer("refreshPlayerData", refreshPlayerData, JM.game.browser_poll);
+        }	
    	});
 
 }
@@ -751,29 +735,38 @@ var updateMap = function() {
    logEntry("updateMap");
 	
    if(isScroll===false && updatingMap===false) {
-	   
-	   updatingMap = true;
-	   $("#mapCanvas").css('cursor', 'wait');
-	   
-	   refreshPlayerData(function() { 
-						
-			// With the player data updated, we can get the map data						
-			if(centerOnPlayer===true) {
-				centerMapOnPlayer();
-			} else {
-				checkBounds();
+	   	   
+		updatingMap = true;
+		
+		// Center map or check bounds to ensure correct map image retrieved		
+		if(centerOnPlayer===true) {
+			centerMapOnPlayer();
+		} else {
+			checkBounds();
+		}
+					
+		// Retrieve the map image, then draw it with entities
+		refreshMapImage(function() {
+								
+			var start = new Date().getTime();
+			var success = drawMap();
+			updatingMap = false;
+			var stop = new Date().getTime();
+			if(success!==false) {
+				console.log("Redrew map: " + (stop-start) + "ms");
 			}
-						
-			// Update the map image, then draw it
-			refreshMapImage(function() {
-				
-				drawMap();
-				updatingMap = false;
-				$("#mapCanvas").css('cursor', 'auto');
-				addTimer("updateMap", updateMap, JM.game.browser_poll);
-			});	   
 			
-	   	});	  
+			if(immediateUpdateMap===true) {
+				immediateUpdateMap = false;
+				updateMap();
+			} else {
+				addTimer("updateMap", updateMap, JM.game.browser_mapimg_poll);
+			}
+		});	
+		
+   } else if(updatingMap===true) {
+	   immediateUpdateMap = true;
+	   return false;
    }
 }
 
@@ -854,100 +847,94 @@ var handleError = function(data, error, jqXHR) {
 
 //////////////DRAW ////////////////////
 
-/**
- * Get the context of the current canvas
- */
-var getContext = function() {
-
-	// Which canvas to use
-	var theCanvas;
-	if(useTempCanvas) {
-	   theCanvas = tempCanvas;
-	} else {
-	   theCanvas = canvas;
-	}
-	return theCanvas.getContext("2d");
-
-}
 
 // Draw the map
 var drawMap = function() {
 	
    logEntry("drawMap");
-	
-   $('body').css('cursor', 'wait');
-   useTempCanvas = true;
    
-   // init canvas dimensions
-   sizeMap();
-   var ctx = getContext();
+   if(drawingMap===true) {
+	   logEntry("Avoided concurrent drawMap()");
+	   return false;
+   }
+   drawingMap = true;
    
-   // check for showing caves
-   checkShowCaves();
+   // Get canvas dimensions
+   var canvasWidth = getCanvasWidth();
+   var canvasHeight = getCanvasHeight();
    
-   // map data
-   drawImageChunks();
+   // Size working canvases
+   $(bgCanvas).attr('width', canvasWidth).attr('height', canvasHeight);
+   $(fgCanvas).attr('width', canvasWidth).attr('height', canvasHeight);
    
-   // player position
-   drawPlayer();
+   // set background color
+   if(showLight===true || JM.player.underground===true) {
+	   mapBackground = '#000';
+   } else {
+	   mapBackground = '#222';
+   }
+   $('body').css('backgroundColor',mapBackground);  
+   
+   // Draw background map image
+   drawBackgroundCanvas(canvasWidth, canvasHeight);
+   
+   // clear foreground canvas
+   var ctx = fgCanvas.getContext("2d");
+   ctx.clearRect(0,0,canvasWidth,canvasHeight);
    
    // mobs
-   drawMobs();
+   drawMobs(canvasWidth, canvasHeight);
    
    // other players
    if(JM.world.singlePlayer!=true) {
-	   drawMultiplayers();
+	   drawMultiplayers(canvasWidth, canvasHeight);
    }
-   
-   // Copy the result
-   if(ctx.getImageData) {
-      tempCanvasImage = ctx.getImageData(0, 0, getCanvasWidth(), getCanvasHeight());
-   }
-   
+      
    // Now put on the visible canvas
-   useTempCanvas = false;
-   sizeMap();
-   ctx = getContext();
-   ctx.globalAlpha=1;
-   if(ctx.putImageData) {
-      ctx.putImageData(tempCanvasImage, 0, 0);
+   ctx = canvas.getContext("2d");
+   if(ctx.drawImage) {
+	  ctx.globalAlpha=1.0;   
+	  ctx.drawImage(bgCanvas, 0,0, canvasWidth, canvasHeight);
+	  ctx.drawImage(fgCanvas, 0,0, canvasWidth, canvasHeight);
    }
-   //getContext().drawImage(tempCanvas, 0,0,getCanvasWidth(), getCanvasHeight());
    
-   // Cursor reset
-   $('body').css('cursor', 'default');
+   // Update player position
+   drawPlayer();
+   
+   drawingMap = false;
+
 }
 
 
-// Draw the player location
-var drawPlayer = function() {
+// Draw the player icon
+var drawPlayer = function(canvasWidth, canvasHeight, xOffset, zOffset) {
 	
    logEntry("drawPlayer");
+   
+   if(!canvasWidth || !canvasHeight) {
+		canvasWidth = getCanvasWidth();
+		canvasHeight = getCanvasHeight();
+   }
 
    var player = JM.player;
    var x = getScaledChunkX(player.posX/16);
    var z = getScaledChunkZ(player.posZ/16);
    
+   if(xOffset) x = x + xOffset;
+   if(zOffset) z = z + zOffset;
+   
    if(x>=0 &&
-      x<=getCanvasWidth() &&  
+      x<=canvasWidth &&  
       z>=0 &&
-      z<=getCanvasWidth()) {     
-
-       var ctx = getContext();
-//       ctx.globalAlpha=.4;
-//       if(showLight===false) {
-//          ctx.fillStyle = "#000000";
-//       } else {
-//          ctx.fillStyle = "#ffffff";
-//       }
-//       ctx.beginPath();
-//       ctx.arc(x, z, 20, 0, Math.PI*2, true); 
-//       ctx.closePath();
-//       ctx.fill();
+      z<=canvasHeight) {     
        
+	   // Get player location value
+	   var loc = $("#playerLocation")[0];
+	   
        // Update player image
        var rotate = "rotate(" + player.heading + "deg)";
        $("#playerImage")
+       		.attr('title', loc)
        		.css("left", x-32)
        		.css("top", z-32)
        		.css("zIndex", 2)
@@ -955,43 +942,49 @@ var drawPlayer = function() {
        		.css("-moz-transform", rotate)
        		.css("-o-transform", rotate)
        		.css("-ms-transform", rotate)
-       		.css("transform", rotate);
-       $("#playerImage").show();
+       		.css("transform", rotate)
+       		.show();
      
-   } 
+   } else {
+	   $("#playerImage").hide();
+   }
 
 }
 
 // Draw the location of mobs
-var drawMobs = function() {
+var drawMobs = function(canvasWidth, canvasHeight) {
 	
 	logEntry("drawMobs");
 	
-	var canvasWidth = getCanvasWidth();
-	var canvasHeight = getCanvasHeight();
+	if(!canvasWidth || !canvasHeight) {
+    	canvasWidth = getCanvasWidth();
+    	canvasHeight = getCanvasHeight();
+    }
+	
+	var ctx = fgCanvas.getContext("2d");
 	
 	if(showMobs===true && JM.mobs) {
 	    $.each(JM.mobs, function(index, mob) {
-			drawEntity(mob, canvasWidth, canvasHeight, false);
+			drawEntity(ctx, mob, canvasWidth, canvasHeight, false);
 		});
 	}
     
     if((showAnimals===true || showPets===true) && JM.animals) {
 	    $.each(JM.animals, function(index, mob) {
-			drawEntity(mob, canvasWidth, canvasHeight, true);
+			drawEntity(ctx, mob, canvasWidth, canvasHeight, true);
 		});
     }
     
     if(showVillagers===true && JM.villagers) {
 	    $.each(JM.villagers, function(index, mob) {
-			drawEntity(mob, canvasWidth, canvasHeight, true);
+			drawEntity(ctx, mob, canvasWidth, canvasHeight, true);
 		});
     }
     
 }
 
 //Draw the location of an entity
-var drawEntity = function(mob, canvasWidth, canvasHeight, friendly) {
+var drawEntity = function(ctx, mob, canvasWidth, canvasHeight, friendly) {
 	
    var x = getScaledChunkX(mob.posX/16);
    var z = getScaledChunkZ(mob.posZ/16);
@@ -1000,8 +993,7 @@ var drawEntity = function(mob, canvasWidth, canvasHeight, friendly) {
       x<=canvasWidth &&  
       z>=0 &&
       z<=canvasHeight) {
-	   
-       var ctx = getContext();        
+	      
 	   if(friendly===true && mob.owner && mob.owner===JM.player.username) {
 		   if(showPets===false) return;
 		   ctx.strokeStyle = "#0000ff";
@@ -1042,12 +1034,17 @@ var drawEntity = function(mob, canvasWidth, canvasHeight, friendly) {
 }
 
 //Draw the location of other players
-var drawMultiplayers = function() {
+var drawMultiplayers = function(canvasWidth, canvasHeight) {
 
 	logEntry("drawMultiplayers");
 	
 	var others = JM.players;
 	if(!others) return;
+	
+	if(!canvasWidth || !canvasHeight) {
+    	canvasWidth = getCanvasWidth();
+    	canvasHeight = getCanvasHeight();
+    }
 	
 	// Remove old
 	$.each(otherImages, function(index, img) { 
@@ -1055,26 +1052,26 @@ var drawMultiplayers = function() {
 	});
 	otherImages = new Array();
 	
+	ctx = canvas.getContext("2d");
+	
 	// Make new
     $.each(others, function(index, other) { 
        var x = getScaledChunkX(other.posX/16);
        var z = getScaledChunkZ(other.posZ/16);
        if(other.username!=player.name) {
 	       if(x>=0 &&
-	          x<=getCanvasWidth() &&  
+	          x<=canvasWidth &&  
 	          z>=0 &&
-	          z<=getCanvasWidth()) {
+	          z<=canvasHeight) {
 
-               var ctx = getContext();
                ctx.globalAlpha=.85;
                ctx.strokeStyle = "#0f0";
                ctx.lineWidth = 2;
                ctx.beginPath();
                ctx.arc(x, z, 20, 0, Math.PI*2, true); 
                ctx.stroke();
-               ctx.globalAlpha=1.0;
                
-               ctx.globalAlpha=1;               
+               ctx.globalAlpha=1.0;             
                ctx.font = "bold 12px Arial";
                ctx.textAlign="center";
                ctx.fillStyle = "#000";
@@ -1102,28 +1099,42 @@ var drawMultiplayers = function() {
     
 }
 
-// Draw the chunks
-// scaled image code via phrogz.net/tmp/canvas_image_zoom.html
-var drawImageChunks = function() {
+// Draw the map image to the background canvas
+var drawBackgroundCanvas = function(canvasWidth, canvasHeight) {
 
-   logEntry("drawImageChunks");
+   logEntry("drawBackgroundCanvas");
    
    // draw the png to the canvas
-   if(lastChunksImage) {
-	   
+   if(latestMapImage) {
+	  		
+	    var width = latestMapImage.width;
+	    var height = latestMapImage.height;
 	    
-		var zoom = mapScale;
-	    var width = lastChunksImage.width;
-	    var height = lastChunksImage.height;
+	    if(!canvasWidth || !canvasHeight) {
+	    	canvasWidth = getCanvasWidth();
+	    	canvasHeight = getCanvasHeight();
+	    }
 	    
-	    var ctx = getContext();
-	    
-	    if(smoothScale===true) {
-	    	ctx.drawImage(lastChunksImage, 0, 0, width*mapScale, height*mapScale);
+	    // Fill background
+	    var ctx = bgCanvas.getContext("2d");
+	    ctx.fillStyle = mapBackground;
+        ctx.fillRect(0, 0 ,canvasWidth, canvasHeight);
+        
+        var autoScale = ctx.imageSmoothingEnabled || ctx.mozImageSmoothingEnabled || ctx.webkitImageSmoothingEnabled;
+        if(autoScale) {
+        	$(ctx).prop('imageSmoothingEnabled', smoothScale)
+        		.prop('mozImageSmoothingEnabled', smoothScale)
+        		.prop('webkitImageSmoothingEnabled', smoothScale)
+        }
+
+	    if(smoothScale===true || autoScale==true || mapScale==1) {
+	    	ctx.fillStyle = mapBackground;
+	        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+	    	ctx.drawImage(latestMapImage, 0, 0, width*mapScale, height*mapScale);
 	    } else {
-	    
-		    ctx.clearRect(0,0,width,height);
-		    ctx.drawImage(lastChunksImage,0,0);
+	    	// phrogz.net/tmp/canvas_image_zoom.html
+	    	// Copy pixels and scale with code-generated squares
+		    ctx.drawImage(latestMapImage,0,0);
 			var imgData = ctx.getImageData(0,0,width,height).data;
 			ctx.clearRect(0,0,width,height);
 			
@@ -1135,7 +1146,7 @@ var drawImageChunks = function() {
 					var b = imgData[i+2];
 					var a = imgData[i+3];
 					ctx.fillStyle = "rgba("+r+","+g+","+b+","+(a/255)+")";
-					ctx.fillRect(x*zoom,y*zoom,zoom,zoom);
+					ctx.fillRect(x*mapScale,y*mapScale,mapScale,mapScale);
 				}
 			}
 	    }	   
@@ -1180,8 +1191,6 @@ function myUp(e){
 
       var xOffset = Math.floor(mouseDragX / chunkScale);
       var zOffset = Math.floor(mouseDragY / chunkScale);
-      //console.log("mouseDragX=" + mouseDragX + ", mouseDragY=" + mouseDragY);
-      //console.log("xOffset=" + xOffset + ", zOffset=" + zOffset);
 
       mapBounds.x1 = mapBounds.x1 - xOffset -1;
       mapBounds.z1 = mapBounds.z1 - zOffset -1;
@@ -1262,19 +1271,13 @@ function scrollCanvas(e){
    msx=mx;
    msy=my;
 
-   // Draw snapshot in current position
-   var ctx = tempCanvas.getContext("2d");
-   ctx.globalAlpha=.5;
-   ctx.drawImage(canvas,0,0);
-   $("#playerImage").hide();
    document.onmousemove = scrollingCanvas;
 }
 
 var scrollingCanvas = function(e){
    
    if(isScroll) {
-	   $('body').css('cursor', 'move');
-	  $("#playerImage").hide();
+	  $('body').css('cursor', 'move');
       getMouse(e);
 
       var mouseDragX = (mx-msx);
@@ -1286,28 +1289,31 @@ var scrollingCanvas = function(e){
         setCenterOnPlayer(false);
       } 
 
-      var ctx = getContext();
+      var ctx = canvas.getContext("2d");
+      var canvasWidth = getCanvasWidth();
+      var canvasHeight = getCanvasHeight();
       
       // Draw background
       ctx.globalAlpha = 1;
       ctx.fillStyle = mapBackground;
-      ctx.fillRect(0, 0, getCanvasWidth(), getCanvasHeight());
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
       
-      // Draw temp canvas
-      ctx.drawImage(tempCanvas,(xOffset*chunkScale), (zOffset*chunkScale));
-      //console.log("Scrolling: " + xOffset + "," + zOffset);
+      // Draw background with offset
+      var drawX = xOffset*chunkScale;
+      var drawZ = zOffset*chunkScale;
+      ctx.drawImage(bgCanvas, drawX, drawZ);
+      ctx.drawImage(fgCanvas, drawX, drawZ);
+      drawPlayer(canvasWidth, canvasHeight, drawX, drawZ);
       
    } else {
 	  logEntry("scrollingCanvas done");
-	   
-      tempCanvasImage = null; // why?
+
       document.onmousemove = null;
       $('body').css('cursor', 'default');      
    }
 }
 
 function moveCanvas(dir){
-   //console.log("moveCanvas " + dir);
    switch(dir){
       case'left':
       mapBounds.x1++;
