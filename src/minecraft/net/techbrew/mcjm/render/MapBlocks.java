@@ -357,7 +357,7 @@ public class MapBlocks extends HashMap {
 		colors[75][0] = new Color(0x290000); // Redstone Torch (off)
 		colors[76][0] = new Color(0xfd0000); // Redstone Torch (on)
 		colors[77][0] = new Color(0x747474); // Stone Button
-		colors[78][0] = new Color(0xffffff); // Snow
+		colors[78][0] = new Color(0xeeeeee); // Snow
 		colors[79][0] = new Color(0x8ebfff); // Ice
 		colors[80][0] = new Color(0xfafaff); // Snow Block
 		colors[81][0] = new Color(0x11801e); // Cactus
