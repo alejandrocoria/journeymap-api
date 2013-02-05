@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
+
+import javax.imageio.ImageIO;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.Chunk;
@@ -81,7 +84,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 		boolean finestLogging = JourneyMap.getLogger().isLoggable(Level.FINEST);
 		
 		try {
-				Boolean flush = true;
+				Boolean flush = false;
 				currentThread = this;
 										
 				// Wait for main thread to make ChunkStubs available
@@ -271,7 +274,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 					Chunk chunk = Utils.getChunkIfAvailable(minecraft.theWorld, x, z);
 					if(chunk!=null) {										
 						if(!chunkStubs.containsKey(ChunkStub.toHashCode(x, z))) {
-							ChunkStub neighborStub = new ChunkStub(chunk, false, minecraft.theWorld, journeyMap.lastHash); // do not map
+							ChunkStub neighborStub = new ChunkStub(chunk, false, minecraft.theWorld, FileHandler.lastWorldHash); // do not map
 							chunkStubs.put(neighborStub.hashCode(), neighborStub);
 							continue;
 						}
@@ -314,6 +317,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 			Constants.CoordType cType = Constants.CoordType.convert(underground, minecraft.theWorld.provider.dimensionId);
 			ChunkCoord cCoord = ChunkCoord.fromChunkStub(worldDir, chunkStub, chunkY, cType);
 			chunkImageCache.put(cCoord, chunkImage);
+			
 		} else {
 			if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
 				JourneyMap.getLogger().fine("Could not render chunk image:" + chunkStub.xPosition + "," + chunkStub.zPosition + " at " + chunkY + " and underground = " + underground); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
