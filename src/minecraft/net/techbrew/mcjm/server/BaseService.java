@@ -58,7 +58,8 @@ public abstract class BaseService extends Service {
 		jpeg("image/jpeg"), //$NON-NLS-1$
 		jpg("image/jpeg"), //$NON-NLS-1$
 		log("text/plain; charset=utf-8"), //$NON-NLS-1$
-		txt("text/plain; charset=utf-8"); //$NON-NLS-1$
+		txt("text/plain; charset=utf-8"), //$NON-NLS-1$
+		UNKNOWN("application/x-unknown"); //$NON-NLS-1$
 				
 		private String mime;
 		
