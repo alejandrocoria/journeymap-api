@@ -21,8 +21,8 @@ import net.techbrew.mcjm.log.LogFormatter;
 
 public class FileHandler {
 
-	private static long lastWorldHash;
-	private static File lastWorldDir;
+	public static volatile long lastWorldHash;
+	public static volatile File lastWorldDir;
 	
 	public static File getJourneyMapDir() {
 		return new File(Minecraft.getMinecraftDir(), Constants.JOURNEYMAP_DIR);
