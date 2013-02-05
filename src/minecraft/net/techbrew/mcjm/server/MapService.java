@@ -129,8 +129,8 @@ public class MapService extends BaseService {
 			mergeImageChunks(event, worldDir, x1, z1, x2, z2, mapType, depth, worldProviderType, width, height);
 			
 			long stop=System.currentTimeMillis();
-			if(JourneyMap.getLogger().isLoggable(Level.INFO)) {
-				JourneyMap.getLogger().info((stop-start) + "ms to serve map.png");
+			if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+				JourneyMap.getLogger().fine((stop-start) + "ms to serve map.png");
 			}
 			
 		} catch (NumberFormatException e) {
@@ -162,22 +162,21 @@ public class MapService extends BaseService {
 		
 		start = System.currentTimeMillis();
 		
-		// Headers
-		event.reply().header("Content-Type:","image/png"); //$NON-NLS-1$
-		event.reply().header("Content-Disposition", "inline; filename=\"jm.png\"");	 //$NON-NLS-1$ //$NON-NLS-2$
-
-		ImageOutputStream ios = ImageIO.createImageOutputStream(event.output());
 		BufferedImage mergedImg = RegionFileHandler.getMergedChunks(worldDir, x1, z1, x2, z2, mapType, depth, cType, true, 
 				new ZoomLevel(1F, 1, false, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
+		
+		// Headers
+		ResponseHeader.on(event).contentType(ContentType.png).noCache();
 
+		ImageOutputStream ios = ImageIO.createImageOutputStream(event.output());
 		ImageIO.write(mergedImg, "png", ios); //$NON-NLS-1$
 		
 		ios.flush();
 		ios.close();
 		
-		if(JourneyMap.getLogger().isLoggable(Level.INFO)) {
+		if(JourneyMap.getLogger().isLoggable(Level.FINER)) {
 			stop = System.currentTimeMillis();
-			//JourneyMap.getLogger().info("mergeImageChunks time: "  + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
+			JourneyMap.getLogger().finer("mergeImageChunks time: "  + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 	}
