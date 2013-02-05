@@ -36,6 +36,7 @@ import net.minecraft.src.World;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
+import net.techbrew.mcjm.io.RegionImageCache;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.server.JMServer;
@@ -70,7 +71,6 @@ public class JourneyMap extends BaseMod {
 	private static JMServer jmServer;
 	
 	public volatile Properties remoteWorldProperties = new Properties();
-	public static volatile long lastHash = 0;
 	public static volatile ChunkStub lastPlayerChunk;
 	private MapOverlay mapOverlay;
 	
@@ -209,10 +209,12 @@ public class JourneyMap extends BaseMod {
 			if(!running) {
 				if(executorsStarted) {
 					getLogger().info("Shutting down JourneyMap threads"); //$NON-NLS-1$
-					lastHash = -1;
+					FileHandler.lastWorldHash = -1;
+					FileHandler.lastWorldDir = null;
 					playerDataExecutor.shutdown();
 					getChunkExecutor().shutdown();
 					executorsStarted = false;
+					RegionImageCache.getInstance().flushToDisk();
 				}
 			}
 		} catch(Exception e) {
@@ -241,7 +243,7 @@ public class JourneyMap extends BaseMod {
 			long newHash = Utils.getWorldHash(minecraft);
 			if(newHash!=0L) {
 				getLogger().info("Map data: " + FileHandler.getWorldDir(minecraft, newHash));
-				lastHash=newHash;
+				FileHandler.lastWorldHash=newHash;
 			}
 
 			// Multiplayer:  Bail if server info not available or hash has changed
@@ -260,7 +262,7 @@ public class JourneyMap extends BaseMod {
 				return true;
 			} else {
 				if(lastPlayerChunk==null || (player.chunkCoordX!=lastPlayerChunk.xPosition || player.chunkCoordZ!=lastPlayerChunk.zPosition)) {
-					lastPlayerChunk = new ChunkStub(pChunk, true, minecraft.theWorld, lastHash);
+					lastPlayerChunk = new ChunkStub(pChunk, true, minecraft.theWorld, FileHandler.lastWorldHash);
 				}				
 			}
 			
@@ -300,7 +302,7 @@ public class JourneyMap extends BaseMod {
 						if(ChunkUpdateThread.currentThread!=null) {
 							synchronized(ChunkUpdateThread.currentThread) {
 								long start = System.currentTimeMillis();
-								int[] result = ChunkUpdateThread.currentThread.fillChunkStubs(minecraft.thePlayer, lastPlayerChunk, minecraft.theWorld, lastHash);
+								int[] result = ChunkUpdateThread.currentThread.fillChunkStubs(minecraft.thePlayer, lastPlayerChunk, minecraft.theWorld, FileHandler.lastWorldHash);
 								long stop = System.currentTimeMillis();
 								if(getLogger().isLoggable(Level.FINER)) {
 									getLogger().finer("Stubbed/skipped: " + result[0] + "," + result[1] + " in " + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -424,14 +426,6 @@ public class JourneyMap extends BaseMod {
 			}
 		}
 		return logger;
-	}
-	
-	/**
-	 * TODO: Make threadsafe
-	 * @return
-	 */
-	public static long getLastWorldHash() {
-		return lastHash;
 	}
 	
 	/**
