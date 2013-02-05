@@ -38,51 +38,59 @@
 			<div class="container">
 			
 			     <a class="brand" href="#"><img src="img/journeymap.png" alt="JourneyMap"></a>
-			     
-			      <ul class="nav jmtoggle">
-                        <li class="active" id="dayButton"><a href="#">[day]</a></li>
-                        <li id="nightButton"><a href="#night">[night]</a></li>
-                        <li id="caveButton"><a href="#caves">[cave]</a></li>                        
-                    </ul>
                     
 			       <div class="btn-toolbar visible-tablet visible-desktop">
+			       
+				       <div class="btn-group jmtoggle">
+	                        <a id="dayButton" class="btn btn-warning active" href="#">[day]</a></li>
+	                        <a id="nightButton" class="btn btn-primary btn-inverse" href="#">[night]</a></li>                                            
+	                    </div>
+                    
 			           <div class="btn-group jmtoggle">
-                            <a id="followButton" class="btn" href="#"><i class="icon-map-marker"></i></a>
+                            <a id="followButton" class="btn active" href="#">[follow]</a>
+                            <a id="caveButton" class="btn active" href="#">[cave]</a>
                        </div>
-                            
+                       
 					   <div class="btn-group jmtoggle">
 
 							<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
 								Show... <span class="caret"></span>
 							</a>
 							<ul class="dropdown-menu">
+							    <li>
+                                  <label>
+                                    <input id="checkSmoothScale" type="checkbox">
+                                    <span>Smooth scaling</span>
+                                  </label>
+                                </li>
+                                <li class="divider"></li>
 								<li>
 	                              <label>
-	                                <input type="checkbox" name="optionsCheckboxes" value="option1">
+	                                <input id="checkShowAnimals" type="checkbox">
 	                                <span>Animals</span>
 	                              </label>
 	                            </li>
 	                            <li>
 	                              <label>
-	                                <input type="checkbox" name="optionsCheckboxes" value="option1">
+	                                <input id="checkShowPets" type="checkbox">
 	                                <span>Pets</span>
 	                              </label>
 	                            </li>	
 	                            <li>
                                   <label>
-                                    <input type="checkbox" name="optionsCheckboxes" value="option1">
+                                    <input id="checkShowMobs" type="checkbox">
                                     <span>Mobs</span>
                                   </label>
                                 </li>
                                 <li>
                                   <label>
-                                    <input type="checkbox" name="optionsCheckboxes" value="option1">
+                                    <input id="checkShowVillagers" type="checkbox">
                                     <span>Villagers</span>
                                   </label>
                                 </li>
 	                            <li>
 	                              <label>
-	                                <input type="checkbox" name="optionsCheckboxes" value="option1">
+	                                <input id="checkShowPlayers" type="checkbox">
 	                                <span>Players</span>
 	                              </label>
 	                            </li>						

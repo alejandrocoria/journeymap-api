@@ -1,5 +1,5 @@
 body {
-	
+   overflow:hidden;
 }
 
 .navbar-inner {
@@ -9,6 +9,10 @@ body {
 .btn-toolbar {
 	margin-bottom: 0px;
 	margin-top: 0px;
+}
+
+.btn-group + .btn-group {
+	margin-left:15px;
 }
 
 #mapCanvas {
