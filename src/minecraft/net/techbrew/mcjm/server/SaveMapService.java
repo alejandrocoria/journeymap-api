@@ -113,7 +113,7 @@ public class SaveMapService extends BaseService {
 			String saveName = URLEncoder.encode(sb.toString(), CHARACTER_ENCODING);
 					
 			// Set response headers
-			ResponseHeader.on(event).noCache().inlineFilename(saveName).contentType(ContentType.png);
+			ResponseHeader.on(event).noCache().inlineFilename(saveName).contentType(ContentType.UNKNOWN);
 			
 			// Write image to output
 			ImageIO.write(mapImg, "png", event.output()); //$NON-NLS-1$
