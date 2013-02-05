@@ -27,16 +27,8 @@ public class MapSaver {
 			throws IOException {
 
 		final Constants.CoordType cType = Constants.CoordType.convert(mapType, worldProviderType);
-		FileOutputStream fos = new FileOutputStream(mapFile);
-		FileChannel fc = fos.getChannel();
-		FileLock lock = fc.lock();
-		try {
-			BufferedImage mergedImg = saveMap(worldDir, mapType, depth, cType);
-			ImageIO.write(mergedImg, "png", fos); //$NON-NLS-1$
-		} finally {
-			lock.release();
-			fos.close();
-		}
+		BufferedImage mergedImg = saveMap(worldDir, mapType, depth, cType);
+		ImageIO.write(mergedImg, "png", mapFile); //$NON-NLS-1$
 		
 		JourneyMap.getLogger().info("Map saved: "  + mapFile); //$NON-NLS-1$
 		JourneyMap.announce(Constants.getString("MapSaver.map_saved", mapFile.getCanonicalPath())); //$NON-NLS-1$
@@ -97,6 +89,10 @@ public class MapSaver {
 		
 		boolean isUnderground = mapType.equals(Constants.MapType.underground);
 		
+		// Ensure latest regions are flushed to disk
+		RegionImageCache.getInstance().flushToDisk();
+		
+		// Get region images without using cache
 		BufferedImage mergedImg = RegionFileHandler.getMergedChunks(worldDir, x1, z1, x2, z2, mapType, chunkY, cType, false, 
 				new ZoomLevel(1F, 1, false, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
 			

@@ -14,16 +14,23 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.util.Iterator;
 import java.util.logging.Level;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 import javax.swing.plaf.FontUIResource;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
@@ -152,6 +159,7 @@ public class RegionFileHandler {
 			regionImage = readRegionFile(getRegionFile(regionCoord), regionCoord, sampling);
 		}
 		BufferedImage chunksImage = regionImage.getSubimage(ix1,iz1,width*16,height*16);
+		
 		return chunksImage;
 		
 	}
@@ -249,17 +257,42 @@ public class RegionFileHandler {
 			return;
 		}
 		
+		ImageOutputStream imageOutputStream;	
+		ImageWriter imageWriter;
+		ImageWriteParam pngparams;
+		
+		
 		File regionFile = getRegionFile(rCoord);
 	    try {
-	    	if(!regionFile.exists()) {
-	    		regionFile.createNewFile();	
-	    	}
-	    	fos = new FileOutputStream(regionFile);
-			FileChannel fc = fos.getChannel();
-			fileLock = fc.lock();
-			ImageIO.setUseCache(false);
-    		ImageIO.write(regionImage, "png", fos); //$NON-NLS-1$
-    		fos.flush();
+//	    	if(!regionFile.exists()) {
+//	    		regionFile.createNewFile();	
+//	    	}
+//	    	fos = new FileOutputStream(regionFile);
+//			FileChannel fc = fos.getChannel();
+//			if(fc.isOpen()) {
+////				JourneyMap.getLogger().warning("Region file already open:" + regionFile.getPath());
+////				return;
+//			}
+//			fileLock = fc.lock();
+//			
+//
+//			imageWriter = (ImageWriter) ImageIO.getImageWritersByFormatName( "png" ).next();
+//			pngparams = imageWriter.getDefaultWriteParam();
+//			//pngparams.setCompressionQuality(1F);
+//			pngparams.setProgressiveMode(ImageWriteParam.MODE_DISABLED);
+//			pngparams.setDestinationType(new ImageTypeSpecifier(regionImage.getColorModel(), regionImage.getSampleModel() ) );
+//			 
+//			imageOutputStream = ImageIO.createImageOutputStream(fos);
+//			imageWriter.setOutput( imageOutputStream );
+//
+//			// Write the changed Image
+//			imageWriter.write(null, new IIOImage(regionImage, null, null ), pngparams );
+//
+//			// Close the streams
+//			imageOutputStream.close();
+//			imageWriter.dispose();
+			
+			ImageIO.write(regionImage, "png", regionFile);
     		
 	    } catch (Exception e) {
 	    	String error = Constants.getMessageJMERR22(regionFile, LogFormatter.toString(e));
@@ -308,8 +341,12 @@ public class RegionFileHandler {
 			
 		BufferedImage mergedImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2D = mergedImg.createGraphics();
-		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, zoomLevel.antialias ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
-		g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, zoomLevel.interpolation);
+//		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, zoomLevel.antialias ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
+//		g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, zoomLevel.interpolation);
+		g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+		g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		g2D.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 
 		// Merge chunk images
 		RegionFileHandler rfh = RegionFileHandler.getInstance();
@@ -333,8 +370,8 @@ public class RegionFileHandler {
 				int cz2 = Math.min(z2, rCoord.getMaxChunkZ());
 				
 				BufferedImage chunks = rfh.getChunkImages(worldDir, cx1, cz1, depth, cx2, cz2, mapType, rCoord.cType, useCache, zoomLevel.sampling);				
-				int imageX = (cx1-x1) * 16;
-				int imageZ = (cz1-z1) * 16;
+				int imageX = ((cx1-x1) * 16)-1;
+				int imageZ = ((cz1-z1) * 16)-1;
 				g2D.drawImage(chunks, imageX, imageZ, null);
 				
 			}
