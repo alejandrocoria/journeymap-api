@@ -82,6 +82,9 @@ public class ChunkStub {
 		
 		this.heightMap = Arrays.copyOf(chunk.heightMap, chunk.heightMap.length);
 		this.blockBiomeArray = Arrays.copyOf(chunk.getBiomeArray(), chunk.getBiomeArray().length);
+		if(blockBiomeArray.length==0) {
+			System.err.println("Biomes not provided for chunk");
+		}
 		this.xPosition = chunk.xPosition;
 		this.zPosition = chunk.zPosition;
 		this.worldHash = worldHash;
@@ -372,9 +375,10 @@ public class ChunkStub {
 
         if (var4 == 255)
         {
-            BiomeGenBase var5 = par3WorldChunkManager.getBiomeGenAt((this.xPosition << 4) + par1, (this.zPosition << 4) + par2);
-            var4 = var5.biomeID;
-            this.blockBiomeArray[par2 << 4 | par1] = (byte)(var4 & 255);
+//            BiomeGenBase var5 = par3WorldChunkManager.getBiomeGenAt((this.xPosition << 4) + par1, (this.zPosition << 4) + par2);
+//            var4 = var5.biomeID;
+//            this.blockBiomeArray[par2 << 4 | par1] = (byte)(var4 & 255);
+        	var4 = BiomeGenBase.taiga.biomeID; // JourneyMap override
         }
 
         return BiomeGenBase.biomeList[var4] == null ? BiomeGenBase.plains : BiomeGenBase.biomeList[var4];
