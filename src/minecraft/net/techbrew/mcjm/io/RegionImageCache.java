@@ -13,6 +13,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
@@ -20,12 +22,14 @@ import javax.imageio.ImageIO;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.ChunkImageCache.CacheMap;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.thread.JMThreadFactory;
 
 public class RegionImageCache  {
 	
-	private static final int SIZE = 4;
+	private static final int SIZE = 16;
 	private static RegionImageCache instance;
 	private CacheMap imageMap;
+	private long lastFlush;
 	private Set<RegionCoord> dirty;
 	
 	public synchronized static RegionImageCache getInstance() {
@@ -38,6 +42,20 @@ public class RegionImageCache  {
 	private RegionImageCache() {
 		imageMap = new CacheMap(SIZE);
 		dirty = new HashSet<RegionCoord>(SIZE);
+		lastFlush = System.currentTimeMillis() + 5000;
+		
+		// Init thread factory
+		JMThreadFactory tf = JMThreadFactory.getInstance();
+		
+		// Add shutdown hook to flush cache to disk
+		Runtime.getRuntime().addShutdownHook(tf.newThread(new Runnable() {
+			public void run() {				
+				flushToDisk();
+				if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+					JourneyMap.getLogger().fine("RegionImageCache flushing to disk on shutdown"); //$NON-NLS-1$
+				}
+			}
+		}));
 	}
 	
 	public boolean contains(RegionCoord rCoord) {
@@ -65,6 +83,9 @@ public class RegionImageCache  {
 				 regionImage = rfh.readRegionFile(rfh.getRegionFile(rCoord), rCoord, 1);
 				 imageMap.put(rCoord,  regionImage);
 				 dirty.add(rCoord);
+				 if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+					JourneyMap.getLogger().fine("RegionImageCache had to pull from disk: " + rCoord); //$NON-NLS-1$
+				 }
 			}
 		}
 		return regionImage;
@@ -82,6 +103,12 @@ public class RegionImageCache  {
 				dirty.add(rCoord);
 			}
 		}
+		if(lastFlush+30000<System.currentTimeMillis()) {
+			if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+				JourneyMap.getLogger().fine("RegionImageCache auto-flushing"); //$NON-NLS-1$
+			}
+			flushToDisk();
+		}
 	}
 	
 	private Boolean insertChunk(ChunkCoord cCoord, BufferedImage chunkImage, BufferedImage regionImage) {
@@ -91,7 +118,7 @@ public class RegionImageCache  {
 		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 		g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		
-		Boolean regionAltered = false;
+		Boolean regionAltered = true;
 		
 		int x,z;
 				
@@ -163,6 +190,7 @@ public class RegionImageCache  {
 				//JourneyMap.getLogger().info("Flushing to disk: " + dirtyRC);
 			}
 		}
+		lastFlush = System.currentTimeMillis();
 	}
 
 	public void clear() {
