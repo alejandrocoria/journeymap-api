@@ -25,6 +25,7 @@ import net.minecraft.src.NibbleArray;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldChunkManager;
+import net.techbrew.mcjm.render.MapBlocks;
 
 public class ChunkStub {
 
@@ -163,7 +164,7 @@ public class ChunkStub {
     	y = this.heightMap[z << 4 | x];
     	while(id==0) {    		
     		id = getBlockID(x,y,z); 
-    		if(id==0||id==31||id==32||id==83||id==141||id==142) {
+    		if(MapBlocks.excludeHeight.contains(id)) {
     			y=y-1;
     		}
     		if(y==0) {
