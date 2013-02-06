@@ -23,6 +23,7 @@ public class JMServer {
 		port = PropertyManager.getInstance().getInteger(PropertyManager.WEBSERVER_PORT_PROP);
 		props.put("port", Integer.toString(port)); //$NON-NLS-1$
 		props.put("delay", Integer.toString(10000)); //$NON-NLS-1$
+		props.put("timeout", Integer.toString(10000)); //$NON-NLS-1$
 		
 		// Instantiate daemon
 		rupy = new Daemon(props);
