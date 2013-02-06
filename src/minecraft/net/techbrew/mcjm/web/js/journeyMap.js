@@ -1,7 +1,7 @@
 
-var mapScale = 2;
+var mapScale = 4;
 var minMapScale = 1;
-var maxMapScale = 8;
+var maxMapScale = 16;
 var smoothScale = false;
 var mapBounds = {x1:0,z1:0,x2:0,z2:0};
 
@@ -21,7 +21,7 @@ var canvas;
 var bgCanvas;
 var fgCanvas;
 
-var isScroll=false;
+var userPanning=false;
 var mx,my;
 var msx,msy;
 
@@ -113,7 +113,7 @@ var initUI = function() {
 	
 	// Ensure messages are loaded first.
 	if(!JM.messages) {
-		console.log("initUI called without JM.messages"); // shouldn't happen
+		logEntry("initUI called without JM.messages"); // shouldn't happen
 		loadMessages();
 		return;
 	}
@@ -283,7 +283,7 @@ var initWorld = function() {
 	
 	logEntry("initWorld");
 	
-	console.log("Initializing world...");
+	logEntry("Initializing world...");
     
     // Clear existing timers (if any)
 	clearTimers();
@@ -343,7 +343,7 @@ var initImages = function() {
 			.css("position", "absolute")
 			.css("height", "64px")
 			.css("width", "64px")
-			.css("cursor", "hand")
+			.css("cursor", "pointer")
 			.click(function(){
 				if(centerOnPlayer===false) {
 			        setCenterOnPlayer(true);
@@ -485,7 +485,7 @@ function setMapType(mapType) {
       $("#dayButton").removeClass("active");
       $("#nightButton").addClass("active");
    } else {
-      console.log("Error: Can't set mapType: " + mapType);
+      logEntry("Error: Can't set mapType: " + mapType);
    }
    
    if(JM.player.underground!==true) {
@@ -681,7 +681,7 @@ var refreshMapImage = function(callback) {
 	
 	$(tempMapImage).load(function() {
         if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth === 0) {
-            console.log('Map image incomplete!');
+            logEntry('Map image incomplete!');
         } else {
         	latestMapImage = $(tempMapImage)[0];
         }             
@@ -734,7 +734,7 @@ var updateMap = function() {
 	
    logEntry("updateMap");
 	
-   if(isScroll===false && updatingMap===false) {
+   if(userPanning===false && updatingMap===false) {
 	   	   
 		updatingMap = true;
 		
@@ -748,13 +748,13 @@ var updateMap = function() {
 		// Retrieve the map image, then draw it with entities
 		refreshMapImage(function() {
 								
-			var start = new Date().getTime();
+//			var start = new Date().getTime();
 			var success = drawMap();
 			updatingMap = false;
-			var stop = new Date().getTime();
-			if(success!==false) {
-				console.log("Redrew map: " + (stop-start) + "ms");
-			}
+//			var stop = new Date().getTime();
+//			if(success!==false) {
+//				logEntry("Redrew map: " + (stop-start) + "ms");
+//			}
 			
 			if(immediateUpdateMap===true) {
 				immediateUpdateMap = false;
@@ -781,7 +781,7 @@ var handleError = function(data, error, jqXHR) {
 	// Secondary errors will be ignored
 	if(halted===true) return;
 	
-	console.log("Server returned error: " + data.status + ": " + jqXHR);
+	logEntry("Server returned error: " + data.status + ": " + jqXHR);
 	
 	$(".jmtoggle").each(function(){$(this).hide()});
 	$("#worldInfo").hide();
@@ -792,8 +792,10 @@ var handleError = function(data, error, jqXHR) {
 	if(data.status===503 || data.status===0) {
 		if(JM.messages.error_world_not_opened) {
 			displayError = JM.messages.error_world_not_opened;
-		} else {
+		} else if(data.statusText) {
 			displayError = data.statusText;
+		} else {
+			displayError = "";
 		}
 	}	
 
@@ -801,7 +803,7 @@ var handleError = function(data, error, jqXHR) {
 	$('body').css('backgroundColor',mapBackground); 
     sizeMap();
     
-    var ctx = getContext();
+    var ctx = canvas.getContext("2d");
     
     if(!JmIcon) {
     	JmIcon = new Image();
@@ -828,7 +830,7 @@ var handleError = function(data, error, jqXHR) {
     // Restart in 5 seconds
 	if(!halted) {
 		halted = true;
-		console.log("Will re-check game state in 5 seconds.");
+		logEntry("Will re-check game state in 5 seconds.");
 		setTimeout(function(){
 			
 			halted = false;
@@ -852,6 +854,11 @@ var handleError = function(data, error, jqXHR) {
 var drawMap = function() {
 	
    logEntry("drawMap");
+   
+   if(userPanning===true) {
+	   logEntry("Can't draw while userPanning");
+	   return false;
+   }
    
    if(drawingMap===true) {
 	   logEntry("Avoided concurrent drawMap()");
@@ -898,10 +905,11 @@ var drawMap = function() {
 	  ctx.drawImage(fgCanvas, 0,0, canvasWidth, canvasHeight);
    }
    
-   // Update player position
-   drawPlayer();
    
    drawingMap = false;
+   
+   // Update player position
+   drawPlayer();
 
 }
 
@@ -910,6 +918,8 @@ var drawMap = function() {
 var drawPlayer = function(canvasWidth, canvasHeight, xOffset, zOffset) {
 	
    logEntry("drawPlayer");
+   
+   if(drawingMap===true || userPanning===true) return;
    
    if(!canvasWidth || !canvasHeight) {
 		canvasWidth = getCanvasWidth();
@@ -929,15 +939,17 @@ var drawPlayer = function(canvasWidth, canvasHeight, xOffset, zOffset) {
       z<=canvasHeight) {     
        
 	   // Get player location value
-	   var loc = $("#playerLocation")[0];
+	   var loc = JM.player.posX + "," + JM.player.posZ + "  (" + JM.player.posY + ")"
 	   
        // Update player image
+	   var cursor = (centerOnPlayer===true) ? "default" : "pointer";
        var rotate = "rotate(" + player.heading + "deg)";
        $("#playerImage")
        		.attr('title', loc)
        		.css("left", x-32)
        		.css("top", z-32)
        		.css("zIndex", 2)
+       		.css("cursor", cursor)
        		.css("-webkit-transform", rotate)
        		.css("-moz-transform", rotate)
        		.css("-o-transform", rotate)
@@ -1136,7 +1148,7 @@ var drawBackgroundCanvas = function(canvasWidth, canvasHeight) {
 	    	// Copy pixels and scale with code-generated squares
 		    ctx.drawImage(latestMapImage,0,0);
 			var imgData = ctx.getImageData(0,0,width,height).data;
-			ctx.clearRect(0,0,width,height);
+			//ctx.clearRect(0,0,width,height);
 			
 			for (var x=0;x<width;++x){
 				for (var y=0;y<height;++y){
@@ -1185,16 +1197,16 @@ function myUp(e){
    var mouseDragY = (my-msy);
    if(mouseDragX===0 && mouseDragY===0) 
    {
-      isScroll=false;
+      userPanning=false;
    }
-   if(isScroll){
+   if(userPanning===true){
 
       var xOffset = Math.floor(mouseDragX / chunkScale);
       var zOffset = Math.floor(mouseDragY / chunkScale);
 
       mapBounds.x1 = mapBounds.x1 - xOffset -1;
       mapBounds.z1 = mapBounds.z1 - zOffset -1;
-      isScroll=false;
+      userPanning=false;
       
       updateMap();
    }
@@ -1265,8 +1277,9 @@ function scrollCanvas(e){
 	
    if(halted===true) return;
    
+   $("#playerImage").hide();
    $('body').css('cursor', 'move');
-   isScroll=true;
+   userPanning=true;
    getMouse(e);
    msx=mx;
    msy=my;
@@ -1276,7 +1289,7 @@ function scrollCanvas(e){
 
 var scrollingCanvas = function(e){
    
-   if(isScroll) {
+   if(userPanning===true) {
 	  $('body').css('cursor', 'move');
       getMouse(e);
 
@@ -1288,22 +1301,23 @@ var scrollingCanvas = function(e){
       if(Math.abs(xOffset)>0 || Math.abs(zOffset)>0) {
         setCenterOnPlayer(false);
       } 
-
-      var ctx = canvas.getContext("2d");
+      
       var canvasWidth = getCanvasWidth();
       var canvasHeight = getCanvasHeight();
-      
-      // Draw background
+      var drawX = xOffset*chunkScale;
+      var drawZ = zOffset*chunkScale;
+
+      // Clear canvas
+      var ctx = canvas.getContext("2d");
       ctx.globalAlpha = 1;
       ctx.fillStyle = mapBackground;
       ctx.fillRect(0, 0, canvasWidth, canvasHeight);
       
-      // Draw background with offset
-      var drawX = xOffset*chunkScale;
-      var drawZ = zOffset*chunkScale;
-      ctx.drawImage(bgCanvas, drawX, drawZ);
-      ctx.drawImage(fgCanvas, drawX, drawZ);
-      drawPlayer(canvasWidth, canvasHeight, drawX, drawZ);
+      if(drawingMap!==true) {
+	      ctx.drawImage(bgCanvas, drawX, drawZ);
+	      ctx.drawImage(fgCanvas, drawX, drawZ);
+	      drawPlayer(canvasWidth, canvasHeight, drawX, drawZ);
+      }
       
    } else {
 	  logEntry("scrollingCanvas done");
