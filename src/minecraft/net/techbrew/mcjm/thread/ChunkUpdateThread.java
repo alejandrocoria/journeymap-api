@@ -166,7 +166,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 					double time = (double) updateTime.get();
 					double avg = time/counter;
 					
-					//System.out.println("*** Chunks rendered with " + chunkRenderer.getClass().getSimpleName() + ": " + (int) counter + " / Average: " + avg + " ms each");
+					System.out.println("*** Chunks rendered with " + chunkRenderer.getClass().getSimpleName() + ": " + (int) counter + " / Average: " + avg + " ms each");
 					
 					if(counter==100) {
 						updateCounter.set(0);
@@ -189,67 +189,56 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 		HashMap<Integer,ChunkStub> tempChunkStubs = new HashMap<Integer,ChunkStub>();
 		int unloadedChunks = 0;
 		
-		// First Pass				
-		if (playerChunkX != lastChunkX || playerChunkZ!=lastChunkZ || playerChunkY != lastChunkY) {
-			
-			// Player has moved
-			lastChunkX = playerChunkX;
-			lastChunkY = playerChunkY;
-			lastChunkZ = playerChunkZ;
 
-			// Stub surrounding chunks
-			int offset = journeyMap.getChunkOffset();
-			if(offset>2) {
-				if(underground) {
-					offset--;
-				}
+		lastChunkX = playerChunkX;
+		lastChunkY = playerChunkY;
+		lastChunkZ = playerChunkZ;
+
+		// Stub surrounding chunks
+		int offset = journeyMap.getChunkOffset();
+		if(offset>2) {
+			if(underground) {
+				offset--;
 			}
+			if (playerChunkX == lastChunkX && playerChunkZ==lastChunkZ) {
+				offset=2;
+			}
+		}
 
-			int startX = playerChunkX - offset;
-			int endX = playerChunkX + offset;
-			int startZ = playerChunkZ - offset;
-			int endZ = playerChunkZ + offset;
-	 
-			// First pass = chunks to map
-			for(int x = startX;x<=endX;x++) {
-				for(int z=startZ;z<=endZ;z++) {
+		int startX = playerChunkX - offset;
+		int endX = playerChunkX + offset;
+		int startZ = playerChunkZ - offset;
+		int endZ = playerChunkZ + offset;
+ 
+		// First pass = chunks to map
+		for(int x = startX;x<=endX;x++) {
+			for(int z=startZ;z<=endZ;z++) {
+				if(theWorld.getChunkProvider().chunkExists(x,z)) {
+					Chunk chunk = Utils.getChunkIfAvailable(theWorld, x, z);
+					if(chunk!=null) {
+						ChunkStub stub = new ChunkStub(chunk, true, theWorld, hash); // doMap
+						tempChunkStubs.put(stub.hashCode(), stub);
+						continue;
+					} 
+				}
+				unloadedChunks++;
+			}
+		}
+		
+		// Second pass = bordering chunks needed for heightmaps
+		for(int x = startX;x<=endX;x++) {
+			for(int z=startZ;z<=endZ;z++) {
+				if(x==startX || x==endX || z==startZ || z==endZ) {
 					if(theWorld.getChunkProvider().chunkExists(x,z)) {
 						Chunk chunk = Utils.getChunkIfAvailable(theWorld, x, z);
-						if(chunk!=null) {
-							ChunkStub stub = new ChunkStub(chunk, true, theWorld, hash); // doMap
-							tempChunkStubs.put(stub.hashCode(), stub);
+						if(chunk!=null) {					
+							ChunkStub stub = new ChunkStub(chunk, false, theWorld, hash); // do not Map
+							unloadedChunks += ensureNeighbors(stub);
 							continue;
 						} 
 					}
-					unloadedChunks++;
+					unloadedChunks++;						
 				}
-			}
-			
-			// Second pass = bordering chunks needed for heightmaps
-			for(int x = startX;x<=endX;x++) {
-				for(int z=startZ;z<=endZ;z++) {
-					if(x==startX || x==endX || z==startZ || z==endZ) {
-						if(theWorld.getChunkProvider().chunkExists(x,z)) {
-							Chunk chunk = Utils.getChunkIfAvailable(theWorld, x, z);
-							if(chunk!=null) {					
-								ChunkStub stub = new ChunkStub(chunk, false, theWorld, hash); // do not Map
-								unloadedChunks += ensureNeighbors(stub);
-								continue;
-							} 
-						}
-						unloadedChunks++;						
-					}
-				}
-			}
-			
-		} else {
-			// Just stub the current chunk
-			if(playerChunk!=null) {
-				ChunkStub stub = new ChunkStub(JourneyMap.getLastPlayerChunk());
-				tempChunkStubs.put(stub.hashCode(), stub);
-				unloadedChunks += ensureNeighbors(stub);
-			} else {
-				JourneyMap.getLogger().warning("Unexpected state: Null playerChunk.");
 			}
 		}
 		
