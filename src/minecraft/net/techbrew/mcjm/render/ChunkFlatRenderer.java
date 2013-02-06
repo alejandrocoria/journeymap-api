@@ -58,77 +58,27 @@ public class ChunkFlatRenderer implements IChunkRenderer {
 			g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 			g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 
-			renderloop: if (underground) {
-				// Underground / interior map
-				for (int x = 0; x < 16; x++) {
-					for (int z = 0; z < 16; z++) {
-						if (!JourneyMap.isRunning()) {
-							if (fineLogging) {
-								JourneyMap.getLogger().fine(
-										"Interupting render of chunk."); //$NON-NLS-1$
-							}
-							break renderloop;
-						}
-						try {
-							if (chunkStub.hasNoSky) {
-								if (chunkStub.worldType == -1) {
-									paintNetherBlock(chunkStub, x, vSlice, z,
-											g2D, neighbors);
-								} else if (chunkStub.worldType == 1) {
-									paintEndBlock(chunkStub, x, vSlice, z, g2D,
-											neighbors);
-								}
-							} else {
-								paintUndergroundBlock(chunkStub, x, vSlice, z, g2D, neighbors);
-							}
-
-						} catch (ArrayIndexOutOfBoundsException e) {
-							JourneyMap.getLogger().log(Level.WARNING,
-									LogFormatter.toString(e));
-							return null; // Can happen when server isn't
-											// connected, just wait for next
-											// tick
-						} catch (Throwable t) {
-							String error = Constants.getMessageJMERR07(LogFormatter.toString(t));
-							JourneyMap.getLogger().severe(error);
-							return null;
-						}
-					}
+			try {
+				
+				if (chunkStub.worldType == -1) {
+					paintNetherBlocks(chunkStub, vSlice, g2D, neighbors);
+				} else if (chunkStub.worldType == 1) {
+					paintEndBlocks(chunkStub, vSlice, g2D, neighbors);
+				} else if (underground || chunkStub.hasNoSky) {
+					paintUndergroundBlocks(chunkStub, vSlice, g2D, neighbors);
+				} else {
+					paintNormalBlocks(chunkStub, g2D, neighbors);
 				}
 
-			} else {
-				// Surface map
-				//System.out.println("---------------");
-				for (int x = 0; x < 16; x++) {
-					for (int z = 0; z < 16; z++) {
-						int y = chunkStub.getSafeHeightValue(x, z);
-						// Weird data error seen on World of Keralis
-						if (y < 0) {
-							if (fineLogging) {
-								JourneyMap.getLogger().fine(
-										"Unexpected height from heightmap at " //$NON-NLS-1$
-												+ x + "," + z + ": " + y); //$NON-NLS-1$ //$NON-NLS-2$
-							}
-							return null;
-						}
-						try {
-							// Paint the block
-							paintNormalBlock(chunkStub, x, y, z, g2D, true, neighbors);
-						} catch (ArrayIndexOutOfBoundsException e) {
-							// Can happen when server isn't connected, just wait
-							// for
-							// next tick
-							JourneyMap.getLogger().log(Level.WARNING,
-									LogFormatter.toString(e));
-							return null;
-						} catch (Throwable t) {
-							String error = Constants.getMessageJMERR07(LogFormatter.toString(t));
-							JourneyMap.getLogger().severe(error);
-							return null;
-						} 
-					}
-				}
+			} catch (ArrayIndexOutOfBoundsException e) {
+				JourneyMap.getLogger().log(Level.WARNING, LogFormatter.toString(e));
+				return null; // Can happen when server isn't connected, just wait for next tick
+			} catch (Throwable t) {
+				String error = Constants.getMessageJMERR07(LogFormatter.toString(t));
+				JourneyMap.getLogger().severe(error);
+				return null;
 			}
+			
 		} finally {
 			if (chunkImage == null) {
 				chunkImage = getPlaceholderChunk();
@@ -139,190 +89,218 @@ public class ChunkFlatRenderer implements IChunkRenderer {
 	}
 
 	@SuppressWarnings("unused")
-	public void paintNormalBlock(ChunkStub chunkStub, int x, int y, int z, Graphics2D g2D,
-			boolean checkDepth, Map<Integer,ChunkStub> neighbors) {
+	public void paintNormalBlocks(ChunkStub chunkStub, Graphics2D g2D, Map<Integer,ChunkStub> neighbors) {
 		
-		int[] blockInfo = MapBlocks.getBlockInfo(chunkStub, x, y, z);
-		
-		if (blockInfo == null) {
-			paintBadBlock(x, y, z, g2D);
-			return;
-		}
-		
-		if(blockInfo[0]==0 || blockInfo[0]==106) {			
-			//JourneyMap.getLogger().info("Lowering block height: " + x + "," + y + "," + z);
-			paintNormalBlock(chunkStub, x, y-1, z, g2D, checkDepth, neighbors);
-			return;
-		}
-
-		boolean useAlpha = mapBlocks.getBlockAlpha(blockInfo) < 1F;
-		boolean isWater = (blockInfo[0] == 8 || blockInfo[0] == 9 || blockInfo[0] == 79);		
-		
-		// Check for snow, torches, fence
-		if(!useAlpha) {
-			
-			int[] upOneBlock = MapBlocks.getBlockInfo(chunkStub, x, y+1, z);
-			if(Arrays.binarySearch(SPECIAL_BLOCK_IDS, upOneBlock[0])>-1) { 
-				blockInfo = upOneBlock;
-			}
-
-		} 
-		
-		// Get base color for block
-		Color color = mapBlocks.getBlockColor(chunkStub, blockInfo, x, y, z);
-		if(color==null) {
-			paintBadBlock(x, y, z, g2D);
-			return;
-		}
-			
-		// Paint deeper blocks if alpha used
-		if (useAlpha && checkDepth) {
-
-			// See how deep the alpha goes
-			int depth;
-			for (depth = 1; depth < 5; depth++) {
-				int[] iBlock = MapBlocks.getBlockInfo(chunkStub, x, Math.max(0, y - depth), z);
-				if (iBlock[0]==0 || mapBlocks.getBlockAlpha(iBlock)==0) {
-					break;
-				}					
-			}
-
-			// Start with color
-			g2D.setComposite(MapBlocks.OPAQUE);
-			g2D.setPaint(color);
-			g2D.fillRect(x, z, 1, 1);
-
-			// Paint from the bottom up
-			for (int i = depth; i > 0; i--) {
-				if(y-i<0) break;
-				paintNormalBlock(chunkStub, x, y - i, z, g2D, false, neighbors);
-			}
-		}
-
-		// Get alpha for final block
-		float alpha = 1F;
-		if (useAlpha) {			
-			alpha = mapBlocks.getBlockAlpha(blockInfo);
-			if(alpha==0F) {
-				g2D.setComposite(MapBlocks.CLEAR);
-			} else if(alpha==1F) {
-				g2D.setComposite(MapBlocks.OPAQUE);
-			} else {
-				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-			}
-			
-		} 
-
-		// One last safety check
-		if(color==null) {
-			paintBadBlock(x, y, z, g2D);
-			return;
-		}
-
-		// Draw block
-		g2D.setPaint(color);
-		g2D.fillRect(x, z, 1, 1);
-
-		// Get light level
-		int lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,y + 1, z);
-		if (lightLevel < 15) {
-			float diff = Math.min(1F, (lightLevel / 15F) + 0.07F);
-			float[] rgb = new float[4];
-			rgb = color.getRGBColorComponents(rgb);
-			color = new Color(mapBlocks.safeColor(rgb[0] * diff),
-					mapBlocks.safeColor(rgb[1] * diff), mapBlocks.safeColor(rgb[2] * diff));
-		}
-
-		// Draw lighted block
-		g2D.setComposite(MapBlocks.OPAQUE);
-		g2D.setPaint(color);
-		g2D.fillRect(x + 16, z, 1, 1);
-
-	}
-	
-	
-
-	public void paintUndergroundBlock(ChunkStub chunkStub, final int x,
-			final int vSlice, final int z, final Graphics2D g2D, Map<Integer, ChunkStub> neighbors) {
-
-		try {
-			int sliceMinY = Math.max((vSlice << 4) - 1, 0);
-			int sliceMaxY = Math.min(((vSlice + 1) << 4) - 1, chunkStub.getSafeHeightValue(x, z)-1);
-			if (sliceMinY == sliceMaxY) {
-				sliceMaxY += 2;
-			}
-			if (blockOpenToSky(chunkStub, x, sliceMinY, z)) {
-				paintClearBlock(x, vSlice, z, g2D);
-				return;
-			}
-
-			boolean hasAir = false;
-			int blockId = -1;
-			int paintY = -1;
-			int lightLevel = -1;
-
-			int y = sliceMaxY;
-			while (blockOpenToSky(chunkStub, x, y, z)) {
-				if (y <= sliceMinY) {
-					paintClearBlock(x, vSlice, z, g2D);
+		boolean fineLogging = JourneyMap.getLogger().isLoggable(Level.FINE);
+		for (int x = 0; x < 16; x++) {
+			for (int z = 0; z < 16; z++) {
+				
+				int y = chunkStub.getSafeHeightValue(x, z);
+				// Weird data error seen on World of Keralis
+				if (y < 0) {
+					if (fineLogging) {
+						JourneyMap.getLogger().fine(
+								"Unexpected height from heightmap at " //$NON-NLS-1$
+										+ x + "," + z + ": " + y); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 					return;
 				}
-				y--;
-			}
+				
+				///////////////////////////////////////////////////////
+				
+				BlockInfo blockInfo = MapBlocks.getBlockInfo(chunkStub, x, y, z);
+				
+				if (blockInfo == null) {
+					paintBadBlock(x, y, z, g2D);
+					return;
+				}			
 
-			for (; y > 0; y--) {
-				blockId = chunkStub.getBlockID(x, y, z);
+				boolean useAlpha = mapBlocks.getBlockAlpha(blockInfo) < 1F;
+				boolean isWater = (blockInfo.id == 8 || blockInfo.id == 9 || blockInfo.id == 79);		
+				
+				// Check for snow, torches, fence
+//				if(!useAlpha) {
+//					
+//					BlockInfo upOneBlock = MapBlocks.getBlockInfo(chunkStub, x, y+1, z);
+//					if(Arrays.binarySearch(SPECIAL_BLOCK_IDS, upOneBlock.id)>-1) { 
+//						blockInfo = upOneBlock;
+//					}
+//
+//				} 
+				
+				// Get base color for block
+				Color color = mapBlocks.getBlockColor(chunkStub, blockInfo, x, y, z);
+				if(color==null) {
+					paintBadBlock(x, y, z, g2D);
+					return;
+				}
+					
+				// Paint deeper blocks if alpha used
+				float alpha = 1F;
+				if (useAlpha) {
 
-				if (!hasAir && y <= sliceMinY) {
-					break;
+					// See how deep the alpha goes
+					BlockInfo[] stack = new BlockInfo[5];
+					int depth;
+					for (depth = 1; depth < 5; depth++) {
+						BlockInfo iBlock = MapBlocks.getBlockInfo(chunkStub, x, Math.max(0, y - depth), z);
+						stack[depth-1] = iBlock;
+						if (iBlock.id==0 || mapBlocks.getBlockAlpha(iBlock)==0) {
+							break;
+						}					
+					}
+
+					// TODO: Ensure bottom color is opaque
+					// Paint from the bottom up
+					for (int i = stack.length-1; i >= 0; i--) {
+						if(stack[i]==null) continue;
+						alpha = mapBlocks.getBlockAlpha(stack[i]);
+						if(alpha==0F) {
+							g2D.setComposite(MapBlocks.CLEAR);
+						} else if(alpha==1F) {
+							g2D.setComposite(MapBlocks.OPAQUE);
+						} else {
+							g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+						}						
+						g2D.setPaint(mapBlocks.getBlockColor(chunkStub, stack[i], x, y, z));
+						g2D.fillRect(x, z, 1, 1);
+					}
 				}
 
-				if (blockId == 0) {
-					hasAir = true;
-				} else if (hasAir && paintY == -1) {
-					paintY = y;
-					lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
-					if (lightLevel > 1)
-						break;
+				// Get alpha for final block
+				
+				if (useAlpha) {			
+					alpha = mapBlocks.getBlockAlpha(blockInfo);
+					if(alpha==0F) {
+						g2D.setComposite(MapBlocks.CLEAR);
+					} else if(alpha==1F) {
+						g2D.setComposite(MapBlocks.OPAQUE);
+					} else {
+						g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+					}
+					
+				} 
+
+				// One last safety check
+				if(color==null) {
+					paintBadBlock(x, y, z, g2D);
+					return;
 				}
+
+				// Draw block
+				g2D.setPaint(color);
+				g2D.fillRect(x, z, 1, 1);
+
+				// Get light level
+				int lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,y + 1, z);
+				if (lightLevel < 15) {
+					float diff = Math.min(1F, (lightLevel / 15F) + 0.07F);
+					float[] rgb = new float[4];
+					rgb = color.getRGBColorComponents(rgb);
+					color = new Color(mapBlocks.safeColor(rgb[0] * diff),
+							mapBlocks.safeColor(rgb[1] * diff), mapBlocks.safeColor(rgb[2] * diff));
+				}
+
+				// Draw lighted block
+				g2D.setComposite(MapBlocks.OPAQUE);
+				g2D.setPaint(color);
+				g2D.fillRect(x + 16, z, 1, 1);
+				
+				
 			}
+		}
+		
+	}
+	
+	public void paintUndergroundBlocks(ChunkStub chunkStub, final int vSlice, final Graphics2D g2D,
+			Map<Integer, ChunkStub> neighbors) {
 
-			// Block isn't viable to paint
-			if (paintY == -1) {
-				paintClearBlock(x, vSlice, z, g2D);
-				return;
+		boolean fineLogging = JourneyMap.getLogger().isLoggable(Level.FINE);
+		for (int x = 0; x < 16; x++) {
+			for (int z = 0; z < 16; z++) {
+
+				
+				try {
+					int sliceMinY = Math.max((vSlice << 4) - 1, 0);
+					int sliceMaxY = Math.min(((vSlice + 1) << 4) - 1, chunkStub.getSafeHeightValue(x, z)-1);
+					if (sliceMinY == sliceMaxY) {
+						sliceMaxY += 2;
+					}
+					if (blockOpenToSky(chunkStub, x, sliceMinY, z)) {
+						paintClearBlock(x, vSlice, z, g2D);
+						return;
+					}
+		
+					boolean hasAir = false;
+					int blockId = -1;
+					int paintY = -1;
+					int lightLevel = -1;
+		
+					int y = sliceMaxY;
+					while (blockOpenToSky(chunkStub, x, y, z)) {
+						if (y <= sliceMinY) {
+							paintClearBlock(x, vSlice, z, g2D);
+							return;
+						}
+						y--;
+					}
+		
+					for (; y > 0; y--) {
+						blockId = chunkStub.getBlockID(x, y, z);
+		
+						if (!hasAir && y <= sliceMinY) {
+							break;
+						}
+		
+						if (blockId == 0) {
+							hasAir = true;
+						} else if (hasAir && paintY == -1) {
+							paintY = y;
+							lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
+							if (lightLevel > 1)
+								break;
+						}
+					}
+		
+					// Block isn't viable to paint
+					if (paintY == -1) {
+						paintClearBlock(x, vSlice, z, g2D);
+						return;
+					}
+		
+					// Too dark
+					if (caveLighting && lightLevel < 2) {
+						paintClearBlock(x, vSlice, z, g2D);
+						return;
+					}
+		
+					// Get block color
+					BlockInfo block = MapBlocks.getBlockInfo(chunkStub, x, paintY, z);
+					Color color = mapBlocks.getBlockColor(chunkStub, block, x, y, z);
+		
+					// Get light level
+					if (caveLighting && lightLevel < 15) {
+						float darken = Math.min(1F, (lightLevel / 16F));
+						float[] rgb = new float[4];
+						rgb = color.getRGBColorComponents(rgb);
+						color = new Color(rgb[0] * darken, rgb[1] * darken, rgb[2]
+								* darken);
+					}
+		
+					// Draw lighted block
+					g2D.setComposite(MapBlocks.OPAQUE);
+					g2D.setPaint(color);
+					g2D.fillRect(x, z, 1, 1);
+		
+				} catch (Throwable t) {
+					paintBadBlock(x, vSlice, z, g2D);
+					String error = Constants.getMessageJMERR07("x,vSlice,z = " + x + "," //$NON-NLS-1$ //$NON-NLS-2$
+							+ vSlice + "," + z + " : " + t.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+					JourneyMap.getLogger().severe(error);
+					JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
+				}
+				
 			}
-
-			// Too dark
-			if (caveLighting && lightLevel < 2) {
-				paintClearBlock(x, vSlice, z, g2D);
-				return;
-			}
-
-			// Get block color
-			int[] block = MapBlocks.getBlockInfo(chunkStub, x, paintY, z);
-			Color color = mapBlocks.getBlockColor(chunkStub, block, x, y, z);
-
-			// Get light level
-			if (caveLighting && lightLevel < 15) {
-				float darken = Math.min(1F, (lightLevel / 16F));
-				float[] rgb = new float[4];
-				rgb = color.getRGBColorComponents(rgb);
-				color = new Color(rgb[0] * darken, rgb[1] * darken, rgb[2]
-						* darken);
-			}
-
-			// Draw lighted block
-			g2D.setComposite(MapBlocks.OPAQUE);
-			g2D.setPaint(color);
-			g2D.fillRect(x, z, 1, 1);
-
-		} catch (Throwable t) {
-			paintBadBlock(x, vSlice, z, g2D);
-			String error = Constants.getMessageJMERR07("x,vSlice,z = " + x + "," //$NON-NLS-1$ //$NON-NLS-2$
-					+ vSlice + "," + z + " : " + t.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
-			JourneyMap.getLogger().severe(error);
-			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
 		}
 
 	}
@@ -335,175 +313,185 @@ public class ChunkFlatRenderer implements IChunkRenderer {
 		return false;
 	}
 
-	public void paintNetherBlock(ChunkStub chunkStub, final int x,
-			final int vSlice, final int z, final Graphics2D g2D,
+	public void paintNetherBlocks(ChunkStub chunkStub, final int vSlice, final Graphics2D g2D,
 			Map<Integer, ChunkStub> neighbors) {
 
-		try {
-			int sliceMinY = Math.max((vSlice << 4) - 1, 0);
-			int sliceMaxY = Math.min(((vSlice + 1) << 4) - 1, 128);
-			if (sliceMinY == sliceMaxY) {
-				sliceMaxY += 2;
-			}
-
-			String metaId = null;
-			boolean hasAir = false;
-			int blockId = -1;
-			int paintY = -1;
-			int lightLevel = -1;
-
-			int y = sliceMaxY;
-			for (; y > 0; y--) {
-				blockId = chunkStub.getBlockID(x, y, z);
-				// System.out.println("BlockId " + blockId);
-				// z + " (" + y + ")");
-
-				if (!hasAir && y <= sliceMinY) {
-					break;
-				}
-
-				if (blockId == 0) {
-					hasAir = true;
-				} else if (hasAir && paintY == -1) {
-					paintY = y;
+		boolean fineLogging = JourneyMap.getLogger().isLoggable(Level.FINE);
+		for (int x = 0; x < 16; x++) {
+			for (int z = 0; z < 16; z++) {
+		
+				try {
+					int sliceMinY = Math.max((vSlice << 4) - 1, 0);
+					int sliceMaxY = Math.min(((vSlice + 1) << 4) - 1, 128);
+					if (sliceMinY == sliceMaxY) {
+						sliceMaxY += 2;
+					}
+		
+					String metaId = null;
+					boolean hasAir = false;
+					int blockId = -1;
+					int paintY = -1;
+					int lightLevel = -1;
+		
+					int y = sliceMaxY;
+					for (; y > 0; y--) {
+						blockId = chunkStub.getBlockID(x, y, z);
+						// System.out.println("BlockId " + blockId);
+						// z + " (" + y + ")");
+		
+						if (!hasAir && y <= sliceMinY) {
+							break;
+						}
+		
+						if (blockId == 0) {
+							hasAir = true;
+						} else if (hasAir && paintY == -1) {
+							paintY = y;
+							lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
+							if (lightLevel > 1)
+								break;
+						}
+					}
+		
+					// Block isn't viable to paint
+					if (paintY == -1 || lightLevel < 0) {
+						paintClearBlock(x, vSlice, z, g2D);
+						return;
+					}
+		
+					blockId = chunkStub.getBlockID(x, paintY, z);
+		
 					lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
-					if (lightLevel > 1)
-						break;
+					if (lightLevel < 0) {
+						paintClearBlock(x, vSlice, z, g2D);
+						return; // how did we get here?
+					}
+		
+					// Get block color
+					BlockInfo block = MapBlocks.getBlockInfo(chunkStub, x, paintY, z);
+					Color color = mapBlocks.getBlockColor(chunkStub, block, x, y, z);
+		
+					// Contour shading
+					boolean isLava = (blockId == 10 || blockId == 11);
+		
+					// Get light level
+					if (lightLevel < 2)
+						lightLevel = 2;
+					if (lightLevel < 15) {
+						float darken = Math.min(1F, (lightLevel / 15F));
+						float[] rgb = new float[4];
+						rgb = color.getRGBColorComponents(rgb);
+						color = new Color(rgb[0] * darken, rgb[1] * darken, rgb[2]
+								* darken);
+					}
+		
+					// Draw lighted block
+					g2D.setComposite(MapBlocks.OPAQUE);
+					g2D.setPaint(color);
+					g2D.fillRect(x, z, 1, 1);
+		
+				} catch (Throwable t) {
+					paintBadBlock(x, vSlice, z, g2D);
+					String error = Constants.getMessageJMERR07("x,vSlice,z = " + x + "," //$NON-NLS-1$ //$NON-NLS-2$
+							+ vSlice + "," + z + " : " + t.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+					JourneyMap.getLogger().severe(error);
+					JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
 				}
+		
 			}
-
-			// Block isn't viable to paint
-			if (paintY == -1 || lightLevel < 0) {
-				paintClearBlock(x, vSlice, z, g2D);
-				return;
-			}
-
-			blockId = chunkStub.getBlockID(x, paintY, z);
-
-			lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
-			if (lightLevel < 0) {
-				paintClearBlock(x, vSlice, z, g2D);
-				return; // how did we get here?
-			}
-
-			// Get block color
-			int[] block = MapBlocks.getBlockInfo(chunkStub, x, paintY, z);
-			Color color = mapBlocks.getBlockColor(chunkStub, block, x, y, z);
-
-			// Contour shading
-			boolean isLava = (blockId == 10 || blockId == 11);
-
-			// Get light level
-			if (lightLevel < 2)
-				lightLevel = 2;
-			if (lightLevel < 15) {
-				float darken = Math.min(1F, (lightLevel / 15F));
-				float[] rgb = new float[4];
-				rgb = color.getRGBColorComponents(rgb);
-				color = new Color(rgb[0] * darken, rgb[1] * darken, rgb[2]
-						* darken);
-			}
-
-			// Draw lighted block
-			g2D.setComposite(MapBlocks.OPAQUE);
-			g2D.setPaint(color);
-			g2D.fillRect(x, z, 1, 1);
-
-		} catch (Throwable t) {
-			paintBadBlock(x, vSlice, z, g2D);
-			String error = Constants.getMessageJMERR07("x,vSlice,z = " + x + "," //$NON-NLS-1$ //$NON-NLS-2$
-					+ vSlice + "," + z + " : " + t.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
-			JourneyMap.getLogger().severe(error);
-			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
 		}
 
 	}
 	
 
-	public void paintEndBlock(ChunkStub chunkStub, final int x,
-			final int vSlice, final int z, final Graphics2D g2D,
+	public void paintEndBlocks(ChunkStub chunkStub, final int vSlice, final Graphics2D g2D,
 			Map<Integer, ChunkStub> neighbors) {
+		
+		for (int x = 0; x < 16; x++) {
+			for (int z = 0; z < 16; z++) {
 
-		try {
-			int sliceMinY = Math.max((vSlice << 4) - 1, 0);
-			int sliceMaxY = Math.min(((vSlice + 1) << 4) - 1, 128);
-			if (sliceMinY == sliceMaxY) {
-				sliceMaxY += 2;
-			}
-
-			String metaId = null;
-			boolean hasAir = false;
-			int blockId = -1;
-			int paintY = -1;
-			int lightLevel = -1;
-
-			int y = sliceMaxY;
-			for (; y > 0; y--) {
-				blockId = chunkStub.getBlockID(x, y, z);
-				// System.out.println("BlockId " + blockId);
-				// z + " (" + y + ")");
-
-				if (!hasAir && y <= sliceMinY) {
-					break;
-				}
-
-				if (blockId == 0) {
-					hasAir = true;
-				} else if (hasAir && paintY == -1) {
-					paintY = y;
+				try {
+					int sliceMinY = Math.max((vSlice << 4) - 1, 0);
+					int sliceMaxY = Math.min(((vSlice + 1) << 4) - 1, 128);
+					if (sliceMinY == sliceMaxY) {
+						sliceMaxY += 2;
+					}
+		
+					String metaId = null;
+					boolean hasAir = false;
+					int blockId = -1;
+					int paintY = -1;
+					int lightLevel = -1;
+		
+					int y = sliceMaxY;
+					for (; y > 0; y--) {
+						blockId = chunkStub.getBlockID(x, y, z);
+						// System.out.println("BlockId " + blockId);
+						// z + " (" + y + ")");
+		
+						if (!hasAir && y <= sliceMinY) {
+							break;
+						}
+		
+						if (blockId == 0) {
+							hasAir = true;
+						} else if (hasAir && paintY == -1) {
+							paintY = y;
+							lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
+							break;
+						}
+					}
+		
+					// Block isn't viable to paint
+					if (paintY == -1) {
+						paintClearBlock(x, vSlice, z, g2D);
+						return;
+					}
+		
+					blockId = chunkStub.getBlockID(x, paintY, z);
+		
 					lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
-					break;
+		
+					if (lightLevel < 10) {
+						lightLevel += 2;
+					}
+					
+					if(blockId==51 || blockId==200 || blockId==7) {
+						lightLevel = 15;
+					}		
+		
+					// Get block color
+					BlockInfo block = MapBlocks.getBlockInfo(chunkStub, x, paintY, z);
+					Color color = mapBlocks.getBlockColor(chunkStub, block, x, y,z);
+		
+					// Contour shading
+					if(blockId==121) {
+			
+						// Get light level
+						if (lightLevel < 15) {
+							float darken = Math.min(1F, (lightLevel / 15F));
+							float[] rgb = new float[4];
+							rgb = color.getRGBColorComponents(rgb);
+							color = new Color(rgb[0] * darken, rgb[1] * darken, rgb[2]
+									* darken);
+						}
+					}
+		
+					// Draw lighted block
+					g2D.setComposite(MapBlocks.OPAQUE);
+					g2D.setPaint(color);
+					g2D.fillRect(x, z, 1, 1);
+					
+					block = null;
+		
+				} catch (Throwable t) {
+					paintBadBlock(x, vSlice, z, g2D);
+					String error = Constants.getMessageJMERR07("x,vSlice,z = " + x + "," //$NON-NLS-1$ //$NON-NLS-2$
+							+ vSlice + "," + z + " : " + t.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+					JourneyMap.getLogger().severe(error);
+					JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
 				}
 			}
-
-			// Block isn't viable to paint
-			if (paintY == -1) {
-				paintClearBlock(x, vSlice, z, g2D);
-				return;
-			}
-
-			blockId = chunkStub.getBlockID(x, paintY, z);
-
-			lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
-
-			if (lightLevel < 10) {
-				lightLevel += 2;
-			}
-			
-			if(blockId==51 || blockId==200 || blockId==7) {
-				lightLevel = 15;
-			}		
-
-			// Get block color
-			int[] block = MapBlocks.getBlockInfo(chunkStub, x, paintY, z);
-			Color color = mapBlocks.getBlockColor(chunkStub, block, x, y,z);
-
-			// Contour shading
-			if(blockId==121) {
-	
-				// Get light level
-				if (lightLevel < 15) {
-					float darken = Math.min(1F, (lightLevel / 15F));
-					float[] rgb = new float[4];
-					rgb = color.getRGBColorComponents(rgb);
-					color = new Color(rgb[0] * darken, rgb[1] * darken, rgb[2]
-							* darken);
-				}
-			}
-
-			// Draw lighted block
-			g2D.setComposite(MapBlocks.OPAQUE);
-			g2D.setPaint(color);
-			g2D.fillRect(x, z, 1, 1);
-			
-			block = null;
-
-		} catch (Throwable t) {
-			paintBadBlock(x, vSlice, z, g2D);
-			String error = Constants.getMessageJMERR07("x,vSlice,z = " + x + "," //$NON-NLS-1$ //$NON-NLS-2$
-					+ vSlice + "," + z + " : " + t.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
-			JourneyMap.getLogger().severe(error);
-			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
 		}
 
 	}
@@ -512,10 +500,10 @@ public class ChunkFlatRenderer implements IChunkRenderer {
 			int sliceMinY, int sliceMaxY) {
 		int y = sliceMinY;
 
-		int[] blockInfo = null;
+		BlockInfo blockInfo = null;
 		while (y <= 1) {
 			blockInfo = MapBlocks.getBlockInfo(chunkStub, x, y, z);
-			if (blockInfo[0] != 0) {
+			if (blockInfo.id != 0) {
 				y++;
 			} else {
 				break;
@@ -524,7 +512,7 @@ public class ChunkFlatRenderer implements IChunkRenderer {
 
 		while (y >= 1) {
 			blockInfo = MapBlocks.getBlockInfo(chunkStub, x, y, z);
-			if (blockInfo[0] == 0) {
+			if (blockInfo.id == 0) {
 				y--;
 			} else {
 				break;
