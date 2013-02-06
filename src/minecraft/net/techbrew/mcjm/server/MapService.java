@@ -6,6 +6,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -153,9 +154,9 @@ public class MapService extends BaseService {
 	 * @param depth
 	 * @throws IOException
 	 */
-	private static synchronized void mergeImageChunks(Event event, File worldDir, int x1, int z1,
+	private synchronized void mergeImageChunks(Event event, File worldDir, int x1, int z1,
 			int x2, int z2, Constants.MapType mapType, int depth, int worldProviderType, int canvasWidth, int canvasHeight)
-			throws IOException {
+			throws Exception {
 		
 		long start = 0, stop = 0;
 		final Constants.CoordType cType = Constants.CoordType.convert(mapType, worldProviderType);
@@ -167,16 +168,20 @@ public class MapService extends BaseService {
 		
 		// Headers
 		ResponseHeader.on(event).contentType(ContentType.png).noCache();
-
-		ImageOutputStream ios = ImageIO.createImageOutputStream(event.output());
-		ImageIO.write(mergedImg, "png", ios); //$NON-NLS-1$
 		
-		ios.flush();
-		ios.close();
+		// Image to byte array			
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(mergedImg, "png", baos);
+		baos.flush();
+		byte[] imageInBytes = baos.toByteArray();
+		baos.close();
+			
+		// Gzip the image and respond with it
+		gzipResponse(event, imageInBytes);
 		
-		if(JourneyMap.getLogger().isLoggable(Level.FINER)) {
+		if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
 			stop = System.currentTimeMillis();
-			JourneyMap.getLogger().finer("mergeImageChunks time: "  + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
+			JourneyMap.getLogger().fine("gzip and respond time: "  + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 	}
