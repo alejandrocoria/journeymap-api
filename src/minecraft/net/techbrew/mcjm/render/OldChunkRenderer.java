@@ -126,20 +126,20 @@ public class OldChunkRenderer implements IChunkRenderer {
 	public void paintNormalBlock(ChunkStub chunkStub, int x, int y, int z, Graphics2D g2D,
 			boolean checkDepth, Map<Integer,ChunkStub> neighbors) {
 		
-		int[] blockInfo = MapBlocks.getBlockInfo(chunkStub, x, y, z);
+		BlockInfo blockInfo = MapBlocks.getBlockInfo(chunkStub, x, y, z);
 		if (blockInfo == null) {
 			paintBadBlock(x, y, z, g2D);
 			return;
 		}
 
 		boolean useAlpha = mapBlocks.getBlockAlpha(blockInfo) < 1F;
-		boolean isWater = (blockInfo[0] == 8 || blockInfo[0] == 9 || blockInfo[0] == 79);
-		boolean isTree = (blockInfo[0] == 18);
+		boolean isWater = (blockInfo.id == 8 || blockInfo.id == 9 || blockInfo.id == 79);
+		boolean isTree = (blockInfo.id == 18);
 		
 		// Check for snow, torches, fence
 		if(!useAlpha) {
-			int[] upOneBlock = MapBlocks.getBlockInfo(chunkStub, x, y+1, z);
-			if(Arrays.binarySearch(SPECIAL_BLOCK_IDS, upOneBlock[0])>-1) { 
+			BlockInfo upOneBlock = MapBlocks.getBlockInfo(chunkStub, x, y+1, z);
+			if(Arrays.binarySearch(SPECIAL_BLOCK_IDS, upOneBlock.id)>-1) { 
 				blockInfo = upOneBlock;
 			}
 		} 
@@ -157,8 +157,8 @@ public class OldChunkRenderer implements IChunkRenderer {
 			// See how deep the alpha goes
 			int depth;
 			for (depth = 1; depth < 6; depth++) {
-				int[] iBlock = MapBlocks.getBlockInfo(chunkStub, x, Math.max(0, y - depth), z);
-				if (iBlock[0]==0 || mapBlocks.getBlockAlpha(iBlock)==0) {
+				BlockInfo iBlock = MapBlocks.getBlockInfo(chunkStub, x, Math.max(0, y - depth), z);
+				if (iBlock.id==0 || mapBlocks.getBlockAlpha(iBlock)==0) {
 					break;
 				}					
 			}
@@ -345,7 +345,7 @@ public class OldChunkRenderer implements IChunkRenderer {
 			}
 
 			// Get block color
-			int[] block = MapBlocks.getBlockInfo(chunkStub, x, paintY, z);
+			BlockInfo block = MapBlocks.getBlockInfo(chunkStub, x, paintY, z);
 			Color color = mapBlocks.getBlockColor(chunkStub, block, x, y, z);
 
 			// Contour lighting
@@ -444,7 +444,7 @@ public class OldChunkRenderer implements IChunkRenderer {
 			}
 
 			// Get block color
-			int[] block = MapBlocks.getBlockInfo(chunkStub, x, paintY, z);
+			BlockInfo block = MapBlocks.getBlockInfo(chunkStub, x, paintY, z);
 			Color color = mapBlocks.getBlockColor(chunkStub, block, x, y, z);
 
 			// Contour shading
@@ -592,7 +592,7 @@ public class OldChunkRenderer implements IChunkRenderer {
 			}		
 
 			// Get block color
-			int[] block = MapBlocks.getBlockInfo(chunkStub, x, paintY, z);
+			BlockInfo block = MapBlocks.getBlockInfo(chunkStub, x, paintY, z);
 			Color color = mapBlocks.getBlockColor(chunkStub, block, x, y,z);
 
 			// Contour shading
@@ -638,10 +638,10 @@ public class OldChunkRenderer implements IChunkRenderer {
 			int sliceMinY, int sliceMaxY) {
 		int y = sliceMinY;
 
-		int[] blockInfo = null;
+		BlockInfo blockInfo = null;
 		while (y <= 1) {
 			blockInfo = MapBlocks.getBlockInfo(chunkStub, x, y, z);
-			if (blockInfo[0] != 0) {
+			if (blockInfo.id != 0) {
 				y++;
 			} else {
 				break;
@@ -650,7 +650,7 @@ public class OldChunkRenderer implements IChunkRenderer {
 
 		while (y >= 1) {
 			blockInfo = MapBlocks.getBlockInfo(chunkStub, x, y, z);
-			if (blockInfo[0] == 0) {
+			if (blockInfo.id == 0) {
 				y--;
 			} else {
 				break;
