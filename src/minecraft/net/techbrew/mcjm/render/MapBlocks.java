@@ -55,11 +55,11 @@ public class MapBlocks extends HashMap {
 	 * @param biome
 	 * @return
 	 */
-	public Color getFoliageColor(BiomeGenBase biome, int[] blockInfo) {
-		Color color = foliageBiomeColors.get(biome.biomeName + blockInfo[1]);
+	public Color getFoliageColor(BiomeGenBase biome, BlockInfo blockInfo) {
+		Color color = foliageBiomeColors.get(biome.biomeName + blockInfo.meta);
 		if(color==null) {
 			color = average(new Color(biome.getBiomeFoliageColor()), getColor(blockInfo));
-			foliageBiomeColors.put(biome.biomeName + blockInfo[1], color.darker());
+			foliageBiomeColors.put(biome.biomeName + blockInfo.meta, color.darker());
 		}
 		return color;
 	}
@@ -80,32 +80,53 @@ public class MapBlocks extends HashMap {
 		return color;
 	}
 	
-	
-	static int[] getBlockInfo(ChunkStub chunkStub, int x, int y, int z) {
+	/**
+	 * Returns a simple wrapper object of the blockId and the block meta values.
+	 * @param chunkStub
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	static BlockInfo getBlockInfo(ChunkStub chunkStub, int x, int y, int z) {
 		try {
 			int blockId = chunkStub.getBlockID(x, y, z);
 			int meta = chunkStub.getBlockMetadata(x, y, z);
-			return new int[]{blockId, meta};
+			return new BlockInfo(blockId, meta);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			JourneyMap.getLogger().warning("Can't get blockId/meta for chunk " + chunkStub.xPosition + "," + chunkStub.zPosition + " block " + x + "," + y + "," + z); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			return null;
 		}
 	}
 	
-	Color getColor(int[] blockInfo) {
-		Color color = colors[blockInfo[0]][blockInfo[1]];
-		if(color==null && blockInfo[1]!=0) {			
-			color = colors[blockInfo[0]][0];
+	/**
+	 * Get the color for the BlockInfo.
+	 * If not found, tries the same block ID with 0 meta.
+	 * If still not found, returns black.  Adds alternate
+	 * keys to make the second access faster.
+	 * @param blockInfo
+	 * @return
+	 */
+	Color getColor(BlockInfo blockInfo) {
+		Color color = colors.get(blockInfo);
+		if(color!=null) {
+			return color;
 		}
+		
+		color = colors.get(new BlockInfo(blockInfo.id, 0));
 		if(color==null) {
 			color = Color.black;
-			JourneyMap.getLogger().warning("Can't get color for " + blockInfo[0] + "," + blockInfo[1]);
+			JourneyMap.getLogger().warning("Using black for unknown block " + blockInfo.id + "," + blockInfo.meta);
+		} else {
+			JourneyMap.getLogger().info("Using color for meta 0 with original " + blockInfo.id + "," + blockInfo.meta);
 		}
+		colors.put(new BlockInfo(blockInfo.id, blockInfo.meta), color);		
 		return color;
 	}
 	
-	Float getBlockAlpha(int[] blockInfo) {
-		return alphas[blockInfo[0]][blockInfo[1]];
+	Float getBlockAlpha(BlockInfo blockInfo) {
+		Float alpha = alphas.get(blockInfo.id);
+		return (alpha==null) ? 1f : alpha;
 	}
 	
 	/**
@@ -137,13 +158,13 @@ public class MapBlocks extends HashMap {
 		return seeSky;
 	}
 	
-	Color getBlockColor(ChunkStub chunkStub, int[] blockInfo, int x, int y, int z) {
+	Color getBlockColor(ChunkStub chunkStub, BlockInfo blockInfo, int x, int y, int z) {
 		Color color = null;
 		
 		BiomeGenBase biome = chunkStub.getBiomeGenForWorldCoords(x, z, chunkStub.worldObj.getWorldChunkManager());
 		String biomeName = biome.biomeName;
 
-		switch(blockInfo[0]) {
+		switch(blockInfo.id) {
 			case 2 : {
 				color = getGrassColor(biome);
 				//color = blend(new Color(chunkStub.grassColor), Color.black, .5);
@@ -174,7 +195,7 @@ public class MapBlocks extends HashMap {
 	/**
 	 * Map of transparent block ids that don't block view of the sky
 	 */
-	public final static HashSet<Integer> sky = new HashSet<Integer>(2);
+	public final static HashSet<Integer> sky = new HashSet<Integer>(7);
 	{
 		sky.add(0); // air 
 		sky.add(8); // water 
@@ -186,261 +207,275 @@ public class MapBlocks extends HashMap {
 	}
 	
 	/**
+	 * Map of block ids that shouldn't cast shadows
+	 */
+	public final static HashSet<Integer> excludeHeight = new HashSet<Integer>(5);
+	{
+		excludeHeight.add(0); // air 
+		excludeHeight.add(31); // grass, fern 
+		excludeHeight.add(32); // shrub 
+		excludeHeight.add(106); // vines
+	}
+	
+	/**
 	 * Alpha values for block ids.
 	 */
-	float[][] alphas = new float[256][16];
+	public final static HashMap<Integer, Float> alphas = new HashMap<Integer, Float>(5);
 	{
-		for(int i=0;i<alphas.length;i++) {
-			Arrays.fill(alphas[i], 1F);
-		}
-		alphas[8][0] = .65F; // water
-		alphas[9][0] = .65F; // water
-		alphas[20][0] = .3F; // glass
-		alphas[102][0] = .3F; // glass
-		alphas[79][0] = .8F; // ice
+		alphas.put(8,.65F); // water
+		alphas.put(9,.65F); // water
+		alphas.put(20,.3F); // glass
+		alphas.put(79,.8F); // ice
+		alphas.put(102,.3F); // glass		
+		alphas.put(131,0F); // tripwire hook
+		alphas.put(132,0F); // tripwire
 	}
 
 	/**
-	 * Block colors by id.
+	 * Block colors by id + meta
 	 */
-	Color[][] colors = new Color[391][16];
+	HashMap<BlockInfo, Color> colors = new HashMap<BlockInfo, Color>(256);
 	{
-		colors[0][0] = new Color(0x000000); // air
-		colors[1][0] = new Color(0x686868); // stone
-		colors[2][0] = new Color(0x7fb238); // grass 
-		colors[3][0] = new Color(0x79553a); // dirt 
-		colors[4][0] = new Color(0x959595); // cobblestone
-		colors[5][0] = new Color(0xbc9862); // wooden plank
-		colors[6][0] = new Color(0xa2c978); // sapling
-		colors[6][1] = new Color(0xa2c978); // redwood sapling 
-		colors[6][2] = new Color(0xa2c978); // birch sapling
-		colors[7][0] = new Color(0x333333); // bedrock
-		colors[8][0] = new Color(0x4040ff); // water 
-		colors[9][0] = new Color(0x4040ff); // stationary water 
-		colors[10][0] = new Color(0xE25822); // lava
-		colors[11][0] = new Color(0xE25822); // stationary lava
-		colors[12][0] = new Color(0xddd7a0); // sand
-		colors[13][0] = new Color(0x747474); // gravel
-		colors[14][0] = new Color(0x747474); // gold ore
-		colors[15][0] = new Color(0x747474); // iron ore
-		colors[16][0] = new Color(0x747474); // coal ore
-		
-		colors[17][0] = new Color(0x675132); // oak wood
-		colors[17][1] = new Color(0x342919); // spruce wood
-		colors[17][2] = new Color(0x455b2e); // birch wood
-		colors[17][3] = new Color(0x3A4D27); // jungle wood
-		
-		colors[17][4] = new Color(0x675132); // oak wood east/west
-		colors[17][5] = new Color(0x342919); // spruce wood  east/west
-		colors[17][6] = new Color(0x455b2e); // birch wood  east/west
-		colors[17][7] = new Color(0x3A4D27); // jungle wood  east/west
-		
-		colors[17][8] = new Color(0x675132); // oak wood north/south
-		colors[17][9] = new Color(0x342919); // spruce wood north/south
-		colors[17][10] = new Color(0x455b2e); // birch wood north/south
-		colors[17][11] = new Color(0x3A4D27); // jungle wood north/south
-		
-		colors[17][12] = new Color(0x675132); // oak wood bark only
-		colors[17][13] = new Color(0x342919); // spruce wood bark only
-		colors[17][14] = new Color(0x455b2e); // birch wood bark only
-		colors[17][15] = new Color(0x3A4D27); // jungle wood bark only
-		
-		colors[18][0] = new Color(0x21530B); // oak leaves 
-		colors[18][1] = new Color(0x21530B); // spruce leaves  
-		colors[18][2] = new Color(0x3D4F28); // birch leaves
-		colors[18][3] = new Color(0x135502); // jungle leaves
-		
-		colors[19][0] = new Color(0xe5e54e); // sponge
-		colors[20][0] = new Color(0xffffff); // glass
-		colors[21][0] = new Color(0x6d7484); // lapis lazuli ore
-		colors[22][0] = new Color(0x1542b2); // lapis lazuli block
-		colors[23][0] = new Color(0x585858); // dispenser
-		colors[24][0] = new Color(0xc6bd6d); // sandstone
-		colors[25][0] = new Color(0x784f3a); // note block
-		colors[26][0] = new Color(0xa95d5d); // bed block
-		
-		colors[27][0] = new Color(0xa4a4a4); // powered rail
-		colors[28][0] = new Color(0xa4a4a4); // detector rail
-		colors[29][0] = new Color(0x784f3a); // sticky piston
-		colors[30][0] = new Color(0xcccccc); // web
-		
-		colors[31][0] = new Color(0x648540); // dead shrub
-		colors[31][1] = new Color(0x265c0e); // tall grass
-		colors[31][2] = new Color(0x265c0e); // fern (living shrub)
-		colors[31][3] = new Color(0x265c0e); // tall grass
-		
-		colors[32][0] = new Color(0x648540); // dead shrub
-				
-		colors[33][0] = new Color(0x550000); // piston
-		colors[34][0] = new Color(0x550000); // piston head
-		
-		colors[35][0] = new Color(0xdddddd); // white wool
-		colors[35][1] = new Color(0xeb8138); // orange wool
-		colors[35][2] = new Color(0xc04cca); // magenta wool
-		colors[35][3] = new Color(0x8aa3d8); // light blue wool
-		colors[35][4] = new Color(0xd3ba27); // yellow wool
-		colors[35][5] = new Color(0x38b62d); // light green wool
-		colors[35][6] = new Color(0xd8879e); // pink wool
-		colors[35][7] = new Color(0x3a3a3a); // gray wool
-		colors[35][8] = new Color(0xa6adad); // light gray wool 
-		colors[35][9] = new Color(0x246985); // cyan wool
-		colors[35][10] = new Color(0x8639cb); // purple wool 
-		colors[35][11] = new Color(0x2937a5); // blue wool
-		colors[35][12] = new Color(0x51301b); // brown wool
-		colors[35][13] = new Color(0x354a18); // dark green wool 
-		colors[35][14] = new Color(0x9c2a27); // red wool 
-		colors[35][15] = new Color(0x181414); // black wool 
-		
-		colors[37][0] = new Color(0xf1f902); // dandelion
-		colors[38][0] = new Color(0xf7070f); // rose
-		colors[39][0] = new Color(0x916d55); // brown mushroom
-		colors[40][0] = new Color(0x9a171c); // red mushroom
-		
-		colors[41][0] = new Color(0xfefb5d); // gold block
-		colors[42][0] = new Color(0xe9e9e9); // iron block
-		
-		colors[43][0] = new Color(0xa8a8a8); // double stone slab
-		colors[43][1] = new Color(0xe5ddaf); // double sandstone slab
-		colors[43][2] = new Color(0x94794a); // double wooden slab
-		colors[43][3] = new Color(0x828282); // Double Cobblestone Slab
-		colors[43][4] = new Color(0xaa543b); // Double Brick Slab
-		colors[43][5] = new Color(0xa8a8a8); // double stone brick slab
-		
-		colors[44][0] = new Color(0xa8a8a8); // stone slab
-		colors[44][1] = new Color(0xc6bd6d); // sandstone slab
-		colors[44][2] = new Color(0x94794a); // wooden slab
-		colors[44][3] = new Color(0x828282); // cobblestone slab
-		colors[44][4] = new Color(0xaa543b); // brick slab
-		colors[44][5] = new Color(0xa8a8a8); // stone brick slab
-		colors[44][6] = new Color(0x34191e); // nether brick slab
-		colors[44][7] = new Color(0xa8a8a8); // stone slab duplicate
-		
-		colors[44][8] = new Color(0xa8a8a8); // upsidedown stone slab
-		colors[44][9] = new Color(0xc6bd6d); // upsidedown sandstone slab
-		colors[44][10] = new Color(0x94794a); // upsidedown wooden slab
-		colors[44][11] = new Color(0x828282); // upsidedown cobblestone slab
-		colors[44][12] = new Color(0xaa543b); // upsidedown brick slab
-		colors[44][13] = new Color(0xa8a8a8); // upsidedown stone brick slab
-		colors[44][14] = new Color(0x34191e); // upsidedown nether brick slab
-		 
-		colors[45][0] = new Color(0xaa543b); // brick
-		colors[46][0] = new Color(0xdb441a); // TNT
-		colors[47][0] = new Color(0xb4905a); // Bookshelf
-		colors[48][0] = new Color(0x1f471f); // Mossy Cobblestone
-		colors[49][0] = new Color(0x101018); // Obsidian
-		
-		colors[50][0] = new Color(0xffd800); // Torch
-		colors[51][0] = new Color(0xc05a01); // Fire
-		colors[52][0] = new Color(0x265f87); // Monster Spawner
-		colors[53][0] = new Color(0xbc9862); // Wooden Stairs
-		colors[54][0] = new Color(0x8f691d); // Chest
-		colors[55][0] = new Color(0x480000); // Redstone Wire
-		colors[56][0] = new Color(0x747474); // Diamond Ore
-		colors[57][0] = new Color(0x82e4e0); // Diamond Block
-		colors[58][0] = new Color(0xa26b3e); // Workbench
-		colors[59][0] = new Color(0xe210); // Wheat Crops
-		colors[60][0] = new Color(0x633f24); // Soil
-		colors[61][0] = new Color(0x747474); // Furnace
-		colors[62][0] = new Color(0x808080); // Burning Furnace
-		colors[63][0] = new Color(0xb4905a); // Sign Post
-		colors[64][0] = new Color(0x7a5b2b); // Wooden Door Block
-		colors[65][0] = new Color(0xac8852); // Ladder
-		colors[66][0] = new Color(0xa4a4a4); // Rails
-		colors[67][0] = new Color(0x9e9e9e); // Cobblestone Stairs
-		colors[68][0] = new Color(0x9f844d); // Wall Sign
-		colors[69][0] = new Color(0x695433); // Lever
-		colors[70][0] = new Color(0x8f8f8f); // Stone Pressure Plate
-		colors[71][0] = new Color(0xc1c1c1); // Iron Door Block
-		colors[72][0] = new Color(0xbc9862); // Wooden Pressure Plate
-		colors[73][0] = new Color(0x747474); // Redstone Ore
-		colors[74][0] = new Color(0x747474); // Glowing Redstone Ore
-		colors[75][0] = new Color(0x290000); // Redstone Torch (off)
-		colors[76][0] = new Color(0xfd0000); // Redstone Torch (on)
-		colors[77][0] = new Color(0x747474); // Stone Button
-		colors[78][0] = new Color(0xeeeeee); // Snow
-		colors[79][0] = new Color(0x8ebfff); // Ice
-		colors[80][0] = new Color(0xfafaff); // Snow Block
-		colors[81][0] = new Color(0x11801e); // Cactus
-		colors[82][0] = new Color(0xbbbbcc); // Clay
-		colors[83][0] = new Color(0x265c0e); // Sugar Cane
-		colors[84][0] = new Color(0xaadb74); // Jukebox
-		colors[85][0] = new Color(0xbc9862); // Fence
-		colors[86][0] = new Color(0xce7b14); // Pumpkin
-		colors[87][0] = new Color(0x582218); // Netherrack
-		colors[88][0] = new Color(0x996731); // Soul Sand
-		colors[89][0] = new Color(0xcda838); // Glowstone
-		colors[90][0] = new Color(0x643993); // Nether Portal
-		colors[91][0] = new Color(0xe08e1d); // Jack-O-Lantern
-		colors[92][0] = new Color(0xe7e7e9); // Cake
-		
-		colors[93][0] = new Color(0x9e9e9e); // Redstone Repeater Block (off)
-		colors[94][0] = new Color(0x9e9e9e); // Redstone Repeater Block (on)
-			
-		colors[95][0] = new Color(0x8f691d);	// 95		Locked Chest
-		colors[96][0] = new Color(0xbc9855);	// 96		Trapdoor
-		colors[97][0] = new Color(0x8f8f8f);	// 97		Stone (Silverfish)
-		colors[97][1] = new Color(0x828282);	// 97][1		Cobblestone (Silverfish)
-		colors[97][2] = new Color(0xa8a8a8);	// 97][2		Stone Brick (Silverfish)
-		colors[98][0] = new Color(0x8f8f8f); // Stone Brick
-		colors[98][1] = new Color(0x1f471f); // Mossy Stone Brick
-		colors[98][2] = new Color(0x8f8f8f); // Cracked Stone Brick
-		colors[99][0] = new Color(0x8F0000); // 99		Red Mushroom Cap
-		colors[100][0] = new Color(0xc4a476); // 100		Brown Mushroom Cap  
-		colors[101][0] = new Color(0xe9e9e9); // Iron Bars
-		colors[102][0] = new Color(0xffffff); // Glass Pane
-		colors[103][0] = new Color(0xbcb628); // 103		Melon Block
-		colors[104][0] = new Color(0x74b422); // 104		Pumpkin Stem 
-		colors[105][0] = new Color(0x74b422);  // 105		Melon Stem
-		colors[106][0] = new Color(0x74b422); // Vines
-		colors[107][0] = new Color(0xbc9852); // Fence Gate
-		colors[108][0] = new Color(0xaa543b); // Brick Stairs
-		colors[109][0] = new Color(0x8f8f8f); // Stone Brick Stairs
-		colors[110][0] = new Color(0x6E5F6E); // 110		Mycelium
-		colors[111][0] = new Color(0x0d5f15); // 111		Lily Pad 0d5f15
-		colors[112][0] = new Color(0x34191e);	// 112		Nether Brick
-		colors[113][0] = new Color(0x34191e);	// 113		Nether Brick Fence
-		colors[114][0] = new Color(0x34191e);	// 114		Nether Brick Stairs
-		colors[115][0] = new Color(0x891c31);	// Nether Wart		
-		colors[116][0] = new Color(0x550000);	// Enchanting Table
-		colors[117][0] = new Color(0xbbc185);	// Brewing Stand		
-		colors[118][0] = new Color(0x424242);   // Cauldron
-		colors[119][0] = new Color(0x0b0b0b);   // End Portal		
-		colors[120][0] = new Color(0x4986bc);	// End Portal Frame
-		colors[121][0] = new Color(0xc6bd6d);	// End Stone		
-		colors[122][0] = new Color(0x050507);	// Dragon Egg
-		colors[123][0] = new Color(0x785b3b);	// Redstone Lamp (off)
-		colors[124][0] = new Color(0xab8a55);	// Redstone Lamp (on)		
-		colors[125][0] = new Color(0x94794a); // double wooden slab
-		colors[126][0] = new Color(0x94794a); // double wooden slab
-		
-		// TODO: Wood slab colors
-		colors[127][0] = new Color(0xcd8e4b); // cocoa plant
-		colors[128][0] = new Color(0xc6bd6d);   // 128 Sandstone Stairs
-		colors[129][0] = new Color(0x37b957);   // 129 Emerald Ore
-		// 130 Ender Chest
-		// 131 Tripwire Hook
-		// 132 Tripwire
-		colors[133][0] = new Color(0x37b957);   // 133 Emerald Block
-		
-		colors[137][0] = new Color(0xc39b81);   // 137 Command Block
-		colors[138][0] = new Color(0xbff9fd);   // 138 Beacon Block
-		
-		colors[139][0] = new Color(0x959595); // cobblestone wall
-		colors[139][1] = new Color(0x1f471f);  // Mossy Cobblestone wall
-		
-		colors[140][0] = new Color(0x7d4536);   // 390 flower pot
-		
-		colors[141][0] = new Color(0x0ac200);  // Carrot crop
-		colors[142][0] = new Color(0x00e01a);  // Potato crop
-		
-		colors[145][0] = new Color(0x424242);   // 145 Anvil
-		colors[200][0] = new Color(0xd270f7);	// 200 Ender Crystal
-		
-		colors[390][0] = new Color(0x7d4536);   // 390 flower pot
-		
+		colors.put(new BlockInfo(0,0), new Color(0x000000)); // air
+		colors.put(new BlockInfo(1,0), new Color(0x686868)); // stone
+		colors.put(new BlockInfo(2,0), new Color(0x7fb238)); // grass 
+		colors.put(new BlockInfo(3,0), new Color(0x79553a)); // dirt 
+		colors.put(new BlockInfo(4,0), new Color(0x959595)); // cobblestone
+		colors.put(new BlockInfo(5,0), new Color(0xbc9862)); // oak plank
+		colors.put(new BlockInfo(5,1), new Color(0x342919)); // spruce plank
+		colors.put(new BlockInfo(5,2), new Color(0x455b2e)); // birch plank
+		colors.put(new BlockInfo(5,3), new Color(0x3A4D27)); // jungle plank
+		colors.put(new BlockInfo(6,0), new Color(0xa2c978)); // sapling
+		colors.put(new BlockInfo(6,1), new Color(0xa2c978)); // redwood sapling 
+		colors.put(new BlockInfo(6,2), new Color(0xa2c978)); // birch sapling
+		colors.put(new BlockInfo(7,0), new Color(0x333333)); // bedrock
+		colors.put(new BlockInfo(8,0), new Color(0x4040ff)); // water 
+		colors.put(new BlockInfo(9,0), new Color(0x4040ff)); // stationary water 
+		colors.put(new BlockInfo(10,0), new Color(0xE25822)); // lava
+		colors.put(new BlockInfo(11,0), new Color(0xE25822)); // stationary lava
+		colors.put(new BlockInfo(12,0), new Color(0xddd7a0)); // sand
+		colors.put(new BlockInfo(13,0), new Color(0x747474)); // gravel
+		colors.put(new BlockInfo(14,0), new Color(0x747474)); // gold ore
+		colors.put(new BlockInfo(15,0), new Color(0x747474)); // iron ore
+		colors.put(new BlockInfo(16,0), new Color(0x747474)); // coal ore		
+		colors.put(new BlockInfo(17,0), new Color(0x675132)); // oak wood
+		colors.put(new BlockInfo(17,1), new Color(0x342919)); // spruce wood
+		colors.put(new BlockInfo(17,2), new Color(0x455b2e)); // birch wood
+		colors.put(new BlockInfo(17,3), new Color(0x3A4D27)); // jungle wood		
+		colors.put(new BlockInfo(17,4), new Color(0x675132)); // oak wood east/west
+		colors.put(new BlockInfo(17,5), new Color(0x342919)); // spruce wood  east/west
+		colors.put(new BlockInfo(17,6), new Color(0x455b2e)); // birch wood  east/west
+		colors.put(new BlockInfo(17,7), new Color(0x3A4D27)); // jungle wood  east/west		
+		colors.put(new BlockInfo(17,8), new Color(0x675132)); // oak wood north/south
+		colors.put(new BlockInfo(17,9), new Color(0x342919)); // spruce wood north/south
+		colors.put(new BlockInfo(17,10), new Color(0x455b2e)); // birch wood north/south
+		colors.put(new BlockInfo(17,11), new Color(0x3A4D27)); // jungle wood north/south		
+		colors.put(new BlockInfo(17,12), new Color(0x675132)); // oak wood bark only
+		colors.put(new BlockInfo(17,13), new Color(0x342919)); // spruce wood bark only
+		colors.put(new BlockInfo(17,14), new Color(0x455b2e)); // birch wood bark only
+		colors.put(new BlockInfo(17,15), new Color(0x3A4D27)); // jungle wood bark only		
+		colors.put(new BlockInfo(18,0), new Color(0x21530B)); // oak leaves 
+		colors.put(new BlockInfo(18,1), new Color(0x21530B)); // spruce leaves  
+		colors.put(new BlockInfo(18,2), new Color(0x3D4F28)); // birch leaves
+		colors.put(new BlockInfo(18,3), new Color(0x135502)); // jungle leaves	
+		colors.put(new BlockInfo(18,4), new Color(0x21530B)); // oak leaves permanent
+		colors.put(new BlockInfo(18,5), new Color(0x21530B)); // spruce leaves permanent
+		colors.put(new BlockInfo(18,6), new Color(0x3D4F28)); // birch leaves permanent
+		colors.put(new BlockInfo(18,7), new Color(0x135502)); // jungle leaves permanent
+		colors.put(new BlockInfo(18,8), new Color(0x21530B)); // oak leaves decay
+		colors.put(new BlockInfo(18,9), new Color(0x21530B)); // spruce leaves decay
+		colors.put(new BlockInfo(18,10), new Color(0x3D4F28)); // birch leaves decay
+		colors.put(new BlockInfo(18,11), new Color(0x135502)); // jungle leaves decay
+		colors.put(new BlockInfo(19,0), new Color(0xe5e54e)); // sponge
+		colors.put(new BlockInfo(20,0), new Color(0xffffff)); // glass
+		colors.put(new BlockInfo(21,0), new Color(0x6d7484)); // lapis lazuli ore
+		colors.put(new BlockInfo(22,0), new Color(0x1542b2)); // lapis lazuli block
+		colors.put(new BlockInfo(23,0), new Color(0x585858)); // dispenser
+		colors.put(new BlockInfo(24,0), new Color(0xc6bd6d)); // sandstone
+		colors.put(new BlockInfo(25,0), new Color(0x784f3a)); // note block
+		colors.put(new BlockInfo(26,0), new Color(0xa95d5d)); // bed block		
+		colors.put(new BlockInfo(27,0), new Color(0xa4a4a4)); // powered rail
+		colors.put(new BlockInfo(28,0), new Color(0xa4a4a4)); // detector rail
+		colors.put(new BlockInfo(29,0), new Color(0x784f3a)); // sticky piston
+		colors.put(new BlockInfo(30,0), new Color(0xcccccc)); // web		
+		colors.put(new BlockInfo(31,0), new Color(0x648540)); // dead shrub
+		colors.put(new BlockInfo(31,1), new Color(0x265c0e)); // tall grass
+		colors.put(new BlockInfo(31,2), new Color(0x265c0e)); // fern (living shrub)
+		colors.put(new BlockInfo(31,3), new Color(0x265c0e)); // tall grass	
+		colors.put(new BlockInfo(32,0), new Color(0x648540)); // dead shrub				
+		colors.put(new BlockInfo(33,0), new Color(0x550000)); // piston
+		colors.put(new BlockInfo(34,0), new Color(0x550000)); // piston head		
+		colors.put(new BlockInfo(35,0), new Color(0xdddddd)); // white wool
+		colors.put(new BlockInfo(35,1), new Color(0xeb8138)); // orange wool
+		colors.put(new BlockInfo(35,2), new Color(0xc04cca)); // magenta wool
+		colors.put(new BlockInfo(35,3), new Color(0x8aa3d8)); // light blue wool
+		colors.put(new BlockInfo(35,4), new Color(0xd3ba27)); // yellow wool
+		colors.put(new BlockInfo(35,5), new Color(0x38b62d)); // light green wool
+		colors.put(new BlockInfo(35,6), new Color(0xd8879e)); // pink wool
+		colors.put(new BlockInfo(35,7), new Color(0x3a3a3a)); // gray wool
+		colors.put(new BlockInfo(35,8), new Color(0xa6adad)); // light gray wool 
+		colors.put(new BlockInfo(35,9), new Color(0x246985)); // cyan wool
+		colors.put(new BlockInfo(35,10), new Color(0x8639cb)); // purple wool 
+		colors.put(new BlockInfo(35,11), new Color(0x2937a5)); // blue wool
+		colors.put(new BlockInfo(35,12), new Color(0x51301b)); // brown wool
+		colors.put(new BlockInfo(35,13), new Color(0x354a18)); // dark green wool 
+		colors.put(new BlockInfo(35,14), new Color(0x9c2a27)); // red wool 
+		colors.put(new BlockInfo(35,15), new Color(0x181414)); // black wool 		
+		colors.put(new BlockInfo(37,0), new Color(0xf1f902)); // dandelion
+		colors.put(new BlockInfo(38,0), new Color(0xf7070f)); // rose
+		colors.put(new BlockInfo(39,0), new Color(0x916d55)); // brown mushroom
+		colors.put(new BlockInfo(40,0), new Color(0x9a171c)); // red mushroom		
+		colors.put(new BlockInfo(41,0), new Color(0xfefb5d)); // gold block
+		colors.put(new BlockInfo(42,0), new Color(0xe9e9e9)); // iron block		
+		colors.put(new BlockInfo(43,0), new Color(0xa8a8a8)); // double stone slab
+		colors.put(new BlockInfo(43,1), new Color(0xe5ddaf)); // double sandstone slab
+		colors.put(new BlockInfo(43,2), new Color(0x94794a)); // double wooden slab
+		colors.put(new BlockInfo(43,3), new Color(0x828282)); // Double Cobblestone Slab
+		colors.put(new BlockInfo(43,4), new Color(0xaa543b)); // Double Brick Slab
+		colors.put(new BlockInfo(43,5), new Color(0xa8a8a8)); // double stone brick slab		
+		colors.put(new BlockInfo(44,0), new Color(0xa8a8a8)); // stone slab
+		colors.put(new BlockInfo(44,1), new Color(0xc6bd6d)); // sandstone slab
+		colors.put(new BlockInfo(44,2), new Color(0x94794a)); // wooden slab
+		colors.put(new BlockInfo(44,3), new Color(0x828282)); // cobblestone slab
+		colors.put(new BlockInfo(44,4), new Color(0xaa543b)); // brick slab
+		colors.put(new BlockInfo(44,5), new Color(0xa8a8a8)); // stone brick slab
+		colors.put(new BlockInfo(44,6), new Color(0x34191e)); // nether brick slab
+		colors.put(new BlockInfo(44,7), new Color(0xa8a8a8)); // stone slab duplicate		
+		colors.put(new BlockInfo(44,8), new Color(0xa8a8a8)); // upsidedown stone slab
+		colors.put(new BlockInfo(44,9), new Color(0xc6bd6d)); // upsidedown sandstone slab
+		colors.put(new BlockInfo(44,10), new Color(0x94794a)); // upsidedown wooden slab
+		colors.put(new BlockInfo(44,11), new Color(0x828282)); // upsidedown cobblestone slab
+		colors.put(new BlockInfo(44,12), new Color(0xaa543b)); // upsidedown brick slab
+		colors.put(new BlockInfo(44,13), new Color(0xa8a8a8)); // upsidedown stone brick slab
+		colors.put(new BlockInfo(44,14), new Color(0x34191e)); // upsidedown nether brick slab		 
+		colors.put(new BlockInfo(45,0), new Color(0xaa543b)); // brick
+		colors.put(new BlockInfo(46,0), new Color(0xdb441a)); // TNT
+		colors.put(new BlockInfo(47,0), new Color(0xb4905a)); // Bookshelf
+		colors.put(new BlockInfo(48,0), new Color(0x1f471f)); // Mossy Cobblestone
+		colors.put(new BlockInfo(49,0), new Color(0x101018)); // Obsidian		
+		colors.put(new BlockInfo(50,0), new Color(0xffd800)); // Torch
+		colors.put(new BlockInfo(51,0), new Color(0xc05a01)); // Fire
+		colors.put(new BlockInfo(52,0), new Color(0x265f87)); // Monster Spawner
+		colors.put(new BlockInfo(53,0), new Color(0xbc9862)); // Wooden Stairs
+		colors.put(new BlockInfo(54,0), new Color(0x8f691d)); // Chest
+		colors.put(new BlockInfo(55,0), new Color(0x480000)); // Redstone Wire
+		colors.put(new BlockInfo(56,0), new Color(0x747474)); // Diamond Ore
+		colors.put(new BlockInfo(57,0), new Color(0x82e4e0)); // Diamond Block
+		colors.put(new BlockInfo(58,0), new Color(0xa26b3e)); // Workbench
+		colors.put(new BlockInfo(59,0), new Color(0xe210));   // Wheat Crops
+		colors.put(new BlockInfo(60,0), new Color(0x633f24)); // Soil
+		colors.put(new BlockInfo(61,0), new Color(0x747474)); // Furnace
+		colors.put(new BlockInfo(62,0), new Color(0x808080)); // Burning Furnace
+		colors.put(new BlockInfo(63,0), new Color(0xb4905a)); // Sign Post
+		colors.put(new BlockInfo(64,0), new Color(0x7a5b2b)); // Wooden Door Block
+		colors.put(new BlockInfo(65,0), new Color(0xac8852)); // Ladder
+		colors.put(new BlockInfo(66,0), new Color(0xa4a4a4)); // Rails
+		colors.put(new BlockInfo(67,0), new Color(0x9e9e9e)); // Cobblestone Stairs
+		colors.put(new BlockInfo(68,0), new Color(0x9f844d)); // Wall Sign
+		colors.put(new BlockInfo(69,0), new Color(0x695433)); // Lever
+		colors.put(new BlockInfo(70,0), new Color(0x8f8f8f)); // Stone Pressure Plate
+		colors.put(new BlockInfo(71,0), new Color(0xc1c1c1)); // Iron Door Block
+		colors.put(new BlockInfo(72,0), new Color(0xbc9862)); // Wooden Pressure Plate
+		colors.put(new BlockInfo(73,0), new Color(0x747474)); // Redstone Ore
+		colors.put(new BlockInfo(74,0), new Color(0x747474)); // Glowing Redstone Ore
+		colors.put(new BlockInfo(75,0), new Color(0x290000)); // Redstone Torch (off)
+		colors.put(new BlockInfo(76,0), new Color(0xfd0000)); // Redstone Torch (on)
+		colors.put(new BlockInfo(77,0), new Color(0x747474)); // Stone Button
+		colors.put(new BlockInfo(78,0), new Color(0xeeeeee)); // Snow
+		colors.put(new BlockInfo(79,0), new Color(0x8ebfff)); // Ice
+		colors.put(new BlockInfo(80,0), new Color(0xfafaff)); // Snow Block
+		colors.put(new BlockInfo(81,0), new Color(0x11801e)); // Cactus
+		colors.put(new BlockInfo(82,0), new Color(0xbbbbcc)); // Clay
+		colors.put(new BlockInfo(83,0), new Color(0x265c0e)); // Sugar Cane
+		colors.put(new BlockInfo(84,0), new Color(0xaadb74)); // Jukebox
+		colors.put(new BlockInfo(85,0), new Color(0xbc9862)); // Fence
+		colors.put(new BlockInfo(86,0), new Color(0xce7b14)); // Pumpkin
+		colors.put(new BlockInfo(87,0), new Color(0x582218)); // Netherrack
+		colors.put(new BlockInfo(88,0), new Color(0x996731)); // Soul Sand
+		colors.put(new BlockInfo(89,0), new Color(0xcda838)); // Glowstone
+		colors.put(new BlockInfo(90,0), new Color(0x643993)); // Nether Portal
+		colors.put(new BlockInfo(91,0), new Color(0xe08e1d)); // Jack-O-Lantern
+		colors.put(new BlockInfo(92,0), new Color(0xe7e7e9)); // Cake		
+		colors.put(new BlockInfo(93,0), new Color(0x9e9e9e)); // Redstone Repeater Block (off)
+		colors.put(new BlockInfo(94,0), new Color(0x9e9e9e)); // Redstone Repeater Block (on)			
+		colors.put(new BlockInfo(95,0), new Color(0x8f691d)); // Locked Chest
+		colors.put(new BlockInfo(96,0), new Color(0xbc9855)); // Trapdoor
+		colors.put(new BlockInfo(97,0), new Color(0x8f8f8f)); // Stone (Silverfish)
+		colors.put(new BlockInfo(97,1), new Color(0x828282)); // Cobblestone (Silverfish)
+		colors.put(new BlockInfo(97,2), new Color(0xa8a8a8)); // Stone Brick (Silverfish)
+		colors.put(new BlockInfo(98,0), new Color(0x8f8f8f)); // Stone Brick
+		colors.put(new BlockInfo(98,1), new Color(0x1f471f)); // Mossy Stone Brick
+		colors.put(new BlockInfo(98,2), new Color(0x8f8f8f)); // Cracked Stone Brick
+		colors.put(new BlockInfo(99,0), new Color(0x8F0000)); // Red Mushroom Cap
+		colors.put(new BlockInfo(100,0), new Color(0xc4a476)); // Brown Mushroom Cap  
+		colors.put(new BlockInfo(101,0), new Color(0xe9e9e9)); // Iron Bars
+		colors.put(new BlockInfo(102,0), new Color(0xffffff)); // Glass Pane
+		colors.put(new BlockInfo(103,0), new Color(0xbcb628)); // Melon Block
+		colors.put(new BlockInfo(104,0), new Color(0x74b422)); // Pumpkin Stem 
+		colors.put(new BlockInfo(105,0), new Color(0x74b422)); // Melon Stem
+		colors.put(new BlockInfo(106,0), new Color(0x74b422)); // Vines
+		colors.put(new BlockInfo(107,0), new Color(0xbc9852)); // Fence Gate
+		colors.put(new BlockInfo(108,0), new Color(0xaa543b)); // Brick Stairs
+		colors.put(new BlockInfo(109,0), new Color(0x8f8f8f)); // Stone Brick Stairs
+		colors.put(new BlockInfo(110,0), new Color(0x6E5F6E)); // Mycelium
+		colors.put(new BlockInfo(111,0), new Color(0x0d5f15)); // Lily Pad 
+		colors.put(new BlockInfo(112,0), new Color(0x34191e)); // Nether Brick
+		colors.put(new BlockInfo(113,0), new Color(0x55191e)); // Nether Brick Fence
+		colors.put(new BlockInfo(114,0), new Color(0x34191e)); // Nether Brick Stairs
+		colors.put(new BlockInfo(115,0), new Color(0x891c31)); // Nether Wart		
+		colors.put(new BlockInfo(116,0), new Color(0x550000)); // Enchanting Table
+		colors.put(new BlockInfo(117,0), new Color(0xbbc185)); // Brewing Stand		
+		colors.put(new BlockInfo(118,0), new Color(0x424242)); // Cauldron
+		colors.put(new BlockInfo(119,0), new Color(0x0b0b0b)); // End Portal		
+		colors.put(new BlockInfo(120,0), new Color(0x4986bc)); // End Portal Frame
+		colors.put(new BlockInfo(121,0), new Color(0xc6bd6d)); // End Stone		
+		colors.put(new BlockInfo(122,0), new Color(0x050507)); // Dragon Egg
+		colors.put(new BlockInfo(123,0), new Color(0x785b3b)); // Redstone Lamp (off)
+		colors.put(new BlockInfo(124,0), new Color(0xab8a55)); // Redstone Lamp (on)		
+		colors.put(new BlockInfo(125,0), new Color(0x94794a)); // double wooden slab
+		colors.put(new BlockInfo(125,1), new Color(0x675132)); // oak double wooden slab
+		colors.put(new BlockInfo(125,2), new Color(0x342919)); // spruce double wooden slab
+		colors.put(new BlockInfo(125,3), new Color(0x455b2e)); // birch double wooden slab
+		colors.put(new BlockInfo(125,4), new Color(0x3A4D27)); // jungle double wooden slab
+		colors.put(new BlockInfo(126,0), new Color(0x94794a)); // wooden slab
+		colors.put(new BlockInfo(126,1), new Color(0x675132)); // oak wooden slab
+		colors.put(new BlockInfo(126,2), new Color(0x342919)); // spruce wooden slab
+		colors.put(new BlockInfo(126,3), new Color(0x455b2e)); // birch wooden slab
+		colors.put(new BlockInfo(126,4), new Color(0x3A4D27)); // jungle wooden slab
+		colors.put(new BlockInfo(127,0), new Color(0xcd8e4b)); // cocoa plant
+		colors.put(new BlockInfo(128,0), new Color(0xc6bd6d)); // Sandstone Stairs
+		colors.put(new BlockInfo(129,0), new Color(0x37b957)); // Emerald Ore
+		colors.put(new BlockInfo(130,0), new Color(0x101019)); // Ender Chest
+		colors.put(new BlockInfo(131,0), new Color(0x785b3b)); // Tripwire Hook
+		colors.put(new BlockInfo(132,0), new Color(0x785b3b)); // Tripwire
+		colors.put(new BlockInfo(133,0), new Color(0x37b957)); // Emerald Block
+		colors.put(new BlockInfo(134,0), new Color(0x342919)); // spruce wooden stairs
+		colors.put(new BlockInfo(135,0), new Color(0x455b2e)); // birch wooden stairs
+		colors.put(new BlockInfo(136,0), new Color(0x3A4D27)); // jungle wooden stairs		
+		colors.put(new BlockInfo(137,0), new Color(0xc39b81)); // Command Block
+		colors.put(new BlockInfo(138,0), new Color(0xbff9fd)); // Beacon Block		
+		colors.put(new BlockInfo(139,0), new Color(0x959595)); // cobblestone wall
+		colors.put(new BlockInfo(139,1), new Color(0x1f471f)); // Mossy Cobblestone wall		
+		colors.put(new BlockInfo(140,0), new Color(0x7d4536)); // Flower pot		
+		colors.put(new BlockInfo(141,0), new Color(0x0ac200)); // Carrot crop
+		colors.put(new BlockInfo(142,0), new Color(0x00e01a)); // Potato crop
+		colors.put(new BlockInfo(143,0), new Color(0x94794a)); // wooden button
+		colors.put(new BlockInfo(144,0), new Color(0xff5b3b)); // Monster head
+		colors.put(new BlockInfo(145,0), new Color(0x424242)); // Anvil
+		colors.put(new BlockInfo(146,0), new Color(0x8f691d)); // Trapped Chest
+		colors.put(new BlockInfo(147,0), new Color(0xf9f249)); // Light Pressure Plate
+		colors.put(new BlockInfo(148,0), new Color(0xe0e0e0)); // Heavy Pressure Plate
+		colors.put(new BlockInfo(149,0), new Color(0x8c8c8c)); // Redstone Comparator Inactive
+		colors.put(new BlockInfo(150,0), new Color(0x8c8c8c)); // Redstone Comparator Active
+		colors.put(new BlockInfo(151,0), new Color(0xbaa890)); // Daylight Sensor
+		colors.put(new BlockInfo(152,0), new Color(0xc22b18)); // Redstone Block
+		colors.put(new BlockInfo(153,0), new Color(0x915c56)); // Nether Quartz
+		colors.put(new BlockInfo(154,0), new Color(0x434343)); // Hopper
+		colors.put(new BlockInfo(155,0), new Color(0xdddcd7)); // Block of Quartz
+		colors.put(new BlockInfo(156,0), new Color(0xdddcd7)); // Quartz Stairs
+		colors.put(new BlockInfo(157,0), new Color(0xa4a4a4)); // Activator rail
+		colors.put(new BlockInfo(158,0), new Color(0x585858)); // Dropper
 	}
-	
-	
 	
 	static Color blend(Color color1, int multiplier)
 	  {
