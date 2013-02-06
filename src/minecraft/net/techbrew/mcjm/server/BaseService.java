@@ -209,6 +209,26 @@ public abstract class BaseService extends Service {
 	}
 	
 	/**
+	 * Attempt to output the data in gzip format, setting headers accordingly.
+	 * Falls back to sending without gzip otherwise.
+	 * 
+	 * @param event
+	 * @param data
+	 */
+	protected void gzipResponse(Event event, byte[] data) throws Exception {
+		
+		byte[] bytes = gzip(data);
+		if(bytes!=null) {
+			ResponseHeader.on(event).setHeader("Content-encoding", "gzip");	//$NON-NLS-1$ //$NON-NLS-2$
+		} else {
+			bytes = data;
+		}
+		
+		ResponseHeader.on(event).contentLength(bytes.length);
+		event.output().write(bytes); 
+	}
+	
+	/**
 	 * Gzip encode a string and return the byte array.  
 	 * 
 	 * @param data
@@ -217,11 +237,28 @@ public abstract class BaseService extends Service {
 	protected byte[] gzip(String data) {
         ByteArrayOutputStream bout = null;
         try {
+            return gzip(data.getBytes(UTF8));
+        } catch (Exception ex) {
+        	JourneyMap.getLogger().warning("Failed to UTF8 encode: " + data);
+        	return null;
+        }
+    }
+	
+	/**
+	 * Gzip encode a byte array.  
+	 * 
+	 * @param data
+	 * @return
+	 */
+	protected byte[] gzip(byte[] data) {
+        ByteArrayOutputStream bout = null;
+        try {
             bout = new ByteArrayOutputStream();
             GZIPOutputStream output = new GZIPOutputStream(bout);
-            output.write(data.getBytes(UTF8));
+            output.write(data);
             output.flush();
             output.close();
+            bout.flush();
             bout.close();
             return bout.toByteArray();
         } catch (Exception ex) {
