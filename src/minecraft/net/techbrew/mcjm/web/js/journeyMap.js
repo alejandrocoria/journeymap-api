@@ -1,7 +1,7 @@
 
 var mapScale = 4;
 var minMapScale = 1;
-var maxMapScale = 16;
+var maxMapScale = 15;
 var smoothScale = false;
 var mapBounds = {x1:0,z1:0,x2:0,z2:0};
 
@@ -175,19 +175,44 @@ var initUI = function() {
     
     $("#aboutButton").attr("title", JM.messages.about_button_title);
     
+    $("#rssLink").attr("title", JM.messages.rss_feed_desc);
+    $("#rssLinkText").html(JM.messages.rss_feed_title);
+    
+    $("#emailLink").attr("title", JM.messages.email_sub_desc);
+    $("#emailLinkText").html(JM.messages.email_sub_title);
+    
+    $("#twitterLink").attr("title", JM.messages.follow_twitter);
+    $("#twitterLinkText").html(JM.messages.follow_twitter);
+    
+    // Tooltip for slider
+    var tooltip = $('<div id="slider-tooltip" />').css({
+    	width: '1em',
+    	textAlign:'center',
+        position: 'absolute',
+        top: 0,
+        left: 0
+    }).hide();
+    
+    // Slider
     $("#slider-vertical" ).slider({
         orientation: "vertical",
         range: "min",
         title: JM.messages.zoom_slider_name,
         min: minMapScale,
         max: maxMapScale,
-        value: 2,
+        value: mapScale,
         slide: function( event, ui ) {
+        	tooltip.text(ui.value);
             setZoom(ui.value);
         }
-    });
+    }).find(".ui-slider-handle")
+    	.append(tooltip).hover(
+    		function() { tooltip.show() }, 
+    		function() { tooltip.hide() }
+    );
     
     $("#worldInfo").hide();
+    $("#worldNameTitle").html(JM.messages.worldname_title);
     $("#worldTimeTitle").html(JM.messages.worldtime_title);
     $("#playerBiomeTitle").html(JM.messages.biome_title);
     $("#playerLocationTitle").html(JM.messages.location_title);
@@ -251,7 +276,7 @@ var initUI = function() {
 		logEntry("initUI() -> /data/game");
 		
 		// Update UI with game info
-		$("#version").attr("innerHTML", JM.game.jm_version + " for Minecraft " + JM.game.mc_version);
+		$("#version").html(JM.game.jm_version);
 		if(JM.game.latest_journeymap_version>JM.game.jm_version) {
 			// TODO: This is sloppy L10N
 			$("#versionButton").attr("title", JM.messages.update_available + " : JourneyMap " + JM.game.latest_journeymap_version + " for Minecraft " + JM.world.latest_minecraft_version);
@@ -293,10 +318,6 @@ var initWorld = function() {
 	updatingMap = false;
 	setCenterOnPlayer(true);
 	
-	// Turn on UI elements that may have been hidden
-	$(".jmtoggle").each(function(){$(this).show()});
-	$("#slider-vertical").show();
-	
 	// Ensure the map is sized
 	sizeMap();
 	
@@ -316,6 +337,10 @@ var initWorld = function() {
 		refreshVillagersData();
 		refreshWorldData(); 
 	});
+	
+	// Turn on UI elements that may have been hidden
+	$(".jmtoggle").each(function(){$(this).show()});
+	$("#slider-vertical").show();
 	 
 	// Resize events can now update the map
 	$(window).resize(function() {
@@ -781,7 +806,7 @@ var handleError = function(data, error, jqXHR) {
 	// Secondary errors will be ignored
 	if(halted===true) return;
 	
-	logEntry("Server returned error: " + data.status + ": " + jqXHR);
+	console.log("Server returned error: " + data.status + ": " + jqXHR);
 	
 	$(".jmtoggle").each(function(){$(this).hide()});
 	$("#worldInfo").hide();
@@ -798,6 +823,11 @@ var handleError = function(data, error, jqXHR) {
 			displayError = "";
 		}
 	}	
+	
+    // Remove others
+	$.each(otherImages, function(index, img) { 
+		document.body.removeChild(img);
+	});
 
 	// Format UI
 	$('body').css('backgroundColor',mapBackground); 
@@ -820,12 +850,7 @@ var handleError = function(data, error, jqXHR) {
     ctx.fillStyle = "red";
     ctx.font = "bold 16px Arial";
     ctx.textAlign="center";
-    ctx.fillText(displayError, getCanvasWidth()/2, (getCanvasHeight()/2) + 10);
-        
-    // Remove others
-	$.each(otherImages, function(index, img) { 
-		document.body.removeChild(img);
-	});
+    ctx.fillText(displayError, getCanvasWidth()/2, (getCanvasHeight()/2) + 10);       
 	
     // Restart in 5 seconds
 	if(!halted) {
@@ -1263,6 +1288,8 @@ function zoom(dir){
 }
 
 function setZoom(scale) {
+	
+	console.log("zoom to scale: " + scale);
 
    var centerChunkX = Math.floor(getCanvasWidth()/chunkScale/2) + mapBounds.x1;
    var centerChunkZ = Math.floor(getCanvasHeight()/chunkScale/2) + mapBounds.z1;
