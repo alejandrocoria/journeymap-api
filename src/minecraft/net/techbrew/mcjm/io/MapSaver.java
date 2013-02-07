@@ -47,7 +47,7 @@ public class MapSaver {
 		// Find all chunk files
 		FilenameFilter ff = new ChunkFileHandler.ChunkFileFilter(cType);
 		File[] foundFiles = worldDir.listFiles(ff);
-		System.out.println("Found chunk files: " + foundFiles.length); //$NON-NLS-1$
+		//System.out.println("Found chunk files: " + foundFiles.length); //$NON-NLS-1$
 
 		for(File file : foundFiles) {
 			String segment = file.getName().split("\\.")[0]; //$NON-NLS-1$
@@ -66,7 +66,7 @@ public class MapSaver {
 		// Find all region files
 		ff = new RegionFileHandler.RegionFileFilter(cType);
 		foundFiles = worldDir.listFiles(ff);
-		System.out.println("Found region files: " + foundFiles.length); //$NON-NLS-1$
+		//System.out.println("Found region files: " + foundFiles.length); //$NON-NLS-1$
 
 		for(File file : foundFiles) {
 			String segment = file.getName().split("_")[0]; //$NON-NLS-1$
@@ -83,7 +83,7 @@ public class MapSaver {
 			if(z2==null || rz2>z2) z2 = rz2;
 		}
 		
-		System.out.println("Final chunk coordinates: " + x1 + "," + z1 + " to " + x2 + "," + z2);  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		//System.out.println("Final chunk coordinates: " + x1 + "," + z1 + " to " + x2 + "," + z2);  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		
 		if(x1==null || x2==null || z1==null ||z2==null ) return new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
 		
