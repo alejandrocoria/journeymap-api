@@ -95,6 +95,7 @@ public class ChunkTerrainRenderer implements IChunkRenderer {
 			}
 		}
 		
+		BlockInfo blockInfo;
 		float sN, sNW, sW, sAvg;		
 		for(int z=0; z<16; z++)
 		{
@@ -125,6 +126,7 @@ public class ChunkTerrainRenderer implements IChunkRenderer {
 					}
 					
 				} else if(slope>1) {
+					
 					if(sAvg>1) {
 						if(slope>=sAvg) {
 							slope = slope*1.15f;
