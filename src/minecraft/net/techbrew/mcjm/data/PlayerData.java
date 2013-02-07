@@ -22,7 +22,7 @@ import net.techbrew.mcjm.render.MapBlocks;
  */
 public class PlayerData implements IDataProvider {
 	
-	private static long TTL = TimeUnit.MINUTES.toMillis(1);
+	private static long TTL = TimeUnit.SECONDS.toMillis(1);
 	
 	public static enum Key {
 		username,
