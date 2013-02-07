@@ -25,6 +25,7 @@ import net.minecraft.src.NibbleArray;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldChunkManager;
+import net.techbrew.mcjm.render.BlockInfo;
 import net.techbrew.mcjm.render.MapBlocks;
 
 public class ChunkStub {
@@ -35,24 +36,15 @@ public class ChunkStub {
 	public final byte[] blockBiomeArray;
 	public final int xPosition;
 	public final int zPosition;
-	public final String biomeName;
 	public final Boolean hasNoSky;
 	public final int worldType;
 	public final long worldHash;
 	public final World worldObj;
     public int[] precipitationHeightMap;
 	public final ExtendedBlockStorageStub storageArrays[];
-	//public final NibbleArray blocklightMap;
-	//public final byte blocks[];
-	//public final int worldXShift;
-	//public final int worldHeightShift;
 	public final int worldHeight;
-	//public final int worldMaxY;
-	//public final int grassColor;
-	//public final int foliageColor;
 	public Boolean doMap;
-	public boolean isModified;
-	
+	public boolean isModified;	
 	
 	public ChunkStub(ChunkStub original) {
 		this.heightMap = Arrays.copyOf(original.heightMap, original.heightMap.length);
@@ -64,7 +56,6 @@ public class ChunkStub {
 		this.worldObj = original.worldObj;
 		this.worldHeight = original.worldHeight;
 		this.doMap = original.doMap;
-		this.biomeName = original.biomeName;
 		this.hasNoSky = original.hasNoSky;
 		this.isModified = original.isModified;
 		this.precipitationHeightMap = original.precipitationHeightMap;
@@ -83,9 +74,6 @@ public class ChunkStub {
 		
 		this.heightMap = Arrays.copyOf(chunk.heightMap, chunk.heightMap.length);
 		this.blockBiomeArray = Arrays.copyOf(chunk.getBiomeArray(), chunk.getBiomeArray().length);
-		if(blockBiomeArray.length==0) {
-			System.err.println("Biomes not provided for chunk");
-		}
 		this.xPosition = chunk.xPosition;
 		this.zPosition = chunk.zPosition;
 		this.worldHash = worldHash;
@@ -103,37 +91,12 @@ public class ChunkStub {
 			}
 		}
 		
-		//this.blocklightMap = new NibbleArray(chunk.blocklightMap.data, chunk.worldObj.heightShift);
-		//this.blocks = Arrays.copyOf(chunk.blocks, chunk.blocks.length);
-		//this.worldXShift = chunk.worldObj.xShift;
-		//this.worldHeightShift = chunk.worldObj.heightShift;
-		//this.worldHeight = chunk.worldObj.worldHeight;
-		
 		if(chunk.isEmpty() || !chunk.isChunkLoaded) {
 			doMap = false;
 		}
-		
-		BiomeGenBase biome = null;
-		if(doMap) {
-			try {
-				//biome = chunk.func_48490_a(chunk.xPosition>>4, chunk.zPosition>>4, chunk.worldObj.worldProvider.worldChunkMgr);
-				biome = worldObj.getWorldChunkManager().getBiomeGenAt(xPosition * 16, zPosition * 16);
-			} catch(Throwable t) {
-				doMap = false;
-			}
-		}
-		
-		if(doMap && biome!=null) {
-			this.biomeName = biome.biomeName;
-		} else {
-			this.biomeName = null;
-		}
-		
-		//this.grassColor = biome.getGrassColorAtCoords(chunk.worldObj, chunk.xPosition, chunk.worldObj.getSeaLevel(), chunk.zPosition);
-		//this.foliageColor = biome.getFoliageColorAtCoords(chunk.worldObj, chunk.xPosition,  chunk.worldObj.getSeaLevel(), chunk.zPosition);
+
 		this.hasNoSky = chunk.worldObj.provider.hasNoSky;
 		
-		generateHeightMap();
 	}
 	
 	/**
