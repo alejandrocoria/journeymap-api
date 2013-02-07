@@ -254,6 +254,7 @@ public class RegionFileHandler {
 		FileOutputStream outputFile = null;
 		
 		if(regionImage==null) {
+			JourneyMap.getLogger().warning("Null regionImage?");
 			return;
 		}
 		
@@ -294,7 +295,7 @@ public class RegionFileHandler {
 			
 			ImageIO.write(regionImage, "png", regionFile);
     		
-	    } catch (Exception e) {
+	    } catch (Throwable e) {
 	    	String error = Constants.getMessageJMERR22(regionFile, LogFormatter.toString(e));
 			JourneyMap.getLogger().severe(error);
 	    } finally {
@@ -359,7 +360,6 @@ public class RegionFileHandler {
 		
 		// Get merged chunks by region
 		for(int rx=rx1;rx<=rx2;rx++) {
-			//if(rx==rx2 && (rx1!=rx2)) break; // why?
 			for(int rz=rz1;rz<=rz2;rz++) {
 				
 				// Get merged chunks from region
@@ -376,10 +376,12 @@ public class RegionFileHandler {
 				
 			}
 		}
+				
+		if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+			stop = System.currentTimeMillis();
+			JourneyMap.getLogger().fine("getMergedChunks time: "  + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		
-		stop = System.currentTimeMillis();
-		JourneyMap.getLogger().finest("getMergedChunks time: "  + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
-
 		return mergedImg;
 
 	}
