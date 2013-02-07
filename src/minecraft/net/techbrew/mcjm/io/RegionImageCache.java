@@ -9,12 +9,14 @@ import java.awt.image.Raster;
 import java.awt.image.RasterFormatException;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
@@ -27,10 +29,12 @@ import net.techbrew.mcjm.thread.JMThreadFactory;
 public class RegionImageCache  {
 	
 	private static final int SIZE = 16;
-	private static RegionImageCache instance;
-	private CacheMap imageMap;
-	private long lastFlush;
-	private Set<RegionCoord> dirty;
+	private static final long flushInterval = TimeUnit.SECONDS.toMillis(30);
+	private static volatile RegionImageCache instance;
+	private volatile Map<RegionCoord, BufferedImage> imageMap;
+	private volatile long lastFlush;
+	private volatile Set<RegionCoord> dirty;
+	private volatile Object lock = new Object();
 	
 	public synchronized static RegionImageCache getInstance() {
 		if(instance==null) {
@@ -40,12 +44,12 @@ public class RegionImageCache  {
 	}
 	
 	private RegionImageCache() {
-		imageMap = new CacheMap(SIZE);
-		dirty = new HashSet<RegionCoord>(SIZE);
-		lastFlush = System.currentTimeMillis() + 5000;
+		imageMap = Collections.synchronizedMap(new CacheMap(SIZE));
+		dirty = Collections.synchronizedSet(new HashSet<RegionCoord>(SIZE));
+		lastFlush = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);
 		
 		// Init thread factory
-		JMThreadFactory tf = JMThreadFactory.getInstance();
+		JMThreadFactory tf = new JMThreadFactory("RegionImageCache");
 		
 		// Add shutdown hook to flush cache to disk
 		Runtime.getRuntime().addShutdownHook(tf.newThread(new Runnable() {
@@ -59,14 +63,14 @@ public class RegionImageCache  {
 	}
 	
 	public boolean contains(RegionCoord rCoord) {
-		synchronized(imageMap) {
+		synchronized(lock) {
 			return imageMap.containsKey(rCoord);
 		}
 	}
 	
 	public BufferedImage get(RegionCoord rCoord) {
 		BufferedImage regionImage = null;
-		synchronized(imageMap) {
+		synchronized(lock) {
 			regionImage = imageMap.get(rCoord);
 		}
 		return regionImage;
@@ -76,7 +80,7 @@ public class RegionImageCache  {
 		
 		BufferedImage regionImage = null;
 		
-		synchronized(imageMap) {
+		synchronized(lock) {
 			regionImage = imageMap.get(rCoord);
 			if(regionImage==null) {
 				RegionFileHandler rfh = RegionFileHandler.getInstance();
@@ -93,31 +97,32 @@ public class RegionImageCache  {
 	
 	public void putAll(final Set<Map.Entry<ChunkCoord, BufferedImage>> chunkImageEntries) {
 		final RegionFileHandler rfh = RegionFileHandler.getInstance();
-		for(Map.Entry<ChunkCoord, BufferedImage> entry : chunkImageEntries) {
-			final ChunkCoord cCoord = entry.getKey();
-			final RegionCoord rCoord = cCoord.getRegionCoord();
-			final BufferedImage chunkImage = entry.getValue();
-			final BufferedImage regionImage = getGuaranteed(rCoord);
-			insertChunk(cCoord, chunkImage, regionImage);
-			synchronized(dirty) {
+		synchronized(lock) {
+			for(Map.Entry<ChunkCoord, BufferedImage> entry : chunkImageEntries) {
+				final ChunkCoord cCoord = entry.getKey();
+				final RegionCoord rCoord = cCoord.getRegionCoord();
+				final BufferedImage chunkImage = entry.getValue();
+				final BufferedImage regionImage = getGuaranteed(rCoord);
+				insertChunk(cCoord, chunkImage, regionImage);
 				dirty.add(rCoord);
 			}
 		}
-		if(lastFlush+30000<System.currentTimeMillis()) {
-			if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
-				JourneyMap.getLogger().fine("RegionImageCache auto-flushing"); //$NON-NLS-1$
+		autoFlush();
+	}
+	
+	private void autoFlush() {
+		synchronized(lock) {
+			if(lastFlush+flushInterval<System.currentTimeMillis()) {
+				if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+					JourneyMap.getLogger().fine("RegionImageCache auto-flushing"); //$NON-NLS-1$
+				}
+				flushToDisk();
 			}
-			flushToDisk();
 		}
 	}
 	
 	private Boolean insertChunk(ChunkCoord cCoord, BufferedImage chunkImage, BufferedImage regionImage) {
-		Graphics2D g2d = regionImage.createGraphics();
-		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-		g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		
+		Graphics2D g2d = regionImage.createGraphics();		
 		Boolean regionAltered = true;
 		
 		int x,z;
@@ -179,29 +184,20 @@ public class RegionImageCache  {
 	
 	public void flushToDisk() {
 		RegionFileHandler rfh = RegionFileHandler.getInstance();
-		Set<RegionCoord> dirtyCopy = null;
-		synchronized(dirty) {
-			dirtyCopy = new HashSet<RegionCoord>(dirty);
-			dirty.clear();
-		}
-		synchronized(imageMap) {
+		synchronized(lock) {
+			Set<RegionCoord> dirtyCopy = new HashSet<RegionCoord>(dirty);			
 			for(RegionCoord dirtyRC : dirtyCopy) {
 				rfh.writeRegionFile(dirtyRC, imageMap.get(dirtyRC));
 				//JourneyMap.getLogger().info("Flushing to disk: " + dirtyRC);
 			}
-		}
-		lastFlush = System.currentTimeMillis();
+			dirty.clear();
+			lastFlush = System.currentTimeMillis();
+		}		
 	}
 
 	public void clear() {
-		synchronized(imageMap) {
+		synchronized(lock) {
 			imageMap.clear();
-		}
-	}
-	
-	public void setLRU(boolean purge) {
-		synchronized(imageMap) {
-			imageMap.purge = purge;
 		}
 	}
 	
@@ -212,7 +208,6 @@ public class RegionImageCache  {
 	class CacheMap extends LinkedHashMap<RegionCoord, BufferedImage> {
 		
 		private final int capacity;
-		private boolean purge = true;
 		
 		CacheMap(int capacity) {
 			super(capacity + 1, 1.1f, true);
@@ -222,7 +217,6 @@ public class RegionImageCache  {
 		@Override
 		protected boolean removeEldestEntry(Map.Entry<RegionCoord, BufferedImage> entry)
 	    {
-			if(!purge) return false;
 			Boolean remove = size() > capacity;
 			if(remove) {
 				RegionCoord rc = entry.getKey();
