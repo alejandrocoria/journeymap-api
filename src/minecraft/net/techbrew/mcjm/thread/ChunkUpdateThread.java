@@ -59,6 +59,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 	public volatile static int lastChunkX = -1;
 	public volatile static int lastChunkY = -1;
 	public volatile static int lastChunkZ = -1;
+	public volatile static int chunkOffset = 2;
 	
 	public volatile AtomicInteger updateCounter = new AtomicInteger(0);
 	public volatile AtomicLong updateTime = new AtomicLong(0);
@@ -74,6 +75,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 	public ChunkUpdateThread(JourneyMap journeyMap, World world) {
 		super(journeyMap, world);
 		chunkImageCache = new ChunkImageCache();
+		chunkOffset = PropertyManager.getInstance().getInteger(PropertyManager.CHUNK_OFFSET_PROP);
 	}
 
 	/**
@@ -141,10 +143,12 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 				if(finestLogging) {
 					JourneyMap.getLogger().fine("Chunks updated: " + chunkImageCache.getEntries().size()); //$NON-NLS-1$
 				}
+				
 				RegionImageCache.getInstance().putAll(chunkImageCache.getEntries());
 		
 				// Flush regions to disk
 				if(flush) {
+					JourneyMap.getLogger().info("Force-flushing RegionImageCache");
 					RegionImageCache.getInstance().flushToDisk();
 				}
 				if(finestLogging) {		
@@ -154,21 +158,21 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 				chunkStubs.clear();
 				chunkImageCache.clear();
 				currentThread = null;
-				if(finestLogging) {
-					long total = Runtime.getRuntime().totalMemory()/1024/1024;
-					long free = Runtime.getRuntime().freeMemory()/1024/1024;
-					long used = total-free;
-					JourneyMap.getLogger().finest("Memory: total/free/used= " + total + " / " + free + " / " + used + " MB"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-				}
-				
-				if(JourneyMap.getLogger().isLoggable(Level.INFO)) {
-					double counter = (double) updateCounter.get();
-					double time = (double) updateTime.get();
-					double avg = time/counter;
-					
-					System.out.println("*** Chunks rendered with " + chunkRenderer.getClass().getSimpleName() + ": " + (int) counter + " / Average: " + avg + " ms each");
-					
-					if(counter==100) {
+
+				double counter = (double) updateCounter.get();
+				if(counter>=1000) {
+					if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+						
+						double time = (double) updateTime.get();
+						double avg = time/counter;
+						
+						long total = Runtime.getRuntime().totalMemory()/1024/1024;
+						long free = Runtime.getRuntime().freeMemory()/1024/1024;
+						long used = total-free;
+						JourneyMap.getLogger().info("Memory: total/free/used= " + total + " / " + free + " / " + used + " MB"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
+						System.out.println("*** Chunks rendered with " + chunkRenderer.getClass().getSimpleName() + ": " + (int) counter + " / Average: " + avg + " ms each in a total of " + time + "ms");
+						
 						updateCounter.set(0);
 						updateTime.set(0);
 					}
@@ -188,22 +192,21 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 		
 		HashMap<Integer,ChunkStub> tempChunkStubs = new HashMap<Integer,ChunkStub>();
 		int unloadedChunks = 0;
-		
-
-		lastChunkX = playerChunkX;
-		lastChunkY = playerChunkY;
-		lastChunkZ = playerChunkZ;
 
 		// Stub surrounding chunks
-		int offset = journeyMap.getChunkOffset();
+		int offset = chunkOffset;
 		if(offset>2) {
 			if(underground) {
 				offset--;
 			}
 			if (playerChunkX == lastChunkX && playerChunkZ==lastChunkZ) {
-				offset=2;
+				offset=1;
 			}
 		}
+		
+		lastChunkX = playerChunkX;
+		lastChunkY = playerChunkY;
+		lastChunkZ = playerChunkZ;
 
 		int startX = playerChunkX - offset;
 		int endX = playerChunkX + offset;
