@@ -1,6 +1,7 @@
 package net.techbrew.mcjm.io;
 
 import java.awt.image.BufferedImage;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -52,7 +53,7 @@ public class ChunkImageCache {
 	}
 	
 	public Set<Map.Entry<ChunkCoord, BufferedImage>> getEntries() {
-		return imageMap.entrySet();
+		return new HashSet<Map.Entry<ChunkCoord, BufferedImage>>(imageMap.entrySet());
 	}
 	
 	class CacheMap extends LinkedHashMap<ChunkCoord, BufferedImage> {
