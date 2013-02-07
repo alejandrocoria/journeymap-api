@@ -44,31 +44,7 @@ public class ChunkStub {
 	public final ExtendedBlockStorageStub storageArrays[];
 	public final int worldHeight;
 	public Boolean doMap;
-	public boolean isModified;	
-	
-	public ChunkStub(ChunkStub original) {
-		this.heightMap = Arrays.copyOf(original.heightMap, original.heightMap.length);
-		this.blockBiomeArray = Arrays.copyOf(original.blockBiomeArray, original.blockBiomeArray.length);
-		this.xPosition = original.xPosition;
-		this.zPosition = original.zPosition;
-		this.worldHash = original.worldHash;
-		this.worldType = original.worldType;
-		this.worldObj = original.worldObj;
-		this.worldHeight = original.worldHeight;
-		this.doMap = original.doMap;
-		this.hasNoSky = original.hasNoSky;
-		this.isModified = original.isModified;
-		this.precipitationHeightMap = original.precipitationHeightMap;
-		this.storageArrays = new ExtendedBlockStorageStub[original.storageArrays.length];
-		for(int i=0;i<storageArrays.length;i++) {
-			ExtendedBlockStorageStub ebs = original.storageArrays[i];
-			if(ebs!=null) {
-				this.storageArrays[i] = new ExtendedBlockStorageStub(ebs);
-			}
-		}
-		
-		generateHeightMap();
-	}
+	public boolean isModified;		
 	
 	public ChunkStub(Chunk chunk, Boolean doMap, World worldObj, long worldHash) {
 		

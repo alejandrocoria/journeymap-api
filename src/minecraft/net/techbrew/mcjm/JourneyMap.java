@@ -1,5 +1,9 @@
 package net.techbrew.mcjm;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -76,12 +80,8 @@ public class JourneyMap extends BaseMod {
 	
 	// Invokes MapOverlay
 	private KeyBinding keybinding;
-		
-	// Offset distance from current chunk
-	private int chunkOffset;
 
 	// Milliseconds between updates
-	private static int playerDelay;
 	public static int chunkDelay;
 
 	// Time stamp of next chunk update
@@ -100,9 +100,6 @@ public class JourneyMap extends BaseMod {
 	
 	// Thread service for writing chunks
 	private static ScheduledExecutorService chunkExecutor;
-	
-	// Thread service for writing player data
-	static ScheduledThreadPoolExecutor playerDataExecutor;
 	
 	// Announcements
 	private static List<String> announcements = Collections.synchronizedList(new LinkedList<String>());
@@ -144,9 +141,8 @@ public class JourneyMap extends BaseMod {
 		//channelClient = new ChannelClient(this);
 
 		// Use property settings
-		playerDelay = PropertyManager.getInstance().getInteger(PropertyManager.UPDATETIMER_PLAYER_PROP);
 		chunkDelay = PropertyManager.getInstance().getInteger(PropertyManager.UPDATETIMER_CHUNKS_PROP);
-		chunkOffset = PropertyManager.getInstance().getInteger(PropertyManager.CHUNK_OFFSET_PROP);
+		
 		enableAnnounceMod = PropertyManager.getInstance().getBoolean(PropertyManager.ANNOUNCE_MODLOADED_PROP); 
 		
 		// Map GUI keycode
@@ -211,7 +207,6 @@ public class JourneyMap extends BaseMod {
 					getLogger().info("Shutting down JourneyMap threads"); //$NON-NLS-1$
 					FileHandler.lastWorldHash = -1;
 					FileHandler.lastWorldDir = null;
-					playerDataExecutor.shutdown();
 					getChunkExecutor().shutdown();
 					executorsStarted = false;
 					RegionImageCache.getInstance().flushToDisk();
@@ -236,6 +231,11 @@ public class JourneyMap extends BaseMod {
 			// Check player status
 			EntityPlayer player = minecraft.thePlayer;
 			if (player==null || player.isDead) {
+				return true;
+			}
+			
+			// Don't do anything when game is paused
+			if(minecraft.isSingleplayer() && minecraft.isGamePaused) {
 				return true;
 			}
 			
@@ -278,18 +278,27 @@ public class JourneyMap extends BaseMod {
 				player.addChatMessage(announcements.remove(0));
 			}
 			
+			ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+			long[] threadIds = bean.findDeadlockedThreads(); // Returns null if no threads are deadlocked.
+
+			if (threadIds != null) {
+			    ThreadInfo[] infos = bean.getThreadInfo(threadIds);
+
+			    for (ThreadInfo info : infos) {
+			        StackTraceElement[] stack = info.getStackTrace();
+			        getLogger().severe("Deadlocked thread: " + Arrays.asList(stack));
+			    }
+			}
+			
 			// Start executors
 			if(!executorsStarted) {
 				
 				getLogger().info("Starting up JourneyMap threads for " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
 				executorsStarted = true;
-				// Start playerDataExecutor
-				playerDataExecutor = new ScheduledThreadPoolExecutor(1, JMThreadFactory.getInstance());
-				playerDataExecutor.scheduleWithFixedDelay(new PlayerUpdateThread(this, minecraft.theWorld), 2000, playerDelay, TimeUnit.MILLISECONDS);
-				
+
 				// Start chunkExecutor
-				chunkExecutor = Executors.newSingleThreadScheduledExecutor(JMThreadFactory.getInstance());
-				getChunkExecutor().scheduleWithFixedDelay(new ChunkUpdateThread(this, minecraft.theWorld), 5500, chunkDelay, TimeUnit.MILLISECONDS);
+				chunkExecutor = Executors.newSingleThreadScheduledExecutor(new JMThreadFactory("chunkExecutor"));
+				getChunkExecutor().scheduleWithFixedDelay(new ChunkUpdateThread(this, minecraft.theWorld), 1500, chunkDelay, TimeUnit.MILLISECONDS);
 			} else {
 				
 				try {
@@ -394,10 +403,6 @@ public class JourneyMap extends BaseMod {
 			}
 		}
     }		
-
-	public int getChunkOffset() {
-		return chunkOffset;
-	}
 	
 	/**
 	 * Queue an announcement to be shown in the UI.
