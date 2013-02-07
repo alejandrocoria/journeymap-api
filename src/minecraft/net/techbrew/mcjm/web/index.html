@@ -33,9 +33,17 @@
 		<div class="navbar-inner">
 			<div class="container">
 			
+				  <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+			      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+			        <span class="icon-bar"></span>
+			        <span class="icon-bar"></span>
+			        <span class="icon-bar"></span>
+			      </a>
+			      
 			     <a class="brand" href="#"><img src="img/journeymap.png" alt="JourneyMap"></a>
-                    
-			       <div class="btn-toolbar visible-tablet visible-desktop">
+                   
+                   <div class="nav-collapse collapse">
+			       <div class="btn-toolbar">
 			       
 				       <div class="btn-group jmtoggle">
 	                        <a id="dayButton" class="btn btn-warning active" href="#">[day]</a></li>
@@ -101,18 +109,19 @@
 					
 					   <div class="btn-group">
 							<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                               <i class="icon-info-sign"></i><span class="caret"></span>
+                               <i class="icon-info-sign"></i> JourneyMap <span id="version"></span>... <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><em>JourneyMap 2.0</em></li>
-                                <li><a target="_blank" title="" href="http://feeds.feedburner.com/JourneyMap"><img src="img/feed-icon16x16.png" alt=""></a></li>
-                                <li><a target="_blank" title="" href="http://feedburner.google.com/fb/a/mailverify?uri=Journeymap"><img src="img/email.png" alt=""></a></li>
-                                <li><a target="_blank" title="" href="https://twitter.com/intent/follow?original_referer=localhost&region=follow_link&screen_name=JourneyMapMod&source=followbutton&variant=2.0"><img src="img/twitter.png" alt=""></a></li>
+                                <li><a target="_blank" id="webLink" title="http://journeymap.techbrew.net" href="http://journeymap.techbrew.net"><img src="img/browser.png" width=16 alt=""><span id="webLinkText">http://journeymap.techbrew.net</span></a></li>
+                                <li><a target="_blank" id="forumLink" title="JourneyMap forum on minecraftforum.net" href="http://goo.gl/pmbTh"><img src="http://trinium.cursecdn.com/netbar/minecraftforums.png" width=16 alt=""><span id="forumLinkText">Minecraft Forum</span></a></li>
+                                <li><a target="_blank" id="rssLink" title="" href="http://feeds.feedburner.com/JourneyMap"><img src="img/feed-icon16x16.png" alt=""><span id="rssLinkText"></span></a></li>
+                                <li><a target="_blank" id="emailLink" title="" href="http://feedburner.google.com/fb/a/mailverify?uri=Journeymap"><img src="img/email.png" alt=""><span id="emailLinkText"></span></a></li>
+                                <li><a target="_blank" id="twitterLink" title="" href="https://twitter.com/intent/follow?original_referer=localhost&region=follow_link&screen_name=JourneyMapMod&source=followbutton&variant=2.0"><img src="img/twitter.png" alt=""><span id="twitterLinkText"></span></a></li>
                             </ul>
 			             </div>
 
 				</div>
-				
+				    </div>
 
 			</div>
 		</div>
@@ -120,26 +129,29 @@
 
 	<canvas id="mapCanvas"></canvas>
 	
-    <div class="container-fluid">
-        <span id="worldInfo">
-            <div id="worldName"></div>
+    <div class="container">
+        <div id="worldInfo">
             <div>
-                <span id="worldTimeTitle"></span>
+                <span class="infoTitle" id="worldNameTitle"></span>
+                <span id="worldName"></span>
+            </div>
+            <div>
+                <span class="infoTitle" id="worldTimeTitle"></span>
                 <span id="worldTime"></span>
             </div>
             <div>
-                <span id="playerBiomeTitle"></span>
-                <span id="playerBiome"></span>
-            </div>
-            <div>
-                <span id="playerLocationTitle"></span>
+                <span class="infoTitle" id="playerLocationTitle"></span>
                 <span id="playerLocation"></span>
             </div>
             <div>
-                <span id="playerElevationTitle"></span>
+                <span class="infoTitle" id="playerElevationTitle"></span>
                 <span id="playerElevation"></span>
             </div>
-        </span>
+            <div>
+                <span class="infoTitle" id="playerBiomeTitle"></span>
+                <span id="playerBiome"></span>
+            </div>
+        </div>
         <div id="slider-vertical"></div>
     </div>
    
