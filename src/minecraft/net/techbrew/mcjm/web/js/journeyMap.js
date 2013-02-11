@@ -683,9 +683,10 @@ var refreshWorldData = function(callback) {
 var getMapDataUrl = function() {
    var width = getCanvasWidth();
    var height = getCanvasHeight();
-   var mapType = (JM.player && JM.player.underground===true && showCaves===true) ? "underground" : (showLight===true ? "night" : "day") ;  
+   var mapType = (JM.player && JM.player.underground===true && showCaves===true) ? "underground" : (showLight===true ? "night" : "day") ; 
+   var dimension = (JM.player.dimension);
    var depth = (JM.player && JM.player.chunkCoordY) ? JM.player.chunkCoordY : 4;
-   var request = "/map.png?mapType=" + mapType + "&depth=" + depth + "&x1=" + mapBounds.x1+ "&z1=" + mapBounds.z1 + 
+   var request = "/map.png?mapType=" + mapType + "&dimension=" + dimension + "&depth=" + depth + "&x1=" + mapBounds.x1 + "&z1=" + mapBounds.z1 + 
                              "&x2=" + mapBounds.x2 + "&z2=" + mapBounds.z2 + "&width=" + width + "&height=" + height;
    return request;
 }
