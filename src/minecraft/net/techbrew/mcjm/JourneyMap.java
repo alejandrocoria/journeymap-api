@@ -236,7 +236,7 @@ public class JourneyMap extends BaseMod {
 			
 			// Don't do anything when game is paused
 			if(minecraft.isSingleplayer() && minecraft.isGamePaused) {
-				return true;
+				//return true; // TODO
 			}
 			
 			// Check for world change
