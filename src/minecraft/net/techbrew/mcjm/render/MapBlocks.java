@@ -20,6 +20,7 @@ public class MapBlocks extends HashMap {
 	public static AlphaComposite SEMICLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F);
 	public static Color COLOR_TRANSPARENT = new Color(0,0,0,0);
 	
+	private final Color grassOffsetColor = new Color(0x111111);
 	final HashMap<BiomeGenBase, Color> grassBiomeColors = new HashMap<BiomeGenBase, Color>(16);
 	final HashMap<BiomeGenBase, Color> waterBiomeColors = new HashMap<BiomeGenBase, Color>(16);
 	final HashMap<String, Color> foliageBiomeColors = new HashMap<String, Color>(16);
@@ -28,7 +29,7 @@ public class MapBlocks extends HashMap {
 	 * Constructor
 	 */
 	public MapBlocks() {
-		JourneyMap.getLogger().info("MapBlocks instantiated"); //$NON-NLS-1$ 
+		// JourneyMap.getLogger().info("MapBlocks instantiated"); //$NON-NLS-1$ 
 	}
 	
 	/**
@@ -38,11 +39,11 @@ public class MapBlocks extends HashMap {
 	 * @param biome
 	 * @return
 	 */
-	public Color getGrassColor(BiomeGenBase biome) {
+	public Color getGrassColor(BiomeGenBase biome, Color baseColor) {
 		
 		Color color = grassBiomeColors.get(biome);
 		if(color==null) {
-			color = new Color(biome.getBiomeGrassColor()).darker();
+			color = average(new Color(biome.getBiomeGrassColor()), baseColor);
 			grassBiomeColors.put(biome, color);
 		}
 		return color;
@@ -55,10 +56,10 @@ public class MapBlocks extends HashMap {
 	 * @param biome
 	 * @return
 	 */
-	public Color getFoliageColor(BiomeGenBase biome, BlockInfo blockInfo) {
+	public Color getFoliageColor(BiomeGenBase biome, BlockInfo blockInfo, Color baseColor) {
 		Color color = foliageBiomeColors.get(biome.biomeName + blockInfo.meta);
 		if(color==null) {
-			color = average(new Color(biome.getBiomeFoliageColor()), getColor(blockInfo));
+			color = average(new Color(biome.getBiomeFoliageColor()), baseColor);
 			foliageBiomeColors.put(biome.biomeName + blockInfo.meta, color.darker());
 		}
 		return color;
@@ -88,11 +89,15 @@ public class MapBlocks extends HashMap {
 	 * @param z
 	 * @return
 	 */
-	static BlockInfo getBlockInfo(ChunkStub chunkStub, int x, int y, int z) {
+	BlockInfo getBlockInfo(ChunkStub chunkStub, int x, int y, int z) {
 		try {
 			int blockId = chunkStub.getBlockID(x, y, z);
 			int meta = chunkStub.getBlockMetadata(x, y, z);
-			return new BlockInfo(blockId, meta);
+			BlockInfo info = new BlockInfo(blockId, meta);
+			info.setColor(getBlockColor(chunkStub, info, x, y, z));
+			info.setAlpha(getBlockAlpha(info));
+			return info;
+			
 		} catch (ArrayIndexOutOfBoundsException e) {
 			JourneyMap.getLogger().warning("Can't get blockId/meta for chunk " + chunkStub.xPosition + "," + chunkStub.zPosition + " block " + x + "," + y + "," + z); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			return null;
@@ -118,7 +123,7 @@ public class MapBlocks extends HashMap {
 			color = Color.black;
 			JourneyMap.getLogger().warning("Using black for unknown block " + blockInfo.id + "," + blockInfo.meta);
 		} else {
-			JourneyMap.getLogger().info("Using color for meta 0 with original " + blockInfo.id + "," + blockInfo.meta);
+			JourneyMap.getLogger().fine("Using color for meta 0 with original " + blockInfo.id + "," + blockInfo.meta);
 		}
 		colors.put(new BlockInfo(blockInfo.id, blockInfo.meta), color);		
 		return color;
@@ -126,6 +131,8 @@ public class MapBlocks extends HashMap {
 	
 	Float getBlockAlpha(BlockInfo blockInfo) {
 		Float alpha = alphas.get(blockInfo.id);
+		
+		//float opac = 1f-Block.lightOpacity[blockInfo.id]/255f;
 		return (alpha==null) ? 1f : alpha;
 	}
 	
@@ -158,16 +165,21 @@ public class MapBlocks extends HashMap {
 		return seeSky;
 	}
 	
-	Color getBlockColor(ChunkStub chunkStub, BlockInfo blockInfo, int x, int y, int z) {
+	
+	
+	private Color getBlockColor(ChunkStub chunkStub, BlockInfo blockInfo, int x, int y, int z) {
 		Color color = null;
+		
+		if(blockInfo.color!=null) {
+			return blockInfo.color;
+		}
 		
 		BiomeGenBase biome = chunkStub.getBiomeGenForWorldCoords(x, z, chunkStub.worldObj.getWorldChunkManager());
 		String biomeName = biome.biomeName;
 
 		switch(blockInfo.id) {
 			case 2 : {
-				color = getGrassColor(biome);
-				//color = blend(new Color(chunkStub.grassColor), Color.black, .5);
+				color = getGrassColor(biome, grassOffsetColor);
 				break;
 			}
 			case 8 : {
@@ -179,8 +191,7 @@ public class MapBlocks extends HashMap {
 				break;
 			}
 			case 18 : {
-				//color = getBiomeFoliageColor(biome, chunk, y); // foliage
-				color = getFoliageColor(biome, blockInfo);
+				color = getFoliageColor(biome, blockInfo, getColor(blockInfo));
 				break;
 			} 
 			default : {
@@ -222,8 +233,8 @@ public class MapBlocks extends HashMap {
 	 */
 	public final static HashMap<Integer, Float> alphas = new HashMap<Integer, Float>(5);
 	{
-		alphas.put(8,.65F); // water
-		alphas.put(9,.65F); // water
+		alphas.put(8,.55F); // water
+		alphas.put(9,.55F); // water
 		alphas.put(20,.3F); // glass
 		alphas.put(79,.8F); // ice
 		alphas.put(102,.3F); // glass		
@@ -381,7 +392,7 @@ public class MapBlocks extends HashMap {
 		colors.put(new BlockInfo(75,0), new Color(0x290000)); // Redstone Torch (off)
 		colors.put(new BlockInfo(76,0), new Color(0xfd0000)); // Redstone Torch (on)
 		colors.put(new BlockInfo(77,0), new Color(0x747474)); // Stone Button
-		colors.put(new BlockInfo(78,0), new Color(0xeeeeee)); // Snow
+		colors.put(new BlockInfo(78,0), new Color(0xe9fafa)); // Snow
 		colors.put(new BlockInfo(79,0), new Color(0x8ebfff)); // Ice
 		colors.put(new BlockInfo(80,0), new Color(0xfafaff)); // Snow Block
 		colors.put(new BlockInfo(81,0), new Color(0x11801e)); // Cactus
