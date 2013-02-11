@@ -7,8 +7,8 @@ import java.util.Map;
 import net.techbrew.mcjm.ChunkStub;
 
 public interface IChunkRenderer {
-
-	public abstract BufferedImage getChunkImage(ChunkStub chunkStub,
-			boolean underground, int vSlice, Map<Integer, ChunkStub> neighbors);
+	
+	public void render(final Graphics2D g2D, final ChunkStub chunkStub, final boolean underground, 
+			final int vSlice, final Map<Integer, ChunkStub> neighbors);
 
 }
