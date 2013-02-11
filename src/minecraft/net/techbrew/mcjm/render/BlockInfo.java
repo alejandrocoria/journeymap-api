@@ -1,13 +1,25 @@
 package net.techbrew.mcjm.render;
 
+import java.awt.Color;
+
 public class BlockInfo {
 
 	public final int id;
 	public final int meta;
+	public Color color;
+	public float alpha;
 	
 	public BlockInfo(int id, int meta) {
 		this.id = id;
 		this.meta = meta;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	public void setAlpha(float alpha) {
+		this.alpha = alpha;
 	}
 
 	@Override
