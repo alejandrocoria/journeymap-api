@@ -43,7 +43,6 @@ import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.render.OldChunkRenderer;
 import net.techbrew.mcjm.ui.ZoomLevel;
 
 /**
@@ -113,7 +112,7 @@ public class MapService extends BaseService {
 			
 			int width = getParameter(query, "width", 100); //$NON-NLS-1$
 			int height = getParameter(query, "height", 100); //$NON-NLS-1$
-			int worldProviderType = getParameter(query, "worldProviderType", 0);  //$NON-NLS-1$
+			int dimension = getParameter(query, "dimension", 0);  //$NON-NLS-1$
 			
 			// Map type
 			String mapTypeString = getParameter(query, "mapType", Constants.MapType.day.name()); //$NON-NLS-1$
@@ -127,7 +126,7 @@ public class MapService extends BaseService {
 			
 			// Return the images
 			ResponseHeader.on(event).noCache().contentType(ContentType.png);
-			mergeImageChunks(event, worldDir, x1, z1, x2, z2, mapType, depth, worldProviderType, width, height);
+			mergeImageChunks(event, worldDir, x1, z1, x2, z2, mapType, depth, dimension, width, height);
 			
 			long stop=System.currentTimeMillis();
 			if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
@@ -155,11 +154,11 @@ public class MapService extends BaseService {
 	 * @throws IOException
 	 */
 	private synchronized void mergeImageChunks(Event event, File worldDir, int x1, int z1,
-			int x2, int z2, Constants.MapType mapType, int depth, int worldProviderType, int canvasWidth, int canvasHeight)
+			int x2, int z2, Constants.MapType mapType, int depth, int dimension, int canvasWidth, int canvasHeight)
 			throws Exception {
 		
 		long start = 0, stop = 0;
-		final Constants.CoordType cType = Constants.CoordType.convert(mapType, worldProviderType);
+		final Constants.CoordType cType = Constants.CoordType.convert(mapType, dimension);
 		
 		start = System.currentTimeMillis();
 		

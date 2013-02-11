@@ -44,9 +44,7 @@ import net.techbrew.mcjm.io.RegionCoord;
 import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.io.RegionImageCache;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.render.ChunkFlatRenderer;
-import net.techbrew.mcjm.render.ChunkHeightMapRenderer;
-import net.techbrew.mcjm.render.OldChunkRenderer;
+import net.techbrew.mcjm.render.ChunkRenderController;
 import net.techbrew.mcjm.render.ChunkTerrainRenderer;
 import net.techbrew.mcjm.render.IChunkRenderer;
 
@@ -61,21 +59,19 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 	public volatile static int lastChunkZ = -1;
 	public volatile static int chunkOffset = 2;
 	
-	public volatile AtomicInteger updateCounter = new AtomicInteger(0);
-	public volatile AtomicLong updateTime = new AtomicLong(0);
-	
 	public static CyclicBarrier getBarrier() {
 		return barrier;
 	}
 	
 	private volatile ConcurrentHashMap<Integer,ChunkStub> chunkStubs = new ConcurrentHashMap<Integer,ChunkStub>();
 	private ChunkImageCache chunkImageCache;
-	private IChunkRenderer chunkRenderer = new ChunkTerrainRenderer();
+	private ChunkRenderController renderController;
 	
 	public ChunkUpdateThread(JourneyMap journeyMap, World world) {
 		super(journeyMap, world);
 		chunkImageCache = new ChunkImageCache();
 		chunkOffset = PropertyManager.getInstance().getInteger(PropertyManager.CHUNK_OFFSET_PROP);
+		renderController = new ChunkRenderController();
 	}
 
 	/**
@@ -159,24 +155,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 				chunkImageCache.clear();
 				currentThread = null;
 
-				double counter = (double) updateCounter.get();
-				if(counter>=1000) {
-					if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
-						
-						double time = (double) updateTime.get();
-						double avg = time/counter;
-						
-						long total = Runtime.getRuntime().totalMemory()/1024/1024;
-						long free = Runtime.getRuntime().freeMemory()/1024/1024;
-						long used = total-free;
-						JourneyMap.getLogger().info("Memory: total/free/used= " + total + " / " + free + " / " + used + " MB"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-
-						System.out.println("*** Chunks rendered with " + chunkRenderer.getClass().getSimpleName() + ": " + (int) counter + " / Average: " + avg + " ms each in a total of " + time + "ms");
-						
-						updateCounter.set(0);
-						updateTime.set(0);
-					}
-				}
+				
 			}
 		
 		
@@ -296,13 +275,8 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 		}
 		
 		Minecraft minecraft = Minecraft.getMinecraft();
-		long start = System.currentTimeMillis();
-		long stop;
-		BufferedImage chunkImage = chunkRenderer.getChunkImage(chunkStub, underground, chunkY, chunkStubs);
-		stop = System.currentTimeMillis();
-		
-		updateCounter.incrementAndGet();
-		updateTime.addAndGet(stop-start);
+		BufferedImage chunkImage = renderController.getChunkImage(chunkStub, underground, chunkY, chunkStubs);
+
 		
 		if(chunkImage!=null  && minecraft.theWorld!=null) {
 			File worldDir = FileHandler.getWorldDir(minecraft);
