@@ -37,7 +37,6 @@ public class ChunkStub {
 	public final int xPosition;
 	public final int zPosition;
 	public final Boolean hasNoSky;
-	public final int worldType;
 	public final long worldHash;
 	public final World worldObj;
     public int[] precipitationHeightMap;
@@ -53,7 +52,6 @@ public class ChunkStub {
 		this.xPosition = chunk.xPosition;
 		this.zPosition = chunk.zPosition;
 		this.worldHash = worldHash;
-		this.worldType = chunk.worldObj.provider.dimensionId;
 		this.worldObj = worldObj;
 		this.worldHeight = worldObj.getHeight();
 		this.doMap = doMap;
@@ -98,19 +96,24 @@ public class ChunkStub {
      */
     public int getSafeHeightValue(int x, int z)
     {
-    	int y = 0;
-    	int id = 0;
-    	y = this.heightMap[z << 4 | x];
-    	while(id==0) {    		
-    		id = getBlockID(x,y,z); 
-    		if(MapBlocks.excludeHeight.contains(id)) {
-    			y=y-1;
-    		}
-    		if(y==0) {
-    			break;
-    		}
+    	try {
+	    	int y = 0;
+	    	int id = 0;
+	    	y = this.heightMap[z << 4 | x];
+	    	if(y<1) return 0;
+	    	while(id==0) {    		
+	    		id = getBlockID(x,y,z); 
+	    		if(MapBlocks.excludeHeight.contains(id)) {
+	    			y=y-1;
+	    		}
+	    		if(y==0) {
+	    			break;
+	    		}
+	    	}
+	    	return y;       
+    	} catch(ArrayIndexOutOfBoundsException e) {
+    		return this.heightMap[z << 4 | x];
     	}
-    	return y;        
     }
 
 
