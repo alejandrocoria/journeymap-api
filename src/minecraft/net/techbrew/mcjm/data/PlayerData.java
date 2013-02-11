@@ -70,7 +70,7 @@ public class PlayerData implements IDataProvider {
 		props.put(Key.posY, (int) Math.floor(player.posY));
 		props.put(Key.posZ, (int) Math.floor(player.posZ));
 		
-		props.put(Key.dimension, mc.theWorld.getWorldInfo().getDimension()); 
+		props.put(Key.dimension, mc.theWorld.provider.dimensionId); 
 		props.put(Key.biome, getPlayerBiome()); 
 		props.put(Key.underground, playerIsUnderground());		
 				

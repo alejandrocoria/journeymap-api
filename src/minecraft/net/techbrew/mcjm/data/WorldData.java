@@ -54,7 +54,7 @@ public class WorldData implements IDataProvider {
 		LinkedHashMap props = new LinkedHashMap();
 		// props.put(Key.dirName, getWorldDirName(mc));
 		props.put(Key.name, getWorldName(mc)); 
-		props.put(Key.dimension, worldInfo.getDimension()); 
+		props.put(Key.dimension, mc.theWorld.provider.dimensionId); 
 		props.put(Key.hardcore,  worldInfo.isHardcoreModeEnabled());
 		props.put(Key.singlePlayer, mc.isSingleplayer()); 
 		props.put(Key.time, mc.theWorld.getWorldTime() % 24000L);
