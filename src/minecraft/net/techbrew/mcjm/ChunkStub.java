@@ -32,6 +32,11 @@ public class ChunkStub {
 
 	public volatile float[][] slopes; // Added for JourneyMap
 	
+	/**
+     * Determines if the chunk is lit or not at a light value greater than 0.
+     */
+    public static boolean isLit;
+	
 	public final int heightMap[];
 	public final byte[] blockBiomeArray;
 	public final int xPosition;
@@ -47,6 +52,7 @@ public class ChunkStub {
 	
 	public ChunkStub(Chunk chunk, Boolean doMap, World worldObj, long worldHash) {
 		
+		this.isLit = chunk.isLit;
 		this.heightMap = Arrays.copyOf(chunk.heightMap, chunk.heightMap.length);
 		this.blockBiomeArray = Arrays.copyOf(chunk.getBiomeArray(), chunk.getBiomeArray().length);
 		this.xPosition = chunk.xPosition;
@@ -226,6 +232,38 @@ public class ChunkStub {
     {
     	ExtendedBlockStorageStub var5 = this.storageArrays[par3 >> 4];
         return var5 == null ? (this.canBlockSeeTheSky(par2, par3, par4) ? par1EnumSkyBlock.defaultLightValue : 0) : (par1EnumSkyBlock == EnumSkyBlock.Sky ? (this.worldObj.provider.hasNoSky ? 0 : var5.getExtSkylightValue(par2, par3 & 15, par4)) : (par1EnumSkyBlock == EnumSkyBlock.Block ? var5.getExtBlocklightValue(par2, par3 & 15, par4) : par1EnumSkyBlock.defaultLightValue));
+    }
+    
+    /**
+     * Gets the amount of light on a block taking into account sunlight
+     */
+    public int getBlockLightValue(int par1, int par2, int par3, int par4)
+    {
+        ExtendedBlockStorageStub var5 = this.storageArrays[par2 >> 4];
+
+        if (var5 != null)
+        {
+            int var6 = this.worldObj.provider.hasNoSky ? 0 : var5.getExtSkylightValue(par1, par2 & 15, par3);
+
+            if (var6 > 0)
+            {
+                isLit = true;
+            }
+
+            var6 -= par4;
+            int var7 = var5.getExtBlocklightValue(par1, par2 & 15, par3);
+
+            if (var7 > var6)
+            {
+                var6 = var7;
+            }
+
+            return var6;
+        }
+        else
+        {
+            return !this.worldObj.provider.hasNoSky && par4 < EnumSkyBlock.Sky.defaultLightValue ? EnumSkyBlock.Sky.defaultLightValue - par4 : 0;
+        }
     }
 
 
