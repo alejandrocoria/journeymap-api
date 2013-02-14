@@ -80,6 +80,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 	protected void doTask() {
 		
 		boolean finestLogging = JourneyMap.getLogger().isLoggable(Level.FINEST);
+		finestLogging = true;
 		
 		try {
 				Boolean flush = false;
@@ -117,7 +118,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 					return;
 				}
 				
-				long start = System.currentTimeMillis();
+				long start = System.nanoTime();
 				
 				// Clear cache (shouldn't be necessary)
 				chunkImageCache.clear();
@@ -137,7 +138,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 		
 				// Push chunk cache to region cache
 				if(finestLogging) {
-					JourneyMap.getLogger().fine("Chunks updated: " + chunkImageCache.getEntries().size()); //$NON-NLS-1$
+					JourneyMap.getLogger().info("Chunks updated: " + chunkImageCache.getEntries().size()); //$NON-NLS-1$
 				}
 				
 				RegionImageCache.getInstance().putAll(chunkImageCache.getEntries());
@@ -148,11 +149,11 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 					RegionImageCache.getInstance().flushToDisk();
 				}
 				if(finestLogging) {		
-					JourneyMap.getLogger().finer("Map regions updated: " + (System.currentTimeMillis()-start) + "ms elapsed"); //$NON-NLS-1$ //$NON-NLS-2$
+					JourneyMap.getLogger().info("Map regions updated: " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start) + "ms elapsed"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			} finally {
 				chunkStubs.clear();
-				chunkImageCache.clear();
+				//chunkImageCache.clear();
 				currentThread = null;
 
 				
@@ -176,9 +177,10 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 		int offset = chunkOffset;
 		if(offset>2) {
 			if(underground) {
-				offset--;
-			}
-			if (playerChunkX == lastChunkX && playerChunkZ==lastChunkZ) {
+				
+				offset=offset-2;
+				//offset=0; // TODO: put back to normal after underground stuff figured out
+			} else if (playerChunkX == lastChunkX && playerChunkZ==lastChunkZ) {
 				offset=1;
 			}
 		}
@@ -215,7 +217,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 						Chunk chunk = Utils.getChunkIfAvailable(theWorld, x, z);
 						if(chunk!=null) {					
 							ChunkStub stub = new ChunkStub(chunk, false, theWorld, hash); // do not Map
-							unloadedChunks += ensureNeighbors(stub);
+							//unloadedChunks += ensureNeighbors(stub);
 							continue;
 						} 
 					}
@@ -225,6 +227,10 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 		}
 		
 		chunkStubs.putAll(tempChunkStubs);
+		
+		if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+			JourneyMap.getLogger().fine("Chunks: " + unloadedChunks + " skipped, " + tempChunkStubs.size() + " used");
+		}
 
 		return new int[]{tempChunkStubs.size(), unloadedChunks};
 	}
