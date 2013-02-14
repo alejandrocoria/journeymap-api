@@ -224,6 +224,13 @@ var initUI = function() {
     	drawMap();
     });
     
+    // Test canvas to see if smooth scaling can be toggled
+    var ctx = bgCanvas.getContext("2d");
+    var autoScale = ctx.imageSmoothingEnabled || ctx.mozImageSmoothingEnabled || ctx.webkitImageSmoothingEnabled;
+    if(autoScale!==true) {
+    	$("#checkSmoothScale").parent().attr('disabled', 'disabled');
+    }    
+    
     $("#checkShowAnimals").prop('checked', showAnimals)
     $("#checkShowAnimals").click(function() {
     	showAnimals = (this.checked===true);    	
@@ -261,7 +268,7 @@ var initUI = function() {
 	$("*").live('selectstart dragstart', function(evt){ evt.preventDefault(); return false; });
    
 	// Mouse events for canvas
-	$(window).mousewheel(myMouseWheel);
+	$(canvas).mousewheel(myMouseWheel);
 	
 	// Keyboard events
 	$(document).keypress(myKeyPress);
@@ -685,7 +692,7 @@ var getMapDataUrl = function() {
    var height = getCanvasHeight();
    var mapType = (JM.player && JM.player.underground===true && showCaves===true) ? "underground" : (showLight===true ? "night" : "day") ; 
    var dimension = (JM.player.dimension);
-   var depth = (JM.player && JM.player.chunkCoordY) ? JM.player.chunkCoordY : 4;
+   var depth = (JM.player && JM.player.chunkCoordY!=undefined) ? JM.player.chunkCoordY : 4;
    var request = "/map.png?mapType=" + mapType + "&dimension=" + dimension + "&depth=" + depth + "&x1=" + mapBounds.x1 + "&z1=" + mapBounds.z1 + 
                              "&x2=" + mapBounds.x2 + "&z2=" + mapBounds.z2 + "&width=" + width + "&height=" + height;
    return request;
@@ -816,13 +823,9 @@ var handleError = function(data, error, jqXHR) {
 	
 	var displayError;
 	if(data.status===503 || data.status===0) {
-		if(JM.messages.error_world_not_opened) {
-			displayError = JM.messages.error_world_not_opened;
-		} else if(data.statusText) {
-			displayError = data.statusText;
-		} else {
-			displayError = "";
-		}
+		displayError = JM.messages.error_world_not_opened;
+	} else {
+		displayError = "?";
 	}	
 	
     // Remove others
@@ -1165,29 +1168,10 @@ var drawBackgroundCanvas = function(canvasWidth, canvasHeight) {
         		.prop('webkitImageSmoothingEnabled', smoothScale)
         }
 
-	    if(smoothScale===true || autoScale==true || mapScale==1) {
-	    	ctx.fillStyle = mapBackground;
-	        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-	    	ctx.drawImage(latestMapImage, 0, 0, width*mapScale, height*mapScale);
-	    } else {
-	    	// phrogz.net/tmp/canvas_image_zoom.html
-	    	// Copy pixels and scale with code-generated squares
-		    ctx.drawImage(latestMapImage,0,0);
-			var imgData = ctx.getImageData(0,0,width,height).data;
-			//ctx.clearRect(0,0,width,height);
-			
-			for (var x=0;x<width;++x){
-				for (var y=0;y<height;++y){
-					var i = (y*width + x)*4;
-					var r = imgData[i  ];
-					var g = imgData[i+1];
-					var b = imgData[i+2];
-					var a = imgData[i+3];
-					ctx.fillStyle = "rgba("+r+","+g+","+b+","+(a/255)+")";
-					ctx.fillRect(x*mapScale,y*mapScale,mapScale,mapScale);
-				}
-			}
-	    }	   
+        ctx.fillStyle = mapBackground;
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    	ctx.drawImage(latestMapImage, 0, 0, width*mapScale, height*mapScale);
+	       
    }
 }
 
