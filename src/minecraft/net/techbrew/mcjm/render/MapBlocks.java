@@ -75,7 +75,7 @@ public class MapBlocks extends HashMap {
 	public Color getWaterColor(BiomeGenBase biome) {		
 		Color color = waterBiomeColors.get(biome);
 		if(color==null) {
-			color = blend(Color.blue.darker(), biome.waterColorMultiplier);
+			color = blend(colors.get(new BlockInfo(8,0)), biome.waterColorMultiplier);
 			waterBiomeColors.put(biome, color);
 		}
 		return color;
@@ -95,7 +95,8 @@ public class MapBlocks extends HashMap {
 			int meta = chunkStub.getBlockMetadata(x, y, z);
 			BlockInfo info = new BlockInfo(blockId, meta);
 			info.setColor(getBlockColor(chunkStub, info, x, y, z));
-			info.setAlpha(getBlockAlpha(info));
+			Float alpha = alphas.get(info.id);
+			info.setAlpha(alpha==null ? 1F : alpha);
 			return info;
 			
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -129,11 +130,36 @@ public class MapBlocks extends HashMap {
 		return color;
 	}
 	
-	Float getBlockAlpha(BlockInfo blockInfo) {
-		Float alpha = alphas.get(blockInfo.id);
+//	Float getBlockAlpha(BlockInfo blockInfo) {
+//		Float alpha = alphas.get(blockInfo.id);
+//		
+//		//float opac = 1f-Block.lightOpacity[blockInfo.id]/255f;
+//		return (alpha==null) ? 1f : alpha;
+//	}
+	
+	/**
+	 * Attempt at faster way to figure out if there is sky above
+	 * @param chunkStub
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public static boolean skyAbove(ChunkStub chunkStub, final int x, final int y, final int maxY, final int z) {
+		boolean seeSky = true;
+		int blockId;
 		
-		//float opac = 1f-Block.lightOpacity[blockInfo.id]/255f;
-		return (alpha==null) ? 1f : alpha;
+		int checkY = y;
+		while(seeSky && checkY<=maxY) {
+			blockId = chunkStub.getBlockID(x, checkY, z);
+			if(sky.contains(blockId)) {
+				checkY++;
+			} else {
+				seeSky = false;
+				break;
+			}
+		}
+		return seeSky;
 	}
 	
 	/**
@@ -144,25 +170,22 @@ public class MapBlocks extends HashMap {
 	 * @param z
 	 * @return
 	 */
-	public static boolean skyAbove(ChunkStub chunkStub, final int x, final int y, final int z) {
-		boolean seeSky = true;
+	public static int topNonSkyBlock(ChunkStub chunkStub, final int x, int maxY, final int z) {
+		
+		final int topY = Math.min(maxY, chunkStub._getHeightValue(x, z));
+		
 		int blockId;
 		
-		final int topY = chunkStub.getTopFilledSegment();
-		if(y<topY) {
-			return false;
-		}
-		int checkY = y;
-		while(seeSky && checkY<chunkStub.worldHeight) {
-			blockId = chunkStub.getBlockID(x, checkY, z);
+		int y = topY;
+		while(y>=0) {
+			blockId = chunkStub.getBlockID(x, y, z);
 			if(sky.contains(blockId)) {
-				checkY++;
+				y--;
 			} else {
-				seeSky = false;
 				break;
 			}
 		}
-		return seeSky;
+		return y;
 	}
 	
 	
@@ -234,7 +257,7 @@ public class MapBlocks extends HashMap {
 	public final static HashMap<Integer, Float> alphas = new HashMap<Integer, Float>(5);
 	{
 		alphas.put(8,.55F); // water
-		alphas.put(9,.55F); // water
+		alphas.put(9,.55F); // stationary water 
 		alphas.put(20,.3F); // glass
 		alphas.put(79,.8F); // ice
 		alphas.put(102,.3F); // glass		
@@ -248,9 +271,9 @@ public class MapBlocks extends HashMap {
 	HashMap<BlockInfo, Color> colors = new HashMap<BlockInfo, Color>(256);
 	{
 		colors.put(new BlockInfo(0,0), new Color(0x000000)); // air
-		colors.put(new BlockInfo(1,0), new Color(0x686868)); // stone
+		colors.put(new BlockInfo(1,0), new Color(0x707070)); // stone
 		colors.put(new BlockInfo(2,0), new Color(0x7fb238)); // grass 
-		colors.put(new BlockInfo(3,0), new Color(0x79553a)); // dirt 
+		colors.put(new BlockInfo(3,0), new Color(0xb76a2f)); // dirt 
 		colors.put(new BlockInfo(4,0), new Color(0x959595)); // cobblestone
 		colors.put(new BlockInfo(5,0), new Color(0xbc9862)); // oak plank
 		colors.put(new BlockInfo(5,1), new Color(0x342919)); // spruce plank
@@ -260,8 +283,8 @@ public class MapBlocks extends HashMap {
 		colors.put(new BlockInfo(6,1), new Color(0xa2c978)); // redwood sapling 
 		colors.put(new BlockInfo(6,2), new Color(0xa2c978)); // birch sapling
 		colors.put(new BlockInfo(7,0), new Color(0x333333)); // bedrock
-		colors.put(new BlockInfo(8,0), new Color(0x4040ff)); // water 
-		colors.put(new BlockInfo(9,0), new Color(0x4040ff)); // stationary water 
+		colors.put(new BlockInfo(8,0), new Color(0x112299)); // water 
+		colors.put(new BlockInfo(9,0), new Color(0x112299)); // stationary water 
 		colors.put(new BlockInfo(10,0), new Color(0xE25822)); // lava
 		colors.put(new BlockInfo(11,0), new Color(0xE25822)); // stationary lava
 		colors.put(new BlockInfo(12,0), new Color(0xddd7a0)); // sand
@@ -317,21 +340,21 @@ public class MapBlocks extends HashMap {
 		colors.put(new BlockInfo(33,0), new Color(0x550000)); // piston
 		colors.put(new BlockInfo(34,0), new Color(0x550000)); // piston head		
 		colors.put(new BlockInfo(35,0), new Color(0xdddddd)); // white wool
-		colors.put(new BlockInfo(35,1), new Color(0xeb8138)); // orange wool
-		colors.put(new BlockInfo(35,2), new Color(0xc04cca)); // magenta wool
-		colors.put(new BlockInfo(35,3), new Color(0x8aa3d8)); // light blue wool
-		colors.put(new BlockInfo(35,4), new Color(0xd3ba27)); // yellow wool
-		colors.put(new BlockInfo(35,5), new Color(0x38b62d)); // light green wool
-		colors.put(new BlockInfo(35,6), new Color(0xd8879e)); // pink wool
-		colors.put(new BlockInfo(35,7), new Color(0x3a3a3a)); // gray wool
-		colors.put(new BlockInfo(35,8), new Color(0xa6adad)); // light gray wool 
-		colors.put(new BlockInfo(35,9), new Color(0x246985)); // cyan wool
-		colors.put(new BlockInfo(35,10), new Color(0x8639cb)); // purple wool 
-		colors.put(new BlockInfo(35,11), new Color(0x2937a5)); // blue wool
-		colors.put(new BlockInfo(35,12), new Color(0x51301b)); // brown wool
-		colors.put(new BlockInfo(35,13), new Color(0x354a18)); // dark green wool 
-		colors.put(new BlockInfo(35,14), new Color(0x9c2a27)); // red wool 
-		colors.put(new BlockInfo(35,15), new Color(0x181414)); // black wool 		
+		colors.put(new BlockInfo(35,1), new Color(0xf2b233)); // orange wool
+		colors.put(new BlockInfo(35,2), new Color(0xe57fd8)); // magenta wool
+		colors.put(new BlockInfo(35,3), new Color(0x99b2f2)); // light blue wool
+		colors.put(new BlockInfo(35,4), new Color(0xe5e533)); // yellow wool
+		colors.put(new BlockInfo(35,5), new Color(0x7fcc19)); // lime green wool
+		colors.put(new BlockInfo(35,6), new Color(0xf2b2cc)); // pink wool
+		colors.put(new BlockInfo(35,7), new Color(0x4c4c4c)); // gray wool
+		colors.put(new BlockInfo(35,8), new Color(0x999999)); // light gray wool 
+		colors.put(new BlockInfo(35,9), new Color(0x4c99b2)); // cyan wool
+		colors.put(new BlockInfo(35,10), new Color(0xb266e5)); // purple wool 
+		colors.put(new BlockInfo(35,11), new Color(0x3366cc)); // blue wool
+		colors.put(new BlockInfo(35,12), new Color(0x7f664c)); // brown wool
+		colors.put(new BlockInfo(35,13), new Color(0x667f33)); // dark green wool 
+		colors.put(new BlockInfo(35,14), new Color(0xcc4c4c)); // red wool 
+		colors.put(new BlockInfo(35,15), new Color(0x191919)); // black wool 		
 		colors.put(new BlockInfo(37,0), new Color(0xf1f902)); // dandelion
 		colors.put(new BlockInfo(38,0), new Color(0xf7070f)); // rose
 		colors.put(new BlockInfo(39,0), new Color(0x916d55)); // brown mushroom
@@ -393,10 +416,10 @@ public class MapBlocks extends HashMap {
 		colors.put(new BlockInfo(76,0), new Color(0xfd0000)); // Redstone Torch (on)
 		colors.put(new BlockInfo(77,0), new Color(0x747474)); // Stone Button
 		colors.put(new BlockInfo(78,0), new Color(0xe9fafa)); // Snow
-		colors.put(new BlockInfo(79,0), new Color(0x8ebfff)); // Ice
+		colors.put(new BlockInfo(79,0), new Color(0xa0a0ff)); // Ice
 		colors.put(new BlockInfo(80,0), new Color(0xfafaff)); // Snow Block
 		colors.put(new BlockInfo(81,0), new Color(0x11801e)); // Cactus
-		colors.put(new BlockInfo(82,0), new Color(0xbbbbcc)); // Clay
+		colors.put(new BlockInfo(82,0), new Color(0xa4a8b8)); // Clay
 		colors.put(new BlockInfo(83,0), new Color(0x265c0e)); // Sugar Cane
 		colors.put(new BlockInfo(84,0), new Color(0xaadb74)); // Jukebox
 		colors.put(new BlockInfo(85,0), new Color(0xbc9862)); // Fence
@@ -429,7 +452,7 @@ public class MapBlocks extends HashMap {
 		colors.put(new BlockInfo(108,0), new Color(0xaa543b)); // Brick Stairs
 		colors.put(new BlockInfo(109,0), new Color(0x8f8f8f)); // Stone Brick Stairs
 		colors.put(new BlockInfo(110,0), new Color(0x6E5F6E)); // Mycelium
-		colors.put(new BlockInfo(111,0), new Color(0x0d5f15)); // Lily Pad 
+		colors.put(new BlockInfo(111,0), new Color(0x208030)); // Lily Pad 
 		colors.put(new BlockInfo(112,0), new Color(0x34191e)); // Nether Brick
 		colors.put(new BlockInfo(113,0), new Color(0x55191e)); // Nether Brick Fence
 		colors.put(new BlockInfo(114,0), new Color(0x34191e)); // Nether Brick Stairs
@@ -493,10 +516,12 @@ public class MapBlocks extends HashMap {
 		int r1 = color1.getRed();
         int g1 = color1.getGreen();
         int b1 = color1.getBlue();
+        
+        Color color2 = new Color(multiplier);
 
-        int r2 = 255-((multiplier & 16711680) >> 16);
-        int g2 = 255-((multiplier & 65280) >> 8);
-        int b2 = 255-((multiplier & 255));
+        int r2 = 255-color2.getRed();
+        int g2 = 255-color2.getGreen();
+        int b2 = 255-color2.getBlue();
         
         int r3 = Math.max(0, r1-r2);
         int g3 = Math.max(0, g1-g2);
