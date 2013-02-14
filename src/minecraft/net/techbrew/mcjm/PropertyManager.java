@@ -1,16 +1,12 @@
 package net.techbrew.mcjm;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import net.minecraft.src.ModLoader;
-import net.techbrew.mcjm.io.ChunkFileHandler;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 

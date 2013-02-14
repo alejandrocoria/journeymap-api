@@ -5,48 +5,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.AxisAlignedBB;
-import net.minecraft.src.Entity;
 import net.minecraft.src.EntityAnimal;
-import net.minecraft.src.EntityBlaze;
-import net.minecraft.src.EntityCaveSpider;
 import net.minecraft.src.EntityCreature;
-import net.minecraft.src.EntityCreeper;
-import net.minecraft.src.EntityDragon;
-import net.minecraft.src.EntityEnderman;
-import net.minecraft.src.EntityGhast;
 import net.minecraft.src.EntityGolem;
-import net.minecraft.src.EntityItem;
-import net.minecraft.src.EntityList;
 import net.minecraft.src.EntityLiving;
-import net.minecraft.src.EntityMagmaCube;
-import net.minecraft.src.EntityMob;
-import net.minecraft.src.EntityPigZombie;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerSP;
-import net.minecraft.src.EntitySilverfish;
-import net.minecraft.src.EntitySkeleton;
-import net.minecraft.src.EntitySlime;
-import net.minecraft.src.EntitySpider;
 import net.minecraft.src.EntityTameable;
 import net.minecraft.src.EntityVillager;
 import net.minecraft.src.EntityWaterMob;
-import net.minecraft.src.EntityWolf;
-import net.minecraft.src.EntityZombie;
 import net.minecraft.src.IAnimals;
 import net.minecraft.src.IMob;
 import net.minecraft.src.MathHelper;
-import net.minecraft.src.World;
-import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.render.MapBlocks;
 
 public class EntityHelper {
 	

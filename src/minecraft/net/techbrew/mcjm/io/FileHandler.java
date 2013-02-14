@@ -14,7 +14,6 @@ import net.minecraft.src.World;
 import net.minecraft.src.WorldInfo;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.ReflectionHelper;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.log.LogFormatter;
 

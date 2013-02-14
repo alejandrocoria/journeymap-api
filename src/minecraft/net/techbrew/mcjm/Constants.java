@@ -10,8 +10,6 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.ModLoader;
-import net.techbrew.mcjm.io.RegionCoord;
 
 
 public class Constants {

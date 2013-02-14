@@ -2,7 +2,6 @@ package net.techbrew.mcjm;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.Chunk;
-import net.minecraft.src.ChunkCoordinates;
 import net.minecraft.src.EmptyChunk;
 import net.minecraft.src.World;
 

@@ -34,7 +34,6 @@ import net.minecraft.src.WorldProvider;
 import net.minecraft.src.WorldProviderHell;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.ReflectionHelper;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.Constants.WorldType;
 import net.techbrew.mcjm.log.LogFormatter;

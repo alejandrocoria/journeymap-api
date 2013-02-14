@@ -2,7 +2,9 @@ package net.techbrew.mcjm;
 
 import java.util.Arrays;
 
-import net.minecraft.src.*;
+import net.minecraft.src.Block;
+import net.minecraft.src.ExtendedBlockStorage;
+import net.minecraft.src.NibbleArray;
 
 public class ExtendedBlockStorageStub
 {
