@@ -24,6 +24,7 @@ public class JMServer {
 		props.put("port", Integer.toString(port)); //$NON-NLS-1$
 		props.put("delay", Integer.toString(10000)); //$NON-NLS-1$
 		props.put("timeout", Integer.toString(10000)); //$NON-NLS-1$
+		props.put("cookie", Integer.toString(0)); //$NON-NLS-1$
 		
 		// Instantiate daemon
 		rupy = new Daemon(props);
