@@ -27,7 +27,7 @@ public class PlayersData implements IDataProvider {
 	private static long TTL = TimeUnit.SECONDS.toMillis(3);
 	
 	public static enum Key {
-		players;
+		root;
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class PlayersData implements IDataProvider {
 		}
 					
 		LinkedHashMap props = new LinkedHashMap();
-		props.put(Key.players, list);
+		props.put(Key.root, list);
 		
 		return props;		
 	}	

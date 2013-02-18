@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.PropertyManager;
 import net.techbrew.mcjm.VersionCheck;
+import net.techbrew.mcjm.data.AllData.Key;
 
 import org.lwjgl.opengl.Display;
 
@@ -30,7 +31,7 @@ public class GameData implements IDataProvider {
 		browser_animalsdata_poll,
 		browser_mobsdata_poll,
 		browser_playersdata_poll,
-		browser_villagersdata_poll
+		browser_villagersdata_poll,
 	}
 
 	/**
@@ -63,7 +64,7 @@ public class GameData implements IDataProvider {
 		props.put(Key.browser_playersdata_poll, pm.getInteger(PropertyManager.BROWSER_PLAYERSDATA_POLL_PROP));
 		props.put(Key.browser_villagersdata_poll, pm.getInteger(PropertyManager.BROWSER_VILLAGERSDATA_POLL_PROP));
 
-		return props;
+		return props;	
 	}
 
 	/**

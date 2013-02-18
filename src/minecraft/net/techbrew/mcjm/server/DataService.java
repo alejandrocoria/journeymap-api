@@ -38,6 +38,7 @@ import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.Constants.WorldType;
+import net.techbrew.mcjm.data.AllData;
 import net.techbrew.mcjm.data.AnimalsData;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.GameData;
@@ -74,6 +75,7 @@ public class DataService extends BaseService {
 	public static final HashMap<String,Class<? extends IDataProvider>> providerMap;
 	static {
 		providerMap = new HashMap<String,Class<? extends IDataProvider>>(8);
+		providerMap.put("/data/all", AllData.class);  //$NON-NLS-1$
 		providerMap.put("/data/animals", AnimalsData.class);  //$NON-NLS-1$
 		providerMap.put("/data/mobs", MobsData.class);  //$NON-NLS-1$
 		providerMap.put("/data/game", GameData.class);  //$NON-NLS-1$

@@ -35,7 +35,7 @@ public class PlayerData implements IDataProvider {
 		posZ,
 		chunkCoordX, 
 		chunkCoordY,
-		chunkCoordZ
+		chunkCoordZ,
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class PlayerData implements IDataProvider {
 		props.put(Key.dimension, mc.theWorld.provider.dimensionId); 
 		props.put(Key.biome, getPlayerBiome()); 
 		props.put(Key.underground, playerIsUnderground());		
-				
+
 		return props;	
 	}	
 	

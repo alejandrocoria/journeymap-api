@@ -37,8 +37,9 @@ public class AnimalsData implements IDataProvider {
 	private final boolean includePets;
 	
 	public static enum Key {
-		animals,
+		root,
 		type,
+		hostile,
 		posX,
 		posZ,
 		chunkCoordX,
@@ -88,6 +89,7 @@ public class AnimalsData implements IDataProvider {
 			EntityLiving entity = (EntityLiving) animal;
 			LinkedHashMap eProps = new LinkedHashMap();
 			eProps.put(Key.type, entity.getEntityName()); 
+			eProps.put(Key.hostile, false);
 			eProps.put(Key.posX, (int) entity.posX); 
 			eProps.put(Key.posZ, (int) entity.posZ); 
 			eProps.put(Key.chunkCoordX, entity.chunkCoordX); 
@@ -103,7 +105,7 @@ public class AnimalsData implements IDataProvider {
 		}
 					
 		LinkedHashMap props = new LinkedHashMap();
-		props.put(Key.animals, list);
+		props.put(Key.root, list);
 		
 		return props;		
 	}	

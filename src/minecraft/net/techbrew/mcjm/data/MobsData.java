@@ -9,11 +9,16 @@ import java.util.concurrent.TimeUnit;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.Entity;
+import net.minecraft.src.EntityAnimal;
+import net.minecraft.src.EntityGolem;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityMob;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerSP;
+import net.minecraft.src.EntityWaterMob;
+import net.minecraft.src.IBossDisplayData;
 import net.minecraft.src.IMob;
+import net.minecraft.src.IRangedAttackMob;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.ChunkStub;
 import net.techbrew.mcjm.EntityHelper;
@@ -31,14 +36,15 @@ public class MobsData implements IDataProvider {
 	
 	private static long TTL = TimeUnit.SECONDS.toMillis(3);
 	
-	public static enum Key {
-		mobs,
+	public static enum Key {		
 		type,
+		hostile,
 		posX,
 		posZ,
 		chunkCoordX,
 		chunkCoordZ,
-		heading;
+		heading,
+		root;
 	}
 
 	/**
@@ -68,6 +74,12 @@ public class MobsData implements IDataProvider {
 			EntityLiving entity = (EntityLiving) mob;
 			LinkedHashMap eProps = new LinkedHashMap();
 			eProps.put(Key.type, entity.getEntityName()); 
+			if(mob instanceof EntityMob || mob instanceof IBossDisplayData || mob instanceof IRangedAttackMob) {
+				eProps.put(Key.hostile, true); 
+			} else {
+				eProps.put(Key.hostile, false); 
+			}
+			
 			eProps.put(Key.posX, (int) entity.posX); 
 			eProps.put(Key.posZ, (int) entity.posZ); 
 			eProps.put(Key.chunkCoordX, entity.chunkCoordX); 
@@ -77,7 +89,7 @@ public class MobsData implements IDataProvider {
 		}
 					
 		LinkedHashMap props = new LinkedHashMap();
-		props.put(Key.mobs, list);
+		props.put(Key.root, list);
 		
 		return props;		
 	}	
