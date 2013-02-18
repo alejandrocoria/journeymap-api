@@ -198,15 +198,14 @@ public class EntityHelper {
 	
 	
 	/**
-	 * Get the entity's heading in degrees
+	 * Get the entity's heading in radians
+	 * 
 	 * @param player
 	 * @return
 	 */
 	public static double getHeading(EntityLiving entity) {
-		double xHeading = -MathHelper.sin((entity.rotationYaw * 3.141593F) / 180F);
-	    double zHeading = MathHelper.cos((entity.rotationYaw * 3.141593F) / 180F);
-		double degrees = Math.atan2(xHeading, zHeading) * (180 / Math.PI);
-	    if(degrees > 0 || degrees < 180) degrees = 180 - degrees;
-	    return degrees;
+		double degrees = Math.round(entity.rotationYaw % 360);
+	    double radians = (degrees * Math.PI) / 180;
+	    return radians;
 	}
 }
