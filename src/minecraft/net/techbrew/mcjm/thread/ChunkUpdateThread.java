@@ -80,7 +80,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 	protected void doTask() {
 		
 		boolean finestLogging = JourneyMap.getLogger().isLoggable(Level.FINEST);
-		finestLogging = true;
+		//finestLogging = true;
 		
 		try {
 				Boolean flush = false;
