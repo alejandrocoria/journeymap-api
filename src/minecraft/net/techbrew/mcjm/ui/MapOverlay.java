@@ -747,8 +747,8 @@ public class MapOverlay extends GuiScreen {
 			if(showMonsters && !hardcore) {
 				// Draw nearby mobs
 				BasicStroke circleStroke = new BasicStroke(2F);				
-				List<Map> hostiles = (List<Map>) DataCache.instance().get(MobsData.class).get(MobsData.Key.mobs);
-				List<Map> animals = (List<Map>) DataCache.instance().get(AnimalsData.class).get(AnimalsData.Key.animals);
+				List<Map> hostiles = (List<Map>) DataCache.instance().get(MobsData.class).get(MobsData.Key.root);
+				List<Map> animals = (List<Map>) DataCache.instance().get(AnimalsData.class).get(AnimalsData.Key.root);
 				
 				List<Map> critters = new ArrayList<Map>(hostiles.size() + animals.size());
 				critters.addAll(hostiles);
@@ -791,7 +791,7 @@ public class MapOverlay extends GuiScreen {
 					g2D.setFont(new Font("Arial", Font.PLAIN, 20)); //$NON-NLS-1$
 					FontMetrics fm = g2D.getFontMetrics();
 					
-					List<EntityPlayer> others = (List<EntityPlayer>) DataCache.instance().get(PlayersData.class).get(PlayersData.Key.players);
+					List<EntityPlayer> others = (List<EntityPlayer>) DataCache.instance().get(PlayersData.class).get(PlayersData.Key.root);
 					for(EntityPlayer other : others) {
 						if(inBounds(other)) {
 	
