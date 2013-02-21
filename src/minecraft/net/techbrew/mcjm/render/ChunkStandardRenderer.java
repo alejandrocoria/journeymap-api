@@ -242,6 +242,14 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						
 						// Treat water with depth
 						if(blockId==8 || blockId==9) {
+							
+							lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
+							if (caveLighting && lightLevel < 1) {
+								// No lit blocks in column
+								paintClearBlock(x, vSlice, z, g2D);
+								continue blockLoop;
+							}
+							
 							BlockInfo blockInfo = mapBlocks.getBlockInfo(chunkStub, x, y, z);
 							paintDepth(chunkStub, blockInfo, x, y, z, g2D);
 							continue blockLoop;
@@ -260,7 +268,10 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 								lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
 							}
 							paintY = y;
-							break airloop;							
+							
+							if (caveLighting && lightLevel > 0) {
+								break airloop;						
+							}
 						}
 					}
 		
