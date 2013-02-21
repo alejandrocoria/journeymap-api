@@ -237,6 +237,7 @@ public class MapBlocks extends HashMap {
 		sky.add(18); // leaves
 		sky.add(30); // web
 		sky.add(65); // ladder
+		sky.add(78); // ladder
 		sky.add(106); // vines
 	}
 	
@@ -353,7 +354,7 @@ public class MapBlocks extends HashMap {
 		colors.put(new BlockInfo(35,11), new Color(0x3366cc)); // blue wool
 		colors.put(new BlockInfo(35,12), new Color(0x7f664c)); // brown wool
 		colors.put(new BlockInfo(35,13), new Color(0x667f33)); // dark green wool 
-		colors.put(new BlockInfo(35,14), new Color(0xcc4c4c)); // red wool 
+		colors.put(new BlockInfo(35,14), new Color(0x943330)); // red wool 
 		colors.put(new BlockInfo(35,15), new Color(0x191919)); // black wool 		
 		colors.put(new BlockInfo(37,0), new Color(0xf1f902)); // dandelion
 		colors.put(new BlockInfo(38,0), new Color(0xf7070f)); // rose
