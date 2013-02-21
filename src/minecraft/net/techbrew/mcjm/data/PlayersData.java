@@ -25,10 +25,6 @@ import net.techbrew.mcjm.render.MapBlocks;
 public class PlayersData implements IDataProvider {
 	
 	private static long TTL = TimeUnit.SECONDS.toMillis(3);
-	
-	public static enum Key {
-		root;
-	}
 
 	/**
 	 * Constructor.
@@ -40,7 +36,7 @@ public class PlayersData implements IDataProvider {
 	 * Provides all possible keys.
 	 */
 	public Enum[] getKeys() {
-		return Key.values();
+		return EntityKey.values();
 	}
 	
 	/**
@@ -58,11 +54,11 @@ public class PlayersData implements IDataProvider {
 			list = new ArrayList<Map>(others.size());
 			for(EntityPlayer other : others) {
 				LinkedHashMap otherProps = new LinkedHashMap();
-				otherProps.put("username", other.username); //$NON-NLS-1$
-				otherProps.put("posX", other.posX); //$NON-NLS-1$
-				otherProps.put("posY", other.posY); //$NON-NLS-1$
-				otherProps.put("posZ", other.posZ); //$NON-NLS-1$
-				otherProps.put("heading", EntityHelper.getHeading(other));
+				otherProps.put(EntityKey.username, other.username); //$NON-NLS-1$
+				otherProps.put(EntityKey.posX, other.posX); //$NON-NLS-1$
+				otherProps.put(EntityKey.posY, other.posY); //$NON-NLS-1$
+				otherProps.put(EntityKey.posZ, other.posZ); //$NON-NLS-1$
+				otherProps.put(EntityKey.heading, EntityHelper.getHeading(other));
 				list.add(otherProps);
 			}
 		} else {
@@ -70,7 +66,7 @@ public class PlayersData implements IDataProvider {
 		}
 					
 		LinkedHashMap props = new LinkedHashMap();
-		props.put(Key.root, list);
+		props.put(EntityKey.root, list);
 		
 		return props;		
 	}	

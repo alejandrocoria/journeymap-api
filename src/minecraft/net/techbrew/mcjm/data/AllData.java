@@ -49,11 +49,11 @@ public class AllData implements IDataProvider {
 		
 		DataCache cache = DataCache.instance();
 		LinkedHashMap props = new LinkedHashMap();
-		props.put(Key.animals, cache.get(AnimalsData.class).get(AnimalsData.Key.root));
-		props.put(Key.mobs, cache.get(MobsData.class).get(MobsData.Key.root));
+		props.put(Key.animals, cache.get(AnimalsData.class).get(EntityKey.root));
+		props.put(Key.mobs, cache.get(MobsData.class).get(EntityKey.root));
 		props.put(Key.player, cache.get(PlayerData.class));
-		props.put(Key.players, cache.get(PlayersData.class).get(PlayersData.Key.root));
-		props.put(Key.villagers, cache.get(VillagersData.class).get(VillagersData.Key.root));
+		props.put(Key.players, cache.get(PlayersData.class).get(EntityKey.root));
+		props.put(Key.villagers, cache.get(VillagersData.class).get(EntityKey.root));
 		props.put(Key.world, cache.get(WorldData.class));
 		
 		return props;		

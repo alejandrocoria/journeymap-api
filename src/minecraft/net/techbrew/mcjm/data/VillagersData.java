@@ -19,7 +19,6 @@ import net.minecraft.src.World;
 import net.techbrew.mcjm.ChunkStub;
 import net.techbrew.mcjm.EntityHelper;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.data.MobsData.Key;
 import net.techbrew.mcjm.render.MapBlocks;
 
 /**
@@ -32,17 +31,6 @@ public class VillagersData implements IDataProvider {
 	
 	private static long TTL = TimeUnit.SECONDS.toMillis(5);
 	
-	public static enum Key {		
-		type,
-		hostile,
-		posX,
-		posZ,
-		chunkCoordX,
-		chunkCoordZ,
-		heading,
-		profession,
-		root
-	}
 
 	/**
 	 * Constructor.
@@ -54,7 +42,7 @@ public class VillagersData implements IDataProvider {
 	 * Provides all possible keys.
 	 */
 	public Enum[] getKeys() {
-		return Key.values();
+		return EntityKey.values();
 	}
 	
 	/**
@@ -70,19 +58,19 @@ public class VillagersData implements IDataProvider {
 		
 		for(EntityVillager entity : villagers) {
 			LinkedHashMap eProps = new LinkedHashMap();
-			eProps.put(Key.type, entity.getEntityName()); 
-			eProps.put(Key.hostile, false);
-			eProps.put(Key.posX, (int) entity.posX); 
-			eProps.put(Key.posZ, (int) entity.posZ); 
-			eProps.put(Key.chunkCoordX, entity.chunkCoordX); 
-			eProps.put(Key.chunkCoordZ, entity.chunkCoordZ); 	
-			eProps.put(Key.heading, EntityHelper.getHeading(entity)); 
-			eProps.put(Key.profession, entity.getProfession()); 
+			eProps.put(EntityKey.type, entity.getEntityName()); 
+			eProps.put(EntityKey.hostile, false);
+			eProps.put(EntityKey.posX, (int) entity.posX); 
+			eProps.put(EntityKey.posZ, (int) entity.posZ); 
+			eProps.put(EntityKey.chunkCoordX, entity.chunkCoordX); 
+			eProps.put(EntityKey.chunkCoordZ, entity.chunkCoordZ); 	
+			eProps.put(EntityKey.heading, EntityHelper.getHeading(entity)); 
+			eProps.put(EntityKey.profession, entity.getProfession()); 
 			list.add(eProps);
 		}
 					
 		LinkedHashMap props = new LinkedHashMap();
-		props.put(Key.root, list);
+		props.put(EntityKey.root, list);
 		
 		return props;		
 	}	

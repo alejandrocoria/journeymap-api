@@ -23,20 +23,6 @@ import net.techbrew.mcjm.render.MapBlocks;
 public class PlayerData implements IDataProvider {
 	
 	private static long TTL = TimeUnit.SECONDS.toMillis(1);
-	
-	public static enum Key {
-		username,
-		heading,
-		biome,
-		dimension,
-		underground,
-		posX, 
-		posY, 
-		posZ,
-		chunkCoordX, 
-		chunkCoordY,
-		chunkCoordZ,
-	}
 
 	/**
 	 * Constructor.
@@ -48,7 +34,7 @@ public class PlayerData implements IDataProvider {
 	 * Provides all possible keys.
 	 */
 	public Enum[] getKeys() {
-		return Key.values();
+		return EntityKey.values();
 	}
 	
 	/**
@@ -61,18 +47,18 @@ public class PlayerData implements IDataProvider {
 	   
 		LinkedHashMap props = new LinkedHashMap();
 
-		props.put(Key.username, player.username);
-		props.put(Key.heading, EntityHelper.getHeading(player));
-		props.put(Key.chunkCoordX, player.chunkCoordX); 
-		props.put(Key.chunkCoordY, player.chunkCoordY); 
-		props.put(Key.chunkCoordZ, player.chunkCoordZ); 
-		props.put(Key.posX, (int) Math.floor(player.posX)); 
-		props.put(Key.posY, (int) Math.floor(player.posY));
-		props.put(Key.posZ, (int) Math.floor(player.posZ));
+		props.put(EntityKey.username, player.username);
+		props.put(EntityKey.heading, EntityHelper.getHeading(player));
+		props.put(EntityKey.chunkCoordX, player.chunkCoordX); 
+		props.put(EntityKey.chunkCoordY, player.chunkCoordY); 
+		props.put(EntityKey.chunkCoordZ, player.chunkCoordZ); 
+		props.put(EntityKey.posX, (int) Math.floor(player.posX)); 
+		props.put(EntityKey.posY, (int) Math.floor(player.posY));
+		props.put(EntityKey.posZ, (int) Math.floor(player.posZ));
 		
-		props.put(Key.dimension, mc.theWorld.provider.dimensionId); 
-		props.put(Key.biome, getPlayerBiome()); 
-		props.put(Key.underground, playerIsUnderground());		
+		props.put(EntityKey.dimension, mc.theWorld.provider.dimensionId); 
+		props.put(EntityKey.biome, getPlayerBiome()); 
+		props.put(EntityKey.underground, playerIsUnderground());		
 
 		return props;	
 	}	

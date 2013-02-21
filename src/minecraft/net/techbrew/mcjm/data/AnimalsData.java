@@ -20,7 +20,6 @@ import net.minecraft.src.World;
 import net.techbrew.mcjm.ChunkStub;
 import net.techbrew.mcjm.EntityHelper;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.data.MobsData.Key;
 import net.techbrew.mcjm.render.MapBlocks;
 
 /**
@@ -35,18 +34,6 @@ public class AnimalsData implements IDataProvider {
 	
 	private final boolean includeNonPets;
 	private final boolean includePets;
-	
-	public static enum Key {
-		root,
-		type,
-		hostile,
-		posX,
-		posZ,
-		chunkCoordX,
-		chunkCoordZ,
-		heading,
-		owner;
-	}
 
 	/**
 	 * Constructor.
@@ -71,7 +58,7 @@ public class AnimalsData implements IDataProvider {
 	 * Provides all possible keys.
 	 */
 	public Enum[] getKeys() {
-		return Key.values();
+		return EntityKey.values();
 	}
 	
 	/**
@@ -88,24 +75,24 @@ public class AnimalsData implements IDataProvider {
 		for(IAnimals animal : animals) {
 			EntityLiving entity = (EntityLiving) animal;
 			LinkedHashMap eProps = new LinkedHashMap();
-			eProps.put(Key.type, entity.getEntityName()); 
-			eProps.put(Key.hostile, false);
-			eProps.put(Key.posX, (int) entity.posX); 
-			eProps.put(Key.posZ, (int) entity.posZ); 
-			eProps.put(Key.chunkCoordX, entity.chunkCoordX); 
-			eProps.put(Key.chunkCoordZ, entity.chunkCoordZ); 
-			eProps.put(Key.heading, EntityHelper.getHeading(entity));
+			eProps.put(EntityKey.type, entity.getEntityName()); 
+			eProps.put(EntityKey.hostile, false);
+			eProps.put(EntityKey.posX, (int) entity.posX); 
+			eProps.put(EntityKey.posZ, (int) entity.posZ); 
+			eProps.put(EntityKey.chunkCoordX, entity.chunkCoordX); 
+			eProps.put(EntityKey.chunkCoordZ, entity.chunkCoordZ); 
+			eProps.put(EntityKey.heading, EntityHelper.getHeading(entity));
 			if(entity instanceof EntityTameable) {
 				String owner = ((EntityTameable) entity).getOwnerName();
 				if(owner!=null) {
-					eProps.put(Key.owner, owner);
+					eProps.put(EntityKey.owner, owner);
 				}
 			}
 			list.add(eProps);
 		}
 					
 		LinkedHashMap props = new LinkedHashMap();
-		props.put(Key.root, list);
+		props.put(EntityKey.root, list);
 		
 		return props;		
 	}	

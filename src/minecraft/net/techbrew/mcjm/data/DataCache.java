@@ -133,7 +133,7 @@ public class DataCache {
      * @param key
      * @return
      */
-    public static Object playerDataValue(PlayerData.Key key) {
+    public static Object playerDataValue(EntityKey key) {
     	return instance().get(PlayerData.class).get(key);
     }
 

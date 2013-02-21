@@ -60,6 +60,7 @@ import net.techbrew.mcjm.Constants.CoordType;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.data.AnimalsData;
 import net.techbrew.mcjm.data.DataCache;
+import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.data.MobsData;
 import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.data.PlayersData;
@@ -175,7 +176,7 @@ public class MapOverlay extends GuiScreen {
 		case 2: { // caves
 			setShowCaves(!showCaves);
 			buttonCaves.toggle = showCaves;	
-			boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(PlayerData.Key.underground);
+			boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
 			if(underground) {
 				lastMapImg = null;
 			}
@@ -623,7 +624,7 @@ public class MapOverlay extends GuiScreen {
 
 			// Maptype
 			Constants.MapType tempMapType = null;
-			final boolean underground = (Boolean) DataCache.playerDataValue(PlayerData.Key.underground);
+			final boolean underground = (Boolean) DataCache.playerDataValue(EntityKey.underground);
 			if(underground && showCaves && !hardcore) {
 				tempMapType = Constants.MapType.underground;
 			} else {
@@ -704,10 +705,14 @@ public class MapOverlay extends GuiScreen {
 	}
 	
 	boolean inBounds(Map entityMap) {
-		int chunkX = (Integer) entityMap.get(MobsData.Key.chunkCoordX);
-		int chunkZ = (Integer) entityMap.get(MobsData.Key.chunkCoordZ);
+		try {
+		int chunkX = (Integer) entityMap.get(EntityKey.chunkCoordX);
+		int chunkZ = (Integer) entityMap.get(EntityKey.chunkCoordZ);
 		return (chunkX>=mapBounds[0].chunkXPos && chunkX<=mapBounds[1].chunkXPos && 
 				chunkZ>=mapBounds[0].chunkZPos && chunkZ<=mapBounds[1].chunkZPos);
+		} catch(NullPointerException e) {
+			return false;
+		}
 	}
 
 	void drawEntityLayer() {
@@ -747,8 +752,8 @@ public class MapOverlay extends GuiScreen {
 			if(showMonsters && !hardcore) {
 				// Draw nearby mobs
 				BasicStroke circleStroke = new BasicStroke(2F);				
-				List<Map> hostiles = (List<Map>) DataCache.instance().get(MobsData.class).get(MobsData.Key.root);
-				List<Map> animals = (List<Map>) DataCache.instance().get(AnimalsData.class).get(AnimalsData.Key.root);
+				List<Map> hostiles = (List<Map>) DataCache.instance().get(MobsData.class).get(EntityKey.root);
+				List<Map> animals = (List<Map>) DataCache.instance().get(AnimalsData.class).get(EntityKey.root);
 				
 				List<Map> critters = new ArrayList<Map>(hostiles.size() + animals.size());
 				critters.addAll(hostiles);
@@ -757,9 +762,9 @@ public class MapOverlay extends GuiScreen {
 				for(Map critter : critters) {
 					if(inBounds(critter)) {
 
-						String type = (String) critter.get(MobsData.Key.type);
-						int x = (Integer) critter.get(MobsData.Key.posX);
-						int z = (Integer) critter.get(MobsData.Key.posZ);
+						String type = (String) critter.get(EntityKey.type);
+						int x = (Integer) critter.get(EntityKey.posX);
+						int z = (Integer) critter.get(EntityKey.posZ);
 						
 						int iconHeight = (type.equals("Dragon") || type.equals("Ghast")) ? 56 : 48;
 						int iconWidth = iconHeight;
@@ -791,7 +796,7 @@ public class MapOverlay extends GuiScreen {
 					g2D.setFont(new Font("Arial", Font.PLAIN, 20)); //$NON-NLS-1$
 					FontMetrics fm = g2D.getFontMetrics();
 					
-					List<EntityPlayer> others = (List<EntityPlayer>) DataCache.instance().get(PlayersData.class).get(PlayersData.Key.root);
+					List<EntityPlayer> others = (List<EntityPlayer>) DataCache.instance().get(PlayersData.class).get(EntityKey.root);
 					for(EntityPlayer other : others) {
 						if(inBounds(other)) {
 	
@@ -882,7 +887,7 @@ public class MapOverlay extends GuiScreen {
 			lastEntityUpdate = System.currentTimeMillis();
 
 			// Update data
-			String biomeName = (String) DataCache.instance().get(PlayerData.class).get(PlayerData.Key.biome);
+			String biomeName = (String) DataCache.instance().get(PlayerData.class).get(EntityKey.biome);
 			
 			long vslice = Math.round(mc.thePlayer.posY) >> 4;
 			String playerPos = Constants.getString("MapOverlay.player_location", 
@@ -971,7 +976,7 @@ public class MapOverlay extends GuiScreen {
 		final File worldDir = FileHandler.getWorldDir(mc);
 		final File saveDir = FileHandler.getJourneyMapDir();
 
-		final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(PlayerData.Key.underground);
+		final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
 		Constants.MapType checkMapType = mapType;
 		if(underground && showCaves) {
 			checkMapType = Constants.MapType.underground;
