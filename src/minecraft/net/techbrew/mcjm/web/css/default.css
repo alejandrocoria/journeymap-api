@@ -4,7 +4,7 @@ body {
 }
 
 .navbar-inner {
-    min-height: 40px;
+    min-height: 50px;
 }
 
 .btn-toolbar {
@@ -95,9 +95,8 @@ body {
     font-weight: bold;
     
     padding: 5px 0px 0px 0px;
-    margin: 0px;
+    margin:0px 0px;
     color: #000;
-    
 
 }
 
