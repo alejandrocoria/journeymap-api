@@ -149,7 +149,7 @@ public class PlayerData implements IDataProvider {
 		boolean seeSky = true;
 		int blockId;
 		
-		int topY = 256; //world.worldMaxY;
+		int topY = world.getHeight();
 		if(y>=topY) {
 			return true;
 		}
