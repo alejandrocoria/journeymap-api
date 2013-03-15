@@ -31,12 +31,13 @@
 
     <div id="header" class="navbar navbar-static-top">
       <div class="navbar-inner">
+      
         <div class="container">
-
-          <div class="btn-group">
-            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-              <img src="ico/favicon.png"> JourneyMap <span id="version"></span> <span class="caret"></span>
-            </a>
+        
+         
+          <img id="logo" src="ico/journeymap40.png">
+          <div class="btn-group">            
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">JourneyMap <span id="version"></span> <span class="caret"></span></a>
             <ul class="dropdown-menu">
               <li><a target="_blank" id="webLink" title="http://journeymap.techbrew.net" href="http://journeymap.techbrew.net"><img src="img/browser.png" width="16" alt=""><span id="webLinkText">http://journeymap.techbrew.net</span></a></li>
               <li><a target="_blank" id="forumLink" title="JourneyMap forum on minecraftforum.net" href="http://goo.gl/pmbTh"><img src="http://trinium.cursecdn.com/netbar/minecraftforums.png" width="16" alt=""><span id="forumLinkText">Minecraft Forum</span></a></li>
@@ -62,13 +63,6 @@
                   <span id="showMenuText"></span><span class="caret"></span>
                 </a>
                 <ul id="showMenu" class="dropdown-menu">
-                  <li>
-                    <label>
-                      <input id="checkSmoothScale" type="checkbox">
-                      <span id="smoothPixelsMenuItem"></span>
-                    </label>
-                  </li>
-                  <li class="divider"></li>
                   <li>
                     <label>
                       <input id="checkShowAnimals" type="checkbox">
@@ -116,7 +110,7 @@
 
     <canvas id="mapCanvas"></canvas>
 
-    <div class="container">
+    <div class="container">      
       <div id="worldInfo">
         <div>
           <span class="infoTitle" id="worldNameTitle"></span>

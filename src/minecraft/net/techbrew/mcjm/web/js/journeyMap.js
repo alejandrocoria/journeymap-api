@@ -263,7 +263,7 @@ var JourneyMap = (function() {
     $("#playerElevationTitle").html(JM.messages.elevation_title);
     
     $("#showMenuText").html(JM.messages.show_menu_text);
-    $("#smoothPixelsMenuItem").html(JM.messages.smooth_pixels_menu_item);
+    //$("#smoothPixelsMenuItem").html(JM.messages.smooth_pixels_menu_item);
     $("#animalsMenuItem").html(JM.messages.animals_menu_item);
     $("#petsMenuItem").html(JM.messages.pets_menu_item);
     $("#mobsMenuItem").html(JM.messages.mobs_menu_item);
@@ -274,10 +274,10 @@ var JourneyMap = (function() {
       event.stopPropagation();
     });
     
-    $("#checksmoothing").prop('checked', smoothing).click(function() {
-      setSmoothing(this.checked === true);
-      drawMap();
-    });
+//    $("#checksmoothing").prop('checked', smoothing).click(function() {
+//      setSmoothing(this.checked === true);
+//      drawMap();
+//    });
   
     // Test canvas to see if smooth scaling can be toggled
     var ctx = bgCanvas.getContext("2d");
@@ -1142,9 +1142,7 @@ var JourneyMap = (function() {
       // Draw map image
       ctx.drawImage(latestMapImage, 0, 0, width * mapScale, height * mapScale);
   
-    } else {
-      console.log("No latestMapImage");
-    }
+    } 
   }
   
   function getScaledChunkX(chunkX) {
