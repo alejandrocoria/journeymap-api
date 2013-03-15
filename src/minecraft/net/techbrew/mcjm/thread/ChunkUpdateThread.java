@@ -175,14 +175,8 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 
 		// Stub surrounding chunks
 		int offset = chunkOffset;
-		if(offset>2) {
-			if(underground) {
-				
-				offset=offset-2;
-				//offset=0; // TODO: put back to normal after underground stuff figured out
-			} else if (playerChunkX == lastChunkX && playerChunkZ==lastChunkZ) {
-				offset=1;
-			}
+		if (offset>0 && playerChunkX == lastChunkX && playerChunkZ==lastChunkZ) {
+			offset=1;
 		}
 		
 		lastChunkX = playerChunkX;
