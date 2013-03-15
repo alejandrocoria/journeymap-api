@@ -72,7 +72,7 @@ import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.render.MapBlocks;
 
 public class MapOverlay extends GuiScreen {
-
+	
 	LinkedList<ZoomLevel> zoomLevels = ZoomLevel.getLevels();
 	
 	static int currentZoomIndex = 3;
@@ -122,8 +122,8 @@ public class MapOverlay extends GuiScreen {
 	}
 
 	private void drawButtonBar() {
-		drawRectangle(0,0,width,9,109,179,242,255);
-		drawRectangle(0,9,width,9,0,0,85,255);
+		drawRectangle(0,0,width,9,216,216,216,255);
+		drawRectangle(0,9,width,9,200,200,200,255);
 		drawRectangle(0,18,width,1,50,50,50,100);
 		
 		// zoom underlay
@@ -132,15 +132,18 @@ public class MapOverlay extends GuiScreen {
 		} else {
 			drawRectangle(2,20,18,50,0,0,0,80);
 		}
-		drawImage(mc.renderEngine.getTexture("/net/techbrew/mcjm/web/journeyMap.png"), 1F, 0, 3, 96, 15); //$NON-NLS-1$
+		drawImage(mc.renderEngine.getTexture(FileHandler.WEB_DIR + "/ico/apple-touch-icon-57x57-precomposed.png"), 1F, 3, 1, 57/2, 57/2); //$NON-NLS-1$
 	}
 
 	@Override
 	public void drawScreen(int i, int j, float f) {
+		int oldGuiScale = mc.gameSettings.guiScale;
+		mc.gameSettings.guiScale = 2;
 		try {
 			if(follow) {    
 				centerMapOnPlayer();                
 			}
+
 			drawBackground(0);
 			drawMap();
 			drawEntityLayer();
@@ -153,6 +156,8 @@ public class MapOverlay extends GuiScreen {
 			JourneyMap.getLogger().severe(LogFormatter.toString(e));
 			String error = Constants.getMessageJMERR23(e.getMessage());
 			JourneyMap.announce(error);
+		} finally {
+			mc.gameSettings.guiScale = oldGuiScale;
 		}
 	}
 
@@ -221,12 +226,15 @@ public class MapOverlay extends GuiScreen {
 
 	@Override
 	public void setWorldAndResolution(Minecraft minecraft, int i, int j) {
+		
+
 		super.setWorldAndResolution(minecraft, i, j);
 		hardcore = !minecraft.isSingleplayer() && minecraft.theWorld.getWorldInfo().isHardcoreModeEnabled();
 		initButtons();
 		layoutButtons();
 		setZoom(currentZoomIndex);
 		centerMapOnPlayer();
+
 	}
 
 	int bWidth = 16;
@@ -238,22 +246,22 @@ public class MapOverlay extends GuiScreen {
 	 * Set up UI buttons.
 	 */
 	void initButtons() {
-		buttonDay = new MapButton(0,0,0,bWidth,bHeight,Constants.getString("MapOverlay.day"), "/net/techbrew/mcjm/web/sun.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonDay = new MapButton(0,0,0,bWidth,bHeight,Constants.getString("MapOverlay.day"), FileHandler.WEB_DIR + "/img/sun.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonDay.toggle = mapType==Constants.MapType.day;
-		buttonNight = new MapButton(1,0,0,bWidth,bHeight,Constants.getString("MapOverlay.night"), "/net/techbrew/mcjm/web/moon.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonNight = new MapButton(1,0,0,bWidth,bHeight,Constants.getString("MapOverlay.night"), FileHandler.WEB_DIR + "/img/moon.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonNight.toggle = mapType==Constants.MapType.night;
-		buttonCaves = new MapButton(2,0,0,bWidth,bHeight,Constants.getString("MapOverlay.show_caves"), "/net/techbrew/mcjm/web/cave.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonCaves = new MapButton(2,0,0,bWidth,bHeight,Constants.getString("MapOverlay.show_caves"), FileHandler.WEB_DIR + "/img/cave.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonCaves.toggle = showCaves;
-		buttonFollow = new MapButton(3,0,0,bWidth,bHeight,Constants.getString("MapOverlay.follow_me"), "/net/techbrew/mcjm/web/follow.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonFollow = new MapButton(3,0,0,bWidth,bHeight,Constants.getString("MapOverlay.follow_me"), FileHandler.WEB_DIR + "/img/follow.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonFollow.toggle = follow;
-		buttonZoomIn = new MapButton(4,0,0,bWidth,bHeight,Constants.getString("MapOverlay.zoom_in"), "/net/techbrew/mcjm/web/zoomin.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonZoomOut = new MapButton(5,0,0,bWidth,bHeight,Constants.getString("MapOverlay.zoom_out"), "/net/techbrew/mcjm/web/zoomout.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonSave = new MapButton(6,0,0,bWidth,bHeight,Constants.getString("MapOverlay.save_map"), "/net/techbrew/mcjm/web/save.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonClose = new MapButton(7,0,0,bWidth,bHeight,Constants.getString("MapOverlay.close"), "/net/techbrew/mcjm/web/close.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonAlert = new MapButton(8,0,0,bWidth,bHeight,Constants.getString("MapOverlay.update_available"), "/net/techbrew/mcjm/web/alert.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonZoomIn = new MapButton(4,0,0,bWidth,bHeight,Constants.getString("MapOverlay.zoom_in"), FileHandler.WEB_DIR + "/img/zoomin.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonZoomOut = new MapButton(5,0,0,bWidth,bHeight,Constants.getString("MapOverlay.zoom_out"), FileHandler.WEB_DIR + "/img/zoomout.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonSave = new MapButton(6,0,0,bWidth,bHeight,Constants.getString("MapOverlay.save_map"), FileHandler.WEB_DIR + "/img/save.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonClose = new MapButton(7,0,0,bWidth,bHeight,Constants.getString("MapOverlay.close"), FileHandler.WEB_DIR + "/img/close.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonAlert = new MapButton(8,0,0,bWidth,bHeight,Constants.getString("MapOverlay.update_available"), FileHandler.WEB_DIR + "/img/alert.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonAlert.drawButton = VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent();
-		buttonBrowser = new MapButton(9,0,0,bWidth,bHeight,Constants.getString("MapOverlay.use_browser"), "/net/techbrew/mcjm/web/browser.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonMonsters = new MapButton(10,0,0,bWidth,bHeight,Constants.getString("MapOverlay.show_monsters"), "/net/techbrew/mcjm/web/Ghast.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonBrowser = new MapButton(9,0,0,bWidth,bHeight,Constants.getString("MapOverlay.use_browser"), FileHandler.WEB_DIR + "/img/browser.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonMonsters = new MapButton(10,0,0,bWidth,bHeight,Constants.getString("MapOverlay.show_monsters"), FileHandler.WEB_DIR + "/img/entity/Ghast.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonMonsters.toggle = showMonsters;
 		
 		// Check for hardcore
@@ -580,7 +588,7 @@ public class MapOverlay extends GuiScreen {
 	}
 
 	void drawPlayerInfo() {
-		drawRectangle(0,height-12,width,height,0,0,85,255);
+		drawRectangle(0,height-12,width,height,0,0,85,255);		
 		drawCenteredString(mc.fontRenderer, playerLastPos, getBackgroundWidth()/2, height-10, 0x8888ff);
 	}
 
@@ -639,7 +647,7 @@ public class MapOverlay extends GuiScreen {
 			File worldDir = FileHandler.getWorldDir(mc);
 			
 			if(tempMapType.equals(Constants.MapType.day)) {
-				mapBackground = new int[]{34,85,34};
+				mapBackground = new int[]{34,34,34};
 			} else {
 				mapBackground = new int[]{0,0,0};
 			}
@@ -835,20 +843,14 @@ public class MapOverlay extends GuiScreen {
 			// Draw player if within bounds
 			if(inBounds(mc.thePlayer)) {
 
-				int iconWidth = 48;
-				int iconHeight = 48;
+				int iconWidth = 64;
+				int iconHeight = 64;
 
 				int playerX = Math.round(getScaledChunkX((float) (mc.thePlayer.posX/16))*overlayScale);
 				int playerY = Math.round(getScaledChunkZ((float) (mc.thePlayer.posZ/16))*overlayScale);
 
 				int offsetWidth = playerX - (iconWidth/2);
 				int offsetHeight = playerY - (iconHeight/2);
-
-				// Player heading
-				double xHeading = -MathHelper.sin((mc.thePlayer.rotationYaw * 3.141593F) / 180F);
-				double zHeading = MathHelper.cos((mc.thePlayer.rotationYaw * 3.141593F) / 180F);
-				double degrees = Math.atan2(xHeading, zHeading) * (180 / Math.PI);
-				if(degrees > 0 || degrees < 180) degrees = 180 - degrees;
 				
 				// Player underlay
 				Color underColor = null;
@@ -866,7 +868,7 @@ public class MapOverlay extends GuiScreen {
 				BufferedImage playerImage = EntityHelper.getPlayerImage();
 				Graphics2D g2Dplayer = entityImg.createGraphics();
 				//g2D.translate(playerX, playerY);
-				g2D.rotate(Math.toRadians(degrees), playerX, playerY);
+				g2D.rotate(EntityHelper.getHeading(mc.thePlayer));
 
 				g2D.setComposite(MapBlocks.OPAQUE);
 				g2D.drawImage(playerImage, offsetWidth, offsetHeight, offsetWidth + iconWidth, offsetHeight + iconHeight, 0, 0, playerImage.getWidth(), playerImage.getHeight(), null);
