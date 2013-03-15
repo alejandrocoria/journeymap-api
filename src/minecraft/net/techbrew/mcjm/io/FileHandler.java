@@ -20,6 +20,7 @@ import net.techbrew.mcjm.log.LogFormatter;
 
 public class FileHandler {
 
+	public static final String WEB_DIR = "/net/techbrew/mcjm/web";
 	public static volatile long lastWorldHash;
 	public static volatile File lastWorldDir;
 	

@@ -23,6 +23,7 @@ import net.minecraft.src.EntityWaterMob;
 import net.minecraft.src.IAnimals;
 import net.minecraft.src.IMob;
 import net.minecraft.src.MathHelper;
+import net.techbrew.mcjm.io.FileHandler;
 
 public class EntityHelper {
 	
@@ -124,7 +125,7 @@ public class EntityHelper {
 		if(img==null) {
 			img = getUnknownImage(); // backup plan
 			try {
-				String png = "/net/techbrew/mcjm/web/img/entity/" + entityName + ".png";	//$NON-NLS-1$ //$NON-NLS-2$
+				String png = FileHandler.WEB_DIR + "/img/entity/" + entityName + ".png";	//$NON-NLS-1$ //$NON-NLS-2$
 				InputStream is = EntityHelper.class.getResourceAsStream(png);
 				img = ImageIO.read(is);
 				is.close();		
@@ -144,7 +145,7 @@ public class EntityHelper {
 	public static BufferedImage getPlayerImage() {
 		if(playerImg==null) {
 			 try {
-				String png = "/net/techbrew/mcjm/web/img/arrow.png";						 //$NON-NLS-1$
+				String png = FileHandler.WEB_DIR + "/img/locator-player.png";						 //$NON-NLS-1$
 				InputStream is = EntityHelper.class.getResourceAsStream(png);
 				playerImg = ImageIO.read(is);
 				is.close();
@@ -164,7 +165,7 @@ public class EntityHelper {
 	public static BufferedImage getOtherImage() {
 		if(otherImg==null) {
 			 try {
-				String png = "/net/techbrew/mcjm/web/img/entity/other.png";						 //$NON-NLS-1$
+				String png = FileHandler.WEB_DIR + "/img/entity/other.png";						 //$NON-NLS-1$
 				InputStream is = EntityHelper.class.getResourceAsStream(png);
 				otherImg = ImageIO.read(is);
 				is.close();
@@ -184,7 +185,7 @@ public class EntityHelper {
 	public static BufferedImage getUnknownImage() {
 		BufferedImage img = null;
 		try {
-			String png = "/net/techbrew/mcjm/web/img/alert.png";						 //$NON-NLS-1$
+			String png = FileHandler.WEB_DIR + "/img/alert.png";						 //$NON-NLS-1$
 			InputStream is = EntityHelper.class.getResourceAsStream(png);
 			img = ImageIO.read(is);
 			is.close();
