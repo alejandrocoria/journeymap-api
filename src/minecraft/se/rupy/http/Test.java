@@ -56,7 +56,7 @@ class Test implements Runnable {
 
 		test = this;
 
-		thread = new Thread(this);
+		thread = new Thread(this,"RupyTest-"+loop);
 		thread.start();
 	}
 
@@ -178,7 +178,7 @@ class Test implements Runnable {
 		for(int i = 0; i < test.length; i++) {
 			test[i] = new Test("localhost:" + daemon.port, unit[i], loop * (unit[i].equals("comet") ? comet_count : other_count));
 			daemon.add(test[i].service());
-			Thread thread = new Thread(test[i]);
+			Thread thread = new Thread(test[i],"RupyTestCase-"+i);
 			thread.start();
 		}
 
@@ -292,7 +292,7 @@ class Test implements Runnable {
 					 */
 					load(event);
 					this.event = event;
-					new Thread(this).start();
+					new Thread(this,"RupyTestWork").start();
 				}
 			}
 		}

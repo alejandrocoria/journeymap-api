@@ -11,6 +11,7 @@ import java.security.ProtectionDomain;
 import java.text.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import java.nio.channels.*;
 
@@ -141,14 +142,9 @@ public class Daemon implements Runnable {
 	}
 
 	protected void log() throws IOException {
-		File file = new File("log");
 
-		if(!file.exists()) {
-			file.mkdir();
-		}
-
-		access = new PrintStream(new FileOutputStream(new File("log/access.txt")), true, "UTF-8");
-		error = new PrintStream(new FileOutputStream(new File("log/error.txt")), true, "UTF-8");
+		access = System.out;
+		error = System.err;
 
 		DATE = new SimpleDateFormat("yy-MM-dd HH:mm:ss.SSS");
 	}
@@ -243,7 +239,7 @@ public class Daemon implements Runnable {
 	public void start() {
 		try {
 			init();
-			new Thread(this).start();
+			new Thread(this, "RupyDaemon").start();
 		} catch (Exception e) {
 			e.printStackTrace(out);
 		}
@@ -875,7 +871,7 @@ public class Daemon implements Runnable {
 
 		Heart() {
 			alive = true;
-			new Thread(this).start();
+			new Thread(this, "RupyHeart").start();
 		}
 
 		protected void stop() {

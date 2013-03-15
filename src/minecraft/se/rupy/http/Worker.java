@@ -38,7 +38,7 @@ public class Worker implements Runnable, Chain.Link {
 
 		alive = true;
 
-		thread = new Thread(this);
+		thread = new Thread(this, "RupyWorker-"+index);
 		thread.start();
 	}
 
