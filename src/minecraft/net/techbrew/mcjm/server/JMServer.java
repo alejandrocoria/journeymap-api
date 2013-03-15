@@ -3,6 +3,7 @@ package net.techbrew.mcjm.server;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.PropertyManager;
@@ -22,9 +23,18 @@ public class JMServer {
 		// Use port from journeymap properties
 		port = PropertyManager.getInstance().getInteger(PropertyManager.WEBSERVER_PORT_PROP);
 		props.put("port", Integer.toString(port)); //$NON-NLS-1$
-		props.put("delay", Integer.toString(10000)); //$NON-NLS-1$
-		props.put("timeout", Integer.toString(10000)); //$NON-NLS-1$
-		props.put("cookie", Integer.toString(0)); //$NON-NLS-1$
+		//props.put("delay", Integer.toString(10000)); //$NON-NLS-1$
+		props.put("timeout", Integer.toString(0)); //$NON-NLS-1$
+		//props.put("cookie", Integer.toString(0)); //$NON-NLS-1$
+		
+		// Rupy logging is spammy.  Only enable it if you really need to.
+		Level logLevel = Level.parse(PropertyManager.getInstance().getString(PropertyManager.LOGGING_LEVEL_PROP));
+		if(logLevel.intValue()<=(Level.FINEST.intValue())) {
+			props.put("debug", Boolean.TRUE.toString()); //$NON-NLS-1$
+		} 	
+		if(logLevel.intValue()<=(Level.FINER.intValue())) {
+			props.put("verbose", Boolean.TRUE.toString()); //$NON-NLS-1$
+		} 
 		
 		// Instantiate daemon
 		rupy = new Daemon(props);
