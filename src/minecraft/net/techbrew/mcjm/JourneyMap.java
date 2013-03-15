@@ -376,14 +376,9 @@ public class JourneyMap extends BaseMod {
 		
 		Minecraft minecraft = Minecraft.getMinecraft();
 		if(keybinding.keyCode==keybinding.keyCode) {
-			if(ModLoader.isGUIOpen(GuiChat.class) || 
-			   ModLoader.isGUIOpen(GuiEditSign.class)) {
-				return;
-			}
-			if(!ModLoader.isGUIOpen(MapOverlay.class)) { 
+			if(Minecraft.getMinecraft().currentScreen==null) {
 				ModLoader.openGUI(minecraft.thePlayer, new MapOverlay(this));
-				//minecraft.setIngameFocus();
-			} else {
+			} else if(ModLoader.isGUIOpen(MapOverlay.class)) {
 				minecraft.displayGuiScreen(null);
 				minecraft.setIngameFocus();
 			}
