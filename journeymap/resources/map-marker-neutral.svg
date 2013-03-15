@@ -12,8 +12,8 @@
    id="svg3001"
    version="1.1"
    inkscape:version="0.48.2 r9819"
-   sodipodi:docname="map-marker.svg"
-   inkscape:export-filename="G:\minecrafting\mcp\src\minecraft\net\techbrew\mcjm\web\img\locator-hostile.png"
+   sodipodi:docname="map-marker-neutral.svg"
+   inkscape:export-filename="G:\minecrafting\mcp\src\minecraft\net\techbrew\mcjm\web\img\locator-other.png"
    inkscape:export-xdpi="120"
    inkscape:export-ydpi="120">
   <metadata
@@ -50,10 +50,10 @@
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:zoom="8"
-     inkscape:cx="-12.903013"
+     inkscape:cx="6.596987"
      inkscape:cy="11.702177"
-     inkscape:window-x="34"
-     inkscape:window-y="122"
+     inkscape:window-x="253"
+     inkscape:window-y="137"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg3001">
     <sodipodi:guide
@@ -75,7 +75,7 @@
      stroke-miterlimit="10"
      clip-rule="evenodd" />
   <path
-     style="fill:#ff0000;stroke:#ff0000;stroke-width:1.68578613000000010;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;fill-opacity:1"
+     style="fill:none;stroke:#000000;stroke-width:1.68578613000000010;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none"
      inkscape:connector-curvature="0"
      id="svg_2-1"
      d="M 24.014163,40.642621 C 23.447688,37.861802 22.448907,35.54767 21.239161,33.402889 20.341836,31.811968 19.30233,30.343521 18.340518,28.80078 18.019447,28.285769 17.742361,27.741691 17.433842,27.207201 16.816952,26.13847 16.316786,24.899339 16.348568,23.29198 c 0.03105,-1.570473 0.485261,-2.830253 1.140232,-3.860276 1.077237,-1.694128 2.881649,-3.083128 5.302731,-3.448153 1.979531,-0.298452 3.83548,0.205777 5.15162,0.975371 1.075498,0.628903 1.908364,1.468975 2.541448,2.459032 0.660787,1.033353 1.115814,2.254161 1.153982,3.84654 0.01954,0.81583 -0.114053,1.571337 -0.302249,2.198019 -0.190462,0.634325 -0.496777,1.164562 -0.769303,1.730939 -0.531992,1.105584 -1.198962,2.118584 -1.868313,3.132182 -1.993717,3.019078 -3.865013,6.09804 -4.684553,10.316987 z"
