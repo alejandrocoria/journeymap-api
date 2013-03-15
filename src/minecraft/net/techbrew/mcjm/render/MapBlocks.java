@@ -172,14 +172,32 @@ public class MapBlocks extends HashMap {
 	 */
 	public static int topNonSkyBlock(ChunkStub chunkStub, final int x, int maxY, final int z) {
 		
-		final int topY = Math.min(maxY, chunkStub._getHeightValue(x, z));
+		final int chunkHeight = chunkStub._getHeightValue(x, z);
+		final int topY = Math.min(maxY, chunkHeight);
 		
 		int blockId;
-		
 		int y = topY;
+		if(topY==chunkHeight) {
+			// Error check, could be bad data in the heightmap
+			while(y<maxY) {
+				blockId = chunkStub.getBlockID(x, y, z);
+				
+				if(blockId==0 || sky.contains(blockId)) {
+					y++;
+				} else {
+					break;
+				}
+			}
+			if(y<maxY) {
+				return y;
+			} else {
+				return topY;
+			}
+		}
+		
 		while(y>=0) {
 			blockId = chunkStub.getBlockID(x, y, z);
-			if(sky.contains(blockId)) {
+			if(blockId==0 || sky.contains(blockId)) {
 				y--;
 			} else {
 				break;

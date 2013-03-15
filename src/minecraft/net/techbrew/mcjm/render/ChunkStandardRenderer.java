@@ -204,15 +204,6 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	 */
 	public void renderUnderground(final Graphics2D g2D, final ChunkStub chunkStub, final int vSlice, final Map<Integer, ChunkStub> neighbors) {
 		
-		if(chunkStub.doMap==false) return; 
-		
-//		if(chunkStub.isLit==false) {
-//			if(JourneyMap.getLogger().isLoggable(Level.INFO)) {
-//				JourneyMap.getLogger().info("Chunk not lit: " + chunkStub.xPosition + "," + chunkStub.zPosition);
-//			}
-//			return;
-//		}
-		
 		int sliceMinY = Math.max((vSlice << 4) - 1, 0);
 		int defaultSliceMaxY = ((vSlice + 1) << 4) - 1;
 		
@@ -227,7 +218,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				try {
 					int sliceMaxY = mapBlocks.topNonSkyBlock(chunkStub, x, defaultSliceMaxY, z) + 1;
 
-					hasAir = false;
+					hasAir = sliceMaxY<defaultSliceMaxY+1; // TODO: This might not be reliable.
 					paintY = sliceMaxY;
 					lightLevel = -1;
 		
@@ -240,38 +231,53 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 							continue airloop;
 						}
 						
-						// Treat water with depth
-						if(blockId==8 || blockId==9) {
-							
-							lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
-							if (caveLighting && lightLevel < 1) {
-								// No lit blocks in column
-								paintClearBlock(x, vSlice, z, g2D);
-								continue blockLoop;
-							}
-							
-							BlockInfo blockInfo = mapBlocks.getBlockInfo(chunkStub, x, y, z);
-							paintDepth(chunkStub, blockInfo, x, y, z, g2D);
-							continue blockLoop;
-						}
-						
 						// Treat torches like there is air
 						if(blockId == 50 || blockId == 76 || blockId == 76) {
 							hasAir = true;
+							// Check whether torch is mounted on the block below it
 							if(chunkStub.getBlockMetadata(x, y, z)!=5) { // standing on block below=5
 								continue airloop;
 							}
 						}
 						
-						if (hasAir) {
-							if (caveLighting) {
+						// If lava with no air, do nothing
+						if(!hasAir && (blockId==10 || blockId==11)) {
+							paintClearBlock(x, vSlice, z, g2D);
+							continue blockLoop;
+						}
+						
+						// Treat water with depth
+						if(blockId==8 || blockId==9) {							
+							if(hasAir) {
 								lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
+								if (caveLighting && lightLevel < 1) {
+									// No lit blocks in column
+									paintClearBlock(x, vSlice, z, g2D);
+									continue blockLoop;
+								}
+								
+								BlockInfo blockInfo = mapBlocks.getBlockInfo(chunkStub, x, y, z);
+								paintDepth(chunkStub, blockInfo, x, y, z, g2D);
 							}
+							continue blockLoop;
+						}						
+						
+						// Arrived at a solid block with air above it
+						if (hasAir) {
 							paintY = y;
 							
-							if (caveLighting && lightLevel > 0) {
-								break airloop;						
+							if (caveLighting) {
+								lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY+1, z);
+								if(lightLevel > 0) {
+									break airloop;		
+								} else {
+									// We've hit an unlit sublayer
+									hasAir = false;
+								}
+							} else {
+								break airloop;
 							}
+							
 						}
 					}
 		
@@ -305,7 +311,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 								MathHelper.clamp_float(rgb[0] * darken, 0f, 1f), 
 								MathHelper.clamp_float(rgb[1] * darken, 0f, 1f), 
 								MathHelper.clamp_float(rgb[2] * darken, 0f, 1f));
-					}
+					}								
 		
 					// Draw block
 					paintBlock(x, vSlice, z, color, g2D);
