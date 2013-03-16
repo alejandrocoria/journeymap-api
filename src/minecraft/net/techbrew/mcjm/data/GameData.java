@@ -54,15 +54,8 @@ public class GameData implements IDataProvider {
 		
 		props.put(Key.jm_version,JourneyMap.JM_VERSION);
 		props.put(Key.latest_journeymap_version, VersionCheck.getVersionAvailable()); 
-		props.put(Key.mc_version, Display.getTitle().split("\\s(?=\\d)")[1]); //$NON-NLS-1$ 
-		
+		props.put(Key.mc_version, Display.getTitle().split("\\s(?=\\d)")[1]); //$NON-NLS-1$ 		
 		props.put(Key.browser_poll, pm.getInteger(PropertyManager.BROWSER_POLL_PROP));
-		props.put(Key.browser_mapimg_poll, pm.getInteger(PropertyManager.BROWSER_MAPIMG_POLL_PROP));
-		props.put(Key.browser_timedata_poll, pm.getInteger(PropertyManager.BROWSER_TIMEDATA_POLL_PROP));
-		props.put(Key.browser_animalsdata_poll, pm.getInteger(PropertyManager.BROWSER_ANIMALSDATA_POLL_PROP));
-		props.put(Key.browser_mobsdata_poll, pm.getInteger(PropertyManager.BROWSER_MOBSDATA_POLL_PROP));
-		props.put(Key.browser_playersdata_poll, pm.getInteger(PropertyManager.BROWSER_PLAYERSDATA_POLL_PROP));
-		props.put(Key.browser_villagersdata_poll, pm.getInteger(PropertyManager.BROWSER_VILLAGERSDATA_POLL_PROP));
 
 		return props;	
 	}
