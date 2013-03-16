@@ -7,31 +7,65 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.src.FontRenderer;
 import net.minecraft.src.GuiSmallButton;
 import net.minecraft.src.Tessellator;
+import net.techbrew.mcjm.Constants;
 
 public class MapButton extends GuiSmallButton {
 	
-	Boolean toggle = true;
-	final String icon;
+	private Boolean toggled = true;
+	String icon;
 	String[] multiline;
+	String labelOn;
+	String labelOff;
 
-	public MapButton(int id, int x, int y, int width, int height, String label, String icon) {
-		super(id, x, y, width, height, label);
-		this.icon = (icon==null) ? "/gui/gui.png" : icon; //$NON-NLS-1$
-		setLabel(label);
+	public MapButton(int id, int x, int y, String label) {
+		super(id, x, y, label);
 	}
 	
-	public void setLabel(String label) {
+	public MapButton(int id, int x, int y, String labelOn, String labelOff, Boolean toggled) {
+		super(id, x, y, toggled ? labelOn : labelOff);
+		this.labelOn = labelOn;
+		this.labelOff = labelOff;
+		this.toggled = toggled;
+	}	
+	
+	public MapButton(int id, int x, int y, int width, int height, String hoverText, String icon) {
+		super(id, x, y, width, height, "");
+		this.icon = (icon==null) ? "/gui/gui.png" : icon; //$NON-NLS-1$
+		setHoverText(hoverText);
+	}
+	
+	public void setHoverText(String label) {
 		multiline = displayString.split(" "); //$NON-NLS-1$
+	}
+	
+	private void updateLabel() {
+		if(labelOn!=null && labelOff!=null) {
+			this.displayString = toggled ? labelOn : labelOff;
+		}		
+	}
+	
+	public void toggle() {
+		setToggled(!toggled);
+	}
+	
+	public void setToggled(Boolean toggled) {
+		this.toggled = toggled;
+		updateLabel();
 	}
 	
 	@Override
 	public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
     {
-		//super.drawButton(minecraft, mouseX, mouseY);
 		if(!drawButton)
         {
             return;
         }
+		
+		if(this.icon==null) {
+			super.drawButton(minecraft, mouseX, mouseY);
+			return;
+		}
+		
 		Tessellator tessellator = Tessellator.instance;
 		GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
 		GL11.glDepthMask(false);
@@ -48,8 +82,8 @@ public class MapButton extends GuiSmallButton {
 		boolean hover = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
 
 		// Preserve aspect ratio of source image		
-		int w = toggle ? this.width : (int) Math.ceil(this.width*.6);
-		int h = toggle ? this.height :  (int) Math.ceil(this.height*.6);
+		int w = toggled ? this.width : (int) Math.ceil(this.width*.6);
+		int h = toggled ? this.height :  (int) Math.ceil(this.height*.6);
 		int widthOffset = (this.width-w)/2;
 		int heightOffset = (this.height-h);
 
@@ -63,7 +97,7 @@ public class MapButton extends GuiSmallButton {
         if(hover)
         {
         	int color = enabled ? 0xffffa0 : 0xcccccc;
-        	if(multiline.length==2) {
+        	if(multiline!=null && multiline.length==2) {
         		drawCenteredString(minecraft.fontRenderer, multiline[0], xPosition + width / 2, yPosition + (height - 16) / 2, color);
         		drawCenteredString(minecraft.fontRenderer, multiline[1], xPosition + width / 2, yPosition + (height - 0) / 2, color);
         	} else {
@@ -72,7 +106,7 @@ public class MapButton extends GuiSmallButton {
         } 
     }
 
-	@Override
+	//@Override
     public boolean mousePressed(Minecraft minecraft, int i, int j)
     {
         return enabled && drawButton && i >= xPosition && j >= yPosition && i < xPosition + width && j < yPosition + height;

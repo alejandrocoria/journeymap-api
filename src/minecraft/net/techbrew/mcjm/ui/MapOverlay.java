@@ -96,6 +96,10 @@ public class MapOverlay extends GuiScreen {
 	static Constants.MapType mapType;
 	static Boolean showCaves = true;
 	static Boolean showMonsters = true;
+	static Boolean showAnimals = true;
+	static Boolean showVillagers = true;
+	static Boolean showPets = true;
+	static Boolean showPlayers = true;
 	static Boolean follow = true;
 	static String playerLastPos = "0,0"; //$NON-NLS-1$
 
@@ -103,16 +107,16 @@ public class MapOverlay extends GuiScreen {
 	int lastWidth = 0;
 	int lastHeight = 0;
 	int overlayScale = 4;
-	ChunkCoordIntPair[] lastMapBounds;
-	BufferedImage lastMapImg;
-	Integer lastMapImgTextureIndex;
-	BufferedImage lastEntityImg;
-	Integer lastEntityImgTextureIndex;
+	private ChunkCoordIntPair[] lastMapBounds;
+	private BufferedImage lastMapImg;
+	private Integer lastMapImgTextureIndex;
+	private BufferedImage lastEntityImg;
+	private Integer lastEntityImgTextureIndex;
 	long lastEntityUpdate = 0;
 	int[] mapBackground = new int[]{0,0,0};
-
-	MapButton buttonDay,buttonNight,buttonCaves,buttonFollow,buttonZoomIn,buttonZoomOut;
-	MapButton buttonSave,buttonClose,buttonAlert,buttonBrowser,buttonMonsters;
+	
+	MapButton buttonDay,buttonNight,buttonFollow,buttonZoomIn,buttonZoomOut;
+	MapButton buttonClose,buttonAlert;
 
 	public MapOverlay(JourneyMap journeyMap) {
 		super();
@@ -128,11 +132,11 @@ public class MapOverlay extends GuiScreen {
 		
 		// zoom underlay
 		if(mapType==null || mapType.equals(Constants.MapType.day)) {
-			drawRectangle(2,20,18,50,255,255,255,80);
+			drawRectangle(3,20,20,60,0,0,0,80);
 		} else {
-			drawRectangle(2,20,18,50,0,0,0,80);
+			drawRectangle(3,20,20,60,0,0,0,80);
 		}
-		drawImage(mc.renderEngine.getTexture(FileHandler.WEB_DIR + "/ico/apple-touch-icon-57x57-precomposed.png"), 1F, 3, 1, 57/2, 57/2); //$NON-NLS-1$
+		drawImage(mc.renderEngine.getTexture(FileHandler.WEB_DIR + "/ico/journeymap40.png"), 1F, 3, 1, 20,20); //$NON-NLS-1$
 	}
 
 	@Override
@@ -166,29 +170,20 @@ public class MapOverlay extends GuiScreen {
 		switch(guibutton.id) {
 		case 0: { // day
 			mapType = Constants.MapType.day;
-			buttonDay.toggle = true;
-			buttonNight.toggle = false;
+			buttonDay.setToggled(true);
+			buttonNight.setToggled(false);
 			lastMapImg = null;
 			break;
 		}
 		case 1: { // night
 			mapType = Constants.MapType.night;
-			buttonDay.toggle = false;
-			buttonNight.toggle = true;
+			buttonDay.setToggled(false);
+			buttonNight.setToggled(true);
 			lastMapImg = null;
 			break;
 		}
-		case 2: { // caves
-			setShowCaves(!showCaves);
-			buttonCaves.toggle = showCaves;	
-			boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
-			if(underground) {
-				lastMapImg = null;
-			}
-			break;
-		}
 		case 3: { // follow
-			setCenterOnPlayer(!follow);
+			setFollow(!follow);
 			if(follow) eraseCachedEntityImg();
 			break;
 		}
@@ -216,11 +211,6 @@ public class MapOverlay extends GuiScreen {
 			launchLocalhost();
 			break;
 		}
-		case 10: { // monsters
-			showMonsters = !showMonsters;
-			buttonMonsters.toggle = showMonsters;
-			break;
-		}
 		}
 	}
 
@@ -237,8 +227,8 @@ public class MapOverlay extends GuiScreen {
 
 	}
 
-	int bWidth = 16;
-	int bHeight = 16;
+	int bWidth = 40;
+	int bHeight = 20;
 	int bHGap = 8;
 	int bVGap = 8;
 
@@ -247,44 +237,24 @@ public class MapOverlay extends GuiScreen {
 	 */
 	void initButtons() {
 		buttonDay = new MapButton(0,0,0,bWidth,bHeight,Constants.getString("MapOverlay.day"), FileHandler.WEB_DIR + "/img/sun.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonDay.toggle = mapType==Constants.MapType.day;
+		buttonDay.setToggled(mapType==Constants.MapType.day);
 		buttonNight = new MapButton(1,0,0,bWidth,bHeight,Constants.getString("MapOverlay.night"), FileHandler.WEB_DIR + "/img/moon.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonNight.toggle = mapType==Constants.MapType.night;
-		buttonCaves = new MapButton(2,0,0,bWidth,bHeight,Constants.getString("MapOverlay.show_caves"), FileHandler.WEB_DIR + "/img/cave.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonCaves.toggle = showCaves;
+		buttonNight.setToggled(mapType==Constants.MapType.night);
 		buttonFollow = new MapButton(3,0,0,bWidth,bHeight,Constants.getString("MapOverlay.follow_me"), FileHandler.WEB_DIR + "/img/follow.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonFollow.toggle = follow;
+		buttonFollow.setToggled(follow);
 		buttonZoomIn = new MapButton(4,0,0,bWidth,bHeight,Constants.getString("MapOverlay.zoom_in"), FileHandler.WEB_DIR + "/img/zoomin.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonZoomOut = new MapButton(5,0,0,bWidth,bHeight,Constants.getString("MapOverlay.zoom_out"), FileHandler.WEB_DIR + "/img/zoomout.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonSave = new MapButton(6,0,0,bWidth,bHeight,Constants.getString("MapOverlay.save_map"), FileHandler.WEB_DIR + "/img/save.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonClose = new MapButton(7,0,0,bWidth,bHeight,Constants.getString("MapOverlay.close"), FileHandler.WEB_DIR + "/img/close.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonAlert = new MapButton(8,0,0,bWidth,bHeight,Constants.getString("MapOverlay.update_available"), FileHandler.WEB_DIR + "/img/alert.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonAlert.drawButton = VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent();
-		buttonBrowser = new MapButton(9,0,0,bWidth,bHeight,Constants.getString("MapOverlay.use_browser"), FileHandler.WEB_DIR + "/img/browser.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonMonsters = new MapButton(10,0,0,bWidth,bHeight,Constants.getString("MapOverlay.show_monsters"), FileHandler.WEB_DIR + "/img/entity/Ghast.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonMonsters.toggle = showMonsters;
-		
-		// Check for hardcore
-		if(hardcore) {
-			buttonCaves.toggle = false;
-			buttonCaves.enabled = false;
-			buttonCaves.setLabel(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
-			buttonMonsters.toggle = false;
-			buttonMonsters.enabled  =false;
-			buttonMonsters.setLabel(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
-		}
 		
 		controlList.add(buttonDay);
 		controlList.add(buttonNight);
-		controlList.add(buttonCaves);
 		controlList.add(buttonFollow);
 		controlList.add(buttonZoomIn);
 		controlList.add(buttonZoomOut);
-		controlList.add(buttonSave);
 		controlList.add(buttonClose);
 		controlList.add(buttonAlert);
-		controlList.add(buttonBrowser);
-		controlList.add(buttonMonsters);
 	}
 
 	/**
@@ -296,7 +266,7 @@ public class MapOverlay extends GuiScreen {
 			initButtons();
 		}
 		if(lastWidth!=width || lastHeight!=height) {
-			int startX = 100;
+			int startX = 50;
 			int endX = width - 10;
 			int offsetX = bWidth + bHGap;
 			int offsetY = bHeight + bVGap;
@@ -305,19 +275,17 @@ public class MapOverlay extends GuiScreen {
 
 			buttonDay.xPosition = startX;
 			buttonNight.xPosition = startX + (offsetX*1);
-			buttonCaves.xPosition = startX + (offsetX*2);
-			buttonMonsters.xPosition = startX + (offsetX*3);
+
 			buttonFollow.xPosition = startX + (offsetX*4);
 			
-			buttonZoomIn.xPosition = 4;
-			buttonZoomIn.yPosition = offsetY;
-			buttonZoomOut.xPosition = 4;
-			buttonZoomOut.yPosition = offsetY*2;
+			buttonZoomIn.xPosition = 6;
+			buttonZoomIn.yPosition = 8 + offsetY;
+			buttonZoomOut.xPosition = 6;
+			buttonZoomOut.yPosition = 8 + (offsetY*2);
 
 			buttonAlert.xPosition = endX - (offsetX*4);			
 			
-			buttonSave.xPosition = endX - (offsetX*3);
-			buttonBrowser.xPosition = endX - (offsetX*2);
+
 			buttonClose.xPosition = endX - bWidth;			
 		}
 		
@@ -428,9 +396,13 @@ public class MapOverlay extends GuiScreen {
 		}
 
 	}
+	
+	void toggleFollow() {
+		setFollow(!follow);
+	}
 
-	void setCenterOnPlayer(Boolean onPlayer) {
-		buttonFollow.toggle = onPlayer;
+	void setFollow(Boolean onPlayer) {
+		buttonFollow.setToggled(onPlayer);
 		follow = onPlayer;
 		if(follow) {
 			centerMapOnPlayer();
@@ -441,7 +413,11 @@ public class MapOverlay extends GuiScreen {
 		centerMapOnChunk(mc.thePlayer.chunkCoordX, mc.thePlayer.chunkCoordZ);
 	}
 
-	void setShowCaves(Boolean show) {	   
+	void toggleShowCaves() {	   
+		setShowCaves(!showCaves);
+	}
+	
+	static void setShowCaves(Boolean show) {	   
 		showCaves = show;
 	}
 
@@ -639,8 +615,8 @@ public class MapOverlay extends GuiScreen {
 				if(mapType==null) {
 					final long ticks = (mc.theWorld.getWorldTime() % 24000L);
 					mapType = ticks<13800 ? Constants.MapType.day : Constants.MapType.night;	
-					buttonDay.toggle = (mapType.equals(Constants.MapType.day));
-					buttonNight.toggle = (mapType.equals(Constants.MapType.night));
+					buttonDay.setToggled(mapType.equals(Constants.MapType.day));
+					buttonNight.setToggled(mapType.equals(Constants.MapType.night));
 				}
 				tempMapType = mapType;
 			}
@@ -973,8 +949,11 @@ public class MapOverlay extends GuiScreen {
 		tessellator.draw();
 	}
 
-	private void save() {
+	void save() {
 
+		if(mc==null) {
+			mc = Minecraft.getMinecraft();
+		}
 		final File worldDir = FileHandler.getWorldDir(mc);
 		final File saveDir = FileHandler.getJourneyMapDir();
 
@@ -1070,7 +1049,7 @@ public class MapOverlay extends GuiScreen {
 			//System.out.println("Scrolling: " + xOffset + "," + zOffset);
 
 			if(Math.abs(xOffset)>0 || Math.abs(zOffset)>0) {
-				setCenterOnPlayer(false);
+				setFollow(false);
 			} 
 
 			// Then scroll the cached map image
@@ -1134,13 +1113,13 @@ public class MapOverlay extends GuiScreen {
 		}
 
 		eraseCachedEntityImg();
-		setCenterOnPlayer(false);
+		setFollow(false);
 
 		// Set new bounds
 		checkBounds();
 	}
 
-	private void eraseCachedEntityImg() {
+	protected void eraseCachedEntityImg() {
 		if(lastEntityImgTextureIndex!=null) {
 			mc.renderEngine.deleteTexture(lastEntityImgTextureIndex);
 			lastEntityImgTextureIndex = null;
@@ -1148,7 +1127,7 @@ public class MapOverlay extends GuiScreen {
 		}
 	}
 	
-	private void eraseCachedMapImg() {
+	protected void eraseCachedMapImg() {
 		if(lastMapImg!=null && lastMapImgTextureIndex!=null) {
 			mc.renderEngine.deleteTexture(lastMapImgTextureIndex);
 			lastMapImg = null;
@@ -1156,7 +1135,7 @@ public class MapOverlay extends GuiScreen {
 		}
 	}
 
-	private void launchLocalhost() {
+	protected static void launchLocalhost() {
 		String port = PropertyManager.getInstance().getString(PropertyManager.WEBSERVER_PORT_PROP);
 		String url = "http://localhost:" + port; //$NON-NLS-1$
 		try {
@@ -1167,7 +1146,7 @@ public class MapOverlay extends GuiScreen {
 		}
 	}
 
-	private void launchWebsite() {
+	protected static void launchWebsite() {
 		String url = JourneyMap.WEBSITE_URL;
 		try {
 			java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));

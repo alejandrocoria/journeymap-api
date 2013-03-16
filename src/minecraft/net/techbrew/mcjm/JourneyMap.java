@@ -38,6 +38,7 @@ import net.techbrew.mcjm.server.JMServer;
 import net.techbrew.mcjm.thread.ChunkUpdateThread;
 import net.techbrew.mcjm.thread.JMThreadFactory;
 import net.techbrew.mcjm.ui.MapOverlay;
+import net.techbrew.mcjm.ui.MapOverlayOptions;
 
 import org.lwjgl.input.Keyboard;
 
@@ -66,7 +67,6 @@ public class JourneyMap extends BaseMod {
 	
 	public volatile Properties remoteWorldProperties = new Properties();
 	public static volatile ChunkStub lastPlayerChunk;
-	private MapOverlay mapOverlay;
 	
 	// Invokes MapOverlay
 	private KeyBinding keybinding;
@@ -377,13 +377,13 @@ public class JourneyMap extends BaseMod {
 		Minecraft minecraft = Minecraft.getMinecraft();
 		if(keybinding.keyCode==keybinding.keyCode) {
 			if(Minecraft.getMinecraft().currentScreen==null) {
-				ModLoader.openGUI(minecraft.thePlayer, new MapOverlay(this));
+				ModLoader.openGUI(minecraft.thePlayer, new MapOverlayOptions(new MapOverlay(this)));
 			} else if(ModLoader.isGUIOpen(MapOverlay.class)) {
 				minecraft.displayGuiScreen(null);
 				minecraft.setIngameFocus();
 			}
 		} else if(keybinding.keyCode==minecraft.gameSettings.keyBindInventory.keyCode) {
-			if(ModLoader.isGUIOpen(MapOverlay.class)) { 
+			if(ModLoader.isGUIOpen(MapOverlayOptions.class)) { 
 				minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer));				
 			}
 		}
