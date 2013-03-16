@@ -248,13 +248,13 @@ public class MapOverlay extends GuiScreen {
 		buttonAlert = new MapButton(8,0,0,bWidth,bHeight,Constants.getString("MapOverlay.update_available"), FileHandler.WEB_DIR + "/img/alert.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonAlert.drawButton = VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent();
 		
-		controlList.add(buttonDay);
-		controlList.add(buttonNight);
-		controlList.add(buttonFollow);
-		controlList.add(buttonZoomIn);
-		controlList.add(buttonZoomOut);
-		controlList.add(buttonClose);
-		controlList.add(buttonAlert);
+		buttonList.add(buttonDay);
+		buttonList.add(buttonNight);
+		buttonList.add(buttonFollow);
+		buttonList.add(buttonZoomIn);
+		buttonList.add(buttonZoomOut);
+		buttonList.add(buttonClose);
+		buttonList.add(buttonAlert);
 	}
 
 	/**
@@ -262,7 +262,7 @@ public class MapOverlay extends GuiScreen {
 	 */
 	void layoutButtons() {
 		// Buttons
-		if(controlList.isEmpty()) {
+		if(buttonList.isEmpty()) {
 			initButtons();
 		}
 		if(lastWidth!=width || lastHeight!=height) {
@@ -321,9 +321,9 @@ public class MapOverlay extends GuiScreen {
 		Boolean guiButtonUsed = false;
 		if(mouseButton == 0)
 		{
-			for(int l = 0; l < controlList.size(); l++)
+			for(int l = 0; l < buttonList.size(); l++)
 			{
-				GuiButton guibutton = (GuiButton)controlList.get(l);
+				GuiButton guibutton = (GuiButton)buttonList.get(l);
 				if(guibutton.mousePressed(mc, mouseX, mouseY))
 				{
 					guiButtonUsed = true;

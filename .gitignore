@@ -20,6 +20,7 @@ src/minecraft/net/minecraft/src/*
 !src/minecraft/net/minecraft/src/mod_JourneyMap.java
 src/minecraft/org/
 src/minecraft/Start.java
+src/minecraft_server/
 temp/
 CHANGELOG
 *.bat

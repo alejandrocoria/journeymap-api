@@ -1,22 +1,26 @@
-JourneyMap 2.0 for Minecraft 1.4.6 (January 8, 2013)
+JourneyMap 2.0 for Minecraft 1.5 (March 16, 2013)
 http://journeymap.techbrew.net
 
 Requirements:
 
-- Minecraft 1.4.6
-- ModLoader 1.4.6
+- Minecraft 1.5
+- ModLoader 1.5 or Forge 7.7.0
 
 Changes since JourneyMap 1.9.1 for Minecraft 1.4.6:
 
-- Recompiled for newer Minecraft version
-- Replaced the TJWS embedded servlet engine with the NIO webserver "Rupy" (http://code.google.com/p/rupy/).
-    - Significantly improved HTTP responses for web browser efficiency
-    - Reduced the mod zip size by nearly 40%
+- Faster chunk render cycles for improved game performance
+- Improved surface map accuracy and appearance
+- Added the ability to toggle display of animals, villagers, pets, other players
+- Removed blurring when zooming in
+- New web UI appearance
+- New in-game UI (added options screen)
+- Replaced the TJWS embedded servlet engine with the NIO webserver "Rupy" (http://code.google.com/p/rupy/)
+- Internal work to allow for custom block mods
 
 Known issues:
 
 - Changing the cave lighting property has no effect
-- Not fully compatible with some custom block mods
+- Translation updates needed for Spanish, German, Russian
 - Bug (Tracking ID AW2-6EE-Z3QB): Maps overwrite on multi-world servers because the world seed is no longer provided by the MC server
 
 Translations added: 

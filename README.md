@@ -41,7 +41,7 @@ Note: The 'mcp' directory name at the end of the git clone command is just to av
 
 ### 1. Checklist before you build
 
-* Update `journeymap/build.xml` version info
+* Update `eclipse/Client/build.xml` version info
 * Update `src/minecraft/net/techbrew/mcjm/JourneyMap.java` version info
 * Update `src/minecraft/net/techbrew/changelog.txt`
 

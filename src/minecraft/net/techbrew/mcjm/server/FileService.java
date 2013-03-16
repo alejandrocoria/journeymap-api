@@ -61,15 +61,17 @@ public class FileService extends BaseService {
 		
 		// Check if in IDE.  If so, use source path to serve files.	
 		URL cpRoot = JourneyMap.class.getResource(CLASSPATH_ROOT); //$NON-NLS-1$
-		String cpRootPath = cpRoot.getPath();
-		if(cpRootPath.contains(IDE_TEST)) { //$NON-NLS-1$
-			try {
-				String srcPath = cpRootPath + IDE_SOURCEPATH;
-				resourceDir = new File(srcPath).getCanonicalFile().toURI().toURL();
-			} catch (Exception e) {				
-				JourneyMap.getLogger().severe(e.getMessage());
+		if(cpRoot!=null) {
+			String cpRootPath = cpRoot.getPath();
+			if(cpRootPath.contains(IDE_TEST)) { //$NON-NLS-1$
+				try {
+					String srcPath = cpRootPath + IDE_SOURCEPATH;
+					resourceDir = new File(srcPath).getCanonicalFile().toURI().toURL();
+				} catch (Exception e) {				
+					JourneyMap.getLogger().severe(e.getMessage());
+				} 
 			} 
-		} 
+		}
 		if(resourceDir==null) {
 			resourceDir = JourneyMap.class.getResource(CLASSPATH_WEBROOT);
 		}

@@ -38,7 +38,7 @@ public class MapOverlayOptions extends GuiScreen {
      */
     public void initGui()
     {
-        this.controlList.clear();
+        this.buttonList.clear();
         String on = Constants.getString("MapOverlay.on");
         String off = Constants.getString("MapOverlay.off");
         
@@ -88,18 +88,18 @@ public class MapOverlayOptions extends GuiScreen {
 			buttonMonsters.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
 		}
 		
-		controlList.add(buttonCaves);
-		controlList.add(buttonSave);
-		controlList.add(buttonClose);
+		buttonList.add(buttonCaves);
+		buttonList.add(buttonSave);
+		buttonList.add(buttonClose);
 		if(buttonAlert.drawButton) {
-			controlList.add(buttonAlert);
+			buttonList.add(buttonAlert);
 		}
-		controlList.add(buttonBrowser);
-		controlList.add(buttonMonsters);
-		controlList.add(buttonAnimals);
-		controlList.add(buttonVillagers);
-		controlList.add(buttonPets);
-		controlList.add(buttonPlayers);
+		buttonList.add(buttonBrowser);
+		buttonList.add(buttonMonsters);
+		buttonList.add(buttonAnimals);
+		buttonList.add(buttonVillagers);
+		buttonList.add(buttonPets);
+		buttonList.add(buttonPlayers);
     }
     
     /**
@@ -108,7 +108,7 @@ public class MapOverlayOptions extends GuiScreen {
 	void layoutButtons() {
 		// Buttons
 		
-		if(controlList.isEmpty()) {
+		if(buttonList.isEmpty()) {
 			initGui();
 		}
 		
