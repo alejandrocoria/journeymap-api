@@ -83,8 +83,15 @@ public class FileService extends BaseService {
 		}
 		
 		// Check whether operating out of a zip/jar
-		useZipEntry = resourceDir.getProtocol().equals("file") && resourcePath.contains("!/"); //$NON-NLS-1$	//$NON-NLS-2$
+		useZipEntry = (resourceDir.getProtocol().equals("file") || resourceDir.getProtocol().equals("jar")) && resourcePath.contains("!/"); //$NON-NLS-1$	//$NON-NLS-2$
+			
+		JourneyMap.getLogger().info("resourceDir: " + resourceDir);
+		JourneyMap.getLogger().info("ResourcePath: " + resourcePath);
+		JourneyMap.getLogger().info("File Protocol: " + resourceDir.getProtocol().equals("file"));
+		JourneyMap.getLogger().info("In zip: " + resourcePath.contains("!/"));
+		JourneyMap.getLogger().info("useZipEntry: " + useZipEntry);
 		
+	
 	}
 	
 	@Override
@@ -125,6 +132,7 @@ public class FileService extends BaseService {
 					ResponseHeader.on(event).content(zipEntry);
 					serveStream(in, event);
 				} else {
+					JourneyMap.getLogger().severe("zipEntry not found: " + zipEntry + " in " + zipFile);	
 					throwEventException(404, Constants.getMessageJMERR13(requestPath), event, true);
 				}
 				
@@ -134,14 +142,11 @@ public class FileService extends BaseService {
 				if(file.exists()) {					
 					serveFile(file, event);
 				} else {
+					JourneyMap.getLogger().severe("Directory not found: " + requestPath);	
 					throwEventException(404, Constants.getMessageJMERR13(requestPath), event, true);
 				}
 			}
 			
-			// Return 404 if not found
-			if(in == null) {
-				
-			}
 
 		} catch(Event eventEx) {
 			throw eventEx;
