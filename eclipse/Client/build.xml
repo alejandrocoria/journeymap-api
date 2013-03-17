@@ -2,7 +2,7 @@
 <project name="JourneyMap" basedir="../.." default="all">
 
   <!-- Update when new version is going to be released -->
-  <property name="version" value="2.0b1_MC1.5" />
+  <property name="version" value="2.0b2_MC1.5" />
 
   <property name="mcp.dir" location="${basedir}" />
   <property name="journeymap.dir" location="${mcp.dir}/journeymap" />
@@ -66,9 +66,14 @@
       </classpath>
     </taskdef>
     <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
-      outputfolder="${build.dir}/net/techbrew/mcjm/web">
-      <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/mcjm/web" >
-        <include name="journeyMap.js" />
+      outputfolder="${build.dir}/net/techbrew/mcjm/web/js">
+      <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/mcjm/web/js" >
+        <include name="journeymap.js_" />
+      </fileset>
+    </yuicompress>
+  	<yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
+      outputfolder="${build.dir}/net/techbrew/mcjm/web/css">
+      <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/mcjm/web/css" >
         <include name="default.css" />
       </fileset>
     </yuicompress>
