@@ -1040,14 +1040,14 @@ var JourneyMap = (function() {
     });
     otherImages = new Array();
   
-    ctx = canvas.getContext("2d");
+    var ctx = fgCanvas.getContext("2d");
   
     // Make new
     $.each(others, function(index, other) {
   
       var x = getScaledChunkX(other.posX / 16) - (mapScale / 2);
       var z = getScaledChunkZ(other.posZ / 16) - (mapScale / 2);
-      if (other.username != player.name) {
+      if (other.username != JM.player.name) {
         if (x >= 0 && x <= canvasWidth && z >= 0 && z <= canvasHeight) {
   
           ctx.globalAlpha = .85;
@@ -1067,7 +1067,7 @@ var JourneyMap = (function() {
           ctx.fillText(other.username, x, z + 30);
   
           var otherImage = new Image();
-          otherImage.src = "other.png";
+          otherImage.src = "/img/entity/other.png";
           otherImage['class'] = 'mobImage';
           otherImage.title = other.username;
           otherImage.style.position = "absolute";
