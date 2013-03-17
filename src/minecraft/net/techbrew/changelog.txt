@@ -8,13 +8,14 @@ Requirements:
 
 Changes since JourneyMap 1.9.1 for Minecraft 1.4.6:
 
+- Added support for IE 9
 - Faster chunk render cycles for improved game performance
 - Improved surface map accuracy and appearance
 - Added the ability to toggle display of animals, villagers, pets, other players
-- Removed blurring when zooming in
 - New web UI appearance
-- New in-game UI (added options screen)
-- Replaced the TJWS embedded servlet engine with the NIO webserver "Rupy" (http://code.google.com/p/rupy/)
+- Removed blurring when zooming with web UI (except in IE 9)
+- In-game UI added options screen
+- Replaced the embedded servlet engine with a modified version of the NIO webserver "Rupy" (http://code.google.com/p/rupy/)
 - Internal work to allow for custom block mods
 
 Known issues:
