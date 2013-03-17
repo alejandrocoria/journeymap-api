@@ -117,6 +117,8 @@ public class MapOverlay extends GuiScreen {
 	
 	MapButton buttonDayNight, buttonFollow,buttonZoomIn,buttonZoomOut;
 	MapButton buttonOptions, buttonClose;
+	
+	BufferedImage playerImage = EntityHelper.getPlayerImage();
 
 	public MapOverlay(JourneyMap journeyMap) {
 		super();
@@ -593,10 +595,10 @@ public class MapOverlay extends GuiScreen {
 		Integer textureIndex = null;
 
 		// Use cached image if bounds haven't changed
-		if(lastMapImg!=null && lastMapImgTextureIndex!=null && lastMapBounds!=null && lastMapBounds[0].equals(mapBounds[0]) && lastMapBounds[1].equals(mapBounds[1])) {
-			mapImg = lastMapImg;
-			textureIndex = lastMapImgTextureIndex;
-		} else {
+//		if(lastMapImg!=null && lastMapImgTextureIndex!=null && lastMapBounds!=null && lastMapBounds[0].equals(mapBounds[0]) && lastMapBounds[1].equals(mapBounds[1])) {
+//			mapImg = lastMapImg;
+//			textureIndex = lastMapImgTextureIndex;
+//		} else {
 			lastMapBounds = new ChunkCoordIntPair[2];
 			lastMapBounds[0] = mapBounds[0];
 			lastMapBounds[1] = mapBounds[1];
@@ -641,7 +643,8 @@ public class MapOverlay extends GuiScreen {
 			try {
 				final Constants.CoordType cType = Constants.CoordType.convert(tempMapType, mc.theWorld.provider.dimensionId);
 				//System.out.println("MapOverlay " + currentZoom);
-				mapImg = RegionFileHandler.getMergedChunks(worldDir, mapBounds[0].chunkXPos, mapBounds[0].chunkZPos,  mapBounds[1].chunkXPos, mapBounds[1].chunkZPos, tempMapType, ccy, cType, false, currentZoom);
+				mapImg = RegionFileHandler.getMergedChunks(worldDir, mapBounds[0].chunkXPos, mapBounds[0].chunkZPos,  mapBounds[1].chunkXPos, mapBounds[1].chunkZPos, 
+						tempMapType, ccy, cType, true, currentZoom);			
 				
 //				if(mapImg.getWidth() > getCanvasWidth()) {
 //					System.out.println("Scaling");
@@ -664,7 +667,7 @@ public class MapOverlay extends GuiScreen {
 				zoomLevels.remove(currentZoom);
 				zoom(true);
 			}
-		}
+		//}
 
 		// Put the map image into a texture and draw it
 		if(textureIndex==null) {
@@ -824,35 +827,20 @@ public class MapOverlay extends GuiScreen {
 
 			// Draw player if within bounds
 			if(inBounds(mc.thePlayer)) {
-
-				int iconWidth = 64;
-				int iconHeight = 64;
+				
+				int iconWidth = playerImage.getWidth();
+				int iconHeight = playerImage.getHeight();
 
 				int playerX = Math.round(getScaledChunkX((float) (mc.thePlayer.posX/16))*overlayScale);
 				int playerY = Math.round(getScaledChunkZ((float) (mc.thePlayer.posZ/16))*overlayScale);
 
 				int offsetWidth = playerX - (iconWidth/2);
 				int offsetHeight = playerY - (iconHeight/2);
-				
-				// Player underlay
-				Color underColor = null;
-				if(mapType==null || mapType.equals(Constants.MapType.day)) {
-					underColor = Color.white;
-				} else {
-					underColor = Color.black;
-				}
-				g2D.setColor(underColor);
-				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .4F));
-				g2D.fillArc(playerX-(iconWidth/2), playerY-(iconHeight/2), iconWidth, iconHeight, 0, 360);
 
-				// Player icon
-				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F));
-				BufferedImage playerImage = EntityHelper.getPlayerImage();
+				// Player icon				
 				Graphics2D g2Dplayer = entityImg.createGraphics();
-				//g2D.translate(playerX, playerY);
-				g2D.rotate(EntityHelper.getHeading(mc.thePlayer));
-
 				g2D.setComposite(MapBlocks.OPAQUE);
+				g2D.rotate(EntityHelper.getHeading(mc.thePlayer));
 				g2D.drawImage(playerImage, offsetWidth, offsetHeight, offsetWidth + iconWidth, offsetHeight + iconHeight, 0, 0, playerImage.getWidth(), playerImage.getHeight(), null);
 			}
 
