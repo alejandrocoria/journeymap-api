@@ -118,7 +118,7 @@ public class MapOverlayOptions extends GuiScreen {
 			lastHeight = height;
 			
 			int hgap = 160;
-			int bx = this.width / 2 - hgap;
+			int bx = this.width / 2 - hgap + 5;
 			int by = (this.height / 4);
 			int row = 0;
 
@@ -215,6 +215,7 @@ public class MapOverlayOptions extends GuiScreen {
     
     void close() {
 		mc.displayGuiScreen(map);
+		map.updateScreen();
 	}
     
     @Override
@@ -230,7 +231,7 @@ public class MapOverlayOptions extends GuiScreen {
     public void drawScreen(int par1, int par2, float par3)
     {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.options_title"), this.width / 2, 40, 16777215);
+        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.options_title", JourneyMap.JM_VERSION), this.width / 2, 40, 16777215);
         layoutButtons();
         super.drawScreen(par1, par2, par3);
     }

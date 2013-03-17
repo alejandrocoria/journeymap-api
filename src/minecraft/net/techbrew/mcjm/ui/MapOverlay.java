@@ -115,20 +115,21 @@ public class MapOverlay extends GuiScreen {
 	long lastEntityUpdate = 0;
 	int[] mapBackground = new int[]{0,0,0};
 	
-	MapButton buttonDay,buttonNight,buttonFollow,buttonZoomIn,buttonZoomOut;
-	MapButton buttonClose,buttonAlert;
+	MapButton buttonDayNight, buttonFollow,buttonZoomIn,buttonZoomOut;
+	MapButton buttonOptions, buttonClose;
 
 	public MapOverlay(JourneyMap journeyMap) {
 		super();
 		super.allowUserInput = true;
 		this.journeyMap = journeyMap;	
 		initButtons();
+		
 	}
 
 	private void drawButtonBar() {
-		drawRectangle(0,0,width,9,216,216,216,255);
-		drawRectangle(0,9,width,9,200,200,200,255);
-		drawRectangle(0,18,width,1,50,50,50,100);
+		drawRectangle(0,0,width,10,216,216,216,255);
+		drawRectangle(0,10,width,10,200,200,200,255);
+		drawRectangle(0,21,width,2,50,50,50,100);
 		
 		// zoom underlay
 		if(mapType==null || mapType.equals(Constants.MapType.day)) {
@@ -168,20 +169,17 @@ public class MapOverlay extends GuiScreen {
 	@Override
 	protected void actionPerformed(GuiButton guibutton) {
 		switch(guibutton.id) {
-		case 0: { // day
-			mapType = Constants.MapType.day;
-			buttonDay.setToggled(true);
-			buttonNight.setToggled(false);
+		case 0: { // day or night			
+			buttonDayNight.toggle();
+			if(buttonDayNight.getToggled()) {
+				mapType = Constants.MapType.day;
+			} else {
+				mapType = Constants.MapType.night;
+			}
 			lastMapImg = null;
 			break;
 		}
-		case 1: { // night
-			mapType = Constants.MapType.night;
-			buttonDay.setToggled(false);
-			buttonNight.setToggled(true);
-			lastMapImg = null;
-			break;
-		}
+
 		case 3: { // follow
 			setFollow(!follow);
 			if(follow) eraseCachedEntityImg();
@@ -211,6 +209,10 @@ public class MapOverlay extends GuiScreen {
 			launchLocalhost();
 			break;
 		}
+		case 15: { // options
+			showOptions();
+			break;
+		}
 		}
 	}
 
@@ -227,8 +229,8 @@ public class MapOverlay extends GuiScreen {
 
 	}
 
-	int bWidth = 40;
-	int bHeight = 20;
+	int bWidth = 16;
+	int bHeight = 16;
 	int bHGap = 8;
 	int bVGap = 8;
 
@@ -236,25 +238,31 @@ public class MapOverlay extends GuiScreen {
 	 * Set up UI buttons.
 	 */
 	void initButtons() {
-		buttonDay = new MapButton(0,0,0,bWidth,bHeight,Constants.getString("MapOverlay.day"), FileHandler.WEB_DIR + "/img/sun.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonDay.setToggled(mapType==Constants.MapType.day);
-		buttonNight = new MapButton(1,0,0,bWidth,bHeight,Constants.getString("MapOverlay.night"), FileHandler.WEB_DIR + "/img/moon.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonNight.setToggled(mapType==Constants.MapType.night);
-		buttonFollow = new MapButton(3,0,0,bWidth,bHeight,Constants.getString("MapOverlay.follow_me"), FileHandler.WEB_DIR + "/img/follow.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonFollow.setToggled(follow);
+		buttonList.clear();
+		String on = Constants.getString("MapOverlay.on"); //$NON-NLS-1$ 
+        String off = Constants.getString("MapOverlay.off"); //$NON-NLS-1$ 
+        
+		buttonDayNight = new MapButton(0,0,0,80,20,
+				Constants.getString("MapOverlay.day"), //$NON-NLS-1$ 
+				Constants.getString("MapOverlay.night"), //$NON-NLS-1$ 
+				mapType == Constants.MapType.day); 
+
+		buttonFollow = new MapButton(3,0,0,80,20,
+				Constants.getString("MapOverlay.follow", on), //$NON-NLS-1$ 
+				Constants.getString("MapOverlay.follow", off), //$NON-NLS-1$ 
+				follow); //$NON-NLS-1$ //$NON-NLS-2$
+		
 		buttonZoomIn = new MapButton(4,0,0,bWidth,bHeight,Constants.getString("MapOverlay.zoom_in"), FileHandler.WEB_DIR + "/img/zoomin.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonZoomOut = new MapButton(5,0,0,bWidth,bHeight,Constants.getString("MapOverlay.zoom_out"), FileHandler.WEB_DIR + "/img/zoomout.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonClose = new MapButton(7,0,0,bWidth,bHeight,Constants.getString("MapOverlay.close"), FileHandler.WEB_DIR + "/img/close.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonAlert = new MapButton(8,0,0,bWidth,bHeight,Constants.getString("MapOverlay.update_available"), FileHandler.WEB_DIR + "/img/alert.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonAlert.drawButton = VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent();
+		buttonClose = new MapButton(7,0,0,60,20,Constants.getString("MapOverlay.close")); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonOptions = new MapButton(15,0,0,60,20, Constants.getString("MapOverlay.options"));
 		
-		buttonList.add(buttonDay);
-		buttonList.add(buttonNight);
+		buttonList.add(buttonDayNight);
 		buttonList.add(buttonFollow);
 		buttonList.add(buttonZoomIn);
 		buttonList.add(buttonZoomOut);
 		buttonList.add(buttonClose);
-		buttonList.add(buttonAlert);
+		buttonList.add(buttonOptions);
 	}
 
 	/**
@@ -273,20 +281,19 @@ public class MapOverlay extends GuiScreen {
 
 			//System.out.println("width=" + width + ", startX=" + startX);
 
-			buttonDay.xPosition = startX;
-			buttonNight.xPosition = startX + (offsetX*1);
+			buttonDayNight.xPosition = 30;
 
-			buttonFollow.xPosition = startX + (offsetX*4);
+			buttonFollow.xPosition = 120;
 			
 			buttonZoomIn.xPosition = 6;
 			buttonZoomIn.yPosition = 8 + offsetY;
 			buttonZoomOut.xPosition = 6;
 			buttonZoomOut.yPosition = 8 + (offsetY*2);
 
-			buttonAlert.xPosition = endX - (offsetX*4);			
 			
-
-			buttonClose.xPosition = endX - bWidth;			
+			
+			buttonOptions.xPosition = endX - 60 - 8 - 60;
+			buttonClose.xPosition = endX - 60;			
 		}
 		
 		buttonZoomIn.enabled = currentZoomIndex>=1;
@@ -615,8 +622,7 @@ public class MapOverlay extends GuiScreen {
 				if(mapType==null) {
 					final long ticks = (mc.theWorld.getWorldTime() % 24000L);
 					mapType = ticks<13800 ? Constants.MapType.day : Constants.MapType.night;	
-					buttonDay.setToggled(mapType.equals(Constants.MapType.day));
-					buttonNight.setToggled(mapType.equals(Constants.MapType.night));
+					buttonDayNight.setToggled(mapType.equals(Constants.MapType.day));
 				}
 				tempMapType = mapType;
 			}
@@ -1154,6 +1160,13 @@ public class MapOverlay extends GuiScreen {
 			JourneyMap.getLogger().log(Level.SEVERE, "Could not launch browser with URL: " + url, e); //$NON-NLS-1$
 			JourneyMap.getLogger().severe(LogFormatter.toString(e));
 		}
+	}
+	
+	void showOptions() {
+		MapOverlayOptions opts = new MapOverlayOptions(this);
+		mc.displayGuiScreen(opts);
+		this.lastWidth = 0;
+		this.lastHeight = 0;
 	}
 
 }

@@ -21,11 +21,22 @@ public class MapButton extends GuiSmallButton {
 		super(id, x, y, label);
 	}
 	
+	public MapButton(int id, int x, int y, int width, int height, String label) {
+		super(id, x, y, width, height, label);
+	}
+	
+	public MapButton(int id, int x, int y, int width, int height, String labelOn, String labelOff, Boolean toggled) {
+		super(id, x, y, width, height, toggled ? labelOn : labelOff);
+		this.labelOn = labelOn;
+		this.labelOff = labelOff;
+		this.setToggled(toggled);
+	}	
+	
 	public MapButton(int id, int x, int y, String labelOn, String labelOff, Boolean toggled) {
 		super(id, x, y, toggled ? labelOn : labelOff);
 		this.labelOn = labelOn;
 		this.labelOff = labelOff;
-		this.toggled = toggled;
+		this.setToggled(toggled);
 	}	
 	
 	public MapButton(int id, int x, int y, int width, int height, String hoverText, String icon) {
@@ -34,18 +45,18 @@ public class MapButton extends GuiSmallButton {
 		setHoverText(hoverText);
 	}
 	
-	public void setHoverText(String label) {
-		multiline = displayString.split(" "); //$NON-NLS-1$
+	public void setHoverText(String hoverText) {
+		multiline = hoverText.split(" "); //$NON-NLS-1$
 	}
 	
 	private void updateLabel() {
 		if(labelOn!=null && labelOff!=null) {
-			this.displayString = toggled ? labelOn : labelOff;
+			this.displayString = getToggled() ? labelOn : labelOff;
 		}		
 	}
 	
 	public void toggle() {
-		setToggled(!toggled);
+		setToggled(!getToggled());
 	}
 	
 	public void setToggled(Boolean toggled) {
@@ -82,8 +93,8 @@ public class MapButton extends GuiSmallButton {
 		boolean hover = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
 
 		// Preserve aspect ratio of source image		
-		int w = toggled ? this.width : (int) Math.ceil(this.width*.6);
-		int h = toggled ? this.height :  (int) Math.ceil(this.height*.6);
+		int w = getToggled() ? this.width : (int) Math.ceil(this.width*.6);
+		int h = getToggled() ? this.height :  (int) Math.ceil(this.height*.6);
 		int widthOffset = (this.width-w)/2;
 		int heightOffset = (this.height-h);
 
@@ -97,12 +108,12 @@ public class MapButton extends GuiSmallButton {
         if(hover)
         {
         	int color = enabled ? 0xffffa0 : 0xcccccc;
-        	if(multiline!=null && multiline.length==2) {
-        		drawCenteredString(minecraft.fontRenderer, multiline[0], xPosition + width / 2, yPosition + (height - 16) / 2, color);
-        		drawCenteredString(minecraft.fontRenderer, multiline[1], xPosition + width / 2, yPosition + (height - 0) / 2, color);
-        	} else {
-        		drawCenteredString(minecraft.fontRenderer, displayString, xPosition + width / 2, yPosition + (height - 8) / 2, color);
-        	}
+//        	if(multiline!=null && multiline.length==2) {
+//        		drawCenteredString(minecraft.fontRenderer, multiline[0], xPosition + width / 2, yPosition + (height - 16) / 2, color);
+//        		drawCenteredString(minecraft.fontRenderer, multiline[1], xPosition + width / 2, yPosition + (height - 0) / 2, color);
+//        	} else {
+//        		drawCenteredString(minecraft.fontRenderer, displayString, xPosition + width / 2, yPosition + (height - 8) / 2, color);
+//        	}
         } 
     }
 
@@ -111,4 +122,10 @@ public class MapButton extends GuiSmallButton {
     {
         return enabled && drawButton && i >= xPosition && j >= yPosition && i < xPosition + width && j < yPosition + height;
     }
+
+	public Boolean getToggled() {
+		return toggled;
+	}
+
+
 }

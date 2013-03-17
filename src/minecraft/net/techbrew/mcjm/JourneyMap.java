@@ -57,7 +57,7 @@ public class JourneyMap extends BaseMod {
 	static final String VERSION_URL = "http://goo.gl/xo4CR"; //$NON-NLS-1$
 	
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-	public static final String JM_VERSION = "2.0"; //$NON-NLS-1$
+	public static final String JM_VERSION = "2.0b1"; //$NON-NLS-1$
 	public static final String ML_VERSION = "ModLoader 1.5"; //$NON-NLS-1$
 	public static final String MC_VERSION = "1.5"; //$NON-NLS-1$
 
@@ -377,13 +377,15 @@ public class JourneyMap extends BaseMod {
 		Minecraft minecraft = Minecraft.getMinecraft();
 		if(keybinding.keyCode==keybinding.keyCode) {
 			if(Minecraft.getMinecraft().currentScreen==null) {
-				ModLoader.openGUI(minecraft.thePlayer, new MapOverlayOptions(new MapOverlay(this)));
+				ModLoader.openGUI(minecraft.thePlayer, new MapOverlay(this));
 			} else if(ModLoader.isGUIOpen(MapOverlay.class)) {
 				minecraft.displayGuiScreen(null);
 				minecraft.setIngameFocus();
 			}
 		} else if(keybinding.keyCode==minecraft.gameSettings.keyBindInventory.keyCode) {
 			if(ModLoader.isGUIOpen(MapOverlayOptions.class)) { 
+				minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer));				
+			} else if(ModLoader.isGUIOpen(MapOverlay.class)) { 
 				minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer));				
 			}
 		}
