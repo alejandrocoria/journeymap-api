@@ -172,9 +172,6 @@ var JourneyMap = (function() {
     bgCanvas = $(document.createElement("canvas")).attr('id', 'bgCanvas')[0];
     fgCanvas = $(document.createElement("canvas")).attr('id', 'fgCanvas')[0];
   
-    // Set initial pixel smoothing on canvases
-    setSmoothing(smoothing);
-  
     sizeMap();
   
     // Set page language, although at this point it may be too late to matter.
@@ -274,11 +271,6 @@ var JourneyMap = (function() {
       event.stopPropagation();
     });
     
-//    $("#checksmoothing").prop('checked', smoothing).click(function() {
-//      setSmoothing(this.checked === true);
-//      drawMap();
-//    });
-  
     // Test canvas to see if smooth scaling can be toggled
     var ctx = bgCanvas.getContext("2d");
   
@@ -423,36 +415,12 @@ var JourneyMap = (function() {
   
   }
   
-  var setSmoothing = function(smooth) {
-  
-    smoothing = smooth;
-  
-    var available = enableSmoothing(canvas.getContext("2d"), smoothing);
-    if (available !== true) {
-      $("#checksmoothing").parent().attr('disabled', 'disabled');
-    }
-  
-  }
-  
   var enableSmoothing = function(ctx, smoothing) {
   
-    var available = false;
-    if ($(ctx).prop('imageSmoothingEnabled') !== undefined) {
-      available = true;
-      $(ctx).prop('imageSmoothingEnabled', smoothing)
-    }
+	$(ctx).prop('imageSmoothingEnabled', smoothing)
+    $(ctx).prop('mozImageSmoothingEnabled', smoothing)
+    $(ctx).prop('webkitImageSmoothingEnabled', smoothing)
   
-    if ($(ctx).prop('mozImageSmoothingEnabled') !== undefined) {
-      available = true;
-      $(ctx).prop('mozImageSmoothingEnabled', smoothing)
-    }
-  
-    if ($(ctx).prop('webkitImageSmoothingEnabled') !== undefined) {
-      available = true;
-      $(ctx).prop('webkitImageSmoothingEnabled', smoothing)
-    }
-  
-    return available;
   }
   
   /**
