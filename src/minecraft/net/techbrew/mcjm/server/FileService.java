@@ -84,14 +84,6 @@ public class FileService extends BaseService {
 		
 		// Check whether operating out of a zip/jar
 		useZipEntry = (resourceDir.getProtocol().equals("file") || resourceDir.getProtocol().equals("jar")) && resourcePath.contains("!/"); //$NON-NLS-1$	//$NON-NLS-2$
-			
-		JourneyMap.getLogger().info("resourceDir: " + resourceDir);
-		JourneyMap.getLogger().info("ResourcePath: " + resourcePath);
-		JourneyMap.getLogger().info("File Protocol: " + resourceDir.getProtocol().equals("file"));
-		JourneyMap.getLogger().info("In zip: " + resourcePath.contains("!/"));
-		JourneyMap.getLogger().info("useZipEntry: " + useZipEntry);
-		
-	
 	}
 	
 	@Override
