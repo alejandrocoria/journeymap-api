@@ -208,7 +208,6 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		int blockId;
 		int paintY;
 		int lightLevel;
-		boolean usefulPaint = false;
 		
 		for (int z = 0; z < 16; z++) {
 			blockLoop: for (int x = 0; x < 16; x++) {			
@@ -278,7 +277,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						}
 					}
 		
-					if (paintY < 0) {
+					if (paintY < 0 || !hasAir) {
 						// No air blocks in column at all
 						paintBlock(x, vSlice, z, Color.black, g2D);
 						continue blockLoop;
@@ -312,8 +311,6 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		
 					// Draw block
 					paintBlock(x, vSlice, z, color, g2D);
-					//if(!usefulPaint && !cheatLight) usefulPaint=true;
-					if(!usefulPaint) usefulPaint=true;
 		
 				} catch (Throwable t) {
 					paintBadBlock(x, vSlice, z, g2D);
@@ -324,13 +321,6 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				}
 				
 			}
-		}
-		
-		if(!usefulPaint) {
-			g2D.setComposite(MapBlocks.OPAQUE);
-			g2D.setBackground(Color.DARK_GRAY);
-			g2D.clearRect(0,0,16,16);
-			//System.out.println("Cleared chunk: " + chunkStub.xPosition + "," + chunkStub.zPosition);
 		}
 
 	}

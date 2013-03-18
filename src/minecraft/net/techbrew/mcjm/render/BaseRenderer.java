@@ -26,7 +26,6 @@ public abstract class BaseRenderer {
 	public BaseRenderer(MapBlocks mapBlocks) {
 		super();
 		this.mapBlocks = mapBlocks;
-		caveLighting = true;
 	}
 
 	/**
