@@ -170,11 +170,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						color = shade(color, s);
 					}
 					
-					if(x==0 || z==0) {
-						color = Color.white;
-					}
-					
-					// TODO: Remove
+					// Draw daytime map block
 					g2D.setComposite(MapBlocks.OPAQUE);						
 					g2D.setPaint(color);
 					g2D.fillRect(x, z, 1, 1);
@@ -188,7 +184,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					color = shadeNight(color, diff);
 				}
 
-				// Draw lighted block on the night side of the image
+				// Draw nighttime map block
 				g2D.setComposite(MapBlocks.OPAQUE);
 				g2D.setPaint(color);
 				g2D.fillRect(x + 16, z, 1, 1);									
@@ -243,7 +239,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						
 						// If lava with no air, do nothing
 						if(!hasAir && (blockId==10 || blockId==11)) {
-							paintClearBlock(x, vSlice, z, g2D);
+							paintBlock(x, vSlice, z, Color.black, g2D);
 							continue blockLoop;
 						}
 						
@@ -253,7 +249,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 								lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
 								if (caveLighting && lightLevel < 1) {
 									// No lit blocks in column
-									paintClearBlock(x, vSlice, z, g2D);
+									paintBlock(x, vSlice, z, Color.black, g2D);
 									continue blockLoop;
 								}
 								
@@ -284,7 +280,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		
 					if (paintY < 0) {
 						// No air blocks in column at all
-						paintClearBlock(x, vSlice, z, g2D);
+						paintBlock(x, vSlice, z, Color.black, g2D);
 						continue blockLoop;
 					}					
 		
@@ -295,7 +291,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					
 					if (caveLighting && lightLevel < 1) {
 						// No lit blocks in column
-						paintClearBlock(x, vSlice, z, g2D);
+						paintBlock(x, vSlice, z, Color.black, g2D);
 						continue blockLoop;
 					}
 		
