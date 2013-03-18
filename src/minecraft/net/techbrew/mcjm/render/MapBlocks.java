@@ -18,6 +18,7 @@ public class MapBlocks extends HashMap {
 	public static AlphaComposite OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
 	public static AlphaComposite CLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0F);
 	public static AlphaComposite SEMICLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F);
+	public static AlphaComposite SLIGHTLYCLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F);
 	public static Color COLOR_TRANSPARENT = new Color(0,0,0,0);
 	
 	private final Color grassOffsetColor = new Color(0x111111);

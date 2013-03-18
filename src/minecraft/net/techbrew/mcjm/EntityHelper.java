@@ -28,10 +28,10 @@ import net.techbrew.mcjm.io.FileHandler;
 
 public class EntityHelper {
 	
-	public static final String PLAYER_TYPE = "player";
+	public static final String PLAYER_TYPE = "Player";
 	
 	// TODO: make threadsafe
-	static BufferedImage playerImg, otherImg;
+	static BufferedImage locatorHostile, locatorNeutral, locatorOther, locatorPet, locatorPlayer;
 	
 	// TODO: make threadsafe
 	static HashMap<String, BufferedImage> entityImageMap = new HashMap<String, BufferedImage>();
@@ -126,23 +126,58 @@ public class EntityHelper {
 	public static BufferedImage getEntityImage(String entityName) {
 		BufferedImage img = entityImageMap.get(entityName);
 		if(img==null) {
-			if(PLAYER_TYPE.equals(entityName)) {
-				img = getOtherPlayerImage();
-			} else {
-				img = getUnknownImage(); // backup plan
-				try {
-					String png = FileHandler.WEB_DIR + "/img/entity/" + entityName + ".png";	//$NON-NLS-1$ //$NON-NLS-2$
-					InputStream is = EntityHelper.class.getResourceAsStream(png);
-					img = ImageIO.read(is);
-					is.close();		
-				} catch (Exception e) {
-					String error = Constants.getMessageJMERR17(entityName);
-					JourneyMap.getLogger().severe(error);			
-				}
-			}
+			img = FileHandler.getImage("entity/" + entityName + ".png");	//$NON-NLS-1$ //$NON-NLS-2$
+			if(img==null) {
+				img = getUnknownImage(); // fall back to unknown image
+			}			
 			entityImageMap.put(entityName, img);
 		}
 		return img;
+	}
+
+	
+	/**
+	 * TODO: Not threadsafe
+	 * @return
+	 */
+	public static BufferedImage getHostileLocator() {
+		if(locatorHostile==null) {
+			locatorHostile = FileHandler.getImage("locator-hostile.png"); //$NON-NLS-1$			
+		}
+		return locatorHostile;
+	}
+	
+	/**
+	 * TODO: Not threadsafe
+	 * @return
+	 */
+	public static BufferedImage getNeutralLocator() {
+		if(locatorNeutral==null) {
+			locatorNeutral = FileHandler.getImage("locator-neutral.png"); //$NON-NLS-1$			
+		}
+		return locatorNeutral;
+	}
+	
+	/**
+	 * TODO: Not threadsafe
+	 * @return
+	 */
+	public static BufferedImage getOtherLocator() {
+		if(locatorOther==null) {
+			locatorOther = FileHandler.getImage("locator-other.png"); //$NON-NLS-1$			
+		}
+		return locatorOther;
+	}
+	
+	/**
+	 * TODO: Not threadsafe
+	 * @return
+	 */
+	public static BufferedImage getPetLocator() {
+		if(locatorPet==null) {
+			locatorPet = FileHandler.getImage("locator-pet.png"); //$NON-NLS-1$			
+		}
+		return locatorPet;
 	}
 	
 	/**
@@ -150,39 +185,10 @@ public class EntityHelper {
 	 * @return
 	 */
 	public static BufferedImage getPlayerImage() {
-		if(playerImg==null) {
-			 try {
-				String png = FileHandler.WEB_DIR + "/img/locator-player.png";						 //$NON-NLS-1$
-				InputStream is = EntityHelper.class.getResourceAsStream(png);
-				playerImg = ImageIO.read(is);
-				is.close();
-			} catch (IOException e) {
-				String error = Constants.getMessageJMERR17(e.getMessage());
-				JourneyMap.getLogger().severe(error);
-				return null;
-			}
+		if(locatorPlayer==null) {
+			locatorPlayer = FileHandler.getImage("locator-player.png"); //$NON-NLS-1$	
 		}
-		return playerImg;
-	}
-	
-	/**
-	 * TODO: Not threadsafe
-	 * @return
-	 */
-	public static BufferedImage getOtherPlayerImage() {
-		if(otherImg==null) {
-			 try {
-				String png = FileHandler.WEB_DIR + "/img/entity/other.png";						 //$NON-NLS-1$
-				InputStream is = EntityHelper.class.getResourceAsStream(png);
-				otherImg = ImageIO.read(is);
-				is.close();
-			} catch (IOException e) {
-				String error = Constants.getMessageJMERR17(e.getMessage());
-				JourneyMap.getLogger().severe(error);
-				return null;
-			}
-		}
-		return otherImg;
+		return locatorPlayer;
 	}
 	
 	/**
@@ -190,18 +196,7 @@ public class EntityHelper {
 	 * @return
 	 */
 	public static BufferedImage getUnknownImage() {
-		BufferedImage img = null;
-		try {
-			String png = FileHandler.WEB_DIR + "/img/alert.png";						 //$NON-NLS-1$
-			InputStream is = EntityHelper.class.getResourceAsStream(png);
-			img = ImageIO.read(is);
-			is.close();
-		} catch (IOException e) {
-			String error = Constants.getMessageJMERR17(e.getMessage());
-			JourneyMap.getLogger().severe(error);
-			return null;
-		}
-		return img;
+		return FileHandler.getImage("alert.png");
 	}
 	
 	
@@ -212,7 +207,11 @@ public class EntityHelper {
 	 * @return
 	 */
 	public static double getHeading(Entity entity) {
-		return getHeading(entity.rotationYaw);
+		if(entity instanceof EntityLiving) {
+			return getHeading(((EntityLiving) entity).rotationYawHead);
+		} else {
+			return getHeading(entity.rotationYaw);
+		}
 	}
 	
 	/**

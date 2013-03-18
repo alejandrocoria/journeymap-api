@@ -1,11 +1,15 @@
 package net.techbrew.mcjm.io;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.logging.Level;
+
+import javax.imageio.ImageIO;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.MapStorage;
@@ -13,6 +17,7 @@ import net.minecraft.src.ModLoader;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldInfo;
 import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.EntityHelper;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -88,5 +93,18 @@ public class FileHandler {
 		}
 	}
 	
+	public static BufferedImage getImage(String fileName) {
+		try {
+			String png = FileHandler.WEB_DIR + "/img/" + fileName;//$NON-NLS-1$
+			InputStream is = EntityHelper.class.getResourceAsStream(png);
+			BufferedImage img = ImageIO.read(is);
+			is.close();
+			return img;
+		} catch (IOException e) {
+			String error = Constants.getMessageJMERR17(e.getMessage());
+			JourneyMap.getLogger().severe(error);
+			return null;
+		}
+	}
 	
 }

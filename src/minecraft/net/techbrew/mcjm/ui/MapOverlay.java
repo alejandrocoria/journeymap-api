@@ -399,6 +399,7 @@ public class MapOverlay extends GuiScreen {
 		} else {
 			//System.out.println("Zoom scale: " + scale + ", center chunk: " + centerChunkX + "," + centerChunkZ);
 			setScale(currentZoom.scale);
+			overlayScale = 4;
 			centerMapOnChunk(centerChunkX, centerChunkZ);
 			zoomInStop = false;	
 			// Reset timer for entity updates
@@ -647,16 +648,6 @@ public class MapOverlay extends GuiScreen {
 				mapImg = RegionFileHandler.getMergedChunks(worldDir, mapBounds[0].chunkXPos, mapBounds[0].chunkZPos,  mapBounds[1].chunkXPos, mapBounds[1].chunkZPos, 
 						tempMapType, ccy, cType, true, currentZoom);		
 				
-				Graphics2D g2D = mapImg.createGraphics();
-				g2D.setColor(Color.MAGENTA);
-				g2D.setComposite(MapBlocks.OPAQUE);
-				float span = 16 ;
-				for(int x = -1 ;x<mapImg.getWidth();x+=span) {
-					for(int z = -1;z<mapImg.getHeight();z+=span) {
-						g2D.fillRect(x,z, 1, 1);
-					}
-				}
-				
 				lastMapImg = mapImg;
 				
 				textureIndex = mc.renderEngine.allocateAndSetupTexture((BufferedImage) mapImg);
@@ -684,13 +675,13 @@ public class MapOverlay extends GuiScreen {
 	
 	int getScaledEntityX(int chunkX, double posX) {
 		int scaledChunkX = (chunkX - mapBounds[0].chunkXPos) * chunkScale;
-		int scaledBlockX = (int) (Math.round(posX-1) % 16) * mapScale;
+		int scaledBlockX = (int) (Math.floor(posX) % 16) * mapScale;
 		return (scaledChunkX + scaledBlockX) * overlayScale;
 	}
 
 	int getScaledEntityZ(int chunkZ, double posZ) {
 		int scaledChunkZ = (chunkZ - mapBounds[0].chunkZPos) * chunkScale;
-		int scaledBlockZ = (int) (Math.round(posZ-1) % 16) * mapScale;
+		int scaledBlockZ = (int) (Math.floor(posZ) % 16) * mapScale;
 		return (scaledChunkZ + scaledBlockZ) * overlayScale;
 	}
 
@@ -736,16 +727,9 @@ public class MapOverlay extends GuiScreen {
 			Graphics2D g2D = entityOverlay.createGraphics();
 			FontMetrics fm = g2D.getFontMetrics();
 			g2D.setFont(new Font("Arial", Font.PLAIN, 20)); //$NON-NLS-1$
-			g2D.setComposite(MapBlocks.CLEAR);
-			g2D.setPaint(Color.black);
-			g2D.fillRect(0,0,entityOverlay.getWidth(),entityOverlay.getHeight());
-			g2D.setComposite(MapBlocks.OPAQUE);
-			g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+			//g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 			g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-
-
-			BasicStroke circleStroke = new BasicStroke(2F);
+			g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			
 			if(!hardcore) {
 				// Draw nearby mobs
@@ -754,33 +738,33 @@ public class MapOverlay extends GuiScreen {
 				
 				if(showAnimals || showPets) {
 					critters.addAll((List<Map>) DataCache.instance().get(AnimalsData.class).get(EntityKey.root));
-				} 
-				if(showMonsters) {
-					critters.addAll((List<Map>) DataCache.instance().get(MobsData.class).get(EntityKey.root));
 				}
 				if(showVillagers) {
 					critters.addAll((List<Map>) DataCache.instance().get(VillagersData.class).get(EntityKey.root));
 				}
+				if(showMonsters) {
+					critters.addAll((List<Map>) DataCache.instance().get(MobsData.class).get(EntityKey.root));
+				}
 				if(!mc.isSingleplayer() && showPlayers) {
 					critters.addAll((List<Map>) DataCache.instance().get(PlayersData.class).get(EntityKey.root));
 				}
-
 				
 				int cx, cz, x, z;
 				double heading;
-				BufferedImage mobImage;
-				String type;
-				Boolean hostile;
+				BufferedImage entityIcon, locatorImg;
+				String type, owner;
+				Boolean isHostile, isPet, isPlayer;
 				boolean filterAnimals = (showAnimals!=showPets);
 				
 				for(Map critter : critters) {
 					
-					hostile = (Boolean) critter.get(EntityKey.hostile);
+					isHostile = Boolean.TRUE.equals(critter.get(EntityKey.hostile));
+					
+					owner = (String) critter.get(EntityKey.owner);
+					isPet = mc.thePlayer.username.equals(owner);					
 					
 					// Skip animals/pets if needed
-					if(filterAnimals && Boolean.FALSE.equals(hostile)) {
-						String owner = (String) critter.get(EntityKey.owner);
-						boolean isPet = mc.thePlayer.username.equals(owner);
+					if(filterAnimals && !isHostile) {						
 						if(showPets != isPet) {
 							continue;
 						}
@@ -793,15 +777,33 @@ public class MapOverlay extends GuiScreen {
 						x = (Integer) critter.get(EntityKey.posX);
 						z = (Integer) critter.get(EntityKey.posZ);
 						heading = (Double) critter.get(EntityKey.heading);
-								
-						mobImage = EntityHelper.getEntityImage(type);		
-						drawEntity(cx, x, cz, z, heading, mobImage, entityOverlay);
 						
-						if(EntityHelper.PLAYER_TYPE.equals(type)) {
+						isPlayer = EntityHelper.PLAYER_TYPE.equals(type);
+								
+						// Determine and draw locator
+						if(isHostile) {
+							locatorImg = EntityHelper.getHostileLocator();
+						} else if(isPet) {
+							locatorImg = EntityHelper.getPetLocator();
+						} else if(isPlayer) {
+							locatorImg = EntityHelper.getOtherLocator();
+						} else {
+							locatorImg = EntityHelper.getNeutralLocator();
+						}			
+						g2D.setComposite(MapBlocks.SLIGHTLYCLEAR);
+						drawEntity(cx, x, cz, z, heading, locatorImg, g2D);
+						
+						// Draw entity image
+						entityIcon = EntityHelper.getEntityImage(type);
+						g2D.setComposite(MapBlocks.OPAQUE);
+						drawEntity(cx, x, cz, z, 0.0, entityIcon, g2D);
+						
+						if(isPlayer) {
 							
-							// Label			
+							// Draw Label			
 							String username = (String) critter.get(EntityKey.username);
-							int offset = x - (fm.stringWidth(username)/2);							
+							int offset = x - (fm.stringWidth(username)/2);		
+							g2D.setComposite(MapBlocks.OPAQUE);
 							g2D.setPaint(Color.black);
 							g2D.drawString(username, offset -2, z + 36);
 							g2D.drawString(username, offset +2, z + 40);
@@ -814,7 +816,10 @@ public class MapOverlay extends GuiScreen {
 
 			// Draw player if within bounds
 			if(inBounds(mc.thePlayer)) {
-				drawEntity(mc.thePlayer, playerImage, entityOverlay);				
+				g2D.setComposite(MapBlocks.OPAQUE);
+				drawEntity(mc.thePlayer.chunkCoordX, mc.thePlayer.posX, 
+						mc.thePlayer.chunkCoordZ, mc.thePlayer.posZ,
+						EntityHelper.getHeading(mc.thePlayer),playerImage, g2D);				
 			}
 
 			lastEntityImg = entityOverlay;
@@ -860,20 +865,23 @@ public class MapOverlay extends GuiScreen {
 	 * @param entityIcon
 	 * @param overlayImg
 	 */
-	private void drawEntity(int chunkX, double posX, int chunkZ, double posZ, double heading, BufferedImage entityIcon, BufferedImage overlayImg) {
-		int radius = entityIcon.getWidth()/2;
+	private void drawEntity(int chunkX, double posX, int chunkZ, double posZ, Double heading, BufferedImage entityIcon, Graphics2D g2D) {
+		int radius = entityIcon.getWidth()/2 + (mapScale * overlayScale)/2;
+		int size = radius*2;
 		
 		int x = getScaledEntityX(chunkX, posX);
 		int y = getScaledEntityZ(chunkZ, posZ);
 		
-		// Player icon				
-		Graphics2D g2D = overlayImg.createGraphics();
-		g2D.setComposite(MapBlocks.OPAQUE);
+		if(heading!=null) {
+			final Graphics2D gCopy = (Graphics2D) g2D.create();
+			gCopy.translate(x, y);
+			gCopy.rotate(heading);
+			gCopy.translate(-radius, -radius);
+			gCopy.drawImage(entityIcon, 0, 0, size, size, null);
+		} else {
+			g2D.drawImage(entityIcon, x, y, size, size, null);
+		}
 		
-		g2D.translate(x, y);
-		g2D.rotate(heading);
-		g2D.translate(-radius, -radius);
-		g2D.drawImage(entityIcon, 0, 0, null);
 	}
 	
 	/**
@@ -881,10 +889,10 @@ public class MapOverlay extends GuiScreen {
 	 * using the provided icon.
 	 * @param entity
 	 * @param entityIcon
-	 * @param overlayImg
+	 * @param g2D
 	 */
-	private void drawEntity(Entity entity, BufferedImage entityIcon, BufferedImage overlayImg) {
-		drawEntity(entity.chunkCoordX, entity.posX, entity.chunkCoordZ, entity.posZ, EntityHelper.getHeading(entity), entityIcon, overlayImg);
+	private void drawEntity(Entity entity, BufferedImage entityIcon, Graphics2D g2D) {
+		drawEntity(entity.chunkCoordX, entity.posX, entity.chunkCoordZ, entity.posZ, EntityHelper.getHeading(entity), entityIcon, g2D);
 	}
 
 	private void drawCenteredImage(int bufferedImage, float transparency, int srcWidth, int srcHeight, int destWidth, int destHeight) {
@@ -1113,7 +1121,7 @@ public class MapOverlay extends GuiScreen {
 			break;
 		}
 
-		eraseCachedEntityImg();
+		//eraseCachedEntityImg();
 		setFollow(false);
 
 		// Set new bounds
@@ -1123,6 +1131,7 @@ public class MapOverlay extends GuiScreen {
 	protected void eraseCachedEntityImg() {
 		if(lastEntityImgTextureIndex!=null) {
 			mc.renderEngine.deleteTexture(lastEntityImgTextureIndex);
+			lastEntityUpdate = 0;
 			lastEntityImgTextureIndex = null;
 			lastEntityImg = null;
 		}
