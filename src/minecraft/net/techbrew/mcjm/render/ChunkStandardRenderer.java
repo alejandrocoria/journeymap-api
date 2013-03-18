@@ -170,14 +170,15 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						color = shade(color, s);
 					}
 					
+					if(x==0 || z==0) {
+						color = Color.white;
+					}
+					
+					// TODO: Remove
 					g2D.setComposite(MapBlocks.OPAQUE);						
 					g2D.setPaint(color);
 					g2D.fillRect(x, z, 1, 1);
 				}
-				
-				
-				
-				
 				
 				// Adjust color for light level
 				int lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,y + 1, z);

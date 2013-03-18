@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.AxisAlignedBB;
+import net.minecraft.src.Entity;
 import net.minecraft.src.EntityAnimal;
 import net.minecraft.src.EntityCreature;
 import net.minecraft.src.EntityGolem;
@@ -26,6 +27,8 @@ import net.minecraft.src.MathHelper;
 import net.techbrew.mcjm.io.FileHandler;
 
 public class EntityHelper {
+	
+	public static final String PLAYER_TYPE = "player";
 	
 	// TODO: make threadsafe
 	static BufferedImage playerImg, otherImg;
@@ -123,15 +126,19 @@ public class EntityHelper {
 	public static BufferedImage getEntityImage(String entityName) {
 		BufferedImage img = entityImageMap.get(entityName);
 		if(img==null) {
-			img = getUnknownImage(); // backup plan
-			try {
-				String png = FileHandler.WEB_DIR + "/img/entity/" + entityName + ".png";	//$NON-NLS-1$ //$NON-NLS-2$
-				InputStream is = EntityHelper.class.getResourceAsStream(png);
-				img = ImageIO.read(is);
-				is.close();		
-			} catch (Exception e) {
-				String error = Constants.getMessageJMERR17(entityName);
-				JourneyMap.getLogger().severe(error);			
+			if(PLAYER_TYPE.equals(entityName)) {
+				img = getOtherPlayerImage();
+			} else {
+				img = getUnknownImage(); // backup plan
+				try {
+					String png = FileHandler.WEB_DIR + "/img/entity/" + entityName + ".png";	//$NON-NLS-1$ //$NON-NLS-2$
+					InputStream is = EntityHelper.class.getResourceAsStream(png);
+					img = ImageIO.read(is);
+					is.close();		
+				} catch (Exception e) {
+					String error = Constants.getMessageJMERR17(entityName);
+					JourneyMap.getLogger().severe(error);			
+				}
 			}
 			entityImageMap.put(entityName, img);
 		}
@@ -162,7 +169,7 @@ public class EntityHelper {
 	 * TODO: Not threadsafe
 	 * @return
 	 */
-	public static BufferedImage getOtherImage() {
+	public static BufferedImage getOtherPlayerImage() {
 		if(otherImg==null) {
 			 try {
 				String png = FileHandler.WEB_DIR + "/img/entity/other.png";						 //$NON-NLS-1$
@@ -204,8 +211,18 @@ public class EntityHelper {
 	 * @param player
 	 * @return
 	 */
-	public static double getHeading(EntityLiving entity) {
-		double degrees = Math.round(entity.rotationYaw % 360);
+	public static double getHeading(Entity entity) {
+		return getHeading(entity.rotationYaw);
+	}
+	
+	/**
+	 * Get the entity's heading in radians
+	 * 
+	 * @param player
+	 * @return
+	 */
+	public static double getHeading(float rotationYaw) {
+		double degrees = Math.round(rotationYaw % 360);
 	    double radians = (degrees * Math.PI) / 180;
 	    return radians;
 	}

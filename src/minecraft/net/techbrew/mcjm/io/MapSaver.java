@@ -94,7 +94,7 @@ public class MapSaver {
 		
 		// Get region images without using cache
 		BufferedImage mergedImg = RegionFileHandler.getMergedChunks(worldDir, x1, z1, x2, z2, mapType, chunkY, cType, false, 
-				new ZoomLevel(1F, 1, false, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
+				new ZoomLevel(1, 1, false, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
 			
 		stop = System.currentTimeMillis();
 		JourneyMap.getLogger().info("World map saved in: " + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$

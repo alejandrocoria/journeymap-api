@@ -96,29 +96,7 @@ public class AnimalsData implements IDataProvider {
 		
 		return props;		
 	}	
-	
-	/**
-	 * Get the biome name where the player is standing.
-	 * 
-	 * @param player
-	 * @return
-	 */
-	private String getPlayerBiome() {
 		
-		Minecraft mc = Minecraft.getMinecraft();
-		
-		EntityPlayerSP player = mc.thePlayer;
-		int x = ((int) Math.floor(player.posX) % 16) & 15;
-		int z = ((int) Math.floor(player.posZ) % 16) & 15;
-		
-		ChunkStub playerChunk = JourneyMap.getLastPlayerChunk();
-		if(playerChunk!=null) {
-			return playerChunk.getBiomeGenForWorldCoords(x,z, mc.theWorld.getWorldChunkManager()).biomeName;
-		} else {
-			return "?"; //$NON-NLS-1$
-		}
-	}
-	
 	
 	/**
 	 * Return length of time in millis data should be kept.

@@ -163,7 +163,7 @@ public class MapService extends BaseService {
 		start = System.currentTimeMillis();
 		
 		BufferedImage mergedImg = RegionFileHandler.getMergedChunks(worldDir, x1, z1, x2, z2, mapType, depth, cType, true, 
-				new ZoomLevel(1F, 1, false, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
+				new ZoomLevel(1, 1, false, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
 		
 		// Headers
 		ResponseHeader.on(event).contentType(ContentType.png).noCache();
