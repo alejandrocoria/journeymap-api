@@ -1067,7 +1067,7 @@ var JourneyMap = (function() {
           ctx.fillText(other.username, x, z + 30);
   
           var otherImage = new Image();
-          otherImage.src = "/img/entity/other.png";
+          otherImage.src = "/img/entity/Player.png";
           otherImage['class'] = 'mobImage';
           otherImage.title = other.username;
           otherImage.style.position = "absolute";
