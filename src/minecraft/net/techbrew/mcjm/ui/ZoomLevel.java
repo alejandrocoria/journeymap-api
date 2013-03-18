@@ -10,6 +10,10 @@ public class ZoomLevel implements Comparable<ZoomLevel> {
 	public final boolean antialias;
 	public final Object interpolation;
 	
+	public ZoomLevel(int scale) {
+		this(scale, 1, true, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+	}
+	
 	public ZoomLevel(int scale, int sampling, boolean antialias, Object interpolation) {
 		this.scale = scale;
 		this.sampling = sampling;
@@ -31,18 +35,9 @@ public class ZoomLevel implements Comparable<ZoomLevel> {
 
 	public static LinkedList<ZoomLevel> getLevels() {
 		final LinkedList<ZoomLevel> list = new LinkedList<ZoomLevel>();
-		list.add(new ZoomLevel(12, 1, true, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
-		list.add(new ZoomLevel(11, 1, true, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
-		list.add(new ZoomLevel(10, 1, true, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
-		list.add(new ZoomLevel(9, 1, true, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
-		list.add(new ZoomLevel(8, 1, true, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
-		list.add(new ZoomLevel(7, 1, true, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
-		list.add(new ZoomLevel(6, 1, true, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
-		list.add(new ZoomLevel(5, 1, true, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
-		list.add(new ZoomLevel(4, 1, true, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
-		list.add(new ZoomLevel(3, 1, true, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
-		list.add(new ZoomLevel(2, 1, true, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
-		list.add(new ZoomLevel(1, 1, true, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
+		for(int i = 12; i>0; i--) {
+			list.add(new ZoomLevel(i));
+		}
 		return list;
 	}
 		
