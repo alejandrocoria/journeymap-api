@@ -1,4 +1,4 @@
-JourneyMap 2.0 for Minecraft 1.5 (March 16, 2013)
+JourneyMap 2.0b3 for Minecraft 1.5 (March 18, 2013)
 http://journeymap.techbrew.net
 
 Requirements:
@@ -8,20 +8,24 @@ Requirements:
 
 Changes since JourneyMap 1.9.1 for Minecraft 1.4.6:
 
-- Added support for IE 9
+- New web UI appearance with added support for IE 9
 - Faster chunk render cycles for improved game performance
+- Faster web server functionality
+- Faster web browser scripts
 - Improved surface map accuracy and appearance
+- Improved cave mapping accuracy and appearance
 - Added the ability to toggle display of animals, villagers, pets, other players
-- New web UI appearance
+- Mobs now show current heading on the map
 - Removed blurring when zooming with web UI (except in IE 9)
-- In-game UI added options screen
+- In-game UI now has options screen
 - Replaced the embedded servlet engine with a modified version of the NIO webserver "Rupy" (http://code.google.com/p/rupy/)
 - Internal work to allow for custom block mods
+- The cave lighting property has been re-enabled
+- Widened default mapping radius to 5 chunks (was 4)
 
 Known issues:
 
-- Changing the cave lighting property has no effect
-- Translation updates needed for Spanish, German, Russian
+- Translation updates needed for German, Russian
 - Bug (Tracking ID AW2-6EE-Z3QB): Maps overwrite on multi-world servers because the world seed is no longer provided by the MC server
 
 Translations added: 
