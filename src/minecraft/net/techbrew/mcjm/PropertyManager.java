@@ -28,7 +28,7 @@ public class PropertyManager {
 	private static final String WEBSERVER_PORT_VALUE = "8080"; //$NON-NLS-1$
 	
 	public static final String CHUNK_OFFSET_PROP = "chunk_offset"; //$NON-NLS-1$
-	private static final String CHUNK_OFFSET_VALUE = "4"; //$NON-NLS-1$
+	private static final String CHUNK_OFFSET_VALUE = "5"; //$NON-NLS-1$
 	
 	public static final String UPDATETIMER_PLAYER_PROP = "update_timer.entities"; //$NON-NLS-1$
 	private static final String UPDATETIMER_PLAYER_VALUE = "1000"; //$NON-NLS-1$
