@@ -85,12 +85,12 @@ public class EntityHelper {
 		List<EntityPlayer> nearbyPlayers = new ArrayList<EntityPlayer>();
 		
 		Minecraft mc = Minecraft.getMinecraft();
-		if(!mc.isSingleplayer()) {
+		//if(!mc.isSingleplayer()) {
 			EntityPlayerSP player = mc.thePlayer;
 			AxisAlignedBB bb = getBB(player);
 			nearbyPlayers = mc.theWorld.getEntitiesWithinAABB(EntityPlayer.class, bb);
 			nearbyPlayers.remove(player);
-		}
+		//}
 		
 		return nearbyPlayers;
 	}
