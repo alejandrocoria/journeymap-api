@@ -436,7 +436,7 @@ public class MapBlocks extends HashMap {
 		colors.put(new BlockInfo(76,0), new Color(0xfd0000)); // Redstone Torch (on)
 		colors.put(new BlockInfo(77,0), new Color(0x747474)); // Stone Button
 		colors.put(new BlockInfo(78,0), new Color(0xe9fafa)); // Snow
-		colors.put(new BlockInfo(79,0), new Color(0xa0a0ff)); // Ice
+		colors.put(new BlockInfo(79,0), new Color(0x5879C8)); // Ice
 		colors.put(new BlockInfo(80,0), new Color(0xfafaff)); // Snow Block
 		colors.put(new BlockInfo(81,0), new Color(0x11801e)); // Cactus
 		colors.put(new BlockInfo(82,0), new Color(0xa4a8b8)); // Clay
