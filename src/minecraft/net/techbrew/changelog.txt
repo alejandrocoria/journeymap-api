@@ -1,10 +1,16 @@
-JourneyMap 2.0b3 for Minecraft 1.5 (March 18, 2013)
+JourneyMap 2.0b4 for Minecraft 1.5 (March 20, 2013)
 http://journeymap.techbrew.net
 
 Requirements:
 
-- Minecraft 1.5
-- ModLoader 1.5 or Forge 7.7.0
+- Minecraft 1.5.1
+- ModLoader or Forge
+
+Changes since JourneyMap 2.0b3 for Minecraft 1.5:
+
+- Recompiled for Minecraft 1.5.1
+- Ice color fixed
+- Filename error inside zip fixed
 
 Changes since JourneyMap 1.9.1 for Minecraft 1.4.6:
 
@@ -26,6 +32,7 @@ Changes since JourneyMap 1.9.1 for Minecraft 1.4.6:
 Known issues:
 
 - Translation updates needed for German, Russian
+- Other players not displayed on multiplayer
 - Bug (Tracking ID AW2-6EE-Z3QB): Maps overwrite on multi-world servers because the world seed is no longer provided by the MC server
 
 Translations added: 
