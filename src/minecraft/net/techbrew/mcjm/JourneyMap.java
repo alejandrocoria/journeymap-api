@@ -53,13 +53,13 @@ import org.lwjgl.input.Keyboard;
  */
 public class JourneyMap extends BaseMod {
 
-	/** http://dl.dropbox.com/u/38077766/JourneyMap/journeymap-version.js?client-version=JM2.0_MC1.5.1 */
+	/** http://dl.dropbox.com/u/38077766/JourneyMap/journeymap-version.js?client-version=JM2.0_MC1.5 */
 	static final String VERSION_URL = "http://goo.gl/6huDx"; //$NON-NLS-1$
 	
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
 	public static final String JM_VERSION = "2.0b4"; //$NON-NLS-1$
-	public static final String ML_VERSION = "ModLoader 1.5.1"; //$NON-NLS-1$
-	public static final String MC_VERSION = "1.5.1"; //$NON-NLS-1$
+	public static final String ML_VERSION = "ModLoader 1.5"; //$NON-NLS-1$
+	public static final String MC_VERSION = "1.5"; //$NON-NLS-1$
 
 	private static Boolean modAnnounced = false;
 	private static JMLogger logger;
