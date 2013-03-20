@@ -115,6 +115,9 @@ public class MapOverlay extends GuiScreen {
 	
 	private Integer logoTextureIndex;
 	
+	private Integer blockXOffset = 0;
+	private Integer blockZOffset = 0;
+	
 	private BufferedImage lastEntityImg;
 	private Integer lastEntityImgTextureIndex;
 	long lastEntityUpdate = 0;
@@ -393,9 +396,9 @@ public class MapOverlay extends GuiScreen {
 		if(follow) {
 			centerChunkX = mc.thePlayer.chunkCoordX;
 			centerChunkZ = mc.thePlayer.chunkCoordZ;
-		} else { // TODO: This is wonky
-			centerChunkX = (int) (getCanvasWidth()/chunkScale/2) + mapBounds[0].chunkXPos;
-			centerChunkZ = (int) (getCanvasHeight()/chunkScale/2) + mapBounds[0].chunkZPos;
+		} else {
+			centerChunkX = (mapBounds[0].chunkXPos + mapBounds[1].chunkXPos) / 2;
+			centerChunkZ = (mapBounds[0].chunkZPos + mapBounds[1].chunkZPos) / 2;
 		}
 
 		// Check to see if scale is viable
@@ -431,11 +434,15 @@ public class MapOverlay extends GuiScreen {
 		follow = onPlayer;
 		if(follow) {
 			centerMapOnPlayer();
+		} else {
+			blockXOffset = 0;
+			blockZOffset = 0;
 		}
 	}
 
 	void centerMapOnPlayer() {
 		centerMapOnChunk(mc.thePlayer.chunkCoordX, mc.thePlayer.chunkCoordZ);
+		
 	}
 
 	void toggleShowCaves() {	   
@@ -473,15 +480,26 @@ public class MapOverlay extends GuiScreen {
 
 	void centerMapOnChunk(int chunkX, int chunkZ) {
 
-		//System.out.println("CenterMapOnChunk: " + chunkX + "," + chunkZ);
-
 		int maxChunksWide = calculateMaxChunksWide(mapScale);
 		int maxChunksHigh = calculateMaxChunksHigh(mapScale);  
 
-		int x1 = chunkX - (int) Math.round(maxChunksWide/2);
-		int z1 = chunkZ - (int) Math.round(maxChunksHigh/2);
+		int x1 = chunkX - maxChunksWide/2;
+		if(maxChunksWide<5) x1++;
+		int z1 = chunkZ - maxChunksHigh/2;
+
 		mapBounds[0] = new ChunkCoordIntPair(x1,z1);
-		checkBounds();
+		mapBounds[1] = new ChunkCoordIntPair( mapBounds[0].chunkXPos + maxChunksWide,  mapBounds[0].chunkZPos + maxChunksHigh);
+		
+		// TODO: Block offsets to truely center player
+//		// Adjust block offsets if following player
+//		if(follow) {
+//			blockXOffset = 0 - (int) (Math.floor(mc.thePlayer.posX % 16) * mapScale )/2;
+//			blockZOffset = 0 - (int) (Math.floor(mc.thePlayer.posZ % 16) * mapScale )/2;
+//			System.out.println("blockXOffset: " + blockXOffset + ", blockZOffset: " + blockZOffset);
+//		} else {
+//			blockXOffset = 0;
+//			blockZOffset = 0;
+//		}
 	}
 
 	void checkBounds() {
@@ -696,7 +714,7 @@ public class MapOverlay extends GuiScreen {
 			//drawCenteredImage(textureIndex, 1.0F, mapImg.getWidth(), mapImg.getHeight(), getCanvasWidth(), getCanvasHeight());
 			int scaledWidth = (int) Math.ceil(lastMapImg.getWidth()*lastMapRatio);
 			int scaledHeight = (int) Math.ceil(lastMapImg.getHeight()*lastMapRatio);
-			drawImage(lastMapImgTextureIndex, 1f, 0, 0, scaledWidth, scaledHeight);
+			drawImage(lastMapImgTextureIndex, 1f, blockXOffset, blockZOffset, scaledWidth, scaledHeight);
 		}
 
 	}
@@ -768,7 +786,7 @@ public class MapOverlay extends GuiScreen {
 			Graphics2D g2D = entityOverlay.createGraphics();
 			FontMetrics fm = g2D.getFontMetrics();
 			g2D.setFont(new Font("Arial", Font.BOLD, 16)); //$NON-NLS-1$
-			//g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+			g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 			g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			
@@ -902,11 +920,11 @@ public class MapOverlay extends GuiScreen {
 
 		}
 
-		// Draw the composite layer image
+		// Draw the entity layer image
 		if(textureIndex!=null && lastMapRatio!=null) {
 			int scaledWidth = (int) Math.ceil(entityOverlay.getWidth()/overlayScale*lastMapRatio);
 			int scaledHeight = (int) Math.ceil(entityOverlay.getHeight()/overlayScale*lastMapRatio);
-			drawImage(textureIndex, 1f, 0, 0, scaledWidth, scaledHeight);
+			drawImage(textureIndex, 1f, blockXOffset, blockZOffset, scaledWidth, scaledHeight);
 		}
 		
 	}
@@ -1091,7 +1109,7 @@ public class MapOverlay extends GuiScreen {
 
 				int scaledWidth = (int) Math.ceil(lastMapImg.getWidth()*lastMapRatio);
 				int scaledHeight = (int) Math.ceil(lastMapImg.getHeight()*lastMapRatio);
-				drawImage(lastMapImgTextureIndex, 1f, xOffset, zOffset, scaledWidth, scaledHeight);
+				drawImage(lastMapImgTextureIndex, 1f, xOffset + blockXOffset, zOffset + blockXOffset, scaledWidth, scaledHeight);
 	
 			} 			
 		} 
