@@ -48,23 +48,25 @@ public class PlayersData implements IDataProvider {
 		EntityPlayerSP player = mc.thePlayer;			
 		List<Map> list;
 		
-		if(!mc.isSingleplayer()) {
+		//if(!mc.isSingleplayer()) {
 			// Nearby players		
 			List<EntityPlayer> others = EntityHelper.getPlayersNearby();
 			list = new ArrayList<Map>(others.size());
 			for(EntityPlayer other : others) {
 				LinkedHashMap otherProps = new LinkedHashMap();
 				otherProps.put(EntityKey.type, EntityHelper.PLAYER_TYPE); 
-				otherProps.put(EntityKey.username, other.username); //$NON-NLS-1$
-				otherProps.put(EntityKey.posX, other.posX); //$NON-NLS-1$
-				otherProps.put(EntityKey.posY, other.posY); //$NON-NLS-1$
-				otherProps.put(EntityKey.posZ, other.posZ); //$NON-NLS-1$
+				otherProps.put(EntityKey.username, other.username);
+				otherProps.put(EntityKey.posX, (int) other.posX); 
+				otherProps.put(EntityKey.posY, (int) other.posY); 
+				otherProps.put(EntityKey.posZ, (int) other.posZ);
+				otherProps.put(EntityKey.chunkCoordX, other.chunkCoordX); 
+				otherProps.put(EntityKey.chunkCoordZ, other.chunkCoordZ); 
 				otherProps.put(EntityKey.heading, EntityHelper.getHeading(other));
 				list.add(otherProps);
 			}
-		} else {
-			list =  new ArrayList<Map>(0);
-		}
+		//} else {
+		//	list =  new ArrayList<Map>(0);
+		//}
 					
 		LinkedHashMap props = new LinkedHashMap();
 		props.put(EntityKey.root, list);
