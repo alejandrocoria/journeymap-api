@@ -767,7 +767,7 @@ public class MapOverlay extends GuiScreen {
 			entityOverlay = new BufferedImage(layerWidth, layerHeight, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2D = entityOverlay.createGraphics();
 			FontMetrics fm = g2D.getFontMetrics();
-			g2D.setFont(new Font("Arial", Font.PLAIN, 20)); //$NON-NLS-1$
+			g2D.setFont(new Font("Arial", Font.BOLD, 16)); //$NON-NLS-1$
 			//g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 			g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -843,13 +843,18 @@ public class MapOverlay extends GuiScreen {
 							
 							// Draw Label			
 							String username = (String) critter.get(EntityKey.username);
-							int offset = x - (fm.stringWidth(username)/2);		
+							
+							int lx = getScaledEntityX(cx, x);
+							int ly = getScaledEntityZ(cz, z) + entityIcon.getHeight();
+							
+							lx = lx - (fm.stringWidth(username)/2) - entityIcon.getWidth()/2;	
 							g2D.setComposite(MapBlocks.OPAQUE);
 							g2D.setPaint(Color.black);
-							g2D.drawString(username, offset -2, z + 36);
-							g2D.drawString(username, offset +2, z + 40);
+							g2D.drawString(username, lx +1, ly + 1);
+							g2D.drawString(username, lx +2, ly + 2);
+							g2D.drawString(username, lx +3, ly + 3);
 							g2D.setPaint(Color.green);
-							g2D.drawString(username, offset, z + 38);
+							g2D.drawString(username, lx, ly);
 						}
 					}
 				}
