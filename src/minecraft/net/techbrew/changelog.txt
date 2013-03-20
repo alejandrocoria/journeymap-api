@@ -9,8 +9,12 @@ Requirements:
 Changes since JourneyMap 2.0b3 for Minecraft 1.5:
 
 - Recompiled for Minecraft 1.5.1
-- Ice color fixed
 - Filename error inside zip fixed
+- Ice color fixed
+- Other players now displayed in multiplayer
+- Some entity icons resized to be more proportional to the others
+- JourneyMap has a new logo
+- Added logo splash to web UI
 
 Changes since JourneyMap 1.9.1 for Minecraft 1.4.6:
 
