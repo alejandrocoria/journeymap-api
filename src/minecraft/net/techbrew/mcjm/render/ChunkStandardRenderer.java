@@ -89,7 +89,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		float slope, s, sN, sNW, sW, sAvg, shaded;
 		
 		for (int x = 0; x < 16; x++) {
-			for (int z = 0; z < 16; z++) {
+			blockLoop : for (int z = 0; z < 16; z++) {				
 				
 				int y = chunkStub.getSafeHeightValue(x, z);				
 				if (y < 0) y=1; // Weird data error seen on World of Keralis
@@ -98,14 +98,14 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				BlockInfo blockInfo = mapBlocks.getBlockInfo(chunkStub, x, y, z);				
 				if (blockInfo == null) {
 					paintBadBlock(x, y, z, g2D);
-					continue;
+					continue blockLoop;
 				}			
 
 				// Get base color for block
 				Color color = blockInfo.color;
 				if(color==null) {
 					paintBadBlock(x, y, z, g2D);
-					return;
+					continue blockLoop;
 				}
 					
 				// Paint deeper blocks if alpha used
@@ -197,7 +197,6 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	/**
 	 * Render blocks in the chunk for underground.
 	 * 
-	 * TODO remove printlns here and in BaseRenderer
 	 */
 	public void renderUnderground(final Graphics2D g2D, final ChunkStub chunkStub, final int vSlice, final Map<Integer, ChunkStub> neighbors) {
 		
@@ -210,11 +209,13 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		int lightLevel;
 		
 		for (int z = 0; z < 16; z++) {
+			
 			blockLoop: for (int x = 0; x < 16; x++) {			
 				try {
+									
 					int sliceMaxY = mapBlocks.topNonSkyBlock(chunkStub, x, defaultSliceMaxY, z) + 1;
 
-					hasAir = sliceMaxY<defaultSliceMaxY+1; // TODO: This might not be reliable.
+					hasAir = sliceMaxY<defaultSliceMaxY+1; // This might not be reliable.
 					paintY = sliceMaxY;
 					lightLevel = -1;
 		
@@ -234,11 +235,11 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 							if(chunkStub.getBlockMetadata(x, y, z)!=5) { // standing on block below=5
 								continue airloop;
 							}
-						}
+						}						
 						
 						// If lava with no air, do nothing
 						if(!hasAir && (blockId==10 || blockId==11)) {
-							paintBlock(x, vSlice, z, Color.black, g2D);
+							paintBlock(x, z, Color.black, g2D);
 							continue blockLoop;
 						}
 						
@@ -248,7 +249,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 								lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
 								if (caveLighting && lightLevel < 1) {
 									// No lit blocks in column
-									paintBlock(x, vSlice, z, Color.black, g2D);
+									paintBlock(x, z, Color.black, g2D);
 									continue blockLoop;
 								}
 								
@@ -277,23 +278,12 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						}
 					}
 		
-					if (paintY < 0 || !hasAir) {
+					if (paintY < 0 || !hasAir || lightLevel<1) {
 						// No air blocks in column at all
-						paintBlock(x, vSlice, z, Color.black, g2D);
+						paintBlock(x, z, Color.black, g2D);
 						continue blockLoop;
-					}					
-		
-					boolean cheatLight = lightLevel<1;
-					if(cheatLight) {
-						lightLevel=1;
-					}
-					
-					if (caveLighting && lightLevel < 1) {
-						// No lit blocks in column
-						paintBlock(x, vSlice, z, Color.black, g2D);
-						continue blockLoop;
-					}
-		
+					}			
+
 					// Get block color
 					BlockInfo block = mapBlocks.getBlockInfo(chunkStub, x, paintY, z);
 					Color color = block.color;
@@ -310,7 +300,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					}								
 		
 					// Draw block
-					paintBlock(x, vSlice, z, color, g2D);
+					paintBlock(x, z, color, g2D);
 		
 				} catch (Throwable t) {
 					paintBadBlock(x, vSlice, z, g2D);

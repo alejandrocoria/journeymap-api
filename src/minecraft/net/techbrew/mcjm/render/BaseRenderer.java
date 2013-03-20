@@ -102,7 +102,7 @@ public abstract class BaseRenderer {
 	 * @param z
 	 * @param color
 	 */
-	public void paintBlock(final int x, final int vSlice, final int z, final Color color,
+	public void paintBlock(final int x, final int z, final Color color,
 			final Graphics2D g2D) {
 		g2D.setComposite(MapBlocks.OPAQUE);
 		g2D.setColor(color);
