@@ -25,13 +25,7 @@ public class GameData implements IDataProvider {
 		jm_version,
 		latest_journeymap_version,
 		mc_version,
-		browser_poll,
-		browser_mapimg_poll,
-		browser_timedata_poll,
-		browser_animalsdata_poll,
-		browser_mobsdata_poll,
-		browser_playersdata_poll,
-		browser_villagersdata_poll,
+		browser_poll
 	}
 
 	/**
