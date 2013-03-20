@@ -35,7 +35,7 @@ public class ZoomLevel implements Comparable<ZoomLevel> {
 
 	public static LinkedList<ZoomLevel> getLevels() {
 		final LinkedList<ZoomLevel> list = new LinkedList<ZoomLevel>();
-		for(int i = 12; i>0; i--) {
+		for(int i = 10; i>0; i--) {
 			list.add(new ZoomLevel(i));
 		}
 		return list;
