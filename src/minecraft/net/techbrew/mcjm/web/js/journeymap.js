@@ -163,7 +163,7 @@ var JourneyMap = (function() {
 			    // Splash
 			    if (!JmIcon) {
 				JmIcon = new Image();
-				JmIcon.src = "/ico/apple-touch-icon-144x144-precomposed.png";
+				JmIcon.src = "/ico/apple-touch-icon.png";
 				JmIcon.title = "JourneyMap";
 				JmIcon.style.position = "absolute";
 				JmIcon.style.visibility = "visible";
@@ -851,11 +851,10 @@ var JourneyMap = (function() {
 		JmIcon = new Image();
 		JmIcon.onload = function() {
 
-		    ctx.drawImage(JmIcon, getCanvasWidth() / 2 - 72,
-			    getCanvasHeight() / 2 - 160);
+		    ctx.drawImage(JmIcon, getCanvasWidth() / 2 - 72, getCanvasHeight() / 2 - 160);
 		    JmIcon.onload = null;
 		};
-		JmIcon.src = "/ico/apple-touch-icon-144x144-precomposed.png";
+		JmIcon.src = "/ico/apple-touch-icon.png";
 	    } else {
 		ctx.drawImage(JmIcon, getCanvasWidth() / 2 - 72,
 			getCanvasHeight() / 2 - 160);
