@@ -15,6 +15,7 @@ Changes since JourneyMap 2.0b3 for Minecraft 1.5:
 - JourneyMap has a new logo
 - Added logo splash to web UI
 - Removed some obsolete images from zip
+- Bugfix to improve file system path determination for web server
 
 Changes since JourneyMap 1.9.1 for Minecraft 1.4.6:
 

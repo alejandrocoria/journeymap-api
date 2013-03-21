@@ -75,7 +75,15 @@ public class FileService extends BaseService {
 		if(resourceDir==null) {
 			resourceDir = JourneyMap.class.getResource(CLASSPATH_WEBROOT);
 		}
+		
+		if(resourceDir==null) {
+			resourceDir = JourneyMap.class.getResource("net/techbrew/mcjm/web"); //$NON-NLS-1$
+		}
 				
+		if(resourceDir==null) {
+			JourneyMap.getLogger().severe("Can't determine path to webroot!");
+		}
+		
 		// Format reusable resourcePath
 		resourcePath = resourceDir.getPath();
 		if(resourcePath.endsWith("/")) { //$NON-NLS-1$
