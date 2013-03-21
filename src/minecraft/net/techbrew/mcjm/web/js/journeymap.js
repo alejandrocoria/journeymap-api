@@ -169,7 +169,7 @@ var JourneyMap = (function() {
 				JmIcon.style.visibility = "visible";
 				JmIcon.style.left = ($(window).width() / 2 - 72)
 					+ "px";
-				JmIcon.style.top = ($(window).height() / 2 - 160)
+				JmIcon.style.top = ($(window).height() / 2 - 72)
 					+ "px";
 				JmIcon.style.zIndex = 100;
 				document.body.appendChild(JmIcon);
