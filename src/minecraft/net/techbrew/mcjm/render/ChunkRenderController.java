@@ -37,7 +37,7 @@ public class ChunkRenderController {
 	private final IChunkRenderer endRenderer;
 	private final IChunkRenderer standardRenderer;
 	
-	final boolean fineLogging = JourneyMap.getLogger().isLoggable(Level.INFO);
+	final boolean fineLogging = JourneyMap.getLogger().isLoggable(Level.FINE);
 	
 	public ChunkRenderController() {
 		MapBlocks mapBlocks = new MapBlocks();
