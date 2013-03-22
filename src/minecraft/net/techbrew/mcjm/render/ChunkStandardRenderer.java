@@ -30,7 +30,6 @@ import net.techbrew.mcjm.ChunkStub;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.PropertyManager;
-import net.techbrew.mcjm.io.ChunkFileHandler;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 
@@ -243,22 +242,6 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 							continue blockLoop;
 						}
 						
-						// Treat water with depth
-						if(blockId==8 || blockId==9) {							
-							if(hasAir) {
-								lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
-								if (caveLighting && lightLevel < 1) {
-									// No lit blocks in column
-									paintBlock(x, z, Color.black, g2D);
-									continue blockLoop;
-								}
-								
-								BlockInfo blockInfo = mapBlocks.getBlockInfo(chunkStub, x, y, z);
-								paintDepth(chunkStub, blockInfo, x, y, z, g2D);
-							}
-							continue blockLoop;
-						}						
-						
 						// Arrived at a solid block with air above it
 						if (hasAir) {
 							paintY = y;
@@ -275,6 +258,8 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 								break airloop;
 							}
 							
+						} else if(y<=sliceMinY) {
+							break airloop;
 						}
 					}
 		
