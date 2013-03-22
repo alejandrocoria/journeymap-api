@@ -259,28 +259,23 @@ var JourneyMap = (function() {
 		// Set RSS feed title
 		$("link #rssfeed").attr("title", JM.messages.rss_feed_title);
 
-		// Init toolbar button tooltips
-		$("#dayButton").html(JM.messages.day_button_title).attr("title", JM.messages.day_button_desc).click(function() {
-
+		// Init Day/Night button
+		$("#dayNightText").html(JM.messages.day_button_title);
+		$("#dayNightButton").attr("title", JM.messages.day_button_desc);
+		$("#dayNightButton").click(function() {
 			playerOverrideMap = true;
-			setMapType('day');
+			if(showLight===true) {
+				setMapType('day');
+			} else {								
+				setMapType('night');
+			}
 		});
 
-		$("#nightButton").html(JM.messages.night_button_title).attr("title", JM.messages.night_button_desc).click(function() {
-
-			playerOverrideMap = true;
-			setMapType('night');
-		});
-
-		$("#followButton").html(JM.messages.follow_button_title).attr("title", JM.messages.follow_button_desc).click(function() {
+		// html(JM.messages.follow_button_title)
+		$("#followButton").attr("title", JM.messages.follow_button_desc).click(function() {
 
 			setCenterOnPlayer(!centerOnPlayer);
 			refreshMap();
-		});
-
-		$("#caveButton").html(JM.messages.cave_button_title).attr("title", JM.messages.cave_button_desc).click(function() {
-
-			setShowCaves(!showCaves);
 		});
 
 		$("#monstersButton").attr("title", "<b>" + JM.messages.monsters_button_title + "</b><br/>" + JM.messages.monsters_button_desc);
@@ -339,7 +334,8 @@ var JourneyMap = (function() {
 		$("#playerElevationTitle").html(JM.messages.elevation_title);
 
 		$("#showMenuText").html(JM.messages.show_menu_text);
-		// $("#smoothPixelsMenuItem").html(JM.messages.smooth_pixels_menu_item);
+		// $("#smoothPixelsMenuItem").html(JM.messages.smooth_pixels_menu_item);		
+		$("#cavesMenuItem").html(JM.messages.cave_button_title);
 		$("#animalsMenuItem").html(JM.messages.animals_menu_item);
 		$("#petsMenuItem").html(JM.messages.pets_menu_item);
 		$("#mobsMenuItem").html(JM.messages.mobs_menu_item);
@@ -353,6 +349,12 @@ var JourneyMap = (function() {
 		// Test canvas to see if smooth scaling can be toggled
 		var ctx = bgCanvas.getContext("2d");
 
+		$("#cavesMenuItem").prop('checked', showCaves)
+		$("#cavesMenuItem").prop('title', JM.messages.cave_button_desc);
+		$("#checkShowCaves").click(function(event) {
+			setShowCaves(this.checked === true);
+		});
+		
 		$("#checkShowAnimals").prop('checked', showAnimals)
 		$("#checkShowAnimals").click(function(event) {
 			showAnimals = (this.checked === true);
@@ -589,22 +591,26 @@ var JourneyMap = (function() {
 				return;
 			showLight = false;
 			$("#header").removeClass("navbar-inverse");
-			$("#dayButton").addClass("active");
-			$("#nightButton").removeClass("active");
-
+			$("#dayNightButton").removeClass("inverse");
+			$("#dayNightButton").addClass("btn-warning");
+			$("#dayNightText").html(JM.messages.day_button_title);
+			$("#dayNightButton").attr("title", JM.messages.day_button_desc);			
 		} else if (mapType === "night") {
 			if (showLight === true)
 				return;
 			showLight = true;
 			$("#header").addClass("navbar-inverse");
-			$("#dayButton").removeClass("active");
-			$("#nightButton").addClass("active");
+			$("#dayNightButton").addClass("inverse");
+			$("#dayNightButton").removeClass("btn-warning");
+			$("#dayNightText").html(JM.messages.night_button_title);
+			$("#dayNightButton").attr("title", JM.messages.night_button_desc);
 		} else {
 			if (JM.debug)
 				console.log(">>> " + "Error: Can't set mapType: " + mapType);
 		}
 
 		if (JM.player.underground !== true) {
+			$(LoadingIcon).show();
 			refreshMap();
 		}
 
@@ -626,12 +632,6 @@ var JourneyMap = (function() {
 		if (show === showCaves)
 			return;
 		showCaves = show;
-
-		if (showCaves === true) {
-			$("#caveButton").addClass("active");
-		} else {
-			$("#caveButton").removeClass("active");
-		}
 
 		if (JM.player.underground === true) {
 			refreshMap();
@@ -840,12 +840,18 @@ var JourneyMap = (function() {
 
 		console.log("Server returned error: " + data.status + ": " + jqXHR);
 
+		// Hide togggle-able components
 		$(".jmtoggle").each(function() {
 
 			$(this).hide()
 		});
 		$("#worldInfo").hide();
 		$("#slider-vertical").hide();
+		
+		// Hide loading image if shown
+		if(LoadingIcon) {
+			$(LoadingIcon).hide();
+		}
 
 		var displayError;
 		if (data.status === 503 || data.status === 0) {
