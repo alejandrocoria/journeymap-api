@@ -44,28 +44,9 @@ public class MapSaver {
 		Integer z1=null;
 		Integer z2=null;
 		
-		// Find all chunk files
-		FilenameFilter ff = new ChunkFileHandler.ChunkFileFilter(cType);
-		File[] foundFiles = worldDir.listFiles(ff);
-		//System.out.println("Found chunk files: " + foundFiles.length); //$NON-NLS-1$
-
-		for(File file : foundFiles) {
-			String segment = file.getName().split("\\.")[0]; //$NON-NLS-1$
-			if(segment.contains("_")) { //$NON-NLS-1$
-				segment = segment.split("_")[0]; //$NON-NLS-1$
-			}
-			String[] xz = segment.split(","); //$NON-NLS-1$
-			Integer x = Integer.parseInt(xz[0]);
-			Integer z = Integer.parseInt(xz[1]);
-			if(x1==null || x<x1) x1 = x;			
-			if(x2==null || x>x2) x2 = x;
-			if(z1==null || z<z1) z1 = z;
-			if(z2==null || z>z2) z2 = z;
-		}
-		
 		// Find all region files
-		ff = new RegionFileHandler.RegionFileFilter(cType);
-		foundFiles = worldDir.listFiles(ff);
+		FilenameFilter ff = new RegionFileHandler.RegionFileFilter(cType);
+		File[] foundFiles = worldDir.listFiles(ff);
 		//System.out.println("Found region files: " + foundFiles.length); //$NON-NLS-1$
 
 		for(File file : foundFiles) {

@@ -196,10 +196,6 @@ public class RegionFileHandler {
 			} else {
 				image = createBlankImage();
 			}
-			Boolean gotChunks = ChunkFileHandler.absorbChunks(rCoord, image);
-			if(gotChunks) {
-				writeRegionFile(rCoord, image);
-			}
 		} else if (regionFile != null && regionFile.canRead()) {
 			
 				final int maxTries = 5;

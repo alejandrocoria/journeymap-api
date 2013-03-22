@@ -65,7 +65,6 @@ import net.techbrew.mcjm.data.MobsData;
 import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.data.PlayersData;
 import net.techbrew.mcjm.data.VillagersData;
-import net.techbrew.mcjm.io.ChunkFileHandler;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.io.RegionFileHandler;

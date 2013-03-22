@@ -37,7 +37,6 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.PropertyManager;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.io.ChunkCoord;
-import net.techbrew.mcjm.io.ChunkFileHandler;
 import net.techbrew.mcjm.io.ChunkImageCache;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.RegionCoord;

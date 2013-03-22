@@ -24,7 +24,6 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.Constants.WorldType;
 import net.techbrew.mcjm.data.WorldData;
-import net.techbrew.mcjm.io.ChunkFileHandler;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.log.LogFormatter;
