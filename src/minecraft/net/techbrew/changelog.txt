@@ -1,4 +1,9 @@
-JourneyMap 2.0b5 for Minecraft 1.5 (March 22, 2013)
+JourneyMap 2.0 for Minecraft 1.5.1 (March 22, 2013)
+
+Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
+This mod may not be altered, file-hosted, or distributed without 
+express written permission by Mark Woodman.
+
 http://journeymap.techbrew.net
 
 Requirements:
@@ -9,6 +14,13 @@ Requirements:
 Changes since JourneyMap 2.0b4 for Minecraft 1.5:
 
 - IOS touch event support added to web UI
+- Responsive layout tweaks for phone-sized devices
+- Day/Night buttons consolidated in Web UI
+- Improved readability of world info, location, etc.
+- Caves button moved to Show menu
+- Removed code for handling obsolete chunk image files
+- Bugfix for surface image cache wrongly using altitude in cache key
+- Bugfix (78B-SYZ-S2SQ) for cave map depth rendering issue
 
 Changes since JourneyMap 2.0b3 for Minecraft 1.5:
 
@@ -31,7 +43,7 @@ Changes since JourneyMap 1.9.1 for Minecraft 1.4.6:
 - Improved cave mapping accuracy and appearance
 - Added the ability to toggle display of animals, villagers, pets, other players
 - Mobs now show current heading on the map
-- Removed blurring when zooming with web UI (except in IE 9)
+- Removed blurring (imageSmoothing) when zooming in web UI (except in IE 9, Safari 5, Safari IOS)
 - In-game UI now has options screen
 - Replaced the embedded servlet engine with a modified version of the NIO webserver "Rupy" (http://code.google.com/p/rupy/)
 - Internal work to allow for custom block mods
@@ -41,7 +53,6 @@ Changes since JourneyMap 1.9.1 for Minecraft 1.4.6:
 Known issues:
 
 - Translation updates needed for German, Russian
-- Other players not displayed on multiplayer
 - Bug (Tracking ID AW2-6EE-Z3QB): Maps overwrite on multi-world servers because the world seed is no longer provided by the MC server
 
 Translations added: 

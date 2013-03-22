@@ -53,21 +53,21 @@ import org.lwjgl.input.Keyboard;
  */
 public class JourneyMap extends BaseMod {
 
-	/** http://dl.dropbox.com/u/38077766/JourneyMap/journeymap-version.js?client-version=JM2.0_MC1.5 */
-	static final String VERSION_URL = "http://goo.gl/6huDx"; //$NON-NLS-1$
-	
+	/** http://dl.dropbox.com/u/38077766/JourneyMap/journeymap-version.js?client-version=JM2.0_MC1.5.1 */
+	static final String VERSION_URL = "http://goo.gl/uxl6E"; //$NON-NLS-1$
+
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-	public static final String JM_VERSION = "2.0b5"; //$NON-NLS-1$
+	public static final String JM_VERSION = "2.0"; //$NON-NLS-1$
 	public static final String ML_VERSION = "ModLoader 1.5"; //$NON-NLS-1$
 	public static final String MC_VERSION = "1.5"; //$NON-NLS-1$
 
 	private static Boolean modAnnounced = false;
 	private static JMLogger logger;
 	private static JMServer jmServer;
-	
+
 	public volatile Properties remoteWorldProperties = new Properties();
 	public static volatile ChunkStub lastPlayerChunk;
-	
+
 	// Invokes MapOverlay
 	private KeyBinding keybinding;
 
@@ -78,19 +78,19 @@ public class JourneyMap extends BaseMod {
 	public static long nextPlayerUpdate = 0;
 	public static long nextChunkUpdate = 0;
 	private static volatile boolean running = false;
-	
+
 	// Whether webserver is running
 	boolean enableWebserver;
 	boolean enableMapGui;
 	boolean enableAnnounceMod;
-	
+
 	//private ChannelClient channelClient;
-	
+
 	private boolean executorsStarted = false;
-	
+
 	// Thread service for writing chunks
 	private static ScheduledExecutorService chunkExecutor;
-	
+
 	// Announcements
 	private static List<String> announcements = Collections.synchronizedList(new LinkedList<String>());
 
@@ -101,7 +101,7 @@ public class JourneyMap extends BaseMod {
 		ModLoader.setInGameHook(this, true, false);
 		ModLoader.setInGUIHook(this, true, false);
 	}
-	
+
 	@Override
 	public String getVersion() {
 		return JM_VERSION;
@@ -111,30 +111,30 @@ public class JourneyMap extends BaseMod {
 	public void load() 
 	{		
 		Minecraft minecraft = Minecraft.getMinecraft();
-		
+
 		// Start logFile
 		getLogger().info("JourneyMap v" + JM_VERSION + " starting " + new Date()); //$NON-NLS-1$ //$NON-NLS-2$
 		logger.showEnvironmentProperties();
 		logger.info("Properties: " + PropertyManager.getInstance().toString()); //$NON-NLS-1$
-		
+
 		// Check Modloader version
-//		if(!ModLoader.VERSION.equals(ML_VERSION)) {
-//			String error = Constants.getMessageJMERR01(JourneyMap.JM_VERSION , JourneyMap.ML_VERSION);
-//			ModLoader.getLogger().severe(error);
-//			getLogger().severe(error);
-//			throw new IllegalStateException(error);
-//		} else {
-//			logger.info(ModLoader.VERSION + " detected."); //$NON-NLS-1$
-//		}
-		
+		//		if(!ModLoader.VERSION.equals(ML_VERSION)) {
+		//			String error = Constants.getMessageJMERR01(JourneyMap.JM_VERSION , JourneyMap.ML_VERSION);
+		//			ModLoader.getLogger().severe(error);
+		//			getLogger().severe(error);
+		//			throw new IllegalStateException(error);
+		//		} else {
+		//			logger.info(ModLoader.VERSION + " detected."); //$NON-NLS-1$
+		//		}
+
 		// Packet Handler
 		//channelClient = new ChannelClient(this);
 
 		// Use property settings
 		chunkDelay = PropertyManager.getInstance().getInteger(PropertyManager.UPDATETIMER_CHUNKS_PROP);
-		
+
 		enableAnnounceMod = PropertyManager.getInstance().getBoolean(PropertyManager.ANNOUNCE_MODLOADED_PROP); 
-		
+
 		// Map GUI keycode
 		int mapGuiKeyCode = PropertyManager.getInstance().getInteger(PropertyManager.MAPGUI_KEYCODE_PROP);
 		enableMapGui = PropertyManager.getInstance().getBoolean(PropertyManager.MAPGUI_ENABLED_PROP); 
@@ -142,13 +142,13 @@ public class JourneyMap extends BaseMod {
 			keybinding = new KeyBinding("JourneyMap", mapGuiKeyCode); //$NON-NLS-1$
 			ModLoader.registerKey(this, keybinding, false);
 		}
-		
+
 		// Register custom packet channel
 		//ModLoader.registerPacketChannel(this, ChannelClient.CHANNEL_NAME);
-		
+
 		// Register listener for events which signal possible world change
 		//
-		
+
 		// Webserver
 		enableWebserver = PropertyManager.getInstance().getBoolean(PropertyManager.WEBSERVER_ENABLED_PROP);
 		if(enableWebserver) {
@@ -164,29 +164,28 @@ public class JourneyMap extends BaseMod {
 				enableWebserver = false;
 			}
 		}
-		
+
 		// Check for newer version online
 		if(VersionCheck.getVersionIsCurrent()==false) {
 			announce(Constants.getString("JourneyMap.new_version_available", WEBSITE_URL)); //$NON-NLS-1$
 		}
-		
+
 		// Override log level now that loading complete
 		logger.info("Load complete."); //$NON-NLS-1$
 		logger.setLevelFromProps();
-		
-		
+
+
 	}
 
 	@Override
-	public boolean onTickInGUI(float f, Minecraft minecraft, GuiScreen guiscreen)
-    {
+	public boolean onTickInGUI(float f, Minecraft minecraft, GuiScreen guiscreen) {
 		try {
-						
+
 			if(!running) return true;
-			
+
 			if(guiscreen instanceof GuiMainMenu ||
-			   guiscreen instanceof GuiSelectWorld ||
-			   guiscreen instanceof GuiMultiplayer) {
+					guiscreen instanceof GuiSelectWorld ||
+					guiscreen instanceof GuiMultiplayer) {
 				running = false;
 			} 
 			if(guiscreen instanceof GuiMultiplayer) {
@@ -206,7 +205,7 @@ public class JourneyMap extends BaseMod {
 			getLogger().severe(LogFormatter.toString(e));
 		}
 		return true;
-    }
+	}
 
 	@Override
 	public boolean onTickInGame(float f, final Minecraft minecraft) {
@@ -217,18 +216,18 @@ public class JourneyMap extends BaseMod {
 			if(!enableWebserver && !enableMapGui) {
 				return true;
 			}
-			
+
 			// Check player status
 			EntityPlayer player = minecraft.thePlayer;
 			if (player==null || player.isDead) {
 				return true;
 			}
-			
+
 			// Don't do anything when game is paused
 			if(minecraft.isSingleplayer() && minecraft.isGamePaused) {
 				//return true; // TODO
 			}
-			
+
 			// Check for world change
 			long newHash = Utils.getWorldHash(minecraft);
 			if(newHash!=0L) {
@@ -243,7 +242,7 @@ public class JourneyMap extends BaseMod {
 					return true;
 				}				
 			}
-			
+
 			// Check for valid player chunk
 			Chunk pChunk = Utils.getChunkIfAvailable(minecraft.theWorld, player.chunkCoordX, player.chunkCoordZ);
 			if(pChunk==null){
@@ -255,34 +254,34 @@ public class JourneyMap extends BaseMod {
 					lastPlayerChunk = new ChunkStub(pChunk, true, minecraft.theWorld, FileHandler.lastWorldHash);
 				}				
 			}
-			
+
 			// We got this far
 			if(!running) {
 				DataCache.instance().purge();
 				running = true;				
 				if(enableAnnounceMod) announceMod();
 			}
-			
+
 			// Show announcements
 			while(!minecraft.isGamePaused && !announcements.isEmpty()) {
 				player.addChatMessage(announcements.remove(0));
 			}
-			
+
 			ThreadMXBean bean = ManagementFactory.getThreadMXBean();
 			long[] threadIds = bean.findDeadlockedThreads(); // Returns null if no threads are deadlocked.
 
 			if (threadIds != null) {
-			    ThreadInfo[] infos = bean.getThreadInfo(threadIds);
+				ThreadInfo[] infos = bean.getThreadInfo(threadIds);
 
-			    for (ThreadInfo info : infos) {
-			        StackTraceElement[] stack = info.getStackTrace();
-			        getLogger().severe("Deadlocked thread: " + Arrays.asList(stack));
-			    }
+				for (ThreadInfo info : infos) {
+					StackTraceElement[] stack = info.getStackTrace();
+					getLogger().severe("Deadlocked thread: " + Arrays.asList(stack));
+				}
 			}
-			
+
 			// Start executors
 			if(!executorsStarted) {
-				
+
 				getLogger().info("Starting up JourneyMap threads for " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
 				executorsStarted = true;
 
@@ -290,7 +289,7 @@ public class JourneyMap extends BaseMod {
 				chunkExecutor = Executors.newSingleThreadScheduledExecutor(new JMThreadFactory("chunkExecutor"));
 				getChunkExecutor().scheduleWithFixedDelay(new ChunkUpdateThread(this, minecraft.theWorld), 1500, chunkDelay, TimeUnit.MILLISECONDS);
 			} else {
-				
+
 				try {
 					// Populate ChunkStubs on ChunkUpdateThread if it is waiting
 					if(ChunkUpdateThread.getBarrier().isBroken()) {
@@ -306,7 +305,7 @@ public class JourneyMap extends BaseMod {
 								if(getLogger().isLoggable(Level.FINER)) {
 									getLogger().finer("Stubbed/skipped: " + result[0] + "," + result[1] + " in " + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 								}
-								
+
 							}
 						} else {
 							if(getLogger().isLoggable(Level.FINER)) {
@@ -325,9 +324,9 @@ public class JourneyMap extends BaseMod {
 				} catch(Throwable t) {
 					getLogger().info(LogFormatter.toString(t));
 				}
-				
+
 			}
-			
+
 		} catch (Throwable t) {
 			String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
 			announce(error);
@@ -336,9 +335,9 @@ public class JourneyMap extends BaseMod {
 		} 
 		return true;
 	}
-	
+
 	private void announceMod() {
-		
+
 		Boolean announceReady = false;
 		Minecraft minecraft = Minecraft.getMinecraft();
 		if(minecraft.isSingleplayer()==false) {
@@ -368,12 +367,12 @@ public class JourneyMap extends BaseMod {
 			enableAnnounceMod = false; // Announcement now only happens once, not on every world switch
 		}
 	}
-	
+
 	@Override
 	public void keyboardEvent(KeyBinding keybinding)
-    {
+	{
 		if(!running) return; 
-		
+
 		Minecraft minecraft = Minecraft.getMinecraft();
 		if(keybinding.keyCode==keybinding.keyCode) {
 			if(Minecraft.getMinecraft().currentScreen==null) {
@@ -389,8 +388,8 @@ public class JourneyMap extends BaseMod {
 				minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer));				
 			}
 		}
-    }		
-	
+	}		
+
 	/**
 	 * Queue an announcement to be shown in the UI.
 	 * @param message
@@ -406,7 +405,7 @@ public class JourneyMap extends BaseMod {
 	public static ScheduledExecutorService getChunkExecutor() {
 		return chunkExecutor;
 	}
-	
+
 	/**
 	 * TODO: Make threadsafe
 	 * @return
@@ -419,7 +418,7 @@ public class JourneyMap extends BaseMod {
 		}
 		return logger;
 	}
-	
+
 	/**
 	 * TODO: Make threadsafe
 	 * @return
@@ -427,7 +426,7 @@ public class JourneyMap extends BaseMod {
 	public static ChunkStub getLastPlayerChunk() {
 		return lastPlayerChunk;
 	}
-	
+
 	/**
 	 * TODO: Make threadsafe
 	 * @return
@@ -435,5 +434,5 @@ public class JourneyMap extends BaseMod {
 	public static Boolean isRunning() {
 		return running;
 	}
-	
+
 }
