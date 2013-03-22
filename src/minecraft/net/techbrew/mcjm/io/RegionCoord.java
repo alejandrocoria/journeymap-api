@@ -27,7 +27,11 @@ public class RegionCoord {
 		this.worldDir = worldDir;
 		this.regionX = regionX;
 		this.regionZ = regionZ;
-		this.vSlice = vSlice;
+		if(Constants.CoordType.Normal.equals(cType)) {
+			this.vSlice = null;
+		} else {
+			this.vSlice = vSlice;
+		}
 		this.cType = cType;
 	}
 	
