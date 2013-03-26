@@ -9,6 +9,7 @@ import java.util.logging.Level;
 
 public class VersionCheck {
 
+	private static Boolean updateCheckEnabled = PropertyManager.getInstance().getBoolean(PropertyManager.Key.UPDATE_CHECK_ENABLED);
 	private static Boolean versionIsCurrent = true;
 	private static Boolean versionIsChecked;
 	private static String versionAvailable;
@@ -36,27 +37,37 @@ public class VersionCheck {
 
 	private static synchronized void checkVersion() {
 		
-		JourneyMap.getLogger().info("Checking for updated version: " + JourneyMap.VERSION_URL); //$NON-NLS-1$
-		BufferedReader in;
-		try {
-			URL uri = URI.create(JourneyMap.VERSION_URL).toURL();
-			HttpURLConnection connection = (HttpURLConnection) uri.openConnection();
-			connection.setRequestMethod("GET");
-			connection.setRequestProperty("Referer", "http://journeymap.techbrew.net/?client=" + JourneyMap.JM_VERSION); //$NON-NLS-1$ //$NON-NLS-2$
-			connection.setRequestProperty("Host", "localhost");
-			connection.setRequestProperty("User-Agent", "Java/" + System.getProperty("java.version"));
-			in = new BufferedReader(new InputStreamReader(uri.openStream()));
-			StringBuffer sb = new StringBuffer();
-			String inputLine;
-			while ((inputLine = in.readLine()) != null) {
-				Boolean done = checkLine(inputLine);
-				if(done!=null && done) break;
+		if(updateCheckEnabled) {
+			JourneyMap.getLogger().info("Checking for updated version: " + JourneyMap.VERSION_URL); //$NON-NLS-1$
+			BufferedReader in;
+			try {
+				URL uri = URI.create(JourneyMap.VERSION_URL).toURL();
+				HttpURLConnection connection = (HttpURLConnection) uri.openConnection();
+				connection.setRequestMethod("GET");
+				connection.setRequestProperty("Referer", "http://journeymap.techbrew.net/?client=" + JourneyMap.JM_VERSION); //$NON-NLS-1$ //$NON-NLS-2$
+				connection.setRequestProperty("Host", "localhost");
+				connection.setRequestProperty("User-Agent", "Java/" + System.getProperty("java.version"));
+				in = new BufferedReader(new InputStreamReader(uri.openStream()));
+				StringBuffer sb = new StringBuffer();
+				String inputLine;
+				while ((inputLine = in.readLine()) != null) {
+					Boolean done = checkLine(inputLine);
+					if(done!=null && done) break;
+				}
+				in.close();
+				JourneyMap.getLogger().info("Version available online: " + versionAvailable); //$NON-NLS-1$
+			} catch (Throwable e) {
+				JourneyMap.getLogger().log(Level.SEVERE, "Could not check version URL", e); //$NON-NLS-1$
+				versionIsChecked = false;
+				versionIsCurrent = true;
+				versionAvailable = "0"; //$NON-NLS-1$
+				updateCheckEnabled = false;
 			}
-			in.close();
-			JourneyMap.getLogger().info("Version available online: " + versionAvailable); //$NON-NLS-1$
-		} catch (Throwable e) {
-			JourneyMap.getLogger().log(Level.SEVERE, "Could not check version URL", e); //$NON-NLS-1$
+		} else {
+			JourneyMap.getLogger().info("Update check disabled in properties file."); //$NON-NLS-1$
 			versionIsChecked = false;
+			versionIsCurrent = true;
+			versionAvailable = "0"; //$NON-NLS-1$
 		}
 	}
 	

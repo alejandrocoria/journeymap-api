@@ -53,11 +53,11 @@ import org.lwjgl.input.Keyboard;
  */
 public class JourneyMap extends BaseMod {
 
-	/** http://dl.dropbox.com/u/38077766/JourneyMap/journeymap-version.js?client-version=JM2.0_MC1.5.1 */
-	static final String VERSION_URL = "http://goo.gl/uxl6E"; //$NON-NLS-1$
+	/** http://dl.dropbox.com/u/38077766/JourneyMap/journeymap-version.js?client-version=JM2.0.1_MC1.5.1 */
+	static final String VERSION_URL = "http://goo.gl/qT1Nq"; //$NON-NLS-1$
 
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-	public static final String JM_VERSION = "2.0"; //$NON-NLS-1$
+	public static final String JM_VERSION = "2.0.1"; //$NON-NLS-1$
 	public static final String ML_VERSION = "ModLoader 1.5"; //$NON-NLS-1$
 	public static final String MC_VERSION = "1.5"; //$NON-NLS-1$
 
@@ -131,13 +131,13 @@ public class JourneyMap extends BaseMod {
 		//channelClient = new ChannelClient(this);
 
 		// Use property settings
-		chunkDelay = PropertyManager.getInstance().getInteger(PropertyManager.UPDATETIMER_CHUNKS_PROP);
+		chunkDelay = PropertyManager.getInstance().getInteger(PropertyManager.Key.UPDATETIMER_CHUNKS);
 
-		enableAnnounceMod = PropertyManager.getInstance().getBoolean(PropertyManager.ANNOUNCE_MODLOADED_PROP); 
+		enableAnnounceMod = PropertyManager.getInstance().getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED); 
 
 		// Map GUI keycode
-		int mapGuiKeyCode = PropertyManager.getInstance().getInteger(PropertyManager.MAPGUI_KEYCODE_PROP);
-		enableMapGui = PropertyManager.getInstance().getBoolean(PropertyManager.MAPGUI_ENABLED_PROP); 
+		int mapGuiKeyCode = PropertyManager.getInstance().getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
+		enableMapGui = PropertyManager.getInstance().getBoolean(PropertyManager.Key.MAPGUI_ENABLED); 
 		if(enableMapGui) {
 			keybinding = new KeyBinding("JourneyMap", mapGuiKeyCode); //$NON-NLS-1$
 			ModLoader.registerKey(this, keybinding, false);
@@ -150,7 +150,7 @@ public class JourneyMap extends BaseMod {
 		//
 
 		// Webserver
-		enableWebserver = PropertyManager.getInstance().getBoolean(PropertyManager.WEBSERVER_ENABLED_PROP);
+		enableWebserver = PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
 		if(enableWebserver) {
 			try {			
 				//new LibraryLoader().loadLibraries();

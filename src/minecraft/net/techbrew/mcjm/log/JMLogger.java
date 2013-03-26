@@ -65,13 +65,13 @@ public class JMLogger extends Logger {
 		String propLevel = null;
 		Level level = Level.INFO;
 		try {
-			propLevel = PropertyManager.getInstance().getString(PropertyManager.LOGGING_LEVEL_PROP);			
+			propLevel = PropertyManager.getInstance().getString(PropertyManager.Key.LOGGING_LEVEL);			
 			if(!propLevel.equals(Level.INFO)) {
 				level = Level.parse(propLevel);
 				info("Setting log level from journeyMap.properties: " + level); //$NON-NLS-1$
 			}
 		} catch(IllegalArgumentException e) {
-			warning("Could not read " + PropertyManager.LOGGING_LEVEL_PROP + " in " + PropertyManager.FILE_NAME + ": " + propLevel);			 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			warning("Could not read " + PropertyManager.Key.LOGGING_LEVEL + " in " + PropertyManager.FILE_NAME + ": " + propLevel);			 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} catch(Throwable t) {
 			severe(LogFormatter.toString(t));
 		} finally {

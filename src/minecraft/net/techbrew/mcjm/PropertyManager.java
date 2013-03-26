@@ -15,43 +15,36 @@ public class PropertyManager {
 	private static PropertyManager instance;
 	
 	public static final String FILE_NAME = "journeyMap.properties"; //$NON-NLS-1$
-	public static final String OLD_FILE_NAME = "webserver.properties"; //$NON-NLS-1$
-
-	public static final String MAPGUI_ENABLED_PROP = "mapgui.enabled"; //$NON-NLS-1$
-	private static final String MAPGUI_ENABLED_VALUE = "true"; //$NON-NLS-1$
 	
-	public static final String WEBSERVER_ENABLED_PROP = "webserver.enabled"; //$NON-NLS-1$
-	private static final String WEBSERVER_ENABLED_VALUE = "true"; //$NON-NLS-1$
-	
-	private static final String WEBSERVER_PORT_LEGACY_PROP = "port"; //$NON-NLS-1$
-	public static final String WEBSERVER_PORT_PROP = "webserver.port"; //$NON-NLS-1$
-	private static final String WEBSERVER_PORT_VALUE = "8080"; //$NON-NLS-1$
-	
-	public static final String CHUNK_OFFSET_PROP = "chunk_offset"; //$NON-NLS-1$
-	private static final String CHUNK_OFFSET_VALUE = "5"; //$NON-NLS-1$
-	
-	public static final String UPDATETIMER_PLAYER_PROP = "update_timer.entities"; //$NON-NLS-1$
-	private static final String UPDATETIMER_PLAYER_VALUE = "1000"; //$NON-NLS-1$
-	
-	public static final String UPDATETIMER_CHUNKS_PROP = "update_timer.chunks"; //$NON-NLS-1$
-	private static final String UPDATETIMER_CHUNKS_VALUE = "2000"; //$NON-NLS-1$
-	
-	public static final String BROWSER_POLL_PROP = "browser.poll"; //$NON-NLS-1$
-	private static final String BROWSER_POLL_VALUE = "1900"; //$NON-NLS-1$
-	
-	public static final String MAPGUI_KEYCODE_PROP = "mapgui.keycode"; //$NON-NLS-1$
-	private static final String MAPGUI_KEYCODE_VALUE = "36"; //$NON-NLS-1$
-	
-	public static final String LOGGING_LEVEL_PROP = "logging.level"; //$NON-NLS-1$
-	private static final String LOGGING_LEVEL_VALUE = "INFO"; //$NON-NLS-1$
-	
-	public static final String CAVE_LIGHTING_PROP = "render.cavelighting.enabled"; //$NON-NLS-1$
-	private static final String CAVE_LIGHTING_VALUE = "true"; //$NON-NLS-1$
-	
-	public static final String ANNOUNCE_MODLOADED_PROP = "announce.modloaded"; //$NON-NLS-1$
-	private static final String ANNOUNCE_MODLOADED_VALUE = "true"; //$NON-NLS-1$
-	
-
+	public enum Key {
+		MAPGUI_ENABLED("mapgui.enabled", true), //$NON-NLS-1$
+		WEBSERVER_ENABLED("webserver.enabled", true), //$NON-NLS-1$
+		WEBSERVER_PORT("webserver.port", 8080), //$NON-NLS-1$
+		CHUNK_OFFSET("chunk_offset", 5), //$NON-NLS-1$
+		BROWSER_POLL("browser.poll", 1900), //$NON-NLS-1$
+		UPDATETIMER_PLAYER("update_timer.entities", 1000), //$NON-NLS-1$
+		UPDATETIMER_CHUNKS("update_timer.chunks",2000), //$NON-NLS-1$
+		MAPGUI_KEYCODE("mapgui.keycode",36), //$NON-NLS-1$
+		LOGGING_LEVEL("logging.level", "INFO"), //$NON-NLS-1$  //$NON-NLS-2$
+		CAVE_LIGHTING("render.cavelighting.enabled",true), //$NON-NLS-1$
+		ANNOUNCE_MODLOADED("announce.modloaded", true), //$NON-NLS-1$
+		UPDATE_CHECK_ENABLED("update_check.enabled", true); //$NON-NLS-1$
+		
+		private final String property;
+		private final String defaultValue;
+		private Key(String property, Object defaultValue) {
+			this.property = property;
+			this.defaultValue = defaultValue.toString();
+		}
+		
+		String getProperty() {
+			return property;
+		}
+		
+		String getDefault() {
+			return defaultValue;
+		}
+	}
 	
 	private final Properties properties;
 	private Boolean writeNeeded = false;
@@ -63,38 +56,29 @@ public class PropertyManager {
 		return instance;
 	}
 	
-	public String getString(String key) {
-		return properties.getProperty(key);
+	public String getString(Key key) {
+		return properties.getProperty(key.getProperty());
 	}
 	
-	public Integer getInteger(String key) {
-		return Integer.parseInt(properties.getProperty(key));
+	public Integer getInteger(Key key) {
+		return Integer.parseInt(properties.getProperty(key.getProperty()));
 	}
 	
-	public Boolean getBoolean(String key) {
-		return Boolean.parseBoolean(properties.getProperty(key));
+	public Boolean getBoolean(Key key) {
+		return Boolean.parseBoolean(properties.getProperty(key.getProperty()));
 	}
 	
 	private Properties getDefaultProperties() {
 		Properties defaults  = new Properties();
-		defaults.put(MAPGUI_ENABLED_PROP, MAPGUI_ENABLED_VALUE);
-		defaults.put(WEBSERVER_ENABLED_PROP, WEBSERVER_ENABLED_VALUE);
-		defaults.put(WEBSERVER_PORT_PROP, WEBSERVER_PORT_VALUE);
-		defaults.put(CHUNK_OFFSET_PROP, CHUNK_OFFSET_VALUE);
-		defaults.put(UPDATETIMER_PLAYER_PROP, UPDATETIMER_PLAYER_VALUE);
-		defaults.put(UPDATETIMER_CHUNKS_PROP, UPDATETIMER_CHUNKS_VALUE);		
-		defaults.put(BROWSER_POLL_PROP, BROWSER_POLL_VALUE);		
-		defaults.put(MAPGUI_KEYCODE_PROP, MAPGUI_KEYCODE_VALUE);
-		defaults.put(LOGGING_LEVEL_PROP, LOGGING_LEVEL_VALUE);
-		defaults.put(CAVE_LIGHTING_PROP, CAVE_LIGHTING_VALUE);
-		defaults.put(ANNOUNCE_MODLOADED_PROP, ANNOUNCE_MODLOADED_VALUE);
+		for(Key key : Key.values()) {
+			defaults.put(key.getProperty(), key.getDefault());
+		}
 		return defaults;
 	}
 	
 	private PropertyManager() {
 		properties = new Properties();
 		readFromFile();
-		addFromLegacyFile();
 		Properties defaults = getDefaultProperties();
 		for(Object key : defaults.keySet()) {
 			if(!properties.containsKey(key)) {
@@ -104,30 +88,7 @@ public class PropertyManager {
 		}
 		if(writeNeeded) {
 			writeToFile();
-		}
-		
-	}
-	
-	private void addFromLegacyFile() {
-		Properties legacy = new Properties();
-		File propFile = new File(FileHandler.getJourneyMapDir(), OLD_FILE_NAME);
-		try {
-			if(propFile.exists()) {
-				// Prop file exists
-				FileReader in = new FileReader(propFile);
-				legacy.load(in);
-				in.close();
-				propFile.deleteOnExit();
-				JourneyMap.getLogger().log(Level.INFO, "Removing obsolete property file: " + OLD_FILE_NAME); //$NON-NLS-1$
-			}
-		} catch(IOException e) {
-			JourneyMap.getLogger().log(Level.SEVERE, "Can't use file: " + propFile.getAbsolutePath()); //$NON-NLS-1$
-			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(e));
-		}
-		if(legacy.containsKey(WEBSERVER_PORT_LEGACY_PROP)){
-			properties.put(WEBSERVER_PORT_PROP, legacy.get(WEBSERVER_PORT_LEGACY_PROP));
-			writeNeeded = true;
-		}
+		}		
 	}
 	
 	private File getFile() {

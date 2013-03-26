@@ -1,5 +1,7 @@
 package net.techbrew.mcjm.server;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,6 +23,7 @@ import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import se.rupy.http.Event;
 import se.rupy.http.Service;
@@ -120,21 +123,37 @@ public class FileService extends BaseService {
 
 			if(useZipEntry) { 				
 				// Running out of a Zip archive or jar
-				String[] tokens = requestPath.split("file:/")[1].split("!/"); //$NON-NLS-1$ //$NON-NLS-2$
-				ZipFile zipFile = new ZipFile(new File( URLDecoder.decode(tokens[0], "utf-8") )); //$NON-NLS-1$
-				ZipEntry zipEntry = zipFile.getEntry(tokens[1]);
+				String[] tokens = requestPath.split("file:")[1].split("!/"); //$NON-NLS-1$ //$NON-NLS-2$
+				File zipFile = new File( URLDecoder.decode(tokens[0], "utf-8") );
+				String innerName = tokens[1];
+				if(!zipFile.canRead()) {
+					throw new RuntimeException("Can't read Zip file: " + zipFile);
+				}
 				
-				// Set inputstream
-				in = zipFile.getInputStream(zipEntry);
-				
-				if(in!=null) {					
-					// Set content headers
-					ResponseHeader.on(event).content(zipEntry);
-					serveStream(in, event);
-				} else {
+				BufferedOutputStream dest = null;
+		        FileInputStream fis = new FileInputStream(zipFile);
+		        ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fis));
+		        ZipEntry zipEntry;
+		        File destFile;
+		        boolean found = false;
+		        while((zipEntry = zis.getNextEntry()) != null) {
+		            if(innerName.equals(zipEntry.getName())) {
+		            	// Set inputstream
+		            	in = new ZipFile(zipFile).getInputStream(zipEntry);		            	
+		            	ResponseHeader.on(event).content(zipEntry);
+						serveStream(in, event);
+						found = true;
+						break;
+		            }
+		        }
+		        zis.close();
+		        fis.close();
+
+		        // Didn't find it		    
+		        if(!found) {
 					JourneyMap.getLogger().severe("zipEntry not found: " + zipEntry + " in " + zipFile);	
 					throwEventException(404, Constants.getMessageJMERR13(requestPath), event, true);
-				}
+		        }
 				
 			} else {
 				// Running out of a directory

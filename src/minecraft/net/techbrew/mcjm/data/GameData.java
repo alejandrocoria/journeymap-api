@@ -49,7 +49,7 @@ public class GameData implements IDataProvider {
 		props.put(Key.jm_version,JourneyMap.JM_VERSION);
 		props.put(Key.latest_journeymap_version, VersionCheck.getVersionAvailable()); 
 		props.put(Key.mc_version, Display.getTitle().split("\\s(?=\\d)")[1]); //$NON-NLS-1$ 		
-		props.put(Key.browser_poll, pm.getInteger(PropertyManager.BROWSER_POLL_PROP));
+		props.put(Key.browser_poll, pm.getInteger(PropertyManager.Key.BROWSER_POLL));
 
 		return props;	
 	}

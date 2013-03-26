@@ -1181,7 +1181,7 @@ public class MapOverlay extends GuiScreen {
 	}
 
 	protected static void launchLocalhost() {
-		String port = PropertyManager.getInstance().getString(PropertyManager.WEBSERVER_PORT_PROP);
+		String port = PropertyManager.getInstance().getString(PropertyManager.Key.WEBSERVER_PORT);
 		String url = "http://localhost:" + port; //$NON-NLS-1$
 		try {
 			java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));

@@ -17,7 +17,7 @@ import net.techbrew.mcjm.PropertyManager;
 public abstract class BaseRenderer {
 
 	final MapBlocks mapBlocks;	
-	boolean caveLighting = PropertyManager.getInstance().getBoolean(PropertyManager.CAVE_LIGHTING_PROP);
+	boolean caveLighting = PropertyManager.getInstance().getBoolean(PropertyManager.Key.CAVE_LIGHTING);
 	final boolean fineLogging = JourneyMap.getLogger().isLoggable(Level.FINE);
 	
 	boolean debug = false;

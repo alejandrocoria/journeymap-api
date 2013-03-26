@@ -35,7 +35,7 @@ public class AllData implements IDataProvider {
 	 * Constructor.
 	 */
 	public AllData() {
-		TTL = PropertyManager.getInstance().getInteger(PropertyManager.BROWSER_POLL_PROP);
+		TTL = PropertyManager.getInstance().getInteger(PropertyManager.Key.BROWSER_POLL);
 	}
 	
 	public Enum[] getKeys() {

@@ -69,7 +69,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 	public ChunkUpdateThread(JourneyMap journeyMap, World world) {
 		super(journeyMap, world);
 		chunkImageCache = new ChunkImageCache();
-		chunkOffset = PropertyManager.getInstance().getInteger(PropertyManager.CHUNK_OFFSET_PROP);
+		chunkOffset = PropertyManager.getInstance().getInteger(PropertyManager.Key.CHUNK_OFFSET);
 		renderController = new ChunkRenderController();
 	}
 

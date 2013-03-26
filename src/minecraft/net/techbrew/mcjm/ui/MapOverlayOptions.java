@@ -49,8 +49,9 @@ public class MapOverlayOptions extends GuiScreen {
    		
 		buttonSave = new MapButton(6,0,0,Constants.getString("MapOverlay.save_map")); //$NON-NLS-1$ 
 		buttonClose = new MapButton(7,0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$ 
-		buttonAlert = new MapButton(8,0,0,Constants.getString("MapOverlay.update_available")); //$NON-NLS-1$ 
-		buttonAlert.drawButton = VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent();
+		String updateText = VersionCheck.getVersionIsChecked() ? Constants.getString("MapOverlay.update_available") : Constants.getString("MapOverlay.update_check"); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonAlert = new MapButton(8,0,0,updateText); //$NON-NLS-1$ 
+		buttonAlert.drawButton = !VersionCheck.getVersionIsChecked() || !VersionCheck.getVersionIsCurrent();
 		buttonBrowser = new MapButton(9,0,0,Constants.getString("MapOverlay.use_browser")); //$NON-NLS-1$ 
 		
 		buttonMonsters = new MapButton(10,0,0,
@@ -121,10 +122,6 @@ public class MapOverlayOptions extends GuiScreen {
 			int bx = this.width / 2 - hgap + 5;
 			int by = (this.height / 4);
 			int row = 0;
-
-			if(buttonAlert.drawButton) {
-				layoutButton(buttonAlert, bx + hgap/2, by + (20*row++));
-			}
 			
 			layoutButton(buttonCaves, bx, by + (20*row));			
 			layoutButton(buttonMonsters, bx + hgap, by + (20*row++));
@@ -139,7 +136,13 @@ public class MapOverlayOptions extends GuiScreen {
 			layoutButton(buttonSave, bx, by + (20*row));			
 			layoutButton(buttonBrowser, bx + hgap, by + (20*row++));
 						
-			layoutButton(buttonClose, bx + hgap/2, by + (20*row++));			
+			if(buttonAlert.drawButton) {
+				layoutButton(buttonAlert, bx + hgap/2, by + (20*row++));
+			}
+			
+			layoutButton(buttonClose, bx + hgap/2, by + (20*row++));		
+			
+			
 			
 			
 		}
