@@ -1,4 +1,4 @@
-JourneyMap 2.0 for Minecraft 1.5.1 (March 22, 2013)
+JourneyMap 2.0.1 for Minecraft 1.5.1 (March 26, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -10,6 +10,15 @@ Requirements:
 
 - Minecraft 1.5
 - ModLoader or Forge
+
+Changes since JourneyMap 2.0 for Minecraft 1.5:
+- Bugfix (XVD-5GX-H9DG) for webserver errors (ZipFileException) on Linux, Mac.  Unzipping the mod no longer needed!
+- Added property (update_check.enabled) to disable the check for an updated version to JourneyMap
+- Bugfixes in web UI triggered when a newer version of JourneyMap is available
+- Bugfix in web UI for "Show Caves" not initially checked
+- HTML tweaks in web UI for HTML validation
+- Made zoom slider easier to see in web UI
+- Optimized CSS in web UI, removed unused selectors and images
 
 Changes since JourneyMap 2.0b4 for Minecraft 1.5:
 
