@@ -133,13 +133,19 @@ var JourneyMap = (function() {
 
 					// Update UI with game info
 					$("#version").html(JM.game.jm_version);
+					
+					// Init update button 
+					$("#updateButton").hide().click(function(e){
+						var url = document.getElementById('webLink').href;
+						window.open(url, '_new', '');
+					});
+					
 					if (JM.game.latest_journeymap_version > JM.game.jm_version) {
 						// TODO: This is sloppy L10N
-						$("#versionButton").attr(
-								"title",
-								JM.messages.update_available + " : JourneyMap " + JM.game.latest_journeymap_version + " for Minecraft "
-										+ JM.world.latest_minecraft_version);
-						$("#versionButton").css("visibility", "visible");
+						$("#updateButton").attr("title", JM.messages.update_available 
+								        + " : JourneyMap " + JM.game.latest_journeymap_version 
+								        + " for Minecraft " + JM.game.mc_version);
+						$("#updateButton").delay(2000).slideDown();
 					}
 
 					// GA event
@@ -154,6 +160,7 @@ var JourneyMap = (function() {
 						JmIcon = new Image();
 						JmIcon.src = "/ico/apple-touch-icon.png";
 						JmIcon.title = "JourneyMap";
+						JmIcon.alt = "JourneyMap";
 						JmIcon.style.position = "absolute";
 						JmIcon.style.visibility = "visible";
 						JmIcon.style.left = ($(window).width() / 2 - 72) + "px";
@@ -166,7 +173,8 @@ var JourneyMap = (function() {
 					// Loading
 					if(!LoadingIcon) {
 						LoadingIcon = new Image();
-						LoadingIcon.src = "/img/loading.gif";						
+						LoadingIcon.src = "/img/loading.gif";
+						LoadingIcon.alt = "";
 						LoadingIcon.style.position = "absolute";
 						LoadingIcon.style.visibility = "visible";
 						LoadingIcon.style.left = ($(window).width() / 2 - 16) + "px";
@@ -336,6 +344,7 @@ var JourneyMap = (function() {
 		$("#showMenuText").html(JM.messages.show_menu_text);
 		// $("#smoothPixelsMenuItem").html(JM.messages.smooth_pixels_menu_item);		
 		$("#cavesMenuItem").html(JM.messages.cave_button_title);
+		$("#cavesMenuItem").prop('title', JM.messages.cave_button_desc);
 		$("#animalsMenuItem").html(JM.messages.animals_menu_item);
 		$("#petsMenuItem").html(JM.messages.pets_menu_item);
 		$("#mobsMenuItem").html(JM.messages.mobs_menu_item);
@@ -349,8 +358,7 @@ var JourneyMap = (function() {
 		// Test canvas to see if smooth scaling can be toggled
 		var ctx = bgCanvas.getContext("2d");
 
-		$("#cavesMenuItem").prop('checked', showCaves)
-		$("#cavesMenuItem").prop('title', JM.messages.cave_button_desc);
+		$("#checkShowCaves").prop('checked', true)		
 		$("#checkShowCaves").click(function(event) {
 			setShowCaves(this.checked === true);
 		});
@@ -629,8 +637,9 @@ var JourneyMap = (function() {
 
 	function setShowCaves(show) {
 
-		if (show === showCaves)
+		if (show === showCaves) {
 			return;
+		}
 		showCaves = show;
 
 		if (JM.player.underground === true) {
