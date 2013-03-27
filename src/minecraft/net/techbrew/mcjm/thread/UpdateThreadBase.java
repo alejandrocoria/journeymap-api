@@ -9,7 +9,6 @@ import net.minecraft.src.Chunk;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
-import net.techbrew.mcjm.EntityHelper;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.data.DataCache;
@@ -18,6 +17,7 @@ import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.EntityHelper;
 
 public abstract class UpdateThreadBase implements Runnable {
 

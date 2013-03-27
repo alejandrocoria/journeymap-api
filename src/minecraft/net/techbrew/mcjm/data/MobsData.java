@@ -20,9 +20,9 @@ import net.minecraft.src.IBossDisplayData;
 import net.minecraft.src.IMob;
 import net.minecraft.src.IRangedAttackMob;
 import net.minecraft.src.World;
-import net.techbrew.mcjm.EntityHelper;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.render.MapBlocks;
 
 /**

@@ -50,7 +50,6 @@ import net.minecraft.src.MathHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.Tessellator;
 import net.techbrew.mcjm.Constants;
-import net.techbrew.mcjm.EntityHelper;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.PropertyManager;
 import net.techbrew.mcjm.Utils;
@@ -69,6 +68,7 @@ import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.render.MapBlocks;
 
 public class MapOverlay extends GuiScreen {
