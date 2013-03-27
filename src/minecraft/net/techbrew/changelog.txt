@@ -1,4 +1,4 @@
-JourneyMap 2.0.1 for Minecraft 1.5.1 (March 26, 2013)
+JourneyMap 2.1 for Minecraft 1.5.1 (March ??, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -11,7 +11,10 @@ Requirements:
 - Minecraft 1.5
 - ModLoader or Forge
 
-Changes since JourneyMap 2.0 for Minecraft 1.5:
+Changes in JourneyMap 2.1 for Minecraft 1.5:
+- Internal code reorganization
+
+Changes in JourneyMap 2.0.1 for Minecraft 1.5:
 - Bugfix (XVD-5GX-H9DG) for webserver errors (ZipFileException) on Linux, Mac.  Unzipping the mod no longer needed!
 - Added property (update_check.enabled) to disable the check for an updated version to JourneyMap
 - Bugfixes in web UI triggered when a newer version of JourneyMap is available
@@ -20,7 +23,7 @@ Changes since JourneyMap 2.0 for Minecraft 1.5:
 - Made zoom slider easier to see in web UI
 - Optimized CSS in web UI, removed unused selectors and images
 
-Changes since JourneyMap 2.0b4 for Minecraft 1.5:
+Changes in JourneyMap 2.0 for Minecraft 1.5:
 
 - IOS touch event support added to web UI
 - Responsive layout tweaks for phone-sized devices
@@ -31,7 +34,7 @@ Changes since JourneyMap 2.0b4 for Minecraft 1.5:
 - Bugfix for surface image cache wrongly using altitude in cache key
 - Bugfix (78B-SYZ-S2SQ) for cave map depth rendering issue
 
-Changes since JourneyMap 2.0b3 for Minecraft 1.5:
+Changes in JourneyMap 2.0b4 for Minecraft 1.5:
 
 - Filename error inside zip fixed
 - Ice color fixed
@@ -42,7 +45,7 @@ Changes since JourneyMap 2.0b3 for Minecraft 1.5:
 - Removed some obsolete images from zip
 - Bugfix to improve file system path determination for web server
 
-Changes since JourneyMap 1.9.1 for Minecraft 1.4.6:
+Changes in JourneyMap 2.0b3 for Minecraft 1.5:
 
 - New web UI appearance with added support for IE 9
 - Faster chunk render cycles for improved game performance

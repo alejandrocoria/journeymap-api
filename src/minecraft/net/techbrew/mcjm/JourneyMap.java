@@ -54,11 +54,11 @@ import org.lwjgl.input.Keyboard;
  */
 public class JourneyMap extends BaseMod {
 
-	/** http://dl.dropbox.com/u/38077766/JourneyMap/journeymap-version.js?client-version=JM2.0.1_MC1.5.1 */
-	static final String VERSION_URL = "http://goo.gl/qT1Nq"; //$NON-NLS-1$
+	/** http://dl.dropbox.com/u/38077766/JourneyMap/journeymap-version.js?client-version=JM2.1_MC1.5.1 */
+	static final String VERSION_URL = "http://goo.gl/cAxxs"; //$NON-NLS-1$
 
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-	public static final String JM_VERSION = "2.0.1"; //$NON-NLS-1$
+	public static final String JM_VERSION = "2.1"; //$NON-NLS-1$
 	public static final String ML_VERSION = "ModLoader 1.5"; //$NON-NLS-1$
 	public static final String MC_VERSION = "1.5"; //$NON-NLS-1$
 
