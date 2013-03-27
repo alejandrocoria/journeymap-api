@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.PropertyManager;
+import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.ChunkStub;
 
 /**

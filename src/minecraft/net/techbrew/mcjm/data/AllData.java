@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.WorldInfo;
-import net.techbrew.mcjm.PropertyManager;
 import net.techbrew.mcjm.io.FileHandler;
+import net.techbrew.mcjm.io.PropertyManager;
 
 /**
  * Provides game-related properties in a Map.

@@ -6,7 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.PropertyManager;
+import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.thread.JMThreadFactory;
 import se.rupy.http.Daemon;
 

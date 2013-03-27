@@ -1,4 +1,4 @@
-package net.techbrew.mcjm;
+package net.techbrew.mcjm.io;
 
 import java.io.File;
 import java.io.FileReader;
@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import net.techbrew.mcjm.io.FileHandler;
+import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 
 public class PropertyManager {

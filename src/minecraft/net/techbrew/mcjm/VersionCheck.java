@@ -7,6 +7,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.logging.Level;
 
+import net.techbrew.mcjm.io.PropertyManager;
+
 public class VersionCheck {
 
 	private static Boolean updateCheckEnabled = PropertyManager.getInstance().getBoolean(PropertyManager.Key.UPDATE_CHECK_ENABLED);

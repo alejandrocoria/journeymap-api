@@ -31,6 +31,7 @@ import net.minecraft.src.ModLoader;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
+import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkStub;

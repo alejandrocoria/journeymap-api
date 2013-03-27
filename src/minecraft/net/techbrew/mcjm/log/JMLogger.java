@@ -7,8 +7,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.PropertyManager;
 import net.techbrew.mcjm.io.FileHandler;
+import net.techbrew.mcjm.io.PropertyManager;
 
 public class JMLogger extends Logger {
 
