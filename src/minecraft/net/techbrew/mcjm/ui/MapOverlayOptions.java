@@ -19,6 +19,7 @@ import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.FileHandler;
+import net.techbrew.mcjm.io.PropertyManager;
 
 public class MapOverlayOptions extends GuiScreen {
 
@@ -165,11 +166,7 @@ public class MapOverlayOptions extends GuiScreen {
 				if(underground) {
 					map.eraseCachedMapImg();
 				}
-				break;
-			}
-			case 3: { // follow
-				map.setFollow(!map.follow);
-				if(map.follow) map.eraseCachedEntityImg();
+				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_CAVES, MapOverlay.showCaves);
 				break;
 			}
 			case 6: { // save
@@ -191,26 +188,31 @@ public class MapOverlayOptions extends GuiScreen {
 			case 10: { // monsters
 				MapOverlay.showMonsters = !MapOverlay.showMonsters;
 				buttonMonsters.setToggled(MapOverlay.showMonsters);
+				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_MOBS, MapOverlay.showMonsters);
 				break;
 			}
 			case 11: { // animals
 				MapOverlay.showAnimals = !MapOverlay.showAnimals;
 				buttonAnimals.setToggled(MapOverlay.showAnimals);
+				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_ANIMALS, MapOverlay.showAnimals);
 				break;
 			}
 			case 12: { // villagers
 				MapOverlay.showVillagers = !MapOverlay.showVillagers;
 				buttonVillagers.setToggled(MapOverlay.showVillagers);
+				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_VILLAGERS, MapOverlay.showVillagers);
 				break;
 			}
 			case 13: { // pets
 				MapOverlay.showPets = !MapOverlay.showPets;
 				buttonPets.setToggled(MapOverlay.showPets);
+				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_PETS, MapOverlay.showPets);
 				break;
 			}
 			case 14: { // players
 				MapOverlay.showPlayers = !MapOverlay.showPlayers;
 				buttonPlayers.setToggled(MapOverlay.showPlayers);
+				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_PLAYERS, MapOverlay.showPlayers);
 				break;
 			}
 		}

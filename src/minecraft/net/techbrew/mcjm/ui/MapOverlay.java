@@ -133,6 +133,16 @@ public class MapOverlay extends GuiScreen {
 		this.journeyMap = journeyMap;
 		this.mc = Minecraft.getMinecraft();
 		initButtons();		
+		
+		// Set preferences-based values
+		PropertyManager pm = PropertyManager.getInstance();
+		showCaves = pm.getBoolean(PropertyManager.Key.PREF_SHOW_CAVES);
+		showMonsters = pm.getBoolean(PropertyManager.Key.PREF_SHOW_MOBS);
+		showAnimals = pm.getBoolean(PropertyManager.Key.PREF_SHOW_ANIMALS);
+		showVillagers = pm.getBoolean(PropertyManager.Key.PREF_SHOW_VILLAGERS);
+		showPets = pm.getBoolean(PropertyManager.Key.PREF_SHOW_PETS);
+		showPlayers = pm.getBoolean(PropertyManager.Key.PREF_SHOW_PLAYERS);
+		
 		setZoom(currentZoomIndex);
 	}
 

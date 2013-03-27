@@ -29,7 +29,14 @@ public class PropertyManager {
 		LOGGING_LEVEL("logging.level", "INFO"), //$NON-NLS-1$  //$NON-NLS-2$
 		CAVE_LIGHTING("render.cavelighting.enabled",true), //$NON-NLS-1$
 		ANNOUNCE_MODLOADED("announce.modloaded", true), //$NON-NLS-1$
-		UPDATE_CHECK_ENABLED("update_check.enabled", true); //$NON-NLS-1$
+		UPDATE_CHECK_ENABLED("update_check.enabled", true), //$NON-NLS-1$
+		
+		PREF_SHOW_CAVES("preference.show_caves", true), //$NON-NLS-1$
+		PREF_SHOW_MOBS("preference.show_mobs", true), //$NON-NLS-1$
+		PREF_SHOW_ANIMALS("preference.show_animals", true), //$NON-NLS-1$
+		PREF_SHOW_VILLAGERS("preference.show_villagers", true), //$NON-NLS-1$
+		PREF_SHOW_PETS("preference.show_animals", true), //$NON-NLS-1$
+		PREF_SHOW_PLAYERS("preference.show_players", true); //$NON-NLS-1$
 		
 		private final String property;
 		private final String defaultValue;
@@ -67,6 +74,11 @@ public class PropertyManager {
 	
 	public Boolean getBoolean(Key key) {
 		return Boolean.parseBoolean(properties.getProperty(key.getProperty()));
+	}
+	
+	public void setProperty(Key key, Object value) {
+		properties.setProperty(key.getProperty(), value.toString());
+		writeToFile();
 	}
 	
 	private Properties getDefaultProperties() {
