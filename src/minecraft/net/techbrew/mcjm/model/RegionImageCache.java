@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.io;
+package net.techbrew.mcjm.model;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -22,8 +22,9 @@ import java.util.logging.Level;
 import javax.imageio.ImageIO;
 
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.ChunkImageCache.CacheMap;
+import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.ChunkImageCache.CacheMap;
 import net.techbrew.mcjm.thread.JMThreadFactory;
 
 public class RegionImageCache  {

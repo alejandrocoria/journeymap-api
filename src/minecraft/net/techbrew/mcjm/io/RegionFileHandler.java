@@ -37,6 +37,9 @@ import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.ChunkCoord;
+import net.techbrew.mcjm.model.RegionCoord;
+import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.ui.ZoomLevel;
 
 public class RegionFileHandler {

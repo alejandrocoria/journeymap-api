@@ -9,9 +9,9 @@ import java.util.HashSet;
 import net.minecraft.src.BiomeGenBase;
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockFluid;
-import net.techbrew.mcjm.ChunkStub;
-import net.techbrew.mcjm.ExtendedBlockStorageStub;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.ExtendedBlockStorageStub;
 
 public class MapBlocks extends HashMap {
 	

@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.io;
+package net.techbrew.mcjm.model;
 
 import java.io.File;
 
@@ -12,12 +12,8 @@ public class RegionCoord {
 	public final int regionZ;
 	public final Integer vSlice;
 	public final Constants.CoordType cType;
-	static final int SIZE = 5;
+	public static final int SIZE = 5;
 	private static final int chunkSqRt = (int) Math.pow(2,SIZE);
-	
-//	public static RegionCoord fromChunk(File worldDir, Chunk chunk, Integer vSlice, Constants.CoordType cType) {
-//		return RegionCoord.fromChunkPos(worldDir, chunk.xPosition, vSlice, chunk.zPosition, cType);
-//	}
 	
 	public static RegionCoord fromChunkPos(File worldDir, int chunkX, Integer vSlice, int chunkZ, Constants.CoordType cType) {
 		return new RegionCoord(worldDir, getRegionPos(chunkX), vSlice, getRegionPos(chunkZ), cType);

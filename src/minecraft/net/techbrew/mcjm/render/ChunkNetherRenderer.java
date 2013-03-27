@@ -20,12 +20,12 @@ import net.minecraft.src.EnumSkyBlock;
 import net.minecraft.src.WorldProvider;
 import net.minecraft.src.WorldProviderHell;
 import net.minecraft.src.WorldProviderEnd;
-import net.techbrew.mcjm.ChunkStub;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.PropertyManager;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.ChunkStub;
 
 /**
  * Render a chunk in the Nether.

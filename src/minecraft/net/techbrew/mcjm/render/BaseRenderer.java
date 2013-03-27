@@ -5,9 +5,9 @@ import java.awt.Graphics2D;
 import java.util.Map;
 import java.util.logging.Level;
 
-import net.techbrew.mcjm.ChunkStub;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.PropertyManager;
+import net.techbrew.mcjm.model.ChunkStub;
 
 /**
  * Base class for methods reusable across renderers.

@@ -1,9 +1,8 @@
-package net.techbrew.mcjm.io;
+package net.techbrew.mcjm.model;
 
 import java.io.File;
 
 import net.minecraft.src.Chunk;
-import net.techbrew.mcjm.ChunkStub;
 import net.techbrew.mcjm.Constants;
 
 public class ChunkCoord {

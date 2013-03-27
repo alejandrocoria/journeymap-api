@@ -16,9 +16,9 @@ import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.EntityTameable;
 import net.minecraft.src.EntityVillager;
 import net.minecraft.src.World;
-import net.techbrew.mcjm.ChunkStub;
 import net.techbrew.mcjm.EntityHelper;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.render.MapBlocks;
 
 /**

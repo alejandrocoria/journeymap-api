@@ -17,11 +17,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.src.WorldProvider;
 import net.minecraft.src.WorldProviderEnd;
 import net.minecraft.src.WorldProviderHell;
-import net.techbrew.mcjm.ChunkStub;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.ChunkStub;
 
 /**
  * Delegates rendering job to one or more renderer.

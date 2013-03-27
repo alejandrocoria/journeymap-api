@@ -27,11 +27,11 @@ import javax.swing.ImageIcon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.EnumSkyBlock;
 import net.minecraft.src.Vec3;
-import net.techbrew.mcjm.ChunkStub;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.ChunkStub;
 
 public class ChunkTerrainRenderer  {
 	

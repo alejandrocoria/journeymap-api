@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.io;
+package net.techbrew.mcjm.model;
 
 import java.awt.image.BufferedImage;
 import java.util.HashSet;

@@ -14,6 +14,8 @@ import javax.imageio.ImageIO;
 
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.model.RegionCoord;
+import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.ui.ZoomLevel;
 
 /**
