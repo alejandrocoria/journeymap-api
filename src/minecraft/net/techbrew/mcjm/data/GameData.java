@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.VersionCheck;
-import net.techbrew.mcjm.data.AllData.Key;
 import net.techbrew.mcjm.io.PropertyManager;
 
 import org.lwjgl.opengl.Display;

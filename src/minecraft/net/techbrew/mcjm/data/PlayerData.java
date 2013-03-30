@@ -1,6 +1,5 @@
 package net.techbrew.mcjm.data;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -9,7 +8,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.data.WorldData.Key;
 import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.render.MapBlocks;

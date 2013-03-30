@@ -1,15 +1,8 @@
 package net.techbrew.mcjm.data;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.src.WorldInfo;
-import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 
 /**

@@ -1,16 +1,11 @@
 package net.techbrew.mcjm.data;
 
-import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.src.WorldInfo;
 import net.techbrew.mcjm.Constants;
 
 /**

@@ -1,26 +1,17 @@
 package net.techbrew.mcjm.data;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityAnimal;
 import net.minecraft.src.EntityLiving;
-import net.minecraft.src.EntityMob;
-import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.EntityTameable;
 import net.minecraft.src.IAnimals;
-import net.minecraft.src.World;
-import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.EntityHelper;
-import net.techbrew.mcjm.render.MapBlocks;
 
 /**
  * Provides nearby mobs in a Map.

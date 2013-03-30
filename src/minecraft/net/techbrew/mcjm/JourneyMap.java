@@ -19,8 +19,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.src.BaseMod;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.GuiChat;
-import net.minecraft.src.GuiEditSign;
 import net.minecraft.src.GuiInventory;
 import net.minecraft.src.GuiMainMenu;
 import net.minecraft.src.GuiMultiplayer;
