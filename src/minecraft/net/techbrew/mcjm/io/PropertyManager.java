@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -18,25 +21,25 @@ public class PropertyManager {
 	public static final String FILE_NAME = "journeyMap.properties"; //$NON-NLS-1$
 	
 	public enum Key {
-		MAPGUI_ENABLED("mapgui.enabled", true), //$NON-NLS-1$
-		WEBSERVER_ENABLED("webserver.enabled", true), //$NON-NLS-1$
-		WEBSERVER_PORT("webserver.port", 8080), //$NON-NLS-1$
+		MAPGUI_ENABLED("mapgui_enabled", true), //$NON-NLS-1$
+		WEBSERVER_ENABLED("webserver_enabled", true), //$NON-NLS-1$
+		WEBSERVER_PORT("webserver_port", 8080), //$NON-NLS-1$
 		CHUNK_OFFSET("chunk_offset", 5), //$NON-NLS-1$
-		BROWSER_POLL("browser.poll", 1900), //$NON-NLS-1$
-		UPDATETIMER_PLAYER("update_timer.entities", 1000), //$NON-NLS-1$
-		UPDATETIMER_CHUNKS("update_timer.chunks",2000), //$NON-NLS-1$
-		MAPGUI_KEYCODE("mapgui.keycode",36), //$NON-NLS-1$
-		LOGGING_LEVEL("logging.level", "INFO"), //$NON-NLS-1$  //$NON-NLS-2$
-		CAVE_LIGHTING("render.cavelighting.enabled",true), //$NON-NLS-1$
-		ANNOUNCE_MODLOADED("announce.modloaded", true), //$NON-NLS-1$
-		UPDATE_CHECK_ENABLED("update_check.enabled", true), //$NON-NLS-1$
+		BROWSER_POLL("browser_poll", 1900), //$NON-NLS-1$
+		UPDATETIMER_PLAYER("update_timer_entities", 1000), //$NON-NLS-1$
+		UPDATETIMER_CHUNKS("update_timer_chunks",2000), //$NON-NLS-1$
+		MAPGUI_KEYCODE("mapgui_keycode",36), //$NON-NLS-1$
+		LOGGING_LEVEL("logging_level", "INFO"), //$NON-NLS-1$  //$NON-NLS-2$
+		CAVE_LIGHTING("render_cavelighting_enabled",true), //$NON-NLS-1$
+		ANNOUNCE_MODLOADED("announce_modloaded", true), //$NON-NLS-1$
+		UPDATE_CHECK_ENABLED("update_check_enabled", true), //$NON-NLS-1$
 		
-		PREF_SHOW_CAVES("preference.show_caves", true), //$NON-NLS-1$
-		PREF_SHOW_MOBS("preference.show_mobs", true), //$NON-NLS-1$
-		PREF_SHOW_ANIMALS("preference.show_animals", true), //$NON-NLS-1$
-		PREF_SHOW_VILLAGERS("preference.show_villagers", true), //$NON-NLS-1$
-		PREF_SHOW_PETS("preference.show_animals", true), //$NON-NLS-1$
-		PREF_SHOW_PLAYERS("preference.show_players", true); //$NON-NLS-1$
+		PREF_SHOW_CAVES("preference_show_caves", true), //$NON-NLS-1$
+		PREF_SHOW_MOBS("preference_show_mobs", true), //$NON-NLS-1$
+		PREF_SHOW_ANIMALS("preference_show_animals", true), //$NON-NLS-1$
+		PREF_SHOW_VILLAGERS("preference_show_villagers", true), //$NON-NLS-1$
+		PREF_SHOW_PETS("preference_show_pets", true), //$NON-NLS-1$
+		PREF_SHOW_PLAYERS("preference_show_players", true); //$NON-NLS-1$
 		
 		private final String property;
 		private final String defaultValue;
@@ -45,7 +48,7 @@ public class PropertyManager {
 			this.defaultValue = defaultValue.toString();
 		}
 		
-		String getProperty() {
+		public String getProperty() {
 			return property;
 		}
 		
@@ -79,6 +82,10 @@ public class PropertyManager {
 	public void setProperty(Key key, Object value) {
 		properties.setProperty(key.getProperty(), value.toString());
 		writeToFile();
+	}
+	
+	public Map getProperties() {
+		return Collections.unmodifiableMap(properties);
 	}
 	
 	private Properties getDefaultProperties() {
@@ -115,6 +122,7 @@ public class PropertyManager {
 			JourneyMap.getLogger().log(Level.INFO, "Property file doesn't exist: " + propFile.getAbsolutePath()); //$NON-NLS-1$
 			return;
 		}
+		
 		try {
 			FileReader in = new FileReader(propFile);
 			properties.load(in);
@@ -125,6 +133,21 @@ public class PropertyManager {
 			JourneyMap.getLogger().severe(LogFormatter.toString(e));
 			throw new RuntimeException(error);
 		}
+		
+		// Convert older files if needed
+		HashMap<String, String> temp = new HashMap(properties);
+		for(Map.Entry<String, String> entry: temp.entrySet()) {
+			if(entry.getKey().contains(".")) {
+				writeNeeded = true;
+				properties.put(entry.getKey().replaceAll("\\.", "_"), entry.getValue());	
+				properties.remove(entry.getKey());
+			}
+		}
+		
+		if(writeNeeded) {
+			JourneyMap.getLogger().info("Updated property names to use _ instead of .");
+		}
+					
 	}
 	
 	private void writeToFile() {
@@ -145,6 +168,5 @@ public class PropertyManager {
 	public String toString() {
 		return properties.toString();
 	}
-
 	
 }
