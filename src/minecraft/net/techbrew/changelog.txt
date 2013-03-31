@@ -1,4 +1,4 @@
-JourneyMap 2.1 for Minecraft 1.5.1 (March ??, 2013)
+JourneyMap 2.1b1 for Minecraft 1.5.1 (March 31, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -12,7 +12,10 @@ Requirements:
 - ModLoader or Forge
 
 Changes in JourneyMap 2.1 for Minecraft 1.5:
-- Internal code reorganization
+- In-game map options (preferences) now saved in journeyMap.properties file
+- journeyMap.properties file now uses underscores in properties name. Legacy files will be converted to use new names.
+- Bugfix (EQ9-WMJ-4EXQ) for errors when switching to German language
+- Updated German translation, thanks to Maik Ploigt!
 
 Changes in JourneyMap 2.0.1 for Minecraft 1.5:
 - Bugfix (XVD-5GX-H9DG) for webserver errors (ZipFileException) on Linux, Mac.  Unzipping the mod no longer needed!
@@ -64,7 +67,7 @@ Changes in JourneyMap 2.0b3 for Minecraft 1.5:
 
 Known issues:
 
-- Translation updates needed for German, Russian
+- Translation updates needed for Russian
 - Bug (Tracking ID AW2-6EE-Z3QB): Maps overwrite on multi-world servers because the world seed is no longer provided by the MC server
 
 Translations added: 
