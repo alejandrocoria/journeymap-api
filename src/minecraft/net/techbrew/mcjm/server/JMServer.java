@@ -51,6 +51,7 @@ public class JMServer {
 		rupy.add(new MapService());
 		rupy.add(new SaveMapService()); 
 		rupy.add(new FileService());
+		rupy.add(new PropertyService());
 		
 		// Initialize daemon
 		rupy.init();

@@ -39,6 +39,12 @@ public class JsonHelper {
 		return toJson(list.toArray());
 	}
 	
+	public static String toJson(Object obj) {
+		final StringBuffer sb = new StringBuffer();
+		wrap(sb, obj);
+		return sb.toString();
+	}
+	
 	public static String toJson(Object[] arr) {
 		final StringBuffer sb = new StringBuffer("[");
 		final int size = arr.length;
