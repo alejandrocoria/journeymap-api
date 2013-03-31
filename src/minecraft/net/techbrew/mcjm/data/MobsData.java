@@ -51,7 +51,7 @@ public class MobsData implements IDataProvider {
 		for(IMob mob : mobs) {
 			EntityLiving entity = (EntityLiving) mob;
 			LinkedHashMap eProps = new LinkedHashMap();
-			eProps.put(EntityKey.type, entity.getEntityName()); 
+			eProps.put(EntityKey.filename, EntityHelper.getFileName(entity)); 
 			if(mob instanceof EntityMob || mob instanceof IBossDisplayData || mob instanceof IRangedAttackMob) {
 				eProps.put(EntityKey.hostile, true); 
 			} else {

@@ -2,7 +2,7 @@ package net.techbrew.mcjm.data;
 
 public enum EntityKey {
 	root,
-	type,
+	filename,
 	hostile,
 	posX, 
 	posY, 

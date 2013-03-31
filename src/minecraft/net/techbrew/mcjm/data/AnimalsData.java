@@ -66,7 +66,7 @@ public class AnimalsData implements IDataProvider {
 		for(IAnimals animal : animals) {
 			EntityLiving entity = (EntityLiving) animal;
 			LinkedHashMap eProps = new LinkedHashMap();
-			eProps.put(EntityKey.type, entity.getEntityName()); 
+			eProps.put(EntityKey.filename, EntityHelper.getFileName(entity)); 
 			eProps.put(EntityKey.hostile, false);
 			eProps.put(EntityKey.posX, (int) entity.posX); 
 			eProps.put(EntityKey.posZ, (int) entity.posZ); 

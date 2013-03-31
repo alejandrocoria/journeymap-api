@@ -97,6 +97,7 @@ public class FileHandler {
 		try {
 			String png = FileHandler.WEB_DIR + "/img/" + fileName;//$NON-NLS-1$
 			InputStream is = EntityHelper.class.getResourceAsStream(png);
+			if(is==null) return null;
 			BufferedImage img = ImageIO.read(is);
 			is.close();
 			return img;

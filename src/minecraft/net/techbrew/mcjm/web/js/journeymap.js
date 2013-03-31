@@ -1085,7 +1085,7 @@ var JourneyMap = (function() {
 				mobLocator = petMobImage;
 				ctx.strokeStyle = "#0000ff";
 			} else if (mob.hostile !== true) {
-				if (showAnimals === false && !(mob.type === 'Villager'))
+				if (showAnimals === false && !(mob.filename === 'villager.png'))
 					return;
 				mobLocator = neutralMobImage;
 				ctx.strokeStyle = "#cccccc";
@@ -1097,8 +1097,8 @@ var JourneyMap = (function() {
 			ctx.lineWidth = 2;
 			ctx.beginPath();
 			var radius = 32;
-			var type = mob.type;
-			if (type === 'Ghast' || type === 'Dragon' || type === 'Wither') {
+			var filename = mob.filename;
+			if (filename === 'ghast.png' || filename === 'ender.png' || filename === 'wither.png') {
 				radius = 48;
 			}
 
@@ -1119,7 +1119,7 @@ var JourneyMap = (function() {
 			ctx.globalAlpha = 1.0;
 
 			// Get pre-loaded image, or lazy-load as needed
-			var mobImage = mobImages[type];
+			var mobImage = mobImages[filename];
 			if (!mobImage) {
 				mobImage = new Image();
 				mobImage['class'] = 'mobImage';
@@ -1127,8 +1127,8 @@ var JourneyMap = (function() {
 
 					this.src = 'img/entity/unknown.png';
 				});
-				mobImage.src = 'img/entity/' + type + '.png';
-				mobImages[type] = mobImage;
+				mobImage.src = 'img/entity/' + filename;
+				mobImages[filename] = mobImage;
 			}
 
 			// Draw if image exists

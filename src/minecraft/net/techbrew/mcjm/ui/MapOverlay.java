@@ -820,7 +820,7 @@ public class MapOverlay extends GuiScreen {
 				int cx, cz, x, z;
 				double heading;
 				BufferedImage entityIcon, locatorImg;
-				String type, owner;
+				String filename, owner;
 				Boolean isHostile, isPet, isPlayer;
 				boolean filterAnimals = (showAnimals!=showPets);
 				
@@ -839,14 +839,14 @@ public class MapOverlay extends GuiScreen {
 					}
 					
 					if(inBounds(critter)) {						
-						type = (String) critter.get(EntityKey.type);
+						filename = (String) critter.get(EntityKey.filename);
 						cx = (Integer) critter.get(EntityKey.chunkCoordX);
 						cz = (Integer) critter.get(EntityKey.chunkCoordZ);
 						x = (Integer) critter.get(EntityKey.posX);
 						z = (Integer) critter.get(EntityKey.posZ);
 						heading = (Double) critter.get(EntityKey.heading);
 						
-						isPlayer = EntityHelper.PLAYER_TYPE.equals(type);
+						isPlayer = EntityHelper.PLAYER_FILENAME.equals(filename);
 								
 						// Determine and draw locator
 						if(isHostile) {
@@ -862,7 +862,7 @@ public class MapOverlay extends GuiScreen {
 						drawEntity(cx, x, cz, z, heading, locatorImg, g2D);
 						
 						// Draw entity image
-						entityIcon = EntityHelper.getEntityImage(type);
+						entityIcon = EntityHelper.getEntityImage(filename);
 						g2D.setComposite(MapBlocks.OPAQUE);
 						drawEntity(cx, x, cz, z, 0.0, entityIcon, g2D);
 						

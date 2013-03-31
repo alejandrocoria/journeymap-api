@@ -28,7 +28,7 @@ import net.techbrew.mcjm.io.FileHandler;
 
 public class EntityHelper {
 	
-	public static final String PLAYER_TYPE = "Player";
+	public static final String PLAYER_FILENAME = "char.png";
 	
 	// TODO: make threadsafe
 	static BufferedImage locatorHostile, locatorNeutral, locatorOther, locatorPet, locatorPlayer;
@@ -123,14 +123,14 @@ public class EntityHelper {
 	 * TODO: Not threadsafe
 	 * @return
 	 */
-	public static BufferedImage getEntityImage(String entityName) {
-		BufferedImage img = entityImageMap.get(entityName);
+	public static BufferedImage getEntityImage(String filename) {
+		BufferedImage img = entityImageMap.get(filename);
 		if(img==null) {
-			img = FileHandler.getImage("entity/" + entityName + ".png");	//$NON-NLS-1$ //$NON-NLS-2$
+			img = FileHandler.getImage("entity/" + filename);	//$NON-NLS-1$ //$NON-NLS-2$
 			if(img==null) {
 				img = getUnknownImage(); // fall back to unknown image
 			}			
-			entityImageMap.put(entityName, img);
+			entityImageMap.put(filename, img);
 		}
 		return img;
 	}
@@ -196,7 +196,7 @@ public class EntityHelper {
 	 * @return
 	 */
 	public static BufferedImage getUnknownImage() {
-		return FileHandler.getImage("alert.png");
+		return FileHandler.getImage("unknown.png");
 	}
 	
 	
@@ -224,5 +224,17 @@ public class EntityHelper {
 		double degrees = Math.round(rotationYaw % 360);
 	    double radians = (degrees * Math.PI) / 180;
 	    return radians;
+	}
+	
+	
+	/**
+	 * Get the simple name of the entity (without Entity prefix)
+	 * @param entity
+	 * @return
+	 */
+	public static String getFileName(Entity entity) {
+		String tex = entity.getTexture();
+		int i = tex.lastIndexOf('/');
+		return tex.substring(i+1);
 	}
 }

@@ -53,7 +53,7 @@ public class PlayersData implements IDataProvider {
 			list = new ArrayList<Map>(others.size());
 			for(EntityPlayer other : others) {
 				LinkedHashMap otherProps = new LinkedHashMap();
-				otherProps.put(EntityKey.type, EntityHelper.PLAYER_TYPE); 
+				otherProps.put(EntityKey.filename, EntityHelper.PLAYER_FILENAME); 
 				otherProps.put(EntityKey.username, other.username);
 				otherProps.put(EntityKey.posX, (int) other.posX); 
 				otherProps.put(EntityKey.posY, (int) other.posY); 
