@@ -140,11 +140,12 @@ var JourneyMap = (function() {
 						window.open(url, '_new', '');
 					});
 					
+					// Show update button
 					if (JM.game.latest_journeymap_version > JM.game.jm_version) {
-						// TODO: This is sloppy L10N
-						$("#updateButton").attr("title", JM.messages.update_available 
-								        + " : JourneyMap " + JM.game.latest_journeymap_version 
-								        + " for Minecraft " + JM.game.mc_version);
+						var text = getMessage('.update_button_title');
+						text = text.replace("{0}", JM.game.latest_journeymap_version);
+						text = text.replace("{1}", JM.game.mc_version);
+						$("#updateButton").attr("title", text);
 						$("#updateButton").delay(2000).slideDown();
 					}
 
@@ -260,16 +261,15 @@ var JourneyMap = (function() {
 
 		sizeMap();
 
-		// Set page language, although at this point it may be too late to
-		// matter.
+		// Set page language
 		$('html').attr('lang', JM.messages.locale.split('_')[0]);
 
 		// Set RSS feed title
-		$("link #rssfeed").attr("title", JM.messages.rss_feed_title);
+		$("link #rssfeed").attr("title", getMessage('rss_feed_title'));
 
 		// Init Day/Night button
-		$("#dayNightText").html(JM.messages.day_button_title);
-		$("#dayNightButton").attr("title", JM.messages.day_button_desc);
+		$("#dayNightText").html(getMessage('day_button_text'));
+		$("#dayNightButton").attr("title", getMessage('day_button_title'));
 		$("#dayNightButton").click(function() {
 			playerOverrideMap = true;
 			if(showLight===true) {
@@ -279,85 +279,53 @@ var JourneyMap = (function() {
 			}
 		});
 
-		// html(JM.messages.follow_button_title)
-		$("#followButton").attr("title", JM.messages.follow_button_desc).click(function() {
-
+		// Follow button
+		$("#followButton").attr("title", getMessage('follow_button_title')).click(function() {
 			setCenterOnPlayer(!centerOnPlayer);
 			refreshMap();
 		});
 
-		$("#monstersButton").attr("title", "<b>" + JM.messages.monsters_button_title + "</b><br/>" + JM.messages.monsters_button_desc);
 
-		$("#saveButton").attr("title", JM.messages.save_button_title).click(function() {
 
-			saveMapImage();
-		});
-
-		$("#aboutButton").attr("title", JM.messages.about_button_title);
-
-		$("#rssLink").attr("title", JM.messages.rss_feed_desc);
-		$("#rssLinkText").html(JM.messages.rss_feed_title);
-
-		$("#emailLink").attr("title", JM.messages.email_sub_desc);
-		$("#emailLinkText").html(JM.messages.email_sub_title);
-
-		$("#twitterLink").attr("title", JM.messages.follow_twitter);
-		$("#twitterLinkText").html(JM.messages.follow_twitter);
-
-		// Tooltip for slider
-		var tooltip = $('<div id="slider-tooltip" />').css({
-			width : '1em',
-			textAlign : 'center',
-			position : 'absolute',
-			top : 0,
-			left : 0
-		}).hide();
-
-		// Slider
-		$("#slider-vertical").slider({
-			orientation : "vertical",
-			range : "min",
-			title : JM.messages.zoom_slider_name,
-			min : minMapScale,
-			max : maxMapScale,
-			value : mapScale,
-			slide : function(event, ui) {
-
-				tooltip.text(ui.value);
-				setZoom(ui.value);
-			}
-		}).find(".ui-slider-handle").append(tooltip).hover(function() {
-
-			tooltip.show()
-		}, function() {
-
-			tooltip.hide()
-		});
+		// JourneyMap menu / homepage link
+		$("#webLink").attr("title", getMessage('web_link_title'));
+		$("#webLinkText").html(getMessage('web_link_text'));
 		
-		$("#worldInfo").hide();
-		$("#worldNameTitle").html(JM.messages.worldname_title);
-		$("#worldTimeTitle").html(JM.messages.worldtime_title);
-		$("#playerBiomeTitle").html(JM.messages.biome_title);
-		$("#playerLocationTitle").html(JM.messages.location_title);
-		$("#playerElevationTitle").html(JM.messages.elevation_title);
+		// JourneyMap menu / forums link
+		$("#forumLink").attr("title", getMessage('forum_link_title'));
+		$("#forumLinkText").html(getMessage('forum_link_text'));
+		
+		// JourneyMap menu / RSS feed link
+		$("#rssLink").attr("title", getMessage('rss_feed_title'));
+		$("#rssLinkText").html(getMessage('rss_feed_text'));
 
-		$("#showMenuText").html(JM.messages.show_menu_text);
-		// $("#smoothPixelsMenuItem").html(JM.messages.smooth_pixels_menu_item);		
-		$("#cavesMenuItem").html(JM.messages.cave_button_title);
-		$("#cavesMenuItem").prop('title', JM.messages.cave_button_desc);
-		$("#animalsMenuItem").html(JM.messages.animals_menu_item);
-		$("#petsMenuItem").html(JM.messages.pets_menu_item);
-		$("#mobsMenuItem").html(JM.messages.mobs_menu_item);
-		$("#villagersMenuItem").html(JM.messages.villagers_menu_item);
-		$("#playersMenuItem").html(JM.messages.players_menu_item);
+		// JourneyMap menu / Email subscription link
+		$("#emailLink").attr("title", getMessage('email_sub_title'));
+		$("#emailLinkText").html(getMessage('email_sub_text'));
 
+		// JourneyMap menu / Follow on Twitter link
+		$("#twitterLink").attr("title", getMessage('follow_twitter_title'));
+		$("#twitterLinkText").html(getMessage('follow_twitter_text'));
+		
+		// JourneyMap menu / Donate link
+		$("#donateLink").attr("title", getMessage('donate_title'));
+		$("#donateLinkText").html(getMessage('donate_text'));
+
+		// Show menu
+		$("#showMenuText").html(getMessage('show_menu_text'));
 		$("#showMenu").click(function(event) {
 			event.stopPropagation();
 		});
-
-		// Test canvas to see if smooth scaling can be toggled
-		var ctx = bgCanvas.getContext("2d");
-
+		
+		// Show menu items
+		setTextAndTitle("#cavesMenuItem", "caves_menu_item_text", "caves_menu_item_title");
+		setTextAndTitle("#animalsMenuItem", "animals_menu_item_text", "animals_menu_item_title");
+		setTextAndTitle("#petsMenuItem", "pets_menu_item_text", "pets_menu_item_title");
+		setTextAndTitle("#mobsMenuItem", "mobs_menu_item_text", "mobs_menu_item_title");
+		setTextAndTitle("#villagersMenuItem", "villagers_menu_item_text", "villagers_menu_item_title");
+		setTextAndTitle("#playersMenuItem", "players_menu_item_text", "players_menu_item_title");
+		
+		// Show menu checkboxes
 		$("#checkShowCaves").prop('checked', true)		
 		$("#checkShowCaves").click(function(event) {
 			setShowCaves(this.checked === true);
@@ -393,6 +361,40 @@ var JourneyMap = (function() {
 			showPlayers = (this.checked === true);
 			drawMap();
 		});
+		
+		// Save map button
+		$("#saveButton").attr("title", getMessage('save_button_title')).click(function() {
+			saveMapImage();
+		});
+		
+		// Tooltip for slider
+		var tooltip = $('<div id="slider-tooltip" />').hide();
+
+		// Slider
+		$("#slider-vertical").slider({
+			orientation : "vertical",
+			range : "min",
+			min : minMapScale,
+			max : maxMapScale,
+			value : mapScale,
+			slide : function(event, ui) {
+				tooltip.text(ui.value);
+				setZoom(ui.value);
+			}
+		}).prop('title', getMessage('zoom_slider_name'))
+		.find(".ui-slider-handle").append(tooltip).hover(function() {
+			tooltip.show()
+		}, function() {
+			tooltip.hide()
+		});
+		
+		// World info
+		$("#worldInfo").hide();
+		$("#worldNameLabel").html(getMessage('worldname_text'));
+		$("#worldTimeLabel").html(getMessage('worldtime_text'));
+		$("#playerBiomeLabel").html(getMessage('biome_text'));
+		$("#playerLocationLabel").html(getMessage('location_text'));
+		$("#playerElevationLabel").html(getMessage('elevation_text'));
 
 		// Init images
 		initImages();
@@ -425,6 +427,13 @@ var JourneyMap = (function() {
 		// Continue
 		initWorld();
 
+	}
+	
+	/**
+	 * Set text and title on same object
+	 */
+	var setTextAndTitle = function(selector, text, title) {
+		$(selector).html(getMessage(text)).prop('title', getMessage(title));
 	}
 
 	/**
@@ -601,8 +610,8 @@ var JourneyMap = (function() {
 			$("#header").removeClass("navbar-inverse");
 			$("#dayNightButton").removeClass("inverse");
 			$("#dayNightButton").addClass("btn-warning");
-			$("#dayNightText").html(JM.messages.day_button_title);
-			$("#dayNightButton").attr("title", JM.messages.day_button_desc);			
+			$("#dayNightText").html(getMessage('day_button_text'));
+			$("#dayNightButton").attr("title", getMessage('day_button_title'));			
 		} else if (mapType === "night") {
 			if (showLight === true)
 				return;
@@ -610,8 +619,8 @@ var JourneyMap = (function() {
 			$("#header").addClass("navbar-inverse");
 			$("#dayNightButton").addClass("inverse");
 			$("#dayNightButton").removeClass("btn-warning");
-			$("#dayNightText").html(JM.messages.night_button_title);
-			$("#dayNightButton").attr("title", JM.messages.night_button_desc);
+			$("#dayNightText").html(getMessage('night_button_text'));
+			$("#dayNightButton").attr("title", getMessage('night_button_title'));
 		} else {
 			if (JM.debug)
 				console.log(">>> " + "Error: Can't set mapType: " + mapType);
@@ -668,33 +677,11 @@ var JourneyMap = (function() {
 			$("#playerBiome").html(JM.player.biome);
 			$("#playerLocation").html(JM.player.posX + "," + JM.player.posZ);
 
-			$("#playerElevationTitle").attr('title', JM.messages.elevation_title + " " + (JM.player.posY >> 4));
+			$("#playerElevationLabel").attr('title', getMessage('slice_text') + " " + (JM.player.posY >> 4));
 			$("#playerElevation").html(JM.player.posY + "&nbsp;(" + (JM.player.posY >> 4) + ")");
 
-			// Interpret data
-			var dimensionName = "";
-			if (JM.world.dimension === -1) {
-				dimensionName = JM.messages.world_name_nether;
-			} else if (JM.world.dimension === 1) {
-				dimensionName = JM.messages.world_name_end;
-			}
-
-			var timeCycleInfo = "";
-			if (JM.world.dimension === 0) {
-				if (JM.world.time < 12000) {
-					timeCycleInfo = JM.messages.sunset_begins;
-				} else if (JM.world.time < 13800) {
-					timeCycleInfo = JM.messages.night_begins;
-				} else if (JM.world.time < 22200) {
-					timeCycleInfo = JM.messages.sunrise_begins;
-				} else if (JM.world.time < 23999) {
-					timeCycleInfo = JM.messages.day_begins;
-				}
-			}
-
 			// 0 is the start of daytime, 12000 is the start of sunset, 13800 is
-			// the
-			// start of nighttime, 22200 is the start of sunrise, and 24000 is
+			// the start of nighttime, 22200 is the start of sunrise, and 24000 is
 			// daytime again.
 			var allsecs = JM.world.time / 20;
 			var mins = Math.floor(allsecs / 60);
@@ -833,6 +820,18 @@ var JourneyMap = (function() {
 			timerId = null;
 		}
 	}
+	
+	/**
+	 * Get L10N message by key
+	 */
+	var getMessage = function(key) {
+		if(!JM.messages || !JM.messages[key]) {
+			console.log("Missing L10N message: " + key);
+			return "!" + key + "!";
+		} else {
+			return JM.messages[key];
+		}
+	}
 
 	// Ajax request got an error from the server
 	var handleError = function(data, error, jqXHR) {
@@ -864,7 +863,7 @@ var JourneyMap = (function() {
 
 		var displayError;
 		if (data.status === 503 || data.status === 0) {
-			displayError = JM.messages.error_world_not_opened;
+			displayError = getMessage('error_world_not_opened');
 		} else {
 			displayError = "";
 		}
