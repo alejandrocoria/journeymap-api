@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.minecraft.client.Minecraft;
+import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
@@ -47,13 +49,15 @@ public class JMLogger extends Logger {
 	/**
 	 * Show system properties and those from the PropertyManager.
 	 */
-	public void showEnvironmentProperties() {
+	public void environment() {
 		
 		info("os.name = " + System.getProperty("os.name") + //$NON-NLS-1$ //$NON-NLS-2$
 			", os.arch = " + System.getProperty("os.arch") +  //$NON-NLS-1$ //$NON-NLS-2$
 			", user.country = " + System.getProperty("user.country") + //$NON-NLS-1$ //$NON-NLS-2$
 			", user.language = " + System.getProperty("user.language") + //$NON-NLS-1$ //$NON-NLS-2$
 			", java.version = " + System.getProperty("java.version")); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		info("Game settings language: " + Minecraft.getMinecraft().gameSettings.language + " / Locale: " + Constants.getLocale());
 	}
 	
 	

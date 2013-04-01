@@ -114,7 +114,7 @@ public class JourneyMap extends BaseMod {
 
 		// Start logFile
 		getLogger().info("JourneyMap v" + JM_VERSION + " starting " + new Date()); //$NON-NLS-1$ //$NON-NLS-2$
-		logger.showEnvironmentProperties();
+		logger.environment();
 		logger.info("Properties: " + PropertyManager.getInstance().toString()); //$NON-NLS-1$
 
 		// Check Modloader version

@@ -28,10 +28,13 @@ public class Constants {
 	public static Locale getLocale() {
 		String language = Minecraft.getMinecraft().gameSettings.language;
 		Locale locale = null;
-		if(language==null) {
+		if(language==null || language.length()==0) {
 			locale = Locale.getDefault();
-		} else if(language.equals("en_PT")) {
-			locale = new Locale("en", "PT");
+		} else if(language.contains("_")) {
+			// workaround for odd behavior where country name is lowercased during locale creation
+			// if allowed to parse xx_YY by itself
+			String[] parts = language.split("_");
+			locale = new Locale(parts[0], parts[1]);
 		} else {
 			locale = new Locale(language);
 		}
