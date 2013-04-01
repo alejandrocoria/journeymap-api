@@ -1,4 +1,4 @@
-JourneyMap 2.1b1 for Minecraft 1.5.1 (March 31, 2013)
+JourneyMap 2.1b2 for Minecraft 1.5.1 (April 2, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -12,10 +12,14 @@ Requirements:
 - ModLoader or Forge
 
 Changes in JourneyMap 2.1 for Minecraft 1.5:
+- Added "donate" link to Web UI in the JourneyMap menu
+- Added hover text to Web UI menu items
+- Tweaked Web UI appearance of World Info area
 - In-game map options (preferences) now saved in journeyMap.properties file
 - journeyMap.properties file now uses underscores in properties name. Legacy files will be converted to use new names.
 - Bugfix (EQ9-WMJ-4EXQ) for errors when switching to German language
 - Updated German translation, thanks to Maik Ploigt!
+- Cleaned up English message bundle names, updated Web UI to use new names
 
 Changes in JourneyMap 2.0.1 for Minecraft 1.5:
 - Bugfix (XVD-5GX-H9DG) for webserver errors (ZipFileException) on Linux, Mac.  Unzipping the mod no longer needed!
