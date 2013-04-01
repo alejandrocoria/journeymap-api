@@ -156,4 +156,11 @@ public class PlayerData implements IDataProvider {
 	public long getTTL() {
 		return TTL;
 	}
+	
+	/**
+	 * Return false by default. Let cache expired based on TTL.
+	 */
+	public boolean dataExpired() {
+		return false;
+	}
 }

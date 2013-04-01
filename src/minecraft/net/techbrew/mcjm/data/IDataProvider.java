@@ -28,4 +28,10 @@ public interface IDataProvider {
 	 * @return
 	 */
 	public long getTTL();
+	
+	/**
+	 * Whether the data has expired for any reason.
+	 * @return
+	 */
+	public boolean dataExpired();
 }

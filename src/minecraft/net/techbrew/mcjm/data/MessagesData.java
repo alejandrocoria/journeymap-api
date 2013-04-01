@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import net.minecraft.client.Minecraft;
 import net.techbrew.mcjm.Constants;
 
 /**
@@ -23,11 +24,14 @@ public class MessagesData implements IDataProvider {
 	public static enum Key {
 		messages;
 	}
+	
+	private final String lang;
 
 	/**
 	 * Constructor.
 	 */
 	public MessagesData() {
+		lang = Minecraft.getMinecraft().gameSettings.language;
 	}
 	
 	/**
@@ -66,4 +70,10 @@ public class MessagesData implements IDataProvider {
 		return TTL;
 	}
 	
+	/**
+	 * Return true if language has changed.
+	 */
+	public boolean dataExpired() {
+		return !Minecraft.getMinecraft().gameSettings.language.equals(lang);
+	}
 }

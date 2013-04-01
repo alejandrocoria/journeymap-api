@@ -144,11 +144,13 @@ public class DataCache {
      */
     private class DataHolder {
 
+    	private final IDataProvider dp;
     	private final long expires;
     	private final Map data;
     	private final String jsonData;
     	
     	DataHolder(IDataProvider dp) {
+    		this.dp = dp;
         	data = Collections.unmodifiableMap(dp.getMap());
         	jsonData = JsonHelper.toJson(data);
         	expires = System.currentTimeMillis() + dp.getTTL(); 		
@@ -159,7 +161,7 @@ public class DataCache {
     	}
     	
     	public boolean hasExpired() {
-    		return expires<=System.currentTimeMillis();
+    		return dp.dataExpired() || expires<=System.currentTimeMillis();
     	}
 
     	public Map getData() {
