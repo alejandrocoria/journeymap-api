@@ -60,6 +60,7 @@ var JourneyMap = (function() {
 	var JM = {
 		debug : false,
 		messages : null,
+		properties : null,
 		game : null,
 		mobs : [],
 		animals : [],
@@ -100,15 +101,38 @@ var JourneyMap = (function() {
 			console.log(">>> " + "initMessages");
 
 		$.ajax({
-			url : "/data/messages",
+			
+			url : "/properties",
 			dataType : "jsonp",
 			contentType : "application/javascript; charset=utf-8",
 			async : false
+			
 		}).fail(handleError).done(function(data, textStatus, jqXHR) {
+			JM.properties = data;
+			
+			// Set global vars of prefs
+			showCaves = JM.properties.preference_show_caves;
+			showMobs = JM.properties.preference_show_mobs;
+			showAnimals = JM.properties.preference_show_animals;
+			showVillagers = JM.properties.preference_show_villagers;
+			showPets = JM.properties.preference_show_pets;
+			showPlayers = JM.properties.preference_show_players;
+			
+			// Get L10N messages
+			$.ajax({
+				url : "/data/messages",
+				dataType : "jsonp",
+				contentType : "application/javascript; charset=utf-8",
+				async : false
+			}).fail(handleError).done(function(data, textStatus, jqXHR) {
 
-			JM.messages = data;
-			initGame();
+				JM.messages = data;
+				initGame();
+			});
+			
 		});
+		
+		
 	}
 
 	/**
@@ -285,8 +309,6 @@ var JourneyMap = (function() {
 			refreshMap();
 		});
 
-
-
 		// JourneyMap menu / homepage link
 		$("#webLink").attr("title", getMessage('web_link_title'));
 		$("#webLinkText").html(getMessage('web_link_text'));
@@ -326,39 +348,45 @@ var JourneyMap = (function() {
 		setTextAndTitle("#playersMenuItem", "players_menu_item_text", "players_menu_item_title");
 		
 		// Show menu checkboxes
-		$("#checkShowCaves").prop('checked', true)		
+		$("#checkShowCaves").prop('checked', showCaves)		
 		$("#checkShowCaves").click(function(event) {
-			setShowCaves(this.checked === true);
+			showCaves = (this.checked === true);
+			postPreference("preference_show_caves", showCaves);
+			setShowCaves(showCaves);
 		});
 		
 		$("#checkShowAnimals").prop('checked', showAnimals)
 		$("#checkShowAnimals").click(function(event) {
 			showAnimals = (this.checked === true);
+			postPreference("preference_show_animals", showAnimals);			
 			drawMap();
 		});
 
 		$("#checkShowPets").prop('checked', showPets)
 		$("#checkShowPets").click(function(event) {
-			event.stopPropagation();
 			showPets = (this.checked === true);
+			postPreference("preference_show_pets", showPets);			
 			drawMap();
 		});
 
 		$("#checkShowMobs").prop('checked', showMobs)
 		$("#checkShowMobs").click(function() {
 			showMobs = (this.checked === true);
+			postPreference("preference_show_mobs", showMobs);			
 			drawMap();
 		});
 
 		$("#checkShowVillagers").prop('checked', showVillagers)
 		$("#checkShowVillagers").click(function() {
 			showVillagers = (this.checked === true);
+			postPreference("preference_show_villagers", showVillagers);			
 			drawMap();
 		});
 
 		$("#checkShowPlayers").prop('checked', showPlayers)
 		$("#checkShowPlayers").click(function() {
 			showPlayers = (this.checked === true);
+			postPreference("preference_show_players", showPlayers);			
 			drawMap();
 		});
 		
@@ -427,6 +455,24 @@ var JourneyMap = (function() {
 		// Continue
 		initWorld();
 
+	}
+	
+	/**
+	 * Post preference to server
+	 */
+	var postPreference = function(prefName, prefValue) {
+		
+		$.ajax({
+		  type: "POST",
+		  url: "/properties",
+		  data: prefName +"="+ prefValue
+		}).fail(function(data, error, jqXHR){
+			if (JM.debug)
+				console.log(">>> postPreference failed: " + data.status, error);
+		}).done(function(){
+			if (JM.debug)
+				console.log(">>> postPreference done: " + prefName);
+		});
 	}
 	
 	/**

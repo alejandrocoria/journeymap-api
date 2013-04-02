@@ -43,8 +43,13 @@ public class PropertyManager {
 		
 		private final String property;
 		private final String defaultValue;
+		private final boolean isBoolean;
+		private final boolean isNumeric;
+		
 		private Key(String property, Object defaultValue) {
 			this.property = property;
+			isNumeric = (defaultValue instanceof Number);
+			isBoolean = (defaultValue instanceof Boolean);
 			this.defaultValue = defaultValue.toString();
 		}
 		
@@ -54,6 +59,23 @@ public class PropertyManager {
 		
 		String getDefault() {
 			return defaultValue;
+		}
+		
+		public boolean isBoolean() {
+			return isBoolean;
+		}
+		
+		public boolean isNumeric() {
+			return isNumeric;
+		}
+		
+		public static Key lookup(String propName) {
+			for(Key key : Key.values()) {
+				if(key.getProperty().equals(propName)) {
+					return key;
+				}
+			}
+			return null;
 		}
 	}
 	
@@ -84,8 +106,22 @@ public class PropertyManager {
 		writeToFile();
 	}
 	
-	public Map getProperties() {
-		return Collections.unmodifiableMap(properties);
+	/**
+	 * Get a normalized, type-safe view of the properties.
+	 * @return
+	 */
+	public Map<String, Object> getProperties() {
+		HashMap<String, Object> map = new HashMap<String,Object>(properties.size());
+		for(Key key : Key.values()) {
+			if(key.isBoolean) {
+				map.put(key.getProperty(), getBoolean(key));
+			} else if(key.isNumeric) {
+				map.put(key.getProperty(), getInteger(key));
+			} else {
+				map.put(key.getProperty(), getString(key));
+			}
+		}
+		return map;
 	}
 	
 	private Properties getDefaultProperties() {

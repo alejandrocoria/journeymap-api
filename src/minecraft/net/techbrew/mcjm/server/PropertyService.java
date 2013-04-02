@@ -71,23 +71,6 @@ public class PropertyService extends BaseService {
 
 	public static final String CALLBACK_PARAM = "callback";  //$NON-NLS-1$	
 	
-	public static final String BASEPATH = "/property"; //$NON-NLS-1$	
-	
-	public static final String combinedPath;
-	
-	static {
-		// Compose path string used by RupyService
-		StringBuffer sb = new StringBuffer();
-		sb.append(BASEPATH).append(":"); //$NON-NLS-1$	
-		
-		String keyProp;
-		for(PropertyManager.Key key : PropertyManager.Key.values()) {
-			keyProp = key.getProperty();			
-			sb.append(BASEPATH).append("/").append(keyProp).append(":"); //$NON-NLS-1$	//$NON-NLS-2$	
-		}
-		combinedPath = sb.toString();
-	}
-	
 	/**
 	 * Serves / saves property info
 	 */
@@ -97,21 +80,21 @@ public class PropertyService extends BaseService {
 	
 	@Override
 	public String path() {
-		return combinedPath;
+		return "/properties";
 	}
 	
 	@Override
 	public void filter(Event event) throws Event, Exception {
 
 		// Parse query for parameters
-		Query query = event.query();
+		Query query = event.query();	
 		query.parse();
 		String path = query.path();
 		
-		if(query.method()==Query.PUT) {
+		if(query.method()==Query.POST) {
 			post(event);
 			return;
-		} else if(query.method()==Query.PUT) {
+		} else if(query.method()!=Query.GET) {
 			throw new Exception("HTTP method not allowed");
 		}
 		
@@ -127,29 +110,39 @@ public class PropertyService extends BaseService {
 			jsonData.append("data="); //$NON-NLS-1$	
 		}	
 		
-		if(path.equals(BASEPATH)) {		
-			jsonData.append(JsonHelper.toJson(PropertyManager.getInstance().getProperties()));
-		} else {
-			String key = path.split(BASEPATH)[1].split("/")[1];
-			String value = JsonHelper.toJson(PropertyManager.getInstance().getProperties().get(key));
-			jsonData.append("{").append(key).append(":").append(value).append("}");
-		}		
+		// Put map into json form
+		jsonData.append(JsonHelper.toJson(PropertyManager.getInstance().getProperties()));	
 		
 		// Finish function call for JsonP if needed
 		if(useJsonP) {
 			jsonData.append(")"); //$NON-NLS-1$
+			
+			// Optimize headers for JSONP
+			ResponseHeader.on(event).noCache().contentType(ContentType.jsonp);
 		}
-		
-		// Optimize headers for JSONP
-		ResponseHeader.on(event).noCache().contentType(ContentType.jsonp);
-				
+
 		// Gzip response
 		gzipResponse(event, jsonData.toString());
 	}
 	
-	public void post(Event event) throws Event, Exception {
+	public void post(Event event) throws Exception {
 		
-		
+		try {
+			Query query = event.query();
+			String[] param = query.parameters().split("=");
+			if(param.length!=2) throw new Exception("Expected single key-value pair");
+			PropertyManager pm = PropertyManager.getInstance();
+			PropertyManager.Key key = PropertyManager.Key.lookup(param[0]);
+			if(key!=null) {
+				// todo: type check param value
+				pm.setProperty(key, param[1]);
+				JourneyMap.getLogger().info("Updated property: " + param[0] + "=" + param[01]);
+			} else {
+				throw new Exception("Unknown property key: " + param[0]);
+			}
+		} catch(Exception e) {
+			throw e;
+		}
 	}
 	
 }
