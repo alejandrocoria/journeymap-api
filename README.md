@@ -57,6 +57,15 @@ The end result will be in `journeymap/dist/JourneyMap*.zip`
 * Copy the `JourneyMap*.zip` to your `.minecraft/mods` folder
 * Run Minecraft.  You should see an announcement in the chat window that JourneyMap is running.
 
+## Recover files after running MCP clean or update scrips
+
+* First, stage+commit+push everything that has been changed
+* If you're running Eclipse, it might be good to shut it down to prevent it from keeping file handles
+* Run MCP clean/update script (either will delete the src directory)
+* Git reset your branch to HEAD using the Git GUI (Branch menu -> Reset) or:
+    git reset --hard HEAD^
+
+
 [1]: https://bitbucket.org/mwoodman/journeymap
 [2]: http://journeymap.techbrew.net
 [3]: http://minecraft.net
