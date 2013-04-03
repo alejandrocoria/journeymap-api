@@ -14,6 +14,7 @@ logs/
 reobf/
 runtime/
 src/minecraft/argo/
+src/minecraft/reifnsk/
 src/minecraft/net/minecraft/client/
 src/minecraft/net/minecraft/server/
 src/minecraft/net/minecraft/src/*
