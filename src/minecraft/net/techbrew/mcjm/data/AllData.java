@@ -21,6 +21,7 @@ public class AllData implements IDataProvider {
 		player,
 		players,
 		villagers,
+		waypoints,
 		world;
 	}
 
@@ -48,6 +49,7 @@ public class AllData implements IDataProvider {
 		props.put(Key.players, cache.get(PlayersData.class).get(EntityKey.root));
 		props.put(Key.villagers, cache.get(VillagersData.class).get(EntityKey.root));
 		props.put(Key.world, cache.get(WorldData.class));
+		props.put(Key.waypoints, cache.get(WaypointsData.class).get(EntityKey.root));
 		
 		return props;		
 	}

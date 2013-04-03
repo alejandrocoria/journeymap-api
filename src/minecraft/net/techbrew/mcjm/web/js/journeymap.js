@@ -22,6 +22,7 @@ var JourneyMap = (function() {
 	var showMobs = true;
 	var showVillagers = true;
 	var showPlayers = true;
+	var showWaypoints = true;
 
 	var mapBackground = "#222";
 
@@ -65,7 +66,8 @@ var JourneyMap = (function() {
 		mobs : [],
 		animals : [],
 		players : [],
-		villagers : []
+		villagers : [],
+		waypoints : []
 	};
 	
 	var isTouchable = !!('ontouchstart' in window) || !!('onmsgesturechange' in window);
@@ -117,6 +119,7 @@ var JourneyMap = (function() {
 			showVillagers = JM.properties.preference_show_villagers;
 			showPets = JM.properties.preference_show_pets;
 			showPlayers = JM.properties.preference_show_players;
+			showWaypoints = JM.properties.preference_show_waypoints;
 			
 			// Get L10N messages
 			$.ajax({
@@ -346,6 +349,7 @@ var JourneyMap = (function() {
 		setTextAndTitle("#mobsMenuItem", "mobs_menu_item_text", "mobs_menu_item_title");
 		setTextAndTitle("#villagersMenuItem", "villagers_menu_item_text", "villagers_menu_item_title");
 		setTextAndTitle("#playersMenuItem", "players_menu_item_text", "players_menu_item_title");
+		setTextAndTitle("#waypointsMenuItem", "waypoints_menu_item_text", "waypoints_menu_item_title");
 		
 		// Show menu checkboxes
 		$("#checkShowCaves").prop('checked', showCaves)		
@@ -353,6 +357,13 @@ var JourneyMap = (function() {
 			showCaves = (this.checked === true);
 			postPreference("preference_show_caves", showCaves);
 			setShowCaves(showCaves);
+		});
+		
+		$("#checkShowWaypoints").prop('checked', showWaypoints)		
+		$("#checkShowWaypoints").click(function(event) {
+			showWaypoints = (this.checked === true);
+			postPreference("preference_show_waypoints", showWaypoints);
+			drawMap();
 		});
 		
 		$("#checkShowAnimals").prop('checked', showAnimals)
@@ -717,6 +728,7 @@ var JourneyMap = (function() {
 			JM.player = data.player;
 			JM.players = data.players;
 			JM.villagers = data.villagers;
+			JM.waypoints = data.waypoints;
 			JM.world = data.world;
 
 			// Update UI
@@ -1026,6 +1038,9 @@ var JourneyMap = (function() {
 
 		// other players
 		drawMultiplayers(canvasWidth, canvasHeight);
+		
+		// waypoints
+		drawWaypoints(canvasWidth, canvasHeight);
 
 		// player
 		drawPlayer();
@@ -1241,7 +1256,7 @@ var JourneyMap = (function() {
 
 					// show image
 					var otherImage = new Image();
-					otherImage.src = "/img/entity/Player.png";
+					otherImage.src = "/img/entity/char.png";
 					otherImage['class'] = 'mobImage';
 					otherImage.title = other.username;
 					otherImage.style.position = "absolute";
@@ -1258,6 +1273,115 @@ var JourneyMap = (function() {
 		});
 
 	}
+	
+	// Draw the location of waypoints
+	var drawWaypoints = function(canvasWidth, canvasHeight) {
+
+		if (JM.debug)
+			console.log(">>> " + "drawWaypoints");
+
+		if(!showWaypoints==true)
+			return;
+		
+		var waypoints = JM.waypoints;
+		if (!waypoints)
+			return;
+
+		if (!canvasWidth || !canvasHeight) {
+			canvasWidth = getCanvasWidth();
+			canvasHeight = getCanvasHeight();
+		}
+
+		var ctx = fgCanvas.getContext("2d");
+		var diameter = 8;
+
+		// Draw waypoints
+		$.each(waypoints, function(index, waypoint) {
+
+			var x = getScaledChunkX(waypoint.x / 16) - (mapScale / 2);
+			var z = getScaledChunkZ(waypoint.z / 16) - (mapScale / 2);
+			var outofbounds = false;
+			var min = diameter;
+			
+			if(x<0) {
+				x = 0;
+				outofbounds = true;
+			} else if(x > canvasWidth) {
+				x = canvasWidth;
+				outofbounds = true;
+			}
+			
+			if(z<0) {
+				z = 0;
+				outofbounds = true;
+			} else if(z > canvasHeight) {
+				z = canvasHeight;
+				outofbounds = true;
+			}
+			
+			if(!waypoint.color) {
+				waypoint.color = "rgb(" 
+					+ waypoint.r + "," 
+					+ waypoint.g + "," 
+					+ waypoint.b + ")";    
+			}
+			
+			// Draw waypoint
+			ctx.strokeStyle = "#000";
+			ctx.lineWidth = 2;
+			ctx.fillStyle = waypoint.color;
+			
+			if(!outofbounds) {
+				
+				// Draw marker
+				ctx.beginPath();
+				ctx.moveTo(x-diameter, z);
+				ctx.lineTo(x, z-diameter);
+				ctx.lineTo(x+diameter, z);
+				ctx.lineTo(x, z+diameter);
+				ctx.lineTo(x-diameter, z);
+				ctx.closePath();
+				ctx.fill();
+				ctx.stroke();
+				
+				ctx.globalAlpha = 0.1;
+				ctx.strokeStyle = "#fff";
+				ctx.beginPath();
+				ctx.moveTo(x-diameter, z);
+				ctx.lineTo(x+diameter, z);
+				ctx.moveTo(x, z-diameter);
+				ctx.lineTo(x, z+diameter);
+				ctx.closePath();
+				ctx.stroke();
+			
+				// Draw label background			
+				ctx.font = "bold 12px Arial";
+				ctx.textAlign = "center";
+				ctx.fillStyle = "#000";
+				
+				var labelZ = z - (diameter*2)+2; 
+				
+				// Get label dimensions
+				var metrics = ctx.measureText(waypoint.name);
+				var width = metrics.width + 6;
+				ctx.globalAlpha = 0.7;
+				ctx.fillRect(x-(width/2), labelZ-12, width, 16);
+				
+				// Draw label
+				ctx.globalAlpha = 1.0;
+				ctx.fillStyle = "#fff";
+				ctx.fillText(waypoint.name, x, labelZ);
+			} else {
+				ctx.beginPath();
+				ctx.arc(x, z, diameter, 0, Math.PI * 2, true);
+				ctx.closePath();
+				ctx.fill();
+				ctx.stroke();
+			}
+		});
+
+	}
+	
 
 	// Draw the map image to the background canvas
 	var drawBackgroundCanvas = function(canvasWidth, canvasHeight) {

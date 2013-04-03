@@ -48,6 +48,7 @@ import net.techbrew.mcjm.data.MobsData;
 import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.data.PlayersData;
 import net.techbrew.mcjm.data.VillagersData;
+import net.techbrew.mcjm.data.WaypointsData;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
@@ -58,7 +59,7 @@ import net.techbrew.mcjm.server.BaseService.ResponseHeader;
 import net.techbrew.mcjm.ui.ZoomLevel;
 
 /**
- * Provide player data
+ * Provide data for the Web UI
  * 
  * @author mwoodman
  *
@@ -83,6 +84,7 @@ public class DataService extends BaseService {
 		providerMap.put("/data/players", PlayersData.class);  //$NON-NLS-1$
 		providerMap.put("/data/world", WorldData.class);  //$NON-NLS-1$
 		providerMap.put("/data/villagers", VillagersData.class);  //$NON-NLS-1$
+		providerMap.put("/data/waypoints", WaypointsData.class);  //$NON-NLS-1$
 		
 		// Compose path string used by RupyService
 		StringBuffer sb = new StringBuffer();

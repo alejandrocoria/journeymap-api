@@ -39,7 +39,8 @@ public class PropertyManager {
 		PREF_SHOW_ANIMALS("preference_show_animals", true), //$NON-NLS-1$
 		PREF_SHOW_VILLAGERS("preference_show_villagers", true), //$NON-NLS-1$
 		PREF_SHOW_PETS("preference_show_pets", true), //$NON-NLS-1$
-		PREF_SHOW_PLAYERS("preference_show_players", true); //$NON-NLS-1$
+		PREF_SHOW_PLAYERS("preference_show_players", true), //$NON-NLS-1$
+		PREF_SHOW_WAYPOINTS("preference_show_waypoints", true); //$NON-NLS-1$
 		
 		private final String property;
 		private final String defaultValue;
