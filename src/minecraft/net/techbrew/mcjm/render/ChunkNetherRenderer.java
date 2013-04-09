@@ -98,14 +98,14 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 					} else {
 						lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z);
 						if(y==sliceMaxY) {
-							paintBlock(x, z, Color.BLACK, g2D);
+							paintBlock(x, z, Color.BLACK, g2D);							
 							continue;
 						} else if (lightLevel < 3) {
 							lightLevel = 3;
 						}
 					}			
 					
-					if(!isLava) {
+					if(true) {
 						// Contour shading
 						// Get slope of block and prepare to shade
 						float slope, s, sN, sNW, sW, sAvg, shaded;
@@ -123,7 +123,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 							} else if(slope>sAvg) {
 								slope = (slope+sAvg)/2f;
 							}
-							s = Math.max(slope * .8f, .1f);
+							s = Math.max(slope * .9f, .2f);
 							color = shade(color, s);
 		
 						} else if(slope>1) {
@@ -134,7 +134,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 								}
 							}
 							s = (float) slope * 1.2f;
-							s = Math.min(s, 1.4f);
+							s = Math.min(s, 1.2f);
 							color = shade(color, s);
 						}
 					}
@@ -169,7 +169,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 	@Override
 	public int getHeightInSlice( final ChunkStub chunkStub, final int x, final int z, final int sliceMinY, final int sliceMaxY) {
 		boolean hasAir = false;
-		int blockId;
+		int blockId = 0;
 		
 		int y = sliceMaxY;
 		for (; y > 0; y--) {
@@ -180,21 +180,20 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 				continue;
 			}
 			
-			if(blockId == 10 || blockId == 11 || blockId==51) { // lava or fire
-				if(hasAir) {
-					break;
-				} else {
-					return sliceMaxY;
-				}				
+			if(blockId==51) { // fire
+				y--;
+				break;
 			}
 			
 			if (hasAir) {
 				break;
-			} else if (y <= sliceMinY) {
+			}
+			
+			if (y <= sliceMinY) {
 				y = sliceMaxY;
 				break;
 			}			
-		}
+		}	
 		return y;
 	}
 	
