@@ -26,6 +26,7 @@ import net.minecraft.src.IBossDisplayData;
 import net.minecraft.src.IMob;
 import net.minecraft.src.IRangedAttackMob;
 import net.minecraft.src.MathHelper;
+import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
 
 public class EntityHelper {
@@ -133,7 +134,7 @@ public class EntityHelper {
 		BufferedImage img = entityImageMap.get(filename);
 		if(img==null) {
 			img = FileHandler.getImage("entity/" + filename);	//$NON-NLS-1$ //$NON-NLS-2$
-			if(img==null) {
+			if(img==null) {				
 				img = getUnknownImage(); // fall back to unknown image
 			}			
 			entityImageMap.put(filename, img);

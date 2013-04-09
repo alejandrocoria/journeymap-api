@@ -912,8 +912,10 @@ public class MapOverlay extends GuiScreen {
 						
 						// Draw entity image
 						entityIcon = EntityHelper.getEntityImage(filename);
-						g2D.setComposite(MapBlocks.OPAQUE);
-						drawEntity(cx, x, cz, z, 0.0, entityIcon, g2D);
+						if(entityIcon!=null) {
+							g2D.setComposite(MapBlocks.OPAQUE);
+							drawEntity(cx, x, cz, z, 0.0, entityIcon, g2D);
+						}
 						
 						if(isPlayer) {
 							
