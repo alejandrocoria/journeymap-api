@@ -57,15 +57,16 @@ public class JourneyMap extends BaseMod {
 	static final String VERSION_URL = "http://goo.gl/cAxxs"; //$NON-NLS-1$
 
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-	public static final String JM_VERSION = "2.1b4"; //$NON-NLS-1$
-	public static final String ML_VERSION = "ModLoader 1.5"; //$NON-NLS-1$
-	public static final String MC_VERSION = "1.5"; //$NON-NLS-1$
+	public static final String JM_VERSION = "2.1b5"; //$NON-NLS-1$
+	public static final String ML_VERSION = "ModLoader 1.5.1"; //$NON-NLS-1$
+	public static final String MC_VERSION = "1.5.1"; //$NON-NLS-1$
 
+	private static volatile Boolean initialized = false;
+	
 	private static Boolean modAnnounced = false;
 	private static JMLogger logger;
 	private static JMServer jmServer;
 
-	public volatile Properties remoteWorldProperties = new Properties();
 	public static volatile ChunkStub lastPlayerChunk;
 
 	// Invokes MapOverlay
@@ -92,14 +93,13 @@ public class JourneyMap extends BaseMod {
 	private static ScheduledExecutorService chunkExecutor;
 
 	// Announcements
-	private static List<String> announcements = Collections.synchronizedList(new LinkedList<String>());
+	private static List<String> announcements;
 
 	/**
 	 * Constructor.
 	 */
 	public JourneyMap() {
-		ModLoader.setInGameHook(this, true, false);
-		ModLoader.setInGUIHook(this, true, false);
+		
 	}
 
 	@Override
@@ -110,76 +110,71 @@ public class JourneyMap extends BaseMod {
 	@Override
 	public void load() 
 	{		
-		Minecraft minecraft = Minecraft.getMinecraft();
+		announcements = Collections.synchronizedList(new LinkedList<String>());
+		ModLoader.setInGameHook(this, true, false);
+		ModLoader.setInGUIHook(this, true, false);
+	}
+	
+	/**
+	 * Initialize
+	 */
+	private void initialize(Minecraft minecraft) {
 
-		// Start logFile
-		getLogger().info("JourneyMap v" + JM_VERSION + " starting " + new Date()); //$NON-NLS-1$ //$NON-NLS-2$
-		logger.environment();
-		logger.info("Properties: " + PropertyManager.getInstance().toString()); //$NON-NLS-1$
+		synchronized(initialized) {
 
-		// Check Modloader version
-		//		if(!ModLoader.VERSION.equals(ML_VERSION)) {
-		//			String error = Constants.getMessageJMERR01(JourneyMap.JM_VERSION , JourneyMap.ML_VERSION);
-		//			ModLoader.getLogger().severe(error);
-		//			getLogger().severe(error);
-		//			throw new IllegalStateException(error);
-		//		} else {
-		//			logger.info(ModLoader.VERSION + " detected."); //$NON-NLS-1$
-		//		}
+			// Start logFile
+			getLogger().info("JourneyMap v" + JM_VERSION + " starting " + new Date()); //$NON-NLS-1$ //$NON-NLS-2$
+			logger.environment();
+			logger.info("Properties: " + PropertyManager.getInstance().toString()); //$NON-NLS-1$
 
-		// Packet Handler
-		//channelClient = new ChannelClient(this);
+			// Use property settings
+			chunkDelay = PropertyManager.getInstance().getInteger(PropertyManager.Key.UPDATETIMER_CHUNKS);
+			enableAnnounceMod = PropertyManager.getInstance().getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED); 
 
-		// Use property settings
-		chunkDelay = PropertyManager.getInstance().getInteger(PropertyManager.Key.UPDATETIMER_CHUNKS);
-
-		enableAnnounceMod = PropertyManager.getInstance().getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED); 
-
-		// Map GUI keycode
-		int mapGuiKeyCode = PropertyManager.getInstance().getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
-		enableMapGui = PropertyManager.getInstance().getBoolean(PropertyManager.Key.MAPGUI_ENABLED); 
-		if(enableMapGui) {
-			keybinding = new KeyBinding("JourneyMap", mapGuiKeyCode); //$NON-NLS-1$
-			ModLoader.registerKey(this, keybinding, false);
-		}
-
-		// Register custom packet channel
-		//ModLoader.registerPacketChannel(this, ChannelClient.CHANNEL_NAME);
-
-		// Register listener for events which signal possible world change
-		//
-
-		// Webserver
-		enableWebserver = PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
-		if(enableWebserver) {
-			try {			
-				//new LibraryLoader().loadLibraries();
-				jmServer = new JMServer();
-				jmServer.start();			
+			// Map GUI keycode
+			int mapGuiKeyCode = PropertyManager.getInstance().getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
+			enableMapGui = PropertyManager.getInstance().getBoolean(PropertyManager.Key.MAPGUI_ENABLED); 
+			if(enableMapGui) {
+				keybinding = new KeyBinding("JourneyMap", mapGuiKeyCode); //$NON-NLS-1$
+				ModLoader.registerKey(this, keybinding, false);
 			}
-			catch(Throwable e) {
-				getLogger().throwing("JourneyMap", "constructor", e); //$NON-NLS-1$ //$NON-NLS-2$
-				JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(e));
-				announce(Constants.getMessageJMERR24()); 
-				enableWebserver = false;
+
+			// Webserver
+			enableWebserver = PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
+			if(enableWebserver) {
+				try {			
+					//new LibraryLoader().loadLibraries();
+					jmServer = new JMServer();
+					jmServer.start();			
+				}
+				catch(Throwable e) {
+					getLogger().throwing("JourneyMap", "constructor", e); //$NON-NLS-1$ //$NON-NLS-2$
+					JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(e));
+					announce(Constants.getMessageJMERR24()); 
+					enableWebserver = false;
+				}
 			}
+
+			// Check for newer version online
+			if(VersionCheck.getVersionIsCurrent()==false) {
+				announce(Constants.getString("JourneyMap.new_version_available", WEBSITE_URL)); //$NON-NLS-1$
+			}
+
+			initialized = true;
+			
+			// Override log level now that loading complete
+			logger.info("Initialization complete."); //$NON-NLS-1$
+			logger.setLevelFromProps();
 		}
-
-		// Check for newer version online
-		if(VersionCheck.getVersionIsCurrent()==false) {
-			announce(Constants.getString("JourneyMap.new_version_available", WEBSITE_URL)); //$NON-NLS-1$
-		}
-
-		// Override log level now that loading complete
-		logger.info("Load complete."); //$NON-NLS-1$
-		logger.setLevelFromProps();
-
-
 	}
 
 	@Override
 	public boolean onTickInGUI(float f, Minecraft minecraft, GuiScreen guiscreen) {
 		try {
+			
+			if(!initialized) {
+				initialize(minecraft);
+			}
 
 			if(!running) return true;
 
