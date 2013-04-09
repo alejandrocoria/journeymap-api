@@ -6,10 +6,10 @@
   "version": "2.1b5",
   "mcversion": "1.5.1",
   "logoFile": "/net/techbrew/mcjm/web/ico/apple-touch-icon.png",
-  "url": "journeymap.techbrew.net",
+  "url": "http://journeymap.techbrew.net/",
   "updateUrl": "",
-  "authors": ["Mark Woodman (techbrew)"],
-  "credits": [],
+  "authors": ["Mark Woodman"],
+  "credits": "See http://journeymap.techbrew.net/credits/",
   "parent": "",
   "screenshots": [],
   "dependencies": []
