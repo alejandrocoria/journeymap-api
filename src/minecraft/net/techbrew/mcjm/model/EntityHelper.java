@@ -28,6 +28,7 @@ import net.minecraft.src.IRangedAttackMob;
 import net.minecraft.src.MathHelper;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
+import net.techbrew.mcjm.io.PropertyManager;
 
 public class EntityHelper {
 	
@@ -39,8 +40,8 @@ public class EntityHelper {
 	// TODO: make threadsafe
 	static HashMap<String, BufferedImage> entityImageMap = new HashMap<String, BufferedImage>();
 
-	private static int lateralDistance = 32;
-	private static int verticalDistance = 8;
+	private static int lateralDistance = PropertyManager.getInstance().getInteger(PropertyManager.Key.CHUNK_OFFSET) * 8;
+	private static int verticalDistance = lateralDistance/2;
 	
 	public static List getMobsNearby() {
 		Minecraft mc = Minecraft.getMinecraft();
@@ -108,7 +109,7 @@ public class EntityHelper {
 	 * @return
 	 */
 	private static AxisAlignedBB getBB(EntityPlayerSP player) {
-		return AxisAlignedBB.getBoundingBox(player.posX, player.posY, player.posZ, player.posX + 1.0D, player.posY + 1.0D, player.posZ + 1.0D).expand(lateralDistance, verticalDistance, lateralDistance);
+		return AxisAlignedBB.getBoundingBox(player.posX, player.posY, player.posZ, player.posX, player.posY, player.posZ).expand(lateralDistance, verticalDistance, lateralDistance);
 	}
 	
 	
