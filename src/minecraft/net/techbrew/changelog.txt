@@ -1,4 +1,4 @@
-JourneyMap 2.1b4 for Minecraft 1.5.1 (April 8, 2013)
+JourneyMap 2.1b5 for Minecraft 1.5.1 (April 9, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -12,8 +12,8 @@ Requirements:
 - ModLoader or Forge
 
 Changes in JourneyMap 2.1 for Minecraft 1.5:
+- New Feature (5ZA-ZYN-B26M): Displays Rei's Minimap or VoxelMap (formerly Zan Minimap) waypoints
 - Improved Nether, End, and Cave mapping with contour shading
-- Support for Rei's Minimap waypoints: If Rei's is running, its waypoints will be displayed in JourneyMap
 - Entities now remain visible while dragging the in-game map, releasing the drag no longer causes "jitter" 
 - In-game map UI adjusted to make off-screen waypoint markers easier to see
 - Map options in-game now shown over the map
@@ -22,7 +22,9 @@ Changes in JourneyMap 2.1 for Minecraft 1.5:
 - Tweaked Web UI appearance of World Info area
 - Improved rendering of End worlds
 - Radar range (for mobs, players, etc) has been extended to be 1/2 of the mapping radius (horizontal) and 1/4 mapping radius (vertical)
+- Dragons and Ghasts are now larger on map radar
 - Bugfix that prevented Dragons from showing on the map
+- Bugfix (LNP-8PW-SBZV) for in-game map when VoxelMap is loaded
 - Bugfix (EQ9-WMJ-4EXQ) for errors when switching to German language
 - Updated German translation, thanks to Maik Ploigt!
 - Updated Russian translation, thanks to Dzmitry Zhemchuhou!
