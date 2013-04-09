@@ -273,10 +273,10 @@ var JourneyMap = (function() {
 			event.preventDefault();
 			var e = event.originalEvent;
 
-			if (e.scale < 1.0 && mapScale < maxMapScale) {
+			if (e.scale > 1.0 && mapScale < maxMapScale) {
 				$(LoadingIcon).show();
 				setZoom(mapScale + 1);
-			} else if (e.scale >= 1.0 && mapScale > minMapScale) {
+			} else if (e.scale <= 1.0 && mapScale > minMapScale) {
 				$(LoadingIcon).show();
 				setZoom(mapScale - 1);
 			}
