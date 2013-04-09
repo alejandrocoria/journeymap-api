@@ -15,6 +15,7 @@ Source code and build resources for [JourneyMap][2] ([http://journeymap.techbrew
 
 Check out the JourneyMap GIT repo to what will become your MCP workspace.  For example:
 
+    git config core.ignorecase false
     git clone https://mwoodman@bitbucket.org/mwoodman/journeymap.git mcp
     
 Note: The 'mcp' directory name at the end of the git clone command is just to avoid having 'journeymap/journeymap' in your project structure, and serves as a reminder where the MCP files need to go.
