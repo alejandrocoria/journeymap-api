@@ -42,8 +42,9 @@ Note: The 'mcp' directory name at the end of the git clone command is just to av
 ### 1. Checklist before you build
 
 * Update `eclipse/Client/build.xml` version info
+* Update `src/minecraft/net/minecraft/src/mcmod.info` version info
 * Update `src/minecraft/net/techbrew/mcjm/JourneyMap.java` version info
-* Update `src/minecraft/net/techbrew/changelog.txt`
+* Update `src/minecraft/net/techbrew/changelog.txt` version info and details
 
 ### 2. Build using Ant from Eclipse
 
@@ -64,7 +65,7 @@ The end result will be in `journeymap/dist/JourneyMap*.zip`
 * Run MCP clean/update script (either will delete the src directory)
 * Git reset your branch to HEAD using the Git GUI (Branch menu -> Reset) or:
 
-    git reset --hard HEAD^
+    `git reset --hard HEAD^`
 
 
 [1]: https://bitbucket.org/mwoodman/journeymap

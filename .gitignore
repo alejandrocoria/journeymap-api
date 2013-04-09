@@ -19,6 +19,7 @@ src/minecraft/net/minecraft/client/
 src/minecraft/net/minecraft/server/
 src/minecraft/net/minecraft/src/*
 !src/minecraft/net/minecraft/src/mod_JourneyMap.java
+!src/minecraft/net/minecraft/src/mcmod.info
 src/minecraft/org/
 src/minecraft/Start.java
 src/minecraft_server/
