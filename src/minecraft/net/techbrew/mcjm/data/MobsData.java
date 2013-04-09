@@ -46,9 +46,9 @@ public class MobsData implements IDataProvider {
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayerSP player = mc.thePlayer;			
 	   
-		List<IMob> mobs = EntityHelper.getMobsNearby();
+		List mobs = EntityHelper.getMobsNearby();
 		List<Map> list = new ArrayList<Map>(mobs.size());
-		for(IMob mob : mobs) {
+		for(Object mob : mobs) {
 			EntityLiving entity = (EntityLiving) mob;
 			LinkedHashMap eProps = new LinkedHashMap();
 			eProps.put(EntityKey.filename, EntityHelper.getFileName(entity)); 

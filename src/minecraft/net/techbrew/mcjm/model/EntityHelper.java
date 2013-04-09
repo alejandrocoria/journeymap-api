@@ -22,7 +22,9 @@ import net.minecraft.src.EntityTameable;
 import net.minecraft.src.EntityVillager;
 import net.minecraft.src.EntityWaterMob;
 import net.minecraft.src.IAnimals;
+import net.minecraft.src.IBossDisplayData;
 import net.minecraft.src.IMob;
+import net.minecraft.src.IRangedAttackMob;
 import net.minecraft.src.MathHelper;
 import net.techbrew.mcjm.io.FileHandler;
 
@@ -39,10 +41,14 @@ public class EntityHelper {
 	private static int lateralDistance = 32;
 	private static int verticalDistance = 8;
 	
-	public static List<IMob> getMobsNearby() {
+	public static List getMobsNearby() {
 		Minecraft mc = Minecraft.getMinecraft();
 		
-		return mc.theWorld.getEntitiesWithinAABB(IMob.class, getBB(mc.thePlayer));
+		AxisAlignedBB bb = getBB(mc.thePlayer);
+		List list = mc.theWorld.getEntitiesWithinAABB(IMob.class, bb);
+		list.addAll(mc.theWorld.getEntitiesWithinAABB(IBossDisplayData.class, bb));
+		list.addAll(mc.theWorld.getEntitiesWithinAABB(IRangedAttackMob.class, bb));		
+		return list;
 	}
 	
 	public static List<EntityVillager> getVillagersNearby() {
