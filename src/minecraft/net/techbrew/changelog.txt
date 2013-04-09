@@ -1,4 +1,4 @@
-JourneyMap 2.1b4 for Minecraft 1.5.1 (April 3, 2013)
+JourneyMap 2.1b4 for Minecraft 1.5.1 (April 8, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -12,10 +12,16 @@ Requirements:
 - ModLoader or Forge
 
 Changes in JourneyMap 2.1 for Minecraft 1.5:
-- Support for Rei's Minimap waypoints: If Rei's is running, its waypoints will be displayed in JourneyMap 
+- Improved Nether, End, and Cave mapping with contour shading
+- Support for Rei's Minimap waypoints: If Rei's is running, its waypoints will be displayed in JourneyMap
+- Entities now remain visible while dragging the in-game map, releasing the drag no longer causes "jitter" 
+- In-game map UI adjusted to make off-screen waypoint markers easier to see
+- Map options in-game now shown over the map
 - Map options now saved in journeyMap.properties file and synchronized between web UI and in-game UI
 - Added hover text to Web UI menu items
 - Tweaked Web UI appearance of World Info area
+- Improved rendering of End worlds
+- Bugfix that prevented Dragons from showing on the map
 - Bugfix (EQ9-WMJ-4EXQ) for errors when switching to German language
 - Updated German translation, thanks to Maik Ploigt!
 - Updated Russian translation, thanks to Dzmitry Zhemchuhou!
@@ -23,6 +29,7 @@ Changes in JourneyMap 2.1 for Minecraft 1.5:
 - Can now refresh web UI after language changed (without the need to restart Minecraft)
 - Added "donate" link to Web UI in the JourneyMap menu
 - journeyMap.properties file now uses underscores in properties name. Older files will be converted to use new names.
+- Added mcmod.info file for Forge users
 
 Changes in JourneyMap 2.0.1 for Minecraft 1.5:
 - Bugfix (XVD-5GX-H9DG) for webserver errors (ZipFileException) on Linux, Mac.  Unzipping the mod no longer needed!
