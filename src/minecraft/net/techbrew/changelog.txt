@@ -21,6 +21,7 @@ Changes in JourneyMap 2.1 for Minecraft 1.5:
 - Added hover text to Web UI menu items
 - Tweaked Web UI appearance of World Info area
 - Improved rendering of End worlds
+- Radar range (for mobs, players, etc) has been extended to be 1/2 of the mapping radius (horizontal) and 1/4 mapping radius (vertical)
 - Bugfix that prevented Dragons from showing on the map
 - Bugfix (EQ9-WMJ-4EXQ) for errors when switching to German language
 - Updated German translation, thanks to Maik Ploigt!
