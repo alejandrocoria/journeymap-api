@@ -45,6 +45,7 @@
     </copy>
     <copy todir="${build.dir}" failonerror="true" verbose="true">
       <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/" includes="changelog.txt" />
+      <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/" includes="mcmod.info" />
     </copy>
     <copy todir="${build.dir}/net/techbrew/mcjm" failonerror="true" verbose="true">
       <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/mcjm" includes="*.properties" />
