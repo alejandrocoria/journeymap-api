@@ -35,7 +35,6 @@ public class MapOverlayOptions extends GuiScreen {
 	MapButton buttonSave,buttonClose,buttonAlert,buttonBrowser;
 	
 	public MapOverlayOptions(MapOverlay map) {
-		super();
 		this.map = map;
 		title = Constants.getString("MapOverlay.options_title", JourneyMap.JM_VERSION);
 	}

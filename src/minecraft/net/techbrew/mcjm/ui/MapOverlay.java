@@ -1289,8 +1289,15 @@ public class MapOverlay extends GuiScreen {
 	}
 	
 	void showOptions() {
-		options = new MapOverlayOptions(this);
-		options.setWorldAndResolution(this.mc, width, height);
+		if(options==null) {
+			try {
+				options = new MapOverlayOptions(this);
+				options.setWorldAndResolution(this.mc, width, height);
+			} catch (Throwable t) {
+				JourneyMap.getLogger().severe("Couldn't init Map options: " + LogFormatter.toString(t));
+				options = null;
+			}
+		}
 	}
 
 }
