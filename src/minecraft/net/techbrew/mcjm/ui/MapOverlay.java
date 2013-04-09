@@ -154,10 +154,7 @@ public class MapOverlay extends GuiScreen {
 		setZoom(currentZoomIndex);
 	}
 
-	private void drawButtonBar() {
-//		drawRectangle(0,0,width,20,mapBackground[0],mapBackground[1],mapBackground[2],mapBackground[3]);
-//		drawRectangle(0,21,width,2,50,50,50,100);
-		
+	private void drawButtonBar() {		
 		// zoom underlay
 		if(options==null) {
 			drawRectangle(3,25,20,55,0,0,0,150);
@@ -180,10 +177,12 @@ public class MapOverlay extends GuiScreen {
 
 			drawBackground(0);
 			drawMap();
-			drawEntityLayer();
-			drawButtonBar();		
-			if(options==null) {
+			drawEntityLayer();		
+			drawButtonBar();	
+			if(options==null) {				
 				super.drawScreen(i, j, f);
+			} else {
+				options.drawScreen(i, j, f);
 			}
 			drawPlayerInfo();
 			lastWidth = width;
@@ -195,10 +194,6 @@ public class MapOverlay extends GuiScreen {
 			JourneyMap.announce(error);
 		} finally {
 			mc.gameSettings.guiScale = oldGuiScale;
-		}
-		
-		if(options!=null) {
-			options.drawScreen(i, j, f);
 		}
 	}
 
@@ -661,6 +656,8 @@ public class MapOverlay extends GuiScreen {
 
 		if(options==null) {
 			drawButtonBar();
+		} else {
+			options.drawBackground(0);
 		}
 
 	}

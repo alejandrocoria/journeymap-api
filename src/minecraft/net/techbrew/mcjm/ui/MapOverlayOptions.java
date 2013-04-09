@@ -1,6 +1,7 @@
 package net.techbrew.mcjm.ui;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 import net.minecraft.src.GuiAchievements;
 import net.minecraft.src.GuiButton;
@@ -255,18 +256,32 @@ public class MapOverlayOptions extends GuiScreen {
      */
     @Override
     public void drawScreen(int par1, int par2, float par3)
-    {
+    {        
+        drawBackground(0);
+        
+        layoutButtons();
+        
+        super.drawScreen(par1, par2, par3);
+
+        drawTitle();
+        
+    }
+    
+    @Override
+	public void drawBackground(int layer)
+	{    	
+    	
+	}
+    
+    private void drawTitle() {
     	int labelWidth = mc.fontRenderer.getStringWidth(title) + 10;
 		int halfBg = width/2;
 		
 		int by = (this.height / 4);
 		
+		GL11.glEnable(GL11.GL_BLEND);
 		map.drawRectangle(halfBg - (labelWidth/2), by-20, labelWidth, 12, 0, 0, 100, 255);    	
-        this.drawCenteredString(this.fontRenderer, title , this.width / 2, by-18, 16777215);
-        
-        layoutButtons();
-        
-        super.drawScreen(par1, par2, par3);
+		map.drawCenteredString(this.fontRenderer, title , this.width / 2, by-18, 16777215);
     }
     
     @Override
