@@ -301,5 +301,49 @@ public abstract class BaseRenderer {
 		
 		return chunk;
 	}
+	
+	/**
+	 * Darken a color by a factor, add a blue tint.
+	 * @param original
+	 * @param factor
+	 * @return
+	 */
+	public final Color shade(Color original, float factor) {
+		
+		if(factor<0) {
+			throw new IllegalArgumentException("factor can't be negative");
+		}
+		
+		float bluer = (factor>=1) ? 1f : .8f;
+		
+		float[] rgb = new float[4];
+		rgb = original.getRGBColorComponents(rgb);
+		return new Color(
+				mapBlocks.safeColor(rgb[0] * bluer * factor),
+				mapBlocks.safeColor(rgb[1] * bluer * factor),
+				mapBlocks.safeColor(rgb[2] * factor));
+		
+	}
+	
+	/**
+	 * Darken a color by a factor, add a blue tint.
+	 * @param original
+	 * @param factor
+	 * @return
+	 */
+	public Color shadeNight(Color original, float factor) {
+		
+		if(factor<0) {
+			throw new IllegalArgumentException("factor can't be negative");
+		}
+		
+		float[] rgb = new float[4];
+		rgb = original.getRGBColorComponents(rgb);
+		return new Color(
+				mapBlocks.safeColor(rgb[0] * factor),
+				mapBlocks.safeColor(rgb[1] * factor),
+				mapBlocks.safeColor(rgb[2] * (factor+.1f)));
+		
+	}
 
 }

@@ -52,25 +52,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	public void render(final Graphics2D g2D, final ChunkStub chunkStub, final boolean underground, 
 			final int vSlice, final Map<Integer, ChunkStub> neighbors) {
 		
-		// Initialize ChunkSub slopes if needed
-		if(chunkStub.slopes==null) {
-			chunkStub.slopes = new float[16][16];
-			float minNorm = chunkStub.worldHeight;
-			float maxNorm = 0;
-			float slope, h, hN, hW;
-			for(int y=0; y<16; y++)
-			{
-				for(int x=0; x<16; x++)
-				{				
-					h = chunkStub.getSafeHeightValue(x, y);
-					hN = (y==0)  ? getBlockHeight(x, y, 0, -1, chunkStub, neighbors, h) : chunkStub.getSafeHeightValue(x, y-1);							
-					hW = (x==0)  ? getBlockHeight(x, y, -1, 0, chunkStub, neighbors, h) : chunkStub.getSafeHeightValue(x-1, y);
-					slope = ((h/hN)+(h/hW))/2f;
-					chunkStub.slopes[x][y] = slope;						
-				}
-			}
-		}
-		
+
 		// Render the chunk image
 		if(underground) {
 			renderUnderground(g2D, chunkStub, vSlice, neighbors);			
@@ -85,7 +67,26 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	 */
 	private void renderSurface(final Graphics2D g2D, final ChunkStub chunkStub, final int vSlice, final Map<Integer, ChunkStub> neighbors) {
 		
-		float slope, s, sN, sNW, sW, sAvg, shaded;
+		float slope, s, sN, sNW, sW, sAvg, shaded, h, hN, hW;
+		
+		// Initialize ChunkSub slopes if needed
+		if(chunkStub.slopes==null) {
+			chunkStub.slopes = new float[16][16];
+			float minNorm = chunkStub.worldHeight;
+			float maxNorm = 0;
+			for(int y=0; y<16; y++)
+			{
+				for(int x=0; x<16; x++)
+				{				
+					h = chunkStub.getSafeHeightValue(x, y);
+					hN = (y==0)  ? getBlockHeight(x, y, 0, -1, chunkStub, neighbors, h) : chunkStub.getSafeHeightValue(x, y-1);							
+					hW = (x==0)  ? getBlockHeight(x, y, -1, 0, chunkStub, neighbors, h) : chunkStub.getSafeHeightValue(x-1, y);
+					slope = ((h/hN)+(h/hW))/2f;
+					chunkStub.slopes[x][y] = slope;						
+				}
+			}
+		}
+		
 		
 		for (int x = 0; x < 16; x++) {
 			blockLoop : for (int z = 0; z < 16; z++) {				
@@ -199,8 +200,32 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	 */
 	public void renderUnderground(final Graphics2D g2D, final ChunkStub chunkStub, final int vSlice, final Map<Integer, ChunkStub> neighbors) {
 		
+		
 		int sliceMinY = Math.max((vSlice << 4) - 1, 0);
-		int defaultSliceMaxY = ((vSlice + 1) << 4) - 1;
+		int sliceMaxY = Math.min(((vSlice + 1) << 4) - 1, chunkStub.worldHeight);
+		if (sliceMinY == sliceMaxY) {
+			sliceMaxY += 2;
+		}
+		
+		// Initialize ChunkSub slopes if needed
+		if(chunkStub.slopes==null) {
+			chunkStub.slopes = new float[16][16];
+			float minNorm = Math.min(((vSlice + 1) << 4) - 1, chunkStub.worldHeight);
+			float maxNorm = 0;
+			float slope, h, hN, hW;
+			
+			for(int z=0; z<16; z++)
+			{
+				for(int x=0; x<16; x++)
+				{									
+					h = getHeightInSlice(chunkStub, x, z, sliceMinY, sliceMaxY);
+					hN = (z==0)  ? getBlockHeight(x, z, 0, -1, chunkStub, neighbors, h, sliceMinY, sliceMaxY) : getHeightInSlice(chunkStub, x, z-1, sliceMinY, sliceMaxY);							
+					hW = (x==0)  ? getBlockHeight(x, z, -1, 0, chunkStub, neighbors, h, sliceMinY, sliceMaxY) : getHeightInSlice(chunkStub, x-1, z, sliceMinY, sliceMaxY);
+					slope = ((h/hN)+(h/hW))/2f;
+					chunkStub.slopes[x][z] = slope;						
+				}
+			}
+		}
 		
 		boolean hasAir;
 		int blockId;
@@ -210,15 +235,15 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		for (int z = 0; z < 16; z++) {
 			
 			blockLoop: for (int x = 0; x < 16; x++) {			
-				try {
-									
-					int sliceMaxY = mapBlocks.topNonSkyBlock(chunkStub, x, defaultSliceMaxY, z) + 1;
+				try {									
+					
+					int blockMaxY = mapBlocks.topNonSkyBlock(chunkStub, x, sliceMaxY, z);				
 
-					hasAir = sliceMaxY<defaultSliceMaxY+1; // This might not be reliable.
-					paintY = sliceMaxY;
+					hasAir = blockMaxY<sliceMaxY+1; // This might not be reliable.
+					paintY = blockMaxY;
 					lightLevel = -1;
 		
-					airloop: for (int y = sliceMaxY; y >= 0; y--) {
+					airloop: for (int y = blockMaxY; y >= 0; y--) {
 														
 						blockId = chunkStub.getBlockID(x, y, z);
 		
@@ -236,10 +261,16 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 							}
 						}						
 						
-						// If lava with no air, do nothing
-						if(!hasAir && (blockId==10 || blockId==11)) {
-							paintBlock(x, z, Color.black, g2D);
-							continue blockLoop;
+						// Lava shortcut
+						if(blockId==10 || blockId==11) {
+							if(!hasAir) {
+								paintBlock(x, z, Color.black, g2D);
+								continue blockLoop;
+							} else {
+								lightLevel = 15;
+								paintY = y;
+								break airloop;
+							}
 						}
 						
 						// Arrived at a solid block with air above it
@@ -263,7 +294,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						}
 					}
 		
-					if (paintY < 0 || !hasAir || lightLevel<1) {
+					if (paintY < 0 || !hasAir || (lightLevel<1 && caveLighting)) {
 						// No air blocks in column at all
 						paintBlock(x, z, Color.black, g2D);
 						continue blockLoop;
@@ -272,6 +303,42 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					// Get block color
 					BlockInfo block = mapBlocks.getBlockInfo(chunkStub, x, paintY, z);
 					Color color = block.color;
+					
+					boolean keepflat = (block.id == 10 || block.id == 11 || block.id==51  || block.id == 8 || block.id == 9); // lava or fire or water
+					
+					if(!keepflat) {
+						// Contour shading
+						// Get slope of block and prepare to shade
+						float slope, s, sN, sNW, sW, sAvg, shaded;
+						slope = chunkStub.slopes[x][z];
+						
+						sN = getBlockSlope(x, z, 0, -1, chunkStub, neighbors, slope);
+						sNW = getBlockSlope(x, z, -1, -1, chunkStub, neighbors, slope);
+						sW = getBlockSlope(x, z, -1, 0, chunkStub, neighbors, slope);
+						sAvg = (sN+sNW+sW)/3f;
+						
+						if(slope<1) {
+							
+							if(slope<=sAvg) {
+								slope = slope*.6f;
+							} else if(slope>sAvg) {
+								slope = (slope+sAvg)/2f;
+							}
+							s = Math.max(slope * .8f, .1f);
+							color = shade(color, s);
+		
+						} else if(slope>1) {
+							
+							if(sAvg>1) {
+								if(slope>=sAvg) {
+									slope = slope*1.2f;
+								}
+							}
+							s = (float) slope * 1.2f;
+							s = Math.min(s, 1.4f);
+							color = shade(color, s);
+						}
+					}
 		
 					// Adjust color for light level
 					if (caveLighting && lightLevel < 15) {
@@ -353,50 +420,87 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		}
 		
 	}
-
-	/**
-	 * Darken a color by a factor, add a blue tint.
-	 * @param original
-	 * @param factor
-	 * @return
-	 */
-	public Color shade(Color original, float factor) {
+	
+	@Override
+	public int getHeightInSlice( final ChunkStub chunkStub, final int x, final int z, final int sliceMinY, final int sliceMaxY) {
 		
-		if(factor<0) {
-			throw new IllegalArgumentException("factor can't be negative");
-		}
+		return mapBlocks.topNonSkyBlock(chunkStub, x, sliceMaxY, z) + 1;
 		
-		float bluer = (factor>=1) ? 1f : .8f;
-		
-		float[] rgb = new float[4];
-		rgb = original.getRGBColorComponents(rgb);
-		return new Color(
-				mapBlocks.safeColor(rgb[0] * bluer * factor),
-				mapBlocks.safeColor(rgb[1] * bluer * factor),
-				mapBlocks.safeColor(rgb[2] * factor));
-		
+//		boolean hasAir = false;
+//		int blockId;
+//		
+//		int y = sliceMaxY;
+//		for (; y > 0; y--) {
+//			blockId = chunkStub.getBlockID(x, y, z);
+//
+//			if (blockId == 0) {
+//				hasAir = true;
+//				continue;
+//			}
+//			
+//			if(blockId == 10 || blockId == 11 || blockId==51  || blockId == 8 || blockId == 9) { // lava or fire or water
+//				if(hasAir) {
+//					break;
+//				} else {
+//					return sliceMaxY;
+//				}				
+//			}
+//			
+//			if (hasAir) {
+//				break;
+//			} else if (y <= sliceMinY) {
+//				y = sliceMaxY;
+//				break;
+//			}			
+//		}
+//		return y;
 	}
 	
 	/**
-	 * Darken a color by a factor, add a blue tint.
-	 * @param original
-	 * @param factor
+	 * Get the height of the block at the coordinates + offsets.  Uses ChunkStub.slopes.
+	 * @param x
+	 * @param z
+	 * @param offsetX
+	 * @param offsetz
+	 * @param currentChunk
+	 * @param neighbors
+	 * @param defaultVal
 	 * @return
 	 */
-	public Color shadeNight(Color original, float factor) {
+	public Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<Integer, ChunkStub> neighbors, float defaultVal, final int sliceMinY, final int sliceMaxY) {
+		int newX = x+offsetX;
+		int newZ = z+offsetz;
 		
-		if(factor<0) {
-			throw new IllegalArgumentException("factor can't be negative");
+		int chunkX = currentChunk.xPosition;
+		int chunkZ = currentChunk.zPosition;
+		boolean search = false;
+		
+		if(newX==-1) {
+			chunkX--;
+			newX = 15;
+			search = true;
+		} else if(newX==16) {
+			chunkX++;
+			newX = 0;
+			search = true;
+		}
+		if(newZ==-1) {
+			chunkZ--;
+			newZ = 15;
+			search = true;
+		} else if(newZ==16) {
+			chunkZ++;
+			newZ = 0;
+			search = true;
 		}
 		
-		float[] rgb = new float[4];
-		rgb = original.getRGBColorComponents(rgb);
-		return new Color(
-				mapBlocks.safeColor(rgb[0] * factor),
-				mapBlocks.safeColor(rgb[1] * factor),
-				mapBlocks.safeColor(rgb[2] * (factor+.1f)));
+		ChunkStub chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
 		
+		if(chunk!=null) {
+			return (float) getHeightInSlice(chunk, newX, newZ, sliceMinY, sliceMaxY);
+		} else {
+			return defaultVal;
+		}
 	}
-
 
 }
