@@ -62,6 +62,7 @@ import net.techbrew.mcjm.data.MobsData;
 import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.data.PlayersData;
 import net.techbrew.mcjm.data.VillagersData;
+import net.techbrew.mcjm.data.WaypointsData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.io.PropertyManager;
@@ -69,7 +70,10 @@ import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.EntityHelper;
+import net.techbrew.mcjm.model.Waypoint;
+import net.techbrew.mcjm.reifnsk.WaypointHelper;
 import net.techbrew.mcjm.render.MapBlocks;
+import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
 
 public class MapOverlay extends GuiScreen {
 	
@@ -101,10 +105,13 @@ public class MapOverlay extends GuiScreen {
 	static Boolean showVillagers = true;
 	static Boolean showPets = true;
 	static Boolean showPlayers = true;
+	static Boolean showWaypoints = true;
 	static Boolean follow = true;
 	static String playerLastPos = "0,0"; //$NON-NLS-1$
 
 	JourneyMap journeyMap;
+	MapOverlayOptions options;
+	
 	int lastWidth = 0;
 	int lastHeight = 0;
 	private BufferedImage lastMapImg;
@@ -120,7 +127,7 @@ public class MapOverlay extends GuiScreen {
 	private BufferedImage lastEntityImg;
 	private Integer lastEntityImgTextureIndex;
 	long lastEntityUpdate = 0;
-	int[] mapBackground = new int[]{0,0,0,200};
+	int[] mapBackground = new int[]{0,0,0,100};
 	
 	MapButton buttonDayNight, buttonFollow,buttonZoomIn,buttonZoomOut;
 	MapButton buttonOptions, buttonClose;
@@ -142,20 +149,20 @@ public class MapOverlay extends GuiScreen {
 		showVillagers = pm.getBoolean(PropertyManager.Key.PREF_SHOW_VILLAGERS);
 		showPets = pm.getBoolean(PropertyManager.Key.PREF_SHOW_PETS);
 		showPlayers = pm.getBoolean(PropertyManager.Key.PREF_SHOW_PLAYERS);
+		showWaypoints = pm.getBoolean(PropertyManager.Key.PREF_SHOW_WAYPOINTS);
 		
 		setZoom(currentZoomIndex);
 	}
 
 	private void drawButtonBar() {
-		drawRectangle(0,0,width,20,mapBackground[0],mapBackground[1],mapBackground[2],mapBackground[3]);
-		drawRectangle(0,21,width,2,50,50,50,100);
+//		drawRectangle(0,0,width,20,mapBackground[0],mapBackground[1],mapBackground[2],mapBackground[3]);
+//		drawRectangle(0,21,width,2,50,50,50,100);
 		
 		// zoom underlay
-		if(mapType==null || mapType.equals(Constants.MapType.day)) {
-			drawRectangle(3,20,20,60,0,0,0,80);
-		} else {
-			drawRectangle(3,20,20,60,0,0,0,80);
+		if(options==null) {
+			drawRectangle(3,25,20,55,0,0,0,150);
 		}
+		
 		if(logoTextureIndex==null) {
 			logoTextureIndex = mc.renderEngine.getTexture(FileHandler.WEB_DIR + "/ico/journeymap40.png");
 		}
@@ -174,8 +181,10 @@ public class MapOverlay extends GuiScreen {
 			drawBackground(0);
 			drawMap();
 			drawEntityLayer();
-			drawButtonBar();			
-			super.drawScreen(i, j, f);
+			drawButtonBar();		
+			if(options==null) {
+				super.drawScreen(i, j, f);
+			}
 			drawPlayerInfo();
 			lastWidth = width;
 			lastHeight = height;
@@ -187,10 +196,20 @@ public class MapOverlay extends GuiScreen {
 		} finally {
 			mc.gameSettings.guiScale = oldGuiScale;
 		}
+		
+		if(options!=null) {
+			options.drawScreen(i, j, f);
+		}
 	}
 
 	@Override
 	protected void actionPerformed(GuiButton guibutton) {
+		
+		if(options!=null) {
+			options.actionPerformed(guibutton);
+			return;
+		}
+		
 		switch(guibutton.id) {
 		case 0: { // day or night			
 			buttonDayNight.toggle();
@@ -240,16 +259,18 @@ public class MapOverlay extends GuiScreen {
 	}
 
 	@Override
-	public void setWorldAndResolution(Minecraft minecraft, int i, int j) {
-		
-
+	public void setWorldAndResolution(Minecraft minecraft, int i, int j) {		
 		super.setWorldAndResolution(minecraft, i, j);
 		hardcore = !minecraft.isSingleplayer() && minecraft.theWorld.getWorldInfo().isHardcoreModeEnabled();
 		initButtons();
 		layoutButtons();
 		setZoom(currentZoomIndex);
 		centerMapOnPlayer();
-
+		
+		if(options!=null) {
+			options.setWorldAndResolution(minecraft, i, j);
+			return;
+		}
 	}
 
 	int bWidth = 16;
@@ -305,18 +326,21 @@ public class MapOverlay extends GuiScreen {
 		//System.out.println("width=" + width + ", startX=" + startX);
 
 		buttonDayNight.xPosition = 30;
+		buttonDayNight.yPosition = 3;
 
 		buttonFollow.xPosition = 120;
+		buttonFollow.yPosition = 3;
+		
+		buttonOptions.xPosition = 210;
+		buttonOptions.yPosition = 3;
 		
 		buttonZoomIn.xPosition = 6;
 		buttonZoomIn.yPosition = 8 + offsetY;
 		buttonZoomOut.xPosition = 6;
 		buttonZoomOut.yPosition = 8 + (offsetY*2);
 
-		
-		
-		buttonOptions.xPosition = endX - 60 - 8 - 60;
-		buttonClose.xPosition = endX - 60;			
+		buttonClose.xPosition = endX - 60;	
+		buttonClose.yPosition = 3;
 		
 		final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
 		buttonDayNight.enabled = !(underground && showCaves);
@@ -328,6 +352,11 @@ public class MapOverlay extends GuiScreen {
 
 	@Override
 	public void handleMouseInput() {
+		
+		if(options!=null) {
+			options.handleMouseInput();
+			//return;
+		}
 
 		mx = (Mouse.getEventX() * width) / mc.displayWidth;
 		my = height - (Mouse.getEventY() * height) / mc.displayHeight - 1;
@@ -350,6 +379,10 @@ public class MapOverlay extends GuiScreen {
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton)
 	{
+		if(options!=null) {
+			//return;
+		}
+		
 		super.mouseClicked(mouseX, mouseY, mouseButton);
 		Boolean guiButtonUsed = false;
 		if(mouseButton == 0)
@@ -527,9 +560,9 @@ public class MapOverlay extends GuiScreen {
 	}
 
 	int calculateMaxChunksHigh(int aMapScale) {
-		int cw = getCanvasHeight()/aMapScale;
-		int chunks = cw >> 4;
-		if(cw % 16 > 0) {
+		int ch = getCanvasHeight()/aMapScale;
+		int chunks = ch >> 4;
+		if(ch % 16 > 0) {
 			chunks++;
 		}
 		return chunks;
@@ -544,9 +577,15 @@ public class MapOverlay extends GuiScreen {
 
 	@Override
 	protected void keyTyped(char c, int i)
-	{
+	{		
 		switch(i) {
 		case Keyboard.KEY_ESCAPE : {
+			
+			if(options!=null) {
+				options.close();
+				break;
+			}
+			
 			close();
 			break;
 		}
@@ -596,6 +635,12 @@ public class MapOverlay extends GuiScreen {
 	@Override
 	public void updateScreen() {
 		super.updateScreen();
+		
+		if(options!=null) {
+			options.updateScreen();
+			return;
+		}
+		
 		layoutButtons();
 	}
 
@@ -607,13 +652,16 @@ public class MapOverlay extends GuiScreen {
 	@Override
 	public void drawBackground(int layer)
 	{
-		drawRectangle(0,0,width,height,mapBackground[0],mapBackground[1],mapBackground[2],mapBackground[3]);
-
+		this.drawDefaultBackground();
+        GL11.glEnable(GL11.GL_BLEND);
+		
 		if(isScroll) {
 			scrollingCanvas();
 		}
 
-		drawButtonBar();
+		if(options==null) {
+			drawButtonBar();
+		}
 
 	}
 
@@ -624,10 +672,12 @@ public class MapOverlay extends GuiScreen {
 		GL11.glBlendFunc(770, 771);
 		GL11.glColor4f(1f,1f,1f,1f);
 		GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
-
 		
-		drawRectangle(0,height-12,width,height,mapBackground[0],mapBackground[1],mapBackground[2],mapBackground[3]);		
-		drawCenteredString(mc.fontRenderer, playerLastPos, getBackgroundWidth()/2, height-10, 0x8888ff);
+		int labelWidth = mc.fontRenderer.getStringWidth(playerLastPos) + 10;
+		int halfBg = getBackgroundWidth()/2;
+		
+		drawRectangle(halfBg - (labelWidth/2), height-18, labelWidth, 12, mapBackground[0],mapBackground[1],mapBackground[2],220);			
+		drawCenteredString(mc.fontRenderer, playerLastPos, getBackgroundWidth()/2, height-16, 0x8888ff);
 	}
 
 	void drawMap() {
@@ -671,9 +721,9 @@ public class MapOverlay extends GuiScreen {
 		File worldDir = FileHandler.getWorldDir(mc);
 		
 		if(effectiveMapType.equals(Constants.MapType.day)) {
-			mapBackground = new int[]{34,34,34,200};
+			mapBackground = new int[]{34,34,34,100};
 		} else {
-			mapBackground = new int[]{0,0,0,200};
+			mapBackground = new int[]{0,0,0,100};
 		}
 			
 		if(System.currentTimeMillis() >= (lastEntityUpdate+entityUpdateInterval)) {
@@ -720,10 +770,9 @@ public class MapOverlay extends GuiScreen {
 
 		// Draw the map image
 		if(lastMapImgTextureIndex!=null && lastMapImg!=null && lastMapRatio!=null) {
-			//drawCenteredImage(textureIndex, 1.0F, mapImg.getWidth(), mapImg.getHeight(), getCanvasWidth(), getCanvasHeight());
-			int scaledWidth = (int) Math.ceil(lastMapImg.getWidth()*lastMapRatio);
-			int scaledHeight = (int) Math.ceil(lastMapImg.getHeight()*lastMapRatio);
-			drawImage(lastMapImgTextureIndex, 1f, blockXOffset, blockZOffset, scaledWidth, scaledHeight);
+			int maxWidth = calculateMaxChunksWide(mapScale) * chunkScale;
+			int maxHeight = calculateMaxChunksHigh(mapScale) * chunkScale;
+			drawImage(lastMapImgTextureIndex, 1f, blockXOffset, blockZOffset, maxWidth, maxHeight);
 		}
 
 	}
@@ -792,12 +841,12 @@ public class MapOverlay extends GuiScreen {
 			int layerHeight = lastMapImg.getHeight() * overlayScale;
 
 			entityOverlay = new BufferedImage(layerWidth, layerHeight, BufferedImage.TYPE_INT_ARGB);
-			Graphics2D g2D = entityOverlay.createGraphics();
-			FontMetrics fm = g2D.getFontMetrics();
+			Graphics2D g2D = entityOverlay.createGraphics();			
 			g2D.setFont(new Font("Arial", Font.BOLD, 16)); //$NON-NLS-1$
 			g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 			g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			FontMetrics fm = g2D.getFontMetrics();
 			
 			if(!hardcore) {
 				// Draw nearby mobs
@@ -894,6 +943,30 @@ public class MapOverlay extends GuiScreen {
 						mc.thePlayer.chunkCoordZ, mc.thePlayer.posZ,
 						EntityHelper.getHeading(mc.thePlayer),playerImage, g2D);				
 			}
+			
+			// Draw waypoints
+			if(showWaypoints && WaypointHelper.waypointsEnabled()) {
+				List<Waypoint> waypoints = (List<Waypoint>) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
+
+				int cw = getCanvasWidth()/mapScale;
+				int chunks = cw >> 4;
+				int maxWidth = chunks * entityChunkSize;
+				if(cw % 16 > 0) {
+					maxWidth = maxWidth +  ((cw%16)*(entityChunkSize/16));
+				}
+				
+				int ch = getCanvasHeight()/mapScale;
+				chunks = ch >> 4;
+				int maxHeight = chunks * entityChunkSize;
+				if(ch % 16 > 0) {
+					maxHeight = maxHeight + ((ch%16)*(entityChunkSize/16));
+				}
+				
+				int xCutoff = layerWidth-maxWidth;
+				int zCutoff = layerHeight-maxHeight;
+
+				new OverlayWaypointRenderer(mapBounds[0], entityChunkSize, layerWidth, layerHeight, xCutoff, zCutoff).render(waypoints, g2D);
+			}
 							
 			lastEntityImg = entityOverlay;
 			try {
@@ -930,10 +1003,11 @@ public class MapOverlay extends GuiScreen {
 		}
 
 		// Draw the entity layer image
-		if(textureIndex!=null && lastMapRatio!=null) {
-			int scaledWidth = (int) Math.ceil(entityOverlay.getWidth()/overlayScale*lastMapRatio);
-			int scaledHeight = (int) Math.ceil(entityOverlay.getHeight()/overlayScale*lastMapRatio);
-			drawImage(textureIndex, 1f, blockXOffset, blockZOffset, scaledWidth, scaledHeight);
+		if(lastEntityImgTextureIndex!=null && lastMapRatio!=null) {
+			int maxWidth = calculateMaxChunksWide(mapScale) * chunkScale;
+			int maxHeight = calculateMaxChunksHigh(mapScale) * chunkScale;
+			
+			drawImage(lastEntityImgTextureIndex, 1f, blockXOffset, blockZOffset, maxWidth, maxHeight);
 		}
 		
 	}
@@ -976,7 +1050,7 @@ public class MapOverlay extends GuiScreen {
 		drawEntity(entity.chunkCoordX, entity.posX, entity.chunkCoordZ, entity.posZ, EntityHelper.getHeading(entity), entityIcon, g2D);
 	}
 	
-	private void drawRectangle(int x, int y, int width, int height, int red, int green, int blue, int alpha) {
+	void drawRectangle(int x, int y, int width, int height, int red, int green, int blue, int alpha) {
 		Tessellator tessellator = Tessellator.instance;
 		
 		GL11.glDisable(3553 /*GL_TEXTURE_2D*/);
@@ -1116,10 +1190,14 @@ public class MapOverlay extends GuiScreen {
 				xOffset = xOffset * chunkScale;
 				zOffset = zOffset * chunkScale;
 
-				int scaledWidth = (int) Math.ceil(lastMapImg.getWidth()*lastMapRatio);
-				int scaledHeight = (int) Math.ceil(lastMapImg.getHeight()*lastMapRatio);
-				drawImage(lastMapImgTextureIndex, 1f, xOffset + blockXOffset, zOffset + blockXOffset, scaledWidth, scaledHeight);
-	
+				int maxWidth = calculateMaxChunksWide(mapScale) * chunkScale;
+				int maxHeight = calculateMaxChunksHigh(mapScale) * chunkScale;
+				drawImage(lastMapImgTextureIndex, 1f, xOffset + blockXOffset, zOffset + blockXOffset, maxWidth, maxHeight);
+				
+				// Draw the entity layer image
+				if(lastEntityImgTextureIndex!=null && lastMapRatio!=null && lastEntityImg!=null) {
+					drawImage(lastEntityImgTextureIndex, 1f, xOffset + blockXOffset, zOffset + blockZOffset, maxWidth, maxHeight);
+				}
 			} 			
 		} 
 		//drawPlayerInfo();
@@ -1212,10 +1290,8 @@ public class MapOverlay extends GuiScreen {
 	}
 	
 	void showOptions() {
-		MapOverlayOptions opts = new MapOverlayOptions(this);
-		mc.displayGuiScreen(opts);
-		this.lastWidth = 0;
-		this.lastHeight = 0;
+		options = new MapOverlayOptions(this);
+		options.setWorldAndResolution(this.mc, width, height);
 	}
 
 }

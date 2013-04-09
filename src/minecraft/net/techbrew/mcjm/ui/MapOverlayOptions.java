@@ -1,5 +1,7 @@
 package net.techbrew.mcjm.ui;
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.src.GuiAchievements;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiGameOver;
@@ -20,18 +22,21 @@ import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.reifnsk.WaypointHelper;
 
 public class MapOverlayOptions extends GuiScreen {
 
 	final MapOverlay map;
+	final String title;
 	int lastWidth = 0;
 	int lastHeight = 0;
-	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers;
+	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints;
 	MapButton buttonSave,buttonClose,buttonAlert,buttonBrowser;
 	
 	public MapOverlayOptions(MapOverlay map) {
 		super();
 		this.map = map;
+		title = Constants.getString("MapOverlay.options_title", JourneyMap.JM_VERSION);
 	}
 
 	/**
@@ -80,13 +85,19 @@ public class MapOverlayOptions extends GuiScreen {
 				Constants.getString("MapOverlay.show_players", off),
 				map.showPlayers); //$NON-NLS-1$ 
 		
+		buttonWaypoints = new MapButton(15,0,0,
+				Constants.getString("MapOverlay.show_waypoints", on),
+				Constants.getString("MapOverlay.show_waypoints", off),
+				map.showWaypoints); //$NON-NLS-1$ 
+		buttonWaypoints.drawButton = WaypointHelper.waypointsEnabled();
+		
 		// Check for hardcore
 		if(map.hardcore) {
 			buttonCaves.setToggled(false);
 			buttonCaves.enabled = false;
 			buttonCaves.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
 			buttonMonsters.setToggled(false);
-			buttonMonsters.enabled  =false;
+			buttonMonsters.enabled = false;
 			buttonMonsters.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
 		}
 		
@@ -102,6 +113,9 @@ public class MapOverlayOptions extends GuiScreen {
 		buttonList.add(buttonVillagers);
 		buttonList.add(buttonPets);
 		buttonList.add(buttonPlayers);
+		if(buttonWaypoints.drawButton) {
+			buttonList.add(buttonWaypoints);
+		}
     }
     
     /**
@@ -133,6 +147,10 @@ public class MapOverlayOptions extends GuiScreen {
 			layoutButton(buttonPets, bx, by + (20*row));			
 			layoutButton(buttonPlayers, bx + hgap, by + (20*row++));	
 			
+			if(buttonWaypoints.drawButton) {
+				layoutButton(buttonWaypoints, bx + hgap/2, by + (20*row++));
+			}
+			
 			row++;
 			layoutButton(buttonSave, bx, by + (20*row));			
 			layoutButton(buttonBrowser, bx + hgap, by + (20*row++));
@@ -142,9 +160,6 @@ public class MapOverlayOptions extends GuiScreen {
 			}
 			
 			layoutButton(buttonClose, bx + hgap/2, by + (20*row++));		
-			
-			
-			
 			
 		}
 		
@@ -215,11 +230,17 @@ public class MapOverlayOptions extends GuiScreen {
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_PLAYERS, MapOverlay.showPlayers);
 				break;
 			}
+			case 15: { // waypoints
+				MapOverlay.showWaypoints = !MapOverlay.showWaypoints;
+				buttonWaypoints.setToggled(MapOverlay.showWaypoints);
+				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_WAYPOINTS, MapOverlay.showWaypoints);
+				break;
+			}
 		}
 	}
     
     void close() {
-		mc.displayGuiScreen(map);
+		map.options = null;
 		map.updateScreen();
 	}
     
@@ -235,10 +256,28 @@ public class MapOverlayOptions extends GuiScreen {
     @Override
     public void drawScreen(int par1, int par2, float par3)
     {
-        this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.options_title", JourneyMap.JM_VERSION), this.width / 2, 40, 16777215);
+    	int labelWidth = mc.fontRenderer.getStringWidth(title) + 10;
+		int halfBg = width/2;
+		
+		int by = (this.height / 4);
+		
+		map.drawRectangle(halfBg - (labelWidth/2), by-20, labelWidth, 12, 0, 0, 100, 255);    	
+        this.drawCenteredString(this.fontRenderer, title , this.width / 2, by-18, 16777215);
+        
         layoutButtons();
+        
         super.drawScreen(par1, par2, par3);
     }
+    
+    @Override
+	protected void keyTyped(char c, int i)
+	{
+		switch(i) {
+		case Keyboard.KEY_ESCAPE : {
+			close();
+			break;
+		}
+		}
+	}
 
 }
