@@ -7,14 +7,16 @@ import java.net.URI;
 import java.net.URL;
 import java.util.logging.Level;
 
+import javax.net.ssl.HttpsURLConnection;
+
 import net.techbrew.mcjm.io.PropertyManager;
 
 public class VersionCheck {
 
-	private static Boolean updateCheckEnabled = PropertyManager.getInstance().getBoolean(PropertyManager.Key.UPDATE_CHECK_ENABLED);
-	private static Boolean versionIsCurrent = true;
-	private static Boolean versionIsChecked;
-	private static String versionAvailable;
+	private static volatile Boolean updateCheckEnabled = PropertyManager.getInstance().getBoolean(PropertyManager.Key.UPDATE_CHECK_ENABLED);
+	private static volatile Boolean versionIsCurrent = true;
+	private static volatile Boolean versionIsChecked;
+	private static volatile String versionAvailable;
 
 	public static Boolean getVersionIsCurrent() {
 		if(versionIsChecked==null) {
@@ -44,7 +46,7 @@ public class VersionCheck {
 			BufferedReader in;
 			try {
 				URL uri = URI.create(JourneyMap.VERSION_URL).toURL();
-				HttpURLConnection connection = (HttpURLConnection) uri.openConnection();
+				HttpsURLConnection connection = (HttpsURLConnection) uri.openConnection();
 				connection.setRequestMethod("GET");
 				connection.setRequestProperty("Referer", "http://journeymap.techbrew.net/?client=" + JourneyMap.JM_VERSION); //$NON-NLS-1$ //$NON-NLS-2$
 				connection.setRequestProperty("Host", "localhost");
