@@ -16,12 +16,13 @@ public class Waypoint extends LinkedHashMap<String, Object> {
 		name, x, y, z, enable, r,g,b,
 		dimension,
 		reiType, // Normal = 0, Deathpoint = 1
+		origin,
 		;
 	}
 	
 	private final String display;
 
-    public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, Integer reiType, String display)
+    public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, Integer reiType, String origin, String display)
     {
         this.put(Key.name.name(), name == null ? "" : name);
         this.put(Key.x.name(), x);
@@ -34,6 +35,7 @@ public class Waypoint extends LinkedHashMap<String, Object> {
         if(reiType!=null) {
         	this.put(Key.reiType.name(), reiType);
         }
+        this.put(Key.origin.name(), origin);
         this.display = display;
     }
     
@@ -43,6 +45,10 @@ public class Waypoint extends LinkedHashMap<String, Object> {
     
     public String getName() {
     	return getString(Key.name);
+    }
+    
+    public String getOrigin() {
+    	return getString(Key.origin.name);
     }
     
     public int getX() {

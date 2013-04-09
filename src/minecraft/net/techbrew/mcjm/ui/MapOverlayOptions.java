@@ -23,7 +23,7 @@ import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.reifnsk.WaypointHelper;
+import net.techbrew.mcjm.model.WaypointHelper;
 
 public class MapOverlayOptions extends GuiScreen {
 

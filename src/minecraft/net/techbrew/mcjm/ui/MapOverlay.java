@@ -71,7 +71,7 @@ import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.Waypoint;
-import net.techbrew.mcjm.reifnsk.WaypointHelper;
+import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.MapBlocks;
 import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
 

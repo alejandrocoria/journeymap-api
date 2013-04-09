@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.VersionCheck;
 import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.reifnsk.WaypointHelper;
+import net.techbrew.mcjm.model.WaypointHelper;
 
 import org.lwjgl.opengl.Display;
 

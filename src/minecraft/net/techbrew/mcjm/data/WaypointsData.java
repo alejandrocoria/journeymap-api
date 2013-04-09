@@ -14,7 +14,7 @@ import net.minecraft.src.EntityTameable;
 import net.minecraft.src.IAnimals;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.Waypoint;
-import net.techbrew.mcjm.reifnsk.WaypointHelper;
+import net.techbrew.mcjm.model.WaypointHelper;
 
 /**
  * Provides waypoint data
