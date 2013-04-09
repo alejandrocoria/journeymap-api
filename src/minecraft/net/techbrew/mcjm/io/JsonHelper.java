@@ -28,7 +28,7 @@ public class JsonHelper {
 			sb.append(key).append(":");			
 			wrap(sb, value);			
 			if(i+1<size) {
-				sb.append(",\n");
+				sb.append(",");
 			}
 		}		
 		sb.append("}");
