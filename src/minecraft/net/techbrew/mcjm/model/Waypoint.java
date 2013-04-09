@@ -9,20 +9,20 @@ import java.util.LinkedHashMap;
  */
 public class Waypoint extends LinkedHashMap<String, Object> {
 	
-	public static final int REITYPE_NORMAL = 0;
-	public static final int REITYPE_DEATH = 1;
+	public static final int TYPE_NORMAL = 0;
+	public static final int TYPE_DEATH = 1;
 	
 	public enum Key {
 		name, x, y, z, enable, r,g,b,
 		dimension,
-		reiType, // Normal = 0, Deathpoint = 1
+		type, // Normal = 0, Deathpoint = 1
 		origin,
 		;
 	}
 	
 	private final String display;
 
-    public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, Integer reiType, String origin, String display)
+    public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, int type, String origin, String display)
     {
         this.put(Key.name.name(), name == null ? "" : name);
         this.put(Key.x.name(), x);
@@ -32,9 +32,7 @@ public class Waypoint extends LinkedHashMap<String, Object> {
         this.put(Key.r.name(), red);
         this.put(Key.g.name(), green);
         this.put(Key.b.name(), blue);
-        if(reiType!=null) {
-        	this.put(Key.reiType.name(), reiType);
-        }
+        this.put(Key.type.name(), type);
         this.put(Key.origin.name(), origin);
         this.display = display;
     }
@@ -59,8 +57,8 @@ public class Waypoint extends LinkedHashMap<String, Object> {
     	return getInteger(Key.z);
     }
     
-    public int getReiType() {
-    	return getInteger(Key.reiType);
+    public int getType() {
+    	return getInteger(Key.type);
     }
     
     public boolean getEnable() {

@@ -1331,7 +1331,7 @@ var JourneyMap = (function() {
 			if(!outofbounds) {
 				
 				// Draw marker
-				if(waypoint.reiType && waypoint.reiType==1) {
+				if(waypoint.type==1) {
 					// X death spot
 					diameter = 6;
 					ctx.strokeStyle = "#000";

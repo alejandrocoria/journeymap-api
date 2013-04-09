@@ -141,7 +141,7 @@ public class WaypointHelper {
 						(int)(wp.red * 255.0F) & 255,
 						(int)(wp.green * 255.0F) & 255,
 		        		(int)(wp.blue * 255.0F) & 255,
-		        		null,
+		        		"skull".equals(wp.imageSuffix) ? 1 : 0,
 		        		"voxelmap",
 		        		wp.name));
 			}

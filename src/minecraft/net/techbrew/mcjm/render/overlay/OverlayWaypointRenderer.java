@@ -88,7 +88,7 @@ public class OverlayWaypointRenderer extends BaseOverlayRenderer<List<Waypoint>>
 				if(!outofbounds) {
 					
 					// Draw marker
-					if(waypoint.getReiType()==1) { // death spot
+					if(waypoint.getType()==Waypoint.TYPE_DEATH) { // death spot
 						
 						g.setComposite(OPAQUE);
 						
@@ -127,7 +127,7 @@ public class OverlayWaypointRenderer extends BaseOverlayRenderer<List<Waypoint>>
 					}
 					
 					// Draw label
-					labelColor = (waypoint.getReiType()==Waypoint.REITYPE_DEATH) ? Color.red : color;
+					labelColor = (waypoint.getType()==Waypoint.TYPE_DEATH) ? Color.red : color;
 					drawCenteredLabel(waypoint.getName(), x, z, fontHeight, diameter*2, g, fm, Color.black, labelColor);
 	
 				} else {
