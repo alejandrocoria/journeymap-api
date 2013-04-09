@@ -44,7 +44,6 @@ import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.render.ChunkRenderController;
-import net.techbrew.mcjm.render.ChunkTerrainRenderer;
 import net.techbrew.mcjm.render.IChunkRenderer;
 
 public class ChunkUpdateThread extends UpdateThreadBase {
