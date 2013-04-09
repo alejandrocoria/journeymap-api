@@ -53,7 +53,7 @@ import org.lwjgl.input.Keyboard;
  */
 public class JourneyMap extends BaseMod {
 	
-	static final String VERSION_URL = "http://dl.dropbox.com/u/38077766/JourneyMap/journeymap-version.js?client-version=JM2.1_MC1.5.1"; //$NON-NLS-1$
+	static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
 
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
 	public static final String JM_VERSION = "2.1b5"; //$NON-NLS-1$
@@ -112,6 +112,14 @@ public class JourneyMap extends BaseMod {
 		announcements = Collections.synchronizedList(new LinkedList<String>());
 		ModLoader.setInGameHook(this, true, false);
 		ModLoader.setInGUIHook(this, true, false);
+		
+		// Map GUI keycode
+		int mapGuiKeyCode = PropertyManager.getInstance().getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
+		enableMapGui = PropertyManager.getInstance().getBoolean(PropertyManager.Key.MAPGUI_ENABLED); 
+		if(enableMapGui) {
+			keybinding = new KeyBinding("JourneyMap", mapGuiKeyCode); //$NON-NLS-1$
+			ModLoader.registerKey(this, keybinding, false);
+		}
 	}
 	
 	/**
@@ -129,14 +137,6 @@ public class JourneyMap extends BaseMod {
 			// Use property settings
 			chunkDelay = PropertyManager.getInstance().getInteger(PropertyManager.Key.UPDATETIMER_CHUNKS);
 			enableAnnounceMod = PropertyManager.getInstance().getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED); 
-
-			// Map GUI keycode
-			int mapGuiKeyCode = PropertyManager.getInstance().getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
-			enableMapGui = PropertyManager.getInstance().getBoolean(PropertyManager.Key.MAPGUI_ENABLED); 
-			if(enableMapGui) {
-				keybinding = new KeyBinding("JourneyMap", mapGuiKeyCode); //$NON-NLS-1$
-				ModLoader.registerKey(this, keybinding, false);
-			}
 
 			// Webserver
 			enableWebserver = PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
