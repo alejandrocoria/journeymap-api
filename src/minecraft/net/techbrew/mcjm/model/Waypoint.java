@@ -7,7 +7,10 @@ import java.util.LinkedHashMap;
 /**
  * Generic waypoint data holder
  */
-public class Waypoint {
+public class Waypoint extends LinkedHashMap<String, Object> {
+	
+	public static final int REITYPE_NORMAL = 0;
+	public static final int REITYPE_DEATH = 1;
 	
 	public enum Key {
 		name, x, y, z, enable, r,g,b,
@@ -17,50 +20,73 @@ public class Waypoint {
 	}
 	
 	private final String display;
-	
-	LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
 
     public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, Integer reiType, String display)
     {
-        map.put(Key.name.name(), name == null ? "" : name);
-        map.put(Key.x.name(), x);
-        map.put(Key.y.name(), y);
-        map.put(Key.z.name(), z);
-        map.put(Key.enable.name(), enable);
-        map.put(Key.r.name(), red);
-        map.put(Key.g.name(), green);
-        map.put(Key.b.name(), blue);
+        this.put(Key.name.name(), name == null ? "" : name);
+        this.put(Key.x.name(), x);
+        this.put(Key.y.name(), y);
+        this.put(Key.z.name(), z);
+        this.put(Key.enable.name(), enable);
+        this.put(Key.r.name(), red);
+        this.put(Key.g.name(), green);
+        this.put(Key.b.name(), blue);
         if(reiType!=null) {
-        	map.put(Key.reiType.name(), reiType);
+        	this.put(Key.reiType.name(), reiType);
         }
         this.display = display;
     }
     
-    public Integer getInteger(Key p) {
-    	Object val = map.get(p.name());
-    	return val==null ? null : (Integer) val; 
-    }
-
-    public Boolean getBoolean(Key p) {
-    	Object val = map.get(p.name());
-    	return val==null ? null : (Boolean) val; 
-    }
-    
-    public String getString(Key p) {
-    	Object val = map.get(p.name());
-    	return val==null ? null : (String) val; 
-    }
-    
     public Object getObject(Key p) {
-    	return map.get(p.name());
+    	return this.get(p.name());
     }
     
-    public HashMap<String, Object> getProperties() {
-    	return map;
+    public String getName() {
+    	return getString(Key.name);
+    }
+    
+    public int getX() {
+    	return getInteger(Key.x);
+    }
+    
+    public int getZ() {
+    	return getInteger(Key.z);
+    }
+    
+    public int getReiType() {
+    	return getInteger(Key.reiType);
+    }
+    
+    public boolean getEnable() {
+    	return getBoolean(Key.enable);
+    }
+    
+    public Color getColor() {
+    	int r = getInteger(Key.r);
+    	int g = getInteger(Key.g);
+    	int b = getInteger(Key.b);
+    	return new Color(r,g,b);
     }
     
     public String toString() {
     	return this.display;
+    }
+    
+    /** Internal to class **/
+    
+    Integer getInteger(Key p) {
+    	Object val = this.get(p.name());
+    	return val==null ? null : (Integer) val; 
+    }
+
+    Boolean getBoolean(Key p) {
+    	Object val = this.get(p.name());
+    	return val==null ? null : (Boolean) val; 
+    }
+    
+    String getString(Key p) {
+    	Object val = this.get(p.name());
+    	return val==null ? null : (String) val; 
     }
     
 }

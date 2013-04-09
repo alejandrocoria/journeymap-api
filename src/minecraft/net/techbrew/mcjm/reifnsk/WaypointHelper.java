@@ -19,6 +19,14 @@ public class WaypointHelper {
 	private static Boolean reiLoaded;
 	
 	/**
+	 * Is any waypoint system enabled.
+	 * @return
+	 */
+	public static boolean waypointsEnabled() {
+		return isReiLoaded();
+	}
+	
+	/**
 	 * Check for Rei Minimap
 	 * @return
 	 */

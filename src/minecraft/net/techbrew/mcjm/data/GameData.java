@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.VersionCheck;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.reifnsk.WaypointHelper;
 
 import org.lwjgl.opengl.Display;
 
@@ -24,7 +25,8 @@ public class GameData implements IDataProvider {
 		jm_version,
 		latest_journeymap_version,
 		mc_version,
-		browser_poll
+		browser_poll,
+		waypoints_enabled
 	}
 
 	/**
@@ -49,6 +51,7 @@ public class GameData implements IDataProvider {
 		props.put(Key.latest_journeymap_version, VersionCheck.getVersionAvailable()); 
 		props.put(Key.mc_version, Display.getTitle().split("\\s(?=\\d)")[1]); //$NON-NLS-1$ 		
 		props.put(Key.browser_poll, pm.getInteger(PropertyManager.Key.BROWSER_POLL));
+		props.put(Key.waypoints_enabled, WaypointHelper.waypointsEnabled());
 
 		return props;	
 	}

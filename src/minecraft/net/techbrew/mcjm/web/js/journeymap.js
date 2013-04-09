@@ -365,6 +365,9 @@ var JourneyMap = (function() {
 			postPreference("preference_show_waypoints", showWaypoints);
 			drawMap();
 		});
+		if(JM.game.waypoints_enabled!==true) {
+			$("#checkShowWaypoints").attr("disabled", true);
+		}
 		
 		$("#checkShowAnimals").prop('checked', showAnimals)
 		$("#checkShowAnimals").click(function(event) {
@@ -1165,16 +1168,13 @@ var JourneyMap = (function() {
 			if (ctx.drawImage) {
 				var locRadius = mobLocator.width / 2;
 				ctx.save();
-				ctx.globalAlpha = .45;
+				ctx.globalAlpha = .6;
 				ctx.translate(x, z);
 				ctx.rotate(mob.heading);
 				ctx.translate(-locRadius, -locRadius);
 				ctx.drawImage(mobLocator, 0, 0);
 				ctx.restore();
 			}
-
-			// ctx.arc(x, z, radius, 0, Math.PI * 2, true);
-			// ctx.stroke();
 
 			ctx.globalAlpha = 1.0;
 
@@ -1280,7 +1280,7 @@ var JourneyMap = (function() {
 		if (JM.debug)
 			console.log(">>> " + "drawWaypoints");
 
-		if(!showWaypoints==true)
+		if(!showWaypoints==true || !JM.game.waypoints_enabled==true)
 			return;
 		
 		var waypoints = JM.waypoints;
@@ -1292,15 +1292,15 @@ var JourneyMap = (function() {
 			canvasHeight = getCanvasHeight();
 		}
 
-		var ctx = fgCanvas.getContext("2d");
-		var diameter = 8;
+		var ctx = fgCanvas.getContext("2d");		
 
 		// Draw waypoints
 		$.each(waypoints, function(index, waypoint) {
 
 			var x = getScaledChunkX(waypoint.x / 16) - (mapScale / 2);
 			var z = getScaledChunkZ(waypoint.z / 16) - (mapScale / 2);
-			var outofbounds = false;
+			var outofbounds = false;			
+			var diameter = 6;
 			var min = diameter;
 			
 			if(x<0) {
@@ -1311,8 +1311,8 @@ var JourneyMap = (function() {
 				outofbounds = true;
 			}
 			
-			if(z<0) {
-				z = 0;
+			if(z<52) {
+				z = 52;
 				outofbounds = true;
 			} else if(z > canvasHeight) {
 				z = canvasHeight;
@@ -1334,25 +1334,66 @@ var JourneyMap = (function() {
 			if(!outofbounds) {
 				
 				// Draw marker
-				ctx.beginPath();
-				ctx.moveTo(x-diameter, z);
-				ctx.lineTo(x, z-diameter);
-				ctx.lineTo(x+diameter, z);
-				ctx.lineTo(x, z+diameter);
-				ctx.lineTo(x-diameter, z);
-				ctx.closePath();
-				ctx.fill();
-				ctx.stroke();
-				
-				ctx.globalAlpha = 0.1;
-				ctx.strokeStyle = "#fff";
-				ctx.beginPath();
-				ctx.moveTo(x-diameter, z);
-				ctx.lineTo(x+diameter, z);
-				ctx.moveTo(x, z-diameter);
-				ctx.lineTo(x, z+diameter);
-				ctx.closePath();
-				ctx.stroke();
+				if(waypoint.reiType && waypoint.reiType==1) {
+					// X death spot
+					diameter = 6;
+					ctx.strokeStyle = "#000";
+					ctx.lineWidth = 6;
+					ctx.lineCap = 'round';
+										
+					ctx.beginPath();
+					ctx.moveTo(x-diameter, z-diameter);
+					ctx.lineTo(x+diameter, z+diameter);
+					ctx.closePath();
+					ctx.stroke();
+					
+					ctx.beginPath();
+					ctx.moveTo(x+diameter, z-diameter);
+					ctx.lineTo(x-diameter, z+diameter);
+					ctx.closePath();
+					ctx.stroke();
+					
+					ctx.strokeStyle = waypoint.color;
+					ctx.lineWidth = 2;
+					
+					ctx.lineCap = 'butt';
+					
+					ctx.beginPath();
+					ctx.moveTo(x-diameter, z-diameter);
+					ctx.lineTo(x+diameter, z+diameter);
+					ctx.closePath();
+					ctx.stroke();
+					
+					ctx.beginPath();
+					ctx.moveTo(x+diameter, z-diameter);
+					ctx.lineTo(x-diameter, z+diameter);
+					ctx.closePath();
+					ctx.stroke();
+					
+				} else {
+					// Diamond
+					ctx.lineCap = 'butt';
+					
+					ctx.beginPath();
+					ctx.moveTo(x-diameter, z);
+					ctx.lineTo(x, z-diameter);
+					ctx.lineTo(x+diameter, z);
+					ctx.lineTo(x, z+diameter);
+					ctx.lineTo(x-diameter, z);
+					ctx.closePath();
+					ctx.fill();
+					ctx.stroke();
+					
+					ctx.globalAlpha = 0.1;
+					ctx.strokeStyle = "#fff";
+					ctx.beginPath();
+					ctx.moveTo(x-diameter, z);
+					ctx.lineTo(x+diameter, z);
+					ctx.moveTo(x, z-diameter);
+					ctx.lineTo(x, z+diameter);
+					ctx.closePath();
+					ctx.stroke();
+				}
 			
 				// Draw label background			
 				ctx.font = "bold 12px Arial";
@@ -1369,9 +1410,16 @@ var JourneyMap = (function() {
 				
 				// Draw label
 				ctx.globalAlpha = 1.0;
-				ctx.fillStyle = "#fff";
+				if(waypoint.reiType && waypoint.reiType==1) {
+					ctx.fillStyle = "#f00";
+				} else {
+					ctx.fillStyle = "#fff";
+				}
 				ctx.fillText(waypoint.name, x, labelZ);
 			} else {
+				
+				// Circle on edge of map
+				ctx.lineWidth = 4;
 				ctx.beginPath();
 				ctx.arc(x, z, diameter, 0, Math.PI * 2, true);
 				ctx.closePath();

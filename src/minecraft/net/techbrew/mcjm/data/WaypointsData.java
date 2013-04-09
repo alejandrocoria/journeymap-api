@@ -42,8 +42,8 @@ public class WaypointsData implements IDataProvider {
 		List<Waypoint> waypoints = WaypointHelper.getWaypoints();
 		ArrayList<Map> list = new ArrayList<Map>(waypoints.size());
 		for(Waypoint waypoint : waypoints) {
-			if(waypoint.getBoolean(Waypoint.Key.enable)) {
-				list.add(waypoint.getProperties());
+			if(waypoint.getEnable()) {
+				list.add(waypoint);
 			}
 		}		
 		
