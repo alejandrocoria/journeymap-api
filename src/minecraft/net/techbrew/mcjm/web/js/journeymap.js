@@ -1161,9 +1161,6 @@ var JourneyMap = (function() {
 			ctx.beginPath();
 			var radius = 32;
 			var filename = mob.filename;
-			if (filename === 'ghast.png' || filename === 'ender.png' || filename === 'wither.png') {
-				radius = 48;
-			}
 
 			if (ctx.drawImage) {
 				var locRadius = mobLocator.width / 2;
