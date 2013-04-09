@@ -1421,7 +1421,7 @@ var JourneyMap = (function() {
 				// Circle on edge of map
 				ctx.lineWidth = 4;
 				ctx.beginPath();
-				ctx.arc(x, z, diameter, 0, Math.PI * 2, true);
+				ctx.arc(x, z, 8, 0, Math.PI * 2, true);
 				ctx.closePath();
 				ctx.fill();
 				ctx.stroke();
