@@ -1,4 +1,4 @@
-JourneyMap 2.5.0 for Minecraft 1.5.1 (April 11, 2013)
+JourneyMap 2.5.0RC2 for Minecraft 1.5.1 (April 11, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -19,6 +19,7 @@ Changes in JourneyMap 2.5.0 for Minecraft 1.5:
 - Radar mobs now face east/west depending on heading
 - Radar mobs now remain visible while dragging the in-game map, releasing the drag no longer causes "jitter" 
 - Radar range (for mobs, players, etc) has been extended to be 1/2 of the mapping radius (horizontal) and 1/4 mapping radius (vertical)
+- Named mobs (via spawn eggs + an anvil) are now labeled on map
 - Dragons and Ghasts are now larger on map radar
 - In-game map UI adjusted to make off-screen waypoint markers easier to see
 - Map options in-game now shown over the map
@@ -27,6 +28,8 @@ Changes in JourneyMap 2.5.0 for Minecraft 1.5:
 - Tweaked Web UI appearance of World Info area
 - Pinch/spread now works as expected for browser map on IOS devices
 - Bugfix that prevented Dragons from showing on the map
+- Bugfix (P5N-WSN-1Z1Q) for named mobs breaking browser map
+- Bugfix (P5N-WSN-1Z1Q) for "Show... Players" toggle not working in browser map
 - Bugfix (LNP-8PW-SBZV) for in-game map when VoxelMap is loaded
 - Bugfix (EQ9-WMJ-4EXQ) for errors when switching to German language
 - Updated German translation, thanks to Maik Ploigt!
@@ -35,7 +38,7 @@ Changes in JourneyMap 2.5.0 for Minecraft 1.5:
 - Can now refresh web UI after language changed (without the need to restart Minecraft)
 - Added "donate" link to Web UI in the JourneyMap menu
 - journeyMap.properties file now uses underscores in properties name. Older files will be converted to use new names.
-- Added mcmod.info file for Forge users
+- Added mcmod.info file for improved Forge compliance
 
 Changes in JourneyMap 2.0.1 for Minecraft 1.5:
 - Bugfix (XVD-5GX-H9DG) for webserver errors (ZipFileException) on Linux, Mac.  Unzipping the mod no longer needed!
