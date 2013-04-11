@@ -12,8 +12,8 @@
    id="svg3001"
    version="1.1"
    inkscape:version="0.48.2 r9819"
-   sodipodi:docname="map-marker.svg"
-   inkscape:export-filename="G:\minecrafting\mcp\src\minecraft\net\techbrew\mcjm\web\img\locator-blue.png"
+   sodipodi:docname="map-marker-player.svg"
+   inkscape:export-filename="G:\minecrafting\mcp\src\minecraft\net\techbrew\mcjm\web\img\locator-player.png"
    inkscape:export-xdpi="120"
    inkscape:export-ydpi="120">
   <metadata
@@ -30,6 +30,17 @@
   </metadata>
   <defs
      id="defs3013">
+    <linearGradient
+       id="linearGradient3792">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3794" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3796" />
+    </linearGradient>
     <filter
        inkscape:collect="always"
        id="filter3926">
@@ -58,9 +69,9 @@
      fit-margin-bottom="0"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:zoom="8"
-     inkscape:cx="26.096987"
-     inkscape:cy="16.702177"
+     inkscape:zoom="5.6568543"
+     inkscape:cx="-5.4541659"
+     inkscape:cy="7.3838377"
      inkscape:window-x="253"
      inkscape:window-y="137"
      inkscape:window-maximized="0"
@@ -77,33 +88,9 @@
   <title
      id="title3003">map marker</title>
   <path
-     style="opacity:0.5;fill:#000080;fill-rule:evenodd;stroke:#000000;stroke-width:8.17663765;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none"
+     style="fill:#0000ff;stroke:#ffffff;stroke-width:1.70850670000000000;stroke-miterlimit:4;stroke-opacity:0.84126985;stroke-dasharray:none"
+     d="m 23.401687,11.914092 c -7.940851,0.408759 -14.221805,8.870293 -10.410634,17.111732 0.63914,1.382101 3.388868,4.995237 6.102786,7.897724 L 24,42.188698 l 4.906162,-5.26515 c 2.733726,-2.902487 5.467,-6.515623 6.102785,-7.897724 2.829148,-6.150138 0.232395,-13.166122 -5.983122,-16.034772 -1.902957,-0.878268 -3.791634,-1.17129 -5.624138,-1.07696 z M 24,19.213503 c 2.612122,0 4.786499,2.174376 4.786499,4.786497 0,2.612123 -2.174377,4.666837 -4.786499,4.666837 -2.612122,0 -4.666837,-2.054714 -4.666837,-4.666837 0,-2.612121 2.054715,-4.786497 4.666837,-4.786497 z"
+     id="path3013"
      inkscape:connector-curvature="0"
-     id="svg_2-1-8"
-     d="m 24.06249,43.379716 c -0.61223,-3.005434 -1.691685,-5.506486 -2.999146,-7.824509 -0.969805,-1.719423 -2.093276,-3.30648 -3.132775,-4.973833 -0.347005,-0.556611 -0.646472,-1.144635 -0.979911,-1.722296 -0.666719,-1.155057 -1.207284,-2.494278 -1.172935,-4.231466 0.03356,-1.697326 0.524456,-3.058862 1.232333,-4.172082 1.164248,-1.830968 3.114408,-3.332161 5.731048,-3.726672 2.139423,-0.322557 4.145283,0.222397 5.56773,1.054155 1.16237,0.679701 2.06251,1.587628 2.74673,2.657656 0.714159,1.11682 1.20594,2.436237 1.247192,4.157235 0.02112,0.881728 -0.123265,1.69826 -0.326664,2.37556 -0.205844,0.685562 -0.536901,1.258627 -0.831442,1.870753 -0.574961,1.194886 -1.295803,2.289708 -2.019221,3.385178 -2.154756,3.262937 -4.177201,6.590597 -5.062939,11.150321 z"
-     stroke-miterlimit="10"
-     clip-rule="evenodd" />
-  <path
-     style="fill:#0000ff;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.68578613;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none"
-     inkscape:connector-curvature="0"
-     id="svg_2-1"
-     d="M 24.014163,41.767621 C 23.447688,38.986802 22.448907,36.67267 21.239161,34.527889 20.341836,32.936968 19.30233,31.468521 18.340518,29.92578 18.019447,29.410769 17.742361,28.866691 17.433842,28.332201 16.816952,27.26347 16.316786,26.024339 16.348568,24.41698 c 0.03105,-1.570473 0.485261,-2.830253 1.140232,-3.860276 1.077237,-1.694128 2.881649,-3.083128 5.302731,-3.448153 1.979531,-0.298452 3.83548,0.205777 5.15162,0.975371 1.075498,0.628903 1.908364,1.468975 2.541448,2.459032 0.660787,1.033353 1.115814,2.254161 1.153982,3.84654 0.01954,0.81583 -0.114053,1.571337 -0.302249,2.198019 -0.190462,0.634325 -0.496777,1.164562 -0.769303,1.730939 -0.531992,1.105584 -1.198962,2.118584 -1.868313,3.132182 -1.993717,3.019078 -3.865013,6.09804 -4.684553,10.316987 z"
-     stroke-miterlimit="10"
-     clip-rule="evenodd"
-     inkscape:export-filename="G:\minecrafting\mcp\src\minecraft\net\techbrew\mcjm\web\img\locator-red.png"
-     inkscape:export-xdpi="90"
-     inkscape:export-ydpi="90" />
-  <circle
-     d="m 1263.8781,740.047 c 0,101.25148 -82.0806,183.33203 -183.3321,183.33203 -101.25146,0 -183.33201,-82.08055 -183.33201,-183.33203 0,-101.25149 82.08055,-183.33203 183.33201,-183.33203 101.2515,0 183.3321,82.08054 183.3321,183.33203 z"
-     style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:94.76564789;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter3926)"
-     sodipodi:ry="183.33203"
-     sodipodi:rx="183.33203"
-     sodipodi:cy="740.047"
-     sodipodi:cx="1080.546"
-     id="svg_4"
-     r="183.33203"
-     cy="740.047"
-     cx="1080.546"
-     clip-rule="evenodd"
-     transform="matrix(0.01461274,0,0,0.01461274,8.2711072,13.163587)" />
+     inkscape:transform-center-y="3.4526599" />
 </svg>
