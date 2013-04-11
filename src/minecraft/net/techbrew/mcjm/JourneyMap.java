@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -56,7 +55,7 @@ public class JourneyMap extends BaseMod {
 	static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
 
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-	public static final String JM_VERSION = "2.1RC1"; //$NON-NLS-1$
+	public static final String JM_VERSION = "2.5.0"; //$NON-NLS-1$
 	public static final String ML_VERSION = "ModLoader 1.5.1"; //$NON-NLS-1$
 	public static final String MC_VERSION = "1.5.1"; //$NON-NLS-1$
 

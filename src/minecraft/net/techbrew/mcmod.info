@@ -3,7 +3,7 @@
   "modid": "mod_JourneyMap",
   "name": "JourneyMap",
   "description": "Real-time map in-game or in a web browser as you explore.",
-  "version": "2.1RC1",
+  "version": "2.5.0",
   "mcversion": "1.5.1",
   "logoFile": "/net/techbrew/mcjm/web/ico/apple-touch-icon.png",
   "url": "http://journeymap.techbrew.net/",

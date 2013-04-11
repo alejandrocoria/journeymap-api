@@ -1,4 +1,4 @@
-JourneyMap 2.1RC1 for Minecraft 1.5.1 (April 9, 2013)
+JourneyMap 2.5.0 for Minecraft 1.5.1 (April 11, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -11,18 +11,21 @@ Requirements:
 - Minecraft 1.5
 - ModLoader or Forge
 
-Changes in JourneyMap 2.1 for Minecraft 1.5:
+Changes in JourneyMap 2.5.0 for Minecraft 1.5:
 - New Feature (5ZA-ZYN-B26M): Displays Rei's Minimap or VoxelMap (formerly Zan's Minimap) waypoints
 - Improved Nether, End, and Cave mapping with contour shading
-- Entities now remain visible while dragging the in-game map, releasing the drag no longer causes "jitter" 
+- Improved player and mob heading indicators
+- Radar mob images now differentiated by type of cat, wolf, or villager
+- Radar mobs now face east/west depending on heading
+- Radar mobs now remain visible while dragging the in-game map, releasing the drag no longer causes "jitter" 
+- Radar range (for mobs, players, etc) has been extended to be 1/2 of the mapping radius (horizontal) and 1/4 mapping radius (vertical)
+- Dragons and Ghasts are now larger on map radar
 - In-game map UI adjusted to make off-screen waypoint markers easier to see
 - Map options in-game now shown over the map
 - Map options now saved in journeyMap.properties file and synchronized between web UI and in-game UI
 - Added hover text to Web UI menu items
 - Tweaked Web UI appearance of World Info area
-- Improved rendering of End worlds
-- Radar range (for mobs, players, etc) has been extended to be 1/2 of the mapping radius (horizontal) and 1/4 mapping radius (vertical)
-- Dragons and Ghasts are now larger on map radar
+- Pinch/spread now works as expected for browser map on IOS devices
 - Bugfix that prevented Dragons from showing on the map
 - Bugfix (LNP-8PW-SBZV) for in-game map when VoxelMap is loaded
 - Bugfix (EQ9-WMJ-4EXQ) for errors when switching to German language
