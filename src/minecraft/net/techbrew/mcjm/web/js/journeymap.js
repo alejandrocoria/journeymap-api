@@ -1198,10 +1198,12 @@ var JourneyMap = (function() {
 				radius = mobImage.width / 2;
 				ctx.save();
 				ctx.translate(x - radius, z - radius);
-				if(mob.heading<0 && mob.heading>-Math.PI) {
+								
+				if(mob.heading>Math.PI) {
 					ctx.translate(mobImage.width, 0);
 					ctx.scale(-1, 1);
 				}
+				
 				ctx.drawImage(mobImage, 0, 0, radius * 2, radius * 2);
 				ctx.restore();
 			}
@@ -1248,7 +1250,7 @@ var JourneyMap = (function() {
 						var radius = otherImage.width / 2;
 						ctx.save();
 						ctx.translate(x - radius, z - radius);
-						if(other.heading<0 && other.heading>-Math.PI) {
+						if(other.heading>Math.PI) {
 							ctx.translate(otherImage.width, 0);
 							ctx.scale(-1, 1);
 						}
