@@ -779,9 +779,10 @@ public class MapOverlay extends GuiScreen {
 		if(chunkX<0) {
 			xDelta++;
 		}
+		int scaledBlockSize = entityChunkSize/16;
 		int scaledChunkX = (xDelta) * entityChunkSize;		
-		int scaledBlockX = (int) (Math.floor(posX) % 16) * (entityChunkSize/16);
-		return (scaledChunkX + scaledBlockX);
+		int scaledBlockX = (int) (Math.floor(posX) % 16) * scaledBlockSize;
+		return (scaledChunkX + scaledBlockX - (scaledBlockSize/2));
 	}
 
 	int getScaledEntityZ(int chunkZ, double posZ) {
@@ -789,9 +790,10 @@ public class MapOverlay extends GuiScreen {
 		if(chunkZ<0) {
 			zDelta++;
 		}
+		int scaledBlockSize = entityChunkSize/16;
 		int scaledChunkZ = (zDelta) * entityChunkSize;
-		int scaledBlockZ = (int) (Math.floor(posZ) % 16) * (entityChunkSize/16);
-		return (scaledChunkZ + scaledBlockZ);
+		int scaledBlockZ = (int) (Math.floor(posZ) % 16) * scaledBlockSize;
+		return (scaledChunkZ + scaledBlockZ - (scaledBlockSize/2));
 	}
 
 	boolean inBounds(Entity entity) {
@@ -904,14 +906,14 @@ public class MapOverlay extends GuiScreen {
 						} else {
 							locatorImg = EntityHelper.getNeutralLocator();
 						}			
-						g2D.setComposite(MapBlocks.SLIGHTLYCLEAR);
-						drawEntity(cx, x, cz, z, heading, locatorImg, g2D);
+						g2D.setComposite(MapBlocks.OPAQUE);
+						drawEntity(cx, x, cz, z, heading, false, locatorImg, g2D);
 						
 						// Draw entity image
 						entityIcon = EntityHelper.getEntityImage(filename);
 						if(entityIcon!=null) {
 							g2D.setComposite(MapBlocks.OPAQUE);
-							drawEntity(cx, x, cz, z, 0.0, entityIcon, g2D);
+							drawEntity(cx, x, cz, z, heading, true, entityIcon, g2D);
 						}
 						
 						if(isPlayer) {
@@ -940,7 +942,7 @@ public class MapOverlay extends GuiScreen {
 				g2D.setComposite(MapBlocks.OPAQUE);
 				drawEntity(mc.thePlayer.chunkCoordX, mc.thePlayer.posX, 
 						mc.thePlayer.chunkCoordZ, mc.thePlayer.posZ,
-						EntityHelper.getHeading(mc.thePlayer),playerImage, g2D);				
+						EntityHelper.getHeading(mc.thePlayer), false, playerImage, g2D);				
 			}
 			
 			// Draw waypoints
@@ -1018,7 +1020,7 @@ public class MapOverlay extends GuiScreen {
 	 * @param entityIcon
 	 * @param overlayImg
 	 */
-	private void drawEntity(int chunkX, double posX, int chunkZ, double posZ, Double heading, BufferedImage entityIcon, Graphics2D g2D) {
+	private void drawEntity(int chunkX, double posX, int chunkZ, double posZ, Double heading, boolean flipNotRotate, BufferedImage entityIcon, Graphics2D g2D) {
 		int radius = entityIcon.getWidth()/2;
 		int size = entityIcon.getWidth();
 		
@@ -1030,23 +1032,19 @@ public class MapOverlay extends GuiScreen {
 		
 		gCopy.translate(x, y);
 		if(heading!=null) {
-			gCopy.rotate(heading);
+			if(flipNotRotate) {
+				if(heading<0 && heading>-Math.PI) {
+					//gCopy.translate(size, 0);
+					gCopy.scale(-1, 1);				
+				} 
+			} else {
+				gCopy.rotate(heading);				
+			}
 		}
 		gCopy.translate(-radius, -radius);
 		gCopy.drawImage(entityIcon, 0, 0, size, size, null);
 		gCopy.dispose();
 		
-	}
-	
-	/**
-	 * Draw the entity's location and heading on the overlay image
-	 * using the provided icon.
-	 * @param entity
-	 * @param entityIcon
-	 * @param g2D
-	 */
-	private void drawEntity(Entity entity, BufferedImage entityIcon, Graphics2D g2D) {
-		drawEntity(entity.chunkCoordX, entity.posX, entity.chunkCoordZ, entity.posZ, EntityHelper.getHeading(entity), entityIcon, g2D);
 	}
 	
 	void drawRectangle(int x, int y, int width, int height, int red, int green, int blue, int alpha) {
