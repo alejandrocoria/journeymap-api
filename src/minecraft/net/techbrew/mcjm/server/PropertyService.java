@@ -136,7 +136,7 @@ public class PropertyService extends BaseService {
 			if(key!=null) {
 				// todo: type check param value
 				pm.setProperty(key, param[1]);
-				JourneyMap.getLogger().info("Updated property: " + param[0] + "=" + param[01]);
+				JourneyMap.getLogger().finer("Updated property: " + param[0] + "=" + param[01]);
 			} else {
 				throw new Exception("Unknown property key: " + param[0]);
 			}
