@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.src.EntityGhast;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityMob;
 import net.minecraft.src.EntityPlayerSP;
@@ -52,7 +53,7 @@ public class MobsData implements IDataProvider {
 			EntityLiving entity = (EntityLiving) mob;
 			LinkedHashMap eProps = new LinkedHashMap();
 			eProps.put(EntityKey.filename, EntityHelper.getFileName(entity)); 
-			if(mob instanceof EntityMob || mob instanceof IBossDisplayData || mob instanceof IRangedAttackMob) {
+			if(mob instanceof EntityMob || mob instanceof IBossDisplayData || mob instanceof IRangedAttackMob || mob instanceof EntityGhast) {
 				eProps.put(EntityKey.hostile, true); 
 			} else {
 				eProps.put(EntityKey.hostile, false); 
