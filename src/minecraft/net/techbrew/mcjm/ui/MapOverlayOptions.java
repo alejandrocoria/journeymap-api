@@ -24,6 +24,7 @@ import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.WaypointHelper;
+import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
 
 public class MapOverlayOptions extends GuiScreen {
 
@@ -279,7 +280,7 @@ public class MapOverlayOptions extends GuiScreen {
 		int by = (this.height / 4);
 		
 		GL11.glEnable(GL11.GL_BLEND);
-		map.drawRectangle(halfBg - (labelWidth/2), by-20, labelWidth, 12, 0, 0, 100, 255);    	
+		BaseOverlayRenderer.drawRectangle(halfBg - (labelWidth/2), by-20, labelWidth, 12, 0, 0, 100, 255);    	
 		map.drawCenteredString(this.fontRenderer, title , this.width / 2, by-18, 16777215);
     }
     

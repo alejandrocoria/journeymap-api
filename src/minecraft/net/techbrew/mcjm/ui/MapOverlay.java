@@ -73,8 +73,16 @@ import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.Waypoint;
 import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.MapBlocks;
+import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
+import net.techbrew.mcjm.render.overlay.OverlayEntityRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
 
+/**
+ * Displays the map as an overlay in-game.
+ * 
+ * @author mwoodman
+ *
+ */
 public class MapOverlay extends GuiScreen {
 	
 	LinkedList<ZoomLevel> zoomLevels = ZoomLevel.getLevels();
@@ -157,13 +165,13 @@ public class MapOverlay extends GuiScreen {
 	private void drawButtonBar() {		
 		// zoom underlay
 		if(options==null) {
-			drawRectangle(3,25,20,55,0,0,0,150);
+			BaseOverlayRenderer.drawRectangle(3,25,20,55,0,0,0,150);
 		}
 		
 		if(logoTextureIndex==null) {
 			logoTextureIndex = mc.renderEngine.getTexture(FileHandler.WEB_DIR + "/ico/journeymap40.png");
 		}
-		drawImage(logoTextureIndex, 1F, 3, 1, 20,20); //$NON-NLS-1$
+		BaseOverlayRenderer.drawImage(logoTextureIndex, 1F, 3, 1, 20,20); //$NON-NLS-1$
 	}
 
 	@Override
@@ -673,7 +681,7 @@ public class MapOverlay extends GuiScreen {
 		int labelWidth = mc.fontRenderer.getStringWidth(playerLastPos) + 10;
 		int halfBg = getBackgroundWidth()/2;
 		
-		drawRectangle(halfBg - (labelWidth/2), height-18, labelWidth, 12, mapBackground[0],mapBackground[1],mapBackground[2],220);			
+		BaseOverlayRenderer.drawRectangle(halfBg - (labelWidth/2), height-18, labelWidth, 12, mapBackground[0],mapBackground[1],mapBackground[2],220);			
 		drawCenteredString(mc.fontRenderer, playerLastPos, getBackgroundWidth()/2, height-16, 0x8888ff);
 	}
 
@@ -769,7 +777,7 @@ public class MapOverlay extends GuiScreen {
 		if(lastMapImgTextureIndex!=null && lastMapImg!=null && lastMapRatio!=null) {
 			int maxWidth = calculateMaxChunksWide(mapScale) * chunkScale;
 			int maxHeight = calculateMaxChunksHigh(mapScale) * chunkScale;
-			drawImage(lastMapImgTextureIndex, 1f, blockXOffset, blockZOffset, maxWidth, maxHeight);
+			BaseOverlayRenderer.drawImage(lastMapImgTextureIndex, 1f, blockXOffset, blockZOffset, maxWidth, maxHeight);
 		}
 
 	}
@@ -847,9 +855,28 @@ public class MapOverlay extends GuiScreen {
 			g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			FontMetrics fm = g2D.getFontMetrics();
 			
-			if(!hardcore) {
-				// Draw nearby mobs
+			// Calculate how much of the bottom and right of the layer will be offscreen
+			int cw = getCanvasWidth()/mapScale;
+			int chunks = cw >> 4;
+			int maxWidth = chunks * entityChunkSize;
+			if(cw % 16 > 0) {
+				maxWidth = maxWidth +  ((cw%16)*(entityChunkSize/16));
+			}
+			
+			int ch = getCanvasHeight()/mapScale;
+			chunks = ch >> 4;
+			int maxHeight = chunks * entityChunkSize;
+			if(ch % 16 > 0) {
+				maxHeight = maxHeight + ((ch%16)*(entityChunkSize/16));
+			}
+			
+			int xCutoff = layerWidth-maxWidth;
+			int zCutoff = layerHeight-maxHeight;
+			
+			// Renderer for entities and player
+			OverlayEntityRenderer entityRenderer = new OverlayEntityRenderer(mapBounds[0], mapBounds[1], entityChunkSize, layerWidth, layerHeight, xCutoff, zCutoff, showAnimals, showPets);
 						
+			if(!hardcore) {
 				List<Map> critters = new ArrayList<Map>(16);
 				
 				if(showAnimals || showPets) {
@@ -865,82 +892,13 @@ public class MapOverlay extends GuiScreen {
 					critters.addAll((List<Map>) DataCache.instance().get(PlayersData.class).get(EntityKey.root));
 				}
 				
-				int cx, cz, x, z;
-				double heading;
-				BufferedImage entityIcon, locatorImg;
-				String filename, owner;
-				Boolean isHostile, isPet, isPlayer;
-				boolean filterAnimals = (showAnimals!=showPets);
-				
-				for(Map critter : critters) {
-					
-					isHostile = Boolean.TRUE.equals(critter.get(EntityKey.hostile));
-					
-					owner = (String) critter.get(EntityKey.owner);
-					isPet = mc.thePlayer.username.equals(owner);					
-					
-					// Skip animals/pets if needed
-					if(filterAnimals && !isHostile) {						
-						if(showPets != isPet) {
-							continue;
-						}
-					}
-					
-					if(inBounds(critter)) {						
-						filename = (String) critter.get(EntityKey.filename);
-						cx = (Integer) critter.get(EntityKey.chunkCoordX);
-						cz = (Integer) critter.get(EntityKey.chunkCoordZ);
-						x = (Integer) critter.get(EntityKey.posX);
-						z = (Integer) critter.get(EntityKey.posZ);
-						heading = (Double) critter.get(EntityKey.heading);
-						
-						isPlayer = EntityHelper.PLAYER_FILENAME.equals(filename);
-								
-						// Determine and draw locator
-						if(isHostile) {
-							locatorImg = EntityHelper.getHostileLocator();
-						} else if(isPet) {
-							locatorImg = EntityHelper.getPetLocator();
-						} else if(isPlayer) {
-							locatorImg = EntityHelper.getOtherLocator();
-						} else {
-							locatorImg = EntityHelper.getNeutralLocator();
-						}			
-						g2D.setComposite(MapBlocks.OPAQUE);
-						drawEntity(cx, x, cz, z, heading, false, locatorImg, g2D);
-						
-						// Draw entity image
-						entityIcon = EntityHelper.getEntityImage(filename);
-						if(entityIcon!=null) {
-							g2D.setComposite(MapBlocks.OPAQUE);
-							drawEntity(cx, x, cz, z, heading, true, entityIcon, g2D);
-						}
-						
-						if(isPlayer) {
-							
-							// Draw Label			
-							String username = (String) critter.get(EntityKey.username);
-							
-							int lx = getScaledEntityX(cx, x);
-							int ly = getScaledEntityZ(cz, z) + entityIcon.getHeight();
-							
-							lx = lx - (fm.stringWidth(username)/2) - entityIcon.getWidth()/2;	
-							g2D.setComposite(MapBlocks.OPAQUE);
-							g2D.setPaint(Color.black);
-							g2D.drawString(username, lx +1, ly + 1);
-							g2D.drawString(username, lx +2, ly + 2);
-							g2D.drawString(username, lx +3, ly + 3);
-							g2D.setPaint(Color.green);
-							g2D.drawString(username, lx, ly);
-						}
-					}
-				}
+				entityRenderer.render(critters, g2D);
 			}			
 
 			// Draw player if within bounds
 			if(inBounds(mc.thePlayer)) {
 				g2D.setComposite(MapBlocks.OPAQUE);
-				drawEntity(mc.thePlayer.chunkCoordX, mc.thePlayer.posX, 
+				entityRenderer.drawEntity(mc.thePlayer.chunkCoordX, mc.thePlayer.posX, 
 						mc.thePlayer.chunkCoordZ, mc.thePlayer.posZ,
 						EntityHelper.getHeading(mc.thePlayer), false, playerImage, g2D);				
 			}
@@ -949,31 +907,14 @@ public class MapOverlay extends GuiScreen {
 			if(showWaypoints && WaypointHelper.waypointsEnabled()) {
 				List<Waypoint> waypoints = (List<Waypoint>) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
 
-				int cw = getCanvasWidth()/mapScale;
-				int chunks = cw >> 4;
-				int maxWidth = chunks * entityChunkSize;
-				if(cw % 16 > 0) {
-					maxWidth = maxWidth +  ((cw%16)*(entityChunkSize/16));
-				}
-				
-				int ch = getCanvasHeight()/mapScale;
-				chunks = ch >> 4;
-				int maxHeight = chunks * entityChunkSize;
-				if(ch % 16 > 0) {
-					maxHeight = maxHeight + ((ch%16)*(entityChunkSize/16));
-				}
-				
-				int xCutoff = layerWidth-maxWidth;
-				int zCutoff = layerHeight-maxHeight;
-
-				new OverlayWaypointRenderer(mapBounds[0], entityChunkSize, layerWidth, layerHeight, xCutoff, zCutoff).render(waypoints, g2D);
+				new OverlayWaypointRenderer(mapBounds[0], mapBounds[1], entityChunkSize, layerWidth, layerHeight, xCutoff, zCutoff).render(waypoints, g2D);
 			}
 							
 			lastEntityImg = entityOverlay;
 			try {
 				textureIndex = mc.renderEngine.allocateAndSetupTexture(entityOverlay);
 			} catch (BufferOverflowException e) {
-				JourneyMap.getLogger().info("Couldn't allocate entity texture at overlay scale " + overlayScale); //$NON-NLS-1$
+				JourneyMap.getLogger().fine("Couldn't allocate entity texture at overlay scale " + overlayScale); //$NON-NLS-1$
 				if(overlayScale>4) {
 					overlayScale = 4;
 				} else if(overlayScale==4) {
@@ -1008,83 +949,12 @@ public class MapOverlay extends GuiScreen {
 			int maxWidth = calculateMaxChunksWide(mapScale) * chunkScale;
 			int maxHeight = calculateMaxChunksHigh(mapScale) * chunkScale;
 			
-			drawImage(lastEntityImgTextureIndex, 1f, blockXOffset, blockZOffset, maxWidth, maxHeight);
+			BaseOverlayRenderer.drawImage(lastEntityImgTextureIndex, 1f, blockXOffset, blockZOffset, maxWidth, maxHeight);
 		}
 		
 	}
 	
-	/**
-	 * Draw the entity's location and heading on the overlay image
-	 * using the provided icon.
-	 * @param entity
-	 * @param entityIcon
-	 * @param overlayImg
-	 */
-	private void drawEntity(int chunkX, double posX, int chunkZ, double posZ, Double heading, boolean flipNotRotate, BufferedImage entityIcon, Graphics2D g2D) {
-		int radius = entityIcon.getWidth()/2;
-		int size = entityIcon.getWidth();
-		
-		int offset = 0;
-		int x = getScaledEntityX(chunkX, posX) + offset;
-		int y = getScaledEntityZ(chunkZ, posZ) + offset;
-		
-		final Graphics2D gCopy = (Graphics2D) g2D.create();
-		
-		gCopy.translate(x, y);
-		if(heading!=null) {
-			if(flipNotRotate) {
-				if(heading<0 && heading>-Math.PI) {
-					//gCopy.translate(size, 0);
-					gCopy.scale(-1, 1);				
-				} 
-			} else {
-				gCopy.rotate(heading);				
-			}
-		}
-		gCopy.translate(-radius, -radius);
-		gCopy.drawImage(entityIcon, 0, 0, size, size, null);
-		gCopy.dispose();
-		
-	}
 	
-	void drawRectangle(int x, int y, int width, int height, int red, int green, int blue, int alpha) {
-		Tessellator tessellator = Tessellator.instance;
-		
-		GL11.glDisable(3553 /*GL_TEXTURE_2D*/);
-		GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
-		GL11.glDepthMask(false);
-		GL11.glBlendFunc(770, 771);
-		GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
-
-		tessellator.startDrawingQuads();
-		tessellator.setColorRGBA(red,green,blue,alpha);
-
-		tessellator.addVertexWithUV(x, height + y, 0.0D, 0, 1);
-		tessellator.addVertexWithUV(x + width, height + y, 0.0D, 1, 1);
-		tessellator.addVertexWithUV(x + width, y, 0.0D, 1, 0);
-		tessellator.addVertexWithUV(x, y, 0.0D, 0, 0);
-		tessellator.draw();
-		
-		GL11.glEnable(3553 /*GL_TEXTURE_2D*/);
-	}
-
-	private void drawImage(int bufferedImage, float transparency, int startX, int startY, int srcWidth, int srcHeight) {
-		Tessellator tessellator = Tessellator.instance;
-		GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
-		GL11.glDepthMask(false);
-		GL11.glBlendFunc(770, 771);
-		GL11.glColor4f(transparency, transparency, transparency, transparency);
-		GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
-		GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, bufferedImage);
-
-		tessellator.startDrawingQuads();
-
-		tessellator.addVertexWithUV(startX, srcHeight + startY, 0.0D, 0, 1);
-		tessellator.addVertexWithUV(startX + srcWidth, srcHeight + startY, 0.0D, 1, 1);
-		tessellator.addVertexWithUV(startX + srcWidth, startY, 0.0D, 1, 0);
-		tessellator.addVertexWithUV(startX, startY, 0.0D, 0, 0);
-		tessellator.draw();
-	}
 
 	void save() {
 
@@ -1189,11 +1059,13 @@ public class MapOverlay extends GuiScreen {
 
 				int maxWidth = calculateMaxChunksWide(mapScale) * chunkScale;
 				int maxHeight = calculateMaxChunksHigh(mapScale) * chunkScale;
-				drawImage(lastMapImgTextureIndex, 1f, xOffset + blockXOffset, zOffset + blockXOffset, maxWidth, maxHeight);
+				
+				// Draw the map layer image
+				BaseOverlayRenderer.drawImage(lastMapImgTextureIndex, 1f, xOffset + blockXOffset, zOffset + blockXOffset, maxWidth, maxHeight);
 				
 				// Draw the entity layer image
 				if(lastEntityImgTextureIndex!=null && lastMapRatio!=null && lastEntityImg!=null) {
-					drawImage(lastEntityImgTextureIndex, 1f, xOffset + blockXOffset, zOffset + blockZOffset, maxWidth, maxHeight);
+					BaseOverlayRenderer.drawImage(lastEntityImgTextureIndex, 1f, xOffset + blockXOffset, zOffset + blockZOffset, maxWidth, maxHeight);
 				}
 			} 			
 		} 

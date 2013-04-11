@@ -34,8 +34,8 @@ public class OverlayWaypointRenderer extends BaseOverlayRenderer<List<Waypoint>>
 	 * @param canvasWidth
 	 * @param canvasHeight
 	 */
-	public OverlayWaypointRenderer(final ChunkCoordIntPair startCoords, final int entityChunkSize, final int canvasWidth, final int canvasHeight, final int widthCutoff, final int heightCutoff) {
-		super(startCoords, entityChunkSize, canvasWidth, canvasHeight, widthCutoff, heightCutoff);
+	public OverlayWaypointRenderer(final ChunkCoordIntPair startCoords, final ChunkCoordIntPair endCoords, final int entityChunkSize, final int canvasWidth, final int canvasHeight, final int widthCutoff, final int heightCutoff) {
+		super(startCoords, endCoords, entityChunkSize, canvasWidth, canvasHeight, widthCutoff, heightCutoff);
 	}
 
 	/**
