@@ -34,6 +34,8 @@ public class EntityHelper {
 	
 	public static final String PLAYER_FILENAME = "char.png";
 	
+	private static final double PI2 = 2*Math.PI;
+	
 	// TODO: make threadsafe
 	static BufferedImage locatorHostile, locatorNeutral, locatorOther, locatorPet, locatorPlayer;
 	
@@ -223,14 +225,22 @@ public class EntityHelper {
 	}
 	
 	/**
-	 * Get the entity's heading in radians
+	 * Get the entity's heading in radians,
+	 * normalized to be between 0 and 2*Pi.
 	 * 
-	 * @param player
+	 * @param rotationYaw
 	 * @return
 	 */
 	public static double getHeading(float rotationYaw) {
 		double degrees = Math.round(rotationYaw % 360);
 	    double radians = (degrees * Math.PI) / 180;
+	    
+	    // Clamp between 0 and 2PI
+		if(radians<PI2 || radians > PI2) {
+			radians = radians % PI2;
+		}
+		if(radians<0) radians = PI2+radians;
+	    
 	    return radians;
 	}
 	
