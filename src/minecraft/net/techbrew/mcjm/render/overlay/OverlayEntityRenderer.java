@@ -32,6 +32,10 @@ import net.techbrew.mcjm.render.MapBlocks;
  */
 public class OverlayEntityRenderer extends BaseOverlayRenderer<List<Map>> {
 	
+	final int fontHeight = 8;
+	final Font labelFont = new Font("Arial", Font.BOLD, fontHeight);
+	final Color labelBg = Color.darkGray.darker();
+	
 	final boolean showAnimals;
 	final boolean showPets;
 	
@@ -88,7 +92,7 @@ public class OverlayEntityRenderer extends BaseOverlayRenderer<List<Map>> {
 					heading = (Double) critter.get(EntityKey.heading);
 					
 					isPlayer = EntityHelper.PLAYER_FILENAME.equals(filename);
-							
+
 					// Determine and draw locator
 					if(isHostile) {
 						locatorImg = EntityHelper.getHostileLocator();
@@ -109,22 +113,17 @@ public class OverlayEntityRenderer extends BaseOverlayRenderer<List<Map>> {
 						drawEntity(cx, x, cz, z, heading, true, entityIcon, g2D);
 					}
 					
+					int lx = getScaledEntityX(cx, x);
+					int lz = getScaledEntityZ(cz, z);
+					
+					g2D.setComposite(MapBlocks.SLIGHTLYCLEAR);
 					if(isPlayer) {
-						
 						// Draw Label			
 						String username = (String) critter.get(EntityKey.username);
-						
-						int lx = getScaledEntityX(cx, x);
-						int ly = getScaledEntityZ(cz, z) + entityIcon.getHeight();
-						
-						lx = lx - (fm.stringWidth(username)/2) - entityIcon.getWidth()/2;	
-						g2D.setComposite(MapBlocks.OPAQUE);
-						g2D.setPaint(Color.black);
-						g2D.drawString(username, lx +1, ly + 1);
-						g2D.drawString(username, lx +2, ly + 2);
-						g2D.drawString(username, lx +3, ly + 3);
-						g2D.setPaint(Color.green);
-						g2D.drawString(username, lx, ly);
+						drawCenteredLabel(username, lx, lz, fontHeight*2, 32, g2D, fm, labelBg, Color.green);
+					} else if(critter.containsKey(EntityKey.customName)){
+						String customName = (String) critter.get(EntityKey.customName);
+						drawCenteredLabel(customName, lx, lz, fontHeight*2, entityIcon.getWidth()-8, g2D, fm, labelBg, Color.white);
 					}
 				}
 			}

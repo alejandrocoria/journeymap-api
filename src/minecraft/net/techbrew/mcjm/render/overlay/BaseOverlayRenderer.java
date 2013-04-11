@@ -137,6 +137,9 @@ public abstract class BaseOverlayRenderer<K> {
 	 */
 	public static void drawCenteredLabel(final String label, int x, int z, int height, int zOffset, final Graphics2D g2D, final FontMetrics fm, Color bgColor, Color color) {
 
+		if(label==null || label.length()==0) {
+			return;
+		}
 		final int margin = 3;
 		final int labelWidth = fm.stringWidth(label);
 		final int lx = x - (labelWidth/2);
@@ -146,7 +149,7 @@ public abstract class BaseOverlayRenderer<K> {
 		if(bgColor!=null) {
 			g2D.setComposite(SLIGHTLYCLEAR);
 			g2D.setPaint(bgColor);
-			g2D.fillRect(lx - margin, ly - margin, labelWidth + margin + margin, height + margin);
+			g2D.fillRect(lx - margin, ly - margin, labelWidth + margin + margin, height + margin + margin);
 		}
 
 		// Draw text
@@ -227,14 +230,14 @@ public abstract class BaseOverlayRenderer<K> {
 		gCopy.dispose();		
 	}
 	
-	boolean inBounds(Entity entity) {
+	public boolean inBounds(Entity entity) {
 		int chunkX = entity.chunkCoordX;
 		int chunkZ = entity.chunkCoordZ;
 		return (chunkX>=startChunkX && chunkX<=endChunkX && 
 				chunkZ>=startChunkZ && chunkZ<=endChunkZ);
 	}
 	
-	boolean inBounds(Map entityMap) {
+	public boolean inBounds(Map entityMap) {
 		try {
 			int chunkX = (Integer) entityMap.get(EntityKey.chunkCoordX);
 			int chunkZ = (Integer) entityMap.get(EntityKey.chunkCoordZ);

@@ -1207,6 +1207,27 @@ var JourneyMap = (function() {
 				ctx.drawImage(mobImage, 0, 0, radius * 2, radius * 2);
 				ctx.restore();
 			}
+			
+			// Label if customName exists
+			if(mob.customName) {
+				// Draw label background			
+				ctx.font = "bold 11px Arial";
+				ctx.textAlign = "center";
+				ctx.fillStyle = "#000";
+				
+				var labelZ = z + 36; 
+				
+				// Get label dimensions
+				var metrics = ctx.measureText(mob.customName);
+				var width = metrics.width + 6;
+				ctx.globalAlpha = 0.7;
+				ctx.fillRect(x-(width/2), labelZ-12, width, 16);
+				
+				// Draw label
+				ctx.globalAlpha = 1.0;
+				ctx.fillStyle = "#fff";
+				ctx.fillText(mob.customName, x, labelZ);
+			}
 		}
 	}
 
@@ -1219,6 +1240,9 @@ var JourneyMap = (function() {
 		var others = JM.players;
 		if (!others)
 			return;
+		
+		if(showPlayers!==true)
+			return;
 
 		if (!canvasWidth || !canvasHeight) {
 			canvasWidth = getCanvasWidth();
@@ -1227,7 +1251,6 @@ var JourneyMap = (function() {
 
 		var ctx = fgCanvas.getContext("2d");
 
-		// Make new
 		$.each(others, function(index, other) {
 
 			var x = getScaledChunkX(other.posX / 16) - (mapScale / 2);

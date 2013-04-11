@@ -1,6 +1,7 @@
 package net.techbrew.mcjm.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class AnimalsData implements IDataProvider {
 		EntityPlayerSP player = mc.thePlayer;			
 	   
 		List<IAnimals> animals = EntityHelper.getAnimalsNearby();
-		List<Map> list = new ArrayList<Map>(animals.size());
+		ArrayList<LinkedHashMap> list = new ArrayList<LinkedHashMap>(animals.size());
 		
 		for(IAnimals animal : animals) {
 			EntityLiving entity = (EntityLiving) animal;
@@ -79,9 +80,18 @@ public class AnimalsData implements IDataProvider {
 					eProps.put(EntityKey.owner, owner);
 				}
 			}
+			
+			// CustomName
+			if(entity.func_94056_bM()) {
+				eProps.put(EntityKey.customName, entity.func_94057_bL()); 
+			}
+						
 			list.add(eProps);
 		}
 					
+		// Sort to keep named entities last
+		Collections.sort(list, new EntityHelper.EntityMapComparator());
+		
 		LinkedHashMap props = new LinkedHashMap();
 		props.put(EntityKey.root, list);
 		

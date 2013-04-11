@@ -1,6 +1,7 @@
 package net.techbrew.mcjm.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class MobsData implements IDataProvider {
 		EntityPlayerSP player = mc.thePlayer;			
 	   
 		List mobs = EntityHelper.getMobsNearby();
-		List<Map> list = new ArrayList<Map>(mobs.size());
+		ArrayList<LinkedHashMap> list = new ArrayList<LinkedHashMap>(mobs.size());
 		for(Object mob : mobs) {
 			EntityLiving entity = (EntityLiving) mob;
 			LinkedHashMap eProps = new LinkedHashMap();
@@ -64,8 +65,17 @@ public class MobsData implements IDataProvider {
 			eProps.put(EntityKey.chunkCoordX, entity.chunkCoordX); 
 			eProps.put(EntityKey.chunkCoordZ, entity.chunkCoordZ); 
 			eProps.put(EntityKey.heading, EntityHelper.getHeading(entity));
+			
+			// CustomName
+			if(entity.func_94056_bM()) {
+				eProps.put(EntityKey.customName, entity.func_94057_bL()); 
+			}
+			
 			list.add(eProps);
 		}
+		
+		// Sort to keep named entities last
+		Collections.sort(list, new EntityHelper.EntityMapComparator());
 					
 		LinkedHashMap props = new LinkedHashMap();
 		props.put(EntityKey.root, list);

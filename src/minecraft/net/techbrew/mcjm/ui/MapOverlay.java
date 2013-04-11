@@ -1,60 +1,32 @@
 package net.techbrew.mcjm.ui;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.FontMetrics;
-import java.awt.Frame;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import javax.imageio.ImageIO;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.BiomeGenBase;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.ChunkCoordinates;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityDragon;
-import net.minecraft.src.EntityGhast;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiChat;
 import net.minecraft.src.GuiInventory;
 import net.minecraft.src.GuiScreen;
-import net.minecraft.src.GuiSmallButton;
-import net.minecraft.src.MathHelper;
-import net.minecraft.client.Minecraft;
-import net.minecraft.src.Tessellator;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
-import net.techbrew.mcjm.VersionCheck;
-import net.techbrew.mcjm.Constants.CoordType;
-import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.data.AnimalsData;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.EntityKey;
@@ -68,7 +40,6 @@ import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.Waypoint;
 import net.techbrew.mcjm.model.WaypointHelper;
@@ -76,6 +47,10 @@ import net.techbrew.mcjm.render.MapBlocks;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayEntityRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
+
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 
 /**
  * Displays the map as an overlay in-game.
@@ -325,8 +300,6 @@ public class MapOverlay extends GuiScreen {
 		int endX = width - 10;
 		int offsetX = bWidth + bHGap;
 		int offsetY = bHeight + bVGap;
-
-		//System.out.println("width=" + width + ", startX=" + startX);
 
 		buttonDayNight.xPosition = 30;
 		buttonDayNight.yPosition = 3;
@@ -781,46 +754,6 @@ public class MapOverlay extends GuiScreen {
 		}
 
 	}
-	
-	int getScaledEntityX(int chunkX, double posX) {
-		int xDelta = chunkX - mapBounds[0].chunkXPos;
-		if(chunkX<0) {
-			xDelta++;
-		}
-		int scaledBlockSize = entityChunkSize/16;
-		int scaledChunkX = (xDelta) * entityChunkSize;		
-		int scaledBlockX = (int) (Math.floor(posX) % 16) * scaledBlockSize;
-		return (scaledChunkX + scaledBlockX - (scaledBlockSize/2));
-	}
-
-	int getScaledEntityZ(int chunkZ, double posZ) {
-		int zDelta = chunkZ - mapBounds[0].chunkZPos;
-		if(chunkZ<0) {
-			zDelta++;
-		}
-		int scaledBlockSize = entityChunkSize/16;
-		int scaledChunkZ = (zDelta) * entityChunkSize;
-		int scaledBlockZ = (int) (Math.floor(posZ) % 16) * scaledBlockSize;
-		return (scaledChunkZ + scaledBlockZ - (scaledBlockSize/2));
-	}
-
-	boolean inBounds(Entity entity) {
-		int chunkX = entity.chunkCoordX;
-		int chunkZ = entity.chunkCoordZ;
-		return (chunkX>=mapBounds[0].chunkXPos && chunkX<=mapBounds[1].chunkXPos && 
-				chunkZ>=mapBounds[0].chunkZPos && chunkZ<=mapBounds[1].chunkZPos);
-	}
-	
-	boolean inBounds(Map entityMap) {
-		try {
-		int chunkX = (Integer) entityMap.get(EntityKey.chunkCoordX);
-		int chunkZ = (Integer) entityMap.get(EntityKey.chunkCoordZ);
-		return (chunkX>=mapBounds[0].chunkXPos && chunkX<=mapBounds[1].chunkXPos && 
-				chunkZ>=mapBounds[0].chunkZPos && chunkZ<=mapBounds[1].chunkZPos);
-		} catch(NullPointerException e) {
-			return false;
-		}
-	}
 
 	void drawEntityLayer() {
 
@@ -892,11 +825,14 @@ public class MapOverlay extends GuiScreen {
 					critters.addAll((List<Map>) DataCache.instance().get(PlayersData.class).get(EntityKey.root));
 				}
 				
+				// Sort to keep named entities last
+				Collections.sort(critters, new EntityHelper.EntityMapComparator());
+				
 				entityRenderer.render(critters, g2D);
 			}			
 
 			// Draw player if within bounds
-			if(inBounds(mc.thePlayer)) {
+			if(entityRenderer.inBounds(mc.thePlayer)) {
 				g2D.setComposite(MapBlocks.OPAQUE);
 				entityRenderer.drawEntity(mc.thePlayer.chunkCoordX, mc.thePlayer.posX, 
 						mc.thePlayer.chunkCoordZ, mc.thePlayer.posZ,
@@ -953,8 +889,6 @@ public class MapOverlay extends GuiScreen {
 		}
 		
 	}
-	
-	
 
 	void save() {
 

@@ -11,6 +11,7 @@ public enum EntityKey {
 	chunkCoordY,
 	chunkCoordZ,
 	heading,
+	customName,
 	owner,
 	// Villager only:
 	profession,

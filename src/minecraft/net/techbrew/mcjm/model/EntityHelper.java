@@ -4,8 +4,11 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -27,6 +30,7 @@ import net.minecraft.src.IMob;
 import net.minecraft.src.IRangedAttackMob;
 import net.minecraft.src.MathHelper;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 
@@ -254,5 +258,28 @@ public class EntityHelper {
 		String tex = entity.getTexture();
 		int i = tex.lastIndexOf('/');
 		return tex.substring(i+1);
+	}
+	
+	public static class EntityMapComparator implements Comparator<Map> {
+
+		@Override
+		public int compare(Map o1, Map o2) {
+			
+			Integer o1rank = 0;
+			Integer o2rank = 0;
+			if(o1.containsKey(EntityKey.customName)) {
+				o1rank++;
+			} else if(o1.containsKey(EntityKey.username)) {
+				o1rank+=2;
+			}
+			if(o2.containsKey(EntityKey.customName)) {
+				o2rank++;
+			} else if(o2.containsKey(EntityKey.username)) {
+				o2rank+=2;
+			}
+			
+			return o1rank.compareTo(o2rank);
+		}
+		
 	}
 }
