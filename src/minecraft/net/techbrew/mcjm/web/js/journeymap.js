@@ -42,9 +42,9 @@ var JourneyMap = (function() {
 	var hostileMobImage;
 	var petMobImage;
 	var otherPlayerMobImage;
+	var otherImage;
 
 	var mobImages = {};
-	var otherImages = [];
 	var chunkScale = mapScale * 16;
 
 	var JmIcon, LoadingIcon;
@@ -572,6 +572,13 @@ var JourneyMap = (function() {
 			otherPlayerMobImage.width = 64;
 			otherPlayerMobImage.height = 64;
 		}
+		
+		if(!otherImage) {
+			otherImage = new Image();
+			otherImage.src = "/img/entity/char.png";
+			otherImage.width = 48;
+			otherImage.height = 48;
+		}
 
 	}
 
@@ -929,12 +936,6 @@ var JourneyMap = (function() {
 			displayError = "";
 		}
 
-		// Remove others
-		$.each(otherImages, function(index, img) {
-
-			document.body.removeChild(img);
-		});
-
 		// Format UI
 		$('body').css('backgroundColor', mapBackground);
 		sizeMap();
@@ -1142,11 +1143,15 @@ var JourneyMap = (function() {
 
 			var mobLocator;
 
-			if (mob.hostile !== true && mob.owner && mob.owner === JM.player.username) {
-				if (showPets === false)
-					return;
-				mobLocator = petMobImage;
-				ctx.strokeStyle = "#0000ff";
+			if (mob.hostile !== true && mob.owner) {
+				if(mob.owner === JM.player.username) {			
+					if (showPets === false)
+						return;
+					mobLocator = petMobImage;
+					ctx.strokeStyle = "#0000ff";
+				} else {
+					mobLocator = neutralMobImage;
+				}
 			} else if (mob.hostile !== true) {
 				if (showAnimals === false && !(mob.filename === 'villager.png'))
 					return;
@@ -1165,7 +1170,7 @@ var JourneyMap = (function() {
 			if (ctx.drawImage) {
 				var locRadius = mobLocator.width / 2;
 				ctx.save();
-				ctx.globalAlpha = .6;
+				ctx.globalAlpha = 1;
 				ctx.translate(x, z);
 				ctx.rotate(mob.heading);
 				ctx.translate(-locRadius, -locRadius);
@@ -1193,6 +1198,10 @@ var JourneyMap = (function() {
 				radius = mobImage.width / 2;
 				ctx.save();
 				ctx.translate(x - radius, z - radius);
+				if(mob.heading<0 && mob.heading>-Math.PI) {
+					ctx.translate(mobImage.width, 0);
+					ctx.scale(-1, 1);
+				}
 				ctx.drawImage(mobImage, 0, 0, radius * 2, radius * 2);
 				ctx.restore();
 			}
@@ -1214,13 +1223,6 @@ var JourneyMap = (function() {
 			canvasHeight = getCanvasHeight();
 		}
 
-		// Remove old
-		$.each(otherImages, function(index, img) {
-
-			document.body.removeChild(img);
-		});
-		otherImages = new Array();
-
 		var ctx = fgCanvas.getContext("2d");
 
 		// Make new
@@ -1234,37 +1236,42 @@ var JourneyMap = (function() {
 					// Draw locator
 					var locRadius = otherPlayerMobImage.width / 2;
 					ctx.save();
-					ctx.globalAlpha = .8;
+					ctx.globalAlpha = 1;
 					ctx.translate(x, z);
 					ctx.rotate(other.heading);
 					ctx.translate(-locRadius, -locRadius);
 					ctx.drawImage(otherPlayerMobImage, 0, 0);
 					ctx.restore();
-
-					// Draw label
-					ctx.globalAlpha = 1.0;
-					ctx.font = "bold 12px Arial";
+					
+					// show image
+					if(otherImage.width) {
+						var radius = otherImage.width / 2;
+						ctx.save();
+						ctx.translate(x - radius, z - radius);
+						if(other.heading<0 && other.heading>-Math.PI) {
+							ctx.translate(otherImage.width, 0);
+							ctx.scale(-1, 1);
+						}
+						ctx.drawImage(otherImage, 0, 0, radius * 2, radius * 2);
+						ctx.restore();
+					}
+					// Draw label background			
+					ctx.font = "bold 11px Arial";
 					ctx.textAlign = "center";
 					ctx.fillStyle = "#000";
-					ctx.fillText(other.username, x - 2, z + 28);
-					ctx.fillText(other.username, x + 2, z + 32);
+					
+					var labelZ = z + 36; 
+					
+					// Get label dimensions
+					var metrics = ctx.measureText(other.username);
+					var width = metrics.width + 6;
+					ctx.globalAlpha = 0.7;
+					ctx.fillRect(x-(width/2), labelZ-12, width, 16);
+					
+					// Draw label
+					ctx.globalAlpha = 1.0;
 					ctx.fillStyle = "#0f0";
-					ctx.fillText(other.username, x, z + 30);
-
-					// show image
-					var otherImage = new Image();
-					otherImage.src = "/img/entity/char.png";
-					otherImage['class'] = 'mobImage';
-					otherImage.title = other.username;
-					otherImage.style.position = "absolute";
-					otherImage.style.visibility = "visible";
-					otherImage.style.height = "20px";
-					otherImage.style.width = "20px";
-					otherImage.style.left = (x - 10) + "px";
-					otherImage.style.top = (z - 10) + "px";
-					otherImage.style.zIndex = 1;
-					document.body.appendChild(otherImage);
-					otherImages.push(otherImage);
+					ctx.fillText(other.username, x, labelZ);
 				}
 			}
 		});
