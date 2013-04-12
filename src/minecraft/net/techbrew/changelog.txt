@@ -1,4 +1,4 @@
-JourneyMap 2.5.0RC2 for Minecraft 1.5.1 (April 11, 2013)
+JourneyMap 2.5.0 for Minecraft 1.5.1 (April 12, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
