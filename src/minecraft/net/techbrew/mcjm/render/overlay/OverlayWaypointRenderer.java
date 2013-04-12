@@ -128,7 +128,7 @@ public class OverlayWaypointRenderer extends BaseOverlayRenderer<List<Waypoint>>
 					
 					// Draw label
 					labelColor = (waypoint.getType()==Waypoint.TYPE_DEATH) ? Color.red : color;
-					drawCenteredLabel(waypoint.getName(), x, z, fontHeight, diameter*2, g, fm, Color.black, labelColor);
+					drawCenteredLabel(waypoint.getName(), x, z, fontHeight, -diameter*2, g, fm, Color.black, labelColor);
 	
 				} else {
 					
