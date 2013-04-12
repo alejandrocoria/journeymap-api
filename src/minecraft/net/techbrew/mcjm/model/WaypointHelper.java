@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.minecraft.client.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 
@@ -133,17 +134,25 @@ public class WaypointHelper {
 			if(wayPts.isEmpty()) {
 				return wayPts;
 			}
-			
+			final int dimension = Minecraft.getMinecraft().thePlayer.dimension;
+			final int netherOffset = (dimension==-1) ? 8 : 1;
 			ArrayList<Waypoint> converted = new ArrayList<Waypoint>(wayPts.size());
 			for(Object wpObj : wayPts) {
 				com.thevoxelbox.voxelmap.util.Waypoint wp = (com.thevoxelbox.voxelmap.util.Waypoint) wpObj;
-				converted.add(new Waypoint(wp.name, wp.x, wp.y, wp.z, wp.enabled,						
+				if(!wp.isActive()) continue;
+				Waypoint convertWp = new Waypoint(wp.name, 
+						wp.x / netherOffset, 
+						wp.y, 
+						wp.z / netherOffset, 
+						wp.enabled,						
 						(int)(wp.red * 255.0F) & 255,
 						(int)(wp.green * 255.0F) & 255,
 		        		(int)(wp.blue * 255.0F) & 255,
 		        		"skull".equals(wp.imageSuffix) ? 1 : 0,
 		        		"voxelmap",
-		        		wp.name));
+		        		wp.name);
+				
+				converted.add(convertWp);
 			}
 			return converted;
 			
