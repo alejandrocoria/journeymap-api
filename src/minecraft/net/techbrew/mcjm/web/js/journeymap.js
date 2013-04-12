@@ -1439,10 +1439,10 @@ var JourneyMap = (function() {
 				
 				// Draw label
 				ctx.globalAlpha = 1.0;
-				if(waypoint.reiType && waypoint.reiType==1) {
+				if(waypoint.tType==1) {
 					ctx.fillStyle = "#f00";
 				} else {
-					ctx.fillStyle = "#fff";
+					ctx.fillStyle = waypoint.color;
 				}
 				ctx.fillText(waypoint.name, x, labelZ);
 			} else {
