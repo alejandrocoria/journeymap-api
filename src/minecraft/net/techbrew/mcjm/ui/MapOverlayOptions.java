@@ -180,7 +180,7 @@ public class MapOverlayOptions extends GuiScreen {
 				buttonCaves.setToggled(MapOverlay.showCaves);	
 				boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
 				if(underground) {
-					map.eraseCachedMapImg();
+					map.forceRefresh();
 				}
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_CAVES, MapOverlay.showCaves);
 				break;

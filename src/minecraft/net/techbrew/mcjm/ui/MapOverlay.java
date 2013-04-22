@@ -1,9 +1,7 @@
 package net.techbrew.mcjm.ui;
 
-import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -38,14 +36,16 @@ import net.techbrew.mcjm.data.WaypointsData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.EntityHelper;
+import net.techbrew.mcjm.model.MapOverlayState;
 import net.techbrew.mcjm.model.Waypoint;
 import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.MapBlocks;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayEntityRenderer;
+import net.techbrew.mcjm.render.overlay.OverlayMapRenderer;
+import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
 
 import org.lwjgl.input.Keyboard;
@@ -60,26 +60,29 @@ import org.lwjgl.opengl.GL11;
  */
 public class MapOverlay extends GuiScreen {
 	
-	LinkedList<ZoomLevel> zoomLevels = ZoomLevel.getLevels();
-	
-	static int currentZoomIndex = 5;
+	static LinkedList<ZoomLevel> zoomLevels = ZoomLevel.getLevels();
+
+	static Integer currentZoomIndex;
 	static ZoomLevel currentZoom;
 	
-	long entityUpdateInterval = 1000;
+	final long refreshInterval = 1000;
 	Boolean isScroll = false;
-	Boolean zoomInStop = false;
 	Boolean hardcore = false;
 	int msx, msy, mx, my;
 
 	static Boolean pauseGame = false;
 	static int mapScale = 4;
 	static int chunkScale = mapScale*16;
-	static int overlayScale = 8;
 	static ChunkCoordIntPair[] mapBounds = new ChunkCoordIntPair[2];
 	static {
 		mapBounds[0] = new ChunkCoordIntPair(0,0);
 		mapBounds[1] = new ChunkCoordIntPair(0,0);
 	}
+	
+	int bWidth = 16;
+	int bHeight = 16;
+	int bHGap = 8;
+	int bVGap = 8;
 
 	static Constants.MapType mapType;
 	static Boolean showCaves = true;
@@ -97,20 +100,18 @@ public class MapOverlay extends GuiScreen {
 	
 	int lastWidth = 0;
 	int lastHeight = 0;
-	private BufferedImage lastMapImg;
-	private Integer lastMapImgTextureIndex;
-	private Float lastMapRatio;
-	private Integer entityChunkSize;
-	
+
 	private Integer logoTextureIndex;
 	
 	private Integer blockXOffset = 0;
 	private Integer blockZOffset = 0;
 	
-	private BufferedImage lastEntityImg;
-	private Integer lastEntityImgTextureIndex;
-	long lastEntityUpdate = 0;
-	int[] mapBackground = new int[]{0,0,0,100};
+	OverlayMapRenderer lastMapRenderer;
+	OverlayEntityRenderer lastEntityRenderer;
+
+	MapOverlayState state = null;
+	
+	long lastRefresh = 0;
 	
 	MapButton buttonDayNight, buttonFollow,buttonZoomIn,buttonZoomOut;
 	MapButton buttonOptions, buttonClose;
@@ -134,19 +135,27 @@ public class MapOverlay extends GuiScreen {
 		showPlayers = pm.getBoolean(PropertyManager.Key.PREF_SHOW_PLAYERS);
 		showWaypoints = pm.getBoolean(PropertyManager.Key.PREF_SHOW_WAYPOINTS);
 		
-		setZoom(currentZoomIndex);
+		if(currentZoomIndex == null) {
+			currentZoomIndex = ZoomLevel.getLevels().size()/2;
+			setZoom(currentZoomIndex);
+		}		
 	}
 
-	private void drawButtonBar() {		
+	private void drawButtonBar() {	
+		
+		// zoom buttons enabled/disabled
+		buttonZoomIn.enabled = currentZoomIndex>0;
+		buttonZoomOut.enabled = currentZoomIndex<zoomLevels.size()-1;
+		
 		// zoom underlay
 		if(options==null) {
 			BaseOverlayRenderer.drawRectangle(3,25,20,55,0,0,0,150);
 		}
 		
 		if(logoTextureIndex==null) {
-			logoTextureIndex = mc.renderEngine.getTexture(FileHandler.WEB_DIR + "/ico/journeymap40.png");
+			logoTextureIndex = mc.renderEngine.getTexture(FileHandler.WEB_DIR + "/ico/journeymap40.png"); //$NON-NLS-1$
 		}
-		BaseOverlayRenderer.drawImage(logoTextureIndex, 1F, 3, 1, 20,20); //$NON-NLS-1$
+		BaseOverlayRenderer.drawImage(logoTextureIndex, 1F, 3, 1, 20,20); 
 	}
 
 	@Override
@@ -159,8 +168,7 @@ public class MapOverlay extends GuiScreen {
 			}
 
 			drawBackground(0);
-			drawMap();
-			drawEntityLayer();		
+			drawMap();	
 			drawButtonBar();	
 			if(options==null) {				
 				super.drawScreen(i, j, f);
@@ -196,21 +204,20 @@ public class MapOverlay extends GuiScreen {
 			} else {
 				mapType = Constants.MapType.night;
 			}
-			lastMapImg = null;
+			forceRefresh();
 			break;
 		}
 
 		case 3: { // follow
 			setFollow(!follow);
-			if(follow) eraseCachedEntityImg();
 			break;
 		}
 		case 4: { // zoom in
-			zoom(true);
+			zoomIn();
 			break;
 		}
 		case 5: { // zoom out
-			zoom(false);
+			zoomOut();
 			break;
 		}
 		case 6: { // save
@@ -242,19 +249,14 @@ public class MapOverlay extends GuiScreen {
 		hardcore = !minecraft.isSingleplayer() && minecraft.theWorld.getWorldInfo().isHardcoreModeEnabled();
 		initButtons();
 		layoutButtons();
-		setZoom(currentZoomIndex);
-		centerMapOnPlayer();
+		//setZoom(currentZoomIndex);
+		if(follow) centerMapOnPlayer();
 		
 		if(options!=null) {
 			options.setWorldAndResolution(minecraft, i, j);
 			return;
 		}
 	}
-
-	int bWidth = 16;
-	int bHeight = 16;
-	int bHGap = 8;
-	int bVGap = 8;
 
 	/**
 	 * Set up UI buttons.
@@ -321,9 +323,6 @@ public class MapOverlay extends GuiScreen {
 		final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
 		buttonDayNight.enabled = !(underground && showCaves);
 	
-		
-		buttonZoomIn.enabled = currentZoomIndex>=1;
-		buttonZoomOut.enabled = currentZoomIndex<zoomLevels.size()-1 && !zoomInStop;
 	}
 
 	@Override
@@ -343,9 +342,9 @@ public class MapOverlay extends GuiScreen {
 		} else {
 			int wheel = Mouse.getEventDWheel();
 			if(wheel>0) {
-				zoom(true);
+				zoomIn();
 			} else if(wheel<0) {
-				zoom(false);
+				zoomOut();
 			} else {
 				mouseMovedOrUp(mx, my, Mouse.getEventButton());
 			}
@@ -382,9 +381,9 @@ public class MapOverlay extends GuiScreen {
 	}
 
 	@Override
-	protected void mouseMovedOrUp(int mouseX, int mouseY, int mouseButton)
+	protected void mouseMovedOrUp(int mouseX, int mouseY, int which)
 	{
-		super.mouseMovedOrUp(mouseX, mouseY, mouseButton);
+		super.mouseMovedOrUp(mouseX, mouseY, which);
 		if(Mouse.isButtonDown(0) && !isScroll) {
 			scrollCanvas(true);
 		} else if(!Mouse.isButtonDown(0) && isScroll) {
@@ -392,26 +391,29 @@ public class MapOverlay extends GuiScreen {
 		}
 	}
 
-	void zoom(boolean in){
-		if(in && currentZoomIndex>0){
+	void zoomIn(){
+		if(currentZoomIndex>0){
 			setZoom(currentZoomIndex-1);
-		}else if(!in && currentZoomIndex<zoomLevels.size()-1){
+		}
+	}
+	
+	void zoomOut(){
+		if(currentZoomIndex<zoomLevels.size()-1){
 			setZoom(currentZoomIndex+1);
-		} else {
-			return;
 		}
 	}
 
 	private void setZoom(int index) {
 
 		// Get the zoom
-		final int oldIndex = this.currentZoomIndex;
+		final int oldIndex = currentZoomIndex;
 		currentZoomIndex = index;
 		currentZoom = zoomLevels.get(index);
 		
 		// Get the chunk
 		int centerChunkX, centerChunkZ;
 		if(follow) {
+			Minecraft mc = Minecraft.getMinecraft();
 			centerChunkX = mc.thePlayer.chunkCoordX;
 			centerChunkZ = mc.thePlayer.chunkCoordZ;
 		} else {
@@ -420,25 +422,21 @@ public class MapOverlay extends GuiScreen {
 		}
 
 		// Check to see if scale is viable
-		ChunkCoordIntPair testPair = calculateMaxChunk(currentZoom.scale);
+		ChunkCoordIntPair testPair = calculateMaxChunk(getCanvasWidth(), getCanvasHeight(), currentZoom.scale);
 		if(testPair.chunkXPos==mapBounds[1].chunkXPos || testPair.chunkZPos==mapBounds[1].chunkZPos) {
 			if(index>oldIndex){
-				zoom(false);
+				zoomOut();
 				return;
 			}else if(index<oldIndex){
-				zoom(true);
+				zoomIn();
 			} 
 		} else {
 			
 			setScale(currentZoom.scale);
-			// TODO: 
-			overlayScale = mapScale << 1;
-			overlayScale = Math.max(overlayScale, 4);			
-			
 			centerMapOnChunk(centerChunkX, centerChunkZ);
-			zoomInStop = false;	
+			
 			// Reset timer for entity updates
-			lastEntityUpdate = 0;
+			forceRefresh();
 		}
 
 	}
@@ -449,12 +447,13 @@ public class MapOverlay extends GuiScreen {
 
 	void setFollow(Boolean onPlayer) {
 		buttonFollow.setToggled(onPlayer);
+		if(follow==onPlayer) {
+			return;
+		}
 		follow = onPlayer;
 		if(follow) {
 			centerMapOnPlayer();
-		} else {
-			blockXOffset = 0;
-			blockZOffset = 0;
+			forceRefresh();
 		}
 	}
 
@@ -484,22 +483,22 @@ public class MapOverlay extends GuiScreen {
 	}
 
 	int getCanvasWidth() {
-		return getBackgroundWidth();
+		return Math.min(1024, getBackgroundWidth());
 	}
 
 	int getCanvasHeight() {
-		return getBackgroundHeight();
+		return Math.min(1024, getBackgroundHeight());
 	}
 
-	void setScale(int newScale) {
+	static void setScale(int newScale) {
 		mapScale = newScale;
 		chunkScale = mapScale*16;
 	}
 
 	void centerMapOnChunk(int chunkX, int chunkZ) {
 
-		int maxChunksWide = calculateMaxChunksWide(mapScale);
-		int maxChunksHigh = calculateMaxChunksHigh(mapScale);  
+		int maxChunksWide = calculateMaxChunksWide(getCanvasWidth(), mapScale);
+		int maxChunksHigh = calculateMaxChunksHigh(getCanvasHeight(), mapScale);  
 
 		int x1 = chunkX - maxChunksWide/2;
 		if(maxChunksWide<5) x1++;
@@ -521,13 +520,13 @@ public class MapOverlay extends GuiScreen {
 	}
 
 	void checkBounds() {
-		int maxChunksWide = calculateMaxChunksWide(mapScale);
-		int maxChunksHigh = calculateMaxChunksHigh(mapScale);  
+		int maxChunksWide = calculateMaxChunksWide(getCanvasWidth(), mapScale);
+		int maxChunksHigh = calculateMaxChunksHigh(getCanvasHeight(), mapScale);  
 		mapBounds[1] = new ChunkCoordIntPair( mapBounds[0].chunkXPos + maxChunksWide,  mapBounds[0].chunkZPos + maxChunksHigh);
 	}
 
-	int calculateMaxChunksWide(int aMapScale) {
-		int cw = getCanvasWidth()/aMapScale;
+	static int calculateMaxChunksWide(int canvasWidth, int aMapScale) {
+		int cw = canvasWidth/aMapScale;
 		int chunks = cw >> 4;
 		if(cw % 16 > 0) {
 			chunks++;
@@ -535,8 +534,8 @@ public class MapOverlay extends GuiScreen {
 		return chunks;
 	}
 
-	int calculateMaxChunksHigh(int aMapScale) {
-		int ch = getCanvasHeight()/aMapScale;
+	static int calculateMaxChunksHigh(int canvasHeight, int aMapScale) {
+		int ch = canvasHeight/aMapScale;
 		int chunks = ch >> 4;
 		if(ch % 16 > 0) {
 			chunks++;
@@ -544,10 +543,10 @@ public class MapOverlay extends GuiScreen {
 		return chunks;
 	}
 
-	ChunkCoordIntPair calculateMaxChunk(int aMapScale) {
+	static ChunkCoordIntPair calculateMaxChunk(int canvasWidth, int canvasHeight, int aMapScale) {
 		// determine how many chunks we can display
-		int x2 = mapBounds[0].chunkXPos + calculateMaxChunksWide(aMapScale);
-		int z2 = mapBounds[0].chunkZPos + calculateMaxChunksHigh(aMapScale);
+		int x2 = mapBounds[0].chunkXPos + calculateMaxChunksWide(canvasWidth, aMapScale);
+		int z2 = mapBounds[0].chunkZPos + calculateMaxChunksHigh(canvasHeight, aMapScale);
 		return new ChunkCoordIntPair(x2,z2);
 	}
 
@@ -566,15 +565,15 @@ public class MapOverlay extends GuiScreen {
 			break;
 		}
 		case Keyboard.KEY_ADD : {
-			zoom(true);
+			zoomIn();
 			break;
 		}
 		case Keyboard.KEY_EQUALS : {
-			zoom(true);
+			zoomIn();
 			break;
 		}
 		case Keyboard.KEY_MINUS : {
-			zoom(false);
+			zoomOut();
 			break;
 		}
 		case Keyboard.KEY_E : {
@@ -628,12 +627,9 @@ public class MapOverlay extends GuiScreen {
 	@Override
 	public void drawBackground(int layer)
 	{
-		this.drawDefaultBackground();
-        GL11.glEnable(GL11.GL_BLEND);
-		
-		if(isScroll) {
-			scrollingCanvas();
-		}
+		//this.drawDefaultBackground();
+		super.drawBackground(0);
+        GL11.glEnable(GL11.GL_BLEND);		
 
 		if(options==null) {
 			drawButtonBar();
@@ -654,7 +650,7 @@ public class MapOverlay extends GuiScreen {
 		int labelWidth = mc.fontRenderer.getStringWidth(playerLastPos) + 10;
 		int halfBg = getBackgroundWidth()/2;
 		
-		BaseOverlayRenderer.drawRectangle(halfBg - (labelWidth/2), height-18, labelWidth, 12, mapBackground[0],mapBackground[1],mapBackground[2],220);			
+		BaseOverlayRenderer.drawRectangle(halfBg - (labelWidth/2), height-18, labelWidth, 12, 0x22, 0x22, 0x22, 220);			
 		drawCenteredString(mc.fontRenderer, playerLastPos, getBackgroundWidth()/2, height-16, 0x8888ff);
 	}
 
@@ -662,130 +658,31 @@ public class MapOverlay extends GuiScreen {
 
 		// Don't draw if during scroll
 		if(isScroll) {
+			scrollingCanvas();
 			return;
 		}
-
-		// Check player status
-		EntityPlayer player = mc.thePlayer;
-		if (player==null) {
-			JourneyMap.getLogger().warning("Could not get player"); //$NON-NLS-1$
-			return;
-		}
-		
-		// Check location
-		final int ccx = player.chunkCoordX;				
-		final int ccz = player.chunkCoordZ;
-		final int ccy = player.chunkCoordY;
-
-		// Check chunk
-		final Chunk playerChunk = Utils.getChunkIfAvailable(mc.theWorld, ccx, ccz);
-		if(playerChunk==null || !playerChunk.isChunkLoaded) {				
-			return;
-		}
-
-		// Maptype
-		Constants.MapType effectiveMapType = null;
-		final boolean underground = (Boolean) DataCache.playerDataValue(EntityKey.underground);
-		if(underground && showCaves && !hardcore) {
-			effectiveMapType = Constants.MapType.underground;
-		} else {
-			if(mapType==null) {
-				final long ticks = (mc.theWorld.getWorldTime() % 24000L);
-				mapType = ticks<13800 ? Constants.MapType.day : Constants.MapType.night;	
-				buttonDayNight.setToggled(mapType.equals(Constants.MapType.day));
-			}
-			effectiveMapType = mapType;
-		}
-		File worldDir = FileHandler.getWorldDir(mc);
-		
-		if(effectiveMapType.equals(Constants.MapType.day)) {
-			mapBackground = new int[]{34,34,34,100};
-		} else {
-			mapBackground = new int[]{0,0,0,100};
-		}
 			
-		if(System.currentTimeMillis() >= (lastEntityUpdate+entityUpdateInterval)) {
+		// Update images
+		if(isRefreshReady()) {
+			//JourneyMap.getLogger().info("drawMap updating");
 			
-			BufferedImage mapImg = null;
-			Integer textureIndex = null;
-			Float mapRatio = null;
-	
-			// Get the map image		
-			try {
-				final Constants.CoordType cType = Constants.CoordType.convert(effectiveMapType, mc.theWorld.provider.dimensionId);
-	
-				mapImg = RegionFileHandler.getMergedChunks(worldDir, 
-						mapBounds[0].chunkXPos, mapBounds[0].chunkZPos, 
-						mapBounds[1].chunkXPos, mapBounds[1].chunkZPos, 
-						effectiveMapType, ccy, cType, true, currentZoom);		
-				
-				// Remove the former map image from the texture cache
-				eraseCachedMapImg();
-				
-				// Determine the display ratio for the new image
-				float ratioWidth = getCanvasWidth()*1f/mapImg.getWidth()*1f;
-				float ratioHeight = getCanvasHeight()*1f/mapImg.getHeight()*1f;
-				mapRatio = Math.max(ratioWidth, ratioHeight);
-				
-				// Allocate the new map image as a texture
-				textureIndex = mc.renderEngine.allocateAndSetupTexture((BufferedImage) mapImg);
-				
-				lastMapImg = mapImg;
-				lastMapRatio = mapRatio;
-				lastMapImgTextureIndex = textureIndex;
-				entityChunkSize = mapImg.getWidth()/calculateMaxChunksWide(mapScale) * overlayScale;
-				
-			} catch (IOException e) {
-				JourneyMap.getLogger().warning("Could not get merged chunks image from player position: " + ccx + "," + ccz); //$NON-NLS-1$ //$NON-NLS-2$
-				return;
-			} catch (java.nio.BufferOverflowException e) {
-				// Can't use this zoom level
-				JourneyMap.getLogger().warning("Could not use zoom level: " + currentZoom); //$NON-NLS-1$ //$NON-NLS-2$
-				//zoomLevels.remove(currentZoom);
-				zoom(true);
-			}
-		}
-
-		// Draw the map image
-		if(lastMapImgTextureIndex!=null && lastMapImg!=null && lastMapRatio!=null) {
-			int maxWidth = calculateMaxChunksWide(mapScale) * chunkScale;
-			int maxHeight = calculateMaxChunksHigh(mapScale) * chunkScale;
-			BaseOverlayRenderer.drawImage(lastMapImgTextureIndex, 1f, blockXOffset, blockZOffset, maxWidth, maxHeight);
-		}
-
-	}
-
-	void drawEntityLayer() {
-
-		// Don't draw if during scroll
-		if(isScroll) {
-			return;
-		}
-
-		BufferedImage entityOverlay = null;
-		Integer textureIndex = null; 
-
-		if(lastEntityImg!=null && (System.currentTimeMillis() < (lastEntityUpdate+entityUpdateInterval))) {
-			entityOverlay = lastEntityImg;
-			textureIndex = lastEntityImgTextureIndex;
-		} else {
+			clearCaches();
+			refreshState();
 			
-			if(lastMapImg==null) {
-				return;
-			}
+			lastMapRenderer = new OverlayMapRenderer(mapBounds[0], mapBounds[1], getCanvasWidth(), getCanvasHeight());
 			
-			// Null obsolete image
-			eraseCachedEntityImg();
+			int mapBlocksWide = (mapBounds[1].chunkXPos - mapBounds[0].chunkXPos) * 16;
+			int mapBlocksHigh = (mapBounds[1].chunkZPos - mapBounds[0].chunkZPos) * 16;
+			
+			int overlayScale = BaseOverlayRenderer.MAX_TEXTURE_SIZE / lastMapRenderer.getTextureSize();
+			
+			int layerWidth = mapBlocksWide * overlayScale;
+			int layerHeight = mapBlocksHigh * overlayScale;
+			int entityChunkSize = 16 * overlayScale; 
+			
+			lastEntityRenderer = new OverlayEntityRenderer(mapBounds[0], mapBounds[1], getCanvasWidth(), getCanvasHeight(), layerWidth, layerHeight);
 
-			int layerWidth = lastMapImg.getWidth() * overlayScale;
-			int layerHeight = lastMapImg.getHeight() * overlayScale;
-
-			entityOverlay = new BufferedImage(layerWidth, layerHeight, BufferedImage.TYPE_INT_ARGB);
-			Graphics2D g2D = entityOverlay.createGraphics();			
-			g2D.setFont(new Font("Arial", Font.BOLD, 16)); //$NON-NLS-1$
-			g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-			g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			Graphics2D g2D = lastEntityRenderer.getGraphics();		
 			FontMetrics fm = g2D.getFontMetrics();
 			
 			// Calculate how much of the bottom and right of the layer will be offscreen
@@ -807,7 +704,7 @@ public class MapOverlay extends GuiScreen {
 			int zCutoff = layerHeight-maxHeight;
 			
 			// Renderer for entities and player
-			OverlayEntityRenderer entityRenderer = new OverlayEntityRenderer(mapBounds[0], mapBounds[1], entityChunkSize, layerWidth, layerHeight, xCutoff, zCutoff, showAnimals, showPets);
+			OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer(lastEntityRenderer, xCutoff, zCutoff, showAnimals, showPets);
 						
 			if(!hardcore) {
 				List<Map> critters = new ArrayList<Map>(16);
@@ -828,14 +725,14 @@ public class MapOverlay extends GuiScreen {
 				// Sort to keep named entities last
 				Collections.sort(critters, new EntityHelper.EntityMapComparator());
 				
-				entityRenderer.render(critters, g2D);
+				radarRenderer.render(critters, g2D);
 			}			
 
 			// Draw player if within bounds
-			if(entityRenderer.inBounds(mc.thePlayer)) {
+			if(radarRenderer.inBounds(mc.thePlayer)) {
 				g2D.setComposite(MapBlocks.OPAQUE);
-				entityRenderer.drawEntity(mc.thePlayer.chunkCoordX, mc.thePlayer.posX, 
-						mc.thePlayer.chunkCoordZ, mc.thePlayer.posZ,
+				radarRenderer.drawEntity(mc.thePlayer.chunkCoordX, (int) Math.floor(mc.thePlayer.posX), 
+						mc.thePlayer.chunkCoordZ, (int) Math.floor(mc.thePlayer.posZ),
 						EntityHelper.getHeading(mc.thePlayer), false, playerImage, g2D);				
 			}
 			
@@ -843,51 +740,78 @@ public class MapOverlay extends GuiScreen {
 			if(showWaypoints && WaypointHelper.waypointsEnabled()) {
 				List<Waypoint> waypoints = (List<Waypoint>) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
 
-				new OverlayWaypointRenderer(mapBounds[0], mapBounds[1], entityChunkSize, layerWidth, layerHeight, xCutoff, zCutoff).render(waypoints, g2D);
+				new OverlayWaypointRenderer(lastEntityRenderer, xCutoff, zCutoff).render(waypoints, g2D);
 			}
-							
-			lastEntityImg = entityOverlay;
-			try {
-				textureIndex = mc.renderEngine.allocateAndSetupTexture(entityOverlay);
-			} catch (BufferOverflowException e) {
-				JourneyMap.getLogger().fine("Couldn't allocate entity texture at overlay scale " + overlayScale); //$NON-NLS-1$
-				if(overlayScale>4) {
-					overlayScale = 4;
-				} else if(overlayScale==4) {
-					overlayScale = 2;
-				} else {
-					overlayScale = 1;
-					drawEntityLayer();
-				}
-				return;
-			}
-			lastEntityImgTextureIndex = textureIndex;
-			lastEntityUpdate = System.currentTimeMillis();
-
-			// Update data
-			String biomeName = (String) DataCache.instance().get(PlayerData.class).get(EntityKey.biome);
 			
-			long vslice = Math.round(mc.thePlayer.posY) >> 4;
-			String playerPos = Constants.getString("MapOverlay.player_location", 
+			// Update player pos
+			String biomeName = (String) DataCache.instance().get(PlayerData.class).get(EntityKey.biome);			
+			playerLastPos = Constants.getString("MapOverlay.player_location", 
 					Integer.toString((int) mc.thePlayer.posX), 
 					Integer.toString((int) mc.thePlayer.posZ), 
 					Integer.toString((int) mc.thePlayer.posY), 
-					vslice, 
+					mc.thePlayer.chunkCoordY, 
 					biomeName); //$NON-NLS-1$ 
-			if(!playerPos.equals(playerLastPos)) {
-				playerLastPos = playerPos;
-			}
-
+			
+			// TODO: Remove
+			//playerLastPos = mapBounds[0].chunkXPos + "," + mapBounds[0].chunkZPos + " to " +  mapBounds[1].chunkXPos + "," + mapBounds[1].chunkZPos;
+			//playerLastPos = getCanvasWidth() + "x" + getCanvasHeight() + " mapTex size: " + lastMapRenderer.getTextureSize() + " entTex size: " + lastEntityRenderer.getTextureSize();
+			//playerLastPos = mc.displayWidth + "x" + mc.displayHeight + " vs " + getCanvasWidth() + "x" + getCanvasHeight() + " mapTex size: " + lastMapRenderer.getTextureSize() + " entTex size: " + lastEntityRenderer.getTextureSize();
+							
+			// Reset timer
+			lastRefresh = System.currentTimeMillis();
 		}
 
-		// Draw the entity layer image
-		if(lastEntityImgTextureIndex!=null && lastMapRatio!=null) {
-			int maxWidth = calculateMaxChunksWide(mapScale) * chunkScale;
-			int maxHeight = calculateMaxChunksHigh(mapScale) * chunkScale;
-			
-			BaseOverlayRenderer.drawImage(lastEntityImgTextureIndex, 1f, blockXOffset, blockZOffset, maxWidth, maxHeight);
+		// Draw map image
+		if(lastMapRenderer!=null && state!=null) {
+			lastMapRenderer.render(state, null);
 		}
 		
+		// Draw entity image
+		if(lastEntityRenderer!=null && state!=null) {
+			lastEntityRenderer.render(state, null);		
+		}
+				
+	}
+	
+	/**
+	 * Get a snapshot of the player's biome, effective map state, etc.
+	 */
+	void refreshState() {
+		// Check player status
+		EntityPlayer player = mc.thePlayer;
+		if (player==null) {
+			JourneyMap.getLogger().warning("Could not get player"); //$NON-NLS-1$
+			return;
+		}
+		
+		// Check location
+		final int ccx = player.chunkCoordX;				
+		final int ccz = player.chunkCoordZ;
+		final int ccy = player.chunkCoordY;
+
+		// Check chunk
+		final Chunk playerChunk = Utils.getChunkIfAvailable(mc.theWorld, ccx, ccz);
+		if(playerChunk==null || !playerChunk.isChunkLoaded) {
+			JourneyMap.getLogger().warning("Could not get player chunk"); //$NON-NLS-1$
+			return;
+		}
+
+		// Maptype
+		Constants.MapType effectiveMapType = null;
+		final boolean underground = (Boolean) DataCache.playerDataValue(EntityKey.underground);
+		if(underground && showCaves && !hardcore) {
+			effectiveMapType = Constants.MapType.underground;
+		} else {
+			if(mapType==null) {
+				final long ticks = (mc.theWorld.getWorldTime() % 24000L);
+				mapType = ticks<13800 ? Constants.MapType.day : Constants.MapType.night;	
+				buttonDayNight.setToggled(mapType.equals(Constants.MapType.day));
+			}
+			effectiveMapType = mapType;
+		}
+		File worldDir = FileHandler.getWorldDir(mc);
+					
+		state = new MapOverlayState(effectiveMapType, currentZoom, worldDir, getCanvasWidth(), getCanvasHeight(), blockXOffset, blockZOffset);
 	}
 
 	void save() {
@@ -938,16 +862,22 @@ public class MapOverlay extends GuiScreen {
 	public void onGuiClosed()
     {
         Keyboard.enableRepeatEvents(false);
-        eraseCachedEntityImg();
-        eraseCachedMapImg();
+        if(lastMapRenderer!=null) {
+        	lastMapRenderer.eraseCachedImg();
+		}
+        if(lastEntityRenderer!=null) {
+			lastEntityRenderer.eraseCachedImg();
+		}
     }
 
 	void scrollCanvas(Boolean startScroll) {
 		if(startScroll && Mouse.isButtonDown(0)) {
+			//JourneyMap.getLogger().info("startScroll true");
 			isScroll=true;
 			msx=mx;
 			msy=my;
 		} else {
+			//JourneyMap.getLogger().info("startScroll false");
 			
 			int[] offsets = getMouseDragOffsets();
 			int xOffset = offsets[0];
@@ -960,48 +890,83 @@ public class MapOverlay extends GuiScreen {
 			ChunkCoordIntPair newCorner = new ChunkCoordIntPair(mapBounds[0].chunkXPos - xOffset, mapBounds[0].chunkZPos - zOffset);
 			mapBounds[0] = newCorner;
 
-			if(follow) {    
-				centerMapOnPlayer();   
-			} else {
-				checkBounds();
-			}
-
-			// Obsolete the entity image
-			eraseCachedEntityImg();
+			setFollow(false);
+			checkBounds();
 
 			isScroll=false;
-
+			
+			forceRefresh();
+//			drawBackground(0);
+//			drawMap();
+//			drawButtonBar();
+//			drawPlayerInfo();
+			
+		}
+	}
+	
+	boolean isRefreshReady() {
+		if(isScroll) {
+			return false;
+		} else {
+			return lastMapRenderer==null || lastEntityRenderer==null || state==null || (System.currentTimeMillis() > (lastRefresh+refreshInterval));
+		}
+	}
+	
+	void forceRefresh() {
+		state = null;
+		clearCaches();		
+	}
+	
+	void clearCaches() {
+		if(isScroll) {
+			return;
+		}
+		if(lastMapRenderer!=null) {
+        	lastMapRenderer.eraseCachedImg();
+		}
+        if(lastEntityRenderer!=null) {
+			lastEntityRenderer.eraseCachedImg();
 		}
 	}
 
 	void scrollingCanvas(){
 		if(isScroll) {
 			
-			// Scroll the cached map image
-			if(lastMapImgTextureIndex!=null && lastMapImg!=null) {
-							
-				int[] offsets = getMouseDragOffsets();
-				int xOffset = offsets[0];
-				int zOffset = offsets[1];
-	
-				if(Math.abs(xOffset)>0 || Math.abs(zOffset)>0) {
-					setFollow(false);
-				} 				
-				
-				xOffset = xOffset * chunkScale;
-				zOffset = zOffset * chunkScale;
+			if(lastMapRenderer==null) {
+				return;
+			}
+			
+			int[] offsets = getMouseDragOffsets();
+			
+			int mapBlocksWide = (mapBounds[1].chunkXPos - mapBounds[0].chunkXPos) * 16;
+			int mapBlocksHigh = (mapBounds[1].chunkZPos - mapBounds[1].chunkZPos) * 16;
+			int actualMaxImgDim = Math.max(mapBlocksWide, mapBlocksHigh);
+			
+			double screen = Math.max(getCanvasWidth(), getCanvasHeight());
+			int w = calculateMaxChunksWide(getCanvasWidth(), mapScale);
+			int h = calculateMaxChunksHigh(getCanvasHeight(), mapScale);
+			int max = Math.max(w,h) * chunkScale;
+			
+			int tex = lastMapRenderer.getTextureSize();
+			//int actual = actualMaxImgDim;
+			double pct = screen/max;
 
-				int maxWidth = calculateMaxChunksWide(mapScale) * chunkScale;
-				int maxHeight = calculateMaxChunksHigh(mapScale) * chunkScale;
-				
-				// Draw the map layer image
-				BaseOverlayRenderer.drawImage(lastMapImgTextureIndex, 1f, xOffset + blockXOffset, zOffset + blockXOffset, maxWidth, maxHeight);
-				
-				// Draw the entity layer image
-				if(lastEntityImgTextureIndex!=null && lastMapRatio!=null && lastEntityImg!=null) {
-					BaseOverlayRenderer.drawImage(lastEntityImgTextureIndex, 1f, xOffset + blockXOffset, zOffset + blockZOffset, maxWidth, maxHeight);
-				}
-			} 			
+			double xOffset = pct * (offsets[0] * chunkScale);
+			double zOffset = pct * (offsets[1] * chunkScale);
+			
+			if(lastMapRenderer!=null) {
+				lastMapRenderer.draw(.9f, xOffset, zOffset);
+			}
+			
+			if(lastEntityRenderer!=null) {
+				int entTex = lastEntityRenderer.getTextureSize();
+				double scale = entTex/screen;
+
+				xOffset = xOffset * scale;
+				zOffset = zOffset * scale;
+				lastEntityRenderer.draw(.6f, xOffset, zOffset);
+			}
+			
 		} 
 		//drawPlayerInfo();
 	}
@@ -1009,7 +974,7 @@ public class MapOverlay extends GuiScreen {
 	int[] getMouseDragOffsets() {
 		int mouseDragX = (mx-msx);
 		int mouseDragY = (my-msy);
-		float size = chunkScale;
+		float size = Math.min(chunkScale, 64);
 		int xOffset = (int) Math.floor(mouseDragX / size);
 		int zOffset = (int) Math.floor(mouseDragY / size);
 		return new int[]{xOffset, zOffset};
@@ -1047,23 +1012,6 @@ public class MapOverlay extends GuiScreen {
 		checkBounds();
 	}
 
-	protected void eraseCachedEntityImg() {
-		if(lastEntityImgTextureIndex!=null) {
-			mc.renderEngine.deleteTexture(lastEntityImgTextureIndex);
-			lastEntityUpdate = 0;
-			lastEntityImgTextureIndex = null;
-			lastEntityImg = null;
-		}
-	}
-	
-	protected void eraseCachedMapImg() {
-		if(lastMapImg!=null && lastMapImgTextureIndex!=null) {
-			mc.renderEngine.deleteTexture(lastMapImgTextureIndex);
-			lastMapImg = null;
-			lastMapImgTextureIndex = null;
-		}
-	}
-	
 	protected void eraseCachedLogoImg() {
 		if(logoTextureIndex!=null) {
 			mc.renderEngine.deleteTexture(logoTextureIndex);

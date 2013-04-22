@@ -35,11 +35,13 @@ import net.minecraft.src.Chunk;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkCoord;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
+import net.techbrew.mcjm.render.MapBlocks;
 import net.techbrew.mcjm.ui.ZoomLevel;
 
 public class RegionFileHandler {
@@ -316,7 +318,7 @@ public class RegionFileHandler {
 	}
 	
 	/**
-	 * Used by ChunkServlet and MapOverlay to get a merged image for what the display needs
+	 * Used by MapSaver, MapService to get a merged image for what the display needs
 	 * @param worldDir
 	 * @param x1
 	 * @param z1
@@ -330,15 +332,34 @@ public class RegionFileHandler {
 			int x2, int z2, Constants.MapType mapType, int depth, final Constants.CoordType cType, Boolean useCache, ZoomLevel zoomLevel)
 			throws IOException {
 
-		long start = 0, stop = 0;
+		int imageWidth = Math.max(16, (x2 - x1) * 16);
+		int imageHeight = Math.max(16, (z2 - z1) * 16);
 		
+		return getMergedChunks(worldDir, x1, z1, x2, z2, mapType, depth, cType, useCache, zoomLevel, imageWidth, imageHeight);
+
+	}
+	
+	/**
+	 * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2)
+	 * @param worldDir
+	 * @param x1
+	 * @param z1
+	 * @param x2
+	 * @param z2
+	 * @param mapType
+	 * @param depth
+	 * @throws IOException
+	 */
+	public static synchronized BufferedImage getMergedChunks(File worldDir, int x1, int z1,
+			int x2, int z2, Constants.MapType mapType, int depth, final Constants.CoordType cType, Boolean useCache, ZoomLevel zoomLevel, int imageWidth, int imageHeight)
+			throws IOException {
+
+		long start = 0, stop = 0;		
 		start = System.currentTimeMillis();
 
-		int width = Math.max(16, (x2 - x1) * 16);
-		int height = Math.max(16, (z2 - z1) * 16);
 		boolean isUnderground = mapType.equals(Constants.MapType.underground);
-			
-		BufferedImage mergedImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		
+		BufferedImage mergedImg = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2D = mergedImg.createGraphics();
 		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, zoomLevel.antialias ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
 		g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, zoomLevel.interpolation);
@@ -364,13 +385,22 @@ public class RegionFileHandler {
 				int cx2 = Math.min(x2, rCoord.getMaxChunkX());
 				int cz2 = Math.min(z2, rCoord.getMaxChunkZ());
 				
-				BufferedImage chunks = rfh.getChunkImages(worldDir, cx1, cz1, depth, cx2, cz2, mapType, rCoord.cType, useCache, zoomLevel.sampling);				
+				BufferedImage chunkImg = rfh.getChunkImages(worldDir, cx1, cz1, depth, cx2, cz2, mapType, rCoord.cType, useCache, zoomLevel.sampling);				
 				int imageX = ((cx1-x1) * 16)-1;
 				int imageZ = ((cz1-z1) * 16)-1;
-				g2D.drawImage(chunks, imageX, imageZ, null);
-				
+				g2D.drawImage(chunkImg, imageX, imageZ, null);
 			}
 		}
+		
+		g2D.setColor(new Color(130,130,130));
+		g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1F));
+				
+		for(int x = -1; x<imageWidth; x+=16) {
+			for(int z = -1; z<imageHeight; z+=16) {
+				g2D.drawRect(x, z, 16, 16);
+			}
+		}
+		g2D.setComposite(MapBlocks.OPAQUE);
 				
 		if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
 			stop = System.currentTimeMillis();

@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.Entity;
 import net.minecraft.src.Tessellator;
@@ -25,37 +26,32 @@ public abstract class BaseOverlayRenderer<K> {
 	public static AlphaComposite SEMICLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F);
 	public static AlphaComposite SLIGHTLYCLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F);
 	
-	final int startChunkX;
-	final int startChunkZ;
-	final int endChunkX;
-	final int endChunkZ;
-	final int entityChunkSize;
-	final int entityBlockSize;
+	public static int MAX_TEXTURE_SIZE = 1024;
+	
+	final ChunkCoordIntPair startCoords;
+	final ChunkCoordIntPair endCoords;
+
 	final int canvasWidth;
 	final int canvasHeight;
-	final int widthCutoff;
-	final int heightCutoff;
+	
+	Double blockSize;
+
 	
 	/**
 	 * Constructor.
 	 * @param startCoords		Chunk coords for upper left of screen
-	 * @param entityChunkSize	Size of a chunk in pixels, scaled for the entity layer
 	 * @param canvasWidth		Width of the map canvas
 	 * @param canvasHeight		Height of the map canvas
 	 * @param widthCutoff		Right-hand margin of canvas that is off-screen
 	 * @param heightCutoff		Bottom margin of canvas that is off-screen
 	 */
-	public BaseOverlayRenderer(final ChunkCoordIntPair startCoords, final ChunkCoordIntPair endCoords, final int entityChunkSize, final int canvasWidth, final int canvasHeight, final int widthCutoff, final int heightCutoff) {
-		this.startChunkX = startCoords.chunkXPos;
-		this.startChunkZ = startCoords.chunkZPos;
-		this.endChunkX = endCoords.chunkXPos;
-		this.endChunkZ = endCoords.chunkZPos;
-		this.entityChunkSize = entityChunkSize;
-		this.entityBlockSize = entityChunkSize/16;
+	public BaseOverlayRenderer(final ChunkCoordIntPair startCoords, final ChunkCoordIntPair endCoords, final int canvasWidth, final int canvasHeight) {
+		this.startCoords = startCoords;
+		this.endCoords = endCoords;
+
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
-		this.widthCutoff = widthCutoff;
-		this.heightCutoff = heightCutoff;		
+	
 	}
 	
 	/**
@@ -65,61 +61,6 @@ public abstract class BaseOverlayRenderer<K> {
 	 */
 	abstract public void render(K data, Graphics2D g2D) throws Exception;
 
-	/**
-	 * Get the scaled screen position value for world chunk X, world position X.
-	 * @param chunkZ
-	 * @param posZ
-	 * @return
-	 */
-	int getScaledEntityX(int chunkX, double posX) {
-		return getScaledEntityPos(startChunkX, chunkX, posX);
-	}
-	
-	/**
-	 * Get the scaled screen position value for world position X.
-	 * @param chunkZ
-	 * @param posZ
-	 * @return
-	 */
-	int getScaledEntityX(double posX) {
-		return getScaledEntityPos(startChunkX, (int) posX>>4, posX);
-	}
-
-	/**
-	 * Get the scaled screen position value for world chunk Z, world position Z.
-	 * @param chunkZ
-	 * @param posZ
-	 * @return
-	 */
-	int getScaledEntityZ(int chunkZ, double posZ) {
-		return getScaledEntityPos(startChunkZ, chunkZ, posZ);
-	}
-
-	/**
-	 * Get the scaled screen position value for world position Z.
-	 * @param posZ
-	 * @return
-	 */
-	int getScaledEntityZ(double posZ) {
-		return getScaledEntityPos(startChunkZ, (int) posZ>>4, posZ);
-	}
-	
-	/**
-	 * Get the scaled screen position value.
-	 * @param startChunkPos
-	 * @param chunkPos
-	 * @param blockPos
-	 * @return
-	 */
-	int getScaledEntityPos(int startChunkPos, int chunkPos, double blockPos) {
-		int delta = chunkPos - startChunkPos;
-		if(chunkPos<0) {
-			delta++;
-		}
-		int scaledChunkPos = (delta * entityChunkSize);		
-		int scaledBlockPos = (int) (Math.floor(blockPos) % 16) * entityBlockSize;
-		return (scaledChunkPos + scaledBlockPos - (entityBlockSize/2));
-	}
 	
 	/**
 	 * Draw a text label, centered on x,z.  If bgColor not null,
@@ -180,7 +121,7 @@ public abstract class BaseOverlayRenderer<K> {
 		GL11.glEnable(3553 /*GL_TEXTURE_2D*/);
 	}
 
-	public static void drawImage(int bufferedImage, float transparency, int startX, int startY, int srcWidth, int srcHeight) {
+	public static void drawImage(int bufferedImage, float transparency, double startX, double startY, double srcWidth, double srcHeight) {
 		Tessellator tessellator = Tessellator.instance;
 		GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
 		GL11.glDepthMask(false);
@@ -198,54 +139,126 @@ public abstract class BaseOverlayRenderer<K> {
 		tessellator.draw();
 	}
 	
-	/**
-	 * Draw the entity's location and heading on the overlay image
-	 * using the provided icon.
-	 * @param entity
-	 * @param entityIcon
-	 * @param overlayImg
-	 */
-	protected void drawEntity(int chunkX, double posX, int chunkZ, double posZ, Double heading, boolean flipNotRotate, BufferedImage entityIcon, Graphics2D g2D) {
-		int radius = entityIcon.getWidth()/2;
-		int size = entityIcon.getWidth();
-		
-		int offset = 0;
-		int x = getScaledEntityX(chunkX, posX) + offset;
-		int y = getScaledEntityZ(chunkZ, posZ) + offset;
-		
-		final Graphics2D gCopy = (Graphics2D) g2D.create();
-		
-		gCopy.translate(x, y);
-		if(heading!=null) {
-			if(flipNotRotate) {
-				if(heading>Math.PI) {
-					gCopy.scale(-1, 1);				
-				} 
-			} else {
-				gCopy.rotate(heading);				
-			}
-		}
-		gCopy.translate(-radius, -radius);
-		gCopy.drawImage(entityIcon, 0, 0, size, size, null);
-		gCopy.dispose();		
-	}
-	
 	public boolean inBounds(Entity entity) {
 		int chunkX = entity.chunkCoordX;
 		int chunkZ = entity.chunkCoordZ;
-		return (chunkX>=startChunkX && chunkX<=endChunkX && 
-				chunkZ>=startChunkZ && chunkZ<=endChunkZ);
+		return (chunkX>=startCoords.chunkXPos && chunkX<=endCoords.chunkXPos && 
+				chunkZ>=startCoords.chunkZPos && chunkZ<=endCoords.chunkZPos);
 	}
 	
 	public boolean inBounds(Map entityMap) {
 		try {
 			int chunkX = (Integer) entityMap.get(EntityKey.chunkCoordX);
 			int chunkZ = (Integer) entityMap.get(EntityKey.chunkCoordZ);
-			return (chunkX>=startChunkX && chunkX<=endChunkX && 
-					chunkZ>=startChunkZ && chunkZ<=endChunkZ);
+			return (chunkX>=startCoords.chunkXPos && chunkX<=endCoords.chunkXPos && 
+					chunkZ>=startCoords.chunkZPos && chunkZ<=endCoords.chunkZPos);
 		} catch(NullPointerException e) {
 			return false;
 		}
+	}
+	
+	static abstract class BaseEntityOverlayRenderer<K> extends BaseOverlayRenderer<K> {
+
+		final int widthCutoff;
+		final int heightCutoff;
+		
+		public BaseEntityOverlayRenderer(ChunkCoordIntPair startCoords,
+				ChunkCoordIntPair endCoords, int canvasWidth, int canvasHeight,
+				int widthCutoff, int heightCutoff) {
+			super(startCoords, endCoords, canvasWidth, canvasHeight);
+			this.widthCutoff = widthCutoff;
+			this.heightCutoff = heightCutoff;	
+		}
+		
+		/**
+		 * Get the scaled screen position value for world chunk X, world position X.
+		 * @param chunkZ
+		 * @param posZ
+		 * @return
+		 */
+		double getScaledEntityX(int chunkX, double posX) {
+			return getScaledEntityPos(startCoords.chunkXPos, chunkX, posX);
+		}
+		
+		/**
+		 * Get the scaled screen position value for world position X.
+		 * @param chunkZ
+		 * @param posZ
+		 * @return
+		 */
+		double getScaledEntityX(double posX) {
+			return getScaledEntityPos(startCoords.chunkXPos, (int) posX>>4, posX);
+		}
+
+		/**
+		 * Get the scaled screen position value for world chunk Z, world position Z.
+		 * @param chunkZ
+		 * @param posZ
+		 * @return
+		 */
+		double getScaledEntityZ(int chunkZ, double posZ) {
+			return getScaledEntityPos(startCoords.chunkZPos, chunkZ, posZ);
+		}
+
+		/**
+		 * Get the scaled screen position value for world position Z.
+		 * @param posZ
+		 * @return
+		 */
+		double getScaledEntityZ(double posZ) {
+			return getScaledEntityPos(startCoords.chunkZPos, (int) posZ>>4, posZ);
+		}
+		
+		/**
+		 * Get the scaled screen position value.
+		 * @param startChunkPos
+		 * @param chunkPos
+		 * @param blockPos
+		 * @return
+		 */
+		double getScaledEntityPos(int startChunkPos, int chunkPos, double blockPos) {
+			int delta = chunkPos - startChunkPos;
+			if(chunkPos<0) {
+				delta++;
+			}
+			double scaledChunkPos = (delta * blockSize * 16);		
+			double scaledBlockPos = ((blockPos) % 16) * blockSize;
+			double adjusted = (scaledChunkPos + scaledBlockPos - (blockSize/2));
+			return adjusted;
+		}
+		
+		/**
+		 * Draw the entity's location and heading on the overlay image
+		 * using the provided icon.
+		 * @param entity
+		 * @param entityIcon
+		 * @param overlayImg
+		 */
+		public void drawEntity(int chunkX, double posX, int chunkZ, double posZ, Double heading, boolean flipNotRotate, BufferedImage entityIcon, Graphics2D g2D) {
+			
+			int radius = entityIcon.getWidth()/2;			
+			
+			int offset = 0;
+			double x = getScaledEntityX(chunkX, posX) + offset;
+			double y = getScaledEntityZ(chunkZ, posZ) + offset;
+			
+			final Graphics2D gCopy = (Graphics2D) g2D.create();
+			
+			gCopy.translate(x, y);
+			if(heading!=null) {
+				if(flipNotRotate) {
+					if(heading>Math.PI) {
+						gCopy.scale(-1, 1);				
+					} 
+				} else {
+					gCopy.rotate(heading);				
+				}
+			}
+			gCopy.translate(-radius, -radius);
+			gCopy.drawImage(entityIcon, 0, 0, radius*2, radius*2, null);
+			gCopy.dispose();		
+		}
+		
 	}
 	
 }

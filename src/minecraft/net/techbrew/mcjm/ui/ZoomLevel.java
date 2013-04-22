@@ -5,6 +5,9 @@ import java.util.LinkedList;
 
 public class ZoomLevel implements Comparable<ZoomLevel> {
 
+	private static final int MINSCALE = 1;
+	private static final int MAXSCALE = 10;
+	
 	public final Integer scale;
 	public final int sampling;
 	public final boolean antialias;
@@ -35,10 +38,14 @@ public class ZoomLevel implements Comparable<ZoomLevel> {
 
 	public static LinkedList<ZoomLevel> getLevels() {
 		final LinkedList<ZoomLevel> list = new LinkedList<ZoomLevel>();
-		for(int i = 10; i>0; i--) {
+		for(int i = MAXSCALE; i>=MINSCALE; i--) {
 			list.add(new ZoomLevel(i));
 		}
 		return list;
+	}
+	
+	public static ZoomLevel getDefault() {
+		return getLevels().get(MAXSCALE/2);
 	}
 		
 }

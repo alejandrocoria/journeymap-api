@@ -1,0 +1,128 @@
+package net.techbrew.mcjm.render.overlay;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.src.ChunkCoordIntPair;
+import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.Utils;
+import net.techbrew.mcjm.data.AnimalsData;
+import net.techbrew.mcjm.data.DataCache;
+import net.techbrew.mcjm.data.EntityKey;
+import net.techbrew.mcjm.data.MobsData;
+import net.techbrew.mcjm.data.PlayersData;
+import net.techbrew.mcjm.data.VillagersData;
+import net.techbrew.mcjm.io.RegionFileHandler;
+import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.EntityHelper;
+import net.techbrew.mcjm.model.MapOverlayState;
+import net.techbrew.mcjm.model.Waypoint;
+import net.techbrew.mcjm.render.MapBlocks;
+
+/**
+ * Renders an entity image in the MapOverlay.
+ * 
+ * @author mwoodman
+ *
+ */
+public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
+	
+	private BufferedImage mapImg;
+	private Integer textureIndex;
+	private Double maxImgDim;
+
+	/**
+	 * Constructor.
+	 * @param startCoords
+	 * @param entityChunkSize
+	 * @param canvasWidth
+	 * @param canvasHeight
+	 */
+	public OverlayMapRenderer(final ChunkCoordIntPair startCoords, final ChunkCoordIntPair endCoords, final int canvasWidth, final int canvasHeight) {
+		super(startCoords, endCoords, canvasWidth, canvasHeight);
+	}
+
+	/**
+	 * Render list of entities.
+	 */
+	@Override
+	public void render(MapOverlayState state, Graphics2D unused) {
+
+		try {
+			
+			if(mapImg==null || textureIndex==null) {
+			
+				Minecraft mc = Minecraft.getMinecraft();
+				
+				// Get the map image		
+	
+				final Constants.CoordType cType = Constants.CoordType.convert(state.getMapType(), mc.thePlayer.dimension);
+	
+				int size = getTextureSize();				
+				BufferedImage tmpMapImg = RegionFileHandler.getMergedChunks(state.getWorldDir(), 
+						startCoords.chunkXPos, startCoords.chunkZPos, 
+						endCoords.chunkXPos, endCoords.chunkZPos, 
+						state.getMapType(), mc.thePlayer.chunkCoordY, cType, true, state.getCurrentZoom(),
+						size, size);
+				
+				// Allocate the new map image as a texture
+				int tmpTextureIndex = mc.renderEngine.allocateAndSetupTexture((BufferedImage) tmpMapImg);
+				
+				// If it worked, set the member vars
+				eraseCachedImg();
+				mapImg = tmpMapImg;
+				textureIndex = tmpTextureIndex;
+
+				int maxScreenSize = Math.max(state.getCanvasWidth(), state.getCanvasHeight());
+				int textureSize = mapImg.getWidth();
+				int maxBlocks = Utils.upperDistanceInBlocks(startCoords, endCoords);
+				double pct = new Double(textureSize) / maxBlocks;
+				maxImgDim = maxScreenSize * pct;
+			}
+			
+			// Draw to screen
+			draw(1f, state.getBlockXOffset(), state.getBlockZOffset());
+			
+		} catch(Throwable t) {
+			JourneyMap.getLogger().severe("Error during render: " + LogFormatter.toString(t));
+		}
+	}
+	
+	public void draw(float opacity, double xOffset, double zOffset) {
+		if(textureIndex!=null && maxImgDim!=null) {
+			drawImage(textureIndex, opacity, xOffset, zOffset, maxImgDim, maxImgDim);
+		}
+	}
+	
+	public void eraseCachedImg() {
+		mapImg = null;
+		if(textureIndex!=null) {
+			try {
+				Minecraft.getMinecraft().renderEngine.deleteTexture(textureIndex);				
+			} catch(Throwable t) {
+				JourneyMap.getLogger().warning("Map image texture not deleted: " + t.getMessage());
+				t.printStackTrace();
+			}
+			textureIndex = null;
+		}
+	}
+	
+	public int getTextureSize() {
+		int width = Math.max(16, (endCoords.chunkXPos - startCoords.chunkXPos) * 16);
+		int height = Math.max(16, (endCoords.chunkZPos - startCoords.chunkZPos) * 16);
+		return Utils.upperPowerOfTwo(Math.max(width, height), MAX_TEXTURE_SIZE);
+		//return MAX_TEXTURE_SIZE;
+	}
+
+
+}

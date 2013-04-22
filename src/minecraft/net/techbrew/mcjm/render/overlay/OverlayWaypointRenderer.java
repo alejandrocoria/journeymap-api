@@ -11,6 +11,7 @@ import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.Waypoint;
+import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer.BaseEntityOverlayRenderer;
 
 /**
  * Renders waypoints in the MapOverlay.
@@ -18,7 +19,7 @@ import net.techbrew.mcjm.model.Waypoint;
  * @author mwoodman
  *
  */
-public class OverlayWaypointRenderer extends BaseOverlayRenderer<List<Waypoint>> {
+public class OverlayWaypointRenderer extends BaseEntityOverlayRenderer<List<Waypoint>> {
 	
 	final int fontHeight = 16;
 	final Font labelFont = new Font("Arial", Font.BOLD, fontHeight);
@@ -34,8 +35,10 @@ public class OverlayWaypointRenderer extends BaseOverlayRenderer<List<Waypoint>>
 	 * @param canvasWidth
 	 * @param canvasHeight
 	 */
-	public OverlayWaypointRenderer(final ChunkCoordIntPair startCoords, final ChunkCoordIntPair endCoords, final int entityChunkSize, final int canvasWidth, final int canvasHeight, final int widthCutoff, final int heightCutoff) {
-		super(startCoords, endCoords, entityChunkSize, canvasWidth, canvasHeight, widthCutoff, heightCutoff);
+	public OverlayWaypointRenderer(OverlayEntityRenderer parentRenderer, int widthCutoff, int heightCutoff) {
+		super(parentRenderer.startCoords, parentRenderer.endCoords, 
+			  parentRenderer.canvasWidth, parentRenderer.canvasHeight, widthCutoff, heightCutoff);
+		this.blockSize = parentRenderer.blockSize;
 	}
 
 	/**
@@ -49,7 +52,7 @@ public class OverlayWaypointRenderer extends BaseOverlayRenderer<List<Waypoint>>
 			Color color;
 			Color labelColor;
 			boolean outofbounds;					
-			final int diameter = Math.max(6, super.entityBlockSize);
+			final int diameter = (int) Math.max(6, Math.round(super.blockSize));
 			g2D.setFont(labelFont); //$NON-NLS-1$
 			final FontMetrics fm = g2D.getFontMetrics();
 			
@@ -61,8 +64,8 @@ public class OverlayWaypointRenderer extends BaseOverlayRenderer<List<Waypoint>>
 				wz = waypoint.getZ();
 				color = waypoint.getColor();
 				
-				x = getScaledEntityX(wx);
-				z = getScaledEntityZ(wz);
+				x = (int) Math.floor(getScaledEntityX(wx));
+				z = (int) Math.floor(getScaledEntityZ(wz));
 				
 				outofbounds = false;
 	
