@@ -16,9 +16,11 @@ import net.techbrew.mcjm.log.LogFormatter;
 
 public class PropertyManager {
 
-	private static PropertyManager instance;
-	
 	public static final String FILE_NAME = "journeyMap.properties"; //$NON-NLS-1$
+	
+	private static PropertyManager instance;
+	private final SortedProperties properties;
+	private Boolean writeNeeded = false;
 	
 	public enum Key {
 		MAPGUI_ENABLED("mapgui_enabled", true), //$NON-NLS-1$
@@ -40,7 +42,8 @@ public class PropertyManager {
 		PREF_SHOW_VILLAGERS("preference_show_villagers", true), //$NON-NLS-1$
 		PREF_SHOW_PETS("preference_show_pets", true), //$NON-NLS-1$
 		PREF_SHOW_PLAYERS("preference_show_players", true), //$NON-NLS-1$
-		PREF_SHOW_WAYPOINTS("preference_show_waypoints", true); //$NON-NLS-1$
+		PREF_SHOW_WAYPOINTS("preference_show_waypoints", true), //$NON-NLS-1$
+		;
 		
 		private final String property;
 		private final String defaultValue;
@@ -79,9 +82,6 @@ public class PropertyManager {
 			return null;
 		}
 	}
-	
-	private final Properties properties;
-	private Boolean writeNeeded = false;
 	
 	public synchronized static PropertyManager getInstance() {
 		if(instance==null) {
@@ -125,8 +125,8 @@ public class PropertyManager {
 		return map;
 	}
 	
-	private Properties getDefaultProperties() {
-		Properties defaults  = new Properties();
+	private SortedProperties getDefaultProperties() {
+		SortedProperties defaults  = new SortedProperties();
 		for(Key key : Key.values()) {
 			defaults.put(key.getProperty(), key.getDefault());
 		}
@@ -134,7 +134,7 @@ public class PropertyManager {
 	}
 	
 	private PropertyManager() {
-		properties = new Properties();
+		properties = new SortedProperties();
 		readFromFile();
 		Properties defaults = getDefaultProperties();
 		for(Object key : defaults.keySet()) {
