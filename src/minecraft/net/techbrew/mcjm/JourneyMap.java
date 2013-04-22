@@ -55,7 +55,7 @@ public class JourneyMap extends BaseMod {
 	static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
 
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-	public static final String JM_VERSION = "2.5.0"; //$NON-NLS-1$
+	public static final String JM_VERSION = "2.5.1b1"; //$NON-NLS-1$
 	public static final String MC_VERSION = "1.5.1"; //$NON-NLS-1$
 
 	private static volatile Boolean initialized = false;
@@ -259,17 +259,17 @@ public class JourneyMap extends BaseMod {
 				player.addChatMessage(announcements.remove(0));
 			}
 
-			ThreadMXBean bean = ManagementFactory.getThreadMXBean();
-			long[] threadIds = bean.findDeadlockedThreads(); // Returns null if no threads are deadlocked.
-
-			if (threadIds != null) {
-				ThreadInfo[] infos = bean.getThreadInfo(threadIds);
-
-				for (ThreadInfo info : infos) {
-					StackTraceElement[] stack = info.getStackTrace();
-					getLogger().severe("Deadlocked thread: " + Arrays.asList(stack));
-				}
-			}
+//			ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+//			long[] threadIds = bean.findDeadlockedThreads(); // Returns null if no threads are deadlocked.
+//
+//			if (threadIds != null) {
+//				ThreadInfo[] infos = bean.getThreadInfo(threadIds);
+//
+//				for (ThreadInfo info : infos) {
+//					StackTraceElement[] stack = info.getStackTrace();
+//					getLogger().severe("Deadlocked thread: " + Arrays.asList(stack));
+//				}
+//			}
 
 			// Start executors
 			if(!executorsStarted) {
