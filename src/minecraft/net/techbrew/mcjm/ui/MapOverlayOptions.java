@@ -32,7 +32,7 @@ public class MapOverlayOptions extends GuiScreen {
 	final String title;
 	int lastWidth = 0;
 	int lastHeight = 0;
-	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints;
+	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid;
 	MapButton buttonSave,buttonClose,buttonAlert,buttonBrowser;
 	
 	public MapOverlayOptions(MapOverlay map) {
@@ -64,33 +64,38 @@ public class MapOverlayOptions extends GuiScreen {
 		buttonMonsters = new MapButton(10,0,0,
 				Constants.getString("MapOverlay.show_monsters", on),
 				Constants.getString("MapOverlay.show_monsters", off),
-				map.showMonsters); //$NON-NLS-1$ 
+				map.showMonsters); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		buttonAnimals = new MapButton(11,0,0,
 				Constants.getString("MapOverlay.show_animals", on),
 				Constants.getString("MapOverlay.show_animals", off),
-				map.showAnimals); //$NON-NLS-1$ 
+				map.showAnimals); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		buttonVillagers = new MapButton(12,0,0,
 				Constants.getString("MapOverlay.show_villagers", on),
 				Constants.getString("MapOverlay.show_villagers", off),
-				map.showVillagers); //$NON-NLS-1$ 
+				map.showVillagers); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		buttonPets = new MapButton(13,0,0,
 				Constants.getString("MapOverlay.show_pets", on),
 				Constants.getString("MapOverlay.show_pets", off),
-				map.showPets); //$NON-NLS-1$ 
+				map.showPets); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		buttonPlayers = new MapButton(14,0,0,
 				Constants.getString("MapOverlay.show_players", on),
 				Constants.getString("MapOverlay.show_players", off),
-				map.showPlayers); //$NON-NLS-1$ 
+				map.showPlayers); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		buttonWaypoints = new MapButton(15,0,0,
 				Constants.getString("MapOverlay.show_waypoints", on),
 				Constants.getString("MapOverlay.show_waypoints", off),
-				map.showWaypoints); //$NON-NLS-1$ 
-		buttonWaypoints.drawButton = WaypointHelper.waypointsEnabled();
+				map.showWaypoints); //$NON-NLS-1$  //$NON-NLS-2$
+		buttonWaypoints.enabled = WaypointHelper.waypointsEnabled();
+		
+		buttonGrid = new MapButton(16,0,0,
+				Constants.getString("MapOverlay.show_grid", on),
+				Constants.getString("MapOverlay.show_grid", off),
+				PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// Check for hardcore
 		if(map.hardcore) {
@@ -114,9 +119,8 @@ public class MapOverlayOptions extends GuiScreen {
 		buttonList.add(buttonVillagers);
 		buttonList.add(buttonPets);
 		buttonList.add(buttonPlayers);
-		if(buttonWaypoints.drawButton) {
-			buttonList.add(buttonWaypoints);
-		}
+		buttonList.add(buttonGrid);
+		buttonList.add(buttonWaypoints);
     }
     
     /**
@@ -148,11 +152,9 @@ public class MapOverlayOptions extends GuiScreen {
 			layoutButton(buttonPets, bx, by + (20*row));			
 			layoutButton(buttonPlayers, bx + hgap, by + (20*row++));	
 			
-			if(buttonWaypoints.drawButton) {
-				layoutButton(buttonWaypoints, bx + hgap/2, by + (20*row++));
-			}
-			
-			row++;
+			layoutButton(buttonGrid, bx, by + (20*row));			
+			layoutButton(buttonWaypoints, bx + hgap, by + (20*row++));	
+
 			layoutButton(buttonSave, bx, by + (20*row));			
 			layoutButton(buttonBrowser, bx + hgap, by + (20*row++));
 						
@@ -236,6 +238,12 @@ public class MapOverlayOptions extends GuiScreen {
 				buttonWaypoints.setToggled(MapOverlay.showWaypoints);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_WAYPOINTS, MapOverlay.showWaypoints);
 				break;
+			}
+			case 16: { // grid
+				boolean showGrid = !PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID);
+				buttonGrid.setToggled(showGrid);
+				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_GRID, showGrid);
+				map.forceRefresh();
 			}
 		}
 	}

@@ -23,6 +23,7 @@ var JourneyMap = (function() {
 	var showVillagers = true;
 	var showPlayers = true;
 	var showWaypoints = true;
+	var showGrid = true;
 
 	var mapBackground = "#222";
 
@@ -120,6 +121,7 @@ var JourneyMap = (function() {
 			showPets = JM.properties.preference_show_pets;
 			showPlayers = JM.properties.preference_show_players;
 			showWaypoints = JM.properties.preference_show_waypoints;
+			showGrid = JM.properties.preference_show_grid;
 			
 			// Get L10N messages
 			$.ajax({
@@ -350,6 +352,7 @@ var JourneyMap = (function() {
 		setTextAndTitle("#villagersMenuItem", "villagers_menu_item_text", "villagers_menu_item_title");
 		setTextAndTitle("#playersMenuItem", "players_menu_item_text", "players_menu_item_title");
 		setTextAndTitle("#waypointsMenuItem", "waypoints_menu_item_text", "waypoints_menu_item_title");
+		setTextAndTitle("#gridMenuItem", "grid_menu_item_text", "grid_menu_item_title");
 		
 		// Show menu checkboxes
 		$("#checkShowCaves").prop('checked', showCaves)		
@@ -357,6 +360,13 @@ var JourneyMap = (function() {
 			showCaves = (this.checked === true);
 			postPreference("preference_show_caves", showCaves);
 			setShowCaves(showCaves);
+		});
+		
+		$("#checkShowGrid").prop('checked', showGrid)		
+		$("#checkShowGrid").click(function(event) {
+			showGrid = (this.checked === true);
+			postPreference("preference_show_grid", showGrid);
+			drawMap();
 		});
 		
 		$("#checkShowWaypoints").prop('checked', showWaypoints)		

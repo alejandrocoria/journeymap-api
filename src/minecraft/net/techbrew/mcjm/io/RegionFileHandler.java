@@ -392,15 +392,18 @@ public class RegionFileHandler {
 			}
 		}
 		
-		g2D.setColor(new Color(130,130,130));
-		g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1F));
-				
-		for(int x = -1; x<imageWidth; x+=16) {
-			for(int z = -1; z<imageHeight; z+=16) {
-				g2D.drawRect(x, z, 16, 16);
+		// Show chunk grid
+		if(PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)) {
+			g2D.setColor(new Color(130,130,130));
+			g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1F));
+					
+			for(int x = -1; x<imageWidth; x+=16) {
+				for(int z = -1; z<imageHeight; z+=16) {
+					g2D.drawRect(x, z, 16, 16);
+				}
 			}
+			g2D.setComposite(MapBlocks.OPAQUE);
 		}
-		g2D.setComposite(MapBlocks.OPAQUE);
 				
 		if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
 			stop = System.currentTimeMillis();

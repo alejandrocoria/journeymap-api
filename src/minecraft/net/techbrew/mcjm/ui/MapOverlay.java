@@ -828,15 +828,18 @@ public class MapOverlay extends GuiScreen {
 			checkMapType = Constants.MapType.underground;
 		}
 		final Constants.MapType useMapType = checkMapType;
-		final File mapFile = new File(saveDir, mc.theWorld.getWorldInfo().getWorldName() + "_" + useMapType + ".png");	 //$NON-NLS-1$ //$NON-NLS-2$
-
-		JourneyMap.announce(Constants.getString("MapOverlay.saving_map_to_file", useMapType)); //$NON-NLS-1$
 		close();
 		
 		JourneyMap.getChunkExecutor().schedule(new Runnable() {
 			public void run() {							
 				try {			
+					final File mapFile = new File(saveDir, FileHandler.getSafeName(mc) + "_" + useMapType + ".png");	 //$NON-NLS-1$ //$NON-NLS-2$
+					JourneyMap.announce(Constants.getString("MapOverlay.saving_map_to_file", useMapType)); //$NON-NLS-1$
 					new MapSaver().saveMapToFile(worldDir, useMapType, mc.thePlayer.chunkCoordY, mc.theWorld.provider.dimensionId, mapFile);
+				} catch (java.lang.OutOfMemoryError e) {
+					String error = Constants.getMessageJMERR18("Out Of Memory: Increase Java Heap Size for Minecraft to save this map.");
+					JourneyMap.getLogger().severe(error);
+					JourneyMap.announce(error);
 				} catch (Throwable t) {	
 					String error = Constants.getMessageJMERR18(t.getMessage());
 					JourneyMap.getLogger().severe(error);
