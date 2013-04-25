@@ -3,12 +3,8 @@ package net.techbrew.mcjm.io;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
@@ -37,7 +33,7 @@ public class MapSaver {
 	}
 	
 	public static synchronized BufferedImage saveMap(final File worldDir, final Constants.MapType mapType, final Integer chunkY, final Constants.CoordType cType)
-			throws IOException {
+			throws IOException, java.lang.OutOfMemoryError {
 		long start = 0, stop = 0;
 		start = System.currentTimeMillis();
 		
@@ -84,4 +80,5 @@ public class MapSaver {
 		return mergedImg;
 		
 	}
+	
 }
