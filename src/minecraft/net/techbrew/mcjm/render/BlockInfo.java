@@ -2,6 +2,8 @@ package net.techbrew.mcjm.render;
 
 import java.awt.Color;
 
+import net.minecraft.src.Block;
+
 public class BlockInfo {
 
 	public final int id;
@@ -20,6 +22,14 @@ public class BlockInfo {
 
 	public void setAlpha(float alpha) {
 		this.alpha = alpha;
+	}
+	
+	public Block getBlock() {
+		return Block.blocksList[id];
+	}
+	
+	public int getRenderColor() {
+		return getBlock().getRenderColor(meta);
 	}
 
 	@Override

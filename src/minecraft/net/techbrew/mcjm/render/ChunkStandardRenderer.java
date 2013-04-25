@@ -130,7 +130,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 							color = iter.next();
 							while(iter.hasNext()) {
 								//color = Color.white;
-								color = mapBlocks.average(color, iter.next());
+								color = ColorCache.average(color, iter.next());
 							}
 						}
 						blockInfo.color = color;

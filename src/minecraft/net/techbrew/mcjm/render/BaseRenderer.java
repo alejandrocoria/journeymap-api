@@ -319,9 +319,9 @@ public abstract class BaseRenderer {
 		float[] rgb = new float[4];
 		rgb = original.getRGBColorComponents(rgb);
 		return new Color(
-				mapBlocks.safeColor(rgb[0] * bluer * factor),
-				mapBlocks.safeColor(rgb[1] * bluer * factor),
-				mapBlocks.safeColor(rgb[2] * factor));
+				ColorCache.safeColor(rgb[0] * bluer * factor),
+				ColorCache.safeColor(rgb[1] * bluer * factor),
+				ColorCache.safeColor(rgb[2] * factor));
 		
 	}
 	
@@ -340,9 +340,9 @@ public abstract class BaseRenderer {
 		float[] rgb = new float[4];
 		rgb = original.getRGBColorComponents(rgb);
 		return new Color(
-				mapBlocks.safeColor(rgb[0] * factor),
-				mapBlocks.safeColor(rgb[1] * factor),
-				mapBlocks.safeColor(rgb[2] * (factor+.1f)));
+				ColorCache.safeColor(rgb[0] * factor),
+				ColorCache.safeColor(rgb[1] * factor),
+				ColorCache.safeColor(rgb[2] * (factor+.1f)));
 		
 	}
 
