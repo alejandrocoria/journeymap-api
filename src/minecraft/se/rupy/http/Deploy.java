@@ -402,6 +402,7 @@ public class Deploy extends Service {
 			return send(url, file, pass, true);
 		}
 
+		@SuppressWarnings("resource")
 		InputStream send(URL url, File file, String pass, boolean chunk) throws IOException {
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("POST");
