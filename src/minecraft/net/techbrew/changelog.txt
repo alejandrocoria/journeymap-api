@@ -1,4 +1,4 @@
-JourneyMap 2.5.1b1 for Minecraft 1.5.1 (April 22, 2013)
+JourneyMap 2.6.0b1 for Minecraft 1.5.1 (April 22, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -11,11 +11,16 @@ Requirements:
 - Minecraft 1.5
 - ModLoader or Forge
 
-Changes in JourneyMap 2.5.1b1 for Minecraft 1.5:
-- Italian translation thanks to @SimoDK (58D-69Y-VQVJ)
-- Bugfix (5E7-M3D-8Y86) "In-game Map Just White Screen".  Fixes OpenGL-related issue with older graphics cards by using PowerOfTwo textures.
+Changes in JourneyMap 2.6.0b1 for Minecraft 1.5:
+- Map colors are now derived from the current texture pack, including custom blocks
+- New option: "Show grid" will display a grid along chunk boundaries
+- Added an Italian translation. Thanks to Simone Dassi! (58D-69Y-VQVJ)
+- Bugfix (5E7-M3D-8Y86) "In-game Map Just White Screen".  Fixes OpenGL-related issue with older graphics cards by using PowerOfTwo textures. 
+- Saving map to file now uses world name in the filename instead of "MpServer".
 - Dragging the in-game map is easier when zoomed in
 - In-game map now retains last position after being closed/re-opened.
+- Added colors to JourneyMap chat text 
+- Properties file now alphabetized
 
 Changes in JourneyMap 2.5.0 for Minecraft 1.5:
 - New Feature (5ZA-ZYN-B26M): Displays Rei's Minimap or VoxelMap (formerly Zan's Minimap) waypoints
