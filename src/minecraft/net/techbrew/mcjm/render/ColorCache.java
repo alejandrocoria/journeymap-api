@@ -74,8 +74,8 @@ public class ColorCache {
 		colors.clear();
 				
 		colors.put(new BlockInfo(0,0), new Color(0x000000)); // air
-		colors.put(new BlockInfo(8,0), new Color(0x112299)); // water still
-		colors.put(new BlockInfo(9,0), new Color(0x112299)); // water moving
+		colors.put(new BlockInfo(8,0), new Color(4210943)); // water still
+		colors.put(new BlockInfo(9,0), new Color(4210943)); // water moving
 		colors.put(new BlockInfo(111,0), multiply(Color.lightGray, Block.waterlily.getRenderColor(0)));
 		
 		MapBlocks.resetAlphas();
@@ -178,7 +178,7 @@ public class ColorCache {
 	 */
 	public Color getWaterColor(BiomeGenBase biome, BlockInfo blockInfo) {	
 		
-		Color color = waterBiomeColors.get(biome.biomeName);
+		Color color = waterBiomeColors.get(biome);
 		if(color==null) {
 			color = blend(getBlockColor(blockInfo), biome.waterColorMultiplier);
 			waterBiomeColors.put(biome, color);
@@ -203,7 +203,7 @@ public class ColorCache {
             }
             
             // Find out which angle icon to use
-            int side = 0;//block.renderAsNormalBlock() ? 0 : 1;
+            int side = block.renderAsNormalBlock() ? 0 : 1;
             
         	TextureStitched blockIcon = (TextureStitched) block.getIcon(side, blockInfo.meta);
         	if(blockIcon==null && side>0) {
