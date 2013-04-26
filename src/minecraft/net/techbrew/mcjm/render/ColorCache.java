@@ -9,6 +9,7 @@ import java.util.HashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.BiomeGenBase;
 import net.minecraft.src.Block;
+import net.minecraft.src.BlockLeaves;
 import net.minecraft.src.ITexturePack;
 import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.Texture;
@@ -37,10 +38,10 @@ public class ColorCache {
 	
 	final boolean useCustomTexturePack;
 	final TexturePackList texturePackList;
-	ITexturePack texturePack;
+	volatile ITexturePack texturePack;
 	
-	String lastTextureName = null;
-	BufferedImage lastTexture;
+	volatile String lastTextureName = null;
+	volatile byte[] lastTextureData;
 	
 	long loadTimes = 0;
 	
@@ -65,15 +66,17 @@ public class ColorCache {
 		
 		loadTimes = 0;
 		lastTextureName = null;
-		lastTexture = null;
+		lastTextureData = null;
 		grassBiomeColors.clear();
 		waterBiomeColors.clear();
 		foliageBiomeColors.clear();		
 		
 		colors.clear();
+				
 		colors.put(new BlockInfo(0,0), new Color(0x000000)); // air
-		colors.put(new BlockInfo(8,0), new Color(0x112299)); // water 
-		colors.put(new BlockInfo(9,0), new Color(0x112299)); // stationary water 
+		colors.put(new BlockInfo(8,0), new Color(0x112299)); // water still
+		colors.put(new BlockInfo(9,0), new Color(0x112299)); // water moving
+		colors.put(new BlockInfo(111,0), multiply(Color.lightGray, Block.waterlily.getRenderColor(0)));
 		
 		MapBlocks.resetAlphas();
 		
@@ -96,7 +99,7 @@ public class ColorCache {
 		} else if(block==Block.grass || block==Block.tallGrass) {
 			color = getGrassColor(biome, blockInfo);
 		} else if(block==Block.waterStill || block==Block.waterMoving) {
-			color = getWaterColor(biome);
+			color = getWaterColor(biome, blockInfo);
 		} else {
 			color = getBlockColor(blockInfo);
 		}
@@ -144,9 +147,7 @@ public class ColorCache {
 		
 		Color color = grassBiomeColors.get(biome);
 		if(color==null) {
-			//color = multiply(getBlockColor(blockInfo),  biome.getBiomeGrassColor());
-			//color = new Color(biome.getBiomeGrassColor());
-			color = average(grassOffsetColor, new Color(biome.getBiomeGrassColor()));
+			color = multiply(Color.lightGray, biome.getBiomeGrassColor());
 			grassBiomeColors.put(biome, color);
 		}
 		return color;
@@ -162,9 +163,7 @@ public class ColorCache {
 	public Color getFoliageColor(BiomeGenBase biome, BlockInfo blockInfo) {
 		Color color = foliageBiomeColors.get(biome.biomeName + blockInfo.hashCode());
 		if(color==null) {
-			color = multiply2(getBlockColor(blockInfo),  biome.getBiomeFoliageColor());
-			//color = new Color(biome.getBiomeFoliageColor());
-			//color = blend(getBlockColor(blockInfo), biome.getBiomeFoliageColor());
+			color = multiply(getBlockColor(blockInfo), biome.getBiomeFoliageColor());
 			foliageBiomeColors.put(biome.biomeName + blockInfo.hashCode(), color);
 		}
 		return color;
@@ -177,13 +176,15 @@ public class ColorCache {
 	 * @param biome
 	 * @return
 	 */
-	public Color getWaterColor(BiomeGenBase biome) {		
-		Color color = waterBiomeColors.get(biome);
+	public Color getWaterColor(BiomeGenBase biome, BlockInfo blockInfo) {	
+		
+		Color color = waterBiomeColors.get(biome.biomeName);
 		if(color==null) {
-			color = blend(colors.get(new BlockInfo(8,0)), biome.waterColorMultiplier);
+			color = blend(getBlockColor(blockInfo), biome.waterColorMultiplier);
 			waterBiomeColors.put(biome, color);
 		}
 		return color;
+
 	}
 	
 	/**
@@ -229,29 +230,13 @@ public class ColorCache {
         	// If the texture sheet has changed, will need a new bufferedimage
         	if(!texSheet.getTextureName().equals(lastTextureName)) {
         		lastTextureName = texSheet.getTextureName();
-        		lastTexture = null;
-        		JourneyMap.getLogger().info("Using texture: " + lastTextureName);
-        	}
-        	
-        	// Keep texture in bufferedimage, trading memory for performance
-        	if(lastTexture==null) {        	
-        		int sheetWidth = texSheet.getWidth();
-        		int sheetHeight = texSheet.getHeight();
-            	lastTexture = new BufferedImage(sheetWidth, sheetHeight, BufferedImage.TYPE_INT_ARGB);
                 ByteBuffer buffer = texSheet.getTextureData();
-                byte[] bytes = new byte[sheetWidth * sheetHeight * 4];
+                lastTextureData = new byte[texSheet.getWidth() * texSheet.getHeight() * 4];
                 buffer.position(0);
-                buffer.get(bytes);
-
-                for (int x = 0; x < sheetWidth; ++x)
-                {
-                    for (int y = 0; y < sheetHeight; ++y)
-                    {
-                        lastTexture.setRGB(x, y, getARGBfromArray(bytes, x, y, sheetWidth));
-                    }
-                }
+                buffer.get(lastTextureData);
+        		JourneyMap.getLogger().info("Using texture (" + lastTextureData.length/1024 + "KB): " + lastTextureName);
         	}
-        	
+
         	long loadStart = System.currentTimeMillis();        	            
             Color color = getColorForIcon(blockInfo, blockIcon);            
             long loadStop = System.currentTimeMillis();
@@ -259,7 +244,7 @@ public class ColorCache {
             loadTimes += (loadStop-loadStart);
             
             if(colors.size() % 10 == 0) {
-            	JourneyMap.getLogger().info("Average color load time: " + (loadTimes*1f/(colors.size()-3)) + "ms");
+            	JourneyMap.getLogger().info("Average color load time: " + (loadTimes*1f/(colors.size()-4)) + "ms");
             }
             
 			// Put the color in the map
@@ -279,25 +264,22 @@ public class ColorCache {
 	Color getColorForIcon(BlockInfo blockInfo, TextureStitched blockIcon) {
 
 		TextureStitchedStub icon = new TextureStitchedStub(blockIcon);
-		int width = icon.getWidth();
-		int height = icon.getHeight();
+		int width = icon.getOriginX() + icon.getWidth();
+		int height = icon.getOriginY() + icon.getHeight();
 		Texture texSheet = icon.getTextureSheet();	
 		
-
-        
-    	// Create a bufferedimage for just the block texture
-        BufferedImage blockImage = new BufferedImage(width, height, 2);
-        blockImage.getGraphics().drawImage(lastTexture, 0, 0, width, height, blockIcon.getOriginX(), blockIcon.getOriginY(), blockIcon.getOriginX()+width,  blockIcon.getOriginY()+height, null);
-			
+		int sheetWidth = texSheet.getWidth();
+		int sheetHeight = texSheet.getHeight();
+    	
         // TODO: Track percentage of pixels that aren't transparent, use that as factor when multiplying biome/grass/foliage color
         
         int count = 0;
         int alpha;
         int argb;
         int a=0, r=0, g=0, b=0;
-        for(int x=0; x<width; x++) {
-        	for(int y=0; y<height; y++) {
-        		argb = blockImage.getRGB(x, y);
+        for(int x=icon.getOriginX(); x<width; x++) {
+        	for(int y=icon.getOriginY(); y<height; y++) {
+        		argb = getARGBfromArray(lastTextureData, x, y, sheetWidth);
         		alpha = (argb >> 24) & 0xFF;
         		if(alpha>0) {
         			count++;
@@ -336,28 +318,8 @@ public class ColorCache {
         argb |= (bytes[pos + 0] & 255) << 16; //r
         argb |= (bytes[pos + 3] & 255) << 24; //a
         return argb;
-	}
-	
-	static Color multiply(Color original, int multiplier) {
-		float[] rgba = original.getComponents(null);
-		
-		float r = rgba[0] * ((multiplier >> 16 & 0xFF) * 0.003921569F);
-		float g = rgba[1] * ((multiplier >> 8 & 0xFF) * 0.003921569F);
-		float b = rgba[2] * ((multiplier >> 0 & 0xFF) * 0.003921569F);
+	}	
 
-		return new Color(r,g,b); 
-	}
-	
-	static Color multiply2(Color original, int multiplier) {
-		float[] rgba = original.getComponents(null);
-		
-        float r = rgba[0] * (float)(multiplier >> 16 & 255) / 255.0F * 0.9F;
-        float g = rgba[1] * (float)(multiplier >> 8 & 255) / 255.0F * 0.9F;
-        float b = rgba[2] * (float)(multiplier & 255) / 255.0F * 0.9F;
-
-		return new Color(r,g,b); 
-	}
-	
 	static Color blend(Color color1, int multiplier) {
 		int r1 = color1.getRed();
 		int g1 = color1.getGreen();
@@ -375,7 +337,7 @@ public class ColorCache {
 
 		return new Color(r3,g3,b3);
 	}
-
+	
 
 	static Color average(Color color1, Color color2)
 	{
@@ -387,6 +349,15 @@ public class ColorCache {
 		return new Color(r,g,b,a);
 	}
 
+	static Color multiply(Color original, int multiplier) {
+		float[] rgba = original.getComponents(null);
+		
+		float r = rgba[0] * ((multiplier >> 16 & 0xFF) * 0.003921569F);
+		float g = rgba[1] * ((multiplier >> 8 & 0xFF) * 0.003921569F);
+		float b = rgba[2] * ((multiplier >> 0 & 0xFF) * 0.003921569F);
+
+		return new Color(r,g,b); 
+	}
 
 	static float safeColor(float original) {
 		return Math.min(1F, (Math.max(0F, original)));
