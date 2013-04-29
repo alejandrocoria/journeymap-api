@@ -21,6 +21,8 @@ import java.util.logging.Level;
 import javax.imageio.ImageIO;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.src.Block;
+import net.minecraft.src.BlockVine;
 import net.minecraft.src.EnumSkyBlock;
 import net.minecraft.src.MathHelper;
 import net.minecraft.src.WorldProvider;
@@ -110,7 +112,6 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					
 				// Paint deeper blocks if alpha used
 				boolean useAlpha = blockInfo.alpha < 1F;		
-				float alpha = 1F;
 				if (useAlpha) {
 					
 					// Check for surrounding water
@@ -126,19 +127,15 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						if(bn.id==8 || bn.id==9) colors.add(bn.color);
 						if(bs.id==8 || bs.id==9) colors.add(bs.color);
 						if(colors.size()>1) {
-							Iterator<Color> iter = colors.iterator();
-							color = iter.next();
-							while(iter.hasNext()) {
-								//color = Color.white;
-								color = ColorCache.average(color, iter.next());
-							}
+							color = ColorCache.average(colors);
 						}
 						blockInfo.color = color;
 						
 					}
-					
 					paintDepth(chunkStub, blockInfo, x, y, z, g2D);
-				} else {
+				}
+				
+				if(!MapBlocks.noShadows.contains(blockInfo)) {
 
 					// Get slope of block and prepare to shade
 					slope = chunkStub.slopes[x][z];
@@ -301,10 +298,10 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					}			
 
 					// Get block color
-					BlockInfo block = mapBlocks.getBlockInfo(chunkStub, x, paintY, z);
-					Color color = block.color;
+					BlockInfo info = mapBlocks.getBlockInfo(chunkStub, x, paintY, z);
+					Color color = info.color;
 					
-					boolean keepflat = (block.id == 10 || block.id == 11 || block.id==51  || block.id == 8 || block.id == 9); // lava or fire or water
+					boolean keepflat = MapBlocks.noShadows.contains(info.id);
 					
 					if(!keepflat) {
 						// Contour shading
@@ -367,7 +364,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
 	}
 		
-	private void paintDepth(ChunkStub chunkStub, BlockInfo blockInfo, int x, int y, int z, final Graphics2D g2D) {
+	private void paintDepth(ChunkStub chunkStub, BlockInfo blockInfo, int x, int y, int z, final Graphics2D g2D) {		
 		
 		// See how deep the alpha goes
 		Stack<BlockInfo> stack = new Stack<BlockInfo>();
@@ -388,10 +385,10 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 			
 		}
 		
-		boolean thinWaterAdjust = stack.size()==2;
+		boolean thinWaterAdjust = (stack.size()==2 && blockInfo.id==Block.waterStill.blockID);
 				
-		// If bottom block is water, don't bother with transparency
-		if(stack.size()<2 || stack.peek().id==8 || stack.peek().id==9) {
+		// If bottom block is same as the top, don't bother with transparency
+		if(stack.size()<2 || stack.peek().id==blockInfo.id) {
 			g2D.setComposite(MapBlocks.OPAQUE);
 			g2D.setPaint(blockInfo.color);
 			g2D.fillRect(x, z, 1, 1);
@@ -413,7 +410,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 			}	
 			
 			if(thinWaterAdjust) {
-				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .5f));
+				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .3f));
 				g2D.setPaint(blockInfo.color);
 				g2D.fillRect(x, z, 1, 1);
 			}
