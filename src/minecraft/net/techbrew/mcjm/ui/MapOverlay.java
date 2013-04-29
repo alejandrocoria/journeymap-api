@@ -554,57 +554,57 @@ public class MapOverlay extends GuiScreen {
 	protected void keyTyped(char c, int i)
 	{		
 		switch(i) {
-		case Keyboard.KEY_ESCAPE : {
-			
-			if(options!=null) {
-				options.close();
+			case Keyboard.KEY_ESCAPE : {
+				
+				if(options!=null) {
+					options.close();
+					break;
+				}
+				
+				close();
 				break;
 			}
-			
-			close();
-			break;
-		}
-		case Keyboard.KEY_ADD : {
-			zoomIn();
-			break;
-		}
-		case Keyboard.KEY_EQUALS : {
-			zoomIn();
-			break;
-		}
-		case Keyboard.KEY_MINUS : {
-			zoomOut();
-			break;
-		}
-		case Keyboard.KEY_E : {
-			close();
-			mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
-			break;
-		}
-		case Keyboard.KEY_W : {
-			moveCanvas(i);
-			break;
-		}
-		case Keyboard.KEY_A : {
-			moveCanvas(i);
-			break;
-		}
-		case Keyboard.KEY_S : {
-			moveCanvas(i);
-			break;
-		}
-		case Keyboard.KEY_D : {
-			moveCanvas(i);
-			break;
-		}
-		case Keyboard.KEY_SLASH : {
-			if(mc.isSingleplayer()==false) {
-				close();
-				mc.displayGuiScreen(new GuiChat());
+			case Keyboard.KEY_ADD : {
+				zoomIn();
+				break;
 			}
-			break;
-		}
-		}
+			case Keyboard.KEY_EQUALS : {
+				zoomIn();
+				break;
+			}
+			case Keyboard.KEY_MINUS : {
+				zoomOut();
+				break;
+			}
+			case Keyboard.KEY_E : {
+				close();
+				mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
+				break;
+			}
+			case Keyboard.KEY_W : {
+				moveCanvas(i);
+				break;
+			}
+			case Keyboard.KEY_A : {
+				moveCanvas(i);
+				break;
+			}
+			case Keyboard.KEY_S : {
+				moveCanvas(i);
+				break;
+			}
+			case Keyboard.KEY_D : {
+				moveCanvas(i);
+				break;
+			}
+			case Keyboard.KEY_SLASH : {
+				if(mc.isSingleplayer()==false) {
+					close();
+					mc.displayGuiScreen(new GuiChat());
+				}
+				break;
+			}
+		}		
 	}
 
 	@Override
