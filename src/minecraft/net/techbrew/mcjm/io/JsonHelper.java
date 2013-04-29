@@ -1,11 +1,15 @@
 package net.techbrew.mcjm.io;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import net.techbrew.mcjm.server.BaseService;
 
 /**
  * Conversion of convenience objects to JSON strings.
@@ -82,7 +86,8 @@ public class JsonHelper {
 	}
 	
 	static void wrapAsString(final StringBuffer sb, final Object val) {
-		sb.append("\"").append(val).append("\"");		
+		String str = val.toString().replaceAll("'", "&apos;").replaceAll("\"", "&quot;");
+		sb.append("\"").append(str).append("\"");	
 	}
 
 }
