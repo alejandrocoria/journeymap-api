@@ -50,7 +50,7 @@ public class RegionImageCache  {
 		lastFlush = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);
 		
 		// Init thread factory
-		JMThreadFactory tf = new JMThreadFactory("RegionImageCache");
+		JMThreadFactory tf = new JMThreadFactory("rcache");
 		
 		// Add shutdown hook to flush cache to disk
 		Runtime.getRuntime().addShutdownHook(tf.newThread(new Runnable() {
