@@ -25,6 +25,7 @@ import net.minecraft.src.Block;
 import net.minecraft.src.BlockFluid;
 import net.minecraft.src.ITexturePack;
 import net.minecraft.src.Icon;
+import net.minecraft.src.Item;
 import net.minecraft.src.ModLoader;
 import net.minecraft.src.Rect2i;
 import net.minecraft.src.Texture;
@@ -42,6 +43,8 @@ public class MapBlocks extends HashMap {
 	public static AlphaComposite SEMICLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F);
 	public static AlphaComposite SLIGHTLYCLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F);
 	public static Color COLOR_TRANSPARENT = new Color(0,0,0,0);
+	
+	public final static HashMap<Integer, Float> alphas = new HashMap<Integer, Float>(5);
 	
 	ColorCache colorCache;
 	
@@ -169,29 +172,42 @@ public class MapBlocks extends HashMap {
 	}
 	
 	/**
-	 * Map of block ids that shouldn't cast shadows
+	 * Map of block ids that shouldn't be used as top blocks
 	 */
 	public final static HashSet<Integer> excludeHeight = new HashSet<Integer>(5);
 	{
 		excludeHeight.add(0); // air 
-		excludeHeight.add(31); // grass, fern 
-		excludeHeight.add(32); // shrub 
-		excludeHeight.add(106); // vines
+		excludeHeight.add(Block.tallGrass.blockID); // grass, fern 
+		excludeHeight.add(Block.deadBush.blockID); // shrub 
+		excludeHeight.add(Block.tripWire.blockID); // tripwire hook
+		excludeHeight.add(Block.tripWireSource.blockID); // tripwire
+		excludeHeight.add(Block.glass.blockID);
+		excludeHeight.add(Block.thinGlass.blockID);
+	}
+	
+	/**
+	 * Map of block ids that shouldn't cast shadows
+	 */
+	public final static HashSet<BlockInfo> noShadows = new HashSet<BlockInfo>(5);
+	{
+		noShadows.add(new BlockInfo(Block.waterStill.blockID, 0));
+		noShadows.add(new BlockInfo(Block.lavaStill.blockID, 0));
+		noShadows.add(new BlockInfo(Block.fire.blockID, 0));
+		noShadows.add(new BlockInfo(Block.glass.blockID, 0));
+		noShadows.add(new BlockInfo(Block.vine.blockID, 0));
 	}
 	
 	/**
 	 * Alpha values for block ids.
-	 */
-	public final static HashMap<Integer, Float> alphas = new HashMap<Integer, Float>(5);
-	
+	 */	
 	static void resetAlphas() {
-		alphas.put(8,.55F); // water
-		alphas.put(9,.55F); // stationary water 
-		alphas.put(20,.3F); // glass
-		alphas.put(79,.8F); // ice
-		alphas.put(102,.3F); // glass		
-		alphas.put(131,0F); // tripwire hook
-		alphas.put(132,0F); // tripwire
+		alphas.put(Block.waterStill.blockID,.7F); 
+		alphas.put(Block.waterMoving.blockID,.7F); 
+		alphas.put(Block.ice.blockID,.8F); 
+		alphas.put(Block.glass.blockID,.3F); 
+		alphas.put(Block.thinGlass.blockID,.3F);
+		alphas.put(Block.vine.blockID,.2F);
+		alphas.put(Block.torchWood.blockID,.5F);
 	}
 	
 }

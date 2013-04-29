@@ -4,13 +4,25 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.BiomeGenBase;
 import net.minecraft.src.Block;
+import net.minecraft.src.BlockDeadBush;
+import net.minecraft.src.BlockFlower;
 import net.minecraft.src.BlockLeaves;
+import net.minecraft.src.BlockLeavesBase;
+import net.minecraft.src.BlockGrass;
+import net.minecraft.src.BlockLilyPad;
+import net.minecraft.src.BlockTallGrass;
+import net.minecraft.src.BlockVine;
 import net.minecraft.src.ITexturePack;
+import net.minecraft.src.Item;
+import net.minecraft.src.ItemBlock;
+import net.minecraft.src.ModLoader;
 import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.Texture;
 import net.minecraft.src.TexturePackDefault;
@@ -29,6 +41,7 @@ import net.techbrew.mcjm.model.TextureStitchedStub;
  */
 public class ColorCache {
 	
+	final static float MAGIC = 0.003921569F;
 	final Color grassOffsetColor = new Color(0x111111);
 	final HashMap<BlockInfo, Color> colors = new HashMap<BlockInfo, Color>(256);
 	final HashMap<BiomeGenBase, Color> grassBiomeColors = new HashMap<BiomeGenBase, Color>(16);
@@ -42,8 +55,7 @@ public class ColorCache {
 	
 	volatile String lastTextureName = null;
 	volatile byte[] lastTextureData;
-	
-	long loadTimes = 0;
+	volatile long lastTextureUsed;
 	
 	public ColorCache() {
 		texturePackList = Minecraft.getMinecraft().texturePackList;
@@ -64,7 +76,6 @@ public class ColorCache {
 		
 		JourneyMap.getLogger().info("Deriving block colors from texture pack: " + texturePack.getTexturePackID());
 		
-		loadTimes = 0;
 		lastTextureName = null;
 		lastTextureData = null;
 		grassBiomeColors.clear();
@@ -74,9 +85,6 @@ public class ColorCache {
 		colors.clear();
 				
 		colors.put(new BlockInfo(0,0), new Color(0x000000)); // air
-		colors.put(new BlockInfo(8,0), new Color(4210943)); // water still
-		colors.put(new BlockInfo(9,0), new Color(4210943)); // water moving
-		colors.put(new BlockInfo(111,0), multiply(Color.lightGray, Block.waterlily.getRenderColor(0)));
 		
 		MapBlocks.resetAlphas();
 		
@@ -94,17 +102,43 @@ public class ColorCache {
 		
 		Block block = blockInfo.getBlock();
 		
-		if(block==Block.leaves) {
-			color = getFoliageColor(biome, blockInfo);
-		} else if(block==Block.grass || block==Block.tallGrass) {
-			color = getGrassColor(biome, blockInfo);
+		if(block instanceof BlockLeaves || block instanceof BlockVine) {
+			
+			color = foliageBiomeColors.get(blockInfo.hashCode() + biomeName);
+			if(color==null) {
+				color = getBlockColor(blockInfo);
+				color = multiply(color, biome.getBiomeFoliageColor());
+				foliageBiomeColors.put(blockInfo.hashCode() + biomeName, color);
+			}
+			
+		} else if(block instanceof BlockGrass || block instanceof BlockTallGrass) {
+
+			color = grassBiomeColors.get(biome);
+			if(color==null) {
+				// TODO: Use scanned color?
+				color = multiply(Color.lightGray, biome.getBiomeGrassColor());
+				grassBiomeColors.put(biome, color);
+			}
+			
 		} else if(block==Block.waterStill || block==Block.waterMoving) {
-			color = getWaterColor(biome, blockInfo);
+			
+			color = waterBiomeColors.get(biome);
+			if(color==null) {
+				color = multiply(getBlockColor(blockInfo), biome.waterColorMultiplier);
+				waterBiomeColors.put(biome, color);
+			}
+			
+		} else if(block instanceof BlockLilyPad) {
+			
+			color = ColorCache.multiply(getBlockColor(blockInfo), block.getRenderColor(blockInfo.meta));
+
 		} else {
+			
 			color = getBlockColor(blockInfo);
 		}
-
-
+		
+		retireCachedData();
+		
 		return color;
 	}
 	
@@ -114,7 +148,7 @@ public class ColorCache {
 	 * @param blockInfo
 	 * @return
 	 */
-	public Color getBlockColor(BlockInfo blockInfo) {
+	private Color getBlockColor(BlockInfo blockInfo) {
 		
 		if(blockInfo.color!=null) {
 			return blockInfo.color;
@@ -131,61 +165,11 @@ public class ColorCache {
 			if(color==null) {
 				color = Color.black;
 			}
-			//colors.put(blockInfo, color);
+			colors.put(blockInfo, color);
 		}
 		return color;		
 	}
-	
-	/**
-	 * Gets the color for grass in the biome.  Lazy-loads
-	 * the result into a map for faster access.
-	 * 
-	 * @param biome
-	 * @return
-	 */
-	public Color getGrassColor(BiomeGenBase biome, BlockInfo blockInfo) {
 		
-		Color color = grassBiomeColors.get(biome);
-		if(color==null) {
-			color = multiply(Color.lightGray, biome.getBiomeGrassColor());
-			grassBiomeColors.put(biome, color);
-		}
-		return color;
-	}
-	
-	/**
-	 * Gets the color for foliage in the biome.  Lazy-loads
-	 * the result into a map for faster access.
-	 * 
-	 * @param biome
-	 * @return
-	 */
-	public Color getFoliageColor(BiomeGenBase biome, BlockInfo blockInfo) {
-		Color color = foliageBiomeColors.get(biome.biomeName + blockInfo.hashCode());
-		if(color==null) {
-			color = multiply(getBlockColor(blockInfo), biome.getBiomeFoliageColor());
-			foliageBiomeColors.put(biome.biomeName + blockInfo.hashCode(), color);
-		}
-		return color;
-	}
-	
-	/**
-	 * Gets the color for water in the biome.  Lazy-loads
-	 * the result into a map for faster access.
-	 * 
-	 * @param biome
-	 * @return
-	 */
-	public Color getWaterColor(BiomeGenBase biome, BlockInfo blockInfo) {	
-		
-		Color color = waterBiomeColors.get(biome);
-		if(color==null) {
-			color = blend(getBlockColor(blockInfo), biome.waterColorMultiplier);
-			waterBiomeColors.put(biome, color);
-		}
-		return color;
-
-	}
 	
 	/**
 	 * Derive block color from the corresponding texture.
@@ -195,68 +179,57 @@ public class ColorCache {
 	protected Color loadBlockColor(BlockInfo blockInfo) {
 		try {
 
+			JourneyMap.getLogger().info("Loading color for " + stringInfo(blockInfo));
+			
+        	double loadStart = System.nanoTime();    
+        	
 	        Block block = Block.blocksList[blockInfo.id];
 
             if (block == null) {
-            	JourneyMap.getLogger().warning("No block type found for " + blockInfo);
+            	JourneyMap.getLogger().warning("No block type found");
+            	
+            	ItemBlock item = (ItemBlock) Item.itemsList[blockInfo.id];
+            	if(item!=null) {
+            		JourneyMap.getLogger().warning("ItemBlocks not supported: " + item.itemID + ":" + item.getMetadata(0) + " " + item.getUnlocalizedName());
+            	}
+
             	return null;
             }
-            
-            // Find out which angle icon to use
-            int side = block.renderAsNormalBlock() ? 0 : 1;
-            
-        	TextureStitched blockIcon = (TextureStitched) block.getIcon(side, blockInfo.meta);
-        	if(blockIcon==null && side>0) {
-        		JourneyMap.getLogger().warning("No side icon for " + block.getUnlocalizedName2() + "("+ blockInfo + ")");
-        		blockIcon = (TextureStitched) block.getIcon(0, blockInfo.meta);
-        	}
-        	
+
+        	TextureStitched blockIcon = (TextureStitched) block.getIcon(0, blockInfo.meta);
         	if(blockIcon==null) {
-        		JourneyMap.getLogger().warning("No top icon for " + block.getUnlocalizedName2() + "("+ blockInfo + ")");
+        		JourneyMap.getLogger().warning("No top icon");
         		return null;
         	}
         	
         	TextureStitchedStub icon = new TextureStitchedStub(blockIcon);	 
-        	int width = icon.getWidth();
-        	int height = icon.getHeight();
         	Texture texSheet = icon.getTextureSheet();	       
         	
         	if(texSheet==null) {
-        		JourneyMap.getLogger().warning("No Texture for " + block.getUnlocalizedName2() + "("+ blockInfo + ")");
+        		JourneyMap.getLogger().warning("No Texture");
         		return null;
         	}
         	
-        	// This is here just in case a texture can have more than one sheet for blocks
-        	// If the texture sheet has changed, will need a new bufferedimage
-        	if(!texSheet.getTextureName().equals(lastTextureName)) {
-        		lastTextureName = texSheet.getTextureName();
-                ByteBuffer buffer = texSheet.getTextureData();
-                lastTextureData = new byte[texSheet.getWidth() * texSheet.getHeight() * 4];
-                buffer.position(0);
-                buffer.get(lastTextureData);
-        		JourneyMap.getLogger().info("Using texture (" + lastTextureData.length/1024 + "KB): " + lastTextureName);
-        	}
-
-        	long loadStart = System.currentTimeMillis();        	            
-            Color color = getColorForIcon(blockInfo, blockIcon);            
-            long loadStop = System.currentTimeMillis();
-            
-            loadTimes += (loadStop-loadStart);
-            
-            if(colors.size() % 10 == 0) {
-            	JourneyMap.getLogger().info("Average color load time: " + (loadTimes*1f/(colors.size()-4)) + "ms");
-            }
-            
+        	renewCachedData(texSheet);
+        	
+        	Color color = getColorForIcon(blockInfo, blockIcon);            
+             
 			// Put the color in the map
 			colors.put(blockInfo, color);
 			if(color.equals(Color.black)) {
-				JourneyMap.getLogger().warning("Black color for " + block.getUnlocalizedName2() + "("+ blockInfo + ")");
+				JourneyMap.getLogger().warning("\tColor eval'd to black");
 			}
+			
+		
+			// Time the whole thing
+            double loadStop = System.nanoTime();   
+            double timer = (loadStop-loadStart)/1000000f;            
+            JourneyMap.getLogger().info("\tColor load time: " + timer + "ms");
 			
 			return color;                           
 
 		} catch (Throwable t) {
-			JourneyMap.getLogger().severe("Error getting color for " + blockInfo + ": " + LogFormatter.toString(t));
+			JourneyMap.getLogger().severe("Error getting color: " + LogFormatter.toString(t));
 			return null;
 		}
 	}
@@ -290,22 +263,33 @@ public class ColorCache {
         		}
         	}
         }
+        
         if(count>0) {    
         	if(a>0) a = a/count;
         	if(r>0) r = r/count;
         	if(g>0) g = g/count;
         	if(b>0) b = b/count;
         } else {
-        	JourneyMap.getLogger().warning("Unusable texture for " + blockInfo.getBlock().getUnlocalizedName2() + "("+ blockInfo + ")");
+        	JourneyMap.getLogger().warning("Unusable texture for " + stringInfo(blockInfo));
+        	r = g = b = 0;
         }
-        
-        Color color = new Color(r,g,b);
-        
-		// Put the alpha in MapBlocks
+		
+		Color color;
+		
+		try {        
+			color = new Color(r,g,b);
+		} catch(IllegalArgumentException e) {
+			JourneyMap.getLogger().warning("Bad color for " + stringInfo(blockInfo));
+			color = Color.black;
+		}
+		        
+		// Put the alpha in MapBlocks		
 		if(blockInfo.getBlock().getRenderBlockPass()>0){
 			float blockAlpha = a * 1.0f/255;
 			MapBlocks.alphas.put(blockInfo.id, blockAlpha);
-			JourneyMap.getLogger().info("Setting transparency for " + blockInfo.getBlock().getUnlocalizedName2() + ": " + blockAlpha);
+			JourneyMap.getLogger().info("Setting transparency for " + stringInfo(blockInfo));
+		} else if(MapBlocks.alphas.containsKey(blockInfo.id)) {
+			blockInfo.setAlpha(MapBlocks.alphas.get(blockInfo.id));
 		}
 		
         return color;
@@ -339,28 +323,113 @@ public class ColorCache {
 	}
 	
 
-	static Color average(Color color1, Color color2)
+	static Color average(Collection<Color> colors)
 	{
-		int r = (color1.getRed() + color2.getRed()) / 2;
-		int g = (color1.getGreen() + color2.getGreen()) / 2;
-		int b = (color1.getBlue() + color2.getBlue()) / 2;
-		int a = (color1.getAlpha() + color2.getAlpha()) / 2;
-
-		return new Color(r,g,b,a);
+		if(colors.isEmpty()) return null;
+		
+		int count = colors.size();
+		
+		int r = 0;
+		int g = 0;
+		int b = 0;
+		
+		for(Color color : colors) {
+			r+= color.getRed();			
+			g+= color.getGreen();
+			b+= color.getBlue();
+		}
+		return new Color(r/count, g/count, b/count);
+	}
+	
+	static Color average(Color... colors)
+	{	
+		int count = colors.length;
+		
+		int r = 0;
+		int g = 0;
+		int b = 0;
+		
+		for(Color color : colors) {
+			r+= color.getRed();			
+			g+= color.getGreen();
+			b+= color.getBlue();
+		}
+		return new Color(r/count, g/count, b/count);
 	}
 
 	static Color multiply(Color original, int multiplier) {
-		float[] rgba = original.getComponents(null);
+		int rgba = original.getRGB();
 		
-		float r = rgba[0] * ((multiplier >> 16 & 0xFF) * 0.003921569F);
-		float g = rgba[1] * ((multiplier >> 8 & 0xFF) * 0.003921569F);
-		float b = rgba[2] * ((multiplier >> 0 & 0xFF) * 0.003921569F);
+		float r = (rgba >> 16 & 0xFF) * MAGIC * ((multiplier >> 16 & 0xFF) * MAGIC);
+		float g = (rgba >> 8 & 0xFF)  * MAGIC * ((multiplier >> 8 & 0xFF)  * MAGIC);
+		float b = (rgba >> 0 & 0xFF)  * MAGIC * ((multiplier >> 0 & 0xFF)  * MAGIC);
 
-		return new Color(r,g,b); 
+		return new Color(safeColor(r),safeColor(g),safeColor(b)); 
 	}
 
 	static float safeColor(float original) {
 		return Math.min(1F, (Math.max(0F, original)));
+	}
+	
+	static Color environment(int envMult) {
+		
+		float r = ((envMult >> 16 & 0xFF) * MAGIC);
+		float g = ((envMult >> 8 & 0xFF) * MAGIC);
+		float b = ((envMult >> 0 & 0xFF) * MAGIC);
+
+		return new Color(safeColor(r),safeColor(g),safeColor(b)); 
+	}
+	
+	String stringInfo(BlockInfo info) {
+		if(info==null) {
+			return "BlockInfo null";
+		}
+		StringBuffer sb = new StringBuffer();
+		Block block = info.getBlock();
+		if(block!=null) {
+			sb.append("Block ").append(block.getUnlocalizedName2()).append(" ");
+		} else {
+			sb.append("Non-Block ");
+		}
+		sb.append(info.id).append(":").append(info.meta);
+		if(block!=null) {
+			int bcolor = block.getBlockColor();
+			if(bcolor!=16777215) {
+				sb.append(", blockColor=").append(Integer.toHexString(bcolor));
+			}
+			sb.append(", renderType=").append(block.getRenderType());
+			int rcolor = block.getBlockColor();
+			if(rcolor!=16777215) {
+				sb.append(", renderColor=").append(Integer.toHexString(rcolor));
+			}
+		}
+		return sb.toString();
+	}
+	
+	void renewCachedData(Texture texSheet) {
+		// This is here just in case a texture can have more than one sheet for blocks
+    	// If the texture sheet has changed, will need a new bufferedimage
+    	if(!texSheet.getTextureName().equals(lastTextureName)) {
+    		
+            ByteBuffer buffer = texSheet.getTextureData();
+            lastTextureName = texSheet.getTextureName();
+            lastTextureData = new byte[texSheet.getWidth() * texSheet.getHeight() * 4];
+            buffer.position(0);
+            buffer.get(lastTextureData);
+            lastTextureUsed = System.currentTimeMillis();
+    		JourneyMap.getLogger().info("Cached texture bytes (" + lastTextureData.length/1024 + "KB): " + lastTextureName);
+    	}
+	}
+	
+	void retireCachedData() {
+		if(lastTextureUsed+10000<System.currentTimeMillis()) {
+			if(lastTextureData!=null) {
+				JourneyMap.getLogger().info("Dumped texture bytes (" + lastTextureData.length/1024 + "KB): " + lastTextureName);
+				lastTextureUsed = 0;
+				lastTextureData = null;
+				lastTextureName = null;
+			}
+		}
 	}
 
 }
