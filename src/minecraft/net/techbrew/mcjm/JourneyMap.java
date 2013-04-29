@@ -55,7 +55,7 @@ public class JourneyMap extends BaseMod {
 	static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
 
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-	public static final String JM_VERSION = "2.6.0b1"; //$NON-NLS-1$
+	public static final String JM_VERSION = "2.6.0b2"; //$NON-NLS-1$
 	public static final String MC_VERSION = "1.5.1"; //$NON-NLS-1$
 
 	private static volatile Boolean initialized = false;
@@ -67,7 +67,7 @@ public class JourneyMap extends BaseMod {
 	public static volatile ChunkStub lastPlayerChunk;
 
 	// Invokes MapOverlay
-	private KeyBinding keybinding;
+	public static KeyBinding keybinding;
 
 	// Milliseconds between updates
 	public static int chunkDelay;
@@ -278,7 +278,7 @@ public class JourneyMap extends BaseMod {
 				executorsStarted = true;
 
 				// Start chunkExecutor
-				chunkExecutor = Executors.newSingleThreadScheduledExecutor(new JMThreadFactory("chunkExecutor"));
+				chunkExecutor = Executors.newSingleThreadScheduledExecutor(new JMThreadFactory("chunk"));
 				getChunkExecutor().scheduleWithFixedDelay(new ChunkUpdateThread(this, minecraft.theWorld), 1500, chunkDelay, TimeUnit.MILLISECONDS);
 			} else {
 
@@ -369,9 +369,11 @@ public class JourneyMap extends BaseMod {
 		if(keybinding.keyCode==keybinding.keyCode) {
 			if(Minecraft.getMinecraft().currentScreen==null) {
 				ModLoader.openGUI(minecraft.thePlayer, new MapOverlay(this));
-			} else if(ModLoader.isGUIOpen(MapOverlay.class)) {
+				keybinding.unPressAllKeys();
+			} else if(Minecraft.getMinecraft().currentScreen instanceof MapOverlay) {
 				minecraft.displayGuiScreen(null);
 				minecraft.setIngameFocus();
+				keybinding.unPressAllKeys();
 			}
 		} else if(keybinding.keyCode==minecraft.gameSettings.keyBindInventory.keyCode) {
 			if(ModLoader.isGUIOpen(MapOverlayOptions.class)) { 

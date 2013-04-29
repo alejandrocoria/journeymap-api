@@ -12,7 +12,7 @@ public class JMThreadFactory implements ThreadFactory {
 	
     final ThreadGroup group;
     final static AtomicInteger threadNumber = new AtomicInteger(1);
-    final static String namePrefix = "JourneyMap-"; //$NON-NLS-1$
+    final static String namePrefix = "JM-"; //$NON-NLS-1$
     final String name;
     
     public JMThreadFactory(String name)

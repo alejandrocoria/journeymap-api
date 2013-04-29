@@ -57,7 +57,7 @@ public class JMServer {
 		rupy.init();
 		
 		// Init thread factory
-		JMThreadFactory tf = new JMThreadFactory("JMServer");
+		JMThreadFactory tf = new JMThreadFactory("svr");
 		
 		// Run server in own thread
 		ExecutorService es = Executors.newSingleThreadExecutor(tf);

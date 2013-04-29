@@ -22,7 +22,7 @@ public class LogFormatter extends Formatter {
 		arguments[i++] = new Date(record.getMillis());
 		arguments[i++] = record.getLevel();
 		arguments[i++] = Thread.currentThread().getName();
-		arguments[i++] = record.getSourceClassName();
+		arguments[i++] = record.getSourceClassName().replaceFirst("net.techbrew.mcjm.","");
 		arguments[i++] = record.getSourceMethodName();
 		arguments[i++] = record.getMessage();
 		return messageFormat.format(arguments);
