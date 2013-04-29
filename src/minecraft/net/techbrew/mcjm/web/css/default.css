@@ -58,6 +58,14 @@ canvas {
 	margin-top:-1px;
 }
 
+#mainMenu {
+    padding-right:10px;
+}
+
+#showMenu {
+	padding-right:10px;
+}
+
 #worldInfo {
 	
 	z-index:10;	
