@@ -23,7 +23,7 @@ public class JMServer {
 		// Use port from journeymap properties
 		port = PropertyManager.getInstance().getInteger(PropertyManager.Key.WEBSERVER_PORT);
 		props.put("port", Integer.toString(port)); //$NON-NLS-1$
-		//props.put("delay", Integer.toString(10000)); //$NON-NLS-1$
+		props.put("delay", Integer.toString(30000)); //$NON-NLS-1$
 		props.put("timeout", Integer.toString(0)); //$NON-NLS-1$
 		//props.put("cookie", Integer.toString(0)); //$NON-NLS-1$
 		
