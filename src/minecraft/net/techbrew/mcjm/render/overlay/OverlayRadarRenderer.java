@@ -1,27 +1,18 @@
 package net.techbrew.mcjm.render.overlay;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.data.AnimalsData;
-import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.EntityKey;
-import net.techbrew.mcjm.data.MobsData;
-import net.techbrew.mcjm.data.PlayersData;
-import net.techbrew.mcjm.data.VillagersData;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.EntityHelper;
-import net.techbrew.mcjm.model.Waypoint;
 import net.techbrew.mcjm.render.MapBlocks;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer.BaseEntityOverlayRenderer;
 

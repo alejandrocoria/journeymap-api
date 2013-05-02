@@ -1,30 +1,19 @@
 package net.techbrew.mcjm.model;
 
-import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.MediaTracker;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
-import java.awt.image.RasterFormatException;
-import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-
-import javax.imageio.ImageIO;
 
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.ChunkImageCache.CacheMap;
 import net.techbrew.mcjm.thread.JMThreadFactory;
 
 public class RegionImageCache  {

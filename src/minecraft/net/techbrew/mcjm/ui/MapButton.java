@@ -1,13 +1,10 @@
 package net.techbrew.mcjm.ui;
 
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.FontRenderer;
 import net.minecraft.src.GuiSmallButton;
 import net.minecraft.src.Tessellator;
-import net.techbrew.mcjm.Constants;
+
+import org.lwjgl.opengl.GL11;
 
 public class MapButton extends GuiSmallButton {
 	

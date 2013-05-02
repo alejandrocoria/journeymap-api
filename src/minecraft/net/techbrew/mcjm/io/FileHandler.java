@@ -12,10 +12,6 @@ import java.util.logging.Level;
 import javax.imageio.ImageIO;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.MapStorage;
-import net.minecraft.src.ModLoader;
-import net.minecraft.src.World;
-import net.minecraft.src.WorldInfo;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;

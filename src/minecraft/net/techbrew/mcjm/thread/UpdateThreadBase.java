@@ -1,23 +1,16 @@
 package net.techbrew.mcjm.thread;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.logging.Level;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.Chunk;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.data.PlayerData;
-import net.techbrew.mcjm.io.FileHandler;
-import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.EntityHelper;
 
 public abstract class UpdateThreadBase implements Runnable {
 

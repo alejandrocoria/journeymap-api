@@ -2,7 +2,6 @@ package net.techbrew.mcjm.log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.logging.Formatter;

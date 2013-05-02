@@ -5,9 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
-import net.minecraft.src.Chunk;
 import net.techbrew.mcjm.JourneyMap;
 
 public class ChunkImageCache {

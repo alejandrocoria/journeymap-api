@@ -1,29 +1,21 @@
 package net.techbrew.mcjm.render;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.BiomeGenBase;
 import net.minecraft.src.Block;
-import net.minecraft.src.BlockDeadBush;
-import net.minecraft.src.BlockFlower;
-import net.minecraft.src.BlockLeaves;
-import net.minecraft.src.BlockLeavesBase;
 import net.minecraft.src.BlockGrass;
+import net.minecraft.src.BlockLeaves;
 import net.minecraft.src.BlockLilyPad;
 import net.minecraft.src.BlockTallGrass;
 import net.minecraft.src.BlockVine;
 import net.minecraft.src.ITexturePack;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemBlock;
-import net.minecraft.src.ModLoader;
-import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.Texture;
 import net.minecraft.src.TexturePackDefault;
 import net.minecraft.src.TexturePackList;

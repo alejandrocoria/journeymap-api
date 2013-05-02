@@ -1,40 +1,18 @@
 package net.techbrew.mcjm.render.overlay;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.nio.BufferOverflowException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.Tessellator;
-import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
-import net.techbrew.mcjm.data.AnimalsData;
-import net.techbrew.mcjm.data.DataCache;
-import net.techbrew.mcjm.data.EntityKey;
-import net.techbrew.mcjm.data.MobsData;
-import net.techbrew.mcjm.data.PlayersData;
-import net.techbrew.mcjm.data.VillagersData;
-import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.MapOverlayState;
-import net.techbrew.mcjm.model.Waypoint;
-import net.techbrew.mcjm.render.MapBlocks;
+
+import org.lwjgl.opengl.GL11;
 
 /**
  * Renders an entity image in the MapOverlay.

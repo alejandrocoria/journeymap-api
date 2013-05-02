@@ -1,7 +1,6 @@
 package net.techbrew.mcjm.model;
 
 import java.awt.Color;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**

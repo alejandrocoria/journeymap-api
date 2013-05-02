@@ -13,7 +13,6 @@ import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityMob;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.IBossDisplayData;
-import net.minecraft.src.IMob;
 import net.minecraft.src.IRangedAttackMob;
 import net.techbrew.mcjm.model.EntityHelper;
 

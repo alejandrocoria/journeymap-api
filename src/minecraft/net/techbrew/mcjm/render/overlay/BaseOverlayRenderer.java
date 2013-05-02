@@ -2,21 +2,17 @@ package net.techbrew.mcjm.render.overlay;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Composite;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.List;
 import java.util.Map;
 
-import org.lwjgl.opengl.GL11;
-
-import net.minecraft.client.Minecraft;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.Entity;
 import net.minecraft.src.Tessellator;
 import net.techbrew.mcjm.data.EntityKey;
-import net.techbrew.mcjm.model.Waypoint;
+
+import org.lwjgl.opengl.GL11;
 
 public abstract class BaseOverlayRenderer<K> {
 	

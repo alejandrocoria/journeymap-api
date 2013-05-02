@@ -1,37 +1,19 @@
 package net.techbrew.mcjm.server;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.Map;
-import java.util.logging.Level;
-
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageInputStream;
-
-import se.rupy.http.Deploy;
-import se.rupy.http.Event;
-import se.rupy.http.Output;
-import se.rupy.http.Query;
-import se.rupy.http.Service;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.ModLoader;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.Constants.MapType;
-import net.techbrew.mcjm.Constants.WorldType;
-import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.log.LogFormatter;
+import se.rupy.http.Deploy;
+import se.rupy.http.Event;
+import se.rupy.http.Query;
 /**
  * Provides a map of the entire world
  * @author mwoodman

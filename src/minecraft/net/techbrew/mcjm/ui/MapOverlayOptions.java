@@ -1,30 +1,19 @@
 package net.techbrew.mcjm.ui;
 
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
-
-import net.minecraft.src.GuiAchievements;
 import net.minecraft.src.GuiButton;
-import net.minecraft.src.GuiGameOver;
-import net.minecraft.src.GuiIngameMenu;
-import net.minecraft.src.GuiMainMenu;
-import net.minecraft.src.GuiOptions;
 import net.minecraft.src.GuiScreen;
-import net.minecraft.src.GuiShareToLan;
-import net.minecraft.src.GuiStats;
-import net.minecraft.src.StatCollector;
-import net.minecraft.src.StatList;
-import net.minecraft.src.WorldClient;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.VersionCheck;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.data.PlayerData;
-import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
+
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 public class MapOverlayOptions extends GuiScreen {
 

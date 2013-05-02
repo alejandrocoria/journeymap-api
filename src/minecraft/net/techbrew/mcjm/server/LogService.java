@@ -1,37 +1,11 @@
 package net.techbrew.mcjm.server;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.zip.GZIPOutputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
-import se.rupy.http.Event;
-import se.rupy.http.Service;
-
-import net.minecraft.client.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.log.JMLogger;
-import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.server.BaseService.ResponseHeader;
+import se.rupy.http.Event;
 
 
 /**

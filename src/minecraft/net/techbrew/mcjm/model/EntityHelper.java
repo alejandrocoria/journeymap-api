@@ -1,16 +1,11 @@
 package net.techbrew.mcjm.model;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.imageio.ImageIO;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.AxisAlignedBB;
@@ -28,8 +23,6 @@ import net.minecraft.src.IAnimals;
 import net.minecraft.src.IBossDisplayData;
 import net.minecraft.src.IMob;
 import net.minecraft.src.IRangedAttackMob;
-import net.minecraft.src.MathHelper;
-import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;

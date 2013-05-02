@@ -2,39 +2,13 @@ package net.techbrew.mcjm.render;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
-import java.awt.image.Raster;
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.logging.FileHandler;
 
-import javax.imageio.ImageIO;
-
-import org.lwjgl.opengl.GL11;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.src.BiomeGenBase;
 import net.minecraft.src.Block;
-import net.minecraft.src.BlockFluid;
-import net.minecraft.src.ITexturePack;
-import net.minecraft.src.Icon;
-import net.minecraft.src.Item;
-import net.minecraft.src.ModLoader;
-import net.minecraft.src.Rect2i;
-import net.minecraft.src.Texture;
-import net.minecraft.src.TextureStitched;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkStub;
-import net.techbrew.mcjm.model.ExtendedBlockStorageStub;
-import net.techbrew.mcjm.model.TextureStitchedStub;
 
 public class MapBlocks extends HashMap {
 	

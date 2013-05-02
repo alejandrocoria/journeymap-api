@@ -1,43 +1,11 @@
 package net.techbrew.mcjm.server;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.channels.Channel;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
-
-import se.rupy.http.Event;
-import se.rupy.http.Output;
-import se.rupy.http.Query;
-import se.rupy.http.Service;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.ModLoader;
-import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.Constants.MapType;
-import net.techbrew.mcjm.Constants.WorldType;
 import net.techbrew.mcjm.data.AllData;
 import net.techbrew.mcjm.data.AnimalsData;
 import net.techbrew.mcjm.data.DataCache;
@@ -50,13 +18,8 @@ import net.techbrew.mcjm.data.PlayersData;
 import net.techbrew.mcjm.data.VillagersData;
 import net.techbrew.mcjm.data.WaypointsData;
 import net.techbrew.mcjm.data.WorldData;
-import net.techbrew.mcjm.io.FileHandler;
-import net.techbrew.mcjm.io.MapSaver;
-import net.techbrew.mcjm.io.RegionFileHandler;
-import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.server.BaseService.ContentType;
-import net.techbrew.mcjm.server.BaseService.ResponseHeader;
-import net.techbrew.mcjm.ui.ZoomLevel;
+import se.rupy.http.Event;
+import se.rupy.http.Query;
 
 /**
  * Provide data for the Web UI

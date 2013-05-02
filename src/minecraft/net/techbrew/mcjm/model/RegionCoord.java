@@ -2,7 +2,6 @@ package net.techbrew.mcjm.model;
 
 import java.io.File;
 
-import net.minecraft.src.Chunk;
 import net.techbrew.mcjm.Constants;
 
 public class RegionCoord {
