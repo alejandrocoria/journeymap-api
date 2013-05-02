@@ -134,7 +134,12 @@ public class ColorCache {
 
 		} else {
 			
-			color = getBlockColor(blockInfo);
+			int rc = block.getRenderColor(blockInfo.meta);
+			if(rc!=16777215 && rc!=0) {
+				color = new Color(rc);
+			} else {			
+				color = getBlockColor(blockInfo);
+			}
 		}
 		
 		retireCachedData();
