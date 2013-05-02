@@ -5,11 +5,26 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 
+import ar.com.hjg.pngj.FileHelper;
+import ar.com.hjg.pngj.ImageInfo;
+import ar.com.hjg.pngj.ImageLine;
+import ar.com.hjg.pngj.PngReader;
+import ar.com.hjg.pngj.PngWriter;
+import ar.com.hjg.pngj.chunks.ChunkCopyBehaviour;
+import ar.com.hjg.pngj.chunks.ChunkLoadBehaviour;
+
+import net.minecraft.client.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.ui.ZoomLevel;
@@ -21,19 +36,32 @@ import net.techbrew.mcjm.ui.ZoomLevel;
  */
 public class MapSaver {
 
-	public void saveMapToFile(File worldDir, Constants.MapType mapType, int depth, int worldProviderType, File mapFile)
-			throws IOException {
-
-		final Constants.CoordType cType = Constants.CoordType.convert(mapType, worldProviderType);
-		BufferedImage mergedImg = saveMap(worldDir, mapType, depth, cType);
-		ImageIO.write(mergedImg, "png", mapFile); //$NON-NLS-1$
-		
-		JourneyMap.getLogger().info("Map saved: "  + mapFile); //$NON-NLS-1$
-		JourneyMap.announce(Constants.getString("MapSaver.map_saved", mapFile.getCanonicalPath())); //$NON-NLS-1$
-	}
+	private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
 	
-	public static synchronized BufferedImage saveMap(final File worldDir, final Constants.MapType mapType, final Integer chunkY, final Constants.CoordType cType)
-			throws IOException, java.lang.OutOfMemoryError {
+	/**
+	 * Use pngj to assemble region files.
+	 * 
+	 * TODO: Night
+	 * TODO: Caves, Nether, End?
+	 * TODO: Draw grid
+	 * 
+	 * @param worldDir
+	 * @param mapType
+	 * @param chunkY
+	 * @param cType
+	 * @return
+	 * @throws IOException
+	 * @throws java.lang.OutOfMemoryError
+	 */
+	public static synchronized File lightWeightSaveMap(final File worldDir, final Constants.MapType mapType, final Integer chunkY, final Constants.CoordType cType) {
+		
+		File mapFile = null;
+		
+		try {
+		
+		// Ensure latest regions are flushed to disk
+		RegionImageCache.getInstance().flushToDisk();
+		
 		long start = 0, stop = 0;
 		start = System.currentTimeMillis();
 		
@@ -64,21 +92,58 @@ public class MapSaver {
 		
 		//System.out.println("Final chunk coordinates: " + x1 + "," + z1 + " to " + x2 + "," + z2);  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		
-		if(x1==null || x2==null || z1==null ||z2==null ) return new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
+		if(x1==null || x2==null || z1==null ||z2==null ) {
+			JourneyMap.getLogger().warning("No region files to save.");
+			return null;
+		}
 		
-		boolean isUnderground = mapType.equals(Constants.MapType.underground);
+		final File saveDir = FileHandler.getJourneyMapDir();
 		
-		// Ensure latest regions are flushed to disk
-		RegionImageCache.getInstance().flushToDisk();
+		JourneyMap.announce(Constants.getString("MapOverlay.saving_map_to_file", mapType)); //$NON-NLS-1$
 		
-		// Get region images without using cache
-		BufferedImage mergedImg = RegionFileHandler.getMergedChunks(worldDir, x1, z1, x2, z2, mapType, chunkY, cType, false, 
-				new ZoomLevel(1, 1, false, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
-			
+		mapFile = createMapFile(FileHandler.getSafeName(Minecraft.getMinecraft()) + "_" + mapType);
+				
+		RegionFileHandler.getMergedChunksFile(worldDir, x1, z1, x2, z2, mapType, chunkY, cType, mapFile);
+		
 		stop = System.currentTimeMillis();
-		JourneyMap.getLogger().info("World map saved in: " + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
-		return mergedImg;
+		
+		JourneyMap.getLogger().info("Map saved in: " + (stop-start) + "ms: " + mapFile); //$NON-NLS-1$ //$NON-NLS-2$
+		JourneyMap.announce(Constants.getString("MapSaver.map_saved", mapFile)); //$NON-NLS-1$
+		
+		
+		} catch (java.lang.OutOfMemoryError e) {
+			String error = Constants.getMessageJMERR18("Out Of Memory: Increase Java Heap Size for Minecraft to save large maps.");
+			JourneyMap.getLogger().severe(error);
+			JourneyMap.announce(error);
+		} catch (Throwable t) {	
+			String error = Constants.getMessageJMERR18(t.getMessage());
+			JourneyMap.getLogger().severe(error);
+			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
+			JourneyMap.announce(error);
+			return null;
+		}
+		
+		return mapFile;
 		
 	}
+	
+	/**
+	 * Create a file handle in the screenshots folder, using the same
+	 * dateFormat that MC's ScreenshotHelper uses.
+	 * 
+	 * @param suffix
+	 * @return
+	 */
+	private static File createMapFile(String suffix)
+    {
+		File screenshots = new File(Minecraft.getMinecraftDir(), "screenshots");
+		if(!screenshots.exists()) {
+			screenshots.mkdir();
+		}
+		
+        String date = dateFormat.format(new Date());
+        return new File(screenshots, date + "_" + suffix + ".png");
+
+    }
 	
 }

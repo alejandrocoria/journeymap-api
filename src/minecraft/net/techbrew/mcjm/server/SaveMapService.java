@@ -3,6 +3,8 @@ package net.techbrew.mcjm.server;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
@@ -11,8 +13,11 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
 
+import se.rupy.http.Deploy;
 import se.rupy.http.Event;
+import se.rupy.http.Output;
 import se.rupy.http.Query;
 import se.rupy.http.Service;
 
@@ -101,19 +106,19 @@ public class SaveMapService extends BaseService {
 
 			// Get image
 			final Constants.CoordType cType = Constants.CoordType.convert(mapType, worldProviderType);
-			BufferedImage mapImg = MapSaver.saveMap(worldDir, mapType, depth, cType);
-			
-			// Get save-as name
-			StringBuffer sb = new StringBuffer(WorldData.getWorldName(minecraft));
-			sb.append("_").append(mapType).append("_"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append(cType).append(".").append(ContentType.png); //$NON-NLS-1$
-			String saveName = URLEncoder.encode(sb.toString(), CHARACTER_ENCODING);
+
+			File mapFile = MapSaver.lightWeightSaveMap(worldDir, mapType, depth, cType);	
 					
 			// Set response headers
-			ResponseHeader.on(event).noCache().inlineFilename(saveName).contentType(ContentType.UNKNOWN);
+			ResponseHeader.on(event).noCache().content(mapFile);			
+			FileInputStream fis = new FileInputStream(mapFile);
 			
 			// Write image to output
-			ImageIO.write(mapImg, "png", event.output()); //$NON-NLS-1$
+			try {
+				Deploy.pipe(fis, event.reply().output(mapFile.length()));
+			} finally {
+				fis.close();
+			}
 			
 		} catch (NumberFormatException e) {
 			reportMalformedRequest(event);

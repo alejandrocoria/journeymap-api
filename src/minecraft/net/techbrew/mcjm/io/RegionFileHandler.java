@@ -8,6 +8,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.DataBufferInt;
+import java.awt.image.SinglePixelPackedSampleModel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,6 +19,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.logging.Level;
 
@@ -30,10 +34,20 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 import javax.swing.plaf.FontUIResource;
 
+import ar.com.hjg.pngj.FileHelper;
+import ar.com.hjg.pngj.ImageInfo;
+import ar.com.hjg.pngj.ImageLine;
+import ar.com.hjg.pngj.PngReader;
+import ar.com.hjg.pngj.PngWriter;
+import ar.com.hjg.pngj.PngjException;
+import ar.com.hjg.pngj.chunks.ChunkCopyBehaviour;
+import ar.com.hjg.pngj.chunks.ChunkLoadBehaviour;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.data.DataCache;
@@ -62,7 +76,7 @@ public class RegionFileHandler {
 		lock = new Object();
 	}
 	
-	public File getRegionFile(RegionCoord rCoord) {
+	public static File getRegionFile(RegionCoord rCoord) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(rCoord.regionX).append(",").append(rCoord.regionZ); //$NON-NLS-1$
 		if(!rCoord.cType.equals(Constants.CoordType.Normal)) {
@@ -172,25 +186,25 @@ public class RegionFileHandler {
 		return RegionImageCache.getInstance().getGuaranteed(rCoord);
 	}	
 	
-	private BufferedImage createBlankImage() {
+	private static BufferedImage createBlankImage() {
 		int height = (int) Math.pow(2, RegionCoord.SIZE)*16;
 		int width = 2*height;
 		return createBlankImage(width, height);
 	}
 	
-	private BufferedImage createUndergroundBlankImage() {
+	private static BufferedImage createUndergroundBlankImage() {
 		int height = (int) Math.pow(2, RegionCoord.SIZE)*16;
 		int width = height;
 		return createBlankImage(width, height);
 	}
 	
-	private BufferedImage createBlankImage(int width, int height) {
+	private static BufferedImage createBlankImage(int width, int height) {
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2D = img.createGraphics();
 		return img;
 	}
 	
-	public BufferedImage readRegionFile(File regionFile, RegionCoord rCoord, int sampling) {
+	public static BufferedImage readRegionFile(File regionFile, RegionCoord rCoord, int sampling) {
 		
 		FileInputStream fis = null;
 		BufferedImage image = null;
@@ -413,6 +427,82 @@ public class RegionFileHandler {
 		return mergedImg;
 
 	}
+	
+	/**
+	 * Used by MapSaver
+	 * @param worldDir
+	 * @param x1
+	 * @param z1
+	 * @param x2
+	 * @param z2
+	 * @param mapType
+	 * @param depth
+	 * @throws IOException
+	 */
+	public static synchronized File getMergedChunksFile(File worldDir, int x1, int z1, int x2, int z2, 
+			Constants.MapType mapType, int depth, final Constants.CoordType cType, File mapFile)
+			throws IOException {
+
+		long start = 0, stop = 0;		
+		if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+			start = System.currentTimeMillis();
+		}
+
+		boolean isUnderground = mapType.equals(Constants.MapType.underground);
+
+		// Merge chunk images
+		RegionFileHandler rfh = RegionFileHandler.getInstance();
+		
+		// Get region coords
+		final int rx1=RegionCoord.getRegionPos(x1);
+		final int rz1=RegionCoord.getRegionPos(z1);
+		final int rx2=RegionCoord.getRegionPos(x2);
+		final int rz2=RegionCoord.getRegionPos(z2);
+		
+		// Get region files
+		RegionCoord rc;
+		File rfile;
+		ArrayList<File> files = new ArrayList<File>();
+		
+		for(int rz=rz1;rz<=rz2;rz++) {
+			for(int rx=rx1;rx<=rx2;rx++) {			
+				rc = new RegionCoord(worldDir, rx, depth, rz, cType);
+				rfile = getRegionFile(rc);
+				if(!rfile.exists()) {
+					BufferedImage image;
+					if(rc.isUnderground()) {
+						image = createUndergroundBlankImage();
+					} else {
+						image = createBlankImage();
+					}
+					image.getGraphics().drawRect(0, 0, image.getWidth(), image.getHeight());
+					try {
+						ImageIO.write(image, "png", rfile);
+					} catch(IOException e) {
+						String error = Constants.getMessageJMERR22(rfile, LogFormatter.toString(e));
+						JourneyMap.getLogger().severe(error);
+						JourneyMap.announce(error);
+					}
+				}
+				files.add(rfile);
+			}
+		}
+		
+		File[] fileArray = files.toArray(new File[files.size()]);
+		
+		int xOffset = (mapType==MapType.night) ? 512 : 0;
+		PngjHelper.mergeFiles(fileArray, mapFile, rx2-rx1+1, xOffset, 512);
+				
+		if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+			stop = System.currentTimeMillis();
+			JourneyMap.getLogger().fine("getMergedChunks time: "  + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		
+		return mapFile;
+
+	}
+	
+	
 	
 	public static class RegionFileFilter implements FilenameFilter {
 		
