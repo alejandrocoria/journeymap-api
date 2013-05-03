@@ -124,12 +124,6 @@ public class MapOverlay extends GuiScreen {
 		this.journeyMap = journeyMap;
 		this.mc = Minecraft.getMinecraft();
 		
-		// When switching dimensions, reset follow to true
-		if(playerLastDimension!=mc.thePlayer.dimension) {
-			playerLastDimension = mc.thePlayer.dimension;
-			follow = true;
-		}
-		
 		initButtons();		
 		
 		// Set preferences-based values
@@ -146,6 +140,13 @@ public class MapOverlay extends GuiScreen {
 			currentZoomIndex = ZoomLevel.getLevels().size()/2;
 			setZoom(currentZoomIndex);
 		}		
+		
+		// When switching dimensions, reset follow to true
+		if(playerLastDimension!=mc.thePlayer.dimension) {
+			playerLastDimension = mc.thePlayer.dimension;
+			follow = true;
+			centerMapOnPlayer();
+		}
 	}
 
 	private void drawButtonBar() {	
