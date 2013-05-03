@@ -176,14 +176,14 @@ public class ColorCache {
 	protected Color loadBlockColor(BlockInfo blockInfo) {
 		try {
 
-			JourneyMap.getLogger().info("Loading color for " + stringInfo(blockInfo));
+			JourneyMap.getLogger().fine("Loading color for " + stringInfo(blockInfo));
 			
         	double loadStart = System.nanoTime();    
         	
 	        Block block = Block.blocksList[blockInfo.id];
 
             if (block == null) {
-            	JourneyMap.getLogger().warning("No block type found");
+            	JourneyMap.getLogger().fine("No block type found");
             	
             	ItemBlock item = (ItemBlock) Item.itemsList[blockInfo.id];
             	if(item!=null) {
@@ -195,7 +195,7 @@ public class ColorCache {
 
         	TextureStitched blockIcon = (TextureStitched) block.getIcon(0, blockInfo.meta);
         	if(blockIcon==null) {
-        		JourneyMap.getLogger().warning("No top icon");
+        		JourneyMap.getLogger().fine("No top icon");
         		return null;
         	}
         	
@@ -203,7 +203,7 @@ public class ColorCache {
         	Texture texSheet = icon.getTextureSheet();	       
         	
         	if(texSheet==null) {
-        		JourneyMap.getLogger().warning("No Texture");
+        		JourneyMap.getLogger().fine("No Texture");
         		return null;
         	}
         	
@@ -214,14 +214,14 @@ public class ColorCache {
 			// Put the color in the map
 			colors.put(blockInfo, color);
 			if(color.equals(Color.black)) {
-				JourneyMap.getLogger().warning("\tColor eval'd to black");
+				JourneyMap.getLogger().fine("\tColor eval'd to black");
 			}
 			
 		
 			// Time the whole thing
             double loadStop = System.nanoTime();   
             double timer = (loadStop-loadStart)/1000000f;            
-            JourneyMap.getLogger().info("\tColor load time: " + timer + "ms");
+            JourneyMap.getLogger().fine("\tColor load time: " + timer + "ms");
 			
 			return color;                           
 
@@ -267,7 +267,7 @@ public class ColorCache {
         	if(g>0) g = g/count;
         	if(b>0) b = b/count;
         } else {
-        	JourneyMap.getLogger().warning("Unusable texture for " + stringInfo(blockInfo));
+        	JourneyMap.getLogger().fine("Unusable texture for " + stringInfo(blockInfo));
         	r = g = b = 0;
         }
 		
@@ -276,7 +276,7 @@ public class ColorCache {
 		try {        
 			color = new Color(r,g,b);
 		} catch(IllegalArgumentException e) {
-			JourneyMap.getLogger().warning("Bad color for " + stringInfo(blockInfo));
+			JourneyMap.getLogger().fine("Bad color for " + stringInfo(blockInfo));
 			color = Color.black;
 		}
 		        
@@ -284,7 +284,7 @@ public class ColorCache {
 		if(blockInfo.getBlock().getRenderBlockPass()>0){
 			float blockAlpha = a * 1.0f/255;
 			MapBlocks.alphas.put(blockInfo.id, blockAlpha);
-			JourneyMap.getLogger().info("Setting transparency for " + stringInfo(blockInfo));
+			JourneyMap.getLogger().fine("Setting transparency for " + stringInfo(blockInfo));
 		} else if(MapBlocks.alphas.containsKey(blockInfo.id)) {
 			blockInfo.setAlpha(MapBlocks.alphas.get(blockInfo.id));
 		}
@@ -414,14 +414,14 @@ public class ColorCache {
             buffer.position(0);
             buffer.get(lastTextureData);
             lastTextureUsed = System.currentTimeMillis();
-    		JourneyMap.getLogger().info("Cached texture bytes (" + lastTextureData.length/1024 + "KB): " + lastTextureName);
+    		JourneyMap.getLogger().fine("Cached texture bytes (" + lastTextureData.length/1024 + "KB): " + lastTextureName);
     	}
 	}
 	
 	void retireCachedData() {
 		if(lastTextureUsed+10000<System.currentTimeMillis()) {
 			if(lastTextureData!=null) {
-				JourneyMap.getLogger().info("Dumped texture bytes (" + lastTextureData.length/1024 + "KB): " + lastTextureName);
+				JourneyMap.getLogger().fine("Dumped texture bytes (" + lastTextureData.length/1024 + "KB): " + lastTextureName);
 				lastTextureUsed = 0;
 				lastTextureData = null;
 				lastTextureName = null;
