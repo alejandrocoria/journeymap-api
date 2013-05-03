@@ -93,6 +93,7 @@ public class MapOverlay extends GuiScreen {
 	static Boolean showWaypoints = true;
 	static Boolean follow = true;
 	static String playerLastPos = "0,0"; //$NON-NLS-1$
+	static int playerLastDimension = Integer.MIN_VALUE;
 
 	JourneyMap journeyMap;
 	MapOverlayOptions options;
@@ -122,6 +123,13 @@ public class MapOverlay extends GuiScreen {
 		super.allowUserInput = true;
 		this.journeyMap = journeyMap;
 		this.mc = Minecraft.getMinecraft();
+		
+		// When switching dimensions, reset follow to true
+		if(playerLastDimension!=mc.thePlayer.dimension) {
+			playerLastDimension = mc.thePlayer.dimension;
+			follow = true;
+		}
+		
 		initButtons();		
 		
 		// Set preferences-based values
@@ -832,7 +840,7 @@ public class MapOverlay extends GuiScreen {
 		JourneyMap.getChunkExecutor().schedule(new Runnable() {
 			public void run() {							
 				try {			
-					final Constants.CoordType cType = Constants.CoordType.convert(mapType, mc.theWorld.provider.dimensionId);
+					final Constants.CoordType cType = Constants.CoordType.convert(useMapType, mc.thePlayer.dimension);
 					new MapSaver().lightWeightSaveMap(worldDir, useMapType, mc.thePlayer.chunkCoordY, cType);
 				} catch (java.lang.OutOfMemoryError e) {
 					String error = Constants.getMessageJMERR18("Out Of Memory: Increase Java Heap Size for Minecraft to save large maps.");
