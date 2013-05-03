@@ -27,8 +27,6 @@ public class MapSaver {
 	/**
 	 * Use pngj to assemble region files.
 	 * 
-	 * TODO: Night
-	 * TODO: Caves, Nether, End?
 	 * TODO: Draw grid
 	 * 
 	 * @param worldDir
@@ -85,9 +83,9 @@ public class MapSaver {
 		
 		final File saveDir = FileHandler.getJourneyMapDir();
 		
-		JourneyMap.announce(Constants.getString("MapOverlay.saving_map_to_file", mapType)); //$NON-NLS-1$
+		JourneyMap.announce(Constants.getString("MapOverlay.saving_map_to_file", cType + " " + mapType)); //$NON-NLS-1$
 		
-		mapFile = createMapFile(FileHandler.getSafeName(Minecraft.getMinecraft()) + "_" + mapType);
+		mapFile = createMapFile(FileHandler.getSafeName(Minecraft.getMinecraft()) + "_" + cType + "_" + mapType);
 				
 		RegionFileHandler.getMergedChunksFile(worldDir, x1, z1, x2, z2, mapType, chunkY, cType, mapFile);
 		
