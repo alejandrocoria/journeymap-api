@@ -7,6 +7,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.util.List;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.src.Entity;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.Waypoint;
@@ -34,9 +36,9 @@ public class OverlayWaypointRenderer extends BaseEntityOverlayRenderer<List<Wayp
 	 * @param canvasWidth
 	 * @param canvasHeight
 	 */
-	public OverlayWaypointRenderer(OverlayEntityRenderer parentRenderer, int widthCutoff, int heightCutoff) {
+	public OverlayWaypointRenderer(OverlayEntityRenderer parentRenderer, int layerWidth, int layerHeight, int widthCutoff, int heightCutoff) {
 		super(parentRenderer.startCoords, parentRenderer.endCoords, 
-			  parentRenderer.canvasWidth, parentRenderer.canvasHeight, widthCutoff, heightCutoff);
+			  parentRenderer.canvasWidth, parentRenderer.canvasHeight, layerWidth, layerHeight, widthCutoff, heightCutoff);
 		this.blockSize = parentRenderer.blockSize;
 	}
 
@@ -46,48 +48,42 @@ public class OverlayWaypointRenderer extends BaseEntityOverlayRenderer<List<Wayp
 	@Override
 	public void render(List<Waypoint> waypoints, Graphics2D g2D) {
 
-		try {
-			int x, z, wx, wz;
+		try {		
+			int wx, wz, x, z;
+			
 			Color color;
 			Color labelColor;
-			boolean outofbounds;					
-			final int diameter = (int) Math.max(6, Math.round(super.blockSize));
+			boolean inbounds;					
+			final int diameter = blockSize>16 ? new Double(blockSize).intValue() : 16;
 			g2D.setFont(labelFont); //$NON-NLS-1$
 			final FontMetrics fm = g2D.getFontMetrics();
-			
-			int xOob = canvasWidth-(widthCutoff)-diameter;
-			int zOob = canvasHeight-(heightCutoff)-diameter;
 			
 			for(Waypoint waypoint : waypoints) {
 				wx = waypoint.getX();
 				wz = waypoint.getZ();
 				color = waypoint.getColor();
 				
-				x = (int) Math.floor(getScaledEntityX(wx));
-				z = (int) Math.floor(getScaledEntityZ(wz));
+				x = new Double(getScaledEntityX(wx)).intValue();
+				z = new Double(getScaledEntityZ(wz)).intValue();
 				
-				outofbounds = false;
-	
-				if(x<0) {
-					x = -diameter;
-					outofbounds = true;
-				} else if(x > xOob) {
-					x = xOob;
-					outofbounds = true;
+				if(waypoint.getName().equals("Last")) {
+					
+					System.out.println("Scaled EndCoord: " + getScaledEntityX(endCoords.chunkXPos, 0) + ", " + getScaledEntityZ(endCoords.chunkZPos, 0));
+					
 				}
 				
-				if(z<0) {
-					z = -diameter;
-					outofbounds = true;
-				} else if(z > zOob) {
-					z = zOob;
-					outofbounds = true;
-				}
-							
+				int maxX = new Double(getScaledEntityX(endCoords.chunkXPos-1, 0)).intValue() - diameter;
+				int maxZ = new Double(getScaledEntityZ(endCoords.chunkZPos-1, 0)).intValue() - diameter;
+				
+				inbounds = x>diameter && x<maxX &&
+						   z>diameter && z<maxZ;
+				
 				// Draw waypoint using copy of G2D			
 				final Graphics2D g = (Graphics2D) g2D.create();
 				
-				if(!outofbounds) {
+				if(inbounds) {
+					
+					System.out.println("Inbound Waypoint: " + x + ", " + z);	
 					
 					// Draw marker
 					if(waypoint.getType()==Waypoint.TYPE_DEATH) { // death spot
@@ -134,13 +130,23 @@ public class OverlayWaypointRenderer extends BaseEntityOverlayRenderer<List<Wayp
 	
 				} else {
 					
+					if(x<0) x = 0;
+					if(z<0) z = 0;
+					
+					
+					
+					if(x>maxX) x = maxX;
+					if(z>maxZ) z = maxZ;
+					
+					System.out.println("Clamped Waypoint: " + x + ", " + z);	
+					
 					// Edge marker (semicircle)
 					g.setComposite(OPAQUE);
 					g.setStroke(thickRoundStroke);
 					g.setPaint(Color.black);
-					g.drawArc(x, z, diameter*2, diameter*2, 0, 360);
+					g.drawArc(x-diameter/2, z-diameter/2, diameter*2, diameter*2, 0, 360);
 					g.setPaint(color);
-					g.fillArc(x, z, diameter*2, diameter*2, 0, 360);
+					g.fillArc(x-diameter/2, z-diameter/2, diameter*2, diameter*2, 0, 360);
 				}
 				
 				g.dispose();
@@ -148,6 +154,13 @@ public class OverlayWaypointRenderer extends BaseEntityOverlayRenderer<List<Wayp
 		} catch(Throwable t) {
 			JourneyMap.getLogger().severe("Error during render: " + LogFormatter.toString(t));
 		}
+	}
+	
+	public boolean inBounds(Waypoint waypoint) {
+		int chunkX = (int) waypoint.getX()>>4;
+		int chunkZ = (int) waypoint.getZ()>>4;
+		return (chunkX>=startCoords.chunkXPos && chunkX<=endCoords.chunkXPos && 
+				chunkZ>=startCoords.chunkZPos && chunkZ<=endCoords.chunkZPos);
 	}
 
 }

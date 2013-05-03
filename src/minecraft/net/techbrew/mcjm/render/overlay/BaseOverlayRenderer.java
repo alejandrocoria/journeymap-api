@@ -30,6 +30,9 @@ public abstract class BaseOverlayRenderer<K> {
 	final int canvasWidth;
 	final int canvasHeight;
 	
+	int layerWidth;
+	int layerHeight;
+	
 	Double blockSize;
 
 	
@@ -41,12 +44,15 @@ public abstract class BaseOverlayRenderer<K> {
 	 * @param widthCutoff		Right-hand margin of canvas that is off-screen
 	 * @param heightCutoff		Bottom margin of canvas that is off-screen
 	 */
-	public BaseOverlayRenderer(final ChunkCoordIntPair startCoords, final ChunkCoordIntPair endCoords, final int canvasWidth, final int canvasHeight) {
+	public BaseOverlayRenderer(final ChunkCoordIntPair startCoords, final ChunkCoordIntPair endCoords, final int canvasWidth, final int canvasHeight, final int layerWidth, final int layerHeight) {
 		this.startCoords = startCoords;
 		this.endCoords = endCoords;
 
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
+		
+		this.layerWidth = layerWidth;
+		this.layerHeight = layerHeight;
 	
 	}
 	
@@ -160,8 +166,9 @@ public abstract class BaseOverlayRenderer<K> {
 		
 		public BaseEntityOverlayRenderer(ChunkCoordIntPair startCoords,
 				ChunkCoordIntPair endCoords, int canvasWidth, int canvasHeight,
+				int layerWidth, int layerHeight,
 				int widthCutoff, int heightCutoff) {
-			super(startCoords, endCoords, canvasWidth, canvasHeight);
+			super(startCoords, endCoords, canvasWidth, canvasHeight, layerWidth, layerHeight);
 			this.widthCutoff = widthCutoff;
 			this.heightCutoff = heightCutoff;	
 		}

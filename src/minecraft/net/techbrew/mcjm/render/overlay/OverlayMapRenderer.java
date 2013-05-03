@@ -31,8 +31,8 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 	 * @param canvasWidth
 	 * @param canvasHeight
 	 */
-	public OverlayMapRenderer(final ChunkCoordIntPair startCoords, final ChunkCoordIntPair endCoords, final int canvasWidth, final int canvasHeight) {
-		super(startCoords, endCoords, canvasWidth, canvasHeight);
+	public OverlayMapRenderer(final ChunkCoordIntPair startCoords, final ChunkCoordIntPair endCoords, final int canvasWidth, final int canvasHeight, int layerWidth, int layerHeight) {
+		super(startCoords, endCoords, canvasWidth, canvasHeight, layerHeight, layerHeight);
 	}
 
 	/**
@@ -105,6 +105,11 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 		int height = Math.max(16, (endCoords.chunkZPos - startCoords.chunkZPos) * 16);
 		return Utils.upperPowerOfTwo(Math.max(width, height), MAX_TEXTURE_SIZE);
 		//return MAX_TEXTURE_SIZE;
+	}
+
+	public void setLayerDimensions(int layerWidth, int layerHeight) {
+		this.layerWidth = layerWidth;
+		this.layerHeight = layerHeight;		
 	}
 
 

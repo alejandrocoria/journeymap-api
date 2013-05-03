@@ -677,7 +677,7 @@ public class MapOverlay extends GuiScreen {
 			clearCaches();
 			refreshState();
 			
-			lastMapRenderer = new OverlayMapRenderer(mapBounds[0], mapBounds[1], getCanvasWidth(), getCanvasHeight());
+			lastMapRenderer = new OverlayMapRenderer(mapBounds[0], mapBounds[1], getCanvasWidth(), getCanvasHeight(), 0, 0);
 			
 			int mapBlocksWide = (mapBounds[1].chunkXPos - mapBounds[0].chunkXPos) * 16;
 			int mapBlocksHigh = (mapBounds[1].chunkZPos - mapBounds[0].chunkZPos) * 16;
@@ -687,6 +687,8 @@ public class MapOverlay extends GuiScreen {
 			int layerWidth = mapBlocksWide * overlayScale;
 			int layerHeight = mapBlocksHigh * overlayScale;
 			int entityChunkSize = 16 * overlayScale; 
+			
+			lastMapRenderer.setLayerDimensions(layerWidth, layerHeight);
 			
 			lastEntityRenderer = new OverlayEntityRenderer(mapBounds[0], mapBounds[1], getCanvasWidth(), getCanvasHeight(), layerWidth, layerHeight);
 
@@ -712,7 +714,7 @@ public class MapOverlay extends GuiScreen {
 			int zCutoff = layerHeight-maxHeight;
 			
 			// Renderer for entities and player
-			OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer(lastEntityRenderer, xCutoff, zCutoff, showAnimals, showPets);
+			OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer(lastEntityRenderer, layerWidth, layerHeight, xCutoff, zCutoff, showAnimals, showPets);
 						
 			if(!hardcore) {
 				List<Map> critters = new ArrayList<Map>(16);
@@ -734,7 +736,14 @@ public class MapOverlay extends GuiScreen {
 				Collections.sort(critters, new EntityHelper.EntityMapComparator());
 				
 				radarRenderer.render(critters, g2D);
-			}			
+			}		
+			
+			// Draw waypoints
+			if(showWaypoints && WaypointHelper.waypointsEnabled()) {
+				List<Waypoint> waypoints = (List<Waypoint>) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
+
+				new OverlayWaypointRenderer(lastEntityRenderer, layerWidth, layerHeight, xCutoff, zCutoff).render(waypoints, g2D);
+			}
 
 			// Draw player if within bounds
 			if(radarRenderer.inBounds(mc.thePlayer)) {
@@ -742,14 +751,7 @@ public class MapOverlay extends GuiScreen {
 				radarRenderer.drawEntity(mc.thePlayer.chunkCoordX, (int) Math.floor(mc.thePlayer.posX), 
 						mc.thePlayer.chunkCoordZ, (int) Math.floor(mc.thePlayer.posZ),
 						EntityHelper.getHeading(mc.thePlayer), false, playerImage, g2D);				
-			}
-			
-			// Draw waypoints
-			if(showWaypoints && WaypointHelper.waypointsEnabled()) {
-				List<Waypoint> waypoints = (List<Waypoint>) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
-
-				new OverlayWaypointRenderer(lastEntityRenderer, xCutoff, zCutoff).render(waypoints, g2D);
-			}
+			}			
 			
 			// Update player pos
 			String biomeName = (String) DataCache.instance().get(PlayerData.class).get(EntityKey.biome);			
@@ -760,7 +762,7 @@ public class MapOverlay extends GuiScreen {
 					mc.thePlayer.chunkCoordY, 
 					biomeName); //$NON-NLS-1$ 
 			
-			// TODO: Remove
+	
 			//playerLastPos = mapBounds[0].chunkXPos + "," + mapBounds[0].chunkZPos + " to " +  mapBounds[1].chunkXPos + "," + mapBounds[1].chunkZPos;
 			//playerLastPos = getCanvasWidth() + "x" + getCanvasHeight() + " mapTex size: " + lastMapRenderer.getTextureSize() + " entTex size: " + lastEntityRenderer.getTextureSize();
 			//playerLastPos = mc.displayWidth + "x" + mc.displayHeight + " vs " + getCanvasWidth() + "x" + getCanvasHeight() + " mapTex size: " + lastMapRenderer.getTextureSize() + " entTex size: " + lastEntityRenderer.getTextureSize();

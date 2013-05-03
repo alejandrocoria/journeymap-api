@@ -38,9 +38,11 @@ public class OverlayRadarRenderer extends BaseEntityOverlayRenderer<List<Map>> {
 	 * @param canvasWidth
 	 * @param canvasHeight
 	 */
-	public OverlayRadarRenderer(OverlayEntityRenderer parentRenderer, int widthCutoff, int heightCutoff, final boolean showAnimals, final boolean showPets) {
+	public OverlayRadarRenderer(OverlayEntityRenderer parentRenderer, int layerWidth, int layerHeight, int widthCutoff, int heightCutoff, final boolean showAnimals, final boolean showPets) {
 		super(parentRenderer.startCoords, parentRenderer.endCoords, 
-			  parentRenderer.canvasWidth, parentRenderer.canvasHeight, widthCutoff, heightCutoff);
+			  parentRenderer.canvasWidth, parentRenderer.canvasHeight,
+			  layerWidth, layerHeight, 
+			  widthCutoff, heightCutoff);
 		this.blockSize = parentRenderer.blockSize;
 		this.showAnimals = showAnimals;
 		this.showPets = showPets;
