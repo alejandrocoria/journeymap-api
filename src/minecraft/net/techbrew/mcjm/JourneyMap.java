@@ -52,7 +52,7 @@ public class JourneyMap extends BaseMod {
 
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
 	public static final String JM_VERSION = "2.6.0b3"; //$NON-NLS-1$
-	public static final String MC_VERSION = "1.5.1"; //$NON-NLS-1$
+	public static final String MC_VERSION = "1.5.2"; //$NON-NLS-1$
 
 	private static volatile Boolean initialized = false;
 	
