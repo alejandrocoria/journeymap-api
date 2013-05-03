@@ -20,7 +20,6 @@ import net.minecraft.src.GuiMultiplayer;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.GuiSelectWorld;
 import net.minecraft.src.KeyBinding;
-import net.minecraft.src.ModLoader;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
@@ -41,12 +40,12 @@ import org.lwjgl.input.Keyboard;
  * This software is copyright (C) Mark Woodman (mwoodman@techbrew.net) and is
  * provided as-is with no warrantee whatsoever.
  * 
- * Central class for the JourneyMap mod.  Extends the ModLoader BaseMod class.
+ * Central class for the JourneyMap mod. 
  * 
  * @author Mark Woodman
  *
  */
-public class JourneyMap extends BaseMod {
+public class JourneyMap {
 	
 	static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
 
@@ -75,7 +74,7 @@ public class JourneyMap extends BaseMod {
 
 	// Whether webserver is running
 	boolean enableWebserver;
-	boolean enableMapGui;
+	public boolean enableMapGui;
 	boolean enableAnnounceMod;
 
 	//private ChannelClient channelClient;
@@ -86,34 +85,13 @@ public class JourneyMap extends BaseMod {
 	private static ScheduledExecutorService chunkExecutor;
 
 	// Announcements
-	private static List<String> announcements;
+	private static List<String> announcements = Collections.synchronizedList(new LinkedList<String>());
 
 	/**
 	 * Constructor.
 	 */
 	public JourneyMap() {
 		
-	}
-
-	@Override
-	public String getVersion() {
-		return JM_VERSION;
-	}
-
-	@Override
-	public void load() 
-	{		
-		announcements = Collections.synchronizedList(new LinkedList<String>());
-		ModLoader.setInGameHook(this, true, false);
-		ModLoader.setInGUIHook(this, true, false);
-		
-		// Map GUI keycode
-		int mapGuiKeyCode = PropertyManager.getInstance().getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
-		enableMapGui = PropertyManager.getInstance().getBoolean(PropertyManager.Key.MAPGUI_ENABLED); 
-		if(enableMapGui) {
-			keybinding = new KeyBinding("JourneyMap", mapGuiKeyCode); //$NON-NLS-1$
-			ModLoader.registerKey(this, keybinding, false);
-		}
 	}
 	
 	/**
@@ -161,7 +139,13 @@ public class JourneyMap extends BaseMod {
 		}
 	}
 
-	@Override
+	/**
+	 * Called via Modloader
+	 * @param f
+	 * @param minecraft
+	 * @param guiscreen
+	 * @return
+	 */
 	public boolean onTickInGUI(float f, Minecraft minecraft, GuiScreen guiscreen) {
 		try {
 			
@@ -195,7 +179,12 @@ public class JourneyMap extends BaseMod {
 		return true;
 	}
 
-	@Override
+	/**
+	 * Called via Modloader
+	 * @param f
+	 * @param minecraft
+	 * @return
+	 */
 	public boolean onTickInGame(float f, final Minecraft minecraft) {
 
 		try {
@@ -254,18 +243,6 @@ public class JourneyMap extends BaseMod {
 			while(!minecraft.isGamePaused && !announcements.isEmpty()) {
 				player.addChatMessage(announcements.remove(0));
 			}
-
-//			ThreadMXBean bean = ManagementFactory.getThreadMXBean();
-//			long[] threadIds = bean.findDeadlockedThreads(); // Returns null if no threads are deadlocked.
-//
-//			if (threadIds != null) {
-//				ThreadInfo[] infos = bean.getThreadInfo(threadIds);
-//
-//				for (ThreadInfo info : infos) {
-//					StackTraceElement[] stack = info.getStackTrace();
-//					getLogger().severe("Deadlocked thread: " + Arrays.asList(stack));
-//				}
-//			}
 
 			// Start executors
 			if(!executorsStarted) {
@@ -356,15 +333,18 @@ public class JourneyMap extends BaseMod {
 		}
 	}
 
-	@Override
+	/**
+	 * Called via Modloader
+	 * @param keybinding
+	 */
 	public void keyboardEvent(KeyBinding keybinding)
 	{
 		if(!running) return; 
 
 		Minecraft minecraft = Minecraft.getMinecraft();
 		if(keybinding.keyCode==keybinding.keyCode) {
-			if(Minecraft.getMinecraft().currentScreen==null) {
-				ModLoader.openGUI(minecraft.thePlayer, new MapOverlay(this));
+			if(minecraft.currentScreen==null) {
+				minecraft.displayGuiScreen(new MapOverlay(this));
 				keybinding.unPressAllKeys();
 			} else if(Minecraft.getMinecraft().currentScreen instanceof MapOverlay) {
 				minecraft.displayGuiScreen(null);
@@ -372,9 +352,9 @@ public class JourneyMap extends BaseMod {
 				keybinding.unPressAllKeys();
 			}
 		} else if(keybinding.keyCode==minecraft.gameSettings.keyBindInventory.keyCode) {
-			if(ModLoader.isGUIOpen(MapOverlayOptions.class)) { 
+			if(minecraft.currentScreen instanceof MapOverlayOptions) { 
 				minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer));				
-			} else if(ModLoader.isGUIOpen(MapOverlay.class)) { 
+			} else if(minecraft.currentScreen instanceof MapOverlay) { 
 				minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer));				
 			}
 		}

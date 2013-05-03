@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.ModLoader;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
@@ -47,7 +46,7 @@ public class SaveMapService extends BaseService {
 		query.parse();
 
 		// Check world
-		Minecraft minecraft = ModLoader.getMinecraftInstance();
+		Minecraft minecraft = Minecraft.getMinecraft();
 		World theWorld = minecraft.theWorld; 
 		if (theWorld == null) {
 			throwEventException(503, Constants.getMessageJMERR09(), event, false);
