@@ -1,10 +1,13 @@
 package net.techbrew.mcjm.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.src.ChunkCoordinates;
+import net.minecraft.src.EntityClientPlayerMP;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 
@@ -18,13 +21,14 @@ public class WaypointHelper {
 	
 	private static Boolean reiLoaded;
 	private static Boolean voxelMapLoaded;
+	private static Boolean nativeLoaded = false;
 	
 	/**
 	 * Is any waypoint system enabled.
 	 * @return
 	 */
 	public static boolean waypointsEnabled() {
-		return isReiLoaded() || isVoxelMapLoaded();
+		return isReiLoaded() || isVoxelMapLoaded() || isNativeLoaded();
 	}
 	
 	/**
@@ -68,6 +72,17 @@ public class WaypointHelper {
 	}
 	
 	/**
+	 * Check for native waypoint support
+	 * @return
+	 */
+	private static boolean isNativeLoaded() {
+		if(nativeLoaded==null) {
+			nativeLoaded = false;
+		}
+		return nativeLoaded;
+	}
+	
+	/**
 	 * Get waypoints from whatever sources are supported.
 	 * @return
 	 */
@@ -77,6 +92,7 @@ public class WaypointHelper {
 		
 		if(isReiLoaded()) list.addAll(getReiWaypoints());
 		if(isVoxelMapLoaded()) list.addAll(getVoxelMapWaypoints());
+		if(isNativeLoaded()) list.addAll(getNativeWaypoints());
 		
 		return list;
 	}
@@ -161,6 +177,32 @@ public class WaypointHelper {
 			voxelMapLoaded = false;
 			return Collections.EMPTY_LIST;
 		}
+	}
+	
+	/**
+	 * Get waypoints from VoxelMap
+	 * @return
+	 */
+	static List<Waypoint> getNativeWaypoints() {
+		
+		if(!isNativeLoaded()) {
+			return Collections.EMPTY_LIST;
+		}
+		
+		ChunkCoordinates spawn = Minecraft.getMinecraft().theWorld.getSpawnPoint();
+		
+		EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
+		
+		Waypoint wpSpawn = new Waypoint("Spawn", spawn.posX, spawn.posY, spawn.posZ, true, 0, 255, 0, Waypoint.TYPE_NORMAL, "journeymap", "Spawn");
+		Waypoint wpLast = new Waypoint("Last", new Double(Math.floor(player.posX)).intValue(), new Double(Math.floor(player.posY)).intValue(), new Double(Math.floor(player.posZ)).intValue(), true, 0, 255, 255, Waypoint.TYPE_NORMAL, "journeymap", "Last");
+		
+		return Arrays.asList(wpLast, wpSpawn 
+//				new Waypoint("0,0,0", 0,0,0, true, 255, 255, 255, Waypoint.TYPE_NORMAL, "journeymap", "0,0,0"),
+//				new Waypoint("8,8,8", 8,8,8, true, 255, 255, 255, Waypoint.TYPE_NORMAL, "journeymap", "8,8,8"),
+//				new Waypoint("16,16,16", 16,16,16, true, 255, 255, 255, Waypoint.TYPE_NORMAL, "journeymap", "16,16,16"),
+//				new Waypoint("32,32,32", 32,32,32, true, 255, 255, 255, Waypoint.TYPE_NORMAL, "journeymap", "32,32,32"),
+//				new Waypoint("64,64,64", 64,64,64, true, 255, 255, 255, Waypoint.TYPE_NORMAL, "journeymap", "64,64,64")
+				);
 	}
 
 }
