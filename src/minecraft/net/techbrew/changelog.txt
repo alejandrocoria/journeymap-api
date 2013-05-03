@@ -1,4 +1,4 @@
-JourneyMap 2.6.0b3 for Minecraft 1.5.1 (April 29, 2013)
+JourneyMap 2.6.0b4 for Minecraft 1.5.2 (May 3, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -8,15 +8,16 @@ http://journeymap.techbrew.net
 
 Requirements:
 
-- Minecraft 1.5
+- Minecraft 1.5.2
 - ModLoader or Forge
 
-Changes in JourneyMap 2.6.0b2 for Minecraft 1.5:
-- Map colors are now derived from the current texture pack, including custom blocks
+Changes in JourneyMap 2.6.0 for Minecraft 1.5.2:
+- Map colors are now derived from the current texture pack, including custom blocks when possible.
 - New option: "Show grid" will display a grid along chunk boundaries
 - Added an Italian translation. Thanks to Simone Dassi! (58D-69Y-VQVJ)
 - Added a French translation. Thanks to cptbaby! (92Z-8AQ-SB5G)
-- Bugfix (5E7-M3D-8Y86) "In-game Map Just White Screen".  Fixes OpenGL-related issue with older graphics cards by using PowerOfTwo textures. 
+- Bugfix (5E7-M3D-8Y86) "In-game Map Just White Screen".  Fixes OpenGL-related issue with older graphics cards by using PowerOfTwo textures.
+- Bugfix (MSR-AXG-31M6) "Save large map fails". Now using the pngj open-source library to keep memory overhead down when saving world maps.  Thanks to Hernán J. González for invaluable code snippets. 
 - Saving map to file now goes into screenshots folder
 - Dragging the in-game map is easier when zoomed in
 - In-game map now retains last position after being closed/re-opened.
@@ -24,7 +25,7 @@ Changes in JourneyMap 2.6.0b2 for Minecraft 1.5:
 - Properties file now alphabetized
 - Padded web dropdown menus to accommodate languages that need more space
 
-Changes in JourneyMap 2.5.0 for Minecraft 1.5:
+Changes in JourneyMap 2.5.0 for Minecraft 1.5.1:
 - New Feature (5ZA-ZYN-B26M): Displays Rei's Minimap or VoxelMap (formerly Zan's Minimap) waypoints
 - Improved Nether, End, and Cave mapping with contour shading
 - Improved player and mob heading indicators
