@@ -448,8 +448,7 @@ public class RegionFileHandler {
 						image = createUndergroundBlankImage();
 					} else {
 						image = createBlankImage();
-					}
-					image.getGraphics().drawRect(0, 0, image.getWidth(), image.getHeight());
+					}					
 					try {
 						ImageIO.write(image, "png", rfile);
 					} catch(IOException e) {
