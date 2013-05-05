@@ -1,4 +1,4 @@
-JourneyMap 2.6.0 for Minecraft 1.5.2 (May 3, 2013)
+JourneyMap 2.6.1 for Minecraft 1.5.2 (May 5, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -10,6 +10,9 @@ Requirements:
 
 - Minecraft 1.5.2
 - ModLoader or Forge
+
+Changes in JourneyMap 2.6.1 for Minecraft 1.5.2:
+- Critical Bugfix (1ZD-933-HAYL) "Hole to void produces errors" which caused significant performance problems.
 
 Changes in JourneyMap 2.6.0 for Minecraft 1.5.2:
 - Map colors are now derived from the current texture pack, including custom blocks when possible.
