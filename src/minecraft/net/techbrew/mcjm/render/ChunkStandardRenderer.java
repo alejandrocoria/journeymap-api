@@ -352,7 +352,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		Stack<BlockInfo> stack = new Stack<BlockInfo>();
 		stack.push(blockInfo);
 		int down = y;
-		while(down>=0) {
+		while(down>0) {
 			down--;
 			BlockInfo lowerBlock = mapBlocks.getBlockInfo(chunkStub, x, down, z);
 			if(lowerBlock!=null) {

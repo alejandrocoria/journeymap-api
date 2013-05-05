@@ -40,8 +40,14 @@ public class MapBlocks extends HashMap {
 	 */
 	BlockInfo getBlockInfo(ChunkStub chunkStub, int x, int y, int z) {
 		try {
-			int blockId = chunkStub.getBlockID(x, y, z);
-			int meta = (blockId==0) ? 0 : chunkStub.getBlockMetadata(x, y, z);
+			int blockId, meta;
+			if(y>=0) {
+				blockId = chunkStub.getBlockID(x, y, z);
+				meta = (blockId==0) ? 0 : chunkStub.getBlockMetadata(x, y, z);
+			} else {
+				blockId = -1;
+				meta = 0;
+			}
 			BlockInfo info = new BlockInfo(blockId, meta);
 			if(blockId>0) {
 				info.setColor(colorCache.getBlockColor(chunkStub, info, x, y, z));
@@ -55,7 +61,7 @@ public class MapBlocks extends HashMap {
 			return info;
 			
 		} catch (Exception e) {
-			JourneyMap.getLogger().severe("Can't get blockId/meta for chunk " + chunkStub.xPosition + "," + chunkStub.zPosition + " block " + x + "," + y + "," + z + ": " + LogFormatter.toString(e)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$			
+			JourneyMap.getLogger().severe("Can't get blockId/meta for chunk " + chunkStub.xPosition + "," + chunkStub.zPosition + " block " + x + "," + y + "," + z); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$			
 			return null;
 		}
 	}
