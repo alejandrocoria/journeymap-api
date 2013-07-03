@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
+import net.minecraft.src.DynamicTexture;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.JourneyMap;
@@ -24,7 +25,7 @@ public class OverlayEntityRenderer extends BaseOverlayRenderer<MapOverlayState> 
 	
 	private BufferedImage entityImage;
 	private Graphics2D g2D;
-	private Integer textureIndex;
+	private DynamicTexture entityTexture;
 	private Double maxImgDim;	
 
 	
@@ -68,11 +69,8 @@ public class OverlayEntityRenderer extends BaseOverlayRenderer<MapOverlayState> 
 
 		try {
 			
-			if(textureIndex==null && entityImage!=null) {
-												
-				// Allocate the new map image as a texture
-				// TODO
-				//textureIndex = Minecraft.getMinecraft().func_110434_K().allocateAndSetupTexture((BufferedImage) entityImage);				
+			if(entityTexture==null && entityImage!=null) {
+				entityTexture = new DynamicTexture(entityImage);				
 			}
 			
 			// Draw to screen
@@ -84,25 +82,24 @@ public class OverlayEntityRenderer extends BaseOverlayRenderer<MapOverlayState> 
 	}
 	
 	public void draw(float opacity, double xOffset, double zOffset) {
-		if(textureIndex!=null && maxImgDim!=null) {
+		if(entityTexture!=null && maxImgDim!=null) {
 			
 			int maxScreenSize = Math.max(canvasWidth, canvasHeight);
 			double scale = maxScreenSize/maxImgDim;
 			
 			GL11.glPushMatrix();
 			GL11.glScaled(scale, scale, scale);
-			drawImage(textureIndex, opacity, xOffset, zOffset, entityImage.getWidth(), entityImage.getHeight());
+			drawImage(entityTexture, opacity, xOffset, zOffset, entityImage.getWidth(), entityImage.getHeight());
 			GL11.glPopMatrix();
 		}
 	}
 	
 	public void eraseCachedImg() {
 		entityImage = null;
-		if(textureIndex!=null) {
+		if(entityTexture!=null) {
 			try {
-				// TODO
-				// Minecraft.getMinecraft().func_110434_K().deleteTexture(textureIndex);
-				textureIndex = null;
+				GL11.glDeleteTextures(entityTexture.func_110552_b());
+				entityTexture = null;
 			} catch(Throwable t) {
 				JourneyMap.getLogger().warning("Map image texture not deleted: " + t.getMessage());
 			}

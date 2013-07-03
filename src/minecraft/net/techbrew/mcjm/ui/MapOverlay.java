@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -13,6 +14,9 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import javax.imageio.ImageIO;
+
+import net.minecraft.src.DynamicTexture;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.ChunkCoordIntPair;
@@ -21,6 +25,8 @@ import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiChat;
 import net.minecraft.src.GuiInventory;
 import net.minecraft.src.GuiScreen;
+import net.minecraft.src.ResourceLocation;
+import net.minecraft.src.ResourcePackFileNotFoundException;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
@@ -101,7 +107,7 @@ public class MapOverlay extends GuiScreen {
 	int lastWidth = 0;
 	int lastHeight = 0;
 
-	private Integer logoTextureIndex;
+	private DynamicTexture logoTexture;
 	
 	private Integer blockXOffset = 0;
 	private Integer blockZOffset = 0;
@@ -160,11 +166,11 @@ public class MapOverlay extends GuiScreen {
 			BaseOverlayRenderer.drawRectangle(3,25,20,55,0,0,0,150);
 		}
 		
-		if(logoTextureIndex==null) {
-			// TODO
-			//logoTextureIndex = mc.func_110434_K().getTexture(FileHandler.WEB_DIR + "/ico/journeymap40.png"); //$NON-NLS-1$
+		if(logoTexture==null) {
+			String path = FileHandler.WEB_DIR + "/ico/journeymap40.png";
+			logoTexture = BaseOverlayRenderer.getTexture(path);
 		}
-		BaseOverlayRenderer.drawImage(logoTextureIndex, 1F, 3, 1, 20,20); 
+		BaseOverlayRenderer.drawImage(logoTexture, 1F, 3, 1, 20,20); 
 	}
 
 	@Override
@@ -1026,10 +1032,9 @@ public class MapOverlay extends GuiScreen {
 	}
 
 	protected void eraseCachedLogoImg() {
-		if(logoTextureIndex!=null) {
-			// TODO
-			//mc.func_110434_K().deleteTexture(logoTextureIndex);
-			logoTextureIndex = null;
+		if(logoTexture!=null) {
+			GL11.glDeleteTextures(logoTexture.func_110552_b());
+			logoTexture = null;
 		}
 	}
 

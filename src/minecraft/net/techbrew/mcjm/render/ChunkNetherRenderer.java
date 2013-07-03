@@ -74,7 +74,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 					
 					BlockInfo block = mapBlocks.getBlockInfo(chunkStub, x, y, z);		
 					blockId = block.id;
-					Color color = block.color;
+					Color color = block.getColor();
 					
 					// Get light level
 					if(isLava) {

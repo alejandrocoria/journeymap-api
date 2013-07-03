@@ -72,7 +72,7 @@ public class Utils {
 		
 		return minecraft.theWorld.getSeed();
 		
-		// TODO FIX FOR 1.3.1
+		// TODO World Hash Fix
 //		World world = minecraft.theWorld;
 //		if(world.getSeed()==0) {
 //			

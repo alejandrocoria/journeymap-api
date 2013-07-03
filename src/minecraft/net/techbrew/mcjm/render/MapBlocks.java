@@ -61,7 +61,8 @@ public class MapBlocks extends HashMap {
 			return info;
 			
 		} catch (Exception e) {
-			JourneyMap.getLogger().severe("Can't get blockId/meta for chunk " + chunkStub.xPosition + "," + chunkStub.zPosition + " block " + x + "," + y + "," + z); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$			
+			JourneyMap.getLogger().severe("Can't get blockId/meta for chunk " + chunkStub.xPosition + "," + chunkStub.zPosition + " block " + x + "," + y + "," + z); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			JourneyMap.getLogger().severe(LogFormatter.toString(e));
 			return null;
 		}
 	}

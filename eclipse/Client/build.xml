@@ -2,7 +2,7 @@
 <project name="JourneyMap" basedir="../.." default="all">
 
   <!-- Update when new version is going to be released -->
-  <property name="version" value="2.6.1_MC1.5.2" />
+  <property name="version" value="2.7.0b1_MC1.6.1" />
 
   <property name="mcp.dir" location="${basedir}" />
   <property name="journeymap.dir" location="${mcp.dir}/journeymap" />

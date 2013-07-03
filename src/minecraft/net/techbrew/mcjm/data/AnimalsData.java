@@ -7,11 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import net.minecraft.src.DataWatcher;
+import net.minecraft.src.EntityHorse;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.EntityTameable;
 import net.minecraft.src.IAnimals;
+import net.minecraft.src.WatchableObject;
 import net.techbrew.mcjm.model.EntityHelper;
 
 /**
@@ -63,9 +66,16 @@ public class AnimalsData implements IDataProvider {
 	   
 		List<IAnimals> animals = EntityHelper.getAnimalsNearby();
 		ArrayList<LinkedHashMap> list = new ArrayList<LinkedHashMap>(animals.size());
-		
+		String owner;
+		EntityLiving entity;
 		for(IAnimals animal : animals) {
-			EntityLiving entity = (EntityLiving) animal;
+			entity = (EntityLiving) animal;
+			
+			// Exclude animals being ridden, since their positions lag behind the players on the map
+			if(entity.riddenByEntity!=null) {
+				continue;
+			}
+			
 			LinkedHashMap eProps = new LinkedHashMap();
 			eProps.put(EntityKey.filename, EntityHelper.getFileName(entity)); 
 			eProps.put(EntityKey.hostile, false);
@@ -75,10 +85,13 @@ public class AnimalsData implements IDataProvider {
 			eProps.put(EntityKey.chunkCoordZ, entity.chunkCoordZ); 
 			eProps.put(EntityKey.heading, EntityHelper.getHeading(entity));
 			if(entity instanceof EntityTameable) {
-				String owner = ((EntityTameable) entity).getOwnerName();
+				owner = ((EntityTameable) entity).getOwnerName();
 				if(owner!=null) {
 					eProps.put(EntityKey.owner, owner);
 				}
+			} else if(entity instanceof EntityHorse) {
+				owner = entity.getDataWatcher().getWatchableObjectString(21);
+				eProps.put(EntityKey.owner, owner);
 			}
 			
 			// CustomName

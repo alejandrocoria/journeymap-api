@@ -52,8 +52,8 @@ public class JourneyMap {
 	static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
 
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-	public static final String JM_VERSION = "2.6.1"; //$NON-NLS-1$
-	public static final String MC_VERSION = "1.5.2"; //$NON-NLS-1$
+	public static final String JM_VERSION = "2.7.0b1"; //$NON-NLS-1$
+	public static final String MC_VERSION = "1.6.1"; //$NON-NLS-1$
 
 	private static volatile Boolean initialized = false;
 	
@@ -205,7 +205,7 @@ public class JourneyMap {
 			// Don't do anything when game is paused
 			boolean isGamePaused = minecraft.isSingleplayer() && minecraft.currentScreen != null && minecraft.currentScreen.doesGuiPauseGame() && !minecraft.getIntegratedServer().getPublic();
 			if(isGamePaused) {
-				//return true; // TODO
+				//return true; // TODO : pause the game?
 			}
 
 			// Check for world change
@@ -246,7 +246,7 @@ public class JourneyMap {
 			}
 
 			// Start executors
-			if(!executorsStarted) {
+			if(!executorsStarted && chunkDelay>0) {
 
 				getLogger().info("Starting up JourneyMap threads for " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
 				executorsStarted = true;

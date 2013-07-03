@@ -106,7 +106,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 		
 					// Get block color
 					BlockInfo block = mapBlocks.getBlockInfo(chunkStub, x, paintY, z);
-					Color color = block.color;
+					Color color = block.getColor();
 					
 					// Get slope of block and prepare to shade
 					float slope, s, sN, sNW, sW, sAvg, shaded;

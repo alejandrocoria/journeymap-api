@@ -8,7 +8,7 @@ public class BlockInfo {
 
 	public final int id;
 	public final int meta;
-	public Color color;
+	private Color color;
 	public float alpha;
 	
 	public BlockInfo(int id, int meta) {
@@ -18,6 +18,14 @@ public class BlockInfo {
 
 	public void setColor(Color color) {
 		this.color = color;
+	}
+	
+	public Color getColor() {
+		if(this.color==null) {
+			return null;
+		} else {
+			return this.color;
+		}
 	}
 
 	public void setAlpha(float alpha) {

@@ -3,6 +3,9 @@ package net.techbrew.mcjm.render.overlay;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import org.lwjgl.opengl.GL11;
+
+import net.minecraft.src.DynamicTexture;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.Constants;
@@ -21,7 +24,7 @@ import net.techbrew.mcjm.model.MapOverlayState;
 public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 	
 	private BufferedImage mapImg;
-	private Integer textureIndex;
+	private DynamicTexture mapTexture;
 	private Double maxImgDim;
 
 	/**
@@ -43,7 +46,7 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 
 		try {
 			
-			if(mapImg==null || textureIndex==null) {
+			if(mapImg==null || mapTexture==null) {
 			
 				Minecraft mc = Minecraft.getMinecraft();
 				
@@ -58,15 +61,9 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 						state.getMapType(), mc.thePlayer.chunkCoordY, cType, true, state.getCurrentZoom(),
 						size, size);
 				
-				// Allocate the new map image as a texture
-				// TODO
-				int tmpTextureIndex = 0;
-				//int tmpTextureIndex = mc.func_110434_K().allocateAndSetupTexture((BufferedImage) tmpMapImg);
-				
-				// If it worked, set the member vars
 				eraseCachedImg();
 				mapImg = tmpMapImg;
-				textureIndex = tmpTextureIndex;
+				mapTexture = new DynamicTexture(mapImg);
 
 				int maxScreenSize = Math.max(state.getCanvasWidth(), state.getCanvasHeight());
 				int textureSize = mapImg.getWidth();
@@ -84,22 +81,21 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 	}
 	
 	public void draw(float opacity, double xOffset, double zOffset) {
-		if(textureIndex!=null && maxImgDim!=null) {
-			drawImage(textureIndex, opacity, xOffset, zOffset, maxImgDim, maxImgDim);
+		if(mapTexture!=null && maxImgDim!=null) {
+			drawImage(mapTexture, opacity, xOffset, zOffset, maxImgDim, maxImgDim);
 		}
 	}
 	
 	public void eraseCachedImg() {
 		mapImg = null;
-		if(textureIndex!=null) {
+		if(mapTexture!=null) {
 			try {
-				// TODO
-				//Minecraft.getMinecraft().func_110434_K().deleteTexture(textureIndex);				
+				GL11.glDeleteTextures(mapTexture.func_110552_b());		
 			} catch(Throwable t) {
 				JourneyMap.getLogger().warning("Map image texture not deleted: " + t.getMessage());
 				t.printStackTrace();
 			}
-			textureIndex = null;
+			mapTexture = null;
 		}
 	}
 	

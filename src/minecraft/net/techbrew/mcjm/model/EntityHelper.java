@@ -1,12 +1,15 @@
 package net.techbrew.mcjm.model;
 
 import java.awt.image.BufferedImage;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.src.EntityHorse;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.Entity;
@@ -23,13 +26,20 @@ import net.minecraft.src.IAnimals;
 import net.minecraft.src.IBossDisplayData;
 import net.minecraft.src.IMob;
 import net.minecraft.src.IRangedAttackMob;
+import net.minecraft.src.Render;
+import net.minecraft.src.RenderHorse;
+import net.minecraft.src.RenderLiving;
+import net.minecraft.src.RenderManager;
+import net.minecraft.src.ResourceLocation;
+import net.minecraft.src.StatCollector;
+import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 
 public class EntityHelper {
 	
-	public static final String PLAYER_FILENAME = "char.png";
+	public static final String PLAYER_FILENAME = "steve.png";
 	
 	private static final double PI2 = 2*Math.PI;
 	
@@ -58,29 +68,16 @@ public class EntityHelper {
 	}
 	
 	public static List<IAnimals> getAnimalsNearby() {
-		return getAnimalsNearby(false);
-	}
-	
-	public static List<IAnimals> getAnimalsNearby(boolean excludePets) {
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayerSP player = mc.thePlayer;
 		AxisAlignedBB bb = getBB(player);
 		
-		List<EntityCreature> animals = mc.theWorld.getEntitiesWithinAABB(EntityAnimal.class, bb);
+		List<IAnimals> animals = mc.theWorld.getEntitiesWithinAABB(EntityAnimal.class, bb);
 		animals.addAll(mc.theWorld.getEntitiesWithinAABB(EntityGolem.class, bb));
 		animals.addAll(mc.theWorld.getEntitiesWithinAABB(EntityWaterMob.class, bb));
 		
-		List<IAnimals> keep = new ArrayList<IAnimals>(animals.size());
-		for(EntityLiving animal : animals) {
-			if(!excludePets) {
-				keep.add((IAnimals) animal);
-			} else if(!isPetOf((IAnimals) animal, player)) {
-				keep.add((IAnimals) animal);
-			}
-		}
-
-		return keep;
+		return animals;
 	}
 	
 	/**
@@ -111,20 +108,6 @@ public class EntityHelper {
 		return AxisAlignedBB.getBoundingBox(player.posX, player.posY, player.posZ, player.posX, player.posY, player.posZ).expand(lateralDistance, verticalDistance, lateralDistance);
 	}
 	
-	
-	/**
-	 * Whether an animal is the tamed pet of player.
-	 * @param animal
-	 * @param player
-	 * @return
-	 */
-	public static boolean isPetOf(IAnimals animal, EntityPlayer player) {
-		if(animal instanceof EntityTameable) {
-			return player.equals(((EntityTameable) animal).getOwner());
-		} else {
-			return false;
-		}
-	}
 		
 	/**
 	 * TODO: Not threadsafe
@@ -248,10 +231,50 @@ public class EntityHelper {
 	 * @return
 	 */
 	public static String getFileName(Entity entity) {
-		// TODO
-		String tex = entity.getEntityName();
-		int i = tex.lastIndexOf('/');
-		return tex.substring(i+1);
+		
+		RenderLiving render = (RenderLiving) RenderManager.instance.getEntityRenderObject(entity);
+		
+		// Manually handle horses
+		if(render instanceof RenderHorse) {			
+			switch (((EntityHorse) entity).func_110265_bP())
+	        {
+		        case 0:
+	            default:
+	                return "horse/horse.png";
+	
+	            case 1:
+	                return "horse/donkey.png";
+	
+	            case 2:
+	                return "horse/mule.png";
+	
+	            case 3:
+	                return "horse/zombiehorse.png";
+	
+	            case 4:
+	                return "horse/skeletonhorse.png";
+	        }
+		}
+		
+		// All other mobs	
+		try {
+			
+			Method m = render.getClass().getDeclaredMethod("func_110775_a", Entity.class);
+			m.setAccessible(true);
+			ResourceLocation loc = (ResourceLocation) m.invoke(render, entity);
+			
+			String tex = loc.func_110623_a();
+			String search = "/entity/";
+			int i = tex.lastIndexOf(search);
+			if(i>=0) {
+				tex = tex.substring(i+search.length());
+			} 
+			return tex;
+			
+		} catch (Exception e) {
+			JourneyMap.getLogger().severe("Can't get mob resource from " + render.getClass().getSimpleName());
+			return null;
+		} 
 	}
 	
 	public static class EntityMapComparator implements Comparator<Map> {

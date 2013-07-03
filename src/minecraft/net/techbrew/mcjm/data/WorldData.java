@@ -98,10 +98,10 @@ public class WorldData implements IDataProvider {
 			try {
 				serverData = ModLoader.getPrivateValue(Minecraft.class, mc, "serverData");
 				worldName = ((ServerData) serverData).serverName;
+			} catch(java.lang.NoSuchFieldException e) {
+				JourneyMap.getLogger().warning(e.toString());
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				JourneyMap.getLogger().severe(LogFormatter.toString(e));
-				e.printStackTrace();
 			} 
 		} 
 		

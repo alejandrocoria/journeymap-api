@@ -83,10 +83,10 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				if (blockInfo == null) {
 					paintBadBlock(x, y, z, g2D);
 					continue blockLoop;
-				}			
+				}
 
 				// Get base color for block
-				Color color = blockInfo.color;
+				Color color = blockInfo.getColor();
 				if(color==null) {
 					paintBadBlock(x, y, z, g2D);
 					continue blockLoop;
@@ -103,15 +103,15 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						BlockInfo bn = getBlock(x, y, z, 0, -1, chunkStub, neighbors, blockInfo);
 						BlockInfo bs = getBlock(x, y, z, 0, +1, chunkStub, neighbors, blockInfo);
 						Set<Color> colors = new HashSet<Color>(5);
-						colors.add(blockInfo.color);
-						if(bw.id==8 || bw.id==9) colors.add(bw.color);
-						if(be.id==8 || be.id==9) colors.add(be.color);
-						if(bn.id==8 || bn.id==9) colors.add(bn.color);
-						if(bs.id==8 || bs.id==9) colors.add(bs.color);
+						colors.add(blockInfo.getColor());
+						if(bw.id==8 || bw.id==9) colors.add(bw.getColor());
+						if(be.id==8 || be.id==9) colors.add(be.getColor());
+						if(bn.id==8 || bn.id==9) colors.add(bn.getColor());
+						if(bs.id==8 || bs.id==9) colors.add(bs.getColor());
 						if(colors.size()>1) {
 							color = ColorCache.average(colors);
 						}
-						blockInfo.color = color;
+						blockInfo.setColor(color);
 						
 					}
 					paintDepth(chunkStub, blockInfo, x, y, z, g2D);
@@ -281,7 +281,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
 					// Get block color
 					BlockInfo info = mapBlocks.getBlockInfo(chunkStub, x, paintY, z);
-					Color color = info.color;
+					Color color = info.getColor();
 					
 					boolean keepflat = MapBlocks.noShadows.contains(info.id);
 					
@@ -372,14 +372,14 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		// If bottom block is same as the top, don't bother with transparency
 		if(stack.size()<2 || stack.peek().id==blockInfo.id) {
 			g2D.setComposite(MapBlocks.OPAQUE);
-			g2D.setPaint(blockInfo.color);
+			g2D.setPaint(blockInfo.getColor());
 			g2D.fillRect(x, z, 1, 1);
 		} else {
 		
 			// Bottom block is always opaque
 			if(!stack.isEmpty()) {
 				g2D.setComposite(MapBlocks.OPAQUE);
-				g2D.setPaint(stack.pop().color);
+				g2D.setPaint(stack.pop().getColor());
 				g2D.fillRect(x, z, 1, 1);
 			}
 			
@@ -387,13 +387,13 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 			while(!stack.isEmpty()) {
 				BlockInfo lowerBlock = stack.pop();
 				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, lowerBlock.alpha));
-				g2D.setPaint(lowerBlock.color);
+				g2D.setPaint(lowerBlock.getColor());
 				g2D.fillRect(x, z, 1, 1);
 			}	
 			
 			if(thinWaterAdjust) {
 				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .3f));
-				g2D.setPaint(blockInfo.color);
+				g2D.setPaint(blockInfo.getColor());
 				g2D.fillRect(x, z, 1, 1);
 			}
 		}

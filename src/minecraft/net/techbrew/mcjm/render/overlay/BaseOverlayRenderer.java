@@ -5,12 +5,23 @@ import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+
 import net.minecraft.src.ChunkCoordIntPair;
+import net.minecraft.src.DefaultResourcePack;
+import net.minecraft.src.DynamicTexture;
 import net.minecraft.src.Entity;
+import net.minecraft.src.Minecraft;
+import net.minecraft.src.ReloadableResourceManager;
+import net.minecraft.src.ResourceLocation;
 import net.minecraft.src.Tessellator;
+import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
+import net.techbrew.mcjm.log.LogFormatter;
 
 import org.lwjgl.opengl.GL11;
 
@@ -63,6 +74,30 @@ public abstract class BaseOverlayRenderer<K> {
 	 */
 	abstract public void render(K data, Graphics2D g2D) throws Exception;
 
+
+	/**
+	 * Get a DynamicTexture for a path
+	 * @param path
+	 * @return
+	 */
+	public static DynamicTexture getTexture(String path) {
+		ResourceLocation loc = new ResourceLocation(path);
+		DynamicTexture texture = null;
+		InputStream is = null;
+		try {
+			is = JourneyMap.class.getResourceAsStream(path);
+        	texture = new DynamicTexture(ImageIO.read(is));
+        } catch(Exception e) {
+        	JourneyMap.getLogger().severe("Can't get icon for " + loc + ": " + LogFormatter.toString(e));     
+        	if(is!=null) {
+        		try {
+					is.close();
+				} catch (IOException e1) {
+				}
+        	}
+        }
+		return texture;
+	}
 	
 	/**
 	 * Draw a text label, centered on x,z.  If bgColor not null,
@@ -123,14 +158,14 @@ public abstract class BaseOverlayRenderer<K> {
 		GL11.glEnable(3553 /*GL_TEXTURE_2D*/);
 	}
 
-	public static void drawImage(int bufferedImage, float transparency, double startX, double startY, double srcWidth, double srcHeight) {
+	public static void drawImage(DynamicTexture texture, float transparency, double startX, double startY, double srcWidth, double srcHeight) {
 		Tessellator tessellator = Tessellator.instance;
 		GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
 		GL11.glDepthMask(false);
 		GL11.glBlendFunc(770, 771);
 		GL11.glColor4f(transparency, transparency, transparency, transparency);
 		GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
-		GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, bufferedImage);
+		GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, texture.func_110552_b());
 
 		tessellator.startDrawingQuads();
 

@@ -1,8 +1,12 @@
 package net.techbrew.mcjm.ui;
 
+import net.minecraft.src.DynamicTexture;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.GuiSmallButton;
+import net.minecraft.src.ResourceLocation;
 import net.minecraft.src.Tessellator;
+import net.minecraft.src.TextureUtil;
+import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
 
 import org.lwjgl.opengl.GL11;
 
@@ -10,6 +14,7 @@ public class MapButton extends GuiSmallButton {
 	
 	private Boolean toggled = true;
 	String icon;
+	DynamicTexture iconTexture;
 	String[] multiline;
 	String labelOn;
 	String labelOff;
@@ -39,6 +44,7 @@ public class MapButton extends GuiSmallButton {
 	public MapButton(int id, int x, int y, int width, int height, String hoverText, String icon) {
 		super(id, x, y, width, height, "");
 		this.icon = (icon==null) ? "/gui/gui.png" : icon; //$NON-NLS-1$
+		this.iconTexture = BaseOverlayRenderer.getTexture(icon);
 		setHoverText(hoverText);
 	}
 	
@@ -83,10 +89,8 @@ public class MapButton extends GuiSmallButton {
 		} else {
 			GL11.glColor4f(.5F, .5F, .5F, 1F);
 		}
-		GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
-		
-		// TODO
-		// GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, minecraft.func_110434_K().getTexture(icon));
+		GL11.glDisable(3008 /*GL_ALPHA_TEST*/);		
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, iconTexture.func_110552_b());
 		
 		// Check hover
 		boolean hover = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;

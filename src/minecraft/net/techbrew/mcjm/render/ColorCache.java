@@ -2,6 +2,8 @@ package net.techbrew.mcjm.render;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,10 +18,13 @@ import net.minecraft.src.BlockLeaves;
 import net.minecraft.src.BlockLilyPad;
 import net.minecraft.src.BlockTallGrass;
 import net.minecraft.src.BlockVine;
+import net.minecraft.src.DefaultResourcePack;
 import net.minecraft.src.Icon;
 import net.minecraft.src.Item;
 import net.minecraft.src.Resource;
+import net.minecraft.src.ResourceLocation;
 import net.minecraft.src.ResourcePack;
+import net.minecraft.src.ResourcePackFileNotFoundException;
 import net.minecraft.src.ResourcePackRepository;
 import net.minecraft.src.ResourcePackRepositoryEntry;
 import net.minecraft.src.TextureAtlasSprite;
@@ -51,52 +56,22 @@ public class ColorCache {
 	
 	final boolean useCustomTexturePack;
 	final ResourcePackRepository texturePackList;
-	volatile ResourcePack texturePack;
 	
-	volatile String lastTextureName = null;
-	volatile byte[] lastTextureData;
+	volatile ResourcePack texturePack;
 	volatile long lastTextureUsed;
 	
 	public ColorCache() {
 		texturePackList = Minecraft.getMinecraft().func_110438_M();
 		useCustomTexturePack = PropertyManager.getInstance().getBoolean(PropertyManager.Key.USE_CUSTOM_TEXTUREPACK);
-		init();
+		validateResourcePack();
 	}
 	
-	/**
-	 * Reset the cache colors and use the selected texture pack.
-	 */
-	void init() {
-		
-		if(useCustomTexturePack) {
-			texturePack = texturePackList.field_110620_b; // DefaultResourcePack
-			// TODO
-			//texturePack = ((ResourcePackRepositoryEntry) texturePackList.func_110613_c().get(0)).func_110514_c();
-		} else {
-			texturePack = texturePackList.field_110620_b; // DefaultResourcePack
-		}
-		
-		JourneyMap.getLogger().info("Deriving block colors from texture pack: " + texturePack.func_130077_b());
-		
-		lastTextureName = null;
-		lastTextureData = null;
-		grassBiomeColors.clear();
-		waterBiomeColors.clear();
-		foliageBiomeColors.clear();		
-		
-		colors.clear();
-				
-		colors.put(new BlockInfo(0,0), new Color(0x000000)); // air
-		
-		MapBlocks.resetAlphas();
-		
-	}
-	
+
 	public Color getBlockColor(ChunkStub chunkStub, BlockInfo blockInfo, int x, int y, int z) {
 		Color color = null;
 		
-		if(blockInfo.color!=null) {
-			return blockInfo.color;
+		if(blockInfo.getColor()!=null) {
+			return blockInfo.getColor();
 		}
 		
 		BiomeGenBase biome = chunkStub.getBiomeGenForWorldCoords(x, z, chunkStub.worldObj.getWorldChunkManager());
@@ -144,8 +119,6 @@ public class ColorCache {
 			}
 		}
 		
-		retireCachedData();
-		
 		return color;
 	}
 	
@@ -157,15 +130,13 @@ public class ColorCache {
 	 */
 	private Color getBlockColor(BlockInfo blockInfo) {
 		
-		if(blockInfo.color!=null) {
-			return blockInfo.color;
+		if(blockInfo.getColor()!=null) {
+			return blockInfo.getColor();
 		}
 
-		// Check for changed texturepack
-		// TODO
-		//if(useCustomTexturePack && texturePack!=((ResourcePackRepositoryEntry) texturePackList.func_110613_c().get(0)).func_110514_c()) {
-		if(useCustomTexturePack && texturePack!=texturePackList.field_110620_b) {
-			init();
+		// Check if the resourcepack has changed
+		if(lastTextureUsed+5000<System.currentTimeMillis()) {
+			validateResourcePack();	    	
 		}
 		
 		Color color = colors.get(blockInfo);
@@ -176,6 +147,8 @@ public class ColorCache {
 			}
 			colors.put(blockInfo, color);
 		}
+		
+		blockInfo.setColor(color);
 		return color;		
 	}
 		
@@ -187,15 +160,15 @@ public class ColorCache {
 	 */
 	protected Color loadBlockColor(BlockInfo blockInfo) {
 		try {
-
+						
 			JourneyMap.getLogger().fine("Loading color for " + stringInfo(blockInfo));
 			
-        	double loadStart = System.nanoTime();    
+        	//double loadStart = System.nanoTime();    
         	
 	        Block block = Block.blocksList[blockInfo.id];
 
             if (block == null) {
-            	JourneyMap.getLogger().fine("No block type found");
+            	JourneyMap.getLogger().warning("No block type found");
             	
             	ItemBlock item = (ItemBlock) Item.itemsList[blockInfo.id];
             	if(item!=null) {
@@ -207,36 +180,23 @@ public class ColorCache {
 
             TextureAtlasSprite blockIcon = (TextureAtlasSprite) block.getIcon(0, blockInfo.meta);
         	if(blockIcon==null) {
-        		JourneyMap.getLogger().fine("No top icon");
+        		JourneyMap.getLogger().warning("No TextureAtlasSprite for " + stringInfo(blockInfo));
         		return null;
-        	}
-        	
-        	// TODO
-//        	TextureStitchedStub icon = new TextureStitchedStub(blockIcon);	 
-//        	Texture texSheet = icon.getTextureSheet();	       
-//        	
-//        	if(texSheet==null) {
-//        		JourneyMap.getLogger().fine("No Texture");
-//        		return null;
-//        	}
-//        	
-//        	renewCachedData(texSheet);
-        	
-        	renewCachedData(blockIcon);
+        	}        
         	
         	Color color = getColorForIcon(blockInfo, blockIcon);            
              
 			// Put the color in the map
 			colors.put(blockInfo, color);
 			if(color.equals(Color.black)) {
-				JourneyMap.getLogger().fine("\tColor eval'd to black");
+				JourneyMap.getLogger().warning("\tColor eval'd to black");
 			}
 			
 		
 			// Time the whole thing
-            double loadStop = System.nanoTime();   
-            double timer = (loadStop-loadStart)/1000000f;            
-            JourneyMap.getLogger().fine("\tColor load time: " + timer + "ms");
+//            double loadStop = System.nanoTime();   
+//            double timer = (loadStop-loadStart)/1000000f;            
+//            JourneyMap.getLogger().fine("\tColor load time: " + timer + "ms");
 			
 			return color;                           
 
@@ -246,70 +206,118 @@ public class ColorCache {
 		}
 	}
 	
+	InputStream getIconStream(ResourceLocation loc, ResourcePack resourcePack) {
+		InputStream is = null;
+		try {
+        	is = resourcePack.func_110590_a(loc);
+        } catch(ResourcePackFileNotFoundException e) {
+        	JourneyMap.getLogger().fine("ResourcePack doesn't have icon for " + loc);
+        } catch(IOException e) {
+        	JourneyMap.getLogger().severe("Can't get ResourcePack icon for " + loc + ": " + LogFormatter.toString(e));
+        }
+		return is;
+	}
+	
 	Color getColorForIcon(BlockInfo blockInfo, TextureAtlasSprite icon) {
-
-//		TextureStitchedStub icon = new TextureStitchedStub(blockIcon);
-		int width = icon.getOriginX();// + icon.getWidth();
-		int height = icon.getOriginY();// + icon.getHeight();
-		int originX = icon.func_130010_a();
-		int originY = icon.func_110967_i();
-		//Texture texSheet = icon.getTextureSheet();	
 		
-//		int sheetWidth = texSheet.getWidth();
-//		int sheetHeight = texSheet.getHeight();
-		
-		int sheetWidth = width;
-		int sheetHeight = height;
-    	
-        // TODO: Track percentage of pixels that aren't transparent, use that as factor when multiplying biome/grass/foliage color
-        
-        int count = 0;
-        int alpha;
-        int argb;
-        int a=0, r=0, g=0, b=0;
-        for(int x=originX; x<width; x++) {
-        	for(int y=originY; y<height; y++) {
-        		argb = getARGBfromArray(lastTextureData, x, y, sheetWidth);
-        		alpha = (argb >> 24) & 0xFF;
-        		if(alpha>0) {
-        			count++;
-        			a+= alpha;
-        			r+= (argb >> 16) & 0xFF;
-        			g+= (argb >> 8) & 0xFF;
-        			b+= (argb >> 0) & 0xFF;
-        		}
-        	}
+		ResourceLocation loc = new ResourceLocation("textures/blocks/" + icon.getIconName() + ".png");
+		ResourcePack rp = texturePack;
+        Color color;
+        BufferedImage img = null;
+        InputStream imgIs = getIconStream(loc, rp);
+        if(imgIs==null && rp!=texturePackList.field_110620_b) {
+        	rp = texturePackList.field_110620_b;
+        	imgIs = getIconStream(loc, rp);
         }
         
-        if(count>0) {    
-        	if(a>0) a = a/count;
-        	if(r>0) r = r/count;
-        	if(g>0) g = g/count;
-        	if(b>0) b = b/count;
+        if(imgIs==null) {
+        	JourneyMap.getLogger().warning("Couldn't access texture for " + stringInfo(blockInfo));
+        	color = Color.black;
         } else {
-        	JourneyMap.getLogger().fine("Unusable texture for " + stringInfo(blockInfo));
-        	r = g = b = 0;
-        }
-		
-		Color color;
-		
-		try {        
-			color = new Color(r,g,b);
-		} catch(IllegalArgumentException e) {
-			JourneyMap.getLogger().fine("Bad color for " + stringInfo(blockInfo));
-			color = Color.black;
-		}
+	        try {
+				img = ImageIO.read(imgIs);
+				
+				int width = icon.getOriginX();// + icon.getWidth();
+				int height = icon.getOriginY();// + icon.getHeight();
+		    	
+		        // TODO: Track percentage of pixels that aren't transparent, use that as factor when multiplying biome/grass/foliage color
 		        
-		// Put the alpha in MapBlocks		
-		if(blockInfo.getBlock().getRenderBlockPass()>0){
-			float blockAlpha = a * 1.0f/255;
-			MapBlocks.alphas.put(blockInfo.id, blockAlpha);
-			JourneyMap.getLogger().fine("Setting transparency for " + stringInfo(blockInfo));
-		} else if(MapBlocks.alphas.containsKey(blockInfo.id)) {
-			blockInfo.setAlpha(MapBlocks.alphas.get(blockInfo.id));
-		}
-		
+		        int count = 0;
+		        int argb, alpha;
+		        int a=0, r=0, g=0, b=0;
+		        for(int x=0; x<width; x++) {
+		        	for(int y=0; y<height; y++) {
+		        		argb = img.getRGB(x, y);
+		        		alpha = (argb >> 24) & 0xFF; 
+		        		if(alpha>0) {
+		        			count++;
+		        			a+= alpha;
+		        			r+= (argb >> 16) & 0xFF;
+		        			g+= (argb >> 8) & 0xFF;
+		        			b+= (argb >> 0) & 0xFF;
+		        		}
+		        	}
+		        }
+		        
+		        if(count>0) {    
+		        	if(a>0) a = a/count;
+		        	if(r>0) r = r/count;
+		        	if(g>0) g = g/count;
+		        	if(b>0) b = b/count;
+		        } else {
+		        	JourneyMap.getLogger().warning("Unusable texture for " + stringInfo(blockInfo));
+		        	r = g = b = 0;
+		        }
+				
+				
+				
+				try {        
+					color = new Color(r,g,b);
+				} catch(IllegalArgumentException e) {
+					JourneyMap.getLogger().warning("Bad color for " + stringInfo(blockInfo));
+					color = Color.black;
+				}
+				
+				// Put the alpha in MapBlocks		
+				if(blockInfo.getBlock().getRenderBlockPass()>0){
+					float blockAlpha = a * 1.0f/255;
+					MapBlocks.alphas.put(blockInfo.id, blockAlpha);
+					JourneyMap.getLogger().fine("Setting transparency for " + stringInfo(blockInfo));
+				} else if(MapBlocks.alphas.containsKey(blockInfo.id)) {
+					blockInfo.setAlpha(MapBlocks.alphas.get(blockInfo.id));
+				}
+				
+				
+			} catch (IOException e1) {
+				e1.printStackTrace();
+				JourneyMap.getLogger().warning("Couldn't read InputStream for " + stringInfo(blockInfo));
+				color = Color.black;
+			}
+        }
+
         return color;
+	}
+	
+	void validateResourcePack() {
+		// Check if the resourcepack has changed
+    	ResourcePack currentPack = null;
+    	if(useCustomTexturePack && texturePackList.func_110613_c().size()>0) {
+			ResourcePackRepositoryEntry rpre = (ResourcePackRepositoryEntry) texturePackList.func_110613_c().get(0);
+			currentPack = rpre.func_110514_c();
+		} else {
+			currentPack = texturePackList.field_110620_b; // DefaultResourcePack
+		}
+    	if(texturePack!=currentPack) {
+    		texturePack = currentPack;
+    		grassBiomeColors.clear();
+    		waterBiomeColors.clear();
+    		foliageBiomeColors.clear();				
+    		colors.clear();    				
+    		colors.put(new BlockInfo(0,0), new Color(0x000000)); // air    		
+    		MapBlocks.resetAlphas();
+    		JourneyMap.getLogger().info("Deriving block colors from ResourcePack: " + texturePack.func_130077_b());
+    	} 
+    	lastTextureUsed = System.currentTimeMillis();
 	}
 	
 	int getARGBfromArray(byte[] bytes, int x, int y, int textureWidth) {
@@ -423,37 +431,5 @@ public class ColorCache {
 		return sb.toString();
 	}
 	
-	void renewCachedData(TextureAtlasSprite icon) {
-		
-		// TODO:  Get the resource of the icon this way
-//		Minecraft.getMinecraft().func_110442_L().
-//		Resource var3 = par1ResourceManager.func_110536_a(this.field_110568_b);
-//        var2 = var3.func_110527_b();
-//        BufferedImage var4 = ImageIO.read(var2);
-        
-		// This is here just in case a texture can have more than one sheet for blocks
-    	// If the texture sheet has changed, will need a new bufferedimage
-//    	if(!texSheet.getTextureName().equals(lastTextureName)) {
-//    		
-//            ByteBuffer buffer = texSheet.getTextureData();
-//            lastTextureName = texSheet.getTextureName();
-//            lastTextureData = new byte[texSheet.getWidth() * texSheet.getHeight() * 4];
-//            buffer.position(0);
-//            buffer.get(lastTextureData);
-//            lastTextureUsed = System.currentTimeMillis();
-//    		JourneyMap.getLogger().fine("Cached texture bytes (" + lastTextureData.length/1024 + "KB): " + lastTextureName);
-//    	}
-	}
-	
-	void retireCachedData() {
-		if(lastTextureUsed+10000<System.currentTimeMillis()) {
-			if(lastTextureData!=null) {
-				JourneyMap.getLogger().fine("Dumped texture bytes (" + lastTextureData.length/1024 + "KB): " + lastTextureName);
-				lastTextureUsed = 0;
-				lastTextureData = null;
-				lastTextureName = null;
-			}
-		}
-	}
 
 }
