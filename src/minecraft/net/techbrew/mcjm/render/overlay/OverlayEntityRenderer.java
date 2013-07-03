@@ -5,7 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
@@ -71,7 +71,8 @@ public class OverlayEntityRenderer extends BaseOverlayRenderer<MapOverlayState> 
 			if(textureIndex==null && entityImage!=null) {
 												
 				// Allocate the new map image as a texture
-				textureIndex = Minecraft.getMinecraft().renderEngine.allocateAndSetupTexture((BufferedImage) entityImage);				
+				// TODO
+				//textureIndex = Minecraft.getMinecraft().func_110434_K().allocateAndSetupTexture((BufferedImage) entityImage);				
 			}
 			
 			// Draw to screen
@@ -99,7 +100,8 @@ public class OverlayEntityRenderer extends BaseOverlayRenderer<MapOverlayState> 
 		entityImage = null;
 		if(textureIndex!=null) {
 			try {
-				Minecraft.getMinecraft().renderEngine.deleteTexture(textureIndex);
+				// TODO
+				// Minecraft.getMinecraft().func_110434_K().deleteTexture(textureIndex);
 				textureIndex = null;
 			} catch(Throwable t) {
 				JourneyMap.getLogger().warning("Map image texture not deleted: " + t.getMessage());

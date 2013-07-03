@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.JourneyMap;
@@ -45,7 +45,7 @@ public class PlayerData implements IDataProvider {
 	   
 		LinkedHashMap props = new LinkedHashMap();
 
-		props.put(EntityKey.username, player.username);
+		props.put(EntityKey.username, player.getEntityName());
 		props.put(EntityKey.heading, EntityHelper.getHeading(player));
 		props.put(EntityKey.chunkCoordX, player.chunkCoordX); 
 		props.put(EntityKey.chunkCoordY, player.chunkCoordY); 

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityAnimal;
@@ -248,7 +248,8 @@ public class EntityHelper {
 	 * @return
 	 */
 	public static String getFileName(Entity entity) {
-		String tex = entity.getTexture();
+		// TODO
+		String tex = entity.getEntityName();
 		int i = tex.lastIndexOf('/');
 		return tex.substring(i+1);
 	}

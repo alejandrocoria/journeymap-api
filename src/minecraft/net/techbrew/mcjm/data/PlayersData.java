@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.World;
@@ -54,7 +54,7 @@ public class PlayersData implements IDataProvider {
 			for(EntityPlayer other : others) {
 				LinkedHashMap otherProps = new LinkedHashMap();
 				otherProps.put(EntityKey.filename, EntityHelper.PLAYER_FILENAME); 
-				otherProps.put(EntityKey.username, other.username);
+				otherProps.put(EntityKey.username, other.getEntityName());
 				otherProps.put(EntityKey.posX, (int) other.posX); 
 				otherProps.put(EntityKey.posY, (int) other.posY); 
 				otherProps.put(EntityKey.posZ, (int) other.posZ);

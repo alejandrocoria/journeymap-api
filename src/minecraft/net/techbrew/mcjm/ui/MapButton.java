@@ -1,6 +1,6 @@
 package net.techbrew.mcjm.ui;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.GuiSmallButton;
 import net.minecraft.src.Tessellator;
 
@@ -84,7 +84,9 @@ public class MapButton extends GuiSmallButton {
 			GL11.glColor4f(.5F, .5F, .5F, 1F);
 		}
 		GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
-		GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, minecraft.renderEngine.getTexture(icon));
+		
+		// TODO
+		// GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, minecraft.func_110434_K().getTexture(icon));
 		
 		// Check hover
 		boolean hover = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;

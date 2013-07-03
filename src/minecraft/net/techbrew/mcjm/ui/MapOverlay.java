@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.EntityPlayer;
@@ -161,7 +161,8 @@ public class MapOverlay extends GuiScreen {
 		}
 		
 		if(logoTextureIndex==null) {
-			logoTextureIndex = mc.renderEngine.getTexture(FileHandler.WEB_DIR + "/ico/journeymap40.png"); //$NON-NLS-1$
+			// TODO
+			//logoTextureIndex = mc.func_110434_K().getTexture(FileHandler.WEB_DIR + "/ico/journeymap40.png"); //$NON-NLS-1$
 		}
 		BaseOverlayRenderer.drawImage(logoTextureIndex, 1F, 3, 1, 20,20); 
 	}
@@ -1026,7 +1027,8 @@ public class MapOverlay extends GuiScreen {
 
 	protected void eraseCachedLogoImg() {
 		if(logoTextureIndex!=null) {
-			mc.renderEngine.deleteTexture(logoTextureIndex);
+			// TODO
+			//mc.func_110434_K().deleteTexture(logoTextureIndex);
 			logoTextureIndex = null;
 		}
 	}

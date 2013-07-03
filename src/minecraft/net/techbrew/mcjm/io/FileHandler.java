@@ -11,7 +11,7 @@ import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
@@ -26,7 +26,7 @@ public class FileHandler {
 	public static volatile File lastWorldDir;
 	
 	public static File getJourneyMapDir() {
-		return new File(Minecraft.getMinecraftDir(), Constants.JOURNEYMAP_DIR);
+		return new File(Minecraft.getMinecraft().mcDataDir, Constants.JOURNEYMAP_DIR);
 	}
 		
 	
@@ -41,7 +41,7 @@ public class FileHandler {
 	
 	public static File getWorldDir(Minecraft minecraft, long hash) {
 		
-		File mcDir = Minecraft.getMinecraftDir();
+		File mcDir = Minecraft.getMinecraft().mcDataDir;
 		
 		if(lastWorldHash!=hash || lastWorldDir==null) {
 			File worldDir = null;
@@ -57,7 +57,7 @@ public class FileHandler {
 				JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(e));
 				throw new RuntimeException(e);
 			}			
-			if(minecraft.isSingleplayer() || minecraft.getServerData()!=null) {
+			if(minecraft.isSingleplayer()) {
 				worldDir.mkdirs();			
 			} 
 			lastWorldHash = hash;
@@ -70,7 +70,7 @@ public class FileHandler {
 		if(!minecraft.isSingleplayer()) {
 			String worldName = minecraft.theWorld.getWorldInfo().getWorldName();
 			if("MpServer".equals(worldName)) worldName = "";			
-			return URLEncoder.encode(minecraft.getServerData().serverName + "_" + worldName, "UTF-8"); //$NON-NLS-1$
+			return URLEncoder.encode(minecraft.getIntegratedServer().getHostname() + "_" + minecraft.getIntegratedServer().getFolderName(), "UTF-8"); //$NON-NLS-1$
 		} else {
 			return URLEncoder.encode(minecraft.getIntegratedServer().getWorldName(), "UTF-8"); //$NON-NLS-1$
 		}		

@@ -1,7 +1,7 @@
 package net.minecraft.src;
 
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.ModLoader;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;

@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -120,7 +120,7 @@ public class MapSaver {
 	 */
 	private static File createMapFile(String suffix)
     {
-		File screenshots = new File(Minecraft.getMinecraftDir(), "screenshots");
+		File screenshots = new File(Minecraft.getMinecraft().mcDataDir, "screenshots");
 		if(!screenshots.exists()) {
 			screenshots.mkdir();
 		}

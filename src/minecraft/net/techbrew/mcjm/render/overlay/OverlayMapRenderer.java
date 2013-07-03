@@ -3,7 +3,7 @@ package net.techbrew.mcjm.render.overlay;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
@@ -59,7 +59,9 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 						size, size);
 				
 				// Allocate the new map image as a texture
-				int tmpTextureIndex = mc.renderEngine.allocateAndSetupTexture((BufferedImage) tmpMapImg);
+				// TODO
+				int tmpTextureIndex = 0;
+				//int tmpTextureIndex = mc.func_110434_K().allocateAndSetupTexture((BufferedImage) tmpMapImg);
 				
 				// If it worked, set the member vars
 				eraseCachedImg();
@@ -91,7 +93,8 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 		mapImg = null;
 		if(textureIndex!=null) {
 			try {
-				Minecraft.getMinecraft().renderEngine.deleteTexture(textureIndex);				
+				// TODO
+				//Minecraft.getMinecraft().func_110434_K().deleteTexture(textureIndex);				
 			} catch(Throwable t) {
 				JourneyMap.getLogger().warning("Map image texture not deleted: " + t.getMessage());
 				t.printStackTrace();

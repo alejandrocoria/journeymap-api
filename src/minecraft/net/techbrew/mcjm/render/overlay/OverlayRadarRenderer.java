@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -63,7 +63,7 @@ public class OverlayRadarRenderer extends BaseEntityOverlayRenderer<List<Map>> {
 			Boolean isHostile, isPet, isPlayer;
 			boolean filterAnimals = (showAnimals!=showPets);
 			FontMetrics fm = g2D.getFontMetrics();
-			String playername = Minecraft.getMinecraft().thePlayer.username;
+			String playername = Minecraft.getMinecraft().thePlayer.getEntityName();
 			
 			for(Map critter : critters) {
 				

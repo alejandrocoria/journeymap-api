@@ -10,7 +10,7 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.World;

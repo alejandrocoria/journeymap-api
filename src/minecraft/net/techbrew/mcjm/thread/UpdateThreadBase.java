@@ -2,7 +2,7 @@ package net.techbrew.mcjm.thread;
 
 import java.util.logging.Level;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
@@ -33,7 +33,7 @@ public abstract class UpdateThreadBase implements Runnable {
 			// Bail if needed
 			Minecraft mc = Minecraft.getMinecraft();
 			if(mc == null || !journeyMap.isRunning()) return;
-			if(mc.isSingleplayer()==false && mc.getServerData()==null) return;
+			if(mc.isSingleplayer()==false) return;
 						
 			// Check player status
 			EntityPlayer player = mc.thePlayer;

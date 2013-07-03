@@ -1,11 +1,14 @@
 package net.techbrew.mcjm.render;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.HashMap;
 
-import net.minecraft.client.Minecraft;
+import javax.imageio.ImageIO;
+
+
 import net.minecraft.src.BiomeGenBase;
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockGrass;
@@ -13,18 +16,23 @@ import net.minecraft.src.BlockLeaves;
 import net.minecraft.src.BlockLilyPad;
 import net.minecraft.src.BlockTallGrass;
 import net.minecraft.src.BlockVine;
-import net.minecraft.src.ITexturePack;
+import net.minecraft.src.Icon;
 import net.minecraft.src.Item;
+import net.minecraft.src.Resource;
+import net.minecraft.src.ResourcePack;
+import net.minecraft.src.ResourcePackRepository;
+import net.minecraft.src.ResourcePackRepositoryEntry;
+import net.minecraft.src.TextureAtlasSprite;
+import net.minecraft.src.TextureMap;
+import net.minecraft.src.TexturedQuad;
+
 import net.minecraft.src.ItemBlock;
-import net.minecraft.src.Texture;
-import net.minecraft.src.TexturePackDefault;
-import net.minecraft.src.TexturePackList;
-import net.minecraft.src.TextureStitched;
+import net.minecraft.src.Minecraft;
+
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkStub;
-import net.techbrew.mcjm.model.TextureStitchedStub;
 
 /**
  * Cache of block colors derived from the current texture pack.
@@ -42,15 +50,15 @@ public class ColorCache {
 	final HashMap<BlockInfo, Float> partialTransparencies = new HashMap<BlockInfo, Float>(16);
 	
 	final boolean useCustomTexturePack;
-	final TexturePackList texturePackList;
-	volatile ITexturePack texturePack;
+	final ResourcePackRepository texturePackList;
+	volatile ResourcePack texturePack;
 	
 	volatile String lastTextureName = null;
 	volatile byte[] lastTextureData;
 	volatile long lastTextureUsed;
 	
 	public ColorCache() {
-		texturePackList = Minecraft.getMinecraft().texturePackList;
+		texturePackList = Minecraft.getMinecraft().func_110438_M();
 		useCustomTexturePack = PropertyManager.getInstance().getBoolean(PropertyManager.Key.USE_CUSTOM_TEXTUREPACK);
 		init();
 	}
@@ -61,12 +69,14 @@ public class ColorCache {
 	void init() {
 		
 		if(useCustomTexturePack) {
-			texturePack = texturePackList.getSelectedTexturePack();
+			texturePack = texturePackList.field_110620_b; // DefaultResourcePack
+			// TODO
+			//texturePack = ((ResourcePackRepositoryEntry) texturePackList.func_110613_c().get(0)).func_110514_c();
 		} else {
-			texturePack = new TexturePackDefault();
+			texturePack = texturePackList.field_110620_b; // DefaultResourcePack
 		}
 		
-		JourneyMap.getLogger().info("Deriving block colors from texture pack: " + texturePack.getTexturePackID());
+		JourneyMap.getLogger().info("Deriving block colors from texture pack: " + texturePack.func_130077_b());
 		
 		lastTextureName = null;
 		lastTextureData = null;
@@ -152,7 +162,9 @@ public class ColorCache {
 		}
 
 		// Check for changed texturepack
-		if(useCustomTexturePack && texturePackList.getSelectedTexturePack()!=texturePack) {
+		// TODO
+		//if(useCustomTexturePack && texturePack!=((ResourcePackRepositoryEntry) texturePackList.func_110613_c().get(0)).func_110514_c()) {
+		if(useCustomTexturePack && texturePack!=texturePackList.field_110620_b) {
 			init();
 		}
 		
@@ -193,21 +205,24 @@ public class ColorCache {
             	return null;
             }
 
-        	TextureStitched blockIcon = (TextureStitched) block.getIcon(0, blockInfo.meta);
+            TextureAtlasSprite blockIcon = (TextureAtlasSprite) block.getIcon(0, blockInfo.meta);
         	if(blockIcon==null) {
         		JourneyMap.getLogger().fine("No top icon");
         		return null;
         	}
         	
-        	TextureStitchedStub icon = new TextureStitchedStub(blockIcon);	 
-        	Texture texSheet = icon.getTextureSheet();	       
+        	// TODO
+//        	TextureStitchedStub icon = new TextureStitchedStub(blockIcon);	 
+//        	Texture texSheet = icon.getTextureSheet();	       
+//        	
+//        	if(texSheet==null) {
+//        		JourneyMap.getLogger().fine("No Texture");
+//        		return null;
+//        	}
+//        	
+//        	renewCachedData(texSheet);
         	
-        	if(texSheet==null) {
-        		JourneyMap.getLogger().fine("No Texture");
-        		return null;
-        	}
-        	
-        	renewCachedData(texSheet);
+        	renewCachedData(blockIcon);
         	
         	Color color = getColorForIcon(blockInfo, blockIcon);            
              
@@ -231,15 +246,20 @@ public class ColorCache {
 		}
 	}
 	
-	Color getColorForIcon(BlockInfo blockInfo, TextureStitched blockIcon) {
+	Color getColorForIcon(BlockInfo blockInfo, TextureAtlasSprite icon) {
 
-		TextureStitchedStub icon = new TextureStitchedStub(blockIcon);
-		int width = icon.getOriginX() + icon.getWidth();
-		int height = icon.getOriginY() + icon.getHeight();
-		Texture texSheet = icon.getTextureSheet();	
+//		TextureStitchedStub icon = new TextureStitchedStub(blockIcon);
+		int width = icon.getOriginX();// + icon.getWidth();
+		int height = icon.getOriginY();// + icon.getHeight();
+		int originX = icon.func_130010_a();
+		int originY = icon.func_110967_i();
+		//Texture texSheet = icon.getTextureSheet();	
 		
-		int sheetWidth = texSheet.getWidth();
-		int sheetHeight = texSheet.getHeight();
+//		int sheetWidth = texSheet.getWidth();
+//		int sheetHeight = texSheet.getHeight();
+		
+		int sheetWidth = width;
+		int sheetHeight = height;
     	
         // TODO: Track percentage of pixels that aren't transparent, use that as factor when multiplying biome/grass/foliage color
         
@@ -247,8 +267,8 @@ public class ColorCache {
         int alpha;
         int argb;
         int a=0, r=0, g=0, b=0;
-        for(int x=icon.getOriginX(); x<width; x++) {
-        	for(int y=icon.getOriginY(); y<height; y++) {
+        for(int x=originX; x<width; x++) {
+        	for(int y=originY; y<height; y++) {
         		argb = getARGBfromArray(lastTextureData, x, y, sheetWidth);
         		alpha = (argb >> 24) & 0xFF;
         		if(alpha>0) {
@@ -384,7 +404,7 @@ public class ColorCache {
 		StringBuffer sb = new StringBuffer();
 		Block block = info.getBlock();
 		if(block!=null) {
-			sb.append("Block ").append(block.getUnlocalizedName2()).append(" ");
+			sb.append("Block ").append(block.getUnlocalizedName()).append(" ");
 		} else {
 			sb.append("Non-Block ");
 		}
@@ -403,19 +423,26 @@ public class ColorCache {
 		return sb.toString();
 	}
 	
-	void renewCachedData(Texture texSheet) {
+	void renewCachedData(TextureAtlasSprite icon) {
+		
+		// TODO:  Get the resource of the icon this way
+//		Minecraft.getMinecraft().func_110442_L().
+//		Resource var3 = par1ResourceManager.func_110536_a(this.field_110568_b);
+//        var2 = var3.func_110527_b();
+//        BufferedImage var4 = ImageIO.read(var2);
+        
 		// This is here just in case a texture can have more than one sheet for blocks
     	// If the texture sheet has changed, will need a new bufferedimage
-    	if(!texSheet.getTextureName().equals(lastTextureName)) {
-    		
-            ByteBuffer buffer = texSheet.getTextureData();
-            lastTextureName = texSheet.getTextureName();
-            lastTextureData = new byte[texSheet.getWidth() * texSheet.getHeight() * 4];
-            buffer.position(0);
-            buffer.get(lastTextureData);
-            lastTextureUsed = System.currentTimeMillis();
-    		JourneyMap.getLogger().fine("Cached texture bytes (" + lastTextureData.length/1024 + "KB): " + lastTextureName);
-    	}
+//    	if(!texSheet.getTextureName().equals(lastTextureName)) {
+//    		
+//            ByteBuffer buffer = texSheet.getTextureData();
+//            lastTextureName = texSheet.getTextureName();
+//            lastTextureData = new byte[texSheet.getWidth() * texSheet.getHeight() * 4];
+//            buffer.position(0);
+//            buffer.get(lastTextureData);
+//            lastTextureUsed = System.currentTimeMillis();
+//    		JourneyMap.getLogger().fine("Cached texture bytes (" + lastTextureData.length/1024 + "KB): " + lastTextureName);
+//    	}
 	}
 	
 	void retireCachedData() {

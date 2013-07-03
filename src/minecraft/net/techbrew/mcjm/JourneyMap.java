@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.BaseMod;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.EntityPlayer;
@@ -20,6 +20,8 @@ import net.minecraft.src.GuiMultiplayer;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.GuiSelectWorld;
 import net.minecraft.src.KeyBinding;
+import net.minecraft.src.ModLoader;
+import net.minecraft.src.ServerData;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
@@ -201,7 +203,8 @@ public class JourneyMap {
 			}
 
 			// Don't do anything when game is paused
-			if(minecraft.isSingleplayer() && minecraft.isGamePaused) {
+			boolean isGamePaused = minecraft.isSingleplayer() && minecraft.currentScreen != null && minecraft.currentScreen.doesGuiPauseGame() && !minecraft.getIntegratedServer().getPublic();
+			if(isGamePaused) {
 				//return true; // TODO
 			}
 
@@ -214,10 +217,8 @@ public class JourneyMap {
 
 			// Multiplayer:  Bail if server info not available or hash has changed
 			if(!minecraft.isSingleplayer()) {	
-				if(minecraft.getServerData()==null) {
-					running = false;
-					return true;
-				}				
+				running = false;
+				return true;			
 			}
 
 			// Check for valid player chunk
@@ -240,7 +241,7 @@ public class JourneyMap {
 			}
 
 			// Show announcements
-			while(!minecraft.isGamePaused && !announcements.isEmpty()) {
+			while(!isGamePaused && !announcements.isEmpty()) {
 				player.addChatMessage(announcements.remove(0));
 			}
 
@@ -305,11 +306,8 @@ public class JourneyMap {
 
 		Boolean announceReady = false;
 		Minecraft minecraft = Minecraft.getMinecraft();
-		if(minecraft.isSingleplayer()==false) {
-			if(minecraft.getServerData()!=null) {
-				announceReady = true;
-				logger.info("Mapping in multiplayer world: " + minecraft.getServerData().serverName + " , " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$ //$NON-NLS-2$
-			}
+		if(minecraft.isSingleplayer()==false) {		
+			logger.info("Mapping in multiplayer world: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 			announceReady = true;
 			logger.info("Mapping in singleplayer world: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$

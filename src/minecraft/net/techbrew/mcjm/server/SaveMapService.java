@@ -3,7 +3,7 @@ package net.techbrew.mcjm.server;
 import java.io.File;
 import java.io.FileInputStream;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;

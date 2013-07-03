@@ -5,9 +5,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
+
 import net.minecraft.src.ChunkCoordinates;
 import net.minecraft.src.EntityClientPlayerMP;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 
