@@ -82,7 +82,7 @@ public class DataService extends BaseService {
 		// If not a request for L10N, check world/minecraft status
 		if(!path.equals("/data/messages")) {		
 			// Ensure JourneyMap and World is loaded
-			if(!JourneyMap.isRunning()) {
+			if(!JourneyMap.getInstance().isRunning()) {
 				throwEventException(503, Constants.getMessageJMERR02(), event, false);
 			} else if(Minecraft.getMinecraft().theWorld==null) {
 				throwEventException(503, Constants.getMessageJMERR09(), event, false);

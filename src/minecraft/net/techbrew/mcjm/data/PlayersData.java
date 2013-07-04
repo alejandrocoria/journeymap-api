@@ -87,7 +87,7 @@ public class PlayersData implements IDataProvider {
 		int x = ((int) Math.floor(player.posX) % 16) & 15;
 		int z = ((int) Math.floor(player.posZ) % 16) & 15;
 		
-		ChunkStub playerChunk = JourneyMap.getLastPlayerChunk();
+		ChunkStub playerChunk = JourneyMap.getInstance().getLastPlayerChunk();
 		if(playerChunk!=null) {
 			return playerChunk.getBiomeGenForWorldCoords(x,z, mc.theWorld.getWorldChunkManager()).biomeName;
 		} else {

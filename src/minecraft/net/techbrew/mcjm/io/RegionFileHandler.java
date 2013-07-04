@@ -237,71 +237,26 @@ public class RegionFileHandler {
 	 */
 	public void writeRegionFile(RegionCoord rCoord, BufferedImage regionImage) {
 
-		FileOutputStream fos = null;
-		FileLock fileLock = null;		
-		FileOutputStream outputFile = null;
 		
 		if(regionImage==null) {
 			JourneyMap.getLogger().warning("Null regionImage?");
 			return;
-		}
-		
-		ImageOutputStream imageOutputStream;	
-		ImageWriter imageWriter;
-		ImageWriteParam pngparams;
-		
+		}		
 		
 		File regionFile = getRegionFile(rCoord);
 	    try {
-//	    	if(!regionFile.exists()) {
-//	    		regionFile.createNewFile();	
-//	    	}
-//	    	fos = new FileOutputStream(regionFile);
-//			FileChannel fc = fos.getChannel();
-//			if(fc.isOpen()) {
-////				JourneyMap.getLogger().warning("Region file already open:" + regionFile.getPath());
-////				return;
-//			}
-//			fileLock = fc.lock();
-//			
-//
-//			imageWriter = (ImageWriter) ImageIO.getImageWritersByFormatName( "png" ).next();
-//			pngparams = imageWriter.getDefaultWriteParam();
-//			//pngparams.setCompressionQuality(1F);
-//			pngparams.setProgressiveMode(ImageWriteParam.MODE_DISABLED);
-//			pngparams.setDestinationType(new ImageTypeSpecifier(regionImage.getColorModel(), regionImage.getSampleModel() ) );
-//			 
-//			imageOutputStream = ImageIO.createImageOutputStream(fos);
-//			imageWriter.setOutput( imageOutputStream );
-//
-//			// Write the changed Image
-//			imageWriter.write(null, new IIOImage(regionImage, null, null ), pngparams );
-//
-//			// Close the streams
-//			imageOutputStream.close();
-//			imageWriter.dispose();
-			
+
+	    	if(!regionFile.canRead()) {
+	    		regionFile.mkdirs();
+	    	}
+	    	
+	    	JourneyMap.getLogger().info("RegionImage updating: " + regionFile);
 			ImageIO.write(regionImage, "png", regionFile);
-    		
+			    		
 	    } catch (Throwable e) {
 	    	String error = Constants.getMessageJMERR22(regionFile, LogFormatter.toString(e));
 			JourneyMap.getLogger().severe(error);
-	    } finally {
-	    	if(fileLock!=null) {
-				try {
-					fileLock.release();
-				} catch (IOException e) {
-					JourneyMap.getLogger().severe("Error releasing file lock: " + LogFormatter.toString(e));
-				}
-	    	}
-	    	if(fos!=null) {
-				try {
-					fos.close();
-				} catch (IOException e) {
-					JourneyMap.getLogger().severe("Error closing file lock: " + LogFormatter.toString(e));
-				}
-	    	}
-	    }
+	    } 
 		
 	}
 	
@@ -454,7 +409,7 @@ public class RegionFileHandler {
 					} catch(IOException e) {
 						String error = Constants.getMessageJMERR22(rfile, LogFormatter.toString(e));
 						JourneyMap.getLogger().severe(error);
-						JourneyMap.announce(error);
+						JourneyMap.getInstance().announce(error);
 					}
 				}
 				files.add(rfile);

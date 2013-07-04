@@ -197,7 +197,7 @@ public class MapOverlay extends GuiScreen {
 			JourneyMap.getLogger().log(Level.SEVERE, "Unexpected exception in MapOverlay.drawScreen(): " + e); //$NON-NLS-1$
 			JourneyMap.getLogger().severe(LogFormatter.toString(e));
 			String error = Constants.getMessageJMERR23(e.getMessage());
-			JourneyMap.announce(error);
+			JourneyMap.getInstance().announce(error);
 		} finally {
 			mc.gameSettings.guiScale = oldGuiScale;
 		}
@@ -847,7 +847,7 @@ public class MapOverlay extends GuiScreen {
 		final Constants.MapType useMapType = checkMapType;
 		close();
 		
-		JourneyMap.getChunkExecutor().schedule(new Runnable() {
+		JourneyMap.getInstance().getChunkExecutor().schedule(new Runnable() {
 			public void run() {							
 				try {			
 					final Constants.CoordType cType = Constants.CoordType.convert(useMapType, mc.thePlayer.dimension);
@@ -855,12 +855,12 @@ public class MapOverlay extends GuiScreen {
 				} catch (java.lang.OutOfMemoryError e) {
 					String error = Constants.getMessageJMERR18("Out Of Memory: Increase Java Heap Size for Minecraft to save large maps.");
 					JourneyMap.getLogger().severe(error);
-					JourneyMap.announce(error);
+					JourneyMap.getInstance().announce(error);
 				} catch (Throwable t) {	
 					String error = Constants.getMessageJMERR18(t.getMessage());
 					JourneyMap.getLogger().severe(error);
 					JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
-					JourneyMap.announce(error);
+					JourneyMap.getInstance().announce(error);
 					return;
 				}
 			}			

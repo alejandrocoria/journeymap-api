@@ -54,40 +54,44 @@ public class JourneyMap {
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
 	public static final String JM_VERSION = "2.7.0b1"; //$NON-NLS-1$
 	public static final String MC_VERSION = "1.6.1"; //$NON-NLS-1$
-
-	private static volatile Boolean initialized = false;
 	
-	private static Boolean modAnnounced = false;
-	private static JMLogger logger;
-	private static JMServer jmServer;
+	private static class Holder {
+        private static final JourneyMap INSTANCE = new JourneyMap();
+    }
 
-	public static volatile ChunkStub lastPlayerChunk;
+    public static JourneyMap getInstance() {
+        return Holder.INSTANCE;
+    }
+
+	private volatile Boolean initialized = false;
+	
+	private Boolean modAnnounced = false;
+	private JMLogger logger;
+	private JMServer jmServer;
+
+	public volatile ChunkStub lastPlayerChunk;
 
 	// Invokes MapOverlay
-	public static KeyBinding keybinding;
+	public KeyBinding keybinding;
 
 	// Milliseconds between updates
-	public static int chunkDelay;
+	public int chunkDelay;
 
 	// Time stamp of next chunk update
-	public static long nextPlayerUpdate = 0;
-	public static long nextChunkUpdate = 0;
-	private static volatile boolean running = false;
+	public long nextPlayerUpdate = 0;
+	public long nextChunkUpdate = 0;
+	private volatile boolean running = false;
 
 	// Whether webserver is running
 	boolean enableWebserver;
 	public boolean enableMapGui;
 	boolean enableAnnounceMod;
 
-	//private ChannelClient channelClient;
-
-	private boolean executorsStarted = false;
-
 	// Thread service for writing chunks
-	private static ScheduledExecutorService chunkExecutor;
+	private volatile ScheduledExecutorService chunkExecutor;
 
 	// Announcements
-	private static List<String> announcements = Collections.synchronizedList(new LinkedList<String>());
+	private List<String> announcements = Collections.synchronizedList(new LinkedList<String>());
 
 	/**
 	 * Constructor.
@@ -96,49 +100,56 @@ public class JourneyMap {
 		
 	}
 	
+    public Boolean isInitialized() {
+    	return initialized;
+    }
+    
 	/**
 	 * Initialize
 	 */
-	private void initialize(Minecraft minecraft) {
-
-		synchronized(initialized) {
-
-			// Start logFile
-			getLogger().info("JourneyMap v" + JM_VERSION + " starting " + new Date()); //$NON-NLS-1$ //$NON-NLS-2$
-			logger.environment();
-			logger.info("Properties: " + PropertyManager.getInstance().toString()); //$NON-NLS-1$
-
-			// Use property settings
-			chunkDelay = PropertyManager.getInstance().getInteger(PropertyManager.Key.UPDATETIMER_CHUNKS);
-			enableAnnounceMod = PropertyManager.getInstance().getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED); 
-
-			// Webserver
-			enableWebserver = PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
-			if(enableWebserver) {
-				try {			
-					//new LibraryLoader().loadLibraries();
-					jmServer = new JMServer();
-					jmServer.start();			
-				}
-				catch(Throwable e) {
-					getLogger().throwing("JourneyMap", "constructor", e); //$NON-NLS-1$ //$NON-NLS-2$
-					JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(e));
-					announce(Constants.getMessageJMERR24()); 
-					enableWebserver = false;
-				}
-			}
-
-			// Check for newer version online
-			if(VersionCheck.getVersionIsCurrent()==false) {
-				announce(Constants.getString("JourneyMap.new_version_available", WEBSITE_URL)); //$NON-NLS-1$
-			}
-
-			initialized = true;
-			
-			// Override log level now that loading complete
-			logger.info("Initialization complete."); //$NON-NLS-1$
-			logger.setLevelFromProps();
+	public void initialize(Minecraft minecraft) {
+		
+		if(initialized) {
+			logger.warning("Already initialized, aborting");
+			return;
 		}
+
+		// Start logFile
+		logger.info("JourneyMap v" + JM_VERSION + " starting " + new Date()); //$NON-NLS-1$ //$NON-NLS-2$
+		logger.environment();
+		logger.info("Properties: " + PropertyManager.getInstance().toString()); //$NON-NLS-1$
+
+		// Use property settings
+		chunkDelay = PropertyManager.getInstance().getInteger(PropertyManager.Key.UPDATETIMER_CHUNKS);
+		enableAnnounceMod = PropertyManager.getInstance().getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED); 
+
+		// Webserver
+		enableWebserver = PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
+		if(enableWebserver) {
+			try {			
+				//new LibraryLoader().loadLibraries();
+				jmServer = new JMServer();
+				jmServer.start();			
+			}
+			catch(Throwable e) {
+				logger.throwing("JourneyMap", "constructor", e); //$NON-NLS-1$ //$NON-NLS-2$
+				logger.log(Level.SEVERE, LogFormatter.toString(e));
+				announce(Constants.getMessageJMERR24()); 
+				enableWebserver = false;
+			}
+		}
+
+		// Check for newer version online
+		if(VersionCheck.getVersionIsCurrent()==false) {
+			announce(Constants.getString("JourneyMap.new_version_available", WEBSITE_URL)); //$NON-NLS-1$
+		}
+
+		initialized = true;
+		
+		// Override log level now that loading complete
+		logger.info("Initialization complete."); //$NON-NLS-1$
+		logger.setLevelFromProps();
+
 	}
 
 	/**
@@ -166,17 +177,16 @@ public class JourneyMap {
 				GuiMultiplayer guiMulti = (GuiMultiplayer) guiscreen;
 			}
 			if(!running) {
-				if(executorsStarted) {
-					getLogger().info("Shutting down JourneyMap threads"); //$NON-NLS-1$
+				if(chunkExecutor!=null && !chunkExecutor.isTerminated()) {
+					logger.info("Shutting down JourneyMap threads"); //$NON-NLS-1$
 					FileHandler.lastWorldHash = -1;
 					FileHandler.lastWorldDir = null;
-					getChunkExecutor().shutdown();
-					executorsStarted = false;
+					chunkExecutor.shutdown();
 					RegionImageCache.getInstance().flushToDisk();
 				}
 			}
 		} catch(Exception e) {
-			getLogger().severe(LogFormatter.toString(e));
+			logger.severe(LogFormatter.toString(e));
 		}
 		return true;
 	}
@@ -190,6 +200,10 @@ public class JourneyMap {
 	public boolean onTickInGame(float f, final Minecraft minecraft) {
 
 		try {
+			
+			if(!initialized) {
+				initialize(minecraft);
+			}
 
 			// If both UIs are disabled, the mod is effectively disabled.
 			if(!enableWebserver && !enableMapGui) {
@@ -211,21 +225,22 @@ public class JourneyMap {
 			// Check for world change
 			long newHash = Utils.getWorldHash(minecraft);
 			if(newHash!=0L) {
-				getLogger().info("Map data: " + FileHandler.getWorldDir(minecraft, newHash));
+				logger.info("Map data: " + FileHandler.getWorldDir(minecraft, newHash));
 				FileHandler.lastWorldHash=newHash;
 			}
 
 			// Multiplayer:  Bail if server info not available or hash has changed
-			if(!minecraft.isSingleplayer()) {	
-				running = false;
-				return true;			
-			}
+			// TODO
+//			if(!minecraft.isSingleplayer()) {	
+//				running = false;
+//				return true;			
+//			}
 
 			// Check for valid player chunk
 			Chunk pChunk = Utils.getChunkIfAvailable(minecraft.theWorld, player.chunkCoordX, player.chunkCoordZ);
 			if(pChunk==null){
 				lastPlayerChunk = null;
-				getLogger().finer("Player chunk not known: " + (player.chunkCoordX) + "," +(player.chunkCoordZ));
+				logger.finer("Player chunk not known: " + (player.chunkCoordX) + "," +(player.chunkCoordZ));
 				return true;
 			} else {
 				if(lastPlayerChunk==null || (player.chunkCoordX!=lastPlayerChunk.xPosition || player.chunkCoordZ!=lastPlayerChunk.zPosition)) {
@@ -246,20 +261,16 @@ public class JourneyMap {
 			}
 
 			// Start executors
-			if(!executorsStarted && chunkDelay>0) {
-
-				getLogger().info("Starting up JourneyMap threads for " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
-				executorsStarted = true;
-
-				// Start chunkExecutor
+			if(chunkExecutor==null || chunkExecutor.isShutdown()) {
+				logger.info("Starting up JourneyMap threads for " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
 				chunkExecutor = Executors.newSingleThreadScheduledExecutor(new JMThreadFactory("chunk"));
-				getChunkExecutor().scheduleWithFixedDelay(new ChunkUpdateThread(this, minecraft.theWorld), 1500, chunkDelay, TimeUnit.MILLISECONDS);
+				chunkExecutor.scheduleWithFixedDelay(new ChunkUpdateThread(this, minecraft.theWorld), 1500, chunkDelay, TimeUnit.MILLISECONDS);
 			} else {
 
 				try {
 					// Populate ChunkStubs on ChunkUpdateThread if it is waiting
 					if(ChunkUpdateThread.getBarrier().isBroken()) {
-						getLogger().finer("Resetting broken Barrier "); 
+						logger.finer("Resetting broken Barrier "); 
 						ChunkUpdateThread.getBarrier().reset();
 					}
 					if(ChunkUpdateThread.getBarrier().getNumberWaiting()==1) {
@@ -268,27 +279,27 @@ public class JourneyMap {
 								long start = System.currentTimeMillis();
 								int[] result = ChunkUpdateThread.currentThread.fillChunkStubs(minecraft.thePlayer, lastPlayerChunk, minecraft.theWorld, FileHandler.lastWorldHash);
 								long stop = System.currentTimeMillis();
-								if(getLogger().isLoggable(Level.FINER)) {
-									getLogger().finer("Stubbed/skipped: " + result[0] + "," + result[1] + " in " + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+								if(logger.isLoggable(Level.FINER)) {
+									logger.finer("Stubbed/skipped: " + result[0] + "," + result[1] + " in " + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 								}
 
 							}
 						} else {
-							if(getLogger().isLoggable(Level.FINER)) {
-								getLogger().finer("ChunkUpdateThread.currentThread==null"); //$NON-NLS-1$ 
+							if(logger.isLoggable(Level.FINER)) {
+								logger.finer("ChunkUpdateThread.currentThread==null"); //$NON-NLS-1$ 
 							}
 						}
-						getLogger().finer("JourneyMap done with fillChunkStubs"); //$NON-NLS-1$ 
+						logger.finer("JourneyMap done with fillChunkStubs"); //$NON-NLS-1$ 
 						if(ChunkUpdateThread.getBarrier().getNumberWaiting()==1) {
 							ChunkUpdateThread.getBarrier().reset(); // Let the chunkthread continue
 						}
 					} else {
-						if(getLogger().isLoggable(Level.FINER)) {
-							//getLogger().finer("ChunkUpdateThread.getBarrier().getNumberWaiting()==" + ChunkUpdateThread.getBarrier().getNumberWaiting()); //$NON-NLS-1$ 
+						if(logger.isLoggable(Level.FINER)) {
+							//logger.finer("ChunkUpdateThread.getBarrier().getNumberWaiting()==" + ChunkUpdateThread.getBarrier().getNumberWaiting()); //$NON-NLS-1$ 
 						}
 					}
 				} catch(Throwable t) {
-					getLogger().info(LogFormatter.toString(t));
+					logger.info(LogFormatter.toString(t));
 				}
 
 			}
@@ -296,8 +307,8 @@ public class JourneyMap {
 		} catch (Throwable t) {
 			String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
 			announce(error);
-			getLogger().throwing("JourneyMap", "OnTickInGame", t); //$NON-NLS-1$ //$NON-NLS-2$
-			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));			
+			logger.throwing("JourneyMap", "OnTickInGame", t); //$NON-NLS-1$ //$NON-NLS-2$
+			logger.log(Level.SEVERE, LogFormatter.toString(t));			
 		} 
 		return true;
 	}
@@ -362,7 +373,7 @@ public class JourneyMap {
 	 * Queue an announcement to be shown in the UI.
 	 * @param message
 	 */
-	public static void announce(String message) {
+	public void announce(String message) {
 		String[] lines = message.split("\n"); //$NON-NLS-1$
 		lines[0] = Constants.getString("JourneyMap.chat_announcement", lines[0]); //$NON-NLS-1$
 		for(String line : lines) {
@@ -370,36 +381,36 @@ public class JourneyMap {
 		}
 	}
 
-	public static ScheduledExecutorService getChunkExecutor() {
+	public ScheduledExecutorService getChunkExecutor() {
 		return chunkExecutor;
 	}
 
 	/**
-	 * TODO: Make threadsafe
+	 * 
 	 * @return
 	 */
 	public static Logger getLogger() {
-		if(logger==null) {
-			synchronized(JourneyMap.class) {
-				logger = new JMLogger();				
-			}
+		
+		JourneyMap instance = getInstance();
+		if(instance.logger==null) {
+			instance.logger = new JMLogger();				
 		}
-		return logger;
+		return instance.logger;
 	}
 
 	/**
-	 * TODO: Make threadsafe
+	 * 
 	 * @return
 	 */
-	public static ChunkStub getLastPlayerChunk() {
+	public ChunkStub getLastPlayerChunk() {
 		return lastPlayerChunk;
 	}
 
 	/**
-	 * TODO: Make threadsafe
+	 * 
 	 * @return
 	 */
-	public static Boolean isRunning() {
+	public Boolean isRunning() {
 		return running;
 	}
 

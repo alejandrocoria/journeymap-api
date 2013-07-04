@@ -1,13 +1,18 @@
 package net.techbrew.mcjm.data;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.ModLoader;
+import net.minecraft.src.NetClientHandler;
 import net.minecraft.src.ServerData;
 import net.minecraft.src.WorldInfo;
 import net.techbrew.mcjm.JourneyMap;
@@ -82,6 +87,47 @@ public class WorldData implements IDataProvider {
 //		return worldDirName;
 //	}
 	
+	private static String getServerHash() {
+		String serverName = getServerName();
+		try
+	    {
+	      MessageDigest md5 = MessageDigest.getInstance("MD5");	      
+	      if (md5 != null)
+	      {	    	 
+	          byte[] bServerName = serverName.getBytes("UTF-8");
+	          byte[] hashed = md5.digest(bServerName);
+	          BigInteger bigInt = new BigInteger(1, hashed);
+	          String md5Hash = bigInt.toString(16);
+	          while (md5Hash.length() < 32) {
+	            md5Hash = "0" + md5Hash;
+	          }
+	          return md5Hash;
+	      } 
+	    }
+	    catch (Exception ex)
+	    {
+	    }
+		return serverName;
+	}
+	
+	private static String getServerName() {
+		try
+	    {
+			NetClientHandler sendQueue = Minecraft.getMinecraft().thePlayer.sendQueue;
+	        SocketAddress socketAddress = sendQueue.getNetManager().getSocketAddress();
+	        if ((socketAddress instanceof InetSocketAddress))
+	        {
+	          InetSocketAddress inetAddr = (InetSocketAddress)socketAddress;
+	          return inetAddr.getHostName();	          
+	        }
+	    }
+	    catch (Exception ex)
+	    {
+	    	JourneyMap.getLogger().severe("Couldn't get server name");
+	    }
+	    return "server";
+	}
+	
 	/**
 	 * Get the current world name.
 	 * @param mc
@@ -94,15 +140,12 @@ public class WorldData implements IDataProvider {
 		if(mc.isSingleplayer()) {
 			worldName = mc.getIntegratedServer().getWorldName();
 		} else {
-			Object serverData;
-			try {
-				serverData = ModLoader.getPrivateValue(Minecraft.class, mc, "serverData");
-				worldName = ((ServerData) serverData).serverName;
-			} catch(java.lang.NoSuchFieldException e) {
-				JourneyMap.getLogger().warning(e.toString());
-			} catch (Exception e) {
-				JourneyMap.getLogger().severe(LogFormatter.toString(e));
-			} 
+			worldName = mc.theWorld.getWorldInfo().getWorldName();
+			if(!"MpServer".equals(worldName)) {
+				worldName = getServerName() + "_" + worldName;
+			} else {
+				worldName = getServerName();
+			}
 		} 
 		
 		// Clean it up for display

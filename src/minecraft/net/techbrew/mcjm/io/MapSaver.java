@@ -83,7 +83,7 @@ public class MapSaver {
 		
 		final File saveDir = FileHandler.getJourneyMapDir();
 		
-		JourneyMap.announce(Constants.getString("MapOverlay.saving_map_to_file", cType + " " + mapType)); //$NON-NLS-1$
+		JourneyMap.getInstance().announce(Constants.getString("MapOverlay.saving_map_to_file", cType + " " + mapType)); //$NON-NLS-1$
 		
 		mapFile = createMapFile(FileHandler.getSafeName(Minecraft.getMinecraft()) + "_" + cType + "_" + mapType);
 				
@@ -92,18 +92,18 @@ public class MapSaver {
 		stop = System.currentTimeMillis();
 		
 		JourneyMap.getLogger().info("Map saved in: " + (stop-start) + "ms: " + mapFile); //$NON-NLS-1$ //$NON-NLS-2$
-		JourneyMap.announce(Constants.getString("MapSaver.map_saved", mapFile)); //$NON-NLS-1$
+		JourneyMap.getInstance().announce(Constants.getString("MapSaver.map_saved", mapFile)); //$NON-NLS-1$
 		
 		
 		} catch (java.lang.OutOfMemoryError e) {
 			String error = Constants.getMessageJMERR18("Out Of Memory: Increase Java Heap Size for Minecraft to save large maps.");
 			JourneyMap.getLogger().severe(error);
-			JourneyMap.announce(error);
+			JourneyMap.getInstance().announce(error);
 		} catch (Throwable t) {	
 			String error = Constants.getMessageJMERR18(t.getMessage());
 			JourneyMap.getLogger().severe(error);
 			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
-			JourneyMap.announce(error);
+			JourneyMap.getInstance().announce(error);
 			return null;
 		}
 		

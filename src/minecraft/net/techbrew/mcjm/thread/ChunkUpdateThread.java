@@ -109,7 +109,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 					}
 				}
 				
-				if(!JourneyMap.isRunning()) {
+				if(!JourneyMap.getInstance().isRunning()) {
 					JourneyMap.getLogger().warning("Interupting ChunkUpdateThread.");			 //$NON-NLS-1$
 					return;
 				}
@@ -247,7 +247,7 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 	 */
 	private void mapChunk(ChunkStub chunkStub, boolean underground, int chunkY) {
 		
-		if(!JourneyMap.isRunning()) {
+		if(!JourneyMap.getInstance().isRunning()) {
 			JourneyMap.getLogger().warning("Interupting ChunkUpdateThread.mapChunk()"); //$NON-NLS-1$
 			return;
 		}

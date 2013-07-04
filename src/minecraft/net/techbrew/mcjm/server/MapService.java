@@ -58,7 +58,7 @@ public class MapService extends BaseService {
 		}
 		
 		// Ensure world is loaded
-		if(!JourneyMap.isRunning()) {
+		if(!JourneyMap.getInstance().isRunning()) {
 			throwEventException(503, Constants.getMessageJMERR02(), event, false);
 		}
 		

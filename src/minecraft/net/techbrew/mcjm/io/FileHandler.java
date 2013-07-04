@@ -15,6 +15,7 @@ import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
+import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.EntityHelper;
 
@@ -52,14 +53,12 @@ public class FileHandler {
 				} else {
 					worldDir = new File(mcDir, Constants.SP_DATA_DIR + getSafeName(minecraft));
 				}
-				
-			} catch (UnsupportedEncodingException e) {
+				worldDir.mkdirs();
+			} catch (Exception e) {
 				JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(e));
 				throw new RuntimeException(e);
 			}			
-			if(minecraft.isSingleplayer()) {
-				worldDir.mkdirs();			
-			} 
+
 			lastWorldHash = hash;
 			lastWorldDir = worldDir;			
 		}
@@ -67,27 +66,23 @@ public class FileHandler {
 	}
 	
 	public static String getSafeName(Minecraft minecraft) throws UnsupportedEncodingException {
-		if(!minecraft.isSingleplayer()) {
-			String worldName = minecraft.theWorld.getWorldInfo().getWorldName();
-			if("MpServer".equals(worldName)) worldName = "";			
-			return URLEncoder.encode(minecraft.getIntegratedServer().getHostname() + "_" + minecraft.getIntegratedServer().getFolderName(), "UTF-8"); //$NON-NLS-1$
-		} else {
-			return URLEncoder.encode(minecraft.getIntegratedServer().getWorldName(), "UTF-8"); //$NON-NLS-1$
-		}		
+				
+		return WorldData.getWorldName(minecraft);
+	
 	}
 	
-	public static void writeToFile(File file, String contents) {
-		try {
-			FileWriter out = new FileWriter(file, false);
-			out.write(contents);
-			out.flush();
-			out.close();
-		} catch (IOException e) {
-			JourneyMap.getLogger().severe(Constants.getMessageJMERR04(e.getMessage()));
-			JourneyMap.announce(Constants.getMessageJMERR04(file.getAbsolutePath())); //$NON-NLS-1$
-			JourneyMap.getLogger().log(Level.SEVERE, e.getMessage(), e);
-		}
-	}
+//	public static void writeToFile(File file, String contents) {
+//		try {
+//			FileWriter out = new FileWriter(file, false);
+//			out.write(contents);
+//			out.flush();
+//			out.close();
+//		} catch (IOException e) {
+//			JourneyMap.getLogger().severe(Constants.getMessageJMERR04(e.getMessage()));
+//			JourneyMap.announce(Constants.getMessageJMERR04(file.getAbsolutePath())); //$NON-NLS-1$
+//			JourneyMap.getLogger().log(Level.SEVERE, e.getMessage(), e);
+//		}
+//	}
 	
 	public static BufferedImage getImage(String fileName) {
 		try {

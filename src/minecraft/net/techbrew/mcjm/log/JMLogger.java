@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.minecraft.src.Minecraft;
+import net.minecraft.src.ModLoader;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
@@ -56,6 +57,7 @@ public class JMLogger extends Logger {
 			", java.version = " + System.getProperty("java.version")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		info("Game settings language: " + Minecraft.getMinecraft().gameSettings.language + " / Locale: " + Constants.getLocale());
+				
 	}
 	
 	
