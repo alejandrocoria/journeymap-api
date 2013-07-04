@@ -585,7 +585,7 @@ var JourneyMap = (function() {
 		
 		if(!otherImage) {
 			otherImage = new Image();
-			otherImage.src = "/img/entity/char.png";
+			otherImage.src = "/img/entity/steve.png";
 			otherImage.width = 48;
 			otherImage.height = 48;
 		}
