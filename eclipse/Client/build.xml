@@ -47,9 +47,12 @@
       <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/" includes="changelog.txt" />
       <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/" includes="mcmod.info" />
     </copy>
-    <copy todir="${build.dir}/net/techbrew/mcjm" failonerror="true" verbose="true">
-      <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/mcjm" includes="*.properties" />
+    <copy todir="${build.dir}/se/rupy/http" failonerror="true" verbose="true">
+      <fileset dir="${mcp.dir}/src/minecraft/se/rupy/http" includes="*.txt" />
     </copy>
+  	<copy todir="${build.dir}/net/techbrew/mcjm" failonerror="true" verbose="true">
+  	      <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/mcjm" includes="*.properties" />
+  	</copy>
     <copy todir="${build.dir}/net/techbrew/mcjm/web" failonerror="true">
       <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/mcjm/web" excludes=".svn/**" />
     </copy>
