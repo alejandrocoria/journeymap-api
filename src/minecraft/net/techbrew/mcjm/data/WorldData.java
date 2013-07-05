@@ -137,6 +137,7 @@ public class WorldData implements IDataProvider {
 		if(mc.isSingleplayer()) {
 			worldName = mc.getIntegratedServer().getWorldName();
 		} else {
+			if(mc.theWorld==null) return "offline";
 			worldName = mc.theWorld.getWorldInfo().getWorldName();
 			if(!"MpServer".equals(worldName)) {
 				worldName = getServerName() + "_" + worldName;
