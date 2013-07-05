@@ -9,10 +9,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import net.minecraft.src.Minecraft;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.EntityPlayerSP;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
@@ -28,7 +29,6 @@ import net.techbrew.mcjm.render.ChunkRenderController;
 
 public class ChunkUpdateThread extends UpdateThreadBase {
 
-	public volatile static CyclicBarrier barrier = new CyclicBarrier(2);
 	public volatile static ChunkUpdateThread currentThread = null;
 	
 	// Last player position
@@ -37,16 +37,20 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 	public volatile static int lastChunkZ = -1;
 	public volatile static int chunkOffset = 2;
 	
-	public static CyclicBarrier getBarrier() {
-		return barrier;
-	}
+	private static class BarrierHolder {
+        private static final CyclicBarrier INSTANCE = new CyclicBarrier(2);
+    }
+
+    public static CyclicBarrier getBarrier() {
+        return BarrierHolder.INSTANCE;
+    }
 	
 	private volatile ConcurrentHashMap<Integer,ChunkStub> chunkStubs = new ConcurrentHashMap<Integer,ChunkStub>();
 	private ChunkImageCache chunkImageCache;
 	private ChunkRenderController renderController;
 	
 	public ChunkUpdateThread(JourneyMap journeyMap, World world) {
-		super(journeyMap, world);
+		super();
 		chunkImageCache = new ChunkImageCache();
 		chunkOffset = PropertyManager.getInstance().getInteger(PropertyManager.Key.CHUNK_OFFSET);
 		renderController = new ChunkRenderController();
@@ -57,86 +61,78 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 	 */
 	protected void doTask() {
 		
-		boolean finestLogging = JourneyMap.getLogger().isLoggable(Level.FINEST);
-		//finestLogging = true;
+		JourneyMap jm = JourneyMap.getInstance();
+		boolean threadLogging = jm.isThreadLogging();
+		Logger logger = JourneyMap.getLogger();
+		CyclicBarrier barrier = getBarrier();
 		
 		try {
-				Boolean flush = false;
-				currentThread = this;
-										
-				// Wait for main thread to make ChunkStubs available
-				try {			
-					if(finestLogging) {
-						JourneyMap.getLogger().finest("Waiting... barrier: " + barrier.getNumberWaiting()); //$NON-NLS-1$
-					}
-
-					barrier.await();		
-				} catch(BrokenBarrierException e) {
-					
-					if(finestLogging) {
-						JourneyMap.getLogger().finest("Barrier Broken: " + barrier.getNumberWaiting()); //$NON-NLS-1$
-					}
-					
-					barrier.reset();
-				} catch (Throwable e) {
-					JourneyMap.getLogger().warning(LogFormatter.toString(e));
-					barrier.reset();
-					return;
-				}
+			Boolean flush = false;
+			currentThread = this;
+									
+			// Wait for main thread to make ChunkStubs available
+			try {			
+				if(threadLogging) logger.info("Waiting... barrier: " + barrier.getNumberWaiting()); //$NON-NLS-1$
+				barrier.await();		
 				
-				if(finestLogging) {
-					JourneyMap.getLogger().finest("Barrier done waiting: " + barrier.getNumberWaiting()); //$NON-NLS-1$
-				}
+			} catch(BrokenBarrierException e) {
 				
-				// If there aren't ChunkStubs, we're done.
-				if(chunkStubs.isEmpty()) {
-					if(finestLogging) {
-						JourneyMap.getLogger().finer("No ChunkStubs to process"); //$NON-NLS-1$
-					}
-					return;
-				}
+				if(threadLogging) logger.info("Barrier Broken: " + barrier.getNumberWaiting()); //$NON-NLS-1$					
+				barrier.reset();
 				
-				long start = System.nanoTime();
+			} catch (Throwable e) {
 				
-				// Clear cache (shouldn't be necessary)
-				chunkImageCache.clear();
-				
-				Iterator<ChunkStub> iter = chunkStubs.values().iterator();
-				while(iter.hasNext()) {
-					ChunkStub chunkStub = iter.next();
-					if(chunkStub.doMap) {
-						mapChunk(chunkStub, underground, playerChunkY);
-					}
-				}
-				
-				if(!JourneyMap.getInstance().isRunning()) {
-					JourneyMap.getLogger().warning("Interupting ChunkUpdateThread.");			 //$NON-NLS-1$
-					return;
-				}
-		
-				// Push chunk cache to region cache
-				if(finestLogging) {
-					JourneyMap.getLogger().info("Chunks updated: " + chunkImageCache.getEntries().size()); //$NON-NLS-1$
-				}
-				
-				RegionImageCache.getInstance().putAll(chunkImageCache.getEntries());
-		
-				// Flush regions to disk
-				if(flush) {
-					JourneyMap.getLogger().info("Force-flushing RegionImageCache");
-					RegionImageCache.getInstance().flushToDisk();
-				}
-				if(finestLogging) {		
-					JourneyMap.getLogger().info("Map regions updated: " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start) + "ms elapsed"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			} finally {
-				chunkStubs.clear();
-				//chunkImageCache.clear();
-				currentThread = null;
-
-				
+				logger.warning("Aborting: " + LogFormatter.toString(e));
+				barrier.reset();
+				return;
 			}
-		
+			
+			if(threadLogging) logger.info("Barrier done waiting: " + barrier.getNumberWaiting()); //$NON-NLS-1$
+			
+			// If there aren't ChunkStubs, we're done.
+			if(chunkStubs.isEmpty()) {
+				if(threadLogging) logger.info("No ChunkStubs to process"); //$NON-NLS-1$
+				return;
+			}
+			
+			long start = System.nanoTime();
+			
+			// Clear cache (precaution only)
+			chunkImageCache.clear();
+			
+			Iterator<ChunkStub> iter = chunkStubs.values().iterator();
+			while(iter.hasNext()) {
+				ChunkStub chunkStub = iter.next();
+				if(chunkStub.doMap) {
+					mapChunk(chunkStub, underground, playerChunkY);
+				}
+			}
+			
+			if(!JourneyMap.getInstance().isMapping()) {
+				if(threadLogging) logger.info("JM isn't mapping, Interupting ChunkUpdateThread.");			 //$NON-NLS-1$
+				return;
+			}
+	
+			// Push chunk cache to region cache
+			if(threadLogging) {
+				logger.info("Chunks updated: " + chunkImageCache.getEntries().size()); //$NON-NLS-1$
+			}
+			
+			RegionImageCache.getInstance().putAll(chunkImageCache.getEntries());
+	
+			// Flush regions to disk
+			if(flush) {
+				logger.info("Force-flushing RegionImageCache");
+				RegionImageCache.getInstance().flushToDisk();
+			}
+			if(threadLogging) {		
+				logger.info("Map regions updated: " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start) + "ms elapsed"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			
+		} finally {
+			chunkStubs.clear();
+			currentThread = null;				
+		}
 		
 	}
 	
@@ -247,8 +243,8 @@ public class ChunkUpdateThread extends UpdateThreadBase {
 	 */
 	private void mapChunk(ChunkStub chunkStub, boolean underground, int chunkY) {
 		
-		if(!JourneyMap.getInstance().isRunning()) {
-			JourneyMap.getLogger().warning("Interupting ChunkUpdateThread.mapChunk()"); //$NON-NLS-1$
+		if(!JourneyMap.getInstance().isMapping()) {
+			JourneyMap.getLogger().warning("JM isn't mapping, aborting"); //$NON-NLS-1$
 			return;
 		}
 		

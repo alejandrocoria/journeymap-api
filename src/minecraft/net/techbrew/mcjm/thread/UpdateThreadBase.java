@@ -2,11 +2,12 @@ package net.techbrew.mcjm.thread;
 
 import java.util.logging.Level;
 
-import net.minecraft.src.Minecraft;
+import net.minecraft.src.Chunk;
 import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.World;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.data.PlayerData;
@@ -14,15 +15,13 @@ import net.techbrew.mcjm.log.LogFormatter;
 
 public abstract class UpdateThreadBase implements Runnable {
 
-	protected JourneyMap journeyMap;
 	protected int playerChunkX;			
 	protected int playerChunkZ;
 	protected int playerChunkY;
 	protected boolean underground;
 	//protected Chunk playerChunk;
 	
-	public UpdateThreadBase(JourneyMap journeyMap, World world) {
-		this.journeyMap = journeyMap;
+	public UpdateThreadBase() {
 	}
 	
 	@Override
@@ -30,19 +29,24 @@ public abstract class UpdateThreadBase implements Runnable {
 
 		try {
 			
-			// Bail if needed
+			JourneyMap jm = JourneyMap.getInstance();
 			Minecraft mc = Minecraft.getMinecraft();
-			if(mc == null || !journeyMap.isRunning()) return;
-			if(mc.isSingleplayer()==false) return;
+			
+			// Bail if needed
+			if(!jm.isMapping()) {
+				jm.getLogger().fine("JM not mapping, aborting");
+				return;
+			}
 						
 			// Check player status
 			EntityPlayer player = mc.thePlayer;
 			if (player==null || player.isDead) {
+				jm.getLogger().fine("Player dead, aborting");
 				return;
 			}
 			
-//			playerChunk = Utils.getChunkIfAvailable(player.worldObj, player.chunkCoordX, player.chunkCoordZ);
-//			if(playerChunk!=null) {
+			Chunk playerChunk = Utils.getChunkIfAvailable(player.worldObj, player.chunkCoordX, player.chunkCoordZ);
+			if(playerChunk!=null) {
 				playerChunkX = player.chunkCoordX;				
 				playerChunkZ = player.chunkCoordZ;
 				playerChunkY = player.chunkCoordY;
@@ -52,9 +56,9 @@ public abstract class UpdateThreadBase implements Runnable {
 
 				// Do the real task
 				doTask();	
-//			} else {
-//				JourneyMap.getLogger().warning("Unable to get player chunk.");
-//			}
+			} else {
+				JourneyMap.getLogger().warning("Unable to get player chunk");
+			}
 			
 		} catch (Throwable t) {
 			String error = Constants.getMessageJMERR16(t.getMessage());

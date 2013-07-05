@@ -10,8 +10,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.BaseMod;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.GuiInventory;
@@ -20,8 +18,7 @@ import net.minecraft.src.GuiMultiplayer;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.GuiSelectWorld;
 import net.minecraft.src.KeyBinding;
-import net.minecraft.src.ModLoader;
-import net.minecraft.src.ServerData;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
@@ -29,7 +26,6 @@ import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkStub;
-import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.server.JMServer;
 import net.techbrew.mcjm.thread.ChunkUpdateThread;
 import net.techbrew.mcjm.thread.JMThreadFactory;
@@ -68,6 +64,8 @@ public class JourneyMap {
 	private Boolean modAnnounced = false;
 	private JMLogger logger;
 	private JMServer jmServer;
+	
+	private boolean threadLogging = false;
 
 	public volatile ChunkStub lastPlayerChunk;
 
@@ -80,7 +78,6 @@ public class JourneyMap {
 	// Time stamp of next chunk update
 	public long nextPlayerUpdate = 0;
 	public long nextChunkUpdate = 0;
-	private volatile boolean running = false;
 
 	// Whether webserver is running
 	boolean enableWebserver;
@@ -104,10 +101,20 @@ public class JourneyMap {
     	return initialized;
     }
     
+    public Boolean isMapping() {
+    	return chunkExecutor!=null && !chunkExecutor.isShutdown();
+    }
+    
+    public Boolean isThreadLogging() {
+    	return threadLogging;
+    }
+    
 	/**
 	 * Initialize
 	 */
 	public void initialize(Minecraft minecraft) {
+		
+		getLogger();
 		
 		if(initialized) {
 			logger.warning("Already initialized, aborting");
@@ -122,6 +129,13 @@ public class JourneyMap {
 		// Use property settings
 		chunkDelay = PropertyManager.getInstance().getInteger(PropertyManager.Key.UPDATETIMER_CHUNKS);
 		enableAnnounceMod = PropertyManager.getInstance().getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED); 
+		
+		// Key bindings
+		int mapGuiKeyCode = PropertyManager.getInstance().getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
+		this.enableMapGui = PropertyManager.getInstance().getBoolean(PropertyManager.Key.MAPGUI_ENABLED); 
+		if(this.enableMapGui) {
+			this.keybinding = new KeyBinding("JourneyMap", mapGuiKeyCode); //$NON-NLS-1$
+		}
 
 		// Webserver
 		enableWebserver = PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
@@ -149,8 +163,46 @@ public class JourneyMap {
 		// Override log level now that loading complete
 		logger.info("Initialization complete."); //$NON-NLS-1$
 		logger.setLevelFromProps();
+		
+		// Logging for thread debugging
+		threadLogging = getLogger().isLoggable(Level.FINER); 
 
 	}
+	
+    
+    /**
+     * Halts mapping threads, clears caches.
+     */
+    public void stopMapping() {
+    	synchronized(this) {
+    		ChunkUpdateThread.getBarrier().reset();
+	    	if(chunkExecutor!=null && !chunkExecutor.isShutdown()) {    		
+				chunkExecutor.shutdown();			
+			}
+	    	chunkExecutor = null;
+	    	Minecraft mc = Minecraft.getMinecraft();
+	    	logger.info("Mapping halted: " + WorldData.getWorldName(mc)); //$NON-NLS-1$
+			lastPlayerChunk = null;
+			FileHandler.lastWorldHash = -1;
+			FileHandler.lastWorldDir = null;
+    	}
+    }
+    
+    /**
+     * Starts mapping threads
+     */
+    private void startMapping() {
+    	synchronized(this) {
+	    	DataCache.instance().purge();	   
+	    	Minecraft mc = Minecraft.getMinecraft();
+	    	if(chunkExecutor==null || chunkExecutor.isShutdown()) {			    		
+				chunkExecutor = Executors.newSingleThreadScheduledExecutor(new JMThreadFactory("chunk"));
+				chunkExecutor.scheduleWithFixedDelay(new ChunkUpdateThread(this, mc.theWorld), 1500, chunkDelay, TimeUnit.MILLISECONDS);				
+			}
+	    	logger.info("Mapping started: " + WorldData.getWorldName(mc)); //$NON-NLS-1$		
+    	}
+		if(enableAnnounceMod) announceMod();
+    }
 
 	/**
 	 * Called via Modloader
@@ -161,30 +213,14 @@ public class JourneyMap {
 	 */
 	public boolean onTickInGUI(float f, Minecraft minecraft, GuiScreen guiscreen) {
 		try {
-			
-			if(!initialized) {
-				initialize(minecraft);
-			}
-
-			if(!running) return true;
+			if(!isMapping()) return true;
 
 			if(guiscreen instanceof GuiMainMenu ||
 					guiscreen instanceof GuiSelectWorld ||
 					guiscreen instanceof GuiMultiplayer) {
-				running = false;
+				stopMapping();
 			} 
-			if(guiscreen instanceof GuiMultiplayer) {
-				GuiMultiplayer guiMulti = (GuiMultiplayer) guiscreen;
-			}
-			if(!running) {
-				if(chunkExecutor!=null && !chunkExecutor.isTerminated()) {
-					logger.info("Shutting down JourneyMap threads"); //$NON-NLS-1$
-					FileHandler.lastWorldHash = -1;
-					FileHandler.lastWorldDir = null;
-					chunkExecutor.shutdown();
-					RegionImageCache.getInstance().flushToDisk();
-				}
-			}
+
 		} catch(Exception e) {
 			logger.severe(LogFormatter.toString(e));
 		}
@@ -200,10 +236,6 @@ public class JourneyMap {
 	public boolean onTickInGame(float f, final Minecraft minecraft) {
 
 		try {
-			
-			if(!initialized) {
-				initialize(minecraft);
-			}
 
 			// If both UIs are disabled, the mod is effectively disabled.
 			if(!enableWebserver && !enableMapGui) {
@@ -216,12 +248,6 @@ public class JourneyMap {
 				return true;
 			}
 
-			// Don't do anything when game is paused
-			boolean isGamePaused = minecraft.isSingleplayer() && minecraft.currentScreen != null && minecraft.currentScreen.doesGuiPauseGame() && !minecraft.getIntegratedServer().getPublic();
-			if(isGamePaused) {
-				//return true; // TODO : pause the game?
-			}
-
 			// Check for world change
 			long newHash = Utils.getWorldHash(minecraft);
 			if(newHash!=0L) {
@@ -229,18 +255,11 @@ public class JourneyMap {
 				FileHandler.lastWorldHash=newHash;
 			}
 
-			// Multiplayer:  Bail if server info not available or hash has changed
-			// TODO
-//			if(!minecraft.isSingleplayer()) {	
-//				running = false;
-//				return true;			
-//			}
-
 			// Check for valid player chunk
 			Chunk pChunk = Utils.getChunkIfAvailable(minecraft.theWorld, player.chunkCoordX, player.chunkCoordZ);
-			if(pChunk==null){
+			if(pChunk==null) {
 				lastPlayerChunk = null;
-				logger.finer("Player chunk not known: " + (player.chunkCoordX) + "," +(player.chunkCoordZ));
+				logger.fine("Player chunk unknown: " + (player.chunkCoordX) + "," +(player.chunkCoordZ));
 				return true;
 			} else {
 				if(lastPlayerChunk==null || (player.chunkCoordX!=lastPlayerChunk.xPosition || player.chunkCoordZ!=lastPlayerChunk.zPosition)) {
@@ -249,59 +268,46 @@ public class JourneyMap {
 			}
 
 			// We got this far
-			if(!running) {
-				DataCache.instance().purge();
-				running = true;				
-				if(enableAnnounceMod) announceMod();
+			if(!isMapping()) {
+				startMapping();
 			}
 
 			// Show announcements
+			boolean isGamePaused = minecraft.currentScreen != null;
 			while(!isGamePaused && !announcements.isEmpty()) {
 				player.addChatMessage(announcements.remove(0));
 			}
+			
 
-			// Start executors
-			if(chunkExecutor==null || chunkExecutor.isShutdown()) {
-				logger.info("Starting up JourneyMap threads for " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
-				chunkExecutor = Executors.newSingleThreadScheduledExecutor(new JMThreadFactory("chunk"));
-				chunkExecutor.scheduleWithFixedDelay(new ChunkUpdateThread(this, minecraft.theWorld), 1500, chunkDelay, TimeUnit.MILLISECONDS);
-			} else {
-
-				try {
-					// Populate ChunkStubs on ChunkUpdateThread if it is waiting
-					if(ChunkUpdateThread.getBarrier().isBroken()) {
-						logger.finer("Resetting broken Barrier "); 
-						ChunkUpdateThread.getBarrier().reset();
+			// Check for broken barrier
+			if(ChunkUpdateThread.getBarrier().isBroken()) {
+				if(threadLogging) logger.warning("Resetting broken Barrier");
+				ChunkUpdateThread.getBarrier().reset();
+			}
+			
+			// Populate ChunkStubs on ChunkUpdateThread if it is waiting
+			if(ChunkUpdateThread.getBarrier().getNumberWaiting()==1) {
+				
+				if(threadLogging) logger.info("ChunkUpdateThread is waiting for fillChunkStubs");
+					
+				if(ChunkUpdateThread.currentThread!=null) {
+					synchronized(ChunkUpdateThread.currentThread) {
+						long start = System.currentTimeMillis();
+						int[] result = ChunkUpdateThread.currentThread.fillChunkStubs(minecraft.thePlayer, lastPlayerChunk, minecraft.theWorld, FileHandler.lastWorldHash);
+						long stop = System.currentTimeMillis();
+						if(threadLogging) logger.info("Stubbed/skipped: " + result[0] + "," + result[1] + " in " + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					}
-					if(ChunkUpdateThread.getBarrier().getNumberWaiting()==1) {
-						if(ChunkUpdateThread.currentThread!=null) {
-							synchronized(ChunkUpdateThread.currentThread) {
-								long start = System.currentTimeMillis();
-								int[] result = ChunkUpdateThread.currentThread.fillChunkStubs(minecraft.thePlayer, lastPlayerChunk, minecraft.theWorld, FileHandler.lastWorldHash);
-								long stop = System.currentTimeMillis();
-								if(logger.isLoggable(Level.FINER)) {
-									logger.finer("Stubbed/skipped: " + result[0] + "," + result[1] + " in " + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-								}
-
-							}
-						} else {
-							if(logger.isLoggable(Level.FINER)) {
-								logger.finer("ChunkUpdateThread.currentThread==null"); //$NON-NLS-1$ 
-							}
-						}
-						logger.finer("JourneyMap done with fillChunkStubs"); //$NON-NLS-1$ 
-						if(ChunkUpdateThread.getBarrier().getNumberWaiting()==1) {
-							ChunkUpdateThread.getBarrier().reset(); // Let the chunkthread continue
-						}
-					} else {
-						if(logger.isLoggable(Level.FINER)) {
-							//logger.finer("ChunkUpdateThread.getBarrier().getNumberWaiting()==" + ChunkUpdateThread.getBarrier().getNumberWaiting()); //$NON-NLS-1$ 
-						}
-					}
-				} catch(Throwable t) {
-					logger.info(LogFormatter.toString(t));
+				} else {
+					if(threadLogging) logger.warning("ChunkUpdateThread.currentThread==null"); //$NON-NLS-1$ 
 				}
 
+				if(ChunkUpdateThread.getBarrier().getNumberWaiting()==1) {
+					if(threadLogging) logger.info("Resetting barrier so ChunkUpdateThread can continue");
+					ChunkUpdateThread.getBarrier().reset(); // Let the chunkthread continue
+				}
+				
+			} else {
+				if(threadLogging) logger.info("ChunkUpdateThread.getBarrier().getNumberWaiting()==" + ChunkUpdateThread.getBarrier().getNumberWaiting()); //$NON-NLS-1$ 
 			}
 
 		} catch (Throwable t) {
@@ -348,7 +354,7 @@ public class JourneyMap {
 	 */
 	public void keyboardEvent(KeyBinding keybinding)
 	{
-		if(!running) return; 
+		if(!isMapping()) return; 
 
 		Minecraft minecraft = Minecraft.getMinecraft();
 		if(keybinding.keyCode==keybinding.keyCode) {
@@ -404,14 +410,6 @@ public class JourneyMap {
 	 */
 	public ChunkStub getLastPlayerChunk() {
 		return lastPlayerChunk;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public Boolean isRunning() {
-		return running;
 	}
 
 }
