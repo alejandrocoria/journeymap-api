@@ -60,11 +60,7 @@ public class mod_JourneyMap extends BaseMod {
 	
 	@Override
 	public void clientConnect(NetClientHandler clientHandler) {
-		Minecraft mc = Minecraft.getMinecraft();
-		if(!(mc.entityRenderer instanceof EntityRendererProxy)) {
-			JourneyMap.getLogger().warning("ModLoader didn't set EntityRendererProxy.  Doing so manually.");
-			mc.entityRenderer = new EntityRendererProxy(mc);
-		}
+		
 	}
 
 	@Override
@@ -74,6 +70,11 @@ public class mod_JourneyMap extends BaseMod {
 	
 	@Override
 	public boolean onTickInGUI(float f, Minecraft minecraft, GuiScreen guiscreen) {
+		Minecraft mc = Minecraft.getMinecraft();	
+		if(!(mc.entityRenderer instanceof EntityRendererProxy)) {
+			JourneyMap.getLogger().warning("ModLoader didn't set EntityRendererProxy.  Doing so manually.");
+			mc.entityRenderer = new EntityRendererProxy(mc);
+		}
 		return JourneyMap.getInstance().onTickInGUI(f, minecraft, guiscreen);
 	}
 	
