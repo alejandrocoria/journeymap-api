@@ -7,20 +7,15 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.ImageOutputStream;
 
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
@@ -236,7 +231,6 @@ public class RegionFileHandler {
 	 * @param regionImage
 	 */
 	public void writeRegionFile(RegionCoord rCoord, BufferedImage regionImage) {
-
 		
 		if(regionImage==null) {
 			JourneyMap.getLogger().warning("Null regionImage?");
@@ -250,7 +244,9 @@ public class RegionFileHandler {
 	    		regionFile.mkdirs();
 	    	}
 	    	
-	    	JourneyMap.getLogger().info("RegionImage updating: " + regionFile);
+	    	if(JourneyMap.getLogger().isLoggable(Level.FINE)){
+	    		JourneyMap.getLogger().info("RegionImage updating: " + regionFile);
+	    	}
 			ImageIO.write(regionImage, "png", regionFile);
 			    		
 	    } catch (Throwable e) {
