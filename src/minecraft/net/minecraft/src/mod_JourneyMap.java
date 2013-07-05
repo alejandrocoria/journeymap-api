@@ -1,19 +1,28 @@
 package net.minecraft.src;
 
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.ModLoader;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.log.LogFormatter;
 
 public class mod_JourneyMap extends BaseMod {
-	
-	JourneyMap instance;
 	
 	public mod_JourneyMap() {		
 		super();
 	}
 
+	@Override
+	public String getName()
+    { 
+        return "JourneyMap"; //$NON-NLS-1$
+    }
+	
 	@Override
 	public String getVersion() {
 		return JourneyMap.JM_VERSION;
@@ -22,34 +31,61 @@ public class mod_JourneyMap extends BaseMod {
 	@Override
 	public void load() 
 	{				
-		instance = new JourneyMap();
+		JourneyMap instance = JourneyMap.getInstance();
+		instance.initialize(Minecraft.getMinecraft());
 		
+		// Register hooks
 		ModLoader.setInGameHook(this, true, false);
 		ModLoader.setInGUIHook(this, true, false);
 		
-		// Map GUI keycode
-		int mapGuiKeyCode = PropertyManager.getInstance().getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
-		instance.enableMapGui = PropertyManager.getInstance().getBoolean(PropertyManager.Key.MAPGUI_ENABLED); 
+		// Register Map GUI keybinding
 		if(instance.enableMapGui) {
-			instance.keybinding = new KeyBinding("JourneyMap", mapGuiKeyCode); //$NON-NLS-1$
 			ModLoader.registerKey(this, instance.keybinding, false);
 		}
 	}
 	
 	@Override
+	public void modsLoaded() {
+		StringBuffer sb = new StringBuffer("ModLoader mods loaded: ");
+		Iterator<BaseMod> iter = new ArrayList<BaseMod>(ModLoader.getLoadedMods()).iterator();
+		while(iter.hasNext()) {
+			sb.append(iter.next().toString());
+			if(iter.hasNext()){
+				sb.append(", ");
+			}
+		}
+		
+		JourneyMap.getLogger().info(sb.toString());
+	}
+	
+	@Override
+	public void clientConnect(NetClientHandler clientHandler) {
+		Minecraft mc = Minecraft.getMinecraft();
+		if(!(mc.entityRenderer instanceof EntityRendererProxy)) {
+			JourneyMap.getLogger().warning("ModLoader didn't set EntityRendererProxy.  Doing so manually.");
+			mc.entityRenderer = new EntityRendererProxy(mc);
+		}
+	}
+
+	@Override
+    public void clientDisconnect(NetClientHandler clientHandler) {
+		JourneyMap.getInstance().stopMapping();
+	}
+	
+	@Override
 	public boolean onTickInGUI(float f, Minecraft minecraft, GuiScreen guiscreen) {
-		return instance.onTickInGUI(f, minecraft, guiscreen);
+		return JourneyMap.getInstance().onTickInGUI(f, minecraft, guiscreen);
 	}
 	
 	@Override
 	public boolean onTickInGame(float f, final Minecraft minecraft) {
-		return instance.onTickInGame(f, minecraft);
+		return JourneyMap.getInstance().onTickInGame(f, minecraft);
 	}
 	
 	@Override
 	public void keyboardEvent(KeyBinding keybinding)
 	{
-		instance.keyboardEvent(keybinding);
+		JourneyMap.getInstance().keyboardEvent(keybinding);
 	}
 
 }
