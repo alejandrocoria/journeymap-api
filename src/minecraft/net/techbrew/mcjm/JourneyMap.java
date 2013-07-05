@@ -318,18 +318,12 @@ public class JourneyMap {
 		} 
 		return true;
 	}
-
+	
 	private void announceMod() {
 
-		Boolean announceReady = false;
-		Minecraft minecraft = Minecraft.getMinecraft();
-		if(minecraft.isSingleplayer()==false) {		
-			logger.info("Mapping in multiplayer world: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$ //$NON-NLS-2$
-		} else {
-			announceReady = true;
-			logger.info("Mapping in singleplayer world: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
-		}	
-		if(enableAnnounceMod && announceReady) {
+		Minecraft minecraft = Minecraft.getMinecraft();	
+		
+		if(enableAnnounceMod) {
 			announcements.add(Constants.getString("JourneyMap.ready", JM_VERSION)); //$NON-NLS-1$ 
 			if(enableWebserver && enableMapGui) {
 				String keyName = Keyboard.getKeyName(keybinding.keyCode);
@@ -344,7 +338,7 @@ public class JourneyMap {
 			} else {
 				announcements.add(Constants.getString("JourneyMap.webserver_and_mapgui_disabled")); //$NON-NLS-1$
 			}
-			enableAnnounceMod = false; // Announcement now only happens once, not on every world switch
+			enableAnnounceMod = false;
 		}
 	}
 
