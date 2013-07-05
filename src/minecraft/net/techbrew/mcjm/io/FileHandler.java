@@ -2,11 +2,9 @@ package net.techbrew.mcjm.io;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;

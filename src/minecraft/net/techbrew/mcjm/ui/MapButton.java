@@ -1,11 +1,9 @@
 package net.techbrew.mcjm.ui;
 
 import net.minecraft.src.DynamicTexture;
-import net.minecraft.src.Minecraft;
 import net.minecraft.src.GuiSmallButton;
-import net.minecraft.src.ResourceLocation;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.Tessellator;
-import net.minecraft.src.TextureUtil;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
 
 import org.lwjgl.opengl.GL11;

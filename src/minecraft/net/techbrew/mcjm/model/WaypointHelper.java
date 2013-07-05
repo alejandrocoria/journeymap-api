@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-
 import net.minecraft.src.ChunkCoordinates;
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.Minecraft;

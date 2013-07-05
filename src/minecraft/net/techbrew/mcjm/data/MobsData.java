@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.src.Minecraft;
 import net.minecraft.src.EntityGhast;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityMob;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.IBossDisplayData;
 import net.minecraft.src.IRangedAttackMob;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.model.EntityHelper;
 
 /**

@@ -7,14 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.src.DataWatcher;
 import net.minecraft.src.EntityHorse;
-import net.minecraft.src.Minecraft;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.EntityTameable;
 import net.minecraft.src.IAnimals;
-import net.minecraft.src.WatchableObject;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.model.EntityHelper;
 
 /**

@@ -11,12 +11,9 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import net.minecraft.src.Minecraft;
-import net.minecraft.src.ModLoader;
 import net.minecraft.src.NetClientHandler;
-import net.minecraft.src.ServerData;
 import net.minecraft.src.WorldInfo;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.log.LogFormatter;
 
 /**
  * Provides game-related properties in a Map.

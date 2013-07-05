@@ -4,12 +4,10 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
-
 
 import net.minecraft.src.BiomeGenBase;
 import net.minecraft.src.Block;
@@ -18,22 +16,15 @@ import net.minecraft.src.BlockLeaves;
 import net.minecraft.src.BlockLilyPad;
 import net.minecraft.src.BlockTallGrass;
 import net.minecraft.src.BlockVine;
-import net.minecraft.src.DefaultResourcePack;
-import net.minecraft.src.Icon;
 import net.minecraft.src.Item;
-import net.minecraft.src.Resource;
+import net.minecraft.src.ItemBlock;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.ResourceLocation;
 import net.minecraft.src.ResourcePack;
 import net.minecraft.src.ResourcePackFileNotFoundException;
 import net.minecraft.src.ResourcePackRepository;
 import net.minecraft.src.ResourcePackRepositoryEntry;
 import net.minecraft.src.TextureAtlasSprite;
-import net.minecraft.src.TextureMap;
-import net.minecraft.src.TexturedQuad;
-
-import net.minecraft.src.ItemBlock;
-import net.minecraft.src.Minecraft;
-
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
