@@ -1,7 +1,6 @@
 package net.minecraft.src;
 
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -9,10 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.NetClientHandler;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.src.ModLoader;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.log.LogFormatter;
 
 public class mod_JourneyMap extends BaseMod {
 	
@@ -72,13 +68,12 @@ public class mod_JourneyMap extends BaseMod {
 	}
 	
 	@Override
-	public boolean onTickInGUI(float f, Minecraft minecraft, GuiScreen guiscreen) {
-		Minecraft mc = Minecraft.getMinecraft();	
-		if(!(mc.entityRenderer instanceof EntityRendererProxy)) {
+	public boolean onTickInGUI(float tick, Minecraft game, GuiScreen gui) {
+		if(!(game.entityRenderer instanceof EntityRendererProxy)) {
 			JourneyMap.getLogger().warning("ModLoader didn't set EntityRendererProxy.  Doing so manually.");
-			mc.entityRenderer = new EntityRendererProxy(mc);
+			game.entityRenderer = new EntityRendererProxy(game);
 		}
-		return JourneyMap.getInstance().onTickInGUI(f, minecraft, guiscreen);
+		return JourneyMap.getInstance().onTickInGUI(tick, game, gui);
 	}
 	
 	@Override
