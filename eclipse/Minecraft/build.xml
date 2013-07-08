@@ -5,9 +5,10 @@
   <property name="version" value="2.7.1b1_MC1.6.2" />
 
   <property name="mcp.dir" location="${basedir}" />
-  <property name="journeymap.dir" location="${mcp.dir}/journeymap" />
-  <property name="dist.dir" location="${journeymap.dir}/dist" />
-  <property name="build.dir" location="${journeymap.dir}/build" />
+  <property name="dist.dir" location="${mcp.dir}/dist" />
+  <property name="build.dir" location="${mcp.dir}/build" />
+  <property name="reobf.dir" location="${mcp.dir}/reobf/minecraft" />
+  <property name="src.dir" location="${mcp.dir}/src/minecraft" />
 
   <!-- Change if not on Windows, but don't check in the change. -->
   <!-- TODO:  OS detection -->
@@ -40,22 +41,42 @@
   </target>
 
   <target name="stage">
-    <copy todir="${build.dir}" failonerror="false">
-      <fileset dir="${mcp.dir}/reobf/minecraft" includes="mod_JourneyMap.class, net/techbrew/**, se/rupy/**">
-      </fileset>
+  	
+  	<!-- Modloader BaseMod -->
+    <copy todir="${build.dir}" failonerror="true" file="${reobf.dir}/mod_JourneyMap.class" />
+  	
+  	<!-- JourneyMap classes -->
+  	<copy todir="${build.dir}/net/techbrew/" failonerror="true">
+      <fileset dir="${reobf.dir}/net/techbrew/" />
     </copy>
-    <copy todir="${build.dir}" failonerror="true" verbose="true">
-      <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/" includes="changelog.txt" />
-      <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/" includes="mcmod.info" />
+  	
+  	<!-- Rupy classes -->
+  	<copy todir="${build.dir}/se/rupy/" failonerror="true">
+      <fileset dir="${reobf.dir}/se/rupy/" />
     </copy>
-    <copy todir="${build.dir}/se/rupy/http" failonerror="true" verbose="true">
-      <fileset dir="${mcp.dir}/src/minecraft/se/rupy/http" includes="*.txt" />
+  	
+  	<!-- PNGJ classes -->
+  	<copy todir="${build.dir}/ar/com/hjg/pngj/" failonerror="true">
+      <fileset dir="${reobf.dir}/ar/com/hjg/pngj/" />
     </copy>
+  	
+  	<!-- Changelog -->
+  	<copy todir="${build.dir}" failonerror="true" file="${src.dir}/net/techbrew/changelog.txt" />
+  	
+  	<!-- ForgeML info -->
+  	<copy todir="${build.dir}" failonerror="true" file="${src.dir}/net/techbrew/mcmod.info" />
+  	
+    <!-- Rupy configs -->
+  	<copy todir="${build.dir}/se/rupy/http" failonerror="true" file="${src.dir}/se/rupy/http/mime.txt" />
+  	
+    <!-- Localization properties -->
   	<copy todir="${build.dir}/net/techbrew/mcjm" failonerror="true" verbose="true">
-  	      <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/mcjm" includes="*.properties" />
+  	      <fileset dir="${src.dir}/net/techbrew/mcjm" includes="*.properties" />
   	</copy>
+  	
+  	<!-- Web assets --> <!-- -->
     <copy todir="${build.dir}/net/techbrew/mcjm/web" failonerror="true">
-      <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/mcjm/web" excludes=".svn/**" />
+      <fileset dir="${src.dir}/net/techbrew/mcjm/web" />
     </copy>
   </target>
 
@@ -72,13 +93,13 @@
     </taskdef>
     <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
       outputfolder="${build.dir}/net/techbrew/mcjm/web/js">
-      <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/mcjm/web/js" >
+      <fileset dir="${src.dir}/net/techbrew/mcjm/web/js" >
         <include name="journeymap.js" />
       </fileset>
     </yuicompress>
   	<yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
       outputfolder="${build.dir}/net/techbrew/mcjm/web/css">
-      <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/mcjm/web/css" >
+      <fileset dir="${src.dir}/net/techbrew/mcjm/web/css" >
         <include name="default.css" />
       </fileset>
     </yuicompress>
