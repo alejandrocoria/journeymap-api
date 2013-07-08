@@ -7,8 +7,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.Waypoint;

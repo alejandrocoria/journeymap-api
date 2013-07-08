@@ -11,7 +11,6 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.ResourceLocation;

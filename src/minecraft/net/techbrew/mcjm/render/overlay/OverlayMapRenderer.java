@@ -3,8 +3,6 @@ package net.techbrew.mcjm.render.overlay;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -14,6 +12,8 @@ import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.io.RegionFileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.MapOverlayState;
+
+import org.lwjgl.opengl.GL11;
 
 /**
  * Renders an entity image in the MapOverlay.

@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiSmallButton;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
 
 import org.lwjgl.opengl.GL11;
