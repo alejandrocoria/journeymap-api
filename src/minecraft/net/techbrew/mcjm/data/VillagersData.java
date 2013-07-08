@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.src.EntityPlayerSP;
-import net.minecraft.src.EntityVillager;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.World;
+
+import net.minecraft.client.Minecraft;
+
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.world.World;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.EntityHelper;
@@ -46,7 +48,7 @@ public class VillagersData implements IDataProvider {
 	public Map getMap() {		
 		
 		Minecraft mc = Minecraft.getMinecraft();
-		EntityPlayerSP player = mc.thePlayer;			
+		EntityClientPlayerMP player = mc.thePlayer;			
 	   
 		List<EntityVillager> villagers = EntityHelper.getVillagersNearby();
 		ArrayList<LinkedHashMap> list = new ArrayList<LinkedHashMap>(villagers.size());
@@ -63,8 +65,8 @@ public class VillagersData implements IDataProvider {
 			eProps.put(EntityKey.profession, entity.getProfession()); 
 			
 			// CustomName
-			if(entity.func_94056_bM()) {
-				eProps.put(EntityKey.customName, entity.func_94057_bL()); 
+			if(entity.hasCustomNameTag()) {
+				eProps.put(EntityKey.customName, entity.getCustomNameTag()); 
 			}
 						
 			list.add(eProps);
@@ -89,7 +91,7 @@ public class VillagersData implements IDataProvider {
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		
-		EntityPlayerSP player = mc.thePlayer;
+		EntityClientPlayerMP player = mc.thePlayer;
 		int x = ((int) Math.floor(player.posX) % 16) & 15;
 		int z = ((int) Math.floor(player.posZ) % 16) & 15;
 		
@@ -109,7 +111,7 @@ public class VillagersData implements IDataProvider {
 	private boolean playerIsUnderground() {
 		
 		Minecraft mc = Minecraft.getMinecraft();		
-		EntityPlayerSP player = mc.thePlayer;
+		EntityClientPlayerMP player = mc.thePlayer;
 		
 		if(player.worldObj.provider.hasNoSky) {
 			return true;

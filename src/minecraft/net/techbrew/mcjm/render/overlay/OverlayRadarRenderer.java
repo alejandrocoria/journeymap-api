@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.src.Minecraft;
+import net.minecraft.client.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.log.LogFormatter;

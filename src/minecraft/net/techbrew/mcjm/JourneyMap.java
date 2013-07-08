@@ -10,15 +10,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.minecraft.src.Chunk;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.GuiInventory;
-import net.minecraft.src.GuiMainMenu;
-import net.minecraft.src.GuiMultiplayer;
-import net.minecraft.src.GuiScreen;
-import net.minecraft.src.GuiSelectWorld;
-import net.minecraft.src.KeyBinding;
-import net.minecraft.src.Minecraft;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.GuiMultiplayer;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiSelectWorld;
+import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.chunk.Chunk;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
@@ -48,8 +48,8 @@ public class JourneyMap {
 	static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
 
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-	public static final String JM_VERSION = "2.7.0b2"; //$NON-NLS-1$
-	public static final String MC_VERSION = "1.6.1"; //$NON-NLS-1$
+	public static final String JM_VERSION = "2.7.1b1"; //$NON-NLS-1$
+	public static final String MC_VERSION = "1.6.2"; //$NON-NLS-1$
 	
 	private static class Holder {
         private static final JourneyMap INSTANCE = new JourneyMap();

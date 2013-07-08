@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.src.EntityHorse;
-import net.minecraft.src.EntityLiving;
-import net.minecraft.src.EntityPlayerSP;
-import net.minecraft.src.EntityTameable;
-import net.minecraft.src.IAnimals;
-import net.minecraft.src.Minecraft;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.passive.EntityHorse;
+import net.minecraft.entity.passive.EntityTameable;
+import net.minecraft.entity.passive.IAnimals;
 import net.techbrew.mcjm.model.EntityHelper;
 
 /**
@@ -93,8 +93,8 @@ public class AnimalsData implements IDataProvider {
 			}
 			
 			// CustomName
-			if(entity.func_94056_bM()) {
-				eProps.put(EntityKey.customName, entity.func_94057_bL()); 
+			if(entity.hasCustomNameTag()) {
+				eProps.put(EntityKey.customName, entity.getCustomNameTag()); 
 			}
 						
 			list.add(eProps);

@@ -1,4 +1,4 @@
-JourneyMap 2.7.0b2 for Minecraft 1.6.1 (July 3, 2013)
+JourneyMap 2.7.1b1 for Minecraft 1.6.2 (July 8, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -8,8 +8,11 @@ http://journeymap.techbrew.net
 
 Requirements:
 
-- Minecraft 1.6.1
-- ModLoader or Forge
+- Minecraft 1.6.2
+- Forge or ModLoader
+
+Changes in JourneyMap 2.7.1 for Minecraft 1.6.2:
+- Updated for 1.6.2
 
 Changes in JourneyMap 2.7.0 for Minecraft 1.6.1:
 - Updated to use new Minecraft ResourcePack system

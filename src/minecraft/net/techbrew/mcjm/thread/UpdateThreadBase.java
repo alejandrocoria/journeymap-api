@@ -2,9 +2,9 @@ package net.techbrew.mcjm.thread;
 
 import java.util.logging.Level;
 
-import net.minecraft.src.Chunk;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.Minecraft;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.world.chunk.Chunk;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
@@ -39,7 +39,7 @@ public abstract class UpdateThreadBase implements Runnable {
 			}
 						
 			// Check player status
-			EntityPlayer player = mc.thePlayer;
+			EntityClientPlayerMP player = mc.thePlayer;
 			if (player==null || player.isDead) {
 				jm.getLogger().fine("Player dead, aborting");
 				return;

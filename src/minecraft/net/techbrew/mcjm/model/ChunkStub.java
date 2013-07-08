@@ -2,15 +2,16 @@ package net.techbrew.mcjm.model;
 
 import java.util.Arrays;
 
-import net.minecraft.src.BiomeGenBase;
-import net.minecraft.src.Block;
-import net.minecraft.src.Chunk;
-import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.EnumSkyBlock;
-import net.minecraft.src.ExtendedBlockStorage;
-import net.minecraft.src.Material;
-import net.minecraft.src.World;
-import net.minecraft.src.WorldChunkManager;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.WorldChunkManager;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+
 import net.techbrew.mcjm.render.MapBlocks;
 
 public class ChunkStub {

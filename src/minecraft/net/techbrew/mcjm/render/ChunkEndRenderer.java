@@ -5,7 +5,7 @@ import java.awt.Graphics2D;
 import java.util.Map;
 import java.util.logging.Level;
 
-import net.minecraft.src.EnumSkyBlock;
+import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;

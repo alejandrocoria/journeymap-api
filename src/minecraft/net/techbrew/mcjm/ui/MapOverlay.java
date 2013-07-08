@@ -13,15 +13,15 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import net.minecraft.src.Chunk;
-import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.DynamicTexture;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.GuiButton;
-import net.minecraft.src.GuiChat;
-import net.minecraft.src.GuiInventory;
-import net.minecraft.src.GuiScreen;
-import net.minecraft.src.Minecraft;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiChat;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.chunk.Chunk;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
@@ -790,7 +790,7 @@ public class MapOverlay extends GuiScreen {
 	 */
 	void refreshState() {
 		// Check player status
-		EntityPlayer player = mc.thePlayer;
+		EntityClientPlayerMP player = mc.thePlayer;
 		if (player==null) {
 			JourneyMap.getLogger().warning("Could not get player"); //$NON-NLS-1$
 			return;

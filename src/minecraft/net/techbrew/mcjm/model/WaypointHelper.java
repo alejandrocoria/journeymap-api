@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.src.ChunkCoordinates;
-import net.minecraft.src.EntityClientPlayerMP;
-import net.minecraft.src.Minecraft;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.util.ChunkCoordinates;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 
@@ -40,7 +40,7 @@ public class WaypointHelper {
 			try {
 				Class.forName("reifnsk.minimap.ReiMinimap");
 				Class.forName("reifnsk.minimap.Waypoint");
-				reiLoaded = reifnsk.minimap.ReiMinimap.instance != null;
+				reiLoaded = Class.forName("reifnsk.minimap.ReiMinimap").getDeclaredField("instance")!=null;
 			} catch(Throwable e) {
 				reiLoaded = false;
 			}
@@ -108,6 +108,7 @@ public class WaypointHelper {
 		}
 		
 		try {
+			Class.forName("reifnsk.minimap.ReiMinimap").getDeclaredField("instance");
 			reifnsk.minimap.ReiMinimap reiMinimap = reifnsk.minimap.ReiMinimap.instance;
 			List<reifnsk.minimap.Waypoint> wayPts = (List<reifnsk.minimap.Waypoint>) reiMinimap.getWaypoints();
 			if(wayPts==null || wayPts.isEmpty()) {

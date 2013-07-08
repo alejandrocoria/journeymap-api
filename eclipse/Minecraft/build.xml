@@ -2,7 +2,7 @@
 <project name="JourneyMap" basedir="../.." default="all">
 
   <!-- Update when new version is going to be released -->
-  <property name="version" value="2.7.0b2_MC1.6.1" />
+  <property name="version" value="2.7.1b1_MC1.6.2" />
 
   <property name="mcp.dir" location="${basedir}" />
   <property name="journeymap.dir" location="${mcp.dir}/journeymap" />
@@ -41,7 +41,8 @@
 
   <target name="stage">
     <copy todir="${build.dir}" failonerror="false">
-      <fileset dir="${mcp.dir}/reobf/minecraft" excludes=".svn/**, *.txt" />
+      <fileset dir="${mcp.dir}/reobf/minecraft" includes="mod_JourneyMap.class, net/techbrew/**, se/rupy/**">
+      </fileset>
     </copy>
     <copy todir="${build.dir}" failonerror="true" verbose="true">
       <fileset dir="${mcp.dir}/src/minecraft/net/techbrew/" includes="changelog.txt" />

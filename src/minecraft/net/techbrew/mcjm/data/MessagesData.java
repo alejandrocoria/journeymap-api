@@ -6,7 +6,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.src.Minecraft;
+import net.minecraft.client.Minecraft;
 import net.techbrew.mcjm.Constants;
 
 /**

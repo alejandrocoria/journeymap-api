@@ -2,7 +2,8 @@ package net.techbrew.mcjm.render;
 
 import java.awt.Color;
 
-import net.minecraft.src.Block;
+import net.minecraft.block.Block;
+
 
 public class BlockInfo {
 

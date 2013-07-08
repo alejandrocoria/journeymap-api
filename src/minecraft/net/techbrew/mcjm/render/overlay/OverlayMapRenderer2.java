@@ -1,9 +1,9 @@
 package net.techbrew.mcjm.render.overlay;
 
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.world.ChunkCoordIntPair;
 
-import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.Tessellator;
+import org.lwjgl.opengl.GL11;
 
 public class OverlayMapRenderer2 {
 	

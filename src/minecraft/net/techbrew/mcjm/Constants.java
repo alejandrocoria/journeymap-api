@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TimeZone;
 
-import net.minecraft.src.Minecraft;
+import net.minecraft.client.Minecraft;
 
 
 public class Constants {

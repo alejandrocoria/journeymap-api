@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.EntityPlayerSP;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.World;
+import net.minecraft.client.Minecraft;
+
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.EntityHelper;
@@ -44,7 +45,7 @@ public class PlayersData implements IDataProvider {
 	public Map getMap() {		
 		
 		Minecraft mc = Minecraft.getMinecraft();
-		EntityPlayerSP player = mc.thePlayer;			
+		EntityClientPlayerMP player = mc.thePlayer;			
 		List<Map> list;
 		
 		//if(!mc.isSingleplayer()) {
@@ -83,7 +84,7 @@ public class PlayersData implements IDataProvider {
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		
-		EntityPlayerSP player = mc.thePlayer;
+		EntityClientPlayerMP player = mc.thePlayer;
 		int x = ((int) Math.floor(player.posX) % 16) & 15;
 		int z = ((int) Math.floor(player.posZ) % 16) & 15;
 		
@@ -103,7 +104,7 @@ public class PlayersData implements IDataProvider {
 	private boolean playerIsUnderground() {
 		
 		Minecraft mc = Minecraft.getMinecraft();		
-		EntityPlayerSP player = mc.thePlayer;
+		EntityClientPlayerMP player = mc.thePlayer;
 		
 		if(player.worldObj.provider.hasNoSky) {
 			return true;
