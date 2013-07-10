@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.NetClientHandler;
+import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldInfo;
 import net.techbrew.mcjm.JourneyMap;
 
@@ -110,7 +111,8 @@ public class WorldData implements IDataProvider {
 	private static String getServerName() {
 		try
 	    {
-			NetClientHandler sendQueue = Minecraft.getMinecraft().thePlayer.sendQueue;
+			NetClientHandler sendQueue = Minecraft.getMinecraft().getNetHandler();
+			MapStorage ms = sendQueue.mapStorage;			
 	        SocketAddress socketAddress = sendQueue.getNetManager().getSocketAddress();
 	        if ((socketAddress instanceof InetSocketAddress))
 	        {

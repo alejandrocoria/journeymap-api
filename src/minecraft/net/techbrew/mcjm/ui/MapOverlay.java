@@ -804,7 +804,7 @@ public class MapOverlay extends GuiScreen {
 		// Check chunk
 		final Chunk playerChunk = Utils.getChunkIfAvailable(mc.theWorld, ccx, ccz);
 		if(playerChunk==null || !playerChunk.isChunkLoaded) {
-			JourneyMap.getLogger().warning("Could not get player chunk"); //$NON-NLS-1$
+			JourneyMap.getLogger().fine("Could not get player chunk"); //$NON-NLS-1$
 			return;
 		}
 

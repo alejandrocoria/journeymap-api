@@ -10,6 +10,7 @@ import java.util.Map;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderHorse;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -31,6 +32,7 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.log.LogFormatter;
 
 public class EntityHelper {
 	
@@ -43,6 +45,8 @@ public class EntityHelper {
 	
 	// TODO: make threadsafe
 	static HashMap<String, BufferedImage> entityImageMap = new HashMap<String, BufferedImage>();
+	
+	static Method renderGetEntityTextureMethod;
 
 	private static int lateralDistance = PropertyManager.getInstance().getInteger(PropertyManager.Key.CHUNK_OFFSET) * 8;
 	private static int verticalDistance = lateralDistance/2;
@@ -181,7 +185,7 @@ public class EntityHelper {
 	 * @return
 	 */
 	public static BufferedImage getUnknownImage() {
-		return FileHandler.getImage("unknown.png");
+		return FileHandler.getImage("entity/unknown.png");
 	}
 	
 	
@@ -254,20 +258,35 @@ public class EntityHelper {
 		// All other mobs	
 		try {
 			
-			Method m = render.getClass().getDeclaredMethod("func_110775_a", Entity.class);
-			m.setAccessible(true);
-			ResourceLocation loc = (ResourceLocation) m.invoke(render, entity);
-			
-			String tex = loc.func_110623_a();
-			String search = "/entity/";
-			int i = tex.lastIndexOf(search);
-			if(i>=0) {
-				tex = tex.substring(i+search.length());
-			} 
-			return tex;
+			//Method m = Render.class.getMethod("func_110775_a", Entity.class);
+			if(renderGetEntityTextureMethod==null) {
+				for(Method m : Render.class.getMethods()){
+					Class[] pTypes = m.getParameterTypes();
+					if(pTypes.length==1) {
+						if(Entity.class.equals(pTypes[0])){
+							renderGetEntityTextureMethod = m;
+							m.setAccessible(true);
+							break;
+						}
+					}
+				}
+			}
+			if(renderGetEntityTextureMethod!=null) {
+				ResourceLocation loc = (ResourceLocation) renderGetEntityTextureMethod.invoke(render, entity);
+				
+				String tex = loc.func_110623_a();
+				String search = "/entity/";
+				int i = tex.lastIndexOf(search);
+				if(i>=0) {
+					tex = tex.substring(i+search.length());
+				} 
+				return tex;
+			} else {
+				return null;
+			}
 			
 		} catch (Exception e) {
-			JourneyMap.getLogger().severe("Can't get mob resource from " + render.getClass().getSimpleName());
+			JourneyMap.getLogger().warning("Can't get mob resource from Render.class aka " + render.getClass().getSimpleName() + " for " + entity.getEntityName() + " because " + e);
 			return null;
 		} 
 	}

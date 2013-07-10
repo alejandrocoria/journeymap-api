@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import net.minecraft.client.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
@@ -85,7 +86,7 @@ public class MapSaver {
 		
 		JourneyMap.getInstance().announce(Constants.getString("MapOverlay.saving_map_to_file", cType + " " + mapType)); //$NON-NLS-1$
 		
-		mapFile = createMapFile(FileHandler.getSafeName(Minecraft.getMinecraft()) + "_" + cType + "_" + mapType);
+		mapFile = createMapFile(WorldData.getWorldName(Minecraft.getMinecraft()) + "_" + cType + "_" + mapType);
 				
 		RegionFileHandler.getMergedChunksFile(worldDir, x1, z1, x2, z2, mapType, chunkY, cType, mapFile);
 		

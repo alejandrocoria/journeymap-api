@@ -46,10 +46,11 @@ public class FileHandler {
 			File worldDir = null;
 			
 			try {				
+				String worldName = WorldData.getWorldName(minecraft);
 				if(!minecraft.isSingleplayer()) {
-					worldDir = new File(mcDir, Constants.MP_DATA_DIR + getSafeName(minecraft) + "_" + hash); //$NON-NLS-1$
+					worldDir = new File(mcDir, Constants.MP_DATA_DIR + worldName + "_" + hash); //$NON-NLS-1$
 				} else {
-					worldDir = new File(mcDir, Constants.SP_DATA_DIR + getSafeName(minecraft));
+					worldDir = new File(mcDir, Constants.SP_DATA_DIR + worldName);
 				}
 				worldDir.mkdirs();
 			} catch (Exception e) {
@@ -63,24 +64,6 @@ public class FileHandler {
 		return lastWorldDir;
 	}
 	
-	public static String getSafeName(Minecraft minecraft) throws UnsupportedEncodingException {
-				
-		return WorldData.getWorldName(minecraft);
-	
-	}
-	
-//	public static void writeToFile(File file, String contents) {
-//		try {
-//			FileWriter out = new FileWriter(file, false);
-//			out.write(contents);
-//			out.flush();
-//			out.close();
-//		} catch (IOException e) {
-//			JourneyMap.getLogger().severe(Constants.getMessageJMERR04(e.getMessage()));
-//			JourneyMap.announce(Constants.getMessageJMERR04(file.getAbsolutePath())); //$NON-NLS-1$
-//			JourneyMap.getLogger().log(Level.SEVERE, e.getMessage(), e);
-//		}
-//	}
 	
 	public static BufferedImage getImage(String fileName) {
 		try {
