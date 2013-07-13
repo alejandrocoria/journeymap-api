@@ -1,7 +1,7 @@
 package net.techbrew.mcjm.render.overlay;
 
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.src.Tessellator;
+import net.minecraft.src.ChunkCoordIntPair;
 
 import org.lwjgl.opengl.GL11;
 

@@ -4,10 +4,10 @@ package net.minecraft.src;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.multiplayer.NetClientHandler;
-import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.src.Minecraft;
+import net.minecraft.src.GuiScreen;
+import net.minecraft.src.NetClientHandler;
+import net.minecraft.src.KeyBinding;
 import net.techbrew.mcjm.JourneyMap;
 
 public class mod_JourneyMap extends BaseMod {

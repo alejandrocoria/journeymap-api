@@ -8,26 +8,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderHorse;
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.resources.ResourceLocation;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.IRangedAttackMob;
-import net.minecraft.entity.boss.IBossDisplayData;
-import net.minecraft.entity.monster.EntityGolem;
-import net.minecraft.entity.monster.IMob;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.passive.EntityHorse;
-import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.entity.passive.EntityWaterMob;
-import net.minecraft.entity.passive.IAnimals;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.src.Minecraft;
+import net.minecraft.src.EntityPlayerSP;
+import net.minecraft.src.Render;
+import net.minecraft.src.RenderHorse;
+import net.minecraft.src.RenderLiving;
+import net.minecraft.src.RenderManager;
+import net.minecraft.src.ResourceLocation;
+import net.minecraft.src.Entity;
+import net.minecraft.src.EntityLiving;
+import net.minecraft.src.IRangedAttackMob;
+import net.minecraft.src.IBossDisplayData;
+import net.minecraft.src.EntityGolem;
+import net.minecraft.src.IMob;
+import net.minecraft.src.EntityAnimal;
+import net.minecraft.src.EntityHorse;
+import net.minecraft.src.EntityVillager;
+import net.minecraft.src.EntityWaterMob;
+import net.minecraft.src.IAnimals;
+import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.AxisAlignedBB;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.io.FileHandler;
@@ -104,7 +104,7 @@ public class EntityHelper {
 	 * @return
 	 */
 	private static AxisAlignedBB getBB(EntityPlayerSP player) {
-		return AxisAlignedBB.getBoundingBox(player.posX, player.posY, player.posZ, player.posX, player.posY, player.posZ).expand(lateralDistance, verticalDistance, lateralDistance);
+		return AxisAlignedBB.expand(lateralDistance, verticalDistance, lateralDistance);
 	}
 	
 		

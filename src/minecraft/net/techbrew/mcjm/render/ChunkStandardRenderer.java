@@ -9,9 +9,9 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 
-import net.minecraft.block.Block;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.src.Block;
+import net.minecraft.src.MathHelper;
+import net.minecraft.src.EnumSkyBlock;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;

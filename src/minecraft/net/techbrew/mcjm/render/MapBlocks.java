@@ -5,7 +5,7 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import net.minecraft.block.Block;
+import net.minecraft.src.Block;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkStub;

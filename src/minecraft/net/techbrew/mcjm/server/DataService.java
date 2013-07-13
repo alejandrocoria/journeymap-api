@@ -3,7 +3,7 @@ package net.techbrew.mcjm.server;
 import java.net.URLEncoder;
 import java.util.HashMap;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.AllData;

@@ -5,8 +5,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.src.DynamicTexture;
+import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.log.LogFormatter;

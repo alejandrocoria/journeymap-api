@@ -2,9 +2,9 @@ package net.techbrew.mcjm.thread;
 
 import java.util.logging.Level;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.src.Minecraft;
+import net.minecraft.src.EntityClientPlayerMP;
+import net.minecraft.src.Chunk;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;

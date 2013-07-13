@@ -11,11 +11,11 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.resources.ResourceLocation;
-import net.minecraft.entity.Entity;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.src.Tessellator;
+import net.minecraft.src.DynamicTexture;
+import net.minecraft.src.ResourceLocation;
+import net.minecraft.src.Entity;
+import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.log.LogFormatter;

@@ -10,10 +10,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.NetClientHandler;
-import net.minecraft.world.storage.MapStorage;
-import net.minecraft.world.storage.WorldInfo;
+import net.minecraft.src.Minecraft;
+import net.minecraft.src.NetClientHandler;
+import net.minecraft.src.MapStorage;
+import net.minecraft.src.WorldInfo;
 import net.techbrew.mcjm.JourneyMap;
 
 /**

@@ -9,7 +9,7 @@ import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;

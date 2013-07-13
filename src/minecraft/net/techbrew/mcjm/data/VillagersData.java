@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.world.World;
+import net.minecraft.src.Minecraft;
+import net.minecraft.src.EntityClientPlayerMP;
+import net.minecraft.src.EntityVillager;
+import net.minecraft.src.World;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.EntityHelper;
