@@ -4,6 +4,9 @@ conf/
 /dist/
 docs/
 eclipse/.metadata
+eclipse/Client/.classpath
+eclipse/Client/.project
+eclipse/Client/.settings/
 eclipse/Minecraft/.settings/
 eclipse/Minecraft/bin/
 eclipse/Minecraft/*.*
