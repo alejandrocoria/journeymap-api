@@ -8,9 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.text.Utilities;
+
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.Render;
+import net.minecraft.src.RenderFacade;
 import net.minecraft.src.RenderHorse;
 import net.minecraft.src.RenderLiving;
 import net.minecraft.src.RenderManager;
@@ -28,6 +31,7 @@ import net.minecraft.src.EntityWaterMob;
 import net.minecraft.src.IAnimals;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.AxisAlignedBB;
+import net.minecraft.src.mod_JourneyMap;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.io.FileHandler;
@@ -104,7 +108,7 @@ public class EntityHelper {
 	 * @return
 	 */
 	private static AxisAlignedBB getBB(EntityPlayerSP player) {
-		return AxisAlignedBB.expand(lateralDistance, verticalDistance, lateralDistance);
+		return AxisAlignedBB.getBoundingBox(player.posX, player.posY, player.posZ, player.posX, player.posY, player.posZ).expand(lateralDistance, verticalDistance, lateralDistance);
 	}
 	
 		
@@ -255,40 +259,15 @@ public class EntityHelper {
 	        }
 		}
 		
-		// All other mobs	
-		try {
-			
-			//Method m = Render.class.getMethod("func_110775_a", Entity.class);
-			if(renderGetEntityTextureMethod==null) {
-				for(Method m : Render.class.getMethods()){
-					Class[] pTypes = m.getParameterTypes();
-					if(pTypes.length==1) {
-						if(Entity.class.equals(pTypes[0])){
-							renderGetEntityTextureMethod = m;
-							m.setAccessible(true);
-							break;
-						}
-					}
-				}
-			}
-			if(renderGetEntityTextureMethod!=null) {
-				ResourceLocation loc = (ResourceLocation) renderGetEntityTextureMethod.invoke(render, entity);
-				
-				String tex = loc.func_110623_a();
-				String search = "/entity/";
-				int i = tex.lastIndexOf(search);
-				if(i>=0) {
-					tex = tex.substring(i+search.length());
-				} 
-				return tex;
-			} else {
-				return null;
-			}
-			
-		} catch (Exception e) {
-			JourneyMap.getLogger().warning("Can't get mob resource from Render.class aka " + render.getClass().getSimpleName() + " for " + entity.getEntityName() + " because " + e);
-			return null;
+		// Non-horse mobs
+		ResourceLocation loc = RenderFacade.getEntityTexture(render, entity);
+		String tex = loc.func_110623_a();
+		String search = "/entity/";
+		int i = tex.lastIndexOf(search);
+		if(i>=0) {
+			tex = tex.substring(i+search.length());
 		} 
+		return tex;
 	}
 	
 	public static class EntityMapComparator implements Comparator<Map> {
