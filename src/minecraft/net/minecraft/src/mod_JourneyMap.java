@@ -69,10 +69,10 @@ public class mod_JourneyMap extends BaseMod {
 	
 	@Override
 	public boolean onTickInGUI(float tick, Minecraft game, GuiScreen gui) {
-		if(!(game.entityRenderer instanceof EntityRendererProxy)) {
-			JourneyMap.getLogger().warning("ModLoader didn't set EntityRendererProxy.  Doing so manually.");
-			game.entityRenderer = new EntityRendererProxy(game);
-		}
+//		if(!(game.entityRenderer instanceof EntityRendererProxy)) {
+//			JourneyMap.getLogger().warning("ModLoader didn't set EntityRendererProxy.  Doing so manually.");
+//			game.entityRenderer = new EntityRendererProxy(game);
+//		}
 		return JourneyMap.getInstance().onTickInGUI(tick, game, gui);
 	}
 	
@@ -86,5 +86,7 @@ public class mod_JourneyMap extends BaseMod {
 	{
 		JourneyMap.getInstance().keyboardEvent(keybinding);
 	}
-
+	
 }
+
+

@@ -2,7 +2,7 @@
 <project name="JourneyMap" basedir="../.." default="all">
 
   <!-- Update when new version is going to be released -->
-  <property name="version" value="2.7.1_MC1.6.2_Forge" />
+  <property name="version" value="2.7.2_MC1.6.2" />
 
   <property name="mcp.dir" location="${basedir}" />
   <property name="dist.dir" location="${mcp.dir}/dist" />
@@ -45,7 +45,10 @@
   	<!-- Modloader BaseMod -->
     <copy todir="${build.dir}" failonerror="true" file="${reobf.dir}/mod_JourneyMap.class" />
   	
-  	<!-- JourneyMap classes -->
+  	<!-- JourneyMap facades -->
+    <copy todir="${build.dir}" failonerror="true" file="${reobf.dir}/RenderFacade.class" />
+  	
+  	<!-- JourneyMap package -->
   	<copy todir="${build.dir}/net/techbrew/" failonerror="true">
       <fileset dir="${reobf.dir}/net/techbrew/" />
     </copy>

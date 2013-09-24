@@ -1,4 +1,4 @@
-JourneyMap 2.7.1 for Minecraft 1.6.2 and Forge (July 10, 2013)
+JourneyMap 2.7.2 for Minecraft 1.6.2 (July 13, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -9,7 +9,15 @@ http://journeymap.techbrew.net
 Requirements:
 
 - Minecraft 1.6.2
-- Forge 9.10.0.777 or higher
+- Forge 9.10.0.777 or higher, 
+  or ModLoader with AComputerDogs ModLoader Patch 1.6.2_c or higher
+  (http://www.minecraftforum.net/topic/1888092-)
+
+Changes in JourneyMap 2.7.2 for Minecraft 1.6.2:
+- Updated to work with ModLoader and AComputerDogs ModLoader Patch 1.6.2_c
+- Improved mob radar icons for horses, mules, donkeys, etc.
+- (W1Y-NY4-9EMN) Bugfix: Mob icons not loading 
+- (25B-BH6-LLWX) Added translation for Simplified Chinese (zh_CH).  Thanks to SF_Chipan!
 
 Changes in JourneyMap 2.7.1 for Minecraft 1.6.2:
 - Updated for 1.6.2
