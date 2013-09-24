@@ -52,7 +52,7 @@ public class ColorCache {
 	volatile long lastTextureUsed;
 	
 	public ColorCache() {
-		texturePackList = Minecraft.getMinecraft().func_110438_M();
+		texturePackList = Minecraft.getMinecraft().getResourcePackRepository();
 		useCustomTexturePack = PropertyManager.getInstance().getBoolean(PropertyManager.Key.USE_CUSTOM_TEXTUREPACK);
 		validateResourcePack();
 	}
@@ -200,7 +200,7 @@ public class ColorCache {
 	InputStream getIconStream(ResourceLocation loc, ResourcePack resourcePack) {
 		InputStream is = null;
 		try {
-        	is = resourcePack.func_110590_a(loc);
+        	is = resourcePack.getInputStream(loc);
         } catch(ResourcePackFileNotFoundException e) {
         	JourneyMap.getLogger().fine("ResourcePack doesn't have icon for " + loc);
         } catch(IOException e) {
@@ -216,8 +216,8 @@ public class ColorCache {
         Color color;
         BufferedImage img = null;
         InputStream imgIs = getIconStream(loc, rp);
-        if(imgIs==null && rp!=texturePackList.field_110620_b) {
-        	rp = texturePackList.field_110620_b;
+        if(imgIs==null && rp!=texturePackList.rprDefaultResourcePack) {
+        	rp = texturePackList.rprDefaultResourcePack;
         	imgIs = getIconStream(loc, rp);
         }
         
@@ -292,11 +292,11 @@ public class ColorCache {
 	void validateResourcePack() {
 		// Check if the resourcepack has changed
     	ResourcePack currentPack = null;
-    	if(useCustomTexturePack && texturePackList.func_110613_c().size()>0) {
-			ResourcePackRepositoryEntry rpre = (ResourcePackRepositoryEntry) texturePackList.func_110613_c().get(0);
-			currentPack = rpre.func_110514_c();
+    	if(useCustomTexturePack && texturePackList.getRepositoryEntries().size()>0) {
+			ResourcePackRepositoryEntry rpre = (ResourcePackRepositoryEntry) texturePackList.getRepositoryEntries().get(0);
+			currentPack = rpre.getResourcePack();
 		} else {
-			currentPack = texturePackList.field_110620_b; // DefaultResourcePack
+			currentPack = texturePackList.rprDefaultResourcePack; // DefaultResourcePack
 		}
     	if(texturePack!=currentPack) {
     		texturePack = currentPack;
@@ -306,7 +306,7 @@ public class ColorCache {
     		colors.clear();    				
     		colors.put(new BlockInfo(0,0), new Color(0x000000)); // air    		
     		MapBlocks.resetAlphas();
-    		JourneyMap.getLogger().info("Deriving block colors from ResourcePack: " + texturePack.func_130077_b());
+    		JourneyMap.getLogger().info("Deriving block colors from ResourcePack: " + texturePack.getPackName());
     	} 
     	lastTextureUsed = System.currentTimeMillis();
 	}

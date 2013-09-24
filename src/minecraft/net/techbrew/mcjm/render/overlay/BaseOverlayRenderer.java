@@ -162,7 +162,7 @@ public abstract class BaseOverlayRenderer<K> {
 		GL11.glBlendFunc(770, 771);
 		GL11.glColor4f(transparency, transparency, transparency, transparency);
 		GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
-		GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, texture.func_110552_b());
+		GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, texture.getGlTextureId());
 
 		tessellator.startDrawingQuads();
 

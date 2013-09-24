@@ -1028,7 +1028,7 @@ public class MapOverlay extends GuiScreen {
 
 	protected void eraseCachedLogoImg() {
 		if(logoTexture!=null) {
-			GL11.glDeleteTextures(logoTexture.func_110552_b());
+			GL11.glDeleteTextures(logoTexture.getGlTextureId());
 			logoTexture = null;
 		}
 	}

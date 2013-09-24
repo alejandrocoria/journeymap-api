@@ -97,7 +97,7 @@ public class OverlayEntityRenderer extends BaseOverlayRenderer<MapOverlayState> 
 		entityImage = null;
 		if(entityTexture!=null) {
 			try {
-				GL11.glDeleteTextures(entityTexture.func_110552_b());
+				GL11.glDeleteTextures(entityTexture.getGlTextureId());
 				entityTexture = null;
 			} catch(Throwable t) {
 				JourneyMap.getLogger().warning("Map image texture not deleted: " + t.getMessage());

@@ -90,7 +90,7 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 		mapImg = null;
 		if(mapTexture!=null) {
 			try {
-				GL11.glDeleteTextures(mapTexture.func_110552_b());		
+				GL11.glDeleteTextures(mapTexture.getGlTextureId());		
 			} catch(Throwable t) {
 				JourneyMap.getLogger().warning("Map image texture not deleted: " + t.getMessage());
 				t.printStackTrace();

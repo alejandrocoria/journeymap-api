@@ -88,7 +88,7 @@ public class MapButton extends GuiSmallButton {
 			GL11.glColor4f(.5F, .5F, .5F, 1F);
 		}
 		GL11.glDisable(3008 /*GL_ALPHA_TEST*/);		
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, iconTexture.func_110552_b());
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, iconTexture.getGlTextureId());
 		
 		// Check hover
 		boolean hover = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;

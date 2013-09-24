@@ -239,7 +239,7 @@ public class EntityHelper {
 		
 		// Manually handle horses
 		if(render instanceof RenderHorse) {			
-			switch (((EntityHorse) entity).func_110265_bP())
+			switch (((EntityHorse) entity).getHorseType())
 	        {
 		        case 0:
 	            default:
@@ -261,7 +261,7 @@ public class EntityHelper {
 		
 		// Non-horse mobs
 		ResourceLocation loc = RenderFacade.getEntityTexture(render, entity);
-		String tex = loc.func_110623_a();
+		String tex = loc.getResourcePath();
 		String search = "/entity/";
 		int i = tex.lastIndexOf(search);
 		if(i>=0) {
