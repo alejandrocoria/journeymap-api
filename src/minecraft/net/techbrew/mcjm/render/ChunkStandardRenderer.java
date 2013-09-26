@@ -115,54 +115,59 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						
 					}
 					paintDepth(chunkStub, blockInfo, x, y, z, g2D);
-				}
+					
+				} else {
 				
-				if(!MapBlocks.noShadows.contains(blockInfo)) {
-
-					// Get slope of block and prepare to shade
-					slope = chunkStub.slopes[x][z];
-					
-					sN = getBlockSlope(x, z, 0, -1, chunkStub, neighbors, slope);
-					sNW = getBlockSlope(x, z, -1, -1, chunkStub, neighbors, slope);
-					sW = getBlockSlope(x, z, -1, 0, chunkStub, neighbors, slope);
-					sAvg = (sN+sNW+sW)/3f;
-					
-					if(slope<1) {
-						
-						if(slope<=sAvg) {
-							slope = slope*.6f;
-						} else if(slope>sAvg) {
-							slope = (slope+sAvg)/2f;
-						}
-						s = Math.max(slope * .8f, .1f);
-						color = shade(color, s);
+					if(!MapBlocks.noShadows.contains(blockInfo)) {
 	
-					} else if(slope>1) {
+						// Get slope of block and prepare to shade
+						slope = chunkStub.slopes[x][z];
 						
-						if(sAvg>1) {
-							if(slope>=sAvg) {
-								slope = slope*1.2f;
+						sN = getBlockSlope(x, z, 0, -1, chunkStub, neighbors, slope);
+						sNW = getBlockSlope(x, z, -1, -1, chunkStub, neighbors, slope);
+						sW = getBlockSlope(x, z, -1, 0, chunkStub, neighbors, slope);
+						sAvg = (sN+sNW+sW)/3f;
+						
+						if(slope<1) {
+							
+							if(slope<=sAvg) {
+								slope = slope*.6f;
+							} else if(slope>sAvg) {
+								slope = (slope+sAvg)/2f;
 							}
+							s = Math.max(slope * .8f, .1f);
+							color = shade(color, s);
+		
+						} else if(slope>1) {
+							
+							if(sAvg>1) {
+								if(slope>=sAvg) {
+									slope = slope*1.2f;
+								}
+							}
+							s = (float) slope * 1.2f;
+							s = Math.min(s, 1.4f);
+							color = shade(color, s);
 						}
-						s = (float) slope * 1.2f;
-						s = Math.min(s, 1.4f);
-						color = shade(color, s);
 					}
-					
+						
 					// Draw daytime map block
 					g2D.setComposite(MapBlocks.OPAQUE);						
 					g2D.setPaint(color);
 					g2D.fillRect(x, z, 1, 1);
 				}
 				
-				// Adjust color for light level
+				
+				// Adjust color for light level at night		
 				int lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,y + 1, z);
 				if(lightLevel==0) lightLevel = 1;
 				if (lightLevel < 15) {
 					float diff = Math.min(1F, (lightLevel / 15F) + .1f);
-					color = shadeNight(color, diff);
+					if(diff!=1.0) {
+						color = shadeNight(color, diff);
+					}
 				}
-
+				
 				// Draw nighttime map block
 				g2D.setComposite(MapBlocks.OPAQUE);
 				g2D.setPaint(color);
@@ -367,12 +372,27 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 			
 		}
 		
-		boolean thinWaterAdjust = (stack.size()==2 && blockInfo.id==Block.waterStill.blockID);
+		float depth = stack.size();
+		boolean thinWaterAdjust = (depth==2 && blockInfo.id==Block.waterStill.blockID);
+		boolean isWater = (blockInfo.id==Block.waterStill.blockID || blockInfo.id==Block.waterMoving.blockID);		
+		
+		Color color;
+		float lightLevel;
 				
 		// If bottom block is same as the top, don't bother with transparency
-		if(stack.size()<2 || stack.peek().id==blockInfo.id) {
+		if(isWater && stack.peek().id==blockInfo.id) {
+			color = blockInfo.getColor();
+			
+			float darken = .68f;
+			float[] rgb = new float[4];
+			rgb = color.getRGBColorComponents(rgb);
+			color = new Color(
+					MathHelper.clamp_float(rgb[0] * darken, 0f, 1f), 
+					MathHelper.clamp_float(rgb[1] * darken, 0f, 1f), 
+					MathHelper.clamp_float(rgb[2] * darken, 0f, 1f));
+			
 			g2D.setComposite(MapBlocks.OPAQUE);
-			g2D.setPaint(blockInfo.getColor());
+			g2D.setPaint(color);
 			g2D.fillRect(x, z, 1, 1);
 		} else {
 		
@@ -382,21 +402,27 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				g2D.setPaint(stack.pop().getColor());
 				g2D.fillRect(x, z, 1, 1);
 			}
-			
+						
 			// Overlay blocks above using transparency
 			while(!stack.isEmpty()) {
 				BlockInfo lowerBlock = stack.pop();
 				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, lowerBlock.alpha));
-				g2D.setPaint(lowerBlock.getColor());
+				
+				color = lowerBlock.getColor();
+				if(isWater) {
+					float darken = .7f;
+					float[] rgb = new float[4];
+					rgb = color.getRGBColorComponents(rgb);
+					color = new Color(
+							MathHelper.clamp_float(rgb[0] * darken, 0f, 1f), 
+							MathHelper.clamp_float(rgb[1] * darken, 0f, 1f), 
+							MathHelper.clamp_float(rgb[2] * darken, 0f, 1f));
+				}
+				
+				g2D.setPaint(color);
 				g2D.fillRect(x, z, 1, 1);
-			}	
-			
-			if(thinWaterAdjust) {
-				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .3f));
-				g2D.setPaint(blockInfo.getColor());
-				g2D.fillRect(x, z, 1, 1);
-			}
-		}
+			}				
+		}	
 		
 	}
 	

@@ -1,6 +1,7 @@
 package net.techbrew.mcjm.render;
 
 import java.awt.Color;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +14,7 @@ import net.minecraft.src.Block;
 import net.minecraft.src.BlockGrass;
 import net.minecraft.src.BlockLeaves;
 import net.minecraft.src.BlockLilyPad;
+import net.minecraft.src.BlockSand;
 import net.minecraft.src.BlockTallGrass;
 import net.minecraft.src.BlockVine;
 import net.minecraft.src.Minecraft;
@@ -59,57 +61,56 @@ public class ColorCache {
 	
 
 	public Color getBlockColor(ChunkStub chunkStub, BlockInfo blockInfo, int x, int y, int z) {
-		Color color = null;
 		
-		if(blockInfo.getColor()!=null) {
-			return blockInfo.getColor();
+		Color color = blockInfo.getColor();
+		
+		if(color==null) {
+			
+			Block block = blockInfo.getBlock();
+			BiomeGenBase biome = chunkStub.getBiomeGenForWorldCoords(x, z, chunkStub.worldObj.getWorldChunkManager());		
+			
+			if(block instanceof BlockLeaves || block instanceof BlockVine) {
+				
+				String key = blockInfo.hashCode() + biome.biomeName;
+				color = foliageBiomeColors.get(key);
+				if(color==null) {
+					color = colorMultiplier(getBasicBlockColor(blockInfo), biome.getBiomeFoliageColor());
+					//color = new Color(block.colorMultiplier(chunkStub.worldObj, x, y, z));
+					foliageBiomeColors.put(key, color);				
+				}
+				
+			} else if(block instanceof BlockGrass || block instanceof BlockTallGrass) {
+	
+				color = grassBiomeColors.get(biome);
+				if(color==null) {
+					color = colorMultiplier(getBasicBlockColor(blockInfo), biome.getBiomeGrassColor());
+					//color = tint(getBasicBlockColor(blockInfo), block.colorMultiplier(chunkStub.worldObj, x, y, z));
+					//color = average(getBasicBlockColor(blockInfo), new Color(block.colorMultiplier(chunkStub.worldObj, x, y, z)));
+					grassBiomeColors.put(biome, color);
+				}
+				
+			} else if(block==Block.waterStill || block==Block.waterMoving) {
+				
+				color = waterBiomeColors.get(biome);
+				if(color==null) {
+					color = colorMultiplier(getBasicBlockColor(blockInfo), biome.waterColorMultiplier);
+					waterBiomeColors.put(biome, color);
+				}
+				
+			} else if(block instanceof BlockLilyPad) {
+				
+				color = colorMultiplier(getBasicBlockColor(blockInfo), block.getBlockColor());
+	
+			} else {
+				
+				int rc = block.getRenderColor(blockInfo.meta);
+				if(rc!=16777215 && rc!=0) {
+					color = new Color(rc);
+				} else {			
+					color = getBasicBlockColor(blockInfo);
+				}
+			}
 		}
-		
-		BiomeGenBase biome = chunkStub.getBiomeGenForWorldCoords(x, z, chunkStub.worldObj.getWorldChunkManager());
-		String biomeName = biome.biomeName;
-		
-		Block block = blockInfo.getBlock();
-		
-		if(block instanceof BlockLeaves || block instanceof BlockVine) {
-			
-			color = foliageBiomeColors.get(blockInfo.hashCode() + biomeName);
-			if(color==null) {
-				color = getBlockColor(blockInfo);
-				color = multiply(color, biome.getBiomeFoliageColor());
-				foliageBiomeColors.put(blockInfo.hashCode() + biomeName, color);
-			}
-			
-		} else if(block instanceof BlockGrass || block instanceof BlockTallGrass) {
-
-			color = grassBiomeColors.get(biome);
-			if(color==null) {
-				// TODO: Use scanned color?
-				color = multiply(Color.lightGray, biome.getBiomeGrassColor());
-				grassBiomeColors.put(biome, color);
-			}
-			
-		} else if(block==Block.waterStill || block==Block.waterMoving) {
-			
-			color = waterBiomeColors.get(biome);
-			if(color==null) {
-				color = multiply(getBlockColor(blockInfo), biome.waterColorMultiplier);
-				waterBiomeColors.put(biome, color);
-			}
-			
-		} else if(block instanceof BlockLilyPad) {
-			
-			color = ColorCache.multiply(getBlockColor(blockInfo), block.getRenderColor(blockInfo.meta));
-
-		} else {
-			
-			int rc = block.getRenderColor(blockInfo.meta);
-			if(rc!=16777215 && rc!=0) {
-				color = new Color(rc);
-			} else {			
-				color = getBlockColor(blockInfo);
-			}
-		}
-		
 		return color;
 	}
 	
@@ -119,27 +120,26 @@ public class ColorCache {
 	 * @param blockInfo
 	 * @return
 	 */
-	private Color getBlockColor(BlockInfo blockInfo) {
-		
-		if(blockInfo.getColor()!=null) {
-			return blockInfo.getColor();
-		}
+	private Color getBasicBlockColor(BlockInfo blockInfo) {
 
 		// Check if the resourcepack has changed
 		if(lastTextureUsed+5000<System.currentTimeMillis()) {
 			validateResourcePack();	    	
 		}
 		
-		Color color = colors.get(blockInfo);
+		Color color = blockInfo.getColor();
+		if(color==null) {		
+			color = colors.get(blockInfo);			
+		}
 		if(color==null) {
 			color = loadBlockColor(blockInfo);
-			if(color==null) {
-				color = Color.black;
-			}
-			colors.put(blockInfo, color);
 		}
-		
+		if(color==null) {
+			JourneyMap.getLogger().warning("\tColor null for " + stringInfo(blockInfo));
+			color = Color.black;
+		}
 		blockInfo.setColor(color);
+			
 		return color;		
 	}
 		
@@ -150,6 +150,9 @@ public class ColorCache {
 	 * @return
 	 */
 	protected Color loadBlockColor(BlockInfo blockInfo) {
+		
+		Color color = null;
+		
 		try {
 						
 			JourneyMap.getLogger().fine("Loading color for " + stringInfo(blockInfo));
@@ -166,23 +169,26 @@ public class ColorCache {
             		JourneyMap.getLogger().warning("ItemBlocks not supported: " + item.itemID + ":" + item.getMetadata(0) + " " + item.getUnlocalizedName());
             	}
 
-            	return null;
+            } else {
+            	int side = MapBlocks.side2Textures.contains(block.blockID) ? 2 : 1;
+	            TextureAtlasSprite blockIcon = (TextureAtlasSprite) block.getIcon(side, blockInfo.meta);
+	        	if(blockIcon==null) {
+	        		JourneyMap.getLogger().warning("No TextureAtlasSprite for " + stringInfo(blockInfo));
+	        	} else {
+	        		color = getColorForIcon(blockInfo, blockIcon);  
+	        	}
             }
-
-            TextureAtlasSprite blockIcon = (TextureAtlasSprite) block.getIcon(0, blockInfo.meta);
-        	if(blockIcon==null) {
-        		JourneyMap.getLogger().warning("No TextureAtlasSprite for " + stringInfo(blockInfo));
-        		return null;
-        	}        
         	
-        	Color color = getColorForIcon(blockInfo, blockIcon);            
+        	if(color==null){
+        		color = Color.black;
+        	}
+        	
+			if(color.equals(Color.black)) {
+				JourneyMap.getLogger().warning("\tColor eval'd to black for " + stringInfo(blockInfo));
+			}
              
 			// Put the color in the map
 			colors.put(blockInfo, color);
-			if(color.equals(Color.black)) {
-				JourneyMap.getLogger().warning("\tColor eval'd to black");
-			}
-			
 		
 			// Time the whole thing
 //            double loadStop = System.nanoTime();   
@@ -193,7 +199,7 @@ public class ColorCache {
 
 		} catch (Throwable t) {
 			JourneyMap.getLogger().severe("Error getting color: " + LogFormatter.toString(t));
-			return null;
+			return Color.black;
 		}
 	}
 	
@@ -213,7 +219,7 @@ public class ColorCache {
 		
 		ResourceLocation loc = new ResourceLocation("textures/blocks/" + icon.getIconName() + ".png");
 		ResourcePack rp = texturePack;
-        Color color;
+        Color color = null;
         BufferedImage img = null;
         InputStream imgIs = getIconStream(loc, rp);
         if(imgIs==null && rp!=texturePackList.rprDefaultResourcePack) {
@@ -221,24 +227,32 @@ public class ColorCache {
         	imgIs = getIconStream(loc, rp);
         }
         
+        int x=0,y=0;
+    	int width = 0;
+    	int height = 0;
+    	
         if(imgIs==null) {
-        	JourneyMap.getLogger().warning("Couldn't access texture for " + stringInfo(blockInfo));
-        	color = Color.black;
+        	JourneyMap.getLogger().warning("Couldn't access texture for " + stringInfo(blockInfo) + " at " + loc.getResourcePath());        	
         } else {
+        	
 	        try {
 				img = ImageIO.read(imgIs);
 				
-				int width = icon.getOriginX();// + icon.getWidth();
-				int height = icon.getOriginY();// + icon.getHeight();
+				width = icon.getIconWidth();
+				height = icon.getIconHeight();
 		    	
-		        // TODO: Track percentage of pixels that aren't transparent, use that as factor when multiplying biome/grass/foliage color
-		        
 		        int count = 0;
 		        int argb, alpha;
-		        int a=0, r=0, g=0, b=0;
-		        for(int x=0; x<width; x++) {
-		        	for(int y=0; y<height; y++) {
-		        		argb = img.getRGB(x, y);
+		    	int a=0, r=0, g=0, b=0;
+		        outer: for(x=0; x<width; x++) {
+		        	for(y=0; y<height; y++) {
+		        		try {
+		        			argb = img.getRGB(x, y);
+		        		} catch(Throwable e) {
+		        			JourneyMap.getLogger().severe("Couldn't get RGB from texture at " + x + "," + y + " for " + loc.getResourcePath());
+		        			JourneyMap.getLogger().severe(LogFormatter.toString(e));
+		        			break outer;
+		        		}
 		        		alpha = (argb >> 24) & 0xFF; 
 		        		if(alpha>0) {
 		        			count++;
@@ -260,32 +274,36 @@ public class ColorCache {
 		        	r = g = b = 0;
 		        }
 				
+		        // Set color
+		        color = new Color(r,g,b);
 				
-				
-				try {        
-					color = new Color(r,g,b);
-				} catch(IllegalArgumentException e) {
-					JourneyMap.getLogger().warning("Bad color for " + stringInfo(blockInfo));
-					color = Color.black;
-				}
-				
-				// Put the alpha in MapBlocks		
-				if(blockInfo.getBlock().getRenderBlockPass()>0){
-					float blockAlpha = a * 1.0f/255;
+		        // Determine alpha
+		        float blockAlpha = 0f;		
+		        if(MapBlocks.alphas.containsKey(blockInfo.id)) {
+		        	blockAlpha = MapBlocks.alphas.get(blockInfo.id);
+		        	//JourneyMap.getLogger().info("Using transparency for " + stringInfo(blockInfo) + ": " + blockAlpha);
+				} else if(blockInfo.getBlock().getRenderBlockPass()>0) {
+					blockAlpha = a * 1.0f/255;
 					MapBlocks.alphas.put(blockInfo.id, blockAlpha);
-					JourneyMap.getLogger().fine("Setting transparency for " + stringInfo(blockInfo));
-				} else if(MapBlocks.alphas.containsKey(blockInfo.id)) {
-					blockInfo.setAlpha(MapBlocks.alphas.get(blockInfo.id));
+					// JourneyMap.getLogger().info("Setting transparency for " + stringInfo(blockInfo) + ": " + blockAlpha);					
 				}
-				
-				
-			} catch (IOException e1) {
-				e1.printStackTrace();
-				JourneyMap.getLogger().warning("Couldn't read InputStream for " + stringInfo(blockInfo));
-				color = Color.black;
-			}
+		        blockInfo.setAlpha(blockAlpha);
+		        
+								
+			} catch (Throwable e1) {				
+				if(x<width || y<height)
+				JourneyMap.getLogger().warning("Error deriving color from texture " + loc.getResourcePath());
+				JourneyMap.getLogger().severe(LogFormatter.toString(e1));
+			} 
         }
 
+        if(color==null) {
+        	JourneyMap.getLogger().warning("Defaulted to black for " + loc.getResourcePath());
+        	color = Color.black;
+        } else {
+    		JourneyMap.getLogger().fine("Derived color for " + loc.getResourcePath() + ": " + Integer.toHexString(color.getRGB()));
+        }
+        
         return color;
 	}
 	
@@ -311,33 +329,6 @@ public class ColorCache {
     	lastTextureUsed = System.currentTimeMillis();
 	}
 	
-	int getARGBfromArray(byte[] bytes, int x, int y, int textureWidth) {
-		int pos = y * textureWidth * 4 + x * 4;
-        int argb = 0 | (bytes[pos + 2] & 255) << 0; //b
-        argb |= (bytes[pos + 1] & 255) << 8;  //g
-        argb |= (bytes[pos + 0] & 255) << 16; //r
-        argb |= (bytes[pos + 3] & 255) << 24; //a
-        return argb;
-	}	
-
-	static Color blend(Color color1, int multiplier) {
-		int r1 = color1.getRed();
-		int g1 = color1.getGreen();
-		int b1 = color1.getBlue();
-
-		Color color2 = new Color(multiplier);
-
-		int r2 = 255-color2.getRed();
-		int g2 = 255-color2.getGreen();
-		int b2 = 255-color2.getBlue();
-
-		int r3 = Math.max(0, r1-r2);
-		int g3 = Math.max(0, g1-g2);
-		int b3 = Math.max(0, b1-b2);
-
-		return new Color(r3,g3,b3);
-	}
-	
 
 	static Color average(Collection<Color> colors)
 	{
@@ -357,43 +348,34 @@ public class ColorCache {
 		return new Color(r/count, g/count, b/count);
 	}
 	
-	static Color average(Color... colors)
-	{	
-		int count = colors.length;
-		
-		int r = 0;
-		int g = 0;
-		int b = 0;
-		
-		for(Color color : colors) {
-			r+= color.getRed();			
-			g+= color.getGreen();
-			b+= color.getBlue();
-		}
-		return new Color(r/count, g/count, b/count);
-	}
 
-	static Color multiply(Color original, int multiplier) {
-		int rgba = original.getRGB();
+	static Color colorMultiplier(Color color, int mult) {
+		int rgb = color.getRGB();
 		
-		float r = (rgba >> 16 & 0xFF) * MAGIC * ((multiplier >> 16 & 0xFF) * MAGIC);
-		float g = (rgba >> 8 & 0xFF)  * MAGIC * ((multiplier >> 8 & 0xFF)  * MAGIC);
-		float b = (rgba >> 0 & 0xFF)  * MAGIC * ((multiplier >> 0 & 0xFF)  * MAGIC);
+	    int alpha1 = rgb >> 24 & 0xFF;
+	    int red1 = rgb >> 16 & 0xFF;
+	    int green1 = rgb >> 8 & 0xFF;
+	    int blue1 = rgb >> 0 & 0xFF;
 
-		return new Color(safeColor(r),safeColor(g),safeColor(b)); 
+	    int alpha2 = mult >> 24 & 0xFF;
+	    int red2 = mult >> 16 & 0xFF;
+	    int green2 = mult >> 8 & 0xFF;
+	    int blue2 = mult >> 0 & 0xFF;
+
+	    int alpha = alpha1 * alpha2 / 255;
+	    int red = red1 * red2 / 255;
+	    int green = green1 * green2 / 255;
+	    int blue = blue1 * blue2 / 255;
+
+	    return new Color((alpha & 0xFF) << 24 | (red & 0xFF) << 16 | (green & 0xFF) << 8 | blue & 0xFF);
 	}
 
 	static float safeColor(float original) {
 		return Math.min(1F, (Math.max(0F, original)));
 	}
 	
-	static Color environment(int envMult) {
-		
-		float r = ((envMult >> 16 & 0xFF) * MAGIC);
-		float g = ((envMult >> 8 & 0xFF) * MAGIC);
-		float b = ((envMult >> 0 & 0xFF) * MAGIC);
-
-		return new Color(safeColor(r),safeColor(g),safeColor(b)); 
+	static int safeColor(int original) {
+		return Math.max(0, (Math.min(255, original)));
 	}
 	
 	String stringInfo(BlockInfo info) {

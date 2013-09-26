@@ -179,11 +179,31 @@ public class MapBlocks extends HashMap {
 	}
 	
 	/**
+	 * Map of block ids that are vegetation; textures should be side 2.
+	 */
+	public final static HashSet<Integer> side2Textures = new HashSet<Integer>(5);
+	{		
+		side2Textures.add(Block.sapling.blockID); 
+		side2Textures.add(Block.web.blockID); 		
+		side2Textures.add(Block.tallGrass.blockID); 
+		side2Textures.add(Block.deadBush.blockID); 
+		side2Textures.add(Block.plantYellow.blockID);
+		side2Textures.add(Block.plantRed.blockID);
+		side2Textures.add(Block.mushroomRed.blockID);
+		side2Textures.add(Block.mushroomBrown.blockID);
+		side2Textures.add(Block.crops.blockID);
+		side2Textures.add(Block.fire.blockID);
+		side2Textures.add(Block.reed.blockID);
+		side2Textures.add(Block.pumpkinStem.blockID);
+		side2Textures.add(Block.netherStalk.blockID);
+		side2Textures.add(Block.carrot.blockID);
+		side2Textures.add(Block.potato.blockID);
+	}
+	
+	/**
 	 * Alpha values for block ids.
 	 */	
 	static void resetAlphas() {
-		alphas.put(Block.waterStill.blockID,.7F); 
-		alphas.put(Block.waterMoving.blockID,.7F); 
 		alphas.put(Block.ice.blockID,.8F); 
 		alphas.put(Block.glass.blockID,.3F); 
 		alphas.put(Block.thinGlass.blockID,.3F);
