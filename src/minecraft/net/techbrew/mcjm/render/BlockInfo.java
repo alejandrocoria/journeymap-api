@@ -71,4 +71,26 @@ public class BlockInfo {
 		return "BlockInfo [" + id + ":" + meta + "]";
 	}
 	
+	public String debugString() {
+		StringBuffer sb = new StringBuffer();
+		Block block = getBlock();
+		if(block!=null) {
+			sb.append("Block ").append(block.getUnlocalizedName()).append(" ");
+		} else {
+			sb.append("Non-Block ");
+		}
+		sb.append(id).append(":").append(meta);
+		if(block!=null) {
+			int bcolor = block.getBlockColor();
+			if(bcolor!=16777215) {
+				sb.append(", blockColor=").append(Integer.toHexString(bcolor));
+			}
+			int rcolor = block.getBlockColor();
+			if(rcolor!=16777215) {
+				sb.append(", renderColor=").append(Integer.toHexString(rcolor));
+			}
+		}
+		return sb.toString();
+	}
+	
 }

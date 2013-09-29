@@ -34,7 +34,6 @@ public class PropertyManager {
 		CAVE_LIGHTING("render_cavelighting_enabled",true), //$NON-NLS-1$
 		ANNOUNCE_MODLOADED("announce_modloaded", true), //$NON-NLS-1$
 		UPDATE_CHECK_ENABLED("update_check_enabled", true), //$NON-NLS-1$
-		USE_CUSTOM_TEXTUREPACK("use_custom_texturepack", true), //$NON-NLS-1$
 		
 		PREF_SHOW_CAVES("preference_show_caves", true), //$NON-NLS-1$
 		PREF_SHOW_MOBS("preference_show_mobs", true), //$NON-NLS-1$
@@ -179,10 +178,14 @@ public class PropertyManager {
 				properties.put(entry.getKey().replaceAll("\\.", "_"), entry.getValue());	
 				properties.remove(entry.getKey());
 			}
+			if(entry.getKey().equals("use_custom_texturepack")) {
+				writeNeeded = true;
+				properties.remove(entry.getKey());
+			}
 		}
 		
 		if(writeNeeded) {
-			JourneyMap.getLogger().info("Updated property names to use _ instead of .");
+			JourneyMap.getLogger().info("Property file updated for programmatic changes.");
 		}
 					
 	}
