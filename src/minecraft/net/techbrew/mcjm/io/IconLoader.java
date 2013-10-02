@@ -5,6 +5,8 @@ import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -35,45 +37,21 @@ public class IconLoader {
 	
 	Logger logger = JourneyMap.getLogger();
 	BufferedImage blocksTexture;
+	HashSet<BlockInfo> failed = new HashSet<BlockInfo>();
 	
 	/**
 	 * Must be instantiated on main minecraft thread where GL context is viable.
 	 */
 	public IconLoader() {
 		initBlocksTexture();
+	}	
+	
+	public boolean isReady() {
+		return blocksTexture!=null;
 	}
 	
-	public void initBlocksTexture() {
-		
-		try {
-			int glid = Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
-			GL11.glBindTexture(3553, glid);
-		    int width = GL11.glGetTexLevelParameteri(3553, 0, 4096);
-		    int height = GL11.glGetTexLevelParameteri(3553, 0, 4097);
-		    ByteBuffer byteBuffer = ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.nativeOrder());
-		
-		    GL11.glGetTexImage(3553, 0, 6408, 5121, byteBuffer);
-		    BufferedImage image = new BufferedImage(width, height, 6);
-		    byteBuffer.position(0);
-		    byte[] var4 = new byte[byteBuffer.remaining()];
-		    byteBuffer.get(var4);
-		
-		    for (int var5 = 0; var5 < width; var5++) {
-		      for (int var6 = 0; var6 < height; var6++)
-		      {
-		        int var7 = var6 * width * 4 + var5 * 4;
-		        byte var8 = 0;
-		        int var10 = var8 | (var4[(var7 + 2)] & 0xFF) << 0;
-		        var10 |= (var4[(var7 + 1)] & 0xFF) << 8;
-		        var10 |= (var4[(var7 + 0)] & 0xFF) << 16;
-		        var10 |= (var4[(var7 + 3)] & 0xFF) << 24;
-		        image.setRGB(var5, var6, var10);
-		      }
-		    }
-		    this.blocksTexture = image;
-		} catch(Throwable t) {
-			logger.severe("Could not load blocksTexture: " + LogFormatter.toString(t));
-		}
+	public boolean failedFor(BlockInfo blockInfo) {
+		return failed.contains(blockInfo);
 	}
 	
 	/**
@@ -85,38 +63,46 @@ public class IconLoader {
 		
 		Color color = null;
 		
-		if(blocksTexture==null) {
+		if(isReady()==false) {
 			logger.warning("BlocksTexture not yet loaded");
 			return null;					
 		}
 		
+		if(failed.contains(blockInfo)){
+			return null;
+		}
+		
 		try {
-						
-			logger.fine("Loading color for " + blockInfo.debugString());
+				
+			if(logger.isLoggable(Level.FINE)){
+				logger.fine("Loading color for " + blockInfo.debugString());
+			}
 			
 	        Block block = Block.blocksList[blockInfo.id];
 
             if (block == null) {
-            	logger.warning("No block type found");
-            	
-            	ItemBlock item = (ItemBlock) Item.itemsList[blockInfo.id];
-            	if(item!=null) {
-            		logger.warning("ItemBlocks not supported: " + item.itemID + ":" + item.getMetadata(0) + " " + item.getUnlocalizedName());
-            	}
-
+            	logger.warning("Block not in blocksList: " + blockInfo.debugString());
             } else {
             	int side = MapBlocks.side2Textures.contains(block.blockID) ? 2 : 1;
-	            TextureAtlasSprite blockIcon = (TextureAtlasSprite) block.getIcon(side, blockInfo.meta);
+	            TextureAtlasSprite blockIcon = null;
+	            while(blockIcon==null && side>=0) {
+	            	blockIcon = (TextureAtlasSprite) block.getIcon(side, blockInfo.meta);
+	            	side--;	            	
+	            }
 	        	if(blockIcon==null) {
-	        		logger.warning("No TextureAtlasSprite for " + blockInfo.debugString());
+	        		logger.warning("Could not get Icon for " + blockInfo.debugString());
 	        	} else {
 	        		color = getColorForIcon(blockInfo, blockIcon);  
 	        	}
             }
 			
+            if(color==null) {
+            	failed.add(blockInfo);
+            }
 			return color;                           
 
 		} catch (Throwable t) {
+			failed.add(blockInfo);
 			logger.severe("Error getting color: " + LogFormatter.toString(t));
 			return null;
 		}
@@ -175,11 +161,9 @@ public class IconLoader {
 	        float blockAlpha = 0f;		
 	        if(MapBlocks.alphas.containsKey(blockInfo.id)) {
 	        	blockAlpha = MapBlocks.alphas.get(blockInfo.id);
-	        	//logger.info("Using transparency for " + blockInfo.debugString() + ": " + blockAlpha);
 			} else if(blockInfo.getBlock().getRenderBlockPass()>0) {
 				blockAlpha = a * 1.0f/255;
-				MapBlocks.alphas.put(blockInfo.id, blockAlpha);
-				// logger.info("Setting transparency for " + blockInfo.debugString() + ": " + blockAlpha);					
+				MapBlocks.alphas.put(blockInfo.id, blockAlpha);		
 			}
 	        blockInfo.setAlpha(blockAlpha);	        
 							
@@ -192,10 +176,43 @@ public class IconLoader {
         	if(logger.isLoggable(Level.FINE)){
         		logger.fine("Derived color for " + blockInfo.debugString() + ": " + Integer.toHexString(color.getRGB()));
         	}
-        }
+        } 
         
         return color;
 	}
 
-
+	public void initBlocksTexture() {
+		
+		failed.clear();
+		
+		try {
+			int glid = Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
+			GL11.glBindTexture(3553, glid);
+		    int width = GL11.glGetTexLevelParameteri(3553, 0, 4096);
+		    int height = GL11.glGetTexLevelParameteri(3553, 0, 4097);
+		    ByteBuffer byteBuffer = ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.nativeOrder());
+		
+		    GL11.glGetTexImage(3553, 0, 6408, 5121, byteBuffer);
+		    BufferedImage image = new BufferedImage(width, height, 6);
+		    byteBuffer.position(0);
+		    byte[] var4 = new byte[byteBuffer.remaining()];
+		    byteBuffer.get(var4);
+		
+		    for (int var5 = 0; var5 < width; var5++) {
+		      for (int var6 = 0; var6 < height; var6++)
+		      {
+		        int var7 = var6 * width * 4 + var5 * 4;
+		        byte var8 = 0;
+		        int var10 = var8 | (var4[(var7 + 2)] & 0xFF) << 0;
+		        var10 |= (var4[(var7 + 1)] & 0xFF) << 8;
+		        var10 |= (var4[(var7 + 0)] & 0xFF) << 16;
+		        var10 |= (var4[(var7 + 3)] & 0xFF) << 24;
+		        image.setRGB(var5, var6, var10);
+		      }
+		    }
+		    this.blocksTexture = image;
+		} catch(Throwable t) {
+			logger.severe("Could not load blocksTexture: " + LogFormatter.toString(t));
+		}
+	}
 }

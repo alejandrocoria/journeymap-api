@@ -195,9 +195,23 @@ public class MapBlocks extends HashMap {
 		side2Textures.add(Block.fire.blockID);
 		side2Textures.add(Block.reed.blockID);
 		side2Textures.add(Block.pumpkinStem.blockID);
+		side2Textures.add(Block.melonStem.blockID);
 		side2Textures.add(Block.netherStalk.blockID);
 		side2Textures.add(Block.carrot.blockID);
 		side2Textures.add(Block.potato.blockID);
+	}
+	
+	/**
+	 * Map of block ids that are colored according to biome.
+	 */
+	public final static HashSet<Integer> biomeBlocks = new HashSet<Integer>(5);
+	{		
+		biomeBlocks.add(Block.grass.blockID); 
+		biomeBlocks.add(Block.waterMoving.blockID); 		
+		biomeBlocks.add(Block.waterStill.blockID); 
+		biomeBlocks.add(Block.leaves.blockID); 
+		biomeBlocks.add(Block.tallGrass.blockID);
+		biomeBlocks.add(Block.vine.blockID);
 	}
 	
 	/**

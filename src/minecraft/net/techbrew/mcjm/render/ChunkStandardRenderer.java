@@ -51,7 +51,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	 */
 	private void renderSurface(final Graphics2D g2D, final ChunkStub chunkStub, final int vSlice, final Map<Integer, ChunkStub> neighbors) {
 		
-		float slope, s, sN, sNW, sW, sAvg, shaded, h, hN, hW;
+		float slope, s, sN, sNW, sW, sS, sE, sAvg, shaded, h, hN, hW;
 		
 		// Initialize ChunkSub slopes if needed
 		if(chunkStub.slopes==null) {
@@ -123,17 +123,27 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						// Get slope of block and prepare to shade
 						slope = chunkStub.slopes[x][z];
 						
-						sN = getBlockSlope(x, z, 0, -1, chunkStub, neighbors, slope);
-						sNW = getBlockSlope(x, z, -1, -1, chunkStub, neighbors, slope);
-						sW = getBlockSlope(x, z, -1, 0, chunkStub, neighbors, slope);
-						sAvg = (sN+sNW+sW)/3f;
+						if(blockInfo.id!=18) {
+							sN = getBlockSlope(x, z, 0, -1, chunkStub, neighbors, slope);
+							sNW = getBlockSlope(x, z, -1, -1, chunkStub, neighbors, slope);
+							sW = getBlockSlope(x, z, -1, 0, chunkStub, neighbors, slope);
+							sAvg = (sN+sNW+sW)/3f;
+						} else {
+							sN = getBlockSlope(x, z, 0, -1, chunkStub, neighbors, slope);	
+							sS = getBlockSlope(x, z, 0, 1, chunkStub, neighbors, slope);
+							sW = getBlockSlope(x, z, -1, 0, chunkStub, neighbors, slope);
+							sE = getBlockSlope(x, z, 1, 0, chunkStub, neighbors, slope);
+							sAvg = (sN+sS+sW+sE)/4f;
+						}
 						
 						if(slope<1) {
 							
 							if(slope<=sAvg) {
 								slope = slope*.6f;
 							} else if(slope>sAvg) {
-								slope = (slope+sAvg)/2f;
+								if(blockInfo.id!=18){
+									slope = (slope+sAvg)/2f;
+								}
 							}
 							s = Math.max(slope * .8f, .1f);
 							color = shade(color, s);
@@ -142,7 +152,9 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 							
 							if(sAvg>1) {
 								if(slope>=sAvg) {
-									slope = slope*1.2f;
+									if(blockInfo.id!=18){
+										slope = slope*1.2f;
+									}
 								}
 							}
 							s = (float) slope * 1.2f;

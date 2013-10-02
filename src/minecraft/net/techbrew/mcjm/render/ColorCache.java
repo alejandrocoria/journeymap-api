@@ -5,6 +5,8 @@ import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -21,6 +23,7 @@ import net.minecraft.src.BlockLilyPad;
 import net.minecraft.src.BlockSand;
 import net.minecraft.src.BlockTallGrass;
 import net.minecraft.src.BlockVine;
+import net.minecraft.src.ColorizerFoliage;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.ReloadableResourceManager;
 import net.minecraft.src.Resource;
@@ -48,10 +51,15 @@ import net.techbrew.mcjm.model.ChunkStub;
  */
 public class ColorCache implements ResourceManagerReloadListener {
 	
-	final HashMap<BlockInfo, Color> colors = new HashMap<BlockInfo, Color>(256);
-	final HashMap<BiomeGenBase, Color> grassBiomeColors = new HashMap<BiomeGenBase, Color>(16);
-	final HashMap<BiomeGenBase, Color> waterBiomeColors = new HashMap<BiomeGenBase, Color>(16);
-	final HashMap<String, Color> foliageBiomeColors = new HashMap<String, Color>(16);
+	private final HashMap<BlockInfo, Color> colors = new HashMap<BlockInfo, Color>(256);
+	
+	private final HashMap<BiomeGenBase, Color> grassBiomeColors = new HashMap<BiomeGenBase, Color>(16);
+	private final HashMap<BiomeGenBase, Color> waterBiomeColors = new HashMap<BiomeGenBase, Color>(16);
+	private final HashMap<String, Color> foliageBiomeColors = new HashMap<String, Color>(16);
+	
+	private static final int[] leafColorMeta =      {0,3,4,7,8,11};
+	private static final int[] leafColorPineMeta =  {1,5,9};
+	private static final int[] leafColorBirchMeta = {2,6,10};
 	
 	IconLoader iconLoader;
 	String lastResourcePack;
@@ -89,92 +97,127 @@ public class ColorCache implements ResourceManagerReloadListener {
 	public Color getBlockColor(ChunkStub chunkStub, BlockInfo blockInfo, int x, int y, int z) {
 		
 		if(iconLoader==null) {
-			JourneyMap.getLogger().warning("Attempting to get BlockColor without iconLoader instantiated.");
 			return Color.BLACK;
-		}
+		}			
 		
+		// BlockInfo may already have it set
 		Color color = blockInfo.getColor();
+		if(color!=null) {
+			return color;
+		}
 		
-		if(color==null) {
-			
-			Block block = blockInfo.getBlock();
-			if(block==null) {
-				color = colors.get(blockInfo==null);
-				if(color==null) {
-					JourneyMap.getLogger().warning("Unregistered block for " + blockInfo.debugString());
-					color = Color.BLACK;
-					colors.put(blockInfo, color);
-				}
-				return color;
+		// Check if colored by biome
+		if(MapBlocks.biomeBlocks.contains(blockInfo.id)) {
+			color = getBiomeBlockColor(chunkStub, blockInfo, x, y, z);
+		} else {
+			color = getCachedColor(blockInfo, x, y, z);
+		}
+		
+		return color;
+				
+	}
+	
+	private Color getBiomeBlockColor(ChunkStub chunkStub, BlockInfo blockInfo, int x, int y, int z) {
+		BiomeGenBase biome = chunkStub.getBiomeGenForWorldCoords(x, z, chunkStub.worldObj.getWorldChunkManager());
+		Color color = null;
+		
+		switch(blockInfo.id) {
+			case 2 : {
+				return getGrassColor(blockInfo, biome, x, y, z);
 			}
-			
-			BiomeGenBase biome = chunkStub.getBiomeGenForWorldCoords(x, z, chunkStub.worldObj.getWorldChunkManager());		
-			
-			if(block instanceof BlockLeavesBase || block instanceof BlockVine) {
-				
-				color = getFoliageColor(blockInfo, biome, x, y, z);			
-				
-			} else if(block instanceof BlockGrass || block instanceof BlockTallGrass) {
-	
-				color = getGrassColor(blockInfo, biome);
-				
-			} else if(block==Block.waterStill || block==Block.waterMoving) {
-				
-				color = getWaterColor(blockInfo, biome);
-				
-			} else if(block instanceof BlockLilyPad) {
-				
-				color = colorMultiplier(getBasicBlockColor(blockInfo), block.getBlockColor());
-	
-			} else {
-				
-				if(block instanceof BlockFlower) {
-					MapBlocks.side2Textures.add(block.blockID);
-				}
-				
-				int colorMultiplier = block.colorMultiplier(chunkStub.worldObj, x, y, z);
-				if(colorMultiplier!=16777215) {
-					color = colorMultiplier(getBasicBlockColor(blockInfo), colorMultiplier);
-				}
-				
-				if(color==null) {				
-					// TODO: determine if/when these variations happen, and if they work.
-					int rc = block.getRenderColor(blockInfo.meta);
-					if(rc!=16777215 && rc!=0) {
-						color = new Color(rc);
-						colors.put(blockInfo, color);
-					} else {			
-						color = getBasicBlockColor(blockInfo);
-					}
-				}
+			case 8 : {
+				return getWaterColor(blockInfo, biome, x, y, z);
+			}
+			case 9 : {
+				return getWaterColor(blockInfo, biome, x, y, z);
+			}
+			case 18 : {
+				return getFoliageColor(blockInfo, biome, x, y, z);
+			}
+			case 31 : { // Tall grass and fern
+				return getGrassColor(blockInfo, biome, x, y, z);
+			}
+			case 106 : { // Vine
+				return getVineFoliageColor(blockInfo, biome, x, y, z);
+			}
+			default : {
+				return Color.black;
 			}
 		}
-		return color;
 	}
 
 	private Color getFoliageColor(BlockInfo blockInfo, BiomeGenBase biome, int x, int y, int z) {
 		String key = blockInfo.hashCode() + biome.biomeName;
 		Color color = foliageBiomeColors.get(key);
 		if(color==null) {
-			color = colorMultiplier(blockInfo.getBlock().getBlockColor(), biome.getBiomeFoliageColor());
+			int leafColor;
+			if(Arrays.binarySearch(leafColorPineMeta, blockInfo.meta)>=0) {
+				leafColor = ColorizerFoliage.getFoliageColorPine(); 
+			} else if(Arrays.binarySearch(leafColorBirchMeta, blockInfo.meta)>=0) {
+				leafColor = ColorizerFoliage.getFoliageColorBirch(); 
+			} else {
+				leafColor = biome.getBiomeFoliageColor();
+			}
+			
+			color = colorMultiplier(getCachedColor(blockInfo, x, y, z), leafColor);			
+			
 			foliageBiomeColors.put(key, color);
 		}
 		return color;
 	}
 	
-	private Color getGrassColor(BlockInfo blockInfo, BiomeGenBase biome) {
+	private Color getVineFoliageColor(BlockInfo blockInfo, BiomeGenBase biome, int x, int y, int z) {
+		String key = blockInfo.hashCode() + biome.biomeName;
+		Color color = foliageBiomeColors.get(key);
+		if(color==null) {
+			final int leafColor = ColorizerFoliage.getFoliageColor(0.7D, 0.8D);
+			final int meta = blockInfo.meta;
+			switch(meta) {
+				case 1 : {
+					color = getCachedColor(new BlockInfo(blockInfo.id, 0), x, y, z);					
+					break;
+				}
+				case 2 : {
+					color = getCachedColor(new BlockInfo(blockInfo.id, 1), x, y, z);					
+					break;
+				}
+				case 4 : {
+					color = getCachedColor(new BlockInfo(blockInfo.id, 2), x, y, z);					
+					break;
+				}
+				case 8 : {
+					color = getCachedColor(new BlockInfo(blockInfo.id, 3), x, y, z);					
+					break;
+				}
+				case 9 : {
+					color = getCachedColor(new BlockInfo(blockInfo.id, 3), x, y, z);					
+					break;
+				}
+				default : {
+					color = getCachedColor(blockInfo, x, y, z);					
+					break;
+				}
+			}			
+			color = colorMultiplier(color, leafColor);
+			foliageBiomeColors.put(key, color);
+			//JourneyMap.getLogger().info("\tBiome-specific color for " + blockInfo.debugString() + ": " + Integer.toHexString(color.getRGB()));
+		}
+		return color;
+	}
+	
+	private Color getGrassColor(BlockInfo blockInfo, BiomeGenBase biome, int x, int y, int z) {
 		Color color = grassBiomeColors.get(biome);
 		if(color==null) {
-			color = colorMultiplier(getBasicBlockColor(blockInfo), biome.getBiomeGrassColor());
+			color = colorMultiplier(getCachedColor(blockInfo, x, y, z), biome.getBiomeGrassColor());
 			grassBiomeColors.put(biome, color);
 		}
 		return color;
 	}
 	
-	private Color getWaterColor(BlockInfo blockInfo, BiomeGenBase biome) {
+	private Color getWaterColor(BlockInfo blockInfo, BiomeGenBase biome, int x, int y, int z) {
 		Color color = waterBiomeColors.get(biome);
 		if(color==null) {
-			color = colorMultiplier(getBasicBlockColor(blockInfo), biome.waterColorMultiplier);
+			color = colorMultiplier(getCachedColor(blockInfo, x, y, z), biome.waterColorMultiplier);
 			waterBiomeColors.put(biome, color);
 		}
 		return color;
@@ -186,17 +229,33 @@ public class ColorCache implements ResourceManagerReloadListener {
 	 * @param blockInfo
 	 * @return
 	 */
-	private Color getBasicBlockColor(BlockInfo blockInfo) {
+	private Color getCachedColor(BlockInfo blockInfo, int x, int y, int z) {
 		
 		Color color = blockInfo.getColor();
 		if(color==null) {		
-			color = colors.get(blockInfo);			
+			color = colors.get(blockInfo);	
+			if(color==null) {								
+				color = iconLoader.loadBlockColor(blockInfo);
+				if(color!=null){
+					if(!MapBlocks.biomeBlocks.contains(blockInfo.id)){
+						int tint = blockInfo.getBlock().colorMultiplier(Minecraft.getMinecraft().theWorld, x, y, z);
+						if(tint!=16777215 && tint!=-1){
+							color = colorMultiplier(color, tint);
+						}
+					} else if(blockInfo.id==Block.waterlily.blockID) {
+						color = colorMultiplier(color, Block.waterlily.getBlockColor());
+					} 
+					colors.put(blockInfo, color);
+					//JourneyMap.getLogger().info("Cached color for " + blockInfo.debugString());
+				} else {
+					color = Color.BLACK;
+					if(iconLoader.failedFor(blockInfo)) {
+						colors.put(blockInfo, color);
+						JourneyMap.getLogger().warning("Cached BLACK for " + blockInfo.debugString());
+					}					
+				}					
+			}
 		}
-		if(color==null) {
-			color = iconLoader.loadBlockColor(blockInfo);
-			colors.put(blockInfo, color);
-		}
-		blockInfo.setColor(color);
 			
 		return color;		
 	}		
@@ -207,9 +266,8 @@ public class ColorCache implements ResourceManagerReloadListener {
 		}
 		grassBiomeColors.clear();
 		waterBiomeColors.clear();
-		foliageBiomeColors.clear();				
-		colors.clear();    				
-		colors.put(new BlockInfo(0,0), new Color(0x000000)); // air    		
+		foliageBiomeColors.clear();
+		colors.clear();		
 		MapBlocks.resetAlphas();	
 	}
 	
@@ -236,7 +294,7 @@ public class ColorCache implements ResourceManagerReloadListener {
 
 	    int result = (alpha & 0xFF) << 24 | (red & 0xFF) << 16 | (green & 0xFF) << 8 | blue & 0xFF;
 	    
-	    return new Color(result);
+	    return new Color(result | -16777216);
 	}
 
 	static float safeColor(float original) {
@@ -252,6 +310,22 @@ public class ColorCache implements ResourceManagerReloadListener {
 		if(colors.isEmpty()) return null;
 		
 		int count = colors.size();
+		
+		int r = 0;
+		int g = 0;
+		int b = 0;
+		
+		for(Color color : colors) {
+			r+= color.getRed();			
+			g+= color.getGreen();
+			b+= color.getBlue();
+		}
+		return new Color(r/count, g/count, b/count);
+	}
+	
+	static Color average(Color... colors)
+	{
+		int count = colors.length;
 		
 		int r = 0;
 		int g = 0;
