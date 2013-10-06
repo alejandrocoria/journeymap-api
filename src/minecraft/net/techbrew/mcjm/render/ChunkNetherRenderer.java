@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.util.Map;
 import java.util.logging.Level;
 
+import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.EnumSkyBlock;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
@@ -32,8 +33,8 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 	 * Render blocks in the chunk for the Nether world.
 	 */
 	@Override
-	public void render(final Graphics2D g2D, final ChunkStub chunkStub, final boolean underground, 
-			final int vSlice, final Map<Integer, ChunkStub> neighbors) {
+	public boolean render(final Graphics2D g2D, final ChunkStub chunkStub, final boolean underground, 
+			final int vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors) {
 		
 		int sliceMinY = Math.max((vSlice << 4) - 1, 0);
 		int sliceMaxY = Math.min(((vSlice + 1) << 4) - 1, chunkStub.worldHeight);
@@ -61,6 +62,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 			}
 		}
 		
+		boolean chunkOk = false;
 		int lightLevel;
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {		
@@ -117,7 +119,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 									slope = slope*1.2f;
 								}
 							}
-							s = (float) slope * 1.2f;
+							s = slope * 1.2f;
 							s = Math.min(s, 1.2f);
 							color = shade(color, s);
 						}
@@ -136,6 +138,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 					g2D.setComposite(MapBlocks.OPAQUE);
 					g2D.setPaint(color);
 					g2D.fillRect(x, z, 1, 1);
+					chunkOk = true;
 		
 				} catch (Throwable t) {
 					paintBadBlock(x, vSlice, z, g2D);
@@ -147,7 +150,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 		
 			}
 		}
-
+		return chunkOk;
 	}
 
 	@Override
@@ -192,7 +195,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 	 * @param defaultVal
 	 * @return
 	 */
-	public Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<Integer, ChunkStub> neighbors, float defaultVal, final int sliceMinY, final int sliceMaxY) {
+	public Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<ChunkCoordIntPair, ChunkStub> neighbors, float defaultVal, final int sliceMinY, final int sliceMaxY) {
 		int newX = x+offsetX;
 		int newZ = z+offsetz;
 		

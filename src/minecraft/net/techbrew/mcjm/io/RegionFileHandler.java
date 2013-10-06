@@ -403,9 +403,7 @@ public class RegionFileHandler {
 					try {
 						ImageIO.write(image, "png", rfile);
 					} catch(IOException e) {
-						String error = Constants.getMessageJMERR22(rfile, LogFormatter.toString(e));
-						JourneyMap.getLogger().severe(error);
-						JourneyMap.getInstance().announce(error);
+						JourneyMap.getInstance().announce(Constants.getMessageJMERR22(rfile, LogFormatter.toString(e)), Level.SEVERE);
 					}
 				}
 				files.add(rfile);

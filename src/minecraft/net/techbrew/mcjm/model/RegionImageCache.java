@@ -43,6 +43,7 @@ public class RegionImageCache  {
 		
 		// Add shutdown hook to flush cache to disk
 		Runtime.getRuntime().addShutdownHook(tf.newThread(new Runnable() {
+			@Override
 			public void run() {				
 				flushToDisk();
 				if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
@@ -85,7 +86,7 @@ public class RegionImageCache  {
 		return regionImage;
 	}
 	
-	public void putAll(final Set<Map.Entry<ChunkCoord, BufferedImage>> chunkImageEntries) {
+	public void putAll(final Set<Map.Entry<ChunkCoord, BufferedImage>> chunkImageEntries, boolean forceFlush) {
 		final RegionFileHandler rfh = RegionFileHandler.getInstance();
 		synchronized(lock) {
 			for(Map.Entry<ChunkCoord, BufferedImage> entry : chunkImageEntries) {
@@ -96,8 +97,11 @@ public class RegionImageCache  {
 				insertChunk(cCoord, chunkImage, regionImage);
 				dirty.add(rCoord);
 			}
+			if(forceFlush) {
+				flushToDisk();
+			}
 		}
-		autoFlush();
+		if(!forceFlush) autoFlush();
 	}
 	
 	private void autoFlush() {
@@ -187,6 +191,7 @@ public class RegionImageCache  {
 
 	public void clear() {
 		synchronized(lock) {
+			dirty.clear();
 			imageMap.clear();
 		}
 	}

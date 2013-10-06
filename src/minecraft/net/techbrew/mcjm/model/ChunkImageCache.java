@@ -5,13 +5,14 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import net.techbrew.mcjm.JourneyMap;
 
 public class ChunkImageCache {
 	
 	private static ChunkImageCache instance;
-	private CacheMap imageMap;
+	private final CacheMap imageMap;
 
 	public synchronized static ChunkImageCache getInstance() {
 		if(instance==null) {
@@ -21,7 +22,7 @@ public class ChunkImageCache {
 	}
 	
 	public ChunkImageCache() {
-		imageMap = new CacheMap(64);
+		imageMap = new CacheMap(1024);
 	}
 	
 	public void put(ChunkCoord cCoord, BufferedImage chunkImage) {
@@ -50,6 +51,12 @@ public class ChunkImageCache {
 		}
 	}
 	
+	public boolean isEmpty() {
+		synchronized(imageMap) {
+			return imageMap.isEmpty();
+		}
+	}
+	
 	public Set<Map.Entry<ChunkCoord, BufferedImage>> getEntries() {
 		return new HashSet<Map.Entry<ChunkCoord, BufferedImage>>(imageMap.entrySet());
 	}
@@ -69,8 +76,8 @@ public class ChunkImageCache {
 	    {
 			if(!purge) return false;
 			Boolean remove = size() > capacity;
-			if(remove) {
-				JourneyMap.getLogger().info("ChunkImageCache purging " + entry.getKey()); //$NON-NLS-1$
+			if(remove && JourneyMap.getLogger().isLoggable(Level.FINE)) {
+				JourneyMap.getLogger().fine("ChunkImageCache purging " + entry.getKey()); //$NON-NLS-1$
 			}
 			return remove;
 	    }

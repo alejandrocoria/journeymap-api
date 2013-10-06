@@ -1,10 +1,13 @@
 package net.techbrew.mcjm.model;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.Constants;
 
-public class RegionCoord {
+public class RegionCoord implements Comparable<RegionCoord>{
 	
 	public final File worldDir;
 	public final int regionX;
@@ -92,6 +95,28 @@ public class RegionCoord {
 		return getMinChunkZ(rZ) + (int) Math.pow(2,SIZE) -1;
 	}
 	
+	public ChunkCoord getMinChunkCoord() {
+		return ChunkCoord.fromChunkPos(worldDir, getMinChunkX(), vSlice, getMinChunkZ(), cType);				
+	}
+	
+	public ChunkCoord getMaxChunkCoord() {
+		return ChunkCoord.fromChunkPos(worldDir, getMaxChunkX(), vSlice, getMaxChunkZ(), cType);				
+	}
+	
+	public List<ChunkCoordIntPair> getChunkCoordsInRegion() {
+		final List<ChunkCoordIntPair> list = new ArrayList<ChunkCoordIntPair>(1024);
+		final ChunkCoord min = getMinChunkCoord();
+		final ChunkCoord max = getMaxChunkCoord();
+		
+		for(int x = min.chunkX; x<=max.chunkX; x++) {
+			for(int z = min.chunkZ; z<=max.chunkZ; z++) {			
+				list.add(new ChunkCoordIntPair(x,z));
+			}
+		}
+		
+		return list;
+	}
+	
 	public static int getRegionPos(int chunkPos) {
 		return chunkPos >> SIZE;
 	}
@@ -155,5 +180,11 @@ public class RegionCoord {
 		if (!cType.equals(other.cType))
 			return false;
 		return true;
+	}
+
+	@Override
+	public int compareTo(RegionCoord o) {		
+		int cx = Double.compare(this.regionX,  o.regionX);
+		return (cx==0) ? Double.compare(this.regionZ,  o.regionZ) : cx;
 	}	
 }

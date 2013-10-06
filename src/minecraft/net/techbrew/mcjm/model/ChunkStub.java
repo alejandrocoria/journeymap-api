@@ -2,15 +2,15 @@ package net.techbrew.mcjm.model;
 
 import java.util.Arrays;
 
+import net.minecraft.src.BiomeGenBase;
 import net.minecraft.src.Block;
-import net.minecraft.src.Material;
+import net.minecraft.src.Chunk;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.EnumSkyBlock;
-import net.minecraft.src.World;
-import net.minecraft.src.BiomeGenBase;
-import net.minecraft.src.WorldChunkManager;
-import net.minecraft.src.Chunk;
 import net.minecraft.src.ExtendedBlockStorage;
+import net.minecraft.src.Material;
+import net.minecraft.src.World;
+import net.minecraft.src.WorldChunkManager;
 import net.techbrew.mcjm.render.MapBlocks;
 
 public class ChunkStub {
@@ -33,8 +33,29 @@ public class ChunkStub {
 	public final ExtendedBlockStorageStub storageArrays[];
 	public final int worldHeight;
 	public Boolean doMap;
-	public boolean isModified;		
+	public boolean isModified;			
 	
+	public boolean isEmptyChunk;
+	
+	public ChunkStub(int[] heightMap, byte[] blockBiomeArray, int xPosition,
+			int zPosition, Boolean hasNoSky, long worldHash, World worldObj,
+			int[] precipitationHeightMap,
+			ExtendedBlockStorageStub[] storageArrays, int worldHeight,
+			boolean isModified) {
+		super();
+		this.heightMap = heightMap;
+		this.blockBiomeArray = blockBiomeArray;
+		this.xPosition = xPosition;
+		this.zPosition = zPosition;
+		this.hasNoSky = hasNoSky;
+		this.worldHash = worldHash;
+		this.worldObj = worldObj;
+		this.precipitationHeightMap = precipitationHeightMap;
+		this.storageArrays = storageArrays;
+		this.worldHeight = worldHeight;
+		this.isModified = isModified;
+	}
+
 	public ChunkStub(Chunk chunk, Boolean doMap, World worldObj, long worldHash) {
 		
 		this.isLit = chunk.isLit;
@@ -357,30 +378,16 @@ public class ChunkStub {
     {
         return this.blockBiomeArray;
     }
-
     
-    /**
-     * JourneyMap addition
-     */
 	@Override
 	public int hashCode() {
-		return toHashCode(xPosition, zPosition);
-	}
-	
-	/**
-     * JourneyMap addition
-     */
-	public static int toHashCode(final int x, final int z) {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + x;
-		result = prime * result + z;
+		result = prime * result + xPosition;
+		result = prime * result + zPosition;
 		return result;
 	}
 
-	/**
-     * JourneyMap addition
-     */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 
+import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -39,7 +40,7 @@ public class ChunkRenderController {
 	
 	public BufferedImage getChunkImage(ChunkStub chunkStub,
 			boolean underground, int vSlice,
-			Map<Integer, ChunkStub> neighbors) {
+			Map<ChunkCoordIntPair, ChunkStub> neighbors) {
 		
 		// Initialize image for the chunk
 		BufferedImage chunkImage = new BufferedImage(underground ? 16 : 32, 16, BufferedImage.TYPE_INT_ARGB);
@@ -49,20 +50,21 @@ public class ChunkRenderController {
 		g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 		
 		int dimension = chunkStub.worldObj.provider.dimensionId;
+		boolean renderOkay = false;
 		
 		long start = System.nanoTime();
-		try {
+		try {			
 			switch(dimension) {
 				case -1 : {
-					netherRenderer.render(g2D, chunkStub, underground, vSlice, neighbors);
+					renderOkay = netherRenderer.render(g2D, chunkStub, underground, vSlice, neighbors);
 					break;
 				}
 				case 1 : {
-					endRenderer.render(g2D, chunkStub, underground, vSlice, neighbors);
+					renderOkay = endRenderer.render(g2D, chunkStub, underground, vSlice, neighbors);
 					break;
 				}
 				default : {
-					standardRenderer.render(g2D, chunkStub, underground, vSlice, neighbors);
+					renderOkay = standardRenderer.render(g2D, chunkStub, underground, vSlice, neighbors);
 				}
 			}
 
@@ -79,13 +81,17 @@ public class ChunkRenderController {
 		long stop = System.nanoTime();
 		
 		updateCounter.incrementAndGet();
-		updateTime.addAndGet(stop-start);
+		updateTime.addAndGet(stop-start);		
 		
-		double counter = (double) updateCounter.get();
-		if(counter>=1000) {
-			if(fineLogging) {
-				
-				double time = (double) TimeUnit.NANOSECONDS.toMillis(updateTime.get());
+		if(!renderOkay) {
+			JourneyMap.getLogger().log(Level.WARNING, "Chunk didn't render: " + chunkStub.xPosition + "," + chunkStub.zPosition);
+			chunkImage = null;
+		}
+		
+		if(fineLogging) {
+			double counter = updateCounter.get();
+			if(counter>=1000) {				
+				double time = TimeUnit.NANOSECONDS.toMillis(updateTime.get());
 				double avg = time/counter;
 
 				JourneyMap.getLogger().info("*** Chunks rendered: " + (int) counter + " in avg " + avg + " ms");
@@ -94,6 +100,7 @@ public class ChunkRenderController {
 				updateTime.set(0);
 			}
 		}
+		
 		
 		return chunkImage;
 					

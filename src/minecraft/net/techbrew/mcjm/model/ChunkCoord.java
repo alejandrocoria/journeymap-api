@@ -25,7 +25,7 @@ public class ChunkCoord {
 	private ChunkCoord(File worldDir, int chunkX, Integer vSlice, int chunkZ, final Constants.CoordType cType) {
 		this.worldDir = worldDir;
 		this.chunkX = chunkX;
-		if(vSlice > 16) {
+		if(vSlice!=null && vSlice > 16) {
 			throw new IllegalArgumentException("Need the vSlice, not a y"); //$NON-NLS-1$
 		}
 		this.vSlice = vSlice;

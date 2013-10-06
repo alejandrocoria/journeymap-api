@@ -10,8 +10,9 @@ import java.util.Stack;
 import java.util.logging.Level;
 
 import net.minecraft.src.Block;
-import net.minecraft.src.MathHelper;
+import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.EnumSkyBlock;
+import net.minecraft.src.MathHelper;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -33,15 +34,15 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	 * Render blocks in the chunk for the standard world.
 	 */
 	@Override
-	public void render(final Graphics2D g2D, final ChunkStub chunkStub, final boolean underground, 
-			final int vSlice, final Map<Integer, ChunkStub> neighbors) {
+	public boolean render(final Graphics2D g2D, final ChunkStub chunkStub, final boolean underground, 
+			final int vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors) {
 		
 
 		// Render the chunk image
 		if(underground) {
-			renderUnderground(g2D, chunkStub, vSlice, neighbors);			
+			return renderUnderground(g2D, chunkStub, vSlice, neighbors);			
 		} else {
-			renderSurface(g2D, chunkStub, vSlice, neighbors);
+			return renderSurface(g2D, chunkStub, vSlice, neighbors);
 		}
 		
 	}
@@ -49,7 +50,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	/**
 	 * Render blocks in the chunk for the surface.
 	 */
-	private void renderSurface(final Graphics2D g2D, final ChunkStub chunkStub, final int vSlice, final Map<Integer, ChunkStub> neighbors) {
+	private boolean renderSurface(final Graphics2D g2D, final ChunkStub chunkStub, final int vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors) {
 		
 		float slope, s, sN, sNW, sW, sS, sE, sAvg, shaded, h, hN, hW;
 		
@@ -71,7 +72,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 			}
 		}
 		
-		
+		boolean chunkOk = false;
 		for (int x = 0; x < 16; x++) {
 			blockLoop : for (int z = 0; z < 16; z++) {				
 				
@@ -115,6 +116,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						
 					}
 					paintDepth(chunkStub, blockInfo, x, y, z, g2D);
+					chunkOk = true;
 					
 				} else {
 				
@@ -157,7 +159,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 									}
 								}
 							}
-							s = (float) slope * 1.2f;
+							s = slope * 1.2f;
 							s = Math.min(s, 1.4f);
 							color = shade(color, s);
 						}
@@ -167,6 +169,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					g2D.setComposite(MapBlocks.OPAQUE);						
 					g2D.setPaint(color);
 					g2D.fillRect(x, z, 1, 1);
+					chunkOk = true;
 				}
 				
 				
@@ -183,18 +186,19 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				// Draw nighttime map block
 				g2D.setComposite(MapBlocks.OPAQUE);
 				g2D.setPaint(color);
-				g2D.fillRect(x + 16, z, 1, 1);									
+				g2D.fillRect(x + 16, z, 1, 1);		
+				chunkOk = true;
 				
 			}
 		}
-		
+		return chunkOk;
 	}
 	
 	/**
 	 * Render blocks in the chunk for underground.
 	 * 
 	 */
-	public void renderUnderground(final Graphics2D g2D, final ChunkStub chunkStub, final int vSlice, final Map<Integer, ChunkStub> neighbors) {
+	public boolean renderUnderground(final Graphics2D g2D, final ChunkStub chunkStub, final int vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors) {
 		
 		
 		int sliceMinY = Math.max((vSlice << 4) - 1, 0);
@@ -228,6 +232,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		int paintY;
 		int lightLevel;
 		
+		boolean chunkOk = false;
 		for (int z = 0; z < 16; z++) {
 			
 			blockLoop: for (int x = 0; x < 16; x++) {			
@@ -330,7 +335,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 									slope = slope*1.2f;
 								}
 							}
-							s = (float) slope * 1.2f;
+							s = slope * 1.2f;
 							s = Math.min(s, 1.4f);
 							color = shade(color, s);
 						}
@@ -349,6 +354,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		
 					// Draw block
 					paintBlock(x, z, color, g2D);
+					chunkOk = true;
 		
 				} catch (Throwable t) {
 					paintBadBlock(x, vSlice, z, g2D);
@@ -360,6 +366,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				
 			}
 		}
+		return chunkOk;
 
 	}
 		
@@ -484,7 +491,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	 * @param defaultVal
 	 * @return
 	 */
-	public Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<Integer, ChunkStub> neighbors, float defaultVal, final int sliceMinY, final int sliceMaxY) {
+	public Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<ChunkCoordIntPair, ChunkStub> neighbors, float defaultVal, final int sliceMinY, final int sliceMaxY) {
 		int newX = x+offsetX;
 		int newZ = z+offsetz;
 		

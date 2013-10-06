@@ -2,6 +2,7 @@ package net.techbrew.mcjm;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -10,23 +11,27 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.minecraft.src.Minecraft;
+import net.minecraft.src.Chunk;
+import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.GuiInventory;
 import net.minecraft.src.GuiMainMenu;
 import net.minecraft.src.GuiMultiplayer;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.GuiSelectWorld;
-import net.minecraft.src.GuiInventory;
 import net.minecraft.src.KeyBinding;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.Chunk;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.io.nbt.RegionLoader;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.RegionCoord;
+import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.server.JMServer;
+import net.techbrew.mcjm.thread.ChunkUpdateProvider;
 import net.techbrew.mcjm.thread.ChunkUpdateThread;
 import net.techbrew.mcjm.thread.JMThreadFactory;
 import net.techbrew.mcjm.ui.MapOverlay;
@@ -61,7 +66,7 @@ public class JourneyMap {
 
 	private volatile Boolean initialized = false;
 	
-	private Boolean modAnnounced = false;
+	private final Boolean modAnnounced = false;
 	private JMLogger logger;
 	private JMServer jmServer;
 	
@@ -88,7 +93,14 @@ public class JourneyMap {
 	private volatile ScheduledExecutorService chunkExecutor;
 
 	// Announcements
-	private List<String> announcements = Collections.synchronizedList(new LinkedList<String>());
+	private final List<String> announcements = Collections.synchronizedList(new LinkedList<String>());
+	
+	// TODO: Move
+	private Iterator<RegionCoord> regionIter;
+	private RegionLoader regionLoader;
+	
+	// Utility class for updating chunks
+	private ChunkUpdateProvider chunkUpdateProvider;
 
 	/**
 	 * Constructor.
@@ -137,6 +149,8 @@ public class JourneyMap {
 			this.keybinding = new KeyBinding("JourneyMap", mapGuiKeyCode); //$NON-NLS-1$
 		}
 
+		chunkUpdateProvider = new ChunkUpdateProvider();
+		
 		// Webserver
 		enableWebserver = PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
 		if(enableWebserver) {
@@ -156,7 +170,7 @@ public class JourneyMap {
 		// Check for newer version online
 		if(VersionCheck.getVersionIsCurrent()==false) {
 			announce(Constants.getString("JourneyMap.new_version_available", WEBSITE_URL)); //$NON-NLS-1$
-		}
+		}		
 
 		initialized = true;
 		
@@ -178,13 +192,22 @@ public class JourneyMap {
     		ChunkUpdateThread.getBarrier().reset();
 	    	if(chunkExecutor!=null && !chunkExecutor.isShutdown()) {    		
 				chunkExecutor.shutdown();			
-			}
+			}	    	
 	    	chunkExecutor = null;
 	    	Minecraft mc = Minecraft.getMinecraft();
 	    	logger.info("Mapping halted: " + WorldData.getWorldName(mc)); //$NON-NLS-1$
 			lastPlayerChunk = null;
 			FileHandler.lastWorldHash = -1;
 			FileHandler.lastWorldDir = null;
+			
+			RegionImageCache.getInstance().flushToDisk();
+			RegionImageCache.getInstance().clear();
+			
+			// TODO: Move?	  
+	    	if(mc.isSingleplayer()) {
+	    		regionLoader = null;
+	    		regionIter = null;
+	    	}
     	}
     }
     
@@ -199,7 +222,19 @@ public class JourneyMap {
 				chunkExecutor = Executors.newSingleThreadScheduledExecutor(new JMThreadFactory("chunk"));
 				chunkExecutor.scheduleWithFixedDelay(new ChunkUpdateThread(this, mc.theWorld), 1500, chunkDelay, TimeUnit.MILLISECONDS);				
 			}
-	    	logger.info("Mapping started: " + WorldData.getWorldName(mc)); //$NON-NLS-1$		
+	    	logger.info("Mapping started: " + WorldData.getWorldName(mc)); //$NON-NLS-1$	
+	    	
+	    	// TODO: Move?	  
+	    	regionLoader = null;
+	    	regionIter = null;
+	    	if(mc.isSingleplayer()) {
+		    	try {
+			    	regionLoader = new RegionLoader(mc, mc.theWorld.provider.dimensionId);
+			    	regionIter = regionLoader.regionIterator();							
+		    	} catch(Throwable t) {
+		    		logger.severe("Couldn't use RegionLoader: " + t.getMessage());
+		    	}
+	    	}
     	}
 		if(enableAnnounceMod) announceMod();
     }
@@ -279,42 +314,42 @@ public class JourneyMap {
 			}
 			
 
-			// Check for broken barrier
-			if(ChunkUpdateThread.getBarrier().isBroken()) {
-				if(threadLogging) logger.warning("Resetting broken Barrier");
-				ChunkUpdateThread.getBarrier().reset();
-			}
-			
-			// Populate ChunkStubs on ChunkUpdateThread if it is waiting
-			if(ChunkUpdateThread.getBarrier().getNumberWaiting()==1) {
+			// Map world first
+			if(regionIter!=null && regionIter.hasNext()) {	
 				
-				if(threadLogging) logger.info("ChunkUpdateThread is waiting for fillChunkStubs");
-					
-				if(ChunkUpdateThread.currentThread!=null) {
-					synchronized(ChunkUpdateThread.currentThread) {
-						long start = System.currentTimeMillis();
-						int[] result = ChunkUpdateThread.currentThread.fillChunkStubs(minecraft.thePlayer, lastPlayerChunk, minecraft.theWorld, FileHandler.lastWorldHash);
-						long stop = System.currentTimeMillis();
-						if(threadLogging) logger.info("Stubbed/skipped: " + result[0] + "," + result[1] + " in " + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				synchronized(chunkUpdateProvider) {
+					if(chunkUpdateProvider.isReady()) {
+						RegionCoord rCoord = regionIter.next();
+						
+						// TODO: make more efficient
+						int total = regionLoader.getRegions().size();
+						int index = 1 + regionLoader.getRegions().indexOf(rCoord);
+						
+						String msg = "Mapping region " + rCoord.regionX + "," + rCoord.regionZ + " (" + index + " of " + total + ")";
+						
+						announce(msg, Level.INFO);
+						chunkUpdateProvider.updateRegion(rCoord, regionLoader.getWorldDirectory(minecraft), minecraft.theWorld, newHash);
 					}
-				} else {
-					if(threadLogging) logger.warning("ChunkUpdateThread.currentThread==null"); //$NON-NLS-1$ 
-				}
-
-				if(ChunkUpdateThread.getBarrier().getNumberWaiting()==1) {
-					if(threadLogging) logger.info("Resetting barrier so ChunkUpdateThread can continue");
-					ChunkUpdateThread.getBarrier().reset(); // Let the chunkthread continue
 				}
 				
-			} else {
-				if(threadLogging) logger.info("ChunkUpdateThread.getBarrier().getNumberWaiting()==" + ChunkUpdateThread.getBarrier().getNumberWaiting()); //$NON-NLS-1$ 
+				if(!regionIter.hasNext()) {
+					regionIter = null;
+					announce("World mapping has completed.", Level.INFO);
+				}
+				
+			} else {			
+				// Provide chunks around player
+				synchronized(chunkUpdateProvider) {
+					if(chunkUpdateProvider.isReady()) {
+						chunkUpdateProvider.updateAroundPlayer(minecraft, lastPlayerChunk);
+					}
+				}
 			}
 
 		} catch (Throwable t) {
 			String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
 			announce(error);
-			logger.throwing("JourneyMap", "OnTickInGame", t); //$NON-NLS-1$ //$NON-NLS-2$
-			logger.log(Level.SEVERE, LogFormatter.toString(t));			
+			logger.severe(LogFormatter.toString(t));
 		} 
 		return true;
 	}
@@ -324,21 +359,21 @@ public class JourneyMap {
 		Minecraft minecraft = Minecraft.getMinecraft();	
 		
 		if(enableAnnounceMod) {
-			announcements.add(Constants.getString("JourneyMap.ready", JM_VERSION)); //$NON-NLS-1$ 
+			announcements.add(0, Constants.getString("JourneyMap.ready", JM_VERSION)); //$NON-NLS-1$ 
 			if(enableWebserver && enableMapGui) {
 				String keyName = Keyboard.getKeyName(keybinding.keyCode);
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
-				announcements.add(Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port)); //$NON-NLS-1$ 
+				announcements.add(1, Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port)); //$NON-NLS-1$ 
 			} else if(enableWebserver) {
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
-				announcements.add(Constants.getString("JourneyMap.webserver_only_ready", port)); //$NON-NLS-1$ 
+				announcements.add(1, Constants.getString("JourneyMap.webserver_only_ready", port)); //$NON-NLS-1$ 
 			} else if(enableMapGui) {
 				String keyName = Keyboard.getKeyName(keybinding.keyCode);
-				announcements.add(Constants.getString("JourneyMap.mapgui_only_ready", keyName)); //$NON-NLS-1$
+				announcements.add(1, Constants.getString("JourneyMap.mapgui_only_ready", keyName)); //$NON-NLS-1$
 			} else {
-				announcements.add(Constants.getString("JourneyMap.webserver_and_mapgui_disabled")); //$NON-NLS-1$
+				announcements.add(1, Constants.getString("JourneyMap.webserver_and_mapgui_disabled")); //$NON-NLS-1$
 			}
-			enableAnnounceMod = false;
+			enableAnnounceMod = false; // Only announce mod once per runtime
 		}
 	}
 
@@ -374,6 +409,17 @@ public class JourneyMap {
 	 * @param message
 	 */
 	public void announce(String message) {
+		announce(message, null);
+	}
+	
+	/**
+	 * Queue an announcement to be shown in the UI.
+	 * @param message
+	 */
+	public void announce(String message, Level logLevel) {
+		if(logLevel!=null) {
+			logger.log(logLevel, message);
+		}
 		String[] lines = message.split("\n"); //$NON-NLS-1$
 		lines[0] = Constants.getString("JourneyMap.chat_announcement", lines[0]); //$NON-NLS-1$
 		for(String line : lines) {

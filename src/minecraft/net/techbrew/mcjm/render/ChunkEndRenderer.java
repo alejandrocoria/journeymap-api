@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.util.Map;
 import java.util.logging.Level;
 
+import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.EnumSkyBlock;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
@@ -30,8 +31,8 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 	 * Render blocks in the chunk for the End world.
 	 */
 	@Override
-	public void render(final Graphics2D g2D, final ChunkStub chunkStub, final boolean underground, 
-			final int vSlice, final Map<Integer, ChunkStub> neighbors) {
+	public boolean render(final Graphics2D g2D, final ChunkStub chunkStub, final boolean underground, 
+			final int vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors) {
 		
 		// Initialize ChunkSub slopes if needed
 		if(chunkStub.slopes==null) {
@@ -52,6 +53,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 			}
 		}
 		
+		boolean chunkOk = false;
 		int maxY = chunkStub.worldHeight;
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
@@ -134,7 +136,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 								slope = slope*1.2f;
 							}
 						}
-						s = (float) slope * 1.2f;
+						s = slope * 1.2f;
 						s = Math.min(s, 1.4f);
 						color = shade(color, s);
 					}
@@ -156,6 +158,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 					g2D.setComposite(MapBlocks.OPAQUE);
 					g2D.setPaint(color);
 					g2D.fillRect(x, z, 1, 1);
+					chunkOk = true;
 					
 		
 				} catch (Throwable t) {
@@ -167,7 +170,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 				}
 			}
 		}
-
+		return chunkOk;
 	}
 
 }

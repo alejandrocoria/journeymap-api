@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.util.Map;
 import java.util.logging.Level;
 
+import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.ChunkStub;
@@ -120,7 +121,7 @@ public abstract class BaseRenderer {
 	 * @param defaultVal
 	 * @return
 	 */
-	public Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<Integer, ChunkStub> neighbors, float defaultVal) {
+	public Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<ChunkCoordIntPair, ChunkStub> neighbors, float defaultVal) {
 		int newX = x+offsetX;
 		int newZ = z+offsetz;
 		
@@ -167,7 +168,7 @@ public abstract class BaseRenderer {
 	 * @param defaultVal
 	 * @return
 	 */
-	public Float getBlockSlope(int x, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<Integer, ChunkStub> neighbors, float defaultVal) {
+	public Float getBlockSlope(int x, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<ChunkCoordIntPair, ChunkStub> neighbors, float defaultVal) {
 		int newX = x+offsetX;
 		int newZ = z+offsetz;
 		
@@ -218,7 +219,7 @@ public abstract class BaseRenderer {
 	 * @param defaultVal
 	 * @return
 	 */
-	public BlockInfo getBlock(int x, int y, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<Integer, ChunkStub> neighbors, BlockInfo defaultVal) {
+	public BlockInfo getBlock(int x, int y, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<ChunkCoordIntPair, ChunkStub> neighbors, BlockInfo defaultVal) {
 		int newX = x+offsetX;
 		int newZ = z+offsetz;
 		
@@ -264,7 +265,7 @@ public abstract class BaseRenderer {
 	 * @param neighbors
 	 * @return
 	 */
-	ChunkStub getChunk(int x, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<Integer, ChunkStub> neighbors) {
+	ChunkStub getChunk(int x, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<ChunkCoordIntPair, ChunkStub> neighbors) {
 		int newX = x+offsetX;
 		int newZ = z+offsetz;
 		
@@ -293,8 +294,8 @@ public abstract class BaseRenderer {
 		
 		ChunkStub chunk = null;
 		if(search) {
-			Integer stubHash = ChunkStub.toHashCode(chunkX, chunkZ);
-			chunk = neighbors.get(stubHash);
+			ChunkCoordIntPair coord = new ChunkCoordIntPair(chunkX, chunkZ);
+			chunk = neighbors.get(coord);
 		} else {
 			chunk = currentChunk;
 		}

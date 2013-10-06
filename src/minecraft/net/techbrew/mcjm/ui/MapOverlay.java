@@ -13,15 +13,15 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import net.minecraft.src.Minecraft;
+import net.minecraft.src.Chunk;
+import net.minecraft.src.ChunkCoordIntPair;
+import net.minecraft.src.DynamicTexture;
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiChat;
-import net.minecraft.src.GuiScreen;
 import net.minecraft.src.GuiInventory;
-import net.minecraft.src.DynamicTexture;
-import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.Chunk;
+import net.minecraft.src.GuiScreen;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
@@ -104,8 +104,8 @@ public class MapOverlay extends GuiScreen {
 
 	private DynamicTexture logoTexture;
 	
-	private Integer blockXOffset = 0;
-	private Integer blockZOffset = 0;
+	private final Integer blockXOffset = 0;
+	private final Integer blockZOffset = 0;
 	
 	OverlayMapRenderer lastMapRenderer;
 	OverlayEntityRenderer lastEntityRenderer;
@@ -843,19 +843,18 @@ public class MapOverlay extends GuiScreen {
 		close();
 		
 		JourneyMap.getInstance().getChunkExecutor().schedule(new Runnable() {
+			@Override
 			public void run() {							
 				try {			
 					final Constants.CoordType cType = Constants.CoordType.convert(useMapType, mc.thePlayer.dimension);
 					new MapSaver().lightWeightSaveMap(worldDir, useMapType, mc.thePlayer.chunkCoordY, cType);
 				} catch (java.lang.OutOfMemoryError e) {
 					String error = Constants.getMessageJMERR18("Out Of Memory: Increase Java Heap Size for Minecraft to save large maps.");
-					JourneyMap.getLogger().severe(error);
-					JourneyMap.getInstance().announce(error);
+					JourneyMap.getInstance().announce(error, Level.SEVERE);
 				} catch (Throwable t) {	
 					String error = Constants.getMessageJMERR18(t.getMessage());
-					JourneyMap.getLogger().severe(error);
-					JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
-					JourneyMap.getInstance().announce(error);
+					JourneyMap.getInstance().announce(error, Level.SEVERE);
+					JourneyMap.getLogger().severe(LogFormatter.toString(t));					
 					return;
 				}
 			}			
@@ -868,11 +867,13 @@ public class MapOverlay extends GuiScreen {
 		mc.setIngameFocus();
 	}
 	
-    public void initGui()
+    @Override
+	public void initGui()
     {
         Keyboard.enableRepeatEvents(true);
     }
     
+	@Override
 	public void onGuiClosed()
     {
         Keyboard.enableRepeatEvents(false);
