@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import net.minecraft.src.Chunk;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.DynamicTexture;
 import net.minecraft.src.EntityClientPlayerMP;
@@ -24,7 +23,6 @@ import net.minecraft.src.GuiScreen;
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.data.AnimalsData;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.EntityKey;
@@ -799,14 +797,14 @@ public class MapOverlay extends GuiScreen {
 		// Check location
 		final int ccx = player.chunkCoordX;				
 		final int ccz = player.chunkCoordZ;
-		final int ccy = player.chunkCoordY;
+		//final int ccy = player.chunkCoordY;
 
 		// Check chunk
-		final Chunk playerChunk = Utils.getChunkIfAvailable(mc.theWorld, ccx, ccz);
-		if(playerChunk==null || !playerChunk.isChunkLoaded) {
-			JourneyMap.getLogger().fine("Could not get player chunk"); //$NON-NLS-1$
-			return;
-		}
+//		final Chunk playerChunk = Utils.getChunkIfAvailable(mc.theWorld, ccx, ccz);
+//		if(playerChunk==null || !playerChunk.isChunkLoaded) {
+//			JourneyMap.getLogger().fine("Could not get player chunk"); //$NON-NLS-1$
+//			return;
+//		}
 
 		// Maptype
 		Constants.MapType effectiveMapType = null;
@@ -821,7 +819,7 @@ public class MapOverlay extends GuiScreen {
 			}
 			effectiveMapType = mapType;
 		}
-		File worldDir = FileHandler.getWorldDir(mc);
+		File worldDir = FileHandler.getJMWorldDir(mc);
 					
 		state = new MapOverlayState(effectiveMapType, currentZoom, worldDir, getCanvasWidth(), getCanvasHeight(), blockXOffset, blockZOffset);
 	}
@@ -831,7 +829,7 @@ public class MapOverlay extends GuiScreen {
 		if(mc==null) {
 			mc = Minecraft.getMinecraft();
 		}
-		final File worldDir = FileHandler.getWorldDir(mc);
+		final File worldDir = FileHandler.getJMWorldDir(mc);
 		final File saveDir = FileHandler.getJourneyMapDir();
 
 		final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);

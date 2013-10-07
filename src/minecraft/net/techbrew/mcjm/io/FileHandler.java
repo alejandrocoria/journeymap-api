@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
@@ -24,21 +23,30 @@ public class FileHandler {
 	public static volatile long lastWorldHash;
 	public static volatile File lastWorldDir;
 	
+	public static File getMCWorldDir(Minecraft minecraft) {
+		File dir = new File(minecraft.mcDataDir, "saves" + File.separator + minecraft.getIntegratedServer().getFolderName());
+		if(dir.exists()) {
+			return dir;
+		} else {
+			return null;
+		}
+	}
+	
 	public static File getJourneyMapDir() {
 		return new File(Minecraft.getMinecraft().mcDataDir, Constants.JOURNEYMAP_DIR);
 	}
 		
 	
-	public static File getWorldDir(Minecraft minecraft) {
+	public static File getJMWorldDir(Minecraft minecraft) {
 		if(!minecraft.isSingleplayer()) {
-			return getWorldDir(minecraft, Utils.getWorldHash(minecraft));
+			return getJMWorldDir(minecraft, Utils.getWorldHash(minecraft));
 		} else {
-			return getWorldDir(minecraft, -1L);
+			return getJMWorldDir(minecraft, -1L);
 		}
 		
 	}
 	
-	public static File getWorldDir(Minecraft minecraft, long hash) {
+	public static File getJMWorldDir(Minecraft minecraft, long hash) {
 		
 		File mcDir = Minecraft.getMinecraft().mcDataDir;
 		

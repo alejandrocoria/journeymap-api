@@ -63,7 +63,7 @@ public class MapService extends BaseService {
 		}
 		
 		// Ensure world dir is found
-		File worldDir = FileHandler.getWorldDir(minecraft);
+		File worldDir = FileHandler.getJMWorldDir(minecraft);
 		if (!worldDir.exists() || !worldDir.isDirectory()) {
 			String error = Constants.getMessageJMERR06("worldDir=" + worldDir.getAbsolutePath()); //$NON-NLS-1$
 			throwEventException(400, error, event, true);

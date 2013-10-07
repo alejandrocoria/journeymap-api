@@ -53,7 +53,6 @@ public class RegionFileHandler {
 		}
 		sb.append(getRegionFileSuffix(rCoord.cType));
 		File regionFile = new File(rCoord.worldDir, sb.toString());
-		//System.out.println("RegionFile: " + regionFile + " exists: " + regionFile.exists();
 		return regionFile;
 	}
 	

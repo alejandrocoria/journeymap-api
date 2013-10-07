@@ -58,7 +58,7 @@ public class SaveMapService extends BaseService {
 		}
 		
 		// Ensure world dir available
-		File worldDir = FileHandler.getWorldDir(minecraft);
+		File worldDir = FileHandler.getJMWorldDir(minecraft);
 		if (!worldDir.exists() || !worldDir.isDirectory()) {
 			String error = Constants.getMessageJMERR10(worldDir.getAbsolutePath());			
 		}
