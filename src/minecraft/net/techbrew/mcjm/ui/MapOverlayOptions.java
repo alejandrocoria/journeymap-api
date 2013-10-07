@@ -2,6 +2,7 @@ package net.techbrew.mcjm.ui;
 
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.VersionCheck;
@@ -21,7 +22,7 @@ public class MapOverlayOptions extends GuiScreen {
 	final String title;
 	int lastWidth = 0;
 	int lastHeight = 0;
-	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid;
+	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid, buttonAutomap;
 	MapButton buttonSave,buttonClose,buttonAlert,buttonBrowser;
 	
 	public MapOverlayOptions(MapOverlay map) {
@@ -32,7 +33,8 @@ public class MapOverlayOptions extends GuiScreen {
 	/**
      * Adds the buttons (and other controls) to the screen in question.
      */
-    public void initGui()
+    @Override
+	public void initGui()
     {
         this.buttonList.clear();
         String on = Constants.getString("MapOverlay.on");
@@ -86,6 +88,13 @@ public class MapOverlayOptions extends GuiScreen {
 				Constants.getString("MapOverlay.show_grid", off),
 				PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)); //$NON-NLS-1$ //$NON-NLS-2$
 		
+		buttonAutomap = new MapButton(17,0,0,
+				Constants.getString("MapOverlay.automap_title", on),
+				Constants.getString("MapOverlay.automap_title", off),
+				PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED)); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonAutomap.setHoverText(Constants.getString("MapOverlay.automap_text")); //$NON-NLS-1$
+		buttonAutomap.enabled = Minecraft.getMinecraft().isSingleplayer();
+		
 		// Check for hardcore
 		if(map.hardcore) {
 			buttonCaves.setToggled(false);
@@ -110,6 +119,7 @@ public class MapOverlayOptions extends GuiScreen {
 		buttonList.add(buttonPlayers);
 		buttonList.add(buttonGrid);
 		buttonList.add(buttonWaypoints);
+		buttonList.add(buttonAutomap);
     }
     
     /**
@@ -144,14 +154,16 @@ public class MapOverlayOptions extends GuiScreen {
 			layoutButton(buttonGrid, bx, by + (20*row));			
 			layoutButton(buttonWaypoints, bx + hgap, by + (20*row++));	
 
-			layoutButton(buttonSave, bx, by + (20*row));			
-			layoutButton(buttonBrowser, bx + hgap, by + (20*row++));
-						
+			layoutButton(buttonAutomap, bx, by + (20*row));	
+			layoutButton(buttonSave, bx + hgap, by + (20*row++));	
+								
 			if(buttonAlert.drawButton) {
 				layoutButton(buttonAlert, bx + hgap/2, by + (20*row++));
 			}
 			
-			layoutButton(buttonClose, bx + hgap/2, by + (20*row++));		
+			layoutButton(buttonBrowser, bx + hgap/2, by + (20*row++));	
+			layoutButton(buttonClose, bx + hgap/2, by + (20*row++));	
+			
 			
 		}
 		
@@ -233,6 +245,12 @@ public class MapOverlayOptions extends GuiScreen {
 				buttonGrid.setToggled(showGrid);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_GRID, showGrid);
 				map.forceRefresh();
+			}
+			case 17: { // automap
+				boolean enable = !PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED);
+				buttonAutomap.setToggled(enable);
+				PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, enable);
+				JourneyMap.getInstance().autoMap(enable);
 			}
 		}
 	}

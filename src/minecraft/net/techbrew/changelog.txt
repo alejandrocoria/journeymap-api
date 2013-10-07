@@ -12,7 +12,7 @@ Requirements:
 - Forge "Recommended-1.6.4" or ModLoader 1.6.4
 
 Changes in JourneyMap 2.8.0 for Minecraft 1.6.4:
-- Support for mapping entire single-player worlds
+- Support for auto-mapping entire single-player worlds
 - Support for multiple resource packs at the same time
 - Support for mod resource packs that have custom blocks and biomes
 - Removed obsolete "use_custom_texturepack" property from journeyMap.properties
