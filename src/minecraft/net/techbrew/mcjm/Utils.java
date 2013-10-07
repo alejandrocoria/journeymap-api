@@ -1,33 +1,10 @@
 package net.techbrew.mcjm;
 
-import net.minecraft.src.Minecraft;
 import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.World;
-import net.minecraft.src.Chunk;
-import net.minecraft.src.EmptyChunk;
+import net.minecraft.src.Minecraft;
 
 
 public class Utils {
-
-	/**
-	 * Tries to safely get a Chunk.
-	 * @param world
-	 * @param chunkX
-	 * @param chunkZ
-	 * @return
-	 */
-	public static Chunk getChunkIfAvailable(World world, int chunkX, int chunkZ) {		
-		Chunk result  = null;
-		if(world.getChunkProvider().chunkExists(chunkX, chunkZ)) {
-			Chunk theChunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
-			if(!(theChunk instanceof EmptyChunk)) {
-				if(theChunk.isChunkLoaded) {
-					result = theChunk;
-				}
-			}			
-		}
-		return result;
-	}
 	
 	/**
 	 * For int v, return the closest larger power of 2, not to exceed clamp.

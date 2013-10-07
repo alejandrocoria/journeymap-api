@@ -2,7 +2,6 @@ package net.techbrew.mcjm;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -11,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.minecraft.src.Chunk;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.GuiInventory;
 import net.minecraft.src.GuiMainMenu;
@@ -24,6 +22,7 @@ import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.io.nbt.ChunkLoader;
 import net.techbrew.mcjm.io.nbt.RegionLoader;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -72,7 +71,8 @@ public class JourneyMap {
 	
 	private boolean threadLogging = false;
 
-	public volatile ChunkStub lastPlayerChunk;
+	private volatile ChunkStub lastPlayerChunk;
+	//private ChunkCoordIntPair lastPlayerCoord;
 
 	// Invokes MapOverlay
 	public KeyBinding keybinding;
@@ -95,8 +95,7 @@ public class JourneyMap {
 	// Announcements
 	private final List<String> announcements = Collections.synchronizedList(new LinkedList<String>());
 	
-	// TODO: Move
-	private Iterator<RegionCoord> regionIter;
+	// Automapping
 	private RegionLoader regionLoader;
 	
 	// Utility class for updating chunks
@@ -194,20 +193,17 @@ public class JourneyMap {
 				chunkExecutor.shutdown();			
 			}	    	
 	    	chunkExecutor = null;
+	    	
+	    	autoMap(false);
+	    	
 	    	Minecraft mc = Minecraft.getMinecraft();
 	    	logger.info("Mapping halted: " + WorldData.getWorldName(mc)); //$NON-NLS-1$
-			lastPlayerChunk = null;
+	    	lastPlayerChunk = null;
 			FileHandler.lastWorldHash = -1;
 			FileHandler.lastWorldDir = null;
 			
 			RegionImageCache.getInstance().flushToDisk();
 			RegionImageCache.getInstance().clear();
-			
-			// TODO: Move?	  
-	    	if(mc.isSingleplayer()) {
-	    		regionLoader = null;
-	    		regionIter = null;
-	    	}
     	}
     }
     
@@ -224,19 +220,48 @@ public class JourneyMap {
 			}
 	    	logger.info("Mapping started: " + WorldData.getWorldName(mc)); //$NON-NLS-1$	
 	    	
-	    	// TODO: Move?	  
-	    	regionLoader = null;
-	    	regionIter = null;
-	    	if(mc.isSingleplayer()) {
-		    	try {
-			    	regionLoader = new RegionLoader(mc, mc.theWorld.provider.dimensionId);
-			    	regionIter = regionLoader.regionIterator();							
-		    	} catch(Throwable t) {
-		    		logger.severe("Couldn't use RegionLoader: " + t.getMessage());
-		    	}
-	    	}
+	    	autoMap(PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED));
     	}
 		if(enableAnnounceMod) announceMod();
+    }
+    
+    /**
+     * Start/stop automap
+     * @param start
+     */
+    public void autoMap(boolean start) {    	 
+    	Minecraft mc = Minecraft.getMinecraft();
+    	if(mc.isSingleplayer()) {
+    		if(start) {
+		    	try {
+			    	regionLoader = new RegionLoader(mc, mc.theWorld.provider.dimensionId);
+			    	if(regionLoader.getRegionsFound()==0) {
+			    		logger.info("Auto-mapping found no unexplored regions.");
+			    		regionLoader = null;
+			    	}
+		    	} catch(Throwable t) {
+		    		String error = Constants.getMessageJMERR00("Couldn't Auto-Map: " + t.getMessage()); //$NON-NLS-1$
+					announce(error);
+					logger.severe(LogFormatter.toString(t));
+		    	}
+    		} else {
+    			if(regionLoader!=null && isMapping()) {
+    				RegionImageCache.getInstance().flushToDisk();
+    				announce(Constants.getString("MapOverlay.automap_complete"), Level.INFO);
+    	    	}
+    	    	regionLoader = null;
+    		}
+    	}
+    }
+    
+    boolean isAutomapping() {
+    	if(regionLoader==null) {
+    		return false;
+    	} else if(regionLoader.getRegions().isEmpty()) {
+    		autoMap(false);
+    		return false;
+    	}
+    	return true;
     }
 
 	/**
@@ -285,21 +310,17 @@ public class JourneyMap {
 
 			// Check for world change
 			long newHash = Utils.getWorldHash(minecraft);
-			if(newHash!=0L) {
-				logger.info("Map data: " + FileHandler.getWorldDir(minecraft, newHash));
+			if(newHash!=0L) {				
 				FileHandler.lastWorldHash=newHash;
 			}
 
 			// Check for valid player chunk
-			Chunk pChunk = Utils.getChunkIfAvailable(minecraft.theWorld, player.chunkCoordX, player.chunkCoordZ);
-			if(pChunk==null) {
-				lastPlayerChunk = null;
-				logger.fine("Player chunk unknown: " + (player.chunkCoordX) + "," +(player.chunkCoordZ));
+			lastPlayerChunk = ChunkLoader.getChunkStubFromMemory(player.chunkCoordX, player.chunkCoordZ, minecraft, newHash);
+			if(lastPlayerChunk==null) {
+				if(logger.isLoggable(Level.FINE)) {
+					logger.fine("Player chunk unknown: " + player.chunkCoordX + "," + player.chunkCoordZ);
+				}
 				return true;
-			} else {
-				if(lastPlayerChunk==null || (player.chunkCoordX!=lastPlayerChunk.xPosition || player.chunkCoordZ!=lastPlayerChunk.zPosition)) {
-					lastPlayerChunk = new ChunkStub(pChunk, true, minecraft.theWorld, FileHandler.lastWorldHash);
-				}				
 			}
 
 			// We got this far
@@ -311,38 +332,20 @@ public class JourneyMap {
 			boolean isGamePaused = minecraft.currentScreen != null;
 			while(!isGamePaused && !announcements.isEmpty()) {
 				player.addChatMessage(announcements.remove(0));
-			}
-			
+			}			
 
 			// Map world first
-			if(regionIter!=null && regionIter.hasNext()) {	
-				
-				synchronized(chunkUpdateProvider) {
-					if(chunkUpdateProvider.isReady()) {
-						RegionCoord rCoord = regionIter.next();
-						
-						// TODO: make more efficient
-						int total = regionLoader.getRegions().size();
-						int index = 1 + regionLoader.getRegions().indexOf(rCoord);
-						
-						String msg = "Mapping region " + rCoord.regionX + "," + rCoord.regionZ + " (" + index + " of " + total + ")";
-						
-						announce(msg, Level.INFO);
-						chunkUpdateProvider.updateRegion(rCoord, regionLoader.getWorldDirectory(minecraft), minecraft.theWorld, newHash);
-					}
-				}
-				
-				if(!regionIter.hasNext()) {
-					regionIter = null;
-					announce("World mapping has completed.", Level.INFO);
-				}
-				
+			if(isAutomapping()) {					
+				if(chunkUpdateProvider.isReady()) {
+					RegionCoord rCoord = regionLoader.getRegions().pop();
+					int total = regionLoader.getRegionsFound();
+					int index = total-regionLoader.getRegions().size();
+					announce(Constants.getString("MapOverlay.automap_status", index, total), Level.INFO);
+					chunkUpdateProvider.updateRegion(rCoord, minecraft, newHash);
+				}				
 			} else {			
-				// Provide chunks around player
-				synchronized(chunkUpdateProvider) {
-					if(chunkUpdateProvider.isReady()) {
-						chunkUpdateProvider.updateAroundPlayer(minecraft, lastPlayerChunk);
-					}
+				if(chunkUpdateProvider.isReady()) {
+					chunkUpdateProvider.updateAroundPlayer(minecraft, newHash);
 				}
 			}
 

@@ -84,7 +84,9 @@ public class ChunkRenderController {
 		updateTime.addAndGet(stop-start);		
 		
 		if(!renderOkay) {
-			JourneyMap.getLogger().log(Level.WARNING, "Chunk didn't render: " + chunkStub.xPosition + "," + chunkStub.zPosition);
+			if(fineLogging) {
+				JourneyMap.getLogger().log(Level.WARNING, "Chunk didn't render: " + chunkStub.xPosition + "," + chunkStub.zPosition);
+			}
 			chunkImage = null;
 		}
 		
