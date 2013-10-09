@@ -30,9 +30,11 @@ import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.server.JMServer;
-import net.techbrew.mcjm.thread.ChunkUpdateProvider;
-import net.techbrew.mcjm.thread.ChunkUpdateThread;
 import net.techbrew.mcjm.thread.JMThreadFactory;
+import net.techbrew.mcjm.thread.MapTaskThread;
+import net.techbrew.mcjm.thread.task.MapPlayerTask;
+import net.techbrew.mcjm.thread.task.MapRegionTask;
+import net.techbrew.mcjm.thread.task.MapTask;
 import net.techbrew.mcjm.ui.MapOverlay;
 import net.techbrew.mcjm.ui.MapOverlayOptions;
 
@@ -78,7 +80,7 @@ public class JourneyMap {
 	public KeyBinding keybinding;
 
 	// Milliseconds between updates
-	public int chunkDelay;
+	public int mapTaskDelay;
 
 	// Time stamp of next chunk update
 	public long nextPlayerUpdate = 0;
@@ -89,17 +91,14 @@ public class JourneyMap {
 	public boolean enableMapGui;
 	boolean enableAnnounceMod;
 
-	// Thread service for writing chunks
-	private volatile ScheduledExecutorService chunkExecutor;
+	// Thread service for mapping tasks
+	private volatile ScheduledExecutorService mapTaskExecutor;
 
 	// Announcements
 	private final List<String> announcements = Collections.synchronizedList(new LinkedList<String>());
 	
 	// Automapping
 	private RegionLoader regionLoader;
-	
-	// Utility class for updating chunks
-	private ChunkUpdateProvider chunkUpdateProvider;
 
 	/**
 	 * Constructor.
@@ -113,7 +112,7 @@ public class JourneyMap {
     }
     
     public Boolean isMapping() {
-    	return chunkExecutor!=null && !chunkExecutor.isShutdown();
+    	return mapTaskExecutor!=null && !mapTaskExecutor.isShutdown();
     }
     
     public Boolean isThreadLogging() {
@@ -125,6 +124,7 @@ public class JourneyMap {
 	 */
 	public void initialize(Minecraft minecraft) {
 		
+		// Ensure logger inits
 		getLogger();
 		
 		if(initialized) {
@@ -132,26 +132,26 @@ public class JourneyMap {
 			return;
 		}
 
+		final PropertyManager pm = PropertyManager.getInstance();
+		
 		// Start logFile
 		logger.info("JourneyMap v" + JM_VERSION + " starting " + new Date()); //$NON-NLS-1$ //$NON-NLS-2$
 		logger.environment();
-		logger.info("Properties: " + PropertyManager.getInstance().toString()); //$NON-NLS-1$
+		logger.info("Properties: " + pm.toString()); //$NON-NLS-1$
 
 		// Use property settings
-		chunkDelay = PropertyManager.getInstance().getInteger(PropertyManager.Key.UPDATETIMER_CHUNKS);
-		enableAnnounceMod = PropertyManager.getInstance().getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED); 
+		mapTaskDelay = pm.getInteger(PropertyManager.Key.UPDATETIMER_CHUNKS);
+		enableAnnounceMod = pm.getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED); 
 		
 		// Key bindings
-		int mapGuiKeyCode = PropertyManager.getInstance().getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
-		this.enableMapGui = PropertyManager.getInstance().getBoolean(PropertyManager.Key.MAPGUI_ENABLED); 
+		int mapGuiKeyCode = pm.getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
+		this.enableMapGui = pm.getBoolean(PropertyManager.Key.MAPGUI_ENABLED); 
 		if(this.enableMapGui) {
 			this.keybinding = new KeyBinding("JourneyMap", mapGuiKeyCode); //$NON-NLS-1$
 		}
-
-		chunkUpdateProvider = new ChunkUpdateProvider();
 		
 		// Webserver
-		enableWebserver = PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
+		enableWebserver = pm.getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
 		if(enableWebserver) {
 			try {			
 				//new LibraryLoader().loadLibraries();
@@ -188,11 +188,10 @@ public class JourneyMap {
      */
     public void stopMapping() {
     	synchronized(this) {
-    		ChunkUpdateThread.getBarrier().reset();
-	    	if(chunkExecutor!=null && !chunkExecutor.isShutdown()) {    		
-				chunkExecutor.shutdown();			
+	    	if(mapTaskExecutor!=null && !mapTaskExecutor.isShutdown()) {    		
+				mapTaskExecutor.shutdown();			
 			}	    	
-	    	chunkExecutor = null;
+	    	mapTaskExecutor = null;
 	    	
 	    	autoMap(false);
 	    	
@@ -214,10 +213,10 @@ public class JourneyMap {
     	synchronized(this) {
 	    	DataCache.instance().purge();	   
 	    	Minecraft mc = Minecraft.getMinecraft();
-	    	if(chunkExecutor==null || chunkExecutor.isShutdown()) {			    		
-				chunkExecutor = Executors.newSingleThreadScheduledExecutor(new JMThreadFactory("chunk"));
-				chunkExecutor.scheduleWithFixedDelay(new ChunkUpdateThread(this, mc.theWorld), 1500, chunkDelay, TimeUnit.MILLISECONDS);				
+	    	if(mapTaskExecutor==null || mapTaskExecutor.isShutdown()) {			    		
+				mapTaskExecutor = Executors.newScheduledThreadPool(1, new JMThreadFactory("maptask")); //$NON-NLS-1$				
 			}
+	    	MapTaskThread.reset();
 	    	logger.info("Mapping started: " + WorldData.getWorldName(mc)); //$NON-NLS-1$	
 	    	
 	    	autoMap(PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED));
@@ -334,18 +333,32 @@ public class JourneyMap {
 				player.addChatMessage(announcements.remove(0));
 			}			
 
-			// Map world first
-			if(isAutomapping()) {					
-				if(chunkUpdateProvider.isReady()) {
-					RegionCoord rCoord = regionLoader.getRegions().pop();
-					int total = regionLoader.getRegionsFound();
-					int index = total-regionLoader.getRegions().size();
-					announce(Constants.getString("MapOverlay.automap_status", index, total), Level.INFO);
-					chunkUpdateProvider.updateRegion(rCoord, minecraft, newHash);
-				}				
-			} else {			
-				if(chunkUpdateProvider.isReady()) {
-					chunkUpdateProvider.updateAroundPlayer(minecraft, newHash);
+			// Create a map task and queue it
+			if(!MapTaskThread.hasQueue()) {
+				MapTask mapTask = null;
+				MapTaskThread thread = null;
+				if(isAutomapping()) {					
+						RegionCoord rCoord = regionLoader.getRegions().peek();
+						mapTask = MapRegionTask.create(rCoord, minecraft, newHash);
+						if(mapTask!=null) {
+							thread = MapTaskThread.createAndQueue(mapTask);
+							if(thread!=null) {
+								regionLoader.getRegions().pop();
+								int total = regionLoader.getRegionsFound();
+								int index = total-regionLoader.getRegions().size();
+								announce(Constants.getString("MapOverlay.automap_status", index, total), Level.INFO);
+							}				
+						}
+				} else {			
+					mapTask = MapPlayerTask.create(minecraft.thePlayer, newHash);
+					if(mapTask!=null) {
+						thread = MapTaskThread.createAndQueue(mapTask);
+					}
+				}
+				if(isMapping()) {
+					if(thread!=null) {
+						mapTaskExecutor.schedule(thread, mapTaskDelay, TimeUnit.MILLISECONDS);
+					}
 				}
 			}
 
@@ -431,7 +444,7 @@ public class JourneyMap {
 	}
 
 	public ScheduledExecutorService getChunkExecutor() {
-		return chunkExecutor;
+		return mapTaskExecutor;
 	}
 
 	/**
