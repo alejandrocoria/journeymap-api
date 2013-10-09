@@ -9,6 +9,6 @@ import net.techbrew.mcjm.model.ChunkStub;
 public interface IChunkRenderer {
 	
 	public boolean render(final Graphics2D g2D, final ChunkStub chunkStub, final boolean underground, 
-			final int vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors);
+			final Integer vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors);
 
 }

@@ -22,8 +22,8 @@ import net.techbrew.mcjm.model.ChunkStub;
  */
 public class ChunkRenderController {
 
-	public volatile AtomicInteger updateCounter = new AtomicInteger(0);
-	public volatile AtomicLong updateTime = new AtomicLong(0);
+	private static AtomicInteger updateCounter = new AtomicInteger(0);
+	private static AtomicLong updateTime = new AtomicLong(0);
 	
 	private final IChunkRenderer netherRenderer;
 	private final IChunkRenderer endRenderer;
@@ -39,7 +39,7 @@ public class ChunkRenderController {
 	}
 	
 	public BufferedImage getChunkImage(ChunkStub chunkStub,
-			boolean underground, int vSlice,
+			boolean underground, Integer vSlice,
 			Map<ChunkCoordIntPair, ChunkStub> neighbors) {
 		
 		// Initialize image for the chunk
@@ -80,8 +80,10 @@ public class ChunkRenderController {
 		
 		long stop = System.nanoTime();
 		
-		updateCounter.incrementAndGet();
-		updateTime.addAndGet(stop-start);		
+		if(fineLogging) {
+			updateCounter.incrementAndGet();
+			updateTime.addAndGet(stop-start);		
+		}
 		
 		if(!renderOkay) {
 			if(fineLogging) {

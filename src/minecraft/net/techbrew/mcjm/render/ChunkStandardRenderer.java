@@ -35,7 +35,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	 */
 	@Override
 	public boolean render(final Graphics2D g2D, final ChunkStub chunkStub, final boolean underground, 
-			final int vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors) {
+			final Integer vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors) {
 		
 
 		// Render the chunk image
@@ -50,7 +50,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	/**
 	 * Render blocks in the chunk for the surface.
 	 */
-	private boolean renderSurface(final Graphics2D g2D, final ChunkStub chunkStub, final int vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors) {
+	private boolean renderSurface(final Graphics2D g2D, final ChunkStub chunkStub, final Integer vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors) {
 		
 		float slope, s, sN, sNW, sW, sS, sE, sAvg, shaded, h, hN, hW;
 		

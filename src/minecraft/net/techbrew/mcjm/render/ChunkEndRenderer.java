@@ -32,7 +32,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 	 */
 	@Override
 	public boolean render(final Graphics2D g2D, final ChunkStub chunkStub, final boolean underground, 
-			final int vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors) {
+			final Integer vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors) {
 		
 		// Initialize ChunkSub slopes if needed
 		if(chunkStub.slopes==null) {

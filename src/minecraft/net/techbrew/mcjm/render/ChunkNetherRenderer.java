@@ -34,7 +34,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 	 */
 	@Override
 	public boolean render(final Graphics2D g2D, final ChunkStub chunkStub, final boolean underground, 
-			final int vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors) {
+			final Integer vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors) {
 		
 		int sliceMinY = Math.max((vSlice << 4) - 1, 0);
 		int sliceMaxY = Math.min(((vSlice + 1) << 4) - 1, chunkStub.worldHeight);
