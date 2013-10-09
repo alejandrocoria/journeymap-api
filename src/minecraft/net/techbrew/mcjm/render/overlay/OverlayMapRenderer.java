@@ -9,7 +9,7 @@ import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
-import net.techbrew.mcjm.io.RegionFileHandler;
+import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.MapOverlayState;
 
@@ -55,7 +55,7 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 				final Constants.CoordType cType = Constants.CoordType.convert(state.getMapType(), mc.thePlayer.dimension);
 	
 				int size = getTextureSize();				
-				BufferedImage tmpMapImg = RegionFileHandler.getMergedChunks(state.getWorldDir(), 
+				BufferedImage tmpMapImg = RegionImageHandler.getMergedChunks(state.getWorldDir(), 
 						startCoords.chunkXPos, startCoords.chunkZPos, 
 						endCoords.chunkXPos, endCoords.chunkZPos, 
 						state.getMapType(), mc.thePlayer.chunkCoordY, cType, true, state.getCurrentZoom(),

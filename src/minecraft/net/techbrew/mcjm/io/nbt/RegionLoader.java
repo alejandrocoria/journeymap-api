@@ -17,7 +17,7 @@ import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.io.FileHandler;
-import net.techbrew.mcjm.io.RegionFileHandler;
+import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.model.RegionCoord;
 
 public class RegionLoader {
@@ -69,7 +69,7 @@ public class RegionLoader {
 	    
 	    Constants.CoordType ctype = Constants.CoordType.convert(worldClient.provider.dimensionId);
 		
-		RegionFileHandler rfh = RegionFileHandler.getInstance();
+		RegionImageHandler rfh = RegionImageHandler.getInstance();
 
 	    File[] anvilFiles = regionDirectory.listFiles();
 	    Stack<RegionCoord> stack = new Stack<RegionCoord>();
@@ -81,7 +81,7 @@ public class RegionLoader {
 				String z = matcher.group(2);
 				if (x != null && z != null) {
 					RegionCoord rc = new RegionCoord(jmImageWorldDir, Integer.parseInt(x), null, Integer.parseInt(z), ctype);
-					if(!rfh.getRegionFile(rc).exists()) {						
+					if(!rfh.getRegionImageFile(rc).exists()) {						
 						List<ChunkCoordIntPair> chunkCoords = rc.getChunkCoordsInRegion();
 						for(ChunkCoordIntPair coord : chunkCoords) {
 							if(ChunkLoader.getChunkFromDisk(coord.chunkXPos, coord.chunkZPos, worldDir, mc.theWorld)!=null) {

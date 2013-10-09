@@ -1,5 +1,6 @@
 package net.techbrew.mcjm.server;
 
+import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -14,7 +15,7 @@ import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
-import net.techbrew.mcjm.io.RegionFileHandler;
+import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.ui.ZoomLevel;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
@@ -79,7 +80,7 @@ public class MapService extends BaseService {
 			int x2 = getParameter(query, "x2", x1); //$NON-NLS-1$
 			int z2 = getParameter(query, "z2", z1); //$NON-NLS-1$
 			
-			if (x1 >= x2 || z1 >= z2) {
+			if (x1 > x2 || z1 > z2) {
 				String error = Constants.getMessageJMERR05("coordinates=" + x1 + "," + z1 + "," + x2 + "," + z2); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				throwEventException(400, error, event, true);
 			}
@@ -136,8 +137,21 @@ public class MapService extends BaseService {
 		
 		start = System.currentTimeMillis();
 		
-		BufferedImage mergedImg = RegionFileHandler.getMergedChunks(worldDir, x1, z1, x2, z2, mapType, depth, cType, true, 
+		BufferedImage mergedImg = RegionImageHandler.getMergedChunks(worldDir, x1, z1, x2, z2, mapType, depth, cType, true, 
 				new ZoomLevel(1, 1, false, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
+				
+		if(mergedImg.getWidth()!=canvasWidth || mergedImg.getHeight()!=canvasHeight) {
+			BufferedImage resized = new BufferedImage(canvasWidth, canvasHeight, mergedImg.getType());
+		    Graphics2D g = resized.createGraphics();
+		    if(mergedImg.getWidth()>canvasWidth || mergedImg.getHeight()>canvasHeight) {
+		    	g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		    } else {
+		    	g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+		    }
+		    g.drawImage(mergedImg, 0, 0, canvasWidth, canvasHeight, 0, 0, mergedImg.getWidth(), mergedImg.getHeight(), null);
+		    g.dispose();
+		    mergedImg = resized;
+		}
 		
 		// Headers
 		ResponseHeader.on(event).contentType(ContentType.png).noCache();

@@ -56,7 +56,7 @@ public class MapSaver {
 		Integer z2=null;
 		
 		// Find all region files
-		FilenameFilter ff = new RegionFileHandler.RegionFileFilter(cType);
+		FilenameFilter ff = new RegionImageHandler.RegionFileFilter(cType);
 		File[] foundFiles = worldDir.listFiles(ff);
 		//System.out.println("Found region files: " + foundFiles.length); //$NON-NLS-1$
 
@@ -88,7 +88,7 @@ public class MapSaver {
 		
 		mapFile = createMapFile(WorldData.getWorldName(Minecraft.getMinecraft()) + "_" + cType + "_" + mapType);
 				
-		RegionFileHandler.getMergedChunksFile(worldDir, x1, z1, x2, z2, mapType, chunkY, cType, mapFile);
+		RegionImageHandler.getMergedChunksFile(worldDir, x1, z1, x2, z2, mapType, chunkY, cType, mapFile);
 		
 		stop = System.currentTimeMillis();
 		

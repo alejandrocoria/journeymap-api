@@ -21,31 +21,30 @@ import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.ChunkCoord;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.render.MapBlocks;
 import net.techbrew.mcjm.ui.ZoomLevel;
 
-public class RegionFileHandler {
+public class RegionImageHandler {
 	
 	private final Object lock;
 	
 	// On-demand-holder for instance
 	private static class Holder {
-        private static final RegionFileHandler INSTANCE = new RegionFileHandler();
+        private static final RegionImageHandler INSTANCE = new RegionImageHandler();
     }
 
 	// Get singleton instance.  Concurrency-safe.
-    public static RegionFileHandler getInstance() {
+    public static RegionImageHandler getInstance() {
         return Holder.INSTANCE;
     }
 
-	private RegionFileHandler() {
+	private RegionImageHandler() {
 		lock = new Object();
 	}
 	
-	public static File getRegionFile(RegionCoord rCoord) {
+	public static File getRegionImageFile(RegionCoord rCoord) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(rCoord.regionX).append(",").append(rCoord.regionZ); //$NON-NLS-1$
 		if(!rCoord.cType.equals(Constants.CoordType.Normal)) {
@@ -61,46 +60,6 @@ public class RegionFileHandler {
 		sb.append(cType.name());
 		sb.append(".region.png"); //$NON-NLS-1$
 		return sb.toString();
-	}
-	
-
-	
-//	public synchronized void putChunkImage(BufferedImage chunkImage, ChunkCoord cCoord) {
-//
-//		RegionCoord rCoord = cCoord.getRegionCoord();
-//		//BufferedImage regionImage = getCachedRegionImage(worldDir, rCoord);
-//		BufferedImage regionImage = readRegionFile(getRegionFile(rCoord));
-//		if(regionImage!=null) {
-//			regionImage = insertChunk(cCoord, chunkImage, regionImage);
-//			synchronized(lock) {
-//				//cache.put(rCoord, regionImage);
-//				writeRegionFile(regionImage, getRegionFile(rCoord));
-//				//System.out.println("Inserted chunk " + chunk.xPosition + "," + chunk.zPosition + " into region " + rCoord.regionX + "," + rCoord.regionZ);
-//			}
-//		}
-//	}
-		
-	public BufferedImage getChunkImage(ChunkCoord cCoord) {
-		
-		BufferedImage chunkImage = new BufferedImage(32,16, BufferedImage.TYPE_INT_ARGB);
-		BufferedImage regionImage = RegionImageCache.getInstance().getGuaranteed(cCoord.getRegionCoord());
-		
-		Graphics2D g2d = chunkImage.createGraphics();		
-		int x,z;
-
-		// Get day image
-		x = cCoord.getXOffsetDay();
-		z = cCoord.getZOffsetDay();
-		BufferedImage chunkDay = regionImage.getSubimage(x, z, 16, 16);
-		g2d.drawImage(chunkDay, 0, 0, null);
-		
-		// Get night image
-		x = cCoord.getXOffsetNight();
-		z = cCoord.getZOffsetNight();
-		BufferedImage chunkNight = regionImage.getSubimage(x, z, 16, 16);
-		g2d.drawImage(chunkNight, 16, 0, null);
-		
-		return chunkImage;
 	}
 	
 	public BufferedImage getChunkImages(File worldDir, int rx1, int rz1, Integer chunkY, int rx2, int rz2, Constants.MapType mapType, Constants.CoordType cType, Boolean useCache, int sampling) {
@@ -142,7 +101,7 @@ public class RegionFileHandler {
 //				RegionImageCache.getInstance().flushToDisk();
 //			} 
 		} else {
-			regionImage = readRegionFile(getRegionFile(regionCoord), regionCoord, sampling);
+			regionImage = readRegionImage(getRegionImageFile(regionCoord), regionCoord, sampling);
 		}
 		BufferedImage chunksImage = regionImage.getSubimage(ix1,iz1,width*16,height*16);
 		
@@ -154,10 +113,22 @@ public class RegionFileHandler {
 		return RegionImageCache.getInstance().getGuaranteed(rCoord);
 	}	
 	
+	public static boolean isBlank(BufferedImage img) {		
+		int[] pixels = img.getRaster().getPixels(0,0,img.getWidth()-1,img.getHeight()-1, (int[]) null);
+		boolean isBlank = true;
+		for(int pixel: pixels) {
+			if(pixel!=0) {
+				isBlank = false;
+				break;
+			}
+		}
+		return isBlank;
+	}
+	
 	private static BufferedImage createBlankImage() {
 		int height = (int) Math.pow(2, RegionCoord.SIZE)*16;
 		int width = 2*height;
-		return createBlankImage(width, height);
+		return createBlankImage(width, height);		
 	}
 	
 	private static BufferedImage createUndergroundBlankImage() {
@@ -172,7 +143,7 @@ public class RegionFileHandler {
 		return img;
 	}
 	
-	public static BufferedImage readRegionFile(File regionFile, RegionCoord rCoord, int sampling) {
+	public static BufferedImage readRegionImage(File regionFile, RegionCoord rCoord, int sampling) {
 		
 		FileInputStream fis = null;
 		BufferedImage image = null;
@@ -229,14 +200,18 @@ public class RegionFileHandler {
 	 * @param rCoord
 	 * @param regionImage
 	 */
-	public void writeRegionFile(RegionCoord rCoord, BufferedImage regionImage) {
+	public void writeRegionImage(RegionCoord rCoord, BufferedImage regionImage) {
 		
 		if(regionImage==null) {
-			JourneyMap.getLogger().warning("Null regionImage?");
+			JourneyMap.getLogger().warning("Ignoring null image for " + rCoord);
 			return;
 		}		
 		
-		File regionFile = getRegionFile(rCoord);
+		if(isBlank(regionImage)) {
+			return;
+		}
+		
+		File regionFile = getRegionImageFile(rCoord);
 	    try {
 
 	    	if(!regionFile.canRead()) {
@@ -304,7 +279,7 @@ public class RegionFileHandler {
 		g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
 		// Merge chunk images
-		RegionFileHandler rfh = RegionFileHandler.getInstance();
+		RegionImageHandler rfh = RegionImageHandler.getInstance();
 		
 		// Get region coords
 		final int rx1=RegionCoord.getRegionPos(x1);
@@ -352,6 +327,38 @@ public class RegionFileHandler {
 
 	}
 	
+	public static synchronized BufferedImage getRegionImage(File worldDir, int rx, int ry,
+			int rz, Constants.MapType mapType, final Constants.CoordType cType)
+			throws IOException {
+		
+		final int imageWidth = 512;
+		final int imageHeight = 512;
+		
+		RegionCoord rCoord = new RegionCoord(worldDir,rx,ry,rz,cType);
+		File file = RegionImageHandler.getRegionImageFile(rCoord);
+		if(!file.exists()) {
+			return createBlankImage(imageWidth, imageHeight);
+		}
+		
+		BufferedImage regionImage = readRegionImage(file, rCoord, 1);
+		
+		// Show chunk grid
+		if(PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)) {
+			Graphics2D g2D = regionImage.createGraphics();
+			g2D.setColor(new Color(130,130,130));
+			g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1F));
+					
+			for(int x = -1; x<imageWidth; x+=16) {
+				for(int z = -1; z<imageHeight; z+=16) {
+					g2D.drawRect(x, z, 16, 16);
+				}
+			}
+			g2D.setComposite(MapBlocks.OPAQUE);
+		}
+		
+		return regionImage;
+	}
+	
 	/**
 	 * Used by MapSaver
 	 * @param worldDir
@@ -375,7 +382,7 @@ public class RegionFileHandler {
 		boolean isUnderground = mapType.equals(Constants.MapType.underground);
 
 		// Merge chunk images
-		RegionFileHandler rfh = RegionFileHandler.getInstance();
+		RegionImageHandler rfh = RegionImageHandler.getInstance();
 		
 		// Get region coords
 		final int rx1=RegionCoord.getRegionPos(x1);
@@ -391,7 +398,7 @@ public class RegionFileHandler {
 		for(int rz=rz1;rz<=rz2;rz++) {
 			for(int rx=rx1;rx<=rx2;rx++) {			
 				rc = new RegionCoord(worldDir, rx, depth, rz, cType);
-				rfile = getRegionFile(rc);
+				rfile = getRegionImageFile(rc);
 				if(!rfile.exists()) {
 					BufferedImage image;
 					if(rc.isUnderground()) {
@@ -424,13 +431,12 @@ public class RegionFileHandler {
 	}
 	
 	
-	
 	public static class RegionFileFilter implements FilenameFilter {
 		
 		final String regionName;
 		
 		public RegionFileFilter(final Constants.CoordType cType) {
-			regionName = RegionFileHandler.getRegionFileSuffix(cType);
+			regionName = RegionImageHandler.getRegionFileSuffix(cType);
 		}
 		
 		@Override

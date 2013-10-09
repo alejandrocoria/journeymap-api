@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.RegionFileHandler;
+import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.thread.JMThreadFactory;
 
@@ -74,8 +74,8 @@ public class RegionImageCache  {
 		synchronized(lock) {
 			regionImage = imageMap.get(rCoord);
 			if(regionImage==null) {
-				RegionFileHandler rfh = RegionFileHandler.getInstance();
-				 regionImage = rfh.readRegionFile(rfh.getRegionFile(rCoord), rCoord, 1);
+				RegionImageHandler rfh = RegionImageHandler.getInstance();
+				 regionImage = rfh.readRegionImage(rfh.getRegionImageFile(rCoord), rCoord, 1);
 				 imageMap.put(rCoord,  regionImage);
 				 dirty.add(rCoord);
 				 if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
@@ -87,7 +87,7 @@ public class RegionImageCache  {
 	}
 	
 	public void putAll(final Set<Map.Entry<ChunkCoord, BufferedImage>> chunkImageEntries, boolean forceFlush) {
-		final RegionFileHandler rfh = RegionFileHandler.getInstance();
+		final RegionImageHandler rfh = RegionImageHandler.getInstance();
 		synchronized(lock) {
 			for(Map.Entry<ChunkCoord, BufferedImage> entry : chunkImageEntries) {
 				final ChunkCoord cCoord = entry.getKey();
@@ -177,11 +177,11 @@ public class RegionImageCache  {
 	}
 	
 	public void flushToDisk() {
-		RegionFileHandler rfh = RegionFileHandler.getInstance();
+		RegionImageHandler rfh = RegionImageHandler.getInstance();
 		synchronized(lock) {
 			Set<RegionCoord> dirtyCopy = new HashSet<RegionCoord>(dirty);			
 			for(RegionCoord dirtyRC : dirtyCopy) {
-				rfh.writeRegionFile(dirtyRC, imageMap.get(dirtyRC));
+				rfh.writeRegionImage(dirtyRC, imageMap.get(dirtyRC));
 				//JourneyMap.getLogger().info("Flushing to disk: " + dirtyRC);
 			}
 			dirty.clear();
@@ -222,7 +222,7 @@ public class RegionImageCache  {
 							JourneyMap.getLogger().fine("RegionImageCache purging " + rc); //$NON-NLS-1$
 						}
 						try {
-							RegionFileHandler.getInstance().writeRegionFile(rc, image);
+							RegionImageHandler.getInstance().writeRegionImage(rc, image);
 						} catch(Throwable t) {
 							JourneyMap.getLogger().severe("RegionImageCache failed to flush purging entry: " + entry.getKey()); //$NON-NLS-1$
 							JourneyMap.getLogger().severe(LogFormatter.toString(t));
