@@ -245,12 +245,14 @@ public class MapOverlayOptions extends GuiScreen {
 				buttonGrid.setToggled(showGrid);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_GRID, showGrid);
 				map.forceRefresh();
+				break;
 			}
 			case 17: { // automap
 				boolean enable = !PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED);
 				buttonAutomap.setToggled(enable);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, enable);
 				JourneyMap.getInstance().autoMap(enable);
+				break;
 			}
 		}
 	}
