@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.thread.task;
+package net.techbrew.mcjm.task;
 
 import java.io.File;
 import java.util.HashMap;

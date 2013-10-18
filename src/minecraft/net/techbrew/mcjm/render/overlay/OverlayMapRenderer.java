@@ -3,10 +3,9 @@ package net.techbrew.mcjm.render.overlay;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.DynamicTexture;
 import net.minecraft.src.ChunkCoordIntPair;
-import net.techbrew.mcjm.Constants;
+import net.minecraft.src.DynamicTexture;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.io.RegionImageHandler;
@@ -52,13 +51,13 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 				
 				// Get the map image		
 	
-				final Constants.CoordType cType = Constants.CoordType.convert(state.getMapType(), mc.thePlayer.dimension);
+				final int dimension = mc.thePlayer.dimension;
 	
 				int size = getTextureSize();				
 				BufferedImage tmpMapImg = RegionImageHandler.getMergedChunks(state.getWorldDir(), 
 						startCoords.chunkXPos, startCoords.chunkZPos, 
 						endCoords.chunkXPos, endCoords.chunkZPos, 
-						state.getMapType(), mc.thePlayer.chunkCoordY, cType, true, state.getCurrentZoom(),
+						state.getMapType(), mc.thePlayer.chunkCoordY, dimension, true, state.getCurrentZoom(),
 						size, size);
 				
 				eraseCachedImg();

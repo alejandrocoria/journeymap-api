@@ -20,7 +20,7 @@ import net.techbrew.mcjm.model.ChunkImageCache;
 import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.render.ChunkRenderController;
-import net.techbrew.mcjm.thread.task.MapTask;
+import net.techbrew.mcjm.task.MapTask;
 
 public class MapTaskThread implements Runnable {
 
@@ -82,9 +82,9 @@ public class MapTaskThread implements Runnable {
 			// Do the real task
 			final long start = System.nanoTime();				
 			final boolean flushImagesToDisk = task.flushImagesToDisk;
-			final Integer chunkY = task.chunkY;	
-			final boolean underground = task.underground && chunkY!=null;					
-			final Constants.CoordType cType = Constants.CoordType.convert(underground, task.dimension);
+			final Integer vSlice = task.vSlice;	
+			final boolean underground = task.underground;					
+			final int dimension = task.dimension;
 			final Map<ChunkCoordIntPair, ChunkStub> chunkStubs = task.chunkStubs;
 			final Iterator<ChunkStub> chunkIter = chunkStubs.values().iterator();
 			final ChunkImageCache chunkImageCache = new ChunkImageCache();
@@ -97,13 +97,13 @@ public class MapTaskThread implements Runnable {
 				}
 				ChunkStub chunkStub = chunkIter.next();
 				if(chunkStub.doMap) {
-					BufferedImage chunkImage = renderController.getChunkImage(chunkStub, underground, chunkY, chunkStubs);		
+					BufferedImage chunkImage = renderController.getChunkImage(chunkStub, underground, vSlice, chunkStubs);		
 					if(chunkImage!=null) {			
-						ChunkCoord cCoord = ChunkCoord.fromChunkStub(jmWorldDir, chunkStub, chunkY, cType);
+						ChunkCoord cCoord = ChunkCoord.fromChunkStub(jmWorldDir, chunkStub, vSlice, dimension);
 						chunkImageCache.put(cCoord, chunkImage);			
 					} else {
 						if(logger.isLoggable(Level.FINE)) {
-							logger.fine("Could not render chunk image:" + chunkStub.xPosition + "," + chunkStub.zPosition + " at " + chunkY + " and underground = " + underground); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+							logger.fine("Could not render chunk image:" + chunkStub.xPosition + "," + chunkStub.zPosition + " at " + vSlice + " and underground = " + underground); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 						}
 					}
 				}
@@ -118,9 +118,9 @@ public class MapTaskThread implements Runnable {
 			int chunks = chunkImageCache.getEntries().size();
 			RegionImageCache.getInstance().putAll(chunkImageCache.getEntries(), flushImagesToDisk);			
 
-			//if(threadLogging) {
-				logger.info(task.getClass().getSimpleName() + " mapped " + chunks + " chunks in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start) + "ms with flush:" + flushImagesToDisk); //$NON-NLS-1$
-			//}
+			if(threadLogging) {
+				logger.fine(task.getClass().getSimpleName() + " mapped " + chunks + " chunks in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start) + "ms with flush:" + flushImagesToDisk); //$NON-NLS-1$
+			}
 
 			chunkStubs.clear();
 			chunkImageCache.clear();								

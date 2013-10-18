@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.thread.task;
+package net.techbrew.mcjm.task;
 
 import java.util.Map;
 
@@ -11,15 +11,18 @@ public abstract class MapTask {
 	public final World world;
 	public final int dimension;
 	public final boolean underground;
-	public final Integer chunkY;
+	public final Integer vSlice;
 	public final Map<ChunkCoordIntPair, ChunkStub> chunkStubs;
 	public final boolean flushImagesToDisk;
 	
-	public MapTask(World world, boolean underground, Integer chunkY, Map<ChunkCoordIntPair, ChunkStub> chunkStubs, boolean flushImagesToDisk) {
+	public MapTask(World world, boolean underground, Integer vSlice, Map<ChunkCoordIntPair, ChunkStub> chunkStubs, boolean flushImagesToDisk) {
 		this.world = world;
 		this.dimension = world.provider.dimensionId;
 		this.underground = underground;
-		this.chunkY = chunkY;
+		this.vSlice = vSlice;
+		if((vSlice==null || vSlice==-1) && underground) {
+			throw new IllegalStateException("vSlice can't be null (-1) and task be underground");
+		}
 		this.chunkStubs = chunkStubs;
 		this.flushImagesToDisk = flushImagesToDisk;
 	}

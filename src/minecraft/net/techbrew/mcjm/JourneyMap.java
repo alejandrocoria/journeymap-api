@@ -30,11 +30,11 @@ import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.server.JMServer;
+import net.techbrew.mcjm.task.MapPlayerTask;
+import net.techbrew.mcjm.task.MapRegionTask;
+import net.techbrew.mcjm.task.MapTask;
 import net.techbrew.mcjm.thread.JMThreadFactory;
 import net.techbrew.mcjm.thread.MapTaskThread;
-import net.techbrew.mcjm.thread.task.MapPlayerTask;
-import net.techbrew.mcjm.thread.task.MapRegionTask;
-import net.techbrew.mcjm.thread.task.MapTask;
 import net.techbrew.mcjm.ui.MapOverlay;
 import net.techbrew.mcjm.ui.MapOverlayOptions;
 

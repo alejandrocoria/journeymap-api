@@ -2,27 +2,25 @@ package net.techbrew.mcjm.model;
 
 import java.io.File;
 
-import net.techbrew.mcjm.Constants;
-
 public class ChunkCoord {
 
 	public final File worldDir;
 	public final int chunkX;
 	public final int chunkZ;
 	public final Integer vSlice;
-	public final Constants.CoordType cType;
+	public final int dimension;
 	
 	private RegionCoord rCoord = null;
 	
-	public static ChunkCoord fromChunkStub(File worldDir, ChunkStub chunkStub, Integer vSlice, final Constants.CoordType cType) {
-		return ChunkCoord.fromChunkPos(worldDir, chunkStub.xPosition, vSlice, chunkStub.zPosition, cType);
+	public static ChunkCoord fromChunkStub(File worldDir, ChunkStub chunkStub, Integer vSlice, int dimension) {
+		return ChunkCoord.fromChunkPos(worldDir, chunkStub.xPosition, vSlice, chunkStub.zPosition, dimension);
 	}
 	
-	public static ChunkCoord fromChunkPos(File worldDir, int xPosition, Integer vSlice, int zPosition, final Constants.CoordType cType) {
-		return new ChunkCoord(worldDir, xPosition, vSlice, zPosition, cType);
+	public static ChunkCoord fromChunkPos(File worldDir, int xPosition, Integer vSlice, int zPosition, int dimension) {
+		return new ChunkCoord(worldDir, xPosition, vSlice, zPosition, dimension);
 	}
 		
-	private ChunkCoord(File worldDir, int chunkX, Integer vSlice, int chunkZ, final Constants.CoordType cType) {
+	private ChunkCoord(File worldDir, int chunkX, Integer vSlice, int chunkZ, int dimension) {
 		this.worldDir = worldDir;
 		this.chunkX = chunkX;
 		if(vSlice!=null && vSlice > 16) {
@@ -30,12 +28,12 @@ public class ChunkCoord {
 		}
 		this.vSlice = vSlice;
 		this.chunkZ = chunkZ;
-		this.cType = cType;
+		this.dimension = dimension;
 	}
 	
 	public RegionCoord getRegionCoord() {
 		if(rCoord==null) {
-			rCoord = RegionCoord.fromChunkPos(worldDir, chunkX, vSlice, chunkZ, cType);
+			rCoord = RegionCoord.fromChunkPos(worldDir, chunkX, vSlice, chunkZ, dimension);
 		}
 		return rCoord;
 	}
@@ -48,10 +46,12 @@ public class ChunkCoord {
 		return getRegionCoord().getZOffsetDay(chunkZ);
 	}
 	
+	@Deprecated
 	public int getXOffsetNight() {
 		return getRegionCoord().getXOffsetNight(chunkX);
 	}
 	
+	@Deprecated
 	public int getZOffsetNight() {
 		return getRegionCoord().getZOffsetNight(chunkZ);
 	}
@@ -65,7 +65,7 @@ public class ChunkCoord {
 	}
 	
 	public Boolean isUnderground() {
-		return !cType.equals(Constants.CoordType.Normal);
+		return vSlice!=null ? vSlice!=-1 : false;
 	}
 	
 	public int getVerticalSlice() {
@@ -85,7 +85,7 @@ public class ChunkCoord {
 		result = prime * result + chunkZ;
 		result = prime * result
 				+ ((worldDir == null) ? 0 : worldDir.hashCode());
-		result = prime * result + cType.hashCode();
+		result = prime * result + dimension;
 		return result;
 	}
 
@@ -98,18 +98,18 @@ public class ChunkCoord {
 		if (getClass() != obj.getClass())
 			return false;
 		ChunkCoord other = (ChunkCoord) obj;
-		if (other.getVerticalSlice() != getVerticalSlice())
+		if (dimension!=other.dimension)
 			return false;
 		if (chunkX != other.chunkX)
 			return false;
 		if (chunkZ != other.chunkZ)
 			return false;
+		if (other.getVerticalSlice() != getVerticalSlice())
+			return false;
 		if (worldDir == null) {
 			if (other.worldDir != null)
 				return false;
 		} else if (!worldDir.equals(other.worldDir))
-			return false;
-		if (!cType.equals(other.cType))
 			return false;
 		return true;
 	}

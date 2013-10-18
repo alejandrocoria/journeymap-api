@@ -1,19 +1,16 @@
 package net.techbrew.mcjm.model;
 
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.RegionImageHandler;
-import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.thread.JMThreadFactory;
 
 public class RegionImageCache  {
@@ -21,9 +18,9 @@ public class RegionImageCache  {
 	private static final int SIZE = 16;
 	private static final long flushInterval = TimeUnit.SECONDS.toMillis(30);
 	private static volatile RegionImageCache instance;
-	private volatile Map<RegionCoord, BufferedImage> imageMap;
+	private volatile Map<RegionCoord, RegionImageSet> imageSets;
 	private volatile long lastFlush;
-	private volatile Set<RegionCoord> dirty;
+	//private volatile Set<RegionCoord> dirty;
 	private volatile Object lock = new Object();
 	
 	public synchronized static RegionImageCache getInstance() {
@@ -34,8 +31,9 @@ public class RegionImageCache  {
 	}
 	
 	private RegionImageCache() {
-		imageMap = Collections.synchronizedMap(new CacheMap(SIZE));
-		dirty = Collections.synchronizedSet(new HashSet<RegionCoord>(SIZE));
+		imageSets = Collections.synchronizedMap(new CacheMap(SIZE));
+		
+		//dirty = Collections.synchronizedSet(new HashSet<RegionCoord>(SIZE));
 		lastFlush = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);
 		
 		// Init thread factory
@@ -53,37 +51,26 @@ public class RegionImageCache  {
 		}));
 	}
 	
+	private RegionImageSet getRegionImageSet(RegionCoord rCoord) {
+		synchronized(lock) {
+			RegionImageSet ris = imageSets.get(rCoord);
+			if(ris==null) {
+				ris = new RegionImageSet(rCoord);
+				imageSets.put(rCoord, ris);			
+			}
+			return ris;
+		}
+	}
+	
 	public boolean contains(RegionCoord rCoord) {
 		synchronized(lock) {
-			return imageMap.containsKey(rCoord);
+			return imageSets.containsKey(rCoord);
 		}
 	}
 	
-	public BufferedImage get(RegionCoord rCoord) {
-		BufferedImage regionImage = null;
-		synchronized(lock) {
-			regionImage = imageMap.get(rCoord);
-		}
-		return regionImage;
-	}
-	
-	public BufferedImage getGuaranteed(RegionCoord rCoord) {
-		
-		BufferedImage regionImage = null;
-		
-		synchronized(lock) {
-			regionImage = imageMap.get(rCoord);
-			if(regionImage==null) {
-				RegionImageHandler rfh = RegionImageHandler.getInstance();
-				 regionImage = rfh.readRegionImage(rfh.getRegionImageFile(rCoord), rCoord, 1);
-				 imageMap.put(rCoord,  regionImage);
-				 dirty.add(rCoord);
-				 if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
-					JourneyMap.getLogger().fine("RegionImageCache had to pull from disk: " + rCoord); //$NON-NLS-1$
-				 }
-			}
-		}
-		return regionImage;
+	public BufferedImage getGuaranteedImage(RegionCoord rCoord, Constants.MapType mapType) {
+		RegionImageSet ris = getRegionImageSet(rCoord);
+		return ris.getImage(mapType);
 	}
 	
 	public void putAll(final Set<Map.Entry<ChunkCoord, BufferedImage>> chunkImageEntries, boolean forceFlush) {
@@ -93,9 +80,9 @@ public class RegionImageCache  {
 				final ChunkCoord cCoord = entry.getKey();
 				final RegionCoord rCoord = cCoord.getRegionCoord();
 				final BufferedImage chunkImage = entry.getValue();
-				final BufferedImage regionImage = getGuaranteed(rCoord);
-				insertChunk(cCoord, chunkImage, regionImage);
-				dirty.add(rCoord);
+				final RegionImageSet ris = getRegionImageSet(rCoord);
+				if(ris.hasLegacy()) ris.writeToDisk(true);
+				ris.insertChunk(cCoord, chunkImage);
 			}
 			if(forceFlush) {
 				flushToDisk();
@@ -115,92 +102,30 @@ public class RegionImageCache  {
 		}
 	}
 	
-	private Boolean insertChunk(ChunkCoord cCoord, BufferedImage chunkImage, BufferedImage regionImage) {
-		Graphics2D g2d = regionImage.createGraphics();		
-		Boolean regionAltered = true;
-		
-		int x,z;
-				
-		if(!cCoord.isUnderground()) {
-			
-			// Insert day image
-			x = cCoord.getXOffsetDay();
-			z = cCoord.getZOffsetDay();
-			
-			g2d.drawImage(chunkImage, x, z, x+16, z+16, 0,0,16,16, null);
-	
-			// Insert night image
-			x = cCoord.getXOffsetNight();
-			z = cCoord.getZOffsetNight();
-			
-			g2d.drawImage(chunkImage, x, z, x+16, z+16, 16,0,32,16, null);
-				
-		} else {
-			
-			// Insert underground image
-			x = cCoord.getXOffsetUnderground();
-			z = cCoord.getZOffsetUnderground();
-			
-			g2d.drawImage(chunkImage, x, z, x+16,z+16, 0,0,16,16,  null);
-		}
-		
-		//regionAltered = !rastersEqual(originalData, newData);
-		return regionAltered;
-	}
-	
-	/**
-	 * http://blog.varunin.com/2011/07/comparing-and-re-sizing-images-using.html
-	 * @param ras1
-	 * @param ras2
-	 * @return
-	 */
-	private Boolean rastersEqual(Raster ras1, Raster ras2) {
-		//Comparing the the two images for number of bands,width & height.
-		if (ras1.getNumBands() != ras2.getNumBands()
-				|| ras1.getWidth() != ras2.getWidth()
-				|| ras1.getHeight() != ras2.getHeight()) {
-			return false;
-		}else{
-			// Once the band ,width & height matches, comparing the images.
-			for (int i = 0; i < ras1.getNumBands(); ++i) {
-				for (int x = 0; x < ras1.getWidth(); ++x) {
-					for (int y = 0; y < ras1.getHeight(); ++y) {
-						if (ras1.getSample(x, y, i) != ras2.getSample(x, y, i)) {
-							// If one of the result is false setting the result as false and breaking the loop.
-							return false;
-						}
-					}
-				}
-			}
-		}
-		return true;
-	}
-	
 	public void flushToDisk() {
 		RegionImageHandler rfh = RegionImageHandler.getInstance();
-		synchronized(lock) {
-			Set<RegionCoord> dirtyCopy = new HashSet<RegionCoord>(dirty);			
-			for(RegionCoord dirtyRC : dirtyCopy) {
-				rfh.writeRegionImage(dirtyRC, imageMap.get(dirtyRC));
-				//JourneyMap.getLogger().info("Flushing to disk: " + dirtyRC);
+		synchronized(lock) {		
+			for(RegionImageSet ris : imageSets.values()) {
+				ris.writeToDisk(false);
 			}
-			dirty.clear();
 			lastFlush = System.currentTimeMillis();
 		}		
 	}
-
+	
 	public void clear() {
 		synchronized(lock) {
-			dirty.clear();
-			imageMap.clear();
+			imageSets.clear();
 		}
 	}
 	
-	public Set<Map.Entry<RegionCoord, BufferedImage>> getEntries() {
-		return imageMap.entrySet();
-	}
-	
-	class CacheMap extends LinkedHashMap<RegionCoord, BufferedImage> {
+	/**
+	 * LinkedHashMap serves as a LRU cache that can write a RIS to disk
+	 * when it's removed.
+	 * 
+	 * @author mwoodman
+	 *
+	 */
+	class CacheMap extends LinkedHashMap<RegionCoord, RegionImageSet> {
 		
 		private final int capacity;
 		
@@ -210,26 +135,14 @@ public class RegionImageCache  {
 		}
 		
 		@Override
-		protected boolean removeEldestEntry(Map.Entry<RegionCoord, BufferedImage> entry)
+		protected boolean removeEldestEntry(Map.Entry<RegionCoord, RegionImageSet> entry)
 	    {
 			Boolean remove = size() > capacity;
 			if(remove) {
-				RegionCoord rc = entry.getKey();
-				if(dirty.contains(rc)) {
-					BufferedImage image = entry.getValue();
-					if(image!=null && image.getWidth()>0) {
-						if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
-							JourneyMap.getLogger().fine("RegionImageCache purging " + rc); //$NON-NLS-1$
-						}
-						try {
-							RegionImageHandler.getInstance().writeRegionImage(rc, image);
-						} catch(Throwable t) {
-							JourneyMap.getLogger().severe("RegionImageCache failed to flush purging entry: " + entry.getKey()); //$NON-NLS-1$
-							JourneyMap.getLogger().severe(LogFormatter.toString(t));
-						}
-					}
-				}
-				dirty.remove(rc);
+				if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+					JourneyMap.getLogger().fine("RegionImageCache purging " + entry.getKey()); //$NON-NLS-1$
+				}				
+				entry.getValue().writeToDisk(false);
 			}
 			if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
 				JourneyMap.getLogger().fine("RegionImageCache size: " + (this.size()-1)); //$NON-NLS-1$

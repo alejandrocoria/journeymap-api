@@ -2,7 +2,6 @@ package net.techbrew.mcjm;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.EnumSet;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -75,31 +74,30 @@ public class Constants {
     }
 	
 	public enum MapType {
-		day(0), night(16), nightAndDay(0), underground(0);
+		day(0), night(16), underground(0), OBSOLETE(-1);
 		MapType(int offset) {
 			_offset = offset;
 		}
-		private int _offset;
+		private final int _offset;
 		public int offset() {
 			return _offset;
 		}
-		
-		public static final EnumSet<MapType> DayOrNight = EnumSet.of(MapType.day, MapType.night, MapType.nightAndDay);
 	};
 	
+	@Deprecated
 	public enum CoordType {
 		Normal, Cave, Nether, End, Other, OtherCave;
 		
-		public static CoordType convert(int wp) {
-			return convert(false, wp);
+		public static CoordType convert(int dimension) {
+			return convert(false, dimension);
 		}
 		
-		public static CoordType convert(MapType mapType, int wp) {
-			return convert(mapType.equals(MapType.underground), wp);
+		public static CoordType convert(MapType mapType, int dimension) {
+			return convert(mapType.equals(MapType.underground), dimension);
 		}
 		
-		public static CoordType convert(Boolean underground, int wp) {
-			switch(wp) {
+		public static CoordType convert(Boolean underground, int dimension) {
+			switch(dimension) {
 				case 0  : {
 					return underground ? Cave : Normal;
 				}

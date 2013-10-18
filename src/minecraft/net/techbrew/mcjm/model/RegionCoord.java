@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.src.ChunkCoordIntPair;
-import net.techbrew.mcjm.Constants;
 
 public class RegionCoord implements Comparable<RegionCoord>{
 	
@@ -13,24 +12,20 @@ public class RegionCoord implements Comparable<RegionCoord>{
 	public final int regionX;
 	public final int regionZ;
 	public final Integer vSlice;
-	public final Constants.CoordType cType;
+	public final int dimension;
 	public static final int SIZE = 5;
 	private static final int chunkSqRt = (int) Math.pow(2,SIZE);
 	
-	public static RegionCoord fromChunkPos(File worldDir, int chunkX, Integer vSlice, int chunkZ, Constants.CoordType cType) {
-		return new RegionCoord(worldDir, getRegionPos(chunkX), vSlice, getRegionPos(chunkZ), cType);
+	public static RegionCoord fromChunkPos(File worldDir, int chunkX, Integer vSlice, int chunkZ, int dimension) {
+		return new RegionCoord(worldDir, getRegionPos(chunkX), vSlice, getRegionPos(chunkZ), dimension);
 	}
 		
-	public RegionCoord(File worldDir, int regionX, Integer vSlice, int regionZ, Constants.CoordType cType) {
+	public RegionCoord(File worldDir, int regionX, Integer vSlice, int regionZ, int dimension) {
 		this.worldDir = worldDir;
 		this.regionX = regionX;
 		this.regionZ = regionZ;
-		if(Constants.CoordType.Normal.equals(cType)) {
-			this.vSlice = null;
-		} else {
-			this.vSlice = vSlice;
-		}
-		this.cType = cType;
+		this.vSlice = vSlice;
+		this.dimension = dimension;
 	}
 	
 	public int getXOffsetDay(int chunkX) {
@@ -96,11 +91,11 @@ public class RegionCoord implements Comparable<RegionCoord>{
 	}
 	
 	public ChunkCoord getMinChunkCoord() {
-		return ChunkCoord.fromChunkPos(worldDir, getMinChunkX(), vSlice, getMinChunkZ(), cType);				
+		return ChunkCoord.fromChunkPos(worldDir, getMinChunkX(), vSlice, getMinChunkZ(), dimension);				
 	}
 	
 	public ChunkCoord getMaxChunkCoord() {
-		return ChunkCoord.fromChunkPos(worldDir, getMaxChunkX(), vSlice, getMaxChunkZ(), cType);				
+		return ChunkCoord.fromChunkPos(worldDir, getMaxChunkX(), vSlice, getMaxChunkZ(), dimension);				
 	}
 	
 	public List<ChunkCoordIntPair> getChunkCoordsInRegion() {
@@ -122,7 +117,7 @@ public class RegionCoord implements Comparable<RegionCoord>{
 	}
 	
 	public Boolean isUnderground() {
-		return !cType.equals(Constants.CoordType.Normal);
+		return vSlice!=null ? vSlice!=-1 : false;
 	}
 
 	@Override
@@ -153,7 +148,7 @@ public class RegionCoord implements Comparable<RegionCoord>{
 		result = prime * result + regionZ;
 		result = prime * result
 				+ ((worldDir == null) ? 0 : worldDir.hashCode());
-		result = prime * result + cType.hashCode();
+		result = prime * result + dimension;
 		return result;
 	}
 
@@ -166,18 +161,18 @@ public class RegionCoord implements Comparable<RegionCoord>{
 		if (getClass() != obj.getClass())
 			return false;
 		RegionCoord other = (RegionCoord) obj;
-		if (other.getVerticalSlice() != getVerticalSlice())
+		if (dimension!=other.dimension)
 			return false;
 		if (regionX != other.regionX)
 			return false;
 		if (regionZ != other.regionZ)
 			return false;
+		if (other.getVerticalSlice() != getVerticalSlice())
+			return false;
 		if (worldDir == null) {
 			if (other.worldDir != null)
 				return false;
 		} else if (!worldDir.equals(other.worldDir))
-			return false;
-		if (!cType.equals(other.cType))
 			return false;
 		return true;
 	}

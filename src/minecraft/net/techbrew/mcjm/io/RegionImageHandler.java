@@ -44,17 +44,53 @@ public class RegionImageHandler {
 		lock = new Object();
 	}
 	
-	public static File getRegionImageFile(RegionCoord rCoord) {
+	public static File getDimensionDir(RegionCoord rCoord) {
+		return getDimensionDir(rCoord.worldDir, rCoord.dimension);
+	}
+	
+	public static File getDimensionDir(File worldDir, int dimension) {
+		File dimDir = new File(worldDir, "DIM"+dimension); //$NON-NLS-1$
+		if(!dimDir.exists()) {
+			dimDir.mkdirs();
+		}
+		return dimDir;
+	}
+	
+	public static File getRegionImageFile(RegionCoord rCoord, Constants.MapType mapType, boolean allowLegacy) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(rCoord.regionX).append(",").append(rCoord.regionZ); //$NON-NLS-1$
-		if(!rCoord.cType.equals(Constants.CoordType.Normal)) {
+		if(rCoord.isUnderground()) {
 			sb.append(",").append(rCoord.getVerticalSlice()); //$NON-NLS-1$
 		}
-		sb.append(getRegionFileSuffix(rCoord.cType));
+		if(Constants.MapType.night==mapType) {
+			sb.append("_night"); //$NON-NLS-1$
+		}
+		sb.append(".png");
+		File regionFile = new File(getDimensionDir(rCoord), sb.toString());
+		
+		if(!regionFile.exists() && allowLegacy) {
+			File oldRegionFile = getRegionImageFileLegacy(rCoord);
+			if(oldRegionFile.exists()) {
+				regionFile = oldRegionFile;
+			}
+		}
+		return regionFile;
+	}
+	
+	@Deprecated
+	public static File getRegionImageFileLegacy(RegionCoord rCoord) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(rCoord.regionX).append(",").append(rCoord.regionZ); //$NON-NLS-1$
+		Constants.CoordType cType = Constants.CoordType.convert(rCoord.dimension);
+		if(cType!=Constants.CoordType.Normal) {
+			sb.append(",").append(rCoord.getVerticalSlice()); //$NON-NLS-1$
+		}
+		sb.append(getRegionFileSuffix(cType));
 		File regionFile = new File(rCoord.worldDir, sb.toString());
 		return regionFile;
 	}
 	
+	@Deprecated
 	static String getRegionFileSuffix(final Constants.CoordType cType) {
 		StringBuffer sb = new StringBuffer("_"); //$NON-NLS-1$
 		sb.append(cType.name());
@@ -62,10 +98,10 @@ public class RegionImageHandler {
 		return sb.toString();
 	}
 	
-	public BufferedImage getChunkImages(File worldDir, int rx1, int rz1, Integer chunkY, int rx2, int rz2, Constants.MapType mapType, Constants.CoordType cType, Boolean useCache, int sampling) {
+	public BufferedImage getChunkImages(File worldDir, int rx1, int rz1, Integer vSlice, int rx2, int rz2, Constants.MapType mapType, int dimension, Boolean useCache, int sampling) {
 
-		final RegionCoord regionCoord = RegionCoord.fromChunkPos(worldDir, rx1, chunkY, rz1, cType);
-		RegionCoord r2 = RegionCoord.fromChunkPos(worldDir, rx2, chunkY, rz2, cType);
+		final RegionCoord regionCoord = RegionCoord.fromChunkPos(worldDir, rx1, vSlice, rz1, dimension);
+		RegionCoord r2 = RegionCoord.fromChunkPos(worldDir, rx2, vSlice, rz2, dimension);
 		
 		if(!regionCoord.equals(r2)) {
 			throw new IllegalArgumentException("Chunks not from the same region: " + regionCoord + " / " + r2); //$NON-NLS-1$ //$NON-NLS-2$
@@ -96,12 +132,9 @@ public class RegionImageHandler {
 		
 		BufferedImage regionImage = null;
 		if(useCache) {
-			regionImage = getCachedRegionImage(regionCoord);
-//			if(flushCacheToDisk) {
-//				RegionImageCache.getInstance().flushToDisk();
-//			} 
+			regionImage = getCachedRegionImage(regionCoord, mapType);
 		} else {
-			regionImage = readRegionImage(getRegionImageFile(regionCoord), regionCoord, sampling);
+			regionImage = readRegionImage(getRegionImageFile(regionCoord, mapType, true), regionCoord, sampling, true); // TODO allow legacy?
 		}
 		BufferedImage chunksImage = regionImage.getSubimage(ix1,iz1,width*16,height*16);
 		
@@ -109,8 +142,8 @@ public class RegionImageHandler {
 		
 	}
 	
-	public BufferedImage getCachedRegionImage(RegionCoord rCoord) {
-		return RegionImageCache.getInstance().getGuaranteed(rCoord);
+	public BufferedImage getCachedRegionImage(RegionCoord rCoord, MapType mapType) {
+		return RegionImageCache.getInstance().getGuaranteedImage(rCoord, mapType);
 	}	
 	
 	public static boolean isBlank(BufferedImage img) {		
@@ -125,36 +158,18 @@ public class RegionImageHandler {
 		return isBlank;
 	}
 	
-	private static BufferedImage createBlankImage() {
-		int height = (int) Math.pow(2, RegionCoord.SIZE)*16;
-		int width = 2*height;
-		return createBlankImage(width, height);		
-	}
-	
-	private static BufferedImage createUndergroundBlankImage() {
-		int height = (int) Math.pow(2, RegionCoord.SIZE)*16;
-		int width = height;
-		return createBlankImage(width, height);
-	}
-	
 	private static BufferedImage createBlankImage(int width, int height) {
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2D = img.createGraphics();
 		return img;
 	}
 	
-	public static BufferedImage readRegionImage(File regionFile, RegionCoord rCoord, int sampling) {
+	public static BufferedImage readRegionImage(File regionFile, RegionCoord rCoord, int sampling, boolean legacy) {
 		
 		FileInputStream fis = null;
 		BufferedImage image = null;
 
-		if(!regionFile.exists()) {
-			if(rCoord.isUnderground()) {
-				image = createUndergroundBlankImage();
-			} else {
-				image = createBlankImage();
-			}
-		} else if (regionFile != null && regionFile.canRead()) {
+		if(regionFile.exists() && regionFile.canRead()) {
 			
 				final int maxTries = 5;
 				int tries = 1;
@@ -189,46 +204,15 @@ public class RegionImageHandler {
 			}
 			
 		if(image==null) {
-			image = createBlankImage();
+			if(legacy) {
+				image = createBlankImage(1024, 512);
+			} else {
+				image = createBlankImage(512, 512);
+			}
 		}
 		return image;
 	}
 	
-	/**
-	 * Write region image to file.
-	 * 
-	 * @param rCoord
-	 * @param regionImage
-	 */
-	public void writeRegionImage(RegionCoord rCoord, BufferedImage regionImage) {
-		
-		if(regionImage==null) {
-			JourneyMap.getLogger().warning("Ignoring null image for " + rCoord);
-			return;
-		}		
-		
-		if(isBlank(regionImage)) {
-			return;
-		}
-		
-		File regionFile = getRegionImageFile(rCoord);
-	    try {
-
-	    	if(!regionFile.canRead()) {
-	    		regionFile.mkdirs();
-	    	}
-	    	
-	    	if(JourneyMap.getLogger().isLoggable(Level.FINE)){
-	    		JourneyMap.getLogger().info("RegionImage updating: " + regionFile);
-	    	}
-			ImageIO.write(regionImage, "png", regionFile);
-			    		
-	    } catch (Throwable e) {
-	    	String error = Constants.getMessageJMERR22(regionFile, LogFormatter.toString(e));
-			JourneyMap.getLogger().severe(error);
-	    } 
-		
-	}
 	
 	/**
 	 * Used by MapSaver, MapService to get a merged image for what the display needs
@@ -242,13 +226,13 @@ public class RegionImageHandler {
 	 * @throws IOException
 	 */
 	public static synchronized BufferedImage getMergedChunks(File worldDir, int x1, int z1,
-			int x2, int z2, Constants.MapType mapType, int depth, final Constants.CoordType cType, Boolean useCache, ZoomLevel zoomLevel)
+			int x2, int z2, Constants.MapType mapType, Integer vSlice, int dimension, Boolean useCache, ZoomLevel zoomLevel)
 			throws IOException {
 
 		int imageWidth = Math.max(16, (x2 - x1) * 16);
 		int imageHeight = Math.max(16, (z2 - z1) * 16);
 		
-		return getMergedChunks(worldDir, x1, z1, x2, z2, mapType, depth, cType, useCache, zoomLevel, imageWidth, imageHeight);
+		return getMergedChunks(worldDir, x1, z1, x2, z2, mapType, vSlice, dimension, useCache, zoomLevel, imageWidth, imageHeight);
 
 	}
 	
@@ -260,11 +244,11 @@ public class RegionImageHandler {
 	 * @param x2
 	 * @param z2
 	 * @param mapType
-	 * @param depth
+	 * @param vSlice
 	 * @throws IOException
 	 */
 	public static synchronized BufferedImage getMergedChunks(File worldDir, int x1, int z1,
-			int x2, int z2, Constants.MapType mapType, int depth, final Constants.CoordType cType, Boolean useCache, ZoomLevel zoomLevel, int imageWidth, int imageHeight)
+			int x2, int z2, Constants.MapType mapType, Integer vSlice, int dimension, Boolean useCache, ZoomLevel zoomLevel, int imageWidth, int imageHeight)
 			throws IOException {
 
 		long start = 0, stop = 0;		
@@ -292,13 +276,13 @@ public class RegionImageHandler {
 			for(int rz=rz1;rz<=rz2;rz++) {
 				
 				// Get merged chunks from region
-				RegionCoord rCoord = new RegionCoord(worldDir, rx, depth, rz, cType);
+				RegionCoord rCoord = new RegionCoord(worldDir, rx, vSlice, rz, dimension);
 				int cx1 = Math.max(x1, rCoord.getMinChunkX());
 				int cz1 = Math.max(z1, rCoord.getMinChunkZ());
 				int cx2 = Math.min(x2, rCoord.getMaxChunkX());
 				int cz2 = Math.min(z2, rCoord.getMaxChunkZ());
 				
-				BufferedImage chunkImg = rfh.getChunkImages(worldDir, cx1, cz1, depth, cx2, cz2, mapType, rCoord.cType, useCache, zoomLevel.sampling);				
+				BufferedImage chunkImg = rfh.getChunkImages(worldDir, cx1, cz1, vSlice, cx2, cz2, mapType, dimension, useCache, zoomLevel.sampling);				
 				int imageX = ((cx1-x1) * 16)-1;
 				int imageZ = ((cz1-z1) * 16)-1;
 				g2D.drawImage(chunkImg, imageX, imageZ, null);
@@ -323,41 +307,12 @@ public class RegionImageHandler {
 			JourneyMap.getLogger().fine("getMergedChunks time: "  + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
+		g2D.dispose();
+		
 		return mergedImg;
 
 	}
 	
-	public static synchronized BufferedImage getRegionImage(File worldDir, int rx, int ry,
-			int rz, Constants.MapType mapType, final Constants.CoordType cType)
-			throws IOException {
-		
-		final int imageWidth = 512;
-		final int imageHeight = 512;
-		
-		RegionCoord rCoord = new RegionCoord(worldDir,rx,ry,rz,cType);
-		File file = RegionImageHandler.getRegionImageFile(rCoord);
-		if(!file.exists()) {
-			return createBlankImage(imageWidth, imageHeight);
-		}
-		
-		BufferedImage regionImage = readRegionImage(file, rCoord, 1);
-		
-		// Show chunk grid
-		if(PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)) {
-			Graphics2D g2D = regionImage.createGraphics();
-			g2D.setColor(new Color(130,130,130));
-			g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1F));
-					
-			for(int x = -1; x<imageWidth; x+=16) {
-				for(int z = -1; z<imageHeight; z+=16) {
-					g2D.drawRect(x, z, 16, 16);
-				}
-			}
-			g2D.setComposite(MapBlocks.OPAQUE);
-		}
-		
-		return regionImage;
-	}
 	
 	/**
 	 * Used by MapSaver
@@ -367,11 +322,11 @@ public class RegionImageHandler {
 	 * @param x2
 	 * @param z2
 	 * @param mapType
-	 * @param depth
+	 * @param vSlice
 	 * @throws IOException
 	 */
 	public static synchronized File getMergedChunksFile(File worldDir, int x1, int z1, int x2, int z2, 
-			Constants.MapType mapType, int depth, final Constants.CoordType cType, File mapFile)
+			Constants.MapType mapType, Integer vSlice, int dimension, File mapFile)
 			throws IOException {
 
 		long start = 0, stop = 0;		
@@ -397,22 +352,19 @@ public class RegionImageHandler {
 		
 		for(int rz=rz1;rz<=rz2;rz++) {
 			for(int rx=rx1;rx<=rx2;rx++) {			
-				rc = new RegionCoord(worldDir, rx, depth, rz, cType);
-				rfile = getRegionImageFile(rc);
+				rc = new RegionCoord(worldDir, rx, vSlice, rz, dimension);
+				rfile = getRegionImageFile(rc, mapType, true);
 				if(!rfile.exists()) {
-					BufferedImage image;
-					if(rc.isUnderground()) {
-						image = createUndergroundBlankImage();
-					} else {
-						image = createBlankImage();
-					}					
-					try {
-						ImageIO.write(image, "png", rfile);
-					} catch(IOException e) {
-						JourneyMap.getInstance().announce(Constants.getMessageJMERR22(rfile, LogFormatter.toString(e)), Level.SEVERE);
-					}
+//					BufferedImage image;
+//					image = createBlankImage();				
+//					try {
+//						ImageIO.write(image, "png", rfile);
+//					} catch(IOException e) {
+//						JourneyMap.getInstance().announce(Constants.getMessageJMERR22(rfile, LogFormatter.toString(e)), Level.SEVERE);
+//					}
+				} else {
+					files.add(rfile);
 				}
-				files.add(rfile);
 			}
 		}
 		
@@ -430,11 +382,17 @@ public class RegionImageHandler {
 
 	}
 	
-	
+	// TODO: Update for new directory structure 
 	public static class RegionFileFilter implements FilenameFilter {
 		
 		final String regionName;
 		
+		public RegionFileFilter() {
+			regionName = ".png";
+			JourneyMap.getLogger().warning("!!NOT IMPLEMENTED!!");
+		}
+		
+		@Deprecated
 		public RegionFileFilter(final Constants.CoordType cType) {
 			regionName = RegionImageHandler.getRegionFileSuffix(cType);
 		}
@@ -444,5 +402,6 @@ public class RegionImageHandler {
 			return arg1.endsWith(regionName);
 		}	
 	}
+
 	
 }

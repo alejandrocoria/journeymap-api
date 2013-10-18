@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.WorldClient;
-import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.io.FileHandler;
@@ -64,15 +64,15 @@ public class RegionLoader {
 	    	return null;
 	    }	        
 	    
-	    Minecraft mc = Minecraft.getMinecraft();
-	    File jmImageWorldDir = FileHandler.getJMWorldDir(mc, worldHash);
+	    final Minecraft mc = Minecraft.getMinecraft();
+	    final File jmImageWorldDir = FileHandler.getJMWorldDir(mc, worldHash);
 	    
-	    Constants.CoordType ctype = Constants.CoordType.convert(worldClient.provider.dimensionId);
+	    final int dimension = worldClient.provider.dimensionId;
 		
-		RegionImageHandler rfh = RegionImageHandler.getInstance();
+		final RegionImageHandler rfh = RegionImageHandler.getInstance();
 
-	    File[] anvilFiles = regionDirectory.listFiles();
-	    Stack<RegionCoord> stack = new Stack<RegionCoord>();
+	    final File[] anvilFiles = regionDirectory.listFiles();
+	    final Stack<RegionCoord> stack = new Stack<RegionCoord>();
 	    
 		for (File anvilFile : anvilFiles) {
 			Matcher matcher = anvilPattern.matcher(anvilFile.getName());
@@ -80,8 +80,8 @@ public class RegionLoader {
 				String x = matcher.group(1);
 				String z = matcher.group(2);
 				if (x != null && z != null) {
-					RegionCoord rc = new RegionCoord(jmImageWorldDir, Integer.parseInt(x), null, Integer.parseInt(z), ctype);
-					if(!rfh.getRegionImageFile(rc).exists()) {						
+					RegionCoord rc = new RegionCoord(jmImageWorldDir, Integer.parseInt(x), null, Integer.parseInt(z), dimension);
+					if(!rfh.getRegionImageFile(rc,MapType.day,true).exists()) {						
 						List<ChunkCoordIntPair> chunkCoords = rc.getChunkCoordsInRegion();
 						for(ChunkCoordIntPair coord : chunkCoords) {
 							if(ChunkLoader.getChunkFromDisk(coord.chunkXPos, coord.chunkZPos, worldDir, mc.theWorld)!=null) {

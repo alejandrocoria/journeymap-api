@@ -4,8 +4,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.src.Minecraft;
 import net.minecraft.src.EntityClientPlayerMP;
+import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.model.ChunkStub;
@@ -31,6 +32,7 @@ public class PlayerData implements IDataProvider {
 	/**
 	 * Provides all possible keys.
 	 */
+	@Override
 	public Enum[] getKeys() {
 		return EntityKey.values();
 	}
@@ -38,6 +40,7 @@ public class PlayerData implements IDataProvider {
 	/**
 	 * Return map of world-related properties.
 	 */
+	@Override
 	public Map getMap() {		
 		
 		Minecraft mc = Minecraft.getMinecraft();
@@ -56,7 +59,7 @@ public class PlayerData implements IDataProvider {
 		
 		props.put(EntityKey.dimension, mc.theWorld.provider.dimensionId); 
 		props.put(EntityKey.biome, getPlayerBiome()); 
-		props.put(EntityKey.underground, playerIsUnderground());		
+		props.put(EntityKey.underground, playerIsUnderground(player));		
 
 		return props;	
 	}	
@@ -88,11 +91,10 @@ public class PlayerData implements IDataProvider {
 	 * @param player
 	 * @return
 	 */
-	private boolean playerIsUnderground() {
+	public static boolean playerIsUnderground(EntityPlayer player) {
 		
 		Minecraft mc = Minecraft.getMinecraft();		
-		EntityClientPlayerMP player = mc.thePlayer;
-		
+
 		if(player.worldObj.provider.hasNoSky) {
 			return true;
 		}
@@ -153,6 +155,7 @@ public class PlayerData implements IDataProvider {
 	/**
 	 * Return length of time in millis data should be kept.
 	 */
+	@Override
 	public long getTTL() {
 		return TTL;
 	}
@@ -160,6 +163,7 @@ public class PlayerData implements IDataProvider {
 	/**
 	 * Return false by default. Let cache expired based on TTL.
 	 */
+	@Override
 	public boolean dataExpired() {
 		return false;
 	}

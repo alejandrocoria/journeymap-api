@@ -5,7 +5,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 
 import net.minecraft.src.Minecraft;
@@ -38,7 +40,7 @@ public class MapSaver {
 	 * @throws IOException
 	 * @throws java.lang.OutOfMemoryError
 	 */
-	public static synchronized File lightWeightSaveMap(final File worldDir, final Constants.MapType mapType, final Integer chunkY, final Constants.CoordType cType) {
+	public static synchronized File lightWeightSaveMap(final File worldDir, final Constants.MapType mapType, final Integer chunkY, final int dimension) {
 		
 		File mapFile = null;
 		
@@ -55,9 +57,14 @@ public class MapSaver {
 		Integer z1=null;
 		Integer z2=null;
 		
-		// Find all region files
-		FilenameFilter ff = new RegionImageHandler.RegionFileFilter(cType);
-		File[] foundFiles = worldDir.listFiles(ff);
+		// Find all legacy region files
+		FilenameFilter ff = new RegionImageHandler.RegionFileFilter(Constants.CoordType.convert(dimension));
+		List<File> foundFiles = Arrays.asList(worldDir.listFiles(ff));
+		
+		// Find all new region files
+		ff = new RegionImageHandler.RegionFileFilter();
+		foundFiles.addAll(Arrays.asList(RegionImageHandler.getDimensionDir(worldDir, dimension).listFiles(ff)));
+		
 		//System.out.println("Found region files: " + foundFiles.length); //$NON-NLS-1$
 
 		for(File file : foundFiles) {
@@ -84,11 +91,11 @@ public class MapSaver {
 		
 		final File saveDir = FileHandler.getJourneyMapDir();
 		
-		JourneyMap.getInstance().announce(Constants.getString("MapOverlay.saving_map_to_file", cType + " " + mapType)); //$NON-NLS-1$
+		JourneyMap.getInstance().announce(Constants.getString("MapOverlay.saving_map_to_file", Constants.CoordType.convert(dimension) + " " + mapType)); //$NON-NLS-1$
 		
-		mapFile = createMapFile(WorldData.getWorldName(Minecraft.getMinecraft()) + "_" + cType + "_" + mapType);
+		mapFile = createMapFile(WorldData.getWorldName(Minecraft.getMinecraft()) + "_" + dimension + "_" + mapType);
 				
-		RegionImageHandler.getMergedChunksFile(worldDir, x1, z1, x2, z2, mapType, chunkY, cType, mapFile);
+		RegionImageHandler.getMergedChunksFile(worldDir, x1, z1, x2, z2, mapType, chunkY, dimension, mapFile);
 		
 		stop = System.currentTimeMillis();
 		

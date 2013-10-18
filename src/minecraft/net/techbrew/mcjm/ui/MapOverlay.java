@@ -833,6 +833,7 @@ public class MapOverlay extends GuiScreen {
 		final File saveDir = FileHandler.getJourneyMapDir();
 
 		final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
+		final Integer vSlice = underground ? mc.thePlayer.chunkCoordY : null;
 		Constants.MapType checkMapType = mapType;
 		if(underground && showCaves) {
 			checkMapType = Constants.MapType.underground;
@@ -844,8 +845,7 @@ public class MapOverlay extends GuiScreen {
 			@Override
 			public void run() {							
 				try {			
-					final Constants.CoordType cType = Constants.CoordType.convert(useMapType, mc.thePlayer.dimension);
-					new MapSaver().lightWeightSaveMap(worldDir, useMapType, mc.thePlayer.chunkCoordY, cType);
+					new MapSaver().lightWeightSaveMap(worldDir, useMapType, vSlice , mc.thePlayer.dimension);
 				} catch (java.lang.OutOfMemoryError e) {
 					String error = Constants.getMessageJMERR18("Out Of Memory: Increase Java Heap Size for Minecraft to save large maps.");
 					JourneyMap.getInstance().announce(error, Level.SEVERE);

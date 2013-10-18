@@ -13,7 +13,7 @@ import se.rupy.http.Daemon;
 public class JMServer {
 		
 	private final Daemon rupy;
-	private int port;
+	private final int port;
 	
 	public JMServer() {
 		
@@ -49,6 +49,7 @@ public class JMServer {
 		rupy.add(new DataService());
 		rupy.add(new LogService());
 		rupy.add(new MapService());
+		rupy.add(new TileService());
 		rupy.add(new SaveMapService()); 
 		rupy.add(new FileService());
 		rupy.add(new PropertyService());
@@ -65,6 +66,7 @@ public class JMServer {
 		
 		// Add shutdown hook
 		Runtime.getRuntime().addShutdownHook(tf.newThread(new Runnable() {
+			@Override
 			public void run() {
 				stop();
 			}

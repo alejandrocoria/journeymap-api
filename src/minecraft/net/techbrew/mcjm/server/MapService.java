@@ -133,11 +133,10 @@ public class MapService extends BaseService {
 			throws Exception {
 		
 		long start = 0, stop = 0;
-		final Constants.CoordType cType = Constants.CoordType.convert(mapType, dimension);
 		
 		start = System.currentTimeMillis();
 		
-		BufferedImage mergedImg = RegionImageHandler.getMergedChunks(worldDir, x1, z1, x2, z2, mapType, depth, cType, true, 
+		BufferedImage mergedImg = RegionImageHandler.getMergedChunks(worldDir, x1, z1, x2, z2, mapType, depth, dimension, true, 
 				new ZoomLevel(1, 1, false, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
 				
 		if(mergedImg.getWidth()!=canvasWidth || mergedImg.getHeight()!=canvasHeight) {

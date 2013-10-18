@@ -67,7 +67,7 @@ public class SaveMapService extends BaseService {
 		int depth = getParameter(query, "depth", 4); //$NON-NLS-1$
 		
 		try {
-			int worldProviderType = getParameter(query, "worldProviderType", 0);  //$NON-NLS-1$
+			int dimension = getParameter(query, "worldProviderType", 0);  //$NON-NLS-1$
 			String mapTypeString = getParameter(query, "mapType", Constants.MapType.day.name()); //$NON-NLS-1$
 			Constants.MapType mapType = null;
 			try {
@@ -86,9 +86,7 @@ public class SaveMapService extends BaseService {
 			}			
 
 			// Get image
-			final Constants.CoordType cType = Constants.CoordType.convert(mapType, worldProviderType);
-
-			File mapFile = MapSaver.lightWeightSaveMap(worldDir, mapType, depth, cType);	
+			File mapFile = MapSaver.lightWeightSaveMap(worldDir, mapType, depth, dimension);	
 					
 			// Set response headers
 			ResponseHeader.on(event).noCache().content(mapFile);			
