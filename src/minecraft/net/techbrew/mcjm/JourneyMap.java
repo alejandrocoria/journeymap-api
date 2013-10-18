@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,18 +22,14 @@ import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.io.nbt.ChunkLoader;
-import net.techbrew.mcjm.io.nbt.RegionLoader;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkStub;
-import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.server.JMServer;
-import net.techbrew.mcjm.task.MapPlayerTask;
-import net.techbrew.mcjm.task.MapRegionTask;
-import net.techbrew.mcjm.task.MapTask;
+import net.techbrew.mcjm.task.ITaskManager;
+import net.techbrew.mcjm.task.TaskController;
 import net.techbrew.mcjm.thread.JMThreadFactory;
-import net.techbrew.mcjm.thread.MapTaskThread;
 import net.techbrew.mcjm.ui.MapOverlay;
 import net.techbrew.mcjm.ui.MapOverlayOptions;
 
@@ -74,13 +69,9 @@ public class JourneyMap {
 	private boolean threadLogging = false;
 
 	private volatile ChunkStub lastPlayerChunk;
-	//private ChunkCoordIntPair lastPlayerCoord;
 
 	// Invokes MapOverlay
 	public KeyBinding keybinding;
-
-	// Milliseconds between updates
-	public int mapTaskDelay;
 
 	// Time stamp of next chunk update
 	public long nextPlayerUpdate = 0;
@@ -91,14 +82,14 @@ public class JourneyMap {
 	public boolean enableMapGui;
 	boolean enableAnnounceMod;
 
-	// Thread service for mapping tasks
+	// Executor for task threads
 	private volatile ScheduledExecutorService mapTaskExecutor;
+	
+	// Task controller for issuing tasks in executor
+	private TaskController taskController;
 
 	// Announcements
 	private final List<String> announcements = Collections.synchronizedList(new LinkedList<String>());
-	
-	// Automapping
-	private RegionLoader regionLoader;
 
 	/**
 	 * Constructor.
@@ -139,8 +130,7 @@ public class JourneyMap {
 		logger.environment();
 		logger.info("Properties: " + pm.toString()); //$NON-NLS-1$
 
-		// Use property settings
-		mapTaskDelay = pm.getInteger(PropertyManager.Key.UPDATETIMER_CHUNKS);
+		// Use property settings		
 		enableAnnounceMod = pm.getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED); 
 		
 		// Key bindings
@@ -182,86 +172,68 @@ public class JourneyMap {
 
 	}
 	
+	/**
+	 * Toggles automapping
+	 * @param enable
+	 */
+	public void toggleTask(Class<? extends ITaskManager> managerClass, boolean enable) {
+		if(taskController!=null) {
+    		taskController.toggleTask(managerClass, enable);
+    	} else {
+    		logger.warning("taskController not available");
+    	}
+	}
+	
+	/**
+     * Starts mapping threads
+     */
+    private void startMapping(Minecraft minecraft) {
+    	synchronized(this) {
+	    	DataCache.instance().purge();	   
+
+	    	if(mapTaskExecutor==null || mapTaskExecutor.isShutdown()) {			    		
+				mapTaskExecutor = Executors.newScheduledThreadPool(1, new JMThreadFactory("maptask")); //$NON-NLS-1$				
+			} else {
+				logger.severe("TaskExecutor in an unexpected state.  Should be null or shutdown.");
+			}
+	    	
+	    	taskController = new TaskController();
+	    	taskController.enableTasks(minecraft);
+	    	
+	    	logger.info("Mapping started: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$	
+	    		    	
+    	}
+		if(enableAnnounceMod) announceMod();
+    }
     
     /**
      * Halts mapping threads, clears caches.
      */
     public void stopMapping() {
     	synchronized(this) {
+    		
 	    	if(mapTaskExecutor!=null && !mapTaskExecutor.isShutdown()) {    		
 				mapTaskExecutor.shutdown();			
 			}	    	
 	    	mapTaskExecutor = null;
 	    	
-	    	autoMap(false);
+	    	Minecraft minecraft = Minecraft.getMinecraft();
 	    	
-	    	Minecraft mc = Minecraft.getMinecraft();
-	    	logger.info("Mapping halted: " + WorldData.getWorldName(mc)); //$NON-NLS-1$
+	    	if(taskController!=null) {
+	    		taskController.disableTasks(minecraft);
+	    		taskController = null;
+	    	}
+	    		    	
 	    	lastPlayerChunk = null;
 			FileHandler.lastWorldHash = -1;
 			FileHandler.lastWorldDir = null;
 			
 			RegionImageCache.getInstance().flushToDisk();
 			RegionImageCache.getInstance().clear();
+			
+			logger.info("Mapping halted: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
     	}
-    }
-    
-    /**
-     * Starts mapping threads
-     */
-    private void startMapping() {
-    	synchronized(this) {
-	    	DataCache.instance().purge();	   
-	    	Minecraft mc = Minecraft.getMinecraft();
-	    	if(mapTaskExecutor==null || mapTaskExecutor.isShutdown()) {			    		
-				mapTaskExecutor = Executors.newScheduledThreadPool(1, new JMThreadFactory("maptask")); //$NON-NLS-1$				
-			}
-	    	MapTaskThread.reset();
-	    	logger.info("Mapping started: " + WorldData.getWorldName(mc)); //$NON-NLS-1$	
-	    	
-	    	autoMap(PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED));
-    	}
-		if(enableAnnounceMod) announceMod();
-    }
-    
-    /**
-     * Start/stop automap
-     * @param start
-     */
-    public void autoMap(boolean start) {    	 
-    	Minecraft mc = Minecraft.getMinecraft();
-    	if(mc.isSingleplayer()) {
-    		if(start) {
-		    	try {
-			    	regionLoader = new RegionLoader(mc, mc.theWorld.provider.dimensionId);
-			    	if(regionLoader.getRegionsFound()==0) {
-			    		logger.info("Auto-mapping found no unexplored regions.");
-			    		regionLoader = null;
-			    	}
-		    	} catch(Throwable t) {
-		    		String error = Constants.getMessageJMERR00("Couldn't Auto-Map: " + t.getMessage()); //$NON-NLS-1$
-					announce(error);
-					logger.severe(LogFormatter.toString(t));
-		    	}
-    		} else {
-    			if(regionLoader!=null && isMapping()) {
-    				RegionImageCache.getInstance().flushToDisk();
-    				announce(Constants.getString("MapOverlay.automap_complete"), Level.INFO);
-    	    	}
-    	    	regionLoader = null;
-    		}
-    	}
-    }
-    
-    boolean isAutomapping() {
-    	if(regionLoader==null) {
-    		return false;
-    	} else if(regionLoader.getRegions().isEmpty()) {
-    		autoMap(false);
-    		return false;
-    	}
-    	return true;
-    }
+    }   
 
 	/**
 	 * Called via Modloader
@@ -324,7 +296,7 @@ public class JourneyMap {
 
 			// We got this far
 			if(!isMapping()) {
-				startMapping();
+				startMapping(minecraft);
 			}
 
 			// Show announcements
@@ -333,34 +305,8 @@ public class JourneyMap {
 				player.addChatMessage(announcements.remove(0));
 			}			
 
-			// Create a map task and queue it
-			if(!MapTaskThread.hasQueue()) {
-				MapTask mapTask = null;
-				MapTaskThread thread = null;
-				if(isAutomapping()) {					
-						RegionCoord rCoord = regionLoader.getRegions().peek();
-						mapTask = MapRegionTask.create(rCoord, minecraft, newHash);
-						if(mapTask!=null) {
-							thread = MapTaskThread.createAndQueue(mapTask);
-							if(thread!=null) {
-								regionLoader.getRegions().pop();
-								int total = regionLoader.getRegionsFound();
-								int index = total-regionLoader.getRegions().size();
-								announce(Constants.getString("MapOverlay.automap_status", index, total), Level.INFO);
-							}				
-						}
-				} else {			
-					mapTask = MapPlayerTask.create(minecraft.thePlayer, newHash);
-					if(mapTask!=null) {
-						thread = MapTaskThread.createAndQueue(mapTask);
-					}
-				}
-				if(isMapping()) {
-					if(thread!=null) {
-						mapTaskExecutor.schedule(thread, mapTaskDelay, TimeUnit.MILLISECONDS);
-					}
-				}
-			}
+			// Perform the next mapping tasks
+			taskController.performTasks(minecraft, newHash, mapTaskExecutor);			
 
 		} catch (Throwable t) {
 			String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$

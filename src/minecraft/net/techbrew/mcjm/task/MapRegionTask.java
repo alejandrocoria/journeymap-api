@@ -10,11 +10,16 @@ import java.util.logging.Logger;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.World;
+import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
+import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.io.nbt.ChunkLoader;
+import net.techbrew.mcjm.io.nbt.RegionLoader;
+import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.RegionCoord;
+import net.techbrew.mcjm.model.RegionImageCache;
 
 public class MapRegionTask extends MapTask {
 	
@@ -60,5 +65,95 @@ public class MapRegionTask extends MapTask {
 			return null;
 		}
 	
+	}
+	
+	/**
+	 * Stateful ITaskManager for MapRegionTasks
+	 * 
+	 * @author mwoodman
+	 *
+	 */
+	public static class Manager implements ITaskManager {
+		
+		RegionLoader regionLoader;
+		boolean enabled;
+		
+		@Override
+		public Class<? extends MapTask> getTaskClass() {
+			return MapRegionTask.class;
+		}
+		
+		@Override
+		public boolean enableTask(Minecraft minecraft) {
+			
+			// Bail if automap not enabled
+			enabled = PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED);
+			if(!enabled) return false;
+			
+			// TODO: verify this is okay to use (instead of isSinglePlayer)
+			enabled = false; // assume the worst
+			if(minecraft.isIntegratedServerRunning()) {
+				try {
+					regionLoader = new RegionLoader(minecraft, minecraft.theWorld.provider.dimensionId);
+			    	if(regionLoader.getRegionsFound()==0) {
+			    		logger.info("Auto-mapping found no unexplored regions.");
+			    		regionLoader = null;
+			    	} else {
+			    		this.enabled = true;
+			    	}
+		    	} catch(Throwable t) {
+		    		String error = Constants.getMessageJMERR00("Couldn't Auto-Map: " + t.getMessage()); //$NON-NLS-1$
+					JourneyMap.getInstance().announce(error);
+					logger.severe(LogFormatter.toString(t));
+		    	}
+			}
+			return this.enabled;
+		}
+		
+		@Override
+		public boolean isEnabled(Minecraft minecraft) {
+			return this.enabled;
+		}
+		
+		@Override
+		public void disableTask(Minecraft minecraft) {
+			
+			if(enabled && regionLoader!=null) {				
+				JourneyMap.getInstance().announce(Constants.getString("MapOverlay.automap_complete"), Level.INFO);
+	    	}
+			enabled = false;
+	    	
+			if(regionLoader!=null) {
+				RegionImageCache.getInstance().flushToDisk();
+				regionLoader.getRegions().clear();
+				regionLoader = null;
+			}
+			
+		}
+		
+		@Override
+		public MapTask getTask(Minecraft minecraft, long worldHash) {
+			
+			if(!enabled) return null;
+			
+			if(regionLoader.getRegions().isEmpty()) {
+				disableTask(minecraft);
+				return null;
+	    	}
+			
+			RegionCoord rCoord = regionLoader.getRegions().peek();
+			MapTask mapTask = MapRegionTask.create(rCoord, minecraft, worldHash);
+			return mapTask;
+		}
+		
+		@Override
+		public void taskAccepted(boolean accepted) {
+			if(accepted) {
+				regionLoader.getRegions().pop();
+				int total = regionLoader.getRegionsFound();
+				int index = total-regionLoader.getRegions().size();
+				JourneyMap.getInstance().announce(Constants.getString("MapOverlay.automap_status", index, total), Level.INFO);
+			}
+		}
 	}
 }

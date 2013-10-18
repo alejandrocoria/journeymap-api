@@ -1,0 +1,131 @@
+package net.techbrew.mcjm.task;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
+
+import net.minecraft.src.Minecraft;
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.thread.MapTaskThread;
+
+public class TaskController {
+	
+	final static Logger logger = JourneyMap.getLogger();
+	final int mapTaskDelay = PropertyManager.getInstance().getInteger(PropertyManager.Key.UPDATETIMER_CHUNKS);
+	final List<ITaskManager> managers = new LinkedList<ITaskManager>();
+
+	public TaskController() {
+		managers.add(new MapRegionTask.Manager());
+		managers.add(new MapPlayerTask.Manager());
+	}
+	
+	public void enableTasks(final Minecraft minecraft) {
+		
+		MapTaskThread.reset();
+		
+		List<ITaskManager> list = new LinkedList<ITaskManager>(managers);
+		for(ITaskManager manager: managers) {
+			boolean enabled = manager.enableTask(minecraft);
+			if(!enabled) {
+				logger.info("Task not initially enabled: " + manager.getClass().getSimpleName());
+			} else {
+				logger.info("Task initially enabled: " + manager.getClass().getSimpleName());
+			}
+		}
+		
+	}
+	
+	public void toggleTask(Class<? extends ITaskManager> managerClass, boolean enable) {
+		
+		ITaskManager taskManager = null;
+		for(ITaskManager manager: managers) {
+			if(manager.getClass()==managerClass) {
+				taskManager = manager;
+				break;
+			}
+		}
+		if(taskManager!=null) {
+			toggleTask(taskManager, enable);
+		} else {
+			logger.warning("Couldn't toggle task; manager not in controller: " + managerClass.getSimpleName());
+		}
+	}
+	
+	private void toggleTask(ITaskManager manager, boolean enable) {
+		Minecraft minecraft = Minecraft.getMinecraft();
+		if(manager.isEnabled(minecraft)) {
+			if(!enable) {
+				logger.info("Disabling task: " + manager.getTaskClass().getSimpleName());
+				manager.disableTask(minecraft);
+			} else {
+				logger.warning("Task already enabled: " + manager.getTaskClass().getSimpleName());
+			}
+		} else {
+			if(enable) {
+				logger.info("Enabling task: " + manager.getTaskClass().getSimpleName());
+				manager.enableTask(minecraft);
+			} else {
+				logger.warning("Task already disabled: " + manager.getTaskClass().getSimpleName());
+			}
+		}
+	}
+	
+	public void disableTasks(final Minecraft minecraft) {
+		for(ITaskManager manager: managers) {
+			manager.disableTask(minecraft);
+			logger.info("Task disabled: " + manager.getClass().getSimpleName());
+		}
+	}
+	
+	public void performTasks(final Minecraft minecraft, final long worldHash, final ScheduledExecutorService taskExecutor) {
+		
+		if(!MapTaskThread.hasQueue()) {
+					
+			MapTask mapTask = null;
+			ITaskManager manager = null;
+			
+			while(mapTask==null) {
+				manager = getNextManager(minecraft, worldHash);
+				if(manager==null) {
+					logger.warning("No task managers enabled!");
+					return;
+				}
+				boolean accepted = false;
+				mapTask = manager.getTask(minecraft, worldHash);				
+				if(mapTask!=null) {
+					MapTaskThread thread = MapTaskThread.createAndQueue(mapTask);
+					if(thread!=null) {
+						if(taskExecutor!=null && !taskExecutor.isShutdown()) {
+							taskExecutor.schedule(thread, mapTaskDelay, TimeUnit.MILLISECONDS);
+							accepted = true;
+							logger.info("Task scheduled for: " + manager.getClass().getSimpleName());
+						} else {
+							logger.warning("TaskExecutor isn't running");
+						}
+					} else {
+						logger.warning("Could not schedule task for: " + manager.getClass().getSimpleName());
+					}
+				} else {
+					logger.warning("Null task returned by: " + manager.getClass().getSimpleName());
+				}
+				manager.taskAccepted(accepted);
+			}
+			
+		}
+		
+	}
+	
+	private ITaskManager getNextManager(final Minecraft minecraft, final long worldHash) {
+		
+		for(ITaskManager manager: managers) {
+			if(manager.isEnabled(minecraft)) {
+				return manager;
+			}
+		}		
+		return null;
+		
+	}
+}

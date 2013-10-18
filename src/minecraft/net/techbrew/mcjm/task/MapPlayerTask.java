@@ -83,4 +83,49 @@ public class MapPlayerTask extends MapTask {
 		}
 	
 	}
+	
+	/**
+	 * ITaskManager for MapPlayerTasks
+	 * 
+	 * @author mwoodman
+	 *
+	 */
+	public static class Manager implements ITaskManager {
+		
+		boolean enabled;
+		
+		@Override
+		public Class<? extends MapTask> getTaskClass() {
+			return MapPlayerTask.class;
+		}
+		
+		@Override
+		public boolean enableTask(Minecraft minecraft) {
+			enabled = true;
+			return enabled;
+		}
+		
+		@Override
+		public boolean isEnabled(Minecraft minecraft) {
+			return enabled;
+		}
+		
+		@Override
+		public void disableTask(Minecraft minecraft) {
+			enabled = false;
+		}
+		
+		@Override
+		public MapTask getTask(Minecraft minecraft, long worldHash) {			
+			if(!enabled) return null;
+			MapTask mapTask = MapPlayerTask.create(minecraft.thePlayer, worldHash);
+			return mapTask;
+		}
+		
+		@Override
+		public void taskAccepted(boolean accepted) {
+			// nothing to do
+		}
+		
+	}
 }

@@ -12,6 +12,7 @@ import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
+import net.techbrew.mcjm.task.MapRegionTask;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -251,7 +252,7 @@ public class MapOverlayOptions extends GuiScreen {
 				boolean enable = !PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED);
 				buttonAutomap.setToggled(enable);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, enable);
-				JourneyMap.getInstance().autoMap(enable);
+				JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, enable);
 				break;
 			}
 		}
