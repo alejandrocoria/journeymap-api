@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.minecraft.src.Minecraft;
@@ -30,9 +31,9 @@ public class TaskController {
 		for(ITaskManager manager: managers) {
 			boolean enabled = manager.enableTask(minecraft);
 			if(!enabled) {
-				logger.info("Task not initially enabled: " + manager.getClass().getSimpleName());
+				logger.info("Task not initially enabled: " + manager.getTaskClass().getSimpleName());
 			} else {
-				logger.info("Task initially enabled: " + manager.getClass().getSimpleName());
+				logger.info("Task initially enabled: " + manager.getTaskClass().getSimpleName());
 			}
 		}
 		
@@ -50,7 +51,7 @@ public class TaskController {
 		if(taskManager!=null) {
 			toggleTask(taskManager, enable);
 		} else {
-			logger.warning("Couldn't toggle task; manager not in controller: " + managerClass.getSimpleName());
+			logger.warning("Couldn't toggle task; manager not in controller: " + managerClass.getClass().getName());
 		}
 	}
 	
@@ -76,7 +77,7 @@ public class TaskController {
 	public void disableTasks(final Minecraft minecraft) {
 		for(ITaskManager manager: managers) {
 			manager.disableTask(minecraft);
-			logger.info("Task disabled: " + manager.getClass().getSimpleName());
+			logger.info("Task disabled: " + manager.getTaskClass().getSimpleName());
 		}
 	}
 	
@@ -101,15 +102,17 @@ public class TaskController {
 						if(taskExecutor!=null && !taskExecutor.isShutdown()) {
 							taskExecutor.schedule(thread, mapTaskDelay, TimeUnit.MILLISECONDS);
 							accepted = true;
-							logger.info("Task scheduled for: " + manager.getClass().getSimpleName());
+							if(logger.isLoggable(Level.FINE)) {
+								logger.info("Scheduled " + manager.getTaskClass().getSimpleName());
+							}
 						} else {
 							logger.warning("TaskExecutor isn't running");
 						}
 					} else {
-						logger.warning("Could not schedule task for: " + manager.getClass().getSimpleName());
+						logger.warning("Could not schedule " + manager.getTaskClass().getSimpleName());
 					}
 				} else {
-					logger.warning("Null task returned by: " + manager.getClass().getSimpleName());
+					logger.warning("Null " + manager.getTaskClass().getSimpleName());
 				}
 				manager.taskAccepted(accepted);
 			}
