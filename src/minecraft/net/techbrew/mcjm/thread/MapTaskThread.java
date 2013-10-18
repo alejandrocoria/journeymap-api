@@ -20,21 +20,21 @@ import net.techbrew.mcjm.model.ChunkImageCache;
 import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.render.ChunkRenderController;
-import net.techbrew.mcjm.task.MapTask;
+import net.techbrew.mcjm.task.BaseTask;
 
 public class MapTaskThread implements Runnable {
 
 	private static volatile AtomicInteger queue = new AtomicInteger(0);
 	private static ChunkRenderController renderController;
-	private final MapTask task;
+	private final BaseTask task;
 	
 	private final Logger logger = JourneyMap.getLogger();
 	
-	private MapTaskThread(MapTask task) {
+	private MapTaskThread(BaseTask task) {
 		this.task = task;
 	}
 	
-	public static MapTaskThread createAndQueue(MapTask task) {
+	public static MapTaskThread createAndQueue(BaseTask task) {
 		if(task==null) return null;
 		synchronized(queue) {
 			if(queue.get()==0) {

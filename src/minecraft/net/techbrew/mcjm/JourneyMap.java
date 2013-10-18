@@ -83,7 +83,7 @@ public class JourneyMap {
 	boolean enableAnnounceMod;
 
 	// Executor for task threads
-	private volatile ScheduledExecutorService mapTaskExecutor;
+	private volatile ScheduledExecutorService taskExecutor;
 	
 	// Task controller for issuing tasks in executor
 	private TaskController taskController;
@@ -103,7 +103,7 @@ public class JourneyMap {
     }
     
     public Boolean isMapping() {
-    	return mapTaskExecutor!=null && !mapTaskExecutor.isShutdown();
+    	return taskExecutor!=null && !taskExecutor.isShutdown();
     }
     
     public Boolean isThreadLogging() {
@@ -191,8 +191,8 @@ public class JourneyMap {
     	synchronized(this) {
 	    	DataCache.instance().purge();	   
 
-	    	if(mapTaskExecutor==null || mapTaskExecutor.isShutdown()) {			    		
-				mapTaskExecutor = Executors.newScheduledThreadPool(1, new JMThreadFactory("maptask")); //$NON-NLS-1$				
+	    	if(taskExecutor==null || taskExecutor.isShutdown()) {			    		
+				taskExecutor = Executors.newScheduledThreadPool(1, new JMThreadFactory("maptask")); //$NON-NLS-1$				
 			} else {
 				logger.severe("TaskExecutor in an unexpected state.  Should be null or shutdown.");
 			}
@@ -212,10 +212,10 @@ public class JourneyMap {
     public void stopMapping() {
     	synchronized(this) {
     		
-	    	if(mapTaskExecutor!=null && !mapTaskExecutor.isShutdown()) {    		
-				mapTaskExecutor.shutdown();			
+	    	if(taskExecutor!=null && !taskExecutor.isShutdown()) {    		
+				taskExecutor.shutdown();			
 			}	    	
-	    	mapTaskExecutor = null;
+	    	taskExecutor = null;
 	    	
 	    	Minecraft minecraft = Minecraft.getMinecraft();
 	    	
@@ -306,7 +306,7 @@ public class JourneyMap {
 			}			
 
 			// Perform the next mapping tasks
-			taskController.performTasks(minecraft, newHash, mapTaskExecutor);			
+			taskController.performTasks(minecraft, newHash, taskExecutor);			
 
 		} catch (Throwable t) {
 			String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
@@ -390,7 +390,7 @@ public class JourneyMap {
 	}
 
 	public ScheduledExecutorService getChunkExecutor() {
-		return mapTaskExecutor;
+		return taskExecutor;
 	}
 
 	/**

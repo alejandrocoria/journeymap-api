@@ -20,7 +20,7 @@ import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.io.nbt.ChunkLoader;
 import net.techbrew.mcjm.model.ChunkStub;
 
-public class MapPlayerTask extends MapTask {
+public class MapPlayerTask extends BaseTask {
 	
 	private static final Logger logger = JourneyMap.getLogger();
 
@@ -31,7 +31,7 @@ public class MapPlayerTask extends MapTask {
 		super(world, underground, chunkY, chunkStubs, false);
 	}
 	
-	public static MapTask create(EntityPlayer player, long hash) {
+	public static BaseTask create(EntityPlayer player, long hash) {
 				
 		int missing = 0;
 
@@ -95,7 +95,7 @@ public class MapPlayerTask extends MapTask {
 		boolean enabled;
 		
 		@Override
-		public Class<? extends MapTask> getTaskClass() {
+		public Class<? extends BaseTask> getTaskClass() {
 			return MapPlayerTask.class;
 		}
 		
@@ -116,10 +116,10 @@ public class MapPlayerTask extends MapTask {
 		}
 		
 		@Override
-		public MapTask getTask(Minecraft minecraft, long worldHash) {			
+		public BaseTask getTask(Minecraft minecraft, long worldHash) {			
 			if(!enabled) return null;
-			MapTask mapTask = MapPlayerTask.create(minecraft.thePlayer, worldHash);
-			return mapTask;
+			BaseTask baseTask = MapPlayerTask.create(minecraft.thePlayer, worldHash);
+			return baseTask;
 		}
 		
 		@Override

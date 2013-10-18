@@ -6,7 +6,7 @@ import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.model.ChunkStub;
 
-public abstract class MapTask {
+public abstract class BaseTask {
 	
 	public final World world;
 	public final int dimension;
@@ -15,7 +15,7 @@ public abstract class MapTask {
 	public final Map<ChunkCoordIntPair, ChunkStub> chunkStubs;
 	public final boolean flushImagesToDisk;
 	
-	public MapTask(World world, boolean underground, Integer vSlice, Map<ChunkCoordIntPair, ChunkStub> chunkStubs, boolean flushImagesToDisk) {
+	public BaseTask(World world, boolean underground, Integer vSlice, Map<ChunkCoordIntPair, ChunkStub> chunkStubs, boolean flushImagesToDisk) {
 		this.world = world;
 		this.dimension = world.provider.dimensionId;
 		this.underground = underground;

@@ -21,7 +21,7 @@ import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
 
-public class MapRegionTask extends MapTask {
+public class MapRegionTask extends BaseTask {
 	
 	private static final Logger logger = JourneyMap.getLogger();
 	private static boolean underground = false;
@@ -36,7 +36,7 @@ public class MapRegionTask extends MapTask {
 		MapRegionTask.dimension = dimension;
 	}
 	
-	public static MapTask create(RegionCoord rCoord, Minecraft minecraft, long worldHash) {
+	public static BaseTask create(RegionCoord rCoord, Minecraft minecraft, long worldHash) {
 		
 		int missing = 0;
 		final int chunkY = underground ? minecraft.thePlayer.chunkCoordY : -1;
@@ -79,7 +79,7 @@ public class MapRegionTask extends MapTask {
 		boolean enabled;
 		
 		@Override
-		public Class<? extends MapTask> getTaskClass() {
+		public Class<? extends BaseTask> getTaskClass() {
 			return MapRegionTask.class;
 		}
 		
@@ -132,7 +132,7 @@ public class MapRegionTask extends MapTask {
 		}
 		
 		@Override
-		public MapTask getTask(Minecraft minecraft, long worldHash) {
+		public BaseTask getTask(Minecraft minecraft, long worldHash) {
 			
 			if(!enabled) return null;
 			
@@ -142,8 +142,8 @@ public class MapRegionTask extends MapTask {
 	    	}
 			
 			RegionCoord rCoord = regionLoader.getRegions().peek();
-			MapTask mapTask = MapRegionTask.create(rCoord, minecraft, worldHash);
-			return mapTask;
+			BaseTask baseTask = MapRegionTask.create(rCoord, minecraft, worldHash);
+			return baseTask;
 		}
 		
 		@Override

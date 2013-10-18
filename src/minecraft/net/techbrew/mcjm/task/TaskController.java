@@ -84,19 +84,19 @@ public class TaskController {
 		
 		if(!MapTaskThread.hasQueue()) {
 					
-			MapTask mapTask = null;
+			BaseTask baseTask = null;
 			ITaskManager manager = null;
 			
-			while(mapTask==null) {
+			while(baseTask==null) {
 				manager = getNextManager(minecraft, worldHash);
 				if(manager==null) {
 					logger.warning("No task managers enabled!");
 					return;
 				}
 				boolean accepted = false;
-				mapTask = manager.getTask(minecraft, worldHash);				
-				if(mapTask!=null) {
-					MapTaskThread thread = MapTaskThread.createAndQueue(mapTask);
+				baseTask = manager.getTask(minecraft, worldHash);				
+				if(baseTask!=null) {
+					MapTaskThread thread = MapTaskThread.createAndQueue(baseTask);
 					if(thread!=null) {
 						if(taskExecutor!=null && !taskExecutor.isShutdown()) {
 							taskExecutor.schedule(thread, mapTaskDelay, TimeUnit.MILLISECONDS);
