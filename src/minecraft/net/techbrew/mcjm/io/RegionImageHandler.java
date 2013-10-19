@@ -44,10 +44,29 @@ public class RegionImageHandler {
 		lock = new Object();
 	}
 	
-	public static File getDimensionDir(RegionCoord rCoord) {
-		return getDimensionDir(rCoord.worldDir, rCoord.dimension);
+	public static File getImageDir(RegionCoord rCoord, MapType mapType) {
+		File dimDir = new File(rCoord.worldDir, "DIM"+rCoord.dimension); //$NON-NLS-1$
+		if(!dimDir.exists()) {
+			dimDir.mkdirs();
+		}
+		if(Constants.MapType.night==mapType) {
+			File nightDir = new File(dimDir, "night");
+			if(!nightDir.exists()) {
+				nightDir.mkdirs();
+			}
+			return nightDir;
+		} else if(rCoord.isUnderground()) {
+			File vSliceDir = new File(dimDir, Integer.toString(rCoord.getVerticalSlice()));
+			if(!vSliceDir.exists()) {
+				vSliceDir.mkdirs();
+			}
+			return vSliceDir;
+		} else {
+			return dimDir;
+		}
 	}
 	
+	@Deprecated
 	public static File getDimensionDir(File worldDir, int dimension) {
 		File dimDir = new File(worldDir, "DIM"+dimension); //$NON-NLS-1$
 		if(!dimDir.exists()) {
@@ -58,15 +77,8 @@ public class RegionImageHandler {
 	
 	public static File getRegionImageFile(RegionCoord rCoord, Constants.MapType mapType, boolean allowLegacy) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(rCoord.regionX).append(",").append(rCoord.regionZ); //$NON-NLS-1$
-		if(rCoord.isUnderground()) {
-			sb.append(",").append(rCoord.getVerticalSlice()); //$NON-NLS-1$
-		}
-		if(Constants.MapType.night==mapType) {
-			sb.append("_night"); //$NON-NLS-1$
-		}
-		sb.append(".png");
-		File regionFile = new File(getDimensionDir(rCoord), sb.toString());
+		sb.append(rCoord.regionX).append(",").append(rCoord.regionZ).append(".png"); //$NON-NLS-1$ //$NON-NLS-2$
+		File regionFile = new File(getImageDir(rCoord, mapType), sb.toString());
 		
 		if(!regionFile.exists() && allowLegacy) {
 			File oldRegionFile = getRegionImageFileLegacy(rCoord);

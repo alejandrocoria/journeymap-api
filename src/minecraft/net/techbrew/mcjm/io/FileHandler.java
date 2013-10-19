@@ -73,6 +73,15 @@ public class FileHandler {
 	}
 	
 	
+	public static File getAnvilRegionDirectory(File worldDirectory, int dimension) {
+		if(dimension==0) {
+			return new File(worldDirectory, "region"); //$NON-NLS-1$
+		} else {
+			return new File(worldDirectory, "DIM"+dimension); //$NON-NLS-1$
+		}
+	}
+	
+	
 	public static BufferedImage getImage(String fileName) {
 		try {
 			String png = FileHandler.WEB_DIR + "/img/" + fileName;//$NON-NLS-1$

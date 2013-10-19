@@ -97,15 +97,9 @@ public class MapTaskThread implements Runnable {
 				}
 				ChunkStub chunkStub = chunkIter.next();
 				if(chunkStub.doMap) {
-					BufferedImage chunkImage = renderController.getChunkImage(chunkStub, underground, vSlice, chunkStubs);		
-					if(chunkImage!=null) {			
-						ChunkCoord cCoord = ChunkCoord.fromChunkStub(jmWorldDir, chunkStub, vSlice, dimension);
-						chunkImageCache.put(cCoord, chunkImage);			
-					} else {
-						if(logger.isLoggable(Level.FINE)) {
-							logger.fine("Could not render chunk image:" + chunkStub.xPosition + "," + chunkStub.zPosition + " at " + vSlice + " and underground = " + underground); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-						}
-					}
+					BufferedImage chunkImage = renderController.getChunkImage(chunkStub, underground, vSlice, chunkStubs);
+					ChunkCoord cCoord = ChunkCoord.fromChunkStub(jmWorldDir, chunkStub, vSlice, dimension);
+					chunkImageCache.put(cCoord, chunkImage);					
 				}
 			}
 			

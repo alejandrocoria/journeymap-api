@@ -1,5 +1,7 @@
 package net.techbrew.mcjm.render;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -30,6 +32,9 @@ public class ChunkRenderController {
 	private final IChunkRenderer standardRenderer;
 	
 	final boolean fineLogging = JourneyMap.getLogger().isLoggable(Level.FINE);
+	
+	private BufferedImage blankChunkImage = null;
+	private BufferedImage blankChunkImageUnderground = null;
 	
 	public ChunkRenderController() {
 		MapBlocks mapBlocks = new MapBlocks();
@@ -76,6 +81,8 @@ public class ChunkRenderController {
 			String error = Constants.getMessageJMERR07(LogFormatter.toString(t));
 			JourneyMap.getLogger().severe(error);
 			
+		} finally {
+			g2D.dispose();
 		}
 		
 		long stop = System.nanoTime();
@@ -89,7 +96,8 @@ public class ChunkRenderController {
 			if(fineLogging) {
 				JourneyMap.getLogger().log(Level.WARNING, "Chunk didn't render: " + chunkStub.xPosition + "," + chunkStub.zPosition);
 			}
-			chunkImage = null;
+			// Use blank
+			chunkImage = underground ? getBlankChunkImageUnderground() : getBlankChunkImage();
 		}
 		
 		if(fineLogging) {
@@ -108,6 +116,30 @@ public class ChunkRenderController {
 		
 		return chunkImage;
 					
+	}
+	
+	private BufferedImage getBlankChunkImage() {
+		if(blankChunkImage==null) {
+			blankChunkImage = new BufferedImage(32, 16, BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g2D = blankChunkImage.createGraphics();
+			g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .1F));
+			g2D.setColor(Color.black);
+			g2D.fillRect(0, 0, 1, 1);
+			g2D.dispose();
+		}
+		return blankChunkImage;
+	}
+	
+	private BufferedImage getBlankChunkImageUnderground() {
+		if(blankChunkImageUnderground==null) {
+			blankChunkImageUnderground = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g2D = blankChunkImageUnderground.createGraphics();
+			g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .1F));
+			g2D.setColor(Color.black);
+			g2D.fillRect(0, 0, 1, 1);
+			g2D.dispose();
+		}
+		return blankChunkImageUnderground;
 	}
 
 }

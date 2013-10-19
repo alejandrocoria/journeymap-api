@@ -253,6 +253,10 @@ public class MapOverlayOptions extends GuiScreen {
 				buttonAutomap.setToggled(enable);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, enable);
 				JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, enable);
+				if(enable) {
+					close();
+					map.close();
+				}
 				break;
 			}
 		}

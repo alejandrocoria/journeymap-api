@@ -15,9 +15,9 @@ public abstract class BaseTask {
 	public final Map<ChunkCoordIntPair, ChunkStub> chunkStubs;
 	public final boolean flushImagesToDisk;
 	
-	public BaseTask(World world, boolean underground, Integer vSlice, Map<ChunkCoordIntPair, ChunkStub> chunkStubs, boolean flushImagesToDisk) {
+	public BaseTask(World world, int dimension, boolean underground, Integer vSlice, Map<ChunkCoordIntPair, ChunkStub> chunkStubs, boolean flushImagesToDisk) {
 		this.world = world;
-		this.dimension = world.provider.dimensionId;
+		this.dimension = dimension;
 		this.underground = underground;
 		this.vSlice = vSlice;
 		if((vSlice==null || vSlice==-1) && underground) {

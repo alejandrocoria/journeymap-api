@@ -27,8 +27,8 @@ public class MapPlayerTask extends BaseTask {
 	private static ChunkCoordinates lastPlayerPos;
 	static Integer chunkOffset;
 	
-	private MapPlayerTask(World world, boolean underground, Integer chunkY, Map<ChunkCoordIntPair, ChunkStub> chunkStubs) {
-		super(world, underground, chunkY, chunkStubs, false);
+	private MapPlayerTask(World world, int dimension, boolean underground, Integer chunkY, Map<ChunkCoordIntPair, ChunkStub> chunkStubs) {
+		super(world, dimension, underground, chunkY, chunkStubs, false);
 	}
 	
 	public static BaseTask create(EntityPlayer player, long hash) {
@@ -41,7 +41,9 @@ public class MapPlayerTask extends BaseTask {
 		int offset = chunkOffset;
 		
 		final ChunkCoordinates playerPos = new ChunkCoordinates(player.chunkCoordX,player.chunkCoordY,player.chunkCoordZ);
-		final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
+		final Map playerData = DataCache.instance().get(PlayerData.class);
+		final boolean underground = (Boolean) playerData.get(EntityKey.underground);
+		final int dimension = (Integer) playerData.get(EntityKey.dimension);
 		
 		if(playerPos.equals(lastPlayerPos)) {
 			offset = 1;
@@ -77,7 +79,7 @@ public class MapPlayerTask extends BaseTask {
 		}
 		
 		if(chunks.size()>0) {
-			return new MapPlayerTask(world, underground, chunkY, chunks);
+			return new MapPlayerTask(world, dimension, underground, chunkY, chunks);
 		} else {
 			return null;
 		}

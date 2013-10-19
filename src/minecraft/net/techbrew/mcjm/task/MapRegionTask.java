@@ -1,6 +1,7 @@
 package net.techbrew.mcjm.task;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,30 +25,25 @@ import net.techbrew.mcjm.model.RegionImageCache;
 public class MapRegionTask extends BaseTask {
 	
 	private static final Logger logger = JourneyMap.getLogger();
-	private static boolean underground = false;
-	private static int dimension = 0;
+
 	
-	private MapRegionTask(World world, boolean underground, Integer chunkY, Map<ChunkCoordIntPair, ChunkStub> chunkStubs) {
-		super(world, underground, chunkY, chunkStubs, true);
-	}
-	
-	public static void setProperties(boolean underground, int dimension) {
-		MapRegionTask.underground = underground;
-		MapRegionTask.dimension = dimension;
+	private MapRegionTask(World world, int dimension, boolean underground, Integer chunkY, Map<ChunkCoordIntPair, ChunkStub> chunkStubs) {
+		super(world, dimension, underground, chunkY, chunkStubs, true);
 	}
 	
 	public static BaseTask create(RegionCoord rCoord, Minecraft minecraft, long worldHash) {
 		
 		int missing = 0;
-		final int chunkY = underground ? minecraft.thePlayer.chunkCoordY : -1;
+
 		final World world = minecraft.theWorld;
-		final File worldDir = FileHandler.getMCWorldDir(minecraft);		
+		final File worldDir = FileHandler.getMCWorldDir(minecraft);
+		final File anvilDir = FileHandler.getAnvilRegionDirectory(FileHandler.getMCWorldDir(minecraft), rCoord.dimension);
 		final Map<ChunkCoordIntPair, ChunkStub> chunks = new HashMap<ChunkCoordIntPair, ChunkStub>(1280); // 1024 * 1.25 alleviates map growth		
 		final List<ChunkCoordIntPair> coords = rCoord.getChunkCoordsInRegion();
 		
 		while(!coords.isEmpty()) {
 			ChunkCoordIntPair coord = coords.remove(0);
-			ChunkStub stub = ChunkLoader.getChunkStubFromDisk(coord.chunkXPos, coord.chunkZPos, worldDir, world, worldHash);
+			ChunkStub stub = ChunkLoader.getChunkStubFromDisk(coord.chunkXPos, coord.chunkZPos, anvilDir, world, worldHash);
 			if(stub==null) {
 				missing++;
 			} else {
@@ -60,7 +56,7 @@ public class MapRegionTask extends BaseTask {
 		}
 		
 		if(chunks.size()>0) {
-			return new MapRegionTask(world, underground, chunkY, chunks);
+			return new MapRegionTask(world, rCoord.dimension, rCoord.isUnderground(), rCoord.getVerticalSlice(), chunks);
 		} else {
 			return null;
 		}
@@ -96,8 +92,7 @@ public class MapRegionTask extends BaseTask {
 				try {
 					regionLoader = new RegionLoader(minecraft, minecraft.theWorld.provider.dimensionId);
 			    	if(regionLoader.getRegionsFound()==0) {
-			    		logger.info("Auto-mapping found no unexplored regions.");
-			    		regionLoader = null;
+			    		disableTask(minecraft);
 			    	} else {
 			    		this.enabled = true;
 			    	}
@@ -118,8 +113,12 @@ public class MapRegionTask extends BaseTask {
 		@Override
 		public void disableTask(Minecraft minecraft) {
 			
-			if(enabled && regionLoader!=null) {				
-				JourneyMap.getInstance().announce(Constants.getString("MapOverlay.automap_complete"), Level.INFO);
+			if(regionLoader!=null) {				
+				if(regionLoader.isUnderground()) {
+					JourneyMap.getInstance().announce(Constants.getString("MapOverlay.automap_complete_underground", regionLoader.getVSlice()), Level.INFO);					
+				} else {
+					JourneyMap.getInstance().announce(Constants.getString("MapOverlay.automap_complete"), Level.INFO);
+				}
 	    	}
 			enabled = false;
 	    	
@@ -128,6 +127,8 @@ public class MapRegionTask extends BaseTask {
 				regionLoader.getRegions().clear();
 				regionLoader = null;
 			}
+			
+			PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, false);
 			
 		}
 		
@@ -152,7 +153,13 @@ public class MapRegionTask extends BaseTask {
 				regionLoader.getRegions().pop();
 				int total = regionLoader.getRegionsFound();
 				int index = total-regionLoader.getRegions().size();
-				JourneyMap.getInstance().announce(Constants.getString("MapOverlay.automap_status", index, total), Level.INFO);
+				String percent = new DecimalFormat("##").format(index*100F/total);
+				if(regionLoader.isUnderground()) {
+					String msg = Constants.getString("MapOverlay.automap_status_underground", regionLoader.getVSlice(), percent);
+					JourneyMap.getInstance().announce(msg, Level.INFO);
+				} else {
+					JourneyMap.getInstance().announce(Constants.getString("MapOverlay.automap_status", percent), Level.INFO);
+				}
 			}
 		}
 	}

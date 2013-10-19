@@ -111,9 +111,7 @@ public class TaskController {
 					} else {
 						logger.warning("Could not schedule " + manager.getTaskClass().getSimpleName());
 					}
-				} else {
-					logger.warning("Null " + manager.getTaskClass().getSimpleName());
-				}
+				} 
 				manager.taskAccepted(accepted);
 			}
 			
