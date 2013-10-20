@@ -32,6 +32,15 @@ public class FileHandler {
 		}
 	}
 	
+	public static File getMCWorldDir(Minecraft minecraft, int dimension) {
+		File worldDir = getMCWorldDir(minecraft);
+		if(dimension==0) {
+			return worldDir;
+		} else {
+			return new File(worldDir, "DIM"+dimension); //$NON-NLS-1$
+		}
+	}
+	
 	public static File getJourneyMapDir() {
 		return new File(Minecraft.getMinecraft().mcDataDir, Constants.JOURNEYMAP_DIR);
 	}

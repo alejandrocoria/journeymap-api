@@ -1,8 +1,10 @@
 package net.techbrew.mcjm.model;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -66,6 +68,10 @@ public class RegionImageCache  {
 		synchronized(lock) {
 			return imageSets.containsKey(rCoord);
 		}
+	}
+	
+	public List<RegionCoord> getRegions() {
+		return new ArrayList<RegionCoord>(imageSets.keySet());
 	}
 	
 	public BufferedImage getGuaranteedImage(RegionCoord rCoord, Constants.MapType mapType) {

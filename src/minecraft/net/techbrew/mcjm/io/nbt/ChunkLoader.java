@@ -52,10 +52,6 @@ public class ChunkLoader {
 		
 	}
 	
-	public static Chunk getChunkFromMemory(int chunkX, int chunkZ, Minecraft minecraft) {
-		return getChunkFromMemory(chunkX, chunkZ, FileHandler.getMCWorldDir(minecraft), minecraft.theWorld);
-	}
-	
 	public static ChunkStub getChunkStubFromMemory(int chunkX, int chunkZ, File worldDir, World world, long worldHash) {
 		Chunk chunk = getChunkFromMemory(chunkX, chunkZ, worldDir, world);
 		if(chunk!=null) return new ChunkStub(chunk, true, world, worldHash);
@@ -63,7 +59,7 @@ public class ChunkLoader {
 	}
 	
 	public static ChunkStub getChunkStubFromMemory(int chunkX, int chunkZ, Minecraft minecraft, long worldHash) {
-		Chunk chunk = getChunkFromMemory(chunkX, chunkZ, FileHandler.getMCWorldDir(minecraft), minecraft.theWorld);
+		Chunk chunk = getChunkFromMemory(chunkX, chunkZ, FileHandler.getMCWorldDir(minecraft, minecraft.theWorld.provider.dimensionId), minecraft.theWorld);
 		if(chunk!=null) return new ChunkStub(chunk, true, minecraft.theWorld, worldHash);
 		return null;
 	}

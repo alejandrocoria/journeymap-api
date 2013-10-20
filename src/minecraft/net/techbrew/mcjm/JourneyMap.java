@@ -9,6 +9,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.GuiInventory;
 import net.minecraft.src.GuiMainMenu;
@@ -30,6 +31,7 @@ import net.techbrew.mcjm.server.JMServer;
 import net.techbrew.mcjm.task.ITaskManager;
 import net.techbrew.mcjm.task.TaskController;
 import net.techbrew.mcjm.thread.JMThreadFactory;
+import net.techbrew.mcjm.thread.TaskThread;
 import net.techbrew.mcjm.ui.MapOverlay;
 import net.techbrew.mcjm.ui.MapOverlayOptions;
 
@@ -68,6 +70,7 @@ public class JourneyMap {
 	
 	private boolean threadLogging = false;
 
+	private ChunkCoordIntPair lastPlayerCoord;
 	private volatile ChunkStub lastPlayerChunk;
 
 	// Invokes MapOverlay
@@ -221,6 +224,7 @@ public class JourneyMap {
 	    	
 	    	if(taskController!=null) {
 	    		taskController.disableTasks(minecraft);
+	    		taskController.clear();
 	    		taskController = null;
 	    	}
 	    		    	
@@ -228,6 +232,7 @@ public class JourneyMap {
 			FileHandler.lastWorldHash = -1;
 			FileHandler.lastWorldDir = null;
 			
+			TaskThread.reset();
 			RegionImageCache.getInstance().flushToDisk();
 			RegionImageCache.getInstance().clear();
 			
@@ -286,12 +291,16 @@ public class JourneyMap {
 			}
 
 			// Check for valid player chunk
-			lastPlayerChunk = ChunkLoader.getChunkStubFromMemory(player.chunkCoordX, player.chunkCoordZ, minecraft, newHash);
-			if(lastPlayerChunk==null) {
-				if(logger.isLoggable(Level.FINE)) {
-					logger.fine("Player chunk unknown: " + player.chunkCoordX + "," + player.chunkCoordZ);
+			ChunkCoordIntPair playerCoord = new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ);
+			if(lastPlayerChunk==null || !playerCoord.equals(lastPlayerCoord)) {
+				lastPlayerCoord = playerCoord;
+				lastPlayerChunk = ChunkLoader.getChunkStubFromMemory(player.chunkCoordX, player.chunkCoordZ, minecraft, newHash);
+				if(lastPlayerChunk==null) {
+					if(logger.isLoggable(Level.FINE)) {
+						logger.fine("Player chunk unknown: " + playerCoord);
+					}
+					return true;
 				}
-				return true;
 			}
 
 			// We got this far

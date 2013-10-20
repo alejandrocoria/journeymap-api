@@ -74,7 +74,11 @@ public class Constants {
     }
 	
 	public enum MapType {
-		day(0), night(16), underground(0), OBSOLETE(-1);
+		day(0), night(16), underground(0), 
+		
+		@Deprecated
+		OBSOLETE(-1);
+		
 		MapType(int offset) {
 			_offset = offset;
 		}

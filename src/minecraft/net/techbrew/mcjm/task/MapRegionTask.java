@@ -12,7 +12,10 @@ import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.data.DataCache;
+import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.io.nbt.ChunkLoader;
@@ -22,28 +25,26 @@ import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
 
-public class MapRegionTask extends BaseTask {
+public class MapRegionTask extends BaseMapTask {
 	
 	private static final Logger logger = JourneyMap.getLogger();
-
 	
 	private MapRegionTask(World world, int dimension, boolean underground, Integer chunkY, Map<ChunkCoordIntPair, ChunkStub> chunkStubs) {
 		super(world, dimension, underground, chunkY, chunkStubs, true);
 	}
 	
-	public static BaseTask create(RegionCoord rCoord, Minecraft minecraft, long worldHash) {
+	public static BaseMapTask create(RegionCoord rCoord, Minecraft minecraft, long worldHash) {
 		
 		int missing = 0;
 
 		final World world = minecraft.theWorld;
-		final File worldDir = FileHandler.getMCWorldDir(minecraft);
-		final File anvilDir = FileHandler.getAnvilRegionDirectory(FileHandler.getMCWorldDir(minecraft), rCoord.dimension);
+		final File mcWorldDir = FileHandler.getMCWorldDir(minecraft, rCoord.dimension);
 		final Map<ChunkCoordIntPair, ChunkStub> chunks = new HashMap<ChunkCoordIntPair, ChunkStub>(1280); // 1024 * 1.25 alleviates map growth		
 		final List<ChunkCoordIntPair> coords = rCoord.getChunkCoordsInRegion();
 		
 		while(!coords.isEmpty()) {
 			ChunkCoordIntPair coord = coords.remove(0);
-			ChunkStub stub = ChunkLoader.getChunkStubFromDisk(coord.chunkXPos, coord.chunkZPos, anvilDir, world, worldHash);
+			ChunkStub stub = ChunkLoader.getChunkStubFromDisk(coord.chunkXPos, coord.chunkZPos, mcWorldDir, world, worldHash);
 			if(stub==null) {
 				missing++;
 			} else {
@@ -75,7 +76,7 @@ public class MapRegionTask extends BaseTask {
 		boolean enabled;
 		
 		@Override
-		public Class<? extends BaseTask> getTaskClass() {
+		public Class<? extends ITask> getTaskClass() {
 			return MapRegionTask.class;
 		}
 		
@@ -90,7 +91,19 @@ public class MapRegionTask extends BaseTask {
 			enabled = false; // assume the worst
 			if(minecraft.isIntegratedServerRunning()) {
 				try {
-					regionLoader = new RegionLoader(minecraft, minecraft.theWorld.provider.dimensionId);
+					final int dimension = (Integer) DataCache.playerDataValue(EntityKey.dimension);
+					final boolean underground = (Boolean) DataCache.playerDataValue(EntityKey.underground);
+					MapType mapType;
+					Integer vSlice = null;
+					if(underground) {
+						mapType = MapType.underground;
+						vSlice = (Integer) DataCache.playerDataValue(EntityKey.chunkCoordY);
+					} else {
+						final long time = minecraft.theWorld.getWorldInfo().getWorldTime() % 24000L;
+						mapType = (time<13800) ? MapType.day : MapType.night; 
+					}
+					
+					regionLoader = new RegionLoader(minecraft, dimension, mapType, vSlice);
 			    	if(regionLoader.getRegionsFound()==0) {
 			    		disableTask(minecraft);
 			    	} else {
@@ -124,6 +137,7 @@ public class MapRegionTask extends BaseTask {
 	    	
 			if(regionLoader!=null) {
 				RegionImageCache.getInstance().flushToDisk();
+				RegionImageCache.getInstance().clear();
 				regionLoader.getRegions().clear();
 				regionLoader = null;
 			}
@@ -133,7 +147,7 @@ public class MapRegionTask extends BaseTask {
 		}
 		
 		@Override
-		public BaseTask getTask(Minecraft minecraft, long worldHash) {
+		public BaseMapTask getTask(Minecraft minecraft, long worldHash) {
 			
 			if(!enabled) return null;
 			
@@ -143,17 +157,17 @@ public class MapRegionTask extends BaseTask {
 	    	}
 			
 			RegionCoord rCoord = regionLoader.getRegions().peek();
-			BaseTask baseTask = MapRegionTask.create(rCoord, minecraft, worldHash);
-			return baseTask;
+			BaseMapTask baseMapTask = MapRegionTask.create(rCoord, minecraft, worldHash);
+			return baseMapTask;
 		}
 		
 		@Override
 		public void taskAccepted(boolean accepted) {
 			if(accepted) {
 				regionLoader.getRegions().pop();
-				int total = regionLoader.getRegionsFound();
-				int index = total-regionLoader.getRegions().size();
-				String percent = new DecimalFormat("##").format(index*100F/total);
+				float total = 1F * regionLoader.getRegionsFound();
+				float remaining = total-regionLoader.getRegions().size();
+				String percent = new DecimalFormat("##.#").format(remaining*100/total) + "%%";
 				if(regionLoader.isUnderground()) {
 					String msg = Constants.getString("MapOverlay.automap_status_underground", regionLoader.getVSlice(), percent);
 					JourneyMap.getInstance().announce(msg, Level.INFO);

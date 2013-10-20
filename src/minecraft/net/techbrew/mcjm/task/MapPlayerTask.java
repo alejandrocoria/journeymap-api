@@ -20,7 +20,7 @@ import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.io.nbt.ChunkLoader;
 import net.techbrew.mcjm.model.ChunkStub;
 
-public class MapPlayerTask extends BaseTask {
+public class MapPlayerTask extends BaseMapTask {
 	
 	private static final Logger logger = JourneyMap.getLogger();
 
@@ -31,7 +31,7 @@ public class MapPlayerTask extends BaseTask {
 		super(world, dimension, underground, chunkY, chunkStubs, false);
 	}
 	
-	public static BaseTask create(EntityPlayer player, long hash) {
+	public static BaseMapTask create(EntityPlayer player, long hash) {
 				
 		int missing = 0;
 
@@ -60,7 +60,7 @@ public class MapPlayerTask extends BaseTask {
 		final ChunkCoordIntPair min = new ChunkCoordIntPair(lastPlayerPos.posX - offset, lastPlayerPos.posZ - offset);
 		final ChunkCoordIntPair max = new ChunkCoordIntPair(lastPlayerPos.posX + offset, lastPlayerPos.posZ + offset);
 		
-		final File worldDir = FileHandler.getMCWorldDir(Minecraft.getMinecraft());
+		final File worldDir = FileHandler.getMCWorldDir(Minecraft.getMinecraft(), player.worldObj.provider.dimensionId);
  
 		// First pass = chunks to map
 		for(int x=min.chunkXPos;x<=max.chunkXPos;x++) {
@@ -97,7 +97,7 @@ public class MapPlayerTask extends BaseTask {
 		boolean enabled;
 		
 		@Override
-		public Class<? extends BaseTask> getTaskClass() {
+		public Class<? extends BaseMapTask> getTaskClass() {
 			return MapPlayerTask.class;
 		}
 		
@@ -118,10 +118,10 @@ public class MapPlayerTask extends BaseTask {
 		}
 		
 		@Override
-		public BaseTask getTask(Minecraft minecraft, long worldHash) {			
+		public BaseMapTask getTask(Minecraft minecraft, long worldHash) {			
 			if(!enabled) return null;
-			BaseTask baseTask = MapPlayerTask.create(minecraft.thePlayer, worldHash);
-			return baseTask;
+			BaseMapTask baseMapTask = MapPlayerTask.create(minecraft.thePlayer, worldHash);
+			return baseMapTask;
 		}
 		
 		@Override

@@ -40,7 +40,7 @@ public class TileService extends FileService {
 	
 	@Override
 	public String path() {
-		return "/tile.png"; //$NON-NLS-1$
+		return "/tile"; //$NON-NLS-1$
 	}
 		
 	@Override
@@ -51,6 +51,8 @@ public class TileService extends FileService {
 		// Parse query for parameters
 		Query query = event.query();
 		query.parse();
+		
+		
 
 		Minecraft minecraft = Minecraft.getMinecraft();
 		World theWorld = minecraft.theWorld;

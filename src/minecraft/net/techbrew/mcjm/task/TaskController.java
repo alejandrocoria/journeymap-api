@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.thread.MapTaskThread;
+import net.techbrew.mcjm.thread.TaskThread;
 
 public class TaskController {
 	
@@ -19,13 +19,14 @@ public class TaskController {
 	final List<ITaskManager> managers = new LinkedList<ITaskManager>();
 
 	public TaskController() {
+		managers.add(new LegacyMigrationTask.Manager());
 		managers.add(new MapRegionTask.Manager());
 		managers.add(new MapPlayerTask.Manager());
 	}
 	
 	public void enableTasks(final Minecraft minecraft) {
 		
-		MapTaskThread.reset();
+		TaskThread.reset();
 		
 		List<ITaskManager> list = new LinkedList<ITaskManager>(managers);
 		for(ITaskManager manager: managers) {
@@ -37,6 +38,10 @@ public class TaskController {
 			}
 		}
 		
+	}
+	
+	public void clear() {
+		managers.clear();
 	}
 	
 	public void toggleTask(Class<? extends ITaskManager> managerClass, boolean enable) {
@@ -83,21 +88,21 @@ public class TaskController {
 	
 	public void performTasks(final Minecraft minecraft, final long worldHash, final ScheduledExecutorService taskExecutor) {
 		
-		if(!MapTaskThread.hasQueue()) {
+		if(!TaskThread.hasQueue()) {
 					
-			BaseTask baseTask = null;
+			ITask task = null;
 			ITaskManager manager = null;
 			
-			while(baseTask==null) {
+			while(task==null) {
 				manager = getNextManager(minecraft, worldHash);
 				if(manager==null) {
 					logger.warning("No task managers enabled!");
 					return;
 				}
 				boolean accepted = false;
-				baseTask = manager.getTask(minecraft, worldHash);				
-				if(baseTask!=null) {
-					MapTaskThread thread = MapTaskThread.createAndQueue(baseTask);
+				task = manager.getTask(minecraft, worldHash);				
+				if(task!=null) {
+					TaskThread thread = TaskThread.createAndQueue(task);
 					if(thread!=null) {
 						if(taskExecutor!=null && !taskExecutor.isShutdown()) {
 							taskExecutor.schedule(thread, mapTaskDelay, TimeUnit.MILLISECONDS);

@@ -20,26 +20,28 @@ import net.techbrew.mcjm.model.ChunkImageCache;
 import net.techbrew.mcjm.model.ChunkStub;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.render.ChunkRenderController;
-import net.techbrew.mcjm.task.BaseTask;
+import net.techbrew.mcjm.task.IGenericTask;
+import net.techbrew.mcjm.task.IMapTask;
+import net.techbrew.mcjm.task.ITask;
 
-public class MapTaskThread implements Runnable {
+public class TaskThread implements Runnable {
 
 	private static volatile AtomicInteger queue = new AtomicInteger(0);
 	private static ChunkRenderController renderController;
-	private final BaseTask task;
+	private final ITask task;
 	
 	private final Logger logger = JourneyMap.getLogger();
 	
-	private MapTaskThread(BaseTask task) {
+	private TaskThread(ITask task) {
 		this.task = task;
 	}
 	
-	public static MapTaskThread createAndQueue(BaseTask task) {
+	public static TaskThread createAndQueue(ITask task) {
 		if(task==null) return null;
 		synchronized(queue) {
 			if(queue.get()==0) {
 				queue.incrementAndGet();
-				return new MapTaskThread(task);
+				return new TaskThread(task);
 			} else {
 				return null;
 			}
@@ -62,7 +64,7 @@ public class MapTaskThread implements Runnable {
 	@Override
 	public final void run() {
 
-		try {					
+		try {
 			final JourneyMap jm = JourneyMap.getInstance();
 			final Minecraft mc = Minecraft.getMinecraft();
 			final boolean threadLogging = jm.isThreadLogging();
@@ -79,13 +81,31 @@ public class MapTaskThread implements Runnable {
 				return;
 			}
 			
-			// Do the real task
+			if(task instanceof IMapTask) {
+				runMapTask((IMapTask) task, mc, jm, jmWorldDir, threadLogging);
+			} else if (task instanceof IGenericTask) {
+				runGenericTask((IGenericTask) task, mc, jm, jmWorldDir, threadLogging);
+			} else {
+				throw new UnsupportedOperationException("ITask unknown: " + task.getClass());
+			}
+		} finally {
+			synchronized(queue) {
+				queue.decrementAndGet();
+			}
+		}
+		
+		
+	}
+	
+	private final void runMapTask(IMapTask task, Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) {
+		
+		try {					
 			final long start = System.nanoTime();				
-			final boolean flushImagesToDisk = task.flushImagesToDisk;
-			final Integer vSlice = task.vSlice;	
-			final boolean underground = task.underground;					
-			final int dimension = task.dimension;
-			final Map<ChunkCoordIntPair, ChunkStub> chunkStubs = task.chunkStubs;
+			final boolean flushImagesToDisk = task.flushCacheWhenDone();
+			final Integer vSlice = task.getVSlice();	
+			final boolean underground = task.isUnderground();					
+			final int dimension = task.getDimension();
+			final Map<ChunkCoordIntPair, ChunkStub> chunkStubs = task.getChunkStubs();
 			final Iterator<ChunkStub> chunkIter = chunkStubs.values().iterator();
 			final ChunkImageCache chunkImageCache = new ChunkImageCache();
 					
@@ -113,7 +133,7 @@ public class MapTaskThread implements Runnable {
 			RegionImageCache.getInstance().putAll(chunkImageCache.getEntries(), flushImagesToDisk);			
 
 			if(threadLogging) {
-				logger.fine(task.getClass().getSimpleName() + " mapped " + chunks + " chunks in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start) + "ms with flush:" + flushImagesToDisk); //$NON-NLS-1$
+				logger.fine(task.getClass().getSimpleName() + " mapped " + chunks + " chunks in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start) + "ms with flush:" + flushImagesToDisk); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			chunkStubs.clear();
@@ -121,14 +141,23 @@ public class MapTaskThread implements Runnable {
 				
 		} catch (Throwable t) {
 			String error = Constants.getMessageJMERR16(t.getMessage());
-			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
+			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));			
+		} 
+	}
+	
+	private final void runGenericTask(IGenericTask task, Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) {
+		try {					
+			final long start = System.nanoTime();	
 			
-		} finally {
-			synchronized(queue) {
-				queue.decrementAndGet();
+			task.performTask();
+			
+			if(threadLogging) {
+				logger.fine(task.getClass().getSimpleName() + " completed in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-		}
-		
+		} catch (Throwable t) {
+			String error = Constants.getMessageJMERR16(t.getMessage());
+			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));			
+		} 
 	}
 	
 }

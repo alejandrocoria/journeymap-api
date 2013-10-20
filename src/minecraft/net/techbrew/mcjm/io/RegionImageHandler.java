@@ -5,17 +5,15 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReadParam;
-import javax.imageio.ImageReader;
 
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
@@ -46,24 +44,16 @@ public class RegionImageHandler {
 	
 	public static File getImageDir(RegionCoord rCoord, MapType mapType) {
 		File dimDir = new File(rCoord.worldDir, "DIM"+rCoord.dimension); //$NON-NLS-1$
-		if(!dimDir.exists()) {
-			dimDir.mkdirs();
-		}
-		if(Constants.MapType.night==mapType) {
-			File nightDir = new File(dimDir, "night");
-			if(!nightDir.exists()) {
-				nightDir.mkdirs();
-			}
-			return nightDir;
-		} else if(rCoord.isUnderground()) {
-			File vSliceDir = new File(dimDir, Integer.toString(rCoord.getVerticalSlice()));
-			if(!vSliceDir.exists()) {
-				vSliceDir.mkdirs();
-			}
-			return vSliceDir;
+		File subDir = null;
+		if(rCoord.isUnderground()) {
+			subDir = new File(dimDir, Integer.toString(rCoord.getVerticalSlice()));
 		} else {
-			return dimDir;
+			subDir = new File(dimDir, mapType.name());
 		}
+		if(!subDir.exists()) {
+			subDir.mkdirs();
+		}
+		return subDir;
 	}
 	
 	@Deprecated
@@ -80,7 +70,7 @@ public class RegionImageHandler {
 		sb.append(rCoord.regionX).append(",").append(rCoord.regionZ).append(".png"); //$NON-NLS-1$ //$NON-NLS-2$
 		File regionFile = new File(getImageDir(rCoord, mapType), sb.toString());
 		
-		if(!regionFile.exists() && allowLegacy) {
+		if(allowLegacy && !regionFile.exists()) {
 			File oldRegionFile = getRegionImageFileLegacy(rCoord);
 			if(oldRegionFile.exists()) {
 				regionFile = oldRegionFile;
@@ -119,28 +109,21 @@ public class RegionImageHandler {
 			throw new IllegalArgumentException("Chunks not from the same region: " + regionCoord + " / " + r2); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
-		int ix1, ix2, iz1, iz2, width, height;
-		if(mapType.equals(Constants.MapType.day) || mapType.equals(Constants.MapType.underground)) {
-			ix1 = regionCoord.getXOffsetDay(rx1);
-			iz1 = regionCoord.getZOffsetDay(rz1);
-			ix2 = regionCoord.getXOffsetDay(rx2);
-			iz2 = regionCoord.getZOffsetDay(rz2);
-		} else {
-			ix1 = regionCoord.getXOffsetNight(rx1);
-			iz1 = regionCoord.getZOffsetNight(rz1);
-			ix2 = regionCoord.getXOffsetNight(rx2);
-			iz2 = regionCoord.getZOffsetNight(rz2);
-		}
-		if(rx1==rx2) {
-			width=1;
-		} else {
-			width = rx2-rx1+1;
-		}
-		if(rz1==rz2) {
-			height=1;
-		} else {
-			height = rz2-rz1+1;
-		}
+//		int ix1, ix2, iz1, iz2, width, height;
+//		ix1 = regionCoord.getXOffsetDay(rx1);
+//		iz1 = regionCoord.getZOffsetDay(rz1);
+//		ix2 = regionCoord.getXOffsetDay(rx2);
+//		iz2 = regionCoord.getZOffsetDay(rz2);
+//		if(rx1==rx2) {
+//			width=1;
+//		} else {
+//			width = rx2-rx1+1;
+//		}
+//		if(rz1==rz2) {
+//			height=1;
+//		} else {
+//			height = rz2-rz1+1;
+//		}
 		
 		BufferedImage regionImage = null;
 		if(useCache) {
@@ -148,9 +131,9 @@ public class RegionImageHandler {
 		} else {
 			regionImage = readRegionImage(getRegionImageFile(regionCoord, mapType, true), regionCoord, sampling, true); // TODO allow legacy?
 		}
-		BufferedImage chunksImage = regionImage.getSubimage(ix1,iz1,width*16,height*16);
+		//BufferedImage chunksImage = regionImage.getSubimage(ix1,iz1,width*16,height*16);
 		
-		return chunksImage;
+		return regionImage;
 		
 	}
 	
@@ -183,37 +166,40 @@ public class RegionImageHandler {
 
 		if(regionFile.exists() && regionFile.canRead()) {
 			
-				final int maxTries = 5;
-				int tries = 1;
-				while(tries<=maxTries) {
+//				final int maxTries = 5;
+//				int tries = 1;
+//				while(tries<=maxTries) {
 					try {
-						fis = new FileInputStream(regionFile);
-						FileChannel fc = fis.getChannel();
-						ImageIO.setUseCache(false);
-						ImageReader reader = ImageIO.getImageReadersBySuffix("png").next(); //$NON-NLS-1$
-						ImageReadParam param = new ImageReadParam();
-						param.setSourceSubsampling(sampling, sampling, 0, 0);
-						image = ImageIO.read(fis);					
-						break;
+//						fis = new FileInputStream(regionFile);
+//						FileChannel fc = fis.getChannel();
+//						ImageIO.setUseCache(false);
+//						ImageReader reader = ImageIO.getImageReadersBySuffix("png").next(); //$NON-NLS-1$
+//						ImageReadParam param = new ImageReadParam();
+//						param.setSourceSubsampling(sampling, sampling, 0, 0);
+//						image = ImageIO.read(fis);				
+						
+						image = ImageIO.read(new BufferedInputStream(new FileInputStream(regionFile)));
+						
+						//break;
 					} catch (Exception e) {
-						tries++;
+//						tries++;
 						String error = Constants.getMessageJMERR21(regionFile, LogFormatter.toString(e));
 						JourneyMap.getLogger().warning(error);
 					} finally {
-				    	if(fis!=null) {
-							try {								
-								fis.close();
-							} catch (IOException e) {
-								JourneyMap.getLogger().severe(LogFormatter.toString(e));
-							}
-				    	}
+//				    	if(fis!=null) {
+//							try {								
+//								fis.close();
+//							} catch (IOException e) {
+//								JourneyMap.getLogger().severe(LogFormatter.toString(e));
+//							}
+//				    	}
 					}
-				}
-				if(tries==maxTries) {
-					JourneyMap.getLogger().severe("Deleting unusable region file: " + regionFile);
-					regionFile.delete();
-				}
-			}
+//				}
+//				if(tries==maxTries) {
+//					JourneyMap.getLogger().severe("Deleting unusable region file: " + regionFile);
+//					regionFile.delete();
+//				}
+		}
 			
 		if(image==null) {
 			if(legacy) {
@@ -225,6 +211,16 @@ public class RegionImageHandler {
 		return image;
 	}
 	
+	
+	public static BufferedImage getImage(File file) {
+		try {
+			return ImageIO.read(file);
+		} catch (IOException e) {
+			String error = Constants.getMessageJMERR17(e.getMessage());
+			JourneyMap.getLogger().severe(error);
+			return null;
+		}
+	}
 	
 	/**
 	 * Used by MapSaver, MapService to get a merged image for what the display needs

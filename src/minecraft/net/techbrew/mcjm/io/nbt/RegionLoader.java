@@ -12,43 +12,33 @@ import java.util.regex.Pattern;
 
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.Minecraft;
-import net.minecraft.src.WorldClient;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
-import net.techbrew.mcjm.data.DataCache;
-import net.techbrew.mcjm.data.EntityKey;
-import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.model.RegionCoord;
+import net.techbrew.mcjm.model.RegionImageCache;
 
 public class RegionLoader {
 	
 	private static final Pattern anvilPattern = Pattern.compile("r\\.([^\\.]+)\\.([^\\.]+)\\.mca");
 	
 	final Logger logger = JourneyMap.getLogger();	
-	final WorldClient worldClient;
-	final long worldHash;
+
+	final MapType mapType;
+	final Integer vSlice;
 	final Stack<RegionCoord> regions;
 	final int regionsFound;
-	final Integer vSlice;
 
-	File anvilDir;
-		
-	public RegionLoader(Minecraft minecraft, int dimension) throws IOException {
-		super();
-		this.worldClient = minecraft.theWorld;
-		this.worldHash = Utils.getWorldHash(minecraft);
-		final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
-		File worldDir = FileHandler.getMCWorldDir(minecraft);	
-		anvilDir = FileHandler.getAnvilRegionDirectory(worldDir, dimension);	
-		if(dimension!=0) {
-			anvilDir = new File(anvilDir, "region"); //$NON-NLS-1$
+	public RegionLoader(final Minecraft minecraft, final int dimension, final MapType mapType, final Integer vSlice) throws IOException {
+		this.mapType = mapType;		
+		this.vSlice = vSlice;
+		if(mapType==MapType.underground && (vSlice==null || vSlice==-1)) {
+			throw new IllegalArgumentException("Underground map requires vSlice");
 		}
-		vSlice = underground ? minecraft.thePlayer.chunkCoordY : null;
-		regions = findRegions(vSlice, dimension);
-		regionsFound = regions.size();
+		this.regions = findRegions(minecraft, vSlice, dimension);
+		this.regionsFound = regions.size();
 	}	
 	
 	public Iterator<RegionCoord> regionIterator() {
@@ -64,59 +54,57 @@ public class RegionLoader {
 	}
 	
 	public boolean isUnderground() {
-		return vSlice!=null && vSlice!=-1;
+		return mapType==MapType.underground;
 	}
 	
 	public Integer getVSlice() {
 		return vSlice;
 	}
 	
-	Stack<RegionCoord> findRegions(final Integer vSlice, final int dimension) {
+	Stack<RegionCoord> findRegions(final Minecraft mc, final Integer vSlice, final int dimension) {
 		
-	    if (!anvilDir.exists()) {
-	    	logger.warning("Anvil directory doesn't exist: " + anvilDir);
+	    final File mcWorldDir = FileHandler.getMCWorldDir(mc, dimension);	
+		final File regionDir = new File(mcWorldDir, "region");
+		if (!regionDir.exists() || regionDir.isFile()) {
+	    	logger.warning("MC world region directory doesn't exist: " + regionDir);
 	    	return null;
 	    }	        
 	    
-	    final Minecraft mc = Minecraft.getMinecraft();
-	    final File jmImageWorldDir = FileHandler.getJMWorldDir(mc, worldHash);		
+	    final File jmImageWorldDir = FileHandler.getJMWorldDir(mc, Utils.getWorldHash(mc));
 		final RegionImageHandler rfh = RegionImageHandler.getInstance();
-
-	    final File[] anvilFiles = anvilDir.listFiles();
-	    if (anvilFiles.length==0) {
-	    	logger.warning("Anvil directory doesn't contain any files: " + anvilDir);
-	    	return null;
-	    }
-	    
 	    final Stack<RegionCoord> stack = new Stack<RegionCoord>();
-	    MapType mapType = this.isUnderground() ? MapType.underground : MapType.day;
+	    	   
+	    RegionImageCache.getInstance().clear();
 	    
+	    int validFileCount = 0;
+	    int existingImageCount = 0;
+	    final File[] anvilFiles = regionDir.listFiles();
 		for (File anvilFile : anvilFiles) {
 			Matcher matcher = anvilPattern.matcher(anvilFile.getName());
 			if (!anvilFile.isDirectory() && matcher.matches()) {
+				validFileCount++;
 				String x = matcher.group(1);
 				String z = matcher.group(2);
 				if (x != null && z != null) {
-					RegionCoord rc = new RegionCoord(jmImageWorldDir, Integer.parseInt(x), vSlice, Integer.parseInt(z), dimension);
-					if(dimension==0) {
-						if(!rfh.getRegionImageFile(rc,mapType,false).exists()) {						
-							List<ChunkCoordIntPair> chunkCoords = rc.getChunkCoordsInRegion();
-							for(ChunkCoordIntPair coord : chunkCoords) {
-								if(ChunkLoader.getChunkFromDisk(coord.chunkXPos, coord.chunkZPos, anvilDir, mc.theWorld)!=null) {
-									stack.add(rc);
-									break;
-								}
-							}							
+					RegionCoord rc = new RegionCoord(jmImageWorldDir, Integer.parseInt(x), vSlice, Integer.parseInt(z), dimension);					
+					if(!rfh.getRegionImageFile(rc,mapType,false).exists()) {	
+						List<ChunkCoordIntPair> chunkCoords = rc.getChunkCoordsInRegion();
+						for(ChunkCoordIntPair coord : chunkCoords) {
+							if(ChunkLoader.getChunkFromDisk(coord.chunkXPos, coord.chunkZPos, mcWorldDir, mc.theWorld)!=null) {
+								stack.add(rc);
+								break;
+							}
 						}
 					} else {
-						stack.add(rc);
+						existingImageCount++;
 					}
 				}
 			}
 		}
-		if (stack.isEmpty()) {
-	    	logger.warning("No viable chunk data found among " + anvilFiles.length + " anvil files");
+		if (stack.isEmpty() && (validFileCount!=existingImageCount)) {
+	    	logger.warning("Anvil region files in " + regionDir + ": " + validFileCount + ", matching image files: " + existingImageCount + ", but found nothing to do for mapType " + mapType);
 	    }
+		
 		Collections.sort(stack);
 		return stack;
 	}

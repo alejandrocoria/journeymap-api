@@ -28,7 +28,7 @@ public class RegionCoord implements Comparable<RegionCoord>{
 		this.dimension = dimension;
 	}
 	
-	public int getXOffsetDay(int chunkX) {
+	public int getXOffset(int chunkX) {
 		if(chunkX>>SIZE!=regionX) {
 			throw new IllegalArgumentException("chunkX " + chunkX + " out of bounds for regionX " + regionX); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -39,11 +39,7 @@ public class RegionCoord implements Comparable<RegionCoord>{
 		return offset;
 	}
 	
-	public int getXOffsetNight(int chunkX) {
-		return getXOffsetDay(chunkX) + (chunkSqRt*16);
-	}
-	
-	public int getZOffsetDay(int chunkZ) {
+	public int getZOffset(int chunkZ) {
 		if(getRegionPos(chunkZ)!=regionZ) {
 			throw new IllegalArgumentException("chunkZ " + chunkZ + " out of bounds for regionZ " + regionZ); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -52,10 +48,6 @@ public class RegionCoord implements Comparable<RegionCoord>{
 			offset = (chunkSqRt*16) + offset;
 		}
 		return offset;
-	}
-	
-	public int getZOffsetNight(int chunkZ) {
-		return getZOffsetDay(chunkZ);
 	}
 	
 	public int getMinChunkX() {

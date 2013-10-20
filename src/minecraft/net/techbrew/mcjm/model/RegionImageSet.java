@@ -3,9 +3,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -61,14 +65,9 @@ public class RegionImageSet {
 			File legacyFile = RegionImageHandler.getRegionImageFileLegacy(rCoord);
 			if(legacyFile.exists()) {
 				
-				System.out.println("******** Using legacy region for " + rCoord);
-				
 				// Get image for wrapper from legacy
 				BufferedImage legacyImage = RegionImageHandler.readRegionImage(legacyFile, rCoord, 1, true);
 				wrapper.setImage(getSubimage(rCoord, mapType, legacyImage));
-				
-				// Add legacy wrapper
-				addWrapper(Constants.MapType.OBSOLETE, legacyFile, null);
 				
 				// Add other wrappers for day/night
 				if(mapType==Constants.MapType.day) {
@@ -76,6 +75,9 @@ public class RegionImageSet {
 				} else if(mapType==Constants.MapType.night) {
 					addWrapperFromLegacy( Constants.MapType.day, legacyImage);
 				}			
+				
+				// Add legacy wrapper
+				addWrapper(Constants.MapType.OBSOLETE, legacyFile, null);
 				
 			}			
 			return wrapper;	
@@ -101,41 +103,21 @@ public class RegionImageSet {
 		synchronized(lock) {
 			Graphics2D g2d;			
 			int x,z;				
-			if(!cCoord.isUnderground()) {			
-				insertChunkDay(cCoord, chunkImage);
-				insertChunkNight(cCoord, chunkImage);				
+			if(cCoord.isUnderground()) {			
+				insertChunk(cCoord, chunkImage, MapType.underground);			
 			} else {			
-				insertChunkUnderground(cCoord, chunkImage);
+				insertChunk(cCoord, chunkImage, MapType.day);
+				insertChunk(cCoord, chunkImage, MapType.night);	
 			}		
 		}
 	}
-	
-	private void insertChunkDay(ChunkCoord cCoord, BufferedImage chunkImage) {
-		final Wrapper wrapper = getWrapper(MapType.day);		
-		final int x = cCoord.getXOffsetDay();
-		final int z = cCoord.getZOffsetDay();
+
+	private void insertChunk(ChunkCoord cCoord, BufferedImage chunkImage, MapType mapType) {
+		final Wrapper wrapper = getWrapper(mapType);		
+		final int x = cCoord.getXOffset();
+		final int z = cCoord.getZOffset();
 		final Graphics2D g2d = wrapper.getImage().createGraphics();	
 		g2d.drawImage(chunkImage, x, z, x+16, z+16, 0,0,16,16, null);
-		g2d.dispose();
-		wrapper.setDirty();
-	}
-	
-	private void insertChunkNight(ChunkCoord cCoord, BufferedImage chunkImage) {
-		final Wrapper wrapper = getWrapper(MapType.night);		
-		final int x = cCoord.getXOffsetDay();
-		final int z = cCoord.getZOffsetDay();
-		final Graphics2D g2d = wrapper.getImage().createGraphics();	
-		g2d.drawImage(chunkImage, x, z, x+16, z+16, 16,0,32,16, null);
-		g2d.dispose();
-		wrapper.setDirty();
-	}
-	
-	private void insertChunkUnderground(ChunkCoord cCoord, BufferedImage chunkImage) {
-		final Wrapper wrapper = getWrapper(MapType.underground);		
-		final int x = cCoord.getXOffsetUnderground();
-		final int z = cCoord.getZOffsetUnderground();
-		final Graphics2D g2d = wrapper.getImage().createGraphics();	
-		g2d.drawImage(chunkImage, x, z, x+16, z+16, 0,0,16,16,  null);
 		g2d.dispose();
 		wrapper.setDirty();
 	}
@@ -160,7 +142,9 @@ public class RegionImageSet {
 	
 	public void writeToDisk(boolean force) {
 		synchronized(lock) {
-			for(Wrapper wrapper: imageWrappers.values()) {
+			List<Wrapper> list = new ArrayList<Wrapper>(imageWrappers.values());
+			Collections.sort(list, new WrapperComparator());
+			for(Wrapper wrapper: list) {
 				if(force || wrapper.isDirty()) {
 					wrapper.writeToDisk();					
 				}
@@ -176,6 +160,17 @@ public class RegionImageSet {
 			}
 		}
 		return false;
+	}
+	
+	public void loadLegacyNormal(File legacyFile) {
+		if(legacyFile.exists()) {
+			BufferedImage legacyImage = RegionImageHandler.getImage(legacyFile);	
+			addWrapperFromLegacy(Constants.MapType.day, legacyImage);
+			addWrapperFromLegacy(Constants.MapType.night, legacyImage);
+			addWrapper(Constants.MapType.OBSOLETE, legacyFile, null);
+		} else {
+			throw new IllegalStateException("legacy file doesn't exist: " + legacyFile);
+		}
 	}
 	
 	private BufferedImage getSubimage(RegionCoord rCoord, MapType mapType, BufferedImage image) {
@@ -255,6 +250,9 @@ public class RegionImageSet {
 		Wrapper(Constants.MapType mapType, File imageFile, BufferedImage image) {
 			this.mapType = mapType;
 			this.imageFile = imageFile;
+			if(imageFile.getParentFile().getName().equals("8")) {
+				JourneyMap.getLogger().info("hm!");
+			}
 			_image = image;
 			if(mapType!=MapType.OBSOLETE && image==null) {
 				_dirty=false;
@@ -286,8 +284,7 @@ public class RegionImageSet {
 			try {
 				if(mapType==Constants.MapType.OBSOLETE) {
 					if(imageFile.exists()) {
-						imageFile.delete();
-						System.out.println("PURGED legacy region for " + rCoord);						
+						imageFile.delete();						
 					}
 					return;
 				}			
@@ -295,15 +292,17 @@ public class RegionImageSet {
 				if(_image==null) {
 					JourneyMap.getLogger().warning("Null image for " + this);
 				} else {
-			    	if(!imageFile.canRead()) {
-			    		imageFile.mkdirs();
+					File dir = imageFile.getParentFile();
+			    	if(!dir.exists()) {
+			    		dir.mkdirs();
 			    	}
-					ImageIO.write(_image, "png", imageFile);
+					ImageIO.write(_image, "png", new FileOutputStream(imageFile));
 					_dirty = false;
 				}
 		    } catch (Throwable e) {
 		    	String error = Constants.getMessageJMERR22(imageFile, LogFormatter.toString(e));
 				JourneyMap.getLogger().severe(error);
+				throw new RuntimeException(e);
 		    } 
 		}
 		
@@ -312,6 +311,13 @@ public class RegionImageSet {
 			return mapType.name() + delim + imageFile.getPath() + delim + "image=" + (_image==null ? "null" : "ok") + "dirty=" + _dirty;
 		}
 
+	}
+	
+	class WrapperComparator implements Comparator<Wrapper> {
+		@Override
+		public int compare(Wrapper o1, Wrapper o2) {
+			return o1.mapType.compareTo(o2.mapType);
+		}
 	}
 
 }

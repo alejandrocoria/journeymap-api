@@ -38,30 +38,12 @@ public class ChunkCoord {
 		return rCoord;
 	}
 	
-	public int getXOffsetDay() {
-		return getRegionCoord().getXOffsetDay(chunkX);
+	public int getXOffset() {
+		return getRegionCoord().getXOffset(chunkX);
 	}
 	
-	public int getZOffsetDay() {
-		return getRegionCoord().getZOffsetDay(chunkZ);
-	}
-	
-	@Deprecated
-	public int getXOffsetNight() {
-		return getRegionCoord().getXOffsetNight(chunkX);
-	}
-	
-	@Deprecated
-	public int getZOffsetNight() {
-		return getRegionCoord().getZOffsetNight(chunkZ);
-	}
-	
-	public int getXOffsetUnderground() {		
-		return getRegionCoord().getXOffsetDay(chunkX);
-	}
-	
-	public int getZOffsetUnderground() {
-		return getRegionCoord().getZOffsetDay(chunkZ);
+	public int getZOffset() {
+		return getRegionCoord().getZOffset(chunkZ);
 	}
 	
 	public Boolean isUnderground() {
