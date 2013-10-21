@@ -263,6 +263,9 @@ public class RegionImageHandler {
 		start = System.currentTimeMillis();
 
 		boolean isUnderground = mapType.equals(Constants.MapType.underground);
+		if(!isUnderground) {
+			vSlice = null;
+		}
 		
 		BufferedImage mergedImg = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2D = mergedImg.createGraphics();

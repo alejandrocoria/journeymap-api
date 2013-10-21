@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.DynamicTexture;
 import net.minecraft.src.Minecraft;
+import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.io.RegionImageHandler;
@@ -38,7 +39,7 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 	}
 
 	/**
-	 * Render list of entities.
+	 * Render map tiles
 	 */
 	@Override
 	public void render(MapOverlayState state, Graphics2D unused) {
@@ -53,11 +54,12 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 	
 				final int dimension = mc.thePlayer.dimension;
 	
-				int size = getTextureSize();				
+				int size = getTextureSize();			
+				Integer vSlice = (state.getMapType()==MapType.underground) ? mc.thePlayer.chunkCoordY : null;
 				BufferedImage tmpMapImg = RegionImageHandler.getMergedChunks(state.getWorldDir(), 
 						startCoords.chunkXPos, startCoords.chunkZPos, 
 						endCoords.chunkXPos, endCoords.chunkZPos, 
-						state.getMapType(), mc.thePlayer.chunkCoordY, dimension, true, state.getCurrentZoom(),
+						state.getMapType(), vSlice, dimension, true, state.getCurrentZoom(),
 						size, size);
 				
 				eraseCachedImg();

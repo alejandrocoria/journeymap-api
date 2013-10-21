@@ -767,6 +767,10 @@ public class MapOverlay extends GuiScreen {
 			//playerLastPos = getCanvasWidth() + "x" + getCanvasHeight() + " mapTex size: " + lastMapRenderer.getTextureSize() + " entTex size: " + lastEntityRenderer.getTextureSize();
 			//playerLastPos = mc.displayWidth + "x" + mc.displayHeight + " vs " + getCanvasWidth() + "x" + getCanvasHeight() + " mapTex size: " + lastMapRenderer.getTextureSize() + " entTex size: " + lastEntityRenderer.getTextureSize();
 							
+			if(g2D!=null) {
+				g2D.dispose();
+			}
+			
 			// Reset timer
 			lastRefresh = System.currentTimeMillis();
 		}
