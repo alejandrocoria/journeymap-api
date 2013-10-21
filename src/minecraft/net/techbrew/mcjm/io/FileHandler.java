@@ -24,8 +24,11 @@ public class FileHandler {
 	public static volatile File lastWorldDir;
 	
 	public static File getMCWorldDir(Minecraft minecraft) {
-		File dir = new File(minecraft.mcDataDir, "saves" + File.separator + minecraft.getIntegratedServer().getFolderName());
-		if(dir.exists()) {
+		File dir = null;
+		if(minecraft.isIntegratedServerRunning()) {
+			dir = new File(minecraft.mcDataDir, "saves" + File.separator + minecraft.getIntegratedServer().getFolderName());
+		}
+		if(dir!=null && dir.exists()) {
 			return dir;
 		} else {
 			return null;

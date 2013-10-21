@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -119,7 +120,12 @@ public class TaskThread implements Runnable {
 				if(chunkStub.doMap) {
 					BufferedImage chunkImage = renderController.getChunkImage(chunkStub, underground, vSlice, chunkStubs);
 					ChunkCoord cCoord = ChunkCoord.fromChunkStub(jmWorldDir, chunkStub, vSlice, dimension);
-					chunkImageCache.put(cCoord, chunkImage);					
+					if(underground) {
+						chunkImageCache.put(cCoord, MapType.underground, chunkImage);
+					} else {
+						chunkImageCache.put(cCoord, MapType.day, getSubimage(MapType.day, chunkImage));
+						chunkImageCache.put(cCoord, MapType.night, getSubimage(MapType.night, chunkImage));
+					}
 				}
 			}
 			
@@ -129,8 +135,8 @@ public class TaskThread implements Runnable {
 			}
 	
 			// Push chunk cache to region cache			
-			int chunks = chunkImageCache.getEntries().size();
-			RegionImageCache.getInstance().putAll(chunkImageCache.getEntries(), flushImagesToDisk);			
+			int chunks = chunkImageCache.size();
+			RegionImageCache.getInstance().putAll(chunkImageCache.values(), flushImagesToDisk);			
 
 			if(threadLogging) {
 				logger.fine(task.getClass().getSimpleName() + " mapped " + chunks + " chunks in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start) + "ms with flush:" + flushImagesToDisk); //$NON-NLS-1$ //$NON-NLS-2$
@@ -158,6 +164,18 @@ public class TaskThread implements Runnable {
 			String error = Constants.getMessageJMERR16(t.getMessage());
 			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));			
 		} 
+	}
+	
+	private BufferedImage getSubimage(MapType mapType, BufferedImage image) {
+		if(image==null) return null;
+		switch(mapType) {
+			case night: {
+				return image.getSubimage(16, 0, 16, 16);
+			}
+			default: {
+				return image.getSubimage(0, 0, 16, 16);
+			}
+		}
 	}
 	
 }

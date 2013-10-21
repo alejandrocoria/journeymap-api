@@ -2,11 +2,11 @@ package net.techbrew.mcjm.model;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -79,16 +79,15 @@ public class RegionImageCache  {
 		return ris.getImage(mapType);
 	}
 	
-	public void putAll(final Set<Map.Entry<ChunkCoord, BufferedImage>> chunkImageEntries, boolean forceFlush) {
+	public void putAll(final Collection<ChunkImageSet> chunkImageSets, boolean forceFlush) {
 		final RegionImageHandler rfh = RegionImageHandler.getInstance();
 		synchronized(lock) {
-			for(Map.Entry<ChunkCoord, BufferedImage> entry : chunkImageEntries) {
-				final ChunkCoord cCoord = entry.getKey();
-				final RegionCoord rCoord = cCoord.getRegionCoord();
-				final BufferedImage chunkImage = entry.getValue();
+			for(ChunkImageSet cis : chunkImageSets) {
+				final ChunkCoord cCoord = cis.getCCoord();
+				final RegionCoord rCoord = cis.getCCoord().getRegionCoord();
 				final RegionImageSet ris = getRegionImageSet(rCoord);
 				if(ris.hasLegacy()) ris.writeToDisk(true);
-				ris.insertChunk(cCoord, chunkImage);
+				ris.insertChunk(cis);
 			}
 			if(forceFlush) {
 				flushToDisk();

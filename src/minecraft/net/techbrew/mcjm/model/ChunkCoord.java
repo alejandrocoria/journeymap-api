@@ -38,14 +38,6 @@ public class ChunkCoord {
 		return rCoord;
 	}
 	
-	public int getXOffset() {
-		return getRegionCoord().getXOffset(chunkX);
-	}
-	
-	public int getZOffset() {
-		return getRegionCoord().getZOffset(chunkZ);
-	}
-	
 	public Boolean isUnderground() {
 		return vSlice!=null ? vSlice!=-1 : false;
 	}
