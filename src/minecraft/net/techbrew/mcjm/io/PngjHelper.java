@@ -27,7 +27,7 @@ public class PngjHelper {
 	 * 
 	 * Original: https://code.google.com/p/pngj/wiki/Snippets
 	 */
-	public static void mergeFiles(File tiles[], File destFile, int tileColumns, int xOffset, int xWidth) {
+	public static void mergeFiles(File tiles[], File destFile, int tileColumns, int xWidth) {
 	    int ntiles = tiles.length;
 	    int tileRows = (ntiles + tileColumns - 1) / tileColumns; // integer ceil
 	    
@@ -65,7 +65,7 @@ public class PngjHelper {
 	                int len = xWidth * imi1.bytesPixel;
 	                
 	                int[] src = line1.scanline;
-                	int srcPos = xOffset * imi1.bytesPixel;	                	
+                	int srcPos = 0; // xOffset * imi1.bytesPixel;	                	
                 	int[] dest = line2.scanline;
                 	int destPos = (len*tx);
                 	int length = len;

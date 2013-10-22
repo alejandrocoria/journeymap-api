@@ -5,10 +5,11 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
@@ -34,73 +35,98 @@ public class MapSaver {
 	 * 
 	 * @param worldDir
 	 * @param mapType
-	 * @param chunkY
+	 * @param vSlice
 	 * @param cType
 	 * @return
 	 * @throws IOException
 	 * @throws java.lang.OutOfMemoryError
 	 */
-	public static synchronized File lightWeightSaveMap(final File worldDir, final Constants.MapType mapType, final Integer chunkY, final int dimension) {
+	public static synchronized File saveMap(final File worldDir, final Constants.MapType mapType, final Integer vSlice, final int dimension) {
 		
 		File mapFile = null;
 		
 		try {
 		
-		// Ensure latest regions are flushed to disk
-		RegionImageCache.getInstance().flushToDisk();
-		
-		long start = 0, stop = 0;
-		start = System.currentTimeMillis();
-		
-		Integer x1=null;
-		Integer x2=null;
-		Integer z1=null;
-		Integer z2=null;
-		
-		// Find all legacy region files
-		FilenameFilter ff = new RegionImageHandler.RegionFileFilter(Constants.CoordType.convert(dimension));
-		List<File> foundFiles = Arrays.asList(worldDir.listFiles(ff));
-		
-		// Find all new region files
-		ff = new RegionImageHandler.RegionFileFilter();
-		foundFiles.addAll(Arrays.asList(RegionImageHandler.getDimensionDir(worldDir, dimension).listFiles(ff)));
-		
-		//System.out.println("Found region files: " + foundFiles.length); //$NON-NLS-1$
+			// Ensure latest regions are flushed to disk
+			RegionImageCache.getInstance().flushToDisk();
+			
+			long start = 0, stop = 0;
+			start = System.currentTimeMillis();
+			
+			// Fake coord gets us to the image directory
+			RegionCoord fakeRc = new RegionCoord(worldDir, 0, vSlice, 0, dimension);
+			File imageDir = RegionImageHandler.getImageDir(fakeRc, mapType);
+			File[] pngFiles = imageDir.listFiles();
+			
+			final Pattern tilePattern = Pattern.compile("([^\\.]+)\\,([^\\.]+)\\.png");
+			Integer minX=null, minZ=null, maxX=null, maxZ=null;
 
-		for(File file : foundFiles) {
-			String segment = file.getName().split("_")[0]; //$NON-NLS-1$
-			String[] xz = segment.split(","); //$NON-NLS-1$
-			Integer x = Integer.parseInt(xz[0]);
-			Integer z = Integer.parseInt(xz[1]);
-			int rx1 = RegionCoord.getMinChunkX(x);
-			int rx2 = RegionCoord.getMaxChunkX(x);
-			int rz1 = RegionCoord.getMinChunkZ(z);
-			int rz2 = RegionCoord.getMaxChunkZ(z);
-			if(x1==null || rx1<x1) x1 = rx1;			
-			if(x2==null || rx2>x2) x2 = rx2;
-			if(z1==null || rz1<z1) z1 = rz1;
-			if(z2==null || rz2>z2) z2 = rz2;
-		}
-		
-		//System.out.println("Final chunk coordinates: " + x1 + "," + z1 + " to " + x2 + "," + z2);  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		
-		if(x1==null || x2==null || z1==null ||z2==null ) {
-			JourneyMap.getLogger().warning("No region files to save.");
-			return null;
-		}
-		
-		final File saveDir = FileHandler.getJourneyMapDir();
-		
-		JourneyMap.getInstance().announce(Constants.getString("MapOverlay.saving_map_to_file", Constants.CoordType.convert(dimension) + " " + mapType)); //$NON-NLS-1$
-		
-		mapFile = createMapFile(WorldData.getWorldName(Minecraft.getMinecraft()) + "_" + dimension + "_" + mapType);
+			for(File file : pngFiles) {
+				Matcher matcher = tilePattern.matcher(file.getName());
+				if(matcher.matches()) {
+					Integer x = Integer.parseInt(matcher.group(1));
+					Integer z = Integer.parseInt(matcher.group(2));
+					if(minX==null || x<minX) minX = x;
+					if(minZ==null || z<minZ) minZ = z;
+					if(maxX==null || x>maxX) maxX = x;
+					if(maxZ==null || z>maxZ) maxZ = z;
+				}
+			}
+	
+			if(minX==null || maxX==null || minZ==null ||maxZ==null ) {
+				JourneyMap.getLogger().warning("No region files to save.");
+				return null;
+			}
+			
+			JourneyMap.getInstance().announce(Constants.getString("MapOverlay.saving_map_to_file", Constants.CoordType.convert(dimension) + " " + mapType)); //$NON-NLS-1$
+			
+			// Save to screenshots directory
+			File screenshotsDir = new File(Minecraft.getMinecraft().mcDataDir, "screenshots");
+			if(!screenshotsDir.exists()) {
+				screenshotsDir.mkdir();
+			}
+			
+			// Generate save file name
+			final Minecraft mc = Minecraft.getMinecraft();
+	        final String date = dateFormat.format(new Date());
+	        final boolean isUnderground = mapType.equals(Constants.MapType.underground);
+	        final StringBuilder sb = new StringBuilder(date).append("_");
+	        sb.append(WorldData.getWorldName(mc)).append("_");
+	        sb.append(mc.theWorld.provider.getDimensionName()).append("_");
+	        if(isUnderground) {
+	        	sb.append("slice").append(vSlice);
+	        } else {
+	        	sb.append(mapType);
+	        }
+	        sb.append(".png");	        
+	        mapFile = new File(screenshotsDir, sb.toString());
 				
-		RegionImageHandler.getMergedChunksFile(worldDir, x1, z1, x2, z2, mapType, chunkY, dimension, mapFile);
-		
-		stop = System.currentTimeMillis();
-		
-		JourneyMap.getLogger().info("Map saved in: " + (stop-start) + "ms: " + mapFile); //$NON-NLS-1$ //$NON-NLS-2$
-		JourneyMap.getInstance().announce(Constants.getString("MapSaver.map_saved", mapFile)); //$NON-NLS-1$
+
+			// Assemble region files into ordered array			
+			final ArrayList<File> files = new ArrayList<File>( ((maxX-minX)+1) * ((maxZ-minZ)+1) );
+			File rfile;
+			RegionCoord rc;
+			
+			for(int rz=minZ;rz<=maxZ;rz++) {
+				for(int rx=minX;rx<=maxX;rx++) {			
+					rc = new RegionCoord(worldDir, rx, vSlice, rz, dimension);
+					rfile = RegionImageHandler.getRegionImageFile(rc, mapType, true);
+					if(rfile.canRead()) {
+						files.add(rfile);
+					} else {						
+						files.add(RegionImageHandler.getBlank512x512ImageFile());
+					} 
+					
+				}
+			}
+			
+			File[] fileArray = files.toArray(new File[files.size()]);			
+			PngjHelper.mergeFiles(fileArray, mapFile, (maxX-minX)+1, 512);
+			
+			stop = System.currentTimeMillis();
+			
+			JourneyMap.getLogger().info("Map saved in: " + (stop-start) + "ms: " + mapFile); //$NON-NLS-1$ //$NON-NLS-2$
+			JourneyMap.getInstance().announce(Constants.getString("MapSaver.map_saved", mapFile)); //$NON-NLS-1$
 		
 		
 		} catch (java.lang.OutOfMemoryError e) {
@@ -119,23 +145,28 @@ public class MapSaver {
 		
 	}
 	
-	/**
-	 * Create a file handle in the screenshots folder, using the same
-	 * dateFormat that MC's ScreenshotHelper uses.
-	 * 
-	 * @param suffix
-	 * @return
-	 */
-	private static File createMapFile(String suffix)
-    {
-		File screenshots = new File(Minecraft.getMinecraft().mcDataDir, "screenshots");
-		if(!screenshots.exists()) {
-			screenshots.mkdir();
-		}
-		
-        String date = dateFormat.format(new Date());
-        return new File(screenshots, date + "_" + suffix + ".png");
 
-    }
+	static class CoordFinder implements FilenameFilter {
+		
+		final Pattern tilePattern = Pattern.compile("([^\\.]+)\\,([^\\.]+)\\.png");
+		Integer minX=null, minZ=null, maxX=null, maxZ=null;
+		int found = 0;
+
+		@Override
+		public boolean accept(File dir, String name) {
+			Matcher matcher = tilePattern.matcher(name);
+			if(matcher.matches()) {
+				Integer x = Integer.parseInt(matcher.group(1));
+				Integer z = Integer.parseInt(matcher.group(2));
+				if(minX==null || x<minX) minX = x;
+				if(minZ==null || z<minZ) minZ = z;
+				if(maxX==null || x>maxX) maxX = x;
+				if(maxZ==null || z>maxZ) maxZ = z;
+				found++;
+				return true;
+			} else {
+				return false;
+			}
+	}};
 	
 }

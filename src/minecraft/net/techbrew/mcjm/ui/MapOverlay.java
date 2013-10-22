@@ -849,7 +849,7 @@ public class MapOverlay extends GuiScreen {
 			@Override
 			public void run() {							
 				try {			
-					new MapSaver().lightWeightSaveMap(worldDir, useMapType, vSlice , mc.thePlayer.dimension);
+					new MapSaver().saveMap(worldDir, useMapType, vSlice , mc.thePlayer.dimension);
 				} catch (java.lang.OutOfMemoryError e) {
 					String error = Constants.getMessageJMERR18("Out Of Memory: Increase Java Heap Size for Minecraft to save large maps.");
 					JourneyMap.getInstance().announce(error, Level.SEVERE);

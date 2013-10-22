@@ -86,7 +86,7 @@ public class SaveMapService extends BaseService {
 			}			
 
 			// Get image
-			File mapFile = MapSaver.lightWeightSaveMap(worldDir, mapType, depth, dimension);	
+			File mapFile = MapSaver.saveMap(worldDir, mapType, depth, dimension);	
 					
 			// Set response headers
 			ResponseHeader.on(event).noCache().content(mapFile);			

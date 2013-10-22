@@ -8,13 +8,12 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
@@ -153,7 +152,7 @@ public class RegionImageHandler {
 		return isBlank;
 	}
 	
-	private static BufferedImage createBlankImage(int width, int height) {
+	static BufferedImage createBlankImage(int width, int height) {
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2D = img.createGraphics();
 		return img;
@@ -324,95 +323,22 @@ public class RegionImageHandler {
 
 	}
 	
-	
-	/**
-	 * Used by MapSaver
-	 * @param worldDir
-	 * @param x1
-	 * @param z1
-	 * @param x2
-	 * @param z2
-	 * @param mapType
-	 * @param vSlice
-	 * @throws IOException
-	 */
-	public static synchronized File getMergedChunksFile(File worldDir, int x1, int z1, int x2, int z2, 
-			Constants.MapType mapType, Integer vSlice, int dimension, File mapFile)
-			throws IOException {
-
-		long start = 0, stop = 0;		
-		if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
-			start = System.currentTimeMillis();
-		}
-
-		boolean isUnderground = mapType.equals(Constants.MapType.underground);
-
-		// Merge chunk images
-		RegionImageHandler rfh = RegionImageHandler.getInstance();
-		
-		// Get region coords
-		final int rx1=RegionCoord.getRegionPos(x1);
-		final int rz1=RegionCoord.getRegionPos(z1);
-		final int rx2=RegionCoord.getRegionPos(x2);
-		final int rz2=RegionCoord.getRegionPos(z2);
-		
-		// Get region files
-		RegionCoord rc;
-		File rfile;
-		ArrayList<File> files = new ArrayList<File>();
-		
-		for(int rz=rz1;rz<=rz2;rz++) {
-			for(int rx=rx1;rx<=rx2;rx++) {			
-				rc = new RegionCoord(worldDir, rx, vSlice, rz, dimension);
-				rfile = getRegionImageFile(rc, mapType, true);
-				if(!rfile.exists()) {
-//					BufferedImage image;
-//					image = createBlankImage();				
-//					try {
-//						ImageIO.write(image, "png", rfile);
-//					} catch(IOException e) {
-//						JourneyMap.getInstance().announce(Constants.getMessageJMERR22(rfile, LogFormatter.toString(e)), Level.SEVERE);
-//					}
-				} else {
-					files.add(rfile);
-				}
+	public static File getBlank512x512ImageFile() {
+		final File dataDir = new File(Minecraft.getMinecraft().mcDataDir, Constants.DATA_DIR);
+		final File tmpFile = new File(dataDir, "blank512x512.png");
+		if(!tmpFile.canRead()) {
+			BufferedImage image;
+			image = createBlankImage(512,512);				
+			try {
+				dataDir.mkdirs();
+				ImageIO.write(image, "png", tmpFile);
+				tmpFile.setReadOnly();
+				tmpFile.deleteOnExit();
+			} catch(IOException e) {
+				JourneyMap.getLogger().severe(Constants.getMessageJMERR22(tmpFile, LogFormatter.toString(e)));
 			}
 		}
-		
-		File[] fileArray = files.toArray(new File[files.size()]);
-		
-		int xOffset = (mapType==MapType.night) ? 512 : 0;
-		PngjHelper.mergeFiles(fileArray, mapFile, rx2-rx1+1, xOffset, 512);
-				
-		if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
-			stop = System.currentTimeMillis();
-			JourneyMap.getLogger().fine("getMergedChunks time: "  + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		
-		return mapFile;
-
+		return tmpFile;
 	}
-	
-	// TODO: Update for new directory structure 
-	public static class RegionFileFilter implements FilenameFilter {
-		
-		final String regionName;
-		
-		public RegionFileFilter() {
-			regionName = ".png";
-			JourneyMap.getLogger().warning("!!NOT IMPLEMENTED!!");
-		}
-		
-		@Deprecated
-		public RegionFileFilter(final Constants.CoordType cType) {
-			regionName = RegionImageHandler.getRegionFileSuffix(cType);
-		}
-		
-		@Override
-		public boolean accept(File arg0, String arg1) {
-			return arg1.endsWith(regionName);
-		}	
-	}
-
 	
 }

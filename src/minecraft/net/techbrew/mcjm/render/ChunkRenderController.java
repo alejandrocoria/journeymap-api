@@ -1,6 +1,5 @@
 package net.techbrew.mcjm.render;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -122,9 +121,9 @@ public class ChunkRenderController {
 		if(blankChunkImage==null) {
 			blankChunkImage = new BufferedImage(32, 16, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2D = blankChunkImage.createGraphics();
-			g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .1F));
-			g2D.setColor(Color.black);
-			g2D.fillRect(0, 0, 1, 1);
+			g2D.setComposite(MapBlocks.CLEAR);
+			g2D.setColor(Color.white);
+			g2D.fillRect(0, 0, 32, 16);
 			g2D.dispose();
 		}
 		return blankChunkImage;
@@ -134,9 +133,9 @@ public class ChunkRenderController {
 		if(blankChunkImageUnderground==null) {
 			blankChunkImageUnderground = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2D = blankChunkImageUnderground.createGraphics();
-			g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .1F));
-			g2D.setColor(Color.black);
-			g2D.fillRect(0, 0, 1, 1);
+			g2D.setComposite(MapBlocks.CLEAR);
+			g2D.setColor(Color.white);
+			g2D.fillRect(0, 0, 16, 16);
 			g2D.dispose();
 		}
 		return blankChunkImageUnderground;

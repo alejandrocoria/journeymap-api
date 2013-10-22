@@ -114,7 +114,7 @@ public class RegionImageSet extends ImageSet {
 		if(image==null) return null;
 		switch(mapType) {
 			case night: {
-				return copyImage(image.getSubimage(511, 0, 512, 512));
+				return copyImage(image.getSubimage(512, 0, 512, 512));
 			}
 			default: {
 				return copyImage(image.getSubimage(0, 0, 512, 512));
