@@ -119,7 +119,7 @@ public class EntityHelper {
 	public static BufferedImage getEntityImage(String filename) {
 		BufferedImage img = entityImageMap.get(filename);
 		if(img==null) {
-			img = FileHandler.getImage("entity/" + filename);	//$NON-NLS-1$ //$NON-NLS-2$
+			img = FileHandler.getWebImage("entity/" + filename);	//$NON-NLS-1$ //$NON-NLS-2$
 			if(img==null) {				
 				img = getUnknownImage(); // fall back to unknown image
 			}			
@@ -135,7 +135,7 @@ public class EntityHelper {
 	 */
 	public static BufferedImage getHostileLocator() {
 		if(locatorHostile==null) {
-			locatorHostile = FileHandler.getImage("locator-hostile.png"); //$NON-NLS-1$			
+			locatorHostile = FileHandler.getWebImage("locator-hostile.png"); //$NON-NLS-1$			
 		}
 		return locatorHostile;
 	}
@@ -146,7 +146,7 @@ public class EntityHelper {
 	 */
 	public static BufferedImage getNeutralLocator() {
 		if(locatorNeutral==null) {
-			locatorNeutral = FileHandler.getImage("locator-neutral.png"); //$NON-NLS-1$			
+			locatorNeutral = FileHandler.getWebImage("locator-neutral.png"); //$NON-NLS-1$			
 		}
 		return locatorNeutral;
 	}
@@ -157,7 +157,7 @@ public class EntityHelper {
 	 */
 	public static BufferedImage getOtherLocator() {
 		if(locatorOther==null) {
-			locatorOther = FileHandler.getImage("locator-other.png"); //$NON-NLS-1$			
+			locatorOther = FileHandler.getWebImage("locator-other.png"); //$NON-NLS-1$			
 		}
 		return locatorOther;
 	}
@@ -168,7 +168,7 @@ public class EntityHelper {
 	 */
 	public static BufferedImage getPetLocator() {
 		if(locatorPet==null) {
-			locatorPet = FileHandler.getImage("locator-pet.png"); //$NON-NLS-1$			
+			locatorPet = FileHandler.getWebImage("locator-pet.png"); //$NON-NLS-1$			
 		}
 		return locatorPet;
 	}
@@ -179,7 +179,7 @@ public class EntityHelper {
 	 */
 	public static BufferedImage getPlayerImage() {
 		if(locatorPlayer==null) {
-			locatorPlayer = FileHandler.getImage("locator-player.png"); //$NON-NLS-1$	
+			locatorPlayer = FileHandler.getWebImage("locator-player.png"); //$NON-NLS-1$	
 		}
 		return locatorPlayer;
 	}
@@ -189,7 +189,7 @@ public class EntityHelper {
 	 * @return
 	 */
 	public static BufferedImage getUnknownImage() {
-		return FileHandler.getImage("entity/unknown.png");
+		return FileHandler.getWebImage("entity/unknown.png");
 	}
 	
 	

@@ -413,7 +413,4 @@ public class ChunkStub {
 				+ ", doMap=" + doMap + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
-	
-	
-	
 }

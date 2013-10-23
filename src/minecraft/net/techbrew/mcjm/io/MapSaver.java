@@ -1,7 +1,6 @@
 package net.techbrew.mcjm.io;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -144,29 +143,5 @@ public class MapSaver {
 		return mapFile;
 		
 	}
-	
 
-	static class CoordFinder implements FilenameFilter {
-		
-		final Pattern tilePattern = Pattern.compile("([^\\.]+)\\,([^\\.]+)\\.png");
-		Integer minX=null, minZ=null, maxX=null, maxZ=null;
-		int found = 0;
-
-		@Override
-		public boolean accept(File dir, String name) {
-			Matcher matcher = tilePattern.matcher(name);
-			if(matcher.matches()) {
-				Integer x = Integer.parseInt(matcher.group(1));
-				Integer z = Integer.parseInt(matcher.group(2));
-				if(minX==null || x<minX) minX = x;
-				if(minZ==null || z<minZ) minZ = z;
-				if(maxX==null || x>maxX) maxX = x;
-				if(maxZ==null || z>maxZ) maxZ = z;
-				found++;
-				return true;
-			} else {
-				return false;
-			}
-	}};
-	
 }

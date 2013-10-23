@@ -58,7 +58,7 @@ public abstract class BaseService extends Service {
 		txt("text/plain; charset=utf-8"), //$NON-NLS-1$
 		UNKNOWN("application/x-unknown"); //$NON-NLS-1$
 				
-		private String mime;
+		private final String mime;
 		
 		private ContentType(String mime) {
 			this.mime = mime;
@@ -172,7 +172,7 @@ public abstract class BaseService extends Service {
 	 * @param defaultValue
 	 * @return
 	 */
-	protected int getParameter(Map<String, String[]> map, String key, int defaultValue) {
+	protected Integer getParameter(Map<String, String[]> map, String key, Integer defaultValue) {
 		Object val = map.get(key);
 		Integer intVal = null;
 		if(val!=null) {

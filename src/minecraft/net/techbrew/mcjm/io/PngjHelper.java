@@ -9,7 +9,6 @@ import ar.com.hjg.pngj.ImageInfo;
 import ar.com.hjg.pngj.ImageLine;
 import ar.com.hjg.pngj.PngReader;
 import ar.com.hjg.pngj.PngWriter;
-import ar.com.hjg.pngj.chunks.ChunkCopyBehaviour;
 import ar.com.hjg.pngj.chunks.ChunkLoadBehaviour;
 
 /**
@@ -27,63 +26,65 @@ public class PngjHelper {
 	 * 
 	 * Original: https://code.google.com/p/pngj/wiki/Snippets
 	 */
-	public static void mergeFiles(File tiles[], File destFile, int tileColumns, int xWidth) {
-	    int ntiles = tiles.length;
-	    int tileRows = (ntiles + tileColumns - 1) / tileColumns; // integer ceil
+	public static void mergeFiles(final File tiles[], final File destFile, final int tileColumns, final int tileSize) {
+	    final int ntiles = tiles.length;
+	    final int tileRows = (ntiles + tileColumns - 1) / tileColumns; // integer ceil
+	    final PngReader[] readers = new PngReader[tileColumns];
+	    final ImageInfo destImgInfo = new ImageInfo(tileSize * tileColumns, tileSize * tileRows, 8, true); // bitdepth, alpha
+	    final PngWriter pngw = FileHelper.createPngWriter(destFile, destImgInfo, true);	  
+	    pngw.getMetadata().setText("Author", "JourneyMap" + JourneyMap.JM_VERSION);
+	    pngw.getMetadata().setText("Comment", JourneyMap.WEBSITE_URL);
 	    
-	    // 1:small tile   2:big image
-	    ImageInfo imi1, imi2; 
-	    PngReader pngr = FileHelper.createPngReader(tiles[0]);
-	    imi1 = pngr.imgInfo;
-	    PngReader[] readers = new PngReader[tileColumns];
-	    imi2 = new ImageInfo(xWidth * tileColumns, imi1.rows * tileRows, imi1.bitDepth, imi1.alpha, imi1.greyscale, imi1.indexed);
-	    PngWriter pngw = FileHelper.createPngWriter(destFile, imi2, true);
+	    final ImageLine destLine = new ImageLine(destImgInfo, ImageLine.SampleType.INT, false);
+	    final int lineLen = tileSize * 4; // 4=bytesPixel
+	    final int gridColor = 150;
+	    final boolean showGrid = PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID);
 	    
-	    // copy palette and transparency if necessary (more chunks?)
-	    pngw.copyChunksFirst(pngr, ChunkCopyBehaviour.COPY_PALETTE | ChunkCopyBehaviour.COPY_TRANSPARENCY);
-	    pngr.end(); // close, we'll reopen it again soon
-	    
-	    ImageLine line2 = new ImageLine(imi2, ImageLine.SampleType.INT, false);
-	    int row2 = 0;
+	    int destRow = 0;
 	    
 	    for( int ty = 0; ty < tileRows; ty++ ) {
 	        int nTilesXcur = ty < tileRows - 1 ? tileColumns : ntiles - (tileRows - 1) * tileColumns;
-	        Arrays.fill(line2.scanline, 0);
+	        Arrays.fill(destLine.scanline, 0);
 	        
 	        for( int tx = 0; tx < nTilesXcur; tx++ ) { // open several readers
 	            readers[tx] = FileHelper.createPngReader(tiles[tx + ty * tileColumns]);
 	            readers[tx].setChunkLoadBehaviour(ChunkLoadBehaviour.LOAD_CHUNK_NEVER);
-	            readers[tx].setUnpackedMode(false);
-	            if(!readers[tx].imgInfo.equals(imi1)) 
-	                throw new RuntimeException("different tile ? "  + readers[tx].imgInfo);
+	            readers[tx].setUnpackedMode(false);	            
 	        }
 	        
-	        rowcopy: for(int row1 = 0; row1 < imi1.rows; row1++, row2++ ) {
+	        rowcopy: for(int srcRow = 0; srcRow < tileSize; srcRow++, destRow++ ) {
 	            for( int tx = 0; tx < nTilesXcur; tx++ ) {
-	                ImageLine line1 = readers[tx].readRowInt(row1); // read line
+	                ImageLine srcLine = readers[tx].readRowInt(srcRow); // read line
+	                int[] src = srcLine.scanline;	                	
 	                
-	                int len = xWidth * imi1.bytesPixel;
+	                // Overlay chunk grid
+	                if(showGrid) {
+		                int skip = (srcRow%16==0) ? 4 : 64;
+		                for(int i=0;i<=src.length-skip;i+=skip) {
+		                	src[i]=(src[i]+gridColor)/2;
+	                		src[i+1]=(src[i+1]+gridColor)/2;
+	                		src[i+2]=(src[i+2]+gridColor)/2;
+	                		src[i+3]=255;
+		                }
+	                }
 	                
-	                int[] src = line1.scanline;
-                	int srcPos = 0; // xOffset * imi1.bytesPixel;	                	
-                	int[] dest = line2.scanline;
-                	int destPos = (len*tx);
-                	int length = len;
+                	int[] dest = destLine.scanline;
+                	int destPos = (lineLen*tx);
 	                try {	                	
-	                	System.arraycopy(src, srcPos, dest, destPos, length);
+	                	System.arraycopy(src, 0, dest, destPos, lineLen);
 	                } catch(ArrayIndexOutOfBoundsException e) {
-	                	JourneyMap.getLogger().severe("Bad numbers: ");
-	                	System.out.println(src.length + ", " + srcPos + ", " + dest.length + ", " + destPos + ", " + length);
+	                	JourneyMap.getLogger().severe("Bad image data. Src len=" +src.length + ", dest len=" + dest.length + ", destPos=" + destPos);
 	                	break rowcopy;
 	                }
 	            }
-	            pngw.writeRow(line2, row2); // write to full image
+	            pngw.writeRow(destLine, destRow); // write to full image
 	        }
 	        
 	        for( int tx = 0; tx < nTilesXcur; tx++ ) {
 	            readers[tx].end(); // close readers
 	        }
 	    }
+	    
 	    pngw.end(); // close writer
 	}
 }

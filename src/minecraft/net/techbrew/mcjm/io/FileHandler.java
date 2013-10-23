@@ -94,7 +94,7 @@ public class FileHandler {
 	}
 	
 	
-	public static BufferedImage getImage(String fileName) {
+	public static BufferedImage getWebImage(String fileName) {
 		try {
 			String png = FileHandler.WEB_DIR + "/img/" + fileName;//$NON-NLS-1$
 			InputStream is = EntityHelper.class.getResourceAsStream(png);

@@ -10,11 +10,11 @@ import javax.imageio.ImageIO;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
-import net.techbrew.mcjm.model.RegionCoord;
-import net.techbrew.mcjm.model.RegionImageCache;
-import net.techbrew.mcjm.model.RegionImageSet;
+import net.techbrew.mcjm.io.RegionImageHandler;
+import net.techbrew.mcjm.ui.ZoomLevel;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 
@@ -52,8 +52,6 @@ public class TileService extends FileService {
 		Query query = event.query();
 		query.parse();
 		
-		
-
 		Minecraft minecraft = Minecraft.getMinecraft();
 		World theWorld = minecraft.theWorld;
 		if (theWorld == null) {
@@ -74,10 +72,11 @@ public class TileService extends FileService {
 		
 		// Region coords
 		try {
-			int rx = getParameter(query, "rx", 0); //$NON-NLS-1$
-			Integer ry = getParameter(query, "ry", (Integer) null); //$NON-NLS-1$
-			int rz = getParameter(query, "rz", 0); //$NON-NLS-1$			
-			int dimension = getParameter(query, "dimension", 0);  //$NON-NLS-1$
+			int zoom = getParameter(query, "zoom", 0); //$NON-NLS-1$
+			int x = getParameter(query, "x", 0); //$NON-NLS-1$
+			Integer vSlice = getParameter(query, "depth", (Integer) null); //$NON-NLS-1$
+			int z = getParameter(query, "z", 0); //$NON-NLS-1$			
+			int dimension = getParameter(query, "dim", 0);  //$NON-NLS-1$
 			
 			// Map type
 			String mapTypeString = getParameter(query, "mapType", Constants.MapType.day.name()); //$NON-NLS-1$
@@ -88,19 +87,27 @@ public class TileService extends FileService {
 				String error = Constants.getMessageJMERR05("mapType=" + mapType); //$NON-NLS-1$
 				throwEventException(400, error, event, true);
 			}
-
-			RegionCoord rCoord = new RegionCoord(worldDir,rx,ry,rz,dimension);	
-			RegionImageCache cache = RegionImageCache.getInstance();
-			if(cache.contains(rCoord)) {
-				serveImage(event, cache.getGuaranteedImage(rCoord, mapType));
-			} else {
-				RegionImageSet ris = new RegionImageSet(rCoord);
-				serveImage(event, ris.getImage(mapType));
+			if(mapType!=MapType.underground) {
+				vSlice = null;
 			}
+			
+			// Determine chunks for coordinates at zoom level
+			int scale = (int) Math.pow(2, zoom);
+			int distance = 32/scale;
+			int minChunkX = x * distance;
+			int minChunkZ = z * distance;
+			int maxChunkX = minChunkX + distance - 1;
+			int maxChunkZ = minChunkZ + distance - 1;
+			
+			//System.out.println("zoom " + zoom + ", scale=" + scale + ", distance=" + distance + ": " + minChunkX + "," + minChunkZ + " - " + maxChunkX + "," + maxChunkZ);			
+			
+			BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, minChunkX, minChunkZ, maxChunkX, maxChunkZ, mapType, vSlice, dimension, true, ZoomLevel.getDefault(), 512, 512);
+
+			serveImage(event, img);
 						
 			long stop=System.currentTimeMillis();
 			if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
-				JourneyMap.getLogger().fine((stop-start) + "ms to serve map.png");
+				JourneyMap.getLogger().fine((stop-start) + "ms to serve tile");
 			}
 			
 		} catch (NumberFormatException e) {
@@ -111,7 +118,14 @@ public class TileService extends FileService {
 	
 	private void serveImage(Event event, BufferedImage img) throws Exception {
 		if(img!=null) {
-			gzipResponse(event, blankImage);
+			ResponseHeader.on(event).contentType(ContentType.png).noCache();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ImageIO.write(img, "png", baos);
+			baos.flush();
+			byte[] bytes = baos.toByteArray();
+			baos.close();
+			event.output().write(bytes); 
+			//gzipResponse(event, bytes);
 			return;
 		}
 		if(blankImage==null) {
@@ -123,7 +137,7 @@ public class TileService extends FileService {
 			blankImage = baos.toByteArray();
 			baos.close();
 		}
-		gzipResponse(event, blankImage);
+		event.output().write(blankImage); 
 	}
 	
 }

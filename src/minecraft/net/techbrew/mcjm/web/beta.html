@@ -17,7 +17,7 @@
     /* <![CDATA[ */
 
         var JM = JM || {};
-        JM.ImagesBaseUrl = '/map.png';
+        JM.ImagesBaseUrl = '/tile';
         
         // EuclideanProjection class
         //////////////////////////////////
@@ -84,19 +84,10 @@
             img.width = SIZE;
             img.height = SIZE;
             
-            var CHUNKS = Math.pow(2,5-zoom);
-            var minX = coord.x * CHUNKS;
-            var minZ = coord.y * CHUNKS;
-            var maxX = minX + CHUNKS;
-            var maxZ = minZ + CHUNKS;
-            
-            var mapType = "night";
+            var mapType = "day";
             var dimension = 0;
             var depth = 4;
-            var request = "?mapType=" + mapType + "&dimension=" + dimension + "&depth=" + depth + "&x1=" + minX + "&z1=" + minZ + "&x2="
-                    + maxX + "&z2=" + maxZ + "&width=" + SIZE + "&height=" + SIZE;
-            
-            console.log("getTile: " + coord.x + "," + coord.y + " / zoom: " + zoom + ": " + request);
+            var request = "?zoom=" + zoom + "&mapType=" + mapType + "&dim=" + dimension + "&x=" + coord.x + "&z=" + coord.y + "&depth=" + depth;         
                   
             img.src = JM.Utils.GetImageUrl(request);                        
 
@@ -215,6 +206,7 @@
             this._window.style.fontSize = '12px';
             this._window.style.width = '88px';
             this._window.style.height = '88px';
+// TODO:  window.png?
             this._window.style.background = 'url(' + JM.Utils.GetImageUrl('window.png') + ')';
             this._window.innerHTML = this._text;
 
