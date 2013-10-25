@@ -158,7 +158,7 @@ public class RegionImageHandler {
 		return img;
 	}
 	
-	public static BufferedImage readRegionImage(File regionFile, RegionCoord rCoord, int sampling, boolean legacy) {
+	public static BufferedImage readRegionImage(File regionFile, RegionCoord rCoord, int sampling, boolean legacy, boolean returnNull) {
 		
 		FileInputStream fis = null;
 		BufferedImage image = null;
@@ -201,10 +201,12 @@ public class RegionImageHandler {
 		}
 			
 		if(image==null) {
-			if(legacy) {
-				image = createBlankImage(1024, 512);
-			} else {
-				image = createBlankImage(512, 512);
+			if(!returnNull) {
+				if(legacy) {
+					image = createBlankImage(1024, 512);
+				} else {
+					image = createBlankImage(512, 512);
+				}
 			}
 		}
 		return image;
@@ -290,7 +292,10 @@ public class RegionImageHandler {
 				if(cache.contains(rc)) {
 					regionImage = cache.getGuaranteedImage(rc, mapType);
 				} else {
-					regionImage = RegionImageHandler.readRegionImage(RegionImageHandler.getRegionImageFile(rc, mapType, false), rc, 1, false);
+					regionImage = RegionImageHandler.readRegionImage(RegionImageHandler.getRegionImageFile(rc, mapType, false), rc, 1, false, true);
+					if(regionImage==null) {
+						continue;
+					}
 				}
 				rminCx = Math.max(rc.getMinChunkX(), cx1);
 				rminCz = Math.max(rc.getMinChunkZ(), cz1);

@@ -37,6 +37,7 @@ public class MessagesData implements IDataProvider {
 	/**
 	 * Provides all possible keys.
 	 */
+	@Override
 	public Enum[] getKeys() {
 		return Key.values();
 	}
@@ -44,7 +45,8 @@ public class MessagesData implements IDataProvider {
 	/**
 	 * Return map of web-UI messages.
 	 */
-	public Map getMap() {		
+	@Override
+	public Map getMap(Map optionalParams) {		
 		
 		LinkedHashMap props = new LinkedHashMap();
 		
@@ -66,6 +68,7 @@ public class MessagesData implements IDataProvider {
 	/**
 	 * Return length of time in millis data should be kept.
 	 */
+	@Override
 	public long getTTL() {
 		return TTL;
 	}
@@ -73,6 +76,7 @@ public class MessagesData implements IDataProvider {
 	/**
 	 * Return true if language has changed.
 	 */
+	@Override
 	public boolean dataExpired() {
 		return !Minecraft.getMinecraft().gameSettings.language.equals(lang);
 	}

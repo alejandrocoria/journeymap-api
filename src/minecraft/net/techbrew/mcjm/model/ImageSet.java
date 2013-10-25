@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -90,6 +91,15 @@ public abstract class ImageSet {
 		return false;
 	}
 	
+	public boolean updatedSince(long time) {
+		for(Wrapper wrapper: imageWrappers.values()) {
+			if(wrapper.getTimestamp()>time) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	protected BufferedImage copyImage(BufferedImage image) {
 		BufferedImage copy = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 	    Graphics g = copy.getGraphics();
@@ -137,19 +147,23 @@ public abstract class ImageSet {
 		
 		BufferedImage _image = null;
 		boolean _dirty = true;
+		long timestamp = System.currentTimeMillis();
 		
 		Wrapper(Constants.MapType mapType, File imageFile, BufferedImage image) {
 			this.mapType = mapType;
 			this.imageFile = imageFile;
-			_image = image;
-			if(mapType!=MapType.OBSOLETE && image==null) {
+			setImage(image);
+			if(mapType==MapType.OBSOLETE) {
 				_dirty=false;
 			}
 		}
 		
 		void setImage(BufferedImage image) {
+			if(image!=_image) {
+				setDirty();
+			}
 			_image = image;
-			_dirty = true;
+			
 		}
 		
 		File getFile() {
@@ -166,6 +180,11 @@ public abstract class ImageSet {
 		
 		void setDirty() {
 			_dirty = true;
+			timestamp = new Date().getTime();
+		}
+		
+		long getTimestamp() {
+			return timestamp;
 		}
 		
 		boolean isDirty() {
@@ -189,6 +208,7 @@ public abstract class ImageSet {
 			    		dir.mkdirs();
 			    	}
 					ImageIO.write(_image, "png", new FileOutputStream(imageFile));
+					System.out.println("Wrote to disk: " + imageFile);
 					_dirty = false;
 				}
 		    } catch (Throwable e) {

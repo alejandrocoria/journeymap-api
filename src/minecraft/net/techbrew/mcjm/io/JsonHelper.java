@@ -1,8 +1,9 @@
 package net.techbrew.mcjm.io;
 
-import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
+
+import net.techbrew.mcjm.JourneyMap;
 
 /**
  * Conversion of convenience objects to JSON strings.
@@ -62,7 +63,9 @@ public class JsonHelper {
 	static void wrap(final StringBuffer sb, final Object val) {
 	
 		if(val == null) {
-			sb.append("null");
+			sb.append("null");			
+		} else if(val instanceof String) {
+			wrapAsString(sb, val);
 		} else if(val instanceof Number) {
 			sb.append(val);
 		} else if(val instanceof Boolean) {
@@ -71,9 +74,10 @@ public class JsonHelper {
 			sb.append(toJson((Map) val));
 		} else if(val instanceof List) {
 			sb.append(toJson((List) val));
-		} else if(val instanceof Array) {
+		} else if(val.getClass().isArray()) {
 			sb.append(toJson((Object[]) val));
 		} else {
+			JourneyMap.getLogger().warning("Unexpected object type for JSON serialization: " + val.getClass());
 			wrapAsString(sb, val);
 		}
 	}

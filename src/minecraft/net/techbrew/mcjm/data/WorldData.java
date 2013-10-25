@@ -10,9 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import net.minecraft.src.MapStorage;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.NetClientHandler;
-import net.minecraft.src.MapStorage;
 import net.minecraft.src.WorldInfo;
 import net.techbrew.mcjm.JourneyMap;
 
@@ -44,6 +44,7 @@ public class WorldData implements IDataProvider {
 	public WorldData() {
 	}
 	
+	@Override
 	public Enum[] getKeys() {
 		return Key.values();
 	}
@@ -51,7 +52,8 @@ public class WorldData implements IDataProvider {
 	/**
 	 * Return map of world-related properties.
 	 */
-	public Map getMap() {		
+	@Override
+	public Map getMap(Map optionalParams) {		
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		WorldInfo worldInfo = mc.theWorld.getWorldInfo();
@@ -161,6 +163,7 @@ public class WorldData implements IDataProvider {
 	/**
 	 * Return length of time in millis data should be kept.
 	 */
+	@Override
 	public long getTTL() {
 		return TTL;
 	}
@@ -168,6 +171,7 @@ public class WorldData implements IDataProvider {
 	/**
 	 * Return false by default. Let cache expired based on TTL.
 	 */
+	@Override
 	public boolean dataExpired() {
 		return false;
 	}

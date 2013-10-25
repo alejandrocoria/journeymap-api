@@ -1,0 +1,91 @@
+html,body{height:100%;margin:0;padding:0}
+/*!
+ * JourneyMap web client 
+ * http://journeymap.techbrew.net 
+ * Copyright (C) 2011-2013.
+ * Mark Woodman / TechBrew.net All rights reserved. 
+ * May not be modified or distributed without express written consent. */
+ 
+
+#map-canvas {
+    position:absolute;
+    top: 50px;
+    right: 0px;
+    bottom: 0px;
+    left:0px;
+    background-color: #111 !important;
+}
+
+#logo {
+    padding-top:5px;
+}
+
+#mainMenu img {
+	margin-right:10px;
+}
+
+li label {
+	display: inline;
+	height: 30px;
+	line-height: 30px;
+	padding: 5px 20px;
+	clear: both;
+	white-space: nowrap;
+	font-weight: normal;
+	cursor: pointer;
+}
+
+li label input {
+    vertical-align: text-bottom;
+}
+
+label span {
+	margin: 5px 0px 5px 5px;
+}
+
+#worldInfo {
+    
+    z-index:10; 
+    font-size: 10px;
+    font-weight: bold;
+    
+    padding-left:5px;
+    padding-right:10px;
+    padding-top:0px;
+    margin:0px 0px;
+    color: #fff;
+    background-color:rgba(34,34,34,0.7);
+    display:inline-block;
+    
+    border-width:1px;
+    border-style:solid;
+    border-color:#c5c5c5;
+    
+    -webkit-border-bottom-right-radius: 6px;
+    -webkit-border-bottom-left-radius: 6px;
+    -moz-border-radius-bottomright: 6px;
+    -moz-border-radius-bottomleft: 6px;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+
+}
+
+#worldInfo .infoTitle  {
+    
+    font-style:italic;
+    font-size: 10px;
+    font-weight: normal;
+    text-align:right;
+    padding-left:4px;
+    padding-right:4px;
+    color: #ccc;
+}
+
+/* Fix Google Maps canvas */
+.google-map-canvas,
+.google-map-canvas * { 
+	.box-sizing(content-box); 
+}
+
+/* Optional responsive image override */
+img { max-width: none; }

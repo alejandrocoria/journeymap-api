@@ -186,6 +186,26 @@ public abstract class BaseService extends Service {
 	}
 	
 	/**
+	 * Get a request parameter int value or return the default provided.
+	 * @param map
+	 * @param key
+	 * @param defaultValue
+	 * @return
+	 */
+	protected Long getParameter(Map<String, String[]> map, String key, Long defaultValue) {
+		Object val = map.get(key);
+		Long longVal = null;
+		if(val!=null) {
+			try {
+				longVal = Long.parseLong((String) val);
+			} catch(NumberFormatException e) {
+				JourneyMap.getLogger().warning("Didn't get numeric query parameter for '" + key + "': " + val);
+			}
+		}
+		return (longVal!=null) ? longVal : defaultValue;
+	}
+	
+	/**
 	 * Attempt to output the data in gzip format, setting headers accordingly.
 	 * Falls back to sending plain text otherwise.
 	 * 

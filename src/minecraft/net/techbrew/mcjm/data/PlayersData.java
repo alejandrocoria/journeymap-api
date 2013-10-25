@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.src.Minecraft;
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.model.ChunkStub;
@@ -34,6 +34,7 @@ public class PlayersData implements IDataProvider {
 	/**
 	 * Provides all possible keys.
 	 */
+	@Override
 	public Enum[] getKeys() {
 		return EntityKey.values();
 	}
@@ -41,7 +42,8 @@ public class PlayersData implements IDataProvider {
 	/**
 	 * Return map of world-related properties.
 	 */
-	public Map getMap() {		
+	@Override
+	public Map getMap(Map optionalParams) {		
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityClientPlayerMP player = mc.thePlayer;			
@@ -165,6 +167,7 @@ public class PlayersData implements IDataProvider {
 	/**
 	 * Return length of time in millis data should be kept.
 	 */
+	@Override
 	public long getTTL() {
 		return TTL;
 	}
@@ -172,6 +175,7 @@ public class PlayersData implements IDataProvider {
 	/**
 	 * Return false by default. Let cache expired based on TTL.
 	 */
+	@Override
 	public boolean dataExpired() {
 		return false;
 	}

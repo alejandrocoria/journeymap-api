@@ -11,6 +11,7 @@ import net.techbrew.mcjm.data.AnimalsData;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.GameData;
 import net.techbrew.mcjm.data.IDataProvider;
+import net.techbrew.mcjm.data.ImagesData;
 import net.techbrew.mcjm.data.MessagesData;
 import net.techbrew.mcjm.data.MobsData;
 import net.techbrew.mcjm.data.PlayerData;
@@ -42,6 +43,7 @@ public class DataService extends BaseService {
 		providerMap.put("/data/animals", AnimalsData.class);  //$NON-NLS-1$
 		providerMap.put("/data/mobs", MobsData.class);  //$NON-NLS-1$
 		providerMap.put("/data/game", GameData.class);  //$NON-NLS-1$
+		providerMap.put("/data/image", ImagesData.class);  //$NON-NLS-1$
 		providerMap.put("/data/messages", MessagesData.class);  //$NON-NLS-1$
 		providerMap.put("/data/player", PlayerData.class);  //$NON-NLS-1$
 		providerMap.put("/data/players", PlayersData.class);  //$NON-NLS-1$
@@ -105,7 +107,7 @@ public class DataService extends BaseService {
 		}	
 		
 		// Append the data
-		DataCache.instance().appendJson(dpClass, jsonData);	
+		DataCache.instance().appendJson(dpClass, query, jsonData);	
 		
 		// Finish function call for JsonP if needed
 		if(useJsonP) {

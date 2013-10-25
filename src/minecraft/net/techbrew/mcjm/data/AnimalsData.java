@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.EntityPlayerSP;
-import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityHorse;
+import net.minecraft.src.EntityLiving;
+import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.EntityTameable;
 import net.minecraft.src.IAnimals;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.model.EntityHelper;
 
 /**
@@ -50,6 +50,7 @@ public class AnimalsData implements IDataProvider {
 	/**
 	 * Provides all possible keys.
 	 */
+	@Override
 	public Enum[] getKeys() {
 		return EntityKey.values();
 	}
@@ -57,7 +58,10 @@ public class AnimalsData implements IDataProvider {
 	/**
 	 * Return map of nearby animals data.
 	 */
-	public Map getMap() {		
+	@Override
+	public Map getMap(Map optionalParams) {		
+		
+		// TODO: override includeNonPets, includePets?
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayerSP player = mc.thePlayer;			
@@ -113,6 +117,7 @@ public class AnimalsData implements IDataProvider {
 	/**
 	 * Return length of time in millis data should be kept.
 	 */
+	@Override
 	public long getTTL() {
 		return TTL;
 	}
@@ -120,6 +125,7 @@ public class AnimalsData implements IDataProvider {
 	/**
 	 * Return false by default. Let cache expired based on TTL.
 	 */
+	@Override
 	public boolean dataExpired() {
 		return false;
 	}

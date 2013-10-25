@@ -1,5 +1,8 @@
 package net.techbrew.mcjm;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -214,6 +217,16 @@ public class JourneyMap {
      */
     public void stopMapping() {
     	synchronized(this) {
+    		
+    		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+    		long[] threadIds = bean.findDeadlockedThreads();
+    		if (threadIds != null) {
+    		    ThreadInfo[] infos = bean.getThreadInfo(threadIds);
+
+    		    for (ThreadInfo info : infos) {
+    		        logger.severe("Deadlock detected: " + info);
+    		    }
+    		}
     		
 	    	if(taskExecutor!=null && !taskExecutor.isShutdown()) {    		
 				taskExecutor.shutdown();			

@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.src.Minecraft;
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.EntityVillager;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.model.ChunkStub;
@@ -36,6 +36,7 @@ public class VillagersData implements IDataProvider {
 	/**
 	 * Provides all possible keys.
 	 */
+	@Override
 	public Enum[] getKeys() {
 		return EntityKey.values();
 	}
@@ -43,7 +44,8 @@ public class VillagersData implements IDataProvider {
 	/**
 	 * Return map of nearby animals data.
 	 */
-	public Map getMap() {		
+	@Override
+	public Map getMap(Map optionalParams) {		
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityClientPlayerMP player = mc.thePlayer;			
@@ -171,6 +173,7 @@ public class VillagersData implements IDataProvider {
 	/**
 	 * Return length of time in millis data should be kept.
 	 */
+	@Override
 	public long getTTL() {
 		return TTL;
 	}
@@ -178,6 +181,7 @@ public class VillagersData implements IDataProvider {
 	/**
 	 * Return false by default. Let cache expired based on TTL.
 	 */
+	@Override
 	public boolean dataExpired() {
 		return false;
 	}

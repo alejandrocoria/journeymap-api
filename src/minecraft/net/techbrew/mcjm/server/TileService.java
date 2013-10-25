@@ -27,6 +27,7 @@ public class TileService extends FileService {
 
 	private static final long serialVersionUID = 4412225358529161454L;
 
+	public static final String CALLBACK_PARAM = "callback";  //$NON-NLS-1$	
 	public static final String CHARACTER_ENCODING = "UTF-8"; //$NON-NLS-1$	
 	
 	private byte[] blankImage;
@@ -70,9 +71,17 @@ public class TileService extends FileService {
 			throwEventException(400, error, event, true);
 		}
 		
-		// Region coords
 		try {
 			int zoom = getParameter(query, "zoom", 0); //$NON-NLS-1$
+			
+//			// Check for ping first
+//			Long since = getParameter(query, "since", (Long) null);
+//			if(since!=null) {
+//				serveChangedBounds(event, zoom, since);
+//				return;
+//			}
+
+			// Region coords
 			int x = getParameter(query, "x", 0); //$NON-NLS-1$
 			Integer vSlice = getParameter(query, "depth", (Integer) null); //$NON-NLS-1$
 			int z = getParameter(query, "z", 0); //$NON-NLS-1$			
@@ -117,27 +126,74 @@ public class TileService extends FileService {
 	}
 	
 	private void serveImage(Event event, BufferedImage img) throws Exception {
-		if(img!=null) {
-			ResponseHeader.on(event).contentType(ContentType.png).noCache();
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ImageIO.write(img, "png", baos);
-			baos.flush();
-			byte[] bytes = baos.toByteArray();
-			baos.close();
-			event.output().write(bytes); 
-			//gzipResponse(event, bytes);
-			return;
-		}
-		if(blankImage==null) {
-			img = new BufferedImage(512, 512, BufferedImage.TYPE_INT_ARGB);
-			ResponseHeader.on(event).contentType(ContentType.png).noCache();
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ImageIO.write(img, "png", baos);
-			baos.flush();
-			blankImage = baos.toByteArray();
-			baos.close();
-		}
-		event.output().write(blankImage); 
+		ResponseHeader.on(event).contentType(ContentType.png).noCache();	
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(img, "png", baos);
+		baos.flush();
+		byte[] bytes = baos.toByteArray();
+		baos.close();
+		event.output().write(bytes); 
+		//gzipResponse(event, bytes);
+		return;
 	}
+	
+//	private void serveChangedBounds(Event event, int zoom, long time) throws Event, Exception {
+//		
+//		ImagesData data = new ImagesData(zoom, time);
+//		DataCache.instance().getJson(data);
+//		
+//		List<RegionCoord> regions = RegionImageCache.getInstance().getDirtySince(time);
+//		List<Double[]> bounds = new ArrayList<Double[]>(regions.size());		
+//		for(RegionCoord rc : regions) {
+//			bounds.add(toZoomedBounds(zoom, rc.regionX, rc.regionZ));
+//		}
+//		
+//		ResponseHeader.on(event).contentType(ContentType.json).noCache();
+//		try {
+//			
+//			// Build the response string
+//			StringBuffer jsonData = new StringBuffer();
+//					
+//			// Check for callback to determine Json or JsonP
+//			boolean useJsonP = event.query().containsKey(CALLBACK_PARAM);
+//			if(useJsonP) {
+//				jsonData.append(URLEncoder.encode(event.query().get(CALLBACK_PARAM).toString(), UTF8.name()));
+//				jsonData.append("("); //$NON-NLS-1$	
+//			} else {
+//				jsonData.append("data="); //$NON-NLS-1$	
+//			}	
+//			
+//			// JSON data
+//			HashMap<String, Object> map = new HashMap<String, Object>(5);
+//			map.put("zoom", zoom);
+//			map.put("since", time);
+//			map.put("bounds", bounds);
+//			jsonData.append(JsonHelper.toJson(map));
+//			
+//			// Finish function call for JsonP if needed
+//			if(useJsonP) {
+//				jsonData.append(")"); //$NON-NLS-1$
+//			}
+//			
+//			// Optimize headers for JSONP
+//			ResponseHeader.on(event).noCache().contentType(ContentType.jsonp);
+//					
+//			// Gzip response
+//			gzipResponse(event, jsonData.toString());
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			throwEventException(400, e.getMessage(), event, true);
+//		}
+//	}
+//	
+//	private Double[] toZoomedBounds(final int zoom, final int rX, final int rZ) {
+//		double scale = Math.pow(2, zoom);
+//		double sX = rX/scale;
+//		double sZ = rZ/scale;
+//		double sX2 = (rX+1)/scale;
+//		double sZ2 = (rZ+1)/scale;
+//		return new Double[]{sX,sZ,sX2,sZ2};
+//	}
 	
 }

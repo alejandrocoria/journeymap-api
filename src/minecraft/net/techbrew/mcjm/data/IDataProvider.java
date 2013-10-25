@@ -14,7 +14,7 @@ public interface IDataProvider {
 	 * Provide an map of data in key-value form.
 	 * @return
 	 */
-	public Map getMap();
+	public Map getMap(Map optionalParams);
 	
 	/**
 	 * Provide a list of all possible keys, whether

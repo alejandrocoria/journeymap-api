@@ -23,6 +23,7 @@ public class WaypointsData implements IDataProvider {
 	/**
 	 * Provides all possible keys.
 	 */
+	@Override
 	public Enum[] getKeys() {
 		return Waypoint.Key.values();
 	}
@@ -30,7 +31,8 @@ public class WaypointsData implements IDataProvider {
 	/**
 	 * Return map of waypoints data.
 	 */
-	public Map getMap() {		
+	@Override
+	public Map getMap(Map optionalParams) {		
 				
 		List<Waypoint> waypoints = WaypointHelper.getWaypoints();
 		ArrayList<Map> list = new ArrayList<Map>(waypoints.size());
@@ -50,6 +52,7 @@ public class WaypointsData implements IDataProvider {
 	/**
 	 * Return length of time in millis data should be kept.
 	 */
+	@Override
 	public long getTTL() {
 		return TTL;
 	}
@@ -57,6 +60,7 @@ public class WaypointsData implements IDataProvider {
 	/**
 	 * Return false by default. Let cache expired based on TTL.
 	 */
+	@Override
 	public boolean dataExpired() {
 		return false;
 	}

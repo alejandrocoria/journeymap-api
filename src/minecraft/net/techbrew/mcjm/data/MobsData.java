@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.EntityPlayerSP;
-import net.minecraft.src.EntityLiving;
-import net.minecraft.src.IRangedAttackMob;
-import net.minecraft.src.IBossDisplayData;
 import net.minecraft.src.EntityGhast;
+import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityMob;
+import net.minecraft.src.EntityPlayerSP;
+import net.minecraft.src.IBossDisplayData;
+import net.minecraft.src.IRangedAttackMob;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.model.EntityHelper;
 
 /**
@@ -35,6 +35,7 @@ public class MobsData implements IDataProvider {
 	/**
 	 * Provides all possible keys.
 	 */
+	@Override
 	public Enum[] getKeys() {
 		return EntityKey.values();
 	}
@@ -42,7 +43,8 @@ public class MobsData implements IDataProvider {
 	/**
 	 * Return map of nearby mobs data.
 	 */
-	public Map getMap() {		
+	@Override
+	public Map getMap(Map optionalParams) {		
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayerSP player = mc.thePlayer;			
@@ -85,6 +87,7 @@ public class MobsData implements IDataProvider {
 	/**
 	 * Return length of time in millis data should be kept.
 	 */
+	@Override
 	public long getTTL() {
 		return TTL;
 	}
@@ -92,6 +95,7 @@ public class MobsData implements IDataProvider {
 	/**
 	 * Return false by default. Let cache expired based on TTL.
 	 */
+	@Override
 	public boolean dataExpired() {
 		return false;
 	}

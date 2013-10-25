@@ -1,10 +1,18 @@
 package net.techbrew.mcjm.model;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
 import java.io.File;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
+import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.RegionImageHandler;
 
 /**
@@ -13,6 +21,8 @@ import net.techbrew.mcjm.io.RegionImageHandler;
  *
  */
 public class RegionImageSet extends ImageSet {
+	
+	Logger logger = JourneyMap.getLogger();
 	
 	protected final RegionCoord rCoord;
 
@@ -37,7 +47,7 @@ public class RegionImageSet extends ImageSet {
 			// Check for new region file 
 			imageFile = RegionImageHandler.getRegionImageFile(rCoord, mapType, false);	
 			boolean useLegacy = !imageFile.exists();
-			image = RegionImageHandler.readRegionImage(imageFile, rCoord, 1, false);
+			image = RegionImageHandler.readRegionImage(imageFile, rCoord, 1, false, false);
 			
 			// Add wrapper
 			wrapper = addWrapper(mapType, imageFile, image);
@@ -50,7 +60,7 @@ public class RegionImageSet extends ImageSet {
 			if(legacyFile.exists()) {
 				
 				// Get image for wrapper from legacy
-				BufferedImage legacyImage = RegionImageHandler.readRegionImage(legacyFile, rCoord, 1, true);
+				BufferedImage legacyImage = RegionImageHandler.readRegionImage(legacyFile, rCoord, 1, true, false);
 				wrapper.setImage(getSubimage(rCoord, mapType, legacyImage));
 				
 				// Add other wrappers for day/night
@@ -78,12 +88,74 @@ public class RegionImageSet extends ImageSet {
 
 	protected void insertChunk(ChunkCoord cCoord, BufferedImage chunkImage, MapType mapType) {
 		final Wrapper wrapper = getWrapper(mapType);		
+		final boolean wasDirty = wrapper.isDirty();
 		final int x = rCoord.getXOffset(cCoord.chunkX);
 		final int z = rCoord.getZOffset(cCoord.chunkZ);
-		final Graphics2D g2d = wrapper.getImage().createGraphics();	
-		g2d.drawImage(chunkImage, x, z, x+16, z+16, 0,0,16,16, null);
+		final BufferedImage subRegion = wrapper.getImage().getSubimage(x, z, 16, 16);
+		final DataBuffer before = subRegion.getData().getDataBuffer();
+		final Graphics2D g2d = subRegion.createGraphics();	
+		g2d.drawImage(chunkImage, 0, 0, null);		
 		g2d.dispose();
-		wrapper.setDirty();
+		final DataBuffer after = subRegion.getData().getDataBuffer();
+		
+		//logger.info("Insert da chunk! " + cCoord);
+
+		// check the buffers to see if anything changed
+		long start = System.nanoTime();
+		boolean dirty = before.getDataType()!=after.getDataType() || before.getSize()!=after.getSize() || before.getNumBanks()!=after.getNumBanks();
+		if(!dirty) {
+			if(before.getClass() != after.getClass()) {
+				dirty = true;
+				logger.info("Classes don't match: " + before.getClass() + " vs " + after.getClass());
+			} else {
+				if(before instanceof DataBufferByte) {
+					dirty = bufferChanged((DataBufferByte) before, (DataBufferByte) after);
+				} else if(before instanceof DataBufferInt) {
+					dirty = bufferChanged((DataBufferInt) before, (DataBufferInt) after);
+				} else {
+					dirty = true;
+				}
+			}			
+		}
+					
+		if(dirty) {					
+			if(!wasDirty) {
+				if(logger.isLoggable(Level.INFO)) {
+					long stop = System.nanoTime();
+					logger.info(rCoord + " dirty after chunk insert " + cCoord + ": " + dirty + ", compared in: " + TimeUnit.NANOSECONDS.toMicros(stop-start) + "micros");
+				}
+			}
+			wrapper.setDirty(); // updates the timestamp			
+		}
+	}
+	private boolean bufferChanged(DataBufferInt before, DataBufferInt after) {
+		boolean changed = false;
+		for (int bank = 0; bank < after.getNumBanks(); bank++) {
+		   int[] afterBank = after.getData(bank);
+		   int[] beforeBank = before.getData(bank);
+
+		   // this line may vary depending on your test framework
+		   changed = !Arrays.equals(afterBank, beforeBank);
+		   if(changed) {
+			   break;
+		   }
+		}
+		return changed;
+	}
+	
+	private boolean bufferChanged(DataBufferByte before, DataBufferByte after) {
+		boolean changed = false;
+		for (int bank = 0; bank < after.getNumBanks(); bank++) {
+		   byte[] afterBank = after.getData(bank);
+		   byte[] beforeBank = before.getData(bank);
+
+		   // this line may vary depending on your test framework
+		   changed = !Arrays.equals(afterBank, beforeBank);
+		   if(changed) {
+			   break;
+		   }
+		}
+		return changed;
 	}
 
 	public void loadLegacyNormal(File legacyFile) {

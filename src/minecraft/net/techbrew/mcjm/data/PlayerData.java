@@ -41,7 +41,7 @@ public class PlayerData implements IDataProvider {
 	 * Return map of world-related properties.
 	 */
 	@Override
-	public Map getMap() {		
+	public Map getMap(Map optionalParams) {		
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityClientPlayerMP player = mc.thePlayer;			

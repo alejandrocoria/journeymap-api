@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -19,19 +20,23 @@ public class RegionImageCache  {
 	
 	private static final int SIZE = 16;
 	private static final long flushInterval = TimeUnit.SECONDS.toMillis(30);
-	private static volatile RegionImageCache instance;
 	private volatile Map<RegionCoord, RegionImageSet> imageSets;
+	
 	private volatile long lastFlush;
 	//private volatile Set<RegionCoord> dirty;
 	private volatile Object lock = new Object();
 	
-	public synchronized static RegionImageCache getInstance() {
-		if(instance==null) {
-			instance = new RegionImageCache();
-		}
-		return instance;
-	}
-	
+	// On-demand-holder for instance
+	private static class Holder {
+        private static final RegionImageCache INSTANCE = new RegionImageCache();
+    }
+
+	// Get singleton instance.  Concurrency-safe.
+    public static RegionImageCache getInstance() {
+        return Holder.INSTANCE;
+    }
+
+	// Private constructor
 	private RegionImageCache() {
 		imageSets = Collections.synchronizedMap(new CacheMap(SIZE));
 		
@@ -71,7 +76,9 @@ public class RegionImageCache  {
 	}
 	
 	public List<RegionCoord> getRegions() {
-		return new ArrayList<RegionCoord>(imageSets.keySet());
+		synchronized(lock) {
+			return new ArrayList<RegionCoord>(imageSets.keySet());
+		}
 	}
 	
 	public BufferedImage getGuaranteedImage(RegionCoord rCoord, Constants.MapType mapType) {
@@ -115,6 +122,33 @@ public class RegionImageCache  {
 			}
 			lastFlush = System.currentTimeMillis();
 		}		
+	}
+	
+	/**
+	 * Not synchronized for now.  It's okay for this to be a little fuzzy.
+	 * @param time
+	 * @return
+	 */
+	public List<RegionCoord> getDirtySince(long time) {
+		if(time<=lastFlush) {
+			if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+				JourneyMap.getLogger().fine("Nothing dirty, last flush was " + (time-lastFlush) + "ms before " + time);
+			}
+			return Collections.EMPTY_LIST;
+		} else {
+			ArrayList<RegionCoord> list = new ArrayList<RegionCoord>(imageSets.size());
+			synchronized(lock) {
+				for(Entry<RegionCoord, RegionImageSet> entry : imageSets.entrySet()) {
+					if(entry.getValue().updatedSince(time)) {
+						list.add(entry.getKey());
+					}
+				}
+				if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+					JourneyMap.getLogger().fine("Dirty regions: " + list.size() + " of " + imageSets.size());
+				}
+			}
+			return list;
+		}
 	}
 	
 	public void clear() {

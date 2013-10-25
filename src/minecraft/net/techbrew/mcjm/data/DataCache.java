@@ -7,6 +7,7 @@ import java.util.logging.Level;
 
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.JsonHelper;
+import net.techbrew.mcjm.log.LogFormatter;
 
 /**
  * Singleton cache of data produced by IDataProviders.
@@ -49,8 +50,8 @@ public class DataCache {
      * and keyed by provider class.
      * @param dp
      */
-    public void put(IDataProvider dp) {
-    	putInternal(dp);
+    public void put(IDataProvider dp, Map optionalParams) {
+    	putInternal(dp, optionalParams);
     }
     
     /**
@@ -58,12 +59,12 @@ public class DataCache {
      * and keyed by provider class.
      * @param dp
      */
-    private DataHolder putInternal(Class<? extends IDataProvider> dpClass) {
+    private DataHolder putInternal(Class<? extends IDataProvider> dpClass, Map optionalParams) {
     	try {
-			return putInternal(dpClass.newInstance());
-		} catch (Exception e) {
+			return putInternal(dpClass.newInstance(), optionalParams);
+    	} catch (Exception e) {
 			// Shouldn't happen
-			JourneyMap.getLogger().severe("Can't instantiate dataprovider for cache: " + e);
+			JourneyMap.getLogger().severe("Can't instantiate dataprovider " + dpClass + " for cache: " + LogFormatter.toString(e));
 			throw new RuntimeException(e);
 		}
     }
@@ -73,13 +74,15 @@ public class DataCache {
      * and keyed by provider class.
      * @param dp
      */
-    private DataHolder putInternal(IDataProvider dp) {
-    	if(JourneyMap.getLogger().isLoggable(Level.FINER)) {
-    		JourneyMap.getLogger().finer("Caching " + dp.getClass().getName());
+    private DataHolder putInternal(IDataProvider dp, Map optionalParams) {
+    	synchronized(cache) {
+	    	if(JourneyMap.getLogger().isLoggable(Level.FINER)) {
+	    		JourneyMap.getLogger().finer("Caching " + dp.getClass().getName());
+	    	}
+	    	DataHolder dh = new DataHolder(dp, optionalParams);
+	    	cache.put(dp.getClass(), dh);
+	    	return dh;
     	}
-    	DataHolder dh = new DataHolder(dp);
-    	cache.put(dp.getClass(), dh);
-    	return dh;
     }
     
     /**
@@ -87,11 +90,11 @@ public class DataCache {
      * @param dpClass
      * @return
      */
-    private DataHolder internalGet(Class<? extends IDataProvider> dpClass) {    	
+    private DataHolder internalGet(Class<? extends IDataProvider> dpClass, Map optionalParams) {    	
     	synchronized(cache) {
     		DataHolder dh = cache.get(dpClass);
     		if(dh==null || dh.hasExpired()) {
-    			dh = putInternal(dpClass); // Get fresh instance and cache it
+    			dh = putInternal(dpClass, optionalParams); // Get fresh instance and cache it
     		}
     		return dh;
     	}
@@ -103,7 +106,16 @@ public class DataCache {
      * @return
      */
     public Map get(Class<? extends IDataProvider> dpClass) {    	
-    	return internalGet(dpClass).getData();
+    	return internalGet(dpClass, null).getData();
+    }
+    
+    /**
+     * Get the cached data map, keyed by provider class.
+     * @param dpClass
+     * @return
+     */
+    public Map get(Class<? extends IDataProvider> dpClass, Map optionalParams) {    	
+    	return internalGet(dpClass, optionalParams).getData();
     }
     
     /**
@@ -111,8 +123,8 @@ public class DataCache {
      * @param dpClass
      * @return
      */
-    public String getJson(Class<? extends IDataProvider> dpClass) {    	
-    	return internalGet(dpClass).getJsonData();
+    public String getJson(Class<? extends IDataProvider> dpClass, Map optionalParams) {    	
+    	return internalGet(dpClass, optionalParams).getJsonData();
     }
     
     /**
@@ -122,8 +134,8 @@ public class DataCache {
      * @param sb
      * @return
      */
-    public long appendJson(Class<? extends IDataProvider> dpClass, StringBuffer sb) {    	
-    	DataHolder dh = internalGet(dpClass);
+    public long appendJson(Class<? extends IDataProvider> dpClass, Map optionalParams, StringBuffer sb) {    	
+    	DataHolder dh = internalGet(dpClass, optionalParams);
     	sb.append(dh.getJsonData());
     	return dh.getExpires();
     }
@@ -134,7 +146,7 @@ public class DataCache {
      * @return
      */
     public static Object playerDataValue(EntityKey key) {
-    	return instance().get(PlayerData.class).get(key);
+    	return instance().get(PlayerData.class, null).get(key);
     }
 
     /**
@@ -149,9 +161,9 @@ public class DataCache {
     	private final Map data;
     	private final String jsonData;
     	
-    	DataHolder(IDataProvider dp) {
+    	DataHolder(IDataProvider dp, Map optionalParams) {
     		this.dp = dp;
-        	data = Collections.unmodifiableMap(dp.getMap());
+        	data = Collections.unmodifiableMap(dp.getMap(optionalParams));
         	jsonData = JsonHelper.toJson(data);
         	expires = System.currentTimeMillis() + dp.getTTL(); 		
     	}

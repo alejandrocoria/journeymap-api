@@ -35,6 +35,7 @@ public class GameData implements IDataProvider {
 	public GameData() {
 	}
 	
+	@Override
 	public Enum[] getKeys() {
 		return Key.values();
 	}
@@ -42,7 +43,8 @@ public class GameData implements IDataProvider {
 	/**
 	 * Return a map of game data.
 	 */
-	public Map getMap() {	
+	@Override
+	public Map getMap(Map optionalParams) {	
 		
 		PropertyManager pm = PropertyManager.getInstance();		
 		LinkedHashMap props = new LinkedHashMap();		
@@ -59,6 +61,7 @@ public class GameData implements IDataProvider {
 	/**
 	 * Return length of time in millis data should be kept.
 	 */
+	@Override
 	public long getTTL() {
 		return TTL;
 	}
@@ -66,6 +69,7 @@ public class GameData implements IDataProvider {
 	/**
 	 * Return false by default. Let cache expired based on TTL.
 	 */
+	@Override
 	public boolean dataExpired() {
 		return false;
 	}

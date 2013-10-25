@@ -280,3 +280,10 @@ canvas {
 .ui-corner-br {
     border-bottom-right-radius: 6px;
 }
+
+/* Fix Google Maps canvas */
+.google-map-canvas,
+.google-map-canvas * { .box-sizing(content-box); }
+
+/* Optional responsive image override */
+img { max-width: none; }

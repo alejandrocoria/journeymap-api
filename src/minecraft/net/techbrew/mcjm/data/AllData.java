@@ -13,10 +13,11 @@ import net.techbrew.mcjm.io.PropertyManager;
  */
 public class AllData implements IDataProvider {
 	
-	private long TTL;
+	private final long TTL;
 	
 	public static enum Key {
 		animals,
+		images,
 		mobs,
 		player,
 		players,
@@ -32,6 +33,7 @@ public class AllData implements IDataProvider {
 		TTL = PropertyManager.getInstance().getInteger(PropertyManager.Key.BROWSER_POLL);
 	}
 	
+	@Override
 	public Enum[] getKeys() {
 		return Key.values();
 	}
@@ -39,11 +41,13 @@ public class AllData implements IDataProvider {
 	/**
 	 * Return map of world-related properties.
 	 */
-	public Map getMap() {		
+	@Override
+	public Map getMap(Map optionalParams) {		
 		
 		DataCache cache = DataCache.instance();
 		LinkedHashMap props = new LinkedHashMap();
 		props.put(Key.animals, cache.get(AnimalsData.class).get(EntityKey.root));
+		props.put(Key.images, cache.get(ImagesData.class, optionalParams));
 		props.put(Key.mobs, cache.get(MobsData.class).get(EntityKey.root));
 		props.put(Key.player, cache.get(PlayerData.class));
 		props.put(Key.players, cache.get(PlayersData.class).get(EntityKey.root));
@@ -59,6 +63,7 @@ public class AllData implements IDataProvider {
 	/**
 	 * Return length of time in millis data should be kept.
 	 */
+	@Override
 	public long getTTL() {
 		return TTL;
 	}
@@ -66,6 +71,7 @@ public class AllData implements IDataProvider {
 	/**
 	 * Return false by default. Let cache expired based on TTL.
 	 */
+	@Override
 	public boolean dataExpired() {
 		return false;
 	}
