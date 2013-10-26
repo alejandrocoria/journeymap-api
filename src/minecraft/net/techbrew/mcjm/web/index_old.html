@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>JourneyMap</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="description" content="">
+    <meta name="author" content="Mark Woodman - Techbrew.net">
+
+    <link href="http://feeds.feedburner.com/JourneyMap" id="rssfeed" rel="alternate" type="application/rss+xml" />
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css" />
+    <link href="css/default.css" rel="stylesheet" type="text/css" />
+
+    <!-- Fav and touch icons -->
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon.png">
+
+    <!-- Javascript -->
+    <!--[if IE]><script type="text/javascript" src="js/excanvas.compiled.js"></script><![endif]-->
+    <script src="js/jquery-1.9.1.js"></script>
+    <script src="js/jquery.mousewheel.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery-ui-1.10.0.custom.min.js"></script>
+  </head>
+
+<body>
+
+    <div id="header" class="navbar navbar-static-top">
+      <div class="navbar-inner">
+
+        <div class="container">
+
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+
+          <img id="logo" src="ico/journeymap40.png" alt="">
+
+          <div class="btn-group">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">JourneyMap <span id="version"></span> <span class="caret"></span></a>
+            <ul id="mainMenu" class="dropdown-menu">
+              <li><a target="_blank" id="webLink" title="http://journeymap.techbrew.net" href="http://journeymap.techbrew.net?original_referer=ingame"><img src="img/browser.png" width="16" alt=""><span id="webLinkText">http://journeymap.techbrew.net</span></a></li>
+              <li><a target="_blank" id="forumLink" title="JourneyMap forum on minecraftforum.net" href="http://goo.gl/sP15m"><img src="img/forums.png" width="16" alt=""><span id="forumLinkText">Minecraft Forum</span></a></li>
+              <li><a target="_blank" id="rssLink" title="" href="http://feeds.feedburner.com/JourneyMap"><img src="img/feed-icon16x16.png" alt=""><span id="rssLinkText">JourneyMap news RSS</span></a></li>
+              <li><a target="_blank" id="emailLink" title="" href="http://feedburner.google.com/fb/a/mailverify?uri=Journeymap"><img src="img/email.png" alt=""><span id="emailLinkText">JourneyMap news Email</span></a></li>
+              <li><a target="_blank" id="twitterLink" title="" href="https://twitter.com/intent/follow?original_referer=localhost&amp;region=follow_link&amp;screen_name=JourneyMapMod&amp;source=followbutton&amp;variant=2.0"><img src="img/twitter.png" alt=""><span id="twitterLinkText">Follow JourneyMapMod on Twitter</span></a></li>
+              <li><a target="_blank" id="donateLink" title="" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=D5KK9FRAQG6DE"><img src="img/paypal.png" alt=""><span id="donateLinkText">Donate to JourneyMap</span></a></li>              
+            </ul>
+          </div>
+          
+          <div class="btn-group jmtoggle nav-collapse collapse">
+            <button id="updateButton" class="btn btn-info">
+              <i class="icon-flag"></i>
+            </button>
+          </div>
+
+          <div class="btn-group jmtoggle nav-collapse collapse">
+            <button id="dayNightButton" class="btn btn-primary btn-warning active"><span id="dayNightText">[day/night]</span></button>
+            <button id="followButton" class="btn active">
+              <i class="icon-map-marker"></i>
+            </button>
+          </div>
+          
+            <ul class="btn-group jmtoggle nav-collapse collapse">
+              <li class="dropdown">
+                <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+	              <span id="showMenuText"></span><span class="caret"></span>
+	            </a>
+	            <ul id="showMenu" class="dropdown-menu">
+	              <li>
+	                <label>
+	                  <input id="checkShowCaves" type="checkbox">
+	                  <span id="cavesMenuItem"></span>
+	                </label>
+	              </li>
+	              <li>
+                    <label>
+                      <input id="checkShowGrid" type="checkbox">
+                      <span id="gridMenuItem"></span>
+                    </label>
+                  </li>
+                  <li>
+                    <label>
+                      <input id="checkShowWaypoints" type="checkbox">
+                      <span id="waypointsMenuItem"></span>
+                    </label>
+                  </li>
+                  <li class="divider"></li>
+	              <li>
+	                <label>
+	                  <input id="checkShowAnimals" type="checkbox">
+	                  <span id="animalsMenuItem"></span>
+	                </label>
+	              </li>
+	              <li>
+	                <label>
+	                  <input id="checkShowPets" type="checkbox">
+	                  <span id="petsMenuItem"></span>
+	                </label>
+	              </li>
+	              <li>
+	                <label>
+	                  <input id="checkShowMobs" type="checkbox">
+	                  <span id="mobsMenuItem"></span>
+	                </label>
+	              </li>
+	              <li>
+	                <label>
+	                  <input id="checkShowVillagers" type="checkbox">
+	                  <span id="villagersMenuItem"></span>
+	                </label>
+	              </li>
+	              <li>
+	                <label>
+	                  <input id="checkShowPlayers" type="checkbox">
+	                  <span id="playersMenuItem"></span>
+	                </label>
+	              </li>
+	            </ul>
+              </li>
+            </ul>            
+
+
+          <div class="btn-group jmtoggle nav-collapse collapse">
+            <button id="saveButton" class="btn">
+              <i class="icon-picture"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <canvas id="mapCanvas"></canvas>
+
+    <div id="main" class="container">
+      <div id="worldInfo" class="nav-collapse collapse">
+
+        <span class="infoTitle" id="worldNameLabel"></span>
+        <span id="worldName"></span>
+
+        <span class="infoTitle" id="worldTimeLabel"></span>
+        <span id="worldTime"></span>
+
+        <span class="infoTitle" id="playerLocationLabel"></span>
+        <span id="playerLocation"></span>
+
+        <span class="infoTitle" id="playerElevationLabel"></span>
+        <span id="playerElevation"></span>
+
+        <span class="infoTitle" id="playerBiomeLabel"></span>
+        <span id="playerBiome"></span>
+
+      </div>
+      <div id="slider-vertical"></div>
+    </div>
+
+    <script type="text/javascript" src="/js/journeymap.js"></script>
+  </body>
+</html>
