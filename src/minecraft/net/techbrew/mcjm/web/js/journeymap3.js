@@ -7,14 +7,14 @@
  * May not be modified or distributed without express written consent.
  */
 var JourneyMap = (function() {
-	var googleMap;
+	var mcMap;
 	var mapScale = 4;
 	var minMapScale = 1;
 	var maxMapScale = 10;
 	var smoothing = false;
 	var mapBounds = {};
 
-	var isNightMap = true;
+	var isNightMap = false;
 	var showCaves = true;
 	var centerOnPlayer = true;
 
@@ -26,7 +26,7 @@ var JourneyMap = (function() {
 	var showWaypoints = true;
 	var showGrid = true;
 
-	var mapBackground = "#222";
+	var mapBackground = "#112";
 
 	var canvas;
 	var bgCanvas;
@@ -52,7 +52,7 @@ var JourneyMap = (function() {
 	var mobImages = {};
 	var chunkScale = mapScale * 16;
 
-	var JmIcon, LoadingIcon;
+	var JmIcon;
 	var halted = false;
 	var uiInitialized = false;
 	var versionChecked = false;
@@ -206,20 +206,6 @@ var JourneyMap = (function() {
 						$(JmIcon).delay(1000).fadeOut(1000);
 					}
 					
-					// Loading
-					if(!LoadingIcon) {
-						LoadingIcon = new Image();
-						LoadingIcon.src = "/img/loading.gif";
-						LoadingIcon.alt = "";
-						LoadingIcon.style.position = "absolute";
-						LoadingIcon.style.visibility = "visible";
-						LoadingIcon.style.left = ($(window).width() / 2 - 16) + "px";
-						LoadingIcon.style.top = ($(window).height() / 2 - 16) + "px";
-						LoadingIcon.style.zIndex = 90;
-						document.body.appendChild(LoadingIcon);
-						$(LoadingIcon).hide();
-					}
-
 					// Init UI
 					initUI();
 				});
@@ -327,7 +313,7 @@ var JourneyMap = (function() {
 			postPreference("preference_show_waypoints", showWaypoints);
 			drawMap();
 		});
-		if(JM.game.waypoints_enabled!==true) {
+		if(JM.game && JM.game.waypoints_enabled!==true) {
 			$("#checkShowWaypoints").attr("disabled", true);
 		}
 		
@@ -382,15 +368,6 @@ var JourneyMap = (function() {
 		// Init images
 		initImages();
 
-		// Disable selection events by default
-		$("*").on('selectstart dragstart', function(evt) {
-			evt.preventDefault();
-			return false;
-		});
-
-		// Keyboard events
-		$(document).keypress(myKeyPress);
-
 		// Set flag so this function doesn't get called twice
 		uiInitialized = true;
 
@@ -437,8 +414,7 @@ var JourneyMap = (function() {
 		// Reset state
 		halted = false;
 		updatingMap = false;
-		clearTimer();
-		setCenterOnPlayer(true);
+		clearTimer();		
 
 		// Ensure the map is sized
 		sizeMap();
@@ -451,7 +427,8 @@ var JourneyMap = (function() {
 			});
 			$("#slider-vertical").show();
 			
-			googleMap = new GM.RegionMap(document.getElementById('map-canvas'));
+			mcMap = new MCMap(document.getElementById('map-canvas'));
+			setCenterOnPlayer(true);
 		}
 
 		queryServer(finishUI);
@@ -523,15 +500,6 @@ var JourneyMap = (function() {
 	var sizeMap = function() {
 	}
 
-	var centerMapOnPlayer = function() {
-		if (JM.player) {
-			centerMapOnChunk(Math.round(JM.player.chunkCoordX), Math.round(JM.player.chunkCoordZ));
-		}
-	}
-
-	function centerMapOnChunk(chunkX, chunkZ) {
-		checkBounds();
-	}
 
 	function checkBounds() {
 	}
@@ -563,8 +531,7 @@ var JourneyMap = (function() {
 		}
 		
 		if(typeChanged && JM.player.underground === false) {		
-			console.log("setMapType(" + mapType + ")");
-			$(LoadingIcon).show();
+			if (JM.debug) console.log("setMapType(" + mapType + ")");
 			refreshMap();
 		}
 
@@ -574,7 +541,7 @@ var JourneyMap = (function() {
 
 		centerOnPlayer = onPlayer;
 		if (onPlayer === true) {
-			centerMapOnPlayer();
+			drawPlayer();
 			$("#followButton").addClass("active");
 		} else {
 			$("#followButton").removeClass("active");
@@ -603,9 +570,9 @@ var JourneyMap = (function() {
 		
 		// Params for dirty image check
 		var params = "";
-		if(googleMap) {
+		if(mcMap) {
 			if(!lastImageCheck) lastImageCheck = new Date().getTime();
-			params = "?images.zoom=" + googleMap._map.getZoom() + "&images.since=" + lastImageCheck;
+			params = "?images.since=" + lastImageCheck;
 		}
 
 		// Get all the datas
@@ -659,12 +626,13 @@ var JourneyMap = (function() {
 				return;
 
 			// Draw the map
-			if(googleMap) {
+			if(mcMap) {
 				mapOverlay.refreshTiles();
 				drawMap();
 			}
 
 			if (timerId === null) {
+				var dur = JM.game ? JM.game.browser_poll : 1000 || 1000;
 				timerId = setInterval(queryServer, Math.max(1000, JM.game.browser_poll));
 			}
 			if (callback) {
@@ -695,7 +663,7 @@ var JourneyMap = (function() {
 	 * Force immediate update
 	 */
 	var refreshMap = function() {
-		console.log("refreshMap");
+		if (JM.debug) console.log(">>> " + "refreshMap");
 		clearTimer();		
 		skipImageCheck = true; // Don't need tiles to be checked by queryServer
 		queryServer(function(){
@@ -750,11 +718,6 @@ var JourneyMap = (function() {
 		});
 		$("#worldInfo").hide();
 		$("#slider-vertical").hide();
-		
-		// Hide loading image if shown
-		if(LoadingIcon) {
-			$(LoadingIcon).hide();
-		}
 
 		var displayError;
 		if (data.status === 503 || data.status === 0) {
@@ -762,32 +725,14 @@ var JourneyMap = (function() {
 		} else {
 			displayError = "";
 		}
-
-		// Format UI
-		$('body').css('backgroundColor', mapBackground);
-		sizeMap();
-
-		if (canvas) {
-			var ctx = canvas.getContext("2d");
-
-			if (!JmIcon) {
-				JmIcon = new Image();
-				JmIcon.onload = function() {
-
-					ctx.drawImage(JmIcon, getCanvasWidth() / 2 - 72, getCanvasHeight() / 2 - 160);
-					JmIcon.onload = null;
-				};
-				JmIcon.src = "/ico/apple-touch-icon.png";
-			} else {
-				ctx.drawImage(JmIcon, getCanvasWidth() / 2 - 72, getCanvasHeight() / 2 - 160);
-			}
-
-			ctx.globalAlpha = 1;
-			ctx.fillStyle = "red";
-			ctx.font = "bold 16px Arial";
-			ctx.textAlign = "center";
-			ctx.fillText(displayError, getCanvasWidth() / 2, (getCanvasHeight() / 2) + 10);
+		
+		// Display error
+		$('#map-canvas').empty().html("<center><h4 style='color:red;margin-top:30px'>" + displayError + "</h4></center>");
+		
+		if (JmIcon) {
+			$('#map-canvas').prepend(JmIcon);
 		}
+		
 
 		// Restart in 5 seconds
 		if (!halted) {
@@ -832,19 +777,9 @@ var JourneyMap = (function() {
 
 		drawingMap = true;
 
-		// Ensure map centered
-		if (centerOnPlayer === true) {
-			centerMapOnPlayer();
-		} else {
-			checkBounds();
-		}
-
 		// Get canvas dimensions
 		var canvasWidth = null;
 		var canvasHeight = null;
-
-		// Turn off loading image
-		$(LoadingIcon).hide();
 		
 		// Refresh GM
 		if(mapOverlay) {
@@ -869,34 +804,37 @@ var JourneyMap = (function() {
 
 	// Draw the player icon
 	var drawPlayer = function(canvasWidth, canvasHeight) {
-
+		
 		if (JM.debug)
 			console.log(">>> " + "drawPlayer");
-
-		if (userPanning === true)
-			return;
-
-		return;
-
-		var player = JM.player;
-		var x = getScaledChunkX(player.posX / 16) - (mapScale / 2);
-		var z = getScaledChunkZ(player.posZ / 16) - (mapScale / 2);
-
-		if (x >= 0 && x <= canvasWidth && z >= 0 && z <= canvasHeight) {
-
-			var ctx = fgCanvas.getContext("2d");
-			var radius = playerImage.width / 2;
-
-			if (ctx.drawImage) {
-				ctx.save();
-				ctx.translate(x, z);
-				ctx.rotate(player.heading);
-				ctx.translate(-radius, -radius);
-				ctx.drawImage(playerImage, 0, 0);
-				ctx.restore();
-			}
-
+		
+		// Get current player position
+		var point = blockPosToLatLng(JM.player.posX, JM.player.posZ);
+		
+		// Ensure marker
+		if(!mcMap.markers['player']) {
+			
+			mcMap.markers['player'] = new google.maps.Marker({
+			    position: point,
+			    map: mcMap.map,
+			    title: JM.player.name
+			});
+			
+			google.maps.event.addListener(mcMap.map, 'dragstart', function() {
+				setCenterOnPlayer(false);
+			});
+			
+		} 
+		
+		// Update marker position
+		mcMap.markers['player'].setPosition(point);	
+		
+		
+		if(centerOnPlayer===true) {
+			mcMap.map.panTo(point);
 		}
+		
+		// TODO:  Update marker rotation with player.heading
 
 	}
 
@@ -1265,205 +1203,174 @@ var JourneyMap = (function() {
 	}
 	
 
-	/**
-	 * Update mouse coordinates based on the last event.
-	 */
-	function getMouse(event) {
-
-		if (!event) { /* For IE. */
-			event = window.event;
-		}
-		
-		if(event.originalEvent && event.originalEvent.targetTouches) {
-			event = event.originalEvent.targetTouches[0];
-		}
-		
-		if(event.pageX) {
-			mx = event.pageX;
-			my = event.pageY;
-		}
-
+	
+	/** Google Maps Code **/
+	
+	google.maps.visualRefresh = true;
+	
+	var MapConfig = {
+		tileSize : 512,
+		defaultZoom : 0,
+		minZoom : 0,
+		maxZoom : 5
 	}
-
-	function myKeyPress(e) {
-
-		var key = (e) ? e.which : e.keyCode;
-		switch (String.fromCharCode(key)) {
-			case '-' :
-				zoom('out');
-				break;
-			case '=' :
-				zoom('in');
-				break;
-			case 'w' :
-			case 'W' :
-				moveCanvas('up');
-				break;
-			case 'a' :
-			case 'A' :
-				moveCanvas('right');
-				break;
-			case 's' :
-			case 'S' :
-				moveCanvas('down');
-				break;
-			case 'd' :
-			case 'D' :
-				moveCanvas('left');
-				break;
-		}
-	}
-
-	var getURLParameter = function(name) {
-		return decodeURI((RegExp(name + '=' + '(.+?)(&|$)').exec(location.search) || [, null])[1]);
+	MapConfig.perPixel = 1.0 / MapConfig.tileSize;
+	
+	var blockPosToLatLng = function (x, y) {
+		var me = this;		
+		var center = .5 * MapConfig.perPixel;		
+		var lat = (y * MapConfig.perPixel) + center;
+		var lng = (x * MapConfig.perPixel) + center;		
+		return new google.maps.LatLng(lat, lng);
 	}
 	
-	var getTileUrlBase = function(coord, zoom) {
-		return "/tile?zoom=" + zoom + "&x=" + coord.x + "&z=" + coord.y;
-	}	
+	var toChunkRange = function (coord, zoom) {
+		var scale = Math.pow(2, zoom);
+		var distance = 32/scale;
+		var minChunkX = coord.x * distance;
+		var minChunkZ = coord.y * distance;
+		var maxChunkX = minChunkX + distance - 1;
+		var maxChunkZ = minChunkZ + distance - 1;
+		return {
+			min: { x:minChunkX, z:minChunkZ },
+			max: { x:maxChunkX, z:maxChunkZ },
+		};
+	}
 	
-	var getTileState = function() {
+	var toRegion = function (coord, zoom) {
+		var scale = Math.pow(2, zoom);
+		var regionX = coord.x / scale;
+		var regionZ = coord.y / scale;
+		return { x:regionX, z:regionZ };
+	}
+		
+	var MCMap = function (container) {
+	    this.map = new google.maps.Map(container, {
+	        zoom: MapConfig.defaultZoom,
+	        center: new google.maps.LatLng(0,0),
+	        mapTypeControl: false,
+	        streetViewControl: false
+	    });
+	    mapOverlay = new MCMapType();
+	    this.map.mapTypes.set('jm', mapOverlay);
+	    this.map.setMapTypeId('jm');
+	    this.markers = {};
+	};
+
+	var MCMapType = function () {
+		this.loadedTiles = {};
+		this.projection = new MCMapProjection(MapConfig.tileSize);
+		this.tileSize = new google.maps.Size(MapConfig.tileSize,MapConfig.tileSize);
+		this.minZoom = MapConfig.minZoom;
+		this.maxZoom = MapConfig.maxZoom;
+		//this.isPng = true;
+	};
+	
+	MCMapType.prototype.getTileState = function() {
 		var mapType = (JM.player && JM.player.underground === true && showCaves === true) ? "underground" : (isNightMap === true ? "night" : "day");
 		var dimension = (JM.player.dimension);
 		var depth = (JM.player && JM.player.chunkCoordY != undefined) ? JM.player.chunkCoordY : 4;
 		return "&mapType=" + mapType + "&dim=" + dimension + "&depth=" + depth + "&ts=" + lastImageCheck;
 	}
 	
-	/** Google Maps Code **/
-	
-	google.maps.visualRefresh = true;
-	
-	var GM = function() {};
-	GM.RegionMap = function (container) {
-	    this._map = new google.maps.Map(container, {
-	        zoom: 0,
-	        center: new google.maps.LatLng(12,36),
-	        mapTypeControl: false,
-	        streetViewControl: false
-	    });
-	    mapOverlay = new GM.ImgMapType();
-	    this._map.mapTypes.set('region', mapOverlay);
-	    this._map.setMapTypeId('region');
-	};
-
-	GM.ImgMapType = function () {
-		this.loadedTiles = {};
-		this.projection = new EuclideanProjection();
-		this.tileSize = new google.maps.Size(512,512);
-		this.minZoom = 0;
-		this.maxZoom = 5;
-	};
-	
 	// Adapted from http://code.martinpearman.co.uk/deleteme/MyOverlayMap.js
-	GM.ImgMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
+	MCMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
+		var me = this;
 
-		var tileUrl = getTileUrlBase(coord, zoom);
+		var tileUrl = "/tile?zoom=" + zoom + "&x=" + coord.x + "&z=" + coord.y;
 		var tileId = 'x_' + coord.x + '_y_' + coord.y + '_zoom_' + zoom;
 		
-		var tile = ownerDocument.createElement('img');
-		tile.style.height = this.tileSize.height + 'px';
-		tile.style.width = this.tileSize.width + 'px';
-		tile.tileId = tileId;
-		tile.tileUrl = tileUrl;
-		tile.coord = coord;
-		tile.zoom = zoom;
-		this.loadedTiles[tileId] = tile;		
-		tileUrl += getTileState();
+		var tile = ownerDocument.createElement('div');
+		$(tile).css('width', this.tileSize.height + 'px')
+			   .css('width', this.tileSize.height + 'px')
+			   .css('height', this.tileSize.height + 'px')
+			   .attr('data-tileid', tileId);
 		
-		var img = new Image();
-		img.onload = function () {
-			console.log("putting in image " + tileId);
-			tile.src = img.src;
-			img.onload = null;
-			img = null;
-		};
-		img.src = tileUrl;
+		if (JM.debug) {
+			var label = ownerDocument.createElement('span');
+			$(label).css('color','white')
+			        .css('float','left')
+			        .html(coord.toString() + " zoom " + zoom);
+			$(tile).append(label);
+		}
 		
+		var img = $('<img>')
+			.attr('src', tileUrl += me.getTileState())
+			.on('load', function() {
+				$(tile).prepend(img);
+			});
+		
+		me.loadedTiles[tileId] = {
+			tile: tile,
+			tileUrl: tileUrl,
+			coord: coord,
+			zoom: zoom
+		}
+			
 		return tile;
 	};
 	
-	GM.ImgMapType.prototype.refreshTiles = function (force) {
+	MCMapType.prototype.refreshTile = function(tile) {
 		var me = this;
 		
-		//console.log('------------- refreshTiles ' + force);
+		if (JM.debug) console.log(">>> " + "refreshTile " + $(tile).data('tileid'));
 		
-		function onloadCallback(tile2, tileUrl2){
-			return function(){
-				tile2.style.backgroundImage = 'url(' + tileUrl2 + ')';
-			};
+		var tileData = me.loadedTiles[$(tile).data('tileid')];
+		if(tileData) {
+			var url = tileData.tileUrl + me.getTileState();			
+			$(tile).find('img').attr('src', url);
 		}
+	}
+	
+	MCMapType.prototype.refreshTiles = function (force) {
+		var me = this;
 		
-		function refreshTile(tile) {
-//			var tileUrl = tile.tileUrl + getTileState();
-//			var img = new Image();
-//			img.onload = onloadCallback(tile, tileUrl);
-//			img.src = tileUrl;
-			
-			tile.onload = function () {
-				console.log("refreshTile " + tile.src);
-			}
-			tile.src = tile.tileUrl + getTileState();
-//			
-//			var img = new Image();
-//			img.onload = function () {
-//				console.log("refreshing image " + tileId);
-//				tile.src = img.src;
-//				img.onload = null;
-//				img = null;
-//			};
-//			img.src = tileUrl;
-		}
+		if (JM.debug) console.log(">>> " + "refreshTiles " + force||false);
 		
-		if(force) {
+		if(force) {			
 			for (var tileId in me.loadedTiles) {
-				var tile = me.loadedTiles[tileId];
-				refreshTile(tile);
+				var tileData = me.loadedTiles[tileId];
+				var tile = tileData.tile;
+				me.refreshTile(tile);
 			}
 			lastImageCheck = JM.images.queryTime;
 			return;
 		}
 			
-		if(!JM.images || !JM.images.regions || JM.images.regions.length===0) {
-			//console.log("No regions: ", JM.images);
-			lastImageCheck = JM.images.queryTime;
+		if(JM.images.regions.length===0) {
+			if (JM.debug) console.log("No regions have changed: ", JM.images);
+			lastImageCheck = JM.images.queryTime || new Date().getTime();
 			return;
 		}
 		
-//		if(lastImageCheck === JM.images.queryTime) {
-//			console.log("skipping redundant refresh");
-//			return;
-//		}
-		lastImageCheck = JM.images.queryTime;
+		lastImageCheck = JM.images.queryTime || new Date().getTime();
 		
-		console.log("Regions changed since ", JM.images.since);
-		JM.images.regions.forEach(function(region) {
-			console.log("\t", region);
-		});
-		
-		var currentZoom = googleMap._map.getZoom();
-		
-		if(!this.loadedTiles) {
-			console.log("where have all the tiles gone?!");
-		}
-		
-		for (var tileId in me.loadedTiles) {
-			var tile = me.loadedTiles[tileId];
-			if(tile.zoom!=currentZoom) {
-				//console.log("bad zoom", tileId);
-				return true; // skip
-			}		
-			
-			var scale = Math.pow(2,tile.zoom);
-			var tileX = tile.coord.x / scale;
-			var tileY = tile.coord.y / scale;
-			
+		if (JM.debug) {
+			console.log("Regions changed since ", JM.images.since);
 			JM.images.regions.forEach(function(region) {
-				if(tileX==region[0] && tileY==region[1]) {
-					console.log(tileX + "," + tileY + " -- " + tileId + "will be refreshed " + region);
-					refreshTile(tile);
+				console.log("\t", region);
+			});
+		}
+
+		for (var tileId in me.loadedTiles) {
+			
+			var tileData = me.loadedTiles[tileId];
+			if(!tileData) continue;
+			
+			var tile = tileData.tile;
+			var zoom = tileData.zoom;
+			var scale = Math.pow(2,zoom);
+			var coord = tileData.coord;
+			
+			var tileRegion = [parseInt(coord.x / scale), parseInt(coord.y / scale)];
+						
+			JM.images.regions.forEach(function(region) {
+				if(tileRegion[0]==region[0] && tileRegion[1]==region[1]) {
+					if (JM.debug) console.log("    tile " + coord + " zoom " + zoom + " in region: ", tileRegion);
+					me.refreshTile(tile);
 					return false;
 				} else {
-					//console.log(tileX + "," + tileY + " -- " + tileId + "not touched " + region);
+					if (JM.debug) console.log("    tile " + coord + " zoom " + zoom + " not in region: ", tileRegion);
 					return true;
 				}
 			});				
@@ -1471,10 +1378,14 @@ var JourneyMap = (function() {
 		
 	};
 	
-	GM.ImgMapType.prototype.releaseTile = function (tile) {
+	MCMapType.prototype.releaseTile = function (tile) {
 		delete this.loadedTiles[tile.tileId];
 		tile = null;
 	};
+	
+	var getURLParameter = function(name) {
+		return decodeURI((RegExp(name + '=' + '(.+?)(&|$)').exec(location.search) || [, null])[1]);
+	}
 	
 	JM.debug = 'true' === getURLParameter('debug');
 	
@@ -1484,7 +1395,28 @@ var JourneyMap = (function() {
 	};
 })();
 
-// Google Analytics
+/** Adapted from https://port70.net/svn/misc/minecraft/positionweb/active.html */
+function MCMapProjection(tileSize) {
+	this.tileSize = tileSize;
+    this.inverseTileSize = 1.0 / tileSize;
+}
+  
+MCMapProjection.prototype.fromLatLngToPoint = function(latLng) {
+	var me = this;
+	var x = latLng.lng() * me.tileSize;
+	var y = latLng.lat() * me.tileSize;
+	return new google.maps.Point(x, y);
+};
+
+MCMapProjection.prototype.fromPointToLatLng = function(point) {
+	var me = this;
+    var lng = point.x * me.inverseTileSize;
+    var lat = point.y * me.inverseTileSize;
+    return new google.maps.LatLng(lat, lng);
+};
+
+
+/** Google Analytics **/
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-28839029-1']);
 _gaq.push(['_setDomainName', 'none']);
@@ -1492,7 +1424,6 @@ _gaq.push(['_setAllowLinker', true]);
 _gaq.push(['_trackPageview']);
 
 (function() {
-
 	var ga = document.createElement('script');
 	ga.type = 'text/javascript';
 	ga.async = true;
@@ -1501,38 +1432,7 @@ _gaq.push(['_trackPageview']);
 	s.parentNode.insertBefore(ga, s);
 })();
 
-/**
- * EuclideanProjection
- * based on code in public domain written by Ben Appleton
- */ 
-function EuclideanProjection() {
-    var EUCLIDEAN_RANGE = 256;
-    this.pixelOrigin_ = new google.maps.Point(EUCLIDEAN_RANGE / 2, EUCLIDEAN_RANGE / 2);
-    this.pixelsPerLonDegree_ = EUCLIDEAN_RANGE / 360;
-    this.pixelsPerLonRadian_ = EUCLIDEAN_RANGE / (2 * Math.PI);
-    this.scaleLat = 18; // Height
-    this.scaleLng = 18; // Width
-    this.offsetLat = 0; // Height
-    this.offsetLng = 0; // Width
-};
- 
-EuclideanProjection.prototype.fromLatLngToPoint = function(latLng, opt_point) {
-    var point = opt_point || new google.maps.Point(0, 0);
-    var origin = this.pixelOrigin_;
-    point.x = (origin.x + (latLng.lng() + this.offsetLng ) * this.scaleLng * this.pixelsPerLonDegree_);
-    point.y = (origin.y + (-1 * latLng.lat() + this.offsetLat ) * this.scaleLat * this.pixelsPerLonDegree_);
-    return point;
-};
- 
-EuclideanProjection.prototype.fromPointToLatLng = function(point) {
-    var me = this;
-    var origin = me.pixelOrigin_;
-    var lng = (((point.x - origin.x) / me.pixelsPerLonDegree_) / this.scaleLng) - this.offsetLng;
-    var lat = ((-1 *( point.y - origin.y) / me.pixelsPerLonDegree_) / this.scaleLat) - this.offsetLat;
-    return new google.maps.LatLng(lat, lng, true);
-};
-
-/** OnLoad * */
+/** OnLoad **/
 google.maps.event.addDomListener(window, 'load', function () {    
     JourneyMap.start();
 });
