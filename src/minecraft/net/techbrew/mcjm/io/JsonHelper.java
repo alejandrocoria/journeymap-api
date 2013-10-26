@@ -3,8 +3,6 @@ package net.techbrew.mcjm.io;
 import java.util.List;
 import java.util.Map;
 
-import net.techbrew.mcjm.JourneyMap;
-
 /**
  * Conversion of convenience objects to JSON strings.
  * 
@@ -77,7 +75,6 @@ public class JsonHelper {
 		} else if(val.getClass().isArray()) {
 			sb.append(toJson((Object[]) val));
 		} else {
-			JourneyMap.getLogger().warning("Unexpected object type for JSON serialization: " + val.getClass());
 			wrapAsString(sb, val);
 		}
 	}

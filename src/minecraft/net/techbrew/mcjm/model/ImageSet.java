@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 
@@ -208,7 +209,9 @@ public abstract class ImageSet {
 			    		dir.mkdirs();
 			    	}
 					ImageIO.write(_image, "png", new FileOutputStream(imageFile));
-					System.out.println("Wrote to disk: " + imageFile);
+					if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+						JourneyMap.getLogger().fine("Wrote to disk: " + imageFile); //$NON-NLS-1$
+					}	
 					_dirty = false;
 				}
 		    } catch (Throwable e) {

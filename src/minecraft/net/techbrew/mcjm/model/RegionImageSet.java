@@ -106,7 +106,9 @@ public class RegionImageSet extends ImageSet {
 		if(!dirty) {
 			if(before.getClass() != after.getClass()) {
 				dirty = true;
-				logger.info("Classes don't match: " + before.getClass() + " vs " + after.getClass());
+				if(logger.isLoggable(Level.FINER)) {
+					logger.finer("Classes don't match: " + before.getClass() + " vs " + after.getClass());
+				}
 			} else {
 				if(before instanceof DataBufferByte) {
 					dirty = bufferChanged((DataBufferByte) before, (DataBufferByte) after);
@@ -120,9 +122,9 @@ public class RegionImageSet extends ImageSet {
 					
 		if(dirty) {					
 			if(!wasDirty) {
-				if(logger.isLoggable(Level.INFO)) {
+				if(logger.isLoggable(Level.FINER)) {
 					long stop = System.nanoTime();
-					logger.info(rCoord + " dirty after chunk insert " + cCoord + ": " + dirty + ", compared in: " + TimeUnit.NANOSECONDS.toMicros(stop-start) + "micros");
+					logger.finer(rCoord + " dirty after chunk insert " + cCoord + ": " + dirty + ", compared in: " + TimeUnit.NANOSECONDS.toMicros(stop-start) + "micros");
 				}
 			}
 			wrapper.setDirty(); // updates the timestamp			
