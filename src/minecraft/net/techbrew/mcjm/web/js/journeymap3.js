@@ -78,6 +78,7 @@ var JourneyMap = (function() {
 		images : null
 	};
 	
+	var RAD_DEG=57.2957795
 
 	/**
 	 * JQuery add-on for disableSelection
@@ -809,16 +810,26 @@ var JourneyMap = (function() {
 			console.log(">>> " + "drawPlayer");
 		
 		// Get current player position
-		var point = blockPosToLatLng(JM.player.posX, JM.player.posZ);
+		var pos = blockPosToLatLng(JM.player.posX, JM.player.posZ);
+		var heading = JM.player.heading;
 		
 		// Ensure marker
 		if(!mcMap.markers['player']) {
+
+			var img = new Image();
+			$(img).attr('id','player-marker')
+			      .attr('src','/img/locator-player.png')
+			      .css('width','64px')
+			      .css('height','64px');
 			
-			mcMap.markers['player'] = new google.maps.Marker({
-			    position: point,
+			mcMap.markers['player'] = new RichMarker({
+				position: pos,
 			    map: mcMap.map,
-			    title: JM.player.name
-			});
+			    draggable: false,
+			    flat: true,
+			    anchor: RichMarkerPosition.MIDDLE,
+			    content: img
+	        });
 			
 			google.maps.event.addListener(mcMap.map, 'dragstart', function() {
 				setCenterOnPlayer(false);
@@ -826,16 +837,15 @@ var JourneyMap = (function() {
 			
 		} 
 		
-		// Update marker position
-		mcMap.markers['player'].setPosition(point);	
+		// Update marker position and heading
+		var marker = mcMap.markers['player'];
+		marker.setPosition(pos);
+		$('#player-marker').rotate(heading*RAD_DEG);
 		
-		
+		// Center if needed
 		if(centerOnPlayer===true) {
-			mcMap.map.panTo(point);
+			mcMap.map.panTo(pos);
 		}
-		
-		// TODO:  Update marker rotation with player.heading
-
 	}
 
 	// Draw the location of mobs
