@@ -20,7 +20,6 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
-import net.techbrew.mcjm.render.MapBlocks;
 import net.techbrew.mcjm.ui.ZoomLevel;
 
 public class RegionImageHandler {
@@ -323,15 +322,20 @@ public class RegionImageHandler {
 
 		// Show chunk grid
 		if(PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)) {
-			g2D.setColor(new Color(130,130,130));
-			g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2F));
-					
+			
+			if(mapType==MapType.day) {
+				g2D.setColor(new Color(130,130,130));
+				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.3F));
+			} else {
+				g2D.setColor(new Color(130,130,130));
+				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.10F));
+			}
+
 			for(int x = 0; x<imageWidth; x+=16) {
 				for(int z = 0; z<imageHeight; z+=16) {
 					g2D.drawRect(x, z, 16, 16);
 				}
 			}
-			g2D.setComposite(MapBlocks.OPAQUE);
 		}
 		
 		g2D.dispose();
