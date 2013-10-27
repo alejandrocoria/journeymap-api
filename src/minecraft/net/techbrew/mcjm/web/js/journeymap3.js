@@ -8,11 +8,6 @@
  */
 var JourneyMap = (function() {
 	var mcMap;
-	var mapScale = 4;
-	var minMapScale = 1;
-	var maxMapScale = 10;
-	var smoothing = false;
-	var mapBounds = {};
 
 	var isNightMap = false;
 	var showCaves = true;
@@ -26,32 +21,9 @@ var JourneyMap = (function() {
 	var showWaypoints = true;
 	var showGrid = true;
 
-	var mapBackground = "#112";
-
-	var canvas;
-	var bgCanvas;
-	var fgCanvas;
-	
 	var lastImageCheck = 0;
 	var skipImageCheck = false;
-
-	var userPanning = false;
-	var mx, my;
-	var msx, msy;
-
-	var tempMapImage;
-	var latestMapImage;
-
-	var playerImage;
-	var neutralMobImage;
-	var hostileMobImage;
-	var petMobImage;
-	var otherPlayerMobImage;
-	var otherImage;
-
-	var mobImages = {};
-	var chunkScale = mapScale * 16;
-
+	
 	var JmIcon;
 	var halted = false;
 	var uiInitialized = false;
@@ -70,24 +42,33 @@ var JourneyMap = (function() {
 		messages : null,
 		properties : null,
 		game : null,
-		mobs : [],
-		animals : [],
-		players : [],
-		villagers : [],
+		mobs : null,
+		animals : null,
+		players : null,
+		villagers : null,
 		waypoints : [],
 		images : null
 	};
 	
-	var RAD_DEG=57.2957795
-
-	/**
-	 * JQuery add-on for disableSelection
-	 */
-	(function($) {
-		$.fn.disableSelection = function() {
-			return this.attr('unselectable', 'on').css('user-select', 'none').on('selectstart', false); // ie
-		};
-	})(jQuery);
+	var markers = {
+		mobs : {},
+		animals : {},
+		players : {},
+		villagers : {},
+		waypoints : {}
+	}
+	
+	var entityTemplate = [
+	    '<div class="entityMarker" id="">',
+	    '<div class="entityName"/>',
+	    '<div class="entityImages">',			    
+	    '<img class="entityLocator" src="">',
+	    '<img class="entityIcon" src="" >',
+	    '</div>',
+	    '</div>'
+	].join('');
+	
+	var RAD_DEG=57.2957795;
 
 	/** Delay helper * */
 	var delay = (function() {
@@ -366,9 +347,6 @@ var JourneyMap = (function() {
 		$("#playerLocationLabel").html(getMessage('location_text'));
 		$("#playerElevationLabel").html(getMessage('elevation_text'));
 
-		// Init images
-		initImages();
-
 		// Set flag so this function doesn't get called twice
 		uiInitialized = true;
 
@@ -417,9 +395,6 @@ var JourneyMap = (function() {
 		updatingMap = false;
 		clearTimer();		
 
-		// Ensure the map is sized
-		sizeMap();
-
 		var finishUI = function() {
 
 			$(".jmtoggle").each(function() {
@@ -437,59 +412,6 @@ var JourneyMap = (function() {
 	}
 
 	/**
-	 * Preload any images as needed.
-	 */
-	var initImages = function() {
-
-		if (JM.debug)
-			console.log(">>> " + "initImages");
-
-		// Init player marker
-		if (!playerImage) {
-			playerImage = new Image();
-			playerImage.src = "/img/locator-player.png";
-			playerImage.width = 64;
-			playerImage.height = 64;
-		}
-
-		if (!neutralMobImage) {
-			neutralMobImage = new Image();
-			neutralMobImage.src = "/img/locator-neutral.png";
-			neutralMobImage.width = 64;
-			neutralMobImage.height = 64;
-		}
-
-		if (!hostileMobImage) {
-			hostileMobImage = new Image();
-			hostileMobImage.src = "/img/locator-hostile.png";
-			hostileMobImage.width = 64;
-			hostileMobImage.height = 64;
-		}
-
-		if (!petMobImage) {
-			petMobImage = new Image();
-			petMobImage.src = "/img/locator-pet.png";
-			petMobImage.width = 64;
-			petMobImage.height = 64;
-		}
-
-		if (!otherPlayerMobImage) {
-			otherPlayerMobImage = new Image();
-			otherPlayerMobImage.src = "/img/locator-other.png";
-			otherPlayerMobImage.width = 64;
-			otherPlayerMobImage.height = 64;
-		}
-		
-		if(!otherImage) {
-			otherImage = new Image();
-			otherImage.src = "/img/entity/steve.png";
-			otherImage.width = 48;
-			otherImage.height = 48;
-		}
-
-	}
-
-	/**
 	 * Invoke saving map file
 	 */
 	var saveMapImage = function() {
@@ -497,13 +419,6 @@ var JourneyMap = (function() {
 		alert("TODO");
 	}
 
-
-	var sizeMap = function() {
-	}
-
-
-	function checkBounds() {
-	}
 
 	function setMapType(mapType) {
 
@@ -764,12 +679,6 @@ var JourneyMap = (function() {
 		if (JM.debug)
 			console.log(">>> " + "drawMap");
 
-		if (userPanning === true) {
-			if (JM.debug)
-				console.log(">>> " + "Can't draw while userPanning");
-			return false;
-		}
-
 		if (drawingMap === true) {
 			if (JM.debug)
 				console.log(">>> " + "Avoided concurrent drawMap()");
@@ -778,23 +687,14 @@ var JourneyMap = (function() {
 
 		drawingMap = true;
 
-		// Get canvas dimensions
-		var canvasWidth = null;
-		var canvasHeight = null;
-		
-		// Refresh GM
-		if(mapOverlay) {
-			// TODO: only refresh tiles that have been updated
-		}
-
 		// mobs
-		drawMobs(canvasWidth, canvasHeight);
+		drawMobs();
 
 		// other players
-		drawMultiplayers(canvasWidth, canvasHeight);
+		drawMultiplayers();
 		
 		// waypoints
-		drawWaypoints(canvasWidth, canvasHeight);
+		drawWaypoints();
 
 		// player
 		drawPlayer();
@@ -804,7 +704,7 @@ var JourneyMap = (function() {
 	}
 
 	// Draw the player icon
-	var drawPlayer = function(canvasWidth, canvasHeight) {
+	var drawPlayer = function() {
 		
 		if (JM.debug)
 			console.log(">>> " + "drawPlayer");
@@ -812,17 +712,18 @@ var JourneyMap = (function() {
 		// Get current player position
 		var pos = blockPosToLatLng(JM.player.posX, JM.player.posZ);
 		var heading = JM.player.heading;
+		var imgId = 'player'+JM.player.entityId;
 		
 		// Ensure marker
-		if(!mcMap.markers['player']) {
+		if(!mcMap.playerMarker) {
 
 			var img = new Image();
-			$(img).attr('id','player-marker')
+			$(img).attr('id', imgId)
 			      .attr('src','/img/locator-player.png')
 			      .css('width','64px')
 			      .css('height','64px');
 			
-			mcMap.markers['player'] = new RichMarker({
+			mcMap.playerMarker = new RichMarker({
 				position: pos,
 			    map: mcMap.map,
 			    draggable: false,
@@ -835,156 +736,176 @@ var JourneyMap = (function() {
 				setCenterOnPlayer(false);
 			});
 			
+			google.maps.event.addListener(mcMap.map, 'zoom_changed', function() {
+				if(centerOnPlayer===true) {
+					mcMap.map.panTo(mcMap.playerMarker.getPosition());
+				}
+				
+				if(mcMap.map.getZoom()<3) {
+					$('img.entityLocator').css('visibility','hidden');
+				} else {
+					$('img.entityLocator').css('visibility','visible');
+				}
+				
+				if(mcMap.map.getZoom()==0) {
+					$('img.entityMarker').css('visibility','hidden');
+				} else {
+					$('img.entityMarker').css('visibility','visible');
+				}
+				
+			});
+
 		} 
 		
 		// Update marker position and heading
-		var marker = mcMap.markers['player'];
-		marker.setPosition(pos);
-		$('#player-marker').rotate(heading*RAD_DEG);
-		
+		mcMap.playerMarker.setPosition(pos);
+		$('#'+imgId).rotate(heading*RAD_DEG);
+
 		// Center if needed
 		if(centerOnPlayer===true) {
 			mcMap.map.panTo(pos);
 		}
 	}
+	
+	// Remove markers not in current JM data
+	var removeObsoleteMarkers = function(jmMap, markerMap) {
+		$.each(markerMap, function(id, marker) {
+			if(!jmMap || !(id in jmMap) ){
+				marker.setMap(null);
+				if(JM.debug) console.log("Marker removed for " + id);
+				delete markerMap[id];
+			}
+		});
+	}
 
 	// Draw the location of mobs
-	var drawMobs = function(canvasWidth, canvasHeight) {
+	var drawMobs = function() {
 
 		if (JM.debug)
 			console.log(">>> " + "drawMobs");
-
-		var ctx = null; // TODO
-
+		
+		if(mcMap.map.getZoom()===0) return;
+		
+		/**
+		 var markers = {
+			mobs : [],
+			animals : [],
+			players : [],
+			villagers : [],
+			waypoints : []
+		}
+		 */
+		
+		removeObsoleteMarkers(JM.mobs, markers.mobs);		
 		if (showMobs === true && JM.mobs) {
 			$.each(JM.mobs, function(index, mob) {
-
-				drawEntity(ctx, mob, canvasWidth, canvasHeight);
+				updateEntityMarker(mob,markers.mobs);
 			});
 		}
 
+		removeObsoleteMarkers(JM.animals, markers.animals);	
 		if ((showAnimals === true || showPets === true) && JM.animals) {
 			$.each(JM.animals, function(index, mob) {
-
-				drawEntity(ctx, mob, canvasWidth, canvasHeight);
+				updateEntityMarker(mob,markers.animals);
 			});
 		}
 
+		removeObsoleteMarkers(JM.villagers, markers.villagers);	
 		if (showVillagers === true && JM.villagers) {
 			$.each(JM.villagers, function(index, mob) {
-
-				drawEntity(ctx, mob, canvasWidth, canvasHeight);
+				updateEntityMarker(mob,markers.villagers);
 			});
 		}
+		
+		// TODO: get rid of old markers
 
 	}
 
-	// Draw the location of an entity
-	var drawEntity = function(ctx, mob, canvasWidth, canvasHeight) {
+	// Create or update marker
+	var updateEntityMarker = function(entity, markerMap) {
 
+		// Get current entity position
+		var id = 'id' + entity.entityId;
+		var pos = blockPosToLatLng(entity.posX, entity.posZ);
+		var heading = entity.heading;
 
-		return;
+		var locatorUrl;
+		var iconSize = 32;
+		var iconColor = "#cccccc";
+		var iconLabel = null;
+		var marker = markerMap[id];
 		
-		var x = getScaledChunkX(mob.posX / 16) - (mapScale * 1.5);
-		var z = getScaledChunkZ(mob.posZ / 16) - (mapScale * 1.5);
-		
-		
-		// TODO
-
-		if (x >= 0 && x <= canvasWidth && z >= 0 && z <= canvasHeight) {
-
-			var mobLocator;
-
-			if (mob.hostile !== true && mob.owner) {
-				if(mob.owner === JM.player.username) {			
-					if (showPets === false)
-						return;
-					mobLocator = petMobImage;
-					ctx.strokeStyle = "#0000ff";
-				} else {
-					mobLocator = neutralMobImage;
+		if (entity.hostile !== true && entity.owner) {
+			if(entity.owner === JM.player.username) {			
+				if (showPets === true) {
+					locatorUrl = "/img/locator-pet.png";
+					iconColor = "#0000ff";
 				}
-			} else if (mob.hostile !== true) {
-				if (showAnimals === false && !(mob.filename === 'villager.png'))
-					return;
-				mobLocator = neutralMobImage;
-				ctx.strokeStyle = "#cccccc";
 			} else {
-				mobLocator = hostileMobImage;
-				ctx.strokeStyle = "#ff0000";
+				locatorUrl = "/img/locator-neutral.png";
 			}
-
-			ctx.lineWidth = 2;
-			ctx.beginPath();
-			var radius = 32;
-			var filename = mob.filename;
-
-			if (ctx.drawImage) {
-				var locRadius = mobLocator.width / 2;
-				ctx.save();
-				ctx.globalAlpha = 1;
-				ctx.translate(x, z);
-				ctx.rotate(mob.heading);
-				ctx.translate(-locRadius, -locRadius);
-				ctx.drawImage(mobLocator, 0, 0);
-				ctx.restore();
+		} else if (entity.hostile !== true) {
+			if (showAnimals === false && !(entity.filename === 'villager.png')) {
+			} else {
+				locatorUrl = "/img/locator-neutral.png";
 			}
-
-			ctx.globalAlpha = 1.0;
-
-			// Get pre-loaded image, or lazy-load as needed
-			var mobImage = mobImages[filename];
-			if (!mobImage) {
-				mobImage = new Image();
-				mobImage['class'] = 'mobImage';
-				$(mobImage).one('error', function() {
-
-					this.src = 'img/entity/unknown.png';
-				});
-				mobImage.src = 'img/entity/' + filename;
-				mobImages[filename] = mobImage;
-			}
-
-			// Draw if image exists
-			if (mobImage.height > 0) {
-				radius = mobImage.width / 2;
-				ctx.save();
-				ctx.translate(x - radius, z - radius);
-								
-				if(mob.heading>Math.PI) {
-					ctx.translate(mobImage.width, 0);
-					ctx.scale(-1, 1);
-				}
-				
-				ctx.drawImage(mobImage, 0, 0, radius * 2, radius * 2);
-				ctx.restore();
-			}
-			
-			// Label if customName exists
-			if(mob.customName) {
-				// Draw label background			
-				ctx.font = "bold 11px Arial";
-				ctx.textAlign = "center";
-				ctx.fillStyle = "#000";
-				
-				var labelZ = z + 36; 
-				
-				// Get label dimensions
-				var metrics = ctx.measureText(mob.customName);
-				var width = metrics.width + 6;
-				ctx.globalAlpha = 0.7;
-				ctx.fillRect(x-(width/2), labelZ-12, width, 16);
-				
-				// Draw label
-				ctx.globalAlpha = 1.0;
-				ctx.fillStyle = "#fff";
-				ctx.fillText(mob.customName, x, labelZ);
-			}
+		} else {
+			locatorUrl = "/img/locator-hostile.png";
+			iconColor = "#ff0000";
 		}
+		
+		// No locator means no marker
+		if(!locatorUrl) {
+			if(marker) {
+				marker.setMap(null);
+				delete markerMap[id];
+				if(JM.debug) console.log("Marker invalid for " + id + " - " + entity.filename);
+				return;
+			} else {
+				if(JM.debug) console.log("Pending marker invalid for " + id + " - " + entity.filename);
+				return;
+			}		
+		}
+
+		// Create marker if needed
+		if(!marker) {	
+			
+			var content = $(entityTemplate).attr('id',id);
+					
+			marker = new RichMarker({
+				position: pos,
+			    map: mcMap.map,
+			    draggable: false,
+			    flat: true,
+			    anchor: RichMarkerPosition.MIDDLE,
+			    content: content[0]
+	        });
+			markerMap[id] = marker;
+			
+			if(JM.debug) console.log("Marker added for " + id);
+		}
+	
+		// Label if customName exists
+		var contentDiv = $('#'+id);
+		
+		if(entity.customName) {
+			$(contentDiv).find('.entityName').css('visibility','visible').html(entity.customName);
+		} else {
+			$(contentDiv).find('.entityName').css('visibility','hidden').html();
+		}
+		
+		// Entity icon
+		$(contentDiv).find('.entityIcon').attr('src','/img/entity/' + entity.filename);
+
+		// Entity locator		
+		$(contentDiv).find('.entityLocator').attr('src', locatorUrl).rotate(heading*RAD_DEG);		
+	
+		// Update marker position
+		marker.setPosition(pos);
 	}
 
 	// Draw the location of other players
-	var drawMultiplayers = function(canvasWidth, canvasHeight) {
+	var drawMultiplayers = function() {
 
 		if (JM.debug)
 			console.log(">>> " + "drawMultiplayers");
@@ -995,8 +916,6 @@ var JourneyMap = (function() {
 		
 		if(showPlayers!==true)
 			return;
-
-		var ctx = null; // TODO
 		
 		return;
 		
@@ -1055,7 +974,7 @@ var JourneyMap = (function() {
 	}
 	
 	// Draw the location of waypoints
-	var drawWaypoints = function(canvasWidth, canvasHeight) {
+	var drawWaypoints = function() {
 		
 		return;
 
@@ -1264,7 +1183,10 @@ var JourneyMap = (function() {
 	    mapOverlay = new MCMapType();
 	    this.map.mapTypes.set('jm', mapOverlay);
 	    this.map.setMapTypeId('jm');
-	    this.markers = {};
+	    this.playerMarker = null;
+	    this.entityMarkers = [];
+	    this.multiplayerMarkers = [];
+	    this.waypointMarkers = [];
 	};
 
 	var MCMapType = function () {

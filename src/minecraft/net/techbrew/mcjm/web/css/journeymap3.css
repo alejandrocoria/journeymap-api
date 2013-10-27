@@ -81,6 +81,42 @@ label span {
     color: #ccc;
 }
 
+.entityMarker {
+	height:64px;
+	width:64px;
+	border: none;
+}
+
+.entityName {
+	font:bold 11px Arial;
+	text-align:center;
+	color:#ffffff;
+	padding:2px;
+	background-color:#000000;
+	visibility:hidden;
+	position:absolute;
+	margin-top:-2em;
+}
+
+.entityImages {
+    position:relative;	
+}
+
+
+.entityIcon {
+	position:absolute;
+	width: 32px;
+	height: 32px;
+	top: 6px;
+	left: 16px;
+}
+
+.entityLocator {
+	position:absolute;
+	width: 64px;
+    height: 64px;
+}
+
 /* Fix Google Maps canvas */
 .google-map-canvas,
 .google-map-canvas * { 
