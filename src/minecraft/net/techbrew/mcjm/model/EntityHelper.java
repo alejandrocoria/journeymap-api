@@ -8,35 +8,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.text.Utilities;
-
-import net.minecraft.src.Minecraft;
+import net.minecraft.src.AxisAlignedBB;
+import net.minecraft.src.Entity;
+import net.minecraft.src.EntityAnimal;
+import net.minecraft.src.EntityGolem;
+import net.minecraft.src.EntityHorse;
+import net.minecraft.src.EntityLiving;
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerSP;
-import net.minecraft.src.Render;
+import net.minecraft.src.EntityVillager;
+import net.minecraft.src.EntityWaterMob;
+import net.minecraft.src.IAnimals;
+import net.minecraft.src.IBossDisplayData;
+import net.minecraft.src.IMob;
+import net.minecraft.src.IRangedAttackMob;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.RenderFacade;
 import net.minecraft.src.RenderHorse;
 import net.minecraft.src.RenderLiving;
 import net.minecraft.src.RenderManager;
 import net.minecraft.src.ResourceLocation;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityLiving;
-import net.minecraft.src.IRangedAttackMob;
-import net.minecraft.src.IBossDisplayData;
-import net.minecraft.src.EntityGolem;
-import net.minecraft.src.IMob;
-import net.minecraft.src.EntityAnimal;
-import net.minecraft.src.EntityHorse;
-import net.minecraft.src.EntityVillager;
-import net.minecraft.src.EntityWaterMob;
-import net.minecraft.src.IAnimals;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.AxisAlignedBB;
-import net.minecraft.src.mod_JourneyMap;
-import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.log.LogFormatter;
 
 public class EntityHelper {
 	

@@ -47,7 +47,7 @@ public class PlayerData implements IDataProvider {
 		EntityClientPlayerMP player = mc.thePlayer;			
 	   
 		LinkedHashMap props = new LinkedHashMap();
-
+		props.put(EntityKey.entityId, player.entityId); 
 		props.put(EntityKey.username, player.getEntityName());
 		props.put(EntityKey.heading, EntityHelper.getHeading(player));
 		props.put(EntityKey.chunkCoordX, player.chunkCoordX); 

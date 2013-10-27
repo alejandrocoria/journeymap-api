@@ -79,6 +79,7 @@ public class AnimalsData implements IDataProvider {
 			}
 			
 			LinkedHashMap eProps = new LinkedHashMap();
+			eProps.put(EntityKey.entityId, entity.entityId); 
 			eProps.put(EntityKey.filename, EntityHelper.getFileName(entity)); 
 			eProps.put(EntityKey.hostile, false);
 			eProps.put(EntityKey.posX, (int) Math.floor(entity.posX)); 
@@ -104,11 +105,17 @@ public class AnimalsData implements IDataProvider {
 			list.add(eProps);
 		}
 					
-		// Sort to keep named entities last
+		// Sort to keep named entities last.  (Why? display on top of others?)
 		Collections.sort(list, new EntityHelper.EntityMapComparator());
 		
+		// Put into map, preserving the order, using entityId as key
+		LinkedHashMap<Object,Map> idMap = new LinkedHashMap<Object,Map>(list.size());
+		for(Map entityMap : list) {
+			idMap.put("id"+entityMap.get(EntityKey.entityId), entityMap);
+		}
+		
 		LinkedHashMap props = new LinkedHashMap();
-		props.put(EntityKey.root, list);
+		props.put(EntityKey.root, idMap);
 		
 		return props;		
 	}	

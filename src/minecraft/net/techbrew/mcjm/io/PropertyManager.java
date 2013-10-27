@@ -107,6 +107,18 @@ public class PropertyManager {
 		writeToFile();
 	}
 	
+	public static String getStringProp(Key key) {
+		return getInstance().getString(key);
+	}
+	
+	public static Integer getIntegerProp(Key key) {
+		return getInstance().getInteger(key);
+	}
+	
+	public static Boolean getBooleanProp(Key key) {
+		return getInstance().getBoolean(key);
+	}
+	
 	/**
 	 * Get a normalized, type-safe view of the properties.
 	 * @return
@@ -210,5 +222,6 @@ public class PropertyManager {
 	public String toString() {
 		return properties.toString();
 	}
+	
 	
 }

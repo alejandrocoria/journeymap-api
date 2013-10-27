@@ -26,7 +26,6 @@ public class ImagesData implements IDataProvider {
 	
 	public static enum Key {
 		since,
-		zoom,
 		regions,
 		queryTime,
 	}

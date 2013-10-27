@@ -13,11 +13,17 @@ public enum EntityKey {
 	heading,
 	customName,
 	owner,
+	entityId,
 	// Villager only:
 	profession,
 	// Player only:
 	username,
 	biome,
 	dimension,
-	underground
+	underground,
+	// Images only:
+	since,
+	zoom,
+	regions,
+	queryTime
 }

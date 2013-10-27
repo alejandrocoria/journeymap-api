@@ -54,6 +54,7 @@ public class MobsData implements IDataProvider {
 		for(Object mob : mobs) {
 			EntityLiving entity = (EntityLiving) mob;
 			LinkedHashMap eProps = new LinkedHashMap();
+			eProps.put(EntityKey.entityId, entity.entityId); 
 			eProps.put(EntityKey.filename, EntityHelper.getFileName(entity)); 
 			if(mob instanceof EntityMob || mob instanceof IBossDisplayData || mob instanceof IRangedAttackMob || mob instanceof EntityGhast) {
 				eProps.put(EntityKey.hostile, true); 
@@ -78,8 +79,14 @@ public class MobsData implements IDataProvider {
 		// Sort to keep named entities last
 		Collections.sort(list, new EntityHelper.EntityMapComparator());
 					
+		// Put into map, preserving the order, using entityId as key
+		LinkedHashMap<Object,Map> idMap = new LinkedHashMap<Object,Map>(list.size());
+		for(Map entityMap : list) {
+			idMap.put("id"+entityMap.get(EntityKey.entityId), entityMap);
+		}
+		
 		LinkedHashMap props = new LinkedHashMap();
-		props.put(EntityKey.root, list);
+		props.put(EntityKey.root, idMap);
 		
 		return props;		
 	}	
