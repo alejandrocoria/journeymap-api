@@ -188,7 +188,7 @@ var JourneyMap = (function() {
 					// Splash
 					if (!JmIcon) {
 						JmIcon = new Image();
-						JmIcon.src = "/ico/apple-touch-icon.png";
+						JmIcon.src = "/ico/journeymap144.png";
 						JmIcon.title = "JourneyMap";
 						JmIcon.alt = "JourneyMap";
 						JmIcon.style.position = "absolute";
@@ -960,7 +960,7 @@ var JourneyMap = (function() {
 					ctx.drawImage(JmIcon, getCanvasWidth() / 2 - 72, getCanvasHeight() / 2 - 160);
 					JmIcon.onload = null;
 				};
-				JmIcon.src = "/ico/apple-touch-icon.png";
+				JmIcon.src = "/ico/journeymap144.png";
 			} else {
 				ctx.drawImage(JmIcon, getCanvasWidth() / 2 - 72, getCanvasHeight() / 2 - 160);
 			}
