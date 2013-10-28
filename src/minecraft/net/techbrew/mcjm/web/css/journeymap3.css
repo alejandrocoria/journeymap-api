@@ -116,6 +116,30 @@ label span {
     height: 64px;
 }
 
+.playerInfo {
+  
+    font-size: 10px;
+    font-weight: bold;
+    
+    margin-bottom:32px;
+    padding:5px;
+    color: #fff;
+    background-color:rgba(34,34,34,0.7);
+    display:inline-block;
+    
+    border-width:1px;
+    border-style:solid;
+    border-color:#c5c5c5;
+    
+    -webkit-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    border-radius: 6px;
+
+}
+
 /* Fix Google Maps canvas */
 .google-map-canvas,
 .google-map-canvas * { 
