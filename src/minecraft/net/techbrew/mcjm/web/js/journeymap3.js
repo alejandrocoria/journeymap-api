@@ -32,6 +32,7 @@ var JourneyMap = (function() {
 	var drawingMap = false;
 
 	var playerOverrideMap = false;
+	var playerUnderground = false;
 	
 	var mapOverlay;
 
@@ -163,7 +164,7 @@ var JourneyMap = (function() {
 					// Splash
 					if (!JmIcon) {
 						JmIcon = new Image();
-						JmIcon.src = "/ico/apple-touch-icon.png";
+						JmIcon.src = "/ico/journeymap144.png";
 						JmIcon.title = "JourneyMap";
 						JmIcon.alt = "JourneyMap";
 						JmIcon.style.position = "absolute";
@@ -264,7 +265,7 @@ var JourneyMap = (function() {
 		$("#checkShowCaves").click(function(event) {
 			showCaves = (this.checked === true);
 			postPreference("preference_show_caves", showCaves);
-			if (JM.player.underground === true) {
+			if (playerUnderground === true) {
 				refreshMap();
 			}			
 		});
@@ -380,6 +381,7 @@ var JourneyMap = (function() {
 		// Reset state
 		halted = false;
 		updatingMap = false;
+		playerUnderground = false;
 		clearTimer();		
 		
 		JM = {
@@ -434,7 +436,6 @@ var JourneyMap = (function() {
 		alert("TODO");
 	}
 
-
 	function setMapType(mapType) {
 
 		var typeChanged = false;
@@ -461,7 +462,7 @@ var JourneyMap = (function() {
 				console.log(">>> " + "Error: Can't set mapType: " + mapType);
 		}
 		
-		if(typeChanged && JM.player.underground === false) {		
+		if(typeChanged && playerUnderground === false) {		
 			if (debug) console.log("setMapType(" + mapType + ")");
 			refreshMap();
 		}
@@ -486,7 +487,7 @@ var JourneyMap = (function() {
 		}
 		showCaves = show;
 
-		if (JM.player.underground === true) {
+		if (playerUnderground === true) {
 			refreshMap();
 		}		
 
@@ -509,6 +510,7 @@ var JourneyMap = (function() {
 		// Get all the datas
 		fetchData("/data/all" + params, function(data) {
 			
+			// Apply data
 			JM.animals = data.animals;
 			JM.images = data.images;
 			JM.mobs = data.mobs;
@@ -517,6 +519,10 @@ var JourneyMap = (function() {
 			JM.villagers = data.villagers;
 			JM.waypoints = data.waypoints;
 			JM.world = data.world;
+			
+			// Update underground state
+			var wasUnderground = playerUnderground;
+			playerUnderground = JM.player.underground;
 
 			// Update UI
 			$("#playerBiome").html(JM.player.biome);
@@ -542,7 +548,7 @@ var JourneyMap = (function() {
 
 			// Set map type based on time
 			if (playerOverrideMap != true) {
-				if (JM.world.dimension === 0 && JM.player && JM.player.underground != true) {
+				if (JM.world.dimension === 0 && playerUnderground === false) {
 					if (JM.world.time < 13800) {
 						setMapType('day');
 					} else {
@@ -555,8 +561,9 @@ var JourneyMap = (function() {
 				return;
 
 			// Draw the map
+			var forceRefresh = (wasUnderground !== playerUnderground)
 			if(mcMap) {
-				mapOverlay.refreshTiles();
+				mapOverlay.refreshTiles(forceRefresh);
 				drawMap();
 			}
 
@@ -743,12 +750,43 @@ var JourneyMap = (function() {
 			    draggable: false,
 			    flat: true,
 			    anchor: RichMarkerPosition.MIDDLE,
-			    content: img
+			    content: img,
+			    tooltip : new RichMarker({
+					position: null,
+				    map: null,
+				    draggable: false,
+				    flat: true,
+				    anchor: RichMarkerPosition.BOTTOM,
+				    content: '<div class="playerInfo">' + JM.player.username + '</div>',
+		        })
 	        });
 			
-			google.maps.event.addDomListener(markers.playerMarker, 'onmouseover', function () {    
-			    alert(JM.player.username)
+			google.maps.event.addListener(markers.playerMarker, 'mouseover', function(args) {
+				var tooltip = markers.playerMarker.tooltip;
+				if(tooltip.timeout) {
+					window.clearTimeout(tooltip.timeout);
+				}
+				if(!tooltip.getMap()) {
+					tooltip.setPosition(markers.playerMarker.position);
+					tooltip.setMap(markers.playerMarker.map);
+					tooltip.setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
+				}
 			});
+			
+			google.maps.event.addListener(markers.playerMarker, 'mouseout', function(args) {
+				
+				var tooltip = markers.playerMarker.tooltip;
+				if(tooltip.getMap()) {
+					if(tooltip.timeout) {
+						window.clearTimeout(tooltip.timeout);
+					}
+					tooltip.timeout = window.setTimeout(function(){
+						delete tooltip.timeout;
+						tooltip.setMap(null);
+					}, 500)					
+				}
+			});
+			
 
 			google.maps.event.addListener(mcMap.map, 'dragstart', function() {
 				setCenterOnPlayer(false);
@@ -1218,7 +1256,7 @@ var JourneyMap = (function() {
 	};
 	
 	MCMapType.prototype.getTileState = function() {
-		var mapType = (JM.player && JM.player.underground === true && showCaves === true) ? "underground" : (isNightMap === true ? "night" : "day");
+		var mapType = (playerUnderground === true && showCaves === true) ? "underground" : (isNightMap === true ? "night" : "day");
 		var dimension = (JM.player.dimension);
 		var depth = (JM.player && JM.player.chunkCoordY != undefined) ? JM.player.chunkCoordY : 4;
 		return "&mapType=" + mapType + "&dim=" + dimension + "&depth=" + depth + "&ts=" + lastImageCheck;
