@@ -37,38 +37,25 @@ var JourneyMap = (function() {
 
 	var timerId = null;
 
-	var JM = {
-		debug : false,
-		messages : null,
-		properties : null,
-		game : null,
-		mobs : null,
-		animals : null,
-		players : null,
-		villagers : null,
-		waypoints : [],
-		images : null
-	};
-	
-	var markers = {
-		mobs : {},
-		animals : {},
-		players : {},
-		villagers : {},
-		waypoints : {}
-	}
+	var JM = {};
+	var markers = {};
 	
 	var entityTemplate = [
 	    '<div class="entityMarker" id="">',
 	    '<div class="entityName"/>',
 	    '<div class="entityImages">',			    
-	    '<img class="entityLocator" src="">',
-	    '<img class="entityIcon" src="" >',
+	    '<img class="entityLocator" src="/img/pixel.png">',
+	    '<img class="entityIcon" src="/img/pixel.png" >',
 	    '</div>',
 	    '</div>'
 	].join('');
 	
 	var RAD_DEG=57.2957795;
+	
+	var debug = false;
+	
+	// Preload images
+	$('<img>').attr('src','/img/pixel.png');
 
 	/** Delay helper * */
 	var delay = (function() {
@@ -88,7 +75,7 @@ var JourneyMap = (function() {
 	 */
 	var initMessages = function() {
 
-		if (JM.debug)
+		if (debug)
 			console.log(">>> " + "initMessages");
 
 		$.ajax({
@@ -135,7 +122,7 @@ var JourneyMap = (function() {
 	 */
 	var initGame = function() {
 
-		if (JM.debug)
+		if (debug)
 			console.log(">>> " + "initGame");
 
 		$.ajax({
@@ -200,7 +187,7 @@ var JourneyMap = (function() {
 	 */
 	var initUI = function() {
 
-		if (JM.debug)
+		if (debug)
 			console.log(">>> " + "initUI");
 
 		// Ensure messages are loaded first.
@@ -365,10 +352,10 @@ var JourneyMap = (function() {
 		  url: "/properties",
 		  data: prefName +"="+ prefValue
 		}).fail(function(data, error, jqXHR){
-			if (JM.debug)
+			if (debug)
 				console.log(">>> postPreference failed: " + data.status, error);
 		}).done(function(){
-			if (JM.debug)
+			if (debug)
 				console.log(">>> postPreference done: " + prefName);
 		});
 	}
@@ -387,13 +374,35 @@ var JourneyMap = (function() {
 	 */
 	var initWorld = function() {
 
-		if (JM.debug)
+		if (debug)
 			console.log(">>> " + "initWorld");
 
 		// Reset state
 		halted = false;
 		updatingMap = false;
 		clearTimer();		
+		
+		JM = {
+			debug : false,
+			messages : null,
+			properties : null,
+			game : null,
+			mobs : null,
+			animals : null,
+			players : null,
+			villagers : null,
+			waypoints : [],
+			images : null
+		};
+		
+		markers = {
+			mobs : {},
+			animals : {},
+			players : {},
+			villagers : {},
+			waypoints : {},
+			player: {}
+		}
 
 		var finishUI = function() {
 
@@ -403,7 +412,13 @@ var JourneyMap = (function() {
 			});
 			$("#slider-vertical").show();
 			
+			// Google Map
 			mcMap = new MCMap(document.getElementById('map-canvas'));
+			
+			// World Info			
+			mcMap.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(
+				document.getElementById('worldInfo')
+			);
 			setCenterOnPlayer(true);
 		}
 
@@ -442,12 +457,12 @@ var JourneyMap = (function() {
 			$("#dayNightButtonImg").attr('src', '/img/moon.png');
 	
 		} else {
-			if (JM.debug)
+			if (debug)
 				console.log(">>> " + "Error: Can't set mapType: " + mapType);
 		}
 		
 		if(typeChanged && JM.player.underground === false) {		
-			if (JM.debug) console.log("setMapType(" + mapType + ")");
+			if (debug) console.log("setMapType(" + mapType + ")");
 			refreshMap();
 		}
 
@@ -506,8 +521,6 @@ var JourneyMap = (function() {
 			// Update UI
 			$("#playerBiome").html(JM.player.biome);
 			$("#playerLocation").html(JM.player.posX + "," + JM.player.posZ);
-
-			$("#playerElevationLabel").attr('title', getMessage('slice_text') + " " + (JM.player.posY >> 4));
 			$("#playerElevation").html(JM.player.posY + "&nbsp;(" + (JM.player.posY >> 4) + ")");
 
 			// 0 is the start of daytime, 12000 is the start of sunset, 13800 is
@@ -548,9 +561,10 @@ var JourneyMap = (function() {
 			}
 
 			if (timerId === null) {
-				var dur = JM.game ? JM.game.browser_poll : 1000 || 1000;
-				timerId = setInterval(queryServer, Math.max(1000, JM.game.browser_poll));
+				var dur = (JM.game && JM.game.browser_poll) ? JM.game.browser_poll : 1000;
+				timerId = setInterval(queryServer, Math.max(1000, dur));
 			}
+			
 			if (callback) {
 				callback();
 			}
@@ -564,7 +578,7 @@ var JourneyMap = (function() {
 	 */
 	var fetchData = function(dataUrl, callback) {
 
-		if (JM.debug)
+		if (debug)
 			console.log(">>> " + "fetchData " + dataUrl);
 
 		$.ajax({
@@ -579,7 +593,7 @@ var JourneyMap = (function() {
 	 * Force immediate update
 	 */
 	var refreshMap = function() {
-		if (JM.debug) console.log(">>> " + "refreshMap");
+		if (debug) console.log(">>> " + "refreshMap");
 		clearTimer();		
 		skipImageCheck = true; // Don't need tiles to be checked by queryServer
 		queryServer(function(){
@@ -615,7 +629,7 @@ var JourneyMap = (function() {
 	// Ajax request got an error from the server
 	var handleError = function(data, error, jqXHR) {
 
-		if (JM.debug)
+		if (debug)
 			console.log(">>> " + "handleError");
 
 		// Secondary errors will be ignored
@@ -653,7 +667,7 @@ var JourneyMap = (function() {
 		// Restart in 5 seconds
 		if (!halted) {
 			halted = true;
-			if (JM.debug)
+			if (debug)
 				console.log(">>> " + "Will re-check game state in 5 seconds.");
 			setTimeout(function() {
 
@@ -676,11 +690,11 @@ var JourneyMap = (function() {
 	// Draw the map
 	var drawMap = function() {
 
-		if (JM.debug)
+		if (debug)
 			console.log(">>> " + "drawMap");
 
 		if (drawingMap === true) {
-			if (JM.debug)
+			if (debug)
 				console.log(">>> " + "Avoided concurrent drawMap()");
 			return false;
 		}
@@ -706,7 +720,7 @@ var JourneyMap = (function() {
 	// Draw the player icon
 	var drawPlayer = function() {
 		
-		if (JM.debug)
+		if (debug)
 			console.log(">>> " + "drawPlayer");
 		
 		// Get current player position
@@ -715,7 +729,7 @@ var JourneyMap = (function() {
 		var imgId = 'player'+JM.player.entityId;
 		
 		// Ensure marker
-		if(!mcMap.playerMarker) {
+		if(!markers.playerMarker) {
 
 			var img = new Image();
 			$(img).attr('id', imgId)
@@ -723,7 +737,7 @@ var JourneyMap = (function() {
 			      .css('width','64px')
 			      .css('height','64px');
 			
-			mcMap.playerMarker = new RichMarker({
+			markers.playerMarker = new RichMarker({
 				position: pos,
 			    map: mcMap.map,
 			    draggable: false,
@@ -732,13 +746,17 @@ var JourneyMap = (function() {
 			    content: img
 	        });
 			
+			google.maps.event.addDomListener(markers.playerMarker, 'onmouseover', function () {    
+			    alert(JM.player.username)
+			});
+
 			google.maps.event.addListener(mcMap.map, 'dragstart', function() {
 				setCenterOnPlayer(false);
 			});
 			
 			google.maps.event.addListener(mcMap.map, 'zoom_changed', function() {
 				if(centerOnPlayer===true) {
-					mcMap.map.panTo(mcMap.playerMarker.getPosition());
+					mcMap.map.panTo(markers.playerMarker.getPosition());
 				}
 				
 				if(mcMap.map.getZoom()<3) {
@@ -758,7 +776,7 @@ var JourneyMap = (function() {
 		} 
 		
 		// Update marker position and heading
-		mcMap.playerMarker.setPosition(pos);
+		markers.playerMarker.setPosition(pos);
 		$('#'+imgId).rotate(heading*RAD_DEG);
 
 		// Center if needed
@@ -772,7 +790,7 @@ var JourneyMap = (function() {
 		$.each(markerMap, function(id, marker) {
 			if(!jmMap || !(id in jmMap) ){
 				marker.setMap(null);
-				if(JM.debug) console.log("Marker removed for " + id);
+				if(debug) console.log("Marker removed for " + id);
 				delete markerMap[id];
 			}
 		});
@@ -781,21 +799,12 @@ var JourneyMap = (function() {
 	// Draw the location of mobs
 	var drawMobs = function() {
 
-		if (JM.debug)
+		if (debug)
 			console.log(">>> " + "drawMobs");
 		
 		if(mcMap.map.getZoom()===0) return;
 		
-		/**
-		 var markers = {
-			mobs : [],
-			animals : [],
-			players : [],
-			villagers : [],
-			waypoints : []
-		}
-		 */
-		
+		// Mobs
 		removeObsoleteMarkers(JM.mobs, markers.mobs);		
 		if (showMobs === true && JM.mobs) {
 			$.each(JM.mobs, function(index, mob) {
@@ -803,6 +812,7 @@ var JourneyMap = (function() {
 			});
 		}
 
+		// Animals
 		removeObsoleteMarkers(JM.animals, markers.animals);	
 		if ((showAnimals === true || showPets === true) && JM.animals) {
 			$.each(JM.animals, function(index, mob) {
@@ -810,6 +820,7 @@ var JourneyMap = (function() {
 			});
 		}
 
+		// Villagers
 		removeObsoleteMarkers(JM.villagers, markers.villagers);	
 		if (showVillagers === true && JM.villagers) {
 			$.each(JM.villagers, function(index, mob) {
@@ -817,8 +828,6 @@ var JourneyMap = (function() {
 			});
 		}
 		
-		// TODO: get rid of old markers
-
 	}
 
 	// Create or update marker
@@ -859,10 +868,10 @@ var JourneyMap = (function() {
 			if(marker) {
 				marker.setMap(null);
 				delete markerMap[id];
-				if(JM.debug) console.log("Marker invalid for " + id + " - " + entity.filename);
+				if(debug) console.log("Marker invalid for " + id + " - " + entity.filename);
 				return;
 			} else {
-				if(JM.debug) console.log("Pending marker invalid for " + id + " - " + entity.filename);
+				if(debug) console.log("Pending marker invalid for " + id + " - " + entity.filename);
 				return;
 			}		
 		}
@@ -870,7 +879,7 @@ var JourneyMap = (function() {
 		// Create marker if needed
 		if(!marker) {	
 			
-			var content = $(entityTemplate).attr('id',id);
+			var contentDiv = $(entityTemplate).attr('id',id);
 					
 			marker = new RichMarker({
 				position: pos,
@@ -878,11 +887,21 @@ var JourneyMap = (function() {
 			    draggable: false,
 			    flat: true,
 			    anchor: RichMarkerPosition.MIDDLE,
-			    content: content[0]
+			    content: contentDiv[0]
 	        });
 			markerMap[id] = marker;
 			
-			if(JM.debug) console.log("Marker added for " + id);
+//			$(contentDiv).find('.entityIcon').on('load', function(){
+//				$(this).css('visibility','visible');
+//				$(this).off('load');
+//			}).css('visibility','hidden');
+//			
+//			$(contentDiv).find('.entityLocator').on('load', function(){
+//				$(this).css('visibility','visible');
+//				$(this).off('load');
+//			}).css('visibility','hidden');
+			
+			if(debug) console.log("Marker added for " + id);
 		}
 	
 		// Label if customName exists
@@ -907,7 +926,7 @@ var JourneyMap = (function() {
 	// Draw the location of other players
 	var drawMultiplayers = function() {
 
-		if (JM.debug)
+		if (debug)
 			console.log(">>> " + "drawMultiplayers");
 
 		var others = JM.players;
@@ -978,7 +997,7 @@ var JourneyMap = (function() {
 		
 		return;
 
-		if (JM.debug)
+		if (debug)
 			console.log(">>> " + "drawWaypoints");
 
 		if(!showWaypoints==true || !JM.game.waypoints_enabled==true)
@@ -1218,7 +1237,7 @@ var JourneyMap = (function() {
 			   .css('height', this.tileSize.height + 'px')
 			   .attr('data-tileid', tileId);
 		
-		if (JM.debug) {
+		if (debug) {
 			var label = ownerDocument.createElement('span');
 			$(label).css('color','white')
 			        .css('float','left')
@@ -1245,7 +1264,7 @@ var JourneyMap = (function() {
 	MCMapType.prototype.refreshTile = function(tile) {
 		var me = this;
 		
-		if (JM.debug) console.log(">>> " + "refreshTile " + $(tile).data('tileid'));
+		if (debug) console.log(">>> " + "refreshTile " + $(tile).data('tileid'));
 		
 		var tileData = me.loadedTiles[$(tile).data('tileid')];
 		if(tileData) {
@@ -1257,7 +1276,7 @@ var JourneyMap = (function() {
 	MCMapType.prototype.refreshTiles = function (force) {
 		var me = this;
 		
-		if (JM.debug) console.log(">>> " + "refreshTiles " + force||false);
+		if (debug) console.log(">>> " + "refreshTiles " + force||false);
 		
 		if(force) {			
 			for (var tileId in me.loadedTiles) {
@@ -1270,14 +1289,14 @@ var JourneyMap = (function() {
 		}
 			
 		if(JM.images.regions.length===0) {
-			if (JM.debug) console.log("No regions have changed: ", JM.images);
+			if (debug) console.log("No regions have changed: ", JM.images);
 			lastImageCheck = JM.images.queryTime || new Date().getTime();
 			return;
 		}
 		
 		lastImageCheck = JM.images.queryTime || new Date().getTime();
 		
-		if (JM.debug) {
+		if (debug) {
 			console.log("Regions changed since ", JM.images.since);
 			JM.images.regions.forEach(function(region) {
 				console.log("\t", region);
@@ -1298,11 +1317,11 @@ var JourneyMap = (function() {
 						
 			JM.images.regions.forEach(function(region) {
 				if(tileRegion[0]==region[0] && tileRegion[1]==region[1]) {
-					if (JM.debug) console.log("    tile " + coord + " zoom " + zoom + " in region: ", tileRegion);
+					if (debug) console.log("    tile " + coord + " zoom " + zoom + " in region: ", tileRegion);
 					me.refreshTile(tile);
 					return false;
 				} else {
-					if (JM.debug) console.log("    tile " + coord + " zoom " + zoom + " not in region: ", tileRegion);
+					if (debug) console.log("    tile " + coord + " zoom " + zoom + " not in region: ", tileRegion);
 					return true;
 				}
 			});				
@@ -1319,7 +1338,7 @@ var JourneyMap = (function() {
 		return decodeURI((RegExp(name + '=' + '(.+?)(&|$)').exec(location.search) || [, null])[1]);
 	}
 	
-	JM.debug = 'true' === getURLParameter('debug');
+	debug = ('true' === getURLParameter('debug'));
 	
 	// Public API for JourneyMap
 	return {
