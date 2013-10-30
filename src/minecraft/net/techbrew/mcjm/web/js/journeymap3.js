@@ -38,7 +38,18 @@ var JourneyMap = (function() {
 
 	var timerId = null;
 
-	var JM = {};
+	var JM = {
+		debug : false,
+		messages : null,
+		properties : null,
+		game : null,
+		mobs : null,
+		animals : null,
+		players : null,
+		villagers : null,
+		waypoints : [],
+		images : null
+	};
 	var markers = {};
 	
 	var entityTemplate = [
@@ -51,8 +62,16 @@ var JourneyMap = (function() {
 	    '</div>'
 	].join('');
 	
+	var errorTemplate = [
+		'<div class="errorDialog">',
+		'<img src="/ico/journeymap144.png">',
+		'<div></div>',
+		'</div>'
+	].join('');	
+	
 	var RAD_DEG=57.2957795;
 	
+	var errorDialog = null;
 	var debug = false;
 	
 	// Preload images
@@ -137,23 +156,8 @@ var JourneyMap = (function() {
 					JM.game = data;
 
 					// Update UI with game info
-					$("#version").html(JM.game.jm_version);
+					$("#version").html("JourneyMap " + JM.game.jm_version);				
 					
-					// Init update button 
-					$("#updateButton").hide().click(function(e){
-						var url = document.getElementById('webLink').href;
-						window.open(url, '_new', '');
-					});
-					
-					// Show update button
-					if (JM.game.latest_journeymap_version > JM.game.jm_version) {
-						var text = getMessage('.update_button_title');
-						text = text.replace("{0}", JM.game.latest_journeymap_version);
-						text = text.replace("{1}", JM.game.mc_version);
-						$("#updateButton").attr("title", text);
-						$("#updateButton").delay(2000).slideDown();
-					}
-
 					// GA event
 					if (versionChecked != true) {
 						_gaq.push(['_setCustomVar', 1, 'jm_version', JM.game.jm_version, 2]);
@@ -200,26 +204,26 @@ var JourneyMap = (function() {
 		$('html').attr('lang', JM.messages.locale.split('_')[0]);
 
 		// Set RSS feed title
-		$("link #rssfeed").attr("title", getMessage('rss_feed_title'));
+		$("link #rssfeed").attr("title", getMessage('rss_feed_title'));		
 
-		// Init Day/Night button
-		$("#dayNightText").html(getMessage('day_button_text'));
-		$("#dayNightButton").attr("title", getMessage('day_button_title'));
-		$("#dayNightButton").click(function() {
-			playerOverrideMap = true;
-			if(isNightMap===true) {
-				setMapType('day');
-			} else {								
-				setMapType('night');
+		// Main menu	
+		$("#jm-menu").menu().hide();
+		$("#jm-button").button({
+			icons: {
+				secondary: "ui-icon-triangle-1-s"
+	        }
+		}).click(function(){
+			var menu = $("#jm-menu");
+			if ( $(menu).is(':visible') ) {
+				menu.hide();
+			} else {
+				var button = $("#jm-button");
+				menu.show().position({ my: "left top", at: "left bottom", of: button });
+				$( document ).one( "click", function() { menu.hide(); });
 			}
+	        return false;
 		});
-
-		// Follow button
-		$("#followButton").attr("title", getMessage('follow_button_title')).click(function() {
-			setCenterOnPlayer(!centerOnPlayer);
-			refreshMap();
-		});
-
+		
 		// JourneyMap menu / homepage link
 		$("#webLink").attr("title", getMessage('web_link_title'));
 		$("#webLinkText").html(getMessage('web_link_text'));
@@ -243,14 +247,57 @@ var JourneyMap = (function() {
 		// JourneyMap menu / Donate link
 		$("#donateLink").attr("title", getMessage('donate_title'));
 		$("#donateLinkText").html(getMessage('donate_text'));
+		
+		// Toggles / Day/Night button
+		$("#dayNightButton")
+			.attr("title", getMessage('day_button_title'))
+			.click(function() {
+				playerOverrideMap = true;
+				if(isNightMap===true) {
+					setMapType('day');
+				} else {								
+					setMapType('night');
+				}
+			});
 
-		// Show menu
-		$("#showMenuText").html(getMessage('show_menu_text'));
-		$("#showMenu").click(function(event) {
+		$("#dayNightButton").parent().buttonset();
+		// Toggles / Follow button
+		$("#followButton")
+			.attr("title", getMessage('follow_button_title'))
+			.click(function() {
+				setCenterOnPlayer(!centerOnPlayer);
+				refreshMap();
+			});
+		$("#jm-toggles").buttonset();
+		
+		// Options Menu and Button		
+		$("#jm-options-menu").menu().hide();
+		$("#jm-options-button").attr("title", getMessage('show_menu_text'));
+		$("#jm-options-button").button({
+			icons: {
+				secondary: "ui-icon-triangle-1-s"
+	        }
+		}).click(function(){
+			$("#jm-actions-menu").hide();
+			var menu = $("#jm-options-menu");
+			if ( $(menu).is(':visible') ) {
+				menu.hide();
+			} else {
+				var button = $("#jm-options-button");
+				var x = $('#map-canvas').width() - button.offset().left - button.width();
+				menu.css('margin-right', x + "px");
+				menu.show();
+				$( document ).one( "click", function() { menu.hide(); });
+			}			
+	        return false;
+		});
+		
+		$("#jm-options-menu").click( function(event){
 			event.stopPropagation();
 		});
 		
-		// Show menu items
+		
+		// Options Menu items
 		setTextAndTitle("#cavesMenuItem", "caves_menu_item_text", "caves_menu_item_title");
 		setTextAndTitle("#animalsMenuItem", "animals_menu_item_text", "animals_menu_item_title");
 		setTextAndTitle("#petsMenuItem", "pets_menu_item_text", "pets_menu_item_title");
@@ -260,7 +307,7 @@ var JourneyMap = (function() {
 		setTextAndTitle("#waypointsMenuItem", "waypoints_menu_item_text", "waypoints_menu_item_title");
 		setTextAndTitle("#gridMenuItem", "grid_menu_item_text", "grid_menu_item_title");
 		
-		// Show menu checkboxes
+		// Options Menu checkboxes
 		$("#checkShowCaves").prop('checked', showCaves)		
 		$("#checkShowCaves").click(function(event) {
 			showCaves = (this.checked === true);
@@ -322,10 +369,39 @@ var JourneyMap = (function() {
 			drawMap();
 		});
 		
+		// Actions Menu Button
+		$("#jm-actions-menu").menu().hide();
+		$("#jm-options-button").attr("title", getMessage('actions_title'));
+		$("#jm-actions-button").button({
+			icons: {
+				secondary: "ui-icon-triangle-1-s"
+	        }
+		}).click(function(){
+			$("#jm-options-menu").hide();
+			var menu = $("#jm-actions-menu");
+			if ( $(menu).is(':visible') ) {
+				menu.hide();
+			} else {
+				var button = $("#jm-actions-button");
+				var x = $('#map-canvas').width() - button.offset().left - button.width();
+				menu.css('margin-right', x + "px");
+				menu.show();
+				$( document ).one( "click", function() { menu.hide(); });
+			}
+	        return false;
+		});
+		
 		// Save map button
 		$("#saveButton").attr("title", getMessage('save_button_title')).click(function() {
 			saveMapImage();
 		});
+		$("#saveButtonText").html(getMessage('save_button_text'));
+		
+		// Automap button
+		$("#autoMapButton").attr("title", getMessage('automap_title')).click(function() {
+			
+		});
+		$("#autoMapButtonText").html(getMessage('automap_text'));
 		
 		// World info
 		$("#worldInfo").hide();
@@ -334,6 +410,9 @@ var JourneyMap = (function() {
 		$("#playerBiomeLabel").html(getMessage('biome_text'));
 		$("#playerLocationLabel").html(getMessage('location_text'));
 		$("#playerElevationLabel").html(getMessage('elevation_text'));
+		
+		// Disable selection on nav elements
+		$(".nav").disableSelection();
 
 		// Set flag so this function doesn't get called twice
 		uiInitialized = true;
@@ -384,18 +463,12 @@ var JourneyMap = (function() {
 		playerUnderground = false;
 		clearTimer();		
 		
-		JM = {
-			debug : false,
-			messages : null,
-			properties : null,
-			game : null,
-			mobs : null,
-			animals : null,
-			players : null,
-			villagers : null,
-			waypoints : [],
-			images : null
-		};
+		JM.mobs = {};
+		JM.animals = {};
+		JM.players = {};
+		JM.villagers = {};
+		JM.waypoints = [];
+		JM.images = {};
 		
 		markers = {
 			mobs : {},
@@ -407,21 +480,39 @@ var JourneyMap = (function() {
 		}
 
 		var finishUI = function() {
-
-			$(".jmtoggle").each(function() {
-
-				$(this).show()
-			});
-			$("#slider-vertical").show();
 			
 			// Google Map
 			mcMap = new MCMap(document.getElementById('map-canvas'));
 			
-			// World Info			
-			mcMap.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(
-				document.getElementById('worldInfo')
-			);
+			mcMap.map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('jm-logo'));
+			mcMap.map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('jm-toolbar'));
+			mcMap.map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('jm-toggles'));			
+			mcMap.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('jm-options'));
+			mcMap.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('jm-actions'));	
+			mcMap.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(document.getElementById('jm-actions-menu'));
+			mcMap.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(document.getElementById('jm-options-menu'));		
+			mcMap.map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(document.getElementById('worldInfo'));
+						
+			// Close any error dialogs
+			$('.ui-dialog').remove();
+			
 			setCenterOnPlayer(true);
+			
+			// Show update button
+			if (JM.game.latest_journeymap_version > JM.game.jm_version) {
+				var text = getMessage('update_button_title');
+				text = text.replace("{0}", JM.game.latest_journeymap_version);
+				text = text.replace("{1}", JM.game.mc_version);
+				$("#jm-update-button").button()
+					.attr("title", text)
+					.click(function(e){
+						var url = document.getElementById('webLink').href;
+						window.open(url, '_new', '');
+				});
+				
+				mcMap.map.controls[google.maps.ControlPosition.TOP_CENTER].push(document.getElementById('jm-alerts'));
+			}
+
 		}
 
 		queryServer(finishUI);
@@ -445,7 +536,7 @@ var JourneyMap = (function() {
 			typeChanged = true;
 
 			$("#dayNightText").html(getMessage('day_button_text'));
-			$("#dayNightButton").attr("title", getMessage('day_button_title'));	
+			$("#dayNightButton").attr("title", getMessage('day_button_title'));
 			$("#dayNightButtonImg").attr('src', '/img/sun.png');
 
 		} else if (mapType === "night") {
@@ -469,15 +560,18 @@ var JourneyMap = (function() {
 
 	}
 
-	function setCenterOnPlayer(onPlayer) {
-
+	function setCenterOnPlayer(onPlayer) {	
 		centerOnPlayer = onPlayer;
+		
+		if(onPlayer) {
+			$("#followButtonImg").attr('src', '/img/follow.png');
+		} else {
+			$("#followButtonImg").attr('src', '/img/follow-off.png');
+		}
+		
 		if (onPlayer === true) {
 			drawPlayer();
-			$("#followButton").addClass("active");
-		} else {
-			$("#followButton").removeClass("active");
-		}
+		} 
 	}
 
 	function setShowCaves(show) {
@@ -602,12 +696,15 @@ var JourneyMap = (function() {
 	var refreshMap = function() {
 		if (debug) console.log(">>> " + "refreshMap");
 		clearTimer();		
-		skipImageCheck = true; // Don't need tiles to be checked by queryServer
+		//skipImageCheck = true; // Don't need tiles to be checked by queryServer
 		queryServer(function(){
 			// After data retrieved,force the tile refresh
-			skipImageCheck = false;
+			//skipImageCheck = false;
 			lastImageCheck = new Date().getTime();
 			mapOverlay.refreshTiles(true); // Force all tiles to be renewed
+			var zoom = mcMap.map.getZoom();			
+			mcMap.map.setZoom(zoom+ .00000001);
+			mcMap.map.setZoom(zoom);
 		});			
 	}
 
@@ -648,14 +745,13 @@ var JourneyMap = (function() {
 
 		console.log("Server returned error: " + data.status + ": " + jqXHR);
 
-		// Hide togggle-able components
-		$(".jmtoggle").each(function() {
+		// Move nav components back to holder
+		$(".nav").appendTo( $("#nav-holder") );
+		
+		// Destroy Google Map
+		$("#map-canvas").empty();
 
-			$(this).hide()
-		});
-		$("#worldInfo").hide();
-		$("#slider-vertical").hide();
-
+		// Display error
 		var displayError;
 		if (data.status === 503 || data.status === 0) {
 			displayError = getMessage('error_world_not_opened');
@@ -663,14 +759,12 @@ var JourneyMap = (function() {
 			displayError = "";
 		}
 		
-		// Display error
-		$('#map-canvas').empty().html("<center><h4 style='color:red;margin-top:30px'>" + displayError + "</h4></center>");
-		
-		if (JmIcon) {
-			$('#map-canvas').prepend(JmIcon);
+		if(!errorDialog) {			
+			errorDialog = $(errorTemplate).dialog({ modal: true });
+			errorDialog.parent().find('.ui-dialog-titlebar').remove();
 		}
-		
-
+		$(errorDialog).find('div').html(displayError);
+			
 		// Restart in 5 seconds
 		if (!halted) {
 			halted = true;
@@ -1231,11 +1325,21 @@ var JourneyMap = (function() {
 	}
 		
 	var MCMap = function (container) {
-	    this.map = new google.maps.Map(container, {
+		this.map = new google.maps.Map(container, {
 	        zoom: MapConfig.defaultZoom,
 	        center: new google.maps.LatLng(0,0),
 	        mapTypeControl: false,
-	        streetViewControl: false
+	        streetViewControl: false,
+	        panControl: true,
+		    panControlOptions: {
+		        position: google.maps.ControlPosition.LEFT_TOP
+		    },
+		    zoomControl: true,
+		    zoomControlOptions: {
+		        style: google.maps.ZoomControlStyle.AUTO,
+		        position: google.maps.ControlPosition.LEFT_TOP
+		    },
+		    overviewMapControl: true
 	    });
 	    mapOverlay = new MCMapType();
 	    this.map.mapTypes.set('jm', mapOverlay);
@@ -1266,6 +1370,7 @@ var JourneyMap = (function() {
 	MCMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
 		var me = this;
 
+		zoom = Math.floor(zoom);
 		var tileUrl = "/tile?zoom=" + zoom + "&x=" + coord.x + "&z=" + coord.y;
 		var tileId = 'x_' + coord.x + '_y_' + coord.y + '_zoom_' + zoom;
 		
