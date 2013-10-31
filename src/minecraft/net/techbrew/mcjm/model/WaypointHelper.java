@@ -1,13 +1,13 @@
 package net.techbrew.mcjm.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.ChunkCoordinates;
+import net.minecraft.src.EntityClientPlayerMP;
+import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 
@@ -21,7 +21,7 @@ public class WaypointHelper {
 	
 	private static Boolean reiLoaded;
 	private static Boolean voxelMapLoaded;
-	private static Boolean nativeLoaded = false;
+	private static Boolean nativeLoaded;
 	
 	/**
 	 * Is any waypoint system enabled.
@@ -77,7 +77,7 @@ public class WaypointHelper {
 	 */
 	private static boolean isNativeLoaded() {
 		if(nativeLoaded==null) {
-			nativeLoaded = false;
+			nativeLoaded = !isReiLoaded() && !isVoxelMapLoaded();
 		}
 		return nativeLoaded;
 	}
@@ -110,7 +110,7 @@ public class WaypointHelper {
 		try {
 			Class.forName("reifnsk.minimap.ReiMinimap").getDeclaredField("instance");
 			reifnsk.minimap.ReiMinimap reiMinimap = reifnsk.minimap.ReiMinimap.instance;
-			List<reifnsk.minimap.Waypoint> wayPts = (List<reifnsk.minimap.Waypoint>) reiMinimap.getWaypoints();
+			List<reifnsk.minimap.Waypoint> wayPts = reiMinimap.getWaypoints();
 			if(wayPts==null || wayPts.isEmpty()) {
 				return Collections.EMPTY_LIST;
 			}
@@ -190,20 +190,30 @@ public class WaypointHelper {
 			return Collections.EMPTY_LIST;
 		}
 		
-		ChunkCoordinates spawn = Minecraft.getMinecraft().theWorld.getSpawnPoint();
+		Minecraft mc = Minecraft.getMinecraft();
 		
-		EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
+		ChunkCoordinates spawn = mc.theWorld.getSpawnPoint();
+		EntityClientPlayerMP player = mc.thePlayer;
+		
+		ArrayList<Waypoint> list = new ArrayList<Waypoint>();
 		
 		Waypoint wpSpawn = new Waypoint("Spawn", spawn.posX, spawn.posY, spawn.posZ, true, 0, 255, 0, Waypoint.TYPE_NORMAL, "journeymap", "Spawn");
-		Waypoint wpLast = new Waypoint("Last", new Double(Math.floor(player.posX)).intValue(), new Double(Math.floor(player.posY)).intValue(), new Double(Math.floor(player.posZ)).intValue(), true, 0, 255, 255, Waypoint.TYPE_NORMAL, "journeymap", "Last");
 		
-		return Arrays.asList(wpLast, wpSpawn 
-//				new Waypoint("0,0,0", 0,0,0, true, 255, 255, 255, Waypoint.TYPE_NORMAL, "journeymap", "0,0,0"),
-//				new Waypoint("8,8,8", 8,8,8, true, 255, 255, 255, Waypoint.TYPE_NORMAL, "journeymap", "8,8,8"),
-//				new Waypoint("16,16,16", 16,16,16, true, 255, 255, 255, Waypoint.TYPE_NORMAL, "journeymap", "16,16,16"),
-//				new Waypoint("32,32,32", 32,32,32, true, 255, 255, 255, Waypoint.TYPE_NORMAL, "journeymap", "32,32,32"),
-//				new Waypoint("64,64,64", 64,64,64, true, 255, 255, 255, Waypoint.TYPE_NORMAL, "journeymap", "64,64,64")
-				);
+		int r = new Random().nextInt(255);
+		int g = new Random().nextInt(255);
+		int b = new Random().nextInt(255);
+		Waypoint wpLast = new Waypoint("Last", new Double(Math.floor(player.posX+128)).intValue(), new Double(Math.floor(player.posY)).intValue(), new Double(Math.floor(player.posZ+128)).intValue(), true, r, g, b, Waypoint.TYPE_DEATH, "journeymap", "Last Death");
+		
+		list.add(wpSpawn);
+		list.add(wpLast);
+		
+		ChunkCoordinates bed = player.getBedLocation();
+		if(bed!=null && !bed.equals(spawn)) {
+			Waypoint wpBed = new Waypoint("Bed", bed.posX, bed.posY, bed.posZ, true, 0, 0, 255, Waypoint.TYPE_NORMAL, "journeymap", "Bed");
+			list.add(wpBed);
+		}
+		
+		return list;
 	}
 
 }

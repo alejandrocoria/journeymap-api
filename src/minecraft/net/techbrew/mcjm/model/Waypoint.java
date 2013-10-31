@@ -12,18 +12,23 @@ public class Waypoint extends LinkedHashMap<String, Object> {
 	public static final int TYPE_DEATH = 1;
 	
 	public enum Key {
-		name, x, y, z, enable, r,g,b,
+		id,
+		name, 
+		x, y, z, 
+		enable,
+		r,g,b,
 		dimension,
 		type, // Normal = 0, Deathpoint = 1
 		origin,
+		display
 		;
 	}
 	
-	private final String display;
-
     public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, int type, String origin, String display)
     {
-        this.put(Key.name.name(), name == null ? "" : name);
+    	if(name==null) name = "";
+    	this.put(Key.id.name(), name + "_" + x + "_" + y + "_" + z);
+        this.put(Key.name.name(), name);
         this.put(Key.x.name(), x);
         this.put(Key.y.name(), y);
         this.put(Key.z.name(), z);
@@ -33,7 +38,11 @@ public class Waypoint extends LinkedHashMap<String, Object> {
         this.put(Key.b.name(), blue);
         this.put(Key.type.name(), type);
         this.put(Key.origin.name(), origin);
-        this.display = display;
+        this.put(Key.display.name(), display);
+    }
+    
+    public String getId() {
+    	return getString(Key.id);
     }
     
     public Object getObject(Key p) {
@@ -45,7 +54,7 @@ public class Waypoint extends LinkedHashMap<String, Object> {
     }
     
     public String getOrigin() {
-    	return getString(Key.origin.name);
+    	return getString(Key.origin);
     }
     
     public int getX() {
@@ -71,8 +80,13 @@ public class Waypoint extends LinkedHashMap<String, Object> {
     	return new Color(r,g,b);
     }
     
-    public String toString() {
-    	return this.display;
+    public String getDisplay() {
+    	return getString(Key.display);
+    }
+    
+    @Override
+	public String toString() {
+    	return getDisplay();
     }
     
     /** Internal to class **/

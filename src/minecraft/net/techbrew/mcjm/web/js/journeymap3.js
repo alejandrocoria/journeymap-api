@@ -47,7 +47,7 @@ var JourneyMap = (function() {
 		animals : null,
 		players : null,
 		villagers : null,
-		waypoints : [],
+		waypoints : null,
 		images : null
 	};
 	var markers = {};
@@ -62,8 +62,8 @@ var JourneyMap = (function() {
 	    '</div>'
 	].join('');
 	
-	var errorTemplate = [
-		'<div class="errorDialog">',
+	var dialogTemplate = [
+		'<div class="dialog">',
 		'<img src="/ico/journeymap144.png">',
 		'<div></div>',
 		'</div>'
@@ -72,6 +72,7 @@ var JourneyMap = (function() {
 	var RAD_DEG=57.2957795;
 	
 	var errorDialog = null;
+	var splashDialog = null;
 	var debug = false;
 	
 	// Preload images
@@ -164,22 +165,12 @@ var JourneyMap = (function() {
 						_gaq.push(['_trackEvent', 'Client', 'CheckVersion', JM.game.jm_version]);
 						versionChecked = true;
 					}
-
-					// Splash
-					if (!JmIcon) {
-						JmIcon = new Image();
-						JmIcon.src = "/ico/journeymap144.png";
-						JmIcon.title = "JourneyMap";
-						JmIcon.alt = "JourneyMap";
-						JmIcon.style.position = "absolute";
-						JmIcon.style.visibility = "visible";
-						JmIcon.style.left = ($(window).width() / 2 - 72) + "px";
-						JmIcon.style.top = ($(window).height() / 2 - 72) + "px";
-						JmIcon.style.zIndex = 100;
-						document.body.appendChild(JmIcon);
-						$(JmIcon).delay(1000).fadeOut(1000);
-					}
 					
+					// Splash
+					if(!errorDialog) {
+						splashDialog = createDialog("JourneyMap " + JM.game.jm_version + "<br><small>by techbrew</small>");
+					}
+
 					// Init UI
 					initUI();
 				});
@@ -321,14 +312,16 @@ var JourneyMap = (function() {
 		$("#checkShowGrid").click(function(event) {
 			showGrid = (this.checked === true);
 			postPreference("preference_show_grid", showGrid);
-			drawMap();
+			refreshMap();
 		});
 		
 		$("#checkShowWaypoints").prop('checked', showWaypoints)		
 		$("#checkShowWaypoints").click(function(event) {
 			showWaypoints = (this.checked === true);
 			postPreference("preference_show_waypoints", showWaypoints);
-			drawMap();
+			if(!showWaypoints) {
+				JM.waypoints = null;				
+			}
 		});
 		if(JM.game && JM.game.waypoints_enabled!==true) {
 			$("#checkShowWaypoints").attr("disabled", true);
@@ -338,35 +331,35 @@ var JourneyMap = (function() {
 		$("#checkShowAnimals").click(function(event) {
 			showAnimals = (this.checked === true);
 			postPreference("preference_show_animals", showAnimals);			
-			drawMap();
+			drawMobs();
 		});
 
 		$("#checkShowPets").prop('checked', showPets)
 		$("#checkShowPets").click(function(event) {
 			showPets = (this.checked === true);
 			postPreference("preference_show_pets", showPets);			
-			drawMap();
+			drawMobs();
 		});
 
 		$("#checkShowMobs").prop('checked', showMobs)
 		$("#checkShowMobs").click(function() {
 			showMobs = (this.checked === true);
 			postPreference("preference_show_mobs", showMobs);			
-			drawMap();
+			drawMobs();
 		});
 
 		$("#checkShowVillagers").prop('checked', showVillagers)
 		$("#checkShowVillagers").click(function() {
 			showVillagers = (this.checked === true);
 			postPreference("preference_show_villagers", showVillagers);			
-			drawMap();
+			drawMobs();
 		});
 
 		$("#checkShowPlayers").prop('checked', showPlayers)
 		$("#checkShowPlayers").click(function() {
 			showPlayers = (this.checked === true);
 			postPreference("preference_show_players", showPlayers);			
-			drawMap();
+			drawMultiplayers();
 		});
 		
 		// Actions Menu Button
@@ -467,7 +460,7 @@ var JourneyMap = (function() {
 		JM.animals = {};
 		JM.players = {};
 		JM.villagers = {};
-		JM.waypoints = [];
+		JM.waypoints = {};
 		JM.images = {};
 		
 		markers = {
@@ -479,43 +472,54 @@ var JourneyMap = (function() {
 			player: {}
 		}
 
-		var finishUI = function() {
-			
-			// Google Map
-			mcMap = new MCMap(document.getElementById('map-canvas'));
-			
-			mcMap.map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('jm-logo'));
-			mcMap.map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('jm-toolbar'));
-			mcMap.map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('jm-toggles'));			
-			mcMap.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('jm-options'));
-			mcMap.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('jm-actions'));	
-			mcMap.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(document.getElementById('jm-actions-menu'));
-			mcMap.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(document.getElementById('jm-options-menu'));		
-			mcMap.map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(document.getElementById('worldInfo'));
-						
-			// Close any error dialogs
-			$('.ui-dialog').remove();
-			
-			setCenterOnPlayer(true);
-			
-			// Show update button
-			if (JM.game.latest_journeymap_version > JM.game.jm_version) {
-				var text = getMessage('update_button_title');
-				text = text.replace("{0}", JM.game.latest_journeymap_version);
-				text = text.replace("{1}", JM.game.mc_version);
-				$("#jm-update-button").button()
-					.attr("title", text)
-					.click(function(e){
-						var url = document.getElementById('webLink').href;
-						window.open(url, '_new', '');
-				});
-				
-				mcMap.map.controls[google.maps.ControlPosition.TOP_CENTER].push(document.getElementById('jm-alerts'));
-			}
+		queryServer(setupMap);
 
+	}
+	
+	var setupMap = function() {
+		
+		// Google Map
+		mcMap = new MCMap(document.getElementById('map-canvas'));
+		
+		mcMap.map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('jm-logo'));
+		mcMap.map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('jm-toolbar'));
+		mcMap.map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('jm-toggles'));			
+		mcMap.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('jm-options'));
+		mcMap.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('jm-actions'));	
+		mcMap.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(document.getElementById('jm-actions-menu'));
+		mcMap.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(document.getElementById('jm-options-menu'));		
+		mcMap.map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(document.getElementById('worldInfo'));
+					
+		// Close error
+		if(errorDialog) {
+			$('.ui-dialog').remove();
+			errorDialog = null;
+		}
+		
+		// Close splash
+		if(splashDialog) {
+			$(splashDialog).parent().delay(1000).fadeOut(1000, function(){
+				$('.ui-dialog').remove();
+				splashDialog = null;
+			});
 		}
 
-		queryServer(finishUI);
+		setCenterOnPlayer(true);
+		
+		// Show update button
+		if (JM.game.latest_journeymap_version > JM.game.jm_version) {
+			var text = getMessage('update_button_title');
+			text = text.replace("{0}", JM.game.latest_journeymap_version);
+			text = text.replace("{1}", JM.game.mc_version);
+			$("#jm-update-button").button()
+				.attr("title", text)
+				.click(function(e){
+					var url = document.getElementById('webLink').href;
+					window.open(url, '_new', '');
+			});
+			
+			mcMap.map.controls[google.maps.ControlPosition.TOP_CENTER].push(document.getElementById('jm-alerts'));
+		}
 
 	}
 
@@ -655,9 +659,12 @@ var JourneyMap = (function() {
 				return;
 
 			// Draw the map
-			var forceRefresh = (wasUnderground !== playerUnderground)
 			if(mcMap) {
-				mapOverlay.refreshTiles(forceRefresh);
+				if(wasUnderground !== playerUnderground) {
+					refreshMap();
+				} else {
+					mapOverlay.refreshTiles();
+				}
 				drawMap();
 			}
 
@@ -695,17 +702,28 @@ var JourneyMap = (function() {
 	 */
 	var refreshMap = function() {
 		if (debug) console.log(">>> " + "refreshMap");
-		clearTimer();		
-		//skipImageCheck = true; // Don't need tiles to be checked by queryServer
-		queryServer(function(){
-			// After data retrieved,force the tile refresh
-			//skipImageCheck = false;
-			lastImageCheck = new Date().getTime();
-			mapOverlay.refreshTiles(true); // Force all tiles to be renewed
-			var zoom = mcMap.map.getZoom();			
-			mcMap.map.setZoom(zoom+ .00000001);
-			mcMap.map.setZoom(zoom);
-		});			
+			
+		lastImageCheck = 1;
+		var zoom = mcMap.map.getZoom();		
+		var delta = (zoom==MapConfig.maxZoom) ? -0.0000001 : 0.0000001 ;
+		var center = mcMap.map.getCenter();
+		
+		
+		// This hack forces the tiles to be replaced but doesn't visibly change the map
+		mcMap.map.setZoom(zoom + delta);
+		mcMap.map.panTo(center);
+		mcMap.map.setZoom(zoom);
+		mcMap.map.panTo(center);
+				
+		// The old way:
+		//      clearTimer();
+		//		queryServer(function(){
+		//		// After data retrieved,force the tile refresh
+		//		//skipImageCheck = false;
+		//		lastImageCheck = new Date().getTime();
+		//		mapOverlay.refreshTiles(true); // Force all tiles to be renewed
+		//	    });	
+		
 	}
 
 	/**
@@ -750,6 +768,12 @@ var JourneyMap = (function() {
 		
 		// Destroy Google Map
 		$("#map-canvas").empty();
+		
+		// Ensure splash destroyed
+		if(splashDialog) {
+			$(splashDialog).remove();
+			splashDialog = null;
+		}
 
 		// Display error
 		var displayError;
@@ -760,8 +784,7 @@ var JourneyMap = (function() {
 		}
 		
 		if(!errorDialog) {			
-			errorDialog = $(errorTemplate).dialog({ modal: true });
-			errorDialog.parent().find('.ui-dialog-titlebar').remove();
+			errorDialog = createDialog(displayError, true);
 		}
 		$(errorDialog).find('div').html(displayError);
 			
@@ -784,6 +807,17 @@ var JourneyMap = (function() {
 
 			}, 5000);
 		}
+	}
+	
+	var createDialog = function(text, modal) {
+		if(!modal) modal=false;
+		var dialog = $(dialogTemplate).dialog({ modal: modal });
+		dialog.parent().find('.ui-dialog-titlebar').remove();
+		dialog.css('z-index', google.maps.Marker.MAX_ZINDEX + 1);
+		if(text) {
+			dialog.find('div').html(text);
+		}
+		return dialog;
 	}
 
 	// ////////////DRAW ////////////////////
@@ -836,8 +870,8 @@ var JourneyMap = (function() {
 			$(img).attr('id', imgId)
 			      .attr('src','/img/locator-player.png')
 			      .css('width','64px')
-			      .css('height','64px');
-			
+			      .css('height','64px')
+			      .rotate(heading*RAD_DEG);
 			markers.playerMarker = new RichMarker({
 				position: pos,
 			    map: mcMap.map,
@@ -845,6 +879,7 @@ var JourneyMap = (function() {
 			    flat: true,
 			    anchor: RichMarkerPosition.MIDDLE,
 			    content: img,
+			    zIndex: google.maps.Marker.MAX_ZINDEX + 1,
 			    tooltip : new RichMarker({
 					position: null,
 				    map: null,
@@ -910,7 +945,12 @@ var JourneyMap = (function() {
 		// Update marker position and heading
 		markers.playerMarker.setPosition(pos);
 		$('#'+imgId).rotate(heading*RAD_DEG);
-
+		
+		// Keep on top
+		if(markers.playerMarker.getZIndex()<google.maps.Marker.MAX_ZINDEX){
+			markers.playerMarker.setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
+		}
+		
 		// Center if needed
 		if(centerOnPlayer===true) {
 			mcMap.map.panTo(pos);
@@ -965,9 +1005,13 @@ var JourneyMap = (function() {
 	// Create or update marker
 	var updateEntityMarker = function(entity, markerMap) {
 
-		// Get current entity position
-		var id = 'id' + entity.entityId;
+		// Check current entity position		
 		var pos = blockPosToLatLng(entity.posX, entity.posZ);
+		if(!mcMap.map.getBounds().contains(pos)) {
+			return; // Don't bother with marker
+		}
+		
+		var id = 'id' + entity.entityId;
 		var heading = entity.heading;
 
 		var locatorUrl;
@@ -1022,16 +1066,6 @@ var JourneyMap = (function() {
 			    content: contentDiv[0]
 	        });
 			markerMap[id] = marker;
-			
-//			$(contentDiv).find('.entityIcon').on('load', function(){
-//				$(this).css('visibility','visible');
-//				$(this).off('load');
-//			}).css('visibility','hidden');
-//			
-//			$(contentDiv).find('.entityLocator').on('load', function(){
-//				$(this).css('visibility','visible');
-//				$(this).off('load');
-//			}).css('visibility','hidden');
 			
 			if(debug) console.log("Marker added for " + id);
 		}
@@ -1127,162 +1161,93 @@ var JourneyMap = (function() {
 	// Draw the location of waypoints
 	var drawWaypoints = function() {
 		
-		return;
-
 		if (debug)
 			console.log(">>> " + "drawWaypoints");
 
-		if(!showWaypoints==true || !JM.game.waypoints_enabled==true)
-			return;
+		removeObsoleteMarkers(JM.waypoints, markers.waypoints);
 		
-		var waypoints = JM.waypoints;
-		if (!waypoints)
+		if(!showWaypoints==true || !JM.game.waypoints_enabled==true || !JM.waypoints) {
 			return;
+		}	
 
-		if (!canvasWidth || !canvasHeight) {
-			canvasWidth = getCanvasWidth();
-			canvasHeight = getCanvasHeight();
-		}
-
-		var ctx = fgCanvas.getContext("2d");		
-
-		// Draw waypoints
-		$.each(waypoints, function(index, waypoint) {
-
-			var x = getScaledChunkX(waypoint.x / 16) - (mapScale / 2);
-			var z = getScaledChunkZ(waypoint.z / 16) - (mapScale / 2);
-			var outofbounds = false;			
-			var diameter = 6;
-			var min = diameter;
-			
-			if(x<0) {
-				x = 0;
-				outofbounds = true;
-			} else if(x > canvasWidth) {
-				x = canvasWidth;
-				outofbounds = true;
-			}
-			
-			if(z<52) {
-				z = 52;
-				outofbounds = true;
-			} else if(z > canvasHeight) {
-				z = canvasHeight;
-				outofbounds = true;
-			}
-			
-			if(!waypoint.color) {
-				waypoint.color = "rgb(" 
-					+ waypoint.r + "," 
-					+ waypoint.g + "," 
-					+ waypoint.b + ")";    
-			}
-			
-			// Draw waypoint
-			ctx.strokeStyle = "#000";
-			ctx.lineWidth = 2;
-			ctx.fillStyle = waypoint.color;
-			
-			if(!outofbounds) {
-				
-				// Draw marker
-				if(waypoint.type==1) {
-					// X death spot
-					diameter = 6;
-					ctx.strokeStyle = "#000";
-					ctx.lineWidth = 6;
-					ctx.lineCap = 'round';
-										
-					ctx.beginPath();
-					ctx.moveTo(x-diameter, z-diameter);
-					ctx.lineTo(x+diameter, z+diameter);
-					ctx.closePath();
-					ctx.stroke();
-					
-					ctx.beginPath();
-					ctx.moveTo(x+diameter, z-diameter);
-					ctx.lineTo(x-diameter, z+diameter);
-					ctx.closePath();
-					ctx.stroke();
-					
-					ctx.strokeStyle = waypoint.color;
-					ctx.lineWidth = 2;
-					
-					ctx.lineCap = 'butt';
-					
-					ctx.beginPath();
-					ctx.moveTo(x-diameter, z-diameter);
-					ctx.lineTo(x+diameter, z+diameter);
-					ctx.closePath();
-					ctx.stroke();
-					
-					ctx.beginPath();
-					ctx.moveTo(x+diameter, z-diameter);
-					ctx.lineTo(x-diameter, z+diameter);
-					ctx.closePath();
-					ctx.stroke();
-					
-				} else {
-					// Diamond
-					ctx.lineCap = 'butt';
-					
-					ctx.beginPath();
-					ctx.moveTo(x-diameter, z);
-					ctx.lineTo(x, z-diameter);
-					ctx.lineTo(x+diameter, z);
-					ctx.lineTo(x, z+diameter);
-					ctx.lineTo(x-diameter, z);
-					ctx.closePath();
-					ctx.fill();
-					ctx.stroke();
-					
-					ctx.globalAlpha = 0.1;
-					ctx.strokeStyle = "#fff";
-					ctx.beginPath();
-					ctx.moveTo(x-diameter, z);
-					ctx.lineTo(x+diameter, z);
-					ctx.moveTo(x, z-diameter);
-					ctx.lineTo(x, z+diameter);
-					ctx.closePath();
-					ctx.stroke();
-				}
-			
-				// Draw label background			
-				ctx.font = "bold 12px Arial";
-				ctx.textAlign = "center";
-				ctx.fillStyle = "#000";
-				
-				var labelZ = z - (diameter*2)+2; 
-				
-				// Get label dimensions
-				var metrics = ctx.measureText(waypoint.name);
-				var width = metrics.width + 6;
-				ctx.globalAlpha = 0.7;
-				ctx.fillRect(x-(width/2), labelZ-12, width, 16);
-				
-				// Draw label
-				ctx.globalAlpha = 1.0;
-				if(waypoint.tType==1) {
-					ctx.fillStyle = "#f00";
-				} else {
-					ctx.fillStyle = waypoint.color;
-				}
-				ctx.fillText(waypoint.name, x, labelZ);
-			} else {
-				
-				// Circle on edge of map
-				ctx.lineWidth = 4;
-				ctx.beginPath();
-				ctx.arc(x, z, 8, 0, Math.PI * 2, true);
-				ctx.closePath();
-				ctx.fill();
-				ctx.stroke();
-			}
+		$.each(JM.waypoints, function(index, waypoint) {
+			updateWaypointMarker(waypoint,markers.waypoints);
 		});
-
+			
 	}
 	
+	// Create or update marker
+	var updateWaypointMarker = function(waypoint, markerMap) {
 
+		// Get current waypoint position		
+		var pos = blockPosToLatLng(waypoint.x, waypoint.z);
+		if(!mcMap.map.getBounds().contains(pos)) {
+			//return; // Don't bother with marker
+			// TODO: Put on edge of map as an arrow?
+		}
+
+		var id = waypoint.id;
+		waypoint.color = rgbToHex(waypoint.r, waypoint.g, waypoint.b);
+		
+		var marker = markerMap[id];
+		
+		if(!marker) {
+			var icon = {
+				fillOpacity: 0.85,
+				scale: 1,
+				fillColor: waypoint.color,
+				strokeColor: 'white'
+			};
+			var labelClass = "waypoint";
+
+			if(waypoint.type==1) {
+				// death point: X marks the spot
+				icon.path = 'M -10,-10 0,-4 10,-10 14,-8 4,0 14,8 10,10 0,4 -10,10 -14,8 -4,0 -14,-8 z';
+				icon.strokeWeight = 2;
+				labelClass = labelClass + " death";
+			} else {
+				// diamond
+				icon.path = 'M 0,-16 16,0 0,16 -16,0 0,-16 z';
+				icon.strokeWeight = 3;
+				labelClass = labelClass;
+			}
+			
+			var title = [
+			    getMessage('location_text'),
+			    waypoint.x + "," + waypoint.z,
+			    getMessage('elevation_text'),
+			    waypoint.y,
+			    "(" + (waypoint.y >> 4) + ")"
+			].join(' ');
+
+			marker = new MarkerWithLabel({
+		       position: pos,
+		       map: mcMap.map,
+		       draggable: false,
+		       clickable: false,
+		       icon: icon,
+		       title: title,
+		       labelContent: waypoint.display,
+		       labelClass: labelClass,
+		       labelAnchor: new google.maps.Point(-18,14)
+		     });
+			markerMap[id] = marker;	
+			
+			if(debug) console.log("Marker added for " + id);
+			
+		} else {
+			
+			// Update marker color		
+			if(marker.icon.fillColor!==waypoint.color) {
+				marker.icon.fillColor = waypoint.color;
+				marker.setIcon(marker.icon);
+			}
+		}
+	}
+	
+	function rgbToHex(r, g, b) {
+	    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+	}
 	
 	/** Google Maps Code **/
 	
@@ -1344,10 +1309,6 @@ var JourneyMap = (function() {
 	    mapOverlay = new MCMapType();
 	    this.map.mapTypes.set('jm', mapOverlay);
 	    this.map.setMapTypeId('jm');
-	    this.playerMarker = null;
-	    this.entityMarkers = [];
-	    this.multiplayerMarkers = [];
-	    this.waypointMarkers = [];
 	};
 
 	var MCMapType = function () {
@@ -1371,6 +1332,7 @@ var JourneyMap = (function() {
 		var me = this;
 
 		zoom = Math.floor(zoom);
+		
 		var tileUrl = "/tile?zoom=" + zoom + "&x=" + coord.x + "&z=" + coord.y;
 		var tileId = 'x_' + coord.x + '_y_' + coord.y + '_zoom_' + zoom;
 		
@@ -1389,11 +1351,16 @@ var JourneyMap = (function() {
 		}
 		
 		var img = $('<img>')
-			.attr('src', tileUrl += me.getTileState())
-			.on('load', function() {
+			.attr('src', tileUrl += me.getTileState());
+		
+		if(img.width()>0) {
+			$(tile).prepend(img);
+		} else {
+			$(img).on('load', function() {
 				$(tile).prepend(img);
 			});
-		
+		}
+			
 		me.loadedTiles[tileId] = {
 			tile: tile,
 			tileUrl: tileUrl,
@@ -1419,7 +1386,8 @@ var JourneyMap = (function() {
 	MCMapType.prototype.refreshTiles = function (force) {
 		var me = this;
 		
-		if (debug) console.log(">>> " + "refreshTiles " + force||false);
+		if(!force) force==false;
+		if (debug) console.log(">>> " + "refreshTiles: " + force);
 		
 		if(force) {			
 			for (var tileId in me.loadedTiles) {

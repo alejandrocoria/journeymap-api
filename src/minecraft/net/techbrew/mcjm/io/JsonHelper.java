@@ -21,7 +21,7 @@ public class JsonHelper {
 		for(int i=0;i<size;i++) {
 			key = keys[i];
 			value = props.get(key);
-			sb.append(key).append(":");			
+			sb.append("'").append(key).append("'").append(":");			
 			wrap(sb, value);			
 			if(i+1<size) {
 				sb.append(",");
@@ -81,7 +81,7 @@ public class JsonHelper {
 	
 	static void wrapAsString(final StringBuffer sb, final Object val) {
 		String str = val.toString().replaceAll("'", "&apos;").replaceAll("\"", "&quot;");
-		sb.append("\"").append(str).append("\"");	
+		sb.append("'").append(str).append("'");	
 	}
 
 }

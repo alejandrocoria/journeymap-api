@@ -1,6 +1,6 @@
 package net.techbrew.mcjm.data;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,15 +35,15 @@ public class WaypointsData implements IDataProvider {
 	public Map getMap(Map optionalParams) {		
 				
 		List<Waypoint> waypoints = WaypointHelper.getWaypoints();
-		ArrayList<Map> list = new ArrayList<Map>(waypoints.size());
+		Map<String, Map> map = new HashMap<String, Map>(waypoints.size());
 		for(Waypoint waypoint : waypoints) {
 			if(waypoint.getEnable()) {
-				list.add(waypoint);
+				map.put(waypoint.getId(),waypoint);
 			}
 		}		
 		
 		LinkedHashMap props = new LinkedHashMap();
-		props.put(EntityKey.root, list);
+		props.put(EntityKey.root, map);
 		
 		return props;		
 	}	
