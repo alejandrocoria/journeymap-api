@@ -103,7 +103,7 @@
   	<yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
       outputfolder="${build.dir}/net/techbrew/mcjm/web/css">
       <fileset dir="${src.dir}/net/techbrew/mcjm/web/css" >
-        <include name="default.css" />
+        <include name="journeymap.css" />
       </fileset>
     </yuicompress>
   </target>
