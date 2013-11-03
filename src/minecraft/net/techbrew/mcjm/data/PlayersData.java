@@ -48,8 +48,8 @@ public class PlayersData implements IDataProvider {
 		List<Map> list = new ArrayList<Map>(others.size());
 		for(EntityPlayer entity : others) {
 			LinkedHashMap eProps = new LinkedHashMap();
-			eProps.put(EntityKey.entityId, entity.entityId); 
-			eProps.put(EntityKey.filename, EntityHelper.PLAYER_FILENAME); 
+			// eProps.put(EntityKey.entityId, entity.entityId); 
+			eProps.put(EntityKey.filename, "/skin/" + entity.getEntityName()); 
 			eProps.put(EntityKey.username, entity.getEntityName());
 			eProps.put(EntityKey.posX, (int) entity.posX); 
 			eProps.put(EntityKey.posY, (int) entity.posY); 
@@ -63,7 +63,7 @@ public class PlayersData implements IDataProvider {
 		// Put into map, preserving the order, using entityId as key
 		LinkedHashMap<Object,Map> idMap = new LinkedHashMap<Object,Map>(list.size());
 		for(Map entityMap : list) {
-			idMap.put("id"+entityMap.get(EntityKey.entityId), entityMap);
+			idMap.put(entityMap.get(EntityKey.username), entityMap);
 		}
 		
 		LinkedHashMap props = new LinkedHashMap();

@@ -1,5 +1,6 @@
 package net.techbrew.mcjm.server;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +16,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
+
+import javax.imageio.ImageIO;
 
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
@@ -283,6 +286,18 @@ public abstract class BaseService extends Service {
         	return null;
         }
     }
+	
+	protected void serveImage(Event event, BufferedImage img) throws Exception {			
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(img, "png", baos);
+		baos.flush();
+		byte[] bytes = baos.toByteArray();
+		baos.close();
+		event.output().write(bytes); 
+		//gzipResponse(event, bytes);
+		return;
+	}
+	
 	
 	/**
 	 * Encapsulate knowledge about setting HTTP headers

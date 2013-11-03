@@ -62,6 +62,16 @@ var JourneyMap = (function() {
 	    '</div>'
 	].join('');
 	
+	var mpTemplate = [
+	    '<div class="mpMarker" id="">',
+	    '<div class="mpName"/>',
+	    '<div class="mpImages">',			    
+	    '<img class="mpLocator" src="/img/locator-other.png">',
+	    '<img class="mpIcon" src="/img/pixel.png" >',
+	    '</div>',
+	    '</div>'
+	].join('');	          
+	
 	var dialogTemplate = [
 		'<div class="dialog">',
 		'<img src="/ico/journeymap144.png">',
@@ -703,6 +713,8 @@ var JourneyMap = (function() {
 	var refreshMap = function() {
 		if (debug) console.log(">>> " + "refreshMap");
 			
+		if(!mcMap || !mcMap.map) return;
+		
 		lastImageCheck = 1;
 		var zoom = mcMap.map.getZoom();		
 		var delta = (zoom==MapConfig.maxZoom) ? -0.0000001 : 0.0000001 ;
@@ -1095,67 +1107,59 @@ var JourneyMap = (function() {
 		if (debug)
 			console.log(">>> " + "drawMultiplayers");
 
-		var others = JM.players;
-		if (!others)
-			return;
+		// Villagers
+		removeObsoleteMarkers(JM.players, markers.players);	
+		if (showPlayers === true && JM.players) {
+			$.each(JM.players, function(index, multiplayer) {
+				updateMultiplayerMarker(multiplayer,markers.players);
+			});
+		}
 		
-		if(showPlayers!==true)
-			return;
-		
-		return;
-		
-		// TODO
+	}
+	
+	// Create or update marker
+	var updateMultiplayerMarker = function(multiplayer, markerMap) {
 
-		$.each(others, function(index, other) {
+		// Check current multiplayer position		
+		var pos = blockPosToLatLng(multiplayer.posX, multiplayer.posZ);
 
-			var x = getScaledChunkX(other.posX / 16) - (mapScale / 2);
-			var z = getScaledChunkZ(other.posZ / 16) - (mapScale / 2);
-			if (other.username != JM.player.name) {
-				if (x >= 0 && x <= canvasWidth && z >= 0 && z <= canvasHeight) {
+		var id = multiplayer.username;
+		var heading = multiplayer.heading;
+		var marker = markerMap[id];
 
-					// Draw locator
-					var locRadius = otherPlayerMobImage.width / 2;
-					ctx.save();
-					ctx.globalAlpha = 1;
-					ctx.translate(x, z);
-					ctx.rotate(other.heading);
-					ctx.translate(-locRadius, -locRadius);
-					ctx.drawImage(otherPlayerMobImage, 0, 0);
-					ctx.restore();
+		// Create marker if needed
+		if(!marker) {	
+			var contentDiv = $(mpTemplate).attr('id',id);
+			$(contentDiv).find('.mpName').html(id);
+			$(contentDiv).find('.mpIcon')
+				.attr('src', multiplayer.filename)
+				.on('error', function(event){
+					if(debug) console.log("Skin not found for " + id);
+					$(event.target).attr('src', '/img/entity/unknown.png');					
+				});
+			$(contentDiv).find('.mpLocator').rotate(heading*RAD_DEG);
 					
-					// show image
-					if(otherImage.width) {
-						var radius = otherImage.width / 2;
-						ctx.save();
-						ctx.translate(x - radius, z - radius);
-						if(other.heading>Math.PI) {
-							ctx.translate(otherImage.width, 0);
-							ctx.scale(-1, 1);
-						}
-						ctx.drawImage(otherImage, 0, 0, radius * 2, radius * 2);
-						ctx.restore();
-					}
-					// Draw label background			
-					ctx.font = "bold 11px Arial";
-					ctx.textAlign = "center";
-					ctx.fillStyle = "#000";
-					
-					var labelZ = z + 36; 
-					
-					// Get label dimensions
-					var metrics = ctx.measureText(other.username);
-					var width = metrics.width + 6;
-					ctx.globalAlpha = 0.7;
-					ctx.fillRect(x-(width/2), labelZ-12, width, 16);
-					
-					// Draw label
-					ctx.globalAlpha = 1.0;
-					ctx.fillStyle = "#0f0";
-					ctx.fillText(other.username, x, labelZ);
-				}
-			}
-		});
+			marker = new RichMarker({
+				position: pos,
+			    map: mcMap.map,
+			    draggable: false,
+			    flat: true,
+			    anchor: RichMarkerPosition.MIDDLE,
+			    content: contentDiv[0]
+	        });
+			markerMap[id] = marker;
+			
+			if(debug) console.log("Marker added for " + id);
+		}
+	
+		// Label if customName exists
+		var contentDiv = $('#'+id);
 
+		// multiplayer locator		
+		$(contentDiv).find('.mpLocator').rotate(heading*RAD_DEG);		
+	
+		// Update marker position
+		marker.setPosition(pos);
 	}
 	
 	// Draw the location of waypoints

@@ -121,7 +121,7 @@ label span {
     color: #ccc;
 }
 
-.entityMarker {
+.entityMarker, .mpMarker {
 	height:64px;
 	width:64px;
 	border: none;
@@ -137,6 +137,17 @@ label span {
 	visibility:hidden;
 	position:absolute;
 	margin-top:-2em;
+}
+
+.mpName {
+    font:bold 11px Arial;
+    text-align:center;
+    white-space: nowrap;
+    color:#ffffff;
+    padding:2px;
+    background-color:#020;
+    position:absolute;
+    margin-top:-2em;
 }
 
 .waypoint {
@@ -166,7 +177,7 @@ label span {
 	background-color:rgba(255,0,0,0.7);
 }
 
-.entityImages {
+.entityImages, .mpImages {
     position:relative;	
 }
 
@@ -179,10 +190,18 @@ label span {
 	left: 16px;
 }
 
-.entityLocator {
+.entityLocator, .mpLocator {
 	position:absolute;
 	width: 64px;
     height: 64px;
+}
+
+.mpIcon {
+    position:absolute;
+    top: 20px;
+    left: 20px;
+    width: 24px;
+    height: 24px;
 }
 
 .playerInfo {

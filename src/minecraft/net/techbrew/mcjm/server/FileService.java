@@ -1,5 +1,8 @@
 package net.techbrew.mcjm.server;
 
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,6 +20,8 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
+
+import javax.imageio.ImageIO;
 
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
@@ -104,6 +109,11 @@ public class FileService extends BaseService {
 			String requestPath = null;
 			path = event.query().path(); //$NON-NLS-1$
 			
+			if(path.startsWith("/skin/")) {
+				serveSkin(path.split("/skin/")[1], event);
+				return;
+			}
+			
 			if("/".equals(path)) { //$NON-NLS-1$
 				// Default to index
 				requestPath = resourcePath + "/index.html"; //$NON-NLS-1$
@@ -163,6 +173,39 @@ public class FileService extends BaseService {
 			JourneyMap.getLogger().severe(LogFormatter.toString(t));			
 			throwEventException(500, Constants.getMessageJMERR12(path), event, true);
 		} 
+	}
+	
+	public void serveSkin(String username, Event event) throws Exception {
+		
+		ResponseHeader.on(event).contentType(ContentType.png);
+		
+		BufferedImage img = null;
+		try {
+			URL url = new URL("http://s3.amazonaws.com/MinecraftSkins/" + username + ".png");
+			img = ImageIO.read(url).getSubimage(8, 8, 8, 8);
+			
+		} catch (Throwable e) {
+			try {
+				URL url = new URL("http://s3.amazonaws.com/MinecraftSkins/char.png");
+				img = ImageIO.read(url).getSubimage(8, 8, 8, 8);
+			} catch (Throwable e2) {
+				JourneyMap.getLogger().warning("Can't get skin image for " + username + ": " + e2.getMessage());
+			}
+		}
+		
+		if(img!=null) {			
+			final BufferedImage scaledImage = new BufferedImage(24, 24, img.getType());
+			final Graphics2D g = scaledImage.createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g.drawImage(img, 0, 0, 24, 24, null);
+			g.dispose();
+			serveImage(event, scaledImage);
+		} else {
+			event.reply().code("404 Not Found");
+		}
+		
 	}
 	
 	/**
@@ -235,6 +278,7 @@ public class FileService extends BaseService {
 	 * @param data
 	 * @return
 	 */
+	@Override
 	protected byte[] gzip(String data) {
         ByteArrayOutputStream bout = null;
         try {
