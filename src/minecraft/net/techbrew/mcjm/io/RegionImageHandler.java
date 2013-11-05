@@ -13,6 +13,7 @@ import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 
+import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
@@ -20,7 +21,6 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
-import net.techbrew.mcjm.ui.ZoomLevel;
 
 public class RegionImageHandler {
 	
@@ -151,7 +151,7 @@ public class RegionImageHandler {
 		return isBlank;
 	}
 	
-	static BufferedImage createBlankImage(int width, int height) {
+	public static BufferedImage createBlankImage(int width, int height) {
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2D = img.createGraphics();
 		return img;
@@ -162,41 +162,13 @@ public class RegionImageHandler {
 		FileInputStream fis = null;
 		BufferedImage image = null;
 
-		if(regionFile.exists() && regionFile.canRead()) {
-			
-//				final int maxTries = 5;
-//				int tries = 1;
-//				while(tries<=maxTries) {
-					try {
-//						fis = new FileInputStream(regionFile);
-//						FileChannel fc = fis.getChannel();
-//						ImageIO.setUseCache(false);
-//						ImageReader reader = ImageIO.getImageReadersBySuffix("png").next(); //$NON-NLS-1$
-//						ImageReadParam param = new ImageReadParam();
-//						param.setSourceSubsampling(sampling, sampling, 0, 0);
-//						image = ImageIO.read(fis);				
-						
-						image = ImageIO.read(new BufferedInputStream(new FileInputStream(regionFile)));
-						
-						//break;
-					} catch (Exception e) {
-//						tries++;
-						String error = Constants.getMessageJMERR21(regionFile, LogFormatter.toString(e));
-						JourneyMap.getLogger().warning(error);
-					} finally {
-//				    	if(fis!=null) {
-//							try {								
-//								fis.close();
-//							} catch (IOException e) {
-//								JourneyMap.getLogger().severe(LogFormatter.toString(e));
-//							}
-//				    	}
-					}
-//				}
-//				if(tries==maxTries) {
-//					JourneyMap.getLogger().severe("Deleting unusable region file: " + regionFile);
-//					regionFile.delete();
-//				}
+		if(regionFile.exists() && regionFile.canRead()) {			
+			try {					
+				image = ImageIO.read(new BufferedInputStream(new FileInputStream(regionFile)));
+			} catch (Exception e) {
+				String error = Constants.getMessageJMERR21(regionFile, LogFormatter.toString(e));
+				JourneyMap.getLogger().warning(error);
+			} 
 		}
 			
 		if(image==null) {
@@ -211,7 +183,6 @@ public class RegionImageHandler {
 		return image;
 	}
 	
-	
 	public static BufferedImage getImage(File file) {
 		try {
 			return ImageIO.read(file);
@@ -222,25 +193,120 @@ public class RegionImageHandler {
 		}
 	}
 	
+	
 	/**
-	 * Used by MapSaver, MapService to get a merged image for what the display needs
+	 * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2)
 	 * @param worldDir
-	 * @param x1
-	 * @param z1
-	 * @param x2
-	 * @param z2
+	 * @param cx1
+	 * @param cz1
+	 * @param cx2
+	 * @param cz2
 	 * @param mapType
-	 * @param depth
+	 * @param vSlice
 	 * @throws IOException
 	 */
-	public static synchronized BufferedImage getMergedChunks(File worldDir, int x1, int z1,
-			int x2, int z2, Constants.MapType mapType, Integer vSlice, int dimension, Boolean useCache, ZoomLevel zoomLevel)
-			throws IOException {
-
-		int imageWidth = Math.max(16, (x2 - x1) * 16);
-		int imageHeight = Math.max(16, (z2 - z1) * 16);
+	public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType, Integer vSlice, final int dimension, final Boolean useCache, final Integer imageWidth, final Integer imageHeight) {
 		
-		return getMergedChunks(worldDir, x1, z1, x2, z2, mapType, vSlice, dimension, useCache, zoomLevel, imageWidth, imageHeight);
+		long start = 0, stop = 0;		
+		start = System.currentTimeMillis();
+
+		boolean isUnderground = mapType.equals(Constants.MapType.underground);
+		if(!isUnderground) {
+			vSlice = null;
+		}
+		
+		final int initialWidth = (endCoord.chunkXPos-startCoord.chunkXPos+1) * 16;
+		final int initialHeight = (endCoord.chunkZPos-startCoord.chunkZPos+1) * 16;		
+		
+		final BufferedImage mergedImg = new BufferedImage(initialWidth, initialHeight, BufferedImage.TYPE_INT_ARGB);
+		final Graphics2D g2D = initRenderingHints(mergedImg.createGraphics());
+
+		final RegionImageCache cache = RegionImageCache.getInstance();
+
+		RegionCoord rc = null;
+		BufferedImage regionImage = null;
+		
+		final int rx1 = RegionCoord.getRegionPos(startCoord.chunkXPos);
+		final int rx2 = RegionCoord.getRegionPos(endCoord.chunkXPos);
+		final int rz1 = RegionCoord.getRegionPos(startCoord.chunkZPos);
+		final int rz2 = RegionCoord.getRegionPos(endCoord.chunkZPos);
+		
+		int rminCx, rminCz, rmaxCx, rmaxCz, sx1, sy1, sx2, sy2, dx1, dx2, dy1, dy2;
+		
+		boolean imageDrawn = false;
+		for(int rx=rx1;rx<=rx2;rx++) {
+			for(int rz=rz1;rz<=rz2;rz++) {
+				rc = new RegionCoord(worldDir, rx, vSlice, rz, dimension);
+				if(cache.contains(rc)) {
+					regionImage = cache.getGuaranteedImage(rc, mapType);
+				} else {
+					regionImage = RegionImageHandler.readRegionImage(RegionImageHandler.getRegionImageFile(rc, mapType, false), rc, 1, false, true);
+					if(regionImage==null) {
+						continue;
+					}
+				}
+				rminCx = Math.max(rc.getMinChunkX(), startCoord.chunkXPos);
+				rminCz = Math.max(rc.getMinChunkZ(), startCoord.chunkZPos);
+				rmaxCx = Math.min(rc.getMaxChunkX(), endCoord.chunkXPos);
+				rmaxCz = Math.min(rc.getMaxChunkZ(), endCoord.chunkZPos);
+						
+				int xoffset = rc.getMinChunkX()*16;
+				int yoffset = rc.getMinChunkZ()*16;
+				sx1 = (rminCx * 16) - xoffset;
+				sy1 = (rminCz * 16) - yoffset;
+				sx2 = sx1 + ((rmaxCx-rminCx + 1)* 16);
+				sy2 = sy1 + ((rmaxCz-rminCz + 1)* 16);
+				
+				xoffset = startCoord.chunkXPos*16;
+				yoffset = startCoord.chunkZPos*16;
+				dx1 = (startCoord.chunkXPos*16) - xoffset;
+				dy1 = (startCoord.chunkZPos*16) - yoffset;
+				dx2 = dx1 +((endCoord.chunkXPos-startCoord.chunkXPos + 1) * 16);
+				dy2 = dy1 +((endCoord.chunkZPos-startCoord.chunkZPos + 1) * 16);
+				
+				g2D.drawImage(regionImage, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);		
+				imageDrawn = true;
+			}
+		}
+
+		// Show chunk grid
+		if(imageDrawn) {
+			if(PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)) {
+				
+				g2D.setColor(new Color(255,255,255));
+				if(mapType==MapType.day) {				
+					g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.4F));
+				} else {
+					g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.1F));
+				}
+	
+				for(int x = 0; x<=initialWidth; x+=16) {
+					g2D.drawLine(x, 0, x, initialHeight);
+				}
+				
+				for(int z = 0; z<=initialHeight; z+=16) {
+					g2D.drawLine(0, z, initialWidth, z);
+				}
+			}
+		}
+		
+		g2D.dispose();
+				
+		if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
+			stop = System.currentTimeMillis();
+			JourneyMap.getLogger().fine("getMergedChunks time: "  + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		
+		// Scale if needed
+		if(imageHeight!=null && imageWidth!=null && (initialHeight!=imageHeight || initialWidth!=imageWidth)) {
+			final BufferedImage scaledImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
+			final Graphics2D g = initRenderingHints(scaledImage.createGraphics());
+			g.drawImage(mergedImg, 0, 0, imageWidth, imageHeight, null);
+			g.dispose();
+			return scaledImage;
+		} else {
+			return mergedImg;
+		}		
 
 	}
 	
@@ -255,33 +321,21 @@ public class RegionImageHandler {
 	 * @param vSlice
 	 * @throws IOException
 	 */
-	public static synchronized BufferedImage getMergedChunks(File worldDir, final int cx1, final int cz1,
-			final int cx2, final int cz2, final Constants.MapType mapType, Integer vSlice, final int dimension, final Boolean useCache, ZoomLevel zoomLevel, int imageWidth, int imageHeight)
-			throws IOException {
-
-		long start = 0, stop = 0;		
-		start = System.currentTimeMillis();
-
+	public static synchronized boolean hasImageChanged(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType, Integer vSlice, final int dimension, final long since) {
+		
 		boolean isUnderground = mapType.equals(Constants.MapType.underground);
 		if(!isUnderground) {
 			vSlice = null;
 		}
-		
-		int initialWidth = (cx2-cx1+1) * 16;
-		int initialHeight = (cz2-cz1+1) * 16;		
-		
-		final BufferedImage mergedImg = new BufferedImage(initialWidth, initialHeight, BufferedImage.TYPE_INT_ARGB);
-		final Graphics2D g2D = mergedImg.createGraphics();
-		
+				
 		final RegionImageCache cache = RegionImageCache.getInstance();
 
 		RegionCoord rc = null;
-		BufferedImage regionImage = null;
-		
-		final int rx1 = RegionCoord.getRegionPos(cx1);
-		final int rx2 = RegionCoord.getRegionPos(cx2);
-		final int rz1 = RegionCoord.getRegionPos(cz1);
-		final int rz2 = RegionCoord.getRegionPos(cz2);
+	
+		final int rx1 = RegionCoord.getRegionPos(startCoord.chunkXPos);
+		final int rx2 = RegionCoord.getRegionPos(endCoord.chunkXPos);
+		final int rz1 = RegionCoord.getRegionPos(startCoord.chunkZPos);
+		final int rz2 = RegionCoord.getRegionPos(endCoord.chunkZPos);
 		
 		int rminCx, rminCz, rmaxCx, rmaxCz, sx1, sy1, sx2, sy2, dx1, dx2, dy1, dy2;
 		
@@ -289,73 +343,81 @@ public class RegionImageHandler {
 			for(int rz=rz1;rz<=rz2;rz++) {
 				rc = new RegionCoord(worldDir, rx, vSlice, rz, dimension);
 				if(cache.contains(rc)) {
-					regionImage = cache.getGuaranteedImage(rc, mapType);
-				} else {
-					regionImage = RegionImageHandler.readRegionImage(RegionImageHandler.getRegionImageFile(rc, mapType, false), rc, 1, false, true);
-					if(regionImage==null) {
-						continue;
+					if(cache.isDirtySince(rc, mapType, since)) {
+						return true;
 					}
-				}
-				rminCx = Math.max(rc.getMinChunkX(), cx1);
-				rminCz = Math.max(rc.getMinChunkZ(), cz1);
-				rmaxCx = Math.min(rc.getMaxChunkX(), cx2);
-				rmaxCz = Math.min(rc.getMaxChunkZ(), cz2);
-						
-				int xoffset = rc.getMinChunkX()*16;
-				int yoffset = rc.getMinChunkZ()*16;
-				sx1 = (rminCx * 16) - xoffset;
-				sy1 = (rminCz * 16) - yoffset;
-				sx2 = sx1 + ((rmaxCx-rminCx + 1)* 16);
-				sy2 = sy1 + ((rmaxCz-rminCz + 1)* 16);
-				
-				xoffset = cx1*16;
-				yoffset = cz1*16;
-				dx1 = (cx1*16) - xoffset;
-				dy1 = (cz1*16) - yoffset;
-				dx2 = dx1 +((cx2-cx1 + 1) * 16);
-				dy2 = dy1 +((cz2-cz1 + 1) * 16);
-				
-				g2D.drawImage(regionImage, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
-			
+				} else {
+					File file = RegionImageHandler.getRegionImageFile(rc, mapType, false);
+					if(file.canRead() && file.lastModified()>since) {
+						return true;
+					}
+				}							
 			}
 		}
+
+		return false;		
+	}
+	
+	/**
+	 * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2)
+	 * @param worldDir
+	 * @param cx1
+	 * @param cz1
+	 * @param cx2
+	 * @param cz2
+	 * @param mapType
+	 * @param vSlice
+	 * @throws IOException
+	 */
+	public static synchronized BufferedImage getRegionImage(final RegionCoord rCoord, final Constants.MapType mapType, final Boolean useCache, final Integer imageSize)
+			throws IOException {
+		
+		final int originalSize = 512;
+
+		final BufferedImage mergedImg = new BufferedImage(originalSize, originalSize, BufferedImage.TYPE_INT_ARGB);
+		final Graphics2D g2D = initRenderingHints(mergedImg.createGraphics());		
+		final RegionImageCache cache = RegionImageCache.getInstance();
+
+		BufferedImage regionImage = null;
+
+		if(cache.contains(rCoord)) {
+			regionImage = cache.getGuaranteedImage(rCoord, mapType);
+		} else {
+			regionImage = RegionImageHandler.readRegionImage(RegionImageHandler.getRegionImageFile(rCoord, mapType, false), rCoord, 1, false, true);
+		}
+		if(regionImage==null) {
+			regionImage = RegionImageHandler.createBlankImage(originalSize, originalSize);
+		}
+		g2D.drawImage(regionImage, 0, 0, null);	
 
 		// Show chunk grid
 		if(PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)) {
 			
-			if(mapType==MapType.day) {
-				g2D.setColor(new Color(130,130,130));
-				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.3F));
+			g2D.setColor(new Color(255,255,255));
+			if(mapType==MapType.day) {				
+				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.4F));
 			} else {
-				g2D.setColor(new Color(130,130,130));
-				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.10F));
+				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.1F));
 			}
 
-			for(int x = 0; x<imageWidth; x+=16) {
-				for(int z = 0; z<imageHeight; z+=16) {
-					g2D.drawRect(x, z, 16, 16);
-				}
+			for(int x = 0; x<=originalSize; x+=16) {
+				g2D.drawLine(x, 0, x, originalSize);
+			}
+			
+			for(int z = 0; z<=originalSize; z+=16) {
+				g2D.drawLine(0, z, originalSize, z);
 			}
 		}
 		
 		g2D.dispose();
 				
-		if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
-			stop = System.currentTimeMillis();
-			JourneyMap.getLogger().fine("getMergedChunks time: "  + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		
 		// Scale if needed
-		if(initialHeight!=imageHeight || initialWidth!=imageWidth) {
-			final BufferedImage scaledImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
-			final Graphics2D g = scaledImage.createGraphics();
-			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			g.drawImage(mergedImg, 0, 0, imageWidth, imageHeight, null);
+		if(imageSize!=null && (imageSize!=originalSize)) {
+			final BufferedImage scaledImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
+			final Graphics2D g = initRenderingHints(scaledImage.createGraphics());
+			g.drawImage(mergedImg, 0, 0, imageSize, imageSize, null);
 			g.dispose();
 			return scaledImage;
-			//return mergedImg;
 		} else {
 			return mergedImg;
 		}		
@@ -378,6 +440,13 @@ public class RegionImageHandler {
 			}
 		}
 		return tmpFile;
+	}
+	
+	public static Graphics2D initRenderingHints(Graphics2D g) {
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+		g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		return g;
 	}
 	
 }

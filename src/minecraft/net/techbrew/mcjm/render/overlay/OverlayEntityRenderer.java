@@ -2,13 +2,13 @@ package net.techbrew.mcjm.render.overlay;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
-import net.minecraft.src.DynamicTexture;
 import net.minecraft.src.ChunkCoordIntPair;
+import net.minecraft.src.DynamicTexture;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
+import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.MapOverlayState;
 
@@ -45,11 +45,8 @@ public class OverlayEntityRenderer extends BaseOverlayRenderer<MapOverlayState> 
 		int textureSize = getTextureSize();
 		maxImgDim = new Double(textureSize);
 		entityImage = new BufferedImage(textureSize, textureSize, BufferedImage.TYPE_INT_ARGB);
-		g2D = entityImage.createGraphics();			
+		g2D = RegionImageHandler.initRenderingHints(entityImage.createGraphics());			
 		g2D.setFont(new Font("Arial", Font.BOLD, 16)); //$NON-NLS-1$
-		g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-		g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	
 		int maxBlocks = Utils.upperDistanceInBlocks(startCoords, endCoords);
 		blockSize = maxImgDim/maxBlocks; 	

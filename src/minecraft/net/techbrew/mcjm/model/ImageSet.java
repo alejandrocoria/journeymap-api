@@ -90,11 +90,15 @@ public abstract class ImageSet {
 			}
 		}
 		return false;
-	}
+	}	
 	
-	public boolean updatedSince(long time) {
+	public boolean updatedSince(MapType mapType, long time) {
 		for(Wrapper wrapper: imageWrappers.values()) {
-			if(wrapper.getTimestamp()>time) {
+			if(mapType!=null) {
+				if(wrapper.getMapType()==mapType && wrapper.getTimestamp()>time) {
+					return true;
+				}
+			} else if(wrapper.getTimestamp()>time) {
 				return true;
 			}
 		}

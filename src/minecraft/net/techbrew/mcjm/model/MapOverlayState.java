@@ -4,29 +4,37 @@ import java.io.File;
 
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
-import net.techbrew.mcjm.ui.ZoomLevel;
 
 public class MapOverlayState {
 
 	private Constants.MapType mapType;
-	private ZoomLevel currentZoom;
 	private File worldDir;
+	private Integer vSlice;
+	private boolean underground;
+	private int currentZoom;
 	private int canvasWidth;
 	private int canvasHeight;
 	private int blockXOffset;
 	private int blockZOffset;
+	private int dimension;
 	
-	public MapOverlayState(MapType mapType, ZoomLevel currentZoom,
-			File worldDir, int canvasWidth, int canvasHeight, int blockXOffset,
-			int blockZOffset) {
+	public MapOverlayState(File worldDir, MapType mapType, Integer vSlice, 
+			boolean underground,
+			int currentZoom,
+			int canvasWidth, int canvasHeight, int blockXOffset,
+			int blockZOffset, int dimension) {
 		super();
 		this.mapType = mapType;
+		this.vSlice = vSlice;
+		this.underground = underground;
+		if(underground) vSlice = null;
 		this.currentZoom = currentZoom;
 		this.worldDir = worldDir;
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
 		this.blockXOffset = blockXOffset;
 		this.blockZOffset = blockZOffset;
+		this.dimension = dimension;
 	}
 
 	public Constants.MapType getMapType() {
@@ -37,11 +45,11 @@ public class MapOverlayState {
 		this.mapType = mapType;
 	}
 
-	public ZoomLevel getCurrentZoom() {
+	public int getCurrentZoom() {
 		return currentZoom;
 	}
 
-	public void setCurrentZoom(ZoomLevel currentZoom) {
+	public void setCurrentZoom(int currentZoom) {
 		this.currentZoom = currentZoom;
 	}
 
@@ -84,7 +92,30 @@ public class MapOverlayState {
 	public void setBlockZOffset(int blockZOffset) {
 		this.blockZOffset = blockZOffset;
 	}
-	
-	
-	
+
+	public int getDimension() {
+		return dimension;
+	}
+
+	public void setDimension(int dimension) {
+		this.dimension = dimension;
+	}
+
+	public Integer getVSlice() {
+		return vSlice;
+	}
+
+	public void setVSlice(Integer vSlice) {
+		this.vSlice = vSlice;
+	}
+
+	public boolean isUnderground() {
+		return underground;
+	}
+
+	public void setUnderground(boolean underground) {
+		this.underground = underground;
+		if(underground) vSlice=null;
+	}
+
 }

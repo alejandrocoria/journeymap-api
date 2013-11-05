@@ -64,12 +64,6 @@ public class OverlayWaypointRenderer extends BaseEntityOverlayRenderer<List<Wayp
 				x = new Double(getScaledEntityX(wx)).intValue();
 				z = new Double(getScaledEntityZ(wz)).intValue();
 				
-				if(waypoint.getName().equals("Last")) {
-					
-					System.out.println("Scaled EndCoord: " + getScaledEntityX(endCoords.chunkXPos, 0) + ", " + getScaledEntityZ(endCoords.chunkZPos, 0));
-					
-				}
-				
 				int maxX = new Double(getScaledEntityX(endCoords.chunkXPos-1, 0)).intValue() - diameter;
 				int maxZ = new Double(getScaledEntityZ(endCoords.chunkZPos-1, 0)).intValue() - diameter;
 				
@@ -80,8 +74,6 @@ public class OverlayWaypointRenderer extends BaseEntityOverlayRenderer<List<Wayp
 				final Graphics2D g = (Graphics2D) g2D.create();
 				
 				if(inbounds) {
-					
-					System.out.println("Inbound Waypoint: " + x + ", " + z);	
 					
 					// Draw marker
 					if(waypoint.getType()==Waypoint.TYPE_DEATH) { // death spot
@@ -130,13 +122,9 @@ public class OverlayWaypointRenderer extends BaseEntityOverlayRenderer<List<Wayp
 					
 					if(x<0) x = 0;
 					if(z<0) z = 0;
-					
-					
-					
+												
 					if(x>maxX) x = maxX;
 					if(z>maxZ) z = maxZ;
-					
-					System.out.println("Clamped Waypoint: " + x + ", " + z);	
 					
 					// Edge marker (semicircle)
 					g.setComposite(OPAQUE);
@@ -155,8 +143,8 @@ public class OverlayWaypointRenderer extends BaseEntityOverlayRenderer<List<Wayp
 	}
 	
 	public boolean inBounds(Waypoint waypoint) {
-		int chunkX = (int) waypoint.getX()>>4;
-		int chunkZ = (int) waypoint.getZ()>>4;
+		int chunkX = waypoint.getX()>>4;
+		int chunkZ = waypoint.getZ()>>4;
 		return (chunkX>=startCoords.chunkXPos && chunkX<=endCoords.chunkXPos && 
 				chunkZ>=startCoords.chunkZPos && chunkZ<=endCoords.chunkZPos);
 	}

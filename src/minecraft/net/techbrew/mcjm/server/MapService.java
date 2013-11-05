@@ -10,13 +10,13 @@ import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 
+import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.RegionImageHandler;
-import net.techbrew.mcjm.ui.ZoomLevel;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 
@@ -136,8 +136,9 @@ public class MapService extends BaseService {
 		
 		start = System.currentTimeMillis();
 		
-		BufferedImage mergedImg = RegionImageHandler.getMergedChunks(worldDir, x1, z1, x2, z2, mapType, depth, dimension, true, 
-				new ZoomLevel(1, 1, false, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
+		ChunkCoordIntPair startCoord = new ChunkCoordIntPair(x1,z1);
+		ChunkCoordIntPair endCoord = new ChunkCoordIntPair(x2,z2);
+		BufferedImage mergedImg = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, depth, dimension, true, null, null);
 				
 		if(mergedImg.getWidth()!=canvasWidth || mergedImg.getHeight()!=canvasHeight) {
 			BufferedImage resized = new BufferedImage(canvasWidth, canvasHeight, mergedImg.getType());

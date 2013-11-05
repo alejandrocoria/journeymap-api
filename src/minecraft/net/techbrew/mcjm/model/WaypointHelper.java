@@ -209,7 +209,7 @@ public class WaypointHelper {
 		
 		ChunkCoordinates bed = player.getBedLocation();
 		if(bed!=null && !bed.equals(spawn)) {
-			Waypoint wpBed = new Waypoint("Bed", bed.posX, bed.posY, bed.posZ, true, 0, 0, 255, Waypoint.TYPE_NORMAL, "journeymap", "Bed");
+			Waypoint wpBed = new Waypoint("Bed", new Double(Math.floor(bed.posX)).intValue(), new Double(Math.floor(bed.posY)).intValue(), new Double(Math.floor(bed.posZ)).intValue(), true, 0, 0, 255, Waypoint.TYPE_NORMAL, "journeymap", "Bed");
 			list.add(wpBed);
 		}
 		

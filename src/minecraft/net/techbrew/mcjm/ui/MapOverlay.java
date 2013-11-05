@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -58,18 +57,17 @@ import org.lwjgl.opengl.GL11;
  */
 public class MapOverlay extends GuiScreen {
 	
-	static LinkedList<ZoomLevel> zoomLevels = ZoomLevel.getLevels();
-
-	static Integer currentZoomIndex;
-	static ZoomLevel currentZoom;
+	static final int minZoom = 0;
+	static final int maxZoom = 5;
+	static Integer currentZoom;
 	
-	final long refreshInterval = 1000;
+	final long refreshInterval = PropertyManager.getIntegerProp(PropertyManager.Key.UPDATETIMER_CHUNKS);
 	Boolean isScroll = false;
 	Boolean hardcore = false;
 	int msx, msy, mx, my;
 
 	static Boolean pauseGame = false;
-	static int mapScale = 4;
+	static int mapScale = 1;
 	static int chunkScale = mapScale*16;
 	static ChunkCoordIntPair[] mapBounds = new ChunkCoordIntPair[2];
 	static {
@@ -116,6 +114,8 @@ public class MapOverlay extends GuiScreen {
 	MapButton buttonOptions, buttonClose;
 	
 	BufferedImage playerImage = EntityHelper.getPlayerImage();
+	
+	static Tiles tiles;
 
 	public MapOverlay(JourneyMap journeyMap) {
 		super();
@@ -135,9 +135,8 @@ public class MapOverlay extends GuiScreen {
 		showPlayers = pm.getBoolean(PropertyManager.Key.PREF_SHOW_PLAYERS);
 		showWaypoints = pm.getBoolean(PropertyManager.Key.PREF_SHOW_WAYPOINTS);
 		
-		if(currentZoomIndex == null) {
-			currentZoomIndex = ZoomLevel.getLevels().size()/2;
-			setZoom(currentZoomIndex);
+		if(currentZoom == null) {
+			setZoom(0);
 		}		
 		
 		// When switching dimensions, reset follow to true
@@ -151,8 +150,8 @@ public class MapOverlay extends GuiScreen {
 	private void drawButtonBar() {	
 		
 		// zoom buttons enabled/disabled
-		buttonZoomIn.enabled = currentZoomIndex>0;
-		buttonZoomOut.enabled = currentZoomIndex<zoomLevels.size()-1;
+		buttonZoomIn.enabled = currentZoom>minZoom;
+		buttonZoomOut.enabled = currentZoom<maxZoom;
 		
 		// zoom underlay
 		if(options==null) {
@@ -254,6 +253,7 @@ public class MapOverlay extends GuiScreen {
 	@Override
 	public void setWorldAndResolution(Minecraft minecraft, int i, int j) {		
 		super.setWorldAndResolution(minecraft, i, j);
+		
 		hardcore = !minecraft.isSingleplayer() && minecraft.theWorld.getWorldInfo().isHardcoreModeEnabled();
 		initButtons();
 		layoutButtons();
@@ -400,23 +400,25 @@ public class MapOverlay extends GuiScreen {
 	}
 
 	void zoomIn(){
-		if(currentZoomIndex>0){
-			setZoom(currentZoomIndex-1);
+		if(currentZoom<maxZoom){
+			setZoom(currentZoom+1);
 		}
 	}
 	
 	void zoomOut(){
-		if(currentZoomIndex<zoomLevels.size()-1){
-			setZoom(currentZoomIndex+1);
+		if(currentZoom>minZoom){
+			setZoom(currentZoom-1);
 		}
 	}
 
-	private void setZoom(int index) {
+	private void setZoom(int zoom) {
 
-		// Get the zoom
-		final int oldIndex = currentZoomIndex;
-		currentZoomIndex = index;
-		currentZoom = zoomLevels.get(index);
+		if(zoom>maxZoom || zoom<minZoom || (currentZoom!=null && zoom==currentZoom)) {
+			System.out.println("\tNo, staying with  " + currentZoom); // TODO
+			return;
+		}
+		System.out.println("Zoom: " + zoom); // TODO
+		currentZoom = zoom;
 		
 		// Get the chunk
 		int centerChunkX, centerChunkZ;
@@ -429,23 +431,10 @@ public class MapOverlay extends GuiScreen {
 			centerChunkZ = (mapBounds[0].chunkZPos + mapBounds[1].chunkZPos) / 2;
 		}
 
-		// Check to see if scale is viable
-		ChunkCoordIntPair testPair = calculateMaxChunk(getCanvasWidth(), getCanvasHeight(), currentZoom.scale);
-		if(testPair.chunkXPos==mapBounds[1].chunkXPos || testPair.chunkZPos==mapBounds[1].chunkZPos) {
-			if(index>oldIndex){
-				zoomOut();
-				return;
-			}else if(index<oldIndex){
-				zoomIn();
-			} 
-		} else {
-			
-			setScale(currentZoom.scale);
-			centerMapOnChunk(centerChunkX, centerChunkZ);
-			
-			// Reset timer for entity updates
-			forceRefresh();
-		}
+		centerMapOnChunk(centerChunkX, centerChunkZ);
+		
+		// Reset timer for entity updates
+		forceRefresh();
 
 	}
 	
@@ -677,6 +666,12 @@ public class MapOverlay extends GuiScreen {
 			clearCaches();
 			refreshState();
 			
+
+			int chunksWide = (mapBounds[1].chunkXPos - mapBounds[0].chunkXPos);
+			int chunksHigh = (mapBounds[1].chunkZPos - mapBounds[0].chunkZPos);
+			
+			int texSize = (BaseOverlayRenderer.MAX_TEXTURE_SIZE >> 4);
+
 			lastMapRenderer = new OverlayMapRenderer(mapBounds[0], mapBounds[1], getCanvasWidth(), getCanvasHeight(), 0, 0);
 			
 			int mapBlocksWide = (mapBounds[1].chunkXPos - mapBounds[0].chunkXPos) * 16;
@@ -686,6 +681,7 @@ public class MapOverlay extends GuiScreen {
 			
 			int layerWidth = mapBlocksWide * overlayScale;
 			int layerHeight = mapBlocksHigh * overlayScale;
+			
 			int entityChunkSize = 16 * overlayScale; 
 			
 			lastMapRenderer.setLayerDimensions(layerWidth, layerHeight);
@@ -720,16 +716,20 @@ public class MapOverlay extends GuiScreen {
 				List<Map> critters = new ArrayList<Map>(16);
 				
 				if(showAnimals || showPets) {
-					critters.addAll((List<Map>) DataCache.instance().get(AnimalsData.class).get(EntityKey.root));
+					Map map = (Map) DataCache.instance().get(AnimalsData.class).get(EntityKey.root);
+					critters.addAll(map.values());
 				}
 				if(showVillagers) {
-					critters.addAll((List<Map>) DataCache.instance().get(VillagersData.class).get(EntityKey.root));
+					Map map = (Map) DataCache.instance().get(VillagersData.class).get(EntityKey.root);
+					critters.addAll(map.values());
 				}
 				if(showMonsters) {
-					critters.addAll((List<Map>) DataCache.instance().get(MobsData.class).get(EntityKey.root));
+					Map map = (Map) DataCache.instance().get(MobsData.class).get(EntityKey.root);
+					critters.addAll(map.values());
 				}
 				if(!mc.isSingleplayer() && showPlayers) {
-					critters.addAll((List<Map>) DataCache.instance().get(PlayersData.class).get(EntityKey.root));
+					Map map = (Map) DataCache.instance().get(PlayersData.class).get(EntityKey.root);
+					critters.addAll(map.values());
 				}
 				
 				// Sort to keep named entities last
@@ -740,7 +740,8 @@ public class MapOverlay extends GuiScreen {
 			
 			// Draw waypoints
 			if(showWaypoints && WaypointHelper.waypointsEnabled()) {
-				List<Waypoint> waypoints = (List<Waypoint>) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
+				Map map = (Map) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
+				List<Waypoint> waypoints = new ArrayList<Waypoint>(map.values());
 
 				new OverlayWaypointRenderer(lastEntityRenderer, layerWidth, layerHeight, xCutoff, zCutoff).render(waypoints, g2D);
 			}
@@ -777,7 +778,11 @@ public class MapOverlay extends GuiScreen {
 
 		// Draw map image
 		if(lastMapRenderer!=null && state!=null) {
-			lastMapRenderer.render(state, null);
+			//lastMapRenderer.render(state, null);
+		}
+		
+		if(tiles!=null) {
+			tiles.drawImage();
 		}
 		
 		// Draw entity image
@@ -801,7 +806,7 @@ public class MapOverlay extends GuiScreen {
 		// Check location
 		final int ccx = player.chunkCoordX;				
 		final int ccz = player.chunkCoordZ;
-		//final int ccy = player.chunkCoordY;
+		final int ccy = player.chunkCoordY;
 
 		// Check chunk
 //		final Chunk playerChunk = Utils.getChunkIfAvailable(mc.theWorld, ccx, ccz);
@@ -825,7 +830,21 @@ public class MapOverlay extends GuiScreen {
 		}
 		File worldDir = FileHandler.getJMWorldDir(mc);
 					
-		state = new MapOverlayState(effectiveMapType, currentZoom, worldDir, getCanvasWidth(), getCanvasHeight(), blockXOffset, blockZOffset);
+		state = new MapOverlayState(worldDir, effectiveMapType, ccy, underground, currentZoom, getCanvasWidth(), getCanvasHeight(), blockXOffset, blockZOffset, playerLastDimension);
+		
+		if(tiles==null || !tiles.isUsing(state.getWorldDir(), state.getDimension())) {
+			if(tiles!=null) tiles.clear();
+			tiles = new Tiles(state.getWorldDir(), state.getDimension());
+		}
+		tiles.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.getCurrentZoom());
+		
+		try {
+			if(tiles.hasChanged(state.getMapType(), state.getVSlice())) {
+				tiles.getImage(state.getMapType(), state.getVSlice());
+			}
+		} catch(Exception e) {
+			System.err.print(e.getMessage());
+		}
 	}
 
 	void save() {
@@ -865,6 +884,9 @@ public class MapOverlay extends GuiScreen {
 	}
 
 	void close() {
+		if(tiles!=null) {
+			//tiles.clear();
+		}		
 		mc.displayGuiScreen(null);
 		mc.setIngameFocus();
 	}

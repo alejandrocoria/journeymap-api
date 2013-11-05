@@ -1,7 +1,6 @@
 package net.techbrew.mcjm.server;
 
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -25,6 +24,7 @@ import javax.imageio.ImageIO;
 
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 import se.rupy.http.Event;
 
@@ -195,10 +195,7 @@ public class FileService extends BaseService {
 		
 		if(img!=null) {			
 			final BufferedImage scaledImage = new BufferedImage(24, 24, img.getType());
-			final Graphics2D g = scaledImage.createGraphics();
-			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			final Graphics2D g = RegionImageHandler.initRenderingHints(scaledImage.createGraphics());
 			g.drawImage(img, 0, 0, 24, 24, null);
 			g.dispose();
 			serveImage(event, scaledImage);

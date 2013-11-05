@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.thread.JMThreadFactory;
@@ -125,11 +126,12 @@ public class RegionImageCache  {
 	}
 	
 	/**
-	 * Not synchronized for now.  It's okay for this to be a little fuzzy.
+	 * Get a list of regions in the cache that are dirty.
+	 * This won't include regions which changed but have already been removed from the cache.
 	 * @param time
 	 * @return
 	 */
-	public List<RegionCoord> getDirtySince(long time) {
+	public List<RegionCoord> getDirtySince(final MapType mapType, long time) {
 		if(time<=lastFlush) {
 			if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
 				JourneyMap.getLogger().fine("Nothing dirty, last flush was " + (time-lastFlush) + "ms before " + time);
@@ -139,7 +141,7 @@ public class RegionImageCache  {
 			ArrayList<RegionCoord> list = new ArrayList<RegionCoord>(imageSets.size());
 			synchronized(lock) {
 				for(Entry<RegionCoord, RegionImageSet> entry : imageSets.entrySet()) {
-					if(entry.getValue().updatedSince(time)) {
+					if(entry.getValue().updatedSince(mapType, time)) {
 						list.add(entry.getKey());
 					}
 				}
@@ -149,6 +151,20 @@ public class RegionImageCache  {
 			}
 			return list;
 		}
+	}
+	
+	/**
+	 * Check whether a given RegionCoord is dirty since a given time
+	 * @param time
+	 * @return
+	 */
+	public boolean isDirtySince(final RegionCoord rc, final MapType mapType, final long time) {		
+		RegionImageSet ris = getRegionImageSet(rc);
+		if(ris==null) {
+			return false;
+		} else {
+			return ris.updatedSince(mapType, time);
+		}		
 	}
 	
 	public void clear() {

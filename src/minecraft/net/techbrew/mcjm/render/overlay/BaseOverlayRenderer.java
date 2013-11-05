@@ -11,11 +11,12 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import net.minecraft.src.Tessellator;
-import net.minecraft.src.DynamicTexture;
-import net.minecraft.src.ResourceLocation;
-import net.minecraft.src.Entity;
 import net.minecraft.src.ChunkCoordIntPair;
+import net.minecraft.src.DynamicTexture;
+import net.minecraft.src.Entity;
+import net.minecraft.src.Minecraft;
+import net.minecraft.src.ResourceLocation;
+import net.minecraft.src.Tessellator;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -30,7 +31,7 @@ public abstract class BaseOverlayRenderer<K> {
 	public static AlphaComposite SEMICLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F);
 	public static AlphaComposite SLIGHTLYCLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F);
 	
-	public static int MAX_TEXTURE_SIZE = 1024;
+	public static int MAX_TEXTURE_SIZE = Minecraft.getGLMaximumTextureSize() > 0 ? Minecraft.getGLMaximumTextureSize() : 1024;
 	
 	final ChunkCoordIntPair startCoords;
 	final ChunkCoordIntPair endCoords;

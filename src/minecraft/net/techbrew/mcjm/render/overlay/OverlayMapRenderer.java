@@ -2,6 +2,9 @@ package net.techbrew.mcjm.render.overlay;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+
+import javax.imageio.ImageIO;
 
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.DynamicTexture;
@@ -25,7 +28,7 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 	
 	private BufferedImage mapImg;
 	private DynamicTexture mapTexture;
-	private Double maxImgDim;
+	private Double imgScale;
 
 	/**
 	 * Constructor.
@@ -54,23 +57,29 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 	
 				final int dimension = mc.thePlayer.dimension;
 	
-				int size = getTextureSize();			
+				final int imgWidth = (endCoords.chunkXPos - startCoords.chunkXPos+1) * 16;
+				final int imgHeight = (endCoords.chunkZPos - startCoords.chunkZPos+1) * 16;		
+								
+				double maxScreenSize = Math.max(state.getCanvasWidth(), state.getCanvasHeight());
+				double textureSize = Math.max(imgWidth, imgHeight);
+				imgScale = maxScreenSize / textureSize;
+				
+				//width = (new Double(Math.ceil(width *imgScale)).intValue() >> 4) * 16;
+				//height = (new Double(Math.ceil(height *imgScale)).intValue() >> 4) * 16;
+				
 				Integer vSlice = (state.getMapType()==MapType.underground) ? mc.thePlayer.chunkCoordY : null;
 				BufferedImage tmpMapImg = RegionImageHandler.getMergedChunks(state.getWorldDir(), 
-						startCoords.chunkXPos, startCoords.chunkZPos, 
-						endCoords.chunkXPos, endCoords.chunkZPos, 
-						state.getMapType(), vSlice, dimension, true, state.getCurrentZoom(),
-						size, size);
+						startCoords, endCoords, 
+						state.getMapType(), vSlice, dimension, true, 
+						imgWidth, 
+						imgHeight);
+				
+				ImageIO.write(tmpMapImg, "png", new File("G:\\tmp\\map.png"));
 				
 				eraseCachedImg();
 				mapImg = tmpMapImg;
 				mapTexture = new DynamicTexture(mapImg);
 
-				int maxScreenSize = Math.max(state.getCanvasWidth(), state.getCanvasHeight());
-				int textureSize = mapImg.getWidth();
-				int maxBlocks = Utils.upperDistanceInBlocks(startCoords, endCoords);
-				double pct = new Double(textureSize) / maxBlocks;
-				maxImgDim = maxScreenSize * pct;
 			}
 			
 			// Draw to screen
@@ -82,8 +91,8 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 	}
 	
 	public void draw(float opacity, double xOffset, double zOffset) {
-		if(mapTexture!=null && maxImgDim!=null) {
-			drawImage(mapTexture, opacity, xOffset, zOffset, maxImgDim, maxImgDim);
+		if(mapTexture!=null && imgScale!=null) {
+			drawImage(mapTexture, opacity, xOffset, zOffset, mapImg.getWidth(), mapImg.getHeight());
 		}
 	}
 	

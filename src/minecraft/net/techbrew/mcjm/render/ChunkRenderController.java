@@ -2,7 +2,6 @@ package net.techbrew.mcjm.render;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -13,6 +12,7 @@ import java.util.logging.Level;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkStub;
 
@@ -48,10 +48,7 @@ public class ChunkRenderController {
 		
 		// Initialize image for the chunk
 		BufferedImage chunkImage = new BufferedImage(underground ? 16 : 32, 16, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g2D = chunkImage.createGraphics();
-		g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-		g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		Graphics2D g2D = RegionImageHandler.initRenderingHints(chunkImage.createGraphics());
 		
 		int dimension = chunkStub.worldObj.provider.dimensionId;
 		boolean renderOkay = false;

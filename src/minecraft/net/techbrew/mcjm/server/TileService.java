@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.logging.Level;
 
+import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
@@ -11,7 +12,6 @@ import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.RegionImageHandler;
-import net.techbrew.mcjm.ui.ZoomLevel;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 
@@ -70,22 +70,15 @@ public class TileService extends FileService {
 		
 		try {
 			int zoom = getParameter(query, "zoom", 0); //$NON-NLS-1$
-			
-//			// Check for ping first
-//			Long since = getParameter(query, "since", (Long) null);
-//			if(since!=null) {
-//				serveChangedBounds(event, zoom, since);
-//				return;
-//			}
 
 			// Region coords
-			int x = getParameter(query, "x", 0); //$NON-NLS-1$
+			final int x = getParameter(query, "x", 0); //$NON-NLS-1$
 			Integer vSlice = getParameter(query, "depth", (Integer) null); //$NON-NLS-1$
-			int z = getParameter(query, "z", 0); //$NON-NLS-1$			
-			int dimension = getParameter(query, "dim", 0);  //$NON-NLS-1$
+			final int z = getParameter(query, "z", 0); //$NON-NLS-1$			
+			final int dimension = getParameter(query, "dim", 0);  //$NON-NLS-1$
 			
 			// Map type
-			String mapTypeString = getParameter(query, "mapType", Constants.MapType.day.name()); //$NON-NLS-1$
+			final String mapTypeString = getParameter(query, "mapType", Constants.MapType.day.name()); //$NON-NLS-1$
 			Constants.MapType mapType = null;
 			try {
 				mapType = Constants.MapType.valueOf(mapTypeString);
@@ -98,21 +91,24 @@ public class TileService extends FileService {
 			}
 			
 			// Determine chunks for coordinates at zoom level
-			int scale = (int) Math.pow(2, zoom);
-			int distance = 32/scale;
-			int minChunkX = x * distance;
-			int minChunkZ = z * distance;
-			int maxChunkX = minChunkX + distance - 1;
-			int maxChunkZ = minChunkZ + distance - 1;
+			final int scale = (int) Math.pow(2, zoom);
+			final int distance = 32/scale;
+			final int minChunkX = x * distance;
+			final int minChunkZ = z * distance;
+			final int maxChunkX = minChunkX + distance - 1;
+			final int maxChunkZ = minChunkZ + distance - 1;
 			
 			//System.out.println("zoom " + zoom + ", scale=" + scale + ", distance=" + distance + ": " + minChunkX + "," + minChunkZ + " - " + maxChunkX + "," + maxChunkZ);			
 			
-			BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, minChunkX, minChunkZ, maxChunkX, maxChunkZ, mapType, vSlice, dimension, true, ZoomLevel.getDefault(), 512, 512);
+			final ChunkCoordIntPair startCoord = new ChunkCoordIntPair(minChunkX,minChunkZ);
+			final ChunkCoordIntPair endCoord = new ChunkCoordIntPair(maxChunkX,maxChunkZ);
+			
+			final BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, true, 512, 512);
 
 			ResponseHeader.on(event).contentType(ContentType.png).noCache();
 			serveImage(event, img);
 						
-			long stop=System.currentTimeMillis();
+			final long stop=System.currentTimeMillis();
 			if(JourneyMap.getLogger().isLoggable(Level.FINE)) {
 				JourneyMap.getLogger().fine((stop-start) + "ms to serve tile");
 			}

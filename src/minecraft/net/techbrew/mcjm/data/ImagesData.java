@@ -68,7 +68,7 @@ public class ImagesData implements IDataProvider {
 		}
 		
 		List<Object[]> coords = null;
-		List<RegionCoord> regions = RegionImageCache.getInstance().getDirtySince(since);
+		List<RegionCoord> regions = RegionImageCache.getInstance().getDirtySince(null, since);
 		if(regions.isEmpty()) {
 			coords = Collections.EMPTY_LIST;
 		} else {
