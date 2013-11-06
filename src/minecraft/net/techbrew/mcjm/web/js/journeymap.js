@@ -7,7 +7,8 @@
  * May not be modified or distributed without express written consent.
  */
 var JourneyMap = (function() {
-	var mcMap;
+	var map;
+	var mapOverlay;
 
 	var isNightMap = false;
 	var showCaves = true;
@@ -33,8 +34,6 @@ var JourneyMap = (function() {
 
 	var playerOverrideMap = false;
 	var playerUnderground = false;
-	
-	var mapOverlay;
 
 	var timerId = null;
 
@@ -489,17 +488,23 @@ var JourneyMap = (function() {
 	var setupMap = function() {
 		
 		// Google Map
-		mcMap = new MCMap(document.getElementById('map-canvas'));
+		map = initMap($('#map-canvas')[0]);
 		
-		mcMap.map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('jm-logo'));
-		mcMap.map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('jm-toolbar'));
-		mcMap.map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('jm-toggles'));			
-		mcMap.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('jm-options'));
-		mcMap.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('jm-actions'));	
-		mcMap.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(document.getElementById('jm-actions-menu'));
-		mcMap.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(document.getElementById('jm-options-menu'));		
-		mcMap.map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(document.getElementById('worldInfo'));
+		map.controls[google.maps.ControlPosition.TOP_LEFT].push($('#jm-logo')[0]);
+		map.controls[google.maps.ControlPosition.TOP_LEFT].push($('#jm-toolbar')[0]);
+		map.controls[google.maps.ControlPosition.TOP_LEFT].push($('#jm-toggles')[0]);			
+		map.controls[google.maps.ControlPosition.TOP_RIGHT].push($('#jm-options')[0]);
+		map.controls[google.maps.ControlPosition.TOP_RIGHT].push($('#jm-actions')[0]);	
+		map.controls[google.maps.ControlPosition.RIGHT_TOP].push($('#jm-actions-menu')[0]);
+		map.controls[google.maps.ControlPosition.RIGHT_TOP].push($('#jm-options-menu')[0]);		
+		map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push($('#worldInfo')[0]);
 					
+		google.maps.event.addListener(map, 'click', function(event) {
+	    	var projection = map.getProjection(); 
+	    	var coords = projection.fromPointToLatLng(event.pixel);
+	        // console.log(coords); TODO show coords with mouseover
+    	});
+	    		
 		// Close error
 		if(errorDialog) {
 			$('.ui-dialog').remove();
@@ -524,11 +529,11 @@ var JourneyMap = (function() {
 			$("#jm-update-button").button()
 				.attr("title", text)
 				.click(function(e){
-					var url = document.getElementById('webLink').href;
+					var url = $('#webLink')[0].href;
 					window.open(url, '_new', '');
 			});
 			
-			mcMap.map.controls[google.maps.ControlPosition.TOP_CENTER].push(document.getElementById('jm-alerts'));
+			map.controls[google.maps.ControlPosition.TOP_CENTER].push($('#jm-alerts')[0]);
 		}
 
 	}
@@ -610,7 +615,7 @@ var JourneyMap = (function() {
 		
 		// Params for dirty image check
 		var params = "";
-		if(mcMap) {
+		if(map) {
 			if(!lastImageCheck) lastImageCheck = new Date().getTime();
 			params = "?images.since=" + lastImageCheck;
 		}
@@ -669,7 +674,7 @@ var JourneyMap = (function() {
 				return;
 
 			// Draw the map
-			if(mcMap) {
+			if(map) {
 				if(wasUnderground !== playerUnderground) {
 					refreshMap();
 				} else {
@@ -713,19 +718,19 @@ var JourneyMap = (function() {
 	var refreshMap = function() {
 		if (debug) console.log(">>> " + "refreshMap");
 			
-		if(!mcMap || !mcMap.map) return;
+		if(!map) return;
 		
 		lastImageCheck = 1;
-		var zoom = mcMap.map.getZoom();		
+		var zoom = map.getZoom();		
 		var delta = (zoom==MapConfig.maxZoom) ? -0.0000001 : 0.0000001 ;
-		var center = mcMap.map.getCenter();
+		var center = map.getCenter();
 		
 		
 		// This hack forces the tiles to be replaced but doesn't visibly change the map
-		mcMap.map.setZoom(zoom + delta);
-		mcMap.map.panTo(center);
-		mcMap.map.setZoom(zoom);
-		mcMap.map.panTo(center);
+		map.setZoom(zoom + delta);
+		map.panTo(center);
+		map.setZoom(zoom);
+		map.panTo(center);
 				
 		// The old way:
 		//      clearTimer();
@@ -884,9 +889,10 @@ var JourneyMap = (function() {
 			      .css('width','64px')
 			      .css('height','64px')
 			      .rotate(heading*RAD_DEG);
+			
 			markers.playerMarker = new RichMarker({
 				position: pos,
-			    map: mcMap.map,
+			    map: map,
 			    draggable: false,
 			    flat: true,
 			    anchor: RichMarkerPosition.MIDDLE,
@@ -929,22 +935,22 @@ var JourneyMap = (function() {
 			});
 			
 
-			google.maps.event.addListener(mcMap.map, 'dragstart', function() {
+			google.maps.event.addListener(map, 'dragstart', function() {
 				setCenterOnPlayer(false);
 			});
 			
-			google.maps.event.addListener(mcMap.map, 'zoom_changed', function() {
+			google.maps.event.addListener(map, 'zoom_changed', function() {
 				if(centerOnPlayer===true) {
-					mcMap.map.panTo(markers.playerMarker.getPosition());
+					map.panTo(markers.playerMarker.getPosition());
 				}
 				
-				if(mcMap.map.getZoom()<3) {
+				if(map.getZoom()<3) {
 					$('img.entityLocator').css('visibility','hidden');
 				} else {
 					$('img.entityLocator').css('visibility','visible');
 				}
 				
-				if(mcMap.map.getZoom()==0) {
+				if(map.getZoom()==0) {
 					$('img.entityMarker').css('visibility','hidden');
 				} else {
 					$('img.entityMarker').css('visibility','visible');
@@ -965,7 +971,7 @@ var JourneyMap = (function() {
 		
 		// Center if needed
 		if(centerOnPlayer===true) {
-			mcMap.map.panTo(pos);
+			map.panTo(pos);
 		}
 	}
 	
@@ -986,7 +992,7 @@ var JourneyMap = (function() {
 		if (debug)
 			console.log(">>> " + "drawMobs");
 		
-		if(mcMap.map.getZoom()===0) return;
+		if(map.getZoom()===0) return;
 		
 		// Mobs
 		removeObsoleteMarkers(JM.mobs, markers.mobs);		
@@ -1019,7 +1025,7 @@ var JourneyMap = (function() {
 
 		// Check current entity position		
 		var pos = blockPosToLatLng(entity.posX, entity.posZ);
-		if(!mcMap.map.getBounds().contains(pos)) {
+		if(!map.getBounds().contains(pos)) {
 			return; // Don't bother with marker
 		}
 		
@@ -1071,7 +1077,7 @@ var JourneyMap = (function() {
 					
 			marker = new RichMarker({
 				position: pos,
-			    map: mcMap.map,
+			    map: map,
 			    draggable: false,
 			    flat: true,
 			    anchor: RichMarkerPosition.MIDDLE,
@@ -1141,7 +1147,7 @@ var JourneyMap = (function() {
 					
 			marker = new RichMarker({
 				position: pos,
-			    map: mcMap.map,
+			    map: map,
 			    draggable: false,
 			    flat: true,
 			    anchor: RichMarkerPosition.MIDDLE,
@@ -1185,7 +1191,7 @@ var JourneyMap = (function() {
 
 		// Get current waypoint position		
 		var pos = blockPosToLatLng(waypoint.x, waypoint.z);
-		if(!mcMap.map.getBounds().contains(pos)) {
+		if(!map.getBounds().contains(pos)) {
 			//return; // Don't bother with marker
 			// TODO: Put on edge of map as an arrow?
 		}
@@ -1226,7 +1232,7 @@ var JourneyMap = (function() {
 
 			marker = new MarkerWithLabel({
 		       position: pos,
-		       map: mcMap.map,
+		       map: map,
 		       draggable: false,
 		       clickable: false,
 		       icon: icon,
@@ -1249,9 +1255,15 @@ var JourneyMap = (function() {
 		}
 	}
 	
-	function rgbToHex(r, g, b) {
+	var rgbToHex = function(r, g, b) {
 	    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 	}
+	
+	var getURLParameter = function(name) {
+		return decodeURI((RegExp(name + '=' + '(.+?)(&|$)').exec(location.search) || [, null])[1]);
+	}
+	
+	debug = ('true' === getURLParameter('debug'));
 	
 	/** Google Maps Code **/
 	
@@ -1273,28 +1285,9 @@ var JourneyMap = (function() {
 		return new google.maps.LatLng(lat, lng);
 	}
 	
-	var toChunkRange = function (coord, zoom) {
-		var scale = Math.pow(2, zoom);
-		var distance = 32/scale;
-		var minChunkX = coord.x * distance;
-		var minChunkZ = coord.y * distance;
-		var maxChunkX = minChunkX + distance - 1;
-		var maxChunkZ = minChunkZ + distance - 1;
-		return {
-			min: { x:minChunkX, z:minChunkZ },
-			max: { x:maxChunkX, z:maxChunkZ },
-		};
-	}
-	
-	var toRegion = function (coord, zoom) {
-		var scale = Math.pow(2, zoom);
-		var regionX = coord.x / scale;
-		var regionZ = coord.y / scale;
-		return { x:regionX, z:regionZ };
-	}
+	var initMap = function (container) {
 		
-	var MCMap = function (container) {
-		this.map = new google.maps.Map(container, {
+		map = new google.maps.Map(container, {
 	        zoom: MapConfig.defaultZoom,
 	        center: new google.maps.LatLng(0,0),
 	        mapTypeControl: false,
@@ -1307,13 +1300,15 @@ var JourneyMap = (function() {
 		    zoomControlOptions: {
 		        style: google.maps.ZoomControlStyle.AUTO,
 		        position: google.maps.ControlPosition.LEFT_TOP
-		    },
-		    overviewMapControl: true
+		    }
 	    });
+		
 	    mapOverlay = new MCMapType();
-	    this.map.mapTypes.set('jm', mapOverlay);
-	    this.map.setMapTypeId('jm');
-	};
+	    map.mapTypes.set('jm', mapOverlay);
+	    map.setMapTypeId('jm');	  
+	    
+	    return map;
+	}
 
 	var MCMapType = function () {
 		this.loadedTiles = {};
@@ -1449,19 +1444,14 @@ var JourneyMap = (function() {
 		tile = null;
 	};
 	
-	var getURLParameter = function(name) {
-		return decodeURI((RegExp(name + '=' + '(.+?)(&|$)').exec(location.search) || [, null])[1]);
-	}
-	
-	debug = ('true' === getURLParameter('debug'));
-	
 	// Public API for JourneyMap
 	return {
 		start : initMessages
 	};
+			
 })();
 
-/** Adapted from https://port70.net/svn/misc/minecraft/positionweb/active.html */
+/** Custom Map Projection **/
 function MCMapProjection(tileSize) {
 	this.tileSize = tileSize;
     this.inverseTileSize = 1.0 / tileSize;
@@ -1481,7 +1471,6 @@ MCMapProjection.prototype.fromPointToLatLng = function(point) {
     return new google.maps.LatLng(lat, lng);
 };
 
-
 /** Google Analytics **/
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-28839029-1']);
@@ -1499,6 +1488,6 @@ _gaq.push(['_trackPageview']);
 })();
 
 /** OnLoad **/
-google.maps.event.addDomListener(window, 'load', function () {    
-    JourneyMap.start();
+$( document ).ready(function() {
+	JourneyMap.start();
 });
