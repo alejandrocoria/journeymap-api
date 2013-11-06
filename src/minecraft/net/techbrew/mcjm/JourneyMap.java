@@ -243,7 +243,7 @@ public class JourneyMap {
 	    		    	
 	    	lastPlayerChunk = null;
 			FileHandler.lastWorldHash = -1;
-			FileHandler.lastWorldDir = null;
+			FileHandler.lastJMWorldDir = null;
 			
 			TaskThread.reset();
 			RegionImageCache.getInstance().flushToDisk();
@@ -326,7 +326,7 @@ public class JourneyMap {
 			while(!isGamePaused && !announcements.isEmpty()) {
 				player.addChatMessage(announcements.remove(0));
 			}			
-
+		
 			// Perform the next mapping tasks
 			taskController.performTasks(minecraft, newHash, taskExecutor);			
 
