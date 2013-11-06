@@ -91,34 +91,31 @@ public class TaskController {
 		if(!TaskThread.hasQueue()) {
 					
 			ITask task = null;
-			ITaskManager manager = null;
-			
-			while(task==null) {
-				manager = getNextManager(minecraft, worldHash);
-				if(manager==null) {
-					logger.warning("No task managers enabled!");
-					return;
-				}
-				boolean accepted = false;
-				task = manager.getTask(minecraft, worldHash);				
-				if(task!=null) {
-					TaskThread thread = TaskThread.createAndQueue(task);
-					if(thread!=null) {
-						if(taskExecutor!=null && !taskExecutor.isShutdown()) {
-							taskExecutor.schedule(thread, mapTaskDelay, TimeUnit.MILLISECONDS);
-							accepted = true;
-							if(logger.isLoggable(Level.FINE)) {
-								logger.info("Scheduled " + manager.getTaskClass().getSimpleName());
-							}
-						} else {
-							logger.warning("TaskExecutor isn't running");
+			ITaskManager manager = getNextManager(minecraft, worldHash);
+			if(manager==null) {
+				logger.warning("No task managers enabled!");
+				return;
+			}
+			boolean accepted = false;
+			task = manager.getTask(minecraft, worldHash);				
+			if(task!=null) {
+				TaskThread thread = TaskThread.createAndQueue(task);
+				if(thread!=null) {
+					if(taskExecutor!=null && !taskExecutor.isShutdown()) {
+						taskExecutor.schedule(thread, mapTaskDelay, TimeUnit.MILLISECONDS);
+						accepted = true;
+						if(logger.isLoggable(Level.FINE)) {
+							logger.info("Scheduled " + manager.getTaskClass().getSimpleName());
 						}
 					} else {
-						logger.warning("Could not schedule " + manager.getTaskClass().getSimpleName());
+						logger.warning("TaskExecutor isn't running");
 					}
-				} 
-				manager.taskAccepted(accepted);
-			}
+				} else {
+					logger.warning("Could not schedule " + manager.getTaskClass().getSimpleName());
+				}
+			} 
+			manager.taskAccepted(accepted);
+			
 			
 		}
 		

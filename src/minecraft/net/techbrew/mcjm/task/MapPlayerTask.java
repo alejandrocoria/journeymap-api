@@ -120,8 +120,14 @@ public class MapPlayerTask extends BaseMapTask {
 		@Override
 		public BaseMapTask getTask(Minecraft minecraft, long worldHash) {			
 			if(!enabled) return null;
-			BaseMapTask baseMapTask = MapPlayerTask.create(minecraft.thePlayer, worldHash);
-			return baseMapTask;
+			
+			// Ensure player chunk is loaded
+			if(minecraft.thePlayer.addedToChunk) {
+				BaseMapTask baseMapTask = MapPlayerTask.create(minecraft.thePlayer, worldHash);
+				return baseMapTask;
+			} else {
+				return null;
+			}
 		}
 		
 		@Override
