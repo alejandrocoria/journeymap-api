@@ -39,7 +39,7 @@ public class Tile {
 		bottomRight = new ChunkCoordIntPair(topLeft.chunkXPos + distance - 1, topLeft.chunkZPos + distance - 1);
 	}
 	
-	public boolean isObsolete(final MapType mapType, final Integer vSlice) {
+	public boolean markObsolete(final MapType mapType, final Integer vSlice) {
 		if(lastImage!=null) {
 			boolean changed = RegionImageHandler.hasImageChanged(worldDir, topLeft, bottomRight, mapType, vSlice, dimension, lastImageTime);
 			if(changed) lastImage=null;
@@ -78,8 +78,7 @@ public class Tile {
 	}
 	
 	public static int blockPosToTile(int b, int zoom) {
-		int chunk = b >> 4;
-		int tile = chunk >> (5-zoom);
+		int tile = b >> (9-zoom);  // (2 pow 9 = 512)
 		return tile;
 	}
 	

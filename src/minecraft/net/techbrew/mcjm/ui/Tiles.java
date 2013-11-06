@@ -1,5 +1,7 @@
 package net.techbrew.mcjm.ui;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -11,6 +13,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import net.minecraft.src.DynamicTexture;
+import net.minecraft.src.Minecraft;
 import net.minecraft.src.Tessellator;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
@@ -48,7 +51,8 @@ public class Tiles {
 	
 	private int centerBlockX;
 	private int centerBlockZ;
-	private int zoom;
+	private int centerHash;
+	private int zoom;	
 	
 	private final int dimension;
 	private final File worldDir;
@@ -69,9 +73,11 @@ public class Tiles {
 		final int tileX = Tile.blockPosToTile(this.centerBlockX, this.zoom);
 		final int tileZ = Tile.blockPosToTile(this.centerBlockZ, this.zoom);
 		
-		final int newCenterHash = Tile.toHashCode(tileX, tileZ, zoom, dimension);		
-		final Tile currentCenterTile = tileSet.get(Compass.Central);
-		if(currentCenterTile==null || currentCenterTile.hashCode()!=newCenterHash) {
+		final int newCenterHash = Tile.toHashCode(tileX, tileZ, zoom, dimension);	
+		if(newCenterHash==centerHash) {
+			return false;
+		} else {		
+			centerHash = newCenterHash;
 			Tile newCenterTile = findTile(tileX, tileZ, true);
 			Map<Compass, Tile> tempTileSet = new HashMap<Compass, Tile>(13);
 			for(Compass compass : Compass.values()) {
@@ -80,9 +86,6 @@ public class Tiles {
 			tileSet.putAll(tempTileSet);
 			if(debug) logger.info("Centered on " + newCenterTile);
 			return true;
-		} else {
-			//if(debug) logger.info("Center hasn't changed from " + currentCenterTile);
-			return false;
 		}
 	}
 	
@@ -90,7 +93,7 @@ public class Tiles {
 		boolean changed = (allImage==null);
 		if(allImage!=null) {
 			for(Tile tile : tileSet.values()) {
-				if(tile.isObsolete(mapType, vSlice)) {
+				if(tile.markObsolete(mapType, vSlice)) {
 					changed = true;
 				}
 			}
@@ -105,9 +108,9 @@ public class Tiles {
 		
 		int col = 0;
 		int row = 0;
-//		final Font labelFont = new Font("Arial", Font.BOLD, 24);
-//		g.setFont(labelFont); //$NON-NLS-1$
-//		g.setPaint(Color.BLUE);
+		final Font labelFont = new Font("Arial", Font.BOLD, 24);
+		g.setFont(labelFont); //$NON-NLS-1$
+		g.setPaint(Color.WHITE);
 
 		for(Compass compass : Compass.values()) {
 			Tile tile = tileSet.get(compass);
@@ -115,8 +118,8 @@ public class Tiles {
 			int x = col*TILESIZE;
 			int y = row*TILESIZE;			
 			g.drawImage(tileImg, x, y, null);
-//			g.drawRect(x, y, TILESIZE, TILESIZE);
-//			g.drawString(tile.toString(), x, y + 40);
+			g.drawRect(x, y, TILESIZE, TILESIZE);
+			g.drawString(tile.toString(), x, y + 40);
 			col++;
 			if(col>2) {
 				col=0;
@@ -139,26 +142,50 @@ public class Tiles {
 	
 	public void drawImage() {
 		if(mapTexture!=null && allImage!=null) {
-			drawImage(0,0, allImage.getWidth(), allImage.getHeight());
+			draw(1f,0,0);
 		}
 	}
 	
-	public void drawImage(double startX, double startY, double srcWidth, double srcHeight) {
-		Tessellator tessellator = Tessellator.instance;
-		GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
-		GL11.glDepthMask(false);
-		GL11.glBlendFunc(770, 771);
-		GL11.glColor4f(1f, 1f, 1f, 1f);
-		GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
-		GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, mapTexture.getGlTextureId());
+	public void draw(float opacity, double offsetX, double offsetZ) {
+		final int SIZE = TILESIZE*3;
+		
+		Minecraft mc = Minecraft.getMinecraft();
+		int displayOffsetX = -(SIZE - mc.displayWidth)/2;
+		int displayOffsetZ = -(SIZE - mc.displayHeight)/2;
+		
+		int scale = (int) Math.pow(2, 5-zoom);
+		int rx1 = centerBlockX % scale;
+		int rx2 = centerBlockZ % scale;
+		
+		double pixelPerBlock = Math.pow(2, zoom);
 
-		tessellator.startDrawingQuads();
+		double adjustX = (256/pixelPerBlock) - ((centerBlockX % 512)  );
+		double adjustZ = (256/pixelPerBlock) - ((centerBlockZ % 512)  );
+	
+		
+		double startX = displayOffsetX + adjustX ;
+		double startZ = displayOffsetZ + adjustZ ;
+		
+		System.out.println("rx " + rx1 + "," + rx2 + " // tile " + Tile.blockPosToTile(centerBlockX, zoom) +"," + Tile.blockPosToTile(centerBlockZ, zoom) + " center " + centerBlockX + "," + centerBlockZ + " at ppb " + pixelPerBlock + " zoom " + zoom);
+		
+		if(mapTexture!=null && allImage!=null) {			
+			Tessellator tessellator = Tessellator.instance;					
+			
+			GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
+			GL11.glDepthMask(false);
+			GL11.glBlendFunc(770, 771);
+			GL11.glColor4f(opacity, opacity, opacity, opacity);
+			GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
+			GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, mapTexture.getGlTextureId());
 
-		tessellator.addVertexWithUV(startX, srcHeight + startY, 0.0D, 0, 1);
-		tessellator.addVertexWithUV(startX + srcWidth, srcHeight + startY, 0.0D, 1, 1);
-		tessellator.addVertexWithUV(startX + srcWidth, startY, 0.0D, 1, 0);
-		tessellator.addVertexWithUV(startX, startY, 0.0D, 0, 0);
-		tessellator.draw();
+			tessellator.startDrawingQuads();
+
+			tessellator.addVertexWithUV(startX, SIZE + startZ, 0.0D, 0, 1);
+			tessellator.addVertexWithUV(startX + SIZE, SIZE + startZ, 0.0D, 1, 1);
+			tessellator.addVertexWithUV(startX + SIZE, startZ, 0.0D, 1, 0);
+			tessellator.addVertexWithUV(startX, startZ, 0.0D, 0, 0);
+			tessellator.draw();
+		}		
 	}
 
 	private Tile findNeighbor(Tile tile, Compass compass) {				
@@ -201,7 +228,6 @@ public class Tiles {
 
 	public void setZoom(int zoom) {
 		if(zoom!=this.zoom) {
-			this.zoom = zoom;
 			center(centerBlockX, centerBlockZ, zoom);
 		}
 	}
