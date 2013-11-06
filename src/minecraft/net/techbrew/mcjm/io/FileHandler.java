@@ -21,18 +21,21 @@ public class FileHandler {
 
 	public static final String WEB_DIR = "/net/techbrew/mcjm/web";
 	public static volatile long lastWorldHash;
-	public static volatile File lastWorldDir;
+	public static volatile File lastJMWorldDir;
 	
-	public static File getMCWorldDir(Minecraft minecraft) {
-		File dir = null;
+	public static volatile String lastMCFolderName = "";
+	public static volatile File lastMCWorldDir = null;
+	
+	public static File getMCWorldDir(Minecraft minecraft) {		
 		if(minecraft.isIntegratedServerRunning()) {
-			dir = new File(minecraft.mcDataDir, "saves" + File.separator + minecraft.getIntegratedServer().getFolderName());
+			if(lastMCWorldDir==null || !lastMCFolderName.equals(minecraft.getIntegratedServer().getFolderName())) {
+				lastMCFolderName = minecraft.getIntegratedServer().getFolderName();
+				lastMCWorldDir = new File(minecraft.mcDataDir, "saves" + File.separator + lastMCFolderName);
+				System.out.println("New world, new dir: " + lastMCWorldDir);
+			} 
+			return lastMCWorldDir;			
 		}
-		if(dir!=null && dir.exists()) {
-			return dir;
-		} else {
-			return null;
-		}
+		return null;
 	}
 	
 	public static File getMCWorldDir(Minecraft minecraft, int dimension) {
@@ -62,7 +65,7 @@ public class FileHandler {
 		
 		File mcDir = Minecraft.getMinecraft().mcDataDir;
 		
-		if(lastWorldHash!=hash || lastWorldDir==null) {
+		if(lastWorldHash!=hash || lastJMWorldDir==null) {
 			File worldDir = null;
 			
 			try {				
@@ -79,9 +82,9 @@ public class FileHandler {
 			}			
 
 			lastWorldHash = hash;
-			lastWorldDir = worldDir;			
+			lastJMWorldDir = worldDir;			
 		}
-		return lastWorldDir;
+		return lastJMWorldDir;
 	}
 	
 	
