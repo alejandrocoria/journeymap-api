@@ -41,7 +41,6 @@ import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.MapBlocks;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayEntityRenderer;
-import net.techbrew.mcjm.render.overlay.OverlayMapRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
 
@@ -103,7 +102,6 @@ public class MapOverlay extends GuiScreen {
 	private final Integer blockXOffset = 0;
 	private final Integer blockZOffset = 0;
 	
-	OverlayMapRenderer lastMapRenderer;
 	OverlayEntityRenderer lastEntityRenderer;
 
 	MapOverlayState state = null;
@@ -141,6 +139,7 @@ public class MapOverlay extends GuiScreen {
 		
 		// When switching dimensions, reset follow to true
 		if(playerLastDimension!=mc.thePlayer.dimension) {
+			tiles = null;
 			playerLastDimension = mc.thePlayer.dimension;
 			follow = true;
 			centerMapOnPlayer();
@@ -414,10 +413,8 @@ public class MapOverlay extends GuiScreen {
 	private void setZoom(int zoom) {
 
 		if(zoom>maxZoom || zoom<minZoom || (currentZoom!=null && zoom==currentZoom)) {
-			System.out.println("\tNo, staying with  " + currentZoom); // TODO
 			return;
 		}
-		System.out.println("Zoom: " + zoom); // TODO
 		currentZoom = zoom;
 		
 		// Get the chunk
@@ -665,26 +662,18 @@ public class MapOverlay extends GuiScreen {
 			
 			clearCaches();
 			refreshState();
-			
 
-			int chunksWide = (mapBounds[1].chunkXPos - mapBounds[0].chunkXPos);
-			int chunksHigh = (mapBounds[1].chunkZPos - mapBounds[0].chunkZPos);
-			
 			int texSize = (BaseOverlayRenderer.MAX_TEXTURE_SIZE >> 4);
 
-			lastMapRenderer = new OverlayMapRenderer(mapBounds[0], mapBounds[1], getCanvasWidth(), getCanvasHeight(), 0, 0);
-			
 			int mapBlocksWide = (mapBounds[1].chunkXPos - mapBounds[0].chunkXPos) * 16;
 			int mapBlocksHigh = (mapBounds[1].chunkZPos - mapBounds[0].chunkZPos) * 16;
 			
-			int overlayScale = BaseOverlayRenderer.MAX_TEXTURE_SIZE / lastMapRenderer.getTextureSize();
+			int overlayScale = 1;
 			
 			int layerWidth = mapBlocksWide * overlayScale;
 			int layerHeight = mapBlocksHigh * overlayScale;
 			
 			int entityChunkSize = 16 * overlayScale; 
-			
-			lastMapRenderer.setLayerDimensions(layerWidth, layerHeight);
 			
 			lastEntityRenderer = new OverlayEntityRenderer(mapBounds[0], mapBounds[1], getCanvasWidth(), getCanvasHeight(), layerWidth, layerHeight);
 
@@ -775,11 +764,8 @@ public class MapOverlay extends GuiScreen {
 			// Reset timer
 			lastRefresh = System.currentTimeMillis();
 		}
-
-		// Draw map image
-		if(lastMapRenderer!=null && state!=null) {
-			//lastMapRenderer.render(state, null);
-		}
+		
+		scaleResolution(false);
 		
 		if(tiles!=null) {
 			tiles.drawImage();
@@ -789,7 +775,23 @@ public class MapOverlay extends GuiScreen {
 		if(lastEntityRenderer!=null && state!=null) {
 			lastEntityRenderer.render(state, null);		
 		}
+		
+		scaleResolution(true);
 				
+	}
+	
+	void scaleResolution(boolean doScale) {		
+		
+		final int glWidth = doScale ? this.width : mc.displayWidth;
+		final int glHeight = doScale ? this.height : mc.displayHeight;
+		
+		GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glLoadIdentity();
+        GL11.glOrtho(0.0D, glWidth, glHeight, 0.0D, 1000.0D, 3000.0D);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glLoadIdentity();
+        GL11.glTranslatef(0.0F, 0.0F, -2000.0F);		
 	}
 	
 	/**
@@ -836,14 +838,13 @@ public class MapOverlay extends GuiScreen {
 			if(tiles!=null) tiles.clear();
 			tiles = new Tiles(state.getWorldDir(), state.getDimension());
 		}
-		tiles.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.getCurrentZoom());
 		
 		try {
-			if(tiles.hasChanged(state.getMapType(), state.getVSlice())) {
-				tiles.getImage(state.getMapType(), state.getVSlice());
-			}
+			// TODO:  only center on player if supposed to
+			tiles.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.getCurrentZoom());
+			tiles.updateTexture(state.getMapType(), state.getVSlice());
 		} catch(Exception e) {
-			System.err.print(e.getMessage());
+			JourneyMap.getLogger().severe(LogFormatter.toString(e));
 		}
 	}
 
@@ -901,9 +902,6 @@ public class MapOverlay extends GuiScreen {
 	public void onGuiClosed()
     {
         Keyboard.enableRepeatEvents(false);
-        if(lastMapRenderer!=null) {
-        	lastMapRenderer.eraseCachedImg();
-		}
         if(lastEntityRenderer!=null) {
 			lastEntityRenderer.eraseCachedImg();
 		}
@@ -947,7 +945,7 @@ public class MapOverlay extends GuiScreen {
 		if(isScroll) {
 			return false;
 		} else {
-			return lastMapRenderer==null || lastEntityRenderer==null || state==null || (System.currentTimeMillis() > (lastRefresh+refreshInterval));
+			return lastEntityRenderer==null || state==null || (System.currentTimeMillis() > (lastRefresh+refreshInterval));
 		}
 	}
 	
@@ -960,9 +958,6 @@ public class MapOverlay extends GuiScreen {
 		if(isScroll) {
 			return;
 		}
-		if(lastMapRenderer!=null) {
-        	lastMapRenderer.eraseCachedImg();
-		}
         if(lastEntityRenderer!=null) {
 			lastEntityRenderer.eraseCachedImg();
 		}
@@ -971,7 +966,7 @@ public class MapOverlay extends GuiScreen {
 	void scrollingCanvas(){
 		if(isScroll) {
 			
-			if(lastMapRenderer==null) {
+			if(tiles==null) {
 				return;
 			}
 			
@@ -986,15 +981,17 @@ public class MapOverlay extends GuiScreen {
 			int h = calculateMaxChunksHigh(getCanvasHeight(), mapScale);
 			int max = Math.max(w,h) * chunkScale;
 			
-			int tex = lastMapRenderer.getTextureSize();
+			int tex = Tiles.TILESIZE*3;
 			//int actual = actualMaxImgDim;
 			double pct = screen/max;
 
 			double xOffset = pct * (offsets[0] * chunkScale);
 			double zOffset = pct * (offsets[1] * chunkScale);
 			
-			if(lastMapRenderer!=null) {
-				lastMapRenderer.draw(.9f, xOffset, zOffset);
+			scaleResolution(false);
+			
+			if(tiles!=null) {
+				tiles.draw(.9f, xOffset, zOffset);
 			}
 			
 			if(lastEntityRenderer!=null) {
@@ -1005,6 +1002,8 @@ public class MapOverlay extends GuiScreen {
 				zOffset = zOffset * scale;
 				lastEntityRenderer.draw(.6f, xOffset, zOffset);
 			}
+			
+			scaleResolution(true);
 			
 		} 
 		//drawPlayerInfo();

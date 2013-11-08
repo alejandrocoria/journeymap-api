@@ -38,7 +38,7 @@ public class OverlayMapRenderer extends BaseOverlayRenderer<MapOverlayState> {
 	 * @param canvasHeight
 	 */
 	public OverlayMapRenderer(final ChunkCoordIntPair startCoords, final ChunkCoordIntPair endCoords, final int canvasWidth, final int canvasHeight, int layerWidth, int layerHeight) {
-		super(startCoords, endCoords, canvasWidth, canvasHeight, layerHeight, layerHeight);
+		super(startCoords, endCoords, canvasWidth, canvasHeight, layerWidth, layerHeight);
 	}
 
 	/**

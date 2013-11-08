@@ -1,23 +1,17 @@
 package net.techbrew.mcjm.ui;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
-
-import net.minecraft.src.DynamicTexture;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.Tessellator;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.RegionImageHandler;
 
 import org.lwjgl.opengl.GL11;
 
@@ -31,173 +25,198 @@ import org.lwjgl.opengl.GL11;
 public class Tiles {
 	
 	final static int TILESIZE = 512;
-	
-	public enum Compass {
-		NorthWest(-1,-1),  North(0,-1),  NorthEast(1,-1), 
-		West(-1,0),  Central(0,0),  East(1,0), 
-		SouthWest(-1,1),  South(0,1),  SouthEast(1,1);		
-		public final int deltaX;
-		public final int deltaZ;
-		private Compass(int dX, int dZ) {
-			deltaX = dX;
-			deltaZ = dZ;
-		}		
-	}	
 			
 	private final Logger logger = JourneyMap.getLogger();
 	private final boolean debug = logger.isLoggable(Level.INFO);
 	
-	private final Map<Compass, Tile> tileSet = new HashMap<Compass, Tile>(13);
+	private final TreeMap<TilePos, Tile> grid = new TreeMap<TilePos, Tile>();
+	
+	private int lastMcDisplayHeight=-1;
+	private int lastMcDisplayWidth=-1;
+	
+	private int displayRows=0;
+	private int displayCols=0;
 	
 	private int centerBlockX;
 	private int centerBlockZ;
-	private int centerHash;
+	private int centerTileHash;
 	private int zoom;	
 	
-	private final int dimension;
-	private final File worldDir;
+	private double centerPixelOffsetX;
+	private double centerPixelOffsetZ;
 	
-	DynamicTexture mapTexture;
-	private BufferedImage allImage;
+	private final int dimension;
+	private final File worldDir;		
 
 	public Tiles(final File worldDir, final int dimension) {
 		this.worldDir = worldDir;
 		this.dimension = dimension;
 	}
 	
+	private int[] getLayout() {		
+		Minecraft mc = Minecraft.getMinecraft();
+		if(mc.displayHeight==lastMcDisplayHeight && mc.displayWidth==lastMcDisplayWidth) {
+			if(displayCols>=3 && displayRows>=3) {
+				//if(debug) logger.info("Screensize hasn't changed. Cols,Rows = " + displayCols + "," + displayRows);
+				return new int[]{displayCols, displayRows};
+			}
+		}
+		lastMcDisplayHeight = mc.displayHeight;
+		lastMcDisplayWidth = mc.displayWidth;
+		
+		final int height = mc.displayHeight + 512;
+		int rows = (int) Math.ceil(height/512);
+		if(rows%2==0) rows++;
+		if(rows<3) rows = 3;
+		
+		final int width = mc.displayWidth + 512;
+		int cols = (int) Math.ceil(width/512);
+		if(cols%2==0) cols++;
+		if(cols<3) cols = 3;
+		
+		if(rows==displayRows && cols==displayCols) {	
+			if(debug) logger.info("Layout hasn't changed after resize. Cols,Rows = " + displayCols + "," + displayRows);
+			return new int[]{displayCols, displayRows};
+		}
+		
+		if(debug) logger.info("Layout needs to change. Cols,Rows = " + cols + "," + rows);
+		return new int[]{cols, rows};
+	}
+	
+	private void populateGrid(Tile centerTile, Set<Tile> existingTiles) {
+				
+		final int endRow = (displayRows-1)/2;
+		final int endCol = (displayCols-1)/2;
+		final int startRow = -endRow;
+		final int startCol = -endCol;				
+
+		HashSet<Tile> oldGrid = new HashSet<Tile>(grid.values());
+		grid.clear();
+		
+		for(int z = startRow;z<=endRow;z++) {
+			for(int x = startCol;x<=endCol;x++) {			
+				TilePos pos = new TilePos(x,z);
+				Tile tile = findNeighbor(centerTile, pos, existingTiles);
+				grid.put(pos, tile);
+				oldGrid.remove(tile);
+				//if(debug) logger.info("Grid pos added: " + pos);				
+			}
+		}
+		
+		for(Tile oldTile : oldGrid) {
+			oldTile.clear();
+			//if(debug) logger.info("Old tile cleared: " + oldTile);
+		}
+		
+		//if(debug) logger.info("Layout done for cols " + startCol + " to " + endCol + " and rows " + startRow + " to " + endRow);
+	}
+	
 	public boolean center(final int blockX, final int blockZ, final int zoom) {
+		
 		this.centerBlockX = blockX;
 		this.centerBlockZ = blockZ;
 		this.zoom = zoom;
 		
 		final int tileX = Tile.blockPosToTile(this.centerBlockX, this.zoom);
 		final int tileZ = Tile.blockPosToTile(this.centerBlockZ, this.zoom);
-		
-		final int newCenterHash = Tile.toHashCode(tileX, tileZ, zoom, dimension);	
-		if(newCenterHash==centerHash) {
-			return false;
-		} else {		
-			centerHash = newCenterHash;
-			Tile newCenterTile = findTile(tileX, tileZ, true);
-			Map<Compass, Tile> tempTileSet = new HashMap<Compass, Tile>(13);
-			for(Compass compass : Compass.values()) {
-				tempTileSet.put(compass, findNeighbor(newCenterTile, compass));
-			}		
-			tileSet.putAll(tempTileSet);
-			if(debug) logger.info("Centered on " + newCenterTile);
-			return true;
-		}
-	}
-	
-	public boolean hasChanged(MapType mapType, Integer vSlice) {
-		boolean changed = (allImage==null);
-		if(allImage!=null) {
-			for(Tile tile : tileSet.values()) {
-				if(tile.markObsolete(mapType, vSlice)) {
-					changed = true;
-				}
-			}
-		}
-		return changed;
-	}
-	
-	public BufferedImage getImage(MapType mapType, Integer vSlice) {
-		
-		allImage = new BufferedImage(TILESIZE*3,TILESIZE*3, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g = RegionImageHandler.initRenderingHints(allImage.createGraphics());
-		
-		int col = 0;
-		int row = 0;
-		final Font labelFont = new Font("Arial", Font.BOLD, 24);
-		g.setFont(labelFont); //$NON-NLS-1$
-		g.setPaint(Color.WHITE);
-
-		for(Compass compass : Compass.values()) {
-			Tile tile = tileSet.get(compass);
-			BufferedImage tileImg = tile.getImage(mapType, vSlice, false);
-			int x = col*TILESIZE;
-			int y = row*TILESIZE;			
-			g.drawImage(tileImg, x, y, null);
-			g.drawRect(x, y, TILESIZE, TILESIZE);
-			g.drawString(tile.toString(), x, y + 40);
-			col++;
-			if(col>2) {
-				col=0;
-				row++;
-			}
-		}
-		g.dispose();
-		
-		try {
-			clearTexture();
-			mapTexture = new DynamicTexture(allImage);			
-			ImageIO.write(allImage, "png", new File("G:\\tmp\\allImage.png"));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return allImage;		
-	}
-	
-	public void drawImage() {
-		if(mapTexture!=null && allImage!=null) {
-			draw(1f,0,0);
-		}
-	}
-	
-	public void draw(float opacity, double offsetX, double offsetZ) {
-		final int SIZE = TILESIZE*3;
-		
-		Minecraft mc = Minecraft.getMinecraft();
-		int displayOffsetX = -(SIZE - mc.displayWidth)/2;
-		int displayOffsetZ = -(SIZE - mc.displayHeight)/2;
-		
-		int scale = (int) Math.pow(2, 5-zoom);
-		int rx1 = centerBlockX % scale;
-		int rx2 = centerBlockZ % scale;
-		
-		double pixelPerBlock = Math.pow(2, zoom);
-
-		double adjustX = (256/pixelPerBlock) - ((centerBlockX % 512)  );
-		double adjustZ = (256/pixelPerBlock) - ((centerBlockZ % 512)  );
-	
-		
-		double startX = displayOffsetX + adjustX ;
-		double startZ = displayOffsetZ + adjustZ ;
-		
-		System.out.println("rx " + rx1 + "," + rx2 + " // tile " + Tile.blockPosToTile(centerBlockX, zoom) +"," + Tile.blockPosToTile(centerBlockZ, zoom) + " center " + centerBlockX + "," + centerBlockZ + " at ppb " + pixelPerBlock + " zoom " + zoom);
-		
-		if(mapTexture!=null && allImage!=null) {			
-			Tessellator tessellator = Tessellator.instance;					
 			
+		final int[] colsRows = getLayout();
+		final boolean layoutChanged = colsRows[0]!=displayCols || colsRows[1]!=displayRows;
+		displayCols = colsRows[0];
+		displayRows = colsRows[1];
+		
+		final int newCenterHash = Tile.toHashCode(tileX, tileZ, zoom, dimension);
+		final boolean centerChanged = newCenterHash!=centerTileHash;
+		centerTileHash = newCenterHash;
+		
+		final double srcWidth = displayCols*TILESIZE;
+		final double srcHeight = displayRows*TILESIZE;
+		final double mysteryX = displayCols==5 ? 2 : displayCols==3 ? 1 : 0; // TODO figure out a formula
+		final double mysteryZ = displayRows==5 ? 2 : displayRows==3 ? 1 : 0; // TODO figure out a formula
+		final double displayOffsetX = (mysteryX*TILESIZE)-((srcWidth - lastMcDisplayWidth)/2);
+		final double displayOffsetZ = (mysteryZ*TILESIZE)-((srcHeight - lastMcDisplayHeight)/2);
+		centerPixelOffsetX = displayOffsetX + Tile.blockPosToPixelOffset(centerBlockX, zoom);
+		centerPixelOffsetZ = displayOffsetZ + Tile.blockPosToPixelOffset(centerBlockZ, zoom);		
+		
+		if(!layoutChanged && !centerChanged && !grid.isEmpty()) {
+			//if(debug) logger.info("No change based on center");
+			return false;
+		}
+		
+		// Pull current tiles for reuse
+		final Set<Tile> currentTiles = new HashSet<Tile>(grid.values());		
+		
+		// Center on tile
+		Tile newCenterTile = findTile(tileX, tileZ, currentTiles, true);
+		populateGrid(newCenterTile, currentTiles);
+		
+		if(debug) logger.info("Centered on " + centerPixelOffsetX + "," + centerPixelOffsetZ + " using " + newCenterTile + " with " + displayCols + " cols and " + displayRows + " rows");
+		return true;
+	}
+	
+	public boolean updateTexture(MapType mapType, Integer vSlice) {		
+		boolean updated = false;
+		for(Map.Entry<TilePos,Tile> entry : grid.entrySet()) {
+			if(entry.getValue().updateTexture(entry.getKey(), mapType, vSlice)) {
+				updated=true;
+			}
+		}
+		return updated;
+	}
+					
+	public void drawImage() {
+		draw(1f,0,0);
+	}
+	
+	public void draw(final float opacity, final double offsetX, final double offsetZ) {		
+		if(!grid.isEmpty()) {	
+								
+			double centerX = offsetX + centerPixelOffsetX;
+			double centerZ = offsetZ + centerPixelOffsetZ;		
+					
 			GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
 			GL11.glDepthMask(false);
 			GL11.glBlendFunc(770, 771);
 			GL11.glColor4f(opacity, opacity, opacity, opacity);
 			GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
-			GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, mapTexture.getGlTextureId());
+			
+			for(Map.Entry<TilePos,Tile> entry : grid.entrySet()) {
+				//if(entry.getKey().deltaX!=0 || entry.getKey().deltaZ!=0) continue;
+				drawTile(entry.getKey(), entry.getValue(), centerX, centerZ);
+			}
+		}		
+	}
+	
+	private void drawTile(final TilePos pos, final Tile tile, final double offsetX, final double offsetZ) {
+		
+		if(tile.hasTexture()) {
+		
+			final double startX = offsetX + (pos.deltaX*512);
+			final double startZ = offsetZ + (pos.deltaZ*512);
+								
+			GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, tile.getTexture().getGlTextureId());
 
-			tessellator.startDrawingQuads();
-
-			tessellator.addVertexWithUV(startX, SIZE + startZ, 0.0D, 0, 1);
-			tessellator.addVertexWithUV(startX + SIZE, SIZE + startZ, 0.0D, 1, 1);
-			tessellator.addVertexWithUV(startX + SIZE, startZ, 0.0D, 1, 0);
+			Tessellator tessellator = Tessellator.instance;
+			tessellator.startDrawingQuads();			
+			tessellator.addVertexWithUV(startX, TILESIZE + startZ, 0.0D, 0, 1);
+			tessellator.addVertexWithUV(startX + TILESIZE, TILESIZE + startZ, 0.0D, 1, 1);
+			tessellator.addVertexWithUV(startX + TILESIZE, startZ, 0.0D, 1, 0);
 			tessellator.addVertexWithUV(startX, startZ, 0.0D, 0, 0);
 			tessellator.draw();
 		}		
 	}
+	
 
-	private Tile findNeighbor(Tile tile, Compass compass) {				
-		if(compass==Compass.Central) return tile;
-		return findTile(tile.tileX + compass.deltaX, tile.tileZ + compass.deltaZ, true);
+	private Tile findNeighbor(Tile tile, TilePos pos, Set<Tile> tiles) {				
+		if(pos.deltaX==0 && pos.deltaZ==0) return tile;
+		return findTile(tile.tileX + pos.deltaX, tile.tileZ + pos.deltaZ, tiles, true);
 	}
 	
-	private Tile findTile(final int tileX, final int tileZ, final boolean createIfMissing) {	
+	private Tile findTile(final int tileX, final int tileZ, Set<Tile> tiles, final boolean createIfMissing) {	
 		final int hash = Tile.toHashCode(tileX, tileZ, zoom, dimension);
-		for(Tile tile : tileSet.values()) {
-			if(tile.hashCode()==hash) {
-				if(debug) logger.info("Got existing " + tile);
+		for(Tile tile : tiles) {
+			if(tile!=null && tile.hashCode()==hash) {
+				//if(debug) logger.info("Got existing " + tile);
 				return tile;
 			}
 		}
@@ -233,19 +252,59 @@ public class Tiles {
 	}
 
 	public void clear() {
-		this.allImage = null;
-		clearTexture();
-		tileSet.clear();
+		for(Tile tile : grid.values()) {
+			tile.clear();
+		}
+		grid.clear();
 	}
 	
-	public void clearTexture() {
-		if(mapTexture!=null) {
-			try {
-				GL11.glDeleteTextures(mapTexture.getGlTextureId());		
-			} catch(Throwable t) {
-				logger.warning("Map image texture not deleted: " + t.getMessage());
-			}
-			mapTexture = null;
+	final class TilePos implements Comparable<TilePos> {		
+		public final int deltaX;
+		public final int deltaZ;
+		
+		TilePos(int deltaX, int deltaZ) {
+			this.deltaX = deltaX;
+			this.deltaZ = deltaZ;
 		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 37;
+			int result = 1;
+			result = prime * result + deltaX;
+			result = prime * result + deltaZ;
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			TilePos other = (TilePos) obj;
+			if (deltaX != other.deltaX)
+				return false;
+			if (deltaZ != other.deltaZ)
+				return false;
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return "TilePos [" + deltaX + "," + deltaZ + "]";
+		}
+
+		@Override
+		public int compareTo(TilePos o) {
+			int result = new Integer(deltaZ).compareTo(o.deltaZ);
+			if(result==0) {
+				result = new Integer(deltaX).compareTo(o.deltaX);
+			}
+			return result;
+		}		
+				
 	}
 }

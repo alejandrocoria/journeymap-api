@@ -1,5 +1,9 @@
 package net.techbrew.mcjm.ui;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Date;
@@ -10,6 +14,8 @@ import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.RegionImageHandler;
+import net.techbrew.mcjm.render.overlay.MapTexture;
+import net.techbrew.mcjm.ui.Tiles.TilePos;
 
 public class Tile {
 		
@@ -23,10 +29,10 @@ public class Tile {
 	
 	long lastImageTime = 0;
 	MapType lastMapType;
-	BufferedImage lastImage = null;
+	MapTexture mapTexture;
 	
 	private final Logger logger = JourneyMap.getLogger();
-	private final boolean debug = logger.isLoggable(Level.INFO);
+	private final boolean debug = logger.isLoggable(Level.FINE);
 
 	public Tile(final File worldDir, final int tileX, final int tileZ, final int zoom, final int dimension) {
 		this.worldDir = worldDir;
@@ -39,24 +45,44 @@ public class Tile {
 		bottomRight = new ChunkCoordIntPair(topLeft.chunkXPos + distance - 1, topLeft.chunkZPos + distance - 1);
 	}
 	
-	public boolean markObsolete(final MapType mapType, final Integer vSlice) {
-		if(lastImage!=null) {
-			boolean changed = RegionImageHandler.hasImageChanged(worldDir, topLeft, bottomRight, mapType, vSlice, dimension, lastImageTime);
-			if(changed) lastImage=null;
-			return changed;
-		} else {
-			return true;
+	public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice) {
+		boolean changed = (mapTexture==null) || RegionImageHandler.hasImageChanged(worldDir, topLeft, bottomRight, mapType, vSlice, dimension, lastImageTime);
+		if(changed) {
+			clear();
+			
+			BufferedImage image = RegionImageHandler.getMergedChunks(worldDir, topLeft, bottomRight, mapType, vSlice, dimension, true, Tiles.TILESIZE, Tiles.TILESIZE);
+			lastMapType = mapType;
+			lastImageTime = new Date().getTime();
+
+			if(debug) {		
+				Graphics2D g = RegionImageHandler.initRenderingHints(image.createGraphics());				
+				g.setPaint(Color.WHITE);
+				g.setStroke(new BasicStroke(3));
+				g.drawRect(0, 0, image.getWidth(), image.getHeight());
+				final Font labelFont = new Font("Arial", Font.BOLD, 16);
+				g.setFont(labelFont); //$NON-NLS-1$
+				g.drawString("DEBUG " + pos.toString(), 32, 32);
+				g.dispose();
+			}
+			
+			mapTexture = new MapTexture(image);
+			if(debug) logger.fine("Updated texture for " + this);
 		}
+		return changed;
 	}
 	
-	public BufferedImage getImage(final MapType mapType, final Integer vSlice, boolean refresh) {	
-		if(lastImage==null || refresh) {		
-			lastImage = RegionImageHandler.getMergedChunks(worldDir, topLeft, bottomRight, mapType, vSlice, dimension, true, Tiles.TILESIZE, Tiles.TILESIZE);
-			lastMapType = mapType;
-			lastImageTime = new Date().getTime();	
-			if(debug) logger.info("Updated image for " + this);
+	public boolean hasTexture() {
+		return mapTexture!=null;
+	}
+	
+	public MapTexture getTexture() {	
+		return mapTexture;
+	}
+	
+	public void clear() {
+		if(mapTexture!=null) {
+			mapTexture.clear();
 		}
-		return lastImage;
 	}
 
 	@Override
@@ -69,21 +95,25 @@ public class Tile {
 		return toHashCode(tileX, tileZ, zoom, dimension);
 	}
 	
-	public static int tilePosToChunk(int t, int zoom) {
-		return tilePosToBlock(t, zoom) >> 4;  // TODO: Probably wrong
-	}
-	
-	public static int tilePosToBlock(int t, int zoom) {
-		return t * pixelsPerBlock(zoom); // TODO: Probably wrong
-	}
-	
 	public static int blockPosToTile(int b, int zoom) {
 		int tile = b >> (9-zoom);  // (2 pow 9 = 512)
 		return tile;
 	}
 	
-	public static int pixelsPerBlock(final int zoom) {
-		return 32 / (int) Math.pow(2, zoom);
+	public static int blockPosToTileOffset(int b, int zoom) {
+		double scale = Math.pow(2,9-zoom);
+		double pos = new Double(b) / scale;
+		double dec = pos - ((int) pos);
+		int offset = (int) (dec * scale);
+		if(b<0) offset = ((int)scale)+offset-1; // magic!
+		return offset;
+	}
+	
+	public static double blockPosToPixelOffset(int blockPos, int zoom) {
+		final double pixelPerBlock = Math.pow(2, zoom);
+		
+		// (center of tile) - (blocks offset within tile * pixel size) + (center of block)
+		return (Tiles.TILESIZE/2) -(Tile.blockPosToTileOffset(blockPos, zoom) * pixelPerBlock) + (32-pixelPerBlock)/2;
 	}
 	
 	public static int toHashCode(final int tileX, final int tileZ, final int zoom, final int dimension) {
