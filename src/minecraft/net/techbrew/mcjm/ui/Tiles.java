@@ -1,6 +1,12 @@
 package net.techbrew.mcjm.ui;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +18,7 @@ import net.minecraft.src.Minecraft;
 import net.minecraft.src.Tessellator;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.render.overlay.MapTexture;
 
 import org.lwjgl.opengl.GL11;
 
@@ -30,20 +37,21 @@ public class Tiles {
 	private final boolean debug = logger.isLoggable(Level.INFO);
 	
 	private final TreeMap<TilePos, Tile> grid = new TreeMap<TilePos, Tile>();
+	private final int gridSize = 5; // 2560px.  Must be an odd number so as to have a center tile.
 	
 	private int lastMcDisplayHeight=-1;
 	private int lastMcDisplayWidth=-1;
-	
-	private int displayRows=0;
-	private int displayCols=0;
 	
 	private int centerBlockX;
 	private int centerBlockZ;
 	private int centerTileHash;
 	private int zoom;	
+	private final Point ulBlock = new Point();
+	private final Point lrBlock = new Point();
 	
-	private double centerPixelOffsetX;
-	private double centerPixelOffsetZ;
+	private final Point centerPixelOffset = new Point();
+	
+	private MapTexture crosshairs;
 	
 	private final int dimension;
 	private final File worldDir;		
@@ -53,62 +61,37 @@ public class Tiles {
 		this.dimension = dimension;
 	}
 	
-	private int[] getLayout() {		
-		Minecraft mc = Minecraft.getMinecraft();
-		if(mc.displayHeight==lastMcDisplayHeight && mc.displayWidth==lastMcDisplayWidth) {
-			if(displayCols>=3 && displayRows>=3) {
-				//if(debug) logger.info("Screensize hasn't changed. Cols,Rows = " + displayCols + "," + displayRows);
-				return new int[]{displayCols, displayRows};
-			}
-		}
-		lastMcDisplayHeight = mc.displayHeight;
-		lastMcDisplayWidth = mc.displayWidth;
-		
-		final int height = mc.displayHeight + 512;
-		int rows = (int) Math.ceil(height/512);
-		if(rows%2==0) rows++;
-		if(rows<3) rows = 3;
-		
-		final int width = mc.displayWidth + 512;
-		int cols = (int) Math.ceil(width/512);
-		if(cols%2==0) cols++;
-		if(cols<3) cols = 3;
-		
-		if(rows==displayRows && cols==displayCols) {	
-			if(debug) logger.info("Layout hasn't changed after resize. Cols,Rows = " + displayCols + "," + displayRows);
-			return new int[]{displayCols, displayRows};
-		}
-		
-		if(debug) logger.info("Layout needs to change. Cols,Rows = " + cols + "," + rows);
-		return new int[]{cols, rows};
-	}
-	
 	private void populateGrid(Tile centerTile, Set<Tile> existingTiles) {
 				
-		final int endRow = (displayRows-1)/2;
-		final int endCol = (displayCols-1)/2;
+		final int endRow = (gridSize-1)/2;
+		final int endCol = (gridSize-1)/2;
 		final int startRow = -endRow;
-		final int startCol = -endCol;				
-
-		HashSet<Tile> oldGrid = new HashSet<Tile>(grid.values());
-		grid.clear();
+		final int startCol = -endCol;
+		
+		ulBlock.setLocation(Tile.tileToBlock(startCol, zoom), Tile.tileToBlock(startRow, zoom));
+		lrBlock.setLocation(Tile.tileToBlock(endCol, zoom), Tile.tileToBlock(endRow, zoom));
+		
+		Set<Tile> removedTiles = new HashSet<Tile>(grid.size());
 		
 		for(int z = startRow;z<=endRow;z++) {
 			for(int x = startCol;x<=endCol;x++) {			
 				TilePos pos = new TilePos(x,z);
 				Tile tile = findNeighbor(centerTile, pos, existingTiles);
-				grid.put(pos, tile);
-				oldGrid.remove(tile);
+				Tile oldTile = grid.put(pos, tile);
+				if(oldTile!=null) removedTiles.add(oldTile);
 				//if(debug) logger.info("Grid pos added: " + pos);				
 			}
 		}
 		
-		for(Tile oldTile : oldGrid) {
-			oldTile.clear();
-			//if(debug) logger.info("Old tile cleared: " + oldTile);
+		for(Tile oldTile : removedTiles) {
+			if(!grid.containsValue(oldTile)) {
+				oldTile.clear();
+				//if(debug) logger.info("Obsolete tile cleared: " + oldTile);
+			}
 		}
-		
-		//if(debug) logger.info("Layout done for cols " + startCol + " to " + endCol + " and rows " + startRow + " to " + endRow);
+		removedTiles.clear();
+
+		//if(debug) logger.info("Grid cen done for cols " + startCol + " to " + endCol + " and rows " + startRow + " to " + endRow);
 	}
 	
 	public boolean center(final int blockX, final int blockZ, final int zoom) {
@@ -117,51 +100,96 @@ public class Tiles {
 		this.centerBlockZ = blockZ;
 		this.zoom = zoom;
 		
+		// Get zoomed tile coords
 		final int tileX = Tile.blockPosToTile(this.centerBlockX, this.zoom);
-		final int tileZ = Tile.blockPosToTile(this.centerBlockZ, this.zoom);
-			
-		final int[] colsRows = getLayout();
-		final boolean layoutChanged = colsRows[0]!=displayCols || colsRows[1]!=displayRows;
-		displayCols = colsRows[0];
-		displayRows = colsRows[1];
+		final int tileZ = Tile.blockPosToTile(this.centerBlockZ, this.zoom);			
 		
+		// Chech hash of tile coords
 		final int newCenterHash = Tile.toHashCode(tileX, tileZ, zoom, dimension);
-		final boolean centerChanged = newCenterHash!=centerTileHash;
+		final boolean centerTileChanged = newCenterHash!=centerTileHash;
 		centerTileHash = newCenterHash;
-		
-		final double srcWidth = displayCols*TILESIZE;
-		final double srcHeight = displayRows*TILESIZE;
-		final double mysteryX = displayCols==5 ? 2 : displayCols==3 ? 1 : 0; // TODO figure out a formula
-		final double mysteryZ = displayRows==5 ? 2 : displayRows==3 ? 1 : 0; // TODO figure out a formula
-		final double displayOffsetX = (mysteryX*TILESIZE)-((srcWidth - lastMcDisplayWidth)/2);
-		final double displayOffsetZ = (mysteryZ*TILESIZE)-((srcHeight - lastMcDisplayHeight)/2);
-		centerPixelOffsetX = displayOffsetX + Tile.blockPosToPixelOffset(centerBlockX, zoom);
-		centerPixelOffsetZ = displayOffsetZ + Tile.blockPosToPixelOffset(centerBlockZ, zoom);		
-		
-		if(!layoutChanged && !centerChanged && !grid.isEmpty()) {
-			//if(debug) logger.info("No change based on center");
+
+		if(centerTileChanged || grid.isEmpty()) {	
+			// Pull current tiles for reuse
+			final Set<Tile> currentTiles = new HashSet<Tile>(grid.values());		
+			
+			// Center on tile
+			Tile newCenterTile = findTile(tileX, tileZ, currentTiles, true);
+			populateGrid(newCenterTile, currentTiles);
+			
+			if(debug) logger.info("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
+			
+			if(debug) {
+				Minecraft mc = Minecraft.getMinecraft();
+				BufferedImage tmp = new BufferedImage(mc.displayWidth, mc.displayHeight, BufferedImage.TYPE_INT_ARGB);
+				Graphics2D g = tmp.createGraphics();
+				g.setStroke(new BasicStroke(1));
+				g.setColor(Color.GREEN);
+				g.drawLine(mc.displayWidth/2, 0, mc.displayWidth/2, mc.displayHeight);
+				g.drawLine(0, mc.displayHeight/2, mc.displayWidth, mc.displayHeight/2);
+				if(crosshairs!=null) crosshairs.clear();
+				crosshairs = new MapTexture(tmp);
+			}
+			
+			return true;
+		} else {
 			return false;
 		}
-		
-		// Pull current tiles for reuse
-		final Set<Tile> currentTiles = new HashSet<Tile>(grid.values());		
-		
-		// Center on tile
-		Tile newCenterTile = findTile(tileX, tileZ, currentTiles, true);
-		populateGrid(newCenterTile, currentTiles);
-		
-		if(debug) logger.info("Centered on " + centerPixelOffsetX + "," + centerPixelOffsetZ + " using " + newCenterTile + " with " + displayCols + " cols and " + displayRows + " rows");
-		return true;
 	}
 	
-	public boolean updateTexture(MapType mapType, Integer vSlice) {		
+	public boolean updateTextures(MapType mapType, Integer vSlice) {
+		
+		// Update screen dimensions
+		Minecraft mc = Minecraft.getMinecraft();
+		lastMcDisplayWidth = mc.displayWidth;
+		lastMcDisplayHeight = mc.displayHeight;
+		
+		// Update pixel offsets for center
+		final double srcSize = gridSize*TILESIZE;
+		final int magic = (2*TILESIZE); // TODO:  Understand why "2" as it relates to gridSize.  If gridSize is 3, this has to be "1".
+		final double displayOffsetX = magic-((srcSize - lastMcDisplayWidth)/2);
+		final double displayOffsetY = magic-((srcSize - lastMcDisplayHeight)/2);
+		
+		// Get center tile
+		Tile centerTile = grid.get(new TilePos(0,0));		
+		Point blockPixelOffset = centerTile.blockPixelOffsetInTile(centerBlockX, centerBlockZ);
+		centerPixelOffset.setLocation(displayOffsetX + blockPixelOffset.x, displayOffsetY + blockPixelOffset.y);
+				
+		// Update textures only if on-screen
 		boolean updated = false;
+		TilePos pos;
+		Tile tile;
 		for(Map.Entry<TilePos,Tile> entry : grid.entrySet()) {
-			if(entry.getValue().updateTexture(entry.getKey(), mapType, vSlice)) {
-				updated=true;
+			pos = entry.getKey();
+			tile = entry.getValue();
+			if(isOnScreen(pos)) {
+				if(tile.updateTexture(pos, mapType, vSlice)) {
+					updated=true;
+				}
+			} else {
+				//if(debug) logger.info("Skipped updating offscreen tile: " + pos);
 			}
 		}
 		return updated;
+	}
+	
+	public Point getBlockPixelOffsetInGrid(int x, int z) {
+
+		if(x<ulBlock.x || x>lrBlock.x || z<ulBlock.y || z>lrBlock.y) {
+			return null;
+		}
+		
+		int localBlockX = ulBlock.x - x;
+		if(x<0) localBlockX++;
+		
+		int localBlockZ = ulBlock.y - z;
+		if(z<0) localBlockZ++;
+		
+		int blockSize = (int) Math.pow(2,zoom);
+		int pixelOffsetX = (localBlockX*blockSize) - (blockSize/2);
+		int pixelOffsetZ = (localBlockZ*blockSize) - (blockSize/2);
+		
+		return new Point(pixelOffsetX, pixelOffsetZ);
 	}
 					
 	public void drawImage() {
@@ -171,8 +199,8 @@ public class Tiles {
 	public void draw(final float opacity, final double offsetX, final double offsetZ) {		
 		if(!grid.isEmpty()) {	
 								
-			double centerX = offsetX + centerPixelOffsetX;
-			double centerZ = offsetZ + centerPixelOffsetZ;		
+			double centerX = offsetX + centerPixelOffset.x;
+			double centerZ = offsetZ + centerPixelOffset.y;		
 					
 			GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
 			GL11.glDepthMask(false);
@@ -184,35 +212,61 @@ public class Tiles {
 				//if(entry.getKey().deltaX!=0 || entry.getKey().deltaZ!=0) continue;
 				drawTile(entry.getKey(), entry.getValue(), centerX, centerZ);
 			}
+			
+			if(debug && crosshairs!=null) {
+				Minecraft mc = Minecraft.getMinecraft();
+				GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, crosshairs.getGlTextureId());	
+				Tessellator tessellator = Tessellator.instance;
+				tessellator.startDrawingQuads();			
+				tessellator.addVertexWithUV(0, mc.displayHeight, 0.0D, 0, 1);
+				tessellator.addVertexWithUV(mc.displayWidth, mc.displayHeight, 0.0D, 1, 1);
+				tessellator.addVertexWithUV(mc.displayWidth, 0, 0.0D, 1, 0);
+				tessellator.addVertexWithUV(0, 0, 0.0D, 0, 0);
+				tessellator.draw();
+			}
 		}		
 	}
 	
 	private void drawTile(final TilePos pos, final Tile tile, final double offsetX, final double offsetZ) {
-		
+				
 		if(tile.hasTexture()) {
 		
-			final double startX = offsetX + (pos.deltaX*512);
-			final double startZ = offsetZ + (pos.deltaZ*512);
-								
-			GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, tile.getTexture().getGlTextureId());
-
-			Tessellator tessellator = Tessellator.instance;
-			tessellator.startDrawingQuads();			
-			tessellator.addVertexWithUV(startX, TILESIZE + startZ, 0.0D, 0, 1);
-			tessellator.addVertexWithUV(startX + TILESIZE, TILESIZE + startZ, 0.0D, 1, 1);
-			tessellator.addVertexWithUV(startX + TILESIZE, startZ, 0.0D, 1, 0);
-			tessellator.addVertexWithUV(startX, startZ, 0.0D, 0, 0);
-			tessellator.draw();
+			final double startX = offsetX + pos.startX;
+			final double startZ = offsetZ + pos.startZ;		
+			final double endX = offsetX + pos.endX;
+			final double endZ = offsetZ + pos.endZ;	
+			
+			if(isOnScreen(startX, startZ, endX, endZ)) {								
+				GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, tile.getTexture().getGlTextureId());	
+				Tessellator tessellator = Tessellator.instance;
+				tessellator.startDrawingQuads();			
+				tessellator.addVertexWithUV(startX, endZ, 0.0D, 0, 1);
+				tessellator.addVertexWithUV(endX, endZ, 0.0D, 1, 1);
+				tessellator.addVertexWithUV(endX, startZ, 0.0D, 1, 0);
+				tessellator.addVertexWithUV(startX, startZ, 0.0D, 0, 0);
+				tessellator.draw();
+			} else {
+				//if(debug) logger.info("Skipped offscreen tile: " + pos);
+			}
+		} else {
+			//if(debug) logger.info("Skipped tile with no texture: " + pos);
 		}		
 	}
 	
+	private boolean isOnScreen(TilePos pos) {
+		return isOnScreen(pos.startX + centerPixelOffset.x, pos.startZ + centerPixelOffset.y, pos.endX + centerPixelOffset.x, pos.endZ + centerPixelOffset.y);
+	}
+	
+	private boolean isOnScreen(double startX, double startZ, double endX, double endZ) {
+		return endX>0 && startX<lastMcDisplayWidth && endZ>0 && startZ<lastMcDisplayHeight;
+	}	
 
 	private Tile findNeighbor(Tile tile, TilePos pos, Set<Tile> tiles) {				
 		if(pos.deltaX==0 && pos.deltaZ==0) return tile;
 		return findTile(tile.tileX + pos.deltaX, tile.tileZ + pos.deltaZ, tiles, true);
 	}
 	
-	private Tile findTile(final int tileX, final int tileZ, Set<Tile> tiles, final boolean createIfMissing) {	
+	private Tile findTile(final int tileX, final int tileZ, Collection<Tile> tiles, final boolean createIfMissing) {	
 		final int hash = Tile.toHashCode(tileX, tileZ, zoom, dimension);
 		for(Tile tile : tiles) {
 			if(tile!=null && tile.hashCode()==hash) {
@@ -258,13 +312,24 @@ public class Tiles {
 		grid.clear();
 	}
 	
-	final class TilePos implements Comparable<TilePos> {		
+	final class TilePos implements Comparable<TilePos> {	
+		
 		public final int deltaX;
 		public final int deltaZ;
 		
+		final double startX;
+		final double startZ;		
+		final double endX;
+		final double endZ;	
+				
 		TilePos(int deltaX, int deltaZ) {
 			this.deltaX = deltaX;
 			this.deltaZ = deltaZ;
+			
+			this.startX = deltaX*TILESIZE;
+			this.startZ = deltaZ*TILESIZE;		
+			this.endX = startX + TILESIZE;
+			this.endZ = startZ + TILESIZE;	
 		}
 
 		@Override

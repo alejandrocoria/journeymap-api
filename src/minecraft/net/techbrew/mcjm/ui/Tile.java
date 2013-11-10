@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Date;
@@ -24,15 +25,19 @@ public class Tile {
 	final int tileX; 
 	final int tileZ;
 	final File worldDir;
-	final ChunkCoordIntPair topLeft;
-	final ChunkCoordIntPair bottomRight;
+	final ChunkCoordIntPair ulChunk;
+	final ChunkCoordIntPair lrChunk;
+	final Point ulBlock;
+	final Point lrBlock;
 	
 	long lastImageTime = 0;
+	
+	Integer lastVSlice;
 	MapType lastMapType;
 	MapTexture mapTexture;
 	
 	private final Logger logger = JourneyMap.getLogger();
-	private final boolean debug = logger.isLoggable(Level.FINE);
+	private final boolean debug = logger.isLoggable(Level.INFO);
 
 	public Tile(final File worldDir, final int tileX, final int tileZ, final int zoom, final int dimension) {
 		this.worldDir = worldDir;
@@ -41,17 +46,20 @@ public class Tile {
 		this.zoom = zoom;
 		this.dimension = dimension;
 		final int distance = 32 / (int) Math.pow(2, zoom);
-		topLeft = new ChunkCoordIntPair(tileX * distance, tileZ * distance);
-		bottomRight = new ChunkCoordIntPair(topLeft.chunkXPos + distance - 1, topLeft.chunkZPos + distance - 1);
+		ulChunk = new ChunkCoordIntPair(tileX * distance, tileZ * distance);
+		lrChunk = new ChunkCoordIntPair(ulChunk.chunkXPos + distance - 1, ulChunk.chunkZPos + distance - 1);
+		ulBlock = new Point(ulChunk.chunkXPos*16, ulChunk.chunkZPos*16);
+		lrBlock = new Point((lrChunk.chunkXPos*16)+15, (lrChunk.chunkZPos*16)+15);
 	}
 	
 	public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice) {
-		boolean changed = (mapTexture==null) || RegionImageHandler.hasImageChanged(worldDir, topLeft, bottomRight, mapType, vSlice, dimension, lastImageTime);
+		boolean changed = (mapTexture==null || mapType!=lastMapType || vSlice!=lastVSlice);
+		if(!changed) changed = RegionImageHandler.hasImageChanged(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, lastImageTime);
+		
 		if(changed) {
-			clear();
-			
-			BufferedImage image = RegionImageHandler.getMergedChunks(worldDir, topLeft, bottomRight, mapType, vSlice, dimension, true, Tiles.TILESIZE, Tiles.TILESIZE);
+			BufferedImage image = RegionImageHandler.getMergedChunks(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, Tiles.TILESIZE, Tiles.TILESIZE);
 			lastMapType = mapType;
+			lastVSlice = vSlice;
 			lastImageTime = new Date().getTime();
 
 			if(debug) {		
@@ -61,12 +69,16 @@ public class Tile {
 				g.drawRect(0, 0, image.getWidth(), image.getHeight());
 				final Font labelFont = new Font("Arial", Font.BOLD, 16);
 				g.setFont(labelFont); //$NON-NLS-1$
-				g.drawString("DEBUG " + pos.toString(), 32, 32);
+				g.drawString(pos.toString() + " " + toString(), 16, 16);
+				g.drawString(blockBounds(), 16, 32);
 				g.dispose();
 			}
-			
-			mapTexture = new MapTexture(image);
-			if(debug) logger.fine("Updated texture for " + this);
+			if(mapTexture==null) {
+				mapTexture = new MapTexture(image);
+			} else {
+				mapTexture.updateTexture(image);
+			}
+			//if(debug) logger.info("Updated texture for " + this + " at " + mapType + ", vSlice " + vSlice);
 		}
 		return changed;
 	}
@@ -100,20 +112,47 @@ public class Tile {
 		return tile;
 	}
 	
+	private String blockBounds() {
+		return ulBlock.x + "," + ulBlock.y + " - " + lrBlock.x + "," + lrBlock.y;
+	}
+	
+	private int tileToBlock(int t) {
+		return t << (9-zoom);
+	}
+	
+	public static int tileToBlock(int t, int zoom) {
+		return t << (9-zoom);
+	}
+	
+	
 	public static int blockPosToTileOffset(int b, int zoom) {
 		double scale = Math.pow(2,9-zoom);
 		double pos = new Double(b) / scale;
 		double dec = pos - ((int) pos);
 		int offset = (int) (dec * scale);
-		if(b<0) offset = ((int)scale)+offset-1; // magic!
 		return offset;
 	}
 	
-	public static double blockPosToPixelOffset(int blockPos, int zoom) {
-		final double pixelPerBlock = Math.pow(2, zoom);
+	public Point blockPixelOffsetInTile(int x, int z) {
 		
-		// (center of tile) - (blocks offset within tile * pixel size) + (center of block)
-		return (Tiles.TILESIZE/2) -(Tile.blockPosToTileOffset(blockPos, zoom) * pixelPerBlock) + (32-pixelPerBlock)/2;
+		if(x<ulBlock.x || x>lrBlock.x || z<ulBlock.y || z>lrBlock.y) {
+			throw new RuntimeException("Block " + x + "," + z + " isn't in " + this);
+		}
+		
+		int localBlockX = ulBlock.x - x;
+		if(x<0) localBlockX++;
+		
+		int localBlockZ = ulBlock.y - z;
+		if(z<0) localBlockZ++;
+		
+		int tileCenterBlockX = lrBlock.x-ulBlock.x;
+		int tileCenterBlockZ = lrBlock.y-ulBlock.y;
+		
+		int blockSize = (int) Math.pow(2,zoom);
+		int pixelOffsetX = (Tiles.TILESIZE/2) + (localBlockX*blockSize) - (blockSize/2);
+		int pixelOffsetZ = (Tiles.TILESIZE/2) + (localBlockZ*blockSize) - (blockSize/2);
+		
+		return new Point(pixelOffsetX, pixelOffsetZ);
 	}
 	
 	public static int toHashCode(final int tileX, final int tileZ, final int zoom, final int dimension) {

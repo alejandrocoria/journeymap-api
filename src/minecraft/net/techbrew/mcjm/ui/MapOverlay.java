@@ -251,18 +251,22 @@ public class MapOverlay extends GuiScreen {
 
 	@Override
 	public void setWorldAndResolution(Minecraft minecraft, int i, int j) {		
-		super.setWorldAndResolution(minecraft, i, j);
+		super.setWorldAndResolution(minecraft, i, j);		
 		
 		hardcore = !minecraft.isSingleplayer() && minecraft.theWorld.getWorldInfo().isHardcoreModeEnabled();
 		initButtons();
-		layoutButtons();
-		//setZoom(currentZoomIndex);
+		layoutButtons();			
+		
 		if(follow) centerMapOnPlayer();
 		
 		if(options!=null) {
 			options.setWorldAndResolution(minecraft, i, j);
 			return;
 		}
+		
+		System.out.println("Screen width changed");
+		lastRefresh=0;
+		
 	}
 
 	/**
@@ -839,10 +843,17 @@ public class MapOverlay extends GuiScreen {
 			tiles = new Tiles(state.getWorldDir(), state.getDimension());
 		}
 		
+		updateTiles();		
+	}
+	
+	void updateTiles() {
+		
+		if(state==null || tiles==null) return;
+
 		try {
 			// TODO:  only center on player if supposed to
 			tiles.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.getCurrentZoom());
-			tiles.updateTexture(state.getMapType(), state.getVSlice());
+			tiles.updateTextures(state.getMapType(), state.getVSlice());
 		} catch(Exception e) {
 			JourneyMap.getLogger().severe(LogFormatter.toString(e));
 		}
@@ -951,7 +962,8 @@ public class MapOverlay extends GuiScreen {
 	
 	void forceRefresh() {
 		state = null;
-		clearCaches();		
+		clearCaches();
+		refreshState();
 	}
 	
 	void clearCaches() {
@@ -991,7 +1003,7 @@ public class MapOverlay extends GuiScreen {
 			scaleResolution(false);
 			
 			if(tiles!=null) {
-				tiles.draw(.9f, xOffset, zOffset);
+				tiles.draw(1f, xOffset, zOffset);
 			}
 			
 			if(lastEntityRenderer!=null) {
