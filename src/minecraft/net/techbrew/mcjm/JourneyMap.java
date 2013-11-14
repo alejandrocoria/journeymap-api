@@ -372,8 +372,15 @@ public class JourneyMap {
 		Minecraft minecraft = Minecraft.getMinecraft();
 		if(keybinding.keyCode==keybinding.keyCode) {
 			if(minecraft.currentScreen==null) {
-				minecraft.displayGuiScreen(new MapOverlay(this));
-				keybinding.unPressAllKeys();
+				try {
+					minecraft.displayGuiScreen(new MapOverlay(this));
+					keybinding.unPressAllKeys();
+				} catch(Throwable e) {
+					logger.log(Level.SEVERE, "Unexpected exception in MapOverlay constructor: " + e); //$NON-NLS-1$
+					JourneyMap.getLogger().severe(LogFormatter.toString(e));
+					String error = Constants.getMessageJMERR23(e.getMessage());
+					JourneyMap.getInstance().announce(error);
+				}
 			} else if(Minecraft.getMinecraft().currentScreen instanceof MapOverlay) {
 				minecraft.displayGuiScreen(null);
 				minecraft.setIngameFocus();

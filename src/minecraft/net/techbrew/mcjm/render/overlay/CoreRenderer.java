@@ -1,10 +1,6 @@
-package net.techbrew.mcjm.ui;
+package net.techbrew.mcjm.render.overlay;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
@@ -18,7 +14,7 @@ import net.minecraft.src.Minecraft;
 import net.minecraft.src.Tessellator;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.render.overlay.MapTexture;
+import net.techbrew.mcjm.model.BlockCoordIntPair;
 
 import org.lwjgl.opengl.GL11;
 
@@ -29,9 +25,7 @@ import org.lwjgl.opengl.GL11;
  * @author mwoodman
  *
  */
-public class Tiles {
-	
-	final static int TILESIZE = 512;
+public class CoreRenderer {
 			
 	private final Logger logger = JourneyMap.getLogger();
 	private final boolean debug = logger.isLoggable(Level.INFO);
@@ -42,21 +36,20 @@ public class Tiles {
 	private int lastMcDisplayHeight=-1;
 	private int lastMcDisplayWidth=-1;
 	
-	private int centerBlockX;
-	private int centerBlockZ;
 	private int centerTileHash;
 	private int zoom;	
-	private final Point ulBlock = new Point();
-	private final Point lrBlock = new Point();
+	private final BlockCoordIntPair ulBlock = new BlockCoordIntPair();
+	private final BlockCoordIntPair centerBlock = new BlockCoordIntPair();
+	private final BlockCoordIntPair lrBlock = new BlockCoordIntPair();
 	
 	private final Point centerPixelOffset = new Point();
 	
-	private MapTexture crosshairs;
+	//private MapTexture crosshairs;
 	
 	private final int dimension;
 	private final File worldDir;		
 
-	public Tiles(final File worldDir, final int dimension) {
+	public CoreRenderer(final File worldDir, final int dimension) {
 		this.worldDir = worldDir;
 		this.dimension = dimension;
 	}
@@ -94,15 +87,22 @@ public class Tiles {
 		//if(debug) logger.info("Grid cen done for cols " + startCol + " to " + endCol + " and rows " + startRow + " to " + endRow);
 	}
 	
+	public void move(final int deltaBlockX, final int deltaBlockZ) {
+		center(centerBlock.x + deltaBlockX, centerBlock.z + deltaBlockZ, zoom);
+	}
+	
+	public boolean center() {
+		return center(0,0,zoom);
+	}
+	
 	public boolean center(final int blockX, final int blockZ, final int zoom) {
 		
-		this.centerBlockX = blockX;
-		this.centerBlockZ = blockZ;
+		centerBlock.setLocation(blockX, blockZ);
 		this.zoom = zoom;
 		
 		// Get zoomed tile coords
-		final int tileX = Tile.blockPosToTile(this.centerBlockX, this.zoom);
-		final int tileZ = Tile.blockPosToTile(this.centerBlockZ, this.zoom);			
+		final int tileX = Tile.blockPosToTile(centerBlock.x, this.zoom);
+		final int tileZ = Tile.blockPosToTile(centerBlock.z, this.zoom);			
 		
 		// Chech hash of tile coords
 		final int newCenterHash = Tile.toHashCode(tileX, tileZ, zoom, dimension);
@@ -117,19 +117,19 @@ public class Tiles {
 			Tile newCenterTile = findTile(tileX, tileZ, currentTiles, true);
 			populateGrid(newCenterTile, currentTiles);
 			
-			if(debug) logger.info("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
-			
-			if(debug) {
-				Minecraft mc = Minecraft.getMinecraft();
-				BufferedImage tmp = new BufferedImage(mc.displayWidth, mc.displayHeight, BufferedImage.TYPE_INT_ARGB);
-				Graphics2D g = tmp.createGraphics();
-				g.setStroke(new BasicStroke(1));
-				g.setColor(Color.GREEN);
-				g.drawLine(mc.displayWidth/2, 0, mc.displayWidth/2, mc.displayHeight);
-				g.drawLine(0, mc.displayHeight/2, mc.displayWidth, mc.displayHeight/2);
-				if(crosshairs!=null) crosshairs.clear();
-				crosshairs = new MapTexture(tmp);
-			}
+//			if(debug) logger.info("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
+//			
+//			if(debug) {
+//				Minecraft mc = Minecraft.getMinecraft();
+//				BufferedImage tmp = new BufferedImage(mc.displayWidth, mc.displayHeight, BufferedImage.TYPE_INT_ARGB);
+//				Graphics2D g = tmp.createGraphics();
+//				g.setStroke(new BasicStroke(1));
+//				g.setColor(Color.GREEN);
+//				g.drawLine(mc.displayWidth/2, 0, mc.displayWidth/2, mc.displayHeight);
+//				g.drawLine(0, mc.displayHeight/2, mc.displayWidth, mc.displayHeight/2);
+//				if(crosshairs!=null) crosshairs.clear();
+//				crosshairs = new MapTexture(tmp);
+//			}
 			
 			return true;
 		} else {
@@ -145,14 +145,18 @@ public class Tiles {
 		lastMcDisplayHeight = mc.displayHeight;
 		
 		// Update pixel offsets for center
-		final double srcSize = gridSize*TILESIZE;
-		final int magic = (2*TILESIZE); // TODO:  Understand why "2" as it relates to gridSize.  If gridSize is 3, this has to be "1".
+		final double srcSize = gridSize*Tile.TILESIZE;
+		final int magic = (2*Tile.TILESIZE); // TODO:  Understand why "2" as it relates to gridSize.  If gridSize is 3, this has to be "1".
 		final double displayOffsetX = magic-((srcSize - lastMcDisplayWidth)/2);
 		final double displayOffsetY = magic-((srcSize - lastMcDisplayHeight)/2);
 		
 		// Get center tile
-		Tile centerTile = grid.get(new TilePos(0,0));		
-		Point blockPixelOffset = centerTile.blockPixelOffsetInTile(centerBlockX, centerBlockZ);
+		Tile centerTile = grid.get(new TilePos(0,0));	
+		if(centerTile==null) {
+			return false;
+		}
+		
+		Point blockPixelOffset = centerTile.blockPixelOffsetInTile(centerBlock.x, centerBlock.z);
 		centerPixelOffset.setLocation(displayOffsetX + blockPixelOffset.x, displayOffsetY + blockPixelOffset.y);
 				
 		// Update textures only if on-screen
@@ -173,28 +177,18 @@ public class Tiles {
 		return updated;
 	}
 	
-	public Point getBlockPixelOffsetInGrid(int x, int z) {
-
-		if(x<ulBlock.x || x>lrBlock.x || z<ulBlock.y || z>lrBlock.y) {
-			return null;
-		}
+	public Point getBlockPixelInGrid(int x, int z) {
 		
-		int localBlockX = ulBlock.x - x;
-		if(x<0) localBlockX++;
-		
-		int localBlockZ = ulBlock.y - z;
-		if(z<0) localBlockZ++;
+		int localBlockX = x - centerBlock.x;
+		int localBlockZ = z - centerBlock.z;
 		
 		int blockSize = (int) Math.pow(2,zoom);
-		int pixelOffsetX = (localBlockX*blockSize) - (blockSize/2);
-		int pixelOffsetZ = (localBlockZ*blockSize) - (blockSize/2);
+
+		int pixelOffsetX = lastMcDisplayWidth/2 + (localBlockX*blockSize) ;
+		int pixelOffsetZ = lastMcDisplayHeight/2 +(localBlockZ*blockSize) ;
 		
 		return new Point(pixelOffsetX, pixelOffsetZ);
-	}
-					
-	public void drawImage() {
-		draw(1f,0,0);
-	}
+	}				
 	
 	public void draw(final float opacity, final double offsetX, final double offsetZ) {		
 		if(!grid.isEmpty()) {	
@@ -213,17 +207,17 @@ public class Tiles {
 				drawTile(entry.getKey(), entry.getValue(), centerX, centerZ);
 			}
 			
-			if(debug && crosshairs!=null) {
-				Minecraft mc = Minecraft.getMinecraft();
-				GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, crosshairs.getGlTextureId());	
-				Tessellator tessellator = Tessellator.instance;
-				tessellator.startDrawingQuads();			
-				tessellator.addVertexWithUV(0, mc.displayHeight, 0.0D, 0, 1);
-				tessellator.addVertexWithUV(mc.displayWidth, mc.displayHeight, 0.0D, 1, 1);
-				tessellator.addVertexWithUV(mc.displayWidth, 0, 0.0D, 1, 0);
-				tessellator.addVertexWithUV(0, 0, 0.0D, 0, 0);
-				tessellator.draw();
-			}
+//			if(debug && crosshairs!=null) {
+//				Minecraft mc = Minecraft.getMinecraft();
+//				GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, crosshairs.getGlTextureId());	
+//				Tessellator tessellator = Tessellator.instance;
+//				tessellator.startDrawingQuads();			
+//				tessellator.addVertexWithUV(0, mc.displayHeight, 0.0D, 0, 1);
+//				tessellator.addVertexWithUV(mc.displayWidth, mc.displayHeight, 0.0D, 1, 1);
+//				tessellator.addVertexWithUV(mc.displayWidth, 0, 0.0D, 1, 0);
+//				tessellator.addVertexWithUV(0, 0, 0.0D, 0, 0);
+//				tessellator.draw();
+//			}
 		}		
 	}
 	
@@ -257,7 +251,74 @@ public class Tiles {
 		return isOnScreen(pos.startX + centerPixelOffset.x, pos.startZ + centerPixelOffset.y, pos.endX + centerPixelOffset.x, pos.endZ + centerPixelOffset.y);
 	}
 	
-	private boolean isOnScreen(double startX, double startZ, double endX, double endZ) {
+	/**
+	 * Returns a pixel point if on screen, null if not.
+	 * @param blockX
+	 * @param blockZ
+	 * @param radius
+	 * @return
+	 */
+	public Point getPixel(int blockX, int blockZ) {
+		Point pixel = getBlockPixelInGrid(blockX, blockZ);
+		if(isOnScreen(pixel)) {
+			return pixel;
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Returns a pixel point if on screen, the closest one there is if not.
+	 * @param blockX
+	 * @param blockZ
+	 * @param radius
+	 * @return
+	 */
+	public Point getClosestOnscreenPixel(int blockX, int blockZ) {
+		Point pixel = getBlockPixelInGrid(blockX, blockZ);
+		if(pixel.x<0) {
+			pixel.setLocation(0, pixel.y);
+		} else if(pixel.x>lastMcDisplayWidth) {
+			pixel.setLocation(lastMcDisplayWidth, pixel.y);
+		}
+		if(pixel.y<0) {
+			pixel.setLocation(pixel.x, 0);
+		} else if(pixel.y>lastMcDisplayHeight) {
+			pixel.setLocation(pixel.x, lastMcDisplayHeight);
+		}
+		return pixel;
+	}
+	
+	/**
+	 * This is a pixel check, not a location check
+	 * @param point
+	 * @return
+	 */
+	public boolean isOnScreen(Point point) {
+		return point.x>0 && point.x<lastMcDisplayWidth && point.y>0 && point.y<lastMcDisplayHeight;
+	}
+	
+	/**
+	 * This is a pixel check, not a location check
+	 * @param startX
+	 * @param startZ
+	 * @param endX
+	 * @param endZ
+	 * @return
+	 */
+	public boolean isOnScreen(double x, double z) {
+		return x>0 && x<lastMcDisplayWidth && z>0 && z<lastMcDisplayHeight;
+	}
+	
+	/**
+	 * This is a pixel check, not a location check
+	 * @param startX
+	 * @param startZ
+	 * @param endX
+	 * @param endZ
+	 * @return
+	 */
+	public boolean isOnScreen(double startX, double startZ, double endX, double endZ) {
 		return endX>0 && startX<lastMcDisplayWidth && endZ>0 && startZ<lastMcDisplayHeight;
 	}	
 
@@ -301,7 +362,7 @@ public class Tiles {
 
 	public void setZoom(int zoom) {
 		if(zoom!=this.zoom) {
-			center(centerBlockX, centerBlockZ, zoom);
+			center(centerBlock.x, centerBlock.z, zoom);
 		}
 	}
 
@@ -310,66 +371,5 @@ public class Tiles {
 			tile.clear();
 		}
 		grid.clear();
-	}
-	
-	final class TilePos implements Comparable<TilePos> {	
-		
-		public final int deltaX;
-		public final int deltaZ;
-		
-		final double startX;
-		final double startZ;		
-		final double endX;
-		final double endZ;	
-				
-		TilePos(int deltaX, int deltaZ) {
-			this.deltaX = deltaX;
-			this.deltaZ = deltaZ;
-			
-			this.startX = deltaX*TILESIZE;
-			this.startZ = deltaZ*TILESIZE;		
-			this.endX = startX + TILESIZE;
-			this.endZ = startZ + TILESIZE;	
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 37;
-			int result = 1;
-			result = prime * result + deltaX;
-			result = prime * result + deltaZ;
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			TilePos other = (TilePos) obj;
-			if (deltaX != other.deltaX)
-				return false;
-			if (deltaZ != other.deltaZ)
-				return false;
-			return true;
-		}
-
-		@Override
-		public String toString() {
-			return "TilePos [" + deltaX + "," + deltaZ + "]";
-		}
-
-		@Override
-		public int compareTo(TilePos o) {
-			int result = new Integer(deltaZ).compareTo(o.deltaZ);
-			if(result==0) {
-				result = new Integer(deltaX).compareTo(o.deltaX);
-			}
-			return result;
-		}		
-				
 	}
 }

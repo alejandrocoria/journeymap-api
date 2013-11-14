@@ -3,14 +3,15 @@ package net.techbrew.mcjm.render.overlay;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.Waypoint;
-import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer.BaseEntityOverlayRenderer;
 
 /**
  * Renders waypoints in the MapOverlay.
@@ -18,7 +19,7 @@ import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer.BaseEntityOverlayRen
  * @author mwoodman
  *
  */
-public class OverlayWaypointRenderer extends BaseEntityOverlayRenderer<List<Waypoint>> {
+public class OverlayWaypointRenderer extends BaseOverlayRenderer<Waypoint> {
 	
 	final int fontHeight = 16;
 	final Font labelFont = new Font("Arial", Font.BOLD, fontHeight);
@@ -27,126 +28,89 @@ public class OverlayWaypointRenderer extends BaseEntityOverlayRenderer<List<Wayp
 	final BasicStroke thinRoundStroke = new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND);
 	final BasicStroke thickRoundStroke = new BasicStroke(6, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND);
 	
-	/**
-	 * Constructor.
-	 * @param startCoords
-	 * @param entityChunkSize
-	 * @param canvasWidth
-	 * @param canvasHeight
-	 */
-	public OverlayWaypointRenderer(OverlayEntityRenderer parentRenderer, int layerWidth, int layerHeight, int widthCutoff, int heightCutoff) {
-		super(parentRenderer.startCoords, parentRenderer.endCoords, 
-			  parentRenderer.canvasWidth, parentRenderer.canvasHeight, layerWidth, layerHeight, widthCutoff, heightCutoff);
-		this.blockSize = parentRenderer.blockSize;
-	}
-
-	/**
-	 * Render waypoints.
-	 */
+	static MapTexture waypoint;
+	static MapTexture deathpoint;
+	static MapTexture offscreen;
+	
 	@Override
-	public void render(List<Waypoint> waypoints, Graphics2D g2D) {
+	public List<DrawStep> prepareSteps(List<Waypoint> waypoints, CoreRenderer core) {
 
+		final List<DrawStep> drawStepList = new ArrayList<DrawStep>();
+		
 		try {		
-			int wx, wz, x, z;
+			int wx, wz;
 			
 			Color color;
 			Color labelColor;
 			boolean inbounds;					
-			final int diameter = blockSize>16 ? new Double(blockSize).intValue() : 16;
-			g2D.setFont(labelFont); //$NON-NLS-1$
-			final FontMetrics fm = g2D.getFontMetrics();
-			
+
 			for(Waypoint waypoint : waypoints) {
 				wx = waypoint.getX();
 				wz = waypoint.getZ();
-				color = waypoint.getColor();
+				color = waypoint.getColor();							
 				
-				x = new Double(getScaledEntityX(wx)).intValue();
-				z = new Double(getScaledEntityZ(wz)).intValue();
+				Point pixel = core.getBlockPixelInGrid(wx, wz);
 				
-				int maxX = new Double(getScaledEntityX(endCoords.chunkXPos-1, 0)).intValue() - diameter;
-				int maxZ = new Double(getScaledEntityZ(endCoords.chunkZPos-1, 0)).intValue() - diameter;
-				
-				inbounds = x>diameter && x<maxX &&
-						   z>diameter && z<maxZ;
-				
-				// Draw waypoint using copy of G2D			
-				final Graphics2D g = (Graphics2D) g2D.create();
-				
-				if(inbounds) {
-					
+				if(core.isOnScreen(pixel.x, pixel.y)) {
+
 					// Draw marker
+					MapTexture texture = null;
 					if(waypoint.getType()==Waypoint.TYPE_DEATH) { // death spot
-						
-						g.setComposite(OPAQUE);
-						
-						// Black X						
-						g.setStroke(thickRoundStroke);
-						g.setPaint(Color.black);
-						g.drawLine(x-diameter, z-diameter, x+diameter, z+diameter);
-						g.drawLine(x+diameter, z-diameter, x-diameter, z+diameter);
-	
-						// Colored X
-						g.setStroke(thinRoundStroke);
-						g.setPaint(color);					
-						g.drawLine(x-diameter, z-diameter, x+diameter, z+diameter);
-						g.drawLine(x+diameter, z-diameter, x-diameter, z+diameter);
-						
-					} else {
-						
-						// Diamond
-						int[] xcoords = new int[]{x-diameter, x, x+diameter, x, x-diameter};
-						int[] zcoords = new int[]{z, z-diameter, z, z+diameter, z};
-						int clen = 5;
-						
-						g.setComposite(OPAQUE);
-						g.setStroke(thinStroke);
-						g.setPaint(color);
-						g.fillPolygon(xcoords, zcoords, clen);
-						g.setPaint(Color.black);
-						g.drawPolygon(xcoords, zcoords, clen);
-						
-						// Cross on Diamond
-						g.setComposite(SLIGHTLYOPAQUE);
-						g.setStroke(thinStroke);
-						g.setPaint(Color.white);
-						g.drawLine(x-diameter, z, x+diameter, z);
-						g.drawLine(x, z-diameter, x, z+diameter);
+						texture = getDeathpointTexture();
+					} else {						
+						texture = getWaypointTexture();
 					}
+					drawStepList.add(new DrawColoredImageStep(pixel, texture, color, 255));
 					
 					// Draw label
 					labelColor = (waypoint.getType()==Waypoint.TYPE_DEATH) ? Color.red : color;
-					drawCenteredLabel(waypoint.getName(), x, z, fontHeight, -diameter*2, g, fm, Color.black, labelColor);
+					drawStepList.add(new DrawCenteredLabelStep(pixel, waypoint.getName(), fontHeight, -texture.height, Color.black, labelColor));
 	
 				} else {
 					
-					if(x<0) x = 0;
-					if(z<0) z = 0;
-												
-					if(x>maxX) x = maxX;
-					if(z>maxZ) z = maxZ;
-					
-					// Edge marker (semicircle)
-					g.setComposite(OPAQUE);
-					g.setStroke(thickRoundStroke);
-					g.setPaint(Color.black);
-					g.drawArc(x-diameter/2, z-diameter/2, diameter*2, diameter*2, 0, 360);
-					g.setPaint(color);
-					g.fillArc(x-diameter/2, z-diameter/2, diameter*2, diameter*2, 0, 360);
+					// Draw offscreen marker
+					pixel = core.getClosestOnscreenPixel(wx, wz);
+					drawStepList.add(new DrawColoredImageStep(pixel, getOffscreenTexture(), color, 255));
 				}
 				
-				g.dispose();
 			}
 		} catch(Throwable t) {
-			JourneyMap.getLogger().severe("Error during render: " + LogFormatter.toString(t));
+			JourneyMap.getLogger().severe("Error during prepareSteps: " + LogFormatter.toString(t));
 		}
+		
+		return drawStepList;
 	}
 	
-	public boolean inBounds(Waypoint waypoint) {
-		int chunkX = waypoint.getX()>>4;
-		int chunkZ = waypoint.getZ()>>4;
-		return (chunkX>=startCoords.chunkXPos && chunkX<=endCoords.chunkXPos && 
-				chunkZ>=startCoords.chunkZPos && chunkZ<=endCoords.chunkZPos);
+
+	private MapTexture getWaypointTexture() {
+		if(waypoint==null) {
+			BufferedImage img = FileHandler.getWebImage("waypoint.png");	//$NON-NLS-1$ //$NON-NLS-2$		
+			waypoint = new MapTexture(img);
+		}
+		return waypoint;
+	}
+	
+	private MapTexture getDeathpointTexture() {
+		if(deathpoint==null) {
+			BufferedImage img = FileHandler.getWebImage("waypoint-death.png");	//$NON-NLS-1$ //$NON-NLS-2$		
+			deathpoint = new MapTexture(img);
+		}
+		return deathpoint;
+	}
+
+	private MapTexture getOffscreenTexture() {
+		if(offscreen==null) {
+			BufferedImage img = FileHandler.getWebImage("waypoint-offscreen.png");	//$NON-NLS-1$ //$NON-NLS-2$		
+			offscreen = new MapTexture(img);
+		}
+		return offscreen;
+	}
+
+	@Override
+	public void clear() {
+		if(waypoint!=null) waypoint.clear();
+		if(deathpoint!=null) deathpoint.clear();
+		if(offscreen!=null) offscreen.clear();
 	}
 
 }

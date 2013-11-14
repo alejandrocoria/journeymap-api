@@ -1,5 +1,7 @@
 package net.techbrew.mcjm.ui;
 
+import java.awt.Color;
+
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.Minecraft;
@@ -25,6 +27,7 @@ public class MapOverlayOptions extends GuiScreen {
 	int lastHeight = 0;
 	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid, buttonAutomap;
 	MapButton buttonSave,buttonClose,buttonAlert,buttonBrowser;
+	Color titleColor = new Color(0,0,100);
 	
 	public MapOverlayOptions(MapOverlay map) {
 		this.map = map;
@@ -184,7 +187,7 @@ public class MapOverlayOptions extends GuiScreen {
 				buttonCaves.setToggled(MapOverlay.showCaves);	
 				boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
 				if(underground) {
-					map.forceRefresh();
+					map.refreshState();
 				}
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_CAVES, MapOverlay.showCaves);
 				break;
@@ -245,7 +248,7 @@ public class MapOverlayOptions extends GuiScreen {
 				boolean showGrid = !PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID);
 				buttonGrid.setToggled(showGrid);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_GRID, showGrid);
-				map.forceRefresh();
+				map.refreshState();
 				break;
 			}
 			case 17: { // automap
@@ -302,7 +305,9 @@ public class MapOverlayOptions extends GuiScreen {
 		int by = (this.height / 4);
 		
 		GL11.glEnable(GL11.GL_BLEND);
-		BaseOverlayRenderer.drawRectangle(halfBg - (labelWidth/2), by-20, labelWidth, 12, 0, 0, 100, 255);    	
+		if(map.coreRenderer!=null) {
+			BaseOverlayRenderer.drawRectangle(halfBg - (labelWidth/2), by-20, labelWidth, 12, titleColor, 255);
+		}
 		map.drawCenteredString(this.fontRenderer, title , this.width / 2, by-18, 16777215);
     }
     

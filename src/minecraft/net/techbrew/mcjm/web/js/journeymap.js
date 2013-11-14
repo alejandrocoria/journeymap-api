@@ -73,12 +73,10 @@ var JourneyMap = (function() {
 	
 	var dialogTemplate = [
 		'<div class="dialog">',
-		'<img src="/ico/journeymap144.png">',
+		'<img src="/img/ico/journeymap144.png">',
 		'<div></div>',
 		'</div>'
 	].join('');	
-	
-	var RAD_DEG=57.2957795;
 	
 	var errorDialog = null;
 	var splashDialog = null;
@@ -888,7 +886,7 @@ var JourneyMap = (function() {
 			      .attr('src','/img/locator-player.png')
 			      .css('width','64px')
 			      .css('height','64px')
-			      .rotate(heading*RAD_DEG);
+			      .rotate(heading);
 			
 			markers.playerMarker = new RichMarker({
 				position: pos,
@@ -962,7 +960,7 @@ var JourneyMap = (function() {
 		
 		// Update marker position and heading
 		markers.playerMarker.setPosition(pos);
-		$('#'+imgId).rotate(heading*RAD_DEG);
+		$('#'+imgId).rotate(heading);
 		
 		// Keep on top
 		if(markers.playerMarker.getZIndex()<google.maps.Marker.MAX_ZINDEX){
@@ -1101,7 +1099,7 @@ var JourneyMap = (function() {
 		$(contentDiv).find('.entityIcon').attr('src','/img/entity/' + entity.filename);
 
 		// Entity locator		
-		$(contentDiv).find('.entityLocator').attr('src', locatorUrl).rotate(heading*RAD_DEG);		
+		$(contentDiv).find('.entityLocator').attr('src', locatorUrl).rotate(heading);		
 	
 		// Update marker position
 		marker.setPosition(pos);
@@ -1143,7 +1141,7 @@ var JourneyMap = (function() {
 					if(debug) console.log("Skin not found for " + id);
 					$(event.target).attr('src', '/img/entity/unknown.png');					
 				});
-			$(contentDiv).find('.mpLocator').rotate(heading*RAD_DEG);
+			$(contentDiv).find('.mpLocator').rotate(heading);
 					
 			marker = new RichMarker({
 				position: pos,
@@ -1162,7 +1160,7 @@ var JourneyMap = (function() {
 		var contentDiv = $('#'+id);
 
 		// multiplayer locator		
-		$(contentDiv).find('.mpLocator').rotate(heading*RAD_DEG);		
+		$(contentDiv).find('.mpLocator').rotate(heading);		
 	
 		// Update marker position
 		marker.setPosition(pos);

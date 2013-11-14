@@ -31,6 +31,7 @@ import net.minecraft.src.ResourceLocation;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.render.overlay.MapTexture;
 
 public class EntityHelper {
 	
@@ -39,10 +40,10 @@ public class EntityHelper {
 	private static final double PI2 = 2*Math.PI;
 	
 	// TODO: make threadsafe
-	static BufferedImage locatorHostile, locatorNeutral, locatorOther, locatorPet, locatorPlayer;
+	static MapTexture locatorHostile, locatorNeutral, locatorOther, locatorPet, locatorPlayer;
 	
 	// TODO: make threadsafe
-	static HashMap<String, BufferedImage> entityImageMap = new HashMap<String, BufferedImage>();
+	static HashMap<String, MapTexture> entityImageMap = new HashMap<String, MapTexture>();
 	
 	static Method renderGetEntityTextureMethod;
 
@@ -110,16 +111,17 @@ public class EntityHelper {
 	 * TODO: Not threadsafe
 	 * @return
 	 */
-	public static BufferedImage getEntityImage(String filename) {
-		BufferedImage img = entityImageMap.get(filename);
-		if(img==null) {
-			img = FileHandler.getWebImage("entity/" + filename);	//$NON-NLS-1$ //$NON-NLS-2$
+	public static MapTexture getEntityImage(String filename) {
+		MapTexture tex = entityImageMap.get(filename);
+		if(tex==null) {
+			BufferedImage img = FileHandler.getWebImage("entity/" + filename);	//$NON-NLS-1$ //$NON-NLS-2$
 			if(img==null) {				
 				img = getUnknownImage(); // fall back to unknown image
-			}			
-			entityImageMap.put(filename, img);
+			}		
+			tex = new MapTexture(img);
+			entityImageMap.put(filename, tex);
 		}
-		return img;
+		return tex;
 	}
 
 	
@@ -127,9 +129,10 @@ public class EntityHelper {
 	 * TODO: Not threadsafe
 	 * @return
 	 */
-	public static BufferedImage getHostileLocator() {
+	public static MapTexture getHostileLocator() {
 		if(locatorHostile==null) {
-			locatorHostile = FileHandler.getWebImage("locator-hostile.png"); //$NON-NLS-1$			
+			BufferedImage img =  FileHandler.getWebImage("locator-hostile.png"); //$NON-NLS-1$	
+			locatorHostile = new MapTexture(img);	
 		}
 		return locatorHostile;
 	}
@@ -138,9 +141,10 @@ public class EntityHelper {
 	 * TODO: Not threadsafe
 	 * @return
 	 */
-	public static BufferedImage getNeutralLocator() {
+	public static MapTexture getNeutralLocator() {
 		if(locatorNeutral==null) {
-			locatorNeutral = FileHandler.getWebImage("locator-neutral.png"); //$NON-NLS-1$			
+			BufferedImage img =  FileHandler.getWebImage("locator-neutral.png"); //$NON-NLS-1$	
+			locatorNeutral = new MapTexture(img);			
 		}
 		return locatorNeutral;
 	}
@@ -149,9 +153,10 @@ public class EntityHelper {
 	 * TODO: Not threadsafe
 	 * @return
 	 */
-	public static BufferedImage getOtherLocator() {
+	public static MapTexture getOtherLocator() {
 		if(locatorOther==null) {
-			locatorOther = FileHandler.getWebImage("locator-other.png"); //$NON-NLS-1$			
+			BufferedImage img =  FileHandler.getWebImage("locator-other.png"); //$NON-NLS-1$	
+			locatorOther = new MapTexture(img);	
 		}
 		return locatorOther;
 	}
@@ -160,9 +165,10 @@ public class EntityHelper {
 	 * TODO: Not threadsafe
 	 * @return
 	 */
-	public static BufferedImage getPetLocator() {
+	public static MapTexture getPetLocator() {
 		if(locatorPet==null) {
-			locatorPet = FileHandler.getWebImage("locator-pet.png"); //$NON-NLS-1$			
+			BufferedImage img =  FileHandler.getWebImage("locator-pet.png"); //$NON-NLS-1$	
+			locatorPet = new MapTexture(img);			
 		}
 		return locatorPet;
 	}
@@ -171,9 +177,10 @@ public class EntityHelper {
 	 * TODO: Not threadsafe
 	 * @return
 	 */
-	public static BufferedImage getPlayerImage() {
+	public static MapTexture getPlayerImage() {
 		if(locatorPlayer==null) {
-			locatorPlayer = FileHandler.getWebImage("locator-player.png"); //$NON-NLS-1$	
+			BufferedImage img =  FileHandler.getWebImage("locator-player.png"); //$NON-NLS-1$	
+			locatorPlayer = new MapTexture(img);
 		}
 		return locatorPlayer;
 	}
@@ -188,7 +195,7 @@ public class EntityHelper {
 	
 	
 	/**
-	 * Get the entity's heading in radians
+	 * Get the entity's heading in degrees
 	 * 
 	 * @param player
 	 * @return
@@ -202,23 +209,15 @@ public class EntityHelper {
 	}
 	
 	/**
-	 * Get the entity's heading in radians,
-	 * normalized to be between 0 and 2*Pi.
+	 * Get the entity's heading in degrees,
+	 * normalized to be between 0 and 360.
 	 * 
 	 * @param rotationYaw
 	 * @return
 	 */
 	public static double getHeading(float rotationYaw) {
 		double degrees = Math.round(rotationYaw % 360);
-	    double radians = (degrees * Math.PI) / 180;
-	    
-	    // Clamp between 0 and 2PI
-		if(radians<PI2 || radians > PI2) {
-			radians = radians % PI2;
-		}
-		if(radians<0) radians = PI2+radians;
-	    
-	    return radians;
+	    return degrees;
 	}
 	
 	

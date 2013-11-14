@@ -1,10 +1,8 @@
 package net.techbrew.mcjm.render.overlay;
 
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
+import java.awt.Point;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +11,6 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.EntityHelper;
-import net.techbrew.mcjm.render.MapBlocks;
-import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer.BaseEntityOverlayRenderer;
 
 /**
  * Renders an entity image in the MapOverlay.
@@ -22,15 +18,14 @@ import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer.BaseEntityOverlayRen
  * @author mwoodman
  *
  */
-public class OverlayRadarRenderer extends BaseEntityOverlayRenderer<List<Map>> {
+public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
 	
-	final int fontHeight = 16;
-	final Font labelFont = new Font("Arial", Font.BOLD, fontHeight);
+	final int fontHeight = 14;
 	final Color labelBg = Color.darkGray.darker();
 	
-	final boolean showAnimals;
-	final boolean showPets;
-	
+	boolean showAnimals;
+	boolean showPets;
+
 	/**
 	 * Constructor.
 	 * @param startCoords
@@ -38,31 +33,33 @@ public class OverlayRadarRenderer extends BaseEntityOverlayRenderer<List<Map>> {
 	 * @param canvasWidth
 	 * @param canvasHeight
 	 */
-	public OverlayRadarRenderer(OverlayEntityRenderer parentRenderer, int layerWidth, int layerHeight, int widthCutoff, int heightCutoff, final boolean showAnimals, final boolean showPets) {
-		super(parentRenderer.startCoords, parentRenderer.endCoords, 
-			  parentRenderer.canvasWidth, parentRenderer.canvasHeight,
-			  layerWidth, layerHeight, 
-			  widthCutoff, heightCutoff);
-		this.blockSize = parentRenderer.blockSize;
+	public OverlayRadarRenderer(final boolean showAnimals, final boolean showPets) {
+		super();
 		this.showAnimals = showAnimals;
 		this.showPets = showPets;
 	}
+	
+	public void setShowAnimals(boolean showAnimals) {
+		this.showAnimals = showAnimals;
+	}
 
-	/**
-	 * Render list of entities.
-	 */
+	public void setShowPets(boolean showPets) {
+		this.showPets = showPets;
+	}
+
 	@Override
-	public void render(List<Map> critters, Graphics2D g2D) {
-
+	public List<DrawStep> prepareSteps(List<Map> critters, CoreRenderer core) {
+		
+		final List<DrawStep> drawStepList = new ArrayList<DrawStep>();
+		
 		try {
 			
-			int cx, cz, x, z;
 			double heading;
-			BufferedImage entityIcon, locatorImg;
+			MapTexture entityIcon, locatorImg;
 			String filename, owner;
 			Boolean isHostile, isPet, isPlayer;
 			boolean filterAnimals = (showAnimals!=showPets);
-			FontMetrics fm = g2D.getFontMetrics();
+			//FontMetrics fm = g2D.getFontMetrics();
 			String playername = Minecraft.getMinecraft().thePlayer.getEntityName();
 			
 			for(Map critter : critters) {
@@ -79,14 +76,12 @@ public class OverlayRadarRenderer extends BaseEntityOverlayRenderer<List<Map>> {
 					}
 				}
 				
-				if(inBounds(critter)) {						
+				int posX = (Integer) critter.get(EntityKey.posX);
+				int posZ = (Integer) critter.get(EntityKey.posZ);
+				Point pixel = core.getPixel(posX, posZ);
+				if(pixel!=null) {						
 					filename = (String) critter.get(EntityKey.filename);
-					cx = (Integer) critter.get(EntityKey.chunkCoordX);
-					cz = (Integer) critter.get(EntityKey.chunkCoordZ);
-					x = (Integer) critter.get(EntityKey.posX);
-					z = (Integer) critter.get(EntityKey.posZ);
-					heading = (Double) critter.get(EntityKey.heading);
-					
+					heading = (Double) critter.get(EntityKey.heading);					
 					isPlayer = EntityHelper.PLAYER_FILENAME.equals(filename);
 
 					// Determine and draw locator
@@ -99,35 +94,34 @@ public class OverlayRadarRenderer extends BaseEntityOverlayRenderer<List<Map>> {
 					} else {
 						locatorImg = EntityHelper.getNeutralLocator();
 					}			
-					g2D.setComposite(MapBlocks.OPAQUE);
-					drawEntity(cx, x, cz, z, heading, false, locatorImg, g2D);
+					
+					drawStepList.add(new DrawEntityStep(pixel, heading, false, locatorImg));
 					
 					// Draw entity image
 					entityIcon = EntityHelper.getEntityImage(filename);
 					if(entityIcon!=null) {
-						g2D.setComposite(MapBlocks.OPAQUE);
-						drawEntity(cx, x, cz, z, heading, true, entityIcon, g2D);
+						drawStepList.add(new DrawEntityStep(pixel, heading, true, entityIcon));
 					}
 					
-					int lx = (int) Math.floor(getScaledEntityX(cx, x));
-					int lz = (int) Math.floor(getScaledEntityZ(cz, z));
-					
-					g2D.setComposite(MapBlocks.SLIGHTLYCLEAR);
 					if(isPlayer) {
 						// Draw Label			
 						String username = (String) critter.get(EntityKey.username);
-						drawCenteredLabel(username, lx, lz, fontHeight, 32, g2D, fm, labelBg, Color.green);
+						drawStepList.add(new DrawCenteredLabelStep(pixel, username, fontHeight, -entityIcon.height, labelBg, Color.green));
 					} else if(critter.containsKey(EntityKey.customName)){
 						String customName = (String) critter.get(EntityKey.customName);
-						drawCenteredLabel(customName, lx, lz, fontHeight, entityIcon.getWidth()-8, g2D, fm, labelBg, Color.white);
-					} else {
-						//drawCenteredLabel(filename, lx, lz, fontHeight, entityIcon.getWidth()-8, g2D, fm, labelBg, Color.white);
+						drawStepList.add(new DrawCenteredLabelStep(pixel, customName, fontHeight, entityIcon.height, labelBg, Color.white));
 					}
 				}
 			}
 		} catch(Throwable t) {
-			JourneyMap.getLogger().severe("Error during render: " + LogFormatter.toString(t));
+			JourneyMap.getLogger().severe("Error during prepareSteps: " + LogFormatter.toString(t));
 		}
+		
+		return drawStepList;
 	}
 
+	@Override
+	public void clear() {
+	}
+	
 }

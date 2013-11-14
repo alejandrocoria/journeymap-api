@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.ui;
+package net.techbrew.mcjm.render.overlay;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -15,11 +15,11 @@ import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.RegionImageHandler;
-import net.techbrew.mcjm.render.overlay.MapTexture;
-import net.techbrew.mcjm.ui.Tiles.TilePos;
 
 public class Tile {
 		
+	public final static int TILESIZE = 512;
+	
 	final int dimension;
 	final int zoom;
 	final int tileX; 
@@ -37,7 +37,7 @@ public class Tile {
 	MapTexture mapTexture;
 	
 	private final Logger logger = JourneyMap.getLogger();
-	private final boolean debug = logger.isLoggable(Level.INFO);
+	private final boolean debug = logger.isLoggable(Level.FINE);
 
 	public Tile(final File worldDir, final int tileX, final int tileZ, final int zoom, final int dimension) {
 		this.worldDir = worldDir;
@@ -57,7 +57,7 @@ public class Tile {
 		if(!changed) changed = RegionImageHandler.hasImageChanged(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, lastImageTime);
 		
 		if(changed) {
-			BufferedImage image = RegionImageHandler.getMergedChunks(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, Tiles.TILESIZE, Tiles.TILESIZE);
+			BufferedImage image = RegionImageHandler.getMergedChunks(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE);
 			lastMapType = mapType;
 			lastVSlice = vSlice;
 			lastImageTime = new Date().getTime();
@@ -124,15 +124,7 @@ public class Tile {
 		return t << (9-zoom);
 	}
 	
-	
-	public static int blockPosToTileOffset(int b, int zoom) {
-		double scale = Math.pow(2,9-zoom);
-		double pos = new Double(b) / scale;
-		double dec = pos - ((int) pos);
-		int offset = (int) (dec * scale);
-		return offset;
-	}
-	
+
 	public Point blockPixelOffsetInTile(int x, int z) {
 		
 		if(x<ulBlock.x || x>lrBlock.x || z<ulBlock.y || z>lrBlock.y) {
@@ -149,8 +141,8 @@ public class Tile {
 		int tileCenterBlockZ = lrBlock.y-ulBlock.y;
 		
 		int blockSize = (int) Math.pow(2,zoom);
-		int pixelOffsetX = (Tiles.TILESIZE/2) + (localBlockX*blockSize) - (blockSize/2);
-		int pixelOffsetZ = (Tiles.TILESIZE/2) + (localBlockZ*blockSize) - (blockSize/2);
+		int pixelOffsetX = (TILESIZE/2) + (localBlockX*blockSize) - (blockSize/2);
+		int pixelOffsetZ = (TILESIZE/2) + (localBlockZ*blockSize) - (blockSize/2);
 		
 		return new Point(pixelOffsetX, pixelOffsetZ);
 	}

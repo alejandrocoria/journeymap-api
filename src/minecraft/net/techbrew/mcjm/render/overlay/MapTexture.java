@@ -14,13 +14,13 @@ public class MapTexture extends AbstractTexture
     private final int[] dynamicTextureData;
 
     /** width of this icon in pixels */
-    private final int width;
+    public final int width;
 
     /** height of this icon in pixels */
-    private final int height;
+    public final int height;
 
     public MapTexture(BufferedImage image)
-    {
+    {    	
     	this.width = image.getWidth();
         this.height = image.getHeight();
         this.dynamicTextureData = new int[width * height];
@@ -42,7 +42,7 @@ public class MapTexture extends AbstractTexture
 			GL11.glDeleteTextures(this.getGlTextureId());
 		}
 	}
-	
+
 	@Override
 	public void loadTexture(ResourceManager par1ResourceManager) throws IOException {}
 }

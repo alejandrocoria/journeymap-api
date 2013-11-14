@@ -3,7 +3,6 @@ package net.techbrew.mcjm.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import net.minecraft.src.ChunkCoordinates;
 import net.minecraft.src.EntityClientPlayerMP;
@@ -198,15 +197,8 @@ public class WaypointHelper {
 		ArrayList<Waypoint> list = new ArrayList<Waypoint>();
 		
 		Waypoint wpSpawn = new Waypoint("Spawn", spawn.posX, spawn.posY, spawn.posZ, true, 0, 255, 0, Waypoint.TYPE_NORMAL, "journeymap", "Spawn");
-		
-		int r = new Random().nextInt(255);
-		int g = new Random().nextInt(255);
-		int b = new Random().nextInt(255);
-		Waypoint wpLast = new Waypoint("Last", new Double(Math.floor(player.posX+128)).intValue(), new Double(Math.floor(player.posY)).intValue(), new Double(Math.floor(player.posZ+128)).intValue(), true, r, g, b, Waypoint.TYPE_DEATH, "journeymap", "Last Death");
-		
 		list.add(wpSpawn);
-		list.add(wpLast);
-		
+			
 		ChunkCoordinates bed = player.getBedLocation();
 		if(bed!=null && !bed.equals(spawn)) {
 			Waypoint wpBed = new Waypoint("Bed", new Double(Math.floor(bed.posX)).intValue(), new Double(Math.floor(bed.posY)).intValue(), new Double(Math.floor(bed.posZ)).intValue(), true, 0, 0, 255, Waypoint.TYPE_NORMAL, "journeymap", "Bed");
