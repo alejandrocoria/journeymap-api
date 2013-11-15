@@ -29,6 +29,7 @@ import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.data.PlayersData;
 import net.techbrew.mcjm.data.VillagersData;
 import net.techbrew.mcjm.data.WaypointsData;
+import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.io.PropertyManager;
@@ -57,10 +58,6 @@ import org.lwjgl.opengl.GL11;
  */
 public class MapOverlay extends GuiScreen {
 	
-	static final int minZoom = 0;
-	static final int maxZoom = 5;
-	static int currentZoom = 1;
-	
 	final long refreshInterval = PropertyManager.getIntegerProp(PropertyManager.Key.UPDATETIMER_CHUNKS);
 	Boolean isScrolling = false;
 	Boolean hardcore = false;
@@ -73,6 +70,7 @@ public class MapOverlay extends GuiScreen {
 	int bHGap = 8;
 	int bVGap = 8;
 
+	// TODO: move to state
 	static Constants.MapType mapType;
 	static Boolean showCaves = true;
 	static Boolean showMonsters = true;
@@ -84,6 +82,13 @@ public class MapOverlay extends GuiScreen {
 	static Boolean follow = true;
 	static String playerLastPos = "0,0"; //$NON-NLS-1$
 	static int playerLastDimension = Integer.MIN_VALUE;
+	static MapTexture logoTexture;
+	static CoreRenderer coreRenderer;	
+	static OverlayWaypointRenderer waypointRenderer;
+	static OverlayRadarRenderer radarRenderer;
+	static final int minZoom = 0;
+	static final int maxZoom = 5;
+	static int currentZoom = 1;
 
 	JourneyMap journeyMap;
 	MapOverlayOptions options;
@@ -96,15 +101,9 @@ public class MapOverlay extends GuiScreen {
 	MapButton buttonDayNight, buttonFollow,buttonZoomIn,buttonZoomOut;
 	MapButton buttonOptions, buttonClose;
 	
-	MapTexture playerImage = EntityHelper.getPlayerImage();
-	
 	Color playerInfoFgColor = new Color(0x8888ff);
 	Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
 	
-	static MapTexture logoTexture;
-	static CoreRenderer coreRenderer;	
-	static OverlayWaypointRenderer waypointRenderer;
-	static OverlayRadarRenderer radarRenderer;
 
 	public MapOverlay(JourneyMap journeyMap) {
 		super();
@@ -130,7 +129,10 @@ public class MapOverlay extends GuiScreen {
 		
 		// When switching dimensions, reset follow to true
 		if(playerLastDimension!=mc.thePlayer.dimension) {
-			coreRenderer = null;
+			if(coreRenderer!=null) {
+				coreRenderer.clear();
+				coreRenderer = null;
+			}
 			playerLastDimension = mc.thePlayer.dimension;
 			follow = true;
 		}
@@ -236,7 +238,7 @@ public class MapOverlay extends GuiScreen {
 	public void setWorldAndResolution(Minecraft minecraft, int i, int j) {		
 		super.setWorldAndResolution(minecraft, i, j);		
 		
-		hardcore = !minecraft.isSingleplayer() && minecraft.theWorld.getWorldInfo().isHardcoreModeEnabled();
+		hardcore = WorldData.isHardcoreAndMultiplayer();
 		initButtons();
 		layoutButtons();			
 		
@@ -714,7 +716,7 @@ public class MapOverlay extends GuiScreen {
 		// Draw player if within bounds
 		Point playerPixel = coreRenderer.getPixel((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ);
 		if(playerPixel!=null) {
-			drawStepList.add(new DrawEntityStep(playerPixel, EntityHelper.getHeading(mc.thePlayer), false, playerImage));				
+			drawStepList.add(new DrawEntityStep(playerPixel, EntityHelper.getHeading(mc.thePlayer), false, EntityHelper.getPlayerImage()));				
 		}			
 		
 		// Update player pos
@@ -870,6 +872,31 @@ public class MapOverlay extends GuiScreen {
 				options = null;
 			}
 		}
+	}
+	
+	public static void reset() {
+		mapType = null;
+		follow = true;
+		currentZoom = 1;
+		playerLastPos = "0,0"; //$NON-NLS-1$
+		playerLastDimension = Integer.MIN_VALUE;
+		
+		if(logoTexture!=null) {
+			logoTexture.clear();
+			logoTexture = null;
+		}
+		if(coreRenderer!=null) {
+			coreRenderer.clear();
+			coreRenderer = null;
+		}
+		if(waypointRenderer!=null) {
+			waypointRenderer.clear();
+			waypointRenderer = null;
+		}
+		if(radarRenderer!=null) {
+			radarRenderer.clear();
+			radarRenderer = null;
+		}		
 	}
 
 }

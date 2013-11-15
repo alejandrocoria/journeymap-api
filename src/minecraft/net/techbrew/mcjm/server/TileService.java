@@ -10,6 +10,7 @@ import net.minecraft.src.World;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.RegionImageHandler;
 import se.rupy.http.Event;
@@ -90,23 +91,29 @@ public class TileService extends FileService {
 				vSlice = null;
 			}
 			
-			// Determine chunks for coordinates at zoom level
-			final int scale = (int) Math.pow(2, zoom);
-			final int distance = 32/scale;
-			final int minChunkX = x * distance;
-			final int minChunkZ = z * distance;
-			final int maxChunkX = minChunkX + distance - 1;
-			final int maxChunkZ = minChunkZ + distance - 1;
+			if(mapType==MapType.underground && WorldData.isHardcoreAndMultiplayer()) {
+				ResponseHeader.on(event).contentType(ContentType.png).noCache();
+				serveFile(RegionImageHandler.getBlank512x512ImageFile(), event);
+			} else {
 			
-			//System.out.println("zoom " + zoom + ", scale=" + scale + ", distance=" + distance + ": " + minChunkX + "," + minChunkZ + " - " + maxChunkX + "," + maxChunkZ);			
-			
-			final ChunkCoordIntPair startCoord = new ChunkCoordIntPair(minChunkX,minChunkZ);
-			final ChunkCoordIntPair endCoord = new ChunkCoordIntPair(maxChunkX,maxChunkZ);
-			
-			final BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, true, 512, 512);
-
-			ResponseHeader.on(event).contentType(ContentType.png).noCache();
-			serveImage(event, img);
+				// Determine chunks for coordinates at zoom level
+				final int scale = (int) Math.pow(2, zoom);
+				final int distance = 32/scale;
+				final int minChunkX = x * distance;
+				final int minChunkZ = z * distance;
+				final int maxChunkX = minChunkX + distance - 1;
+				final int maxChunkZ = minChunkZ + distance - 1;
+				
+				//System.out.println("zoom " + zoom + ", scale=" + scale + ", distance=" + distance + ": " + minChunkX + "," + minChunkZ + " - " + maxChunkX + "," + maxChunkZ);			
+				
+				final ChunkCoordIntPair startCoord = new ChunkCoordIntPair(minChunkX,minChunkZ);
+				final ChunkCoordIntPair endCoord = new ChunkCoordIntPair(maxChunkX,maxChunkZ);
+				
+				final BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, true, 512, 512);
+	
+				ResponseHeader.on(event).contentType(ContentType.png).noCache();
+				serveImage(event, img);
+			}
 						
 			final long stop=System.currentTimeMillis();
 			if(JourneyMap.getLogger().isLoggable(Level.FINE)) {

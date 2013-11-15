@@ -49,6 +49,12 @@ public class WorldData implements IDataProvider {
 		return Key.values();
 	}
 	
+	public static boolean isHardcoreAndMultiplayer() {
+		boolean hardcore = (Boolean) DataCache.instance().get(WorldData.class, null).get(Key.hardcore);
+		boolean multiplayer = (Boolean) DataCache.instance().get(WorldData.class, null).get(Key.singlePlayer)==false;
+		return hardcore && multiplayer;
+	}
+	
 	/**
 	 * Return map of world-related properties.
 	 */

@@ -47,35 +47,43 @@ public class AllData implements IDataProvider {
 		
 		DataCache cache = DataCache.instance();
 		LinkedHashMap props = new LinkedHashMap();
-		if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_ANIMALS)) {
-			props.put(Key.animals, cache.get(AnimalsData.class).get(EntityKey.root));
-		} else {
-			props.put(Key.animals, Collections.emptyMap());
-		}
-		props.put(Key.images, cache.get(ImagesData.class, optionalParams));
-		if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_MOBS)) {
-			props.put(Key.mobs, cache.get(MobsData.class).get(EntityKey.root));
-		} else {
-			props.put(Key.mobs, Collections.emptyMap());
-		}
-		props.put(Key.player, cache.get(PlayerData.class));
-		if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_PLAYERS)) {
-			props.put(Key.players, cache.get(PlayersData.class).get(EntityKey.root));
-		} else {
-			props.put(Key.players, Collections.emptyMap());
-		}
-		if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_VILLAGERS)) {
-			props.put(Key.villagers, cache.get(VillagersData.class).get(EntityKey.root));
-		} else {
-			props.put(Key.villagers, Collections.emptyMap());
-		}
 		props.put(Key.world, cache.get(WorldData.class));
+		props.put(Key.images, cache.get(ImagesData.class, optionalParams));
+		props.put(Key.player, cache.get(PlayerData.class));
+		
 		if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_WAYPOINTS)) {
 			props.put(Key.waypoints, cache.get(WaypointsData.class).get(EntityKey.root));
 		} else {
 			props.put(Key.waypoints, Collections.emptyMap());
 		}
 		
+		if(!WorldData.isHardcoreAndMultiplayer()) {
+		
+			if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_ANIMALS)) {
+				props.put(Key.animals, cache.get(AnimalsData.class).get(EntityKey.root));
+			} else {
+				props.put(Key.animals, Collections.emptyMap());
+			}
+		
+			if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_MOBS)) {
+				props.put(Key.mobs, cache.get(MobsData.class).get(EntityKey.root));
+			} else {
+				props.put(Key.mobs, Collections.emptyMap());
+			}
+		
+			if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_PLAYERS)) {
+				props.put(Key.players, cache.get(PlayersData.class).get(EntityKey.root));
+			} else {
+				props.put(Key.players, Collections.emptyMap());
+			}
+			
+			if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_VILLAGERS)) {
+				props.put(Key.villagers, cache.get(VillagersData.class).get(EntityKey.root));
+			} else {
+				props.put(Key.villagers, Collections.emptyMap());
+			}
+		}
+				
 		return props;		
 	}
 	

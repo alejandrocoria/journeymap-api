@@ -104,9 +104,26 @@ public class MapOverlayOptions extends GuiScreen {
 			buttonCaves.setToggled(false);
 			buttonCaves.enabled = false;
 			buttonCaves.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
+			
 			buttonMonsters.setToggled(false);
 			buttonMonsters.enabled = false;
 			buttonMonsters.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
+			
+			buttonAnimals.setToggled(false);
+			buttonAnimals.enabled = false;
+			buttonAnimals.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
+			
+			buttonVillagers.setToggled(false);
+			buttonVillagers.enabled = false;
+			buttonVillagers.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
+			
+			buttonPets.setToggled(false);
+			buttonPets.enabled = false;
+			buttonPets.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
+			
+			buttonPlayers.setToggled(false);
+			buttonPlayers.enabled = false;
+			buttonPlayers.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
 		}
 		
 		buttonList.add(buttonCaves);
