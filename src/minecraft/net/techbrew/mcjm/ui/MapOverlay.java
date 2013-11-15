@@ -10,11 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.GuiButton;
-import net.minecraft.src.GuiChat;
 import net.minecraft.src.GuiInventory;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.Minecraft;
@@ -90,8 +89,9 @@ public class MapOverlay extends GuiScreen {
 	static final int maxZoom = 5;
 	static int currentZoom = 1;
 
-	JourneyMap journeyMap;
+	Logger logger = JourneyMap.getLogger();
 	MapOverlayOptions options;
+	MapChat chat;
 	
 	MapOverlayState state = null;
 	List<DrawStep> drawStepList = new ArrayList<DrawStep>();
@@ -104,15 +104,13 @@ public class MapOverlay extends GuiScreen {
 	Color playerInfoFgColor = new Color(0x8888ff);
 	Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
 	
-
-	public MapOverlay(JourneyMap journeyMap) {
+	public MapOverlay() {
 		super();
-		super.allowUserInput = true;
-		this.journeyMap = journeyMap;
-		this.mc = Minecraft.getMinecraft();
-		
-		initButtons();		
-		
+	}
+	
+    @Override
+	public void initGui()
+    {	
 		// Set preferences-based values
 		PropertyManager pm = PropertyManager.getInstance();
 		showCaves = pm.getBoolean(PropertyManager.Key.PREF_SHOW_CAVES);
@@ -137,8 +135,11 @@ public class MapOverlay extends GuiScreen {
 			follow = true;
 		}
 		
-		refreshState();		
-	}
+    	super.allowUserInput = true;    			
+        Keyboard.enableRepeatEvents(true);
+    	initButtons();
+    	chat = new MapChat(this, "", true);
+    }
 
 	private void drawButtonBar() {	
 		
@@ -163,13 +164,16 @@ public class MapOverlay extends GuiScreen {
 			drawButtonBar();	
 			if(options==null) {				
 				super.drawScreen(i, j, f);
+				if(chat!=null) {
+					chat.drawScreen(i, j, f);
+				}
 			} else {
 				options.drawScreen(i, j, f);
 			}
 			drawPlayerInfo();
 		} catch(Throwable e) {
-			JourneyMap.getLogger().log(Level.SEVERE, "Unexpected exception in MapOverlay.drawScreen(): " + e); //$NON-NLS-1$
-			JourneyMap.getLogger().severe(LogFormatter.toString(e));
+			logger.log(Level.SEVERE, "Unexpected exception in MapOverlay.drawScreen(): " + e); //$NON-NLS-1$
+			logger.severe(LogFormatter.toString(e));
 			String error = Constants.getMessageJMERR23(e.getMessage());
 			JourneyMap.getInstance().announce(error);
 			close();
@@ -242,13 +246,18 @@ public class MapOverlay extends GuiScreen {
 		initButtons();
 		layoutButtons();			
 		
-		if(follow) {
+		if(follow && coreRenderer!=null) {
 			Minecraft mc = Minecraft.getMinecraft();
 			coreRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, currentZoom);
 		}
 		
 		if(options!=null) {
 			options.setWorldAndResolution(minecraft, i, j);
+			return;
+		}
+		
+		if(chat!=null) {
+			chat.setWorldAndResolution(minecraft, i, j);
 			return;
 		}
 
@@ -329,6 +338,11 @@ public class MapOverlay extends GuiScreen {
 			options.handleMouseInput();
 			//return;
 		}
+		
+		if(chat!=null && !chat.hidden) {
+			chat.handleMouseInput();
+			//return;
+		}
 
 		mx = (Mouse.getEventX() * width) / mc.displayWidth;
 		my = height - (Mouse.getEventY() * height) / mc.displayHeight - 1;
@@ -353,6 +367,10 @@ public class MapOverlay extends GuiScreen {
 	{
 		if(options!=null) {
 			//return;
+		}
+		
+		if(chat!=null && !chat.hidden) {
+			chat.mouseClicked(mouseX, mouseY, mouseButton);
 		}
 		
 		super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -452,14 +470,17 @@ public class MapOverlay extends GuiScreen {
 	@Override
 	protected void keyTyped(char c, int i)
 	{		
+		if(chat!=null && !chat.hidden) {
+			chat.keyTyped(c, i);
+			return;
+		}
+		
 		switch(i) {
-			case Keyboard.KEY_ESCAPE : {
-				
+			case Keyboard.KEY_ESCAPE : {				
 				if(options!=null) {
 					options.close();
 					break;
-				}
-				
+				}		
 				close();
 				break;
 			}
@@ -474,36 +495,51 @@ public class MapOverlay extends GuiScreen {
 			case Keyboard.KEY_MINUS : {
 				zoomOut();
 				break;
-			}
-			case Keyboard.KEY_E : {
-				close();
-				mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
-				break;
-			}
-			case Keyboard.KEY_W : {
-				moveCanvas(i);
-				break;
-			}
-			case Keyboard.KEY_A : {
-				moveCanvas(i);
-				break;
-			}
-			case Keyboard.KEY_S : {
-				moveCanvas(i);
-				break;
-			}
-			case Keyboard.KEY_D : {
-				moveCanvas(i);
-				break;
-			}
-			case Keyboard.KEY_SLASH : {
-				if(mc.isSingleplayer()==false) {
-					close();
-					mc.displayGuiScreen(new GuiChat());
-				}
-				break;
-			}
+			}		
 		}		
+		
+		// North
+		if(i==mc.gameSettings.keyBindForward.keyCode) {
+			moveCanvas(0,-16);
+			return;
+		}
+		
+		// West
+		if(i==mc.gameSettings.keyBindLeft.keyCode) {
+			moveCanvas(-16, 0);
+			return;
+		}
+		
+		// South
+		if(i==mc.gameSettings.keyBindBack.keyCode) {
+			moveCanvas(0,16);
+			return;
+		}
+		
+		// East
+		if(i==mc.gameSettings.keyBindRight.keyCode) {
+			moveCanvas(16, 0);
+			return;
+		}
+		
+		// Open inventory
+		if(i==mc.gameSettings.keyBindInventory.keyCode) {
+			close();
+			mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
+			return;
+		}
+		
+		// Open chat
+		if(i==mc.gameSettings.keyBindChat.keyCode) {
+			openChat("");
+			return;
+		}
+		
+		// Open chat with command prefix (Minecraft.java does this in runTick() )
+		if(i==mc.gameSettings.keyBindCommand.keyCode) {
+			openChat("/");
+			return;
+		}
 	}
 
 	@Override
@@ -513,6 +549,10 @@ public class MapOverlay extends GuiScreen {
 		if(options!=null) {
 			options.updateScreen();
 			return;
+		}
+		
+		if(chat!=null) {
+			chat.updateScreen();
 		}
 		
 		layoutButtons();
@@ -574,10 +614,8 @@ public class MapOverlay extends GuiScreen {
 			xOffset = mouseDragX*blockSize;
 			yOffset = mouseDragY*blockSize;
 
-		} else if(isRefreshReady()) {
-			
+		} else if(isRefreshReady()) {						
 			refreshState();			
-			
 		}
 			
 		if(coreRenderer!=null) {
@@ -612,7 +650,7 @@ public class MapOverlay extends GuiScreen {
 		// Check player status
 		EntityClientPlayerMP player = mc.thePlayer;
 		if (player==null) {
-			JourneyMap.getLogger().warning("Could not get player"); //$NON-NLS-1$
+			logger.warning("Could not get player"); //$NON-NLS-1$
 			return;
 		}
 		
@@ -741,7 +779,7 @@ public class MapOverlay extends GuiScreen {
 			coreRenderer.updateTextures(state.getMapType(), state.getVSlice());
 			coreRenderer.setZoom(currentZoom);
 		} catch(Exception e) {
-			JourneyMap.getLogger().severe(LogFormatter.toString(e));
+			logger.severe(LogFormatter.toString(e));
 		}
 	}
 
@@ -773,27 +811,34 @@ public class MapOverlay extends GuiScreen {
 				} catch (Throwable t) {	
 					String error = Constants.getMessageJMERR18(t.getMessage());
 					JourneyMap.getInstance().announce(error, Level.SEVERE);
-					JourneyMap.getLogger().severe(LogFormatter.toString(t));					
+					logger.severe(LogFormatter.toString(t));					
 					return;
 				}
 			}			
 		}, 0, TimeUnit.MILLISECONDS);		
 
 	}
+	
+	void openChat(String defaultText) {
+		if(chat!=null) {			
+			chat.inputField.setText(defaultText);
+			chat.hidden = false;
+		} else {
+	        chat = new MapChat(this, defaultText, false);
+	        chat.setWorldAndResolution(mc, width, height);
+		}
+	}
 
 	void close() {
 		if(coreRenderer!=null) {
 			//tiles.clear();
 		}		
+		if(chat!=null) {
+			chat.close();
+		}
 		mc.displayGuiScreen(null);
 		mc.setIngameFocus();
 	}
-	
-    @Override
-	public void initGui()
-    {
-        Keyboard.enableRepeatEvents(true);
-    }
     
 	@Override
 	public void onGuiClosed()
@@ -809,27 +854,8 @@ public class MapOverlay extends GuiScreen {
 		}
 	}
 
-	void moveCanvas(int dir){
-		ChunkCoordIntPair old;
-		switch(dir){		
-			case Keyboard.KEY_A:
-				coreRenderer.move(-16, 0);
-				//System.out.println("Pan west");
-				break;
-			case Keyboard.KEY_D:
-				coreRenderer.move(16, 0);
-				//System.out.println("Pan east");
-				break;
-			case Keyboard.KEY_W:
-				coreRenderer.move(0,-16);
-				//System.out.println("Pan north");
-				break;
-			case Keyboard.KEY_S:
-				coreRenderer.move(0,16);
-				//System.out.println("Pan south");
-				break;
-		}
-	
+	void moveCanvas(int deltaBlockX, int deltaBlockz){
+		coreRenderer.move(deltaBlockX, deltaBlockz);
 		setFollow(false);
 		refreshState();
 	}
@@ -841,24 +867,24 @@ public class MapOverlay extends GuiScreen {
 		}
 	}
 
-	protected static void launchLocalhost() {
+	protected void launchLocalhost() {
 		String port = PropertyManager.getInstance().getString(PropertyManager.Key.WEBSERVER_PORT);
 		String url = "http://localhost:" + port; //$NON-NLS-1$
 		try {
 			java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
 		} catch (IOException e) {
-			JourneyMap.getLogger().log(Level.SEVERE, "Could not launch browser with URL: " + url, e); //$NON-NLS-1$
-			JourneyMap.getLogger().severe(LogFormatter.toString(e));
+			logger.log(Level.SEVERE, "Could not launch browser with URL: " + url, e); //$NON-NLS-1$
+			logger.severe(LogFormatter.toString(e));
 		}
 	}
 
-	protected static void launchWebsite() {
+	protected void launchWebsite() {
 		String url = JourneyMap.WEBSITE_URL;
 		try {
 			java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
 		} catch (Throwable e) {
-			JourneyMap.getLogger().log(Level.SEVERE, "Could not launch browser with URL: " + url, e); //$NON-NLS-1$
-			JourneyMap.getLogger().severe(LogFormatter.toString(e));
+			logger.log(Level.SEVERE, "Could not launch browser with URL: " + url, e); //$NON-NLS-1$
+			logger.severe(LogFormatter.toString(e));
 		}
 	}
 	
@@ -868,7 +894,7 @@ public class MapOverlay extends GuiScreen {
 				options = new MapOverlayOptions(this);
 				options.setWorldAndResolution(this.mc, width, height);
 			} catch (Throwable t) {
-				JourneyMap.getLogger().severe("Couldn't init Map options: " + LogFormatter.toString(t));
+				logger.severe("Couldn't init Map options: " + LogFormatter.toString(t));
 				options = null;
 			}
 		}

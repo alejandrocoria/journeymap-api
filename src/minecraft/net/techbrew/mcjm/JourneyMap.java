@@ -374,7 +374,7 @@ public class JourneyMap {
 		if(keybinding.keyCode==keybinding.keyCode) {
 			if(minecraft.currentScreen==null) {
 				try {
-					minecraft.displayGuiScreen(new MapOverlay(this));
+					minecraft.displayGuiScreen(new MapOverlay());
 					keybinding.unPressAllKeys();
 				} catch(Throwable e) {
 					logger.log(Level.SEVERE, "Unexpected exception in MapOverlay constructor: " + e); //$NON-NLS-1$

@@ -218,11 +218,11 @@ public class MapOverlayOptions extends GuiScreen {
 				break;
 			}
 			case 8: { // alert
-				MapOverlay.launchWebsite();
+				map.launchWebsite();
 				break;
 			}
 			case 9: { // browser
-				MapOverlay.launchLocalhost();
+				map.launchLocalhost();
 				break;
 			}
 			case 10: { // monsters
