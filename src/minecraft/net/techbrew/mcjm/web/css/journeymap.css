@@ -66,6 +66,16 @@ label span {
 	margin: 0px;
 }
 
+
+#jm-rt-menus {
+	display: inline;
+	position: relative;
+}
+
+#jm-rt-menus div {
+    display: inline;
+}
+
 #jm-menu {
 	padding: 5px;
 }
@@ -226,6 +236,12 @@ label span {
     border-radius: 6px;
     border-radius: 6px;
 
+}
+
+.message {
+    font-size: 14px !important;
+    text-align: center;
+    cursor: pointer;
 }
 
 .dialog {
