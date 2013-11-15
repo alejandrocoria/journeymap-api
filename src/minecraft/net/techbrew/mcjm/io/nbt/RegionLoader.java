@@ -17,6 +17,7 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.RegionImageHandler;
+import net.techbrew.mcjm.model.ChunkCoord;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
 
@@ -104,6 +105,13 @@ public class RegionLoader {
 		if (stack.isEmpty() && (validFileCount!=existingImageCount)) {
 	    	logger.warning("Anvil region files in " + regionDir + ": " + validFileCount + ", matching image files: " + existingImageCount + ", but found nothing to do for mapType " + mapType);
 	    }
+		
+		// Add player's current region
+		ChunkCoord cc = ChunkCoord.fromChunkPos(jmImageWorldDir, mc.thePlayer.chunkCoordX, vSlice, mc.thePlayer.chunkCoordZ, dimension);
+		RegionCoord rc = cc.getRegionCoord();
+		if(!stack.contains(rc)) {
+			stack.add(rc);
+		}
 		
 		Collections.sort(stack);
 		return stack;

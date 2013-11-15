@@ -73,7 +73,7 @@ public class MapSaver {
 			}
 	
 			if(minX==null || maxX==null || minZ==null ||maxZ==null ) {
-				JourneyMap.getLogger().warning("No region files to save.");
+				JourneyMap.getLogger().warning("No region files to save in " + imageDir);
 				return null;
 			}
 			
