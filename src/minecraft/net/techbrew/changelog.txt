@@ -1,4 +1,4 @@
-JourneyMap 3.0.0 for Minecraft 1.7.2 (??, 2013)
+JourneyMap 3.0.0 for Minecraft 1.7.2 (November 14, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -12,6 +12,7 @@ Requirements:
 - Forge "Recommended-1.7.2" or ModLoader 1.7.2
 
 Changes in JourneyMap 3.0.0 for Minecraft 1.7.2:
+- In-game UI completely re-written to be much faster, zoom out further, and have no texture distortions.
 - New feature: The web map is now powered by Google Maps and has a new look
 - New feature: Auto-mapping entire single-player worlds
 - New feature: Saved map files now show the chunk grid (if enabled)
