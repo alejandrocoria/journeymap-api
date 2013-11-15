@@ -78,6 +78,9 @@ var JourneyMap = (function() {
 		'</div>'
 	].join('');	
 	
+	var messageTemplate = '<div class="message"></div>';
+	
+	
 	var errorDialog = null;
 	var splashDialog = null;
 	var debug = false;
@@ -280,10 +283,12 @@ var JourneyMap = (function() {
 			var menu = $("#jm-options-menu");
 			if ( $(menu).is(':visible') ) {
 				menu.hide();
-			} else {
-				var button = $("#jm-options-button");
-				var x = $('#map-canvas').width() - button.offset().left - button.width();
-				menu.css('margin-right', x + "px");
+			} else {		
+				if(JM.world.hardcore===true && JM.world.singlePlayer===false) {
+					$(".nohardcore").addClass('ui-state-disabled').find('input').attr('disabled', 'disabled');
+				} else {
+					$(".nohardcore").removeClass('ui-state-disabled').find('input').removeAttr('disabled');
+				}
 				menu.show();
 				$( document ).one( "click", function() { menu.hide(); });
 			}			
@@ -371,7 +376,7 @@ var JourneyMap = (function() {
 		
 		// Actions Menu Button
 		$("#jm-actions-menu").menu().hide();
-		$("#jm-options-button").attr("title", getMessage('actions_title'));
+		$("#jm-actions-button").attr("title", getMessage('actions_title'));
 		$("#jm-actions-button").button({
 			icons: {
 				secondary: "ui-icon-triangle-1-s"
@@ -382,9 +387,11 @@ var JourneyMap = (function() {
 			if ( $(menu).is(':visible') ) {
 				menu.hide();
 			} else {
-				var button = $("#jm-actions-button");
-				var x = $('#map-canvas').width() - button.offset().left - button.width();
-				menu.css('margin-right', x + "px");
+				if(JM.world.singlePlayer===true) {
+					$("#autoMapButton").removeClass('ui-state-disabled');
+				} else {
+					$("#autoMapButton").addClass('ui-state-disabled');
+				}
 				menu.show();
 				$( document ).one( "click", function() { menu.hide(); });
 			}
@@ -399,9 +406,13 @@ var JourneyMap = (function() {
 		
 		// Automap button
 		$("#autoMapButton").attr("title", getMessage('automap_title')).click(function() {
-			
+			if(JM.world.singlePlayer===true) {
+				startAutoMap();
+			} else {
+				return false;
+			}
 		});
-		$("#autoMapButtonText").html(getMessage('automap_text'));
+		$("#autoMapButtonText").html(getMessage('automap_text'));				
 		
 		// World info
 		$("#worldInfo").hide();
@@ -491,10 +502,7 @@ var JourneyMap = (function() {
 		map.controls[google.maps.ControlPosition.TOP_LEFT].push($('#jm-logo')[0]);
 		map.controls[google.maps.ControlPosition.TOP_LEFT].push($('#jm-toolbar')[0]);
 		map.controls[google.maps.ControlPosition.TOP_LEFT].push($('#jm-toggles')[0]);			
-		map.controls[google.maps.ControlPosition.TOP_RIGHT].push($('#jm-options')[0]);
-		map.controls[google.maps.ControlPosition.TOP_RIGHT].push($('#jm-actions')[0]);	
-		map.controls[google.maps.ControlPosition.RIGHT_TOP].push($('#jm-actions-menu')[0]);
-		map.controls[google.maps.ControlPosition.RIGHT_TOP].push($('#jm-options-menu')[0]);		
+		map.controls[google.maps.ControlPosition.TOP_RIGHT].push($('#jm-rt-menus')[0]);	
 		map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push($('#worldInfo')[0]);
 					
 		google.maps.event.addListener(map, 'click', function(event) {
@@ -520,18 +528,24 @@ var JourneyMap = (function() {
 		setCenterOnPlayer(true);
 		
 		// Show update button
-		if (JM.game.latest_journeymap_version > JM.game.jm_version) {
-			var text = getMessage('update_button_title');
-			text = text.replace("{0}", JM.game.latest_journeymap_version);
-			text = text.replace("{1}", JM.game.mc_version);
-			$("#jm-update-button").button()
-				.attr("title", text)
-				.click(function(e){
+		if (JM.game.latest_journeymap_version > JM.game.jm_version) {		
+			window.setTimeout(function(){
+				var text = getMessage('update_button_title');
+				text = text.replace("{0}", JM.game.latest_journeymap_version);
+				text = text.replace("{1}", JM.game.mc_version);
+				var onClickFn = function(e){
 					var url = $('#webLink')[0].href;
 					window.open(url, '_new', '');
-			});
-			
-			map.controls[google.maps.ControlPosition.TOP_CENTER].push($('#jm-alerts')[0]);
+				};
+				$("#jm-update-button").button()
+					.attr("title", text)
+					.click(onClickFn);
+				
+				map.controls[google.maps.ControlPosition.TOP_CENTER].push($('#jm-alerts')[0]);
+				
+				showInfoMessage(text, 2500, onClickFn);
+				
+			}, 3000);
 		}
 
 	}
@@ -540,8 +554,46 @@ var JourneyMap = (function() {
 	 * Invoke saving map file
 	 */
 	var saveMapImage = function() {
-
-		alert("TODO");
+		window.open('/action?type=savemap' + getMapStateUrl(),'_new');
+	}
+	
+	/**
+	 * Invoke starting auto-map
+	 */
+	var startAutoMap = function() {
+		$.ajax({
+			  type: "POST",
+			  url: "/action?type=automap",
+		}).fail(function(data, error, jqXHR){
+			if (debug)
+				console.log(">>> postPreference failed: " + JSON.stringify(data));
+			var msg = 'Error: ' + JSON.stringify(data);
+			$('#jm-actions-button').tooltip({ content: msg, hide: { effect: "explode", delay: 5000 } });
+		}).success(function(){
+			var msg = getMessage('automap_started');
+			showInfoMessage(msg, 2000);
+		});	
+	}
+	
+	var showInfoMessage = function(msg, duration, callback) {
+		
+		var message = $(messageTemplate).dialog({ modal: false });
+		
+		var closeFn = function(){
+			$(message).remove();
+			message = null;
+		}
+		
+		$(message).css('z-index', google.maps.Marker.MAX_ZINDEX + 1)
+			   .css('min-height', '20px')
+			   .html(msg)
+			   .click(function(){
+				   if(callback) callback();
+				   closeFn();
+			   })
+			   .parent().find('.ui-dialog-titlebar').remove();
+		
+		$(message).parent().delay(2000).fadeOut(1500, closeFn);
 	}
 
 	function setMapType(mapType) {
@@ -655,7 +707,7 @@ var JourneyMap = (function() {
 			// Update UI elements
 			$("#worldName").html(unescape(JM.world.name).replace("\\+", " "));
 			$("#worldTime").html(currentTime);
-			$("#worldInfo").show();
+			$("#worldInfo").show();					
 
 			// Set map type based on time
 			if (playerOverrideMap != true) {
@@ -709,7 +761,6 @@ var JourneyMap = (function() {
 	}
 
 	
-
 	/**
 	 * Force immediate update
 	 */
@@ -776,7 +827,7 @@ var JourneyMap = (function() {
 		// Clear the timer
 		clearTimer();
 
-		console.log("Server returned error: " + data.status + ": " + jqXHR);
+		if(console && console.log) console.log("Server returned error: " + JSON.stringify(data));
 
 		// Move nav components back to holder
 		$(".nav").appendTo( $("#nav-holder") );
@@ -808,8 +859,8 @@ var JourneyMap = (function() {
 			halted = true;
 			if (debug)
 				console.log(">>> " + "Will re-check game state in 5 seconds.");
+			
 			setTimeout(function() {
-
 				halted = false;
 
 				if (!JM.messages) {
@@ -992,9 +1043,11 @@ var JourneyMap = (function() {
 		
 		if(map.getZoom()===0) return;
 		
+		var isNotHardcore = (JM.world.hardcore===false);
+		
 		// Mobs
 		removeObsoleteMarkers(JM.mobs, markers.mobs);		
-		if (showMobs === true && JM.mobs) {
+		if (isNotHardcore && showMobs === true && JM.mobs) {
 			$.each(JM.mobs, function(index, mob) {
 				updateEntityMarker(mob,markers.mobs);
 			});
@@ -1002,7 +1055,7 @@ var JourneyMap = (function() {
 
 		// Animals
 		removeObsoleteMarkers(JM.animals, markers.animals);	
-		if ((showAnimals === true || showPets === true) && JM.animals) {
+		if (isNotHardcore && (showAnimals === true || showPets === true) && JM.animals) {
 			$.each(JM.animals, function(index, mob) {
 				updateEntityMarker(mob,markers.animals);
 			});
@@ -1010,7 +1063,7 @@ var JourneyMap = (function() {
 
 		// Villagers
 		removeObsoleteMarkers(JM.villagers, markers.villagers);	
-		if (showVillagers === true && JM.villagers) {
+		if (isNotHardcore && showVillagers === true && JM.villagers) {
 			$.each(JM.villagers, function(index, mob) {
 				updateEntityMarker(mob,markers.villagers);
 			});
@@ -1253,6 +1306,13 @@ var JourneyMap = (function() {
 		}
 	}
 	
+	var getMapStateUrl = function() {
+		var mapType = (playerUnderground === true && showCaves === true) ? "underground" : (isNightMap === true ? "night" : "day");
+		var dimension = (JM.player.dimension);
+		var depth = (JM.player && JM.player.chunkCoordY != undefined) ? JM.player.chunkCoordY : 4;
+		return "&mapType=" + mapType + "&dim=" + dimension + "&depth=" + depth + "&ts=" + lastImageCheck;
+	}
+	
 	var rgbToHex = function(r, g, b) {
 	    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 	}
@@ -1315,14 +1375,7 @@ var JourneyMap = (function() {
 		this.minZoom = MapConfig.minZoom;
 		this.maxZoom = MapConfig.maxZoom;
 		//this.isPng = true;
-	};
-	
-	MCMapType.prototype.getTileState = function() {
-		var mapType = (playerUnderground === true && showCaves === true) ? "underground" : (isNightMap === true ? "night" : "day");
-		var dimension = (JM.player.dimension);
-		var depth = (JM.player && JM.player.chunkCoordY != undefined) ? JM.player.chunkCoordY : 4;
-		return "&mapType=" + mapType + "&dim=" + dimension + "&depth=" + depth + "&ts=" + lastImageCheck;
-	}
+	};	
 	
 	// Adapted from http://code.martinpearman.co.uk/deleteme/MyOverlayMap.js
 	MCMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
@@ -1348,7 +1401,7 @@ var JourneyMap = (function() {
 		}
 		
 		var img = $('<img>')
-			.attr('src', tileUrl += me.getTileState());
+			.attr('src', tileUrl += getMapStateUrl());
 		
 		if(img.width()>0) {
 			$(tile).prepend(img);
@@ -1375,7 +1428,7 @@ var JourneyMap = (function() {
 		
 		var tileData = me.loadedTiles[$(tile).data('tileid')];
 		if(tileData) {
-			var url = tileData.tileUrl + me.getTileState();			
+			var url = tileData.tileUrl + getMapStateUrl();			
 			$(tile).find('img').attr('src', url);
 		}
 	}
