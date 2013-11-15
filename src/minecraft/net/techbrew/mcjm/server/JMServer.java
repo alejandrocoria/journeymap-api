@@ -48,9 +48,8 @@ public class JMServer {
 		
 		rupy.add(new DataService());
 		rupy.add(new LogService());
-		rupy.add(new MapService());
 		rupy.add(new TileService());
-		rupy.add(new SaveMapService()); 
+		rupy.add(new ActionService()); 
 		rupy.add(new FileService());
 		rupy.add(new PropertyService());
 		
