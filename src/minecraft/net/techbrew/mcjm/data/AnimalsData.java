@@ -13,6 +13,7 @@ import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.EntityTameable;
 import net.minecraft.src.IAnimals;
 import net.minecraft.src.Minecraft;
+import net.minecraft.src.StringUtils;
 import net.techbrew.mcjm.model.EntityHelper;
 
 /**
@@ -99,7 +100,7 @@ public class AnimalsData implements IDataProvider {
 			
 			// CustomName
 			if(entity.hasCustomNameTag()) {
-				eProps.put(EntityKey.customName, entity.getCustomNameTag()); 
+				eProps.put(EntityKey.customName, StringUtils.stripControlCodes(entity.getCustomNameTag())); 
 			}
 						
 			list.add(eProps);

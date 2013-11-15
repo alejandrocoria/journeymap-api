@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.EntityVillager;
 import net.minecraft.src.Minecraft;
+import net.minecraft.src.StringUtils;
 import net.techbrew.mcjm.model.EntityHelper;
 
 /**
@@ -62,7 +63,7 @@ public class VillagersData implements IDataProvider {
 			
 			// CustomName
 			if(entity.hasCustomNameTag()) {
-				eProps.put(EntityKey.customName, entity.getCustomNameTag()); 
+				eProps.put(EntityKey.customName, StringUtils.stripControlCodes(entity.getCustomNameTag())); 
 			}
 						
 			list.add(eProps);
