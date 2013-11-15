@@ -2,8 +2,13 @@ package net.techbrew.mcjm.io;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
@@ -38,12 +43,46 @@ public class FileHandler {
 		return null;
 	}
 	
-	public static File getMCWorldDir(Minecraft minecraft, int dimension) {
+	public static File getMCWorldDir(Minecraft minecraft, final int dimension) {
 		File worldDir = getMCWorldDir(minecraft);
 		if(dimension==0) {
 			return worldDir;
 		} else {
-			return new File(worldDir, "DIM"+dimension); //$NON-NLS-1$
+			final String dimString = Integer.toString(dimension);
+			File dimDir = null;
+			
+			// Normal dimensions handled this way
+			if(dimension==-1 || dimension==1) {			
+				dimDir = new File(worldDir, "DIM"+dimString); //$NON-NLS-1$
+			}
+			
+			// Custom dimensions handled this way
+			// TODO: Use Forge dimensionhandler to get directory name.  This is a brittle workaround.
+			if(dimDir==null || !dimDir.exists()) {
+				File[] dims = worldDir.listFiles(new FilenameFilter() {
+					@Override
+					public boolean accept(File dir, String name) {
+						return name.startsWith("DIM") && name.endsWith(dimString) && !name.endsWith("-"+dimString); // this last part prevents negative matches, but may nerf a dumb naming scheme
+					}					
+				});
+				
+				if(dims.length==0) {
+					dimDir = dims[0];
+				} else {
+					// 7 might match DIM7 and DIM17.  Sort and return shortest filename.
+					List<File> list = Arrays.asList(dims);
+					Collections.sort(list, new Comparator<File>() {
+						@Override
+						public int compare(File o1, File o2) {
+							// TODO Auto-generated method stub
+							return new Integer(o1.getName().length()).compareTo(o2.getName().length());
+						}						
+					});
+					return list.get(0);
+				}
+			}
+			
+			return dimDir;
 		}
 	}
 	
