@@ -29,6 +29,7 @@ import net.techbrew.mcjm.io.nbt.ChunkLoader;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.server.JMServer;
 import net.techbrew.mcjm.task.ITaskManager;
@@ -195,10 +196,12 @@ public class JourneyMap {
      */
     private void startMapping(Minecraft minecraft) {
     	synchronized(this) {
-	    	DataCache.instance().purge();	   
+    		MapOverlay.reset();
+    		EntityHelper.clearCaches();
+	    	DataCache.instance().purge();   
 
 	    	if(taskExecutor==null || taskExecutor.isShutdown()) {			    		
-				taskExecutor = Executors.newScheduledThreadPool(1, new JMThreadFactory("maptask")); //$NON-NLS-1$				
+				taskExecutor = Executors.newScheduledThreadPool(1, new JMThreadFactory("task")); //$NON-NLS-1$				
 			} else {
 				logger.severe("TaskExecutor in an unexpected state.  Should be null or shutdown.");
 			}
@@ -208,8 +211,7 @@ public class JourneyMap {
 	    	
 	    	logger.info("Mapping started: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$	
 	    		    	
-    	}
-    	MapOverlay.reset();
+    	}    	
 		if(enableAnnounceMod) announceMod();
     }
     

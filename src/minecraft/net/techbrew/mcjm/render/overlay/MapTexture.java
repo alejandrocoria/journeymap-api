@@ -18,9 +18,17 @@ public class MapTexture extends AbstractTexture
 
     /** height of this icon in pixels */
     public final int height;
-
-    public MapTexture(BufferedImage image)
+    
+    /** optionally-retained image **/
+    public BufferedImage image;
+    
+    public MapTexture(BufferedImage image) {
+    	this(image, false);
+    }
+    
+    public MapTexture(BufferedImage image, boolean retainImage)
     {    	
+    	if(retainImage) this.image = image;
     	this.width = image.getWidth();
         this.height = image.getHeight();
         this.dynamicTextureData = new int[width * height];
@@ -36,10 +44,21 @@ public class MapTexture extends AbstractTexture
     	image.getRGB(0, 0, width, height, this.dynamicTextureData, 0, width);
         TextureUtil.uploadTexture(getGlTextureId(), dynamicTextureData, width, height);
     }
+    
+    public boolean hasImage() {
+    	return image!=null;
+    }
+    
+    public BufferedImage getImage() {
+    	return image;
+    }
 
 	public void clear() {
 		if(this.glTextureId!=-1) {
 			GL11.glDeleteTextures(this.getGlTextureId());
+		}
+		if(this.image!=null) {
+			this.image = null;
 		}
 	}
 

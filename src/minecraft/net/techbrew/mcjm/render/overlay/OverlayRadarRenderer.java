@@ -82,7 +82,7 @@ public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
 				if(pixel!=null) {						
 					filename = (String) critter.get(EntityKey.filename);
 					heading = (Double) critter.get(EntityKey.heading);					
-					isPlayer = EntityHelper.PLAYER_FILENAME.equals(filename);
+					isPlayer = filename.startsWith("/skin/");
 
 					// Determine and draw locator
 					if(isHostile) {
@@ -95,12 +95,17 @@ public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
 						locatorImg = EntityHelper.getNeutralLocator();
 					}			
 					
-					drawStepList.add(new DrawEntityStep(pixel, heading, false, locatorImg));
+					drawStepList.add(new DrawEntityStep(pixel, heading, false, locatorImg, 8));
 					
 					// Draw entity image
-					entityIcon = EntityHelper.getEntityImage(filename);
+					if(isPlayer) {
+						entityIcon = EntityHelper.getPlayerSkin((String) critter.get(EntityKey.username));
+					} else {
+						entityIcon = EntityHelper.getEntityImage(filename);
+					}
 					if(entityIcon!=null) {
-						drawStepList.add(new DrawEntityStep(pixel, heading, true, entityIcon));
+						int bottomMargin = isPlayer ? 0 : 8;
+						drawStepList.add(new DrawEntityStep(pixel, heading, true, entityIcon, bottomMargin));
 					}
 					
 					if(isPlayer) {

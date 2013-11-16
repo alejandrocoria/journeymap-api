@@ -732,7 +732,7 @@ public class MapOverlay extends GuiScreen {
 				}
 			}
 			
-			if(!mc.isSingleplayer() && showPlayers) {
+			if(showPlayers) {
 				Map map = (Map) DataCache.instance().get(PlayersData.class).get(EntityKey.root);
 				critters.addAll(map.values());
 			}
@@ -754,7 +754,7 @@ public class MapOverlay extends GuiScreen {
 		// Draw player if within bounds
 		Point playerPixel = coreRenderer.getPixel((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ);
 		if(playerPixel!=null) {
-			drawStepList.add(new DrawEntityStep(playerPixel, EntityHelper.getHeading(mc.thePlayer), false, EntityHelper.getPlayerImage()));				
+			drawStepList.add(new DrawEntityStep(playerPixel, EntityHelper.getHeading(mc.thePlayer), false, EntityHelper.getPlayerImage(), 8));				
 		}			
 		
 		// Update player pos

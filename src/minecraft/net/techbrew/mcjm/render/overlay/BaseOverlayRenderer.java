@@ -178,7 +178,7 @@ public abstract class BaseOverlayRenderer<K> {
 	 * @param entityIcon
 	 * @param overlayImg
 	 */
-	private static void drawEntity(int x, int y, Double heading, boolean flipInsteadOfRotate, MapTexture texture) {
+	private static void drawEntity(int x, int y, Double heading, boolean flipInsteadOfRotate, MapTexture texture, int bottomMargin) {
 
 		if(heading==null) {
 			drawImage(texture, x, y, false);
@@ -186,7 +186,7 @@ public abstract class BaseOverlayRenderer<K> {
 			drawRotatedImage(texture, x, y, heading.floatValue());
 		} else {
 			boolean flip = heading<90;
-			drawImage(texture, x-(texture.width/2), y-(texture.height/2)-8, flip);			
+			drawImage(texture, x-(texture.width/2), y-(texture.height/2)-bottomMargin, flip);			
 		}			
 	}
 	
@@ -211,18 +211,20 @@ public abstract class BaseOverlayRenderer<K> {
 		final Double heading;
 		final boolean flip;
 		final MapTexture texture;
+		final int bottomMargin;
 		
-		public DrawEntityStep(Point pixel, Double heading, boolean flip, MapTexture texture) {
+		public DrawEntityStep(Point pixel, Double heading, boolean flip, MapTexture texture, int bottomMargin) {
 			super();
 			this.pixel = pixel;
 			this.heading = heading;
 			this.flip = flip;
 			this.texture = texture;
+			this.bottomMargin = bottomMargin;
 		}
 
 		@Override
 		public void draw(int xOffset, int yOffset) {
-			drawEntity(pixel.x + xOffset, pixel.y + yOffset, heading, flip, texture);
+			drawEntity(pixel.x + xOffset, pixel.y + yOffset, heading, flip, texture, bottomMargin);
 		}		
 	}
 	

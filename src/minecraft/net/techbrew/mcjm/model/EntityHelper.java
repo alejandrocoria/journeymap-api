@@ -1,12 +1,17 @@
 package net.techbrew.mcjm.model;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.Entity;
@@ -28,9 +33,11 @@ import net.minecraft.src.RenderHorse;
 import net.minecraft.src.RenderLiving;
 import net.minecraft.src.RenderManager;
 import net.minecraft.src.ResourceLocation;
+import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.render.overlay.MapTexture;
 
 public class EntityHelper {
@@ -40,10 +47,12 @@ public class EntityHelper {
 	private static final double PI2 = 2*Math.PI;
 	
 	// TODO: make threadsafe
-	static MapTexture locatorHostile, locatorNeutral, locatorOther, locatorPet, locatorPlayer;
+	static MapTexture locatorHostile, locatorNeutral, locatorOther, locatorPet, locatorPlayer, unknownImage;
 	
 	// TODO: make threadsafe
-	static HashMap<String, MapTexture> entityImageMap = new HashMap<String, MapTexture>();
+	static volatile HashMap<String, MapTexture> entityImageMap = new HashMap<String, MapTexture>();
+	
+	static volatile Map<String, MapTexture> skinImageMap = Collections.synchronizedMap(new HashMap<String, MapTexture>());
 	
 	static Method renderGetEntityTextureMethod;
 
@@ -105,8 +114,7 @@ public class EntityHelper {
 	private static AxisAlignedBB getBB(EntityPlayerSP player) {
 		return AxisAlignedBB.getBoundingBox(player.posX, player.posY, player.posZ, player.posX, player.posY, player.posZ).expand(lateralDistance, verticalDistance, lateralDistance);
 	}
-	
-		
+			
 	/**
 	 * TODO: Not threadsafe
 	 * @return
@@ -116,12 +124,47 @@ public class EntityHelper {
 		if(tex==null) {
 			BufferedImage img = FileHandler.getWebImage("entity/" + filename);	//$NON-NLS-1$ //$NON-NLS-2$
 			if(img==null) {				
-				img = getUnknownImage(); // fall back to unknown image
-			}		
-			tex = new MapTexture(img);
+				tex = getUnknownImage();
+			} else {	
+				tex = new MapTexture(img);
+			}
 			entityImageMap.put(filename, tex);
 		}
 		return tex;
+	}
+	
+	public static MapTexture getPlayerSkin(String username) {
+		
+		synchronized(skinImageMap) {
+			MapTexture tex = skinImageMap.get(username);
+			if(tex==null) {				
+				BufferedImage img = null;
+				try {
+					URL url = new URL("http://s3.amazonaws.com/MinecraftSkins/" + username + ".png");
+					img = ImageIO.read(url).getSubimage(8, 8, 8, 8);
+					
+				} catch (Throwable e) {
+					try {
+						URL url = new URL("http://s3.amazonaws.com/MinecraftSkins/char.png");
+						img = ImageIO.read(url).getSubimage(8, 8, 8, 8);
+					} catch (Throwable e2) {
+						JourneyMap.getLogger().warning("Can't get skin image for " + username + ": " + e2.getMessage());
+					}
+				}
+				
+				if(img!=null) {			
+					final BufferedImage scaledImage = new BufferedImage(24, 24, img.getType());
+					final Graphics2D g = RegionImageHandler.initRenderingHints(scaledImage.createGraphics());
+					g.drawImage(img, 0, 0, 24, 24, null);
+					g.dispose();
+					tex = new MapTexture(scaledImage, true);
+				} else {
+					tex = getUnknownImage();
+				}
+				skinImageMap.put(username, tex);
+			}
+			return tex;
+		}			
 	}
 
 	
@@ -186,11 +229,13 @@ public class EntityHelper {
 	}
 	
 	/**
-	 * TODO: Not threadsafe
 	 * @return
 	 */
-	public static BufferedImage getUnknownImage() {
-		return FileHandler.getWebImage("entity/unknown.png");
+	public static synchronized MapTexture getUnknownImage() {
+		if(unknownImage==null) {
+			unknownImage = new MapTexture(FileHandler.getWebImage("entity/unknown.png"), true);
+		}
+		return unknownImage;
 	}
 	
 	
@@ -284,5 +329,10 @@ public class EntityHelper {
 			return o1rank.compareTo(o2rank);
 		}
 		
+	}
+	
+	public static void clearCaches() {
+		entityImageMap.clear();
+		skinImageMap.clear();
 	}
 }

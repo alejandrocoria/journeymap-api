@@ -1,6 +1,5 @@
 package net.techbrew.mcjm.server;
 
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -20,12 +19,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
-import javax.imageio.ImageIO;
-
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.EntityHelper;
+import net.techbrew.mcjm.render.overlay.MapTexture;
 import se.rupy.http.Event;
 
 
@@ -179,26 +177,10 @@ public class FileService extends BaseService {
 		
 		ResponseHeader.on(event).contentType(ContentType.png);
 		
-		BufferedImage img = null;
-		try {
-			URL url = new URL("http://s3.amazonaws.com/MinecraftSkins/" + username + ".png");
-			img = ImageIO.read(url).getSubimage(8, 8, 8, 8);
-			
-		} catch (Throwable e) {
-			try {
-				URL url = new URL("http://s3.amazonaws.com/MinecraftSkins/char.png");
-				img = ImageIO.read(url).getSubimage(8, 8, 8, 8);
-			} catch (Throwable e2) {
-				JourneyMap.getLogger().warning("Can't get skin image for " + username + ": " + e2.getMessage());
-			}
-		}
-		
+		MapTexture tex = EntityHelper.getPlayerSkin(username);
+		BufferedImage img = tex.getImage();
 		if(img!=null) {			
-			final BufferedImage scaledImage = new BufferedImage(24, 24, img.getType());
-			final Graphics2D g = RegionImageHandler.initRenderingHints(scaledImage.createGraphics());
-			g.drawImage(img, 0, 0, 24, 24, null);
-			g.dispose();
-			serveImage(event, scaledImage);
+			serveImage(event, img);
 		} else {
 			event.reply().code("404 Not Found");
 		}

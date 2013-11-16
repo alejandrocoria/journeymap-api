@@ -154,10 +154,24 @@ label span {
     text-align:center;
     white-space: nowrap;
     color:#ffffff;
-    padding:2px;
-    background-color:#020;
+    padding:3px;
+
     position:absolute;
-    margin-top:-2em;
+    margin-top:-12px;
+    
+    background-color:rgba(34,34,34,0.7);
+    display:inline-block;
+    
+    border-width:1px;
+    border-style:solid;
+    border-color:#c5c5c5;
+    
+    -webkit-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    border-radius: 6px;
 }
 
 .waypoint {
