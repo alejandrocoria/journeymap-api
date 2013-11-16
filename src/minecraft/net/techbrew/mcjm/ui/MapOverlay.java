@@ -144,8 +144,8 @@ public class MapOverlay extends GuiScreen {
 	private void drawButtonBar() {	
 		
 		// zoom buttons enabled/disabled
-		buttonZoomIn.enabled = currentZoom>minZoom;
-		buttonZoomOut.enabled = currentZoom<maxZoom;
+		buttonZoomOut.enabled = currentZoom>minZoom;
+		buttonZoomIn.enabled = currentZoom<maxZoom;
 		
 		// zoom underlay
 		if(options==null) {
