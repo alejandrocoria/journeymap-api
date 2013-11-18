@@ -37,6 +37,8 @@ public class ChunkStub {
 	
 	public boolean isEmptyChunk;
 	
+	public int flagToDiscard = 0;
+	
 	public ChunkStub(int[] heightMap, byte[] blockBiomeArray, int xPosition,
 			int zPosition, Boolean hasNoSky, long worldHash, World worldObj,
 			int[] precipitationHeightMap,
@@ -68,7 +70,7 @@ public class ChunkStub {
 		this.worldHeight = worldObj.getHeight();
 		this.doMap = doMap;
 		this.isModified = chunk.isModified;
-		this.precipitationHeightMap = chunk.precipitationHeightMap;
+		this.precipitationHeightMap = Arrays.copyOf(chunk.precipitationHeightMap, chunk.precipitationHeightMap.length);
 		this.storageArrays = new ExtendedBlockStorageStub[chunk.getBlockStorageArray().length];
 		for(int i=0;i<storageArrays.length;i++) {
 			ExtendedBlockStorage ebs = chunk.getBlockStorageArray()[i];
@@ -411,6 +413,25 @@ public class ChunkStub {
 	public String toString() {
 		return "ChunkStub [" + xPosition + ", " + zPosition //$NON-NLS-1$ //$NON-NLS-2$
 				+ ", doMap=" + doMap + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	/**
+	 * Compare storage arrays of another chunkStub at the same position.
+	 * @param other
+	 * @return
+	 */
+	public boolean blockDataEquals(ChunkStub other) {
+		if(storageArrays.length!=other.storageArrays.length) {
+			return false;
+		}
+		for(int i=0;i<storageArrays.length;i++) {
+			ExtendedBlockStorageStub ebs = storageArrays[i];
+			ExtendedBlockStorageStub otherEbs = other.storageArrays[i];
+			if(ebs==null && otherEbs!=null) return false;
+			if(ebs!=null && otherEbs==null) return false;
+			if(ebs!=null && !ebs.equals(otherEbs)) return false;
+		}
+		return true;
 	}
 	
 }

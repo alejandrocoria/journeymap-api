@@ -2,7 +2,9 @@ package net.techbrew.mcjm.task;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,13 +26,14 @@ public class MapPlayerTask extends BaseMapTask {
 	
 	private static final Logger logger = JourneyMap.getLogger();
 
+	private static Map<ChunkCoordIntPair, ChunkStub> lastChunkStubs = new HashMap<ChunkCoordIntPair, ChunkStub>();
 	private static ChunkCoordinates lastPlayerPos;
 	static Integer chunkOffset;
 	
 	private MapPlayerTask(World world, int dimension, boolean underground, Integer chunkY, Map<ChunkCoordIntPair, ChunkStub> chunkStubs) {
 		super(world, dimension, underground, chunkY, chunkStubs, false);
 	}
-	
+
 	public static BaseMapTask create(EntityPlayer player, long hash) {
 				
 		int missing = 0;
@@ -62,7 +65,7 @@ public class MapPlayerTask extends BaseMapTask {
 		
 		final File worldDir = FileHandler.getMCWorldDir(Minecraft.getMinecraft(), player.worldObj.provider.dimensionId);
  
-		// First pass = chunks to map
+		// Get chunkstubs to map
 		for(int x=min.chunkXPos;x<=max.chunkXPos;x++) {
 			for(int z=min.chunkZPos;z<=max.chunkZPos;z++) {
 				ChunkStub stub = ChunkLoader.getChunkStubFromMemory(x, z, worldDir, world, hash);
@@ -72,10 +75,42 @@ public class MapPlayerTask extends BaseMapTask {
 					missing++;
 				}
 			}
-		}				
+		}			
+		
+		int initialSize = chunks.size();
+		
+		// Remove unchanged chunkstubs from last task
+		if(!lastChunkStubs.isEmpty()) {
+			Set<ChunkCoordIntPair> removed = new HashSet<ChunkCoordIntPair>();
+			for(Map.Entry<ChunkCoordIntPair, ChunkStub> entry : lastChunkStubs.entrySet()) {
+				ChunkCoordIntPair pos = entry.getKey();
+				ChunkStub oldChunk = entry.getValue();
+				ChunkStub newChunk = chunks.get(pos);
+				if(newChunk==null) {
+					oldChunk.flagToDiscard++;
+					if(oldChunk.flagToDiscard>2) {
+						removed.add(pos);
+					}
+				} else {
+					oldChunk.flagToDiscard = 0;
+					if(newChunk.blockDataEquals(oldChunk)) {
+						chunks.remove(pos);
+					}
+				}
+				
+			}
+			for(ChunkCoordIntPair pos : removed) {
+				//logger.info("chunk flagged to be discarded: " + pos);
+				lastChunkStubs.remove(pos);
+			}
+		}
+		if(chunks.size()>0) {
+			//logger.info("chunks to map: " + chunks.size() + " out of " + initialSize);
+			lastChunkStubs.putAll(chunks);
+		}
 		
 		if(logger.isLoggable(Level.FINE)) {
-			logger.fine("Chunks: " + missing + " skipped, " + chunks.size() + " used");
+			logger.fine("Chunks: " + missing + " missing, " + chunks.size() + " used");
 		}
 		
 		if(chunks.size()>0) {
@@ -120,7 +155,7 @@ public class MapPlayerTask extends BaseMapTask {
 		@Override
 		public BaseMapTask getTask(Minecraft minecraft, long worldHash) {			
 			if(!enabled) return null;
-			
+				
 			// Ensure player chunk is loaded
 			if(minecraft.thePlayer.addedToChunk) {
 				BaseMapTask baseMapTask = MapPlayerTask.create(minecraft.thePlayer, worldHash);
@@ -135,5 +170,9 @@ public class MapPlayerTask extends BaseMapTask {
 			// nothing to do
 		}
 		
+	}
+	
+	public static void clearCache() {
+		lastChunkStubs.clear();
 	}
 }
