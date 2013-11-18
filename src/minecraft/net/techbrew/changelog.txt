@@ -1,4 +1,4 @@
-JourneyMap 3.0.0b2 for Minecraft 1.6.4 (November 15, 2013)
+JourneyMap 3.0.0b3 for Minecraft 1.6.4 (November 16, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -11,6 +11,10 @@ Requirements:
 - Minecraft 1.6.4
 - Forge "Recommended-1.6.4" or ModLoader 1.6.4
 
+BETA 3 NOTES:
+- Optimization: Added chunk change detection to vastly reduce mapping overhead when you're not travelling.
+- Webserver port is now checked to see if already in use. If so, port # is increased by 10 and retried.
+
 BETA 2 NOTES:
 
 - Added support for seeing and using chat when the In-game Map is open
@@ -18,7 +22,6 @@ BETA 2 NOTES:
 - Control codes are now stripped from named entities (mobs, pets, etc.)
 - Bugfix for Auto-Map when custom dimension directory name doesn't follow standard naming convention (MystCraft)
 - Bugfix: zoom button enable/disable triggers were reversed
-
 
 Changes in JourneyMap 3.0.0b1 for Minecraft 1.6.4:
 - In-game UI completely re-written to be much faster, zoom out further, and have no texture distortions.
