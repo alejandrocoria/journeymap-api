@@ -23,25 +23,6 @@ public class ChunkLoader {
 	
 	private static Logger logger = JourneyMap.getLogger();
 	
-	public static ChunkStub getChunkStub(int chunkX, int chunkZ, Minecraft minecraft, long worldHash) {		
-		
-		return getChunkStub(chunkX, chunkZ, minecraft.mcDataDir, minecraft.theWorld, worldHash);
-		
-	}
-
-	public static ChunkStub getChunkStub(int chunkX, int chunkZ, File worldDir, World world, long worldHash) {		
-		
-		Chunk chunk = getChunkFromMemory(chunkX, chunkZ, worldDir, world);
-		if(chunk==null) {
-			chunk = getChunkFromDisk(chunkX, chunkZ, worldDir, world);
-			if(chunk==null) {
-				return null;
-			}
-		}		
-		return new ChunkStub(chunk, true, world, worldHash);
-		
-	}
-	
 	public static ChunkStub getChunkStubFromDisk(int chunkX, int chunkZ, File worldDir, World world, long worldHash) {		
 		
 		Chunk chunk = getChunkFromDisk(chunkX, chunkZ, worldDir, world);
@@ -54,7 +35,9 @@ public class ChunkLoader {
 	
 	public static ChunkStub getChunkStubFromMemory(int chunkX, int chunkZ, File worldDir, World world, long worldHash) {
 		Chunk chunk = getChunkFromMemory(chunkX, chunkZ, worldDir, world);
-		if(chunk!=null) return new ChunkStub(chunk, true, world, worldHash);
+		if(chunk!=null) {
+			return new ChunkStub(chunk, true, world, worldHash);
+		}
 		return null;
 	}
 	
@@ -181,67 +164,6 @@ public class ChunkLoader {
         {
             var5.setBiomeArray(par2NBTTagCompound.getByteArray("Biomes"));
         }
-
-//        NBTTagList var18 = par2NBTTagCompound.getTagList("Entities");
-//
-//        if (var18 != null)
-//        {
-//            for (int var17 = 0; var17 < var18.tagCount(); ++var17)
-//            {
-//                NBTTagCompound var19 = (NBTTagCompound)var18.tagAt(var17);
-//                Entity var25 = EntityList.createEntityFromNBT(var19, par1World);
-//                var5.hasEntities = true;
-//
-//                if (var25 != null)
-//                {
-//                    var5.addEntity(var25);
-//                    Entity var14 = var25;
-//
-//                    for (NBTTagCompound var15 = var19; var15.hasKey("Riding"); var15 = var15.getCompoundTag("Riding"))
-//                    {
-//                        Entity var16 = EntityList.createEntityFromNBT(var15.getCompoundTag("Riding"), par1World);
-//
-//                        if (var16 != null)
-//                        {
-//                            var5.addEntity(var16);
-//                            var14.mountEntity(var16);
-//                        }
-//
-//                        var14 = var16;
-//                    }
-//                }
-//            }
-//        }
-//
-//        NBTTagList var21 = par2NBTTagCompound.getTagList("TileEntities");
-//
-//        if (var21 != null)
-//        {
-//            for (int var20 = 0; var20 < var21.tagCount(); ++var20)
-//            {
-//                NBTTagCompound var22 = (NBTTagCompound)var21.tagAt(var20);
-//                TileEntity var27 = TileEntity.createAndLoadEntity(var22);
-//
-//                if (var27 != null)
-//                {
-//                    var5.addTileEntity(var27);
-//                }
-//            }
-//        }
-//
-//        if (par2NBTTagCompound.hasKey("TileTicks"))
-//        {
-//            NBTTagList var24 = par2NBTTagCompound.getTagList("TileTicks");
-//
-//            if (var24 != null)
-//            {
-//                for (int var23 = 0; var23 < var24.tagCount(); ++var23)
-//                {
-//                    NBTTagCompound var26 = (NBTTagCompound)var24.tagAt(var23);
-//                    par1World.scheduleBlockUpdateFromLoad(var26.getInteger("x"), var26.getInteger("y"), var26.getInteger("z"), var26.getInteger("i"), var26.getInteger("t"), var26.getInteger("p"));
-//                }
-//            }
-//        }
 
         return var5;
     }
