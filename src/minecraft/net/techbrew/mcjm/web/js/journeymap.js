@@ -142,8 +142,7 @@ var JourneyMap = (function() {
 			});
 			
 		});
-		
-		
+				
 	}
 
 	/**
@@ -162,28 +161,24 @@ var JourneyMap = (function() {
 			contentType : "application/javascript; charset=utf-8",
 			async : false
 		}).fail(handleError).done(
-				function(data, textStatus, jqXHR) {
+			function(data, textStatus, jqXHR) {
 
-					JM.game = data;
+				JM.game = data;
+				_gaq.push(['_setCustomVar', 1, 'jm_version', JM.game.jm_version, 2]);
+				_gaq.push(['_setCustomVar', 2, 'mc_version', JM.game.mc_version, 2]);
 
-					// Update UI with game info
-					$("#version").html("JourneyMap " + JM.game.jm_version);				
-					
-					// GA event
-					if (versionChecked != true) {
-						_gaq.push(['_setCustomVar', 1, 'jm_version', JM.game.jm_version, 2]);
-						_gaq.push(['_trackEvent', 'Client', 'CheckVersion', JM.game.jm_version]);
-						versionChecked = true;
-					}
-					
-					// Splash
-					if(!errorDialog) {
-						splashDialog = createDialog("JourneyMap " + JM.game.jm_version + "<br><small>by techbrew</small>");
-					}
+				// Update UI with game info
+				$("#version").html("JourneyMap " + JM.game.jm_version);									
+				
+				// Splash
+				if(!errorDialog) {
+					splashDialog = createDialog("JourneyMap " + JM.game.jm_version + "<br><small>by techbrew</small>");
+				}
 
-					// Init UI
-					initUI();
-				});
+				// Init UI
+				initUI();
+			}
+		);
 	}
 
 	/**
@@ -208,7 +203,11 @@ var JourneyMap = (function() {
 		$("link #rssfeed").attr("title", getMessage('rss_feed_title'));		
 
 		// Main menu	
-		$("#jm-menu").menu().hide();
+		$("#jm-menu").menu().hide().find('a').click(function(){
+			_gaq.push(['_trackEvent', 'menu', 'link', this.href]);
+			return true;
+		});
+		
 		$("#jm-button").button({
 			icons: {
 				secondary: "ui-icon-triangle-1-s"
@@ -437,7 +436,7 @@ var JourneyMap = (function() {
 	 * Post preference to server
 	 */
 	var postPreference = function(prefName, prefValue) {
-		
+
 		$.ajax({
 		  type: "POST",
 		  url: "/properties",
@@ -554,6 +553,7 @@ var JourneyMap = (function() {
 	 * Invoke saving map file
 	 */
 	var saveMapImage = function() {
+		_gaq.push(['_trackEvent', 'saveMapImage', null, 0, true]);
 		window.open('/action?type=savemap' + getMapStateUrl(),'_new');
 	}
 	
@@ -561,6 +561,7 @@ var JourneyMap = (function() {
 	 * Invoke starting auto-map
 	 */
 	var startAutoMap = function() {
+		_gaq.push(['_trackEvent', 'startAutoMap', null, 0, true]);
 		$.ajax({
 			  type: "POST",
 			  url: "/action?type=automap",
@@ -637,7 +638,6 @@ var JourneyMap = (function() {
 		} else {
 			$("#followButtonImg").attr('src', '/img/follow-off.png');
 		}
-		
 		if (onPlayer === true) {
 			drawPlayer();
 		} 
@@ -774,22 +774,12 @@ var JourneyMap = (function() {
 		var delta = (zoom==MapConfig.maxZoom) ? -0.0000001 : 0.0000001 ;
 		var center = map.getCenter();
 		
-		
 		// This hack forces the tiles to be replaced but doesn't visibly change the map
 		map.setZoom(zoom + delta);
 		map.panTo(center);
 		map.setZoom(zoom);
 		map.panTo(center);
-				
-		// The old way:
-		//      clearTimer();
-		//		queryServer(function(){
-		//		// After data retrieved,force the tile refresh
-		//		//skipImageCheck = false;
-		//		lastImageCheck = new Date().getTime();
-		//		mapOverlay.refreshTiles(true); // Force all tiles to be renewed
-		//	    });	
-		
+
 	}
 
 	/**
@@ -823,6 +813,8 @@ var JourneyMap = (function() {
 		// Secondary errors will be ignored
 		if (halted === true)
 			return;
+		
+		_gaq.push(['_trackEvent', 'handleError', JSON.stringify(data), 0, true]);
 
 		// Clear the timer
 		clearTimer();
@@ -889,7 +881,7 @@ var JourneyMap = (function() {
 	// ////////////DRAW ////////////////////
 
 	// Draw the map
-	var drawMap = function() {
+	var drawMap = function() {		
 
 		if (debug)
 			console.log(">>> " + "drawMap");
@@ -1364,7 +1356,7 @@ var JourneyMap = (function() {
 	    mapOverlay = new MCMapType();
 	    map.mapTypes.set('jm', mapOverlay);
 	    map.setMapTypeId('jm');	  
-	    
+
 	    return map;
 	}
 
@@ -1538,7 +1530,18 @@ _gaq.push(['_trackPageview']);
 	s.parentNode.insertBefore(ga, s);
 })();
 
+function ga_heartbeat(){
+  _gaq.push(['_trackEvent', 'heartbeat', 'heartbeat', null, 0, true]);
+  setTimeout(ga_heartbeat, 5*60*1000);
+}
+ga_heartbeat();
+
 /** OnLoad **/
 $( document ).ready(function() {
-	JourneyMap.start();
+	_gaq.push(['_trackEvent', 'document', 'ready', null, 0, true]);
+	JourneyMap.start();	
+});
+
+$(window).unload(function(){
+	_gaq.push(['_trackEvent', 'document', 'unload', null, 0, true]);
 });
