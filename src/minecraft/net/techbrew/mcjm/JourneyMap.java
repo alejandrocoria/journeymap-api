@@ -33,6 +33,7 @@ import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.server.JMServer;
 import net.techbrew.mcjm.task.ITaskManager;
+import net.techbrew.mcjm.task.MapPlayerTask;
 import net.techbrew.mcjm.task.TaskController;
 import net.techbrew.mcjm.thread.JMThreadFactory;
 import net.techbrew.mcjm.thread.TaskThread;
@@ -55,7 +56,7 @@ public class JourneyMap {
 	static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
 
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-	public static final String JM_VERSION = "3.0.0b1"; //$NON-NLS-1$
+	public static final String JM_VERSION = "3.0.0b3"; //$NON-NLS-1$
 	public static final String MC_VERSION = "1.6.4"; //$NON-NLS-1$
 	
 	private static class Holder {
@@ -151,15 +152,19 @@ public class JourneyMap {
 		enableWebserver = pm.getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
 		if(enableWebserver) {
 			try {			
-				//new LibraryLoader().loadLibraries();
 				jmServer = new JMServer();
-				jmServer.start();			
-			}
-			catch(Throwable e) {
+				if(jmServer.isReady()) {
+					jmServer.start();		
+				} else {
+					enableWebserver = false;
+				}
+			} catch(Throwable e) {
 				logger.throwing("JourneyMap", "constructor", e); //$NON-NLS-1$ //$NON-NLS-2$
-				logger.log(Level.SEVERE, LogFormatter.toString(e));
-				announce(Constants.getMessageJMERR24()); 
+				logger.log(Level.SEVERE, LogFormatter.toString(e));				
 				enableWebserver = false;
+			}
+			if(!enableWebserver) {
+				announce(Constants.getMessageJMERR24()); 
 			}
 		}
 
@@ -219,6 +224,9 @@ public class JourneyMap {
      * Halts mapping threads, clears caches.
      */
     public void stopMapping() {
+    	
+    	Minecraft minecraft = Minecraft.getMinecraft();
+    	
     	synchronized(this) {
     		
     		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
@@ -236,8 +244,6 @@ public class JourneyMap {
 			}	    	
 	    	taskExecutor = null;
 	    	
-	    	Minecraft minecraft = Minecraft.getMinecraft();
-	    	
 	    	if(taskController!=null) {
 	    		taskController.disableTasks(minecraft);
 	    		taskController.clear();
@@ -251,6 +257,9 @@ public class JourneyMap {
 			TaskThread.reset();
 			RegionImageCache.getInstance().flushToDisk();
 			RegionImageCache.getInstance().clear();
+			EntityHelper.clearCaches();
+			MapOverlay.reset();
+			MapPlayerTask.clearCache();
 			
 			logger.info("Mapping halted: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
     	}
@@ -288,7 +297,7 @@ public class JourneyMap {
 	public boolean onTickInGame(float f, final Minecraft minecraft) {
 
 		try {
-
+			
 			// If both UIs are disabled, the mod is effectively disabled.
 			if(!enableWebserver && !enableMapGui) {
 				return true;
@@ -330,8 +339,9 @@ public class JourneyMap {
 				player.addChatMessage(announcements.remove(0));
 			}			
 		
-			// Perform the next mapping tasks
-			taskController.performTasks(minecraft, newHash, taskExecutor);			
+			// Perform the next mapping tasks			
+
+			taskController.performTasks(minecraft, newHash, taskExecutor);	
 
 		} catch (Throwable t) {
 			String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
