@@ -3,15 +3,15 @@ package net.techbrew.mcjm.model;
 import java.util.Arrays;
 
 import net.minecraft.src.Block;
-import net.minecraft.src.NibbleArray;
 import net.minecraft.src.ExtendedBlockStorage;
+import net.minecraft.src.NibbleArray;
 
 public class ExtendedBlockStorageStub
 {
     /**
      * Contains the bottom-most Y block represented by this ExtendedBlockStorage. Typically a multiple of 16.
      */
-    private int yBase;
+    private final int yBase;
 
     /**
      * A total count of the number of non-air blocks in this block storage's Chunk.
@@ -388,4 +388,38 @@ public class ExtendedBlockStorageStub
         this.blockMSBArray = new NibbleArray(this.blockLSBArray.length, 4);
         return this.blockMSBArray;
     }
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ExtendedBlockStorageStub other = (ExtendedBlockStorageStub) obj;
+		if (blockRefCount != other.blockRefCount) {
+			return false;
+		}
+		if (blockMetadataArray == null) {
+			if (other.blockMetadataArray != null) {
+				return false;
+			}
+		} else if (!Arrays.equals(blockMetadataArray.data,other.blockMetadataArray.data)) {
+			return false;
+		}
+		
+		if (blocklightArray == null) {
+			if (other.blocklightArray != null) {
+				return false;
+			}
+		} else if (!Arrays.equals(blocklightArray.data,other.blocklightArray.data)) {
+			return false;
+		}
+		
+		return true;
+	}
+    
+    
 }
