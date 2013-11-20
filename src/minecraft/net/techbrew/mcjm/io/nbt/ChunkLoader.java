@@ -15,39 +15,38 @@ import net.minecraft.src.NibbleArray;
 import net.minecraft.src.RegionFileCache;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.ChunkMD;
 
 public class ChunkLoader {
 	
 	private static Logger logger = JourneyMap.getLogger();
 	
-	public static ChunkStub getChunkStubFromDisk(int chunkX, int chunkZ, File worldDir, World world, long worldHash) {		
+	public static ChunkMD getChunkStubFromDisk(int chunkX, int chunkZ, File worldDir, World world) {		
 		
 		Chunk chunk = getChunkFromDisk(chunkX, chunkZ, worldDir, world);
 		if(chunk==null) {
 			return null;
 		}	
-		return new ChunkStub(chunk, true, world, worldHash);
+		return new ChunkMD(chunk, true, world);
 		
 	}
 	
-	public static ChunkStub getChunkStubFromMemory(int chunkX, int chunkZ, File worldDir, World world, long worldHash) {
-		Chunk chunk = getChunkFromMemory(chunkX, chunkZ, worldDir, world);
+	public static ChunkMD getChunkStubFromMemory(int chunkX, int chunkZ, World world) {
+		Chunk chunk = getChunkFromMemory(chunkX, chunkZ, world);
 		if(chunk!=null) {
-			return new ChunkStub(chunk, true, world, worldHash);
+			return new ChunkMD(chunk, true, world);
 		}
 		return null;
 	}
 	
-	public static ChunkStub getChunkStubFromMemory(int chunkX, int chunkZ, Minecraft minecraft, long worldHash) {
-		Chunk chunk = getChunkFromMemory(chunkX, chunkZ, FileHandler.getMCWorldDir(minecraft, minecraft.theWorld.provider.dimensionId), minecraft.theWorld);
-		if(chunk!=null) return new ChunkStub(chunk, true, minecraft.theWorld, worldHash);
+	public static ChunkMD getChunkStubFromMemory(int chunkX, int chunkZ, Minecraft minecraft) {
+		Chunk chunk = getChunkFromMemory(chunkX, chunkZ, minecraft.theWorld);
+		if(chunk!=null) return new ChunkMD(chunk, true, minecraft.theWorld);
 		return null;
 	}
 	
-	public static Chunk getChunkFromMemory(int chunkX, int chunkZ, File worldDir, World world) {
+	public static Chunk getChunkFromMemory(int chunkX, int chunkZ, World world) {
 		Chunk result  = null;
 		if(world.getChunkProvider().chunkExists(chunkX, chunkZ)) {
 			Chunk theChunk = world.getChunkFromChunkCoords(chunkX, chunkZ);

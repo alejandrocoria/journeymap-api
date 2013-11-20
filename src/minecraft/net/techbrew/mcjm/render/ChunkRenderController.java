@@ -3,18 +3,16 @@ package net.techbrew.mcjm.render;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 
-import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.ChunkMD;
 
 /**
  * Delegates rendering job to one or more renderer.
@@ -42,30 +40,30 @@ public class ChunkRenderController {
 		standardRenderer = new ChunkStandardRenderer(mapBlocks);
 	}
 	
-	public BufferedImage getChunkImage(ChunkStub chunkStub,
+	public BufferedImage getChunkImage(ChunkMD chunkMd,
 			boolean underground, Integer vSlice,
-			Map<ChunkCoordIntPair, ChunkStub> neighbors) {
+			ChunkMD.Set neighbors) {
 		
 		// Initialize image for the chunk
 		BufferedImage chunkImage = new BufferedImage(underground ? 16 : 32, 16, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2D = RegionImageHandler.initRenderingHints(chunkImage.createGraphics());
 		
-		int dimension = chunkStub.worldObj.provider.dimensionId;
+		int dimension = chunkMd.worldObj.provider.dimensionId;
 		boolean renderOkay = false;
 		
 		long start = System.nanoTime();
 		try {			
 			switch(dimension) {
 				case -1 : {
-					renderOkay = netherRenderer.render(g2D, chunkStub, underground, vSlice, neighbors);
+					renderOkay = netherRenderer.render(g2D, chunkMd, underground, vSlice, neighbors);
 					break;
 				}
 				case 1 : {
-					renderOkay = endRenderer.render(g2D, chunkStub, underground, vSlice, neighbors);
+					renderOkay = endRenderer.render(g2D, chunkMd, underground, vSlice, neighbors);
 					break;
 				}
 				default : {
-					renderOkay = standardRenderer.render(g2D, chunkStub, underground, vSlice, neighbors);
+					renderOkay = standardRenderer.render(g2D, chunkMd, underground, vSlice, neighbors);
 				}
 			}
 
@@ -90,7 +88,7 @@ public class ChunkRenderController {
 		
 		if(!renderOkay) {
 			if(fineLogging) {
-				JourneyMap.getLogger().log(Level.WARNING, "Chunk didn't render: " + chunkStub.xPosition + "," + chunkStub.zPosition);
+				JourneyMap.getLogger().log(Level.WARNING, "Chunk didn't render: " + chunkMd.stub.xPosition + "," + chunkMd.stub.zPosition);
 			}
 			// Use blank
 			chunkImage = underground ? getBlankChunkImageUnderground() : getBlankChunkImage();
@@ -130,8 +128,8 @@ public class ChunkRenderController {
 		if(blankChunkImageUnderground==null) {
 			blankChunkImageUnderground = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2D = blankChunkImageUnderground.createGraphics();
-			g2D.setComposite(MapBlocks.CLEAR);
-			g2D.setColor(Color.white);
+			g2D.setComposite(MapBlocks.SLIGHTLYCLEAR);
+			g2D.setColor(Color.black);
 			g2D.fillRect(0, 0, 16, 16);
 			g2D.dispose();
 		}

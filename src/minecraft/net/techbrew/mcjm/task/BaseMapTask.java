@@ -1,10 +1,7 @@
 package net.techbrew.mcjm.task;
 
-import java.util.Map;
-
-import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.World;
-import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.ChunkMD;
 
 public abstract class BaseMapTask implements IMapTask {
 	
@@ -12,10 +9,10 @@ public abstract class BaseMapTask implements IMapTask {
 	final int dimension;
 	final boolean underground;
 	final Integer vSlice;
-	final Map<ChunkCoordIntPair, ChunkStub> chunkStubs;
+	final ChunkMD.Set chunkMdSet;
 	final boolean flushCacheWhenDone;
 	
-	public BaseMapTask(World world, int dimension, boolean underground, Integer vSlice, Map<ChunkCoordIntPair, ChunkStub> chunkStubs, boolean flushCacheWhenDone) {
+	public BaseMapTask(World world, int dimension, boolean underground, Integer vSlice, ChunkMD.Set chunkMdSet, boolean flushCacheWhenDone) {
 		this.world = world;
 		this.dimension = dimension;
 		this.underground = underground;
@@ -23,7 +20,7 @@ public abstract class BaseMapTask implements IMapTask {
 		if((vSlice==null || vSlice==-1) && underground) {
 			throw new IllegalStateException("vSlice can't be null (-1) and task be underground");
 		}
-		this.chunkStubs = chunkStubs;
+		this.chunkMdSet = chunkMdSet;
 		this.flushCacheWhenDone = flushCacheWhenDone;
 	}
 
@@ -48,8 +45,8 @@ public abstract class BaseMapTask implements IMapTask {
 	}
 
 	@Override
-	public Map<ChunkCoordIntPair, ChunkStub> getChunkStubs() {
-		return chunkStubs;
+	public ChunkMD.Set getChunkStubs() {
+		return chunkMdSet;
 	}
 
 	@Override

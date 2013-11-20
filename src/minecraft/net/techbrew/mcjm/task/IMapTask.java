@@ -1,10 +1,7 @@
 package net.techbrew.mcjm.task;
 
-import java.util.Map;
-
-import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.World;
-import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.ChunkMD;
 
 public interface IMapTask extends ITask {
 	
@@ -16,8 +13,10 @@ public interface IMapTask extends ITask {
 
 	public Integer getVSlice();
 
-	public Map<ChunkCoordIntPair, ChunkStub> getChunkStubs();
+	public ChunkMD.Set getChunkStubs();
 
 	public boolean flushCacheWhenDone();
+	
+	public void taskComplete();
 	
 }

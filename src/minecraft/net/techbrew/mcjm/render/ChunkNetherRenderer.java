@@ -2,15 +2,13 @@ package net.techbrew.mcjm.render;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.Map;
 import java.util.logging.Level;
 
-import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.EnumSkyBlock;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.ChunkMD;
 
 /**
  * Render a chunk in the Nether.
@@ -33,19 +31,19 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 	 * Render blocks in the chunk for the Nether world.
 	 */
 	@Override
-	public boolean render(final Graphics2D g2D, final ChunkStub chunkStub, final boolean underground, 
-			final Integer vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors) {
+	public boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final boolean underground, 
+			final Integer vSlice, final ChunkMD.Set neighbors) {
 		
 		int sliceMinY = Math.max((vSlice << 4) - 1, 0);
-		int sliceMaxY = Math.min(((vSlice + 1) << 4) - 1, chunkStub.worldHeight);
+		int sliceMaxY = Math.min(((vSlice + 1) << 4) - 1, chunkMd.worldHeight);
 		if (sliceMinY == sliceMaxY) {
 			sliceMaxY += 2;
 		}
 		
 		// Initialize ChunkSub slopes if needed
-		if(chunkStub.slopes==null) {
-			chunkStub.slopes = new float[16][16];
-			float minNorm = Math.min(((vSlice + 1) << 4) - 1, chunkStub.worldHeight);
+		if(chunkMd.slopes==null) {
+			chunkMd.slopes = new float[16][16];
+			float minNorm = Math.min(((vSlice + 1) << 4) - 1, chunkMd.worldHeight);
 			float maxNorm = 0;
 			float slope, h, hN, hW;
 			
@@ -53,11 +51,11 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 			{
 				for(int x=0; x<16; x++)
 				{									
-					h = getHeightInSlice(chunkStub, x, z, sliceMinY, sliceMaxY);
-					hN = (z==0)  ? getBlockHeight(x, z, 0, -1, chunkStub, neighbors, h, sliceMinY, sliceMaxY) : getHeightInSlice(chunkStub, x, z-1, sliceMinY, sliceMaxY);							
-					hW = (x==0)  ? getBlockHeight(x, z, -1, 0, chunkStub, neighbors, h, sliceMinY, sliceMaxY) : getHeightInSlice(chunkStub, x-1, z, sliceMinY, sliceMaxY);
+					h = getHeightInSlice(chunkMd, x, z, sliceMinY, sliceMaxY);
+					hN = (z==0)  ? getBlockHeight(x, z, 0, -1, chunkMd, neighbors, h, sliceMinY, sliceMaxY) : getHeightInSlice(chunkMd, x, z-1, sliceMinY, sliceMaxY);							
+					hW = (x==0)  ? getBlockHeight(x, z, -1, 0, chunkMd, neighbors, h, sliceMinY, sliceMaxY) : getHeightInSlice(chunkMd, x-1, z, sliceMinY, sliceMaxY);
 					slope = ((h/hN)+(h/hW))/2f;
-					chunkStub.slopes[x][z] = slope;						
+					chunkMd.slopes[x][z] = slope;						
 				}
 			}
 		}
@@ -70,11 +68,11 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 					String metaId = null;
 					boolean hasAir = false;
 					int blockId = -1;
-					int y = getHeightInSlice(chunkStub, x, z, sliceMinY, sliceMaxY);
-					blockId = chunkStub.getBlockID(x, y, z);
+					int y = getHeightInSlice(chunkMd, x, z, sliceMinY, sliceMaxY);
+					blockId = chunkMd.stub.getBlockID(x, y, z);
 					boolean isLava = (blockId == 10 || blockId == 11);
 					
-					BlockInfo block = mapBlocks.getBlockInfo(chunkStub, x, y, z);		
+					BlockInfo block = mapBlocks.getBlockInfo(chunkMd, x, y, z);		
 					blockId = block.id;
 					Color color = block.getColor();
 					
@@ -82,7 +80,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 					if(isLava) {
 						lightLevel = 14;
 					} else {
-						lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z);
+						lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z);
 						if(y==sliceMaxY) {
 							paintBlock(x, z, Color.BLACK, g2D);							
 							continue;
@@ -95,11 +93,11 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 						// Contour shading
 						// Get slope of block and prepare to shade
 						float slope, s, sN, sNW, sW, sAvg, shaded;
-						slope = chunkStub.slopes[x][z];
+						slope = chunkMd.slopes[x][z];
 						
-						sN = getBlockSlope(x, z, 0, -1, chunkStub, neighbors, slope);
-						sNW = getBlockSlope(x, z, -1, -1, chunkStub, neighbors, slope);
-						sW = getBlockSlope(x, z, -1, 0, chunkStub, neighbors, slope);
+						sN = getBlockSlope(x, z, 0, -1, chunkMd, neighbors, slope);
+						sNW = getBlockSlope(x, z, -1, -1, chunkMd, neighbors, slope);
+						sW = getBlockSlope(x, z, -1, 0, chunkMd, neighbors, slope);
 						sAvg = (sN+sNW+sW)/3f;
 						
 						if(slope<1) {
@@ -153,14 +151,13 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 		return chunkOk;
 	}
 
-	@Override
-	public int getHeightInSlice( final ChunkStub chunkStub, final int x, final int z, final int sliceMinY, final int sliceMaxY) {
+	public int getHeightInSlice( final ChunkMD chunkMd, final int x, final int z, final int sliceMinY, final int sliceMaxY) {
 		boolean hasAir = false;
 		int blockId = 0;
 		
 		int y = sliceMaxY;
 		for (; y > 0; y--) {
-			blockId = chunkStub.getBlockID(x, y, z);
+			blockId = chunkMd.stub.getBlockID(x, y, z);
 
 			if (blockId == 0) {
 				hasAir = true;
@@ -185,7 +182,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 	}
 	
 	/**
-	 * Get the height of the block at the coordinates + offsets.  Uses ChunkStub.slopes.
+	 * Get the height of the block at the coordinates + offsets.  Uses ChunkMD.slopes.
 	 * @param x
 	 * @param z
 	 * @param offsetX
@@ -195,12 +192,12 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 	 * @param defaultVal
 	 * @return
 	 */
-	public Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<ChunkCoordIntPair, ChunkStub> neighbors, float defaultVal, final int sliceMinY, final int sliceMaxY) {
+	public Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, float defaultVal, final int sliceMinY, final int sliceMaxY) {
 		int newX = x+offsetX;
 		int newZ = z+offsetz;
 		
-		int chunkX = currentChunk.xPosition;
-		int chunkZ = currentChunk.zPosition;
+		int chunkX = currentChunk.stub.xPosition;
+		int chunkZ = currentChunk.stub.zPosition;
 		boolean search = false;
 		
 		if(newX==-1) {
@@ -222,7 +219,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 			search = true;
 		}
 		
-		ChunkStub chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
+		ChunkMD chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
 		
 		if(chunk!=null) {
 			return (float) getHeightInSlice(chunk, newX, newZ, sliceMinY, sliceMaxY);

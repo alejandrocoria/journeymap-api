@@ -2,15 +2,13 @@ package net.techbrew.mcjm.render;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.Map;
 import java.util.logging.Level;
 
-import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.EnumSkyBlock;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.ChunkMD;
 
 /**
  * Render a chunk in the End.
@@ -31,30 +29,30 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 	 * Render blocks in the chunk for the End world.
 	 */
 	@Override
-	public boolean render(final Graphics2D g2D, final ChunkStub chunkStub, final boolean underground, 
-			final Integer vSlice, final Map<ChunkCoordIntPair, ChunkStub> neighbors) {
+	public boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final boolean underground, 
+			final Integer vSlice, final ChunkMD.Set neighbors) {
 		
 		// Initialize ChunkSub slopes if needed
-		if(chunkStub.slopes==null) {
-			chunkStub.slopes = new float[16][16];
-			float minNorm = chunkStub.worldHeight;
+		if(chunkMd.slopes==null) {
+			chunkMd.slopes = new float[16][16];
+			float minNorm = chunkMd.worldHeight;
 			float maxNorm = 0;
 			float slope, h, hN, hW;
 			for(int y=0; y<16; y++)
 			{
 				for(int x=0; x<16; x++)
 				{				
-					h = chunkStub.getSafeHeightValue(x, y);
-					hN = (y==0)  ? getBlockHeight(x, y, 0, -1, chunkStub, neighbors, h) : chunkStub.getSafeHeightValue(x, y-1);							
-					hW = (x==0)  ? getBlockHeight(x, y, -1, 0, chunkStub, neighbors, h) : chunkStub.getSafeHeightValue(x-1, y);
+					h = chunkMd.getSafeHeightValue(x, y);
+					hN = (y==0)  ? getBlockHeight(x, y, 0, -1, chunkMd, neighbors, h) : chunkMd.getSafeHeightValue(x, y-1);							
+					hW = (x==0)  ? getBlockHeight(x, y, -1, 0, chunkMd, neighbors, h) : chunkMd.getSafeHeightValue(x-1, y);
 					slope = ((h/hN)+(h/hW))/2f;
-					chunkStub.slopes[x][y] = slope;						
+					chunkMd.slopes[x][y] = slope;						
 				}
 			}
 		}
 		
 		boolean chunkOk = false;
-		int maxY = chunkStub.worldHeight;
+		int maxY = chunkMd.worldHeight;
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 
@@ -73,7 +71,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 		
 					int y = sliceMaxY;
 					for (; y > 0; y--) {
-						blockId = chunkStub.getBlockID(x, y, z);
+						blockId = chunkMd.stub.getBlockID(x, y, z);
 		
 						if (!hasAir && y <= sliceMinY) {
 							break;
@@ -83,7 +81,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 							hasAir = true;
 						} else if (hasAir && paintY == -1) {
 							paintY = y;
-							lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
+							lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
 							break;
 						}
 					}
@@ -93,9 +91,9 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 						paintY = 0;
 					}
 		
-					blockId = chunkStub.getBlockID(x, paintY, z);
+					blockId = chunkMd.stub.getBlockID(x, paintY, z);
 		
-					lightLevel = chunkStub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
+					lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
 		
 					if (lightLevel < 10) {
 						lightLevel += 3;
@@ -107,16 +105,16 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 					}		
 		
 					// Get block color
-					BlockInfo block = mapBlocks.getBlockInfo(chunkStub, x, paintY, z);
+					BlockInfo block = mapBlocks.getBlockInfo(chunkMd, x, paintY, z);
 					Color color = block.getColor();
 					
 					// Get slope of block and prepare to shade
 					float slope, s, sN, sNW, sW, sAvg, shaded;
-					slope = chunkStub.slopes[x][z];
+					slope = chunkMd.slopes[x][z];
 					
-					sN = getBlockSlope(x, z, 0, -1, chunkStub, neighbors, slope);
-					sNW = getBlockSlope(x, z, -1, -1, chunkStub, neighbors, slope);
-					sW = getBlockSlope(x, z, -1, 0, chunkStub, neighbors, slope);
+					sN = getBlockSlope(x, z, 0, -1, chunkMd, neighbors, slope);
+					sNW = getBlockSlope(x, z, -1, -1, chunkMd, neighbors, slope);
+					sW = getBlockSlope(x, z, -1, 0, chunkMd, neighbors, slope);
 					sAvg = (sN+sNW+sW)/3f;
 					
 					if(slope<1) {

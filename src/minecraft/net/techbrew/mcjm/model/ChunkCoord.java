@@ -12,8 +12,8 @@ public class ChunkCoord {
 	
 	private RegionCoord rCoord = null;
 	
-	public static ChunkCoord fromChunkStub(File worldDir, ChunkStub chunkStub, Integer vSlice, int dimension) {
-		return ChunkCoord.fromChunkPos(worldDir, chunkStub.xPosition, vSlice, chunkStub.zPosition, dimension);
+	public static ChunkCoord fromChunkMD(File worldDir, ChunkMD chunkMd, Integer vSlice, int dimension) {
+		return ChunkCoord.fromChunkPos(worldDir, chunkMd.stub.xPosition, vSlice, chunkMd.stub.zPosition, dimension);
 	}
 	
 	public static ChunkCoord fromChunkPos(File worldDir, int xPosition, Integer vSlice, int zPosition, int dimension) {

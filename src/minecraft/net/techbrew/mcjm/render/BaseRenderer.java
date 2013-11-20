@@ -2,13 +2,12 @@ package net.techbrew.mcjm.render;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.Map;
 import java.util.logging.Level;
 
 import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.ChunkMD;
 
 /**
  * Base class for methods reusable across renderers.
@@ -29,38 +28,6 @@ public abstract class BaseRenderer {
 		this.mapBlocks = mapBlocks;
 	}
 
-	/**
-	 * Find the effective heightmap value within the slice.
-	 * @param chunkStub
-	 * @param x
-	 * @param z
-	 * @param sliceMinY
-	 * @param sliceMaxY
-	 * @return
-	 */
-	public int getHeightInSlice(ChunkStub chunkStub, int x, int z, int sliceMinY, int sliceMaxY) {
-		int y = sliceMinY;
-
-		int blockId;
-		while (y <= 1) {
-			blockId = chunkStub.getBlockID(x, y, z);
-			if (blockId!= 0) {
-				y++;
-			} else {
-				break;
-			}
-		}
-
-		while (y >= 1) {
-			blockId = chunkStub.getBlockID(x, y, z);
-			if (blockId == 0) {
-				y--;
-			} else {
-				break;
-			}
-		}
-		return (y<0) ? 0 : y;
-	}
 
 	/**
 	 * Paint the block with half-clear red to indicate it's a problem.
@@ -111,7 +78,7 @@ public abstract class BaseRenderer {
 	}
 	
 	/**
-	 * Get the height of the block at the coordinates + offsets.  Uses ChunkStub.slopes.
+	 * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
 	 * @param x
 	 * @param z
 	 * @param offsetX
@@ -121,12 +88,12 @@ public abstract class BaseRenderer {
 	 * @param defaultVal
 	 * @return
 	 */
-	public Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<ChunkCoordIntPair, ChunkStub> neighbors, float defaultVal) {
+	public Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, float defaultVal) {
 		int newX = x+offsetX;
 		int newZ = z+offsetz;
 		
-		int chunkX = currentChunk.xPosition;
-		int chunkZ = currentChunk.zPosition;
+		int chunkX = currentChunk.stub.xPosition;
+		int chunkZ = currentChunk.stub.zPosition;
 		boolean search = false;
 		
 		if(newX==-1) {
@@ -148,7 +115,7 @@ public abstract class BaseRenderer {
 			search = true;
 		}
 		
-		ChunkStub chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
+		ChunkMD chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
 		
 		if(chunk!=null) {
 			return (float) chunk.getSafeHeightValue(newX, newZ);
@@ -158,7 +125,7 @@ public abstract class BaseRenderer {
 	}
 	
 	/**
-	 * Get the slope of the block at the coordinates + offsets.  Uses ChunkStub.slopes.
+	 * Get the slope of the block at the coordinates + offsets.  Uses chunkMd.slopes.
 	 * @param x
 	 * @param z
 	 * @param offsetX
@@ -168,12 +135,12 @@ public abstract class BaseRenderer {
 	 * @param defaultVal
 	 * @return
 	 */
-	public Float getBlockSlope(int x, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<ChunkCoordIntPair, ChunkStub> neighbors, float defaultVal) {
+	public Float getBlockSlope(int x, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, float defaultVal) {
 		int newX = x+offsetX;
 		int newZ = z+offsetz;
 		
-		int chunkX = currentChunk.xPosition;
-		int chunkZ = currentChunk.zPosition;
+		int chunkX = currentChunk.stub.xPosition;
+		int chunkZ = currentChunk.stub.zPosition;
 		boolean search = false;
 		
 		if(newX==-1) {
@@ -195,7 +162,7 @@ public abstract class BaseRenderer {
 			search = true;
 		}
 		
-		ChunkStub chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
+		ChunkMD chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
 		
 		if(chunk!=null) {
 			if(chunk.slopes==null) {
@@ -209,7 +176,7 @@ public abstract class BaseRenderer {
 	}
 	
 	/**
-	 * Get the block at the coordinates + offsets.  Uses ChunkStub.slopes.
+	 * Get the block at the coordinates + offsets.  Uses chunkMd.slopes.
 	 * @param x
 	 * @param z
 	 * @param offsetX
@@ -219,12 +186,12 @@ public abstract class BaseRenderer {
 	 * @param defaultVal
 	 * @return
 	 */
-	public BlockInfo getBlock(int x, int y, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<ChunkCoordIntPair, ChunkStub> neighbors, BlockInfo defaultVal) {
+	public BlockInfo getBlock(int x, int y, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, BlockInfo defaultVal) {
 		int newX = x+offsetX;
 		int newZ = z+offsetz;
 		
-		int chunkX = currentChunk.xPosition;
-		int chunkZ = currentChunk.zPosition;
+		int chunkX = currentChunk.stub.xPosition;
+		int chunkZ = currentChunk.stub.zPosition;
 		boolean search = false;
 		
 		if(newX==-1) {
@@ -246,7 +213,7 @@ public abstract class BaseRenderer {
 			search = true;
 		}
 		
-		ChunkStub chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
+		ChunkMD chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
 		
 		if(chunk!=null) {
 			return mapBlocks.getBlockInfo(chunk, newX, y, newZ);
@@ -256,7 +223,7 @@ public abstract class BaseRenderer {
 	}
 	
 	/**
-	 * Gets the chunkStub at the coordinates + offsets.
+	 * Gets the chunkMd at the coordinates + offsets.
 	 * @param x
 	 * @param z
 	 * @param offsetX
@@ -265,12 +232,12 @@ public abstract class BaseRenderer {
 	 * @param neighbors
 	 * @return
 	 */
-	ChunkStub getChunk(int x, int z, int offsetX, int offsetz, ChunkStub currentChunk, Map<ChunkCoordIntPair, ChunkStub> neighbors) {
+	ChunkMD getChunk(int x, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors) {
 		int newX = x+offsetX;
 		int newZ = z+offsetz;
 		
-		int chunkX = currentChunk.xPosition;
-		int chunkZ = currentChunk.zPosition;
+		int chunkX = currentChunk.stub.xPosition;
+		int chunkZ = currentChunk.stub.zPosition;
 		boolean search = false;
 		
 		if(newX==-1) {
@@ -292,7 +259,7 @@ public abstract class BaseRenderer {
 			search = true;
 		}
 		
-		ChunkStub chunk = null;
+		ChunkMD chunk = null;
 		if(search) {
 			ChunkCoordIntPair coord = new ChunkCoordIntPair(chunkX, chunkZ);
 			chunk = neighbors.get(coord);

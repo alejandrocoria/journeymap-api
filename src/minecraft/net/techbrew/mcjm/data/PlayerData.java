@@ -9,7 +9,7 @@ import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.render.MapBlocks;
 
@@ -78,9 +78,9 @@ public class PlayerData implements IDataProvider {
 		int x = ((int) Math.floor(player.posX) % 16) & 15;
 		int z = ((int) Math.floor(player.posZ) % 16) & 15;
 		
-		ChunkStub playerChunk = JourneyMap.getInstance().getLastPlayerChunk();
+		ChunkMD playerChunk = JourneyMap.getInstance().getLastPlayerChunk();
 		if(playerChunk!=null) {
-			return playerChunk.getBiomeGenForWorldCoords(x,z, mc.theWorld.getWorldChunkManager()).biomeName;
+			return playerChunk.stub.getBiomeGenForWorldCoords(x,z, mc.theWorld.getWorldChunkManager()).biomeName;
 		} else {
 			return "?"; //$NON-NLS-1$
 		}

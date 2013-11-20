@@ -1,48 +1,21 @@
 package net.techbrew.mcjm.render;
 
 import java.awt.Color;
-import java.awt.color.ColorSpace;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
-
+import net.minecraft.src.BiomeGenBase;
 import net.minecraft.src.Block;
-import net.minecraft.src.BlockFlower;
-import net.minecraft.src.BlockGrass;
-import net.minecraft.src.BlockLeaves;
-import net.minecraft.src.BlockLeavesBase;
-import net.minecraft.src.BlockLilyPad;
-import net.minecraft.src.BlockSand;
-import net.minecraft.src.BlockTallGrass;
-import net.minecraft.src.BlockVine;
 import net.minecraft.src.ColorizerFoliage;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.ReloadableResourceManager;
-import net.minecraft.src.Resource;
 import net.minecraft.src.ResourceManager;
 import net.minecraft.src.ResourceManagerReloadListener;
-import net.minecraft.src.TextureAtlasSprite;
-import net.minecraft.src.ResourceLocation;
-import net.minecraft.src.ResourcePack;
-import net.minecraft.src.ResourcePackFileNotFoundException;
 import net.minecraft.src.ResourcePackRepository;
-import net.minecraft.src.ResourcePackRepositoryEntry;
-import net.minecraft.src.Item;
-import net.minecraft.src.ItemBlock;
-import net.minecraft.src.BiomeGenBase;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.IconLoader;
-import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.ChunkMD;
 
 /**
  * Cache of block colors derived from the current texture pack.
@@ -94,7 +67,7 @@ public class ColorCache implements ResourceManagerReloadListener {
 		}
 	}
 	
-	public Color getBlockColor(ChunkStub chunkStub, BlockInfo blockInfo, int x, int y, int z) {
+	public Color getBlockColor(ChunkMD chunkMd, BlockInfo blockInfo, int x, int y, int z) {
 		
 		if(iconLoader==null) {
 			return Color.BLACK;
@@ -108,7 +81,7 @@ public class ColorCache implements ResourceManagerReloadListener {
 		
 		// Check if colored by biome
 		if(MapBlocks.biomeBlocks.contains(blockInfo.id)) {
-			color = getBiomeBlockColor(chunkStub, blockInfo, x, y, z);
+			color = getBiomeBlockColor(chunkMd, blockInfo, x, y, z);
 		} else {
 			color = getCachedColor(blockInfo, x, y, z);
 		}
@@ -117,8 +90,8 @@ public class ColorCache implements ResourceManagerReloadListener {
 				
 	}
 	
-	private Color getBiomeBlockColor(ChunkStub chunkStub, BlockInfo blockInfo, int x, int y, int z) {
-		BiomeGenBase biome = chunkStub.getBiomeGenForWorldCoords(x, z, chunkStub.worldObj.getWorldChunkManager());
+	private Color getBiomeBlockColor(ChunkMD chunkMd, BlockInfo blockInfo, int x, int y, int z) {
+		BiomeGenBase biome = chunkMd.stub.getBiomeGenForWorldCoords(x, z, chunkMd.worldObj.getWorldChunkManager());
 		Color color = null;
 		
 		switch(blockInfo.id) {

@@ -45,6 +45,7 @@ public class FileHandler {
 	
 	public static File getMCWorldDir(Minecraft minecraft, final int dimension) {
 		File worldDir = getMCWorldDir(minecraft);
+		if(worldDir==null) return null;
 		if(dimension==0) {
 			return worldDir;
 		} else {

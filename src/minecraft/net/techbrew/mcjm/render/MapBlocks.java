@@ -8,7 +8,7 @@ import java.util.HashSet;
 import net.minecraft.src.Block;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.ChunkMD;
 
 public class MapBlocks extends HashMap {
 	
@@ -32,25 +32,25 @@ public class MapBlocks extends HashMap {
 	
 	/**
 	 * Returns a simple wrapper object of the blockId and the block meta values.
-	 * @param chunkStub
+	 * @param chunkMd
 	 * @param x
 	 * @param y
 	 * @param z
 	 * @return
 	 */
-	BlockInfo getBlockInfo(ChunkStub chunkStub, int x, int y, int z) {
+	BlockInfo getBlockInfo(ChunkMD chunkMd, int x, int y, int z) {
 		try {
 			int blockId, meta;
 			if(y>=0) {
-				blockId = chunkStub.getBlockID(x, y, z);
-				meta = (blockId==0) ? 0 : chunkStub.getBlockMetadata(x, y, z);
+				blockId = chunkMd.stub.getBlockID(x, y, z);
+				meta = (blockId==0) ? 0 : chunkMd.stub.getBlockMetadata(x, y, z);
 			} else {
 				blockId = -1;
 				meta = 0;
 			}
 			BlockInfo info = new BlockInfo(blockId, meta);
 			if(blockId>0) {
-				info.setColor(colorCache.getBlockColor(chunkStub, info, x, y, z));
+				info.setColor(colorCache.getBlockColor(chunkMd, info, x, y, z));
 				Float alpha = alphas.get(blockId);
 				info.setAlpha(alpha==null ? 1F : alpha);
 			} else {
@@ -61,12 +61,11 @@ public class MapBlocks extends HashMap {
 			return info;
 			
 		} catch (Exception e) {
-			JourneyMap.getLogger().severe("Can't get blockId/meta for chunk " + chunkStub.xPosition + "," + chunkStub.zPosition + " block " + x + "," + y + "," + z); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			JourneyMap.getLogger().severe("Can't get blockId/meta for chunk " + chunkMd.stub.xPosition + "," + chunkMd.stub.zPosition + " block " + x + "," + y + "," + z); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			JourneyMap.getLogger().severe(LogFormatter.toString(e));
 			return null;
 		}
 	}
-	
 	
 	/**
 	 * Attempt at faster way to figure out if there is sky above
@@ -76,13 +75,13 @@ public class MapBlocks extends HashMap {
 	 * @param z
 	 * @return
 	 */
-	public static boolean skyAbove(ChunkStub chunkStub, final int x, final int y, final int maxY, final int z) {
+	public static boolean skyAbove(ChunkMD chunkMd, final int x, final int y, final int maxY, final int z) {
 		boolean seeSky = true;
 		int blockId;
 		
 		int checkY = y;
 		while(seeSky && checkY<=maxY) {
-			blockId = chunkStub.getBlockID(x, checkY, z);
+			blockId = chunkMd.stub.getBlockID(x, checkY, z);
 			if(sky.contains(blockId)) {
 				checkY++;
 			} else {
@@ -101,34 +100,41 @@ public class MapBlocks extends HashMap {
 	 * @param z
 	 * @return
 	 */
-	public static int topNonSkyBlock(ChunkStub chunkStub, final int x, int maxY, final int z) {
+	public static int ceiling(ChunkMD chunkStub, final int x, final int maxY, final int z) {
 		
-		final int chunkHeight = chunkStub._getHeightValue(x, z);
+		final int chunkHeight = chunkStub.stub._getHeightValue(x, z);
 		final int topY = Math.min(maxY, chunkHeight);
 		
 		int blockId;
 		int y = topY;
 		if(topY==chunkHeight) {
-			// Error check, could be bad data in the heightmap
-			while(y<maxY) {
-				blockId = chunkStub.getBlockID(x, y, z);
-				
-				if(blockId==0 || sky.contains(blockId)) {
-					y++;
-				} else {
-					break;
-				}
+			// Experimental
+			blockId = chunkStub.stub.getBlockID(x, y, z);
+			if(nonCeilingBlocks.contains(blockId)) {
+				y--;
 			}
-			if(y<maxY) {
-				return y;
-			} else {
-				return topY;
-			}
+			return y;
+
+//			// Error check, could be bad data in the heightmap
+//			while(y<maxY) {
+//				blockId = chunkStub.stub.getBlockID(x, y, z);
+//				
+//				if(nonCeilingBlocks.contains(blockId)) {
+//					y++;
+//				} else {
+//					break;
+//				}
+//			}
+//			if(y<maxY) {
+//				return y;
+//			} else {
+//				return topY;
+//			}
 		}
 		
 		while(y>=0) {
-			blockId = chunkStub.getBlockID(x, y, z);
-			if(blockId==0 || sky.contains(blockId)) {
+			blockId = chunkStub.stub.getBlockID(x, y, z);
+			if(nonCeilingBlocks.contains(blockId)) {
 				y--;
 			} else {
 				break;
@@ -150,6 +156,19 @@ public class MapBlocks extends HashMap {
 		sky.add(65); // ladder
 		sky.add(78); // snow
 		sky.add(106); // vines
+	}
+	
+	/**
+	 * Map of block ids that won't be considered a ceiling block.
+	 */
+	public final static HashSet<Integer> nonCeilingBlocks = new HashSet<Integer>(7);
+	{
+		nonCeilingBlocks.add(0); // air 
+		nonCeilingBlocks.add(18); // leaves
+		nonCeilingBlocks.add(30); // web
+		nonCeilingBlocks.add(65); // ladder
+		nonCeilingBlocks.add(78); // snow
+		nonCeilingBlocks.add(106); // vines
 	}
 	
 	/**

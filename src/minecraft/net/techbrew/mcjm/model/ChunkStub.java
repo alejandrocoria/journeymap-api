@@ -11,65 +11,44 @@ import net.minecraft.src.ExtendedBlockStorage;
 import net.minecraft.src.Material;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldChunkManager;
-import net.techbrew.mcjm.render.MapBlocks;
 
 public class ChunkStub {
+	
 
-	public volatile float[][] slopes; // Added for JourneyMap
-	
-	/**
-     * Determines if the chunk is lit or not at a light value greater than 0.
-     */
-    public static boolean isLit;
-	
 	public final int heightMap[];
 	public final byte[] blockBiomeArray;
 	public final int xPosition;
 	public final int zPosition;
-	public final Boolean hasNoSky;
-	public final long worldHash;
 	public final World worldObj;
     public int[] precipitationHeightMap;
 	public final ExtendedBlockStorageStub storageArrays[];
-	public final int worldHeight;
-	public Boolean doMap;
 	public boolean isModified;			
 	
-	public boolean isEmptyChunk;
+
 	
-	public int flagToDiscard = 0;
-	
-	public ChunkStub(int[] heightMap, byte[] blockBiomeArray, int xPosition,
-			int zPosition, Boolean hasNoSky, long worldHash, World worldObj,
+	ChunkStub(int[] heightMap, byte[] blockBiomeArray, int xPosition,
+			int zPosition, World worldObj,
 			int[] precipitationHeightMap,
 			ExtendedBlockStorageStub[] storageArrays, int worldHeight,
 			boolean isModified) {
-		super();
 		this.heightMap = heightMap;
 		this.blockBiomeArray = blockBiomeArray;
 		this.xPosition = xPosition;
 		this.zPosition = zPosition;
-		this.hasNoSky = hasNoSky;
-		this.worldHash = worldHash;
-		this.worldObj = worldObj;
 		this.precipitationHeightMap = precipitationHeightMap;
 		this.storageArrays = storageArrays;
-		this.worldHeight = worldHeight;
+		this.worldObj = worldObj;
 		this.isModified = isModified;
 	}
 
-	public ChunkStub(Chunk chunk, Boolean doMap, World worldObj, long worldHash) {
+	ChunkStub(Chunk chunk) {
 		
-		this.isLit = chunk.isLit;
 		this.heightMap = Arrays.copyOf(chunk.heightMap, chunk.heightMap.length);
 		this.blockBiomeArray = Arrays.copyOf(chunk.getBiomeArray(), chunk.getBiomeArray().length);
 		this.xPosition = chunk.xPosition;
 		this.zPosition = chunk.zPosition;
-		this.worldHash = worldHash;
-		this.worldObj = worldObj;
-		this.worldHeight = worldObj.getHeight();
-		this.doMap = doMap;
 		this.isModified = chunk.isModified;
+		this.worldObj = chunk.worldObj;
 		this.precipitationHeightMap = Arrays.copyOf(chunk.precipitationHeightMap, chunk.precipitationHeightMap.length);
 		this.storageArrays = new ExtendedBlockStorageStub[chunk.getBlockStorageArray().length];
 		for(int i=0;i<storageArrays.length;i++) {
@@ -78,13 +57,6 @@ public class ChunkStub {
 				this.storageArrays[i] = new ExtendedBlockStorageStub(ebs);
 			}
 		}
-		
-		if(chunk.isEmpty() || !chunk.isChunkLoaded) {
-			doMap = false;
-		}
-
-		this.hasNoSky = chunk.worldObj.provider.hasNoSky;
-		
 	}
 	
 	/**
@@ -103,32 +75,7 @@ public class ChunkStub {
         return this.heightMap[par2 << 4 | par1];
     }
     
-    /**
-     * Added for JourneyMap because getHeightValue() sometimes returns an air block.
-     * 
-     * Returns the value in the height map at this x, z coordinate in the chunk
-     */
-    public int getSafeHeightValue(int x, int z)
-    {
-    	try {
-	    	int y = 0;
-	    	int id = 0;
-	    	y = this.heightMap[z << 4 | x];
-	    	if(y<1) return 0;
-	    	while(id==0) {    		
-	    		id = getBlockID(x,y,z); 
-	    		if(MapBlocks.excludeHeight.contains(id)) {
-	    			y=y-1;
-	    		}
-	    		if(y==0) {
-	    			break;
-	    		}
-	    	}
-	    	return y;       
-    	} catch(ArrayIndexOutOfBoundsException e) {
-    		return this.heightMap[z << 4 | x];
-    	}
-    }
+    
 
 
     /**
@@ -255,7 +202,7 @@ public class ChunkStub {
 
             if (var6 > 0)
             {
-                isLit = true;
+                //isLit = true;
             }
 
             var6 -= par4;
@@ -381,57 +328,8 @@ public class ChunkStub {
         return this.blockBiomeArray;
     }
     
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + xPosition;
-		result = prime * result + zPosition;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ChunkStub other = (ChunkStub) obj;
-		if (xPosition != other.xPosition)
-			return false;
-		if (zPosition != other.zPosition)
-			return false;
-		return true;
-	}
-
-	/**
-     * JourneyMap addition
-     */
-	@Override
-	public String toString() {
-		return "ChunkStub [" + xPosition + ", " + zPosition //$NON-NLS-1$ //$NON-NLS-2$
-				+ ", doMap=" + doMap + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-	}
 	
-	/**
-	 * Compare storage arrays of another chunkStub at the same position.
-	 * @param other
-	 * @return
-	 */
-	public boolean blockDataEquals(ChunkStub other) {
-		if(storageArrays.length!=other.storageArrays.length) {
-			return false;
-		}
-		for(int i=0;i<storageArrays.length;i++) {
-			ExtendedBlockStorageStub ebs = storageArrays[i];
-			ExtendedBlockStorageStub otherEbs = other.storageArrays[i];
-			if(ebs==null && otherEbs!=null) return false;
-			if(ebs!=null && otherEbs==null) return false;
-			if(ebs!=null && !ebs.equals(otherEbs)) return false;
-		}
-		return true;
-	}
+	
+	
 	
 }
