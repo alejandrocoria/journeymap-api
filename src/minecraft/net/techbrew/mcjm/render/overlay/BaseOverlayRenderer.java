@@ -119,6 +119,10 @@ public abstract class BaseOverlayRenderer<K> {
 	
 	public static void drawRectangle(int x, int y, int width, int height, Color color, int alpha) {
 		
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDepthMask(false);
+		GL11.glBlendFunc(770, 771);
+		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);		
 		Tessellator tessellator = Tessellator.instance;
 		tessellator.startDrawingQuads();
@@ -132,14 +136,25 @@ public abstract class BaseOverlayRenderer<K> {
 	}
 
 	public static void drawImage(MapTexture texture, int x, int y, boolean flip) {		
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDepthMask(false);
+		GL11.glBlendFunc(770, 771);
+		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
 		drawQuad(x, y, texture.width, texture.height, flip);		
 	}
 	
 	public static void drawRotatedImage(MapTexture texture, int x, int y, float heading) {
 			
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDepthMask(false);
+		GL11.glBlendFunc(770, 771);
+		GL11.glDisable(GL11.GL_ALPHA_TEST);
+		
 		// Start a new matrix for translation/rotation
 		GL11.glPushMatrix();
+		
+
 		
 		// Bind texture
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
@@ -191,11 +206,6 @@ public abstract class BaseOverlayRenderer<K> {
 	}
 	
 	public static void draw(List<DrawStep> drawStepList, int xOffset, int yOffset) {
-		
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDepthMask(false);
-		GL11.glBlendFunc(770, 771);
-		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		
 		for(DrawStep drawStep : drawStepList) {
 			drawStep.draw(xOffset, yOffset);
