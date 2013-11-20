@@ -2,9 +2,7 @@ package net.techbrew.mcjm.task;
 
 import java.io.File;
 import java.text.DecimalFormat;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +19,7 @@ import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.io.nbt.ChunkLoader;
 import net.techbrew.mcjm.io.nbt.RegionLoader;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
 
@@ -29,8 +27,8 @@ public class MapRegionTask extends BaseMapTask {
 	
 	private static final Logger logger = JourneyMap.getLogger();
 	
-	private MapRegionTask(World world, int dimension, boolean underground, Integer chunkY, Map<ChunkCoordIntPair, ChunkStub> chunkStubs) {
-		super(world, dimension, underground, chunkY, chunkStubs, true);
+	private MapRegionTask(World world, int dimension, boolean underground, Integer chunkY, ChunkMD.Set chunkMdPool) {
+		super(world, dimension, underground, chunkY, chunkMdPool, true);
 	}
 	
 	public static BaseMapTask create(RegionCoord rCoord, Minecraft minecraft, long worldHash) {
@@ -39,16 +37,16 @@ public class MapRegionTask extends BaseMapTask {
 
 		final World world = minecraft.theWorld;
 		final File mcWorldDir = FileHandler.getMCWorldDir(minecraft, rCoord.dimension);
-		final Map<ChunkCoordIntPair, ChunkStub> chunks = new HashMap<ChunkCoordIntPair, ChunkStub>(1280); // 1024 * 1.25 alleviates map growth		
+		final ChunkMD.Set chunks = new ChunkMD.Set(1280); // 1024 * 1.25 alleviates map growth		
 		final List<ChunkCoordIntPair> coords = rCoord.getChunkCoordsInRegion();
 		
 		while(!coords.isEmpty()) {
 			ChunkCoordIntPair coord = coords.remove(0);
-			ChunkStub stub = ChunkLoader.getChunkStubFromDisk(coord.chunkXPos, coord.chunkZPos, mcWorldDir, world, worldHash);
+			ChunkMD stub = ChunkLoader.getChunkStubFromDisk(coord.chunkXPos, coord.chunkZPos, mcWorldDir, world);
 			if(stub==null) {
 				missing++;
 			} else {
-				chunks.put(coord, stub);
+				chunks.add(stub);
 			}
 		}		
 
@@ -176,5 +174,10 @@ public class MapRegionTask extends BaseMapTask {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void taskComplete() {
+		
 	}
 }

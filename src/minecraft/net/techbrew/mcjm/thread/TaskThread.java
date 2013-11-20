@@ -3,13 +3,11 @@ package net.techbrew.mcjm.thread;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
@@ -18,7 +16,7 @@ import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkCoord;
 import net.techbrew.mcjm.model.ChunkImageCache;
-import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.render.ChunkRenderController;
 import net.techbrew.mcjm.task.IGenericTask;
@@ -106,8 +104,8 @@ public class TaskThread implements Runnable {
 			final Integer vSlice = task.getVSlice();	
 			final boolean underground = task.isUnderground();					
 			final int dimension = task.getDimension();
-			final Map<ChunkCoordIntPair, ChunkStub> chunkStubs = task.getChunkStubs();
-			final Iterator<ChunkStub> chunkIter = chunkStubs.values().iterator();
+			final ChunkMD.Set chunkSet = task.getChunkStubs();
+			final Iterator<ChunkMD> chunkIter = chunkSet.iterator();
 			final ChunkImageCache chunkImageCache = new ChunkImageCache();
 					
 			// Map the chunks
@@ -116,16 +114,17 @@ public class TaskThread implements Runnable {
 					if(threadLogging) logger.info("JM isn't mapping, aborting"); //$NON-NLS-1$
 					return;
 				}
-				ChunkStub chunkStub = chunkIter.next();
-				if(chunkStub.doMap) {
-					BufferedImage chunkImage = renderController.getChunkImage(chunkStub, underground, vSlice, chunkStubs);
-					ChunkCoord cCoord = ChunkCoord.fromChunkStub(jmWorldDir, chunkStub, vSlice, dimension);
+				ChunkMD chunkMd = chunkIter.next();
+				if(chunkMd.render) {
+					BufferedImage chunkImage = renderController.getChunkImage(chunkMd, underground, vSlice, chunkSet);
+					ChunkCoord cCoord = ChunkCoord.fromChunkMD(jmWorldDir, chunkMd, vSlice, dimension);
 					if(underground) {
 						chunkImageCache.put(cCoord, MapType.underground, chunkImage);
 					} else {
 						chunkImageCache.put(cCoord, MapType.day, getSubimage(MapType.day, chunkImage));
 						chunkImageCache.put(cCoord, MapType.night, getSubimage(MapType.night, chunkImage));
 					}
+					chunkMd.render = false;
 				}
 			}
 			
@@ -142,7 +141,8 @@ public class TaskThread implements Runnable {
 				logger.fine(task.getClass().getSimpleName() + " mapped " + chunks + " chunks in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start) + "ms with flush:" + flushImagesToDisk); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
-			chunkStubs.clear();
+			task.taskComplete();
+			chunkSet.clear();
 			chunkImageCache.clear();								
 				
 		} catch (Throwable t) {
