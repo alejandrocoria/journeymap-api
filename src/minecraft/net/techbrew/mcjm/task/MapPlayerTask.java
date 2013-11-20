@@ -42,7 +42,7 @@ public class MapPlayerTask extends BaseMapTask {
 		final Map playerData = DataCache.instance().get(PlayerData.class);
 		final boolean underground = (Boolean) playerData.get(EntityKey.underground);
 		final int dimension = (Integer) playerData.get(EntityKey.dimension);
-		boolean skipUnchanged = playerPos.posY==lastPlayerPos.posY;
+		boolean skipUnchanged = lastPlayerPos!=null && playerPos.posY==lastPlayerPos.posY;
 		
 		if(playerPos.equals(lastPlayerPos)) {
 			offset = 1;
@@ -97,12 +97,8 @@ public class MapPlayerTask extends BaseMapTask {
 				lastChunkStubs.remove(old);
 			}
 		}
-		//if(chunks.size()>0) {
-			logger.info("chunks left to map: " + chunks.size() + " out of " + initialSize + ".  lastChunkStubs=" + lastChunkStubs.size());
-		//}
-		
 		if(logger.isLoggable(Level.FINE)) {
-			logger.fine("Chunks: " + missing + " missing, " + chunks.size() + " used");
+			logger.info("chunks left to map: " + chunks.size() + " out of " + initialSize + ".  lastChunkStubs=" + lastChunkStubs.size());
 		}
 		
 		return new MapPlayerTask(world, dimension, underground, chunkY, chunks);
