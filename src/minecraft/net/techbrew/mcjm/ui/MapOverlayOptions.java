@@ -275,7 +275,6 @@ public class MapOverlayOptions extends GuiScreen {
 				JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, enable);
 				if(enable) {
 					close();
-					map.close();
 				}
 				break;
 			}

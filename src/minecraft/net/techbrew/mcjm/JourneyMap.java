@@ -28,7 +28,7 @@ import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.io.nbt.ChunkLoader;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.ChunkStub;
+import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.server.JMServer;
@@ -56,7 +56,7 @@ public class JourneyMap {
 	static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
 
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-	public static final String JM_VERSION = "3.0.0b3"; //$NON-NLS-1$
+	public static final String JM_VERSION = "3.0.0b4"; //$NON-NLS-1$
 	public static final String MC_VERSION = "1.6.4"; //$NON-NLS-1$
 	
 	private static class Holder {
@@ -75,8 +75,7 @@ public class JourneyMap {
 	
 	private boolean threadLogging = false;
 
-	private ChunkCoordIntPair lastPlayerCoord;
-	private volatile ChunkStub lastPlayerChunk;
+	private volatile ChunkMD lastPlayerChunk;
 
 	// Invokes MapOverlay
 	public KeyBinding keybinding;
@@ -317,9 +316,8 @@ public class JourneyMap {
 
 			// Check for valid player chunk
 			ChunkCoordIntPair playerCoord = new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ);
-			if(lastPlayerChunk==null || !playerCoord.equals(lastPlayerCoord)) {
-				lastPlayerCoord = playerCoord;
-				lastPlayerChunk = ChunkLoader.getChunkStubFromMemory(player.chunkCoordX, player.chunkCoordZ, minecraft, newHash);
+			if(lastPlayerChunk==null || !playerCoord.equals(lastPlayerChunk.coord)) {
+				lastPlayerChunk = ChunkLoader.getChunkStubFromMemory(player.chunkCoordX, player.chunkCoordZ, minecraft);
 				if(lastPlayerChunk==null) {
 					if(logger.isLoggable(Level.FINE)) {
 						logger.fine("Player chunk unknown: " + playerCoord);
@@ -334,7 +332,7 @@ public class JourneyMap {
 			}
 
 			// Show announcements
-			boolean isGamePaused = minecraft.currentScreen != null;
+			boolean isGamePaused = minecraft.currentScreen != null && !(minecraft.currentScreen instanceof MapOverlay);
 			while(!isGamePaused && !announcements.isEmpty()) {
 				player.addChatMessage(announcements.remove(0));
 			}			
@@ -452,7 +450,7 @@ public class JourneyMap {
 	 * 
 	 * @return
 	 */
-	public ChunkStub getLastPlayerChunk() {
+	public ChunkMD getLastPlayerChunk() {
 		return lastPlayerChunk;
 	}
 
