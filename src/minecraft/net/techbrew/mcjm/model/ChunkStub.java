@@ -14,7 +14,6 @@ import net.minecraft.src.WorldChunkManager;
 
 public class ChunkStub {
 	
-
 	public final int heightMap[];
 	public final byte[] blockBiomeArray;
 	public final int xPosition;
@@ -24,23 +23,6 @@ public class ChunkStub {
 	public final ExtendedBlockStorageStub storageArrays[];
 	public boolean isModified;			
 	
-
-	
-	ChunkStub(int[] heightMap, byte[] blockBiomeArray, int xPosition,
-			int zPosition, World worldObj,
-			int[] precipitationHeightMap,
-			ExtendedBlockStorageStub[] storageArrays, int worldHeight,
-			boolean isModified) {
-		this.heightMap = heightMap;
-		this.blockBiomeArray = blockBiomeArray;
-		this.xPosition = xPosition;
-		this.zPosition = zPosition;
-		this.precipitationHeightMap = precipitationHeightMap;
-		this.storageArrays = storageArrays;
-		this.worldObj = worldObj;
-		this.isModified = isModified;
-	}
-
 	ChunkStub(Chunk chunk) {
 		
 		this.heightMap = Arrays.copyOf(chunk.heightMap, chunk.heightMap.length);
