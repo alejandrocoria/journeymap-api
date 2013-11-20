@@ -1,4 +1,4 @@
-JourneyMap 3.0.0b3 for Minecraft 1.6.4 (November 16, 2013)
+JourneyMap 3.0.0b4 for Minecraft 1.6.4 (November ??, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -10,6 +10,11 @@ Requirements:
 
 - Minecraft 1.6.4
 - Forge "Recommended-1.6.4" or ModLoader 1.6.4
+
+BETA 4 NOTES:
+- Fixed bug releated to chunk change detection (introduced in Beta 3) that caused some chunks not to map.
+- Fixed bug where underground mapping didn't include water
+- Fixed NullPointerException when going to Nether on a Multiplayer server
 
 BETA 3 NOTES:
 - Optimization: Added chunk change detection to vastly reduce mapping overhead when you're not travelling.
