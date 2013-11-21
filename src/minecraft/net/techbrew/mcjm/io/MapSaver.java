@@ -30,8 +30,6 @@ public class MapSaver {
 	/**
 	 * Use pngj to assemble region files.
 	 * 
-	 * TODO: Draw grid on saved map
-	 * 
 	 * @param worldDir
 	 * @param mapType
 	 * @param vSlice
