@@ -52,7 +52,7 @@ public class ChunkStub {
     /**
      * Returns the value in the height map at this x, z coordinate in the chunk
      */
-    public int _getHeightValue(int par1, int par2)
+    public int getHeightValue(int par1, int par2)
     {
         return this.heightMap[par2 << 4 | par1];
     }
