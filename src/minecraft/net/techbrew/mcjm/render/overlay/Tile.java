@@ -15,6 +15,8 @@ import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.RegionImageHandler;
+import net.techbrew.mcjm.render.texture.TextureImpl;
+import net.techbrew.mcjm.render.texture.TextureCache;
 
 public class Tile {
 		
@@ -34,7 +36,7 @@ public class Tile {
 	
 	Integer lastVSlice;
 	MapType lastMapType;
-	MapTexture mapTexture;
+	TextureImpl textureImpl;
 	
 	private final Logger logger = JourneyMap.getLogger();
 	private final boolean debug = logger.isLoggable(Level.FINE);
@@ -53,7 +55,7 @@ public class Tile {
 	}
 	
 	public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice) {
-		boolean changed = (mapTexture==null || mapType!=lastMapType || vSlice!=lastVSlice);
+		boolean changed = (textureImpl==null || mapType!=lastMapType || vSlice!=lastVSlice);
 		if(!changed) changed = RegionImageHandler.hasImageChanged(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, lastImageTime);
 		
 		if(changed) {
@@ -73,10 +75,10 @@ public class Tile {
 				g.drawString(blockBounds(), 16, 32);
 				g.dispose();
 			}
-			if(mapTexture==null) {
-				mapTexture = new MapTexture(image);
+			if(textureImpl==null) {
+				textureImpl = TextureCache.newUnmanagedTexture(image);
 			} else {
-				mapTexture.updateTexture(image);
+				textureImpl.updateTexture(image);
 			}
 			//if(debug) logger.info("Updated texture for " + this + " at " + mapType + ", vSlice " + vSlice);
 		}
@@ -84,16 +86,16 @@ public class Tile {
 	}
 	
 	public boolean hasTexture() {
-		return mapTexture!=null;
+		return textureImpl!=null;
 	}
 	
-	public MapTexture getTexture() {	
-		return mapTexture;
+	public TextureImpl getTexture() {	
+		return textureImpl;
 	}
 	
 	public void clear() {
-		if(mapTexture!=null) {
-			mapTexture.clear();
+		if(textureImpl!=null) {
+			textureImpl.deleteTexture();
 		}
 	}
 

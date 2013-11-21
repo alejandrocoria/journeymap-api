@@ -10,7 +10,8 @@ import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.EntityHelper;
+import net.techbrew.mcjm.render.texture.TextureCache;
+import net.techbrew.mcjm.render.texture.TextureImpl;
 
 /**
  * Renders an entity image in the MapOverlay.
@@ -48,19 +49,20 @@ public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
 	}
 
 	@Override
-	public List<DrawStep> prepareSteps(List<Map> critters, CoreRenderer core) {
+	public List<DrawStep> prepareSteps(List<Map> critters, GridRenderer grid) {
 		
 		final List<DrawStep> drawStepList = new ArrayList<DrawStep>();
 		
 		try {
 			
 			double heading;
-			MapTexture entityIcon, locatorImg;
+			TextureImpl entityIcon, locatorImg;
 			String filename, owner;
 			Boolean isHostile, isPet, isPlayer;
 			boolean filterAnimals = (showAnimals!=showPets);
 			//FontMetrics fm = g2D.getFontMetrics();
 			String playername = Minecraft.getMinecraft().thePlayer.getEntityName();
+			TextureCache tc = TextureCache.instance();
 			
 			for(Map critter : critters) {
 				
@@ -78,7 +80,7 @@ public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
 				
 				int posX = (Integer) critter.get(EntityKey.posX);
 				int posZ = (Integer) critter.get(EntityKey.posZ);
-				Point pixel = core.getPixel(posX, posZ);
+				Point pixel = grid.getPixel(posX, posZ);
 				if(pixel!=null) {						
 					filename = (String) critter.get(EntityKey.filename);
 					heading = (Double) critter.get(EntityKey.heading);					
@@ -86,22 +88,22 @@ public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
 
 					// Determine and draw locator
 					if(isHostile) {
-						locatorImg = EntityHelper.getHostileLocator();
+						locatorImg = tc.getHostileLocator();
 					} else if(isPet) {
-						locatorImg = EntityHelper.getPetLocator();
+						locatorImg = tc.getPetLocator();
 					} else if(isPlayer) {
-						locatorImg = EntityHelper.getOtherLocator();
+						locatorImg = tc.getOtherLocator();
 					} else {
-						locatorImg = EntityHelper.getNeutralLocator();
+						locatorImg = tc.getNeutralLocator();
 					}			
 					
 					drawStepList.add(new DrawEntityStep(pixel, heading, false, locatorImg, 8));
 					
 					// Draw entity image
 					if(isPlayer) {
-						entityIcon = EntityHelper.getPlayerSkin((String) critter.get(EntityKey.username));
+						entityIcon = tc.getPlayerSkin((String) critter.get(EntityKey.username));
 					} else {
-						entityIcon = EntityHelper.getEntityImage(filename);
+						entityIcon = tc.getEntityImage(filename);
 					}
 					if(entityIcon!=null) {
 						int bottomMargin = isPlayer ? 0 : 8;
@@ -123,10 +125,6 @@ public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
 		}
 		
 		return drawStepList;
-	}
-
-	@Override
-	public void clear() {
 	}
 	
 }

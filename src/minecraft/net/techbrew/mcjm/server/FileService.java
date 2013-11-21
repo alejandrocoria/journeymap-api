@@ -22,8 +22,8 @@ import java.util.zip.ZipInputStream;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.EntityHelper;
-import net.techbrew.mcjm.render.overlay.MapTexture;
+import net.techbrew.mcjm.render.texture.TextureCache;
+import net.techbrew.mcjm.render.texture.TextureImpl;
 import se.rupy.http.Event;
 
 
@@ -177,7 +177,7 @@ public class FileService extends BaseService {
 		
 		ResponseHeader.on(event).contentType(ContentType.png);
 		
-		MapTexture tex = EntityHelper.getPlayerSkin(username);
+		TextureImpl tex = TextureCache.instance().getPlayerSkin(username);
 		BufferedImage img = tex.getImage();
 		if(img!=null) {			
 			serveImage(event, img);

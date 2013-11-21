@@ -321,7 +321,7 @@ public class MapOverlayOptions extends GuiScreen {
 		int by = (this.height / 4);
 		
 		GL11.glEnable(GL11.GL_BLEND);
-		if(map.coreRenderer!=null) {
+		if(map.gridRenderer!=null) {
 			BaseOverlayRenderer.drawRectangle(halfBg - (labelWidth/2), by-20, labelWidth, 12, titleColor, 255);
 		}
 		map.drawCenteredString(this.fontRenderer, title , this.width / 2, by-18, 16777215);

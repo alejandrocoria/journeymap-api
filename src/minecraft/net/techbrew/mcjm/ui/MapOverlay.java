@@ -40,10 +40,10 @@ import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer.DrawEntityStep;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer.DrawStep;
-import net.techbrew.mcjm.render.overlay.CoreRenderer;
-import net.techbrew.mcjm.render.overlay.MapTexture;
+import net.techbrew.mcjm.render.overlay.GridRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
+import net.techbrew.mcjm.render.texture.TextureCache;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -81,8 +81,8 @@ public class MapOverlay extends GuiScreen {
 	static Boolean follow = true;
 	static String playerLastPos = "0,0"; //$NON-NLS-1$
 	static int playerLastDimension = Integer.MIN_VALUE;
-	static MapTexture logoTexture;
-	static CoreRenderer coreRenderer;	
+
+	static GridRenderer gridRenderer;	
 	static OverlayWaypointRenderer waypointRenderer;
 	static OverlayRadarRenderer radarRenderer;
 	static final int minZoom = 0;
@@ -121,15 +121,13 @@ public class MapOverlay extends GuiScreen {
 		showPlayers = pm.getBoolean(PropertyManager.Key.PREF_SHOW_PLAYERS);
 		showWaypoints = pm.getBoolean(PropertyManager.Key.PREF_SHOW_WAYPOINTS);
 		
-		if(logoTexture==null) {
-			logoTexture = new MapTexture(FileHandler.getWebImage("ico/journeymap40.png"));
-		}			
+				
 		
 		// When switching dimensions, reset follow to true
 		if(playerLastDimension!=mc.thePlayer.dimension) {
-			if(coreRenderer!=null) {
-				coreRenderer.clear();
-				coreRenderer = null;
+			if(gridRenderer!=null) {
+				gridRenderer.clear();
+				gridRenderer = null;
 			}
 			playerLastDimension = mc.thePlayer.dimension;
 			follow = true;
@@ -243,12 +241,13 @@ public class MapOverlay extends GuiScreen {
 		super.setWorldAndResolution(minecraft, i, j);		
 		
 		hardcore = WorldData.isHardcoreAndMultiplayer();
+		lastRefresh=0;
+		
 		initButtons();
 		layoutButtons();			
 		
-		if(follow && coreRenderer!=null) {
-			Minecraft mc = Minecraft.getMinecraft();
-			coreRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, currentZoom);
+		if(follow && gridRenderer!=null) {			
+			gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, currentZoom);
 		}
 		
 		if(options!=null) {
@@ -260,8 +259,12 @@ public class MapOverlay extends GuiScreen {
 			chat.setWorldAndResolution(minecraft, i, j);
 			return;
 		}
+		
+		if(gridRenderer!=null) {
+			drawMap();
+		}
 
-		lastRefresh=0;		
+		
 	}
 
 	/**
@@ -412,8 +415,8 @@ public class MapOverlay extends GuiScreen {
 			msx=mx;
 			msy=my;
 			
-			coreRenderer.move(-mouseDragX, -mouseDragY);
-			updateCoreRenderer();
+			gridRenderer.move(-mouseDragX, -mouseDragY);
+			updateGrid();
 			
 			setFollow(false);
 			
@@ -452,8 +455,6 @@ public class MapOverlay extends GuiScreen {
 		buttonFollow.setToggled(onPlayer);
 		follow = onPlayer;
 		if(follow) {
-			//Minecraft mc = Minecraft.getMinecraft();
-			//coreRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, currentZoom);
 			refreshState();
 		} 
 	}
@@ -618,12 +619,12 @@ public class MapOverlay extends GuiScreen {
 			refreshState();			
 		}
 			
-		if(coreRenderer!=null) {
-			coreRenderer.draw(1f, xOffset, yOffset);
+		if(gridRenderer!=null) {
+			gridRenderer.draw(1f, xOffset, yOffset);
 			BaseOverlayRenderer.draw(drawStepList, xOffset, yOffset);
 		}
 				
-		BaseOverlayRenderer.drawImage(logoTexture, 6, 1, false); 
+		BaseOverlayRenderer.drawImage(TextureCache.instance().getLogo(), 6, 1, false); 
 		
 		scaleResolution(true);
 				
@@ -682,34 +683,33 @@ public class MapOverlay extends GuiScreen {
 		// Refresh state
 		state = new MapOverlayState(worldDir, effectiveMapType, vSlice, underground, currentZoom, playerLastDimension);
 		
-		// Get core renderer updated
-		if(coreRenderer==null || !coreRenderer.isUsing(state.getWorldDir(), state.getDimension())) {
-			if(coreRenderer!=null) coreRenderer.clear();
+		// Set/update the grid
+		if(gridRenderer==null || !gridRenderer.isUsing(state.getWorldDir(), state.getDimension())) {
+			if(gridRenderer!=null) gridRenderer.clear();
 			setFollow(true);
-			coreRenderer = new CoreRenderer(state.getWorldDir(), state.getDimension());
-		}				
+			gridRenderer = new GridRenderer(state.getWorldDir(), state.getDimension());
+		}			
+		
+		// Center core renderer
 		if(follow) {
 			Minecraft mc = Minecraft.getMinecraft();
-			coreRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, currentZoom);
+			gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, currentZoom);
 		} else {
-			coreRenderer.setZoom(currentZoom);
+			gridRenderer.setZoom(currentZoom);
 		}
-		coreRenderer.updateTextures(state.getMapType(), state.getVSlice());
+		gridRenderer.updateTextures(state.getMapType(), state.getVSlice());
 		
-
 		// Ensure radarRenderer is updated
 		if(radarRenderer==null) {
 			radarRenderer = new OverlayRadarRenderer(showAnimals, showPets);
 		} else {
 			radarRenderer.setShowAnimals(showAnimals);
 			radarRenderer.setShowPets(showPets);
-			radarRenderer.clear();
 		}
 		
 		// Ensure waypointRenderer
 		if(waypointRenderer==null) {
 			waypointRenderer = new OverlayWaypointRenderer();
-			waypointRenderer.clear();
 		}
 				
 		// Build list of drawSteps
@@ -740,7 +740,7 @@ public class MapOverlay extends GuiScreen {
 			// Sort to keep named entities last
 			Collections.sort(critters, new EntityHelper.EntityMapComparator());
 			
-			drawStepList.addAll(radarRenderer.prepareSteps(critters, coreRenderer));
+			drawStepList.addAll(radarRenderer.prepareSteps(critters, gridRenderer));
 		}		
 		
 		// Draw waypoints
@@ -748,13 +748,13 @@ public class MapOverlay extends GuiScreen {
 			Map map = (Map) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
 			List<Waypoint> waypoints = new ArrayList<Waypoint>(map.values());
 
-			drawStepList.addAll(waypointRenderer.prepareSteps(waypoints, coreRenderer));
+			drawStepList.addAll(waypointRenderer.prepareSteps(waypoints, gridRenderer));
 		}
 
 		// Draw player if within bounds
-		Point playerPixel = coreRenderer.getPixel((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ);
+		Point playerPixel = gridRenderer.getPixel((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ);
 		if(playerPixel!=null) {
-			drawStepList.add(new DrawEntityStep(playerPixel, EntityHelper.getHeading(mc.thePlayer), false, EntityHelper.getPlayerImage(), 8));				
+			drawStepList.add(new DrawEntityStep(playerPixel, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8));				
 		}			
 		
 		// Update player pos
@@ -771,13 +771,13 @@ public class MapOverlay extends GuiScreen {
 				
 	}
 	
-	void updateCoreRenderer() {
+	void updateGrid() {
 		
-		if(state==null || coreRenderer==null) return;
+		if(state==null || gridRenderer==null) return;
 
 		try {
-			coreRenderer.updateTextures(state.getMapType(), state.getVSlice());
-			coreRenderer.setZoom(currentZoom);
+			gridRenderer.updateTextures(state.getMapType(), state.getVSlice());
+			gridRenderer.setZoom(currentZoom);
 		} catch(Exception e) {
 			logger.severe(LogFormatter.toString(e));
 		}
@@ -830,7 +830,7 @@ public class MapOverlay extends GuiScreen {
 	}
 
 	void close() {
-		if(coreRenderer!=null) {
+		if(gridRenderer!=null) {
 			//tiles.clear();
 		}		
 		if(chat!=null) {
@@ -855,16 +855,9 @@ public class MapOverlay extends GuiScreen {
 	}
 
 	void moveCanvas(int deltaBlockX, int deltaBlockz){
-		coreRenderer.move(deltaBlockX, deltaBlockz);
+		gridRenderer.move(deltaBlockX, deltaBlockz);
 		setFollow(false);
 		refreshState();
-	}
-
-	protected void eraseCachedLogoImg() {
-		if(logoTexture!=null) {
-			GL11.glDeleteTextures(logoTexture.getGlTextureId());
-			logoTexture = null;
-		}
 	}
 
 	protected void launchLocalhost() {
@@ -906,23 +899,10 @@ public class MapOverlay extends GuiScreen {
 		currentZoom = 1;
 		playerLastPos = "0,0"; //$NON-NLS-1$
 		playerLastDimension = Integer.MIN_VALUE;
-		
-		if(logoTexture!=null) {
-			logoTexture.clear();
-			logoTexture = null;
+		if(gridRenderer!=null) {
+			gridRenderer.clear();
+			gridRenderer = null;
 		}
-		if(coreRenderer!=null) {
-			coreRenderer.clear();
-			coreRenderer = null;
-		}
-		if(waypointRenderer!=null) {
-			waypointRenderer.clear();
-			waypointRenderer = null;
-		}
-		if(radarRenderer!=null) {
-			radarRenderer.clear();
-			radarRenderer = null;
-		}		
 	}
 
 }

@@ -29,8 +29,8 @@ import net.techbrew.mcjm.io.nbt.ChunkLoader;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkMD;
-import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.RegionImageCache;
+import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.server.JMServer;
 import net.techbrew.mcjm.task.ITaskManager;
 import net.techbrew.mcjm.task.MapPlayerTask;
@@ -201,8 +201,8 @@ public class JourneyMap {
     private void startMapping(Minecraft minecraft) {
     	synchronized(this) {
     		MapOverlay.reset();
-    		EntityHelper.clearCaches();
-	    	DataCache.instance().purge();   
+	    	DataCache.instance().purge();
+	    	TextureCache.instance().purge();
 
 	    	if(taskExecutor==null || taskExecutor.isShutdown()) {			    		
 				taskExecutor = Executors.newScheduledThreadPool(1, new JMThreadFactory("task")); //$NON-NLS-1$				
@@ -256,7 +256,7 @@ public class JourneyMap {
 			TaskThread.reset();
 			RegionImageCache.getInstance().flushToDisk();
 			RegionImageCache.getInstance().clear();
-			EntityHelper.clearCaches();
+			TextureCache.instance().purge();
 			MapOverlay.reset();
 			MapPlayerTask.clearCache();
 			

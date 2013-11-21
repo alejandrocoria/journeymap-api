@@ -1,17 +1,9 @@
 package net.techbrew.mcjm.model;
 
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.imageio.ImageIO;
 
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.Entity;
@@ -33,12 +25,8 @@ import net.minecraft.src.RenderHorse;
 import net.minecraft.src.RenderLiving;
 import net.minecraft.src.RenderManager;
 import net.minecraft.src.ResourceLocation;
-import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
-import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.io.RegionImageHandler;
-import net.techbrew.mcjm.render.overlay.MapTexture;
 
 public class EntityHelper {
 	
@@ -46,16 +34,6 @@ public class EntityHelper {
 	
 	private static final double PI2 = 2*Math.PI;
 	
-	// TODO: make threadsafe
-	static MapTexture locatorHostile, locatorNeutral, locatorOther, locatorPet, locatorPlayer, unknownImage;
-	
-	// TODO: make threadsafe
-	static volatile HashMap<String, MapTexture> entityImageMap = new HashMap<String, MapTexture>();
-	
-	static volatile Map<String, MapTexture> skinImageMap = Collections.synchronizedMap(new HashMap<String, MapTexture>());
-	
-	static Method renderGetEntityTextureMethod;
-
 	private static int lateralDistance = PropertyManager.getInstance().getInteger(PropertyManager.Key.CHUNK_OFFSET) * 8;
 	private static int verticalDistance = lateralDistance/2;
 	
@@ -114,129 +92,10 @@ public class EntityHelper {
 	private static AxisAlignedBB getBB(EntityPlayerSP player) {
 		return AxisAlignedBB.getBoundingBox(player.posX, player.posY, player.posZ, player.posX, player.posY, player.posZ).expand(lateralDistance, verticalDistance, lateralDistance);
 	}
-			
-	/**
-	 * TODO: Not threadsafe
-	 * @return
-	 */
-	public static MapTexture getEntityImage(String filename) {
-		MapTexture tex = entityImageMap.get(filename);
-		if(tex==null) {
-			BufferedImage img = FileHandler.getWebImage("entity/" + filename);	//$NON-NLS-1$ //$NON-NLS-2$
-			if(img==null) {				
-				tex = getUnknownImage();
-			} else {	
-				tex = new MapTexture(img);
-			}
-			entityImageMap.put(filename, tex);
-		}
-		return tex;
-	}
-	
-	public static MapTexture getPlayerSkin(String username) {
-		
-		synchronized(skinImageMap) {
-			MapTexture tex = skinImageMap.get(username);
-			if(tex==null) {				
-				BufferedImage img = null;
-				try {
-					URL url = new URL("http://s3.amazonaws.com/MinecraftSkins/" + username + ".png");
-					img = ImageIO.read(url).getSubimage(8, 8, 8, 8);
-					
-				} catch (Throwable e) {
-					try {
-						URL url = new URL("http://s3.amazonaws.com/MinecraftSkins/char.png");
-						img = ImageIO.read(url).getSubimage(8, 8, 8, 8);
-					} catch (Throwable e2) {
-						JourneyMap.getLogger().warning("Can't get skin image for " + username + ": " + e2.getMessage());
-					}
-				}
-				
-				if(img!=null) {			
-					final BufferedImage scaledImage = new BufferedImage(24, 24, img.getType());
-					final Graphics2D g = RegionImageHandler.initRenderingHints(scaledImage.createGraphics());
-					g.drawImage(img, 0, 0, 24, 24, null);
-					g.dispose();
-					tex = new MapTexture(scaledImage, true);
-				} else {
-					tex = getUnknownImage();
-				}
-				skinImageMap.put(username, tex);
-			}
-			return tex;
-		}			
-	}
+
 
 	
-	/**
-	 * TODO: Not threadsafe
-	 * @return
-	 */
-	public static MapTexture getHostileLocator() {
-		if(locatorHostile==null) {
-			BufferedImage img =  FileHandler.getWebImage("locator-hostile.png"); //$NON-NLS-1$	
-			locatorHostile = new MapTexture(img);	
-		}
-		return locatorHostile;
-	}
 	
-	/**
-	 * TODO: Not threadsafe
-	 * @return
-	 */
-	public static MapTexture getNeutralLocator() {
-		if(locatorNeutral==null) {
-			BufferedImage img =  FileHandler.getWebImage("locator-neutral.png"); //$NON-NLS-1$	
-			locatorNeutral = new MapTexture(img);			
-		}
-		return locatorNeutral;
-	}
-	
-	/**
-	 * TODO: Not threadsafe
-	 * @return
-	 */
-	public static MapTexture getOtherLocator() {
-		if(locatorOther==null) {
-			BufferedImage img =  FileHandler.getWebImage("locator-other.png"); //$NON-NLS-1$	
-			locatorOther = new MapTexture(img);	
-		}
-		return locatorOther;
-	}
-	
-	/**
-	 * TODO: Not threadsafe
-	 * @return
-	 */
-	public static MapTexture getPetLocator() {
-		if(locatorPet==null) {
-			BufferedImage img =  FileHandler.getWebImage("locator-pet.png"); //$NON-NLS-1$	
-			locatorPet = new MapTexture(img);			
-		}
-		return locatorPet;
-	}
-	
-	/**
-	 * TODO: Not threadsafe
-	 * @return
-	 */
-	public static MapTexture getPlayerImage() {
-		if(locatorPlayer==null) {
-			BufferedImage img =  FileHandler.getWebImage("locator-player.png"); //$NON-NLS-1$	
-			locatorPlayer = new MapTexture(img);
-		}
-		return locatorPlayer;
-	}
-	
-	/**
-	 * @return
-	 */
-	public static synchronized MapTexture getUnknownImage() {
-		if(unknownImage==null) {
-			unknownImage = new MapTexture(FileHandler.getWebImage("entity/unknown.png"), true);
-		}
-		return unknownImage;
-	}
 	
 	
 	/**
@@ -331,8 +190,4 @@ public class EntityHelper {
 		
 	}
 	
-	public static void clearCaches() {
-		entityImageMap.clear();
-		skinImageMap.clear();
-	}
 }

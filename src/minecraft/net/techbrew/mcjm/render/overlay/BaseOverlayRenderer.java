@@ -16,6 +16,7 @@ import net.minecraft.src.ResourceLocation;
 import net.minecraft.src.Tessellator;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.render.texture.TextureImpl;
 
 import org.lwjgl.opengl.GL11;
 
@@ -26,11 +27,9 @@ public abstract class BaseOverlayRenderer<K> {
 	public static AlphaComposite CLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0F);
 	public static AlphaComposite SEMICLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F);
 	public static AlphaComposite SLIGHTLYCLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F);
-	
-	abstract public List<DrawStep> prepareSteps(List<K> data, CoreRenderer core);
-	
-	abstract public void clear();
 
+	abstract public List<DrawStep> prepareSteps(List<K> data, GridRenderer grid);
+	
 	/**
 	 * Get a DynamicTexture for a path
 	 * @param path
@@ -93,18 +92,24 @@ public abstract class BaseOverlayRenderer<K> {
         fontRenderer.drawStringWithShadow(text, x - fontRenderer.getStringWidth(text) / 2, y, color);
     }
 	
-	private static void drawQuad(final int x, final int y, final int width, final int height, boolean flip) {
-		drawQuad(x,y,width,height,null,1f,flip);
+	private static void drawQuad(TextureImpl texture, final int x, final int y, final int width, final int height, boolean flip) {
+		drawQuad(texture,x,y,width,height,null,1f,flip);
 	}
 	
-	private static void drawQuad(final int x, final int y, final int width, final int height, Color color, float alpha, boolean flip) {
+	private static void drawQuad(TextureImpl texture, final int x, final int y, final int width, final int height, Color color, float alpha, boolean flip) {
 				
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDepthMask(false);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);		
 		if(color!=null) {
 			float[] c = color.getColorComponents(null);
 			GL11.glColor4f(c[0], c[1], c[2], alpha);
 		} else {
 			GL11.glColor4f(alpha,alpha,alpha,alpha);
 		}
+		GL11.glDisable(GL11.GL_ALPHA_TEST);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
 		
 		final int direction = flip ? -1 : 1;
 		
@@ -121,7 +126,7 @@ public abstract class BaseOverlayRenderer<K> {
 		
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthMask(false);
-		GL11.glBlendFunc(770, 771);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);		
 		Tessellator tessellator = Tessellator.instance;
@@ -135,26 +140,20 @@ public abstract class BaseOverlayRenderer<K> {
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 	}
 
-	public static void drawImage(MapTexture texture, int x, int y, boolean flip) {		
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDepthMask(false);
-		GL11.glBlendFunc(770, 771);
-		GL11.glDisable(GL11.GL_ALPHA_TEST);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
-		drawQuad(x, y, texture.width, texture.height, flip);		
+	public static void drawImage(TextureImpl texture, int x, int y, boolean flip) {				
+		drawQuad(texture, x, y, texture.width, texture.height, flip);		
 	}
 	
-	public static void drawRotatedImage(MapTexture texture, int x, int y, float heading) {
-			
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDepthMask(false);
-		GL11.glBlendFunc(770, 771);
-		GL11.glDisable(GL11.GL_ALPHA_TEST);
+	public static void drawRotatedImage(TextureImpl texture, int x, int y, float heading) {
 		
 		// Start a new matrix for translation/rotation
 		GL11.glPushMatrix();
 		
-
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDepthMask(false);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glDisable(GL11.GL_ALPHA_TEST);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		// Bind texture
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
@@ -173,16 +172,15 @@ public abstract class BaseOverlayRenderer<K> {
 		GL11.glTranslated(-texture.width, -texture.height, 0);
 		
 		// Draw texture in rotated position
-		drawQuad(texture.width/2, texture.height/2, texture.width, texture.height, false);		
+		drawQuad(texture, texture.width/2, texture.height/2, texture.width, texture.height, false);		
 		
 		// Drop out of the translated+rotated matrix
 		GL11.glPopMatrix();	
 	}
 	
-	private static void drawColoredImage(MapTexture texture, int alpha, Color color, int x, int y) {
+	private static void drawColoredImage(TextureImpl texture, int alpha, Color color, int x, int y) {
 		
-		GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, texture.getGlTextureId());
-		drawQuad(x, y, texture.width, texture.height, color, alpha, false);
+		drawQuad(texture, x, y, texture.width, texture.height, color, alpha, false);
 		
 	}
 	
@@ -193,7 +191,7 @@ public abstract class BaseOverlayRenderer<K> {
 	 * @param entityIcon
 	 * @param overlayImg
 	 */
-	private static void drawEntity(int x, int y, Double heading, boolean flipInsteadOfRotate, MapTexture texture, int bottomMargin) {
+	private static void drawEntity(int x, int y, Double heading, boolean flipInsteadOfRotate, TextureImpl texture, int bottomMargin) {
 
 		if(heading==null) {
 			drawImage(texture, x, y, false);
@@ -205,13 +203,26 @@ public abstract class BaseOverlayRenderer<K> {
 		}			
 	}
 	
-	public static void draw(List<DrawStep> drawStepList, int xOffset, int yOffset) {
+	/**
+	 * Draw a list of steps
+	 * @param drawStepList
+	 * @param xOffset
+	 * @param yOffset
+	 */
+	public static synchronized void draw(final List<DrawStep> drawStepList, int xOffset, int yOffset) {
+		if(drawStepList==null || drawStepList.isEmpty()) return;
 		
-		for(DrawStep drawStep : drawStepList) {
+		DrawStep[] stepArray = drawStepList.toArray(new DrawStep[drawStepList.size()]); // ensure the list won't be modified
+		for(DrawStep drawStep : stepArray) {
 			drawStep.draw(xOffset, yOffset);
 		}
 	}
 	
+	/**
+	 * Interface for something that needs to be drawn at a pixel coordinate.
+	 * @author mwoodman
+	 *
+	 */
 	public interface DrawStep {
 		public void draw(int xOffset, int yOffset);
 	}
@@ -220,10 +231,10 @@ public abstract class BaseOverlayRenderer<K> {
 		final Point pixel;
 		final Double heading;
 		final boolean flip;
-		final MapTexture texture;
+		final TextureImpl texture;
 		final int bottomMargin;
 		
-		public DrawEntityStep(Point pixel, Double heading, boolean flip, MapTexture texture, int bottomMargin) {
+		public DrawEntityStep(Point pixel, Double heading, boolean flip, TextureImpl texture, int bottomMargin) {
 			super();
 			this.pixel = pixel;
 			this.heading = heading;
@@ -241,11 +252,11 @@ public abstract class BaseOverlayRenderer<K> {
 	class DrawColoredImageStep implements DrawStep {
 		
 		final Point pixel;
-		final MapTexture texture;
+		final TextureImpl texture;
 		final Color color;
 		final int alpha;
 		
-		public DrawColoredImageStep(Point pixel, MapTexture texture,
+		public DrawColoredImageStep(Point pixel, TextureImpl texture,
 				Color color, int alpha) {
 			super();
 			this.pixel = pixel;
@@ -263,10 +274,10 @@ public abstract class BaseOverlayRenderer<K> {
 	class DrawRotatedImageStep implements DrawStep {
 		
 		final Point pixel;
-		final MapTexture texture;
+		final TextureImpl texture;
 		final float heading;
 		
-		public DrawRotatedImageStep(Point pixel, MapTexture texture, float heading) {
+		public DrawRotatedImageStep(Point pixel, TextureImpl texture, float heading) {
 			super();
 			this.pixel = pixel;
 			this.texture = texture;

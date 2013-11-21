@@ -25,7 +25,7 @@ import org.lwjgl.opengl.GL11;
  * @author mwoodman
  *
  */
-public class CoreRenderer {
+public class GridRenderer {
 			
 	private final Logger logger = JourneyMap.getLogger();
 	private final boolean debug = logger.isLoggable(Level.INFO);
@@ -49,7 +49,7 @@ public class CoreRenderer {
 	private final int dimension;
 	private final File worldDir;		
 
-	public CoreRenderer(final File worldDir, final int dimension) {
+	public GridRenderer(final File worldDir, final int dimension) {
 		this.worldDir = worldDir;
 		this.dimension = dimension;
 	}

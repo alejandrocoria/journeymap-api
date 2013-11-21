@@ -1,17 +1,21 @@
-package net.techbrew.mcjm.render.overlay;
+package net.techbrew.mcjm.render.texture;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.minecraft.src.AbstractTexture;
 import net.minecraft.src.ResourceManager;
 import net.minecraft.src.TextureUtil;
+import net.techbrew.mcjm.JourneyMap;
 
 import org.lwjgl.opengl.GL11;
 
-public class MapTexture extends AbstractTexture
-{
-    private final int[] dynamicTextureData;
+public class TextureImpl extends AbstractTexture {
+	
+	static Set<Integer> texIds = Collections.synchronizedSet(new HashSet<Integer>());
 
     /** width of this icon in pixels */
     public final int width;
@@ -19,21 +23,29 @@ public class MapTexture extends AbstractTexture
     /** height of this icon in pixels */
     public final int height;
     
-    /** optionally-retained image **/
-    public BufferedImage image;
+    /** keep image with object */
+    public final boolean retainImage;
     
-    public MapTexture(BufferedImage image) {
+    /** optionally-retained image **/
+    private BufferedImage image;
+    
+    TextureImpl(BufferedImage image) {
     	this(image, false);
     }
     
-    public MapTexture(BufferedImage image, boolean retainImage)
-    {    	
-    	if(retainImage) this.image = image;
+    TextureImpl(BufferedImage image, boolean retainImage)
+    {    	    	
+    	this.retainImage = retainImage;
     	this.width = image.getWidth();
         this.height = image.getHeight();
-        this.dynamicTextureData = new int[width * height];
-        TextureUtil.allocateTexture(this.getGlTextureId(), width, height);
         updateTexture(image);
+        
+        if(texIds.contains(glTextureId)) {
+        	JourneyMap.getLogger().severe("*** WARNING!  Texture ID has already been used: " + glTextureId);
+        } else {
+        	texIds.add(glTextureId);
+        }
+        
     }    
 
     public void updateTexture(BufferedImage image)
@@ -41,8 +53,8 @@ public class MapTexture extends AbstractTexture
     	if(image.getWidth()!=width || image.getHeight()!=height) {
     		throw new IllegalArgumentException("Image dimensions don't match");
     	}
-    	image.getRGB(0, 0, width, height, this.dynamicTextureData, 0, width);
-        TextureUtil.uploadTexture(getGlTextureId(), dynamicTextureData, width, height);
+    	if(retainImage) this.image = image;
+        TextureUtil.uploadTextureImage(getGlTextureId(), image);
     }
     
     public boolean hasImage() {
@@ -53,7 +65,7 @@ public class MapTexture extends AbstractTexture
     	return image;
     }
 
-	public void clear() {
+	public void deleteTexture() {
 		if(this.glTextureId!=-1) {
 			GL11.glDeleteTextures(this.getGlTextureId());
 		}
