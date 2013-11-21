@@ -197,10 +197,9 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	 * 
 	 */
 	public boolean renderUnderground(final Graphics2D g2D, final ChunkMD chunkMd, final int vSlice, final ChunkMD.Set neighbors) {
-		
-		
+				
 		int sliceMinY = Math.max((vSlice << 4) - 1, 0);
-		int sliceMaxY = Math.min(((vSlice + 1) << 4) - 1, chunkMd.worldHeight);
+		int sliceMaxY = Math.min(((vSlice + 1) << 4) - 1, chunkMd.worldObj.getActualHeight());
 		if (sliceMinY == sliceMaxY) {
 			sliceMaxY += 2;
 		}
@@ -208,7 +207,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		// Initialize ChunkSub slopes if needed
 		if(chunkMd.slopes==null) {
 			chunkMd.slopes = new float[16][16];
-			float minNorm = Math.min(((vSlice + 1) << 4) - 1, chunkMd.worldHeight);
+			float minNorm = Math.min(((vSlice + 1) << 4) - 1, chunkMd.worldObj.getActualHeight());
 			float maxNorm = 0;
 			float slope, h, hN, hW;
 			
@@ -236,11 +235,14 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 			
 			blockLoop: for (int x = 0; x < 16; x++) {			
 				try {									
+					if(chunkMd.stub.canBlockSeeTheSky(x, sliceMinY, z)) {
+						continue blockLoop;
+					}
 					
 					int blockMaxY = mapBlocks.ceiling(chunkMd, x, sliceMaxY, z);	
 					//System.out.print(blockMaxY + " ");
 
-					hasAir = false; 
+					hasAir = chunkMd.stub.getBlockID(x, blockMaxY+1, z)==0; 
 					hasWater = false;
 					paintY = blockMaxY;
 					lightLevel = -1;

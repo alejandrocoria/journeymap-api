@@ -102,44 +102,48 @@ public class MapBlocks extends HashMap {
 	 */
 	public static int ceiling(ChunkMD chunkStub, final int x, final int maxY, final int z) {
 		
-		final int chunkHeight = chunkStub.stub._getHeightValue(x, z);
+		final int chunkHeight = chunkStub.stub.getHeightValue(x, z);
 		final int topY = Math.min(maxY, chunkHeight);
-		
+
 		int blockId;
 		int y = topY;
-		if(topY==chunkHeight) {
-			// Experimental
-			blockId = chunkStub.stub.getBlockID(x, y, z);
-			if(nonCeilingBlocks.contains(blockId)) {
-				y--;
-			}
-			return y;
-
-//			// Error check, could be bad data in the heightmap
-//			while(y<maxY) {
-//				blockId = chunkStub.stub.getBlockID(x, y, z);
-//				
-//				if(nonCeilingBlocks.contains(blockId)) {
-//					y++;
-//				} else {
-//					break;
-//				}
+		
+//		if(topY==chunkHeight) {
+//			// Experimental
+//			blockId = chunkStub.stub.getBlockID(x, y, z);
+//			if(nonCeilingBlocks.contains(blockId)) {
+//				y--;
 //			}
-//			if(y<maxY) {
-//				return y;
-//			} else {
-//				return topY;
-//			}
-		}
+//			return y;
+//
+////			// Error check, could be bad data in the heightmap
+////			while(y<maxY) {
+////				blockId = chunkStub.stub.getBlockID(x, y, z);
+////				
+////				if(nonCeilingBlocks.contains(blockId)) {
+////					y++;
+////				} else {
+////					break;
+////				}
+////			}
+////			if(y<maxY) {
+////				return y;
+////			} else {
+////				return topY;
+////			}
+//		}
 		
 		while(y>=0) {
 			blockId = chunkStub.stub.getBlockID(x, y, z);
-			if(nonCeilingBlocks.contains(blockId)) {
+			if(chunkStub.stub.canBlockSeeTheSky(x, y, z)) {
+				y--;
+			} else if(nonCeilingBlocks.contains(blockId)) {
 				y--;
 			} else {
 				break;
 			}
 		}
+		
 		return y;
 	}
 		
