@@ -126,6 +126,10 @@ public abstract class ImageSet {
 		return sb.append(" ]").toString();
 	}
 	
+	public void clear() {
+		imageWrappers.clear();
+	}
+	
 	@Override
 	public abstract int hashCode();
 

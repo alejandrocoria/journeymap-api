@@ -169,6 +169,9 @@ public class RegionImageCache  {
 	
 	public void clear() {
 		synchronized(lock) {
+			for(ImageSet imageSet : imageSets.values()) {
+				imageSet.clear();
+			}
 			imageSets.clear();
 		}
 	}
