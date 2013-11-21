@@ -234,79 +234,89 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		for (int z = 0; z < 16; z++) {
 			
 			blockLoop: for (int x = 0; x < 16; x++) {			
-				try {									
-					if(chunkMd.stub.canBlockSeeTheSky(x, sliceMinY, z)) {
-						continue blockLoop;
-					}
+				try {				
 					
-					int blockMaxY = mapBlocks.ceiling(chunkMd, x, sliceMaxY, z);	
-					//System.out.print(blockMaxY + " ");
-
-					hasAir = chunkMd.stub.getBlockID(x, blockMaxY+1, z)==0; 
-					hasWater = false;
-					paintY = blockMaxY;
-					lightLevel = -1;
-		
-					airloop: for (int y = blockMaxY; y >= 0; y--) {
-														
-						blockId = chunkMd.stub.getBlockID(x, y, z);
-		
-						if (blockId == 0) {
-							hasAir = true;
-							continue airloop;
-						}
+					int blockMaxY = mapBlocks.ceiling(chunkMd, x, sliceMaxY, z);
+					boolean skipUndergroundCheck = chunkMd.stub.canBlockSeeTheSky(x, sliceMinY, z);
+											
+					if(skipUndergroundCheck) {
 						
-						// Water handling
-						if((blockId == 8 || blockId == 9)) {
-							if(!hasWater) {
-								lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,y,z);
-								paintY = y;
-							}
-							hasWater = true;							
-						}
+						hasAir = true;
 						
-						// Treat torches like there is air
-						if(blockId == 50 || blockId == 76 || blockId == 76) {
-							hasAir = true;
-							// Check whether torch is mounted on the block below it
-							if(chunkMd.stub.getBlockMetadata(x, y, z)!=5) { // standing on block below=5
+						paintY = blockMaxY;
+						lightLevel = Math.max(1,chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,paintY+1, z));
+						hasWater = false;
+						
+					} else {
+					
+						hasAir = chunkMd.stub.getBlockID(x, blockMaxY+1, z)==0; 
+						hasWater = false;
+						paintY = blockMaxY;
+						lightLevel = -1;
+			
+						airloop: for (int y = blockMaxY; y >= 0; y--) {
+															
+							blockId = chunkMd.stub.getBlockID(x, y, z);
+			
+							if (blockId == 0) {
+								hasAir = true;
 								continue airloop;
 							}
-						}						
-						
-						// Lava shortcut
-						if(blockId==10 || blockId==11) {
-							if(!hasAir) {
-								paintBlock(x, z, Color.black, g2D);
-								continue blockLoop;
-							} else {
-								lightLevel = 15;
-								paintY = y;
-								break airloop;
-							}
-						}
-						
-						// Arrived at a solid block with air above it
-						if (hasAir) {
-							paintY = y;
 							
-							if (caveLighting) {
-								lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,paintY+1, z);
-								if(lightLevel > 0) {
-									break airloop;		
-								} else {
-									// We've hit an unlit sublayer
-									hasAir = false;
+							// Water handling
+							if((blockId == 8 || blockId == 9)) {
+								if(!hasWater) {
+									lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,y,z);
+									paintY = y;
 								}
-							} else {
-								break airloop;
+								hasWater = true;							
 							}
 							
-						} else if(y<=sliceMinY) {
-							break airloop;
-						}
-					} // end airloop
-									
+							// Treat torches like there is air
+							if(blockId == 50 || blockId == 76 || blockId == 76) {
+								hasAir = true;
+								// Check whether torch is mounted on the block below it
+								if(chunkMd.stub.getBlockMetadata(x, y, z)!=5) { // standing on block below=5
+									continue airloop;
+								}
+							}						
+							
+							// Lava shortcut
+							if(blockId==10 || blockId==11) {
+								if(!hasAir) {
+									paintBlock(x, z, Color.black, g2D);
+									continue blockLoop;
+								} else {
+									lightLevel = 15;
+									paintY = y;
+									break airloop;
+								}
+							}
+							
+							// Arrived at a solid block with air above it
+							if (hasAir) {
+								paintY = y;
+								
+								if (caveLighting) {
+									lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,paintY+1, z);
+									if(lightLevel > 0) {
+										break airloop;		
+									} else {
+										// We've hit an unlit sublayer
+										hasAir = false;
+									}
+								} else {
+									break airloop;
+								}
+								
+							} else if(y<=sliceMinY) {
+								break airloop;
+							}
+						} // end airloop
+										
+						
+					}
+					
 					// No air blocks in column at all
 					if (paintY < 0 || (!hasAir && !hasWater) || (lightLevel<1 && caveLighting)) {						
 						paintBlock(x, z, Color.black, g2D);
@@ -353,16 +363,29 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						}
 					}
 		
-					// Adjust color for light level
-					if (caveLighting && lightLevel < 15) {
-						float darken = Math.min(1F, (lightLevel / 16F));
-						float[] rgb = new float[4];
-						rgb = color.getRGBColorComponents(rgb);
-						color = new Color(
-								MathHelper.clamp_float(rgb[0] * darken, 0f, 1f), 
-								MathHelper.clamp_float(rgb[1] * darken, 0f, 1f), 
-								MathHelper.clamp_float(rgb[2] * darken, 0f, 1f));
-					}								
+					if(skipUndergroundCheck) {
+						
+						if(lightLevel==0) lightLevel = 1;
+						if (lightLevel < 15) {
+							float diff = Math.min(1F, (lightLevel / 15F) + .1f);
+							if(diff!=1.0) {
+								color = shadeNight(color, diff);
+							}
+						}
+						
+					} else {
+						
+						// Adjust color for light level
+						if (caveLighting && lightLevel < 15) {
+							float darken = Math.min(1F, (lightLevel / 16F));
+							float[] rgb = new float[4];
+							rgb = color.getRGBColorComponents(rgb);
+							color = new Color(
+									MathHelper.clamp_float(rgb[0] * darken, 0f, 1f), 
+									MathHelper.clamp_float(rgb[1] * darken, 0f, 1f), 
+									MathHelper.clamp_float(rgb[2] * darken, 0f, 1f));
+						}		
+					}
 		
 					// Draw block
 					paintBlock(x, z, color, g2D);
