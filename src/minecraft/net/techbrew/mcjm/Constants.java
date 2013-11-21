@@ -14,7 +14,7 @@ import net.minecraft.src.Minecraft;
 public class Constants {
 	
 	public static String JOURNEYMAP_DIR = "journeyMap" + File.separator; //$NON-NLS-1$
-	public static String LIB_DIR = JOURNEYMAP_DIR + "lib" + File.separator; //$NON-NLS-1$
+	public static String CUSTOM_DIR = JOURNEYMAP_DIR + "custom" + File.separator; //$NON-NLS-1$
 	public static String DATA_DIR = JOURNEYMAP_DIR + "data" + File.separator; //$NON-NLS-1$
 	public static String SP_DATA_DIR = DATA_DIR + WorldType.sp + File.separator;
 	public static String MP_DATA_DIR = DATA_DIR + WorldType.mp + File.separator;

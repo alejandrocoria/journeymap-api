@@ -75,7 +75,6 @@ public class FileHandler {
 					Collections.sort(list, new Comparator<File>() {
 						@Override
 						public int compare(File o1, File o2) {
-							// TODO Auto-generated method stub
 							return new Integer(o1.getName().length()).compareTo(o2.getName().length());
 						}						
 					});
@@ -153,6 +152,57 @@ public class FileHandler {
 			JourneyMap.getLogger().severe(error);
 			return null;
 		}
+	}
+	
+	public static File getCustomDir() {
+		return new File(Minecraft.getMinecraft().mcDataDir, Constants.CUSTOM_DIR);
+	}
+	
+	public static BufferedImage getCustomImage(String fileName) {
+		try {
+			File png = new File(getCustomDir(), "img/" + fileName); //$NON-NLS-1$
+			if(!png.canRead()) {
+				return null;
+			}
+			return ImageIO.read(png);
+		} catch (IOException e) {
+			String error = Constants.getMessageJMERR17(e.getMessage());
+			JourneyMap.getLogger().severe(error);
+			return null;
+		}
+	}
+	
+	public static void setCustomImage(String fileName, BufferedImage img) {
+		try {			
+			File pngFile = new File(getCustomDir(), "img/" + fileName); //$NON-NLS-1$
+			File parentDir = pngFile.getParentFile();
+			if(!parentDir.exists()) parentDir.mkdirs();
+			
+			ImageIO.write(img, "png", pngFile);
+		} catch (Exception e) {
+			String error = Constants.getMessageJMERR00("Can't write custom image " + fileName + ": " + e);
+			JourneyMap.getLogger().severe(error);
+		}
+	}
+	
+	public static BufferedImage getAssuredCustomImage(String fileName, BufferedImage defaultImg) {
+				
+		boolean writeNeeded = false;
+		BufferedImage img = FileHandler.getCustomImage(fileName);
+		if(img==null) {
+			writeNeeded = true;
+			img = FileHandler.getWebImage(fileName);			
+			if(img==null) {				
+				img = defaultImg;
+			}
+		}		
+		
+		if(writeNeeded) {		
+			setCustomImage(fileName, img);
+		}
+		
+		return img;
+
 	}
 	
 }
