@@ -90,7 +90,7 @@ public class MapRegionTask extends BaseMapTask {
 			if(minecraft.isIntegratedServerRunning()) {
 				try {
 					final int dimension = (Integer) DataCache.playerDataValue(EntityKey.dimension);
-					final boolean underground = (Boolean) DataCache.playerDataValue(EntityKey.underground);
+					final boolean underground = (Boolean) DataCache.playerDataValue(EntityKey.underground) && PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_CAVES);
 					MapType mapType;
 					Integer vSlice = null;
 					if(underground) {

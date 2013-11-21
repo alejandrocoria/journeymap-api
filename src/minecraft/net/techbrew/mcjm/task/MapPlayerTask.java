@@ -40,7 +40,7 @@ public class MapPlayerTask extends BaseMapTask {
 		
 		final ChunkCoordinates playerPos = new ChunkCoordinates(player.chunkCoordX,player.chunkCoordY,player.chunkCoordZ);
 		final Map playerData = DataCache.instance().get(PlayerData.class);
-		final boolean underground = (Boolean) playerData.get(EntityKey.underground);
+		final boolean underground = (Boolean) playerData.get(EntityKey.underground) && PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_CAVES);
 		final int dimension = (Integer) playerData.get(EntityKey.dimension);
 		boolean skipUnchanged = lastPlayerPos!=null && playerPos.posY==lastPlayerPos.posY;
 		
@@ -111,7 +111,6 @@ public class MapPlayerTask extends BaseMapTask {
 
 	@Override
 	public void taskComplete() {
-		// TODO Auto-generated method stub
 		lastChunkStubs.putAll(chunkMdSet);
 	}
 	
