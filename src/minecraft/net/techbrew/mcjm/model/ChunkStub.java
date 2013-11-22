@@ -20,6 +20,7 @@ public class ChunkStub {
 	public final int zPosition;
 	public final World worldObj;
     public int[] precipitationHeightMap;
+    public final long lastSaveTime;
 	public final ExtendedBlockStorageStub storageArrays[];
 	public boolean isModified;			
 	
@@ -30,6 +31,7 @@ public class ChunkStub {
 		this.xPosition = chunk.xPosition;
 		this.zPosition = chunk.zPosition;
 		this.isModified = chunk.isModified;
+		this.lastSaveTime = chunk.lastSaveTime;
 		this.worldObj = chunk.worldObj;
 		this.precipitationHeightMap = Arrays.copyOf(chunk.precipitationHeightMap, chunk.precipitationHeightMap.length);
 		this.storageArrays = new ExtendedBlockStorageStub[chunk.getBlockStorageArray().length];

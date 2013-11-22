@@ -1,5 +1,6 @@
 package net.techbrew.mcjm.model;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -78,8 +79,14 @@ public class ChunkMD {
 	 * @param other
 	 * @return
 	 */
-	public boolean blockDataEquals(ChunkMD other) {
+	public boolean isUnchanged(ChunkMD other) {
+		if(stub.lastSaveTime!=other.stub.lastSaveTime) {
+			return false;
+		}
 		if(stub.storageArrays.length!=other.stub.storageArrays.length) {
+			return false;
+		}
+		if(!Arrays.equals(stub.heightMap,other.stub.heightMap)) {
 			return false;
 		}
 		for(int i=0;i<stub.storageArrays.length;i++) {
