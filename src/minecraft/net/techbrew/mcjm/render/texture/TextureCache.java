@@ -109,8 +109,7 @@ public class TextureCache {
 		synchronized(entityImageMap) {
 			TextureImpl tex = entityImageMap.get(filename);
 			if(tex==null) {
-				String entityFilename = "entity/" + filename; //$NON-NLS-1$		
-				BufferedImage img = FileHandler.getWebImage(entityFilename); //FileHandler.getAssuredCustomImage(entityFilename, getUnknownImage().image);
+				BufferedImage img = FileHandler.getCustomizableImage("entity/" + filename, getUnknownEntity().getImage()); //$NON-NLS-1$	
 				tex = new TextureImpl(img);
 				entityImageMap.put(filename, tex);
 			}
