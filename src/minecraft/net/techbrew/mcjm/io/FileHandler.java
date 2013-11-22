@@ -141,7 +141,7 @@ public class FileHandler {
 			String png = FileHandler.WEB_DIR + "/img/" + fileName;//$NON-NLS-1$
 			InputStream is = EntityHelper.class.getResourceAsStream(png);
 			if(is==null) {
-				JourneyMap.getLogger().warning("Unable to get image: " + png);
+				JourneyMap.getLogger().warning("Image not found: " + png);
 				return null;
 			}
 			BufferedImage img = ImageIO.read(is);
@@ -176,8 +176,7 @@ public class FileHandler {
 		try {			
 			File pngFile = new File(getCustomDir(), "img/" + fileName); //$NON-NLS-1$
 			File parentDir = pngFile.getParentFile();
-			if(!parentDir.exists()) parentDir.mkdirs();
-			
+			if(!parentDir.exists()) parentDir.mkdirs();			
 			ImageIO.write(img, "png", pngFile);
 		} catch (Exception e) {
 			String error = Constants.getMessageJMERR00("Can't write custom image " + fileName + ": " + e);
@@ -194,9 +193,9 @@ public class FileHandler {
 		if(img==null) {
 			img = FileHandler.getWebImage(fileName);			
 			if(img==null) {				
-				img = defaultImg;
-				JourneyMap.getLogger().info("Creating placeholder custom image: " + fileName);
+				img = defaultImg;				
 				setCustomImage(fileName, img);
+				JourneyMap.getLogger().info("Created placeholder image: " + new File(getCustomDir(), fileName));
 			}
 		}		
 		
