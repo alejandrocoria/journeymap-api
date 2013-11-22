@@ -185,24 +185,22 @@ public class FileHandler {
 		}
 	}
 	
-	public static BufferedImage getAssuredCustomImage(String fileName, BufferedImage defaultImg) {
+	public static BufferedImage getCustomizableImage(String fileName, BufferedImage defaultImg) {
 				
-		boolean writeNeeded = false;
-		BufferedImage img = FileHandler.getCustomImage(fileName);
+		BufferedImage img = null;
+		if(getCustomDir().exists()) {
+			img = FileHandler.getCustomImage(fileName);
+		}
 		if(img==null) {
-			writeNeeded = true;
 			img = FileHandler.getWebImage(fileName);			
 			if(img==null) {				
 				img = defaultImg;
+				JourneyMap.getLogger().info("Creating placeholder custom image: " + fileName);
+				setCustomImage(fileName, img);
 			}
 		}		
 		
-		if(writeNeeded) {		
-			setCustomImage(fileName, img);
-		}
-		
 		return img;
-
 	}
 	
 }
