@@ -3,6 +3,7 @@ package net.techbrew.mcjm.io.nbt;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -108,12 +109,30 @@ public class RegionLoader {
 		
 		// Add player's current region
 		ChunkCoord cc = ChunkCoord.fromChunkPos(jmImageWorldDir, mc.thePlayer.chunkCoordX, vSlice, mc.thePlayer.chunkCoordZ, dimension);
-		RegionCoord rc = cc.getRegionCoord();
-		if(!stack.contains(rc)) {
-			stack.add(rc);
+		final RegionCoord playerRc = cc.getRegionCoord();
+		if(stack.contains(playerRc)) {
+			stack.remove(playerRc);
 		}
 		
-		Collections.sort(stack);
+		Collections.sort(stack, new Comparator<RegionCoord>() {
+
+			@Override
+			public int compare(RegionCoord o1, RegionCoord o2) {				
+				Float d1 = distanceToPlayer(o1);
+				Float d2 = distanceToPlayer(o2);
+				int comp = d2.compareTo(d1);
+				if(comp==0) return o2.compareTo(o1);
+				return comp;
+			}
+			
+			float distanceToPlayer(RegionCoord rc) {
+				float x = rc.regionX - playerRc.regionX;
+		        float z = rc.regionZ - playerRc.regionZ;
+		        return (x * x) + (z * z);
+			}
+			
+		});
+		stack.add(playerRc);
 		return stack;
 	}
 	
