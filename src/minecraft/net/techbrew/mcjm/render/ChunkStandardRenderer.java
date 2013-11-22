@@ -244,7 +244,8 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						hasAir = true;
 						
 						paintY = blockMaxY;
-						lightLevel = Math.max(1,chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,paintY+1, z));
+						//lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,paintY+1, z);
+						lightLevel = Math.max(1, getMixedBrightnessForBlock(chunkMd, x,paintY+1, z));
 						hasWater = false;
 						
 					} else {
@@ -267,6 +268,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 							if((blockId == 8 || blockId == 9)) {
 								if(!hasWater) {
 									lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,y,z);
+									//lightLevel = getMixedBrightnessForBlock(chunkMd, x,y,z);
 									paintY = y;
 								}
 								hasWater = true;							
@@ -299,6 +301,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 								
 								if (caveLighting) {
 									lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,paintY+1, z);
+									//lightLevel = getMixedBrightnessForBlock(chunkMd, x,y,z);
 									if(lightLevel > 0) {
 										break airloop;		
 									} else {
@@ -365,13 +368,14 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		
 					if(skipUndergroundCheck) {
 						
-						if(lightLevel==0) lightLevel = 1;
-						if (lightLevel < 15) {
-							float diff = Math.min(1F, (lightLevel / 15F) + .1f);
-							if(diff!=1.0) {
-								color = shadeNight(color, diff);
-							}
-						}
+//						if(lightLevel==0) lightLevel = 1;
+//						if (lightLevel < 15) {
+//							float diff = Math.min(1F, (lightLevel / 30F) + .1f);
+//							if(diff!=1.0) {
+//								color = shadeOutside(color, diff);
+//							}
+//						}
+						color = shadeOutside(color, .1f);
 						
 					} else {
 						
@@ -404,6 +408,16 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		return chunkOk;
 
 	}
+	
+	private int getMixedBrightnessForBlock(ChunkMD chunkMd, int x, int y, int z)
+    {
+        return chunkMd.worldObj.getLightBrightnessForSkyBlocks(x, y, z, Block.lightValue[chunkMd.worldObj.getBlockId(x, y, z)]);
+    }
+	
+	public float getBlockBrightness(ChunkMD chunkMd, int x, int y, int z)
+    {
+        return chunkMd.worldObj.getBrightness(x, y, z, Block.lightValue[chunkMd.worldObj.getBlockId(x, y, z)]);
+    }
 		
 	private void paintDepth(ChunkMD chunkMd, BlockInfo blockInfo, int x, int y, int z, final Graphics2D g2D) {		
 		

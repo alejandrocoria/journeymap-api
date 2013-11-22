@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.util.logging.Level;
 
 import net.minecraft.src.ChunkCoordIntPair;
+import net.minecraft.src.EnumSkyBlock;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.ChunkMD;
@@ -176,6 +177,54 @@ public abstract class BaseRenderer {
 	}
 	
 	/**
+	 * Get the slope of the block at the coordinates + offsets.  Uses chunkMd.slopes.
+	 * @param x
+	 * @param z
+	 * @param offsetX
+	 * @param offsetz
+	 * @param currentChunk
+	 * @param neighbors
+	 * @param defaultVal
+	 * @return
+	 */
+	public int getBlockLight(int x, int y, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, int defaultVal) {
+		int newX = x+offsetX;
+		int newZ = z+offsetz;
+		
+		int chunkX = currentChunk.stub.xPosition;
+		int chunkZ = currentChunk.stub.zPosition;
+		boolean search = false;
+		
+		if(newX==-1) {
+			chunkX--;
+			newX = 15;
+			search = true;
+		} else if(newX==16) {
+			chunkX++;
+			newX = 0;
+			search = true;
+		}
+		if(newZ==-1) {
+			chunkZ--;
+			newZ = 15;
+			search = true;
+		} else if(newZ==16) {
+			chunkZ++;
+			newZ = 0;
+			search = true;
+		}
+		
+		ChunkMD chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
+		
+		
+		if(chunk!=null) {
+			return chunk.stub.getSavedLightValue(EnumSkyBlock.Block, x,y+1, z);
+		} else {
+			return defaultVal;
+		}
+	}
+	
+	/**
 	 * Get the block at the coordinates + offsets.  Uses chunkMd.slopes.
 	 * @param x
 	 * @param z
@@ -311,6 +360,20 @@ public abstract class BaseRenderer {
 				ColorCache.safeColor(rgb[0] * factor),
 				ColorCache.safeColor(rgb[1] * factor),
 				ColorCache.safeColor(rgb[2] * (factor+.1f)));
+		
+	}
+	
+	/**
+	 * Adjust color to indicate it's outside (for underground rendering)
+	 * @param original
+	 * @param factor
+	 * @return
+	 */
+	public Color shadeOutside(Color original, float factor) {
+
+		float hsb[] = Color.RGBtoHSB(original.getRed(), original.getGreen(), original.getBlue(), null);
+		int result = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]*factor);
+		return new Color(result);
 		
 	}
 
