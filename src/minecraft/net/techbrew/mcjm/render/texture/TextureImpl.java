@@ -2,21 +2,15 @@ package net.techbrew.mcjm.render.texture;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import net.minecraft.src.AbstractTexture;
 import net.minecraft.src.ResourceManager;
 import net.minecraft.src.TextureUtil;
-import net.techbrew.mcjm.JourneyMap;
 
 import org.lwjgl.opengl.GL11;
 
 public class TextureImpl extends AbstractTexture {
 	
-	static Set<Integer> texIds = Collections.synchronizedSet(new HashSet<Integer>());
-
     /** width of this icon in pixels */
     public final int width;
 
@@ -38,14 +32,7 @@ public class TextureImpl extends AbstractTexture {
     	this.retainImage = retainImage;
     	this.width = image.getWidth();
         this.height = image.getHeight();
-        updateTexture(image);
-        
-        if(texIds.contains(glTextureId)) {
-        	JourneyMap.getLogger().severe("*** WARNING!  Texture ID has already been used: " + glTextureId);
-        } else {
-        	texIds.add(glTextureId);
-        }
-        
+        updateTexture(image);  
     }    
 
     public void updateTexture(BufferedImage image)
