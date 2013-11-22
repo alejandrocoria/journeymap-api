@@ -23,6 +23,7 @@ public class MapPlayerTask extends BaseMapTask {
 
 	private static ChunkMD.Set lastChunkStubs = new ChunkMD.Set(512);
 	private static ChunkCoordinates lastPlayerPos;
+	private static Boolean lastUnderground;
 	static Integer chunkOffset;
 	
 	private MapPlayerTask(World world, int dimension, boolean underground, Integer chunkY, ChunkMD.Set chunkStubs) {
@@ -42,12 +43,23 @@ public class MapPlayerTask extends BaseMapTask {
 		final Map playerData = DataCache.instance().get(PlayerData.class);
 		final boolean underground = (Boolean) playerData.get(EntityKey.underground) && PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_CAVES);
 		final int dimension = (Integer) playerData.get(EntityKey.dimension);
-		boolean skipUnchanged = lastPlayerPos!=null && playerPos.posY==lastPlayerPos.posY;
 		
-		if(playerPos.equals(lastPlayerPos)) {
-			offset = 1;
+		if(lastUnderground==null) lastUnderground = underground;
+		if(lastPlayerPos==null) lastPlayerPos = playerPos;
+		
+		boolean skipUnchanged = (lastUnderground==underground);
+		if(skipUnchanged && underground) {
+			skipUnchanged = (playerPos.posY==lastPlayerPos.posY);
 		}
+		
+		if(lastPlayerPos.equals(playerPos)) {
+			if(offset>=2) {
+				offset = offset/2;
+			}
+		}
+		
 		lastPlayerPos = playerPos;
+		lastUnderground = underground;
 		
 		final int side = offset + offset + 1;
 		final int capacity = (side*side) + (side*side)/4; // alleviates map growth
@@ -64,6 +76,7 @@ public class MapPlayerTask extends BaseMapTask {
 			for(int z=min.chunkZPos;z<=max.chunkZPos;z++) {
 				ChunkMD stub = ChunkLoader.getChunkStubFromMemory(x, z, world);
 				if(stub!=null) {
+					stub.render = true;
 					chunks.add(stub);
 				} else {
 					missing++;
@@ -76,29 +89,42 @@ public class MapPlayerTask extends BaseMapTask {
 		// Remove unchanged chunkstubs from last task
 		if(!lastChunkStubs.isEmpty()) {
 			ChunkMD.Set removed = new ChunkMD.Set(64);
-			for(ChunkMD oldChunk : lastChunkStubs) {
-				ChunkMD newChunk = chunks.get(oldChunk.coord);
+			for(ChunkMD oldChunk : lastChunkStubs) {	
+				
 				if(!chunks.containsKey(oldChunk.coord)) {					
 					if(oldChunk.discard(1)>4) {
+						if(logger.isLoggable(Level.FINE)) {
+							logger.fine("Discarding out-of-range chunk: " + oldChunk);
+						}
 						removed.add(oldChunk);
 					}
+					continue;
 				} else {
 					oldChunk.discard(-1);
-					if(skipUnchanged && newChunk.blockDataEquals(oldChunk)) {
-						// skip unchanged except for the chunk where player is, just to be safe.
-						if(newChunk.coord.chunkXPos!=lastPlayerPos.posX || newChunk.coord.chunkZPos!=lastPlayerPos.posZ) {
-							chunks.remove(newChunk);
+				}
+				
+				ChunkMD newChunk = chunks.get(oldChunk.coord);
+				
+				if(skipUnchanged) {
+					if(newChunk.coord.chunkXPos!=lastPlayerPos.posX || newChunk.coord.chunkZPos!=lastPlayerPos.posZ) {						
+						if(newChunk.isUnchanged(oldChunk)) {						
+							newChunk.render=false;
 						}
+					}		
+				}
+				
+				if(newChunk.render==true) {
+					if(logger.isLoggable(Level.FINE)) {
+						logger.fine("Mapping chunk: " + newChunk);
 					}
-				}				
+				}
 			}
-			for(ChunkMD old : removed) {
-				//logger.info("chunk flagged to be discarded: " + old);
-				lastChunkStubs.remove(old);
-			}
+			
+			lastChunkStubs.keySet().removeAll(removed.keySet());
 		}
+		
 		if(logger.isLoggable(Level.FINE)) {
-			logger.info("chunks left to map: " + chunks.size() + " out of " + initialSize + ".  lastChunkStubs=" + lastChunkStubs.size());
+			logger.fine("Chunks in set: " + chunks.size() + ".  lastChunkStubs=" + lastChunkStubs.size());
 		}
 		
 		return new MapPlayerTask(world, dimension, underground, chunkY, chunks);
@@ -107,6 +133,9 @@ public class MapPlayerTask extends BaseMapTask {
 	
 	public static void clearCache() {
 		lastChunkStubs.clear();
+		lastPlayerPos = null;
+		lastUnderground = null;
+		chunkOffset = null;
 	}
 
 	@Override

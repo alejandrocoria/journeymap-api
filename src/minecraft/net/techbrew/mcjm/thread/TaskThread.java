@@ -124,7 +124,6 @@ public class TaskThread implements Runnable {
 						chunkImageCache.put(cCoord, MapType.day, getSubimage(MapType.day, chunkImage));
 						chunkImageCache.put(cCoord, MapType.night, getSubimage(MapType.night, chunkImage));
 					}
-					chunkMd.render = false;
 				}
 			}
 			
