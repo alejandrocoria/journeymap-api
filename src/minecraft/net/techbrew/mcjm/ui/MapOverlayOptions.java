@@ -3,34 +3,26 @@ package net.techbrew.mcjm.ui;
 import java.awt.Color;
 
 import net.minecraft.src.GuiButton;
-import net.minecraft.src.GuiScreen;
-import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.VersionCheck;
-import net.techbrew.mcjm.data.DataCache;
-import net.techbrew.mcjm.data.EntityKey;
-import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
-import net.techbrew.mcjm.task.MapRegionTask;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
-public class MapOverlayOptions extends GuiScreen {
-
-	final MapOverlay map;
+public class MapOverlayOptions extends JmUI {
+	
 	final String title;
 	int lastWidth = 0;
 	int lastHeight = 0;
-	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid, buttonAutomap;
-	MapButton buttonSave,buttonClose,buttonAlert,buttonBrowser;
+	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid;
+	MapButton buttonClose,buttonAlert;
 	Color titleColor = new Color(0,0,100);
 	
-	public MapOverlayOptions(MapOverlay map) {
-		this.map = map;
+	public MapOverlayOptions() {
 		title = Constants.getString("MapOverlay.options_title", JourneyMap.JM_VERSION);
 	}
 
@@ -47,44 +39,42 @@ public class MapOverlayOptions extends GuiScreen {
    		buttonCaves = new MapButton(2,0,0,
    				Constants.getString("MapOverlay.show_caves", on),
    				Constants.getString("MapOverlay.show_caves", off),
-   				map.showCaves); //$NON-NLS-1$ 
+   				MapOverlay.showCaves); //$NON-NLS-1$ 
    		
-		buttonSave = new MapButton(6,0,0,Constants.getString("MapOverlay.save_map")); //$NON-NLS-1$ 
 		buttonClose = new MapButton(7,0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$ 
 		String updateText = VersionCheck.getVersionIsChecked() ? Constants.getString("MapOverlay.update_available") : Constants.getString("MapOverlay.update_check"); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonAlert = new MapButton(8,0,0,updateText); //$NON-NLS-1$ 
 		buttonAlert.drawButton = !VersionCheck.getVersionIsChecked() || !VersionCheck.getVersionIsCurrent();
-		buttonBrowser = new MapButton(9,0,0,Constants.getString("MapOverlay.use_browser")); //$NON-NLS-1$ 
 		
 		buttonMonsters = new MapButton(10,0,0,
 				Constants.getString("MapOverlay.show_monsters", on),
 				Constants.getString("MapOverlay.show_monsters", off),
-				map.showMonsters); //$NON-NLS-1$  //$NON-NLS-2$
+				MapOverlay.showMonsters); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		buttonAnimals = new MapButton(11,0,0,
 				Constants.getString("MapOverlay.show_animals", on),
 				Constants.getString("MapOverlay.show_animals", off),
-				map.showAnimals); //$NON-NLS-1$  //$NON-NLS-2$
+				MapOverlay.showAnimals); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		buttonVillagers = new MapButton(12,0,0,
 				Constants.getString("MapOverlay.show_villagers", on),
 				Constants.getString("MapOverlay.show_villagers", off),
-				map.showVillagers); //$NON-NLS-1$  //$NON-NLS-2$
+				MapOverlay.showVillagers); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		buttonPets = new MapButton(13,0,0,
 				Constants.getString("MapOverlay.show_pets", on),
 				Constants.getString("MapOverlay.show_pets", off),
-				map.showPets); //$NON-NLS-1$  //$NON-NLS-2$
+				MapOverlay.showPets); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		buttonPlayers = new MapButton(14,0,0,
 				Constants.getString("MapOverlay.show_players", on),
 				Constants.getString("MapOverlay.show_players", off),
-				map.showPlayers); //$NON-NLS-1$  //$NON-NLS-2$
+				MapOverlay.showPlayers); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		buttonWaypoints = new MapButton(15,0,0,
 				Constants.getString("MapOverlay.show_waypoints", on),
 				Constants.getString("MapOverlay.show_waypoints", off),
-				map.showWaypoints); //$NON-NLS-1$  //$NON-NLS-2$
+				MapOverlay.showWaypoints); //$NON-NLS-1$  //$NON-NLS-2$
 		buttonWaypoints.enabled = WaypointHelper.waypointsEnabled();
 		
 		buttonGrid = new MapButton(16,0,0,
@@ -92,15 +82,8 @@ public class MapOverlayOptions extends GuiScreen {
 				Constants.getString("MapOverlay.show_grid", off),
 				PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		buttonAutomap = new MapButton(17,0,0,
-				Constants.getString("MapOverlay.automap_title", on),
-				Constants.getString("MapOverlay.automap_title", off),
-				PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED)); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonAutomap.setHoverText(Constants.getString("MapOverlay.automap_text")); //$NON-NLS-1$
-		buttonAutomap.enabled = Minecraft.getMinecraft().isSingleplayer();
-		
 		// Check for hardcore
-		if(map.hardcore) {
+		if(MapOverlay.hardcore) {
 			buttonCaves.setToggled(false);
 			buttonCaves.enabled = false;
 			buttonCaves.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
@@ -127,12 +110,10 @@ public class MapOverlayOptions extends GuiScreen {
 		}
 		
 		buttonList.add(buttonCaves);
-		buttonList.add(buttonSave);
 		buttonList.add(buttonClose);
 		if(buttonAlert.drawButton) {
 			buttonList.add(buttonAlert);
 		}
-		buttonList.add(buttonBrowser);
 		buttonList.add(buttonMonsters);
 		buttonList.add(buttonAnimals);
 		buttonList.add(buttonVillagers);
@@ -140,7 +121,6 @@ public class MapOverlayOptions extends GuiScreen {
 		buttonList.add(buttonPlayers);
 		buttonList.add(buttonGrid);
 		buttonList.add(buttonWaypoints);
-		buttonList.add(buttonAutomap);
     }
     
     /**
@@ -173,16 +153,12 @@ public class MapOverlayOptions extends GuiScreen {
 			layoutButton(buttonPlayers, bx + hgap, by + (20*row++));	
 			
 			layoutButton(buttonGrid, bx, by + (20*row));			
-			layoutButton(buttonWaypoints, bx + hgap, by + (20*row++));	
-
-			layoutButton(buttonAutomap, bx, by + (20*row));	
-			layoutButton(buttonSave, bx + hgap, by + (20*row++));	
+			layoutButton(buttonWaypoints, bx + hgap, by + (20*row++));		
 								
 			if(buttonAlert.drawButton) {
 				layoutButton(buttonAlert, bx + hgap/2, by + (20*row++));
 			}
-			
-			layoutButton(buttonBrowser, bx + hgap/2, by + (20*row++));	
+			row++;
 			layoutButton(buttonClose, bx + hgap/2, by + (20*row++));	
 			
 			
@@ -200,29 +176,13 @@ public class MapOverlayOptions extends GuiScreen {
 	protected void actionPerformed(GuiButton guibutton) {
 		switch(guibutton.id) {
 			case 2: { // caves
-				MapOverlay.setShowCaves(!MapOverlay.showCaves);
-				buttonCaves.setToggled(MapOverlay.showCaves);	
-				boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
-				if(underground) {
-					map.refreshState();
-				}
+				MapOverlay.toggleShowCaves();				
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_CAVES, MapOverlay.showCaves);
-				break;
-			}
-			case 6: { // save
-				map.save();
+				buttonCaves.setToggled(MapOverlay.showCaves);
 				break;
 			}
 			case 7: { // close
-				close();
-				break;
-			}
-			case 8: { // alert
-				map.launchWebsite();
-				break;
-			}
-			case 9: { // browser
-				map.launchLocalhost();
+				UIManager.getInstance().openMap();
 				break;
 			}
 			case 10: { // monsters
@@ -265,25 +225,11 @@ public class MapOverlayOptions extends GuiScreen {
 				boolean showGrid = !PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID);
 				buttonGrid.setToggled(showGrid);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_GRID, showGrid);
-				map.refreshState();
+				MapOverlay.lastRefresh = 0;
 				break;
 			}
-			case 17: { // automap
-				boolean enable = !PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED);
-				buttonAutomap.setToggled(enable);
-				PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, enable);
-				JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, enable);
-				if(enable) {
-					close();
-				}
-				break;
-			}
+
 		}
-	}
-    
-    void close() {
-		map.options = null;
-		map.updateScreen();
 	}
     
     @Override
@@ -311,7 +257,9 @@ public class MapOverlayOptions extends GuiScreen {
     @Override
 	public void drawBackground(int layer)
 	{    	
-    	
+    	super.drawBackground(0);
+    	MapOverlay.drawMapBackground(this);
+    	super.drawDefaultBackground();
 	}
     
     private void drawTitle() {
@@ -321,10 +269,8 @@ public class MapOverlayOptions extends GuiScreen {
 		int by = (this.height / 4);
 		
 		GL11.glEnable(GL11.GL_BLEND);
-		if(map.gridRenderer!=null) {
-			BaseOverlayRenderer.drawRectangle(halfBg - (labelWidth/2), by-20, labelWidth, 12, titleColor, 255);
-		}
-		map.drawCenteredString(this.fontRenderer, title , this.width / 2, by-18, 16777215);
+		BaseOverlayRenderer.drawRectangle(halfBg - (labelWidth/2), by-20, labelWidth, 12, titleColor, 255);
+		drawCenteredString(this.fontRenderer, title , this.width / 2, by-18, 16777215);
     }
     
     @Override
@@ -332,10 +278,14 @@ public class MapOverlayOptions extends GuiScreen {
 	{
 		switch(i) {
 		case Keyboard.KEY_ESCAPE : {
-			close();
+			UIManager.getInstance().openMap();
 			break;
 		}
 		}
+	}
+    
+    @Override
+	public void close() {	
 	}
 
 }

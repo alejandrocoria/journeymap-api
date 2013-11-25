@@ -13,7 +13,7 @@ public class MapButton extends GuiSmallButton {
 	private Boolean toggled = true;
 	String icon;
 	DynamicTexture iconTexture;
-	String[] multiline;
+	String hover;
 	String labelOn;
 	String labelOff;
 
@@ -47,7 +47,7 @@ public class MapButton extends GuiSmallButton {
 	}
 	
 	public void setHoverText(String hoverText) {
-		multiline = new String[]{hoverText}; //$NON-NLS-1$
+		hover = hoverText; //$NON-NLS-1$
 	}
 	
 	private void updateLabel() {
@@ -72,12 +72,10 @@ public class MapButton extends GuiSmallButton {
         {
             return;
         }
+				
+		super.drawButton(minecraft, mouseX, mouseY);
 		
-
-		if(this.icon==null) {
-			super.drawButton(minecraft, mouseX, mouseY);
-		} else {
-		
+		if(this.icon!=null) {
 			Tessellator tessellator = Tessellator.instance;
 			GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
 			GL11.glDepthMask(false);
@@ -89,6 +87,8 @@ public class MapButton extends GuiSmallButton {
 			}
 			GL11.glDisable(3008 /*GL_ALPHA_TEST*/);		
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, iconTexture.getGlTextureId());
+			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+	        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 			
 			// Preserve aspect ratio of source image		
 			int w = getToggled() ? this.width : (int) Math.ceil(this.width*.6);

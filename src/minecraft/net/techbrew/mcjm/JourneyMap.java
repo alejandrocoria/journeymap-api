@@ -1,8 +1,5 @@
 package net.techbrew.mcjm;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -14,7 +11,6 @@ import java.util.logging.Logger;
 
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.GuiInventory;
 import net.minecraft.src.GuiMainMenu;
 import net.minecraft.src.GuiMultiplayer;
 import net.minecraft.src.GuiScreen;
@@ -38,7 +34,7 @@ import net.techbrew.mcjm.task.TaskController;
 import net.techbrew.mcjm.thread.JMThreadFactory;
 import net.techbrew.mcjm.thread.TaskThread;
 import net.techbrew.mcjm.ui.MapOverlay;
-import net.techbrew.mcjm.ui.MapOverlayOptions;
+import net.techbrew.mcjm.ui.UIManager;
 
 import org.lwjgl.input.Keyboard;
 
@@ -78,7 +74,7 @@ public class JourneyMap {
 	private volatile ChunkMD lastPlayerChunk;
 
 	// Invokes MapOverlay
-	public KeyBinding keybinding;
+	public KeyBinding uiKeybinding;
 
 	// Time stamp of next chunk update
 	public long nextPlayerUpdate = 0;
@@ -144,7 +140,7 @@ public class JourneyMap {
 		int mapGuiKeyCode = pm.getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
 		this.enableMapGui = pm.getBoolean(PropertyManager.Key.MAPGUI_ENABLED); 
 		if(this.enableMapGui) {
-			this.keybinding = new KeyBinding("JourneyMap", mapGuiKeyCode); //$NON-NLS-1$
+			this.uiKeybinding = new KeyBinding("JourneyMap", mapGuiKeyCode); //$NON-NLS-1$
 		}
 		
 		// Webserver
@@ -187,9 +183,9 @@ public class JourneyMap {
 	 * Toggles automapping
 	 * @param enable
 	 */
-	public void toggleTask(Class<? extends ITaskManager> managerClass, boolean enable) {
+	public void toggleTask(Class<? extends ITaskManager> managerClass, boolean enable, Object params) {
 		if(taskController!=null) {
-    		taskController.toggleTask(managerClass, enable);
+    		taskController.toggleTask(managerClass, enable, params);
     	} else {
     		logger.warning("taskController not available");
     	}
@@ -227,17 +223,7 @@ public class JourneyMap {
     	Minecraft minecraft = Minecraft.getMinecraft();
     	
     	synchronized(this) {
-    		
-    		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
-    		long[] threadIds = bean.findDeadlockedThreads();
-    		if (threadIds != null) {
-    		    ThreadInfo[] infos = bean.getThreadInfo(threadIds);
 
-    		    for (ThreadInfo info : infos) {
-    		        logger.severe("Deadlock detected: " + info);
-    		    }
-    		}
-    		
 	    	if(taskExecutor!=null && !taskExecutor.isShutdown()) {    		
 				taskExecutor.shutdown();			
 			}	    	
@@ -356,14 +342,14 @@ public class JourneyMap {
 		if(enableAnnounceMod) {
 			announcements.add(0, Constants.getString("JourneyMap.ready", JM_VERSION)); //$NON-NLS-1$ 
 			if(enableWebserver && enableMapGui) {
-				String keyName = Keyboard.getKeyName(keybinding.keyCode);
+				String keyName = Keyboard.getKeyName(uiKeybinding.keyCode);
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
 				announcements.add(1, Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port)); //$NON-NLS-1$ 
 			} else if(enableWebserver) {
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
 				announcements.add(1, Constants.getString("JourneyMap.webserver_only_ready", port)); //$NON-NLS-1$ 
 			} else if(enableMapGui) {
-				String keyName = Keyboard.getKeyName(keybinding.keyCode);
+				String keyName = Keyboard.getKeyName(uiKeybinding.keyCode);
 				announcements.add(1, Constants.getString("JourneyMap.mapgui_only_ready", keyName)); //$NON-NLS-1$
 			} else {
 				announcements.add(1, Constants.getString("JourneyMap.webserver_and_mapgui_disabled")); //$NON-NLS-1$
@@ -379,31 +365,7 @@ public class JourneyMap {
 	public void keyboardEvent(KeyBinding keybinding)
 	{
 		if(!isMapping()) return; 
-
-		Minecraft minecraft = Minecraft.getMinecraft();
-		if(keybinding.keyCode==keybinding.keyCode) {
-			if(minecraft.currentScreen==null) {
-				try {
-					minecraft.displayGuiScreen(new MapOverlay());
-					keybinding.unPressAllKeys();
-				} catch(Throwable e) {
-					logger.log(Level.SEVERE, "Unexpected exception in MapOverlay constructor: " + e); //$NON-NLS-1$
-					JourneyMap.getLogger().severe(LogFormatter.toString(e));
-					String error = Constants.getMessageJMERR23(e.getMessage());
-					JourneyMap.getInstance().announce(error);
-				}
-			} else if(Minecraft.getMinecraft().currentScreen instanceof MapOverlay) {
-				minecraft.displayGuiScreen(null);
-				minecraft.setIngameFocus();
-				keybinding.unPressAllKeys();
-			}
-		} else if(keybinding.keyCode==minecraft.gameSettings.keyBindInventory.keyCode) {
-			if(minecraft.currentScreen instanceof MapOverlayOptions) { 
-				minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer));				
-			} else if(minecraft.currentScreen instanceof MapOverlay) { 
-				minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer));				
-			}
-		}
+		UIManager.getInstance().keyboardEvent(keybinding);
 	}		
 
 	/**

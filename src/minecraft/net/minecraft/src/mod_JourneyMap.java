@@ -44,7 +44,7 @@ public class mod_JourneyMap extends BaseMod {
 			
 			// Register Map GUI keybinding
 			if(instance.enableMapGui) {
-				ModLoader.registerKey(this, instance.keybinding, false);
+				ModLoader.registerKey(this, instance.uiKeybinding, false);
 			}
 			
 			loadSuccess = true;
