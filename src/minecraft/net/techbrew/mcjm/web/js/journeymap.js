@@ -406,7 +406,7 @@ var JourneyMap = (function() {
 		// Automap button
 		$("#autoMapButton").attr("title", getMessage('automap_title')).click(function() {
 			if(JM.world.singlePlayer===true) {
-				startAutoMap();
+				autoMapDialog();
 			} else {
 				return false;
 			}
@@ -554,24 +554,60 @@ var JourneyMap = (function() {
 	 */
 	var saveMapImage = function() {
 		_gaq.push(['_trackEvent', 'saveMapImage', null, 0, true]);
-		window.open('/action?type=savemap' + getMapStateUrl(),'_new');
+		
+		$.ajax({
+			  type: 'POST',
+			  url: '/action?type=savemap' + getMapStateUrl(),
+			  dataType : 'jsonp'
+		}).fail(function(data, error, jqXHR){
+			//if (debug)
+				console.log(">>> saveMapImage failed: " + JSON.stringify(data));
+			var msg = 'Error: ' + JSON.stringify(data);
+			showInfoMessage(msg, 2000);
+		}).success(function(data){
+			console.log('automap result: ', data);
+			var msg = getMessage('save_filename', data.filename);
+			showInfoMessage(msg, 2000);
+		});	
 	}
 	
 	/**
+	 * Prompt automap
+	 */
+	var autoMapDialog = function() {
+		
+		var dialog = $(messageTemplate)
+			.html(getMessage('automap_dialog_text'))
+			.css('z-index', google.maps.Marker.MAX_ZINDEX + 1)
+			.css('min-height', '20px')
+			.dialog({ 
+			modal: true,
+			buttons: [ 
+			   { text: getMessage('automap_dialog_all'),     click: function() { toggleAutoMap('all');  $( this ).dialog( "close" ); } },
+			   { text: getMessage('automap_dialog_missing'), click: function() { toggleAutoMap('missing');  $( this ).dialog( "close" ); } },
+	           { text: getMessage('automap_dialog_cancel'),  click: function() { toggleAutoMap('stop');  $( this ).dialog( "close" ); } } 
+			]
+		}).parent().find('.ui-dialog-titlebar').remove();
+				
+	}
+
+	/**
 	 * Invoke starting auto-map
 	 */
-	var startAutoMap = function() {
-		_gaq.push(['_trackEvent', 'startAutoMap', null, 0, true]);
+	var toggleAutoMap = function(scope) {
+		_gaq.push(['_trackEvent', 'toggleAutoMap', null, 0, true]);
 		$.ajax({
 			  type: "POST",
-			  url: "/action?type=automap",
+			  url: "/action?type=automap&scope=" + scope,
+			  dataType : "jsonp"
 		}).fail(function(data, error, jqXHR){
-			if (debug)
-				console.log(">>> postPreference failed: " + JSON.stringify(data));
+			//if (debug)
+				console.log(">>> toggleAutoMap failed: " + JSON.stringify(data));
 			var msg = 'Error: ' + JSON.stringify(data);
-			$('#jm-actions-button').tooltip({ content: msg, hide: { effect: "explode", delay: 5000 } });
-		}).success(function(){
-			var msg = getMessage('automap_started');
+			showInfoMessage(msg, 2000);
+		}).success(function(data){
+			console.log('automap result: ', data);
+			var msg = getMessage(data.message);
 			showInfoMessage(msg, 2000);
 		});	
 	}
@@ -795,12 +831,20 @@ var JourneyMap = (function() {
 	/**
 	 * Get L10N message by key
 	 */
-	var getMessage = function(key) {
+	var getMessage = function(key, params) {
 		if(!JM.messages || !JM.messages[key]) {
 			console.log("Missing L10N message: " + key);
 			return "!" + key + "!";
 		} else {
-			return JM.messages[key];
+			var msg = JM.messages[key];
+			if(!params) {
+				return msg;
+			} else {
+				if(!Array.isArray(params)){
+					params = [params];
+				}
+				return msg.format.apply(msg, params);
+			}
 		}
 	}
 
@@ -1535,6 +1579,19 @@ function ga_heartbeat(){
   setTimeout(ga_heartbeat, 5*60*1000);
 }
 ga_heartbeat();
+
+/** String format **/
+if (!String.prototype.format) {
+  String.prototype.format = function() {
+    var args = arguments;
+    return this.replace(/{(\d+)}/g, function(match, number) { 
+      return typeof args[number] != 'undefined'
+        ? args[number]
+        : match
+      ;
+    });
+  };
+} 
 
 /** OnLoad **/
 $( document ).ready(function() {
