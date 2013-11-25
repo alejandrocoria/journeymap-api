@@ -30,7 +30,7 @@ public class TaskController {
 		
 		List<ITaskManager> list = new LinkedList<ITaskManager>(managers);
 		for(ITaskManager manager: managers) {
-			boolean enabled = manager.enableTask(minecraft);
+			boolean enabled = manager.enableTask(minecraft, null);
 			if(!enabled) {
 				logger.info("Task not initially enabled: " + manager.getTaskClass().getSimpleName());
 			} else {
@@ -44,7 +44,7 @@ public class TaskController {
 		managers.clear();
 	}
 	
-	public void toggleTask(Class<? extends ITaskManager> managerClass, boolean enable) {
+	public void toggleTask(Class<? extends ITaskManager> managerClass, boolean enable, Object params) {
 		
 		ITaskManager taskManager = null;
 		for(ITaskManager manager: managers) {
@@ -54,13 +54,13 @@ public class TaskController {
 			}
 		}
 		if(taskManager!=null) {
-			toggleTask(taskManager, enable);
+			toggleTask(taskManager, enable, params);
 		} else {
 			logger.warning("Couldn't toggle task; manager not in controller: " + managerClass.getClass().getName());
 		}
 	}
 	
-	private void toggleTask(ITaskManager manager, boolean enable) {
+	private void toggleTask(ITaskManager manager, boolean enable, Object params) {
 		Minecraft minecraft = Minecraft.getMinecraft();
 		if(manager.isEnabled(minecraft)) {
 			if(!enable) {
@@ -72,7 +72,7 @@ public class TaskController {
 		} else {
 			if(enable) {
 				logger.info("Enabling task: " + manager.getTaskClass().getSimpleName());
-				manager.enableTask(minecraft);
+				manager.enableTask(minecraft, params);
 			} else {
 				logger.warning("Task already disabled: " + manager.getTaskClass().getSimpleName());
 			}

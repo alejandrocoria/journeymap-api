@@ -159,7 +159,7 @@ public class MapPlayerTask extends BaseMapTask {
 		}
 		
 		@Override
-		public boolean enableTask(Minecraft minecraft) {
+		public boolean enableTask(Minecraft minecraft, Object params) {
 			enabled = true;
 			return enabled;
 		}

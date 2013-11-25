@@ -176,7 +176,7 @@ public class LegacyMigrationTask implements IGenericTask {
 		}
 		
 		@Override
-		public boolean enableTask(Minecraft minecraft) {
+		public boolean enableTask(Minecraft minecraft, Object params) {
 			
 			jmWorldDir = FileHandler.getJMWorldDir(minecraft, Utils.getWorldHash(minecraft));
 			File[] files = jmWorldDir.listFiles(new PngFileFilter());

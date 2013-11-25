@@ -33,13 +33,13 @@ public class RegionLoader {
 	final Stack<RegionCoord> regions;
 	final int regionsFound;
 
-	public RegionLoader(final Minecraft minecraft, final int dimension, final MapType mapType, final Integer vSlice) throws IOException {
+	public RegionLoader(final Minecraft minecraft, final int dimension, final MapType mapType, final Integer vSlice, boolean all) throws IOException {
 		this.mapType = mapType;		
 		this.vSlice = vSlice;
 		if(mapType==MapType.underground && (vSlice==null || vSlice==-1)) {
 			throw new IllegalArgumentException("Underground map requires vSlice");
 		}
-		this.regions = findRegions(minecraft, vSlice, dimension);
+		this.regions = findRegions(minecraft, vSlice, dimension, all);
 		this.regionsFound = regions.size();
 	}	
 	
@@ -63,7 +63,7 @@ public class RegionLoader {
 		return vSlice;
 	}
 	
-	Stack<RegionCoord> findRegions(final Minecraft mc, final Integer vSlice, final int dimension) {
+	Stack<RegionCoord> findRegions(final Minecraft mc, final Integer vSlice, final int dimension, boolean all) {
 		
 	    final File mcWorldDir = FileHandler.getMCWorldDir(mc, dimension);	
 		final File regionDir = new File(mcWorldDir, "region");
@@ -88,17 +88,21 @@ public class RegionLoader {
 				String x = matcher.group(1);
 				String z = matcher.group(2);
 				if (x != null && z != null) {
-					RegionCoord rc = new RegionCoord(jmImageWorldDir, Integer.parseInt(x), vSlice, Integer.parseInt(z), dimension);					
-					if(!rfh.getRegionImageFile(rc,mapType,false).exists()) {	
-						List<ChunkCoordIntPair> chunkCoords = rc.getChunkCoordsInRegion();
-						for(ChunkCoordIntPair coord : chunkCoords) {
-							if(ChunkLoader.getChunkFromDisk(coord.chunkXPos, coord.chunkZPos, mcWorldDir, mc.theWorld)!=null) {
-								stack.add(rc);
-								break;
-							}
-						}
+					RegionCoord rc = new RegionCoord(jmImageWorldDir, Integer.parseInt(x), vSlice, Integer.parseInt(z), dimension);	
+					if(all) {
+						stack.add(rc);
 					} else {
-						existingImageCount++;
+						if(!rfh.getRegionImageFile(rc,mapType,false).exists()) {	
+							List<ChunkCoordIntPair> chunkCoords = rc.getChunkCoordsInRegion();
+							for(ChunkCoordIntPair coord : chunkCoords) {
+								if(ChunkLoader.getChunkFromDisk(coord.chunkXPos, coord.chunkZPos, mcWorldDir, mc.theWorld)!=null) {
+									stack.add(rc);
+									break;
+								}
+							}
+						} else {
+							existingImageCount++;
+						}
 					}
 				}
 			}

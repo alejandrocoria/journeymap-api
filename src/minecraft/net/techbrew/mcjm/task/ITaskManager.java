@@ -6,7 +6,7 @@ public interface ITaskManager {
 
 	public Class<? extends ITask> getTaskClass();
 	
-	public boolean enableTask(Minecraft minecraft);
+	public boolean enableTask(Minecraft minecraft, Object params);
 	
 	public boolean isEnabled(Minecraft minecraft);
 	

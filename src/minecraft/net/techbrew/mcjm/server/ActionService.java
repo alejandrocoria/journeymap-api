@@ -155,7 +155,7 @@ public class ActionService extends BaseService {
 		boolean enabled = PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED);
 		if(!enabled) {
 			PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, true);
-			JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true);
+			JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.TRUE);
 		}
 		
 		event.reply().code("200 OK");	
