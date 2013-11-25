@@ -21,6 +21,7 @@ public class TaskController {
 	public TaskController() {
 		managers.add(new LegacyMigrationTask.Manager());
 		managers.add(new MapRegionTask.Manager());
+		managers.add(new SaveMapTask.Manager());
 		managers.add(new MapPlayerTask.Manager());
 	}
 	
@@ -32,9 +33,9 @@ public class TaskController {
 		for(ITaskManager manager: managers) {
 			boolean enabled = manager.enableTask(minecraft, null);
 			if(!enabled) {
-				logger.info("Task not initially enabled: " + manager.getTaskClass().getSimpleName());
+				logger.fine("Task not initially enabled: " + manager.getTaskClass().getSimpleName());
 			} else {
-				logger.info("Task initially enabled: " + manager.getTaskClass().getSimpleName());
+				logger.info("Task ready: " + manager.getTaskClass().getSimpleName());
 			}
 		}
 		

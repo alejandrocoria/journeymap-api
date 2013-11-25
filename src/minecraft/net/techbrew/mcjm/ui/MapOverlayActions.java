@@ -3,7 +3,6 @@ package net.techbrew.mcjm.ui;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,6 +19,7 @@ import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
 import net.techbrew.mcjm.task.MapRegionTask;
+import net.techbrew.mcjm.task.SaveMapTask;
 import net.techbrew.mcjm.ui.dialog.AutoMapConfirmation;
 
 import org.lwjgl.input.Keyboard;
@@ -83,17 +83,18 @@ public class MapOverlayActions extends JmUI {
 			lastWidth = width;
 			lastHeight = height;
 			
-			int hgap = 160;
-			int bx = this.width / 2 - hgap + 5;
-			int by = (this.height / 4);
+			final int rowHeight = 22;
+			final int hgap = 160;
+			final int bx = this.width / 2 - hgap + 5;
+			final int by = (this.height / 4);
 			int row = 0;
 			
-			layoutButton(buttonAutomap, bx + hgap/2, by + (20*row++));	
-			layoutButton(buttonSave, bx + hgap/2, by + (20*row++));				
-			layoutButton(buttonBrowser, bx + hgap/2, by + (20*row++));	
+			layoutButton(buttonAutomap, bx + hgap/2, by + (rowHeight*row++));	
+			layoutButton(buttonSave, bx + hgap/2, by + (rowHeight*row++));				
+			layoutButton(buttonBrowser, bx + hgap/2, by + (rowHeight*row++));	
 			
 			row++;
-			layoutButton(buttonClose, bx + hgap/2, by + (20*row++));	
+			layoutButton(buttonClose, bx + hgap/2, by + (rowHeight*row++));	
 
 		}
 		
@@ -153,7 +154,6 @@ public class MapOverlayActions extends JmUI {
 	}
 	
     void save() {
-
 		if(mc==null) {
 			mc = Minecraft.getMinecraft();
 		}
@@ -167,26 +167,12 @@ public class MapOverlayActions extends JmUI {
 			checkMapType = Constants.MapType.underground;
 		}
 		final Constants.MapType useMapType = checkMapType;
-		
-		JourneyMap.getInstance().getChunkExecutor().schedule(new Runnable() {
-			@Override
-			public void run() {							
-				try {			
-					new MapSaver().saveMap(worldDir, useMapType, vSlice , mc.thePlayer.dimension);
-				} catch (java.lang.OutOfMemoryError e) {
-					String error = Constants.getMessageJMERR18("Out Of Memory: Increase Java Heap Size for Minecraft to save large maps.");
-					JourneyMap.getInstance().announce(error, Level.SEVERE);
-				} catch (Throwable t) {	
-					String error = Constants.getMessageJMERR18(t.getMessage());
-					JourneyMap.getInstance().announce(error, Level.SEVERE);
-					JourneyMap.getLogger().severe(LogFormatter.toString(t));					
-					return;
-				}
-			}			
-		}, 0, TimeUnit.MILLISECONDS);	
-		
+		final MapSaver mapSaver = new MapSaver(worldDir, useMapType, vSlice , mc.thePlayer.dimension);
+		if(mapSaver.isValid()) {
+			JourneyMap.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
+			JourneyMap.getInstance().announce(Constants.getString("MapOverlay.save_filename", mapSaver.getSaveFileName())); //$NON-NLS-1$
+		}		
 		close();
-
 	}
 
     /**

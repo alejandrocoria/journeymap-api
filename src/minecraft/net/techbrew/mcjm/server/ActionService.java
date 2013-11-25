@@ -1,7 +1,8 @@
 package net.techbrew.mcjm.server;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.util.HashMap;
+import java.util.Properties;
 
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.World;
@@ -13,7 +14,7 @@ import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.task.MapRegionTask;
-import se.rupy.http.Deploy;
+import net.techbrew.mcjm.task.SaveMapTask;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 /**
@@ -113,25 +114,19 @@ public class ActionService extends BaseService {
 			Boolean hardcore = !minecraft.isSingleplayer() && theWorld.getWorldInfo().isHardcoreModeEnabled();
 			if(mapType.equals(Constants.MapType.underground) && hardcore) {
 				String error = "Cave mapping on hardcore servers is not allowed"; //$NON-NLS-1$
-				throwEventException(403, error, event, false);
+				throwEventException(403, error, event, true);
 			}			
 
-			// Get image
-			File mapFile = MapSaver.saveMap(worldDir, mapType, vSlice, dimension);	
-			if(mapFile.exists()) {				
-				// Set response headers
-				ResponseHeader.on(event).noCache().content(mapFile);			
-				FileInputStream fis = new FileInputStream(mapFile);
-				
-				// Write image to output
-				try {
-					Deploy.pipe(fis, event.reply().output(mapFile.length()));
-				} finally {
-					fis.close();
-				}
-			} else {
-				throwEventException(500, "Map images not found.", event, true);
-			}
+			// Check estimated file size
+			MapSaver mapSaver = new MapSaver(worldDir, mapType, vSlice, dimension);			
+			if(!mapSaver.isValid()) {
+				throwEventException(403, "No image files to save.", event, true);
+			} 
+			JourneyMap.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
+			
+			Properties response = new Properties();
+			response.put("filename", mapSaver.getSaveFileName());
+			respondJson(event, response);
 			
 		} catch (NumberFormatException e) {
 			reportMalformedRequest(event);
@@ -153,12 +148,22 @@ public class ActionService extends BaseService {
 	private void autoMap(Event event) throws Event, Exception {
 		
 		boolean enabled = PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED);
-		if(!enabled) {
-			PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, true);
-			JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.TRUE);
-		}
+		String scope = getParameter(event.query(), "scope", "stop");
 		
-		event.reply().code("200 OK");	
+		HashMap responseObj = new HashMap();
+		
+		if("stop".equals(scope)) {
+			PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, false);
+			JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, false, Boolean.FALSE);			
+			responseObj.put("message","automap_complete");			
+		} else {
+			boolean doAll = "all".equals(scope);
+			PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, true);
+			JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, doAll);
+			responseObj.put("message","automap_started");			
+		} 
+		
+		respondJson(event, responseObj);
 	}
 
 }
