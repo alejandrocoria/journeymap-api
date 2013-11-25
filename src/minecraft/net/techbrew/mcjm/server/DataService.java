@@ -31,8 +31,6 @@ import se.rupy.http.Query;
 public class DataService extends BaseService {
 
 	private static final long serialVersionUID = 4412225358529161454L;
-
-	public static final String CALLBACK_PARAM = "callback";  //$NON-NLS-1$	
 	
 	public static final String combinedPath;
 	

@@ -5,6 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,6 +23,7 @@ import javax.imageio.ImageIO;
 
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.io.JsonHelper;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 import se.rupy.http.Reply;
@@ -34,6 +37,7 @@ import se.rupy.http.Service;
 public abstract class BaseService extends Service {
 	
 	public static final Charset UTF8 = Charset.forName("UTF-8"); //$NON-NLS-1$
+	public static final String CALLBACK_PARAM = "callback";  //$NON-NLS-1$
 	
 	protected String path;
 	
@@ -246,6 +250,47 @@ public abstract class BaseService extends Service {
 		
 		ResponseHeader.on(event).contentLength(bytes.length);
 		event.output().write(bytes); 
+	}
+	
+	/**
+	 * Respond with a JSON-encoded Map.  Uses JSONP if needed.
+	 * @param event
+	 * @param responseObj
+	 * @throws Exception
+	 */
+	protected void respondJson(Event event, Map responseObj) throws Exception {
+		
+		Query query = event.query();
+		
+		// Build the response string
+		StringBuffer jsonData = new StringBuffer();
+				
+		// Check for callback to determine Json or JsonP
+		boolean useJsonP = query.containsKey(CALLBACK_PARAM);
+		if(useJsonP) {
+			try {
+				jsonData.append(URLEncoder.encode(query.get(CALLBACK_PARAM).toString(), UTF8.name()));
+			} catch (UnsupportedEncodingException e) {
+				jsonData.append(query.get(CALLBACK_PARAM).toString());
+			}
+			jsonData.append("("); //$NON-NLS-1$	
+		} else {
+			jsonData.append("data="); //$NON-NLS-1$	
+		}	
+		
+		// Append the data
+		jsonData.append(JsonHelper.toJson(responseObj));
+
+		// Finish function call for JsonP if needed
+		if(useJsonP) {
+			jsonData.append(")"); //$NON-NLS-1$
+		}
+		
+		// Optimize headers for JSONP
+		ResponseHeader.on(event).noCache().contentType(ContentType.jsonp);
+				
+		// Gzip response
+		gzipResponse(event, jsonData.toString());
 	}
 	
 	/**
