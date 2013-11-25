@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,13 +14,17 @@ import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 
+import net.minecraft.src.EnumOS;
 import net.minecraft.src.Minecraft;
+import net.minecraft.src.Util;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.EntityHelper;
+
+import org.lwjgl.Sys;
 
 
 public class FileHandler {
@@ -200,6 +205,40 @@ public class FileHandler {
 		}		
 		
 		return img;
+	}
+	
+	public static void open(File file) {
+
+        String path = file.getAbsolutePath();
+
+        if (Util.getOSType() == EnumOS.MACOS) {
+            try {
+                Runtime.getRuntime().exec(new String[] {"/usr/bin/open", path});
+                return;
+            } catch (IOException e) {
+                JourneyMap.getLogger().severe("Could not open path with /usr/bin/open: " + path + " : " + LogFormatter.toString(e));
+            }
+            
+        } else if (Util.getOSType() == EnumOS.WINDOWS) {
+        	
+            String cmd = String.format("cmd.exe /C start \"Open file\" \"%s\"", new Object[] {path});
+
+            try {
+                Runtime.getRuntime().exec(cmd);
+                return;
+            } catch (IOException e) {
+                JourneyMap.getLogger().severe("Could not open path with cmd.exe: " + path + " : " + LogFormatter.toString(e));
+            }
+        }
+
+        try {
+            Class desktopClass = Class.forName("java.awt.Desktop");
+            Object method = desktopClass.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
+            desktopClass.getMethod("browse", new Class[] {URI.class}).invoke(method, new Object[] {file.toURI()});
+        } catch (Throwable e) {
+            JourneyMap.getLogger().severe("Could not open path with Desktop: " + path + " : " + LogFormatter.toString(e));
+            Sys.openURL("file://" + path);
+        }
 	}
 	
 }
