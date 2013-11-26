@@ -80,9 +80,8 @@ public class MapRegionTask extends BaseMapTask {
 		
 		@Override
 		public boolean enableTask(Minecraft minecraft, Object params) {
-			
-			// Bail if automap not enabled
-			enabled = PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED);
+
+			enabled = (params!=null);
 			if(!enabled) return false;
 			
 			// TODO: verify this is okay to use (instead of isSinglePlayer)
@@ -101,7 +100,9 @@ public class MapRegionTask extends BaseMapTask {
 						mapType = (time<13800) ? MapType.day : MapType.night; 
 					}
 					
-					regionLoader = new RegionLoader(minecraft, dimension, mapType, vSlice, (Boolean) params);
+					Boolean mapAll = params==null ? false : (Boolean) params;
+					
+					regionLoader = new RegionLoader(minecraft, dimension, mapType, vSlice, mapAll);
 			    	if(regionLoader.getRegionsFound()==0) {
 			    		disableTask(minecraft);
 			    	} else {
@@ -139,9 +140,7 @@ public class MapRegionTask extends BaseMapTask {
 				regionLoader.getRegions().clear();
 				regionLoader = null;
 			}
-			
-			PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, false);
-			
+						
 		}
 		
 		@Override

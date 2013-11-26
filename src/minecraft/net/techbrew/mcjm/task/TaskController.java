@@ -45,6 +45,27 @@ public class TaskController {
 		managers.clear();
 	}
 	
+	private ITaskManager getManager(Class<? extends ITaskManager> managerClass) {
+		ITaskManager taskManager = null;
+		for(ITaskManager manager: managers) {
+			if(manager.getClass()==managerClass) {
+				taskManager = manager;
+				break;
+			}
+		}
+		return taskManager;
+	}
+	
+	public boolean isTaskManagerEnabled(Class<? extends ITaskManager> managerClass) {
+		ITaskManager taskManager = getManager(managerClass);
+		if(taskManager!=null) {
+			return taskManager.isEnabled(Minecraft.getMinecraft());
+		} else {
+			logger.warning("Couldn't toggle task; manager not in controller: " + managerClass.getClass().getName());
+			return false;
+		}
+	}
+	
 	public void toggleTask(Class<? extends ITaskManager> managerClass, boolean enable, Object params) {
 		
 		ITaskManager taskManager = null;
@@ -68,22 +89,24 @@ public class TaskController {
 				logger.info("Disabling task: " + manager.getTaskClass().getSimpleName());
 				manager.disableTask(minecraft);
 			} else {
-				logger.warning("Task already enabled: " + manager.getTaskClass().getSimpleName());
+				logger.fine("Task already enabled: " + manager.getTaskClass().getSimpleName());
 			}
 		} else {
 			if(enable) {
 				logger.info("Enabling task: " + manager.getTaskClass().getSimpleName());
 				manager.enableTask(minecraft, params);
 			} else {
-				logger.warning("Task already disabled: " + manager.getTaskClass().getSimpleName());
+				logger.fine("Task already disabled: " + manager.getTaskClass().getSimpleName());
 			}
 		}
 	}
 	
 	public void disableTasks(final Minecraft minecraft) {
 		for(ITaskManager manager: managers) {
-			manager.disableTask(minecraft);
-			logger.info("Task disabled: " + manager.getTaskClass().getSimpleName());
+			if(manager.isEnabled(minecraft)) {
+				manager.disableTask(minecraft);
+				logger.info("Task disabled: " + manager.getTaskClass().getSimpleName());
+			}
 		}
 	}
 	

@@ -34,8 +34,7 @@ public class PropertyManager {
 		CAVE_LIGHTING("render_cavelighting_enabled",true), //$NON-NLS-1$
 		ANNOUNCE_MODLOADED("announce_modloaded", true), //$NON-NLS-1$
 		UPDATE_CHECK_ENABLED("update_check_enabled", true), //$NON-NLS-1$
-		AUTOMAP_ENABLED("automap_enabled", false), //$NON-NLS-1$
-		
+	
 		PREF_SHOW_CAVES("preference_show_caves", true), //$NON-NLS-1$
 		PREF_SHOW_MOBS("preference_show_mobs", true), //$NON-NLS-1$
 		PREF_SHOW_ANIMALS("preference_show_animals", true), //$NON-NLS-1$
@@ -195,6 +194,10 @@ public class PropertyManager {
 				writeNeeded = true;
 				properties.remove(entry.getKey());
 			}
+			if(entry.getKey().equals("automap_enabled")) {
+				writeNeeded = true;
+				properties.remove(entry.getKey());
+			}			
 		}
 		
 		if(writeNeeded) {

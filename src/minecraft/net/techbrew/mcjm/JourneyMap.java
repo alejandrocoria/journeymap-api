@@ -192,6 +192,20 @@ public class JourneyMap {
 	}
 	
 	/**
+	 * Checks whether a task manager is enabled.
+	 * @param managerClass
+	 * @return
+	 */
+	public boolean isTaskManagerEnabled(Class<? extends ITaskManager> managerClass) {
+		if(taskController!=null) {
+    		return taskController.isTaskManagerEnabled(managerClass);
+    	} else {
+    		logger.warning("taskController not available");
+    		return false;
+    	}
+	}
+	
+	/**
      * Starts mapping threads
      */
     private void startMapping(Minecraft minecraft) {

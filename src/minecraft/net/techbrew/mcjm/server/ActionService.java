@@ -11,7 +11,6 @@ import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
-import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.task.MapRegionTask;
 import net.techbrew.mcjm.task.SaveMapTask;
@@ -147,21 +146,23 @@ public class ActionService extends BaseService {
 	 */
 	private void autoMap(Event event) throws Event, Exception {
 		
-		boolean enabled = PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED);
+		boolean enabled = JourneyMap.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);
 		String scope = getParameter(event.query(), "scope", "stop");
 		
 		HashMap responseObj = new HashMap();
 		
-		if("stop".equals(scope)) {
-			PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, false);
-			JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, false, Boolean.FALSE);			
-			responseObj.put("message","automap_complete");			
-		} else {
+		if("stop".equals(scope)) {		
+			if(enabled) {
+				JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, false, Boolean.FALSE);			
+				responseObj.put("message","automap_complete");
+			}
+		} else if(!enabled) {
 			boolean doAll = "all".equals(scope);
-			PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, true);
 			JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, doAll);
 			responseObj.put("message","automap_started");			
-		} 
+		} else {
+			responseObj.put("message","automap_already_started");
+		}
 		
 		respondJson(event, responseObj);
 	}
