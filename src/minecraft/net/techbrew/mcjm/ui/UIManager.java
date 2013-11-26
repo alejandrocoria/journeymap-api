@@ -35,14 +35,14 @@ public class UIManager {
     
     public void closeCurrent() {    	
     	if(minecraft.currentScreen!=null && minecraft.currentScreen instanceof JmUI) {
-    		logger.info("Closing " + minecraft.currentScreen.getClass());
+    		logger.fine("Closing " + minecraft.currentScreen.getClass());
 			((JmUI) minecraft.currentScreen).close();
 		}
 		uiKeybinding.unPressAllKeys();
     }
     
     public void openInventory() {
-    	logger.info("Opening inventory");
+    	logger.fine("Opening inventory");
     	closeAll();
     	minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer));
     }
@@ -50,7 +50,7 @@ public class UIManager {
     void open(Class<? extends JmUI> uiClass) {
     	closeCurrent();
     	try {    		
-    		logger.info("Opening UI " + uiClass.getSimpleName());
+    		logger.fine("Opening UI " + uiClass.getSimpleName());
 			minecraft.displayGuiScreen(uiClass.newInstance());
 		} catch(Throwable e) {
 			logger.log(Level.SEVERE, "Unexpected exception opening UI: " + e); //$NON-NLS-1$
