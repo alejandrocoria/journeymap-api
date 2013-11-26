@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import javax.net.ssl.HttpsURLConnection;
 
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.log.LogFormatter;
 
 public class VersionCheck {
 
@@ -88,5 +89,14 @@ public class VersionCheck {
 			}
 		}
 		return versionIsChecked;
+	}
+	
+	public static void launchWebsite() {
+		String url = JourneyMap.WEBSITE_URL;
+		try {
+			java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+		} catch (Throwable e) {
+			JourneyMap.getLogger().log(Level.SEVERE, "Could not launch browser with URL: " + url, LogFormatter.toString(e)); //$NON-NLS-1$
+		}
 	}
 }
