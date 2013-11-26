@@ -74,7 +74,7 @@ public class ExtendedBlockStorageStub
         	skylightArray = new NibbleArray(skylight.data,4);
         }
         
-        this.removeInvalidBlocks();
+        //this.removeInvalidBlocks();
 
     }
     
@@ -107,7 +107,7 @@ public class ExtendedBlockStorageStub
         	skylightArray = new NibbleArray(skylight.data,4);
         }
         
-        this.removeInvalidBlocks();
+        //this.removeInvalidBlocks();
 
     }
     
