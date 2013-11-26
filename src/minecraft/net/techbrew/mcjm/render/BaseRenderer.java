@@ -371,9 +371,17 @@ public abstract class BaseRenderer {
 	 */
 	public Color shadeOutside(Color original, float factor) {
 
-		float hsb[] = Color.RGBtoHSB(original.getRed(), original.getGreen(), original.getBlue(), null);
-		int result = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]*factor);
+		float[] rgb = original.getRGBColorComponents(null); 
+		Color washout= new Color(
+				ColorCache.safeColor((rgb[0] + 2f) /3f),
+				ColorCache.safeColor((rgb[1] + 2f) /3f),
+				ColorCache.safeColor((rgb[2] + 2f) /3f));
+		
+		float hsb[] = Color.RGBtoHSB(washout.getRed(), washout.getGreen(), washout.getBlue(), null);
+		int result = Color.HSBtoRGB(hsb[0], 0, hsb[2]*factor);
 		return new Color(result);
+		
+		
 		
 	}
 

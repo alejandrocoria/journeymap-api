@@ -168,8 +168,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					g2D.setPaint(color);
 					g2D.fillRect(x, z, 1, 1);
 					chunkOk = true;
-				}
-				
+				}				
 				
 				// Adjust color for light level at night		
 				int lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,y + 1, z);
@@ -242,11 +241,9 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					if(skipUndergroundCheck) {
 						
 						hasAir = true;
-						
-						paintY = blockMaxY;
-						//lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,paintY+1, z);
-						lightLevel = Math.max(1, getMixedBrightnessForBlock(chunkMd, x,paintY+1, z));
 						hasWater = false;
+						paintY = blockMaxY;
+						lightLevel = 15;						
 						
 					} else {
 					
@@ -317,7 +314,6 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 							}
 						} // end airloop
 										
-						
 					}
 					
 					// No air blocks in column at all
@@ -368,14 +364,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		
 					if(skipUndergroundCheck) {
 						
-//						if(lightLevel==0) lightLevel = 1;
-//						if (lightLevel < 15) {
-//							float diff = Math.min(1F, (lightLevel / 30F) + .1f);
-//							if(diff!=1.0) {
-//								color = shadeOutside(color, diff);
-//							}
-//						}
-						color = shadeOutside(color, .1f);
+						color = shadeOutside(color, .3f);
 						
 					} else {
 						
