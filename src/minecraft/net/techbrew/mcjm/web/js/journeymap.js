@@ -583,11 +583,12 @@ var JourneyMap = (function() {
 			.dialog({ 
 			modal: true,
 			buttons: [ 
-			   { text: getMessage('automap_dialog_all'),     click: function() { toggleAutoMap('all');  $( this ).dialog( "close" ); } },
-			   { text: getMessage('automap_dialog_missing'), click: function() { toggleAutoMap('missing');  $( this ).dialog( "close" ); } },
-	           { text: getMessage('automap_dialog_cancel'),  click: function() { toggleAutoMap('stop');  $( this ).dialog( "close" ); } } 
+			   { width:'80px', text: getMessage('automap_dialog_all'),     click: function() { toggleAutoMap('all');  $( this ).dialog( "close" ); } },
+			   { width:'80px', text: getMessage('automap_dialog_missing'), click: function() { toggleAutoMap('missing');  $( this ).dialog( "close" ); } },
+	           { width:'80px', text: getMessage('automap_dialog_cancel'),  click: function() { toggleAutoMap('stop');  $( this ).dialog( "close" ); } } 
 			]
 		}).parent().find('.ui-dialog-titlebar').remove();
+		$(dialog).find('.ui-dialog-buttonset').css('width','100%');
 				
 	}
 
@@ -815,6 +816,9 @@ var JourneyMap = (function() {
 		map.panTo(center);
 		map.setZoom(zoom);
 		map.panTo(center);
+		
+		// Waypoints need a little extra help
+		drawWaypoints();
 
 	}
 
@@ -1278,15 +1282,16 @@ var JourneyMap = (function() {
 
 		// Get current waypoint position		
 		var pos = blockPosToLatLng(waypoint.x, waypoint.z);
-		if(!map.getBounds().contains(pos)) {
-			//return; // Don't bother with marker
-			// TODO: Put on edge of map as an arrow?
-		}
 
 		var id = waypoint.id;
 		waypoint.color = rgbToHex(waypoint.r, waypoint.g, waypoint.b);
 		
 		var marker = markerMap[id];
+		
+		if(!map.getBounds().contains(pos)) {
+			return; // Don't bother with marker
+			// TODO: Put on edge of map as an arrow?
+		}
 		
 		if(!marker) {
 			var icon = {
@@ -1297,15 +1302,15 @@ var JourneyMap = (function() {
 			};
 			var labelClass = "waypoint";
 
-			if(waypoint.type==1) {
+			if(waypoint.type===2) {
 				// death point: X marks the spot
 				icon.path = 'M -10,-10 0,-4 10,-10 14,-8 4,0 14,8 10,10 0,4 -10,10 -14,8 -4,0 -14,-8 z';
-				icon.strokeWeight = 2;
+				icon.strokeWeight = 1.5;
 				labelClass = labelClass + " death";
 			} else {
 				// diamond
-				icon.path = 'M 0,-16 16,0 0,16 -16,0 0,-16 z';
-				icon.strokeWeight = 3;
+				icon.path = 'M 0,-8 8,0 0,8 -8,0 0,-8 z';
+				icon.strokeWeight = 1.5;
 				labelClass = labelClass;
 			}
 			
@@ -1316,6 +1321,12 @@ var JourneyMap = (function() {
 			    waypoint.y,
 			    "(" + (waypoint.y >> 4) + ")"
 			].join(' ');
+			
+			var label = waypoint.display;
+			var titleSpan = $('<span/>').addClass(labelClass).html(label).hide().appendTo(document.body);
+			var titleWidth = 4 + $(titleSpan).innerWidth()/2;
+			$(titleSpan).remove();
+			//console.log("titleWidth " + titleWidth);
 
 			marker = new MarkerWithLabel({
 		       position: pos,
@@ -1324,9 +1335,9 @@ var JourneyMap = (function() {
 		       clickable: false,
 		       icon: icon,
 		       title: title,
-		       labelContent: waypoint.display,
+		       labelContent: label,
 		       labelClass: labelClass,
-		       labelAnchor: new google.maps.Point(-18,14)
+		       labelAnchor: new google.maps.Point(titleWidth,40)
 		     });
 			markerMap[id] = marker;	
 			
@@ -1339,6 +1350,9 @@ var JourneyMap = (function() {
 				marker.icon.fillColor = waypoint.color;
 				marker.setIcon(marker.icon);
 			}
+			
+			//console.log("Setting position of waypoint: ", pos);
+			marker.setPosition(pos);
 		}
 	}
 	

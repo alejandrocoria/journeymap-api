@@ -266,9 +266,6 @@ label span {
 	font-size: 14px !important;
 }
 
- .ui-dialog-buttonset { 
-    text-align: center; 
-}
 
 /* Fix Google Maps canvas */
 .google-map-canvas,
