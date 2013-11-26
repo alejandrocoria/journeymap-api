@@ -453,7 +453,7 @@ public class MapOverlay extends JmUI {
 		
 		switch(i) {
 			case Keyboard.KEY_ESCAPE : {	
-				close();
+				UIManager.getInstance().closeAll();
 				break;
 			}
 			case Keyboard.KEY_ADD : {
