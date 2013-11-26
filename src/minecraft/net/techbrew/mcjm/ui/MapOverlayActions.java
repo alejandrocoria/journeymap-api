@@ -10,6 +10,7 @@ import net.minecraft.src.GuiButton;
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.VersionCheck;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.data.PlayerData;
@@ -29,10 +30,12 @@ public class MapOverlayActions extends JmUI {
 
 	private final Logger logger = JourneyMap.getLogger();
 	
+	private enum ButtonEnum {Automap,Check,Save,Browser,Close};
+	
 	final String title = Constants.getString("MapOverlay.actions_title", JourneyMap.JM_VERSION);
 	int lastWidth = 0;
 	int lastHeight = 0;
-	MapButton buttonAutomap, buttonSave, buttonClose, buttonBrowser;
+	MapButton buttonAutomap, buttonSave, buttonClose, buttonBrowser, buttonCheck;
 	Color titleColor = new Color(0,0,100);
 	
 	public MapOverlayActions() {
@@ -49,21 +52,24 @@ public class MapOverlayActions extends JmUI {
         String on = Constants.getString("MapOverlay.on");
         String off = Constants.getString("MapOverlay.off");
 
-		buttonSave = new MapButton(6,0,0,Constants.getString("MapOverlay.save_map")); //$NON-NLS-1$ 
-		buttonClose = new MapButton(7,0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$ 
-		buttonBrowser = new MapButton(9,0,0,Constants.getString("MapOverlay.use_browser")); //$NON-NLS-1$ 
-		
-		buttonAutomap = new MapButton(17,0,0,
+		buttonSave = new MapButton(ButtonEnum.Save.ordinal(),0,0,Constants.getString("MapOverlay.save_map")); //$NON-NLS-1$ 
+		buttonClose = new MapButton(ButtonEnum.Close.ordinal(),0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$ 
+		buttonBrowser = new MapButton(ButtonEnum.Browser.ordinal(),0,0,Constants.getString("MapOverlay.use_browser")); //$NON-NLS-1$ 		
+		buttonAutomap = new MapButton(ButtonEnum.Automap.ordinal(),0,0,
 				Constants.getString("MapOverlay.automap_title", on),
 				Constants.getString("MapOverlay.automap_title", off),
-				PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED)); //$NON-NLS-1$ //$NON-NLS-2$
+				true); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonAutomap.setHoverText(Constants.getString("MapOverlay.automap_text")); //$NON-NLS-1$
 		buttonAutomap.enabled = Minecraft.getMinecraft().isSingleplayer();
+		
+		buttonCheck = new MapButton(ButtonEnum.Check.ordinal(),0,0, Constants.getString("MapOverlay.update_check")); //$NON-NLS-1$ 
 	
-		buttonList.add(buttonSave);
-		buttonList.add(buttonClose);
-		buttonList.add(buttonBrowser);
 		buttonList.add(buttonAutomap);
+		buttonList.add(buttonSave);
+		buttonList.add(buttonCheck);
+		buttonList.add(buttonBrowser);
+		buttonList.add(buttonClose);		
+		
     }
     
     /**
@@ -76,67 +82,56 @@ public class MapOverlayActions extends JmUI {
 			initGui();
 		}
 		
-		buttonSave.enabled = !PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED);
+		buttonSave.enabled = !JourneyMap.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);
 		
 		if(lastWidth!=width || lastHeight!=height) {
 			
 			lastWidth = width;
 			lastHeight = height;
+
+			final int hgap = 4;
+			final int vgap = 3;
+			final int bx = (this.width / 2) - (buttonAutomap.getWidth() - hgap/2);
+			final int by = this.height / 4;
 			
-			final int rowHeight = 22;
-			final int hgap = 160;
-			final int bx = this.width / 2 - hgap + 5;
-			final int by = (this.height / 4);
-			int row = 0;
+			buttonAutomap.setPosition(bx, by);
+			buttonSave.below(buttonAutomap, vgap).xPosition=bx;
 			
-			layoutButton(buttonAutomap, bx + hgap/2, by + (rowHeight*row++));	
-			layoutButton(buttonSave, bx + hgap/2, by + (rowHeight*row++));				
-			layoutButton(buttonBrowser, bx + hgap/2, by + (rowHeight*row++));	
+			buttonBrowser.rightOf(buttonAutomap, hgap).yPosition=by;
+			buttonCheck.below(buttonBrowser, vgap).rightOf(buttonSave, hgap);
 			
-			row++;
-			layoutButton(buttonClose, bx + hgap/2, by + (rowHeight*row++));	
+			buttonClose.below(buttonSave, vgap*2).xPosition=this.width / 2 - buttonClose.getWidth()/2;
 
 		}
 		
 	}
-	
-	private void layoutButton(GuiButton guibutton, int x, int y) {
-		guibutton.xPosition = x;
-		guibutton.yPosition = y;
-	}
-
 
     @Override
 	protected void actionPerformed(GuiButton guibutton) {
     	
-		switch(guibutton.id) {
-			case 6: { // save
+    	final ButtonEnum id = ButtonEnum.values()[guibutton.id];
+    	switch(id) {
+			case Save: { 
 				save();
 				UIManager.getInstance().openMap();
 				break;
 			}
-			case 7: { // close
+			case Close: { 
 				UIManager.getInstance().openMap();
 				break;
 			}
-
-			case 9: { // browser
+			case Browser: { 
 				launchLocalhost();
 				UIManager.getInstance().openMap();
 				break;
 			}
-			
-			case 17: { // automap
-				
-				boolean enable = !PropertyManager.getInstance().getBoolean(PropertyManager.Key.AUTOMAP_ENABLED);
-				if(enable) {
-					UIManager.getInstance().open(AutoMapConfirmation.class);
-				} else {
-					JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, false, null);
-					buttonAutomap.setToggled(false);
-					PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, false);
-					updateScreen();
-				}
+			case Automap: { 			
+				UIManager.getInstance().open(AutoMapConfirmation.class);
+				break;
+			}
+			case Check: {	
+				VersionCheck.launchWebsite();
+				UIManager.getInstance().openMap();
 				break;
 			}
 		}

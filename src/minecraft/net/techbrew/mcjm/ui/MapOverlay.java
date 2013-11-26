@@ -17,6 +17,7 @@ import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.VersionCheck;
 import net.techbrew.mcjm.data.AnimalsData;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.EntityKey;
@@ -57,11 +58,6 @@ public class MapOverlay extends JmUI {
 	Boolean isScrolling = false;
 	static Boolean hardcore = false;
 	int msx, msy, mx, my;	
-	
-	int bWidth = 16;
-	int bHeight = 16;
-	int bHGap = 8;
-	int bVGap = 8;
 
 	// TODO: move to state
 	static Constants.MapType mapType;
@@ -91,8 +87,10 @@ public class MapOverlay extends JmUI {
 	
 	static long lastRefresh = 0;
 	
+	private enum ButtonEnum{Alert,DayNight,Follow,ZoomIn,ZoomOut,Options,Actions,Close};
+	
 	MapButton buttonDayNight, buttonFollow,buttonZoomIn,buttonZoomOut;
-	MapButton buttonOptions, buttonActions, buttonClose;
+	MapButton buttonAlert, buttonOptions, buttonActions, buttonClose;
 	
 	Color bgColor = new Color(0x22, 0x22, 0x22);
 	Color playerInfoFgColor = new Color(0x8888ff);
@@ -163,46 +161,47 @@ public class MapOverlay extends JmUI {
 	@Override
 	protected void actionPerformed(GuiButton guibutton) {
 		
-		switch(guibutton.id) {
-		case 0: { // day or night			
-			buttonDayNight.toggle();
-			if(buttonDayNight.getToggled()) {
-				mapType = Constants.MapType.day;
-			} else {
-				mapType = Constants.MapType.night;
+		final ButtonEnum id = ButtonEnum.values()[guibutton.id];
+    	switch(id) {
+			case DayNight: { // day or night			
+				buttonDayNight.toggle();
+				if(buttonDayNight.getToggled()) {
+					mapType = Constants.MapType.day;
+				} else {
+					mapType = Constants.MapType.night;
+				}
+				refreshState();
+				break;
 			}
-			refreshState();
-			break;
-		}
-
-		case 3: { // follow
-			toggleFollow();
-			break;
-		}
-		case 4: { // zoom in
-			zoomIn();
-			break;
-		}
-		case 5: { // zoom out
-			zoomOut();
-			break;
-		}
-		case 7: { // close
-			UIManager.getInstance().closeAll();
-			break;
-		}
-		case 8: { // alert
-			launchWebsite();
-			break;
-		}
-		case 15: { // options
-			UIManager.getInstance().openMapOptions();
-			break;
-		}
-		case 16: { // actions
-			UIManager.getInstance().openMapActions();
-			break;
-		}
+	
+			case Follow: { // follow
+				toggleFollow();
+				break;
+			}
+			case ZoomIn: { // zoom in
+				zoomIn();
+				break;
+			}
+			case ZoomOut: { // zoom out
+				zoomOut();
+				break;
+			}
+			case Close: { // close
+				UIManager.getInstance().closeAll();
+				break;
+			}
+			case Alert: { // alert
+				VersionCheck.launchWebsite();
+				break;
+			}
+			case Options: { // options
+				UIManager.getInstance().openMapOptions();
+				break;
+			}
+			case Actions: { // actions
+				UIManager.getInstance().openMapActions();
+				break;
+			}
 		}
 	}
 
@@ -240,22 +239,28 @@ public class MapOverlay extends JmUI {
 		String on = Constants.getString("MapOverlay.on"); //$NON-NLS-1$ 
         String off = Constants.getString("MapOverlay.off"); //$NON-NLS-1$ 
         
-		buttonDayNight = new MapButton(0,0,0,80,20,
+		buttonAlert = new MapButton(ButtonEnum.Alert.ordinal(),0,0, Constants.getString("MapOverlay.update_available")); //$NON-NLS-1$ 
+		buttonAlert.drawButton = VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent();
+		
+		buttonDayNight = new MapButton(ButtonEnum.DayNight.ordinal(),0,0,80,20,
 				Constants.getString("MapOverlay.day"), //$NON-NLS-1$ 
 				Constants.getString("MapOverlay.night"), //$NON-NLS-1$ 
 				mapType == Constants.MapType.day); 
 
-		buttonFollow = new MapButton(3,0,0,80,20,
+		buttonFollow = new MapButton(ButtonEnum.Follow.ordinal(),0,0,80,20,
 				Constants.getString("MapOverlay.follow", on), //$NON-NLS-1$ 
 				Constants.getString("MapOverlay.follow", off), //$NON-NLS-1$ 
 				follow); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		buttonZoomIn  = new MapButton(4,0,0,12,12,Constants.getString("MapOverlay.zoom_in"), FileHandler.WEB_DIR + "/img/zoomin.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonZoomOut = new MapButton(5,0,0,12,12,Constants.getString("MapOverlay.zoom_out"), FileHandler.WEB_DIR + "/img/zoomout.png"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonClose   = new MapButton(7,0,0,60,20,Constants.getString("MapOverlay.close")); //$NON-NLS-1$
-		buttonOptions = new MapButton(15,0,0,60,20, Constants.getString("MapOverlay.options")); //$NON-NLS-1$
-		buttonActions = new MapButton(16,0,0,60,20, Constants.getString("MapOverlay.actions")); //$NON-NLS-1$
+		buttonZoomIn  = new MapButton(ButtonEnum.ZoomIn.ordinal(),0,0,12,12,Constants.getString("MapOverlay.zoom_in"), FileHandler.WEB_DIR + "/img/zoomin.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonZoomOut = new MapButton(ButtonEnum.ZoomOut.ordinal(),0,0,12,12,Constants.getString("MapOverlay.zoom_out"), FileHandler.WEB_DIR + "/img/zoomout.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		buttonClose   = new MapButton(ButtonEnum.Close.ordinal(),0,0,60,20,Constants.getString("MapOverlay.close")); //$NON-NLS-1$
+		buttonOptions = new MapButton(ButtonEnum.Options.ordinal(),0,0,60,20, Constants.getString("MapOverlay.options")); //$NON-NLS-1$
+		buttonActions = new MapButton(ButtonEnum.Actions.ordinal(),0,0,60,20, Constants.getString("MapOverlay.actions")); //$NON-NLS-1$
 		
+		if(buttonAlert.drawButton) {
+			buttonList.add(buttonAlert);
+		}
 		buttonList.add(buttonDayNight);
 		buttonList.add(buttonFollow);
 		buttonList.add(buttonZoomIn);
@@ -273,41 +278,47 @@ public class MapOverlay extends JmUI {
 		if(buttonList.isEmpty()) {
 			initButtons();
 		}
+		final boolean smallScale = (mc.gameSettings.guiScale==1);
+		final int startX = smallScale ? 60 : 30;
+		final int endX = width - 3;
+		final int startY = 3;
+		final int hgap = 3;
+		final int vgap = 3;
 
-		int startX = 50;
-		int endX = width - 10;
-		int offsetX = bWidth + bHGap;
-		int offsetY = bHeight + bVGap;
-
-		buttonDayNight.xPosition = 30;
-		buttonDayNight.yPosition = 3;
-
-		buttonFollow.xPosition = 120;
-		buttonFollow.yPosition = 3;
+		buttonDayNight.setPosition(startX,startY);
 		
-		buttonZoomIn.xPosition = 8;
-		buttonZoomIn.yPosition = 8 + offsetY;
-		buttonZoomOut.xPosition = 8;
-		buttonZoomOut.yPosition = 8 + (offsetY*2);
+		buttonZoomIn.setPosition(smallScale ? 20 : 8, smallScale ? 64 : 32);
+		buttonZoomOut.below(buttonZoomIn, 8).xPosition=buttonZoomIn.xPosition;
+				
+				
 		
 		if(width>=420) { // across top
-			buttonOptions.xPosition = endX - 200;
-			buttonOptions.yPosition = 3;
 			
-			buttonActions.xPosition = endX - 130;
-			buttonActions.yPosition = 3;
+			buttonFollow.rightOf(buttonDayNight, hgap).yPosition=startY;
 			
-		} else { // below close
+			buttonClose.leftOf(endX).yPosition=startY;
+			buttonActions.leftOf(buttonClose, hgap).yPosition=startY;
+			buttonOptions.leftOf(buttonActions, hgap).yPosition=startY;
 			
-			buttonOptions.xPosition = endX - 60;
-			buttonOptions.yPosition = 30;
+			if(buttonAlert.drawButton) {
+				buttonAlert.below(buttonClose, vgap).leftOf(endX);
+			}
 			
-			buttonActions.xPosition = endX - 60;
-			buttonActions.yPosition = 55;
+		} else { // down right
+			
+			buttonFollow.below(buttonDayNight, hgap).xPosition=startX;
+			
+			if(buttonAlert.drawButton) {
+				buttonAlert.leftOf(endX).yPosition=startY;
+				buttonClose.leftOf(endX).below(buttonAlert, vgap);
+			} else {
+				buttonClose.leftOf(endX).yPosition=startY;
+			}
+			
+			buttonActions.below(buttonClose, hgap).leftOf(endX);
+			buttonOptions.below(buttonActions, hgap).leftOf(endX);
+			
 		}
-		
-		buttonClose.xPosition = endX - 60;	
-		buttonClose.yPosition = 3;
 		
 		final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
 		buttonDayNight.enabled = !(underground && showCaves);
@@ -787,17 +798,7 @@ public class MapOverlay extends JmUI {
 		gridRenderer.move(deltaBlockX, deltaBlockz);
 		setFollow(false);
 		refreshState();
-	}
-
-	protected void launchWebsite() {
-		String url = JourneyMap.WEBSITE_URL;
-		try {
-			java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
-		} catch (Throwable e) {
-			logger.log(Level.SEVERE, "Could not launch browser with URL: " + url, e); //$NON-NLS-1$
-			logger.severe(LogFormatter.toString(e));
-		}
-	}
+	}	
 	
 	public static void reset() {
 		mapType = null;

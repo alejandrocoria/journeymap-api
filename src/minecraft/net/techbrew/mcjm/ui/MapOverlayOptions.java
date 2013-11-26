@@ -5,7 +5,6 @@ import java.awt.Color;
 import net.minecraft.src.GuiButton;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.VersionCheck;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
@@ -18,8 +17,9 @@ public class MapOverlayOptions extends JmUI {
 	final String title;
 	int lastWidth = 0;
 	int lastHeight = 0;
-	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid;
-	MapButton buttonClose,buttonAlert;
+	
+	private enum ButtonEnum {Caves,Monsters,Animals,Villagers,Pets,Players,Waypoints,Grid,Close};	
+	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid, buttonClose;
 	Color titleColor = new Color(0,0,100);
 	
 	public MapOverlayOptions() {
@@ -36,48 +36,45 @@ public class MapOverlayOptions extends JmUI {
         String on = Constants.getString("MapOverlay.on");
         String off = Constants.getString("MapOverlay.off");
         
-   		buttonCaves = new MapButton(2,0,0,
+   		buttonCaves = new MapButton(ButtonEnum.Caves.ordinal(),0,0,
    				Constants.getString("MapOverlay.show_caves", on),
    				Constants.getString("MapOverlay.show_caves", off),
    				MapOverlay.showCaves); //$NON-NLS-1$ 
    		
-		buttonClose = new MapButton(7,0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$ 
-		String updateText = VersionCheck.getVersionIsChecked() ? Constants.getString("MapOverlay.update_available") : Constants.getString("MapOverlay.update_check"); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonAlert = new MapButton(8,0,0,updateText); //$NON-NLS-1$ 
-		buttonAlert.drawButton = !VersionCheck.getVersionIsChecked() || !VersionCheck.getVersionIsCurrent();
-		
-		buttonMonsters = new MapButton(10,0,0,
+		buttonClose = new MapButton(ButtonEnum.Close.ordinal(),0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$ 
+				
+		buttonMonsters = new MapButton(ButtonEnum.Monsters.ordinal(),0,0,
 				Constants.getString("MapOverlay.show_monsters", on),
 				Constants.getString("MapOverlay.show_monsters", off),
 				MapOverlay.showMonsters); //$NON-NLS-1$  //$NON-NLS-2$
 		
-		buttonAnimals = new MapButton(11,0,0,
+		buttonAnimals = new MapButton(ButtonEnum.Animals.ordinal(),0,0,
 				Constants.getString("MapOverlay.show_animals", on),
 				Constants.getString("MapOverlay.show_animals", off),
 				MapOverlay.showAnimals); //$NON-NLS-1$  //$NON-NLS-2$
 		
-		buttonVillagers = new MapButton(12,0,0,
+		buttonVillagers = new MapButton(ButtonEnum.Villagers.ordinal(),0,0,
 				Constants.getString("MapOverlay.show_villagers", on),
 				Constants.getString("MapOverlay.show_villagers", off),
 				MapOverlay.showVillagers); //$NON-NLS-1$  //$NON-NLS-2$
 		
-		buttonPets = new MapButton(13,0,0,
+		buttonPets = new MapButton(ButtonEnum.Pets.ordinal(),0,0,
 				Constants.getString("MapOverlay.show_pets", on),
 				Constants.getString("MapOverlay.show_pets", off),
 				MapOverlay.showPets); //$NON-NLS-1$  //$NON-NLS-2$
 		
-		buttonPlayers = new MapButton(14,0,0,
+		buttonPlayers = new MapButton(ButtonEnum.Players.ordinal(),0,0,
 				Constants.getString("MapOverlay.show_players", on),
 				Constants.getString("MapOverlay.show_players", off),
 				MapOverlay.showPlayers); //$NON-NLS-1$  //$NON-NLS-2$
 		
-		buttonWaypoints = new MapButton(15,0,0,
+		buttonWaypoints = new MapButton(ButtonEnum.Waypoints.ordinal(),0,0,
 				Constants.getString("MapOverlay.show_waypoints", on),
 				Constants.getString("MapOverlay.show_waypoints", off),
 				MapOverlay.showWaypoints); //$NON-NLS-1$  //$NON-NLS-2$
 		buttonWaypoints.enabled = WaypointHelper.waypointsEnabled();
 		
-		buttonGrid = new MapButton(16,0,0,
+		buttonGrid = new MapButton(ButtonEnum.Grid.ordinal(),0,0,
 				Constants.getString("MapOverlay.show_grid", on),
 				Constants.getString("MapOverlay.show_grid", off),
 				PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)); //$NON-NLS-1$ //$NON-NLS-2$
@@ -110,10 +107,7 @@ public class MapOverlayOptions extends JmUI {
 		}
 		
 		buttonList.add(buttonCaves);
-		buttonList.add(buttonClose);
-		if(buttonAlert.drawButton) {
-			buttonList.add(buttonAlert);
-		}
+		buttonList.add(buttonClose);		
 		buttonList.add(buttonMonsters);
 		buttonList.add(buttonAnimals);
 		buttonList.add(buttonVillagers);
@@ -138,90 +132,80 @@ public class MapOverlayOptions extends JmUI {
 			lastWidth = width;
 			lastHeight = height;
 			
-			int hgap = 160;
-			int bx = this.width / 2 - hgap + 5;
-			int by = (this.height / 4);
-			int row = 0;
+			final int hgap = 4;
+			final int vgap = 3;
+			final int bx = (this.width / 2) - (buttonCaves.getWidth() - hgap/2);
+			final int by = this.height / 4;
 			
-			layoutButton(buttonCaves, bx, by + (20*row));			
-			layoutButton(buttonMonsters, bx + hgap, by + (20*row++));
+			buttonCaves.setPosition(bx, by);
+			buttonMonsters.rightOf(buttonCaves, hgap).yPosition=by;
+			
+			buttonAnimals.below(buttonCaves, vgap).xPosition=bx;
+			buttonVillagers.rightOf(buttonAnimals, hgap).below(buttonMonsters, vgap);
 
-			layoutButton(buttonAnimals, bx, by + (20*row));			
-			layoutButton(buttonVillagers, bx + hgap, by + (20*row++));
+			buttonPets.below(buttonAnimals, vgap).xPosition=bx;
+			buttonPlayers.rightOf(buttonPets, hgap).below(buttonVillagers, vgap);
+
+			buttonGrid.below(buttonPets, vgap).xPosition=bx;
+			buttonWaypoints.rightOf(buttonGrid, hgap).below(buttonPlayers, vgap);
 			
-			layoutButton(buttonPets, bx, by + (20*row));			
-			layoutButton(buttonPlayers, bx + hgap, by + (20*row++));	
-			
-			layoutButton(buttonGrid, bx, by + (20*row));			
-			layoutButton(buttonWaypoints, bx + hgap, by + (20*row++));		
-								
-			if(buttonAlert.drawButton) {
-				layoutButton(buttonAlert, bx + hgap/2, by + (20*row++));
-			}
-			row++;
-			layoutButton(buttonClose, bx + hgap/2, by + (20*row++));	
-			
-			
-		}
-		
+			buttonClose.below(buttonGrid, vgap*2).xPosition=this.width / 2 - buttonClose.getWidth()/2;
+
+		}	
 	}
 	
-	private void layoutButton(GuiButton guibutton, int x, int y) {
-		guibutton.xPosition = x;
-		guibutton.yPosition = y;
-	}
-
-
     @Override
 	protected void actionPerformed(GuiButton guibutton) {
-		switch(guibutton.id) {
-			case 2: { // caves
+    	
+    	final ButtonEnum id = ButtonEnum.values()[guibutton.id];
+    	switch(id) {
+			case Caves: { // caves
 				MapOverlay.toggleShowCaves();				
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_CAVES, MapOverlay.showCaves);
 				buttonCaves.setToggled(MapOverlay.showCaves);
 				break;
 			}
-			case 7: { // close
+			case Close: { // close
 				UIManager.getInstance().openMap();
 				break;
 			}
-			case 10: { // monsters
+			case Monsters: { // monsters
 				MapOverlay.showMonsters = !MapOverlay.showMonsters;
 				buttonMonsters.setToggled(MapOverlay.showMonsters);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_MOBS, MapOverlay.showMonsters);
 				break;
 			}
-			case 11: { // animals
+			case Animals: { // animals
 				MapOverlay.showAnimals = !MapOverlay.showAnimals;
 				buttonAnimals.setToggled(MapOverlay.showAnimals);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_ANIMALS, MapOverlay.showAnimals);
 				break;
 			}
-			case 12: { // villagers
+			case Villagers: { // villagers
 				MapOverlay.showVillagers = !MapOverlay.showVillagers;
 				buttonVillagers.setToggled(MapOverlay.showVillagers);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_VILLAGERS, MapOverlay.showVillagers);
 				break;
 			}
-			case 13: { // pets
+			case Pets: { // pets
 				MapOverlay.showPets = !MapOverlay.showPets;
 				buttonPets.setToggled(MapOverlay.showPets);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_PETS, MapOverlay.showPets);
 				break;
 			}
-			case 14: { // players
+			case Players: { // players
 				MapOverlay.showPlayers = !MapOverlay.showPlayers;
 				buttonPlayers.setToggled(MapOverlay.showPlayers);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_PLAYERS, MapOverlay.showPlayers);
 				break;
 			}
-			case 15: { // waypoints
+			case Waypoints: { // waypoints
 				MapOverlay.showWaypoints = !MapOverlay.showWaypoints;
 				buttonWaypoints.setToggled(MapOverlay.showWaypoints);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_WAYPOINTS, MapOverlay.showWaypoints);
 				break;
 			}
-			case 16: { // grid
+			case Grid: { // grid
 				boolean showGrid = !PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID);
 				buttonGrid.setToggled(showGrid);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_GRID, showGrid);

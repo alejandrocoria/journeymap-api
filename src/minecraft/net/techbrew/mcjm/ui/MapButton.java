@@ -117,5 +117,37 @@ public class MapButton extends GuiSmallButton {
 		return toggled;
 	}
 
-
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
+	}
+	
+	public void setPosition(int x, int y) {
+		this.xPosition = x;
+		this.yPosition = y;
+	}
+	
+	public MapButton leftOf(int x) {
+		this.xPosition = x - this.width;
+		return this;
+	}
+	
+	public MapButton leftOf(MapButton other, int margin) {
+		this.xPosition = other.xPosition - this.width - margin;
+		return this;
+	}
+	
+	public MapButton rightOf(MapButton other, int margin) {
+		this.xPosition = other.xPosition + other.width + margin;
+		return this;
+	}
+	
+	public MapButton below(MapButton other, int margin) {
+		this.yPosition = other.yPosition + this.height + margin;		
+		return this;
+	}
+	
 }

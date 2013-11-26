@@ -4,7 +4,6 @@ import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiSmallButton;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.task.MapRegionTask;
 import net.techbrew.mcjm.ui.JmUI;
 import net.techbrew.mcjm.ui.MapOverlay;
@@ -22,9 +21,17 @@ public class AutoMapConfirmation extends JmUI {
     @Override
 	public void initGui()
     {
-        this.buttonList.add(new GuiSmallButton(ButtonEnum.All.ordinal(), this.width / 2 - 155, this.height / 5 + 60, Constants.getString("MapOverlay.automap_dialog_all")));
-        this.buttonList.add(new GuiSmallButton(ButtonEnum.Missing.ordinal(), this.width / 2 - 155 + 160, this.height / 5 + 60, Constants.getString("MapOverlay.automap_dialog_missing")));
-        this.buttonList.add(new GuiSmallButton(ButtonEnum.Cancel.ordinal(), this.width / 2 - 80, this.height / 5 + 85, Constants.getString("MapOverlay.automap_dialog_cancel")));
+    	GuiSmallButton buttonAll = new GuiSmallButton(ButtonEnum.All.ordinal(), this.width / 2 - 155, this.height / 5 + 60, Constants.getString("MapOverlay.automap_dialog_all"));        
+        GuiSmallButton buttonMissing = new GuiSmallButton(ButtonEnum.Missing.ordinal(), this.width / 2 - 155 + 160, this.height / 5 + 60, Constants.getString("MapOverlay.automap_dialog_missing"));
+        GuiSmallButton buttonCancel = new GuiSmallButton(ButtonEnum.Cancel.ordinal(), this.width / 2 - 80, this.height / 5 + 85, Constants.getString("MapOverlay.automap_dialog_cancel"));
+        
+        boolean enable = !JourneyMap.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);        
+        buttonAll.enabled = enable;
+        buttonMissing.enabled = enable;
+        
+        this.buttonList.add(buttonAll);
+        this.buttonList.add(buttonMissing);
+        this.buttonList.add(buttonCancel);        
     }
 
     /**
@@ -36,22 +43,19 @@ public class AutoMapConfirmation extends JmUI {
     	final ButtonEnum id = ButtonEnum.values()[button.id];
     	switch(id) {
     		case All : {
-    			UIManager.getInstance().openMap();
-    			PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, true);
     			JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.TRUE);
-    			return;
+    			break;  
     		}
     		case Missing : {
-    			UIManager.getInstance().openMap();
-    			PropertyManager.getInstance().setProperty(PropertyManager.Key.AUTOMAP_ENABLED, true);
     			JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.FALSE);
-    			return;
+    			break;  
     		}
     		case Cancel : {
+    			JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, false, null);
     			break;      			
     		}        		
     	}        	
-    	UIManager.getInstance().openMapActions();
+    	UIManager.getInstance().openMap();
     }
     
     /**
