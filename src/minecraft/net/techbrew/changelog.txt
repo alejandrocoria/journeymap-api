@@ -1,4 +1,4 @@
-JourneyMap 3.0.0b4 for Minecraft 1.6.4 (November ??, 2013)
+JourneyMap 3.0.0rc1 for Minecraft 1.6.4 (November 26, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -11,17 +11,31 @@ Requirements:
 - Minecraft 1.6.4
 - Forge "Recommended-1.6.4" or ModLoader 1.6.4
 
-BETA 4 NOTES:
+Changes in JourneyMap 3.0.0rc1 for Minecraft 1.6.4:
+- Cave/Indoor mapping now shows a dimmed view of "outside" surface at the same elevation
+- When "Show Caves" is turned off, surface mapping will be done instead of cave mapping when player is underground
+- A new "custom" folder is now created in the JourneyMap folder with placeholder icons for custom mobs.  These can be replaced with your own icons.
+- Web UI now uses versioned URLs to load javascript/css to prevent browsers from using obsolete cached versions.
+- Algorithm improvements to chunk change detection; mapping load reduced
+- Auto-map now prompts to map all regions or just ones missing images
+- Auto-map now maps regions outward from player position
+- In-game UI now has Options and Actions menus to match the Web UI
+- Save Map now runs as a scheduled task (like legacy file migration, proxmity mapping, and auto-mapping)
+- Save Map in Web UI no longer tries to load the image via the browser
+- Save Map (both In-game or Web UI) now opens the image using the system's default viewer for PNG images when complete
+- Replaced In-game zoom icons
+- Web UI waypoint icons reposition more quickly, label is now above instead of to the side.
+
+Changes in JourneyMap 3.0.0b4 for Minecraft 1.6.4:
 - Fixed bug releated to chunk change detection (introduced in Beta 3) that caused some chunks not to map.
 - Fixed bug where underground mapping didn't include water
 - Fixed NullPointerException when going to Nether on a Multiplayer server
 
-BETA 3 NOTES:
+Changes in JourneyMap 3.0.0b3 for Minecraft 1.6.4:
 - Optimization: Added chunk change detection to vastly reduce mapping overhead when you're not travelling.
 - Webserver port is now checked to see if already in use. If so, port # is increased by 10 and retried.
 
-BETA 2 NOTES:
-
+Changes in JourneyMap 3.0.0b2 for Minecraft 1.6.4:
 - Added support for seeing and using chat when the In-game Map is open
 - The icons for other players are now their Minecraft skin (no longer a generic Steve face)
 - Control codes are now stripped from named entities (mobs, pets, etc.)
