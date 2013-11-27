@@ -117,6 +117,8 @@ public class DataService extends BaseService {
 				
 		// Gzip response
 		gzipResponse(event, jsonData.toString());
+		
+		
 	}
 	
 }
