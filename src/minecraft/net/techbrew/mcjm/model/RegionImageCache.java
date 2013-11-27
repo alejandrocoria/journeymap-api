@@ -95,7 +95,7 @@ public class RegionImageCache  {
 				final RegionCoord rCoord = cis.getCCoord().getRegionCoord();
 				final RegionImageSet ris = getRegionImageSet(rCoord);
 				if(ris.hasLegacy()) ris.writeToDisk(true);
-				ris.insertChunk(cis);
+				ris.insertChunk(cis, forceFlush);
 			}
 			if(forceFlush) {
 				flushToDisk();

@@ -78,15 +78,15 @@ public class RegionImageSet extends ImageSet {
 		}
 	}
 	
-	public void insertChunk(ChunkImageSet cis) {		
+	public void insertChunk(final ChunkImageSet cis, final boolean forceFlush) {		
 		synchronized(lock) {
 			for(ChunkImageSet.Wrapper cisWrapper : cis.imageWrappers.values()) {
-				insertChunk(cis.getCCoord(), cisWrapper.getImage(), cisWrapper.getMapType());
+				insertChunk(cis.getCCoord(), cisWrapper.getImage(), cisWrapper.getMapType(), forceFlush);
 			}
 		}
 	}
 
-	protected void insertChunk(ChunkCoord cCoord, BufferedImage chunkImage, MapType mapType) {
+	protected void insertChunk(ChunkCoord cCoord, BufferedImage chunkImage, MapType mapType, final boolean forceFlush) {
 		final Wrapper wrapper = getWrapper(mapType);		
 		final boolean wasDirty = wrapper.isDirty();
 		final int x = rCoord.getXOffset(cCoord.chunkX);
@@ -102,7 +102,12 @@ public class RegionImageSet extends ImageSet {
 
 		// check the buffers to see if anything changed
 		long start = System.nanoTime();
-		boolean dirty = before.getDataType()!=after.getDataType() || before.getSize()!=after.getSize() || before.getNumBanks()!=after.getNumBanks();
+		boolean dirty = forceFlush;
+		
+		if(!dirty) {
+			dirty = before.getDataType()!=after.getDataType() || before.getSize()!=after.getSize() || before.getNumBanks()!=after.getNumBanks();
+		}
+		
 		if(!dirty) {
 			if(before.getClass() != after.getClass()) {
 				dirty = true;
