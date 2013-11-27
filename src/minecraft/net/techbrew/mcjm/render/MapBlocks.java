@@ -75,18 +75,25 @@ public class MapBlocks extends HashMap {
 	 * @param z
 	 * @return
 	 */
-	public static boolean skyAbove(ChunkMD chunkMd, final int x, final int y, final int maxY, final int z) {
-		boolean seeSky = true;
-		int blockId;
+	public static boolean skyAbove(ChunkMD chunkMd, final int x, final int y, final int z) {
 		
-		int checkY = y;
-		while(seeSky && checkY<=maxY) {
-			blockId = chunkMd.stub.getBlockID(x, checkY, z);
-			if(sky.contains(blockId)) {
-				checkY++;
-			} else {
-				seeSky = false;
-				break;
+		boolean seeSky = chunkMd.stub.canBlockSeeTheSky(x, y, z);
+		if(!seeSky) {
+			seeSky = true;
+			int blockId;			
+			int checkY = y;
+			final int maxY = chunkMd.stub.getHeightValue(x, z);
+			while(seeSky && checkY<=maxY) {
+				blockId = chunkMd.stub.getBlockID(x, checkY, z);
+				if(sky.contains(blockId)) {
+					checkY++;
+				} else {
+					seeSky = false;
+					break;
+				}
+			}
+			if(seeSky==true) {
+				//JourneyMap.getLogger().info("Can see sky at " + x + "," + y + "," + z);
 			}
 		}
 		return seeSky;
@@ -94,15 +101,15 @@ public class MapBlocks extends HashMap {
 	
 	/**
 	 * Attempt at faster way to figure out if there is sky above
-	 * @param chunkStub
+	 * @param chunkMd
 	 * @param x
 	 * @param y
 	 * @param z
 	 * @return
 	 */
-	public static int ceiling(ChunkMD chunkStub, final int x, final int maxY, final int z) {
+	public static int ceiling(ChunkMD chunkMd, final int x, final int maxY, final int z) {
 		
-		final int chunkHeight = chunkStub.stub.getHeightValue(x, z);
+		final int chunkHeight = chunkMd.stub.getHeightValue(x, z);
 		final int topY = Math.min(maxY, chunkHeight);
 
 		int blockId;
@@ -134,8 +141,8 @@ public class MapBlocks extends HashMap {
 //		}
 		
 		while(y>=0) {
-			blockId = chunkStub.stub.getBlockID(x, y, z);
-			if(chunkStub.stub.canBlockSeeTheSky(x, y, z)) {
+			blockId = chunkMd.stub.getBlockID(x, y, z);
+			if(chunkMd.stub.canBlockSeeTheSky(x, y, z)) {
 				y--;
 			} else if(nonCeilingBlocks.contains(blockId)) {
 				y--;
@@ -160,6 +167,8 @@ public class MapBlocks extends HashMap {
 		sky.add(65); // ladder
 		sky.add(78); // snow
 		sky.add(106); // vines
+		sky.add(Block.glass.blockID);
+		sky.add(Block.thinGlass.blockID);
 	}
 	
 	/**
