@@ -1,6 +1,5 @@
 package net.techbrew.mcjm.render.overlay;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Point;
 import java.io.IOException;
@@ -22,12 +21,6 @@ import org.lwjgl.opengl.GL11;
 
 public abstract class BaseOverlayRenderer<K> {
 	
-	public static AlphaComposite SLIGHTLYOPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1F);
-	public static AlphaComposite OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
-	public static AlphaComposite CLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0F);
-	public static AlphaComposite SEMICLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F);
-	public static AlphaComposite SLIGHTLYCLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F);
-
 	abstract public List<DrawStep> prepareSteps(List<K> data, GridRenderer grid);
 	
 	/**
