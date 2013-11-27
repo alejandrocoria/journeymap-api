@@ -165,59 +165,63 @@ public class PropertyManager {
 	}
 	
 	private void readFromFile() {
-		File propFile = getFile();
-		if(!propFile.exists()) {
-			JourneyMap.getLogger().log(Level.INFO, "Property file doesn't exist: " + propFile.getAbsolutePath()); //$NON-NLS-1$
-			return;
-		}
-		
-		try {
-			FileReader in = new FileReader(propFile);
-			properties.load(in);
-			in.close();
-		} catch (IOException e) {
-			String error = Constants.getMessageJMERR19(propFile.getAbsolutePath());
-			JourneyMap.getLogger().severe(error);
-			JourneyMap.getLogger().severe(LogFormatter.toString(e));
-			throw new RuntimeException(error);
-		}
-		
-		// Convert older files if needed
-		HashMap<String, String> temp = new HashMap(properties);
-		for(Map.Entry<String, String> entry: temp.entrySet()) {
-			if(entry.getKey().contains(".")) {
-				writeNeeded = true;
-				properties.put(entry.getKey().replaceAll("\\.", "_"), entry.getValue());	
-				properties.remove(entry.getKey());
+		synchronized(properties) {
+			File propFile = getFile();
+			if(!propFile.exists()) {
+				JourneyMap.getLogger().log(Level.INFO, "Property file doesn't exist: " + propFile.getAbsolutePath()); //$NON-NLS-1$
+				return;
 			}
-			if(entry.getKey().equals("use_custom_texturepack")) {
-				writeNeeded = true;
-				properties.remove(entry.getKey());
+			
+			try {
+				FileReader in = new FileReader(propFile);
+				properties.load(in);
+				in.close();
+			} catch (IOException e) {
+				String error = Constants.getMessageJMERR19(propFile.getAbsolutePath());
+				JourneyMap.getLogger().severe(error);
+				JourneyMap.getLogger().severe(LogFormatter.toString(e));
+				throw new RuntimeException(error);
 			}
-			if(entry.getKey().equals("automap_enabled")) {
-				writeNeeded = true;
-				properties.remove(entry.getKey());
-			}			
-		}
-		
-		if(writeNeeded) {
-			JourneyMap.getLogger().info("Property file updated for programmatic changes.");
+			
+			// Convert older files if needed
+			HashMap<String, String> temp = new HashMap(properties);
+			for(Map.Entry<String, String> entry: temp.entrySet()) {
+				if(entry.getKey().contains(".")) {
+					writeNeeded = true;
+					properties.put(entry.getKey().replaceAll("\\.", "_"), entry.getValue());	
+					properties.remove(entry.getKey());
+				}
+				if(entry.getKey().equals("use_custom_texturepack")) {
+					writeNeeded = true;
+					properties.remove(entry.getKey());
+				}
+				if(entry.getKey().equals("automap_enabled")) {
+					writeNeeded = true;
+					properties.remove(entry.getKey());
+				}			
+			}
+			
+			if(writeNeeded) {
+				JourneyMap.getLogger().info("Property file updated for programmatic changes.");
+			}
 		}
 					
 	}
 	
 	private void writeToFile() {
-		File propFile = getFile();
-		try {
-			FileHandler.getJourneyMapDir().mkdirs();
-			FileWriter out = new FileWriter(propFile);
-			properties.store(out, "Properties for JourneyMap " + JourneyMap.JM_VERSION); //$NON-NLS-1$
-			out.close();
-		} catch(IOException e) {
-			String error = Constants.getMessageJMERR20(propFile.getAbsolutePath());
-			JourneyMap.getLogger().severe(error);
-			JourneyMap.getLogger().severe(LogFormatter.toString(e));
-			throw new RuntimeException(error);
+		synchronized(properties) {
+			File propFile = getFile();
+			try {
+				FileHandler.getJourneyMapDir().mkdirs();
+				FileWriter out = new FileWriter(propFile);
+				properties.store(out, "Properties for JourneyMap " + JourneyMap.JM_VERSION); //$NON-NLS-1$
+				out.close();
+			} catch(IOException e) {
+				String error = Constants.getMessageJMERR20(propFile.getAbsolutePath());
+				JourneyMap.getLogger().severe(error);
+				JourneyMap.getLogger().severe(LogFormatter.toString(e));
+				throw new RuntimeException(error);
+			}
 		}
 	}
 	
