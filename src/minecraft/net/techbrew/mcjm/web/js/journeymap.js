@@ -35,6 +35,7 @@ var JourneyMap = (function() {
 	var playerOverrideMap = false;
 	var playerUnderground = false;
 
+	var queryServerPending = 0;
 	var timerId = null;
 
 	var JM = {
@@ -266,7 +267,6 @@ var JourneyMap = (function() {
 			.attr("title", getMessage('follow_button_title'))
 			.click(function() {
 				setCenterOnPlayer(!centerOnPlayer);
-				refreshMap();
 			});
 		$("#jm-toggles").buttonset();
 		
@@ -314,9 +314,9 @@ var JourneyMap = (function() {
 		$("#checkShowCaves").click(function(event) {
 			showCaves = (this.checked === true);
 			postPreference("preference_show_caves", showCaves);
-			if (playerUnderground === true) {
-				refreshMap();
-			}			
+			if(playerUnderground) {
+				refreshMap();			
+			}
 		});
 		
 		$("#checkShowGrid").prop('checked', showGrid)		
@@ -471,6 +471,7 @@ var JourneyMap = (function() {
 		halted = false;
 		updatingMap = false;
 		playerUnderground = false;
+		queryServerPending = 0;
 		clearTimer();		
 		
 		JM.mobs = {};
@@ -672,12 +673,16 @@ var JourneyMap = (function() {
 		
 		if(onPlayer) {
 			$("#followButtonImg").attr('src', '/img/follow.png');
+			if(markers.playerMarker) {
+				map.panTo(markers.playerMarker.getPosition());
+				drawPlayer();
+			} else {
+				refreshMap();
+			}	
 		} else {
 			$("#followButtonImg").attr('src', '/img/follow-off.png');
 		}
-		if (onPlayer === true) {
-			drawPlayer();
-		} 
+
 	}
 
 	function setShowCaves(show) {
@@ -700,6 +705,12 @@ var JourneyMap = (function() {
 		if (halted === true)
 			return;
 		
+		if(queryServerPending>2) {
+			// time to reset
+			if(debug) console.log("Too many queries pending, resetting.");
+			window.location = window.location;
+		}
+		
 		// Params for dirty image check
 		var params = "";
 		if(map) {
@@ -708,7 +719,9 @@ var JourneyMap = (function() {
 		}
 
 		// Get all the datas
+		queryServerPending++;
 		fetchData("/data/all" + params, function(data) {
+			queryServerPending--;
 			
 			// Apply data
 			JM.animals = data.animals;
@@ -806,19 +819,20 @@ var JourneyMap = (function() {
 			
 		if(!map) return;
 		
-		lastImageCheck = 1;
-		var zoom = map.getZoom();		
-		var delta = (zoom==MapConfig.maxZoom) ? -0.0000001 : 0.0000001 ;
-		var center = map.getCenter();
-		
-		// This hack forces the tiles to be replaced but doesn't visibly change the map
-		map.setZoom(zoom + delta);
-		map.panTo(center);
-		map.setZoom(zoom);
-		map.panTo(center);
-		
-		// Waypoints need a little extra help
-		drawWaypoints();
+		delay(function(){			
+			console.log(">>> " + "delayed refreshMap");
+			
+			lastImageCheck = 1;
+			var zoom = map.getZoom();		
+			var delta = (zoom==MapConfig.maxZoom) ? -0.0000001 : 0.0000001 ;
+			var center = map.getCenter();
+			
+			// This hack forces the tiles to be replaced but doesn't visibly change the map
+			map.setZoom(zoom + delta);
+			map.panTo(center);
+			map.setZoom(zoom);
+			map.panTo(center);
+		}, 500 );
 
 	}
 
@@ -866,6 +880,7 @@ var JourneyMap = (function() {
 
 		// Clear the timer
 		clearTimer();
+		queryServerPending = false;
 
 		if(console && console.log) console.log("Server returned error: " + JSON.stringify(data));
 
@@ -1030,7 +1045,13 @@ var JourneyMap = (function() {
 			
 			google.maps.event.addListener(map, 'zoom_changed', function() {
 				if(centerOnPlayer===true) {
-					map.panTo(markers.playerMarker.getPosition());
+					if(markers.playerMarker) {
+						map.panTo(markers.playerMarker.getPosition());
+					}
+				}
+				
+				if(markers.waypoints) {
+					drawWaypoints();
 				}
 				
 				if(map.getZoom()<3) {
