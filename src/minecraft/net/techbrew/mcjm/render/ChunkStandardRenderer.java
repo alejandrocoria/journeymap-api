@@ -35,7 +35,6 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	public boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final boolean underground, 
 			final Integer vSlice, final ChunkMD.Set neighbors) {
 		
-
 		// Render the chunk image
 		if(underground) {
 			return renderUnderground(g2D, chunkMd, vSlice, neighbors);			
@@ -197,8 +196,9 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	 */
 	public boolean renderUnderground(final Graphics2D g2D, final ChunkMD chunkMd, final int vSlice, final ChunkMD.Set neighbors) {
 				
-		int sliceMinY = Math.max((vSlice << 4) - 1, 0);
-		int sliceMaxY = Math.min(((vSlice + 1) << 4) - 1, chunkMd.worldObj.getActualHeight());
+		final int sliceMinY = Math.max((vSlice << 4) - 1, 0);
+		final int hardSliceMaxY = ((vSlice + 1) << 4) - 1;
+		int sliceMaxY = Math.min(hardSliceMaxY, chunkMd.worldObj.getActualHeight());
 		if (sliceMinY == sliceMaxY) {
 			sliceMaxY += 2;
 		}
@@ -236,6 +236,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				try {				
 					
 					int blockMaxY = mapBlocks.ceiling(chunkMd, x, sliceMaxY, z);
+					
 					boolean skipUndergroundCheck = chunkMd.stub.canBlockSeeTheSky(x, sliceMinY, z);
 											
 					if(skipUndergroundCheck) {
@@ -317,17 +318,27 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					}
 					
 					// No air blocks in column at all
-					if (paintY < 0 || (!hasAir && !hasWater) || (lightLevel<1 && caveLighting)) {						
-						paintBlock(x, z, Color.black, g2D);
-						continue blockLoop;
+					if (paintY < 0 || (!hasAir && !hasWater) || (lightLevel<1 && caveLighting)) {
+						
+						// Last chance - can the top of the slice see sky?
+						if(chunkMd.stub.canBlockSeeTheSky(x, blockMaxY, z)) {
+							skipUndergroundCheck = true;
+							hasAir = true;
+							hasWater = false;
+							paintY = blockMaxY;
+							lightLevel = 15;	
+						} else {
+							// I see nothing and I want to paint it black.
+							paintBlock(x, z, Color.black, g2D);
+							continue blockLoop;
+						}
 					}			
 
 					// Get block color
 					BlockInfo info = mapBlocks.getBlockInfo(chunkMd, x, paintY, z);
 					Color color = info.getColor();
 					
-					boolean keepflat = MapBlocks.noShadows.contains(info.id);
-					
+					boolean keepflat = MapBlocks.noShadows.contains(info.id);					
 					if(!keepflat) {
 						// Contour shading
 						// Get slope of block and prepare to shade
