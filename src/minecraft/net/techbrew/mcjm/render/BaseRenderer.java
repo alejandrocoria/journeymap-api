@@ -136,7 +136,7 @@ public abstract class BaseRenderer {
 	 * @param defaultVal
 	 * @return
 	 */
-	public Float getBlockSlope(int x, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, float defaultVal) {
+	public Float getBlockSlope(int x, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, float defaultVal, boolean underground) {
 		int newX = x+offsetX;
 		int newZ = z+offsetz;
 		
@@ -163,13 +163,13 @@ public abstract class BaseRenderer {
 			search = true;
 		}
 		
-		ChunkMD chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
-		
-		if(chunk!=null) {
-			if(chunk.slopes==null) {
+		ChunkMD chunkMd = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);		
+		if(chunkMd!=null) {
+			float[][] slopes = underground ? chunkMd.sliceSlopes : chunkMd.surfaceSlopes;
+			if(slopes==null) {
 				return defaultVal;
 			} else {
-				return chunk.slopes[newX][newZ];
+				return slopes[newX][newZ];
 			}
 		} else {
 			return defaultVal;
@@ -366,22 +366,20 @@ public abstract class BaseRenderer {
 	/**
 	 * Adjust color to indicate it's outside (for underground rendering)
 	 * @param original
-	 * @param factor
 	 * @return
 	 */
-	public Color shadeOutside(Color original, float factor) {
-
-		float[] rgb = original.getRGBColorComponents(null); 
+	public Color ghostSurface(Color original) {
+		final float factor = .3f;
+		float hsb[] = Color.RGBtoHSB(original.getRed(), original.getGreen(), original.getBlue(), null);
+		Color grey = new Color(Color.HSBtoRGB(hsb[0], 0, hsb[2]));
+		
+		float[] rgb = grey.getRGBColorComponents(null); 
 		Color washout= new Color(
-				ColorCache.safeColor((rgb[0] + 2f) /3f),
-				ColorCache.safeColor((rgb[1] + 2f) /3f),
-				ColorCache.safeColor((rgb[2] + 2f) /3f));
-		
-		float hsb[] = Color.RGBtoHSB(washout.getRed(), washout.getGreen(), washout.getBlue(), null);
-		int result = Color.HSBtoRGB(hsb[0], 0, hsb[2]*factor);
-		return new Color(result);
-		
-		
+				ColorCache.safeColor((rgb[0]+.5f)/2*factor),
+				ColorCache.safeColor((rgb[1]+.5f)/2*factor),
+				ColorCache.safeColor((rgb[2]+.6f)/2*factor));
+				
+		return washout;
 		
 	}
 
