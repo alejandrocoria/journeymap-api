@@ -41,8 +41,8 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 		}
 		
 		// Initialize ChunkSub slopes if needed
-		if(chunkMd.slopes==null) {
-			chunkMd.slopes = new float[16][16];
+		if(chunkMd.sliceSlopes==null) {
+			chunkMd.sliceSlopes = new float[16][16];
 			float minNorm = Math.min(((vSlice + 1) << 4) - 1, chunkMd.worldHeight);
 			float maxNorm = 0;
 			float slope, h, hN, hW;
@@ -55,7 +55,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 					hN = (z==0)  ? getBlockHeight(x, z, 0, -1, chunkMd, neighbors, h, sliceMinY, sliceMaxY) : getHeightInSlice(chunkMd, x, z-1, sliceMinY, sliceMaxY);							
 					hW = (x==0)  ? getBlockHeight(x, z, -1, 0, chunkMd, neighbors, h, sliceMinY, sliceMaxY) : getHeightInSlice(chunkMd, x-1, z, sliceMinY, sliceMaxY);
 					slope = ((h/hN)+(h/hW))/2f;
-					chunkMd.slopes[x][z] = slope;						
+					chunkMd.sliceSlopes[x][z] = slope;						
 				}
 			}
 		}
@@ -93,11 +93,11 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 						// Contour shading
 						// Get slope of block and prepare to shade
 						float slope, s, sN, sNW, sW, sAvg, shaded;
-						slope = chunkMd.slopes[x][z];
+						slope = chunkMd.sliceSlopes[x][z];
 						
-						sN = getBlockSlope(x, z, 0, -1, chunkMd, neighbors, slope);
-						sNW = getBlockSlope(x, z, -1, -1, chunkMd, neighbors, slope);
-						sW = getBlockSlope(x, z, -1, 0, chunkMd, neighbors, slope);
+						sN = getBlockSlope(x, z, 0, -1, chunkMd, neighbors, slope, true);
+						sNW = getBlockSlope(x, z, -1, -1, chunkMd, neighbors, slope, true);
+						sW = getBlockSlope(x, z, -1, 0, chunkMd, neighbors, slope, true);
 						sAvg = (sN+sNW+sW)/3f;
 						
 						if(slope<1) {
@@ -182,7 +182,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 	}
 	
 	/**
-	 * Get the height of the block at the coordinates + offsets.  Uses ChunkMD.slopes.
+	 * Get the height of the block at the coordinates + offsets.  Uses ChunkMD.sliceSlopes.
 	 * @param x
 	 * @param z
 	 * @param offsetX

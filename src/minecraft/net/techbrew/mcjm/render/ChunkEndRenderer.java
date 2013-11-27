@@ -33,8 +33,8 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 			final Integer vSlice, final ChunkMD.Set neighbors) {
 		
 		// Initialize ChunkSub slopes if needed
-		if(chunkMd.slopes==null) {
-			chunkMd.slopes = new float[16][16];
+		if(chunkMd.sliceSlopes==null) {
+			chunkMd.sliceSlopes = new float[16][16];
 			float minNorm = chunkMd.worldHeight;
 			float maxNorm = 0;
 			float slope, h, hN, hW;
@@ -46,7 +46,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 					hN = (y==0)  ? getBlockHeight(x, y, 0, -1, chunkMd, neighbors, h) : chunkMd.getSafeHeightValue(x, y-1);							
 					hW = (x==0)  ? getBlockHeight(x, y, -1, 0, chunkMd, neighbors, h) : chunkMd.getSafeHeightValue(x-1, y);
 					slope = ((h/hN)+(h/hW))/2f;
-					chunkMd.slopes[x][y] = slope;						
+					chunkMd.sliceSlopes[x][y] = slope;						
 				}
 			}
 		}
@@ -110,11 +110,11 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 					
 					// Get slope of block and prepare to shade
 					float slope, s, sN, sNW, sW, sAvg, shaded;
-					slope = chunkMd.slopes[x][z];
+					slope = chunkMd.sliceSlopes[x][z];
 					
-					sN = getBlockSlope(x, z, 0, -1, chunkMd, neighbors, slope);
-					sNW = getBlockSlope(x, z, -1, -1, chunkMd, neighbors, slope);
-					sW = getBlockSlope(x, z, -1, 0, chunkMd, neighbors, slope);
+					sN = getBlockSlope(x, z, 0, -1, chunkMd, neighbors, slope, true);
+					sNW = getBlockSlope(x, z, -1, -1, chunkMd, neighbors, slope, true);
+					sW = getBlockSlope(x, z, -1, 0, chunkMd, neighbors, slope, true);
 					sAvg = (sN+sNW+sW)/3f;
 					
 					if(slope<1) {
