@@ -18,7 +18,8 @@ import net.techbrew.mcjm.render.MapBlocks;
  */
 public class ChunkMD {
 
-	public volatile float[][] slopes;
+	public volatile float[][] surfaceSlopes;
+	public volatile float[][] sliceSlopes;
 	public final World worldObj;
 	public final int worldHeight;
 	public final Boolean hasNoSky;
@@ -28,7 +29,11 @@ public class ChunkMD {
 	private int discards;
 	
 	public ChunkMD(Chunk chunk, Boolean render, World worldObj) {		
-		this(new ChunkStub(chunk), render, worldObj);
+		this(chunk,render,worldObj,false);
+	}
+	
+	public ChunkMD(Chunk chunk, Boolean render, World worldObj, boolean doErrorChecks) {		
+		this(new ChunkStub(chunk, doErrorChecks), render, worldObj);
 		if(chunk.isEmpty() || !chunk.isChunkLoaded) {
 			render = false;
 		}

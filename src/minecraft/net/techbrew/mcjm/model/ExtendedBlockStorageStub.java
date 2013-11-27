@@ -74,41 +74,7 @@ public class ExtendedBlockStorageStub
         	skylightArray = new NibbleArray(skylight.data,4);
         }
         
-        //this.removeInvalidBlocks();
-
-    }
-    
-    public ExtendedBlockStorageStub(ExtendedBlockStorageStub original)
-    {
-    	yBase = original.getYLocation();
-        
-    	byte[] lbs = original.getBlockLSBArray();
-    	if(lbs!=null) {
-    		blockLSBArray = Arrays.copyOf(lbs, lbs.length);
-    	}
-    	
-    	NibbleArray mbs = original.getBlockMSBArray();
-        if(mbs!=null) {
-        	blockMSBArray = new NibbleArray(mbs.data,4);
-        }
-        
-        NibbleArray meta = original.getMetadataArray();
-        if(meta!=null) {
-        	blockMetadataArray = new NibbleArray(meta.data,4);
-        }
-        
-        NibbleArray blocklight = original.getBlocklightArray();
-        if(blocklight!=null) {
-        	blocklightArray = new NibbleArray(blocklight.data,4);
-        }
-        
-        NibbleArray skylight = original.getSkylightArray();
-        if(original.getSkylightArray()!=null) {
-        	skylightArray = new NibbleArray(skylight.data,4);
-        }
-        
-        //this.removeInvalidBlocks();
-
+        //this.removeInvalidBlocks();        
     }
     
     public ExtendedBlockStorageStub(int par1)

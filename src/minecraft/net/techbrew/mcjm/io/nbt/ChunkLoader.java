@@ -28,7 +28,7 @@ public class ChunkLoader {
 		if(chunk==null) {
 			return null;
 		}	
-		return new ChunkMD(chunk, true, world);
+		return new ChunkMD(chunk, true, world, /* do error checks */ true);
 		
 	}
 	

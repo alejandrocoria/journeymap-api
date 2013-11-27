@@ -24,7 +24,7 @@ public class ChunkStub {
 	public final ExtendedBlockStorageStub storageArrays[];
 	public boolean isModified;			
 	
-	ChunkStub(Chunk chunk) {
+	ChunkStub(Chunk chunk, boolean doErrorChecks) {
 		
 		this.heightMap = Arrays.copyOf(chunk.heightMap, chunk.heightMap.length);
 		this.blockBiomeArray = Arrays.copyOf(chunk.getBiomeArray(), chunk.getBiomeArray().length);
@@ -38,6 +38,9 @@ public class ChunkStub {
 		for(int i=0;i<storageArrays.length;i++) {
 			ExtendedBlockStorage ebs = chunk.getBlockStorageArray()[i];
 			if(ebs!=null) {
+				if(doErrorChecks) {
+					ebs.removeInvalidBlocks();
+				}
 				this.storageArrays[i] = new ExtendedBlockStorageStub(ebs);
 			}
 		}
