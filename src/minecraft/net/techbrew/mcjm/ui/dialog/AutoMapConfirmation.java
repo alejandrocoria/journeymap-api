@@ -21,9 +21,9 @@ public class AutoMapConfirmation extends JmUI {
     @Override
 	public void initGui()
     {
-    	GuiSmallButton buttonAll = new GuiSmallButton(ButtonEnum.All.ordinal(), this.width / 2 - 155, this.height / 5 + 60, Constants.getString("MapOverlay.automap_dialog_all"));        
-        GuiSmallButton buttonMissing = new GuiSmallButton(ButtonEnum.Missing.ordinal(), this.width / 2 - 155 + 160, this.height / 5 + 60, Constants.getString("MapOverlay.automap_dialog_missing"));
-        GuiSmallButton buttonCancel = new GuiSmallButton(ButtonEnum.Cancel.ordinal(), this.width / 2 - 80, this.height / 5 + 85, Constants.getString("MapOverlay.automap_dialog_cancel"));
+    	GuiSmallButton buttonAll = new GuiSmallButton(ButtonEnum.All.ordinal(), this.width / 2 - 155, this.height / 4 + 60, Constants.getString("MapOverlay.automap_dialog_all"));        
+        GuiSmallButton buttonMissing = new GuiSmallButton(ButtonEnum.Missing.ordinal(), this.width / 2 - 155 + 160, this.height / 4 + 60, Constants.getString("MapOverlay.automap_dialog_missing"));
+        GuiSmallButton buttonCancel = new GuiSmallButton(ButtonEnum.Cancel.ordinal(), this.width / 2 - 80, this.height / 4 + 85, Constants.getString("MapOverlay.automap_dialog_cancel"));
         
         boolean enable = !JourneyMap.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);        
         buttonAll.enabled = enable;
@@ -65,8 +65,8 @@ public class AutoMapConfirmation extends JmUI {
 	public void drawScreen(int par1, int par2, float par3)
     {
     	drawBackground(0);
-        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.automap_dialog"), this.width / 2,      this.height / 5, 16777215);
-        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.automap_dialog_text"), this.width / 2, this.height / 5 + 30, 16777215);
+        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.automap_dialog"), this.width / 2,      this.height / 4, 16777215);
+        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.automap_dialog_text"), this.width / 2, this.height / 4 + 30, 16777215);
         super.drawScreen(par1, par2, par3);
     }
     
