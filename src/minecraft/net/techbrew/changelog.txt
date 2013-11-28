@@ -1,4 +1,4 @@
-JourneyMap 3.0.0rc1 for Minecraft 1.6.4 (November 26, 2013)
+JourneyMap 3.0.0rc1 for Minecraft 1.6.4 (November 27, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
