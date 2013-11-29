@@ -55,10 +55,9 @@ public class MapRegionTask extends BaseMapTask {
 		}
 		
 		if(chunks.size()>0) {
-			return new MapRegionTask(world, rCoord.dimension, rCoord.isUnderground(), rCoord.getVerticalSlice(), chunks);
-		} else {
-			return null;
+			logger.warning("No viable chunks found in region " + rCoord);
 		}
+		return new MapRegionTask(world, rCoord.dimension, rCoord.isUnderground(), rCoord.getVerticalSlice(), chunks);
 	
 	}
 	
