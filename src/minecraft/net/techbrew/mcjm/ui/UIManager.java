@@ -9,6 +9,8 @@ import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.ui.dialog.MapOverlayActions;
+import net.techbrew.mcjm.ui.dialog.MapOverlayOptions;
 
 public class UIManager {	
 	
@@ -47,7 +49,7 @@ public class UIManager {
     	minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer));
     }
     
-    void open(Class<? extends JmUI> uiClass) {
+    public void open(Class<? extends JmUI> uiClass) {
     	closeCurrent();
     	try {    		
     		logger.fine("Opening UI " + uiClass.getSimpleName());

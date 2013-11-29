@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.ui;
+package net.techbrew.mcjm.ui.dialog;
 
 import java.awt.Color;
 
@@ -8,6 +8,10 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
+import net.techbrew.mcjm.ui.JmUI;
+import net.techbrew.mcjm.ui.MapButton;
+import net.techbrew.mcjm.ui.MapOverlay;
+import net.techbrew.mcjm.ui.UIManager;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;

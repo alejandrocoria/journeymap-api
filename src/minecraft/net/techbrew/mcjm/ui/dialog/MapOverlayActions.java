@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.ui;
+package net.techbrew.mcjm.ui.dialog;
 
 import java.awt.Color;
 import java.io.File;
@@ -21,7 +21,10 @@ import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
 import net.techbrew.mcjm.task.MapRegionTask;
 import net.techbrew.mcjm.task.SaveMapTask;
-import net.techbrew.mcjm.ui.dialog.AutoMapConfirmation;
+import net.techbrew.mcjm.ui.JmUI;
+import net.techbrew.mcjm.ui.MapButton;
+import net.techbrew.mcjm.ui.MapOverlay;
+import net.techbrew.mcjm.ui.UIManager;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;

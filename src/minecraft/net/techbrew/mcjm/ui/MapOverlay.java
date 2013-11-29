@@ -53,41 +53,41 @@ import org.lwjgl.opengl.GL11;
  *
  */
 public class MapOverlay extends JmUI {
-	
-	final long refreshInterval = PropertyManager.getIntegerProp(PropertyManager.Key.UPDATETIMER_CHUNKS);
-	Boolean isScrolling = false;
-	static Boolean hardcore = false;
-	int msx, msy, mx, my;	
 
 	// TODO: move to state
-	static Constants.MapType mapType;
-	static Boolean showCaves = true;
-	static Boolean showMonsters = true;
-	static Boolean showAnimals = true;
-	static Boolean showVillagers = true;
-	static Boolean showPets = true;
-	static Boolean showPlayers = true;
-	static Boolean showWaypoints = true;
-	static Boolean follow = true;
+	public static Boolean hardcore = false;
+	public static Constants.MapType mapType;
+	public static Boolean showCaves = true;
+	public static Boolean showMonsters = true;
+	public static Boolean showAnimals = true;
+	public static Boolean showVillagers = true;
+	public static Boolean showPets = true;
+	public static Boolean showPlayers = true;
+	public static Boolean showWaypoints = true;
+	public static Boolean follow = true;
+	public static long lastRefresh = 0;
+	
 	static String playerLastPos = "0,0"; //$NON-NLS-1$
 	static int playerLastDimension = Integer.MIN_VALUE;
-
 	static GridRenderer gridRenderer;	
 	static OverlayWaypointRenderer waypointRenderer;
 	static OverlayRadarRenderer radarRenderer;
 	static final int minZoom = 0;
 	static final int maxZoom = 5;
 	static int currentZoom = 1;
+	
+	private enum ButtonEnum{Alert,DayNight,Follow,ZoomIn,ZoomOut,Options,Actions,Close};
+	
+	final long refreshInterval = PropertyManager.getIntegerProp(PropertyManager.Key.UPDATETIMER_CHUNKS);
+	Boolean isScrolling = false;
+	
+	int msx, msy, mx, my;	
 
 	Logger logger = JourneyMap.getLogger();
 	MapChat chat;
 	
 	MapOverlayState state = null;
 	List<DrawStep> drawStepList = new ArrayList<DrawStep>();
-	
-	static long lastRefresh = 0;
-	
-	private enum ButtonEnum{Alert,DayNight,Follow,ZoomIn,ZoomOut,Options,Actions,Close};
 	
 	MapButton buttonDayNight, buttonFollow,buttonZoomIn,buttonZoomOut;
 	MapButton buttonAlert, buttonOptions, buttonActions, buttonClose;
@@ -441,7 +441,7 @@ public class MapOverlay extends JmUI {
 		} 
 	}
 
-	static void toggleShowCaves() {	   
+	public static void toggleShowCaves() {	   
 		setShowCaves(!showCaves);
 	}
 	
