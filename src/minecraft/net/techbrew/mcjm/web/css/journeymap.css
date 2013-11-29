@@ -266,6 +266,13 @@ label span {
 	font-size: 14px !important;
 }
 
+.ui-dialog .ui-dialog-buttonpane { 
+    text-align: center;
+    padding:5px !important;
+}
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { 
+    float: none;
+}
 
 /* Fix Google Maps canvas */
 .google-map-canvas,
