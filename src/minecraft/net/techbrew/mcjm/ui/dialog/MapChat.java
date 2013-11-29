@@ -1,19 +1,20 @@
-package net.techbrew.mcjm.ui;
+package net.techbrew.mcjm.ui.dialog;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.minecraft.src.GuiScreen;
 import net.minecraft.src.GuiTextField;
 import net.minecraft.src.Packet203AutoComplete;
+import net.techbrew.mcjm.ui.JmUI;
+import net.techbrew.mcjm.ui.MapOverlay;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-public class MapChat extends GuiScreen
+public class MapChat extends JmUI
 {
     private String field_73898_b = "";
 
@@ -39,14 +40,13 @@ public class MapChat extends GuiScreen
      */
     private String defaultInputFieldText = "";
     
-    protected MapOverlay mapOverlay;
+
     protected boolean hidden = false;
-    protected int bottomMargin = 14;
+    protected int bottomMargin = 8;
 
     public MapChat(MapOverlay mapOverlay, String defaultText, boolean hidden)
     {
     	this.hidden = hidden;
-    	this.mapOverlay = mapOverlay;
         this.defaultInputFieldText = defaultText;
     }
 
@@ -77,9 +77,8 @@ public class MapChat extends GuiScreen
         hidden = true;
     }
     
-    public void close() {
-        this.mapOverlay.chat = null;
-    	this.mapOverlay = null;
+    @Override
+	public void close() {
     }
 
     /**
@@ -98,7 +97,7 @@ public class MapChat extends GuiScreen
      * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
      */
     @Override
-	protected void keyTyped(char par1, int par2)
+	public void keyTyped(char par1, int par2)
     {
     	if(hidden) return;
     	
@@ -196,7 +195,7 @@ public class MapChat extends GuiScreen
      * Called when the mouse is clicked.
      */
     @Override
-	protected void mouseClicked(int par1, int par2, int par3)
+	public void mouseClicked(int par1, int par2, int par3)
     {
     	if(hidden) return;
     			
@@ -318,7 +317,7 @@ public class MapChat extends GuiScreen
 	public void drawScreen(int par1, int par2, float par3)
     {    	    
     	GL11.glPushMatrix();
-        GL11.glTranslatef(2.0F, this.height - 40 - bottomMargin, 0.0F);
+        GL11.glTranslatef(0, this.height - 39.5f - bottomMargin, 0.0F);
     	this.mc.ingameGUI.getChatGUI().drawChat(hidden ? this.mc.ingameGUI.getUpdateCounter() : this.cursorCounter);
     	GL11.glPopMatrix();
     	
@@ -355,13 +354,17 @@ public class MapChat extends GuiScreen
         }
     }
 
-    /**
-     * Returns true if this GUI should pause the game when it is displayed in single-player
-     */
-    @Override
-	public boolean doesGuiPauseGame()
-    {
-        return false;
-    }
+	public boolean isHidden() {
+		return hidden;
+	}
 
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
+	}
+	
+	public void setText(String text) {
+		inputField.setText(text);
+	}
+
+    
 }

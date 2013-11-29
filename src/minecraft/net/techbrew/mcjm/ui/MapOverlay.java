@@ -41,6 +41,7 @@ import net.techbrew.mcjm.render.overlay.GridRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
 import net.techbrew.mcjm.render.texture.TextureCache;
+import net.techbrew.mcjm.ui.dialog.MapChat;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -328,7 +329,7 @@ public class MapOverlay extends JmUI {
 	@Override
 	public void handleMouseInput() {
 		
-		if(chat!=null && !chat.hidden) {
+		if(chat!=null && !chat.isHidden()) {
 			chat.handleMouseInput();
 			//return;
 		}
@@ -354,7 +355,7 @@ public class MapOverlay extends JmUI {
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton)
 	{
-		if(chat!=null && !chat.hidden) {
+		if(chat!=null && !chat.isHidden()) {
 			chat.mouseClicked(mouseX, mouseY, mouseButton);
 		}
 		
@@ -457,7 +458,7 @@ public class MapOverlay extends JmUI {
 	@Override
 	protected void keyTyped(char c, int i)
 	{		
-		if(chat!=null && !chat.hidden) {
+		if(chat!=null && !chat.isHidden()) {
 			chat.keyTyped(c, i);
 			return;
 		}
@@ -765,8 +766,8 @@ public class MapOverlay extends JmUI {
 	
 	void openChat(String defaultText) {
 		if(chat!=null) {			
-			chat.inputField.setText(defaultText);
-			chat.hidden = false;
+			chat.setText(defaultText);
+			chat.setHidden(false);
 		} else {
 	        chat = new MapChat(this, defaultText, false);
 	        chat.setWorldAndResolution(mc, width, height);
