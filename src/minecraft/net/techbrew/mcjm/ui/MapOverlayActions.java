@@ -156,10 +156,13 @@ public class MapOverlayActions extends JmUI {
 		final File saveDir = FileHandler.getJourneyMapDir();
 
 		final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
-		final Integer vSlice = underground ? mc.thePlayer.chunkCoordY : null;
+		Integer vSlice = underground ? mc.thePlayer.chunkCoordY : null;
 		Constants.MapType checkMapType = MapOverlay.mapType;
 		if(underground && MapOverlay.showCaves) {
 			checkMapType = Constants.MapType.underground;
+		}
+		if(checkMapType != Constants.MapType.underground) {
+			vSlice=null;
 		}
 		final Constants.MapType useMapType = checkMapType;
 		final MapSaver mapSaver = new MapSaver(worldDir, useMapType, vSlice , mc.thePlayer.dimension);
