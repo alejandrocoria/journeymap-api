@@ -113,7 +113,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						blockInfo.setColor(color);
 						
 					}
-					paintDepth(chunkMd, blockInfo, x, y, z, g2D, prepUnderground);
+					paintDepth(chunkMd, blockInfo, x, y, z, g2D, false, prepUnderground);
 					chunkOk = true;
 					
 				} else {
@@ -235,7 +235,6 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		int blockId;
 		int paintY;
 		int lightLevel;
-		boolean skipUndergroundCheck;
 		
 		boolean chunkOk = false;
 		for (int z = 0; z < 16; z++) {
@@ -248,8 +247,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				blockId = 0;
 				paintY = -1;
 				lightLevel =0;
-				skipUndergroundCheck = false;
-				
+	
 				try {				
 					
 					int blockMaxY = mapBlocks.ceiling(chunkMd, x, sliceMaxY, z);
@@ -258,37 +256,36 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					}
 
 					// Skip blocks open to the sky
-					if(MapBlocks.skyAbove(chunkMd, x, blockMaxY+1, z)) {
+					int checkY = Math.min(sliceMaxY-1, blockMaxY+1);
+					if(MapBlocks.skyAbove(chunkMd, x, checkY, z)) {
 						continue blockLoop;
 					}					
 				
 					// Check for air at the top of column
-					hasAir = chunkMd.stub.getBlockID(x, blockMaxY+1, z)==0; 
+					blockId = chunkMd.stub.getBlockID(x, blockMaxY+1, z);
+					hasAir = blockId==0;
+					hasWater = blockId==8 || blockId==9;
 					paintY = blockMaxY;
 
 					// Step downward to find air
 					airloop: for (int y = blockMaxY; y >= 0; y--) {
 														
 						blockId = chunkMd.stub.getBlockID(x, y, z);
-		
+						
+						// Water handling
+						if((blockId == 8 || blockId == 9)) {		
+							
+							paintDepth(chunkMd, mapBlocks.getBlockInfo(chunkMd, x, y, z), x, y, z, g2D, true, false);
+							continue blockLoop;
+							
+						} 
+						
 						// Found air
 						if (blockId == 0) {
 							hasAir = true;
 							continue airloop;
 						}
-						
-						// Water handling
-						if((blockId == 8 || blockId == 9)) {
-							paintY = y;
-							hasWater = true;
-							if(hasAir) {
-								lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,y,z);									
-							} else {
-								lightLevel = 2;
-								continue airloop;
-							}
-						} 
-						else
+																	
 						// Treat torches like there is air
 						if(blockId == 50 || blockId == 76 || blockId == 76) {
 							hasAir = true;
@@ -407,18 +404,40 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
 	}
 		
-	private void paintDepth(ChunkMD chunkMd, BlockInfo blockInfo, int x, int y, int z, final Graphics2D g2D, final boolean prepUnderground) {		
+	private void paintDepth(ChunkMD chunkMd, BlockInfo blockInfo, int x, int y, int z, final Graphics2D g2D, final boolean useLighting, final boolean prepUnderground) {		
 		
 		// See how deep the alpha goes
+		
 		Stack<BlockInfo> stack = new Stack<BlockInfo>();
 		stack.push(blockInfo);
+		int maxDepth = alphaDepth;
 		int down = y;
 		while(down>0) {
 			down--;
 			BlockInfo lowerBlock = mapBlocks.getBlockInfo(chunkMd, x, down, z);
 			if(lowerBlock!=null) {
 				stack.push(lowerBlock);
-				if (lowerBlock.id==0 || lowerBlock.alpha==1f || y-down>alphaDepth) {
+				
+				switch(lowerBlock.id) {
+					case 79 : { // ice
+						maxDepth = 2;
+						break;
+					}
+					case 8 : { // water
+						maxDepth = 4;
+						break;
+					}
+					case 9 : { // water
+						maxDepth = 4;
+						break;
+					}
+					case 0 : { // air
+						maxDepth = 256;
+						break;
+					}
+				}
+				
+				if (lowerBlock.alpha==1f || y-down>maxDepth) {
 					break;
 				}	
 				
@@ -433,12 +452,19 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		boolean isWater = (blockInfo.id==Block.waterStill.blockID || blockInfo.id==Block.waterMoving.blockID);		
 		
 		Color color;
-		float lightLevel;
-				
-		// If bottom block is same as the top, don't bother with transparency
-		if(isWater && stack.peek().id==blockInfo.id) {
-			color = blockInfo.getColor();
-			
+
+		// Get color for bottom of stack
+		color = stack.peek().getColor();
+		
+		if(useLighting) {
+			int lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,down+1, z);
+			if (lightLevel < 15) {
+				float diff = Math.min(1F, (lightLevel / 15F) + .05f);
+				if(diff!=1.0) {
+					color = shadeNight(color, diff);
+				}
+			}
+		} else if(isWater) {
 			float darken = .68f;
 			float[] rgb = new float[4];
 			rgb = color.getRGBColorComponents(rgb);
@@ -446,37 +472,29 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					MathHelper.clamp_float(rgb[0] * darken, 0f, 1f), 
 					MathHelper.clamp_float(rgb[1] * darken, 0f, 1f), 
 					MathHelper.clamp_float(rgb[2] * darken, 0f, 1f));
-			
-			if(prepUnderground) {
-				color = ghostSurface(color);
-			}
-			
-			g2D.setComposite(MapBlocks.OPAQUE);
-			g2D.setPaint(color);
-			g2D.fillRect(x, z, 1, 1);
-		} else {
+		}
 		
-			// Bottom block is always opaque
-			if(!stack.isEmpty()) {
+		g2D.setComposite(MapBlocks.OPAQUE);
+		g2D.setPaint(color);
+		g2D.fillRect(x, z, 1, 1);	
 				
-				color = stack.pop().getColor();
-				
-				if(prepUnderground) {
-					color = ghostSurface(color);
-				}
-				
-				g2D.setComposite(MapBlocks.OPAQUE);
-				g2D.setPaint(color);
-				g2D.fillRect(x, z, 1, 1);
-			}
-						
-			// Overlay blocks above using transparency
+		// If bottom block is same as the top, don't bother with transparency
+		if(stack.peek().id!=blockInfo.id) {
+			stack.pop(); // already used it
 			while(!stack.isEmpty()) {
 				BlockInfo lowerBlock = stack.pop();
 				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, lowerBlock.alpha));
-				
 				color = lowerBlock.getColor();
-				if(isWater) {
+				
+				if(useLighting) {
+					int lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,++down, z);
+					if (lightLevel < 15) {
+						float diff = Math.min(1F, (lightLevel / 15F) + .05f);
+						if(diff!=1.0) {
+							color = shadeNight(color, diff);
+						}
+					}
+				} else if(isWater) {
 					float darken = .7f;
 					float[] rgb = new float[4];
 					rgb = color.getRGBColorComponents(rgb);
@@ -492,9 +510,9 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				
 				g2D.setPaint(color);
 				g2D.fillRect(x, z, 1, 1);
-			}				
-		}	
-		
+			}	
+			
+		} 
 	}
 	
 

@@ -160,8 +160,8 @@ public class MapBlocks extends HashMap {
 	public final static HashSet<Integer> sky = new HashSet<Integer>(7);
 	{
 		sky.add(0); // air 
-		sky.add(8); // water 
-		sky.add(9); // stationary water 
+//		sky.add(8); // water 
+//		sky.add(9); // stationary water 
 		sky.add(18); // leaves
 		sky.add(30); // web
 		sky.add(65); // ladder
