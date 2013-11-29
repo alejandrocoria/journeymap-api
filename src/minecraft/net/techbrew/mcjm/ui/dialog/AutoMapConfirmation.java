@@ -1,11 +1,11 @@
 package net.techbrew.mcjm.ui.dialog;
 
 import net.minecraft.src.GuiButton;
-import net.minecraft.src.GuiSmallButton;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.task.MapRegionTask;
 import net.techbrew.mcjm.ui.JmUI;
+import net.techbrew.mcjm.ui.MapButton;
 import net.techbrew.mcjm.ui.MapOverlay;
 import net.techbrew.mcjm.ui.UIManager;
 
@@ -13,7 +13,8 @@ import org.lwjgl.input.Keyboard;
 
 public class AutoMapConfirmation extends JmUI {
 
-	private enum ButtonEnum {All,Missing,Cancel};
+	private enum ButtonEnum {All,Missing,None,Close};
+	MapButton buttonAll, buttonMissing, buttonNone, buttonClose;
 	
 	/**
      * Adds the buttons (and other controls) to the screen in question.
@@ -21,17 +22,21 @@ public class AutoMapConfirmation extends JmUI {
     @Override
 	public void initGui()
     {
-    	GuiSmallButton buttonAll = new GuiSmallButton(ButtonEnum.All.ordinal(), this.width / 2 - 155, this.height / 4 + 60, Constants.getString("MapOverlay.automap_dialog_all"));        
-        GuiSmallButton buttonMissing = new GuiSmallButton(ButtonEnum.Missing.ordinal(), this.width / 2 - 155 + 160, this.height / 4 + 60, Constants.getString("MapOverlay.automap_dialog_missing"));
-        GuiSmallButton buttonCancel = new GuiSmallButton(ButtonEnum.Cancel.ordinal(), this.width / 2 - 80, this.height / 4 + 85, Constants.getString("MapOverlay.automap_dialog_cancel"));
+    	
+    	buttonAll = new MapButton(ButtonEnum.All.ordinal(), 0, 0, Constants.getString("MapOverlay.automap_dialog_all"));        
+    	buttonMissing = new MapButton(ButtonEnum.Missing.ordinal(), 0, 0, Constants.getString("MapOverlay.automap_dialog_missing"));
+    	buttonNone = new MapButton(ButtonEnum.None.ordinal(), 0, 0, Constants.getString("MapOverlay.automap_dialog_none"));
+    	buttonClose = new MapButton(ButtonEnum.None.ordinal(), 0, 0, Constants.getString("MapOverlay.close"));
         
         boolean enable = !JourneyMap.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);        
         buttonAll.enabled = enable;
         buttonMissing.enabled = enable;
+        buttonNone.enabled = !enable;
         
         this.buttonList.add(buttonAll);
         this.buttonList.add(buttonMissing);
-        this.buttonList.add(buttonCancel);        
+        this.buttonList.add(buttonNone); 
+        this.buttonList.add(buttonClose);
     }
 
     /**
@@ -50,10 +55,13 @@ public class AutoMapConfirmation extends JmUI {
     			JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.FALSE);
     			break;  
     		}
-    		case Cancel : {
+    		case None : {
     			JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, false, null);
     			break;      			
-    		}        		
+    		}    
+    		case Close: {
+    			break;
+    		}
     	}        	
     	UIManager.getInstance().openMap();
     }
@@ -65,8 +73,19 @@ public class AutoMapConfirmation extends JmUI {
 	public void drawScreen(int par1, int par2, float par3)
     {
     	drawBackground(0);
-        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.automap_dialog"), this.width / 2,      this.height / 4, 16777215);
-        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.automap_dialog_text"), this.width / 2, this.height / 4 + 30, 16777215);
+    	
+    	final int x = this.width / 2;
+    	final int y = this.height / 4;
+    	final int vgap = 3;
+    	
+        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.automap_dialog"), x, y, 16777215);
+        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.automap_dialog_text"), x, y + 30, 16777215);
+    	
+    	buttonAll.centerHorizontalOn(x).yPosition=y+60;
+    	buttonMissing.centerHorizontalOn(x).below(buttonAll, vgap);
+    	buttonNone.centerHorizontalOn(x).below(buttonMissing, vgap);
+    	buttonClose.centerHorizontalOn(x).below(buttonNone, vgap*2);
+        
         super.drawScreen(par1, par2, par3);
     }
     

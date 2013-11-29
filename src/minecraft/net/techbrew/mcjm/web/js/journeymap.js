@@ -586,7 +586,8 @@ var JourneyMap = (function() {
 			buttons: [ 
 			   { width:'80px', text: getMessage('automap_dialog_all'),     click: function() { toggleAutoMap('all');  $( this ).dialog( "close" ); } },
 			   { width:'80px', text: getMessage('automap_dialog_missing'), click: function() { toggleAutoMap('missing');  $( this ).dialog( "close" ); } },
-	           { width:'80px', text: getMessage('automap_dialog_cancel'),  click: function() { toggleAutoMap('stop');  $( this ).dialog( "close" ); } } 
+	           { width:'80px', text: getMessage('automap_dialog_none'),  click: function() { toggleAutoMap('stop');  $( this ).dialog( "close" ); } },
+	           { width:'80px', text: getMessage('automap_dialog_close'),  click: function() { $( this ).dialog( "close" ); } }
 			]
 		}).parent().find('.ui-dialog-titlebar').remove();
 		$(dialog).find('.ui-dialog-buttonset').css('width','100%');
