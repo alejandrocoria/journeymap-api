@@ -37,7 +37,7 @@ public class PngjHelper {
 	    
 	    final ImageLine destLine = new ImageLine(destImgInfo, ImageLine.SampleType.INT, false);
 	    final int lineLen = tileSize * 4; // 4=bytesPixel
-	    final int gridColor = 150;
+	    final int gridColor = 135;
 	    final boolean showGrid = PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID);
 	    
 	    int destRow = 0;
@@ -61,9 +61,9 @@ public class PngjHelper {
 	                if(showGrid) {
 		                int skip = (srcRow%16==0) ? 4 : 64;
 		                for(int i=0;i<=src.length-skip;i+=skip) {
-		                	src[i]=(src[i]+gridColor)/2;
-	                		src[i+1]=(src[i+1]+gridColor)/2;
-	                		src[i+2]=(src[i+2]+gridColor)/2;
+		                	src[i]=(src[i]+src[i]+gridColor)/3;
+	                		src[i+1]=(src[i+1]+src[i+1]+gridColor)/3;
+	                		src[i+2]=(src[i+2]+src[i+2]+gridColor)/3;
 	                		src[i+3]=255;
 		                }
 	                }
