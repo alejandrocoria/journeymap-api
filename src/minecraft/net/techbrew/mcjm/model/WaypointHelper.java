@@ -73,10 +73,11 @@ public class WaypointHelper {
 	 * @return
 	 */
 	private static boolean isNativeLoaded() {
-		if(nativeLoaded==null) {
-			nativeLoaded = !isReiLoaded() && !isVoxelMapLoaded();
-		}
-		return nativeLoaded;
+		return false;
+//		if(nativeLoaded==null) {
+//			nativeLoaded = !isReiLoaded() && !isVoxelMapLoaded();
+//		}
+//		return nativeLoaded;
 	}
 	
 	/**
