@@ -66,6 +66,9 @@
   	<!-- Changelog -->
   	<copy todir="${build.dir}" failonerror="true" file="${src.dir}/net/techbrew/changelog.txt" />
   	
+  	<!-- License info -->
+    <copy todir="${build.dir}" failonerror="true" file="${src.dir}/net/techbrew/license.txt" />
+  	
   	<!-- ForgeML info -->
   	<copy todir="${build.dir}" failonerror="true" file="${src.dir}/net/techbrew/mcmod.info" />
   	

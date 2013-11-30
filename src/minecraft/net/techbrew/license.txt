@@ -1,0 +1,36 @@
+JourneyMap mod for Minecraft
+Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
+This mod may not be altered, file-hosted, re-packaged, or distributed without express written permission by Mark Woodman.
+
+JourneyMap includes and/or makes use of the following software under their respective licenses:
+
+PNGJ : PNG image IO Java library
+https://code.google.com/p/pngj/
+Apache License 2.0: http://www.apache.org/licenses/LICENSE-2.0
+
+Rupy NIO HTTP application server
+https://code.google.com/p/rupy/
+GNU Lesser General Public License: http://www.gnu.org/licenses/lgpl.html
+
+Google Maps API
+Limited License: https://developers.google.com/maps/licensing
+
+JQuery
+https://jquery.org
+MIT License: http://opensource.org/licenses/mit-license.php
+
+JQuery UI
+http://jqueryui.com/
+MIT License: http://opensource.org/licenses/mit-license.php
+
+JQuery Rotate Plugin
+https://code.google.com/p/jqueryrotate/
+MIT License: http://opensource.org/licenses/mit-license.php
+
+Google Maps Utility Library
+https://code.google.com/p/google-maps-utility-library-v3/
+Apache License 2.0: http://www.apache.org/licenses/LICENSE-2.0
+
+Risugami's Modloader
+http://www.minecraftforum.net/topic/75440-
+License: Unspecified, assumed public domain

@@ -1,3 +1,7 @@
+/CHANGELOG
+/*.bat
+/*.sh
+/LICENSE.txt
 bin/
 build/
 conf/
@@ -31,13 +35,11 @@ src/minecraft/net/minecraft/src/*
 !src/minecraft/net/minecraft/src/RenderFacade.java
 !src/minecraft/net/minecraft/src/mod_JourneyMap.java
 !src/minecraft/net/minecraft/src/mcmod.info
+!src/minecraft/net/minecraft/src/license.txt
 src/minecraft/net/minecraftforge/*
 src/minecraft/ibxm/
 src/minecraft/org/
 src/minecraft/Start.java
 src/minecraft_server/
 temp/
-CHANGELOG
-*.bat
-*.sh
-LICENSE.txt
+
