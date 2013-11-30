@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.src.ChunkCoordinates;
-import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -180,7 +178,7 @@ public class WaypointHelper {
 	}
 	
 	/**
-	 * Get waypoints from VoxelMap
+	 * Get native waypoints from JourneyMap
 	 * @return
 	 */
 	static List<Waypoint> getNativeWaypoints() {
@@ -189,21 +187,21 @@ public class WaypointHelper {
 			return Collections.EMPTY_LIST;
 		}
 		
-		Minecraft mc = Minecraft.getMinecraft();
-		
-		ChunkCoordinates spawn = mc.theWorld.getSpawnPoint();
-		EntityClientPlayerMP player = mc.thePlayer;
-		
 		ArrayList<Waypoint> list = new ArrayList<Waypoint>();
 		
-		Waypoint wpSpawn = new Waypoint("Spawn", spawn.posX, spawn.posY, spawn.posZ, true, 0, 255, 0, Waypoint.TYPE_NORMAL, "journeymap", "Spawn");
-		list.add(wpSpawn);
-			
-		ChunkCoordinates bed = player.getBedLocation();
-		if(bed!=null && !bed.equals(spawn)) {
-			Waypoint wpBed = new Waypoint("Bed", new Double(Math.floor(bed.posX)).intValue(), new Double(Math.floor(bed.posY)).intValue(), new Double(Math.floor(bed.posZ)).intValue(), true, 0, 0, 255, Waypoint.TYPE_NORMAL, "journeymap", "Bed");
-			list.add(wpBed);
-		}
+//		Minecraft mc = Minecraft.getMinecraft();
+//		
+//		ChunkCoordinates spawn = mc.theWorld.getSpawnPoint();
+//		EntityClientPlayerMP player = mc.thePlayer;
+//
+//		Waypoint wpSpawn = new Waypoint("Spawn", spawn.posX, spawn.posY, spawn.posZ, true, 0, 255, 0, Waypoint.TYPE_NORMAL, "journeymap", "Spawn");
+//		list.add(wpSpawn);
+//			
+//		ChunkCoordinates bed = player.getBedLocation();
+//		if(bed!=null && !bed.equals(spawn)) {
+//			Waypoint wpBed = new Waypoint("Bed", new Double(Math.floor(bed.posX)).intValue(), new Double(Math.floor(bed.posY)).intValue(), new Double(Math.floor(bed.posZ)).intValue(), true, 0, 0, 255, Waypoint.TYPE_NORMAL, "journeymap", "Bed");
+//			list.add(wpBed);
+//		}
 		
 		return list;
 	}
