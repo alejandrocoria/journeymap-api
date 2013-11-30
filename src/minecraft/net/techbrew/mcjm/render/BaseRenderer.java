@@ -215,10 +215,9 @@ public abstract class BaseRenderer {
 		}
 		
 		ChunkMD chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
-		
-		
+				
 		if(chunk!=null) {
-			return chunk.stub.getSavedLightValue(EnumSkyBlock.Block, x,y+1, z);
+			return chunk.getSavedLightValue(EnumSkyBlock.Block, x,y+1, z);
 		} else {
 			return defaultVal;
 		}

@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import net.minecraft.src.Chunk;
 import net.minecraft.src.ChunkCoordIntPair;
+import net.minecraft.src.EnumSkyBlock;
 import net.minecraft.src.World;
 import net.techbrew.mcjm.render.MapBlocks;
 
@@ -51,6 +52,18 @@ public class ChunkMD {
 	public int discard(int i) {
 		discards = Math.max(0, discards+i);
 		return discards;
+	}
+	
+	/**
+	 * Added to do a safety check on the world height value
+	 * @param par1EnumSkyBlock
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public int getSavedLightValue(EnumSkyBlock par1EnumSkyBlock, int x, int y, int z) {
+		return stub.getSavedLightValue(par1EnumSkyBlock, x, Math.min(y, worldHeight-1), z);
 	}
 	
 	/**

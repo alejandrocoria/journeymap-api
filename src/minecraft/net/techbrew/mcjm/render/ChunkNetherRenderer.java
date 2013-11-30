@@ -80,7 +80,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 					if(isLava) {
 						lightLevel = 14;
 					} else {
-						lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z);
+						lightLevel = chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z);
 						if(y==sliceMaxY) {
 							paintBlock(x, z, Color.BLACK, g2D);							
 							continue;

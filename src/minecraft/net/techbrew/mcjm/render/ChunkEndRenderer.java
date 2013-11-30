@@ -81,7 +81,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 							hasAir = true;
 						} else if (hasAir && paintY == -1) {
 							paintY = y;
-							lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
+							lightLevel = chunkMd.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
 							break;
 						}
 					}
@@ -93,7 +93,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 		
 					blockId = chunkMd.stub.getBlockID(x, paintY, z);
 		
-					lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
+					lightLevel = chunkMd.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
 		
 					if (lightLevel < 10) {
 						lightLevel += 3;

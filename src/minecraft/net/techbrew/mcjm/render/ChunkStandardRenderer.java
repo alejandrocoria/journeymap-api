@@ -176,8 +176,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				
 				if(!prepUnderground) {
 					// Adjust color for light level at night		
-					int lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,y + 1, z);
-					if(lightLevel==0) lightLevel = 1;
+					int lightLevel = Math.max(1, chunkMd.getSavedLightValue(EnumSkyBlock.Block, x,(y + 1), z));
 					if (lightLevel < 15) {
 						float diff = Math.min(1F, (lightLevel / 15F) + .1f);
 						if(diff!=1.0) {
@@ -312,7 +311,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 							paintY = y;							
 							
 							if (caveLighting) {
-								lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,paintY+1, z);
+								lightLevel = chunkMd.getSavedLightValue(EnumSkyBlock.Block, x,paintY+1, z);
 								//lightLevel = getMixedBrightnessForBlock(chunkMd, x,y,z);
 								if(lightLevel > 0) {
 									break airloop;		
@@ -457,7 +456,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		color = stack.peek().getColor();
 		
 		if(useLighting) {
-			int lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,down+1, z);
+			int lightLevel = chunkMd.getSavedLightValue(EnumSkyBlock.Block, x,down+1, z);
 			if (lightLevel < 15) {
 				float diff = Math.min(1F, (lightLevel / 15F) + .05f);
 				if(diff!=1.0) {
@@ -487,7 +486,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				color = lowerBlock.getColor();
 				
 				if(useLighting) {
-					int lightLevel = chunkMd.stub.getSavedLightValue(EnumSkyBlock.Block, x,++down, z);
+					int lightLevel = chunkMd.getSavedLightValue(EnumSkyBlock.Block, x,++down, z);
 					if (lightLevel < 15) {
 						float diff = Math.min(1F, (lightLevel / 15F) + .05f);
 						if(diff!=1.0) {
