@@ -420,7 +420,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				
 				switch(lowerBlock.id) {
 					case 79 : { // ice
-						maxDepth = 2;
+						maxDepth = 4;
 						break;
 					}
 					case 8 : { // water
