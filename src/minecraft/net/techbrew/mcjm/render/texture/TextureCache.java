@@ -154,6 +154,6 @@ public class TextureCache {
 	}
 
 	public void purge() {
-		// TODO
+		
 	}
 }

@@ -83,7 +83,6 @@ public class MapRegionTask extends BaseMapTask {
 			enabled = (params!=null);
 			if(!enabled) return false;
 			
-			// TODO: verify this is okay to use (instead of isSinglePlayer)
 			enabled = false; // assume the worst
 			if(minecraft.isIntegratedServerRunning()) {
 				try {
