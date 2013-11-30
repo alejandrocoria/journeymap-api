@@ -1,4 +1,4 @@
-JourneyMap 3.0.0rc1 for Minecraft 1.6.4 (November 27, 2013)
+JourneyMap 3.0.0 for Minecraft 1.6.4 (November 29, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -11,47 +11,25 @@ Requirements:
 - Minecraft 1.6.4
 - Forge "Recommended-1.6.4" or ModLoader 1.6.4
 
-Changes in JourneyMap 3.0.0rc1 for Minecraft 1.6.4:
-- Cave/Indoor mapping now shows a dimmed view of "outside" surface at the same elevation
-- When "Show Caves" is turned off, surface mapping will be done instead of cave mapping when player is underground
-- A new "custom" folder is now created in the JourneyMap folder with placeholder icons for custom mobs.  These can be replaced with your own icons.
-- Web UI now uses versioned URLs to load javascript/css to prevent browsers from using obsolete cached versions.
-- Algorithm improvements to chunk change detection; mapping load reduced
-- Auto-map now prompts to map all regions or just ones missing images
-- Auto-map now maps regions outward from player position
-- In-game UI now has Options and Actions menus to match the Web UI
-- Save Map now runs as a scheduled task (like legacy file migration, proxmity mapping, and auto-mapping)
-- Save Map in Web UI no longer tries to load the image via the browser
-- Save Map (both In-game or Web UI) now opens the image using the system's default viewer for PNG images when complete
-- Replaced In-game zoom icons
-- Web UI waypoint icons reposition more quickly, label is now above instead of to the side.
-
-Changes in JourneyMap 3.0.0b4 for Minecraft 1.6.4:
-- Fixed bug releated to chunk change detection (introduced in Beta 3) that caused some chunks not to map.
-- Fixed bug where underground mapping didn't include water
-- Fixed NullPointerException when going to Nether on a Multiplayer server
-
-Changes in JourneyMap 3.0.0b3 for Minecraft 1.6.4:
-- Optimization: Added chunk change detection to vastly reduce mapping overhead when you're not travelling.
-- Webserver port is now checked to see if already in use. If so, port # is increased by 10 and retried.
-
-Changes in JourneyMap 3.0.0b2 for Minecraft 1.6.4:
-- Added support for seeing and using chat when the In-game Map is open
+Changes in JourneyMap 3.0.0 for Minecraft 1.6.4:
+- In-game UI and Web UI completely re-written to be much faster, zoom out further, and have no texture distortions.
+- Cave/Indoor mapping now shows large bodies of water at the same depth and a dimmed view of "outside" surface at the same elevation
 - The icons for other players are now their Minecraft skin (no longer a generic Steve face)
-- Control codes are now stripped from named entities (mobs, pets, etc.)
-- Bugfix for Auto-Map when custom dimension directory name doesn't follow standard naming convention (MystCraft)
-- Bugfix: zoom button enable/disable triggers were reversed
-
-Changes in JourneyMap 3.0.0b1 for Minecraft 1.6.4:
-- In-game UI completely re-written to be much faster, zoom out further, and have no texture distortions.
-- New feature: The web map is now powered by Google Maps and has a new look
-- New feature: Auto-mapping entire single-player worlds
-- New feature: Saved map files now show the chunk grid (if enabled)
+- Chat is now visible when the In-game Map is open
+- New feature for single-player: "Auto-Map" the entire world at your current elevation
+- When "Show Caves" is turned off, surface mapping will be done instead of cave mapping when player is underground
+- Saved map files now show the chunk grid (if enabled)
+- Save Map (both In-game or Web UI) now opens the image using the system's default viewer for PNG images when complete
 - Added support for multiple resource packs at the same time
 - Added support for custom blocks, biomes, and dimensions
-- Changes to JourneyMap's data files.  Your map files will be migrated when first connecting to a new world.
 - Major reductions in how often image files are written to disk.
+- Chunk change detection is used to vastly reduce mapping overhead.
 - In-game Map UI now honors the user keybinding for: Forward, Back, Left, Right, Open Chat, and Open Inventory
+- Control codes are now stripped from the display of named entities (mobs, pets, etc.)
+- Changes to JourneyMap's data file structures.  Your map files will be migrated when first connecting to a new world.
+- A new "custom" folder is now created in the JourneyMap folder with placeholder icons for custom mobs.  These can be replaced with your own icons.
+- Webserver port is now checked to see if already in use. If so, port # is increased by 10 and retried.
+- Replaced In-game zoom icons
 - Removed obsolete "use_custom_texturepack" property from journeyMap.properties
 
 Changes in JourneyMap 2.7.3 for Minecraft 1.6.4:
