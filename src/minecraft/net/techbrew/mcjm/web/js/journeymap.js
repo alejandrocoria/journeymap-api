@@ -913,20 +913,11 @@ var JourneyMap = (function() {
 		// Restart in 5 seconds
 		if (!halted) {
 			halted = true;
-			if (debug)
+			if (console)
 				console.log(">>> " + "Will re-check game state in 5 seconds.");
 			
 			setTimeout(function() {
-				halted = false;
-
-				if (!JM.messages) {
-					initMessages();
-				} else if (uiInitialized != true) {
-					initUI();
-				} else {
-					initWorld();
-				}
-
+				document.location = document.location;
 			}, 5000);
 		}
 	}
@@ -1417,9 +1408,16 @@ var JourneyMap = (function() {
 	
 	var initMap = function (container) {
 		
+		var pos;
+		if(JM.player && JM.player.posX) {
+			pos = blockPosToLatLng(JM.player.posX, JM.player.posZ);
+		} else {
+			pos = new google.maps.LatLng(0,0);
+		}
+		
 		map = new google.maps.Map(container, {
 	        zoom: MapConfig.defaultZoom,
-	        center: new google.maps.LatLng(0,0),
+	        center: pos,
 	        mapTypeControl: false,
 	        streetViewControl: false,
 	        panControl: true,
