@@ -57,7 +57,9 @@ public class MapOverlayActions extends JmUI {
 
 		buttonSave = new MapButton(ButtonEnum.Save.ordinal(),0,0,Constants.getString("MapOverlay.save_map")); //$NON-NLS-1$ 
 		buttonClose = new MapButton(ButtonEnum.Close.ordinal(),0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$ 
-		buttonBrowser = new MapButton(ButtonEnum.Browser.ordinal(),0,0,Constants.getString("MapOverlay.use_browser")); //$NON-NLS-1$ 		
+		buttonBrowser = new MapButton(ButtonEnum.Browser.ordinal(),0,0,Constants.getString("MapOverlay.use_browser")); //$NON-NLS-1$ 	
+		buttonBrowser.enabled = PropertyManager.getBooleanProp(PropertyManager.Key.WEBSERVER_ENABLED);
+		
 		buttonAutomap = new MapButton(ButtonEnum.Automap.ordinal(),0,0,
 				Constants.getString("MapOverlay.automap_title", on),
 				Constants.getString("MapOverlay.automap_title", off),

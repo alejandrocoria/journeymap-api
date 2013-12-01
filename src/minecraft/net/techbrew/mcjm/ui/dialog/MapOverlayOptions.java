@@ -22,8 +22,8 @@ public class MapOverlayOptions extends JmUI {
 	int lastWidth = 0;
 	int lastHeight = 0;
 	
-	private enum ButtonEnum {Caves,Monsters,Animals,Villagers,Pets,Players,Waypoints,Grid,Close};	
-	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid, buttonClose;
+	private enum ButtonEnum {Caves,Monsters,Animals,Villagers,Pets,Players,Waypoints,Grid,Webserver,Close};	
+	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid, buttonWebserver, buttonClose;
 	Color titleColor = new Color(0,0,100);
 	
 	public MapOverlayOptions() {
@@ -78,6 +78,13 @@ public class MapOverlayOptions extends JmUI {
 				MapOverlay.showWaypoints); //$NON-NLS-1$  //$NON-NLS-2$
 		buttonWaypoints.enabled = WaypointHelper.waypointsEnabled();
 		
+		boolean webserverOn = PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
+		buttonWebserver = new MapButton(ButtonEnum.Webserver.ordinal(),0,0,
+				Constants.getString("MapOverlay.enable_webserver", on),
+				Constants.getString("MapOverlay.enable_webserver", off),
+				webserverOn); //$NON-NLS-1$  //$NON-NLS-2$
+		buttonWebserver.setToggled(webserverOn);
+		
 		buttonGrid = new MapButton(ButtonEnum.Grid.ordinal(),0,0,
 				Constants.getString("MapOverlay.show_grid", on),
 				Constants.getString("MapOverlay.show_grid", off),
@@ -119,6 +126,7 @@ public class MapOverlayOptions extends JmUI {
 		buttonList.add(buttonPlayers);
 		buttonList.add(buttonGrid);
 		buttonList.add(buttonWaypoints);
+		buttonList.add(buttonWebserver);
     }
     
     /**
@@ -153,7 +161,9 @@ public class MapOverlayOptions extends JmUI {
 			buttonGrid.below(buttonPets, vgap).xPosition=bx;
 			buttonWaypoints.rightOf(buttonGrid, hgap).below(buttonPlayers, vgap);
 			
-			buttonClose.below(buttonGrid, vgap*2).xPosition=this.width / 2 - buttonClose.getWidth()/2;
+			buttonWebserver.below(buttonGrid, vgap).centerHorizontalOn(this.width / 2);
+			
+			buttonClose.below(buttonWebserver, vgap*2).centerHorizontalOn(this.width / 2);
 
 		}	
 	}
@@ -169,51 +179,57 @@ public class MapOverlayOptions extends JmUI {
 				buttonCaves.setToggled(MapOverlay.showCaves);
 				break;
 			}
-			case Close: { // close
+			case Close: {
 				UIManager.getInstance().openMap();
 				break;
 			}
-			case Monsters: { // monsters
+			case Monsters: { 
 				MapOverlay.showMonsters = !MapOverlay.showMonsters;
 				buttonMonsters.setToggled(MapOverlay.showMonsters);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_MOBS, MapOverlay.showMonsters);
 				break;
 			}
-			case Animals: { // animals
+			case Animals: { 
 				MapOverlay.showAnimals = !MapOverlay.showAnimals;
 				buttonAnimals.setToggled(MapOverlay.showAnimals);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_ANIMALS, MapOverlay.showAnimals);
 				break;
 			}
-			case Villagers: { // villagers
+			case Villagers: { 
 				MapOverlay.showVillagers = !MapOverlay.showVillagers;
 				buttonVillagers.setToggled(MapOverlay.showVillagers);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_VILLAGERS, MapOverlay.showVillagers);
 				break;
 			}
-			case Pets: { // pets
+			case Pets: {
 				MapOverlay.showPets = !MapOverlay.showPets;
 				buttonPets.setToggled(MapOverlay.showPets);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_PETS, MapOverlay.showPets);
 				break;
 			}
-			case Players: { // players
+			case Players: { 
 				MapOverlay.showPlayers = !MapOverlay.showPlayers;
 				buttonPlayers.setToggled(MapOverlay.showPlayers);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_PLAYERS, MapOverlay.showPlayers);
 				break;
 			}
-			case Waypoints: { // waypoints
+			case Waypoints: { 
 				MapOverlay.showWaypoints = !MapOverlay.showWaypoints;
 				buttonWaypoints.setToggled(MapOverlay.showWaypoints);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_WAYPOINTS, MapOverlay.showWaypoints);
 				break;
 			}
-			case Grid: { // grid
+			case Grid: { 
 				boolean showGrid = !PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID);
 				buttonGrid.setToggled(showGrid);
 				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_GRID, showGrid);
 				MapOverlay.lastRefresh = 0;
+				break;
+			}
+			case Webserver: { 
+				boolean enableWebserver = !PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
+				buttonWebserver.setToggled(enableWebserver);
+				JourneyMap.getInstance().toggleWebserver(enableWebserver, true);
 				break;
 			}
 

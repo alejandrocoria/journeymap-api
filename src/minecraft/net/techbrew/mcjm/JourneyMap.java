@@ -144,7 +144,27 @@ public class JourneyMap {
 		}
 		
 		// Webserver
-		enableWebserver = pm.getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
+		toggleWebserver(pm.getBoolean(PropertyManager.Key.WEBSERVER_ENABLED), false);
+		
+		// Check for newer version online
+		if(VersionCheck.getVersionIsCurrent()==false) {
+			announce(Constants.getString("JourneyMap.new_version_available", WEBSITE_URL)); //$NON-NLS-1$
+		}		
+
+		initialized = true;
+		
+		// Override log level now that loading complete
+		logger.info("Initialization complete."); //$NON-NLS-1$
+		logger.setLevelFromProps();
+		
+		// Logging for thread debugging
+		threadLogging = getLogger().isLoggable(Level.FINER); 
+
+	}
+	
+	public void toggleWebserver(Boolean enable, boolean forceAnnounce) {
+		PropertyManager.getInstance().setProperty(PropertyManager.Key.WEBSERVER_ENABLED, enable);
+		enableWebserver = enable;
 		if(enableWebserver) {
 			try {			
 				jmServer = new JMServer();
@@ -161,22 +181,22 @@ public class JourneyMap {
 			if(!enableWebserver) {
 				announce(Constants.getMessageJMERR24()); 
 			}
+		} else {
+			enableWebserver = false;
+			try {			
+				if(jmServer!=null) {
+					jmServer.stop();
+				}
+			} catch(Throwable e) {
+				logger.throwing("JourneyMap", "constructor", e); //$NON-NLS-1$ //$NON-NLS-2$
+				logger.log(Level.SEVERE, LogFormatter.toString(e));				
+				enableWebserver = false;
+			}
 		}
-
-		// Check for newer version online
-		if(VersionCheck.getVersionIsCurrent()==false) {
-			announce(Constants.getString("JourneyMap.new_version_available", WEBSITE_URL)); //$NON-NLS-1$
-		}		
-
-		initialized = true;
-		
-		// Override log level now that loading complete
-		logger.info("Initialization complete."); //$NON-NLS-1$
-		logger.setLevelFromProps();
-		
-		// Logging for thread debugging
-		threadLogging = getLogger().isLoggable(Level.FINER); 
-
+		if(forceAnnounce) {
+			enableAnnounceMod = true;
+		}
+		announceMod(forceAnnounce);
 	}
 	
 	/**
@@ -225,8 +245,7 @@ public class JourneyMap {
 	    	
 	    	logger.info("Mapping started: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$	
 	    		    	
-    	}    	
-		if(enableAnnounceMod) announceMod();
+    	}    			
     }
     
     /**
@@ -349,24 +368,25 @@ public class JourneyMap {
 		return true;
 	}
 	
-	private void announceMod() {
+	private void announceMod(boolean forced) {
 
 		Minecraft minecraft = Minecraft.getMinecraft();	
+		int pos = forced ? Math.max(0,announcements.size()-1) : 0;
 		
 		if(enableAnnounceMod) {
-			announcements.add(0, Constants.getString("JourneyMap.ready", JM_VERSION)); //$NON-NLS-1$ 
+			announcements.add(pos, Constants.getString("JourneyMap.ready", JM_VERSION)); //$NON-NLS-1$ 
 			if(enableWebserver && enableMapGui) {
 				String keyName = Keyboard.getKeyName(uiKeybinding.keyCode);
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
-				announcements.add(1, Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port)); //$NON-NLS-1$ 
+				announcements.add(pos+1, Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port)); //$NON-NLS-1$ 
 			} else if(enableWebserver) {
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
-				announcements.add(1, Constants.getString("JourneyMap.webserver_only_ready", port)); //$NON-NLS-1$ 
+				announcements.add(pos+1, Constants.getString("JourneyMap.webserver_only_ready", port)); //$NON-NLS-1$ 
 			} else if(enableMapGui) {
 				String keyName = Keyboard.getKeyName(uiKeybinding.keyCode);
-				announcements.add(1, Constants.getString("JourneyMap.mapgui_only_ready", keyName)); //$NON-NLS-1$
+				announcements.add(pos+1, Constants.getString("JourneyMap.mapgui_only_ready", keyName)); //$NON-NLS-1$
 			} else {
-				announcements.add(1, Constants.getString("JourneyMap.webserver_and_mapgui_disabled")); //$NON-NLS-1$
+				announcements.add(pos+1, Constants.getString("JourneyMap.webserver_and_mapgui_disabled")); //$NON-NLS-1$
 			}
 			enableAnnounceMod = false; // Only announce mod once per runtime
 		}
