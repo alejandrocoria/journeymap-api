@@ -102,8 +102,14 @@ public class PropertyManager {
 	}
 	
 	public void setProperty(Key key, Object value) {
-		properties.setProperty(key.getProperty(), value.toString());
-		writeToFile();
+		Object old = properties.getProperty(key.getProperty());
+		if(old==null || !old.equals(value)) {
+			properties.setProperty(key.getProperty(), value.toString());
+			writeToFile();
+			JourneyMap.getLogger().info("Property changed: " + key.getProperty());
+		} else {
+			JourneyMap.getLogger().info("Property unchanged: " + key.getProperty());
+		}
 	}
 	
 	public static String getStringProp(Key key) {
