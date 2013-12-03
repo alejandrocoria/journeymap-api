@@ -61,7 +61,7 @@ public class UIManager {
 			JourneyMap.getInstance().announce(error);
 		}
     }
-    
+
     public void openMap() {
     	open(MapOverlay.class);
     }

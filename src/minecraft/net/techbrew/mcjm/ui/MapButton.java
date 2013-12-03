@@ -25,14 +25,14 @@ public class MapButton extends GuiSmallButton {
 		super(id, x, y, width, height, label);
 	}
 	
-	public MapButton(int id, int x, int y, int width, int height, String labelOn, String labelOff, Boolean toggled) {
+	public MapButton(int id, int x, int y, int width, int height, String labelOn, String labelOff, boolean toggled) {
 		super(id, x, y, width, height, toggled ? labelOn : labelOff);
 		this.labelOn = labelOn;
 		this.labelOff = labelOff;
 		this.setToggled(toggled);
 	}	
 	
-	public MapButton(int id, int x, int y, String labelOn, String labelOff, Boolean toggled) {
+	public MapButton(int id, int x, int y, String labelOn, String labelOff, boolean toggled) {
 		super(id, x, y, toggled ? labelOn : labelOff);
 		this.labelOn = labelOn;
 		this.labelOff = labelOff;
