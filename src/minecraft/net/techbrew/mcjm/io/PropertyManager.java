@@ -106,9 +106,9 @@ public class PropertyManager {
 		if(old==null || !old.equals(value)) {
 			properties.setProperty(key.getProperty(), value.toString());
 			writeToFile();
-			JourneyMap.getLogger().info("Property changed: " + key.getProperty());
+			JourneyMap.getLogger().fine("Property changed: " + key.getProperty() + "=" + value);
 		} else {
-			JourneyMap.getLogger().info("Property unchanged: " + key.getProperty());
+			JourneyMap.getLogger().fine("Property unchanged: " + key.getProperty() + "=" + value);
 		}
 	}
 	
@@ -122,6 +122,20 @@ public class PropertyManager {
 	
 	public static Boolean getBooleanProp(Key key) {
 		return getInstance().getBoolean(key);
+	}
+	
+	public static Boolean toggle(Key key) {
+		boolean flip = !getInstance().getBoolean(key);
+		set(key, flip);
+		return flip;
+	}
+	
+	public static void set(Key key, Boolean value) {
+		getInstance().setProperty(key, value);
+	}
+	
+	public static void set(Key key, Integer value) {
+		getInstance().setProperty(key, value);
 	}
 	
 	/**
