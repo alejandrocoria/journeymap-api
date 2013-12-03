@@ -9,6 +9,7 @@ import java.util.Map;
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
+import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.render.texture.TextureImpl;
@@ -20,36 +21,14 @@ import net.techbrew.mcjm.render.texture.TextureImpl;
  *
  */
 public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
-	
-	final int fontHeight = 14;
-	final Color labelBg = Color.darkGray.darker();
-	
-	boolean showAnimals;
-	boolean showPets;
-
-	/**
-	 * Constructor.
-	 * @param startCoords
-	 * @param entityChunkSize
-	 * @param canvasWidth
-	 * @param canvasHeight
-	 */
-	public OverlayRadarRenderer(final boolean showAnimals, final boolean showPets) {
-		super();
-		this.showAnimals = showAnimals;
-		this.showPets = showPets;
-	}
-	
-	public void setShowAnimals(boolean showAnimals) {
-		this.showAnimals = showAnimals;
-	}
-
-	public void setShowPets(boolean showPets) {
-		this.showPets = showPets;
-	}
 
 	@Override
 	public List<DrawStep> prepareSteps(List<Map> critters, GridRenderer grid) {
+		
+		final boolean showAnimals = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_ANIMALS);
+		final boolean showPets = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_PETS);
+		final int fontHeight = 14;
+		final Color labelBg = Color.darkGray.darker();
 		
 		final List<DrawStep> drawStepList = new ArrayList<DrawStep>();
 		
