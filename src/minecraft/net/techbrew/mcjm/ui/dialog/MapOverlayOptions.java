@@ -8,6 +8,8 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.data.PlayerData;
+import net.techbrew.mcjm.feature.Feature;
+import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
@@ -92,32 +94,39 @@ public class MapOverlayOptions extends JmUI {
 				Constants.getString("MapOverlay.show_grid", on),
 				Constants.getString("MapOverlay.show_grid", off),
 				PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		// Check for hardcore
-		if(MapOverlay.state().getHardcore()) {
+				
+		if(!FeatureManager.isAllowed(Feature.MapCaves)) {
 			buttonCaves.setToggled(false);
 			buttonCaves.enabled = false;
-			buttonCaves.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
+			buttonCaves.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
+		}
 			
+		if(!FeatureManager.isAllowed(Feature.RadarMobs)) {
 			buttonMonsters.setToggled(false);
 			buttonMonsters.enabled = false;
-			buttonMonsters.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
+			buttonMonsters.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
+		}
 			
+		if(!FeatureManager.isAllowed(Feature.RadarAnimals)) {
 			buttonAnimals.setToggled(false);
 			buttonAnimals.enabled = false;
-			buttonAnimals.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
-			
-			buttonVillagers.setToggled(false);
-			buttonVillagers.enabled = false;
-			buttonVillagers.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
+			buttonAnimals.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
 			
 			buttonPets.setToggled(false);
 			buttonPets.enabled = false;
-			buttonPets.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
-			
+			buttonPets.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$			
+		}
+		
+		if(!FeatureManager.isAllowed(Feature.RadarVillagers)) {
+			buttonVillagers.setToggled(false);
+			buttonVillagers.enabled = false;
+			buttonVillagers.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
+		}
+
+		if(!FeatureManager.isAllowed(Feature.RadarPlayers)) {
 			buttonPlayers.setToggled(false);
 			buttonPlayers.enabled = false;
-			buttonPlayers.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
+			buttonPlayers.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
 		}
 		
 		buttonList.add(buttonCaves);

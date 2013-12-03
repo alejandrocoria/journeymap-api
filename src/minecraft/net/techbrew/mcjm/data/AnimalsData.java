@@ -9,11 +9,11 @@ import java.util.concurrent.TimeUnit;
 
 import net.minecraft.src.EntityHorse;
 import net.minecraft.src.EntityLiving;
-import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.EntityTameable;
 import net.minecraft.src.IAnimals;
-import net.minecraft.src.Minecraft;
 import net.minecraft.src.StringUtils;
+import net.techbrew.mcjm.feature.Feature;
+import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.model.EntityHelper;
 
 /**
@@ -64,11 +64,12 @@ public class AnimalsData implements IDataProvider {
 		
 		// TODO: override includeNonPets, includePets?
 		
-		Minecraft mc = Minecraft.getMinecraft();
-		EntityPlayerSP player = mc.thePlayer;			
-	   
+		if(!FeatureManager.isAllowed(Feature.RadarAnimals)) {
+			return Collections.emptyMap();
+		}
+		
 		List<IAnimals> animals = EntityHelper.getAnimalsNearby();
-		ArrayList<LinkedHashMap> list = new ArrayList<LinkedHashMap>(animals.size());
+		List<LinkedHashMap> list = new ArrayList<LinkedHashMap>(animals.size());
 		String owner;
 		EntityLiving entity;
 		for(IAnimals animal : animals) {
@@ -104,19 +105,10 @@ public class AnimalsData implements IDataProvider {
 			}
 						
 			list.add(eProps);
-		}
-					
-		// Sort to keep named entities last.  (Why? display on top of others?)
-		Collections.sort(list, new EntityHelper.EntityMapComparator());
-		
-		// Put into map, preserving the order, using entityId as key
-		LinkedHashMap<Object,Map> idMap = new LinkedHashMap<Object,Map>(list.size());
-		for(Map entityMap : list) {
-			idMap.put("id"+entityMap.get(EntityKey.entityId), entityMap);
-		}
+		}					
 		
 		LinkedHashMap props = new LinkedHashMap();
-		props.put(EntityKey.root, idMap);
+		props.put(EntityKey.root, EntityHelper.buildEntityIdMap(list, true));
 		
 		return props;		
 	}	
