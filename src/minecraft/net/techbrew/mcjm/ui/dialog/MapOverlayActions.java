@@ -1,7 +1,6 @@
 package net.techbrew.mcjm.ui.dialog;
 
 import java.awt.Color;
-import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -9,15 +8,13 @@ import java.util.logging.Logger;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.VersionCheck;
-import net.techbrew.mcjm.data.DataCache;
-import net.techbrew.mcjm.data.EntityKey;
-import net.techbrew.mcjm.data.PlayerData;
-import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.MapOverlayState;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
 import net.techbrew.mcjm.task.MapRegionTask;
 import net.techbrew.mcjm.task.SaveMapTask;
@@ -154,23 +151,10 @@ public class MapOverlayActions extends JmUI {
 	}
 	
     void save() {
-		if(mc==null) {
-			mc = Minecraft.getMinecraft();
-		}
-		final File worldDir = FileHandler.getJMWorldDir(mc);
-		final File saveDir = FileHandler.getJourneyMapDir();
-
-		final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
-		Integer vSlice = underground ? mc.thePlayer.chunkCoordY : null;
-		Constants.MapType checkMapType = MapOverlay.mapType;
-		if(underground && MapOverlay.showCaves) {
-			checkMapType = Constants.MapType.underground;
-		}
-		if(checkMapType != Constants.MapType.underground) {
-			vSlice=null;
-		}
-		final Constants.MapType useMapType = checkMapType;
-		final MapSaver mapSaver = new MapSaver(worldDir, useMapType, vSlice , mc.thePlayer.dimension);
+		final MapOverlayState state = MapOverlay.state();
+		final MapType mapType = state.getMapType();
+		final Integer vSlice = state.getMapType()==MapType.underground ? state.getVSlice() : null;
+		final MapSaver mapSaver = new MapSaver(state.getWorldDir(), mapType, vSlice, state.getDimension());
 		if(mapSaver.isValid()) {
 			JourneyMap.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
 			JourneyMap.getInstance().announce(Constants.getString("MapOverlay.save_filename", mapSaver.getSaveFileName())); //$NON-NLS-1$

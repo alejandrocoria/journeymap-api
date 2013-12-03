@@ -2,7 +2,6 @@ package net.techbrew.mcjm.ui;
 
 import java.awt.Color;
 import java.awt.Point;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,7 +14,6 @@ import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiInventory;
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
-import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.VersionCheck;
 import net.techbrew.mcjm.data.AnimalsData;
@@ -26,7 +24,6 @@ import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.data.PlayersData;
 import net.techbrew.mcjm.data.VillagersData;
 import net.techbrew.mcjm.data.WaypointsData;
-import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -55,96 +52,60 @@ import org.lwjgl.opengl.GL11;
  */
 public class MapOverlay extends JmUI {
 
-	// TODO: move to state
-	public static Boolean hardcore = false;
-	public static Constants.MapType mapType;
-	public static Boolean showCaves = true;
-	public static Boolean showMonsters = true;
-	public static Boolean showAnimals = true;
-	public static Boolean showVillagers = true;
-	public static Boolean showPets = true;
-	public static Boolean showPlayers = true;
-	public static Boolean showWaypoints = true;
-	public static Boolean follow = true;
-	public static long lastRefresh = 0;
-	
-	static String playerLastPos = "0,0"; //$NON-NLS-1$
-	static int playerLastDimension = Integer.MIN_VALUE;
-	static GridRenderer gridRenderer;	
-	static OverlayWaypointRenderer waypointRenderer;
-	static OverlayRadarRenderer radarRenderer;
-	static final int minZoom = 0;
-	static final int maxZoom = 5;
-	static int currentZoom = 1;
+	final static MapOverlayState state = new MapOverlayState();
+	final static OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
+	final static OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
+	static GridRenderer gridRenderer;
 	
 	private enum ButtonEnum{Alert,DayNight,Follow,ZoomIn,ZoomOut,Options,Actions,Close};
 	
-	final long refreshInterval = PropertyManager.getIntegerProp(PropertyManager.Key.UPDATETIMER_CHUNKS);
-	Boolean isScrolling = false;
+	final int minZoom = 0;
+	final int maxZoom = 5;
 	
+	Boolean isScrolling = false;
 	int msx, msy, mx, my;	
 
 	Logger logger = JourneyMap.getLogger();
 	MapChat chat;
-	
-	MapOverlayState state = null;
+
 	List<DrawStep> drawStepList = new ArrayList<DrawStep>();
 	
-	MapButton buttonDayNight, buttonFollow,buttonZoomIn,buttonZoomOut;
+	MapButton buttonDayNight, buttonFollow, buttonZoomIn, buttonZoomOut;
 	MapButton buttonAlert, buttonOptions, buttonActions, buttonClose;
 	
 	Color bgColor = new Color(0x22, 0x22, 0x22);
 	Color playerInfoFgColor = new Color(0x8888ff);
 	Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
 	
+	/**
+	 * Default constructor
+	 */
 	public MapOverlay() {
-		super();
 	}
 	
     @Override
 	public void initGui()
-    {	
-		// Set preferences-based values
-		PropertyManager pm = PropertyManager.getInstance();
-		showCaves = pm.getBoolean(PropertyManager.Key.PREF_SHOW_CAVES);
-		showMonsters = pm.getBoolean(PropertyManager.Key.PREF_SHOW_MOBS);
-		showAnimals = pm.getBoolean(PropertyManager.Key.PREF_SHOW_ANIMALS);
-		showVillagers = pm.getBoolean(PropertyManager.Key.PREF_SHOW_VILLAGERS);
-		showPets = pm.getBoolean(PropertyManager.Key.PREF_SHOW_PETS);
-		showPlayers = pm.getBoolean(PropertyManager.Key.PREF_SHOW_PLAYERS);
-		showWaypoints = pm.getBoolean(PropertyManager.Key.PREF_SHOW_WAYPOINTS);
-		
-		// When switching dimensions, reset follow to true
-		if(playerLastDimension!=mc.thePlayer.dimension) {
-			if(gridRenderer!=null) {
-				gridRenderer.clear();
-				gridRenderer = null;
-			}
-			playerLastDimension = mc.thePlayer.dimension;
-			follow = true;
-		}
-		
-    	super.allowUserInput = true;    			
-        Keyboard.enableRepeatEvents(true);
+    {			
+    	super.allowUserInput = true;
+    	Keyboard.enableRepeatEvents(true);
     	initButtons();
+    	
+    	// When switching dimensions, reset grid
+		if(state.getDimension()!=mc.thePlayer.dimension) {
+			if(gridRenderer!=null) gridRenderer.clear();
+		}
+
     	chat = new MapChat(this, "", true);
     }
 
-	private void drawButtonBar() {			
-		// zoom buttons enabled/disabled
-		buttonZoomOut.enabled = currentZoom>minZoom;
-		buttonZoomIn.enabled = currentZoom<maxZoom;				
-	}
-
 	@Override
 	public void drawScreen(int i, int j, float f) {
-		int oldGuiScale = mc.gameSettings.guiScale;
-		mc.gameSettings.guiScale = 2;
+//		int oldGuiScale = mc.gameSettings.guiScale;
+//		mc.gameSettings.guiScale = 2;
 		try {
 			drawBackground(0);
-			drawMap();	
-			drawButtonBar();	
-			super.drawScreen(i, j, f);
+			drawMap();		
+			super.drawScreen(i, j, f); // Buttons
 			drawPlayerInfo();
 			if(chat!=null) chat.drawScreen(i, j, f);
 		} catch(Throwable e) {
@@ -155,7 +116,7 @@ public class MapOverlay extends JmUI {
 			close();
 			
 		} finally {
-			mc.gameSettings.guiScale = oldGuiScale;
+//			mc.gameSettings.guiScale = oldGuiScale;
 		}
 	}
 
@@ -165,13 +126,7 @@ public class MapOverlay extends JmUI {
 		final ButtonEnum id = ButtonEnum.values()[guibutton.id];
     	switch(id) {
 			case DayNight: { // day or night			
-				buttonDayNight.toggle();
-				if(buttonDayNight.getToggled()) {
-					mapType = Constants.MapType.day;
-				} else {
-					mapType = Constants.MapType.night;
-				}
-				refreshState();
+				toggleDayNight();
 				break;
 			}
 	
@@ -210,14 +165,13 @@ public class MapOverlay extends JmUI {
 	public void setWorldAndResolution(Minecraft minecraft, int width, int height) {				
 		super.setWorldAndResolution(minecraft, width, height);	
 		
-		hardcore = WorldData.isHardcoreAndMultiplayer();
-		lastRefresh=0;
+		state.requireRefresh();
 		
 		initButtons();
 		layoutButtons();			
 		
-		if(follow && gridRenderer!=null) {			
-			gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, currentZoom);
+		if(state.follow) {			
+			gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
 		}
 		
 		if(chat!=null) {
@@ -228,8 +182,6 @@ public class MapOverlay extends JmUI {
 		if(gridRenderer!=null) {
 			drawMap();
 		}
-
-		
 	}
 
 	/**
@@ -246,15 +198,19 @@ public class MapOverlay extends JmUI {
 		buttonDayNight = new MapButton(ButtonEnum.DayNight.ordinal(),0,0,80,20,
 				Constants.getString("MapOverlay.day"), //$NON-NLS-1$ 
 				Constants.getString("MapOverlay.night"), //$NON-NLS-1$ 
-				mapType == Constants.MapType.day); 
+				state.getMapType() == Constants.MapType.day); 
 
 		buttonFollow = new MapButton(ButtonEnum.Follow.ordinal(),0,0,80,20,
 				Constants.getString("MapOverlay.follow", on), //$NON-NLS-1$ 
 				Constants.getString("MapOverlay.follow", off), //$NON-NLS-1$ 
-				follow); //$NON-NLS-1$ //$NON-NLS-2$
+				state.follow); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		buttonZoomIn  = new MapButton(ButtonEnum.ZoomIn.ordinal(),0,0,12,12,Constants.getString("MapOverlay.zoom_in"), FileHandler.WEB_DIR + "/img/zoomin.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonZoomOut = new MapButton(ButtonEnum.ZoomOut.ordinal(),0,0,12,12,Constants.getString("MapOverlay.zoom_out"), FileHandler.WEB_DIR + "/img/zoomout.png"); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		buttonZoomOut.enabled = state.currentZoom>minZoom;
+		buttonZoomIn.enabled = state.currentZoom<maxZoom;
+		
 		buttonClose   = new MapButton(ButtonEnum.Close.ordinal(),0,0,60,20,Constants.getString("MapOverlay.close")); //$NON-NLS-1$
 		buttonOptions = new MapButton(ButtonEnum.Options.ordinal(),0,0,60,20, Constants.getString("MapOverlay.options")); //$NON-NLS-1$
 		buttonActions = new MapButton(ButtonEnum.Actions.ordinal(),0,0,60,20, Constants.getString("MapOverlay.actions")); //$NON-NLS-1$
@@ -286,12 +242,9 @@ public class MapOverlay extends JmUI {
 		final int hgap = 3;
 		final int vgap = 3;
 
-		buttonDayNight.setPosition(startX,startY);
-		
+		buttonDayNight.setPosition(startX,startY);		
 		buttonZoomIn.setPosition(smallScale ? 20 : 8, smallScale ? 64 : 32);
-		buttonZoomOut.below(buttonZoomIn, 8).xPosition=buttonZoomIn.xPosition;
-				
-				
+		buttonZoomOut.below(buttonZoomIn, 8).xPosition=buttonZoomIn.xPosition;					
 		
 		if(width>=420) { // across top
 			
@@ -322,7 +275,7 @@ public class MapOverlay extends JmUI {
 		}
 		
 		final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
-		buttonDayNight.enabled = !(underground && showCaves);
+		buttonDayNight.enabled = !(underground && PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_CAVES));
 	
 	}
 
@@ -337,8 +290,7 @@ public class MapOverlay extends JmUI {
 		mx = (Mouse.getEventX() * width) / mc.displayWidth;
 		my = height - (Mouse.getEventY() * height) / mc.displayHeight - 1;
 
-		if(Mouse.getEventButtonState())
-		{
+		if(Mouse.getEventButtonState()) {
 			mouseClicked(mx, my, Mouse.getEventButton());
 		} else {
 			int wheel = Mouse.getEventDWheel();
@@ -382,8 +334,7 @@ public class MapOverlay extends JmUI {
 	}
 
 	@Override
-	protected void mouseMovedOrUp(int mouseX, int mouseY, int which)
-	{
+	protected void mouseMovedOrUp(int mouseX, int mouseY, int which) {
 		super.mouseMovedOrUp(mouseX, mouseY, which);
 		if(Mouse.isButtonDown(0) && !isScrolling) {
 			isScrolling=true;
@@ -392,68 +343,73 @@ public class MapOverlay extends JmUI {
 		} else if(!Mouse.isButtonDown(0) && isScrolling) {
 			isScrolling=false;
 						
-			int blockSize = (int) Math.pow(2,currentZoom);
+			int blockSize = (int) Math.pow(2,state.currentZoom);
 			int mouseDragX = (mx-msx)/blockSize;
 			int mouseDragY = (my-msy)/blockSize;
 			msx=mx;
 			msy=my;
 			
-			gridRenderer.move(-mouseDragX, -mouseDragY);
-			updateGrid();
+			if(gridRenderer!=null) {
+				try {
+					gridRenderer.move(-mouseDragX, -mouseDragY);
+					gridRenderer.updateTextures(state.getMapType(), state.getVSlice());
+					gridRenderer.setZoom(state.currentZoom);
+				} catch(Exception e) {
+					logger.severe("Error moving grid: " + e);
+				}
+			}
 			
-			setFollow(false);
-			
+			setFollow(false);			
 			refreshState();
 		}
 	}
 
 	void zoomIn(){
-		if(currentZoom<maxZoom){
-			setZoom(currentZoom+1);
+		if(state.currentZoom<maxZoom){
+			setZoom(state.currentZoom+1);
 		}
 	}
 	
 	void zoomOut(){
-		if(currentZoom>minZoom){
-			setZoom(currentZoom-1);
+		if(state.currentZoom>minZoom){
+			setZoom(state.currentZoom-1);
 		}
 	}
 
 	private void setZoom(int zoom) {
-		if(zoom>maxZoom || zoom<minZoom || zoom==currentZoom) {
+		if(zoom>maxZoom || zoom<minZoom || zoom==state.currentZoom) {
 			return;
 		}
-		currentZoom = zoom;
+		state.currentZoom = zoom;
+		buttonZoomOut.enabled = state.currentZoom>minZoom;
+		buttonZoomIn.enabled = state.currentZoom<maxZoom;		
+		refreshState();
+	}
+	
+	void toggleDayNight() {
+		buttonDayNight.toggle();
+		if(buttonDayNight.getToggled()) {
+			state.overrideMapType(Constants.MapType.day);
+		} else {
+			state.overrideMapType(Constants.MapType.night);
+		}
 		refreshState();
 	}
 	
 	void toggleFollow() {
-		setFollow(!follow);
+		setFollow(!state.follow);
 	}
 
 	void setFollow(Boolean onPlayer) {		
-		if(follow==onPlayer) {
+		if(state.follow==onPlayer) {
 			return;
 		}
 		buttonFollow.setToggled(onPlayer);
-		follow = onPlayer;
-		if(follow) {
+		state.follow = onPlayer;
+		if(state.follow) {
 			refreshState();
 		} 
 	}
-
-	public static void toggleShowCaves() {	   
-		setShowCaves(!showCaves);
-	}
-	
-	static void setShowCaves(Boolean show) {	   
-		showCaves = show;
-		boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
-		if(underground) {
-			lastRefresh = 0;
-		}
-	}
-
 
 	@Override
 	protected void keyTyped(char c, int i)
@@ -466,19 +422,19 @@ public class MapOverlay extends JmUI {
 		switch(i) {
 			case Keyboard.KEY_ESCAPE : {	
 				UIManager.getInstance().closeAll();
-				break;
+				return;
 			}
 			case Keyboard.KEY_ADD : {
 				zoomIn();
-				break;
+				return;
 			}
 			case Keyboard.KEY_EQUALS : {
 				zoomIn();
-				break;
+				return;
 			}
 			case Keyboard.KEY_MINUS : {
 				zoomOut();
-				break;
+				return;
 			}		
 		}		
 		
@@ -530,24 +486,16 @@ public class MapOverlay extends JmUI {
 	@Override
 	public void updateScreen() {
 		super.updateScreen();
-		
 		if(chat!=null) {
 			chat.updateScreen();
 		}
-		
 		layoutButtons();
 	}
 
 	@Override
 	public void drawBackground(int layer)
 	{
-
 		BaseOverlayRenderer.drawRectangle(0, 0, width, height, bgColor, 255);
-		
-        GL11.glEnable(GL11.GL_BLEND);		
-
-        drawButtonBar();
-
 	}
 
 	void drawPlayerInfo() {
@@ -558,10 +506,10 @@ public class MapOverlay extends JmUI {
 		GL11.glColor4f(1f,1f,1f,1f);
 		GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
 		
-		int labelWidth = mc.fontRenderer.getStringWidth(playerLastPos) + 10;
+		int labelWidth = mc.fontRenderer.getStringWidth(state.playerLastPos) + 10;
 		int halfBg = width/2;
 		
-		BaseOverlayRenderer.drawCenteredLabel(playerLastPos, width/2, height-6, 14, 0, playerInfoBgColor, playerInfoFgColor, 205);
+		BaseOverlayRenderer.drawCenteredLabel(state.playerLastPos, width/2, height-6, 14, 0, playerInfoBgColor, playerInfoFgColor, 205);
 
 	}
 
@@ -574,7 +522,7 @@ public class MapOverlay extends JmUI {
 		
 		if(isScrolling) {
 			
-			int blockSize = (int) Math.pow(2,currentZoom);
+			int blockSize = (int) Math.pow(2,state.currentZoom);
 			int mouseDragX = (mx-msx)/blockSize;
 			int mouseDragY = (my-msy)/blockSize;
 			
@@ -634,33 +582,8 @@ public class MapOverlay extends JmUI {
 			return;
 		}
 		
-		Integer vSlice = player.chunkCoordY;
-
-		// Maptype
-		Constants.MapType effectiveMapType = null;
-		final boolean underground = (Boolean) DataCache.playerDataValue(EntityKey.underground);
-		if(!underground) vSlice=null;
-		if(underground && showCaves && !hardcore) {
-			effectiveMapType = Constants.MapType.underground;
-		} else {
-			if(mapType==null) {
-				final long ticks = (mc.theWorld.getWorldTime() % 24000L);
-				mapType = ticks<13800 ? Constants.MapType.day : Constants.MapType.night;	
-				buttonDayNight.setToggled(mapType.equals(Constants.MapType.day));
-			}
-			effectiveMapType = mapType;
-		}
-		File worldDir = FileHandler.getJMWorldDir(mc);
-		
-		if(state!=null) {
-			if(!state.getWorldDir().equals(worldDir) || state.getDimension()!=playerLastDimension || 
-				effectiveMapType.equals(MapType.underground) && !state.getMapType().equals(MapType.underground)) {
-				setFollow(true);
-			}
-		}
-					
-		// Refresh state
-		state = new MapOverlayState(worldDir, effectiveMapType, vSlice, underground, currentZoom, playerLastDimension);
+		// Update the state first
+		state.refresh(mc, player);
 		
 		// Set/update the grid
 		if(gridRenderer==null || !gridRenderer.isUsing(state.getWorldDir(), state.getDimension())) {
@@ -670,48 +593,35 @@ public class MapOverlay extends JmUI {
 		}			
 		
 		// Center core renderer
-		if(follow) {
+		if(state.follow) {
 			Minecraft mc = Minecraft.getMinecraft();
-			gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, currentZoom);
+			gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
 		} else {
-			gridRenderer.setZoom(currentZoom);
+			gridRenderer.setZoom(state.currentZoom);
 		}
 		gridRenderer.updateTextures(state.getMapType(), state.getVSlice());
 		
-		// Ensure radarRenderer is updated
-		if(radarRenderer==null) {
-			radarRenderer = new OverlayRadarRenderer(showAnimals, showPets);
-		} else {
-			radarRenderer.setShowAnimals(showAnimals);
-			radarRenderer.setShowPets(showPets);
-		}
-		
-		// Ensure waypointRenderer
-		if(waypointRenderer==null) {
-			waypointRenderer = new OverlayWaypointRenderer();
-		}
-				
 		// Build list of drawSteps
 		drawStepList.clear();
-		if(!hardcore) {
+		if(!state.getHardcore()) {
 			List<Map> critters = new ArrayList<Map>(16);
-			
-			if(currentZoom>0) {
-				if(showAnimals || showPets) {
+			PropertyManager pm = PropertyManager.getInstance();
+			if(state.currentZoom>0) {
+				if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_ANIMALS) || pm.getBoolean(PropertyManager.Key.PREF_SHOW_PETS)) {
 					Map map = (Map) DataCache.instance().get(AnimalsData.class).get(EntityKey.root);
 					critters.addAll(map.values());
 				}
-				if(showVillagers) {
+				if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_VILLAGERS)) {
 					Map map = (Map) DataCache.instance().get(VillagersData.class).get(EntityKey.root);
 					critters.addAll(map.values());
 				}
-				if(showMonsters) {
+				if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_MOBS)) {
 					Map map = (Map) DataCache.instance().get(MobsData.class).get(EntityKey.root);
 					critters.addAll(map.values());
 				}
 			}
 			
-			if(showPlayers) {
+			if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_PLAYERS)) {
 				Map map = (Map) DataCache.instance().get(PlayersData.class).get(EntityKey.root);
 				critters.addAll(map.values());
 			}
@@ -723,7 +633,7 @@ public class MapOverlay extends JmUI {
 		}		
 		
 		// Draw waypoints
-		if(showWaypoints && WaypointHelper.waypointsEnabled()) {
+		if(WaypointHelper.waypointsEnabled()) {
 			Map map = (Map) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
 			List<Waypoint> waypoints = new ArrayList<Waypoint>(map.values());
 
@@ -738,7 +648,7 @@ public class MapOverlay extends JmUI {
 		
 		// Update player pos
 		String biomeName = (String) DataCache.instance().get(PlayerData.class).get(EntityKey.biome);			
-		playerLastPos = Constants.getString("MapOverlay.player_location", 
+		state.playerLastPos = Constants.getString("MapOverlay.player_location", 
 				Integer.toString((int) mc.thePlayer.posX), 
 				Integer.toString((int) mc.thePlayer.posZ), 
 				Integer.toString((int) mc.thePlayer.posY), 
@@ -746,23 +656,8 @@ public class MapOverlay extends JmUI {
 				biomeName); //$NON-NLS-1$ 	
 		
 		// Reset timer
-		lastRefresh = System.currentTimeMillis();
-				
+		state.updateLastRefresh();		
 	}
-	
-	void updateGrid() {
-		
-		if(state==null || gridRenderer==null) return;
-
-		try {
-			gridRenderer.updateTextures(state.getMapType(), state.getVSlice());
-			gridRenderer.setZoom(currentZoom);
-		} catch(Exception e) {
-			logger.severe(LogFormatter.toString(e));
-		}
-	}
-
-	
 	
 	void openChat(String defaultText) {
 		if(chat!=null) {			
@@ -791,7 +686,7 @@ public class MapOverlay extends JmUI {
 		if(isScrolling) {
 			return false;
 		} else {
-			return state==null || (System.currentTimeMillis() > (lastRefresh+refreshInterval));
+			return state.shouldRefresh();
 		}
 	}
 
@@ -801,12 +696,12 @@ public class MapOverlay extends JmUI {
 		refreshState();
 	}	
 	
+	public static synchronized MapOverlayState state() {
+		return state;
+	}
+	
 	public static void reset() {
-		mapType = null;
-		follow = true;
-		currentZoom = 1;
-		playerLastPos = "0,0"; //$NON-NLS-1$
-		playerLastDimension = Integer.MIN_VALUE;
+		state.requireRefresh();
 		if(gridRenderer!=null) {
 			gridRenderer.clear();
 			gridRenderer = null;

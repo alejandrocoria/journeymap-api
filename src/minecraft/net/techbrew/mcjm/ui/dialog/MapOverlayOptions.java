@@ -5,6 +5,9 @@ import java.awt.Color;
 import net.minecraft.src.GuiButton;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.data.DataCache;
+import net.techbrew.mcjm.data.EntityKey;
+import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
@@ -43,39 +46,39 @@ public class MapOverlayOptions extends JmUI {
    		buttonCaves = new MapButton(ButtonEnum.Caves.ordinal(),0,0,
    				Constants.getString("MapOverlay.show_caves", on),
    				Constants.getString("MapOverlay.show_caves", off),
-   				MapOverlay.showCaves); //$NON-NLS-1$ 
+   				PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_CAVES)); //$NON-NLS-1$ 
    		
 		buttonClose = new MapButton(ButtonEnum.Close.ordinal(),0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$ 
 				
 		buttonMonsters = new MapButton(ButtonEnum.Monsters.ordinal(),0,0,
 				Constants.getString("MapOverlay.show_monsters", on),
 				Constants.getString("MapOverlay.show_monsters", off),
-				MapOverlay.showMonsters); //$NON-NLS-1$  //$NON-NLS-2$
+				PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_MOBS)); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		buttonAnimals = new MapButton(ButtonEnum.Animals.ordinal(),0,0,
 				Constants.getString("MapOverlay.show_animals", on),
 				Constants.getString("MapOverlay.show_animals", off),
-				MapOverlay.showAnimals); //$NON-NLS-1$  //$NON-NLS-2$
+				PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_ANIMALS)); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		buttonVillagers = new MapButton(ButtonEnum.Villagers.ordinal(),0,0,
 				Constants.getString("MapOverlay.show_villagers", on),
 				Constants.getString("MapOverlay.show_villagers", off),
-				MapOverlay.showVillagers); //$NON-NLS-1$  //$NON-NLS-2$
+				PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_VILLAGERS)); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		buttonPets = new MapButton(ButtonEnum.Pets.ordinal(),0,0,
 				Constants.getString("MapOverlay.show_pets", on),
 				Constants.getString("MapOverlay.show_pets", off),
-				MapOverlay.showPets); //$NON-NLS-1$  //$NON-NLS-2$
+				PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_PETS)); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		buttonPlayers = new MapButton(ButtonEnum.Players.ordinal(),0,0,
 				Constants.getString("MapOverlay.show_players", on),
 				Constants.getString("MapOverlay.show_players", off),
-				MapOverlay.showPlayers); //$NON-NLS-1$  //$NON-NLS-2$
+				PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_PLAYERS)); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		buttonWaypoints = new MapButton(ButtonEnum.Waypoints.ordinal(),0,0,
 				Constants.getString("MapOverlay.show_waypoints", on),
 				Constants.getString("MapOverlay.show_waypoints", off),
-				MapOverlay.showWaypoints); //$NON-NLS-1$  //$NON-NLS-2$
+				PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_WAYPOINTS)); //$NON-NLS-1$  //$NON-NLS-2$
 		buttonWaypoints.enabled = WaypointHelper.waypointsEnabled();
 		
 		boolean webserverOn = PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
@@ -91,7 +94,7 @@ public class MapOverlayOptions extends JmUI {
 				PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// Check for hardcore
-		if(MapOverlay.hardcore) {
+		if(MapOverlay.state().getHardcore()) {
 			buttonCaves.setToggled(false);
 			buttonCaves.enabled = false;
 			buttonCaves.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
@@ -173,10 +176,12 @@ public class MapOverlayOptions extends JmUI {
     	
     	final ButtonEnum id = ButtonEnum.values()[guibutton.id];
     	switch(id) {
-			case Caves: { // caves
-				MapOverlay.toggleShowCaves();				
-				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_CAVES, MapOverlay.showCaves);
-				buttonCaves.setToggled(MapOverlay.showCaves);
+			case Caves: { // caves				
+				buttonCaves.setToggled(PropertyManager.toggle(PropertyManager.Key.PREF_SHOW_CAVES));
+				boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
+				if(underground) {
+					MapOverlay.state().requireRefresh();
+				}
 				break;
 			}
 			case Close: {
@@ -184,52 +189,37 @@ public class MapOverlayOptions extends JmUI {
 				break;
 			}
 			case Monsters: { 
-				MapOverlay.showMonsters = !MapOverlay.showMonsters;
-				buttonMonsters.setToggled(MapOverlay.showMonsters);
-				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_MOBS, MapOverlay.showMonsters);
+				buttonMonsters.setToggled(PropertyManager.toggle(PropertyManager.Key.PREF_SHOW_MOBS));
 				break;
 			}
 			case Animals: { 
-				MapOverlay.showAnimals = !MapOverlay.showAnimals;
-				buttonAnimals.setToggled(MapOverlay.showAnimals);
-				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_ANIMALS, MapOverlay.showAnimals);
+				buttonAnimals.setToggled(PropertyManager.toggle(PropertyManager.Key.PREF_SHOW_ANIMALS));
 				break;
 			}
 			case Villagers: { 
-				MapOverlay.showVillagers = !MapOverlay.showVillagers;
-				buttonVillagers.setToggled(MapOverlay.showVillagers);
-				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_VILLAGERS, MapOverlay.showVillagers);
+				buttonVillagers.setToggled(PropertyManager.toggle(PropertyManager.Key.PREF_SHOW_VILLAGERS));
 				break;
 			}
 			case Pets: {
-				MapOverlay.showPets = !MapOverlay.showPets;
-				buttonPets.setToggled(MapOverlay.showPets);
-				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_PETS, MapOverlay.showPets);
+				buttonPets.setToggled(PropertyManager.toggle(PropertyManager.Key.PREF_SHOW_PETS));
 				break;
 			}
 			case Players: { 
-				MapOverlay.showPlayers = !MapOverlay.showPlayers;
-				buttonPlayers.setToggled(MapOverlay.showPlayers);
-				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_PLAYERS, MapOverlay.showPlayers);
+				buttonPlayers.setToggled(PropertyManager.toggle(PropertyManager.Key.PREF_SHOW_PLAYERS));
 				break;
 			}
 			case Waypoints: { 
-				MapOverlay.showWaypoints = !MapOverlay.showWaypoints;
-				buttonWaypoints.setToggled(MapOverlay.showWaypoints);
-				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_WAYPOINTS, MapOverlay.showWaypoints);
+				buttonWaypoints.setToggled(PropertyManager.toggle(PropertyManager.Key.PREF_SHOW_WAYPOINTS));
 				break;
 			}
 			case Grid: { 
-				boolean showGrid = !PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID);
-				buttonGrid.setToggled(showGrid);
-				PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_GRID, showGrid);
-				MapOverlay.lastRefresh = 0;
+				buttonGrid.setToggled(PropertyManager.toggle(PropertyManager.Key.PREF_SHOW_GRID));
+				MapOverlay.state().requireRefresh();
 				break;
 			}
 			case Webserver: { 
-				boolean enableWebserver = !PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
-				buttonWebserver.setToggled(enableWebserver);
-				JourneyMap.getInstance().toggleWebserver(enableWebserver, true);
+				buttonWebserver.setToggled(PropertyManager.toggle(PropertyManager.Key.WEBSERVER_ENABLED));
+				JourneyMap.getInstance().toggleWebserver(buttonWebserver.getToggled(), true);
 				break;
 			}
 
