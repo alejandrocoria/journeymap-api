@@ -17,12 +17,12 @@ public class mod_JourneyMap extends BaseMod {
 	@Override
 	public String getName()
     { 
-        return "JourneyMap"; //$NON-NLS-1$
+        return JourneyMap.SHORT_MOD_NAME; //$NON-NLS-1$
     }
 	
 	@Override
 	public String getVersion() {
-		return JourneyMap.MOD_NAME;
+		return JourneyMap.EDITION;
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class mod_JourneyMap extends BaseMod {
 	{				
 		String modName = getName();
 		try {
-			modName += (" " + getVersion() + " for Minecraft " + JourneyMap.MC_VERSION);
+			modName = JourneyMap.MOD_NAME + " for Minecraft " + JourneyMap.MC_VERSION;
 			JourneyMap instance = JourneyMap.getInstance();			
 			instance.initialize(Minecraft.getMinecraft());
 			

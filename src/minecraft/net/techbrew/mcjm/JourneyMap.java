@@ -55,7 +55,10 @@ public class JourneyMap {
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
 	public static final String JM_VERSION = "3.1.0b1"; //$NON-NLS-1$
 	public static final String MC_VERSION = "1.6.4"; //$NON-NLS-1$
-	public static final String MOD_NAME = getModName();
+	
+	public static final String EDITION = getEdition();
+	public static final String SHORT_MOD_NAME = "JourneyMap";
+	public static final String MOD_NAME = SHORT_MOD_NAME + " " + EDITION;
 	
 	private static class Holder {
         private static final JourneyMap INSTANCE = new JourneyMap();
@@ -104,14 +107,15 @@ public class JourneyMap {
     	logger = new JMLogger();
 	}
 	
-	private static String getModName() {
-		String name = "JourneyMap " + JM_VERSION;
+	private static String getEdition() {
+		String ed = null;
 		try {
-			name += (" " + FeatureManager.getFeatureSetName());
+			ed = JM_VERSION + " " + FeatureManager.getFeatureSetName();
 		} catch(Throwable t) {
+			ed = JM_VERSION + " ?";
 			t.printStackTrace(System.err);
 		}
-		return name;
+		return ed;
 	}
 	
     public Boolean isInitialized() {
