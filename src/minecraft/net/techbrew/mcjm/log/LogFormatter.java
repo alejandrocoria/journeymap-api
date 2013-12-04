@@ -9,7 +9,7 @@ import java.util.logging.LogRecord;
 
 public class LogFormatter extends Formatter {
 	 
-	private static final MessageFormat messageFormat = new MessageFormat("{0,time,hh:mm:ss} {1} [{2}]: {3}.{4}() {5}\n"); //$NON-NLS-1$
+	private static final MessageFormat messageFormat = new MessageFormat("{0,time,hh:mm:ss} {1} [{2}] [{3}.{4}] {5}\n"); //$NON-NLS-1$
 	private static final String MINECRAFT_THREADNAME = "Minecraft main thread";
 	
 	public LogFormatter() {
@@ -18,9 +18,10 @@ public class LogFormatter extends Formatter {
 	
 	@Override
 	public String format(LogRecord record) {		
-		String className = record.getSourceClassName();
-		className = className.substring(className.lastIndexOf('.')+1);
-		String threadName = Thread.currentThread().getName();
+		final String className = record.getSourceClassName();
+		final String shortClassName = className.substring(className.lastIndexOf('.')+1);
+		final Thread thread = Thread.currentThread();
+		String threadName = thread.getName();
 		if(MINECRAFT_THREADNAME.equals(threadName)) {
 			threadName = "MC";
 		}
@@ -30,7 +31,7 @@ public class LogFormatter extends Formatter {
 		arguments[i++] = new Date(record.getMillis());
 		arguments[i++] = record.getLevel();
 		arguments[i++] = threadName;
-		arguments[i++] = className;
+		arguments[i++] = shortClassName;
 		arguments[i++] = record.getSourceMethodName();
 		arguments[i++] = record.getMessage();
 		return messageFormat.format(arguments);
