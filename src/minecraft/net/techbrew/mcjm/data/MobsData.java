@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import net.minecraft.src.Entity;
 import net.minecraft.src.EntityGhast;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityMob;
@@ -54,28 +55,32 @@ public class MobsData implements IDataProvider {
 		List mobs = EntityHelper.getMobsNearby();
 		ArrayList<LinkedHashMap> list = new ArrayList<LinkedHashMap>(mobs.size());
 		for(Object mob : mobs) {
-			EntityLiving entity = (EntityLiving) mob;
-			LinkedHashMap eProps = new LinkedHashMap();
-			eProps.put(EntityKey.entityId, entity.entityId); 
-			eProps.put(EntityKey.filename, EntityHelper.getFileName(entity)); 
-			if(mob instanceof EntityMob || mob instanceof IBossDisplayData || mob instanceof IRangedAttackMob || mob instanceof EntityGhast) {
-				eProps.put(EntityKey.hostile, true); 
-			} else {
-				eProps.put(EntityKey.hostile, false); 
+			if(mob instanceof Entity) {
+				Entity entity = (Entity) mob;
+				LinkedHashMap eProps = new LinkedHashMap();
+				eProps.put(EntityKey.entityId, entity.entityId); 
+				eProps.put(EntityKey.filename, EntityHelper.getFileName(entity)); 
+				if(mob instanceof EntityMob || mob instanceof IBossDisplayData || mob instanceof IRangedAttackMob || mob instanceof EntityGhast) {
+					eProps.put(EntityKey.hostile, true); 
+				} else {
+					eProps.put(EntityKey.hostile, false); 
+				}
+				
+				eProps.put(EntityKey.posX, (int) Math.floor(entity.posX)); 
+				eProps.put(EntityKey.posZ, (int) Math.floor(entity.posZ)); 
+				eProps.put(EntityKey.chunkCoordX, entity.chunkCoordX); 
+				eProps.put(EntityKey.chunkCoordZ, entity.chunkCoordZ); 
+				eProps.put(EntityKey.heading, EntityHelper.getHeading(entity));
+				
+				// CustomName
+				if(entity instanceof EntityLiving) {
+					if(((EntityLiving)entity).hasCustomNameTag()) {
+						eProps.put(EntityKey.customName, StringUtils.stripControlCodes(((EntityLiving)entity).getCustomNameTag())); 
+					}
+				}
+				
+				list.add(eProps);
 			}
-			
-			eProps.put(EntityKey.posX, (int) Math.floor(entity.posX)); 
-			eProps.put(EntityKey.posZ, (int) Math.floor(entity.posZ)); 
-			eProps.put(EntityKey.chunkCoordX, entity.chunkCoordX); 
-			eProps.put(EntityKey.chunkCoordZ, entity.chunkCoordZ); 
-			eProps.put(EntityKey.heading, EntityHelper.getHeading(entity));
-			
-			// CustomName
-			if(entity.hasCustomNameTag()) {
-				eProps.put(EntityKey.customName, StringUtils.stripControlCodes(entity.getCustomNameTag())); 
-			}
-			
-			list.add(eProps);
 		}
 		
 		LinkedHashMap props = new LinkedHashMap();
