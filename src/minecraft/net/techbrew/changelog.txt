@@ -1,4 +1,4 @@
-JourneyMap 3.0.0 for Minecraft 1.6.4 (November 29, 2013)
+JourneyMap 3.1.0b1 for Minecraft 1.6.4 (December 4, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -10,6 +10,16 @@ Requirements:
 
 - Minecraft 1.6.4
 - Forge "Recommended-1.6.4" or ModLoader 1.6.4
+
+Changes in JourneyMap 3.1.0b1 for Minecraft 1.6.4:
+- JourneyMap now comes in two editions: FairPlay and Unlimited.  
+-- FairPlay Edition disables Radar and Cave mapping when in Multi-Player.
+-- Unlimited Edition has all features enabled for Single- and Multi-Player.
+- (T7M-D6N-JS1X) Bugfix : Non-entity mobs from other mods can trigger a crash
+- Bugfix for chunks that wouldn't map because blocks were at the maximum world height.
+- Added button to start/stop webserver from the in-game Options menu.
+- Minor aesthetic changes to in-game Options and Actions menus. 
+- Error handling improvements in Web UI
 
 Changes in JourneyMap 3.0.0 for Minecraft 1.6.4:
 - In-game UI and Web UI completely re-written to be much faster, zoom out further, and have no texture distortions.
