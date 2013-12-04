@@ -19,6 +19,7 @@ import net.minecraft.src.KeyBinding;
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
+import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.io.nbt.ChunkLoader;
@@ -54,6 +55,7 @@ public class JourneyMap {
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
 	public static final String JM_VERSION = "3.0.0"; //$NON-NLS-1$
 	public static final String MC_VERSION = "1.6.4"; //$NON-NLS-1$
+	public static final String MOD_NAME = getModName();
 	
 	private static class Holder {
         private static final JourneyMap INSTANCE = new JourneyMap();
@@ -62,11 +64,12 @@ public class JourneyMap {
     public static JourneyMap getInstance() {
         return Holder.INSTANCE;
     }
+    
+    private static JMLogger logger;
 
 	private volatile Boolean initialized = false;
 	
-	private final Boolean modAnnounced = false;
-	private JMLogger logger;
+	private final Boolean modAnnounced = false;	
 	private JMServer jmServer;
 	
 	private boolean threadLogging = false;
@@ -98,7 +101,17 @@ public class JourneyMap {
 	 * Constructor.
 	 */
 	public JourneyMap() {
-		
+    	logger = new JMLogger();
+	}
+	
+	private static String getModName() {
+		String name = "JourneyMap " + JM_VERSION;
+		try {
+			name += (" " + FeatureManager.getFeatureSetName());
+		} catch(Throwable t) {
+			t.printStackTrace(System.err);
+		}
+		return name;
 	}
 	
     public Boolean isInitialized() {
@@ -129,7 +142,7 @@ public class JourneyMap {
 		final PropertyManager pm = PropertyManager.getInstance();
 		
 		// Start logFile
-		logger.info("JourneyMap v" + JM_VERSION + " starting " + new Date()); //$NON-NLS-1$ //$NON-NLS-2$
+		logger.info(MOD_NAME + " starting " + new Date()); //$NON-NLS-1$ //$NON-NLS-2$
 		logger.environment();
 		logger.info("Properties: " + pm.toString()); //$NON-NLS-1$
 
@@ -374,7 +387,7 @@ public class JourneyMap {
 		int pos = forced ? Math.max(0,announcements.size()-1) : 0;
 		
 		if(enableAnnounceMod) {
-			announcements.add(pos, Constants.getString("JourneyMap.ready", JM_VERSION)); //$NON-NLS-1$ 
+			announcements.add(pos, Constants.getString("JourneyMap.ready", MOD_NAME)); //$NON-NLS-1$ 
 			if(enableWebserver && enableMapGui) {
 				String keyName = Keyboard.getKeyName(uiKeybinding.keyCode);
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -434,12 +447,7 @@ public class JourneyMap {
 	 * @return
 	 */
 	public static Logger getLogger() {
-		
-		JourneyMap instance = getInstance();
-		if(instance.logger==null) {
-			instance.logger = new JMLogger();				
-		}
-		return instance.logger;
+		return Holder.INSTANCE.logger;
 	}
 
 	/**

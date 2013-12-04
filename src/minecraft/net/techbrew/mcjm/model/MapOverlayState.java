@@ -8,7 +8,8 @@ import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.EntityKey;
-import net.techbrew.mcjm.data.WorldData;
+import net.techbrew.mcjm.feature.Feature;
+import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 
@@ -22,15 +23,14 @@ public class MapOverlayState {
 	public int currentZoom;
 	public String playerLastPos = "0,0"; //$NON-NLS-1$
 	
-
 	// These must be internally managed
-	private boolean hardcore = true;
 	private Constants.MapType overrideMapType;
 	private File worldDir = null;
 	private long lastRefresh = 0;
 	private Integer vSlice = null;
 	private boolean underground = false;
 	private int dimension = Integer.MIN_VALUE;
+	private boolean caveMappingAllowed = false;
 	
 	/**
 	 * Default constructor
@@ -48,7 +48,7 @@ public class MapOverlayState {
 		final int lastDimension = this.currentZoom;
 		final File lastWorldDir = this.worldDir;
 				
-		this.hardcore = WorldData.isHardcoreAndMultiplayer();
+		this.caveMappingAllowed = FeatureManager.isAllowed(Feature.MapCaves);
 		this.dimension = player.dimension;
 		this.underground = (Boolean) DataCache.playerDataValue(EntityKey.underground);
 		this.vSlice = this.underground ? player.chunkCoordY : null;
@@ -70,7 +70,7 @@ public class MapOverlayState {
 	}
 	
 	public MapType getMapType() {
-		if(underground && PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_CAVES) && !hardcore) {
+		if(underground && caveMappingAllowed && PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_CAVES)) {
 			return MapType.underground;
 		} else if(overrideMapType!=null) {
 			return overrideMapType;			
@@ -88,10 +88,6 @@ public class MapOverlayState {
 		return underground;
 	}
 	
-	public Boolean getHardcore() {
-		return hardcore;
-	}
-
 	public int getDimension() {
 		return dimension;
 	}

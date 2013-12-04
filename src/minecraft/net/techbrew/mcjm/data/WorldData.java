@@ -15,6 +15,7 @@ import net.minecraft.src.Minecraft;
 import net.minecraft.src.NetClientHandler;
 import net.minecraft.src.WorldInfo;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.feature.FeatureManager;
 
 /**
  * Provides game-related properties in a Map.
@@ -34,6 +35,7 @@ public class WorldData implements IDataProvider {
 //		totalTime,
 		hardcore,
 		singlePlayer,
+		features,
 //		worldType,
 //		gameType
 	}
@@ -65,15 +67,13 @@ public class WorldData implements IDataProvider {
 		WorldInfo worldInfo = mc.theWorld.getWorldInfo();
 
 		LinkedHashMap props = new LinkedHashMap();
-		// props.put(Key.dirName, getWorldDirName(mc));
+
 		props.put(Key.name, getWorldName(mc)); 
 		props.put(Key.dimension, mc.theWorld.provider.dimensionId); 
 		props.put(Key.hardcore,  worldInfo.isHardcoreModeEnabled());
 		props.put(Key.singlePlayer, mc.isSingleplayer()); 
 		props.put(Key.time, mc.theWorld.getWorldTime() % 24000L);
-//		props.put(Key.totalTime, mc.theWorld.getTotalWorldTime());
-//		props.put(Key.gameType, worldInfo.getGameType().toString());
-//		props.put(Key.worldType, worldInfo.getTerrainType().getWorldTypeName());
+		props.put(Key.features, FeatureManager.getAllowedFeatures());
 
 		return props;		
 	}

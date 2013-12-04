@@ -78,10 +78,10 @@ public class AutoMapConfirmation extends JmUI {
     	final int y = this.height / 4;
     	final int vgap = 3;
     	
-        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.automap_dialog"), x, y, 16777215);
-        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.automap_dialog_text"), x, y + 30, 16777215);
+        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.automap_dialog"), x, y - 18, 16777215);
+        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.automap_dialog_text"), x, y, 16777215);
     	
-    	buttonAll.centerHorizontalOn(x).yPosition=y+60;
+    	buttonAll.centerHorizontalOn(x).yPosition=y+18;
     	buttonMissing.centerHorizontalOn(x).below(buttonAll, vgap);
     	buttonNone.centerHorizontalOn(x).below(buttonMissing, vgap);
     	buttonClose.centerHorizontalOn(x).below(buttonNone, vgap*2);

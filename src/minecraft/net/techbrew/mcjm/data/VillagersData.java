@@ -1,15 +1,16 @@
 package net.techbrew.mcjm.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.EntityVillager;
-import net.minecraft.src.Minecraft;
 import net.minecraft.src.StringUtils;
+import net.techbrew.mcjm.feature.Feature;
+import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.model.EntityHelper;
 
 /**
@@ -43,9 +44,10 @@ public class VillagersData implements IDataProvider {
 	@Override
 	public Map getMap(Map optionalParams) {		
 		
-		Minecraft mc = Minecraft.getMinecraft();
-		EntityClientPlayerMP player = mc.thePlayer;			
-	   
+		if(!FeatureManager.isAllowed(Feature.RadarVillagers)) {
+			return Collections.emptyMap();
+		}
+		
 		List<EntityVillager> villagers = EntityHelper.getVillagersNearby();
 		ArrayList<LinkedHashMap> list = new ArrayList<LinkedHashMap>(villagers.size());
 		
@@ -69,14 +71,8 @@ public class VillagersData implements IDataProvider {
 			list.add(eProps);
 		}
 		
-		// Put into map, preserving the order, using entityId as key
-		LinkedHashMap<Object,Map> idMap = new LinkedHashMap<Object,Map>(list.size());
-		for(Map entityMap : list) {
-			idMap.put("id"+entityMap.get(EntityKey.entityId), entityMap);
-		}
-		
 		LinkedHashMap props = new LinkedHashMap();
-		props.put(EntityKey.root, idMap);
+		props.put(EntityKey.root, EntityHelper.buildEntityIdMap(list, true));
 		
 		return props;		
 	}	

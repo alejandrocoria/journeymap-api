@@ -24,6 +24,8 @@ import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.data.PlayersData;
 import net.techbrew.mcjm.data.VillagersData;
 import net.techbrew.mcjm.data.WaypointsData;
+import net.techbrew.mcjm.feature.Feature;
+import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -603,34 +605,42 @@ public class MapOverlay extends JmUI {
 		
 		// Build list of drawSteps
 		drawStepList.clear();
-		if(!state.getHardcore()) {
-			List<Map> critters = new ArrayList<Map>(16);
-			PropertyManager pm = PropertyManager.getInstance();
-			if(state.currentZoom>0) {
+		
+		List<Map> entities = new ArrayList<Map>(16);
+		PropertyManager pm = PropertyManager.getInstance();
+		if(state.currentZoom>0) {
+			if(FeatureManager.isAllowed(Feature.RadarAnimals)) {
 				if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_ANIMALS) || pm.getBoolean(PropertyManager.Key.PREF_SHOW_PETS)) {
 					Map map = (Map) DataCache.instance().get(AnimalsData.class).get(EntityKey.root);
-					critters.addAll(map.values());
+					entities.addAll(map.values());
 				}
+			}
+			if(FeatureManager.isAllowed(Feature.RadarVillagers)) {
 				if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_VILLAGERS)) {
 					Map map = (Map) DataCache.instance().get(VillagersData.class).get(EntityKey.root);
-					critters.addAll(map.values());
+					entities.addAll(map.values());
 				}
+			}
+			if(FeatureManager.isAllowed(Feature.RadarMobs)) {
 				if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_MOBS)) {
 					Map map = (Map) DataCache.instance().get(MobsData.class).get(EntityKey.root);
-					critters.addAll(map.values());
+					entities.addAll(map.values());
 				}
 			}
-			
+		}
+		
+		if(FeatureManager.isAllowed(Feature.RadarPlayers)) {
 			if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_PLAYERS)) {
 				Map map = (Map) DataCache.instance().get(PlayersData.class).get(EntityKey.root);
-				critters.addAll(map.values());
+				entities.addAll(map.values());
 			}
-			
-			// Sort to keep named entities last
-			Collections.sort(critters, new EntityHelper.EntityMapComparator());
-			
-			drawStepList.addAll(radarRenderer.prepareSteps(critters, gridRenderer));
-		}		
+		}
+		
+		// Sort to keep named entities last
+		if(!entities.isEmpty()) {
+			Collections.sort(entities, new EntityHelper.EntityMapComparator());		
+			drawStepList.addAll(radarRenderer.prepareSteps(entities, gridRenderer));
+		}
 		
 		// Draw waypoints
 		if(WaypointHelper.waypointsEnabled()) {

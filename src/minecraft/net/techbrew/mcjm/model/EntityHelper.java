@@ -1,7 +1,9 @@
 package net.techbrew.mcjm.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -93,11 +95,6 @@ public class EntityHelper {
 		return AxisAlignedBB.getBoundingBox(player.posX, player.posY, player.posZ, player.posX, player.posY, player.posZ).expand(lateralDistance, verticalDistance, lateralDistance);
 	}
 
-
-	
-	
-	
-	
 	/**
 	 * Get the entity's heading in degrees
 	 * 
@@ -122,6 +119,27 @@ public class EntityHelper {
 	public static double getHeading(float rotationYaw) {
 		double degrees = Math.round(rotationYaw % 360);
 	    return degrees;
+	}
+	
+	/**
+	 * Put entities into map, preserving the order, using entityId as key
+	 * @param list
+	 * @return
+	 */
+	public static Map<Object,Map> buildEntityIdMap(List<LinkedHashMap> list, boolean sort) {
+		
+		if(list==null || list.isEmpty()) return Collections.emptyMap();
+		
+		// Sort to keep named entities last.  (Why? display on top of others?)
+		if(sort) {
+			Collections.sort(list, new EntityHelper.EntityMapComparator());
+		}
+
+		LinkedHashMap<Object,Map> idMap = new LinkedHashMap<Object,Map>(list.size());
+		for(Map entityMap : list) {
+			idMap.put("id"+entityMap.get(EntityKey.entityId), entityMap);
+		}
+		return idMap;
 	}
 	
 	

@@ -8,16 +8,16 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.data.PlayerData;
+import net.techbrew.mcjm.feature.Feature;
+import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.WaypointHelper;
-import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
 import net.techbrew.mcjm.ui.JmUI;
 import net.techbrew.mcjm.ui.MapButton;
 import net.techbrew.mcjm.ui.MapOverlay;
 import net.techbrew.mcjm.ui.UIManager;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
 
 public class MapOverlayOptions extends JmUI {
 	
@@ -27,10 +27,9 @@ public class MapOverlayOptions extends JmUI {
 	
 	private enum ButtonEnum {Caves,Monsters,Animals,Villagers,Pets,Players,Waypoints,Grid,Webserver,Close};	
 	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid, buttonWebserver, buttonClose;
-	Color titleColor = new Color(0,0,100);
 	
 	public MapOverlayOptions() {
-		title = Constants.getString("MapOverlay.options_title", JourneyMap.JM_VERSION);
+		title = Constants.getString("MapOverlay.options");
 	}
 
 	/**
@@ -92,32 +91,39 @@ public class MapOverlayOptions extends JmUI {
 				Constants.getString("MapOverlay.show_grid", on),
 				Constants.getString("MapOverlay.show_grid", off),
 				PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		// Check for hardcore
-		if(MapOverlay.state().getHardcore()) {
+				
+		if(!FeatureManager.isAllowed(Feature.MapCaves)) {
 			buttonCaves.setToggled(false);
 			buttonCaves.enabled = false;
-			buttonCaves.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
+			buttonCaves.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
+		}
 			
+		if(!FeatureManager.isAllowed(Feature.RadarMobs)) {
 			buttonMonsters.setToggled(false);
 			buttonMonsters.enabled = false;
-			buttonMonsters.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
+			buttonMonsters.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
+		}
 			
+		if(!FeatureManager.isAllowed(Feature.RadarAnimals)) {
 			buttonAnimals.setToggled(false);
 			buttonAnimals.enabled = false;
-			buttonAnimals.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
-			
-			buttonVillagers.setToggled(false);
-			buttonVillagers.enabled = false;
-			buttonVillagers.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
+			buttonAnimals.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
 			
 			buttonPets.setToggled(false);
 			buttonPets.enabled = false;
-			buttonPets.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
-			
+			buttonPets.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$			
+		}
+		
+		if(!FeatureManager.isAllowed(Feature.RadarVillagers)) {
+			buttonVillagers.setToggled(false);
+			buttonVillagers.enabled = false;
+			buttonVillagers.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
+		}
+
+		if(!FeatureManager.isAllowed(Feature.RadarPlayers)) {
 			buttonPlayers.setToggled(false);
 			buttonPlayers.enabled = false;
-			buttonPlayers.setHoverText(Constants.getString("MapOverlay.disabled_in_hardcore")); //$NON-NLS-1$
+			buttonPlayers.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
 		}
 		
 		buttonList.add(buttonCaves);
@@ -243,9 +249,9 @@ public class MapOverlayOptions extends JmUI {
         layoutButtons();
         
         super.drawScreen(par1, par2, par3);
-
-        drawTitle();
         
+        int y = this.height / 4 - 18;
+        drawCenteredString(this.fontRenderer, title , this.width / 2, y, 16777215);
     }
     
     @Override
@@ -255,17 +261,6 @@ public class MapOverlayOptions extends JmUI {
     	MapOverlay.drawMapBackground(this);
     	super.drawDefaultBackground();
 	}
-    
-    private void drawTitle() {
-    	int labelWidth = mc.fontRenderer.getStringWidth(title) + 10;
-		int halfBg = width/2;
-		
-		int by = (this.height / 4);
-		
-		GL11.glEnable(GL11.GL_BLEND);
-		BaseOverlayRenderer.drawRectangle(halfBg - (labelWidth/2), by-20, labelWidth, 12, titleColor, 255);
-		drawCenteredString(this.fontRenderer, title , this.width / 2, by-18, 16777215);
-    }
     
     @Override
 	protected void keyTyped(char c, int i)

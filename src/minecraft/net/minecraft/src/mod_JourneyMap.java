@@ -22,16 +22,16 @@ public class mod_JourneyMap extends BaseMod {
 	
 	@Override
 	public String getVersion() {
-		return JourneyMap.JM_VERSION;
+		return JourneyMap.MOD_NAME;
 	}
 
 	@Override
 	public void load() 
 	{				
-		String version = "?";
+		String modName = getName();
 		try {
-			version = JourneyMap.JM_VERSION + " for Minecraft " + JourneyMap.MC_VERSION;
-			JourneyMap instance = JourneyMap.getInstance();
+			modName += (" " + getVersion() + " for Minecraft " + JourneyMap.MC_VERSION);
+			JourneyMap instance = JourneyMap.getInstance();			
 			instance.initialize(Minecraft.getMinecraft());
 			
 			// Register hooks
@@ -45,7 +45,9 @@ public class mod_JourneyMap extends BaseMod {
 			
 			loadSuccess = true;
 		} catch(Throwable t) {
-			throw new RuntimeException("Could not load JourneyMap " + version + ". Ensure compatible Minecraft/Modloader/Forge versions.", t);
+			loadSuccess = false;
+			System.err.println("Error loading " + modName + ". Ensure compatible Minecraft/Modloader/Forge versions.");
+			t.printStackTrace(System.err);
 		}
 	}
 	

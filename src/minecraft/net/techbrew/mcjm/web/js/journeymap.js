@@ -11,9 +11,8 @@ var JourneyMap = (function() {
 	var mapOverlay;
 
 	var isNightMap = false;
-	var showCaves = true;
 	var centerOnPlayer = true;
-
+	var showCaves = true;	
 	var showAnimals = true;
 	var showPets = true;
 	var showMobs = true;
@@ -169,11 +168,11 @@ var JourneyMap = (function() {
 				_gaq.push(['_setCustomVar', 2, 'mc_version', JM.game.mc_version, 2]);
 
 				// Update UI with game info
-				$("#version").html("JourneyMap " + JM.game.jm_version);									
+				$("#version").html(JM.game.mod_name);									
 				
 				// Splash
 				if(!errorDialog) {
-					splashDialog = createDialog("JourneyMap " + JM.game.jm_version + "<br><small>by techbrew</small>");
+					splashDialog = createDialog(JM.game.mod_name + "<br><small>by techbrew</small>");
 				}
 
 				// Init UI
@@ -262,6 +261,7 @@ var JourneyMap = (function() {
 			});
 
 		$("#dayNightButton").parent().buttonset();
+		
 		// Toggles / Follow button
 		$("#followButton")
 			.attr("title", getMessage('follow_button_title'))
@@ -283,11 +283,14 @@ var JourneyMap = (function() {
 			if ( $(menu).is(':visible') ) {
 				menu.hide();
 			} else {		
-				if(JM.world.hardcore===true && JM.world.singlePlayer===false) {
-					$(".nohardcore").addClass('ui-state-disabled').find('input').attr('disabled', 'disabled');
-				} else {
-					$(".nohardcore").removeClass('ui-state-disabled').find('input').removeAttr('disabled');
-				}
+
+				enforceFeature("#checkShowCaves", JM.world.features.MapCaves);
+				enforceFeature("#checkShowAnimals", JM.world.features.RadarAnimals);
+				enforceFeature("#checkShowPets", JM.world.features.RadarAnimals);
+				enforceFeature("#checkShowMobs", JM.world.features.RadarMobs);
+				enforceFeature("#checkShowVillagers", JM.world.features.RadarVillagers);
+				enforceFeature("#checkShowPlayers", JM.world.features.RadarPlayers);
+				
 				menu.show();
 				$( document ).one( "click", function() { menu.hide(); });
 			}			
@@ -430,6 +433,16 @@ var JourneyMap = (function() {
 		// Continue
 		initWorld();
 
+	}
+	
+	var enforceFeature = function(buttonId, feature) {
+		if(feature!==true) {
+			$(buttonId).attr('disabled', true).parent().find('span').addClass('ui-state-disabled');
+			$(buttonId).parent().children().css('cursor','not-allowed');
+		} else {
+			$(buttonId).removeAttr('disabled').parent().find('span').removeClass('ui-state-disabled');
+			$(buttonId).parent().children().css('cursor','pointer');
+		}
 	}
 	
 	/**
@@ -1096,11 +1109,9 @@ var JourneyMap = (function() {
 		
 		if(map.getZoom()===0) return;
 		
-		var isNotHardcore = (JM.world.hardcore===false);
-		
 		// Mobs
 		removeObsoleteMarkers(JM.mobs, markers.mobs);		
-		if (isNotHardcore && showMobs === true && JM.mobs) {
+		if (JM.world.features.RadarMobs && showMobs === true && JM.mobs) {
 			$.each(JM.mobs, function(index, mob) {
 				updateEntityMarker(mob,markers.mobs);
 			});
@@ -1108,7 +1119,7 @@ var JourneyMap = (function() {
 
 		// Animals
 		removeObsoleteMarkers(JM.animals, markers.animals);	
-		if (isNotHardcore && (showAnimals === true || showPets === true) && JM.animals) {
+		if (JM.world.features.RadarAnimals && (showAnimals === true || showPets === true) && JM.animals) {
 			$.each(JM.animals, function(index, mob) {
 				updateEntityMarker(mob,markers.animals);
 			});
@@ -1116,7 +1127,7 @@ var JourneyMap = (function() {
 
 		// Villagers
 		removeObsoleteMarkers(JM.villagers, markers.villagers);	
-		if (isNotHardcore && showVillagers === true && JM.villagers) {
+		if (JM.world.features.RadarVillagers && showVillagers === true && JM.villagers) {
 			$.each(JM.villagers, function(index, mob) {
 				updateEntityMarker(mob,markers.villagers);
 			});
@@ -1370,7 +1381,7 @@ var JourneyMap = (function() {
 	}
 	
 	var getMapStateUrl = function() {
-		var mapType = (playerUnderground === true && showCaves === true) ? "underground" : (isNightMap === true ? "night" : "day");
+		var mapType = (JM.world.features.MapCaves === true && playerUnderground === true && showCaves === true) ? "underground" : (isNightMap === true ? "night" : "day");
 		var dimension = (JM.player.dimension);
 		var depth = (JM.player && JM.player.chunkCoordY != undefined) ? JM.player.chunkCoordY : 4;
 		return "&mapType=" + mapType + "&dim=" + dimension + "&depth=" + depth + "&ts=" + lastImageCheck;

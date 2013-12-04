@@ -65,20 +65,25 @@ public class JMLogger extends Logger {
 	 */
 	public void setLevelFromProps() {
 
-		String propLevel = null;
+		String propLevel = "";
 		Level level = Level.INFO;
-		try {
-			propLevel = PropertyManager.getInstance().getString(PropertyManager.Key.LOGGING_LEVEL);			
-			if(!propLevel.equals(Level.INFO)) {
-				level = Level.parse(propLevel);
-				info("Setting log level from journeyMap.properties: " + level); //$NON-NLS-1$
+		try {		
+			propLevel = PropertyManager.getInstance().getString(PropertyManager.Key.LOGGING_LEVEL);
+			level = Level.parse(propLevel);		
+			if(level!=getLevel()) {
+				log(level, "Log level (via " + PropertyManager.FILE_NAME + ") set to " + level + "."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				setLevel(level);				
+				if(level.intValue()<Level.INFO.intValue()) {
+					log(level, ("THIS LOGGING LEVEL WILL SLOW DOWN THE GAME! DO NOT USE IT UNLESS YOU ARE TROUBLESHOOTING AN ISSUE!"));
+				}
 			}
+					
 		} catch(IllegalArgumentException e) {
-			warning("Could not read " + PropertyManager.Key.LOGGING_LEVEL + " in " + PropertyManager.FILE_NAME + ": " + propLevel);			 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			warning("Illegal value for " + PropertyManager.Key.LOGGING_LEVEL + " in " + PropertyManager.FILE_NAME + ": " + propLevel); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} catch(Throwable t) {
 			severe(LogFormatter.toString(t));
 		} finally {
-			setLevel(level);
+			
 			consoleHandler.setLevel(level);
 			logHandler.setLevel(level);
 		}

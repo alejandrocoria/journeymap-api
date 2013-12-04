@@ -1,6 +1,5 @@
 package net.techbrew.mcjm.ui.dialog;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,7 +14,6 @@ import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.MapOverlayState;
-import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
 import net.techbrew.mcjm.task.MapRegionTask;
 import net.techbrew.mcjm.task.SaveMapTask;
 import net.techbrew.mcjm.ui.JmUI;
@@ -24,7 +22,6 @@ import net.techbrew.mcjm.ui.MapOverlay;
 import net.techbrew.mcjm.ui.UIManager;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
 
 public class MapOverlayActions extends JmUI {
 
@@ -32,14 +29,12 @@ public class MapOverlayActions extends JmUI {
 	
 	private enum ButtonEnum {Automap,Check,Save,Browser,Close};
 	
-	final String title = Constants.getString("MapOverlay.actions_title", JourneyMap.JM_VERSION);
+	final String title = Constants.getString("MapOverlay.actions");
 	int lastWidth = 0;
 	int lastHeight = 0;
 	MapButton buttonAutomap, buttonSave, buttonClose, buttonBrowser, buttonCheck;
-	Color titleColor = new Color(0,0,100);
 	
-	public MapOverlayActions() {
-		
+	public MapOverlayActions() {		
 	}
 	
 	/**
@@ -171,7 +166,9 @@ public class MapOverlayActions extends JmUI {
     	drawBackground(0);
     	layoutButtons();
     	super.drawScreen(par1, par2, par3);
-    	drawTitle();
+
+    	int y = this.height / 4 - 18;
+        drawCenteredString(this.fontRenderer, title , this.width / 2, y, 16777215);
     }
     
     @Override
@@ -182,16 +179,6 @@ public class MapOverlayActions extends JmUI {
     	super.drawDefaultBackground();
 	}
     
-    private void drawTitle() {
-    	int labelWidth = mc.fontRenderer.getStringWidth(title) + 10;
-		int halfBg = width/2;
-		
-		int by = (this.height / 4);
-		
-		GL11.glEnable(GL11.GL_BLEND);
-		BaseOverlayRenderer.drawRectangle(halfBg - (labelWidth/2), by-20, labelWidth, 12, titleColor, 255);
-		drawCenteredString(this.fontRenderer, title , this.width / 2, by-18, 16777215);
-    }
     
     @Override
 	protected void keyTyped(char c, int i)
