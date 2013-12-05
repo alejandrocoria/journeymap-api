@@ -6,7 +6,6 @@ import java.util.List;
 
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
 
 /**
@@ -26,7 +25,7 @@ public class WaypointHelper {
 	 * @return
 	 */
 	public static boolean waypointsEnabled() {
-		return PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_WAYPOINTS) && (isReiLoaded() || isVoxelMapLoaded() || isNativeLoaded());
+		return (isReiLoaded() || isVoxelMapLoaded() || isNativeLoaded());
 	}
 	
 	/**
