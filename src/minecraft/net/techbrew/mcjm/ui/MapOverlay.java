@@ -643,7 +643,7 @@ public class MapOverlay extends JmUI {
 		}
 		
 		// Draw waypoints
-		if(WaypointHelper.waypointsEnabled()) {
+		if(WaypointHelper.waypointsEnabled() && PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_WAYPOINTS)) {
 			Map map = (Map) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
 			List<Waypoint> waypoints = new ArrayList<Waypoint>(map.values());
 
