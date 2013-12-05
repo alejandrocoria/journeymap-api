@@ -1346,7 +1346,7 @@ var JourneyMap = (function() {
 			    "(" + (waypoint.y >> 4) + ")"
 			].join(' ');
 			
-			var label = waypoint.display;
+			var label = waypoint.name;
 			var titleSpan = $('<span/>').addClass(labelClass).html(label).hide().appendTo(document.body);
 			var titleWidth = 4 + $(titleSpan).innerWidth()/2;
 			$(titleSpan).remove();
