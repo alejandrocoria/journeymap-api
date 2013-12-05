@@ -21,7 +21,8 @@ public class JsonHelper {
 		for(int i=0;i<size;i++) {
 			key = keys[i];
 			value = props.get(key);
-			sb.append("'").append(key).append("'").append(":");			
+			wrapAsString(sb, key);
+			sb.append(":");			
 			wrap(sb, value);			
 			if(i+1<size) {
 				sb.append(",");
