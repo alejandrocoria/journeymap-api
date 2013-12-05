@@ -48,6 +48,7 @@ public class VersionCheck {
 				URL uri = URI.create(JourneyMap.VERSION_URL).toURL();
 				HttpsURLConnection connection = (HttpsURLConnection) uri.openConnection();
 				connection.setConnectTimeout(3000);
+				connection.setReadTimeout(3000);
 				connection.setRequestMethod("GET");
 				connection.setRequestProperty("Referer", "http://journeymap.techbrew.net/?client=" + JourneyMap.JM_VERSION); //$NON-NLS-1$ //$NON-NLS-2$
 				connection.setRequestProperty("Host", "localhost");
