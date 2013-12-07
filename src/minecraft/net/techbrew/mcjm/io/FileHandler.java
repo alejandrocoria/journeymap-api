@@ -2,9 +2,14 @@ package net.techbrew.mcjm.io;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
@@ -159,6 +164,10 @@ public class FileHandler {
 		}
 	}
 	
+	public static File getCacheDir() {
+		return new File(Minecraft.getMinecraft().mcDataDir, Constants.CACHE_DIR);
+	}
+	
 	public static File getCustomDir() {
 		return new File(Minecraft.getMinecraft().mcDataDir, Constants.CUSTOM_DIR);
 	}
@@ -239,6 +248,42 @@ public class FileHandler {
             JourneyMap.getLogger().severe("Could not open path with Desktop: " + path + " : " + LogFormatter.toString(e));
             Sys.openURL("file://" + path);
         }
+	}
+	
+	public static boolean serializeCache(String name, Serializable cache) {
+		try {
+			File cacheDir = getCacheDir();
+			if(!cacheDir.exists()) cacheDir.mkdirs();		
+			
+			File cacheFile = new File(cacheDir, name);
+			
+			FileOutputStream fileOut = new FileOutputStream(cacheFile);
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(cache);
+			out.close();
+			fileOut.close();
+			return true;
+		} catch(IOException e) {
+			JourneyMap.getLogger().severe("Could not serialize cache: " + name + " : " + LogFormatter.toString(e));
+			return false;
+	    }
+	}
+	
+	public static <C extends Serializable> C deserializeCache(String name, Class<C> cacheClass) {
+		try {
+			File cacheFile = new File(getCacheDir(), name);
+			if(!cacheFile.exists()) return null;
+			
+			FileInputStream fileIn = new FileInputStream(cacheFile);
+	        ObjectInputStream in = new ObjectInputStream(fileIn);
+	        C cache = (C) in.readObject();
+	        in.close();
+	        fileIn.close();
+			return cache;
+		} catch(Exception e) {
+			JourneyMap.getLogger().severe("Could not deserialize cache: " + name + " : " + LogFormatter.toString(e));
+			return null;
+	    } 
 	}
 	
 }

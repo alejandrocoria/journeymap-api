@@ -20,13 +20,12 @@ public class MapBlocks extends HashMap {
 	
 	public final static HashMap<Integer, Float> alphas = new HashMap<Integer, Float>(5);
 	
-	ColorCache colorCache;
+	final ColorCache colorCache = ColorCache.getInstance();
 	
 	/**
 	 * Constructor
 	 */
 	public MapBlocks() {
-		colorCache = new ColorCache();
 		resetAlphas();
 	}	
 	

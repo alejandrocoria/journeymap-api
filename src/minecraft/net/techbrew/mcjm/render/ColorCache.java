@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 import net.minecraft.src.BiomeGenBase;
 import net.minecraft.src.Block;
@@ -14,6 +15,7 @@ import net.minecraft.src.ResourceManager;
 import net.minecraft.src.ResourceManagerReloadListener;
 import net.minecraft.src.ResourcePackRepository;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.IconLoader;
 import net.techbrew.mcjm.model.ChunkMD;
 
@@ -24,20 +26,29 @@ import net.techbrew.mcjm.model.ChunkMD;
  */
 public class ColorCache implements ResourceManagerReloadListener {
 	
+	private static class Holder {
+        private static final ColorCache INSTANCE = new ColorCache();
+    }
+	
+	public static ColorCache getInstance() {
+        return Holder.INSTANCE;
+    }
+	
 	private final HashMap<BlockInfo, Color> colors = new HashMap<BlockInfo, Color>(256);
 	
-	private final HashMap<BiomeGenBase, Color> grassBiomeColors = new HashMap<BiomeGenBase, Color>(16);
-	private final HashMap<BiomeGenBase, Color> waterBiomeColors = new HashMap<BiomeGenBase, Color>(16);
+	private final HashMap<String, Color> grassBiomeColors = new HashMap<String, Color>(16);
+	private final HashMap<String, Color> waterBiomeColors = new HashMap<String, Color>(16);
 	private final HashMap<String, Color> foliageBiomeColors = new HashMap<String, Color>(16);
 	
 	private static final int[] leafColorMeta =      {0,3,4,7,8,11};
 	private static final int[] leafColorPineMeta =  {1,5,9};
 	private static final int[] leafColorBirchMeta = {2,6,10};
 	
-	IconLoader iconLoader;
-	String lastResourcePack;
+	private IconLoader iconLoader;
+	private String lastResourcePack;
+	private final Object lock = new Object();
 	
-	public ColorCache() {
+	private ColorCache() {
 		
 		ResourceManager rm = Minecraft.getMinecraft().getResourceManager();
 		if(rm instanceof ReloadableResourceManager) {
@@ -45,7 +56,8 @@ public class ColorCache implements ResourceManagerReloadListener {
 		} else {
 			JourneyMap.getLogger().warning("Could not register ResourcePack ReloadListener.  Changing resource packs will require restart");
 		}		
-		reset();
+
+		this.onResourceManagerReload(rm);
 	}
 	
 	@Override
@@ -54,17 +66,30 @@ public class ColorCache implements ResourceManagerReloadListener {
 		// Check if the resourcepack has changed
 		ResourcePackRepository repo = Minecraft.getMinecraft().getResourcePackRepository();		
     	String currentPack = repo.getResourcePackName();
-
-    	if(currentPack!=lastResourcePack) {    		
-    		JourneyMap.getLogger().info("Map colors will be derived from ResourcePack: " + currentPack);    		
-    		lastResourcePack = currentPack;	    		    	
-			reset();
-		}
     	
-		// Ensure iconLoader instantiated
-		if(iconLoader==null) {
-			iconLoader = new IconLoader();
-		}
+    	if(JourneyMap.getInstance().isMapping()) {
+    		if(currentPack.equals(lastResourcePack)) {
+    			JourneyMap.getLogger().info("ResourcePack unchanged: " + currentPack);
+    		} else {
+    			JourneyMap.getLogger().info("ResourcePack changed: " + lastResourcePack + " --> " + currentPack);
+    			if(lastResourcePack!=null) {
+    				serializeCache();
+    			}
+    			reset();
+    			lastResourcePack = currentPack;
+        		deserializeCache();
+        		
+        		// TODO: avoid this?
+        		iconLoader = new IconLoader();			
+    		}
+    		
+    	} else if(iconLoader!=null) {
+    		
+    		JourneyMap.getLogger().info("Serializing texture-based cache...");
+    		serializeCache();
+    	}
+    	
+    	
 	}
 	
 	public Color getBlockColor(ChunkMD chunkMd, BlockInfo blockInfo, int x, int y, int z) {
@@ -182,16 +207,16 @@ public class ColorCache implements ResourceManagerReloadListener {
 		Color color = grassBiomeColors.get(biome);
 		if(color==null) {
 			color = colorMultiplier(getCachedColor(blockInfo, x, y, z), biome.getBiomeGrassColor());
-			grassBiomeColors.put(biome, color);
+			grassBiomeColors.put(biome.biomeName, color);
 		}
 		return color;
 	}
 	
 	private Color getWaterColor(BlockInfo blockInfo, BiomeGenBase biome, int x, int y, int z) {
-		Color color = waterBiomeColors.get(biome);
+		Color color = waterBiomeColors.get(biome.biomeName);
 		if(color==null) {
 			color = colorMultiplier(getCachedColor(blockInfo, x, y, z), biome.waterColorMultiplier);
-			waterBiomeColors.put(biome, color);
+			waterBiomeColors.put(biome.biomeName, color);
 		}
 		return color;
 	}
@@ -207,7 +232,7 @@ public class ColorCache implements ResourceManagerReloadListener {
 		Color color = blockInfo.getColor();
 		if(color==null) {		
 			color = colors.get(blockInfo);	
-			if(color==null) {								
+			if(color==null) {						
 				color = iconLoader.loadBlockColor(blockInfo);
 				if(color!=null){
 					if(!MapBlocks.biomeBlocks.contains(blockInfo.id)){
@@ -233,10 +258,7 @@ public class ColorCache implements ResourceManagerReloadListener {
 		return color;		
 	}		
 	
-	private void reset() {
-		if(iconLoader!=null) {
-			iconLoader.initBlocksTexture();
-		}
+	public void reset() {
 		grassBiomeColors.clear();
 		waterBiomeColors.clear();
 		foliageBiomeColors.clear();
@@ -244,6 +266,82 @@ public class ColorCache implements ResourceManagerReloadListener {
 		MapBlocks.resetAlphas();	
 	}
 	
+	public void serializeCache() {
+		
+		if(lastResourcePack==null) return;
+		
+		Logger logger = JourneyMap.getLogger();
+		StringBuffer sb = new StringBuffer();
+		
+		long start = System.currentTimeMillis();
+		
+		if(!colors.isEmpty()) {
+			FileHandler.serializeCache(lastResourcePack + "_blocks", colors);
+			sb.append(colors.size() + " block colors, ");
+		}
+		if(!MapBlocks.alphas.isEmpty()) {
+			FileHandler.serializeCache(lastResourcePack + "_alpha", MapBlocks.alphas);
+			sb.append(MapBlocks.alphas.size() + " block alphas, ");
+		}
+		if(!grassBiomeColors.isEmpty()) {
+			FileHandler.serializeCache(lastResourcePack + "_grass", grassBiomeColors);
+			sb.append(grassBiomeColors.size() + " grass+biome colors, ");
+		}
+		if(!waterBiomeColors.isEmpty()) {
+			FileHandler.serializeCache(lastResourcePack + "_water", waterBiomeColors);
+			sb.append(waterBiomeColors.size() + " water+biome colors, ");
+		}
+		if(!foliageBiomeColors.isEmpty()) {
+			FileHandler.serializeCache(lastResourcePack + "_foliage", foliageBiomeColors);
+			sb.append(foliageBiomeColors.size() + " foliage+biome colors");
+		}
+		
+		long stop = System.currentTimeMillis();
+		logger.info("Serialized texture cache for " + lastResourcePack + " in " + (stop-start) + "ms: " + sb.toString());
+	}
+	
+	private void deserializeCache() {
+
+		Logger logger = JourneyMap.getLogger();		
+		
+		StringBuffer sb = new StringBuffer();
+		long start = System.currentTimeMillis();
+		
+		HashMap<BlockInfo, Color> tempColors = FileHandler.deserializeCache(lastResourcePack + "_blocks", colors.getClass());
+		if(tempColors!=null) {
+			colors.putAll(tempColors);
+			sb.append(tempColors.size() + " block colors");
+		}
+		
+		HashMap<Integer, Float> tempAlphas = FileHandler.deserializeCache(lastResourcePack + "_alpha", MapBlocks.alphas.getClass());
+		if(tempAlphas!=null) {
+			MapBlocks.alphas.putAll(tempAlphas);
+			sb.append(tempAlphas.size() + " block alphas");
+		}
+		
+		HashMap<String, Color> tempGrass = FileHandler.deserializeCache(lastResourcePack + "_grass", grassBiomeColors.getClass());
+		if(tempGrass!=null) {
+			grassBiomeColors.putAll(tempGrass);
+			sb.append(tempGrass.size() + " grass+biome colors");
+		}
+		
+		HashMap<String, Color> tempWater = FileHandler.deserializeCache(lastResourcePack + "_water", waterBiomeColors.getClass());
+		if(tempWater!=null) {
+			waterBiomeColors.putAll(tempWater);
+			sb.append(tempWater.size() + " water+biome colors");
+		}
+		
+		HashMap<String, Color> tempFoliage = FileHandler.deserializeCache(lastResourcePack + "_foliage", foliageBiomeColors.getClass());
+		if(tempFoliage!=null) {
+			foliageBiomeColors.putAll(tempFoliage);
+			sb.append(tempFoliage.size() + " foliage+biome colors");
+		}
+		
+		long stop = System.currentTimeMillis();
+		logger.info("Deserialized texture cache for " + lastResourcePack + " in " + (stop-start) + "ms: " + sb.toString());
+		
+	}
+		
 	Color colorMultiplier(Color color, int mult) {
 		return colorMultiplier(color.getRGB(), mult);
 	}
