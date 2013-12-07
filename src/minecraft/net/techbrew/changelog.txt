@@ -1,4 +1,4 @@
-JourneyMap 3.1.0b2 for Minecraft 1.6.4 (December 4, 2013)
+JourneyMap 3.1.0b3 for Minecraft 1.6.4 (December 7, 2013)
 
 Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
@@ -10,6 +10,9 @@ Requirements:
 
 - Minecraft 1.6.4
 - Forge "Recommended-1.6.4" or ModLoader 1.6.4
+
+Changes in JourneyMap 3.1.0b3 for Minecraft 1.6.4:
+- (DBT-51Z-QQ9U) Added serialization of cached color assignments for texture packs, streamlined loading sequence.
 
 Changes in JourneyMap 3.1.0b2 for Minecraft 1.6.4:
 - (P4E-Q5J-7S36) Bugfix: Waypoint names with apostrophes broke the Web UI
