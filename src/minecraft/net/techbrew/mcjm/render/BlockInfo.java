@@ -1,12 +1,15 @@
 package net.techbrew.mcjm.render;
 
 import java.awt.Color;
+import java.io.Serializable;
 
 import net.minecraft.src.Block;
 
 
-public class BlockInfo {
+public class BlockInfo implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	public final int id;
 	public final int meta;
 	private Color color;
