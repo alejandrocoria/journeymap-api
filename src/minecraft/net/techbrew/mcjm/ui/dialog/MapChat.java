@@ -318,7 +318,9 @@ public class MapChat extends JmUI
     {    	    
     	GL11.glPushMatrix();
         GL11.glTranslatef(0, this.height - 39.5f - bottomMargin, 0.0F);
-    	this.mc.ingameGUI.getChatGUI().drawChat(hidden ? this.mc.ingameGUI.getUpdateCounter() : this.cursorCounter);
+        if(this.mc.ingameGUI!=null && this.mc.ingameGUI.getChatGUI()!=null) {
+        	this.mc.ingameGUI.getChatGUI().drawChat(hidden ? this.mc.ingameGUI.getUpdateCounter() : this.cursorCounter);
+        }
     	GL11.glPopMatrix();
     	
     	if(hidden) return;
