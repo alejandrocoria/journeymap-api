@@ -2,30 +2,14 @@ package net.techbrew.mcjm.io;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
-
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.src.Block;
-import net.minecraft.src.Item;
-import net.minecraft.src.ItemBlock;
 import net.minecraft.src.Minecraft;
-import net.minecraft.src.Resource;
-import net.minecraft.src.ResourceLocation;
-import net.minecraft.src.ResourceManager;
-import net.minecraft.src.ResourcePack;
-import net.minecraft.src.ResourcePackRepository;
-import net.minecraft.src.ResourcePackRepositoryEntry;
 import net.minecraft.src.TextureAtlasSprite;
 import net.minecraft.src.TextureMap;
 import net.techbrew.mcjm.JourneyMap;
@@ -33,22 +17,20 @@ import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.render.BlockInfo;
 import net.techbrew.mcjm.render.MapBlocks;
 
+import org.lwjgl.opengl.GL11;
+
 public class IconLoader {
 	
 	Logger logger = JourneyMap.getLogger();
-	BufferedImage blocksTexture;
+	final BufferedImage blocksTexture;
 	HashSet<BlockInfo> failed = new HashSet<BlockInfo>();
 	
 	/**
 	 * Must be instantiated on main minecraft thread where GL context is viable.
 	 */
 	public IconLoader() {
-		initBlocksTexture();
+		blocksTexture = initBlocksTexture();
 	}	
-	
-	public boolean isReady() {
-		return blocksTexture!=null;
-	}
 	
 	public boolean failedFor(BlockInfo blockInfo) {
 		return failed.contains(blockInfo);
@@ -63,7 +45,7 @@ public class IconLoader {
 		
 		Color color = null;
 		
-		if(isReady()==false) {
+		if(blocksTexture==null) {
 			logger.warning("BlocksTexture not yet loaded");
 			return null;					
 		}
@@ -181,9 +163,10 @@ public class IconLoader {
         return color;
 	}
 
-	public void initBlocksTexture() {
+	private BufferedImage initBlocksTexture() {
 		
-		failed.clear();
+		BufferedImage image = null;
+		long start = System.currentTimeMillis();
 		
 		try {
 			int glid = Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
@@ -193,7 +176,7 @@ public class IconLoader {
 		    ByteBuffer byteBuffer = ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.nativeOrder());
 		
 		    GL11.glGetTexImage(3553, 0, 6408, 5121, byteBuffer);
-		    BufferedImage image = new BufferedImage(width, height, 6);
+		    image = new BufferedImage(width, height, 6);
 		    byteBuffer.position(0);
 		    byte[] var4 = new byte[byteBuffer.remaining()];
 		    byteBuffer.get(var4);
@@ -210,9 +193,14 @@ public class IconLoader {
 		        image.setRGB(var5, var6, var10);
 		      }
 		    }
-		    this.blocksTexture = image;
+
+		    long stop = System.currentTimeMillis();
+		    logger.info("Got blockTexture image in " + (stop-start) + "ms");		    
+		    
 		} catch(Throwable t) {
 			logger.severe("Could not load blocksTexture: " + LogFormatter.toString(t));
 		}
+		return image;
 	}
+	
 }
