@@ -27,6 +27,7 @@ import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.RegionImageCache;
+import net.techbrew.mcjm.render.ColorCache;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.server.JMServer;
 import net.techbrew.mcjm.task.ITaskManager;
@@ -53,7 +54,7 @@ public class JourneyMap {
 	static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
 
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-	public static final String JM_VERSION = "3.1.0b2"; //$NON-NLS-1$
+	public static final String JM_VERSION = "3.1.0b3"; //$NON-NLS-1$
 	public static final String MC_VERSION = "1.6.4"; //$NON-NLS-1$
 	
 	public static final String EDITION = getEdition();
@@ -293,6 +294,8 @@ public class JourneyMap {
 			RegionImageCache.getInstance().flushToDisk();
 			RegionImageCache.getInstance().clear();
 			TextureCache.instance().purge();
+			ColorCache.getInstance().serializeCache();
+			ColorCache.getInstance().reset();
 			MapOverlay.reset();
 			MapPlayerTask.clearCache();
 			
