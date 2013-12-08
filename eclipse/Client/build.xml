@@ -1,126 +1,159 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="JourneyMap" basedir="../.." default="all">
 
-  <!-- Update when new version is going to be released -->
-  <property name="version" value="3.1.0b3_Unlimited_MC1.6.4" />
+    <!-- Update when new version is going to be released -->
+    <property name="jmversion" value="3.1.0b3" />
+    <property name="mcversion" value="MC1.6.4" />
+	<property name="unlimited" value="Unlimited" />
+	<property name="fairplay" value="FairPlay" />
 
-  <property name="mcp.dir" location="${basedir}" />
-  <property name="dist.dir" location="${mcp.dir}/dist" />
-  <property name="build.dir" location="${mcp.dir}/build" />
-  <property name="reobf.dir" location="${mcp.dir}/reobf/minecraft" />
-  <property name="src.dir" location="${mcp.dir}/src/minecraft" />
+    <property name="zipfile.unlimited" value="JourneyMap${jmversion}_${unlimited}_${mcversion}" />
+    <property name="zipfile.fairplay" value="JourneyMap${jmversion}_${fairplay}_${mcversion}" />
 
-  <!-- Change if not on Windows, but don't check in the change. -->
-  <!-- TODO:  OS detection -->
-  <property name="python" location="${mcp.dir}/runtime/bin/python/python_mcp.exe" />
+    <property name="mcp.dir" location="${basedir}" />
+    <property name="dist.dir" location="${mcp.dir}/dist" />
+    <property name="build.dir" location="${mcp.dir}/build" />
+    <property name="reobf.dir" location="${mcp.dir}/reobf/minecraft" />
+    <property name="src.dir" location="${mcp.dir}/src/minecraft" />
 
-  <target name="init">
-    <echo message="Cleaning old build and dist, reobf" />
-    <delete dir="${build.dir}" />
-    <delete dir="${dist.dir}" />
-    <delete dir="${mcp.dir}/reobf" />
+    <!-- Change if not on Windows, but don't check in the change. -->
+    <!-- TODO:  OS detection -->
+    <property name="python" location="${mcp.dir}/runtime/bin/python/python_mcp.exe" />
 
-    <echo message="Creating build and dist dirs" />
-    <mkdir dir="${build.dir}" />
-    <mkdir dir="${dist.dir}" />
-  </target>
+    <target name="all" description="All" depends="init, recompile, reobfuscate, stage, minify, jarzip">
+        <echo message="Done." />
+    </target>
 
-  <target name="recompile" >
-    <exec executable="${python}" dir="${mcp.dir}">
-      <arg value="runtime/recompile.py"/>
-      <arg value="%*"/>
-    </exec>
-  </target>
+    <target name="init">
+        <echo message="Cleaning old build and dist, reobf" />
+        <delete dir="${build.dir}" />
+        <delete dir="${dist.dir}" />
+        <delete dir="${mcp.dir}/reobf" />
 
-  <target name="reobfuscate">
-    <exec executable="${python}" dir="${mcp.dir}">
-      <arg value="runtime/reobfuscate.py"/>
-      <arg value="%*"/>
-    </exec>
-  </target>
+        <echo message="Creating build and dist dirs" />
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${dist.dir}" />
+    </target>
 
-  <target name="stage">
-  	
-  	<!-- Modloader BaseMod -->
-    <copy todir="${build.dir}" failonerror="true" file="${reobf.dir}/mod_JourneyMap.class" />
-  	
-  	<!-- JourneyMap facades -->
-    <copy todir="${build.dir}" failonerror="true" file="${reobf.dir}/RenderFacade.class" />
-  	
-  	<!-- JourneyMap package -->
-  	<copy todir="${build.dir}/net/techbrew/" failonerror="true">
-      <fileset dir="${reobf.dir}/net/techbrew/" />
-    </copy>
-  	
-  	<!-- Rupy classes -->
-  	<copy todir="${build.dir}/se/rupy/" failonerror="true">
-      <fileset dir="${reobf.dir}/se/rupy/" />
-    </copy>
-  	
-  	<!-- PNGJ classes -->
-  	<copy todir="${build.dir}/ar/com/hjg/pngj/" failonerror="true">
-      <fileset dir="${reobf.dir}/ar/com/hjg/pngj/" />
-    </copy>
-  	
-  	<!-- Changelog -->
-  	<copy todir="${build.dir}" failonerror="true" file="${src.dir}/net/techbrew/changelog.txt" />
-  	
-  	<!-- License info -->
-    <copy todir="${build.dir}" failonerror="true" file="${src.dir}/net/techbrew/license.txt" />
-  	
-  	<!-- ForgeML info -->
-  	<copy todir="${build.dir}" failonerror="true" file="${src.dir}/net/techbrew/mcmod.info" />
-  	
-    <!-- Rupy configs -->
-  	<copy todir="${build.dir}/se/rupy/http" failonerror="true" file="${src.dir}/se/rupy/http/mime.txt" />
-  	
-    <!-- Localization properties -->
-  	<copy todir="${build.dir}/net/techbrew/mcjm" failonerror="true" verbose="true">
-  	      <fileset dir="${src.dir}/net/techbrew/mcjm" includes="*.properties" />
-  	</copy>
-  	
-  	<!-- Web assets --> <!-- -->
-    <copy todir="${build.dir}/net/techbrew/mcjm/web" failonerror="true">
-      <fileset dir="${src.dir}/net/techbrew/mcjm/web" />
-    </copy>
-  </target>
+    <target name="recompile" >
+        <exec executable="${python}" dir="${mcp.dir}">
+            <arg value="runtime/recompile.py"/>
+            <arg value="%*"/>
+        </exec>
+    </target>
 
-  <target name="all" description="All" depends="init, recompile, reobfuscate, stage, minify, jarzip">
-    <echo message="Done: ${dist.dir}/JourneyMap${version}.zip" />
-  </target>
+    <target name="reobfuscate">
+        <exec executable="${python}" dir="${mcp.dir}">
+            <arg value="runtime/reobfuscate.py"/>
+            <arg value="%*"/>
+        </exec>
+    </target>
 
-  <target name="minify" description="Minifiy a set of files">
-    <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
-      <classpath>
-        <pathelement path="${mcp.dir}/lib/yuicompressor-2.4.7.jar" />
-        <pathelement path="${mcp.dir}/lib/YUIAnt.jar" />
-      </classpath>
-    </taskdef>
-    <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
-      outputfolder="${build.dir}/net/techbrew/mcjm/web/js">
-      <fileset dir="${src.dir}/net/techbrew/mcjm/web/js" >
-        <include name="journeymap.js" />
-      </fileset>
-    </yuicompress>
-  	<yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
-      outputfolder="${build.dir}/net/techbrew/mcjm/web/css">
-      <fileset dir="${src.dir}/net/techbrew/mcjm/web/css" >
-        <include name="journeymap.css" />
-      </fileset>
-    </yuicompress>
-  </target>
+    <target name="stage">
 
-  <target name="jarzip">
-    <mkdir dir="${dist.dir}" />
-    <delete dir="${dist.dir}/JourneyMap${version}.zip" />
-    <jar destfile="${dist.dir}/JourneyMap${version}.zip" duplicate="preserve" index="true" manifestencoding="UTF-8">
-      <manifest>
-        <attribute name="Built-By" value="Mark Woodman"/>
-        <attribute name="Implementation-Vendor" value="TechBrew.net"/>
-        <attribute name="Implementation-Title" value="JourneyMap"/>
-        <attribute name="Implementation-Version" value="${version}"/>
-      </manifest>
-      <fileset dir="${build.dir}" />
-    </jar>
-  </target>
+        <!-- Modloader BaseMod -->
+        <copy todir="${build.dir}" failonerror="true" file="${reobf.dir}/mod_JourneyMap.class" />
+
+        <!-- JourneyMap facades -->
+        <copy todir="${build.dir}" failonerror="true" file="${reobf.dir}/RenderFacade.class" />
+
+        <!-- JourneyMap package -->
+        <copy todir="${build.dir}/net/techbrew/" failonerror="true">
+            <fileset dir="${reobf.dir}/net/techbrew/" />
+        </copy>
+
+        <!-- Rupy classes -->
+        <copy todir="${build.dir}/se/rupy/" failonerror="true">
+            <fileset dir="${reobf.dir}/se/rupy/" />
+        </copy>
+
+        <!-- PNGJ classes -->
+        <copy todir="${build.dir}/ar/com/hjg/pngj/" failonerror="true">
+            <fileset dir="${reobf.dir}/ar/com/hjg/pngj/" />
+        </copy>
+
+        <!-- License info -->
+        <copy todir="${build.dir}" failonerror="true" file="${src.dir}/net/techbrew/license.txt" />
+
+        <!-- Rupy configs -->
+        <copy todir="${build.dir}/se/rupy/http" failonerror="true" file="${src.dir}/se/rupy/http/mime.txt" />
+
+        <!-- Localization properties -->
+        <copy todir="${build.dir}/net/techbrew/mcjm" failonerror="true" verbose="true">
+            <fileset dir="${src.dir}/net/techbrew/mcjm" includes="*.properties" />
+        </copy>
+
+        <!-- Web assets --> <!-- -->
+        <copy todir="${build.dir}/net/techbrew/mcjm/web" failonerror="true">
+            <fileset dir="${src.dir}/net/techbrew/mcjm/web" />
+        </copy>
+    </target>
+
+    <target name="minify" description="Minifiy a set of files">
+        <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
+            <classpath>
+                <pathelement path="${mcp.dir}/lib/yuicompressor-2.4.7.jar" />
+                <pathelement path="${mcp.dir}/lib/YUIAnt.jar" />
+            </classpath>
+        </taskdef>
+        <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
+            outputfolder="${build.dir}/net/techbrew/mcjm/web/js">
+            <fileset dir="${src.dir}/net/techbrew/mcjm/web/js" >
+                <include name="journeymap.js" />
+            </fileset>
+        </yuicompress>
+        <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
+            outputfolder="${build.dir}/net/techbrew/mcjm/web/css">
+            <fileset dir="${src.dir}/net/techbrew/mcjm/web/css" >
+                <include name="journeymap.css" />
+            </fileset>
+        </yuicompress>
+    </target>
+
+	<macrodef name="editionJarzip">
+	    <attribute name="edition"/>
+		<attribute name="zipName"/>
+	    <sequential>
+	    	
+	    	<tstamp> 
+                <format property="TODAY" pattern="yyyy-MM-dd"/> 
+            </tstamp> 
+	    		    	
+	    	<mkdir dir="${dist.dir}" />	    	        
+	        <delete file="${dist.dir}/@{zipName}.zip" />
+	    	
+	    	<copy todir="${build.dir}" failonerror="true" overwrite="true" file="${src.dir}/net/techbrew/mcmod.info" />
+            <copy todir="${build.dir}" failonerror="true" overwrite="true" file="${src.dir}/net/techbrew/changelog.txt" />
+	    		
+	        <replace dir="${build.dir}" token="@JMVERSION@" value="${jmversion}" />
+	    	<replace dir="${build.dir}" token="@EDITION@" value="@{edition}" />
+	    	<replace dir="${build.dir}" token="@MCVERSION@" value="${mcversion}" />
+	    	<replace dir="${build.dir}" token="@DATE@" value="${TODAY}" />
+	    	
+	    	<jar destfile="${dist.dir}/@{zipname}.zip" duplicate="preserve" index="true" manifestencoding="UTF-8">
+	            <manifest>
+	                <attribute name="Built-By" value="Mark Woodman"/>
+	            	<attribute name="Built-Date" value="${TODAY}"/>
+	                <attribute name="Implementation-Vendor" value="TechBrew.net"/>
+	                <attribute name="Implementation-Title" value="JourneyMap"/>
+	                <attribute name="Implementation-Version" value="${jmversion} @{edition} Edition"/>	            	
+	            </manifest>
+	            <fileset dir="${build.dir}" />
+	        </jar>
+	        <echo message="Built: ${dist.dir}\@{zipname}.zip" />
+	    	
+	    </sequential>
+	</macrodef>
+	
+    <target name="jarzip">
+        
+    	<!-- Unlimited edition -->
+    	<editionJarzip edition="${unlimited}" zipname="${zipfile.unlimited}"/>
+        
+    	<!-- FairPlay Edition -->
+    	<delete file="${build.dir}/net/techbrew/mcjm/feature/impl/Unlimited.class" failonerror="true" />
+    	<editionJarzip edition="${fairplay}" zipname="${zipfile.fairplay}"/>
+
+    </target>
+	
 </project>
