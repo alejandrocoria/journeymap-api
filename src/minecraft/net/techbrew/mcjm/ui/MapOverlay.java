@@ -1,14 +1,5 @@
 package net.techbrew.mcjm.ui;
 
-import java.awt.Color;
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiInventory;
@@ -16,35 +7,26 @@ import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.VersionCheck;
-import net.techbrew.mcjm.data.AnimalsData;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.EntityKey;
-import net.techbrew.mcjm.data.MobsData;
 import net.techbrew.mcjm.data.PlayerData;
-import net.techbrew.mcjm.data.PlayersData;
-import net.techbrew.mcjm.data.VillagersData;
-import net.techbrew.mcjm.data.WaypointsData;
-import net.techbrew.mcjm.feature.Feature;
-import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.MapOverlayState;
-import net.techbrew.mcjm.model.Waypoint;
-import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
-import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer.DrawEntityStep;
-import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer.DrawStep;
 import net.techbrew.mcjm.render.overlay.GridRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.ui.dialog.MapChat;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Displays the map as an overlay in-game.
@@ -58,8 +40,9 @@ public class MapOverlay extends JmUI {
 	final static OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
 	final static OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
 	static GridRenderer gridRenderer;
-	
-	private enum ButtonEnum{Alert,DayNight,Follow,ZoomIn,ZoomOut,Options,Actions,Close};
+
+    private enum Mode{Fullscreen, TopRight}
+	private enum ButtonEnum{Alert,DayNight,Follow,ZoomIn,ZoomOut,Options,Actions,Close,MiniMap}
 	
 	final int minZoom = 0;
 	final int maxZoom = 5;
@@ -70,10 +53,12 @@ public class MapOverlay extends JmUI {
 	Logger logger = JourneyMap.getLogger();
 	MapChat chat;
 
-	List<DrawStep> drawStepList = new ArrayList<DrawStep>();
+    private Mode displayMode = Mode.Fullscreen;
+
 	
 	MapButton buttonDayNight, buttonFollow, buttonZoomIn, buttonZoomOut;
 	MapButton buttonAlert, buttonOptions, buttonActions, buttonClose;
+    MapButton buttonMiniMap;
 	
 	Color bgColor = new Color(0x22, 0x22, 0x22);
 	Color playerInfoFgColor = new Color(0x8888ff);
@@ -105,11 +90,15 @@ public class MapOverlay extends JmUI {
 //		int oldGuiScale = mc.gameSettings.guiScale;
 //		mc.gameSettings.guiScale = 2;
 		try {
-			drawBackground(0);
-			drawMap();		
-			super.drawScreen(i, j, f); // Buttons
-			drawPlayerInfo();
-			if(chat!=null) chat.drawScreen(i, j, f);
+            if(displayMode==Mode.Fullscreen) {
+			    drawBackground(0);
+            }
+			drawMap();
+            if(displayMode==Mode.Fullscreen) {
+                super.drawScreen(i, j, f); // Buttons
+                drawPlayerInfo();
+                if(chat!=null) chat.drawScreen(i, j, f);
+            }
 		} catch(Throwable e) {
 			logger.log(Level.SEVERE, "Unexpected exception in MapOverlay.drawScreen(): " + e); //$NON-NLS-1$
 			logger.severe(LogFormatter.toString(e));
@@ -537,10 +526,12 @@ public class MapOverlay extends JmUI {
 			
 		if(gridRenderer!=null) {
 			gridRenderer.draw(1f, xOffset, yOffset);
-			BaseOverlayRenderer.draw(drawStepList, xOffset, yOffset);
+			BaseOverlayRenderer.draw(state.getDrawSteps(), xOffset, yOffset);
 		}
-				
-		BaseOverlayRenderer.drawImage(TextureCache.instance().getLogo(), 8, 4, false); 
+
+        if(displayMode==Mode.Fullscreen) {
+		    BaseOverlayRenderer.drawImage(TextureCache.instance().getLogo(), 8, 4, false);
+        }
 		
 		scaleResolution(this,true);
 				
@@ -604,57 +595,7 @@ public class MapOverlay extends JmUI {
 		gridRenderer.updateTextures(state.getMapType(), state.getVSlice());
 		
 		// Build list of drawSteps
-		drawStepList.clear();
-		
-		List<Map> entities = new ArrayList<Map>(16);
-		PropertyManager pm = PropertyManager.getInstance();
-		if(state.currentZoom>0) {
-			if(FeatureManager.isAllowed(Feature.RadarAnimals)) {
-				if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_ANIMALS) || pm.getBoolean(PropertyManager.Key.PREF_SHOW_PETS)) {
-					Map map = (Map) DataCache.instance().get(AnimalsData.class).get(EntityKey.root);
-					entities.addAll(map.values());
-				}
-			}
-			if(FeatureManager.isAllowed(Feature.RadarVillagers)) {
-				if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_VILLAGERS)) {
-					Map map = (Map) DataCache.instance().get(VillagersData.class).get(EntityKey.root);
-					entities.addAll(map.values());
-				}
-			}
-			if(FeatureManager.isAllowed(Feature.RadarMobs)) {
-				if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_MOBS)) {
-					Map map = (Map) DataCache.instance().get(MobsData.class).get(EntityKey.root);
-					entities.addAll(map.values());
-				}
-			}
-		}
-		
-		if(FeatureManager.isAllowed(Feature.RadarPlayers)) {
-			if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_PLAYERS)) {
-				Map map = (Map) DataCache.instance().get(PlayersData.class).get(EntityKey.root);
-				entities.addAll(map.values());
-			}
-		}
-		
-		// Sort to keep named entities last
-		if(!entities.isEmpty()) {
-			Collections.sort(entities, new EntityHelper.EntityMapComparator());		
-			drawStepList.addAll(radarRenderer.prepareSteps(entities, gridRenderer));
-		}
-		
-		// Draw waypoints
-		if(WaypointHelper.waypointsEnabled() && PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_WAYPOINTS)) {
-			Map map = (Map) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
-			List<Waypoint> waypoints = new ArrayList<Waypoint>(map.values());
-
-			drawStepList.addAll(waypointRenderer.prepareSteps(waypoints, gridRenderer));
-		}
-
-		// Draw player if within bounds
-		Point playerPixel = gridRenderer.getPixel((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ);
-		if(playerPixel!=null) {
-			drawStepList.add(new DrawEntityStep(playerPixel, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8));				
-		}			
+		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer);
 		
 		// Update player pos
 		String biomeName = (String) DataCache.instance().get(PlayerData.class).get(EntityKey.biome);			

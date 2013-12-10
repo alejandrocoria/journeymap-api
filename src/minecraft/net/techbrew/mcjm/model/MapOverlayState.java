@@ -1,17 +1,26 @@
 package net.techbrew.mcjm.model;
 
-import java.io.File;
-
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
-import net.techbrew.mcjm.data.DataCache;
-import net.techbrew.mcjm.data.EntityKey;
+import net.techbrew.mcjm.data.*;
 import net.techbrew.mcjm.feature.Feature;
 import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
+import net.techbrew.mcjm.render.overlay.GridRenderer;
+import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
+import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
+import net.techbrew.mcjm.render.texture.TextureCache;
+
+import java.awt.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class MapOverlayState {
 
@@ -31,14 +40,12 @@ public class MapOverlayState {
 	private boolean underground = false;
 	private int dimension = Integer.MIN_VALUE;
 	private boolean caveMappingAllowed = false;
+    private List<BaseOverlayRenderer.DrawStep> drawStepList = new ArrayList<BaseOverlayRenderer.DrawStep>();
 	
 	/**
 	 * Default constructor
 	 */
 	public MapOverlayState() {
-		
-		// Set preferences-based values
-		
 	}
 	
 	public void refresh(Minecraft mc, EntityClientPlayerMP player) {
@@ -96,7 +103,65 @@ public class MapOverlayState {
 		return worldDir;
 	}
 
-	public void requireRefresh() {
+    public List<BaseOverlayRenderer.DrawStep> getDrawSteps() {
+        return drawStepList;
+    }
+
+    public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, OverlayWaypointRenderer waypointRenderer, OverlayRadarRenderer radarRenderer) {
+        drawStepList.clear();
+
+        List<Map> entities = new ArrayList<Map>(16);
+        PropertyManager pm = PropertyManager.getInstance();
+        if(this.currentZoom>0) {
+            if(FeatureManager.isAllowed(Feature.RadarAnimals)) {
+                if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_ANIMALS) || pm.getBoolean(PropertyManager.Key.PREF_SHOW_PETS)) {
+                    Map map = (Map) DataCache.instance().get(AnimalsData.class).get(EntityKey.root);
+                    entities.addAll(map.values());
+                }
+            }
+            if(FeatureManager.isAllowed(Feature.RadarVillagers)) {
+                if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_VILLAGERS)) {
+                    Map map = (Map) DataCache.instance().get(VillagersData.class).get(EntityKey.root);
+                    entities.addAll(map.values());
+                }
+            }
+            if(FeatureManager.isAllowed(Feature.RadarMobs)) {
+                if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_MOBS)) {
+                    Map map = (Map) DataCache.instance().get(MobsData.class).get(EntityKey.root);
+                    entities.addAll(map.values());
+                }
+            }
+        }
+
+        if(FeatureManager.isAllowed(Feature.RadarPlayers)) {
+            if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_PLAYERS)) {
+                Map map = (Map) DataCache.instance().get(PlayersData.class).get(EntityKey.root);
+                entities.addAll(map.values());
+            }
+        }
+
+        // Sort to keep named entities last
+        if(!entities.isEmpty()) {
+            Collections.sort(entities, new EntityHelper.EntityMapComparator());
+            drawStepList.addAll(radarRenderer.prepareSteps(entities, gridRenderer));
+        }
+
+        // Draw waypoints
+        if(WaypointHelper.waypointsEnabled() && PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_WAYPOINTS)) {
+            Map map = (Map) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
+            List<Waypoint> waypoints = new ArrayList<Waypoint>(map.values());
+
+            drawStepList.addAll(waypointRenderer.prepareSteps(waypoints, gridRenderer));
+        }
+
+        // Draw player if within bounds
+        Point playerPixel = gridRenderer.getPixel((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ);
+        if(playerPixel!=null) {
+            drawStepList.add(new BaseOverlayRenderer.DrawEntityStep(playerPixel, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8));
+        }
+    }
+
+    public void requireRefresh() {
 		this.lastRefresh = 0;
 	}
 	

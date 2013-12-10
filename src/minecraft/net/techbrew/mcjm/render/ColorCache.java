@@ -1,23 +1,16 @@
 package net.techbrew.mcjm.render;
 
-import java.awt.Color;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.logging.Logger;
-
-import net.minecraft.src.BiomeGenBase;
-import net.minecraft.src.Block;
-import net.minecraft.src.ColorizerFoliage;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.ReloadableResourceManager;
-import net.minecraft.src.ResourceManager;
-import net.minecraft.src.ResourceManagerReloadListener;
-import net.minecraft.src.ResourcePackRepository;
+import net.minecraft.src.*;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.IconLoader;
 import net.techbrew.mcjm.model.ChunkMD;
+
+import java.awt.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.logging.Logger;
 
 /**
  * Cache of block colors derived from the current texture pack.
@@ -310,25 +303,25 @@ public class ColorCache implements ResourceManagerReloadListener {
 		HashMap<BlockInfo, Color> tempColors = FileHandler.deserializeCache(lastResourcePack + "_blocks", colors.getClass());
 		if(tempColors!=null) {
 			colors.putAll(tempColors);
-			sb.append(tempColors.size() + " block colors");
+			sb.append(tempColors.size() + " block colors,");
 		}
 		
 		HashMap<Integer, Float> tempAlphas = FileHandler.deserializeCache(lastResourcePack + "_alpha", MapBlocks.alphas.getClass());
 		if(tempAlphas!=null) {
 			MapBlocks.alphas.putAll(tempAlphas);
-			sb.append(tempAlphas.size() + " block alphas");
+			sb.append(tempAlphas.size() + " block alphas,");
 		}
 		
 		HashMap<String, Color> tempGrass = FileHandler.deserializeCache(lastResourcePack + "_grass", grassBiomeColors.getClass());
 		if(tempGrass!=null) {
 			grassBiomeColors.putAll(tempGrass);
-			sb.append(tempGrass.size() + " grass+biome colors");
+			sb.append(tempGrass.size() + " grass+biome colors,");
 		}
 		
 		HashMap<String, Color> tempWater = FileHandler.deserializeCache(lastResourcePack + "_water", waterBiomeColors.getClass());
 		if(tempWater!=null) {
 			waterBiomeColors.putAll(tempWater);
-			sb.append(tempWater.size() + " water+biome colors");
+			sb.append(tempWater.size() + " water+biome colors,");
 		}
 		
 		HashMap<String, Color> tempFoliage = FileHandler.deserializeCache(lastResourcePack + "_foliage", foliageBiomeColors.getClass());
