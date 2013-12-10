@@ -1,22 +1,17 @@
 package net.techbrew.mcjm.render.overlay;
 
-import java.awt.Point;
-import java.io.File;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.Tessellator;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.model.BlockCoordIntPair;
-
 import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
+import java.io.File;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Contains a set of 9 tiles organized along compass points. 
@@ -28,7 +23,7 @@ import org.lwjgl.opengl.GL11;
 public class GridRenderer {
 			
 	private final Logger logger = JourneyMap.getLogger();
-	private final boolean debug = logger.isLoggable(Level.INFO);
+	private final boolean debug = logger.isLoggable(Level.FINE);
 	
 	private final TreeMap<TilePos, Tile> grid = new TreeMap<TilePos, Tile>();
 	private final int gridSize = 5; // 2560px.  Must be an odd number so as to have a center tile.
@@ -72,7 +67,7 @@ public class GridRenderer {
 				Tile tile = findNeighbor(centerTile, pos, existingTiles);
 				Tile oldTile = grid.put(pos, tile);
 				if(oldTile!=null) removedTiles.add(oldTile);
-				//if(debug) logger.info("Grid pos added: " + pos);				
+				//if(debug) logger.info("Grid pos added: " + pos);
 			}
 		}
 		
@@ -117,7 +112,7 @@ public class GridRenderer {
 			Tile newCenterTile = findTile(tileX, tileZ, currentTiles, true);
 			populateGrid(newCenterTile, currentTiles);
 			
-//			if(debug) logger.info("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
+			if(debug) logger.fine("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
 //			
 //			if(debug) {
 //				Minecraft mc = Minecraft.getMinecraft();
@@ -170,8 +165,6 @@ public class GridRenderer {
 				if(tile.updateTexture(pos, mapType, vSlice)) {
 					updated=true;
 				}
-			} else {
-				//if(debug) logger.info("Skipped updating offscreen tile: " + pos);
 			}
 		}
 		return updated;
@@ -239,25 +232,20 @@ public class GridRenderer {
 				tessellator.addVertexWithUV(endX, startZ, 0.0D, 1, 0);
 				tessellator.addVertexWithUV(startX, startZ, 0.0D, 0, 0);
 				tessellator.draw();
-			} else {
-				//if(debug) logger.info("Skipped offscreen tile: " + pos);
 			}
-		} else {
-			//if(debug) logger.info("Skipped tile with no texture: " + pos);
-		}		
+		}
 	}
 	
 	private boolean isOnScreen(TilePos pos) {
 		return isOnScreen(pos.startX + centerPixelOffset.x, pos.startZ + centerPixelOffset.y, pos.endX + centerPixelOffset.x, pos.endZ + centerPixelOffset.y);
 	}
-	
-	/**
-	 * Returns a pixel point if on screen, null if not.
-	 * @param blockX
-	 * @param blockZ
-	 * @param radius
-	 * @return
-	 */
+
+    /**
+     * Returns a pixel point if on screen, null if not.
+     * @param blockX pos x
+     * @param blockZ pos z
+     * @return  pixel
+     */
 	public Point getPixel(int blockX, int blockZ) {
 		Point pixel = getBlockPixelInGrid(blockX, blockZ);
 		if(isOnScreen(pixel)) {
@@ -266,14 +254,13 @@ public class GridRenderer {
 			return null;
 		}
 	}
-	
-	/**
-	 * Returns a pixel point if on screen, the closest one there is if not.
-	 * @param blockX
-	 * @param blockZ
-	 * @param radius
-	 * @return
-	 */
+
+    /**
+     * Returns a pixel point if on screen, the closest one there is if not.
+     * @param blockX x
+     * @param blockZ z
+     * @return  pixel
+     */
 	public Point getClosestOnscreenPixel(int blockX, int blockZ) {
 		Point pixel = getBlockPixelInGrid(blockX, blockZ);
 		if(pixel.x<0) {
@@ -291,35 +278,33 @@ public class GridRenderer {
 	
 	/**
 	 * This is a pixel check, not a location check
-	 * @param point
-	 * @return
+	 * @param point pixel
+	 * @return true if on screen
 	 */
 	public boolean isOnScreen(Point point) {
 		return point.x>0 && point.x<lastMcDisplayWidth && point.y>0 && point.y<lastMcDisplayHeight;
 	}
-	
-	/**
-	 * This is a pixel check, not a location check
-	 * @param startX
-	 * @param startZ
-	 * @param endX
-	 * @param endZ
-	 * @return
-	 */
-	public boolean isOnScreen(double x, double z) {
-		return x>0 && x<lastMcDisplayWidth && z>0 && z<lastMcDisplayHeight;
+
+    /**
+     * This is a pixel check, not a location check
+     * @param x screen x
+     * @param y screen y
+     * @return true if on screen
+     */
+	public boolean isOnScreen(double x, double y) {
+		return x>0 && x<lastMcDisplayWidth && y>0 && y<lastMcDisplayHeight;
 	}
-	
-	/**
-	 * This is a pixel check, not a location check
-	 * @param startX
-	 * @param startZ
-	 * @param endX
-	 * @param endZ
-	 * @return
-	 */
-	public boolean isOnScreen(double startX, double startZ, double endX, double endZ) {
-		return endX>0 && startX<lastMcDisplayWidth && endZ>0 && startZ<lastMcDisplayHeight;
+
+    /**
+     * This is a pixel check, not a location check
+     * @param startX upper pixel x
+     * @param startY upper pixel y
+     * @param endX lower pixel x
+     * @param endY lower pixel y
+     * @return true if on screen
+     */
+	public boolean isOnScreen(double startX, double startY, double endX, double endY) {
+		return endX>0 && startX<lastMcDisplayWidth && endY>0 && startY<lastMcDisplayHeight;
 	}	
 
 	private Tile findNeighbor(Tile tile, TilePos pos, Set<Tile> tiles) {				
@@ -336,9 +321,7 @@ public class GridRenderer {
 			}
 		}
 		if(createIfMissing) {
-			Tile tile = new Tile(worldDir, tileX, tileZ, zoom, dimension);
-			//if(debug) logger.info("Created " + tile);
-			return tile;
+			return new Tile(worldDir, tileX, tileZ, zoom, dimension);
 		} else {
 			return null;
 		}
