@@ -12,6 +12,9 @@ Requirements:
 - Forge "Recommended-1.6.4" or ModLoader 1.6.4
 
 Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
+- Bugfix for occasional NullPointerException in MapOverlay.drawScreen() during init sequence
+
+Changes in JourneyMap 3.1.0b3 for Minecraft 1.6.4:
 - (DBT-51Z-QQ9U) Added serialization of cached color assignments for texture packs, streamlined loading sequence.
 
 Changes in JourneyMap 3.1.0b2 for Minecraft 1.6.4:
