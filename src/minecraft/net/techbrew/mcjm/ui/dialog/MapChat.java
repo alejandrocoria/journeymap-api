@@ -1,18 +1,17 @@
 package net.techbrew.mcjm.ui.dialog;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import net.minecraft.src.GuiTextField;
 import net.minecraft.src.Packet203AutoComplete;
 import net.techbrew.mcjm.ui.JmUI;
 import net.techbrew.mcjm.ui.MapOverlay;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class MapChat extends JmUI
 {
@@ -318,8 +317,10 @@ public class MapChat extends JmUI
     {    	    
     	GL11.glPushMatrix();
         GL11.glTranslatef(0, this.height - 39.5f - bottomMargin, 0.0F);
-        if(this.mc.ingameGUI!=null && this.mc.ingameGUI.getChatGUI()!=null) {
-        	this.mc.ingameGUI.getChatGUI().drawChat(hidden ? this.mc.ingameGUI.getUpdateCounter() : this.cursorCounter);
+        if(this.mc!=null) {
+            if(this.mc.ingameGUI!=null && this.mc.ingameGUI.getChatGUI()!=null) {
+                this.mc.ingameGUI.getChatGUI().drawChat(hidden ? this.mc.ingameGUI.getUpdateCounter() : this.cursorCounter);
+            }
         }
     	GL11.glPopMatrix();
     	
