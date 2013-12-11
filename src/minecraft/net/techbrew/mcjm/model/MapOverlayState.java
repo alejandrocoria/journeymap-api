@@ -107,7 +107,7 @@ public class MapOverlayState {
         return drawStepList;
     }
 
-    public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, OverlayWaypointRenderer waypointRenderer, OverlayRadarRenderer radarRenderer) {
+    public void generateDrawSteps(Minecraft mc, boolean showPlayer, GridRenderer gridRenderer, OverlayWaypointRenderer waypointRenderer, OverlayRadarRenderer radarRenderer) {
         drawStepList.clear();
 
         List<Map> entities = new ArrayList<Map>(16);
@@ -155,9 +155,11 @@ public class MapOverlayState {
         }
 
         // Draw player if within bounds
-        Point playerPixel = gridRenderer.getPixel((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ);
-        if(playerPixel!=null) {
-            drawStepList.add(new BaseOverlayRenderer.DrawEntityStep(playerPixel, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8));
+        if(showPlayer) {
+            Point playerPixel = gridRenderer.getPixel((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ);
+            if(playerPixel!=null) {
+                drawStepList.add(new BaseOverlayRenderer.DrawEntityStep(playerPixel, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8));
+            }
         }
     }
 

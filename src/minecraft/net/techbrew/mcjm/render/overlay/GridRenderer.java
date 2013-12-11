@@ -8,6 +8,7 @@ import net.techbrew.mcjm.model.BlockCoordIntPair;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
@@ -26,70 +27,55 @@ public class GridRenderer {
 	private final boolean debug = logger.isLoggable(Level.FINE);
 	
 	private final TreeMap<TilePos, Tile> grid = new TreeMap<TilePos, Tile>();
-	private final int gridSize = 5; // 2560px.  Must be an odd number so as to have a center tile.
+	private final int gridSize; // 5 = 2560px.
 	
-	private int lastMcDisplayHeight=-1;
-	private int lastMcDisplayWidth=-1;
+	private int lastHeight =-1;
+	private int lastWidth =-1;
 	
 	private int centerTileHash;
-	private int zoom;	
-	private final BlockCoordIntPair ulBlock = new BlockCoordIntPair();
+	private int zoom;
 	private final BlockCoordIntPair centerBlock = new BlockCoordIntPair();
-	private final BlockCoordIntPair lrBlock = new BlockCoordIntPair();
 	
 	private final Point centerPixelOffset = new Point();
 	
 	//private MapTexture crosshairs;
 	
-	private final int dimension;
-	private final File worldDir;		
+	private Integer dimension;
+	private File worldDir;
 
-	public GridRenderer(final File worldDir, final int dimension) {
-		this.worldDir = worldDir;
-		this.dimension = dimension;
+	public GridRenderer(final int gridSize) {
+        this.gridSize = gridSize;  // Must be an odd number so as to have a center tile.
 	}
 	
-	private void populateGrid(Tile centerTile, Set<Tile> existingTiles) {
+	private void populateGrid(Tile centerTile) {
 				
 		final int endRow = (gridSize-1)/2;
 		final int endCol = (gridSize-1)/2;
 		final int startRow = -endRow;
 		final int startCol = -endCol;
-		
-		ulBlock.setLocation(Tile.tileToBlock(startCol, zoom), Tile.tileToBlock(startRow, zoom));
-		lrBlock.setLocation(Tile.tileToBlock(endCol, zoom), Tile.tileToBlock(endRow, zoom));
-		
-		Set<Tile> removedTiles = new HashSet<Tile>(grid.size());
-		
+
 		for(int z = startRow;z<=endRow;z++) {
 			for(int x = startCol;x<=endCol;x++) {			
 				TilePos pos = new TilePos(x,z);
-				Tile tile = findNeighbor(centerTile, pos, existingTiles);
+				Tile tile = findNeighbor(centerTile, pos);
 				Tile oldTile = grid.put(pos, tile);
-				if(oldTile!=null) removedTiles.add(oldTile);
-				//if(debug) logger.info("Grid pos added: " + pos);
+                if(oldTile!=null) {
+                    TileCache.instance().put(oldTile.hashCode(), oldTile);
+                }
 			}
 		}
-		
-		for(Tile oldTile : removedTiles) {
-			if(!grid.containsValue(oldTile)) {
-				oldTile.clear();
-				//if(debug) logger.info("Obsolete tile cleared: " + oldTile);
-			}
-		}
-		removedTiles.clear();
 
-		//if(debug) logger.info("Grid cen done for cols " + startCol + " to " + endCol + " and rows " + startRow + " to " + endRow);
+		if(debug) logger.info("Grid cen done for cols " + startCol + " to " + endCol + " and rows " + startRow + " to " + endRow);
 	}
 	
 	public void move(final int deltaBlockX, final int deltaBlockZ) {
 		center(centerBlock.x + deltaBlockX, centerBlock.z + deltaBlockZ, zoom);
 	}
-	
+
 	public boolean center() {
-		return center(0,0,zoom);
+		return center(centerBlock.x, centerBlock.z, zoom);
 	}
-	
+
 	public boolean center(final int blockX, final int blockZ, final int zoom) {
 		
 		centerBlock.setLocation(blockX, blockZ);
@@ -105,26 +91,24 @@ public class GridRenderer {
 		centerTileHash = newCenterHash;
 
 		if(centerTileChanged || grid.isEmpty()) {	
-			// Pull current tiles for reuse
-			final Set<Tile> currentTiles = new HashSet<Tile>(grid.values());		
-			
+
 			// Center on tile
-			Tile newCenterTile = findTile(tileX, tileZ, currentTiles, true);
-			populateGrid(newCenterTile, currentTiles);
+			Tile newCenterTile = findTile(tileX, tileZ);
+			populateGrid(newCenterTile);
 			
 			if(debug) logger.fine("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
-//			
-//			if(debug) {
-//				Minecraft mc = Minecraft.getMinecraft();
-//				BufferedImage tmp = new BufferedImage(mc.displayWidth, mc.displayHeight, BufferedImage.TYPE_INT_ARGB);
-//				Graphics2D g = tmp.createGraphics();
-//				g.setStroke(new BasicStroke(1));
-//				g.setColor(Color.GREEN);
-//				g.drawLine(mc.displayWidth/2, 0, mc.displayWidth/2, mc.displayHeight);
-//				g.drawLine(0, mc.displayHeight/2, mc.displayWidth, mc.displayHeight/2);
+
+			if(debug) {
+				Minecraft mc = Minecraft.getMinecraft();
+				BufferedImage tmp = new BufferedImage(mc.displayWidth, mc.displayHeight, BufferedImage.TYPE_INT_ARGB);
+				Graphics2D g = tmp.createGraphics();
+				g.setStroke(new BasicStroke(1));
+				g.setColor(Color.GREEN);
+				g.drawLine(mc.displayWidth/2, 0, mc.displayWidth/2, mc.displayHeight);
+				g.drawLine(0, mc.displayHeight/2, mc.displayWidth, mc.displayHeight/2);
 //				if(crosshairs!=null) crosshairs.clear();
 //				crosshairs = new MapTexture(tmp);
-//			}
+			}
 			
 			return true;
 		} else {
@@ -132,18 +116,18 @@ public class GridRenderer {
 		}
 	}
 	
-	public boolean updateTextures(MapType mapType, Integer vSlice) {
-		
+	public boolean updateTextures(MapType mapType, Integer vSlice, int width, int height, boolean fullUpdate, double xOffset, double yOffset) {
+
 		// Update screen dimensions
-		Minecraft mc = Minecraft.getMinecraft();
-		lastMcDisplayWidth = mc.displayWidth;
-		lastMcDisplayHeight = mc.displayHeight;
+		lastWidth = width;
+		lastHeight = height;
 		
 		// Update pixel offsets for center
 		final double srcSize = gridSize*Tile.TILESIZE;
-		final int magic = (2*Tile.TILESIZE); // TODO:  Understand why "2" as it relates to gridSize.  If gridSize is 3, this has to be "1".
-		final double displayOffsetX = magic-((srcSize - lastMcDisplayWidth)/2);
-		final double displayOffsetY = magic-((srcSize - lastMcDisplayHeight)/2);
+
+		final int magic = (gridSize==5? 2 : 1) * Tile.TILESIZE; // TODO:  Understand why "2" as it relates to gridSize.  If gridSize is 3, this has to be "1".
+		final double displayOffsetX = xOffset + magic-((srcSize - lastWidth)/2);
+		final double displayOffsetY = yOffset + magic-((srcSize - lastHeight)/2);
 		
 		// Get center tile
 		Tile centerTile = grid.get(new TilePos(0,0));	
@@ -153,20 +137,28 @@ public class GridRenderer {
 		
 		Point blockPixelOffset = centerTile.blockPixelOffsetInTile(centerBlock.x, centerBlock.z);
 		centerPixelOffset.setLocation(displayOffsetX + blockPixelOffset.x, displayOffsetY + blockPixelOffset.y);
-				
-		// Update textures only if on-screen
+
 		boolean updated = false;
-		TilePos pos;
-		Tile tile;
-		for(Map.Entry<TilePos,Tile> entry : grid.entrySet()) {
-			pos = entry.getKey();
-			tile = entry.getValue();
-			if(isOnScreen(pos)) {
-				if(tile.updateTexture(pos, mapType, vSlice)) {
-					updated=true;
-				}
-			}
-		}
+
+        TilePos pos;
+        Tile tile;
+        for(Map.Entry<TilePos,Tile> entry : grid.entrySet()) {
+            pos = entry.getKey();
+            tile = entry.getValue();
+            // Renew lease in cache
+            TileCache.instance().getIfPresent(tile.hashCode());
+
+            // Update texture only if on-screen
+            if(fullUpdate) {
+                if(isOnScreen(pos)) {
+                    if(tile.updateTexture(pos, mapType, vSlice)) {
+                        updated=true;
+                    }
+                }
+            }
+        }
+
+
 		return updated;
 	}
 	
@@ -177,8 +169,8 @@ public class GridRenderer {
 		
 		int blockSize = (int) Math.pow(2,zoom);
 
-		int pixelOffsetX = lastMcDisplayWidth/2 + (localBlockX*blockSize) ;
-		int pixelOffsetZ = lastMcDisplayHeight/2 +(localBlockZ*blockSize) ;
+		int pixelOffsetX = lastWidth /2 + (localBlockX*blockSize) ;
+		int pixelOffsetZ = lastHeight /2 +(localBlockZ*blockSize) ;
 		
 		return new Point(pixelOffsetX, pixelOffsetZ);
 	}				
@@ -202,9 +194,9 @@ public class GridRenderer {
 			
 //			if(debug && crosshairs!=null) {
 //				Minecraft mc = Minecraft.getMinecraft();
-//				GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, crosshairs.getGlTextureId());	
+//				GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, crosshairs.getGlTextureId());
 //				Tessellator tessellator = Tessellator.instance;
-//				tessellator.startDrawingQuads();			
+//				tessellator.startDrawingQuads();
 //				tessellator.addVertexWithUV(0, mc.displayHeight, 0.0D, 0, 1);
 //				tessellator.addVertexWithUV(mc.displayWidth, mc.displayHeight, 0.0D, 1, 1);
 //				tessellator.addVertexWithUV(mc.displayWidth, 0, 0.0D, 1, 0);
@@ -223,8 +215,8 @@ public class GridRenderer {
 			final double endX = offsetX + pos.endX;
 			final double endZ = offsetZ + pos.endZ;	
 			
-			if(isOnScreen(startX, startZ, endX, endZ)) {								
-				GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, tile.getTexture().getGlTextureId());	
+			//if(isOnScreen(startX, startZ, endX, endZ)) {
+				GL11.glBindTexture(GL11.GL_TEXTURE_2D, tile.getTexture().getGlTextureId());
 				Tessellator tessellator = Tessellator.instance;
 				tessellator.startDrawingQuads();			
 				tessellator.addVertexWithUV(startX, endZ, 0.0D, 0, 1);
@@ -232,8 +224,10 @@ public class GridRenderer {
 				tessellator.addVertexWithUV(endX, startZ, 0.0D, 1, 0);
 				tessellator.addVertexWithUV(startX, startZ, 0.0D, 0, 0);
 				tessellator.draw();
-			}
-		}
+			//}
+		} else {
+           if(debug) logger.fine("Tile has no texture: " + tile);
+        }
 	}
 	
 	private boolean isOnScreen(TilePos pos) {
@@ -265,13 +259,13 @@ public class GridRenderer {
 		Point pixel = getBlockPixelInGrid(blockX, blockZ);
 		if(pixel.x<0) {
 			pixel.setLocation(0, pixel.y);
-		} else if(pixel.x>lastMcDisplayWidth) {
-			pixel.setLocation(lastMcDisplayWidth, pixel.y);
+		} else if(pixel.x> lastWidth) {
+			pixel.setLocation(lastWidth, pixel.y);
 		}
 		if(pixel.y<0) {
 			pixel.setLocation(pixel.x, 0);
-		} else if(pixel.y>lastMcDisplayHeight) {
-			pixel.setLocation(pixel.x, lastMcDisplayHeight);
+		} else if(pixel.y> lastHeight) {
+			pixel.setLocation(pixel.x, lastHeight);
 		}
 		return pixel;
 	}
@@ -282,7 +276,7 @@ public class GridRenderer {
 	 * @return true if on screen
 	 */
 	public boolean isOnScreen(Point point) {
-		return point.x>0 && point.x<lastMcDisplayWidth && point.y>0 && point.y<lastMcDisplayHeight;
+		return point.x>0 && point.x< lastWidth && point.y>0 && point.y< lastHeight;
 	}
 
     /**
@@ -292,7 +286,7 @@ public class GridRenderer {
      * @return true if on screen
      */
 	public boolean isOnScreen(double x, double y) {
-		return x>0 && x<lastMcDisplayWidth && y>0 && y<lastMcDisplayHeight;
+		return x>0 && x< lastWidth && y>0 && y< lastHeight;
 	}
 
     /**
@@ -304,31 +298,33 @@ public class GridRenderer {
      * @return true if on screen
      */
 	public boolean isOnScreen(double startX, double startY, double endX, double endY) {
-		return endX>0 && startX<lastMcDisplayWidth && endY>0 && startY<lastMcDisplayHeight;
+		return endX>0 && startX< lastWidth && endY>0 && startY< lastHeight;
 	}	
 
-	private Tile findNeighbor(Tile tile, TilePos pos, Set<Tile> tiles) {				
+	private Tile findNeighbor(Tile tile, TilePos pos) {
 		if(pos.deltaX==0 && pos.deltaZ==0) return tile;
-		return findTile(tile.tileX + pos.deltaX, tile.tileZ + pos.deltaZ, tiles, true);
+		return findTile(tile.tileX + pos.deltaX, tile.tileZ + pos.deltaZ);
 	}
 	
-	private Tile findTile(final int tileX, final int tileZ, Collection<Tile> tiles, final boolean createIfMissing) {	
+	private Tile findTile(final int tileX, final int tileZ) {
 		final int hash = Tile.toHashCode(tileX, tileZ, zoom, dimension);
-		for(Tile tile : tiles) {
-			if(tile!=null && tile.hashCode()==hash) {
-				//if(debug) logger.info("Got existing " + tile);
-				return tile;
-			}
-		}
-		if(createIfMissing) {
-			return new Tile(worldDir, tileX, tileZ, zoom, dimension);
-		} else {
-			return null;
-		}
+
+        // Check cache first
+        Tile tile = TileCache.instance().getIfPresent(hash);
+        if(tile==null) {
+            tile = new Tile(worldDir, tileX, tileZ, zoom, dimension);
+            TileCache.instance().put(hash, tile);
+            //logger.info("Created for cache:" + tile);
+            return tile;
+        } else {
+            if(debug) logger.finer("Reused from cache:" + tile);
+        }
+        return tile;
 	}
 	
-	public boolean isUsing(File worldDir, int dimension) {
-		return this.dimension == dimension && this.worldDir.equals(worldDir);
+	public void setContext(File worldDir, int dimension) {
+        this.worldDir = worldDir;
+        this.dimension = dimension;
 	}
 	
 	public File getWorldDir() {
@@ -344,15 +340,10 @@ public class GridRenderer {
 	}
 
 	public void setZoom(int zoom) {
-		if(zoom!=this.zoom) {
-			center(centerBlock.x, centerBlock.z, zoom);
-		}
+		center(centerBlock.x, centerBlock.z, zoom);
 	}
 
 	public void clear() {
-		for(Tile tile : grid.values()) {
-			tile.clear();
-		}
 		grid.clear();
 	}
 }

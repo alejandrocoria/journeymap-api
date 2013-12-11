@@ -1,22 +1,6 @@
 package net.techbrew.mcjm;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.GuiMainMenu;
-import net.minecraft.src.GuiMultiplayer;
-import net.minecraft.src.GuiScreen;
-import net.minecraft.src.GuiSelectWorld;
-import net.minecraft.src.KeyBinding;
-import net.minecraft.src.Minecraft;
+import net.minecraft.src.*;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.feature.FeatureManager;
@@ -37,8 +21,16 @@ import net.techbrew.mcjm.thread.JMThreadFactory;
 import net.techbrew.mcjm.thread.TaskThread;
 import net.techbrew.mcjm.ui.MapOverlay;
 import net.techbrew.mcjm.ui.UIManager;
-
 import org.lwjgl.input.Keyboard;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This software is copyright (C) Mark Woodman (mwoodman@techbrew.net) and is
@@ -369,6 +361,9 @@ public class JourneyMap {
 			if(!isMapping()) {
 				startMapping(minecraft);
 			}
+
+            // Minimap
+            UIManager.getInstance().drawMiniMap();
 
 			// Show announcements
 			boolean isGamePaused = minecraft.currentScreen != null && !(minecraft.currentScreen instanceof MapOverlay);

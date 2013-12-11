@@ -1,22 +1,18 @@
 package net.techbrew.mcjm.render.overlay;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Point;
+import net.minecraft.src.ChunkCoordIntPair;
+import net.techbrew.mcjm.Constants.MapType;
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.io.RegionImageHandler;
+import net.techbrew.mcjm.render.texture.TextureCache;
+import net.techbrew.mcjm.render.texture.TextureImpl;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import net.minecraft.src.ChunkCoordIntPair;
-import net.techbrew.mcjm.Constants.MapType;
-import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.RegionImageHandler;
-import net.techbrew.mcjm.render.texture.TextureImpl;
-import net.techbrew.mcjm.render.texture.TextureCache;
 
 public class Tile {
 		
@@ -82,6 +78,9 @@ public class Tile {
 			}
 			//if(debug) logger.info("Updated texture for " + this + " at " + mapType + ", vSlice " + vSlice);
 		}
+        if(textureImpl==null) {
+            logger.warning("Texture still null after update: " + this);
+        }
 		return changed;
 	}
 	
@@ -96,6 +95,7 @@ public class Tile {
 	public void clear() {
 		if(textureImpl!=null) {
 			textureImpl.deleteTexture();
+            textureImpl = null;
 		}
 	}
 
@@ -139,8 +139,8 @@ public class Tile {
 		int localBlockZ = ulBlock.y - z;
 		if(z<0) localBlockZ++;
 		
-		int tileCenterBlockX = lrBlock.x-ulBlock.x;
-		int tileCenterBlockZ = lrBlock.y-ulBlock.y;
+//		int tileCenterBlockX = lrBlock.x-ulBlock.x;
+//		int tileCenterBlockZ = lrBlock.y-ulBlock.y;
 		
 		int blockSize = (int) Math.pow(2,zoom);
 		int pixelOffsetX = (TILESIZE/2) + (localBlockX*blockSize) - (blockSize/2);
@@ -181,4 +181,15 @@ public class Tile {
 		return true;
 	}
 
+    @Override
+    protected void finalize()  {
+        try {
+            if(textureImpl!=null) {
+                logger.warning("Tile wasn't cleared before finalize() called: " + this);
+                clear();
+            }
+        } catch(Throwable t){
+            logger.severe(t.getMessage());
+        }
+    }
 }
