@@ -71,7 +71,7 @@ public class UIManager {
     }
 
     public void drawMiniMap() {
-        if(miniMap.isVisible()){
+        if(MiniMapOverlay.isEnabled() && miniMap.isVisible()){
             boolean isGamePaused = (minecraft.currentScreen != null) && !(minecraft.currentScreen instanceof MapOverlay) && !(minecraft.currentScreen instanceof GuiChat);
             if(!isGamePaused) {
                 miniMap.drawMap();

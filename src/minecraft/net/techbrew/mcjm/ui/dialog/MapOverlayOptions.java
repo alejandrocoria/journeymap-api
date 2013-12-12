@@ -1,7 +1,5 @@
 package net.techbrew.mcjm.ui.dialog;
 
-import java.awt.Color;
-
 import net.minecraft.src.GuiButton;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
@@ -12,11 +10,7 @@ import net.techbrew.mcjm.feature.Feature;
 import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.WaypointHelper;
-import net.techbrew.mcjm.ui.JmUI;
-import net.techbrew.mcjm.ui.MapButton;
-import net.techbrew.mcjm.ui.MapOverlay;
-import net.techbrew.mcjm.ui.UIManager;
-
+import net.techbrew.mcjm.ui.*;
 import org.lwjgl.input.Keyboard;
 
 public class MapOverlayOptions extends JmUI {
@@ -25,8 +19,8 @@ public class MapOverlayOptions extends JmUI {
 	int lastWidth = 0;
 	int lastHeight = 0;
 	
-	private enum ButtonEnum {Caves,Monsters,Animals,Villagers,Pets,Players,Waypoints,Grid,Webserver,Close};	
-	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid, buttonWebserver, buttonClose;
+	private enum ButtonEnum {Caves,Monsters,Animals,Villagers,Pets,Players,Waypoints,Grid,Webserver,MiniMap,Close};
+	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid, buttonWebserver, buttonMiniMap, buttonClose;
 	
 	public MapOverlayOptions() {
 		title = Constants.getString("MapOverlay.options");
@@ -86,6 +80,13 @@ public class MapOverlayOptions extends JmUI {
 				Constants.getString("MapOverlay.enable_webserver", off),
 				webserverOn); //$NON-NLS-1$  //$NON-NLS-2$
 		buttonWebserver.setToggled(webserverOn);
+
+        boolean minimapOn = MiniMapOverlay.isEnabled();
+        buttonMiniMap = new MapButton(ButtonEnum.MiniMap.ordinal(),0,0,
+                Constants.getString("MapOverlay.enable_minimap", on),
+                Constants.getString("MapOverlay.enable_minimap", off),
+                minimapOn); //$NON-NLS-1$  //$NON-NLS-2$
+        buttonMiniMap.setToggled(minimapOn);
 		
 		buttonGrid = new MapButton(ButtonEnum.Grid.ordinal(),0,0,
 				Constants.getString("MapOverlay.show_grid", on),
@@ -136,6 +137,7 @@ public class MapOverlayOptions extends JmUI {
 		buttonList.add(buttonGrid);
 		buttonList.add(buttonWaypoints);
 		buttonList.add(buttonWebserver);
+        buttonList.add(buttonMiniMap);
     }
     
     /**
@@ -169,8 +171,9 @@ public class MapOverlayOptions extends JmUI {
 
 			buttonGrid.below(buttonPets, vgap).xPosition=bx;
 			buttonWaypoints.rightOf(buttonGrid, hgap).below(buttonPlayers, vgap);
-			
-			buttonWebserver.below(buttonGrid, vgap).centerHorizontalOn(this.width / 2);
+
+            buttonMiniMap.below(buttonGrid, vgap).xPosition=bx;
+			buttonWebserver.rightOf(buttonMiniMap, vgap).below(buttonWaypoints, vgap);
 			
 			buttonClose.below(buttonWebserver, vgap*2).centerHorizontalOn(this.width / 2);
 
@@ -228,14 +231,17 @@ public class MapOverlayOptions extends JmUI {
 				JourneyMap.getInstance().toggleWebserver(buttonWebserver.getToggled(), true);
 				break;
 			}
-
+            case MiniMap: {
+                buttonMiniMap.setToggled(!MiniMapOverlay.isEnabled());
+                MiniMapOverlay.setEnabled(!MiniMapOverlay.isEnabled());
+                break;
+            }
 		}
 	}
     
     @Override
 	public void updateScreen() {
 		super.updateScreen();
-		//layoutButtons();
 	}
 
     /**

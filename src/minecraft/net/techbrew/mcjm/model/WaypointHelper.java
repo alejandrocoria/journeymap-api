@@ -1,12 +1,12 @@
 package net.techbrew.mcjm.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Get waypoints
@@ -32,7 +32,7 @@ public class WaypointHelper {
 	 * Check for Rei Minimap
 	 * @return
 	 */
-	private static boolean isReiLoaded() {
+	public static boolean isReiLoaded() {
 		if(reiLoaded==null) {
 			try {
 				Class.forName("reifnsk.minimap.ReiMinimap");
@@ -52,7 +52,7 @@ public class WaypointHelper {
 	 * Check for VoxelMap (was Zans) Minimap
 	 * @return
 	 */
-	private static boolean isVoxelMapLoaded() {
+    public static boolean isVoxelMapLoaded() {
 		if(voxelMapLoaded==null) {
 			try {
 				Class.forName("com.thevoxelbox.voxelmap.VoxelMap");

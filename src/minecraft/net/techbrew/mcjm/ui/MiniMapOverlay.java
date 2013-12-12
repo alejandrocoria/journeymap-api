@@ -4,8 +4,10 @@ import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.ScaledResolution;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.MapOverlayState;
+import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
 import net.techbrew.mcjm.render.overlay.GridRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
@@ -23,6 +25,8 @@ import java.util.logging.Logger;
  *
  */
 public class MiniMapOverlay {
+
+    static Boolean enabled;
 
 	final MapOverlayState state = MapOverlay.state();
 	final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
@@ -141,6 +145,19 @@ public class MiniMapOverlay {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public static boolean isEnabled() {
+        if(enabled==null) {
+            enabled = PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_MINIMAP)
+                    && !WaypointHelper.isReiLoaded() && !WaypointHelper.isVoxelMapLoaded();
+        }
+        return enabled;
+    }
+
+    public static void setEnabled(boolean enable){
+        enabled = enable;
+        PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_MINIMAP, enable);
     }
 }
 

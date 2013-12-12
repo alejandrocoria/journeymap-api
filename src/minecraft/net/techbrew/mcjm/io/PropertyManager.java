@@ -1,5 +1,9 @@
 package net.techbrew.mcjm.io;
 
+import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.log.LogFormatter;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -8,10 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
-
-import net.techbrew.mcjm.Constants;
-import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.log.LogFormatter;
 
 public class PropertyManager {
 
@@ -42,7 +42,8 @@ public class PropertyManager {
 		PREF_SHOW_PETS("preference_show_pets", true), //$NON-NLS-1$
 		PREF_SHOW_PLAYERS("preference_show_players", true), //$NON-NLS-1$
 		PREF_SHOW_WAYPOINTS("preference_show_waypoints", true), //$NON-NLS-1$
-		PREF_SHOW_GRID("preference_show_grid", true); //$NON-NLS-1$
+		PREF_SHOW_GRID("preference_show_grid", true), //$NON-NLS-1$
+        PREF_SHOW_MINIMAP("preference_show_minimap", true); //$NON-NLS-1$
 		
 		private final String property;
 		private final String defaultValue;
