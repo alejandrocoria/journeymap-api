@@ -14,10 +14,7 @@ import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.MapOverlayState;
-import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
-import net.techbrew.mcjm.render.overlay.GridRenderer;
-import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
-import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
+import net.techbrew.mcjm.render.overlay.*;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.ui.dialog.MapChat;
 import org.lwjgl.input.Keyboard;
@@ -29,7 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Displays the map as an overlay in-game.
+ * Displays the map as a full-screen overlay in-game.
  * 
  * @author mwoodman
  *
@@ -37,9 +34,9 @@ import java.util.logging.Logger;
 public class MapOverlay extends JmUI {
 
 	final static MapOverlayState state = new MapOverlayState();
-	final static OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
-	final static OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
-	static GridRenderer gridRenderer;
+	final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
+	final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
+	final static GridRenderer gridRenderer = new GridRenderer(5);
 
     private enum Mode{Fullscreen, TopRight}
 	private enum ButtonEnum{Alert,DayNight,Follow,ZoomIn,ZoomOut,Options,Actions,Close,MiniMap}
@@ -54,7 +51,6 @@ public class MapOverlay extends JmUI {
 	MapChat chat;
 
     private Mode displayMode = Mode.Fullscreen;
-
 	
 	MapButton buttonDayNight, buttonFollow, buttonZoomIn, buttonZoomOut;
 	MapButton buttonAlert, buttonOptions, buttonActions, buttonClose;
@@ -68,6 +64,10 @@ public class MapOverlay extends JmUI {
 	 * Default constructor
 	 */
 	public MapOverlay() {
+        Minecraft mc = Minecraft.getMinecraft();
+        state.refresh(Minecraft.getMinecraft(), mc.thePlayer);
+        gridRenderer.setContext(state.getWorldDir(), state.getDimension());
+        gridRenderer.setZoom(state.currentZoom);
 	}
 	
     @Override
@@ -79,7 +79,7 @@ public class MapOverlay extends JmUI {
     	
     	// When switching dimensions, reset grid
 		if(state.getDimension()!=mc.thePlayer.dimension) {
-			if(gridRenderer!=null) gridRenderer.clear();
+			gridRenderer.clear();
 		}
 
     	chat = new MapChat(this, "", true);
@@ -161,8 +161,8 @@ public class MapOverlay extends JmUI {
 		initButtons();
 		layoutButtons();			
 		
-		if(state.follow) {			
-			gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
+		if(state.follow) {
+            gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
 		}
 		
 		if(chat!=null) {
@@ -170,9 +170,7 @@ public class MapOverlay extends JmUI {
 			return;
 		}
 		
-		if(gridRenderer!=null) {
-			drawMap();
-		}
+		drawMap();
 	}
 
 	/**
@@ -343,7 +341,7 @@ public class MapOverlay extends JmUI {
 			if(gridRenderer!=null) {
 				try {
 					gridRenderer.move(-mouseDragX, -mouseDragY);
-					gridRenderer.updateTextures(state.getMapType(), state.getVSlice());
+					gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
 					gridRenderer.setZoom(state.currentZoom);
 				} catch(Exception e) {
 					logger.severe("Error moving grid: " + e);
@@ -561,7 +559,7 @@ public class MapOverlay extends JmUI {
         GL11.glOrtho(0.0D, glWidth, glHeight, 0.0D, 1000.0D, 3000.0D);
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadIdentity();
-        GL11.glTranslatef(0.0F, 0.0F, -2000.0F);		
+        GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
 	}
 	
 	/**
@@ -579,11 +577,10 @@ public class MapOverlay extends JmUI {
 		state.refresh(mc, player);
 		
 		// Set/update the grid
-		if(gridRenderer==null || !gridRenderer.isUsing(state.getWorldDir(), state.getDimension())) {
-			if(gridRenderer!=null) gridRenderer.clear();
+		if(state.getDimension() != gridRenderer.getDimension()) {
 			setFollow(true);
-			gridRenderer = new GridRenderer(state.getWorldDir(), state.getDimension());
-		}			
+		}
+        gridRenderer.setContext(state.getWorldDir(), state.getDimension());
 		
 		// Center core renderer
 		if(state.follow) {
@@ -592,10 +589,10 @@ public class MapOverlay extends JmUI {
 		} else {
 			gridRenderer.setZoom(state.currentZoom);
 		}
-		gridRenderer.updateTextures(state.getMapType(), state.getVSlice());
+		gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 		
 		// Build list of drawSteps
-		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer);
+		state.generateDrawSteps(mc, true, gridRenderer, waypointRenderer, radarRenderer);
 		
 		// Update player pos
 		String biomeName = (String) DataCache.instance().get(PlayerData.class).get(EntityKey.biome);			
@@ -607,7 +604,10 @@ public class MapOverlay extends JmUI {
 				biomeName); //$NON-NLS-1$ 	
 		
 		// Reset timer
-		state.updateLastRefresh();		
+		state.updateLastRefresh();
+
+        // Clean up expired tiles
+        TileCache.instance().cleanUp();
 	}
 	
 	void openChat(String defaultText) {
@@ -653,10 +653,9 @@ public class MapOverlay extends JmUI {
 	
 	public static void reset() {
 		state.requireRefresh();
-		if(gridRenderer!=null) {
-			gridRenderer.clear();
-			gridRenderer = null;
-		}
+		gridRenderer.clear();
+        TileCache.instance().invalidateAll();
+        TileCache.instance().cleanUp();
 	}
 
 }
