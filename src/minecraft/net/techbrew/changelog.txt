@@ -12,26 +12,18 @@ Requirements:
 - Forge "Recommended-1.6.4" or ModLoader 1.6.4
 
 Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
-- Bugfix for occasional NullPointerException in MapOverlay.drawScreen() during init sequence
-
-Changes in JourneyMap 3.1.0b3 for Minecraft 1.6.4:
-- (DBT-51Z-QQ9U) Added serialization of cached color assignments for texture packs, streamlined loading sequence.
-
-Changes in JourneyMap 3.1.0b2 for Minecraft 1.6.4:
-- (P4E-Q5J-7S36) Bugfix: Waypoint names with apostrophes broke the Web UI
-- (DBT-51Z-QQ9U) Bugfix: Version check now has an explicit connection timeout of 3 seconds and a read timeout of 3 seconds
-- Bugfix: Waypoint names originating from Rei's Minimap were displayed incorrectly in the Web UI
-- Bugfix: In-game Options button "Show Waypoints" would be disabled after toggled off.
-
-Changes in JourneyMap 3.1.0b1 for Minecraft 1.6.4:
-- JourneyMap now comes in two editions: FairPlay and Unlimited.  
--- FairPlay Edition disables Radar and Cave mapping when in Multi-Player.
--- Unlimited Edition has all features enabled for Single- and Multi-Player.
-- (T7M-D6N-JS1X) Bugfix : Non-entity mobs from other mods can trigger a crash
-- Bugfix for chunks that wouldn't map because blocks were at the maximum world height.
+- JourneyMap now comes in two editions: FairPlay and Unlimited:
+  - FairPlay Edition disables Radar and Cave mapping when in Multi-Player.
+  - Unlimited Edition has all features enabled for Single- and Multi-Player.
 - Added button to start/stop webserver from the in-game Options menu.
 - Minor aesthetic changes to in-game Options and Actions menus. 
 - Error handling improvements in Web UI
+- (T7M-D6N-JS1X) Bugfix : Non-entity mobs from other mods can trigger a crash
+- (DBT-51Z-QQ9U) Bugfix: Added serialization of cached color assignments for texture packs, streamlined loading sequence.
+- (P4E-Q5J-7S36) Bugfix: Waypoint names with apostrophes broke the Web UI
+- Bugfix for chunks that wouldn't map because blocks were at the maximum world height.
+- Bugfix: Waypoint names originating from Rei's Minimap were displayed incorrectly in the Web UI
+- Bugfix: In-game Options button "Show Waypoints" would be disabled after toggled off.
 
 Changes in JourneyMap 3.0.0 for Minecraft 1.6.4:
 - In-game UI and Web UI completely re-written to be much faster, zoom out further, and have no texture distortions.

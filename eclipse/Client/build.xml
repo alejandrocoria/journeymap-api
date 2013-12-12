@@ -2,7 +2,7 @@
 <project name="JourneyMap" basedir="../.." default="all">
 
     <!-- Update when new version is going to be released -->
-    <property name="jmversion" value="3.1.0b3" />
+    <property name="jmversion" value="3.1.0" />
     <property name="mcversion" value="MC1.6.4" />
 	<property name="unlimited" value="Unlimited" />
 	<property name="fairplay" value="FairPlay" />
@@ -130,7 +130,7 @@
 	    	<replace dir="${build.dir}" token="@MCVERSION@" value="${mcversion}" />
 	    	<replace dir="${build.dir}" token="@DATE@" value="${TODAY}" />
 	    	
-	    	<jar destfile="${dist.dir}/@{zipname}.zip" duplicate="preserve" index="true" manifestencoding="UTF-8">
+	    	<jar destfile="${dist.dir}/@{zipName}.zip" duplicate="preserve" index="true" manifestencoding="UTF-8">
 	            <manifest>
 	                <attribute name="Built-By" value="Mark Woodman"/>
 	            	<attribute name="Built-Date" value="${TODAY}"/>
@@ -140,7 +140,7 @@
 	            </manifest>
 	            <fileset dir="${build.dir}" />
 	        </jar>
-	        <echo message="Built: ${dist.dir}\@{zipname}.zip" />
+	        <echo message="Built: ${dist.dir}\@{zipName}.zip" />
 	    	
 	    </sequential>
 	</macrodef>

@@ -1,22 +1,6 @@
 package net.techbrew.mcjm;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.GuiMainMenu;
-import net.minecraft.src.GuiMultiplayer;
-import net.minecraft.src.GuiScreen;
-import net.minecraft.src.GuiSelectWorld;
-import net.minecraft.src.KeyBinding;
-import net.minecraft.src.Minecraft;
+import net.minecraft.src.*;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.feature.FeatureManager;
@@ -37,8 +21,16 @@ import net.techbrew.mcjm.thread.JMThreadFactory;
 import net.techbrew.mcjm.thread.TaskThread;
 import net.techbrew.mcjm.ui.MapOverlay;
 import net.techbrew.mcjm.ui.UIManager;
-
 import org.lwjgl.input.Keyboard;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This software is copyright (C) Mark Woodman (mwoodman@techbrew.net) and is
@@ -54,7 +46,7 @@ public class JourneyMap {
 	static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
 
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-	public static final String JM_VERSION = "3.1.0b3"; //$NON-NLS-1$
+	public static final String JM_VERSION = "3.1.0"; //$NON-NLS-1$
 	public static final String MC_VERSION = "1.6.4"; //$NON-NLS-1$
 	
 	public static final String EDITION = getEdition();
