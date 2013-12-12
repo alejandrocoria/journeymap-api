@@ -2,7 +2,7 @@
 <project name="JourneyMap" basedir="../.." default="all">
 
     <!-- Update when new version is going to be released -->
-    <property name="jmversion" value="3.1.0" />
+    <property name="jmversion" value="3.2.0b1" />
     <property name="mcversion" value="MC1.6.4" />
 	<property name="unlimited" value="Unlimited" />
 	<property name="fairplay" value="FairPlay" />

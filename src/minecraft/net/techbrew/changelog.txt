@@ -12,6 +12,9 @@ Requirements:
 - Forge "Recommended-1.6.4" or ModLoader 1.6.4
 
 Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
+- New Feature:  Minimap will be enabled if Rei's/Zan's (Voxel) is not active
+
+Changes in JourneyMap 3.1.0 for Minecraft 1.6.4:
 - JourneyMap now comes in two editions: FairPlay and Unlimited:
   - FairPlay Edition disables Radar and Cave mapping when in Multi-Player.
   - Unlimited Edition has all features enabled for Single- and Multi-Player.
