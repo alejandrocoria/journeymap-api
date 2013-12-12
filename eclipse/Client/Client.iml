@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="EclipseModuleManager">
+    <libelement value="jar://$MCP_LOC$/lib/ModLoader.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/argo/argo/2.25_fixed/argo-2.25_fixed.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/com/google/code/gson/gson/2.2.2/gson-2.2.2.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/com/google/guava/guava/14.0/guava-14.0.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/com/paulscode/codecjorbis/20101023/codecjorbis-20101023.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/com/paulscode/codecwav/20101023/codecwav-20101023.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/com/paulscode/libraryjavasound/20101123/libraryjavasound-20101123.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/com/paulscode/librarylwjglopenal/20100824/librarylwjglopenal-20100824.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/com/paulscode/soundsystem/20120107/soundsystem-20120107.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/commons-io/commons-io/2.4/commons-io-2.4.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/net/java/jinput/jinput/2.0.5/jinput-2.0.5.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/net/java/jinput/jinput-platform/2.0.5/jinput-platform-2.0.5-natives-windows.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/net/java/jutils/jutils/1.0.0/jutils-1.0.0.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/net/sf/jopt-simple/jopt-simple/4.5/jopt-simple-4.5.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/org/apache/commons/commons-lang3/3.1/commons-lang3-3.1.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/org/bouncycastle/bcprov-jdk15on/1.47/bcprov-jdk15on-1.47.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/org/lwjgl/lwjgl/lwjgl-platform/2.9.0/lwjgl-platform-2.9.0-natives-windows.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/org/lwjgl/lwjgl/lwjgl_util/2.9.0/lwjgl_util-2.9.0.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/libraries/org/lwjgl/lwjgl/lwjgl/2.9.0/lwjgl-2.9.0.jar!/" />
+    <libelement value="jar://$MCP_LOC$/lib/[1.6.2]ReiMinimap_v3.4_01.jar!/" />
+    <libelement value="jar://$MCP_LOC$/lib/YUIAnt.jar!/" />
+    <libelement value="jar://$MCP_LOC$/lib/yuicompressor-2.4.7.jar!/" />
+    <libelement value="jar://$MCP_LOC$/lib/Zans-Minimap-Mod-ML-Forge-1.6.1.jar!/" />
+    <libelement value="jar://$MCP_LOC$/jars/versions/1.6.4/1.6.4.jar!/" />
+    <varelement var="file://$MCP_LOC$/src/minecraft" value="linksrc:src" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/argo/argo/2.25_fixed/argo-2.25_fixed.jar!/" value="link:jars/libraries/argo/argo/2.25_fixed/argo-2.25_fixed.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/com/google/code/gson/gson/2.2.2/gson-2.2.2.jar!/" value="link:jars/libraries/com/google/code/gson/gson/2.2.2/gson-2.2.2.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/com/google/guava/guava/14.0/guava-14.0.jar!/" value="link:jars/libraries/com/google/guava/guava/14.0/guava-14.0.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/com/paulscode/codecjorbis/20101023/codecjorbis-20101023.jar!/" value="link:jars/libraries/com/paulscode/codecjorbis/20101023/codecjorbis-20101023.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/com/paulscode/codecwav/20101023/codecwav-20101023.jar!/" value="link:jars/libraries/com/paulscode/codecwav/20101023/codecwav-20101023.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/com/paulscode/libraryjavasound/20101123/libraryjavasound-20101123.jar!/" value="link:jars/libraries/com/paulscode/libraryjavasound/20101123/libraryjavasound-20101123.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/com/paulscode/librarylwjglopenal/20100824/librarylwjglopenal-20100824.jar!/" value="link:jars/libraries/com/paulscode/librarylwjglopenal/20100824/librarylwjglopenal-20100824.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/com/paulscode/soundsystem/20120107/soundsystem-20120107.jar!/" value="link:jars/libraries/com/paulscode/soundsystem/20120107/soundsystem-20120107.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/commons-io/commons-io/2.4/commons-io-2.4.jar!/" value="link:jars/libraries/commons-io/commons-io/2.4/commons-io-2.4.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/net/java/jinput/jinput/2.0.5/jinput-2.0.5.jar!/" value="link:jars/libraries/net/java/jinput/jinput/2.0.5/jinput-2.0.5.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/net/java/jinput/jinput-platform/2.0.5/jinput-platform-2.0.5-natives-windows.jar!/" value="link:jars/libraries/net/java/jinput/jinput-platform/2.0.5/jinput-platform-2.0.5-natives-windows.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/net/java/jutils/jutils/1.0.0/jutils-1.0.0.jar!/" value="link:jars/libraries/net/java/jutils/jutils/1.0.0/jutils-1.0.0.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/net/sf/jopt-simple/jopt-simple/4.5/jopt-simple-4.5.jar!/" value="link:jars/libraries/net/sf/jopt-simple/jopt-simple/4.5/jopt-simple-4.5.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/org/apache/commons/commons-lang3/3.1/commons-lang3-3.1.jar!/" value="link:jars/libraries/org/apache/commons/commons-lang3/3.1/commons-lang3-3.1.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/org/bouncycastle/bcprov-jdk15on/1.47/bcprov-jdk15on-1.47.jar!/" value="link:jars/libraries/org/bouncycastle/bcprov-jdk15on/1.47/bcprov-jdk15on-1.47.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/org/lwjgl/lwjgl/lwjgl-platform/2.9.0/lwjgl-platform-2.9.0-natives-windows.jar!/" value="link:jars/libraries/org/lwjgl/lwjgl/lwjgl-platform/2.9.0/lwjgl-platform-2.9.0-natives-windows.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/org/lwjgl/lwjgl/lwjgl_util/2.9.0/lwjgl_util-2.9.0.jar!/" value="link:jars/libraries/org/lwjgl/lwjgl/lwjgl_util/2.9.0/lwjgl_util-2.9.0.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/libraries/org/lwjgl/lwjgl/lwjgl/2.9.0/lwjgl-2.9.0.jar!/" value="link:jars/libraries/org/lwjgl/lwjgl/lwjgl/2.9.0/lwjgl-2.9.0.jar" />
+    <varelement var="jar://$MCP_LOC$/jars/versions/1.6.4/1.6.4.jar!/" value="link:jars/versions/1.6.4/1.6.4.jar" />
+    <src_description expected_position="1">
+      <src_folder value="file://$MCP_LOC$/src/minecraft" expected_position="1" />
+    </src_description>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/bin" />
+    <output-test url="file://$MCP_LOC$/eclipse/out/test/Client" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MCP_LOC$/src/minecraft">
+      <sourceFolder url="file://$MCP_LOC$/src/minecraft" isTestSource="false" />
+    </content>
+    <orderEntry type="module-library">
+      <library name="ModLoader.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/lib/ModLoader.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="jdk" jdkName="1.6" jdkType="JavaSDK" />
+    <orderEntry type="library" name="LWJGL 2.9" level="project" />
+    <orderEntry type="module-library">
+      <library name="argo-2.25_fixed.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/argo/argo/2.25_fixed/argo-2.25_fixed.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="gson-2.2.2.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/com/google/code/gson/gson/2.2.2/gson-2.2.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="guava-14.0.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/com/google/guava/guava/14.0/guava-14.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="codecjorbis-20101023.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/com/paulscode/codecjorbis/20101023/codecjorbis-20101023.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="codecwav-20101023.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/com/paulscode/codecwav/20101023/codecwav-20101023.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="libraryjavasound-20101123.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/com/paulscode/libraryjavasound/20101123/libraryjavasound-20101123.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="librarylwjglopenal-20100824.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/com/paulscode/librarylwjglopenal/20100824/librarylwjglopenal-20100824.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="soundsystem-20120107.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/com/paulscode/soundsystem/20120107/soundsystem-20120107.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-io-2.4.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/commons-io/commons-io/2.4/commons-io-2.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jinput-2.0.5.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/net/java/jinput/jinput/2.0.5/jinput-2.0.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jinput-platform-2.0.5-natives-windows.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/net/java/jinput/jinput-platform/2.0.5/jinput-platform-2.0.5-natives-windows.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jutils-1.0.0.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/net/java/jutils/jutils/1.0.0/jutils-1.0.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jopt-simple-4.5.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/net/sf/jopt-simple/jopt-simple/4.5/jopt-simple-4.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-lang3-3.1.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/org/apache/commons/commons-lang3/3.1/commons-lang3-3.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="bcprov-jdk15on-1.47.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/org/bouncycastle/bcprov-jdk15on/1.47/bcprov-jdk15on-1.47.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="lwjgl-platform-2.9.0-natives-windows.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/org/lwjgl/lwjgl/lwjgl-platform/2.9.0/lwjgl-platform-2.9.0-natives-windows.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="lwjgl_util-2.9.0.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/org/lwjgl/lwjgl/lwjgl_util/2.9.0/lwjgl_util-2.9.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="lwjgl-2.9.0.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/libraries/org/lwjgl/lwjgl/lwjgl/2.9.0/lwjgl-2.9.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="[1.6.2]ReiMinimap_v3.4_01.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/lib/[1.6.2]ReiMinimap_v3.4_01.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="YUIAnt.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/lib/YUIAnt.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="yuicompressor-2.4.7.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/lib/yuicompressor-2.4.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Zans-Minimap-Mod-ML-Forge-1.6.1.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/lib/Zans-Minimap-Mod-ML-Forge-1.6.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="1.6.4.jar">
+        <CLASSES>
+          <root url="jar://$MCP_LOC$/jars/versions/1.6.4/1.6.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+  </component>
+</module>
+
