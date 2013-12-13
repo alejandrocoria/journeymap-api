@@ -11,7 +11,9 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -78,7 +80,11 @@ public class GridRenderer {
 	}
 
 	public boolean center(final int blockX, final int blockZ, final int zoom) {
-		
+
+        if(blockX==centerBlock.x && blockZ==centerBlock.z && zoom==this.zoom && !grid.isEmpty()){
+            return false;
+        }
+
 		centerBlock.setLocation(blockX, blockZ);
 		this.zoom = zoom;
 		
@@ -110,11 +116,8 @@ public class GridRenderer {
 				if(crosshairs!=null) crosshairs.deleteTexture();
 				crosshairs = new TextureImpl(tmp);
 			}
-			
-			return true;
-		} else {
-			return false;
 		}
+        return true;
 	}
 
 	public boolean updateTextures(MapType mapType, Integer vSlice, int width, int height, boolean fullUpdate, double xOffset, double yOffset) {
@@ -178,7 +181,38 @@ public class GridRenderer {
 		int pixelOffsetZ = lastHeight /2 +(localBlockZ*blockSize) ;
 		
 		return new Point(pixelOffsetX, pixelOffsetZ);
-	}				
+	}
+
+    /**
+     * Draw a list of steps
+     * @param drawStepList
+     * @param xOffset
+     * @param yOffset
+     */
+    public void draw(final List<BaseOverlayRenderer.DrawStep> drawStepList, int xOffset, int yOffset) {
+        if(drawStepList==null || drawStepList.isEmpty()) return;
+        draw(xOffset, yOffset, drawStepList.toArray(new BaseOverlayRenderer.DrawStep[drawStepList.size()]));
+    }
+
+    /**
+     * Draw an array of steps
+     * @param xOffset
+     * @param yOffset
+     * @param drawSteps
+     */
+    public void draw(int xOffset, int yOffset, BaseOverlayRenderer.DrawStep... drawSteps) {
+
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glDepthMask(false);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+        for(BaseOverlayRenderer.DrawStep drawStep : drawSteps) {
+            drawStep.draw(xOffset, yOffset, this);
+        }
+
+        GL11.glDepthMask(true);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+    }
 	
 	public void draw(final float opacity, final double offsetX, final double offsetZ) {		
 		if(!grid.isEmpty()) {	
@@ -351,8 +385,8 @@ public class GridRenderer {
 		return zoom;
 	}
 
-	public void setZoom(int zoom) {
-		center(centerBlock.x, centerBlock.z, zoom);
+	public boolean setZoom(int zoom) {
+		return center(centerBlock.x, centerBlock.z, zoom);
 	}
 
     public int getRenderSize() {

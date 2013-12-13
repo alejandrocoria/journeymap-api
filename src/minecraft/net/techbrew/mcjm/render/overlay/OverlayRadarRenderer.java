@@ -76,7 +76,7 @@ public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
 						locatorImg = tc.getNeutralLocator();
 					}			
 					
-					drawStepList.add(new DrawEntityStep(pixel, heading, false, locatorImg, 8));
+					drawStepList.add(new DrawEntityStep(posX, posZ, heading, false, locatorImg, 8));
 					
 					// Draw entity image
 					if(isPlayer) {
@@ -86,7 +86,7 @@ public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
 					}
 					if(entityIcon!=null) {
 						int bottomMargin = isPlayer ? 0 : 8;
-						drawStepList.add(new DrawEntityStep(pixel, heading, true, entityIcon, bottomMargin));
+						drawStepList.add(new DrawEntityStep(posX, posZ, heading, true, entityIcon, bottomMargin));
 					}
 					
 					if(isPlayer) {

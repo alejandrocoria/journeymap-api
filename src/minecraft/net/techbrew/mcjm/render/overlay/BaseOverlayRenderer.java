@@ -201,71 +201,26 @@ public abstract class BaseOverlayRenderer<K> {
 	}
 	
 	/**
-	 * Draw a list of steps
-	 * @param drawStepList
-	 * @param xOffset
-	 * @param yOffset
-	 */
-	public static synchronized void draw(final List<DrawStep> drawStepList, int xOffset, int yOffset) {
-		if(drawStepList==null || drawStepList.isEmpty()) return;
-        draw(xOffset, yOffset, drawStepList.toArray(new DrawStep[drawStepList.size()]));
-	}
-
-    /**
-     * Draw an array of steps
-     * @param xOffset
-     * @param yOffset
-     * @param drawSteps
-     */
-    public static synchronized void draw( int xOffset, int yOffset, DrawStep... drawSteps) {
-
-        //GL11.glDisable(GL11.GL_DEPTH_TEST);
-        //GL11.glDepthMask(false);
-        //GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-        for(DrawStep drawStep : drawSteps) {
-            drawStep.draw(xOffset, yOffset);
-        }
-
-        GL11.glDepthMask(true);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-    }
-
-    /**
-     * Draw the player marker
-     * @param gridRenderer
-     * @param mc
-     * @param xOffset
-     * @param yOffset
-     * @param fullSize
-     */
-    public static void drawPlayer(GridRenderer gridRenderer, Minecraft mc, int xOffset, int yOffset, boolean fullSize) {
-        Point playerPixel = gridRenderer.getPixel((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ);
-        if(playerPixel!=null) {
-            draw(xOffset, yOffset, new BaseOverlayRenderer.DrawEntityStep(
-                    playerPixel, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8));
-        }
-    }
-	
-	/**
 	 * Interface for something that needs to be drawn at a pixel coordinate.
 	 * @author mwoodman
 	 *
 	 */
 	public interface DrawStep {
-		public void draw(int xOffset, int yOffset);
+		public void draw(int xOffset, int yOffset, GridRenderer gridRenderer);
 	}
 	
 	public static class DrawEntityStep implements DrawStep {
-		final Point pixel;
+		final int posX;
+        final int posZ;
 		final Double heading;
 		final boolean flip;
 		final TextureImpl texture;
 		final int bottomMargin;
 		
-		public DrawEntityStep(Point pixel, Double heading, boolean flip, TextureImpl texture, int bottomMargin) {
+		public DrawEntityStep(int posX, int posZ, Double heading, boolean flip, TextureImpl texture, int bottomMargin) {
 			super();
-			this.pixel = pixel;
+			this.posX = posX;
+            this.posZ = posZ;
 			this.heading = heading;
 			this.flip = flip;
 			this.texture = texture;
@@ -273,8 +228,11 @@ public abstract class BaseOverlayRenderer<K> {
 		}
 
 		@Override
-		public void draw(int xOffset, int yOffset) {
-			drawEntity(pixel.x + xOffset, pixel.y + yOffset, heading, flip, texture, bottomMargin);
+		public void draw(int xOffset, int yOffset, GridRenderer gridRenderer) {
+            Point pixel = gridRenderer.getPixel(posX, posZ);
+            if(pixel!=null) {
+                drawEntity(pixel.x + xOffset, pixel.y + yOffset, heading, flip, texture, bottomMargin);
+            }
 		}		
 	}
 	
@@ -295,7 +253,7 @@ public abstract class BaseOverlayRenderer<K> {
 		}
 
 		@Override
-		public void draw(int xOffset, int yOffset) {
+		public void draw(int xOffset, int yOffset, GridRenderer gridRenderer) {
 			drawColoredImage(texture, alpha, color, pixel.x + xOffset - (texture.width/2), pixel.y + yOffset- (texture.height/2));
 		}		
 	}
@@ -314,7 +272,7 @@ public abstract class BaseOverlayRenderer<K> {
 		}
 
 		@Override
-		public void draw(int xOffset, int yOffset) {
+		public void draw(int xOffset, int yOffset, GridRenderer gridRenderer) {
 			drawRotatedImage(texture, pixel.x + xOffset, pixel.y + yOffset, heading);
 		}		
 	}
@@ -339,7 +297,7 @@ public abstract class BaseOverlayRenderer<K> {
 		}
 
 		@Override
-		public void draw(int xOffset, int yOffset) {
+		public void draw(int xOffset, int yOffset, GridRenderer gridRenderer) {
 			drawCenteredLabel(text, pixel.x + xOffset, pixel.y + yOffset, height, heightOffset, bgColor, fgColor, 205);
 		}		
 	}

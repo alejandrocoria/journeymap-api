@@ -5,11 +5,7 @@ import net.minecraft.src.Minecraft;
 import net.minecraft.src.ScaledResolution;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.data.DataCache;
-import net.techbrew.mcjm.data.EntityKey;
-import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.MapOverlayState;
 import net.techbrew.mcjm.model.WaypointHelper;
@@ -79,8 +75,10 @@ public class MiniMapOverlay {
 
         // Update the grid
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
-        gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
-        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+        boolean moved = gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
+        if(moved) {
+            gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+        }
 
         // Update the state first
         if(doStateRefresh) {
@@ -109,11 +107,12 @@ public class MiniMapOverlay {
             final int yOffset = 0;
 
             gridRenderer.draw(1f, xOffset, yOffset);
-            BaseOverlayRenderer.draw(state.getDrawSteps(), xOffset, yOffset);
+            gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset);
 
             Point playerPixel = gridRenderer.getPixel((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ);
             if(playerPixel!=null) {
-                BaseOverlayRenderer.drawPlayer(gridRenderer, mc, xOffset, yOffset, false);
+                BaseOverlayRenderer.DrawStep drawStep = new BaseOverlayRenderer.DrawEntityStep((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
+                gridRenderer.draw(xOffset, yOffset, drawStep);
             }
 
             GL11.glDisable(GL11.GL_SCISSOR_TEST);
