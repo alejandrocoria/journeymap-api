@@ -15,6 +15,8 @@ import net.minecraft.src.ResourceLocation;
 import net.minecraft.src.Tessellator;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.EntityHelper;
+import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.render.texture.TextureImpl;
 
 import org.lwjgl.opengl.GL11;
@@ -46,21 +48,19 @@ public abstract class BaseOverlayRenderer<K> {
         }
 		return texture;
 	}
-	
-	/**
-	 * Draw a text label, centered on x,z.  If bgColor not null,
-	 * a rectangle will be drawn behind the text.
-	 * 
-	 * @param label
-	 * @param x
-	 * @param z
-	 * @param height
-	 * @param zOffset
-	 * @param g2D
-	 * @param fm
-	 * @param bgColor
-	 * @param color
-	 */
+
+    /**
+     * Draw a text label, centered on x,z.  If bgColor not null,
+     * a rectangle will be drawn behind the text.
+     * @param text
+     * @param x
+     * @param z
+     * @param height
+     * @param zOffset
+     * @param bgColor
+     * @param color
+     * @param alpha
+     */
 	public static void drawCenteredLabel(final String text, int x, int z, int height, int zOffset, Color bgColor, Color color, int alpha) {
 
 		if(text==null || text.length()==0) {
@@ -90,9 +90,7 @@ public abstract class BaseOverlayRenderer<K> {
 	}
 	
 	private static void drawQuad(TextureImpl texture, final int x, final int y, final int width, final int height, Color color, float alpha, boolean flip) {
-				
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDepthMask(false);
+
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);		
 		if(color!=null) {
 			float[] c = color.getColorComponents(null);
@@ -113,12 +111,12 @@ public abstract class BaseOverlayRenderer<K> {
 		tessellator.addVertexWithUV(x + width, y, 0.0D, direction, 0);
 		tessellator.addVertexWithUV(x, y, 0.0D, 0, 0);
 		tessellator.draw();
+
+        GL11.glEnable(GL11.GL_ALPHA_TEST);
 	}
 	
 	public static void drawRectangle(int x, int y, int width, int height, Color color, int alpha) {
-		
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDepthMask(false);
+
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);		
@@ -129,8 +127,10 @@ public abstract class BaseOverlayRenderer<K> {
 		tessellator.addVertexWithUV(x + width, height + y, 0.0D, 1, 1);
 		tessellator.addVertexWithUV(x + width, y, 0.0D, 1, 0);
 		tessellator.addVertexWithUV(x, y, 0.0D, 0, 0);
-		tessellator.draw();	
+		tessellator.draw();
+
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL11.GL_ALPHA_TEST);
 	}
 
 	public static void drawImage(TextureImpl texture, int x, int y, boolean flip) {				
@@ -141,9 +141,7 @@ public abstract class BaseOverlayRenderer<K> {
 		
 		// Start a new matrix for translation/rotation
 		GL11.glPushMatrix();
-		
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDepthMask(false);
+
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -165,8 +163,11 @@ public abstract class BaseOverlayRenderer<K> {
 		GL11.glTranslated(-texture.width, -texture.height, 0);
 		
 		// Draw texture in rotated position
-		drawQuad(texture, texture.width/2, texture.height/2, texture.width, texture.height, false);		
-		
+		drawQuad(texture, texture.width/2, texture.height/2, texture.width, texture.height, false);
+
+        // Re-enable alpha test
+        GL11.glEnable(GL11.GL_ALPHA_TEST);
+
 		// Drop out of the translated+rotated matrix
 		GL11.glPopMatrix();	
 	}
@@ -176,14 +177,17 @@ public abstract class BaseOverlayRenderer<K> {
 		drawQuad(texture, x, y, texture.width, texture.height, color, alpha, false);
 		
 	}
-	
-	/**
-	 * Draw the entity's location and heading on the overlay image
-	 * using the provided icon.
-	 * @param entity
-	 * @param entityIcon
-	 * @param overlayImg
-	 */
+
+    /**
+     * Draw the entity's location and heading on the overlay image
+     * using the provided icon.
+     * @param x
+     * @param y
+     * @param heading
+     * @param flipInsteadOfRotate
+     * @param texture
+     * @param bottomMargin
+     */
 	private static void drawEntity(int x, int y, Double heading, boolean flipInsteadOfRotate, TextureImpl texture, int bottomMargin) {
 
 		if(heading==null) {
@@ -204,12 +208,44 @@ public abstract class BaseOverlayRenderer<K> {
 	 */
 	public static synchronized void draw(final List<DrawStep> drawStepList, int xOffset, int yOffset) {
 		if(drawStepList==null || drawStepList.isEmpty()) return;
-		
-		DrawStep[] stepArray = drawStepList.toArray(new DrawStep[drawStepList.size()]); // ensure the list won't be modified
-		for(DrawStep drawStep : stepArray) {
-			drawStep.draw(xOffset, yOffset);
-		}
+        draw(xOffset, yOffset, drawStepList.toArray(new DrawStep[drawStepList.size()]));
 	}
+
+    /**
+     * Draw an array of steps
+     * @param xOffset
+     * @param yOffset
+     * @param drawSteps
+     */
+    public static synchronized void draw( int xOffset, int yOffset, DrawStep... drawSteps) {
+
+        //GL11.glDisable(GL11.GL_DEPTH_TEST);
+        //GL11.glDepthMask(false);
+        //GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+        for(DrawStep drawStep : drawSteps) {
+            drawStep.draw(xOffset, yOffset);
+        }
+
+        GL11.glDepthMask(true);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+    }
+
+    /**
+     * Draw the player marker
+     * @param gridRenderer
+     * @param mc
+     * @param xOffset
+     * @param yOffset
+     * @param fullSize
+     */
+    public static void drawPlayer(GridRenderer gridRenderer, Minecraft mc, int xOffset, int yOffset, boolean fullSize) {
+        Point playerPixel = gridRenderer.getPixel((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ);
+        if(playerPixel!=null) {
+            draw(xOffset, yOffset, new BaseOverlayRenderer.DrawEntityStep(
+                    playerPixel, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8));
+        }
+    }
 	
 	/**
 	 * Interface for something that needs to be drawn at a pixel coordinate.

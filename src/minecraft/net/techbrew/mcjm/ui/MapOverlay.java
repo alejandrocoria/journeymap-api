@@ -38,7 +38,6 @@ public class MapOverlay extends JmUI {
 	final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
 	final static GridRenderer gridRenderer = new GridRenderer(5);
 
-    private enum Mode{Fullscreen, TopRight}
 	private enum ButtonEnum{Alert,DayNight,Follow,ZoomIn,ZoomOut,Options,Actions,Close,MiniMap}
 	
 	final int minZoom = 0;
@@ -49,8 +48,6 @@ public class MapOverlay extends JmUI {
 
 	Logger logger = JourneyMap.getLogger();
 	MapChat chat;
-
-    private Mode displayMode = Mode.Fullscreen;
 	
 	MapButton buttonDayNight, buttonFollow, buttonZoomIn, buttonZoomOut;
 	MapButton buttonAlert, buttonOptions, buttonActions, buttonClose;
@@ -87,27 +84,18 @@ public class MapOverlay extends JmUI {
 
 	@Override
 	public void drawScreen(int i, int j, float f) {
-//		int oldGuiScale = mc.gameSettings.guiScale;
-//		mc.gameSettings.guiScale = 2;
 		try {
-            if(displayMode==Mode.Fullscreen) {
-			    drawBackground(0);
-            }
+            drawBackground(0);
 			drawMap();
-            if(displayMode==Mode.Fullscreen) {
-                super.drawScreen(i, j, f); // Buttons
-                drawPlayerInfo();
-                if(chat!=null) chat.drawScreen(i, j, f);
-            }
+            super.drawScreen(i, j, f); // Buttons
+            drawPlayerInfo();
+            if(chat!=null) chat.drawScreen(i, j, f);
 		} catch(Throwable e) {
 			logger.log(Level.SEVERE, "Unexpected exception in MapOverlay.drawScreen(): " + e); //$NON-NLS-1$
 			logger.severe(LogFormatter.toString(e));
 			String error = Constants.getMessageJMERR23(e.getMessage());
 			JourneyMap.getInstance().announce(error);
 			close();
-			
-		} finally {
-//			mc.gameSettings.guiScale = oldGuiScale;
 		}
 	}
 
@@ -493,7 +481,7 @@ public class MapOverlay extends JmUI {
 		GL11.glDepthMask(false);
 		GL11.glBlendFunc(770, 771);
 		GL11.glColor4f(1f,1f,1f,1f);
-		GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
+		//GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
 		
 		int labelWidth = mc.fontRenderer.getStringWidth(state.playerLastPos) + 10;
 		int halfBg = width/2;
@@ -504,7 +492,7 @@ public class MapOverlay extends JmUI {
 
 	void drawMap() {
 		
-		scaleResolution(this,false);
+		sizeDisplay(false);
 
 		int xOffset = 0;
 		int yOffset = 0;
@@ -522,44 +510,26 @@ public class MapOverlay extends JmUI {
 			refreshState();			
 		}
 			
-		if(gridRenderer!=null) {
-			gridRenderer.draw(1f, xOffset, yOffset);
-			BaseOverlayRenderer.draw(state.getDrawSteps(), xOffset, yOffset);
-		}
+		gridRenderer.draw(1f, xOffset, yOffset);
 
-        if(displayMode==Mode.Fullscreen) {
-		    BaseOverlayRenderer.drawImage(TextureCache.instance().getLogo(), 8, 4, false);
+	    BaseOverlayRenderer.draw(state.getDrawSteps(), xOffset, yOffset);
+
+        Point playerPixel = gridRenderer.getPixel((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ);
+        if(playerPixel!=null) {
+            BaseOverlayRenderer.drawPlayer(gridRenderer, mc, xOffset, yOffset, false);
         }
+
+        BaseOverlayRenderer.drawImage(TextureCache.instance().getLogo(), 8, 4, false);
 		
-		scaleResolution(this,true);
+		sizeDisplay(true);
 				
 	}
 	
 	public static void drawMapBackground(JmUI ui) {
-		scaleResolution(ui,false);
-
-		if(gridRenderer!=null) {
-			gridRenderer.draw(1f, 0, 0);
-		}
-				
-		BaseOverlayRenderer.drawImage(TextureCache.instance().getLogo(), 8, 4, false); 
-		
-		scaleResolution(ui,true);
-	}
-	
-	static void scaleResolution(JmUI ui, boolean doScale) {		
-		
-		Minecraft mc = Minecraft.getMinecraft();
-		final int glWidth = doScale ? ui.width : mc.displayWidth;
-		final int glHeight = doScale ? ui.height : mc.displayHeight;
-		
-		GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glMatrixMode(GL11.GL_PROJECTION);
-        GL11.glLoadIdentity();
-        GL11.glOrtho(0.0D, glWidth, glHeight, 0.0D, 1000.0D, 3000.0D);
-        GL11.glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadIdentity();
-        GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
+		ui.sizeDisplay(false);
+        gridRenderer.draw(1f, 0, 0);
+		BaseOverlayRenderer.drawImage(TextureCache.instance().getLogo(), 8, 4, false);
+		ui.sizeDisplay(true);
 	}
 	
 	/**
@@ -592,7 +562,7 @@ public class MapOverlay extends JmUI {
 		gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 		
 		// Build list of drawSteps
-		state.generateDrawSteps(mc, true, gridRenderer, waypointRenderer, radarRenderer);
+		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer);
 		
 		// Update player pos
 		String biomeName = (String) DataCache.instance().get(PlayerData.class).get(EntityKey.biome);			

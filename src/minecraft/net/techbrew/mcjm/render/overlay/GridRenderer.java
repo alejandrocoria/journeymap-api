@@ -5,6 +5,7 @@ import net.minecraft.src.Tessellator;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.model.BlockCoordIntPair;
+import net.techbrew.mcjm.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -38,7 +39,7 @@ public class GridRenderer {
 	
 	private final Point centerPixelOffset = new Point();
 	
-	//private MapTexture crosshairs;
+	private TextureImpl crosshairs;
 	
 	private Integer dimension;
 	private File worldDir;
@@ -65,7 +66,7 @@ public class GridRenderer {
 			}
 		}
 
-		if(debug) logger.info("Grid cen done for cols " + startCol + " to " + endCol + " and rows " + startRow + " to " + endRow);
+		//if(debug) logger.info("Grid cen done for cols " + startCol + " to " + endCol + " and rows " + startRow + " to " + endRow);
 	}
 	
 	public void move(final int deltaBlockX, final int deltaBlockZ) {
@@ -106,8 +107,8 @@ public class GridRenderer {
 				g.setColor(Color.GREEN);
 				g.drawLine(mc.displayWidth/2, 0, mc.displayWidth/2, mc.displayHeight);
 				g.drawLine(0, mc.displayHeight/2, mc.displayWidth, mc.displayHeight/2);
-//				if(crosshairs!=null) crosshairs.clear();
-//				crosshairs = new MapTexture(tmp);
+				if(crosshairs!=null) crosshairs.deleteTexture();
+				crosshairs = new TextureImpl(tmp);
 			}
 			
 			return true;
@@ -115,7 +116,7 @@ public class GridRenderer {
 			return false;
 		}
 	}
-	
+
 	public boolean updateTextures(MapType mapType, Integer vSlice, int width, int height, boolean fullUpdate, double xOffset, double yOffset) {
 
 		// Update screen dimensions
@@ -161,6 +162,10 @@ public class GridRenderer {
 
 		return updated;
 	}
+
+    public Point getCenterPixelOffset() {
+        return centerPixelOffset;
+    }
 	
 	public Point getBlockPixelInGrid(int x, int z) {
 		
@@ -181,28 +186,34 @@ public class GridRenderer {
 			double centerX = offsetX + centerPixelOffset.x;
 			double centerZ = offsetZ + centerPixelOffset.y;		
 					
-			GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
+			GL11.glDisable(GL11.GL_DEPTH_TEST);
 			GL11.glDepthMask(false);
-			GL11.glBlendFunc(770, 771);
-			GL11.glColor4f(opacity, opacity, opacity, opacity);
-			GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
+//            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+//            GL11.glColor4f(opacity, opacity, opacity, opacity);
+			GL11.glDisable(GL11.GL_ALPHA_TEST);
 			
 			for(Map.Entry<TilePos,Tile> entry : grid.entrySet()) {
 				//if(entry.getKey().deltaX!=0 || entry.getKey().deltaZ!=0) continue;
 				drawTile(entry.getKey(), entry.getValue(), centerX, centerZ);
 			}
+
+            if(debug && crosshairs!=null) {
+                Minecraft mc = Minecraft.getMinecraft();
+                GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, crosshairs.getGlTextureId());
+                Tessellator tessellator = Tessellator.instance;
+                tessellator.startDrawingQuads();
+                tessellator.addVertexWithUV(0, mc.displayHeight, 0.0D, 0, 1);
+                tessellator.addVertexWithUV(mc.displayWidth, mc.displayHeight, 0.0D, 1, 1);
+                tessellator.addVertexWithUV(mc.displayWidth, 0, 0.0D, 1, 0);
+                tessellator.addVertexWithUV(0, 0, 0.0D, 0, 0);
+                tessellator.draw();
+            }
+
+            GL11.glEnable(GL11.GL_ALPHA_TEST);
+            GL11.glDepthMask(true);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
 			
-//			if(debug && crosshairs!=null) {
-//				Minecraft mc = Minecraft.getMinecraft();
-//				GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, crosshairs.getGlTextureId());
-//				Tessellator tessellator = Tessellator.instance;
-//				tessellator.startDrawingQuads();
-//				tessellator.addVertexWithUV(0, mc.displayHeight, 0.0D, 0, 1);
-//				tessellator.addVertexWithUV(mc.displayWidth, mc.displayHeight, 0.0D, 1, 1);
-//				tessellator.addVertexWithUV(mc.displayWidth, 0, 0.0D, 1, 0);
-//				tessellator.addVertexWithUV(0, 0, 0.0D, 0, 0);
-//				tessellator.draw();
-//			}
+
 		}		
 	}
 	
@@ -216,6 +227,7 @@ public class GridRenderer {
 			final double endZ = offsetZ + pos.endZ;	
 			
 			//if(isOnScreen(startX, startZ, endX, endZ)) {
+                GL11.glEnable(GL11.GL_TEXTURE_2D);
 				GL11.glBindTexture(GL11.GL_TEXTURE_2D, tile.getTexture().getGlTextureId());
 				Tessellator tessellator = Tessellator.instance;
 				tessellator.startDrawingQuads();			
@@ -342,6 +354,10 @@ public class GridRenderer {
 	public void setZoom(int zoom) {
 		center(centerBlock.x, centerBlock.z, zoom);
 	}
+
+    public int getRenderSize() {
+        return this.gridSize * Tile.TILESIZE;
+    }
 
 	public void clear() {
 		grid.clear();

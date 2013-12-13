@@ -3,8 +3,13 @@ package net.techbrew.mcjm.ui;
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.ScaledResolution;
+import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.data.DataCache;
+import net.techbrew.mcjm.data.EntityKey;
+import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.MapOverlayState;
 import net.techbrew.mcjm.model.WaypointHelper;
@@ -35,6 +40,8 @@ public class MiniMapOverlay {
     int lastMcWidth = 0;
     int lastMcHeight = 0;
     ScaledResolution lastScaledResolution;
+    Color playerInfoFgColor = Color.GREEN;
+    Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
 
     private enum Mode{TopRight}
 
@@ -73,34 +80,29 @@ public class MiniMapOverlay {
         // Update the grid
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
         gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
-        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), 512, 512, doStateRefresh, 0, 0);
+        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 
         // Update the state first
         if(doStateRefresh) {
             // Build list of drawSteps
-            state.generateDrawSteps(mc, false, gridRenderer, waypointRenderer, radarRenderer);
+            state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer);
 
             // Reset timers
             state.updateLastRefresh();
         }
 
-
-
-
         try {
-            GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-            GL11.glMatrixMode(GL11.GL_PROJECTION);
-            GL11.glLoadIdentity();
-            GL11.glOrtho(0.0D, lastMcWidth, lastMcHeight, 0.0D, 1000.0D, 3000.0D);
-            GL11.glMatrixMode(GL11.GL_MODELVIEW);
-            GL11.glLoadIdentity();
+
+            updateResolution();
+            JmUI.sizeDisplay(mc.displayWidth, mc.displayHeight);
 
             GL11.glPushMatrix();
-
             // TODO: encapsulate the offsets for positioning and sizing
-            GL11.glTranslatef(mc.displayWidth - 384, -128, -2000.0F);
+            final int minimapSize = 256;
+            final double minimapOffset = minimapSize*0.5;
+            GL11.glTranslated((mc.displayWidth/2)-minimapOffset, -(mc.displayHeight/2)+minimapOffset, 0);
 
-            GL11.glScissor(mc.displayWidth-256,mc.displayHeight-256,512,512);
+            GL11.glScissor(mc.displayWidth-minimapSize,mc.displayHeight-minimapSize,minimapSize,minimapSize);
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
 
             final int xOffset = 0;
@@ -111,17 +113,28 @@ public class MiniMapOverlay {
 
             Point playerPixel = gridRenderer.getPixel((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ);
             if(playerPixel!=null) {
-                new BaseOverlayRenderer.DrawEntityStep(playerPixel, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8).draw(xOffset, yOffset);
+                BaseOverlayRenderer.drawPlayer(gridRenderer, mc, xOffset, yOffset, false);
             }
 
             GL11.glDisable(GL11.GL_SCISSOR_TEST);
+
+
             GL11.glPopMatrix();
 
-            updateResolution();
-            GL11.glOrtho(0.0D, lastScaledResolution.getScaledWidth_double(), lastScaledResolution.getScaledHeight_double(), 0.0D, 1000.0D, 3000.0D);
+            final int playerX = (int) player.posX;
+            final int playerZ = (int) player.posZ;
+            final int playerY = (int) player.posY;
+            final int worldX = ((int) Math.floor(player.posX) % 16) & 15;
+            final int worldZ = ((int) Math.floor(player.posZ) % 16) & 15;
+
+            String biomeName = mc.theWorld.getChunkFromChunkCoords(player.chunkCoordX, player.chunkCoordZ).getBiomeGenForWorldCoords(worldX, worldZ, mc.theWorld.getWorldChunkManager()).biomeName;
+            state.playerLastPos = Constants.getString("MapOverlay.player_location_abbrev", playerX, playerZ, playerY, mc.thePlayer.chunkCoordY, biomeName);
+            BaseOverlayRenderer.drawCenteredLabel(state.playerLastPos, mc.displayWidth-(minimapSize/2), minimapSize, 14, -7, playerInfoBgColor, playerInfoFgColor, 215);
+
+            JmUI.sizeDisplay(lastScaledResolution.getScaledWidth_double(), lastScaledResolution.getScaledHeight_double());
 
         } catch(Throwable t) {
-            logger.severe(t.getMessage());
+            logger.severe("Minimap error:" + t);
         }
 				
 	}

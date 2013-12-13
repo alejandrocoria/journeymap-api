@@ -23,7 +23,7 @@ public class TextureImpl extends AbstractTexture {
     /** optionally-retained image **/
     private BufferedImage image;
     
-    TextureImpl(BufferedImage image) {
+    public TextureImpl(BufferedImage image) {
     	this(image, false);
     }
     
