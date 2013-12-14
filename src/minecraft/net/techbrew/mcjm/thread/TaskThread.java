@@ -14,6 +14,7 @@ import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.model.ChunkCoord;
 import net.techbrew.mcjm.model.ChunkImageCache;
 import net.techbrew.mcjm.model.ChunkMD;
@@ -97,7 +98,9 @@ public class TaskThread implements Runnable {
 	}
 	
 	private final void runMapTask(IMapTask task, Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) {
-		
+
+        StatTimer timer = StatTimer.get(task.getClass().getSimpleName() + ".runMapTask").start();
+
 		try {					
 			final long start = System.nanoTime();				
 			final boolean flushImagesToDisk = task.flushCacheWhenDone();
@@ -112,6 +115,7 @@ public class TaskThread implements Runnable {
 			while(chunkIter.hasNext()) {								
 				if(!jm.isMapping()) {
 					if(threadLogging) logger.info("JM isn't mapping, aborting"); //$NON-NLS-1$
+                    timer.cancel();
 					return;
 				}
 				ChunkMD chunkMd = chunkIter.next();
@@ -129,6 +133,7 @@ public class TaskThread implements Runnable {
 			
 			if(!jm.isMapping()) {
 				if(threadLogging) logger.info("JM isn't mapping, aborting.");  //$NON-NLS-1$
+                timer.cancel();
 				return;
 			}
 	
@@ -142,26 +147,34 @@ public class TaskThread implements Runnable {
 
 			task.taskComplete();
 			chunkSet.clear();
-			chunkImageCache.clear();								
+			chunkImageCache.clear();
+
+            timer.pause();
 				
 		} catch (Throwable t) {
 			String error = Constants.getMessageJMERR16(t.getMessage());
-			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));			
+			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
+            timer.cancel();
 		} 
 	}
 	
 	private final void runGenericTask(IGenericTask task, Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) {
+
+        StatTimer timer = StatTimer.get(task.getClass().getSimpleName() + ".performTask").start();
+
 		try {					
-			final long start = System.nanoTime();	
-			
+
 			task.performTask();
+
+            timer.pause();
 			
 			if(threadLogging) {
-				logger.fine(task.getClass().getSimpleName() + " completed in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
+                timer.report();
 			}
 		} catch (Throwable t) {
 			String error = Constants.getMessageJMERR16(t.getMessage());
-			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));			
+			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
+            timer.cancel();
 		} 
 	}
 	

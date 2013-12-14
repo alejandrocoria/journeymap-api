@@ -28,7 +28,7 @@ public class MapOverlayState {
 	final long refreshInterval = PropertyManager.getIntegerProp(PropertyManager.Key.UPDATETIMER_CHUNKS);
 	
 	// These can be safely changed at will
-	public boolean follow;
+	public boolean follow = true;
 	public int currentZoom;
 	public String playerLastPos = "0,0"; //$NON-NLS-1$
 	

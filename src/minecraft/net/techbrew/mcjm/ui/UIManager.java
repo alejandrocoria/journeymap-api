@@ -90,6 +90,15 @@ public class UIManager {
     public void openMapActions() {
     	open(MapOverlayActions.class);
     }
+
+    public void reset() {
+        MapOverlay.reset();
+        TileCache.instance().invalidateAll();
+        TileCache.instance().cleanUp();
+        if(this.miniMap!=null){
+            this.miniMap.reset();
+        }
+    }
     
 	public void keyboardEvent(KeyBinding keybinding)
 	{		

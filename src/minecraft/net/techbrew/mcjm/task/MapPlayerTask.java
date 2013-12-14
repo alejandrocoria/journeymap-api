@@ -126,7 +126,7 @@ public class MapPlayerTask extends BaseMapTask {
 		if(logger.isLoggable(Level.FINE)) {
 			logger.fine("Chunks in set: " + chunks.size() + ".  lastChunkStubs=" + lastChunkStubs.size());
 		}
-		
+
 		return new MapPlayerTask(world, dimension, underground, chunkY, chunks);
 	
 	}

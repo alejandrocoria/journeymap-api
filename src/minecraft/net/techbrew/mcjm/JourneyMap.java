@@ -9,6 +9,7 @@ import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.io.nbt.ChunkLoader;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.render.ColorCache;
@@ -240,7 +241,8 @@ public class JourneyMap {
      */
     private void startMapping(Minecraft minecraft) {
     	synchronized(this) {
-    		MapOverlay.reset();
+            StatTimer.resetAll();
+            UIManager.getInstance().reset();
 	    	DataCache.instance().purge();
 	    	TextureCache.instance().purge();
 
@@ -288,8 +290,9 @@ public class JourneyMap {
 			TextureCache.instance().purge();
 			ColorCache.getInstance().serializeCache();
 			ColorCache.getInstance().reset();
-			MapOverlay.reset();
+            UIManager.getInstance().reset();
 			MapPlayerTask.clearCache();
+            StatTimer.reportAll();
 			
 			logger.info("Mapping halted: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
     	}

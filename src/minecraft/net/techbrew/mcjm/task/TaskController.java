@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.thread.TaskThread;
 
 public class TaskController {
@@ -121,8 +122,12 @@ public class TaskController {
 				return;
 			}
 			boolean accepted = false;
-			task = manager.getTask(minecraft, worldHash);				
+
+            StatTimer timer = StatTimer.get(manager.getTaskClass().getSimpleName() + ".Manager.getTask").start();
+			task = manager.getTask(minecraft, worldHash);
+
 			if(task!=null) {
+                timer.pause();
 				TaskThread thread = TaskThread.createAndQueue(task);
 				if(thread!=null) {
 					if(taskExecutor!=null && !taskExecutor.isShutdown()) {
@@ -137,10 +142,12 @@ public class TaskController {
 				} else {
 					logger.warning("Could not schedule " + manager.getTaskClass().getSimpleName());
 				}
-			} 
+			} else {
+                timer.cancel();
+            }
+
 			manager.taskAccepted(accepted);
-			
-			
+
 		}
 		
 	}

@@ -13,6 +13,7 @@ import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.MapOverlayState;
 import net.techbrew.mcjm.render.overlay.*;
@@ -57,13 +58,16 @@ public class MapOverlay extends JmUI {
 	Color bgColor = new Color(0x22, 0x22, 0x22);
 	Color playerInfoFgColor = new Color(0x8888ff);
 	Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
+
+    StatTimer drawTimer = StatTimer.get("MapOverlay.drawMapRefresh");
+    StatTimer refreshTimer = StatTimer.get("MapOverlay.refreshState");
 	
 	/**
 	 * Default constructor
 	 */
 	public MapOverlay() {
         Minecraft mc = Minecraft.getMinecraft();
-        state.refresh(Minecraft.getMinecraft(), mc.thePlayer);
+        state.refresh(mc, mc.thePlayer);
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
         gridRenderer.setZoom(state.currentZoom);
 	}
@@ -495,14 +499,18 @@ public class MapOverlay extends JmUI {
 	}
 
 	void drawMap() {
-		
+
+        final boolean refreshReady = isRefreshReady();
+        if(!isRefreshReady()){
+            drawTimer.start();
+        }
+
 		sizeDisplay(false);
 
 		int xOffset = 0;
 		int yOffset = 0;
-		
+
 		if(isScrolling) {
-			
 			int blockSize = (int) Math.pow(2,state.currentZoom);
 			int mouseDragX = (mx-msx)/blockSize;
 			int mouseDragY = (my-msy)/blockSize;
@@ -510,17 +518,17 @@ public class MapOverlay extends JmUI {
 			xOffset = mouseDragX*blockSize;
 			yOffset = mouseDragY*blockSize;
 
-		} else if(isRefreshReady()) {						
-			refreshState();			
+		} else if(refreshReady) {
+            refreshState();
 		} else {
-            if(state.follow) {
-                boolean moved = gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
-                if(moved) {
-                    gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
-                }
-            }
+            gridRenderer.setContext(state.getWorldDir(), state.getDimension());
         }
-			
+
+        boolean moved = false;
+        if(state.follow) {
+            moved = gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
+        }
+        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, moved, 0, 0);
 		gridRenderer.draw(1f, xOffset, yOffset);
         gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset);
 
@@ -533,7 +541,10 @@ public class MapOverlay extends JmUI {
         BaseOverlayRenderer.drawImage(TextureCache.instance().getLogo(), 8, 4, false);
 		
 		sizeDisplay(true);
-				
+
+        if(!refreshReady){
+            drawTimer.pause();
+        }
 	}
 	
 	public static void drawMapBackground(JmUI ui) {
@@ -553,6 +564,8 @@ public class MapOverlay extends JmUI {
 			logger.warning("Could not get player"); //$NON-NLS-1$
 			return;
 		}
+
+        refreshTimer.start();
 		
 		// Update the state first
 		state.refresh(mc, player);
@@ -593,6 +606,8 @@ public class MapOverlay extends JmUI {
 
         // Clean up expired tiles
         TileCache.instance().cleanUp();
+
+        refreshTimer.pause();
 	}
 	
 	void openChat(String defaultText) {

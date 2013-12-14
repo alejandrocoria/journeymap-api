@@ -6,6 +6,7 @@ import net.minecraft.src.ScaledResolution;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.MapOverlayState;
 import net.techbrew.mcjm.model.WaypointHelper;
@@ -17,6 +18,7 @@ import net.techbrew.mcjm.render.texture.TextureCache;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 /**
@@ -26,6 +28,8 @@ import java.util.logging.Logger;
  *
  */
 public class MiniMapOverlay {
+
+    StatTimer timer = StatTimer.get("MiniMapOverlay.drawMap");
 
     static Boolean enabled;
 
@@ -67,29 +71,31 @@ public class MiniMapOverlay {
         }
 
         final boolean doStateRefresh = state.shouldRefresh();
-
-        // Update the state first
-        if(doStateRefresh) {
-            state.refresh(mc, player);
+        if(!doStateRefresh) {
+            timer.start();
         }
-
-        // Update the grid
-        gridRenderer.setContext(state.getWorldDir(), state.getDimension());
-        boolean moved = gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
-        if(moved) {
-            gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
-        }
-
-        // Update the state first
-        if(doStateRefresh) {
-            // Build list of drawSteps
-            state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer);
-
-            // Reset timers
-            state.updateLastRefresh();
-        }
-
         try {
+
+            // Update the state first
+            if(doStateRefresh) {
+                state.refresh(mc, player);
+            }
+
+            // Update the grid
+            gridRenderer.setContext(state.getWorldDir(), state.getDimension());
+            boolean moved = gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
+            if(doStateRefresh || moved) {
+                gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+            }
+
+            // Update the state first
+            if(doStateRefresh) {
+                // Build list of drawSteps
+                state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer);
+
+                // Reset timers
+                state.updateLastRefresh();
+            }
 
             updateResolution();
             JmUI.sizeDisplay(mc.displayWidth, mc.displayHeight);
@@ -135,7 +141,11 @@ public class MiniMapOverlay {
         } catch(Throwable t) {
             logger.severe("Minimap error:" + t);
         }
-				
+
+        if(!doStateRefresh) {
+            timer.pause();
+        }
+
 	}
 
     private void updateResolution(){
