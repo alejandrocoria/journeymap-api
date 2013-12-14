@@ -91,6 +91,7 @@ public abstract class BaseOverlayRenderer<K> {
 	
 	private static void drawQuad(TextureImpl texture, final int x, final int y, final int width, final int height, Color color, float alpha, boolean flip) {
 
+        GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);		
 		if(color!=null) {
 			float[] c = color.getColorComponents(null);
@@ -98,7 +99,7 @@ public abstract class BaseOverlayRenderer<K> {
 		} else {
 			GL11.glColor4f(alpha,alpha,alpha,alpha);
 		}
-		GL11.glDisable(GL11.GL_ALPHA_TEST);
+
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
 		
@@ -112,7 +113,7 @@ public abstract class BaseOverlayRenderer<K> {
 		tessellator.addVertexWithUV(x, y, 0.0D, 0, 0);
 		tessellator.draw();
 
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GL11.glDisable(GL11.GL_BLEND);
 	}
 	
 	public static void drawRectangle(int x, int y, int width, int height, Color color, int alpha) {
@@ -142,8 +143,8 @@ public abstract class BaseOverlayRenderer<K> {
 		// Start a new matrix for translation/rotation
 		GL11.glPushMatrix();
 
+        GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		// Bind texture
@@ -165,8 +166,7 @@ public abstract class BaseOverlayRenderer<K> {
 		// Draw texture in rotated position
 		drawQuad(texture, texture.width/2, texture.height/2, texture.width, texture.height, false);
 
-        // Re-enable alpha test
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GL11.glDisable(GL11.GL_BLEND);
 
 		// Drop out of the translated+rotated matrix
 		GL11.glPopMatrix();	

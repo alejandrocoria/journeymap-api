@@ -101,13 +101,15 @@ public class MiniMapOverlay {
             JmUI.sizeDisplay(mc.displayWidth, mc.displayHeight);
 
             GL11.glPushMatrix();
-            // TODO: encapsulate the offsets for positioning and sizing
+
             final int minimapSize = 256;
             final double minimapOffset = minimapSize*0.5;
             GL11.glTranslated((mc.displayWidth/2)-minimapOffset, -(mc.displayHeight/2)+minimapOffset, 0);
 
             GL11.glScissor(mc.displayWidth-minimapSize,mc.displayHeight-minimapSize,minimapSize,minimapSize);
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
+
+            GL11.glColor4f(1,1,1,1);
 
             final int xOffset = 0;
             final int yOffset = 0;
@@ -122,6 +124,8 @@ public class MiniMapOverlay {
             }
 
             GL11.glDisable(GL11.GL_SCISSOR_TEST);
+
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
 
 
             GL11.glPopMatrix();
