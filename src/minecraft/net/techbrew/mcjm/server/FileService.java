@@ -1,15 +1,16 @@
 package net.techbrew.mcjm.server;
 
+import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.render.texture.TextureCache;
+import net.techbrew.mcjm.render.texture.TextureImpl;
+import se.rupy.http.Event;
+
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URI;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -18,13 +19,6 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
-
-import net.techbrew.mcjm.Constants;
-import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.render.texture.TextureCache;
-import net.techbrew.mcjm.render.texture.TextureImpl;
-import se.rupy.http.Event;
 
 
 /**
@@ -47,6 +41,7 @@ public class FileService extends BaseService {
 	
 	private String resourcePath;
 	private final boolean useZipEntry;
+    private File zipFile;
 	
 	/**
 	 * Default constructor
@@ -122,11 +117,15 @@ public class FileService extends BaseService {
 			if(useZipEntry) { 				
 				// Running out of a Zip archive or jar
 				String[] tokens = requestPath.split("file:")[1].split("!/"); //$NON-NLS-1$ //$NON-NLS-2$
-				File zipFile = new File( URLDecoder.decode(tokens[0], "utf-8") );
-				String innerName = tokens[1];
-				if(!zipFile.canRead()) {
-					throw new RuntimeException("Can't read Zip file: " + zipFile);
-				}
+
+                // Lazy load the file
+                if(zipFile==null) {
+                    zipFile = new File( URI.create(tokens[0]).getPath() );
+                    if(!zipFile.canRead()) {
+                        throw new RuntimeException("Can't read Zip file: " + zipFile + " (originally: " + tokens[0] + ")");
+                    }
+                }
+                String innerName = tokens[1];
 				
 				BufferedOutputStream dest = null;
 		        FileInputStream fis = new FileInputStream(zipFile);
@@ -137,7 +136,7 @@ public class FileService extends BaseService {
 		        while((zipEntry = zis.getNextEntry()) != null) {
 		            if(innerName.equals(zipEntry.getName())) {
 		            	// Set inputstream
-		            	in = new ZipFile(zipFile).getInputStream(zipEntry);		            	
+		            	in = new ZipFile(zipFile).getInputStream(zipEntry);
 		            	ResponseHeader.on(event).content(zipEntry);
 						serveStream(in, event);
 						found = true;
@@ -203,15 +202,14 @@ public class FileService extends BaseService {
 		// Stream file
 		serveStream(new FileInputStream(sourceFile), event);
 	}
-	
-	/**
-	 * Respond with the contents of a file input stream.
-	 * 
-	 * @param sourceFile
-	 * @param event
-	 * @throws Event
-	 * @throws IOException
-	 */
+
+    /**
+     * Respond with the contents of a file input stream.
+     * @param input
+     * @param event
+     * @throws Event
+     * @throws IOException
+     */
 	public void serveStream(final InputStream input, Event event) throws Event, IOException {
 		
 		// Transfer inputstream to event outputstream
