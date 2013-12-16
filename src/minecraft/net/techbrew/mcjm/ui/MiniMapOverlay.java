@@ -39,7 +39,8 @@ public class MiniMapOverlay {
     private final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
     private final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
     private final GridRenderer gridRenderer = new GridRenderer(3);
-    private final StatTimer timer = StatTimer.get("MiniMapOverlay.drawMap");
+    private StatTimer drawTimer;
+    private StatTimer drawTimerWithRefresh;
     private final Color playerInfoFgColor = Color.GREEN;
     private final Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
 
@@ -67,18 +68,16 @@ public class MiniMapOverlay {
 	void drawMap() {
 
         // Check player status
-        EntityClientPlayerMP player = mc.thePlayer;
-
-        final boolean doStateRefresh = state.shouldRefresh();
-        if(!doStateRefresh && player!=null) {
-            timer.start();
-        }
-
-        if (player==null) {
+        if (mc.thePlayer==null) {
             return;
         }
 
+        final boolean doStateRefresh = state.shouldRefresh();
+        final StatTimer timer = doStateRefresh ? drawTimerWithRefresh : drawTimer;
+        timer.start();
+
         try {
+            final EntityClientPlayerMP player = mc.thePlayer;
 
             // Update the state first
             if(doStateRefresh) {
@@ -115,8 +114,6 @@ public class MiniMapOverlay {
             int minimapSize=0,textureX=0,textureY=0;
             double minimapOffset=0,translateX=0,translateY=0;
             int scissorMarginX=0,scissorMarginY=0,scissorX=0,scissorY=0,labelX=0,labelY=0,labelYOffset=0;
-
-
 
             switch(shape){
                 case SmallSquare: {
@@ -241,9 +238,7 @@ public class MiniMapOverlay {
 
         } catch(Throwable t) {
             logger.severe("Minimap error:" + LogFormatter.toString(t));
-        }
-
-        if(!doStateRefresh) {
+        } finally {
             timer.pause();
         }
 
@@ -319,6 +314,8 @@ public class MiniMapOverlay {
                     break;
                 }
             }
+            this.drawTimer = StatTimer.get("MiniMapOverlay.drawMap." + shape.name());
+            this.drawTimerWithRefresh = StatTimer.get("MiniMapOverlay.drawMap+refreshState." + shape.name());
         }
     }
 }

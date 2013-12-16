@@ -4,6 +4,7 @@ import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.RegionImageHandler;
+import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.render.texture.TextureImpl;
 
@@ -55,6 +56,7 @@ public class Tile {
 		if(!changed) changed = RegionImageHandler.hasImageChanged(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, lastImageTime);
 		
 		if(changed) {
+            StatTimer timer = StatTimer.get("Tile.updateTexture").start();
 			BufferedImage image = RegionImageHandler.getMergedChunks(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE);
 			lastMapType = mapType;
 			lastVSlice = vSlice;
@@ -76,11 +78,9 @@ public class Tile {
 			} else {
 				textureImpl.updateTexture(image);
 			}
+            timer.pause();
 			//if(debug) logger.info("Updated texture for " + this + " at " + mapType + ", vSlice " + vSlice);
 		}
-        if(textureImpl==null) {
-            logger.warning("Texture still null after update: " + this);
-        }
 		return changed;
 	}
 	
@@ -183,11 +183,16 @@ public class Tile {
 
     @Override
     protected void finalize()  {
+
         try {
-            if(textureImpl!=null) {
-                logger.warning("Tile wasn't cleared before finalize() called: " + this);
-                clear();
+            if(JourneyMap.getInstance().isMapping()) {
+                if(textureImpl!=null) {
+                    logger.warning("Tile wasn't cleared before finalize() called: " + this);
+                    clear();
+                }
             }
+        } catch(NullPointerException e){
+            // Forced shutdown, JM instance already GC'd
         } catch(Throwable t){
             logger.severe(t.getMessage());
         }

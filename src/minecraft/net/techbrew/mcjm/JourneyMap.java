@@ -340,11 +340,9 @@ public class JourneyMap {
             return true;
         }
 
-        StatTimer timer = StatTimer.get("JourneyMap.onTickInGame");
+        final StatTimer timer = StatTimer.get("JourneyMap.onTickInGame").start();
 
 		try {
-
-            timer.start();
 
 			// Check for world change
 			long newHash = Utils.getWorldHash(minecraft);
@@ -360,6 +358,7 @@ public class JourneyMap {
 					if(logger.isLoggable(Level.FINE)) {
 						logger.fine("Player chunk unknown: " + playerCoord);
 					}
+                    timer.cancel();
 					return true;
 				}
 			}
@@ -389,7 +388,6 @@ public class JourneyMap {
 		}
 
         timer.pause();
-
 		return true;
 	}
 	
