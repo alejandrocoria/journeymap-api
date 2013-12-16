@@ -21,8 +21,7 @@ import net.techbrew.mcjm.render.texture.TextureImpl;
  */
 public class OverlayWaypointRenderer extends BaseOverlayRenderer<Waypoint> {
 	
-	final int fontHeight = 16;
-	final Font labelFont = new Font("Arial", Font.BOLD, fontHeight);
+
 	final BasicStroke thinStroke = new BasicStroke(2);
 	final BasicStroke mediumStroke = new BasicStroke(4);
 	final BasicStroke thinRoundStroke = new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND);
@@ -30,7 +29,7 @@ public class OverlayWaypointRenderer extends BaseOverlayRenderer<Waypoint> {
 	
 	
 	@Override
-	public List<DrawStep> prepareSteps(List<Waypoint> waypoints, GridRenderer grid) {
+	public List<DrawStep> prepareSteps(List<Waypoint> waypoints, GridRenderer grid, double fontScale) {
 
 		final List<DrawStep> drawStepList = new ArrayList<DrawStep>();
 		
@@ -45,32 +44,17 @@ public class OverlayWaypointRenderer extends BaseOverlayRenderer<Waypoint> {
 			for(Waypoint waypoint : waypoints) {
 				wx = waypoint.getX();
 				wz = waypoint.getZ();
-				color = waypoint.getColor();							
-				
-				Point pixel = grid.getBlockPixelInGrid(wx, wz);
-				
-				if(grid.isOnScreen(pixel.x, pixel.y)) {
+				color = waypoint.getColor();
 
-					// Draw marker
-					TextureImpl texture = null;
-					if(waypoint.getType()==Waypoint.TYPE_DEATH) { // death spot
-						texture = tc.getDeathpoint();
-					} else {						
-						texture = tc.getWaypoint();
-					}
-					drawStepList.add(new DrawColoredImageStep(pixel, texture, color, 255));
-					
-					// Draw label
-					labelColor = (waypoint.getType()==Waypoint.TYPE_DEATH) ? Color.red : color;
-					drawStepList.add(new DrawCenteredLabelStep(pixel, waypoint.getName(), fontHeight, -texture.height, Color.black, labelColor));
-	
-				} else {
-					
-					// Draw offscreen marker
-					pixel = grid.getClosestOnscreenPixel(wx, wz);
-					drawStepList.add(new DrawColoredImageStep(pixel, tc.getWaypointOffscreen(), color, 255));
-				}
-				
+                // Draw marker
+                TextureImpl texture = null;
+                if(waypoint.getType()==Waypoint.TYPE_DEATH) { // death spot
+                    texture = tc.getDeathpoint();
+                } else {
+                    texture = tc.getWaypoint();
+                }
+                labelColor = (waypoint.getType()==Waypoint.TYPE_DEATH) ? Color.red : color;
+                drawStepList.add(new DrawWayPointStep(wx, wz, texture, tc.getWaypointOffscreen(), waypoint.getName(), color, labelColor, 255, fontScale));
 			}
 		} catch(Throwable t) {
 			JourneyMap.getLogger().severe("Error during prepareSteps: " + LogFormatter.toString(t));

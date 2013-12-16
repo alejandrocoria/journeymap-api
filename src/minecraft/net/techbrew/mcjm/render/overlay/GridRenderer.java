@@ -304,7 +304,7 @@ public class GridRenderer {
      * @param blockZ z
      * @return  pixel
      */
-	public Point getClosestOnscreenPixel(int blockX, int blockZ) {
+	public Point getClosestOnscreenBlock(int blockX, int blockZ) {
 		Point pixel = getBlockPixelInGrid(blockX, blockZ);
 		if(pixel.x<0) {
 			pixel.setLocation(0, pixel.y);
@@ -318,6 +318,22 @@ public class GridRenderer {
 		}
 		return pixel;
 	}
+
+    /**
+     * Ensures a point is going to be visible.
+     */
+    public void ensureOnScreen(Point pixel) {
+        if(pixel.x<0) {
+            pixel.setLocation(0, pixel.y);
+        } else if(pixel.x> lastWidth) {
+            pixel.setLocation(lastWidth, pixel.y);
+        }
+        if(pixel.y<0) {
+            pixel.setLocation(pixel.x, 0);
+        } else if(pixel.y> lastHeight) {
+            pixel.setLocation(pixel.x, lastHeight);
+        }
+    }
 	
 	/**
 	 * This is a pixel check, not a location check

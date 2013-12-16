@@ -522,7 +522,7 @@ public class MapOverlay extends JmUI {
 
 		sizeDisplay(true);
 
-        BaseOverlayRenderer.drawCenteredLabel(state.playerLastPos, width/2, height-7, 14, 0, playerInfoBgColor, playerInfoFgColor, 205);
+        BaseOverlayRenderer.drawCenteredLabel(state.playerLastPos, width/2, height-7, 14, 0, playerInfoBgColor, playerInfoFgColor, 205, 1);
 
         timer.pause();
 	}

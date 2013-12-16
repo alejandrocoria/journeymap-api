@@ -30,6 +30,7 @@ public class MapOverlayState {
 	// These can be safely changed at will
 	public boolean follow = true;
 	public int currentZoom;
+    public double fontScale = 1;
 	public String playerLastPos = "0,0"; //$NON-NLS-1$
 	
 	// These must be internally managed
@@ -143,7 +144,7 @@ public class MapOverlayState {
         // Sort to keep named entities last
         if(!entities.isEmpty()) {
             Collections.sort(entities, new EntityHelper.EntityMapComparator());
-            drawStepList.addAll(radarRenderer.prepareSteps(entities, gridRenderer));
+            drawStepList.addAll(radarRenderer.prepareSteps(entities, gridRenderer, fontScale));
         }
 
         // Draw waypoints
@@ -151,7 +152,7 @@ public class MapOverlayState {
             Map map = (Map) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
             List<Waypoint> waypoints = new ArrayList<Waypoint>(map.values());
 
-            drawStepList.addAll(waypointRenderer.prepareSteps(waypoints, gridRenderer));
+            drawStepList.addAll(waypointRenderer.prepareSteps(waypoints, gridRenderer, fontScale));
         }
     }
 

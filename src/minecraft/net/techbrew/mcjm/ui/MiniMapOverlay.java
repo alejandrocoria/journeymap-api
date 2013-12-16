@@ -228,7 +228,7 @@ public class MiniMapOverlay {
             String biomeName = mc.theWorld.getChunkFromChunkCoords(player.chunkCoordX, player.chunkCoordZ).getBiomeGenForWorldCoords(worldX, worldZ, mc.theWorld.getWorldChunkManager()).biomeName;
             state.playerLastPos = Constants.getString("MapOverlay.player_location_abbrev", playerX, playerZ, playerY, mc.thePlayer.chunkCoordY, biomeName);
 
-            BaseOverlayRenderer.drawCenteredLabel(state.playerLastPos, labelX, labelY, 14, labelYOffset, playerInfoBgColor, playerInfoFgColor, 215);
+            BaseOverlayRenderer.drawCenteredLabel(state.playerLastPos, labelX, labelY, 14, labelYOffset, playerInfoBgColor, playerInfoFgColor, 215, state.fontScale);
 
             // Restore GL attrs
             GL11.glEnable(GL11.GL_DEPTH_TEST);

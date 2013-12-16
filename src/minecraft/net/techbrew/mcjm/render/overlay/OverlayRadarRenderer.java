@@ -23,7 +23,7 @@ import net.techbrew.mcjm.render.texture.TextureImpl;
 public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
 
 	@Override
-	public List<DrawStep> prepareSteps(List<Map> critters, GridRenderer grid) {
+	public List<DrawStep> prepareSteps(List<Map> critters, GridRenderer grid, double fontScale) {
 		
 		final boolean showAnimals = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_ANIMALS);
 		final boolean showPets = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_PETS);
@@ -59,8 +59,8 @@ public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
 				
 				int posX = (Integer) critter.get(EntityKey.posX);
 				int posZ = (Integer) critter.get(EntityKey.posZ);
-				Point pixel = grid.getPixel(posX, posZ);
-				if(pixel!=null) {						
+
+				if(grid.getPixel(posX, posZ)!=null) {
 					filename = (String) critter.get(EntityKey.filename);
 					heading = (Double) critter.get(EntityKey.heading);					
 					isPlayer = filename.startsWith("/skin/");
@@ -92,10 +92,10 @@ public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
 					if(isPlayer) {
 						// Draw Label			
 						String username = (String) critter.get(EntityKey.username);
-						drawStepList.add(new DrawCenteredLabelStep(pixel, username, fontHeight, -entityIcon.height, labelBg, Color.green));
+						drawStepList.add(new DrawCenteredLabelStep(posX, posZ, username, fontHeight, -entityIcon.height, labelBg, Color.green, fontScale));
 					} else if(critter.containsKey(EntityKey.customName)){
 						String customName = (String) critter.get(EntityKey.customName);
-						drawStepList.add(new DrawCenteredLabelStep(pixel, customName, fontHeight, entityIcon.height, labelBg, Color.white));
+						drawStepList.add(new DrawCenteredLabelStep(posX, posZ, customName, fontHeight, entityIcon.height/2, labelBg, Color.white, fontScale));
 					}
 				}
 			}

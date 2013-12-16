@@ -1,7 +1,6 @@
 package net.techbrew.mcjm.render.overlay;
 
-import java.awt.Color;
-import java.awt.Point;
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -22,9 +21,12 @@ import net.techbrew.mcjm.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
 
 public abstract class BaseOverlayRenderer<K> {
-	
-	abstract public List<DrawStep> prepareSteps(List<K> data, GridRenderer grid);
-	
+
+    final int fontHeight = 16;
+    final Font labelFont = new Font("Arial", Font.BOLD, fontHeight);
+
+	abstract public List<DrawStep> prepareSteps(List<K> data, GridRenderer grid, double fontScale);
+
 	/**
 	 * Get a DynamicTexture for a path
 	 * @param path
@@ -54,36 +56,44 @@ public abstract class BaseOverlayRenderer<K> {
      * a rectangle will be drawn behind the text.
      * @param text
      * @param x
-     * @param z
+     * @param y
      * @param height
      * @param zOffset
      * @param bgColor
      * @param color
      * @param alpha
      */
-	public static void drawCenteredLabel(final String text, int x, int z, int height, int zOffset, Color bgColor, Color color, int alpha) {
+	public static void drawCenteredLabel(final String text, double x, double y, int height, int zOffset, Color bgColor, Color color, int alpha, double fontScale) {
 
 		if(text==null || text.length()==0) {
 			return;
 		}
-		
-		final int width = Minecraft.getMinecraft().fontRenderer.getStringWidth(text) + 6;
 
-		// Draw background
-		if(bgColor!=null) {
-			final float[] rgb = bgColor.getColorComponents(null);
-			drawRectangle(x-width/2, z-height/2 + zOffset, width, height, bgColor, alpha);
-		}
+        Minecraft mc = Minecraft.getMinecraft();
+        final FontRenderer fontRenderer = mc.fontRenderer;
+		final int width = fontRenderer.getStringWidth(text) + 6;
 
-		// Draw text
-		drawCenteredString(text, x, z-height/2 + zOffset + 3, color.getRGB());		
+        if(fontScale!=1) {
+            GL11.glPushMatrix();
+
+            x = x/fontScale;
+            y = y/fontScale;
+            GL11.glScaled(fontScale,fontScale,0);
+        }
+
+        // Draw background
+        if(bgColor!=null) {
+            final float[] rgb = bgColor.getColorComponents(null);
+            drawRectangle(x-width/2, y-height/2 + zOffset, width, height, bgColor, alpha);
+        }
+
+        // Draw text
+        fontRenderer.drawStringWithShadow(text, (int) x - (width/2)+3, (int) y-height/2 + zOffset + 3, color.getRGB()); // TODO: clean up this offset mess
+
+        if(fontScale!=1) {
+            GL11.glPopMatrix();
+        }
 	}
-	
-	private static void drawCenteredString(String text, int x, int y, int color)
-    {
-		FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
-        fontRenderer.drawStringWithShadow(text, x - fontRenderer.getStringWidth(text) / 2, y, color);
-    }
 	
 	private static void drawQuad(TextureImpl texture, final int x, final int y, final int width, final int height, boolean flip) {
 		drawQuad(texture,x,y,width,height,null,1f,flip);
@@ -235,69 +245,98 @@ public abstract class BaseOverlayRenderer<K> {
 		}		
 	}
 	
-	class DrawColoredImageStep implements DrawStep {
-		
-		final Point pixel;
+	class DrawWayPointStep implements DrawStep {
+
+        final int posX;
+        final int posZ;
 		final TextureImpl texture;
+        final TextureImpl offScreenTexture;
+        final String label;
 		final Color color;
+        final Color fontColor;
 		final int alpha;
+        final double fontScale;
 		
-		public DrawColoredImageStep(Point pixel, TextureImpl texture,
-				Color color, int alpha) {
+		public DrawWayPointStep(int posX, int posZ, TextureImpl texture, TextureImpl offScreenTexture, String label,
+                                Color color, Color fontColor, int alpha, double fontScale) {
 			super();
-			this.pixel = pixel;
+            this.posX = posX;
+            this.posZ = posZ;
 			this.texture = texture;
+            this.offScreenTexture = offScreenTexture;
+            this.label = label;
 			this.color = color;
+            this.fontColor = fontColor;
 			this.alpha = alpha;
+            this.fontScale = fontScale;
 		}
 
 		@Override
 		public void draw(int xOffset, int yOffset, GridRenderer gridRenderer) {
-			drawColoredImage(texture, alpha, color, pixel.x + xOffset - (texture.width/2), pixel.y + yOffset- (texture.height/2));
+            Point pixel = gridRenderer.getBlockPixelInGrid(posX, posZ);
+            if(gridRenderer.isOnScreen(pixel.x, pixel.y)) {
+                drawColoredImage(texture, alpha, color, pixel.x + xOffset - (texture.width/2), pixel.y + yOffset- (texture.height/2));
+                drawCenteredLabel(label, pixel.x, pixel.y, fontHeight, -texture.height, Color.black, fontColor, alpha, fontScale);
+            } else {
+                gridRenderer.ensureOnScreen(pixel);
+                drawColoredImage(offScreenTexture, alpha, color, pixel.x + xOffset - (offScreenTexture.width / 2), pixel.y + yOffset - (offScreenTexture.height / 2));
+            }
 		}		
 	}
 	
 	class DrawRotatedImageStep implements DrawStep {
-		
-		final Point pixel;
+
+        final int posX;
+        final int posZ;
 		final TextureImpl texture;
 		final float heading;
 		
-		public DrawRotatedImageStep(Point pixel, TextureImpl texture, float heading) {
+		public DrawRotatedImageStep(int posX, int posZ, TextureImpl texture, float heading) {
 			super();
-			this.pixel = pixel;
+            this.posX = posX;
+            this.posZ = posZ;
 			this.texture = texture;
 			this.heading = heading;
 		}
 
 		@Override
 		public void draw(int xOffset, int yOffset, GridRenderer gridRenderer) {
-			drawRotatedImage(texture, pixel.x + xOffset, pixel.y + yOffset, heading);
+            Point pixel = gridRenderer.getPixel(posX, posZ);
+            if(pixel!=null) {
+			    drawRotatedImage(texture, pixel.x + xOffset, pixel.y + yOffset, heading);
+            }
 		}		
 	}
 	
 	class DrawCenteredLabelStep implements DrawStep {
-		final Point pixel;
+
+        final int posX;
+        final int posZ;
 		final String text;
 		final int height;
 		final int heightOffset;
 		final Color bgColor;
 		final Color fgColor;
+        final double fontScale;
 		
-		public DrawCenteredLabelStep(Point pixel, String text, int height,
-				int heightOffset, Color bgColor, Color fgColor) {
-			super();
-			this.pixel = pixel;
+		public DrawCenteredLabelStep(int posX, int posZ, String text, int height,
+				int heightOffset, Color bgColor, Color fgColor, double fontScale) {
+            this.posX = posX;
+            this.posZ = posZ;
 			this.text = text;
 			this.height = height;
 			this.heightOffset = heightOffset;
 			this.bgColor = bgColor;
 			this.fgColor = fgColor;
+            this.fontScale = fontScale;
 		}
 
 		@Override
 		public void draw(int xOffset, int yOffset, GridRenderer gridRenderer) {
-			drawCenteredLabel(text, pixel.x + xOffset, pixel.y + yOffset, height, heightOffset, bgColor, fgColor, 205);
+            Point pixel = gridRenderer.getPixel(posX, posZ);
+            if(pixel!=null) {
+			    drawCenteredLabel(text, pixel.x + xOffset, pixel.y + yOffset, height, heightOffset, bgColor, fgColor, 205, fontScale);
+            }
 		}		
 	}
 	
