@@ -113,10 +113,9 @@ public abstract class BaseOverlayRenderer<K> {
 		tessellator.addVertexWithUV(x, y, 0.0D, 0, 0);
 		tessellator.draw();
 
-        GL11.glDisable(GL11.GL_BLEND);
 	}
 	
-	public static void drawRectangle(int x, int y, int width, int height, Color color, int alpha) {
+	public static void drawRectangle(double x, double y, int width, int height, Color color, int alpha) {
 
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_ALPHA_TEST);

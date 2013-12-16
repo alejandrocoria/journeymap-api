@@ -38,6 +38,7 @@ public class GridRenderer {
 	private int centerTileHash;
 	private int zoom;
 	private final BlockCoordIntPair centerBlock = new BlockCoordIntPair();
+    private final Color bgColor = new Color(0x22, 0x22, 0x22);
 	
 	private final Point centerPixelOffset = new Point();
 	
@@ -222,8 +223,8 @@ public class GridRenderer {
 					
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 			GL11.glDepthMask(false);
-//            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-//            GL11.glColor4f(opacity, opacity, opacity, opacity);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GL11.glColor4f(opacity, opacity, opacity, opacity);
 			GL11.glDisable(GL11.GL_ALPHA_TEST);
 			
 			for(Map.Entry<TilePos,Tile> entry : grid.entrySet()) {
@@ -252,14 +253,16 @@ public class GridRenderer {
 	}
 	
 	private void drawTile(final TilePos pos, final Tile tile, final double offsetX, final double offsetZ) {
-				
+
+        final double startX = offsetX + pos.startX;
+        final double startZ = offsetZ + pos.startZ;
+        final double endX = offsetX + pos.endX;
+        final double endZ = offsetZ + pos.endZ;
+
+        BaseOverlayRenderer.drawRectangle(startX, startZ, Tile.TILESIZE, Tile.TILESIZE, bgColor, 255);
+
 		if(tile.hasTexture()) {
-		
-			final double startX = offsetX + pos.startX;
-			final double startZ = offsetZ + pos.startZ;		
-			final double endX = offsetX + pos.endX;
-			final double endZ = offsetZ + pos.endZ;	
-			
+            // TODO: get this check working again
 			//if(isOnScreen(startX, startZ, endX, endZ)) {
                 GL11.glEnable(GL11.GL_TEXTURE_2D);
 				GL11.glBindTexture(GL11.GL_TEXTURE_2D, tile.getTexture().getGlTextureId());
