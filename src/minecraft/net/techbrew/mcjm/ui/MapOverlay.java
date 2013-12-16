@@ -642,9 +642,10 @@ public class MapOverlay extends JmUI {
 	}
 
 	void moveCanvas(int deltaBlockX, int deltaBlockz){
-		gridRenderer.move(deltaBlockX, deltaBlockz);
+        refreshState();
+        gridRenderer.move(deltaBlockX, deltaBlockz);
+        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 		setFollow(false);
-		refreshState();
 	}	
 	
 	public static synchronized MapOverlayState state() {

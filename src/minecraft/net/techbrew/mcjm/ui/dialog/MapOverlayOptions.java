@@ -81,7 +81,7 @@ public class MapOverlayOptions extends JmUI {
 				webserverOn); //$NON-NLS-1$  //$NON-NLS-2$
 		buttonWebserver.setToggled(webserverOn);
 
-        boolean minimapOn = MiniMapOverlay.isEnabled();
+        boolean minimapOn = UIManager.getInstance().isMiniMapEnabled();
         buttonMiniMap = new MapButton(ButtonEnum.MiniMap.ordinal(),0,0,
                 Constants.getString("MapOverlay.enable_minimap", on),
                 Constants.getString("MapOverlay.enable_minimap", off),
@@ -89,9 +89,7 @@ public class MapOverlayOptions extends JmUI {
         buttonMiniMap.setToggled(minimapOn);
 		
 		buttonGrid = new MapButton(ButtonEnum.Grid.ordinal(),0,0,
-				Constants.getString("MapOverlay.show_grid", on),
-				Constants.getString("MapOverlay.show_grid", off),
-				PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)); //$NON-NLS-1$ //$NON-NLS-2$
+				Constants.getString("MapOverlay.minimap")); //$NON-NLS-1$ //$NON-NLS-2$
 				
 		if(!FeatureManager.isAllowed(Feature.MapCaves)) {
 			buttonCaves.setToggled(false);
@@ -232,8 +230,7 @@ public class MapOverlayOptions extends JmUI {
 				break;
 			}
             case MiniMap: {
-                buttonMiniMap.setToggled(!MiniMapOverlay.isEnabled());
-                MiniMapOverlay.setEnabled(!MiniMapOverlay.isEnabled());
+                UIManager.getInstance().openMiniMapOptions();
                 break;
             }
 		}

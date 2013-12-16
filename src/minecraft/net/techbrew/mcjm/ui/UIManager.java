@@ -10,6 +10,7 @@ import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.render.overlay.TileCache;
 import net.techbrew.mcjm.ui.dialog.MapOverlayActions;
 import net.techbrew.mcjm.ui.dialog.MapOverlayOptions;
+import net.techbrew.mcjm.ui.dialog.MiniMapOptions;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,8 +71,16 @@ public class UIManager {
 		}
     }
 
+    public void setMiniMapEnabled(boolean enable) {
+        miniMap.setEnabled(enable);
+    }
+
+    public boolean isMiniMapEnabled() {
+        return miniMap.isEnabled();
+    }
+
     public void drawMiniMap() {
-        if(MiniMapOverlay.isEnabled() && miniMap.isVisible()){
+        if(miniMap.isEnabled() && miniMap.isVisible()){
             boolean isGamePaused = (minecraft.currentScreen != null) && !(minecraft.currentScreen instanceof MapOverlay) && !(minecraft.currentScreen instanceof GuiChat);
             if(!isGamePaused) {
                 miniMap.drawMap();
@@ -82,9 +91,13 @@ public class UIManager {
     public void openMap() {
     	open(MapOverlay.class);
     }
+
+    public void openMiniMapOptions() {
+        open(MiniMapOptions.class);
+    }
     
     public void openMapOptions() {
-    	open(MapOverlayOptions.class);
+        open(MapOverlayOptions.class);
     }
     
     public void openMapActions() {

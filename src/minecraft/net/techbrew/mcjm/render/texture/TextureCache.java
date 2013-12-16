@@ -39,7 +39,7 @@ public class TextureCache {
     }
     
     public static enum Name {
-    	Waypoint, Deathpoint, WaypointOffscreen, Logo, LocatorHostile, LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, UnknownEntity;
+    	MinimapSmallSquare, MinimapLargeSquare, MinimapSmallCircle, MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, Logo, LocatorHostile, LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, UnknownEntity;
     }
     
     private final Map<Name, TextureImpl> namedTextures = Collections.synchronizedMap(new HashMap<Name, TextureImpl>(Name.values().length + (Name.values().length/2) + 1));
@@ -53,7 +53,7 @@ public class TextureCache {
 	private TextureImpl getNamedTexture(Name name, String filename, boolean retain) {
 		synchronized(namedTextures) {
 			TextureImpl tex = namedTextures.get(name);
-			if(tex==null) {
+			if(tex==null || !tex.hasImage()) {
 				BufferedImage img = FileHandler.getWebImage(filename);
 				tex = new TextureImpl(img, retain);
 				namedTextures.put(name, tex);
@@ -61,7 +61,22 @@ public class TextureCache {
 			return tex;			
 		}
 	}
-	
+
+    public TextureImpl getMinimapSmallSquare() {
+        return getNamedTexture(Name.MinimapSmallSquare, "minimap-square-256.png", false); //$NON-NLS-1$
+    }
+
+    public TextureImpl getMinimapLargeSquare() {
+        return getNamedTexture(Name.MinimapLargeSquare, "minimap-square-512.png", false); //$NON-NLS-1$
+    }
+
+    public TextureImpl getMinimapSmallCircle() {
+        return getNamedTexture(Name.MinimapSmallCircle, "minimap-circle-256.png", false); //$NON-NLS-1$
+    }
+    public TextureImpl getMinimapLargeCircle() {
+        return getNamedTexture(Name.MinimapLargeCircle, "minimap-circle-512.png", false); //$NON-NLS-1$
+    }
+
 	public TextureImpl getWaypoint() {
 		return getNamedTexture(Name.Waypoint, "waypoint.png", false); //$NON-NLS-1$
 	}
@@ -108,7 +123,7 @@ public class TextureCache {
 		
 		synchronized(entityImageMap) {
 			TextureImpl tex = entityImageMap.get(filename);
-			if(tex==null) {
+            if(tex==null || !tex.hasImage()) {
 				BufferedImage img = FileHandler.getCustomizableImage("entity/" + filename, getUnknownEntity().getImage()); //$NON-NLS-1$	
 				tex = new TextureImpl(img);
 				entityImageMap.put(filename, tex);

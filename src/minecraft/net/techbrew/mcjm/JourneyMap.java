@@ -329,18 +329,22 @@ public class JourneyMap {
 	 */
 	public boolean onTickInGame(float f, final Minecraft minecraft) {
 
-		try {
-			
-			// If both UIs are disabled, the mod is effectively disabled.
-			if(!enableWebserver && !enableMapGui) {
-				return true;
-			}
+        // If both UIs are disabled, the mod is effectively disabled.
+        if(!enableWebserver && !enableMapGui) {
+            return true;
+        }
 
-			// Check player status
-			EntityPlayer player = minecraft.thePlayer;
-			if (player==null || player.isDead) {
-				return true;
-			}
+        // Check player status
+        EntityPlayer player = minecraft.thePlayer;
+        if (player==null || player.isDead) {
+            return true;
+        }
+
+        StatTimer timer = StatTimer.get("JourneyMap.onTickInGame");
+
+		try {
+
+            timer.start();
 
 			// Check for world change
 			long newHash = Utils.getWorldHash(minecraft);
@@ -376,13 +380,16 @@ public class JourneyMap {
 		
 			// Perform the next mapping tasks			
 
-			taskController.performTasks(minecraft, newHash, taskExecutor);	
+			taskController.performTasks(minecraft, newHash, taskExecutor);
 
 		} catch (Throwable t) {
 			String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
 			announce(error);
 			logger.severe(LogFormatter.toString(t));
-		} 
+		}
+
+        timer.pause();
+
 		return true;
 	}
 	
