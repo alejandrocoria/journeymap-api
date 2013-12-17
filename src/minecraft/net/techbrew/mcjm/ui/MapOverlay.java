@@ -61,7 +61,7 @@ public class MapOverlay extends JmUI {
 
     StatTimer drawScreenTimer = StatTimer.get("MapOverlay.drawScreen");
     StatTimer drawMapTimer = StatTimer.get("MapOverlay.drawScreen.drawMap");
-    StatTimer drawMapTimerWithRefresh = StatTimer.get("MapOverlay.drawScreen.drawMap+refreshState)");
+    StatTimer drawMapTimerWithRefresh = StatTimer.get("MapOverlay.drawScreen.drawMap+refreshState");
 	
 	/**
 	 * Default constructor
@@ -569,13 +569,12 @@ public class MapOverlay extends JmUI {
 		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer);
 		
 		// Update player pos
-		String biomeName = (String) DataCache.instance().get(PlayerData.class).get(EntityKey.biome);			
 		state.playerLastPos = Constants.getString("MapOverlay.player_location", 
 				Integer.toString((int) mc.thePlayer.posX), 
 				Integer.toString((int) mc.thePlayer.posZ), 
 				Integer.toString((int) mc.thePlayer.posY), 
 				mc.thePlayer.chunkCoordY, 
-				biomeName); //$NON-NLS-1$ 	
+				state.getPlayerBiome()); //$NON-NLS-1$
 		
 		// Reset timer
 		state.updateLastRefresh();
