@@ -340,7 +340,7 @@ public class JourneyMap {
             return true;
         }
 
-        final StatTimer timer = StatTimer.get("JourneyMap.onTickInGame").start();
+        final StatTimer timer = StatTimer.get("JourneyMap.onTickInGame", 200).start();
 
 		try {
 
