@@ -30,9 +30,6 @@ import java.util.logging.Logger;
  */
 public class MiniMapOverlay {
 
-    private enum Position {TopLeft, TopRight, BottomLeft, BottomRight}
-    private enum Shape {SmallSquare, LargeSquare, SmallCircle, LargeCircle}
-
     private final Logger logger = JourneyMap.getLogger();
     private final Minecraft mc = Minecraft.getMinecraft();
     private final MapOverlayState state = MapOverlay.state();
@@ -45,13 +42,8 @@ public class MiniMapOverlay {
     private final Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
 
     private Boolean enabled;
-    private TextureImpl minimapTexture;
-    private int lastMcWidth = 0;
-    private int lastMcHeight = 0;
-    private ScaledResolution lastScaledResolution;
 
-    private Position position;
-    private Shape shape;
+    private DisplayVars dv;
 
     private boolean visible = true;
 
@@ -59,9 +51,11 @@ public class MiniMapOverlay {
 	 * Default constructor
 	 */
 	public MiniMapOverlay() {
-        setPosition(Position.TopRight);
-        setShape(Shape.LargeSquare); // TODO: Get as preference
-        updateResolution();
+        try {
+            updateDisplayVars(DisplayVars.Shape.SmallSquare, DisplayVars.Position.TopRight); // TODO: Get from preferences
+        } catch(Throwable t) {
+            t.printStackTrace();
+        }
 	}
 
 
@@ -84,15 +78,12 @@ public class MiniMapOverlay {
                 state.refresh(mc, player);
             }
 
-            // Update the grid
+            // Update the grid // TODO:  Do this in another thread
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
-            boolean moved = gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
-            if(doStateRefresh || moved) {
-                gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
-            }
+            gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
+            gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0);
+            if(doStateRefresh ) {
 
-            // Update the state first
-            if(doStateRefresh) {
                 // Build list of drawSteps
                 state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer);
 
@@ -100,7 +91,7 @@ public class MiniMapOverlay {
                 state.updateLastRefresh();
             }
 
-            updateResolution();
+            updateDisplayVars();
 
             // Use 1:1 resolution for minimap regardless of how Minecraft UI is scaled
             JmUI.sizeDisplay(mc.displayWidth, mc.displayHeight);
@@ -111,95 +102,11 @@ public class MiniMapOverlay {
             // Push matrix for translation to corner
             GL11.glPushMatrix();
 
-            int minimapSize=0,textureX=0,textureY=0;
-            double minimapOffset=0,translateX=0,translateY=0;
-            int scissorMarginX=0,scissorMarginY=0,scissorX=0,scissorY=0,labelX=0,labelY=0,labelYOffset=0;
-
-            switch(shape){
-                case SmallSquare: {
-                    minimapSize = 256;
-                    scissorMarginX=5;
-                    scissorMarginY=5;
-                    break;
-                }
-                case SmallCircle: {
-                    minimapSize = 256;
-                    scissorMarginX=5;
-                    scissorMarginY=5;
-                    break;
-                }
-                case LargeSquare: {
-                    minimapSize = 512;
-                    scissorMarginX=5;
-                    scissorMarginY=6;
-                    break;
-                }
-                case LargeCircle: {
-                    minimapSize = 512;
-                    scissorMarginX=5;
-                    scissorMarginY=5;
-                    break;
-                }
-            }
-
-            minimapOffset = minimapSize*0.5;
-            labelYOffset = -7;
-
-            switch(position){
-                case TopRight : {
-                    textureX = mc.displayWidth- minimapTexture.width;
-                    textureY = 0;
-                    translateX = (mc.displayWidth/2)-minimapOffset;
-                    translateY = -(mc.displayHeight/2)+minimapOffset;
-                    scissorX = mc.displayWidth-minimapSize-scissorMarginX;
-                    scissorY = mc.displayHeight-minimapSize-scissorMarginY;
-                    labelX = mc.displayWidth-(minimapSize/2);
-                    labelY = minimapSize;
-                    break;
-                }
-                case BottomRight : {
-                    textureX = mc.displayWidth- minimapTexture.width;
-                    textureY = mc.displayHeight- minimapSize-scissorMarginY-scissorMarginY;
-                    translateX = (mc.displayWidth/2)-minimapOffset;
-                    translateY = (mc.displayHeight/2)-minimapOffset;
-                    scissorX = mc.displayWidth-minimapSize-scissorMarginX;
-                    scissorY = scissorMarginY;
-                    labelX = mc.displayWidth-(minimapSize/2);
-                    labelY = mc.displayHeight-scissorMarginY;
-                    break;
-                }
-                case TopLeft : {
-                    textureX = -minimapTexture.width+minimapSize+scissorMarginX+scissorMarginX;
-                    textureY = 0;
-                    translateX = -(mc.displayWidth/2)+minimapOffset;
-                    translateY = -(mc.displayHeight/2)+minimapOffset;
-                    scissorX = 0+scissorMarginX;
-                    scissorY = mc.displayHeight-minimapSize-scissorMarginY;
-                    labelX = minimapSize/2;
-                    labelY = minimapSize;
-                    break;
-                }
-                case BottomLeft : {
-                    textureX = 0;
-                    textureY = mc.displayHeight- minimapTexture.height;
-                    translateX = -(mc.displayWidth/2)+minimapOffset;
-                    translateY = (mc.displayHeight/2)-minimapOffset;
-                    scissorX = 0+scissorMarginX;
-                    scissorY = mc.displayHeight-scissorMarginY;
-                    labelX = minimapSize/2;
-                    labelY = mc.displayHeight-20; // TODO
-                    break;
-                }
-            }
-
-            // Draw texture
-            BaseOverlayRenderer.drawImage(minimapTexture, textureX, textureY, false);
-
             // Move map center
-            GL11.glTranslated(translateX, translateY, 0);
+            GL11.glTranslated(dv.translateX, dv.translateY, 0);
 
             // Scissor area that shouldn't be drawn
-            GL11.glScissor(scissorX,scissorY,minimapSize,minimapSize);
+            GL11.glScissor(dv.scissorX,dv.scissorY,dv.minimapSize,dv.minimapSize);
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
 
             // Draw grid
@@ -223,18 +130,20 @@ public class MiniMapOverlay {
             final int playerX = (int) player.posX;
             final int playerZ = (int) player.posZ;
             final int playerY = (int) player.posY;
-            final int worldX = ((int) Math.floor(player.posX) % 16) & 15;
-            final int worldZ = ((int) Math.floor(player.posZ) % 16) & 15;
-            String biomeName = mc.theWorld.getChunkFromChunkCoords(player.chunkCoordX, player.chunkCoordZ).getBiomeGenForWorldCoords(worldX, worldZ, mc.theWorld.getWorldChunkManager()).biomeName;
-            state.playerLastPos = Constants.getString("MapOverlay.player_location_abbrev", playerX, playerZ, playerY, mc.thePlayer.chunkCoordY, biomeName);
+            final String playerInfo = Constants.getString("MapOverlay.player_location_abbrev",
+                    playerX, playerZ, playerY, mc.thePlayer.chunkCoordY, state.getPlayerBiome());
 
-            BaseOverlayRenderer.drawCenteredLabel(state.playerLastPos, labelX, labelY, 14, labelYOffset, playerInfoBgColor, playerInfoFgColor, 215, state.fontScale);
+            // Draw position text
+            BaseOverlayRenderer.drawCenteredLabel(playerInfo, dv.labelX, dv.labelY, 14, dv.labelYOffset, playerInfoBgColor, playerInfoFgColor, 215, state.fontScale);
+
+            // Draw minimap texture
+            BaseOverlayRenderer.drawImage(dv.minimapTexture, dv.textureX, dv.textureY, false);
 
             // Restore GL attrs
             GL11.glEnable(GL11.GL_DEPTH_TEST);
 
             // Return resolution to how it is normally scaled
-            JmUI.sizeDisplay(lastScaledResolution.getScaledWidth_double(), lastScaledResolution.getScaledHeight_double());
+            JmUI.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
 
         } catch(Throwable t) {
             logger.severe("Minimap error:" + LogFormatter.toString(t));
@@ -243,14 +152,6 @@ public class MiniMapOverlay {
         }
 
 	}
-
-    private void updateResolution(){
-        if(mc.displayHeight!=lastMcHeight || mc.displayWidth!=lastMcWidth) {
-            lastMcWidth = mc.displayWidth;
-            lastMcHeight = mc.displayHeight;
-            lastScaledResolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
-        }
-    }
 
 	public void reset() {
 		state.requireRefresh();
@@ -278,44 +179,157 @@ public class MiniMapOverlay {
         PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_MINIMAP, enable);
     }
 
-    public Position getPosition() {
-        return position;
+    public DisplayVars.Position getPosition() {
+        return dv.position;
     }
 
-    public void setPosition(Position position) {
-        this.position = position;
+    public void setPosition(DisplayVars.Position position) {
+        if(dv!=null) {
+            updateDisplayVars(dv.shape, position);
+        }
     }
 
-    public Shape getShape() {
-        return shape;
+    public DisplayVars.Shape getShape() {
+        return dv.shape;
     }
 
-    public void setShape(Shape shape) {
-        if(shape!=this.shape) {
+    public void setShape(DisplayVars.Shape shape) {
+        if(dv!=null) {
+            updateDisplayVars(shape, dv.position);
+        }
+    }
+
+    private void updateDisplayVars() {
+        if(dv!=null) {
+            updateDisplayVars(dv.shape, dv.position);
+        }
+    }
+    public void updateDisplayVars(DisplayVars.Shape shape, DisplayVars.Position position) {
+
+        if(dv!=null && mc.displayHeight==dv.displayHeight && mc.displayWidth==dv.displayWidth
+                && this.dv.shape==shape && this.dv.position==position){
+            return;
+        }
+
+        DisplayVars oldDv = this.dv;
+        this.dv = new DisplayVars(mc, shape, position);
+
+        if(oldDv==null || oldDv.shape!=this.dv.shape){
+            this.drawTimer = StatTimer.get("MiniMapOverlay.drawMap." + shape.name(), 200);
+            this.drawTimerWithRefresh = StatTimer.get("MiniMapOverlay.drawMap+refreshState." + shape.name());
+        }
+
+        if(oldDv!=null && oldDv.shape!=this.dv.shape){
+            oldDv.minimapTexture.deleteTexture(); // TODO: ensure reloading texture works
+        }
+    }
+
+    static class DisplayVars {
+
+        enum Position {TopLeft, TopRight, BottomLeft, BottomRight}
+        enum Shape {SmallSquare, LargeSquare, SmallCircle, LargeCircle}
+
+        final Position position;
+        final Shape shape;
+        final TextureImpl minimapTexture;
+        final int displayWidth;
+        final int displayHeight;
+        final ScaledResolution scaledResolution;
+        final int minimapSize,textureX,textureY;
+        final double minimapOffset,translateX,translateY;
+        final int marginX,marginY,scissorX,scissorY,labelX,labelY,labelYOffset;
+
+        DisplayVars(Minecraft mc, Shape shape, Position position){
             this.shape = shape;
-            if(this.minimapTexture!=null){
-                this.minimapTexture.deleteTexture(); // TODO: ensure reloading texture works
-            }
-            switch(shape) {
-                case SmallSquare: {
-                    this.minimapTexture = TextureCache.instance().getMinimapSmallSquare();
+            this.position = position;
+            displayWidth = mc.displayWidth;
+            displayHeight = mc.displayHeight;
+            scaledResolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
+
+            switch(shape){
+                case LargeCircle: {
+                    minimapTexture = TextureCache.instance().getMinimapLargeCircle();
+                    minimapSize = 512;
+                    marginX=5;
+                    marginY=5;
                     break;
                 }
                 case SmallCircle: {
-                    this.minimapTexture = TextureCache.instance().getMinimapSmallCircle();
+                    minimapTexture = TextureCache.instance().getMinimapSmallCircle();
+                    minimapSize = 256;
+                    marginX=5;
+                    marginY=5;
                     break;
                 }
                 case LargeSquare: {
-                    this.minimapTexture = TextureCache.instance().getMinimapLargeSquare();
+                    minimapTexture = TextureCache.instance().getMinimapLargeSquare();
+                    minimapSize = 512;
+                    marginX=5;
+                    marginY=5;
                     break;
                 }
-                case LargeCircle: {
-                    this.minimapTexture = TextureCache.instance().getMinimapLargeCircle();
+                case SmallSquare:
+                default: {
+                    minimapTexture = TextureCache.instance().getMinimapSmallSquare();
+                    minimapSize = 256;
+                    marginX=2;
+                    marginY=4;
                     break;
                 }
             }
-            this.drawTimer = StatTimer.get("MiniMapOverlay.drawMap." + shape.name());
-            this.drawTimerWithRefresh = StatTimer.get("MiniMapOverlay.drawMap+refreshState." + shape.name());
+
+            minimapOffset = minimapSize*0.5;
+            labelYOffset = -7;
+
+            switch(position){
+                case BottomRight : {
+                    textureX = mc.displayWidth- minimapTexture.width;
+                    textureY = mc.displayHeight- minimapSize-marginY-marginY;
+                    translateX = (mc.displayWidth/2)-minimapOffset;
+                    translateY = (mc.displayHeight/2)-minimapOffset;
+                    scissorX = mc.displayWidth-minimapSize-marginX;
+                    scissorY = marginY;
+                    labelX = mc.displayWidth-(minimapSize/2);
+                    labelY = mc.displayHeight-marginY;
+                    break;
+                }
+                case TopLeft : {
+                    textureX = -minimapTexture.width+minimapSize+marginX+marginX;
+                    textureY = 0;
+                    translateX = -(mc.displayWidth/2)+minimapOffset;
+                    translateY = -(mc.displayHeight/2)+minimapOffset;
+                    scissorX = 0+marginX;
+                    scissorY = mc.displayHeight-minimapSize-marginY;
+                    labelX = minimapSize/2;
+                    labelY = minimapSize;
+                    break;
+                }
+                case BottomLeft : {
+                    textureX = 0;
+                    textureY = mc.displayHeight- minimapTexture.height;
+                    translateX = -(mc.displayWidth/2)+minimapOffset;
+                    translateY = (mc.displayHeight/2)-minimapOffset;
+                    scissorX = 0+marginX;
+                    scissorY = mc.displayHeight-marginY;
+                    labelX = minimapSize/2;
+                    labelY = mc.displayHeight-20; // TODO
+                    break;
+                }
+                case TopRight :
+                default : {
+                    textureX = mc.displayWidth- (minimapTexture.width) + ((minimapTexture.width-minimapSize)/2) - marginX;
+                    textureY = -(minimapTexture.height-minimapSize)/2 + marginY;
+                    translateX = (mc.displayWidth/2)-minimapOffset;
+                    translateY = -(mc.displayHeight/2)+minimapOffset;
+                    scissorX = mc.displayWidth-minimapSize-marginX;
+                    scissorY = mc.displayHeight-minimapSize-marginY;
+                    labelX = mc.displayWidth-(minimapSize/2);
+                    labelY = minimapSize;
+                    break;
+                }
+            }
+
+            System.out.println("New DisplayVars: " + shape + " " + position + " : " + displayWidth + "x" + displayHeight);
         }
     }
 }
