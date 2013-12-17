@@ -143,6 +143,8 @@ public class GridRenderer {
 		Point blockPixelOffset = centerTile.blockPixelOffsetInTile(centerBlock.x, centerBlock.z);
 		centerPixelOffset.setLocation(displayOffsetX + blockPixelOffset.x, displayOffsetY + blockPixelOffset.y);
 
+        if(!fullUpdate) return false;
+
 		boolean updated = false;
 
         TilePos pos;
