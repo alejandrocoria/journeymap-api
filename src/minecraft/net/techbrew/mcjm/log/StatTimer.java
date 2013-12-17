@@ -60,7 +60,9 @@ public class StatTimer {
         });
         StringBuffer sb = new StringBuffer();
         for(StatTimer timer : list){
-            sb.append("\n\t").append(timer.getReportString());
+            if(timer.counter.get()>0){
+                sb.append("\n\t").append(timer.getReportString());
+            }
         }
         JourneyMap.getLogger().info(sb.toString());
     }
