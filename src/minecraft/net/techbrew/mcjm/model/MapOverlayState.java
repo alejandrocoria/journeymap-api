@@ -42,6 +42,7 @@ public class MapOverlayState {
 	private int dimension = Integer.MIN_VALUE;
 	private boolean caveMappingAllowed = false;
     private List<BaseOverlayRenderer.DrawStep> drawStepList = new ArrayList<BaseOverlayRenderer.DrawStep>();
+    private String playerBiome = "";
 	
 	/**
 	 * Default constructor
@@ -69,6 +70,8 @@ public class MapOverlayState {
 		} else if(getMapType()==MapType.underground && lastMapType!=MapType.underground) {
 			follow = true;
 		}
+
+        playerBiome = (String) DataCache.instance().get(PlayerData.class).get(EntityKey.biome);
 						
 		updateLastRefresh();
 	}
@@ -103,6 +106,10 @@ public class MapOverlayState {
 	public File getWorldDir() {
 		return worldDir;
 	}
+
+    public String getPlayerBiome() {
+        return playerBiome;
+    }
 
     public List<BaseOverlayRenderer.DrawStep> getDrawSteps() {
         return drawStepList;
