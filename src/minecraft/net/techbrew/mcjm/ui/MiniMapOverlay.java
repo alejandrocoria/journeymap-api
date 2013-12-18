@@ -148,7 +148,7 @@ public class MiniMapOverlay {
         } catch(Throwable t) {
             logger.severe("Minimap error:" + LogFormatter.toString(t));
         } finally {
-            timer.pause();
+            timer.stop();
         }
 
 	}

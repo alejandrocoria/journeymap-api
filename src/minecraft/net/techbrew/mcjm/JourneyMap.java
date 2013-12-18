@@ -387,7 +387,7 @@ public class JourneyMap {
 			logger.severe(LogFormatter.toString(t));
 		}
 
-        timer.pause();
+        timer.stop();
 		return true;
 	}
 	

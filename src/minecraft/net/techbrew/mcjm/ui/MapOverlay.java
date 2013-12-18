@@ -21,7 +21,6 @@ import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.ui.dialog.MapChat;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.logging.Level;
@@ -103,7 +102,7 @@ public class MapOverlay extends JmUI {
 			JourneyMap.getInstance().announce(error);
 			close();
 		} finally {
-            drawScreenTimer.pause();
+            drawScreenTimer.stop();
         }
 	}
 
@@ -524,7 +523,7 @@ public class MapOverlay extends JmUI {
 
         BaseOverlayRenderer.drawCenteredLabel(state.playerLastPos, width/2, height-7, 14, 0, playerInfoBgColor, playerInfoFgColor, 205, 1);
 
-        timer.pause();
+        timer.stop();
 	}
 	
 	public static void drawMapBackground(JmUI ui) {

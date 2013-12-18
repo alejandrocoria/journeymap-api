@@ -78,7 +78,7 @@ public class Tile {
 			} else {
 				textureImpl.updateTexture(image);
 			}
-            timer.pause();
+            timer.stop();
 			//if(debug) logger.info("Updated texture for " + this + " at " + mapType + ", vSlice " + vSlice);
 		}
 		return changed;

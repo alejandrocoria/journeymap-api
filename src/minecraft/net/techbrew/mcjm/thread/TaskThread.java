@@ -149,7 +149,7 @@ public class TaskThread implements Runnable {
 			chunkSet.clear();
 			chunkImageCache.clear();
 
-            timer.pause();
+            timer.stop();
 				
 		} catch (Throwable t) {
 			String error = Constants.getMessageJMERR16(t.getMessage());
@@ -166,7 +166,7 @@ public class TaskThread implements Runnable {
 
 			task.performTask();
 
-            timer.pause();
+            timer.stop();
 			
 			if(threadLogging) {
                 timer.report();

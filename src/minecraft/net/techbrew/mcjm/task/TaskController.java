@@ -127,7 +127,7 @@ public class TaskController {
 			task = manager.getTask(minecraft, worldHash);
 
 			if(task!=null) {
-                timer.pause();
+                timer.stop();
 				TaskThread thread = TaskThread.createAndQueue(task);
 				if(thread!=null) {
 					if(taskExecutor!=null && !taskExecutor.isShutdown()) {

@@ -101,7 +101,7 @@ public class StatTimer {
         }
     }
 
-    public void pause() {
+    public void stop() {
         synchronized (counter) {
             if(maxed) return;
 
