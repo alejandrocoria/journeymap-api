@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Created by mwoodman on 12/13/13.
+ * Utility class for timing whatever needs to be timed.
  */
 public class StatTimer {
 
@@ -22,18 +22,29 @@ public class StatTimer {
 
     private final Logger logger = JourneyMap.getLogger();
     private final int warmupCount;
-    private boolean warmup = true;
-    private boolean maxed = false;
     private final AtomicLong counter = new AtomicLong();
     private final AtomicDouble totalTime = new AtomicDouble();
     private final String name;
 
+    private boolean warmup = true;
+    private boolean maxed = false;
     private Long started;
 
+    /**
+     * Get a timer by name.  If it hasn't been created, it will have WARMUP_COUNT_DEFAULT.
+     * @param name
+     * @return
+     */
     public synchronized static StatTimer get(String name) {
         return get(name, WARMUP_COUNT_DEFAULT);
     }
 
+    /**
+     * Get a timer by name.  If it hasn't been created, it will have the warmupCount value provided.
+     * @param name
+     * @param warmupCount
+     * @return
+     */
     public synchronized static StatTimer get(String name, int warmupCount) {
         if(name==null) throw new IllegalArgumentException("StatTimer name required");
         StatTimer timer = timers.get(name);
@@ -44,12 +55,18 @@ public class StatTimer {
         return timer;
     }
 
+    /**
+     * Reset all timers.
+     */
     public synchronized static void resetAll() {
         for(StatTimer timer : timers.values()){
             timer.reset();
         }
     }
 
+    /**
+     * Report all timers via log file.
+     */
     public synchronized static void reportAll() {
         List<StatTimer> list = new ArrayList<StatTimer>(timers.values());
         Collections.sort(list, new Comparator<StatTimer>(){
@@ -67,11 +84,20 @@ public class StatTimer {
         JourneyMap.getLogger().info(sb.toString());
     }
 
+    /**
+     * Private constructor.
+     * @param name
+     * @param warmupCount
+     */
     private StatTimer(String name, int warmupCount) {
         this.name = name;
         this.warmupCount = warmupCount;
     }
 
+    /**
+     * Start the timer.
+     * @return
+     */
     public StatTimer start() {
         synchronized (counter) {
             if(maxed) return this;
@@ -101,6 +127,9 @@ public class StatTimer {
         }
     }
 
+    /**
+     * Stop the timer.
+     */
     public void stop() {
         synchronized (counter) {
             if(maxed) return;
@@ -122,12 +151,18 @@ public class StatTimer {
         }
     }
 
+    /**
+     * Cancel a started timer.
+     */
     public void cancel() {
         synchronized (counter) {
             started = null;
         }
     }
 
+    /**
+     * Reset the timer.
+     */
     public void reset() {
         synchronized (counter) {
             warmup = true;
@@ -138,10 +173,17 @@ public class StatTimer {
         }
     }
 
+    /**
+     * Log the timer's stats.
+     */
     public void report() {
         logger.info(getReportString());
     }
 
+    /**
+     * Get the timer's stats as a string.
+     * @return
+     */
     public String getReportString() {
         final DecimalFormat df = new DecimalFormat("###.##");
         synchronized(counter) {
@@ -159,6 +201,12 @@ public class StatTimer {
         }
     }
 
+    /**
+     * Pad string s with up to n spaces.
+     * @param s
+     * @param n
+     * @return
+     */
     private static String pad(Object s, int n) {
         return String.format("%1$-" + n + "s", s);
     }
