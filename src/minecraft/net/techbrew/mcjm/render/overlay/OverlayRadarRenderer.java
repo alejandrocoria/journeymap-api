@@ -92,10 +92,10 @@ public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
 					if(isPlayer) {
 						// Draw Label			
 						String username = (String) critter.get(EntityKey.username);
-						drawStepList.add(new DrawCenteredLabelStep(posX, posZ, username, fontHeight, -entityIcon.height, labelBg, Color.green, fontScale));
+						drawStepList.add(new DrawCenteredLabelStep(posX, posZ, username, -entityIcon.height, labelBg, Color.green, fontScale));
 					} else if(critter.containsKey(EntityKey.customName)){
 						String customName = (String) critter.get(EntityKey.customName);
-						drawStepList.add(new DrawCenteredLabelStep(posX, posZ, customName, fontHeight, entityIcon.height/2, labelBg, Color.white, fontScale));
+						drawStepList.add(new DrawCenteredLabelStep(posX, posZ, customName, entityIcon.height/2, labelBg, Color.white, fontScale));
 					}
 				}
 			}

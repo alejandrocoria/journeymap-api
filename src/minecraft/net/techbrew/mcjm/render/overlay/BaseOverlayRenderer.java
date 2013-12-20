@@ -57,13 +57,11 @@ public abstract class BaseOverlayRenderer<K> {
      * @param text
      * @param x
      * @param y
-     * @param height
-     * @param zOffset
      * @param bgColor
      * @param color
      * @param alpha
      */
-	public static void drawCenteredLabel(final String text, double x, double y, int height, int zOffset, Color bgColor, Color color, int alpha, double fontScale) {
+	public static void drawCenteredLabel(final String text, double x, double y, Color bgColor, Color color, int alpha, double fontScale) {
 
 		if(text==null || text.length()==0) {
 			return;
@@ -71,7 +69,7 @@ public abstract class BaseOverlayRenderer<K> {
 
         Minecraft mc = Minecraft.getMinecraft();
         final FontRenderer fontRenderer = mc.fontRenderer;
-		final int width = fontRenderer.getStringWidth(text) + 6;
+		final int width = fontRenderer.getStringWidth(text);
 
         if(fontScale!=1) {
             GL11.glPushMatrix();
@@ -84,11 +82,13 @@ public abstract class BaseOverlayRenderer<K> {
         // Draw background
         if(bgColor!=null) {
             final float[] rgb = bgColor.getColorComponents(null);
-            drawRectangle(x-width/2, y-height/2 + zOffset, width, height, bgColor, alpha);
+            final int rectWidth = width + fontRenderer.getCharWidth(' ');
+            final int vMargin = 2;
+            drawRectangle(x-(rectWidth/2), y-2, rectWidth, fontRenderer.FONT_HEIGHT+3, bgColor, alpha);
         }
 
         // Draw text
-        fontRenderer.drawStringWithShadow(text, (int) x - (width/2)+3, (int) y-height/2 + zOffset + 3, color.getRGB()); // TODO: clean up this offset mess
+        fontRenderer.drawStringWithShadow(text, (int) x - (width/2), (int) y, color.getRGB());
 
         if(fontScale!=1) {
             GL11.glPopMatrix();
@@ -96,13 +96,30 @@ public abstract class BaseOverlayRenderer<K> {
 	}
 	
 	private static void drawQuad(TextureImpl texture, final int x, final int y, final int width, final int height, boolean flip) {
-		drawQuad(texture,x,y,width,height,null,1f,flip);
+		drawQuad(texture,x,y,width,height,null,1f,flip, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 	}
-	
-	private static void drawQuad(TextureImpl texture, final int x, final int y, final int width, final int height, Color color, float alpha, boolean flip) {
+
+    private static void drawQuad(TextureImpl texture, final int x, final int y, final int width, final int height, boolean flip, int glBlendSfactor, int glBlendDFactor) {
+        drawQuad(texture,x,y,width,height,null,1f,flip, glBlendSfactor, glBlendDFactor);
+    }
+
+    /**
+     *
+     * @param texture
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     * @param color
+     * @param alpha
+     * @param flip
+     * @param glBlendSfactor  For normal alpha blending: GL11.GL_SRC_ALPHA
+     * @param glBlendDFactor  For normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
+     */
+    public static void drawQuad(TextureImpl texture, final int x, final int y, final int width, final int height, Color color, float alpha, boolean flip, int glBlendSfactor, int glBlendDFactor) {
 
         GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);		
+		GL11.glBlendFunc(glBlendSfactor, glBlendDFactor); // normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
 		if(color!=null) {
 			float[] c = color.getColorComponents(null);
 			GL11.glColor4f(c[0], c[1], c[2], alpha);
@@ -123,11 +140,16 @@ public abstract class BaseOverlayRenderer<K> {
 		tessellator.addVertexWithUV(x, y, 0.0D, 0, 0);
 		tessellator.draw();
 
+        // Ensure normal alpha blending afterward, just in case
+        if(glBlendSfactor!=GL11.GL_SRC_ALPHA || glBlendDFactor!=GL11.GL_ONE_MINUS_SRC_ALPHA){
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        }
 	}
 	
 	public static void drawRectangle(double x, double y, int width, int height, Color color, int alpha) {
 
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);		
 		Tessellator tessellator = Tessellator.instance;
@@ -146,6 +168,10 @@ public abstract class BaseOverlayRenderer<K> {
 	public static void drawImage(TextureImpl texture, int x, int y, boolean flip) {				
 		drawQuad(texture, x, y, texture.width, texture.height, flip);		
 	}
+
+    public static void drawImage(TextureImpl texture, int x, int y, boolean flip, int glBlendSfactor, int glBlendDfactor) {
+        drawQuad(texture, x, y, texture.width, texture.height, flip, glBlendSfactor, glBlendDfactor);
+    }
 	
 	public static void drawRotatedImage(TextureImpl texture, int x, int y, float heading) {
 		
@@ -183,7 +209,7 @@ public abstract class BaseOverlayRenderer<K> {
 	
 	private static void drawColoredImage(TextureImpl texture, int alpha, Color color, int x, int y) {
 		
-		drawQuad(texture, x, y, texture.width, texture.height, color, alpha, false);
+		drawQuad(texture, x, y, texture.width, texture.height, color, alpha, false, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
 	}
 
@@ -276,7 +302,7 @@ public abstract class BaseOverlayRenderer<K> {
             Point pixel = gridRenderer.getBlockPixelInGrid(posX, posZ);
             if(gridRenderer.isOnScreen(pixel.x, pixel.y)) {
                 drawColoredImage(texture, alpha, color, pixel.x + xOffset - (texture.width/2), pixel.y + yOffset- (texture.height/2));
-                drawCenteredLabel(label, pixel.x, pixel.y, fontHeight, -texture.height, Color.black, fontColor, alpha, fontScale);
+                drawCenteredLabel(label, pixel.x, pixel.y-texture.height, Color.black, fontColor, alpha, fontScale);
             } else {
                 gridRenderer.ensureOnScreen(pixel);
                 drawColoredImage(offScreenTexture, alpha, color, pixel.x + xOffset - (offScreenTexture.width / 2), pixel.y + yOffset - (offScreenTexture.height / 2));
@@ -313,19 +339,16 @@ public abstract class BaseOverlayRenderer<K> {
         final int posX;
         final int posZ;
 		final String text;
-		final int height;
-		final int heightOffset;
+		final int labelYOffset;
 		final Color bgColor;
 		final Color fgColor;
         final double fontScale;
 		
-		public DrawCenteredLabelStep(int posX, int posZ, String text, int height,
-				int heightOffset, Color bgColor, Color fgColor, double fontScale) {
+		public DrawCenteredLabelStep(int posX, int posZ, String text, int labelYOffset, Color bgColor, Color fgColor, double fontScale) {
             this.posX = posX;
             this.posZ = posZ;
 			this.text = text;
-			this.height = height;
-			this.heightOffset = heightOffset;
+			this.labelYOffset = labelYOffset;
 			this.bgColor = bgColor;
 			this.fgColor = fgColor;
             this.fontScale = fontScale;
@@ -335,7 +358,7 @@ public abstract class BaseOverlayRenderer<K> {
 		public void draw(int xOffset, int yOffset, GridRenderer gridRenderer) {
             Point pixel = gridRenderer.getPixel(posX, posZ);
             if(pixel!=null) {
-			    drawCenteredLabel(text, pixel.x + xOffset, pixel.y + yOffset, height, heightOffset, bgColor, fgColor, 205, fontScale);
+			    drawCenteredLabel(text, pixel.x + xOffset, pixel.y + yOffset + labelYOffset, bgColor, fgColor, 205, fontScale);
             }
 		}		
 	}
