@@ -20,6 +20,11 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 import java.util.logging.Logger;
 
+import static org.lwjgl.opengl.GL11.*;
+
+import java.awt.*;
+import java.util.logging.Logger;
+
 /**
  * Displays the map as a minimap overlay in-game.
  * 
@@ -33,10 +38,10 @@ public class MiniMapOverlay {
     private final MapOverlayState state = MapOverlay.state();
     private final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
     private final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
-    private final GridRenderer gridRenderer = new GridRenderer(3);
+    private final GridRenderer gridRenderer = new GridRenderer(5);
     private StatTimer drawTimer;
     private StatTimer drawTimerWithRefresh;
-    private final Color playerInfoFgColor = Color.GREEN;
+    private final Color playerInfoFgColor = Color.LIGHT_GRAY;
     private final Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
 
     private Boolean enabled;
@@ -50,11 +55,7 @@ public class MiniMapOverlay {
 	 * Default constructor
 	 */
 	public MiniMapOverlay() {
-        try {
-            updateDisplayVars(DisplayVars.Shape.SmallSquare, DisplayVars.Position.TopRight); // TODO: Get from preferences
-        } catch(Throwable t) {
-            t.printStackTrace();
-        }
+        updateDisplayVars(DisplayVars.Shape.SmallSquare, DisplayVars.Position.TopRight); // TODO: Get from preferences
 	}
 
 
@@ -92,12 +93,41 @@ public class MiniMapOverlay {
             JmUI.sizeDisplay(mc.displayWidth, mc.displayHeight);
 
             // Ensure colors and alpha reset
-            GL11.glColor4f(1,1,1,1);
+            GL11.glColor4f(1, 1, 1, 1);
 
             // Push matrix for translation to corner
             GL11.glPushMatrix();
 
-            // Move map center
+            // Draw mask (if present) using stencil buffer
+            if (dv.maskTexture!=null)
+            {
+                try {
+                    glClear(GL_DEPTH_BUFFER_BIT);
+                    glEnable(GL_STENCIL_TEST);
+                    glColorMask(false, false, false, false);
+                    glDepthMask(false);
+                    glStencilFunc(GL_NEVER, 1, 0xFF);
+                    glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
+                    glStencilMask(0xFF);
+                    glClear(GL_STENCIL_BUFFER_BIT);
+                    BaseOverlayRenderer.drawQuad(dv.maskTexture, dv.textureX, dv.textureY, dv.maskTexture.width, dv.maskTexture.height, null, 1f, false, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                    glColorMask(true, true, true, true);
+                    glDepthMask(true);
+                    glStencilMask(0x00);
+                    //glStencilFunc(GL_EQUAL, 0, 0xFF);
+                    glStencilFunc(GL_EQUAL, 1, 0xFF);
+                } catch(Throwable t) {
+                    logger.warning("Stencil buffer failing with circle mask:" + LogFormatter.toString(t));
+                    if(getShape()==DisplayVars.Shape.LargeCircle){
+                        setShape(DisplayVars.Shape.LargeSquare);
+                    } else if(getShape()==DisplayVars.Shape.SmallCircle){
+                        setShape(DisplayVars.Shape.SmallSquare);
+                    }
+                    return;
+                }
+            }
+
+            // Move center to corner
             GL11.glTranslated(dv.translateX, dv.translateY, 0);
 
             // Scissor area that shouldn't be drawn
@@ -117,36 +147,49 @@ public class MiniMapOverlay {
                 gridRenderer.draw(0, 0, drawStep);
             }
 
-            GL11.glPopMatrix();
+            // Return center to mid-screen
+            GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
+
+            // If using a mask, turn off the stencil test
+            if (dv.maskTexture!=null)
+            {
+                glDisable(GL_STENCIL_TEST);
+            }
+
+            // Finish Scissor
+            GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
             // Determine current biome
             final int playerX = (int) player.posX;
             final int playerZ = (int) player.posZ;
             final int playerY = (int) player.posY;
-            final String playerInfo = Constants.getString("MapOverlay.player_location_abbrev",
-                    playerX, playerZ, playerY, mc.thePlayer.chunkCoordY, state.getPlayerBiome());
+
+            // Player info string
+            String playerInfo = Constants.getString("MapOverlay.player_location_minimap", playerX, playerZ, playerY, mc.thePlayer.chunkCoordY, state.getPlayerBiome());
+            if(dv.fontScale>1 && mc.fontRenderer.getStringWidth(playerInfo)*dv.fontScale>dv.minimapSize){
+                // Drop biome if running of space
+                playerInfo = Constants.getString("MapOverlay.player_location_minimap_nobiome", playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
+            }
 
             // Draw position text
-            BaseOverlayRenderer.drawCenteredLabel(playerInfo, dv.labelX, dv.bottomLabelY, 14, dv.bottomLabelYOffset, playerInfoBgColor, playerInfoFgColor, 215, state.fontScale);
+            BaseOverlayRenderer.drawCenteredLabel(playerInfo, dv.labelX, dv.bottomLabelY, playerInfoBgColor, playerInfoFgColor, 200, dv.fontScale);
 
             // Draw FPS
             if(showFps){
                 String fps = mc.debug;
                 final int i = fps!=null ? fps.indexOf(',') : -1;
                 if(i>0){
-                    BaseOverlayRenderer.drawCenteredLabel(fps.substring(0,i), dv.labelX, dv.topLabelY, 14, dv.topLabelYOffset, playerInfoBgColor, playerInfoFgColor, 215, state.fontScale);
+                    BaseOverlayRenderer.drawCenteredLabel(fps.substring(0,i), dv.labelX, dv.topLabelY, playerInfoBgColor, playerInfoFgColor, 200, dv.fontScale);
                 }
             }
 
-
-            // Finish Scissor
-            GL11.glDisable(GL11.GL_SCISSOR_TEST);
-
-            // Draw minimap texture
-            BaseOverlayRenderer.drawImage(dv.minimapTexture, dv.textureX, dv.textureY, false);
-
-            // Restore GL attrs
+            // Restore GL attrs assumed by Minecraft to be enabled
             GL11.glEnable(GL11.GL_DEPTH_TEST);
+
+            // Draw border texture
+            BaseOverlayRenderer.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false);
+
+            GL11.glPopMatrix();
 
             // Return resolution to how it is normally scaled
             JmUI.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
@@ -214,20 +257,24 @@ public class MiniMapOverlay {
         }
     }
 
-    private void updateDisplayVars() {
+    public void updateDisplayVars() {
         if(dv!=null) {
             updateDisplayVars(dv.shape, dv.position);
         }
     }
     public void updateDisplayVars(DisplayVars.Shape shape, DisplayVars.Position position) {
 
-        if(dv!=null && mc.displayHeight==dv.displayHeight && mc.displayWidth==dv.displayWidth
-                && this.dv.shape==shape && this.dv.position==position){
+        if(dv!=null
+                && mc.displayHeight==dv.displayHeight
+                && mc.displayWidth==dv.displayWidth
+                && this.dv.shape==shape
+                && this.dv.position==position
+                && this.dv.fontScale==state.fontScale){
             return;
         }
 
         DisplayVars oldDv = this.dv;
-        this.dv = new DisplayVars(mc, shape, position);
+        this.dv = new DisplayVars(mc, shape, position, state.fontScale);
 
         if(oldDv==null || oldDv.shape!=this.dv.shape){
             this.drawTimer = StatTimer.get("MiniMapOverlay.drawMap." + shape.name(), 200);
@@ -235,7 +282,7 @@ public class MiniMapOverlay {
         }
 
         if(oldDv!=null && oldDv.shape!=this.dv.shape){
-            oldDv.minimapTexture.deleteTexture(); // TODO: ensure reloading texture works
+            oldDv.borderTexture.deleteTexture(); // TODO: ensure reloading texture works
         }
     }
 
