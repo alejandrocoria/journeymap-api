@@ -2,9 +2,14 @@ package net.techbrew.mcjm.ui;
 
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.Minecraft;
+import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
+import net.techbrew.mcjm.render.texture.TextureCache;
+import net.techbrew.mcjm.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
 
 public abstract class JmUI extends GuiScreen {
+
+    TextureImpl logo = TextureCache.instance().getLogo();
 	
 	public abstract void close();
 	
@@ -13,10 +18,16 @@ public abstract class JmUI extends GuiScreen {
 		return true;
 	}
 
-    void sizeDisplay(boolean scaled) {
+    protected void sizeDisplay(boolean scaled) {
         final int glWidth = scaled ? this.width : mc.displayWidth;
         final int glHeight = scaled ? this.height : mc.displayHeight;
         sizeDisplay(glWidth, glHeight);
+    }
+
+    protected void drawLogo() {
+        sizeDisplay(mc.displayWidth, mc.displayHeight);
+        BaseOverlayRenderer.drawImage(logo, (mc.displayWidth - logo.width)/2, 20, false);
+        sizeDisplay(width, height);
     }
 
     public static void sizeDisplay(double width, double height) {
@@ -29,5 +40,7 @@ public abstract class JmUI extends GuiScreen {
         GL11.glLoadIdentity();
         GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
     }
+
+
 
 }

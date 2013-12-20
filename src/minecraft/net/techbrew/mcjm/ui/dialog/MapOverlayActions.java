@@ -88,16 +88,16 @@ public class MapOverlayActions extends JmUI {
 
 			final int hgap = 4;
 			final int vgap = 3;
-			final int bx = (this.width / 2) - (buttonAutomap.getWidth() - hgap/2);
+			final int bx = (this.width-hgap)/2;
 			final int by = this.height / 4;
 			
-			buttonAutomap.setPosition(bx, by);
-			buttonSave.below(buttonAutomap, vgap).xPosition=bx;
-			
-			buttonBrowser.rightOf(buttonAutomap, hgap).yPosition=by;
+			buttonAutomap.leftOf(bx).yPosition=by;
+            buttonBrowser.rightOf(buttonAutomap, hgap).yPosition=by;
+
+            buttonSave.below(buttonAutomap, vgap).leftOf(bx);
 			buttonCheck.below(buttonBrowser, vgap).rightOf(buttonSave, hgap);
 			
-			buttonClose.below(buttonSave, vgap*2).xPosition=this.width / 2 - buttonClose.getWidth()/2;
+			buttonClose.below(buttonSave, vgap*4).centerHorizontalOn(bx);
 
 		}
 		
@@ -177,6 +177,8 @@ public class MapOverlayActions extends JmUI {
     	super.drawBackground(0);
     	MapOverlay.drawMapBackground(this);
     	super.drawDefaultBackground();
+
+        super.drawLogo();
 	}
     
     

@@ -99,7 +99,7 @@ public class MiniMapOptions extends JmUI {
 			
 			final int hgap = 4;
 			final int vgap = 3;
-			final int bx = (this.width / 2);
+			final int bx = (this.width-hgap)/2;
 			final int by = this.height / 4;
 
             buttonMiniMap.leftOf(bx).yPosition = by;
@@ -227,19 +227,15 @@ public class MiniMapOptions extends JmUI {
     
     @Override
 	public void drawBackground(int layer)
-	{    	
-    	//super.drawBackground(0);
-
+	{
     	super.drawDefaultBackground();
+
         MiniMapOverlay miniMap = UIManager.getInstance().getMiniMap();
         if(miniMap.isEnabled()){
             miniMap.drawMap();
         }
 
-        TextureImpl logo = TextureCache.instance().getLogo();
-        JmUI.sizeDisplay(mc.displayWidth, mc.displayHeight);
-        BaseOverlayRenderer.drawImage(logo, (mc.displayWidth/2) - (logo.width/2), 20, false);
-        JmUI.sizeDisplay(width, height);
+        super.drawLogo();
 	}
     
     @Override

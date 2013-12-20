@@ -81,15 +81,14 @@ public class MapOverlayOptions extends JmUI {
 				webserverOn); //$NON-NLS-1$  //$NON-NLS-2$
 		buttonWebserver.setToggled(webserverOn);
 
-        boolean minimapOn = UIManager.getInstance().isMiniMapEnabled();
         buttonMiniMap = new MapButton(ButtonEnum.MiniMap.ordinal(),0,0,
-                Constants.getString("MapOverlay.enable_minimap", on),
-                Constants.getString("MapOverlay.enable_minimap", off),
-                minimapOn); //$NON-NLS-1$  //$NON-NLS-2$
-        buttonMiniMap.setToggled(minimapOn);
-		
-		buttonGrid = new MapButton(ButtonEnum.Grid.ordinal(),0,0,
 				Constants.getString("MapOverlay.minimap")); //$NON-NLS-1$ //$NON-NLS-2$
+
+        boolean gridOn = PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID);
+        buttonGrid = new MapButton(ButtonEnum.Grid.ordinal(),0,0,
+                Constants.getString("MapOverlay.show_grid", on),
+                Constants.getString("MapOverlay.show_grid", off),
+                gridOn); //$NON-NLS-1$  //$NON-NLS-2$
 				
 		if(!FeatureManager.isAllowed(Feature.MapCaves)) {
 			buttonCaves.setToggled(false);
@@ -155,25 +154,25 @@ public class MapOverlayOptions extends JmUI {
 			
 			final int hgap = 4;
 			final int vgap = 3;
-			final int bx = (this.width / 2) - (buttonCaves.getWidth() - hgap/2);
+			final int bx = (this.width - hgap)/2;
 			final int by = this.height / 4;
 			
-			buttonCaves.setPosition(bx, by);
+			buttonCaves.leftOf(bx).yPosition=by;
 			buttonMonsters.rightOf(buttonCaves, hgap).yPosition=by;
 			
-			buttonAnimals.below(buttonCaves, vgap).xPosition=bx;
+			buttonAnimals.below(buttonCaves, vgap).leftOf(bx);
 			buttonVillagers.rightOf(buttonAnimals, hgap).below(buttonMonsters, vgap);
 
-			buttonPets.below(buttonAnimals, vgap).xPosition=bx;
+			buttonPets.below(buttonAnimals, vgap).leftOf(bx);
 			buttonPlayers.rightOf(buttonPets, hgap).below(buttonVillagers, vgap);
 
-			buttonGrid.below(buttonPets, vgap).xPosition=bx;
+			buttonGrid.below(buttonPets, vgap).leftOf(bx);
 			buttonWaypoints.rightOf(buttonGrid, hgap).below(buttonPlayers, vgap);
 
-            buttonMiniMap.below(buttonGrid, vgap).xPosition=bx;
+            buttonMiniMap.below(buttonGrid, vgap).leftOf(bx);
 			buttonWebserver.rightOf(buttonMiniMap, vgap).below(buttonWaypoints, vgap);
 			
-			buttonClose.below(buttonWebserver, vgap*2).centerHorizontalOn(this.width / 2);
+			buttonClose.below(buttonWebserver, vgap*4).centerHorizontalOn(bx);
 
 		}	
 	}
@@ -263,6 +262,8 @@ public class MapOverlayOptions extends JmUI {
     	super.drawBackground(0);
     	MapOverlay.drawMapBackground(this);
     	super.drawDefaultBackground();
+
+        super.drawLogo();
 	}
     
     @Override

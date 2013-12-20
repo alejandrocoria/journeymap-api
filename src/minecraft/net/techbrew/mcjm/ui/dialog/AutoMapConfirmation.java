@@ -84,7 +84,7 @@ public class AutoMapConfirmation extends JmUI {
     	buttonAll.centerHorizontalOn(x).yPosition=y+18;
     	buttonMissing.centerHorizontalOn(x).below(buttonAll, vgap);
     	buttonNone.centerHorizontalOn(x).below(buttonMissing, vgap);
-    	buttonClose.centerHorizontalOn(x).below(buttonNone, vgap*2);
+    	buttonClose.centerHorizontalOn(x).below(buttonNone, vgap*4);
         
         super.drawScreen(par1, par2, par3);
     }
@@ -95,6 +95,8 @@ public class AutoMapConfirmation extends JmUI {
     	super.drawBackground(0);
     	MapOverlay.drawMapBackground(this);
     	super.drawDefaultBackground();
+
+        super.drawLogo();
 	}
     
     @Override
