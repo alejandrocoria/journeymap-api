@@ -1,9 +1,6 @@
 package net.techbrew.mcjm.ui;
 
-import net.minecraft.src.GuiChat;
-import net.minecraft.src.GuiInventory;
-import net.minecraft.src.KeyBinding;
-import net.minecraft.src.Minecraft;
+import net.minecraft.src.*;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -81,11 +78,16 @@ public class UIManager {
 
     public void drawMiniMap() {
         if(miniMap.isEnabled() && miniMap.isVisible()){
-            boolean isGamePaused = (minecraft.currentScreen != null) && !(minecraft.currentScreen instanceof MapOverlay) && !(minecraft.currentScreen instanceof GuiChat);
-            if(!isGamePaused) {
+            final GuiScreen currentScreen = minecraft.currentScreen;
+            final boolean doDraw = currentScreen==null || currentScreen instanceof GuiChat || currentScreen instanceof MiniMapOptions;
+            if(doDraw) {
                 miniMap.drawMap();
             }
         }
+    }
+
+    public MiniMapOverlay getMiniMap() {
+        return miniMap;
     }
 
     public void openMap() {

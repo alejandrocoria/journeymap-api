@@ -134,6 +134,11 @@ public class MapButton extends GuiSmallButton {
 		this.xPosition = x - this.width;
 		return this;
 	}
+
+    public MapButton rightOf(int x) {
+        this.xPosition = x;
+        return this;
+    }
 	
 	public MapButton centerHorizontalOn(int x) {
 		this.xPosition = x - (this.width/2);

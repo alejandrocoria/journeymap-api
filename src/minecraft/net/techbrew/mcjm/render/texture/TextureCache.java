@@ -55,8 +55,13 @@ public class TextureCache {
 			TextureImpl tex = namedTextures.get(name);
 			if(tex==null || !tex.hasImage()) {
 				BufferedImage img = FileHandler.getWebImage(filename);
-				tex = new TextureImpl(img, retain);
-				namedTextures.put(name, tex);
+                if(img==null){
+                    img = getUnknownEntity().getImage();
+                }
+                if(img!=null){
+                    tex = new TextureImpl(img, retain);
+                    namedTextures.put(name, tex);
+                }
 			}
 			return tex;			
 		}
@@ -125,8 +130,10 @@ public class TextureCache {
 			TextureImpl tex = entityImageMap.get(filename);
             if(tex==null || !tex.hasImage()) {
 				BufferedImage img = FileHandler.getCustomizableImage("entity/" + filename, getUnknownEntity().getImage()); //$NON-NLS-1$	
-				tex = new TextureImpl(img);
-				entityImageMap.put(filename, tex);
+                if(img!=null){
+                    tex = new TextureImpl(img);
+                    entityImageMap.put(filename, tex);
+                }
 			}
 			return tex;
 		}		

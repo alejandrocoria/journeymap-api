@@ -29,6 +29,8 @@ public class StatTimer {
     private boolean warmup = true;
     private boolean maxed = false;
     private Long started;
+    private double max=0;
+    private double min=Double.MAX_VALUE;
 
     /**
      * Get a timer by name.  If it hasn't been created, it will have WARMUP_COUNT_DEFAULT.
@@ -115,6 +117,8 @@ public class StatTimer {
 
             if(warmup && counter.get()>warmupCount){
                 warmup = false;
+                max = 0;
+                min = 0;
                 counter.set(0);
                 totalTime.set(0);
                 if(logger.isLoggable(Level.INFO)){
@@ -143,6 +147,8 @@ public class StatTimer {
                 final double elapsedMs = (System.nanoTime() - started)/NS;
                 totalTime.getAndAdd(elapsedMs);
                 counter.getAndIncrement();
+                if(elapsedMs<min) min=elapsedMs;
+                if(elapsedMs>max) max=elapsedMs;
                 started = null;
             } catch(Throwable t) {
                 logger.warning("Timer error: " + LogFormatter.toString(t));
@@ -194,6 +200,8 @@ public class StatTimer {
             final StringBuffer sb = new StringBuffer(pad(name,50)).append(": ");
             sb.append("Count: ").append(pad(count,8));
             sb.append("Time: ").append(pad(df.format(total)+"ms", 15));
+            sb.append("Min: ").append(pad(df.format(min)+"ms",8));
+            sb.append("Max: ").append(pad(df.format(max)+"ms",12));
             sb.append("Avg: ").append(pad(df.format(avg)+"ms",10));
             if(warmup) sb.append("(WARMUP NOT MET: ").append(warmupCount).append(")");
             if(maxed) sb.append("(MAXED)");

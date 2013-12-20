@@ -340,7 +340,8 @@ public class JourneyMap {
             return true;
         }
 
-        final StatTimer timer = StatTimer.get("JourneyMap.onTickInGame", 200).start();
+        final StatTimer timer = StatTimer.get("JourneyMap.onTickInGame", 200);
+        timer.start();
 
 		try {
 
@@ -380,14 +381,15 @@ public class JourneyMap {
 			// Perform the next mapping tasks			
 
 			taskController.performTasks(minecraft, newHash, taskExecutor);
+            timer.stop();
 
 		} catch (Throwable t) {
 			String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
 			announce(error);
 			logger.severe(LogFormatter.toString(t));
+            timer.stop();
 		}
 
-        timer.stop();
 		return true;
 	}
 	

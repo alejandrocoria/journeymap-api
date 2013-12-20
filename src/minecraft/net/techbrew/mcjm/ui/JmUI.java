@@ -9,8 +9,8 @@ public abstract class JmUI extends GuiScreen {
 	public abstract void close();
 	
 	@Override
-	public final boolean doesGuiPauseGame() {
-		return false;
+	public boolean doesGuiPauseGame() {
+		return true;
 	}
 
     void sizeDisplay(boolean scaled) {

@@ -32,7 +32,7 @@ public class TextureImpl extends AbstractTexture {
     	this.retainImage = retainImage;
     	this.width = image.getWidth();
         this.height = image.getHeight();
-        updateTexture(image);  
+        updateTexture(image);
     }    
 
     public void updateTexture(BufferedImage image)

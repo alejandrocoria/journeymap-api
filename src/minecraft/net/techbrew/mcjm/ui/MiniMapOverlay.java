@@ -2,7 +2,6 @@ package net.techbrew.mcjm.ui;
 
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.Minecraft;
-import net.minecraft.src.ScaledResolution;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
@@ -16,7 +15,6 @@ import net.techbrew.mcjm.render.overlay.GridRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
 import net.techbrew.mcjm.render.texture.TextureCache;
-import net.techbrew.mcjm.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -42,6 +40,7 @@ public class MiniMapOverlay {
     private final Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
 
     private Boolean enabled;
+    private Boolean showFps = true;
 
     private DisplayVars dv;
 
@@ -59,7 +58,7 @@ public class MiniMapOverlay {
 	}
 
 
-	void drawMap() {
+	public void drawMap() {
 
         // Check player status
         if (mc.thePlayer==null) {
@@ -78,16 +77,12 @@ public class MiniMapOverlay {
                 state.refresh(mc, player);
             }
 
-            // Update the grid // TODO:  Do this in another thread
+            // Update the grid
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
             gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
             gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0);
             if(doStateRefresh ) {
-
-                // Build list of drawSteps
                 state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer);
-
-                // Reset timers
                 state.updateLastRefresh();
             }
 
@@ -122,8 +117,6 @@ public class MiniMapOverlay {
                 gridRenderer.draw(0, 0, drawStep);
             }
 
-            // Finish Scissor
-            GL11.glDisable(GL11.GL_SCISSOR_TEST);
             GL11.glPopMatrix();
 
             // Determine current biome
@@ -134,7 +127,20 @@ public class MiniMapOverlay {
                     playerX, playerZ, playerY, mc.thePlayer.chunkCoordY, state.getPlayerBiome());
 
             // Draw position text
-            BaseOverlayRenderer.drawCenteredLabel(playerInfo, dv.labelX, dv.labelY, 14, dv.labelYOffset, playerInfoBgColor, playerInfoFgColor, 215, state.fontScale);
+            BaseOverlayRenderer.drawCenteredLabel(playerInfo, dv.labelX, dv.bottomLabelY, 14, dv.bottomLabelYOffset, playerInfoBgColor, playerInfoFgColor, 215, state.fontScale);
+
+            // Draw FPS
+            if(showFps){
+                String fps = mc.debug;
+                final int i = fps!=null ? fps.indexOf(',') : -1;
+                if(i>0){
+                    BaseOverlayRenderer.drawCenteredLabel(fps.substring(0,i), dv.labelX, dv.topLabelY, 14, dv.topLabelYOffset, playerInfoBgColor, playerInfoFgColor, 215, state.fontScale);
+                }
+            }
+
+
+            // Finish Scissor
+            GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
             // Draw minimap texture
             BaseOverlayRenderer.drawImage(dv.minimapTexture, dv.textureX, dv.textureY, false);
@@ -177,6 +183,15 @@ public class MiniMapOverlay {
     public void setEnabled(boolean enable){
         enabled = enable;
         PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_MINIMAP, enable);
+    }
+
+    public boolean isShowFps() {
+        return showFps;
+    }
+
+    public void setShowFps(boolean enable){
+        showFps = enable;
+        //PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_MINIMAP, enable); // TODO
     }
 
     public DisplayVars.Position getPosition() {
@@ -224,113 +239,5 @@ public class MiniMapOverlay {
         }
     }
 
-    static class DisplayVars {
-
-        enum Position {TopLeft, TopRight, BottomLeft, BottomRight}
-        enum Shape {SmallSquare, LargeSquare, SmallCircle, LargeCircle}
-
-        final Position position;
-        final Shape shape;
-        final TextureImpl minimapTexture;
-        final int displayWidth;
-        final int displayHeight;
-        final ScaledResolution scaledResolution;
-        final int minimapSize,textureX,textureY;
-        final double minimapOffset,translateX,translateY;
-        final int marginX,marginY,scissorX,scissorY,labelX,labelY,labelYOffset;
-
-        DisplayVars(Minecraft mc, Shape shape, Position position){
-            this.shape = shape;
-            this.position = position;
-            displayWidth = mc.displayWidth;
-            displayHeight = mc.displayHeight;
-            scaledResolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
-
-            switch(shape){
-                case LargeCircle: {
-                    minimapTexture = TextureCache.instance().getMinimapLargeCircle();
-                    minimapSize = 512;
-                    marginX=5;
-                    marginY=5;
-                    break;
-                }
-                case SmallCircle: {
-                    minimapTexture = TextureCache.instance().getMinimapSmallCircle();
-                    minimapSize = 256;
-                    marginX=5;
-                    marginY=5;
-                    break;
-                }
-                case LargeSquare: {
-                    minimapTexture = TextureCache.instance().getMinimapLargeSquare();
-                    minimapSize = 512;
-                    marginX=5;
-                    marginY=5;
-                    break;
-                }
-                case SmallSquare:
-                default: {
-                    minimapTexture = TextureCache.instance().getMinimapSmallSquare();
-                    minimapSize = 256;
-                    marginX=2;
-                    marginY=4;
-                    break;
-                }
-            }
-
-            minimapOffset = minimapSize*0.5;
-            labelYOffset = -7;
-
-            switch(position){
-                case BottomRight : {
-                    textureX = mc.displayWidth- minimapTexture.width;
-                    textureY = mc.displayHeight- minimapSize-marginY-marginY;
-                    translateX = (mc.displayWidth/2)-minimapOffset;
-                    translateY = (mc.displayHeight/2)-minimapOffset;
-                    scissorX = mc.displayWidth-minimapSize-marginX;
-                    scissorY = marginY;
-                    labelX = mc.displayWidth-(minimapSize/2);
-                    labelY = mc.displayHeight-marginY;
-                    break;
-                }
-                case TopLeft : {
-                    textureX = -minimapTexture.width+minimapSize+marginX+marginX;
-                    textureY = 0;
-                    translateX = -(mc.displayWidth/2)+minimapOffset;
-                    translateY = -(mc.displayHeight/2)+minimapOffset;
-                    scissorX = 0+marginX;
-                    scissorY = mc.displayHeight-minimapSize-marginY;
-                    labelX = minimapSize/2;
-                    labelY = minimapSize;
-                    break;
-                }
-                case BottomLeft : {
-                    textureX = 0;
-                    textureY = mc.displayHeight- minimapTexture.height;
-                    translateX = -(mc.displayWidth/2)+minimapOffset;
-                    translateY = (mc.displayHeight/2)-minimapOffset;
-                    scissorX = 0+marginX;
-                    scissorY = mc.displayHeight-marginY;
-                    labelX = minimapSize/2;
-                    labelY = mc.displayHeight-20; // TODO
-                    break;
-                }
-                case TopRight :
-                default : {
-                    textureX = mc.displayWidth- (minimapTexture.width) + ((minimapTexture.width-minimapSize)/2) - marginX;
-                    textureY = -(minimapTexture.height-minimapSize)/2 + marginY;
-                    translateX = (mc.displayWidth/2)-minimapOffset;
-                    translateY = -(mc.displayHeight/2)+minimapOffset;
-                    scissorX = mc.displayWidth-minimapSize-marginX;
-                    scissorY = mc.displayHeight-minimapSize-marginY;
-                    labelX = mc.displayWidth-(minimapSize/2);
-                    labelY = minimapSize;
-                    break;
-                }
-            }
-
-            System.out.println("New DisplayVars: " + shape + " " + position + " : " + displayWidth + "x" + displayHeight);
-        }
-    }
 }
 

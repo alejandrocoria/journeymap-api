@@ -618,7 +618,12 @@ public class MapOverlay extends JmUI {
         gridRenderer.move(deltaBlockX, deltaBlockz);
         gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 		setFollow(false);
-	}	
+	}
+
+    @Override
+    public final boolean doesGuiPauseGame() {
+        return true;
+    }
 	
 	public static synchronized MapOverlayState state() {
 		return state;
