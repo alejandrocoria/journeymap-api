@@ -52,7 +52,8 @@ public class MiniMapOptions extends JmUI {
                 
         buttonFont = new MapButton(ButtonEnum.Font.ordinal(), 0, 0,
                 Constants.getString("MiniMapOverlay.font", Constants.getString("MiniMapOverlay.font_small")),
-                Constants.getString("MiniMapOverlay.font", Constants.getString("MiniMapOverlay.font_large")), true);
+                Constants.getString("MiniMapOverlay.font", Constants.getString("MiniMapOverlay.font_large")),
+                (MapOverlay.state().fontScale==1));
         buttonFont.enabled = minimapOn;
 
         buttonKeyboard = new MapButton(ButtonEnum.Keyboard.ordinal(), 0, 0,
@@ -149,6 +150,7 @@ public class MiniMapOptions extends JmUI {
                 double newScale = (MapOverlay.state().fontScale==1) ? 2 : 1;
                 MapOverlay.state().fontScale = newScale;
                 buttonFont.setToggled(newScale==1);
+                UIManager.getInstance().getMiniMap().updateDisplayVars();
                 break;
             }
 
