@@ -132,15 +132,15 @@ public class StatTimer {
     }
 
     /**
-     * Stop the timer.
+     * Stop the timer, returns elapsed time in milliseconds.
      */
-    public void stop() {
+    public double stop() {
         synchronized (counter) {
-            if(maxed) return;
+            if(maxed) return 0;
 
             if(started == null) {
                 logger.warning(name + " is not running.");
-                return;
+                return 0;
             }
 
             try {
@@ -150,9 +150,11 @@ public class StatTimer {
                 if(elapsedMs<min) min=elapsedMs;
                 if(elapsedMs>max) max=elapsedMs;
                 started = null;
+                return elapsedMs;
             } catch(Throwable t) {
                 logger.warning("Timer error: " + LogFormatter.toString(t));
                 reset();
+                return 0;
             }
         }
     }
