@@ -13,10 +13,10 @@ import net.techbrew.mcjm.render.texture.TextureImpl;
 public class DisplayVars {
 
     public enum Position {
-        TopRight(Constants.getString("MiniMapOverlay.position_topright")),
-        BottomRight(Constants.getString("MiniMapOverlay.position_bottomright")),
-        BottomLeft(Constants.getString("MiniMapOverlay.position_bottomleft")),
-        TopLeft(Constants.getString("MiniMapOverlay.position_topleft"));
+        TopRight(Constants.getString("MiniMap.position_topright")),
+        BottomRight(Constants.getString("MiniMap.position_bottomright")),
+        BottomLeft(Constants.getString("MiniMap.position_bottomleft")),
+        TopLeft(Constants.getString("MiniMap.position_topleft"));
 
         public final String label;
         private Position(String label){
@@ -25,10 +25,10 @@ public class DisplayVars {
     }
 
     public enum Shape {
-        SmallSquare(Constants.getString("MiniMapOverlay.shape_smallsquare")),
-        LargeSquare(Constants.getString("MiniMapOverlay.shape_largesquare")),
-        SmallCircle(Constants.getString("MiniMapOverlay.shape_smallcircle")),
-        LargeCircle(Constants.getString("MiniMapOverlay.shape_largecircle"));
+        SmallSquare(Constants.getString("MiniMap.shape_smallsquare")),
+        LargeSquare(Constants.getString("MiniMap.shape_largesquare")),
+        SmallCircle(Constants.getString("MiniMap.shape_smallcircle")),
+        LargeCircle(Constants.getString("MiniMap.shape_largecircle"));
         public final String label;
         private Shape(String label){
             this.label = label;

@@ -22,10 +22,10 @@ public class UIManager {
         return Holder.INSTANCE;
     }
 
-    private MiniMapOverlay miniMap;
+    private MiniMap miniMap;
 	
     private UIManager() {
-        miniMap = new MiniMapOverlay();
+        miniMap = new MiniMap();
     }
     
     private final Logger logger = JourneyMap.getLogger();
@@ -86,7 +86,7 @@ public class UIManager {
         }
     }
 
-    public MiniMapOverlay getMiniMap() {
+    public MiniMap getMiniMap() {
         return miniMap;
     }
 

@@ -2,12 +2,8 @@ package net.techbrew.mcjm.ui.dialog;
 
 import net.minecraft.src.GuiButton;
 import net.techbrew.mcjm.Constants;
-import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
-import net.techbrew.mcjm.render.texture.TextureCache;
-import net.techbrew.mcjm.render.texture.TextureImpl;
 import net.techbrew.mcjm.ui.*;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
 
 public class MiniMapOptions extends JmUI {
 
@@ -22,7 +18,7 @@ public class MiniMapOptions extends JmUI {
     private DisplayVars.Position currentPosition;
 
 	public MiniMapOptions() {
-		title = Constants.getString("MiniMapOverlay.options");
+		title = Constants.getString("MiniMap.options");
 	}
 
 	/**
@@ -37,8 +33,8 @@ public class MiniMapOptions extends JmUI {
 
         boolean minimapOn = UIManager.getInstance().isMiniMapEnabled();
         buttonMiniMap = new MapButton(ButtonEnum.MiniMap.ordinal(),0,0,
-                Constants.getString("MiniMapOverlay.enable_minimap", on),
-                Constants.getString("MiniMapOverlay.enable_minimap", off),
+                Constants.getString("MiniMap.enable_minimap", on),
+                Constants.getString("MiniMap.enable_minimap", off),
                 minimapOn); //$NON-NLS-1$  //$NON-NLS-2$
         buttonMiniMap.setToggled(minimapOn);
 
@@ -51,25 +47,25 @@ public class MiniMapOptions extends JmUI {
         buttonShape.enabled = minimapOn;
                 
         buttonFont = new MapButton(ButtonEnum.Font.ordinal(), 0, 0,
-                Constants.getString("MiniMapOverlay.font", Constants.getString("MiniMapOverlay.font_small")),
-                Constants.getString("MiniMapOverlay.font", Constants.getString("MiniMapOverlay.font_large")),
+                Constants.getString("MiniMap.font", Constants.getString("MiniMap.font_small")),
+                Constants.getString("MiniMap.font", Constants.getString("MiniMap.font_large")),
                 (MapOverlay.state().fontScale==1));
         buttonFont.enabled = minimapOn;
 
         buttonKeyboard = new MapButton(ButtonEnum.Keyboard.ordinal(), 0, 0,
-                Constants.getString("MiniMapOverlay.hotkeys", on),
-                Constants.getString("MiniMapOverlay.hotkeys", off), true);
+                Constants.getString("MiniMap.hotkeys", on),
+                Constants.getString("MiniMap.hotkeys", off), true);
         buttonKeyboard.enabled = minimapOn;
 
         boolean isShowFps = UIManager.getInstance().getMiniMap().isShowFps();
         buttonShowfps = new MapButton(ButtonEnum.Showfps.ordinal(), 0, 0,
-                Constants.getString("MiniMapOverlay.show_fps", on),
-                Constants.getString("MiniMapOverlay.show_fps", off), isShowFps); // TODO:  Pref
+                Constants.getString("MiniMap.show_fps", on),
+                Constants.getString("MiniMap.show_fps", off), isShowFps); // TODO:  Pref
         buttonShowfps.enabled = minimapOn;
 
 		buttonClose = new MapButton(ButtonEnum.Close.ordinal(),0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$
 
-        buttonCloseAll = new MapButton(ButtonEnum.CloseAll.ordinal(),0,0,Constants.getString("MiniMapOverlay.return_to_game")); //$NON-NLS-1$
+        buttonCloseAll = new MapButton(ButtonEnum.CloseAll.ordinal(),0,0,Constants.getString("MiniMap.return_to_game")); //$NON-NLS-1$
 
         buttonList.add(buttonMiniMap);
         buttonList.add(buttonPosition);
@@ -188,7 +184,7 @@ public class MiniMapOptions extends JmUI {
 
     private void setShape(DisplayVars.Shape shape){
         currentShape = shape;
-        buttonShape.displayString = Constants.getString("MiniMapOverlay.shape", currentShape.label);
+        buttonShape.displayString = Constants.getString("MiniMap.shape", currentShape.label);
         UIManager.getInstance().getMiniMap().setShape(shape);
     }
 
@@ -202,7 +198,7 @@ public class MiniMapOptions extends JmUI {
 
     private void setPosition(DisplayVars.Position position){
         currentPosition = position;
-        buttonPosition.displayString = Constants.getString("MiniMapOverlay.position", currentPosition.label);
+        buttonPosition.displayString = Constants.getString("MiniMap.position", currentPosition.label);
         UIManager.getInstance().getMiniMap().setPosition(position);
     }
     
@@ -232,7 +228,7 @@ public class MiniMapOptions extends JmUI {
 	{
     	super.drawDefaultBackground();
 
-        MiniMapOverlay miniMap = UIManager.getInstance().getMiniMap();
+        MiniMap miniMap = UIManager.getInstance().getMiniMap();
         if(miniMap.isEnabled()){
             miniMap.drawMap();
         }

@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  * @author mwoodman
  *
  */
-public class MiniMapOverlay {
+public class MiniMap {
 
     private final Logger logger = JourneyMap.getLogger();
     private final Minecraft mc = Minecraft.getMinecraft();
@@ -54,7 +54,7 @@ public class MiniMapOverlay {
 	/**
 	 * Default constructor
 	 */
-	public MiniMapOverlay() {
+	public MiniMap() {
         updateDisplayVars(DisplayVars.Shape.SmallSquare, DisplayVars.Position.TopRight); // TODO: Get from preferences
 	}
 
@@ -277,8 +277,8 @@ public class MiniMapOverlay {
         this.dv = new DisplayVars(mc, shape, position, state.fontScale);
 
         if(oldDv==null || oldDv.shape!=this.dv.shape){
-            this.drawTimer = StatTimer.get("MiniMapOverlay.drawMap." + shape.name(), 200);
-            this.drawTimerWithRefresh = StatTimer.get("MiniMapOverlay.drawMap+refreshState." + shape.name());
+            this.drawTimer = StatTimer.get("MiniMap.drawMap." + shape.name(), 200);
+            this.drawTimerWithRefresh = StatTimer.get("MiniMap.drawMap+refreshState." + shape.name());
         }
 
         if(oldDv!=null && oldDv.shape!=this.dv.shape){
