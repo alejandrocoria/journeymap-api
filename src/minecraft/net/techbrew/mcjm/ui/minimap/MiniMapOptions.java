@@ -1,8 +1,9 @@
-package net.techbrew.mcjm.ui.dialog;
+package net.techbrew.mcjm.ui.minimap;
 
 import net.minecraft.src.GuiButton;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.ui.*;
+import net.techbrew.mcjm.ui.map.MapOverlay;
 import org.lwjgl.input.Keyboard;
 
 public class MiniMapOptions extends JmUI {

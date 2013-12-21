@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.ui.dialog;
+package net.techbrew.mcjm.ui.map;
 
 import net.minecraft.src.GuiButton;
 import net.techbrew.mcjm.Constants;
@@ -6,7 +6,6 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.task.MapRegionTask;
 import net.techbrew.mcjm.ui.JmUI;
 import net.techbrew.mcjm.ui.MapButton;
-import net.techbrew.mcjm.ui.MapOverlay;
 import net.techbrew.mcjm.ui.UIManager;
 
 import org.lwjgl.input.Keyboard;

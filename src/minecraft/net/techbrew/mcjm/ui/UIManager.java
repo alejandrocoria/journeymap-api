@@ -5,9 +5,11 @@ import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.render.overlay.TileCache;
-import net.techbrew.mcjm.ui.dialog.MapOverlayActions;
-import net.techbrew.mcjm.ui.dialog.MapOverlayOptions;
-import net.techbrew.mcjm.ui.dialog.MiniMapOptions;
+import net.techbrew.mcjm.ui.map.MapOverlay;
+import net.techbrew.mcjm.ui.map.MapOverlayActions;
+import net.techbrew.mcjm.ui.map.MapOverlayOptions;
+import net.techbrew.mcjm.ui.minimap.MiniMapOptions;
+import net.techbrew.mcjm.ui.minimap.MiniMap;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.ui;
+package net.techbrew.mcjm.ui.minimap;
 
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.ScaledResolution;

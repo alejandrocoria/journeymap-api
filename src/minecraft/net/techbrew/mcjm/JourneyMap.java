@@ -21,7 +21,7 @@ import net.techbrew.mcjm.task.MapPlayerTask;
 import net.techbrew.mcjm.task.TaskController;
 import net.techbrew.mcjm.thread.JMThreadFactory;
 import net.techbrew.mcjm.thread.TaskThread;
-import net.techbrew.mcjm.ui.MapOverlay;
+import net.techbrew.mcjm.ui.map.MapOverlay;
 import net.techbrew.mcjm.ui.UIManager;
 import org.lwjgl.input.Keyboard;
 

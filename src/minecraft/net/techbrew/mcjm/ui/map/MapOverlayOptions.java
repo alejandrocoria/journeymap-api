@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.ui.dialog;
+package net.techbrew.mcjm.ui.map;
 
 import net.minecraft.src.GuiButton;
 import net.techbrew.mcjm.Constants;

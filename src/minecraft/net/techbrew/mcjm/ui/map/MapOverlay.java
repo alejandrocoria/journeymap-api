@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.ui;
+package net.techbrew.mcjm.ui.map;
 
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.GuiButton;
@@ -18,7 +18,9 @@ import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.MapOverlayState;
 import net.techbrew.mcjm.render.overlay.*;
 import net.techbrew.mcjm.render.texture.TextureCache;
-import net.techbrew.mcjm.ui.dialog.MapChat;
+import net.techbrew.mcjm.ui.JmUI;
+import net.techbrew.mcjm.ui.MapButton;
+import net.techbrew.mcjm.ui.UIManager;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -622,7 +624,7 @@ public class MapOverlay extends JmUI {
 
     @Override
     public final boolean doesGuiPauseGame() {
-        return true;
+        return false;
     }
 	
 	public static synchronized MapOverlayState state() {

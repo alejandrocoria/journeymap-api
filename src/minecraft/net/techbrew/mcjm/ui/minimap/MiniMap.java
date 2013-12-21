@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.ui;
+package net.techbrew.mcjm.ui.minimap;
 
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.Minecraft;
@@ -15,15 +15,14 @@ import net.techbrew.mcjm.render.overlay.GridRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
 import net.techbrew.mcjm.render.texture.TextureCache;
+import net.techbrew.mcjm.ui.JmUI;
+import net.techbrew.mcjm.ui.map.MapOverlay;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
-
-import java.awt.*;
-import java.util.logging.Logger;
 
 /**
  * Displays the map as a minimap overlay in-game.

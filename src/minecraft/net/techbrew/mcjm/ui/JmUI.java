@@ -18,13 +18,13 @@ public abstract class JmUI extends GuiScreen {
 		return true;
 	}
 
-    protected void sizeDisplay(boolean scaled) {
+    public void sizeDisplay(boolean scaled) {
         final int glWidth = scaled ? this.width : mc.displayWidth;
         final int glHeight = scaled ? this.height : mc.displayHeight;
         sizeDisplay(glWidth, glHeight);
     }
 
-    protected void drawLogo() {
+    public void drawLogo() {
         sizeDisplay(mc.displayWidth, mc.displayHeight);
         BaseOverlayRenderer.drawImage(logo, (mc.displayWidth - logo.width)/2, 20, false);
         sizeDisplay(width, height);
