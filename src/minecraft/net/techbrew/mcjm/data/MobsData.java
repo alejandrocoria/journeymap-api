@@ -65,10 +65,10 @@ public class MobsData implements IDataProvider {
 				} else {
 					eProps.put(EntityKey.hostile, false); 
 				}
-				
-				eProps.put(EntityKey.posX, (int) Math.floor(entity.posX)); 
-				eProps.put(EntityKey.posZ, (int) Math.floor(entity.posZ)); 
-				eProps.put(EntityKey.chunkCoordX, entity.chunkCoordX); 
+
+                eProps.put(EntityKey.posX, entity.posX);
+                eProps.put(EntityKey.posZ, entity.posZ);
+                eProps.put(EntityKey.chunkCoordX, entity.chunkCoordX);
 				eProps.put(EntityKey.chunkCoordZ, entity.chunkCoordZ); 
 				eProps.put(EntityKey.heading, EntityHelper.getHeading(entity));
 				

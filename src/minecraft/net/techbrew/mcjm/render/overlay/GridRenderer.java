@@ -38,7 +38,8 @@ public class GridRenderer {
 	
 	private int centerTileHash;
 	private int zoom;
-	private final BlockCoordIntPair centerBlock = new BlockCoordIntPair();
+	private double centerBlockX;
+    private double centerBlockZ;
     private final Color bgColor = new Color(0x22, 0x22, 0x22);
 	
 	private final Point centerPixelOffset = new Point();
@@ -72,29 +73,30 @@ public class GridRenderer {
 	}
 	
 	public void move(final int deltaBlockX, final int deltaBlockZ) {
-		center(centerBlock.x + deltaBlockX, centerBlock.z + deltaBlockZ, zoom);
+		center(centerBlockX + deltaBlockX, centerBlockZ + deltaBlockZ, zoom);
 	}
 
 	public boolean center() {
-		return center(centerBlock.x, centerBlock.z, zoom);
+		return center(centerBlockX, centerBlockZ, zoom);
 	}
 
     public boolean hasTile(Tile tile) {
         return grid.containsValue(tile);
     }
 
-	public boolean center(final int blockX, final int blockZ, final int zoom) {
+	public boolean center(final double blockX, final double blockZ, final int zoom) {
 
-        if(blockX==centerBlock.x && blockZ==centerBlock.z && zoom==this.zoom && !grid.isEmpty()){
+        if(blockX==centerBlockX && blockZ==centerBlockZ && zoom==this.zoom && !grid.isEmpty()){
             return false;
         }
 
-		centerBlock.setLocation(blockX, blockZ);
+		centerBlockX = blockX;
+        centerBlockZ = blockZ;
 		this.zoom = zoom;
 		
 		// Get zoomed tile coords
-		final int tileX = Tile.blockPosToTile(centerBlock.x, this.zoom);
-		final int tileZ = Tile.blockPosToTile(centerBlock.z, this.zoom);			
+		final int tileX = Tile.blockPosToTile((int)Math.floor(centerBlockX), this.zoom);
+		final int tileZ = Tile.blockPosToTile((int)Math.floor(centerBlockZ), this.zoom);
 		
 		// Chech hash of tile coords
 		final int newCenterHash = Tile.toHashCode(tileX, tileZ, zoom, dimension);
@@ -150,7 +152,7 @@ public class GridRenderer {
 			return false;
 		}
 		
-		Point blockPixelOffset = centerTile.blockPixelOffsetInTile(centerBlock.x, centerBlock.z);
+		Point blockPixelOffset = centerTile.blockPixelOffsetInTile(centerBlockX, centerBlockZ);
 		centerPixelOffset.setLocation(displayOffsetX + blockPixelOffset.x, displayOffsetY + blockPixelOffset.y);
 
         if(!fullUpdate) return false;
@@ -174,6 +176,8 @@ public class GridRenderer {
                         if(tile.updateTexture(pos, mapType, vSlice)) {
                             updated=true;
                         }
+                    } else {
+
                     }
                 }
             }
@@ -187,17 +191,19 @@ public class GridRenderer {
         return centerPixelOffset;
     }
 	
-	public Point getBlockPixelInGrid(int x, int z) {
-		
-		int localBlockX = x - centerBlock.x;
-		int localBlockZ = z - centerBlock.z;
+	public Point getBlockPixelInGrid(double x, double z) {
+
+        double localBlockX = x - centerBlockX;
+        double localBlockZ = z - centerBlockZ;
 		
 		int blockSize = (int) Math.pow(2,zoom);
 
-		int pixelOffsetX = lastWidth /2 + (localBlockX*blockSize) ;
-		int pixelOffsetZ = lastHeight /2 +(localBlockZ*blockSize) ;
+        double pixelOffsetX = lastWidth /2 + (localBlockX*blockSize) - blockSize/2;
+        double pixelOffsetZ = lastHeight /2 +(localBlockZ*blockSize) - blockSize/2;
 		
-		return new Point(pixelOffsetX, pixelOffsetZ);
+		Point p = new Point();
+        p.setLocation(pixelOffsetX, pixelOffsetZ);
+        return p;
 	}
 
     /**
@@ -250,7 +256,7 @@ public class GridRenderer {
                 if(tile!=null) {
 				    drawTile(entry.getKey(), tile, centerX, centerZ);
                 } else {
-                    System.out.println("Grid tile missing at " + entry.getKey());
+                    //System.out.println("Grid tile missing at " + entry.getKey());
                 }
 			}
 
@@ -311,7 +317,7 @@ public class GridRenderer {
      * @param blockZ pos z
      * @return  pixel
      */
-	public Point getPixel(int blockX, int blockZ) {
+	public Point getPixel(double blockX, double blockZ) {
 		Point pixel = getBlockPixelInGrid(blockX, blockZ);
 		if(isOnScreen(pixel)) {
 			return pixel;
@@ -426,7 +432,7 @@ public class GridRenderer {
 	}
 
 	public boolean setZoom(int zoom) {
-		return center(centerBlock.x, centerBlock.z, zoom);
+		return center(centerBlockX, centerBlockZ, zoom);
 	}
 
     public int getRenderSize() {

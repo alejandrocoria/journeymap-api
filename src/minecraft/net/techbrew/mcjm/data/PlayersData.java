@@ -53,10 +53,10 @@ public class PlayersData implements IDataProvider {
 			// eProps.put(EntityKey.entityId, entity.entityId); 
 			eProps.put(EntityKey.filename, "/skin/" + entity.getEntityName()); 
 			eProps.put(EntityKey.username, entity.getEntityName());
-			eProps.put(EntityKey.posX, (int) entity.posX); 
-			eProps.put(EntityKey.posY, (int) entity.posY); 
-			eProps.put(EntityKey.posZ, (int) entity.posZ);
-			eProps.put(EntityKey.chunkCoordX, entity.chunkCoordX); 
+            eProps.put(EntityKey.posX, entity.posX);
+            eProps.put(EntityKey.posY, entity.posY);
+            eProps.put(EntityKey.posZ, entity.posZ);
+            eProps.put(EntityKey.chunkCoordX, entity.chunkCoordX);
 			eProps.put(EntityKey.chunkCoordZ, entity.chunkCoordZ); 
 			eProps.put(EntityKey.heading, EntityHelper.getHeading(entity));
 			list.add(eProps);

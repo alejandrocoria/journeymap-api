@@ -245,14 +245,14 @@ public abstract class BaseOverlayRenderer<K> {
 	}
 	
 	public static class DrawEntityStep implements DrawStep {
-		final int posX;
-        final int posZ;
+		final double posX;
+        final double posZ;
 		final Double heading;
 		final boolean flip;
 		final TextureImpl texture;
 		final int bottomMargin;
 		
-		public DrawEntityStep(int posX, int posZ, Double heading, boolean flip, TextureImpl texture, int bottomMargin) {
+		public DrawEntityStep(double posX, double posZ, Double heading, boolean flip, TextureImpl texture, int bottomMargin) {
 			super();
 			this.posX = posX;
             this.posZ = posZ;
@@ -336,15 +336,15 @@ public abstract class BaseOverlayRenderer<K> {
 	
 	class DrawCenteredLabelStep implements DrawStep {
 
-        final int posX;
-        final int posZ;
+        final double posX;
+        final double posZ;
 		final String text;
 		final int labelYOffset;
 		final Color bgColor;
 		final Color fgColor;
         final double fontScale;
 		
-		public DrawCenteredLabelStep(int posX, int posZ, String text, int labelYOffset, Color bgColor, Color fgColor, double fontScale) {
+		public DrawCenteredLabelStep(double posX, double posZ, String text, int labelYOffset, Color bgColor, Color fgColor, double fontScale) {
             this.posX = posX;
             this.posZ = posZ;
 			this.text = text;

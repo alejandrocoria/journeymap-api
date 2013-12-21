@@ -84,8 +84,8 @@ public class AnimalsData implements IDataProvider {
 			eProps.put(EntityKey.entityId, entity.entityId); 
 			eProps.put(EntityKey.filename, EntityHelper.getFileName(entity)); 
 			eProps.put(EntityKey.hostile, false);
-			eProps.put(EntityKey.posX, (int) Math.floor(entity.posX)); 
-			eProps.put(EntityKey.posZ, (int) Math.floor(entity.posZ)); 
+			eProps.put(EntityKey.posX, entity.posX);
+			eProps.put(EntityKey.posZ, entity.posZ);
 			eProps.put(EntityKey.chunkCoordX, entity.chunkCoordX); 
 			eProps.put(EntityKey.chunkCoordZ, entity.chunkCoordZ); 
 			eProps.put(EntityKey.heading, EntityHelper.getHeading(entity));

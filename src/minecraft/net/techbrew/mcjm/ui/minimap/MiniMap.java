@@ -79,7 +79,7 @@ public class MiniMap {
 
             // Update the grid
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
-            gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
+            gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
             gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0);
             if(doStateRefresh ) {
                 state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer);
@@ -140,9 +140,9 @@ public class MiniMap {
             gridRenderer.draw(state.getDrawSteps(), 0, 0);
 
             // Draw player
-            Point playerPixel = gridRenderer.getPixel((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ);
+            Point playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
             if(playerPixel!=null) {
-                BaseOverlayRenderer.DrawStep drawStep = new BaseOverlayRenderer.DrawEntityStep((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
+                BaseOverlayRenderer.DrawStep drawStep = new BaseOverlayRenderer.DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
                 gridRenderer.draw(0, 0, drawStep);
             }
 

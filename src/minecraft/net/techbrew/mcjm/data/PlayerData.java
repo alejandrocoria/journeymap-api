@@ -53,9 +53,9 @@ public class PlayerData implements IDataProvider {
 		props.put(EntityKey.chunkCoordX, player.chunkCoordX); 
 		props.put(EntityKey.chunkCoordY, player.chunkCoordY); 
 		props.put(EntityKey.chunkCoordZ, player.chunkCoordZ); 
-		props.put(EntityKey.posX, (int) Math.floor(player.posX)); 
-		props.put(EntityKey.posY, (int) Math.floor(player.posY));
-		props.put(EntityKey.posZ, (int) Math.floor(player.posZ));
+		props.put(EntityKey.posX, player.posX);
+		props.put(EntityKey.posY, player.posY);
+		props.put(EntityKey.posZ, player.posZ);
 		
 		props.put(EntityKey.dimension, mc.theWorld.provider.dimensionId); 
 		props.put(EntityKey.biome, getPlayerBiome()); 
@@ -66,9 +66,6 @@ public class PlayerData implements IDataProvider {
 	
 	/**
 	 * Get the biome name where the player is standing.
-	 * 
-	 * @param player
-	 * @return
 	 */
 	private String getPlayerBiome() {
 		

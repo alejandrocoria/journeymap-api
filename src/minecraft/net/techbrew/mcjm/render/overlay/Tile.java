@@ -148,26 +148,28 @@ public class Tile {
 	}
 	
 
-	public Point blockPixelOffsetInTile(int x, int z) {
+	public Point blockPixelOffsetInTile(double x, double z) {
 		
-		if(x<ulBlock.x || x>lrBlock.x || z<ulBlock.y || z>lrBlock.y) {
+		if(x<ulBlock.x || Math.floor(x)>lrBlock.x || z<ulBlock.y || Math.floor(z)>lrBlock.y) {
 			throw new RuntimeException("Block " + x + "," + z + " isn't in " + this);
 		}
 		
-		int localBlockX = ulBlock.x - x;
+		double localBlockX = ulBlock.x - x;
 		if(x<0) localBlockX++;
 		
-		int localBlockZ = ulBlock.y - z;
+		double localBlockZ = ulBlock.y - z;
 		if(z<0) localBlockZ++;
 		
 //		int tileCenterBlockX = lrBlock.x-ulBlock.x;
 //		int tileCenterBlockZ = lrBlock.y-ulBlock.y;
 		
 		int blockSize = (int) Math.pow(2,zoom);
-		int pixelOffsetX = (TILESIZE/2) + (localBlockX*blockSize) - (blockSize/2);
-		int pixelOffsetZ = (TILESIZE/2) + (localBlockZ*blockSize) - (blockSize/2);
+		double pixelOffsetX = (TILESIZE/2) + (localBlockX*blockSize) - (blockSize/2);
+		double pixelOffsetZ = (TILESIZE/2) + (localBlockZ*blockSize) - (blockSize/2);
 		
-		return new Point(pixelOffsetX, pixelOffsetZ);
+		Point p = new Point();
+        p.setLocation(pixelOffsetX, pixelOffsetZ);
+        return p;
 	}
 	
 	public static int toHashCode(final int tileX, final int tileZ, final int zoom, final int dimension) {

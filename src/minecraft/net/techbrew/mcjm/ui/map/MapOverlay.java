@@ -506,15 +506,15 @@ public class MapOverlay extends JmUI {
         }
 
         if(state.follow) {
-            gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
+            gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
         }
         gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
 		gridRenderer.draw(1f, xOffset, yOffset);
         gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset);
 
-        Point playerPixel = gridRenderer.getPixel((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ);
+        Point playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
         if(playerPixel!=null) {
-            BaseOverlayRenderer.DrawStep drawStep = new BaseOverlayRenderer.DrawEntityStep((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
+            BaseOverlayRenderer.DrawStep drawStep = new BaseOverlayRenderer.DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
             gridRenderer.draw(xOffset, yOffset, drawStep);
         }
 
@@ -556,8 +556,7 @@ public class MapOverlay extends JmUI {
 		
 		// Center core renderer
 		if(state.follow) {
-			Minecraft mc = Minecraft.getMinecraft();
-			gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
+			gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
 		} else {
 			gridRenderer.setZoom(state.currentZoom);
 		}

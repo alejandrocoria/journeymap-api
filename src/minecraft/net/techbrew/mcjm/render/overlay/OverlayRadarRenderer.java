@@ -57,8 +57,8 @@ public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
 					}
 				}
 				
-				int posX = (Integer) critter.get(EntityKey.posX);
-				int posZ = (Integer) critter.get(EntityKey.posZ);
+				double posX = (Double) critter.get(EntityKey.posX);
+                double posZ = (Double) critter.get(EntityKey.posZ);
 
 				if(grid.getPixel(posX, posZ)!=null) {
 					filename = (String) critter.get(EntityKey.filename);
