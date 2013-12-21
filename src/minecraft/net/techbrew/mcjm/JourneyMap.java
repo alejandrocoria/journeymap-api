@@ -246,6 +246,7 @@ public class JourneyMap {
             UIManager.getInstance().reset();
 	    	DataCache.instance().purge();
 	    	TextureCache.instance().purge();
+            Constants.refreshBundle();
 
 	    	if(taskExecutor==null || taskExecutor.isShutdown()) {			    		
 				taskExecutor = Executors.newScheduledThreadPool(1, new JMThreadFactory("task")); //$NON-NLS-1$				
