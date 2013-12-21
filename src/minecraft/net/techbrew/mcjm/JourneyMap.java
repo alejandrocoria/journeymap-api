@@ -13,6 +13,7 @@ import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.render.ColorCache;
+import net.techbrew.mcjm.render.overlay.TileCache;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.server.JMServer;
 import net.techbrew.mcjm.task.ITaskManager;
@@ -292,6 +293,7 @@ public class JourneyMap {
 			ColorCache.getInstance().reset();
             UIManager.getInstance().reset();
 			MapPlayerTask.clearCache();
+            TileCache.instance().invalidateAll();
             StatTimer.reportAll();
 			
 			logger.info("Mapping halted: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
@@ -313,7 +315,11 @@ public class JourneyMap {
 					guiscreen instanceof GuiSelectWorld ||
 					guiscreen instanceof GuiMultiplayer) {
 				stopMapping();
-			} 
+			}
+
+            if(!(guiscreen instanceof MapOverlay)) {
+                TileCache.pause();
+            }
 
 		} catch(Exception e) {
 			logger.severe(LogFormatter.toString(e));
@@ -340,9 +346,6 @@ public class JourneyMap {
             return true;
         }
 
-        final StatTimer timer = StatTimer.get("JourneyMap.onTickInGame", 200);
-        timer.start();
-
 		try {
 
 			// Check for world change
@@ -359,7 +362,6 @@ public class JourneyMap {
 					if(logger.isLoggable(Level.FINE)) {
 						logger.fine("Player chunk unknown: " + playerCoord);
 					}
-                    timer.cancel();
 					return true;
 				}
 			}
@@ -369,25 +371,30 @@ public class JourneyMap {
 				startMapping(minecraft);
 			}
 
-            // Minimap
+            final boolean isGamePaused = minecraft.currentScreen != null && !(minecraft.currentScreen instanceof MapOverlay);
+
+            // Manage tiles
+            if(isGamePaused) {
+                TileCache.pause();
+            } else {
+                TileCache.resume();
+            }
+
+            // Draw Minimap
             UIManager.getInstance().drawMiniMap();
 
 			// Show announcements
-			boolean isGamePaused = minecraft.currentScreen != null && !(minecraft.currentScreen instanceof MapOverlay);
 			while(!isGamePaused && !announcements.isEmpty()) {
 				player.addChatMessage(announcements.remove(0));
 			}			
 		
-			// Perform the next mapping tasks			
-
+			// Perform the next mapping tasks
 			taskController.performTasks(minecraft, newHash, taskExecutor);
-            timer.stop();
 
 		} catch (Throwable t) {
 			String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
 			announce(error);
 			logger.severe(LogFormatter.toString(t));
-            timer.stop();
 		}
 
 		return true;

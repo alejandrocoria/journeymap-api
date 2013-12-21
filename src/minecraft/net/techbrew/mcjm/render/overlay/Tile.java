@@ -53,14 +53,26 @@ public class Tile {
 	
 	public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice) {
 		boolean changed = (textureImpl==null || mapType!=lastMapType || vSlice!=lastVSlice);
-		if(!changed) changed = RegionImageHandler.hasImageChanged(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, lastImageTime);
+        if(changed) {
+            if(logger.isLoggable(Level.FINE)) {
+                logger.fine(this + " needs to be updated because " + textureImpl + " or " + mapType + "!=" + lastMapType + " or " + vSlice + "!=" + lastVSlice);
+            }
+        } else {
+		    changed = RegionImageHandler.hasImageChanged(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, lastImageTime);
+            if(changed) {
+                if(logger.isLoggable(Level.FINER)) {
+                    logger.fine(this + " needs to be updated because the region image changed since " + new Date(lastImageTime));
+                }
+            }
+        }
 		
 		if(changed) {
-            StatTimer timer = StatTimer.get("Tile.updateTexture").start();
+
+            StatTimer timer = StatTimer.get("Tile.updateTexture.getMergedChunks").start();
 			BufferedImage image = RegionImageHandler.getMergedChunks(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE);
+            timer.stop();
 			lastMapType = mapType;
 			lastVSlice = vSlice;
-			lastImageTime = new Date().getTime();
 
 			if(debug) {		
 				Graphics2D g = RegionImageHandler.initRenderingHints(image.createGraphics());				
@@ -73,14 +85,23 @@ public class Tile {
 				g.drawString(blockBounds(), 16, 32);
 				g.dispose();
 			}
+
+            timer = StatTimer.get("Tile.updateTexture").start();
 			if(textureImpl==null) {
 				textureImpl = TextureCache.newUnmanagedTexture(image);
 			} else {
 				textureImpl.updateTexture(image);
 			}
-            timer.stop();
-			//if(debug) logger.info("Updated texture for " + this + " at " + mapType + ", vSlice " + vSlice);
-		}
+            double time = timer.stop();
+
+            lastImageTime = new Date().getTime();
+
+			if(logger.isLoggable(Level.FINE)) {
+                logger.fine("Updated texture for " + this + " at " + mapType + ", vSlice " + vSlice + " in " + time + "ms");
+            }
+		} else {
+            lastImageTime = new Date().getTime();
+        }
 		return changed;
 	}
 	

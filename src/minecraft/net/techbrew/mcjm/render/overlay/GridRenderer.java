@@ -1,5 +1,6 @@
 package net.techbrew.mcjm.render.overlay;
 
+import com.google.common.cache.Cache;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.Tessellator;
 import net.techbrew.mcjm.Constants.MapType;
@@ -29,7 +30,7 @@ public class GridRenderer {
 	private final Logger logger = JourneyMap.getLogger();
 	private final boolean debug = logger.isLoggable(Level.FINE);
 	
-	private final TreeMap<TilePos, Tile> grid = new TreeMap<TilePos, Tile>();
+	private final TreeMap<TilePos, Integer> grid = new TreeMap<TilePos, Integer>();
 	private final int gridSize; // 5 = 2560px.
 	
 	private int lastHeight =-1;
@@ -57,15 +58,13 @@ public class GridRenderer {
 		final int endCol = (gridSize-1)/2;
 		final int startRow = -endRow;
 		final int startCol = -endCol;
+        Cache<Integer, Tile> tc = TileCache.instance();
 
 		for(int z = startRow;z<=endRow;z++) {
 			for(int x = startCol;x<=endCol;x++) {			
 				TilePos pos = new TilePos(x,z);
-				Tile tile = findNeighbor(centerTile, pos);
-				Tile oldTile = grid.put(pos, tile);
-                if(oldTile!=null) {
-                    TileCache.instance().put(oldTile.hashCode(), oldTile);
-                }
+                Tile tile = findNeighbor(centerTile, pos);
+                grid.put(pos, tile.hashCode());
 			}
 		}
 
@@ -79,6 +78,10 @@ public class GridRenderer {
 	public boolean center() {
 		return center(centerBlock.x, centerBlock.z, zoom);
 	}
+
+    public boolean hasTile(Tile tile) {
+        return grid.containsValue(tile);
+    }
 
 	public boolean center(final int blockX, final int blockZ, final int zoom) {
 
@@ -133,9 +136,16 @@ public class GridRenderer {
 		final int magic = (gridSize==5? 2 : 1) * Tile.TILESIZE; // TODO:  Understand why "2" as it relates to gridSize.  If gridSize is 3, this has to be "1".
 		final double displayOffsetX = xOffset + magic-((srcSize - lastWidth)/2);
 		final double displayOffsetY = yOffset + magic-((srcSize - lastHeight)/2);
+
+        final Cache<Integer,Tile> tc = TileCache.instance();
 		
 		// Get center tile
-		Tile centerTile = grid.get(new TilePos(0,0));	
+        TilePos centerPos = new TilePos(0,0);
+        Integer centerHash = grid.get(centerPos);
+        if(centerHash==null){
+            return false;
+        }
+		Tile centerTile = tc.getIfPresent(centerHash);
 		if(centerTile==null) {
 			return false;
 		}
@@ -149,17 +159,21 @@ public class GridRenderer {
 
         TilePos pos;
         Tile tile;
-        for(Map.Entry<TilePos,Tile> entry : grid.entrySet()) {
+        Integer hashCode;
+        // Get tiles
+
+        for(Map.Entry<TilePos,Integer> entry : grid.entrySet()) {
             pos = entry.getKey();
-            tile = entry.getValue();
-            // Renew lease in cache
-            TileCache.instance().getIfPresent(tile.hashCode());
+            hashCode = entry.getValue();
+            tile = tc.getIfPresent(hashCode);
 
             // Update texture only if on-screen
-            if(fullUpdate) {
-                if(isOnScreen(pos)) {
-                    if(tile.updateTexture(pos, mapType, vSlice)) {
-                        updated=true;
+            if(tile!=null) {
+                if(fullUpdate) {
+                    if(isOnScreen(pos)) {
+                        if(tile.updateTexture(pos, mapType, vSlice)) {
+                            updated=true;
+                        }
                     }
                 }
             }
@@ -221,7 +235,8 @@ public class GridRenderer {
 		if(!grid.isEmpty()) {	
 								
 			double centerX = offsetX + centerPixelOffset.x;
-			double centerZ = offsetZ + centerPixelOffset.y;		
+			double centerZ = offsetZ + centerPixelOffset.y;
+            final Cache<Integer,Tile> tc = TileCache.instance();
 					
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 			GL11.glDepthMask(false);
@@ -229,9 +244,14 @@ public class GridRenderer {
             GL11.glColor4f(opacity, opacity, opacity, opacity);
 			GL11.glDisable(GL11.GL_ALPHA_TEST);
 			
-			for(Map.Entry<TilePos,Tile> entry : grid.entrySet()) {
+			for(Map.Entry<TilePos,Integer> entry : grid.entrySet()) {
 				//if(entry.getKey().deltaX!=0 || entry.getKey().deltaZ!=0) continue;
-				drawTile(entry.getKey(), entry.getValue(), centerX, centerZ);
+                Tile tile = tc.getIfPresent(entry.getValue());
+                if(tile!=null) {
+				    drawTile(entry.getKey(), tile, centerX, centerZ);
+                } else {
+                    System.out.println("Grid tile missing at " + entry.getKey());
+                }
 			}
 
             if(debug && crosshairs!=null) {
@@ -382,9 +402,8 @@ public class GridRenderer {
             tile = new Tile(worldDir, tileX, tileZ, zoom, dimension);
             TileCache.instance().put(hash, tile);
             //logger.info("Created for cache:" + tile);
-            return tile;
         } else {
-            if(debug) logger.finer("Reused from cache:" + tile);
+            //logger.info("Reused from cache:" + tile);
         }
         return tile;
 	}
