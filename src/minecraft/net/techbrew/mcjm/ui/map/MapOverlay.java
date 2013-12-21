@@ -505,11 +505,10 @@ public class MapOverlay extends JmUI {
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
         }
 
-        boolean moved = false;
         if(state.follow) {
-            moved = gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
+            gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
         }
-        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, moved, 0, 0);
+        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
 		gridRenderer.draw(1f, xOffset, yOffset);
         gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset);
 
@@ -556,7 +555,6 @@ public class MapOverlay extends JmUI {
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
 		
 		// Center core renderer
-        boolean moved = false;
 		if(state.follow) {
 			Minecraft mc = Minecraft.getMinecraft();
 			gridRenderer.center((int) mc.thePlayer.posX, (int) mc.thePlayer.posZ, state.currentZoom);
