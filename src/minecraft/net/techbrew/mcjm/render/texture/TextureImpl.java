@@ -32,16 +32,25 @@ public class TextureImpl extends AbstractTexture {
     	this.retainImage = retainImage;
     	this.width = image.getWidth();
         this.height = image.getHeight();
-        updateTexture(image);
+        updateTexture(image, true);
     }    
 
-    public void updateTexture(BufferedImage image)
+    private void updateTexture(BufferedImage image, boolean allocateMemory)
     {
     	if(image.getWidth()!=width || image.getHeight()!=height) {
     		throw new IllegalArgumentException("Image dimensions don't match");
     	}
     	if(retainImage) this.image = image;
-        TextureUtil.uploadTextureImage(getGlTextureId(), image);
+        if(allocateMemory) {
+            TextureUtil.uploadTextureImage(getGlTextureId(), image);
+        } else {
+            TextureUtil.uploadTextureImageSub(getGlTextureId(), image, 0, 0, false, false);
+        }
+    }
+
+    public void updateTexture(BufferedImage image)
+    {
+        updateTexture(image, false);
     }
     
     public boolean hasImage() {
