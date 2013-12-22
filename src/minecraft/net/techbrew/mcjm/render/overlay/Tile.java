@@ -9,6 +9,7 @@ import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.render.texture.TextureImpl;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Date;
@@ -148,7 +149,7 @@ public class Tile {
 	}
 	
 
-	public Point blockPixelOffsetInTile(double x, double z) {
+	public Point2D blockPixelOffsetInTile(double x, double z) {
 		
 		if(x<ulBlock.x || Math.floor(x)>lrBlock.x || z<ulBlock.y || Math.floor(z)>lrBlock.y) {
 			throw new RuntimeException("Block " + x + "," + z + " isn't in " + this);
@@ -167,9 +168,7 @@ public class Tile {
 		double pixelOffsetX = (TILESIZE/2) + (localBlockX*blockSize) - (blockSize/2);
 		double pixelOffsetZ = (TILESIZE/2) + (localBlockZ*blockSize) - (blockSize/2);
 		
-		Point p = new Point();
-        p.setLocation(pixelOffsetX, pixelOffsetZ);
-        return p;
+		return new Point2D.Double(pixelOffsetX, pixelOffsetZ);
 	}
 	
 	public static int toHashCode(final int tileX, final int tileZ, final int zoom, final int dimension) {

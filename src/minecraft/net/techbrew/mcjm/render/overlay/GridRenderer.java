@@ -5,11 +5,11 @@ import net.minecraft.src.Minecraft;
 import net.minecraft.src.Tessellator;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.model.BlockCoordIntPair;
 import net.techbrew.mcjm.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Contains a set of 9 tiles organized along compass points. 
+ * Contains a set of 9 tiles organized along compass Point2D.Doubles. 
  * Has basic logic to center on a tile and arrange neighboring tiles around it.
  * 
  * @author mwoodman
@@ -42,7 +42,7 @@ public class GridRenderer {
     private double centerBlockZ;
     private final Color bgColor = new Color(0x22, 0x22, 0x22);
 	
-	private final Point centerPixelOffset = new Point();
+	private final Point2D.Double centerPixelOffset = new Point2D.Double();
 	
 	private TextureImpl crosshairs;
 	
@@ -108,10 +108,9 @@ public class GridRenderer {
 			// Center on tile
 			Tile newCenterTile = findTile(tileX, tileZ);
 			populateGrid(newCenterTile);
-			
-			if(debug) logger.fine("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
 
 			if(debug) {
+                logger.fine("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
 				Minecraft mc = Minecraft.getMinecraft();
 				BufferedImage tmp = new BufferedImage(mc.displayWidth, mc.displayHeight, BufferedImage.TYPE_INT_ARGB);
 				Graphics2D g = tmp.createGraphics();
@@ -135,9 +134,8 @@ public class GridRenderer {
 		// Update pixel offsets for center
 		final double srcSize = gridSize*Tile.TILESIZE;
 
-		final int magic = (gridSize==5? 2 : 1) * Tile.TILESIZE; // TODO:  Understand why "2" as it relates to gridSize.  If gridSize is 3, this has to be "1".
-		final double displayOffsetX = xOffset + magic-((srcSize - lastWidth)/2);
-		final double displayOffsetY = yOffset + magic-((srcSize - lastHeight)/2);
+
+
 
         final Cache<Integer,Tile> tc = TileCache.instance();
 		
@@ -151,9 +149,26 @@ public class GridRenderer {
 		if(centerTile==null) {
 			return false;
 		}
-		
-		Point blockPixelOffset = centerTile.blockPixelOffsetInTile(centerBlockX, centerBlockZ);
-		centerPixelOffset.setLocation(displayOffsetX + blockPixelOffset.x, displayOffsetY + blockPixelOffset.y);
+
+        // Derive offsets for centering the map
+		Point2D blockPixelOffset = centerTile.blockPixelOffsetInTile(centerBlockX, centerBlockZ);
+        final double blockSizeOffset = Math.pow(2,zoom)/2;
+        final int magic = (gridSize==5? 2 : 1) * Tile.TILESIZE; // TODO:  Understand why "2" as it relates to gridSize.  If gridSize is 3, this has to be "1".
+
+        double displayOffsetX = xOffset + magic-((srcSize - lastWidth)/2);
+        if(centerBlockX<0) {
+            displayOffsetX-=blockSizeOffset;
+        } else {
+            displayOffsetX+=blockSizeOffset;
+        }
+        double displayOffsetY = yOffset + magic-((srcSize - lastHeight)/2);
+        if(centerBlockZ<0) {
+            displayOffsetY-=blockSizeOffset;
+        } else {
+            displayOffsetY+=blockSizeOffset;
+        }
+
+		centerPixelOffset.setLocation(displayOffsetX + blockPixelOffset.getX(), displayOffsetY + blockPixelOffset.getY());
 
         if(!fullUpdate) return false;
 
@@ -187,21 +202,23 @@ public class GridRenderer {
 		return updated;
 	}
 
-    public Point getCenterPixelOffset() {
+    public Point2D.Double getCenterPixelOffset() {
         return centerPixelOffset;
     }
 	
-	public Point getBlockPixelInGrid(double x, double z) {
+	public Point2D.Double getBlockPixelInGrid(double x, double z) {
 
         double localBlockX = x - centerBlockX;
         double localBlockZ = z - centerBlockZ;
 		
 		int blockSize = (int) Math.pow(2,zoom);
+        double blockSizeOffset = (blockSize/2D);
 
-        double pixelOffsetX = lastWidth /2 + (localBlockX*blockSize) - blockSize/2;
-        double pixelOffsetZ = lastHeight /2 +(localBlockZ*blockSize) - blockSize/2;
-		
-		Point p = new Point();
+        double pixelOffsetX = lastWidth /2 + (localBlockX*blockSize);
+
+        double pixelOffsetZ = lastHeight /2 + (localBlockZ*blockSize);
+
+		Point2D.Double p = new Point2D.Double();
         p.setLocation(pixelOffsetX, pixelOffsetZ);
         return p;
 	}
@@ -260,7 +277,7 @@ public class GridRenderer {
                 }
 			}
 
-            if(debug && crosshairs!=null) {
+            if( debug && crosshairs!=null) {
                 Minecraft mc = Minecraft.getMinecraft();
                 GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, crosshairs.getGlTextureId());
                 Tessellator tessellator = Tessellator.instance;
@@ -312,13 +329,13 @@ public class GridRenderer {
 	}
 
     /**
-     * Returns a pixel point if on screen, null if not.
+     * Returns a pixel Point2D.Double if on screen, null if not.
      * @param blockX pos x
      * @param blockZ pos z
      * @return  pixel
      */
-	public Point getPixel(double blockX, double blockZ) {
-		Point pixel = getBlockPixelInGrid(blockX, blockZ);
+	public Point2D.Double getPixel(double blockX, double blockZ) {
+		Point2D.Double pixel = getBlockPixelInGrid(blockX, blockZ);
 		if(isOnScreen(pixel)) {
 			return pixel;
 		} else {
@@ -327,49 +344,49 @@ public class GridRenderer {
 	}
 
     /**
-     * Returns a pixel point if on screen, the closest one there is if not.
+     * Returns a pixel Point2D.Double if on screen, the closest one there is if not.
      * @param blockX x
      * @param blockZ z
      * @return  pixel
      */
-	public Point getClosestOnscreenBlock(int blockX, int blockZ) {
-		Point pixel = getBlockPixelInGrid(blockX, blockZ);
-		if(pixel.x<0) {
-			pixel.setLocation(0, pixel.y);
-		} else if(pixel.x> lastWidth) {
-			pixel.setLocation(lastWidth, pixel.y);
+	public Point2D.Double getClosestOnscreenBlock(int blockX, int blockZ) {
+		Point2D.Double pixel = getBlockPixelInGrid(blockX, blockZ);
+		if(pixel.getX()<0) {
+			pixel.setLocation(0, pixel.getY());
+		} else if(pixel.getX()> lastWidth) {
+			pixel.setLocation(lastWidth, pixel.getY());
 		}
-		if(pixel.y<0) {
-			pixel.setLocation(pixel.x, 0);
-		} else if(pixel.y> lastHeight) {
-			pixel.setLocation(pixel.x, lastHeight);
+		if(pixel.getY()<0) {
+			pixel.setLocation(pixel.getX(), 0);
+		} else if(pixel.getY()> lastHeight) {
+			pixel.setLocation(pixel.getX(), lastHeight);
 		}
 		return pixel;
 	}
 
     /**
-     * Ensures a point is going to be visible.
+     * Ensures a Point2D.Double is going to be visible.
      */
-    public void ensureOnScreen(Point pixel) {
-        if(pixel.x<0) {
-            pixel.setLocation(0, pixel.y);
-        } else if(pixel.x> lastWidth) {
-            pixel.setLocation(lastWidth, pixel.y);
+    public void ensureOnScreen(Point2D pixel) {
+        if(pixel.getX()<0) {
+            pixel.setLocation(0, pixel.getY());
+        } else if(pixel.getX()> lastWidth) {
+            pixel.setLocation(lastWidth, pixel.getY());
         }
-        if(pixel.y<0) {
-            pixel.setLocation(pixel.x, 0);
-        } else if(pixel.y> lastHeight) {
-            pixel.setLocation(pixel.x, lastHeight);
+        if(pixel.getY()<0) {
+            pixel.setLocation(pixel.getX(), 0);
+        } else if(pixel.getY()> lastHeight) {
+            pixel.setLocation(pixel.getX(), lastHeight);
         }
     }
 	
 	/**
 	 * This is a pixel check, not a location check
-	 * @param point pixel
+	 * @param pixel
 	 * @return true if on screen
 	 */
-	public boolean isOnScreen(Point point) {
-		return point.x>0 && point.x< lastWidth && point.y>0 && point.y< lastHeight;
+	public boolean isOnScreen(Point2D.Double pixel) {
+		return pixel.getX()>0 && pixel.getX()< lastWidth && pixel.getY()>0 && pixel.getY()< lastHeight;
 	}
 
     /**

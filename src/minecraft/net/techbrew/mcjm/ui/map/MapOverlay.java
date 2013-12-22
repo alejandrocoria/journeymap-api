@@ -25,6 +25,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -512,7 +513,7 @@ public class MapOverlay extends JmUI {
 		gridRenderer.draw(1f, xOffset, yOffset);
         gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset);
 
-        Point playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
+        Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
         if(playerPixel!=null) {
             BaseOverlayRenderer.DrawStep drawStep = new BaseOverlayRenderer.DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
             gridRenderer.draw(xOffset, yOffset, drawStep);
@@ -567,11 +568,11 @@ public class MapOverlay extends JmUI {
 		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer);
 		
 		// Update player pos
-		state.playerLastPos = Constants.getString("MapOverlay.player_location", 
-				Integer.toString((int) mc.thePlayer.posX), 
-				Integer.toString((int) mc.thePlayer.posZ), 
-				Integer.toString((int) mc.thePlayer.posY), 
-				mc.thePlayer.chunkCoordY, 
+		state.playerLastPos = Constants.getString("MapOverlay.player_location",
+				Integer.toString((int) mc.thePlayer.posX),
+				Integer.toString((int) mc.thePlayer.posZ),
+				Integer.toString((int) mc.thePlayer.posY),
+				mc.thePlayer.chunkCoordY,
 				state.getPlayerBiome()); //$NON-NLS-1$
 		
 		// Reset timer

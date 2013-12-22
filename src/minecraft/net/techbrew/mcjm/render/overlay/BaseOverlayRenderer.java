@@ -1,24 +1,17 @@
 package net.techbrew.mcjm.render.overlay;
 
+import net.minecraft.src.*;
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.render.texture.TextureImpl;
+import org.lwjgl.opengl.GL11;
+
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-
-import javax.imageio.ImageIO;
-
-import net.minecraft.src.DynamicTexture;
-import net.minecraft.src.FontRenderer;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.ResourceLocation;
-import net.minecraft.src.Tessellator;
-import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.EntityHelper;
-import net.techbrew.mcjm.render.texture.TextureCache;
-import net.techbrew.mcjm.render.texture.TextureImpl;
-
-import org.lwjgl.opengl.GL11;
 
 public abstract class BaseOverlayRenderer<K> {
 
@@ -95,11 +88,11 @@ public abstract class BaseOverlayRenderer<K> {
         }
 	}
 	
-	private static void drawQuad(TextureImpl texture, final int x, final int y, final int width, final int height, boolean flip) {
+	private static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, boolean flip) {
 		drawQuad(texture,x,y,width,height,null,1f,flip, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 	}
 
-    private static void drawQuad(TextureImpl texture, final int x, final int y, final int width, final int height, boolean flip, int glBlendSfactor, int glBlendDFactor) {
+    private static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, boolean flip, int glBlendSfactor, int glBlendDFactor) {
         drawQuad(texture,x,y,width,height,null,1f,flip, glBlendSfactor, glBlendDFactor);
     }
 
@@ -116,7 +109,7 @@ public abstract class BaseOverlayRenderer<K> {
      * @param glBlendSfactor  For normal alpha blending: GL11.GL_SRC_ALPHA
      * @param glBlendDFactor  For normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
      */
-    public static void drawQuad(TextureImpl texture, final int x, final int y, final int width, final int height, Color color, float alpha, boolean flip, int glBlendSfactor, int glBlendDFactor) {
+    public static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, Color color, float alpha, boolean flip, int glBlendSfactor, int glBlendDFactor) {
 
         GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(glBlendSfactor, glBlendDFactor); // normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
@@ -165,15 +158,15 @@ public abstract class BaseOverlayRenderer<K> {
         GL11.glEnable(GL11.GL_ALPHA_TEST);
 	}
 
-	public static void drawImage(TextureImpl texture, int x, int y, boolean flip) {				
+	public static void drawImage(TextureImpl texture, double x, double y, boolean flip) {				
 		drawQuad(texture, x, y, texture.width, texture.height, flip);		
 	}
 
-    public static void drawImage(TextureImpl texture, int x, int y, boolean flip, int glBlendSfactor, int glBlendDfactor) {
+    public static void drawImage(TextureImpl texture, double x, double y, boolean flip, int glBlendSfactor, int glBlendDfactor) {
         drawQuad(texture, x, y, texture.width, texture.height, flip, glBlendSfactor, glBlendDfactor);
     }
 	
-	public static void drawRotatedImage(TextureImpl texture, int x, int y, float heading) {
+	public static void drawRotatedImage(TextureImpl texture, double x, double y, float heading) {
 		
 		// Start a new matrix for translation/rotation
 		GL11.glPushMatrix();
@@ -207,7 +200,7 @@ public abstract class BaseOverlayRenderer<K> {
 		GL11.glPopMatrix();	
 	}
 	
-	private static void drawColoredImage(TextureImpl texture, int alpha, Color color, int x, int y) {
+	private static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y) {
 		
 		drawQuad(texture, x, y, texture.width, texture.height, color, alpha, false, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
@@ -223,7 +216,7 @@ public abstract class BaseOverlayRenderer<K> {
      * @param texture
      * @param bottomMargin
      */
-	private static void drawEntity(int x, int y, Double heading, boolean flipInsteadOfRotate, TextureImpl texture, int bottomMargin) {
+	private static void drawEntity(double x, double y, Double heading, boolean flipInsteadOfRotate, TextureImpl texture, int bottomMargin) {
 
 		if(heading==null) {
 			drawImage(texture, x, y, false);
@@ -264,9 +257,9 @@ public abstract class BaseOverlayRenderer<K> {
 
 		@Override
 		public void draw(int xOffset, int yOffset, GridRenderer gridRenderer) {
-            Point pixel = gridRenderer.getPixel(posX, posZ);
+            Point2D pixel = gridRenderer.getPixel(posX, posZ);
             if(pixel!=null) {
-                drawEntity(pixel.x + xOffset, pixel.y + yOffset, heading, flip, texture, bottomMargin);
+                drawEntity(pixel.getX() + xOffset, pixel.getY() + yOffset, heading, flip, texture, bottomMargin);
             }
 		}		
 	}
@@ -299,13 +292,13 @@ public abstract class BaseOverlayRenderer<K> {
 
 		@Override
 		public void draw(int xOffset, int yOffset, GridRenderer gridRenderer) {
-            Point pixel = gridRenderer.getBlockPixelInGrid(posX, posZ);
-            if(gridRenderer.isOnScreen(pixel.x, pixel.y)) {
-                drawColoredImage(texture, alpha, color, pixel.x + xOffset - (texture.width/2), pixel.y + yOffset- (texture.height/2));
-                drawCenteredLabel(label, pixel.x, pixel.y-texture.height, Color.black, fontColor, alpha, fontScale);
+            Point2D pixel = gridRenderer.getBlockPixelInGrid(posX, posZ);
+            if(gridRenderer.isOnScreen(pixel.getX(), pixel.getY())) {
+                drawColoredImage(texture, alpha, color, pixel.getX() + xOffset - (texture.width/2), pixel.getY() + yOffset- (texture.height/2));
+                drawCenteredLabel(label, pixel.getX(), pixel.getY()-texture.height, Color.black, fontColor, alpha, fontScale);
             } else {
                 gridRenderer.ensureOnScreen(pixel);
-                drawColoredImage(offScreenTexture, alpha, color, pixel.x + xOffset - (offScreenTexture.width / 2), pixel.y + yOffset - (offScreenTexture.height / 2));
+                drawColoredImage(offScreenTexture, alpha, color, pixel.getX() + xOffset - (offScreenTexture.width / 2), pixel.getY() + yOffset - (offScreenTexture.height / 2));
             }
 		}		
 	}
@@ -327,9 +320,9 @@ public abstract class BaseOverlayRenderer<K> {
 
 		@Override
 		public void draw(int xOffset, int yOffset, GridRenderer gridRenderer) {
-            Point pixel = gridRenderer.getPixel(posX, posZ);
+            Point2D pixel = gridRenderer.getPixel(posX, posZ);
             if(pixel!=null) {
-			    drawRotatedImage(texture, pixel.x + xOffset, pixel.y + yOffset, heading);
+			    drawRotatedImage(texture, pixel.getX() + xOffset, pixel.getY() + yOffset, heading);
             }
 		}		
 	}
@@ -356,9 +349,9 @@ public abstract class BaseOverlayRenderer<K> {
 
 		@Override
 		public void draw(int xOffset, int yOffset, GridRenderer gridRenderer) {
-            Point pixel = gridRenderer.getPixel(posX, posZ);
+            Point2D pixel = gridRenderer.getPixel(posX, posZ);
             if(pixel!=null) {
-			    drawCenteredLabel(text, pixel.x + xOffset, pixel.y + yOffset + labelYOffset, bgColor, fgColor, 205, fontScale);
+			    drawCenteredLabel(text, pixel.getX() + xOffset, pixel.getY() + yOffset + labelYOffset, bgColor, fgColor, 205, fontScale);
             }
 		}		
 	}

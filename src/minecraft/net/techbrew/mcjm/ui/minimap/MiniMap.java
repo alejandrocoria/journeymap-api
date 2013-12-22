@@ -20,6 +20,7 @@ import net.techbrew.mcjm.ui.map.MapOverlay;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -140,7 +141,7 @@ public class MiniMap {
             gridRenderer.draw(state.getDrawSteps(), 0, 0);
 
             // Draw player
-            Point playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
+            Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
             if(playerPixel!=null) {
                 BaseOverlayRenderer.DrawStep drawStep = new BaseOverlayRenderer.DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
                 gridRenderer.draw(0, 0, drawStep);
