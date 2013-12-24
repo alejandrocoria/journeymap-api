@@ -32,9 +32,17 @@ public class GridRenderer {
 	
 	private final TreeMap<TilePos, Integer> grid = new TreeMap<TilePos, Integer>();
 	private final int gridSize; // 5 = 2560px.
-	
+    // Update pixel offsets for center
+    final double srcSize;
+    final Cache<Integer,Tile> tc = TileCache.instance();
+
+    final TilePos centerPos = new TilePos(0,0);
+    private Point2D viewPortOrigin;
+    private int viewPortSize;
+
 	private int lastHeight =-1;
 	private int lastWidth =-1;
+
 	
 	private int centerTileHash;
 	private int zoom;
@@ -51,7 +59,13 @@ public class GridRenderer {
 
 	public GridRenderer(final int gridSize) {
         this.gridSize = gridSize;  // Must be an odd number so as to have a center tile.
+        srcSize = gridSize*Tile.TILESIZE;
 	}
+
+    public void setViewPort(Point2D origin, int size) {
+        this.viewPortOrigin = origin;
+        this.viewPortSize = size;
+    }
 	
 	private void populateGrid(Tile centerTile) {
 				
@@ -130,17 +144,8 @@ public class GridRenderer {
 		// Update screen dimensions
 		lastWidth = width;
 		lastHeight = height;
-		
-		// Update pixel offsets for center
-		final double srcSize = gridSize*Tile.TILESIZE;
 
-
-
-
-        final Cache<Integer,Tile> tc = TileCache.instance();
-		
 		// Get center tile
-        TilePos centerPos = new TilePos(0,0);
         Integer centerHash = grid.get(centerPos);
         if(centerHash==null){
             return false;
@@ -178,7 +183,6 @@ public class GridRenderer {
         Tile tile;
         Integer hashCode;
         // Get tiles
-
         for(Map.Entry<TilePos,Integer> entry : grid.entrySet()) {
             pos = entry.getKey();
             hashCode = entry.getValue();
@@ -186,18 +190,13 @@ public class GridRenderer {
 
             // Update texture only if on-screen
             if(tile!=null) {
-                if(fullUpdate) {
-                    if(isOnScreen(pos)) {
-                        if(tile.updateTexture(pos, mapType, vSlice)) {
-                            updated=true;
-                        }
-                    } else {
-
+                //if(isOnScreen(pos)) {
+                    if(tile.updateTexture(pos, mapType, vSlice)) {
+                        updated=true;
                     }
-                }
+                //}
             }
         }
-
 
 		return updated;
 	}
@@ -408,7 +407,12 @@ public class GridRenderer {
      * @return true if on screen
      */
 	public boolean isOnScreen(double startX, double startY, double endX, double endY) {
-		return endX>0 && startX< lastWidth && endY>0 && startY< lastHeight;
+//        if(viewPortOrigin!=null) {
+//            return endX>(viewPortOrigin.getX()) && startX<(viewPortOrigin.getX()+viewPortSize)
+//                    && endY > (viewPortOrigin.getY()) && startY<(viewPortOrigin.getY()+viewPortSize);
+//        } else {
+		    return endX>0 && startX< lastWidth && endY>0 && startY< lastHeight;
+//        }
 	}	
 
 	private Tile findNeighbor(Tile tile, TilePos pos) {

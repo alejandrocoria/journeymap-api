@@ -4,7 +4,9 @@ import net.minecraft.src.ChunkCoordIntPair;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.RegionImageHandler;
+import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.log.StatTimer;
+import net.techbrew.mcjm.render.texture.DelayedTexture;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.render.texture.TextureImpl;
 
@@ -13,6 +15,8 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,6 +38,8 @@ public class Tile {
 	
 	Integer lastVSlice;
 	MapType lastMapType;
+
+    Future<DelayedTexture> futureTex;
 	TextureImpl textureImpl;
 	
 	private final Logger logger = JourneyMap.getLogger();
@@ -53,13 +59,13 @@ public class Tile {
 	}
 	
 	public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice) {
-		boolean changed = (textureImpl==null || mapType!=lastMapType || vSlice!=lastVSlice);
+		boolean changed = (futureTex==null) && (textureImpl==null || mapType!=lastMapType || vSlice!=lastVSlice);
         if(changed) {
             if(logger.isLoggable(Level.FINE)) {
                 logger.fine(this + " needs to be updated because " + textureImpl + " or " + mapType + "!=" + lastMapType + " or " + vSlice + "!=" + lastVSlice);
             }
         } else {
-		    changed = RegionImageHandler.hasImageChanged(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, lastImageTime);
+		    changed = futureTex!=null && RegionImageHandler.hasImageChanged(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, lastImageTime);
             if(changed) {
                 if(logger.isLoggable(Level.FINER)) {
                     logger.fine(this + " needs to be updated because the region image changed since " + new Date(lastImageTime));
@@ -69,49 +75,44 @@ public class Tile {
 		
 		if(changed) {
 
-            StatTimer timer = StatTimer.get("Tile.updateTexture.getMergedChunks").start();
-			BufferedImage image = RegionImageHandler.getMergedChunks(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE);
-            timer.stop();
+            lastImageTime = new Date().getTime();
 			lastMapType = mapType;
 			lastVSlice = vSlice;
 
-			if(debug) {		
-				Graphics2D g = RegionImageHandler.initRenderingHints(image.createGraphics());				
-				g.setPaint(Color.WHITE);
-				g.setStroke(new BasicStroke(3));
-				g.drawRect(0, 0, image.getWidth(), image.getHeight());
-				final Font labelFont = new Font("Arial", Font.BOLD, 16);
-				g.setFont(labelFont); //$NON-NLS-1$
-				g.drawString(pos.toString() + " " + toString(), 16, 16);
-				g.drawString(blockBounds(), 16, 32);
-				g.dispose();
-			}
+            //logger.info("FutureTex preparing for " + this);
 
-            timer = StatTimer.get("Tile.updateTexture").start();
-			if(textureImpl==null) {
-				textureImpl = TextureCache.newUnmanagedTexture(image);
-			} else {
-				textureImpl.updateTexture(image);
-			}
+            Integer glId = textureImpl!=null ? textureImpl.getGlTextureId() : null;
+
+            StatTimer timer = StatTimer.get("Tile.updateTexture.prepareImage").start();
+            futureTex = TextureCache.instance().prepareImage(glId, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE);
             double time = timer.stop();
 
-            lastImageTime = new Date().getTime();
+		}
 
-			if(logger.isLoggable(Level.FINE)) {
-                logger.fine("Updated texture for " + this + " at " + mapType + ", vSlice " + vSlice + " in " + time + "ms");
-            }
-		} else {
-            lastImageTime = new Date().getTime();
-        }
 		return changed;
 	}
 	
 	public boolean hasTexture() {
-		return textureImpl!=null;
+		return textureImpl!=null || (futureTex!=null && futureTex.isDone());
 	}
 	
 	public TextureImpl getTexture() {	
-		return textureImpl;
+
+        if(futureTex!=null && futureTex.isDone()){
+            try {
+                TextureImpl texture = futureTex.get().bindTexture();
+                if(textureImpl==null){
+                    textureImpl = texture;
+                }
+                futureTex = null;
+                lastImageTime = new Date().getTime();
+                //logger.info("FutureTex bound for " + this);
+            } catch (Throwable e) {
+                logger.severe(LogFormatter.toString(e));
+            }
+        }
+
+        return textureImpl;
 	}
 	
 	public void clear() {

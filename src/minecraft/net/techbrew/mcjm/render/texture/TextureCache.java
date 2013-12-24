@@ -1,17 +1,26 @@
 package net.techbrew.mcjm.render.texture;
 
-import java.awt.Graphics2D;
+import net.minecraft.src.ChunkCoordIntPair;
+import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.io.FileHandler;
+import net.techbrew.mcjm.io.RegionImageHandler;
+import net.techbrew.mcjm.log.StatTimer;
+import net.techbrew.mcjm.render.overlay.Tile;
+import net.techbrew.mcjm.thread.JMThreadFactory;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.imageio.ImageIO;
-
-import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.FileHandler;
-import net.techbrew.mcjm.io.RegionImageHandler;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * TODO:  Make this actually act like a cache.  
@@ -47,6 +56,27 @@ public class TextureCache {
     private final Map<String, TextureImpl> skinImageMap = Collections.synchronizedMap(new HashMap<String, TextureImpl>());    
     
     private final Map<String, TextureImpl> entityImageMap = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
+
+    private ThreadPoolExecutor texExec = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, new JMThreadFactory("texture"));
+
+    /*************************************************/
+
+    public Future<DelayedTexture> prepareImage(final Integer glId, final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType,
+                                               final Integer vSlice, final int dimension, final Boolean useCache, final Integer imageWidth, final Integer imageHeight) {
+        Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>() {
+            @Override
+            public DelayedTexture call() throws Exception {
+
+                StatTimer timer = StatTimer.get("TextureCache.prepareImage");
+                timer.start();
+                BufferedImage image = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, true, Tile.TILESIZE, Tile.TILESIZE);
+                DelayedTexture tex = new DelayedTexture(glId, image, null);
+                timer.stop();
+                return tex;
+            }
+        });
+        return future;
+    }
     
     /*************************************************/
     

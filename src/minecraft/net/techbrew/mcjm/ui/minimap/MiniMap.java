@@ -40,7 +40,6 @@ public class MiniMap {
     private final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
     private final GridRenderer gridRenderer = new GridRenderer(5);
     private StatTimer drawTimer;
-    private StatTimer drawTimerWithRefresh;
     private final Color playerInfoFgColor = Color.LIGHT_GRAY;
     private final Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
 
@@ -67,8 +66,7 @@ public class MiniMap {
         }
 
         final boolean doStateRefresh = state.shouldRefresh();
-        final StatTimer timer = doStateRefresh ? drawTimerWithRefresh : drawTimer;
-        timer.start();
+        drawTimer.start();
 
         try {
             final EntityClientPlayerMP player = mc.thePlayer;
@@ -197,7 +195,7 @@ public class MiniMap {
         } catch(Throwable t) {
             logger.severe("Minimap error:" + LogFormatter.toString(t));
         } finally {
-            timer.stop();
+            drawTimer.stop();
         }
 
 	}
@@ -278,12 +276,14 @@ public class MiniMap {
 
         if(oldDv==null || oldDv.shape!=this.dv.shape){
             this.drawTimer = StatTimer.get("MiniMap.drawMap." + shape.name(), 200);
-            this.drawTimerWithRefresh = StatTimer.get("MiniMap.drawMap+refreshState." + shape.name());
         }
 
         if(oldDv!=null && oldDv.shape!=this.dv.shape){
             oldDv.borderTexture.deleteTexture(); // TODO: ensure reloading texture works
         }
+
+        // THIS IS WRONG - scissorY you bastard
+        gridRenderer.setViewPort(new Point2D.Double(this.dv.scissorX, this.dv.scissorY+dv.minimapSize), this.dv.minimapSize);
     }
 
 }
