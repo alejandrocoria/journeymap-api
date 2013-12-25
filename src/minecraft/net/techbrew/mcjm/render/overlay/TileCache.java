@@ -6,6 +6,7 @@ import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import net.techbrew.mcjm.JourneyMap;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +52,19 @@ public class TileCache implements RemovalListener<Integer, Tile>{
         Holder.INSTANCE.restoreExpired();
     }
 
+    public static synchronized Tile getOrCreate(final File worldDir, final int tileX, final int tileZ, final int zoom, final int dimension) {
+        final int hash = Tile.toHashCode(tileX, tileZ, zoom, dimension);
+        TileCache tc = Holder.INSTANCE;
+        synchronized (tc.cache) {
+            Tile tile = tc.cache.getIfPresent(hash);
+            if(tile==null) {
+                tile = new Tile(worldDir, tileX, tileZ, zoom, dimension);
+                tc.cache.put(hash, tile);
+            }
+            return tile;
+        }
+    }
+
     private void retainTiles() {
         if(!paused) {
             retained.putAll(cache.asMap());
@@ -61,8 +75,12 @@ public class TileCache implements RemovalListener<Integer, Tile>{
 
     private void restoreExpired() {
         if(paused) {
-            //logger.info("Restoring retained tiles: " + retained.size());
-            cache.putAll(retained);
+            for(Integer key : retained.keySet()){
+                if(cache.getIfPresent(key)==null){
+                    //logger.info("Restoring retained tile: " + retained.get(key));
+                    cache.put(key, retained.get(key));
+                }
+            }
             retained.clear();
             paused = false;
         }
@@ -71,8 +89,10 @@ public class TileCache implements RemovalListener<Integer, Tile>{
     @Override
     public void onRemoval(RemovalNotification<Integer, Tile> notification) {
         Tile oldTile = notification.getValue();
-        oldTile.clear();
-        if(logger.isLoggable(Level.FINE)) logger.fine("Expired:" + notification.getValue() + " because: " + notification.getCause() + ". Size now: " + cache.size());
+        if(!retained.containsValue(oldTile)) {
+            if(logger.isLoggable(Level.FINER)) logger.finer("Expired:" + notification.getValue() + " because: " + notification.getCause() + ". Size now: " + cache.size());
+            oldTile.clear();
+        }
     }
 
 }

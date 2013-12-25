@@ -44,7 +44,7 @@ public class GridRenderer {
 	private int lastWidth =-1;
 
 	
-	private int centerTileHash;
+	private int centerTileHash = Integer.MIN_VALUE;
 	private int zoom;
 	private double centerBlockX;
     private double centerBlockZ;
@@ -150,9 +150,14 @@ public class GridRenderer {
         if(centerHash==null){
             return false;
         }
+
+        // Corner case where center tile is here but not in cache, not sure why
 		Tile centerTile = tc.getIfPresent(centerHash);
 		if(centerTile==null) {
-			return false;
+            final int tileX = Tile.blockPosToTile((int)Math.floor(centerBlockX), this.zoom);
+            final int tileZ = Tile.blockPosToTile((int)Math.floor(centerBlockZ), this.zoom);
+            centerTile = findTile(tileX, tileZ);
+            populateGrid(centerTile);
 		}
 
         // Derive offsets for centering the map
@@ -178,10 +183,10 @@ public class GridRenderer {
         if(!fullUpdate) return false;
 
 		boolean updated = false;
-
         TilePos pos;
         Tile tile;
         Integer hashCode;
+
         // Get tiles
         for(Map.Entry<TilePos,Integer> entry : grid.entrySet()) {
             pos = entry.getKey();
@@ -189,13 +194,17 @@ public class GridRenderer {
             tile = tc.getIfPresent(hashCode);
 
             // Update texture only if on-screen
-            if(tile!=null) {
-                //if(isOnScreen(pos)) {
-                    if(tile.updateTexture(pos, mapType, vSlice)) {
-                        updated=true;
-                    }
-                //}
+            if(tile==null) {
+                tile = findNeighbor(centerTile, pos);
+                grid.put(pos, tile.hashCode());
             }
+
+            //if(isOnScreen(pos)) { // TODO
+                if(tile.updateTexture(pos, mapType, vSlice)) {
+                    updated=true;
+                }
+            //}
+
         }
 
 		return updated;
@@ -272,7 +281,7 @@ public class GridRenderer {
                 if(tile!=null) {
 				    drawTile(entry.getKey(), tile, centerX, centerZ);
                 } else {
-                    //System.out.println("Grid tile missing at " + entry.getKey());
+                    logger.warning("Grid tile missing at " + entry.getKey());
                 }
 			}
 
@@ -319,7 +328,7 @@ public class GridRenderer {
 				tessellator.draw();
 			//}
 		} else {
-           if(debug) logger.fine("Tile has no texture: " + tile);
+           //logger.warning("Tile has no texture: " + tile);
         }
 	}
 	
@@ -421,18 +430,7 @@ public class GridRenderer {
 	}
 	
 	private Tile findTile(final int tileX, final int tileZ) {
-		final int hash = Tile.toHashCode(tileX, tileZ, zoom, dimension);
-
-        // Check cache first
-        Tile tile = TileCache.instance().getIfPresent(hash);
-        if(tile==null) {
-            tile = new Tile(worldDir, tileX, tileZ, zoom, dimension);
-            TileCache.instance().put(hash, tile);
-            //logger.info("Created for cache:" + tile);
-        } else {
-            //logger.info("Reused from cache:" + tile);
-        }
-        return tile;
+        return TileCache.getOrCreate(worldDir, tileX, tileZ, zoom, dimension);
 	}
 	
 	public void setContext(File worldDir, int dimension) {

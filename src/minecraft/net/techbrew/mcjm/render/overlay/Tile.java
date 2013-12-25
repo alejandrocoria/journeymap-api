@@ -59,53 +59,66 @@ public class Tile {
 	}
 	
 	public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice) {
-		boolean changed = (futureTex==null) && (textureImpl==null || mapType!=lastMapType || vSlice!=lastVSlice);
-        if(changed) {
-            if(logger.isLoggable(Level.FINE)) {
-                logger.fine(this + " needs to be updated because " + textureImpl + " or " + mapType + "!=" + lastMapType + " or " + vSlice + "!=" + lastVSlice);
-            }
-        } else {
-		    changed = futureTex!=null && RegionImageHandler.hasImageChanged(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, lastImageTime);
-            if(changed) {
-                if(logger.isLoggable(Level.FINER)) {
-                    logger.fine(this + " needs to be updated because the region image changed since " + new Date(lastImageTime));
-                }
-            }
-        }
-		
-		if(changed) {
-
-            lastImageTime = new Date().getTime();
-			lastMapType = mapType;
-			lastVSlice = vSlice;
-
-            //logger.info("FutureTex preparing for " + this);
-
+        if(futureTex==null) {
+            lastMapType = mapType;
+            lastVSlice = vSlice;
             Integer glId = textureImpl!=null ? textureImpl.getGlTextureId() : null;
-
-            StatTimer timer = StatTimer.get("Tile.updateTexture.prepareImage").start();
             futureTex = TextureCache.instance().prepareImage(glId, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE);
-            double time = timer.stop();
-
-		}
-
-		return changed;
+            return true;
+        } else {
+            return false;
+        }
+//		boolean changed = (futureTex==null) && (textureImpl==null || mapType!=lastMapType || vSlice!=lastVSlice);
+//        if(changed) {
+//            if(logger.isLoggable(Level.FINE)) {
+//                logger.fine(this + " needs to be updated because " + textureImpl + " or " + mapType + "!=" + lastMapType + " or " + vSlice + "!=" + lastVSlice);
+//            }
+//        } else if(futureTex!=null) {
+//            changed = true; // RegionImageHandler.hasImageChanged(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, lastImageTime);
+//            lastImageTime = new Date().getTime();
+//        }
+//
+//		if(changed) {
+//			lastMapType = mapType;
+//			lastVSlice = vSlice;
+//            Integer glId = textureImpl!=null ? textureImpl.getGlTextureId() : null;
+//            futureTex = TextureCache.instance().prepareImage(glId, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE);
+//		}
+//
+//		return changed;
 	}
 	
 	public boolean hasTexture() {
-		return textureImpl!=null || (futureTex!=null && futureTex.isDone());
+		if(textureImpl!=null) return true;
+        if(futureTex!=null && futureTex.isDone()){
+            try {
+                if(futureTex.get()==null){
+                    futureTex=null;
+                    lastImageTime = 0;
+                    return false;
+                } else {
+                    return true;
+                }
+            } catch (Throwable e) {
+                logger.severe(LogFormatter.toString(e));
+            }
+        }
+        return false;
 	}
 	
 	public TextureImpl getTexture() {	
 
         if(futureTex!=null && futureTex.isDone()){
             try {
-                TextureImpl texture = futureTex.get().bindTexture();
-                if(textureImpl==null){
-                    textureImpl = texture;
+                DelayedTexture dt = futureTex.get();
+                if(dt!=null) {
+                    TextureImpl texture = dt.bindTexture();
+                    if(textureImpl==null){ // new
+                        textureImpl = texture;
+                    }
                 }
                 futureTex = null;
-                lastImageTime = new Date().getTime();
+                //lastImageTime = new Date().getTime();
                 //logger.info("FutureTex bound for " + this);
             } catch (Throwable e) {
                 logger.severe(LogFormatter.toString(e));

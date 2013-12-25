@@ -19,7 +19,7 @@ import net.techbrew.mcjm.thread.JMThreadFactory;
 
 public class RegionImageCache  {
 	
-	private static final int SIZE = 16;
+	private static final int SIZE = 25;
 	private static final long flushInterval = TimeUnit.SECONDS.toMillis(30);
 	private volatile Map<RegionCoord, RegionImageSet> imageSets;
 	

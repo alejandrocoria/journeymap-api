@@ -57,7 +57,7 @@ public class TextureCache {
     
     private final Map<String, TextureImpl> entityImageMap = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
 
-    private ThreadPoolExecutor texExec = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, new JMThreadFactory("texture"));
+    private ThreadPoolExecutor texExec = (ThreadPoolExecutor) Executors.newFixedThreadPool(3, new JMThreadFactory("texture"));
 
     /*************************************************/
 
@@ -66,13 +66,12 @@ public class TextureCache {
         Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>() {
             @Override
             public DelayedTexture call() throws Exception {
-
-                StatTimer timer = StatTimer.get("TextureCache.prepareImage");
-                timer.start();
-                BufferedImage image = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, true, Tile.TILESIZE, Tile.TILESIZE);
-                DelayedTexture tex = new DelayedTexture(glId, image, null);
-                timer.stop();
-                return tex;
+                BufferedImage image = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, true, Tile.TILESIZE, Tile.TILESIZE, true);
+                if(image==null){
+                    return null;
+                } else {
+                    return new DelayedTexture(glId, image, null);
+                }
             }
         });
         return future;

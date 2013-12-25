@@ -205,7 +205,7 @@ public class RegionImageHandler {
 	 * @param vSlice
 	 * @throws IOException
 	 */
-	public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType, Integer vSlice, final int dimension, final Boolean useCache, final Integer imageWidth, final Integer imageHeight) {
+	public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType, Integer vSlice, final int dimension, final Boolean useCache, final Integer imageWidth, final Integer imageHeight, final boolean allowNullImage) {
 		
 		long start = 0, stop = 0;		
 		start = System.currentTimeMillis();
@@ -296,6 +296,10 @@ public class RegionImageHandler {
 			stop = System.currentTimeMillis();
 			JourneyMap.getLogger().fine("getMergedChunks time: "  + (stop-start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+
+        if(allowNullImage && !imageDrawn){
+            return null;
+        }
 		
 		// Scale if needed
 		if(imageHeight!=null && imageWidth!=null && (initialHeight!=imageHeight || initialWidth!=imageWidth)) {

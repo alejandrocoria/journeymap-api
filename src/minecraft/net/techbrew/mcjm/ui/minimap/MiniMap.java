@@ -38,7 +38,7 @@ public class MiniMap {
     private final MapOverlayState state = MapOverlay.state();
     private final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
     private final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
-    private final GridRenderer gridRenderer = new GridRenderer(5);
+    private final GridRenderer gridRenderer = new GridRenderer(3);
     private StatTimer drawTimer;
     private final Color playerInfoFgColor = Color.LIGHT_GRAY;
     private final Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);

@@ -109,7 +109,7 @@ public class TileService extends FileService {
 				final ChunkCoordIntPair startCoord = new ChunkCoordIntPair(minChunkX,minChunkZ);
 				final ChunkCoordIntPair endCoord = new ChunkCoordIntPair(maxChunkX,maxChunkZ);
 				
-				final BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, true, 512, 512);
+				final BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, true, 512, 512, false);
 	
 				ResponseHeader.on(event).contentType(ContentType.png).noCache();
 				serveImage(event, img);
