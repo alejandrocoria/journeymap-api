@@ -161,8 +161,8 @@ public class MiniMapOptions extends JmUI {
 
             case Keyboard: {
                 boolean showHotKeys = !PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_HOTKEYS);
-                PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_HOTKEYS, showHotKeys);
                 buttonKeyboard.setToggled(showHotKeys);
+                PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_HOTKEYS, showHotKeys);
                 // TODO: Actually use this
                 break;
             }
@@ -171,6 +171,7 @@ public class MiniMapOptions extends JmUI {
                 boolean showFps = !PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_SHOWFPS);
                 buttonShowfps.setToggled(showFps);
                 UIManager.getInstance().getMiniMap().setShowFps(showFps);
+                PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_SHOWFPS, showFps);
                 break;
             }
 
