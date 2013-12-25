@@ -22,6 +22,7 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -54,7 +55,16 @@ public class MiniMap {
 	 * Default constructor
 	 */
 	public MiniMap() {
-        updateDisplayVars(DisplayVars.Shape.SmallSquare, DisplayVars.Position.TopRight); // TODO: Get from preferences
+        final PropertyManager pm = PropertyManager.getInstance();
+
+        setEnabled(pm.getBoolean(PropertyManager.Key.PREF_SHOW_MINIMAP));
+        setShowFps(pm.getBoolean(PropertyManager.Key.PREF_MINIMAP_SHOWFPS));
+        state.fontScale = pm.getDouble(PropertyManager.Key.PREF_MINIMAP_FONTSCALE);
+
+        DisplayVars.Shape shape = DisplayVars.Shape.valueOf(pm.getString(PropertyManager.Key.PREF_MINIMAP_SHAPE));
+        DisplayVars.Position position = DisplayVars.Position.valueOf(pm.getString(PropertyManager.Key.PREF_MINIMAP_POSITION));
+
+        updateDisplayVars(shape, position);
 	}
 
 

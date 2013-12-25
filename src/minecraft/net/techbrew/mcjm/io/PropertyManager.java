@@ -3,6 +3,8 @@ package net.techbrew.mcjm.io;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.WaypointHelper;
+import net.techbrew.mcjm.ui.minimap.DisplayVars;
 
 import java.io.File;
 import java.io.FileReader;
@@ -43,8 +45,14 @@ public class PropertyManager {
 		PREF_SHOW_PLAYERS("preference_show_players", true), //$NON-NLS-1$
 		PREF_SHOW_WAYPOINTS("preference_show_waypoints", true), //$NON-NLS-1$
 		PREF_SHOW_GRID("preference_show_grid", true), //$NON-NLS-1$
-        PREF_SHOW_MINIMAP("preference_show_minimap", true); //$NON-NLS-1$
-		
+        PREF_SHOW_MINIMAP("preference_show_minimap", !WaypointHelper.isReiLoaded() && !WaypointHelper.isVoxelMapLoaded()), //$NON-NLS-1$
+
+        PREF_MINIMAP_SHAPE("preference_minimap_shape", DisplayVars.Shape.SmallSquare.name()), //$NON-NLS-1$
+        PREF_MINIMAP_POSITION("preference_minimap_position", DisplayVars.Position.TopRight.name()), //$NON-NLS-1$
+        PREF_MINIMAP_FONTSCALE("preference_minimap_fontscale", 1.0), //$NON-NLS-1$
+        PREF_MINIMAP_SHOWFPS("preference_minimap_showfps", false), //$NON-NLS-1$
+        PREF_MINIMAP_HOTKEYS("preference_minimap_hotkeys", true), //$NON-NLS-1$
+		;
 		private final String property;
 		private final String defaultValue;
 		private final boolean isBoolean;
@@ -89,7 +97,7 @@ public class PropertyManager {
 		}
 		return instance;
 	}
-	
+
 	public String getString(Key key) {
 		return properties.getProperty(key.getProperty());
 	}
@@ -97,6 +105,10 @@ public class PropertyManager {
 	public Integer getInteger(Key key) {
 		return Integer.parseInt(properties.getProperty(key.getProperty()));
 	}
+
+    public Double getDouble(Key key) {
+        return Double.parseDouble(properties.getProperty(key.getProperty()));
+    }
 	
 	public Boolean getBoolean(Key key) {
 		return Boolean.parseBoolean(properties.getProperty(key.getProperty()));
@@ -138,6 +150,14 @@ public class PropertyManager {
 	public static void set(Key key, Integer value) {
 		getInstance().setProperty(key, value);
 	}
+
+    public static void set(Key key, Double value) {
+        getInstance().setProperty(key, value);
+    }
+
+    public static void set(Key key, String value) {
+        getInstance().setProperty(key, value);
+    }
 	
 	/**
 	 * Get a normalized, type-safe view of the properties.
