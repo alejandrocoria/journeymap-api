@@ -16,7 +16,13 @@ import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.MapOverlayState;
-import net.techbrew.mcjm.render.overlay.*;
+import net.techbrew.mcjm.render.draw.DrawEntityStep;
+import net.techbrew.mcjm.render.draw.DrawStep;
+import net.techbrew.mcjm.render.draw.DrawUtil;
+import net.techbrew.mcjm.render.overlay.GridRenderer;
+import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
+import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
+import net.techbrew.mcjm.render.overlay.TileCache;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.ui.JmUI;
 import net.techbrew.mcjm.ui.MapButton;
@@ -477,7 +483,7 @@ public class MapOverlay extends JmUI {
 	@Override
 	public void drawBackground(int layer)
 	{
-		BaseOverlayRenderer.drawRectangle(0, 0, width, height, bgColor, 255);
+		DrawUtil.drawRectangle(0, 0, width, height, bgColor, 255);
 	}
 
 
@@ -515,15 +521,15 @@ public class MapOverlay extends JmUI {
 
         Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
         if(playerPixel!=null) {
-            BaseOverlayRenderer.DrawStep drawStep = new BaseOverlayRenderer.DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
+            DrawStep drawStep = new DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
             gridRenderer.draw(xOffset, yOffset, drawStep);
         }
 
-        BaseOverlayRenderer.drawImage(TextureCache.instance().getLogo(), 8, 4, false);
+        DrawUtil.drawImage(TextureCache.instance().getLogo(), 8, 4, false);
 
 		sizeDisplay(true);
 
-        BaseOverlayRenderer.drawCenteredLabel(state.playerLastPos, width/2, height-11, playerInfoBgColor, playerInfoFgColor, 205, 1);
+        DrawUtil.drawCenteredLabel(state.playerLastPos, width / 2, height - 11, playerInfoBgColor, playerInfoFgColor, 205, 1);
 
         timer.stop();
 	}
@@ -531,7 +537,7 @@ public class MapOverlay extends JmUI {
 	public static void drawMapBackground(JmUI ui) {
 		ui.sizeDisplay(false);
         gridRenderer.draw(1f, 0, 0);
-		BaseOverlayRenderer.drawImage(TextureCache.instance().getLogo(), 8, 4, false);
+		DrawUtil.drawImage(TextureCache.instance().getLogo(), 8, 4, false);
 		ui.sizeDisplay(true);
 	}
 	

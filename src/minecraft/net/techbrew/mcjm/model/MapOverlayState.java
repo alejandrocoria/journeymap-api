@@ -9,13 +9,11 @@ import net.techbrew.mcjm.feature.Feature;
 import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
+import net.techbrew.mcjm.render.draw.DrawStep;
 import net.techbrew.mcjm.render.overlay.GridRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
-import net.techbrew.mcjm.render.texture.TextureCache;
 
-import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,7 +39,7 @@ public class MapOverlayState {
 	private boolean underground = false;
 	private int dimension = Integer.MIN_VALUE;
 	private boolean caveMappingAllowed = false;
-    private List<BaseOverlayRenderer.DrawStep> drawStepList = new ArrayList<BaseOverlayRenderer.DrawStep>();
+    private List<DrawStep> drawStepList = new ArrayList<DrawStep>();
     private String playerBiome = "";
 	
 	/**
@@ -111,7 +109,7 @@ public class MapOverlayState {
         return playerBiome;
     }
 
-    public List<BaseOverlayRenderer.DrawStep> getDrawSteps() {
+    public List<DrawStep> getDrawSteps() {
         return drawStepList;
     }
 

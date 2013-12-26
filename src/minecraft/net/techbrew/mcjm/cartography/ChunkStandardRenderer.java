@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.render;
+package net.techbrew.mcjm.cartography;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -15,6 +15,7 @@ import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkMD;
+import net.techbrew.mcjm.render.BlockInfo;
 
 public class ChunkStandardRenderer extends BaseRenderer implements IChunkRenderer {
 
@@ -78,7 +79,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				if (y < 0) y=1; // Weird data error seen on World of Keralis
 				
 				// Get blockinfo for coords
-				BlockInfo blockInfo = mapBlocks.getBlockInfo(chunkMd, x, y, z);				
+				BlockInfo blockInfo = mapBlocks.getBlockInfo(chunkMd, x, y, z);
 				if (blockInfo == null) {
 					paintBadBlock(x, y, z, g2D);
 					continue blockLoop;

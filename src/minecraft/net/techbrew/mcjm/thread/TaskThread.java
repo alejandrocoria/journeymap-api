@@ -19,7 +19,7 @@ import net.techbrew.mcjm.model.ChunkCoord;
 import net.techbrew.mcjm.model.ChunkImageCache;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.RegionImageCache;
-import net.techbrew.mcjm.render.ChunkRenderController;
+import net.techbrew.mcjm.cartography.ChunkRenderController;
 import net.techbrew.mcjm.task.IGenericTask;
 import net.techbrew.mcjm.task.IMapTask;
 import net.techbrew.mcjm.task.ITask;

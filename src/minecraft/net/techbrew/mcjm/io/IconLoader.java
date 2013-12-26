@@ -15,7 +15,7 @@ import net.minecraft.src.TextureMap;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.render.BlockInfo;
-import net.techbrew.mcjm.render.MapBlocks;
+import net.techbrew.mcjm.cartography.MapBlocks;
 
 import org.lwjgl.opengl.GL11;
 

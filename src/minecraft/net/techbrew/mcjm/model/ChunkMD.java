@@ -8,7 +8,7 @@ import net.minecraft.src.Chunk;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.EnumSkyBlock;
 import net.minecraft.src.World;
-import net.techbrew.mcjm.render.MapBlocks;
+import net.techbrew.mcjm.cartography.MapBlocks;
 
 /**
  * ChunkStub MetaData wrapper for the various bits

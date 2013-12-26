@@ -11,7 +11,7 @@ import net.minecraft.src.World;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.EntityHelper;
-import net.techbrew.mcjm.render.MapBlocks;
+import net.techbrew.mcjm.cartography.MapBlocks;
 
 /**
  * Provides game-related properties in a Map.

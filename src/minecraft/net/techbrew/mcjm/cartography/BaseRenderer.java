@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.render;
+package net.techbrew.mcjm.cartography;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -9,6 +9,7 @@ import net.minecraft.src.EnumSkyBlock;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.ChunkMD;
+import net.techbrew.mcjm.render.BlockInfo;
 
 /**
  * Base class for methods reusable across renderers.

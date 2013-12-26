@@ -1,17 +1,16 @@
 package net.techbrew.mcjm.render.overlay;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
-
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.Waypoint;
+import net.techbrew.mcjm.render.draw.DrawStep;
+import net.techbrew.mcjm.render.draw.DrawWayPointStep;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.render.texture.TextureImpl;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Renders waypoints in the MapOverlay.
@@ -19,16 +18,13 @@ import net.techbrew.mcjm.render.texture.TextureImpl;
  * @author mwoodman
  *
  */
-public class OverlayWaypointRenderer extends BaseOverlayRenderer<Waypoint> {
-	
+public class OverlayWaypointRenderer {
 
 	final BasicStroke thinStroke = new BasicStroke(2);
 	final BasicStroke mediumStroke = new BasicStroke(4);
 	final BasicStroke thinRoundStroke = new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND);
 	final BasicStroke thickRoundStroke = new BasicStroke(6, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND);
-	
-	
-	@Override
+
 	public List<DrawStep> prepareSteps(List<Waypoint> waypoints, GridRenderer grid, double fontScale) {
 
 		final List<DrawStep> drawStepList = new ArrayList<DrawStep>();

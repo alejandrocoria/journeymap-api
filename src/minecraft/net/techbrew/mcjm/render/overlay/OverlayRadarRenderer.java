@@ -1,18 +1,20 @@
 package net.techbrew.mcjm.render.overlay;
 
-import java.awt.Color;
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import net.minecraft.src.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.render.draw.DrawStep;
+import net.techbrew.mcjm.render.draw.DrawCenteredLabelStep;
+import net.techbrew.mcjm.render.draw.DrawEntityStep;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.render.texture.TextureImpl;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Renders an entity image in the MapOverlay.
@@ -20,9 +22,8 @@ import net.techbrew.mcjm.render.texture.TextureImpl;
  * @author mwoodman
  *
  */
-public class OverlayRadarRenderer extends BaseOverlayRenderer<Map> {
+public class OverlayRadarRenderer {
 
-	@Override
 	public List<DrawStep> prepareSteps(List<Map> critters, GridRenderer grid, double fontScale) {
 		
 		final boolean showAnimals = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_ANIMALS);

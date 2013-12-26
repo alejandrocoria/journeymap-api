@@ -5,6 +5,8 @@ import net.minecraft.src.Minecraft;
 import net.minecraft.src.Tessellator;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.render.draw.DrawStep;
+import net.techbrew.mcjm.render.draw.DrawUtil;
 import net.techbrew.mcjm.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
 
@@ -237,9 +239,9 @@ public class GridRenderer {
      * @param xOffset
      * @param yOffset
      */
-    public void draw(final List<BaseOverlayRenderer.DrawStep> drawStepList, int xOffset, int yOffset) {
+    public void draw(final List<DrawStep> drawStepList, int xOffset, int yOffset) {
         if(drawStepList==null || drawStepList.isEmpty()) return;
-        draw(xOffset, yOffset, drawStepList.toArray(new BaseOverlayRenderer.DrawStep[drawStepList.size()]));
+        draw(xOffset, yOffset, drawStepList.toArray(new DrawStep[drawStepList.size()]));
     }
 
     /**
@@ -248,13 +250,13 @@ public class GridRenderer {
      * @param yOffset
      * @param drawSteps
      */
-    public void draw(int xOffset, int yOffset, BaseOverlayRenderer.DrawStep... drawSteps) {
+    public void draw(int xOffset, int yOffset, DrawStep... drawSteps) {
 
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glDepthMask(false);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-        for(BaseOverlayRenderer.DrawStep drawStep : drawSteps) {
+        for(DrawStep drawStep : drawSteps) {
             drawStep.draw(xOffset, yOffset, this);
         }
 
@@ -312,7 +314,7 @@ public class GridRenderer {
         final double endX = offsetX + pos.endX;
         final double endZ = offsetZ + pos.endZ;
 
-        BaseOverlayRenderer.drawRectangle(startX, startZ, Tile.TILESIZE, Tile.TILESIZE, bgColor, 255);
+        DrawUtil.drawRectangle(startX, startZ, Tile.TILESIZE, Tile.TILESIZE, bgColor, 255);
 
 		if(tile.hasTexture()) {
             // TODO: get this check working again

@@ -4,8 +4,8 @@ import net.minecraft.src.DynamicTexture;
 import net.minecraft.src.GuiSmallButton;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.Tessellator;
-import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
 
+import net.techbrew.mcjm.render.texture.TextureCache;
 import org.lwjgl.opengl.GL11;
 
 public class MapButton extends GuiSmallButton {
@@ -42,7 +42,7 @@ public class MapButton extends GuiSmallButton {
 	public MapButton(int id, int x, int y, int width, int height, String hoverText, String icon) {
 		super(id, x, y, width, height, "");
 		this.icon = (icon==null) ? "/gui/gui.png" : icon; //$NON-NLS-1$
-		this.iconTexture = BaseOverlayRenderer.getTexture(icon);
+		this.iconTexture = TextureCache.newTexture(icon);
 		setHoverText(hoverText);
 	}
 	

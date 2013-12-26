@@ -1,10 +1,13 @@
 package net.techbrew.mcjm.render.texture;
 
 import net.minecraft.src.ChunkCoordIntPair;
+import net.minecraft.src.DynamicTexture;
+import net.minecraft.src.ResourceLocation;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.RegionImageHandler;
+import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.render.overlay.Tile;
 import net.techbrew.mcjm.thread.JMThreadFactory;
@@ -13,6 +16,8 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,6 +50,25 @@ public class TextureCache {
     
     public static TextureImpl newUnmanagedTexture(BufferedImage image, boolean retain) {
     	return new TextureImpl(image, retain);
+    }
+
+    public static DynamicTexture newTexture(String path) {
+        ResourceLocation loc = new ResourceLocation(path);
+        DynamicTexture texture = null;
+        InputStream is = null;
+        try {
+            is = JourneyMap.class.getResourceAsStream(path);
+            texture = new DynamicTexture(ImageIO.read(is));
+        } catch(Exception e) {
+            JourneyMap.getLogger().severe("Can't get icon for " + loc + ": " + LogFormatter.toString(e));
+            if(is!=null) {
+                try {
+                    is.close();
+                } catch (IOException e1) {
+                }
+            }
+        }
+        return texture;
     }
     
     public static enum Name {

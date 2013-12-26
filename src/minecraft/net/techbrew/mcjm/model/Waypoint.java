@@ -1,5 +1,7 @@
 package net.techbrew.mcjm.model;
 
+import net.minecraft.src.ChunkCoordinates;
+
 import java.awt.Color;
 import java.util.LinkedHashMap;
 
@@ -23,6 +25,8 @@ public class Waypoint extends LinkedHashMap<String, Object> {
 		display
 		;
 	}
+
+    ChunkCoordinates location;
 	
     public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, int type, String origin, String display)
     {
@@ -39,6 +43,7 @@ public class Waypoint extends LinkedHashMap<String, Object> {
         this.put(Key.type.name(), type);
         this.put(Key.origin.name(), origin);
         this.put(Key.display.name(), display);
+        location = new ChunkCoordinates(x, y, z);
     }
     
     public String getId() {
@@ -59,6 +64,10 @@ public class Waypoint extends LinkedHashMap<String, Object> {
     
     public int getX() {
     	return getInteger(Key.x);
+    }
+
+    public int getY() {
+        return getInteger(Key.y);
     }
     
     public int getZ() {
@@ -82,6 +91,10 @@ public class Waypoint extends LinkedHashMap<String, Object> {
     
     public String getDisplay() {
     	return getString(Key.display);
+    }
+
+    public ChunkCoordinates getLocation() {
+        return location;
     }
     
     @Override

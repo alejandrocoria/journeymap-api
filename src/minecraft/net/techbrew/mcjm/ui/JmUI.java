@@ -1,8 +1,7 @@
 package net.techbrew.mcjm.ui;
 
 import net.minecraft.src.GuiScreen;
-import net.minecraft.src.Minecraft;
-import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
+import net.techbrew.mcjm.render.draw.DrawUtil;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
@@ -26,7 +25,7 @@ public abstract class JmUI extends GuiScreen {
 
     public void drawLogo() {
         sizeDisplay(mc.displayWidth, mc.displayHeight);
-        BaseOverlayRenderer.drawImage(logo, (mc.displayWidth - logo.width)/2, 20, false);
+        DrawUtil.drawImage(logo, (mc.displayWidth - logo.width) / 2, 20, false);
         sizeDisplay(width, height);
     }
 

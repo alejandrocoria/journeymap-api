@@ -10,7 +10,9 @@ import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.MapOverlayState;
 import net.techbrew.mcjm.model.WaypointHelper;
-import net.techbrew.mcjm.render.overlay.BaseOverlayRenderer;
+import net.techbrew.mcjm.render.draw.DrawEntityStep;
+import net.techbrew.mcjm.render.draw.DrawStep;
+import net.techbrew.mcjm.render.draw.DrawUtil;
 import net.techbrew.mcjm.render.overlay.GridRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
@@ -22,7 +24,6 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -118,7 +119,7 @@ public class MiniMap {
                     glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
                     glStencilMask(0xFF);
                     glClear(GL_STENCIL_BUFFER_BIT);
-                    BaseOverlayRenderer.drawQuad(dv.maskTexture, dv.textureX, dv.textureY, dv.maskTexture.width, dv.maskTexture.height, null, 1f, false, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                    DrawUtil.drawQuad(dv.maskTexture, dv.textureX, dv.textureY, dv.maskTexture.width, dv.maskTexture.height, null, 1f, false, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                     glColorMask(true, true, true, true);
                     glDepthMask(true);
                     glStencilMask(0x00);
@@ -151,7 +152,7 @@ public class MiniMap {
             // Draw player
             Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
             if(playerPixel!=null) {
-                BaseOverlayRenderer.DrawStep drawStep = new BaseOverlayRenderer.DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
+                DrawStep drawStep = new DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
                 gridRenderer.draw(0, 0, drawStep);
             }
 
@@ -180,14 +181,14 @@ public class MiniMap {
             }
 
             // Draw position text
-            BaseOverlayRenderer.drawCenteredLabel(playerInfo, dv.labelX, dv.bottomLabelY, playerInfoBgColor, playerInfoFgColor, 200, dv.fontScale);
+            DrawUtil.drawCenteredLabel(playerInfo, dv.labelX, dv.bottomLabelY, playerInfoBgColor, playerInfoFgColor, 200, dv.fontScale);
 
             // Draw FPS
             if(showFps){
                 String fps = mc.debug;
                 final int i = fps!=null ? fps.indexOf(',') : -1;
                 if(i>0){
-                    BaseOverlayRenderer.drawCenteredLabel(fps.substring(0,i), dv.labelX, dv.topLabelY, playerInfoBgColor, playerInfoFgColor, 200, dv.fontScale);
+                    DrawUtil.drawCenteredLabel(fps.substring(0, i), dv.labelX, dv.topLabelY, playerInfoBgColor, playerInfoFgColor, 200, dv.fontScale);
                 }
             }
 
@@ -195,7 +196,7 @@ public class MiniMap {
             GL11.glEnable(GL11.GL_DEPTH_TEST);
 
             // Draw border texture
-            BaseOverlayRenderer.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false);
+            DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false);
 
             GL11.glPopMatrix();
 

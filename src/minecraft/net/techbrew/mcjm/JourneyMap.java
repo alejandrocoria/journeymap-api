@@ -12,7 +12,7 @@ import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.RegionImageCache;
-import net.techbrew.mcjm.render.ColorCache;
+import net.techbrew.mcjm.cartography.ColorCache;
 import net.techbrew.mcjm.render.overlay.TileCache;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.server.JMServer;

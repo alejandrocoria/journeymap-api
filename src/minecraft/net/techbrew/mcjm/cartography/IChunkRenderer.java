@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.render;
+package net.techbrew.mcjm.cartography;
 
 import java.awt.Graphics2D;
 

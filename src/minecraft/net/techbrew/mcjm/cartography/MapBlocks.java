@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.render;
+package net.techbrew.mcjm.cartography;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -9,6 +9,7 @@ import net.minecraft.src.Block;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkMD;
+import net.techbrew.mcjm.render.BlockInfo;
 
 public class MapBlocks extends HashMap {
 	

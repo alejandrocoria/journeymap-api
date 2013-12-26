@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.render;
+package net.techbrew.mcjm.cartography;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -9,6 +9,7 @@ import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkMD;
+import net.techbrew.mcjm.render.BlockInfo;
 
 /**
  * Render a chunk in the Nether.
@@ -72,7 +73,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 					blockId = chunkMd.stub.getBlockID(x, y, z);
 					boolean isLava = (blockId == 10 || blockId == 11);
 					
-					BlockInfo block = mapBlocks.getBlockInfo(chunkMd, x, y, z);		
+					BlockInfo block = mapBlocks.getBlockInfo(chunkMd, x, y, z);
 					blockId = block.id;
 					Color color = block.getColor();
 					
