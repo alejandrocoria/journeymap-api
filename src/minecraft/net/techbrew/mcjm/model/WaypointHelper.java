@@ -1,12 +1,13 @@
 package net.techbrew.mcjm.model;
 
-import net.minecraft.src.Minecraft;
+import net.minecraft.src.*;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.waypoint.EntityWaypoint;
+import net.techbrew.mcjm.waypoint.RenderWaypoint;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Get waypoints
@@ -19,6 +20,8 @@ public class WaypointHelper {
 	private static Boolean reiLoaded;
 	private static Boolean voxelMapLoaded;
 	private static Boolean nativeLoaded;
+
+    private static Boolean renderWaypoints;
 	
 	/**
 	 * Is any waypoint system enabled.
@@ -72,12 +75,12 @@ public class WaypointHelper {
 	 * Check for native waypoint support
 	 * @return
 	 */
-	private static boolean isNativeLoaded() {
-		return false;
-//		if(nativeLoaded==null) {
-//			nativeLoaded = !isReiLoaded() && !isVoxelMapLoaded();
-//		}
-//		return nativeLoaded;
+	public static boolean isNativeLoaded() {
+//		return false;
+		if(nativeLoaded==null) {
+			nativeLoaded = !isReiLoaded() && !isVoxelMapLoaded();
+		}
+		return nativeLoaded;
 	}
 	
 	/**
@@ -177,7 +180,12 @@ public class WaypointHelper {
 			return Collections.EMPTY_LIST;
 		}
 	}
-	
+
+
+    // TODO
+    static ArrayList<Waypoint> list = new ArrayList<Waypoint>();
+    static Integer waypointEntityId;
+
 	/**
 	 * Get native waypoints from JourneyMap
 	 * @return
@@ -187,24 +195,66 @@ public class WaypointHelper {
 		if(!isNativeLoaded()) {
 			return Collections.EMPTY_LIST;
 		}
-		
-		ArrayList<Waypoint> list = new ArrayList<Waypoint>();
-		
-//		Minecraft mc = Minecraft.getMinecraft();
-//		
-//		ChunkCoordinates spawn = mc.theWorld.getSpawnPoint();
-//		EntityClientPlayerMP player = mc.thePlayer;
-//
-//		Waypoint wpSpawn = new Waypoint("Spawn", spawn.posX, spawn.posY, spawn.posZ, true, 0, 255, 0, Waypoint.TYPE_NORMAL, "journeymap", "Spawn");
-//		list.add(wpSpawn);
-//			
-//		ChunkCoordinates bed = player.getBedLocation();
-//		if(bed!=null && !bed.equals(spawn)) {
-//			Waypoint wpBed = new Waypoint("Bed", new Double(Math.floor(bed.posX)).intValue(), new Double(Math.floor(bed.posY)).intValue(), new Double(Math.floor(bed.posZ)).intValue(), true, 0, 0, 255, Waypoint.TYPE_NORMAL, "journeymap", "Bed");
-//			list.add(wpBed);
-//		}
+
+//        if(!list.isEmpty()) {
+//            return list;
+//        }
+
+		Minecraft mc = Minecraft.getMinecraft();
+
+		ChunkCoordinates spawn = mc.theWorld.getSpawnPoint();
+		EntityClientPlayerMP player = mc.thePlayer;
+
+		Waypoint wpSpawn = new Waypoint("Spawn", spawn.posX, spawn.posY, spawn.posZ, true, 0, 255, 0, Waypoint.TYPE_NORMAL, "journeymap", "Spawn");
+		list.add(wpSpawn);
+        if(renderWaypoints) {
+            mc.theWorld.addEntityToWorld(waypointEntityId, new EntityWaypoint(mc.theWorld, wpSpawn));
+        }
+
+		ChunkCoordinates bed = player.getBedLocation();
+		if(bed!=null && !bed.equals(spawn)) {
+			Waypoint wpBed = new Waypoint("Bed", new Double(Math.floor(bed.posX)).intValue(), new Double(Math.floor(bed.posY)).intValue(), new Double(Math.floor(bed.posZ)).intValue(), true, 0, 0, 255, Waypoint.TYPE_NORMAL, "journeymap", "Bed");
+			list.add(wpBed);
+
+            if(renderWaypoints) {
+                mc.theWorld.addEntityToWorld(waypointEntityId, new EntityWaypoint(mc.theWorld, wpBed));
+            }
+		}
 		
 		return list;
 	}
+
+    public static void initialize() {
+
+        if(waypointEntityId!=null) {
+            getNativeWaypoints(); // TODO: call this somewhere else
+            return;
+        }
+
+        RenderManager rm = RenderManager.instance;
+        Map entityRenderMap = Utils.getPrivateField(rm, RenderManager.class, Map.class);
+        if(entityRenderMap!=null) {
+
+            for(int i=201;i<2048;i++){
+                if(EntityList.getClassFromID(i)==null){
+                    waypointEntityId = i;
+                    break;
+                }
+            }
+
+            if(waypointEntityId!=null) {
+                entityRenderMap.put(EntityWaypoint.class, new RenderWaypoint(Minecraft.getMinecraft(), rm));
+                renderWaypoints = true;
+
+                JourneyMap.getLogger().info("Waypoints will be rendered on-screen");
+                getNativeWaypoints(); // TODO: call this somewhere else
+            } else {
+                JourneyMap.getLogger().warning("Could not get unused entity ID, so Waypoints won't be rendered on screen.");
+            }
+
+        } else {
+            JourneyMap.getLogger().warning("Could not get access to RenderManager, so Waypoints won't be rendered on screen.");
+        }
+    }
 
 }

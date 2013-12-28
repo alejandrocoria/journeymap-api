@@ -3,6 +3,8 @@ package net.techbrew.mcjm;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.Minecraft;
 
+import java.lang.reflect.Field;
+
 
 public class Utils {
 	
@@ -43,7 +45,7 @@ public class Utils {
 	/**
 	 * Workaround now that in 1.2.1 you can't get the world seed.
 	 * 
-	 * @param world
+	 * @param minecraft
 	 * @return
 	 */
 	public static long getWorldHash(Minecraft minecraft) {
@@ -91,4 +93,23 @@ public class Utils {
 //			return world.getSeed();
 //		}
 	}
+
+    public static <T> T getPrivateField(Object instance, Class objectType, Class<T> fieldType) {
+        Class objectClass = instance.getClass();
+        while ((!objectClass.equals(objectType)) && (objectClass.getSuperclass() != null)) {
+            objectClass = objectClass.getSuperclass();
+        }
+        int counter = 0;
+        Field[] fields = objectClass.getDeclaredFields();
+        for (int i = 0; i < fields.length; i++) {
+            if (fieldType.equals(fields[i].getType())) {
+                try {
+                    fields[i].setAccessible(true);
+                    return (T) fields[i].get(instance);
+                } catch (IllegalAccessException ex) {
+                }
+            }
+        }
+        return null;
+    }
 }

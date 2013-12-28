@@ -58,11 +58,11 @@ public class DrawUtil {
     }
 
     private static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, boolean flip) {
-        drawQuad(texture, x, y, width, height, null, 1f, flip, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        drawQuad(texture, x, y, width, height, null, 1f, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     private static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, boolean flip, int glBlendSfactor, int glBlendDFactor) {
-        drawQuad(texture, x, y, width, height, null, 1f, flip, glBlendSfactor, glBlendDFactor);
+        drawQuad(texture, x, y, width, height, null, 1f, flip, true, glBlendSfactor, glBlendDFactor);
     }
 
     /**
@@ -77,15 +77,17 @@ public class DrawUtil {
      * @param glBlendSfactor For normal alpha blending: GL11.GL_SRC_ALPHA
      * @param glBlendDFactor For normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
      */
-    public static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, Color color, float alpha, boolean flip, int glBlendSfactor, int glBlendDFactor) {
+    public static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, Color color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor) {
 
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(glBlendSfactor, glBlendDFactor); // normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
-        if (color != null) {
-            float[] c = color.getColorComponents(null);
-            GL11.glColor4f(c[0], c[1], c[2], alpha);
-        } else {
-            GL11.glColor4f(alpha, alpha, alpha, alpha);
+        if(blend) {
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glBlendFunc(glBlendSfactor, glBlendDFactor); // normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
+            if (color != null) {
+                float[] c = color.getColorComponents(null);
+                GL11.glColor4f(c[0], c[1], c[2], alpha);
+            } else {
+                GL11.glColor4f(alpha, alpha, alpha, alpha);
+            }
         }
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -102,8 +104,10 @@ public class DrawUtil {
         tessellator.draw();
 
         // Ensure normal alpha blending afterward, just in case
-        if (glBlendSfactor != GL11.GL_SRC_ALPHA || glBlendDFactor != GL11.GL_ONE_MINUS_SRC_ALPHA) {
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        if(blend) {
+            if (glBlendSfactor != GL11.GL_SRC_ALPHA || glBlendDFactor != GL11.GL_ONE_MINUS_SRC_ALPHA) {
+                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            }
         }
     }
 
@@ -170,7 +174,13 @@ public class DrawUtil {
 
     public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y) {
 
-        drawQuad(texture, x, y, texture.width, texture.height, color, alpha, false, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        drawQuad(texture, x, y, texture.width, texture.height, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+    }
+
+    public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y, boolean blend) {
+
+        drawQuad(texture, x, y, texture.width, texture.height, color, alpha, false, false, 0, 0);
 
     }
 

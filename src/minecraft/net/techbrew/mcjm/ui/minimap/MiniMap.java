@@ -9,6 +9,7 @@ import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.MapOverlayState;
+import net.techbrew.mcjm.model.Waypoint;
 import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.draw.DrawEntityStep;
 import net.techbrew.mcjm.render.draw.DrawStep;
@@ -16,11 +17,13 @@ import net.techbrew.mcjm.render.draw.DrawUtil;
 import net.techbrew.mcjm.render.overlay.GridRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
+import net.techbrew.mcjm.render.overlay.WaypointRenderer;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.ui.JmUI;
 import net.techbrew.mcjm.ui.map.MapOverlay;
 import org.lwjgl.opengl.GL11;
 
+import java.util.List;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.logging.Logger;
@@ -119,7 +122,7 @@ public class MiniMap {
                     glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
                     glStencilMask(0xFF);
                     glClear(GL_STENCIL_BUFFER_BIT);
-                    DrawUtil.drawQuad(dv.maskTexture, dv.textureX, dv.textureY, dv.maskTexture.width, dv.maskTexture.height, null, 1f, false, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                    DrawUtil.drawQuad(dv.maskTexture, dv.textureX, dv.textureY, dv.maskTexture.width, dv.maskTexture.height, null, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                     glColorMask(true, true, true, true);
                     glDepthMask(true);
                     glStencilMask(0x00);
@@ -199,6 +202,9 @@ public class MiniMap {
             DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false);
 
             GL11.glPopMatrix();
+
+            // TODO: Move this somewhere else
+
 
             // Return resolution to how it is normally scaled
             JmUI.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());

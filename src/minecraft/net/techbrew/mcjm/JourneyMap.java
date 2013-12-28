@@ -13,6 +13,7 @@ import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.cartography.ColorCache;
+import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.overlay.TileCache;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.server.JMServer;
@@ -23,12 +24,11 @@ import net.techbrew.mcjm.thread.JMThreadFactory;
 import net.techbrew.mcjm.thread.TaskThread;
 import net.techbrew.mcjm.ui.map.MapOverlay;
 import net.techbrew.mcjm.ui.UIManager;
+import net.techbrew.mcjm.waypoint.EntityWaypoint;
+import net.techbrew.mcjm.waypoint.RenderWaypoint;
 import org.lwjgl.input.Keyboard;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
@@ -247,6 +247,11 @@ public class JourneyMap {
 	    	DataCache.instance().purge();
 	    	TextureCache.instance().purge();
             Constants.refreshBundle();
+
+            // Waypoint Entity Rendering
+            if(WaypointHelper.isNativeLoaded()) {
+                WaypointHelper.initialize();
+            }
 
 	    	if(taskExecutor==null || taskExecutor.isShutdown()) {			    		
 				taskExecutor = Executors.newScheduledThreadPool(1, new JMThreadFactory("task")); //$NON-NLS-1$				
