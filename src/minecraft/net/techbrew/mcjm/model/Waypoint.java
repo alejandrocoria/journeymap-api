@@ -1,8 +1,8 @@
 package net.techbrew.mcjm.model;
 
-import net.minecraft.src.ChunkCoordinates;
+import net.minecraft.util.ChunkCoordinates;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.LinkedHashMap;
 
 /**

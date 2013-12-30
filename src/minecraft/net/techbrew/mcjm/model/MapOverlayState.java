@@ -1,7 +1,8 @@
 package net.techbrew.mcjm.model;
 
-import net.minecraft.src.EntityClientPlayerMP;
-import net.minecraft.src.Minecraft;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.data.*;
@@ -19,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+;
 
 public class MapOverlayState {
 

@@ -1,14 +1,14 @@
 package net.techbrew.mcjm.model;
 
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.techbrew.mcjm.cartography.MapBlocks;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import net.minecraft.src.Chunk;
-import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.EnumSkyBlock;
-import net.minecraft.src.World;
-import net.techbrew.mcjm.cartography.MapBlocks;
 
 /**
  * ChunkStub MetaData wrapper for the various bits
@@ -29,7 +29,7 @@ public class ChunkMD {
 	public Boolean render;
 	private int discards;
 	
-	public ChunkMD(Chunk chunk, Boolean render, World worldObj) {		
+	public ChunkMD(Chunk chunk, Boolean render, World worldObj) {
 		this(chunk,render,worldObj,false);
 	}
 	

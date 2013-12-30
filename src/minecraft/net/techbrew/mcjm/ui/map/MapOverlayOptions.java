@@ -1,6 +1,6 @@
 package net.techbrew.mcjm.ui.map;
 
-import net.minecraft.src.GuiButton;
+import net.minecraft.client.gui.GuiButton;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.DataCache;
@@ -10,7 +10,9 @@ import net.techbrew.mcjm.feature.Feature;
 import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.WaypointHelper;
-import net.techbrew.mcjm.ui.*;
+import net.techbrew.mcjm.ui.JmUI;
+import net.techbrew.mcjm.ui.MapButton;
+import net.techbrew.mcjm.ui.UIManager;
 import org.lwjgl.input.Keyboard;
 
 public class MapOverlayOptions extends JmUI {

@@ -1,9 +1,9 @@
 package net.techbrew.mcjm.render;
 
-import java.awt.Color;
-import java.io.Serializable;
+import net.minecraft.block.Block;
 
-import net.minecraft.src.Block;
+import java.awt.*;
+import java.io.Serializable;
 
 
 public class BlockInfo implements Serializable {

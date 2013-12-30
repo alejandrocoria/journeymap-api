@@ -1,17 +1,13 @@
 package net.techbrew.mcjm.data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import net.minecraft.src.EntityVillager;
-import net.minecraft.src.StringUtils;
+import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.util.StringUtils;
 import net.techbrew.mcjm.feature.Feature;
 import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.model.EntityHelper;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Provides nearby mobs in a Map.
@@ -65,7 +61,7 @@ public class VillagersData implements IDataProvider {
 			
 			// CustomName
 			if(entity.hasCustomNameTag()) {
-				eProps.put(EntityKey.customName, StringUtils.stripControlCodes(entity.getCustomNameTag())); 
+				eProps.put(EntityKey.customName, StringUtils.stripControlCodes(entity.getCustomNameTag()));
 			}
 						
 			list.add(eProps);

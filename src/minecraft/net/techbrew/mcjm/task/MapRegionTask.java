@@ -1,14 +1,8 @@
 package net.techbrew.mcjm.task;
 
-import java.io.File;
-import java.text.DecimalFormat;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.World;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
@@ -22,6 +16,12 @@ import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
+
+import java.io.File;
+import java.text.DecimalFormat;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MapRegionTask extends BaseMapTask {
 	

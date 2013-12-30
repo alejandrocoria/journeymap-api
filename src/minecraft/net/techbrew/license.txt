@@ -42,10 +42,6 @@ JourneyMap includes and/or makes use of the following software under their respe
     https://code.google.com/p/pngj/
     Apache License 2.0: http://www.apache.org/licenses/LICENSE-2.0
 
-    Risugami's Modloader
-    http://www.minecraftforum.net/topic/75440-
-    License: Unspecified, assumed public domain
-
     Rupy NIO HTTP application server
     https://code.google.com/p/rupy/
     GNU Lesser General Public License: http://www.gnu.org/licenses/lgpl.html

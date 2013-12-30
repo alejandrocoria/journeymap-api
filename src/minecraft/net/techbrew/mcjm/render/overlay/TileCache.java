@@ -7,9 +7,7 @@ import com.google.common.cache.RemovalNotification;
 import net.techbrew.mcjm.JourneyMap;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;

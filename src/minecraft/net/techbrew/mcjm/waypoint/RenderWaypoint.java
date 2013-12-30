@@ -1,13 +1,16 @@
 package net.techbrew.mcjm.waypoint;
 
-import com.thevoxelbox.voxelmap.VoxelMap;
-import net.minecraft.src.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderEntity;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.ChunkCoordinates;
 import net.techbrew.mcjm.model.Waypoint;
 import net.techbrew.mcjm.render.draw.DrawUtil;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import org.lwjgl.opengl.GL11;
-
-import java.awt.*;
 
 /**
  * Created by mwoodman on 12/26/13.

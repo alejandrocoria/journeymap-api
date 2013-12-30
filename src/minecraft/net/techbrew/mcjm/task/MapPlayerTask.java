@@ -1,14 +1,10 @@
 package net.techbrew.mcjm.task;
 
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.ChunkCoordinates;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.World;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.EntityKey;
@@ -16,6 +12,10 @@ import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.io.nbt.ChunkLoader;
 import net.techbrew.mcjm.model.ChunkMD;
+
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MapPlayerTask extends BaseMapTask {
 	

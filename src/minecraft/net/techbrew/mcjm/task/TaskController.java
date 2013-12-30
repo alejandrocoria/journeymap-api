@@ -1,17 +1,17 @@
 package net.techbrew.mcjm.task;
 
+import net.minecraft.client.Minecraft;
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.log.StatTimer;
+import net.techbrew.mcjm.thread.TaskThread;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import net.minecraft.src.Minecraft;
-import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.log.StatTimer;
-import net.techbrew.mcjm.thread.TaskThread;
 
 public class TaskController {
 	

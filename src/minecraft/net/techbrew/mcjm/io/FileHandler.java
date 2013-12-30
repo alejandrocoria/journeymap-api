@@ -1,36 +1,26 @@
 package net.techbrew.mcjm.io;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.logging.Level;
 
-import javax.imageio.ImageIO;
-
-import net.minecraft.src.EnumOS;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.EnumOS;
+import net.minecraft.util.Util;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.EntityHelper;
-
 import org.lwjgl.Sys;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.logging.Level;
 
 public class FileHandler {
 
@@ -41,7 +31,7 @@ public class FileHandler {
 	public static volatile String lastMCFolderName = "";
 	public static volatile File lastMCWorldDir = null;
 	
-	public static File getMCWorldDir(Minecraft minecraft) {		
+	public static File getMCWorldDir(Minecraft minecraft) {
 		if(minecraft.isIntegratedServerRunning()) {
 			if(lastMCWorldDir==null || !lastMCFolderName.equals(minecraft.getIntegratedServer().getFolderName())) {
 				lastMCFolderName = minecraft.getIntegratedServer().getFolderName();

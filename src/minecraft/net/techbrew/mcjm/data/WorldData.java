@@ -1,5 +1,12 @@
 package net.techbrew.mcjm.data;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.NetClientHandler;
+import net.minecraft.world.storage.MapStorage;
+import net.minecraft.world.storage.WorldInfo;
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.feature.FeatureManager;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
@@ -10,12 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.src.MapStorage;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.NetClientHandler;
-import net.minecraft.src.WorldInfo;
-import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.feature.FeatureManager;
+;
 
 /**
  * Provides game-related properties in a Map.
@@ -120,7 +122,7 @@ public class WorldData implements IDataProvider {
 		try
 	    {
 			NetClientHandler sendQueue = Minecraft.getMinecraft().getNetHandler();
-			MapStorage ms = sendQueue.mapStorage;			
+			MapStorage ms = sendQueue.mapStorage;
 	        SocketAddress socketAddress = sendQueue.getNetManager().getSocketAddress();
 	        if ((socketAddress instanceof InetSocketAddress))
 	        {

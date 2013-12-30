@@ -1,7 +1,7 @@
 package net.techbrew.mcjm.ui.minimap;
 
-import net.minecraft.src.EntityClientPlayerMP;
-import net.minecraft.src.Minecraft;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
@@ -9,7 +9,6 @@ import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.MapOverlayState;
-import net.techbrew.mcjm.model.Waypoint;
 import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.draw.DrawEntityStep;
 import net.techbrew.mcjm.render.draw.DrawStep;
@@ -17,18 +16,18 @@ import net.techbrew.mcjm.render.draw.DrawUtil;
 import net.techbrew.mcjm.render.overlay.GridRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
-import net.techbrew.mcjm.render.overlay.WaypointRenderer;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.ui.JmUI;
 import net.techbrew.mcjm.ui.map.MapOverlay;
 import org.lwjgl.opengl.GL11;
 
-import java.util.List;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
+
+;
 
 /**
  * Displays the map as a minimap overlay in-game.

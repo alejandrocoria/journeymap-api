@@ -1,5 +1,11 @@
 package net.techbrew.mcjm.model;
-import java.awt.Graphics2D;
+
+import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.Constants.MapType;
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.io.RegionImageHandler;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
@@ -9,11 +15,6 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import net.techbrew.mcjm.Constants;
-import net.techbrew.mcjm.Constants.MapType;
-import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.RegionImageHandler;
 
 /**
  * A RegionImageSet contains one or more Wrappers of image, file, and maptype.

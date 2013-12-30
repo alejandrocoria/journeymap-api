@@ -1,13 +1,13 @@
 package net.techbrew.mcjm.data;
 
+import net.techbrew.mcjm.model.Waypoint;
+import net.techbrew.mcjm.model.WaypointHelper;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import net.techbrew.mcjm.model.Waypoint;
-import net.techbrew.mcjm.model.WaypointHelper;
 
 /**
  * Provides waypoint data

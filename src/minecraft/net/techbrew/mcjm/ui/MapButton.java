@@ -1,10 +1,9 @@
 package net.techbrew.mcjm.ui;
 
-import net.minecraft.src.DynamicTexture;
-import net.minecraft.src.GuiSmallButton;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.Tessellator;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiSmallButton;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import org.lwjgl.opengl.GL11;
 

@@ -1,21 +1,19 @@
 package net.techbrew.mcjm.cartography;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
-import java.util.logging.Level;
-
-import net.minecraft.src.Block;
-import net.minecraft.src.EnumSkyBlock;
-import net.minecraft.src.MathHelper;
+import net.minecraft.block.Block;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.render.BlockInfo;
+
+import java.awt.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Stack;
+import java.util.logging.Level;
 
 public class ChunkStandardRenderer extends BaseRenderer implements IChunkRenderer {
 
@@ -381,7 +379,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						float[] rgb = new float[4];
 						rgb = color.getRGBColorComponents(rgb);
 						color = new Color(
-								MathHelper.clamp_float(rgb[0] * darken, 0f, 1f), 
+								MathHelper.clamp_float(rgb[0] * darken, 0f, 1f),
 								MathHelper.clamp_float(rgb[1] * darken, 0f, 1f), 
 								MathHelper.clamp_float(rgb[2] * darken, 0f, 1f));
 					}
@@ -448,7 +446,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		}
 		
 		float depth = stack.size();
-		boolean thinWaterAdjust = (depth==2 && blockInfo.id==Block.waterStill.blockID);
+		boolean thinWaterAdjust = (depth==2 && blockInfo.id== Block.waterStill.blockID);
 		boolean isWater = (blockInfo.id==Block.waterStill.blockID || blockInfo.id==Block.waterMoving.blockID);		
 		
 		Color color;

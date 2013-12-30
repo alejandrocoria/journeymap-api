@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="launchwrapper-1.8">
+    <CLASSES>
+      <root url="jar://$MCP_LOC$/jars/libraries/net/minecraft/launchwrapper/1.8/launchwrapper-1.8.jar!/" />
+      <root url="jar://$MCP_LOC$/jars/libraries/net/java/jutils/jutils/1.0.0/jutils-1.0.0.jar!/" />
+      <root url="jar://$MCP_LOC$/jars/libraries/net/sf/jopt-simple/jopt-simple/4.5/jopt-simple-4.5.jar!/" />
+      <root url="jar://$MCP_LOC$/jars/libraries/net/java/jinput/jinput/2.0.5/jinput-2.0.5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,10 +1,12 @@
 package net.techbrew.mcjm.feature;
 
+import net.minecraft.client.Minecraft;
+
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.src.Minecraft;
+;
 
 public enum Feature {
 

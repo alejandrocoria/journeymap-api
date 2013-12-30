@@ -1,11 +1,7 @@
 package net.techbrew.mcjm.server;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Properties;
-
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.World;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
@@ -16,6 +12,12 @@ import net.techbrew.mcjm.task.MapRegionTask;
 import net.techbrew.mcjm.task.SaveMapTask;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Properties;
+
+;
 /**
  * Service delegate for special actions.
  *
@@ -48,7 +50,7 @@ public class ActionService extends BaseService {
 
 		// Check world
 		Minecraft minecraft = Minecraft.getMinecraft();
-		World theWorld = minecraft.theWorld; 
+		World theWorld = minecraft.theWorld;
 		if (theWorld == null) {
 			throwEventException(503, Constants.getMessageJMERR09(), event, false);
 		}

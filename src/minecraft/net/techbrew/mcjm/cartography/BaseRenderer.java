@@ -1,15 +1,15 @@
 package net.techbrew.mcjm.cartography;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.util.logging.Level;
 
-import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.EnumSkyBlock;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.render.BlockInfo;
+
+import java.awt.*;
+import java.util.logging.Level;
 
 /**
  * Base class for methods reusable across renderers.

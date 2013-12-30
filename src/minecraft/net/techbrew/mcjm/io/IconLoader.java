@@ -1,23 +1,22 @@
 package net.techbrew.mcjm.io;
 
-import java.awt.Color;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.cartography.MapBlocks;
+import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.render.BlockInfo;
+import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import net.minecraft.src.Block;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.TextureAtlasSprite;
-import net.minecraft.src.TextureMap;
-import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.render.BlockInfo;
-import net.techbrew.mcjm.cartography.MapBlocks;
-
-import org.lwjgl.opengl.GL11;
 
 public class IconLoader {
 	

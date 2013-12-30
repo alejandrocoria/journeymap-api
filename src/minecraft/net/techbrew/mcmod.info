@@ -1,6 +1,6 @@
 [
 {
-  "modid": "mod_JourneyMap",
+  "modid": "JourneyMap",
   "name": "JourneyMap",
   "description": "Real-time map in-game or in a web browser as you explore.",
   "version": "@JMVERSION@ @EDITION@ Edition",

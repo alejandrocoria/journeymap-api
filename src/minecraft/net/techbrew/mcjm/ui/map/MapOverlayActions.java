@@ -1,11 +1,7 @@
 package net.techbrew.mcjm.ui.map;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import net.minecraft.src.GuiButton;
-import net.minecraft.src.Minecraft;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
@@ -19,8 +15,12 @@ import net.techbrew.mcjm.task.SaveMapTask;
 import net.techbrew.mcjm.ui.JmUI;
 import net.techbrew.mcjm.ui.MapButton;
 import net.techbrew.mcjm.ui.UIManager;
-
 import org.lwjgl.input.Keyboard;
+
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 public class MapOverlayActions extends JmUI {
 

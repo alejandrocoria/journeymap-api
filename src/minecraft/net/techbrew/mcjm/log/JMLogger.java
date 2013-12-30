@@ -1,14 +1,16 @@
 package net.techbrew.mcjm.log;
 
+import net.minecraft.client.Minecraft;
+import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.io.FileHandler;
+import net.techbrew.mcjm.io.PropertyManager;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.minecraft.src.Minecraft;
-import net.techbrew.mcjm.Constants;
-import net.techbrew.mcjm.io.FileHandler;
-import net.techbrew.mcjm.io.PropertyManager;
+;
 
 public class JMLogger extends Logger {
 

@@ -1,10 +1,10 @@
 package net.techbrew.mcjm.feature.impl;
 
-import java.util.EnumSet;
-
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.feature.Feature;
 import net.techbrew.mcjm.feature.FeatureManager.FeatureSet;
+
+import java.util.EnumSet;
 
 /**
  * Unlimited features.

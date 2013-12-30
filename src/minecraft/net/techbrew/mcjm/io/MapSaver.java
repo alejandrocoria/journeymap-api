@@ -1,5 +1,14 @@
 package net.techbrew.mcjm.io;
 
+import net.minecraft.client.Minecraft;
+import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.Constants.MapType;
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.data.WorldData;
+import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.RegionCoord;
+import net.techbrew.mcjm.model.RegionImageCache;
+
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -9,14 +18,7 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.minecraft.src.Minecraft;
-import net.techbrew.mcjm.Constants;
-import net.techbrew.mcjm.Constants.MapType;
-import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.data.WorldData;
-import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.RegionCoord;
-import net.techbrew.mcjm.model.RegionImageCache;
+;
 
 /**
  * Merges all region files into a single image

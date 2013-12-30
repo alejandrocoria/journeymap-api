@@ -1,5 +1,10 @@
 package net.techbrew.mcjm.server;
 
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.thread.JMThreadFactory;
+import se.rupy.http.Daemon;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
@@ -8,11 +13,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.thread.JMThreadFactory;
-import se.rupy.http.Daemon;
 
 /**
  * Wraps Rupy Daemon and provides thread management.  Tests webserver_port

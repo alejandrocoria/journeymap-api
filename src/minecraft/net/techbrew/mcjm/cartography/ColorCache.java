@@ -1,6 +1,13 @@
 package net.techbrew.mcjm.cartography;
 
-import net.minecraft.src.*;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.ReloadableResourceManager;
+import net.minecraft.client.resources.ResourceManager;
+import net.minecraft.client.resources.ResourceManagerReloadListener;
+import net.minecraft.client.resources.ResourcePackRepository;
+import net.minecraft.world.ColorizerFoliage;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.IconLoader;
@@ -58,7 +65,7 @@ public class ColorCache implements ResourceManagerReloadListener {
 	public void onResourceManagerReload(ResourceManager var1) {
 		
 		// Check if the resourcepack has changed
-		ResourcePackRepository repo = Minecraft.getMinecraft().getResourcePackRepository();		
+		ResourcePackRepository repo = Minecraft.getMinecraft().getResourcePackRepository();
     	String currentPack = repo.getResourcePackName();
     	
     	if(JourneyMap.getInstance().isMapping()) {
@@ -144,7 +151,7 @@ public class ColorCache implements ResourceManagerReloadListener {
 		if(color==null) {
 			int leafColor;
 			if(Arrays.binarySearch(leafColorPineMeta, blockInfo.meta)>=0) {
-				leafColor = ColorizerFoliage.getFoliageColorPine(); 
+				leafColor = ColorizerFoliage.getFoliageColorPine();
 			} else if(Arrays.binarySearch(leafColorBirchMeta, blockInfo.meta)>=0) {
 				leafColor = ColorizerFoliage.getFoliageColorBirch(); 
 			} else {
@@ -234,7 +241,7 @@ public class ColorCache implements ResourceManagerReloadListener {
 						if(tint!=16777215 && tint!=-1){
 							color = colorMultiplier(color, tint);
 						}
-					} else if(blockInfo.id==Block.waterlily.blockID) {
+					} else if(blockInfo.id== Block.waterlily.blockID) {
 						color = colorMultiplier(color, Block.waterlily.getBlockColor());
 					} 
 					colors.put(blockInfo, color);

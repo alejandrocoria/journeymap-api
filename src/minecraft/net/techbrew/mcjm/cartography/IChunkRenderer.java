@@ -1,8 +1,8 @@
 package net.techbrew.mcjm.cartography;
 
-import java.awt.Graphics2D;
-
 import net.techbrew.mcjm.model.ChunkMD;
+
+import java.awt.*;
 
 public interface IChunkRenderer {
 	

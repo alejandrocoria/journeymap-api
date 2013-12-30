@@ -1,21 +1,16 @@
 package net.techbrew.mcjm.render.overlay;
 
-import net.minecraft.src.ChunkCoordIntPair;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.render.texture.DelayedTexture;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.render.texture.TextureImpl;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Date;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;

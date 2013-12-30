@@ -1,15 +1,15 @@
 package net.techbrew.mcjm.cartography;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.util.logging.Level;
 
-import net.minecraft.src.EnumSkyBlock;
+import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.render.BlockInfo;
+
+import java.awt.*;
+import java.util.logging.Level;
 
 /**
  * Render a chunk in the Nether.

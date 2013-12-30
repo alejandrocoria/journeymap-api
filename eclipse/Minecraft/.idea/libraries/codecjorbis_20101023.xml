@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="codecjorbis-20101023">
+    <CLASSES>
+      <root url="jar://$MCP_LOC$/jars/libraries/com/paulscode/codecjorbis/20101023/codecjorbis-20101023.jar!/" />
+      <root url="jar://$MCP_LOC$/jars/libraries/com/paulscode/codecwav/20101023/codecwav-20101023.jar!/" />
+      <root url="jar://$MCP_LOC$/jars/libraries/commons-io/commons-io/2.4/commons-io-2.4.jar!/" />
+      <root url="jar://$MCP_LOC$/jars/libraries/org/apache/commons/commons-lang3/3.1/commons-lang3-3.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,15 +1,11 @@
 package net.techbrew.mcjm.io;
 
+import ar.com.hjg.pngj.*;
+import ar.com.hjg.pngj.chunks.ChunkLoadBehaviour;
+import net.techbrew.mcjm.JourneyMap;
+
 import java.io.File;
 import java.util.Arrays;
-
-import net.techbrew.mcjm.JourneyMap;
-import ar.com.hjg.pngj.FileHelper;
-import ar.com.hjg.pngj.ImageInfo;
-import ar.com.hjg.pngj.ImageLine;
-import ar.com.hjg.pngj.PngReader;
-import ar.com.hjg.pngj.PngWriter;
-import ar.com.hjg.pngj.chunks.ChunkLoadBehaviour;
 
 /**
  * Encapsulates knowledge of PngJ

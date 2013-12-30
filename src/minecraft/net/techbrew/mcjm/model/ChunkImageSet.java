@@ -1,9 +1,9 @@
 package net.techbrew.mcjm.model;
-import java.awt.image.BufferedImage;
-
-import javax.naming.OperationNotSupportedException;
 
 import net.techbrew.mcjm.Constants;
+
+import javax.naming.OperationNotSupportedException;
+import java.awt.image.BufferedImage;
 
 /**
  * A ChunkImageSet contains one or more Wrappers of image, file, and maptype.

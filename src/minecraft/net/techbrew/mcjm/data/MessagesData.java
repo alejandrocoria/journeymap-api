@@ -1,13 +1,15 @@
 package net.techbrew.mcjm.data;
 
+import net.minecraft.client.Minecraft;
+import net.techbrew.mcjm.Constants;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.src.Minecraft;
-import net.techbrew.mcjm.Constants;
+;
 
 /**
  * Provides game-related properties in a Map.

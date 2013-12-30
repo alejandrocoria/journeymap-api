@@ -2,7 +2,6 @@ package net.techbrew.mcjm.log;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import net.techbrew.mcjm.JourneyMap;
-import sun.rmi.runtime.Log;
 
 import java.text.DecimalFormat;
 import java.util.*;

@@ -1,6 +1,7 @@
 package net.techbrew.mcjm.ui;
 
-import net.minecraft.src.GuiScreen;
+
+import net.minecraft.client.gui.GuiScreen;
 import net.techbrew.mcjm.render.draw.DrawUtil;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.render.texture.TextureImpl;

@@ -1,11 +1,11 @@
 package net.techbrew.mcjm.data;
 
+import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.model.WaypointHelper;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.model.WaypointHelper;
 
 /**
  * Provides game-related properties in a Map.

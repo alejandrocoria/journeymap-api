@@ -1,10 +1,10 @@
 package net.techbrew.mcjm.feature;
 
+import net.techbrew.mcjm.feature.impl.FairPlay;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import net.techbrew.mcjm.feature.impl.FairPlay;
 
 public class FeatureManager {
 

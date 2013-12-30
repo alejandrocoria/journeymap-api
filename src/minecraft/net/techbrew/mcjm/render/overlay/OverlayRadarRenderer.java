@@ -1,13 +1,13 @@
 package net.techbrew.mcjm.render.overlay;
 
-import net.minecraft.src.Minecraft;
+import net.minecraft.client.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.render.draw.DrawStep;
 import net.techbrew.mcjm.render.draw.DrawCenteredLabelStep;
 import net.techbrew.mcjm.render.draw.DrawEntityStep;
+import net.techbrew.mcjm.render.draw.DrawStep;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.render.texture.TextureImpl;
 
@@ -15,6 +15,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+;
 
 /**
  * Renders an entity image in the MapOverlay.

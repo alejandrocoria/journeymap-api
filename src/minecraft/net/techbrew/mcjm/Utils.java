@@ -1,9 +1,12 @@
 package net.techbrew.mcjm;
 
-import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.Minecraft;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.ChunkCoordIntPair;
 
 import java.lang.reflect.Field;
+
+;
 
 
 public class Utils {

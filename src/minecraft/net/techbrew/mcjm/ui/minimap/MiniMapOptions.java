@@ -1,9 +1,11 @@
 package net.techbrew.mcjm.ui.minimap;
 
-import net.minecraft.src.GuiButton;
+import net.minecraft.client.gui.GuiButton;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.ui.*;
+import net.techbrew.mcjm.ui.JmUI;
+import net.techbrew.mcjm.ui.MapButton;
+import net.techbrew.mcjm.ui.UIManager;
 import net.techbrew.mcjm.ui.map.MapOverlay;
 import org.lwjgl.input.Keyboard;
 

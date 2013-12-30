@@ -1,13 +1,20 @@
 package net.techbrew.mcjm.model;
 
-import net.minecraft.src.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.EntityList;
+import net.minecraft.util.ChunkCoordinates;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.waypoint.EntityWaypoint;
 import net.techbrew.mcjm.waypoint.RenderWaypoint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Get waypoints

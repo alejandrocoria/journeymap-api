@@ -1,8 +1,9 @@
 package net.techbrew.mcjm.render.draw;
 
-import net.minecraft.src.FontRenderer;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.Tessellator;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.mcjm.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
 

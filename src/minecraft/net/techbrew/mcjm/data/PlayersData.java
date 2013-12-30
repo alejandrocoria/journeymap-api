@@ -1,16 +1,12 @@
 package net.techbrew.mcjm.data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import net.minecraft.src.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayer;
 import net.techbrew.mcjm.feature.Feature;
 import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.model.EntityHelper;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Provides game-related properties in a Map.

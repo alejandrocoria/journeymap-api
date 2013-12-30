@@ -1,10 +1,12 @@
 package net.techbrew.mcjm.task;
 
-import java.util.logging.Logger;
-
-import net.minecraft.src.Minecraft;
+import net.minecraft.client.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.MapSaver;
+
+import java.util.logging.Logger;
+
+;
 
 public class SaveMapTask implements IGenericTask {
 	

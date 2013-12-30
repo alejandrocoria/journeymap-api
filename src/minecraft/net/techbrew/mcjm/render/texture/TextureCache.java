@@ -1,14 +1,13 @@
 package net.techbrew.mcjm.render.texture;
 
-import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.DynamicTexture;
-import net.minecraft.src.ResourceLocation;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.render.overlay.Tile;
 import net.techbrew.mcjm.thread.JMThreadFactory;
 

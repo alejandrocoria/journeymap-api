@@ -1,7 +1,7 @@
 package net.techbrew.mcjm.ui.map;
 
-import net.minecraft.src.GuiTextField;
-import net.minecraft.src.Packet203AutoComplete;
+import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.network.packet.Packet203AutoComplete;
 import net.techbrew.mcjm.ui.JmUI;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;

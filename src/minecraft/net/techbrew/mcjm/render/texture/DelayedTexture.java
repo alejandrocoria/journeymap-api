@@ -1,10 +1,10 @@
 package net.techbrew.mcjm.render.texture;
 
-import net.minecraft.src.TextureUtil;
+
+import net.minecraft.client.renderer.texture.TextureUtil;
 import net.techbrew.mcjm.io.RegionImageHandler;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

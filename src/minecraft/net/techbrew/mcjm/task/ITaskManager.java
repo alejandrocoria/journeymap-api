@@ -1,6 +1,7 @@
 package net.techbrew.mcjm.task;
 
-import net.minecraft.src.Minecraft;
+
+import net.minecraft.client.Minecraft;
 
 public interface ITaskManager {
 

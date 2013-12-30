@@ -1,12 +1,8 @@
 package net.techbrew.mcjm.server;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.logging.Level;
-
-import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.World;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
@@ -15,6 +11,10 @@ import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.RegionImageHandler;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.logging.Level;
 
 /**
  * Provides a map image by combining region files.

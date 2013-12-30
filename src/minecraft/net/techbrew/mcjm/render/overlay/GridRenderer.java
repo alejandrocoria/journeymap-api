@@ -1,8 +1,8 @@
 package net.techbrew.mcjm.render.overlay;
 
 import com.google.common.cache.Cache;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.Tessellator;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.render.draw.DrawStep;

@@ -1,10 +1,10 @@
 package net.techbrew.mcjm.feature.impl;
 
-import java.util.Set;
-
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.feature.Feature;
 import net.techbrew.mcjm.feature.FeatureManager.FeatureSet;
+
+import java.util.Set;
 
 /**
  * Fair Play features - no Multiplayer features

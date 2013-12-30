@@ -1,17 +1,18 @@
 package net.techbrew.mcjm.data;
 
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.cartography.MapBlocks;
+import net.techbrew.mcjm.model.ChunkMD;
+import net.techbrew.mcjm.model.EntityHelper;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import net.minecraft.src.EntityClientPlayerMP;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.World;
-import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.model.ChunkMD;
-import net.techbrew.mcjm.model.EntityHelper;
-import net.techbrew.mcjm.cartography.MapBlocks;
 
 /**
  * Provides game-related properties in a Map.
@@ -44,7 +45,7 @@ public class PlayerData implements IDataProvider {
 	public Map getMap(Map optionalParams) {		
 		
 		Minecraft mc = Minecraft.getMinecraft();
-		EntityClientPlayerMP player = mc.thePlayer;			
+		EntityClientPlayerMP player = mc.thePlayer;
 	   
 		LinkedHashMap props = new LinkedHashMap();
 		props.put(EntityKey.entityId, player.entityId); 

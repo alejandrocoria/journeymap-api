@@ -1,22 +1,18 @@
 package net.techbrew.mcjm.data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityGhast;
-import net.minecraft.src.EntityLiving;
-import net.minecraft.src.EntityMob;
-import net.minecraft.src.IBossDisplayData;
-import net.minecraft.src.IRangedAttackMob;
-import net.minecraft.src.StringUtils;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.IRangedAttackMob;
+import net.minecraft.entity.boss.IBossDisplayData;
+import net.minecraft.entity.monster.EntityGhast;
+import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.util.StringUtils;
 import net.techbrew.mcjm.feature.Feature;
 import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.model.EntityHelper;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Provides nearby mobs in a Map.
@@ -75,7 +71,7 @@ public class MobsData implements IDataProvider {
 				// CustomName
 				if(entity instanceof EntityLiving) {
 					if(((EntityLiving)entity).hasCustomNameTag()) {
-						eProps.put(EntityKey.customName, StringUtils.stripControlCodes(((EntityLiving)entity).getCustomNameTag())); 
+						eProps.put(EntityKey.customName, StringUtils.stripControlCodes(((EntityLiving) entity).getCustomNameTag()));
 					}
 				}
 				

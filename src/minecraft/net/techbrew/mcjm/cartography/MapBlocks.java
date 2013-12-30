@@ -1,15 +1,15 @@
 package net.techbrew.mcjm.cartography;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.util.HashMap;
-import java.util.HashSet;
 
-import net.minecraft.src.Block;
+import net.minecraft.block.Block;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.render.BlockInfo;
+
+import java.awt.*;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class MapBlocks extends HashMap {
 	

@@ -1,12 +1,12 @@
 package net.techbrew.mcjm.server;
 
-import java.net.URLEncoder;
-
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.JsonHelper;
 import net.techbrew.mcjm.io.PropertyManager;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
+
+import java.net.URLEncoder;
 
 /**
  * Provide player data

@@ -1,10 +1,10 @@
 package net.techbrew.mcjm.model;
 
+import net.minecraft.world.ChunkCoordIntPair;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.minecraft.src.ChunkCoordIntPair;
 
 public class RegionCoord implements Comparable<RegionCoord>{
 	

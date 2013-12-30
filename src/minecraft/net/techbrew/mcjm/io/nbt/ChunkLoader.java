@@ -1,28 +1,28 @@
 package net.techbrew.mcjm.io.nbt;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.util.logging.Logger;
-
-import net.minecraft.src.Chunk;
-import net.minecraft.src.CompressedStreamTools;
-import net.minecraft.src.EmptyChunk;
-import net.minecraft.src.ExtendedBlockStorage;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.NBTTagList;
-import net.minecraft.src.NibbleArray;
-import net.minecraft.src.RegionFileCache;
-import net.minecraft.src.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.EmptyChunk;
+import net.minecraft.world.chunk.NibbleArray;
+import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import net.minecraft.world.chunk.storage.RegionFileCache;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkMD;
+
+import java.io.DataInputStream;
+import java.io.File;
+import java.util.logging.Logger;
 
 public class ChunkLoader {
 	
 	private static Logger logger = JourneyMap.getLogger();
 	
-	public static ChunkMD getChunkStubFromDisk(int chunkX, int chunkZ, File worldDir, World world) {		
+	public static ChunkMD getChunkStubFromDisk(int chunkX, int chunkZ, File worldDir, World world) {
 		
 		Chunk chunk = getChunkFromDisk(chunkX, chunkZ, worldDir, world);
 		if(chunk==null) {

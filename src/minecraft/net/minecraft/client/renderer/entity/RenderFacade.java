@@ -1,4 +1,7 @@
-package net.minecraft.src;
+package net.minecraft.client.renderer.entity;
+
+import net.minecraft.entity.Entity;
+import net.minecraft.util.ResourceLocation;
 
 public class RenderFacade extends Render {
 	

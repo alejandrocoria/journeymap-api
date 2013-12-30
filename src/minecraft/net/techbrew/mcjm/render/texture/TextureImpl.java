@@ -1,9 +1,9 @@
 package net.techbrew.mcjm.render.texture;
 
-import net.minecraft.src.AbstractTexture;
-import net.minecraft.src.GLAllocation;
-import net.minecraft.src.ResourceManager;
-import net.minecraft.src.TextureUtil;
+import net.minecraft.client.renderer.GLAllocation;
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.TextureUtil;
+import net.minecraft.client.resources.ResourceManager;
 import net.techbrew.mcjm.log.StatTimer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;

@@ -1,9 +1,10 @@
 package net.techbrew.mcjm.ui.map;
 
-import net.minecraft.src.EntityClientPlayerMP;
-import net.minecraft.src.GuiButton;
-import net.minecraft.src.GuiInventory;
-import net.minecraft.src.Minecraft;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.VersionCheck;

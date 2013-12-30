@@ -1,6 +1,7 @@
 package net.techbrew.mcjm.task;
 
-import net.minecraft.src.World;
+
+import net.minecraft.world.World;
 import net.techbrew.mcjm.model.ChunkMD;
 
 public interface IMapTask extends ITask {

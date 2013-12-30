@@ -1,16 +1,7 @@
 package net.techbrew.mcjm.task;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Stack;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.World;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
@@ -20,6 +11,17 @@ import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageSet;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.Stack;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+;
 
 public class LegacyMigrationTask implements IGenericTask {
 	

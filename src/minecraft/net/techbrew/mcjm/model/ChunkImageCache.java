@@ -1,9 +1,9 @@
 package net.techbrew.mcjm.model;
 
+import net.techbrew.mcjm.Constants.MapType;
+
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
-
-import net.techbrew.mcjm.Constants.MapType;
 
 public class ChunkImageCache extends HashMap<ChunkCoord, ChunkImageSet> {
 	

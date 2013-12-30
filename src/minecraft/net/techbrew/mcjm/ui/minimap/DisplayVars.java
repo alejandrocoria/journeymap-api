@@ -1,9 +1,8 @@
 package net.techbrew.mcjm.ui.minimap;
 
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.ScaledResolution;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
 import net.techbrew.mcjm.Constants;
-import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import net.techbrew.mcjm.render.texture.TextureImpl;
 

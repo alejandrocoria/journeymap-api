@@ -1,34 +1,27 @@
 package net.techbrew.mcjm.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import net.minecraft.src.AxisAlignedBB;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityAnimal;
-import net.minecraft.src.EntityGolem;
-import net.minecraft.src.EntityHorse;
-import net.minecraft.src.EntityLiving;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.EntityPlayerSP;
-import net.minecraft.src.EntityVillager;
-import net.minecraft.src.EntityWaterMob;
-import net.minecraft.src.IAnimals;
-import net.minecraft.src.IBossDisplayData;
-import net.minecraft.src.IMob;
-import net.minecraft.src.IRangedAttackMob;
-import net.minecraft.src.Minecraft;
-import net.minecraft.src.RenderFacade;
-import net.minecraft.src.RenderHorse;
-import net.minecraft.src.RenderLiving;
-import net.minecraft.src.RenderManager;
-import net.minecraft.src.ResourceLocation;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.renderer.entity.RenderFacade;
+import net.minecraft.client.renderer.entity.RenderHorse;
+import net.minecraft.client.renderer.entity.RenderLiving;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.IRangedAttackMob;
+import net.minecraft.entity.boss.IBossDisplayData;
+import net.minecraft.entity.monster.EntityGolem;
+import net.minecraft.entity.monster.IMob;
+import net.minecraft.entity.passive.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ResourceLocation;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.io.PropertyManager;
+
+import java.util.*;
+
+;
 
 public class EntityHelper {
 	
@@ -45,7 +38,7 @@ public class EntityHelper {
 		AxisAlignedBB bb = getBB(mc.thePlayer);
 		List list = mc.theWorld.getEntitiesWithinAABB(IMob.class, bb);
 		list.addAll(mc.theWorld.getEntitiesWithinAABB(IBossDisplayData.class, bb));
-		list.addAll(mc.theWorld.getEntitiesWithinAABB(IRangedAttackMob.class, bb));		
+		list.addAll(mc.theWorld.getEntitiesWithinAABB(IRangedAttackMob.class, bb));
 		return list;
 	}
 	
@@ -98,7 +91,7 @@ public class EntityHelper {
 	/**
 	 * Get the entity's heading in degrees
 	 * 
-	 * @param player
+	 * @param entity
 	 * @return
 	 */
 	public static double getHeading(Entity entity) {
@@ -153,7 +146,7 @@ public class EntityHelper {
 		RenderLiving render = (RenderLiving) RenderManager.instance.getEntityRenderObject(entity);
 		
 		// Manually handle horses
-		if(render instanceof RenderHorse) {			
+		if(render instanceof RenderHorse) {
 			switch (((EntityHorse) entity).getHorseType())
 	        {
 		        case 0:

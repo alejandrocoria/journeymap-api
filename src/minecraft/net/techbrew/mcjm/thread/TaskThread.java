@@ -1,5 +1,21 @@
 package net.techbrew.mcjm.thread;
 
+import net.minecraft.client.Minecraft;
+import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.Constants.MapType;
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.cartography.ChunkRenderController;
+import net.techbrew.mcjm.io.FileHandler;
+import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.log.StatTimer;
+import net.techbrew.mcjm.model.ChunkCoord;
+import net.techbrew.mcjm.model.ChunkImageCache;
+import net.techbrew.mcjm.model.ChunkMD;
+import net.techbrew.mcjm.model.RegionImageCache;
+import net.techbrew.mcjm.task.IGenericTask;
+import net.techbrew.mcjm.task.IMapTask;
+import net.techbrew.mcjm.task.ITask;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Iterator;
@@ -8,21 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.minecraft.src.Minecraft;
-import net.techbrew.mcjm.Constants;
-import net.techbrew.mcjm.Constants.MapType;
-import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.FileHandler;
-import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.log.StatTimer;
-import net.techbrew.mcjm.model.ChunkCoord;
-import net.techbrew.mcjm.model.ChunkImageCache;
-import net.techbrew.mcjm.model.ChunkMD;
-import net.techbrew.mcjm.model.RegionImageCache;
-import net.techbrew.mcjm.cartography.ChunkRenderController;
-import net.techbrew.mcjm.task.IGenericTask;
-import net.techbrew.mcjm.task.IMapTask;
-import net.techbrew.mcjm.task.ITask;
+;
 
 public class TaskThread implements Runnable {
 

@@ -1,6 +1,10 @@
 package net.techbrew.mcjm.ui;
 
-import net.minecraft.src.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiChat;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -8,8 +12,8 @@ import net.techbrew.mcjm.render.overlay.TileCache;
 import net.techbrew.mcjm.ui.map.MapOverlay;
 import net.techbrew.mcjm.ui.map.MapOverlayActions;
 import net.techbrew.mcjm.ui.map.MapOverlayOptions;
-import net.techbrew.mcjm.ui.minimap.MiniMapOptions;
 import net.techbrew.mcjm.ui.minimap.MiniMap;
+import net.techbrew.mcjm.ui.minimap.MiniMapOptions;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

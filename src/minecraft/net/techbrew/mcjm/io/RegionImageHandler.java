@@ -1,26 +1,23 @@
 package net.techbrew.mcjm.io;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.logging.Level;
 
-import javax.imageio.ImageIO;
-
-import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.Minecraft;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.logging.Level;
 
 public class RegionImageHandler {
 	
@@ -192,19 +189,22 @@ public class RegionImageHandler {
 			return null;
 		}
 	}
-	
-	
-	/**
-	 * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2)
-	 * @param worldDir
-	 * @param cx1
-	 * @param cz1
-	 * @param cx2
-	 * @param cz2
-	 * @param mapType
-	 * @param vSlice
-	 * @throws IOException
-	 */
+
+
+    /**
+     * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2)
+     * @param worldDir
+     * @param startCoord
+     * @param endCoord
+     * @param mapType
+     * @param vSlice
+     * @param dimension
+     * @param useCache
+     * @param imageWidth
+     * @param imageHeight
+     * @param allowNullImage
+     * @return
+     */
 	public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType, Integer vSlice, final int dimension, final Boolean useCache, final Integer imageWidth, final Integer imageHeight, final boolean allowNullImage) {
 		
 		long start = 0, stop = 0;		
@@ -313,18 +313,18 @@ public class RegionImageHandler {
 		}		
 
 	}
-	
-	/**
-	 * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2)
-	 * @param worldDir
-	 * @param cx1
-	 * @param cz1
-	 * @param cx2
-	 * @param cz2
-	 * @param mapType
-	 * @param vSlice
-	 * @throws IOException
-	 */
+
+    /**
+     *  Used by MapOverlay to let the image dimensions be directly specified (as a power of 2)
+     * @param worldDir
+     * @param startCoord
+     * @param endCoord
+     * @param mapType
+     * @param vSlice
+     * @param dimension
+     * @param since
+     * @return
+     */
 	public static synchronized boolean hasImageChanged(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType, Integer vSlice, final int dimension, final long since) {
 		
 		boolean isUnderground = mapType.equals(Constants.MapType.underground);
@@ -361,18 +361,16 @@ public class RegionImageHandler {
 
 		return false;		
 	}
-	
-	/**
-	 * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2)
-	 * @param worldDir
-	 * @param cx1
-	 * @param cz1
-	 * @param cx2
-	 * @param cz2
-	 * @param mapType
-	 * @param vSlice
-	 * @throws IOException
-	 */
+
+    /**
+     * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2)
+     * @param rCoord
+     * @param mapType
+     * @param useCache
+     * @param imageSize
+     * @return
+     * @throws IOException
+     */
 	public static synchronized BufferedImage getRegionImage(final RegionCoord rCoord, final Constants.MapType mapType, final Boolean useCache, final Integer imageSize)
 			throws IOException {
 		
