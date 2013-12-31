@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="JourneyMap" basedir="../.." default="all">
+<project name="JourneyMap" basedir="." default="all">
 
     <!-- Update when new version is going to be released -->
     <property name="jmversion" value="3.2.0b1" />
@@ -10,17 +10,20 @@
     <property name="zipfile.unlimited" value="JourneyMap${jmversion}_${unlimited}_${mcversion}" />
     <property name="zipfile.fairplay" value="JourneyMap${jmversion}_${fairplay}_${mcversion}" />
 
-    <property name="mcp.dir" location="${basedir}" />
-    <property name="dist.dir" location="${mcp.dir}/dist" />
+    <property name="java.dir" location="${basedir}/src/main/java" />
+    <property name="resources.dir" location="${basedir}/src/main/resources" />
+    <property name="mcp.dir" location="${basedir}/../forge/mcp" />
+    <property name="dist.dir" location="${basedir}/dist" />
     <property name="build.dir" location="${mcp.dir}/build" />
     <property name="reobf.dir" location="${mcp.dir}/reobf/minecraft" />
-    <property name="src.dir" location="${mcp.dir}/src/minecraft" />
+    <property name="mcp.src.dir" location="${mcp.dir}/src/minecraft" />
 
     <!-- Change if not on Windows, but don't check in the change. -->
     <!-- TODO:  OS detection -->
     <property name="python" location="${mcp.dir}/runtime/bin/python/python_mcp.exe" />
 
     <target name="all" description="All" depends="init, recompile, reobfuscate, stage, minify, jarzip">
+        <ant target="cleansrc" />
         <echo message="Done." />
     </target>
 
@@ -35,14 +38,28 @@
         <mkdir dir="${dist.dir}" />
     </target>
 
-    <target name="recompile" >
+    <target name="cleansrc">
+        <delete dir="${mcp.src.dir}/ar/com/hjg/pngj" />
+        <delete dir="${mcp.src.dir}/se/rupy/http" />
+        <delete dir="${mcp.src.dir}/net/techbrew" />
+        <delete file="${mcp.src.dir}/net/minecraft/src/mod_JourneyMap.java" />
+        <delete file="${mcp.src.dir}/net/minecraft/client/renderer/entity/RenderFacade.java" />
+    </target>
+
+    <target name="recompile" depends="cleansrc">
+
+        <copy todir="${mcp.src.dir}" failonerror="true" overwrite="true">
+            <fileset dir="${basedir}/src/main/java" />
+        </copy>
+
         <exec executable="${python}" dir="${mcp.dir}">
             <arg value="runtime/recompile.py"/>
             <arg value="%*"/>
         </exec>
+
     </target>
 
-    <target name="reobfuscate">
+    <target name="reobfuscate" depends="recompile">
         <exec executable="${python}" dir="${mcp.dir}">
             <arg value="runtime/reobfuscate.py"/>
             <arg value="%*"/>
@@ -55,7 +72,7 @@
         <copy todir="${build.dir}" failonerror="true" file="${reobf.dir}/mod_JourneyMap.class" />
 
         <!-- JourneyMap facades -->
-        <copy todir="${build.dir}" failonerror="true" file="${reobf.dir}/RenderFacade.class" />
+        <copy todir="${build.dir}" failonerror="true" file="${reobf.dir}/net/minecraft/client/renderer/entity/RenderFacade.class" />
 
         <!-- JourneyMap package -->
         <copy todir="${build.dir}/net/techbrew/" failonerror="true">
@@ -73,38 +90,38 @@
         </copy>
 
         <!-- License info -->
-        <copy todir="${build.dir}" failonerror="true" file="${src.dir}/net/techbrew/license.txt" />
+        <copy todir="${build.dir}" failonerror="true" file="${resources.dir}/license.txt" />
 
         <!-- Rupy configs -->
-        <copy todir="${build.dir}/se/rupy/http" failonerror="true" file="${src.dir}/se/rupy/http/mime.txt" />
+        <copy todir="${build.dir}/se/rupy/http" failonerror="true" file="${java.dir}/se/rupy/http/mime.txt" />
 
         <!-- Localization properties -->
         <copy todir="${build.dir}/net/techbrew/mcjm" failonerror="true" verbose="true">
-            <fileset dir="${src.dir}/net/techbrew/mcjm" includes="*.properties" />
+            <fileset dir="${java.dir}/net/techbrew/mcjm" includes="*.properties" />
         </copy>
 
         <!-- Web assets --> <!-- -->
         <copy todir="${build.dir}/net/techbrew/mcjm/web" failonerror="true">
-            <fileset dir="${src.dir}/net/techbrew/mcjm/web" />
+            <fileset dir="${java.dir}/net/techbrew/mcjm/web" />
         </copy>
     </target>
 
-    <target name="minify" description="Minifiy a set of files">
+    <target name="minify">
         <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
             <classpath>
-                <pathelement path="${mcp.dir}/lib/yuicompressor-2.4.7.jar" />
-                <pathelement path="${mcp.dir}/lib/YUIAnt.jar" />
+                <pathelement path="${basedir}/lib/yuicompressor-2.4.7.jar" />
+                <pathelement path="${basedir}/lib/YUIAnt.jar" />
             </classpath>
         </taskdef>
         <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
             outputfolder="${build.dir}/net/techbrew/mcjm/web/js">
-            <fileset dir="${src.dir}/net/techbrew/mcjm/web/js" >
+            <fileset dir="${java.dir}/net/techbrew/mcjm/web/js" >
                 <include name="journeymap.js" />
             </fileset>
         </yuicompress>
         <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
             outputfolder="${build.dir}/net/techbrew/mcjm/web/css">
-            <fileset dir="${src.dir}/net/techbrew/mcjm/web/css" >
+            <fileset dir="${java.dir}/net/techbrew/mcjm/web/css" >
                 <include name="journeymap.css" />
             </fileset>
         </yuicompress>
@@ -122,8 +139,8 @@
 	    	<mkdir dir="${dist.dir}" />	    	        
 	        <delete file="${dist.dir}/@{zipName}.zip" />
 	    	
-	    	<copy todir="${build.dir}" failonerror="true" overwrite="true" file="${src.dir}/net/techbrew/mcmod.info" />
-            <copy todir="${build.dir}" failonerror="true" overwrite="true" file="${src.dir}/net/techbrew/changelog.txt" />
+	    	<copy todir="${build.dir}" failonerror="true" overwrite="true" file="${resources.dir}/mcmod.info" />
+            <copy todir="${build.dir}" failonerror="true" overwrite="true" file="${resources.dir}/changelog.txt" />
 	    		
 	        <replace dir="${build.dir}" token="@JMVERSION@" value="${jmversion}" />
 	    	<replace dir="${build.dir}" token="@EDITION@" value="@{edition}" />
