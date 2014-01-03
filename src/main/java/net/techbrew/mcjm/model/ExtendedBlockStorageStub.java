@@ -11,7 +11,7 @@ public class ExtendedBlockStorageStub
     /**
      * Contains the bottom-most Y block represented by this ExtendedBlockStorage. Typically a multiple of 16.
      */
-    private final int yBase;
+    private int yBase;
 
     /**
      * A total count of the number of non-air blocks in this block storage's Chunk.
@@ -47,43 +47,39 @@ public class ExtendedBlockStorageStub
 
     public ExtendedBlockStorageStub(ExtendedBlockStorage original)
     {
-    	yBase = original.getYLocation();
-        
-    	byte[] lbs = original.getBlockLSBArray();
-    	if(lbs!=null) {
-    		blockLSBArray = Arrays.copyOf(lbs, lbs.length);
-    	}
-    	
-    	NibbleArray mbs = original.getBlockMSBArray();
-        if(mbs!=null) {
-        	blockMSBArray = new NibbleArray(mbs.data,4);
+    	this.updateFrom(original);
+    }
+
+    public void updateFrom(ExtendedBlockStorage original)
+    {
+        yBase = original.getYLocation();
+
+        byte[] lbs = original.getBlockLSBArray();
+        if(lbs!=null) {
+            blockLSBArray = Arrays.copyOf(lbs, lbs.length);
         }
-        
+
+        NibbleArray mbs = original.getBlockMSBArray();
+        if(mbs!=null) {
+            blockMSBArray = new NibbleArray(mbs.data,4);
+        }
+
         NibbleArray meta = original.getMetadataArray();
         if(meta!=null) {
-        	blockMetadataArray = new NibbleArray(meta.data,4);
+            blockMetadataArray = new NibbleArray(meta.data,4);
         }
-        
+
         NibbleArray blocklight = original.getBlocklightArray();
         if(blocklight!=null) {
-        	blocklightArray = new NibbleArray(blocklight.data,4);
+            blocklightArray = new NibbleArray(blocklight.data,4);
         }
-        
+
         NibbleArray skylight = original.getSkylightArray();
         if(original.getSkylightArray()!=null) {
-        	skylightArray = new NibbleArray(skylight.data,4);
+            skylightArray = new NibbleArray(skylight.data,4);
         }
-        
-        //this.removeInvalidBlocks();        
-    }
-    
-    public ExtendedBlockStorageStub(int par1)
-    {
-        this.yBase = par1;
-        this.blockLSBArray = new byte[4096];
-        this.blockMetadataArray = new NibbleArray(this.blockLSBArray.length, 4);
-        this.skylightArray = new NibbleArray(this.blockLSBArray.length, 4);
-        this.blocklightArray = new NibbleArray(this.blockLSBArray.length, 4);
+
+        //this.removeInvalidBlocks();
     }
 
     /**

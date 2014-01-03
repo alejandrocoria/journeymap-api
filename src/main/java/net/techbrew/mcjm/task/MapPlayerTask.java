@@ -72,12 +72,20 @@ public class MapPlayerTask extends BaseMapTask {
 		final ChunkCoordIntPair max = new ChunkCoordIntPair(lastPlayerPos.posX + offset, lastPlayerPos.posZ + offset);
 		
 		// Get chunkstubs to map
+        ChunkMD chunkMd;
+        ChunkCoordIntPair coord;
 		for(int x=min.chunkXPos;x<=max.chunkXPos;x++) {
 			for(int z=min.chunkZPos;z<=max.chunkZPos;z++) {
-				ChunkMD stub = ChunkLoader.getChunkStubFromMemory(x, z, world);
-				if(stub!=null) {
-					stub.render = true;
-					chunks.add(stub);
+                coord = new ChunkCoordIntPair(x, z);
+                chunkMd = lastChunkStubs.get(coord);
+                if(chunkMd==null) {
+				    chunkMd = ChunkLoader.getChunkStubFromMemory(x, z, world);
+                } else {
+                    chunkMd = ChunkLoader.refreshChunkStubFromMemory(chunkMd, world);
+                }
+				if(chunkMd!=null) {
+					chunkMd.render = true;
+					chunks.add(chunkMd);
 				} else {
 					missing++;
 				}

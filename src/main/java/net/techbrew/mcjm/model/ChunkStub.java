@@ -14,14 +14,14 @@ import java.util.Arrays;
 
 public class ChunkStub {
 	
-	public final int heightMap[];
-	public final byte[] blockBiomeArray;
+	public int heightMap[];
+	public byte[] blockBiomeArray;
 	public final int xPosition;
 	public final int zPosition;
 	public final World worldObj;
     public int[] precipitationHeightMap;
-    public final long lastSaveTime;
-	public final ExtendedBlockStorageStub storageArrays[];
+    public long lastSaveTime;
+	public ExtendedBlockStorageStub storageArrays[];
 	public boolean isModified;			
 	
 	ChunkStub(Chunk chunk, boolean doErrorChecks) {
@@ -45,6 +45,29 @@ public class ChunkStub {
 			}
 		}
 	}
+
+    public void updateFrom(Chunk chunk) {
+        if(this.xPosition!=chunk.xPosition || this.zPosition!=chunk.zPosition) {
+            throw new IllegalArgumentException("ChunkStub can't be populated from a chunk in a different position");
+        }
+        this.heightMap = Arrays.copyOf(chunk.heightMap, chunk.heightMap.length);
+
+        if(this.storageArrays.length!=chunk.getBlockStorageArray().length) {
+            this.storageArrays = new ExtendedBlockStorageStub[chunk.getBlockStorageArray().length];
+        }
+        for(int i=0;i<storageArrays.length;i++) {
+            ExtendedBlockStorage ebs = chunk.getBlockStorageArray()[i];
+            if(ebs!=null) {
+                if(this.storageArrays[i]==null){
+                    this.storageArrays[i] = new ExtendedBlockStorageStub(ebs);
+                } else {
+                    this.storageArrays[i].updateFrom(ebs);
+                }
+            } else {
+                this.storageArrays[i] = null;
+            }
+        }
+    }
 	
 	/**
      * Checks whether the chunk is at the X/Z location specified

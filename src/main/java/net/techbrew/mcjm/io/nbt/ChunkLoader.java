@@ -39,7 +39,17 @@ public class ChunkLoader {
 		}
 		return null;
 	}
-	
+
+    public static ChunkMD refreshChunkStubFromMemory(ChunkMD chunkMD, World world) {
+        Chunk chunk = getChunkFromMemory(chunkMD.coord.chunkXPos, chunkMD.coord.chunkZPos, world);
+        if(chunk!=null) {
+            chunkMD.stub.updateFrom(chunk);
+            return chunkMD;
+        } else {
+            return null;
+        }
+    }
+
 	public static ChunkMD getChunkStubFromMemory(int chunkX, int chunkZ, Minecraft minecraft) {
 		Chunk chunk = getChunkFromMemory(chunkX, chunkZ, minecraft.theWorld);
 		if(chunk!=null) return new ChunkMD(chunk, true, minecraft.theWorld);
