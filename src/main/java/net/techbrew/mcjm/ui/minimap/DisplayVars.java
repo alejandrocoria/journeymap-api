@@ -137,7 +137,7 @@ public class DisplayVars {
                 translateX = (mc.displayWidth/2)-minimapOffset;
                 translateY = (mc.displayHeight/2)-minimapOffset - bottomTextureYMargin;
                 scissorX = mc.displayWidth-minimapSize-marginX;
-                scissorY = marginY - bottomTextureYMargin;
+                scissorY = marginY + bottomTextureYMargin;
                 labelX = mc.displayWidth-(minimapSize/2);
                 topLabelY = mc.displayHeight-minimapSize+topLabelYOffset-bottomTextureYMargin;
                 bottomLabelY = mc.displayHeight-marginY-marginY+bottomLabelYOffset-bottomTextureYMargin;
@@ -161,7 +161,7 @@ public class DisplayVars {
                 translateX = -(mc.displayWidth/2)+minimapOffset;
                 translateY = (mc.displayHeight/2)-minimapOffset - bottomTextureYMargin;
                 scissorX = marginX;
-                scissorY = marginY - bottomTextureYMargin;
+                scissorY = marginY + bottomTextureYMargin;
                 labelX = minimapSize/2;
                 topLabelY = mc.displayHeight-minimapSize+topLabelYOffset-bottomTextureYMargin;
                 bottomLabelY = mc.displayHeight-marginY-marginY+bottomLabelYOffset-bottomTextureYMargin;
