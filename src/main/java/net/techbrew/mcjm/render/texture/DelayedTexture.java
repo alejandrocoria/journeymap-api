@@ -82,7 +82,7 @@ public class DelayedTexture {
         //Send texel data to OpenGL
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, image.getWidth(), image.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
 
-        return new TextureImpl(glId, width, height);
+        return new TextureImpl(glId, image);
     }
 
 //    private static void setTextureClamped(boolean par0)

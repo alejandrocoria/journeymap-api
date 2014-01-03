@@ -8,7 +8,6 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.render.overlay.Tile;
 import net.techbrew.mcjm.thread.JMThreadFactory;
 
 import javax.imageio.ImageIO;
@@ -84,16 +83,16 @@ public class TextureCache {
 
     /*************************************************/
 
-    public Future<DelayedTexture> prepareImage(final Integer glId, final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType,
+    public Future<DelayedTexture> prepareImage(final Integer glId, final BufferedImage image, final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType,
                                                final Integer vSlice, final int dimension, final Boolean useCache, final Integer imageWidth, final Integer imageHeight) {
         Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>() {
             @Override
             public DelayedTexture call() throws Exception {
-                BufferedImage image = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, true, Tile.TILESIZE, Tile.TILESIZE, true);
-                if(image==null){
+                BufferedImage chunksImage = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, useCache, image, imageWidth, imageHeight, true);
+                if(chunksImage==null){
                     return null;
                 } else {
-                    return new DelayedTexture(glId, image, null);
+                    return new DelayedTexture(glId, chunksImage, null);
                 }
             }
         });

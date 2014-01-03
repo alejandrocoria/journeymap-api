@@ -39,12 +39,12 @@ public class TextureImpl extends AbstractTexture {
         updateTexture(image, true);
     }
 
-    TextureImpl(int glId, int width, int height)
+    TextureImpl(int glId, BufferedImage image)
     {
-        this.retainImage = false;
-        this.width = width;
-        this.height = height;
         this.glTextureId = glId;
+        this.retainImage = true;
+        this.width = image.getWidth();
+        this.height = image.getHeight();
     }
 
     protected void updateTexture(BufferedImage image, boolean allocateMemory)

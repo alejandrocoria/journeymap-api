@@ -10,6 +10,7 @@ import net.techbrew.mcjm.render.texture.TextureImpl;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -57,8 +58,14 @@ public class Tile {
         if(futureTex==null) {
             lastMapType = mapType;
             lastVSlice = vSlice;
-            Integer glId = textureImpl!=null ? textureImpl.getGlTextureId() : null;
-            futureTex = TextureCache.instance().prepareImage(glId, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE);
+
+            Integer glId = null;
+            BufferedImage image = null;
+            if(textureImpl!=null) {
+                glId = textureImpl.getGlTextureId();
+                image = textureImpl.getImage();
+            }
+            futureTex = TextureCache.instance().prepareImage(glId, image, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE);
             return true;
         } else {
             return false;

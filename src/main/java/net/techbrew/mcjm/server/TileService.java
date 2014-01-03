@@ -9,6 +9,7 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.RegionImageHandler;
+import net.techbrew.mcjm.render.overlay.Tile;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 
@@ -109,7 +110,7 @@ public class TileService extends FileService {
 				final ChunkCoordIntPair startCoord = new ChunkCoordIntPair(minChunkX,minChunkZ);
 				final ChunkCoordIntPair endCoord = new ChunkCoordIntPair(maxChunkX,maxChunkZ);
 				
-				final BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, true, 512, 512, false);
+				final BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, true, null, Tile.TILESIZE, Tile.TILESIZE, false);
 	
 				ResponseHeader.on(event).contentType(ContentType.png).noCache();
 				serveImage(event, img);

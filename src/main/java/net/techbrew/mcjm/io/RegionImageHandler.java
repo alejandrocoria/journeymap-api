@@ -205,7 +205,7 @@ public class RegionImageHandler {
      * @param allowNullImage
      * @return
      */
-	public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType, Integer vSlice, final int dimension, final Boolean useCache, final Integer imageWidth, final Integer imageHeight, final boolean allowNullImage) {
+	public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType, Integer vSlice, final int dimension, final Boolean useCache, BufferedImage image, final Integer imageWidth, final Integer imageHeight, final boolean allowNullImage) {
 		
 		long start = 0, stop = 0;		
 		start = System.currentTimeMillis();
@@ -217,9 +217,15 @@ public class RegionImageHandler {
 		
 		final int initialWidth = (endCoord.chunkXPos-startCoord.chunkXPos+1) * 16;
 		final int initialHeight = (endCoord.chunkZPos-startCoord.chunkZPos+1) * 16;		
-		
-		final BufferedImage mergedImg = new BufferedImage(initialWidth, initialHeight, BufferedImage.TYPE_INT_ARGB);
-		final Graphics2D g2D = initRenderingHints(mergedImg.createGraphics());
+
+        if(image==null) {
+		    image = new BufferedImage(initialWidth, initialHeight, BufferedImage.TYPE_INT_ARGB);
+        } else {
+            if(image.getWidth()!=initialWidth || imageHeight!=initialHeight){
+                throw new IllegalArgumentException("BufferedImage size doesn't match chunk area requested");
+            }
+        }
+		final Graphics2D g2D = initRenderingHints(image.createGraphics());
 
 		final RegionImageCache cache = RegionImageCache.getInstance();
 
@@ -305,11 +311,11 @@ public class RegionImageHandler {
 		if(imageHeight!=null && imageWidth!=null && (initialHeight!=imageHeight || initialWidth!=imageWidth)) {
 			final BufferedImage scaledImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
 			final Graphics2D g = initRenderingHints(scaledImage.createGraphics());
-			g.drawImage(mergedImg, 0, 0, imageWidth, imageHeight, null);
+			g.drawImage(image, 0, 0, imageWidth, imageHeight, null);
 			g.dispose();
 			return scaledImage;
 		} else {
-			return mergedImg;
+			return image;
 		}		
 
 	}
