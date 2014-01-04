@@ -10,13 +10,12 @@ import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.model.EntityHelper;
 import net.techbrew.mcjm.model.MapOverlayState;
 import net.techbrew.mcjm.model.WaypointHelper;
-import net.techbrew.mcjm.render.draw.DrawEntityStep;
-import net.techbrew.mcjm.render.draw.DrawStep;
 import net.techbrew.mcjm.render.draw.DrawUtil;
 import net.techbrew.mcjm.render.overlay.GridRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayRadarRenderer;
 import net.techbrew.mcjm.render.overlay.OverlayWaypointRenderer;
 import net.techbrew.mcjm.render.texture.TextureCache;
+import net.techbrew.mcjm.render.texture.TextureImpl;
 import net.techbrew.mcjm.ui.JmUI;
 import net.techbrew.mcjm.ui.map.MapOverlay;
 import org.lwjgl.opengl.GL11;
@@ -53,11 +52,18 @@ public class MiniMap {
     private DisplayVars dv;
 
     private boolean visible = true;
+    private EntityClientPlayerMP player;
+    private Point2D playerPixel;
+    private TextureImpl playerLocatorTex;
 
 	/**
 	 * Default constructor
 	 */
 	public MiniMap() {
+
+        player = mc.thePlayer;
+        playerLocatorTex = TextureCache.instance().getPlayerLocator();
+
         final PropertyManager pm = PropertyManager.getInstance();
 
         setEnabled(pm.getBoolean(PropertyManager.Key.PREF_SHOW_MINIMAP));
@@ -74,15 +80,17 @@ public class MiniMap {
 	public void drawMap() {
 
         // Check player status
-        if (mc.thePlayer==null) {
-            return;
+        if (player==null) {
+            player = mc.thePlayer;
+            if(player==null) return;
         }
+
 
         final boolean doStateRefresh = state.shouldRefresh();
         drawTimer.start();
 
         try {
-            final EntityClientPlayerMP player = mc.thePlayer;
+
 
             // Update the state first
             if(doStateRefresh) {
@@ -98,6 +106,8 @@ public class MiniMap {
                 state.updateLastRefresh();
             }
 
+
+
             updateDisplayVars();
 
             // Use 1:1 resolution for minimap regardless of how Minecraft UI is scaled
@@ -105,6 +115,8 @@ public class MiniMap {
 
             // Ensure colors and alpha reset
             GL11.glColor4f(1, 1, 1, 1);
+
+
 
             // Push matrix for translation to corner
             GL11.glPushMatrix();
@@ -152,10 +164,9 @@ public class MiniMap {
             gridRenderer.draw(state.getDrawSteps(), 0, 0);
 
             // Draw player
-            Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
+            playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
             if(playerPixel!=null) {
-                DrawStep drawStep = new DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
-                gridRenderer.draw(0, 0, drawStep);
+                DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), EntityHelper.getHeading(mc.thePlayer), false, playerLocatorTex, 8);
             }
 
             // Return center to mid-screen
