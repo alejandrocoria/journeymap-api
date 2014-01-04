@@ -6,19 +6,15 @@ import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSelectWorld;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.mcjm.cartography.ColorCache;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
-import net.techbrew.mcjm.io.nbt.ChunkLoader;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.log.StatTimer;
-import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.overlay.TileCache;
@@ -80,7 +76,6 @@ public class JourneyMap {
 	
 	private boolean threadLogging = false;
 
-	private volatile ChunkMD lastPlayerChunk;
 
 	// Invokes MapOverlay
 	public KeyBinding uiKeybinding;
@@ -102,6 +97,8 @@ public class JourneyMap {
 
 	// Announcements
 	private final List<String> announcements = Collections.synchronizedList(new LinkedList<String>());
+
+    private Minecraft mc;
 
 	/**
 	 * Constructor.
@@ -140,13 +137,15 @@ public class JourneyMap {
 		
 		// Ensure logger inits
 		getLogger();
-		
+
 		if(initialized) {
 			logger.warning("Already initialized, aborting");
 			return;
 		}
 
-		final PropertyManager pm = PropertyManager.getInstance();
+        mc = minecraft;
+
+        final PropertyManager pm = PropertyManager.getInstance();
 		
 		// Start logFile
 		logger.info(MOD_NAME + " starting " + new Date()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -248,7 +247,7 @@ public class JourneyMap {
 	/**
      * Starts mapping threads
      */
-    private void startMapping(Minecraft minecraft) {
+    private void startMapping() {
     	synchronized(this) {
             StatTimer.resetAll();
             UIManager.getInstance().reset();
@@ -268,9 +267,9 @@ public class JourneyMap {
 			}
 	    	
 	    	taskController = new TaskController();
-	    	taskController.enableTasks(minecraft);
+	    	taskController.enableTasks(mc);
 	    	
-	    	logger.info("Mapping started: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$	
+	    	logger.info("Mapping started: " + WorldData.getWorldName(mc)); //$NON-NLS-1$
 	    		    	
     	}    			
     }
@@ -294,8 +293,7 @@ public class JourneyMap {
 	    		taskController.clear();
 	    		taskController = null;
 	    	}
-	    		    	
-	    	lastPlayerChunk = null;
+
 			FileHandler.lastWorldHash = -1;
 			FileHandler.lastJMWorldDir = null;
 			
@@ -312,107 +310,70 @@ public class JourneyMap {
 			
 			logger.info("Mapping halted: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
     	}
-    }   
+    }
 
-	/**
-	 * Called via Modloader
-	 * @param f
-	 * @param minecraft
-	 * @param guiscreen
-	 * @return
-	 */
-	public boolean onTickInGUI(float f, Minecraft minecraft, GuiScreen guiscreen) {
-		try {
-			if(!isMapping()) return true;
+    public void updateState() {
+        try {
 
-			if(guiscreen instanceof GuiMainMenu ||
-					guiscreen instanceof GuiSelectWorld ||
-					guiscreen instanceof GuiMultiplayer) {
-				stopMapping();
-			}
-
-            if(!(guiscreen instanceof MapOverlay)) {
-                TileCache.pause();
+            // If both UIs are disabled, the mod is effectively disabled.
+            if(!enableWebserver && !enableMapGui) {
+                return;
             }
 
-		} catch(Exception e) {
-			logger.severe(LogFormatter.toString(e));
-		}
-		return true;
-	}
-
-	/**
-	 * Called via Modloader
-	 * @param f
-	 * @param minecraft
-	 * @return
-	 */
-	public boolean onTickInGame(float f, final Minecraft minecraft) {
-
-        // If both UIs are disabled, the mod is effectively disabled.
-        if(!enableWebserver && !enableMapGui) {
-            return true;
-        }
-
-        // Check player status
-        EntityPlayer player = minecraft.thePlayer;
-        if (player==null || player.isDead) {
-            return true;
-        }
-
-		try {
-
-			// Check for world change
-			long newHash = Utils.getWorldHash(minecraft);
-			if(newHash!=0L) {				
-				FileHandler.lastWorldHash=newHash;
-			}
-
-			// Check for valid player chunk
-			ChunkCoordIntPair playerCoord = new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ);
-			if(lastPlayerChunk==null || !playerCoord.equals(lastPlayerChunk.coord)) {
-				lastPlayerChunk = ChunkLoader.getChunkStubFromMemory(player.chunkCoordX, player.chunkCoordZ, minecraft);
-				if(lastPlayerChunk==null) {
-					if(logger.isLoggable(Level.FINE)) {
-						logger.fine("Player chunk unknown: " + playerCoord);
-					}
-					return true;
-				}
-			}
-
-			// We got this far
-			if(!isMapping()) {
-				startMapping(minecraft);
-			}
-
-            final boolean isGamePaused = minecraft.currentScreen != null && !(minecraft.currentScreen instanceof MapOverlay);
-
-            // Manage tiles
+            // Show announcements
+            final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof MapOverlay);
             if(isGamePaused) {
                 TileCache.pause();
-            } else {
-                TileCache.resume();
+
+                if(!isMapping()) {
+                    return;
+                }
+
+                GuiScreen guiScreen = mc.currentScreen;
+                if(guiScreen instanceof GuiMainMenu ||
+                        guiScreen instanceof GuiSelectWorld ||
+                        guiScreen instanceof GuiMultiplayer) {
+                    stopMapping();
+                    return;
+                }
             }
 
-            // Draw Minimap
-            UIManager.getInstance().drawMiniMap();
+            TileCache.resume();
 
-			// Show announcements
-			while(!isGamePaused && !announcements.isEmpty()) {
-				player.addChatMessage(announcements.remove(0));
-			}			
-		
-			// Perform the next mapping tasks
-			taskController.performTasks(minecraft, newHash, taskExecutor);
+            if(!isGamePaused) {
+                while(!announcements.isEmpty()) {
+                    mc.thePlayer.addChatMessage(announcements.remove(0));
+                }
+            }
 
-		} catch (Throwable t) {
-			String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
-			announce(error);
-			logger.severe(LogFormatter.toString(t));
-		}
+            // We got this far
+            if(!isMapping()) {
+                startMapping();
+            }
 
-		return true;
-	}
+
+        } catch (Throwable t) {
+            String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
+            logger.severe(LogFormatter.toString(t));
+        }
+    }
+
+    public void performTasks() {
+        try {
+            if(isMapping()){
+                long newHash = Utils.getWorldHash(mc);
+                if(newHash!=0L) {
+                    FileHandler.lastWorldHash=newHash;
+                }
+                // Perform the next mapping tasks
+                taskController.performTasks(mc, newHash, taskExecutor);
+            }
+        } catch (Throwable t) {
+            String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
+            announce(error);
+            logger.severe(LogFormatter.toString(t));
+        }
+    }
 	
 	private void announceMod(boolean forced) {
 
@@ -481,14 +442,6 @@ public class JourneyMap {
 	 */
 	public static Logger getLogger() {
 		return Holder.INSTANCE.logger;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public ChunkMD getLastPlayerChunk() {
-		return lastPlayerChunk;
 	}
 
 }
