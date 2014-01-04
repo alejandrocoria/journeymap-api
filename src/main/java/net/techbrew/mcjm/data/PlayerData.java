@@ -5,8 +5,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
-import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.cartography.MapBlocks;
+import net.techbrew.mcjm.io.nbt.ChunkLoader;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.EntityHelper;
 
@@ -75,8 +75,8 @@ public class PlayerData implements IDataProvider {
 		EntityClientPlayerMP player = mc.thePlayer;
 		int x = ((int) Math.floor(player.posX) % 16) & 15;
 		int z = ((int) Math.floor(player.posZ) % 16) & 15;
-		
-		ChunkMD playerChunk = JourneyMap.getInstance().getLastPlayerChunk();
+
+		ChunkMD playerChunk = ChunkLoader.getChunkStubFromMemory(player.chunkCoordX, player.chunkCoordZ, mc);
 		if(playerChunk!=null) {
 			return playerChunk.stub.getBiomeGenForWorldCoords(x,z, mc.theWorld.getWorldChunkManager()).biomeName;
 		} else {
