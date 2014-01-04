@@ -106,7 +106,7 @@ public class JMServer {
 		props.put("port", Integer.toString(port)); //$NON-NLS-1$
 		props.put("delay", Integer.toString(5000)); //$NON-NLS-1$ // socket timeout in ms
 		props.put("timeout", Integer.toString(0)); //$NON-NLS-1$ // session timeout, 0 to disable sessions
-		props.put("threads", Integer.toString(15)); //$NON-NLS-1$
+		props.put("threads", Integer.toString(5)); //$NON-NLS-1$
 		
 		// Rupy logging is spammy.  Only enable it if you really need to.
 		Level logLevel = Level.parse(PropertyManager.getInstance().getString(PropertyManager.Key.LOGGING_LEVEL));
