@@ -282,14 +282,12 @@ public class GridRenderer {
                 Tile tile = tc.getIfPresent(entry.getValue());
                 if(tile!=null) {
 				    drawTile(entry.getKey(), tile, centerX, centerZ);
-                } else {
-                    logger.warning("Grid tile missing at " + entry.getKey());
                 }
 			}
 
             if( debug && crosshairs!=null) {
                 Minecraft mc = Minecraft.getMinecraft();
-                GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, crosshairs.getGlTextureId());
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, crosshairs.getGlTextureId());
                 Tessellator tessellator = Tessellator.instance;
                 tessellator.startDrawingQuads();
                 tessellator.addVertexWithUV(0, mc.displayHeight, 0.0D, 0, 1);
@@ -302,7 +300,6 @@ public class GridRenderer {
             GL11.glEnable(GL11.GL_ALPHA_TEST);
             GL11.glDepthMask(true);
             GL11.glEnable(GL11.GL_DEPTH_TEST);
-			
 
 		}		
 	}
