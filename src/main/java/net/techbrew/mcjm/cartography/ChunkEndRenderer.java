@@ -1,6 +1,8 @@
 package net.techbrew.mcjm.cartography;
 
 
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
@@ -66,19 +68,19 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 		
 					String metaId = null;
 					boolean hasAir = false;
-					int blockId = -1;
+                    BlockInfo blockInfo;
 					int paintY = -1;
 					int lightLevel = -1;
 		
 					int y = sliceMaxY;
 					for (; y > 0; y--) {
-						blockId = chunkMd.stub.getBlockID(x, y, z);
+                        blockInfo = mapBlocks.getBlockInfo(chunkMd, x, y, z);
 		
 						if (!hasAir && y <= sliceMinY) {
 							break;
 						}
 		
-						if (blockId == 0) {
+						if (MapBlocks.hasFlag(blockInfo.getBlock(), MapBlocks.Flag.HasAir)) {
 							hasAir = true;
 						} else if (hasAir && paintY == -1) {
 							paintY = y;
@@ -91,8 +93,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 					if (paintY == -1) {
 						paintY = 0;
 					}
-		
-					blockId = chunkMd.stub.getBlockID(x, paintY, z);
+                    blockInfo = mapBlocks.getBlockInfo(chunkMd, x, paintY, z);
 		
 					lightLevel = chunkMd.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
 		
@@ -101,13 +102,14 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 					}
 					
 					// Ender Crystal
-					if(blockId==51 || blockId==200 || blockId==7) {
+                    // TODO:  Map the entity for the crystal
+                    Block block = blockInfo.getBlock();
+					if(block== Blocks.bedrock || block==Blocks.obsidian) {
 						lightLevel = 15;
 					}		
 		
 					// Get block color
-					BlockInfo block = mapBlocks.getBlockInfo(chunkMd, x, paintY, z);
-					Color color = block.getColor();
+					Color color = blockInfo.getColor();
 					
 					// Get slope of block and prepare to shade
 					float slope, s, sN, sNW, sW, sAvg, shaded;
@@ -141,7 +143,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 					}
 		
 					// Contour shading
-					if(blockId==121) {
+					if(block==Blocks.end_stone) {
 			
 						// Get light level
 						if (lightLevel < 15) {

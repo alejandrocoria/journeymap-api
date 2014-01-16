@@ -46,9 +46,9 @@ public class PlayersData implements IDataProvider {
 		List<LinkedHashMap> list = new ArrayList<LinkedHashMap>(others.size());
 		for(EntityPlayer entity : others) {
 			LinkedHashMap eProps = new LinkedHashMap();
-			// eProps.put(EntityKey.entityId, entity.entityId); 
-			eProps.put(EntityKey.filename, "/skin/" + entity.getEntityName()); 
-			eProps.put(EntityKey.username, entity.getEntityName());
+			// eProps.put(EntityKey.entityId, entity.entityId);
+			eProps.put(EntityKey.filename, "/skin/" + entity.getDisplayName());
+			eProps.put(EntityKey.username, entity.getDisplayName());
             eProps.put(EntityKey.posX, entity.posX);
             eProps.put(EntityKey.posY, entity.posY);
             eProps.put(EntityKey.posZ, entity.posZ);

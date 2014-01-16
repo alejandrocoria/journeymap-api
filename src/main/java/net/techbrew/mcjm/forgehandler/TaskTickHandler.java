@@ -1,45 +1,24 @@
 package net.techbrew.mcjm.forgehandler;
 
-import cpw.mods.fml.common.IScheduledTickHandler;
-import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
+import net.minecraft.client.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.io.PropertyManager;
-
-import java.util.EnumSet;
 
 /**
- * Scheduled tick handler for the TaskController
+ * Tick handler for the TaskController
  */
-public class TaskTickHandler implements IScheduledTickHandler {
+public class TaskTickHandler  {
 
-    final int tickSpacing;
-    final EnumSet<TickType> tickTypes = EnumSet.of(TickType.RENDER);
+    Minecraft mc = FMLClientHandler.instance().getClient();
 
-    public TaskTickHandler(){
-        tickSpacing = PropertyManager.getIntegerProp(PropertyManager.Key.UPDATETIMER_CHUNKS) / 50; // millis -> ticks
-    }
+    @SubscribeEvent
+    public void onClientTick(TickEvent.ClientTickEvent event) {
 
-    @Override
-    public int nextTickSpacing() {
-        return tickSpacing;
-    }
-
-    @Override
-    public void tickStart(EnumSet<TickType> type, Object... tickData) {
-    }
-
-    @Override
-    public void tickEnd(EnumSet<TickType> type, Object... tickData) {
+        if(event.phase!= TickEvent.Phase.END) {
+            return;
+        }
         JourneyMap.getInstance().performTasks();
-    }
-
-    @Override
-    public EnumSet<TickType> ticks() {
-        return tickTypes;
-    }
-
-    @Override
-    public String getLabel() {
-        return this.getClass().getName();
     }
 }

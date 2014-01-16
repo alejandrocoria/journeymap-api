@@ -1,6 +1,8 @@
 package net.techbrew.mcjm.cartography;
 
 
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
@@ -68,14 +70,12 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 				try {
 					String metaId = null;
 					boolean hasAir = false;
-					int blockId = -1;
+
 					int y = getHeightInSlice(chunkMd, x, z, sliceMinY, sliceMaxY);
-					blockId = chunkMd.stub.getBlockID(x, y, z);
-					boolean isLava = (blockId == 10 || blockId == 11);
-					
-					BlockInfo block = mapBlocks.getBlockInfo(chunkMd, x, y, z);
-					blockId = block.id;
-					Color color = block.getColor();
+                    BlockInfo blockInfo = mapBlocks.getBlockInfo(chunkMd, x, y, z);
+					boolean isLava = (blockInfo.getBlock() == Blocks.lava || blockInfo.getBlock() == Blocks.flowing_lava);
+
+					Color color = blockInfo.getColor();
 					
 					// Get light level
 					if(isLava) {
@@ -154,18 +154,18 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 
 	public int getHeightInSlice( final ChunkMD chunkMd, final int x, final int z, final int sliceMinY, final int sliceMaxY) {
 		boolean hasAir = false;
-		int blockId = 0;
+		Block block;
 		
 		int y = sliceMaxY;
 		for (; y > 0; y--) {
-			blockId = chunkMd.stub.getBlockID(x, y, z);
+			block = chunkMd.getBlock(x, y, z);
 
-			if (blockId == 0) {
+			if (MapBlocks.hasFlag(block, MapBlocks.Flag.HasAir)) {
 				hasAir = true;
 				continue;
 			}
 			
-			if(blockId==51) { // fire
+			if(block==Blocks.fire) {
 				y--;
 				break;
 			}

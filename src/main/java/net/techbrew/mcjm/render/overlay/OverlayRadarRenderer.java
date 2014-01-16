@@ -43,7 +43,7 @@ public class OverlayRadarRenderer {
 			Boolean isHostile, isPet, isPlayer;
 			boolean filterAnimals = (showAnimals!=showPets);
 			//FontMetrics fm = g2D.getFontMetrics();
-			String playername = Minecraft.getMinecraft().thePlayer.getEntityName();
+			String playername = Minecraft.getMinecraft().thePlayer.getDisplayName();
 			TextureCache tc = TextureCache.instance();
 			
 			for(Map critter : critters) {

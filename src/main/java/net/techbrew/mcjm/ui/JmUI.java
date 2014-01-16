@@ -1,6 +1,7 @@
 package net.techbrew.mcjm.ui;
 
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.techbrew.mcjm.render.draw.DrawUtil;
 import net.techbrew.mcjm.render.texture.TextureCache;
@@ -10,24 +11,34 @@ import org.lwjgl.opengl.GL11;
 public abstract class JmUI extends GuiScreen {
 
     TextureImpl logo = TextureCache.instance().getLogo();
-	
+
 	public abstract void close();
-	
+
+
+    public JmUI() {
+        super();
+//        width = field_146294_l;
+//        height = field_146295_m;
+//        mc = field_146297_k;
+//        fontRenderer = super.field_146289_q;
+//        buttonList = field_146292_n;
+    }
+
 	@Override
 	public boolean doesGuiPauseGame() {
 		return true;
 	}
 
     public void sizeDisplay(boolean scaled) {
-        final int glWidth = scaled ? this.width : mc.displayWidth;
-        final int glHeight = scaled ? this.height : mc.displayHeight;
-        sizeDisplay(glWidth, glHeight);
+        final int glwidth = scaled ? this.field_146294_l : field_146297_k.displayWidth;
+        final int glheight = scaled ? this.field_146295_m : field_146297_k.displayHeight;
+        sizeDisplay(glwidth, glheight);
     }
 
     public void drawLogo() {
-        sizeDisplay(mc.displayWidth, mc.displayHeight);
-        DrawUtil.drawImage(logo, (mc.displayWidth - logo.width) / 2, 20, false);
-        sizeDisplay(width, height);
+        sizeDisplay(field_146297_k.displayWidth, field_146297_k.displayHeight);
+        DrawUtil.drawImage(logo, (field_146297_k.displayWidth - logo.width) / 2, 20, false);
+        sizeDisplay(field_146294_l, field_146295_m);
     }
 
     public static void sizeDisplay(double width, double height) {
@@ -41,6 +52,9 @@ public abstract class JmUI extends GuiScreen {
         GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
     }
 
-
-
+    @Override
+    // setWorldAndResolution
+    public void func_146280_a(Minecraft minecraft, int width, int height) {
+        super.func_146280_a(minecraft, width, height);
+    }
 }

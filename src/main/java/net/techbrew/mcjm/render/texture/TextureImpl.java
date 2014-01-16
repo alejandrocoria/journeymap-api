@@ -3,13 +3,12 @@ package net.techbrew.mcjm.render.texture;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.client.resources.ResourceManager;
+import net.minecraft.client.resources.IResourceManager;
 import net.techbrew.mcjm.log.StatTimer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
@@ -163,5 +162,5 @@ public class TextureImpl extends AbstractTexture {
     }
 
 	@Override
-	public void loadTexture(ResourceManager par1ResourceManager) throws IOException {}
+	public void loadTexture(IResourceManager par1ResourceManager){}
 }

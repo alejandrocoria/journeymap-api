@@ -1,16 +1,13 @@
 package net.techbrew.mcjm.data;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.NetClientHandler;
-import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldInfo;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.feature.FeatureManager;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.LinkedHashMap;
@@ -121,14 +118,15 @@ public class WorldData implements IDataProvider {
 	private static String getServerName() {
 		try
 	    {
-			NetClientHandler sendQueue = Minecraft.getMinecraft().getNetHandler();
-			MapStorage ms = sendQueue.mapStorage;
-	        SocketAddress socketAddress = sendQueue.getNetManager().getSocketAddress();
-	        if ((socketAddress instanceof InetSocketAddress))
-	        {
-	          InetSocketAddress inetAddr = (InetSocketAddress)socketAddress;
-	          return inetAddr.getHostName();	          
-	        }
+            return FMLClientHandler.instance().getServer().getServerHostname();
+//			NetClientHandler sendQueue = Minecraft.getMinecraft().getNetHandler();
+//			MapStorage ms = sendQueue.mapStorage;
+//	        SocketAddress socketAddress = sendQueue.getNetManager().getSocketAddress();
+//	        if ((socketAddress instanceof InetSocketAddress))
+//	        {
+//	          InetSocketAddress inetAddr = (InetSocketAddress)socketAddress;
+//	          return inetAddr.getHostName();
+//	        }
 	    }
 	    catch (Exception ex)
 	    {

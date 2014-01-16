@@ -11,8 +11,14 @@ import org.lwjgl.input.Keyboard;
 
 public class AutoMapConfirmation extends JmUI {
 
-	private enum ButtonEnum {All,Missing,None,Close};
+	private enum ButtonEnum {All,Missing,None,Close}
 	MapButton buttonAll, buttonMissing, buttonNone, buttonClose;
+
+//        width = field_146294_l;
+//        height = field_146295_m;
+//        mc = field_146297_k;
+//        fontRenderer = super.field_146289_q;
+//        buttonList = field_146292_n;
 	
 	/**
      * Adds the buttons (and other controls) to the screen in question.
@@ -31,19 +37,16 @@ public class AutoMapConfirmation extends JmUI {
         buttonMissing.enabled = enable;
         buttonNone.enabled = !enable;
         
-        this.buttonList.add(buttonAll);
-        this.buttonList.add(buttonMissing);
-        this.buttonList.add(buttonNone); 
-        this.buttonList.add(buttonClose);
+        field_146292_n.add(buttonAll);
+        field_146292_n.add(buttonMissing);
+        field_146292_n.add(buttonNone);
+        field_146292_n.add(buttonClose);
     }
 
-    /**
-     * Fired when a control is clicked. This is the equivalent of ActionListener.actionPerformed(ActionEvent e).
-     */
     @Override
-	protected void actionPerformed(GuiButton button)
-    {
-    	final ButtonEnum id = ButtonEnum.values()[button.id];
+    protected void func_146284_a(GuiButton guibutton) { // actionPerformed
+
+        final ButtonEnum id = ButtonEnum.values()[guibutton.field_146127_k];
     	switch(id) {
     		case All : {
     			JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.TRUE);
@@ -70,32 +73,32 @@ public class AutoMapConfirmation extends JmUI {
     @Override
 	public void drawScreen(int par1, int par2, float par3)
     {
-    	drawBackground(0);
+        func_146270_b(0);
     	
-    	final int x = this.width / 2;
-    	final int y = this.height / 4;
+    	final int x = this.field_146294_l / 2;
+    	final int y = this.field_146295_m / 4;
     	final int vgap = 3;
     	
-        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.automap_dialog"), x, y - 18, 16777215);
-        this.drawCenteredString(this.fontRenderer, Constants.getString("MapOverlay.automap_dialog_text"), x, y, 16777215);
+        this.drawCenteredString(this.field_146289_q, Constants.getString("MapOverlay.automap_dialog"), x, y - 18, 16777215);
+        this.drawCenteredString(this.field_146289_q, Constants.getString("MapOverlay.automap_dialog_text"), x, y, 16777215);
     	
-    	buttonAll.centerHorizontalOn(x).yPosition=y+18;
+    	buttonAll.centerHorizontalOn(x).setY(y+18);
     	buttonMissing.centerHorizontalOn(x).below(buttonAll, vgap);
     	buttonNone.centerHorizontalOn(x).below(buttonMissing, vgap);
     	buttonClose.centerHorizontalOn(x).below(buttonNone, vgap*4);
         
         super.drawScreen(par1, par2, par3);
     }
-    
+
     @Override
-	public void drawBackground(int layer)
-	{    	
-    	super.drawBackground(0);
-    	MapOverlay.drawMapBackground(this);
-    	super.drawDefaultBackground();
+    public void func_146270_b(int layer) //drawBackground
+    {
+        super.func_146278_c(layer); // super.drawBackground(0);
+        MapOverlay.drawMapBackground(this);
+        super.func_146270_b(layer); // super.drawDefaultBackground();
 
         super.drawLogo();
-	}
+    }
     
     @Override
 	protected void keyTyped(char c, int i)

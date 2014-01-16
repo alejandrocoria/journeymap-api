@@ -2,6 +2,7 @@ package net.techbrew.mcjm.ui.minimap;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
@@ -113,6 +114,15 @@ public class MiniMap {
             // Use 1:1 resolution for minimap regardless of how Minecraft UI is scaled
             JmUI.sizeDisplay(mc.displayWidth, mc.displayHeight);
 
+            // TODO:  Experimental way to get the dark thing managed
+            {
+                int i = 15728880;
+                int j = i % 65536;
+                int k = i / 65536;
+                OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
+            }
+
+
             // Ensure colors and alpha reset
             GL11.glColor4f(1, 1, 1, 1);
 
@@ -141,11 +151,6 @@ public class MiniMap {
                     glStencilFunc(GL_EQUAL, 1, 0xFF);
                 } catch(Throwable t) {
                     logger.warning("Stencil buffer failing with circle mask:" + LogFormatter.toString(t));
-                    if(getShape()==DisplayVars.Shape.LargeCircle){
-                        setShape(DisplayVars.Shape.LargeSquare);
-                    } else if(getShape()==DisplayVars.Shape.SmallCircle){
-                        setShape(DisplayVars.Shape.SmallSquare);
-                    }
                     return;
                 }
             }
@@ -156,6 +161,8 @@ public class MiniMap {
             // Scissor area that shouldn't be drawn
             GL11.glScissor(dv.scissorX,dv.scissorY,dv.minimapSize,dv.minimapSize);
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
+
+
 
             // Draw grid
             gridRenderer.draw(1f, 0, 0);
@@ -199,9 +206,9 @@ public class MiniMap {
             // Draw FPS
             if(showFps){
                 String fps = mc.debug;
-                final int i = fps!=null ? fps.indexOf(',') : -1;
-                if(i>0){
-                    DrawUtil.drawCenteredLabel(fps.substring(0, i), dv.labelX, dv.topLabelY, playerInfoBgColor, playerInfoFgColor, 200, dv.fontScale);
+                final int idx = fps!=null ? fps.indexOf(',') : -1;
+                if(idx>0){
+                    DrawUtil.drawCenteredLabel(fps.substring(0, idx), dv.labelX, dv.topLabelY, playerInfoBgColor, playerInfoFgColor, 200, dv.fontScale);
                 }
             }
 

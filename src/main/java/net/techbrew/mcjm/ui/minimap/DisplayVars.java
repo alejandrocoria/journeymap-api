@@ -32,6 +32,8 @@ public class DisplayVars {
         private Shape(String label){
             this.label = label;
         }
+
+        public static Shape[] Enabled = {SmallSquare, LargeSquare};
     }
 
     final Position position;

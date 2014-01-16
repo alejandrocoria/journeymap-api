@@ -115,7 +115,7 @@ public class MapPlayerTask extends BaseMapTask {
 				
 				if(skipUnchanged) {
 					if(newChunk.coord.chunkXPos!=lastPlayerPos.posX || newChunk.coord.chunkZPos!=lastPlayerPos.posZ) {						
-						if(newChunk.isUnchanged(oldChunk)) {						
+						if(newChunk.stub.equalTo(oldChunk.stub)) {
 							newChunk.render=false;
 						}
 					}		

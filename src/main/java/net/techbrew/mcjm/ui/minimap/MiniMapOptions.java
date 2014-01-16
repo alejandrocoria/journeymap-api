@@ -9,6 +9,8 @@ import net.techbrew.mcjm.ui.UIManager;
 import net.techbrew.mcjm.ui.map.MapOverlay;
 import org.lwjgl.input.Keyboard;
 
+import java.util.Arrays;
+
 public class MiniMapOptions extends JmUI {
 
     private final String title;
@@ -31,7 +33,7 @@ public class MiniMapOptions extends JmUI {
     @Override
 	public void initGui()
     {
-        this.buttonList.clear();
+        this.field_146292_n.clear();
         String on = Constants.getString("MapOverlay.on");
         String off = Constants.getString("MapOverlay.off");
         final PropertyManager pm = PropertyManager.getInstance();
@@ -76,15 +78,15 @@ public class MiniMapOptions extends JmUI {
 
         buttonCloseAll = new MapButton(ButtonEnum.CloseAll.ordinal(),0,0,Constants.getString("MiniMap.return_to_game")); //$NON-NLS-1$
 
-        buttonList.add(buttonMiniMap);
-        buttonList.add(buttonPosition);
-        buttonList.add(buttonShape);
-        buttonList.add(buttonFont);
-        buttonList.add(buttonKeyboard);
-        buttonList.add(buttonShowfps);
+        field_146292_n.add(buttonMiniMap);
+        field_146292_n.add(buttonPosition);
+        field_146292_n.add(buttonShape);
+        field_146292_n.add(buttonFont);
+        field_146292_n.add(buttonKeyboard);
+        field_146292_n.add(buttonShowfps);
 
-        buttonList.add(buttonClose);
-        buttonList.add(buttonCloseAll);
+        field_146292_n.add(buttonClose);
+        field_146292_n.add(buttonCloseAll);
         
     }
     
@@ -94,22 +96,22 @@ public class MiniMapOptions extends JmUI {
 	void layoutButtons() {
 		// Buttons
 		
-		if(buttonList.isEmpty()) {
+		if(field_146292_n.isEmpty()) {
 			initGui();
 		}
 		
-		if(lastWidth!=width || lastHeight!=height) {
+		if(lastWidth!=field_146294_l || lastHeight!=field_146295_m) {
 			
-			lastWidth = width;
-			lastHeight = height;
+			lastWidth = field_146294_l;
+			lastHeight = field_146295_m;
 			
 			final int hgap = 4;
 			final int vgap = 3;
-			final int bx = (this.width-hgap)/2;
-			final int by = this.height / 4;
+			final int bx = (this.field_146294_l-hgap)/2;
+			final int by = this.field_146295_m / 4;
 
-            buttonMiniMap.leftOf(bx).yPosition = by;
-            buttonShape.rightOf(buttonMiniMap, hgap).yPosition = by;
+            buttonMiniMap.leftOf(bx).setY(by);
+            buttonShape.rightOf(buttonMiniMap, hgap).setY(by);
 
             buttonPosition.below(buttonMiniMap, vgap).leftOf(bx);
             buttonFont.below(buttonShape, vgap).rightOf(buttonPosition, hgap);
@@ -117,15 +119,15 @@ public class MiniMapOptions extends JmUI {
             buttonKeyboard.below(buttonPosition, vgap).leftOf(bx);
             buttonShowfps.below(buttonFont, vgap).rightOf(buttonKeyboard, hgap);
 
-			buttonClose.below(buttonShowfps, vgap*4).centerHorizontalOn(this.width / 2);
-            buttonCloseAll.below(buttonClose, vgap).centerHorizontalOn(this.width / 2);
+			buttonClose.below(buttonShowfps, vgap*4).centerHorizontalOn(this.field_146294_l / 2);
+            buttonCloseAll.below(buttonClose, vgap).centerHorizontalOn(this.field_146294_l / 2);
 		}	
 	}
-	
+
     @Override
-	protected void actionPerformed(GuiButton guibutton) {
-    	
-    	final ButtonEnum id = ButtonEnum.values()[guibutton.id];
+    protected void func_146284_a(GuiButton guibutton) { // actionPerformed
+
+        final ButtonEnum id = ButtonEnum.values()[guibutton.field_146127_k];
     	switch(id) {
 
             case MiniMap: {
@@ -191,15 +193,18 @@ public class MiniMapOptions extends JmUI {
 
     private void nextShape() {
         int nextIndex = currentShape.ordinal()+1;
-        if(nextIndex==DisplayVars.Shape.values().length){
+        if(nextIndex==DisplayVars.Shape.Enabled.length){
             nextIndex = 0;
         }
-        setShape(DisplayVars.Shape.values()[nextIndex]);
+        setShape(DisplayVars.Shape.Enabled[nextIndex]);
     }
 
     private void setShape(DisplayVars.Shape shape){
+        if(Arrays.binarySearch(DisplayVars.Shape.Enabled, shape)<0){
+            shape = DisplayVars.Shape.Enabled[0];
+        }
         currentShape = shape;
-        buttonShape.displayString = Constants.getString("MiniMap.shape", currentShape.label);
+        buttonShape.field_146126_j = Constants.getString("MiniMap.shape", currentShape.label);
         UIManager.getInstance().getMiniMap().setShape(shape);
         PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_SHAPE, shape.name());
     }
@@ -214,7 +219,7 @@ public class MiniMapOptions extends JmUI {
 
     private void setPosition(DisplayVars.Position position){
         currentPosition = position;
-        buttonPosition.displayString = Constants.getString("MiniMap.position", currentPosition.label);
+        buttonPosition.field_146126_j = Constants.getString("MiniMap.position", currentPosition.label);
         UIManager.getInstance().getMiniMap().setPosition(position);
         PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_POSITION, position.name());
     }
@@ -229,21 +234,22 @@ public class MiniMapOptions extends JmUI {
      */
     @Override
     public void drawScreen(int par1, int par2, float par3)
-    {        
-        drawBackground(0);
-        
+    {
+        func_146270_b(0); // super.drawBackground(0);
+
         layoutButtons();
         
         super.drawScreen(par1, par2, par3);
         
-        int y = this.height / 4 - 18;
-        drawCenteredString(this.fontRenderer, title , this.width / 2, y, 16777215);
+        int y = this.field_146295_m / 4 - 18;
+        drawCenteredString(this.field_146289_q, title , this.field_146294_l / 2, y, 16777215);
+
     }
     
     @Override
-	public void drawBackground(int layer)
+	public void func_146270_b(int layer)
 	{
-    	super.drawDefaultBackground();
+    	super.func_146270_b(layer);
 
         MiniMap miniMap = UIManager.getInstance().getMiniMap();
         if(miniMap.isEnabled()){

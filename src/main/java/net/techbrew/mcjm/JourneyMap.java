@@ -1,15 +1,26 @@
 package net.techbrew.mcjm;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.client.registry.ClientRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.eventhandler.EventBus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSelectWorld;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.util.ChatComponentText;
 import net.techbrew.mcjm.cartography.ColorCache;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.feature.FeatureManager;
+import net.techbrew.mcjm.forgehandler.ConnectionHandler;
+import net.techbrew.mcjm.forgehandler.MiniMapTickHandler;
+import net.techbrew.mcjm.forgehandler.StateTickHandler;
+import net.techbrew.mcjm.forgehandler.TaskTickHandler;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.JMLogger;
@@ -47,27 +58,26 @@ import java.util.logging.Logger;
  * @author Mark Woodman
  *
  */
+@Mod(modid = JourneyMap.SHORT_MOD_NAME, name = JourneyMap.SHORT_MOD_NAME, version = JourneyMap.JM_VERSION)
 public class JourneyMap {
 	
 	static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
 
 	public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
 	public static final String JM_VERSION = "3.2.0b1"; //$NON-NLS-1$
-	public static final String MC_VERSION = "1.6.4"; //$NON-NLS-1$
+	public static final String MC_VERSION = "1.7.2"; //$NON-NLS-1$
 	
 	public static final String EDITION = getEdition();
 	public static final String SHORT_MOD_NAME = "JourneyMap";
 	public static final String MOD_NAME = SHORT_MOD_NAME + " " + EDITION;
-	
-	private static class Holder {
-        private static final JourneyMap INSTANCE = new JourneyMap();
-    }
+
+    private static JourneyMap INSTANCE;
 
     public static JourneyMap getInstance() {
-        return Holder.INSTANCE;
+        return INSTANCE;
     }
     
-    private static JMLogger logger;
+    private JMLogger logger;
 
 	private volatile Boolean initialized = false;
 	
@@ -104,7 +114,8 @@ public class JourneyMap {
 	 * Constructor.
 	 */
 	public JourneyMap() {
-    	logger = new JMLogger();
+        if(INSTANCE!=null) throw new IllegalArgumentException("Use getInstance() after initialization is complete");
+        INSTANCE = this;
 	}
 	
 	private static String getEdition() {
@@ -123,63 +134,74 @@ public class JourneyMap {
     }
     
     public Boolean isMapping() {
-    	return taskExecutor!=null && !taskExecutor.isShutdown();
+    	return taskExecutor!=null && !taskExecutor.isShutdown() && mc.theWorld!=null;
     }
     
     public Boolean isThreadLogging() {
     	return threadLogging;
     }
-    
-	/**
-	 * Initialize
-	 */
-	public void initialize(Minecraft minecraft) {
-		
-		// Ensure logger inits
-		getLogger();
 
-		if(initialized) {
-			logger.warning("Already initialized, aborting");
-			return;
-		}
+    @Mod.EventHandler
+    public void initialize(FMLInitializationEvent event)
+    {
+        try {
+            // Ensure logger inits
+            logger = new JMLogger();
 
-        mc = minecraft;
+            if(initialized) {
+                logger.warning("Already initialized, aborting");
+                return;
+            }
 
-        final PropertyManager pm = PropertyManager.getInstance();
-		
-		// Start logFile
-		logger.info(MOD_NAME + " starting " + new Date()); //$NON-NLS-1$ //$NON-NLS-2$
-		logger.environment();
-		logger.info("Properties: " + pm.toString()); //$NON-NLS-1$
+            mc = FMLClientHandler.instance().getClient();
 
-		// Use property settings		
-		enableAnnounceMod = pm.getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED); 
-		
-		// Key bindings
-		int mapGuiKeyCode = pm.getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
-		this.enableMapGui = pm.getBoolean(PropertyManager.Key.MAPGUI_ENABLED); 
-		if(this.enableMapGui) {
-			this.uiKeybinding = new KeyBinding("JourneyMap", mapGuiKeyCode); //$NON-NLS-1$
-		}
-		
-		// Webserver
-		toggleWebserver(pm.getBoolean(PropertyManager.Key.WEBSERVER_ENABLED), false);
-		
-		// Check for newer version online
-		if(VersionCheck.getVersionIsCurrent()==false) {
-			announce(Constants.getString("JourneyMap.new_version_available", WEBSITE_URL)); //$NON-NLS-1$
-		}		
+            final PropertyManager pm = PropertyManager.getInstance();
 
-		initialized = true;
-		
-		// Override log level now that loading complete
-		logger.info("Initialization complete."); //$NON-NLS-1$
-		logger.setLevelFromProps();
-		
-		// Logging for thread debugging
-		threadLogging = getLogger().isLoggable(Level.FINER); 
+            // Start logFile
+            logger.info(MOD_NAME + " starting " + new Date()); //$NON-NLS-1$ //$NON-NLS-2$
+            logger.environment();
+            logger.info("Properties: " + pm.toString()); //$NON-NLS-1$
 
-	}
+            // Use property settings
+            enableAnnounceMod = pm.getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED);
+
+            EventBus bus = FMLCommonHandler.instance().bus();
+            bus.register(new TaskTickHandler());
+            bus.register(new StateTickHandler());
+            bus.register(new ConnectionHandler());
+
+            // In-Game UI
+            this.enableMapGui = pm.getBoolean(PropertyManager.Key.MAPGUI_ENABLED);
+            if(enableMapGui) {
+                int mapGuiKeyCode = pm.getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
+                this.uiKeybinding = new KeyBinding("key.journeymap", mapGuiKeyCode, "JourneyMap"); //$NON-NLS-1$
+                ClientRegistry.registerKeyBinding(JourneyMap.getInstance().uiKeybinding);
+                bus.register(UIManager.getInstance());
+                bus.register(new MiniMapTickHandler());
+            }
+
+            // Webserver
+            toggleWebserver(pm.getBoolean(PropertyManager.Key.WEBSERVER_ENABLED), false);
+
+            // Check for newer version online
+            if(VersionCheck.getVersionIsCurrent()==false) {
+                announce(Constants.getString("JourneyMap.new_version_available", WEBSITE_URL)); //$NON-NLS-1$
+            }
+
+            initialized = true;
+
+            // Override log level now that loading complete
+            logger.info("Initialization complete."); //$NON-NLS-1$
+            logger.setLevelFromProps();
+
+            // Logging for thread debugging
+            threadLogging = getLogger().isLoggable(Level.FINER);
+
+        } catch(Throwable t) {
+            System.err.println("Error loading " + JourneyMap.MOD_NAME + " for Minecraft " + JourneyMap.MC_VERSION + ". Ensure compatible Minecraft/Modloader/Forge versions.");
+            t.printStackTrace(System.err);
+        }
+    }
 	
 	public void toggleWebserver(Boolean enable, boolean forceAnnounce) {
 		PropertyManager.getInstance().setProperty(PropertyManager.Key.WEBSERVER_ENABLED, enable);
@@ -315,6 +337,8 @@ public class JourneyMap {
     public void updateState() {
         try {
 
+            if(mc==null) mc= FMLClientHandler.instance().getClient();
+
             // If both UIs are disabled, the mod is effectively disabled.
             if(!enableWebserver && !enableMapGui) {
                 return;
@@ -342,7 +366,11 @@ public class JourneyMap {
 
             if(!isGamePaused) {
                 while(!announcements.isEmpty()) {
-                    mc.thePlayer.addChatMessage(announcements.remove(0));
+                    try {
+                        mc.ingameGUI.func_146158_b().func_146227_a(new ChatComponentText(announcements.remove(0)));
+                    } catch(Exception e){
+                        getLogger().severe("Could not display announcement: " + e);
+                    }
                 }
             }
 
@@ -383,14 +411,14 @@ public class JourneyMap {
 		if(enableAnnounceMod) {
 			announcements.add(pos, Constants.getString("JourneyMap.ready", MOD_NAME)); //$NON-NLS-1$ 
 			if(enableWebserver && enableMapGui) {
-				String keyName = Keyboard.getKeyName(uiKeybinding.keyCode);
+				String keyName = Keyboard.getKeyName(uiKeybinding.func_151463_i()); // Should be KeyCode
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
 				announcements.add(pos+1, Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port)); //$NON-NLS-1$ 
 			} else if(enableWebserver) {
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
 				announcements.add(pos+1, Constants.getString("JourneyMap.webserver_only_ready", port)); //$NON-NLS-1$ 
 			} else if(enableMapGui) {
-				String keyName = Keyboard.getKeyName(uiKeybinding.keyCode);
+				String keyName = Keyboard.getKeyName(uiKeybinding.func_151463_i()); // Should be KeyCode
 				announcements.add(pos+1, Constants.getString("JourneyMap.mapgui_only_ready", keyName)); //$NON-NLS-1$
 			} else {
 				announcements.add(pos+1, Constants.getString("JourneyMap.webserver_and_mapgui_disabled")); //$NON-NLS-1$
@@ -398,16 +426,6 @@ public class JourneyMap {
 			enableAnnounceMod = false; // Only announce mod once per runtime
 		}
 	}
-
-	/**
-	 * Called via Modloader
-	 * @param keybinding
-	 */
-	public void keyboardEvent(KeyBinding keybinding)
-	{
-		if(!isMapping()) return; 
-		UIManager.getInstance().keyboardEvent(keybinding);
-	}		
 
 	/**
 	 * Queue an announcement to be shown in the UI.
@@ -441,7 +459,7 @@ public class JourneyMap {
 	 * @return
 	 */
 	public static Logger getLogger() {
-		return Holder.INSTANCE.logger;
+		return INSTANCE.logger;
 	}
 
 }

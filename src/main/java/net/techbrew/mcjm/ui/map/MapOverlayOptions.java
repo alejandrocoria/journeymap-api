@@ -34,7 +34,7 @@ public class MapOverlayOptions extends JmUI {
     @Override
 	public void initGui()
     {
-        this.buttonList.clear();
+        this.field_146292_n.clear();
         String on = Constants.getString("MapOverlay.on");
         String off = Constants.getString("MapOverlay.off");
         
@@ -126,41 +126,41 @@ public class MapOverlayOptions extends JmUI {
 			buttonPlayers.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
 		}
 		
-		buttonList.add(buttonCaves);
-		buttonList.add(buttonClose);		
-		buttonList.add(buttonMonsters);
-		buttonList.add(buttonAnimals);
-		buttonList.add(buttonVillagers);
-		buttonList.add(buttonPets);
-		buttonList.add(buttonPlayers);
-		buttonList.add(buttonGrid);
-		buttonList.add(buttonWaypoints);
-		buttonList.add(buttonWebserver);
-        buttonList.add(buttonMiniMap);
+		field_146292_n.add(buttonCaves);
+		field_146292_n.add(buttonClose);		
+		field_146292_n.add(buttonMonsters);
+		field_146292_n.add(buttonAnimals);
+		field_146292_n.add(buttonVillagers);
+		field_146292_n.add(buttonPets);
+		field_146292_n.add(buttonPlayers);
+		field_146292_n.add(buttonGrid);
+		field_146292_n.add(buttonWaypoints);
+		field_146292_n.add(buttonWebserver);
+        field_146292_n.add(buttonMiniMap);
     }
-    
+
     /**
 	 * Center buttons in UI.
 	 */
 	void layoutButtons() {
 		// Buttons
 		
-		if(buttonList.isEmpty()) {
+		if(field_146292_n.isEmpty()) {
 			initGui();
 		}
 		
-		if(lastWidth!=width || lastHeight!=height) {
+		if(lastWidth!=field_146294_l || lastHeight!=field_146295_m) {
 			
-			lastWidth = width;
-			lastHeight = height;
+			lastWidth = field_146294_l;
+			lastHeight = field_146295_m;
 			
 			final int hgap = 4;
 			final int vgap = 3;
-			final int bx = (this.width - hgap)/2;
-			final int by = this.height / 4;
+			final int bx = (this.field_146294_l - hgap)/2;
+			final int by = this.field_146295_m / 4;
 			
-			buttonCaves.leftOf(bx).yPosition=by;
-			buttonMonsters.rightOf(buttonCaves, hgap).yPosition=by;
+			buttonCaves.leftOf(bx).setY(by);
+			buttonMonsters.rightOf(buttonCaves, hgap).setY(by);
 			
 			buttonAnimals.below(buttonCaves, vgap).leftOf(bx);
 			buttonVillagers.rightOf(buttonAnimals, hgap).below(buttonMonsters, vgap);
@@ -180,9 +180,9 @@ public class MapOverlayOptions extends JmUI {
 	}
 	
     @Override
-	protected void actionPerformed(GuiButton guibutton) {
+    protected void func_146284_a(GuiButton guibutton) { // actionPerformed
     	
-    	final ButtonEnum id = ButtonEnum.values()[guibutton.id];
+    	final ButtonEnum id = ButtonEnum.values()[guibutton.field_146127_k];
     	switch(id) {
 			case Caves: { // caves				
 				buttonCaves.setToggled(PropertyManager.toggle(PropertyManager.Key.PREF_SHOW_CAVES));
@@ -247,23 +247,23 @@ public class MapOverlayOptions extends JmUI {
      */
     @Override
     public void drawScreen(int par1, int par2, float par3)
-    {        
-        drawBackground(0);
+    {
+        func_146270_b(0);
         
         layoutButtons();
         
         super.drawScreen(par1, par2, par3);
         
-        int y = this.height / 4 - 18;
-        drawCenteredString(this.fontRenderer, title , this.width / 2, y, 16777215);
+        int y = this.field_146295_m / 4 - 18;
+        drawCenteredString(this.field_146289_q, title , this.field_146294_l / 2, y, 16777215);
     }
     
     @Override
-	public void drawBackground(int layer)
-	{    	
-    	super.drawBackground(0);
-    	MapOverlay.drawMapBackground(this);
-    	super.drawDefaultBackground();
+    public void func_146270_b(int layer)
+	{
+        super.func_146278_c(layer); // super.drawBackground(0);
+        MapOverlay.drawMapBackground(this);
+        super.func_146270_b(layer); // super.drawDefaultBackground();
 
         super.drawLogo();
 	}

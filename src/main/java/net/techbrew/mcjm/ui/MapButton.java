@@ -1,13 +1,13 @@
 package net.techbrew.mcjm.ui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiSmallButton;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.techbrew.mcjm.render.texture.TextureCache;
 import org.lwjgl.opengl.GL11;
 
-public class MapButton extends GuiSmallButton {
+public class MapButton extends GuiButton {
 	
 	private Boolean toggled = true;
 	String icon;
@@ -16,12 +16,25 @@ public class MapButton extends GuiSmallButton {
 	String labelOn;
 	String labelOff;
 
+    // TODO FORGE
+    public boolean enabled;
+    public boolean drawButton;
+
+    public void drawButton(){}
+
+    private void tempInit(){
+        this.enabled = true;
+        this.drawButton = true;
+    }
+
 	public MapButton(int id, int x, int y, String label) {
 		super(id, x, y, label);
+        tempInit();
 	}
 	
 	public MapButton(int id, int x, int y, int width, int height, String label) {
 		super(id, x, y, width, height, label);
+        tempInit();
 	}
 	
 	public MapButton(int id, int x, int y, int width, int height, String labelOn, String labelOff, boolean toggled) {
@@ -29,6 +42,7 @@ public class MapButton extends GuiSmallButton {
 		this.labelOn = labelOn;
 		this.labelOff = labelOff;
 		this.setToggled(toggled);
+        tempInit();
 	}	
 	
 	public MapButton(int id, int x, int y, String labelOn, String labelOff, boolean toggled) {
@@ -36,6 +50,7 @@ public class MapButton extends GuiSmallButton {
 		this.labelOn = labelOn;
 		this.labelOff = labelOff;
 		this.setToggled(toggled);
+        tempInit();
 	}	
 	
 	public MapButton(int id, int x, int y, int width, int height, String hoverText, String icon) {
@@ -43,6 +58,7 @@ public class MapButton extends GuiSmallButton {
 		this.icon = (icon==null) ? "/gui/gui.png" : icon; //$NON-NLS-1$
 		this.iconTexture = TextureCache.newTexture(icon);
 		setHoverText(hoverText);
+        tempInit();
 	}
 	
 	public void setHoverText(String hoverText) {
@@ -51,7 +67,7 @@ public class MapButton extends GuiSmallButton {
 	
 	private void updateLabel() {
 		if(labelOn!=null && labelOff!=null) {
-			this.displayString = getToggled() ? labelOn : labelOff;
+			super.field_146126_j = getToggled() ? labelOn : labelOff;
 		}		
 	}
 	
@@ -63,16 +79,18 @@ public class MapButton extends GuiSmallButton {
 		this.toggled = toggled;
 		updateLabel();
 	}
-	
-	@Override
+
+    // TODO FORGE
+	//@Override
 	public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
     {
 		if(!drawButton)
         {
             return;
         }
-				
-		super.drawButton(minecraft, mouseX, mouseY);
+
+        // TODO FORGE
+		// super.drawButton(minecraft, mouseX, mouseY);
 		
 		if(this.icon!=null) {
 			Tessellator tessellator = Tessellator.instance;
@@ -89,13 +107,17 @@ public class MapButton extends GuiSmallButton {
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 	        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 			
-			// Preserve aspect ratio of source image		
-			int w = getToggled() ? this.width : (int) Math.ceil(this.width*.6);
-			int h = getToggled() ? this.height :  (int) Math.ceil(this.height*.6);
-			int widthOffset = (this.width-w)/2;
-			int heightOffset = (this.height-h);
+			// Preserve aspect ratio of source image
+            int height = getHeight();
+            int width = getWidth();
+			int w = getToggled() ? width : (int) Math.ceil(width*.6);
+			int h = getToggled() ? height :  (int) Math.ceil(height*.6);
+			int widthOffset = (width-w)/2;
+			int heightOffset = (height-h);
 	
 			tessellator.startDrawingQuads();
+            int xPosition = getX();
+            int yPosition = getY();
 			tessellator.addVertexWithUV(xPosition + widthOffset, h + yPosition + heightOffset, 0.0D, 0, 1);
 			tessellator.addVertexWithUV(xPosition + w + widthOffset, h + yPosition + heightOffset, 0.0D, 1, 1);
 			tessellator.addVertexWithUV(xPosition + w + widthOffset, yPosition + heightOffset, 0.0D, 1, 0);
@@ -105,11 +127,11 @@ public class MapButton extends GuiSmallButton {
 		
     }
 
-	//@Override
-    @Override
+    // TODO FORGE
+    // @Override
 	public boolean mousePressed(Minecraft minecraft, int i, int j)
     {
-        return enabled && drawButton && i >= xPosition && j >= yPosition && i < xPosition + width && j < yPosition + height;
+        return enabled && drawButton && i >= getX() && j >= getY() && i < getX() + getWidth() && j < getY() + getHeight();
     }
 
 	public Boolean getToggled() {
@@ -117,45 +139,61 @@ public class MapButton extends GuiSmallButton {
 	}
 
 	public int getWidth() {
-		return width;
+		return field_146120_f;
 	}
 	
 	public int getHeight() {
-		return height;
+		return field_146121_g;
 	}
+
+    public int getX() {
+        return this.field_146128_h;
+    }
+
+    public int getY() {
+        return this.field_146129_i;
+    }
+
+    public void setX(int x) {
+        this.field_146128_h = x;
+    }
+
+    public void setY(int y) {
+        this.field_146129_i = y;
+    }
 	
 	public void setPosition(int x, int y) {
-		this.xPosition = x;
-		this.yPosition = y;
+		setX(x);
+        setY(y);
 	}
 	
 	public MapButton leftOf(int x) {
-		this.xPosition = x - this.width;
+		this.setX(x - getWidth());
 		return this;
 	}
 
     public MapButton rightOf(int x) {
-        this.xPosition = x;
+        this.setX(x);
         return this;
     }
 	
 	public MapButton centerHorizontalOn(int x) {
-		this.xPosition = x - (this.width/2);
+		this.setX(x - (getWidth()/2));
 		return this;
 	}
 	
 	public MapButton leftOf(MapButton other, int margin) {
-		this.xPosition = other.xPosition - this.width - margin;
+        this.setX(other.getX() - getWidth() - margin);
 		return this;
 	}
 	
 	public MapButton rightOf(MapButton other, int margin) {
-		this.xPosition = other.xPosition + other.width + margin;
+        this.setX(other.getX() + other.getWidth() + margin);
 		return this;
 	}
 	
 	public MapButton below(MapButton other, int margin) {
-		this.yPosition = other.yPosition + this.height + margin;		
+        this.setY(other.getY() + this.getHeight() + margin);
 		return this;
 	}
 	

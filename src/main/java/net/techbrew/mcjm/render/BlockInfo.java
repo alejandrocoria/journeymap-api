@@ -1,6 +1,12 @@
 package net.techbrew.mcjm.render;
 
+import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockLeaves;
+import net.minecraft.block.material.Material;
+import net.minecraft.init.Blocks;
+import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.cartography.MapBlocks;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -8,17 +14,38 @@ import java.io.Serializable;
 
 public class BlockInfo implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-	
-	public final int id;
+	private static final long serialVersionUID = 2L;
+
 	public final int meta;
+    public final String uid_name;
+    public final String uid_modId;
+    public final int hash;
+
+    private transient Block block;
 	private Color color;
-	public float alpha;
-	
-	public BlockInfo(int id, int meta) {
-		this.id = id;
+	private Float alpha;
+
+    public BlockInfo(Block block) {
+        this(block, 0);
+    }
+
+	public BlockInfo(Block block, int meta) {
+        if(block==null) throw new IllegalArgumentException("Block can't be null");
+		this.block = block;
 		this.meta = meta;
+        GameRegistry.UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(block);
+        this.uid_name = uid.name;
+        this.uid_modId = uid.modId;
+        hash = (uid_modId + uid_name + meta).hashCode();
 	}
+
+    public BlockInfo(BlockInfo blockInfo, int meta) {
+        this.block = blockInfo.block;
+        this.meta = meta;
+        this.uid_name = blockInfo.uid_name;
+        this.uid_modId = blockInfo.uid_modId;
+        this.hash = (uid_modId + uid_name + meta).hashCode();
+    }
 
 	public void setColor(Color color) {
 		this.color = color;
@@ -35,19 +62,55 @@ public class BlockInfo implements Serializable {
 	public void setAlpha(float alpha) {
 		this.alpha = alpha;
 	}
+
+    public float getAlpha() {
+        if(alpha==null){
+            alpha = isTransparent() ? 0f : 1f;
+        }
+        return alpha;
+    }
 	
 	public Block getBlock() {
-		return Block.blocksList[id];
+        if(block==null){
+            block = GameRegistry.findBlock(uid_modId, uid_name);
+            if(block==null){
+                JourneyMap.getLogger().warning("Block not found: " + uid_modId + ":" + uid_name);
+                block = Blocks.air; // TODO  This is probably a bad idea.
+            }
+        }
+        return block;
 	}
-	
-	public int getRenderColor() {
-		return getBlock().getRenderColor(meta);
-	}
+
+    public boolean isTransparent() {
+        return block.func_149688_o() == Material.field_151579_a;
+    }
+
+    public boolean isAir() {
+        return MapBlocks.hasFlag(getBlock(), MapBlocks.Flag.HasAir);
+    }
+
+    public boolean isTorch() {
+        getBlock();
+        return block== Blocks.torch||block==Blocks.redstone_torch||block==Blocks.unlit_redstone_torch;
+    }
+
+    public boolean isWater() {
+        getBlock();
+        return block== Blocks.water||block==Blocks.flowing_water;
+    }
+
+    public boolean isLava() {
+        getBlock();
+        return block== Blocks.lava||block==Blocks.flowing_lava;
+    }
+
+    public boolean isFoliage() {
+        return getBlock() instanceof BlockLeaves;
+    }
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		return prime * (id | meta << 12);
+		return hash;
 	}
 
 	@Override
@@ -59,38 +122,12 @@ public class BlockInfo implements Serializable {
 		if (!(obj instanceof BlockInfo))
 			return false;
 		BlockInfo other = (BlockInfo) obj;
-		if (id != other.id)
-			return false;
-		if (meta != other.meta)
-			return false;
-		return true;
+		return hash == other.hash;
 	}
 
 	@Override
 	public String toString() {
-		return "BlockInfo [" + id + ":" + meta + "]";
+		return "BlockInfo [" + GameRegistry.findUniqueIdentifierFor(block) + ":" + meta + "]";
 	}
-	
-	public String debugString() {
-		StringBuffer sb = new StringBuffer();
-		Block block = getBlock();
-		if(block!=null) {
-			sb.append("Block ").append(block.getUnlocalizedName()).append(" ");
-		} else {
-			sb.append("Non-Block ");
-		}
-		sb.append(id).append(":").append(meta);
-		if(block!=null) {
-			int bcolor = block.getBlockColor();
-			if(bcolor!=16777215) {
-				sb.append(", blockColor=").append(Integer.toHexString(bcolor));
-			}
-			int rcolor = block.getBlockColor();
-			if(rcolor!=16777215) {
-				sb.append(", renderColor=").append(Integer.toHexString(rcolor));
-			}
-		}
-		return sb.toString();
-	}
-	
+
 }

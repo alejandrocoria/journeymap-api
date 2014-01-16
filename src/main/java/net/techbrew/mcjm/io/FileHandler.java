@@ -2,7 +2,6 @@ package net.techbrew.mcjm.io;
 
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.EnumOS;
 import net.minecraft.util.Util;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
@@ -210,7 +209,7 @@ public class FileHandler {
 
         String path = file.getAbsolutePath();
 
-        if (Util.getOSType() == EnumOS.MACOS) {
+        if (Util.getOSType() == Util.EnumOS.MACOS) {
             try {
                 Runtime.getRuntime().exec(new String[] {"/usr/bin/open", path});
                 return;
@@ -218,7 +217,7 @@ public class FileHandler {
                 JourneyMap.getLogger().severe("Could not open path with /usr/bin/open: " + path + " : " + LogFormatter.toString(e));
             }
             
-        } else if (Util.getOSType() == EnumOS.WINDOWS) {
+        } else if (Util.getOSType() == Util.EnumOS.WINDOWS) {
         	
             String cmd = String.format("cmd.exe /C start \"Open file\" \"%s\"", new Object[] {path});
 
@@ -260,18 +259,20 @@ public class FileHandler {
 	}
 	
 	public static <C extends Serializable> C deserializeCache(String name, Class<C> cacheClass) {
+
+        File cacheFile = new File(getCacheDir(), name);
+        if(!cacheFile.exists()) return null;
 		try {
-			File cacheFile = new File(getCacheDir(), name);
-			if(!cacheFile.exists()) return null;
-			
 			FileInputStream fileIn = new FileInputStream(cacheFile);
 	        ObjectInputStream in = new ObjectInputStream(fileIn);
 	        C cache = (C) in.readObject();
 	        in.close();
 	        fileIn.close();
+            if(cache.getClass()!=cacheClass) throw new ClassCastException(cache.getClass() + " can't be cast to " + cacheClass);
 			return cache;
 		} catch(Exception e) {
-			JourneyMap.getLogger().severe("Could not deserialize cache: " + name + " : " + LogFormatter.toString(e));
+			JourneyMap.getLogger().warning("Could not deserialize cache: " + name + " : " + e);
+            if(cacheFile.exists()) cacheFile.delete();
 			return null;
 	    } 
 	}

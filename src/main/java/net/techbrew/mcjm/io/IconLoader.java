@@ -56,25 +56,19 @@ public class IconLoader {
 		try {
 				
 			if(logger.isLoggable(Level.FINE)){
-				logger.fine("Loading color for " + blockInfo.debugString());
+				logger.fine("Loading color for " + blockInfo);
 			}
-			
-	        Block block = Block.blocksList[blockInfo.id];
 
-            if (block == null) {
-            	logger.warning("Block not in blocksList: " + blockInfo.debugString());
+            int side = MapBlocks.hasFlag(blockInfo.getBlock(), MapBlocks.Flag.Side2Texture) ? 2 : 1;
+            TextureAtlasSprite blockIcon = null;
+            while(blockIcon==null && side>=0) {
+                blockIcon = (TextureAtlasSprite) blockInfo.getBlock().func_149691_a(side, blockInfo.meta);
+                side--;
+            }
+            if(blockIcon==null) {
+                logger.warning("Could not get Icon for " + blockInfo);
             } else {
-            	int side = MapBlocks.side2Textures.contains(block.blockID) ? 2 : 1;
-	            TextureAtlasSprite blockIcon = null;
-	            while(blockIcon==null && side>=0) {
-	            	blockIcon = (TextureAtlasSprite) block.getIcon(side, blockInfo.meta);
-	            	side--;	            	
-	            }
-	        	if(blockIcon==null) {
-	        		logger.warning("Could not get Icon for " + blockInfo.debugString());
-	        	} else {
-	        		color = getColorForIcon(blockInfo, blockIcon);  
-	        	}
+                color = getColorForIcon(blockInfo, blockIcon);
             }
 			
             if(color==null) {
@@ -110,7 +104,7 @@ public class IconLoader {
 	        		try {
 	        			argb = blocksTexture.getRGB(x, y);
 	        		} catch(Throwable e) {
-	        			logger.severe("Couldn't get RGB from BlocksTexture at " + x + "," + y + " for " + blockInfo.debugString());
+	        			logger.severe("Couldn't get RGB from BlocksTexture at " + x + "," + y + " for " + blockInfo);
 	        			logger.severe(LogFormatter.toString(e));
 	        			break outer;
 	        		}
@@ -131,7 +125,7 @@ public class IconLoader {
 	        	if(g>0) g = g/count;
 	        	if(b>0) b = b/count;
 	        } else {
-	        	logger.warning("Unusable texture for " + blockInfo.debugString());
+	        	logger.warning("Unusable texture for " + blockInfo);
 	        	r = g = b = 0;
 	        }
 			
@@ -139,23 +133,24 @@ public class IconLoader {
 	        color = new Color(r,g,b);
 			
 	        // Determine alpha
-	        float blockAlpha = 0f;		
-	        if(MapBlocks.alphas.containsKey(blockInfo.id)) {
-	        	blockAlpha = MapBlocks.alphas.get(blockInfo.id);
-			} else if(blockInfo.getBlock().getRenderBlockPass()>0) {
+	        float blockAlpha = 0f;
+            Block block = blockInfo.getBlock();
+	        if(MapBlocks.hasAlpha(block)) {
+	        	blockAlpha = MapBlocks.getAlpha(block);
+			} else if(blockInfo.getBlock().func_149701_w()>0) { // TODO FORGE:  should be getRenderBlockPass()
 				blockAlpha = a * 1.0f/255;
-				MapBlocks.alphas.put(blockInfo.id, blockAlpha);		
+				MapBlocks.setAlpha(block, blockAlpha);
 			}
 	        blockInfo.setAlpha(blockAlpha);	        
 							
 		} catch (Throwable e1) {				
-			logger.warning("Error deriving color for " + blockInfo.debugString());
+			logger.warning("Error deriving color for " + blockInfo);
 			logger.severe(LogFormatter.toString(e1));
 		} 
         
         if(color!=null) {
         	if(logger.isLoggable(Level.FINE)){
-        		logger.fine("Derived color for " + blockInfo.debugString() + ": " + Integer.toHexString(color.getRGB()));
+        		logger.fine("Derived color for " + blockInfo + ": " + Integer.toHexString(color.getRGB()));
         	}
         } 
         

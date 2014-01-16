@@ -1,15 +1,17 @@
 package net.techbrew.mcjm.cartography;
 
-
+import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.render.BlockInfo;
 
 import java.awt.*;
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class MapBlocks extends HashMap {
 	
@@ -18,17 +20,60 @@ public class MapBlocks extends HashMap {
 	public static AlphaComposite SEMICLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F);
 	public static AlphaComposite SLIGHTLYCLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F);
 	public static Color COLOR_TRANSPARENT = new Color(0,0,0,0);
-	
-	public final static HashMap<Integer, Float> alphas = new HashMap<Integer, Float>(5);
-	
+
+    public enum Flag {HasAir, BiomeColor, IgnoreOverhead, NotTopBlock, NoShadow, Side2Texture}
+
+    private final static HashMap<GameRegistry.UniqueIdentifier, EnumSet<Flag>> blockFlags = new HashMap<GameRegistry.UniqueIdentifier, EnumSet<Flag>>(64);
+    private final static HashMap<GameRegistry.UniqueIdentifier, Float> blockAlphas = new HashMap<GameRegistry.UniqueIdentifier, Float>(8);
+
 	final ColorCache colorCache = ColorCache.getInstance();
 	
 	/**
 	 * Constructor
 	 */
 	public MapBlocks() {
-		resetAlphas();
-	}	
+
+        blockAlphas.clear();
+        setAlpha(Blocks.ice, .8F);
+        setAlpha(Blocks.glass, .3F);
+        setAlpha(Blocks.glass_pane, .3F);
+        setAlpha(Blocks.vine, .2F);
+        setAlpha(Blocks.torch, .5F);
+
+        blockFlags.clear();
+        setFlags(Blocks.air, Flag.HasAir, Flag.IgnoreOverhead, Flag.NotTopBlock, Flag.NoShadow);
+        setFlags(Blocks.brown_mushroom, Flag.Side2Texture);
+        setFlags(Blocks.carrots, Flag.Side2Texture);
+        setFlags(Blocks.deadbush, Flag.NotTopBlock, Flag.Side2Texture);
+        setFlags(Blocks.fire, Flag.NoShadow, Flag.Side2Texture);
+        setFlags(Blocks.flowing_water, Flag.BiomeColor);
+        setFlags(Blocks.grass, Flag.BiomeColor);
+        setFlags(Blocks.glass, Flag.NotTopBlock, Flag.NoShadow);
+        setFlags(Blocks.glass_pane, Flag.NotTopBlock, Flag.NoShadow);
+        setFlags(Blocks.ladder, Flag.IgnoreOverhead);
+        setFlags(Blocks.lava, Flag.NoShadow);
+        setFlags(Blocks.leaves, Flag.IgnoreOverhead, Flag.BiomeColor);
+        setFlags(Blocks.leaves2, Flag.IgnoreOverhead, Flag.BiomeColor);
+        setFlags(Blocks.redstone_torch, Flag.HasAir);
+        setFlags(Blocks.red_flower, Flag.Side2Texture);
+        setFlags(Blocks.red_mushroom, Flag.Side2Texture);
+        setFlags(Blocks.reeds, Flag.Side2Texture);
+        setFlags(Blocks.sapling, Flag.Side2Texture);
+        setFlags(Blocks.torch, Flag.HasAir);
+        setFlags(Blocks.melon_stem, Flag.Side2Texture);
+        setFlags(Blocks.nether_wart, Flag.Side2Texture);
+        setFlags(Blocks.potatoes, Flag.Side2Texture);
+        setFlags(Blocks.pumpkin_stem, Flag.Side2Texture);
+        setFlags(Blocks.tallgrass, Flag.NotTopBlock, Flag.Side2Texture, Flag.BiomeColor);
+        setFlags(Blocks.tripwire_hook, Flag.NotTopBlock);
+        setFlags(Blocks.tripwire, Flag.NotTopBlock);
+        setFlags(Blocks.unlit_redstone_torch, Flag.HasAir);
+        setFlags(Blocks.vine, Flag.IgnoreOverhead, Flag.NoShadow, Flag.BiomeColor);
+        setFlags(Blocks.water, Flag.NoShadow, Flag.BiomeColor);
+        setFlags(Blocks.wheat, Flag.Side2Texture);
+        setFlags(Blocks.web, Flag.IgnoreOverhead, Flag.Side2Texture);
+        setFlags(Blocks.yellow_flower, Flag.Side2Texture);
+    }
 	
 	/**
 	 * Returns a simple wrapper object of the blockId and the block meta values.
@@ -40,18 +85,21 @@ public class MapBlocks extends HashMap {
 	 */
 	BlockInfo getBlockInfo(ChunkMD chunkMd, int x, int y, int z) {
 		try {
-			int blockId, meta;
+            Block block;
+			int meta;
+            boolean isAir = false;
 			if(y>=0) {
-				blockId = chunkMd.stub.getBlockID(x, y, z);
-				meta = (blockId==0) ? 0 : chunkMd.stub.getBlockMetadata(x, y, z);
+                block = chunkMd.stub.func_150810_a(x, y, z);
+                isAir = block.isAir(chunkMd.worldObj, x, y, z);
+				meta = (isAir) ? 0 : chunkMd.stub.getBlockMetadata(x, y, z);
 			} else {
-				blockId = -1;
+				block = Blocks.bedrock;
 				meta = 0;
 			}
-			BlockInfo info = new BlockInfo(blockId, meta);
-			if(blockId>0) {
+			BlockInfo info = new BlockInfo(block, meta);
+			if(!isAir) {
 				info.setColor(colorCache.getBlockColor(chunkMd, info, x, y, z));
-				Float alpha = alphas.get(blockId);
+				Float alpha = getAlpha(block);
 				info.setAlpha(alpha==null ? 1F : alpha);
 			} else {
 				info.setColor(Color.black);
@@ -66,26 +114,26 @@ public class MapBlocks extends HashMap {
 			return null;
 		}
 	}
-	
-	/**
-	 * Attempt at faster way to figure out if there is sky above
-	 * @param chunkStub
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return
-	 */
+
+    /**
+     * Attempt at faster way to figure out if there is sky above
+     * @param chunkMd
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
 	public static boolean skyAbove(ChunkMD chunkMd, final int x, final int y, final int z) {
 		
 		boolean seeSky = chunkMd.stub.canBlockSeeTheSky(x, y, z);
 		if(!seeSky) {
 			seeSky = true;
-			int blockId;			
+			Block block;
 			int checkY = y;
 			final int maxY = chunkMd.stub.getHeightValue(x, z);
 			while(seeSky && checkY<=maxY) {
-				blockId = chunkMd.stub.getBlockID(x, checkY, z);
-				if(sky.contains(blockId)) {
+                block = chunkMd.stub.func_150810_a(x, y, z);
+				if(hasFlag(block, Flag.IgnoreOverhead)) {
 					checkY++;
 				} else {
 					seeSky = false;
@@ -98,53 +146,28 @@ public class MapBlocks extends HashMap {
 		}
 		return seeSky;
 	}
-	
-	/**
-	 * Attempt at faster way to figure out if there is sky above
-	 * @param chunkMd
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return
-	 */
+
+    /**
+     * Attempt at faster way to figure out if there is sky above
+     * @param chunkMd
+     * @param x
+     * @param maxY
+     * @param z
+     * @return
+     */
 	public static int ceiling(ChunkMD chunkMd, final int x, final int maxY, final int z) {
 		
 		final int chunkHeight = chunkMd.stub.getHeightValue(x, z);
 		final int topY = Math.min(maxY, chunkHeight);
 
-		int blockId;
+		Block block;
 		int y = topY;
 		
-//		if(topY==chunkHeight) {
-//			// Experimental
-//			blockId = chunkStub.stub.getBlockID(x, y, z);
-//			if(nonCeilingBlocks.contains(blockId)) {
-//				y--;
-//			}
-//			return y;
-//
-////			// Error check, could be bad data in the heightmap
-////			while(y<maxY) {
-////				blockId = chunkStub.stub.getBlockID(x, y, z);
-////				
-////				if(nonCeilingBlocks.contains(blockId)) {
-////					y++;
-////				} else {
-////					break;
-////				}
-////			}
-////			if(y<maxY) {
-////				return y;
-////			} else {
-////				return topY;
-////			}
-//		}
-		
 		while(y>=0) {
-			blockId = chunkMd.stub.getBlockID(x, y, z);
+            block = chunkMd.stub.func_150810_a(x, y, z);
 			if(chunkMd.stub.canBlockSeeTheSky(x, y, z)) {
 				y--;
-			} else if(nonCeilingBlocks.contains(blockId)) {
+			} else if(hasFlag(block, Flag.NotTopBlock)) {
 				y--;
 			} else {
 				break;
@@ -153,108 +176,38 @@ public class MapBlocks extends HashMap {
 		
 		return y;
 	}
-		
-	/**
-	 * Map of transparent block ids that don't block view of the sky
-	 */
-	public final static HashSet<Integer> sky = new HashSet<Integer>(7);
-	{
-		sky.add(0); // air 
-//		sky.add(8); // water 
-//		sky.add(9); // stationary water 
-		sky.add(18); // leaves
-		sky.add(30); // web
-		sky.add(65); // ladder
-		sky.add(78); // snow
-		sky.add(106); // vines
-		sky.add(Block.glass.blockID);
-		sky.add(Block.thinGlass.blockID);
-	}
-	
-	/**
-	 * Map of block ids that won't be considered a ceiling block.
-	 */
-	public final static HashSet<Integer> nonCeilingBlocks = new HashSet<Integer>(7);
-	{
-		nonCeilingBlocks.add(0); // air 
-		nonCeilingBlocks.add(18); // leaves
-		nonCeilingBlocks.add(30); // web
-		nonCeilingBlocks.add(65); // ladder
-		nonCeilingBlocks.add(78); // snow
-		nonCeilingBlocks.add(106); // vines
-	}
-	
-	/**
-	 * Map of block ids that shouldn't be used as top blocks
-	 */
-	public final static HashSet<Integer> excludeHeight = new HashSet<Integer>(5);
-	{
-		excludeHeight.add(0); // air 
-		excludeHeight.add(Block.tallGrass.blockID); // grass, fern 
-		excludeHeight.add(Block.deadBush.blockID); // shrub 
-		excludeHeight.add(Block.tripWire.blockID); // tripwire hook
-		excludeHeight.add(Block.tripWireSource.blockID); // tripwire
-		excludeHeight.add(Block.glass.blockID);
-		excludeHeight.add(Block.thinGlass.blockID);
-	}
-	
-	/**
-	 * Map of block ids that shouldn't cast shadows
-	 */
-	public final static HashSet<BlockInfo> noShadows = new HashSet<BlockInfo>(5);
-	{
-		noShadows.add(new BlockInfo(Block.waterStill.blockID, 0));
-		noShadows.add(new BlockInfo(Block.lavaStill.blockID, 0));
-		noShadows.add(new BlockInfo(Block.fire.blockID, 0));
-		noShadows.add(new BlockInfo(Block.glass.blockID, 0));
-		noShadows.add(new BlockInfo(Block.vine.blockID, 0));
-	}
-	
-	/**
-	 * Map of block ids that are vegetation; textures should be side 2.
-	 */
-	public final static HashSet<Integer> side2Textures = new HashSet<Integer>(5);
-	{		
-		side2Textures.add(Block.sapling.blockID); 
-		side2Textures.add(Block.web.blockID); 		
-		side2Textures.add(Block.tallGrass.blockID); 
-		side2Textures.add(Block.deadBush.blockID); 
-		side2Textures.add(Block.plantYellow.blockID);
-		side2Textures.add(Block.plantRed.blockID);
-		side2Textures.add(Block.mushroomRed.blockID);
-		side2Textures.add(Block.mushroomBrown.blockID);
-		side2Textures.add(Block.crops.blockID);
-		side2Textures.add(Block.fire.blockID);
-		side2Textures.add(Block.reed.blockID);
-		side2Textures.add(Block.pumpkinStem.blockID);
-		side2Textures.add(Block.melonStem.blockID);
-		side2Textures.add(Block.netherStalk.blockID);
-		side2Textures.add(Block.carrot.blockID);
-		side2Textures.add(Block.potato.blockID);
-	}
-	
-	/**
-	 * Map of block ids that are colored according to biome.
-	 */
-	public final static HashSet<Integer> biomeBlocks = new HashSet<Integer>(5);
-	{		
-		biomeBlocks.add(Block.grass.blockID); 
-		biomeBlocks.add(Block.waterMoving.blockID); 		
-		biomeBlocks.add(Block.waterStill.blockID); 
-		biomeBlocks.add(Block.leaves.blockID); 
-		biomeBlocks.add(Block.tallGrass.blockID);
-		biomeBlocks.add(Block.vine.blockID);
-	}
-	
-	/**
-	 * Alpha values for block ids.
-	 */	
-	static void resetAlphas() {
-		alphas.put(Block.ice.blockID,.8F); 
-		alphas.put(Block.glass.blockID,.3F); 
-		alphas.put(Block.thinGlass.blockID,.3F);
-		alphas.put(Block.vine.blockID,.2F);
-		alphas.put(Block.torchWood.blockID,.5F);
-	}
+
+    public static void setFlags(Block block, Flag... flags)
+    {
+        GameRegistry.UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(block);
+        EnumSet<Flag> eset = blockFlags.get(uid);
+        if(eset==null) {
+            eset = EnumSet.noneOf(Flag.class);
+        }
+        eset.addAll(Arrays.asList(flags));
+        blockFlags.put(uid, eset);
+    }
+
+    public static boolean hasFlag(Block block, Flag flag)
+    {
+        EnumSet<Flag> flags = blockFlags.get(GameRegistry.findUniqueIdentifierFor(block));
+        return flags!=null && flags.contains(flag);
+    }
+
+    public static boolean hasAlpha(Block block)
+    {
+        return blockAlphas.containsKey(GameRegistry.findUniqueIdentifierFor(block));
+    }
+
+    public static Float getAlpha(Block block)
+    {
+        return blockAlphas.get(GameRegistry.findUniqueIdentifierFor(block));
+    }
+
+    public static void setAlpha(Block block, Float alpha)
+    {
+        blockAlphas.put(GameRegistry.findUniqueIdentifierFor(block), alpha);
+    }
+
 	
 }

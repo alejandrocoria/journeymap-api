@@ -42,7 +42,7 @@ public class MapOverlayActions extends JmUI {
     @Override
 	public void initGui()
     {
-        this.buttonList.clear();
+        this.field_146292_n.clear();
         String on = Constants.getString("MapOverlay.on");
         String off = Constants.getString("MapOverlay.off");
 
@@ -60,11 +60,11 @@ public class MapOverlayActions extends JmUI {
 		
 		buttonCheck = new MapButton(ButtonEnum.Check.ordinal(),0,0, Constants.getString("MapOverlay.update_check")); //$NON-NLS-1$ 
 	
-		buttonList.add(buttonAutomap);
-		buttonList.add(buttonSave);
-		buttonList.add(buttonCheck);
-		buttonList.add(buttonBrowser);
-		buttonList.add(buttonClose);		
+		field_146292_n.add(buttonAutomap);
+		field_146292_n.add(buttonSave);
+		field_146292_n.add(buttonCheck);
+		field_146292_n.add(buttonBrowser);
+		field_146292_n.add(buttonClose);		
 		
     }
     
@@ -74,24 +74,24 @@ public class MapOverlayActions extends JmUI {
 	void layoutButtons() {
 		// Buttons
 		
-		if(buttonList.isEmpty()) {
+		if(field_146292_n.isEmpty()) {
 			initGui();
 		}
 		
 		buttonSave.enabled = !JourneyMap.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);
 		
-		if(lastWidth!=width || lastHeight!=height) {
+		if(lastWidth!=field_146294_l || lastHeight!=field_146295_m) {
 			
-			lastWidth = width;
-			lastHeight = height;
+			lastWidth = field_146294_l;
+			lastHeight = field_146295_m;
 
 			final int hgap = 4;
 			final int vgap = 3;
-			final int bx = (this.width-hgap)/2;
-			final int by = this.height / 4;
+			final int bx = (this.field_146294_l-hgap)/2;
+			final int by = this.field_146295_m / 4;
 			
-			buttonAutomap.leftOf(bx).yPosition=by;
-            buttonBrowser.rightOf(buttonAutomap, hgap).yPosition=by;
+			buttonAutomap.leftOf(bx).setY(by);
+            buttonBrowser.rightOf(buttonAutomap, hgap).setY(by);
 
             buttonSave.below(buttonAutomap, vgap).leftOf(bx);
 			buttonCheck.below(buttonBrowser, vgap).rightOf(buttonSave, hgap);
@@ -103,9 +103,9 @@ public class MapOverlayActions extends JmUI {
 	}
 
     @Override
-	protected void actionPerformed(GuiButton guibutton) {
+	protected void func_146284_a(GuiButton guibutton) { // actionPerformed
     	
-    	final ButtonEnum id = ButtonEnum.values()[guibutton.id];
+    	final ButtonEnum id = ButtonEnum.values()[guibutton.field_146127_k];
     	switch(id) {
 			case Save: { 
 				save();
@@ -161,21 +161,21 @@ public class MapOverlayActions extends JmUI {
      */
     @Override
     public void drawScreen(int par1, int par2, float par3)
-    {        
-    	drawBackground(0);
+    {
+        func_146270_b(0);
     	layoutButtons();
     	super.drawScreen(par1, par2, par3);
 
-    	int y = this.height / 4 - 18;
-        drawCenteredString(this.fontRenderer, title , this.width / 2, y, 16777215);
+    	int y = this.field_146295_m / 4 - 18;
+        drawCenteredString(this.field_146289_q, title , this.field_146294_l / 2, y, 16777215);
     }
     
     @Override
-	public void drawBackground(int layer)
-	{    	
-    	super.drawBackground(0);
-    	MapOverlay.drawMapBackground(this);
-    	super.drawDefaultBackground();
+	public void func_146270_b(int layer) //drawBackground
+	{
+        super.func_146278_c(layer); // super.drawBackground(0);
+        MapOverlay.drawMapBackground(this);
+        super.func_146270_b(layer); // super.drawDefaultBackground();
 
         super.drawLogo();
 	}

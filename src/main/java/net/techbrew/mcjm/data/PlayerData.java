@@ -1,10 +1,13 @@
 package net.techbrew.mcjm.data;
 
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.cartography.MapBlocks;
 import net.techbrew.mcjm.io.nbt.ChunkLoader;
 import net.techbrew.mcjm.model.ChunkMD;
@@ -48,8 +51,8 @@ public class PlayerData implements IDataProvider {
 		EntityClientPlayerMP player = mc.thePlayer;
 	   
 		LinkedHashMap props = new LinkedHashMap();
-		props.put(EntityKey.entityId, player.entityId); 
-		props.put(EntityKey.username, player.getEntityName());
+		props.put(EntityKey.entityId, player.getUniqueID());
+		props.put(EntityKey.username, player.getDisplayName());
 		props.put(EntityKey.heading, EntityHelper.getHeading(player));
 		props.put(EntityKey.chunkCoordX, player.chunkCoordX); 
 		props.put(EntityKey.chunkCoordY, player.chunkCoordY); 
@@ -131,21 +134,30 @@ public class PlayerData implements IDataProvider {
 	 */
 	private static boolean canSeeSky(World world, final int x, final int y, final int z) {
 		boolean seeSky = true;
-		int blockId;
-		
-		int topY = world.getHeight();
-		if(y>=topY) {
-			return true;
-		}
+		Block block;
+
+        int topY = world.getTopSolidOrLiquidBlock(x,z);
+        if(y>=topY) {
+            return true;
+        }
+
+        Chunk chunk = world.getChunkFromBlockCoords(x, z);
 		int checkY = topY;
 		while(seeSky && checkY>y) {
-			blockId = world.getBlockId(x, checkY, z);
-			if(MapBlocks.sky.contains(blockId)) {
-				checkY--;
-			} else {
-				seeSky = false;
-				break;
-			}
+            try {
+                block = chunk.func_150810_a(x & 15, checkY, z & 15);
+                if(MapBlocks.hasFlag(block, MapBlocks.Flag.IgnoreOverhead)) {
+                    checkY--;
+                } else {
+                    seeSky = false;
+                    break;
+                }
+            } catch (Exception e) {
+                checkY--;
+                JourneyMap.getLogger().warning(e + " at " + (x & 15) + "," + checkY + "," + (z & 15));
+                continue;
+            }
+
 		}
 		return seeSky;
 	}

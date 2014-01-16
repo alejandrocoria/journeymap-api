@@ -49,7 +49,7 @@ public class VillagersData implements IDataProvider {
 		
 		for(EntityVillager entity : villagers) {
 			LinkedHashMap eProps = new LinkedHashMap();
-			eProps.put(EntityKey.entityId, entity.entityId); 
+			eProps.put(EntityKey.entityId, entity.getUniqueID());
 			eProps.put(EntityKey.filename, EntityHelper.getFileName(entity)); 
 			eProps.put(EntityKey.hostile, false);
             eProps.put(EntityKey.posX, entity.posX);

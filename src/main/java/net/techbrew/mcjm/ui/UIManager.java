@@ -1,5 +1,7 @@
 package net.techbrew.mcjm.ui;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.InputEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
@@ -14,6 +16,7 @@ import net.techbrew.mcjm.ui.map.MapOverlayActions;
 import net.techbrew.mcjm.ui.map.MapOverlayOptions;
 import net.techbrew.mcjm.ui.minimap.MiniMap;
 import net.techbrew.mcjm.ui.minimap.MiniMapOptions;
+import org.lwjgl.input.Keyboard;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,7 +43,7 @@ public class UIManager {
     
     public void closeAll() {    	
     	closeCurrent();
-    	minecraft.displayGuiScreen(null);
+    	minecraft.func_147108_a(null);
 		minecraft.setIngameFocus();
         miniMap.setVisible(true);
         TileCache.instance().cleanUp();
@@ -57,14 +60,14 @@ public class UIManager {
     public void openInventory() {
     	logger.fine("Opening inventory");
     	closeAll();
-    	minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer));
+    	minecraft.func_147108_a(new GuiInventory(minecraft.thePlayer)); // displayGuiScreen
     }
     
     public void open(Class<? extends JmUI> uiClass) {
     	closeCurrent();
     	try {    		
     		logger.fine("Opening UI " + uiClass.getSimpleName());
-			minecraft.displayGuiScreen(uiClass.newInstance());
+			minecraft.func_147108_a(uiClass.newInstance()); // displayGuiScreen
             miniMap.setVisible(false);
 		} catch(Throwable e) {
 			logger.log(Level.SEVERE, "Unexpected exception opening UI: " + e); //$NON-NLS-1$
@@ -120,11 +123,11 @@ public class UIManager {
             this.miniMap.reset();
         }
     }
-    
-	public void keyboardEvent(KeyBinding keybinding)
-	{		
-		// JourneyMap key
-		if(keybinding.keyCode==uiKeybinding.keyCode) {
+
+    @SubscribeEvent
+    public void onKeyboardEvent(InputEvent.KeyInputEvent event) {
+
+        if(Keyboard.getEventKey()==uiKeybinding.func_151463_i()) {
 			if(minecraft.currentScreen==null) {
 				openMap();
 			} else if(minecraft.currentScreen instanceof MapOverlay) {

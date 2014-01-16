@@ -1,12 +1,14 @@
 package net.techbrew.mcjm.model;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.mcjm.cartography.MapBlocks;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -34,7 +36,7 @@ public class ChunkMD {
 	}
 	
 	public ChunkMD(Chunk chunk, Boolean render, World worldObj, boolean doErrorChecks) {		
-		this(new ChunkStub(chunk, doErrorChecks), render, worldObj);
+		this(new ChunkStub(chunk), render, worldObj);
 		if(chunk.isEmpty() || !chunk.isChunkLoaded) {
 			render = false;
 		}
@@ -53,6 +55,10 @@ public class ChunkMD {
 		discards = Math.max(0, discards+i);
 		return discards;
 	}
+
+    public Block getBlock(int x, int y, int z) {
+        return stub.func_150810_a(x, y, z);
+    }
 	
 	/**
 	 * Added to do a safety check on the world height value
@@ -74,12 +80,12 @@ public class ChunkMD {
     {
     	try {
 	    	int y = 0;
-	    	int id = 0;
+	    	Block block = null;
 	    	y = stub.heightMap[z << 4 | x];
 	    	if(y<1) return 0;
-	    	while(id==0) {    		
-	    		id = stub.getBlockID(x,y,z); 
-	    		if(MapBlocks.excludeHeight.contains(id)) {
+	    	while(block == Blocks.air || block.func_149688_o() == Material.field_151579_a) {
+	    		block = stub.func_150810_a(x, y, z);
+                if(MapBlocks.hasFlag(block, MapBlocks.Flag.NotTopBlock)) {
 	    			y=y-1;
 	    		}
 	    		if(y==0) {
@@ -87,35 +93,10 @@ public class ChunkMD {
 	    		}
 	    	}
 	    	return y;       
-    	} catch(ArrayIndexOutOfBoundsException e) {
+    	} catch(Exception e) {
     		return stub.heightMap[z << 4 | x];
     	}
     }
-    
-    /**
-	 * Compare storage arrays of another chunkStub at the same position.
-	 * @param other
-	 * @return
-	 */
-	public boolean isUnchanged(ChunkMD other) {
-		if(stub.lastSaveTime!=other.stub.lastSaveTime) {
-			return false;
-		}
-		if(stub.storageArrays.length!=other.stub.storageArrays.length) {
-			return false;
-		}
-		if(!Arrays.equals(stub.heightMap,other.stub.heightMap)) {
-			return false;
-		}
-		for(int i=0;i<stub.storageArrays.length;i++) {
-			ExtendedBlockStorageStub ebs = stub.storageArrays[i];
-			ExtendedBlockStorageStub otherEbs = other.stub.storageArrays[i];
-			if(ebs==null && otherEbs!=null) return false;
-			if(ebs!=null && otherEbs==null) return false;
-			if(ebs!=null && !ebs.equals(otherEbs)) return false;
-		}
-		return true;
-	}
 
 	@Override
 	public int hashCode() {

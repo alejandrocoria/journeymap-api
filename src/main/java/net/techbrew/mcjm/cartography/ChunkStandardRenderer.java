@@ -1,6 +1,6 @@
 package net.techbrew.mcjm.cartography;
 
-import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.mcjm.Constants;
@@ -73,11 +73,22 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		for (int x = 0; x < 16; x++) {
 			blockLoop : for (int z = 0; z < 16; z++) {				
 				
-				int y = chunkMd.getSafeHeightValue(x, z);				
+				//int y = chunkMd.getSafeHeightValue(x, z);
+                int y = chunkMd.stub.getHeightValue(x, z);
 				if (y < 0) y=1; // Weird data error seen on World of Keralis
 				
 				// Get blockinfo for coords
 				BlockInfo blockInfo = mapBlocks.getBlockInfo(chunkMd, x, y, z);
+
+                // Ensure not air
+                if(MapBlocks.hasFlag(blockInfo.getBlock(), MapBlocks.Flag.HasAir)) {
+                    while(y>=0 && blockInfo!=null && MapBlocks.hasFlag(blockInfo.getBlock(), MapBlocks.Flag.HasAir)) {
+                        y--;
+                        blockInfo = mapBlocks.getBlockInfo(chunkMd, x, y, z);
+                    }
+                }
+
+                // Null check
 				if (blockInfo == null) {
 					paintBadBlock(x, y, z, g2D);
 					continue blockLoop;
@@ -91,38 +102,37 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				}
 					
 				// Paint deeper blocks if alpha used
-				boolean useAlpha = blockInfo.alpha < 1F;		
+				boolean useAlpha = blockInfo.getAlpha() < 1F;
 				if (!prepUnderground && useAlpha) {
 					
 					// Check for surrounding water
-					if(blockInfo.id==9||blockInfo.id==8) {
+					if(blockInfo.isWater()) {
 						BlockInfo bw = getBlock(x, y, z, -1, 0, chunkMd, neighbors, blockInfo);
 						BlockInfo be = getBlock(x, y, z, +1, 0, chunkMd, neighbors, blockInfo);
 						BlockInfo bn = getBlock(x, y, z, 0, -1, chunkMd, neighbors, blockInfo);
 						BlockInfo bs = getBlock(x, y, z, 0, +1, chunkMd, neighbors, blockInfo);
 						Set<Color> colors = new HashSet<Color>(5);
 						colors.add(blockInfo.getColor());
-						if(bw.id==8 || bw.id==9) colors.add(bw.getColor());
-						if(be.id==8 || be.id==9) colors.add(be.getColor());
-						if(bn.id==8 || bn.id==9) colors.add(bn.getColor());
-						if(bs.id==8 || bs.id==9) colors.add(bs.getColor());
+						if(bw.isWater()) colors.add(bw.getColor());
+						if(be.isWater()) colors.add(be.getColor());
+						if(bn.isWater()) colors.add(bn.getColor());
+						if(bs.isWater()) colors.add(bs.getColor());
 						if(colors.size()>1) {
 							color = ColorCache.average(colors);
 						}
 						blockInfo.setColor(color);
-						
 					}
 					paintDepth(chunkMd, blockInfo, x, y, z, g2D, false, prepUnderground);
 					chunkOk = true;
 					
 				} else {
-				
-					if(!MapBlocks.noShadows.contains(blockInfo)) {
+
+                    if(!MapBlocks.hasFlag(blockInfo.getBlock(), MapBlocks.Flag.NoShadow)) {
 	
 						// Get slope of block and prepare to shade
 						slope = chunkMd.surfaceSlopes[x][z];
-						
-						if(blockInfo.id!=18) {
+
+						if(!blockInfo.isFoliage()) {
 							sN = getBlockSlope(x, z, 0, -1, chunkMd, neighbors, slope, false);
 							sNW = getBlockSlope(x, z, -1, -1, chunkMd, neighbors, slope, false);
 							sW = getBlockSlope(x, z, -1, 0, chunkMd, neighbors, slope, false);
@@ -140,18 +150,17 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 							if(slope<=sAvg) {
 								slope = slope*.6f;
 							} else if(slope>sAvg) {
-								if(blockInfo.id!=18){
+								if(!blockInfo.isFoliage()){
 									slope = (slope+sAvg)/2f;
 								}
 							}
 							s = Math.max(slope * .8f, .1f);
 							color = shade(color, s);
-		
 						} else if(slope>1) {
 							
 							if(sAvg>1) {
 								if(slope>=sAvg) {
-									if(blockInfo.id!=18){
+									if(!blockInfo.isFoliage()){
 										slope = slope*1.2f;
 									}
 								}
@@ -230,7 +239,8 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		
 		boolean hasAir;
 		boolean hasWater;
-		int blockId;
+        BlockInfo info;
+
 		int paintY;
 		int lightLevel;
 		
@@ -242,7 +252,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				// reset vars
 				hasAir = false;
 				hasWater = false;
-				blockId = 0;
+
 				paintY = -1;
 				lightLevel =0;
 	
@@ -260,32 +270,32 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					}					
 				
 					// Check for air at the top of column
-					blockId = chunkMd.stub.getBlockID(x, blockMaxY+1, z);
-					hasAir = blockId==0;
-					hasWater = blockId==8 || blockId==9;
+                    info = mapBlocks.getBlockInfo(chunkMd, x, blockMaxY+1, z);
+
+					hasAir = info.isAir();
+					hasWater = info.isWater();
 					paintY = blockMaxY;
 
 					// Step downward to find air
 					airloop: for (int y = blockMaxY; y >= 0; y--) {
-														
-						blockId = chunkMd.stub.getBlockID(x, y, z);
+
+                        info = mapBlocks.getBlockInfo(chunkMd, x, y, z);
 						
 						// Water handling
-						if((blockId == 8 || blockId == 9)) {		
-							
+						if(info.isWater()) {
+                            hasWater = true;
 							paintDepth(chunkMd, mapBlocks.getBlockInfo(chunkMd, x, y, z), x, y, z, g2D, true, false);
 							continue blockLoop;
-							
 						} 
 						
 						// Found air
-						if (blockId == 0) {
+						if (info.isAir()) {
 							hasAir = true;
 							continue airloop;
 						}
 																	
 						// Treat torches like there is air
-						if(blockId == 50 || blockId == 76 || blockId == 76) {
+						if(info.isTorch()) {
 							hasAir = true;
 							// Check whether torch is mounted on the block below it
 							if(chunkMd.stub.getBlockMetadata(x, y, z)!=5) { // standing on block below=5
@@ -294,7 +304,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						}						
 						else
 						// Lava shortcut
-						if(blockId==10 || blockId==11) {
+						if(info.isLava()) {
 							if(!hasAir) {
 								paintBlock(x, z, Color.black, g2D);
 								continue blockLoop;
@@ -335,10 +345,10 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					} 					
 
 					// Get block color
-					BlockInfo info = mapBlocks.getBlockInfo(chunkMd, x, paintY, z);
+					info = mapBlocks.getBlockInfo(chunkMd, x, paintY, z);
 					Color color = info.getColor();
 
-					boolean keepflat = MapBlocks.noShadows.contains(info.id);					
+					boolean keepflat = MapBlocks.hasFlag(info.getBlock(), MapBlocks.Flag.NoShadow);
 					if(!keepflat) {
 						// Contour shading
 						// Get slope of block and prepare to shade
@@ -415,27 +425,14 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 			BlockInfo lowerBlock = mapBlocks.getBlockInfo(chunkMd, x, down, z);
 			if(lowerBlock!=null) {
 				stack.push(lowerBlock);
+
+                if(lowerBlock.isWater() || lowerBlock.getBlock()==Blocks.ice){
+                    maxDepth = 4;
+                } else if(lowerBlock.isAir()) {
+                    maxDepth = 256;
+                }
 				
-				switch(lowerBlock.id) {
-					case 79 : { // ice
-						maxDepth = 4;
-						break;
-					}
-					case 8 : { // water
-						maxDepth = 4;
-						break;
-					}
-					case 9 : { // water
-						maxDepth = 4;
-						break;
-					}
-					case 0 : { // air
-						maxDepth = 256;
-						break;
-					}
-				}
-				
-				if (lowerBlock.alpha==1f || y-down>maxDepth) {
+				if (lowerBlock.getAlpha()==1f || y-down>maxDepth) {
 					break;
 				}	
 				
@@ -444,12 +441,9 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 			}
 			
 		}
-		
-		float depth = stack.size();
-		boolean thinWaterAdjust = (depth==2 && blockInfo.id== Block.waterStill.blockID);
-		boolean isWater = (blockInfo.id==Block.waterStill.blockID || blockInfo.id==Block.waterMoving.blockID);		
-		
+
 		Color color;
+        boolean isWater = blockInfo.isWater();
 
 		// Get color for bottom of stack
 		color = stack.peek().getColor();
@@ -477,11 +471,11 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		g2D.fillRect(x, z, 1, 1);	
 				
 		// If bottom block is same as the top, don't bother with transparency
-		if(stack.peek().id!=blockInfo.id) {
+		if(stack.peek().getBlock()!=blockInfo.getBlock()) {
 			stack.pop(); // already used it
 			while(!stack.isEmpty()) {
 				BlockInfo lowerBlock = stack.pop();
-				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, lowerBlock.alpha));
+				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, lowerBlock.getAlpha()));
 				color = lowerBlock.getColor();
 				
 				if(useLighting) {
