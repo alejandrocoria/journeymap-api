@@ -1,4 +1,4 @@
-package net.techbrew.mcjm.cartography;
+package net.techbrew.mcjm.model;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -9,14 +9,15 @@ import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.cartography.ColorCache;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.ChunkMD;
 
 import java.awt.*;
 import java.io.Serializable;
+import java.util.EnumSet;
 
 
-public class BlockInfo implements Serializable {
+public class BlockMD implements Serializable {
 
 	private static final long serialVersionUID = 2L;
 
@@ -53,13 +54,17 @@ public class BlockInfo implements Serializable {
         }
     }
 
-    private static final LoadingCache<CacheKey, BlockInfo> cache = CacheBuilder.newBuilder()
+    private static final LoadingCache<CacheKey, BlockMD> cache = CacheBuilder.newBuilder()
             .concurrencyLevel(1)
             .initialCapacity(256)
-            .build(new CacheLoader<CacheKey, BlockInfo>() {
+            .build(new CacheLoader<CacheKey, BlockMD>() {
                 @Override
-                public BlockInfo load(CacheKey key) throws Exception {
-                    return createBlockInfo(key);
+                public BlockMD load(CacheKey key) throws Exception {
+                    try {
+                        return createBlockMD(key);
+                    } catch (Exception e) {
+                        throw e;
+                    }
                 }
             });
 
@@ -67,18 +72,17 @@ public class BlockInfo implements Serializable {
     private transient Block block;
 	private Color color;
 	private Float alpha;
-    private final boolean biomeColored;
-    private final boolean air;
+    private final EnumSet<BlockUtils.Flag> flags;
 
     /**
-     * Produces a BlockInfo instance.
+     * Produces a BlockMD instance.
      * @param chunkMd
      * @param x
      * @param y
      * @param z
      * @return
      */
-    public static BlockInfo getBlockInfo(ChunkMD chunkMd, int x, int y, int z) {
+    public static BlockMD getBlockMD(ChunkMD chunkMd, int x, int y, int z) {
         try {
             Block block;
             int meta;
@@ -102,56 +106,56 @@ public class BlockInfo implements Serializable {
         }
     }
 
-    public static BlockInfo getBlockInfo(GameRegistry.UniqueIdentifier uid, int meta) {
+    public static BlockMD getBlockMD(GameRegistry.UniqueIdentifier uid, int meta) {
         try {
             return cache.get(new CacheKey(uid, meta));
         } catch (Exception e) {
-            JourneyMap.getLogger().severe("Can't get BlockInfo for block " + uid + " meta " + meta);
+            JourneyMap.getLogger().severe("Can't get BlockMD for block " + uid + " meta " + meta);
             JourneyMap.getLogger().severe(LogFormatter.toString(e));
             return null;
         }
     }
 
-    private static final BlockInfo createBlockInfo(CacheKey key) {
+    private static final BlockMD createBlockMD(CacheKey key) {
 
         Block block = GameRegistry.findBlock(key.uid.modId, key.uid.name);
         if(block==null)
         {
             JourneyMap.getLogger().severe("Block not found for " + key.uid);
-            return new BlockInfo(key, Blocks.air);
+            return new BlockMD(key, Blocks.air);
         }
 
-        BlockInfo info = new BlockInfo(key, block);
-        if(info.isAir()) {
-            info.color = Color.CYAN; // Should be obvious if it gets displayed somehow.
-            info.setAlpha(0f);
+        BlockMD blockMD = new BlockMD(key, block);
+        if(blockMD.isAir()) {
+            blockMD.color = Color.CYAN; // Should be obvious if it gets displayed somehow.
+            blockMD.setAlpha(0f);
         } else {
-            Float alpha = MapBlocks.getAlpha(block);
-            info.setAlpha(alpha==null ? 1F : alpha);
+            Float alpha = BlockUtils.getAlpha(block);
+            blockMD.setAlpha(alpha==null ? 1F : alpha);
         }
 
-        JourneyMap.getLogger().info("Created " + info);
+        JourneyMap.getLogger().info("Created " + blockMD);
 
-        return info;
+        return blockMD;
     }
 
-	private BlockInfo(CacheKey key, Block block) {
+	private BlockMD(CacheKey key, Block block) {
         if(block==null) throw new IllegalArgumentException("Block can't be null");
         this.key = key;
 		this.block = block;
-        this.biomeColored = hasFlag(MapBlocks.Flag.BiomeColor);
-        this.air = hasFlag(MapBlocks.Flag.HasAir);
+        this.flags = BlockUtils.getFlags(this.key.uid);
 	}
 
-    public boolean hasFlag(MapBlocks.Flag flag)
+    public boolean hasFlag(BlockUtils.Flag flag)
     {
-        return MapBlocks.hasFlag(this.key.uid, flag);
+        return flags.contains(flag);
     }
 	
 	public Color getColor(ChunkMD chunkMd, int x, int y, int z) {
 		if(this.color!=null) {
             return this.color;
         } else {
+            boolean biomeColored = hasFlag(BlockUtils.Flag.BiomeColor);
 			Color color = ColorCache.getInstance().getBlockColor(chunkMd, this, biomeColored, x, y, z);
             if(color==null) {
                 return Color.BLACK;
@@ -192,7 +196,7 @@ public class BlockInfo implements Serializable {
     }
 
     public boolean isAir() {
-        return air;
+        return hasFlag(BlockUtils.Flag.HasAir);
     }
 
     public boolean isTorch() {
@@ -215,7 +219,7 @@ public class BlockInfo implements Serializable {
     }
 
     public boolean isBiomeColored() {
-        return biomeColored;
+        return hasFlag(BlockUtils.Flag.BiomeColor);
     }
 
 	@Override
@@ -229,15 +233,15 @@ public class BlockInfo implements Serializable {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof BlockInfo))
+		if (!(obj instanceof BlockMD))
 			return false;
-		BlockInfo other = (BlockInfo) obj;
+		BlockMD other = (BlockMD) obj;
 		return key.equals(other.key);
 	}
 
 	@Override
 	public String toString() {
-		return "BlockInfo [" + key.uid + " meta " + key.meta + "]";
+		return "BlockMD [" + key.uid + " meta " + key.meta + "]";
 	}
 
 }

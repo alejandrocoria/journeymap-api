@@ -4,6 +4,7 @@ import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.RegionImageHandler;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.BlockUtils;
 import net.techbrew.mcjm.model.ChunkMD;
 
 import java.awt.*;
@@ -33,10 +34,10 @@ public class ChunkRenderController {
 	private BufferedImage blankChunkImageUnderground = null;
 	
 	public ChunkRenderController() {
-		MapBlocks mapBlocks = new MapBlocks();
-		netherRenderer = new ChunkNetherRenderer(mapBlocks);
-		endRenderer = new ChunkEndRenderer(mapBlocks);
-		standardRenderer = new ChunkStandardRenderer(mapBlocks);
+		BlockUtils blockUtils = new BlockUtils();
+		netherRenderer = new ChunkNetherRenderer();
+		endRenderer = new ChunkEndRenderer();
+		standardRenderer = new ChunkStandardRenderer();
 	}
 	
 	public BufferedImage getChunkImage(ChunkMD chunkMd,
@@ -115,7 +116,7 @@ public class ChunkRenderController {
 		if(blankChunkImage==null) {
 			blankChunkImage = new BufferedImage(32, 16, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2D = blankChunkImage.createGraphics();
-			g2D.setComposite(MapBlocks.CLEAR);
+			g2D.setComposite(BlockUtils.CLEAR);
 			g2D.setColor(Color.white);
 			g2D.fillRect(0, 0, 32, 16);
 			g2D.dispose();
@@ -127,7 +128,7 @@ public class ChunkRenderController {
 		if(blankChunkImageUnderground==null) {
 			blankChunkImageUnderground = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2D = blankChunkImageUnderground.createGraphics();
-			g2D.setComposite(MapBlocks.SLIGHTLYCLEAR);
+			g2D.setComposite(BlockUtils.SLIGHTLYCLEAR);
 			g2D.setColor(Color.black);
 			g2D.fillRect(0, 0, 16, 16);
 			g2D.dispose();

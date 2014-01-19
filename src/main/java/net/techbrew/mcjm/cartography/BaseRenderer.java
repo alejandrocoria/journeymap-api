@@ -5,6 +5,8 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.model.BlockMD;
+import net.techbrew.mcjm.model.BlockUtils;
 import net.techbrew.mcjm.model.ChunkMD;
 
 import java.awt.*;
@@ -17,28 +19,21 @@ import java.util.logging.Level;
  */
 public abstract class BaseRenderer {
 
-	final MapBlocks mapBlocks;	
 	boolean caveLighting = PropertyManager.getInstance().getBoolean(PropertyManager.Key.CAVE_LIGHTING);
 	final boolean fineLogging = JourneyMap.getLogger().isLoggable(Level.FINE);
 	
 	boolean debug = false;
 	long badBlockCount = 0;
-	
-	public BaseRenderer(MapBlocks mapBlocks) {
-		super();
-		this.mapBlocks = mapBlocks;
-	}
 
-
-	/**
-	 * Paint the block with half-clear red to indicate it's a problem.
-	 * 
-	 * @param x
-	 * @param vSlice
-	 * @param z
-	 */
+    /**
+     * Paint the block with half-clear red to indicate it's a problem.
+     * @param x
+     * @param y
+     * @param z
+     * @param g2D
+     */
 	public void paintBadBlock(final int x, final int y, final int z, final Graphics2D g2D) {
-		g2D.setComposite(MapBlocks.SEMICLEAR);
+		g2D.setComposite(BlockUtils.SEMICLEAR);
 		g2D.setPaint(Color.red);
 		g2D.fillRect(x, z, 1, 1);
 		badBlockCount++;
@@ -49,31 +44,30 @@ public abstract class BaseRenderer {
 		}
 	}
 
-	/**
-	 * Paint the block clear.
-	 * 
-	 * @param x
-	 * @param vSlice
-	 * @param z
-	 */
+    /**
+     * Paint the block clear.
+     * @param x
+     * @param vSlice
+     * @param z
+     * @param g2D
+     */
 	public void paintClearBlock(final int x, final int vSlice, final int z,
 			final Graphics2D g2D) {
-		g2D.setComposite(MapBlocks.OPAQUE);
-		g2D.setBackground(MapBlocks.COLOR_TRANSPARENT);
+		g2D.setComposite(BlockUtils.OPAQUE);
+		g2D.setBackground(BlockUtils.COLOR_TRANSPARENT);
 		g2D.clearRect(x, z, 1, 1);
 	}
-	
-	/**
-	 * Paint the block.
-	 * 
-	 * @param x
-	 * @param vSlice
-	 * @param z
-	 * @param color
-	 */
+
+    /**
+     * Paint the block.
+     * @param x
+     * @param z
+     * @param color
+     * @param g2D
+     */
 	public void paintBlock(final int x, final int z, final Color color,
 			final Graphics2D g2D) {
-		g2D.setComposite(MapBlocks.OPAQUE);
+		g2D.setComposite(BlockUtils.OPAQUE);
 		g2D.setColor(color);
 		g2D.fillRect(x, z, 1, 1);
 	}
@@ -234,7 +228,7 @@ public abstract class BaseRenderer {
 	 * @param defaultVal
 	 * @return
 	 */
-	public BlockInfo getBlock(int x, int y, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, BlockInfo defaultVal) {
+	public BlockMD getBlock(int x, int y, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, BlockMD defaultVal) {
 		int newX = x+offsetX;
 		int newZ = z+offsetz;
 		
@@ -264,7 +258,7 @@ public abstract class BaseRenderer {
 		ChunkMD chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
 		
 		if(chunk!=null) {
-			return mapBlocks.getBlockInfo(chunk, newX, y, newZ);
+			return BlockMD.getBlockMD(chunk, newX, y, newZ);
 		} else {
 			return defaultVal;
 		}

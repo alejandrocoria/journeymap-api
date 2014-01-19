@@ -7,6 +7,8 @@ import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.BlockMD;
+import net.techbrew.mcjm.model.BlockUtils;
 import net.techbrew.mcjm.model.ChunkMD;
 
 import java.awt.*;
@@ -18,16 +20,6 @@ import java.util.logging.Level;
  *
  */
 public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer {
-
-	static final int alphaDepth = 5;
-	
-	/**
-	 * Constructor.
-	 * @param mapBlocks
-	 */
-	ChunkNetherRenderer(MapBlocks mapBlocks) {
-		super(mapBlocks);
-	}
 
 	/**
 	 * Render blocks in the chunk for the Nether world.
@@ -71,10 +63,10 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 					boolean hasAir = false;
 
 					int y = getHeightInSlice(chunkMd, x, z, sliceMinY, sliceMaxY);
-                    BlockInfo blockInfo = mapBlocks.getBlockInfo(chunkMd, x, y, z);
-					boolean isLava = (blockInfo.getBlock() == Blocks.lava || blockInfo.getBlock() == Blocks.flowing_lava);
+                    BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+					boolean isLava = (blockMD.getBlock() == Blocks.lava || blockMD.getBlock() == Blocks.flowing_lava);
 
-					Color color = blockInfo.getColor(chunkMd, x, y, z);
+					Color color = blockMD.getColor(chunkMd, x, y, z);
 					
 					// Get light level
 					if(isLava) {
@@ -133,7 +125,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 					}
 		
 					// Draw lighted block
-					g2D.setComposite(MapBlocks.OPAQUE);
+					g2D.setComposite(BlockUtils.OPAQUE);
 					g2D.setPaint(color);
 					g2D.fillRect(x, z, 1, 1);
 					chunkOk = true;
@@ -159,7 +151,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 		for (; y > 0; y--) {
 			block = chunkMd.getBlock(x, y, z);
 
-			if (MapBlocks.hasFlag(block, MapBlocks.Flag.HasAir)) {
+			if (BlockUtils.hasFlag(block, BlockUtils.Flag.HasAir)) {
 				hasAir = true;
 				continue;
 			}

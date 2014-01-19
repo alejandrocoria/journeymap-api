@@ -1,18 +1,15 @@
-package net.techbrew.mcjm.cartography;
+package net.techbrew.mcjm.model;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.ChunkMD;
 
 import java.awt.*;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 
-public class MapBlocks extends HashMap {
+public class BlockUtils {
 	
 	public static AlphaComposite OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
 	public static AlphaComposite CLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0F);
@@ -25,12 +22,10 @@ public class MapBlocks extends HashMap {
     private final static HashMap<GameRegistry.UniqueIdentifier, EnumSet<Flag>> blockFlags = new HashMap<GameRegistry.UniqueIdentifier, EnumSet<Flag>>(64);
     private final static HashMap<GameRegistry.UniqueIdentifier, Float> blockAlphas = new HashMap<GameRegistry.UniqueIdentifier, Float>(8);
 
-	final ColorCache colorCache = ColorCache.getInstance();
-	
 	/**
 	 * Constructor
 	 */
-	public MapBlocks() {
+	public BlockUtils() {
 
         blockAlphas.clear();
         setAlpha(Blocks.air, 0F);
@@ -74,24 +69,6 @@ public class MapBlocks extends HashMap {
         setFlags(Blocks.web, Flag.IgnoreOverhead, Flag.Side2Texture);
         setFlags(Blocks.yellow_flower, Flag.Side2Texture);
     }
-	
-	/**
-	 * Returns a simple wrapper object of the blockId and the block meta values.
-	 * @param chunkMd
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return
-	 */
-	BlockInfo getBlockInfo(ChunkMD chunkMd, int x, int y, int z) {
-		try {
-            return BlockInfo.getBlockInfo(chunkMd, x, y, z);
-		} catch (Exception e) {
-			JourneyMap.getLogger().severe("Can't get blockId/meta for chunk " + chunkMd.stub.xPosition + "," + chunkMd.stub.zPosition + " block " + x + "," + y + "," + z); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-			JourneyMap.getLogger().severe(LogFormatter.toString(e));
-			return null;
-		}
-	}
 
     /**
      * Attempt at faster way to figure out if there is sky above
@@ -155,13 +132,16 @@ public class MapBlocks extends HashMap {
 		return y;
 	}
 
+    public static EnumSet<Flag> getFlags(GameRegistry.UniqueIdentifier uid)
+    {
+        EnumSet<Flag> flags = blockFlags.get(uid);
+        return flags==null ? EnumSet.noneOf(Flag.class) : flags;
+    }
+
     public static void setFlags(Block block, Flag... flags)
     {
         GameRegistry.UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(block);
-        EnumSet<Flag> eset = blockFlags.get(uid);
-        if(eset==null) {
-            eset = EnumSet.noneOf(Flag.class);
-        }
+        EnumSet<Flag> eset = getFlags(uid);
         eset.addAll(Arrays.asList(flags));
         blockFlags.put(uid, eset);
     }

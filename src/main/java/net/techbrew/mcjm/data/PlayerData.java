@@ -8,8 +8,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.cartography.MapBlocks;
 import net.techbrew.mcjm.io.nbt.ChunkLoader;
+import net.techbrew.mcjm.model.BlockUtils;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.EntityHelper;
 
@@ -146,7 +146,7 @@ public class PlayerData implements IDataProvider {
 		while(seeSky && checkY>y) {
             try {
                 block = chunk.func_150810_a(x & 15, checkY, z & 15);
-                if(MapBlocks.hasFlag(block, MapBlocks.Flag.IgnoreOverhead)) {
+                if(BlockUtils.hasFlag(block, BlockUtils.Flag.IgnoreOverhead)) {
                     checkY--;
                 } else {
                     seeSky = false;

@@ -7,7 +7,6 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import net.techbrew.mcjm.cartography.MapBlocks;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -85,7 +84,7 @@ public class ChunkMD {
 	    	if(y<1) return 0;
 	    	while(block == Blocks.air || block.func_149688_o() == Material.field_151579_a) {
 	    		block = stub.func_150810_a(x, y, z);
-                if(MapBlocks.hasFlag(block, MapBlocks.Flag.NotTopBlock)) {
+                if(BlockUtils.hasFlag(block, BlockUtils.Flag.NotTopBlock)) {
 	    			y=y-1;
 	    		}
 	    		if(y==0) {

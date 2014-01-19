@@ -7,6 +7,8 @@ import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.BlockMD;
+import net.techbrew.mcjm.model.BlockUtils;
 import net.techbrew.mcjm.model.ChunkMD;
 
 import java.awt.*;
@@ -18,14 +20,6 @@ import java.util.logging.Level;
  *
  */
 public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
-	
-	/**
-	 * Constructor.
-	 * @param mapBlocks
-	 */
-	ChunkEndRenderer(MapBlocks mapBlocks) {
-		super(mapBlocks);
-	}
 
 	/**
 	 * Render blocks in the chunk for the End world.
@@ -67,19 +61,19 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 		
 					String metaId = null;
 					boolean hasAir = false;
-                    BlockInfo blockInfo;
+                    BlockMD blockMD;
 					int paintY = -1;
 					int lightLevel = -1;
 		
 					int y = sliceMaxY;
 					for (; y > 0; y--) {
-                        blockInfo = mapBlocks.getBlockInfo(chunkMd, x, y, z);
+                        blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
 		
 						if (!hasAir && y <= sliceMinY) {
 							break;
 						}
 		
-						if (blockInfo.isAir()) {
+						if (blockMD.isAir()) {
 							hasAir = true;
 						} else if (hasAir && paintY == -1) {
 							paintY = y;
@@ -92,7 +86,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 					if (paintY == -1) {
 						paintY = 0;
 					}
-                    blockInfo = mapBlocks.getBlockInfo(chunkMd, x, paintY, z);
+                    blockMD = BlockMD.getBlockMD(chunkMd, x, paintY, z);
 		
 					lightLevel = chunkMd.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
 		
@@ -102,13 +96,13 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 					
 					// Ender Crystal
                     // TODO:  Map the entity for the crystal
-                    Block block = blockInfo.getBlock();
+                    Block block = blockMD.getBlock();
 					if(block== Blocks.bedrock || block==Blocks.obsidian) {
 						lightLevel = 15;
 					}		
 		
 					// Get block color
-					Color color = blockInfo.getColor(chunkMd, x, paintY, z);
+					Color color = blockMD.getColor(chunkMd, x, paintY, z);
 					
 					// Get slope of block and prepare to shade
 					float slope, s, sN, sNW, sW, sAvg, shaded;
@@ -155,7 +149,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 					}
 		
 					// Draw 
-					g2D.setComposite(MapBlocks.OPAQUE);
+					g2D.setComposite(BlockUtils.OPAQUE);
 					g2D.setPaint(color);
 					g2D.fillRect(x, z, 1, 1);
 					chunkOk = true;
