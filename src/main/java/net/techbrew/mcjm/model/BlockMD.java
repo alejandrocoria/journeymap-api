@@ -71,7 +71,7 @@ public class BlockMD implements Serializable {
     public final CacheKey key;
     private transient Block block;
 	private Color color;
-	private Float alpha;
+	private float alpha;
     private final EnumSet<BlockUtils.Flag> flags;
 
     /**
@@ -130,8 +130,11 @@ public class BlockMD implements Serializable {
             blockMD.color = Color.CYAN; // Should be obvious if it gets displayed somehow.
             blockMD.setAlpha(0f);
         } else {
-            Float alpha = BlockUtils.getAlpha(block);
-            blockMD.setAlpha(alpha==null ? 1F : alpha);
+            if(BlockUtils.hasAlpha(block)) {
+                blockMD.setAlpha(BlockUtils.getAlpha(block));
+            } else {
+                blockMD.setAlpha(1F);
+            }
         }
 
         JourneyMap.getLogger().info("Created " + blockMD);
@@ -149,6 +152,13 @@ public class BlockMD implements Serializable {
     public boolean hasFlag(BlockUtils.Flag flag)
     {
         return flags.contains(flag);
+    }
+
+    public void addFlags(BlockUtils.Flag... addFlags)
+    {
+        for(BlockUtils.Flag flag : addFlags) {
+            this.flags.add(flag);
+        }
     }
 	
 	public Color getColor(ChunkMD chunkMd, int x, int y, int z) {
@@ -175,9 +185,6 @@ public class BlockMD implements Serializable {
 	}
 
     public float getAlpha() {
-        if(alpha==null){
-            alpha = isTransparent() ? 0f : 1f;
-        }
         return alpha;
     }
 	

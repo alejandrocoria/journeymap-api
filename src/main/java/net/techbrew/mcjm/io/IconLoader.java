@@ -133,13 +133,13 @@ public class IconLoader {
 	        color = new Color(r,g,b);
 			
 	        // Determine alpha
-	        float blockAlpha = 0f;
+	        float blockAlpha = 1f;
             Block block = blockMD.getBlock();
 	        if(BlockUtils.hasAlpha(block)) {
 	        	blockAlpha = BlockUtils.getAlpha(block);
 			} else if(blockMD.getBlock().func_149701_w()>0) { // TODO FORGE:  should be getRenderBlockPass()
 				blockAlpha = a * 1.0f/255;
-				BlockUtils.setAlpha(block, blockAlpha);
+				//BlockUtils.setAlpha(block, blockAlpha);
 			}
 	        blockMD.setAlpha(blockAlpha);
 							

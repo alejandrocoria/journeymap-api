@@ -71,21 +71,22 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				if (y < 0) y=1; // Weird data error seen on World of Keralis
 				
 				// Get blockinfo for coords
-				BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+				BlockMD blockMD;
+                do {
+                    blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
 
-                // Ensure not air
-                if(blockMD.isAir()) {
-                    while(y>=0 && blockMD !=null && blockMD.isAir()) {
-                        y--;
-                        blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+                    // Null check
+                    if (blockMD == null) {
+                        paintBadBlock(x, y, z, g2D);
+                        continue blockLoop;
                     }
-                }
 
-                // Null check
-				if (blockMD == null) {
-					paintBadBlock(x, y, z, g2D);
-					continue blockLoop;
-				}
+                    if(blockMD.isAir()) {
+                        y--;
+                    } else {
+                        break;
+                    }
+                } while(y>=0);
 
 				// Get base color for block
 				Color color = blockMD.getColor(chunkMd, x, y, z);
@@ -147,7 +148,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 									slope = (slope+sAvg)/2f;
 								}
 							}
-							s = Math.max(slope * .7f, .1f);
+							s = Math.max(slope * .8f, .1f);
 							color = shade(color, s);
 						} else if(slope>1) {
 							
@@ -499,7 +500,6 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 			
 		} 
 	}
-	
 
 	public int getHeightInSlice(final ChunkMD chunkMd, final int x, final int z, final int sliceMinY, final int sliceMaxY) {
 		return BlockUtils.ceiling(chunkMd, x, sliceMaxY, z) + 1;

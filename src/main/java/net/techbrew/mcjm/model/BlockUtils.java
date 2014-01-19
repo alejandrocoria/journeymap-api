@@ -163,9 +163,10 @@ public class BlockUtils {
         return blockAlphas.containsKey(GameRegistry.findUniqueIdentifierFor(block));
     }
 
-    public static Float getAlpha(Block block)
+    public static float getAlpha(Block block)
     {
-        return blockAlphas.get(GameRegistry.findUniqueIdentifierFor(block));
+        Float alpha = blockAlphas.get(GameRegistry.findUniqueIdentifierFor(block));
+        return alpha==null ? 1F : alpha;
     }
 
     public static void setAlpha(Block block, Float alpha)

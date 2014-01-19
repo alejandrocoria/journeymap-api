@@ -49,7 +49,7 @@ public class ColorCache implements IResourceManagerReloadListener {
 	private static final int[] leafColorPineMeta =  {1,5,9};
 	private static final int[] leafColorBirchMeta = {2,6,10};
 	
-	private IconLoader iconLoader;
+	private volatile IconLoader iconLoader;
 	private String lastResourcePack;
 	private final Object lock = new Object();
 	
@@ -232,26 +232,28 @@ public class ColorCache implements IResourceManagerReloadListener {
                 color = Color.white;
                 baseColors.put(blockMD, color);
 
-                BlockUtils.setAlpha(block, 0f);
-                BlockUtils.setFlags(block, BlockUtils.Flag.HasAir, BlockUtils.Flag.IgnoreOverhead, BlockUtils.Flag.NotTopBlock, BlockUtils.Flag.NoShadow);
+                blockMD.setAlpha(0f);
+                blockMD.addFlags(BlockUtils.Flag.HasAir, BlockUtils.Flag.IgnoreOverhead, BlockUtils.Flag.NotTopBlock, BlockUtils.Flag.NoShadow);
             } else {
-                color = iconLoader.loadBlockColor(blockMD);
-                if(color!=null){
-                    if(!blockMD.isBiomeColored()){
-                        int tint = blockMD.getBlock().func_149720_d(Minecraft.getMinecraft().theWorld, x, y, z);
-                        if(tint!=16777215 && tint!=-1){
-                            color = colorMultiplier(color, tint);
+                synchronized (iconLoader) {
+                    color = iconLoader.loadBlockColor(blockMD);
+                    if(color!=null){
+                        if(!blockMD.isBiomeColored()){
+                            int tint = blockMD.getBlock().func_149720_d(Minecraft.getMinecraft().theWorld, x, y, z);
+                            if(tint!=16777215 && tint!=-1){
+                                color = colorMultiplier(color, tint);
+                            }
+                        } else if(block== Blocks.waterlily) {
+                            color = colorMultiplier(color, Blocks.waterlily.func_149635_D()); // getBlockColor
                         }
-                    } else if(block== Blocks.waterlily) {
-                        color = colorMultiplier(color, Blocks.waterlily.func_149635_D()); // getBlockColor
-                    }
-                    baseColors.put(blockMD, color);
-                    //JourneyMap.getLogger().info("Cached color for " + blockMD.debugString());
-                } else {
-                    color = Color.BLACK;
-                    if(iconLoader.failedFor(blockMD)) {
                         baseColors.put(blockMD, color);
-                        JourneyMap.getLogger().warning("Failed to get base color for " + blockMD);
+                        //JourneyMap.getLogger().info("Cached color for " + blockMD.debugString());
+                    } else {
+                        color = Color.BLACK;
+                        if(iconLoader.failedFor(blockMD)) {
+                            baseColors.put(blockMD, color);
+                            JourneyMap.getLogger().warning("Failed to get base color for " + blockMD);
+                        }
                     }
                 }
             }
