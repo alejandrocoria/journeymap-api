@@ -124,6 +124,7 @@ public class JMServer {
 		rupy.add(new ActionService()); 
 		rupy.add(new FileService());
 		rupy.add(new PropertyService());
+        rupy.add(new DebugService());
 		
 		// Initialize daemon
 		rupy.init();

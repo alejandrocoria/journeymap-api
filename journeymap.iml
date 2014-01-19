@@ -8,7 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/project" />
     </content>
     <orderEntry type="inheritedJdk" />
-    <orderEntry type="module" module-name="forge1.7.2" />
+    <orderEntry type="module" module-name="forge" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>

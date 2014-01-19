@@ -34,6 +34,7 @@ public class MapBlocks extends HashMap {
 	public MapBlocks() {
 
         blockAlphas.clear();
+        setAlpha(Blocks.air, 0F);
         setAlpha(Blocks.ice, .8F);
         setAlpha(Blocks.glass, .3F);
         setAlpha(Blocks.glass_pane, .3F);
@@ -85,29 +86,7 @@ public class MapBlocks extends HashMap {
 	 */
 	BlockInfo getBlockInfo(ChunkMD chunkMd, int x, int y, int z) {
 		try {
-            Block block;
-			int meta;
-            boolean isAir = false;
-			if(y>=0) {
-                block = chunkMd.stub.func_150810_a(x, y, z);
-                isAir = block.isAir(chunkMd.worldObj, x, y, z);
-				meta = (isAir) ? 0 : chunkMd.stub.getBlockMetadata(x, y, z);
-			} else {
-				block = Blocks.bedrock;
-				meta = 0;
-			}
-			BlockInfo info = new BlockInfo(block, meta);
-			if(!isAir) {
-				info.setColor(colorCache.getBlockColor(chunkMd, info, x, y, z));
-				Float alpha = getAlpha(block);
-				info.setAlpha(alpha==null ? 1F : alpha);
-			} else {
-				info.setColor(Color.black);
-				info.setAlpha(0);
-			}
-			
-			return info;
-			
+            return BlockInfo.getBlockInfo(chunkMd, x, y, z);
 		} catch (Exception e) {
 			JourneyMap.getLogger().severe("Can't get blockId/meta for chunk " + chunkMd.stub.xPosition + "," + chunkMd.stub.zPosition + " block " + x + "," + y + "," + z); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			JourneyMap.getLogger().severe(LogFormatter.toString(e));

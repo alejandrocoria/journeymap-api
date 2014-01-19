@@ -80,12 +80,12 @@ public class JourneyMap {
     private JMLogger logger;
 
 	private volatile Boolean initialized = false;
+    private volatile Boolean flaggedForReset = false;
 	
 	private final Boolean modAnnounced = false;	
 	private JMServer jmServer;
 	
 	private boolean threadLogging = false;
-
 
 	// Invokes MapOverlay
 	public KeyBinding uiKeybinding;
@@ -269,13 +269,10 @@ public class JourneyMap {
 	/**
      * Starts mapping threads
      */
-    private void startMapping() {
+    public void startMapping() {
     	synchronized(this) {
-            StatTimer.resetAll();
-            UIManager.getInstance().reset();
-	    	DataCache.instance().purge();
-	    	TextureCache.instance().purge();
-            Constants.refreshBundle();
+
+            this.reset();
 
             // Waypoint Entity Rendering
             if(WaypointHelper.isNativeLoaded()) {
@@ -316,28 +313,47 @@ public class JourneyMap {
 	    		taskController = null;
 	    	}
 
-			FileHandler.lastWorldHash = -1;
-			FileHandler.lastJMWorldDir = null;
-			
-			TaskThread.reset();
-			RegionImageCache.getInstance().flushToDisk();
-			RegionImageCache.getInstance().clear();
-			TextureCache.instance().purge();
-			ColorCache.getInstance().serializeCache();
-			ColorCache.getInstance().reset();
-            UIManager.getInstance().reset();
-			MapPlayerTask.clearCache();
-            TileCache.instance().invalidateAll();
+
             StatTimer.reportAll();
+            this.reset();
 			
 			logger.info("Mapping halted: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
     	}
+    }
+
+    public void flagForReset() {
+        flaggedForReset = true;
+    }
+
+    private void reset() {
+
+        flaggedForReset = false;
+        FileHandler.lastWorldHash = -1;
+        FileHandler.lastJMWorldDir = null;
+
+        ColorCache.getInstance().serializeCache();
+        ColorCache.getInstance().reset();
+        Constants.refreshBundle();
+        DataCache.instance().purge();
+        MapPlayerTask.clearCache();
+        StatTimer.resetAll();
+        TaskThread.reset();
+        TextureCache.instance().purge();
+        TileCache.instance().invalidateAll();
+        RegionImageCache.getInstance().flushToDisk();
+        RegionImageCache.getInstance().clear();
+        UIManager.getInstance().reset();
+        logger.info("So much reset.  Very wow."); //$NON-NLS-1$
     }
 
     public void updateState() {
         try {
 
             if(mc==null) mc= FMLClientHandler.instance().getClient();
+
+            if(flaggedForReset) {
+                reset();
+            }
 
             // If both UIs are disabled, the mod is effectively disabled.
             if(!enableWebserver && !enableMapGui) {

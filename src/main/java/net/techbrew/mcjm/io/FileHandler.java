@@ -257,6 +257,20 @@ public class FileHandler {
 			return false;
 	    }
 	}
+
+    public static boolean writeDebugFile(String name, String contents) {
+        try {
+            File debugFile = new File(getJourneyMapDir(), "DEBUG-" + name);
+            FileWriter writer = new FileWriter(debugFile, false);
+            writer.write(contents);
+            writer.flush();
+            writer.close();
+            return true;
+        } catch(IOException e) {
+            JourneyMap.getLogger().severe("Could not write debug file: " + name + " : " + LogFormatter.toString(e));
+            return false;
+        }
+    }
 	
 	public static <C extends Serializable> C deserializeCache(String name, Class<C> cacheClass) {
 

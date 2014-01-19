@@ -95,7 +95,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				}
 
 				// Get base color for block
-				Color color = blockInfo.getColor();
+				Color color = blockInfo.getColor(chunkMd, x, y, z);
 				if(color==null) {
 					paintBadBlock(x, y, z, g2D);
 					continue blockLoop;
@@ -112,15 +112,15 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 						BlockInfo bn = getBlock(x, y, z, 0, -1, chunkMd, neighbors, blockInfo);
 						BlockInfo bs = getBlock(x, y, z, 0, +1, chunkMd, neighbors, blockInfo);
 						Set<Color> colors = new HashSet<Color>(5);
-						colors.add(blockInfo.getColor());
-						if(bw.isWater()) colors.add(bw.getColor());
-						if(be.isWater()) colors.add(be.getColor());
-						if(bn.isWater()) colors.add(bn.getColor());
-						if(bs.isWater()) colors.add(bs.getColor());
+						colors.add(blockInfo.getColor(chunkMd, x, y, z));
+						if(bw.isWater()) colors.add(bw.getColor(chunkMd, x, y, z));
+						if(be.isWater()) colors.add(be.getColor(chunkMd, x, y, z));
+						if(bn.isWater()) colors.add(bn.getColor(chunkMd, x, y, z));
+						if(bs.isWater()) colors.add(bs.getColor(chunkMd, x, y, z));
 						if(colors.size()>1) {
 							color = ColorCache.average(colors);
 						}
-						blockInfo.setColor(color);
+						//blockInfo.setColor(color);
 					}
 					paintDepth(chunkMd, blockInfo, x, y, z, g2D, false, prepUnderground);
 					chunkOk = true;
@@ -154,7 +154,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 									slope = (slope+sAvg)/2f;
 								}
 							}
-							s = Math.max(slope * .8f, .1f);
+							s = Math.max(slope * .7f, .1f);
 							color = shade(color, s);
 						} else if(slope>1) {
 							
@@ -346,7 +346,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
 					// Get block color
 					info = mapBlocks.getBlockInfo(chunkMd, x, paintY, z);
-					Color color = info.getColor();
+					Color color = info.getColor(chunkMd, x, paintY, z);
 
 					boolean keepflat = MapBlocks.hasFlag(info.getBlock(), MapBlocks.Flag.NoShadow);
 					if(!keepflat) {
@@ -446,7 +446,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
         boolean isWater = blockInfo.isWater();
 
 		// Get color for bottom of stack
-		color = stack.peek().getColor();
+		color = stack.peek().getColor(chunkMd, x, down, z);
 		
 		if(useLighting) {
 			int lightLevel = chunkMd.getSavedLightValue(EnumSkyBlock.Block, x,down+1, z);
@@ -476,7 +476,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 			while(!stack.isEmpty()) {
 				BlockInfo lowerBlock = stack.pop();
 				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, lowerBlock.getAlpha()));
-				color = lowerBlock.getColor();
+				color = lowerBlock.getColor(chunkMd, x, down, z);
 				
 				if(useLighting) {
 					int lightLevel = chunkMd.getSavedLightValue(EnumSkyBlock.Block, x,++down, z);

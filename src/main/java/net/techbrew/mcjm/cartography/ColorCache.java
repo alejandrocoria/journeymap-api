@@ -1,6 +1,5 @@
 package net.techbrew.mcjm.cartography;
 
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.BlockGrass;
@@ -20,13 +19,12 @@ import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.render.BlockInfo;
 
 import java.awt.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Cache of block colors derived from the current texture pack.
+ * Cache of block baseColors derived from the current texture pack.
  * @author mwoodman
  *
  */
@@ -40,7 +38,7 @@ public class ColorCache implements IResourceManagerReloadListener {
         return Holder.INSTANCE;
     }
 	
-	private final HashMap<BlockInfo, Color> colors = new HashMap<BlockInfo, Color>(256);
+	private final HashMap<BlockInfo, Color> baseColors = new HashMap<BlockInfo, Color>(256);
 	
 	private final HashMap<String, Color> grassBiomeColors = new HashMap<String, Color>(16);
 	private final HashMap<String, Color> waterBiomeColors = new HashMap<String, Color>(16);
@@ -80,7 +78,7 @@ public class ColorCache implements IResourceManagerReloadListener {
         }
     	String currentPack = sb.toString();
     	
-    	if(JourneyMap.getInstance().isMapping()) {
+    	if(JourneyMap.getInstance().isMapping() || iconLoader==null) {
     		if(currentPack.equals(lastResourcePack)) {
     			JourneyMap.getLogger().info("ResourcePack unchanged: " + currentPack);
     		} else {
@@ -98,34 +96,21 @@ public class ColorCache implements IResourceManagerReloadListener {
     		
     	} else if(iconLoader!=null) {
     		
-    		JourneyMap.getLogger().info("Serializing texture-based cache...");
+    		//JourneyMap.getLogger().info("Serializing texture-based cache...");
     		//serializeCache();
     	}
     	
     	
 	}
 	
-	public Color getBlockColor(ChunkMD chunkMd, BlockInfo blockInfo, int x, int y, int z) {
-		
+	public Color getBlockColor(ChunkMD chunkMd, BlockInfo blockInfo, boolean biomeColored, int x, int y, int z) {
 		if(iconLoader==null) {
-			return Color.BLACK;
-		}			
-		
-		// BlockInfo may already have it set
-		Color color = blockInfo.getColor();
-		if(color!=null) {
-			return color;
-		}
-		
-		// Check if colored by biome
-		if(MapBlocks.hasFlag(blockInfo.getBlock(), MapBlocks.Flag.BiomeColor)) {
-			color = getBiomeBlockColor(chunkMd, blockInfo, x, y, z);
+			return null;
+		} else if(biomeColored) {
+			return getBiomeBlockColor(chunkMd, blockInfo, x, y, z);
 		} else {
-			color = getCachedColor(blockInfo, x, y, z);
+			return getBaseColor(blockInfo, x, y, z);
 		}
-		
-		return color;
-				
 	}
 	
 	private Color getBiomeBlockColor(ChunkMD chunkMd, BlockInfo blockInfo, int x, int y, int z) {
@@ -152,54 +137,53 @@ public class ColorCache implements IResourceManagerReloadListener {
 	}
 
 	private Color getFoliageColor(BlockInfo blockInfo, BiomeGenBase biome, int x, int y, int z) {
-		String key = blockInfo.uid_modId + ":" + blockInfo.uid_name + "+" + biome.biomeName;
+		String key = blockInfo.key.toString() + "_" + biome.biomeName;
 		Color color = foliageBiomeColors.get(key);
 		if(color==null) {
             int leafColor;
-            if(Arrays.binarySearch(leafColorPineMeta, blockInfo.meta)>=0) {
+            if(Arrays.binarySearch(leafColorPineMeta, blockInfo.key.meta)>=0) {
                 leafColor = ColorizerFoliage.getFoliageColorPine();
-            } else if(Arrays.binarySearch(leafColorBirchMeta, blockInfo.meta)>=0) {
+            } else if(Arrays.binarySearch(leafColorBirchMeta, blockInfo.key.meta)>=0) {
                 leafColor = ColorizerFoliage.getFoliageColorBirch();
             } else {
                 leafColor = biome.getModdedBiomeFoliageColor(blockInfo.getBlock().func_149635_D());
             }
-            color = colorMultiplier(getCachedColor(blockInfo, x, y, z), leafColor);
+            color = colorMultiplier(getBaseColor(blockInfo, x, y, z), leafColor);
 
 			foliageBiomeColors.put(key, color);
-            System.out.println(key +" " + color.toString());
 		}
 		return color;
 	}
 	
 	private Color getVineFoliageColor(BlockInfo blockInfo, BiomeGenBase biome, int x, int y, int z) {
-		String key = blockInfo.hashCode() + biome.biomeName;
+		String key = blockInfo.key.toString() + "_" + biome.biomeName;
 		Color color = foliageBiomeColors.get(key);
 		if(color==null) {
 			final int leafColor = ColorizerFoliage.getFoliageColor(0.7D, 0.8D);
-			final int meta = blockInfo.meta;
+			final int meta = blockInfo.key.meta;
 			switch(meta) {
 				case 1 : {
-					color = getCachedColor(new BlockInfo(blockInfo, 0), x, y, z);
+					color = getBaseColor(BlockInfo.getBlockInfo(blockInfo.key.uid, 0), x, y, z);
 					break;
 				}
 				case 2 : {
-					color = getCachedColor(new BlockInfo(blockInfo, 1), x, y, z);
+					color = getBaseColor(BlockInfo.getBlockInfo(blockInfo.key.uid, 1), x, y, z);
 					break;
 				}
 				case 4 : {
-					color = getCachedColor(new BlockInfo(blockInfo, 2), x, y, z);
+					color = getBaseColor(BlockInfo.getBlockInfo(blockInfo.key.uid, 2), x, y, z);
 					break;
 				}
 				case 8 : {
-					color = getCachedColor(new BlockInfo(blockInfo, 3), x, y, z);
+					color = getBaseColor(BlockInfo.getBlockInfo(blockInfo.key.uid, 3), x, y, z);
 					break;
 				}
 				case 9 : {
-					color = getCachedColor(new BlockInfo(blockInfo, 3), x, y, z);
+					color = getBaseColor(BlockInfo.getBlockInfo(blockInfo.key.uid, 3), x, y, z);
 					break;
 				}
 				default : {
-					color = getCachedColor(blockInfo, x, y, z);					
+					color = getBaseColor(blockInfo, x, y, z);
 					break;
 				}
 			}			
@@ -211,11 +195,12 @@ public class ColorCache implements IResourceManagerReloadListener {
 	}
 	
 	private Color getGrassColor(BlockInfo blockInfo, BiomeGenBase biome, int x, int y, int z) {
-		Color color = grassBiomeColors.get(biome.biomeName);
+        String key = blockInfo.key.toString() + "_" + biome.biomeName;
+		Color color = grassBiomeColors.get(key);
 		if(color==null) {
             Block block = blockInfo.getBlock();
-			color = colorMultiplier(getCachedColor(blockInfo, x, y, z), biome.getModdedBiomeGrassColor(block.func_149635_D()));
-			grassBiomeColors.put(biome.biomeName, color);
+			color = colorMultiplier(getBaseColor(blockInfo, x, y, z), biome.getModdedBiomeGrassColor(block.func_149635_D()));
+			grassBiomeColors.put(key, color);
 		}
 		return color;
 	}
@@ -223,7 +208,7 @@ public class ColorCache implements IResourceManagerReloadListener {
 	private Color getWaterColor(BlockInfo blockInfo, BiomeGenBase biome, int x, int y, int z) {
 		Color color = waterBiomeColors.get(biome.biomeName);
 		if(color==null) {
-			color = colorMultiplier(getCachedColor(blockInfo, x, y, z), biome.waterColorMultiplier);
+			color = colorMultiplier(getBaseColor(blockInfo, x, y, z), biome.waterColorMultiplier);
 			waterBiomeColors.put(biome.biomeName, color);
 		}
 		return color;
@@ -235,48 +220,42 @@ public class ColorCache implements IResourceManagerReloadListener {
 	 * @param blockInfo
 	 * @return
 	 */
-	private Color getCachedColor(BlockInfo blockInfo, int x, int y, int z) {
-		
-		Color color = blockInfo.getColor();
-		if(color==null) {		
-			color = colors.get(blockInfo);	
-			if(color==null) {
-                Block block = blockInfo.getBlock();
-                BlockInfo biWithMeta0 = new BlockInfo(block, 0);
+	private Color getBaseColor(BlockInfo blockInfo, int x, int y, int z) {
 
-                // Transparent blocks get handled easily
-                if(blockInfo.isTransparent()) {
-                    color = Color.white;
-                    colors.put(blockInfo, color);
+        Color color = baseColors.get(blockInfo);
+        if(color==null) {
+            Block block = blockInfo.getBlock();
 
-                    MapBlocks.setAlpha(block, 0f);
-                    MapBlocks.setFlags(block, MapBlocks.Flag.HasAir, MapBlocks.Flag.IgnoreOverhead, MapBlocks.Flag.NotTopBlock, MapBlocks.Flag.NoShadow);
+            // Transparent blocks get handled easily
+            if(blockInfo.isTransparent()) {
+                color = Color.white;
+                baseColors.put(blockInfo, color);
+
+                MapBlocks.setAlpha(block, 0f);
+                MapBlocks.setFlags(block, MapBlocks.Flag.HasAir, MapBlocks.Flag.IgnoreOverhead, MapBlocks.Flag.NotTopBlock, MapBlocks.Flag.NoShadow);
+            } else {
+                color = iconLoader.loadBlockColor(blockInfo);
+                if(color!=null){
+                    if(!MapBlocks.hasFlag(block, MapBlocks.Flag.BiomeColor)){
+                        int tint = blockInfo.getBlock().func_149720_d(Minecraft.getMinecraft().theWorld, x, y, z);
+                        if(tint!=16777215 && tint!=-1){
+                            color = colorMultiplier(color, tint);
+                        }
+                    } else if(block== Blocks.waterlily) {
+                        color = colorMultiplier(color, Blocks.waterlily.func_149635_D()); // getBlockColor
+                    }
+                    baseColors.put(blockInfo, color);
+                    //JourneyMap.getLogger().info("Cached color for " + blockInfo.debugString());
                 } else {
-                    color = iconLoader.loadBlockColor(blockInfo);
-                    if(color!=null){
-                        Minecraft mc = FMLClientHandler.instance().getClient();
-
-                        if(!MapBlocks.hasFlag(block, MapBlocks.Flag.BiomeColor)){
-                            int tint = blockInfo.getBlock().func_149720_d(Minecraft.getMinecraft().theWorld, x, y, z);
-                            if(tint!=16777215 && tint!=-1){
-                                color = colorMultiplier(color, tint);
-                            }
-                        } else if(block== Blocks.waterlily) {
-                            color = colorMultiplier(color, Blocks.waterlily.func_149635_D()); // getBlockColor
-                        }
-                        colors.put(blockInfo, color);
-                        //JourneyMap.getLogger().info("Cached color for " + blockInfo.debugString());
-                    } else {
-                        color = Color.BLACK;
-                        if(iconLoader.failedFor(blockInfo)) {
-                            colors.put(blockInfo, color);
-                            JourneyMap.getLogger().warning("Cached BLACK for " + blockInfo);
-                        }
+                    color = Color.BLACK;
+                    if(iconLoader.failedFor(blockInfo)) {
+                        baseColors.put(blockInfo, color);
+                        JourneyMap.getLogger().warning("Failed to get base color for " + blockInfo);
                     }
                 }
-			}
-		}
-			
+            }
+        }
+
 		return color;		
 	}		
 	
@@ -284,8 +263,52 @@ public class ColorCache implements IResourceManagerReloadListener {
 		grassBiomeColors.clear();
 		waterBiomeColors.clear();
 		foliageBiomeColors.clear();
-		colors.clear();
+		baseColors.clear();
 	}
+
+    public String getCacheDebugHtml() {
+        StringBuilder sb = new StringBuilder();
+        sb.append('\n').append("<html><head><title>Cached Block Colors</title><style>");
+        sb.append('\n').append("span{vertical-align:middle; margin:2px}");
+        sb.append('\n').append(".entry{width:300px;display:inline-block;}");
+        sb.append('\n').append(".rgb{display:inline-block;height:32px;width:32px}");
+        sb.append('\n').append("</style></head><body>");
+        sb.append(debugCache(baseColors, "Base Colors"));
+        sb.append(debugCache(grassBiomeColors, "Grass Biome Colors"));
+        sb.append(debugCache(waterBiomeColors, "Water Biome Colors"));
+        sb.append(debugCache(foliageBiomeColors, "Foliage Biome Colors"));
+        sb.append('\n').append("</body></html>");
+        return sb.toString();
+    }
+
+    private String debugCache(HashMap cache, String name) {
+        if(cache.isEmpty()) return "";
+        Iterator<Map.Entry> iter = cache.entrySet().iterator();
+        List<String> list = new ArrayList<String>(cache.size());
+        while(iter.hasNext()) {
+            Map.Entry entry = iter.next();
+            String info;
+            if(entry.getKey() instanceof BlockInfo) {
+                info = ((BlockInfo) entry.getKey()).key.toString();
+            } else {
+                info = entry.getKey().toString();
+            }
+            Color color = (Color) entry.getValue();
+            String hex = String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+            StringBuilder sb = new StringBuilder();
+            sb.append('\n').append("<span class='entry' title='").append(hex).append("'>");
+            sb.append("<span class='rgb' style='background-color:").append(hex).append("'></span>");
+            sb.append(info).append("</span>");
+            list.add(sb.toString());
+        }
+
+        Collections.sort(list);
+
+        StringBuilder sb = new StringBuilder().append('\n').append("<div><h1>").append(name).append("</h1>");
+        for(String line : list) sb.append(line);
+        sb.append('\n').append("</div>");
+        return sb.toString();
+    }
 	
 	public void serializeCache() {
 		
@@ -296,21 +319,21 @@ public class ColorCache implements IResourceManagerReloadListener {
 		
 		long start = System.currentTimeMillis();
 		
-		if(!colors.isEmpty()) {
-			FileHandler.serializeCache(lastResourcePack + "_blocks", colors);
-			sb.append(colors.size() + " block colors, ");
+		if(!baseColors.isEmpty()) {
+			FileHandler.serializeCache(lastResourcePack + "_blocks", baseColors);
+			sb.append(baseColors.size() + " block baseColors, ");
 		}
 		if(!grassBiomeColors.isEmpty()) {
 			FileHandler.serializeCache(lastResourcePack + "_grass", grassBiomeColors);
-			sb.append(grassBiomeColors.size() + " grass+biome colors, ");
+			sb.append(grassBiomeColors.size() + " grass+biome baseColors, ");
 		}
 		if(!waterBiomeColors.isEmpty()) {
 			FileHandler.serializeCache(lastResourcePack + "_water", waterBiomeColors);
-			sb.append(waterBiomeColors.size() + " water+biome colors, ");
+			sb.append(waterBiomeColors.size() + " water+biome baseColors, ");
 		}
 		if(!foliageBiomeColors.isEmpty()) {
 			FileHandler.serializeCache(lastResourcePack + "_foliage", foliageBiomeColors);
-			sb.append(foliageBiomeColors.size() + " foliage+biome colors");
+			sb.append(foliageBiomeColors.size() + " foliage+biome baseColors");
 		}
 		long stop = System.currentTimeMillis();
 		logger.info("Serialized texture cache for " + lastResourcePack + " in " + (stop-start) + "ms: " + sb.toString());
@@ -326,29 +349,29 @@ public class ColorCache implements IResourceManagerReloadListener {
 		long start = System.currentTimeMillis();
 
         try {
-            HashMap<BlockInfo, Color> tempColors = FileHandler.deserializeCache(lastResourcePack + "_blocks", colors.getClass());
+            HashMap<BlockInfo, Color> tempColors = FileHandler.deserializeCache(lastResourcePack + "_blocks", baseColors.getClass());
             HashMap<String, Color> tempGrass = FileHandler.deserializeCache(lastResourcePack + "_grass", grassBiomeColors.getClass());
             HashMap<String, Color> tempWater = FileHandler.deserializeCache(lastResourcePack + "_water", waterBiomeColors.getClass());
             HashMap<String, Color> tempFoliage = FileHandler.deserializeCache(lastResourcePack + "_foliage", foliageBiomeColors.getClass());
 
             if(tempColors!=null) {
-                colors.putAll(tempColors);
-                sb.append(tempColors.size() + " block colors,");
+                baseColors.putAll(tempColors);
+                sb.append(tempColors.size() + " block baseColors,");
             }
 
             if(tempGrass!=null) {
                 grassBiomeColors.putAll(tempGrass);
-                sb.append(tempGrass.size() + " grass+biome colors,");
+                sb.append(tempGrass.size() + " grass+biome baseColors,");
             }
 
             if(tempWater!=null) {
                 waterBiomeColors.putAll(tempWater);
-                sb.append(tempWater.size() + " water+biome colors,");
+                sb.append(tempWater.size() + " water+biome baseColors,");
             }
 
             if(tempFoliage!=null) {
                 foliageBiomeColors.putAll(tempFoliage);
-                sb.append(tempFoliage.size() + " foliage+biome colors");
+                sb.append(tempFoliage.size() + " foliage+biome baseColors");
             }
 
             long stop = System.currentTimeMillis();

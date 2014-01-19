@@ -1,12 +1,18 @@
 package net.techbrew.mcjm.render;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.cartography.ColorCache;
 import net.techbrew.mcjm.cartography.MapBlocks;
+import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.model.ChunkMD;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -16,46 +22,141 @@ public class BlockInfo implements Serializable {
 
 	private static final long serialVersionUID = 2L;
 
-	public final int meta;
-    public final String uid_name;
-    public final String uid_modId;
-    public final int hash;
+    public final static class CacheKey implements Serializable
+    {
+        public final GameRegistry.UniqueIdentifier uid;
+        public final int meta;
 
+        public CacheKey(GameRegistry.UniqueIdentifier uid, int meta) {
+            this.uid = uid;
+            this.meta = meta;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof CacheKey)) return false;
+            CacheKey cacheKey = (CacheKey) o;
+            if (meta != cacheKey.meta) return false;
+            if (!uid.equals(cacheKey.uid)) return false;
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = uid.hashCode();
+            result = 31 * result + meta;
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return uid + ":" + meta;
+        }
+    }
+
+    private static final LoadingCache<CacheKey, BlockInfo> cache = CacheBuilder.newBuilder()
+            .concurrencyLevel(1)
+            .initialCapacity(256)
+            .build(new CacheLoader<CacheKey, BlockInfo>() {
+                @Override
+                public BlockInfo load(CacheKey key) throws Exception {
+                    return createBlockInfo(key);
+                }
+            });
+
+    public final CacheKey key;
     private transient Block block;
 	private Color color;
 	private Float alpha;
 
-    public BlockInfo(Block block) {
-        this(block, 0);
+    /**
+     * Produces a BlockInfo instance.
+     * @param chunkMd
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public static BlockInfo getBlockInfo(ChunkMD chunkMd, int x, int y, int z) {
+        try {
+            Block block;
+            int meta;
+            boolean isAir = false;
+            if(y>=0) {
+                block = chunkMd.stub.func_150810_a(x, y, z);
+                isAir = block.isAir(chunkMd.worldObj, x, y, z);
+                meta = (isAir) ? 0 : chunkMd.stub.getBlockMetadata(x, y, z);
+            } else {
+                block = Blocks.bedrock;
+                meta = 0;
+            }
+
+            CacheKey key = new CacheKey(GameRegistry.findUniqueIdentifierFor(block), meta);
+            return cache.get(key);
+
+        } catch (Exception e) {
+            JourneyMap.getLogger().severe("Can't get blockId/meta for chunk " + chunkMd.stub.xPosition + "," + chunkMd.stub.zPosition + " block " + x + "," + y + "," + z); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+            JourneyMap.getLogger().severe(LogFormatter.toString(e));
+            return null;
+        }
     }
 
-	public BlockInfo(Block block, int meta) {
+    public static BlockInfo getBlockInfo(GameRegistry.UniqueIdentifier uid, int meta) {
+        try {
+            return cache.get(new CacheKey(uid, meta));
+        } catch (Exception e) {
+            JourneyMap.getLogger().severe("Can't get BlockInfo for block " + uid + " meta " + meta);
+            JourneyMap.getLogger().severe(LogFormatter.toString(e));
+            return null;
+        }
+    }
+
+    private static final BlockInfo createBlockInfo(CacheKey key) {
+
+        Block block = GameRegistry.findBlock(key.uid.modId, key.uid.name);
+        if(block==null)
+        {
+            JourneyMap.getLogger().severe("Block not found for " + key.uid);
+            return new BlockInfo(key, Blocks.air);
+        }
+
+        BlockInfo info = new BlockInfo(key, block);
+        if(info.isAir()) {
+            info.color = Color.CYAN; // Should be obvious if it gets displayed somehow.
+            info.setAlpha(0f);
+        } else {
+            Float alpha = MapBlocks.getAlpha(block);
+            info.setAlpha(alpha==null ? 1F : alpha);
+        }
+
+        JourneyMap.getLogger().info("Created " + info);
+
+        return info;
+    }
+
+	private BlockInfo(CacheKey key, Block block) {
         if(block==null) throw new IllegalArgumentException("Block can't be null");
+        this.key = key;
 		this.block = block;
-		this.meta = meta;
-        GameRegistry.UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(block);
-        this.uid_name = uid.name;
-        this.uid_modId = uid.modId;
-        hash = (uid_modId + uid_name + meta).hashCode();
-	}
-
-    public BlockInfo(BlockInfo blockInfo, int meta) {
-        this.block = blockInfo.block;
-        this.meta = meta;
-        this.uid_name = blockInfo.uid_name;
-        this.uid_modId = blockInfo.uid_modId;
-        this.hash = (uid_modId + uid_name + meta).hashCode();
-    }
-
-	public void setColor(Color color) {
-		this.color = color;
 	}
 	
-	public Color getColor() {
-		if(this.color==null) {
-			return null;
-		} else {
-			return this.color;
+	public Color getColor(ChunkMD chunkMd, int x, int y, int z) {
+		if(this.color!=null) {
+            return this.color;
+        } else {
+            boolean biomeColored = MapBlocks.hasFlag(getBlock(), MapBlocks.Flag.BiomeColor);
+			Color color = ColorCache.getInstance().getBlockColor(chunkMd, this, biomeColored, x, y, z);
+            if(color==null) {
+                return Color.BLACK;
+            }
+
+            if(biomeColored) {
+                return color;
+            } else {
+                this.color = color;
+                return color;
+            }
 		}
 	}
 
@@ -72,10 +173,9 @@ public class BlockInfo implements Serializable {
 	
 	public Block getBlock() {
         if(block==null){
-            block = GameRegistry.findBlock(uid_modId, uid_name);
+            block = GameRegistry.findBlock(key.uid.modId, key.uid.name);
             if(block==null){
-                JourneyMap.getLogger().warning("Block not found: " + uid_modId + ":" + uid_name);
-                block = Blocks.air; // TODO  This is probably a bad idea.
+                block = Blocks.air;
             }
         }
         return block;
@@ -110,7 +210,7 @@ public class BlockInfo implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return hash;
+		return key.hashCode();
 	}
 
 	@Override
@@ -122,12 +222,12 @@ public class BlockInfo implements Serializable {
 		if (!(obj instanceof BlockInfo))
 			return false;
 		BlockInfo other = (BlockInfo) obj;
-		return hash == other.hash;
+		return key.equals(other.key);
 	}
 
 	@Override
 	public String toString() {
-		return "BlockInfo [" + GameRegistry.findUniqueIdentifierFor(block) + ":" + meta + "]";
+		return "BlockInfo [" + key.uid + " meta " + key.meta + "]";
 	}
 
 }
