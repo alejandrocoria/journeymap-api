@@ -1,8 +1,6 @@
 package net.techbrew.mcjm.model;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.init.Blocks;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
@@ -77,24 +75,25 @@ public class ChunkMD {
      */
     public int getSafeHeightValue(int x, int z)
     {
-    	try {
-	    	int y = 0;
-	    	Block block = null;
-	    	y = stub.heightMap[z << 4 | x];
-	    	if(y<1) return 0;
-	    	while(block == Blocks.air || block.func_149688_o() == Material.field_151579_a) {
-	    		block = stub.func_150810_a(x, y, z);
-                if(BlockUtils.hasFlag(block, BlockUtils.Flag.NotTopBlock)) {
-	    			y=y-1;
-	    		}
-	    		if(y==0) {
-	    			break;
-	    		}
-	    	}
-	    	return y;       
-    	} catch(Exception e) {
-    		return stub.heightMap[z << 4 | x];
-    	}
+        return stub.getHeightValue(x,z);
+//    	try {
+//	    	int y = 0;
+//	    	Block block = null;
+//	    	y = stub.heightMap[z << 4 | x];
+//	    	if(y<1) return 0;
+//	    	while(block == Blocks.air || block.func_149688_o() == Material.field_151579_a) {
+//	    		block = stub.func_150810_a(x, y, z);
+//                if(BlockUtils.hasFlag(block, BlockUtils.Flag.NotTopBlock)) {
+//	    			y=y-1;
+//	    		}
+//	    		if(y==0) {
+//	    			break;
+//	    		}
+//	    	}
+//	    	return y;
+//    	} catch(Exception e) {
+//    		return stub.heightMap[z << 4 | x];
+//    	}
     }
 
 	@Override
