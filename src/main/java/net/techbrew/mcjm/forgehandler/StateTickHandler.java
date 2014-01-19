@@ -20,8 +20,6 @@ public class StateTickHandler {
             return;
         }
 
-        if (mc.theWorld!=null && mc.thePlayer!=null && !mc.thePlayer.isDead) {
-            JourneyMap.getInstance().updateState();
-        }
+        JourneyMap.getInstance().updateState();
     }
 }
