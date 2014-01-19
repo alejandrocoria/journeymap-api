@@ -16,7 +16,6 @@ import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.IconLoader;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkMD;
-import net.techbrew.mcjm.render.BlockInfo;
 
 import java.awt.*;
 import java.util.*;

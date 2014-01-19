@@ -5,9 +5,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.cartography.BlockInfo;
 import net.techbrew.mcjm.cartography.MapBlocks;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.render.BlockInfo;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;

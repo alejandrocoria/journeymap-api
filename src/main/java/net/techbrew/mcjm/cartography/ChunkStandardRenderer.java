@@ -7,7 +7,6 @@ import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkMD;
-import net.techbrew.mcjm.render.BlockInfo;
 
 import java.awt.*;
 import java.util.HashSet;
