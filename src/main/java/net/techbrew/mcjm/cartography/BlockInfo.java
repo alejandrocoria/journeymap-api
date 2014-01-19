@@ -67,6 +67,8 @@ public class BlockInfo implements Serializable {
     private transient Block block;
 	private Color color;
 	private Float alpha;
+    private final boolean biomeColored;
+    private final boolean air;
 
     /**
      * Produces a BlockInfo instance.
@@ -137,13 +139,19 @@ public class BlockInfo implements Serializable {
         if(block==null) throw new IllegalArgumentException("Block can't be null");
         this.key = key;
 		this.block = block;
+        this.biomeColored = hasFlag(MapBlocks.Flag.BiomeColor);
+        this.air = hasFlag(MapBlocks.Flag.HasAir);
 	}
+
+    public boolean hasFlag(MapBlocks.Flag flag)
+    {
+        return MapBlocks.hasFlag(this.key.uid, flag);
+    }
 	
 	public Color getColor(ChunkMD chunkMd, int x, int y, int z) {
 		if(this.color!=null) {
             return this.color;
         } else {
-            boolean biomeColored = MapBlocks.hasFlag(getBlock(), MapBlocks.Flag.BiomeColor);
 			Color color = ColorCache.getInstance().getBlockColor(chunkMd, this, biomeColored, x, y, z);
             if(color==null) {
                 return Color.BLACK;
@@ -184,7 +192,7 @@ public class BlockInfo implements Serializable {
     }
 
     public boolean isAir() {
-        return MapBlocks.hasFlag(getBlock(), MapBlocks.Flag.HasAir);
+        return air;
     }
 
     public boolean isTorch() {
@@ -204,6 +212,10 @@ public class BlockInfo implements Serializable {
 
     public boolean isFoliage() {
         return getBlock() instanceof BlockLeaves;
+    }
+
+    public boolean isBiomeColored() {
+        return biomeColored;
     }
 
 	@Override

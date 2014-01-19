@@ -59,7 +59,7 @@ public class IconLoader {
 				logger.fine("Loading color for " + blockInfo);
 			}
 
-            int side = MapBlocks.hasFlag(blockInfo.getBlock(), MapBlocks.Flag.Side2Texture) ? 2 : 1;
+            int side = blockInfo.hasFlag(MapBlocks.Flag.Side2Texture) ? 2 : 1;
             TextureAtlasSprite blockIcon = null;
             while(blockIcon==null && side>=0) {
                 blockIcon = (TextureAtlasSprite) blockInfo.getBlock().func_149691_a(side, blockInfo.key.meta);

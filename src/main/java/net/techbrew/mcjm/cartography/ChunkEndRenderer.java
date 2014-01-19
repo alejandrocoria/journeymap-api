@@ -79,7 +79,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 							break;
 						}
 		
-						if (MapBlocks.hasFlag(blockInfo.getBlock(), MapBlocks.Flag.HasAir)) {
+						if (blockInfo.isAir()) {
 							hasAir = true;
 						} else if (hasAir && paintY == -1) {
 							paintY = y;

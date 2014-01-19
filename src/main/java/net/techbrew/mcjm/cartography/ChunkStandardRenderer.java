@@ -80,8 +80,8 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				BlockInfo blockInfo = mapBlocks.getBlockInfo(chunkMd, x, y, z);
 
                 // Ensure not air
-                if(MapBlocks.hasFlag(blockInfo.getBlock(), MapBlocks.Flag.HasAir)) {
-                    while(y>=0 && blockInfo!=null && MapBlocks.hasFlag(blockInfo.getBlock(), MapBlocks.Flag.HasAir)) {
+                if(blockInfo.isAir()) {
+                    while(y>=0 && blockInfo!=null && blockInfo.isAir()) {
                         y--;
                         blockInfo = mapBlocks.getBlockInfo(chunkMd, x, y, z);
                     }
@@ -126,7 +126,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					
 				} else {
 
-                    if(!MapBlocks.hasFlag(blockInfo.getBlock(), MapBlocks.Flag.NoShadow)) {
+                    if(!blockInfo.hasFlag(MapBlocks.Flag.NoShadow)) {
 	
 						// Get slope of block and prepare to shade
 						slope = chunkMd.surfaceSlopes[x][z];
@@ -347,7 +347,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					info = mapBlocks.getBlockInfo(chunkMd, x, paintY, z);
 					Color color = info.getColor(chunkMd, x, paintY, z);
 
-					boolean keepflat = MapBlocks.hasFlag(info.getBlock(), MapBlocks.Flag.NoShadow);
+					boolean keepflat = info.hasFlag(MapBlocks.Flag.NoShadow);
 					if(!keepflat) {
 						// Contour shading
 						// Get slope of block and prepare to shade

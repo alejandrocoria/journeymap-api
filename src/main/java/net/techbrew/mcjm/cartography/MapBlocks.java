@@ -172,6 +172,12 @@ public class MapBlocks extends HashMap {
         return flags!=null && flags.contains(flag);
     }
 
+    public static boolean hasFlag(GameRegistry.UniqueIdentifier uid, Flag flag)
+    {
+        EnumSet<Flag> flags = blockFlags.get(uid);
+        return flags!=null && flags.contains(flag);
+    }
+
     public static boolean hasAlpha(Block block)
     {
         return blockAlphas.containsKey(GameRegistry.findUniqueIdentifierFor(block));

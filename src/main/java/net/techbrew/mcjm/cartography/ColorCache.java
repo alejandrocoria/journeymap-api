@@ -235,7 +235,7 @@ public class ColorCache implements IResourceManagerReloadListener {
             } else {
                 color = iconLoader.loadBlockColor(blockInfo);
                 if(color!=null){
-                    if(!MapBlocks.hasFlag(block, MapBlocks.Flag.BiomeColor)){
+                    if(!blockInfo.isBiomeColored()){
                         int tint = blockInfo.getBlock().func_149720_d(Minecraft.getMinecraft().theWorld, x, y, z);
                         if(tint!=16777215 && tint!=-1){
                             color = colorMultiplier(color, tint);
