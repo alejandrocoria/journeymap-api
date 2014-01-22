@@ -10,6 +10,7 @@ import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.BlockMD;
 import net.techbrew.mcjm.model.BlockUtils;
 import net.techbrew.mcjm.model.ChunkMD;
+import net.techbrew.mcjm.model.RGB;
 
 import java.awt.*;
 import java.util.logging.Level;
@@ -66,7 +67,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
                     BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
 					boolean isLava = (blockMD.getBlock() == Blocks.lava || blockMD.getBlock() == Blocks.flowing_lava);
 
-					Color color = blockMD.getColor(chunkMd, x, y, z);
+					RGB color = blockMD.getColor(chunkMd, x, y, z);
 					
 					// Get light level
 					if(isLava) {
@@ -83,7 +84,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 					
 					if(true) {
 						// Contour shading
-						// Get slope of block and prepare to shade
+						// Get slope of block and prepare to bevelSlope
 						float slope, s, sN, sNW, sW, sAvg, shaded;
 						slope = chunkMd.sliceSlopes[x][z];
 						
@@ -100,7 +101,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 								slope = (slope+sAvg)/2f;
 							}
 							s = Math.max(slope * .9f, .2f);
-							color = shade(color, s);
+							color.bevelSlope(s);
 		
 						} else if(slope>1) {
 							
@@ -111,22 +112,18 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 							}
 							s = slope * 1.2f;
 							s = Math.min(s, 1.2f);
-							color = shade(color, s);
+							color.bevelSlope(s);
 						}
 					}
 		
 					// Darken based on light level
 					if (lightLevel < 14) {
-						float darken = Math.min(1F, (lightLevel / 15F));
-						float[] rgb = new float[4];
-						rgb = color.getRGBColorComponents(rgb);
-						color = new Color(rgb[0] * darken, rgb[1] * darken, rgb[2]
-								* darken);
+                        color.darken(Math.min(1F, (lightLevel / 15F)));
 					}
 		
 					// Draw lighted block
 					g2D.setComposite(BlockUtils.OPAQUE);
-					g2D.setPaint(color);
+					g2D.setPaint(color.toColor());
 					g2D.fillRect(x, z, 1, 1);
 					chunkOk = true;
 		

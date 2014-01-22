@@ -12,6 +12,7 @@ import net.techbrew.mcjm.JourneyMap;
 public class StateTickHandler {
 
     Minecraft mc = FMLClientHandler.instance().getClient();
+    int counter = 0;
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
@@ -20,6 +21,15 @@ public class StateTickHandler {
             return;
         }
 
-        JourneyMap.getInstance().updateState();
+        if(counter==0) {
+            JourneyMap.getInstance().updateState();
+        } else if(counter==10) {
+            if(JourneyMap.getInstance().isMapping() && mc.theWorld!=null) {
+                JourneyMap.getInstance().performTasks();
+            }
+        } else if(counter==20) {
+            counter = 0;
+        }
+        counter++;
     }
 }

@@ -119,7 +119,7 @@ public class MapOverlay extends JmUI {
 
         final ButtonEnum id = ButtonEnum.values()[guibutton.field_146127_k];
     	switch(id) {
-			case DayNight: { // day or night			
+			case DayNight: { // day or moonlight
 				toggleDayNight();
 				break;
 			}

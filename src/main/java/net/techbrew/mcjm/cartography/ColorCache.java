@@ -233,7 +233,7 @@ public class ColorCache implements IResourceManagerReloadListener {
                 baseColors.put(blockMD, color);
 
                 blockMD.setAlpha(0f);
-                blockMD.addFlags(BlockUtils.Flag.HasAir, BlockUtils.Flag.IgnoreOverhead, BlockUtils.Flag.NotTopBlock, BlockUtils.Flag.NoShadow);
+                blockMD.addFlags(BlockUtils.Flag.HasAir, BlockUtils.Flag.NotHideSky, BlockUtils.Flag.NotTopBlock, BlockUtils.Flag.NoShadow);
             } else {
                 synchronized (iconLoader) {
                     color = iconLoader.loadBlockColor(blockMD);
@@ -390,7 +390,7 @@ public class ColorCache implements IResourceManagerReloadListener {
 	}
 
 	Color colorMultiplier(int rgb, int mult) {
-		
+
 	    int alpha1 = rgb >> 24 & 0xFF;
 	    int red1 = rgb >> 16 & 0xFF;
 	    int green1 = rgb >> 8 & 0xFF;
@@ -407,50 +407,10 @@ public class ColorCache implements IResourceManagerReloadListener {
 	    int blue = blue1 * blue2 / 255;
 
 	    int result = (alpha & 0xFF) << 24 | (red & 0xFF) << 16 | (green & 0xFF) << 8 | blue & 0xFF;
-	    
+
 	    return new Color(result | -16777216);
 	}
 
-	static float safeColor(float original) {
-		return Math.min(1F, (Math.max(0F, original)));
-	}
-	
-	static int safeColor(int original) {
-		return Math.max(0, (Math.min(255, original)));
-	}
-	
-	static Color average(Collection<Color> colors)
-	{
-		if(colors.isEmpty()) return null;
-		
-		int count = colors.size();
-		
-		int r = 0;
-		int g = 0;
-		int b = 0;
-		
-		for(Color color : colors) {
-			r+= color.getRed();			
-			g+= color.getGreen();
-			b+= color.getBlue();
-		}
-		return new Color(r/count, g/count, b/count);
-	}
-	
-	static Color average(Color... colors)
-	{
-		int count = colors.length;
-		
-		int r = 0;
-		int g = 0;
-		int b = 0;
-		
-		for(Color color : colors) {
-			r+= color.getRed();			
-			g+= color.getGreen();
-			b+= color.getBlue();
-		}
-		return new Color(r/count, g/count, b/count);
-	}
+
 
 }

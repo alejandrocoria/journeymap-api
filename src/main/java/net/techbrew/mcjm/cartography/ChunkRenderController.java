@@ -34,7 +34,6 @@ public class ChunkRenderController {
 	private BufferedImage blankChunkImageUnderground = null;
 	
 	public ChunkRenderController() {
-		BlockUtils blockUtils = new BlockUtils();
 		netherRenderer = new ChunkNetherRenderer();
 		endRenderer = new ChunkEndRenderer();
 		standardRenderer = new ChunkStandardRenderer();

@@ -280,5 +280,5 @@ label span {
 	.box-sizing(content-box); 
 }
 
-/* Optional responsive image override */
+/* Optional responsive image setFrom */
 img { max-width: none; }

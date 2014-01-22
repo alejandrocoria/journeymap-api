@@ -58,7 +58,7 @@ public class AnimalsData implements IDataProvider {
 	@Override
 	public Map getMap(Map optionalParams) {		
 		
-		// TODO: override includeNonPets, includePets?
+		// TODO: setFrom includeNonPets, includePets?
 		
 		if(!FeatureManager.isAllowed(Feature.RadarAnimals)) {
 			return Collections.emptyMap();

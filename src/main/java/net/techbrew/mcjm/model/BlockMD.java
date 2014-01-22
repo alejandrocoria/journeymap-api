@@ -60,11 +60,11 @@ public class BlockMD implements Serializable {
             .build(new CacheLoader<CacheKey, BlockMD>() {
                 @Override
                 public BlockMD load(CacheKey key) throws Exception {
-                    try {
-                        return createBlockMD(key);
-                    } catch (Exception e) {
-                        throw e;
-                    }
+                try {
+                    return createBlockMD(key);
+                } catch (Exception e) {
+                    throw e;
+                }
                 }
             });
 
@@ -137,7 +137,7 @@ public class BlockMD implements Serializable {
             }
         }
 
-        JourneyMap.getLogger().info("Created " + blockMD);
+        //JourneyMap.getLogger().info("Created " + blockMD);
 
         return blockMD;
     }
@@ -161,21 +161,21 @@ public class BlockMD implements Serializable {
         }
     }
 	
-	public Color getColor(ChunkMD chunkMd, int x, int y, int z) {
+	public RGB getColor(ChunkMD chunkMd, int x, int y, int z) {
 		if(this.color!=null) {
-            return this.color;
+            return new RGB(this.color);
         } else {
             boolean biomeColored = hasFlag(BlockUtils.Flag.BiomeColor);
 			Color color = ColorCache.getInstance().getBlockColor(chunkMd, this, biomeColored, x, y, z);
             if(color==null) {
-                return Color.BLACK;
+                return new RGB(Color.BLACK);
             }
 
             if(biomeColored) {
-                return color;
+                return new RGB(color);
             } else {
                 this.color = color;
-                return color;
+                return new RGB(color);
             }
 		}
 	}
@@ -250,5 +250,10 @@ public class BlockMD implements Serializable {
 	public String toString() {
 		return "BlockMD [" + key.uid + " meta " + key.meta + "]";
 	}
+
+
+    public static void clearCache() {
+        cache.invalidateAll();
+    }
 
 }

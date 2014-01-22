@@ -146,7 +146,7 @@ public class PlayerData implements IDataProvider {
 		while(seeSky && checkY>y) {
             try {
                 block = chunk.func_150810_a(x & 15, checkY, z & 15);
-                if(BlockUtils.hasFlag(block, BlockUtils.Flag.IgnoreOverhead)) {
+                if(BlockUtils.hasFlag(block, BlockUtils.Flag.NotHideSky)) {
                     checkY--;
                 } else {
                     seeSky = false;

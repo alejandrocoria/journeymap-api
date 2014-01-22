@@ -5,6 +5,7 @@ import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.eventhandler.EventBus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
@@ -20,12 +21,13 @@ import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.forgehandler.ConnectionHandler;
 import net.techbrew.mcjm.forgehandler.MiniMapTickHandler;
 import net.techbrew.mcjm.forgehandler.StateTickHandler;
-import net.techbrew.mcjm.forgehandler.TaskTickHandler;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.log.StatTimer;
+import net.techbrew.mcjm.model.BlockMD;
+import net.techbrew.mcjm.model.BlockUtils;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.model.WaypointHelper;
 import net.techbrew.mcjm.render.overlay.TileCache;
@@ -134,7 +136,7 @@ public class JourneyMap {
     }
     
     public Boolean isMapping() {
-    	return taskExecutor!=null && !taskExecutor.isShutdown() && mc.theWorld!=null;
+    	return taskExecutor!=null && !taskExecutor.isShutdown();
     }
     
     public Boolean isThreadLogging() {
@@ -166,7 +168,6 @@ public class JourneyMap {
             enableAnnounceMod = pm.getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED);
 
             EventBus bus = FMLCommonHandler.instance().bus();
-            bus.register(new TaskTickHandler());
             bus.register(new StateTickHandler());
             bus.register(new ConnectionHandler());
 
@@ -201,6 +202,11 @@ public class JourneyMap {
             System.err.println("Error loading " + JourneyMap.MOD_NAME + " for Minecraft " + JourneyMap.MC_VERSION + ". Ensure compatible Minecraft/Modloader/Forge versions.");
             t.printStackTrace(System.err);
         }
+    }
+
+    @Mod.EventHandler
+    public void postInitialize(FMLPostInitializationEvent event) {
+        BlockUtils.initialize();
     }
 	
 	public void toggleWebserver(Boolean enable, boolean forceAnnounce) {
@@ -322,6 +328,7 @@ public class JourneyMap {
     }
 
     public void flagForReset() {
+        logger.info("Flagged for reset");
         flaggedForReset = true;
     }
 
@@ -330,8 +337,8 @@ public class JourneyMap {
         flaggedForReset = false;
         FileHandler.lastWorldHash = -1;
         FileHandler.lastJMWorldDir = null;
-
-        ColorCache.getInstance().serializeCache();
+        BlockMD.clearCache();
+        //ColorCache.getInstance().serializeCache();
         ColorCache.getInstance().reset();
         Constants.refreshBundle();
         DataCache.instance().purge();
@@ -350,6 +357,17 @@ public class JourneyMap {
         try {
 
             if(mc==null) mc= FMLClientHandler.instance().getClient();
+
+            if(mc.theWorld==null) {
+                if(isMapping()) {
+                    stopMapping();
+                }
+                return;
+            } else {
+                if(!isMapping()) {
+                    startMapping();
+                }
+            }
 
             if(flaggedForReset) {
                 reset();

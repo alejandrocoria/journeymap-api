@@ -64,7 +64,7 @@ public class RegionImageSet extends ImageSet {
 				BufferedImage legacyImage = RegionImageHandler.readRegionImage(legacyFile, rCoord, 1, true, false);
 				wrapper.setImage(getSubimage(rCoord, mapType, legacyImage));
 				
-				// Add other wrappers for day/night
+				// Add other wrappers for day/moonlight
 				if(mapType==Constants.MapType.day) {
 					addWrapperFromLegacy(Constants.MapType.night, legacyImage);
 				} else if(mapType==Constants.MapType.night) {
