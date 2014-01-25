@@ -256,7 +256,7 @@ var JourneyMap = (function() {
 				if(isNightMap===true) {
 					setMapType('day');
 				} else {								
-					setMapType('moonlight');
+					setMapType('night');
 				}
 			});
 
@@ -661,7 +661,7 @@ var JourneyMap = (function() {
 			$("#dayNightButton").attr("title", getMessage('day_button_title'));
 			$("#dayNightButtonImg").attr('src', '/img/sun.png');
 
-		} else if (mapType === "moonlight") {
+		} else if (mapType === "night") {
 			if (isNightMap === true) return;
 			isNightMap = true;
 			typeChanged = true;
@@ -779,7 +779,7 @@ var JourneyMap = (function() {
 					if (JM.world.time < 13800) {
 						setMapType('day');
 					} else {
-						setMapType('moonlight');
+						setMapType('night');
 					}
 				}
 			}
@@ -1381,7 +1381,7 @@ var JourneyMap = (function() {
 	}
 	
 	var getMapStateUrl = function() {
-		var mapType = (JM.world.features.MapCaves === true && playerUnderground === true && showCaves === true) ? "underground" : (isNightMap === true ? "moonlight" : "day");
+		var mapType = (JM.world.features.MapCaves === true && playerUnderground === true && showCaves === true) ? "underground" : (isNightMap === true ? "night" : "day");
 		var dimension = (JM.player.dimension);
 		var depth = (JM.player && JM.player.chunkCoordY != undefined) ? JM.player.chunkCoordY : 4;
 		return "&mapType=" + mapType + "&dim=" + dimension + "&depth=" + depth + "&ts=" + lastImageCheck;
