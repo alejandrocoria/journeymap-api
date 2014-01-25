@@ -82,7 +82,6 @@ public class JourneyMap {
     private JMLogger logger;
 
 	private volatile Boolean initialized = false;
-    private volatile Boolean flaggedForReset = false;
 	
 	private final Boolean modAnnounced = false;	
 	private JMServer jmServer;
@@ -319,22 +318,14 @@ public class JourneyMap {
 	    		taskController = null;
 	    	}
 
-
             StatTimer.reportAll();
-            this.reset();
 			
 			logger.info("Mapping halted: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
     	}
     }
 
-    public void flagForReset() {
-        logger.info("Flagged for reset");
-        flaggedForReset = true;
-    }
-
     private void reset() {
 
-        flaggedForReset = false;
         FileHandler.lastWorldHash = -1;
         FileHandler.lastJMWorldDir = null;
         BlockMD.clearCache();
@@ -350,7 +341,6 @@ public class JourneyMap {
         RegionImageCache.getInstance().flushToDisk();
         RegionImageCache.getInstance().clear();
         UIManager.getInstance().reset();
-        logger.info("So much reset.  Very wow."); //$NON-NLS-1$
     }
 
     public void updateState() {
@@ -367,10 +357,6 @@ public class JourneyMap {
                 if(!isMapping()) {
                     startMapping();
                 }
-            }
-
-            if(flaggedForReset) {
-                reset();
             }
 
             // If both UIs are disabled, the mod is effectively disabled.
