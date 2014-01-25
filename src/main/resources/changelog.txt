@@ -8,8 +8,8 @@ http://journeymap.techbrew.net
 
 Requirements:
 
-- Minecraft 1.7.2
-- Forge "Recommended-1.7.2"
+- Minecraft @MCVERSION@
+- Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 - ModLoader is no longer supported.  You must use Forge.
