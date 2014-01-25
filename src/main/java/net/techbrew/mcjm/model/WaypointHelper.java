@@ -83,11 +83,11 @@ public class WaypointHelper {
 	 * @return
 	 */
 	public static boolean isNativeLoaded() {
-//		return false;
-		if(nativeLoaded==null) {
-			nativeLoaded = !isReiLoaded() && !isVoxelMapLoaded();
-		}
-		return nativeLoaded;
+		return false;
+//		if(nativeLoaded==null) {
+//			nativeLoaded = !isReiLoaded() && !isVoxelMapLoaded();
+//		}
+//		return nativeLoaded;
 	}
 	
 	/**
@@ -199,7 +199,7 @@ public class WaypointHelper {
 	 */
 	static List<Waypoint> getNativeWaypoints() {
 		
-		if(!isNativeLoaded()) {
+		if(!isNativeLoaded() || renderWaypoints==null) {
 			return Collections.EMPTY_LIST;
 		}
 
