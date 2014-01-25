@@ -9,7 +9,7 @@ import java.util.logging.LogRecord;
 
 public class LogFormatter extends Formatter {
 	 
-	private static final MessageFormat messageFormat = new MessageFormat("{0,time,hh:mm:ss} {1} [{2}] [{3}.{4}] {5}\n"); //$NON-NLS-1$
+	private static final MessageFormat messageFormat = new MessageFormat("{0,time,HH:mm:ss} {1} [{2}] [{3}.{4}] {5}\n"); //$NON-NLS-1$
 	private static final String MINECRAFT_THREADNAME = "Minecraft main thread";
 	
 	public LogFormatter() {
