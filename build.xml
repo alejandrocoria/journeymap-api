@@ -12,15 +12,16 @@
 
     <property name="java.dir" location="${basedir}/src/main/java" />
     <property name="resources.dir" location="${basedir}/src/main/resources" />
+    <property name="forge.dir" location="${basedir}/../forge" />
     <property name="mcp.dir" location="${basedir}/../forge/mcp" />
     <property name="dist.dir" location="${basedir}/dist" />
     <property name="build.dir" location="${mcp.dir}/build" />
     <property name="reobf.dir" location="${mcp.dir}/reobf/minecraft" />
-    <property name="mcp.src.dir" location="${mcp.dir}/src/minecraft" />
 
-    <!-- Change if not on Windows, but don't check in the change. -->
-    <!-- TODO:  OS detection -->
-    <property name="python" location="${mcp.dir}/runtime/bin/python/python_mcp.exe" />
+    <property name="forge.src.dir" location="${forge.dir}/src/main/java" />
+    <property name="forge.resources.dir" location="${forge.dir}/src/main/resources" />
+
+    <property name="gradle" location="${forge.dir}/gradlew.bat" />
 
     <target name="all" description="All" depends="init, recompile, reobfuscate, stage, minify, jarzip">
         <ant target="cleansrc" />
@@ -39,54 +40,46 @@
     </target>
 
     <target name="cleansrc">
-        <delete dir="${mcp.src.dir}/ar/com/hjg/pngj" />
-        <delete dir="${mcp.src.dir}/se/rupy/http" />
-        <delete dir="${mcp.src.dir}/net/techbrew" />
-        <delete file="${mcp.src.dir}/net/minecraft/src/mod_JourneyMap.java" />
-        <delete file="${mcp.src.dir}/net/minecraft/client/renderer/entity/RenderFacade.java" />
+        <delete dir="${forge.src.dir}/" />
+        <delete dir="${forge.resources.dir}/" />
     </target>
 
     <target name="recompile" depends="cleansrc">
 
-        <copy todir="${mcp.src.dir}" failonerror="true" overwrite="true">
+        <copy todir="${forge.src.dir}" failonerror="true" overwrite="true">
             <fileset dir="${basedir}/src/main/java" />
         </copy>
 
-        <exec executable="${python}" dir="${mcp.dir}">
-            <arg value="runtime/recompile.py"/>
-            <arg value="%*"/>
+        <exec executable="${gradle}" dir="${forge.dir}">
+            <arg value="recompForge"/>
         </exec>
 
     </target>
 
     <target name="reobfuscate" depends="recompile">
-        <exec executable="${python}" dir="${mcp.dir}">
-            <arg value="runtime/reobfuscate.py"/>
-            <arg value="%*"/>
+        <exec executable="${gradle}" dir="${forge.dir}">
+            <arg value="reobf"/>
         </exec>
     </target>
 
     <target name="stage">
 
-        <!-- Modloader BaseMod -->
-        <copy todir="${build.dir}" failonerror="true" file="${reobf.dir}/mod_JourneyMap.class" />
-
         <!-- JourneyMap facades -->
-        <copy todir="${build.dir}" failonerror="true" file="${reobf.dir}/net/minecraft/client/renderer/entity/RenderFacade.class" />
+        <copy todir="${build.dir}" failonerror="true" file="${forge.dir}/build/classes/main/net/minecraft/client/renderer/entity/RenderFacade.class" />
 
         <!-- JourneyMap package -->
         <copy todir="${build.dir}/net/techbrew/" failonerror="true">
-            <fileset dir="${reobf.dir}/net/techbrew/" />
+            <fileset dir="${forge.dir}/build/classes/main/net/techbrew/" />
         </copy>
 
         <!-- Rupy classes -->
         <copy todir="${build.dir}/se/rupy/" failonerror="true">
-            <fileset dir="${reobf.dir}/se/rupy/" />
+            <fileset dir="${forge.dir}/build/classes/main/se/rupy/" />
         </copy>
 
         <!-- PNGJ classes -->
         <copy todir="${build.dir}/ar/com/hjg/pngj/" failonerror="true">
-            <fileset dir="${reobf.dir}/ar/com/hjg/pngj/" />
+            <fileset dir="${forge.dir}/build/classes/main/ar/com/hjg/pngj/" />
         </copy>
 
         <!-- License info -->
