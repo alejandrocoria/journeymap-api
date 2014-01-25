@@ -2,19 +2,14 @@ package net.techbrew.mcjm.model;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.EntityList;
 import net.minecraft.util.ChunkCoordinates;
 import net.techbrew.mcjm.JourneyMap;
-import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.waypoint.EntityWaypoint;
-import net.techbrew.mcjm.waypoint.RenderWaypoint;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Get waypoints
@@ -233,35 +228,35 @@ public class WaypointHelper {
 
     public static void initialize() {
 
-        if(waypointEntityId!=null) {
-            getNativeWaypoints(); // TODO: call this somewhere else
-            return;
-        }
-
-        RenderManager rm = RenderManager.instance;
-        Map entityRenderMap = Utils.getPrivateField(rm, RenderManager.class, Map.class);
-        if(entityRenderMap!=null) {
-
-            for(int i=201;i<2048;i++){
-                if(EntityList.getClassFromID(i)==null){
-                    waypointEntityId = i;
-                    break;
-                }
-            }
-
-            if(waypointEntityId!=null) {
-                entityRenderMap.put(EntityWaypoint.class, new RenderWaypoint(Minecraft.getMinecraft(), rm));
-                renderWaypoints = true;
-
-                JourneyMap.getLogger().info("Waypoints will be rendered on-screen");
-                getNativeWaypoints(); // TODO: call this somewhere else
-            } else {
-                JourneyMap.getLogger().warning("Could not get unused entity ID, so Waypoints won't be rendered on screen.");
-            }
-
-        } else {
-            JourneyMap.getLogger().warning("Could not get access to RenderManager, so Waypoints won't be rendered on screen.");
-        }
+//        if(waypointEntityId!=null) {
+//            getNativeWaypoints(); // TODO: call this somewhere else
+//            return;
+//        }
+//
+//        RenderManager rm = RenderManager.instance;
+//        Map entityRenderMap = Utils.getPrivateField(rm, RenderManager.class, Map.class);
+//        if(entityRenderMap!=null) {
+//
+//            for(int i=201;i<2048;i++){
+//                if(EntityList.getClassFromID(i)==null){
+//                    waypointEntityId = i;
+//                    break;
+//                }
+//            }
+//
+//            if(waypointEntityId!=null) {
+//                entityRenderMap.put(EntityWaypoint.class, new RenderWaypoint(Minecraft.getMinecraft(), rm));
+//                renderWaypoints = true;
+//
+//                JourneyMap.getLogger().info("Waypoints will be rendered on-screen");
+//                getNativeWaypoints(); // TODO: call this somewhere else
+//            } else {
+//                JourneyMap.getLogger().warning("Could not get unused entity ID, so Waypoints won't be rendered on screen.");
+//            }
+//
+//        } else {
+//            JourneyMap.getLogger().warning("Could not get access to RenderManager, so Waypoints won't be rendered on screen.");
+//        }
     }
 
 }
