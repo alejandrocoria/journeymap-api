@@ -39,9 +39,9 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 			{
 				for(int x=0; x<16; x++)
 				{
-					h = chunkMd.getSafeHeightValue(x, y);
-					hN = (y==0)  ? getBlockHeight(x, y, 0, -1, chunkMd, neighbors, h) : chunkMd.getSafeHeightValue(x, y-1);
-					hW = (x==0)  ? getBlockHeight(x, y, -1, 0, chunkMd, neighbors, h) : chunkMd.getSafeHeightValue(x-1, y);
+					h = chunkMd.getSlopeHeightValue(x, y);
+					hN = (y==0)  ? getBlockHeight(x, y, 0, -1, chunkMd, neighbors, h) : chunkMd.getSlopeHeightValue(x, y - 1);
+					hW = (x==0)  ? getBlockHeight(x, y, -1, 0, chunkMd, neighbors, h) : chunkMd.getSlopeHeightValue(x - 1, y);
 					slope = ((h/hN)+(h/hW))/2f;
 					chunkMd.sliceSlopes[x][y] = slope;
 				}

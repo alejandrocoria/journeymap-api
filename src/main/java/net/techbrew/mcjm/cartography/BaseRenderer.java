@@ -86,34 +86,31 @@ public abstract class BaseRenderer {
     protected Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, float defaultVal) {
 		int newX = x+offsetX;
 		int newZ = z+offsetz;
-		
-//		int chunkX = currentChunk.stub.xPosition;
-//		int chunkZ = currentChunk.stub.zPosition;
-//		boolean search = false;
-		
-		if(newX==-1) {
-			//chunkX--;
-			newX = 15;
-			//search = true;
-		} else if(newX==16) {
-			//chunkX++;
-			newX = 0;
-			//search = true;
-		}
-		if(newZ==-1) {
-			//chunkZ--;
-			newZ = 15;
-			//search = true;
-		} else if(newZ==16) {
-			//chunkZ++;
-			newZ = 0;
-			//search = true;
-		}
+
+        // TODO: I'm sure there's a bitwise way to do this.
+
+        switch(newX) {
+            case -1:
+                newX = 15;
+                break;
+            case 16:
+                newX = 0;
+                break;
+        }
+
+        switch(newZ) {
+            case -1:
+                newZ = 15;
+                break;
+            case 16:
+                newZ = 0;
+                break;
+        }
 		
 		ChunkMD chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
 		
 		if(chunk!=null) {
-            return (float) chunk.getSafeHeightValue(newX, newZ);
+            return (float) chunk.getSlopeHeightValue(newX, newZ);
 		} else {
 			return defaultVal;
 		}

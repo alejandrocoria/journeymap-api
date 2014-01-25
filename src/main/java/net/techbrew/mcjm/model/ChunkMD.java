@@ -72,18 +72,19 @@ public class ChunkMD {
 	
 	/**
      * Added because getHeightValue() sometimes returns an air block.
-     * Returns the value in the height map at this x, z coordinate in the chunk
+     * Returns the value in the height map at this x, z coordinate in the chunk, disregarding
+     * blocks that shouldn't be used as the top block.
      */
-    public int getSafeHeightValue(int x, int z)
+    public int getSlopeHeightValue(int x, int z)
     {
     	try {
 	    	int y = stub.getHeightValue(x, z);
 	    	if(y<1) return 0;
             Block block = getBlock(x,y,z);
-	    	while(y>0 && BlockUtils.hasFlag(block, BlockUtils.Flag.NotTopBlock)) {
+            while(y>0 && BlockUtils.hasFlag(block, BlockUtils.Flag.NoShadow)) {
                 y--;
-	    		block = getBlock(x,y,z);
-	    	}
+                block = getBlock(x,y,z);
+            }
 	    	return y;
     	} catch(Exception e) {
             JourneyMap.getLogger().warning("Couldn't get safe height at " + x + "," + z + ": " + e);

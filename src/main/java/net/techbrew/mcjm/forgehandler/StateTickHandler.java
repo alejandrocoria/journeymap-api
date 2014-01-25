@@ -21,15 +21,16 @@ public class StateTickHandler {
             return;
         }
 
-        if(counter==0) {
+        if(counter==20) {
             JourneyMap.getInstance().updateState();
+            counter = 0;
         } else if(counter==10) {
             if(JourneyMap.getInstance().isMapping() && mc.theWorld!=null) {
                 JourneyMap.getInstance().performTasks();
             }
-        } else if(counter==20) {
-            counter = 0;
+            counter++;
+        }  else {
+            counter++;
         }
-        counter++;
     }
 }

@@ -21,7 +21,7 @@ public class BlockUtils {
 	public static AlphaComposite SLIGHTLYCLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F);
 	public static Color COLOR_TRANSPARENT = new Color(0,0,0,0);
 
-    public enum Flag {HasAir, BiomeColor, NotHideSky, NotTopBlock, NotCeiling, NoShadow, Side2Texture}
+    public enum Flag {HasAir, BiomeColor, CustomBiomeColor, NotHideSky, NotCeiling, NoShadow, Side2Texture}
 
     private final static HashMap<GameRegistry.UniqueIdentifier, EnumSet<Flag>> blockFlags = new HashMap<GameRegistry.UniqueIdentifier, EnumSet<Flag>>(64);
     private final static HashMap<GameRegistry.UniqueIdentifier, Float> blockAlphas = new HashMap<GameRegistry.UniqueIdentifier, Float>(8);
@@ -40,10 +40,7 @@ public class BlockUtils {
         setAlpha(Blocks.torch, .5F);
 
         blockFlags.clear();
-        setFlags(Blocks.air, Flag.HasAir, Flag.NotHideSky, Flag.NotTopBlock, Flag.NoShadow, Flag.NotCeiling);
-        setFlags(Blocks.brown_mushroom, Flag.Side2Texture);
-        setFlags(Blocks.carrots, Flag.Side2Texture);
-        setFlags(Blocks.deadbush, Flag.NotTopBlock, Flag.Side2Texture);
+        setFlags(Blocks.air, Flag.HasAir, Flag.NotHideSky, Flag.NoShadow, Flag.NotCeiling);
         setFlags(Blocks.fire, Flag.NoShadow, Flag.Side2Texture);
         setFlags(Blocks.flowing_water, Flag.BiomeColor);
         setFlags(Blocks.grass, Flag.BiomeColor);
@@ -54,43 +51,33 @@ public class BlockUtils {
         setFlags(Blocks.leaves, Flag.NotHideSky, Flag.BiomeColor);
         setFlags(Blocks.leaves2, Flag.NotHideSky, Flag.BiomeColor);
         setFlags(Blocks.redstone_torch, Flag.HasAir);
-        setFlags(Blocks.red_flower, Flag.Side2Texture);
-        setFlags(Blocks.red_mushroom, Flag.Side2Texture);
-        setFlags(Blocks.reeds, Flag.Side2Texture);
-        setFlags(Blocks.sapling, Flag.Side2Texture);
         setFlags(Blocks.torch, Flag.HasAir);
-        setFlags(Blocks.melon_stem, Flag.Side2Texture);
-        setFlags(Blocks.nether_wart, Flag.Side2Texture);
-        setFlags(Blocks.potatoes, Flag.Side2Texture);
-        setFlags(Blocks.pumpkin_stem, Flag.Side2Texture);
-        setFlags(Blocks.tallgrass, Flag.NotTopBlock, Flag.Side2Texture, Flag.BiomeColor);
-        setFlags(Blocks.tripwire_hook, Flag.NotTopBlock);
-        setFlags(Blocks.tripwire, Flag.NotTopBlock);
+        setFlags(Blocks.tallgrass, Flag.BiomeColor);
+        setFlags(Blocks.tripwire_hook, Flag.NoShadow);
+        setFlags(Blocks.tripwire, Flag.NoShadow);
         setFlags(Blocks.unlit_redstone_torch, Flag.HasAir);
         setFlags(Blocks.vine, Flag.NotHideSky, Flag.NoShadow, Flag.BiomeColor);
         setFlags(Blocks.water, Flag.NoShadow, Flag.BiomeColor);
-        setFlags(Blocks.wheat, Flag.Side2Texture);
         setFlags(Blocks.web, Flag.NotHideSky, Flag.Side2Texture);
-        setFlags(Blocks.yellow_flower, Flag.Side2Texture);
 
         Iterator<Block> fmlBlockIter = GameData.blockRegistry.iterator();
         while(fmlBlockIter.hasNext()) {
             Block block = fmlBlockIter.next();
 
             if(block.func_149688_o() == Material.field_151579_a) {
-                setFlags(block, Flag.HasAir, Flag.NotHideSky, Flag.NotTopBlock, Flag.NoShadow, Flag.NotCeiling);
-                JourneyMap.getLogger().info(GameRegistry.findUniqueIdentifierFor(block) + " flags set to hide block");
+                setFlags(block, Flag.HasAir, Flag.NotHideSky, Flag.NoShadow, Flag.NotCeiling);
+                JourneyMap.getLogger().fine(GameRegistry.findUniqueIdentifierFor(block) + " flags set to hide block");
                 continue;
             }
 
             if(block instanceof BlockLeavesBase || block instanceof BlockGrass || block instanceof BlockVine || block instanceof BlockLilyPad) {
                 setFlags(block, Flag.BiomeColor);
-                JourneyMap.getLogger().info(GameRegistry.findUniqueIdentifierFor(block) + " flag set: Flag.BiomeColor");
+                JourneyMap.getLogger().fine(GameRegistry.findUniqueIdentifierFor(block) + " flag set: Flag.BiomeColor");
             }
 
-            if(block instanceof BlockFlower || block instanceof BlockStem || block instanceof BlockBush) {
-                setFlags(block, Flag.Side2Texture);
-                JourneyMap.getLogger().info(GameRegistry.findUniqueIdentifierFor(block) + " flag set: Flag.Side2Texture");
+            if(block instanceof BlockBush) {
+                setFlags(block, Flag.Side2Texture, Flag.NoShadow);
+                JourneyMap.getLogger().fine(GameRegistry.findUniqueIdentifierFor(block) + " flags set: Flag.Side2Texture, Flag.NoShadow");
             }
         }
     }
@@ -176,6 +163,18 @@ public class BlockUtils {
         return flags!=null && flags.contains(flag);
     }
 
+    public static boolean hasAnyFlags(Block block, Flag... flags)
+    {
+        EnumSet<Flag> flagSet = blockFlags.get(GameRegistry.findUniqueIdentifierFor(block));
+        if(flagSet==null) return false;
+        for(Flag flag : flags) {
+            if(flagSet.contains(flag)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean hasFlag(GameRegistry.UniqueIdentifier uid, Flag flag)
     {
         EnumSet<Flag> flags = blockFlags.get(uid);
@@ -196,6 +195,11 @@ public class BlockUtils {
     public static void setAlpha(Block block, Float alpha)
     {
         blockAlphas.put(GameRegistry.findUniqueIdentifierFor(block), alpha);
+    }
+
+    public static HashMap getFlagsMap()
+    {
+        return blockFlags;
     }
 
 	

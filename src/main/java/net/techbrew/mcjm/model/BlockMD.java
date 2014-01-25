@@ -8,6 +8,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.cartography.ColorCache;
 import net.techbrew.mcjm.log.LogFormatter;
@@ -73,6 +75,7 @@ public class BlockMD implements Serializable {
 	private Color color;
 	private float alpha;
     private final EnumSet<BlockUtils.Flag> flags;
+    private final String name;
 
     /**
      * Produces a BlockMD instance.
@@ -121,11 +124,25 @@ public class BlockMD implements Serializable {
         Block block = GameRegistry.findBlock(key.uid.modId, key.uid.name);
         if(block==null)
         {
-            JourneyMap.getLogger().severe("Block not found for " + key.uid);
-            return new BlockMD(key, Blocks.air);
+            if(!key.uid.name.equals("air")) {
+                JourneyMap.getLogger().severe("Block not found for " + key.uid);
+            }
+            return new BlockMD(key, Blocks.air, "Air");
         }
 
-        BlockMD blockMD = new BlockMD(key, block);
+        String name = key.uid.toString();
+        try {
+            // Gotta love this.
+            name = new ItemStack(Item.func_150898_a(block), 1, block.func_149692_a(key.meta)).getDisplayName();
+            if(!key.uid.modId.equals("minecraft")){
+                name = key.uid.modId+":"+name;
+            }
+        } catch(Exception e) {
+            JourneyMap.getLogger().severe("Name not found for " + key.uid);
+        }
+        name = name + ":" + key.meta;
+
+        BlockMD blockMD = new BlockMD(key, block, name);
         if(blockMD.isAir()) {
             blockMD.color = Color.CYAN; // Should be obvious if it gets displayed somehow.
             blockMD.setAlpha(0f);
@@ -142,10 +159,11 @@ public class BlockMD implements Serializable {
         return blockMD;
     }
 
-	private BlockMD(CacheKey key, Block block) {
+	private BlockMD(CacheKey key, Block block, String name) {
         if(block==null) throw new IllegalArgumentException("Block can't be null");
         this.key = key;
 		this.block = block;
+        this.name = name;
         this.flags = BlockUtils.getFlags(this.key.uid);
 	}
 
@@ -165,13 +183,13 @@ public class BlockMD implements Serializable {
 		if(this.color!=null) {
             return new RGB(this.color);
         } else {
-            boolean biomeColored = hasFlag(BlockUtils.Flag.BiomeColor);
-			Color color = ColorCache.getInstance().getBlockColor(chunkMd, this, biomeColored, x, y, z);
+
+			Color color = ColorCache.getInstance().getBlockColor(chunkMd, this, x, y, z);
             if(color==null) {
                 return new RGB(Color.BLACK);
             }
 
-            if(biomeColored) {
+            if(isBiomeColored()) {
                 return new RGB(color);
             } else {
                 this.color = color;
@@ -226,7 +244,7 @@ public class BlockMD implements Serializable {
     }
 
     public boolean isBiomeColored() {
-        return hasFlag(BlockUtils.Flag.BiomeColor);
+        return flags.contains(BlockUtils.Flag.BiomeColor) || flags.contains(BlockUtils.Flag.CustomBiomeColor);
     }
 
 	@Override
@@ -251,6 +269,13 @@ public class BlockMD implements Serializable {
 		return "BlockMD [" + key.uid + " meta " + key.meta + "]";
 	}
 
+    /**
+     * Use with care, since this creates an itemstack just to get the name.
+     * @return
+     */
+    public String getName() {
+        return name;
+    }
 
     public static void clearCache() {
         cache.invalidateAll();
