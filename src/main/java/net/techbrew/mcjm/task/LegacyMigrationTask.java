@@ -47,7 +47,7 @@ public class LegacyMigrationTask implements IGenericTask {
 		
 		float total = 1F * pngFilesFound;
 		float remaining = total-pngFiles.size();
-		String percent = new DecimalFormat("##.#").format(remaining*100/total) + "%%";
+		String percent = new DecimalFormat("##.#").format(remaining*100/total) + "%";
 		JourneyMap.getInstance().announce(Constants.getString("JourneyMap.file_updates", percent), Level.INFO);
 		
 		final long start = System.nanoTime();

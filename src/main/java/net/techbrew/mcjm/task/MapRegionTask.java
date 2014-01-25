@@ -162,7 +162,7 @@ public class MapRegionTask extends BaseMapTask {
 				regionLoader.getRegions().pop();
 				float total = 1F * regionLoader.getRegionsFound();
 				float remaining = total-regionLoader.getRegions().size();
-				String percent = new DecimalFormat("##.#").format(remaining*100/total) + "%%";
+				String percent = new DecimalFormat("##.#").format(remaining*100/total) + "%";
 				if(regionLoader.isUnderground()) {
 					String msg = Constants.getString("MapOverlay.automap_status_underground", regionLoader.getVSlice(), percent);
 					JourneyMap.getInstance().announce(msg, Level.INFO);
