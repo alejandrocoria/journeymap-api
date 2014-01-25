@@ -24,44 +24,42 @@ public class PropertyManager {
 	private Boolean writeNeeded = false;
 	
 	public enum Key {
-		MAPGUI_ENABLED("mapgui_enabled", true), //$NON-NLS-1$
-		WEBSERVER_ENABLED("webserver_enabled", true), //$NON-NLS-1$
-		WEBSERVER_PORT("webserver_port", 8080), //$NON-NLS-1$
-		CHUNK_OFFSET("chunk_offset", 5), //$NON-NLS-1$
-		BROWSER_POLL("browser_poll", 1900), //$NON-NLS-1$
-		UPDATETIMER_PLAYER("update_timer_entities", 1000), //$NON-NLS-1$
-		UPDATETIMER_CHUNKS("update_timer_chunks",2000), //$NON-NLS-1$
-		MAPGUI_KEYCODE("mapgui_keycode",36), //$NON-NLS-1$
-		LOGGING_LEVEL("logging_level", "INFO"), //$NON-NLS-1$  //$NON-NLS-2$
-		CAVE_LIGHTING("render_cavelighting_enabled",true), //$NON-NLS-1$
-		ANNOUNCE_MODLOADED("announce_modloaded", true), //$NON-NLS-1$
-		UPDATE_CHECK_ENABLED("update_check_enabled", true), //$NON-NLS-1$
+		MAPGUI_ENABLED(Boolean.class, "mapgui_enabled", true), //$NON-NLS-1$
+		WEBSERVER_ENABLED(Boolean.class, "webserver_enabled", true), //$NON-NLS-1$
+		WEBSERVER_PORT(Integer.class, "webserver_port", 8080), //$NON-NLS-1$
+		CHUNK_OFFSET(Integer.class, "chunk_offset", 5), //$NON-NLS-1$
+		BROWSER_POLL(Integer.class,"browser_poll", 1900), //$NON-NLS-1$
+		UPDATETIMER_PLAYER(Integer.class,"update_timer_entities", 1000), //$NON-NLS-1$
+		UPDATETIMER_CHUNKS(Integer.class,"update_timer_chunks",2000), //$NON-NLS-1$
+		MAPGUI_KEYCODE(Integer.class,"mapgui_keycode",36), //$NON-NLS-1$
+		LOGGING_LEVEL(String.class,"logging_level", "INFO"), //$NON-NLS-1$  //$NON-NLS-2$
+		CAVE_LIGHTING(Boolean.class,"render_cavelighting_enabled",true), //$NON-NLS-1$
+		ANNOUNCE_MODLOADED(Boolean.class,"announce_modloaded", true), //$NON-NLS-1$
+		UPDATE_CHECK_ENABLED(Boolean.class,"update_check_enabled", true), //$NON-NLS-1$
 	
-		PREF_SHOW_CAVES("preference_show_caves", true), //$NON-NLS-1$
-		PREF_SHOW_MOBS("preference_show_mobs", true), //$NON-NLS-1$
-		PREF_SHOW_ANIMALS("preference_show_animals", true), //$NON-NLS-1$
-		PREF_SHOW_VILLAGERS("preference_show_villagers", true), //$NON-NLS-1$
-		PREF_SHOW_PETS("preference_show_pets", true), //$NON-NLS-1$
-		PREF_SHOW_PLAYERS("preference_show_players", true), //$NON-NLS-1$
-		PREF_SHOW_WAYPOINTS("preference_show_waypoints", true), //$NON-NLS-1$
-		PREF_SHOW_GRID("preference_show_grid", true), //$NON-NLS-1$
-        PREF_SHOW_MINIMAP("preference_show_minimap", !WaypointHelper.isReiLoaded() && !WaypointHelper.isVoxelMapLoaded()), //$NON-NLS-1$
+		PREF_SHOW_CAVES(Boolean.class,"preference_show_caves", true), //$NON-NLS-1$
+		PREF_SHOW_MOBS(Boolean.class,"preference_show_mobs", true), //$NON-NLS-1$
+		PREF_SHOW_ANIMALS(Boolean.class,"preference_show_animals", true), //$NON-NLS-1$
+		PREF_SHOW_VILLAGERS(Boolean.class,"preference_show_villagers", true), //$NON-NLS-1$
+		PREF_SHOW_PETS(Boolean.class,"preference_show_pets", true), //$NON-NLS-1$
+		PREF_SHOW_PLAYERS(Boolean.class,"preference_show_players", true), //$NON-NLS-1$
+		PREF_SHOW_WAYPOINTS(Boolean.class,"preference_show_waypoints", true), //$NON-NLS-1$
+		PREF_SHOW_GRID(Boolean.class,"preference_show_grid", true), //$NON-NLS-1$
+        PREF_SHOW_MINIMAP(Boolean.class,"preference_show_minimap", !WaypointHelper.isReiLoaded() && !WaypointHelper.isVoxelMapLoaded()), //$NON-NLS-1$
 
-        PREF_MINIMAP_SHAPE("preference_minimap_shape", DisplayVars.Shape.SmallSquare.name()), //$NON-NLS-1$
-        PREF_MINIMAP_POSITION("preference_minimap_position", DisplayVars.Position.TopRight.name()), //$NON-NLS-1$
-        PREF_MINIMAP_FONTSCALE("preference_minimap_fontscale", 1.0), //$NON-NLS-1$
-        PREF_MINIMAP_SHOWFPS("preference_minimap_showfps", false), //$NON-NLS-1$
-        PREF_MINIMAP_HOTKEYS("preference_minimap_hotkeys", true), //$NON-NLS-1$
+        PREF_MINIMAP_SHAPE(String.class,"preference_minimap_shape", DisplayVars.Shape.SmallSquare.name()), //$NON-NLS-1$
+        PREF_MINIMAP_POSITION(String.class,"preference_minimap_position", DisplayVars.Position.TopRight.name()), //$NON-NLS-1$
+        PREF_MINIMAP_FONTSCALE(Double.class,"preference_minimap_fontscale", 1.0), //$NON-NLS-1$
+        PREF_MINIMAP_SHOWFPS(Boolean.class,"preference_minimap_showfps", false), //$NON-NLS-1$
+        PREF_MINIMAP_HOTKEYS(Boolean.class,"preference_minimap_hotkeys", true), //$NON-NLS-1$
 		;
 		private final String property;
 		private final String defaultValue;
-		private final boolean isBoolean;
-		private final boolean isNumeric;
+        private final Class type;
 		
-		private Key(String property, Object defaultValue) {
-			this.property = property;
-			isNumeric = (defaultValue instanceof Number);
-			isBoolean = (defaultValue instanceof Boolean);
+		private Key(Class type, String property, Object defaultValue) {
+            this.type = type;
+			this.property = property;			
 			this.defaultValue = defaultValue.toString();
 		}
 		
@@ -71,14 +69,6 @@ public class PropertyManager {
 		
 		String getDefault() {
 			return defaultValue;
-		}
-		
-		public boolean isBoolean() {
-			return isBoolean;
-		}
-		
-		public boolean isNumeric() {
-			return isNumeric;
 		}
 		
 		public static Key lookup(String propName) {
@@ -136,6 +126,10 @@ public class PropertyManager {
 	public static Boolean getBooleanProp(Key key) {
 		return getInstance().getBoolean(key);
 	}
+
+    public static Double getDoubleProp(Key key) {
+        return getInstance().getDouble(key);
+    }
 	
 	public static Boolean toggle(Key key) {
 		boolean flip = !getInstance().getBoolean(key);
@@ -166,13 +160,15 @@ public class PropertyManager {
 	public Map<String, Object> getProperties() {
 		HashMap<String, Object> map = new HashMap<String,Object>(properties.size());
 		for(Key key : Key.values()) {
-			if(key.isBoolean) {
+			if(key.type.equals(Boolean.class)) {
 				map.put(key.getProperty(), getBoolean(key));
-			} else if(key.isNumeric) {
+			} else if(key.type.equals(Integer.class)) {
 				map.put(key.getProperty(), getInteger(key));
+			} else if(key.type.equals(Double.class)) {
+				map.put(key.getProperty(), getDouble(key));
 			} else {
-				map.put(key.getProperty(), getString(key));
-			}
+                map.put(key.getProperty(), getString(key));
+            }
 		}
 		return map;
 	}
