@@ -1,6 +1,6 @@
 JourneyMap @JMVERSION@ for Minecraft @MCVERSION@ (@DATE@)
 
-Copyright (C) 2011-2013 Mark Woodman.  All Rights Reserved.
+Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
 This mod may not be altered, file-hosted, or distributed without 
 express written permission by Mark Woodman.
 
@@ -8,13 +8,17 @@ http://journeymap.techbrew.net
 
 Requirements:
 
-- Minecraft 1.6.4
-- Forge "Recommended-1.6.4"
+- Minecraft 1.7.2
+- Forge "Recommended-1.7.2"
 
 Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 - ModLoader is no longer supported.  You must use Forge.
 - New Feature:  Minimap will be enabled if Rei's/Zan's (Voxel) is not active
+- Significant "under the hood" changes for the new Forge and Minecraft environment
 
+Changes in JourneyMap 3.2.0 for Minecraft 1.6.4:
+- Minor bugfixes
+- License updates to allow Feed The Beast to distribute JourneyMap
 
 Changes in JourneyMap 3.1.0 for Minecraft 1.6.4:
 - JourneyMap now comes in two editions: FairPlay and Unlimited:
