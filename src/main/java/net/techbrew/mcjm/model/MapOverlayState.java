@@ -172,8 +172,17 @@ public class MapOverlayState {
 		this.lastRefresh = System.currentTimeMillis();
 	}
 	
-	public boolean shouldRefresh() {
-		return System.currentTimeMillis() > (lastRefresh+refreshInterval);
+	public boolean shouldRefresh(Minecraft mc) {
+
+		if(System.currentTimeMillis() > (lastRefresh+refreshInterval)) {
+            return true;
+        }
+
+        if(this.dimension != mc.theWorld.provider.dimensionId) {
+            return true;
+        }
+
+        return false;
 	}
 	
 }

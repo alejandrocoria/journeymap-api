@@ -627,7 +627,7 @@ public class MapOverlay extends JmUI {
 		if(isScrolling) {
 			return false;
 		} else {
-			return state.shouldRefresh();
+			return state.shouldRefresh(super.field_146297_k);
 		}
 	}
 

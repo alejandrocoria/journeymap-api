@@ -122,6 +122,7 @@ public class UIManager {
         if(this.miniMap!=null){
             this.miniMap.reset();
         }
+        this.miniMap = new MiniMap();
     }
 
     @SubscribeEvent

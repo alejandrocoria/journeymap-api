@@ -54,11 +54,21 @@ public class ChunkRenderController {
 		try {			
 			switch(dimension) {
 				case -1 : {
-					renderOkay = netherRenderer.render(g2D, chunkMd, underground, vSlice, neighbors);
+                    if(!underground || vSlice==null) {
+                        JourneyMap.getLogger().warning("Map task isn't underground, can't perform in Nether.");
+                        renderOkay = false;
+                    } else {
+					    renderOkay = netherRenderer.render(g2D, chunkMd, underground, vSlice, neighbors);
+                    }
 					break;
 				}
 				case 1 : {
-					renderOkay = endRenderer.render(g2D, chunkMd, underground, vSlice, neighbors);
+                    if(!underground || vSlice==null) {
+                        JourneyMap.getLogger().warning("Map task isn't underground, can't perform in End.");
+                        renderOkay = false;
+                    } else {
+					    renderOkay = endRenderer.render(g2D, chunkMd, underground, vSlice, neighbors);
+                    }
 					break;
 				}
 				default : {
@@ -87,7 +97,7 @@ public class ChunkRenderController {
 		
 		if(!renderOkay) {
 			if(fineLogging) {
-				JourneyMap.getLogger().log(Level.WARNING, "Chunk didn't render: " + chunkMd.stub.xPosition + "," + chunkMd.stub.zPosition);
+				JourneyMap.getLogger().log(Level.WARNING, "Chunk didn't render for dimension " + dimension + ": " + chunkMd);
 			}
 			// Use blank
 			chunkImage = underground ? getBlankChunkImageUnderground() : getBlankChunkImage();

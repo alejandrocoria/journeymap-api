@@ -39,14 +39,17 @@ public class TaskThread implements Runnable {
 	}
 	
 	public static TaskThread createAndQueue(ITask task) {
-		if(task==null) return null;
+		if(task==null) {
+            return null;
+        }
 		synchronized(queue) {
-			if(queue.get()==0) {
-				queue.incrementAndGet();
-				return new TaskThread(task);
-			} else {
-				return null;
-			}
+            final int q = queue.get();
+            if(q>1) {
+                return null;
+            } else {
+                queue.set(1);
+                return new TaskThread(task);
+            }
 		}
 	}
 	
@@ -112,7 +115,15 @@ public class TaskThread implements Runnable {
 			final ChunkMD.Set chunkSet = task.getChunkStubs();
 			final Iterator<ChunkMD> chunkIter = chunkSet.iterator();
 			final ChunkImageCache chunkImageCache = new ChunkImageCache();
-					
+
+            // Check the dimension
+            int currentDimension = mc.theWorld.provider.dimensionId;
+            if(currentDimension!=dimension) {
+                if(threadLogging) logger.info("Dimension changed, map task obsolete."); //$NON-NLS-1$
+                timer.cancel();
+                return;
+            }
+
 			// Map the chunks
 			while(chunkIter.hasNext()) {								
 				if(!jm.isMapping()) {

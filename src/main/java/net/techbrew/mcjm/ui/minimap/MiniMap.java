@@ -87,7 +87,7 @@ public class MiniMap {
         }
 
 
-        final boolean doStateRefresh = state.shouldRefresh();
+        final boolean doStateRefresh = state.shouldRefresh(mc);
         drawTimer.start();
 
         try {

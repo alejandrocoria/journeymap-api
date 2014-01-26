@@ -26,7 +26,6 @@ import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.log.StatTimer;
-import net.techbrew.mcjm.model.BlockMD;
 import net.techbrew.mcjm.model.BlockUtils;
 import net.techbrew.mcjm.model.RegionImageCache;
 import net.techbrew.mcjm.model.WaypointHelper;
@@ -328,7 +327,7 @@ public class JourneyMap {
 
         FileHandler.lastWorldHash = -1;
         FileHandler.lastJMWorldDir = null;
-        BlockMD.clearCache();
+        //BlockMD.clearCache();
         //ColorCache.getInstance().serializeCache();
         ColorCache.getInstance().reset();
         Constants.refreshBundle();
