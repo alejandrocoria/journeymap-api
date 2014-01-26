@@ -51,7 +51,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 		boolean chunkOk = false;
 		int maxY = chunkMd.worldHeight;
 		for (int x = 0; x < 16; x++) {
-			for (int z = 0; z < 16; z++) {
+			blockloop: for (int z = 0; z < 16; z++) {
 
 				try {
 					int sliceMinY = Math.max((vSlice << 4) - 1, 0);
@@ -78,14 +78,14 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 							hasAir = true;
 						} else if (hasAir && paintY == -1) {
 							paintY = y;
-							lightLevel = chunkMd.getSavedLightValue(EnumSkyBlock.Block, x,paintY + 1, z);
 							break;
 						}
 					}
 		
 					// Block isn't viable to paint
-					if (paintY == -1) {
-						paintY = 0;
+					if (paintY <=0) {
+                        paintBlock(x, z, Color.BLACK, g2D);
+                        continue blockloop;
 					}
                     blockMD = BlockMD.getBlockMD(chunkMd, x, paintY, z);
 		
