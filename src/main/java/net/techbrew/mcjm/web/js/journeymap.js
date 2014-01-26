@@ -753,8 +753,8 @@ var JourneyMap = (function() {
 
 			// Update UI
 			$("#playerBiome").html(JM.player.biome);
-			$("#playerLocation").html(JM.player.posX + "," + JM.player.posZ);
-			$("#playerElevation").html(JM.player.posY + "&nbsp;(" + (JM.player.posY >> 4) + ")");
+			$("#playerLocation").html(Math.round(JM.player.posX) + "," + Math.round(JM.player.posZ));
+			$("#playerElevation").html(Math.round(JM.player.posY) + "&nbsp;(" + (JM.player.posY >> 4) + ")");
 
 			// 0 is the start of daytime, 12000 is the start of sunset, 13800 is
 			// the start of nighttime, 22200 is the start of sunrise, and 24000 is
