@@ -120,8 +120,8 @@ public class StatTimer {
                 min = 0;
                 counter.set(0);
                 totalTime.set(0);
-                if(logger.isLoggable(Level.INFO)){
-                    logger.info(name + " warmup done, " + warmupCount);
+                if(logger.isLoggable(Level.FINE)){
+                    logger.fine(name + " warmup done, " + warmupCount);
                 }
             }
 
