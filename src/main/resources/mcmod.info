@@ -12,6 +12,6 @@
   "credits": "http://journeymap.techbrew.net/credits/",
   "parent": "",
   "screenshots": [],
-  "dependencies": []
+  "dependencies": ["Forge"]
 }
 ]

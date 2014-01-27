@@ -2,27 +2,21 @@ package net.techbrew.mcjm.forgehandler;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.relauncher.Side;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.techbrew.mcjm.render.overlay.TileCache;
 import net.techbrew.mcjm.ui.UIManager;
 import net.techbrew.mcjm.ui.map.MapOverlay;
 
 /**
- * Scheduled tick handler for rendering the MiniMap
+ * RenderGameOverlayEvent handler for rendering the MiniMap
  */
-public class MiniMapTickHandler {
-
-    Minecraft mc = FMLClientHandler.instance().getClient();
+public class MiniMapOverlayHandler {
 
     @SubscribeEvent
-    public void onRenderTick(TickEvent.RenderTickEvent event) {
+    public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
 
-        if(event.side!= Side.CLIENT || event.phase!= TickEvent.Phase.END) {
-            return;
-        }
-
+        final Minecraft mc = FMLClientHandler.instance().getClient();
         final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof MapOverlay);
 
         // Manage tiles
@@ -32,7 +26,8 @@ public class MiniMapTickHandler {
             TileCache.resume();
         }
 
-        // Draw Minimap
-        UIManager.getInstance().drawMiniMap();
+        if (event.type == RenderGameOverlayEvent.ElementType.ALL) {
+            UIManager.getInstance().drawMiniMap();
+        }
     }
 }

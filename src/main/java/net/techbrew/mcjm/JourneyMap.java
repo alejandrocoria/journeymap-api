@@ -6,7 +6,6 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.eventhandler.EventBus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiMultiplayer;
@@ -14,12 +13,13 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSelectWorld;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.ChatComponentText;
+import net.minecraftforge.common.MinecraftForge;
 import net.techbrew.mcjm.cartography.ColorCache;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.forgehandler.ConnectionHandler;
-import net.techbrew.mcjm.forgehandler.MiniMapTickHandler;
+import net.techbrew.mcjm.forgehandler.MiniMapOverlayHandler;
 import net.techbrew.mcjm.forgehandler.StateTickHandler;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
@@ -165,18 +165,24 @@ public class JourneyMap {
             // Use property settings
             enableAnnounceMod = pm.getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED);
 
-            EventBus bus = FMLCommonHandler.instance().bus();
-            bus.register(new StateTickHandler());
-            bus.register(new ConnectionHandler());
+            // Use FML bus for some tick-based events
+            FMLCommonHandler.instance().bus().register(new StateTickHandler());
+            FMLCommonHandler.instance().bus().register(new ConnectionHandler());
 
             // In-Game UI
             this.enableMapGui = pm.getBoolean(PropertyManager.Key.MAPGUI_ENABLED);
             if(enableMapGui) {
+
+                // Register keybinding
                 int mapGuiKeyCode = pm.getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
                 this.uiKeybinding = new KeyBinding("key.journeymap", mapGuiKeyCode, "JourneyMap"); //$NON-NLS-1$
                 ClientRegistry.registerKeyBinding(JourneyMap.getInstance().uiKeybinding);
-                bus.register(UIManager.getInstance());
-                bus.register(new MiniMapTickHandler());
+
+                // FML bus for Tick event handler in UI Manager
+                FMLCommonHandler.instance().bus().register(UIManager.getInstance());
+
+                // Forge bus for render overlay events
+                MinecraftForge.EVENT_BUS.register(new MiniMapOverlayHandler());
             }
 
             // Webserver
@@ -276,6 +282,8 @@ public class JourneyMap {
     public void startMapping() {
     	synchronized(this) {
 
+            if(mc.theWorld==null) return;
+
             this.reset();
 
             // Waypoint Entity Rendering
@@ -291,9 +299,8 @@ public class JourneyMap {
 	    	
 	    	taskController = new TaskController();
 	    	taskController.enableTasks(mc);
-	    	
-	    	logger.info("Mapping started: " + WorldData.getWorldName(mc)); //$NON-NLS-1$
-	    		    	
+
+            logger.info("Mapping started in " + WorldData.getWorldName(mc) + " dimension " + mc.theWorld.provider.dimensionId + "."); //$NON-NLS-1$
     	}    			
     }
     
@@ -317,9 +324,11 @@ public class JourneyMap {
 	    		taskController = null;
 	    	}
 
-            StatTimer.reportAll();
-			
-			logger.info("Mapping halted: " + WorldData.getWorldName(minecraft)); //$NON-NLS-1$
+            String dim = ".";
+            if(minecraft.theWorld!=null && minecraft.theWorld.provider!=null) {
+                dim = " dimension " + minecraft.theWorld.provider.dimensionId + "."; //$NON-NLS-1$ //$NON-NLS-2$
+            }
+			logger.info("Mapping halted in " + WorldData.getWorldName(minecraft) + dim); //$NON-NLS-1$
     	}
     }
 
