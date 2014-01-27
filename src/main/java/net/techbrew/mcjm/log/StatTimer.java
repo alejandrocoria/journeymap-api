@@ -68,7 +68,7 @@ public class StatTimer {
     /**
      * Report all timers via log file.
      */
-    public synchronized static void reportAll() {
+    public synchronized static String getReport() {
         List<StatTimer> list = new ArrayList<StatTimer>(timers.values());
         Collections.sort(list, new Comparator<StatTimer>(){
             @Override
@@ -82,7 +82,7 @@ public class StatTimer {
                 sb.append("\n\t").append(timer.getReportString());
             }
         }
-        JourneyMap.getLogger().info(sb.toString());
+        return sb.toString();
     }
 
     /**
