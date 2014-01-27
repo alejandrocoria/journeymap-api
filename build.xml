@@ -73,7 +73,7 @@
 
             <!-- Copy Java libs -->
             <copy todir="${forge.dir}/libs">
-                <fileset dir="${basedir}/lib" />
+                <fileset dir="${basedir}/lib"  />
             </copy>
 
             <!-- Copy Java sources -->
