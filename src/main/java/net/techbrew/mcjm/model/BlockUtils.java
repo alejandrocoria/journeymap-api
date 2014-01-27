@@ -140,7 +140,7 @@ public class BlockUtils {
 			}
 		}
 		
-		return y;
+		return Math.max(0,y);
 	}
 
     public static EnumSet<Flag> getFlags(GameRegistry.UniqueIdentifier uid)

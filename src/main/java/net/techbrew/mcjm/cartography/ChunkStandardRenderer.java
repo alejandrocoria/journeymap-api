@@ -35,8 +35,15 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
 		// Render the chunk image
 		if(underground) {
-			renderSurface(g2D, chunkMd, vSlice, neighbors, true);
-			return renderUnderground(g2D, chunkMd, vSlice, neighbors);
+			boolean ok = renderSurface(g2D, chunkMd, vSlice, neighbors, true);
+            if(!ok) {
+                JourneyMap.getLogger().fine("The surface chunk didn't paint: " + chunkMd.toString());
+            }
+			ok = renderUnderground(g2D, chunkMd, vSlice, neighbors);
+            if(!ok) {
+                JourneyMap.getLogger().fine("The underground chunk didn't paint: " + chunkMd.toString());
+            }
+            return ok;
 		} else {
 			return renderSurface(g2D, chunkMd, vSlice, neighbors, false);
 		}
@@ -72,13 +79,13 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
         StatTimer timer = StatTimer.get("ChunkStandardRenderer.renderSurface");
         timer.start();
 
+        g2D.setComposite(BlockUtils.OPAQUE);
+
 		boolean chunkOk = false;
 		for (int x = 0; x < 16; x++) {
 			blockLoop : for (int z = 0; z < 16; z++) {
 
-				//int y = chunkMd.getSlopeHeightValue(x, z);
-                int y = chunkMd.stub.getHeightValue(x, z);
-				if (y < 0) y=1; // Weird data error seen on World of Keralis
+                int y = Math.max(1, chunkMd.stub.getHeightValue(x, z));
 
 				// Get blockinfo for coords
 				BlockMD blockMD;
@@ -119,15 +126,15 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					}
 
                     // Grey out if used to show outside in underground layer
-					if(forUndergroundLayer) {
-						color.ghostSurface();
-					}
+                    if(forUndergroundLayer) {
+                        color.ghostSurface();
+                    }
 
-					// Draw daytime map block
-					g2D.setComposite(BlockUtils.OPAQUE);
-					g2D.setPaint(color.toColor());
-					g2D.fillRect(x, z, 1, 1);
-				}
+                    // Draw daytime map block
+                    g2D.setPaint(color.toColor());
+                    g2D.fillRect(x, z, 1, 1);
+                    chunkOk = true;
+                }
 
                 // Night color
 				if(!forUndergroundLayer) {
@@ -140,13 +147,11 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					}
 
 					// Draw nighttime map block
-					g2D.setComposite(BlockUtils.OPAQUE);
 					g2D.setPaint(color.toColor());
 					g2D.fillRect(x + 16, z, 1, 1);
-				}
 
-				chunkOk = true;
-
+                    chunkOk = true;
+                }
 			}
 		}
         timer.stop();
@@ -279,13 +284,11 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				try {
 
 					int blockMaxY = BlockUtils.ceiling(chunkMd, x, sliceMaxY, z);
-					if(blockMaxY<0) {
-						continue blockLoop;
-					}
 
 					// Skip blocks open to the sky
 					int checkY = Math.min(sliceMaxY - 1, blockMaxY + 1);
                     if(BlockUtils.skyAbove(chunkMd, x, checkY, z)) {
+                        chunkOk = true;
                         continue blockLoop;
                     }
 
@@ -360,7 +363,8 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					// No air blocks in column at all
 					if (paintY < 0 || (!hasAir && !hasWater) || (lightLevel<1 && caveLighting)) {
 						// I see an unlit block; I want to paint it black.
-						paintBlock(x, z, Color.black, g2D);
+                        paintBlock(x, z, Color.black, g2D);
+                        chunkOk = true;
 						continue blockLoop;
 					}
 

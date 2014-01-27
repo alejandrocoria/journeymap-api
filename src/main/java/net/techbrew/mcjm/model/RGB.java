@@ -114,8 +114,11 @@ public final class RGB {
      * @return
      */
     public void ghostSurface() {
-        final float factor = .3f;
-        float hsb[] = Color.RGBtoHSB((int) frgb[0]*255, (int) frgb[1]*255, (int) frgb[2]*255, null);
+
+        //Color c = toColor();
+
+        final float factor = .4f;
+        float hsb[] = Color.RGBtoHSB((int) (frgb[0]*255+0.5), (int) (frgb[1]*255+0.5), (int) (frgb[2]*255+0.5), null);
         int grey = Color.HSBtoRGB(hsb[0], 0, hsb[2]);
         this.setFrom(grey);
         frgb[0] = ((frgb[0]+.5f)/2*factor);
