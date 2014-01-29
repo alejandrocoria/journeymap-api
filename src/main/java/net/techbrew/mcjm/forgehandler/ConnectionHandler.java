@@ -5,11 +5,17 @@ import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
 import net.techbrew.mcjm.JourneyMap;
 
+import java.util.EnumSet;
+
 /**
  * Stops mapping when connectionClosed.
  */
-public class ConnectionHandler {
+public class ConnectionHandler implements EventHandlerManager.EventHandler {
 
+    @Override
+    public EnumSet<EventHandlerManager.BusType> getBus() {
+        return EnumSet.of(EventHandlerManager.BusType.FMLCommonHandlerBus);
+    }
 
     @SubscribeEvent
     public void onLogin(PlayerEvent.PlayerLoggedInEvent event) {

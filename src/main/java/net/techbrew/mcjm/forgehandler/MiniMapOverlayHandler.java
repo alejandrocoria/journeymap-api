@@ -8,10 +8,17 @@ import net.techbrew.mcjm.render.overlay.TileCache;
 import net.techbrew.mcjm.ui.UIManager;
 import net.techbrew.mcjm.ui.map.MapOverlay;
 
+import java.util.EnumSet;
+
 /**
  * RenderGameOverlayEvent handler for rendering the MiniMap
  */
-public class MiniMapOverlayHandler {
+public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler {
+
+    @Override
+    public EnumSet<EventHandlerManager.BusType> getBus() {
+        return EnumSet.of(EventHandlerManager.BusType.MinecraftForgeBus);
+    }
 
     @SubscribeEvent
     public void onRenderOverlay(RenderGameOverlayEvent.Post event) {

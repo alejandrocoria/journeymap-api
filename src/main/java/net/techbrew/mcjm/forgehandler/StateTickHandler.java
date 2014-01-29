@@ -6,10 +6,17 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import net.minecraft.client.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 
+import java.util.EnumSet;
+
 /**
  * Tick handler for JourneyMap state
  */
-public class StateTickHandler {
+public class StateTickHandler implements EventHandlerManager.EventHandler {
+
+    @Override
+    public EnumSet<EventHandlerManager.BusType> getBus() {
+        return EnumSet.of(EventHandlerManager.BusType.FMLCommonHandlerBus);
+    }
 
     Minecraft mc = FMLClientHandler.instance().getClient();
     int counter = 0;

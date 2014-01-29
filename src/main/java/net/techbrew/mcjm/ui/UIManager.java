@@ -1,7 +1,5 @@
 package net.techbrew.mcjm.ui;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.InputEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
@@ -16,7 +14,6 @@ import net.techbrew.mcjm.ui.map.MapOverlayActions;
 import net.techbrew.mcjm.ui.map.MapOverlayOptions;
 import net.techbrew.mcjm.ui.minimap.MiniMap;
 import net.techbrew.mcjm.ui.minimap.MiniMapOptions;
-import org.lwjgl.input.Keyboard;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -124,17 +121,4 @@ public class UIManager {
         }
         this.miniMap = new MiniMap();
     }
-
-    @SubscribeEvent
-    public void onKeyboardEvent(InputEvent.KeyInputEvent event) {
-
-        if(Keyboard.getEventKey()==uiKeybinding.func_151463_i()) {
-			if(minecraft.currentScreen==null) {
-				openMap();
-			} else if(minecraft.currentScreen instanceof MapOverlay) {
-				closeAll();
-			}
-		} 
-	}
-
 }

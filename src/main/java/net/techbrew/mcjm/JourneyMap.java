@@ -2,7 +2,6 @@ package net.techbrew.mcjm;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -13,14 +12,11 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSelectWorld;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.ChatComponentText;
-import net.minecraftforge.common.MinecraftForge;
 import net.techbrew.mcjm.cartography.ColorCache;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.feature.FeatureManager;
-import net.techbrew.mcjm.forgehandler.ConnectionHandler;
-import net.techbrew.mcjm.forgehandler.MiniMapOverlayHandler;
-import net.techbrew.mcjm.forgehandler.StateTickHandler;
+import net.techbrew.mcjm.forgehandler.EventHandlerManager;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.JMLogger;
@@ -165,9 +161,8 @@ public class JourneyMap {
             // Use property settings
             enableAnnounceMod = pm.getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED);
 
-            // Use FML bus for some tick-based events
-            FMLCommonHandler.instance().bus().register(new StateTickHandler());
-            FMLCommonHandler.instance().bus().register(new ConnectionHandler());
+            // Register general event handlers
+            EventHandlerManager.registerGeneralHandlers();
 
             // In-Game UI
             this.enableMapGui = pm.getBoolean(PropertyManager.Key.MAPGUI_ENABLED);
@@ -178,11 +173,8 @@ public class JourneyMap {
                 this.uiKeybinding = new KeyBinding("key.journeymap", mapGuiKeyCode, "JourneyMap"); //$NON-NLS-1$
                 ClientRegistry.registerKeyBinding(JourneyMap.getInstance().uiKeybinding);
 
-                // FML bus for Tick event handler in UI Manager
-                FMLCommonHandler.instance().bus().register(UIManager.getInstance());
-
-                // Forge bus for render overlay events
-                MinecraftForge.EVENT_BUS.register(new MiniMapOverlayHandler());
+                // Register GUI event handlers
+                EventHandlerManager.registerGuiHandlers();
             }
 
             // Webserver
