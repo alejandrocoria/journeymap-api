@@ -42,14 +42,6 @@ public class TextureCache {
         return Holder.INSTANCE;
     }
 
-    public static TextureImpl newUnmanagedTexture(BufferedImage image) {
-    	return new TextureImpl(image);
-    }
-    
-    public static TextureImpl newUnmanagedTexture(BufferedImage image, boolean retain) {
-    	return new TextureImpl(image, retain);
-    }
-
     public static DynamicTexture newTexture(String path) {
         ResourceLocation loc = new ResourceLocation(path);
         DynamicTexture texture = null;
@@ -104,12 +96,15 @@ public class TextureCache {
 	private TextureImpl getNamedTexture(Name name, String filename, boolean retain) {
 		synchronized(namedTextures) {
 			TextureImpl tex = namedTextures.get(name);
-			if(tex==null || !tex.hasImage()) {
+			if(tex==null || (!tex.hasImage() && retain)) {
 				BufferedImage img = FileHandler.getWebImage(filename);
                 if(img==null){
                     img = getUnknownEntity().getImage();
                 }
                 if(img!=null){
+                    if(tex!=null){
+                        tex.deleteTexture();
+                    }
                     tex = new TextureImpl(img, retain);
                     namedTextures.put(name, tex);
                 }
@@ -191,6 +186,9 @@ public class TextureCache {
             if(tex==null || !tex.hasImage()) {
 				BufferedImage img = FileHandler.getCustomizableImage("entity/" + filename, getUnknownEntity().getImage()); //$NON-NLS-1$	
                 if(img!=null){
+                    if(tex!=null) {
+                        tex.deleteTexture();
+                    }
                     tex = new TextureImpl(img);
                     entityImageMap.put(filename, tex);
                 }
