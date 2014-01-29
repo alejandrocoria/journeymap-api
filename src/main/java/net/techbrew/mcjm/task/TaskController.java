@@ -36,7 +36,7 @@ public class TaskController {
 			if(!enabled) {
 				logger.fine("Task not initially enabled: " + manager.getTaskClass().getSimpleName());
 			} else {
-				logger.info("Task ready: " + manager.getTaskClass().getSimpleName());
+				logger.fine("Task ready: " + manager.getTaskClass().getSimpleName());
 			}
 		}
 		
@@ -87,14 +87,14 @@ public class TaskController {
 		Minecraft minecraft = Minecraft.getMinecraft();
 		if(manager.isEnabled(minecraft)) {
 			if(!enable) {
-				logger.info("Disabling task: " + manager.getTaskClass().getSimpleName());
+				logger.fine("Disabling task: " + manager.getTaskClass().getSimpleName());
 				manager.disableTask(minecraft);
 			} else {
 				logger.fine("Task already enabled: " + manager.getTaskClass().getSimpleName());
 			}
 		} else {
 			if(enable) {
-				logger.info("Enabling task: " + manager.getTaskClass().getSimpleName());
+				logger.fine("Enabling task: " + manager.getTaskClass().getSimpleName());
 				manager.enableTask(minecraft, params);
 			} else {
 				logger.fine("Task already disabled: " + manager.getTaskClass().getSimpleName());
@@ -106,7 +106,7 @@ public class TaskController {
 		for(ITaskManager manager: managers) {
 			if(manager.isEnabled(minecraft)) {
 				manager.disableTask(minecraft);
-				logger.info("Task disabled: " + manager.getTaskClass().getSimpleName());
+				logger.fine("Task disabled: " + manager.getTaskClass().getSimpleName());
 			}
 		}
 	}
@@ -134,7 +134,7 @@ public class TaskController {
 						taskExecutor.schedule(thread, mapTaskDelay, TimeUnit.MILLISECONDS);
 						accepted = true;
 						if(logger.isLoggable(Level.FINE)) {
-							logger.info("Scheduled " + manager.getTaskClass().getSimpleName());
+							logger.fine("Scheduled " + manager.getTaskClass().getSimpleName());
 						}
 					} else {
 						logger.warning("TaskExecutor isn't running");

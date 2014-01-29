@@ -71,7 +71,7 @@ public class ColorCache implements IResourceManagerReloadListener {
     	
     	if(JourneyMap.getInstance().isMapping() || iconLoader==null) {
     		if(currentPack.equals(lastResourcePack)) {
-    			JourneyMap.getLogger().info("ResourcePack unchanged: " + currentPack);
+    			JourneyMap.getLogger().fine("ResourcePack unchanged: " + currentPack);
     		} else {
     			JourneyMap.getLogger().info("ResourcePack: " + lastResourcePack + " --> " + currentPack);
     			reset();
@@ -126,9 +126,9 @@ public class ColorCache implements IResourceManagerReloadListener {
             int tint = getBiomeColorMultiplier(blockMD, x, y, z);
             if ((tint != 0xFFFFFF) && (tint != 0xFFFFFFFF)) { // white without alpha, white with alpha
                 color = colorMultiplier(color, tint);
-                JourneyMap.getLogger().info("Custom biome tint set for " + blockMD.key + " in " + biome.biomeName);
+                JourneyMap.getLogger().fine("Custom biome tint set for " + blockMD.key + " in " + biome.biomeName);
             } else {
-                JourneyMap.getLogger().warning("Custom biome tint not found for " + blockMD.key + " in " + biome.biomeName);
+                JourneyMap.getLogger().fine("Custom biome tint not found for " + blockMD.key + " in " + biome.biomeName);
             }
             putBiomeColor(blockMD, biome, color);
         }
@@ -236,13 +236,13 @@ public class ColorCache implements IResourceManagerReloadListener {
                 if ((tint != 0xFFFFFF) && (tint != 0xFFFFFFFF)) { // white without alpha, white with alpha
                     blockMD.addFlags(BlockUtils.Flag.CustomBiomeColor);
                     BlockUtils.setFlags(blockMD.getBlock(), BlockUtils.Flag.BiomeColor);
-                    JourneyMap.getLogger().info("Custom biome tint discovered for " + blockMD);
+                    JourneyMap.getLogger().fine("Custom biome tint discovered for " + blockMD);
                 } else {
                     // Check for render color
                     int renderColor = blockMD.getBlock().func_149741_i(blockMD.key.meta & 0xf); // getRenderColor()
                     if(renderColor!=0xffffff && renderColor!=0xffffffff) { // white without alpha or white with alpha
                         baseColor = colorMultiplier(baseColor, 0xff000000 | renderColor); // Force opaque render color
-                        JourneyMap.getLogger().info("Applied render color for " + blockMD);
+                        JourneyMap.getLogger().fine("Applied render color for " + blockMD);
                     }
                 }
             }
@@ -358,7 +358,7 @@ public class ColorCache implements IResourceManagerReloadListener {
 
 	    int result = (alpha & 0xFF) << 24 | (red & 0xFF) << 16 | (green & 0xFF) << 8 | blue & 0xFF;
 
-	    return result | -16777216; // TODO:  what's this magic?
+	    return result | 0xFFFFFF;
 	}
 
 }

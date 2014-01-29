@@ -76,13 +76,13 @@ public class TaskThread implements Runnable {
 			
 			// Bail if needed
 			if(!jm.isMapping()) {
-				jm.getLogger().warning("JM not mapping, aborting");
+				jm.getLogger().fine("JM not mapping, aborting");
 				return;
 			}				
 			
 			final File jmWorldDir = FileHandler.getJMWorldDir(mc);
 			if(jmWorldDir==null) {
-				jm.getLogger().warning("JM world dir not found, aborting");
+				jm.getLogger().fine("JM world dir not found, aborting");
 				return;
 			}
 			
@@ -119,7 +119,7 @@ public class TaskThread implements Runnable {
             // Check the dimension
             int currentDimension = mc.theWorld.provider.dimensionId;
             if(currentDimension!=dimension) {
-                if(threadLogging) logger.info("Dimension changed, map task obsolete."); //$NON-NLS-1$
+                if(threadLogging) logger.fine("Dimension changed, map task obsolete."); //$NON-NLS-1$
                 timer.cancel();
                 return;
             }
@@ -127,7 +127,7 @@ public class TaskThread implements Runnable {
 			// Map the chunks
 			while(chunkIter.hasNext()) {								
 				if(!jm.isMapping()) {
-					if(threadLogging) logger.info("JM isn't mapping, aborting"); //$NON-NLS-1$
+					if(threadLogging) logger.fine("JM isn't mapping, aborting"); //$NON-NLS-1$
                     timer.cancel();
 					return;
 				}
@@ -145,7 +145,7 @@ public class TaskThread implements Runnable {
 			}
 			
 			if(!jm.isMapping()) {
-				if(threadLogging) logger.info("JM isn't mapping, aborting.");  //$NON-NLS-1$
+				if(threadLogging) logger.fine("JM isn't mapping, aborting.");  //$NON-NLS-1$
                 timer.cancel();
 				return;
 			}
