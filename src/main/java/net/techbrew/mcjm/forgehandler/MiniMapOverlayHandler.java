@@ -2,6 +2,8 @@ package net.techbrew.mcjm.forgehandler;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.techbrew.mcjm.render.overlay.TileCache;
@@ -13,6 +15,7 @@ import java.util.EnumSet;
 /**
  * RenderGameOverlayEvent handler for rendering the MiniMap
  */
+@SideOnly(Side.CLIENT)
 public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler {
 
     @Override

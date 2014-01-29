@@ -3,7 +3,8 @@ package net.techbrew.mcjm.forgehandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.WorldEvent;
+import net.techbrew.mcjm.JourneyMap;
 
 import java.util.EnumSet;
 
@@ -11,7 +12,7 @@ import java.util.EnumSet;
  * Created by mwoodman on 1/29/14.
  */
 @SideOnly(Side.CLIENT)
-public class ChunkUpdateHandler implements EventHandlerManager.EventHandler {
+public class WorldEventHandler implements EventHandlerManager.EventHandler {
 
     @Override
     public EnumSet<EventHandlerManager.BusType> getBus() {
@@ -19,8 +20,13 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler {
     }
 
     @SubscribeEvent
-    public void onChunkLoad(ChunkEvent.Load event) {
-        //JourneyMap.getLogger().info(event.getChunk().getChunkCoordIntPair().toString());
+    public void onWorldLoad(WorldEvent.Load event) {
+        //JourneyMap.getLogger().info(event.world.getWorldInfo().getWorldName());
+    }
+
+    @SubscribeEvent
+    public void onWorldUnload(WorldEvent.Unload event) {
+        JourneyMap.getInstance().stopMapping();
     }
 
 }

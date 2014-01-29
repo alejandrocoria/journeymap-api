@@ -3,6 +3,8 @@ package net.techbrew.mcjm.forgehandler;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.techbrew.mcjm.JourneyMap;
 
@@ -11,6 +13,7 @@ import java.util.EnumSet;
 /**
  * Tick handler for JourneyMap state
  */
+@SideOnly(Side.CLIENT)
 public class StateTickHandler implements EventHandlerManager.EventHandler {
 
     @Override

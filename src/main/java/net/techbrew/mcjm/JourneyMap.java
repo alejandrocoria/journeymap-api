@@ -5,6 +5,8 @@ import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiMultiplayer;
@@ -55,6 +57,7 @@ import java.util.logging.Logger;
  * @author Mark Woodman
  *
  */
+@SideOnly(Side.CLIENT)
 @Mod(modid = JourneyMap.SHORT_MOD_NAME, name = JourneyMap.SHORT_MOD_NAME, version = JourneyMap.JM_VERSION)
 public class JourneyMap {
 	
@@ -305,22 +308,25 @@ public class JourneyMap {
     	
     	synchronized(this) {
 
+            if(taskExecutor!=null || taskController!=null)
+            {
+                String dim = ".";
+                if(minecraft.theWorld!=null && minecraft.theWorld.provider!=null) {
+                    dim = " dimension " + minecraft.theWorld.provider.dimensionId + "."; //$NON-NLS-1$ //$NON-NLS-2$
+                }
+                logger.info("Mapping halting in " + WorldData.getWorldName(minecraft) + dim); //$NON-NLS-1$
+            }
+
 	    	if(taskExecutor!=null && !taskExecutor.isShutdown()) {    		
-				taskExecutor.shutdown();			
+				taskExecutor.shutdown();
+                taskExecutor = null;
 			}	    	
-	    	taskExecutor = null;
-	    	
+
 	    	if(taskController!=null) {
 	    		taskController.disableTasks(minecraft);
 	    		taskController.clear();
 	    		taskController = null;
 	    	}
-
-            String dim = ".";
-            if(minecraft.theWorld!=null && minecraft.theWorld.provider!=null) {
-                dim = " dimension " + minecraft.theWorld.provider.dimensionId + "."; //$NON-NLS-1$ //$NON-NLS-2$
-            }
-			logger.info("Mapping halted in " + WorldData.getWorldName(minecraft) + dim); //$NON-NLS-1$
     	}
     }
 
