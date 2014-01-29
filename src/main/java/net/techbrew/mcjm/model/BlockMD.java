@@ -124,23 +124,38 @@ public class BlockMD implements Serializable {
         Block block = GameRegistry.findBlock(key.uid.modId, key.uid.name);
         if(block==null)
         {
-            if(!key.uid.name.equals("air")) {
-                JourneyMap.getLogger().severe("Block not found for " + key.uid);
+            block = GameRegistry.findBlock(null, key.uid.name);
+            if(block==null)
+            {
+                if(!key.uid.name.equals("Air")) {
+                    JourneyMap.getLogger().warning("Block not found for " + key.uid);
+                    return new BlockMD(key, Blocks.air, "ERROR-" + block.getClass().getName());
+                }
+                else
+                {
+                    return new BlockMD(key, Blocks.air, "Air");
+                }
             }
-            return new BlockMD(key, Blocks.air, "Air");
         }
 
-        String name = key.uid.toString();
+        String prefix = "";
+        String suffix = ":" + key.meta;
+        String name = key.uid.toString() + suffix;
         try {
             // Gotta love this.
-            name = new ItemStack(Item.func_150898_a(block), 1, block.func_149692_a(key.meta)).getDisplayName();
+            Item item = Item.func_150898_a(block);
+            ItemStack stack = new ItemStack(item, 1, block.func_149692_a(key.meta));
+            String displayName = stack.getDisplayName();
+
             if(!key.uid.modId.equals("minecraft")){
-                name = key.uid.modId+":"+name;
+                prefix = key.uid.modId+":";
             }
-        } catch(Exception e) {
-            JourneyMap.getLogger().severe("Name not found for " + key.uid);
+
+            name = prefix + displayName + suffix;
+
+        } catch(Throwable t) {
+            JourneyMap.getLogger().fine("Displayname not available for " + name);
         }
-        name = name + ":" + key.meta;
 
         BlockMD blockMD = new BlockMD(key, block, name);
         if(blockMD.isAir()) {
