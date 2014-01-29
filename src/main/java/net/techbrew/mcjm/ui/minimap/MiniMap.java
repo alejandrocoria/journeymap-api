@@ -313,7 +313,7 @@ public class MiniMap {
         }
 
         if(oldDv!=null && oldDv.shape!=this.dv.shape){
-            oldDv.borderTexture.deleteTexture(); // TODO: ensure reloading texture works
+            //oldDv.borderTexture.deleteTexture();
         }
 
         // THIS IS WRONG - scissorY you bastard
