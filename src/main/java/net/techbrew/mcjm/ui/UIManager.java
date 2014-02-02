@@ -7,12 +7,14 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
+import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.render.overlay.TileCache;
 import net.techbrew.mcjm.ui.map.MapOverlay;
 import net.techbrew.mcjm.ui.map.MapOverlayActions;
 import net.techbrew.mcjm.ui.map.MapOverlayOptions;
 import net.techbrew.mcjm.ui.minimap.MiniMap;
+import net.techbrew.mcjm.ui.minimap.MiniMapHotkeysHelp;
 import net.techbrew.mcjm.ui.minimap.MiniMapOptions;
 
 import java.util.logging.Level;
@@ -74,6 +76,12 @@ public class UIManager {
 		}
     }
 
+    public void toggleMinimap() {
+        final boolean enabled = !isMiniMapEnabled();
+        PropertyManager.set(PropertyManager.Key.PREF_SHOW_MINIMAP, enabled);
+        setMiniMapEnabled(enabled);
+    }
+
     public void setMiniMapEnabled(boolean enable) {
         miniMap.setEnabled(enable);
     }
@@ -102,6 +110,10 @@ public class UIManager {
 
     public void openMiniMapOptions() {
         open(MiniMapOptions.class);
+    }
+
+    public void openMiniMapHotkeyHelp() {
+        open(MiniMapHotkeysHelp.class);
     }
     
     public void openMapOptions() {

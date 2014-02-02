@@ -22,6 +22,7 @@ public class MapOverlayOptions extends JmUI {
 	int lastHeight = 0;
 	
 	private enum ButtonEnum {Caves,Monsters,Animals,Villagers,Pets,Players,Waypoints,Grid,Webserver,MiniMap,Close};
+
 	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid, buttonWebserver, buttonMiniMap, buttonClose;
 	
 	public MapOverlayOptions() {

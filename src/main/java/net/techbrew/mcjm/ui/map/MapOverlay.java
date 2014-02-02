@@ -51,9 +51,6 @@ public class MapOverlay extends JmUI {
 
 	private enum ButtonEnum{Alert,DayNight,Follow,ZoomIn,ZoomOut,Options,Actions,Close,MiniMap}
 	
-	final int minZoom = 0;
-	final int maxZoom = 5;
-	
 	Boolean isScrolling = false;
 	int msx, msy, mx, my;	
 
@@ -208,8 +205,8 @@ public class MapOverlay extends JmUI {
             buttonZoomIn  = new MapButton(ButtonEnum.ZoomIn.ordinal(),0,0,20,20, "+"); //$NON-NLS-1$ //$NON-NLS-2$
             buttonZoomOut = new MapButton(ButtonEnum.ZoomOut.ordinal(),0,0,20,20, "-"); //$NON-NLS-1$ //$NON-NLS-2$
 
-            buttonZoomOut.enabled = state.currentZoom>minZoom;
-            buttonZoomIn.enabled = state.currentZoom<maxZoom;
+            buttonZoomOut.enabled = state.currentZoom>state.minZoom;
+            buttonZoomIn.enabled = state.currentZoom<state.maxZoom;
 
             buttonClose   = new MapButton(ButtonEnum.Close.ordinal(),0,0,60,20,Constants.getString("MapOverlay.close")); //$NON-NLS-1$
             buttonOptions = new MapButton(ButtonEnum.Options.ordinal(),0,0,60,20, Constants.getString("MapOverlay.options")); //$NON-NLS-1$
@@ -366,25 +363,24 @@ public class MapOverlay extends JmUI {
 	}
 
 	void zoomIn(){
-		if(state.currentZoom<maxZoom){
+		if(state.currentZoom<state.maxZoom){
 			setZoom(state.currentZoom+1);
 		}
 	}
 	
 	void zoomOut(){
-		if(state.currentZoom>minZoom){
+		if(state.currentZoom>state.minZoom){
 			setZoom(state.currentZoom-1);
 		}
 	}
 
 	private void setZoom(int zoom) {
-		if(zoom>maxZoom || zoom<minZoom || zoom==state.currentZoom) {
-			return;
-		}
-		state.currentZoom = zoom;
-		buttonZoomOut.enabled = state.currentZoom>minZoom;
-		buttonZoomIn.enabled = state.currentZoom<maxZoom;		
-		refreshState();
+		if(state.setZoom(zoom))
+        {
+            buttonZoomOut.enabled = state.currentZoom>state.minZoom;
+            buttonZoomIn.enabled = state.currentZoom<state.maxZoom;
+		    refreshState();
+        }
 	}
 	
 	void toggleDayNight() {
@@ -434,10 +430,18 @@ public class MapOverlay extends JmUI {
 				return;
 			}
 			case Keyboard.KEY_MINUS : {
-				zoomOut();
-				return;
-			}		
-		}		
+                zoomOut();
+                return;
+            }
+            case Keyboard.KEY_LBRACKET : {
+                state.overrideMapType(Constants.MapType.day);
+                return;
+            }
+            case Keyboard.KEY_RBRACKET : {
+                state.overrideMapType(Constants.MapType.night);
+                return;
+            }
+        }
 		
 		// North
 		if(i==field_146297_k.gameSettings.keyBindForward.func_151463_i()) { // getkeyCode

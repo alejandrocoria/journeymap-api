@@ -27,12 +27,16 @@ public class MapOverlayState {
 
 	// One-time setup
 	final long refreshInterval = PropertyManager.getIntegerProp(PropertyManager.Key.UPDATETIMER_CHUNKS);
+    public final int minZoom = 0;
+    public final int maxZoom = 5;
 	
 	// These can be safely changed at will
 	public boolean follow = true;
 	public int currentZoom;
     public double fontScale = 1;
 	public String playerLastPos = "0,0"; //$NON-NLS-1$
+    public boolean minimapEnabled = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_MINIMAP);
+    public boolean minimapHotkeys = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_HOTKEYS);
 	
 	// These must be internally managed
 	private Constants.MapType overrideMapType;
@@ -52,7 +56,10 @@ public class MapOverlayState {
 	}
 	
 	public void refresh(Minecraft mc, EntityClientPlayerMP player) {
-	
+
+        this.minimapEnabled = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_MINIMAP);
+        this.minimapHotkeys = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_HOTKEYS);
+
 		final MapType lastMapType = getMapType();
 		final boolean lastUnderground = this.underground;				
 		final int lastDimension = this.currentZoom;
@@ -79,6 +86,7 @@ public class MapOverlayState {
 	
 	public void overrideMapType(MapType mapType) {
 		overrideMapType = mapType;
+        requireRefresh();
 	}
 	
 	public MapType getMapType() {
@@ -162,6 +170,29 @@ public class MapOverlayState {
 
             drawStepList.addAll(waypointRenderer.prepareSteps(waypoints, gridRenderer, fontScale));
         }
+    }
+
+    public boolean zoomIn(){
+        if(currentZoom<maxZoom){
+            return setZoom(currentZoom+1);
+        }
+        return false;
+    }
+
+    public boolean zoomOut(){
+        if(currentZoom>minZoom){
+            return setZoom(currentZoom-1);
+        }
+        return false;
+    }
+
+    public boolean setZoom(int zoom) {
+        if(zoom>maxZoom || zoom<minZoom || zoom==currentZoom) {
+            return false;
+        }
+        currentZoom = zoom;
+        requireRefresh();
+        return true;
     }
 
     public void requireRefresh() {

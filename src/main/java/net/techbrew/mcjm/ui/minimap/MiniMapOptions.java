@@ -17,8 +17,8 @@ public class MiniMapOptions extends JmUI {
     private int lastWidth = 0;
     private int lastHeight = 0;
 
-	private enum ButtonEnum {MiniMap,Position,Shape,Font,Keyboard,Close, Showfps, CloseAll};
-	private MapButton buttonPosition, buttonShape, buttonFont, buttonMiniMap, buttonKeyboard, buttonShowfps, buttonClose, buttonCloseAll;
+	private enum ButtonEnum {MiniMap,Position,Shape,Font,Keyboard,KeyboardHelp, Close, Showfps, CloseAll};
+	private MapButton buttonPosition, buttonShape, buttonFont, buttonMiniMap, buttonKeyboard, buttonKeyboardHelp, buttonShowfps, buttonClose, buttonCloseAll;
 
     private DisplayVars.Shape currentShape;
     private DisplayVars.Position currentPosition;
@@ -66,12 +66,14 @@ public class MiniMapOptions extends JmUI {
         buttonKeyboard = new MapButton(ButtonEnum.Keyboard.ordinal(), 0, 0,
                 Constants.getString("MiniMap.hotkeys", on),
                 Constants.getString("MiniMap.hotkeys", off), showHotKeys);
-        buttonKeyboard.enabled = false; // TODO
+
+        buttonKeyboardHelp = new MapButton(ButtonEnum.KeyboardHelp.ordinal(), 0, 0,
+                Constants.getString("MiniMap.hotkeys_help"));
 
         boolean isShowFps = pm.getBoolean(PropertyManager.Key.PREF_MINIMAP_SHOWFPS);
         buttonShowfps = new MapButton(ButtonEnum.Showfps.ordinal(), 0, 0,
                 Constants.getString("MiniMap.show_fps", on),
-                Constants.getString("MiniMap.show_fps", off), isShowFps); // TODO:  Pref
+                Constants.getString("MiniMap.show_fps", off), isShowFps);
         buttonShowfps.enabled = minimapOn;
 
 		buttonClose = new MapButton(ButtonEnum.Close.ordinal(),0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$
@@ -83,6 +85,7 @@ public class MiniMapOptions extends JmUI {
         field_146292_n.add(buttonShape);
         field_146292_n.add(buttonFont);
         field_146292_n.add(buttonKeyboard);
+        field_146292_n.add(buttonKeyboardHelp);
         field_146292_n.add(buttonShowfps);
 
         field_146292_n.add(buttonClose);
@@ -119,7 +122,9 @@ public class MiniMapOptions extends JmUI {
             buttonKeyboard.below(buttonPosition, vgap).leftOf(bx);
             buttonShowfps.below(buttonFont, vgap).rightOf(buttonKeyboard, hgap);
 
-			buttonClose.below(buttonShowfps, vgap*4).centerHorizontalOn(this.field_146294_l / 2);
+            buttonKeyboardHelp.below(buttonKeyboard, vgap).centerHorizontalOn(this.field_146294_l / 2);
+
+			buttonClose.below(buttonKeyboardHelp, vgap*4).centerHorizontalOn(this.field_146294_l / 2);
             buttonCloseAll.below(buttonClose, vgap).centerHorizontalOn(this.field_146294_l / 2);
 		}	
 	}
@@ -139,7 +144,6 @@ public class MiniMapOptions extends JmUI {
                 buttonPosition.enabled = enabled;
                 buttonShape.enabled = enabled;
                 buttonFont.enabled = enabled;
-                //buttonKeyboard.enabled = enabled; TODO
                 buttonShowfps.enabled = enabled;
                 break;
             }
@@ -167,7 +171,11 @@ public class MiniMapOptions extends JmUI {
                 boolean showHotKeys = !PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_HOTKEYS);
                 buttonKeyboard.setToggled(showHotKeys);
                 PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_HOTKEYS, showHotKeys);
-                // TODO: Actually use this
+                break;
+            }
+
+            case KeyboardHelp: {
+                UIManager.getInstance().openMiniMapHotkeyHelp();
                 break;
             }
 
