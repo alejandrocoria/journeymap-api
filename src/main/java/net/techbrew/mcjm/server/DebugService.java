@@ -1,6 +1,8 @@
 package net.techbrew.mcjm.server;
 
+import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.cartography.ColorCache;
+import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.log.StatTimer;
 import se.rupy.http.Event;
 
@@ -42,6 +44,8 @@ public class DebugService extends FileService {
         sb.append('\n').append(".entry{width:300px;display:inline-block;}");
         sb.append('\n').append(".rgb{display:inline-block;height:32px;width:32px}");
         sb.append('\n').append("</style></head><body><div>");
+        sb.append('\n').append("<h1>").append(JourneyMap.MOD_NAME).append("</h1>");
+        sb.append('\n').append(PropertyManager.getInstance().toString()).append("</div>");
 
         sb.append('\n').append("<div><h1>Stat Timers</h1>");
         sb.append('\n').append("<pre>").append(StatTimer.getReport()).append("</pre></div>");
