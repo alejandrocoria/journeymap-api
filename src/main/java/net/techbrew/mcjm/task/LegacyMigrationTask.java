@@ -2,13 +2,13 @@ package net.techbrew.mcjm.task;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
-import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.io.RegionImageHandler;
+import net.techbrew.mcjm.log.ChatLog;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageSet;
 
@@ -18,7 +18,6 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 ;
@@ -48,7 +47,7 @@ public class LegacyMigrationTask implements IGenericTask {
 		float total = 1F * pngFilesFound;
 		float remaining = total-pngFiles.size();
 		String percent = new DecimalFormat("##.#").format(remaining*100/total) + "%";
-		JourneyMap.getInstance().announce(Constants.getString("JourneyMap.file_updates", percent), Level.INFO);
+        ChatLog.announceI18N("JourneyMap.file_updates", percent);
 		
 		final long start = System.nanoTime();
 		int count = 0;
@@ -216,7 +215,7 @@ public class LegacyMigrationTask implements IGenericTask {
 			if(!enabled) return null;
 			
 			if(this.pngFiles.isEmpty()) {
-				JourneyMap.getInstance().announce(Constants.getString("JourneyMap.file_updates_complete"), Level.INFO);
+                ChatLog.announceI18N("JourneyMap.file_updates_complete");
 				disableTask(minecraft);
 				return null;				
 			} else {

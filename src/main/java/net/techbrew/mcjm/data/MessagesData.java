@@ -2,11 +2,12 @@ package net.techbrew.mcjm.data;
 
 import net.minecraft.client.Minecraft;
 import net.techbrew.mcjm.Constants;
+import net.techbrew.mcjm.io.FileHandler;
 
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 ;
@@ -53,13 +54,14 @@ public class MessagesData implements IDataProvider {
 		LinkedHashMap props = new LinkedHashMap();
 		
 		props.put("locale", Constants.getLocale());
-		ResourceBundle bundle = Constants.getResourceBundle();
+		Properties properties = FileHandler.getLangFile("en_US.lang");
 
-		Set<String> allKeys = Constants.getBundleKeys();
-		for(String key : allKeys) {
+		Enumeration<Object> allKeys = properties.keys();
+        while(allKeys.hasMoreElements()){
+            String key = (String) allKeys.nextElement();
 			if(key.startsWith(KEY_PREFIX)) {
 				String name = key.split(KEY_PREFIX)[1];
-				String value = Constants.getString(key, bundle);
+				String value = Constants.getString(key);
 				props.put(name, value);
 			}
 		}

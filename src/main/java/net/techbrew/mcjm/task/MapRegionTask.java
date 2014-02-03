@@ -12,6 +12,7 @@ import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
 import net.techbrew.mcjm.io.nbt.ChunkLoader;
 import net.techbrew.mcjm.io.nbt.RegionLoader;
+import net.techbrew.mcjm.log.ChatLog;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.RegionCoord;
@@ -108,7 +109,7 @@ public class MapRegionTask extends BaseMapTask {
 			    	}
 		    	} catch(Throwable t) {
 		    		String error = Constants.getMessageJMERR00("Couldn't Auto-Map: " + t.getMessage()); //$NON-NLS-1$
-					JourneyMap.getInstance().announce(error);
+					ChatLog.announceError(error);
 					logger.severe(LogFormatter.toString(t));
 		    	}
 			}
@@ -125,9 +126,9 @@ public class MapRegionTask extends BaseMapTask {
 			
 			if(regionLoader!=null) {				
 				if(regionLoader.isUnderground()) {
-					JourneyMap.getInstance().announce(Constants.getString("MapOverlay.automap_complete_underground", regionLoader.getVSlice()), Level.INFO);					
+					ChatLog.announceI18N("MapOverlay.automap_complete_underground", regionLoader.getVSlice());
 				} else {
-					JourneyMap.getInstance().announce(Constants.getString("MapOverlay.automap_complete"), Level.INFO);
+					ChatLog.announceI18N("MapOverlay.automap_complete");
 				}
 	    	}
 			enabled = false;
@@ -164,10 +165,9 @@ public class MapRegionTask extends BaseMapTask {
 				float remaining = total-regionLoader.getRegions().size();
 				String percent = new DecimalFormat("##.#").format(remaining*100/total) + "%";
 				if(regionLoader.isUnderground()) {
-					String msg = Constants.getString("MapOverlay.automap_status_underground", regionLoader.getVSlice(), percent);
-					JourneyMap.getInstance().announce(msg, Level.INFO);
+					ChatLog.announceI18N("MapOverlay.automap_status_underground", regionLoader.getVSlice(), percent);
 				} else {
-					JourneyMap.getInstance().announce(Constants.getString("MapOverlay.automap_status", percent), Level.INFO);
+					ChatLog.announceI18N("MapOverlay.automap_status", percent);
 				}
 			}
 		}

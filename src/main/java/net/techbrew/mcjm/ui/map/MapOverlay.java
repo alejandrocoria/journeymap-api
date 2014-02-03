@@ -13,6 +13,7 @@ import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.EntityKey;
 import net.techbrew.mcjm.data.PlayerData;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.log.ChatLog;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.model.EntityHelper;
@@ -104,7 +105,7 @@ public class MapOverlay extends JmUI {
 			logger.log(Level.SEVERE, "Unexpected exception in MapOverlay.drawScreen(): " + e); //$NON-NLS-1$
 			logger.severe(LogFormatter.toString(e));
 			String error = Constants.getMessageJMERR23(e.getMessage());
-			JourneyMap.getInstance().announce(error);
+			ChatLog.announceError(error);
 			close();
 		} finally {
             drawScreenTimer.stop();

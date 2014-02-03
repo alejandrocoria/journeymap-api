@@ -1,0 +1,279 @@
+# JourneyMap Resource Bundle - pl_PL
+# Author: Cross (cross@reosh.co.uk)
+# Updated for 3.3.0
+
+########################
+# Error messages:  Note, translating these are optional, but they may help users diagnose the problem on their own.
+########################
+
+JMERR00=[JMERR00] JourneyMap napotka\u0142 nieprzewidziany b\u0142\u0105d: %1$s
+JMERR01=[JMERR01] JourneyMap %1$s wymaga %2$s
+JMERR02=[JMERR02] JourneyMap not yet available for world
+JMERR03=[JMERR03] JMServer nie m\u00F3g\u0142 uruchomi\u0107 serwera WWW
+JMERR04=[JMERR04] FileHandler nie m\u00F3g\u0142 zapisa\u0107 do pliku: %1$s
+JMERR05=[JMERR05] Przegl\u0105darka internetowa wys\u0142a\u0142a nieprawid\u0142owe \u017C\u0105danie: %1$s
+JMERR06=[JMERR06] ChunkServlet nie m\u00F3g\u0142 odczyta\u0107 danych \u015Bwiata: %1$s
+JMERR07=[JMERR07] Nie uda\u0142o si\u0119 pobra\u0107 bloku z chunku: %1$s
+JMERR08=[JMERR08] Nie uda\u0142o si\u0119 zapisa\u0107 obrazu chunku do pliku: %1$s
+JMERR09=[JMERR09] Gracz nie jest po\u0142\u0105czony do \u017Cadnego \u015Bwiata
+JMERR10=[JMERR10] Gracz nie jest po\u0142\u0105czony do \u015Bwiata: %1$s
+JMERR11=[JMERR11] Nie uda\u0142o si\u0119 odczyta\u0107 danych gracza
+JMERR12=[JMERR12] Nie uda\u0142o si\u0119 wys\u0142a\u0107 pliku przez serwer WWW: %1$s
+JMERR13=[JMERR13] Przegl\u0105darka za\u017C\u0105da\u0142a nieznanego pliku: %1$s
+JMERR14=[JMERR14] Przegl\u0105darka u\u017Cy\u0142a nieznanej metody HTTP: %1$s
+JMERR15=[JMERR15] Wyst\u0105pi\u0142 nieprzewidziany b\u0142\u0105d podczas zapisywania danych gracza: %1$s
+JMERR16=[JMERR16] Wyst\u0105pi\u0142 nieprzewidziany b\u0142\u0105d podczas zapisywania obrazu chunku: %1$s
+JMERR17=[JMERR17] Wyst\u0105pi\u0142 nieprzewidziany b\u0142\u0105d podczas pobierania ikony bytu: %1$s
+JMERR18=[JMERR18] Wyst\u0105pi\u0142 b\u0142\u0105d podczas zapisywania mapy: %1$s
+JMERR19=[JMERR19] Wyst\u0105pi\u0142 b\u0142\u0105d podczas czytania pliku konfiguracji: %1$s
+JMERR20=[JMERR20] Wyst\u0105pi\u0142 b\u0142\u0105d podczas zapisywania pliku konfiguracji: %1$s
+JMERR21=[JMERR21] B\u0142\u0105d podczas czytania pliku regionu: %1$s.  B\u0142\u0105d: %2$s
+JMERR22=[JMERR22] B\u0142\u0105d podczas zapisywania pliku regionu: %1$s.  B\u0142\u0105d: %2$s
+JMERR23=[JMERR23] B\u0142\u0105d interfejsu mapy: %1$s
+JMERR24=[JMERR24] Nie uda\u0142o si\u0119 uruchomi\u0107 serwera WWW
+
+########################
+# In-game chat messages
+# Note: Do not translate or alter chat color changes (\u00A7b, \u00A7e, \u00A7f, etc.)
+########################
+
+# %1$s = JourneyMap version (\u00A7e and \u00A7f are color changes)
+JourneyMap.chat_announcement=\u00A7eJourneyMap:\u00A7f %1$s
+
+# %1$s = Key to press ('J')
+JourneyMap.mapgui_only_ready=Naci\u015Bnij [§b%1$s§f].  (Serwer WWW wy\u0142\u0105czony)
+
+# %1$s = JourneyMap version
+JourneyMap.new_version_available=Nowsza wersja jest dost\u0119pna:\n%1$s
+
+# %1$s = JourneyMap version (\u00A7e is a color change)
+JourneyMap.ready=§e%1$s zosta\u0142o wczytane.
+
+JourneyMap.webserver_and_mapgui_disabled=JourneyMap jest wy\u0142\u0105czone w pliku konfiguracji journeyMap.properties
+
+# %1$s = Key to press ('J'), %2$s = website port number (8080) (\u00A7b and \u00A7f are color changes)
+JourneyMap.webserver_and_mapgui_ready=Naci\u015Bnij [\u00A7b%1$s\u00A7f] lub otw\u00F3rz\u00A7b http://localhost%2$s \u00A7fw przegl\u0105darce
+
+# %1$s = website port number (8080) (\u00A7b and \u00A7f are color changes)
+JourneyMap.webserver_only_ready=Otw\u00F3rz\u00A7b http://localhost%1$s \u00A7fw przegl\u0105darce. (Mapa w grze wy\u0142\u0105czona)
+
+########################
+# In-game Map messages
+########################
+
+# %1$s = JourneyMap version
+MapOverlay.options=Ustawienia
+MapOverlay.close=Zamknij
+
+MapOverlay.day=Dzie\u0144
+MapOverlay.night=Noc
+
+MapOverlay.on=Tak
+MapOverlay.off=Nie
+
+# %1$s = "On" or "Off"
+MapOverlay.follow=Pod\u0105\u017Caj: %1$s
+
+# %1$s = x, %2$s = y, %3$s = z, %4$s = vertical slice, %5$s Biome name
+MapOverlay.player_location=Po\u0142o\u017Cenie: %1$s , %2$s | Wysoko\u015B\u0107: %3$s (%4$s) | Biom: %5$s
+MapOverlay.save_map=Zapisz map\u0119
+
+# %1$s = type of map
+MapOverlay.saving_map_to_file=Zapisywanie mapy %1$s do pliku...
+
+# %1$s = "On" or "Off"
+MapOverlay.show_caves=Pokazuj jaskinie: %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_monsters=Pokazuj potwory : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_animals=Pokazuj zwierz\u0119ta : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_villagers=Pokazuj osadnik\u00F3w : %1$s
+
+# %1$s = "On" or "Off"
+# Zwierzeta = pets and animals in polish.
+MapOverlay.show_pets=Pokazuj zwierz\u0119ta (udomowione) : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_players=Pokazuj graczy : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_waypoints=Pokazuj punkty orientacyjne : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_grid=Pokazuj siatk\u0119 : %1$s
+
+MapOverlay.update_available=Aktualizacja dost\u0119pna!
+MapOverlay.update_check=Sprawd\u017A aktualizacje
+MapOverlay.use_browser=U\u017Cyj przegl\u0105darki
+MapOverlay.zoom_in=Przybli\u017C
+MapOverlay.zoom_out=Oddal
+
+# %1$s = filename
+MapSaver.map_saved=Mapa zapisana: %1$s
+
+########################
+# Web UI messages
+########################
+
+# Unused, but keep for future use
+WebMap.text_direction=ltr
+
+# JourneyMap menu / homepage link
+WebMap.web_link_text=journeymap.techbrew.net
+WebMap.web_link_title=Strona domowa JourneyMap
+
+# JourneyMap menu / forums link
+WebMap.forum_link_text=minecraftforum.net
+WebMap.forum_link_title=JourneyMap na minecraftforum.net
+
+# JourneyMap menu / RSS feed link
+WebMap.rss_feed_text=JourneyMap RSS
+WebMap.rss_feed_title=Subskrybuj RSS JourneyMap
+
+# JourneyMap menu / Email subscription link
+WebMap.email_sub_text=JourneyMap newsletter
+WebMap.email_sub_title=Subskrybuj biuletyn email JourneyMap
+
+# JourneyMap menu / Follow on Twitter link
+WebMap.follow_twitter_text=\u015Aled\u017A JourneyMapMod na Twitterze
+WebMap.follow_twitter_title=\u015Aled\u017A JourneyMapMod na Twitterze
+
+# JourneyMap menu / Donate link
+WebMap.donate_text=Wspom\u00F3\u017C JourneyMap
+WebMap.donate_title=Wspom\u00F3\u017C rozw\u00F3j JourneyMap u\u017Cywaj\u0105c PayPal
+
+# Update button title (shown only when update available)
+WebMap.update_button_title=Dost\u0119pna aktualizacja: JourneyMap %1$s dla Minecraft %2$s
+
+# Day/Night button
+WebMap.day_button_text=Dzie\u0144
+WebMap.day_button_title=Mapa \u015Bwiata w \u015Bwietle dnia.
+WebMap.night_button_text=Noc
+WebMap.night_button_title=Mapa \u015Bwiata w blasku nocy.
+
+# Follow button
+WebMap.follow_button_title=Automatycznie wy\u015Brodkuj map\u0119 na graczu. (Wy\u0142\u0105cza si\u0119 po przesuni\u0119ciu.)
+
+# Show menu
+WebMap.show_menu_text=Poka\u017C...
+
+# Show menu / Smooth Pixels (Unused)
+WebMap.smooth_pixels_menu_item=P\u0142ynne piksele
+
+# Show menu / Caves
+WebMap.caves_menu_item_text=Jaskinie
+WebMap.caves_menu_item_title=Poka\u017C jaskinie/wn\u0119trze gdy nie znajdujesz si\u0119 pod niebem.
+
+# Show menu / Grid
+WebMap.grid_menu_item_text=Siatka
+WebMap.grid_menu_item_title=Poka\u017C siatk\u0119 chunk\u00F3w
+
+# Show menu / Waypoints
+WebMap.waypoints_menu_item_text=Punkty orientacyjne
+WebMap.waypoints_menu_item_title=Poka\u017C punkty orientacyjne
+
+# Show menu / Animals
+WebMap.animals_menu_item_text=Zwierz\u0119ta
+WebMap.animals_menu_item_title=Poka\u017C pobliskie zwierz\u0119ta
+
+# Show menu / Pets
+WebMap.pets_menu_item_text=Udomowione zwierz\u0119ta
+WebMap.pets_menu_item_title=Poka\u017C pobliskie udomowione zwierz\u0119ta
+
+# Show menu / Mobs (Monsters)
+WebMap.mobs_menu_item_text=Potwory
+WebMap.mobs_menu_item_title=Poka\u017C pobliskie potwory
+
+# Show menu / Villagers
+WebMap.villagers_menu_item_text=Osadnicy
+WebMap.villagers_menu_item_title=Poka\u017C pobliskich osadnik\u00F3w
+
+# Show menu / Other players (multiplayer)
+WebMap.players_menu_item_text=Gracze
+WebMap.players_menu_item_title=Poka\u017C pobliskich graczy (multiplayer)
+
+# Save Map button
+WebMap.save_button_title=Zapisz zbadan\u0105 map\u0119 do pliku
+
+# Zoom slider
+WebMap.zoom_slider_name=Przybli\u017Cenie
+
+# World info area
+WebMap.worldname_text=Nazwa \u015Bwiatu:
+WebMap.worldtime_text=Czas \u015Bwiatu:
+WebMap.location_text=Po\u0142o\u017Cenie:
+WebMap.elevation_text=Wysoko\u015B\u0107:
+# Vertical slice TODO.
+WebMap.slice_text=Vertical Slice:
+WebMap.biome_text=Biom:
+
+# Error message if world isn't open in Minecraft
+WebMap.error_world_not_opened=\u015Awiat Minecraft nie jest otwarty
+
+# 3.3.0 - Need to be translated
+JourneyMap.file_updates=Files are being updated (%1$s). Mapping suspended.
+JourneyMap.file_updates_complete=File updates complete.  Mapping resumed.
+MapOverlay.disabled_feature=Feature not available
+MapOverlay.actions=MapOverlay.actions
+MapOverlay.player_location_minimap=%1$s, %2$s | %3$s (%4$s) | %5$s
+MapOverlay.player_location_minimap_nobiome=%1$s, %2$s | %3$s (%4$s)
+MapOverlay.save_filename=MapOverlay.save_filename
+MapOverlay.minimap=MiniMap...
+MapOverlay.enable_webserver=Webserver\: %1$s
+MapOverlay.automap_title=Auto-Map...
+MapOverlay.automap_text=Automatically map regions (single-player
+MapOverlay.automap_dialog=Auto-Map
+MapOverlay.automap_dialog_text=Automatically map all regions or just missing regions?
+MapOverlay.automap_dialog_all=All
+MapOverlay.automap_dialog_missing=Missing
+MapOverlay.automap_dialog_none=None
+MapOverlay.automap_status=Auto-mapping surface (%1$s).
+MapOverlay.automap_status_underground=Auto-mapping slice %1$s (%2$s).
+MapOverlay.automap_complete=Auto-mapping of surface has stopped.
+MapOverlay.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
+MiniMap.options=MiniMap Options
+MiniMap.enable_minimap=MiniMap\: %1$s
+MiniMap.position=Position\: %1$s
+MiniMap.position_topleft=Top Left
+MiniMap.position_topright=Top Right
+MiniMap.position_bottomleft=Bottom Left
+MiniMap.position_bottomright=Bottom Right
+MiniMap.shape=Shape\: %1$s
+MiniMap.shape_smallsquare=Small Square
+MiniMap.shape_largesquare=Large Square
+MiniMap.shape_smallcircle=Small Circle
+MiniMap.shape_largecircle=Large Circle
+MiniMap.font=Font\: %1$s
+MiniMap.font_small=Small
+MiniMap.font_large=Large
+MiniMap.hotkeys=Hot Keys\: %1$s
+MiniMap.hotkeys_help=Hot Keys...
+MiniMap.hotkeys_help_title=Minimap Hot Keys
+MiniMap.hotkeys_help_toggle=Toggle Minimap on and off\:
+MiniMap.hotkeys_help_toggle_key=§bCTRL J§f
+MiniMap.hotkeys_help_zoom=Zoom Minimap In, Out\:
+MiniMap.hotkeys_help_zoom_key=§bCTRL +§f , §bCTRL -§f
+MiniMap.hotkeys_help_maptype=Change map to Day, Night\:
+MiniMap.hotkeys_help_maptype_key=§bCTRL [§f , §bCTRL ]§f
+MiniMap.show_fps=Show FPS\: %1$s
+MiniMap.return_to_game=Return to Game
+Feature.unlimited=Unlimited
+Feature.fair_play=FairPlay
+WebMap.automap_text=Auto-Map...
+WebMap.automap_title=Automatically map unexplored regions (single-player)
+WebMap.automap_dialog_text=Automatically map all regions or just missing regions?
+WebMap.automap_dialog_all=All
+WebMap.automap_dialog_missing=Missing
+WebMap.automap_dialog_none=None
+WebMap.automap_dialog_close=Close
+WebMap.automap_already_started=Auto-mapping already in progress.
+WebMap.automap_started=Auto-mapping started. Check game chat for progress.
+WebMap.automap_complete=Auto-mapping has stopped.
+WebMap.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
+WebMap.save_button_text=Save Map
+WebMap.save_filename=Saving map to screenshots\: %1$s
+WebMap.actions_title=Actions...

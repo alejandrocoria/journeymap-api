@@ -1,0 +1,276 @@
+# JourneyMap Resource Bundle - en_US
+# Updated for 3.3.0
+
+########################
+# Error messages:  Note, translating these are optional, but they may help users diagnose the problem on their own.
+########################
+
+JMERR00=[JMERR00] Er is een onverwachte fout opgetreden in JourneyMap: %1$s
+JMERR01=[JMERR01] JourneyMap %1$s heeft nodig %2$s
+JMERR02=[JMERR02] JourneyMap is nog niet beschikbaar voor wereld
+JMERR03=[JMERR03] JMServer kon de webserver niet opstarten
+JMERR04=[JMERR04] FileHandler kan niet naar het volgende bestand schrijven: %1$s
+JMERR05=[JMERR05] Web Browser verstuurde een vervormd verzoek: %1$s
+JMERR06=[JMERR06] ChunkServlet kon de data map niet lezen voor wereld: %1$s
+JMERR07=[JMERR07] Kon blok niet verkrijgen in chunk: %1$s
+JMERR08=[JMERR08] Kon chunk image niet schrijven naar bestand: %1$s
+JMERR09=[JMERR09] Speler niet verbonden met een wereld
+JMERR10=[JMERR10] Speler niet verbonden met wereld: %1$s
+JMERR11=[JMERR11] Kon speler data bestand niet lezen
+JMERR12=[JMERR12] Kan web-file niet aanleveren: %1$s
+JMERR13=[JMERR13] Browser vroeg om een onbekend bestand: %1$s
+JMERR14=[JMERR14] Browser probeerde een niet ondersteunde HTTP methode: %1$s
+JMERR15=[JMERR15] Onverwachte fout bij het schrijven van het speler bestand: %1$s
+JMERR16=[JMERR16] Onverwachte fout bij het schrijven van chunk image bestanden: %1$s
+JMERR17=[JMERR17] Onverwachte fout bij het verkrijgen entity icoon voor in-game kaart: %1$s
+JMERR18=[JMERR18] Fout bij exporteren wereld kaart: %1$s
+JMERR19=[JMERR19] Fout bij het lezen van gegevens bestand: %1$s
+JMERR20=[JMERR20] Fout bij het schrijven van gegevens bestand: %1$s
+JMERR21=[JMERR21] Fout bij het lezen van regio bestand: %1$s.  Fout: %2$s
+JMERR22=[JMERR22] Fout bij het schrijven van regio bestand: %1$s.  Fout: %2$s
+JMERR23=[JMERR23] Kaart UI fout: %1$s
+JMERR24=[JMERR24] Webserver kon niet gestart worden
+
+########################
+# In-game chat messages
+# Note: Do not translate or alter chat color changes (§b, §e, §f, etc.)
+########################
+
+# %1$s = JourneyMap version (§e and §f are color changes)
+JourneyMap.chat_announcement=§eJourneyMap:§f %1$s
+
+# %1$s = Key to press ('J')
+JourneyMap.mapgui_only_ready=Druk op [§b%1$s§f].  (Webserver uitgeschakeld)
+
+# %1$s = JourneyMap version
+JourneyMap.new_version_available=Nieuwere versie beschikbaar:\n%1$s
+
+# %1$s = JourneyMap version (§e is a color change)
+JourneyMap.ready=§e%1$s klaar voor gebruik.
+
+JourneyMap.webserver_and_mapgui_disabled=JourneyMap is uitgeschakeld in het journeyMap.properties bestand
+
+# %1$s = Key to press ('J'), %2$s = website port number (8080) (§b and §f are color changes)
+JourneyMap.webserver_and_mapgui_ready=Druk op [§b%1$s§f] of open een browser naar §b http://localhost%2$s §f
+
+# %1$s = website port number (8080) (§b and §f are color changes)
+JourneyMap.webserver_only_ready=Open browser naar§b http://localhost%1$s §f. (In-game kaart uitgeschakeld)
+
+########################
+# In-game Map messages
+########################
+
+# %1$s = JourneyMap version
+MapOverlay.options=Opties
+MapOverlay.close=Sluit
+
+MapOverlay.day=Dag
+MapOverlay.night=Nacht
+
+MapOverlay.on=Aan
+MapOverlay.off=Uit
+
+# %1$s = "On" or "Off"
+MapOverlay.follow=Volg: %1$s
+
+# %1$s = x, %2$s = y, %3$s = z, %4$s = vertical slice, %5$s Biome name
+MapOverlay.player_location=Locatie: %1$s , %2$s | Hoogte: %3$s (%4$s) | Bioom: %5$s
+MapOverlay.save_map=Kaart Opslaan
+
+# %1$s = type of map
+MapOverlay.saving_map_to_file=%1$s kaart opslaan naar bestand...
+
+# %1$s = "On" or "Off"
+MapOverlay.show_caves=Toon Grotten: %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_monsters=Toon Monsters : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_animals=Toon Dieren : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_villagers=Toon Dorpelingen : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_pets=Toon Huisdieren : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_players=Toon Spelers : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_waypoints=Toon Waypoints : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_grid=Toon Grid : %1$s
+
+MapOverlay.update_available=Update Beschikbaar!
+MapOverlay.update_check=Controleer op Updates
+MapOverlay.use_browser=Gebruik de Browser
+MapOverlay.zoom_in=Zoom In
+MapOverlay.zoom_out=Zoom Uit
+
+# %1$s = filename
+MapSaver.map_saved=Kaart opgeslagen: %1$s
+
+########################
+# Web UI messages
+########################
+
+# Unused, but keep for future use
+WebMap.text_direction=ltr
+
+# JourneyMap menu / homepage link
+WebMap.web_link_text=journeymap.techbrew.net
+WebMap.web_link_title=JourneyMap website
+
+# JourneyMap menu / forums link
+WebMap.forum_link_text=minecraftforum.net
+WebMap.forum_link_title=JourneyMap forum op minecraftforum.net
+
+# JourneyMap menu / RSS feed link
+WebMap.rss_feed_text=JourneyMap RSS-Feed
+WebMap.rss_feed_title=Abonneer je op de JourneyMap RSS-Feed
+
+# JourneyMap menu / Email subscription link
+WebMap.email_sub_text=JourneyMap E-Mail nieuwsbrief
+WebMap.email_sub_title= Abonneer je op de JourneyMap E-Mail nieuwsbrief
+
+# JourneyMap menu / Follow on Twitter link
+WebMap.follow_twitter_text=Volg JourneyMapMod op Twitter
+WebMap.follow_twitter_title=Volg JourneyMapMod op Twitter
+
+# JourneyMap menu / Donate link
+WebMap.donate_text=Doneer aan JourneyMap
+WebMap.donate_title=Doneer aan JourneyMap ontwikkeling door gebruik te maken van PayPal
+
+# Update button title (shown only when update available)
+WebMap.update_button_title=Update beschikbaar: JourneyMap %1$s voor Minecraft %2$s
+
+# Day/Night button
+WebMap.day_button_text=Dag
+WebMap.day_button_title=De wereld kaart zoals bij daglicht.
+WebMap.night_button_text=Nacht
+WebMap.night_button_title=De wereld kaart zoals bij maanlicht.
+
+# Follow button
+WebMap.follow_button_title=Auto-centreer kaart op speler. (Schakelt uit als je manueel pant.)
+
+# Show menu
+WebMap.show_menu_text=Toon...
+
+# Show menu / Smooth Pixels (Unused)
+WebMap.smooth_pixels_menu_item=Gladde Pixels
+
+# Show menu / Caves
+WebMap.caves_menu_item_text=Grotten
+WebMap.caves_menu_item_title=Laat grot kaart zien als je niet onder open lucht bent.
+
+# Show menu / Grid
+WebMap.grid_menu_item_text=Grid
+WebMap.grid_menu_item_title=Toon chunk grid
+
+# Show menu / Waypoints
+WebMap.waypoints_menu_item_text=Waypoints
+WebMap.waypoints_menu_item_title=Toon waypoints
+
+# Show menu / Animals
+WebMap.animals_menu_item_text=Dieren
+WebMap.animals_menu_item_title=Toon dichtstbijzijnde dieren
+
+# Show menu / Pets
+WebMap.pets_menu_item_text=Huisdieren
+WebMap.pets_menu_item_title=Toon dichtstbijzijnde huisdieren
+
+# Show menu / Mobs (Monsters)
+WebMap.mobs_menu_item_text=Monsters
+WebMap.mobs_menu_item_title=Toon dichtstbijzijnde monsters
+
+# Show menu / Villagers
+WebMap.villagers_menu_item_text=Dorpelingen
+WebMap.villagers_menu_item_title=Toon dichtstbijzijnde dorpelinge
+
+# Show menu / Other players (multiplayer)
+WebMap.players_menu_item_text=Spelers
+WebMap.players_menu_item_title=Toon dichtstbijzijnde spelers (multiplayer)
+
+# Save Map button
+WebMap.save_button_title=Bewaar de verkende kaart naar een bestand
+
+# Zoom slider
+WebMap.zoom_slider_name=Zoom
+
+# World info area
+WebMap.worldname_text=Wereld naam:
+WebMap.worldtime_text=Wereld tijd:
+WebMap.location_text=Locatie:
+WebMap.elevation_text=Hoogte:
+WebMap.slice_text=Vertikale doorsnede:
+WebMap.biome_text=Bioom:
+
+# Error message if world isn't open in Minecraft
+WebMap.error_world_not_opened=Minecraft Wereld niet geopend
+
+# 3.3.0 - Need to be translated
+JourneyMap.file_updates=Files are being updated (%1$s). Mapping suspended.
+JourneyMap.file_updates_complete=File updates complete.  Mapping resumed.
+MapOverlay.disabled_feature=Feature not available
+MapOverlay.actions=MapOverlay.actions
+MapOverlay.player_location_minimap=%1$s, %2$s | %3$s (%4$s) | %5$s
+MapOverlay.player_location_minimap_nobiome=%1$s, %2$s | %3$s (%4$s)
+MapOverlay.save_filename=MapOverlay.save_filename
+MapOverlay.minimap=MiniMap...
+MapOverlay.enable_webserver=Webserver\: %1$s
+MapOverlay.automap_title=Auto-Map...
+MapOverlay.automap_text=Automatically map regions (single-player
+MapOverlay.automap_dialog=Auto-Map
+MapOverlay.automap_dialog_text=Automatically map all regions or just missing regions?
+MapOverlay.automap_dialog_all=All
+MapOverlay.automap_dialog_missing=Missing
+MapOverlay.automap_dialog_none=None
+MapOverlay.automap_status=Auto-mapping surface (%1$s).
+MapOverlay.automap_status_underground=Auto-mapping slice %1$s (%2$s).
+MapOverlay.automap_complete=Auto-mapping of surface has stopped.
+MapOverlay.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
+MiniMap.options=MiniMap Options
+MiniMap.enable_minimap=MiniMap\: %1$s
+MiniMap.position=Position\: %1$s
+MiniMap.position_topleft=Top Left
+MiniMap.position_topright=Top Right
+MiniMap.position_bottomleft=Bottom Left
+MiniMap.position_bottomright=Bottom Right
+MiniMap.shape=Shape\: %1$s
+MiniMap.shape_smallsquare=Small Square
+MiniMap.shape_largesquare=Large Square
+MiniMap.shape_smallcircle=Small Circle
+MiniMap.shape_largecircle=Large Circle
+MiniMap.font=Font\: %1$s
+MiniMap.font_small=Small
+MiniMap.font_large=Large
+MiniMap.hotkeys=Hot Keys\: %1$s
+MiniMap.hotkeys_help=Hot Keys...
+MiniMap.hotkeys_help_title=Minimap Hot Keys
+MiniMap.hotkeys_help_toggle=Toggle Minimap on and off\:
+MiniMap.hotkeys_help_toggle_key=§bCTRL J§f
+MiniMap.hotkeys_help_zoom=Zoom Minimap In, Out\:
+MiniMap.hotkeys_help_zoom_key=§bCTRL +§f , §bCTRL -§f
+MiniMap.hotkeys_help_maptype=Change map to Day, Night\:
+MiniMap.hotkeys_help_maptype_key=§bCTRL [§f , §bCTRL ]§f
+MiniMap.show_fps=Show FPS\: %1$s
+MiniMap.return_to_game=Return to Game
+Feature.unlimited=Unlimited
+Feature.fair_play=FairPlay
+WebMap.automap_text=Auto-Map...
+WebMap.automap_title=Automatically map unexplored regions (single-player)
+WebMap.automap_dialog_text=Automatically map all regions or just missing regions?
+WebMap.automap_dialog_all=All
+WebMap.automap_dialog_missing=Missing
+WebMap.automap_dialog_none=None
+WebMap.automap_dialog_close=Close
+WebMap.automap_already_started=Auto-mapping already in progress.
+WebMap.automap_started=Auto-mapping started. Check game chat for progress.
+WebMap.automap_complete=Auto-mapping has stopped.
+WebMap.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
+WebMap.save_button_text=Save Map
+WebMap.save_filename=Saving map to screenshots\: %1$s
+WebMap.actions_title=Actions...

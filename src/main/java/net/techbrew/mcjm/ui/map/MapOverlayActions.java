@@ -8,6 +8,7 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.VersionCheck;
 import net.techbrew.mcjm.io.MapSaver;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.log.ChatLog;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.MapOverlayState;
 import net.techbrew.mcjm.task.MapRegionTask;
@@ -151,7 +152,7 @@ public class MapOverlayActions extends JmUI {
 		final MapSaver mapSaver = new MapSaver(state.getWorldDir(), mapType, vSlice, state.getDimension());
 		if(mapSaver.isValid()) {
 			JourneyMap.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
-			JourneyMap.getInstance().announce(Constants.getString("MapOverlay.save_filename", mapSaver.getSaveFileName())); //$NON-NLS-1$
+			ChatLog.announceI18N("MapOverlay.save_filename", mapSaver.getSaveFileName()); //$NON-NLS-1$
 		}		
 		close();
 	}

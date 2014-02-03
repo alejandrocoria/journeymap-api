@@ -8,17 +8,13 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.Utils;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.model.EntityHelper;
 import org.lwjgl.Sys;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 
 public class FileHandler {
@@ -134,11 +130,10 @@ public class FileHandler {
 		}
 	}
 	
-	
 	public static BufferedImage getWebImage(String fileName) {
 		try {
 			String png = FileHandler.WEB_DIR + "/img/" + fileName;//$NON-NLS-1$
-			InputStream is = EntityHelper.class.getResourceAsStream(png);
+			InputStream is = JourneyMap.class.getResourceAsStream(png);
 			if(is==null) {
 				JourneyMap.getLogger().warning("Image not found: " + png);
 				return null;
@@ -152,6 +147,24 @@ public class FileHandler {
 			return null;
 		}
 	}
+
+    public static Properties getLangFile(String fileName) {
+        try {
+            InputStream is = JourneyMap.class.getResourceAsStream("/assets/JourneyMap/lang/" + fileName);
+            if(is==null) {
+                JourneyMap.getLogger().warning("Language file not found: " + fileName);
+                return null;
+            }
+            Properties properties = new Properties();
+            properties.load(is);
+            is.close();
+            return properties;
+        } catch (IOException e) {
+            String error = Constants.getMessageJMERR17(e.getMessage());
+            JourneyMap.getLogger().severe(error);
+            return null;
+        }
+    }
 	
 	public static File getCacheDir() {
 		return new File(Minecraft.getMinecraft().mcDataDir, Constants.CACHE_DIR);

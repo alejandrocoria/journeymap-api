@@ -395,7 +395,7 @@ public abstract class BaseService extends Service {
 		
 		/**
 		 * Set content headers for the ZipEntry-based file to be returned.
-		 * @param file
+		 * @param zipEntry
 		 * @return
 		 */
 		ResponseHeader content(ZipEntry zipEntry) {
@@ -423,7 +423,7 @@ public abstract class BaseService extends Service {
 		
 		/**
 		 * Set content last=modified timestamp.
-		 * @param file
+		 * @param timestamp
 		 * @return
 		 */
 		ResponseHeader contentModified(long timestamp) {
@@ -432,7 +432,7 @@ public abstract class BaseService extends Service {
 		
 		/**
 		 * Set content length for the file to be returned.
-		 * @param file
+		 * @param fileSize
 		 * @return
 		 */
 		ResponseHeader contentLength(long fileSize) {
@@ -441,7 +441,7 @@ public abstract class BaseService extends Service {
 		
 		/**
 		 * Set expires of data to be returned.
-		 * @param file
+		 * @param timestamp
 		 * @return
 		 */
 		ResponseHeader expires(long timestamp) {
@@ -451,7 +451,7 @@ public abstract class BaseService extends Service {
 		/**
 		 * Set MIME content type for the file to be returned. Also sets the language if
 		 * the type is HTML or TEXT.
-		 * @param file
+		 * @param type
 		 * @return
 		 */
 		ResponseHeader contentType(ContentType type) {
@@ -466,7 +466,7 @@ public abstract class BaseService extends Service {
 		
 		/**
 		 * Set language for the file to be returned.
-		 * @param file
+		 * @param locale
 		 * @return
 		 */
 		ResponseHeader contentLanguage(Locale locale) {

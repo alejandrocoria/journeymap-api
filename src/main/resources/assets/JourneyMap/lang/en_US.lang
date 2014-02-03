@@ -5,66 +5,66 @@
 # Error messages:  Note, translating these are optional, but they may help users diagnose the problem on their own.
 ########################
 
-JMERR00=[JMERR00] JourneyMap encountered an unexpected error: {0}
-JMERR01=[JMERR01] JourneyMap {0} requires {1}
+JMERR00=[JMERR00] JourneyMap encountered an unexpected error: %1$s
+JMERR01=[JMERR01] JourneyMap %1$s requires %2$s
 JMERR02=[JMERR02] JourneyMap not yet available for world
 JMERR03=[JMERR03] JMServer could not start webserver
-JMERR04=[JMERR04] FileHandler could not write to file: {0}
-JMERR05=[JMERR05] Web Browser sent a malformed request: {0}
-JMERR06=[JMERR06] ChunkServlet could not read data directory for world: {0}
-JMERR07=[JMERR07] Couldn't get block in chunk: {0}
-JMERR08=[JMERR08] Could not write chunk image to file: {0}
+JMERR04=[JMERR04] FileHandler could not write to file: %1$s
+JMERR05=[JMERR05] Web Browser sent a malformed request: %1$s
+JMERR06=[JMERR06] ChunkServlet could not read data directory for world: %1$s
+JMERR07=[JMERR07] Couldn't get block in chunk: %1$s
+JMERR08=[JMERR08] Could not write chunk image to file: %1$s
 JMERR09=[JMERR09] Player not connected to any world
-JMERR10=[JMERR10] Player not connected to world: {0}
+JMERR10=[JMERR10] Player not connected to world: %1$s
 JMERR11=[JMERR11] Could not read player data file
-JMERR12=[JMERR12] Could not serve web file: {0}
-JMERR13=[JMERR13] Browser requested unknown file: {0}
-JMERR14=[JMERR14] Browser tried an unsupported HTTP method: {0}
-JMERR15=[JMERR15] Unexpected error while writing player file: {0}
-JMERR16=[JMERR16] Unexpected error while writing chunk image files: {0}
-JMERR17=[JMERR17] Unexpected error getting entity icon for in-game map: {0}
-JMERR18=[JMERR18] Error exporting world map: {0}
-JMERR19=[JMERR19] Error reading property file: {0}
-JMERR20=[JMERR20] Error writing property file: {0}
-JMERR21=[JMERR21] Error reading region file: {0}.  Error: {1}
-JMERR22=[JMERR22] Error writing region file: {0}.  Error: {1}
-JMERR23=[JMERR23] Map UI error: {0}
+JMERR12=[JMERR12] Could not serve web file: %1$s
+JMERR13=[JMERR13] Browser requested unknown file: %1$s
+JMERR14=[JMERR14] Browser tried an unsupported HTTP method: %1$s
+JMERR15=[JMERR15] Unexpected error while writing player file: %1$s
+JMERR16=[JMERR16] Unexpected error while writing chunk image files: %1$s
+JMERR17=[JMERR17] Unexpected error getting entity icon for in-game map: %1$s
+JMERR18=[JMERR18] Error exporting world map: %1$s
+JMERR19=[JMERR19] Error reading property file: %1$s
+JMERR20=[JMERR20] Error writing property file: %1$s
+JMERR21=[JMERR21] Error reading region file: %1$s.  Error: %2$s
+JMERR22=[JMERR22] Error writing region file: %1$s.  Error: %2$s
+JMERR23=[JMERR23] Map UI error: %1$s
 JMERR24=[JMERR24] Failed to start webserver
 
 ########################
 # In-game chat messages
-# Note: Do not translate or alter chat color changes (§b, §e, §f, etc.)
+# Note: Do not translate or alter chat color changes (Â§b, Â§e, Â§f, etc.)
 ########################
 
-# {0} = JourneyMap version (§e and §f are color changes)
-JourneyMap.chat_announcement=§eJourneyMap:§f {0}
+# %1$s = JourneyMap version (Â§e and Â§f are color changes)
+JourneyMap.chat_announcement=Â§eJourneyMap:Â§f %1$s
 
-# {0} = Key to press ('J')
-JourneyMap.mapgui_only_ready=Press [§b{0}§f].  (Webserver disabled.)
+# %1$s = Key to press ('J')
+JourneyMap.mapgui_only_ready=Press [Â§b%1$sÂ§f].  (Webserver disabled.)
 
-# {0} = JourneyMap version
-JourneyMap.new_version_available=Newer version available:\n{0}
+# %1$s = JourneyMap version
+JourneyMap.new_version_available=Newer version available:\n%1$s
 
-# {0} = JourneyMap version (§e is a color change)
-JourneyMap.ready=§e{0} ready.
+# %1$s = JourneyMap version (Â§e is a color change)
+JourneyMap.ready=Â§e%1$s ready.
 
 JourneyMap.webserver_and_mapgui_disabled=JourneyMap is disabled by journeyMap.properties file
 
-# {0} = Key to press ('J'), {1} = website port number (8080) (§b and §f are color changes)
-JourneyMap.webserver_and_mapgui_ready=Press [§b{0}§f] or open browser to§b http://localhost{1} §f
+# %1$s = Key to press ('J'), %2$s = website port number (8080) (Â§b and Â§f are color changes)
+JourneyMap.webserver_and_mapgui_ready=Press [Â§b%1$sÂ§f] or open browser toÂ§b http://localhost%2$s Â§f
 
-# {0} = website port number (8080) (§b and §f are color changes)
-JourneyMap.webserver_only_ready=Open browser to§b http://localhost{0} §f. (In-game map disabled)
+# %1$s = website port number (8080) (Â§b and Â§f are color changes)
+JourneyMap.webserver_only_ready=Open browser toÂ§b http://localhost%1$s Â§f. (In-game map disabled)
 
 # Added in 3.0.0
-JourneyMap.file_updates=Files are being updated ({0}). Mapping suspended.
+JourneyMap.file_updates=Files are being updated (%1$s). Mapping suspended.
 JourneyMap.file_updates_complete=File updates complete.  Mapping resumed.
 
 ########################
 # In-game Map messages
 ########################
 
-# {0} = JourneyMap version
+# %1$s = JourneyMap version
 MapOverlay.options=Options
 MapOverlay.close=Close
 
@@ -77,58 +77,58 @@ MapOverlay.night=Night
 MapOverlay.on=On
 MapOverlay.off=Off
 
-# Added in 3.0.0: Actions button 
+# Added in 3.0.0: Actions button
 MapOverlay.actions=Actions
 
-# {0} = "On" or "Off"
-MapOverlay.follow=Follow: {0}
+# %1$s = "On" or "Off"
+MapOverlay.follow=Follow: %1$s
 
-# {0} = x, {1} = y, {2} = z, {3} = vertical slice, {4} Biome name
-MapOverlay.player_location=Location: {0} , {1} | Elevation: {2} ({3}) | Biome: {4}
+# %1$s = x, %2$s = y, %3$s = z, %4$s = vertical slice, %5$s Biome name
+MapOverlay.player_location=Location: %1$s , %2$s | Elevation: %3$s (%4$s) | Biome: %5$s
 
-# Added in 3.1.0. {0} = x, {1} = y, {2} = z, {3} = vertical slice, {4} Biome name
-MapOverlay.player_location_minimap={0}, {1} | {2} ({3}) | {4}
+# Added in 3.1.0. %1$s = x, %2$s = y, %3$s = z, %4$s = vertical slice, %5$s Biome name
+MapOverlay.player_location_minimap=%1$s, %2$s | %3$s (%4$s) | %5$s
 
-# Added in 3.1.0. {0} = x, {1} = y, {2} = z, {3} = vertical slice
-MapOverlay.player_location_minimap_nobiome={0}, {1} | {2} ({3})
+# Added in 3.1.0. %1$s = x, %2$s = y, %3$s = z, %4$s = vertical slice
+MapOverlay.player_location_minimap_nobiome=%1$s, %2$s | %3$s (%4$s)
 
 MapOverlay.save_map=Save Map
 
 # OBSOLETE in 3.0.0
-MapOverlay.saving_map_to_file=Saving {0} map to file...
+MapOverlay.saving_map_to_file=Saving %1$s map to file...
 
-# Added in 3.0.0.  {0}=filename
-MapOverlay.save_filename=Saving map to screenshots: {0}
+# Added in 3.0.0.  %1$s=filename
+MapOverlay.save_filename=Saving map to screenshots: %1$s
 
-# {0} = "On" or "Off"
-MapOverlay.show_caves=Show Caves: {0}
+# %1$s = "On" or "Off"
+MapOverlay.show_caves=Show Caves: %1$s
 
-# {0} = "On" or "Off"
-MapOverlay.show_monsters=Show Monsters : {0}
+# %1$s = "On" or "Off"
+MapOverlay.show_monsters=Show Monsters : %1$s
 
-# {0} = "On" or "Off"
-MapOverlay.show_animals=Show Animals : {0}
+# %1$s = "On" or "Off"
+MapOverlay.show_animals=Show Animals : %1$s
 
-# {0} = "On" or "Off"
-MapOverlay.show_villagers=Show Villagers : {0}
+# %1$s = "On" or "Off"
+MapOverlay.show_villagers=Show Villagers : %1$s
 
-# {0} = "On" or "Off"
-MapOverlay.show_pets=Show Pets : {0}
+# %1$s = "On" or "Off"
+MapOverlay.show_pets=Show Pets : %1$s
 
-# {0} = "On" or "Off"
-MapOverlay.show_players=Show Players : {0}
+# %1$s = "On" or "Off"
+MapOverlay.show_players=Show Players : %1$s
 
-# {0} = "On" or "Off"
-MapOverlay.show_waypoints=Show Waypoints : {0}
+# %1$s = "On" or "Off"
+MapOverlay.show_waypoints=Show Waypoints : %1$s
 
-# {0} = "On" or "Off"
-MapOverlay.show_grid=Show Grid : {0}
+# %1$s = "On" or "Off"
+MapOverlay.show_grid=Show Grid : %1$s
 
 # Added in 3.1.x.
 MapOverlay.minimap=MiniMap...
 
-# Added in 3.0.0.  {0} = "On" or "Off"
-MapOverlay.enable_webserver=Webserver: {0}
+# Added in 3.0.0.  %1$s = "On" or "Off"
+MapOverlay.enable_webserver=Webserver: %1$s
 
 # Added in 3.0.0
 MapOverlay.automap_title=Auto-Map...
@@ -151,17 +151,17 @@ MapOverlay.automap_dialog_missing=Missing
 # Added in 3.0.0
 MapOverlay.automap_dialog_none=None
 
-# Added in 3.0.0: {0} = Percent complete
-MapOverlay.automap_status=Auto-mapping surface ({0}).
+# Added in 3.0.0: %1$s = Percent complete
+MapOverlay.automap_status=Auto-mapping surface (%1$s).
 
-# Added in 3.0.0: {0} = Vertical slice number, {1} = Percent complete
-MapOverlay.automap_status_underground=Auto-mapping slice {0} ({1}).
+# Added in 3.0.0: %1$s = Vertical slice number, %2$s = Percent complete
+MapOverlay.automap_status_underground=Auto-mapping slice %1$s (%2$s).
 
 # Added in 3.0.0
 MapOverlay.automap_complete=Auto-mapping of surface has stopped.
 
-# Added in 3.0.0: {0} = Vertical slice number,
-MapOverlay.automap_complete_underground=Auto-mapping of slice {0} has stopped.
+# Added in 3.0.0: %1$s = Vertical slice number,
+MapOverlay.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
 
 MapOverlay.update_available=Update Available!
 MapOverlay.update_check=Check for Update
@@ -172,11 +172,11 @@ MapOverlay.zoom_out=Zoom Out
 # Added in 3.1.x:
 MiniMap.options=MiniMap Options
 
-# Added in 3.1.x: {0} = "On" or "Off"
-MiniMap.enable_minimap=MiniMap: {0}
+# Added in 3.1.x: %1$s = "On" or "Off"
+MiniMap.enable_minimap=MiniMap: %1$s
 
-# Added in 3.1.x.  {0} One of "Top Left", "Top Right", "Bottom Left", "Bottom Right"
-MiniMap.position=Position: {0}
+# Added in 3.1.x.  %1$s One of "Top Left", "Top Right", "Bottom Left", "Bottom Right"
+MiniMap.position=Position: %1$s
 
 # Added in 3.1.x.
 MiniMap.position_topleft=Top Left
@@ -190,8 +190,8 @@ MiniMap.position_bottomleft=Bottom Left
 # Added in 3.1.x.
 MiniMap.position_bottomright=Bottom Right
 
-# Added in 3.1.x.  {0} = One of "Small Square", "Large Square", "Small Circle", "Large Circle"
-MiniMap.shape=Shape: {0}
+# Added in 3.1.x.  %1$s = One of "Small Square", "Large Square", "Small Circle", "Large Circle"
+MiniMap.shape=Shape: %1$s
 
 # Added in 3.1.x.
 MiniMap.shape_smallsquare=Small Square
@@ -205,32 +205,32 @@ MiniMap.shape_smallcircle=Small Circle
 # Added in 3.1.x.
 MiniMap.shape_largecircle=Large Circle
 
-# Added in 3.1.x.  {0} = one of "Small", "Large"
-MiniMap.font=Font: {0}
+# Added in 3.1.x.  %1$s = one of "Small", "Large"
+MiniMap.font=Font\: %1$s
 MiniMap.font_small=Small
 MiniMap.font_large=Large
 
-# Added in 3.3.x.  {0} = one of "On", "Off".  Hot Keys are keyboard shortcuts that can control the minimap.
-MiniMap.hotkeys=Hot Keys: {0}
+# Added in 3.3.x.  %1$s = one of "On", "Off".  Hot Keys are keyboard shortcuts that can control the minimap.
+MiniMap.hotkeys=Hot Keys: %1$s
 
-# Added in 3.3.x.  (§b and §f are color changes)
+# Added in 3.3.x.  (Â§b and Â§f are color changes)
 MiniMap.hotkeys_help=Hot Keys...
 MiniMap.hotkeys_help_title=Minimap Hot Keys
 MiniMap.hotkeys_help_toggle=Toggle Minimap on and off:
-MiniMap.hotkeys_help_toggle_key=§bCTRL J§f
+MiniMap.hotkeys_help_toggle_key=Â§bCTRL JÂ§f
 MiniMap.hotkeys_help_zoom=Zoom Minimap In, Out:
-MiniMap.hotkeys_help_zoom_key=§bCTRL +§f , §bCTRL -§f
+MiniMap.hotkeys_help_zoom_key=Â§bCTRL +Â§f , Â§bCTRL -Â§f
 MiniMap.hotkeys_help_maptype=Change map to Day, Night:
-MiniMap.hotkeys_help_maptype_key=§bCTRL [§f , §bCTRL ]§f
+MiniMap.hotkeys_help_maptype_key=Â§bCTRL [Â§f , Â§bCTRL ]Â§f
 
-# Added in 3.1.x.  {0} = one of "On", "Off".  FPS is short for "Frames per Second", a measurement of graphic performance.
-MiniMap.show_fps=Show FPS: {0}
+# Added in 3.1.x.  %1$s = one of "On", "Off".  FPS is short for "Frames per Second", a measurement of graphic performance.
+MiniMap.show_fps=Show FPS: %1$s
 
 # Added in 3.1.x.
 MiniMap.return_to_game=Return to Game
 
-# {0} = filename
-MapSaver.map_saved=Map saved: {0}
+# %1$s = filename
+MapSaver.map_saved=Map saved: %1$s
 
 # Added in 3.1.0.  Unlimited means there are no feature restrictions
 Feature.unlimited=Unlimited
@@ -270,7 +270,7 @@ WebMap.donate_text=Donate to JourneyMap
 WebMap.donate_title=Donate to JourneyMap development using PayPal
 
 # Update button title (shown only when update available)
-WebMap.update_button_title=Update Available: JourneyMap {0} for Minecraft {1}
+WebMap.update_button_title=Update Available: JourneyMap %1$s for Minecraft %2$s
 
 # Day/Night button
 WebMap.day_button_text=Day
@@ -333,8 +333,8 @@ WebMap.automap_already_started=Auto-mapping already in progress.
 WebMap.automap_started=Auto-mapping started. Check game chat for progress.
 WebMap.automap_complete=Auto-mapping has stopped.
 
-# Added in 3.0.0: {0} = Vertical slice number,
-WebMap.automap_complete_underground=Auto-mapping of slice {0} has stopped.
+# Added in 3.0.0: %1$s = Vertical slice number,
+WebMap.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
 
 # Added in 3.0.0: Save Map button text
 WebMap.save_button_text=Save Map
@@ -342,8 +342,8 @@ WebMap.save_button_text=Save Map
 # Save Map button
 WebMap.save_button_title=Save the explored map to file
 
-# Added in 3.0.0.  {0} = filename
-WebMap.save_filename=Saving map to screenshots: {0}
+# Added in 3.0.0.  %1$s = filename
+WebMap.save_filename=Saving map to screenshots: %1$s
 
 # Added in 3.0.0: Actions button 
 WebMap.actions_title=Actions...

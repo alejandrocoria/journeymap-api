@@ -13,7 +13,6 @@ import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSelectWorld;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.util.ChatComponentText;
 import net.techbrew.mcjm.cartography.ColorCache;
 import net.techbrew.mcjm.data.DataCache;
 import net.techbrew.mcjm.data.WorldData;
@@ -21,6 +20,7 @@ import net.techbrew.mcjm.feature.FeatureManager;
 import net.techbrew.mcjm.forgehandler.EventHandlerManager;
 import net.techbrew.mcjm.io.FileHandler;
 import net.techbrew.mcjm.io.PropertyManager;
+import net.techbrew.mcjm.log.ChatLog;
 import net.techbrew.mcjm.log.JMLogger;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.log.StatTimer;
@@ -39,10 +39,7 @@ import net.techbrew.mcjm.ui.UIManager;
 import net.techbrew.mcjm.ui.map.MapOverlay;
 import org.lwjgl.input.Keyboard;
 
-import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
@@ -103,9 +100,6 @@ public class JourneyMap {
 	
 	// Task controller for issuing tasks in executor
 	private TaskController taskController;
-
-	// Announcements
-	private final List<String> announcements = Collections.synchronizedList(new LinkedList<String>());
 
     private Minecraft mc;
 
@@ -185,7 +179,7 @@ public class JourneyMap {
 
             // Check for newer version online
             if(VersionCheck.getVersionIsCurrent()==false) {
-                announce(Constants.getString("JourneyMap.new_version_available", WEBSITE_URL)); //$NON-NLS-1$
+                ChatLog.announceI18N("JourneyMap.new_version_available", WEBSITE_URL); //$NON-NLS-1$
             }
 
             initialized = true;
@@ -225,7 +219,7 @@ public class JourneyMap {
 				enableWebserver = false;
 			}
 			if(!enableWebserver) {
-				announce(Constants.getMessageJMERR24()); 
+                ChatLog.announceError(Constants.getMessageJMERR24());
 			}
 		} else {
 			enableWebserver = false;
@@ -337,7 +331,6 @@ public class JourneyMap {
         //BlockMD.clearCache();
         //ColorCache.getInstance().serializeCache();
         ColorCache.getInstance().reset();
-        Constants.refreshBundle();
         DataCache.instance().purge();
         MapPlayerTask.clearCache();
         StatTimer.resetAll();
@@ -370,7 +363,6 @@ public class JourneyMap {
                 return;
             }
 
-            // Show announcements
             final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof MapOverlay);
             if(isGamePaused) {
                 TileCache.pause();
@@ -390,21 +382,15 @@ public class JourneyMap {
 
             TileCache.resume();
 
+            // Show announcements
             if(!isGamePaused) {
-                while(!announcements.isEmpty()) {
-                    try {
-                        mc.ingameGUI.func_146158_b().func_146227_a(new ChatComponentText(announcements.remove(0)));
-                    } catch(Exception e){
-                        getLogger().severe("Could not display announcement: " + e);
-                    }
-                }
+                ChatLog.showChatAnnouncements(mc);
             }
 
             // We got this far
             if(!isMapping()) {
                 startMapping();
             }
-
 
         } catch (Throwable t) {
             String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
@@ -424,7 +410,7 @@ public class JourneyMap {
             }
         } catch (Throwable t) {
             String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
-            announce(error);
+            ChatLog.announceError(error);
             logger.severe(LogFormatter.toString(t));
         }
     }
@@ -432,47 +418,26 @@ public class JourneyMap {
 	private void announceMod(boolean forced) {
 
 		Minecraft minecraft = Minecraft.getMinecraft();	
-		int pos = forced ? Math.max(0,announcements.size()-1) : 0;
-		
+		int pos = forced ? Math.max(0,ChatLog.pending()-1) : 0;
+
 		if(enableAnnounceMod) {
-			announcements.add(pos, Constants.getString("JourneyMap.ready", MOD_NAME)); //$NON-NLS-1$ 
+            ChatLog.announceI18N(pos, "JourneyMap.ready", MOD_NAME); //$NON-NLS-1$
 			if(enableWebserver && enableMapGui) {
 				String keyName = Keyboard.getKeyName(uiKeybinding.func_151463_i()); // Should be KeyCode
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
-				announcements.add(pos+1, Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port)); //$NON-NLS-1$ 
+                String message = Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
+                ChatLog.announceWebserver(pos + 1, message, port); //$NON-NLS-1$
 			} else if(enableWebserver) {
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
-				announcements.add(pos+1, Constants.getString("JourneyMap.webserver_only_ready", port)); //$NON-NLS-1$ 
+                String message = Constants.getString("JourneyMap.webserver_only_ready", port); //$NON-NLS-1$
+                ChatLog.announceWebserver(pos + 1, message, port); //$NON-NLS-1$
 			} else if(enableMapGui) {
 				String keyName = Keyboard.getKeyName(uiKeybinding.func_151463_i()); // Should be KeyCode
-				announcements.add(pos+1, Constants.getString("JourneyMap.mapgui_only_ready", keyName)); //$NON-NLS-1$
+                ChatLog.announceI18N(pos + 1, "JourneyMap.mapgui_only_ready", keyName); //$NON-NLS-1$
 			} else {
-				announcements.add(pos+1, Constants.getString("JourneyMap.webserver_and_mapgui_disabled")); //$NON-NLS-1$
+                ChatLog.announceI18N(pos + 1, "JourneyMap.webserver_and_mapgui_disabled"); //$NON-NLS-1$
 			}
 			enableAnnounceMod = false; // Only announce mod once per runtime
-		}
-	}
-
-	/**
-	 * Queue an announcement to be shown in the UI.
-	 * @param message
-	 */
-	public void announce(String message) {
-		announce(message, null);
-	}
-	
-	/**
-	 * Queue an announcement to be shown in the UI.
-	 * @param message
-	 */
-	public void announce(String message, Level logLevel) {
-		if(logLevel!=null) {
-			logger.log(logLevel, message);
-		}
-		String[] lines = message.split("\n"); //$NON-NLS-1$
-		lines[0] = Constants.getString("JourneyMap.chat_announcement", lines[0]); //$NON-NLS-1$
-		for(String line : lines) {
-			announcements.add(line);
 		}
 	}
 

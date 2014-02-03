@@ -72,7 +72,7 @@ public class UIManager {
 			logger.log(Level.SEVERE, "Unexpected exception opening UI: " + e); //$NON-NLS-1$
 			logger.severe(LogFormatter.toString(e));
 			String error = Constants.getMessageJMERR23(e.getMessage());
-			JourneyMap.getInstance().announce(error);
+			//ChatLog.announceError(error);
 		}
     }
 

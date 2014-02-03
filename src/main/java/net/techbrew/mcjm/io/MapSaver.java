@@ -5,6 +5,7 @@ import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.Constants.MapType;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.WorldData;
+import net.techbrew.mcjm.log.ChatLog;
 import net.techbrew.mcjm.log.LogFormatter;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
@@ -74,18 +75,18 @@ public class MapSaver {
 			stop = System.currentTimeMillis();
 			
 			JourneyMap.getLogger().info("Map saved in: " + (stop-start) + "ms: " + saveFile + ". Estimated/actual filesize:" + estimatedBytes + " / " + saveFile.length()); //$NON-NLS-1$ //$NON-NLS-2$
-			JourneyMap.getInstance().announce(Constants.getString("MapSaver.map_saved", saveFile)); //$NON-NLS-1$		
+			ChatLog.announceI18N("MapSaver.map_saved", saveFile); //$NON-NLS-1$
 			FileHandler.open(saveFile);
 		
 		} catch (java.lang.OutOfMemoryError e) {
 			String error = Constants.getMessageJMERR18("Out Of Memory: Increase Java Heap Size for Minecraft to save large maps.");
 			JourneyMap.getLogger().severe(error);
-			JourneyMap.getInstance().announce(error);
+			ChatLog.announceError(error);
 		} catch (Throwable t) {	
 			String error = Constants.getMessageJMERR18(t.getMessage());
 			JourneyMap.getLogger().severe(error);
 			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
-			JourneyMap.getInstance().announce(error);
+			ChatLog.announceError(error);
 			return null;
 		}
 		
