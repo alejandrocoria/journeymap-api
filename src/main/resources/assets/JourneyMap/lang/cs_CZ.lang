@@ -5,31 +5,31 @@
 # Error messages:  Note, translating these are optional, but they may help users diagnose the problem on their own.
 ########################
 
-JMERR00=[JMERR00] V JourneyMap do\u0161lo k neo\u010dek\u00e1van\u00e9 chyb\u011b: %1$s
-JMERR01=[JMERR01] JourneyMap %1$s vy\u017eaduje %2$s
-JMERR02=[JMERR02] JourneyMap je\u0161t\u011b nen\u00ed k dispozici pro tento sv\u011bt
-JMERR03=[JMERR03] JMServer nem\u016f\u017ee spustit webov\u00fd server
-JMERR04=[JMERR04] FileHandler nem\u016f\u017ee zapisovat do souboru: %1$s
-JMERR05=[JMERR05] Web Browser poslal chybn\u00fd po\u017eadavek: %1$s
-JMERR06=[JMERR06] ChunkServlet nem\u016f\u017ee p\u0159e\u010d\u00edst adres\u00e1\u0159 data pro sv\u011bt: %1$s
-JMERR07=[JMERR07] Nelze z\u00edskat blok v chunk: %1$s
+JMERR00=[JMERR00] V JourneyMap došlo k neočekávané chybě: %1$s
+JMERR01=[JMERR01] JourneyMap %1$s vyžaduje %2$s
+JMERR02=[JMERR02] JourneyMap ještě není k dispozici pro tento svět
+JMERR03=[JMERR03] JMServer nemůže spustit webový server
+JMERR04=[JMERR04] FileHandler nemůže zapisovat do souboru: %1$s
+JMERR05=[JMERR05] Web Browser poslal chybný požadavek: %1$s
+JMERR06=[JMERR06] ChunkServlet nemůže přečíst adresář data pro svět: %1$s
+JMERR07=[JMERR07] Nelze získat blok v chunk: %1$s
 JMERR08=[JMERR08] Nelze zapsat chunk image do souboru: %1$s
-JMERR09=[JMERR09] Hr\u00e1\u010d nen\u00ed p\u0159ipojen k \u017e\u00e1dn\u00e9mu sv\u011btu
-JMERR10=[JMERR10] Hr\u00e1\u010d nen\u00ed p\u0159ipojen k sv\u011btu: %1$s
-JMERR11=[JMERR11] Nelze \u010d\u00edst soubor player data
-JMERR12=[JMERR12] Nelze doru\u010dit webov\u00fd soubor: %1$s
-JMERR13=[JMERR13] Browser po\u017e\u00e1dal o nezn\u00e1m\u00fd soubor: %1$s
-JMERR14=[JMERR14] Browser pou\u017eil nepodporovanou HTTP metodu: %1$s
-JMERR15=[JMERR15] Neo\u010dek\u00e1van\u00e1 chyba b\u011bhem z\u00e1pisu do souboru player data: %1$s
-JMERR16=[JMERR16] Neo\u010dek\u00e1van\u00e1 chyba b\u011bhem z\u00e1pisu do soubor\u016f chunk image: %1$s
-JMERR17=[JMERR17] Neo\u010dek\u00e1van\u00e1 chyba p\u0159i \u010dten\u00ed ikony entity pro in-game mapu: %1$s
-JMERR18=[JMERR18] Chyba p\u0159i exportu mapy sv\u011bta: %1$s
-JMERR19=[JMERR19] Chyba p\u0159i \u010dten\u00ed property souboru: %1$s
-JMERR20=[JMERR20] Chyba p\u0159i z\u00e1pisu do property souboru: %1$s
-JMERR21=[JMERR21] Chyba p\u0159i \u010dten\u00ed souboru region: %1$s.  Chyba: %2$s
-JMERR22=[JMERR22] Chyba p\u0159i z\u00e1pisu souboru region: %1$s.  Chyba: %2$s
+JMERR09=[JMERR09] Hráč není připojen k žádnému světu
+JMERR10=[JMERR10] Hráč není připojen k světu: %1$s
+JMERR11=[JMERR11] Nelze číst soubor player data
+JMERR12=[JMERR12] Nelze doručit webový soubor: %1$s
+JMERR13=[JMERR13] Browser požádal o neznámý soubor: %1$s
+JMERR14=[JMERR14] Browser použil nepodporovanou HTTP metodu: %1$s
+JMERR15=[JMERR15] Neočekávaná chyba během zápisu do souboru player data: %1$s
+JMERR16=[JMERR16] Neočekávaná chyba během zápisu do souborů chunk image: %1$s
+JMERR17=[JMERR17] Neočekávaná chyba při čtení ikony entity pro in-game mapu: %1$s
+JMERR18=[JMERR18] Chyba při exportu mapy světa: %1$s
+JMERR19=[JMERR19] Chyba při čtení property souboru: %1$s
+JMERR20=[JMERR20] Chyba při zápisu do property souboru: %1$s
+JMERR21=[JMERR21] Chyba při čtení souboru region: %1$s.  Chyba: %2$s
+JMERR22=[JMERR22] Chyba při zápisu souboru region: %1$s.  Chyba: %2$s
 JMERR23=[JMERR23] Chyba UI mapy: %1$s
-JMERR24=[JMERR24] Selhalo spu\u0161t\u011bn\u00ed webov\u00e9ho serveru
+JMERR24=[JMERR24] Selhalo spuštění webového serveru
 
 ########################
 # In-game chat messages
@@ -40,29 +40,30 @@ JMERR24=[JMERR24] Selhalo spu\u0161t\u011bn\u00ed webov\u00e9ho serveru
 JourneyMap.chat_announcement=§eJourneyMap:§f %1$s
 
 # %1$s = Key to press ('J')
-JourneyMap.mapgui_only_ready=Stiskn\u011bte [§b%1$s§f].  (Webov\u00fd server vypnut\u00fd)
+JourneyMap.mapgui_only_ready=Stiskněte [§b%1$s§f].  (Webový server vypnutý)
 
 # %1$s = JourneyMap version
-JourneyMap.new_version_available=K dispozici je nov\u011bj\u0161\u00ed verze:\n%1$s
+JourneyMap.new_version_available=K dispozici je novější verze:
+%1$s
 
 # %1$s = JourneyMap version (§e is a color change)
-JourneyMap.ready=§e%1$s p\u0159ipraven.
+JourneyMap.ready=§e%1$s připraven.
 
-JourneyMap.webserver_and_mapgui_disabled=JourneyMap je vypnut\u00fd v souboru journeyMap.properties
+JourneyMap.webserver_and_mapgui_disabled=JourneyMap je vypnutý v souboru journeyMap.properties
 
 # %1$s = Key to press ('J'), %2$s = website port number (8080) (§b and §f are color changes)
-JourneyMap.webserver_and_mapgui_ready=Stiskn\u011bte [§b%1$s§f] nebo otev\u0159ete webov\u00fd prohl\u00ed\u017ee\u010d na adrese §b http://localhost%2$s §f
+JourneyMap.webserver_and_mapgui_ready=Stiskněte [§b%1$s§f] nebo otevřete webový prohlížeč na adrese §b http://localhost%2$s §f
 
 # %1$s = website port number (8080) (§b and §f are color changes)
-JourneyMap.webserver_only_ready=Otev\u0159ete webov\u00fd prohl\u00ed\u017ee\u010d na adrese §b http://localhost%1$s §f. (In-game mapa vypnut\u00e1)
+JourneyMap.webserver_only_ready=Otevřete webový prohlížeč na adrese §b http://localhost%1$s §f. (In-game mapa vypnutá)
 
 ########################
 # In-game Map messages
 ########################
 
 # %1$s = JourneyMap version
-MapOverlay.options=Mo\u017enosti
-MapOverlay.close=Zav\u0159\u00edt
+MapOverlay.options=Možnosti
+MapOverlay.close=Zavřít
 
 MapOverlay.day=Den
 MapOverlay.night=Noc
@@ -74,44 +75,44 @@ MapOverlay.off=Vyp.
 MapOverlay.follow=Sledovat: %1$s
 
 # %1$s = x, %2$s = y, %3$s = z, %4$s = vertical slice, %5$s Biome name
-MapOverlay.player_location=Poloha: %1$s , %2$s | V\u00fd\u0161ka: %3$s (%4$s) | Biom: %5$s
-MapOverlay.save_map=Ulo\u017eit mapu
+MapOverlay.player_location=Poloha: %1$s , %2$s | Výška: %3$s (%4$s) | Biom: %5$s
+MapOverlay.save_map=Uložit mapu
 
 # %1$s = type of map
-MapOverlay.saving_map_to_file=Ukl\u00e1d\u00e1n\u00ed %1$s mapy do souboru...
+MapOverlay.saving_map_to_file=Ukládání %1$s mapy do souboru...
 
 # %1$s = "On" or "Off"
-MapOverlay.show_caves=Zobrazit jeskyn\u011b: %1$s
+MapOverlay.show_caves=Zobrazit jeskyně: %1$s
 
 # %1$s = "On" or "Off"
-MapOverlay.show_monsters=Zobrazit p\u0159\u00ed\u0161ery : %1$s
+MapOverlay.show_monsters=Zobrazit příšery : %1$s
 
 # %1$s = "On" or "Off"
-MapOverlay.show_animals=Zobrazit zv\u00ed\u0159ata : %1$s
+MapOverlay.show_animals=Zobrazit zvířata : %1$s
 
 # %1$s = "On" or "Off"
-MapOverlay.show_villagers=Zobrazit vesni\u010dany : %1$s
+MapOverlay.show_villagers=Zobrazit vesničany : %1$s
 
 # %1$s = "On" or "Off"
-MapOverlay.show_pets=Zobrazit mazl\u00ed\u010dky : %1$s
+MapOverlay.show_pets=Zobrazit mazlíčky : %1$s
 
 # %1$s = "On" or "Off"
-MapOverlay.show_players=Zobrazit hr\u00e1\u010de : %1$s
+MapOverlay.show_players=Zobrazit hráče : %1$s
 
 # %1$s = "On" or "Off"
 MapOverlay.show_waypoints=Zobrazit waypointy: %1$s
 
 # %1$s = "On" or "Off"
-MapOverlay.show_grid=Zobrazit m\u0159\u00ed\u017eku : %1$s
+MapOverlay.show_grid=Zobrazit mřížku : %1$s
 
 MapOverlay.update_available=Aktualizace k dispozici!
 MapOverlay.update_check=Zkontrolovat aktualizace
-MapOverlay.use_browser=Pou\u017e\u00edt prohl\u00ed\u017ee\u010d
-MapOverlay.zoom_in=P\u0159ibl\u00ed\u017eit
-MapOverlay.zoom_out=Odd\u00e1lit
+MapOverlay.use_browser=Použít prohlížeč
+MapOverlay.zoom_in=Přiblížit
+MapOverlay.zoom_out=Oddálit
 
 # %1$s = filename
-MapSaver.map_saved=Mapa ulo\u017eena: %1$s
+MapSaver.map_saved=Mapa uložena: %1$s
 
 ########################
 # Web UI messages
@@ -126,90 +127,90 @@ WebMap.web_link_title=JourneyMap homepage
 
 # JourneyMap menu / forums link
 WebMap.forum_link_text=minecraftforum.net
-WebMap.forum_link_title=JourneyMap f\u00f3rum na minecraftforum.net
+WebMap.forum_link_title=JourneyMap fórum na minecraftforum.net
 
 # JourneyMap menu / RSS feed link
 WebMap.rss_feed_text=JourneyMap novinky RSS
-WebMap.rss_feed_title=P\u0159ihl\u00e1sit se k odb\u011bru novinek JourneyMap z RSS kan\u00e1lu
+WebMap.rss_feed_title=Přihlásit se k odběru novinek JourneyMap z RSS kanálu
 
 # JourneyMap menu / Email subscription link
 WebMap.email_sub_text=JourneyMap novinky email
-WebMap.email_sub_title=P\u0159ihl\u00e1sit se k odb\u011bru novinek JourneyMap emailem
+WebMap.email_sub_title=Přihlásit se k odběru novinek JourneyMap emailem
 
 # JourneyMap menu / Follow on Twitter link
 WebMap.follow_twitter_text=Sledovat JourneyMapMod na Twitter
 WebMap.follow_twitter_title=Sledovat JourneyMapMod na Twitter
 
 # JourneyMap menu / Donate link
-WebMap.donate_text=Podpo\u0159it JourneyMap
-WebMap.donate_title=Podpo\u0159it v\u00fdvoj JourneyMap pomoc\u00ed PayPal
+WebMap.donate_text=Podpořit JourneyMap
+WebMap.donate_title=Podpořit vývoj JourneyMap pomocí PayPal
 
 # Update button title (shown only when update available)
 WebMap.update_button_title=Aktualizace k dispozici: JourneyMap %1$s pro Minecraft %2$s
 
 # Day/Night button
 WebMap.day_button_text=Den
-WebMap.day_button_title=Mapa sv\u011bta za denn\u00edho sv\u011btla.
+WebMap.day_button_title=Mapa světa za denního světla.
 WebMap.night_button_text=Noc
-WebMap.night_button_title=Mapa sv\u011bta za svitu m\u011bs\u00edce.
+WebMap.night_button_title=Mapa světa za svitu měsíce.
 
 # Follow button
-WebMap.follow_button_title=Vyst\u0159edit mapu na v\u00e1s. (Vypne se p\u0159i ru\u010dn\u00edm posouv\u00e1n\u00ed.)
+WebMap.follow_button_title=Vystředit mapu na vás. (Vypne se při ručním posouvání.)
 
 # Show menu
 WebMap.show_menu_text=Zobrazit...
 
 # Show menu / Smooth Pixels (Unused)
-WebMap.smooth_pixels_menu_item=Vyhlazen\u00e9 pixely
+WebMap.smooth_pixels_menu_item=Vyhlazené pixely
 
 # Show menu / Caves
-WebMap.caves_menu_item_text=Jeskyn\u011b
-WebMap.caves_menu_item_title=Zobrazit jeskyn\u011b/interi\u00e9ry, nejste-li pod oblohou.
+WebMap.caves_menu_item_text=Jeskyně
+WebMap.caves_menu_item_title=Zobrazit jeskyně/interiéry, nejste-li pod oblohou.
 
 # Show menu / Grid
-WebMap.grid_menu_item_text=M\u0159\u00ed\u017eka
-WebMap.grid_menu_item_title=Zobrazit chunk m\u0159\u00ed\u017eku
+WebMap.grid_menu_item_text=Mřížka
+WebMap.grid_menu_item_title=Zobrazit chunk mřížku
 
 # Show menu / Waypoints
 WebMap.waypoints_menu_item_text=Waypointy
 WebMap.waypoints_menu_item_title=Zobrazit waypointy
 
 # Show menu / Animals
-WebMap.animals_menu_item_text=Zv\u00ed\u0159ata
-WebMap.animals_menu_item_title=Zobrazit zv\u00ed\u0159ata v okol\u00ed
+WebMap.animals_menu_item_text=Zvířata
+WebMap.animals_menu_item_title=Zobrazit zvířata v okolí
 
 # Show menu / Pets
-WebMap.pets_menu_item_text=Mazl\u00ed\u010dci
-WebMap.pets_menu_item_title=Zobrazit mazl\u00ed\u010dky v okol\u00ed
+WebMap.pets_menu_item_text=Mazlíčci
+WebMap.pets_menu_item_title=Zobrazit mazlíčky v okolí
 
 # Show menu / Mobs (Monsters)
-WebMap.mobs_menu_item_text=P\u0159\u00ed\u0161ery
-WebMap.mobs_menu_item_title=Zobrazit p\u0159\u00ed\u0161ery v okol\u00ed
+WebMap.mobs_menu_item_text=Příšery
+WebMap.mobs_menu_item_title=Zobrazit příšery v okolí
 
 # Show menu / Villagers
-WebMap.villagers_menu_item_text=Vesni\u010dan\u00e9
-WebMap.villagers_menu_item_title=Zobrazit vesni\u010dany v okol\u00ed
+WebMap.villagers_menu_item_text=Vesničané
+WebMap.villagers_menu_item_title=Zobrazit vesničany v okolí
 
 # Show menu / Other players (multiplayer)
-WebMap.players_menu_item_text=Hr\u00e1\u010di
-WebMap.players_menu_item_title=Zobrazit hr\u00e1\u010de v okol\u00ed (hra v\u00edce hr\u00e1\u010d\u016f)
+WebMap.players_menu_item_text=Hráči
+WebMap.players_menu_item_title=Zobrazit hráče v okolí (hra více hráčů)
 
 # Save Map button
-WebMap.save_button_title=Ulo\u017eit prozkoumanou mapu do souboru
+WebMap.save_button_title=Uložit prozkoumanou mapu do souboru
 
 # Zoom slider
 WebMap.zoom_slider_name=Zoom
 
 # World info area
-WebMap.worldname_text=N\u00e1zev sv\u011bta:
-WebMap.worldtime_text=\u010cas sv\u011bta:
+WebMap.worldname_text=Název světa:
+WebMap.worldtime_text=Čas světa:
 WebMap.location_text=Poloha:
-WebMap.elevation_text=V\u00fd\u0161ka:
-WebMap.slice_text=Vertik\u00e1ln\u00ed \u0159ez:
+WebMap.elevation_text=Výška:
+WebMap.slice_text=Vertikální řez:
 WebMap.biome_text=Biom:
 
 # Error message if world isn't open in Minecraft
-WebMap.error_world_not_opened=Sv\u011bt Minecraftu nen\u00ed otev\u0159en
+WebMap.error_world_not_opened=Svět Minecraftu není otevřen
 
 # 3.3.0 - Need to be translated
 JourneyMap.file_updates=Files are being updated (%1$s). Mapping suspended.

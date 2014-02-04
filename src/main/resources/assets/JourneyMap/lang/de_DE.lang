@@ -7,10 +7,10 @@
 
 JMERR00=[JMERR00] Es ist ein unerwarteter Fehler in JourneyMap aufgetreten: %1$s
 JMERR01=[JMERR01] JourneyMap %1$s braucht %2$s
-JMERR02=[JMERR02] JourneyMap ist f\u00FCr diese Welt noch nicht verf\u00FCgbar
+JMERR02=[JMERR02] JourneyMap ist für diese Welt noch nicht verfügbar
 JMERR03=[JMERR03] JMServer konnte den Webserver nicht starten
 JMERR04=[JMERR04] FileHandler konnte die Datei %1$s nicht schreiben
-JMERR05=[JMERR05] Der Web Browser hat eine ung\u00FCltige Anfrage an das Servlet gestellt: %1$s
+JMERR05=[JMERR05] Der Web Browser hat eine ungültige Anfrage an das Servlet gestellt: %1$s
 JMERR06=[JMERR06] ChunkServlet konnte das Datenverzeichnis der Welt nicht lesen: %1$s
 JMERR07=[JMERR07] Block im Chunk %1$s nicht gefunden
 JMERR08=[JMERR08] Chunk-Abbild konnte nicht in Datei %1$s geschrieben werden
@@ -19,10 +19,10 @@ JMERR10=[JMERR10] Der Spieler ist nicht mit der Welt %1$s verbunden
 JMERR11=[JMERR11] Datendatei des Spielers konnte nicht gelesen werden
 JMERR12=[JMERR12] Die Webdatei %1$s konnte nicht ausgeliefert werden
 JMERR13=[JMERR13] Browser hat eine unbekannte Datei vom FileServlet angefordert: %1$s
-JMERR14=[JMERR14] Browser ruft eine nicht unterst\u00FCtzte HTTP Methode in ChunkServlet auf: %1$s
+JMERR14=[JMERR14] Browser ruft eine nicht unterstützte HTTP Methode in ChunkServlet auf: %1$s
 JMERR15=[JMERR15] Unerwarteter Fehler beim Schreiben der Spielerdatei: %1$s
 JMERR16=[JMERR16] Unerwarteter Fehler beim Schreiben des Chunk-Abbildes: %1$s
-JMERR17=[JMERR17] Unerwarteter Fehler beim Holen des Icons f\u00FCr die InGame-Karte: %1$s
+JMERR17=[JMERR17] Unerwarteter Fehler beim Holen des Icons für die InGame-Karte: %1$s
 JMERR18=[JMERR18] Fehler beim Exportieren der Karte: %1$s
 JMERR19=[JMERR19] Fehler beim Lesen der property-Datei: %1$s
 JMERR20=[JMERR20] Fehler beim Schreiben der property-Datei: %1$s
@@ -40,10 +40,11 @@ JMERR24=[JMERR24] Webserver konnte nicht gestartet werden
 JourneyMap.chat_announcement=§eJourneyMap:§f %1$s
 
 # %1$s = Key to press ('J')
-JourneyMap.mapgui_only_ready=Dr\u00FCcke [%1$s]. (Webserver ist abgeschaltet)
+JourneyMap.mapgui_only_ready=Drücke [%1$s]. (Webserver ist abgeschaltet)
 
 # %1$s = JourneyMap version
-JourneyMap.new_version_available=Neue Version verf\u00FCgbar:\n%1$s
+JourneyMap.new_version_available=Neue Version verfügbar:
+%1$s
 
 # %1$s = JourneyMap version (§e is a color change)
 JourneyMap.ready=§e%1$s ist bereit.
@@ -51,10 +52,10 @@ JourneyMap.ready=§e%1$s ist bereit.
 JourneyMap.webserver_and_mapgui_disabled=JourneyMap ist in journeyMap.properties abgeschaltet
 
 # %1$s = Key to press ('J'), %2$s = website port number (8080) (§b and §f are color changes)
-JourneyMap.webserver_and_mapgui_ready=Dr\u00FCcke [§b%1$s§f] oder \u00F6ffne§b http://localhost%2$s §fim Browser
+JourneyMap.webserver_and_mapgui_ready=Drücke [§b%1$s§f] oder öffne§b http://localhost%2$s §fim Browser
 
 # %1$s = website port number (8080) (§b and §f are color changes)
-JourneyMap.webserver_only_ready=\u00D6ffne§b http://localhost%1$s §fim Browser. (InGame-Karte ist abgeschaltet)
+JourneyMap.webserver_only_ready=Öffne§b http://localhost%1$s §fim Browser. (InGame-Karte ist abgeschaltet)
 
 ########################
 # In-game Map messages
@@ -74,14 +75,14 @@ MapOverlay.off=Aus
 MapOverlay.follow=Folgen: %1$s
 
 # %1$s = x, %2$s = y, %3$s = z, %4$s = vertical slice, %5$s Biome name
-MapOverlay.player_location=Koordinaten: %1$s , %2$s | H\u00F6he: %3$s (%4$s) | Biom: %5$s
+MapOverlay.player_location=Koordinaten: %1$s , %2$s | Höhe: %3$s (%4$s) | Biom: %5$s
 MapOverlay.save_map=Karte speichern
 
 # %1$s = type of map
 MapOverlay.saving_map_to_file=Speichere Karte %1$s...
 
 # %1$s = "On" or "Off"
-MapOverlay.show_caves=Zeige H\u00F6hlen: %1$s
+MapOverlay.show_caves=Zeige Höhlen: %1$s
 
 # %1$s = "On" or "Off"
 MapOverlay.show_monsters=Zeige Monster: %1$s
@@ -104,7 +105,7 @@ MapOverlay.show_waypoints=Zeige Wegpunkte : %1$s
 # %1$s = "On" or "Off"
 MapOverlay.show_grid=Zeige Grid : %1$s
 
-MapOverlay.update_available=Neue Version verf\u00FCgbar!
+MapOverlay.update_available=Neue Version verfügbar!
 MapOverlay.update_check=Neue Version suchen
 MapOverlay.use_browser=Browser benutzen
 MapOverlay.zoom_in=rein
@@ -145,11 +146,11 @@ WebMap.donate_text=Spenden an JourneyMap
 WebMap.donate_title=Spenden per PayPal für die Weiterentwicklung von JourneyMap
 
 # Update button title (shown only when update available)
-WebMap.update_button_title=Neue Version verf\u00FCgbar: JourneyMap %1$s f\u00FCr Minecraft %2$s
+WebMap.update_button_title=Neue Version verfügbar: JourneyMap %1$s für Minecraft %2$s
 
 # Day/Night button
 WebMap.day_button_text=Tag
-WebMap.day_button_title=Die Welt, wie sie tags\u00FCber aussieht
+WebMap.day_button_title=Die Welt, wie sie tagsüber aussieht
 WebMap.night_button_text=Nacht
 WebMap.night_button_title=Die Welt, wie sie nachts aussieht
 
@@ -163,8 +164,8 @@ WebMap.show_menu_text=Zeige...
 WebMap.smooth_pixels_menu_item=Glatte Pixel
 
 # Show menu / Caves
-WebMap.caves_menu_item_text=H\u00F6hlen
-WebMap.caves_menu_item_title=H\u00F6hlen anzeigen, wenn Du Dich nicht draussen aufh\u00E4lst
+WebMap.caves_menu_item_text=Höhlen
+WebMap.caves_menu_item_title=Höhlen anzeigen, wenn Du Dich nicht draussen aufhälst
 
 # Show menu / Grid
 WebMap.grid_menu_item_text=Gitter
@@ -204,12 +205,12 @@ WebMap.zoom_slider_name=Zoom
 WebMap.worldname_text=Welt-Name:
 WebMap.worldtime_text=Welt-Zeit:
 WebMap.location_text=Koordinaten:
-WebMap.elevation_text=H\u00F6he:
+WebMap.elevation_text=Höhe:
 WebMap.slice_text=Vertikaler Schnitt:
 WebMap.biome_text=Biom:
 
 # Error message if world isn't open in Minecraft
-WebMap.error_world_not_opened=Es ist keine Minecraft Welt ge\u00F6ffnet
+WebMap.error_world_not_opened=Es ist keine Minecraft Welt geöffnet
 
 # 3.3.0 - Need to be translated
 JourneyMap.file_updates=Files are being updated (%1$s). Mapping suspended.
