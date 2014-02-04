@@ -25,14 +25,14 @@ public class ChatLog {
     }
 
     /**
-     * Announce webserver status with link.
+     * Announce URL with link.
      * @param pos
      * @param message
-     * @param portStr
+     * @param url
      */
-    public static void announceWebserver(int pos, String message, String portStr) {
+    public static void announceURL(int pos, String message, String url) {
         ChatComponentText chatcomponenttext = new ChatComponentText(message);
-        chatcomponenttext.func_150256_b().func_150241_a(new ClickEvent(ClickEvent.Action.OPEN_URL, "http://localhost" + portStr));
+        chatcomponenttext.func_150256_b().func_150241_a(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
         announcements.add(pos, chatcomponenttext);
         JourneyMap.getLogger().info(message);
     }
@@ -71,7 +71,8 @@ public class ChatLog {
      * @param message
      */
     public static void announceText(String message, int pos, Level logLevel) {
-        announcements.add(pos, new ChatComponentText(message));
+        String chat = Constants.getString("JourneyMap.chat_announcement", message);
+        announcements.add(pos, new ChatComponentText(chat));
         JourneyMap.getLogger().log(logLevel, message.toString());
     }
 

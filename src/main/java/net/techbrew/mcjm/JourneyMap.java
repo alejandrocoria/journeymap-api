@@ -178,9 +178,10 @@ public class JourneyMap {
             toggleWebserver(pm.getBoolean(PropertyManager.Key.WEBSERVER_ENABLED), false);
 
             // Check for newer version online
-            if(VersionCheck.getVersionIsCurrent()==false) {
-                ChatLog.announceI18N("JourneyMap.new_version_available", WEBSITE_URL); //$NON-NLS-1$
-            }
+            //if(VersionCheck.getVersionIsCurrent()==false) {
+            ChatLog.announceI18N(ChatLog.pending(), Constants.getString("JourneyMap.new_version_available", "")); //$NON-NLS-1$
+            ChatLog.announceURL(ChatLog.pending(), WEBSITE_URL, WEBSITE_URL);
+           // }
 
             initialized = true;
 
@@ -426,11 +427,11 @@ public class JourneyMap {
 				String keyName = Keyboard.getKeyName(uiKeybinding.func_151463_i()); // Should be KeyCode
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
                 String message = Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
-                ChatLog.announceWebserver(pos + 1, message, port); //$NON-NLS-1$
+                ChatLog.announceURL(pos + 1, message, "http://localhost" + port); //$NON-NLS-1$
 			} else if(enableWebserver) {
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
                 String message = Constants.getString("JourneyMap.webserver_only_ready", port); //$NON-NLS-1$
-                ChatLog.announceWebserver(pos + 1, message, port); //$NON-NLS-1$
+                ChatLog.announceURL(pos + 1, message, "http://localhost" + port); //$NON-NLS-1$
 			} else if(enableMapGui) {
 				String keyName = Keyboard.getKeyName(uiKeybinding.func_151463_i()); // Should be KeyCode
                 ChatLog.announceI18N(pos + 1, "JourneyMap.mapgui_only_ready", keyName); //$NON-NLS-1$
