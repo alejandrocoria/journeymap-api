@@ -44,7 +44,7 @@ public class ChatLog {
      */
     public static void announceI18N(String key, Object... parms) {
         String text = Constants.getString(key, parms);
-        announceText(text, announcements.size() - 1, Level.INFO);
+        announceText(text, Math.max(0,announcements.size() - 1), Level.INFO);
     }
 
     /**
@@ -63,7 +63,7 @@ public class ChatLog {
      * @param message
      */
     public static void announceError(String message) {
-        announceText(message, announcements.size()-1, Level.SEVERE);
+        announceText(message, Math.max(0,announcements.size()-1), Level.SEVERE);
     }
 
     /**
