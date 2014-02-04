@@ -136,7 +136,6 @@ var JourneyMap = (function() {
 				contentType : "application/javascript; charset=utf-8",
 				async : false
 			}).fail(handleError).done(function(data, textStatus, jqXHR) {
-
 				JM.messages = data;
 				initGame();
 			});
@@ -544,8 +543,8 @@ var JourneyMap = (function() {
 		if (JM.game.latest_journeymap_version > JM.game.jm_version) {		
 			window.setTimeout(function(){
 				var text = getMessage('update_button_title');
-				text = text.replace("{0}", JM.game.latest_journeymap_version);
-				text = text.replace("{1}", JM.game.mc_version);
+				text = text.replace("%1$s", JM.game.latest_journeymap_version);
+				text = text.replace("%2$s", JM.game.mc_version);
 				var onClickFn = function(e){
 					var url = $('#webLink')[0].href;
 					window.open(url, '_new', '');
