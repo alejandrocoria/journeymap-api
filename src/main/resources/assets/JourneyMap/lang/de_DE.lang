@@ -43,8 +43,7 @@ JourneyMap.chat_announcement=§eJourneyMap:§f %1$s
 JourneyMap.mapgui_only_ready=Drücke [%1$s]. (Webserver ist abgeschaltet)
 
 # %1$s = JourneyMap version
-JourneyMap.new_version_available=Neue Version verfügbar:
-%1$s
+JourneyMap.new_version_available=Neue Version verfügbar: %1$s
 
 # %1$s = JourneyMap version (§e is a color change)
 JourneyMap.ready=§e%1$s ist bereit.
