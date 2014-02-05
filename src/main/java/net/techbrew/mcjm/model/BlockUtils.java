@@ -21,7 +21,7 @@ public class BlockUtils {
 	public static AlphaComposite SLIGHTLYCLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F);
 	public static Color COLOR_TRANSPARENT = new Color(0,0,0,0);
 
-    public enum Flag {HasAir, BiomeColor, CustomBiomeColor, NotHideSky, NotCeiling, NoShadow, Side2Texture}
+    public enum Flag {HasAir, BiomeColor, CustomBiomeColor, NotHideSky, NotCeiling, NoShadow, Side2Texture, Transparency}
 
     private final static HashMap<GameRegistry.UniqueIdentifier, EnumSet<Flag>> blockFlags = new HashMap<GameRegistry.UniqueIdentifier, EnumSet<Flag>>(64);
     private final static HashMap<GameRegistry.UniqueIdentifier, Float> blockAlphas = new HashMap<GameRegistry.UniqueIdentifier, Float>(8);

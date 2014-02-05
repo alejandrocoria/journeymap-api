@@ -215,6 +215,11 @@ public class BlockMD implements Serializable {
 
 	public void setAlpha(float alpha) {
 		this.alpha = alpha;
+        if(alpha<1f) {
+            this.flags.add(BlockUtils.Flag.Transparency);
+        } else {
+            this.flags.remove(BlockUtils.Flag.Transparency);
+        }
 	}
 
     public float getAlpha() {
