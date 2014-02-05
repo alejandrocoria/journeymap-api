@@ -12,6 +12,7 @@ import net.techbrew.mcjm.model.ChunkMD;
 import net.techbrew.mcjm.model.RGB;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
@@ -19,7 +20,7 @@ import java.util.logging.Level;
 
 public class ChunkStandardRenderer extends BaseRenderer implements IChunkRenderer {
 
-	static final int alphaDepth = 7;
+	static final int alphaDepth = 5;
 
 	/**
 	 * Render blocks in the chunk for the standard world.
@@ -112,8 +113,8 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					continue blockLoop;
 				}
 
-				// Paint deeper blocks if alpha used, but not if just for underground layer
-				boolean useAlpha = blockMD.getAlpha() < 1F;
+				// Paint deeper blocks if alpha used, but not if this pass is just for underground layer
+				boolean useAlpha = blockMD.hasFlag(BlockUtils.Flag.Transparency);
 				if (!forUndergroundLayer && useAlpha) {
 
 					color = renderSurfaceAlpha(g2D, chunkMd, blockMD, neighbors, x, y, z);
@@ -484,12 +485,18 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		g2D.setPaint(color.toColor());
 		g2D.fillRect(x, z, 1, 1);
 
+        //if(color!=null) return;
+
 		// If bottom block is same as the top, don't bother with transparency
 		if(stack.peek().getBlock()!= blockMD.getBlock()) {
 			stack.pop(); // already used it
+
+            ArrayList<RGB> colors = new ArrayList<RGB>();
+            colors.add(color);
+
 			while(!stack.isEmpty()) {
 				BlockMD lowerBlock = stack.pop();
-				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, lowerBlock.getAlpha()));
+				//g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, lowerBlock.getAlpha()));
 				color = lowerBlock.getColor(chunkMd, x, down, z);
 
 				if(useLighting) {
@@ -504,12 +511,14 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					float factor = .7f;
 					color.darken(factor);
 				}
-				
-				g2D.setPaint(color.toColor());
-				g2D.fillRect(x, z, 1, 1);
-			}	
-			
-		} 
+
+                colors.add(color);
+			}
+
+            g2D.setComposite(BlockUtils.OPAQUE);
+            g2D.setPaint(RGB.average(colors).toColor());
+            g2D.fillRect(x, z, 1, 1);
+		}
 	}
 
 	public int getHeightInSlice(final ChunkMD chunkMd, final int x, final int z, final int sliceMinY, final int sliceMaxY) {
