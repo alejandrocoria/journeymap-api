@@ -125,9 +125,11 @@ public class ChunkRenderController {
 		if(blankChunkImage==null) {
 			blankChunkImage = new BufferedImage(32, 16, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2D = blankChunkImage.createGraphics();
-			g2D.setComposite(BlockUtils.CLEAR);
+			g2D.setComposite(BlockUtils.SLIGHTLYCLEAR);
 			g2D.setColor(Color.white);
-			g2D.fillRect(0, 0, 32, 16);
+			g2D.fillRect(0, 0, 16, 16);
+            g2D.setColor(Color.black);
+            g2D.fillRect(16, 0, 16, 16);
 			g2D.dispose();
 		}
 		return blankChunkImage;
