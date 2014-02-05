@@ -7,6 +7,7 @@ import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.data.WorldData;
 import net.techbrew.mcjm.log.ChatLog;
 import net.techbrew.mcjm.log.LogFormatter;
+import net.techbrew.mcjm.log.StatTimer;
 import net.techbrew.mcjm.model.RegionCoord;
 import net.techbrew.mcjm.model.RegionImageCache;
 
@@ -35,7 +36,6 @@ public class MapSaver {
 	final Constants.MapType mapType;
 	final Integer vSlice;
 	final int dimension;
-	long estimatedBytes;
 	int outputColumns;
 	int outputRows;
 	ArrayList<File> files;
@@ -54,7 +54,9 @@ public class MapSaver {
 	 * Use pngj to assemble region files.
 	 */
 	public File saveMap() {
-		
+
+        StatTimer timer = StatTimer.get("MapSaver.saveMap");
+
 		try {					
 					
 			if(!isValid()) {
@@ -64,29 +66,31 @@ public class MapSaver {
 			
 			// Ensure latest regions are flushed to disk
 			RegionImageCache.getInstance().flushToDisk();
-			
-			long start = 0, stop = 0;
-			start = System.currentTimeMillis();
-			
+
+            timer.start();
+
 	        // Merge image files
 			File[] fileArray = files.toArray(new File[files.size()]);			
 			PngjHelper.mergeFiles(fileArray, saveFile, outputColumns, 512);
 			
-			stop = System.currentTimeMillis();
-			
-			JourneyMap.getLogger().info("Map saved in: " + (stop-start) + "ms: " + saveFile + ". Estimated/actual filesize:" + estimatedBytes + " / " + saveFile.length()); //$NON-NLS-1$ //$NON-NLS-2$
-			ChatLog.announceI18N("MapSaver.map_saved", saveFile); //$NON-NLS-1$
-			FileHandler.open(saveFile);
+			timer.stop();
+			JourneyMap.getLogger().info("Map filesize:" + saveFile.length()); //$NON-NLS-1$ //$NON-NLS-2$
+
+            String message = Constants.getString("MapSaver.map_saved", saveFile);
+            ChatLog.announceFile(message, saveFile);
+			//FileHandler.open(saveFile);
 		
 		} catch (java.lang.OutOfMemoryError e) {
 			String error = Constants.getMessageJMERR18("Out Of Memory: Increase Java Heap Size for Minecraft to save large maps.");
 			JourneyMap.getLogger().severe(error);
 			ChatLog.announceError(error);
+            timer.cancel();
 		} catch (Throwable t) {	
 			String error = Constants.getMessageJMERR18(t.getMessage());
 			JourneyMap.getLogger().severe(error);
 			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
 			ChatLog.announceError(error);
+            timer.cancel();
 			return null;
 		}
 		

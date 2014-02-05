@@ -178,10 +178,10 @@ public class JourneyMap {
             toggleWebserver(pm.getBoolean(PropertyManager.Key.WEBSERVER_ENABLED), false);
 
             // Check for newer version online
-            //if(VersionCheck.getVersionIsCurrent()==false) {
-            ChatLog.announceI18N(ChatLog.pending(), Constants.getString("JourneyMap.new_version_available", "")); //$NON-NLS-1$
-            ChatLog.announceURL(ChatLog.pending(), WEBSITE_URL, WEBSITE_URL);
-           // }
+            if(VersionCheck.getVersionIsCurrent()==false) {
+                ChatLog.announceI18N(Constants.getString("JourneyMap.new_version_available", "")); //$NON-NLS-1$
+                ChatLog.announceURL(WEBSITE_URL, WEBSITE_URL);
+            }
 
             initialized = true;
 
@@ -418,27 +418,24 @@ public class JourneyMap {
 	
 	private void announceMod(boolean forced) {
 
-		Minecraft minecraft = Minecraft.getMinecraft();	
-		int pos = forced ? Math.max(0,ChatLog.pending()-1) : 0;
-
 		if(enableAnnounceMod) {
-            ChatLog.announceI18N(pos, "JourneyMap.ready", MOD_NAME); //$NON-NLS-1$
+            ChatLog.announceI18N("JourneyMap.ready", MOD_NAME); //$NON-NLS-1$
 			if(enableWebserver && enableMapGui) {
 				String keyName = Keyboard.getKeyName(uiKeybinding.func_151463_i()); // Should be KeyCode
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
                 String message = Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
-                ChatLog.announceURL(pos + 1, message, "http://localhost" + port); //$NON-NLS-1$
+                ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
 			} else if(enableWebserver) {
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
                 String message = Constants.getString("JourneyMap.webserver_only_ready", port); //$NON-NLS-1$
-                ChatLog.announceURL(pos + 1, message, "http://localhost" + port); //$NON-NLS-1$
+                ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
 			} else if(enableMapGui) {
 				String keyName = Keyboard.getKeyName(uiKeybinding.func_151463_i()); // Should be KeyCode
-                ChatLog.announceI18N(pos + 1, "JourneyMap.mapgui_only_ready", keyName); //$NON-NLS-1$
+                ChatLog.announceI18N("JourneyMap.mapgui_only_ready", keyName); //$NON-NLS-1$
 			} else {
-                ChatLog.announceI18N(pos + 1, "JourneyMap.webserver_and_mapgui_disabled"); //$NON-NLS-1$
+                ChatLog.announceI18N("JourneyMap.webserver_and_mapgui_disabled"); //$NON-NLS-1$
 			}
-			enableAnnounceMod = false; // Only announce mod once per runtime
+			enableAnnounceMod = false; // Only queueAnnouncement mod once per runtime
 		}
 	}
 
