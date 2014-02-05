@@ -2,7 +2,7 @@
 # Updated for 3.3.0
 
 ########################
-# Error messages:  Note, translating these are optional, but they may help users diagnose the problem on their own.
+# Error messages: Note, translating these are optional, but they may help users diagnose the problem on their own.
 ########################
 
 JMERR00=[JMERR00] JourneyMap encountered an unexpected error: %1$s
@@ -26,8 +26,8 @@ JMERR17=[JMERR17] Unexpected error getting entity icon for in-game map: %1$s
 JMERR18=[JMERR18] Error exporting world map: %1$s
 JMERR19=[JMERR19] Error reading property file: %1$s
 JMERR20=[JMERR20] Error writing property file: %1$s
-JMERR21=[JMERR21] Error reading region file: %1$s.  Error: %2$s
-JMERR22=[JMERR22] Error writing region file: %1$s.  Error: %2$s
+JMERR21=[JMERR21] Error reading region file: %1$s. Error: %2$s
+JMERR22=[JMERR22] Error writing region file: %1$s. Error: %2$s
 JMERR23=[JMERR23] Map UI error: %1$s
 JMERR24=[JMERR24] Failed to start webserver
 
@@ -40,7 +40,7 @@ JMERR24=[JMERR24] Failed to start webserver
 JourneyMap.chat_announcement=§eJourneyMap:§f %1$s
 
 # %1$s = Key to press ('J')
-JourneyMap.mapgui_only_ready=Press [§b%1$s§f].  (Webserver disabled.)
+JourneyMap.mapgui_only_ready=Press [§b%1$s§f]. (Webserver disabled.)
 
 # %1$s = JourneyMap version
 JourneyMap.new_version_available=Newer version available: %1$s
@@ -58,7 +58,7 @@ JourneyMap.webserver_only_ready=Open browser to§b http://localhost%1$s §f. (In
 
 # Added in 3.0.0
 JourneyMap.file_updates=Files are being updated (%1$s). Mapping suspended.
-JourneyMap.file_updates_complete=File updates complete.  Mapping resumed.
+JourneyMap.file_updates_complete=File updates complete. Mapping resumed.
 
 ########################
 # In-game Map messages
@@ -97,7 +97,7 @@ MapOverlay.save_map=Save Map
 # OBSOLETE in 3.0.0
 MapOverlay.saving_map_to_file=Saving %1$s map to file...
 
-# Added in 3.0.0.  %1$s=filename
+# Added in 3.0.0. %1$s=filename
 MapOverlay.save_filename=Saving map to screenshots: %1$s
 
 # %1$s = "On" or "Off"
@@ -127,7 +127,7 @@ MapOverlay.show_grid=Show Grid : %1$s
 # Added in 3.1.x.
 MapOverlay.minimap=MiniMap...
 
-# Added in 3.0.0.  %1$s = "On" or "Off"
+# Added in 3.0.0. %1$s = "On" or "Off"
 MapOverlay.enable_webserver=Webserver: %1$s
 
 # Added in 3.0.0
@@ -175,7 +175,7 @@ MiniMap.options=MiniMap Options
 # Added in 3.1.x: %1$s = "On" or "Off"
 MiniMap.enable_minimap=MiniMap: %1$s
 
-# Added in 3.1.x.  %1$s One of "Top Left", "Top Right", "Bottom Left", "Bottom Right"
+# Added in 3.1.x. %1$s One of "Top Left", "Top Right", "Bottom Left", "Bottom Right"
 MiniMap.position=Position: %1$s
 
 # Added in 3.1.x.
@@ -190,7 +190,7 @@ MiniMap.position_bottomleft=Bottom Left
 # Added in 3.1.x.
 MiniMap.position_bottomright=Bottom Right
 
-# Added in 3.1.x.  %1$s = One of "Small Square", "Large Square", "Small Circle", "Large Circle"
+# Added in 3.1.x. %1$s = One of "Small Square", "Large Square", "Small Circle", "Large Circle"
 MiniMap.shape=Shape: %1$s
 
 # Added in 3.1.x.
@@ -205,15 +205,15 @@ MiniMap.shape_smallcircle=Small Circle
 # Added in 3.1.x.
 MiniMap.shape_largecircle=Large Circle
 
-# Added in 3.1.x.  %1$s = one of "Small", "Large"
-MiniMap.font=Font\: %1$s
+# Added in 3.1.x. %1$s = one of "Small", "Large"
+MiniMap.font=Font: %1$s
 MiniMap.font_small=Small
 MiniMap.font_large=Large
 
-# Added in 3.3.x.  %1$s = one of "On", "Off".  Hot Keys are keyboard shortcuts that can control the minimap.
+# Added in 3.3.x. %1$s = one of "On", "Off". Hot Keys are keyboard shortcuts that can control the minimap.
 MiniMap.hotkeys=Hot Keys: %1$s
 
-# Added in 3.3.x.  (§b and §f are color changes)
+# Added in 3.3.x. (§b and §f are color changes)
 MiniMap.hotkeys_help=Hot Keys...
 MiniMap.hotkeys_help_title=Minimap Hot Keys
 MiniMap.hotkeys_help_toggle=Toggle Minimap on and off:
@@ -223,7 +223,7 @@ MiniMap.hotkeys_help_zoom_key=§bCTRL +§f , §bCTRL -§f
 MiniMap.hotkeys_help_maptype=Change map to Day, Night:
 MiniMap.hotkeys_help_maptype_key=§bCTRL [§f , §bCTRL ]§f
 
-# Added in 3.1.x.  %1$s = one of "On", "Off".  FPS is short for "Frames per Second", a measurement of graphic performance.
+# Added in 3.1.x. %1$s = one of "On", "Off". FPS is short for "Frames per Second", a measurement of graphic performance.
 MiniMap.show_fps=Show FPS: %1$s
 
 # Added in 3.1.x.
@@ -232,10 +232,10 @@ MiniMap.return_to_game=Return to Game
 # %1$s = filename
 MapSaver.map_saved=Map saved: %1$s
 
-# Added in 3.1.0.  Unlimited means there are no feature restrictions
+# Added in 3.1.0. Unlimited means there are no feature restrictions
 Feature.unlimited=Unlimited
 
-# Added in 3.1.0.  "Fair play" means multiplayer features used for cheating are disabled
+# Added in 3.1.0. "Fair play" means multiplayer features used for cheating are disabled
 Feature.fair_play=FairPlay
 
 ########################
@@ -342,7 +342,7 @@ WebMap.save_button_text=Save Map
 # Save Map button
 WebMap.save_button_title=Save the explored map to file
 
-# Added in 3.0.0.  %1$s = filename
+# Added in 3.0.0. %1$s = filename
 WebMap.save_filename=Saving map to screenshots: %1$s
 
 # Added in 3.0.0: Actions button 

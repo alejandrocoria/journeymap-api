@@ -2,7 +2,7 @@
 # Updated for 3.3.0
 
 ########################
-# Error messages:  Note, translating these are optional, but they may help users diagnose the problem on their own.
+# Error messages: Note, translating these are optional, but they may help users diagnose the problem on their own.
 ########################
 
 JMERR00=[JMERR00] JourneyMap ha riscontrato un errore inaspettato: %1$s
@@ -26,8 +26,8 @@ JMERR17=[JMERR17] Unexpected error getting entity icon for in-game map: %1$s
 JMERR18=[JMERR18] Errore durante l'esportazione della mappa del mondo: %1$s
 JMERR19=[JMERR19] Errore durante la lettura del file delle proprietÃ : %1$s
 JMERR20=[JMERR20] Errore durante la scrittura del file delle proprietÃ : %1$s
-JMERR21=[JMERR21] Errore durante la lettura del file delle regioni: %1$s.  Error: %2$s
-JMERR22=[JMERR22] Errore durante la scrittura del file delle regioni: %1$s.  Error: %2$s
+JMERR21=[JMERR21] Errore durante la lettura del file delle regioni: %1$s. Error: %2$s
+JMERR22=[JMERR22] Errore durante la scrittura del file delle regioni: %1$s. Error: %2$s
 JMERR23=[JMERR23] Errore UI mappa: %1$s
 JMERR24=[JMERR24] Fallito l'avvio del webserver
 
@@ -40,7 +40,7 @@ JMERR24=[JMERR24] Fallito l'avvio del webserver
 JourneyMap.chat_announcement=§eJourneyMap:§f %1$s
 
 # %1$s = Key to press ('J')
-JourneyMap.mapgui_only_ready=Premi [§b%1$s§f].  (Webserver disabilitato)
+JourneyMap.mapgui_only_ready=Premi [§b%1$s§f]. (Webserver disabilitato)
 
 # %1$s = JourneyMap version
 JourneyMap.new_version_available=Nuova versione disponibile: %1$s
@@ -213,14 +213,14 @@ WebMap.error_world_not_opened=Mondo non aperto
 
 # 3.3.0 - Need to be translated
 JourneyMap.file_updates=Files are being updated (%1$s). Mapping suspended.
-JourneyMap.file_updates_complete=File updates complete.  Mapping resumed.
+JourneyMap.file_updates_complete=File updates complete. Mapping resumed.
 MapOverlay.disabled_feature=Feature not available
 MapOverlay.actions=MapOverlay.actions
 MapOverlay.player_location_minimap=%1$s, %2$s | %3$s (%4$s) | %5$s
 MapOverlay.player_location_minimap_nobiome=%1$s, %2$s | %3$s (%4$s)
 MapOverlay.save_filename=MapOverlay.save_filename
 MapOverlay.minimap=MiniMap...
-MapOverlay.enable_webserver=Webserver\: %1$s
+MapOverlay.enable_webserver=Webserver: %1$s
 MapOverlay.automap_title=Auto-Map...
 MapOverlay.automap_text=Automatically map regions (single-player
 MapOverlay.automap_dialog=Auto-Map
@@ -233,30 +233,30 @@ MapOverlay.automap_status_underground=Auto-mapping slice %1$s (%2$s).
 MapOverlay.automap_complete=Auto-mapping of surface has stopped.
 MapOverlay.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
 MiniMap.options=MiniMap Options
-MiniMap.enable_minimap=MiniMap\: %1$s
-MiniMap.position=Position\: %1$s
+MiniMap.enable_minimap=MiniMap: %1$s
+MiniMap.position=Position: %1$s
 MiniMap.position_topleft=Top Left
 MiniMap.position_topright=Top Right
 MiniMap.position_bottomleft=Bottom Left
 MiniMap.position_bottomright=Bottom Right
-MiniMap.shape=Shape\: %1$s
+MiniMap.shape=Shape: %1$s
 MiniMap.shape_smallsquare=Small Square
 MiniMap.shape_largesquare=Large Square
 MiniMap.shape_smallcircle=Small Circle
 MiniMap.shape_largecircle=Large Circle
-MiniMap.font=Font\: %1$s
+MiniMap.font=Font: %1$s
 MiniMap.font_small=Small
 MiniMap.font_large=Large
-MiniMap.hotkeys=Hot Keys\: %1$s
+MiniMap.hotkeys=Hot Keys: %1$s
 MiniMap.hotkeys_help=Hot Keys...
 MiniMap.hotkeys_help_title=Minimap Hot Keys
-MiniMap.hotkeys_help_toggle=Toggle Minimap on and off\:
+MiniMap.hotkeys_help_toggle=Toggle Minimap on and off:
 MiniMap.hotkeys_help_toggle_key=§bCTRL J§f
-MiniMap.hotkeys_help_zoom=Zoom Minimap In, Out\:
+MiniMap.hotkeys_help_zoom=Zoom Minimap In, Out:
 MiniMap.hotkeys_help_zoom_key=§bCTRL +§f , §bCTRL -§f
-MiniMap.hotkeys_help_maptype=Change map to Day, Night\:
+MiniMap.hotkeys_help_maptype=Change map to Day, Night:
 MiniMap.hotkeys_help_maptype_key=§bCTRL [§f , §bCTRL ]§f
-MiniMap.show_fps=Show FPS\: %1$s
+MiniMap.show_fps=Show FPS: %1$s
 MiniMap.return_to_game=Return to Game
 Feature.unlimited=Unlimited
 Feature.fair_play=FairPlay
@@ -272,5 +272,5 @@ WebMap.automap_started=Auto-mapping started. Check game chat for progress.
 WebMap.automap_complete=Auto-mapping has stopped.
 WebMap.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
 WebMap.save_button_text=Save Map
-WebMap.save_filename=Saving map to screenshots\: %1$s
+WebMap.save_filename=Saving map to screenshots: %1$s
 WebMap.actions_title=Actions...

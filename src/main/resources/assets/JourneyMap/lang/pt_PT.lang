@@ -1,0 +1,363 @@
+# JourneyMap Resource Bundle - pt_PT
+# Updated for 3.3.0
+
+########################
+# Error messages: Note, translating these are optional, but they may help users diagnose the problem on their own.
+########################
+
+JMERR00=[JMERR00] JourneyMap Encontrou um erro inexperado: %1$s
+JMERR01=[JMERR01] JourneyMap %1$s requer %2$s
+JMERR02=[JMERR02] JourneyMap ainda nao esta disponivel para o mundo
+JMERR03=[JMERR03] JMServer nao conseguiu iniciar o webserver
+JMERR04=[JMERR04] FileHandler nao conseguiu escrever para o ficheiro: %1$s
+JMERR05=[JMERR05] Web Browser enviou um pedido mal formado: %1$s
+JMERR06=[JMERR06] ChunkServlet nao conseguiu ler a data do directorio do mundo: %1$s
+JMERR07=[JMERR07] Nao conseguiu encontrar o bloco no chunk: %1$s
+JMERR08=[JMERR08] Nao conseguiu escrever a imagem do chunk para o ficheiro: %1$s
+JMERR09=[JMERR09] O jogador nao esta conectado em nenhum mundo
+JMERR10=[JMERR10] O jogador nao esta conectado no mundo: %1$s
+JMERR11=[JMERR11] Nao conseguiu ler o ficheiro do perfil do jogador
+JMERR12=[JMERR12] Nao conseguiu o ficheiro serve web: %1$s
+JMERR13=[JMERR13] O Browser pediu um ficheiro desconhecido: %1$s
+JMERR14=[JMERR14] O Browser tentou um metodo HTTP nao suportado: %1$s
+JMERR15=[JMERR15] Erro inexperado ao escrever o ficheiro do jogador: %1$s
+JMERR16=[JMERR16] Erro inexperado ao escrever os ficheiros da imagem do chunk: %1$s
+JMERR17=[JMERR17] Erro inexperado ao conseguir o icon da entidade para o mapa dentro do jogo: %1$s
+JMERR18=[JMERR18] Erro ao exportar o mapa do mundo: %1$s
+JMERR19=[JMERR19] Erro ao ler a propriedade do ficheiro: %1$s
+JMERR20=[JMERR20] Erro ao escrever a propriedade do ficheiro: %1$s
+JMERR21=[JMERR21] Erro ao ler o ficheiro da regiao: %1$s. Erro: %2$s
+JMERR22=[JMERR22] Erro ao escrever o ficheiro da regiao: %1$s. Erro: %2$s
+JMERR23=[JMERR23] Erro do UI do mapa: %1$s
+JMERR24=[JMERR24] Falha ao iniciar o webserver
+
+########################
+# In-game chat messages
+# Note: Do not translate or alter chat color changes (§b, §e, §f, etc.)
+########################
+
+# %1$s = JourneyMap version(§e and §f are color changes)
+JourneyMap.chat_announcement=§eJourneyMap:§f %1$s
+
+# %1$s = Key to press ('J')
+JourneyMap.mapgui_only_ready=Pressiona [§b%1$s§f]. (Webserver desactivado.)
+
+# %1$s = JourneyMap version
+JourneyMap.new_version_available=Nova versao disponivel: n%1$s
+
+# %1$s = JourneyMap version (§e is a color change)
+JourneyMap.ready=§e%1$s pronto.
+
+JourneyMap.webserver_and_mapgui_disabled=JourneyMap esta desactivado por journeyMap.properties file
+
+# %1$s = Key to press ('J'), %2$s = website port number (8080) (§b and §f are color changes)
+JourneyMap.webserver_and_mapgui_ready=Pressiona [§b%1$s§f] ou abre o browser para§b http://localhost%2$s §f
+
+# %1$s = website port number (8080) (§b and §f are color changes)
+JourneyMap.webserver_only_ready=Abre o browser para§b http://localhost%1$s §f. (Mapa do jogo desactivado)
+
+# Added in 3.0.0
+JourneyMap.file_updates=Os ficheiros estao a ser actualizados (%1$s). Mapeacao suspensa.
+JourneyMap.file_updates_complete=Actualizacao dos ficheiros completa. Mapeacao continuada.
+
+########################
+# In-game Map messages
+########################
+
+# %1$s = JourneyMap version
+MapOverlay.options=Opcoes
+MapOverlay.close=Fechar
+
+# Added in 3.1.0:
+MapOverlay.disabled_feature= Esta caracteristica nao esta disponivel
+
+MapOverlay.day=Dia
+MapOverlay.night=Noite
+
+MapOverlay.on=Ligado
+MapOverlay.off=Desligado
+
+# Adicionado no 3.0.0: Actions button
+MapOverlay.actions=Accoes
+
+# %1$s = "On" or "Off"
+MapOverlay.follow=Seguir: %1$s
+
+# %1$s = x, %2$s = y, %3$s = z, %4$s = Vertical slice, %5$s Biome name
+MapOverlay.player_location=Localizacao: %1$s , %2$s | Elevacao: %3$s (%4$s) | Bioma: %5$s
+
+# Added in 3.1.0. %1$s = x, %2$s = y, %3$s = z, %4$s = Vertical slice, %5$s Biome name
+MapOverlay.player_location_minimap=%1$s, %2$s | %3$s (%4$s) | %5$s
+
+# Added in 3.1.0. %1$s = x, %2$s = y, %3$s = z, %4$s = Vertical slice
+MapOverlay.player_location_minimap_nobiome=%1$s, %2$s | %3$s (%4$s)
+
+MapOverlay.save_map=A gravar o mapa 	
+
+# Retirado no 3.0.0
+MapOverlay.saving_map_to_file=A gravar o %1$s mapa para o ficheiro...
+
+# Adicionado no 3.0.0. %1$s=filename
+MapOverlay.save_filename=A gravar o mapa para as screenshots: %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_caves=Mostrar Caves: %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_monsters=Mostrar Monstros: %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_animals=Mostrar Animals : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_villagers=Mostrar Villagers : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_pets=Mostrar Animais de Estimacao : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_players=Mostrar Jogadores : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_waypoints=Mostrar Waypoints : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_grid=Mostrar Grelha : %1$s
+
+# Added in 3.1.x.
+MapOverlay.minimap=Mini-Mapa...
+
+# Added in 3.0.0. %1$s = "On" or "Off"
+MapOverlay.enable_webserver=Webserver: %1$s
+
+# Added in 3.0.0
+MapOverlay.automap_title=Auto-Mapeamento...
+
+# Added in 3.0.0
+MapOverlay.automap_text= Mapear as regioes automaticamente (single-player)
+
+# Added in 3.0.0
+MapOverlay.automap_dialog=Auto-Mapeamento
+
+# Added in 3.0.0
+MapOverlay.automap_dialog_text=Mapear todas as regioes ou so as regioes em falta automaticamente?
+
+# Added in 3.0.0
+MapOverlay.automap_dialog_all=Tudo
+
+# Added in 3.0.0
+MapOverlay.automap_dialog_missing= Desaparecido
+
+# Added in 3.0.0
+MapOverlay.automap_dialog_none=Nenhum
+
+# Added in 3.0.0: %1$s = Percent complete
+MapOverlay.automap_status=Auto-mapeamento da superficie(%1$s).
+
+# Added in 3.0.0: %1$s = Vertical slice number, %2$s = Percent complete
+MapOverlay.automap_status_underground=Auto-mapeamento do corte %1$s (%2$s).
+
+# Added in 3.0.0
+MapOverlay.automap_complete=Auto-mapeamento da superficie parou.
+
+# Added in 3.0.0: %1$s = Vertical slice number,
+MapOverlay.automap_complete_underground=Auto-mapeamento do corte %1$s parou.
+
+MapOverlay.update_available=Actualizacao disponivel!
+MapOverlay.update_check=Verificar se existem actualizacoes
+MapOverlay.use_browser=Usar o Browser
+MapOverlay.zoom_in=Aumentar o zoom
+MapOverlay.zoom_out=Diminuir o zoom
+
+# Added in 3.1.x:
+MiniMap.options=Opcoes do mini-mapa
+
+# Added in 3.1.x: %1$s = "On" or "Off"
+MiniMap.enable_minimap=Mini-Mapa: %1$s
+
+# Added in 3.1.x. %1$s One of "Top Left", "Top Right", "Bottom Left", "Bottom Right"
+MiniMap.position=Posicao: %1$s
+
+# Added in 3.1.x.
+MiniMap.position_topleft=Superior Esquerdo
+
+# Added in 3.1.x.
+MiniMap.position_topright=Superior Direiro
+
+# Added in 3.1.x.
+MiniMap.position_bottomleft=Inferior Esquerdo
+
+# Added in 3.1.x.
+MiniMap.position_bottomright=Inferior Direito
+
+# Added in 3.1.x. %1$s = One of "Small Square", "Large Square", "Small Circle", "Large Circle"
+MiniMap.shape=Shape: %1$s
+
+# Added in 3.1.x.
+MiniMap.shape_smallsquare=Pequeno Quadrado
+
+# Added in 3.1.x.
+MiniMap.shape_largesquare=Grande Quadrado
+
+# Added in 3.1.x.
+MiniMap.shape_smallcircle=Pequeno Circulo
+
+# Added in 3.1.x.
+MiniMap.shape_largecircle=Grande Circulo
+
+# Added in 3.1.x. %1$s = one of "Small", "Large"
+MiniMap.font=Font: %1$s
+MiniMap.font_small=Pequeno
+MiniMap.font_large=Grande
+
+# Added in 3.3.x. %1$s = one of "On", "Off". Hot Keys are keyboard shortcuts that can control the minimap.
+MiniMap.hotkeys=Teclas definidas: %1$s
+
+# Added in 3.3.x. (§b and §f are color changes)
+MiniMap.hotkeys_help=Teclas definidas...
+MiniMap.hotkeys_help_title=Teclas definidas do mini-mapa
+MiniMap.hotkeys_help_toggle=Alternar o Mini-mapa Ligado e Desligado:
+MiniMap.hotkeys_help_toggle_key=§bCTRL J§f
+MiniMap.hotkeys_help_zoom=Zoom Mini-mapa Aumentar, Diminuir:
+MiniMap.hotkeys_help_zoom_key=§bCTRL +§f , §bCTRL -§f
+MiniMap.hotkeys_help_maptype=Mudar o mapa para Dia, Noite:
+MiniMap.hotkeys_help_maptype_key=§bCTRL [§f , §bCTRL ]§f
+
+# Added in 3.1.x. %1$s = one of "On", "Off". FPS is short for "Frames per Second", a measurement of graphic performance.
+MiniMap.show_fps=Mostrar FPS: %1$s
+
+# Added in 3.1.x.
+MiniMap.return_to_game=Voltar para o Jogo
+
+# %1$s = filename
+MapSaver.map_saved=Mapa gravado: %1$s
+
+# Added in 3.1.0. Unlimited means there are no feature restrictions
+Feature.unlimited=Unlimited
+
+# Added in 3.1.0. "Fair play" means multiplayer features used for cheating are disabled
+Feature.fair_play=Jogo limpo
+
+########################
+# Web UI messages
+########################
+
+# Unused, but keep for future use
+WebMap.text_direction=ltr
+
+# JourneyMap menu / homepage link
+WebMap.web_link_text=journeymap.techbrew.net
+WebMap.web_link_title=Pagina inicial do JourneyMap
+
+# JourneyMap menu / forums link
+WebMap.forum_link_text=minecraftforum.net
+WebMap.forum_link_title=O forum do JourneyMap esta no minecraftforum.net
+
+# JourneyMap menu / RSS feed link
+WebMap.rss_feed_text=Noticias RSS do JourneyMap
+WebMap.rss_feed_title=Subscreve-te às noticas do JourneyMap por RSS feed
+
+# JourneyMap menu / Email subscription link
+WebMap.email_sub_text=JourneyMap news Email
+WebMap.email_sub_title=Subscreve-te às noticias do JourneyMap por Email
+
+# JourneyMap menu / Follow on Twitter link
+WebMap.follow_twitter_text=Segue o JourneyMapMod no Twitter
+WebMap.follow_twitter_title=Segue o JourneyMapMod no Twitter
+
+# JourneyMap menu / Donate link
+WebMap.donate_text=Doa para o JourneyMap
+WebMap.donate_title=Doa para o desenvolvimento do JourneyMap usando o PayPal
+
+# Update button title (shown only when update available)
+WebMap.update_button_title=Actualizacao disponivel: JourneyMap %1$s para o Minecraft %2$s
+
+# Day/Night button
+WebMap.day_button_text=Dia
+WebMap.day_button_title=O mapa do mundo como aparece durante a luz do dia.
+WebMap.night_button_text=Noite
+WebMap.night_button_title=O mapa do mundo como aparece durante o luar.
+
+# Follow button
+WebMap.follow_button_title=Auto-centrar o mapa em ti. (Desliga-se se mexeres.)
+
+# Show menu
+WebMap.show_menu_text=Mostrar...
+
+# Show menu / Smooth Pixels (Unused)
+WebMap.smooth_pixels_menu_item=Pixels suaves
+
+# Show menu / Caves
+WebMap.caves_menu_item_text=Caves
+WebMap.caves_menu_item_title=Mostrar caves/interior do mapa quando nao estas debaixo do céu.
+
+# Show menu / Grid
+WebMap.grid_menu_item_text=Grelha
+WebMap.grid_menu_item_title=Mostrar a grelha do chunk
+
+# Show menu / Waypoints
+WebMap.waypoints_menu_item_text=Waypoints
+WebMap.waypoints_menu_item_title=Mostrar waypoints
+
+# Show menu / Animals
+WebMap.animals_menu_item_text=Animais
+WebMap.animals_menu_item_title=Mostrar animais por perto
+
+# Show menu / Pets
+WebMap.pets_menu_item_text=Animais de Estimacao
+WebMap.pets_menu_item_title=Mostrar animais de Estimacao por perto
+
+# Show menu / Mobs (Monsters)
+WebMap.mobs_menu_item_text=Monstros
+WebMap.mobs_menu_item_title=Mostrar monstros por perto
+
+# Show menu / Villagers
+WebMap.villagers_menu_item_text=Villagers
+WebMap.villagers_menu_item_title=Mostrar villagers por perto
+
+# Show menu / Other players (multiplayer)
+WebMap.players_menu_item_text=Jogadores
+WebMap.players_menu_item_title=Mostrar Jogadores por perto (multi-jogador)
+
+# Added in 3.0.0: Auto-Map button (singleplayer)
+WebMap.automap_text=Auto-Mapear...
+
+# Added in 3.0.0: Auto-Map button tooltip
+WebMap.automap_title=Mapear automaticamente regioes inexploradas (single-player)
+WebMap.automap_dialog_text=Mapear todas as regioes ou so as regioes em falta automaticamente? all regions or just missing regions?
+WebMap.automap_dialog_all=Tudo
+WebMap.automap_dialog_missing=Desaparecido
+WebMap.automap_dialog_none=Nenhum
+WebMap.automap_dialog_close=Fechar
+WebMap.automap_already_started=O auto-mapeamento ja esta em progresso.
+WebMap.automap_started=Auto-mapeamento comecado. Verifica o chat para veres o progresso.
+WebMap.automap_complete=O auto-mapeamento parou.
+
+# Added in 3.0.0: %1$s = Vertical slice number,
+WebMap.automap_complete_underground=Auto-mapeamento do corte %1$s parou.
+
+# Added in 3.0.0: Save Map button text
+WebMap.save_button_text=Gravar mapa
+
+# Save Map button
+WebMap.save_button_title=Gravar o mapa explorado para o ficheiro
+
+# Added in 3.0.0. %1$s = filename
+WebMap.save_filename=A gravar o mapa para as screenshots: %1$s
+
+# Added in 3.0.0: Actions button 
+WebMap.actions_title=Accoes...
+
+# Zoom slider
+WebMap.zoom_slider_name=Zoom
+
+# World info area
+WebMap.worldname_text=Nome do mundo:
+WebMap.worldtime_text=Tempo do mundo:
+WebMap.location_text=Localizacao:
+WebMap.elevation_text=Elevacao:
+WebMap.slice_text=Corte vertical:
+WebMap.biome_text=Bioma:
+
+# Error message if world isn't open no Minecraft
+WebMap.error_world_not_opened=O mundo do Minecraft nao abriu
