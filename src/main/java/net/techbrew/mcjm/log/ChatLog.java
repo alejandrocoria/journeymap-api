@@ -3,6 +3,7 @@ package net.techbrew.mcjm.log;
 import net.minecraft.client.Minecraft;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.techbrew.mcjm.Constants;
 import net.techbrew.mcjm.JourneyMap;
@@ -19,19 +20,19 @@ import java.util.logging.Level;
 public class ChatLog {
 
     // Announcements
-    static final List<IChatComponent> announcements = Collections.synchronizedList(new LinkedList<IChatComponent>());
+    static final List<ChatComponentTranslation> announcements = Collections.synchronizedList(new LinkedList<ChatComponentTranslation>());
 
     /**
      * Announce chat component.
      * @param chat
      */
     public static void queueAnnouncement(IChatComponent chat) {
-        announcements.add(chat);
+        ChatComponentTranslation wrap = new ChatComponentTranslation("JourneyMap.chat_announcement", new Object[] {chat});
+        announcements.add(wrap);
     }
 
     /**
      * Announce URL with link.
-     * @param pos
      * @param message
      * @param url
      */
@@ -53,8 +54,7 @@ public class ChatLog {
         {
             chat.func_150256_b().func_150241_a(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getCanonicalPath()));
             chat.func_150256_b().func_150228_d(Boolean.valueOf(true));
-        } catch(Exception e)
-        {
+        } catch(Exception e) {
             JourneyMap.getLogger().warning("Couldn't build ClickEvent for file: " + LogFormatter.toString(e));
         }
         queueAnnouncement(chat);
@@ -87,14 +87,14 @@ public class ChatLog {
      */
     public static void showChatAnnouncements(Minecraft mc) {
         while(!announcements.isEmpty()) {
-            IChatComponent message = announcements.remove(0);
+            ChatComponentTranslation message = announcements.remove(0);
             if(message!=null) {
                 try {
                     mc.ingameGUI.func_146158_b().func_146227_a(message);
                 } catch(Exception e){
                     JourneyMap.getLogger().severe("Could not display announcement in chat: " + LogFormatter.toString(e));
                 } finally {
-                    Level logLevel = message instanceof ErrorChat ? Level.SEVERE : Level.INFO;
+                    Level logLevel = message.func_150271_j()[0] instanceof ErrorChat ? Level.SEVERE : Level.INFO;
                     JourneyMap.getLogger().log(logLevel, message.func_150261_e());
                 }
             }
@@ -105,6 +105,7 @@ public class ChatLog {
      * Decorator to indicate log level should be ERROR.
      */
     private static class ErrorChat extends ChatComponentText {
+
         public ErrorChat(String text) {
             super(text);
         }
