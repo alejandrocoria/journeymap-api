@@ -26,15 +26,15 @@ public abstract class BaseRenderer {
 	long badBlockCount = 0;
 
     /**
-     * Paint the block with half-clear red to indicate it's a problem.
+     * Paint the block with magenta to indicate it's a problem.
      * @param x
      * @param y
      * @param z
      * @param g2D
      */
 	public void paintBadBlock(final int x, final int y, final int z, final Graphics2D g2D) {
-		g2D.setComposite(BlockUtils.SEMICLEAR);
-		g2D.setPaint(Color.red);
+		g2D.setComposite(BlockUtils.OPAQUE);
+		g2D.setPaint(Color.magenta);
 		g2D.fillRect(x, z, 1, 1);
 		badBlockCount++;
 		if (badBlockCount % 10 == 0) {
@@ -42,20 +42,6 @@ public abstract class BaseRenderer {
 					"Bad block at " + x + "," + y + "," + z //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							+ ". Total bad blocks painted: " + badBlockCount); //$NON-NLS-1$
 		}
-	}
-
-    /**
-     * Paint the block clear.
-     * @param x
-     * @param vSlice
-     * @param z
-     * @param g2D
-     */
-	public void paintClearBlock(final int x, final int vSlice, final int z,
-			final Graphics2D g2D) {
-		g2D.setComposite(BlockUtils.OPAQUE);
-		g2D.setBackground(BlockUtils.COLOR_TRANSPARENT);
-		g2D.clearRect(x, z, 1, 1);
 	}
 
     /**
