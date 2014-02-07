@@ -74,8 +74,8 @@ public class MapOverlay extends JmUI {
 	 * Default constructor
 	 */
 	public MapOverlay() {
-        field_146297_k = FMLClientHandler.instance().getClient();
-        state.refresh(field_146297_k, field_146297_k.thePlayer);
+        mc = FMLClientHandler.instance().getClient();
+        state.refresh(mc, mc.thePlayer);
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
         gridRenderer.setZoom(state.currentZoom);
 	}
@@ -88,7 +88,7 @@ public class MapOverlay extends JmUI {
     	initButtons();
     	
     	// When switching dimensions, reset grid
-		if(state.getDimension()!=field_146297_k.thePlayer.dimension) {
+		if(state.getDimension()!=mc.thePlayer.dimension) {
 			gridRenderer.clear();
 		}
     }
@@ -97,7 +97,7 @@ public class MapOverlay extends JmUI {
 	public void drawScreen(int i, int j, float f) {
 		try {
             drawScreenTimer.start();
-            func_146270_b(0); // drawBackground
+            drawBackground(0); // drawBackground
 			drawMap();
             super.drawScreen(i, j, f); // Buttons
             if(chat!=null) chat.drawScreen(i, j, f);
@@ -113,9 +113,9 @@ public class MapOverlay extends JmUI {
 	}
 
 	@Override
-    protected void func_146284_a(GuiButton guibutton) { // actionPerformed
+    protected void actionPerformed(GuiButton guibutton) { // actionPerformed
 
-        final ButtonEnum id = ButtonEnum.values()[guibutton.field_146127_k];
+        final ButtonEnum id = ButtonEnum.values()[guibutton.id];
     	switch(id) {
 			case DayNight: { // day or night
 				toggleDayNight();
@@ -154,8 +154,8 @@ public class MapOverlay extends JmUI {
 	}
 
 	@Override
-	public void func_146280_a(Minecraft minecraft, int width, int height) {
-		super.func_146280_a(minecraft, width, height);
+	public void setWorldAndResolution(Minecraft minecraft, int width, int height) {
+		super.setWorldAndResolution(minecraft, width, height);
 		
 		state.requireRefresh();
 
@@ -165,7 +165,7 @@ public class MapOverlay extends JmUI {
             chat = new MapChat("", true);
         }
 		if(chat!=null) {
-			chat.func_146280_a(minecraft, width, height);
+			chat.setWorldAndResolution(minecraft, width, height);
 		}
 
         initGui();
@@ -173,17 +173,17 @@ public class MapOverlay extends JmUI {
 		drawMap();
 	}
 
-    //        width = field_146294_l;
-//        height = field_146295_m;
-//        mc = field_146297_k;
-//        fontRenderer = super.field_146289_q;
-//        buttonList = field_146292_n;
+    //        width = width;
+//        height = height;
+//        mc = mc;
+//        fontRenderer = super.fontRendererObj;
+//        buttonList = buttonList;
 
 	/**
 	 * Set up UI buttons.
 	 */
 	void initButtons() {
-        if(field_146292_n.isEmpty()) {
+        if(buttonList.isEmpty()) {
             String on = Constants.getString("MapOverlay.on"); //$NON-NLS-1$
             String off = Constants.getString("MapOverlay.off"); //$NON-NLS-1$
 
@@ -214,15 +214,15 @@ public class MapOverlay extends JmUI {
             buttonActions = new MapButton(ButtonEnum.Actions.ordinal(),0,0,60,20, Constants.getString("MapOverlay.actions")); //$NON-NLS-1$
 
             if(buttonAlert.drawButton) {
-                field_146292_n.add(buttonAlert);
+                buttonList.add(buttonAlert);
             }
-            field_146292_n.add(buttonDayNight);
-            field_146292_n.add(buttonFollow);
-            field_146292_n.add(buttonZoomIn);
-            field_146292_n.add(buttonZoomOut);
-            field_146292_n.add(buttonClose);
-            field_146292_n.add(buttonOptions);
-            field_146292_n.add(buttonActions);
+            buttonList.add(buttonDayNight);
+            buttonList.add(buttonFollow);
+            buttonList.add(buttonZoomIn);
+            buttonList.add(buttonZoomOut);
+            buttonList.add(buttonClose);
+            buttonList.add(buttonOptions);
+            buttonList.add(buttonActions);
         }
 	}
 
@@ -231,12 +231,12 @@ public class MapOverlay extends JmUI {
 	 */
 	void layoutButtons() {
 		// Buttons
-		if(field_146292_n.isEmpty()) {
+		if(buttonList.isEmpty()) {
 			initButtons();
 		}
-		final boolean smallScale = (field_146297_k.gameSettings.guiScale==1);
+		final boolean smallScale = (mc.gameSettings.guiScale==1);
 		final int startX = smallScale ? 60 : 40;
-		final int endX = field_146294_l - 3;
+		final int endX = width - 3;
 		final int startY = 3;
 		final int hgap = 3;
 		final int vgap = 3;
@@ -245,7 +245,7 @@ public class MapOverlay extends JmUI {
 		buttonZoomIn.setPosition(smallScale ? 20 : 8, smallScale ? 64 : 32);
 		buttonZoomOut.below(buttonZoomIn, 8).setX(buttonZoomIn.getX());
 		
-		if(field_146294_l>=420) { // across top
+		if(width>=420) { // across top
 			
 			buttonFollow.rightOf(buttonDayNight, hgap).setY(startY);
 			
@@ -279,15 +279,15 @@ public class MapOverlay extends JmUI {
 	}
 
 	@Override
-	public void func_146274_d() { // handleMouseInput
+	public void handleMouseInput() { // handleMouseInput
 		
 		if(chat!=null && !chat.isHidden()) {
-			chat.func_146274_d();
+			chat.handleMouseInput();
 			//return;
 		}
 
-		mx = (Mouse.getEventX() * field_146294_l) / field_146297_k.displayWidth;
-		my = field_146295_m - (Mouse.getEventY() * field_146295_m) / field_146297_k.displayHeight - 1;
+		mx = (Mouse.getEventX() * width) / mc.displayWidth;
+		my = height - (Mouse.getEventY() * height) / mc.displayHeight - 1;
 
 		if(Mouse.getEventButtonState()) {
 			mouseClicked(mx, my, Mouse.getEventButton());
@@ -298,7 +298,7 @@ public class MapOverlay extends JmUI {
 			} else if(wheel<0) {
 				zoomOut();
 			} else {
-                func_146286_b(mx, my, Mouse.getEventButton());
+                mouseMovedOrUp(mx, my, Mouse.getEventButton());
 			}
 		}
 	}
@@ -314,10 +314,10 @@ public class MapOverlay extends JmUI {
 		Boolean guiButtonUsed = false;
 		if(mouseButton == 0)
 		{
-			for(int l = 0; l < field_146292_n.size(); l++)
+			for(int l = 0; l < buttonList.size(); l++)
 			{
-				GuiButton guibutton = (GuiButton)field_146292_n.get(l);
-				if(guibutton.func_146116_c(field_146297_k, mouseX, mouseY))
+				GuiButton guibutton = (GuiButton)buttonList.get(l);
+				if(guibutton.mousePressed(mc, mouseX, mouseY))
 				{
 					guiButtonUsed = true;
 					break;
@@ -333,8 +333,8 @@ public class MapOverlay extends JmUI {
 	}
 
 	@Override
-	protected void func_146286_b(int mouseX, int mouseY, int which) { // mouseMovedOrUp
-		super.func_146286_b(mouseX, mouseY, which);
+	protected void mouseMovedOrUp(int mouseX, int mouseY, int which) { // mouseMovedOrUp
+		super.mouseMovedOrUp(mouseX, mouseY, which);
 		if(Mouse.isButtonDown(0) && !isScrolling) {
 			isScrolling=true;
 			msx=mx;
@@ -351,7 +351,7 @@ public class MapOverlay extends JmUI {
 			if(gridRenderer!=null) {
 				try {
 					gridRenderer.move(-mouseDragX, -mouseDragY);
-					gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), field_146297_k.displayWidth, field_146297_k.displayHeight, false, 0, 0);
+					gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
 					gridRenderer.setZoom(state.currentZoom);
 				} catch(Exception e) {
 					logger.severe("Error moving grid: " + e);
@@ -445,44 +445,44 @@ public class MapOverlay extends JmUI {
         }
 		
 		// North
-		if(i==field_146297_k.gameSettings.keyBindForward.func_151463_i()) { // getkeyCode
+		if(i==mc.gameSettings.keyBindForward.getKeyCode()) { // getkeyCode
 			moveCanvas(0,-16);
 			return;
 		}
 		
 		// West
-		if(i==field_146297_k.gameSettings.keyBindLeft.func_151463_i()) {
+		if(i==mc.gameSettings.keyBindLeft.getKeyCode()) {
 			moveCanvas(-16, 0);
 			return;
 		}
 		
 		// South
-		if(i==field_146297_k.gameSettings.keyBindBack.func_151463_i()) {
+		if(i==mc.gameSettings.keyBindBack.getKeyCode()) {
 			moveCanvas(0,16);
 			return;
 		}
 		
 		// East
-		if(i==field_146297_k.gameSettings.keyBindRight.func_151463_i()) {
+		if(i==mc.gameSettings.keyBindRight.getKeyCode()) {
 			moveCanvas(16, 0);
 			return;
 		}
 		
 		// Open inventory
-		if(i==field_146297_k.gameSettings.field_151445_Q.func_151463_i()) { // keyBindInventory
+		if(i==mc.gameSettings.keyBindInventory.getKeyCode()) { // keyBindInventory
 			close();
-			field_146297_k.func_147108_a(new GuiInventory(field_146297_k.thePlayer));
+			mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
 			return;
 		}
 		
 		// Open chat
-		if(i==field_146297_k.gameSettings.keyBindChat.func_151463_i()) {
+		if(i==mc.gameSettings.keyBindChat.getKeyCode()) {
 			openChat("");
 			return;
 		}
 		
 		// Open chat with command prefix (Minecraft.java does this in runTick() )
-		if(i==field_146297_k.gameSettings.keyBindCommand.func_151463_i()) {
+		if(i==mc.gameSettings.keyBindCommand.getKeyCode()) {
 			openChat("/");
 			return;
 		}
@@ -499,9 +499,9 @@ public class MapOverlay extends JmUI {
 	}
 
     @Override
-    public void func_146270_b(int layer) //drawBackground
+    public void drawBackground(int layer) //drawBackground
 	{
-		DrawUtil.drawRectangle(0, 0, field_146294_l, field_146295_m, bgColor, 255);
+		DrawUtil.drawRectangle(0, 0, width, height, bgColor, 255);
 	}
 
 	void drawMap() {
@@ -530,15 +530,15 @@ public class MapOverlay extends JmUI {
         }
 
         if(state.follow) {
-            gridRenderer.center(field_146297_k.thePlayer.posX, field_146297_k.thePlayer.posZ, state.currentZoom);
+            gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
         }
-        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), field_146297_k.displayWidth, field_146297_k.displayHeight, false, 0, 0);
+        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
 		gridRenderer.draw(1f, xOffset, yOffset);
         gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset);
 
-        Point2D playerPixel = gridRenderer.getPixel(field_146297_k.thePlayer.posX, field_146297_k.thePlayer.posZ);
+        Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
         if(playerPixel!=null) {
-            DrawStep drawStep = new DrawEntityStep(field_146297_k.thePlayer.posX, field_146297_k.thePlayer.posZ, EntityHelper.getHeading(field_146297_k.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
+            DrawStep drawStep = new DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
             gridRenderer.draw(xOffset, yOffset, drawStep);
         }
 
@@ -546,7 +546,7 @@ public class MapOverlay extends JmUI {
 
 		sizeDisplay(true);
 
-        DrawUtil.drawCenteredLabel(state.playerLastPos, field_146294_l / 2, field_146295_m - 11, playerInfoBgColor, playerInfoFgColor, 205, 1);
+        DrawUtil.drawCenteredLabel(state.playerLastPos, width / 2, height - 11, playerInfoBgColor, playerInfoFgColor, 205, 1);
 
         timer.stop();
 	}
@@ -563,14 +563,14 @@ public class MapOverlay extends JmUI {
 	 */
 	void refreshState() {
 		// Check player status
-		EntityClientPlayerMP player = field_146297_k.thePlayer;
+		EntityClientPlayerMP player = mc.thePlayer;
 		if (player==null) {
 			logger.warning("Could not get player"); //$NON-NLS-1$
 			return;
 		}
 
 		// Update the state first
-		state.refresh(field_146297_k, player);
+		state.refresh(mc, player);
 
 		if(state.getDimension() != gridRenderer.getDimension()) {
 			setFollow(true);
@@ -579,22 +579,22 @@ public class MapOverlay extends JmUI {
 		
 		// Center core renderer
 		if(state.follow) {
-			gridRenderer.center(field_146297_k.thePlayer.posX, field_146297_k.thePlayer.posZ, state.currentZoom);
+			gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
 		} else {
 			gridRenderer.setZoom(state.currentZoom);
 		}
 
-        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), field_146297_k.displayWidth, field_146297_k.displayHeight, true, 0, 0);
+        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 
 		// Build list of drawSteps
-		state.generateDrawSteps(field_146297_k, gridRenderer, waypointRenderer, radarRenderer);
+		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer);
 		
 		// Update player pos
 		state.playerLastPos = Constants.getString("MapOverlay.player_location",
-				Integer.toString((int) field_146297_k.thePlayer.posX),
-				Integer.toString((int) field_146297_k.thePlayer.posZ),
-				Integer.toString((int) field_146297_k.thePlayer.posY),
-				field_146297_k.thePlayer.chunkCoordY,
+				Integer.toString((int) mc.thePlayer.posX),
+				Integer.toString((int) mc.thePlayer.posZ),
+				Integer.toString((int) mc.thePlayer.posY),
+				mc.thePlayer.chunkCoordY,
 				state.getPlayerBiome()); //$NON-NLS-1$
 		
 		// Reset timer
@@ -610,7 +610,7 @@ public class MapOverlay extends JmUI {
 			chat.setHidden(false);
 		} else {
 	        chat = new MapChat(defaultText, false);
-	        chat.func_146280_a(field_146297_k, field_146294_l, field_146295_m);
+	        chat.setWorldAndResolution(mc, width, height);
 		}
 	}
 
@@ -632,14 +632,14 @@ public class MapOverlay extends JmUI {
 		if(isScrolling) {
 			return false;
 		} else {
-			return state.shouldRefresh(super.field_146297_k);
+			return state.shouldRefresh(super.mc);
 		}
 	}
 
 	void moveCanvas(int deltaBlockX, int deltaBlockz){
         refreshState();
         gridRenderer.move(deltaBlockX, deltaBlockz);
-        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), field_146297_k.displayWidth, field_146297_k.displayHeight, true, 0, 0);
+        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 		setFollow(false);
 	}
 

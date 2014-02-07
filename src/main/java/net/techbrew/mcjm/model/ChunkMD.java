@@ -55,7 +55,7 @@ public class ChunkMD {
 	}
 
     public Block getBlock(int x, int y, int z) {
-        return stub.func_150810_a(x, y, z);
+        return stub.getBlock(x, y, z);
     }
 	
 	/**

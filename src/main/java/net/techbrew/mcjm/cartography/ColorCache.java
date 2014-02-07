@@ -138,8 +138,8 @@ public class ColorCache implements IResourceManagerReloadListener {
 	private Color getFoliageColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z) {
         Color color = getBiomeColor(blockMD, biome);
 		if(color==null) {
-            int leafColor = blockMD.getBlock().func_149741_i(blockMD.key.meta); // getRenderColor()
-            int biomeColor = biome.func_150571_c(x, y, z); // getBiomeFoliageColor()
+            int leafColor = blockMD.getBlock().getRenderColor(blockMD.key.meta); // getRenderColor()
+            int biomeColor = biome.getBiomeFoliageColor(x, y, z); // getBiomeFoliageColor()
             int leafTimesBiome = colorMultiplier(biomeColor, leafColor);
             int darker = colorMultiplier(leafTimesBiome, 0xFFAAAAAA); // I added this, I'm sure it'll break with some custom leaf mod somewhere.
             color = new Color(darker);
@@ -152,7 +152,7 @@ public class ColorCache implements IResourceManagerReloadListener {
         Color color = getBiomeColor(blockMD, biome);
 		if(color==null) {
             Color baseColor = getBaseColor(blockMD, x, y, z);
-            int biomeColor = biome.func_150558_b(x,y,z); // BiomeGenBase.getBiomeGrassColor()
+            int biomeColor = biome.getBiomeGrassColor(x,y,z); // BiomeGenBase.getBiomeGrassColor()
             color = colorMultiplier(baseColor, biomeColor);
             putBiomeColor(blockMD, biome, color);
 		}
@@ -170,7 +170,7 @@ public class ColorCache implements IResourceManagerReloadListener {
 
     private int getBiomeColorMultiplier(BlockMD blockMD, int x, int y, int z) {
         WorldClient world = FMLClientHandler.instance().getClient().theWorld;
-        return blockMD.getBlock().func_149720_d(world, x, 78, z) | 0xFF000000; // getColorMultiplier()
+        return blockMD.getBlock().colorMultiplier(world, x, 78, z) | 0xFF000000; // getColorMultiplier()
     }
 
     private HashMap<BlockMD, Color> getBiomeColorMap(BiomeGenBase biome) {
@@ -239,7 +239,7 @@ public class ColorCache implements IResourceManagerReloadListener {
                     JourneyMap.getLogger().fine("Custom biome tint discovered for " + blockMD);
                 } else {
                     // Check for render color
-                    int renderColor = blockMD.getBlock().func_149741_i(blockMD.key.meta & 0xf); // getRenderColor()
+                    int renderColor = blockMD.getBlock().getRenderColor(blockMD.key.meta & 0xf); // getRenderColor()
                     if(renderColor!=0xffffff && renderColor!=0xffffffff) { // white without alpha or white with alpha
                         baseColor = colorMultiplier(baseColor, 0xff000000 | renderColor); // Force opaque render color
                         JourneyMap.getLogger().fine("Applied render color for " + blockMD);

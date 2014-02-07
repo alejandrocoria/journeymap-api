@@ -38,8 +38,8 @@ public class ChatLog {
      */
     public static void announceURL(String message, String url) {
         ChatComponentText chat = new ChatComponentText(message);
-        chat.func_150256_b().func_150241_a(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
-        chat.func_150256_b().func_150228_d(Boolean.valueOf(true));
+        chat.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
+        chat.getChatStyle().setUnderlined(Boolean.valueOf(true));
         queueAnnouncement(chat);
     }
 
@@ -52,8 +52,8 @@ public class ChatLog {
         ChatComponentText chat = new ChatComponentText(message);
         try
         {
-            chat.func_150256_b().func_150241_a(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getCanonicalPath()));
-            chat.func_150256_b().func_150228_d(Boolean.valueOf(true));
+            chat.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getCanonicalPath()));
+            chat.getChatStyle().setUnderlined(Boolean.valueOf(true));
         } catch(Exception e) {
             JourneyMap.getLogger().warning("Couldn't build ClickEvent for file: " + LogFormatter.toString(e));
         }
@@ -90,12 +90,12 @@ public class ChatLog {
             ChatComponentTranslation message = announcements.remove(0);
             if(message!=null) {
                 try {
-                    mc.ingameGUI.func_146158_b().func_146227_a(message);
+                    mc.ingameGUI.getChatGUI().printChatMessage(message);
                 } catch(Exception e){
                     JourneyMap.getLogger().severe("Could not display announcement in chat: " + LogFormatter.toString(e));
                 } finally {
-                    Level logLevel = message.func_150271_j()[0] instanceof ErrorChat ? Level.SEVERE : Level.INFO;
-                    JourneyMap.getLogger().log(logLevel, message.func_150261_e());
+                    Level logLevel = message.getFormatArgs()[0] instanceof ErrorChat ? Level.SEVERE : Level.INFO;
+                    JourneyMap.getLogger().log(logLevel, message.getUnformattedTextForChat());
                 }
             }
         }

@@ -62,7 +62,7 @@ public class IconLoader {
             int side = blockMD.hasFlag(BlockUtils.Flag.Side2Texture) ? 2 : 1;
             TextureAtlasSprite blockIcon = null;
             while(blockIcon==null && side>=0) {
-                blockIcon = (TextureAtlasSprite) blockMD.getBlock().func_149691_a(side, blockMD.key.meta);
+                blockIcon = (TextureAtlasSprite) blockMD.getBlock().getIcon(side, blockMD.key.meta);
                 side--;
             }
             if(blockIcon==null) {
@@ -137,9 +137,8 @@ public class IconLoader {
             Block block = blockMD.getBlock();
 	        if(BlockUtils.hasAlpha(block)) {
 	        	blockAlpha = BlockUtils.getAlpha(block);
-			} else if(blockMD.getBlock().func_149701_w()>0) { // TODO FORGE:  should be getRenderBlockPass()
+			} else if(blockMD.getBlock().getRenderBlockPass()>0) {
 				blockAlpha = a * 1.0f/255;
-				//BlockUtils.setAlpha(block, blockAlpha);
 			}
 	        blockMD.setAlpha(blockAlpha);
 							

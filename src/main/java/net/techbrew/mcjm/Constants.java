@@ -31,11 +31,11 @@ public class Constants {
     }
 
     public static String getString(String key) {
-        return I18n.getStringParams(key);
+        return I18n.format(key);
     }
 
     public static String getString(String key, Object... params) {
-        return I18n.getStringParams(key, params);
+        return I18n.format(key, params);
     }
 
     public enum MapType {

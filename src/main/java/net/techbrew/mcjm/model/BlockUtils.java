@@ -64,7 +64,7 @@ public class BlockUtils {
         while(fmlBlockIter.hasNext()) {
             Block block = fmlBlockIter.next();
 
-            if(block.func_149688_o() == Material.field_151579_a) {
+            if(block.getMaterial() == Material.air) {
                 setFlags(block, Flag.HasAir, Flag.NotHideSky, Flag.NoShadow, Flag.NotCeiling);
                 JourneyMap.getLogger().fine(GameRegistry.findUniqueIdentifierFor(block) + " flags set to hide block");
                 continue;
@@ -128,7 +128,7 @@ public class BlockUtils {
 		int y = topY;
 		
 		while(y>=0) {
-            block = chunkMd.stub.func_150810_a(x, y, z);
+            block = chunkMd.getBlock(x, y, z);
 			if(chunkMd.stub.canBlockSeeTheSky(x, y, z)) {
 				y--;
 			} else if(hasFlag(block, Flag.NotCeiling)) {

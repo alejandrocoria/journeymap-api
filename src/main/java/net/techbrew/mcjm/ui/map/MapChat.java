@@ -17,14 +17,14 @@ public class MapChat extends GuiChat
     }
 
     @Override
-	public void func_146281_b()
+	public void onGuiClosed()
     {
-        super.func_146281_b();
+        super.onGuiClosed();
         hidden = true;
     }
 
 	public void close() {
-        func_146281_b();
+        onGuiClosed();
     }
 
     /**
@@ -52,10 +52,10 @@ public class MapChat extends GuiChat
      * Handles mouse input.
      */
     @Override
-    public void func_146274_d()
+    public void handleMouseInput()
     {
     	if(hidden) return;
-        super.func_146274_d();
+        super.handleMouseInput();
     }
 
     /**
@@ -82,10 +82,10 @@ public class MapChat extends GuiChat
 	public void drawScreen(int par1, int par2, float par3)
     {    	    
     	GL11.glPushMatrix();
-        GL11.glTranslatef(0, this.field_146295_m - 39.5f - bottomMargin, 0.0F);
-        if(this.field_146297_k!=null) {
-            if(this.field_146297_k.ingameGUI!=null && this.field_146297_k.ingameGUI.func_146158_b()!=null) {
-                this.field_146297_k.ingameGUI.func_146158_b().func_146230_a(hidden ? this.field_146297_k.ingameGUI.getUpdateCounter() : this.cursorCounter);
+        GL11.glTranslatef(0, this.height - 39.5f - bottomMargin, 0.0F);
+        if(this.mc!=null) {
+            if(this.mc.ingameGUI!=null && this.mc.ingameGUI.getChatGUI()!=null) {
+                this.mc.ingameGUI.getChatGUI().drawChat(hidden ? this.mc.ingameGUI.getUpdateCounter() : this.cursorCounter);
             }
         }
     	GL11.glPopMatrix();
@@ -104,6 +104,6 @@ public class MapChat extends GuiChat
 	}
 
     public void setText(String defaultText) {
-        this.field_146415_a.func_146180_a(defaultText);
+        this.inputField.setText(defaultText);
     }
 }

@@ -42,7 +42,7 @@ public class UIManager {
     
     public void closeAll() {    	
     	closeCurrent();
-    	minecraft.func_147108_a(null);
+    	minecraft.displayGuiScreen(null);
 		minecraft.setIngameFocus();
         miniMap.setVisible(true);
         TileCache.instance().cleanUp();
@@ -59,14 +59,14 @@ public class UIManager {
     public void openInventory() {
     	logger.fine("Opening inventory");
     	closeAll();
-    	minecraft.func_147108_a(new GuiInventory(minecraft.thePlayer)); // displayGuiScreen
+    	minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer)); // displayGuiScreen
     }
     
     public void open(Class<? extends JmUI> uiClass) {
     	closeCurrent();
     	try {    		
     		logger.fine("Opening UI " + uiClass.getSimpleName());
-			minecraft.func_147108_a(uiClass.newInstance()); // displayGuiScreen
+			minecraft.displayGuiScreen(uiClass.newInstance()); // displayGuiScreen
             miniMap.setVisible(false);
 		} catch(Throwable e) {
 			logger.log(Level.SEVERE, "Unexpected exception opening UI: " + e); //$NON-NLS-1$

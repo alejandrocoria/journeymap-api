@@ -67,7 +67,7 @@ public class MapButton extends GuiButton {
 	
 	private void updateLabel() {
 		if(labelOn!=null && labelOff!=null) {
-			super.field_146126_j = getToggled() ? labelOn : labelOff;
+			super.displayString = getToggled() ? labelOn : labelOff;
 		}		
 	}
 	
@@ -139,27 +139,27 @@ public class MapButton extends GuiButton {
 	}
 
 	public int getWidth() {
-		return field_146120_f;
+		return width;
 	}
 	
 	public int getHeight() {
-		return field_146121_g;
+		return height;
 	}
 
     public int getX() {
-        return this.field_146128_h;
+        return this.xPosition;
     }
 
     public int getY() {
-        return this.field_146129_i;
+        return this.yPosition;
     }
 
     public void setX(int x) {
-        this.field_146128_h = x;
+        this.xPosition = x;
     }
 
     public void setY(int y) {
-        this.field_146129_i = y;
+        this.yPosition = y;
     }
 	
 	public void setPosition(int x, int y) {

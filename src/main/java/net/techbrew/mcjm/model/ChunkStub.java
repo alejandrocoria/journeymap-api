@@ -53,8 +53,8 @@ public class ChunkStub extends Chunk {
         // public boolean isTerrainPopulated;
         this.isTerrainPopulated = chunk.isTerrainPopulated;
 
-        // public boolean field_150814_l;
-        this.field_150814_l = chunk.field_150814_l;
+        // public boolean isLightPopulated;
+        this.isLightPopulated = chunk.isLightPopulated;
 
         // public boolean field_150815_m;
         this.field_150815_m = chunk.field_150815_m;
@@ -99,8 +99,8 @@ public class ChunkStub extends Chunk {
         // public boolean isTerrainPopulated;
         this.isTerrainPopulated = chunk.isTerrainPopulated;
 
-        // public boolean field_150814_l;
-        this.field_150814_l = chunk.field_150814_l;
+        // public boolean isLightPopulated;
+        this.isLightPopulated = chunk.isLightPopulated;
 
         // public boolean field_150815_m;
         this.field_150815_m = chunk.field_150815_m;

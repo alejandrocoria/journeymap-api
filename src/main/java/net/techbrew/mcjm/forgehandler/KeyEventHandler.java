@@ -34,7 +34,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler {
 
         MapOverlayState mapOverlayState = MapOverlay.state();
         if(mapOverlayState.minimapHotkeys && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)|| Keyboard.isKeyDown(Keyboard.KEY_RCONTROL))) {
-            if(keyPressed==uiKeybinding.func_151463_i()) {
+            if(keyPressed==uiKeybinding.getKeyCode()) {
                 UIManager.getInstance().toggleMinimap();
             }
             else
@@ -69,7 +69,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler {
         }
         else
         {
-            if(keyPressed==uiKeybinding.func_151463_i()) {
+            if(keyPressed==uiKeybinding.getKeyCode()) {
                 if(mc.currentScreen==null) {
                     UIManager.getInstance().openMap();
                 }

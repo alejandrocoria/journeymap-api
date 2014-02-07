@@ -91,7 +91,7 @@ public class BlockMD implements Serializable {
             int meta;
             boolean isAir = false;
             if(y>=0) {
-                block = chunkMd.stub.func_150810_a(x, y, z);
+                block = chunkMd.stub.getBlock(x, y, z);
                 isAir = block.isAir(chunkMd.worldObj, x, y, z);
                 meta = (isAir) ? 0 : chunkMd.stub.getBlockMetadata(x, y, z);
             } else {
@@ -143,8 +143,8 @@ public class BlockMD implements Serializable {
         String name = key.uid.toString() + suffix;
         try {
             // Gotta love this.
-            Item item = Item.func_150898_a(block);
-            ItemStack stack = new ItemStack(item, 1, block.func_149692_a(key.meta));
+            Item item = Item.getItemFromBlock(block);
+            ItemStack stack = new ItemStack(item, 1, block.damageDropped(key.meta));
             String displayName = stack.getDisplayName();
 
             if(!key.uid.modId.equals("minecraft")){
@@ -237,7 +237,7 @@ public class BlockMD implements Serializable {
 	}
 
     public boolean isTransparent() {
-        return block.func_149688_o() == Material.field_151579_a;
+        return block.getMaterial() == Material.air;
     }
 
     public boolean isAir() {

@@ -17,11 +17,11 @@ public abstract class JmUI extends GuiScreen {
 
     public JmUI() {
         super();
-//        width = field_146294_l;
-//        height = field_146295_m;
-//        mc = field_146297_k;
-//        fontRenderer = super.field_146289_q;
-//        buttonList = field_146292_n;
+//        width = width;
+//        height = height;
+//        mc = mc;
+//        fontRenderer = super.fontRendererObj;
+//        buttonList = buttonList;
     }
 
 	@Override
@@ -30,15 +30,15 @@ public abstract class JmUI extends GuiScreen {
 	}
 
     public void sizeDisplay(boolean scaled) {
-        final int glwidth = scaled ? this.field_146294_l : field_146297_k.displayWidth;
-        final int glheight = scaled ? this.field_146295_m : field_146297_k.displayHeight;
+        final int glwidth = scaled ? this.width : mc.displayWidth;
+        final int glheight = scaled ? this.height : mc.displayHeight;
         sizeDisplay(glwidth, glheight);
     }
 
     public void drawLogo() {
-        sizeDisplay(field_146297_k.displayWidth, field_146297_k.displayHeight);
-        DrawUtil.drawImage(logo, (field_146297_k.displayWidth - logo.width) / 2, 20, false);
-        sizeDisplay(field_146294_l, field_146295_m);
+        sizeDisplay(mc.displayWidth, mc.displayHeight);
+        DrawUtil.drawImage(logo, (mc.displayWidth - logo.width) / 2, 20, false);
+        sizeDisplay(width, height);
     }
 
     public static void sizeDisplay(double width, double height) {
@@ -54,7 +54,7 @@ public abstract class JmUI extends GuiScreen {
 
     @Override
     // setWorldAndResolution
-    public void func_146280_a(Minecraft minecraft, int width, int height) {
-        super.func_146280_a(minecraft, width, height);
+    public void setWorldAndResolution(Minecraft minecraft, int width, int height) {
+        super.setWorldAndResolution(minecraft, width, height);
     }
 }

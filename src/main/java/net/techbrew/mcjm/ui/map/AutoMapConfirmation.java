@@ -14,11 +14,11 @@ public class AutoMapConfirmation extends JmUI {
 	private enum ButtonEnum {All,Missing,None,Close}
 	MapButton buttonAll, buttonMissing, buttonNone, buttonClose;
 
-//        width = field_146294_l;
-//        height = field_146295_m;
-//        mc = field_146297_k;
-//        fontRenderer = super.field_146289_q;
-//        buttonList = field_146292_n;
+//        width = width;
+//        height = height;
+//        mc = mc;
+//        fontRenderer = super.fontRendererObj;
+//        buttonList = buttonList;
 	
 	/**
      * Adds the buttons (and other controls) to the screen in question.
@@ -37,16 +37,16 @@ public class AutoMapConfirmation extends JmUI {
         buttonMissing.enabled = enable;
         buttonNone.enabled = !enable;
         
-        field_146292_n.add(buttonAll);
-        field_146292_n.add(buttonMissing);
-        field_146292_n.add(buttonNone);
-        field_146292_n.add(buttonClose);
+        buttonList.add(buttonAll);
+        buttonList.add(buttonMissing);
+        buttonList.add(buttonNone);
+        buttonList.add(buttonClose);
     }
 
     @Override
-    protected void func_146284_a(GuiButton guibutton) { // actionPerformed
+    protected void actionPerformed(GuiButton guibutton) { // actionPerformed
 
-        final ButtonEnum id = ButtonEnum.values()[guibutton.field_146127_k];
+        final ButtonEnum id = ButtonEnum.values()[guibutton.id];
     	switch(id) {
     		case All : {
     			JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.TRUE);
@@ -73,14 +73,14 @@ public class AutoMapConfirmation extends JmUI {
     @Override
 	public void drawScreen(int par1, int par2, float par3)
     {
-        func_146270_b(0);
+        drawBackground(0);
     	
-    	final int x = this.field_146294_l / 2;
-    	final int y = this.field_146295_m / 4;
+    	final int x = this.width / 2;
+    	final int y = this.height / 4;
     	final int vgap = 3;
     	
-        this.drawCenteredString(this.field_146289_q, Constants.getString("MapOverlay.automap_dialog"), x, y - 18, 16777215);
-        this.drawCenteredString(this.field_146289_q, Constants.getString("MapOverlay.automap_dialog_text"), x, y, 16777215);
+        this.drawCenteredString(this.fontRendererObj, Constants.getString("MapOverlay.automap_dialog"), x, y - 18, 16777215);
+        this.drawCenteredString(this.fontRendererObj, Constants.getString("MapOverlay.automap_dialog_text"), x, y, 16777215);
     	
     	buttonAll.centerHorizontalOn(x).setY(y+18);
     	buttonMissing.centerHorizontalOn(x).below(buttonAll, vgap);
@@ -91,11 +91,11 @@ public class AutoMapConfirmation extends JmUI {
     }
 
     @Override
-    public void func_146270_b(int layer) //drawBackground
+    public void drawBackground(int layer) //drawBackground
     {
-        super.func_146278_c(layer); // super.drawBackground(0);
+        super.drawWorldBackground(layer); // super.drawBackground(0);
         MapOverlay.drawMapBackground(this);
-        super.func_146270_b(layer); // super.drawDefaultBackground();
+        super.drawBackground(layer); // super.drawDefaultBackground();
 
         super.drawLogo();
     }

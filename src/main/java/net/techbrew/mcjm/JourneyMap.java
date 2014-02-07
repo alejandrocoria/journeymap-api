@@ -421,7 +421,7 @@ public class JourneyMap {
 		if(enableAnnounceMod) {
             ChatLog.announceI18N("JourneyMap.ready", MOD_NAME); //$NON-NLS-1$
 			if(enableWebserver && enableMapGui) {
-				String keyName = Keyboard.getKeyName(uiKeybinding.func_151463_i()); // Should be KeyCode
+				String keyName = Keyboard.getKeyName(uiKeybinding.getKeyCode()); // Should be KeyCode
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
                 String message = Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
                 ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
@@ -430,7 +430,7 @@ public class JourneyMap {
                 String message = Constants.getString("JourneyMap.webserver_only_ready", port); //$NON-NLS-1$
                 ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
 			} else if(enableMapGui) {
-				String keyName = Keyboard.getKeyName(uiKeybinding.func_151463_i()); // Should be KeyCode
+				String keyName = Keyboard.getKeyName(uiKeybinding.getKeyCode()); // Should be KeyCode
                 ChatLog.announceI18N("JourneyMap.mapgui_only_ready", keyName); //$NON-NLS-1$
 			} else {
                 ChatLog.announceI18N("JourneyMap.webserver_and_mapgui_disabled"); //$NON-NLS-1$

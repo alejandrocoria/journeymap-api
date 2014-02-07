@@ -137,21 +137,21 @@ public class ChunkLoader {
         Chunk chunk = new Chunk(par1World, i, j);
         chunk.heightMap = par2NBTTagCompound.getIntArray("HeightMap");
         chunk.isTerrainPopulated = par2NBTTagCompound.getBoolean("TerrainPopulated");
-        chunk.field_150814_l = par2NBTTagCompound.getBoolean("LightPopulated");
+        chunk.isLightPopulated = par2NBTTagCompound.getBoolean("LightPopulated");
         chunk.inhabitedTime = par2NBTTagCompound.getLong("InhabitedTime");
-        NBTTagList nbttaglist = par2NBTTagCompound.func_150295_c("Sections", 10);
+        NBTTagList nbttaglist = par2NBTTagCompound.getTagList("Sections", 10);
         byte b0 = 16;
         ExtendedBlockStorage[] aextendedblockstorage = new ExtendedBlockStorage[b0];
         boolean flag = !par1World.provider.hasNoSky;
 
         for (int k = 0; k < nbttaglist.tagCount(); ++k)
         {
-            NBTTagCompound nbttagcompound1 = nbttaglist.func_150305_b(k);
+            NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(k);
             byte b1 = nbttagcompound1.getByte("Y");
             ExtendedBlockStorage extendedblockstorage = new ExtendedBlockStorage(b1 << 4, flag);
             extendedblockstorage.setBlockLSBArray(nbttagcompound1.getByteArray("Blocks"));
 
-            if (nbttagcompound1.func_150297_b("Add", 7))
+            if (nbttagcompound1.hasKey("Add", 7))
             {
                 extendedblockstorage.setBlockMSBArray(new NibbleArray(nbttagcompound1.getByteArray("Add"), 4));
             }
@@ -170,7 +170,7 @@ public class ChunkLoader {
 
         chunk.setStorageArrays(aextendedblockstorage);
 
-        if (par2NBTTagCompound.func_150297_b("Biomes", 7))
+        if (par2NBTTagCompound.hasKey("Biomes", 7))
         {
             chunk.setBiomeArray(par2NBTTagCompound.getByteArray("Biomes"));
         }
