@@ -17,11 +17,6 @@ public abstract class JmUI extends GuiScreen {
 
     public JmUI() {
         super();
-//        width = width;
-//        height = height;
-//        mc = mc;
-//        fontRenderer = super.fontRendererObj;
-//        buttonList = buttonList;
     }
 
 	@Override
@@ -53,7 +48,6 @@ public abstract class JmUI extends GuiScreen {
     }
 
     @Override
-    // setWorldAndResolution
     public void setWorldAndResolution(Minecraft minecraft, int width, int height) {
         super.setWorldAndResolution(minecraft, width, height);
     }
