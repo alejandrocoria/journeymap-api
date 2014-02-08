@@ -11,7 +11,7 @@ public interface ITaskManager {
 	
 	public boolean isEnabled(Minecraft minecraft);
 	
-	public ITask getTask(Minecraft minecraft, long worldHash);
+	public ITask getTask(Minecraft minecraft);
 	
 	public void taskAccepted(boolean accepted);
 	

@@ -32,7 +32,7 @@ public class MapRegionTask extends BaseMapTask {
 		super(world, dimension, underground, chunkY, chunkMdPool, true);
 	}
 	
-	public static BaseMapTask create(RegionCoord rCoord, Minecraft minecraft, long worldHash) {
+	public static BaseMapTask create(RegionCoord rCoord, Minecraft minecraft) {
 		
 		int missing = 0;
 
@@ -143,7 +143,7 @@ public class MapRegionTask extends BaseMapTask {
 		}
 		
 		@Override
-		public BaseMapTask getTask(Minecraft minecraft, long worldHash) {
+		public BaseMapTask getTask(Minecraft minecraft) {
 			
 			if(!enabled) return null;
 			
@@ -153,7 +153,7 @@ public class MapRegionTask extends BaseMapTask {
 	    	}
 			
 			RegionCoord rCoord = regionLoader.getRegions().peek();
-			BaseMapTask baseMapTask = MapRegionTask.create(rCoord, minecraft, worldHash);
+			BaseMapTask baseMapTask = MapRegionTask.create(rCoord, minecraft);
 			return baseMapTask;
 		}
 		

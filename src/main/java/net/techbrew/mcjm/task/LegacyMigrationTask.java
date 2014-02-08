@@ -211,7 +211,7 @@ public class LegacyMigrationTask implements IGenericTask {
 		}
 		
 		@Override
-		public IGenericTask getTask(Minecraft minecraft, long worldHash) {			
+		public IGenericTask getTask(Minecraft minecraft) {
 			if(!enabled) return null;
 			
 			if(this.pngFiles.isEmpty()) {

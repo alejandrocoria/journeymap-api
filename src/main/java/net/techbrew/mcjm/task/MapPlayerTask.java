@@ -30,7 +30,7 @@ public class MapPlayerTask extends BaseMapTask {
 		super(world, dimension, underground, chunkY, chunkStubs, false);
 	}
 
-	public static BaseMapTask create(EntityPlayer player, long hash) {
+	public static BaseMapTask create(EntityPlayer player) {
 				
 		int missing = 0;
 
@@ -183,12 +183,12 @@ public class MapPlayerTask extends BaseMapTask {
 		}
 		
 		@Override
-		public BaseMapTask getTask(Minecraft minecraft, long worldHash) {			
+		public BaseMapTask getTask(Minecraft minecraft) {
 			if(!enabled) return null;
 				
 			// Ensure player chunk is loaded
 			if(minecraft.thePlayer.addedToChunk) {
-				BaseMapTask baseMapTask = MapPlayerTask.create(minecraft.thePlayer, worldHash);
+				BaseMapTask baseMapTask = MapPlayerTask.create(minecraft.thePlayer);
 				return baseMapTask;
 			} else {
 				return null;

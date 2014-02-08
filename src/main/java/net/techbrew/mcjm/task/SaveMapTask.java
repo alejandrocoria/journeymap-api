@@ -57,7 +57,7 @@ public class SaveMapTask implements IGenericTask {
 		}
 		
 		@Override
-		public SaveMapTask getTask(Minecraft minecraft, long worldHash) {			
+		public SaveMapTask getTask(Minecraft minecraft) {
 			if(mapSaver==null) return null;			
 			return new SaveMapTask(mapSaver);
 		}

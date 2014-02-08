@@ -111,12 +111,12 @@ public class TaskController {
 		}
 	}
 	
-	public void performTasks(final Minecraft minecraft, final long worldHash, final ScheduledExecutorService taskExecutor) {
+	public void performTasks(final Minecraft minecraft, final ScheduledExecutorService taskExecutor) {
 		
 		if(!TaskThread.hasQueue()) {
 					
 			ITask task = null;
-			ITaskManager manager = getNextManager(minecraft, worldHash);
+			ITaskManager manager = getNextManager(minecraft);
 			if(manager==null) {
 				logger.warning("No task managers enabled!");
 				return;
@@ -124,7 +124,7 @@ public class TaskController {
 			boolean accepted = false;
 
             StatTimer timer = StatTimer.get(manager.getTaskClass().getSimpleName() + ".Manager.getTask").start();
-			task = manager.getTask(minecraft, worldHash);
+			task = manager.getTask(minecraft);
 
 			if(task!=null) {
                 timer.stop();
@@ -152,7 +152,7 @@ public class TaskController {
 		
 	}
 	
-	private ITaskManager getNextManager(final Minecraft minecraft, final long worldHash) {
+	private ITaskManager getNextManager(final Minecraft minecraft) {
 		
 		for(ITaskManager manager: managers) {
 			if(manager.isEnabled(minecraft)) {
