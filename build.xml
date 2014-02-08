@@ -38,8 +38,8 @@
 
     <target name="build-fairplay" description="Build FairPlay Edition" depends="init">
         <stage edition="${fairplay}"/>
-        <delete file="${forge.src.dir}/net/techbrew/mcjm/feature/impl/Unlimited.java" failonerror="true" />
-        <delete file="${forge.classes.dir}/net/techbrew/mcjm/feature/impl/Unlimited.class"/>
+        <delete file="${forge.src.dir}/net/techbrew/journeymap/feature/impl/Unlimited.java" failonerror="true" />
+        <delete file="${forge.classes.dir}/net/techbrew/journeymap/feature/impl/Unlimited.class"/>
         <dist edition="${fairplay}"/>
         <ant target="cleanforge" />
     </target>
@@ -83,8 +83,8 @@
             </copy>
 
             <!-- Replace params in JourneyMap class -->
-            <replace file="${forge.src.dir}/net/techbrew/mcjm/JourneyMap.java" token="@JMVERSION@" value="${jmversion}" />
-            <replace file="${forge.src.dir}/net/techbrew/mcjm/JourneyMap.java" token="@MCVERSION@" value="${mcversion}" />
+            <replace file="${forge.src.dir}/net/techbrew/journeymap/JourneyMap.java" token="@JMVERSION@" value="${jmversion}" />
+            <replace file="${forge.src.dir}/net/techbrew/journeymap/JourneyMap.java" token="@MCVERSION@" value="${mcversion}" />
 
             <!-- Copy resources -->
             <copy todir="${forge.resources.dir}" failonerror="true">
@@ -161,13 +161,13 @@
         </taskdef>
         <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
             outputfolder="${forge.resources.dir}/assets/journeymap/web/js">
-            <fileset dir="/assets/journeymap/web/js" >
+            <fileset dir="${resources.dir}/assets/journeymap/web/js" >
                 <include name="journeymap.js" />
             </fileset>
         </yuicompress>
         <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
             outputfolder="${forge.resources.dir}/assets/journeymap/web/css">
-            <fileset dir="/assets/journeymap/web/css" >
+            <fileset dir="${resources.dir}/assets/journeymap/web/css" >
                 <include name="journeymap.css" />
             </fileset>
         </yuicompress>
