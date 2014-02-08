@@ -76,7 +76,11 @@ public class MapOverlayOptions extends JmUI {
 				Constants.getString("MapOverlay.show_waypoints", off),
 				PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_WAYPOINTS)); //$NON-NLS-1$  //$NON-NLS-2$
 		buttonWaypoints.enabled = WaypointHelper.waypointsEnabled();
-		
+        buttonWaypoints.restricted = !buttonWaypoints.enabled;
+        if(buttonWaypoints.restricted) {
+            buttonWaypoints.setHoverText(Constants.getString("MapOverlay.disabled_feature"));
+        }
+
 		boolean webserverOn = PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
 		buttonWebserver = new MapButton(ButtonEnum.Webserver.ordinal(),0,0,
 				Constants.getString("MapOverlay.enable_webserver", on),
@@ -96,34 +100,40 @@ public class MapOverlayOptions extends JmUI {
 		if(!FeatureManager.isAllowed(Feature.MapCaves)) {
 			buttonCaves.setToggled(false);
 			buttonCaves.enabled = false;
+            buttonCaves.restricted = true;
 			buttonCaves.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
 		}
 			
 		if(!FeatureManager.isAllowed(Feature.RadarMobs)) {
 			buttonMonsters.setToggled(false);
 			buttonMonsters.enabled = false;
+            buttonMonsters.restricted = true;
 			buttonMonsters.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
 		}
 			
 		if(!FeatureManager.isAllowed(Feature.RadarAnimals)) {
 			buttonAnimals.setToggled(false);
 			buttonAnimals.enabled = false;
+            buttonAnimals.restricted = true;
 			buttonAnimals.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
 			
 			buttonPets.setToggled(false);
 			buttonPets.enabled = false;
+            buttonPets.restricted = true;
 			buttonPets.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$			
 		}
 		
 		if(!FeatureManager.isAllowed(Feature.RadarVillagers)) {
 			buttonVillagers.setToggled(false);
 			buttonVillagers.enabled = false;
+            buttonVillagers.restricted = true;
 			buttonVillagers.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
 		}
 
 		if(!FeatureManager.isAllowed(Feature.RadarPlayers)) {
 			buttonPlayers.setToggled(false);
 			buttonPlayers.enabled = false;
+            buttonPlayers.restricted = true;
 			buttonPlayers.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
 		}
 		

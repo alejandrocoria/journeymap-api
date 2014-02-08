@@ -51,4 +51,20 @@ public abstract class JmUI extends GuiScreen {
     public void setWorldAndResolution(Minecraft minecraft, int width, int height) {
         super.setWorldAndResolution(minecraft, width, height);
     }
+
+    @Override
+    public void drawScreen(int par1, int par2, float par3)
+    {
+        int k;
+
+        super.drawScreen(par1, par2, par3);
+
+        for (k = 0; k < this.buttonList.size(); ++k)
+        {
+            if(this.buttonList.get(k) instanceof MapButton)
+            {
+                ((MapButton)this.buttonList.get(k)).drawButtonHover(this.mc, par1, par2);
+            }
+        }
+    }
 }

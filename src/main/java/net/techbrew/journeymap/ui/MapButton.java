@@ -15,6 +15,7 @@ public class MapButton extends GuiButton {
 	String hover;
 	String labelOn;
 	String labelOff;
+    public Boolean restricted = false;
 
     // TODO FORGE
     public boolean enabled;
@@ -89,9 +90,14 @@ public class MapButton extends GuiButton {
             return;
         }
 
-        // TODO FORGE
 		super.drawButton(minecraft, mouseX, mouseY);
-		
+
+        if(this.restricted)
+        {
+            String strikethru = String.format("%"+this.displayString.length()+"s", "").replace(' ', '-');
+            this.drawCenteredString(minecraft.fontRenderer, strikethru, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, 10526880);
+        }
+
 		if(this.icon!=null) {
 			Tessellator tessellator = Tessellator.instance;
 			GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
@@ -125,6 +131,18 @@ public class MapButton extends GuiButton {
 			tessellator.draw();
 		}
 		
+    }
+
+    /**
+     * Draws this button to the screen.
+     */
+    public void drawButtonHover(Minecraft minecraft, int mouseX, int mouseY)
+    {
+        int k = this.getHoverState(this.field_146123_n);
+        if(k==2)
+        {
+            this.drawCenteredString(minecraft.fontRenderer, this.hover, this.xPosition + this.width / 2, 20 + this.yPosition + (this.height - 8) / 2, 10526880);
+        }
     }
 
     // TODO FORGE
