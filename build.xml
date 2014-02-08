@@ -4,7 +4,7 @@
     <!-- Update when new version is going to be released -->
     <property name="jmversion" value="3.3.0rc1" />
     <property name="mcversion" value="1.7.2" />
-    <property name="forgeversion" value="1.7.2-10.12.0.1022" />
+    <property name="forgeversion" value="1.7.2-10.12.0.1024" />
 	<property name="unlimited" value="Unlimited" />
 	<property name="fairplay" value="FairPlay" />
 
@@ -41,6 +41,7 @@
         <delete file="${forge.src.dir}/net/techbrew/mcjm/feature/impl/Unlimited.java" failonerror="true" />
         <delete file="${forge.classes.dir}/net/techbrew/mcjm/feature/impl/Unlimited.class"/>
         <dist edition="${fairplay}"/>
+        <ant target="cleanforge" />
     </target>
 
     <target name="init">
