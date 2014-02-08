@@ -222,6 +222,8 @@ MiniMap.hotkeys_help_zoom=Zoom Minimap In, Out:
 MiniMap.hotkeys_help_zoom_key=§bCTRL +§f , §bCTRL -§f
 MiniMap.hotkeys_help_maptype=Change map to Day, Night:
 MiniMap.hotkeys_help_maptype_key=§bCTRL [§f , §bCTRL ]§f
+MiniMap.hotkeys_help_position=Change map position:
+MiniMap.hotkeys_help_position_key=§bCTRL \\§f
 
 # Added in 3.1.x. %1$s = one of "On", "Off". FPS is short for "Frames per Second", a measurement of graphic performance.
 MiniMap.show_fps=Show FPS: %1$s

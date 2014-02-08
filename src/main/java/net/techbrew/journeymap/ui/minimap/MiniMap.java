@@ -272,11 +272,21 @@ public class MiniMap {
         //PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_MINIMAP, enable); // TODO
     }
 
+
+    public void nextPosition() {
+        int nextIndex = dv.position.ordinal()+1;
+        if(nextIndex==DisplayVars.Position.values().length){
+            nextIndex = 0;
+        }
+        setPosition(DisplayVars.Position.values()[nextIndex]);
+    }
+
     public DisplayVars.Position getPosition() {
         return dv.position;
     }
 
     public void setPosition(DisplayVars.Position position) {
+        PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_POSITION, position.name());
         if(dv!=null) {
             updateDisplayVars(dv.shape, position);
         }

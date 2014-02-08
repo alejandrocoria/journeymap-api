@@ -64,6 +64,10 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler {
                         mapOverlayState.overrideMapType(Constants.MapType.night);
                         return;
                     }
+                    case Keyboard.KEY_BACKSLASH : {
+                        UIManager.getInstance().getMiniMap().nextPosition();
+                        return;
+                    }
                 }
             }
         }

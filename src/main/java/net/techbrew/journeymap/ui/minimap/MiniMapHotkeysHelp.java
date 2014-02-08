@@ -101,6 +101,7 @@ public class MiniMapHotkeysHelp extends JmUI {
         drawHelpStrings(Constants.getString("MiniMap.hotkeys_help_toggle"), Constants.getString("MiniMap.hotkeys_help_toggle_key"), x, y+=12);
         drawHelpStrings(Constants.getString("MiniMap.hotkeys_help_zoom"), Constants.getString("MiniMap.hotkeys_help_zoom_key"), x, y+=12);
         drawHelpStrings(Constants.getString("MiniMap.hotkeys_help_maptype"), Constants.getString("MiniMap.hotkeys_help_maptype_key"), x, y+=12);
+        drawHelpStrings(Constants.getString("MiniMap.hotkeys_help_position"), Constants.getString("MiniMap.hotkeys_help_position_key"), x, y+=12);
     }
 
     protected void drawHelpStrings(String title, String keys, int x, int y)
@@ -109,7 +110,7 @@ public class MiniMapHotkeysHelp extends JmUI {
         int tWidth = this.fontRendererObj.getStringWidth(title);
         drawString(this.fontRendererObj, title, x - tWidth - hgap, y, 16777215);
         int kWidth = this.fontRendererObj.getStringWidth(title);
-        drawString(this.fontRendererObj, keys, x + hgap, y, 16777215);
+        drawString(this.fontRendererObj, keys, x + hgap + hgap, y, 16777215);
     }
     
     @Override

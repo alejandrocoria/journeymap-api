@@ -199,7 +199,7 @@ public class MiniMapOptions extends JmUI {
 		}
 	}
 
-    private void nextShape() {
+    public void nextShape() {
         int nextIndex = currentShape.ordinal()+1;
         if(nextIndex==DisplayVars.Shape.Enabled.length){
             nextIndex = 0;
@@ -229,7 +229,6 @@ public class MiniMapOptions extends JmUI {
         currentPosition = position;
         buttonPosition.displayString = Constants.getString("MiniMap.position", Constants.getString(currentPosition.label));
         UIManager.getInstance().getMiniMap().setPosition(position);
-        PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_POSITION, position.name());
     }
     
     @Override
