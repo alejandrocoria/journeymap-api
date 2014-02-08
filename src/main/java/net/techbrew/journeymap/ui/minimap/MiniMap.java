@@ -195,20 +195,23 @@ public class MiniMap {
 
             // Player info string
             String playerInfo = Constants.getString("MapOverlay.player_location_minimap", playerX, playerZ, playerY, mc.thePlayer.chunkCoordY, state.getPlayerBiome());
-            if(dv.fontScale>1 && mc.fontRenderer.getStringWidth(playerInfo)*dv.fontScale>dv.minimapSize){
+            double fontScale = dv.fontScale * (mc.fontRenderer.getUnicodeFlag() ? 2 : 1);
+            double bottomY = dv.bottomLabelY - (mc.fontRenderer.getUnicodeFlag() ? (fontScale * 4) : 0);
+
+            if(fontScale>1 && mc.fontRenderer.getStringWidth(playerInfo)*fontScale>dv.minimapSize){
                 // Drop biome if running of space
                 playerInfo = Constants.getString("MapOverlay.player_location_minimap_nobiome", playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
             }
 
             // Draw position text
-            DrawUtil.drawCenteredLabel(playerInfo, dv.labelX, dv.bottomLabelY, playerInfoBgColor, playerInfoFgColor, 200, dv.fontScale);
+            DrawUtil.drawCenteredLabel(playerInfo, dv.labelX, bottomY, playerInfoBgColor, playerInfoFgColor, 200, fontScale);
 
             // Draw FPS
             if(showFps){
                 String fps = mc.debug;
                 final int idx = fps!=null ? fps.indexOf(',') : -1;
                 if(idx>0){
-                    DrawUtil.drawCenteredLabel(fps.substring(0, idx), dv.labelX, dv.topLabelY, playerInfoBgColor, playerInfoFgColor, 200, dv.fontScale);
+                    DrawUtil.drawCenteredLabel(fps.substring(0, idx), dv.labelX, dv.topLabelY, playerInfoBgColor, playerInfoFgColor, 200, fontScale);
                 }
             }
 
