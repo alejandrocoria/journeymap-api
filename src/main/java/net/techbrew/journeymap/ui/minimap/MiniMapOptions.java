@@ -212,7 +212,7 @@ public class MiniMapOptions extends JmUI {
             shape = DisplayVars.Shape.Enabled[0];
         }
         currentShape = shape;
-        buttonShape.displayString = Constants.getString("MiniMap.shape", currentShape.label);
+        buttonShape.displayString = Constants.getString("MiniMap.shape", Constants.getString(currentShape.label));
         UIManager.getInstance().getMiniMap().setShape(shape);
         PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_SHAPE, shape.name());
     }
@@ -227,7 +227,7 @@ public class MiniMapOptions extends JmUI {
 
     private void setPosition(DisplayVars.Position position){
         currentPosition = position;
-        buttonPosition.displayString = Constants.getString("MiniMap.position", currentPosition.label);
+        buttonPosition.displayString = Constants.getString("MiniMap.position", Constants.getString(currentPosition.label));
         UIManager.getInstance().getMiniMap().setPosition(position);
         PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_POSITION, position.name());
     }

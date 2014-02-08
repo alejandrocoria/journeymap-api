@@ -2,7 +2,6 @@ package net.techbrew.journeymap.ui.minimap;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 
@@ -12,10 +11,10 @@ import net.techbrew.journeymap.render.texture.TextureImpl;
 public class DisplayVars {
 
     public enum Position {
-        TopRight(Constants.getString("MiniMap.position_topright")),
-        BottomRight(Constants.getString("MiniMap.position_bottomright")),
-        BottomLeft(Constants.getString("MiniMap.position_bottomleft")),
-        TopLeft(Constants.getString("MiniMap.position_topleft"));
+        TopRight("MiniMap.position_topright"),
+        BottomRight("MiniMap.position_bottomright"),
+        BottomLeft("MiniMap.position_bottomleft"),
+        TopLeft("MiniMap.position_topleft");
 
         public final String label;
         private Position(String label){
@@ -24,10 +23,10 @@ public class DisplayVars {
     }
 
     public enum Shape {
-        SmallSquare(Constants.getString("MiniMap.shape_smallsquare")),
-        LargeSquare(Constants.getString("MiniMap.shape_largesquare")),
-        SmallCircle(Constants.getString("MiniMap.shape_smallcircle")),
-        LargeCircle(Constants.getString("MiniMap.shape_largecircle"));
+        SmallSquare("MiniMap.shape_smallsquare"),
+        LargeSquare("MiniMap.shape_largesquare"),
+        SmallCircle("MiniMap.shape_smallcircle"),
+        LargeCircle("MiniMap.shape_largecircle");
         public final String label;
         private Shape(String label){
             this.label = label;
