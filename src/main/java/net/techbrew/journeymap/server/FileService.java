@@ -32,15 +32,10 @@ import java.util.zip.ZipInputStream;
  */
 public class FileService extends BaseService {
 	
-	private static final long serialVersionUID = 1L;
-	
-	private static final String CLASSPATH_ROOT = "/";
-	private static final String CLASSPATH_WEBROOT = "web";
-	private static final String IDE_TEST = "eclipse/Client/bin/";	
-	private static final String IDE_SOURCEPATH = "../../../src/minecraft/net/techbrew/journeymap/web";
-	
+	private static final long serialVersionUID = 2L;
+
 	private String resourcePath;
-	private final boolean useZipEntry;
+	private boolean useZipEntry;
     private File zipFile;
 	
 	/**
@@ -48,41 +43,21 @@ public class FileService extends BaseService {
 	 */
 	public FileService() {
 		
-		URL resourceDir = null;
-		
-		// Check if in IDE.  If so, use source path to serve files.	
-		URL cpRoot = JourneyMap.class.getResource(CLASSPATH_ROOT); //$NON-NLS-1$
-		if(cpRoot!=null) {
-			String cpRootPath = cpRoot.getPath();
-			if(cpRootPath.contains(IDE_TEST)) { //$NON-NLS-1$
-				try {
-					String srcPath = cpRootPath + IDE_SOURCEPATH;
-					resourceDir = new File(srcPath).getCanonicalFile().toURI().toURL();
-				} catch (Exception e) {				
-					JourneyMap.getLogger().severe(e.getMessage());
-				} 
-			} 
-		}
-		if(resourceDir==null) {
-			resourceDir = JourneyMap.class.getResource(CLASSPATH_WEBROOT);
-		}
-		
-		if(resourceDir==null) {
-			resourceDir = JourneyMap.class.getResource("assets/journeymap/web"); //$NON-NLS-1$
-		}
+		URL resourceDir = JourneyMap.class.getResource("/assets/journeymap/web"); //$NON-NLS-1$
 				
 		if(resourceDir==null) {
 			JourneyMap.getLogger().severe("Can't determine path to webroot!");
-		}
-		
-		// Format reusable resourcePath
-		resourcePath = resourceDir.getPath();
-		if(resourcePath.endsWith("/")) { //$NON-NLS-1$
-			resourcePath = resourcePath.substring(0, resourcePath.length()-1);
-		}
-		
-		// Check whether operating out of a zip/jar
-		useZipEntry = (resourceDir.getProtocol().equals("file") || resourceDir.getProtocol().equals("jar")) && resourcePath.contains("!/"); //$NON-NLS-1$	//$NON-NLS-2$
+		} else {
+
+            // Format reusable resourcePath
+            resourcePath = resourceDir.getPath();
+            if(resourcePath.endsWith("/")) { //$NON-NLS-1$
+                resourcePath = resourcePath.substring(0, resourcePath.length()-1);
+            }
+
+            // Check whether operating out of a zip/jar
+            useZipEntry = (resourceDir.getProtocol().equals("file") || resourceDir.getProtocol().equals("jar")) && resourcePath.contains("!/"); //$NON-NLS-1$	//$NON-NLS-2$
+        }
 	}
 	
 	@Override
