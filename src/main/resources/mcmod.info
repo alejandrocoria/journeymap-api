@@ -1,16 +1,13 @@
 [
 {
   "modid": "journeymap",
-  "name": "JourneyMap",
+  "name": "JourneyMap @EDITION@ Edition",
   "description": "Real-time map in-game or in a web browser as you explore.",
-  "version": "@JMVERSION@ @EDITION@ Edition",
+  "version": "@JMVERSION@",
   "mcversion": "@MCVERSION@",
-  "logoFile": "/assets/journeymap/web/img/ico/journeymap144.png",
-  "url": "journeymap.techbrew.net",
-  "updateUrl": "",
-  "authors": ["techbrew (Mark Woodman)"],
-  "credits": "http://journeymap.techbrew.net/credits/",
-  "parent": "",
+  "logoFile": "/assets/journeymap/mod.png",
+  "url": "http://journeymap.techbrew.net",
+  "authorList": ["techbrew (Mark Woodman)"],
   "screenshots": [],
   "dependencies": ["Forge"]
 }
