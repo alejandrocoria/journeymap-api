@@ -1,11 +1,8 @@
 package net.techbrew.mcjm.model;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.util.ChunkCoordinates;
 import net.techbrew.mcjm.JourneyMap;
 import net.techbrew.mcjm.log.LogFormatter;
-import net.techbrew.mcjm.waypoint.EntityWaypoint;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -202,27 +199,27 @@ public class WaypointHelper {
 //            return list;
 //        }
 
-		Minecraft mc = Minecraft.getMinecraft();
-
-		ChunkCoordinates spawn = mc.theWorld.getSpawnPoint();
-		EntityClientPlayerMP player = mc.thePlayer;
-
-		Waypoint wpSpawn = new Waypoint("Spawn", spawn.posX, spawn.posY, spawn.posZ, true, 0, 255, 0, Waypoint.TYPE_NORMAL, "journeymap", "Spawn");
-		list.add(wpSpawn);
-        if(renderWaypoints) {
-            mc.theWorld.addEntityToWorld(waypointEntityId, new EntityWaypoint(mc.theWorld, wpSpawn));
-        }
-
-		ChunkCoordinates bed = player.getBedLocation();
-		if(bed!=null && !bed.equals(spawn)) {
-			Waypoint wpBed = new Waypoint("Bed", new Double(Math.floor(bed.posX)).intValue(), new Double(Math.floor(bed.posY)).intValue(), new Double(Math.floor(bed.posZ)).intValue(), true, 0, 0, 255, Waypoint.TYPE_NORMAL, "journeymap", "Bed");
-			list.add(wpBed);
-
-            if(renderWaypoints) {
-                mc.theWorld.addEntityToWorld(waypointEntityId, new EntityWaypoint(mc.theWorld, wpBed));
-            }
-		}
-		
+//		Minecraft mc = Minecraft.getMinecraft();
+//
+//		ChunkCoordinates spawn = mc.theWorld.getSpawnPoint();
+//		EntityClientPlayerMP player = mc.thePlayer;
+//
+//		Waypoint wpSpawn = new Waypoint("Spawn", spawn.posX, spawn.posY, spawn.posZ, true, 0, 255, 0, Waypoint.TYPE_NORMAL, "journeymap", "Spawn");
+//		list.add(wpSpawn);
+//        if(renderWaypoints) {
+//            mc.theWorld.addEntityToWorld(waypointEntityId, new EntityWaypoint(mc.theWorld, wpSpawn));
+//        }
+//
+//		ChunkCoordinates bed = player.getBedLocation();
+//		if(bed!=null && !bed.equals(spawn)) {
+//			Waypoint wpBed = new Waypoint("Bed", new Double(Math.floor(bed.posX)).intValue(), new Double(Math.floor(bed.posY)).intValue(), new Double(Math.floor(bed.posZ)).intValue(), true, 0, 0, 255, Waypoint.TYPE_NORMAL, "journeymap", "Bed");
+//			list.add(wpBed);
+//
+//            if(renderWaypoints) {
+//                mc.theWorld.addEntityToWorld(waypointEntityId, new EntityWaypoint(mc.theWorld, wpBed));
+//            }
+//		}
+//
 		return list;
 	}
 
