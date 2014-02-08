@@ -499,7 +499,7 @@ public class MapOverlay extends JmUI {
 	}
 
     @Override
-    public void drawBackground(int layer) //drawBackground
+    public void drawBackground(int layer)
 	{
 		DrawUtil.drawRectangle(0, 0, width, height, bgColor, 255);
 	}
@@ -621,7 +621,6 @@ public class MapOverlay extends JmUI {
 		}
 	}
 
-    // TODO FORGE: find superclass function
 	// @Override
 	public void onGuiClosed()
     {
