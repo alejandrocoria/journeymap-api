@@ -268,7 +268,8 @@ MiniMap.hotkeys_help_maptype=Przełącz mapę na dzień/noc:
 MiniMap.hotkeys_help_maptype_key=§bCTRL [§f , §bCTRL ]§f
 MiniMap.show_fps=Pokaż FPS: %1$s
 MiniMap.return_to_game=Wróć do gry
-
+MiniMap.hotkeys_help_position=Change map position:
+MiniMap.hotkeys_help_position_key=§bCTRL \§f
 
 Feature.unlimited=Unlimited
 Feature.fair_play=FairPlay
