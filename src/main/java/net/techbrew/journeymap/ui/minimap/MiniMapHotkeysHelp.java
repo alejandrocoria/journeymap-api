@@ -2,6 +2,7 @@ package net.techbrew.journeymap.ui.minimap;
 
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.forgehandler.KeyEventHandler;
 import net.techbrew.journeymap.ui.JmUI;
 import net.techbrew.journeymap.ui.MapButton;
 import net.techbrew.journeymap.ui.UIManager;
@@ -19,8 +20,11 @@ public class MiniMapHotkeysHelp extends JmUI {
     private DisplayVars.Shape currentShape;
     private DisplayVars.Position currentPosition;
 
+    private KeyEventHandler keyEventHandler;
+
 	public MiniMapHotkeysHelp() {
 		title = Constants.getString("MiniMap.hotkeys_help_title");
+        keyEventHandler = new KeyEventHandler();
 	}
 
 	/**
@@ -111,7 +115,12 @@ public class MiniMapHotkeysHelp extends JmUI {
     @Override
 	public void drawBackground(int layer)
 	{
-    	super.drawBackground(layer);
+        super.drawBackground(layer);
+
+        MiniMap miniMap = UIManager.getInstance().getMiniMap();
+        if(miniMap.isEnabled()){
+            miniMap.drawMap();
+        }
 
         super.drawLogo();
 	}
@@ -122,9 +131,11 @@ public class MiniMapHotkeysHelp extends JmUI {
 		switch(i) {
             case Keyboard.KEY_ESCAPE : {
                 UIManager.getInstance().openMiniMapOptions();
-                break;
+                return;
             }
 		}
+
+        keyEventHandler.onKeyboardEvent(null);
 	}
     
     @Override
