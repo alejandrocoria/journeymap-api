@@ -18,6 +18,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import net.techbrew.journeymap.data.EntityKey;
 import net.techbrew.journeymap.io.PropertyManager;
+import net.techbrew.journeymap.log.StatTimer;
 
 import java.util.*;
 
@@ -25,39 +26,41 @@ import java.util.*;
 
 public class EntityHelper {
 	
-	public static final String PLAYER_FILENAME = "steve.png";
-	
-	private static final double PI2 = 2*Math.PI;
-	
+    private static int MAX_ENTITIES = 16;
 	private static int lateralDistance = PropertyManager.getInstance().getInteger(PropertyManager.Key.CHUNK_OFFSET) * 8;
 	private static int verticalDistance = lateralDistance/2;
-	
+
+    public static List getEntitiesNearby(String timerName, Class... entityClasses) {
+        StatTimer timer = StatTimer.get("EntityHelper." + timerName);
+        timer.start();
+
+        Minecraft mc = Minecraft.getMinecraft();
+        AxisAlignedBB bb = getBB(mc.thePlayer);
+        List list = new ArrayList();
+        for(Class entityClass : entityClasses) {
+            list.addAll(mc.theWorld.getEntitiesWithinAABB(entityClass, bb));
+        }
+
+        if(list.size()>MAX_ENTITIES)
+        {
+            Collections.sort(list, new EntityDistanceComparator(mc.thePlayer));
+            list = list.subList(0, MAX_ENTITIES);
+        }
+
+        timer.stop();
+        return list;
+    }
+
 	public static List getMobsNearby() {
-		Minecraft mc = Minecraft.getMinecraft();
-		
-		AxisAlignedBB bb = getBB(mc.thePlayer);
-		List list = mc.theWorld.getEntitiesWithinAABB(IMob.class, bb);
-		list.addAll(mc.theWorld.getEntitiesWithinAABB(IBossDisplayData.class, bb));
-		list.addAll(mc.theWorld.getEntitiesWithinAABB(IRangedAttackMob.class, bb));
-		return list;
+		return getEntitiesNearby("getMobsNearby", IMob.class, IBossDisplayData.class, IRangedAttackMob.class);
 	}
 	
 	public static List<EntityVillager> getVillagersNearby() {
-		Minecraft mc = Minecraft.getMinecraft();
-		return mc.theWorld.getEntitiesWithinAABB(EntityVillager.class, getBB(mc.thePlayer));
+        return getEntitiesNearby("getVillagersNearby", EntityVillager.class);
 	}
 	
 	public static List<IAnimals> getAnimalsNearby() {
-		
-		Minecraft mc = Minecraft.getMinecraft();
-		EntityPlayerSP player = mc.thePlayer;
-		AxisAlignedBB bb = getBB(player);
-		
-		List<IAnimals> animals = mc.theWorld.getEntitiesWithinAABB(EntityAnimal.class, bb);
-		animals.addAll(mc.theWorld.getEntitiesWithinAABB(EntityGolem.class, bb));
-		animals.addAll(mc.theWorld.getEntitiesWithinAABB(EntityWaterMob.class, bb));
-		
-		return animals;
+        return getEntitiesNearby("getAnimalsNearby", EntityAnimal.class, EntityGolem.class, EntityWaterMob.class);
 	}
 	
 	/**
@@ -65,18 +68,14 @@ public class EntityHelper {
 	 * @return
 	 */
 	public static List<EntityPlayer> getPlayersNearby() {
-		
-		List<EntityPlayer> nearbyPlayers = new ArrayList<EntityPlayer>();
-		
-		Minecraft mc = Minecraft.getMinecraft();
-		//if(!mc.isSingleplayer()) {
-			EntityPlayerSP player = mc.thePlayer;
-			AxisAlignedBB bb = getBB(player);
-			nearbyPlayers = mc.theWorld.getEntitiesWithinAABB(EntityPlayer.class, bb);
-			nearbyPlayers.remove(player);
-		//}
-		
-		return nearbyPlayers;
+        Minecraft mc = Minecraft.getMinecraft();
+        if(!mc.isSingleplayer()) {
+            List<EntityPlayer> nearbyPlayers = getEntitiesNearby("getPlayersNearby", EntityPlayer.class);
+            nearbyPlayers.remove(Minecraft.getMinecraft().thePlayer);
+            return nearbyPlayers;
+        } else {
+            return Collections.EMPTY_LIST;
+        }
 	}
 	
 	/**
@@ -200,5 +199,20 @@ public class EntityHelper {
 		}
 		
 	}
+
+    public static class EntityDistanceComparator implements Comparator<Entity> {
+
+        final EntityPlayer player;
+
+        EntityDistanceComparator(EntityPlayer player)
+        {
+            this.player = player;
+        }
+
+        @Override
+        public int compare(Entity o1, Entity o2) {
+            return Double.compare(o1.getDistanceSqToEntity(player), o2.getDistanceSqToEntity(player));
+        }
+    }
 	
 }
