@@ -90,7 +90,7 @@ public class MapButton extends GuiButton {
         }
 
         // TODO FORGE
-		// super.drawButton(minecraft, mouseX, mouseY);
+		super.drawButton(minecraft, mouseX, mouseY);
 		
 		if(this.icon!=null) {
 			Tessellator tessellator = Tessellator.instance;
