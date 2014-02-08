@@ -5,7 +5,7 @@
   "description": "Real-time map in-game or in a web browser as you explore.",
   "version": "@JMVERSION@",
   "mcversion": "@MCVERSION@",
-  "logoFile": "/assets/journeymap/mod.png",
+  "logoFile": "assets/journeymap/mod.png",
   "url": "http://journeymap.techbrew.net",
   "authorList": ["techbrew (Mark Woodman)"],
   "screenshots": [],

@@ -53,6 +53,8 @@
         <delete dir="${forge.src.dir}" failonerror="true"  />
         <delete dir="${forge.resources.dir}" failonerror="true" />
         <delete dir="${forge.classes.dir}" failonerror="true" />
+        <delete dir="${forge.dir}/build/resources" failonerror="true" />
+        <delete dir="${forge.dir}/out/production" failonerror="true" />
     </target>
 
     <macrodef name="stage">
