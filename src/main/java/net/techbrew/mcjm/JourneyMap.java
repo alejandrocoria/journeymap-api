@@ -55,7 +55,7 @@ import java.util.logging.Logger;
  *
  */
 @SideOnly(Side.CLIENT)
-@Mod(modid = JourneyMap.SHORT_MOD_NAME, name = JourneyMap.SHORT_MOD_NAME, version = JourneyMap.JM_VERSION)
+@Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = JourneyMap.JM_VERSION)
 public class JourneyMap {
 	
 	static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
@@ -65,6 +65,7 @@ public class JourneyMap {
 	public static final String MC_VERSION = "@MCVERSION@"; //$NON-NLS-1$
 	
 	public static final String EDITION = getEdition();
+    public static final String MOD_ID = "journeymap";
 	public static final String SHORT_MOD_NAME = "JourneyMap";
 	public static final String MOD_NAME = SHORT_MOD_NAME + " " + EDITION;
 
@@ -327,7 +328,6 @@ public class JourneyMap {
 
     private void reset() {
 
-        FileHandler.lastWorldHash = -1;
         FileHandler.lastJMWorldDir = null;
         //BlockMD.clearCache();
         //ColorCache.getInstance().serializeCache();
@@ -402,12 +402,7 @@ public class JourneyMap {
     public void performTasks() {
         try {
             if(isMapping()){
-                long newHash = Utils.getWorldHash(mc);
-                if(newHash!=0L) {
-                    FileHandler.lastWorldHash=newHash;
-                }
-                // Perform the next mapping tasks
-                taskController.performTasks(mc, newHash, taskExecutor);
+                taskController.performTasks(mc, taskExecutor);
             }
         } catch (Throwable t) {
             String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$

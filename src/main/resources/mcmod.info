@@ -1,11 +1,11 @@
 [
 {
-  "modid": "JourneyMap",
+  "modid": "journeymap",
   "name": "JourneyMap",
   "description": "Real-time map in-game or in a web browser as you explore.",
   "version": "@JMVERSION@ @EDITION@ Edition",
   "mcversion": "@MCVERSION@",
-  "logoFile": "/net/techbrew/mcjm/web/img/ico/journeymap144.png",
+  "logoFile": "/assets/journeymap/web/img/ico/journeymap144.png",
   "url": "journeymap.techbrew.net",
   "updateUrl": "",
   "authors": ["techbrew (Mark Woodman)"],

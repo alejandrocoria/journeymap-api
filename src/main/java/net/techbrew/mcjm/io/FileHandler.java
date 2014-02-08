@@ -19,8 +19,7 @@ import java.util.logging.Level;
 
 public class FileHandler {
 
-	public static final String WEB_DIR = "/net/techbrew/mcjm/web";
-	public static volatile long lastWorldHash;
+	public static final String WEB_DIR = "/assets/journeymap/web";
 	public static volatile File lastJMWorldDir;
 	
 	public static volatile String lastMCFolderName = "";
@@ -99,7 +98,7 @@ public class FileHandler {
 		
 		File mcDir = Minecraft.getMinecraft().mcDataDir;
 		
-		if(lastWorldHash!=hash || lastJMWorldDir==null) {
+		if(lastJMWorldDir==null) {
 			File worldDir = null;
 			
 			try {				
@@ -115,7 +114,6 @@ public class FileHandler {
 				throw new RuntimeException(e);
 			}			
 
-			lastWorldHash = hash;
 			lastJMWorldDir = worldDir;			
 		}
 		return lastJMWorldDir;
@@ -150,7 +148,7 @@ public class FileHandler {
 
     public static Properties getLangFile(String fileName) {
         try {
-            InputStream is = JourneyMap.class.getResourceAsStream("/assets/JourneyMap/lang/" + fileName);
+            InputStream is = JourneyMap.class.getResourceAsStream("/assets/journeymap/lang/" + fileName);
             if(is==null) {
                 JourneyMap.getLogger().warning("Language file not found: " + fileName);
                 return null;

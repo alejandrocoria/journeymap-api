@@ -68,7 +68,7 @@ public class FileService extends BaseService {
 		}
 		
 		if(resourceDir==null) {
-			resourceDir = JourneyMap.class.getResource("net/techbrew/mcjm/web"); //$NON-NLS-1$
+			resourceDir = JourneyMap.class.getResource("assets/journeymap/web"); //$NON-NLS-1$
 		}
 				
 		if(resourceDir==null) {

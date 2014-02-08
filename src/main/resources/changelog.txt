@@ -13,8 +13,9 @@ Requirements:
 
 Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 - ModLoader is no longer supported.  You must use Forge.
-- New Feature:  Minimap will be enabled if Rei's/Zan's (Voxel) is not active
+- New Feature:  Minimap! (Automatically enabled if Rei's/Zan's (Voxel) is not in use)
 - Significant "under the hood" changes for the new Forge and Minecraft environment
+- Localization files migrated to standard resourcepack framework
 
 Changes in JourneyMap 3.2.0 for Minecraft 1.6.4:
 - Minor bugfixes

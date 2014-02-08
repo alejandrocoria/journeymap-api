@@ -160,14 +160,14 @@
             </classpath>
         </taskdef>
         <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
-            outputfolder="${forge.resources.dir}/net/techbrew/mcjm/web/js">
-            <fileset dir="${java.dir}/net/techbrew/mcjm/web/js" >
+            outputfolder="${forge.resources.dir}/assets/journeymap/web/js">
+            <fileset dir="/assets/journeymap/web/js" >
                 <include name="journeymap.js" />
             </fileset>
         </yuicompress>
         <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
-            outputfolder="${forge.resources.dir}/net/techbrew/mcjm/web/css">
-            <fileset dir="${java.dir}/net/techbrew/mcjm/web/css" >
+            outputfolder="${forge.resources.dir}/assets/journeymap/web/css">
+            <fileset dir="/assets/journeymap/web/css" >
                 <include name="journeymap.css" />
             </fileset>
         </yuicompress>
