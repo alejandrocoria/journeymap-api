@@ -1,11 +1,11 @@
 package net.techbrew.journeymap.forgehandler;
 
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.event.ForgeSubscribe;
 import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
@@ -23,7 +23,7 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler {
         return EnumSet.of(EventHandlerManager.BusType.MinecraftForgeBus);
     }
 
-    @SubscribeEvent
+    @ForgeSubscribe
     public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
 
         final Minecraft mc = FMLClientHandler.instance().getClient();

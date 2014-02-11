@@ -3,7 +3,7 @@ package net.techbrew.journeymap.render.texture;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.ResourceManager;
 import net.techbrew.journeymap.log.StatTimer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -162,5 +162,5 @@ public class TextureImpl extends AbstractTexture {
     }
 
 	@Override
-	public void loadTexture(IResourceManager par1ResourceManager){}
+	public void loadTexture(ResourceManager par1ResourceManager){}
 }

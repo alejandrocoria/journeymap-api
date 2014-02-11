@@ -3,13 +3,9 @@ package net.techbrew.journeymap.model;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.material.Material;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.ColorCache;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -21,14 +17,14 @@ import java.util.EnumSet;
 
 public class BlockMD implements Serializable {
 
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 1L;
 
     public final static class CacheKey implements Serializable
     {
-        public final GameRegistry.UniqueIdentifier uid;
+        public final BlockUtils.UniqueIdentifierProxy uid;
         public final int meta;
 
-        public CacheKey(GameRegistry.UniqueIdentifier uid, int meta) {
+        public CacheKey(BlockUtils.UniqueIdentifierProxy uid, int meta) {
             this.uid = uid;
             this.meta = meta;
         }
@@ -91,16 +87,22 @@ public class BlockMD implements Serializable {
             int meta;
             boolean isAir = false;
             if(y>=0) {
-                block = chunkMd.stub.getBlock(x, y, z);
-                isAir = block.isAir(chunkMd.worldObj, x, y, z);
+                block = chunkMd.getBlock(x, y, z);
+                isAir = block == null || block.isAirBlock(chunkMd.worldObj, x, y, z);
                 meta = (isAir) ? 0 : chunkMd.stub.getBlockMetadata(x, y, z);
             } else {
-                block = Blocks.bedrock;
+                block = Block.bedrock;
                 meta = 0;
             }
 
-            CacheKey key = new CacheKey(GameRegistry.findUniqueIdentifierFor(block), meta);
-            return cache.get(key);
+            if(isAir)
+            {
+                return cache.get(new CacheKey(BlockUtils.AIRPROXY, 0));
+            } else {
+                CacheKey key = new CacheKey(new BlockUtils.UniqueIdentifierProxy(block), meta);
+                return cache.get(key);
+            }
+
 
         } catch (Exception e) {
             JourneyMap.getLogger().severe("Can't get blockId/meta for chunk " + chunkMd.stub.xPosition + "," + chunkMd.stub.zPosition + " block " + x + "," + y + "," + z); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
@@ -109,7 +111,7 @@ public class BlockMD implements Serializable {
         }
     }
 
-    public static BlockMD getBlockMD(GameRegistry.UniqueIdentifier uid, int meta) {
+    public static BlockMD getBlockMD(BlockUtils.UniqueIdentifierProxy uid, int meta) {
         try {
             return cache.get(new CacheKey(uid, meta));
         } catch (Exception e) {
@@ -121,49 +123,21 @@ public class BlockMD implements Serializable {
 
     private static final BlockMD createBlockMD(CacheKey key) {
 
-        Block block = GameRegistry.findBlock(key.uid.modId, key.uid.name);
-        if(block==null)
-        {
-            block = GameRegistry.findBlock(null, key.uid.name);
-            if(block==null)
-            {
-                if(!key.uid.name.equals("Air")) {
-                    JourneyMap.getLogger().warning("Block not found for " + key.uid);
-                    return new BlockMD(key, Blocks.air, "ERROR-" + block.getClass().getName());
-                }
-                else
-                {
-                    return new BlockMD(key, Blocks.air, "Air");
-                }
-            }
+        BlockMD blockMD;
+
+        if(key.uid.blockId==0 || key.uid.blockId -1 > Block.blocksList.length) {
+            blockMD = new BlockMD(key, null, "air");
+        } else {
+            Block block = Block.blocksList[key.uid.blockId];
+            blockMD = new BlockMD(key, block, key.uid.toString() + ":" + key.meta);
         }
 
-        String prefix = "";
-        String suffix = ":" + key.meta;
-        String name = key.uid.toString() + suffix;
-        try {
-            // Gotta love this.
-            Item item = Item.getItemFromBlock(block);
-            ItemStack stack = new ItemStack(item, 1, block.damageDropped(key.meta));
-            String displayName = stack.getDisplayName();
-
-            if(!key.uid.modId.equals("minecraft")){
-                prefix = key.uid.modId+":";
-            }
-
-            name = prefix + displayName + suffix;
-
-        } catch(Throwable t) {
-            JourneyMap.getLogger().fine("Displayname not available for " + name);
-        }
-
-        BlockMD blockMD = new BlockMD(key, block, name);
         if(blockMD.isAir()) {
             blockMD.color = Color.CYAN; // Should be obvious if it gets displayed somehow.
             blockMD.setAlpha(0f);
         } else {
-            if(BlockUtils.hasAlpha(block)) {
-                blockMD.setAlpha(BlockUtils.getAlpha(block));
+            if(BlockUtils.hasAlpha(blockMD.getBlock())) {
+                blockMD.setAlpha(BlockUtils.getAlpha(blockMD.getBlock()));
             } else {
                 blockMD.setAlpha(1F);
             }
@@ -175,7 +149,7 @@ public class BlockMD implements Serializable {
     }
 
 	private BlockMD(CacheKey key, Block block, String name) {
-        if(block==null) throw new IllegalArgumentException("Block can't be null");
+        //if(block==null) throw new IllegalArgumentException("Block can't be null");
         this.key = key;
 		this.block = block;
         this.name = name;
@@ -227,17 +201,16 @@ public class BlockMD implements Serializable {
     }
 	
 	public Block getBlock() {
-        if(block==null){
-            block = GameRegistry.findBlock(key.uid.modId, key.uid.name);
-            if(block==null){
-                block = Blocks.air;
+        if(block==null && key.uid.blockId>0){
+            if(key.uid.blockId==0) {
+                block = Block.blocksList[key.uid.blockId];
             }
         }
         return block;
 	}
 
     public boolean isTransparent() {
-        return block.getMaterial() == Material.air;
+        return block.blockMaterial == Material.air;
     }
 
     public boolean isAir() {
@@ -246,17 +219,17 @@ public class BlockMD implements Serializable {
 
     public boolean isTorch() {
         getBlock();
-        return block== Blocks.torch||block==Blocks.redstone_torch||block==Blocks.unlit_redstone_torch;
+        return block== Block.torchWood||block==Block.torchRedstoneActive||block==Block.torchRedstoneIdle;
     }
 
     public boolean isWater() {
         getBlock();
-        return block== Blocks.water||block==Blocks.flowing_water;
+        return block== Block.waterMoving||block==Block.waterStill;
     }
 
     public boolean isLava() {
         getBlock();
-        return block== Blocks.lava||block==Blocks.flowing_lava;
+        return block== Block.lavaMoving||block==Block.lavaStill;
     }
 
     public boolean isFoliage() {
@@ -300,5 +273,6 @@ public class BlockMD implements Serializable {
     public static void clearCache() {
         cache.invalidateAll();
     }
+
 
 }

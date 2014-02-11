@@ -1,6 +1,6 @@
 package net.techbrew.journeymap.cartography;
 
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Block;
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -446,7 +446,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 			if(lowerBlock!=null) {
 				stack.push(lowerBlock);
 
-                if(lowerBlock.isWater() || lowerBlock.getBlock()==Blocks.ice){
+                if(lowerBlock.isWater() || lowerBlock.getBlock()== Block.ice){
                     maxDepth = 4;
                 } else if(lowerBlock.isAir()) {
                     maxDepth = 256;

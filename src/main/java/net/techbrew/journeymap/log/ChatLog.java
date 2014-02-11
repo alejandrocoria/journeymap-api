@@ -1,12 +1,9 @@
 package net.techbrew.journeymap.log;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.event.ClickEvent;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.IChatComponent;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.io.FileHandler;
 
 import java.io.File;
 import java.util.Collections;
@@ -20,15 +17,15 @@ import java.util.logging.Level;
 public class ChatLog {
 
     // Announcements
-    static final List<ChatComponentTranslation> announcements = Collections.synchronizedList(new LinkedList<ChatComponentTranslation>());
+    static final List<Chat> announcements = Collections.synchronizedList(new LinkedList<Chat>());
 
     /**
      * Announce chat component.
      * @param chat
      */
-    public static void queueAnnouncement(IChatComponent chat) {
-        ChatComponentTranslation wrap = new ChatComponentTranslation("JourneyMap.chat_announcement", new Object[] {chat});
-        announcements.add(wrap);
+    public static void queueAnnouncement(Chat chat) {
+        chat.text = Constants.getString("JourneyMap.chat_announcement", new Object[] {chat.text});
+        announcements.add(chat);
     }
 
     /**
@@ -37,10 +34,8 @@ public class ChatLog {
      * @param url
      */
     public static void announceURL(String message, String url) {
-        ChatComponentText chat = new ChatComponentText(message);
-        chat.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
-        chat.getChatStyle().setUnderlined(Boolean.valueOf(true));
-        queueAnnouncement(chat);
+        // Clickable text doesn't exist yet
+        queueAnnouncement(new Chat(message));
     }
 
     /**
@@ -49,15 +44,8 @@ public class ChatLog {
      * @param file
      */
     public static void announceFile(String message, File file) {
-        ChatComponentText chat = new ChatComponentText(message);
-        try
-        {
-            chat.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getCanonicalPath()));
-            chat.getChatStyle().setUnderlined(Boolean.valueOf(true));
-        } catch(Exception e) {
-            JourneyMap.getLogger().warning("Couldn't build ClickEvent for file: " + LogFormatter.toString(e));
-        }
-        queueAnnouncement(chat);
+        // Clickable text doesn't exist yet
+        queueAnnouncement(new FileChat(message, file));
     }
 
     /**
@@ -67,8 +55,7 @@ public class ChatLog {
      */
     public static void announceI18N(String key, Object... parms) {
         String text = Constants.getString(key, parms);
-        ChatComponentText chat = new ChatComponentText(text);
-        queueAnnouncement(chat);
+        queueAnnouncement(new Chat(text));
     }
 
     /**
@@ -76,7 +63,8 @@ public class ChatLog {
      * @param text
      */
     public static void announceError(String text) {
-        ErrorChat chat = new ErrorChat(text);
+        Chat chat = new Chat(text);
+        chat.logLevel = Level.SEVERE;
         queueAnnouncement(chat);
     }
 
@@ -87,28 +75,41 @@ public class ChatLog {
      */
     public static void showChatAnnouncements(Minecraft mc) {
         while(!announcements.isEmpty()) {
-            ChatComponentTranslation message = announcements.remove(0);
+            Chat message = announcements.remove(0);
             if(message!=null) {
                 try {
-                    mc.ingameGUI.getChatGUI().printChatMessage(message);
+                    mc.ingameGUI.getChatGUI().printChatMessage(message.text);
+                    if(message instanceof FileChat) {
+                        FileHandler.open(((FileChat) message).file);
+                    }
                 } catch(Exception e){
                     JourneyMap.getLogger().severe("Could not display announcement in chat: " + LogFormatter.toString(e));
                 } finally {
-                    Level logLevel = message.getFormatArgs()[0] instanceof ErrorChat ? Level.SEVERE : Level.INFO;
-                    JourneyMap.getLogger().log(logLevel, message.getUnformattedTextForChat());
+                    JourneyMap.getLogger().log(message.logLevel, message.text);
                 }
             }
         }
     }
 
     /**
-     * Decorator to indicate log level should be ERROR.
+     * Decorator class for chat message
      */
-    private static class ErrorChat extends ChatComponentText {
-
-        public ErrorChat(String text) {
-            super(text);
+    private static class Chat {
+        Level logLevel = Level.INFO;
+        String text;
+        public Chat(String text) {
+            this.text = text;
         }
     }
 
+    /**
+     * Decorator to open file when displayed
+     */
+    private static class FileChat extends Chat {
+        final File file;
+        public FileChat(String text, File file) {
+            super(text);
+            this.file = file;
+        }
+    }
 }

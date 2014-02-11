@@ -249,7 +249,7 @@ public class MiniMapOptions extends JmUI {
         super.drawScreen(par1, par2, par3);
         
         int y = this.height / 4 - 18;
-        drawCenteredString(this.fontRendererObj, title , this.width / 2, y, 16777215);
+        drawCenteredString(this.fontRenderer, title , this.width / 2, y, 16777215);
 
     }
     

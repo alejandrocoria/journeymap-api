@@ -2,7 +2,6 @@ package net.techbrew.journeymap.cartography;
 
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -65,7 +64,8 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 
 					int y = getHeightInSlice(chunkMd, x, z, sliceMinY, sliceMaxY);
                     BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
-					boolean isLava = (blockMD.getBlock() == Blocks.lava || blockMD.getBlock() == Blocks.flowing_lava);
+                    Block block = blockMD.getBlock();
+					boolean isLava = (block == Block.lavaStill || block == Block.lavaMoving);
 
 					RGB color = blockMD.getColor(chunkMd, x, y, z);
 					
@@ -153,7 +153,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 				continue;
 			}
 			
-			if(block==Blocks.fire) {
+			if(block==Block.fire) {
 				y--;
 				break;
 			}

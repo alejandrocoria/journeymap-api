@@ -93,7 +93,7 @@ public class MiniMapHotkeysHelp extends JmUI {
 
         // Title
         int y = this.height / 4 - 18;
-        drawCenteredString(this.fontRendererObj, title , this.width / 2, y, 16777215);
+        drawCenteredString(this.fontRenderer, title , this.width / 2, y, 16777215);
 
         // Hotkey help
         y+=12;
@@ -107,10 +107,10 @@ public class MiniMapHotkeysHelp extends JmUI {
     protected void drawHelpStrings(String title, String keys, int x, int y)
     {
         int hgap = 4;
-        int tWidth = this.fontRendererObj.getStringWidth(title);
-        drawString(this.fontRendererObj, title, x - tWidth - hgap, y, 16777215);
-        int kWidth = this.fontRendererObj.getStringWidth(title);
-        drawString(this.fontRendererObj, keys, x + hgap + hgap, y, 16777215);
+        int tWidth = this.fontRenderer.getStringWidth(title);
+        drawString(this.fontRenderer, title, x - tWidth - hgap, y, 16777215);
+        int kWidth = this.fontRenderer.getStringWidth(title);
+        drawString(this.fontRenderer, keys, x + hgap + hgap, y, 16777215);
     }
     
     @Override
@@ -135,8 +135,6 @@ public class MiniMapHotkeysHelp extends JmUI {
                 return;
             }
 		}
-
-        keyEventHandler.onKeyboardEvent(null);
 	}
     
     @Override

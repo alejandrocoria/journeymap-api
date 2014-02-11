@@ -2,14 +2,14 @@ package net.techbrew.journeymap.cartography;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockBush;
+import net.minecraft.block.BlockDeadBush;
 import net.minecraft.block.BlockGrass;
 import net.minecraft.block.BlockVine;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.resources.IReloadableResourceManager;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.client.resources.IResourceManagerReloadListener;
+import net.minecraft.client.resources.ReloadableResourceManager;
+import net.minecraft.client.resources.ResourceManager;
+import net.minecraft.client.resources.ResourceManagerReloadListener;
 import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.techbrew.journeymap.JourneyMap;
@@ -27,7 +27,7 @@ import java.util.List;
  * @author mwoodman
  *
  */
-public class ColorCache implements IResourceManagerReloadListener {
+public class ColorCache implements ResourceManagerReloadListener {
 	
 	private static class Holder {
         private static final ColorCache INSTANCE = new ColorCache();
@@ -45,9 +45,9 @@ public class ColorCache implements IResourceManagerReloadListener {
 	
 	private ColorCache() {
 		
-		IResourceManager rm = Minecraft.getMinecraft().getResourceManager();
-		if(rm instanceof IReloadableResourceManager) {
-			((IReloadableResourceManager) rm).registerReloadListener(this);
+		ResourceManager rm = Minecraft.getMinecraft().getResourceManager();
+		if(rm instanceof ReloadableResourceManager) {
+			((ReloadableResourceManager) rm).registerReloadListener(this);
 		} else {
 			JourneyMap.getLogger().warning("Could not register ResourcePack ReloadListener.  Changing resource packs will require restart");
 		}		
@@ -56,7 +56,7 @@ public class ColorCache implements IResourceManagerReloadListener {
 	}
 	
 	@Override
-	public void onResourceManagerReload(IResourceManager mgr) {
+	public void onResourceManagerReload(ResourceManager mgr) {
 		
 		// Check if the resourcepack has changed
 		ResourcePackRepository repo = Minecraft.getMinecraft().getResourcePackRepository();
@@ -77,7 +77,9 @@ public class ColorCache implements IResourceManagerReloadListener {
     			reset();
     			lastResourcePack = currentPack;
         		// TODO: avoid this?
-        		iconLoader = new IconLoader();			
+                BlockUtils.initialize();
+        		iconLoader = new IconLoader();
+
     		}
     		
     	}
@@ -103,7 +105,7 @@ public class ColorCache implements IResourceManagerReloadListener {
 		BiomeGenBase biome = chunkMd.stub.getBiomeGenForWorldCoords(x, z, chunkMd.worldObj.getWorldChunkManager());
 		Block block = blockMD.getBlock();
 
-        if(block instanceof BlockGrass || block instanceof BlockBush) {
+        if(block instanceof BlockGrass || block instanceof BlockDeadBush) {
             return getGrassColor(blockMD, biome, x, y, z);
         }
 
@@ -139,7 +141,7 @@ public class ColorCache implements IResourceManagerReloadListener {
         Color color = getBiomeColor(blockMD, biome);
 		if(color==null) {
             int leafColor = blockMD.getBlock().getRenderColor(blockMD.key.meta); // getRenderColor()
-            int biomeColor = biome.getBiomeFoliageColor(x, y, z); // getBiomeFoliageColor()
+            int biomeColor = biome.getBiomeFoliageColor(); // getBiomeFoliageColor()
             int leafTimesBiome = colorMultiplier(biomeColor, leafColor);
             int darker = colorMultiplier(leafTimesBiome, 0xFFAAAAAA); // I added this, I'm sure it'll break with some custom leaf mod somewhere.
             color = new Color(darker);
@@ -152,7 +154,7 @@ public class ColorCache implements IResourceManagerReloadListener {
         Color color = getBiomeColor(blockMD, biome);
 		if(color==null) {
             Color baseColor = getBaseColor(blockMD, x, y, z);
-            int biomeColor = biome.getBiomeGrassColor(x,y,z); // BiomeGenBase.getBiomeGrassColor()
+            int biomeColor = biome.getBiomeGrassColor(); // BiomeGenBase.getBiomeGrassColor()
             color = colorMultiplier(baseColor, biomeColor);
             putBiomeColor(blockMD, biome, color);
 		}
@@ -235,7 +237,7 @@ public class ColorCache implements IResourceManagerReloadListener {
                 int tint = getBiomeColorMultiplier(blockMD, x, y, z);
                 if ((tint != 0xFFFFFF) && (tint != 0xFFFFFFFF)) { // white without alpha, white with alpha
                     blockMD.addFlags(BlockUtils.Flag.CustomBiomeColor);
-                    BlockUtils.setFlags(blockMD.getBlock(), BlockUtils.Flag.BiomeColor);
+                    BlockUtils.setFlags(blockMD.key.uid, BlockUtils.Flag.BiomeColor);
                     JourneyMap.getLogger().fine("Custom biome tint discovered for " + blockMD);
                 } else {
                     // Check for render color

@@ -145,7 +145,7 @@ public class PlayerData implements IDataProvider {
 		int checkY = topY;
 		while(seeSky && checkY>y) {
             try {
-                block = chunk.getBlock(x & 15, checkY, z & 15);
+                block = Block.blocksList[chunk.getBlockID(x & 15, checkY, z & 15)];
                 if(BlockUtils.hasFlag(block, BlockUtils.Flag.NotHideSky)) {
                     checkY--;
                 } else {

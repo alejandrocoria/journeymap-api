@@ -2,6 +2,7 @@ package net.techbrew.journeymap.io;
 
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.EnumOS;
 import net.minecraft.util.Util;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -220,7 +221,7 @@ public class FileHandler {
 
         String path = file.getAbsolutePath();
 
-        if (Util.getOSType() == Util.EnumOS.MACOS) {
+        if (Util.getOSType() == EnumOS.MACOS) {
             try {
                 Runtime.getRuntime().exec(new String[] {"/usr/bin/open", path});
                 return;
@@ -228,7 +229,7 @@ public class FileHandler {
                 JourneyMap.getLogger().severe("Could not open path with /usr/bin/open: " + path + " : " + LogFormatter.toString(e));
             }
             
-        } else if (Util.getOSType() == Util.EnumOS.WINDOWS) {
+        } else if (Util.getOSType() == EnumOS.WINDOWS) {
         	
             String cmd = String.format("cmd.exe /C start \"Open file\" \"%s\"", new Object[] {path});
 
