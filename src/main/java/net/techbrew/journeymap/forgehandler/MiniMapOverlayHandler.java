@@ -24,7 +24,7 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler {
     }
 
     @ForgeSubscribe
-    public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
+    public void onRenderOverlay(RenderGameOverlayEvent.Pre event) {
 
         final Minecraft mc = FMLClientHandler.instance().getClient();
         final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof MapOverlay);

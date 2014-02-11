@@ -21,6 +21,7 @@ public class BlockMD implements Serializable {
 
     public final static class CacheKey implements Serializable
     {
+        public static final CacheKey AIR = new CacheKey(BlockUtils.AIRPROXY, 0);
         public final BlockUtils.UniqueIdentifierProxy uid;
         public final int meta;
 
@@ -82,13 +83,14 @@ public class BlockMD implements Serializable {
      * @return
      */
     public static BlockMD getBlockMD(ChunkMD chunkMd, int x, int y, int z) {
+        Block block;
+        int meta;
+        boolean isAir = false;
+
         try {
-            Block block;
-            int meta;
-            boolean isAir = false;
             if(y>=0) {
                 block = chunkMd.getBlock(x, y, z);
-                isAir = block == null || block.isAirBlock(chunkMd.worldObj, x, y, z);
+                isAir = block == null || block.blockID ==0 || block.isAirBlock(chunkMd.worldObj, x, y, z);
                 meta = (isAir) ? 0 : chunkMd.stub.getBlockMetadata(x, y, z);
             } else {
                 block = Block.bedrock;
@@ -97,7 +99,7 @@ public class BlockMD implements Serializable {
 
             if(isAir)
             {
-                return cache.get(new CacheKey(BlockUtils.AIRPROXY, 0));
+                return cache.get(CacheKey.AIR);
             } else {
                 CacheKey key = new CacheKey(new BlockUtils.UniqueIdentifierProxy(block), meta);
                 return cache.get(key);

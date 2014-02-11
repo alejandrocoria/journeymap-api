@@ -148,7 +148,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 		for (; y > 0; y--) {
 			block = chunkMd.getBlock(x, y, z);
 
-			if (BlockUtils.hasFlag(block, BlockUtils.Flag.HasAir)) {
+			if (block==null || BlockUtils.hasFlag(block, BlockUtils.Flag.HasAir)) {
 				hasAir = true;
 				continue;
 			}

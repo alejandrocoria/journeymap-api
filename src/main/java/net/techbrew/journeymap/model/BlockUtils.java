@@ -103,7 +103,7 @@ public class BlockUtils {
 			final int maxY = chunkMd.stub.getHeightValue(x, z);
 			while(seeSky && checkY<=maxY) {
                 block = chunkMd.getBlock(x, checkY, z);
-				if(hasFlag(block, Flag.NotHideSky)) {
+				if(block==null || hasFlag(block, Flag.NotHideSky)) {
 					checkY++;
 				} else {
 					seeSky = false;
@@ -123,27 +123,34 @@ public class BlockUtils {
      * @return
      */
 	public static int ceiling(ChunkMD chunkMd, final int x, final int maxY, final int z) {
-		
-		final int chunkHeight = chunkMd.stub.getHeightValue(x, z);
-		final int topY = Math.min(maxY, chunkHeight);
 
-		Block block;
-		int y = topY;
-		
-		while(y>=0) {
-            block = chunkMd.getBlock(x, y, z);
-			if(chunkMd.stub.canBlockSeeTheSky(x, y, z)) {
-				y--;
-			} else if(hasFlag(block, Flag.NotCeiling)) {
-				y--;
-			} else if(hasFlag(block, Flag.NotHideSky)) {
-                y--;
-            } else {
-				break;
-			}
-		}
-		
-		return Math.max(0,y);
+        final int chunkHeight = chunkMd.stub.getHeightValue(x, z);
+        final int topY = Math.min(maxY, chunkHeight);
+        int y = topY;
+
+        try
+        {
+            Block block;
+            while(y>=0) {
+                block = chunkMd.getBlock(x, y, z);
+                if(block==null) {
+                    y--;
+                } else if(chunkMd.stub.canBlockSeeTheSky(x, y, z)) {
+                    y--;
+                } else if(hasFlag(block, Flag.NotCeiling)) {
+                    y--;
+                } else if(hasFlag(block, Flag.NotHideSky)) {
+                    y--;
+                } else {
+                    break;
+                }
+            }
+
+            return Math.max(0,y);
+        } catch(Exception e) {
+            JourneyMap.getLogger().fine(e + " at " + x + "," + y + "," + z);
+            return Math.max(0, topY);
+        }
 	}
 
     public static EnumSet<Flag> getFlags(Block block)
