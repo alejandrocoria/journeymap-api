@@ -82,7 +82,7 @@ public class EventHandlerManager {
                         break;
                 }
                 if(registered) {
-                    JourneyMap.getLogger().info(name + " registered in " + busType);
+                    JourneyMap.getLogger().fine(name + " registered in " + busType);
                 }
             }
             catch(Throwable t)
@@ -120,7 +120,7 @@ public class EventHandlerManager {
                             break;
                     }
                     if(unregistered) {
-                        JourneyMap.getLogger().info(name + " unregistered from " + busType);
+                        JourneyMap.getLogger().fine(name + " unregistered from " + busType);
                     }
                 }
                 catch(Throwable t)

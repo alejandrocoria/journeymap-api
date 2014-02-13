@@ -1,6 +1,7 @@
 package net.techbrew.journeymap.log;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.StringUtils;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
@@ -85,7 +86,7 @@ public class ChatLog {
                 } catch(Exception e){
                     JourneyMap.getLogger().severe("Could not display announcement in chat: " + LogFormatter.toString(e));
                 } finally {
-                    JourneyMap.getLogger().log(message.logLevel, message.text);
+                    JourneyMap.getLogger().log(message.logLevel, StringUtils.stripControlCodes(message.text));
                 }
             }
         }
