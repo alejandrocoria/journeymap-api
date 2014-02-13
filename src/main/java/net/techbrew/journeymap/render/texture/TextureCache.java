@@ -114,27 +114,27 @@ public class TextureCache {
 	}
 
     public TextureImpl getMinimapSmallSquare() {
-        return getNamedTexture(Name.MinimapSmallSquare, "minimap-square-256.png", false); //$NON-NLS-1$
+        return getNamedTexture(Name.MinimapSmallSquare, "minimap/minimap-square-256.png", false); //$NON-NLS-1$
     }
 
     public TextureImpl getMinimapLargeSquare() {
-        return getNamedTexture(Name.MinimapLargeSquare, "minimap-square-512.png", false); //$NON-NLS-1$
+        return getNamedTexture(Name.MinimapLargeSquare, "minimap/minimap-square-512.png", false); //$NON-NLS-1$
     }
 
     public TextureImpl getMinimapSmallCircle() {
-        return getNamedTexture(Name.MinimapSmallCircle, "minimap-circle-256.png", false); //$NON-NLS-1$
+        return getNamedTexture(Name.MinimapSmallCircle, "minimap/minimap-circle-256.png", false); //$NON-NLS-1$
     }
 
     public TextureImpl getMinimapSmallCircleMask() {
-        return getNamedTexture(Name.MinimapSmallCircle, "minimap-circle-mask-256.png", false); //$NON-NLS-1$
+        return getNamedTexture(Name.MinimapSmallCircle, "minimap/minimap-circle-mask-256.png", false); //$NON-NLS-1$
     }
 
     public TextureImpl getMinimapLargeCircle() {
-        return getNamedTexture(Name.MinimapLargeCircle, "minimap-circle-512.png", false); //$NON-NLS-1$
+        return getNamedTexture(Name.MinimapLargeCircle, "minimap/minimap-circle-512.png", false); //$NON-NLS-1$
     }
 
     public TextureImpl getMinimapLargeCircleMask() {
-        return getNamedTexture(Name.MinimapLargeCircle, "minimap-circle-mask-512.png", false); //$NON-NLS-1$
+        return getNamedTexture(Name.MinimapLargeCircle, "minimap/minimap-circle-mask-512.png", false); //$NON-NLS-1$
     }
 
 	public TextureImpl getWaypoint() {
