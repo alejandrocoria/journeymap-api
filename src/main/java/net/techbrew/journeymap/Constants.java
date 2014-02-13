@@ -23,7 +23,7 @@ public class Constants {
         Locale locale = Locale.getDefault();
         try {
             String lang = Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode();
-            locale = Locale.forLanguageTag(lang);
+            locale = new Locale(lang);
         } catch (Exception e) {
             JourneyMap.getLogger().warning("Couldn't determine locale from game settings, defaulting to " + locale);
         }
@@ -31,11 +31,11 @@ public class Constants {
     }
 
     public static String getString(String key) {
-        return I18n.format(key);
+        return I18n.getString(key);
     }
 
     public static String getString(String key, Object... params) {
-        return I18n.format(key, params);
+        return I18n.getStringParams(key, params);
     }
 
     public enum MapType {

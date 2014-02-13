@@ -94,6 +94,9 @@ public class DrawUtil {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
 
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+
         final int direction = flip ? -1 : 1;
 
         Tessellator tessellator = Tessellator.instance;
@@ -131,15 +134,15 @@ public class DrawUtil {
         GL11.glEnable(GL11.GL_ALPHA_TEST);
     }
 
-    public static void drawImage(TextureImpl texture, double x, double y, boolean flip) {
-        drawQuad(texture, x, y, texture.width, texture.height, flip);
+    public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float scale) {
+        drawQuad(texture, x, y, (int) (texture.width * scale), (int) (texture.height * scale), flip);
     }
 
     public static void drawImage(TextureImpl texture, double x, double y, boolean flip, int glBlendSfactor, int glBlendDfactor) {
         drawQuad(texture, x, y, texture.width, texture.height, flip, glBlendSfactor, glBlendDfactor);
     }
 
-    public static void drawRotatedImage(TextureImpl texture, double x, double y, float heading) {
+    public static void drawRotatedImage(TextureImpl texture, double x, double y, float heading, float scale) {
 
         // Start a new matrix for translation/rotation
         GL11.glPushMatrix();
@@ -161,11 +164,15 @@ public class DrawUtil {
         // Rotatate around origin
         GL11.glRotatef(heading, 0, 0, 1.0f);
 
+        // Adjust to scale
+        int width = (int)(texture.width * scale);
+        int height = (int)(texture.height * scale);
+
         // Offset the radius
-        GL11.glTranslated(-texture.width, -texture.height, 0);
+        GL11.glTranslated(-width, -height, 0);
 
         // Draw texture in rotated position
-        drawQuad(texture, texture.width / 2, texture.height / 2, texture.width, texture.height, false);
+        drawQuad(texture, width / 2, height / 2, width, height, false);
 
         GL11.glDisable(GL11.GL_BLEND);
 
@@ -196,15 +203,17 @@ public class DrawUtil {
      * @param texture
      * @param bottomMargin
      */
-    public static void drawEntity(double x, double y, Double heading, boolean flipInsteadOfRotate, TextureImpl texture, int bottomMargin) {
+    public static void drawEntity(double x, double y, Double heading, boolean flipInsteadOfRotate, TextureImpl texture, int bottomMargin, float scale) {
 
         if (heading == null) {
-            drawImage(texture, x, y, false);
+            drawImage(texture, x, y, false, scale);
         } else if (!flipInsteadOfRotate) {
-            drawRotatedImage(texture, x, y, heading.floatValue());
+            drawRotatedImage(texture, x, y, heading.floatValue(), scale);
         } else {
             boolean flip = heading < 90;
-            drawImage(texture, x - (texture.width / 2), y - (texture.height / 2) - bottomMargin, flip);
+            int width = (int)(texture.width * scale);
+            int height = (int)(texture.height * scale);
+            drawImage(texture, x - (width / 2), y - (height / 2) - bottomMargin, flip, scale);
         }
     }
 }

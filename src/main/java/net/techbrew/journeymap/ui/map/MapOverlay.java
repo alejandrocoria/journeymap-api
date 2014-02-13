@@ -26,6 +26,7 @@ import net.techbrew.journeymap.render.overlay.OverlayRadarRenderer;
 import net.techbrew.journeymap.render.overlay.OverlayWaypointRenderer;
 import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
+import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.ui.JmUI;
 import net.techbrew.journeymap.ui.MapButton;
 import net.techbrew.journeymap.ui.UIManager;
@@ -176,7 +177,7 @@ public class MapOverlay extends JmUI {
     //        width = width;
 //        height = height;
 //        mc = mc;
-//        fontRenderer = super.fontRendererObj;
+//        fontRenderer = super.fontRenderer;
 //        buttonList = buttonList;
 
 	/**
@@ -343,8 +344,8 @@ public class MapOverlay extends JmUI {
 			isScrolling=false;
 						
 			int blockSize = (int) Math.pow(2,state.currentZoom);
-			int mouseDragX = (mx-msx)/blockSize;
-			int mouseDragY = (my-msy)/blockSize;
+			int mouseDragX = (mx-msx)*2/blockSize;
+			int mouseDragY = (my-msy)*2/blockSize;
 			msx=mx;
 			msy=my;
 			
@@ -445,44 +446,44 @@ public class MapOverlay extends JmUI {
         }
 		
 		// North
-		if(i==mc.gameSettings.keyBindForward.getKeyCode()) { // getkeyCode
+		if(i==mc.gameSettings.keyBindForward.keyCode) { // getkeyCode
 			moveCanvas(0,-16);
 			return;
 		}
 		
 		// West
-		if(i==mc.gameSettings.keyBindLeft.getKeyCode()) {
+		if(i==mc.gameSettings.keyBindLeft.keyCode) {
 			moveCanvas(-16, 0);
 			return;
 		}
 		
 		// South
-		if(i==mc.gameSettings.keyBindBack.getKeyCode()) {
+		if(i==mc.gameSettings.keyBindBack.keyCode) {
 			moveCanvas(0,16);
 			return;
 		}
 		
 		// East
-		if(i==mc.gameSettings.keyBindRight.getKeyCode()) {
+		if(i==mc.gameSettings.keyBindRight.keyCode) {
 			moveCanvas(16, 0);
 			return;
 		}
 		
 		// Open inventory
-		if(i==mc.gameSettings.keyBindInventory.getKeyCode()) { // keyBindInventory
+		if(i==mc.gameSettings.keyBindInventory.keyCode) { // keyBindInventory
 			close();
 			mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
 			return;
 		}
 		
 		// Open chat
-		if(i==mc.gameSettings.keyBindChat.getKeyCode()) {
+		if(i==mc.gameSettings.keyBindChat.keyCode) {
 			openChat("");
 			return;
 		}
 		
 		// Open chat with command prefix (Minecraft.java does this in runTick() )
-		if(i==mc.gameSettings.keyBindCommand.getKeyCode()) {
+		if(i==mc.gameSettings.keyBindCommand.keyCode) {
 			openChat("/");
 			return;
 		}
@@ -517,11 +518,11 @@ public class MapOverlay extends JmUI {
 
 		if(isScrolling) {
 			int blockSize = (int) Math.pow(2,state.currentZoom);
-			int mouseDragX = (mx-msx)/blockSize;
-			int mouseDragY = (my-msy)/blockSize;
+			int mouseDragX = (mx-msx)*2/blockSize;
+			int mouseDragY = (my-msy)*2/blockSize;
 			
-			xOffset = mouseDragX*blockSize;
-			yOffset = mouseDragY*blockSize;
+			xOffset = (mouseDragX*blockSize);
+			yOffset = (mouseDragY*blockSize);
 
 		} else if(refreshReady) {
             refreshState();
@@ -534,15 +535,16 @@ public class MapOverlay extends JmUI {
         }
         gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
 		gridRenderer.draw(1f, xOffset, yOffset);
-        gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset);
+        gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, 1f);
 
         Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
         if(playerPixel!=null) {
-            DrawStep drawStep = new DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
-            gridRenderer.draw(xOffset, yOffset, drawStep);
+            TextureImpl tex = state.currentZoom==0 ? TextureCache.instance().getPlayerLocatorSmall() : TextureCache.instance().getPlayerLocator();
+            DrawStep drawStep = new DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, tex, 8);
+            gridRenderer.draw(xOffset, yOffset, 1f, drawStep);
         }
 
-        DrawUtil.drawImage(TextureCache.instance().getLogo(), 16, 4, false);
+        DrawUtil.drawImage(TextureCache.instance().getLogo(), 16, 4, false, 1f);
 
 		sizeDisplay(true);
 
@@ -554,7 +556,7 @@ public class MapOverlay extends JmUI {
 	public static void drawMapBackground(JmUI ui) {
 		ui.sizeDisplay(false);
         gridRenderer.draw(1f, 0, 0);
-		DrawUtil.drawImage(TextureCache.instance().getLogo(), 16, 4, false);
+		DrawUtil.drawImage(TextureCache.instance().getLogo(), 16, 4, false, 1f);
 		ui.sizeDisplay(true);
 	}
 	
@@ -587,7 +589,7 @@ public class MapOverlay extends JmUI {
         gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 
 		// Build list of drawSteps
-		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer);
+		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, 1f);
 		
 		// Update player pos
 		state.playerLastPos = Constants.getString("MapOverlay.player_location",

@@ -1,6 +1,6 @@
 package net.techbrew.journeymap.cartography;
 
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Block;
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -36,11 +36,25 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
 		// Render the chunk image
 		if(underground) {
+
 			boolean ok = renderSurface(g2D, chunkMd, vSlice, neighbors, true);
             if(!ok) {
                 JourneyMap.getLogger().fine("The surface chunk didn't paint: " + chunkMd.toString());
             }
-			ok = renderUnderground(g2D, chunkMd, vSlice, neighbors);
+
+            final int sliceMinY = Math.max((vSlice << 4) - 1, 0);
+            final int hardSliceMaxY = ((vSlice + 1) << 4) - 1;
+            int sliceMaxY = Math.min(hardSliceMaxY, chunkMd.worldObj.getActualHeight());
+            if (sliceMinY == sliceMaxY) {
+                sliceMaxY += 2;
+            }
+
+            if(chunkMd.sliceSlopes==null) {
+                initSliceSlopes(chunkMd, sliceMinY, sliceMaxY, neighbors);
+            }
+
+			ok = renderUnderground(g2D, chunkMd, vSlice, sliceMinY, sliceMaxY, neighbors);
+
             if(!ok) {
                 JourneyMap.getLogger().fine("The underground chunk didn't paint: " + chunkMd.toString());
             }
@@ -71,6 +85,28 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
             }
         }
     }
+
+    /**
+     * Initialize slice slopes in chunk if needed.
+     * @param chunkMd
+     * @param neighbors
+     */
+    private void initSliceSlopes(final ChunkMD chunkMd, int sliceMinY, int sliceMaxY, final ChunkMD.Set neighbors) {
+        chunkMd.sliceSlopes = new float[16][16];
+        float slope, h, hN, hW;
+
+        for(int z=0; z<16; z++)
+        {
+            for(int x=0; x<16; x++)
+            {
+                h = getHeightInSlice(chunkMd, x, z, sliceMinY, sliceMaxY);
+                hN = (z==0)  ? getBlockHeight(x, z, 0, -1, chunkMd, neighbors, h, sliceMinY, sliceMaxY) : getHeightInSlice(chunkMd, x, z - 1, sliceMinY, sliceMaxY);
+                hW = (x==0)  ? getBlockHeight(x, z, -1, 0, chunkMd, neighbors, h, sliceMinY, sliceMaxY) : getHeightInSlice(chunkMd, x - 1, z, sliceMinY, sliceMaxY);
+                slope = ((h/hN)+(h/hW))/2f;
+                chunkMd.sliceSlopes[x][z] = slope;
+            }
+        }
+    }
 		
 	/**
 	 * Render blocks in the chunk for the surface.
@@ -89,22 +125,30 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                 int y = Math.max(1, chunkMd.stub.getHeightValue(x, z));
 
 				// Get blockinfo for coords
-				BlockMD blockMD;
+				BlockMD blockMD = null;
+                int blockId;
                 do {
-                    blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
-
-                    // Null check
-                    if (blockMD == null) {
-                        paintBadBlock(x, y, z, g2D);
-                        continue blockLoop;
-                    }
-
-                    if(blockMD.isAir()) {
+                    blockId = chunkMd.stub.getBlockID(x, y, z);
+                    if(blockId==0) {
                         y--;
                     } else {
-                        break;
+                        blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+                        if (blockMD == null) {
+                            break;
+                        }
+
+                        if(blockMD.isAir()) {
+                            y--;
+                        } else {
+                            break;
+                        }
                     }
                 } while(y>=0);
+
+                if(blockMD==null) {
+                    paintBadBlock(x, y, z, g2D);
+                    continue blockLoop;
+                }
 
 				// Get base color for block
 				RGB color = blockMD.getColor(chunkMd, x, y, z);
@@ -236,32 +280,9 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	 * Render blocks in the chunk for underground.
 	 *
 	 */
-	public boolean renderUnderground(final Graphics2D g2D, final ChunkMD chunkMd, final int vSlice, final ChunkMD.Set neighbors) {
+	public boolean renderUnderground(final Graphics2D g2D, final ChunkMD chunkMd, final int vSlice, final int sliceMinY, final int sliceMaxY, final ChunkMD.Set neighbors) {
 
-		final int sliceMinY = Math.max((vSlice << 4) - 1, 0);
-		final int hardSliceMaxY = ((vSlice + 1) << 4) - 1;
-		int sliceMaxY = Math.min(hardSliceMaxY, chunkMd.worldObj.getActualHeight());
-		if (sliceMinY == sliceMaxY) {
-			sliceMaxY += 2;
-		}
 
-		// Initialize ChunkSub slopes if needed
-		if(chunkMd.sliceSlopes==null) {
-			chunkMd.sliceSlopes = new float[16][16];
-			float slope, h, hN, hW;
-
-			for(int z=0; z<16; z++)
-			{
-				for(int x=0; x<16; x++)
-				{
-					h = getHeightInSlice(chunkMd, x, z, sliceMinY, sliceMaxY);
-					hN = (z==0)  ? getBlockHeight(x, z, 0, -1, chunkMd, neighbors, h, sliceMinY, sliceMaxY) : getHeightInSlice(chunkMd, x, z-1, sliceMinY, sliceMaxY);
-					hW = (x==0)  ? getBlockHeight(x, z, -1, 0, chunkMd, neighbors, h, sliceMinY, sliceMaxY) : getHeightInSlice(chunkMd, x-1, z, sliceMinY, sliceMaxY);
-					slope = ((h/hN)+(h/hW))/2f;
-					chunkMd.sliceSlopes[x][z] = slope;
-				}
-			}
-		}
 
 		boolean hasAir;
 		boolean hasWater;
@@ -446,7 +467,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 			if(lowerBlock!=null) {
 				stack.push(lowerBlock);
 
-                if(lowerBlock.isWater() || lowerBlock.getBlock()==Blocks.ice){
+                if(lowerBlock.isWater() || lowerBlock.getBlock()== Block.ice){
                     maxDepth = 4;
                 } else if(lowerBlock.isAir()) {
                     maxDepth = 256;

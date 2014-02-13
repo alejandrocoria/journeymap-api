@@ -27,10 +27,10 @@ public class DrawEntityStep implements DrawStep {
     }
 
     @Override
-    public void draw(int xOffset, int yOffset, GridRenderer gridRenderer) {
+    public void draw(int xOffset, int yOffset, GridRenderer gridRenderer, float scale) {
         Point2D pixel = gridRenderer.getPixel(posX, posZ);
         if (pixel != null) {
-            DrawUtil.drawEntity(pixel.getX() + xOffset, pixel.getY() + yOffset, heading, flip, texture, bottomMargin);
+            DrawUtil.drawEntity(pixel.getX() + xOffset, pixel.getY() + yOffset, heading, flip, texture, bottomMargin, scale);
         }
     }
 }

@@ -143,18 +143,24 @@ public class PlayerData implements IDataProvider {
 
         Chunk chunk = world.getChunkFromBlockCoords(x, z);
 		int checkY = topY;
+        int blockId;
 		while(seeSky && checkY>y) {
             try {
-                block = chunk.getBlock(x & 15, checkY, z & 15);
-                if(BlockUtils.hasFlag(block, BlockUtils.Flag.NotHideSky)) {
+                blockId = chunk.getBlockID(x & 15, checkY, z & 15);
+                if(blockId==0) {
                     checkY--;
                 } else {
-                    seeSky = false;
-                    break;
+                    block = Block.blocksList[blockId];
+                    if(BlockUtils.hasFlag(block, BlockUtils.Flag.NotHideSky)) {
+                        checkY--;
+                    } else {
+                        seeSky = false;
+                        break;
+                    }
                 }
             } catch (Exception e) {
                 checkY--;
-                JourneyMap.getLogger().warning(e + " at " + (x & 15) + "," + checkY + "," + (z & 15));
+                JourneyMap.getLogger().fine(e + " at " + (x & 15) + "," + checkY + "," + (z & 15));
                 continue;
             }
 

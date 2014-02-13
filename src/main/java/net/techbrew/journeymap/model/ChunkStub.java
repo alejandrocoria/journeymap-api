@@ -13,10 +13,10 @@ public class ChunkStub extends Chunk {
         super(chunk.worldObj, chunk.xPosition, chunk.zPosition);
 
         // private ExtendedBlockStorage[] storageArrays;
-        ReflectionHelper.setPrivateValue(Chunk.class, (Chunk) this, chunk.getBlockStorageArray(), 2);
+        ReflectionHelper.setPrivateValue(Chunk.class, (Chunk) this, chunk.getBlockStorageArray(), 1);
 
         // private byte[] blockBiomeArray;
-        ReflectionHelper.setPrivateValue(Chunk.class, (Chunk) this, chunk.getBiomeArray(), 3);
+        ReflectionHelper.setPrivateValue(Chunk.class, (Chunk) this, chunk.getBiomeArray(), 2);
 
         // public int[] precipitationHeightMap;
         this.precipitationHeightMap = Arrays.copyOf(chunk.precipitationHeightMap, chunk.precipitationHeightMap.length);
@@ -54,10 +54,10 @@ public class ChunkStub extends Chunk {
         this.isTerrainPopulated = chunk.isTerrainPopulated;
 
         // public boolean isLightPopulated;
-        this.isLightPopulated = chunk.isLightPopulated;
+        //this.isGapLightingUpdated = chunk.isLightPopulated;
 
         // public boolean field_150815_m;
-        this.field_150815_m = chunk.field_150815_m;
+        //this.field_150815_m = chunk.field_150815_m;
 
         // public boolean isModified;
         this.isModified = chunk.isModified;
@@ -88,7 +88,7 @@ public class ChunkStub extends Chunk {
         }
 
         // private ExtendedBlockStorage[] storageArrays;
-        ReflectionHelper.setPrivateValue(Chunk.class, (Chunk) this, chunk.getBlockStorageArray(), 2);
+        ReflectionHelper.setPrivateValue(Chunk.class, (Chunk) this, chunk.getBlockStorageArray(), 1);
 
         // public boolean[] updateSkylightColumns;
         this.updateSkylightColumns = Arrays.copyOf(chunk.updateSkylightColumns, chunk.updateSkylightColumns.length);
@@ -100,10 +100,10 @@ public class ChunkStub extends Chunk {
         this.isTerrainPopulated = chunk.isTerrainPopulated;
 
         // public boolean isLightPopulated;
-        this.isLightPopulated = chunk.isLightPopulated;
+        //this.isLightPopulated = chunk.isLightPopulated;
 
         // public boolean field_150815_m;
-        this.field_150815_m = chunk.field_150815_m;
+        //this.field_150815_m = chunk.field_150815_m;
 
         // public boolean isModified;
         this.isModified = chunk.isModified;

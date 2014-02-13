@@ -1,0 +1,363 @@
+﻿# JourneyMap Resource Bundle - es_ES
+# Updated for 3.3.0
+
+########################
+# Error messages:  Note, translating these are optional, but they may help users diagnose the problem on their own.
+########################
+
+JMERR00=[JMERR00] JourneyMap ha encontrado un error inesperado: %1$s
+JMERR01=[JMERR01] JourneyMap %1$s requiere %2$s
+JMERR02=[JMERR02] JourneyMap no está disponible para el mundo
+JMERR03=[JMERR03] JMServer no puede empezar un servidor web
+JMERR04=[JMERR04] FileHandler no puede escribir el archivo: %1$s
+JMERR05=[JMERR05] Web Browser sent a malformed request: %1$s
+JMERR06=[JMERR06] ChunkServlet could not read data directory for world: %1$s
+JMERR07=[JMERR07] Couldn't get block in chunk: %1$s
+JMERR08=[JMERR08] Could not write chunk image to file: %1$s
+JMERR09=[JMERR09] Player not connected to any world
+JMERR10=[JMERR10] Player not connected to world: %1$s
+JMERR11=[JMERR11] Could not read player data file
+JMERR12=[JMERR12] Could not serve web file: %1$s
+JMERR13=[JMERR13] Browser requested unknown file: %1$s
+JMERR14=[JMERR14] Browser tried an unsupported HTTP method: %1$s
+JMERR15=[JMERR15] Unexpected error while writing player file: %1$s
+JMERR16=[JMERR16] Unexpected error while writing chunk image files: %1$s
+JMERR17=[JMERR17] Unexpected error getting entity icon for in-game map: %1$s
+JMERR18=[JMERR18] Error exporting world map: %1$s
+JMERR19=[JMERR19] Error reading property file: %1$s
+JMERR20=[JMERR20] Error writing property file: %1$s
+JMERR21=[JMERR21] Error reading region file: %1$s.  Error: %2$s
+JMERR22=[JMERR22] Error writing region file: %1$s.  Error: %2$s
+JMERR23=[JMERR23] Map UI error: %1$s
+JMERR24=[JMERR24] Failed to start webserver
+
+########################
+# In-game chat messages
+# Note: Do not translate or alter chat color changes (§b, §e, §f, etc.)
+########################
+
+# %1$s = JourneyMap version (§e and §f are color changes)
+JourneyMap.chat_announcement=§eJourneyMap:§f %1$s
+
+# %1$s = Key to press ('J')
+JourneyMap.mapgui_only_ready=Pulsa [§b%1$s§f].  (El servidor web está desactivado.)
+
+# %1$s = JourneyMap version
+JourneyMap.new_version_available=Nueva versión disponible: %1$s
+
+# %1$s = JourneyMap version (§e is a color change)
+JourneyMap.ready=§e%1$s listo.
+
+JourneyMap.webserver_and_mapgui_disabled=JourneyMap está desactivado por el archivo journeyMap.properties
+
+# %1$s = Key to press ('J'), %2$s = website port number (8080) (§b and §f are color changes)
+JourneyMap.webserver_and_mapgui_ready=Pulsa [§b%1$s§f] o abre el navegador web con la url§b http://localhost%2$s §f
+
+# %1$s = website port number (8080) (§b and §f are color changes)
+JourneyMap.webserver_only_ready=Abre el navagador web con la url§b http://localhost%1$s §f. (Mapa en el juego deshabilitado)
+
+# Added in 3.0.0
+JourneyMap.file_updates=Se están actualizando los archivos (%1$s). Mapping abortado.
+JourneyMap.file_updates_complete=Se ha completado la actualización de los archivos.  Mapping resumido.
+
+########################
+# In-game Map messages
+########################
+
+# %1$s = JourneyMap version
+MapOverlay.options=Opciones
+MapOverlay.close=Cerrar
+
+# Added in 3.1.0:
+MapOverlay.disabled_feature=Característica no disponible
+
+MapOverlay.day=Día
+MapOverlay.night=Noche
+
+MapOverlay.on=Encendido
+MapOverlay.off=Apagado
+
+# Added in 3.0.0: Actions button
+MapOverlay.actions=Acciones
+
+# %1$s = "On" or "Off"
+MapOverlay.follow=Seguir: %1$s
+
+# %1$s = x, %2$s = y, %3$s = z, %4$s = vertical slice, %5$s Biome name
+MapOverlay.player_location=Localización: %1$s , %2$s | Elevación: %3$s (%4$s) | Bioma: %5$s
+
+# Added in 3.1.0. %1$s = x, %2$s = y, %3$s = z, %4$s = vertical slice, %5$s Biome name
+MapOverlay.player_location_minimap=%1$s, %2$s | %3$s (%4$s) | %5$s
+
+# Added in 3.1.0. %1$s = x, %2$s = y, %3$s = z, %4$s = vertical slice
+MapOverlay.player_location_minimap_nobiome=%1$s, %2$s | %3$s (%4$s)
+
+MapOverlay.save_map=Guardar Mapa
+
+# OBSOLETE in 3.0.0
+MapOverlay.saving_map_to_file=Guardando %1$s mapa en archivo...
+
+# Added in 3.0.0.  %1$s=filename
+MapOverlay.save_filename=Guardando mapa en imágenes: %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_caves=Mostrar cuevas: %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_monsters=Mostrar monstruos : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_animals=Mostrar animales : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_villagers=Mostrar aldeanos : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_pets=Mostrar mascotas : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_players=Mostrar jugadores : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_waypoints=Mostrar Waypoints : %1$s
+
+# %1$s = "On" or "Off"
+MapOverlay.show_grid=Mostrar cuadrícula : %1$s
+
+# Added in 3.1.x.
+MapOverlay.minimap=MiniMap...
+
+# Added in 3.0.0.  %1$s = "On" or "Off"
+MapOverlay.enable_webserver=Webserver: %1$s
+
+# Added in 3.0.0
+MapOverlay.automap_title=Auto-Map...
+
+# Added in 3.0.0
+MapOverlay.automap_text=Completa las regiones automáticamente (Un jugador)
+
+# Added in 3.0.0
+MapOverlay.automap_dialog=Auto-Map
+
+# Added in 3.0.0
+MapOverlay.automap_dialog_text=Completar automáticamente todas las regiones o sólo las que faltan?
+
+# Added in 3.0.0
+MapOverlay.automap_dialog_all=Todas
+
+# Added in 3.0.0
+MapOverlay.automap_dialog_missing=Las que faltan
+
+# Added in 3.0.0
+MapOverlay.automap_dialog_none=Ninguna
+
+# Added in 3.0.0: %1$s = Percent complete
+MapOverlay.automap_status=Auto-mapping superfície (%1$s).
+
+# Added in 3.0.0: %1$s = Vertical slice number, %2$s = Percent complete
+MapOverlay.automap_status_underground=Auto-mapping slice %1$s (%2$s).
+
+# Added in 3.0.0
+MapOverlay.automap_complete=Auto-mapping de la superfície se ha parado.
+
+# Added in 3.0.0: %1$s = Vertical slice number,
+MapOverlay.automap_complete_underground=Auto-mapping of slice %1$s se ha parado.
+
+MapOverlay.update_available=Actualización disponible!
+MapOverlay.update_check=Comprobar actualizaciones
+MapOverlay.use_browser=Usar navegador
+MapOverlay.zoom_in=Aumentar zoom
+MapOverlay.zoom_out=Alejar Zoom
+
+# Added in 3.1.x:
+MiniMap.options=Opciones del MiniMapa
+
+# Added in 3.1.x: %1$s = "On" or "Off"
+MiniMap.enable_minimap=MiniMap: %1$s
+
+# Added in 3.1.x.  %1$s One of "Top Left", "Top Right", "Bottom Left", "Bottom Right"
+MiniMap.position=Posición: %1$s
+
+# Added in 3.1.x.
+MiniMap.position_topleft=Arriba a la izquierda
+
+# Added in 3.1.x.
+MiniMap.position_topright=Arriba a la derecha
+
+# Added in 3.1.x.
+MiniMap.position_bottomleft=Abajo a la izquierda
+
+# Added in 3.1.x.
+MiniMap.position_bottomright=Abajo a la derecha
+
+# Added in 3.1.x.  %1$s = One of "Small Square", "Large Square", "Small Circle", "Large Circle"
+MiniMap.shape=Shape: %1$s
+
+# Added in 3.1.x.
+MiniMap.shape_smallsquare=Cuadrado pequeño
+
+# Added in 3.1.x.
+MiniMap.shape_largesquare=Cuadrado grande
+
+# Added in 3.1.x.
+MiniMap.shape_smallcircle=Círculo pequeño
+
+# Added in 3.1.x.
+MiniMap.shape_largecircle=Círculo grande
+
+# Added in 3.1.x.  %1$s = one of "Small", "Large"
+MiniMap.font=Fuente: %1$s
+MiniMap.font_small=Pequeña
+MiniMap.font_large=Grande
+
+# Added in 3.3.x.  %1$s = one of "On", "Off".  Hot Keys are keyboard shortcuts that can control the minimap.
+MiniMap.hotkeys=Hot Keys: %1$s
+
+# Added in 3.3.x.  (§b and §f are color changes)
+MiniMap.hotkeys_help=Hot Keys...
+MiniMap.hotkeys_help_title=Minimap Hot Keys
+MiniMap.hotkeys_help_toggle=Mostrar/ocultar MiniMapa:
+MiniMap.hotkeys_help_toggle_key=§bCTRL J§f
+MiniMap.hotkeys_help_zoom=Acercar/Alejar MiniMapa:
+MiniMap.hotkeys_help_zoom_key=§bCTRL +§f , §bCTRL -§f
+MiniMap.hotkeys_help_maptype=Cambiar el mapa a día/noche:
+MiniMap.hotkeys_help_maptype_key=§bCTRL [§f , §bCTRL ]§f
+
+# Added in 3.1.x.  %1$s = one of "On", "Off".  FPS is short for "Frames per Second", a measurement of graphic performance.
+MiniMap.show_fps=Mostrar FPS: %1$s
+
+# Added in 3.1.x.
+MiniMap.return_to_game=Volver al juego
+
+# %1$s = filename
+MapSaver.map_saved=Mapa guardado: %1$s
+
+# Added in 3.1.0.  Unlimited means there are no feature restrictions
+Feature.unlimited=Ilimitado
+
+# Added in 3.1.0.  "Fair play" means multiplayer features used for cheating are disabled
+Feature.fair_play=Juego Limpio
+
+########################
+# Web UI messages
+########################
+
+# Unused, but keep for future use
+WebMap.text_direction=ltr
+
+# JourneyMap menu / homepage link
+WebMap.web_link_text=journeymap.techbrew.net
+WebMap.web_link_title=JourneyMap homepage
+
+# JourneyMap menu / forums link
+WebMap.forum_link_text=minecraftforum.net
+WebMap.forum_link_title=JourneyMap forum on minecraftforum.net
+
+# JourneyMap menu / RSS feed link
+WebMap.rss_feed_text=JourneyMap noticias RSS
+WebMap.rss_feed_title=Suscribete a las noticias de JourneyMap con RSS
+
+# JourneyMap menu / Email subscription link
+WebMap.email_sub_text=JourneyMap news Email
+WebMap.email_sub_title=Subscribe to JourneyMap news by Email
+
+# JourneyMap menu / Follow on Twitter link
+WebMap.follow_twitter_text=Sigue a JourneyMapMod en Twitter
+WebMap.follow_twitter_title=Sigue a JourneyMapMod en Twitter
+
+# JourneyMap menu / Donate link
+WebMap.donate_text=Dona a JourneyMap
+WebMap.donate_title=Dona al desarrollo de JourneyMap mediante PayPal
+
+# Update button title (shown only when update available)
+WebMap.update_button_title=Update Available: JourneyMap %1$s for Minecraft %2$s
+
+# Day/Night button
+WebMap.day_button_text=Day
+WebMap.day_button_title=The world map as it appears in daylight.
+WebMap.night_button_text=Night
+WebMap.night_button_title=The world map as it appears in moonlight.
+
+# Follow button
+WebMap.follow_button_title=Auto-center the map on you. (Turns off if you manually pan.)
+
+# Show menu
+WebMap.show_menu_text=Show...
+
+# Show menu / Smooth Pixels (Unused)
+WebMap.smooth_pixels_menu_item=Smooth Pixels
+
+# Show menu / Caves
+WebMap.caves_menu_item_text=Caves
+WebMap.caves_menu_item_title=Show cave/interior map when you are not under sky.
+
+# Show menu / Grid
+WebMap.grid_menu_item_text=Grid
+WebMap.grid_menu_item_title=Show chunk grid
+
+# Show menu / Waypoints
+WebMap.waypoints_menu_item_text=Waypoints
+WebMap.waypoints_menu_item_title=Show waypoints
+
+# Show menu / Animals
+WebMap.animals_menu_item_text=Animals
+WebMap.animals_menu_item_title=Show nearby animals
+
+# Show menu / Pets
+WebMap.pets_menu_item_text=Pets
+WebMap.pets_menu_item_title=Show nearby pets
+
+# Show menu / Mobs (Monsters)
+WebMap.mobs_menu_item_text=Mobs
+WebMap.mobs_menu_item_title=Show nearby mobs
+
+# Show menu / Villagers
+WebMap.villagers_menu_item_text=Villagers
+WebMap.villagers_menu_item_title=Show nearby villagers
+
+# Show menu / Other players (multiplayer)
+WebMap.players_menu_item_text=Players
+WebMap.players_menu_item_title=Show nearby players (multiplayer)
+
+# Added in 3.0.0: Auto-Map button (singleplayer)
+WebMap.automap_text=Auto-Map...
+
+# Added in 3.0.0: Auto-Map button tooltip
+WebMap.automap_title=Automatically map unexplored regions (single-player)
+WebMap.automap_dialog_text=Automatically map all regions or just missing regions?
+WebMap.automap_dialog_all=All
+WebMap.automap_dialog_missing=Missing
+WebMap.automap_dialog_none=None
+WebMap.automap_dialog_close=Close
+WebMap.automap_already_started=Auto-mapping already in progress.
+WebMap.automap_started=Auto-mapping started. Check game chat for progress.
+WebMap.automap_complete=Auto-mapping has stopped.
+
+# Added in 3.0.0: %1$s = Vertical slice number,
+WebMap.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
+
+# Added in 3.0.0: Save Map button text
+WebMap.save_button_text=Save Map
+
+# Save Map button
+WebMap.save_button_title=Save the explored map to file
+
+# Added in 3.0.0.  %1$s = filename
+WebMap.save_filename=Saving map to screenshots: %1$s
+
+# Added in 3.0.0: Actions button 
+WebMap.actions_title=Actions...
+
+# Zoom slider
+WebMap.zoom_slider_name=Zoom
+
+# World info area
+WebMap.worldname_text=World Name:
+WebMap.worldtime_text=World Time:
+WebMap.location_text=Location:
+WebMap.elevation_text=Elevation:
+WebMap.slice_text=Vertical Slice:
+WebMap.biome_text=Biome:
+
+# Error message if world isn't open in Minecraft
+WebMap.error_world_not_opened=Minecraft World Not Opened
