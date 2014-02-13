@@ -18,6 +18,8 @@ import java.util.EnumSet;
 @SideOnly(Side.CLIENT)
 public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler {
 
+    final Minecraft mc = FMLClientHandler.instance().getClient();
+
     @Override
     public EnumSet<EventHandlerManager.BusType> getBus() {
         return EnumSet.of(EventHandlerManager.BusType.MinecraftForgeBus);
@@ -26,17 +28,13 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler {
     @ForgeSubscribe
     public void onRenderOverlay(RenderGameOverlayEvent.Pre event) {
 
-        final Minecraft mc = FMLClientHandler.instance().getClient();
-        final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof MapOverlay);
-
-        // Manage tiles
-        if(isGamePaused) {
-            TileCache.pause();
-        } else {
-            TileCache.resume();
-        }
-
-        if (event.type == RenderGameOverlayEvent.ElementType.ALL) {
+        if (event.type == RenderGameOverlayEvent.ElementType.HOTBAR) {
+            final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof MapOverlay);
+            if(isGamePaused) {
+                TileCache.pause();
+            } else {
+                TileCache.resume();
+            }
             UIManager.getInstance().drawMiniMap();
         }
     }
