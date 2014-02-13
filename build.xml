@@ -33,13 +33,12 @@
     <target name="build-unlimited" description="Build Unlimited Edition" depends="init">
         <stage edition="${unlimited}"/>
         <dist edition="${unlimited}"/>
-        <ant target="cleanforge" />
     </target>
 
     <target name="build-fairplay" description="Build FairPlay Edition" depends="init">
         <stage edition="${fairplay}"/>
         <delete file="${forge.src.dir}/net/techbrew/journeymap/feature/impl/Unlimited.java" failonerror="true" />
-        <delete file="${forge.build.dir}/net/techbrew/journeymap/feature/impl/Unlimited.class" failonerror="true"/>
+        <delete file="${forge.reobf.dir}/net/techbrew/journeymap/feature/impl/Unlimited.class" failonerror="true"/>
         <dist edition="${fairplay}"/>
         <ant target="cleanforge" />
     </target>
@@ -72,11 +71,8 @@
             <!-- Clean forge dirs -->
             <ant target="cleanforge" />
 
-            <!-- Copy custom gradle build script -->
-            <copy file="${basedir}/build.gradle" tofile="${forge.dir}/journeymap-build.gradle" failonerror="true" overwrite="true" />
-
             <!-- Copy Java libs -->
-            <copy todir="${forge.dir}/lib" overwrite="true">
+            <copy todir="${forge.dir}/lib" failonerror="true" overwrite="true">
                 <fileset dir="${basedir}/lib"  />
             </copy>
 
@@ -86,25 +82,39 @@
             </copy>
 
             <!-- Replace params in JourneyMap class -->
-            <replace file="${forge.src.dir}/net/techbrew/journeymap/JourneyMap.java" token="@JMVERSION@" value="${jmversion}" />
-            <replace file="${forge.src.dir}/net/techbrew/journeymap/JourneyMap.java" token="@MCVERSION@" value="${mcversion}" />
+            <replace file="${forge.src.dir}/net/techbrew/journeymap/JourneyMap.java">
+                <replacefilter token="@JMVERSION@" value="${jmversion}" />
+                <replacefilter token="@MCVERSION@" value="${mcversion}" />
+            </replace>
+
+            <exec executable="${python}" dir="${forge.dir}">
+                <arg value="runtime/recompile.py"/>
+                <arg value="%*"/>
+            </exec>
+
+            <exec executable="${python}" dir="${forge.dir}">
+                <arg value="runtime/reobfuscate.py"/>
+                <arg value="%*"/>
+            </exec>
 
             <!-- Copy resources -->
-            <copy todir="${forge.src.dir}" failonerror="true" overwrite="true">
+            <copy todir="${forge.reobf.dir}" failonerror="true" overwrite="true">
                 <fileset dir="${resources.dir}" />
             </copy>
 
-            <!-- Replace tokens in resources -->
-            <replace dir="${forge.src.dir}" token="@JMVERSION@" value="${jmversion}" />
-            <replace dir="${forge.src.dir}" token="@FORGEVERSION@" value="${forgeversion}" />
-            <replace dir="${forge.src.dir}" token="@MCVERSION@" value="${mcversion}" />
-            <replace dir="${forge.src.dir}" token="@EDITION@" value="@{edition}" />
-            <replace dir="${forge.src.dir}" token="@DATE@" value="${TODAY}" />
-
             <!-- Copy non-Java files to resources -->
-            <copy todir="${forge.src.dir}" failonerror="true">
+            <copy todir="${forge.reobf.dir}" failonerror="true">
                 <fileset dir="${java.dir}" excludes="**/*.java" />
             </copy>
+
+            <!-- Replace tokens in resources -->
+            <replace dir="${forge.reobf.dir}" excludes="*.class">
+                <replacefilter token="@JMVERSION@" value="${jmversion}" />
+                <replacefilter token="@FORGEVERSION@" value="${forgeversion}" />
+                <replacefilter token="@MCVERSION@" value="${mcversion}" />
+                <replacefilter token="@EDITION@" value="@{edition}" />
+                <replacefilter token="@DATE@" value="${TODAY}" />
+            </replace>
 
             <!-- Minify js and css -->
             <ant target="minify" />
@@ -117,16 +127,6 @@
         <attribute name="jarfile" default="JourneyMap${jmversion}_@{edition}_MC${mcversion}.jar" />
         <sequential>
 
-            <exec executable="${python}" dir="${forge.dir}">
-                <arg value="runtime/recompile.py"/>
-                <arg value="%*"/>
-            </exec>
-
-            <exec executable="${python}" dir="${forge.dir}">
-                <arg value="runtime/reobfuscate.py"/>
-                <arg value="%*"/>
-            </exec>
-
             <jar destfile="${dist.dir}/@{jarfile}" duplicate="preserve" index="true" manifestencoding="UTF-8">
                 <manifest>
                     <attribute name="Built-By" value="techbrew (Mark Woodman)"/>
@@ -135,7 +135,7 @@
                     <attribute name="Implementation-Title" value="JourneyMap"/>
                     <attribute name="Implementation-Version" value="${jmversion} @{edition} Edition"/>
                 </manifest>
-                <fileset dir="${forge.build.dir}" />
+                <fileset dir="${forge.reobf.dir}" />
             </jar>
             <echo message="Built: ${dist.dir}\@{jarfile}" />
 
@@ -150,7 +150,6 @@
         </sequential>
     </macrodef>
 
-
     <target name="minify">
         <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
             <classpath>
@@ -159,53 +158,17 @@
             </classpath>
         </taskdef>
         <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
-                     outputfolder="${forge.src.dir}/assets/journeymap/web/js">
+                     outputfolder="${forge.reobf.dir}/assets/journeymap/web/js">
             <fileset dir="${resources.dir}/assets/journeymap/web/js" >
                 <include name="journeymap.js" />
             </fileset>
         </yuicompress>
         <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
-                     outputfolder="${forge.src.dir}/assets/journeymap/web/css">
+                     outputfolder="${forge.reobf.dir}/assets/journeymap/web/css">
             <fileset dir="${resources.dir}/assets/journeymap/web/css" >
                 <include name="journeymap.css" />
             </fileset>
         </yuicompress>
     </target>
-
-
-    <macrodef name="editionJarzip">
-        <attribute name="edition"/>
-        <attribute name="zipName"/>
-        <sequential>
-
-            <tstamp>
-                <format property="TODAY" pattern="yyyy-MM-dd"/>
-            </tstamp>
-
-            <mkdir dir="${dist.dir}" />
-            <delete file="${dist.dir}/@{zipName}.jar" />
-
-            <copy todir="${build.dir}" failonerror="true" overwrite="true" file="${resources.dir}/mcmod.info" />
-            <copy todir="${build.dir}" failonerror="true" overwrite="true" file="${resources.dir}/changelog.txt" />
-
-            <replace dir="${build.dir}" token="@JMVERSION@" value="${jmversion}" />
-            <replace dir="${build.dir}" token="@EDITION@" value="@{edition}" />
-            <replace dir="${build.dir}" token="@MCVERSION@" value="${mcversion}" />
-            <replace dir="${build.dir}" token="@DATE@" value="${TODAY}" />
-
-            <jar destfile="${dist.dir}/@{zipName}.jar" duplicate="preserve" index="true" manifestencoding="UTF-8">
-                <manifest>
-                    <attribute name="Built-By" value="Mark Woodman"/>
-                    <attribute name="Built-Date" value="${TODAY}"/>
-                    <attribute name="Implementation-Vendor" value="TechBrew.net"/>
-                    <attribute name="Implementation-Title" value="JourneyMap"/>
-                    <attribute name="Implementation-Version" value="${jmversion} @{edition} Edition"/>
-                </manifest>
-                <fileset dir="${build.dir}" />
-            </jar>
-            <echo message="Built: ${dist.dir}\@{zipName}.jar" />
-
-        </sequential>
-    </macrodef>
 
 </project>
