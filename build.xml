@@ -22,8 +22,6 @@
         <format property="TODAY" pattern="yyyy-MM-dd.HHMM"/>
     </tstamp>
 
-    <!-- Change if not on Windows, but don't check in the change. -->
-    <!-- TODO:  OS detection -->
     <property name="python" location="${forge.dir}/runtime/bin/python/python_mcp.exe" />
 
     <target name="all" description="All" depends="init, build-unlimited, build-fairplay">
@@ -56,6 +54,10 @@
 
     <target name="cleanforge">
         <delete dir="${forge.dir}/lib" />
+        <delete dir="${forge.reobf.dir}/" />
+        <delete file="${forge.src.dir}/mcmod.info" />
+        <delete file="${forge.src.dir}/changelog.txt" />
+        <delete file="${forge.src.dir}/license.txt" />
         <delete dir="${forge.src.dir}/ar/com/hjg/pngj" />
         <delete dir="${forge.src.dir}/se/rupy/http" />
         <delete dir="${forge.src.dir}/net/techbrew" />
@@ -147,8 +149,16 @@
                 </condition>
             </fail>
 
+            <ant target="opendist" />
+
         </sequential>
     </macrodef>
+
+    <target name="opendist">
+        <exec executable="explorer">
+            <arg value="${dist.dir}"/>
+        </exec>
+    </target>
 
     <target name="minify">
         <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
