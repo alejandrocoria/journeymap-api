@@ -124,7 +124,7 @@ public class MapOverlayState {
         return drawStepList;
     }
 
-    public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, OverlayWaypointRenderer waypointRenderer, OverlayRadarRenderer radarRenderer) {
+    public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, OverlayWaypointRenderer waypointRenderer, OverlayRadarRenderer radarRenderer, float drawScale) {
         drawStepList.clear();
 
         List<Map> entities = new ArrayList<Map>(16);
@@ -160,7 +160,7 @@ public class MapOverlayState {
         // Sort to keep named entities last
         if(!entities.isEmpty()) {
             Collections.sort(entities, new EntityHelper.EntityMapComparator());
-            drawStepList.addAll(radarRenderer.prepareSteps(entities, gridRenderer, fontScale));
+            drawStepList.addAll(radarRenderer.prepareSteps(entities, gridRenderer, fontScale, drawScale));
         }
 
         // Draw waypoints

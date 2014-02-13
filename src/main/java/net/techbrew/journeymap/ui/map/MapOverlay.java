@@ -26,6 +26,7 @@ import net.techbrew.journeymap.render.overlay.OverlayRadarRenderer;
 import net.techbrew.journeymap.render.overlay.OverlayWaypointRenderer;
 import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
+import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.ui.JmUI;
 import net.techbrew.journeymap.ui.MapButton;
 import net.techbrew.journeymap.ui.UIManager;
@@ -534,15 +535,16 @@ public class MapOverlay extends JmUI {
         }
         gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
 		gridRenderer.draw(1f, xOffset, yOffset);
-        gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset);
+        gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, 1f);
 
         Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
         if(playerPixel!=null) {
-            DrawStep drawStep = new DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocator(), 8);
-            gridRenderer.draw(xOffset, yOffset, drawStep);
+            TextureImpl tex = state.currentZoom==0 ? TextureCache.instance().getPlayerLocatorSmall() : TextureCache.instance().getPlayerLocator();
+            DrawStep drawStep = new DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, tex, 8);
+            gridRenderer.draw(xOffset, yOffset, 1f, drawStep);
         }
 
-        DrawUtil.drawImage(TextureCache.instance().getLogo(), 16, 4, false);
+        DrawUtil.drawImage(TextureCache.instance().getLogo(), 16, 4, false, 1f);
 
 		sizeDisplay(true);
 
@@ -554,7 +556,7 @@ public class MapOverlay extends JmUI {
 	public static void drawMapBackground(JmUI ui) {
 		ui.sizeDisplay(false);
         gridRenderer.draw(1f, 0, 0);
-		DrawUtil.drawImage(TextureCache.instance().getLogo(), 16, 4, false);
+		DrawUtil.drawImage(TextureCache.instance().getLogo(), 16, 4, false, 1f);
 		ui.sizeDisplay(true);
 	}
 	
@@ -587,7 +589,7 @@ public class MapOverlay extends JmUI {
         gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 
 		// Build list of drawSteps
-		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer);
+		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, 1f);
 		
 		// Update player pos
 		state.playerLastPos = Constants.getString("MapOverlay.player_location",

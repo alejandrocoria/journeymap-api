@@ -9,6 +9,6 @@ import net.techbrew.journeymap.render.overlay.GridRenderer;
  */
 public interface DrawStep {
 
-    public void draw(int xOffset, int yOffset, GridRenderer gridRenderer);
+    public void draw(int xOffset, int yOffset, GridRenderer gridRenderer, float scale);
 
 }

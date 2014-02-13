@@ -26,7 +26,7 @@ import java.util.Map;
  */
 public class OverlayRadarRenderer {
 
-	public List<DrawStep> prepareSteps(List<Map> critters, GridRenderer grid, double fontScale) {
+	public List<DrawStep> prepareSteps(List<Map> critters, GridRenderer grid, double fontScale, float drawScale) {
 		
 		final boolean showAnimals = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_ANIMALS);
 		final boolean showPets = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_PETS);
@@ -79,7 +79,7 @@ public class OverlayRadarRenderer {
 						locatorImg = tc.getNeutralLocator();
 					}			
 					
-					drawStepList.add(new DrawEntityStep(posX, posZ, heading, false, locatorImg, 8));
+					drawStepList.add(new DrawEntityStep(posX, posZ, heading, false, locatorImg, (int)(8 * drawScale)));
 					
 					// Draw entity image
 					if(isPlayer) {
@@ -88,7 +88,7 @@ public class OverlayRadarRenderer {
 						entityIcon = tc.getEntityImage(filename);
 					}
 					if(entityIcon!=null) {
-						int bottomMargin = isPlayer ? 0 : 8;
+						int bottomMargin = isPlayer ? 0 : (int)(8 * drawScale);
 						drawStepList.add(new DrawEntityStep(posX, posZ, heading, true, entityIcon, bottomMargin));
 					}
 					

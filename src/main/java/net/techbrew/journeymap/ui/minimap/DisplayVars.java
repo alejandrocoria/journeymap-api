@@ -40,6 +40,7 @@ public class DisplayVars {
     final TextureImpl borderTexture;
     final TextureImpl maskTexture;
 
+    final float drawScale;
     final double fontScale;
     final int displayWidth;
     final int displayHeight;
@@ -62,6 +63,7 @@ public class DisplayVars {
 
         switch(shape){
             case LargeCircle: {
+                drawScale = 1f;
                 borderTexture = TextureCache.instance().getMinimapLargeCircle();
                 maskTexture = TextureCache.instance().getMinimapLargeCircleMask();
                 minimapSize = 512;
@@ -79,6 +81,7 @@ public class DisplayVars {
                 break;
             }
             case SmallCircle: {
+                drawScale = 0.5f;
                 borderTexture = TextureCache.instance().getMinimapSmallCircle();
                 maskTexture = TextureCache.instance().getMinimapSmallCircleMask();
                 minimapSize = 256;
@@ -96,6 +99,7 @@ public class DisplayVars {
                 break;
             }
             case LargeSquare: {
+                drawScale = 1f;
                 borderTexture = TextureCache.instance().getMinimapLargeSquare();
                 maskTexture = null;
                 minimapSize = 512;
@@ -112,6 +116,7 @@ public class DisplayVars {
             }
             case SmallSquare:
             default: {
+                drawScale = 0.5f;
                 borderTexture = TextureCache.instance().getMinimapSmallSquare();
                 maskTexture = null;
                 minimapSize = 256;
