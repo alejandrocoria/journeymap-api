@@ -1,10 +1,7 @@
 package net.techbrew.journeymap.cartography;
 
 import cpw.mods.fml.client.FMLClientHandler;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockDeadBush;
-import net.minecraft.block.BlockGrass;
-import net.minecraft.block.BlockVine;
+import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.ReloadableResourceManager;
@@ -105,7 +102,7 @@ public class ColorCache implements ResourceManagerReloadListener {
 		BiomeGenBase biome = chunkMd.stub.getBiomeGenForWorldCoords(x, z, chunkMd.worldObj.getWorldChunkManager());
 		Block block = blockMD.getBlock();
 
-        if(block instanceof BlockGrass || block instanceof BlockDeadBush) {
+        if(block instanceof BlockGrass || block instanceof BlockDeadBush || block instanceof BlockTallGrass) {
             return getGrassColor(blockMD, biome, x, y, z);
         }
 

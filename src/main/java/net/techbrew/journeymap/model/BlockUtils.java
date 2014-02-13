@@ -1,6 +1,5 @@
 package net.techbrew.journeymap.model;
 
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraftforge.common.IPlantable;
@@ -42,6 +41,7 @@ public class BlockUtils {
         setFlags(AIRPROXY, Flag.HasAir, Flag.NotHideSky, Flag.NoShadow, Flag.NotCeiling);
         setFlags(Block.fire, Flag.NoShadow, Flag.Side2Texture);
         setFlags(Block.waterStill, Flag.BiomeColor);
+        setFlags(Block.tallGrass, Flag.BiomeColor);
         setFlags(Block.grass, Flag.BiomeColor);
         setFlags(Block.glass, Flag.NotCeiling, Flag.NoShadow);
         setFlags(Block.thinGlass, Flag.NotCeiling, Flag.NoShadow);
@@ -180,24 +180,6 @@ public class BlockUtils {
     public static boolean hasFlag(Block block, Flag flag)
     {
         EnumSet<Flag> flags = blockFlags.get(new UniqueIdentifierProxy(block));
-        return flags!=null && flags.contains(flag);
-    }
-
-    public static boolean hasAnyFlags(Block block, Flag... flags)
-    {
-        EnumSet<Flag> flagSet = blockFlags.get(GameRegistry.findUniqueIdentifierFor(block));
-        if(flagSet==null) return false;
-        for(Flag flag : flags) {
-            if(flagSet.contains(flag)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean hasFlag(UniqueIdentifierProxy uid, Flag flag)
-    {
-        EnumSet<Flag> flags = getFlags(uid);
         return flags!=null && flags.contains(flag);
     }
 
