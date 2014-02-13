@@ -344,8 +344,8 @@ public class MapOverlay extends JmUI {
 			isScrolling=false;
 						
 			int blockSize = (int) Math.pow(2,state.currentZoom);
-			int mouseDragX = (mx-msx)/blockSize;
-			int mouseDragY = (my-msy)/blockSize;
+			int mouseDragX = (mx-msx)*2/blockSize;
+			int mouseDragY = (my-msy)*2/blockSize;
 			msx=mx;
 			msy=my;
 			
@@ -518,11 +518,11 @@ public class MapOverlay extends JmUI {
 
 		if(isScrolling) {
 			int blockSize = (int) Math.pow(2,state.currentZoom);
-			int mouseDragX = (mx-msx)/blockSize;
-			int mouseDragY = (my-msy)/blockSize;
+			int mouseDragX = (mx-msx)*2/blockSize;
+			int mouseDragY = (my-msy)*2/blockSize;
 			
-			xOffset = mouseDragX*blockSize;
-			yOffset = mouseDragY*blockSize;
+			xOffset = (mouseDragX*blockSize);
+			yOffset = (mouseDragY*blockSize);
 
 		} else if(refreshReady) {
             refreshState();
