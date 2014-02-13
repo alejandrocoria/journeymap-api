@@ -55,8 +55,7 @@ public class ChunkMD {
 	}
 
     public Block getBlock(int x, int y, int z) {
-        int blockId = stub.getBlockID(x, y, z);
-        return Block.blocksList[blockId];
+        return stub.getBlock(x, y, z);
     }
 	
 	/**
@@ -82,7 +81,7 @@ public class ChunkMD {
 	    	int y = stub.getHeightValue(x, z);
 	    	if(y<1) return 0;
             Block block = getBlock(x,y,z);
-            while(y>0 && block==null || BlockUtils.hasFlag(block, BlockUtils.Flag.NoShadow)) {
+            while(y>0 && BlockUtils.hasFlag(block, BlockUtils.Flag.NoShadow)) {
                 y--;
                 block = getBlock(x,y,z);
             }

@@ -1,6 +1,6 @@
 package net.techbrew.journeymap.cartography;
 
-import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -124,38 +124,30 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
                 int y = Math.max(1, chunkMd.stub.getHeightValue(x, z));
 
-				// Get blockinfo for coords
-				BlockMD blockMD = null;
-                int blockId;
+                // Get blockinfo for coords
+                BlockMD blockMD;
                 do {
-                    blockId = chunkMd.stub.getBlockID(x, y, z);
-                    if(blockId==0) {
+                    blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+
+                    // Null check
+                    if (blockMD == null) {
+                        paintBadBlock(x, y, z, g2D);
+                        continue blockLoop;
+                    }
+
+                    if(blockMD.isAir()) {
                         y--;
                     } else {
-                        blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
-                        if (blockMD == null) {
-                            break;
-                        }
-
-                        if(blockMD.isAir()) {
-                            y--;
-                        } else {
-                            break;
-                        }
+                        break;
                     }
                 } while(y>=0);
 
-                if(blockMD==null) {
+                // Get base color for block
+                RGB color = blockMD.getColor(chunkMd, x, y, z);
+                if(color==null) {
                     paintBadBlock(x, y, z, g2D);
                     continue blockLoop;
                 }
-
-				// Get base color for block
-				RGB color = blockMD.getColor(chunkMd, x, y, z);
-				if(color==null) {
-					paintBadBlock(x, y, z, g2D);
-					continue blockLoop;
-				}
 
 				// Paint deeper blocks if alpha used, but not if this pass is just for underground layer
 				boolean useAlpha = blockMD.hasFlag(BlockUtils.Flag.Transparency);
@@ -467,7 +459,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 			if(lowerBlock!=null) {
 				stack.push(lowerBlock);
 
-                if(lowerBlock.isWater() || lowerBlock.getBlock()== Block.ice){
+                if(lowerBlock.isWater() || lowerBlock.getBlock()== Blocks.ice){
                     maxDepth = 4;
                 } else if(lowerBlock.isAir()) {
                     maxDepth = 256;

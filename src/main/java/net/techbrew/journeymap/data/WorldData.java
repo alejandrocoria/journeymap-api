@@ -1,7 +1,8 @@
 package net.techbrew.journeymap.data;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.NetClientHandler;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.world.storage.WorldInfo;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.FeatureManager;
@@ -16,8 +17,6 @@ import java.security.MessageDigest;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-;
 
 /**
  * Provides game-related properties in a Map.
@@ -121,12 +120,14 @@ public class WorldData implements IDataProvider {
 	private static String getServerName() {
 		try
 	    {
-            NetClientHandler sendQueue = Minecraft.getMinecraft().getNetHandler();
-            SocketAddress socketAddress = sendQueue.getNetManager().getSocketAddress();
-            if ((socketAddress !=null && socketAddress instanceof InetSocketAddress))
-            {
-                InetSocketAddress inetAddr = (InetSocketAddress)socketAddress;
-                return inetAddr.getHostName();
+            NetworkManager netManager = FMLClientHandler.instance().getClientToServerNetworkManager();
+            if(netManager!=null) {
+                SocketAddress socketAddress = netManager.getSocketAddress();
+                if ((socketAddress !=null && socketAddress instanceof InetSocketAddress))
+                {
+                    InetSocketAddress inetAddr = (InetSocketAddress)socketAddress;
+                    return inetAddr.getHostName();
+                }
             }
 	    }
 	    catch (Throwable t)

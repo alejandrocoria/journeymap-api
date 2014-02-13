@@ -446,44 +446,44 @@ public class MapOverlay extends JmUI {
         }
 		
 		// North
-		if(i==mc.gameSettings.keyBindForward.keyCode) { // getkeyCode
+		if(i==mc.gameSettings.keyBindForward.getKeyCode()) { // getkeyCode
 			moveCanvas(0,-16);
 			return;
 		}
 		
 		// West
-		if(i==mc.gameSettings.keyBindLeft.keyCode) {
+		if(i==mc.gameSettings.keyBindLeft.getKeyCode()) {
 			moveCanvas(-16, 0);
 			return;
 		}
 		
 		// South
-		if(i==mc.gameSettings.keyBindBack.keyCode) {
+		if(i==mc.gameSettings.keyBindBack.getKeyCode()) {
 			moveCanvas(0,16);
 			return;
 		}
 		
 		// East
-		if(i==mc.gameSettings.keyBindRight.keyCode) {
+		if(i==mc.gameSettings.keyBindRight.getKeyCode()) {
 			moveCanvas(16, 0);
 			return;
 		}
 		
 		// Open inventory
-		if(i==mc.gameSettings.keyBindInventory.keyCode) { // keyBindInventory
+		if(i==mc.gameSettings.keyBindInventory.getKeyCode()) { // keyBindInventory
 			close();
 			mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
 			return;
 		}
 		
 		// Open chat
-		if(i==mc.gameSettings.keyBindChat.keyCode) {
+		if(i==mc.gameSettings.keyBindChat.getKeyCode()) {
 			openChat("");
 			return;
 		}
 		
 		// Open chat with command prefix (Minecraft.java does this in runTick() )
-		if(i==mc.gameSettings.keyBindCommand.keyCode) {
+		if(i==mc.gameSettings.keyBindCommand.getKeyCode()) {
 			openChat("/");
 			return;
 		}

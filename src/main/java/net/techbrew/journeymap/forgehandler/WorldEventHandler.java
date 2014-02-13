@@ -1,8 +1,8 @@
 package net.techbrew.journeymap.forgehandler;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.world.WorldEvent;
 import net.techbrew.journeymap.JourneyMap;
 
@@ -19,8 +19,9 @@ public class WorldEventHandler implements EventHandlerManager.EventHandler {
         return EnumSet.of(EventHandlerManager.BusType.MinecraftForgeBus);
     }
 
-    @ForgeSubscribe
-    public void invoke(WorldEvent.Unload event) {
+    @SubscribeEvent
+    public void onWorldUnload(WorldEvent.Unload event) {
         JourneyMap.getInstance().stopMapping();
     }
+
 }
