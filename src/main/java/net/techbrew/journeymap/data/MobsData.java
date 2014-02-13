@@ -2,10 +2,6 @@ package net.techbrew.journeymap.data;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.IRangedAttackMob;
-import net.minecraft.entity.boss.IBossDisplayData;
-import net.minecraft.entity.monster.EntityGhast;
-import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.util.StringUtils;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
@@ -55,13 +51,8 @@ public class MobsData implements IDataProvider {
 				Entity entity = (Entity) mob;
 				LinkedHashMap eProps = new LinkedHashMap();
 				eProps.put(EntityKey.entityId, entity.getUniqueID());
-				eProps.put(EntityKey.filename, EntityHelper.getFileName(entity)); 
-				if(mob instanceof EntityMob || mob instanceof IBossDisplayData || mob instanceof IRangedAttackMob || mob instanceof EntityGhast) {
-					eProps.put(EntityKey.hostile, true); 
-				} else {
-					eProps.put(EntityKey.hostile, false); 
-				}
-
+				eProps.put(EntityKey.filename, EntityHelper.getFileName(entity));
+                eProps.put(EntityKey.hostile, true);
                 eProps.put(EntityKey.posX, entity.posX);
                 eProps.put(EntityKey.posZ, entity.posZ);
                 eProps.put(EntityKey.chunkCoordX, entity.chunkCoordX);

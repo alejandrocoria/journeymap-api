@@ -57,13 +57,15 @@ public class MiniMap {
     private Point2D playerPixel;
     private TextureImpl playerLocatorTex;
 
+    float lightmapS = (float) (15728880 % 65536)/1f;
+    float lightmapT = (float) (15728880 / 65536)/1f;
 	/**
 	 * Default constructor
 	 */
 	public MiniMap() {
 
         player = mc.thePlayer;
-        playerLocatorTex = TextureCache.instance().getPlayerLocator();
+        playerLocatorTex = TextureCache.instance().getPlayerLocatorSmall();
 
         final PropertyManager pm = PropertyManager.getInstance();
 
@@ -92,7 +94,6 @@ public class MiniMap {
 
         try {
 
-
             // Update the state first
             if(doStateRefresh) {
                 state.refresh(mc, player);
@@ -103,30 +104,20 @@ public class MiniMap {
             gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
             gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0);
             if(doStateRefresh ) {
-                state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer);
+                state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, dv.drawScale);
                 state.updateLastRefresh();
             }
-
-
 
             updateDisplayVars();
 
             // Use 1:1 resolution for minimap regardless of how Minecraft UI is scaled
             JmUI.sizeDisplay(mc.displayWidth, mc.displayHeight);
 
-            // TODO:  Experimental way to get the dark thing managed
-            {
-                int i = 15728880;
-                int j = i % 65536;
-                int k = i / 65536;
-                OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
-            }
-
+            // Experimental fix for overly-dark screens with some graphics cards
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightmapS, lightmapT);
 
             // Ensure colors and alpha reset
             GL11.glColor4f(1, 1, 1, 1);
-
-
 
             // Push matrix for translation to corner
             GL11.glPushMatrix();
@@ -162,18 +153,16 @@ public class MiniMap {
             GL11.glScissor(dv.scissorX,dv.scissorY,dv.minimapSize,dv.minimapSize);
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
 
-
-
             // Draw grid
             gridRenderer.draw(1f, 0, 0);
 
             // Draw entities, etc
-            gridRenderer.draw(state.getDrawSteps(), 0, 0);
+            gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale);
 
             // Draw player
             playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
             if(playerPixel!=null) {
-                DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), EntityHelper.getHeading(mc.thePlayer), false, playerLocatorTex, 8);
+                DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), EntityHelper.getHeading(mc.thePlayer), false, playerLocatorTex, 8, 1f);
             }
 
             // Return center to mid-screen
@@ -219,7 +208,7 @@ public class MiniMap {
             GL11.glEnable(GL11.GL_DEPTH_TEST);
 
             // Draw border texture
-            DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false);
+            DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, 1f);
 
             GL11.glPopMatrix();
 

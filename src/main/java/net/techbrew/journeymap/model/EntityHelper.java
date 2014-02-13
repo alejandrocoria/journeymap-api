@@ -2,22 +2,19 @@ package net.techbrew.journeymap.model;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.renderer.entity.RenderFacade;
-import net.minecraft.client.renderer.entity.RenderHorse;
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.IRangedAttackMob;
-import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.EntityKey;
 import net.techbrew.journeymap.io.PropertyManager;
+import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 
 import java.util.*;
@@ -37,14 +34,21 @@ public class EntityHelper {
         Minecraft mc = Minecraft.getMinecraft();
         AxisAlignedBB bb = getBB(mc.thePlayer);
         List list = new ArrayList();
-        for(Class entityClass : entityClasses) {
-            list.addAll(mc.theWorld.getEntitiesWithinAABB(entityClass, bb));
-        }
 
-        if(list.size()>MAX_ENTITIES)
+        try
         {
-            Collections.sort(list, new EntityDistanceComparator(mc.thePlayer));
-            list = list.subList(0, MAX_ENTITIES);
+            for(Class entityClass : entityClasses) {
+                list.addAll(mc.theWorld.getEntitiesWithinAABB(entityClass, bb));
+            }
+
+            if(list.size()>MAX_ENTITIES)
+            {
+                Collections.sort(list, new EntityDistanceComparator(mc.thePlayer));
+                list = list.subList(0, MAX_ENTITIES);
+            }
+        }
+        catch(Throwable t) {
+            JourneyMap.getLogger().warning("Failed to " + timerName + ": " + LogFormatter.toString(t));
         }
 
         timer.stop();
@@ -52,7 +56,7 @@ public class EntityHelper {
     }
 
 	public static List getMobsNearby() {
-		return getEntitiesNearby("getMobsNearby", IMob.class, IBossDisplayData.class, IRangedAttackMob.class);
+		return getEntitiesNearby("getMobsNearby", IMob.class);
 	}
 	
 	public static List<EntityVillager> getVillagersNearby() {
@@ -142,16 +146,12 @@ public class EntityHelper {
 	 */
 	public static String getFileName(Entity entity) {
 		
-		RenderLiving render = (RenderLiving) RenderManager.instance.getEntityRenderObject(entity);
-		
+		Render entityRender = RenderManager.instance.getEntityRenderObject(entity);
+
 		// Manually handle horses
-		if(render instanceof RenderHorse) {
+		if(entityRender instanceof RenderHorse) {
 			switch (((EntityHorse) entity).getHorseType())
 	        {
-		        case 0:
-	            default:
-	                return "horse/horse.png";
-	
 	            case 1:
 	                return "horse/donkey.png";
 	
@@ -163,18 +163,25 @@ public class EntityHelper {
 	
 	            case 4:
 	                return "horse/skeletonhorse.png";
+                case 0:
+                default:
+                    return "horse/horse.png";
 	        }
 		}
-		
-		// Non-horse mobs
-		ResourceLocation loc = RenderFacade.getEntityTexture(render, entity);
-		String tex = loc.getResourcePath();
-		String search = "/entity/";
-		int i = tex.lastIndexOf(search);
-		if(i>=0) {
-			tex = tex.substring(i+search.length());
-		} 
-		return tex;
+
+        // Non-horse mobs
+        ResourceLocation loc = RenderFacade.getEntityTexture(entityRender, entity);
+        if(loc.getResourceDomain().equals("minecraft")) {
+            String tex = loc.getResourcePath();
+            String search = "/entity/";
+            int i = tex.lastIndexOf(search);
+            if(i>=0) {
+                tex = tex.substring(i+search.length());
+            }
+            return tex;
+        } else {
+            return loc.getResourceDomain() + "/" + loc.getResourcePath();
+        }
 	}
 	
 	public static class EntityMapComparator implements Comparator<Map> {

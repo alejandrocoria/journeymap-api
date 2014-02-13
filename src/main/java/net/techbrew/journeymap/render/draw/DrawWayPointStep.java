@@ -36,7 +36,7 @@ public class DrawWayPointStep implements DrawStep {
     }
 
     @Override
-    public void draw(int xOffset, int yOffset, GridRenderer gridRenderer) {
+    public void draw(int xOffset, int yOffset, GridRenderer gridRenderer, float scale) {
         Point2D pixel = gridRenderer.getBlockPixelInGrid(posX, posZ);
         if (gridRenderer.isOnScreen(pixel.getX(), pixel.getY())) {
             DrawUtil.drawColoredImage(texture, alpha, color, pixel.getX() + xOffset - (texture.width / 2), pixel.getY() + yOffset - (texture.height / 2));

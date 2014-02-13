@@ -1,7 +1,7 @@
 package net.techbrew.journeymap;
 
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.client.registry.ClientRegistry;
+import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -18,6 +18,7 @@ import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.forgehandler.EventHandlerManager;
+import net.techbrew.journeymap.forgehandler.KeyEventHandler;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.ChatLog;
@@ -168,8 +169,8 @@ public class JourneyMap {
 
                 // Register keybinding
                 int mapGuiKeyCode = pm.getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
-                this.uiKeybinding = new KeyBinding("key.journeymap", mapGuiKeyCode, "JourneyMap"); //$NON-NLS-1$
-                ClientRegistry.registerKeyBinding(JourneyMap.getInstance().uiKeybinding);
+                this.uiKeybinding = new KeyBinding("key.journeymap", mapGuiKeyCode); //$NON-NLS-1$
+                KeyBindingRegistry.registerKeyBinding(new KeyEventHandler());
 
                 // Register GUI event handlers
                 EventHandlerManager.registerGuiHandlers();
@@ -183,6 +184,8 @@ public class JourneyMap {
                 ChatLog.announceI18N(Constants.getString("JourneyMap.new_version_available", "")); //$NON-NLS-1$
                 ChatLog.announceURL(WEBSITE_URL, WEBSITE_URL);
             }
+
+            BlockUtils.initialize();
 
             initialized = true;
 
@@ -201,7 +204,7 @@ public class JourneyMap {
 
     @Mod.EventHandler
     public void postInitialize(FMLPostInitializationEvent event) {
-        BlockUtils.initialize();
+
     }
 	
 	public void toggleWebserver(Boolean enable, boolean forceAnnounce) {
@@ -416,7 +419,7 @@ public class JourneyMap {
 		if(enableAnnounceMod) {
             ChatLog.announceI18N("JourneyMap.ready", MOD_NAME); //$NON-NLS-1$
 			if(enableWebserver && enableMapGui) {
-				String keyName = Keyboard.getKeyName(uiKeybinding.getKeyCode()); // Should be KeyCode
+				String keyName = Keyboard.getKeyName(uiKeybinding.keyCode); // Should be KeyCode
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
                 String message = Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
                 ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
@@ -425,7 +428,7 @@ public class JourneyMap {
                 String message = Constants.getString("JourneyMap.webserver_only_ready", port); //$NON-NLS-1$
                 ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
 			} else if(enableMapGui) {
-				String keyName = Keyboard.getKeyName(uiKeybinding.getKeyCode()); // Should be KeyCode
+				String keyName = Keyboard.getKeyName(uiKeybinding.keyCode); // Should be KeyCode
                 ChatLog.announceI18N("JourneyMap.mapgui_only_ready", keyName); //$NON-NLS-1$
 			} else {
                 ChatLog.announceI18N("JourneyMap.webserver_and_mapgui_disabled"); //$NON-NLS-1$

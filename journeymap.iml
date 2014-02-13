@@ -8,8 +8,8 @@
       <excludeFolder url="file://$MODULE_DIR$/project" />
     </content>
     <orderEntry type="inheritedJdk" />
-    <orderEntry type="module" module-name="forge" />
-    <orderEntry type="module-library">
+    <orderEntry type="module" module-name="Minecraft" />
+    <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/[1.6.2]ReiMinimap_v3.4_01.jar!/" />
@@ -36,7 +36,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/Zans-Minimap-Mod-ML-Forge-1.6.1.jar!/" />

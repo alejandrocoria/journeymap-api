@@ -1,8 +1,10 @@
 package net.techbrew.journeymap.forgehandler;
 
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.EventBus;
+import cpw.mods.fml.common.IScheduledTickHandler;
+import cpw.mods.fml.common.ITickHandler;
+import cpw.mods.fml.common.registry.TickRegistry;
+import cpw.mods.fml.relauncher.Side;
 import net.minecraftforge.common.MinecraftForge;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -17,14 +19,9 @@ import java.util.HashMap;
 public class EventHandlerManager {
 
     public enum BusType {
-        FMLCommonHandlerBus(FMLCommonHandler.instance().bus()),
-        MinecraftForgeBus(MinecraftForge.EVENT_BUS);
-
-        protected final EventBus eventBus;
-        private BusType(EventBus eventBus)
-        {
-            this.eventBus = eventBus;
-        }
+        TickRegistry,
+        ScheduledTickRegistry,
+        MinecraftForgeBus;
     }
 
     private static HashMap<Class<? extends EventHandler>, EventHandler> handlers = new HashMap<Class<? extends EventHandler>, EventHandler>();
@@ -44,7 +41,6 @@ public class EventHandlerManager {
     public static void registerGuiHandlers()
     {
         register(new MiniMapOverlayHandler());
-        register(new KeyEventHandler());
     }
 
     public static void unregisterAll()
@@ -71,9 +67,23 @@ public class EventHandlerManager {
             String name = handler.getClass().getName();
             try
             {
-                busType.eventBus.register(handler);
-                registered = true;
-                JourneyMap.getLogger().info(name + " registered in " + busType);
+                switch(busType) {
+                    case MinecraftForgeBus:
+                        MinecraftForge.EVENT_BUS.register(handler);
+                        registered = true;
+                        break;
+                    case TickRegistry:
+                        TickRegistry.registerTickHandler((ITickHandler) handler, Side.CLIENT);
+                        registered = true;
+                        break;
+                    case ScheduledTickRegistry:
+                        TickRegistry.registerScheduledTickHandler((IScheduledTickHandler) handler, Side.CLIENT);
+                        registered = true;
+                        break;
+                }
+                if(registered) {
+                    JourneyMap.getLogger().fine(name + " registered in " + busType);
+                }
             }
             catch(Throwable t)
             {
@@ -102,8 +112,16 @@ public class EventHandlerManager {
                 String name = handler.getClass().getName();
                 try
                 {
-                    busType.eventBus.register(handler);
-                    JourneyMap.getLogger().info(name + " unregistered from " + busType);
+                    boolean unregistered = false;
+                    switch(busType) {
+                        case MinecraftForgeBus:
+                            MinecraftForge.EVENT_BUS.unregister(handler);
+                            unregistered = true;
+                            break;
+                    }
+                    if(unregistered) {
+                        JourneyMap.getLogger().fine(name + " unregistered from " + busType);
+                    }
                 }
                 catch(Throwable t)
                 {

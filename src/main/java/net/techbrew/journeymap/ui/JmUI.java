@@ -32,7 +32,7 @@ public abstract class JmUI extends GuiScreen {
 
     public void drawLogo() {
         sizeDisplay(mc.displayWidth, mc.displayHeight);
-        DrawUtil.drawImage(logo, (mc.displayWidth - logo.width) / 2, 20, false);
+        DrawUtil.drawImage(logo, (mc.displayWidth - logo.width) / 2, 20, false, 1f);
         sizeDisplay(width, height);
     }
 

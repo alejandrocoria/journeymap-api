@@ -2,57 +2,68 @@
 <project name="JourneyMap" basedir="." default="all">
 
     <!-- Update when new version is going to be released -->
-    <property name="jmversion" value="3.3.0rc1" />
-    <property name="mcversion" value="1.7.2" />
-    <property name="forgeversion" value="1.7.2-10.12.0.1024" />
-	<property name="unlimited" value="Unlimited" />
-	<property name="fairplay" value="FairPlay" />
+    <property name="jmversion" value="3.3.0rc2" />
+    <property name="mcversion" value="1.6.4" />
+    <property name="forgeversion" value="1.6.4-9.11.1.964" />
+
+    <property name="unlimited" value="Unlimited" />
+    <property name="fairplay" value="FairPlay" />
 
     <property name="java.dir" location="${basedir}/src/main/java" />
     <property name="resources.dir" location="${basedir}/src/main/resources" />
-    <property name="forge.dir" location="${basedir}/../forge" />
-    <property name="mcp.dir" location="${basedir}/../forge/mcp" />
     <property name="dist.dir" location="${basedir}/dist" />
-    <property name="build.dir" location="${mcp.dir}/build" />
-
-    <property name="forge.classes.dir" location="${forge.dir}/build/classes/main" />
-    <property name="forge.src.dir" location="${forge.dir}/src/main/java" />
-    <property name="forge.resources.dir" location="${forge.dir}/src/main/resources" />
-    <property name="forge.build.dir" location="${forge.dir}/build/libs" />
-
-    <property name="gradle" location="${forge.dir}/gradlew.bat" />
+    <property name="forge.dir" location="${basedir}/../forge/mcp" />
+    <property name="forge.build.dir" location="${forge.dir}/build" />
+    <property name="forge.reobf.dir" location="${forge.dir}/reobf/minecraft" />
+    <property name="forge.src.dir" location="${forge.dir}/src/minecraft" />
 
     <!-- Timestamp for build -->
     <tstamp>
         <format property="TODAY" pattern="yyyy-MM-dd.HHMM"/>
     </tstamp>
 
+    <property name="python" location="${forge.dir}/runtime/bin/python/python_mcp.exe" />
+
     <target name="all" description="All" depends="init, build-unlimited, build-fairplay">
+        <echo message="Done." />
     </target>
 
     <target name="build-unlimited" description="Build Unlimited Edition" depends="init">
         <stage edition="${unlimited}"/>
         <dist edition="${unlimited}"/>
-        <ant target="cleanforge" />
     </target>
 
     <target name="build-fairplay" description="Build FairPlay Edition" depends="init">
         <stage edition="${fairplay}"/>
         <delete file="${forge.src.dir}/net/techbrew/journeymap/feature/impl/Unlimited.java" failonerror="true" />
-        <delete file="${forge.classes.dir}/net/techbrew/journeymap/feature/impl/Unlimited.class"/>
+        <delete file="${forge.reobf.dir}/net/techbrew/journeymap/feature/impl/Unlimited.class" failonerror="true"/>
         <dist edition="${fairplay}"/>
         <ant target="cleanforge" />
     </target>
 
     <target name="init">
+        <echo message="Cleaning old build and dist, reobf" />
+        <delete dir="${forge.build.dir}" />
         <delete dir="${dist.dir}" />
+        <delete dir="${forge.reobf.dir}" />
+
+        <echo message="Creating build and dist dirs" />
+        <mkdir dir="${forge.build.dir}" />
         <mkdir dir="${dist.dir}" />
     </target>
 
     <target name="cleanforge">
-        <delete dir="${forge.src.dir}" failonerror="true"  />
-        <delete dir="${forge.resources.dir}" failonerror="true" />
-        <delete dir="${forge.classes.dir}" failonerror="true" />
+        <delete dir="${forge.dir}/lib" />
+        <delete dir="${forge.reobf.dir}/" />
+        <delete file="${forge.src.dir}/mcmod.info" />
+        <delete file="${forge.src.dir}/changelog.txt" />
+        <delete file="${forge.src.dir}/license.txt" />
+        <delete dir="${forge.src.dir}/ar/com/hjg/pngj" />
+        <delete dir="${forge.src.dir}/se/rupy/http" />
+        <delete dir="${forge.src.dir}/net/techbrew" />
+        <delete dir="${forge.src.dir}/assets/journeymap" />
+        <delete file="${forge.src.dir}/assets/minecraft/pack.mcmeta" />
+        <delete file="${forge.src.dir}/net/minecraft/client/renderer/entity/RenderFacade.java" />
     </target>
 
     <macrodef name="stage">
@@ -62,18 +73,8 @@
             <!-- Clean forge dirs -->
             <ant target="cleanforge" />
 
-            <!-- Copy custom gradle build script -->
-            <copy file="${basedir}/build.gradle" tofile="${forge.dir}/journeymap-build.gradle" failonerror="true" overwrite="true" />
-
-            <!-- Replace params in custom gradle build script -->
-            <replace file="${forge.dir}/journeymap-build.gradle" token="@JMVERSION@" value="${jmversion}" />
-            <replace file="${forge.dir}/journeymap-build.gradle" token="@MCVERSION@" value="${mcversion}" />
-            <replace file="${forge.dir}/journeymap-build.gradle" token="@FORGEVERSION@" value="${forgeversion}" />
-            <replace file="${forge.dir}/journeymap-build.gradle" token="@EDITION@" value="@{edition}" />
-            <replace file="${forge.dir}/journeymap-build.gradle" token="@TODAY@" value="${TODAY}" />
-
             <!-- Copy Java libs -->
-            <copy todir="${forge.dir}/libs">
+            <copy todir="${forge.dir}/lib" failonerror="true" overwrite="true">
                 <fileset dir="${basedir}/lib"  />
             </copy>
 
@@ -83,25 +84,39 @@
             </copy>
 
             <!-- Replace params in JourneyMap class -->
-            <replace file="${forge.src.dir}/net/techbrew/journeymap/JourneyMap.java" token="@JMVERSION@" value="${jmversion}" />
-            <replace file="${forge.src.dir}/net/techbrew/journeymap/JourneyMap.java" token="@MCVERSION@" value="${mcversion}" />
+            <replace file="${forge.src.dir}/net/techbrew/journeymap/JourneyMap.java">
+                <replacefilter token="@JMVERSION@" value="${jmversion}" />
+                <replacefilter token="@MCVERSION@" value="${mcversion}" />
+            </replace>
+
+            <exec executable="${python}" dir="${forge.dir}">
+                <arg value="runtime/recompile.py"/>
+                <arg value="%*"/>
+            </exec>
+
+            <exec executable="${python}" dir="${forge.dir}">
+                <arg value="runtime/reobfuscate.py"/>
+                <arg value="%*"/>
+            </exec>
 
             <!-- Copy resources -->
-            <copy todir="${forge.resources.dir}" failonerror="true">
+            <copy todir="${forge.reobf.dir}" failonerror="true" overwrite="true">
                 <fileset dir="${resources.dir}" />
             </copy>
 
-            <!-- Replace tokens in resources -->
-            <replace dir="${forge.resources.dir}" token="@JMVERSION@" value="${jmversion}" />
-            <replace dir="${forge.resources.dir}" token="@FORGEVERSION@" value="${forgeversion}" />
-            <replace dir="${forge.resources.dir}" token="@MCVERSION@" value="${mcversion}" />
-            <replace dir="${forge.resources.dir}" token="@EDITION@" value="@{edition}" />
-            <replace dir="${forge.resources.dir}" token="@DATE@" value="${TODAY}" />
-
             <!-- Copy non-Java files to resources -->
-            <copy todir="${forge.resources.dir}" failonerror="true">
+            <copy todir="${forge.reobf.dir}" failonerror="true">
                 <fileset dir="${java.dir}" excludes="**/*.java" />
             </copy>
+
+            <!-- Replace tokens in resources -->
+            <replace dir="${forge.reobf.dir}" excludes="*.class">
+                <replacefilter token="@JMVERSION@" value="${jmversion}" />
+                <replacefilter token="@FORGEVERSION@" value="${forgeversion}" />
+                <replacefilter token="@MCVERSION@" value="${mcversion}" />
+                <replacefilter token="@EDITION@" value="@{edition}" />
+                <replacefilter token="@DATE@" value="${TODAY}" />
+            </replace>
 
             <!-- Minify js and css -->
             <ant target="minify" />
@@ -114,23 +129,7 @@
         <attribute name="jarfile" default="JourneyMap${jmversion}_@{edition}_MC${mcversion}.jar" />
         <sequential>
 
-            <exec executable="${gradle}" dir="${forge.dir}">
-                <arg value="-b"/>
-                <arg value="journeymap-build.gradle"/>
-                <arg value="build"/>
-            </exec>
-
-            <fail message="@edition Build Failed">
-                <condition>
-                    <not>
-                        <available file="${forge.build.dir}/journeymap-${jmversion}.jar" />
-                    </not>
-                </condition>
-            </fail>
-
-            <move file="${forge.build.dir}/journeymap-${jmversion}.jar" tofile="${dist.dir}/@{jarfile}" overwrite="true" failonerror="true"/>
-
-            <jar update="true" file="${dist.dir}/@{jarfile}" index="true" manifestencoding="UTF-8">
+            <jar destfile="${dist.dir}/@{jarfile}" duplicate="preserve" index="true" manifestencoding="UTF-8">
                 <manifest>
                     <attribute name="Built-By" value="techbrew (Mark Woodman)"/>
                     <attribute name="Built-Date" value="${TODAY}"/>
@@ -138,7 +137,9 @@
                     <attribute name="Implementation-Title" value="JourneyMap"/>
                     <attribute name="Implementation-Version" value="${jmversion} @{edition} Edition"/>
                 </manifest>
+                <fileset dir="${forge.reobf.dir}" />
             </jar>
+            <echo message="Built: ${dist.dir}\@{jarfile}" />
 
             <fail message="@edition Dist Failed">
                 <condition>
@@ -148,9 +149,16 @@
                 </condition>
             </fail>
 
+            <ant target="opendist" />
+
         </sequential>
     </macrodef>
 
+    <target name="opendist">
+        <exec executable="explorer">
+            <arg value="${dist.dir}"/>
+        </exec>
+    </target>
 
     <target name="minify">
         <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
@@ -160,18 +168,17 @@
             </classpath>
         </taskdef>
         <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
-            outputfolder="${forge.resources.dir}/assets/journeymap/web/js">
+                     outputfolder="${forge.reobf.dir}/assets/journeymap/web/js">
             <fileset dir="${resources.dir}/assets/journeymap/web/js" >
                 <include name="journeymap.js" />
             </fileset>
         </yuicompress>
         <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"
-            outputfolder="${forge.resources.dir}/assets/journeymap/web/css">
+                     outputfolder="${forge.reobf.dir}/assets/journeymap/web/css">
             <fileset dir="${resources.dir}/assets/journeymap/web/css" >
                 <include name="journeymap.css" />
             </fileset>
         </yuicompress>
     </target>
 
-	
 </project>

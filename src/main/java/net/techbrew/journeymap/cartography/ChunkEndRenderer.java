@@ -2,7 +2,6 @@ package net.techbrew.journeymap.cartography;
 
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -98,7 +97,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 					// Ender Crystal
                     // TODO:  Map the entity for the crystal
                     Block block = blockMD.getBlock();
-					if(block== Blocks.bedrock || block==Blocks.obsidian) {
+					if(block== Block.bedrock || block==Block.obsidian) {
 						lightLevel = 15;
 					}		
 		
@@ -137,7 +136,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 					}
 		
 					// Contour shading
-					if(block==Blocks.end_stone) {
+					if(block==Block.whiteStone) {
 			
 						// Get light level
 						if (lightLevel < 15) {

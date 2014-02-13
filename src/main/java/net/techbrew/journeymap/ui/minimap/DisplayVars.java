@@ -40,6 +40,7 @@ public class DisplayVars {
     final TextureImpl borderTexture;
     final TextureImpl maskTexture;
 
+    final float drawScale;
     final double fontScale;
     final int displayWidth;
     final int displayHeight;
@@ -62,6 +63,7 @@ public class DisplayVars {
 
         switch(shape){
             case LargeCircle: {
+                drawScale = 1f;
                 borderTexture = TextureCache.instance().getMinimapLargeCircle();
                 maskTexture = TextureCache.instance().getMinimapLargeCircleMask();
                 minimapSize = 512;
@@ -79,6 +81,7 @@ public class DisplayVars {
                 break;
             }
             case SmallCircle: {
+                drawScale = 0.5f;
                 borderTexture = TextureCache.instance().getMinimapSmallCircle();
                 maskTexture = TextureCache.instance().getMinimapSmallCircleMask();
                 minimapSize = 256;
@@ -96,6 +99,7 @@ public class DisplayVars {
                 break;
             }
             case LargeSquare: {
+                drawScale = 1f;
                 borderTexture = TextureCache.instance().getMinimapLargeSquare();
                 maskTexture = null;
                 minimapSize = 512;
@@ -106,35 +110,36 @@ public class DisplayVars {
                     bottomLabelYOffset = -6 - mc.fontRenderer.FONT_HEIGHT;
                 } else {
                     topLabelYOffset = 9;
-                    bottomLabelYOffset = -14-mc.fontRenderer.FONT_HEIGHT;
+                    bottomLabelYOffset = -14 -mc.fontRenderer.FONT_HEIGHT;
                 }
                 break;
             }
             case SmallSquare:
             default: {
+                drawScale = 0.5f;
                 borderTexture = TextureCache.instance().getMinimapSmallSquare();
                 maskTexture = null;
                 minimapSize = 256;
-                marginX=2;
-                marginY=2;
+                marginX=0;
+                marginY=0;
                 if(fontScale==1){
-                    topLabelYOffset = 5;
-                    bottomLabelYOffset = -2 - mc.fontRenderer.FONT_HEIGHT;
+                    topLabelYOffset = 7;
+                    bottomLabelYOffset = -6 - mc.fontRenderer.FONT_HEIGHT;
                 } else {
-                    topLabelYOffset = 6;
-                    bottomLabelYOffset = -8-mc.fontRenderer.FONT_HEIGHT;
+                    topLabelYOffset = 9;
+                    bottomLabelYOffset = -14 -mc.fontRenderer.FONT_HEIGHT;
                 }
                 break;
             }
         }
 
         minimapOffset = minimapSize*0.5;
-        final int textureOffsetX = (borderTexture.width-minimapSize)/2;
+        final int textureOffsetX = 0; //(borderTexture.width-minimapSize)/2;
 
         switch(position){
             case BottomRight : {
                 textureX = mc.displayWidth - borderTexture.width + textureOffsetX - marginX;
-                textureY = mc.displayHeight-(borderTexture.height)+(minimapSize/2) - marginY - bottomTextureYMargin;
+                textureY = mc.displayHeight-(borderTexture.height) - marginY - bottomTextureYMargin;
                 translateX = (mc.displayWidth/2)-minimapOffset;
                 translateY = (mc.displayHeight/2)-minimapOffset - bottomTextureYMargin;
                 scissorX = mc.displayWidth-minimapSize-marginX;
@@ -146,7 +151,7 @@ public class DisplayVars {
             }
             case TopLeft : {
                 textureX = -textureOffsetX + marginX;
-                textureY = -(borderTexture.height-minimapSize)/2 + marginY;
+                textureY =  marginY;
                 translateX = -(mc.displayWidth/2)+minimapOffset;
                 translateY = -(mc.displayHeight/2)+minimapOffset;
                 scissorX = 0+marginX;
@@ -158,7 +163,7 @@ public class DisplayVars {
             }
             case BottomLeft : {
                 textureX = -textureOffsetX + marginX;
-                textureY = mc.displayHeight-(borderTexture.height)+(minimapSize/2) - marginY - bottomTextureYMargin;
+                textureY = mc.displayHeight-(borderTexture.height) - marginY - bottomTextureYMargin;
                 translateX = -(mc.displayWidth/2)+minimapOffset;
                 translateY = (mc.displayHeight/2)-minimapOffset - bottomTextureYMargin;
                 scissorX = marginX;
@@ -171,7 +176,7 @@ public class DisplayVars {
             case TopRight :
             default : {
                 textureX = mc.displayWidth - borderTexture.width + textureOffsetX - marginX;
-                textureY = -(borderTexture.height-minimapSize)/2 + marginY;
+                textureY = marginY;
                 translateX = (mc.displayWidth/2)-minimapOffset;
                 translateY = -(mc.displayHeight/2)+minimapOffset;
                 scissorX = mc.displayWidth-minimapSize-marginX;
