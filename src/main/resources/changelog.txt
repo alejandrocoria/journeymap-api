@@ -14,6 +14,9 @@ Requirements:
 Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 - ModLoader is no longer supported.  You must use Forge.
 - New Feature:  Minimap! (Automatically enabled if Rei's/Zan's (Voxel) is not in use)
+- Bugfix for crashes when used with Thaumcraft (wisps)
+- Improved scrolling speeds in full-screen map
+- You can now provide your own map icons for custom mod creatures in journeyMap/custom/img/entity
 - Significant "under the hood" changes for the new Forge and Minecraft environment
 - Localization files migrated to standard resourcepack framework
 
