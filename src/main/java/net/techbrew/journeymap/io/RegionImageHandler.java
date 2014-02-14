@@ -281,7 +281,7 @@ public class RegionImageHandler {
 				
 				g2D.setColor(new Color(255,255,255));
 				if(mapType==MapType.day) {				
-					g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.4F));
+					g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.2F));
 				} else {
 					g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.1F));
 				}
