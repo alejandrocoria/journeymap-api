@@ -8,6 +8,8 @@ import net.techbrew.journeymap.ui.MapButton;
 import net.techbrew.journeymap.ui.UIManager;
 import org.lwjgl.input.Keyboard;
 
+import java.awt.*;
+
 public class MiniMapHotkeysHelp extends JmUI {
 
     private final String title;
@@ -98,19 +100,22 @@ public class MiniMapHotkeysHelp extends JmUI {
         // Hotkey help
         y+=12;
         final int x = (this.width)/2;
-        drawHelpStrings(Constants.getString("MiniMap.hotkeys_help_toggle"), Constants.getString("MiniMap.hotkeys_help_toggle_key"), x, y+=12);
-        drawHelpStrings(Constants.getString("MiniMap.hotkeys_help_zoom"), Constants.getString("MiniMap.hotkeys_help_zoom_key"), x, y+=12);
-        drawHelpStrings(Constants.getString("MiniMap.hotkeys_help_maptype"), Constants.getString("MiniMap.hotkeys_help_maptype_key"), x, y+=12);
-        drawHelpStrings(Constants.getString("MiniMap.hotkeys_help_position"), Constants.getString("MiniMap.hotkeys_help_position_key"), x, y+=12);
+        drawHelpStrings(Constants.getString("MiniMap.hotkeys_help_toggle_minimap"), Keyboard.getKeyName(Constants.KB_MAP.keyCode), x, y+=12);
+        drawHelpStrings(Constants.getString("MiniMap.hotkeys_help_zoom_in"), Keyboard.getKeyName(Constants.KB_MAP_ZOOMIN.keyCode), x, y+=12);
+        drawHelpStrings(Constants.getString("MiniMap.hotkeys_help_zoom_out"), Keyboard.getKeyName(Constants.KB_MAP_ZOOMOUT.keyCode), x, y+=12);
+        drawHelpStrings(Constants.getString("MiniMap.hotkeys_help_day"), Keyboard.getKeyName(Constants.KB_MAP_DAY.keyCode), x, y+=12);
+        drawHelpStrings(Constants.getString("MiniMap.hotkeys_help_night"), Keyboard.getKeyName(Constants.KB_MAP_NIGHT.keyCode), x, y+=12);
+        drawHelpStrings(Constants.getString("MiniMap.hotkeys_help_position"), Keyboard.getKeyName(Constants.KB_MINIMAP_POS.keyCode), x, y+=12);
+        buttonClose.setY(y + 16);
     }
 
-    protected void drawHelpStrings(String title, String keys, int x, int y)
+    protected void drawHelpStrings(String title, String key, int x, int y)
     {
-        int hgap = 4;
+        int hgap = 8;
         int tWidth = this.fontRenderer.getStringWidth(title);
         drawString(this.fontRenderer, title, x - tWidth - hgap, y, 16777215);
-        int kWidth = this.fontRenderer.getStringWidth(title);
-        drawString(this.fontRenderer, keys, x + hgap + hgap, y, 16777215);
+
+        drawString(this.fontRenderer, "CTRL + " + key, x + hgap, y, Color.YELLOW.getRGB());
     }
     
     @Override
@@ -135,6 +140,8 @@ public class MiniMapHotkeysHelp extends JmUI {
                 return;
             }
 		}
+
+        keyEventHandler.onKeypress(true);
 	}
     
     @Override

@@ -417,34 +417,28 @@ public class MapOverlay extends JmUI {
 			chat.keyTyped(c, i);
 			return;
 		}
-		
-		switch(i) {
-			case Keyboard.KEY_ESCAPE : {	
-				UIManager.getInstance().closeAll();
-				return;
-			}
-			case Keyboard.KEY_ADD : {
-				zoomIn();
-				return;
-			}
-			case Keyboard.KEY_EQUALS : {
-				zoomIn();
-				return;
-			}
-			case Keyboard.KEY_MINUS : {
-                zoomOut();
-                return;
-            }
-            case Keyboard.KEY_LBRACKET : {
-                state.overrideMapType(Constants.MapType.day);
-                return;
-            }
-            case Keyboard.KEY_RBRACKET : {
-                state.overrideMapType(Constants.MapType.night);
-                return;
-            }
+
+        if(i==Keyboard.KEY_ESCAPE) {
+            UIManager.getInstance().closeAll();
+            return;
         }
-		
+        else if(i==Constants.KB_MAP_ZOOMIN.keyCode) {
+            zoomIn();
+            return;
+        }
+        else if(i==Constants.KB_MAP_ZOOMOUT.keyCode) {
+            zoomOut();
+            return;
+        }
+        else if(i==Constants.KB_MAP_DAY.keyCode) {
+            state.overrideMapType(Constants.MapType.day);
+            return;
+        }
+        else if(i==Constants.KB_MAP_NIGHT.keyCode) {
+            state.overrideMapType(Constants.MapType.night);
+            return;
+        }
+
 		// North
 		if(i==mc.gameSettings.keyBindForward.keyCode) { // getkeyCode
 			moveCanvas(0,-16);

@@ -20,6 +20,7 @@ Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 - (GUT-4L9-GB5Z) Bugfix: improved scrolling behavior in full-screen map
 - Player icon is now smaller (by popular request)
 - Significant "under the hood" changes for the new Forge and Minecraft environment
+- Keybindings added and customizable through the standard Minecraft Controls menu
 - Language files migrated to standard resourcepack framework
 - Languages files updated: en_US, pl_PL
 - Languages files added: es_ES, pt_PT

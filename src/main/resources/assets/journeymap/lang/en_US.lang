@@ -213,17 +213,18 @@ MiniMap.font_large=Large
 # Added in 3.3.x. %1$s = one of "On", "Off". Hot Keys are keyboard shortcuts that can control the minimap.
 MiniMap.hotkeys=Hot Keys: %1$s
 
-# Added in 3.3.x. (§b and §f are color changes)
+# Added in 3.3.x.  Used in Minecraft Controls menu and JourneyMap/Options/Minimap.../HotKeys... dialog.
+MiniMap.hotkeys_category=JourneyMap (Use CTRL+[key] for Minimap)
 MiniMap.hotkeys_help=Hot Keys...
 MiniMap.hotkeys_help_title=Minimap Hot Keys
-MiniMap.hotkeys_help_toggle=Toggle Minimap on and off:
-MiniMap.hotkeys_help_toggle_key=§bCTRL J§f
-MiniMap.hotkeys_help_zoom=Zoom Minimap In, Out:
-MiniMap.hotkeys_help_zoom_key=§bCTRL +§f , §bCTRL -§f
-MiniMap.hotkeys_help_maptype=Change map to Day, Night:
-MiniMap.hotkeys_help_maptype_key=§bCTRL [§f , §bCTRL ]§f
-MiniMap.hotkeys_help_position=Change map position:
-MiniMap.hotkeys_help_position_key=§bCTRL \§f
+MiniMap.hotkeys_help_toggle=Toggle Map
+MiniMap.hotkeys_help_toggle_minimap=Toggle Minimap
+MiniMap.hotkeys_help_zoom_in=Zoom In
+MiniMap.hotkeys_help_zoom_out=Zoom Out
+MiniMap.hotkeys_help_day=Show Day Map
+MiniMap.hotkeys_help_night=Show Night Map
+MiniMap.hotkeys_help_position=Change Minimap Position
+
 
 # Added in 3.1.x. %1$s = one of "On", "Off". FPS is short for "Frames per Second", a measurement of graphic performance.
 MiniMap.show_fps=Show FPS: %1$s

@@ -1,6 +1,7 @@
 package net.techbrew.journeymap.forgehandler;
 
 
+import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.registry.TickRegistry;
@@ -40,6 +41,7 @@ public class EventHandlerManager {
 
     public static void registerGuiHandlers()
     {
+        KeyBindingRegistry.registerKeyBinding(new KeyEventHandler());
         register(new MiniMapOverlayHandler());
     }
 
