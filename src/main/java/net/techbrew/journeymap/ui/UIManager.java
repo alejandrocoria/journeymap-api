@@ -37,7 +37,6 @@ public class UIManager {
     }
     
     private final Logger logger = JourneyMap.getLogger();
-    private final KeyBinding uiKeybinding = JourneyMap.getInstance().uiKeybinding;
     Minecraft minecraft = Minecraft.getMinecraft();
     
     public void closeAll() {    	
@@ -53,7 +52,6 @@ public class UIManager {
     		logger.fine("Closing " + minecraft.currentScreen.getClass());
 			((JmUI) minecraft.currentScreen).close();
 		}
-		uiKeybinding.unPressAllKeys();
     }
     
     public void openInventory() {
@@ -105,7 +103,8 @@ public class UIManager {
     }
 
     public void openMap() {
-    	open(MapOverlay.class);
+        KeyBinding.unPressAllKeys();
+        open(MapOverlay.class);
     }
 
     public void openMiniMapOptions() {

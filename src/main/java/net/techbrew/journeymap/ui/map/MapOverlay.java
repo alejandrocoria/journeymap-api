@@ -417,36 +417,30 @@ public class MapOverlay extends JmUI {
 			chat.keyTyped(c, i);
 			return;
 		}
-		
-		switch(i) {
-			case Keyboard.KEY_ESCAPE : {	
-				UIManager.getInstance().closeAll();
-				return;
-			}
-			case Keyboard.KEY_ADD : {
-				zoomIn();
-				return;
-			}
-			case Keyboard.KEY_EQUALS : {
-				zoomIn();
-				return;
-			}
-			case Keyboard.KEY_MINUS : {
-                zoomOut();
-                return;
-            }
-            case Keyboard.KEY_LBRACKET : {
-                state.overrideMapType(Constants.MapType.day);
-                return;
-            }
-            case Keyboard.KEY_RBRACKET : {
-                state.overrideMapType(Constants.MapType.night);
-                return;
-            }
+
+        if(i==Keyboard.KEY_ESCAPE || i==Constants.KB_MAP.getKeyCode()) {
+            UIManager.getInstance().closeAll();
+            return;
         }
-		
+        else if(i==Constants.KB_MAP_ZOOMIN.getKeyCode()) {
+            zoomIn();
+            return;
+        }
+        else if(i==Constants.KB_MAP_ZOOMOUT.getKeyCode()) {
+            zoomOut();
+            return;
+        }
+        else if(i==Constants.KB_MAP_DAY.getKeyCode()) {
+            state.overrideMapType(Constants.MapType.day);
+            return;
+        }
+        else if(i==Constants.KB_MAP_NIGHT.getKeyCode()) {
+            state.overrideMapType(Constants.MapType.night);
+            return;
+        }
+
 		// North
-		if(i==mc.gameSettings.keyBindForward.getKeyCode()) { // getkeyCode
+		if(i==mc.gameSettings.keyBindForward.getKeyCode()) {
 			moveCanvas(0,-16);
 			return;
 		}
@@ -458,7 +452,7 @@ public class MapOverlay extends JmUI {
 		}
 		
 		// South
-		if(i==mc.gameSettings.keyBindBack.getKeyCode()) {
+		if(mc.gameSettings.keyBindBack.isPressed()) {
 			moveCanvas(0,16);
 			return;
 		}
@@ -470,7 +464,7 @@ public class MapOverlay extends JmUI {
 		}
 		
 		// Open inventory
-		if(i==mc.gameSettings.keyBindInventory.getKeyCode()) { // keyBindInventory
+		if(i==mc.gameSettings.keyBindInventory.getKeyCode()) {
 			close();
 			mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
 			return;

@@ -11,7 +11,6 @@ import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSelectWorld;
-import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.cartography.ColorCache;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.WorldData;
@@ -82,9 +81,6 @@ public class JourneyMap {
 	private JMServer jmServer;
 	
 	private boolean threadLogging = false;
-
-	// Invokes MapOverlay
-	public KeyBinding uiKeybinding;
 
 	// Time stamp of next chunk update
 	public long nextPlayerUpdate = 0;
@@ -164,11 +160,6 @@ public class JourneyMap {
             // In-Game UI
             this.enableMapGui = pm.getBoolean(PropertyManager.Key.MAPGUI_ENABLED);
             if(enableMapGui) {
-
-                // Register keybinding
-                int mapGuiKeyCode = pm.getInteger(PropertyManager.Key.MAPGUI_KEYCODE);
-                this.uiKeybinding = new KeyBinding("key.journeymap", mapGuiKeyCode, SHORT_MOD_NAME); //$NON-NLS-1$
-
                 // Register GUI event handlers
                 EventHandlerManager.registerGuiHandlers();
             }
@@ -414,7 +405,7 @@ public class JourneyMap {
 		if(enableAnnounceMod) {
             ChatLog.announceI18N("JourneyMap.ready", MOD_NAME); //$NON-NLS-1$
 			if(enableWebserver && enableMapGui) {
-				String keyName = Keyboard.getKeyName(uiKeybinding.getKeyCode()); // Should be KeyCode
+				String keyName = Keyboard.getKeyName(Constants.KB_MAP.getKeyCode());
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
                 String message = Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
                 ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
@@ -423,7 +414,7 @@ public class JourneyMap {
                 String message = Constants.getString("JourneyMap.webserver_only_ready", port); //$NON-NLS-1$
                 ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
 			} else if(enableMapGui) {
-				String keyName = Keyboard.getKeyName(uiKeybinding.getKeyCode()); // Should be KeyCode
+				String keyName = Keyboard.getKeyName(Constants.KB_MAP.getKeyCode());
                 ChatLog.announceI18N("JourneyMap.mapgui_only_ready", keyName); //$NON-NLS-1$
 			} else {
                 ChatLog.announceI18N("JourneyMap.webserver_and_mapgui_disabled"); //$NON-NLS-1$

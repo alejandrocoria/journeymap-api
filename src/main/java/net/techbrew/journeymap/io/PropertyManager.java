@@ -31,7 +31,6 @@ public class PropertyManager {
 		BROWSER_POLL(Integer.class,"browser_poll", 1900), //$NON-NLS-1$
 		UPDATETIMER_PLAYER(Integer.class,"update_timer_entities", 1000), //$NON-NLS-1$
 		UPDATETIMER_CHUNKS(Integer.class,"update_timer_chunks",2000), //$NON-NLS-1$
-		MAPGUI_KEYCODE(Integer.class,"mapgui_keycode",36), //$NON-NLS-1$
 		LOGGING_LEVEL(String.class,"logging_level", "INFO"), //$NON-NLS-1$  //$NON-NLS-2$
 		CAVE_LIGHTING(Boolean.class,"render_cavelighting_enabled",true), //$NON-NLS-1$
 		ANNOUNCE_MODLOADED(Boolean.class,"announce_modloaded", true), //$NON-NLS-1$
@@ -235,7 +234,11 @@ public class PropertyManager {
 				if(entry.getKey().equals("automap_enabled")) {
 					writeNeeded = true;
 					properties.remove(entry.getKey());
-				}			
+				}
+                if(entry.getKey().equals("mapgui_keycode")) {
+                    writeNeeded = true;
+                    properties.remove(entry.getKey());
+                }
 			}
 			
 			if(writeNeeded) {
