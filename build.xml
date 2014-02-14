@@ -2,7 +2,7 @@
 <project name="JourneyMap" basedir="." default="all">
 
     <!-- Update when new version is going to be released -->
-    <property name="jmversion" value="3.3.0rc1" />
+    <property name="jmversion" value="3.3.0rc2" />
     <property name="mcversion" value="1.7.2" />
     <property name="forgeversion" value="1.7.2-10.12.0.1024" />
 	<property name="unlimited" value="Unlimited" />
@@ -68,11 +68,13 @@
             <copy file="${basedir}/build.gradle" tofile="${forge.dir}/journeymap-build.gradle" failonerror="true" overwrite="true" />
 
             <!-- Replace params in custom gradle build script -->
-            <replace file="${forge.dir}/journeymap-build.gradle" token="@JMVERSION@" value="${jmversion}" />
-            <replace file="${forge.dir}/journeymap-build.gradle" token="@MCVERSION@" value="${mcversion}" />
-            <replace file="${forge.dir}/journeymap-build.gradle" token="@FORGEVERSION@" value="${forgeversion}" />
-            <replace file="${forge.dir}/journeymap-build.gradle" token="@EDITION@" value="@{edition}" />
-            <replace file="${forge.dir}/journeymap-build.gradle" token="@TODAY@" value="${TODAY}" />
+            <replace file="${forge.dir}/journeymap-build.gradle">
+                <replacefilter token="@JMVERSION@" value="${jmversion}" />
+                <replacefilter token="@MCVERSION@" value="${mcversion}" />
+                <replacefilter token="@FORGEVERSION@" value="${forgeversion}" />
+                <replacefilter token="@EDITION@" value="@{edition}" />
+                <replacefilter token="@TODAY@" value="${TODAY}" />
+            </replace>
 
             <!-- Copy Java libs -->
             <copy todir="${forge.dir}/libs">
@@ -85,8 +87,10 @@
             </copy>
 
             <!-- Replace params in JourneyMap class -->
-            <replace file="${forge.src.dir}/net/techbrew/journeymap/JourneyMap.java" token="@JMVERSION@" value="${jmversion}" />
-            <replace file="${forge.src.dir}/net/techbrew/journeymap/JourneyMap.java" token="@MCVERSION@" value="${mcversion}" />
+            <replace file="${forge.src.dir}/net/techbrew/journeymap/JourneyMap.java">
+                <replacefilter token="@JMVERSION@" value="${jmversion}" />
+                <replacefilter token="@MCVERSION@" value="${mcversion}" />
+            </replace>
 
             <!-- Copy resources -->
             <copy todir="${forge.resources.dir}" failonerror="true">
@@ -94,11 +98,13 @@
             </copy>
 
             <!-- Replace tokens in resources -->
-            <replace dir="${forge.resources.dir}" token="@JMVERSION@" value="${jmversion}" />
-            <replace dir="${forge.resources.dir}" token="@FORGEVERSION@" value="${forgeversion}" />
-            <replace dir="${forge.resources.dir}" token="@MCVERSION@" value="${mcversion}" />
-            <replace dir="${forge.resources.dir}" token="@EDITION@" value="@{edition}" />
-            <replace dir="${forge.resources.dir}" token="@DATE@" value="${TODAY}" />
+            <replace dir="${forge.resources.dir}">
+                <replacefilter token="@JMVERSION@" value="${jmversion}" />
+                <replacefilter token="@MCVERSION@" value="${mcversion}" />
+                <replacefilter token="@FORGEVERSION@" value="${forgeversion}" />
+                <replacefilter token="@EDITION@" value="@{edition}" />
+                <replacefilter token="@TODAY@" value="${TODAY}" />
+            </replace>
 
             <!-- Copy non-Java files to resources -->
             <copy todir="${forge.resources.dir}" failonerror="true">
@@ -149,6 +155,10 @@
                     </not>
                 </condition>
             </fail>
+
+            <exec executable="explorer">
+                <arg value="${dist.dir}"/>
+            </exec>
 
         </sequential>
     </macrodef>
