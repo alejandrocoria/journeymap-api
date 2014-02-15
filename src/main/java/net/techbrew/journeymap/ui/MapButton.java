@@ -4,8 +4,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
 
 public class MapButton extends GuiButton {
 	
@@ -16,11 +19,8 @@ public class MapButton extends GuiButton {
 	String labelOn;
 	String labelOff;
 
-    // TODO FORGE
     public boolean enabled;
     public boolean drawButton;
-
-    public void drawButton(){}
 
     private void tempInit(){
         this.enabled = true;
@@ -80,8 +80,7 @@ public class MapButton extends GuiButton {
 		updateLabel();
 	}
 
-    // TODO FORGE
-	//@Override
+	@Override
 	public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
     {
 		if(!drawButton)
@@ -89,9 +88,13 @@ public class MapButton extends GuiButton {
             return;
         }
 
-        // TODO FORGE
-		super.drawButton(minecraft, mouseX, mouseY);
-		
+        if(this.enabled) {
+            super.drawButton(minecraft, mouseX, mouseY);
+        } else {
+            this.drawCenteredString(minecraft.fontRenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, -6250336);
+            DrawUtil.drawRectangle(this.getX()+2, this.getY()+2, width-4, height-4, Color.darkGray, 185);
+        }
+
 		if(this.icon!=null) {
 			Tessellator tessellator = Tessellator.instance;
 			GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
@@ -127,8 +130,7 @@ public class MapButton extends GuiButton {
 		
     }
 
-    // TODO FORGE
-    // @Override
+    @Override
 	public boolean mousePressed(Minecraft minecraft, int i, int j)
     {
         return enabled && drawButton && i >= getX() && j >= getY() && i < getX() + getWidth() && j < getY() + getHeight();
