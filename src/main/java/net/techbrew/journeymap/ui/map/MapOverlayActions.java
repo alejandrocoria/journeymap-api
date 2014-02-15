@@ -56,7 +56,6 @@ public class MapOverlayActions extends JmUI {
 				Constants.getString("MapOverlay.automap_title", on),
 				Constants.getString("MapOverlay.automap_title", off),
 				true); //$NON-NLS-1$ //$NON-NLS-2$
-		buttonAutomap.setHoverText(Constants.getString("MapOverlay.automap_text")); //$NON-NLS-1$
 		buttonAutomap.enabled = Minecraft.getMinecraft().isSingleplayer();
 		
 		buttonCheck = new MapButton(ButtonEnum.Check.ordinal(),0,0, Constants.getString("MapOverlay.update_check")); //$NON-NLS-1$ 

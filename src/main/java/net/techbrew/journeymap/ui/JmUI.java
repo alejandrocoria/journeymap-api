@@ -1,7 +1,6 @@
 package net.techbrew.journeymap.ui;
 
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
@@ -13,7 +12,6 @@ public abstract class JmUI extends GuiScreen {
     TextureImpl logo = TextureCache.instance().getLogo();
 
 	public abstract void close();
-
 
     public JmUI() {
         super();
@@ -45,10 +43,5 @@ public abstract class JmUI extends GuiScreen {
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadIdentity();
         GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
-    }
-
-    @Override
-    public void setWorldAndResolution(Minecraft minecraft, int width, int height) {
-        super.setWorldAndResolution(minecraft, width, height);
     }
 }

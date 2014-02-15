@@ -76,7 +76,7 @@ public class MapOverlayOptions extends JmUI {
 				Constants.getString("MapOverlay.show_waypoints", off),
 				PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_WAYPOINTS)); //$NON-NLS-1$  //$NON-NLS-2$
 		buttonWaypoints.enabled = WaypointHelper.waypointsEnabled();
-		
+
 		boolean webserverOn = PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
 		buttonWebserver = new MapButton(ButtonEnum.Webserver.ordinal(),0,0,
 				Constants.getString("MapOverlay.enable_webserver", on),
@@ -96,35 +96,28 @@ public class MapOverlayOptions extends JmUI {
 		if(!FeatureManager.isAllowed(Feature.MapCaves)) {
 			buttonCaves.setToggled(false);
 			buttonCaves.enabled = false;
-			buttonCaves.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
 		}
 			
 		if(!FeatureManager.isAllowed(Feature.RadarMobs)) {
 			buttonMonsters.setToggled(false);
 			buttonMonsters.enabled = false;
-			buttonMonsters.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
 		}
 			
 		if(!FeatureManager.isAllowed(Feature.RadarAnimals)) {
 			buttonAnimals.setToggled(false);
 			buttonAnimals.enabled = false;
-			buttonAnimals.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
-			
 			buttonPets.setToggled(false);
 			buttonPets.enabled = false;
-			buttonPets.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$			
 		}
 		
 		if(!FeatureManager.isAllowed(Feature.RadarVillagers)) {
 			buttonVillagers.setToggled(false);
 			buttonVillagers.enabled = false;
-			buttonVillagers.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
 		}
 
 		if(!FeatureManager.isAllowed(Feature.RadarPlayers)) {
 			buttonPlayers.setToggled(false);
 			buttonPlayers.enabled = false;
-			buttonPlayers.setHoverText(Constants.getString("MapOverlay.disabled_feature")); //$NON-NLS-1$
 		}
 		
 		buttonList.add(buttonCaves);
@@ -256,7 +249,7 @@ public class MapOverlayOptions extends JmUI {
         super.drawScreen(par1, par2, par3);
         
         int y = this.height / 4 - 18;
-        drawCenteredString(this.fontRenderer, title , this.width / 2, y, 16777215);
+        drawCenteredString(this.fontRendererObj, title , this.width / 2, y, 16777215);
     }
     
     @Override
