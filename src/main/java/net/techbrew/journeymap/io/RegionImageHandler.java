@@ -278,11 +278,12 @@ public class RegionImageHandler {
 		// Show chunk grid
 		if(imageDrawn) {
 			if(PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)) {
-				
-				g2D.setColor(new Color(255,255,255));
-				if(mapType==MapType.day) {				
-					g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.2F));
+
+				if(mapType==MapType.day) {
+                    g2D.setColor(Color.black);
+					g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.25F));
 				} else {
+                    g2D.setColor(Color.gray);
 					g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.1F));
 				}
 	
