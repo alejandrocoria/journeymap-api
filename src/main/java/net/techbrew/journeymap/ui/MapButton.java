@@ -4,24 +4,22 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.techbrew.journeymap.render.texture.TextureCache;
+import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.render.draw.DrawUtil;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
+
 public class MapButton extends GuiButton {
-	
+
 	private Boolean toggled = true;
 	String icon;
 	DynamicTexture iconTexture;
-	String hover;
 	String labelOn;
 	String labelOff;
-    public Boolean restricted = false;
 
-    // TODO FORGE
     public boolean enabled;
     public boolean drawButton;
-
-    public void drawButton(){}
 
     private void tempInit(){
         this.enabled = true;
@@ -53,19 +51,7 @@ public class MapButton extends GuiButton {
 		this.setToggled(toggled);
         tempInit();
 	}	
-	
-	public MapButton(int id, int x, int y, int width, int height, String hoverText, String icon) {
-		super(id, x, y, width, height, "");
-		this.icon = (icon==null) ? "/gui/gui.png" : icon; //$NON-NLS-1$
-		this.iconTexture = TextureCache.newTexture(icon);
-		setHoverText(hoverText);
-        tempInit();
-	}
-	
-	public void setHoverText(String hoverText) {
-		hover = hoverText; //$NON-NLS-1$
-	}
-	
+
 	private void updateLabel() {
 		if(labelOn!=null && labelOff!=null) {
 			super.displayString = getToggled() ? labelOn : labelOff;
@@ -81,8 +67,7 @@ public class MapButton extends GuiButton {
 		updateLabel();
 	}
 
-    // TODO FORGE
-	//@Override
+	@Override
 	public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
     {
 		if(!drawButton)
@@ -90,12 +75,19 @@ public class MapButton extends GuiButton {
             return;
         }
 
-		super.drawButton(minecraft, mouseX, mouseY);
-
-        if(this.restricted)
-        {
-            String strikethru = String.format("%"+this.displayString.length()+"s", "").replace(' ', '-');
-            this.drawCenteredString(minecraft.fontRenderer, strikethru, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, 10526880);
+        if(this.enabled) {
+            super.drawButton(minecraft, mouseX, mouseY);
+        } else {
+            boolean mouseover = mouseX >= this.xPosition && mouseY >= this.yPosition
+                    && mouseX <= (this.xPosition + this.width)
+                    && mouseY <= (this.yPosition + this.height);
+            if(mouseover) {
+                DrawUtil.drawRectangle(this.getX()+2, this.getY()+2, width-4, height-4, Color.darkGray, 185);
+                this.drawCenteredString(minecraft.fontRenderer, Constants.getString("MapOverlay.disabled_feature"), this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, -6250336);
+            } else {
+                this.drawCenteredString(minecraft.fontRenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, -6250336);
+                DrawUtil.drawRectangle(this.getX()+2, this.getY()+2, width-4, height-4, Color.darkGray, 185);
+            }
         }
 
 		if(this.icon!=null) {
@@ -133,20 +125,7 @@ public class MapButton extends GuiButton {
 		
     }
 
-    /**
-     * Draws this button to the screen.
-     */
-    public void drawButtonHover(Minecraft minecraft, int mouseX, int mouseY)
-    {
-        int k = this.getHoverState(this.field_146123_n);
-        if(k==2)
-        {
-            this.drawCenteredString(minecraft.fontRenderer, this.hover, this.xPosition + this.width / 2, 20 + this.yPosition + (this.height - 8) / 2, 10526880);
-        }
-    }
-
-    // TODO FORGE
-    // @Override
+    @Override
 	public boolean mousePressed(Minecraft minecraft, int i, int j)
     {
         return enabled && drawButton && i >= getX() && j >= getY() && i < getX() + getWidth() && j < getY() + getHeight();
