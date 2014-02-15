@@ -270,13 +270,7 @@ public class GridRenderer {
 			double centerX = offsetX + centerPixelOffset.x;
 			double centerZ = offsetZ + centerPixelOffset.y;
             final Cache<Integer,Tile> tc = TileCache.instance();
-					
-			GL11.glDisable(GL11.GL_DEPTH_TEST);
-			GL11.glDepthMask(false);
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            GL11.glColor4f(opacity, opacity, opacity, opacity);
-			GL11.glDisable(GL11.GL_ALPHA_TEST);
-			
+
 			for(Map.Entry<TilePos,Integer> entry : grid.entrySet()) {
 				//if(entry.getKey().deltaX!=0 || entry.getKey().deltaZ!=0) continue;
                 Tile tile = tc.getIfPresent(entry.getValue());
@@ -297,10 +291,6 @@ public class GridRenderer {
                 tessellator.draw();
             }
 
-            GL11.glEnable(GL11.GL_ALPHA_TEST);
-            GL11.glDepthMask(true);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
-
 		}		
 	}
 	
@@ -313,11 +303,17 @@ public class GridRenderer {
 
         DrawUtil.drawRectangle(startX, startZ, Tile.TILESIZE, Tile.TILESIZE, bgColor, 255);
 
-		if(tile.hasTexture()) {
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glDepthMask(false);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glColor4f(1f, 1f, 1f, 1f);
+
+        if(tile.hasTexture()) {
             // TODO: get this check working again
 			//if(isOnScreen(startX, startZ, endX, endZ)) {
                 GL11.glEnable(GL11.GL_TEXTURE_2D);
 				GL11.glBindTexture(GL11.GL_TEXTURE_2D, tile.getTexture().getGlTextureId());
+
 				Tessellator tessellator = Tessellator.instance;
 				tessellator.startDrawingQuads();			
 				tessellator.addVertexWithUV(startX, endZ, 0.0D, 0, 1);
@@ -329,6 +325,9 @@ public class GridRenderer {
 		} else {
            //logger.warning("Tile has no texture: " + tile);
         }
+
+        GL11.glDepthMask(true);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
 	}
 	
 	private boolean isOnScreen(TilePos pos) {

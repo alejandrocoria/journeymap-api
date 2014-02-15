@@ -129,9 +129,9 @@ public class DrawUtil {
         tessellator.addVertexWithUV(x + width, y, 0.0D, 1, 0);
         tessellator.addVertexWithUV(x, y, 0.0D, 0, 0);
         tessellator.draw();
-
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GL11.glDisable(GL11.GL_BLEND);
     }
 
     public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float scale) {
@@ -146,17 +146,6 @@ public class DrawUtil {
 
         // Start a new matrix for translation/rotation
         GL11.glPushMatrix();
-
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-
-        // Bind texture
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
-
-        // Smooth the texture interpolation that will come with rotation
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 
         // Move origin to x,y
         GL11.glTranslated(x, y, 0);
