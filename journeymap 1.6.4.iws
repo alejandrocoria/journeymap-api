@@ -82,10 +82,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".classpath" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name=".classpath" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$MCP_LOC$/eclipse/Minecraft/.classpath">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="27" column="0" selection-start="3306" selection-end="3306" vertical-scroll-proportion="0.46270162" vertical-offset="0" max-vertical-offset="992">
+            <state line="27" column="0" selection-start="3306" selection-end="3306" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="612">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="EntityHelper.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/net/techbrew/journeymap/model/EntityHelper.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="27" column="13" selection-start="1028" selection-end="1028" vertical-scroll-proportion="-0.30846775" vertical-offset="408" max-vertical-offset="3774">
               <folding />
             </state>
           </provider>
@@ -103,7 +112,7 @@
       <file leaf-file-name="journeymap 1.6.4.iws" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/journeymap 1.6.4.iws">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="130" column="14" selection-start="6265" selection-end="6265" vertical-scroll-proportion="0.0" vertical-offset="2210" max-vertical-offset="10540">
+            <state line="128" column="14" selection-start="6136" selection-end="6136" vertical-scroll-proportion="0.0" vertical-offset="2176" max-vertical-offset="11101">
               <folding />
             </state>
           </provider>
@@ -408,7 +417,7 @@
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24973376" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -419,7 +428,7 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24973376" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24973376" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -542,14 +551,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/journeymap 1.6.4.iws">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="130" column="14" selection-start="6265" selection-end="6265" vertical-scroll-proportion="0.0" vertical-offset="2210" max-vertical-offset="10540">
+        <state line="128" column="14" selection-start="6136" selection-end="6136" vertical-scroll-proportion="0.0" vertical-offset="2176" max-vertical-offset="11101">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$MCP_LOC$/eclipse/Minecraft/.classpath">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="0" selection-start="3306" selection-end="3306" vertical-scroll-proportion="0.46270162" vertical-offset="0" max-vertical-offset="992">
+        <state line="27" column="0" selection-start="3306" selection-end="3306" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="612">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/net/techbrew/journeymap/model/EntityHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="27" column="13" selection-start="1028" selection-end="1028" vertical-scroll-proportion="-0.30846775" vertical-offset="408" max-vertical-offset="3774">
           <folding />
         </state>
       </provider>
