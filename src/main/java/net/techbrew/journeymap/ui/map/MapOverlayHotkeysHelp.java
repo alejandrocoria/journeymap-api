@@ -1,4 +1,4 @@
-package net.techbrew.journeymap.ui.minimap;
+package net.techbrew.journeymap.ui.map;
 
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
@@ -6,11 +6,12 @@ import net.techbrew.journeymap.forgehandler.KeyEventHandler;
 import net.techbrew.journeymap.ui.JmUI;
 import net.techbrew.journeymap.ui.MapButton;
 import net.techbrew.journeymap.ui.UIManager;
+import net.techbrew.journeymap.ui.minimap.DisplayVars;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
 
-public class MiniMapHotkeysHelp extends JmUI {
+public class MapOverlayHotkeysHelp extends JmUI {
 
     private int lastWidth = 0;
     private int lastHeight = 0;
@@ -23,8 +24,8 @@ public class MiniMapHotkeysHelp extends JmUI {
 
     private KeyEventHandler keyEventHandler;
 
-	public MiniMapHotkeysHelp() {
-		super(Constants.getString("MiniMap.hotkeys_title"));
+	public MapOverlayHotkeysHelp() {
+		super(Constants.getString("MapOverlay.hotkeys_title"));
         keyEventHandler = new KeyEventHandler();
 	}
 
@@ -70,10 +71,15 @@ public class MiniMapHotkeysHelp extends JmUI {
 
 
             case Close: {
-                UIManager.getInstance().openMiniMapOptions();
+                UIManager.getInstance().openMapOptions();
                 break;
             }
 		}
+	}
+    
+    @Override
+	public void updateScreen() {
+		super.updateScreen();
 	}
 
     /**
@@ -90,12 +96,15 @@ public class MiniMapHotkeysHelp extends JmUI {
         // Hotkey help
         y+=12;
         final int x = (this.width)/2;
-        drawHelpStrings(Constants.getString("MiniMap.hotkeys_toggle"), Keyboard.getKeyName(Constants.KB_MAP.keyCode), x, y+=12);
+        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_toggle"), Keyboard.getKeyName(Constants.KB_MAP.keyCode), x, y+=12);
         drawHelpStrings(Constants.getString("MapOverlay.hotkeys_zoom_in"), Keyboard.getKeyName(Constants.KB_MAP_ZOOMIN.keyCode), x, y+=12);
         drawHelpStrings(Constants.getString("MapOverlay.hotkeys_zoom_out"), Keyboard.getKeyName(Constants.KB_MAP_ZOOMOUT.keyCode), x, y+=12);
         drawHelpStrings(Constants.getString("MapOverlay.hotkeys_day"), Keyboard.getKeyName(Constants.KB_MAP_DAY.keyCode), x, y+=12);
         drawHelpStrings(Constants.getString("MapOverlay.hotkeys_night"), Keyboard.getKeyName(Constants.KB_MAP_NIGHT.keyCode), x, y+=12);
-        drawHelpStrings(Constants.getString("MiniMap.hotkeys_position"), Keyboard.getKeyName(Constants.KB_MINIMAP_POS.keyCode), x, y+=12);
+        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_north"), Keyboard.getKeyName(mc.gameSettings.keyBindForward.keyCode), x, y+=12);
+        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_west"), Keyboard.getKeyName(mc.gameSettings.keyBindLeft.keyCode), x, y+=12);
+        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_south"), Keyboard.getKeyName(mc.gameSettings.keyBindBack.keyCode), x, y+=12);
+        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_east"), Keyboard.getKeyName(mc.gameSettings.keyBindRight.keyCode), x, y+=12);
         buttonClose.setY(y + 16);
     }
 
@@ -105,31 +114,17 @@ public class MiniMapHotkeysHelp extends JmUI {
         int tWidth = getFontRenderer().getStringWidth(title);
         drawString(getFontRenderer(), title, x - tWidth - hgap, y, 16777215);
 
-        drawString(getFontRenderer(), Constants.CONTROL_KEYNAME_COMBO + key, x + hgap, y, Color.YELLOW.getRGB());
+        drawString(getFontRenderer(), key, x + hgap, y, Color.YELLOW.getRGB());
     }
-    
-    @Override
-	public void drawBackground(int layer)
-	{
-        super.drawBackground(layer);
-
-        MiniMap miniMap = UIManager.getInstance().getMiniMap();
-        if(miniMap.isEnabled()){
-            miniMap.drawMap();
-        }
-	}
     
     @Override
 	protected void keyTyped(char c, int i)
 	{
 		switch(i) {
             case Keyboard.KEY_ESCAPE : {
-                UIManager.getInstance().openMiniMapOptions();
+                UIManager.getInstance().openMapOptions();
                 return;
             }
 		}
-
-        keyEventHandler.onKeypress(true);
 	}
-
 }

@@ -13,7 +13,6 @@ import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.EntityKey;
 import net.techbrew.journeymap.data.PlayerData;
 import net.techbrew.journeymap.io.PropertyManager;
-import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.EntityHelper;
@@ -75,6 +74,7 @@ public class MapOverlay extends JmUI {
 	 * Default constructor
 	 */
 	public MapOverlay() {
+        super(null);
         mc = FMLClientHandler.instance().getClient();
         state.refresh(mc, mc.thePlayer);
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
@@ -95,18 +95,24 @@ public class MapOverlay extends JmUI {
     }
 
 	@Override
-	public void drawScreen(int i, int j, float f) {
+	public void drawScreen(int width, int height, float f) {
 		try {
             drawScreenTimer.start();
             drawBackground(0); // drawBackground
 			drawMap();
-            super.drawScreen(i, j, f); // Buttons
-            if(chat!=null) chat.drawScreen(i, j, f);
+
+            layoutButtons();
+            for (int k = 0; k < this.buttonList.size(); ++k)
+            {
+                GuiButton guibutton = (GuiButton)this.buttonList.get(k);
+                guibutton.drawButton(this.mc, width, height);
+            }
+
+            if(chat!=null) chat.drawScreen(width, height, f);
+
 		} catch(Throwable e) {
 			logger.log(Level.SEVERE, "Unexpected exception in MapOverlay.drawScreen(): " + e); //$NON-NLS-1$
 			logger.severe(LogFormatter.toString(e));
-			String error = Constants.getMessageJMERR23(e.getMessage());
-			ChatLog.announceError(error);
 			close();
 		} finally {
             drawScreenTimer.stop();
@@ -174,12 +180,6 @@ public class MapOverlay extends JmUI {
 		drawMap();
 	}
 
-    //        width = width;
-//        height = height;
-//        mc = mc;
-//        fontRenderer = super.fontRenderer;
-//        buttonList = buttonList;
-
 	/**
 	 * Set up UI buttons.
 	 */
@@ -201,11 +201,11 @@ public class MapOverlay extends JmUI {
                     Constants.getString("MapOverlay.follow", off), //$NON-NLS-1$
                     state.follow); //$NON-NLS-1$ //$NON-NLS-2$
 
-//            buttonZoomIn  = new MapButton(ButtonEnum.ZoomIn.ordinal(),0,0,12,12,Constants.getString("MapOverlay.zoom_in"), FileHandler.WEB_DIR + "/img/zoomin.png"); //$NON-NLS-1$ //$NON-NLS-2$
-//            buttonZoomOut = new MapButton(ButtonEnum.ZoomOut.ordinal(),0,0,12,12,Constants.getString("MapOverlay.zoom_out"), FileHandler.WEB_DIR + "/img/zoomout.png"); //$NON-NLS-1$ //$NON-NLS-2$
-
             buttonZoomIn  = new MapButton(ButtonEnum.ZoomIn.ordinal(),0,0,20,20, "+"); //$NON-NLS-1$ //$NON-NLS-2$
+            buttonZoomIn.noDisableText = true;
+
             buttonZoomOut = new MapButton(ButtonEnum.ZoomOut.ordinal(),0,0,20,20, "-"); //$NON-NLS-1$ //$NON-NLS-2$
+            buttonZoomOut.noDisableText = true;
 
             buttonZoomOut.enabled = state.currentZoom>state.minZoom;
             buttonZoomIn.enabled = state.currentZoom<state.maxZoom;
@@ -230,7 +230,8 @@ public class MapOverlay extends JmUI {
 	/**
 	 * Center buttons in UI.
 	 */
-	void layoutButtons() {
+    @Override
+	protected void layoutButtons() {
 		// Buttons
 		if(buttonList.isEmpty()) {
 			initButtons();
@@ -326,16 +327,16 @@ public class MapOverlay extends JmUI {
 			}
 
 		}
-		if(!guiButtonUsed) {
-			//			if(Mouse.isButtonDown(0)) {
-			//				scrollCanvas(true);
-			//			}
-		}
 	}
 
 	@Override
 	protected void mouseMovedOrUp(int mouseX, int mouseY, int which) { // mouseMovedOrUp
 		super.mouseMovedOrUp(mouseX, mouseY, which);
+
+        if(Mouse.isButtonDown(0) && mouseOverButtons(mouseX, mouseY)) {
+            return;
+        }
+
 		if(Mouse.isButtonDown(0) && !isScrolling) {
 			isScrolling=true;
 			msx=mx;
@@ -411,7 +412,7 @@ public class MapOverlay extends JmUI {
 	}
 
 	@Override
-	protected void keyTyped(char c, int i)
+	public void keyTyped(char c, int i)
 	{		
 		if(chat!=null && !chat.isHidden()) {
 			chat.keyTyped(c, i);
@@ -549,7 +550,48 @@ public class MapOverlay extends JmUI {
 	
 	public static void drawMapBackground(JmUI ui) {
 		ui.sizeDisplay(false);
+
+        Minecraft mc = ui.mc;
+
+        if(state.shouldRefresh(ui.mc)) {
+            EntityClientPlayerMP player = ui.mc.thePlayer;
+            if (player==null) {
+                return;
+            }
+
+            MapOverlayState state = MapOverlay.state();
+
+            // Update the state first
+            state.refresh(ui.mc, player);
+
+            gridRenderer.setContext(state.getWorldDir(), state.getDimension());
+
+            // Center core renderer
+            if(state.follow) {
+                gridRenderer.center(ui.mc.thePlayer.posX, ui.mc.thePlayer.posZ, state.currentZoom);
+            } else {
+                gridRenderer.setZoom(state.currentZoom);
+            }
+
+            gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+        } else {
+            gridRenderer.setContext(state.getWorldDir(), state.getDimension());
+        }
+
+        if(state.follow) {
+            gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
+        }
+        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
         gridRenderer.draw(1f, 0, 0);
+        gridRenderer.draw(state.getDrawSteps(), 0, 0, 1f);
+
+        Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
+        if(playerPixel!=null) {
+            TextureImpl tex = state.currentZoom==0 ? TextureCache.instance().getPlayerLocatorSmall() : TextureCache.instance().getPlayerLocator();
+            DrawStep drawStep = new DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, tex, 8);
+            gridRenderer.draw(0, 0, 1f, drawStep);
+        }
+
 		DrawUtil.drawImage(TextureCache.instance().getLogo(), 16, 4, false, 1f);
 		ui.sizeDisplay(true);
 	}

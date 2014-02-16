@@ -20,21 +20,16 @@ import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 public class MapOverlayActions extends JmUI {
-
-	private final Logger logger = JourneyMap.getLogger();
 	
 	private enum ButtonEnum {Automap,Check,Save,Browser,Close};
-	
-	final String title = Constants.getString("MapOverlay.actions");
-	int lastWidth = 0;
-	int lastHeight = 0;
+
 	MapButton buttonAutomap, buttonSave, buttonClose, buttonBrowser, buttonCheck;
 	
-	public MapOverlayActions() {		
+	public MapOverlayActions() {
+        super(Constants.getString("MapOverlay.actions"));
 	}
 	
 	/**
@@ -71,7 +66,8 @@ public class MapOverlayActions extends JmUI {
     /**
 	 * Center buttons in UI.
 	 */
-	void layoutButtons() {
+    @Override
+    protected void layoutButtons() {
 		// Buttons
 		
 		if(buttonList.isEmpty()) {
@@ -79,27 +75,17 @@ public class MapOverlayActions extends JmUI {
 		}
 		
 		buttonSave.enabled = !JourneyMap.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);
-		
-		if(lastWidth!=width || lastHeight!=height) {
-			
-			lastWidth = width;
-			lastHeight = height;
 
-			final int hgap = 4;
-			final int vgap = 3;
-			final int bx = (this.width-hgap)/2;
-			final int by = this.height / 4;
-			
-			buttonAutomap.leftOf(bx).setY(by);
-            buttonBrowser.rightOf(buttonAutomap, hgap).setY(by);
+        final int hgap = 4;
+        final int vgap = 3;
+        final int bx = (this.width-hgap)/2;
+        final int by = this.height / 4;
 
-            buttonSave.below(buttonAutomap, vgap).leftOf(bx);
-			buttonCheck.below(buttonBrowser, vgap).rightOf(buttonSave, hgap);
-			
-			buttonClose.below(buttonSave, vgap*4).centerHorizontalOn(bx);
-
-		}
-		
+        buttonAutomap.leftOf(bx).setY(by);
+        buttonBrowser.rightOf(buttonAutomap, hgap).setY(by);
+        buttonSave.below(buttonAutomap, vgap).leftOf(bx);
+        buttonCheck.below(buttonBrowser, vgap).rightOf(buttonSave, hgap);
+        buttonClose.below(buttonSave, vgap*4).centerHorizontalOn(bx);
 	}
 
     @Override
@@ -156,30 +142,6 @@ public class MapOverlayActions extends JmUI {
 		close();
 	}
 
-    /**
-     * Draws the screen and all the components in it.
-     */
-    @Override
-    public void drawScreen(int par1, int par2, float par3)
-    {
-        drawBackground(0);
-    	layoutButtons();
-    	super.drawScreen(par1, par2, par3);
-
-    	int y = this.height / 4 - 18;
-        drawCenteredString(this.fontRenderer, title , this.width / 2, y, 16777215);
-    }
-    
-    @Override
-	public void drawBackground(int layer) //drawBackground
-	{
-        super.drawWorldBackground(layer); // super.drawBackground(0);
-        MapOverlay.drawMapBackground(this);
-        super.drawBackground(layer); // super.drawDefaultBackground();
-
-        super.drawLogo();
-	}
-    
     
     @Override
 	protected void keyTyped(char c, int i)
@@ -191,9 +153,5 @@ public class MapOverlayActions extends JmUI {
 		}
 		}
 	}
-    
 
-	@Override
-	public void close() {	
-	}
 }

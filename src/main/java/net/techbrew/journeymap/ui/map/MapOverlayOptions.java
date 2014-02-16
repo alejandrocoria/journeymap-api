@@ -16,17 +16,16 @@ import net.techbrew.journeymap.ui.UIManager;
 import org.lwjgl.input.Keyboard;
 
 public class MapOverlayOptions extends JmUI {
-	
-	final String title;
+
 	int lastWidth = 0;
 	int lastHeight = 0;
 	
-	private enum ButtonEnum {Caves,Monsters,Animals,Villagers,Pets,Players,Waypoints,Grid,Webserver,MiniMap,Close};
+	private enum ButtonEnum {Caves,Monsters,Animals,Villagers,Pets,Players,Waypoints,Grid,Webserver,MiniMap, KeyboardHelp, Close};
 
-	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid, buttonWebserver, buttonMiniMap, buttonClose;
+	MapButton buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid, buttonWebserver, buttonMiniMap, buttonKeyboardHelp, buttonClose;
 	
 	public MapOverlayOptions() {
-		title = Constants.getString("MapOverlay.options");
+		super(Constants.getString("MapOverlay.options"));
 	}
 
 	/**
@@ -85,7 +84,10 @@ public class MapOverlayOptions extends JmUI {
 		buttonWebserver.setToggled(webserverOn);
 
         buttonMiniMap = new MapButton(ButtonEnum.MiniMap.ordinal(),0,0,
-				Constants.getString("MapOverlay.minimap")); //$NON-NLS-1$ //$NON-NLS-2$
+                Constants.getString("MapOverlay.minimap")); //$NON-NLS-1$ //$NON-NLS-2$
+
+        buttonKeyboardHelp = new MapButton(ButtonEnum.KeyboardHelp.ordinal(), 0, 0,
+                Constants.getString("MapOverlay.hotkeys_button"));
 
         boolean gridOn = PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID);
         buttonGrid = new MapButton(ButtonEnum.Grid.ordinal(),0,0,
@@ -130,13 +132,15 @@ public class MapOverlayOptions extends JmUI {
 		buttonList.add(buttonGrid);
 		buttonList.add(buttonWaypoints);
 		buttonList.add(buttonWebserver);
+        buttonList.add(buttonKeyboardHelp);
         buttonList.add(buttonMiniMap);
     }
 
     /**
 	 * Center buttons in UI.
 	 */
-	void layoutButtons() {
+    @Override
+    protected void layoutButtons() {
 		// Buttons
 		
 		if(buttonList.isEmpty()) {
@@ -167,8 +171,10 @@ public class MapOverlayOptions extends JmUI {
 
             buttonMiniMap.below(buttonGrid, vgap).leftOf(bx);
 			buttonWebserver.rightOf(buttonMiniMap, vgap).below(buttonWaypoints, vgap);
-			
-			buttonClose.below(buttonWebserver, vgap*4).centerHorizontalOn(bx);
+
+            buttonKeyboardHelp.below(buttonWebserver, vgap).centerHorizontalOn(bx);
+
+			buttonClose.below(buttonKeyboardHelp, vgap).centerHorizontalOn(bx);
 
 		}	
 	}
@@ -228,40 +234,13 @@ public class MapOverlayOptions extends JmUI {
                 UIManager.getInstance().openMiniMapOptions();
                 break;
             }
+            case KeyboardHelp: {
+                UIManager.getInstance().openMapHotkeyHelp();
+                break;
+            }
 		}
 	}
-    
-    @Override
-	public void updateScreen() {
-		super.updateScreen();
-	}
 
-    /**
-     * Draws the screen and all the components in it.
-     */
-    @Override
-    public void drawScreen(int par1, int par2, float par3)
-    {
-        drawBackground(0);
-        
-        layoutButtons();
-        
-        super.drawScreen(par1, par2, par3);
-        
-        int y = this.height / 4 - 18;
-        drawCenteredString(this.fontRenderer, title , this.width / 2, y, 16777215);
-    }
-    
-    @Override
-    public void drawBackground(int layer)
-	{
-        super.drawWorldBackground(layer); // super.drawBackground(0);
-        MapOverlay.drawMapBackground(this);
-        super.drawBackground(layer); // super.drawDefaultBackground();
-
-        super.drawLogo();
-	}
-    
     @Override
 	protected void keyTyped(char c, int i)
 	{
@@ -271,10 +250,6 @@ public class MapOverlayOptions extends JmUI {
 			break;
 		}
 		}
-	}
-    
-    @Override
-	public void close() {	
 	}
 
 }

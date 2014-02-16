@@ -260,18 +260,24 @@ MiniMap.font_large=Duży
 
 # Added in 3.3.x. %1$s = one of "On", "Off". Hot Keys are keyboard shortcuts that can control the minimap.
 MiniMap.hotkeys=Hot Keys: %1$s
+MiniMap.hotkeys_title=Minimap Hot Keys
+MiniMap.hotkeys_toggle=Toggle Minimap
+MiniMap.hotkeys_position=Change Minimap Position
 
 # Added in 3.3.x.  Used in Minecraft Controls menu and JourneyMap/Options/Minimap.../HotKeys... dialog.
-MiniMap.hotkeys_category=JourneyMap (Use CTRL+[key] for Minimap)
-MiniMap.hotkeys_help=Hot Keys...
-MiniMap.hotkeys_help_title=Minimap Hot Keys
-MiniMap.hotkeys_help_toggle=Toggle Map
-MiniMap.hotkeys_help_toggle_minimap=Toggle Minimap
-MiniMap.hotkeys_help_zoom_in=Zoom In
-MiniMap.hotkeys_help_zoom_out=Zoom Out
-MiniMap.hotkeys_help_day=Show Day Map
-MiniMap.hotkeys_help_night=Show Night Map
-MiniMap.hotkeys_help_position=Change Minimap Position
+# {0} is either "Ctrl+" or "^" depending on Windows or MacOS
+MapOverlay.hotkeys_keybinding_category=JourneyMap (Use %1%s[key] for Minimap)
+MapOverlay.hotkeys_button=Hot Keys...
+MapOverlay.hotkeys_title=Hot Keys
+MapOverlay.hotkeys_toggle=Toggle Map
+MapOverlay.hotkeys_zoom_in=Zoom In
+MapOverlay.hotkeys_zoom_out=Zoom Out
+MapOverlay.hotkeys_day=Show Day Map
+MapOverlay.hotkeys_night=Show Night Map
+MapOverlay.hotkeys_north=Pan North (16 Blocks)
+MapOverlay.hotkeys_south=Pan South (16 Blocks)
+MapOverlay.hotkeys_east=Pan East (16 Blocks)
+MapOverlay.hotkeys_west=Pan West (16 Blocks)
 
 Feature.unlimited=Unlimited
 Feature.fair_play=FairPlay

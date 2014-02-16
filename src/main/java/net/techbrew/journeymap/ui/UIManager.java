@@ -12,6 +12,7 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.ui.map.MapOverlay;
 import net.techbrew.journeymap.ui.map.MapOverlayActions;
+import net.techbrew.journeymap.ui.map.MapOverlayHotkeysHelp;
 import net.techbrew.journeymap.ui.map.MapOverlayOptions;
 import net.techbrew.journeymap.ui.minimap.MiniMap;
 import net.techbrew.journeymap.ui.minimap.MiniMapHotkeysHelp;
@@ -105,6 +106,10 @@ public class UIManager {
     public void openMap() {
         KeyBinding.unPressAllKeys();
         open(MapOverlay.class);
+    }
+
+    public void openMapHotkeyHelp() {
+        open(MapOverlayHotkeysHelp.class);
     }
 
     public void openMiniMapOptions() {
