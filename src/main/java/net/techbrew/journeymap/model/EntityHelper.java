@@ -1,8 +1,12 @@
 package net.techbrew.journeymap.model;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.renderer.entity.*;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderFacade;
+import net.minecraft.client.renderer.entity.RenderHorse;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityGolem;
@@ -74,9 +78,17 @@ public class EntityHelper {
 	public static List<EntityPlayer> getPlayersNearby() {
         Minecraft mc = Minecraft.getMinecraft();
         if(!mc.isSingleplayer()) {
-            List<EntityPlayer> nearbyPlayers = getEntitiesNearby("getPlayersNearby", EntityPlayer.class);
-            nearbyPlayers.remove(Minecraft.getMinecraft().thePlayer);
-            return nearbyPlayers;
+            int x = mc.thePlayer.chunkCoordX << 4;
+            int z = mc.thePlayer.chunkCoordZ << 4;
+            int radius = 512;
+            AxisAlignedBB bb = AxisAlignedBB.getBoundingBox(x - radius, 0, z - radius, x + radius, mc.theWorld.getHeight(), z + radius);
+            List<EntityPlayer> list = mc.theWorld.getEntitiesWithinAABB(EntityOtherPlayerMP.class, bb);
+            if(list.size()>MAX_ENTITIES)
+            {
+                Collections.sort(list, new EntityDistanceComparator(mc.thePlayer));
+                list = list.subList(0, MAX_ENTITIES);
+            }
+            return list;
         } else {
             return Collections.EMPTY_LIST;
         }
