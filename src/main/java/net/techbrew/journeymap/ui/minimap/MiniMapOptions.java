@@ -13,10 +13,6 @@ import java.util.Arrays;
 
 public class MiniMapOptions extends JmUI {
 
-    private final String title;
-    private int lastWidth = 0;
-    private int lastHeight = 0;
-
 	private enum ButtonEnum {MiniMap,Position,Shape,Font,Keyboard,KeyboardHelp, Close, Showfps, CloseAll};
 	private MapButton buttonPosition, buttonShape, buttonFont, buttonMiniMap, buttonKeyboard, buttonKeyboardHelp, buttonShowfps, buttonClose, buttonCloseAll;
 
@@ -24,7 +20,7 @@ public class MiniMapOptions extends JmUI {
     private DisplayVars.Position currentPosition;
 
 	public MiniMapOptions() {
-		title = Constants.getString("MiniMap.options");
+		super(Constants.getString("MiniMap.options"));
 	}
 
 	/**
@@ -68,7 +64,7 @@ public class MiniMapOptions extends JmUI {
                 Constants.getString("MiniMap.hotkeys", off), showHotKeys);
 
         buttonKeyboardHelp = new MapButton(ButtonEnum.KeyboardHelp.ordinal(), 0, 0,
-                Constants.getString("MiniMap.hotkeys_help"));
+                Constants.getString("MapOverlay.hotkeys_button"));
 
         boolean isShowFps = pm.getBoolean(PropertyManager.Key.PREF_MINIMAP_SHOWFPS);
         buttonShowfps = new MapButton(ButtonEnum.Showfps.ordinal(), 0, 0,
@@ -96,37 +92,33 @@ public class MiniMapOptions extends JmUI {
     /**
 	 * Center buttons in UI.
 	 */
-	void layoutButtons() {
+    @Override
+	protected void layoutButtons() {
 		// Buttons
 		
 		if(buttonList.isEmpty()) {
 			initGui();
 		}
-		
-		if(lastWidth!=width || lastHeight!=height) {
-			
-			lastWidth = width;
-			lastHeight = height;
-			
-			final int hgap = 4;
-			final int vgap = 3;
-			final int bx = (this.width-hgap)/2;
-			final int by = this.height / 4;
 
-            buttonMiniMap.leftOf(bx).setY(by);
-            buttonShape.rightOf(buttonMiniMap, hgap).setY(by);
+        final int hgap = 4;
+        final int vgap = 3;
+        final int bx = (this.width-hgap)/2;
+        final int by = this.height / 4;
 
-            buttonPosition.below(buttonMiniMap, vgap).leftOf(bx);
-            buttonFont.below(buttonShape, vgap).rightOf(buttonPosition, hgap);
+        buttonMiniMap.leftOf(bx).setY(by);
+        buttonShape.rightOf(buttonMiniMap, hgap).setY(by);
 
-            buttonKeyboard.below(buttonPosition, vgap).leftOf(bx);
-            buttonShowfps.below(buttonFont, vgap).rightOf(buttonKeyboard, hgap);
+        buttonPosition.below(buttonMiniMap, vgap).leftOf(bx);
+        buttonFont.below(buttonShape, vgap).rightOf(buttonPosition, hgap);
 
-            buttonKeyboardHelp.below(buttonKeyboard, vgap).centerHorizontalOn(this.width / 2);
+        buttonKeyboard.below(buttonPosition, vgap).leftOf(bx);
+        buttonShowfps.below(buttonFont, vgap).rightOf(buttonKeyboard, hgap);
 
-			buttonClose.below(buttonKeyboardHelp, vgap*4).centerHorizontalOn(this.width / 2);
-            buttonCloseAll.below(buttonClose, vgap).centerHorizontalOn(this.width / 2);
-		}	
+        buttonKeyboardHelp.below(buttonKeyboard, vgap).centerHorizontalOn(this.width / 2);
+
+        buttonClose.below(buttonKeyboardHelp, vgap).centerHorizontalOn(this.width / 2);
+        buttonCloseAll.below(buttonClose, vgap).centerHorizontalOn(this.width / 2);
+
 	}
 
     @Override
@@ -230,29 +222,7 @@ public class MiniMapOptions extends JmUI {
         buttonPosition.displayString = Constants.getString("MiniMap.position", Constants.getString(currentPosition.label));
         UIManager.getInstance().getMiniMap().setPosition(position);
     }
-    
-    @Override
-	public void updateScreen() {
-		super.updateScreen();
-	}
 
-    /**
-     * Draws the screen and all the components in it.
-     */
-    @Override
-    public void drawScreen(int par1, int par2, float par3)
-    {
-        drawBackground(0); // super.drawBackground(0);
-
-        layoutButtons();
-        
-        super.drawScreen(par1, par2, par3);
-        
-        int y = this.height / 4 - 18;
-        drawCenteredString(this.fontRendererObj, title , this.width / 2, y, 16777215);
-
-    }
-    
     @Override
 	public void drawBackground(int layer)
 	{
@@ -262,8 +232,6 @@ public class MiniMapOptions extends JmUI {
         if(miniMap.isEnabled()){
             miniMap.drawMap();
         }
-
-        super.drawLogo();
 	}
     
     @Override
@@ -275,10 +243,6 @@ public class MiniMapOptions extends JmUI {
 			break;
 		}
 		}
-	}
-    
-    @Override
-	public void close() {	
 	}
 
 }

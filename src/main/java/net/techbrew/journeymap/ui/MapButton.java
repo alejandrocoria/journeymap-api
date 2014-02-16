@@ -20,6 +20,7 @@ public class MapButton extends GuiButton {
 
     public boolean enabled;
     public boolean drawButton;
+    public boolean noDisableText;
 
     private void tempInit(){
         this.enabled = true;
@@ -75,18 +76,21 @@ public class MapButton extends GuiButton {
             return;
         }
 
-        if(this.enabled) {
-            super.drawButton(minecraft, mouseX, mouseY);
-        } else {
-            boolean mouseover = mouseX >= this.xPosition && mouseY >= this.yPosition
-                    && mouseX <= (this.xPosition + this.width)
-                    && mouseY <= (this.yPosition + this.height);
-            if(mouseover) {
-                DrawUtil.drawRectangle(this.getX()+2, this.getY()+2, width-4, height-4, Color.darkGray, 185);
-                this.drawCenteredString(minecraft.fontRenderer, Constants.getString("MapOverlay.disabled_feature"), this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, -6250336);
+        super.drawButton(minecraft, mouseX, mouseY);
+
+        if(!this.enabled) {
+
+            if(mouseOver(mouseX, mouseY)) {
+
+                if(noDisableText) {
+                    DrawUtil.drawRectangle(this.getX(), this.getY(), width, height, Color.darkGray, 185);
+                } else {
+                    DrawUtil.drawRectangle(this.getX()+1, this.getY()+1, width-2, height-2, Color.darkGray, 255);
+                    this.drawCenteredString(minecraft.fontRenderer, Constants.getString("MapOverlay.disabled_feature"), this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, -6250336);
+                }
             } else {
-                this.drawCenteredString(minecraft.fontRenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, -6250336);
-                DrawUtil.drawRectangle(this.getX()+2, this.getY()+2, width-4, height-4, Color.darkGray, 185);
+                //this.drawCenteredString(minecraft.fontRenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, -6250336);
+                DrawUtil.drawRectangle(this.getX(), this.getY(), width, height, Color.darkGray, 185);
             }
         }
 
@@ -129,6 +133,12 @@ public class MapButton extends GuiButton {
 	public boolean mousePressed(Minecraft minecraft, int i, int j)
     {
         return enabled && drawButton && i >= getX() && j >= getY() && i < getX() + getWidth() && j < getY() + getHeight();
+    }
+
+    public boolean mouseOver(int mouseX, int mouseY) {
+        return mouseX >= this.xPosition && mouseY >= this.yPosition
+                && mouseX <= (this.xPosition + this.width)
+                && mouseY <= (this.yPosition + this.height);
     }
 
 	public Boolean getToggled() {

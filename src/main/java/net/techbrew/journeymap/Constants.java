@@ -4,6 +4,7 @@ package net.techbrew.journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.util.Util;
 import org.lwjgl.input.Keyboard;
 
 import java.io.File;
@@ -21,13 +22,14 @@ public class Constants {
     public static String CHUNK_FILE_EXT = "chunk"; //$NON-NLS-1$
     public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
 
-    public static final String KEYBINDING_CATEGORY = Constants.getString("MiniMap.hotkeys_category");
-    public static final KeyBinding KB_MAP = new KeyBinding("MiniMap.hotkeys_help_toggle", Keyboard.KEY_J, KEYBINDING_CATEGORY);
-    public static final KeyBinding KB_MAP_ZOOMIN = new KeyBinding(Constants.getString("MiniMap.hotkeys_help_zoom_in"), Keyboard.KEY_EQUALS, KEYBINDING_CATEGORY);
-    public static final KeyBinding KB_MAP_ZOOMOUT = new KeyBinding(Constants.getString("MapOverlay.zoom_out"), Keyboard.KEY_MINUS, KEYBINDING_CATEGORY);
-    public static final KeyBinding KB_MAP_DAY = new KeyBinding(Constants.getString("MiniMap.hotkeys_help_day"), Keyboard.KEY_LBRACKET, KEYBINDING_CATEGORY);
-    public static final KeyBinding KB_MAP_NIGHT = new KeyBinding(Constants.getString("MiniMap.hotkeys_help_night"), Keyboard.KEY_RBRACKET, KEYBINDING_CATEGORY);
-    public static final KeyBinding KB_MINIMAP_POS = new KeyBinding(Constants.getString("MiniMap.hotkeys_help_position"), Keyboard.KEY_BACKSLASH, KEYBINDING_CATEGORY);
+    public static final String CONTROL_KEYNAME_COMBO = Util.getOSType()== Util.EnumOS.MACOS ? "^" : "Ctrl+";
+    public static final String KEYBINDING_CATEGORY = Constants.getString("MapOverlay.hotkeys_keybinding_category", CONTROL_KEYNAME_COMBO);
+    public static final KeyBinding KB_MAP = new KeyBinding("MapOverlay.hotkeys_toggle", Keyboard.KEY_J, KEYBINDING_CATEGORY);
+    public static final KeyBinding KB_MAP_ZOOMIN = new KeyBinding(Constants.getString("MapOverlay.hotkeys_zoom_in"), Keyboard.KEY_EQUALS, KEYBINDING_CATEGORY);
+    public static final KeyBinding KB_MAP_ZOOMOUT = new KeyBinding(Constants.getString("MapOverlay.hotkeys_zoom_out"), Keyboard.KEY_MINUS, KEYBINDING_CATEGORY);
+    public static final KeyBinding KB_MAP_DAY = new KeyBinding(Constants.getString("MapOverlay.hotkeys_day"), Keyboard.KEY_LBRACKET, KEYBINDING_CATEGORY);
+    public static final KeyBinding KB_MAP_NIGHT = new KeyBinding(Constants.getString("MapOverlay.hotkeys_night"), Keyboard.KEY_RBRACKET, KEYBINDING_CATEGORY);
+    public static final KeyBinding KB_MINIMAP_POS = new KeyBinding(Constants.getString("MiniMap.hotkeys_position"), Keyboard.KEY_BACKSLASH, KEYBINDING_CATEGORY);
 
     public static final KeyBinding[] KEYBINDINGS = new KeyBinding[] {
         KB_MAP, KB_MAP_ZOOMIN, KB_MAP_ZOOMOUT, KB_MAP_DAY, KB_MAP_NIGHT, KB_MINIMAP_POS
