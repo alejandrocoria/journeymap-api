@@ -13,6 +13,21 @@ Requirements:
 
 Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 
+- (DN7-PUV-49UN) Bugfix: Waypoints could be disabled if Zans/Rei's loaded after JourneyMap
+- Languages files updated: pt_PT
+
+Known issues:
+
+- (AW2-6EE-Z3QB): Maps overwrite on multi-world servers because the world seed is no longer provided by the MC server
+  PLEASE SUPPORT THIS FEATURE REQUEST TO MOJANG:  http://www.minecraftforum.net/topic/1759032-world-uid-for-multi-world-servers/
+
+- Languages which still need to be updated:  cs_CZ, de_DE, es_ES, fr_FR, it_IT, nl_NL, ru_RU, zh_CH
+  Can you help with translations?  See http://journeymap.techbrew.net/helpdesk/knowledgebase.php?article=12
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Changes in JourneyMap 3.3.0 for Minecraft 1.6.4 / 1.7.2:
+
 - ModLoader is no longer supported.  You must use Forge.
 - New Feature: Minimap! See the JourneyMap Options -> Minimap... screen when in-game.
 - New Feature: You can now provide your own map icons for custom mod creatures in journeyMap/custom/img/entity
@@ -24,16 +39,6 @@ Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 - Language files migrated to standard resourcepack framework
 - Languages files updated: en_US, pl_PL
 - Languages files added: es_ES, pt_PT
-
-Known issues:
-
-- (AW2-6EE-Z3QB): Maps overwrite on multi-world servers because the world seed is no longer provided by the MC server
-  PLEASE SUPPORT THIS FEATURE REQUEST TO MOJANG:  http://www.minecraftforum.net/topic/1759032-world-uid-for-multi-world-servers/
-
-- Languages which still need to be updated:  cs_CZ, de_DE, fr_FR, it_IT, nl_NL, ru_RU, zh_CH
-  Can you help with translations?  See http://journeymap.techbrew.net/helpdesk/knowledgebase.php?article=12
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Changes in JourneyMap 3.2.0 for Minecraft 1.6.4:
 - Minor bugfixes

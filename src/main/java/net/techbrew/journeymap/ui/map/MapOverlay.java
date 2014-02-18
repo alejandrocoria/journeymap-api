@@ -551,10 +551,10 @@ public class MapOverlay extends JmUI {
 	public static void drawMapBackground(JmUI ui) {
 		ui.sizeDisplay(false);
 
-        Minecraft mc = ui.mc;
+        Minecraft mc = ui.getMinecraft();
 
-        if(state.shouldRefresh(ui.mc)) {
-            EntityClientPlayerMP player = ui.mc.thePlayer;
+        if(state.shouldRefresh(mc)) {
+            EntityClientPlayerMP player = mc.thePlayer;
             if (player==null) {
                 return;
             }
@@ -562,13 +562,13 @@ public class MapOverlay extends JmUI {
             MapOverlayState state = MapOverlay.state();
 
             // Update the state first
-            state.refresh(ui.mc, player);
+            state.refresh(mc, player);
 
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
 
             // Center core renderer
             if(state.follow) {
-                gridRenderer.center(ui.mc.thePlayer.posX, ui.mc.thePlayer.posZ, state.currentZoom);
+                gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
             } else {
                 gridRenderer.setZoom(state.currentZoom);
             }
