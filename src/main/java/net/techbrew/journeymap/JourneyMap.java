@@ -190,6 +190,7 @@ public class JourneyMap {
 
     @Mod.EventHandler
     public void postInitialize(FMLPostInitializationEvent event) {
+        WaypointHelper.reset();
         BlockUtils.initialize();
     }
 	
@@ -265,11 +266,6 @@ public class JourneyMap {
             if(mc.theWorld==null) return;
 
             this.reset();
-
-            // Waypoint Entity Rendering
-            if(WaypointHelper.isNativeLoaded()) {
-                WaypointHelper.initialize();
-            }
 
 	    	if(taskExecutor==null || taskExecutor.isShutdown()) {			    		
 				taskExecutor = Executors.newScheduledThreadPool(1, new JMThreadFactory("task")); //$NON-NLS-1$				

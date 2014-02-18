@@ -1,6 +1,7 @@
 package net.techbrew.journeymap.ui;
 
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -23,6 +24,10 @@ public abstract class JmUI extends GuiScreen {
     public JmUI(String title) {
         super();
         this.title = title;
+    }
+
+    public Minecraft getMinecraft() {
+        return this.mc;
     }
 
 	@Override
