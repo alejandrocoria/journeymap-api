@@ -2,7 +2,7 @@
 <project name="JourneyMap" basedir="." default="all">
 
     <!-- Update when new version is going to be released -->
-    <property name="jmversion" value="3.3.0" />
+    <property name="jmversion" value="3.3.1" />
     <property name="mcversion" value="1.6.4" />
     <property name="forgeversion" value="1.6.4-9.11.1.964" />
 
@@ -61,6 +61,7 @@
         <delete dir="${forge.src.dir}/ar/com/hjg/pngj" />
         <delete dir="${forge.src.dir}/se/rupy/http" />
         <delete dir="${forge.src.dir}/net/techbrew" />
+        <delete dir="${forge.src.dir}/modinfo" />
         <delete dir="${forge.src.dir}/assets/journeymap" />
         <delete file="${forge.src.dir}/assets/minecraft/pack.mcmeta" />
         <delete file="${forge.src.dir}/net/minecraft/client/renderer/entity/RenderFacade.java" />
