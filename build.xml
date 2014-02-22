@@ -2,7 +2,7 @@
 <project name="JourneyMap" basedir="." default="all">
 
     <!-- Update when new version is going to be released -->
-    <property name="jmversion" value="3.3.0" />
+    <property name="jmversion" value="3.3.1" />
     <property name="mcversion" value="1.7.2" />
     <property name="forgeversion" value="1.7.2-10.12.0.1024" />
 	<property name="unlimited" value="Unlimited" />
@@ -73,7 +73,7 @@
                 <replacefilter token="@MCVERSION@" value="${mcversion}" />
                 <replacefilter token="@FORGEVERSION@" value="${forgeversion}" />
                 <replacefilter token="@EDITION@" value="@{edition}" />
-                <replacefilter token="@TODAY@" value="${TODAY}" />
+                <replacefilter token="@DATE@" value="${TODAY}" />
             </replace>
 
             <!-- Copy Java libs -->
@@ -103,7 +103,7 @@
                 <replacefilter token="@MCVERSION@" value="${mcversion}" />
                 <replacefilter token="@FORGEVERSION@" value="${forgeversion}" />
                 <replacefilter token="@EDITION@" value="@{edition}" />
-                <replacefilter token="@TODAY@" value="${TODAY}" />
+                <replacefilter token="@DATE@" value="${TODAY}" />
             </replace>
 
             <!-- Copy non-Java files to resources -->
