@@ -1,10 +1,14 @@
 package net.techbrew.journeymap.log;
 
+import modinfo.ModInfo;
+import net.techbrew.journeymap.JourneyMap;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.logging.Formatter;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 public class LogFormatter extends Formatter {
@@ -34,10 +38,28 @@ public class LogFormatter extends Formatter {
 		arguments[i++] = shortClassName;
 		arguments[i++] = record.getSourceMethodName();
 		arguments[i++] = record.getMessage();
+
+        if(record.getLevel() == Level.SEVERE)
+        {
+            ModInfo modInfo = JourneyMap.getInstance().getModInfo();
+            if(modInfo!=null)
+            {
+                String action = shortClassName + "." + record.getSourceMethodName();
+                modInfo.reportEvent("Log: " + record.getLevel(), action, record.getMessage());
+            }
+        }
+
 		return messageFormat.format(arguments);
 	}	
 	
 	public static String toString(Throwable t) {
+
+        ModInfo modInfo = JourneyMap.getInstance().getModInfo();
+        if(modInfo!=null)
+        {
+            modInfo.reportException(t);
+        }
+
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(baos);
 		t.printStackTrace(ps);

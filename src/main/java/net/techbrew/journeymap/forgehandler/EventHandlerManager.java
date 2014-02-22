@@ -73,7 +73,7 @@ public class EventHandlerManager {
             {
                 busType.eventBus.register(handler);
                 registered = true;
-                JourneyMap.getLogger().info(name + " registered in " + busType);
+                JourneyMap.getLogger().fine(name + " registered in " + busType);
             }
             catch(Throwable t)
             {

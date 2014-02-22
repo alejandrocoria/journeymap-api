@@ -3,6 +3,7 @@ package net.techbrew.journeymap.forgehandler;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.model.MapOverlayState;
@@ -36,9 +37,8 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler {
     public static void onKeypress(boolean minimapOnly) {
         final int i = Keyboard.getEventKey();
         MapOverlayState mapOverlayState = MapOverlay.state();
-        if(mapOverlayState.minimapHotkeys && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)|| Keyboard.isKeyDown(Keyboard.KEY_RCONTROL))) {
 
-
+        if(mapOverlayState.minimapHotkeys && GuiScreen.isCtrlKeyDown()) {
 
             if(i==Constants.KB_MAP.getKeyCode()) {
                 UIManager.getInstance().toggleMinimap();

@@ -6,6 +6,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiMultiplayer;
@@ -86,6 +87,8 @@ public class JourneyMap {
 	public long nextPlayerUpdate = 0;
 	public long nextChunkUpdate = 0;
 
+    public ModInfo modInfo;
+
 	// Whether webserver is running
 	boolean enableWebserver;
 	public boolean enableMapGui;
@@ -136,6 +139,8 @@ public class JourneyMap {
         try {
             // Ensure logger inits
             logger = new JMLogger();
+
+            modInfo = new ModInfo("UA-28839029-4", "en_US", MOD_ID, MOD_NAME, getEdition());
 
             if(initialized) {
                 logger.warning("Already initialized, aborting");
@@ -256,7 +261,11 @@ public class JourneyMap {
     		return false;
     	}
 	}
-	
+
+    public ModInfo getModInfo() {
+        return this.modInfo;
+    }
+
 	/**
      * Starts mapping threads
      */
@@ -264,6 +273,8 @@ public class JourneyMap {
     	synchronized(this) {
 
             if(mc.theWorld==null) return;
+
+            modInfo.reportAppView();
 
             this.reset();
 
@@ -357,6 +368,7 @@ public class JourneyMap {
                     return;
                 }
 
+                // TODO: Does this happen ever?
                 GuiScreen guiScreen = mc.currentScreen;
                 if(guiScreen instanceof GuiMainMenu ||
                         guiScreen instanceof GuiSelectWorld ||
@@ -364,6 +376,10 @@ public class JourneyMap {
                     stopMapping();
                     return;
                 }
+            }
+            else
+            {
+                TileCache.resume();
             }
 
             TileCache.resume();
