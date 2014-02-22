@@ -147,7 +147,6 @@ public class TaskController {
             }
 
 			manager.taskAccepted(accepted);
-
 		}
 		
 	}

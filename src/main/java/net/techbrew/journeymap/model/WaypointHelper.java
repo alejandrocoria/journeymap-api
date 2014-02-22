@@ -180,9 +180,11 @@ public class WaypointHelper {
                 loaded = false;
                 Class.forName(name);
                 loaded = true;
-                JourneyMap.getLogger().fine("Class found: ");
+                JourneyMap.getLogger().fine("Class found: " + name);
+            } catch(NoClassDefFoundError e) {
+                JourneyMap.getLogger().warning("Class detected, but is obsolete. Can't use waypoints: " + e.getMessage());
             } catch(ClassNotFoundException e) {
-                JourneyMap.getLogger().fine("Class not found: ");
+                JourneyMap.getLogger().fine("Class not found: " + name);
             } catch(VerifyError v) {
                 JourneyMap.getLogger().warning("Class detected, but is obsolete. Can't use waypoints: " + v.getMessage());
             } catch(Throwable t) {
