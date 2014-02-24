@@ -1,6 +1,7 @@
 package net.techbrew.journeymap.cartography;
 
 import cpw.mods.fml.client.FMLClientHandler;
+import modinfo.ModInfo;
 import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -58,28 +59,24 @@ public class ColorCache implements ResourceManagerReloadListener {
 		// Check if the resourcepack has changed
 		ResourcePackRepository repo = Minecraft.getMinecraft().getResourcePackRepository();
 
-        // TODO Is this accomplishing what we want?
-        StringBuffer sb = new StringBuffer();
-        for(Object domain : mgr.getResourceDomains().toArray())
-        {
-            sb.append(domain).append(",");
-        }
-    	String currentPack = sb.toString();
-    	
-    	if(JourneyMap.getInstance().isMapping() || iconLoader==null) {
-    		if(currentPack.equals(lastResourcePack)) {
-    			JourneyMap.getLogger().fine("ResourcePack unchanged: " + currentPack);
-    		} else {
-    			JourneyMap.getLogger().info("ResourcePack: " + lastResourcePack + " --> " + currentPack);
-    			reset();
-    			lastResourcePack = currentPack;
-        		// TODO: avoid this?
-                BlockUtils.initialize();
-        		iconLoader = new IconLoader();
+        String currentPack = Arrays.asList(mgr.getResourceDomains().toArray()).toString();
 
-    		}
-    		
-    	}
+        if(JourneyMap.getInstance().isMapping() || iconLoader==null) {
+            if(currentPack.equals(lastResourcePack)) {
+                JourneyMap.getLogger().fine("ResourcePack unchanged: " + currentPack);
+            } else {
+                JourneyMap.getLogger().info("ResourcePack: " + lastResourcePack + " --> " + currentPack);
+                ModInfo modInfo = JourneyMap.getInstance().getModInfo();
+                if(modInfo!=null) {
+                    modInfo.reportEvent("Resource Pack", "Load", currentPack);
+                }
+                reset();
+                lastResourcePack = currentPack;
+                // TODO: avoid this?
+                iconLoader = new IconLoader();
+            }
+
+        }
 	}
 
 	public Color getBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z) {
