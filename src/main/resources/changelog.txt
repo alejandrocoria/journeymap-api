@@ -13,8 +13,13 @@ Requirements:
 
 Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 
-- (DN7-PUV-49UN) Bugfix: Waypoints could be disabled if Zans/Rei's loaded after JourneyMap
-- Languages files updated: pt_PT
+- Added generic support for custom block textures like ExtraUtils connected textures
+- Bugfix where Singleplayer games opened to LAN didn't show other player icons
+- Bugfix where Singlerplayer games opened to LAN weren't treated like multiplayer games
+- Bugfix where Multiplayer player icons in the browser were causing "No OpenGL context found in the current thread" errors
+- Defensive measures put in place for errors thrown by uk.co.shadeddimensions.ep3.block.BlockFrame
+- Reduced logging of 404 errors in FileService
+- Logging-related improvements (more uniformity across SEVERE-level log statements)
 
 Known issues:
 
@@ -25,6 +30,11 @@ Known issues:
   Can you help with translations?  See http://journeymap.techbrew.net/helpdesk/knowledgebase.php?article=12
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Changes in JourneyMap 3.3.1 for Minecraft 1.6.4 / 1.7.2:
+
+- (DN7-PUV-49UN) Bugfix: Waypoints could be disabled if Zans/Rei's loaded after JourneyMap
+- Languages files updated: pt_PT
 
 Changes in JourneyMap 3.3.0 for Minecraft 1.6.4 / 1.7.2:
 

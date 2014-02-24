@@ -2,6 +2,7 @@ package net.techbrew.journeymap.data;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.NetClientHandler;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.world.storage.WorldInfo;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.FeatureManager;
@@ -68,12 +69,15 @@ public class WorldData implements IDataProvider {
 		Minecraft mc = Minecraft.getMinecraft();
 		WorldInfo worldInfo = mc.theWorld.getWorldInfo();
 
+        IntegratedServer server = mc.getIntegratedServer();
+        boolean multiplayer = server==null || server.getPublic();
+
 		LinkedHashMap props = new LinkedHashMap();
 
 		props.put(Key.name, getWorldName(mc)); 
 		props.put(Key.dimension, mc.theWorld.provider.dimensionId); 
 		props.put(Key.hardcore,  worldInfo.isHardcoreModeEnabled());
-		props.put(Key.singlePlayer, mc.isSingleplayer()); 
+		props.put(Key.singlePlayer, !multiplayer);
 		props.put(Key.time, mc.theWorld.getWorldTime() % 24000L);
 		props.put(Key.features, FeatureManager.getAllowedFeatures());
 

@@ -4,8 +4,10 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.util.Icon;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.BlockUtils;
 import org.lwjgl.opengl.GL11;
@@ -60,9 +62,10 @@ public class IconLoader {
 			}
 
             int side = blockMD.hasFlag(BlockUtils.Flag.Side2Texture) ? 2 : 1;
-            TextureAtlasSprite blockIcon = null;
+
+            Icon blockIcon = null;
             while(blockIcon==null && side>=0) {
-                blockIcon = (TextureAtlasSprite) blockMD.getBlock().getIcon(side, blockMD.key.meta);
+                blockIcon = blockMD.getBlock().getIcon(side, blockMD.key.meta);
                 side--;
             }
             if(blockIcon==null) {
@@ -85,7 +88,7 @@ public class IconLoader {
 	
 
 	
-	Color getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon) {
+	Color getColorForIcon(BlockMD blockMD, Icon icon) {
 		
 		Color color = null;		
 
@@ -94,57 +97,100 @@ public class IconLoader {
 	        int argb, alpha;
 	    	int a=0, r=0, g=0, b=0;
 	    	int x=0, y=0;
-	    	int xStart = icon.getOriginX();
-	    	int xStop = xStart + icon.getIconWidth();
-	    	int yStart = icon.getOriginY();
-	    	int yStop = yStart + icon.getIconHeight();
-	    			    	
-	        outer: for(x=xStart; x<xStop; x++) {
-	        	for(y=yStart; y<yStop; y++) {
-	        		try {
-	        			argb = blocksTexture.getRGB(x, y);
-	        		} catch(Throwable e) {
-	        			logger.severe("Couldn't get RGB from BlocksTexture at " + x + "," + y + " for " + blockMD);
-	        			logger.severe(LogFormatter.toString(e));
-	        			break outer;
-	        		}
-	        		alpha = (argb >> 24) & 0xFF; 
-	        		if(alpha>0) {
-	        			count++;
-	        			a+= alpha;
-	        			r+= (argb >> 16) & 0xFF;
-	        			g+= (argb >> 8) & 0xFF;
-	        			b+= (argb >> 0) & 0xFF;
-	        		}
-	        	}
-	        }
-	        
-	        if(count>0) {    
-	        	if(a>0) a = a/count;
-	        	if(r>0) r = r/count;
-	        	if(g>0) g = g/count;
-	        	if(b>0) b = b/count;
-	        } else {
-	        	logger.warning("Unusable texture for " + blockMD);
-	        	r = g = b = 0;
-	        }
+
+            int xStart, yStart, xStop, yStop;
+            BufferedImage textureImg;
+
+            if(icon instanceof TextureAtlasSprite) {
+                TextureAtlasSprite tas = (TextureAtlasSprite) icon;
+                textureImg = blocksTexture;
+                xStart = tas.getOriginX();
+                yStart = tas.getOriginY();
+                xStop = xStart + icon.getIconWidth();
+                yStop = yStart + icon.getIconHeight();
+            } else {
+                textureImg = blocksTexture;
+
+                xStart = (int) Math.round(((float) textureImg.getWidth()) * Math.min(icon.getMinU(), icon.getMaxU()));
+                yStart = (int) Math.round(((float) textureImg.getHeight()) * Math.min(icon.getMinV(), icon.getMaxV()));
+                int iconWidth = (int) Math.round(((float) textureImg.getWidth()) * Math.abs(icon.getMaxU() - icon.getMinU()));
+                int iconHeight = (int) Math.round(((float) textureImg.getHeight()) * Math.abs(icon.getMaxV() - icon.getMinV()));
+
+                xStop = xStart + iconWidth;
+                yStop = yStart + iconHeight;
+            }
+
+            boolean unusable = true;
+            if(textureImg!=null && textureImg.getWidth()>0)
+            {
+                outer: for(x=xStart; x<xStop; x++) {
+                    inner: for(y=yStart; y<yStop; y++) {
+                        try {
+                            argb = textureImg.getRGB(x, y);
+                        } catch(ArrayIndexOutOfBoundsException e) {
+                            logger.warning("Bad index at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
+                            continue; // Bugfix for some texturepacks that may not be reporting correct size?
+                        } catch(Throwable e) {
+                            logger.severe("Couldn't get RGB from BlocksTexture at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
+                            break outer;
+                        }
+                        alpha = (argb >> 24) & 0xFF;
+                        if(alpha>0) {
+                            count++;
+                            a+= alpha;
+                            r+= (argb >> 16) & 0xFF;
+                            g+= (argb >> 8) & 0xFF;
+                            b+= (argb >> 0) & 0xFF;
+                        }
+                    }
+                }
+
+                if(count>0) {
+                    unusable = false;
+                    if(a>0) a = a/count;
+                    if(r>0) r = r/count;
+                    if(g>0) g = g/count;
+                    if(b>0) b = b/count;
+                }
+            }
+            else {
+                logger.warning("Couldn't get texture for " + icon.getIconName() + " using blockid ");
+            }
+
+            if(unusable) {
+                blockMD.addFlags(BlockUtils.Flag.Error);
+                BlockUtils.setFlags(blockMD.getBlock(), BlockUtils.Flag.Error);
+                String pattern = "Unusable texture for %s, icon=%s,texture coords %s,%s - %s,%s";
+                logger.severe(String.format(pattern, blockMD, icon.getIconName(), xStart, yStart, xStop, yStop));
+                r = g = b = 0;
+            }
+
 			
 	        // Set color
 	        color = new Color(r,g,b);
 			
 	        // Determine alpha
-	        float blockAlpha = 1f;
             Block block = blockMD.getBlock();
-	        if(BlockUtils.hasAlpha(block)) {
-	        	blockAlpha = BlockUtils.getAlpha(block);
-			} else if(blockMD.getBlock().getRenderBlockPass()>0) {
-				blockAlpha = a * 1.0f/255;
-			}
+	        float blockAlpha = 1f;
+            if(unusable) {
+                blockAlpha = 0f;
+            }
+            else
+            {
+                if(BlockUtils.hasAlpha(block)) {
+                    blockAlpha = BlockUtils.getAlpha(block);
+                } else if(block.getRenderBlockPass()>0) {
+                    blockAlpha = a * 1.0f/255; // try to use texture alpha
+                    if(blockAlpha==1f) { // try to use light opacity
+                        blockAlpha = block.getLightOpacity(Minecraft.getMinecraft().theWorld, 0, 65, 0) / 255f;
+                    }
+                }
+            }
+            BlockUtils.setAlpha(block, blockAlpha);
 	        blockMD.setAlpha(blockAlpha);
 							
 		} catch (Throwable e1) {				
-			logger.warning("Error deriving color for " + blockMD);
-			logger.severe(LogFormatter.toString(e1));
+			logger.warning("Error deriving color for " + blockMD + ": " + LogFormatter.toString(e1));
 		} 
         
         if(color!=null) {
@@ -156,13 +202,15 @@ public class IconLoader {
         return color;
 	}
 
-	private BufferedImage initBlocksTexture() {
-		
+    private BufferedImage initBlocksTexture() {
+
+        StatTimer timer = StatTimer.get("IconLoader.initBlocksTexture", 0);
+        timer.start();
+
 		BufferedImage image = null;
-		long start = System.currentTimeMillis();
-		
+
 		try {
-			int glid = Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
+            int glid = Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
 			GL11.glBindTexture(3553, glid);
 		    int width = GL11.glGetTexLevelParameteri(3553, 0, 4096);
 		    int height = GL11.glGetTexLevelParameteri(3553, 0, 4097);
@@ -187,12 +235,13 @@ public class IconLoader {
 		      }
 		    }
 
-		    long stop = System.currentTimeMillis();
-		    logger.info("Got blockTexture image in " + (stop-start) + "ms");		    
+            timer.stop();
 		    
 		} catch(Throwable t) {
-			logger.severe("Could not load blocksTexture: " + LogFormatter.toString(t));
+			logger.severe("Could not load blocksTexture :" + t);
+            timer.cancel();
 		}
+
 		return image;
 	}
 	

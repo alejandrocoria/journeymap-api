@@ -5,7 +5,6 @@ import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.settings.KeyBinding;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -68,10 +67,7 @@ public class UIManager {
 			minecraft.displayGuiScreen(uiClass.newInstance()); // displayGuiScreen
             miniMap.setVisible(false);
 		} catch(Throwable e) {
-			logger.log(Level.SEVERE, "Unexpected exception opening UI: " + e); //$NON-NLS-1$
-			logger.severe(LogFormatter.toString(e));
-			String error = Constants.getMessageJMERR23(e.getMessage());
-			//ChatLog.announceError(error);
+			logger.log(Level.SEVERE, "Unexpected exception opening UI: " + LogFormatter.toString(e)); //$NON-NLS-1$
 		}
     }
 

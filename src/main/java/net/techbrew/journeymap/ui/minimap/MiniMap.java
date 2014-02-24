@@ -141,7 +141,7 @@ public class MiniMap {
                     //glStencilFunc(GL_EQUAL, 0, 0xFF);
                     glStencilFunc(GL_EQUAL, 1, 0xFF);
                 } catch(Throwable t) {
-                    logger.warning("Stencil buffer failing with circle mask:" + LogFormatter.toString(t));
+                    logger.severe("Stencil buffer failing with circle mask:" + LogFormatter.toString(t));
                     return;
                 }
             }

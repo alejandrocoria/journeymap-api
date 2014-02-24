@@ -123,7 +123,7 @@ public class FileService extends BaseService {
 
 		        // Didn't find it		    
 		        if(!found) {
-					JourneyMap.getLogger().severe("zipEntry not found: " + zipEntry + " in " + zipFile);	
+					JourneyMap.getLogger().fine("zipEntry not found: " + zipEntry + " in " + zipFile);
 					throwEventException(404, Constants.getMessageJMERR13(requestPath), event, true);
 		        }
 				
@@ -133,7 +133,7 @@ public class FileService extends BaseService {
 				if(file.exists()) {					
 					serveFile(file, event);
 				} else {
-					JourneyMap.getLogger().severe("Directory not found: " + requestPath);	
+					JourneyMap.getLogger().fine("Directory not found: " + requestPath);
 					throwEventException(404, Constants.getMessageJMERR13(requestPath), event, true);
 				}
 			}

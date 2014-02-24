@@ -169,7 +169,13 @@ public class ColorCache implements ResourceManagerReloadListener {
 
     private int getBiomeColorMultiplier(BlockMD blockMD, int x, int y, int z) {
         WorldClient world = FMLClientHandler.instance().getClient().theWorld;
-        return blockMD.getBlock().colorMultiplier(world, x, 78, z) | 0xFF000000; // getColorMultiplier()
+        try {
+            return blockMD.getBlock().colorMultiplier(world, x, 78, z) | 0xFF000000;
+        } catch(NullPointerException e) {
+            // Bugfix for NPE thrown by uk.co.shadeddimensions.ep3.block.BlockFrame.func_71920_b
+            JourneyMap.getLogger().warning("Block throws NullPointerException when calling colorMultiplier(): " + blockMD.getBlock().getUnlocalizedName());
+            return 16777215;
+        }
     }
 
     private HashMap<BlockMD, Color> getBiomeColorMap(BiomeGenBase biome) {
@@ -272,6 +278,7 @@ public class ColorCache implements ResourceManagerReloadListener {
         sb.append('\n').append(".entry{width:300px;display:inline-block;}");
         sb.append('\n').append(".rgb{display:inline-block;height:32px;width:32px}");
         sb.append('\n').append("</style></head><body><div>");
+        sb.append(debugCache(BlockUtils.getAlphaMap(), "Block Transparency"));
         sb.append(debugCache(BlockUtils.getFlagsMap(), "Block Flags"));
         sb.append(debugCache(baseColors, "Base Colors"));
 

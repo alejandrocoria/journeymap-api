@@ -214,8 +214,7 @@ public class PropertyManager {
 				in.close();
 			} catch (IOException e) {
 				String error = Constants.getMessageJMERR19(propFile.getAbsolutePath());
-				JourneyMap.getLogger().severe(error);
-				JourneyMap.getLogger().severe(LogFormatter.toString(e));
+				JourneyMap.getLogger().severe(error + ": " + LogFormatter.toString(e));
 				throw new RuntimeException(error);
 			}
 			

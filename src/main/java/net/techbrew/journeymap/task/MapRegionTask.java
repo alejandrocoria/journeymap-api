@@ -110,7 +110,7 @@ public class MapRegionTask extends BaseMapTask {
 		    	} catch(Throwable t) {
 		    		String error = Constants.getMessageJMERR00("Couldn't Auto-Map: " + t.getMessage()); //$NON-NLS-1$
 					ChatLog.announceError(error);
-					logger.severe(LogFormatter.toString(t));
+					logger.severe(error + ": " + LogFormatter.toString(t));
 		    	}
 			}
 			return this.enabled;

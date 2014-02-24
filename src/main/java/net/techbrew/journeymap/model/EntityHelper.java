@@ -13,6 +13,7 @@ import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.*;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import net.techbrew.journeymap.JourneyMap;
@@ -77,7 +78,8 @@ public class EntityHelper {
 	 */
 	public static List<EntityPlayer> getPlayersNearby() {
         Minecraft mc = Minecraft.getMinecraft();
-        if(!mc.isSingleplayer()) {
+        IntegratedServer server = mc.getIntegratedServer();
+        if(server==null || server.getPublic()) { // was !mc.isSinglePlayer()
             int x = mc.thePlayer.chunkCoordX << 4;
             int z = mc.thePlayer.chunkCoordZ << 4;
             int radius = 512;

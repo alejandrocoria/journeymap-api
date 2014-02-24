@@ -1,6 +1,7 @@
 package net.techbrew.journeymap.feature;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.integrated.IntegratedServer;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -39,7 +40,10 @@ public enum Feature {
 			return true;
 		} else {		
 			Minecraft mc = Minecraft.getMinecraft();
-			boolean isSinglePlayer = mc.isSingleplayer();
+
+            IntegratedServer server = mc.getIntegratedServer();
+            boolean isSinglePlayer = server!=null && !server.getPublic();
+
 			if(restrictInSingleplayer && isSinglePlayer) {
 				return true;
 			}

@@ -18,7 +18,7 @@ public class BlockUtils {
 	public static AlphaComposite SLIGHTLYCLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F);
 	public static Color COLOR_TRANSPARENT = new Color(0,0,0,0);
 
-    public enum Flag {HasAir, BiomeColor, CustomBiomeColor, NotHideSky, NotCeiling, NoShadow, Side2Texture, Transparency}
+    public enum Flag {HasAir, BiomeColor, CustomBiomeColor, NotHideSky, NotCeiling, NoShadow, Side2Texture, Transparency, Error}
 
     private final static HashMap<UniqueIdentifierProxy, EnumSet<Flag>> blockFlags = new HashMap<UniqueIdentifierProxy, EnumSet<Flag>>(64);
     private final static HashMap<UniqueIdentifierProxy, Float> blockAlphas = new HashMap<UniqueIdentifierProxy, Float>(8);
@@ -207,6 +207,11 @@ public class BlockUtils {
     public static HashMap getFlagsMap()
     {
         return blockFlags;
+    }
+
+    public static HashMap getAlphaMap()
+    {
+        return blockAlphas;
     }
 
     public static class UniqueIdentifierProxy

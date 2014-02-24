@@ -111,8 +111,8 @@ public class ActionService extends BaseService {
 			}
 			
 			// Validate cave mapping allowed
-			// Check for hardcore			
-			Boolean hardcore = !minecraft.isSingleplayer() && theWorld.getWorldInfo().isHardcoreModeEnabled();
+			// Check for hardcore
+			Boolean hardcore = theWorld.getWorldInfo().isHardcoreModeEnabled();
 			if(mapType.equals(Constants.MapType.underground) && hardcore) {
 				String error = "Cave mapping on hardcore servers is not allowed"; //$NON-NLS-1$
 				throwEventException(403, error, event, true);
