@@ -164,7 +164,7 @@ public class RegionImageHandler {
 				image = ImageIO.read(new BufferedInputStream(new FileInputStream(regionFile)));
 			} catch (Exception e) {
 				String error = Constants.getMessageJMERR21(regionFile, LogFormatter.toString(e));
-				JourneyMap.getLogger().warning(error);
+				JourneyMap.getLogger().severe(error);
 			} 
 		}
 			

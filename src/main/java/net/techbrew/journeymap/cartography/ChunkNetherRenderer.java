@@ -13,7 +13,6 @@ import net.techbrew.journeymap.model.ChunkMD;
 import net.techbrew.journeymap.model.RGB;
 
 import java.awt.*;
-import java.util.logging.Level;
 
 /**
  * Render a chunk in the Nether.
@@ -130,9 +129,8 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 				} catch (Throwable t) {
 					paintBadBlock(x, vSlice, z, g2D);
 					String error = Constants.getMessageJMERR07("x,vSlice,z = " + x + "," //$NON-NLS-1$ //$NON-NLS-2$
-							+ vSlice + "," + z + " : " + t.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+							+ vSlice + "," + z + " : " + LogFormatter.toString(t)); //$NON-NLS-1$ //$NON-NLS-2$
 					JourneyMap.getLogger().severe(error);
-					JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
 				}
 		
 			}

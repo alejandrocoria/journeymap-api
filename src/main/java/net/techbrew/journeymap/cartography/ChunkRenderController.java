@@ -80,9 +80,7 @@ public class ChunkRenderController {
 			JourneyMap.getLogger().log(Level.WARNING, LogFormatter.toString(e));
 			return null; // Can happen when server isn't connected, just wait for next tick
 		} catch (Throwable t) {
-			t.printStackTrace();
-			String error = Constants.getMessageJMERR07(LogFormatter.toString(t));
-			JourneyMap.getLogger().severe(error);
+			JourneyMap.getLogger().severe(Constants.getMessageJMERR07(LogFormatter.toString(t)));
 			
 		} finally {
 			g2D.dispose();

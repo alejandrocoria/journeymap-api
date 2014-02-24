@@ -21,7 +21,6 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 ;
@@ -165,8 +164,8 @@ public class TaskThread implements Runnable {
             timer.stop();
 				
 		} catch (Throwable t) {
-			String error = Constants.getMessageJMERR16(t.getMessage());
-			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
+			String error = Constants.getMessageJMERR16(LogFormatter.toString(t));
+			JourneyMap.getLogger().severe(error);
             timer.cancel();
 		} 
 	}
@@ -185,8 +184,8 @@ public class TaskThread implements Runnable {
                 timer.report();
 			}
 		} catch (Throwable t) {
-			String error = Constants.getMessageJMERR16(t.getMessage());
-			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
+            String error = Constants.getMessageJMERR16(LogFormatter.toString(t));
+            JourneyMap.getLogger().severe(error);
             timer.cancel();
 		} 
 	}

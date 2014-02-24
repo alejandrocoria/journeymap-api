@@ -6,6 +6,7 @@ import modinfo.mp.v1.Payload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.Language;
 import net.minecraft.client.resources.Locale;
+import net.minecraft.server.integrated.IntegratedServer;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
@@ -240,7 +241,9 @@ public class ModInfo {
         StringBuilder desc = new StringBuilder(Display.getTitle());
         if(minecraft.theWorld != null)
         {
-            desc.append(", ").append(minecraft.isSingleplayer() ? this.I18n("menu.singleplayer") : this.I18n("menu.multiplayer"));
+            IntegratedServer server = minecraft.getIntegratedServer();
+            boolean multiplayer = server==null || server.getPublic();
+            desc.append(", ").append(multiplayer ? this.I18n("menu.multiplayer") : this.I18n("menu.singleplayer"));
         }
 
         map.put(Payload.Parameter.ContentDescription, desc.toString());

@@ -4,6 +4,7 @@ import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.StatTimer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -25,6 +26,8 @@ public class TextureImpl extends AbstractTexture {
     
     /** optionally-retained image **/
     protected BufferedImage image;
+
+    protected volatile boolean unbound;
     
     public TextureImpl(BufferedImage image) {
     	this(image, false);
@@ -52,13 +55,24 @@ public class TextureImpl extends AbstractTexture {
     		throw new IllegalArgumentException("Image dimensions don't match");
     	}
     	if(retainImage) this.image = image;
-        if(allocateMemory) {
-            TextureUtil.uploadTextureImage(getGlTextureId(), image);
-        } else {
-
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, getGlTextureId());
-            uploadTextureImageSubImpl(image, 0, 0, false, false);
-
+        try
+        {
+            int glId = getGlTextureId();
+            if(allocateMemory) {
+                TextureUtil.uploadTextureImage(glId, image);
+            } else {
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, glId);
+                uploadTextureImageSubImpl(image, 0, 0, false, false);
+            }
+        } catch(RuntimeException e) {
+            if(e.getMessage().startsWith("No OpenGL context"))
+            {
+                this.unbound = true;
+            }
+            else
+            {
+                JourneyMap.getLogger().severe("Failed to upload/bind texture: " + e.getMessage());
+            }
         }
     }
 
@@ -66,7 +80,26 @@ public class TextureImpl extends AbstractTexture {
     {
         updateTexture(image, false);
     }
-    
+
+    @Override
+    public int getGlTextureId() {
+
+        int glId = super.getGlTextureId();
+        if(unbound)
+        {
+            try
+            {
+                TextureUtil.uploadTextureImage(glId, image);
+                unbound = false;
+            }
+            catch(Exception e)
+            {
+                JourneyMap.getLogger().severe("Couldn't use deferred binding: " + e.getMessage());
+            }
+        }
+        return glId;
+    }
+
     public boolean hasImage() {
     	return image!=null;
     }

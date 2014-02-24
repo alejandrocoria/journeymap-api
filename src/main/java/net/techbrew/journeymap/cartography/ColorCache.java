@@ -1,6 +1,7 @@
 package net.techbrew.journeymap.cartography;
 
 import cpw.mods.fml.client.FMLClientHandler;
+import modinfo.ModInfo;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.BlockGrass;
@@ -61,19 +62,17 @@ public class ColorCache implements IResourceManagerReloadListener {
 		// Check if the resourcepack has changed
 		ResourcePackRepository repo = Minecraft.getMinecraft().getResourcePackRepository();
 
-        // TODO Is this accomplishing what we want?
-        StringBuffer sb = new StringBuffer();
-        for(Object domain : mgr.getResourceDomains().toArray())
-        {
-            sb.append(domain).append(",");
-        }
-    	String currentPack = sb.toString();
+    	String currentPack = Arrays.asList(mgr.getResourceDomains().toArray()).toString();
     	
     	if(JourneyMap.getInstance().isMapping() || iconLoader==null) {
     		if(currentPack.equals(lastResourcePack)) {
     			JourneyMap.getLogger().fine("ResourcePack unchanged: " + currentPack);
     		} else {
     			JourneyMap.getLogger().info("ResourcePack: " + lastResourcePack + " --> " + currentPack);
+                ModInfo modInfo = JourneyMap.getInstance().getModInfo();
+                if(modInfo!=null) {
+                    modInfo.reportEvent("Resource Pack", "Load", currentPack);
+                }
     			reset();
     			lastResourcePack = currentPack;
         		// TODO: avoid this?
@@ -170,7 +169,13 @@ public class ColorCache implements IResourceManagerReloadListener {
 
     private int getBiomeColorMultiplier(BlockMD blockMD, int x, int y, int z) {
         WorldClient world = FMLClientHandler.instance().getClient().theWorld;
-        return blockMD.getBlock().colorMultiplier(world, x, 78, z) | 0xFF000000; // getColorMultiplier()
+        try {
+            return blockMD.getBlock().colorMultiplier(world, x, 78, z) | 0xFF000000;
+        } catch(NullPointerException e) {
+            // Bugfix for NPE thrown by uk.co.shadeddimensions.ep3.block.BlockFrame.func_71920_b
+            JourneyMap.getLogger().warning("Block throws NullPointerException when calling colorMultiplier(): " + blockMD.getBlock().getUnlocalizedName());
+            return 16777215;
+        }
     }
 
     private HashMap<BlockMD, Color> getBiomeColorMap(BiomeGenBase biome) {
@@ -273,6 +278,7 @@ public class ColorCache implements IResourceManagerReloadListener {
         sb.append('\n').append(".entry{width:300px;display:inline-block;}");
         sb.append('\n').append(".rgb{display:inline-block;height:32px;width:32px}");
         sb.append('\n').append("</style></head><body><div>");
+        sb.append(debugCache(BlockUtils.getAlphaMap(), "Block Transparency"));
         sb.append(debugCache(BlockUtils.getFlagsMap(), "Block Flags"));
         sb.append(debugCache(baseColors, "Base Colors"));
 

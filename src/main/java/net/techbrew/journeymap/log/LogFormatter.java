@@ -53,13 +53,6 @@ public class LogFormatter extends Formatter {
 	}	
 	
 	public static String toString(Throwable t) {
-
-        ModInfo modInfo = JourneyMap.getInstance().getModInfo();
-        if(modInfo!=null)
-        {
-            modInfo.reportException(t);
-        }
-
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(baos);
 		t.printStackTrace(ps);

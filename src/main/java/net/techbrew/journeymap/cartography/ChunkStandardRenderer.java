@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
-import java.util.logging.Level;
 
 public class ChunkStandardRenderer extends BaseRenderer implements IChunkRenderer {
 
@@ -434,9 +433,8 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 				} catch (Throwable t) {
 					paintBadBlock(x, vSlice, z, g2D);
 					String error = Constants.getMessageJMERR07("x,vSlice,z = " + x + "," //$NON-NLS-1$ //$NON-NLS-2$
-							+ vSlice + "," + z + " : " + t.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+							+ vSlice + "," + z + " : " + LogFormatter.toString(t)); //$NON-NLS-1$ //$NON-NLS-2$
 					JourneyMap.getLogger().severe(error);
-					JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
 				}
 
 			}

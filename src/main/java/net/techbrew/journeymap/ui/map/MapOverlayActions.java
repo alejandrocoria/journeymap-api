@@ -125,8 +125,7 @@ public class MapOverlayActions extends JmUI {
 		try {
 			java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Could not launch browser with URL: " + url, e); //$NON-NLS-1$
-			logger.severe(LogFormatter.toString(e));
+			logger.log(Level.SEVERE, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e)); //$NON-NLS-1$
 		}
 	}
 	

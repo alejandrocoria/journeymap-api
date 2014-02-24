@@ -103,8 +103,7 @@ public class BlockMD implements Serializable {
             return cache.get(key);
 
         } catch (Exception e) {
-            JourneyMap.getLogger().severe("Can't get blockId/meta for chunk " + chunkMd.stub.xPosition + "," + chunkMd.stub.zPosition + " block " + x + "," + y + "," + z); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-            JourneyMap.getLogger().severe(LogFormatter.toString(e));
+            JourneyMap.getLogger().severe("Can't get blockId/meta for chunk " + chunkMd.stub.xPosition + "," + chunkMd.stub.zPosition + " block " + x + "," + y + "," + z + ": " + LogFormatter.toString(e)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
             return null;
         }
     }
@@ -113,8 +112,7 @@ public class BlockMD implements Serializable {
         try {
             return cache.get(new CacheKey(uid, meta));
         } catch (Exception e) {
-            JourneyMap.getLogger().severe("Can't get BlockMD for block " + uid + " meta " + meta);
-            JourneyMap.getLogger().severe(LogFormatter.toString(e));
+            JourneyMap.getLogger().severe("Can't get BlockMD for block " + uid + " meta " + meta + ": " + LogFormatter.toString(e));
             return null;
         }
     }

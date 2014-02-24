@@ -151,7 +151,7 @@ public class StatTimer {
                 started = null;
                 return elapsedMs;
             } catch(Throwable t) {
-                logger.warning("Timer error: " + LogFormatter.toString(t));
+                logger.severe("Timer error: " + LogFormatter.toString(t));
                 reset();
                 return 0;
             }

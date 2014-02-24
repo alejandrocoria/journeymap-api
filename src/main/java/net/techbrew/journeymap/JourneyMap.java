@@ -211,7 +211,6 @@ public class JourneyMap {
 					enableWebserver = false;
 				}
 			} catch(Throwable e) {
-				logger.throwing("JourneyMap", "constructor", e); //$NON-NLS-1$ //$NON-NLS-2$
 				logger.log(Level.SEVERE, LogFormatter.toString(e));				
 				enableWebserver = false;
 			}
@@ -225,7 +224,6 @@ public class JourneyMap {
 					jmServer.stop();
 				}
 			} catch(Throwable e) {
-				logger.throwing("JourneyMap", "constructor", e); //$NON-NLS-1$ //$NON-NLS-2$
 				logger.log(Level.SEVERE, LogFormatter.toString(e));				
 				enableWebserver = false;
 			}
@@ -395,8 +393,7 @@ public class JourneyMap {
             }
 
         } catch (Throwable t) {
-            String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
-            logger.severe(LogFormatter.toString(t));
+            logger.severe(Constants.getMessageJMERR00(LogFormatter.toString(t)));
         }
     }
 

@@ -85,11 +85,9 @@ public class MapSaver {
 			JourneyMap.getLogger().severe(error);
 			ChatLog.announceError(error);
             timer.cancel();
-		} catch (Throwable t) {	
-			String error = Constants.getMessageJMERR18(t.getMessage());
-			JourneyMap.getLogger().severe(error);
-			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
-			ChatLog.announceError(error);
+		} catch (Throwable t) {
+			JourneyMap.getLogger().severe(LogFormatter.toString(t));
+			ChatLog.announceError(Constants.getMessageJMERR18(t.getMessage()));
             timer.cancel();
 			return null;
 		}
@@ -190,8 +188,6 @@ public class MapSaver {
 			}
 			
 		} catch (Throwable t) {	
-			String error = Constants.getMessageJMERR18(t.getMessage());
-			JourneyMap.getLogger().severe(error);
 			JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
 		}
 		

@@ -111,8 +111,7 @@ public class MapOverlay extends JmUI {
             if(chat!=null) chat.drawScreen(width, height, f);
 
 		} catch(Throwable e) {
-			logger.log(Level.SEVERE, "Unexpected exception in MapOverlay.drawScreen(): " + e); //$NON-NLS-1$
-			logger.severe(LogFormatter.toString(e));
+			logger.log(Level.SEVERE, "Unexpected exception in MapOverlay.drawScreen(): " + LogFormatter.toString(e)); //$NON-NLS-1$
 			close();
 		} finally {
             drawScreenTimer.stop();
