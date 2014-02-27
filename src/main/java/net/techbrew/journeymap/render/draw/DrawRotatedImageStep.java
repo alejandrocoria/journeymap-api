@@ -10,12 +10,12 @@ import java.awt.geom.Point2D;
  */
 public class DrawRotatedImageStep implements DrawStep {
 
-    final int posX;
-    final int posZ;
+    final double posX;
+    final double posZ;
     final TextureImpl texture;
     final float heading;
 
-    public DrawRotatedImageStep(int posX, int posZ, TextureImpl texture, float heading) {
+    public DrawRotatedImageStep(double posX, double posZ, TextureImpl texture, float heading) {
         super();
         this.posX = posX;
         this.posZ = posZ;
@@ -24,7 +24,7 @@ public class DrawRotatedImageStep implements DrawStep {
     }
 
     @Override
-    public void draw(int xOffset, int yOffset, GridRenderer gridRenderer, float scale) {
+    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float scale) {
         Point2D pixel = gridRenderer.getPixel(posX, posZ);
         if (pixel != null) {
             DrawUtil.drawRotatedImage(texture, pixel.getX() + xOffset, pixel.getY() + yOffset, heading, scale);

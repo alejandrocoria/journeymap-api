@@ -15,6 +15,7 @@ import net.techbrew.journeymap.data.PlayerData;
 import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
+import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.EntityHelper;
 import net.techbrew.journeymap.model.MapOverlayState;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
@@ -29,6 +30,7 @@ import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.ui.JmUI;
 import net.techbrew.journeymap.ui.MapButton;
 import net.techbrew.journeymap.ui.UIManager;
+import net.techbrew.journeymap.ui.map.layer.LayerDelegate;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -49,11 +51,12 @@ public class MapOverlay extends JmUI {
 	final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
 	final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
 	final static GridRenderer gridRenderer = new GridRenderer(5);
+    final LayerDelegate layerDelegate = new LayerDelegate();
 
 	private enum ButtonEnum{Alert,DayNight,Follow,ZoomIn,ZoomOut,Options,Actions,Close,MiniMap}
 	
 	Boolean isScrolling = false;
-	int msx, msy, mx, my;	
+	int msx, msy, mx, my;
 
 	Logger logger = JourneyMap.getLogger();
 	MapChat chat;
@@ -63,7 +66,7 @@ public class MapOverlay extends JmUI {
     MapButton buttonMiniMap;
 	
 	Color bgColor = new Color(0x22, 0x22, 0x22);
-	Color playerInfoFgColor = new Color(0x8888ff);
+	Color playerInfoFgColor = Color.lightGray;
 	Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
 
     StatTimer drawScreenTimer = StatTimer.get("MapOverlay.drawScreen");
@@ -336,32 +339,35 @@ public class MapOverlay extends JmUI {
             return;
         }
 
+        int blockSize = (int) Math.pow(2,state.currentZoom);
+
 		if(Mouse.isButtonDown(0) && !isScrolling) {
 			isScrolling=true;
 			msx=mx;
 			msy=my;
 		} else if(!Mouse.isButtonDown(0) && isScrolling) {
 			isScrolling=false;
-						
-			int blockSize = (int) Math.pow(2,state.currentZoom);
 			int mouseDragX = (mx-msx)*2/blockSize;
 			int mouseDragY = (my-msy)*2/blockSize;
 			msx=mx;
 			msy=my;
-			
-			if(gridRenderer!=null) {
-				try {
-					gridRenderer.move(-mouseDragX, -mouseDragY);
-					gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
-					gridRenderer.setZoom(state.currentZoom);
-				} catch(Exception e) {
-					logger.severe("Error moving grid: " + e);
-				}
-			}
-			
+
+            try {
+                gridRenderer.move(-mouseDragX, -mouseDragY);
+                gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
+                gridRenderer.setZoom(state.currentZoom);
+            } catch(Exception e) {
+                logger.severe("Error moving grid: " + e);
+            }
+
 			setFollow(false);			
 			refreshState();
 		}
+
+        if(!isScrolling && which==-1) {
+            BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(mouseX, mouseY, width, height);
+            layerDelegate.onMouseMove(mc, gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord);
+        }
 	}
 
 	void zoomIn(){
@@ -538,11 +544,13 @@ public class MapOverlay extends JmUI {
             gridRenderer.draw(xOffset, yOffset, 1f, drawStep);
         }
 
+        gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, 1f);
+
+        DrawUtil.drawCenteredLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight - 11, playerInfoBgColor, 235, playerInfoFgColor, 255, 1);
+
         DrawUtil.drawImage(TextureCache.instance().getLogo(), 16, 4, false, 1f);
 
 		sizeDisplay(true);
-
-        DrawUtil.drawCenteredLabel(state.playerLastPos, width / 2, height - 11, playerInfoBgColor, playerInfoFgColor, 205, 1);
 
         timer.stop();
 	}

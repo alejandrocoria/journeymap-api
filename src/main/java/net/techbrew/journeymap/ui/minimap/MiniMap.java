@@ -193,14 +193,14 @@ public class MiniMap {
             }
 
             // Draw position text
-            DrawUtil.drawCenteredLabel(playerInfo, dv.labelX, bottomY, playerInfoBgColor, playerInfoFgColor, 200, fontScale);
+            DrawUtil.drawCenteredLabel(playerInfo, dv.labelX, bottomY, playerInfoBgColor, 200, playerInfoFgColor, 255, fontScale);
 
             // Draw FPS
             if(showFps){
                 String fps = mc.debug;
                 final int idx = fps!=null ? fps.indexOf(',') : -1;
                 if(idx>0){
-                    DrawUtil.drawCenteredLabel(fps.substring(0, idx), dv.labelX, dv.topLabelY, playerInfoBgColor, playerInfoFgColor, 200, fontScale);
+                    DrawUtil.drawCenteredLabel(fps.substring(0, idx), dv.labelX, dv.topLabelY, playerInfoBgColor, 200, playerInfoFgColor, 255, fontScale);
                 }
             }
 

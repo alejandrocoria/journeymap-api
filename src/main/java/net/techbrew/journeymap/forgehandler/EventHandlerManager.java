@@ -45,6 +45,7 @@ public class EventHandlerManager {
     {
         register(new MiniMapOverlayHandler());
         register(new KeyEventHandler());
+        register(new WaypointOverlayHandler());
     }
 
     public static void unregisterAll()

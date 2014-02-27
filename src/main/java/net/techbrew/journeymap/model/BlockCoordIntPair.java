@@ -18,4 +18,23 @@ public class BlockCoordIntPair {
 		this.z = z;
 	}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BlockCoordIntPair that = (BlockCoordIntPair) o;
+
+        if (x != that.x) return false;
+        if (z != that.z) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = x;
+        result = 31 * result + z;
+        return result;
+    }
 }

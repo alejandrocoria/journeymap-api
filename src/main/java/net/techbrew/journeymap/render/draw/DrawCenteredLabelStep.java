@@ -29,10 +29,10 @@ public class DrawCenteredLabelStep implements DrawStep {
     }
 
     @Override
-    public void draw(int xOffset, int yOffset, GridRenderer gridRenderer, float scale) {
+    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float scale) {
         Point2D pixel = gridRenderer.getPixel(posX, posZ);
         if (pixel != null) {
-            DrawUtil.drawCenteredLabel(text, pixel.getX() + xOffset, pixel.getY() + yOffset + labelYOffset, bgColor, fgColor, 205, fontScale);
+            DrawUtil.drawCenteredLabel(text, pixel.getX() + xOffset, pixel.getY() + yOffset + labelYOffset, bgColor, 205, fgColor, 255, fontScale);
         }
     }
 }

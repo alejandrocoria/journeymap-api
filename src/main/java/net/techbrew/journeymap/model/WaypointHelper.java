@@ -1,12 +1,15 @@
 package net.techbrew.journeymap.model;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ChunkCoordinates;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Pull waypoints from one of several waypoint managers.
@@ -71,7 +74,7 @@ public class WaypointHelper {
      * @return
      */
     public static boolean isNativeLoaded() {
-        return false;
+        return !isReiLoaded() && !isVoxelMapLoaded();
     }
 
     /**
@@ -84,6 +87,7 @@ public class WaypointHelper {
 
         if(isReiLoaded()) list.addAll(getReiWaypoints());
         if(isVoxelMapLoaded()) list.addAll(getVoxelMapWaypoints());
+        if(isNativeLoaded()) list.addAll(getNativeWaypoints());
 
         return list;
     }
@@ -201,62 +205,32 @@ public class WaypointHelper {
      */
     static List<Waypoint> getNativeWaypoints() {
 
-        return Collections.EMPTY_LIST;
+        List<Waypoint> list = new ArrayList<Waypoint>();
 
-//        if(!list.isEmpty()) {
-//            return list;
-//        }
+		Minecraft mc = Minecraft.getMinecraft();
 
-//		Minecraft mc = Minecraft.getMinecraft();
-//
-//		ChunkCoordinates spawn = mc.theWorld.getSpawnPoint();
-//		EntityClientPlayerMP player = mc.thePlayer;
-//
-//		Waypoint wpSpawn = new Waypoint("Spawn", spawn.posX, spawn.posY, spawn.posZ, true, 0, 255, 0, Waypoint.TYPE_NORMAL, "journeymap", "Spawn");
-//		list.add(wpSpawn);
-//        if(renderWaypoints) {
-//            mc.theWorld.addEntityToWorld(waypointEntityId, new EntityWaypoint(mc.theWorld, wpSpawn));
-//        }
-//
-//		ChunkCoordinates bed = player.getBedLocation();
-//		if(bed!=null && !bed.equals(spawn)) {
-//			Waypoint wpBed = new Waypoint("Bed", new Double(Math.floor(bed.posX)).intValue(), new Double(Math.floor(bed.posY)).intValue(), new Double(Math.floor(bed.posZ)).intValue(), true, 0, 0, 255, Waypoint.TYPE_NORMAL, "journeymap", "Bed");
-//			list.add(wpBed);
-//
-//            if(renderWaypoints) {
-//                mc.theWorld.addEntityToWorld(waypointEntityId, new EntityWaypoint(mc.theWorld, wpBed));
-//            }
-//		}
-//
-//        if(waypointEntityId!=null) {
-//            getNativeWaypoints();
-//            return;
-//        }
-//
-//        RenderManager rm = RenderManager.instance;
-//        Map entityRenderMap = Utils.getPrivateField(rm, RenderManager.class, Map.class);
-//        if(entityRenderMap!=null) {
-//
-//            for(int i=201;i<2048;i++){
-//                if(EntityList.getClassFromID(i)==null){
-//                    waypointEntityId = i;
-//                    break;
-//                }
-//            }
-//
-//            if(waypointEntityId!=null) {
-//                entityRenderMap.put(EntityWaypoint.class, new RenderWaypoint(Minecraft.getMinecraft(), rm));
-//                renderWaypoints = true;
-//
-//                JourneyMap.getLogger().info("Waypoints will be rendered on-screen");
-//                getNativeWaypoints();
-//            } else {
-//                JourneyMap.getLogger().warning("Could not get unused entity ID, so Waypoints won't be rendered on screen.");
-//            }
-//
-//        } else {
-//            JourneyMap.getLogger().warning("Could not get access to RenderManager, so Waypoints won't be rendered on screen.");
-//        }
+		ChunkCoordinates spawn = mc.theWorld.getSpawnPoint();
+
+		Waypoint wpSpawn = new Waypoint("Spawn", spawn.posX, spawn.posY, spawn.posZ, true, 0, 255, 0, Waypoint.TYPE_NORMAL, "journeymap", "Spawn");
+		list.add(wpSpawn);
+
+        EntityPlayer player = mc.thePlayer;
+        Random random = new Random();
+        Waypoint wpPlayer = new Waypoint("Footprints", (int) player.posX, (int)player.posY, (int)player.posZ, true, random.nextInt(255), random.nextInt(255), random.nextInt(255), Waypoint.TYPE_NORMAL, "journeymap", "Spawn");
+        list.add(wpPlayer);
+
+        list.add(new Waypoint("0,0", 0,0,0, true, random.nextInt(255), random.nextInt(255), random.nextInt(255), Waypoint.TYPE_NORMAL, "journeymap", "0,0"));
+        list.add(new Waypoint("-64,-64", -64,0,-64, true, random.nextInt(255), random.nextInt(255), random.nextInt(255), Waypoint.TYPE_NORMAL, "journeymap", "-64,-64"));
+        list.add(new Waypoint("64,64", 64,0,64, true, random.nextInt(255), random.nextInt(255), random.nextInt(255), Waypoint.TYPE_NORMAL, "journeymap", "64,64"));
+        list.add(new Waypoint("-64,64", -64,0,64, true, random.nextInt(255), random.nextInt(255), random.nextInt(255), Waypoint.TYPE_NORMAL, "journeymap", "-64,64"));
+        list.add(new Waypoint("64,-64", 64,0,-64, true, random.nextInt(255), random.nextInt(255), random.nextInt(255), Waypoint.TYPE_NORMAL, "journeymap", "64,-64"));
+
+        list.add(new Waypoint("-512,-512", -512,0,-512, true, random.nextInt(255), random.nextInt(255), random.nextInt(255), Waypoint.TYPE_NORMAL, "journeymap", "-512,-512"));
+        list.add(new Waypoint("512,512", 512,0,512, true, random.nextInt(255), random.nextInt(255), random.nextInt(255), Waypoint.TYPE_NORMAL, "journeymap", "512,512"));
+        list.add(new Waypoint("-512,512", -512,0,512, true, random.nextInt(255), random.nextInt(255), random.nextInt(255), Waypoint.TYPE_NORMAL, "journeymap", "-512,512"));
+        list.add(new Waypoint("512,-512", 512,0,-512, true, random.nextInt(255), random.nextInt(255), random.nextInt(255), Waypoint.TYPE_NORMAL, "journeymap", "512,-512"));
+
+        return list;
     }
 
 }

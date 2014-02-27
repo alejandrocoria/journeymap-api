@@ -66,7 +66,7 @@ public abstract class JmUI extends GuiScreen {
     }
 
     protected void drawTitle() {
-        DrawUtil.drawCenteredLabel(this.title, this.width/2, 40, Color.black, Color.CYAN, 128, 1);
+        DrawUtil.drawCenteredLabel(this.title, this.width/2, 40, Color.black, 128, Color.CYAN, 255, 1);
     }
 
     @Override

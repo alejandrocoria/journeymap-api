@@ -22,9 +22,9 @@ public class DrawUtil {
      * @param y
      * @param bgColor
      * @param color
-     * @param alpha
+     * @param bgAlpha
      */
-    public static void drawCenteredLabel(final String text, double x, double y, Color bgColor, Color color, int alpha, double fontScale) {
+    public static void drawCenteredLabel(final String text, double x, double y, Color bgColor,  int bgAlpha, Color color, int alpha, double fontScale) {
 
         if (text == null || text.length() == 0) {
             return;
@@ -43,11 +43,17 @@ public class DrawUtil {
         }
 
         // Draw background
+        int rectHeight = fontRenderer.FONT_HEIGHT + 4;
         if (bgColor != null) {
             final float[] rgb = bgColor.getColorComponents(null);
-            final int rectWidth = width + fontRenderer.getCharWidth(' ');
+            int charWidth = fontRenderer.getCharWidth(' ');
+            final int rectWidth = width + charWidth + charWidth;
             final int vMargin = 2;
-            drawRectangle(x - (rectWidth / 2), y - 2, rectWidth, fontRenderer.FONT_HEIGHT + 3, bgColor, alpha);
+            drawRectangle(x - (rectWidth / 2) - (charWidth/2), y - 3, rectWidth, rectHeight, bgColor, bgAlpha);
+        }
+
+        if(alpha<255){
+            color = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
         }
 
         // Draw text

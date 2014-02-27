@@ -11,8 +11,8 @@ import java.awt.geom.Point2D;
  */
 public class DrawWayPointStep implements DrawStep {
 
-    final int posX;
-    final int posZ;
+    final double posX;
+    final double posZ;
     final TextureImpl texture;
     final TextureImpl offScreenTexture;
     final String label;
@@ -21,7 +21,7 @@ public class DrawWayPointStep implements DrawStep {
     final int alpha;
     final double fontScale;
 
-    public DrawWayPointStep(int posX, int posZ, TextureImpl texture, TextureImpl offScreenTexture, String label,
+    public DrawWayPointStep(double posX, double posZ, TextureImpl texture, TextureImpl offScreenTexture, String label,
                             Color color, Color fontColor, int alpha, double fontScale) {
         super();
         this.posX = posX;
@@ -36,14 +36,33 @@ public class DrawWayPointStep implements DrawStep {
     }
 
     @Override
-    public void draw(int xOffset, int yOffset, GridRenderer gridRenderer, float scale) {
+    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float scale) {
         Point2D pixel = gridRenderer.getBlockPixelInGrid(posX, posZ);
-        if (gridRenderer.isOnScreen(pixel.getX(), pixel.getY())) {
-            DrawUtil.drawColoredImage(texture, alpha, color, pixel.getX() + xOffset - (texture.width / 2), pixel.getY() + yOffset - (texture.height / 2));
-            DrawUtil.drawCenteredLabel(label, pixel.getX(), pixel.getY() - texture.height, Color.black, fontColor, alpha, fontScale);
-        } else {
-            gridRenderer.ensureOnScreen(pixel);
-            DrawUtil.drawColoredImage(offScreenTexture, alpha, color, pixel.getX() + xOffset - (offScreenTexture.width / 2), pixel.getY() + yOffset - (offScreenTexture.height / 2));
+        if (gridRenderer.isOnScreen(pixel.getX(), pixel.getY()))
+        {
+            if (gridRenderer.isOnScreen(pixel.getX() + xOffset, pixel.getY() + yOffset)) {
+                DrawUtil.drawColoredImage(texture, alpha, color, pixel.getX() + xOffset - (texture.width / 2), pixel.getY() + yOffset - (texture.height / 2));
+                DrawUtil.drawCenteredLabel(label, pixel.getX() + xOffset, pixel.getY() + yOffset - texture.height, Color.black, alpha, fontColor, 255, fontScale);
+            }
+            else
+            {
+                pixel.setLocation(pixel.getX() + xOffset, pixel.getY() + yOffset);
+                gridRenderer.ensureOnScreen(pixel);
+                DrawUtil.drawColoredImage(offScreenTexture, alpha, color, pixel.getX() - (offScreenTexture.width / 2), pixel.getY() - (offScreenTexture.height / 2));
+            }
+        }
+        else
+        {
+            if (gridRenderer.isOnScreen(pixel.getX() + xOffset, pixel.getY() + yOffset)) {
+                DrawUtil.drawColoredImage(texture, alpha, color, pixel.getX() + xOffset - (texture.width / 2), pixel.getY() + yOffset - (texture.height / 2));
+                DrawUtil.drawCenteredLabel(label, pixel.getX() + xOffset, pixel.getY() + yOffset - texture.height, Color.black, alpha, fontColor, 255, fontScale);
+            }
+            else {
+                gridRenderer.ensureOnScreen(pixel);
+                DrawUtil.drawColoredImage(offScreenTexture, alpha, color, pixel.getX() - (offScreenTexture.width / 2), pixel.getY()  - (offScreenTexture.height / 2));
+            }
         }
     }
+
+
 }

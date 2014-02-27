@@ -61,7 +61,7 @@ public class ChunkLoader {
 		if(world.getChunkProvider().chunkExists(chunkX, chunkZ)) {
 			Chunk theChunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
 			if(!(theChunk instanceof EmptyChunk)) {
-				if(theChunk.isChunkLoaded) {
+				if(theChunk.isChunkLoaded && !theChunk.isEmpty()) {
 					result = theChunk;
 				}
 			}			

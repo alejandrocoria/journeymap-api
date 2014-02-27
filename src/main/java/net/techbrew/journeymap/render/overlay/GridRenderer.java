@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -215,6 +216,18 @@ public class GridRenderer {
     public Point2D.Double getCenterPixelOffset() {
         return centerPixelOffset;
     }
+
+    public BlockCoordIntPair getBlockUnderMouse(double mouseX, double mouseY, int screenWidth, int screenHeight)
+    {
+        double centerPixelX = screenWidth/2;
+        double centerPixelZ = screenHeight/2;
+
+        int blockSize = (int) Math.pow(2,zoom);
+
+        int x = (int) Math.floor(centerBlockX - ((centerPixelX-mouseX) / blockSize*2));
+        int z = (int) Math.floor(centerBlockZ - ((centerPixelZ-mouseY) / blockSize*2));
+        return new BlockCoordIntPair(x, z);
+    }
 	
 	public Point2D.Double getBlockPixelInGrid(double x, double z) {
 
@@ -222,10 +235,7 @@ public class GridRenderer {
         double localBlockZ = z - centerBlockZ;
 		
 		int blockSize = (int) Math.pow(2,zoom);
-        double blockSizeOffset = (blockSize/2D);
-
         double pixelOffsetX = lastWidth /2 + (localBlockX*blockSize);
-
         double pixelOffsetZ = lastHeight /2 + (localBlockZ*blockSize);
 
 		Point2D.Double p = new Point2D.Double();
@@ -239,7 +249,7 @@ public class GridRenderer {
      * @param xOffset
      * @param yOffset
      */
-    public void draw(final List<DrawStep> drawStepList, int xOffset, int yOffset, float scale) {
+    public void draw(final List<DrawStep> drawStepList, double xOffset, double yOffset, float scale) {
         if(drawStepList==null || drawStepList.isEmpty()) return;
         draw(xOffset, yOffset, scale, drawStepList.toArray(new DrawStep[drawStepList.size()]));
     }
@@ -250,7 +260,7 @@ public class GridRenderer {
      * @param yOffset
      * @param drawSteps
      */
-    public void draw(int xOffset, int yOffset, float scale, DrawStep... drawSteps) {
+    public void draw(double xOffset, double yOffset, float scale, DrawStep... drawSteps) {
 
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glDepthMask(false);
@@ -435,8 +445,16 @@ public class GridRenderer {
         this.worldDir = worldDir;
         this.dimension = dimension;
 	}
-	
-	public File getWorldDir() {
+
+    public double getCenterBlockX() {
+        return centerBlockX;
+    }
+
+    public double getCenterBlockZ() {
+        return centerBlockZ;
+    }
+
+    public File getWorldDir() {
 		return worldDir;
 	}
 	
@@ -459,4 +477,12 @@ public class GridRenderer {
 	public void clear() {
 		grid.clear();
 	}
+
+    public int getWidth() {
+        return lastWidth;
+    }
+
+    public int getHeight() {
+        return lastHeight;
+    }
 }
