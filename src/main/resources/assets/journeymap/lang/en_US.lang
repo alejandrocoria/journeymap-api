@@ -169,6 +169,28 @@ MapOverlay.use_browser=Use Browser
 MapOverlay.zoom_in=Zoom In
 MapOverlay.zoom_out=Zoom Out
 
+# Added in 4.0.0:
+Waypoint.manage=Manage Waypoints
+Waypoint.new=New Waypoint
+Waypoint.edit=Edit Waypoint
+Waypoint.name=Name
+Waypoint.default_name=New Waypoint
+Waypoint.location=Location
+Waypoint.dimensions=Dimensions
+Waypoint.x=X
+Waypoint.y=Y
+Waypoint.z=Z
+Waypoint.color=Color
+Waypoint.r=R
+Waypoint.g=G
+Waypoint.b=B
+Waypoint.randomize=Random Color
+Waypoint.enable=Enabled: %1$s
+Waypoint.cancel=Cancel
+Waypoint.remove=Remove
+Waypoint.reset=Reset
+Waypoint.save=Save
+
 # Added in 3.1.x:
 MiniMap.options=MiniMap Options
 
@@ -218,7 +240,7 @@ MiniMap.hotkeys_position=Change Minimap Position
 
 # Added in 3.3.x.  Used in Minecraft Controls menu and JourneyMap/Options/Minimap.../HotKeys... dialog.
 # {0} is either "Ctrl+" or "^" depending on Windows or MacOS
-MapOverlay.hotkeys_keybinding_category=JourneyMap (Use %1$s[key] for Minimap)
+MapOverlay.hotkeys_keybinding_category=JourneyMap (Use %1%s[key] for Minimap)
 MapOverlay.hotkeys_button=Hot Keys...
 MapOverlay.hotkeys_title=Hot Keys
 MapOverlay.hotkeys_toggle=Toggle Map
