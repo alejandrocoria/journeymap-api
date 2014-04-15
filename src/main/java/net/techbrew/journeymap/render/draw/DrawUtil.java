@@ -33,23 +33,22 @@ public class DrawUtil {
         Minecraft mc = Minecraft.getMinecraft();
         final FontRenderer fontRenderer = mc.fontRenderer;
         final int width = fontRenderer.getStringWidth(text);
+        final int height = fontRenderer.FONT_HEIGHT;
+        GL11.glPushMatrix();
 
         if (fontScale != 1) {
-            GL11.glPushMatrix();
-
             x = x / fontScale;
             y = y / fontScale;
             GL11.glScaled(fontScale, fontScale, 0);
         }
 
+        final double textX = x - (width/2);
+        final double textY = y - (height/2);
+
         // Draw background
-        int rectHeight = fontRenderer.FONT_HEIGHT + 4;
-        if (bgColor != null) {
-            final float[] rgb = bgColor.getColorComponents(null);
-            int charWidth = fontRenderer.getCharWidth(' ');
-            final int rectWidth = width + charWidth + charWidth;
-            final int vMargin = 2;
-            drawRectangle(x - (rectWidth / 2) - (charWidth/2), y - 3, rectWidth, rectHeight, bgColor, bgAlpha);
+        if (bgColor != null && alpha>0) {
+            final int pad = 3;
+            drawRectangle(textX-pad, textY-pad, width + (2*pad), height + (2*pad), bgColor, bgAlpha);
         }
 
         if(alpha<255){
@@ -57,11 +56,13 @@ public class DrawUtil {
         }
 
         // Draw text
-        fontRenderer.drawStringWithShadow(text, (int) x - (width / 2), (int) y, color.getRGB());
+        int intTextX = (int) Math.floor(textX);
+        int intTextY = (int) Math.floor(textY);
 
-        if (fontScale != 1) {
-            GL11.glPopMatrix();
-        }
+        GL11.glTranslated(textX-intTextX, textY-intTextY, 0);
+        fontRenderer.drawStringWithShadow(text, intTextX, intTextY, color.getRGB());
+
+        GL11.glPopMatrix();
     }
 
     private static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, boolean flip) {
