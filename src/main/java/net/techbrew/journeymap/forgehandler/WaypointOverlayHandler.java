@@ -12,9 +12,9 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.EntityKey;
 import net.techbrew.journeymap.data.WaypointsData;
-import net.techbrew.journeymap.model.WaypointHelper;
 import net.techbrew.journeymap.waypoint.EntityWaypoint;
 import net.techbrew.journeymap.waypoint.RenderWaypoint;
+import net.techbrew.journeymap.waypoint.WaypointHelper;
 
 import java.util.EnumSet;
 import java.util.Map;

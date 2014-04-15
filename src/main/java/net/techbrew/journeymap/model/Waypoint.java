@@ -1,122 +1,296 @@
 package net.techbrew.journeymap.model;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.render.texture.TextureCache;
+import net.techbrew.journeymap.render.texture.TextureImpl;
 
 import java.awt.*;
-import java.util.LinkedHashMap;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Random;
 
 /**
  * Generic waypoint data holder
  */
-public class Waypoint extends LinkedHashMap<String, Object> {
-	
-	public static final int TYPE_NORMAL = 0;
-	public static final int TYPE_DEATH = 1;
-	
-	public enum Key {
-		id,
-		name, 
-		x, y, z, 
-		enable,
-		r,g,b,
-		dimension,
-		type, // Normal = 0, Deathpoint = 1
-		origin,
-		display
-		;
-	}
-
-    ChunkCoordinates location;
-	
-    public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, int type, String origin, String display)
+public class Waypoint implements Serializable
+{
+    public enum Type
     {
-    	if(name==null) name = "";
-    	this.put(Key.id.name(), name + "_" + x + "_" + y + "_" + z);
-        this.put(Key.name.name(), name);
-        this.put(Key.x.name(), x);
-        this.put(Key.y.name(), y);
-        this.put(Key.z.name(), z);
-        this.put(Key.enable.name(), enable);
-        this.put(Key.r.name(), red);
-        this.put(Key.g.name(), green);
-        this.put(Key.b.name(), blue);
-        this.put(Key.type.name(), type);
-        this.put(Key.origin.name(), origin);
-        this.put(Key.display.name(), display);
-        location = new ChunkCoordinates(x, y, z);
-    }
-    
-    public String getId() {
-    	return getString(Key.id);
-    }
-    
-    public Object getObject(Key p) {
-    	return this.get(p.name());
-    }
-    
-    public String getName() {
-    	return getString(Key.name);
-    }
-    
-    public String getOrigin() {
-    	return getString(Key.origin);
-    }
-    
-    public int getX() {
-    	return getInteger(Key.x);
+        Normal,
+        Death
     }
 
-    public int getY() {
-        return getInteger(Key.y);
-    }
-    
-    public int getZ() {
-    	return getInteger(Key.z);
-    }
-    
-    public int getType() {
-    	return getInteger(Key.type);
-    }
-    
-    public boolean getEnable() {
-    	return getBoolean(Key.enable);
-    }
-    
-    public Color getColor() {
-    	int r = getInteger(Key.r);
-    	int g = getInteger(Key.g);
-    	int b = getInteger(Key.b);
-    	return new Color(r,g,b);
-    }
-    
-    public String getDisplay() {
-    	return getString(Key.display);
+    protected String id;
+    protected String name;
+    protected int x;
+    protected int y;
+    protected int z;
+    protected int r;
+    protected int g;
+    protected int b;
+    protected boolean enable;
+    protected Type type;
+    protected String origin;
+    protected String texture;
+    protected Integer[] dimensions;
+    transient protected ChunkCoordinates location;
+
+    public static Waypoint deathOf(Entity player)
+    {
+        ChunkCoordinates cc = new ChunkCoordinates((int)Math.floor(player.posX), (int)Math.floor(player.posY), (int)Math.floor(player.posZ));
+        return at(cc, Type.Death, player.dimension);
     }
 
-    public ChunkCoordinates getLocation() {
+    public static Waypoint of(EntityPlayer player)
+    {
+        ChunkCoordinates cc = new ChunkCoordinates((int)Math.floor(player.posX), (int)Math.floor(player.posY), (int)Math.floor(player.posZ));
+        return at(cc, Type.Normal, player.dimension);
+    }
+
+    public static Waypoint at(ChunkCoordinates cc, Type type, int dimension)
+    {
+        String name;
+        if(type == Type.Death)
+        {
+            name = Constants.getString("Waypoint.deathpoint");
+        }
+        else
+        {
+            name = createName(cc.posX, cc.posZ);
+        }
+        Waypoint waypoint = new Waypoint(name, cc, Color.white, type, dimension);
+        waypoint.setRandomColor();
+        return waypoint;
+    }
+
+    private static String createName(int x, int z)
+    {
+        return String.format("%s, %s", x, z);
+    }
+
+    public Waypoint(Waypoint original)
+    {
+        this(original.name, original.x, original.y, original.z, original.enable, original.r, original.g, original.b, original.type, original.origin, original.dimensions);
+    }
+
+    public Waypoint(String name, ChunkCoordinates location, Color color, Type type, int dimension) {
+        this(name, location.posX, location.posY, location.posZ, true, color.getRed(), color.getGreen(), color.getBlue(), type, "journeymap", dimension);
+    }
+
+    public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, Type type, String origin, Integer... dimensions)
+    {
+        if(name==null) name = createName(x, z);
+        this.name = name;
+        setLocation(x, y, z);
+
+        this.r = red;
+        this.g = green;
+        this.b = blue;
+        this.enable = enable;
+        this.type = type;
+        this.origin = origin;
+        this.dimensions = dimensions;
+    }
+
+    public void setLocation(int x, int y, int z)
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        updateId();
+    }
+
+    public String updateId()
+    {
+        String oldId = this.id;
+        this.id = String.format("%s_%s,%s,%s", this.name, this.x, this.y, this.z);
+        return oldId;
+    }
+
+    public boolean isDeathPoint()
+    {
+        return this.type == Type.Death;
+    }
+
+    public TextureImpl getTexture()
+    {
+        return isDeathPoint() ? TextureCache.instance().getDeathpoint() : TextureCache.instance().getWaypoint();
+    }
+
+    public ChunkCoordIntPair getChunkCoordIntPair()
+    {
+        return new ChunkCoordIntPair(x >> 4, z >> 4);
+    }
+
+    public void setColor(Color color)
+    {
+        this.r = color.getRed();
+        this.g = color.getGreen();
+        this.b = color.getBlue();
+    }
+
+    public void setRandomColor()
+    {
+        Random random = new Random();
+        int r = random.nextInt(255);
+        int g = random.nextInt(255);
+        int b = random.nextInt(255);
+
+        int min = 100;
+        int max = Math.max(r, Math.max(g, b));
+        if(max < min)
+        {
+            if(r == max)
+            {
+                r = min;
+            }
+            else if(g == max)
+            {
+                g = min;
+            }
+            else
+            {
+                b = min;
+            }
+        }
+
+        setColor(new Color(r,g,b));
+    }
+
+    public Color getColor()
+    {
+        return new Color(r,g,b);
+    }
+
+    public Collection<Integer> getDimensions()
+    {
+        return Arrays.asList(this.dimensions);
+    }
+
+    public void setDimensions(Collection<Integer> dims)
+    {
+        this.dimensions = dims.toArray(new Integer[dims.size()]);
+    }
+
+    public boolean isTeleportReady()
+    {
+        return y>=0 && this.isInPlayerDimension();
+    }
+
+    public boolean isInPlayerDimension()
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+        return getDimensions().contains(mc.thePlayer.dimension);
+    }
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public int getX()
+    {
+        return x;
+    }
+
+    public int getY()
+    {
+        return y;
+    }
+
+    public int getZ()
+    {
+        return z;
+    }
+
+    public int getR()
+    {
+        return r;
+    }
+
+    public void setR(int r)
+    {
+        this.r = r;
+    }
+
+    public int getG()
+    {
+        return g;
+    }
+
+    public void setG(int g)
+    {
+        this.g = g;
+    }
+
+    public int getB()
+    {
+        return b;
+    }
+
+    public void setB(int b)
+    {
+        this.b = b;
+    }
+
+    public boolean isEnable()
+    {
+        return enable;
+    }
+
+    public void setEnable(boolean enable)
+    {
+        this.enable = enable;
+    }
+
+    public Type getType()
+    {
+        return type;
+    }
+
+    public void setType(Type type)
+    {
+        this.type = type;
+    }
+
+    public String getOrigin()
+    {
+        return origin;
+    }
+
+    public ChunkCoordinates getLocation()
+    {
+        if(location==null)
+        {
+            location = new ChunkCoordinates(x, y, z);
+        }
         return location;
     }
-    
-    @Override
-	public String toString() {
-    	return getDisplay();
-    }
-    
-    /** Internal to class **/
-    
-    Integer getInteger(Key p) {
-    	Object val = this.get(p.name());
-    	return val==null ? null : (Integer) val; 
+
+    public String getFileName()
+    {
+        return id.replaceAll("[\\\\/:\"*?<>|]", "_").concat(".json");
     }
 
-    Boolean getBoolean(Key p) {
-    	Object val = this.get(p.name());
-    	return val==null ? null : (Boolean) val; 
+    @Override
+    public String toString()
+    {
+        return name;
     }
-    
-    String getString(Key p) {
-    	Object val = this.get(p.name());
-    	return val==null ? null : (String) val; 
-    }
-    
 }

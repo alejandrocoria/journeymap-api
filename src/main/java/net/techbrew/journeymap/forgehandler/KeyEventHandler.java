@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.model.MapOverlayState;
+import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
 import org.lwjgl.input.Keyboard;
@@ -69,6 +70,13 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler {
         {
             if(i==Constants.KB_MAP.getKeyCode()) {
                 UIManager.getInstance().openMap();
+                return;
+            }
+            else if(i==Constants.KB_WAYPOINT.keyCode) {
+                if(Minecraft.getMinecraft().currentScreen==null) {
+                    Waypoint waypoint = Waypoint.of(Minecraft.getMinecraft().thePlayer);
+                    UIManager.getInstance().openWaypointEditor(waypoint, true, null);
+                }
                 return;
             }
         }

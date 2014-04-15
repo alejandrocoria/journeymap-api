@@ -34,7 +34,7 @@ public class RenderWaypoint extends RenderEntity {
 
 
         double var10 = Math.sqrt(entity.getDistanceSqToEntity(renderManager.livingPlayer));
-        final String par2Str = new StringBuilder(waypoint.getDisplay()).append(String.format(" [%1.2fm]", new Object[] { var10 })).toString();
+        final String par2Str = new StringBuilder(waypoint.getName()).append(String.format(" [%1.2fm]", new Object[] { var10 })).toString();
         int maxDisplayDistance = 16;
         //if ((var10 <= maxDisplayDistance) || (maxDisplayDistance < 0))
         {

@@ -1,9 +1,11 @@
 package se.rupy.http;
 
-import java.io.*;
-import java.net.*;
-import java.text.*;
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.StringTokenizer;
 
 /**
  * HTTP request and query in one.
@@ -43,7 +45,7 @@ public class Query extends Hash {
 		} else if (method.equalsIgnoreCase("post")) {
 			this.method = POST;
 			parsed = false;
-		} else if (method.equalsIgnoreCase("put")) {
+		} else if (method.equalsIgnoreCase("save")) {
 			this.method = PUT;
 			parsed = false;
 		} else if (method.equalsIgnoreCase("delete")) {

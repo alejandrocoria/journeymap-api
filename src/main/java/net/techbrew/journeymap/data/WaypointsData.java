@@ -1,7 +1,8 @@
 package net.techbrew.journeymap.data;
 
+import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.model.Waypoint;
-import net.techbrew.journeymap.model.WaypointHelper;
+import net.techbrew.journeymap.waypoint.WaypointHelper;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -20,13 +21,6 @@ public class WaypointsData implements IDataProvider {
 	private static long TTL = TimeUnit.SECONDS.toMillis(5);
 
 
-	/**
-	 * Provides all possible keys.
-	 */
-	@Override
-	public Enum[] getKeys() {
-		return Waypoint.Key.values();
-	}
 	
 	/**
 	 * Return map of waypoints data.
@@ -35,9 +29,10 @@ public class WaypointsData implements IDataProvider {
 	public Map getMap(Map optionalParams) {		
 				
 		List<Waypoint> waypoints = WaypointHelper.getWaypoints();
-		Map<String, Map> map = new HashMap<String, Map>(waypoints.size());
+		Map<String, Waypoint> map = new HashMap<String, Waypoint>(waypoints.size());
+        final int dimension = Minecraft.getMinecraft().thePlayer.dimension;
 		for(Waypoint waypoint : waypoints) {
-			if(waypoint.getEnable()) {
+			if(waypoint.isEnable() && waypoint.getDimensions().contains(dimension)) {
 				map.put(waypoint.getId(),waypoint);
 			}
 		}		
@@ -46,10 +41,15 @@ public class WaypointsData implements IDataProvider {
 		props.put(EntityKey.root, map);
 		
 		return props;		
-	}	
-		
-	
-	/**
+	}
+
+    @Override
+    public Enum[] getKeys()
+    {
+        return new Enum[0];
+    }
+
+    /**
 	 * Return length of time in millis data should be kept.
 	 */
 	@Override

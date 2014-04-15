@@ -14,6 +14,7 @@ import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
 import net.techbrew.journeymap.render.overlay.OverlayRadarRenderer;
 import net.techbrew.journeymap.render.overlay.OverlayWaypointRenderer;
+import net.techbrew.journeymap.waypoint.WaypointHelper;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -3,7 +3,7 @@ package net.techbrew.journeymap.data;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.io.PropertyManager;
-import net.techbrew.journeymap.model.WaypointHelper;
+import net.techbrew.journeymap.waypoint.WaypointHelper;
 import org.lwjgl.opengl.Display;
 
 import java.util.LinkedHashMap;

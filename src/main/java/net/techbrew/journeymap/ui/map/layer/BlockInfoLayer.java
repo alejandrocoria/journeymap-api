@@ -1,15 +1,22 @@
 package net.techbrew.journeymap.ui.map.layer;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
+import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
+import net.techbrew.journeymap.render.draw.DrawWayPointStep;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
+import net.techbrew.journeymap.ui.UIManager;
+import net.techbrew.journeymap.ui.map.MapOverlay;
+import net.techbrew.journeymap.waypoint.WaypointHelper;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -20,6 +27,7 @@ public class BlockInfoLayer {
     private List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
 
     BlockCoordIntPair lastCoord = null;
+    long lastClicked = 0;
 
     public BlockInfoLayer()
     {
@@ -48,9 +56,54 @@ public class BlockInfoLayer {
             }
 
             drawStepList.add(new BlockInfoStep(gridWidth/2, gridHeight-25, info, 0, Color.DARK_GRAY, Color.white, 1.0));
+
+            // check for existing
+            Collection<Waypoint> waypoints = WaypointHelper.getCachedWaypoints();
+            for(Waypoint existing : waypoints)
+            {
+                if(existing.getX()==blockCoord.x && existing.getZ()==blockCoord.z)
+                {
+                    drawStepList.add(new DrawWayPointStep(blockCoord.x, blockCoord.z));
+                }
+            }
         }
 
         return drawStepList;
+    }
+
+    // TODO:  Move to waypoint delegate?
+    public void onMouseClicked(Minecraft mc, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
+    {
+        // check for double-click
+        long sysTime = Minecraft.getSystemTime();
+        boolean doubleClick = blockCoord.equals(lastCoord) && sysTime - this.lastClicked < 450L;
+        this.lastClicked = sysTime;
+
+        if(doubleClick)
+        {
+            // check for existing
+            Collection<Waypoint> waypoints = WaypointHelper.getCachedWaypoints();
+            for(Waypoint existing : waypoints)
+            {
+                if(existing.getX()==blockCoord.x && existing.getZ()==blockCoord.z)
+                {
+                    UIManager.getInstance().openWaypointEditor(existing, false, MapOverlay.class);
+                    return;
+                }
+            }
+
+            // check chunk
+            Chunk chunk = mc.theWorld.getChunkFromChunkCoords(blockCoord.x >> 4, blockCoord.z >> 4);
+            int y = -1;
+            if(!chunk.isEmpty())
+            {
+                y = Math.max(1, chunk.getHeightValue(blockCoord.x & 15, blockCoord.z & 15));
+            }
+
+            ChunkCoordinates cc = new ChunkCoordinates(blockCoord.x, y, blockCoord.z);
+            Waypoint waypoint = Waypoint.at(cc, Waypoint.Type.Normal, mc.thePlayer.dimension);
+            UIManager.getInstance().openWaypointEditor(waypoint, true, MapOverlay.class);
+        }
     }
 
     class BlockInfoStep implements DrawStep {
@@ -80,7 +133,7 @@ public class BlockInfoLayer {
         public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float scale) {
             if(ticks--<0)
             {
-                alpha-=10;
+                //alpha-=10; // Fade
             }
             if(alpha>0) {
                 DrawUtil.drawCenteredLabel(text, posX, posZ + labelYOffset, bgColor, Math.max(0, alpha-50), fgColor, Math.max(0, alpha), fontScale);

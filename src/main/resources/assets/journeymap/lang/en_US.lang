@@ -60,6 +60,11 @@ JourneyMap.webserver_only_ready=Open browser to§b http://localhost%1$s §f. (In
 JourneyMap.file_updates=Files are being updated (%1$s). Mapping suspended.
 JourneyMap.file_updates_complete=File updates complete. Mapping resumed.
 
+# Added in 4.0.0
+# Languages which use the unicode font can use Unicode arrows U+2191 and U+2193
+JourneyMap.char_uparrow=<
+JourneyMap.char_downarrow=>
+
 ########################
 # In-game Map messages
 ########################
@@ -170,13 +175,17 @@ MapOverlay.zoom_in=Zoom In
 MapOverlay.zoom_out=Zoom Out
 
 # Added in 4.0.0:
-Waypoint.manage=Manage Waypoints
-Waypoint.new=New Waypoint
-Waypoint.edit=Edit Waypoint
+Waypoint.waypoints=Waypoints
+Waypoint.manage_title=Manage Waypoints
+Waypoint.new=New...
+Waypoint.new_title=New Waypoint
+Waypoint.edit_title=Edit Waypoint
 Waypoint.name=Name
-Waypoint.default_name=New Waypoint
+Waypoint.distance=Distance
 Waypoint.location=Location
 Waypoint.dimensions=Dimensions
+Waypoint.dimension=Dimension: %1$s
+Waypoint.dimension_all=All
 Waypoint.x=X
 Waypoint.y=Y
 Waypoint.z=Z
@@ -190,6 +199,10 @@ Waypoint.cancel=Cancel
 Waypoint.remove=Remove
 Waypoint.reset=Reset
 Waypoint.save=Save
+Waypoint.edit=Edit
+Waypoint.find=Find
+Waypoint.teleport=Teleport
+Waypoint.deathpoint=Death
 
 # Added in 3.1.x:
 MiniMap.options=MiniMap Options

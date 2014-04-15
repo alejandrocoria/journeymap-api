@@ -30,7 +30,6 @@ public class FileHandler {
 			if(lastMCWorldDir==null || !lastMCFolderName.equals(minecraft.getIntegratedServer().getFolderName())) {
 				lastMCFolderName = minecraft.getIntegratedServer().getFolderName();
 				lastMCWorldDir = new File(minecraft.mcDataDir, "saves" + File.separator + lastMCFolderName);
-				System.out.println("New world, new dir: " + lastMCWorldDir);
 			} 
 			return lastMCWorldDir;			
 		}
@@ -118,6 +117,25 @@ public class FileHandler {
 		}
 		return lastJMWorldDir;
 	}
+
+    public static File getWaypointDir()
+    {
+        return getWaypointDir(getJMWorldDir(Minecraft.getMinecraft()));
+    }
+
+    public static File getWaypointDir(File jmWorldDir)
+    {
+        File waypointDir = new File(jmWorldDir, "waypoints");
+        if(!waypointDir.isDirectory())
+        {
+            waypointDir.delete();
+        }
+        if(!waypointDir.exists())
+        {
+            waypointDir.mkdirs();
+        }
+        return waypointDir;
+    }
 	
 	
 	public static File getAnvilRegionDirectory(File worldDirectory, int dimension) {

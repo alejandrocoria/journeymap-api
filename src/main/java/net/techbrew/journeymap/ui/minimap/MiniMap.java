@@ -10,7 +10,6 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.EntityHelper;
 import net.techbrew.journeymap.model.MapOverlayState;
-import net.techbrew.journeymap.model.WaypointHelper;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
 import net.techbrew.journeymap.render.overlay.OverlayRadarRenderer;
@@ -19,6 +18,7 @@ import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.ui.JmUI;
 import net.techbrew.journeymap.ui.map.MapOverlay;
+import net.techbrew.journeymap.waypoint.WaypointHelper;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;

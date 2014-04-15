@@ -25,7 +25,6 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockUtils;
 import net.techbrew.journeymap.model.RegionImageCache;
-import net.techbrew.journeymap.model.WaypointHelper;
 import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.server.JMServer;
@@ -36,6 +35,8 @@ import net.techbrew.journeymap.thread.JMThreadFactory;
 import net.techbrew.journeymap.thread.TaskThread;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
+import net.techbrew.journeymap.waypoint.WaypointHelper;
+import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.lwjgl.input.Keyboard;
 
 import java.util.Date;
@@ -335,6 +336,7 @@ public class JourneyMap {
         RegionImageCache.getInstance().flushToDisk();
         RegionImageCache.getInstance().clear();
         UIManager.getInstance().reset();
+        WaypointStore.instance().load();
     }
 
     public void updateState() {

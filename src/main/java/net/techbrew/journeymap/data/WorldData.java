@@ -4,7 +4,12 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldProviderEnd;
+import net.minecraft.world.WorldProviderHell;
+import net.minecraft.world.WorldProviderSurface;
 import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.common.DimensionManager;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -171,6 +176,46 @@ public class WorldData implements IDataProvider {
 		}
 		return worldName;
 	}
+
+    public static Integer[] getDimensions()
+    {
+        Integer[] dims = DimensionManager.getIDs();
+        if(dims.length==0)
+        {
+            dims = new Integer[]{0,-1,1};
+        }
+        return dims;
+    }
+
+    /**
+     * Get the name of the provided dimension.
+     * @param dimension
+     * @return
+     */
+    public static String getDimensionName(final int dimension)
+    {
+        if(DimensionManager.getWorld(dimension)!=null)
+        {
+            return DimensionManager.getProvider(dimension).getDimensionName();
+        }
+
+        World world = Minecraft.getMinecraft().theWorld;
+        if(world!=null && world.provider.dimensionId==dimension)
+        {
+            return world.provider.getDimensionName();
+        }
+        else
+        {
+            switch(dimension)
+            {
+                case 0 : return new WorldProviderSurface().getDimensionName();
+                case 1 : return new WorldProviderEnd().getDimensionName();
+                case -1 : return new WorldProviderHell().getDimensionName();
+            }
+        }
+
+        return Integer.toString(dimension);
+    }
 	
 	/**
 	 * Return length of time in millis data should be kept.

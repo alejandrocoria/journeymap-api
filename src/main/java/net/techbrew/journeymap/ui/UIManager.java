@@ -8,6 +8,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.ui.map.MapOverlay;
 import net.techbrew.journeymap.ui.map.MapOverlayActions;
@@ -16,6 +17,8 @@ import net.techbrew.journeymap.ui.map.MapOverlayOptions;
 import net.techbrew.journeymap.ui.minimap.MiniMap;
 import net.techbrew.journeymap.ui.minimap.MiniMapHotkeysHelp;
 import net.techbrew.journeymap.ui.minimap.MiniMapOptions;
+import net.techbrew.journeymap.ui.waypoint.WaypointEditor;
+import net.techbrew.journeymap.ui.waypoint.WaypointManager;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,15 +63,29 @@ public class UIManager {
     	minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer)); // displayGuiScreen
     }
     
-    public void open(Class<? extends JmUI> uiClass) {
-    	closeCurrent();
-    	try {    		
-    		logger.fine("Opening UI " + uiClass.getSimpleName());
-			minecraft.displayGuiScreen(uiClass.newInstance()); // displayGuiScreen
-            miniMap.setVisible(false);
+    public <T extends JmUI> T open(Class<T> uiClass) {
+    	try {
+            T ui = uiClass.newInstance();
+			return open(ui);
 		} catch(Throwable e) {
-			logger.log(Level.SEVERE, "Unexpected exception opening UI: " + LogFormatter.toString(e)); //$NON-NLS-1$
+			logger.log(Level.SEVERE, "Unexpected exception creating UI: " + LogFormatter.toString(e)); //$NON-NLS-1$
+            return null;
 		}
+    }
+
+    public <T extends JmUI> T open(T ui) {
+        closeCurrent();
+        logger.fine("Opening UI " + ui.getClass().getSimpleName());
+        try
+        {
+            minecraft.displayGuiScreen(ui);
+            miniMap.setVisible(false);
+        }
+        catch(Throwable t)
+        {
+            logger.severe(String.format("Unexpected exception opening UI %s: %s", ui.getClass(), LogFormatter.toString(t)));
+        }
+        return ui;
     }
 
     public void toggleMinimap() {
@@ -104,6 +121,16 @@ public class UIManager {
         open(MapOverlay.class);
     }
 
+    public void openMap(Waypoint waypoint)
+    {
+        if(waypoint.isInPlayerDimension())
+        {
+            KeyBinding.unPressAllKeys();
+            MapOverlay map = open(MapOverlay.class);
+            map.centerOn(waypoint);
+        }
+    }
+
     public void openMapHotkeyHelp() {
         open(MapOverlayHotkeysHelp.class);
     }
@@ -121,7 +148,17 @@ public class UIManager {
     }
     
     public void openMapActions() {
-    	open(MapOverlayActions.class);
+        open(MapOverlayActions.class);
+    }
+
+    public void openWaypointManager() {
+        WaypointManager manager = new WaypointManager();
+        open(manager);
+    }
+
+    public void openWaypointEditor(Waypoint waypoint, boolean isNew, Class<? extends JmUI> returnClass) {
+        WaypointEditor editor = new WaypointEditor(waypoint, isNew, returnClass);
+        open(editor);
     }
 
     public void reset() {

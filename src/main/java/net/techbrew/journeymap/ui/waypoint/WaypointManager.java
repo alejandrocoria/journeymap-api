@@ -1,81 +1,53 @@
 package net.techbrew.journeymap.ui.waypoint;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraftforge.common.DimensionManager;
+import net.minecraft.command.CommandServerTp;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.WaypointsData;
+import net.techbrew.journeymap.data.WorldData;
+import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
-import net.techbrew.journeymap.model.WaypointHelper;
 import net.techbrew.journeymap.render.draw.DrawUtil;
-import net.techbrew.journeymap.render.texture.TextureCache;
-import net.techbrew.journeymap.render.texture.TextureImpl;
-import net.techbrew.journeymap.ui.Button;
 import net.techbrew.journeymap.ui.*;
-import net.techbrew.journeymap.ui.ScrollPane;
-import net.techbrew.journeymap.ui.TextField;
 import net.techbrew.journeymap.ui.map.MapOverlay;
+import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.lwjgl.input.Keyboard;
 
-import java.awt.*;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Random;
+import java.util.*;
 
 public class WaypointManager extends JmUI {
 
-    String labelName = Constants.getString("Waypoint.name");
-    String locationTitle = Constants.getString("Waypoint.location");
-    String colorTitle = Constants.getString("Waypoint.color");
-    String dimensionsTitle = Constants.getString("Waypoint.dimensions");
-    String labelX = Constants.getString("Waypoint.x");
-    String labelY = Constants.getString("Waypoint.y");
-    String labelZ = Constants.getString("Waypoint.z");
-    String labelR = Constants.getString("Waypoint.r");
-    String labelG = Constants.getString("Waypoint.g");
-    String labelB = Constants.getString("Waypoint.b");
+    final static String ASCEND = Constants.getString("JourneyMap.char_uparrow");
+    final static String DESCEND = Constants.getString("JourneyMap.char_downarrow");
 
-	private enum ButtonEnum {Randomize, Enable, Remove, Reset, Save};
+	private enum ButtonEnum {Add, Find, SortName, SortDistance, Dimensions, Close};
 
-    private final TextureImpl wpTexture;
-    private final TextureImpl colorPickTexture;
+    protected int rowHeight = 16;
+    protected int colWaypoint = 0;
+    protected int colLocation = 20;
+    protected int colName = 60;
 
-    private Button buttonRandomize;
-    private Button buttonEnable;
-    private Button buttonRemove;
-    private Button buttonReset;
-    private Button buttonSave;
+    protected Boolean canUserTeleport;
 
-    private TextField fieldName;
-    private TextField fieldR;
-    private TextField fieldG;
-    private TextField fieldB;
-    private TextField fieldX;
-    private TextField fieldY;
-    private TextField fieldZ;
+    private SortButton buttonSortName, buttonSortDistance;
+    private DimensionsButton buttonDimensions;
+    private Button buttonClose, buttonAdd;
 
-    private ArrayList<GuiTextField> fieldList = new ArrayList<GuiTextField>();
+    private ButtonList bottomButtons;
 
-    private ArrayList<DimensionButton> dimButtonList = new ArrayList<DimensionButton>();
-    private ScrollPane dimScrollPane;
+    private ArrayList<WaypointManagerItem> items = new ArrayList<WaypointManagerItem>();
 
-    private Color currentColor;
-    private Random random = new Random();
-    private Rectangle2D.Double colorPickRect;
-    private BufferedImage colorPickImg;
+    private ScrollPane itemScrollPane;
 
-	public WaypointManager() {
-		super(Constants.getString("Waypoint.manage"));
+    private WaypointManagerItem.Sort currentSort;
 
-        this.wpTexture = TextureCache.instance().getWaypoint();
-        this.colorPickTexture = TextureCache.instance().getColorPicker();
-        this.colorPickRect = new Rectangle2D.Double(0,0,colorPickTexture.width, colorPickTexture.height);
-        this.colorPickImg = colorPickTexture.getImage();
-        Keyboard.enableRepeatEvents(true);
+	public WaypointManager()
+    {
+		super(Constants.getString("Waypoint.manage_title"));
 	}
 
 	/**
@@ -84,39 +56,79 @@ public class WaypointManager extends JmUI {
     @Override
 	public void initGui()
     {
-        if(this.fieldList.isEmpty())
+        try
         {
-            FontRenderer fr = getFontRenderer();
+            if (canUserTeleport == null)
+            {
+                if (mc.thePlayer.capabilities.isCreativeMode)
+                {
+                    canUserTeleport = true;
+                } else
+                {
+                    CommandServerTp command = new CommandServerTp();
+                    canUserTeleport = command.canCommandSenderUseCommand(mc.thePlayer);
+                }
+            }
 
+            if (this.buttonList.isEmpty())
+            {
+                FontRenderer fr = getFontRenderer();
 
-            dimScrollPane = new ScrollPane(mc, 0, 0 , dimButtonList);
+                if (buttonSortDistance == null)
+                {
+                    WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(mc.thePlayer, true);
+                    String distanceLabel = Constants.getString("Waypoint.distance");
+                    buttonSortDistance = new SortButton(ButtonEnum.SortDistance, distanceLabel, distanceSort);
+                    buttonSortDistance.setTextOnly(fr);
+                    colName = Math.max(colName, colLocation + buttonSortDistance.getWidth() + 5);
+                }
+                buttonList.add(buttonSortDistance);
+
+                if (buttonSortName == null)
+                {
+                    WaypointManagerItem.Sort nameSort = new WaypointManagerItem.NameComparator(true);
+                    buttonSortName = new SortButton(ButtonEnum.SortName, Constants.getString("Waypoint.name"), nameSort);
+                    buttonSortName.setTextOnly(fr);
+                }
+                buttonList.add(buttonSortName);
+
+                if (buttonDimensions == null)
+                {
+                    buttonDimensions = new DimensionsButton(ButtonEnum.Dimensions.ordinal());
+                }
+                buttonList.add(buttonDimensions);
+
+                if (buttonAdd == null)
+                {
+                    buttonAdd = new Button(ButtonEnum.Add, Constants.getString("Waypoint.new"));
+                    buttonAdd.fitWidth(getFontRenderer());
+                    buttonAdd.setWidth(buttonAdd.getWidth() * 2);
+                }
+                buttonList.add(buttonAdd);
+
+                buttonClose = new Button(ButtonEnum.Close, Constants.getString("MapOverlay.close"));
+                //buttonClose.fitWidth(getFontRenderer());
+                buttonList.add(buttonClose);
+
+                bottomButtons = new ButtonList(buttonDimensions, buttonAdd, buttonClose);
+            }
+
+            if (this.items.isEmpty())
+            {
+                updateItems();
+                updateSort(buttonSortName);
+            }
+
+            if (itemScrollPane == null)
+            {
+                itemScrollPane = new ScrollPane(mc, 0, 0, items, rowHeight, 2);
+                itemScrollPane.setShowFrame(false);
+            }
         }
-
-        if(this.buttonList.isEmpty())
+        catch(Throwable t)
         {
-            String on = Constants.getString("MapOverlay.on");
-            String off = Constants.getString("MapOverlay.off");
-            String enableOn = Constants.getString("Waypoint.enable", on);
-            String enableOff = Constants.getString("Waypoint.enable", off);
-
-            buttonRandomize = new Button(ButtonEnum.Randomize.ordinal(),0,0,Constants.getString("Waypoint.randomize")); //$NON-NLS-1$
-
-            buttonEnable = new Button(ButtonEnum.Enable.ordinal(),0,0, enableOn, enableOff, true); //$NON-NLS-1$
-            buttonEnable.setToggled(waypoint.getEnable());
-
-            String closeLabel = isNew ? "Waypoint.cancel" : "Waypoint.remove";
-            buttonRemove = new Button(ButtonEnum.Remove.ordinal(),0,0,Constants.getString(closeLabel)); //$NON-NLS-1$
-
-            buttonReset = new Button(ButtonEnum.Reset.ordinal(),0,0,Constants.getString("Waypoint.reset")); //$NON-NLS-1$
-
-            buttonSave = new Button(ButtonEnum.Save.ordinal(),0,0,Constants.getString("Waypoint.save")); //$NON-NLS-1$
-            buttonSave.noDisableText = true;
-
-            buttonList.add(buttonEnable);
-            buttonList.add(buttonRandomize);
-            buttonList.add(buttonRemove);
-            buttonList.add(buttonReset);
-            buttonList.add(buttonSave);
+            JourneyMap.getLogger().severe(LogFormatter.toString(t));
+            UIManager.getInstance().closeAll();
         }
     }
     
@@ -127,101 +139,25 @@ public class WaypointManager extends JmUI {
     protected void layoutButtons() {
 		// Buttons
 
-        initGui();
-        final FontRenderer fr = getFontRenderer();
+        //initGui();
 
-        // Margins
-        final int vpad = 5;
-        final int hgap = fr.getStringWidth("X")*3;
-        final int vgap = fieldX.getHeight() + vpad;
-        final int startY = Math.max(45, this.height/5);
+        // Header buttons
+        int pad = 3;
+        final int headerY = headerHeight + pad;
+        final int headerX = itemScrollPane.getX();
+        buttonSortName.setPosition(headerX + colName, headerY);
+        buttonSortDistance.setPosition(headerX + colLocation, headerY);
 
-        // Determine dimension button spacing requirement
-        int dcw = fr.getStringWidth(dimensionsTitle);
-        dcw = 8 + Math.max(dcw, dimScrollPane.getFitWidth(fr));
+        // Scroll pane
+        int hgap = 4;
+        int vgap = 5;
+        int bottomButtonsHeight = buttonClose.getHeight() + (vgap*2);
+        final int startY = headerHeight + vgap + getFontRenderer().FONT_HEIGHT;
+        int scrollWidth = this.width-6;
+        itemScrollPane.position(scrollWidth, this.height, startY, bottomButtonsHeight, 0, 0);
 
-        // Set column dimensions
-        final int leftWidth = hgap*2 + fieldX.getWidth() + fieldY.getWidth() + fieldZ.getWidth();
-        final int rightWidth = dcw;
-        final int totalWidth = leftWidth + 10 + rightWidth;
-        final int leftX = ((this.width - totalWidth)/2);
-        final int leftXEnd = leftX + leftWidth;
-        final int rightX = leftXEnd + 10;
-        final int rightXEnd = rightX + rightWidth;
-
-        // Left column starting Y
-        int leftRow = startY;
-        drawLabel(labelName, leftX, leftRow);
-        leftRow+=12;
-        fieldName.setWidth(leftWidth);
-        fieldName.setX(leftX);
-        fieldName.setY(leftRow);
-        if(!fieldName.isFocused())
-        {
-            fieldName.setSelectionPos(fieldName.getText().length());
-        }
-        fieldName.drawTextBox();
-
-        // Coordinates
-        leftRow+=vgap+vpad;
-        drawLabel(locationTitle, leftX, leftRow);
-        leftRow+=12;
-        drawLabelAndField(labelX, fieldX, leftX, leftRow);
-        drawLabelAndField(labelZ, fieldZ, fieldX.getX() + fieldX.getWidth() + hgap, leftRow);
-        drawLabelAndField(labelY, fieldY, fieldZ.getX() + fieldZ.getWidth() + hgap, leftRow);
-
-        // Color
-        leftRow+=vgap+vpad;
-        drawLabel(colorTitle, leftX, leftRow);
-        leftRow+=12;
-        drawLabelAndField(labelR, fieldR, leftX, leftRow);
-        drawLabelAndField(labelG, fieldG, fieldR.getX() + fieldR.getWidth() + hgap, leftRow);
-        drawLabelAndField(labelB, fieldB, fieldG.getX() + fieldG.getWidth() + hgap, leftRow);
-        buttonRandomize.setWidth(4 + Math.max(fieldB.getX()+fieldB.getWidth() - fieldR.getX(), 10 + fr.getStringWidth(buttonRandomize.displayString)));
-        buttonRandomize.setPosition(fieldR.getX()-2, leftRow += vgap);
-
-        // Color picker
-        int cpY = fieldB.getY();
-        int cpSize = buttonRandomize.getY() + buttonRandomize.getHeight() - cpY - 2;
-        int cpHAreaX = fieldB.getX() + fieldB.getWidth();
-        int cpHArea = (fieldName.getX() + fieldName.getWidth()) - (cpHAreaX);
-        int cpX = cpHAreaX + (cpHArea-cpSize);
-        drawColorPicker(cpX, cpY, cpSize);
-
-        // WP icon
-        int iconX = cpHAreaX + ((cpX - cpHAreaX)/2) - (wpTexture.width/2) + 1;
-        int iconY = buttonRandomize.getY() - vpad/2;
-        drawWaypoint(iconX, iconY);
-
-        // Enable
-        leftRow += (vgap);
-        buttonEnable.fitWidth(fr);
-        buttonEnable.setWidth(Math.max(leftWidth / 2, buttonEnable.getWidth()));
-        buttonEnable.setPosition(leftX - 2, leftRow);
-
-        // Reset
-        buttonReset.setWidth(leftWidth - buttonEnable.getWidth() - 2);
-        buttonReset.setPosition(leftXEnd - buttonReset.getWidth() + 2, leftRow);
-
-        // Dimensions column
-        int rightRow = startY;
-
-        // Dimensions label
-        drawLabel(dimensionsTitle, rightX, rightRow);
-        rightRow += (12);
-
-        // Dimension buttons in the scroll pane
-        int scrollHeight = (buttonReset.getY() + buttonReset.getHeight() -2) - rightRow;
-        dimScrollPane.position(dcw, scrollHeight, 0, scrollHeight, rightX, rightRow);
-
-        // Remove(Cancel) / Save
-        int totalRow = Math.max(leftRow + vgap, rightRow + vgap);
-
-        buttonRemove.setWidth((totalWidth / 2) - 4);
-        buttonRemove.setPosition(leftX -2, totalRow);
-
-        buttonSave.setWidth((totalWidth / 2) - 4);
-        buttonSave.setPosition(rightXEnd + 3 - buttonSave.getWidth(), totalRow);
+        // Bottom buttons
+        bottomButtons.layoutCenteredHorizontal(this.width/2, this.height - bottomButtonsHeight + vgap, true, hgap);
 	}
 
     @Override
@@ -230,7 +166,7 @@ public class WaypointManager extends JmUI {
         drawBackground(0);
         layoutButtons();
 
-        dimScrollPane.drawScreen(x, y, par3);
+        itemScrollPane.drawScreen(x, y, par3);
 
         for (int k = 0; k < this.buttonList.size(); ++k)
         {
@@ -238,50 +174,8 @@ public class WaypointManager extends JmUI {
             guibutton.drawButton(this.mc, x, y);
         }
 
-        drawLogo();
         drawTitle();
-    }
-
-    protected void drawWaypoint(int x, int y)
-    {
-        DrawUtil.drawColoredImage(wpTexture, 255, currentColor, x, y - (wpTexture.height / 2));
-    }
-
-    protected void drawColorPicker(int x, int y, float size)
-    {
-        int sizeI = (int) size;
-        drawRect(x - 1, y - 1, x + sizeI + 1, y + sizeI + 1, -6250336);
-
-        if(colorPickRect.width!=size) {
-            // Updated scaled image only when necessary
-            Image image = colorPickTexture.getImage().getScaledInstance(sizeI, sizeI, Image.SCALE_FAST);
-            colorPickImg = new BufferedImage(sizeI, sizeI, BufferedImage.TYPE_INT_RGB);
-
-            Graphics g = colorPickImg.createGraphics();
-            g.drawImage(image, 0, 0, sizeI, sizeI, null);
-            g.dispose();
-        }
-        colorPickRect.setRect(x, y, size, size);
-        float scale = size / colorPickTexture.width;
-        DrawUtil.drawImage(colorPickTexture, x, y, false, scale);
-
-
-        //drawRect(x, y, x + sizeI, y + sizeI, -16777216);
-    }
-
-    protected void drawLabelAndField(String label, TextField field, int x, int y)
-    {
-        field.setX(x);
-        field.setY(y);
-        FontRenderer fr = getFontRenderer();
-        int width = fr.getStringWidth(label) + 4;
-        drawString(getFontRenderer(), label, x - width, y + (field.getHeight()-8)/2, Color.lightGray.getRGB());
-        field.drawTextBox();
-    }
-
-    protected void drawLabel(String label, int x, int y)
-    {
-        drawString(getFontRenderer(), label, x , y , Color.lightGray.getRGB());
+        drawLogo();
     }
 
     protected void keyTyped(char par1, int par2)
@@ -289,153 +183,225 @@ public class WaypointManager extends JmUI {
         switch(par2)
         {
             case Keyboard.KEY_ESCAPE :
-                UIManager.getInstance().openMap();
+                refreshAndClose();
                 return;
-            case Keyboard.KEY_RETURN :
-                save();
-                return;
-            case Keyboard.KEY_TAB :
-                validate();
-                onTab();
-                return;
+            // TODO: Arrow keys
             default:
                 break;
         }
-
-        for(GuiTextField field : fieldList) {
-            boolean done = field.textboxKeyTyped(par1, par2);
-            if(done) break;
-        }
-
-        validate();
-    }
-
-    @Override
-    protected void mouseClickMove(int par1, int par2, int par3, long par4) {
-        checkColorPicker(par1, par2);
     }
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        for(GuiTextField field : fieldList) {
-            field.mouseClicked(mouseX, mouseY, mouseButton);
-        }
-
-        checkColorPicker(mouseX, mouseY);
-
-        Button button = dimScrollPane.mouseClicked(mouseX, mouseY, mouseButton);
-        if(button!=null)
-        {
-            actionPerformed(button);
-        }
-    }
-
-    protected void checkColorPicker(int mouseX, int mouseY) {
-        if(colorPickRect.contains(mouseX, mouseY)) {
-            int x = mouseX - (int) colorPickRect.x;
-            int y = mouseY - (int) colorPickRect.y;
-            setFormColor(new Color(colorPickImg.getRGB(x, y)));
-        }
-    }
-
-    protected void setFormColor(Color color) {
-        currentColor = color;
-        fieldR.setText(Integer.toString(color.getRed()));
-        fieldG.setText(Integer.toString(color.getGreen()));
-        fieldB.setText(Integer.toString(color.getBlue()));
+        itemScrollPane.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
-    protected void actionPerformed(GuiButton guibutton) { // actionPerformed
-
-        if(dimButtonList.contains(guibutton)) {
-            DimensionButton dimButton = (DimensionButton) guibutton;
-            dimButton.toggle();
-        } else {
-            final ButtonEnum id = ButtonEnum.values()[guibutton.id];
-            switch(id) {
-
-                case Randomize: {
-                    setFormColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
-                    break;
-                }
-                case Enable: {
-                    buttonEnable.toggle();
-                    break;
-                }
-                case Remove: {
-                    WaypointHelper.removeNative(waypoint);
-                    refreshAndClose();
-                    break;
-                }
-                case Reset: {
-                    initGui();
-                    break;
-                }
-                case Save: {
-                    save();
-                    break;
-                }
+    protected void actionPerformed(GuiButton guibutton)
+    {
+        switch(ButtonEnum.values()[guibutton.id])
+        {
+            case Close :
+            {
+                refreshAndClose();
+                return;
+            }
+            case SortName :
+            {
+                updateSort(buttonSortName);
+                return;
+            }
+            case SortDistance:
+            {
+                updateSort(buttonSortDistance);
+                return;
+            }
+            case Dimensions:
+            {
+                buttonDimensions.toggle();
+                updateItems();
+                return;
+            }
+            case Add:
+            {
+                Waypoint waypoint = Waypoint.of(mc.thePlayer);
+                UIManager.getInstance().openWaypointEditor(waypoint, true, WaypointManager.class);
+                return;
             }
         }
 	}
 
-    protected void onTab()
+    public void removeWaypoint(WaypointManagerItem item)
     {
-        boolean focusNext = false;
-        boolean foundFocus = false;
-        for(GuiTextField field : fieldList) {
-            if(focusNext)
-            {
-                field.setFocused(true);
-                foundFocus = true;
-                break;
-            }
-            if(field.isFocused())
-            {
-                field.setFocused(false);
-                focusNext = true;
-            }
-        }
-        if(!foundFocus) fieldList.get(0).setFocused(true);
+        WaypointStore.instance().remove(item.waypoint);
+        this.items.remove(item);
     }
 
-    protected boolean validate()
+    protected void updateItems()
     {
-        boolean valid = true;
-        valid = fieldName.hasMinLength();
-        this.buttonSave.enabled = valid;
-        return valid;
-    }
+        items.clear();
+        Integer currentDim = buttonDimensions.currentDim;
+        FontRenderer fr = getFontRenderer();
 
-    protected void save()
-    {
-        if(!validate()) return;
-        updateWaypointFromForm();
-        WaypointHelper.addNative(waypoint);
-        refreshAndClose();
-    }
-
-    protected void updateWaypointFromForm()
-    {
-        waypoint.setColor(currentColor);
-
-        ArrayList<Integer> dims = new ArrayList<Integer>();
-        for(DimensionButton db : dimButtonList)
+        Collection<Waypoint> waypoints = WaypointStore.instance().getAll();
+        for(Waypoint waypoint : waypoints)
         {
-            if(db.getToggled()) dims.add(db.dimension);
+            WaypointManagerItem item = new WaypointManagerItem(waypoint, fr, this);
+            item.getDistanceSqToEntity(mc.thePlayer);
+            if(currentDim==null || item.waypoint.getDimensions().contains(currentDim))
+            {
+                items.add(item);
+            }
         }
-        waypoint.setDimensions(dims);
-        waypoint.setDisplay(fieldName.getText());
-        waypoint.setEnable(buttonEnable.getToggled());
-        waypoint.setName(fieldName.getText());
-        waypoint.setLocation(Integer.parseInt(fieldX.getText()), Integer.parseInt(fieldY.getText()), Integer.parseInt(fieldZ.getText()));
+
+        if(currentSort!=null)
+        {
+            Collections.sort(items, currentSort);
+        }
+    }
+
+    protected void updateSort(SortButton sortButton)
+    {
+        for(Button button : (List<Button>) buttonList)
+        {
+            if(button instanceof SortButton)
+            {
+                if(button == sortButton)
+                {
+                    if(currentSort==sortButton.sort)
+                    {
+                        sortButton.toggle();
+                    }
+                    else
+                    {
+                        sortButton.setActive(true);
+                    }
+                    currentSort = sortButton.sort;
+                }
+                else
+                {
+                    ((SortButton) button).setActive(false);
+                }
+            }
+        }
+
+        if(currentSort!=null)
+        {
+            Collections.sort(items, currentSort);
+        }
     }
 
     protected void refreshAndClose() {
         DataCache.instance().forceRefresh(WaypointsData.class);
         MapOverlay.state().requireRefresh();
         UIManager.getInstance().openMap();
+    }
+
+    protected class SortButton extends Button
+    {
+        final WaypointManagerItem.Sort sort;
+        final String labelInactive;
+
+        public SortButton(Enum enumValue, String label, WaypointManagerItem.Sort sort)
+        {
+            super(enumValue.ordinal(), 0, 0, String.format("%s %s", label, ASCEND), String.format("%s %s", label, DESCEND), sort.ascending);
+            this.labelInactive = label;
+            this.sort = sort;
+        }
+
+        @Override
+        public void toggle()
+        {
+            sort.ascending = !sort.ascending;
+            setActive(true);
+        }
+
+        @Override
+        public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
+        {
+            super.drawButton(minecraft, mouseX, mouseY);
+            if (!drawButton)
+            {
+                return;
+            }
+            DrawUtil.drawRectangle(xPosition,yPosition+height,width,1, Button.smallFrameColorDark, 255);
+        }
+
+        public void setActive(boolean active)
+        {
+            if(active)
+            {
+                setToggled(sort.ascending);
+            }
+            else
+            {
+                displayString = String.format("%s %s", labelInactive, " ");
+            }
+        }
+    }
+
+    protected class DimensionsButton extends Button
+    {
+        final Integer[] dimensions;
+        Integer currentDim;
+
+        public DimensionsButton(int id)
+        {
+            super(id, 0, 0, "");
+            dimensions = WorldData.getDimensions();
+            currentDim = Minecraft.getMinecraft().thePlayer.dimension;
+            updateLabel();
+
+            // Determine width
+            int maxWidth = 0;
+            for(Integer dim : dimensions)
+            {
+                String name = Constants.getString("Waypoint.dimension", WorldData.getDimensionName(dim));
+                maxWidth = Math.max(maxWidth, getFontRenderer().getStringWidth(name));
+            }
+            this.width = maxWidth+12;
+        }
+
+        protected void updateLabel()
+        {
+            String dimName;
+
+            if(currentDim!=null)
+            {
+                dimName = WorldData.getDimensionName(currentDim);
+            }
+            else
+            {
+                dimName = Constants.getString("Waypoint.dimension_all");
+            }
+            displayString = Constants.getString("Waypoint.dimension", dimName);
+        }
+
+        @Override
+        public void toggle()
+        {
+            int index;
+
+            if(currentDim==null)
+            {
+                index = 0;
+            }
+            else
+            {
+                index = Arrays.binarySearch(dimensions, currentDim) + 1;
+            }
+
+            if(index==dimensions.length || index==-1)
+            {
+                currentDim = null;
+            }
+            else
+            {
+                currentDim = dimensions[index];
+            }
+
+            updateLabel();
+        }
     }
 }

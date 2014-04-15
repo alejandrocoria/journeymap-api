@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.render.overlay;
 
+import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
@@ -36,23 +37,23 @@ public class OverlayWaypointRenderer {
 			Color labelColor;
 			boolean inbounds;			
 			TextureCache tc = TextureCache.instance();
+            final int dimension = Minecraft.getMinecraft().thePlayer.dimension;
+            final int netherOffset = (dimension==-1) ? 8 : 1;
 
 			for(Waypoint waypoint : waypoints) {
-				wx = waypoint.getX();
-				wz = waypoint.getZ();
+				wx = waypoint.getX() * netherOffset;
+				wz = waypoint.getZ() * netherOffset;
 				color = waypoint.getColor();
 
                 // Draw marker
                 TextureImpl texture = null;
-                if(waypoint.getType()==Waypoint.TYPE_DEATH) { // death spot
+                if(waypoint.getType()==Waypoint.Type.Death) { // death spot
                     texture = tc.getDeathpoint();
                 } else {
                     texture = tc.getWaypoint();
                 }
-                labelColor = (waypoint.getType()==Waypoint.TYPE_DEATH) ? Color.red : color;
-                double xOffset = wx < 0 ? -.5 : .5;
-                double zOffset = wz < 0 ? -.5 : .5;
-                drawStepList.add(new DrawWayPointStep(wx + xOffset, wz + zOffset, texture, tc.getWaypointOffscreen(), waypoint.getName(), color, labelColor, 255, fontScale));
+                labelColor = (waypoint.getType()==Waypoint.Type.Death) ? Color.red : color;
+                drawStepList.add(new DrawWayPointStep(wx, wz, texture, tc.getWaypointOffscreen(), waypoint.getName(), color, labelColor, 220, fontScale));
 			}
 		} catch(Throwable t) {
 			JourneyMap.getLogger().severe("Error during prepareSteps: " + LogFormatter.toString(t));

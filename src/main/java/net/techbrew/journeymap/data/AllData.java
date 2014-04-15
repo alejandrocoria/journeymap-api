@@ -1,7 +1,7 @@
 package net.techbrew.journeymap.data;
 
 import net.techbrew.journeymap.io.PropertyManager;
-import net.techbrew.journeymap.model.WaypointHelper;
+import net.techbrew.journeymap.waypoint.WaypointHelper;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;

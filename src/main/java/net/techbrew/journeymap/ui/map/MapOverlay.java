@@ -4,6 +4,7 @@ package net.techbrew.journeymap.ui.map;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.techbrew.journeymap.Constants;
@@ -18,6 +19,7 @@ import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.EntityHelper;
 import net.techbrew.journeymap.model.MapOverlayState;
+import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -27,8 +29,9 @@ import net.techbrew.journeymap.render.overlay.OverlayWaypointRenderer;
 import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
+import net.techbrew.journeymap.ui.Button;
+import net.techbrew.journeymap.ui.ButtonList;
 import net.techbrew.journeymap.ui.JmUI;
-import net.techbrew.journeymap.ui.MapButton;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.layer.LayerDelegate;
 import org.lwjgl.input.Keyboard;
@@ -36,6 +39,7 @@ import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,7 +57,7 @@ public class MapOverlay extends JmUI {
 	final static GridRenderer gridRenderer = new GridRenderer(5);
     final LayerDelegate layerDelegate = new LayerDelegate();
 
-	private enum ButtonEnum{Alert,DayNight,Follow,ZoomIn,ZoomOut,Options,Actions,Close,MiniMap}
+	private enum ButtonEnum{Alert,DayNight,Follow,ZoomIn,ZoomOut,Options,Actions,Close,Mode,WaypointManager}
 	
 	Boolean isScrolling = false;
 	int msx, msy, mx, my;
@@ -61,9 +65,11 @@ public class MapOverlay extends JmUI {
 	Logger logger = JourneyMap.getLogger();
 	MapChat chat;
 	
-	MapButton buttonDayNight, buttonFollow, buttonZoomIn, buttonZoomOut;
-	MapButton buttonAlert, buttonOptions, buttonActions, buttonClose;
-    MapButton buttonMiniMap;
+	Button buttonDayNight, buttonFollow, buttonZoomIn, buttonZoomOut;
+	Button buttonAlert, buttonOptions, buttonActions, buttonClose;
+    Button buttonMode, buttonWaypointManager;
+
+    ButtonList rightButtons;
 	
 	Color bgColor = new Color(0x22, 0x22, 0x22);
 	Color playerInfoFgColor = Color.lightGray;
@@ -105,6 +111,7 @@ public class MapOverlay extends JmUI {
 			drawMap();
 
             layoutButtons();
+            //ButtonList.drawOutlines(1, Color.black, 96, buttonList);
             for (int k = 0; k < this.buttonList.size(); ++k)
             {
                 GuiButton guibutton = (GuiButton)this.buttonList.get(k);
@@ -159,6 +166,9 @@ public class MapOverlay extends JmUI {
 				UIManager.getInstance().openMapActions();
 				break;
 			}
+            case WaypointManager: {
+                UIManager.getInstance().openWaypointManager();
+            }
 		}
 	}
 
@@ -187,34 +197,50 @@ public class MapOverlay extends JmUI {
 	 */
 	void initButtons() {
         if(buttonList.isEmpty()) {
+
+            FontRenderer fr = getFontRenderer();
+
             String on = Constants.getString("MapOverlay.on"); //$NON-NLS-1$
             String off = Constants.getString("MapOverlay.off"); //$NON-NLS-1$
 
-            buttonAlert = new MapButton(ButtonEnum.Alert.ordinal(),0,0, Constants.getString("MapOverlay.update_available")); //$NON-NLS-1$
+            buttonAlert = new Button(ButtonEnum.Alert.ordinal(),0,0, Constants.getString("MapOverlay.update_available")); //$NON-NLS-1$
+            buttonAlert.fitWidth(fr);
             buttonAlert.drawButton = VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent();
 
-            buttonDayNight = new MapButton(ButtonEnum.DayNight.ordinal(),0,0,80,20,
+            buttonDayNight = new Button(ButtonEnum.DayNight.ordinal(),0,0,80,20,
                     Constants.getString("MapOverlay.day"), //$NON-NLS-1$
                     Constants.getString("MapOverlay.night"), //$NON-NLS-1$
                     state.getMapType() == Constants.MapType.day);
+            buttonDayNight.fitWidth(fr);
 
-            buttonFollow = new MapButton(ButtonEnum.Follow.ordinal(),0,0,80,20,
+            buttonFollow = new Button(ButtonEnum.Follow.ordinal(),0,0,80,20,
                     Constants.getString("MapOverlay.follow", on), //$NON-NLS-1$
                     Constants.getString("MapOverlay.follow", off), //$NON-NLS-1$
                     state.follow); //$NON-NLS-1$ //$NON-NLS-2$
+            buttonFollow.fitWidth(fr);
 
-            buttonZoomIn  = new MapButton(ButtonEnum.ZoomIn.ordinal(),0,0,20,20, "+"); //$NON-NLS-1$ //$NON-NLS-2$
+            buttonZoomIn  = new Button(ButtonEnum.ZoomIn.ordinal(),0,0,20,20, "+"); //$NON-NLS-1$ //$NON-NLS-2$
             buttonZoomIn.noDisableText = true;
 
-            buttonZoomOut = new MapButton(ButtonEnum.ZoomOut.ordinal(),0,0,20,20, "-"); //$NON-NLS-1$ //$NON-NLS-2$
+            buttonZoomOut = new Button(ButtonEnum.ZoomOut.ordinal(),0,0,20,20, "-"); //$NON-NLS-1$ //$NON-NLS-2$
             buttonZoomOut.noDisableText = true;
 
             buttonZoomOut.enabled = state.currentZoom>state.minZoom;
             buttonZoomIn.enabled = state.currentZoom<state.maxZoom;
 
-            buttonClose   = new MapButton(ButtonEnum.Close.ordinal(),0,0,60,20,Constants.getString("MapOverlay.close")); //$NON-NLS-1$
-            buttonOptions = new MapButton(ButtonEnum.Options.ordinal(),0,0,60,20, Constants.getString("MapOverlay.options")); //$NON-NLS-1$
-            buttonActions = new MapButton(ButtonEnum.Actions.ordinal(),0,0,60,20, Constants.getString("MapOverlay.actions")); //$NON-NLS-1$
+            buttonClose   = new Button(ButtonEnum.Close.ordinal(),0,0,60,20,Constants.getString("MapOverlay.close")); //$NON-NLS-1$
+            buttonClose.fitWidth(fr);
+
+            buttonOptions = new Button(ButtonEnum.Options.ordinal(),0,0,60,20, Constants.getString("MapOverlay.options")); //$NON-NLS-1$
+            buttonOptions.fitWidth(fr);
+            buttonActions = new Button(ButtonEnum.Actions.ordinal(),0,0,60,20, Constants.getString("MapOverlay.actions")); //$NON-NLS-1$
+            buttonActions.fitWidth(fr);
+
+//            buttonMode = new Button(ButtonEnum.Mode.ordinal(),0,0,60,20, Constants.getString("MapOverlay.mode")); //$NON-NLS-1$
+//            buttonMode.fitWidth(fr);
+
+            buttonWaypointManager = new Button(ButtonEnum.WaypointManager.ordinal(),0,0,60,20, Constants.getString("Waypoint.waypoints")); //$NON-NLS-1$
+            buttonWaypointManager.fitWidth(fr);
 
             if(buttonAlert.drawButton) {
                 buttonList.add(buttonAlert);
@@ -226,6 +252,12 @@ public class MapOverlay extends JmUI {
             buttonList.add(buttonClose);
             buttonList.add(buttonOptions);
             buttonList.add(buttonActions);
+            buttonList.add(buttonWaypointManager);
+
+            rightButtons = new ButtonList(buttonAlert, buttonWaypointManager, buttonOptions, buttonActions, buttonClose);
+            Collections.reverse(rightButtons);
+
+            //ButtonList.setHeights(mc.fontRenderer.FONT_HEIGHT+5, buttonList);
         }
 	}
 
@@ -238,48 +270,39 @@ public class MapOverlay extends JmUI {
 		if(buttonList.isEmpty()) {
 			initButtons();
 		}
-		final boolean smallScale = (mc.gameSettings.guiScale==1);
-		final int startX = smallScale ? 60 : 40;
+
+		final int startX = 40;
 		final int endX = width - 3;
 		final int startY = 3;
 		final int hgap = 3;
 		final int vgap = 3;
 
-		buttonDayNight.setPosition(startX,startY);		
-		buttonZoomIn.setPosition(smallScale ? 20 : 8, smallScale ? 64 : 32);
-		buttonZoomOut.below(buttonZoomIn, 8).setX(buttonZoomIn.getX());
-		
-		if(width>=420) { // across top
-			
-			buttonFollow.rightOf(buttonDayNight, hgap).setY(startY);
-			
-			buttonClose.leftOf(endX).setY(startY);
-			buttonActions.leftOf(buttonClose, hgap).setY(startY);
-			buttonOptions.leftOf(buttonActions, hgap).setY(startY);
-			
-			if(buttonAlert.drawButton) {
-				buttonAlert.below(buttonClose, vgap).leftOf(endX);
-			}
-			
-		} else { // down right
-			
-			buttonFollow.below(buttonDayNight, hgap).setX(startX);
-			
-			if(buttonAlert.drawButton) {
-				buttonAlert.leftOf(endX).setY(startY);
-				buttonClose.leftOf(endX).below(buttonAlert, vgap);
-			} else {
-				buttonClose.leftOf(endX).setY(startY);
-			}
-			
-			buttonActions.below(buttonClose, hgap).leftOf(endX);
-			buttonOptions.below(buttonActions, hgap).leftOf(endX);
-			
-		}
-		
-		final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
-		buttonDayNight.enabled = !(underground && PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_CAVES));
-	
+        buttonZoomIn.setPosition(8, 32);
+        buttonZoomOut.below(buttonZoomIn, 8).setX(8);
+
+        final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
+        buttonDayNight.enabled = !(underground && PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_CAVES));
+		buttonDayNight.setPosition(startX,startY);
+
+        buttonFollow.rightOf(buttonDayNight, hgap).setY(startY);
+
+        int rightX = buttonFollow.getX()+buttonFollow.getWidth()+hgap+hgap;
+        if(rightX <= width - rightButtons.getWidth(hgap))
+        {
+            if(!rightButtons.isHorizontal())
+            {
+                rightButtons.setFitWidths(mc.fontRenderer);
+            }
+            rightButtons.layoutHorizontal(endX, startY, false, hgap);
+        }
+        else
+        {
+            if(rightButtons.isHorizontal())
+            {
+                rightButtons.setUniformWidths(mc.fontRenderer);
+            }
+            rightButtons.layoutVertical(endX, startY, false, vgap);
+        }
 	}
 
 	@Override
@@ -327,8 +350,12 @@ public class MapOverlay extends JmUI {
 					break;
 				}
 			}
-
 		}
+        if(!guiButtonUsed)
+        {
+            BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(mouseX, mouseY, width, height);
+            layerDelegate.onMouseClicked(mc, gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord, mouseButton);
+        }
 	}
 
 	@Override
@@ -424,66 +451,66 @@ public class MapOverlay extends JmUI {
 			return;
 		}
 
-        if(i==Keyboard.KEY_ESCAPE || i==Constants.KB_MAP.getKeyCode()) {
+        if(i==Keyboard.KEY_ESCAPE) {
             UIManager.getInstance().closeAll();
             return;
         }
-        else if(i==Constants.KB_MAP_ZOOMIN.getKeyCode()) {
+        else if(i==Constants.KB_MAP_ZOOMIN.keyCode) {
             zoomIn();
             return;
         }
-        else if(i==Constants.KB_MAP_ZOOMOUT.getKeyCode()) {
+        else if(i==Constants.KB_MAP_ZOOMOUT.keyCode) {
             zoomOut();
             return;
         }
-        else if(i==Constants.KB_MAP_DAY.getKeyCode()) {
+        else if(i==Constants.KB_MAP_DAY.keyCode) {
             state.overrideMapType(Constants.MapType.day);
             return;
         }
-        else if(i==Constants.KB_MAP_NIGHT.getKeyCode()) {
+        else if(i==Constants.KB_MAP_NIGHT.keyCode) {
             state.overrideMapType(Constants.MapType.night);
             return;
         }
 
 		// North
-		if(i==mc.gameSettings.keyBindForward.getKeyCode()) {
+		if(i==mc.gameSettings.keyBindForward.keyCode) { // getkeyCode
 			moveCanvas(0,-16);
 			return;
 		}
 		
 		// West
-		if(i==mc.gameSettings.keyBindLeft.getKeyCode()) {
+		if(i==mc.gameSettings.keyBindLeft.keyCode) {
 			moveCanvas(-16, 0);
 			return;
 		}
 		
 		// South
-		if(mc.gameSettings.keyBindBack.isPressed()) {
+		if(i==mc.gameSettings.keyBindBack.keyCode) {
 			moveCanvas(0,16);
 			return;
 		}
 		
 		// East
-		if(i==mc.gameSettings.keyBindRight.getKeyCode()) {
+		if(i==mc.gameSettings.keyBindRight.keyCode) {
 			moveCanvas(16, 0);
 			return;
 		}
 		
 		// Open inventory
-		if(i==mc.gameSettings.keyBindInventory.getKeyCode()) {
+		if(i==mc.gameSettings.keyBindInventory.keyCode) { // keyBindInventory
 			close();
 			mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
 			return;
 		}
 		
 		// Open chat
-		if(i==mc.gameSettings.keyBindChat.getKeyCode()) {
+		if(i==mc.gameSettings.keyBindChat.keyCode) {
 			openChat("");
 			return;
 		}
 		
 		// Open chat with command prefix (Minecraft.java does this in runTick() )
-		if(i==mc.gameSettings.keyBindCommand.getKeyCode()) {
+		if(i==mc.gameSettings.keyBindCommand.keyCode) {
 			openChat("/");
 			return;
 		}
@@ -548,7 +575,7 @@ public class MapOverlay extends JmUI {
 
         DrawUtil.drawCenteredLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight - 11, playerInfoBgColor, 235, playerInfoFgColor, 255, 1);
 
-        DrawUtil.drawImage(TextureCache.instance().getLogo(), 16, 4, false, 1f);
+        drawLogo();
 
 		sizeDisplay(true);
 
@@ -602,6 +629,18 @@ public class MapOverlay extends JmUI {
 		DrawUtil.drawImage(TextureCache.instance().getLogo(), 16, 4, false, 1f);
 		ui.sizeDisplay(true);
 	}
+
+    public void centerOn(Waypoint waypoint)
+    {
+        if(waypoint.getDimensions().contains(mc.thePlayer.dimension))
+        {
+            state.follow = false;
+            state.requireRefresh();
+            gridRenderer.center(waypoint.getX(), waypoint.getZ(), state.currentZoom);
+            refreshState();
+            updateScreen();
+        }
+    }
 	
 	/**
 	 * Get a snapshot of the player's biome, effective map state, etc.
@@ -632,7 +671,7 @@ public class MapOverlay extends JmUI {
         gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 
 		// Build list of drawSteps
-		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, 1f);
+		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, state.mapFontScale, 1f);
 		
 		// Update player pos
 		state.playerLastPos = Constants.getString("MapOverlay.player_location",

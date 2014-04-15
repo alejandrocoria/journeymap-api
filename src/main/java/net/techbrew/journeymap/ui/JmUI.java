@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
@@ -19,6 +20,8 @@ public abstract class JmUI extends GuiScreen {
     TextureImpl logo = TextureCache.instance().getLogo();
 
     protected final String title;
+    protected final int headerHeight = 25;
+    protected int scaleFactor = 1;
     protected final Logger logger = JourneyMap.getLogger();
 
     public JmUI(String title) {
@@ -28,6 +31,13 @@ public abstract class JmUI extends GuiScreen {
 
     public Minecraft getMinecraft() {
         return this.mc;
+    }
+
+    @Override
+    public void setWorldAndResolution(Minecraft minecraft, int width, int height) {
+        super.setWorldAndResolution(minecraft, width, height);
+        ScaledResolution resolution = new ScaledResolution(minecraft.gameSettings, minecraft.displayWidth, minecraft.displayHeight);
+        this.scaleFactor = resolution.getScaleFactor();
     }
 
 	@Override
@@ -61,12 +71,15 @@ public abstract class JmUI extends GuiScreen {
 
     protected void drawLogo() {
         sizeDisplay(mc.displayWidth, mc.displayHeight);
-        DrawUtil.drawImage(logo, (mc.displayWidth - logo.width) / 2, 20, false, 1f);
+
+        final boolean smallScale = (scaleFactor==1);
+        DrawUtil.drawImage(logo, smallScale ? 8 : 16, 4, false, smallScale ? .5f : 1f);
         sizeDisplay(width, height);
     }
 
     protected void drawTitle() {
-        DrawUtil.drawCenteredLabel(this.title, this.width/2, 40, Color.black, 128, Color.CYAN, 255, 1);
+        DrawUtil.drawRectangle(0, 0, this.width, headerHeight, Color.black, 100);
+        DrawUtil.drawCenteredLabel(this.title, this.width/2, 12, Color.black, 0, Color.CYAN, 255, 1);
     }
 
     @Override
@@ -90,8 +103,8 @@ public abstract class JmUI extends GuiScreen {
             guibutton.drawButton(this.mc, x, y);
         }
 
-        drawLogo();
         drawTitle();
+        drawLogo();
     }
 
     public static void sizeDisplay(double width, double height) {

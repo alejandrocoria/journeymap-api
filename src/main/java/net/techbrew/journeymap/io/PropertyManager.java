@@ -3,8 +3,8 @@ package net.techbrew.journeymap.io;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.model.WaypointHelper;
 import net.techbrew.journeymap.ui.minimap.DisplayVars;
+import net.techbrew.journeymap.waypoint.WaypointHelper;
 
 import java.io.File;
 import java.io.FileReader;
