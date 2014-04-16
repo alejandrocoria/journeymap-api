@@ -41,8 +41,9 @@ public class Tile {
 	private final Logger logger = JourneyMap.getLogger();
 	private final boolean debug = logger.isLoggable(Level.FINE);
 
-	public Tile(final File worldDir, final int tileX, final int tileZ, final int zoom, final int dimension) {
+	public Tile(final File worldDir, final MapType mapType, final int tileX, final int tileZ, final int zoom, final int dimension) {
 		this.worldDir = worldDir;
+        this.lastMapType = mapType;
 		this.tileX = tileX;
 		this.tileZ = tileZ;
 		this.zoom = zoom;
@@ -54,40 +55,35 @@ public class Tile {
 		lrBlock = new Point((lrChunk.chunkXPos*16)+15, (lrChunk.chunkZPos*16)+15);
 	}
 	
-	public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice) {
-        if(futureTex==null) {
-            lastMapType = mapType;
-            lastVSlice = vSlice;
+	public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice)
+    {
+        boolean forceReset = (lastMapType != mapType || lastVSlice != vSlice);
 
-            Integer glId = null;
-            BufferedImage image = null;
-            if(textureImpl!=null) {
-                glId = textureImpl.getGlTextureId();
-                image = textureImpl.getImage();
-            }
-            futureTex = TextureCache.instance().prepareImage(glId, image, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE);
-            return true;
-        } else {
+        if(futureTex != null && forceReset)
+        {
+            futureTex.cancel(true);
+            futureTex = null;
+        }
+
+        if(futureTex!=null)
+        {
             return false;
         }
-//		boolean changed = (futureTex==null) && (textureImpl==null || mapType!=lastMapType || vSlice!=lastVSlice);
-//        if(changed) {
-//            if(logger.isLoggable(Level.FINE)) {
-//                logger.fine(this + " needs to be updated because " + textureImpl + " or " + mapType + "!=" + lastMapType + " or " + vSlice + "!=" + lastVSlice);
-//            }
-//        } else if(futureTex!=null) {
-//            changed = true; // RegionImageHandler.hasImageChanged(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, lastImageTime);
-//            lastImageTime = new Date().getTime();
-//        }
-//
-//		if(changed) {
-//			lastMapType = mapType;
-//			lastVSlice = vSlice;
-//            Integer glId = textureImpl!=null ? textureImpl.getGlTextureId() : null;
-//            futureTex = TextureCache.instance().prepareImage(glId, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE);
-//		}
-//
-//		return changed;
+
+        lastMapType = mapType;
+        lastVSlice = vSlice;
+
+        Integer glId = null;
+        BufferedImage image = null;
+        if(textureImpl!=null)
+        {
+            // Reuse existing buffered image and glId
+            glId = textureImpl.getGlTextureId();
+            image = textureImpl.getImage();
+        }
+        futureTex = TextureCache.instance().prepareImage(glId, image, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE);
+
+        return true;
 	}
 	
 	public boolean hasTexture() {

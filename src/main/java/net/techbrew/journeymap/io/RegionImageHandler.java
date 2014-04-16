@@ -95,43 +95,6 @@ public class RegionImageHandler {
 		return sb.toString();
 	}
 	
-//	public BufferedImage getChunkImages(File worldDir, int cx1, int cz1, Integer vSlice, int cx2, int cz2, Constants.MapType mapType, int dimension, Boolean useCache, int sampling) {
-//
-//		final RegionCoord regionCoord = RegionCoord.fromChunkPos(worldDir, cx1, vSlice, cz1, dimension);
-//		RegionCoord r2 = RegionCoord.fromChunkPos(worldDir, cx2, vSlice, cz2, dimension);
-//		
-//		if(!regionCoord.equals(r2)) {
-//			throw new IllegalArgumentException("Chunks not from the same region: " + regionCoord + " / " + r2); //$NON-NLS-1$ //$NON-NLS-2$
-//		}
-//		
-////		int ix1, ix2, iz1, iz2, width, height;
-////		ix1 = regionCoord.getXOffsetDay(rx1);
-////		iz1 = regionCoord.getZOffsetDay(rz1);
-////		ix2 = regionCoord.getXOffsetDay(rx2);
-////		iz2 = regionCoord.getZOffsetDay(rz2);
-////		if(rx1==rx2) {
-////			width=1;
-////		} else {
-////			width = rx2-rx1+1;
-////		}
-////		if(rz1==rz2) {
-////			height=1;
-////		} else {
-////			height = rz2-rz1+1;
-////		}
-//		
-//		BufferedImage regionImage = null;
-//		if(useCache) {
-//			regionImage = getCachedRegionImage(regionCoord, mapType);
-//		} else {
-//			regionImage = readRegionImage(getRegionImageFile(regionCoord, mapType, true), regionCoord, sampling, true); // TODO allow legacy?
-//		}
-//		//BufferedImage chunksImage = regionImage.getSubimage(ix1,iz1,width*16,height*16);
-//		
-//		return regionImage;
-//		
-//	}
-	
 	public BufferedImage getCachedRegionImage(RegionCoord rCoord, MapType mapType) {
 		return RegionImageCache.getInstance().getGuaranteedImage(rCoord, mapType);
 	}	
@@ -218,14 +181,11 @@ public class RegionImageHandler {
 		final int initialWidth = (endCoord.chunkXPos-startCoord.chunkXPos+1) * 16;
 		final int initialHeight = (endCoord.chunkZPos-startCoord.chunkZPos+1) * 16;		
 
-        if(image==null) {
+        if(image==null || image.getWidth()!=initialWidth || imageHeight!=initialHeight) {
 		    image = new BufferedImage(initialWidth, initialHeight, BufferedImage.TYPE_INT_ARGB);
-        } else {
-            if(image.getWidth()!=initialWidth || imageHeight!=initialHeight){
-                throw new IllegalArgumentException("BufferedImage size doesn't match chunk area requested");
-            }
         }
 		final Graphics2D g2D = initRenderingHints(image.createGraphics());
+        g2D.clearRect(0, 0, imageWidth, imageHeight);
 
 		final RegionImageCache cache = RegionImageCache.getInstance();
 
@@ -247,10 +207,13 @@ public class RegionImageHandler {
 					regionImage = cache.getGuaranteedImage(rc, mapType);
 				} else {
 					regionImage = RegionImageHandler.readRegionImage(RegionImageHandler.getRegionImageFile(rc, mapType, false), rc, 1, false, true);
-					if(regionImage==null) {
-						continue;
-					}
 				}
+
+                if(regionImage==null)
+                {
+                    continue;
+                }
+
 				rminCx = Math.max(rc.getMinChunkX(), startCoord.chunkXPos);
 				rminCz = Math.max(rc.getMinChunkZ(), startCoord.chunkZPos);
 				rmaxCx = Math.min(rc.getMaxChunkX(), endCoord.chunkXPos);

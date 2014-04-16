@@ -92,8 +92,7 @@ public class MapOverlay extends JmUI {
 	
     @Override
 	public void initGui()
-    {			
-    	// TODO: super.allowUserInput = true;
+    {
     	Keyboard.enableRepeatEvents(true);
     	initButtons();
     	
@@ -122,7 +121,7 @@ public class MapOverlay extends JmUI {
 
 		} catch(Throwable e) {
 			logger.log(Level.SEVERE, "Unexpected exception in MapOverlay.drawScreen(): " + LogFormatter.toString(e)); //$NON-NLS-1$
-			close();
+			UIManager.getInstance().closeAll();
 		} finally {
             drawScreenTimer.stop();
         }
@@ -498,7 +497,7 @@ public class MapOverlay extends JmUI {
 		
 		// Open inventory
 		if(i==mc.gameSettings.keyBindInventory.keyCode) { // keyBindInventory
-			close();
+			UIManager.getInstance().closeAll();
 			mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
 			return;
 		}

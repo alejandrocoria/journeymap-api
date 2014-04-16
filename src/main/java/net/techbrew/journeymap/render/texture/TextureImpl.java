@@ -45,6 +45,7 @@ public class TextureImpl extends AbstractTexture {
     {
         this.glTextureId = glId;
         this.retainImage = true;
+        this.image = image;
         this.width = image.getWidth();
         this.height = image.getHeight();
     }

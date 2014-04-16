@@ -13,9 +13,30 @@ Requirements:
 
 Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 
-- New feature: In-game full-screen map:  The coordinates of the block under your mouse are now displayed. Elevation and biome is also shown if that chunk is loaded.
-- Bugfix: In-game full-screen map: Waypoints behaved badly during mouse-drag of map
-- Bugfix: In-game maps: Mobs and label positions were jittery during map movement
+- New feature: Waypoint Creation
+-- In-game: Use the "B" key to create a Waypoint at your location and open the Waypoint Editor
+-- In-game Full-screen Map: Double-click anywhere on the map to open the new Waypoint Editor and create/edit a Waypoint
+
+- New feature: Waypoint Management
+-- Features include: Find on Map, Teleport To (if permitted), Sort by Name or Distance, Filter by Dimension, Enable/Disable, Edit, and Delete
+-- In-game: Use CTRL-"B" to directly open the Waypoint Manager
+-- In-game Full-screen Map: Use the "Waypoints" button to open the Waypoint Manager
+
+- New feature: Map Coordinates
+-- In-game Full-screen Map: Block coordinates under your mouse are now displayed at the bottom of the screen. Elevation and biome are also shown if that chunk is loaded.
+
+- Notable Changes:
+-- In-game map dialogs now use the dimmed game world as background instead of the dirt texture.
+
+- Performance Improvements:
+-- In-game maps are more efficient about checking render steps are within the active viewport; should improve pan/zoom update speeds on slower machines
+
+- Bugfixes:
+-- In-game full-screen map: Waypoint positioning was erratic when panning map
+-- In-game maps: Label positions and Mobs positions were jittery during map movement
+-- In-game maps: Surface map tiles would "show through" in un-mapped underground areas
+-- Minimap disappeared after opening inventory in full-screen map
+-- VoxelMap 1.7.2 waypoints were not recognized
 
 Known issues:
 

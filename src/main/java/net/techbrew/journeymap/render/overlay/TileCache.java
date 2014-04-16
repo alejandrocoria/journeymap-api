@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
+import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 
 import java.io.File;
@@ -50,13 +51,14 @@ public class TileCache implements RemovalListener<Integer, Tile>{
         Holder.INSTANCE.restoreExpired();
     }
 
-    public static synchronized Tile getOrCreate(final File worldDir, final int tileX, final int tileZ, final int zoom, final int dimension) {
+    public static synchronized Tile getOrCreate(final File worldDir, Constants.MapType mapType, final int tileX, final int tileZ, final int zoom, final int dimension) {
         final int hash = Tile.toHashCode(tileX, tileZ, zoom, dimension);
         TileCache tc = Holder.INSTANCE;
         synchronized (tc.cache) {
             Tile tile = tc.cache.getIfPresent(hash);
-            if(tile==null) {
-                tile = new Tile(worldDir, tileX, tileZ, zoom, dimension);
+            if(tile==null)
+            {
+                tile = new Tile(worldDir, mapType, tileX, tileZ, zoom, dimension);
                 tc.cache.put(hash, tile);
             }
             return tile;

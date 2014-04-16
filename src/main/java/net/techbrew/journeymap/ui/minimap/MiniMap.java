@@ -23,6 +23,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -54,7 +55,6 @@ public class MiniMap {
 
     private boolean visible = true;
     private EntityClientPlayerMP player;
-    private Point2D playerPixel;
     private TextureImpl playerLocatorTex;
 
     float lightmapS = (float) (15728880 % 65536)/1f;
@@ -150,7 +150,7 @@ public class MiniMap {
             GL11.glTranslated(dv.translateX, dv.translateY, 0);
 
             // Scissor area that shouldn't be drawn
-            GL11.glScissor(dv.scissorX,dv.scissorY,dv.minimapSize,dv.minimapSize);
+            GL11.glScissor(dv.scissorX+1,dv.scissorY+1,dv.minimapSize-2,dv.minimapSize-2);
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
 
             // Draw grid
@@ -160,7 +160,7 @@ public class MiniMap {
             gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale);
 
             // Draw player
-            playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
+            Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
             if(playerPixel!=null) {
                 DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), EntityHelper.getHeading(mc.thePlayer), false, playerLocatorTex, 8, 1f);
             }
@@ -210,10 +210,8 @@ public class MiniMap {
             // Draw border texture
             DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, 1f);
 
+            // Pop matrix changes
             GL11.glPopMatrix();
-
-            // TODO: Move this somewhere else
-
 
             // Return resolution to how it is normally scaled
             JmUI.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
@@ -258,7 +256,6 @@ public class MiniMap {
 
     public void setShowFps(boolean enable){
         showFps = enable;
-        //PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_MINIMAP, enable); // TODO
     }
 
 
@@ -314,12 +311,11 @@ public class MiniMap {
             this.drawTimer = StatTimer.get("MiniMap.drawMap." + shape.name(), 200);
         }
 
-        if(oldDv!=null && oldDv.shape!=this.dv.shape){
-            //oldDv.borderTexture.deleteTexture();
-        }
-
-        // THIS IS WRONG - scissorY you bastard
-        gridRenderer.setViewPort(new Point2D.Double(this.dv.scissorX, this.dv.scissorY+dv.minimapSize), this.dv.minimapSize);
+        // Set viewport
+        int xpad = this.dv.viewPortPadX;
+        int ypad = this.dv.viewPortPadY;
+        Rectangle2D.Double viewPort = new Rectangle2D.Double(this.dv.textureX + xpad, this.dv.textureY + ypad, this.dv.minimapSize - (2*xpad), this.dv.minimapSize - (2*ypad));
+        gridRenderer.setViewPort(viewPort);
     }
 
 }

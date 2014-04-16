@@ -214,6 +214,11 @@ public class MapOverlayState {
             return true;
         }
 
+        if(this.underground != (Boolean) DataCache.playerDataValue(EntityKey.underground))
+        {
+            return true;
+        }
+
         return false;
 	}
 	

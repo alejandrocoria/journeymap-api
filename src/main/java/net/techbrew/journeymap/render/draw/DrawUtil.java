@@ -10,9 +10,20 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 
 /**
- * Created by mwoodman on 12/26/13.
+ * Useful drawing routines that utilize the Minecraft Tessellator.
  */
-public class DrawUtil {
+public class DrawUtil
+{
+    public enum HAlign
+    {
+        Left, Center, Right;
+    }
+
+    public enum VAlign
+    {
+        Above, Middle, Below;
+    }
+
     /**
      * Draw a text label, centered on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
@@ -24,7 +35,28 @@ public class DrawUtil {
      * @param color
      * @param bgAlpha
      */
-    public static void drawCenteredLabel(final String text, double x, double y, Color bgColor,  int bgAlpha, Color color, int alpha, double fontScale) {
+    public static void drawCenteredLabel(final String text, double x, double y, Color bgColor,  int bgAlpha, Color color, int alpha, double fontScale)
+    {
+        drawLabel(text, x, y, HAlign.Center, VAlign.Middle, bgColor, bgAlpha, color, alpha, fontScale, true);
+    }
+
+    /**
+     * Draw a text label, aligned on x,z.  If bgColor not null,
+     * a rectangle will be drawn behind the text.
+     *
+     * @param text
+     * @param x
+     * @param y
+     * @param hAlign
+     * @param vAlign
+     * @param bgColor
+     * @param bgAlpha
+     * @param color
+     * @param alpha
+     * @param fontScale
+     * @param fontShadow
+     */
+    public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Color bgColor, int bgAlpha, Color color, int alpha, double fontScale, boolean fontShadow) {
 
         if (text == null || text.length() == 0) {
             return;
@@ -42,8 +74,46 @@ public class DrawUtil {
             GL11.glScaled(fontScale, fontScale, 0);
         }
 
-        final double textX = x - (width/2);
-        final double textY = y - (height/2);
+        double textX = x;
+        double textY = y;
+
+        switch(hAlign)
+        {
+            case Left:
+            {
+                textX = x - width;
+                break;
+            }
+            case Center:
+            {
+                textX = x - (width/2);
+                break;
+            }
+            case Right:
+            {
+                textX = x;
+                break;
+            }
+        }
+
+        switch(vAlign)
+        {
+            case Above:
+            {
+                textY = y - height;
+                break;
+            }
+            case Middle:
+            {
+                textY = y - (height/2);
+                break;
+            }
+            case Below:
+            {
+                textY = y;
+                break;
+            }
+        }
 
         // Draw background
         if (bgColor != null && alpha>0) {
@@ -55,12 +125,22 @@ public class DrawUtil {
             color = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
         }
 
-        // Draw text
+        // String positioning uses ints
         int intTextX = (int) Math.floor(textX);
         int intTextY = (int) Math.floor(textY);
 
+        // Use translation for the double precision
         GL11.glTranslated(textX-intTextX, textY-intTextY, 0);
-        fontRenderer.drawStringWithShadow(text, intTextX, intTextY, color.getRGB());
+
+        // Draw the string
+        if(fontShadow)
+        {
+            fontRenderer.drawStringWithShadow(text, intTextX, intTextY, color.getRGB());
+        }
+        else
+        {
+            fontRenderer.drawString(text, intTextX, intTextY, color.getRGB());
+        }
 
         GL11.glPopMatrix();
     }

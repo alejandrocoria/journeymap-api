@@ -82,10 +82,9 @@ public class TextureCache {
             public DelayedTexture call() throws Exception {
                 BufferedImage chunksImage = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, useCache, image, imageWidth, imageHeight, true);
                 if(chunksImage==null){
-                    return null;
-                } else {
-                    return new DelayedTexture(glId, chunksImage, null);
+                    chunksImage = RegionImageHandler.createBlankImage(imageWidth, imageHeight);
                 }
+                return new DelayedTexture(glId, chunksImage, null);
             }
         });
         return future;

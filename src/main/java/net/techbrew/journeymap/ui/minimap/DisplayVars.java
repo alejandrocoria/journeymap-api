@@ -48,6 +48,8 @@ public class DisplayVars {
     final int minimapSize,textureX,textureY;
     final double minimapOffset,translateX,translateY;
     final int marginX,marginY,scissorX,scissorY, labelX, topLabelY, bottomLabelY;
+    final int viewPortPadX;
+    final int viewPortPadY;
 
     DisplayVars(Minecraft mc, Shape shape, Position position, double fontScale){
         this.shape = shape;
@@ -69,6 +71,8 @@ public class DisplayVars {
                 minimapSize = 512;
                 marginX=3;
                 marginY=3;
+                viewPortPadX=5;
+                viewPortPadY=5;
                 if(fontScale==1){
                     topLabelYOffset = 6;
                     bottomLabelYOffset = 4;
@@ -87,6 +91,8 @@ public class DisplayVars {
                 minimapSize = 256;
                 marginX=2;
                 marginY=2;
+                viewPortPadX=5;
+                viewPortPadY=5;
                 if(fontScale==1){
                     topLabelYOffset = 6;
                     bottomLabelYOffset = 6;
@@ -105,6 +111,8 @@ public class DisplayVars {
                 minimapSize = 512;
                 marginX=0;
                 marginY=0;
+                viewPortPadX=5;
+                viewPortPadY=5;
                 if(fontScale==1){
                     topLabelYOffset = 7;
                     bottomLabelYOffset = -6 - mc.fontRenderer.FONT_HEIGHT;
@@ -122,6 +130,8 @@ public class DisplayVars {
                 minimapSize = 256;
                 marginX=0;
                 marginY=0;
+                viewPortPadX=4;
+                viewPortPadY=5;
                 if(fontScale==1){
                     topLabelYOffset = 7;
                     bottomLabelYOffset = -6 - mc.fontRenderer.FONT_HEIGHT;

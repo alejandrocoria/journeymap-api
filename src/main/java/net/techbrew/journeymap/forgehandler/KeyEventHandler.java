@@ -65,6 +65,10 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler {
                 UIManager.getInstance().getMiniMap().nextPosition();
                 return;
             }
+            else if(i==Constants.KB_WAYPOINT.keyCode) {
+                UIManager.getInstance().openWaypointManager();
+                return;
+            }
         }
         else if(!minimapOnly)
         {

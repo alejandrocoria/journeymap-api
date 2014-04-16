@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
@@ -40,14 +41,15 @@ public class GridRenderer {
     final Cache<Integer,Tile> tc = TileCache.instance();
 
     final TilePos centerPos = new TilePos(0,0);
-    private Point2D viewPortOrigin;
-    private int viewPortSize;
+    private Rectangle2D.Double viewPort = null;
+    private Rectangle2D.Double screenBounds = null;
 
 	private int lastHeight =-1;
 	private int lastWidth =-1;
 
-	
-	private int centerTileHash = Integer.MIN_VALUE;
+    private MapType mapType = MapType.day;
+
+    private int centerTileHash = Integer.MIN_VALUE;
 	private int zoom;
 	private double centerBlockX;
     private double centerBlockZ;
@@ -65,9 +67,10 @@ public class GridRenderer {
         srcSize = gridSize*Tile.TILESIZE;
 	}
 
-    public void setViewPort(Point2D origin, int size) {
-        this.viewPortOrigin = origin;
-        this.viewPortSize = size;
+    public void setViewPort(Rectangle2D.Double viewPort) {
+        this.viewPort = viewPort;
+        this.screenBounds = null;
+        updateBounds(lastWidth, lastHeight);
     }
 	
 	private void populateGrid(Tile centerTile) {
@@ -145,10 +148,10 @@ public class GridRenderer {
 	public boolean updateTextures(MapType mapType, Integer vSlice, int width, int height, boolean fullUpdate, double xOffset, double yOffset) {
 
 		// Update screen dimensions
-		lastWidth = width;
-		lastHeight = height;
+        updateBounds(width, height);
 
 		// Get center tile
+        this.mapType = mapType;
         Integer centerHash = grid.get(centerPos);
         if(centerHash==null){
             return false;
@@ -196,20 +199,22 @@ public class GridRenderer {
             hashCode = entry.getValue();
             tile = tc.getIfPresent(hashCode);
 
-            // Update texture only if on-screen
-            if(tile==null) {
+            // Ensure grid populated
+            if(tile==null)
+            {
                 tile = findNeighbor(centerTile, pos);
-                grid.put(pos, tile.hashCode());
+                grid.put(pos, hashCode);
             }
 
-            //if(isOnScreen(pos)) { // TODO
-                if(tile.updateTexture(pos, mapType, vSlice)) {
+            // Update texture only if on-screen
+            if(isOnScreen(pos))
+            {
+                if(tile!=null && tile.updateTexture(pos, this.mapType, vSlice))
+                {
                     updated=true;
                 }
-            //}
-
+            }
         }
-
 		return updated;
 	}
 
@@ -238,9 +243,7 @@ public class GridRenderer {
         double pixelOffsetX = lastWidth /2 + (localBlockX*blockSize);
         double pixelOffsetZ = lastHeight /2 + (localBlockZ*blockSize);
 
-		Point2D.Double p = new Point2D.Double();
-        p.setLocation(pixelOffsetX, pixelOffsetZ);
-        return p;
+		return new Point2D.Double(pixelOffsetX, pixelOffsetZ);
 	}
 
     /**
@@ -281,27 +284,29 @@ public class GridRenderer {
 			double centerZ = offsetZ + centerPixelOffset.y;
             final Cache<Integer,Tile> tc = TileCache.instance();
 
-			for(Map.Entry<TilePos,Integer> entry : grid.entrySet()) {
-				//if(entry.getKey().deltaX!=0 || entry.getKey().deltaZ!=0) continue;
+            int index = 0;
+
+			for(Map.Entry<TilePos,Integer> entry : grid.entrySet())
+            {
+                index++;
+                TilePos pos = entry.getKey();
                 Tile tile = tc.getIfPresent(entry.getValue());
-                if(tile!=null) {
-				    drawTile(entry.getKey(), tile, centerX, centerZ);
-                }
+                drawTile(pos, tile, centerX, centerZ);
 			}
 
-            if( debug && crosshairs!=null) {
-                Minecraft mc = Minecraft.getMinecraft();
-                GL11.glBindTexture(GL11.GL_TEXTURE_2D, crosshairs.getGlTextureId());
-                Tessellator tessellator = Tessellator.instance;
-                tessellator.startDrawingQuads();
-                tessellator.addVertexWithUV(0, mc.displayHeight, 0.0D, 0, 1);
-                tessellator.addVertexWithUV(mc.displayWidth, mc.displayHeight, 0.0D, 1, 1);
-                tessellator.addVertexWithUV(mc.displayWidth, 0, 0.0D, 1, 0);
-                tessellator.addVertexWithUV(0, 0, 0.0D, 0, 0);
-                tessellator.draw();
-            }
+//            if( debug && crosshairs!=null) {
+//                Minecraft mc = Minecraft.getMinecraft();
+//                GL11.glBindTexture(GL11.GL_TEXTURE_2D, crosshairs.getGlTextureId());
+//                Tessellator tessellator = Tessellator.instance;
+//                tessellator.startDrawingQuads();
+//                tessellator.addVertexWithUV(0, mc.displayHeight, 0.0D, 0, 1);
+//                tessellator.addVertexWithUV(mc.displayWidth, mc.displayHeight, 0.0D, 1, 1);
+//                tessellator.addVertexWithUV(mc.displayWidth, 0, 0.0D, 1, 0);
+//                tessellator.addVertexWithUV(0, 0, 0.0D, 0, 0);
+//                tessellator.draw();
+//            }
 
-		}		
+		}
 	}
 	
 	private void drawTile(final TilePos pos, final Tile tile, final double offsetX, final double offsetZ) {
@@ -311,37 +316,46 @@ public class GridRenderer {
         final double endX = offsetX + pos.endX;
         final double endZ = offsetZ + pos.endZ;
 
-        DrawUtil.drawRectangle(startX, startZ, Tile.TILESIZE, Tile.TILESIZE, bgColor, 255);
+        if(isOnScreen(startX, startZ, Tile.TILESIZE, Tile.TILESIZE))
+        {
+            DrawUtil.drawRectangle(startX, startZ, Tile.TILESIZE, Tile.TILESIZE, bgColor, 255);
+            if(tile!=null && tile.hasTexture())
+            {
+                GL11.glDisable(GL11.GL_DEPTH_TEST);
+                GL11.glDepthMask(false);
+                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                GL11.glColor4f(1f, 1f, 1f, 1f);
 
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glDepthMask(false);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glColor4f(1f, 1f, 1f, 1f);
-
-        if(tile.hasTexture()) {
-            // TODO: get this check working again
-			//if(isOnScreen(startX, startZ, endX, endZ)) {
                 GL11.glEnable(GL11.GL_TEXTURE_2D);
-				GL11.glBindTexture(GL11.GL_TEXTURE_2D, tile.getTexture().getGlTextureId());
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, tile.getTexture().getGlTextureId());
 
-				Tessellator tessellator = Tessellator.instance;
-				tessellator.startDrawingQuads();			
-				tessellator.addVertexWithUV(startX, endZ, 0.0D, 0, 1);
-				tessellator.addVertexWithUV(endX, endZ, 0.0D, 1, 1);
-				tessellator.addVertexWithUV(endX, startZ, 0.0D, 1, 0);
-				tessellator.addVertexWithUV(startX, startZ, 0.0D, 0, 0);
-				tessellator.draw();
-			//}
-		} else {
-           //logger.warning("Tile has no texture: " + tile);
+                Tessellator tessellator = Tessellator.instance;
+                tessellator.startDrawingQuads();
+                tessellator.addVertexWithUV(startX, endZ, 0.0D, 0, 1);
+                tessellator.addVertexWithUV(endX, endZ, 0.0D, 1, 1);
+                tessellator.addVertexWithUV(endX, startZ, 0.0D, 1, 0);
+                tessellator.addVertexWithUV(startX, startZ, 0.0D, 0, 0);
+                tessellator.draw();
+
+                GL11.glDepthMask(true);
+                GL11.glEnable(GL11.GL_DEPTH_TEST);
+            }
         }
 
-        GL11.glDepthMask(true);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-	}
-	
-	private boolean isOnScreen(TilePos pos) {
-		return isOnScreen(pos.startX + centerPixelOffset.x, pos.startZ + centerPixelOffset.y, pos.endX + centerPixelOffset.x, pos.endZ + centerPixelOffset.y);
+        if(debug)
+        {
+            Color color = tile == null ? Color.RED : Color.BLUE;
+            DrawUtil.drawLabel(pos.toString(), startX + (Tile.TILESIZE/2), startZ + (Tile.TILESIZE/2), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.WHITE, 255, color, 255, 1.0, false);
+
+//            int pad = 3;
+//            DrawUtil.drawLabel(String.format("TL %.0f, %.0f", startX, startZ), startX + pad, startZ + pad, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, color, 255, 1.0, false);
+//            DrawUtil.drawLabel(String.format("BR %.0f, %.0f", endX, endZ), endX - pad, endZ - pad, DrawUtil.HAlign.Left, DrawUtil.VAlign.Above, Color.WHITE, 255, color, 255, 1.0, false);
+
+            DrawUtil.drawRectangle(startX, startZ, Tile.TILESIZE, 1, Color.white, 200);
+            DrawUtil.drawRectangle(startX, startZ, 1, Tile.TILESIZE, Color.white, 200);
+            DrawUtil.drawRectangle(startX, startZ + Tile.TILESIZE, Tile.TILESIZE, 1, Color.gray, 200);
+            DrawUtil.drawRectangle(startX+ Tile.TILESIZE, startZ, 1, Tile.TILESIZE, Color.gray, 200);
+        }
 	}
 
     /**
@@ -350,7 +364,8 @@ public class GridRenderer {
      * @param blockZ pos z
      * @return  pixel
      */
-	public Point2D.Double getPixel(double blockX, double blockZ) {
+	public Point2D.Double getPixel(double blockX, double blockZ)
+    {
 		Point2D.Double pixel = getBlockPixelInGrid(blockX, blockZ);
 		if(isOnScreen(pixel)) {
 			return pixel;
@@ -360,49 +375,56 @@ public class GridRenderer {
 	}
 
     /**
-     * Returns a pixel Point2D.Double if on screen, the closest one there is if not.
-     * @param blockX x
-     * @param blockZ z
-     * @return  pixel
+     * Adjusts a pixel to the nearest edge if it is not on screen.
      */
-	public Point2D.Double getClosestOnscreenBlock(int blockX, int blockZ) {
-		Point2D.Double pixel = getBlockPixelInGrid(blockX, blockZ);
-		if(pixel.getX()<0) {
-			pixel.setLocation(0, pixel.getY());
-		} else if(pixel.getX()> lastWidth) {
-			pixel.setLocation(lastWidth, pixel.getY());
-		}
-		if(pixel.getY()<0) {
-			pixel.setLocation(pixel.getX(), 0);
-		} else if(pixel.getY()> lastHeight) {
-			pixel.setLocation(pixel.getX(), lastHeight);
-		}
-		return pixel;
-	}
+    public void ensureOnScreen(Point2D pixel)
+    {
+        if(screenBounds == null)
+        {
+            return;
+        }
+        
+        double x = pixel.getX();
+        if(x<screenBounds.x)
+        {
+            x = screenBounds.x;
+        }
+        else if(x>screenBounds.getMaxX())
+        {
+            x = screenBounds.getMaxX();
+        }
+
+        double y = pixel.getY();
+        if(y<screenBounds.y)
+        {
+            y = screenBounds.y;
+        }
+        else if(y>screenBounds.getMaxY())
+        {
+            y = screenBounds.getMaxY();
+        }
+
+        pixel.setLocation(x, y);
+    }
 
     /**
-     * Ensures a Point2D.Double is going to be visible.
+     * This is a pixel-based area check, not a location check
+     * @param pos tile position in grid
+     * @return true if on screen
      */
-    public void ensureOnScreen(Point2D pixel) {
-        if(pixel.getX()<0) {
-            pixel.setLocation(0, pixel.getY());
-        } else if(pixel.getX()> lastWidth) {
-            pixel.setLocation(lastWidth, pixel.getY());
-        }
-        if(pixel.getY()<0) {
-            pixel.setLocation(pixel.getX(), 0);
-        } else if(pixel.getY()> lastHeight) {
-            pixel.setLocation(pixel.getX(), lastHeight);
-        }
+    private boolean isOnScreen(TilePos pos)
+    {
+        return isOnScreen(pos.startX + centerPixelOffset.x, pos.startZ + centerPixelOffset.y, Tile.TILESIZE, Tile.TILESIZE);
     }
-	
+
 	/**
 	 * This is a pixel check, not a location check
-	 * @param pixel
+	 * @param pixel checked
 	 * @return true if on screen
 	 */
-	public boolean isOnScreen(Point2D.Double pixel) {
-		return pixel.getX()>0 && pixel.getX()< lastWidth && pixel.getY()>0 && pixel.getY()< lastHeight;
+	public boolean isOnScreen(Point2D.Double pixel)
+    {
+		return screenBounds.contains(pixel);
 	}
 
     /**
@@ -411,26 +433,55 @@ public class GridRenderer {
      * @param y screen y
      * @return true if on screen
      */
-	public boolean isOnScreen(double x, double y) {
-		return x>0 && x< lastWidth && y>0 && y< lastHeight;
+	public boolean isOnScreen(double x, double y)
+    {
+		return screenBounds.contains(x, y);
 	}
 
     /**
-     * This is a pixel check, not a location check
+     * This is a pixel-based area check, not a location check
      * @param startX upper pixel x
      * @param startY upper pixel y
-     * @param endX lower pixel x
-     * @param endY lower pixel y
+     * @param width of area
+     * @param height of area
      * @return true if on screen
      */
-	public boolean isOnScreen(double startX, double startY, double endX, double endY) {
-//        if(viewPortOrigin!=null) {
-//            return endX>(viewPortOrigin.getX()) && startX<(viewPortOrigin.getX()+viewPortSize)
-//                    && endY > (viewPortOrigin.getY()) && startY<(viewPortOrigin.getY()+viewPortSize);
-//        } else {
-		    return endX>0 && startX< lastWidth && endY>0 && startY< lastHeight;
-//        }
-	}	
+	public boolean isOnScreen(double startX, double startY, int width, int height) {
+
+        if(screenBounds==null) return false;
+
+        if(screenBounds.intersects(startX, startY, width, height))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+	}
+
+    /**
+     * Updates the screenBounds rectangle.
+     * @param width
+     * @param height
+     */
+    private void updateBounds(int width, int height)
+    {
+        if(screenBounds == null || lastWidth!=width || lastHeight!=height)
+        {
+            lastWidth = width;
+            lastHeight = height;
+
+            if(viewPort==null)
+            {
+                screenBounds = new Rectangle2D.Double(0, 0, width, height);
+            }
+            else
+            {
+                screenBounds = new Rectangle2D.Double((width - viewPort.width)/2, (height - viewPort.height)/2, viewPort.width, viewPort.height);
+            }
+        }
+    }
 
 	private Tile findNeighbor(Tile tile, TilePos pos) {
 		if(pos.deltaX==0 && pos.deltaZ==0) return tile;
@@ -438,7 +489,7 @@ public class GridRenderer {
 	}
 	
 	private Tile findTile(final int tileX, final int tileZ) {
-        return TileCache.getOrCreate(worldDir, tileX, tileZ, zoom, dimension);
+        return TileCache.getOrCreate(worldDir, mapType, tileX, tileZ, zoom, dimension);
 	}
 	
 	public void setContext(File worldDir, int dimension) {
