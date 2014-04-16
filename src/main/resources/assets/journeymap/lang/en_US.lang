@@ -228,6 +228,9 @@ MiniMap.position_bottomright=Bottom Right
 # Added in 3.1.x. %1$s = One of "Small Square", "Large Square", "Small Circle", "Large Circle"
 MiniMap.shape=Shape: %1$s
 
+# Added in 4.0.0
+MiniMap.shape_tinysquare=Tiny Square
+
 # Added in 3.1.x.
 MiniMap.shape_smallsquare=Small Square
 

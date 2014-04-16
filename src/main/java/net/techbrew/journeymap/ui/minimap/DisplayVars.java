@@ -23,6 +23,7 @@ public class DisplayVars {
     }
 
     public enum Shape {
+        TinySquare("MiniMap.shape_tinysquare"),
         SmallSquare("MiniMap.shape_smallsquare"),
         LargeSquare("MiniMap.shape_largesquare"),
         SmallCircle("MiniMap.shape_smallcircle"),
@@ -32,7 +33,7 @@ public class DisplayVars {
             this.label = label;
         }
 
-        public static Shape[] Enabled = {SmallSquare, LargeSquare};
+        public static Shape[] Enabled = {TinySquare, SmallSquare, LargeSquare};
     }
 
     final Position position;
@@ -123,7 +124,7 @@ public class DisplayVars {
                 break;
             }
             case SmallSquare:
-            default: {
+            {
                 drawScale = 0.5f;
                 borderTexture = TextureCache.instance().getMinimapSmallSquare();
                 maskTexture = null;
@@ -138,6 +139,25 @@ public class DisplayVars {
                 } else {
                     topLabelYOffset = 9;
                     bottomLabelYOffset = -14 -mc.fontRenderer.FONT_HEIGHT;
+                }
+                break;
+            }
+            case TinySquare:
+            default: {
+                drawScale = 0.5f;
+                borderTexture = TextureCache.instance().getMinimapTinySquare();
+                maskTexture = null;
+                minimapSize = 128;
+                marginX=0;
+                marginY=0;
+                viewPortPadX=2;
+                viewPortPadY=2;
+                if(fontScale==1){
+                    topLabelYOffset = fontOffset - 3;
+                    bottomLabelYOffset = -fontOffset + 3;
+                } else {
+                    topLabelYOffset = fontOffset - 6;
+                    bottomLabelYOffset = -fontOffset + 6;
                 }
                 break;
             }

@@ -13,11 +13,12 @@ Requirements:
 
 Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 
-- New feature: Waypoint Creation
+- New feature: Waypoint Editor
+-- Features include: Multiple dimension support, color picker, error-checking (form validation)
 -- In-game: Use the "B" key to create a Waypoint at your location and open the Waypoint Editor
 -- In-game Full-screen Map: Double-click anywhere on the map to open the new Waypoint Editor and create/edit a Waypoint
 
-- New feature: Waypoint Management
+- New feature: Waypoint Manager
 -- Features include: Find on Map, Teleport To (if permitted), Sort by Name or Distance, Filter by Dimension, Enable/Disable, Edit, and Delete
 -- In-game: Use CTRL-"B" to directly open the Waypoint Manager
 -- In-game Full-screen Map: Use the "Waypoints" button to open the Waypoint Manager
@@ -27,6 +28,7 @@ Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 
 - Notable Changes:
 -- In-game map dialogs now use the dimmed game world as background instead of the dirt texture.
+-- "Tiny Square" size added to minimap shape options
 
 - Performance Improvements:
 -- In-game maps are more efficient about checking render steps are within the active viewport; should improve pan/zoom update speeds on slower machines
@@ -36,6 +38,7 @@ Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 -- In-game maps: Label positions and Mobs positions were jittery during map movement
 -- In-game maps: Surface map tiles would "show through" in un-mapped underground areas
 -- Minimap disappeared after opening inventory in full-screen map
+-- Minimap didn't show off-screen waypoint locators along edges
 -- VoxelMap 1.7.2 waypoints were not recognized
 
 Known issues:

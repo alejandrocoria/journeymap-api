@@ -71,7 +71,7 @@ public class MiniMap {
 
         setEnabled(pm.getBoolean(PropertyManager.Key.PREF_SHOW_MINIMAP));
         setShowFps(pm.getBoolean(PropertyManager.Key.PREF_MINIMAP_SHOWFPS));
-        state.fontScale = pm.getDouble(PropertyManager.Key.PREF_MINIMAP_FONTSCALE);
+        state.minimapFontScale = pm.getDouble(PropertyManager.Key.PREF_MINIMAP_FONTSCALE);
 
         DisplayVars.Shape shape = DisplayVars.Shape.valueOf(pm.getString(PropertyManager.Key.PREF_MINIMAP_SHAPE));
         DisplayVars.Position position = DisplayVars.Position.valueOf(pm.getString(PropertyManager.Key.PREF_MINIMAP_POSITION));
@@ -104,7 +104,7 @@ public class MiniMap {
             gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
             gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0);
             if(doStateRefresh ) {
-                state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, dv.drawScale);
+                state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, state.minimapFontScale, dv.drawScale);
                 state.updateLastRefresh();
             }
 
@@ -187,7 +187,7 @@ public class MiniMap {
             double fontScale = dv.fontScale * (mc.fontRenderer.getUnicodeFlag() ? 2 : 1);
             double bottomY = dv.bottomLabelY - (mc.fontRenderer.getUnicodeFlag() ? (fontScale * 4) : 0);
 
-            if(fontScale>1 && mc.fontRenderer.getStringWidth(playerInfo)*fontScale>dv.minimapSize){
+            if(mc.fontRenderer.getStringWidth(playerInfo)*fontScale>(dv.minimapSize-dv.viewPortPadX-dv.viewPortPadX)){
                 // Drop biome if running of space
                 playerInfo = Constants.getString("MapOverlay.player_location_minimap_nobiome", playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
             }
@@ -300,12 +300,12 @@ public class MiniMap {
                 && mc.displayWidth==dv.displayWidth
                 && this.dv.shape==shape
                 && this.dv.position==position
-                && this.dv.fontScale==state.fontScale){
+                && this.dv.fontScale==state.minimapFontScale){
             return;
         }
 
         DisplayVars oldDv = this.dv;
-        this.dv = new DisplayVars(mc, shape, position, state.fontScale);
+        this.dv = new DisplayVars(mc, shape, position, state.minimapFontScale);
 
         if(oldDv==null || oldDv.shape!=this.dv.shape){
             this.drawTimer = StatTimer.get("MiniMap.drawMap." + shape.name(), 200);

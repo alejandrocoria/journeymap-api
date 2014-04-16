@@ -62,7 +62,7 @@ public class TextureCache {
     }
     
     public static enum Name {
-    	MinimapSmallSquare, MinimapLargeSquare, MinimapSmallCircle, MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, Logo, LocatorHostile, LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, UnknownEntity;
+        MinimapTinySquare, MinimapSmallSquare, MinimapLargeSquare, MinimapSmallCircle, MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, LocatorHostile, LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, ColorPicker, UnknownEntity;
     }
     
     private final Map<Name, TextureImpl> namedTextures = Collections.synchronizedMap(new HashMap<Name, TextureImpl>(Name.values().length + (Name.values().length/2) + 1));
@@ -112,6 +112,10 @@ public class TextureCache {
 		}
 	}
 
+    public TextureImpl getMinimapTinySquare() {
+        return getNamedTexture(Name.MinimapTinySquare, "minimap/minimap-square-128.png", false); //$NON-NLS-1$
+    }
+
     public TextureImpl getMinimapSmallSquare() {
         return getNamedTexture(Name.MinimapSmallSquare, "minimap/minimap-square-256.png", false); //$NON-NLS-1$
     }
@@ -140,9 +144,13 @@ public class TextureCache {
 		return getNamedTexture(Name.Waypoint, "waypoint.png", false); //$NON-NLS-1$
 	}
 	
-	public TextureImpl getWaypointOffscreen() {
-		return getNamedTexture(Name.WaypointOffscreen, "waypoint-offscreen.png", false); //$NON-NLS-1$
+	public TextureImpl getWaypointEdit() {
+		return getNamedTexture(Name.WaypointEdit, "waypoint-edit.png", false); //$NON-NLS-1$
 	}
+
+    public TextureImpl getWaypointOffscreen() {
+        return getNamedTexture(Name.WaypointOffscreen, "waypoint-offscreen.png", false); //$NON-NLS-1$
+    }
 	
 	public TextureImpl getDeathpoint() {
 		return getNamedTexture(Name.Deathpoint, "waypoint-death.png", false); //$NON-NLS-1$
@@ -174,6 +182,10 @@ public class TextureCache {
 
     public TextureImpl getPlayerLocatorSmall() {
         return getNamedTexture(Name.LocatorPlayerSmall, "locator-player-sm.png", false); //$NON-NLS-1$
+    }
+
+    public TextureImpl getColorPicker() {
+        return getNamedTexture(Name.ColorPicker, "colorpick.png", true); //$NON-NLS-1$
     }
 	
 	public TextureImpl getUnknownEntity() {
