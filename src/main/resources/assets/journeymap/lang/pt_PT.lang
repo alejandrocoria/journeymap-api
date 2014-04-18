@@ -83,15 +83,6 @@ MapOverlay.actions=Accoes
 # %1$s = "On" or "Off"
 MapOverlay.follow=Seguir: %1$s
 
-# %1$s = x, %2$s = y, %3$s = z, %4$s = Vertical slice, %5$s Biome name
-MapOverlay.player_location=Localizacao: %1$s , %2$s | Elevacao: %3$s (%4$s) | Bioma: %5$s
-
-# Added in 3.1.0. %1$s = x, %2$s = y, %3$s = z, %4$s = Vertical slice, %5$s Biome name
-MapOverlay.player_location_minimap=%1$s, %2$s | %3$s (%4$s) | %5$s
-
-# Added in 3.1.0. %1$s = x, %2$s = y, %3$s = z, %4$s = Vertical slice
-MapOverlay.player_location_minimap_nobiome=%1$s, %2$s | %3$s (%4$s)
-
 MapOverlay.save_map=A gravar o mapa 	
 
 # Retirado no 3.0.0

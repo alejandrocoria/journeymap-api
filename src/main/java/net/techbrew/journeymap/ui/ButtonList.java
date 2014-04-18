@@ -78,6 +78,38 @@ public class ButtonList extends ArrayList<Button>
         return left;
     }
 
+    public int getTopY()
+    {
+        int top = Integer.MAX_VALUE;
+        for(Button button : this)
+        {
+            if(button.drawButton) {
+                top = Math.min(top, button.getY());
+            }
+        }
+        if(top == Integer.MAX_VALUE)
+        {
+            top = 0;
+        }
+        return top;
+    }
+
+    public int getBottomY()
+    {
+        int bottom = Integer.MIN_VALUE;
+        for(Button button : this)
+        {
+            if(button.drawButton) {
+                bottom = Math.max(bottom, button.getY() + button.getHeight());
+            }
+        }
+        if(bottom == Integer.MIN_VALUE)
+        {
+            bottom = 0;
+        }
+        return bottom;
+    }
+
     public int getRightX()
     {
         int right = 0;

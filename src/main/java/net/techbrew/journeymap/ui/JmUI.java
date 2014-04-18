@@ -46,7 +46,7 @@ public abstract class JmUI extends GuiScreen {
 	}
 
     public FontRenderer getFontRenderer() {
-        return this.fontRendererObj;
+        return this.fontRenderer;
     }
 
     public void sizeDisplay(boolean scaled) {
@@ -60,8 +60,8 @@ public abstract class JmUI extends GuiScreen {
         for (int k = 0; k < this.buttonList.size(); ++k)
         {
             GuiButton guibutton = (GuiButton)this.buttonList.get(k);
-            if(guibutton instanceof MapButton) {
-                if(((MapButton)guibutton).mouseOver(x, y)) {
+            if(guibutton instanceof Button) {
+                if(((Button)guibutton).mouseOver(x, y)) {
                     return true;
                 }
             }
@@ -85,8 +85,7 @@ public abstract class JmUI extends GuiScreen {
     @Override
     public void drawBackground(int layer)
     {
-        super.drawBackground(layer);
-        drawLogo();
+        drawDefaultBackground();
     }
 
     protected abstract void layoutButtons();

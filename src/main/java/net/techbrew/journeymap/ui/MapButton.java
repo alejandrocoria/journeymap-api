@@ -318,9 +318,14 @@ public class Button extends GuiSmallButton implements ScrollPane.Scrollable {
     }
 	
 	public Button below(Button other, int margin) {
-        this.setY(other.getY() + this.getHeight() + margin);
+        this.setY(other.getY() + other.getHeight() + margin);
 		return this;
 	}
+
+    public Button below(ButtonList list, int margin) {
+        this.setY(list.getBottomY() + margin);
+        return this;
+    }
 
     public Button below(int y) {
         this.setY(y);

@@ -28,74 +28,76 @@ import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
 
-;
-
 /**
  * Displays the map as a minimap overlay in-game.
- * 
- * @author mwoodman
  *
+ * @author mwoodman
  */
-public class MiniMap {
+public class MiniMap
+{
+    private static final float lightmapS = (float) (15728880 % 65536) / 1f;
+    private static final float lightmapT = (float) (15728880 / 65536) / 1f;
+    private static final long labelRefreshRate = 1001;
 
     private final Logger logger = JourneyMap.getLogger();
     private final Minecraft mc = Minecraft.getMinecraft();
+
+    private final Color playerInfoFgColor = Color.LIGHT_GRAY;
+    private final Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
+    private final String[] locationFormats = {"MapOverlay.location_xzye", "MapOverlay.location_xzy", "MapOverlay.location_xz"};
+
     private final MapOverlayState state = MapOverlay.state();
     private final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
     private final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
     private final GridRenderer gridRenderer = new GridRenderer(3);
-    private StatTimer drawTimer;
-    private final Color playerInfoFgColor = Color.LIGHT_GRAY;
-    private final Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
+    private final TextureImpl playerLocatorTex;
 
-    private Boolean enabled;
-    private Boolean showFps = true;
-
-    private DisplayVars dv;
-
-    private boolean visible = true;
     private EntityClientPlayerMP player;
-    private TextureImpl playerLocatorTex;
+    private StatTimer drawTimer;
+    private Boolean enabled;
+    private DisplayVars dv;
+    private boolean visible = true;
 
-    float lightmapS = (float) (15728880 % 65536)/1f;
-    float lightmapT = (float) (15728880 / 65536)/1f;
-	/**
-	 * Default constructor
-	 */
-	public MiniMap() {
+    private long lastLabelRefresh = 0;
+    private String fpsLabelText;
+    private String locationLabelText;
+    private String biomeLabelText;
 
+    /**
+     * Default constructor
+     */
+    public MiniMap()
+    {
         player = mc.thePlayer;
         playerLocatorTex = TextureCache.instance().getPlayerLocatorSmall();
 
         final PropertyManager pm = PropertyManager.getInstance();
-
         setEnabled(pm.getBoolean(PropertyManager.Key.PREF_SHOW_MINIMAP));
-        setShowFps(pm.getBoolean(PropertyManager.Key.PREF_MINIMAP_SHOWFPS));
         state.minimapFontScale = pm.getDouble(PropertyManager.Key.PREF_MINIMAP_FONTSCALE);
 
         DisplayVars.Shape shape = DisplayVars.Shape.valueOf(pm.getString(PropertyManager.Key.PREF_MINIMAP_SHAPE));
         DisplayVars.Position position = DisplayVars.Position.valueOf(pm.getString(PropertyManager.Key.PREF_MINIMAP_POSITION));
 
-        updateDisplayVars(shape, position);
-	}
+        updateDisplayVars(shape, position, true);
+    }
 
-
-	public void drawMap() {
-
+    /**
+     * Called in the render loop.
+     */
+    public void drawMap()
+    {
         // Check player status
-        if (player==null) {
-            player = mc.thePlayer;
-            if(player==null) return;
-        }
-
+        player = mc.thePlayer;
+        if (player == null) return;
 
         final boolean doStateRefresh = state.shouldRefresh(mc);
         drawTimer.start();
 
-        try {
-
+        try
+        {
             // Update the state first
-            if(doStateRefresh) {
+            if (doStateRefresh)
+            {
                 state.refresh(mc, player);
             }
 
@@ -103,12 +105,20 @@ public class MiniMap {
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
             gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
             gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0);
-            if(doStateRefresh ) {
-                state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, state.minimapFontScale, dv.drawScale);
+            if (doStateRefresh)
+            {
+                state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, state.mapFontScale, dv.drawScale);
                 state.updateLastRefresh();
             }
 
-            updateDisplayVars();
+            // Update display vars if needed
+            updateDisplayVars(false);
+
+            // Update labels if needed
+            if(System.currentTimeMillis() - lastLabelRefresh > labelRefreshRate)
+            {
+                updateLabels();
+            }
 
             // Use 1:1 resolution for minimap regardless of how Minecraft UI is scaled
             JmUI.sizeDisplay(mc.displayWidth, mc.displayHeight);
@@ -123,9 +133,10 @@ public class MiniMap {
             GL11.glPushMatrix();
 
             // Draw mask (if present) using stencil buffer
-            if (dv.maskTexture!=null)
+            if (dv.maskTexture != null)
             {
-                try {
+                try
+                {
                     glClear(GL_DEPTH_BUFFER_BIT);
                     glEnable(GL_STENCIL_TEST);
                     glColorMask(false, false, false, false);
@@ -140,7 +151,8 @@ public class MiniMap {
                     glStencilMask(0x00);
                     //glStencilFunc(GL_EQUAL, 0, 0xFF);
                     glStencilFunc(GL_EQUAL, 1, 0xFF);
-                } catch(Throwable t) {
+                } catch (Throwable t)
+                {
                     logger.severe("Stencil buffer failing with circle mask:" + LogFormatter.toString(t));
                     return;
                 }
@@ -150,7 +162,7 @@ public class MiniMap {
             GL11.glTranslated(dv.translateX, dv.translateY, 0);
 
             // Scissor area that shouldn't be drawn
-            GL11.glScissor(dv.scissorX+1,dv.scissorY+1,dv.minimapSize-2,dv.minimapSize-2);
+            GL11.glScissor((int)dv.scissorX + 1, (int)dv.scissorY + 1, (int)dv.minimapSize - 2, (int)dv.minimapSize - 2);
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
 
             // Draw grid
@@ -161,15 +173,32 @@ public class MiniMap {
 
             // Draw player
             Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
-            if(playerPixel!=null) {
+            if (playerPixel != null)
+            {
                 DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), EntityHelper.getHeading(mc.thePlayer), false, playerLocatorTex, 8, 1f);
             }
 
             // Return center to mid-screen
             GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
 
+            // Draw labels if scissored
+            if(dv.labelFps.scissor && dv.showFps)
+            {
+                dv.labelFps.draw(fpsLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
+            }
+
+            if(dv.labelLocation.scissor)
+            {
+                dv.labelLocation.draw(locationLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
+            }
+
+            if(dv.labelBiome.scissor)
+            {
+                dv.labelBiome.draw(biomeLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
+            }
+
             // If using a mask, turn off the stencil test
-            if (dv.maskTexture!=null)
+            if (dv.maskTexture != null)
             {
                 glDisable(GL_STENCIL_TEST);
             }
@@ -177,31 +206,20 @@ public class MiniMap {
             // Finish Scissor
             GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
-            // Determine current biome
-            final int playerX = (int) player.posX;
-            final int playerZ = (int) player.posZ;
-            final int playerY = (int) player.posY;
-
-            // Player info string
-            String playerInfo = Constants.getString("MapOverlay.player_location_minimap", playerX, playerZ, playerY, mc.thePlayer.chunkCoordY, state.getPlayerBiome());
-            double fontScale = dv.fontScale * (mc.fontRenderer.getUnicodeFlag() ? 2 : 1);
-            double bottomY = dv.bottomLabelY - (mc.fontRenderer.getUnicodeFlag() ? (fontScale * 4) : 0);
-
-            if(mc.fontRenderer.getStringWidth(playerInfo)*fontScale>(dv.minimapSize-dv.viewPortPadX-dv.viewPortPadX)){
-                // Drop biome if running of space
-                playerInfo = Constants.getString("MapOverlay.player_location_minimap_nobiome", playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
+            // Draw labels if not scissored
+            if(!dv.labelFps.scissor && dv.showFps)
+            {
+                dv.labelFps.draw(fpsLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
             }
 
-            // Draw position text
-            DrawUtil.drawCenteredLabel(playerInfo, dv.labelX, bottomY, playerInfoBgColor, 200, playerInfoFgColor, 255, fontScale);
+            if(!dv.labelLocation.scissor)
+            {
+                dv.labelLocation.draw(locationLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
+            }
 
-            // Draw FPS
-            if(showFps){
-                String fps = mc.debug;
-                final int idx = fps!=null ? fps.indexOf(',') : -1;
-                if(idx>0){
-                    DrawUtil.drawCenteredLabel(fps.substring(0, idx), dv.labelX, dv.topLabelY, playerInfoBgColor, 200, playerInfoFgColor, 255, fontScale);
-                }
+            if(!dv.labelBiome.scissor)
+            {
+                dv.labelBiome.draw(biomeLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
             }
 
             // Restore GL attrs assumed by Minecraft to be enabled
@@ -216,106 +234,173 @@ public class MiniMap {
             // Return resolution to how it is normally scaled
             JmUI.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
 
-        } catch(Throwable t) {
+        } catch (Throwable t)
+        {
             logger.severe("Minimap error:" + LogFormatter.toString(t));
-        } finally {
+        } finally
+        {
             drawTimer.stop();
         }
 
-	}
+    }
 
-	public void reset() {
-		state.requireRefresh();
+    public void reset()
+    {
+        state.requireRefresh();
         gridRenderer.clear();
-	}
+    }
 
-    public boolean isVisible() {
+    public boolean isVisible()
+    {
         return visible;
     }
 
-    public void setVisible(boolean visible) {
+    public void setVisible(boolean visible)
+    {
         this.visible = visible;
     }
 
-    public boolean isEnabled() {
-        if(enabled==null) {
+    public boolean isEnabled()
+    {
+        if (enabled == null)
+        {
             enabled = PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_MINIMAP)
                     && !WaypointHelper.isReiLoaded() && !WaypointHelper.isVoxelMapLoaded();
         }
         return enabled;
     }
 
-    public void setEnabled(boolean enable){
+    public void setEnabled(boolean enable)
+    {
         enabled = enable;
         PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_MINIMAP, enable);
     }
 
-    public boolean isShowFps() {
-        return showFps;
+    public void setForceUnicode(boolean forceUnicode)
+    {
+        if(this.dv!=null)
+        {
+            this.dv.forceUnicode = forceUnicode;
+            PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_MINIMAP_FORCEUNICODE, forceUnicode);
+        }
     }
 
-    public void setShowFps(boolean enable){
-        showFps = enable;
-    }
-
-
-    public void nextPosition() {
-        int nextIndex = dv.position.ordinal()+1;
-        if(nextIndex==DisplayVars.Position.values().length){
+    public void nextPosition()
+    {
+        int nextIndex = dv.position.ordinal() + 1;
+        if (nextIndex == DisplayVars.Position.values().length)
+        {
             nextIndex = 0;
         }
         setPosition(DisplayVars.Position.values()[nextIndex]);
     }
 
-    public DisplayVars.Position getPosition() {
+    public DisplayVars.Position getPosition()
+    {
         return dv.position;
     }
 
-    public void setPosition(DisplayVars.Position position) {
+    public void setPosition(DisplayVars.Position position)
+    {
         PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_POSITION, position.name());
-        if(dv!=null) {
-            updateDisplayVars(dv.shape, position);
+        if (dv != null)
+        {
+            updateDisplayVars(dv.shape, position, false);
         }
     }
 
-    public DisplayVars.Shape getShape() {
+    public DisplayVars.Shape getShape()
+    {
         return dv.shape;
     }
 
-    public void setShape(DisplayVars.Shape shape) {
-        if(dv!=null) {
-            updateDisplayVars(shape, dv.position);
+    public void setShape(DisplayVars.Shape shape)
+    {
+        if (dv != null)
+        {
+            updateDisplayVars(shape, dv.position, false);
         }
     }
 
-    public void updateDisplayVars() {
-        if(dv!=null) {
-            updateDisplayVars(dv.shape, dv.position);
+    public void updateDisplayVars(boolean force)
+    {
+        if (dv != null)
+        {
+            updateDisplayVars(dv.shape, dv.position, force);
         }
     }
-    public void updateDisplayVars(DisplayVars.Shape shape, DisplayVars.Position position) {
 
-        if(dv!=null
-                && mc.displayHeight==dv.displayHeight
-                && mc.displayWidth==dv.displayWidth
-                && this.dv.shape==shape
-                && this.dv.position==position
-                && this.dv.fontScale==state.minimapFontScale){
+    public void updateDisplayVars(DisplayVars.Shape shape, DisplayVars.Position position, boolean force)
+    {
+        if (dv != null
+                && !force
+                && mc.displayHeight == dv.displayHeight
+                && mc.displayWidth == dv.displayWidth
+                && this.dv.shape == shape
+                && this.dv.position == position
+                && this.dv.fontScale == state.minimapFontScale)
+        {
             return;
         }
 
         DisplayVars oldDv = this.dv;
         this.dv = new DisplayVars(mc, shape, position, state.minimapFontScale);
 
-        if(oldDv==null || oldDv.shape!=this.dv.shape){
+        if (oldDv == null || oldDv.shape != this.dv.shape)
+        {
             this.drawTimer = StatTimer.get("MiniMap.drawMap." + shape.name(), 200);
         }
 
+        // Update labels
+        updateLabels();
+
         // Set viewport
-        int xpad = this.dv.viewPortPadX;
-        int ypad = this.dv.viewPortPadY;
-        Rectangle2D.Double viewPort = new Rectangle2D.Double(this.dv.textureX + xpad, this.dv.textureY + ypad, this.dv.minimapSize - (2*xpad), this.dv.minimapSize - (2*ypad));
+        double xpad = this.dv.viewPortPadX;
+        double ypad = this.dv.viewPortPadY;
+        Rectangle2D.Double viewPort = new Rectangle2D.Double(this.dv.textureX + xpad, this.dv.textureY + ypad, this.dv.minimapSize - (2 * xpad), this.dv.minimapSize - (2 * ypad));
         gridRenderer.setViewPort(viewPort);
+    }
+
+    private void updateLabels()
+    {
+        // FPS label
+        if (dv.showFps)
+        {
+            String fps = mc.debug;
+            final int idx = fps != null ? fps.indexOf(',') : -1;
+            if (idx > 0)
+            {
+                fpsLabelText = fps.substring(0, idx);
+            }
+            else
+            {
+                fpsLabelText = "";
+            }
+        }
+
+        // Location label
+        String playerInfo = "";
+        final int playerX = (int) player.posX;
+        final int playerZ = (int) player.posZ;
+        final int playerY = (int) player.posY;
+
+        for(String format : locationFormats)
+        {
+            playerInfo = Constants.getString(format, playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
+            double infoWidth = mc.fontRenderer.getStringWidth(playerInfo) * dv.fontScale;
+            if (infoWidth <= dv.minimapSize - (dv.viewPortPadX*2))
+            {
+                break;
+            }
+        }
+
+        locationLabelText = playerInfo;
+
+        // Biome label
+        biomeLabelText = state.getPlayerBiome();
+
+        // Update timestamp
+        lastLabelRefresh = System.currentTimeMillis();
     }
 
 }

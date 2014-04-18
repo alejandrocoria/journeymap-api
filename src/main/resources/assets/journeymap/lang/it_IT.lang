@@ -73,8 +73,6 @@ MapOverlay.off=Off
 # %1$s = "On" or "Off"
 MapOverlay.follow=Segui: %1$s
 
-# %1$s = x, %2$s = y, %3$s = z, %4$s = vertical slice, %5$s Biome name
-MapOverlay.player_location=Posizione: %1$s , %2$s | Altezza: %3$s (%4$s) | Bioma: %5$s
 MapOverlay.save_map=Salva Mappa
 
 # %1$s = type of map
@@ -216,8 +214,6 @@ JourneyMap.file_updates=Files are being updated (%1$s). Mapping suspended.
 JourneyMap.file_updates_complete=File updates complete. Mapping resumed.
 MapOverlay.disabled_feature=Feature not available
 MapOverlay.actions=MapOverlay.actions
-MapOverlay.player_location_minimap=%1$s, %2$s | %3$s (%4$s) | %5$s
-MapOverlay.player_location_minimap_nobiome=%1$s, %2$s | %3$s (%4$s)
 MapOverlay.save_filename=MapOverlay.save_filename
 MapOverlay.minimap=MiniMap...
 MapOverlay.enable_webserver=Webserver: %1$s

@@ -50,6 +50,7 @@ public class PropertyManager {
         PREF_MINIMAP_POSITION(String.class,"preference_minimap_position", DisplayVars.Position.TopRight.name()), //$NON-NLS-1$
         PREF_MINIMAP_FONTSCALE(Double.class,"preference_minimap_fontscale", 1.0), //$NON-NLS-1$
         PREF_MINIMAP_SHOWFPS(Boolean.class,"preference_minimap_showfps", false), //$NON-NLS-1$
+        PREF_MINIMAP_FORCEUNICODE(Boolean.class,"preference_minimap_forceunicode", false), //$NON-NLS-1$
         PREF_MINIMAP_HOTKEYS(Boolean.class,"preference_minimap_hotkeys", true), //$NON-NLS-1$
 		;
 		private final String property;

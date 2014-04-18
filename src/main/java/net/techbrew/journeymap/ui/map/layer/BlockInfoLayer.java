@@ -48,11 +48,11 @@ public class BlockInfoLayer {
             {
                 int blockY = chunk.getHeightValue(blockCoord.x & 15, blockCoord.z & 15);
                 String biome = mc.theWorld.getBiomeGenForCoords(blockCoord.x, blockCoord.z).biomeName;
-                info = Constants.getString("MapOverlay.player_location_minimap", blockCoord.x, blockCoord.z, blockY, (blockY >> 4), biome);
+                info = Constants.getString("MapOverlay.location_xzyeb", blockCoord.x, blockCoord.z, blockY, (blockY >> 4), biome);
             }
             else
             {
-                info = String.format("%s , %s", blockCoord.x, blockCoord.z);
+                info = Constants.getString("MapOverlay.location_xzy", blockCoord.x, blockCoord.z, "?");
             }
 
             drawStepList.add(new BlockInfoStep(gridWidth/2, gridHeight-25, info, 0, Color.DARK_GRAY, Color.white, 1.0));

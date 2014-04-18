@@ -1,12 +1,18 @@
 package net.techbrew.journeymap.ui.minimap;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.techbrew.journeymap.io.PropertyManager;
+import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 
+import java.awt.*;
+
 /**
-* Created by mwoodman on 12/18/13.
+ * Encapsulates all the layout and display specifics for rendering the Minimap
+ * given a Shape, Position, screen size, and user preferences.
 */
 public class DisplayVars {
 
@@ -36,6 +42,48 @@ public class DisplayVars {
         public static Shape[] Enabled = {TinySquare, SmallSquare, LargeSquare};
     }
 
+    class LabelVars
+    {
+        final double x;
+        final double y;
+        DrawUtil.HAlign hAlign;
+        DrawUtil.VAlign vAlign;
+        final double fontScale;
+        final boolean scissor;
+        final boolean fontShadow;
+
+        private LabelVars(double x, double y, DrawUtil.HAlign hAlign, DrawUtil.VAlign vAlign, double fontScale, boolean scissor, boolean fontShadow)
+        {
+            this.x = x;
+            this.y = y;
+            this.hAlign = hAlign;
+            this.vAlign = vAlign;
+            this.fontScale = fontScale;
+            this.scissor = scissor;
+            this.fontShadow = fontShadow;
+        }
+
+        void draw(String text, Color bgColor, int bgAlpha, Color color, int alpha)
+        {
+            boolean isUnicode = false;
+            FontRenderer fontRenderer = null;
+            if(forceUnicode)
+            {
+                fontRenderer =  Minecraft.getMinecraft().fontRenderer;
+                isUnicode = fontRenderer.getUnicodeFlag();
+                if(!isUnicode)
+                {
+                    fontRenderer.setUnicodeFlag(true);
+                }
+            }
+            DrawUtil.drawLabel(text, x, y, hAlign, vAlign, bgColor, bgAlpha, color, alpha, fontScale, fontShadow);
+            if(forceUnicode && !isUnicode)
+            {
+                fontRenderer.setUnicodeFlag(false);
+            }
+        }
+    }
+
     final Position position;
     final Shape shape;
     final TextureImpl borderTexture;
@@ -46,23 +94,46 @@ public class DisplayVars {
     final int displayWidth;
     final int displayHeight;
     final ScaledResolution scaledResolution;
-    final int minimapSize,textureX,textureY;
+    final double minimapSize,textureX,textureY;
     final double minimapOffset,translateX,translateY;
-    final int marginX,marginY,scissorX,scissorY, labelX, topLabelY, bottomLabelY;
-    final int viewPortPadX;
-    final int viewPortPadY;
+    final double marginX, marginY, scissorX, scissorY;
+    final double viewPortPadX;
+    final double viewPortPadY;
+    final boolean showFps;
+    final LabelVars labelFps, labelLocation, labelBiome;
 
-    DisplayVars(Minecraft mc, Shape shape, Position position, double fontScale){
+    boolean forceUnicode;
+
+    DisplayVars(Minecraft mc, Shape shape, Position position, double _fontScale)
+    {
+        forceUnicode = (PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_FORCEUNICODE));
+        showFps = (PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_SHOWFPS));
+
+        final boolean useUnicode = (forceUnicode || mc.fontRenderer.getUnicodeFlag());
         this.shape = shape;
         this.position = position;
-        this.fontScale = fontScale;
+        this.fontScale = _fontScale * (useUnicode ? 2 : 1);
         displayWidth = mc.displayWidth;
         displayHeight = mc.displayHeight;
         scaledResolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
 
-        int topLabelYOffset = 0;
-        int bottomLabelYOffset = 0;
-        int bottomTextureYMargin = 0;
+        final boolean useFontShadow = false;
+
+        double labelHeight = DrawUtil.getLabelHeight(mc.fontRenderer, useFontShadow) * (useUnicode ? this.fontScale*.7 : this.fontScale);
+        double labelFpsYOffset = 4;
+        double labelBiomeYOffset =  -3;
+        double labelLocationYOffset = labelBiomeYOffset + -labelHeight;
+        double bottomTextureYMargin = 0;
+
+        boolean scissorFps = true;
+        boolean scissorLocation = false;
+        boolean scissorBiome = true;
+
+        boolean labelsOutside = false;
+
+        DrawUtil.VAlign valignFps = DrawUtil.VAlign.Below;
+        DrawUtil.VAlign valignLocation = DrawUtil.VAlign.Above;
+        DrawUtil.VAlign valignBiome = DrawUtil.VAlign.Above;
 
         switch(shape){
             case LargeCircle: {
@@ -75,12 +146,8 @@ public class DisplayVars {
                 viewPortPadX=5;
                 viewPortPadY=5;
                 if(fontScale==1){
-                    topLabelYOffset = 6;
-                    bottomLabelYOffset = 4;
                     bottomTextureYMargin = 10;
                 } else {
-                    topLabelYOffset = 9;
-                    bottomLabelYOffset = 6;
                     bottomTextureYMargin = 20;
                 }
                 break;
@@ -95,12 +162,8 @@ public class DisplayVars {
                 viewPortPadX=5;
                 viewPortPadY=5;
                 if(fontScale==1){
-                    topLabelYOffset = 6;
-                    bottomLabelYOffset = 6;
                     bottomTextureYMargin = 14;
                 } else {
-                    topLabelYOffset = 9;
-                    bottomLabelYOffset = 10;
                     bottomTextureYMargin = 24;
                 }
                 break;
@@ -114,13 +177,9 @@ public class DisplayVars {
                 marginY=0;
                 viewPortPadX=5;
                 viewPortPadY=5;
-                if(fontScale==1){
-                    topLabelYOffset = 7;
-                    bottomLabelYOffset = -6 - mc.fontRenderer.FONT_HEIGHT;
-                } else {
-                    topLabelYOffset = 9;
-                    bottomLabelYOffset = -14 -mc.fontRenderer.FONT_HEIGHT;
-                }
+                labelFpsYOffset = 5;
+                labelLocationYOffset = -5;
+                labelBiomeYOffset = labelLocationYOffset - labelHeight;
                 break;
             }
             case SmallSquare:
@@ -133,13 +192,9 @@ public class DisplayVars {
                 marginY=0;
                 viewPortPadX=4;
                 viewPortPadY=5;
-                if(fontScale==1){
-                    topLabelYOffset = 7;
-                    bottomLabelYOffset = -6 - mc.fontRenderer.FONT_HEIGHT;
-                } else {
-                    topLabelYOffset = 9;
-                    bottomLabelYOffset = -14 -mc.fontRenderer.FONT_HEIGHT;
-                }
+                labelFpsYOffset = 5;
+                labelLocationYOffset = -5;
+                labelBiomeYOffset = labelLocationYOffset - labelHeight;
                 break;
             }
             case TinySquare:
@@ -152,13 +207,14 @@ public class DisplayVars {
                 marginY=0;
                 viewPortPadX=2;
                 viewPortPadY=2;
-                if(fontScale==1){
-                    topLabelYOffset = fontOffset - 3;
-                    bottomLabelYOffset = -fontOffset + 3;
-                } else {
-                    topLabelYOffset = fontOffset - 6;
-                    bottomLabelYOffset = -fontOffset + 6;
-                }
+                valignLocation = DrawUtil.VAlign.Below;
+                valignBiome = DrawUtil.VAlign.Below;
+                labelFpsYOffset = 3;
+                labelLocationYOffset = 1;
+                labelBiomeYOffset = labelLocationYOffset + labelHeight;
+                scissorLocation = false;
+                scissorBiome = false;
+                labelsOutside = true;
                 break;
             }
         }
@@ -174,9 +230,13 @@ public class DisplayVars {
                 translateY = (mc.displayHeight/2)-minimapOffset - bottomTextureYMargin;
                 scissorX = mc.displayWidth-minimapSize-marginX;
                 scissorY = marginY + bottomTextureYMargin;
-                labelX = mc.displayWidth-(minimapSize/2);
-                topLabelY = mc.displayHeight-minimapSize+topLabelYOffset-bottomTextureYMargin;
-                bottomLabelY = mc.displayHeight-marginY-marginY+bottomLabelYOffset-bottomTextureYMargin;
+                if(labelsOutside)
+                {
+                    labelLocationYOffset = -minimapSize;
+                    valignLocation = DrawUtil.VAlign.Above;
+                    valignBiome = DrawUtil.VAlign.Above;
+                    labelBiomeYOffset = labelLocationYOffset - labelHeight;
+                }
                 break;
             }
             case TopLeft : {
@@ -184,11 +244,8 @@ public class DisplayVars {
                 textureY =  marginY;
                 translateX = -(mc.displayWidth/2)+minimapOffset;
                 translateY = -(mc.displayHeight/2)+minimapOffset;
-                scissorX = 0+marginX;
+                scissorX = marginX;
                 scissorY = mc.displayHeight-minimapSize-marginY;
-                labelX = minimapSize/2;
-                topLabelY = marginY+topLabelYOffset;
-                bottomLabelY = minimapSize+bottomLabelYOffset;
                 break;
             }
             case BottomLeft : {
@@ -198,9 +255,13 @@ public class DisplayVars {
                 translateY = (mc.displayHeight/2)-minimapOffset - bottomTextureYMargin;
                 scissorX = marginX;
                 scissorY = marginY + bottomTextureYMargin;
-                labelX = minimapSize/2;
-                topLabelY = mc.displayHeight-minimapSize+topLabelYOffset-bottomTextureYMargin;
-                bottomLabelY = mc.displayHeight-marginY-marginY+bottomLabelYOffset-bottomTextureYMargin;
+                if(labelsOutside)
+                {
+                    labelLocationYOffset = -minimapSize;
+                    valignLocation = DrawUtil.VAlign.Above;
+                    valignBiome = DrawUtil.VAlign.Above;
+                    labelBiomeYOffset = labelLocationYOffset - labelHeight;
+                }
                 break;
             }
             case TopRight :
@@ -211,13 +272,16 @@ public class DisplayVars {
                 translateY = -(mc.displayHeight/2)+minimapOffset;
                 scissorX = mc.displayWidth-minimapSize-marginX;
                 scissorY = mc.displayHeight-minimapSize-marginY;
-                labelX = mc.displayWidth-(minimapSize/2);
-                topLabelY = marginY+topLabelYOffset;
-                bottomLabelY = minimapSize+bottomLabelYOffset;
                 break;
             }
         }
 
-        //JourneyMap.getLogger().info("New DisplayVars: " + shape + " " + position + " : " + displayWidth + "x" + displayHeight);
+        double centerX = textureX + (minimapSize/2);
+        double topY = textureY;
+        double bottomY = textureY + minimapSize;
+        labelFps = new LabelVars(centerX, topY + labelFpsYOffset, DrawUtil.HAlign.Center, valignFps, fontScale, scissorFps, useFontShadow);
+        labelLocation = new LabelVars(centerX, bottomY + labelLocationYOffset, DrawUtil.HAlign.Center, valignLocation, fontScale, scissorLocation, useFontShadow);
+        labelBiome = new LabelVars(centerX, bottomY + labelBiomeYOffset, DrawUtil.HAlign.Center, valignBiome, fontScale, scissorBiome, useFontShadow);
+
     }
 }

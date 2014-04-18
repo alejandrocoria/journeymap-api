@@ -673,7 +673,7 @@ public class MapOverlay extends JmUI {
 		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, state.mapFontScale, 1f);
 		
 		// Update player pos
-		state.playerLastPos = Constants.getString("MapOverlay.player_location",
+		state.playerLastPos = Constants.getString("MapOverlay.location_xzyeb",
 				Integer.toString((int) mc.thePlayer.posX),
 				Integer.toString((int) mc.thePlayer.posZ),
 				Integer.toString((int) mc.thePlayer.posY),

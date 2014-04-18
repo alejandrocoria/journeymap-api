@@ -27,11 +27,13 @@ Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 -- In-game Full-screen Map: Block coordinates under your mouse are now displayed at the bottom of the screen. Elevation and biome are also shown if that chunk is loaded.
 
 - Notable Changes:
--- In-game map dialogs now use the dimmed game world as background instead of the dirt texture.
--- "Tiny Square" size added to minimap shape options
+-- In-game map dialogs use the dimmed game world as background instead of the dirt texture.
+-- Minimap Options has a "Tiny Square" size
+-- Minimap Options has a "Force Unicode" option for display of FPS and Location labels
 
 - Performance Improvements:
 -- In-game maps are more efficient about checking render steps are within the active viewport; should improve pan/zoom update speeds on slower machines
+-- Minimap render pass simplified
 
 - Bugfixes:
 -- In-game full-screen map: Waypoint positioning was erratic when panning map

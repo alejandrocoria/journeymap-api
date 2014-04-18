@@ -64,8 +64,10 @@ public class DrawUtil
 
         Minecraft mc = Minecraft.getMinecraft();
         final FontRenderer fontRenderer = mc.fontRenderer;
+        final boolean drawRect = (bgColor != null && alpha>0);
         final int width = fontRenderer.getStringWidth(text);
-        final int height = fontRenderer.FONT_HEIGHT;
+        final int height = drawRect ? getLabelHeight(fontRenderer, fontShadow) : fontRenderer.FONT_HEIGHT;
+
         GL11.glPushMatrix();
 
         if (fontScale != 1) {
@@ -76,6 +78,8 @@ public class DrawUtil
 
         double textX = x;
         double textY = y;
+        double rectX = x;
+        double rectY = y;
 
         switch(hAlign)
         {
@@ -96,29 +100,36 @@ public class DrawUtil
             }
         }
 
+        double vpad = drawRect ? (height-fontRenderer.FONT_HEIGHT)/2.0 : 0;
+
         switch(vAlign)
         {
             case Above:
             {
-                textY = y - height;
+                rectY = y - height;
+                textY = rectY + vpad;
                 break;
             }
             case Middle:
             {
-                textY = y - (height/2);
+                rectY = y - (height/2);
+                textY = rectY + vpad;
                 break;
             }
             case Below:
             {
-                textY = y;
+                rectY = y;
+                textY = rectY + vpad;
                 break;
             }
         }
 
         // Draw background
-        if (bgColor != null && alpha>0) {
-            final int pad = 3;
-            drawRectangle(textX-pad, textY-pad, width + (2*pad), height + (2*pad), bgColor, bgAlpha);
+        if (bgColor != null && alpha>0)
+        {
+            final int hpad = 2;
+            final double rectHeight = getLabelHeight(fontRenderer, fontShadow);
+            drawRectangle(textX-hpad-.5, rectY, width + (2*hpad), rectHeight, bgColor, bgAlpha);
         }
 
         if(alpha<255){
@@ -133,6 +144,7 @@ public class DrawUtil
         GL11.glTranslated(textX-intTextX, textY-intTextY, 0);
 
         // Draw the string
+        //final int voffset = fontRenderer.getUnicodeFlag() ? 0 : 1;
         if(fontShadow)
         {
             fontRenderer.drawStringWithShadow(text, intTextX, intTextY, color.getRGB());
@@ -143,6 +155,12 @@ public class DrawUtil
         }
 
         GL11.glPopMatrix();
+    }
+
+    public static int getLabelHeight(FontRenderer fr, boolean fontShadow)
+    {
+        final int vpad = fr.getUnicodeFlag() ? 0 : fontShadow ? 3 : 2;
+        return fr.FONT_HEIGHT + (2*vpad);
     }
 
     private static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, boolean flip) {
@@ -202,7 +220,7 @@ public class DrawUtil
         }
     }
 
-    public static void drawRectangle(double x, double y, int width, int height, Color color, int alpha) {
+    public static void drawRectangle(double x, double y, double width, double height, Color color, int alpha) {
 
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glEnable(GL11.GL_BLEND);
