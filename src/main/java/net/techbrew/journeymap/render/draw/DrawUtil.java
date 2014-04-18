@@ -125,15 +125,11 @@ public class DrawUtil
         }
 
         // Draw background
-        if (bgColor != null && alpha>0)
+        if (bgColor != null && bgAlpha>0)
         {
             final int hpad = 2;
             final double rectHeight = getLabelHeight(fontRenderer, fontShadow);
             drawRectangle(textX-hpad-.5, rectY, width + (2*hpad), rectHeight, bgColor, bgAlpha);
-        }
-
-        if(alpha<255){
-            color = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
         }
 
         // String positioning uses ints
@@ -145,6 +141,12 @@ public class DrawUtil
 
         // Draw the string
         //final int voffset = fontRenderer.getUnicodeFlag() ? 0 : 1;
+
+        if(color.getTransparency()!=alpha)
+        {
+            color = new Color(color.getRed(), color.getBlue(), color.getGreen(), alpha);
+        }
+
         if(fontShadow)
         {
             fontRenderer.drawStringWithShadow(text, intTextX, intTextY, color.getRGB());

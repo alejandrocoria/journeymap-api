@@ -21,10 +21,15 @@ public class LayerDelegate {
 
     }
 
-    public void onMouseMove(Minecraft mc, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
+    public void onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
     {
         drawSteps.clear();
-        drawSteps.addAll(blockInfoLayer.onMouseMove(mc, gridWidth, gridHeight, blockCoord));
+        drawSteps.addAll(blockInfoLayer.onMouseMove(mc, mouseX, mouseY, gridWidth, gridHeight, blockCoord));
+    }
+
+    public void onMouseClicked(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord, int mouseButton)
+    {
+        blockInfoLayer.onMouseClicked(mc, mouseX, mouseY, gridWidth, gridHeight, blockCoord);
     }
 
     public List<DrawStep> getDrawSteps() {

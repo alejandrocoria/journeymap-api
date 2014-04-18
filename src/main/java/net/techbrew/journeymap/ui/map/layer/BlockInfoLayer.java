@@ -8,7 +8,6 @@ import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
-import net.techbrew.journeymap.render.draw.DrawWayPointStep;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
@@ -24,22 +23,25 @@ import java.util.List;
  */
 public class BlockInfoLayer {
 
-    private List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
+    private final List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
 
     BlockCoordIntPair lastCoord = null;
     long lastClicked = 0;
+    int lastMouseX;
+    int lastMouseY;
+    BlockInfoStep blockInfoStep;
 
     public BlockInfoLayer()
     {
-
+        blockInfoStep = new BlockInfoStep();
+        drawStepList.add(blockInfoStep);
     }
 
-    public List<DrawStep> onMouseMove(Minecraft mc, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
+    public List<DrawStep> onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
     {
         if(!blockCoord.equals(lastCoord))
         {
             lastCoord = blockCoord;
-            drawStepList.clear();
 
             // Get block under mouse
             Chunk chunk = mc.theWorld.getChunkFromChunkCoords(blockCoord.x >> 4, blockCoord.z >> 4);
@@ -55,24 +57,15 @@ public class BlockInfoLayer {
                 info = Constants.getString("MapOverlay.location_xzy", blockCoord.x, blockCoord.z, "?");
             }
 
-            drawStepList.add(new BlockInfoStep(gridWidth/2, gridHeight-25, info, 0, Color.DARK_GRAY, Color.white, 1.0));
-
-            // check for existing
-            Collection<Waypoint> waypoints = WaypointHelper.getCachedWaypoints();
-            for(Waypoint existing : waypoints)
-            {
-                if(existing.getX()==blockCoord.x && existing.getZ()==blockCoord.z)
-                {
-                    drawStepList.add(new DrawWayPointStep(blockCoord.x, blockCoord.z));
-                }
-            }
+            int infoHeight = DrawUtil.getLabelHeight(mc.fontRenderer, true);
+            blockInfoStep.update(info, gridWidth/2, gridHeight - infoHeight);
         }
 
         return drawStepList;
     }
 
     // TODO:  Move to waypoint delegate?
-    public void onMouseClicked(Minecraft mc, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
+    public void onMouseClicked(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
     {
         // check for double-click
         long sysTime = Minecraft.getSystemTime();
@@ -106,37 +99,37 @@ public class BlockInfoLayer {
         }
     }
 
-    class BlockInfoStep implements DrawStep {
+    class BlockInfoStep implements DrawStep
+    {
 
-        final double posX;
-        final double posZ;
-        final String text;
-        final int labelYOffset;
-        final Color bgColor;
-        final Color fgColor;
-        final double fontScale;
+        private double x;
+        private double y;
+        private String text;
+        Color bgColor = Color.darkGray;
+        Color fgColor = Color.white;
+        double fontScale = 1;
+        boolean fontShadow = false;
         int alpha = 255;
-
         int ticks = 20*5;
 
-        public BlockInfoStep(double posX, double posZ, String text, int labelYOffset, Color bgColor, Color fgColor, double fontScale) {
-            this.posX = posX;
-            this.posZ = posZ;
+        void update(String text, double x, double y)
+        {
             this.text = text;
-            this.labelYOffset = labelYOffset;
-            this.bgColor = bgColor;
-            this.fgColor = fgColor;
-            this.fontScale = fontScale;
+            this.x = x;
+            this.y = y;
+            this.alpha = 255;
+            this.ticks = 20*5;
         }
 
         @Override
-        public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float scale) {
-            if(ticks--<0)
+        public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float scale)
+        {
+            if(ticks--<0 && alpha>0)
             {
-                //alpha-=10; // Fade
+                alpha-=5; // Fade
             }
-            if(alpha>0) {
-                DrawUtil.drawCenteredLabel(text, posX, posZ + labelYOffset, bgColor, Math.max(0, alpha-50), fgColor, Math.max(0, alpha), fontScale);
+            if(alpha>0 && text!=null) {
+                DrawUtil.drawLabel(text, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, bgColor, Math.max(0, alpha), fgColor, Math.max(0, alpha), fontScale, fontShadow);
             }
         }
     }

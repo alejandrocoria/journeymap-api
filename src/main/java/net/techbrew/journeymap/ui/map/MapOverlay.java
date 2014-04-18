@@ -353,7 +353,9 @@ public class MapOverlay extends JmUI {
         if(!guiButtonUsed)
         {
             BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(mouseX, mouseY, width, height);
-            layerDelegate.onMouseClicked(mc, gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord, mouseButton);
+            double gridMouseX = (1.0 * mouseX * gridRenderer.getWidth()) / width;
+            double gridMouseY = (1.0 * mouseY * gridRenderer.getHeight()) / height;
+            layerDelegate.onMouseClicked(mc, gridMouseX, gridMouseY, gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord, mouseButton);
         }
 	}
 
@@ -392,7 +394,9 @@ public class MapOverlay extends JmUI {
 
         if(!isScrolling && which==-1) {
             BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(mouseX, mouseY, width, height);
-            layerDelegate.onMouseMove(mc, gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord);
+            double gridMouseX = (1.0 * mouseX * gridRenderer.getWidth()) / width;
+            double gridMouseY = (1.0 * mouseY * gridRenderer.getHeight()) / height;
+            layerDelegate.onMouseMove(mc, gridMouseX, gridMouseY, gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord);
         }
 	}
 
@@ -572,7 +576,7 @@ public class MapOverlay extends JmUI {
 
         gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, 1f);
 
-        DrawUtil.drawCenteredLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight - 11, playerInfoBgColor, 235, playerInfoFgColor, 255, 1);
+        DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, playerInfoBgColor, 235, playerInfoFgColor, 255, state.mapFontScale, true);
 
         drawLogo();
 
