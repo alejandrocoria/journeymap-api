@@ -70,15 +70,10 @@ public class MiniMap
     {
         player = mc.thePlayer;
         playerLocatorTex = TextureCache.instance().getPlayerLocatorSmall();
+        setEnabled(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_MINIMAP));
+        state.minimapFontScale = PropertyManager.getDoubleProp(PropertyManager.Key.PREF_MINIMAP_FONTSCALE);
 
-        final PropertyManager pm = PropertyManager.getInstance();
-        setEnabled(pm.getBoolean(PropertyManager.Key.PREF_SHOW_MINIMAP));
-        state.minimapFontScale = pm.getDouble(PropertyManager.Key.PREF_MINIMAP_FONTSCALE);
-
-        DisplayVars.Shape shape = DisplayVars.Shape.valueOf(pm.getString(PropertyManager.Key.PREF_MINIMAP_SHAPE));
-        DisplayVars.Position position = DisplayVars.Position.valueOf(pm.getString(PropertyManager.Key.PREF_MINIMAP_POSITION));
-
-        updateDisplayVars(shape, position, true);
+        updateDisplayVars(DisplayVars.Shape.getPreferred(), DisplayVars.Position.getPreferred(), true);
     }
 
     /**

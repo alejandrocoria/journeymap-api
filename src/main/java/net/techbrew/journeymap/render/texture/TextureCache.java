@@ -62,7 +62,7 @@ public class TextureCache {
     }
     
     public static enum Name {
-        MinimapTinySquare, MinimapSmallSquare, MinimapLargeSquare, MinimapSmallCircle, MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, LocatorHostile, LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, ColorPicker, UnknownEntity;
+        MinimapSmallSquare, MinimapMediumSquare, MinimapLargeSquare, MinimapSmallCircle, MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, LocatorHostile, LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, ColorPicker, UnknownEntity;
     }
     
     private final Map<Name, TextureImpl> namedTextures = Collections.synchronizedMap(new HashMap<Name, TextureImpl>(Name.values().length + (Name.values().length/2) + 1));
@@ -112,12 +112,12 @@ public class TextureCache {
 		}
 	}
 
-    public TextureImpl getMinimapTinySquare() {
-        return getNamedTexture(Name.MinimapTinySquare, "minimap/minimap-square-128.png", false); //$NON-NLS-1$
+    public TextureImpl getMinimapSmallSquare() {
+        return getNamedTexture(Name.MinimapSmallSquare, "minimap/minimap-square-128.png", false); //$NON-NLS-1$
     }
 
-    public TextureImpl getMinimapSmallSquare() {
-        return getNamedTexture(Name.MinimapSmallSquare, "minimap/minimap-square-256.png", false); //$NON-NLS-1$
+    public TextureImpl getMinimapMediumSquare() {
+        return getNamedTexture(Name.MinimapMediumSquare, "minimap/minimap-square-256.png", false); //$NON-NLS-1$
     }
 
     public TextureImpl getMinimapLargeSquare() {

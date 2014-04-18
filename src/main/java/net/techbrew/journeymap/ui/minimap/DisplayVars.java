@@ -3,45 +3,132 @@ package net.techbrew.journeymap.ui.minimap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 
 import java.awt.*;
+import java.util.Arrays;
 
 /**
+ * Display variables for the Minimap.
+ *
  * Encapsulates all the layout and display specifics for rendering the Minimap
- * given a Shape, Position, screen size, and user preferences.
-*/
-public class DisplayVars {
+ * given a Shape, Position, screen size, and user preferences.  All of the values
+ * only need to be calculated once after a change of shape/position/screen size,
+ * so it's done here rather than during the minimap renderloop.
+ */
+public class DisplayVars
+{
 
-    public enum Position {
+    /**
+     * Position of minimap on screen
+     */
+    public enum Position
+    {
         TopRight("MiniMap.position_topright"),
         BottomRight("MiniMap.position_bottomright"),
         BottomLeft("MiniMap.position_bottomleft"),
         TopLeft("MiniMap.position_topleft");
 
         public final String label;
-        private Position(String label){
+
+        public static Position getPreferred()
+        {
+            String positionName = PropertyManager.getStringProp(PropertyManager.Key.PREF_MINIMAP_POSITION);
+            DisplayVars.Position position = DisplayVars.Position.safeValueOf(positionName);
+            if(!position.name().equals(positionName))
+            {
+                PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_POSITION, position.name());
+            }
+            return position;
+        }
+
+        private static Position safeValueOf(String name)
+        {
+            Position value = null;
+            try
+            {
+                value = Position.valueOf(name);
+            }
+            catch (IllegalArgumentException e)
+            {
+                JourneyMap.getLogger().warning("Not a valid minimap position: " + name);
+            }
+
+            if(value==null)
+            {
+                value = Position.TopRight;
+            }
+            return value;
+        }
+
+        private Position(String label)
+        {
             this.label = label;
         }
     }
 
-    public enum Shape {
-        TinySquare("MiniMap.shape_tinysquare"),
+    /**
+     * Shape (and size) of minimap
+     */
+    public enum Shape
+    {
         SmallSquare("MiniMap.shape_smallsquare"),
+        MediumSquare("MiniMap.shape_mediumsquare"),
         LargeSquare("MiniMap.shape_largesquare"),
         SmallCircle("MiniMap.shape_smallcircle"),
         LargeCircle("MiniMap.shape_largecircle");
         public final String label;
-        private Shape(String label){
+
+        private Shape(String label)
+        {
             this.label = label;
         }
 
-        public static Shape[] Enabled = {TinySquare, SmallSquare, LargeSquare};
+        public static Shape getPreferred()
+        {
+            String shapeName = PropertyManager.getStringProp(PropertyManager.Key.PREF_MINIMAP_SHAPE);
+            DisplayVars.Shape shape = DisplayVars.Shape.safeValueOf(shapeName);
+            if(!shape.name().equals(shapeName))
+            {
+                PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_SHAPE, shape.name());
+            }
+            return shape;
+        }
+
+        private static Shape safeValueOf(String name)
+        {
+            Shape value = null;
+            try
+            {
+                value = Shape.valueOf(name);
+            }
+            catch (IllegalArgumentException e)
+            {
+                JourneyMap.getLogger().warning("Not a valid minimap shape: " + name);
+            }
+
+            if(value==null || !value.isEnabled())
+            {
+                value = Shape.MediumSquare;
+            }
+            return value;
+        }
+
+        public boolean isEnabled()
+        {
+            return Arrays.binarySearch(DisplayVars.Shape.Enabled, this)>=0;
+        }
+
+        public static Shape[] Enabled = {SmallSquare, MediumSquare, LargeSquare};
     }
 
+    /**
+     * Encapsulation of label attributes.
+     */
     class LabelVars
     {
         final double x;
@@ -67,17 +154,17 @@ public class DisplayVars {
         {
             boolean isUnicode = false;
             FontRenderer fontRenderer = null;
-            if(forceUnicode)
+            if (forceUnicode)
             {
-                fontRenderer =  Minecraft.getMinecraft().fontRenderer;
+                fontRenderer = Minecraft.getMinecraft().fontRenderer;
                 isUnicode = fontRenderer.getUnicodeFlag();
-                if(!isUnicode)
+                if (!isUnicode)
                 {
                     fontRenderer.setUnicodeFlag(true);
                 }
             }
             DrawUtil.drawLabel(text, x, y, hAlign, vAlign, bgColor, bgAlpha, color, alpha, fontScale, fontShadow);
-            if(forceUnicode && !isUnicode)
+            if (forceUnicode && !isUnicode)
             {
                 fontRenderer.setUnicodeFlag(false);
             }
@@ -94,8 +181,8 @@ public class DisplayVars {
     final int displayWidth;
     final int displayHeight;
     final ScaledResolution scaledResolution;
-    final double minimapSize,textureX,textureY;
-    final double minimapOffset,translateX,translateY;
+    final double minimapSize, textureX, textureY;
+    final double minimapOffset, translateX, translateY;
     final double marginX, marginY, scissorX, scissorY;
     final double viewPortPadX;
     final double viewPortPadY;
@@ -104,82 +191,95 @@ public class DisplayVars {
 
     boolean forceUnicode;
 
-    DisplayVars(Minecraft mc, Shape shape, Position position, double _fontScale)
+    /**
+     * Constructor.
+     * @param mc    Minecraft
+     * @param shape Desired shape
+     * @param position  Desired position
+     * @param labelFontScale    Font scale for labels
+     */
+    DisplayVars(Minecraft mc, Shape shape, Position position, double labelFontScale)
     {
-        forceUnicode = (PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_FORCEUNICODE));
-        showFps = (PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_SHOWFPS));
-
-        final boolean useUnicode = (forceUnicode || mc.fontRenderer.getUnicodeFlag());
+        // Immutable member and local vars
+        this.scaledResolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
+        this.forceUnicode = (PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_FORCEUNICODE));
+        this.showFps = (PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_SHOWFPS));
         this.shape = shape;
         this.position = position;
-        this.fontScale = _fontScale * (useUnicode ? 2 : 1);
-        displayWidth = mc.displayWidth;
-        displayHeight = mc.displayHeight;
-        scaledResolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
-
+        this.displayWidth = mc.displayWidth;
+        this.displayHeight = mc.displayHeight;
         final boolean useFontShadow = false;
+        final boolean useUnicode = (forceUnicode || mc.fontRenderer.getUnicodeFlag());
+        this.fontScale = labelFontScale * (useUnicode ? 2 : 1);
+        final double labelHeight = DrawUtil.getLabelHeight(mc.fontRenderer, useFontShadow) * (useUnicode ? this.fontScale * .7 : this.fontScale);
 
-        double labelHeight = DrawUtil.getLabelHeight(mc.fontRenderer, useFontShadow) * (useUnicode ? this.fontScale*.7 : this.fontScale);
-        double labelFpsYOffset = 4;
-        double labelBiomeYOffset =  -3;
-        double labelLocationYOffset = labelBiomeYOffset + -labelHeight;
+        // Mutable local vars
         double bottomTextureYMargin = 0;
-
+        boolean labelsOutside = false;
         boolean scissorFps = true;
         boolean scissorLocation = false;
         boolean scissorBiome = true;
-
-        boolean labelsOutside = false;
-
+        double yOffsetFps = 4;
+        double yOffsetBiome = -3;
+        double yOffsetLocation = yOffsetBiome + -labelHeight;
         DrawUtil.VAlign valignFps = DrawUtil.VAlign.Below;
         DrawUtil.VAlign valignLocation = DrawUtil.VAlign.Above;
         DrawUtil.VAlign valignBiome = DrawUtil.VAlign.Above;
 
-        switch(shape){
-            case LargeCircle: {
+        // Assign shape
+        switch (shape)
+        {
+            case LargeCircle:
+            {
                 drawScale = 1f;
                 borderTexture = TextureCache.instance().getMinimapLargeCircle();
                 maskTexture = TextureCache.instance().getMinimapLargeCircleMask();
                 minimapSize = 512;
-                marginX=3;
-                marginY=3;
-                viewPortPadX=5;
-                viewPortPadY=5;
-                if(fontScale==1){
+                marginX = 3;
+                marginY = 3;
+                viewPortPadX = 5;
+                viewPortPadY = 5;
+                if (fontScale == 1)
+                {
                     bottomTextureYMargin = 10;
-                } else {
+                } else
+                {
                     bottomTextureYMargin = 20;
                 }
                 break;
             }
-            case SmallCircle: {
+            case SmallCircle:
+            {
                 drawScale = 0.5f;
                 borderTexture = TextureCache.instance().getMinimapSmallCircle();
                 maskTexture = TextureCache.instance().getMinimapSmallCircleMask();
                 minimapSize = 256;
-                marginX=2;
-                marginY=2;
-                viewPortPadX=5;
-                viewPortPadY=5;
-                if(fontScale==1){
+                marginX = 2;
+                marginY = 2;
+                viewPortPadX = 5;
+                viewPortPadY = 5;
+                if (fontScale == 1)
+                {
                     bottomTextureYMargin = 14;
-                } else {
+                } else
+                {
                     bottomTextureYMargin = 24;
                 }
                 break;
             }
-            case LargeSquare: {
+            case LargeSquare:
+            {
                 drawScale = 1f;
                 borderTexture = TextureCache.instance().getMinimapLargeSquare();
                 maskTexture = null;
                 minimapSize = 512;
-                marginX=0;
-                marginY=0;
-                viewPortPadX=5;
-                viewPortPadY=5;
-                labelFpsYOffset = 5;
-                labelLocationYOffset = -5;
-                labelBiomeYOffset = labelLocationYOffset - labelHeight;
+                marginX = 0;
+                marginY = 0;
+                viewPortPadX = 5;
+                viewPortPadY = 5;
+                yOffsetFps = 5;
+                yOffsetLocation = -5;
+                yOffsetBiome = yOffsetLocation - labelHeight;
                 break;
             }
             case SmallSquare:
@@ -187,101 +287,106 @@ public class DisplayVars {
                 drawScale = 0.5f;
                 borderTexture = TextureCache.instance().getMinimapSmallSquare();
                 maskTexture = null;
-                minimapSize = 256;
-                marginX=0;
-                marginY=0;
-                viewPortPadX=4;
-                viewPortPadY=5;
-                labelFpsYOffset = 5;
-                labelLocationYOffset = -5;
-                labelBiomeYOffset = labelLocationYOffset - labelHeight;
-                break;
-            }
-            case TinySquare:
-            default: {
-                drawScale = 0.5f;
-                borderTexture = TextureCache.instance().getMinimapTinySquare();
-                maskTexture = null;
                 minimapSize = 128;
-                marginX=0;
-                marginY=0;
-                viewPortPadX=2;
-                viewPortPadY=2;
+                marginX = 0;
+                marginY = 0;
+                viewPortPadX = 2;
+                viewPortPadY = 2;
                 valignLocation = DrawUtil.VAlign.Below;
                 valignBiome = DrawUtil.VAlign.Below;
-                labelFpsYOffset = 3;
-                labelLocationYOffset = 1;
-                labelBiomeYOffset = labelLocationYOffset + labelHeight;
+                yOffsetFps = 3;
+                yOffsetLocation = 1;
+                yOffsetBiome = yOffsetLocation + labelHeight;
                 scissorLocation = false;
                 scissorBiome = false;
                 labelsOutside = true;
                 break;
             }
+            case MediumSquare:
+            default:
+            {
+                drawScale = 0.5f;
+                borderTexture = TextureCache.instance().getMinimapMediumSquare();
+                maskTexture = null;
+                minimapSize = 256;
+                marginX = 0;
+                marginY = 0;
+                viewPortPadX = 4;
+                viewPortPadY = 5;
+                yOffsetFps = 5;
+                yOffsetLocation = -5;
+                yOffsetBiome = yOffsetLocation - labelHeight;
+                break;
+            }
         }
 
-        minimapOffset = minimapSize*0.5;
-        final int textureOffsetX = 0; //(borderTexture.width-minimapSize)/2;
+        minimapOffset = minimapSize * 0.5;
 
-        switch(position){
-            case BottomRight : {
-                textureX = mc.displayWidth - borderTexture.width + textureOffsetX - marginX;
-                textureY = mc.displayHeight-(borderTexture.height) - marginY - bottomTextureYMargin;
-                translateX = (mc.displayWidth/2)-minimapOffset;
-                translateY = (mc.displayHeight/2)-minimapOffset - bottomTextureYMargin;
-                scissorX = mc.displayWidth-minimapSize-marginX;
+        // Assign position
+        switch (position)
+        {
+            case BottomRight:
+            {
+                textureX = mc.displayWidth - borderTexture.width - marginX;
+                textureY = mc.displayHeight - (borderTexture.height) - marginY - bottomTextureYMargin;
+                translateX = (mc.displayWidth / 2) - minimapOffset;
+                translateY = (mc.displayHeight / 2) - minimapOffset - bottomTextureYMargin;
+                scissorX = mc.displayWidth - minimapSize - marginX;
                 scissorY = marginY + bottomTextureYMargin;
-                if(labelsOutside)
+                if (labelsOutside)
                 {
-                    labelLocationYOffset = -minimapSize;
+                    yOffsetLocation = -minimapSize;
                     valignLocation = DrawUtil.VAlign.Above;
                     valignBiome = DrawUtil.VAlign.Above;
-                    labelBiomeYOffset = labelLocationYOffset - labelHeight;
+                    yOffsetBiome = yOffsetLocation - labelHeight;
                 }
                 break;
             }
-            case TopLeft : {
-                textureX = -textureOffsetX + marginX;
-                textureY =  marginY;
-                translateX = -(mc.displayWidth/2)+minimapOffset;
-                translateY = -(mc.displayHeight/2)+minimapOffset;
-                scissorX = marginX;
-                scissorY = mc.displayHeight-minimapSize-marginY;
-                break;
-            }
-            case BottomLeft : {
-                textureX = -textureOffsetX + marginX;
-                textureY = mc.displayHeight-(borderTexture.height) - marginY - bottomTextureYMargin;
-                translateX = -(mc.displayWidth/2)+minimapOffset;
-                translateY = (mc.displayHeight/2)-minimapOffset - bottomTextureYMargin;
-                scissorX = marginX;
-                scissorY = marginY + bottomTextureYMargin;
-                if(labelsOutside)
-                {
-                    labelLocationYOffset = -minimapSize;
-                    valignLocation = DrawUtil.VAlign.Above;
-                    valignBiome = DrawUtil.VAlign.Above;
-                    labelBiomeYOffset = labelLocationYOffset - labelHeight;
-                }
-                break;
-            }
-            case TopRight :
-            default : {
-                textureX = mc.displayWidth - borderTexture.width + textureOffsetX - marginX;
+            case TopLeft:
+            {
+                textureX = marginX;
                 textureY = marginY;
-                translateX = (mc.displayWidth/2)-minimapOffset;
-                translateY = -(mc.displayHeight/2)+minimapOffset;
-                scissorX = mc.displayWidth-minimapSize-marginX;
-                scissorY = mc.displayHeight-minimapSize-marginY;
+                translateX = -(mc.displayWidth / 2) + minimapOffset;
+                translateY = -(mc.displayHeight / 2) + minimapOffset;
+                scissorX = marginX;
+                scissorY = mc.displayHeight - minimapSize - marginY;
+                break;
+            }
+            case BottomLeft:
+            {
+                textureX = marginX;
+                textureY = mc.displayHeight - (borderTexture.height) - marginY - bottomTextureYMargin;
+                translateX = -(mc.displayWidth / 2) + minimapOffset;
+                translateY = (mc.displayHeight / 2) - minimapOffset - bottomTextureYMargin;
+                scissorX = marginX;
+                scissorY = marginY + bottomTextureYMargin;
+                if (labelsOutside)
+                {
+                    yOffsetLocation = -minimapSize;
+                    valignLocation = DrawUtil.VAlign.Above;
+                    valignBiome = DrawUtil.VAlign.Above;
+                    yOffsetBiome = yOffsetLocation - labelHeight;
+                }
+                break;
+            }
+            case TopRight:
+            default:
+            {
+                textureX = mc.displayWidth - borderTexture.width + marginX;
+                textureY = marginY;
+                translateX = (mc.displayWidth / 2) - minimapOffset;
+                translateY = -(mc.displayHeight / 2) + minimapOffset;
+                scissorX = mc.displayWidth - minimapSize - marginX;
+                scissorY = mc.displayHeight - minimapSize - marginY;
                 break;
             }
         }
 
-        double centerX = textureX + (minimapSize/2);
+        double centerX = textureX + (minimapSize / 2);
         double topY = textureY;
         double bottomY = textureY + minimapSize;
-        labelFps = new LabelVars(centerX, topY + labelFpsYOffset, DrawUtil.HAlign.Center, valignFps, fontScale, scissorFps, useFontShadow);
-        labelLocation = new LabelVars(centerX, bottomY + labelLocationYOffset, DrawUtil.HAlign.Center, valignLocation, fontScale, scissorLocation, useFontShadow);
-        labelBiome = new LabelVars(centerX, bottomY + labelBiomeYOffset, DrawUtil.HAlign.Center, valignBiome, fontScale, scissorBiome, useFontShadow);
-
+        labelFps = new LabelVars(centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, scissorFps, useFontShadow);
+        labelLocation = new LabelVars(centerX, bottomY + yOffsetLocation, DrawUtil.HAlign.Center, valignLocation, fontScale, scissorLocation, useFontShadow);
+        labelBiome = new LabelVars(centerX, bottomY + yOffsetBiome, DrawUtil.HAlign.Center, valignBiome, fontScale, scissorBiome, useFontShadow);
     }
 }

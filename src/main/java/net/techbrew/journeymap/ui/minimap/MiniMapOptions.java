@@ -10,8 +10,6 @@ import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
 import org.lwjgl.input.Keyboard;
 
-import java.util.Arrays;
-
 public class MiniMapOptions extends JmUI {
 
 	private enum ButtonEnum {MiniMap,Position,Shape,Font,Unicode,Keyboard,KeyboardHelp, Close, Showfps, CloseAll};
@@ -44,12 +42,12 @@ public class MiniMapOptions extends JmUI {
                 minimapOn); //$NON-NLS-1$  //$NON-NLS-2$
         buttonMiniMap.setToggled(minimapOn);
 
-        DisplayVars.Position position = DisplayVars.Position.valueOf(pm.getString(PropertyManager.Key.PREF_MINIMAP_POSITION));
+        DisplayVars.Position position = DisplayVars.Position.getPreferred();
         buttonPosition = new Button(ButtonEnum.Position.ordinal(), 0, 0, "");
         setPosition(position);
         buttonPosition.enabled = minimapOn;
 
-        DisplayVars.Shape shape = DisplayVars.Shape.valueOf(pm.getString(PropertyManager.Key.PREF_MINIMAP_SHAPE));
+        DisplayVars.Shape shape = DisplayVars.Shape.getPreferred();
         buttonShape = new Button(ButtonEnum.Shape.ordinal(), 0, 0, "");
         setShape(shape);
         buttonShape.enabled = minimapOn;
@@ -211,7 +209,8 @@ public class MiniMapOptions extends JmUI {
     }
 
     private void setShape(DisplayVars.Shape shape){
-        if(Arrays.binarySearch(DisplayVars.Shape.Enabled, shape)<0){
+        if(!shape.isEnabled())
+        {
             shape = DisplayVars.Shape.Enabled[0];
         }
         currentShape = shape;

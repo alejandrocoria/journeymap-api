@@ -226,7 +226,7 @@ MiniMap.position_bottomright=Bottom Right
 MiniMap.shape=Shape: %1$s
 
 # Added in 4.0.0
-MiniMap.shape_tinysquare=Tiny Square
+MiniMap.shape_mediumsquare=Medium Square
 
 # Added in 3.1.x.
 MiniMap.shape_smallsquare=Small Square

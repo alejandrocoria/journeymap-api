@@ -63,11 +63,12 @@ public class DrawWayPointStep implements DrawStep {
         Point2D.Double pixel = gridRenderer.getBlockPixelInGrid(posX + xOffset + .5, posZ + yOffset + .5);
         if (gridRenderer.isOnScreen(pixel))
         {
+            double halfTexHeight = texture.height/2;
             if(label!=null)
             {
-                DrawUtil.drawCenteredLabel(label, pixel.getX(), pixel.getY() - texture.height, Color.black, alpha, fontColor, 255, fontScale);
+                DrawUtil.drawLabel(label, pixel.getX(), pixel.getY()-halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, alpha, fontColor, 180, fontScale, false);
             }
-            DrawUtil.drawColoredImage(texture, alpha, color, pixel.getX() - (texture.width / 2), pixel.getY() - (texture.height / 2));
+            DrawUtil.drawColoredImage(texture, alpha, color, pixel.getX() - (texture.width / 2), pixel.getY() - halfTexHeight);
         }
         else
         {
