@@ -20,6 +20,9 @@ import java.util.Random;
  */
 public class Waypoint implements Serializable
 {
+    protected static final String ICON_NORMAL = "waypoint-normal.png";
+    protected static final String ICON_DEATH = "waypoint-death.png";
+
     public enum Type
     {
         Normal,
@@ -28,6 +31,7 @@ public class Waypoint implements Serializable
 
     protected String id;
     protected String name;
+    protected String icon;
     protected int x;
     protected int y;
     protected int z;
@@ -96,6 +100,18 @@ public class Waypoint implements Serializable
         this.type = type;
         this.origin = origin;
         this.dimensions = dimensions;
+
+        switch(type)
+        {
+            case Normal:
+            {
+                icon = ICON_NORMAL;
+            }
+            case Death:
+            {
+                icon = ICON_DEATH;
+            }
+        }
     }
 
     public void setLocation(int x, int y, int z)
@@ -202,6 +218,16 @@ public class Waypoint implements Serializable
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public String getIcon()
+    {
+        return icon;
+    }
+
+    public void setIcon(String icon)
+    {
+        this.icon = icon;
     }
 
     public int getX()

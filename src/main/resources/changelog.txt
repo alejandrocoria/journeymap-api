@@ -23,13 +23,14 @@ Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 -- In-game: Use CTRL-"B" to directly open the Waypoint Manager
 -- In-game Full-screen Map: Use the "Waypoints" button to open the Waypoint Manager
 
-- New feature: Map Coordinates
+- New feature: Map Coordinates under Mouse
 -- In-game Full-screen Map: Block coordinates under your mouse are now displayed at the bottom of the screen. Elevation and biome are also shown if that chunk is loaded.
 
 - Notable Changes:
 -- In-game map dialogs use the dimmed game world as background instead of the dirt texture.
 -- Minimap Options has a "Tiny Square" size
 -- Minimap Options has a "Force Unicode" option for display of FPS and Location labels
+-- In-game map locations now use explicit coordinate designations.  For example: "x:982, z:-520, y:70"
 
 - Performance Improvements:
 -- In-game maps are more efficient about checking render steps are within the active viewport; should improve pan/zoom update speeds on slower machines
