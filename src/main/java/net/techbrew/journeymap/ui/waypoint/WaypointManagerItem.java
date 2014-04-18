@@ -22,14 +22,16 @@ import java.util.Comparator;
  */
 public class WaypointManagerItem implements ScrollPane.Scrollable {
 
+    final FontRenderer fontRenderer;
+    final WaypointManager manager;
+
     int x;
     int y;
     int width;
-    Integer distance;
+    int internalWidth;
 
+    Integer distance;
     Waypoint waypoint;
-    final FontRenderer fontRenderer;
-    final WaypointManager manager;
 
     Button buttonEnable;
     Button buttonRemove;
@@ -37,6 +39,7 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
     Button buttonFind;
     Button buttonTeleport;
 
+    int hgap = 4;
     ButtonList buttonListLeft;
     ButtonList buttonListRight;
 
@@ -69,6 +72,12 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
         buttonListRight = new ButtonList(buttonEdit, buttonRemove);
         ButtonList.setHeights(manager.rowHeight, buttonListRight);
         ButtonList.fitWidths(fontRenderer, buttonListRight);
+
+        this.internalWidth = fontRenderer.getStringWidth(waypoint.getName());
+        internalWidth += Math.max(manager.colLocation, manager.colName);
+        internalWidth += buttonListLeft.getWidth(hgap);
+        internalWidth += buttonListRight.getWidth(hgap);
+        internalWidth += 40;
     }
 
     @Override
@@ -130,20 +139,19 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
         int alpha = hover ? 255 : 100;
         DrawUtil.drawRectangle(this.x, this.y, this.width, manager.rowHeight, color, alpha);
 
-        drawWaypoint(x + manager.colWaypoint, y + (manager.rowHeight / 2));
-        drawLabels(mc, this.x, this.y, this.width, manager.rowHeight, null);
-
-        int hgap = 4;
+        int margin = manager.getMargin();
+        drawWaypoint(this.x + margin + manager.colWaypoint, this.y + (manager.rowHeight / 2));
+        drawLabels(mc, this.x + margin, this.y, null);
 
         buttonFind.enabled = waypoint.isInPlayerDimension();
 
         buttonTeleport.enabled = waypoint.isTeleportReady();
 
-        buttonListRight.layoutHorizontal(x + width, y, false, hgap).draw(mc, mouseX, mouseY);
+        buttonListRight.layoutHorizontal(x + width - margin, y, false, hgap).draw(mc, mouseX, mouseY);
         buttonListLeft.layoutHorizontal(buttonListRight.getLeftX() - (hgap*2), y, false, hgap).draw(mc, mouseX, mouseY);
     }
 
-    protected void drawLabels(Minecraft mc, int x, int y, int width, int height, Color color)
+    protected void drawLabels(Minecraft mc, int x, int y, Color color)
     {
         if(this.waypoint==null) return;
 
@@ -222,6 +230,20 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
         Sort(boolean ascending)
         {
             this.ascending = ascending;
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            return true;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return (ascending ? 1 : 0);
         }
     }
 
