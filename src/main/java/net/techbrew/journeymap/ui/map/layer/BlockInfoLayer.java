@@ -57,7 +57,10 @@ public class BlockInfoLayer {
                 info = Constants.getString("MapOverlay.location_xzy", blockCoord.x, blockCoord.z, "?");
             }
 
-            int infoHeight = DrawUtil.getLabelHeight(mc.fontRenderer, true);
+            boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, MapOverlay.state().mapForceUnicode);
+            double infoHeight = DrawUtil.getLabelHeight(mc.fontRenderer, true) * MapOverlay.state().getMapFontScale();
+            if(unicodeForced) DrawUtil.stopUnicode(mc.fontRenderer);
+
             blockInfoStep.update(info, gridWidth/2, gridHeight - infoHeight);
         }
 
@@ -122,14 +125,14 @@ public class BlockInfoLayer {
         }
 
         @Override
-        public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float scale)
+        public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale)
         {
             if(ticks--<0 && alpha>0)
             {
                 alpha-=5; // Fade
             }
             if(alpha>0 && text!=null) {
-                DrawUtil.drawLabel(text, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, bgColor, Math.max(0, alpha), fgColor, Math.max(0, alpha), fontScale, fontShadow);
+                DrawUtil.drawLabel(text, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, bgColor, Math.max(0, alpha), fgColor, Math.max(0, alpha), MapOverlay.state().getMapFontScale(), fontShadow);
             }
         }
     }

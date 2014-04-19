@@ -20,7 +20,6 @@ public class DrawWayPointStep implements DrawStep {
     final Color color;
     final Color fontColor;
     final int alpha;
-    final double fontScale;
 
     /**
      * Draw just the editor icon
@@ -29,7 +28,7 @@ public class DrawWayPointStep implements DrawStep {
      */
     public DrawWayPointStep(double posX, double posZ)
     {
-        this(posX, posZ, TextureCache.instance().getWaypointEdit(), null, null, Color.white, Color.white, 255, 1f);
+        this(posX, posZ, TextureCache.instance().getWaypointEdit(), null, null, Color.white, Color.white, 255);
     }
 
     /**
@@ -42,10 +41,9 @@ public class DrawWayPointStep implements DrawStep {
      * @param color
      * @param fontColor
      * @param alpha
-     * @param fontScale
      */
     public DrawWayPointStep(double posX, double posZ, TextureImpl texture, TextureImpl offScreenTexture, String label,
-                            Color color, Color fontColor, int alpha, double fontScale)
+                            Color color, Color fontColor, int alpha)
     {
         this.posX = posX;
         this.posZ = posZ;
@@ -55,12 +53,12 @@ public class DrawWayPointStep implements DrawStep {
         this.color = color;
         this.fontColor = fontColor;
         this.alpha = alpha;
-        this.fontScale = fontScale;
     }
 
     @Override
-    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float scale) {
-        Point2D.Double pixel = gridRenderer.getBlockPixelInGrid(posX + xOffset + .5, posZ + yOffset + .5);
+    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale) {
+        Point2D.Double pixel = gridRenderer.getBlockPixelInGrid(posX + .5, posZ  + .5);
+        pixel.setLocation(pixel.getX() + xOffset, pixel.getY() + yOffset);
         if (gridRenderer.isOnScreen(pixel))
         {
             double halfTexHeight = texture.height/2;

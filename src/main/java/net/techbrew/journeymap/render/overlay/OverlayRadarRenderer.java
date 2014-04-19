@@ -26,7 +26,7 @@ import java.util.Map;
  */
 public class OverlayRadarRenderer {
 
-	public List<DrawStep> prepareSteps(List<Map> critters, GridRenderer grid, double fontScale, float drawScale) {
+	public List<DrawStep> prepareSteps(List<Map> critters, GridRenderer grid, float drawScale) {
 		
 		final boolean showAnimals = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_ANIMALS);
 		final boolean showPets = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_PETS);
@@ -95,10 +95,10 @@ public class OverlayRadarRenderer {
 					if(isPlayer) {
 						// Draw Label			
 						String username = (String) critter.get(EntityKey.username);
-						drawStepList.add(new DrawCenteredLabelStep(posX, posZ, username, -entityIcon.height, labelBg, Color.green, fontScale));
+						drawStepList.add(new DrawCenteredLabelStep(posX, posZ, username, -entityIcon.height, labelBg, Color.green));
 					} else if(critter.containsKey(EntityKey.customName)){
 						String customName = (String) critter.get(EntityKey.customName);
-						drawStepList.add(new DrawCenteredLabelStep(posX, posZ, customName, entityIcon.height/2, labelBg, Color.white, fontScale));
+						drawStepList.add(new DrawCenteredLabelStep(posX, posZ, customName, entityIcon.height/2, labelBg, Color.white));
 					}
 				}
 			}

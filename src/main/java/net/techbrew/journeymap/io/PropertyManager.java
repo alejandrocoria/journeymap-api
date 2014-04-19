@@ -44,6 +44,10 @@ public class PropertyManager {
 		PREF_SHOW_PLAYERS(Boolean.class,"preference_show_players", true), //$NON-NLS-1$
 		PREF_SHOW_WAYPOINTS(Boolean.class,"preference_show_waypoints", true), //$NON-NLS-1$
 		PREF_SHOW_GRID(Boolean.class,"preference_show_grid", true), //$NON-NLS-1$
+
+        PREF_FONTSCALE(Double.class,"preference_fontscale", 1.0), //$NON-NLS-1$
+        PREF_FORCEUNICODE(Boolean.class,"preference_forceunicode", false), //$NON-NLS-1$
+
         PREF_SHOW_MINIMAP(Boolean.class,"preference_show_minimap", !WaypointHelper.isReiLoaded() && !WaypointHelper.isVoxelMapLoaded()), //$NON-NLS-1$
 
         PREF_MINIMAP_SHAPE(String.class,"preference_minimap_shape", DisplayVars.Shape.SmallSquare.name()), //$NON-NLS-1$

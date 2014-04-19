@@ -10,6 +10,7 @@ import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.ui.Button;
+import net.techbrew.journeymap.ui.ButtonList;
 import net.techbrew.journeymap.ui.JmUI;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.waypoint.WaypointHelper;
@@ -20,9 +21,13 @@ public class MapOverlayOptions extends JmUI {
 	int lastWidth = 0;
 	int lastHeight = 0;
 	
-	private enum ButtonEnum {Caves,Monsters,Animals,Villagers,Pets,Players,Waypoints,Grid,Webserver,MiniMap, KeyboardHelp, Close};
+	private enum ButtonEnum {Caves,Monsters,Animals,Villagers,Pets,Players,Waypoints,Grid,Webserver,MiniMap,Font,Unicode, KeyboardHelp, Close};
 
-	Button buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonWaypoints, buttonGrid, buttonWebserver, buttonMiniMap, buttonKeyboardHelp, buttonClose;
+	Button buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonFont, buttonUnicode, buttonWaypoints;
+    Button buttonGrid, buttonWebserver, buttonMiniMap, buttonKeyboardHelp, buttonClose;
+
+    ButtonList leftButtons;
+    ButtonList rightButtons;
 	
 	public MapOverlayOptions() {
 		super(Constants.getString("MapOverlay.options"));
@@ -35,6 +40,7 @@ public class MapOverlayOptions extends JmUI {
 	public void initGui()
     {
         this.buttonList.clear();
+
         String on = Constants.getString("MapOverlay.on");
         String off = Constants.getString("MapOverlay.off");
         
@@ -94,6 +100,19 @@ public class MapOverlayOptions extends JmUI {
                 Constants.getString("MapOverlay.show_grid", on),
                 Constants.getString("MapOverlay.show_grid", off),
                 gridOn); //$NON-NLS-1$  //$NON-NLS-2$
+
+        double mapFontScale = PropertyManager.getDoubleProp(PropertyManager.Key.PREF_FONTSCALE);
+        MapOverlay.state().setMapFontScale(mapFontScale);
+        buttonFont = new Button(ButtonEnum.Font.ordinal(), 0, 0,
+                Constants.getString("MiniMap.font", Constants.getString("MiniMap.font_small")),
+                Constants.getString("MiniMap.font", Constants.getString("MiniMap.font_large")),
+                (mapFontScale==1));
+
+        boolean forceUnicode = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_FORCEUNICODE);
+        buttonUnicode = new Button(ButtonEnum.Unicode.ordinal(), 0, 0,
+                Constants.getString("MiniMap.force_unicode", on),
+                Constants.getString("MiniMap.force_unicode", off), forceUnicode);
+        MapOverlay.state().mapForceUnicode = forceUnicode;
 				
 		if(!FeatureManager.isAllowed(Feature.MapCaves)) {
 			buttonCaves.setToggled(false);
@@ -134,6 +153,11 @@ public class MapOverlayOptions extends JmUI {
 		buttonList.add(buttonWebserver);
         buttonList.add(buttonKeyboardHelp);
         buttonList.add(buttonMiniMap);
+        buttonList.add(buttonFont);
+        buttonList.add(buttonUnicode);
+
+        leftButtons = new ButtonList(buttonCaves, buttonAnimals, buttonPets, buttonGrid, buttonFont, buttonMiniMap);
+        rightButtons = new ButtonList(buttonMonsters, buttonVillagers, buttonPlayers, buttonWaypoints, buttonUnicode, buttonWebserver);
     }
 
     /**
@@ -154,25 +178,13 @@ public class MapOverlayOptions extends JmUI {
 			
 			final int hgap = 4;
 			final int vgap = 3;
-			final int bx = (this.width - hgap)/2;
-			final int by = this.height / 4;
-			
-			buttonCaves.leftOf(bx).setY(by);
-			buttonMonsters.rightOf(buttonCaves, hgap).setY(by);
-			
-			buttonAnimals.below(buttonCaves, vgap).leftOf(bx);
-			buttonVillagers.rightOf(buttonAnimals, hgap).below(buttonMonsters, vgap);
+			final int bx = (this.width)/2;
+			final int by = Math.max(30, this.height/6);
 
-			buttonPets.below(buttonAnimals, vgap).leftOf(bx);
-			buttonPlayers.rightOf(buttonPets, hgap).below(buttonVillagers, vgap);
+			leftButtons.layoutVertical(bx - (hgap/2), by, false, vgap);
+            rightButtons.layoutVertical(bx + (hgap/2), by, true, vgap);
 
-			buttonGrid.below(buttonPets, vgap).leftOf(bx);
-			buttonWaypoints.rightOf(buttonGrid, hgap).below(buttonPlayers, vgap);
-
-            buttonMiniMap.below(buttonGrid, vgap).leftOf(bx);
-			buttonWebserver.rightOf(buttonMiniMap, vgap).below(buttonWaypoints, vgap);
-
-            buttonKeyboardHelp.below(buttonWebserver, vgap).centerHorizontalOn(bx);
+            buttonKeyboardHelp.below(leftButtons, vgap).centerHorizontalOn(bx);
 
 			buttonClose.below(buttonKeyboardHelp, vgap).centerHorizontalOn(bx);
 
@@ -236,6 +248,20 @@ public class MapOverlayOptions extends JmUI {
             }
             case KeyboardHelp: {
                 UIManager.getInstance().openMapHotkeyHelp();
+                break;
+            }
+            case Font: {
+                double newScale = (PropertyManager.getDoubleProp(PropertyManager.Key.PREF_FONTSCALE)==1) ? 2 : 1;
+                MapOverlay.state().setMapFontScale(newScale);
+                PropertyManager.set(PropertyManager.Key.PREF_FONTSCALE, newScale);
+                buttonFont.setToggled(newScale==1);
+                break;
+            }
+            case Unicode: {
+                boolean forceUnicode = !PropertyManager.getBooleanProp(PropertyManager.Key.PREF_FORCEUNICODE);
+                buttonUnicode.setToggled(forceUnicode);
+                PropertyManager.set(PropertyManager.Key.PREF_FORCEUNICODE, forceUnicode);
+                MapOverlay.state().mapForceUnicode = forceUnicode;
                 break;
             }
 		}

@@ -102,7 +102,9 @@ public class MiniMap
             gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0);
             if (doStateRefresh)
             {
-                state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, state.mapFontScale, dv.drawScale);
+                //boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, state.mapForceUnicode);
+                state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, dv.drawScale);
+                //if(unicodeForced) DrawUtil.stopUnicode(mc.fontRenderer);
                 state.updateLastRefresh();
             }
 
@@ -164,7 +166,9 @@ public class MiniMap
             gridRenderer.draw(1f, 0, 0);
 
             // Draw entities, etc
-            gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale);
+            boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, state.mapForceUnicode);
+            gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, state.getMapFontScale());
+            if(unicodeForced) DrawUtil.stopUnicode(mc.fontRenderer);
 
             // Draw player
             Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);

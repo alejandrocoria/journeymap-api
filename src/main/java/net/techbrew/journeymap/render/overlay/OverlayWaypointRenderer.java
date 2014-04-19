@@ -26,7 +26,7 @@ public class OverlayWaypointRenderer {
 	final BasicStroke thinRoundStroke = new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND);
 	final BasicStroke thickRoundStroke = new BasicStroke(6, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND);
 
-	public List<DrawStep> prepareSteps(List<Waypoint> waypoints, GridRenderer grid, double fontScale) {
+	public List<DrawStep> prepareSteps(List<Waypoint> waypoints, GridRenderer grid) {
 
 		final List<DrawStep> drawStepList = new ArrayList<DrawStep>();
 		
@@ -53,7 +53,7 @@ public class OverlayWaypointRenderer {
                     texture = tc.getWaypoint();
                 }
                 labelColor = (waypoint.getType()==Waypoint.Type.Death) ? Color.red : color;
-                drawStepList.add(new DrawWayPointStep(wx, wz, texture, tc.getWaypointOffscreen(), waypoint.getName(), color, labelColor, 220, fontScale));
+                drawStepList.add(new DrawWayPointStep(wx, wz, texture, tc.getWaypointOffscreen(), waypoint.getName(), color, labelColor, 220));
 			}
 		} catch(Throwable t) {
 			JourneyMap.getLogger().severe("Error during prepareSteps: " + LogFormatter.toString(t));

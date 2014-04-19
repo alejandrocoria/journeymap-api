@@ -24,10 +24,10 @@ public class DrawRotatedImageStep implements DrawStep {
     }
 
     @Override
-    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float scale) {
+    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale) {
         Point2D pixel = gridRenderer.getPixel(posX, posZ);
         if (pixel != null) {
-            DrawUtil.drawRotatedImage(texture, pixel.getX() + xOffset, pixel.getY() + yOffset, heading, scale);
+            DrawUtil.drawRotatedImage(texture, pixel.getX() + xOffset, pixel.getY() + yOffset, heading, drawScale);
         }
     }
 }

@@ -312,4 +312,23 @@ public class DrawUtil
             drawImage(texture, x - (width / 2), y - (height / 2) - bottomMargin, flip, scale);
         }
     }
+
+    public static boolean startUnicode(FontRenderer fr, boolean force)
+    {
+        if(!force) return false;
+
+        boolean isUnicode = fr.getUnicodeFlag();
+        if(!isUnicode)
+        {
+            fr.setUnicodeFlag(true);
+            return true;
+        }
+        return false;
+    }
+
+    public static void stopUnicode(FontRenderer fr)
+    {
+        fr.setUnicodeFlag(false);
+    }
+
 }

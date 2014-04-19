@@ -34,7 +34,10 @@ public class MapOverlayState {
 	// These can be safely changed at will
 	public boolean follow = true;
 	public int currentZoom;
-    public double fontScale = 1;
+    public double minimapFontScale = 1;
+    private double mapFontScale = 1;
+    public boolean mapForceUnicode = false;
+
 	public String playerLastPos = "0,0"; //$NON-NLS-1$
     public boolean minimapEnabled = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_MINIMAP);
     public boolean minimapHotkeys = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_HOTKEYS);
@@ -60,6 +63,8 @@ public class MapOverlayState {
 
         this.minimapEnabled = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_MINIMAP);
         this.minimapHotkeys = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_HOTKEYS);
+        mapFontScale = PropertyManager.getDoubleProp(PropertyManager.Key.PREF_FONTSCALE);
+        mapForceUnicode = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_FORCEUNICODE);
 
 		final MapType lastMapType = getMapType();
 		final boolean lastUnderground = this.underground;				
@@ -161,7 +166,7 @@ public class MapOverlayState {
         // Sort to keep named entities last
         if(!entities.isEmpty()) {
             Collections.sort(entities, new EntityHelper.EntityMapComparator());
-            drawStepList.addAll(radarRenderer.prepareSteps(entities, gridRenderer, fontScale, drawScale));
+            drawStepList.addAll(radarRenderer.prepareSteps(entities, gridRenderer, drawScale));
         }
 
         // Draw waypoints
@@ -169,8 +174,18 @@ public class MapOverlayState {
             Map map = (Map) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
             List<Waypoint> waypoints = new ArrayList<Waypoint>(map.values());
 
-            drawStepList.addAll(waypointRenderer.prepareSteps(waypoints, gridRenderer, fontScale));
+            drawStepList.addAll(waypointRenderer.prepareSteps(waypoints, gridRenderer));
         }
+    }
+
+    public double getMapFontScale()
+    {
+        return mapFontScale * (mapForceUnicode ? 2 : 1);
+    }
+
+    public void setMapFontScale(double fontScale)
+    {
+        this.mapFontScale = fontScale;
     }
 
     public boolean zoomIn(){

@@ -252,25 +252,22 @@ public class GridRenderer {
      * @param xOffset
      * @param yOffset
      */
-    public void draw(final List<DrawStep> drawStepList, double xOffset, double yOffset, float scale) {
+    public void draw(final List<DrawStep> drawStepList, double xOffset, double yOffset, float drawScale, double fontScale) {
         if(drawStepList==null || drawStepList.isEmpty()) return;
-        draw(xOffset, yOffset, scale, drawStepList.toArray(new DrawStep[drawStepList.size()]));
+        draw(xOffset, yOffset, drawScale, fontScale, drawStepList.toArray(new DrawStep[drawStepList.size()]));
     }
 
     /**
      * Draw an array of steps
-     * @param xOffset
-     * @param yOffset
-     * @param drawSteps
      */
-    public void draw(double xOffset, double yOffset, float scale, DrawStep... drawSteps) {
+    public void draw(double xOffset, double yOffset, float drawScale, double fontScale, DrawStep... drawSteps) {
 
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glDepthMask(false);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         for(DrawStep drawStep : drawSteps) {
-            drawStep.draw(xOffset, yOffset, this, scale);
+            drawStep.draw(xOffset, yOffset, this, drawScale, fontScale);
         }
 
         GL11.glDepthMask(true);

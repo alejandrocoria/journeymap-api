@@ -95,7 +95,7 @@ public class MapOverlay extends JmUI {
     {
     	Keyboard.enableRepeatEvents(true);
     	initButtons();
-    	
+
     	// When switching dimensions, reset grid
 		if(state.getDimension()!=mc.thePlayer.dimension) {
 			gridRenderer.clear();
@@ -560,23 +560,27 @@ public class MapOverlay extends JmUI {
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
         }
 
+        boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, state.mapForceUnicode);
+
         if(state.follow) {
             gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
         }
         gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
 		gridRenderer.draw(1f, xOffset, yOffset);
-        gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, 1f);
+        gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, 1f, state.getMapFontScale());
 
         Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
         if(playerPixel!=null) {
             TextureImpl tex = state.currentZoom==0 ? TextureCache.instance().getPlayerLocatorSmall() : TextureCache.instance().getPlayerLocator();
             DrawStep drawStep = new DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, tex, 8);
-            gridRenderer.draw(xOffset, yOffset, 1f, drawStep);
+            gridRenderer.draw(xOffset, yOffset, 1f, state.getMapFontScale(), drawStep);
         }
 
-        gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, 1f);
+        gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, 1f, state.getMapFontScale());
 
-        DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, playerInfoBgColor, 235, playerInfoFgColor, 255, state.mapFontScale, true);
+        DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, playerInfoBgColor, 235, playerInfoFgColor, 255, state.getMapFontScale(), true);
+
+        if(unicodeForced) DrawUtil.stopUnicode(mc.fontRenderer);
 
         drawLogo();
 
@@ -620,13 +624,13 @@ public class MapOverlay extends JmUI {
         }
         gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
         gridRenderer.draw(1f, 0, 0);
-        gridRenderer.draw(state.getDrawSteps(), 0, 0, 1f);
+        gridRenderer.draw(state.getDrawSteps(), 0, 0, 1f, state.getMapFontScale());
 
         Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
         if(playerPixel!=null) {
             TextureImpl tex = state.currentZoom==0 ? TextureCache.instance().getPlayerLocatorSmall() : TextureCache.instance().getPlayerLocator();
             DrawStep drawStep = new DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, tex, 8);
-            gridRenderer.draw(0, 0, 1f, drawStep);
+            gridRenderer.draw(0, 0, 1f, state.getMapFontScale(), drawStep);
         }
 
 		DrawUtil.drawImage(TextureCache.instance().getLogo(), 16, 4, false, 1f);
@@ -674,7 +678,7 @@ public class MapOverlay extends JmUI {
         gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 
 		// Build list of drawSteps
-		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, state.mapFontScale, 1f);
+		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, 1f);
 		
 		// Update player pos
 		state.playerLastPos = Constants.getString("MapOverlay.location_xzyeb",

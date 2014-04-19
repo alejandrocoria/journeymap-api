@@ -16,20 +16,18 @@ public class DrawCenteredLabelStep implements DrawStep {
     final int labelYOffset;
     final Color bgColor;
     final Color fgColor;
-    final double fontScale;
 
-    public DrawCenteredLabelStep(double posX, double posZ, String text, int labelYOffset, Color bgColor, Color fgColor, double fontScale) {
+    public DrawCenteredLabelStep(double posX, double posZ, String text, int labelYOffset, Color bgColor, Color fgColor) {
         this.posX = posX;
         this.posZ = posZ;
         this.text = text;
         this.labelYOffset = labelYOffset;
         this.bgColor = bgColor;
         this.fgColor = fgColor;
-        this.fontScale = fontScale;
     }
 
     @Override
-    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float scale) {
+    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale) {
         Point2D pixel = gridRenderer.getPixel(posX, posZ);
         if (pixel != null) {
             DrawUtil.drawCenteredLabel(text, pixel.getX() + xOffset, pixel.getY() + yOffset + labelYOffset, bgColor, 205, fgColor, 255, fontScale);
