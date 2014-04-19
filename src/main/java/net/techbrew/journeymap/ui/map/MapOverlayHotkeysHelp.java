@@ -3,8 +3,8 @@ package net.techbrew.journeymap.ui.map;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.forgehandler.KeyEventHandler;
+import net.techbrew.journeymap.ui.Button;
 import net.techbrew.journeymap.ui.JmUI;
-import net.techbrew.journeymap.ui.MapButton;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.minimap.DisplayVars;
 import org.lwjgl.input.Keyboard;
@@ -17,7 +17,7 @@ public class MapOverlayHotkeysHelp extends JmUI {
     private int lastHeight = 0;
 
 	private enum ButtonEnum {Close};
-	private MapButton buttonClose;
+	private Button buttonClose;
 
     private DisplayVars.Shape currentShape;
     private DisplayVars.Position currentPosition;
@@ -37,7 +37,7 @@ public class MapOverlayHotkeysHelp extends JmUI {
     {
         this.buttonList.clear();
 
-		buttonClose = new MapButton(ButtonEnum.Close.ordinal(),0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$
+		buttonClose = new Button(ButtonEnum.Close.ordinal(),0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$
 
         buttonList.add(buttonClose);
         

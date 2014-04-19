@@ -13,8 +13,8 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.MapOverlayState;
 import net.techbrew.journeymap.task.MapRegionTask;
 import net.techbrew.journeymap.task.SaveMapTask;
+import net.techbrew.journeymap.ui.Button;
 import net.techbrew.journeymap.ui.JmUI;
-import net.techbrew.journeymap.ui.MapButton;
 import net.techbrew.journeymap.ui.UIManager;
 import org.lwjgl.input.Keyboard;
 
@@ -26,7 +26,7 @@ public class MapOverlayActions extends JmUI {
 	
 	private enum ButtonEnum {Automap,Check,Save,Browser,Close};
 
-	MapButton buttonAutomap, buttonSave, buttonClose, buttonBrowser, buttonCheck;
+	Button buttonAutomap, buttonSave, buttonClose, buttonBrowser, buttonCheck;
 	
 	public MapOverlayActions() {
         super(Constants.getString("MapOverlay.actions"));
@@ -42,18 +42,18 @@ public class MapOverlayActions extends JmUI {
         String on = Constants.getString("MapOverlay.on");
         String off = Constants.getString("MapOverlay.off");
 
-		buttonSave = new MapButton(ButtonEnum.Save.ordinal(),0,0,Constants.getString("MapOverlay.save_map")); //$NON-NLS-1$ 
-		buttonClose = new MapButton(ButtonEnum.Close.ordinal(),0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$ 
-		buttonBrowser = new MapButton(ButtonEnum.Browser.ordinal(),0,0,Constants.getString("MapOverlay.use_browser")); //$NON-NLS-1$ 	
+		buttonSave = new Button(ButtonEnum.Save.ordinal(),0,0,Constants.getString("MapOverlay.save_map")); //$NON-NLS-1$ 
+		buttonClose = new Button(ButtonEnum.Close.ordinal(),0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$ 
+		buttonBrowser = new Button(ButtonEnum.Browser.ordinal(),0,0,Constants.getString("MapOverlay.use_browser")); //$NON-NLS-1$ 	
 		buttonBrowser.enabled = PropertyManager.getBooleanProp(PropertyManager.Key.WEBSERVER_ENABLED);
 		
-		buttonAutomap = new MapButton(ButtonEnum.Automap.ordinal(),0,0,
+		buttonAutomap = new Button(ButtonEnum.Automap.ordinal(),0,0,
 				Constants.getString("MapOverlay.automap_title", on),
 				Constants.getString("MapOverlay.automap_title", off),
 				true); //$NON-NLS-1$ //$NON-NLS-2$
 		buttonAutomap.enabled = Minecraft.getMinecraft().isSingleplayer();
 		
-		buttonCheck = new MapButton(ButtonEnum.Check.ordinal(),0,0, Constants.getString("MapOverlay.update_check")); //$NON-NLS-1$ 
+		buttonCheck = new Button(ButtonEnum.Check.ordinal(),0,0, Constants.getString("MapOverlay.update_check")); //$NON-NLS-1$ 
 	
 		buttonList.add(buttonAutomap);
 		buttonList.add(buttonSave);

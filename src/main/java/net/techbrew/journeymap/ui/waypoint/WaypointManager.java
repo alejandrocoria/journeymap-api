@@ -3,7 +3,7 @@ package net.techbrew.journeymap.ui.waypoint;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.command.CommandServerTp;
+import net.minecraft.command.server.CommandTeleport;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
@@ -70,7 +70,7 @@ public class WaypointManager extends JmUI {
                     canUserTeleport = true;
                 } else
                 {
-                    CommandServerTp command = new CommandServerTp();
+                    CommandTeleport command = new CommandTeleport();
                     canUserTeleport = command.canCommandSenderUseCommand(mc.thePlayer);
                 }
             }

@@ -30,9 +30,11 @@ public class Constants {
     public static final KeyBinding KB_MAP_DAY = new KeyBinding(Constants.getString("MapOverlay.hotkeys_day"), Keyboard.KEY_LBRACKET, KEYBINDING_CATEGORY);
     public static final KeyBinding KB_MAP_NIGHT = new KeyBinding(Constants.getString("MapOverlay.hotkeys_night"), Keyboard.KEY_RBRACKET, KEYBINDING_CATEGORY);
     public static final KeyBinding KB_MINIMAP_POS = new KeyBinding(Constants.getString("MiniMap.hotkeys_position"), Keyboard.KEY_BACKSLASH, KEYBINDING_CATEGORY);
+    public static final KeyBinding KB_WAYPOINT = new KeyBinding(Constants.getString("Waypoint.new_title"), Keyboard.KEY_B, KEYBINDING_CATEGORY);
+
 
     public static final KeyBinding[] KEYBINDINGS = new KeyBinding[] {
-        KB_MAP, KB_MAP_ZOOMIN, KB_MAP_ZOOMOUT, KB_MAP_DAY, KB_MAP_NIGHT, KB_MINIMAP_POS
+        KB_MAP, KB_MAP_ZOOMIN, KB_MAP_ZOOMOUT, KB_MAP_DAY, KB_MAP_NIGHT, KB_MINIMAP_POS, KB_WAYPOINT
     };
 
     public static Locale getLocale() {

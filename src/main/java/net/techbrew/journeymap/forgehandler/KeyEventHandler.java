@@ -3,6 +3,7 @@ package net.techbrew.journeymap.forgehandler;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.Constants;
@@ -65,7 +66,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler {
                 UIManager.getInstance().getMiniMap().nextPosition();
                 return;
             }
-            else if(i==Constants.KB_WAYPOINT.keyCode) {
+            else if(i==Constants.KB_WAYPOINT.getKeyCode()) {
                 UIManager.getInstance().openWaypointManager();
                 return;
             }
@@ -76,7 +77,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler {
                 UIManager.getInstance().openMap();
                 return;
             }
-            else if(i==Constants.KB_WAYPOINT.keyCode) {
+            else if(i==Constants.KB_WAYPOINT.getKeyCode()) {
                 if(Minecraft.getMinecraft().currentScreen==null) {
                     Waypoint waypoint = Waypoint.of(Minecraft.getMinecraft().thePlayer);
                     UIManager.getInstance().openWaypointEditor(waypoint, true, null);

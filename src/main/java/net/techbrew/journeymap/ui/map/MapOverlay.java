@@ -458,62 +458,62 @@ public class MapOverlay extends JmUI {
             UIManager.getInstance().closeAll();
             return;
         }
-        else if(i==Constants.KB_MAP_ZOOMIN.keyCode) {
+        else if(i==Constants.KB_MAP_ZOOMIN.getKeyCode()) {
             zoomIn();
             return;
         }
-        else if(i==Constants.KB_MAP_ZOOMOUT.keyCode) {
+        else if(i==Constants.KB_MAP_ZOOMOUT.getKeyCode()) {
             zoomOut();
             return;
         }
-        else if(i==Constants.KB_MAP_DAY.keyCode) {
+        else if(i==Constants.KB_MAP_DAY.getKeyCode()) {
             state.overrideMapType(Constants.MapType.day);
             return;
         }
-        else if(i==Constants.KB_MAP_NIGHT.keyCode) {
+        else if(i==Constants.KB_MAP_NIGHT.getKeyCode()) {
             state.overrideMapType(Constants.MapType.night);
             return;
         }
 
 		// North
-		if(i==mc.gameSettings.keyBindForward.keyCode) { // getkeyCode
+		if(i==mc.gameSettings.keyBindForward.getKeyCode()) { // getkeyCode
 			moveCanvas(0,-16);
 			return;
 		}
 		
 		// West
-		if(i==mc.gameSettings.keyBindLeft.keyCode) {
+		if(i==mc.gameSettings.keyBindLeft.getKeyCode()) {
 			moveCanvas(-16, 0);
 			return;
 		}
 		
 		// South
-		if(i==mc.gameSettings.keyBindBack.keyCode) {
+		if(i==mc.gameSettings.keyBindBack.getKeyCode()) {
 			moveCanvas(0,16);
 			return;
 		}
 		
 		// East
-		if(i==mc.gameSettings.keyBindRight.keyCode) {
+		if(i==mc.gameSettings.keyBindRight.getKeyCode()) {
 			moveCanvas(16, 0);
 			return;
 		}
 		
 		// Open inventory
-		if(i==mc.gameSettings.keyBindInventory.keyCode) { // keyBindInventory
+		if(i==mc.gameSettings.keyBindInventory.getKeyCode()) { // keyBindInventory
 			UIManager.getInstance().closeAll();
 			mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
 			return;
 		}
 		
 		// Open chat
-		if(i==mc.gameSettings.keyBindChat.keyCode) {
+		if(i==mc.gameSettings.keyBindChat.getKeyCode()) {
 			openChat("");
 			return;
 		}
 		
 		// Open chat with command prefix (Minecraft.java does this in runTick() )
-		if(i==mc.gameSettings.keyBindCommand.keyCode) {
+		if(i==mc.gameSettings.keyBindCommand.getKeyCode()) {
 			openChat("/");
 			return;
 		}

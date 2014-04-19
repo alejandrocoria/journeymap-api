@@ -78,7 +78,7 @@ public class ScrollPane extends GuiSlot
 
     public void position(int width, int height, int marginTop, int marginBottom, int x, int y)
     {
-        super.func_77207_a(width, height, marginTop, height-marginBottom);
+        super.func_148122_a(width, height, marginTop, height-marginBottom);
         paneWidth = width;
         paneHeight = height;
         origin.setLocation(x, y);
@@ -91,7 +91,7 @@ public class ScrollPane extends GuiSlot
     }
 
     @Override
-    protected void elementClicked(int i, boolean flag)
+    protected void elementClicked(int i, boolean flag, int p1, int p2)
     {
 //        items.get(i).clickScrollable(mc, mouseX, mouseY);
 //        System.out.println(String.format("Width: %s, click: %s,%s", this.getWidth(), mouseX, mouseY));
@@ -125,7 +125,7 @@ public class ScrollPane extends GuiSlot
                         Button button = (Button) item;
                         if (button.mousePressed(this.mc, mouseX, mouseY))
                         {
-                            this.mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
+                            //this.mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
                             this.actionPerformed(button);
                             return button;
                         }
@@ -162,7 +162,7 @@ public class ScrollPane extends GuiSlot
     }
 
     @Override
-    protected void drawSlot(int index, int xPosition, int yPosition, int l, Tessellator tessellator)
+    protected void drawSlot(int index, int xPosition, int yPosition, int l, Tessellator tessellator, int var6, int var7)
     {
         GL11.glPushMatrix();
         GL11.glTranslated(-getX(), -getY(), 0);
@@ -219,7 +219,7 @@ public class ScrollPane extends GuiSlot
 
     public int getWidth()
     {
-        boolean scrollVisible = 0 < this.func_77209_d();
+        boolean scrollVisible = 0 < this.getAmountScrolled(); // TODO right super?
         return paneWidth + (scrollVisible ? 5 : 0);
     }
 

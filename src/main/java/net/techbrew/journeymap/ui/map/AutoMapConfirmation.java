@@ -4,15 +4,15 @@ import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.task.MapRegionTask;
+import net.techbrew.journeymap.ui.Button;
 import net.techbrew.journeymap.ui.JmUI;
-import net.techbrew.journeymap.ui.MapButton;
 import net.techbrew.journeymap.ui.UIManager;
 import org.lwjgl.input.Keyboard;
 
 public class AutoMapConfirmation extends JmUI {
 
     private enum ButtonEnum {All,Missing,None,Close}
-	MapButton buttonAll, buttonMissing, buttonNone, buttonClose;
+	Button buttonAll, buttonMissing, buttonNone, buttonClose;
 
 
     public AutoMapConfirmation() {
@@ -24,16 +24,16 @@ public class AutoMapConfirmation extends JmUI {
     @Override
 	public void initGui()
     {
-    	buttonAll = new MapButton(ButtonEnum.All.ordinal(), 0, 0, Constants.getString("MapOverlay.automap_dialog_all"));
+    	buttonAll = new Button(ButtonEnum.All.ordinal(), 0, 0, Constants.getString("MapOverlay.automap_dialog_all"));
         buttonAll.noDisableText = true;
 
-    	buttonMissing = new MapButton(ButtonEnum.Missing.ordinal(), 0, 0, Constants.getString("MapOverlay.automap_dialog_missing"));
+    	buttonMissing = new Button(ButtonEnum.Missing.ordinal(), 0, 0, Constants.getString("MapOverlay.automap_dialog_missing"));
         buttonMissing.noDisableText = true;
 
-    	buttonNone = new MapButton(ButtonEnum.None.ordinal(), 0, 0, Constants.getString("MapOverlay.automap_dialog_none"));
+    	buttonNone = new Button(ButtonEnum.None.ordinal(), 0, 0, Constants.getString("MapOverlay.automap_dialog_none"));
         buttonNone.noDisableText = true;
 
-    	buttonClose = new MapButton(ButtonEnum.None.ordinal(), 0, 0, Constants.getString("MapOverlay.close"));
+    	buttonClose = new Button(ButtonEnum.None.ordinal(), 0, 0, Constants.getString("MapOverlay.close"));
         buttonClose.noDisableText = true;
         
         boolean enable = !JourneyMap.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);        

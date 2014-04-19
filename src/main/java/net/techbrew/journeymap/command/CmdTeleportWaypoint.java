@@ -1,7 +1,7 @@
 package net.techbrew.journeymap.command;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.command.CommandServerTp;
+import net.minecraft.command.server.CommandTeleport;
 import net.techbrew.journeymap.model.Waypoint;
 
 /**
@@ -29,12 +29,12 @@ public class CmdTeleportWaypoint
             return true;
         }
 
-        CommandServerTp command = new CommandServerTp();
+        CommandTeleport command = new CommandTeleport();
         return command.canCommandSenderUseCommand(mc.thePlayer);
     }
 
     public void run()
     {
-        mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", mc.thePlayer.getEntityName(), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
+        mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", mc.thePlayer.getCommandSenderName(), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
     }
 }

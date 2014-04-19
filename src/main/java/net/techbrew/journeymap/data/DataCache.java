@@ -44,7 +44,13 @@ public class DataCache {
     		cache.clear();
     	}
     }
-    
+
+    public void forceRefresh(Class<? extends IDataProvider> dpClass) {
+        synchronized(cache) {
+            putInternal(dpClass, null);
+        }
+    }
+
     /**
      * Put the dataprovider's map into the cache, wrapped in a DataHolder 
      * and keyed by provider class.
@@ -57,7 +63,7 @@ public class DataCache {
     /**
      * Put an instance of the dataholder class into the cache, wrapped in a DataHolder 
      * and keyed by provider class.
-     * @param dp
+     * @param dpClass
      */
     private DataHolder putInternal(Class<? extends IDataProvider> dpClass, Map optionalParams) {
     	try {
