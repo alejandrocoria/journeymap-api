@@ -10,9 +10,7 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +38,7 @@ public class WaypointStore
     {
     }
 
-    private void writeToFile(Waypoint waypoint)
+    private boolean writeToFile(Waypoint waypoint)
     {
         File waypointFile = null;
         try
@@ -51,10 +49,12 @@ public class WaypointStore
             fw.write(gson.toJson(waypoint));
             fw.flush();
             fw.close();
+            return true;
         }
         catch (Exception e)
         {
             JourneyMap.getLogger().severe(String.format("Can't save waypoint file %s: %s", waypointFile, LogFormatter.toString(e)));
+            return false;
         }
     }
 
@@ -66,7 +66,11 @@ public class WaypointStore
     public void save(Waypoint waypoint)
     {
         cache.put(waypoint.getId(), waypoint);
-        writeToFile(waypoint);
+        boolean saved = writeToFile(waypoint);
+        if(saved)
+        {
+            waypoint.setDirty(false);
+        }
     }
 
     public void remove(Waypoint waypoint)
@@ -77,7 +81,7 @@ public class WaypointStore
         remove(waypointFile);
     }
 
-    public void remove(File waypointFile)
+    private void remove(File waypointFile)
     {
         try
         {
@@ -105,34 +109,22 @@ public class WaypointStore
             try
             {
                 File waypointDir = FileHandler.getWaypointDir();
-                File[] files = waypointDir.listFiles(new FilenameFilter()
+                ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
+
+                waypoints.addAll(new ReiReader().loadWaypoints(waypointDir, true));
+
+                waypoints.addAll(new JmReader().loadWaypoints(waypointDir));
+
+                for(Waypoint waypoint : waypoints)
                 {
-                    @Override
-                    public boolean accept(File dir, String name)
+                    if(waypoint.isDirty())
                     {
-                        return name.endsWith(".json");
+                        save(waypoint);
                     }
-                });
-
-                ArrayList<File> obsoleteFiles = new ArrayList<File>();
-
-                for (File waypointFile : files)
-                {
-                    Waypoint wp = load(waypointFile);
-                    if(wp!=null)
+                    else
                     {
-                        // Check for obsolete filename
-                        if(!wp.getFileName().endsWith(waypointFile.getName()))
-                        {
-                            save(wp);
-                            obsoleteFiles.add(waypointFile);
-                        }
+                        cache.put(waypoint.getId(), waypoint);
                     }
-                }
-
-                while(!obsoleteFiles.isEmpty())
-                {
-                    remove(obsoleteFiles.remove(0));
                 }
 
                 loaded = true;
@@ -151,34 +143,5 @@ public class WaypointStore
         return loaded;
     }
 
-    private Waypoint load(File waypointFile)
-    {
-        Waypoint waypoint = null;
-        FileReader reader = null;
-        try
-        {
-            reader = new FileReader(waypointFile);
-            waypoint = gson.fromJson(reader, Waypoint.class);
-            cache.put(waypoint.getId(), waypoint);
-        }
-        catch (Exception e)
-        {
-            JourneyMap.getLogger().severe(String.format("Can't load waypoint file %s: %s", waypointFile, e.getMessage()));
-        }
-        finally
-        {
-            if(reader!=null)
-            {
-                try
-                {
-                    reader.close();
-                }
-                catch (Exception e)
-                {
-                    JourneyMap.getLogger().severe(String.format("Can't close waypoint file %s: %s", waypointFile, e.getMessage()));
-                }
-            }
-        }
-        return waypoint;
-    }
+
 }

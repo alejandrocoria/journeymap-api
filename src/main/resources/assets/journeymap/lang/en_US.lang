@@ -200,6 +200,15 @@ Waypoint.edit=Edit
 Waypoint.find=Find
 Waypoint.teleport=Teleport
 Waypoint.deathpoint=Death
+Waypoint.import_rei_file_error=Could not import Rei's waypoint file: %1$s
+Waypoint.import_rei_success=Imported %1$s of Rei's waypoints.
+Waypoint.import_rei_failure=No Rei's waypoints were imported. See journeyMap.log for details.
+Waypoint.import_rei_errors=Imported %1$s of Rei's waypoints with %1$s errors. See journeyMap.log for details.
+
+Waypoint.import_vox_file_error=Could not import Voxel waypoint file: %1$s
+Waypoint.import_vox_success=Imported %1$s of Voxel waypoints.
+Waypoint.import_vox_failure=No Voxel waypoints were imported. See journeyMap.log for details.
+Waypoint.import_vox_errors=Imported %1$s of Voxel waypoints with %1$s errors. See journeyMap.log for details.
 
 # Added in 3.1.x:
 MiniMap.options=MiniMap Options

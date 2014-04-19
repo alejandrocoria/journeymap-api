@@ -73,11 +73,11 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
         ButtonList.setHeights(manager.rowHeight, buttonListRight);
         ButtonList.fitWidths(fontRenderer, buttonListRight);
 
-        this.internalWidth = fontRenderer.getStringWidth(waypoint.getName());
+        this.internalWidth = fontRenderer.getStringWidth("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
         internalWidth += Math.max(manager.colLocation, manager.colName);
         internalWidth += buttonListLeft.getWidth(hgap);
         internalWidth += buttonListRight.getWidth(hgap);
-        internalWidth += 40;
+        internalWidth += 10;
     }
 
     @Override

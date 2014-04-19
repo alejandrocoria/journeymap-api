@@ -29,6 +29,7 @@ public class Waypoint implements Serializable
         Death
     }
 
+    protected int version = 1;
     protected String id;
     protected String name;
     protected String icon;
@@ -43,6 +44,7 @@ public class Waypoint implements Serializable
     protected String origin;
     protected String texture;
     protected Integer[] dimensions;
+    transient protected boolean dirty;
     transient protected ChunkCoordinates location;
 
     public static Waypoint deathOf(Entity player)
@@ -312,6 +314,26 @@ public class Waypoint implements Serializable
     public String getFileName()
     {
         return id.replaceAll("[\\\\/:\"*?<>|]", "_").concat(".json");
+    }
+
+    public int getVersion()
+    {
+        return version;
+    }
+
+    public boolean isDirty()
+    {
+        return dirty;
+    }
+
+    public void setDirty(boolean dirty)
+    {
+        this.dirty = dirty;
+    }
+
+    public void setOrigin(String origin)
+    {
+        this.origin = origin;
     }
 
     @Override

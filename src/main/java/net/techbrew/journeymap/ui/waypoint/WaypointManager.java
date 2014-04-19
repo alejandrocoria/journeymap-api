@@ -178,6 +178,9 @@ public class WaypointManager extends JmUI {
         colName = buttonSortDistance.getX() + buttonSortDistance.getWidth() + 5 - headerX;
         buttonSortName.setPosition(headerX + colName, headerY);
 
+        buttonSortDistance.drawButton = !items.isEmpty();
+        buttonSortName.drawButton = !items.isEmpty();
+
         // Scroll pane
         int hgap = 4;
         int vgap = 5;
@@ -288,13 +291,16 @@ public class WaypointManager extends JmUI {
             if(currentDim==null || item.waypoint.getDimensions().contains(currentDim))
             {
                 items.add(item);
-                itemWidth = Math.max(itemWidth, item.internalWidth);
             }
         }
 
         if(items.isEmpty())
         {
             itemWidth = DEFAULT_ITEMWIDTH;
+        }
+        else
+        {
+            itemWidth = items.get(0).internalWidth;
         }
 
         if(currentSort!=null)
