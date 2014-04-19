@@ -529,6 +529,7 @@ public class WaypointEditor extends JmUI {
 
     protected void resetForm()
     {
+        dimButtonList.clear();
         fieldList.clear();
         buttonList.clear();
         initGui();
