@@ -8,7 +8,6 @@ import net.techbrew.journeymap.model.Waypoint;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -61,7 +60,7 @@ public class JmReader
     {
         try
         {
-            Files.deleteIfExists(waypointFile.toPath());
+            waypointFile.delete();
         }
         catch (Exception e)
         {

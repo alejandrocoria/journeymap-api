@@ -11,7 +11,6 @@ import net.techbrew.journeymap.model.Waypoint;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -85,7 +84,7 @@ public class WaypointStore
     {
         try
         {
-            Files.deleteIfExists(waypointFile.toPath());
+            waypointFile.delete();
         }
         catch (Exception e)
         {

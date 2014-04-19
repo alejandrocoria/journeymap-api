@@ -19,7 +19,8 @@ public class Payload
     public static Comparator<Parameter> ParameterOrdinalSort = new Comparator<Parameter>(){
         @Override
         public int compare(Parameter o1, Parameter o2) {
-            return Integer.compare(o1.ordinal(), o2.ordinal());
+            //return Integer.compare(o1.ordinal(), o2.ordinal());
+            return o1.compareTo(o2);
         }
     };
 
