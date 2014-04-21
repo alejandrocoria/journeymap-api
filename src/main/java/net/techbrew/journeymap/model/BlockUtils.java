@@ -44,6 +44,7 @@ public class BlockUtils {
         setFlags(Blocks.fire, Flag.NoShadow, Flag.Side2Texture);
         setFlags(Blocks.flowing_water, Flag.BiomeColor);
         setFlags(Blocks.grass, Flag.BiomeColor);
+        setFlags(Blocks.double_plant, Flag.BiomeColor);
         setFlags(Blocks.glass, Flag.NotCeiling, Flag.NoShadow);
         setFlags(Blocks.glass_pane, Flag.NotCeiling, Flag.NoShadow);
         setFlags(Blocks.ladder, Flag.NotHideSky);

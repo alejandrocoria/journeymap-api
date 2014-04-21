@@ -43,6 +43,7 @@ Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 -- Minimap disappeared after opening inventory in full-screen map
 -- Minimap didn't show off-screen waypoint locators along edges
 -- VoxelMap 1.7.2 waypoints were not recognized
+-- Double-high grass color was gray instead of determined by biome
 
 Known issues:
 
