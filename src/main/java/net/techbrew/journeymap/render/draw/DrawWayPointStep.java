@@ -1,5 +1,8 @@
 package net.techbrew.journeymap.render.draw;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.WorldProvider;
+import net.minecraft.world.WorldProviderHell;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -28,7 +31,7 @@ public class DrawWayPointStep implements DrawStep {
      */
     public DrawWayPointStep(double posX, double posZ)
     {
-        this(posX, posZ, TextureCache.instance().getWaypointEdit(), null, null, Color.white, Color.white, 255);
+        this(posX, posZ, TextureCache.instance().getWaypointEdit(), TextureCache.instance().getWaypointEdit(), null, Color.white, Color.white, 255);
     }
 
     /**
@@ -57,14 +60,28 @@ public class DrawWayPointStep implements DrawStep {
 
     @Override
     public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale) {
-        Point2D.Double pixel = gridRenderer.getBlockPixelInGrid(posX + .5, posZ  + .5);
-        pixel.setLocation(pixel.getX() + xOffset, pixel.getY() + yOffset);
+
+        double aPosX = posX + .5;
+        double aPosZ = posZ + .5;
+        int halfBlock = (int) Math.pow(2,gridRenderer.getZoom())/2;
+
+        Point2D.Double pixel;
+        if(WorldProvider.getProviderForDimension(Minecraft.getMinecraft().thePlayer.dimension) instanceof WorldProviderHell)
+        {
+            pixel = gridRenderer.getBlockPixelInGrid(aPosX/8, aPosZ/8);
+        }
+        else
+        {
+            pixel = gridRenderer.getBlockPixelInGrid(aPosX, aPosZ);
+        }
+
+        pixel.setLocation(pixel.getX() + halfBlock + xOffset, pixel.getY() + halfBlock + yOffset);
         if (gridRenderer.isOnScreen(pixel))
         {
             double halfTexHeight = texture.height/2;
             if(label!=null)
             {
-                DrawUtil.drawLabel(label, pixel.getX(), pixel.getY()-halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, alpha, fontColor, 180, fontScale, false);
+                DrawUtil.drawLabel(label, pixel.getX(), pixel.getY()-halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, alpha, fontColor, 255, fontScale, false);
             }
             DrawUtil.drawColoredImage(texture, alpha, color, pixel.getX() - (texture.width / 2), pixel.getY() - halfTexHeight);
         }

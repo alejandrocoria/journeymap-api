@@ -53,7 +53,7 @@ public class OverlayWaypointRenderer {
                     texture = tc.getWaypoint();
                 }
                 labelColor = (waypoint.getType()==Waypoint.Type.Death) ? Color.red : color;
-                drawStepList.add(new DrawWayPointStep(wx, wz, texture, tc.getWaypointOffscreen(), waypoint.getName(), color, labelColor, 220));
+                drawStepList.add(new DrawWayPointStep(wx, wz, texture, tc.getWaypointOffscreen(), waypoint.getName(), color, labelColor, 200));
 			}
 		} catch(Throwable t) {
 			JourneyMap.getLogger().severe("Error during prepareSteps: " + LogFormatter.toString(t));

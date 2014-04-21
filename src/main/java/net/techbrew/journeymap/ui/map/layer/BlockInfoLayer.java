@@ -8,6 +8,7 @@ import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
+import net.techbrew.journeymap.render.draw.DrawWayPointStep;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
@@ -55,6 +56,17 @@ public class BlockInfoLayer {
             else
             {
                 info = Constants.getString("MapOverlay.location_xzy", blockCoord.x, blockCoord.z, "?");
+            }
+
+            // check for existing
+            Collection<Waypoint> waypoints = WaypointHelper.getCachedWaypoints();
+            for(Waypoint existing : waypoints)
+            {
+                if(existing.getX()==blockCoord.x && existing.getZ()==blockCoord.z)
+                {
+                    // Show highlight
+                    drawStepList.add(new DrawWayPointStep(blockCoord.x, blockCoord.z));
+                }
             }
 
             boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, MapOverlay.state().mapForceUnicode);
