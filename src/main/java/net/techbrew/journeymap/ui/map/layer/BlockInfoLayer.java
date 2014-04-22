@@ -1,29 +1,24 @@
 package net.techbrew.journeymap.ui.map.layer;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
-import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
-import net.techbrew.journeymap.render.draw.DrawWayPointStep;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
-import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
-import net.techbrew.journeymap.waypoint.WaypointHelper;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by mwoodman on 2/26/14.
  */
-public class BlockInfoLayer {
-
+public class BlockInfoLayer implements LayerDelegate.Layer
+{
     private final List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
 
     BlockCoordIntPair lastCoord = null;
@@ -38,6 +33,7 @@ public class BlockInfoLayer {
         drawStepList.add(blockInfoStep);
     }
 
+    @Override
     public List<DrawStep> onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
     {
         if(!blockCoord.equals(lastCoord))
@@ -58,60 +54,24 @@ public class BlockInfoLayer {
                 info = Constants.getString("MapOverlay.location_xzy", blockCoord.x, blockCoord.z, "?");
             }
 
-            // check for existing
-            Collection<Waypoint> waypoints = WaypointHelper.getCachedWaypoints();
-            for(Waypoint existing : waypoints)
-            {
-                if(existing.getX()==blockCoord.x && existing.getZ()==blockCoord.z)
-                {
-                    // Show highlight
-                    drawStepList.add(new DrawWayPointStep(blockCoord.x, blockCoord.z));
-                }
-            }
-
             boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, MapOverlay.state().mapForceUnicode);
             double infoHeight = DrawUtil.getLabelHeight(mc.fontRenderer, true) * MapOverlay.state().getMapFontScale();
             if(unicodeForced) DrawUtil.stopUnicode(mc.fontRenderer);
 
             blockInfoStep.update(info, gridWidth/2, gridHeight - infoHeight);
         }
+        else
+        {
+            blockInfoStep.update(blockInfoStep.text, gridWidth/2, blockInfoStep.y);
+        }
 
         return drawStepList;
     }
 
-    // TODO:  Move to waypoint delegate?
-    public void onMouseClicked(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
+    @Override
+    public List<DrawStep> onMouseClick(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
     {
-        // check for double-click
-        long sysTime = Minecraft.getSystemTime();
-        boolean doubleClick = blockCoord.equals(lastCoord) && sysTime - this.lastClicked < 450L;
-        this.lastClicked = sysTime;
-
-        if(doubleClick)
-        {
-            // check for existing
-            Collection<Waypoint> waypoints = WaypointHelper.getCachedWaypoints();
-            for(Waypoint existing : waypoints)
-            {
-                if(existing.getX()==blockCoord.x && existing.getZ()==blockCoord.z)
-                {
-                    UIManager.getInstance().openWaypointEditor(existing, false, MapOverlay.class);
-                    return;
-                }
-            }
-
-            // check chunk
-            Chunk chunk = mc.theWorld.getChunkFromChunkCoords(blockCoord.x >> 4, blockCoord.z >> 4);
-            int y = -1;
-            if(!chunk.isEmpty())
-            {
-                y = Math.max(1, chunk.getHeightValue(blockCoord.x & 15, blockCoord.z & 15));
-            }
-
-            ChunkCoordinates cc = new ChunkCoordinates(blockCoord.x, y, blockCoord.z);
-            Waypoint waypoint = Waypoint.at(cc, Waypoint.Type.Normal, mc.thePlayer.dimension);
-            UIManager.getInstance().openWaypointEditor(waypoint, true, MapOverlay.class);
-        }
+        return Collections.EMPTY_LIST;
     }
 
     class BlockInfoStep implements DrawStep

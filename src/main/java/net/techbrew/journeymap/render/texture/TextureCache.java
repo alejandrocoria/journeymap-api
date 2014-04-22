@@ -66,7 +66,9 @@ public class TextureCache {
     }
     
     private final Map<Name, TextureImpl> namedTextures = Collections.synchronizedMap(new HashMap<Name, TextureImpl>(Name.values().length + (Name.values().length/2) + 1));
-    
+
+    private final Map<String, TextureImpl> customTextures = Collections.synchronizedMap(new HashMap<String, TextureImpl>(3));
+
     private final Map<String, TextureImpl> skinImageMap = Collections.synchronizedMap(new HashMap<String, TextureImpl>());    
     
     private final Map<String, TextureImpl> entityImageMap = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
@@ -91,7 +93,28 @@ public class TextureCache {
     }
     
     /*************************************************/
-    
+
+    public TextureImpl getCustomTexture(String filename, boolean retain) {
+        synchronized(customTextures)
+        {
+            TextureImpl tex = customTextures.get(filename);
+            if(tex==null || (!tex.hasImage() && retain)) {
+                BufferedImage img = FileHandler.getCustomImage(filename);
+                if(img==null){
+                    img = getUnknownEntity().getImage();
+                }
+                if(img!=null){
+                    if(tex!=null){
+                        tex.deleteTexture();
+                    }
+                    tex = new TextureImpl(img, retain);
+                    customTextures.put(filename, tex);
+                }
+            }
+            return tex;
+        }
+    }
+
 	private TextureImpl getNamedTexture(Name name, String filename, boolean retain) {
 		synchronized(namedTextures) {
 			TextureImpl tex = namedTextures.get(name);

@@ -3,6 +3,7 @@ package net.techbrew.journeymap.render.draw;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldProviderHell;
+import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -15,60 +16,52 @@ import java.awt.geom.Point2D;
  */
 public class DrawWayPointStep implements DrawStep {
 
-    final double posX;
-    final double posZ;
-    final TextureImpl texture;
-    final TextureImpl offScreenTexture;
-    final String label;
+    final Waypoint waypoint;
     final Color color;
     final Color fontColor;
     final int alpha;
+    final boolean isEdit;
 
     /**
-     * Draw just the editor icon
-     * @param posX
-     * @param posZ
+     * Draw a waypoint on the map.
+     * @param waypoint
      */
-    public DrawWayPointStep(double posX, double posZ)
+    public DrawWayPointStep(Waypoint waypoint)
     {
-        this(posX, posZ, TextureCache.instance().getWaypointEdit(), TextureCache.instance().getWaypointEdit(), null, Color.white, Color.white, 255);
+        this.waypoint = waypoint;
+        this.color = waypoint.getColor();
+        this.fontColor = waypoint.isDeathPoint() ? Color.red : this.color;
+        this.alpha = 200;
+        this.isEdit = false;
     }
 
     /**
-     * Normal waypoint.
-     * @param posX
-     * @param posZ
-     * @param texture
-     * @param offScreenTexture
-     * @param label
+     * Draw a waypoint on the map.
+     * @param waypoint
      * @param color
      * @param fontColor
      * @param alpha
      */
-    public DrawWayPointStep(double posX, double posZ, TextureImpl texture, TextureImpl offScreenTexture, String label,
-                            Color color, Color fontColor, int alpha)
+    public DrawWayPointStep(Waypoint waypoint, Color color, Color fontColor, int alpha, boolean isEdit)
     {
-        this.posX = posX;
-        this.posZ = posZ;
-        this.texture = texture;
-        this.offScreenTexture = offScreenTexture;
-        this.label = label;
+        this.waypoint = waypoint;
         this.color = color;
         this.fontColor = fontColor;
         this.alpha = alpha;
+        this.isEdit = isEdit;
     }
 
     @Override
     public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale) {
 
-        double aPosX = posX + .5;
-        double aPosZ = posZ + .5;
+        double aPosX = waypoint.getX();
+        double aPosZ = waypoint.getZ();
         int halfBlock = (int) Math.pow(2,gridRenderer.getZoom())/2;
 
         Point2D.Double pixel;
         if(WorldProvider.getProviderForDimension(Minecraft.getMinecraft().thePlayer.dimension) instanceof WorldProviderHell)
         {
-            pixel = gridRenderer.getBlockPixelInGrid(aPosX/8, aPosZ/8);
+            pixel = gridRenderer.getBlockPixelInGrid(aPosX, aPosZ);
         }
         else
         {
@@ -78,17 +71,21 @@ public class DrawWayPointStep implements DrawStep {
         pixel.setLocation(pixel.getX() + halfBlock + xOffset, pixel.getY() + halfBlock + yOffset);
         if (gridRenderer.isOnScreen(pixel))
         {
-            double halfTexHeight = texture.height/2;
-            if(label!=null)
+            TextureImpl tex = waypoint.getTexture();
+            double halfTexHeight = tex.height/2;
+            DrawUtil.drawLabel(waypoint.getName(), pixel.getX(), pixel.getY()-halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, alpha, fontColor, 255, fontScale, false);
+            if(isEdit)
             {
-                DrawUtil.drawLabel(label, pixel.getX(), pixel.getY()-halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, alpha, fontColor, 255, fontScale, false);
+                TextureImpl editTex = TextureCache.instance().getWaypointEdit();
+                DrawUtil.drawColoredImage(editTex, alpha, color, pixel.getX() - (editTex.width / 2), pixel.getY() - editTex.height/2);
             }
-            DrawUtil.drawColoredImage(texture, alpha, color, pixel.getX() - (texture.width / 2), pixel.getY() - halfTexHeight);
+            DrawUtil.drawColoredImage(tex, alpha, color, pixel.getX() - (tex.width / 2), pixel.getY() - halfTexHeight);
         }
-        else
+        else if(!isEdit)
         {
             gridRenderer.ensureOnScreen(pixel);
-            DrawUtil.drawColoredImage(offScreenTexture, alpha, color, pixel.getX() - (offScreenTexture.width / 2), pixel.getY() - (offScreenTexture.height / 2));
+            TextureImpl tex =TextureCache.instance().getWaypointOffscreen();
+            DrawUtil.drawColoredImage(tex, alpha, color, pixel.getX() - (tex.width / 2), pixel.getY() - (tex.height / 2));
         }
     }
 }

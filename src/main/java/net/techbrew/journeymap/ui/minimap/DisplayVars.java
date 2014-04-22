@@ -209,9 +209,10 @@ public class DisplayVars
         this.displayWidth = mc.displayWidth;
         this.displayHeight = mc.displayHeight;
         final boolean useFontShadow = false;
-        final boolean useUnicode = (forceUnicode || mc.fontRenderer.getUnicodeFlag());
+        final boolean wasUnicode = mc.fontRenderer.getUnicodeFlag();
+        final boolean useUnicode = (forceUnicode || wasUnicode);
         this.fontScale = labelFontScale * (useUnicode ? 2 : 1);
-        final double labelHeight = Math.ceil(DrawUtil.getLabelHeight(mc.fontRenderer, useFontShadow) * this.fontScale);
+        final double labelHeight = DrawUtil.getLabelHeight(mc.fontRenderer, useFontShadow) * (wasUnicode ? 1 : .7) * this.fontScale;
 
         // Mutable local vars
         double bottomTextureYMargin = 0;

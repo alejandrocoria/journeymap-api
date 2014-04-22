@@ -548,6 +548,7 @@ public class MapOverlay extends JmUI {
 
 		if(isScrolling) {
 			int blockSize = (int) Math.pow(2,state.currentZoom);
+
 			int mouseDragX = (mx-msx)*2/blockSize;
 			int mouseDragY = (my-msy)*2/blockSize;
 			
