@@ -1,7 +1,8 @@
 package net.techbrew.journeymap.data;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.io.JsonHelper;
 import net.techbrew.journeymap.log.LogFormatter;
 
 import java.util.Collections;
@@ -18,7 +19,9 @@ import java.util.logging.Level;
  *
  */
 public class DataCache {
-	
+
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
 	private final ConcurrentHashMap<Class<? extends IDataProvider>, DataHolder> cache;
 	
 	// Private constructor
@@ -170,7 +173,7 @@ public class DataCache {
     	DataHolder(IDataProvider dp, Map optionalParams) {
     		this.dp = dp;
         	data = Collections.unmodifiableMap(dp.getMap(optionalParams));
-        	jsonData = JsonHelper.toJson(data);
+        	jsonData = GSON.toJson(data);
         	expires = System.currentTimeMillis() + dp.getTTL(); 		
     	}
 

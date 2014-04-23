@@ -5,6 +5,7 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
@@ -18,7 +19,6 @@ import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.ui.JmUI;
 import net.techbrew.journeymap.ui.map.MapOverlay;
-import net.techbrew.journeymap.waypoint.WaypointHelper;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -264,7 +264,7 @@ public class MiniMap
         if (enabled == null)
         {
             enabled = PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_MINIMAP)
-                    && !WaypointHelper.isReiLoaded() && !WaypointHelper.isVoxelMapLoaded();
+                    && !WaypointsData.isReiMinimapEnabled() && !WaypointsData.isVoxelMapEnabled();
         }
         return enabled;
     }

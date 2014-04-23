@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.waypoint;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
@@ -15,7 +16,6 @@ public class EntityWaypoint extends Entity implements Comparable<EntityWaypoint>
     public EntityWaypoint(World world, Waypoint waypoint) {
         super(world);
         this.waypoint = waypoint;
-        this.setPosition(waypoint.getX(), waypoint.getY(), waypoint.getZ());
     }
 
     public Waypoint getWaypoint() {
@@ -24,7 +24,8 @@ public class EntityWaypoint extends Entity implements Comparable<EntityWaypoint>
 
     @Override
     protected void entityInit() {
-
+        int dimension = Minecraft.getMinecraft().thePlayer.dimension;
+        this.setPosition(waypoint.getX(dimension), waypoint.getY(dimension), waypoint.getZ(dimension));
     }
 
     @Override

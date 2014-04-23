@@ -108,25 +108,13 @@ public class WaypointStore
             try
             {
                 File waypointDir = FileHandler.getWaypointDir();
+
                 ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
-
                 waypoints.addAll(new ReiReader().loadWaypoints(waypointDir, true));
-
+                waypoints.addAll(new VoxelReader().loadWaypoints(waypointDir, true));
                 waypoints.addAll(new JmReader().loadWaypoints(waypointDir));
 
-                for(Waypoint waypoint : waypoints)
-                {
-                    if(waypoint.isDirty())
-                    {
-                        save(waypoint);
-                    }
-                    else
-                    {
-                        cache.put(waypoint.getId(), waypoint);
-                    }
-                }
-
-                loaded = true;
+                load(waypoints, false);
 
                 JourneyMap.getLogger().info(String.format("Loaded %s waypoints for world", cache.size()));
             }
@@ -135,6 +123,22 @@ public class WaypointStore
                 JourneyMap.getLogger().severe(String.format("Error loading waypoints: %s", LogFormatter.toString(e)));
             }
         }
+    }
+
+    public void load(Collection<Waypoint> waypoints, boolean forceSave)
+    {
+        for(Waypoint waypoint : waypoints)
+        {
+            if(forceSave || (!waypoint.isReadOnly() && waypoint.isDirty()))
+            {
+                save(waypoint);
+            }
+            else
+            {
+                cache.put(waypoint.getId(), waypoint);
+            }
+        }
+        loaded = true;
     }
 
     public boolean hasLoaded()

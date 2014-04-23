@@ -1,8 +1,9 @@
 package net.techbrew.journeymap.server;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.io.JsonHelper;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 import se.rupy.http.Reply;
@@ -26,7 +27,9 @@ import java.util.zip.ZipEntry;
  *
  */
 public abstract class BaseService extends Service {
-	
+
+    protected static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
 	public static final Charset UTF8 = Charset.forName("UTF-8"); //$NON-NLS-1$
 	public static final String CALLBACK_PARAM = "callback";  //$NON-NLS-1$
 	
@@ -270,7 +273,7 @@ public abstract class BaseService extends Service {
 		}	
 		
 		// Append the data
-		jsonData.append(JsonHelper.toJson(responseObj));
+		jsonData.append(GSON.toJson(responseObj));
 
 		// Finish function call for JsonP if needed
 		if(useJsonP) {

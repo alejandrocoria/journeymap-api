@@ -1087,7 +1087,7 @@ var JourneyMap = (function() {
 		if(centerOnPlayer===true) {
 			map.panTo(pos);
 		}
-	}
+	};
 	
 	// Remove markers not in current JM data
 	var removeObsoleteMarkers = function(jmMap, markerMap) {
@@ -1098,7 +1098,7 @@ var JourneyMap = (function() {
 				delete markerMap[id];
 			}
 		});
-	}
+	};
 
 	// Draw the location of mobs
 	var drawMobs = function() {
@@ -1132,7 +1132,7 @@ var JourneyMap = (function() {
 			});
 		}
 		
-	}
+	};
 
 	// Create or update marker
 	var updateEntityMarker = function(entity, markerMap) {
@@ -1219,7 +1219,7 @@ var JourneyMap = (function() {
 	
 		// Update marker position
 		marker.setPosition(pos);
-	}
+	};
 
 	// Draw the location of other players
 	var drawMultiplayers = function() {
@@ -1235,7 +1235,7 @@ var JourneyMap = (function() {
 			});
 		}
 		
-	}
+	};
 	
 	// Create or update marker
 	var updateMultiplayerMarker = function(multiplayer, markerMap) {
@@ -1280,7 +1280,7 @@ var JourneyMap = (function() {
 	
 		// Update marker position
 		marker.setPosition(pos);
-	}
+	};
 	
 	// Draw the location of waypoints
 	var drawWaypoints = function() {
@@ -1298,23 +1298,25 @@ var JourneyMap = (function() {
 			updateWaypointMarker(waypoint,markers.waypoints);
 		});
 			
-	}
+	};
 	
 	// Create or update marker
 	var updateWaypointMarker = function(waypoint, markerMap) {
 
-		// Get current waypoint position		
-		var pos = blockPosToLatLng(waypoint.x, waypoint.z);
+		// Get current waypoint position
+        var x = dimensionalValue(waypoint.x, waypoint.primaryDimension, JM.player.dimension);
+        var z = dimensionalValue(waypoint.z, waypoint.primaryDimension, JM.player.dimension);
+        var pos = blockPosToLatLng(x, z);
 
-		var id = waypoint.id;
-		waypoint.color = rgbToHex(waypoint.r, waypoint.g, waypoint.b);
-		
-		var marker = markerMap[id];
-		
 		if(!map.getBounds().contains(pos)) {
 			return; // Don't bother with marker
 			// TODO: Put on edge of map as an arrow?
 		}
+
+        var id = waypoint.id;
+        waypoint.color = rgbToHex(waypoint.r, waypoint.g, waypoint.b);
+
+        var marker = markerMap[id];
 		
 		if(!marker) {
 			var icon = {
@@ -1325,7 +1327,7 @@ var JourneyMap = (function() {
 			};
 			var labelClass = "waypoint";
 
-			if(waypoint.type===2) {
+			if(waypoint.type=="Death") {
 				// death point: X marks the spot
 				icon.path = 'M -10,-10 0,-4 10,-10 14,-8 4,0 14,8 10,10 0,4 -10,10 -14,8 -4,0 -14,-8 z';
 				icon.strokeWeight = 1.5;
@@ -1377,14 +1379,33 @@ var JourneyMap = (function() {
 			//console.log("Setting position of waypoint: ", pos);
 			marker.setPosition(pos);
 		}
-	}
+	};
+
+    var dimensionalValue = function(original, primaryDimension, dimension) {
+        if(primaryDimension==dimension)
+        {
+            return original;
+        }
+        else if(primaryDimension==-1)
+        {
+            return original*8;
+        }
+        else if(dimension==-1)
+        {
+            return original/8;
+        }
+        else
+        {
+            return original;
+        }
+    };
 	
 	var getMapStateUrl = function() {
 		var mapType = (JM.world.features.MapCaves === true && playerUnderground === true && showCaves === true) ? "underground" : (isNightMap === true ? "night" : "day");
 		var dimension = (JM.player.dimension);
 		var depth = (JM.player && JM.player.chunkCoordY != undefined) ? JM.player.chunkCoordY : 4;
 		return "&mapType=" + mapType + "&dim=" + dimension + "&depth=" + depth + "&ts=" + lastImageCheck;
-	}
+	};
 	
 	var rgbToHex = function(r, g, b) {
 	    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);

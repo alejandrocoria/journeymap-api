@@ -2,9 +2,9 @@ package net.techbrew.journeymap.io;
 
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.ui.minimap.DisplayVars;
-import net.techbrew.journeymap.waypoint.WaypointHelper;
 
 import java.io.File;
 import java.io.FileReader;
@@ -35,6 +35,7 @@ public class PropertyManager {
 		CAVE_LIGHTING(Boolean.class,"render_cavelighting_enabled",true), //$NON-NLS-1$
 		ANNOUNCE_MODLOADED(Boolean.class,"announce_modloaded", true), //$NON-NLS-1$
 		UPDATE_CHECK_ENABLED(Boolean.class,"update_check_enabled", true), //$NON-NLS-1$
+        NATIVE_WAYPOINTS_ENABLED(Boolean.class, "native_waypoints_enabled", true), //$NON-NLS-1$
 	
 		PREF_SHOW_CAVES(Boolean.class,"preference_show_caves", true), //$NON-NLS-1$
 		PREF_SHOW_MOBS(Boolean.class,"preference_show_mobs", true), //$NON-NLS-1$
@@ -48,7 +49,7 @@ public class PropertyManager {
         PREF_FONTSCALE(Double.class,"preference_fontscale", 1.0), //$NON-NLS-1$
         PREF_FORCEUNICODE(Boolean.class,"preference_forceunicode", false), //$NON-NLS-1$
 
-        PREF_SHOW_MINIMAP(Boolean.class,"preference_show_minimap", !WaypointHelper.isReiLoaded() && !WaypointHelper.isVoxelMapLoaded()), //$NON-NLS-1$
+        PREF_SHOW_MINIMAP(Boolean.class,"preference_show_minimap", !WaypointsData.isOtherModEnabled()), //$NON-NLS-1$
 
         PREF_MINIMAP_SHAPE(String.class,"preference_minimap_shape", DisplayVars.Shape.SmallSquare.name()), //$NON-NLS-1$
         PREF_MINIMAP_POSITION(String.class,"preference_minimap_position", DisplayVars.Position.TopRight.name()), //$NON-NLS-1$
@@ -56,6 +57,7 @@ public class PropertyManager {
         PREF_MINIMAP_SHOWFPS(Boolean.class,"preference_minimap_showfps", false), //$NON-NLS-1$
         PREF_MINIMAP_FORCEUNICODE(Boolean.class,"preference_minimap_forceunicode", false), //$NON-NLS-1$
         PREF_MINIMAP_HOTKEYS(Boolean.class,"preference_minimap_hotkeys", true), //$NON-NLS-1$
+
 		;
 		private final String property;
 		private final String defaultValue;

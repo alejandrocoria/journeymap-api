@@ -23,6 +23,13 @@ public class Waypoint implements Serializable
     protected static final String ICON_NORMAL = "waypoint-normal.png";
     protected static final String ICON_DEATH = "waypoint-death.png";
 
+    public enum Origin
+    {
+        JourneyMap,
+        ReiMinimap,
+        VoxelMap
+    }
+
     public enum Type
     {
         Normal,
@@ -41,11 +48,12 @@ public class Waypoint implements Serializable
     protected int b;
     protected boolean enable;
     protected Type type;
-    protected String origin;
+    protected Origin origin;
     protected String texture;
+
     protected Integer[] dimensions;
+    transient protected boolean readOnly;
     transient protected boolean dirty;
-    transient protected ChunkCoordinates location;
 
     public static Waypoint deathOf(Entity player)
     {
@@ -83,17 +91,40 @@ public class Waypoint implements Serializable
     public Waypoint(Waypoint original)
     {
         this(original.name, original.x, original.y, original.z, original.enable, original.r, original.g, original.b, original.type, original.origin, original.dimensions);
+        this.x = original.x;
+        this.y = original.y;
+        this.z = original.z;
     }
 
-    public Waypoint(String name, ChunkCoordinates location, Color color, Type type, int dimension) {
-        this(name, location.posX, location.posY, location.posZ, true, color.getRed(), color.getGreen(), color.getBlue(), type, "journeymap", dimension);
+    public Waypoint(String name, ChunkCoordinates location, Color color, Type type, Integer... dimension) {
+        this(name, location.posX, location.posY, location.posZ, true, color.getRed(), color.getGreen(), color.getBlue(), type, Origin.JourneyMap, dimension);
     }
 
-    public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, Type type, String origin, Integer... dimensions)
+    /**
+     * Main constructor.
+     * @param name
+     * @param x
+     * @param y
+     * @param z
+     * @param enable
+     * @param red
+     * @param green
+     * @param blue
+     * @param type
+     * @param origin
+     * @param dimensions
+     */
+    public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, Type type, Origin origin, Integer... dimensions)
     {
         if(name==null) name = createName(x, z);
+        if(dimensions==null || dimensions.length==0)
+        {
+            dimensions = new Integer[0];
+        }
+        this.dimensions = dimensions;
+
         this.name = name;
-        setLocation(x, y, z);
+        setLocation(x, y, z, dimensions[0]);
 
         this.r = red;
         this.g = green;
@@ -101,7 +132,7 @@ public class Waypoint implements Serializable
         this.enable = enable;
         this.type = type;
         this.origin = origin;
-        this.dimensions = dimensions;
+
 
         switch(type)
         {
@@ -118,9 +149,14 @@ public class Waypoint implements Serializable
 
     public void setLocation(int x, int y, int z)
     {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        setLocation(x, y, z, 0);
+    }
+
+    public void setLocation(int x, int y, int z, int currentDimension)
+    {
+        this.x = dimensionalValue(x, currentDimension, 0);
+        this.y = dimensionalValue(y, currentDimension, 0);
+        this.z = dimensionalValue(z, currentDimension, 0);
         updateId();
     }
 
@@ -232,19 +268,34 @@ public class Waypoint implements Serializable
         this.icon = icon;
     }
 
-    public int getX()
+    private int getX()
     {
         return x;
     }
 
-    public int getY()
+    private int getY()
     {
         return y;
     }
 
-    public int getZ()
+    private int getZ()
     {
         return z;
+    }
+
+    public int getX(int dimension)
+    {
+        return dimensionalValue(x, 0, dimension);
+    }
+
+    public int getY(int dimension)
+    {
+        return dimensionalValue(y, 0, dimension);
+    }
+
+    public int getZ(int dimension)
+    {
+        return dimensionalValue(z, 0, dimension);
     }
 
     public int getR()
@@ -297,18 +348,9 @@ public class Waypoint implements Serializable
         this.type = type;
     }
 
-    public String getOrigin()
+    public Origin getOrigin()
     {
         return origin;
-    }
-
-    public ChunkCoordinates getLocation()
-    {
-        if(location==null)
-        {
-            location = new ChunkCoordinates(x, y, z);
-        }
-        return location;
     }
 
     public String getFileName()
@@ -331,14 +373,116 @@ public class Waypoint implements Serializable
         this.dirty = dirty;
     }
 
-    public void setOrigin(String origin)
+    public void setOrigin(Origin origin)
     {
         this.origin = origin;
+    }
+
+    public boolean isReadOnly()
+    {
+        return readOnly;
+    }
+
+    public void setReadOnly(boolean readOnly)
+    {
+        this.readOnly = readOnly;
     }
 
     @Override
     public String toString()
     {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        Waypoint waypoint = (Waypoint) o;
+
+        if (b != waypoint.b)
+        {
+            return false;
+        }
+        if (enable != waypoint.enable)
+        {
+            return false;
+        }
+        if (g != waypoint.g)
+        {
+            return false;
+        }
+        if (r != waypoint.r)
+        {
+            return false;
+        }
+        if (x != waypoint.x)
+        {
+            return false;
+        }
+        if (y != waypoint.y)
+        {
+            return false;
+        }
+        if (z != waypoint.z)
+        {
+            return false;
+        }
+        if (!Arrays.equals(dimensions, waypoint.dimensions))
+        {
+            return false;
+        }
+        if (!icon.equals(waypoint.icon))
+        {
+            return false;
+        }
+        if (!name.equals(waypoint.name))
+        {
+            return false;
+        }
+        if (origin != waypoint.origin)
+        {
+            return false;
+        }
+        if (type != waypoint.type)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return id.hashCode();
+    }
+
+    private static int dimensionalValue(int original, int currentDimension, int targetDimension)
+    {
+        if(targetDimension==currentDimension)
+        {
+            return original;
+        }
+        else if(targetDimension==-1)
+        {
+            return original/8;
+        }
+        else if(currentDimension==-1)
+        {
+            return original*8;
+        }
+        else
+        {
+            return original;
+        }
     }
 }

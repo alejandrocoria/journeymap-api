@@ -220,6 +220,30 @@ public class ButtonList extends ArrayList<Button>
         return this;
     }
 
+    public ButtonList layoutFilledHorizontal(FontRenderer fr, final int leftX, final int y, final int rightX, final int hgap, final boolean leftToRight)
+    {
+        if(this.size()==0) return this;
+
+        this.horizontal = true;
+        this.setUniformWidths(fr);
+
+        int width = getWidth(hgap);
+        int remaining = (rightX-leftX)-width;
+        if(remaining>this.size())
+        {
+            int gaps = hgap * (size());
+            int area = (rightX-leftX) - gaps;
+            int wider = area/size();
+            setWidths(wider, this);
+            layoutDistributedHorizontal(leftX, y, rightX, leftToRight);
+        }
+        else
+        {
+            layoutCenteredHorizontal((rightX-leftX)/2, y, leftToRight, hgap);
+        }
+        return this;
+    }
+
     public void setUniformWidths(FontRenderer fr)
     {
         int max = 0;
@@ -284,6 +308,17 @@ public class ButtonList extends ArrayList<Button>
         {
             button.fitWidth(fr);
         }
+    }
+
+    public static void equalizeWidths(FontRenderer fr, Collection<Button> collection)
+    {
+        int maxWidth = 0;
+        for(Button button : collection)
+        {
+            button.fitWidth(fr);
+            maxWidth = Math.max(maxWidth, button.getWidth());
+        }
+        setWidths(maxWidth, collection);
     }
 
     public static void drawOutlines(int thick, Color color, int alpha, Collection<Button> collection)

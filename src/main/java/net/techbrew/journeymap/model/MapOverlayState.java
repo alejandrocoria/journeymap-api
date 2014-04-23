@@ -14,7 +14,6 @@ import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
 import net.techbrew.journeymap.render.overlay.OverlayRadarRenderer;
 import net.techbrew.journeymap.render.overlay.OverlayWaypointRenderer;
-import net.techbrew.journeymap.waypoint.WaypointHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -170,7 +169,7 @@ public class MapOverlayState {
         }
 
         // Draw waypoints
-        if(WaypointHelper.waypointsEnabled() && PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_WAYPOINTS)) {
+        if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_WAYPOINTS)) {
             Map map = (Map) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
             List<Waypoint> waypoints = new ArrayList<Waypoint>(map.values());
 

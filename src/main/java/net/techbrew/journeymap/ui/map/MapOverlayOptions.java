@@ -6,6 +6,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.EntityKey;
 import net.techbrew.journeymap.data.PlayerData;
+import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.PropertyManager;
@@ -13,7 +14,7 @@ import net.techbrew.journeymap.ui.Button;
 import net.techbrew.journeymap.ui.ButtonList;
 import net.techbrew.journeymap.ui.JmUI;
 import net.techbrew.journeymap.ui.UIManager;
-import net.techbrew.journeymap.waypoint.WaypointHelper;
+import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.lwjgl.input.Keyboard;
 
 public class MapOverlayOptions extends JmUI {
@@ -21,10 +22,10 @@ public class MapOverlayOptions extends JmUI {
 	int lastWidth = 0;
 	int lastHeight = 0;
 	
-	private enum ButtonEnum {Caves,Monsters,Animals,Villagers,Pets,Players,Waypoints,Grid,Webserver,MiniMap,Font,Unicode, KeyboardHelp, Close};
+	private enum ButtonEnum {Caves,Monsters,Animals,Villagers,Pets,Players,Waypoints,WaypointsManager, Grid,Webserver,MiniMap,Font,Unicode, KeyboardHelp, Close};
 
 	Button buttonCaves, buttonMonsters, buttonAnimals, buttonVillagers, buttonPets, buttonPlayers, buttonFont, buttonUnicode, buttonWaypoints;
-    Button buttonGrid, buttonWebserver, buttonMiniMap, buttonKeyboardHelp, buttonClose;
+    Button buttonGrid, buttonWebserver, buttonMiniMap, buttonKeyboardHelp, buttonWaypointsManager, buttonClose;
 
     ButtonList leftButtons;
     ButtonList rightButtons;
@@ -80,7 +81,7 @@ public class MapOverlayOptions extends JmUI {
 				Constants.getString("MapOverlay.show_waypoints", on),
 				Constants.getString("MapOverlay.show_waypoints", off),
 				PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_WAYPOINTS)); //$NON-NLS-1$  //$NON-NLS-2$
-		buttonWaypoints.enabled = WaypointHelper.waypointsEnabled();
+		buttonWaypoints.enabled = WaypointsData.isAnyEnabled();
 
 		boolean webserverOn = PropertyManager.getInstance().getBoolean(PropertyManager.Key.WEBSERVER_ENABLED);
 		buttonWebserver = new Button(ButtonEnum.Webserver.ordinal(),0,0,
@@ -113,6 +114,11 @@ public class MapOverlayOptions extends JmUI {
                 Constants.getString("MiniMap.force_unicode", on),
                 Constants.getString("MiniMap.force_unicode", off), forceUnicode);
         MapOverlay.state().mapForceUnicode = forceUnicode;
+
+        boolean nativeWaypointManagement = PropertyManager.getBooleanProp(PropertyManager.Key.NATIVE_WAYPOINTS_ENABLED);
+        buttonWaypointsManager = new Button(ButtonEnum.WaypointsManager.ordinal(), 0, 0,
+                Constants.getString("MapOverlay.waypoint_manager", on),
+                Constants.getString("MapOverlay.waypoint_manager", off), nativeWaypointManagement);
 				
 		if(!FeatureManager.isAllowed(Feature.MapCaves)) {
 			buttonCaves.setToggled(false);
@@ -155,9 +161,12 @@ public class MapOverlayOptions extends JmUI {
         buttonList.add(buttonMiniMap);
         buttonList.add(buttonFont);
         buttonList.add(buttonUnicode);
+        buttonList.add(buttonWaypointsManager);
 
-        leftButtons = new ButtonList(buttonCaves, buttonAnimals, buttonPets, buttonGrid, buttonFont, buttonMiniMap);
-        rightButtons = new ButtonList(buttonMonsters, buttonVillagers, buttonPlayers, buttonWaypoints, buttonUnicode, buttonWebserver);
+        leftButtons = new ButtonList(buttonCaves, buttonAnimals, buttonPets, buttonGrid, buttonFont, buttonMiniMap, buttonWaypointsManager);
+        rightButtons = new ButtonList(buttonMonsters, buttonVillagers, buttonPlayers, buttonWaypoints, buttonUnicode, buttonKeyboardHelp, buttonWebserver);
+
+        ButtonList.equalizeWidths(getFontRenderer(), buttonList);
     }
 
     /**
@@ -184,9 +193,7 @@ public class MapOverlayOptions extends JmUI {
 			leftButtons.layoutVertical(bx - (hgap/2), by, false, vgap);
             rightButtons.layoutVertical(bx + (hgap/2), by, true, vgap);
 
-            buttonKeyboardHelp.below(leftButtons, vgap).centerHorizontalOn(bx);
-
-			buttonClose.below(buttonKeyboardHelp, vgap).centerHorizontalOn(bx);
+			buttonClose.below(leftButtons, vgap).centerHorizontalOn(bx);
 
 		}	
 	}
@@ -263,6 +270,20 @@ public class MapOverlayOptions extends JmUI {
                 PropertyManager.set(PropertyManager.Key.PREF_FORCEUNICODE, forceUnicode);
                 MapOverlay.state().mapForceUnicode = forceUnicode;
                 break;
+            }
+            case WaypointsManager: {
+                boolean nativeWaypointManagement = !PropertyManager.getBooleanProp(PropertyManager.Key.NATIVE_WAYPOINTS_ENABLED);
+                buttonWaypointsManager.setToggled(nativeWaypointManagement);
+                PropertyManager.set(PropertyManager.Key.NATIVE_WAYPOINTS_ENABLED, nativeWaypointManagement);
+                buttonWaypoints.enabled = WaypointsData.isAnyEnabled();
+                if(buttonWaypoints.enabled)
+                {
+                    WaypointStore.instance().load();
+                }
+                else
+                {
+                    WaypointStore.instance().clear();
+                }
             }
 		}
 	}

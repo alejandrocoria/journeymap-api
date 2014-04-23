@@ -39,45 +39,48 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler {
     public static void onKeypress(boolean minimapOnly) {
         final int i = Keyboard.getEventKey();
         MapOverlayState mapOverlayState = MapOverlay.state();
-
         if(mapOverlayState.minimapHotkeys && GuiScreen.isCtrlKeyDown()) {
 
-            if(i==Constants.KB_MAP.getKeyCode()) {
+            if(i==Constants.getKeyCode(Constants.KB_MAP)) {
                 UIManager.getInstance().toggleMinimap();
                 return;
             }
-            else if(i==Constants.KB_MAP_ZOOMIN.getKeyCode()) {
+            else if(i==Constants.getKeyCode(Constants.KB_MAP_ZOOMIN)) {
                 mapOverlayState.zoomIn();
                 return;
             }
-            else if(i==Constants.KB_MAP_ZOOMOUT.getKeyCode()) {
+            else if(i==Constants.getKeyCode(Constants.KB_MAP_ZOOMOUT)) {
                 mapOverlayState.zoomOut();
                 return;
             }
-            else if(i==Constants.KB_MAP_DAY.getKeyCode()) {
+            else if(i==Constants.getKeyCode(Constants.KB_MAP_DAY)) {
                 mapOverlayState.overrideMapType(Constants.MapType.day);
                 return;
             }
-            else if(i==Constants.KB_MAP_NIGHT.getKeyCode()) {
+            else if(i==Constants.getKeyCode(Constants.KB_MAP_NIGHT)) {
                 mapOverlayState.overrideMapType(Constants.MapType.night);
                 return;
             }
-            else if(i==Constants.KB_MINIMAP_POS.getKeyCode()) {
+            else if(i==Constants.getKeyCode(Constants.KB_MINIMAP_POS)) {
                 UIManager.getInstance().getMiniMap().nextPosition();
                 return;
             }
-            else if(i==Constants.KB_WAYPOINT.getKeyCode()) {
+            else if(i==Constants.getKeyCode(Constants.KB_WAYPOINT)) {
                 UIManager.getInstance().openWaypointManager();
                 return;
             }
         }
         else if(!minimapOnly)
         {
-            if(i==Constants.KB_MAP.getKeyCode()) {
-                UIManager.getInstance().openMap();
+            if(i==Constants.getKeyCode(Constants.KB_MAP)) {
+                if(Minecraft.getMinecraft().currentScreen==null) {
+                    UIManager.getInstance().openMap();
+                } else if(Minecraft.getMinecraft().currentScreen instanceof MapOverlay) {
+                    UIManager.getInstance().closeAll();
+                }
                 return;
             }
-            else if(i==Constants.KB_WAYPOINT.getKeyCode()) {
+            else if(i==Constants.getKeyCode(Constants.KB_WAYPOINT)) {
                 if(Minecraft.getMinecraft().currentScreen==null) {
                     Waypoint waypoint = Waypoint.of(Minecraft.getMinecraft().thePlayer);
                     UIManager.getInstance().openWaypointEditor(waypoint, true, null);
@@ -87,3 +90,4 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler {
         }
     }
 }
+

@@ -1,7 +1,6 @@
 package net.techbrew.journeymap.data;
 
 import net.techbrew.journeymap.io.PropertyManager;
-import net.techbrew.journeymap.waypoint.WaypointHelper;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -52,7 +51,7 @@ public class AllData implements IDataProvider {
 		props.put(Key.images, cache.get(ImagesData.class, optionalParams));
 		props.put(Key.player, cache.get(PlayerData.class));
 		
-		if(WaypointHelper.waypointsEnabled() && PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_WAYPOINTS)) {
+		if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_WAYPOINTS)) {
 			props.put(Key.waypoints, cache.get(WaypointsData.class).get(EntityKey.root));
 		} else {
 			props.put(Key.waypoints, Collections.emptyMap());

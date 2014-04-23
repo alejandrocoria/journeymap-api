@@ -200,15 +200,15 @@ Waypoint.edit=Edit
 Waypoint.find=Find
 Waypoint.teleport=Teleport
 Waypoint.deathpoint=Death
-Waypoint.import_rei_file_error=Could not import Rei's waypoint file: %1$s
-Waypoint.import_rei_success=Imported %1$s of Rei's waypoints.
-Waypoint.import_rei_failure=No Rei's waypoints were imported. See journeyMap.log for details.
-Waypoint.import_rei_errors=Imported %1$s of Rei's waypoints with %1$s errors. See journeyMap.log for details.
+Waypoint.import_rei_file_error=Could not import Rei's MiniMap waypoint file: %1$s
+Waypoint.import_rei_success=Imported %1$s waypoints from of Rei's MiniMap.
+Waypoint.import_rei_failure=No Rei's MiniMap waypoints were imported. See journeyMap.log for details.
+Waypoint.import_rei_errors=Imported %1$s waypoints from Rei's MiniMap with %1$s errors. See journeyMap.log for details.
 
-Waypoint.import_vox_file_error=Could not import Voxel waypoint file: %1$s
-Waypoint.import_vox_success=Imported %1$s of Voxel waypoints.
-Waypoint.import_vox_failure=No Voxel waypoints were imported. See journeyMap.log for details.
-Waypoint.import_vox_errors=Imported %1$s of Voxel waypoints with %1$s errors. See journeyMap.log for details.
+Waypoint.import_vox_file_error=Could not import VoxelMap waypoint file: %1$s
+Waypoint.import_vox_success=Imported %1$s waypoints from VoxelMap.
+Waypoint.import_vox_failure=No VoxelMap waypoints were imported. See journeyMap.log for details.
+Waypoint.import_vox_errors=Imported %1$s waypoints from VoxelMap with %1$s errors. See journeyMap.log for details.
 
 # Added in 3.1.x:
 MiniMap.options=MiniMap Options
@@ -277,6 +277,24 @@ MapOverlay.hotkeys_north=Pan North (16 Blocks)
 MapOverlay.hotkeys_south=Pan South (16 Blocks)
 MapOverlay.hotkeys_east=Pan East (16 Blocks)
 MapOverlay.hotkeys_west=Pan West (16 Blocks)
+MapOverlay.hotkeys_waypoint=Create/Edit Waypoint
+MapOverlay.hotkeys_doubleclick=(Double-click)
+
+# Added in 4.0.0 %1$s = one of "On", "Off".
+MapOverlay.waypoint_manager=Create/Manage Waypoints: %1$s
+
+# Added in 4.0.0
+MapOverlay.help=Help...
+MapOverlay.waypoint_help_title=Waypoint Help
+MapOverlay.waypoint_help_create_ingame=Create/Edit Waypoint (in game)
+MapOverlay.waypoint_help_create_inmap=Create/Edit Waypoint (in map)
+MapOverlay.waypoint_help_manage_ingame=Waypoint Manager (in game)
+
+MapOverlay.waypoint_help_import_rei_title=Import Rei's MiniMap Waypoints
+MapOverlay.waypoint_help_import_rei=Or copy §b%1$s§f to §b%2$s§f and restart Minecraft.
+
+MapOverlay.waypoint_help_import_voxel_title=Import VoxelMap Waypoints
+MapOverlay.waypoint_help_import_voxel=Or copy §b%1$s§f to §b%2$s§f and restart Minecraft.
 
 # Added in 3.1.x. %1$s = one of "On", "Off". FPS is short for "Frames per Second", a measurement of graphic performance.
 MiniMap.show_fps=Show FPS: %1$s

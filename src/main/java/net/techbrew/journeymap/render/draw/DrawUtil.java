@@ -70,93 +70,102 @@ public class DrawUtil
 
         GL11.glPushMatrix();
 
-        if (fontScale != 1) {
-            x = x / fontScale;
-            y = y / fontScale;
-            GL11.glScaled(fontScale, fontScale, 0);
-        }
-
-        double textX = x;
-        double textY = y;
-        double rectX = x;
-        double rectY = y;
-
-        switch(hAlign)
+        try
         {
-            case Left:
+
+            if (fontScale != 1)
             {
-                textX = x - width;
-                break;
+                x = x / fontScale;
+                y = y / fontScale;
+                GL11.glScaled(fontScale, fontScale, 0);
             }
-            case Center:
+
+            double textX = x;
+            double textY = y;
+            double rectX = x;
+            double rectY = y;
+
+            switch (hAlign)
             {
-                textX = x - (width/2);
-                break;
+                case Left:
+                {
+                    textX = x - width;
+                    break;
+                }
+                case Center:
+                {
+                    textX = x - (width / 2);
+                    break;
+                }
+                case Right:
+                {
+                    textX = x;
+                    break;
+                }
             }
-            case Right:
+
+            double vpad = drawRect ? (height - fontRenderer.FONT_HEIGHT) / 2.0 : 0;
+
+            switch (vAlign)
             {
-                textX = x;
-                break;
+                case Above:
+                {
+                    rectY = y - height;
+                    textY = rectY + vpad;
+                    break;
+                }
+                case Middle:
+                {
+                    rectY = y - (height / 2);
+                    textY = rectY + vpad;
+                    break;
+                }
+                case Below:
+                {
+                    rectY = y;
+                    textY = rectY + vpad;
+                    break;
+                }
+            }
+
+            // Draw background
+            if (bgColor != null && bgAlpha > 0)
+            {
+                final int hpad = 2;
+                final double rectHeight = getLabelHeight(fontRenderer, fontShadow);
+                drawRectangle(textX - hpad - .5, rectY, width + (2 * hpad), rectHeight, bgColor, bgAlpha);
+            }
+
+            // String positioning uses ints
+            int intTextX = (int) Math.floor(textX);
+            int intTextY = (int) Math.floor(textY);
+            double dTextX = textX - intTextX;
+            double dTextY = textY - intTextY;
+
+            // Use translation for the double precision
+            GL11.glTranslated(dTextX, dTextY, 0);
+
+            // Draw the string
+            //final int voffset = fontRenderer.getUnicodeFlag() ? 0 : 1;
+
+            if (color.getTransparency() != alpha)
+            {
+                color = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+            }
+
+            if (fontShadow)
+            {
+                fontRenderer.drawStringWithShadow(text, intTextX, intTextY, color.getRGB());
+            }
+            else
+            {
+                fontRenderer.drawString(text, intTextX, intTextY, color.getRGB());
             }
         }
-
-        double vpad = drawRect ? (height-fontRenderer.FONT_HEIGHT)/2.0 : 0;
-
-        switch(vAlign)
+        finally
         {
-            case Above:
-            {
-                rectY = y - height;
-                textY = rectY + vpad;
-                break;
-            }
-            case Middle:
-            {
-                rectY = y - (height/2);
-                textY = rectY + vpad;
-                break;
-            }
-            case Below:
-            {
-                rectY = y;
-                textY = rectY + vpad;
-                break;
-            }
+            GL11.glPopMatrix();
         }
-
-        // Draw background
-        if (bgColor != null && bgAlpha>0)
-        {
-            final int hpad = 2;
-            final double rectHeight = getLabelHeight(fontRenderer, fontShadow);
-            drawRectangle(textX-hpad-.5, rectY, width + (2*hpad), rectHeight, bgColor, bgAlpha);
-        }
-
-        // String positioning uses ints
-        int intTextX = (int) Math.floor(textX);
-        int intTextY = (int) Math.floor(textY);
-
-        // Use translation for the double precision
-        GL11.glTranslated(textX-intTextX, textY-intTextY, 0);
-
-        // Draw the string
-        //final int voffset = fontRenderer.getUnicodeFlag() ? 0 : 1;
-
-        if(color.getTransparency()!=alpha)
-        {
-            color = new Color(color.getRed(), color.getBlue(), color.getGreen(), alpha);
-        }
-
-        if(fontShadow)
-        {
-            fontRenderer.drawStringWithShadow(text, intTextX, intTextY, color.getRGB());
-        }
-        else
-        {
-            fontRenderer.drawString(text, intTextX, intTextY, color.getRGB());
-        }
-
-        GL11.glPopMatrix();
     }
 
     public static int getLabelHeight(FontRenderer fr, boolean fontShadow)

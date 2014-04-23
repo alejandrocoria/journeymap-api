@@ -6,14 +6,12 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.overlay.TileCache;
-import net.techbrew.journeymap.ui.map.MapOverlay;
-import net.techbrew.journeymap.ui.map.MapOverlayActions;
-import net.techbrew.journeymap.ui.map.MapOverlayHotkeysHelp;
-import net.techbrew.journeymap.ui.map.MapOverlayOptions;
+import net.techbrew.journeymap.ui.map.*;
 import net.techbrew.journeymap.ui.minimap.MiniMap;
 import net.techbrew.journeymap.ui.minimap.MiniMapHotkeysHelp;
 import net.techbrew.journeymap.ui.minimap.MiniMapOptions;
@@ -103,12 +101,19 @@ public class UIManager {
     }
 
     public void drawMiniMap() {
-        if(miniMap.isEnabled() && miniMap.isVisible()){
-            final GuiScreen currentScreen = minecraft.currentScreen;
-            final boolean doDraw = currentScreen==null || currentScreen instanceof GuiChat || currentScreen instanceof MiniMapOptions;
-            if(doDraw) {
-                miniMap.drawMap();
+        try
+        {
+            if(miniMap.isEnabled() && miniMap.isVisible()){
+                final GuiScreen currentScreen = minecraft.currentScreen;
+                final boolean doDraw = currentScreen==null || currentScreen instanceof GuiChat || currentScreen instanceof MiniMapOptions;
+                if(doDraw) {
+                    miniMap.drawMap();
+                }
             }
+        }
+        catch(Throwable e)
+        {
+            JourneyMap.getLogger().severe("Error drawing minimap: " + LogFormatter.toString(e));
         }
     }
 
@@ -123,11 +128,18 @@ public class UIManager {
 
     public void openMap(Waypoint waypoint)
     {
-        if(waypoint.isInPlayerDimension())
+        try
         {
-            KeyBinding.unPressAllKeys();
-            MapOverlay map = open(MapOverlay.class);
-            map.centerOn(waypoint);
+            if(waypoint.isInPlayerDimension())
+            {
+                KeyBinding.unPressAllKeys();
+                MapOverlay map = open(MapOverlay.class);
+                map.centerOn(waypoint);
+            }
+        }
+        catch(Throwable e)
+        {
+            JourneyMap.getLogger().severe("Error opening map on waypoint: " + LogFormatter.toString(e));
         }
     }
 
@@ -151,14 +163,38 @@ public class UIManager {
         open(MapOverlayActions.class);
     }
 
+    public void openWaypointHelp() {
+        open(WaypointHelp.class);
+    }
+
     public void openWaypointManager() {
-        WaypointManager manager = new WaypointManager();
-        open(manager);
+        if(WaypointsData.isNativeEnabled())
+        {
+            try
+            {
+                WaypointManager manager = new WaypointManager();
+                open(manager);
+            }
+            catch(Throwable e)
+            {
+                JourneyMap.getLogger().severe("Error opening waypoint manager: " + LogFormatter.toString(e));
+            }
+        }
     }
 
     public void openWaypointEditor(Waypoint waypoint, boolean isNew, Class<? extends JmUI> returnClass) {
-        WaypointEditor editor = new WaypointEditor(waypoint, isNew, returnClass);
-        open(editor);
+        if(WaypointsData.isNativeEnabled())
+        {
+            try
+            {
+                WaypointEditor editor = new WaypointEditor(waypoint, isNew, returnClass);
+                open(editor);
+            }
+            catch(Throwable e)
+            {
+                JourneyMap.getLogger().severe("Error opening waypoint editor: " + LogFormatter.toString(e));
+            }
+        }
     }
 
     public void reset() {

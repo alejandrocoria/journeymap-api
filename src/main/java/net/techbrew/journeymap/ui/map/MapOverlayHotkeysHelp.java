@@ -96,15 +96,16 @@ public class MapOverlayHotkeysHelp extends JmUI {
         // Hotkey help
         y+=12;
         final int x = (this.width)/2;
-        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_toggle"), Keyboard.getKeyName(Constants.KB_MAP.getKeyCode()), x, y+=12);
-        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_zoom_in"), Keyboard.getKeyName(Constants.KB_MAP_ZOOMIN.getKeyCode()), x, y+=12);
-        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_zoom_out"), Keyboard.getKeyName(Constants.KB_MAP_ZOOMOUT.getKeyCode()), x, y+=12);
-        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_day"), Keyboard.getKeyName(Constants.KB_MAP_DAY.getKeyCode()), x, y+=12);
-        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_night"), Keyboard.getKeyName(Constants.KB_MAP_NIGHT.getKeyCode()), x, y+=12);
-        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_north"), Keyboard.getKeyName(mc.gameSettings.keyBindForward.getKeyCode()), x, y+=12);
-        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_west"), Keyboard.getKeyName(mc.gameSettings.keyBindLeft.getKeyCode()), x, y+=12);
-        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_south"), Keyboard.getKeyName(mc.gameSettings.keyBindBack.getKeyCode()), x, y+=12);
-        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_east"), Keyboard.getKeyName(mc.gameSettings.keyBindRight.getKeyCode()), x, y+=12);
+        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_toggle"), Constants.getKeyName(Constants.KB_MAP), x, y+=12);
+        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_zoom_in"), Constants.getKeyName(Constants.KB_MAP_ZOOMIN), x, y+=12);
+        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_zoom_out"), Constants.getKeyName(Constants.KB_MAP_ZOOMOUT), x, y+=12);
+        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_day"), Constants.getKeyName(Constants.KB_MAP_DAY), x, y+=12);
+        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_night"), Constants.getKeyName(Constants.KB_MAP_NIGHT), x, y+=12);
+        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_north"), Constants.getKeyName(mc.gameSettings.keyBindForward), x, y+=12);
+        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_west"), Constants.getKeyName(mc.gameSettings.keyBindLeft), x, y+=12);
+        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_south"), Constants.getKeyName(mc.gameSettings.keyBindBack), x, y+=12);
+        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_east"), Constants.getKeyName(mc.gameSettings.keyBindRight), x, y+=12);
+        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_waypoint"), Constants.getString("MapOverlay.hotkeys_doubleclick"), x, y+=12);
         buttonClose.setY(y + 16);
     }
 

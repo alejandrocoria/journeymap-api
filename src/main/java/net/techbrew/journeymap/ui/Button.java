@@ -95,7 +95,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable {
         if(this.labelOff!=null) {
             max = Math.max(max, fr.getStringWidth(labelOff));
         }
-        return max + 8;
+        return max + 12;
     }
 
     public void fitWidth(FontRenderer fr) {

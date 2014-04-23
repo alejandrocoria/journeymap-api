@@ -20,6 +20,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -145,6 +146,24 @@ public class WorldData implements IDataProvider {
 	    }
 	    return "server";
 	}
+
+    public static int getServerPort() {
+        try
+        {
+            NetClientHandler sendQueue = Minecraft.getMinecraft().getNetHandler();
+            SocketAddress socketAddress = sendQueue.getNetManager().getSocketAddress();
+            if ((socketAddress !=null && socketAddress instanceof InetSocketAddress))
+            {
+                InetSocketAddress inetAddr = (InetSocketAddress)socketAddress;
+                return inetAddr.getPort();
+            }
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().severe("Couldn't get server port: " + LogFormatter.toString(t));
+        }
+        return 0;
+    }
 	
 	/**
 	 * Get the current world name.
@@ -184,6 +203,7 @@ public class WorldData implements IDataProvider {
         {
             dims = new Integer[]{0,-1,1};
         }
+        Arrays.sort(dims);
         return dims;
     }
 

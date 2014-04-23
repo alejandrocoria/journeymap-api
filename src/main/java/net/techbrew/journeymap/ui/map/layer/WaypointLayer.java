@@ -5,13 +5,13 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.chunk.Chunk;
+import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawWayPointStep;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
-import net.techbrew.journeymap.waypoint.WaypointHelper;
 
 import java.awt.*;
 import java.util.*;
@@ -41,6 +41,12 @@ public class WaypointLayer implements LayerDelegate.Layer
     public List<DrawStep> onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
     {
         drawStepList.clear();
+
+        if(!WaypointsData.isNativeEnabled())
+        {
+            return drawStepList;
+        }
+
         if(lastCoord==null)
         {
             lastCoord = blockCoord;
@@ -74,16 +80,18 @@ public class WaypointLayer implements LayerDelegate.Layer
             return Collections.EMPTY_LIST;
         }
 
+        int dimension = mc.thePlayer.dimension;
+
         // check for existing
-        Collection<Waypoint> waypoints = WaypointHelper.getCachedWaypoints();
+        Collection<Waypoint> waypoints = WaypointsData.getCachedWaypoints();
         ArrayList<Waypoint> proximal = new ArrayList<Waypoint>();
-        for(Waypoint existing : waypoints)
+        for(Waypoint waypoint : waypoints)
         {
-            if(existing.isEnable() && existing.isInPlayerDimension())
+            if(!waypoint.isReadOnly() && waypoint.isEnable() && waypoint.isInPlayerDimension())
             {
-                if(area.isVecInside(Vec3.createVectorHelper(existing.getX(), existing.getY(), existing.getZ())))
+                if(area.isVecInside(Vec3.createVectorHelper(waypoint.getX(dimension), waypoint.getY(dimension), waypoint.getZ(dimension))))
                 {
-                    proximal.add(existing);
+                    proximal.add(waypoint);
                 }
             }
         }
@@ -92,7 +100,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         {
             if(proximal.size()>1)
             {
-                sortByDistance(proximal, blockCoord);
+                sortByDistance(proximal, blockCoord, dimension);
             }
             select(proximal.get(0));
         }
@@ -100,44 +108,17 @@ public class WaypointLayer implements LayerDelegate.Layer
         return drawStepList;
     }
 
-    private void sortByDistance(List<Waypoint> waypoints, final BlockCoordIntPair blockCoord)
-    {
-        Collections.sort(waypoints, new Comparator<Waypoint>()
-        {
-            @Override
-            public int compare(Waypoint o1, Waypoint o2)
-            {
-                return Double.compare(getDistance(o1), getDistance(o2));
-            }
-
-            private double getDistance(Waypoint waypoint)
-            {
-                double dx = waypoint.getX() - blockCoord.x;
-                double dz = waypoint.getZ() - blockCoord.z;
-                return (Math.sqrt(dx * dx + dz * dz));
-            }
-        });
-    }
-
-    private void select(Waypoint waypoint)
-    {
-        selected = waypoint;
-        selectedWaypointStep = new DrawWayPointStep(waypoint, waypoint.getColor(), Color.white, 255, true);
-        drawStepList.add(selectedWaypointStep);
-    }
-
-    private int getProximity()
-    {
-        int blockSize = (int) Math.max(1, Math.pow(2, MapOverlay.state().currentZoom));
-        return Math.max(1, 8/blockSize);
-    }
-
     @Override
     public List<DrawStep> onMouseClick(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
     {
+        if(!WaypointsData.isNativeEnabled())
+        {
+            return drawStepList;
+        }
+
         // check for double-click
         long sysTime = Minecraft.getSystemTime();
-        boolean doubleClick = blockCoord.equals(lastCoord) && sysTime - this.lastClicked < 450L;
+        boolean doubleClick = sysTime - this.lastClicked < 450L;
         this.lastClicked = sysTime;
         if(!doubleClick)
         {
@@ -165,5 +146,37 @@ public class WaypointLayer implements LayerDelegate.Layer
         UIManager.getInstance().openWaypointEditor(waypoint, true, MapOverlay.class);
 
         return Collections.EMPTY_LIST;
+    }
+
+    private void sortByDistance(List<Waypoint> waypoints, final BlockCoordIntPair blockCoord, final int dimension)
+    {
+        Collections.sort(waypoints, new Comparator<Waypoint>()
+        {
+            @Override
+            public int compare(Waypoint o1, Waypoint o2)
+            {
+                return Double.compare(getDistance(o1), getDistance(o2));
+            }
+
+            private double getDistance(Waypoint waypoint)
+            {
+                double dx = waypoint.getX(dimension) - blockCoord.x;
+                double dz = waypoint.getZ(dimension) - blockCoord.z;
+                return (Math.sqrt(dx * dx + dz * dz));
+            }
+        });
+    }
+
+    private void select(Waypoint waypoint)
+    {
+        selected = waypoint;
+        selectedWaypointStep = new DrawWayPointStep(waypoint, waypoint.getColor(), Color.white, true);
+        drawStepList.add(selectedWaypointStep);
+    }
+
+    private int getProximity()
+    {
+        int blockSize = (int) Math.max(1, Math.pow(2, MapOverlay.state().currentZoom));
+        return Math.max(1, 8/blockSize);
     }
 }

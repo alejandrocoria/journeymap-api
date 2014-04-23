@@ -30,7 +30,7 @@ public class WaypointManager extends JmUI {
 
     private static WaypointManagerItem.Sort currentSort;
 
-	private enum ButtonEnum {Add, Find, SortName, SortDistance, Dimensions, Close};
+	private enum ButtonEnum {Add, Find, SortName, SortDistance, Dimensions, Help, Close};
 
     protected int rowHeight = 16;
     protected int colWaypoint = COLWAYPOINT;
@@ -42,7 +42,7 @@ public class WaypointManager extends JmUI {
 
     private SortButton buttonSortName, buttonSortDistance;
     private DimensionsButton buttonDimensions;
-    private Button buttonClose, buttonAdd;
+    private Button buttonClose, buttonAdd, buttonHelp;
 
     private ButtonList bottomButtons;
 
@@ -110,11 +110,18 @@ public class WaypointManager extends JmUI {
                 }
                 buttonList.add(buttonAdd);
 
+                if(buttonHelp == null)
+                {
+                    buttonHelp = new Button(ButtonEnum.Help, Constants.getString("MapOverlay.help"));
+                    buttonHelp.fitWidth(getFontRenderer());
+                }
+                buttonList.add(buttonHelp);
+
                 buttonClose = new Button(ButtonEnum.Close, Constants.getString("MapOverlay.close"));
                 //buttonClose.fitWidth(getFontRenderer());
                 buttonList.add(buttonClose);
 
-                bottomButtons = new ButtonList(buttonDimensions, buttonAdd, buttonClose);
+                bottomButtons = new ButtonList(buttonHelp, buttonDimensions, buttonAdd, buttonClose);
             }
 
             if (this.items.isEmpty())
@@ -190,6 +197,13 @@ public class WaypointManager extends JmUI {
         itemScrollPane.position(scrollWidth, this.height, startY, bottomButtonsHeight, 0, 0);
 
         // Bottom buttons
+        ButtonList.equalizeWidths(mc.fontRenderer, bottomButtons);
+        if(bottomButtons.getWidth(hgap) > this.width)
+        {
+            ButtonList.equalizeWidths(mc.fontRenderer, new ButtonList(buttonAdd, buttonHelp));
+            buttonAdd.setWidth(buttonAdd.getWidth() + 10);
+            buttonHelp.setWidth(buttonHelp.getWidth() + 10);
+        }
         bottomButtons.layoutCenteredHorizontal(this.width/2, this.height - bottomButtonsHeight + vgap, true, hgap);
 	}
 
@@ -265,6 +279,11 @@ public class WaypointManager extends JmUI {
             {
                 Waypoint waypoint = Waypoint.of(mc.thePlayer);
                 UIManager.getInstance().openWaypointEditor(waypoint, true, WaypointManager.class);
+                return;
+            }
+            case Help:
+            {
+                UIManager.getInstance().openWaypointHelp();
                 return;
             }
         }
@@ -389,26 +408,23 @@ public class WaypointManager extends JmUI {
         }
     }
 
-    protected class DimensionsButton extends Button
+    protected static class DimensionsButton extends Button
     {
         final Integer[] dimensions;
-        Integer currentDim;
+        static Integer currentDim = 0;
 
         public DimensionsButton(int id)
         {
             super(id, 0, 0, "");
             dimensions = WorldData.getDimensions();
-            currentDim = Minecraft.getMinecraft().thePlayer.dimension;
+            if(currentDim!=null)
+            {
+                currentDim = Minecraft.getMinecraft().thePlayer.dimension;
+            }
             updateLabel();
 
             // Determine width
-            int maxWidth = 0;
-            for(Integer dim : dimensions)
-            {
-                String name = Constants.getString("Waypoint.dimension", WorldData.getDimensionName(dim));
-                maxWidth = Math.max(maxWidth, getFontRenderer().getStringWidth(name));
-            }
-            this.width = maxWidth+12;
+            fitWidth(Minecraft.getMinecraft().fontRenderer);
         }
 
         protected void updateLabel()
@@ -424,6 +440,18 @@ public class WaypointManager extends JmUI {
                 dimName = Constants.getString("Waypoint.dimension_all");
             }
             displayString = Constants.getString("Waypoint.dimension", dimName);
+        }
+
+        @Override
+        public int getFitWidth(FontRenderer fr)
+        {
+            int maxWidth = 0;
+            for(Integer dim : dimensions)
+            {
+                String name = Constants.getString("Waypoint.dimension", WorldData.getDimensionName(dim));
+                maxWidth = Math.max(maxWidth, Minecraft.getMinecraft().fontRenderer.getStringWidth(name));
+            }
+            return maxWidth+12;
         }
 
         @Override

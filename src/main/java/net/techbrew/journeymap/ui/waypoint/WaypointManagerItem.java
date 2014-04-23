@@ -215,9 +215,9 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
     public int getDistanceSqToEntity(EntityPlayer player)
     {
         if(distance==null) {
-            double d0 = this.waypoint.getX() - player.posX;
-            double d1 = this.waypoint.getY() - player.posY;
-            double d2 = this.waypoint.getZ() - player.posZ;
+            double d0 = this.waypoint.getX(player.dimension) - player.posX;
+            double d1 = this.waypoint.getY(player.dimension) - player.posY;
+            double d2 = this.waypoint.getZ(player.dimension) - player.posZ;
             distance = (int) Math.round(Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2));
         }
         return distance;

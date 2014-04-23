@@ -127,7 +127,7 @@ public class TextField extends GuiTextField {
         String text = getText();
         if(clampMin!=null) {
 
-            if(text==null || text.length()==0) {
+            if(text==null || text.length()==0 || text.equals("-")) {
                 return;
             }
 

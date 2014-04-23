@@ -14,6 +14,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSelectWorld;
 import net.techbrew.journeymap.cartography.ColorCache;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.forgehandler.EventHandlerManager;
@@ -35,9 +36,7 @@ import net.techbrew.journeymap.thread.JMThreadFactory;
 import net.techbrew.journeymap.thread.TaskThread;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
-import net.techbrew.journeymap.waypoint.WaypointHelper;
 import net.techbrew.journeymap.waypoint.WaypointStore;
-import org.lwjgl.input.Keyboard;
 
 import java.util.Date;
 import java.util.concurrent.Executors;
@@ -196,7 +195,7 @@ public class JourneyMap {
 
     @Mod.EventHandler
     public void postInitialize(FMLPostInitializationEvent event) {
-        WaypointHelper.reset();
+        WaypointsData.reset();
         BlockUtils.initialize();
     }
 	
@@ -336,7 +335,11 @@ public class JourneyMap {
         RegionImageCache.getInstance().flushToDisk();
         RegionImageCache.getInstance().clear();
         UIManager.getInstance().reset();
-        WaypointStore.instance().load();
+
+        if(PropertyManager.getBooleanProp(PropertyManager.Key.NATIVE_WAYPOINTS_ENABLED))
+        {
+            WaypointStore.instance().load();
+        }
     }
 
     public void updateState() {
@@ -416,7 +419,7 @@ public class JourneyMap {
 		if(enableAnnounceMod) {
             ChatLog.announceI18N("JourneyMap.ready", MOD_NAME); //$NON-NLS-1$
 			if(enableWebserver && enableMapGui) {
-				String keyName = Keyboard.getKeyName(Constants.KB_MAP.getKeyCode());
+				String keyName = Constants.getKeyName(Constants.KB_MAP);
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
                 String message = Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
                 ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
@@ -425,7 +428,7 @@ public class JourneyMap {
                 String message = Constants.getString("JourneyMap.webserver_only_ready", port); //$NON-NLS-1$
                 ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
 			} else if(enableMapGui) {
-				String keyName = Keyboard.getKeyName(Constants.KB_MAP.getKeyCode());
+				String keyName = Constants.getKeyName(Constants.KB_MAP); // Should be KeyCode
                 ChatLog.announceI18N("JourneyMap.mapgui_only_ready", keyName); //$NON-NLS-1$
 			} else {
                 ChatLog.announceI18N("JourneyMap.webserver_and_mapgui_disabled"); //$NON-NLS-1$

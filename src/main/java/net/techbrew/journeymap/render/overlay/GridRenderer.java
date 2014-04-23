@@ -8,7 +8,6 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
-import net.techbrew.journeymap.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -56,9 +55,6 @@ public class GridRenderer {
     private final Color bgColor = new Color(0x22, 0x22, 0x22);
 	
 	private final Point2D.Double centerPixelOffset = new Point2D.Double();
-	
-	private TextureImpl crosshairs;
-	
 	private Integer dimension;
 	private File worldDir;
 
@@ -138,8 +134,6 @@ public class GridRenderer {
 				g.setColor(Color.GREEN);
 				g.drawLine(mc.displayWidth/2, 0, mc.displayWidth/2, mc.displayHeight);
 				g.drawLine(0, mc.displayHeight/2, mc.displayWidth, mc.displayHeight/2);
-				if(crosshairs!=null) crosshairs.deleteTexture();
-				crosshairs = new TextureImpl(tmp);
 			}
 		}
         return true;
@@ -290,19 +284,6 @@ public class GridRenderer {
                 Tile tile = tc.getIfPresent(entry.getValue());
                 drawTile(pos, tile, centerX, centerZ);
 			}
-
-//            if( debug && crosshairs!=null) {
-//                Minecraft mc = Minecraft.getMinecraft();
-//                GL11.glBindTexture(GL11.GL_TEXTURE_2D, crosshairs.getGlTextureId());
-//                Tessellator tessellator = Tessellator.instance;
-//                tessellator.startDrawingQuads();
-//                tessellator.addVertexWithUV(0, mc.displayHeight, 0.0D, 0, 1);
-//                tessellator.addVertexWithUV(mc.displayWidth, mc.displayHeight, 0.0D, 1, 1);
-//                tessellator.addVertexWithUV(mc.displayWidth, 0, 0.0D, 1, 0);
-//                tessellator.addVertexWithUV(0, 0, 0.0D, 0, 0);
-//                tessellator.draw();
-//            }
-
 		}
 	}
 	

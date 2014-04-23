@@ -8,10 +8,11 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.event.ForgeSubscribe;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.waypoint.EntityWaypoint;
 import net.techbrew.journeymap.waypoint.RenderWaypoint;
-import net.techbrew.journeymap.waypoint.WaypointHelper;
 
 import java.util.EnumSet;
 
@@ -41,9 +42,8 @@ public class WaypointOverlayHandler implements EventHandlerManager.EventHandler 
 
         if (event.type == RenderGameOverlayEvent.ElementType.HOTBAR) {
 
-            if(WaypointHelper.isNativeLoaded()) {
-
-                //Map<String, Map> waypoints = (Map<String, Map>) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
+            if(WaypointsData.isNativeEnabled())
+            {
                 // TODO
             }
         }

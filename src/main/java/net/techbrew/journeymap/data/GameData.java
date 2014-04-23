@@ -3,7 +3,6 @@ package net.techbrew.journeymap.data;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.io.PropertyManager;
-import net.techbrew.journeymap.waypoint.WaypointHelper;
 import org.lwjgl.opengl.Display;
 
 import java.util.LinkedHashMap;
@@ -54,7 +53,7 @@ public class GameData implements IDataProvider {
 		props.put(Key.latest_journeymap_version, VersionCheck.getVersionAvailable()); 
 		props.put(Key.mc_version, Display.getTitle().split("\\s(?=\\d)")[1]); //$NON-NLS-1$ 		
 		props.put(Key.browser_poll, pm.getInteger(PropertyManager.Key.BROWSER_POLL));
-		props.put(Key.waypoints_enabled, WaypointHelper.waypointsEnabled());
+        props.put(Key.waypoints_enabled, WaypointsData.isAnyEnabled());
 
 		return props;	
 	}

@@ -56,6 +56,20 @@ public class Constants {
         return I18n.format(key, params);
     }
 
+    public static String getKeyName(KeyBinding keyBinding)
+    {
+        return Keyboard.getKeyName(getKeyCode(keyBinding));
+    }
+
+    public static int getKeyCode(KeyBinding keyBinding)
+    {
+        // 1.7.2
+        // return keyBinding.getKeyCode()
+
+        // 1.6.4
+        return keyBinding.keyCode;
+    }
+
     public enum MapType {
         day(0), night(16), underground(0),
 

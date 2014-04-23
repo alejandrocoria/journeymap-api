@@ -9,8 +9,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.model.Waypoint;
-import net.techbrew.journeymap.waypoint.WaypointHelper;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 
 import java.util.EnumSet;
@@ -34,7 +34,7 @@ public class WorldEventHandler implements EventHandlerManager.EventHandler {
     {
         try
         {
-            if (WaypointHelper.isNativeLoaded())
+            if (WaypointsData.isNativeEnabled())
             {
                 Entity deadEntity = event.entity;
                 if (deadEntity != null && deadEntity instanceof EntityPlayer)

@@ -35,6 +35,7 @@ public class CmdTeleportWaypoint
 
     public void run()
     {
-        mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", mc.thePlayer.getCommandSenderName(), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
+        int dimension = mc.thePlayer.dimension;
+        mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", mc.thePlayer.getCommandSenderName(), waypoint.getX(dimension), waypoint.getY(dimension), waypoint.getZ(dimension)));
     }
 }

@@ -13,6 +13,7 @@ import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.EntityKey;
 import net.techbrew.journeymap.data.PlayerData;
+import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
@@ -240,6 +241,7 @@ public class MapOverlay extends JmUI {
 
             buttonWaypointManager = new Button(ButtonEnum.WaypointManager.ordinal(),0,0,60,20, Constants.getString("Waypoint.waypoints")); //$NON-NLS-1$
             buttonWaypointManager.fitWidth(fr);
+            buttonWaypointManager.drawButton = WaypointsData.isNativeEnabled();
 
             if(buttonAlert.drawButton) {
                 buttonList.add(buttonAlert);
@@ -282,6 +284,8 @@ public class MapOverlay extends JmUI {
         final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
         buttonDayNight.enabled = !(underground && PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_CAVES));
 		buttonDayNight.setPosition(startX,startY);
+
+        buttonWaypointManager.drawButton = PropertyManager.getBooleanProp(PropertyManager.Key.NATIVE_WAYPOINTS_ENABLED);
 
         buttonFollow.rightOf(buttonDayNight, hgap).setY(startY);
 
@@ -458,62 +462,67 @@ public class MapOverlay extends JmUI {
             UIManager.getInstance().closeAll();
             return;
         }
-        else if(i==Constants.KB_MAP_ZOOMIN.getKeyCode()) {
+        else if(i==Constants.getKeyCode(Constants.KB_MAP_ZOOMIN)) {
             zoomIn();
             return;
         }
-        else if(i==Constants.KB_MAP_ZOOMOUT.getKeyCode()) {
+        else if(i==Constants.getKeyCode(Constants.KB_MAP_ZOOMOUT)) {
             zoomOut();
             return;
         }
-        else if(i==Constants.KB_MAP_DAY.getKeyCode()) {
+        else if(i==Constants.getKeyCode(Constants.KB_MAP_DAY)) {
             state.overrideMapType(Constants.MapType.day);
             return;
         }
-        else if(i==Constants.KB_MAP_NIGHT.getKeyCode()) {
+        else if(i==Constants.getKeyCode(Constants.KB_MAP_NIGHT)) {
             state.overrideMapType(Constants.MapType.night);
+            return;
+        }
+        else if(i==Constants.getKeyCode(Constants.KB_WAYPOINT)) {
+            Waypoint waypoint = Waypoint.of(mc.thePlayer);
+            UIManager.getInstance().openWaypointEditor(waypoint, true, null);
             return;
         }
 
 		// North
-		if(i==mc.gameSettings.keyBindForward.getKeyCode()) { // getkeyCode
+		if(i==Constants.getKeyCode(mc.gameSettings.keyBindForward)) {
 			moveCanvas(0,-16);
 			return;
 		}
 		
 		// West
-		if(i==mc.gameSettings.keyBindLeft.getKeyCode()) {
+		if(i==Constants.getKeyCode(mc.gameSettings.keyBindLeft)) {
 			moveCanvas(-16, 0);
 			return;
 		}
 		
 		// South
-		if(i==mc.gameSettings.keyBindBack.getKeyCode()) {
+		if(i==Constants.getKeyCode(mc.gameSettings.keyBindBack)) {
 			moveCanvas(0,16);
 			return;
 		}
 		
 		// East
-		if(i==mc.gameSettings.keyBindRight.getKeyCode()) {
+		if(i==Constants.getKeyCode(mc.gameSettings.keyBindRight)) {
 			moveCanvas(16, 0);
 			return;
 		}
 		
 		// Open inventory
-		if(i==mc.gameSettings.keyBindInventory.getKeyCode()) { // keyBindInventory
+		if(i==Constants.getKeyCode(mc.gameSettings.keyBindInventory)) { // keyBindInventory
 			UIManager.getInstance().closeAll();
 			mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
 			return;
 		}
 		
 		// Open chat
-		if(i==mc.gameSettings.keyBindChat.getKeyCode()) {
+		if(i==Constants.getKeyCode(mc.gameSettings.keyBindChat)) {
 			openChat("");
 			return;
 		}
 		
 		// Open chat with command prefix (Minecraft.java does this in runTick() )
-		if(i==mc.gameSettings.keyBindCommand.getKeyCode()) {
+		if(i==Constants.getKeyCode(mc.gameSettings.keyBindCommand)) {
 			openChat("/");
 			return;
 		}
@@ -644,7 +653,10 @@ public class MapOverlay extends JmUI {
         {
             state.follow = false;
             state.requireRefresh();
-            gridRenderer.center(waypoint.getX(), waypoint.getZ(), state.currentZoom);
+            int x = waypoint.getX(mc.thePlayer.dimension);
+            int z = waypoint.getZ(mc.thePlayer.dimension);
+
+            gridRenderer.center(x, z, state.currentZoom);
             refreshState();
             updateScreen();
         }

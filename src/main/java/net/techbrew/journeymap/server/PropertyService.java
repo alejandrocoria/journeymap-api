@@ -1,7 +1,6 @@
 package net.techbrew.journeymap.server;
 
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.io.JsonHelper;
 import net.techbrew.journeymap.io.PropertyManager;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
@@ -60,7 +59,7 @@ public class PropertyService extends BaseService {
 		}	
 		
 		// Put map into json form
-		jsonData.append(JsonHelper.toJson(PropertyManager.getInstance().getProperties()));	
+		jsonData.append(GSON.toJson(PropertyManager.getInstance().getProperties()));
 		
 		// Finish function call for JsonP if needed
 		if(useJsonP) {
