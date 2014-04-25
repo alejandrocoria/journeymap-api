@@ -64,10 +64,10 @@ public class Constants {
     public static int getKeyCode(KeyBinding keyBinding)
     {
         // 1.7.2
-        // return keyBinding.getKeyCode()
+        return keyBinding.getKeyCode();
 
         // 1.6.4
-        return keyBinding.keyCode;
+        //return keyBinding.keyCode;
     }
 
     public enum MapType {

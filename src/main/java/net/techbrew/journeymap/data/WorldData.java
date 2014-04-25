@@ -2,6 +2,7 @@ package net.techbrew.journeymap.data;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.world.World;
@@ -150,8 +151,8 @@ public class WorldData implements IDataProvider {
     public static int getServerPort() {
         try
         {
-            NetClientHandler sendQueue = Minecraft.getMinecraft().getNetHandler();
-            SocketAddress socketAddress = sendQueue.getNetManager().getSocketAddress();
+            NetHandlerPlayClient sendQueue = Minecraft.getMinecraft().getNetHandler();
+            SocketAddress socketAddress = sendQueue.getNetworkManager().getSocketAddress();
             if ((socketAddress !=null && socketAddress instanceof InetSocketAddress))
             {
                 InetSocketAddress inetAddr = (InetSocketAddress)socketAddress;

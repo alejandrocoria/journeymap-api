@@ -1,7 +1,7 @@
 package net.techbrew.journeymap.waypoint;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.NetClientHandler;
+import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraft.util.ChunkCoordinates;
@@ -82,8 +82,8 @@ public class ReiReader
         String worldName = null;
         try
         {
-            NetClientHandler sendQueue = Minecraft.getMinecraft().getNetHandler();
-            SocketAddress addr = sendQueue.getNetManager().getSocketAddress();
+            NetHandlerPlayClient sendQueue = Minecraft.getMinecraft().getNetHandler();
+            SocketAddress addr = sendQueue.getNetworkManager().getSocketAddress();
             String addrStr = addr.toString().replaceAll("[\r\n]", "");
             Matcher matcher = Pattern.compile("(.*)/(.*):([0-9]+)").matcher(addrStr);
             if (matcher.matches())
@@ -98,7 +98,7 @@ public class ReiReader
                     worldName = (new StringBuilder()).append(worldName).append("[").append(matcher.group(3)).append("]").toString();
                 }
 
-                char arr$[] = ChatAllowedCharacters.allowedCharactersArray;
+                char arr$[] = ChatAllowedCharacters.allowedCharacters;
                 int len$ = arr$.length;
                 for (int i$ = 0; i$ < len$; i$++)
                 {
