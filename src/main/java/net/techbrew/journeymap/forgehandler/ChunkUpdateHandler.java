@@ -5,7 +5,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraftforge.client.event.sound.PlaySoundEvent;
+import net.minecraftforge.client.event.sound.PlaySoundEvent17;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.UseHoeEvent;
@@ -29,7 +29,7 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler {
 
     }
 
-    Level logLevel = Level.INFO;
+    Level logLevel = Level.FINER;
     boolean debug = JourneyMap.getLogger().isLoggable(logLevel);
 
     @Override
@@ -82,26 +82,31 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler {
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public void onSoundEvent(PlaySoundEvent event)
+    public void onSoundEvent(PlaySoundEvent17 event)
     {
-        final int x = (int)event.x >> 4;
-        final int z = (int)event.x >> 4;
-        ChunkCoordIntPair coord;
-        if(event.name.contains("explode"))
+        if(JourneyMap.getInstance().isMapping())
         {
-            for(int ox=x-1;ox<=x+1;ox++)
+            ChunkCoordIntPair coord;
+            if (event.name.contains("explode"))
             {
-                for(int oz=z-1;oz<=z+1;oz++)
+                final int x = (int) event.sound.getXPosF() >> 4;
+                final int z = (int) event.sound.getZPosF() >> 4;
+                for (int ox = x - 1; ox <= x + 1; ox++)
                 {
-                    coord = new ChunkCoordIntPair(ox, oz);
-                    queueChunk(event, coord);
+                    for (int oz = z - 1; oz <= z + 1; oz++)
+                    {
+                        coord = new ChunkCoordIntPair(ox, oz);
+                        queueChunk(event, coord);
+                    }
                 }
             }
-        }
-        else if(event.name.contains("dig"))
-        {
-            coord = new ChunkCoordIntPair(x, z);
-            queueChunk(event, coord);
+            else if (event.name.contains("dig"))
+            {
+                final int x = (int) event.sound.getXPosF() >> 4;
+                final int z = (int) event.sound.getZPosF() >> 4;
+                coord = new ChunkCoordIntPair(x, z);
+                queueChunk(event, coord);
+            }
         }
     }
 
@@ -117,7 +122,7 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler {
     @SubscribeEvent
     public void onBonemealEvent(BonemealEvent event)
     {
-        ChunkCoordIntPair coord = new ChunkCoordIntPair(event.X >> 4, event.Z >> 4);
+        ChunkCoordIntPair coord = new ChunkCoordIntPair(event.x >> 4, event.z >> 4);
         queueChunk(event, coord);
     }
 
