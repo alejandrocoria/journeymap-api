@@ -31,6 +31,7 @@ Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 -- Minimap Options has a "Tiny Square" size
 -- Minimap Options has a "Force Unicode" option for display of FPS and Location labels
 -- In-game map locations now use explicit coordinate designations.  For example: "x:982, z:-520, y:70"
+-- Improved detection of chunk changes via multiple Forge events
 
 - Performance Improvements:
 -- In-game maps are more efficient about checking render steps are within the active viewport; should improve pan/zoom update speeds on slower machines

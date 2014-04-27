@@ -7,8 +7,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.JourneyMap;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 /**
  * ChunkStub MetaData wrapper for the various bits
@@ -118,7 +118,7 @@ public class ChunkMD {
 		return "ChunkStubMD [" + stub.xPosition + ", " + stub.zPosition + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
-	public static class Set extends HashMap<ChunkCoordIntPair, ChunkMD> implements Iterable<ChunkMD> {
+	public static class Set extends LinkedHashMap<ChunkCoordIntPair, ChunkMD> implements Iterable<ChunkMD> {
 
 		public Set(int i) {
 			super(i);
@@ -135,6 +135,10 @@ public class ChunkMD {
 		public ChunkMD remove(ChunkMD chunkMd) {
 			return super.remove(chunkMd.coord);
 		}
+
+        public ChunkMD remove(ChunkCoordIntPair coord) {
+            return super.remove(coord);
+        }
 
 		@Override
 		public Iterator<ChunkMD> iterator() {

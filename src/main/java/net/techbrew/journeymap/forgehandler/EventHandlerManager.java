@@ -38,7 +38,7 @@ public class EventHandlerManager {
     {
         register(new StateTickHandler());
         register(new WorldEventHandler());
-        //register(new ChunkUpdateHandler());
+        register(new ChunkUpdateHandler());
     }
 
     public static void registerGuiHandlers()

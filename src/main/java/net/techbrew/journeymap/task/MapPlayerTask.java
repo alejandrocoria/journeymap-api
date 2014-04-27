@@ -13,19 +13,56 @@ import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.io.nbt.ChunkLoader;
 import net.techbrew.journeymap.model.ChunkMD;
 
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MapPlayerTask extends BaseMapTask {
 	
 	private static final Logger logger = JourneyMap.getLogger();
-
+    private static TreeSet<ChunkCoordIntPair> queuedChunks = new TreeSet<ChunkCoordIntPair>(getDistanceComparator());
 	private static ChunkMD.Set lastChunkStubs = new ChunkMD.Set(512);
 	private static ChunkCoordinates lastPlayerPos;
 	private static Boolean lastUnderground;
 	static Integer chunkOffset;
-	
+
+    public static boolean queueChunk(ChunkCoordIntPair chunkCoords)
+    {
+        synchronized (queuedChunks)
+        {
+            return queuedChunks.add(chunkCoords);
+        }
+    }
+
+    public static void dequeueChunk(ChunkCoordIntPair chunkCoords)
+    {
+        synchronized (queuedChunks)
+        {
+            queuedChunks.remove(chunkCoords);
+        }
+        synchronized (lastChunkStubs)
+        {
+            lastChunkStubs.remove(chunkCoords);
+        }
+    }
+
+    private static Comparator<ChunkCoordIntPair> getDistanceComparator()
+    {
+        return new Comparator<ChunkCoordIntPair>()
+        {
+            Minecraft minecraft = Minecraft.getMinecraft();
+
+            @Override
+            public int compare(ChunkCoordIntPair o1, ChunkCoordIntPair o2)
+            {
+                if (minecraft.thePlayer == null) return 0;
+                double d1 = minecraft.thePlayer.getDistanceSq(o1.getCenterXPos(), minecraft.thePlayer.posY, o1.getCenterZPosition());
+                double d2 = minecraft.thePlayer.getDistanceSq(o2.getCenterXPos(), minecraft.thePlayer.posY, o2.getCenterZPosition());
+                return Double.compare(d1, d2);
+            }
+        };
+    }
+
 	private MapPlayerTask(World world, int dimension, boolean underground, Integer chunkY, ChunkMD.Set chunkStubs) {
 		super(world, dimension, underground, chunkY, chunkStubs, false);
 	}
@@ -47,10 +84,12 @@ public class MapPlayerTask extends BaseMapTask {
 		if(lastUnderground==null) lastUnderground = underground;
 		if(lastPlayerPos==null) lastPlayerPos = playerPos;
 		
-		boolean skipUnchanged = (lastUnderground==underground);
-		if(skipUnchanged && underground) {
-			skipUnchanged = (playerPos.posY==lastPlayerPos.posY);
-		}
+//		boolean skipUnchanged = (lastUnderground==underground);
+//		if(skipUnchanged && underground) {
+//			skipUnchanged = (playerPos.posY==lastPlayerPos.posY);
+//		}
+//
+//        skipUnchanged = false;
 		
 		if(lastPlayerPos.equals(playerPos)) {
 			if(offset>=2) {
@@ -70,8 +109,7 @@ public class MapPlayerTask extends BaseMapTask {
 
 		final ChunkCoordIntPair min = new ChunkCoordIntPair(lastPlayerPos.posX - offset, lastPlayerPos.posZ - offset);
 		final ChunkCoordIntPair max = new ChunkCoordIntPair(lastPlayerPos.posX + offset, lastPlayerPos.posZ + offset);
-		
-		// Get chunkstubs to map
+
         ChunkMD chunkMd;
         ChunkCoordIntPair coord;
 		for(int x=min.chunkXPos;x<=max.chunkXPos;x++) {
@@ -90,56 +128,113 @@ public class MapPlayerTask extends BaseMapTask {
 					missing++;
 				}
 			}
-		}			
-		
-		int initialSize = chunks.size();
+		}
+
+        // Pull queued coords with as little delay as possible
+        HashSet<ChunkCoordIntPair> tempQueue = new HashSet<ChunkCoordIntPair>(0);
+        int initialQueueSize;
+        synchronized (queuedChunks)
+        {
+            initialQueueSize = queuedChunks.size();
+            tempQueue.addAll(queuedChunks);
+            queuedChunks.clear();
+        }
+
+        // Add remaining queued chunks
+        int maxChunks = 512;
+        int queued = 0;
+
+        Iterator<ChunkCoordIntPair> iter = tempQueue.iterator();
+        while(iter.hasNext())
+        {
+            coord = iter.next();
+            chunkMd = ChunkLoader.getChunkStubFromMemory(coord.chunkXPos, coord.chunkZPos, world);
+            if(chunkMd!=null) {
+                chunkMd.render = true;
+                chunks.add(chunkMd);
+                lastChunkStubs.put(coord, chunkMd);
+                queued++;
+            } else {
+                missing++;
+            }
+            if(queued>maxChunks)
+            {
+                logger.info(String.format("Exceeded maxChunks, discarding %s", tempQueue.size() - maxChunks));
+            }
+        }
+
+        int skipped = 0;
 		
 		// Remove unchanged chunkstubs from last task
-		if(!lastChunkStubs.isEmpty()) {
-			ChunkMD.Set removed = new ChunkMD.Set(64);
-			for(ChunkMD oldChunk : lastChunkStubs) {	
-				
-				if(!chunks.containsKey(oldChunk.coord)) {					
-					if(oldChunk.discard(1)>4) {
-						if(logger.isLoggable(Level.FINE)) {
-							logger.fine("Discarding out-of-range chunk: " + oldChunk);
-						}
-						removed.add(oldChunk);
-					}
-					continue;
-				} else {
-					oldChunk.discard(-1);
-				}
-				
-				ChunkMD newChunk = chunks.get(oldChunk.coord);
-				
-				if(skipUnchanged) {
-					if(newChunk.coord.chunkXPos!=lastPlayerPos.posX || newChunk.coord.chunkZPos!=lastPlayerPos.posZ) {						
-						if(newChunk.stub.equalTo(oldChunk.stub)) {
-							newChunk.render=false;
-						}
-					}		
-				}
-				
-				if(newChunk.render==true) {
-					if(logger.isLoggable(Level.FINE)) {
-						logger.fine("Mapping chunk: " + newChunk);
-					}
-				}
-			}
-			
-			lastChunkStubs.keySet().removeAll(removed.keySet());
-		}
-		
-		if(logger.isLoggable(Level.FINE)) {
-			logger.fine("Chunks in set: " + chunks.size() + ".  lastChunkStubs=" + lastChunkStubs.size());
-		}
+        synchronized (lastChunkStubs)
+        {
+            if (!lastChunkStubs.isEmpty())
+            {
+                ChunkMD.Set removed = new ChunkMD.Set(64);
+                for (ChunkMD oldChunk : lastChunkStubs)
+                {
+                    if (!chunks.containsKey(oldChunk.coord))
+                    {
+                        if (oldChunk.discard(1) > 4)
+                        {
+                            if (logger.isLoggable(Level.FINE))
+                            {
+                                logger.fine("Discarding out-of-range chunk: " + oldChunk);
+                            }
+                            removed.add(oldChunk);
+                        }
+                        continue;
+                    }
+                    else
+                    {
+                        oldChunk.discard(-1);
+                    }
+
+                    ChunkMD newChunk = chunks.get(oldChunk.coord);
+
+                    if(tempQueue.contains(newChunk.coord))
+                    {
+                        newChunk.render = true;
+                    }
+                    else // if (skipUnchanged)
+                    {
+//                        if (newChunk.coord.chunkXPos != lastPlayerPos.posX || newChunk.coord.chunkZPos != lastPlayerPos.posZ)
+//                        {
+//                            if (newChunk.stub.equalTo(oldChunk.stub))
+//                            {
+//                                newChunk.render = false;
+//                                skipped++;
+//                            }
+//                        }
+                    }
+
+                    if (newChunk.render)
+                    {
+                        if (logger.isLoggable(Level.FINE))
+                        {
+                            logger.fine("Mapping chunk: " + newChunk);
+                        }
+                    }
+                }
+
+                lastChunkStubs.keySet().removeAll(removed.keySet());
+            }
+        }
+
+        if(chunks.size()-skipped>1)
+        {
+            if (logger.isLoggable(Level.FINE))
+            {
+                logger.fine(String.format("Kept %s of %s queued chunks, mapped %s, skipped %s, missing %s, lastChunkStubs=%s", tempQueue.size(), initialQueueSize, chunks.size()-skipped, skipped, missing, lastChunkStubs.size()));
+            }
+        }
 
 		return new MapPlayerTask(world, dimension, underground, chunkY, chunks);
 	
 	}
 	
-	public static void clearCache() {
+	public static void clearCache()
+    {
 		lastChunkStubs.clear();
 		lastPlayerPos = null;
 		lastUnderground = null;
