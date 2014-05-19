@@ -26,7 +26,7 @@ public class DrawWayPointStep implements DrawStep {
      */
     public DrawWayPointStep(Waypoint waypoint)
     {
-        this(waypoint, waypoint.getColor(), waypoint.isDeathPoint() ? Color.red : waypoint.getColor(), false);
+        this(waypoint, waypoint.getColor(), waypoint.isDeathPoint() ? Color.red : waypoint.getSafeColor(), false);
     }
 
     /**

@@ -200,6 +200,7 @@ Waypoint.edit=Edit
 Waypoint.find=Find
 Waypoint.teleport=Teleport
 Waypoint.deathpoint=Death
+
 Waypoint.import_rei_file_error=Could not import Rei's MiniMap waypoint file: %1$s
 Waypoint.import_rei_success=Imported %1$s waypoints from of Rei's MiniMap.
 Waypoint.import_rei_failure=No Rei's MiniMap waypoints were imported. See journeyMap.log for details.
@@ -209,6 +210,9 @@ Waypoint.import_vox_file_error=Could not import VoxelMap waypoint file: %1$s
 Waypoint.import_vox_success=Imported %1$s waypoints from VoxelMap.
 Waypoint.import_vox_failure=No VoxelMap waypoints were imported. See journeyMap.log for details.
 Waypoint.import_vox_errors=Imported %1$s waypoints from VoxelMap with %1$s errors. See journeyMap.log for details.
+
+# %1$s = distance in meters. Okay to change parentheses and trailing 'm' (abbreviation for 'meters') Ex: [%1$sM]
+Waypoint.distance_meters=(%1$sm)
 
 # Added in 3.1.x:
 MiniMap.options=MiniMap Options

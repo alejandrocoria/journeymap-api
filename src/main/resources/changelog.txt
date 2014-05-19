@@ -11,6 +11,19 @@ Requirements:
 - Minecraft @MCVERSION@
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
+Changes since 4.0.0b1:
+
+
+- Feature: In-game waypoint beacons added.
+
+- Change: Waypoint label color will default to dark gray if the waypoint's color is too dark to be readable.
+- Change: Waypoint Editor's name field text now uses the waypoint's color. (Helps you see what the label will look like).
+- Change: Waypoint Manager now uses waypoint colors in the Name column.
+- Change: Waypoint Manager waypoint names use strike-through font when disabled
+- Bugfix: Waypoint "enable" state (on/off) wasn't saved to file.
+- Bugfix: Waypoint Editor wouldn't open a waypoint with no dimensions selected.
+- Bugfix: Waypoint Editor didn't check for changes to selected dimensions when determining whether Save button enabled.
+
 Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 
 - New feature: Waypoint Editor
@@ -45,6 +58,7 @@ Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 -- Minimap didn't show off-screen waypoint locators along edges
 -- VoxelMap 1.7.2 waypoints were not recognized
 -- Double-high grass color was gray instead of determined by biome
+
 
 Known issues:
 

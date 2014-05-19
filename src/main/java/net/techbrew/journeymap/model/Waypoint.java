@@ -119,7 +119,7 @@ public class Waypoint implements Serializable
         if(name==null) name = createName(x, z);
         if(dimensions==null || dimensions.length==0)
         {
-            dimensions = new Integer[0];
+            dimensions = new Integer[]{0};
         }
         this.dimensions = dimensions;
 
@@ -220,6 +220,12 @@ public class Waypoint implements Serializable
     public Color getColor()
     {
         return new Color(r,g,b);
+    }
+
+    public Color getSafeColor()
+    {
+        if(r+g+b>=100) return getColor();
+        return Color.darkGray;
     }
 
     public Collection<Integer> getDimensions()
@@ -335,7 +341,11 @@ public class Waypoint implements Serializable
 
     public void setEnable(boolean enable)
     {
-        this.enable = enable;
+        if(enable!=this.enable)
+        {
+            this.enable = enable;
+            this.dirty = true;
+        }
     }
 
     public Type getType()

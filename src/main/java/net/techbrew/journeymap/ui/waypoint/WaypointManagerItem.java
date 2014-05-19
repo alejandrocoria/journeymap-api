@@ -13,6 +13,7 @@ import net.techbrew.journeymap.ui.ButtonList;
 import net.techbrew.journeymap.ui.ScrollPane;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
+import net.techbrew.journeymap.waypoint.WaypointStore;
 
 import java.awt.*;
 import java.util.Comparator;
@@ -155,14 +156,18 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
     {
         if(this.waypoint==null) return;
 
+        boolean waypointValid = waypoint.isEnable() && waypoint.isInPlayerDimension();
+
         if(color==null)
         {
-            color = waypoint.isEnable() && waypoint.isInPlayerDimension() ? Color.WHITE : Color.GRAY;
+            color = waypointValid ? waypoint.getSafeColor() : Color.GRAY;
         }
 
         int yOffset = 1 +(this.manager.rowHeight-mc.fontRenderer.FONT_HEIGHT)/2;
         mc.fontRenderer.drawStringWithShadow(Integer.toString(getDistance()), x + manager.colLocation, y+yOffset, color.getRGB());
-        mc.fontRenderer.drawStringWithShadow(waypoint.getName(), x + manager.colName, y+yOffset, color.getRGB());
+
+        String name = waypointValid ? waypoint.getName() : "§m" + waypoint.getName();
+        mc.fontRenderer.drawStringWithShadow(name, x + manager.colName, y+yOffset, color.getRGB());
     }
 
     protected void drawWaypoint(int x, int y)
@@ -186,6 +191,10 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
         {
             buttonEnable.toggle();
             waypoint.setEnable(buttonEnable.getToggled());
+            if(waypoint.isDirty())
+            {
+                WaypointStore.instance().save(waypoint);
+            }
         }
         else if(buttonEdit.mouseOver(mouseX, mouseY))
         {

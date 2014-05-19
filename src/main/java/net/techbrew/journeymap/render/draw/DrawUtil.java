@@ -3,6 +3,7 @@ package net.techbrew.journeymap.render.draw;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
@@ -14,6 +15,9 @@ import java.awt.*;
  */
 public class DrawUtil
 {
+    private static final float lightmapS = (float) (15728880 % 65536) / 1f;
+    private static final float lightmapT = (float) (15728880 / 65536) / 1f;
+
     public enum HAlign
     {
         Left, Center, Right;
@@ -22,6 +26,12 @@ public class DrawUtil
     public enum VAlign
     {
         Above, Middle, Below;
+    }
+
+
+    public static void resetLightMap()
+    {
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightmapS, lightmapT);
     }
 
     /**
@@ -146,8 +156,6 @@ public class DrawUtil
             GL11.glTranslated(dTextX, dTextY, 0);
 
             // Draw the string
-            //final int voffset = fontRenderer.getUnicodeFlag() ? 0 : 1;
-
             if (color.getTransparency() != alpha)
             {
                 color = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
@@ -161,6 +169,7 @@ public class DrawUtil
             {
                 fontRenderer.drawString(text, intTextX, intTextY, color.getRGB());
             }
+
         }
         finally
         {

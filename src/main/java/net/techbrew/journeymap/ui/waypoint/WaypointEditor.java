@@ -145,8 +145,6 @@ public class WaypointEditor extends JmUI {
                 fieldB.setMaxStringLength(3);
                 fieldList.add(fieldB);
 
-                setFormColor(originalWaypoint.getColor());
-
                 Collection<Integer> wpDims = originalWaypoint.getDimensions();
                 int buttonId = ButtonEnum.values().length;
 
@@ -197,8 +195,12 @@ public class WaypointEditor extends JmUI {
                 bottomButtons = new ButtonList(buttonRemove, buttonSave, buttonClose);
                 bottomButtons.setUniformWidths(getFontRenderer());
 
+                setFormColor(originalWaypoint.getColor());
+
                 validate();
             }
+
+
         }
         catch(Throwable t)
         {
@@ -392,10 +394,6 @@ public class WaypointEditor extends JmUI {
             boolean done = field.textboxKeyTyped(par1, par2);
             if(done)
             {
-                if(field==fieldR || field==fieldG || field==fieldB)
-                {
-                    //updateWaypointFromForm();
-                }
                 break;
             }
         }
@@ -433,24 +431,26 @@ public class WaypointEditor extends JmUI {
             int x = mouseX - (int) colorPickRect.x;
             int y = mouseY - (int) colorPickRect.y;
             setFormColor(new Color(colorPickImg.getRGB(x, y)));
-            updateWaypointFromForm();
         }
     }
 
     protected void setFormColor(Color color) {
+        //if(color!=null && color.equals(currentColor)) return;
+
         currentColor = color;
         fieldR.setText(Integer.toString(color.getRed()));
         fieldG.setText(Integer.toString(color.getGreen()));
         fieldB.setText(Integer.toString(color.getBlue()));
+        updateWaypointFromForm();
     }
 
     @Override
     protected void actionPerformed(GuiButton guibutton)
     {
-
         if(dimButtonList.contains(guibutton)) {
             DimensionButton dimButton = (DimensionButton) guibutton;
             dimButton.toggle();
+            updateWaypointFromForm();
         } else {
             final ButtonEnum id = ButtonEnum.values()[guibutton.id];
             switch(id) {
@@ -525,7 +525,6 @@ public class WaypointEditor extends JmUI {
 
         if(this.buttonSave!=null)
         {
-            //updateWaypointFromForm();
             this.buttonSave.enabled = valid && (isNew || !originalWaypoint.equals(editedWaypoint));
         }
 
@@ -554,12 +553,14 @@ public class WaypointEditor extends JmUI {
         fieldList.clear();
         buttonList.clear();
         initGui();
+        validate();
     }
 
     protected void updateWaypointFromForm()
     {
         currentColor = new Color(getSafeColorInt(fieldR), getSafeColorInt(fieldG), getSafeColorInt(fieldB));
         editedWaypoint.setColor(currentColor);
+        fieldName.setTextColor(editedWaypoint.getSafeColor().getRGB());
 
         ArrayList<Integer> dims = new ArrayList<Integer>();
         for(DimensionButton db : dimButtonList)

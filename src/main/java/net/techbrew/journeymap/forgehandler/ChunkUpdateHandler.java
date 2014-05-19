@@ -74,7 +74,6 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler {
     {
         if(event.getResult()==event.useBlock)
         {
-            System.out.println(event.getClass().toString());
             ChunkCoordIntPair coord = new ChunkCoordIntPair(event.x >> 4, event.z >> 4);
             queueChunk(event, coord);
         }

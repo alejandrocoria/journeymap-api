@@ -39,13 +39,13 @@ public class EventHandlerManager {
         register(new StateTickHandler());
         register(new WorldEventHandler());
         register(new ChunkUpdateHandler());
+        register(new WaypointBeaconHandler());
     }
 
     public static void registerGuiHandlers()
     {
-        register(new MiniMapOverlayHandler());
+        register(new MiniMapOverlayHandler());        
         register(new KeyEventHandler());
-        register(new WaypointOverlayHandler());
     }
 
     public static void unregisterAll()
