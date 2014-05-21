@@ -4,6 +4,7 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.render.texture.DelayedTexture;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -55,7 +56,7 @@ public class Tile {
 		lrBlock = new Point((lrChunk.chunkXPos*16)+15, (lrChunk.chunkZPos*16)+15);
 	}
 	
-	public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice)
+	public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice, MapProperties mapProperties)
     {
         boolean forceReset = (lastMapType != mapType || lastVSlice != vSlice);
 
@@ -81,7 +82,7 @@ public class Tile {
             glId = textureImpl.getGlTextureId();
             image = textureImpl.getImage();
         }
-        futureTex = TextureCache.instance().prepareImage(glId, image, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE);
+        futureTex = TextureCache.instance().prepareImage(glId, image, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE, mapProperties.isShowGrid());
 
         return true;
 	}

@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.MapOverlayState;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.ui.UIManager;
@@ -39,40 +40,41 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler {
     public static void onKeypress(boolean minimapOnly) {
         final int i = Keyboard.getEventKey();
         MapOverlayState mapOverlayState = MapOverlay.state();
-        if(mapOverlayState.minimapHotkeys && GuiScreen.isCtrlKeyDown()) {
 
-            if(i==Constants.getKeyCode(Constants.KB_MAP)) {
+        if(GuiScreen.isCtrlKeyDown() && JourneyMap.getInstance().miniMapProperties.isEnableHotkeys()) {
+
+            if(Constants.isPressed(Constants.KB_MAP)) {
                 UIManager.getInstance().toggleMinimap();
                 return;
             }
-            else if(i==Constants.getKeyCode(Constants.KB_MAP_ZOOMIN)) {
+            else if(Constants.isPressed(Constants.KB_MAP_ZOOMIN)) {
                 mapOverlayState.zoomIn();
                 return;
             }
-            else if(i==Constants.getKeyCode(Constants.KB_MAP_ZOOMOUT)) {
+            else if(Constants.isPressed(Constants.KB_MAP_ZOOMOUT)) {
                 mapOverlayState.zoomOut();
                 return;
             }
-            else if(i==Constants.getKeyCode(Constants.KB_MAP_DAY)) {
+            else if(Constants.isPressed(Constants.KB_MAP_DAY)) {
                 mapOverlayState.overrideMapType(Constants.MapType.day);
                 return;
             }
-            else if(i==Constants.getKeyCode(Constants.KB_MAP_NIGHT)) {
+            else if(Constants.isPressed(Constants.KB_MAP_NIGHT)) {
                 mapOverlayState.overrideMapType(Constants.MapType.night);
                 return;
             }
-            else if(i==Constants.getKeyCode(Constants.KB_MINIMAP_POS)) {
+            else if(Constants.isPressed(Constants.KB_MINIMAP_POS)) {
                 UIManager.getInstance().getMiniMap().nextPosition();
                 return;
             }
-            else if(i==Constants.getKeyCode(Constants.KB_WAYPOINT)) {
+            else if(Constants.isPressed(Constants.KB_WAYPOINT)) {
                 UIManager.getInstance().openWaypointManager();
                 return;
             }
         }
         else if(!minimapOnly)
         {
-            if(i==Constants.getKeyCode(Constants.KB_MAP)) {
+            if(Constants.KB_MAP.isPressed()) {
                 if(Minecraft.getMinecraft().currentScreen==null) {
                     UIManager.getInstance().openMap();
                 } else if(Minecraft.getMinecraft().currentScreen instanceof MapOverlay) {
@@ -80,7 +82,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler {
                 }
                 return;
             }
-            else if(i==Constants.getKeyCode(Constants.KB_WAYPOINT)) {
+            else if(Constants.KB_WAYPOINT.isPressed()) {
                 if(Minecraft.getMinecraft().currentScreen==null) {
                     Waypoint waypoint = Waypoint.of(Minecraft.getMinecraft().thePlayer);
                     UIManager.getInstance().openWaypointEditor(waypoint, true, null);

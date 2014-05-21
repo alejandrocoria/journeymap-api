@@ -3,8 +3,8 @@ package net.techbrew.journeymap.render.overlay;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.EntityKey;
-import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.render.draw.DrawCenteredLabelStep;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
 import net.techbrew.journeymap.render.draw.DrawStep;
@@ -26,10 +26,10 @@ import java.util.Map;
  */
 public class OverlayRadarRenderer {
 
-	public List<DrawStep> prepareSteps(List<Map> critters, GridRenderer grid, float drawScale) {
+	public List<DrawStep> prepareSteps(List<Map> critters, GridRenderer grid, float drawScale, MapProperties mapProperties) {
 		
-		final boolean showAnimals = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_ANIMALS);
-		final boolean showPets = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_PETS);
+		final boolean showAnimals = mapProperties.isShowAnimals();
+		final boolean showPets = mapProperties.isShowPets();
 		final int fontHeight = 14;
 		final Color labelBg = Color.darkGray.darker();
 		

@@ -6,7 +6,6 @@ import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.Utils;
 import net.techbrew.journeymap.io.FileHandler;
-import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.model.RegionCoord;
@@ -24,7 +23,7 @@ import java.util.logging.Logger;
 
 public class LegacyMigrationTask implements IGenericTask {
 	
-	final int mapTaskDelay = PropertyManager.getInstance().getInteger(PropertyManager.Key.UPDATETIMER_CHUNKS);
+	final int mapTaskDelay = JourneyMap.getInstance().configProperties.getChunkPoll();
 	
 	private static final Logger logger = JourneyMap.getLogger();
 	

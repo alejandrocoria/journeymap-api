@@ -168,7 +168,7 @@ public class RegionImageHandler {
      * @param allowNullImage
      * @return
      */
-	public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType, Integer vSlice, final int dimension, final Boolean useCache, BufferedImage image, final Integer imageWidth, final Integer imageHeight, final boolean allowNullImage) {
+	public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType, Integer vSlice, final int dimension, final Boolean useCache, BufferedImage image, final Integer imageWidth, final Integer imageHeight, final boolean allowNullImage, boolean showGrid) {
 		
 		long start = 0, stop = 0;		
 		start = System.currentTimeMillis();
@@ -240,7 +240,7 @@ public class RegionImageHandler {
 
 		// Show chunk grid
 		if(imageDrawn) {
-			if(PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)) {
+			if(showGrid) {
 
 				if(mapType==MapType.day) {
                     g2D.setColor(Color.black);
@@ -330,70 +330,6 @@ public class RegionImageHandler {
 		}
 
 		return false;		
-	}
-
-    /**
-     * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2)
-     * @param rCoord
-     * @param mapType
-     * @param useCache
-     * @param imageSize
-     * @return
-     * @throws IOException
-     */
-	public static synchronized BufferedImage getRegionImage(final RegionCoord rCoord, final Constants.MapType mapType, final Boolean useCache, final Integer imageSize)
-			throws IOException {
-		
-		final int originalSize = 512;
-
-		final BufferedImage mergedImg = new BufferedImage(originalSize, originalSize, BufferedImage.TYPE_INT_ARGB);
-		final Graphics2D g2D = initRenderingHints(mergedImg.createGraphics());		
-		final RegionImageCache cache = RegionImageCache.getInstance();
-
-		BufferedImage regionImage = null;
-
-		if(cache.contains(rCoord)) {
-			regionImage = cache.getGuaranteedImage(rCoord, mapType);
-		} else {
-			regionImage = RegionImageHandler.readRegionImage(RegionImageHandler.getRegionImageFile(rCoord, mapType, false), rCoord, 1, false, true);
-		}
-		if(regionImage==null) {
-			regionImage = RegionImageHandler.createBlankImage(originalSize, originalSize);
-		}
-		g2D.drawImage(regionImage, 0, 0, null);	
-
-		// Show chunk grid
-		if(PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_GRID)) {
-			
-			g2D.setColor(new Color(255,255,255));
-			if(mapType==MapType.day) {				
-				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.4F));
-			} else {
-				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.1F));
-			}
-
-			for(int x = 0; x<=originalSize; x+=16) {
-				g2D.drawLine(x, 0, x, originalSize);
-			}
-			
-			for(int z = 0; z<=originalSize; z+=16) {
-				g2D.drawLine(0, z, originalSize, z);
-			}
-		}
-		
-		g2D.dispose();
-				
-		// Scale if needed
-		if(imageSize!=null && (imageSize!=originalSize)) {
-			final BufferedImage scaledImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
-			final Graphics2D g = initRenderingHints(scaledImage.createGraphics());
-			g.drawImage(mergedImg, 0, 0, imageSize, imageSize, null);
-			g.dispose();
-			return scaledImage;
-		} else {
-			return mergedImg;
-		}		
-
 	}
 	
 	public static File getBlank512x512ImageFile() {

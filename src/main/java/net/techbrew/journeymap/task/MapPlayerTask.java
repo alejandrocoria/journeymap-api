@@ -9,7 +9,8 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.EntityKey;
 import net.techbrew.journeymap.data.PlayerData;
-import net.techbrew.journeymap.io.PropertyManager;
+import net.techbrew.journeymap.feature.Feature;
+import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.nbt.ChunkLoader;
 import net.techbrew.journeymap.model.ChunkMD;
 
@@ -24,7 +25,6 @@ public class MapPlayerTask extends BaseMapTask {
 	private static ChunkMD.Set lastChunkStubs = new ChunkMD.Set(512);
 	private static ChunkCoordinates lastPlayerPos;
 	private static Boolean lastUnderground;
-	static Integer chunkOffset;
 
     public static boolean queueChunk(ChunkCoordIntPair chunkCoords)
     {
@@ -71,14 +71,12 @@ public class MapPlayerTask extends BaseMapTask {
 				
 		int missing = 0;
 
-		if(chunkOffset==null) {
-			chunkOffset = PropertyManager.getInstance().getInteger(PropertyManager.Key.CHUNK_OFFSET);
-		}
-		int offset = chunkOffset;
+
+		int offset = JourneyMap.getInstance().configProperties.getChunkOffset();
 		
 		final ChunkCoordinates playerPos = new ChunkCoordinates(player.chunkCoordX,player.chunkCoordY,player.chunkCoordZ);
 		final Map playerData = DataCache.instance().get(PlayerData.class);
-		final boolean underground = (Boolean) playerData.get(EntityKey.underground) && PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_CAVES);
+		final boolean underground = (Boolean) playerData.get(EntityKey.underground) && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.isShowCaves();
 		final int dimension = (Integer) playerData.get(EntityKey.dimension);
 		
 		if(lastUnderground==null) lastUnderground = underground;
@@ -238,7 +236,6 @@ public class MapPlayerTask extends BaseMapTask {
 		lastChunkStubs.clear();
 		lastPlayerPos = null;
 		lastUnderground = null;
-		chunkOffset = null;
 	}
 
 	@Override

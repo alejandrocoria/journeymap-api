@@ -7,7 +7,6 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WaypointsData;
-import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.overlay.TileCache;
@@ -53,6 +52,7 @@ public class UIManager {
     		logger.fine("Closing " + minecraft.currentScreen.getClass());
 			((JmUI) minecraft.currentScreen).close();
 		}
+        KeyBinding.unPressAllKeys();
     }
     
     public void openInventory() {
@@ -87,13 +87,11 @@ public class UIManager {
     }
 
     public void toggleMinimap() {
-        final boolean enabled = !isMiniMapEnabled();
-        PropertyManager.set(PropertyManager.Key.PREF_SHOW_MINIMAP, enabled);
-        setMiniMapEnabled(enabled);
+        setMiniMapEnabled(!isMiniMapEnabled());
     }
 
     public void setMiniMapEnabled(boolean enable) {
-        miniMap.setEnabled(enable);
+        JourneyMap.getInstance().miniMapProperties.setEnabled(enable);
     }
 
     public boolean isMiniMapEnabled() {

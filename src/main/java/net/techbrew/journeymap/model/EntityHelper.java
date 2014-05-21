@@ -18,7 +18,6 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.EntityKey;
-import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 
@@ -29,7 +28,7 @@ import java.util.*;
 public class EntityHelper {
 	
     private static int MAX_ENTITIES = 16;
-	private static int lateralDistance = PropertyManager.getInstance().getInteger(PropertyManager.Key.CHUNK_OFFSET) * 8;
+	private static int lateralDistance = JourneyMap.getInstance().configProperties.getChunkOffset() * 8;
 	private static int verticalDistance = lateralDistance/2;
 
     public static List getEntitiesNearby(String timerName, Class... entityClasses) {

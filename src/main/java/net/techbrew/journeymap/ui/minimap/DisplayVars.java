@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -37,16 +36,16 @@ public class DisplayVars
 
         public static Position getPreferred()
         {
-            String positionName = PropertyManager.getStringProp(PropertyManager.Key.PREF_MINIMAP_POSITION);
+            String positionName = JourneyMap.getInstance().miniMapProperties.getPosition();
             DisplayVars.Position position = DisplayVars.Position.safeValueOf(positionName);
             if(!position.name().equals(positionName))
             {
-                PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_POSITION, position.name());
+                JourneyMap.getInstance().miniMapProperties.setPosition(position.name());
             }
             return position;
         }
 
-        private static Position safeValueOf(String name)
+        public static Position safeValueOf(String name)
         {
             Position value = null;
             try
@@ -90,16 +89,16 @@ public class DisplayVars
 
         public static Shape getPreferred()
         {
-            String shapeName = PropertyManager.getStringProp(PropertyManager.Key.PREF_MINIMAP_SHAPE);
+            String shapeName = JourneyMap.getInstance().miniMapProperties.getShape();
             DisplayVars.Shape shape = DisplayVars.Shape.safeValueOf(shapeName);
             if(!shape.name().equals(shapeName))
             {
-                PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_SHAPE, shape.name());
+                JourneyMap.getInstance().miniMapProperties.setShape(shape.name());
             }
             return shape;
         }
 
-        private static Shape safeValueOf(String name)
+        public static Shape safeValueOf(String name)
         {
             Shape value = null;
             try
@@ -202,8 +201,8 @@ public class DisplayVars
     {
         // Immutable member and local vars
         this.scaledResolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
-        this.forceUnicode = (PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_FORCEUNICODE));
-        this.showFps = (PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_SHOWFPS));
+        this.forceUnicode = JourneyMap.getInstance().miniMapProperties.isForceUnicode();
+        this.showFps = JourneyMap.getInstance().miniMapProperties.isShowFps();
         this.shape = shape;
         this.position = position;
         this.displayWidth = mc.displayWidth;

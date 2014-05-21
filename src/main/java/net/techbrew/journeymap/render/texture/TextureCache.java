@@ -78,11 +78,11 @@ public class TextureCache {
     /*************************************************/
 
     public Future<DelayedTexture> prepareImage(final Integer glId, final BufferedImage image, final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType,
-                                               final Integer vSlice, final int dimension, final Boolean useCache, final Integer imageWidth, final Integer imageHeight) {
+                                               final Integer vSlice, final int dimension, final Boolean useCache, final Integer imageWidth, final Integer imageHeight, final boolean showGrid) {
         Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>() {
             @Override
             public DelayedTexture call() throws Exception {
-                BufferedImage chunksImage = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, useCache, image, imageWidth, imageHeight, true);
+                BufferedImage chunksImage = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, useCache, image, imageWidth, imageHeight, true, showGrid);
                 if(chunksImage==null){
                     chunksImage = RegionImageHandler.createBlankImage(imageWidth, imageHeight);
                 }

@@ -2,7 +2,6 @@ package net.techbrew.journeymap.data;
 
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.waypoint.ReiReader;
@@ -56,7 +55,7 @@ public class WaypointsData implements IDataProvider
      */
     public static boolean isNativeEnabled()
     {
-        return PropertyManager.getBooleanProp(PropertyManager.Key.NATIVE_WAYPOINTS_ENABLED);
+        return JourneyMap.getInstance().configProperties.isWaypointManagementEnabled();
     }
 
     /**

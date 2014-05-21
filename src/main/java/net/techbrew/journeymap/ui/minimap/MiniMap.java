@@ -6,11 +6,11 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WaypointsData;
-import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.EntityHelper;
 import net.techbrew.journeymap.model.MapOverlayState;
+import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
 import net.techbrew.journeymap.render.overlay.OverlayRadarRenderer;
@@ -46,6 +46,7 @@ public class MiniMap
     private final Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
     private final String[] locationFormats = {"MapOverlay.location_xzye", "MapOverlay.location_xzy", "MapOverlay.location_xz"};
 
+    private final MiniMapProperties miniMapProperties = JourneyMap.getInstance().miniMapProperties;
     private final MapOverlayState state = MapOverlay.state();
     private final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
     private final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
@@ -54,7 +55,6 @@ public class MiniMap
 
     private EntityClientPlayerMP player;
     private StatTimer drawTimer;
-    private Boolean enabled;
     private DisplayVars dv;
     private boolean visible = true;
 
@@ -70,9 +70,6 @@ public class MiniMap
     {
         player = mc.thePlayer;
         playerLocatorTex = TextureCache.instance().getPlayerLocatorSmall();
-        setEnabled(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_MINIMAP));
-        state.minimapFontScale = PropertyManager.getDoubleProp(PropertyManager.Key.PREF_MINIMAP_FONTSCALE);
-
         updateDisplayVars(DisplayVars.Shape.getPreferred(), DisplayVars.Position.getPreferred(), true);
     }
 
@@ -93,17 +90,17 @@ public class MiniMap
             // Update the state first
             if (doStateRefresh)
             {
-                state.refresh(mc, player);
+                state.refresh(mc, player, miniMapProperties);
             }
 
             // Update the grid
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
             gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
-            gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0);
+            gridRenderer.updateTextures(state.getMapType(miniMapProperties.isShowCaves()), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0, miniMapProperties);
             if (doStateRefresh)
             {
                 //boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, state.mapForceUnicode);
-                state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, dv.drawScale);
+                state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, miniMapProperties, dv.drawScale);
                 //if(unicodeForced) DrawUtil.stopUnicode(mc.fontRenderer);
                 state.updateLastRefresh();
             }
@@ -166,8 +163,8 @@ public class MiniMap
             gridRenderer.draw(1f, 0, 0);
 
             // Draw entities, etc
-            boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, state.mapForceUnicode);
-            gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, state.getMapFontScale());
+            boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, miniMapProperties.isForceUnicode());
+            gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, getMapFontScale());
             if(unicodeForced) DrawUtil.stopUnicode(mc.fontRenderer);
 
             // Draw player
@@ -261,18 +258,13 @@ public class MiniMap
 
     public boolean isEnabled()
     {
-        if (enabled == null)
-        {
-            enabled = PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_MINIMAP)
+        return JourneyMap.getInstance().miniMapProperties.isEnabled()
                     && !WaypointsData.isReiMinimapEnabled() && !WaypointsData.isVoxelMapEnabled();
-        }
-        return enabled;
     }
 
-    public void setEnabled(boolean enable)
+    public double getMapFontScale()
     {
-        enabled = enable;
-        PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_SHOW_MINIMAP, enable);
+        return miniMapProperties.getFontScale() * (miniMapProperties.isForceUnicode() ? 2 : 1);
     }
 
     public void setForceUnicode(boolean forceUnicode)
@@ -280,7 +272,7 @@ public class MiniMap
         if(this.dv!=null)
         {
             this.dv.forceUnicode = forceUnicode;
-            PropertyManager.getInstance().setProperty(PropertyManager.Key.PREF_MINIMAP_FORCEUNICODE, forceUnicode);
+            JourneyMap.getInstance().miniMapProperties.setForceUnicode(forceUnicode);
         }
     }
 
@@ -301,7 +293,7 @@ public class MiniMap
 
     public void setPosition(DisplayVars.Position position)
     {
-        PropertyManager.set(PropertyManager.Key.PREF_MINIMAP_POSITION, position.name());
+        JourneyMap.getInstance().miniMapProperties.setPosition(position.name());
         if (dv != null)
         {
             updateDisplayVars(dv.shape, position, false);
@@ -337,13 +329,13 @@ public class MiniMap
                 && mc.displayWidth == dv.displayWidth
                 && this.dv.shape == shape
                 && this.dv.position == position
-                && this.dv.fontScale == state.minimapFontScale)
+                && this.dv.fontScale == miniMapProperties.getFontScale())
         {
             return;
         }
 
         DisplayVars oldDv = this.dv;
-        this.dv = new DisplayVars(mc, shape, position, state.minimapFontScale);
+        this.dv = new DisplayVars(mc, shape, position, miniMapProperties.getFontScale());
 
         if (oldDv == null || oldDv.shape != this.dv.shape)
         {

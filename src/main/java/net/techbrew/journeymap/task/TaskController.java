@@ -2,7 +2,6 @@ package net.techbrew.journeymap.task;
 
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.thread.TaskThread;
 
@@ -16,7 +15,7 @@ import java.util.logging.Logger;
 public class TaskController {
 	
 	final static Logger logger = JourneyMap.getLogger();
-	final int mapTaskDelay = PropertyManager.getInstance().getInteger(PropertyManager.Key.UPDATETIMER_CHUNKS);
+    final int mapTaskDelay = JourneyMap.getInstance().configProperties.getChunkPoll();
 	final List<ITaskManager> managers = new LinkedList<ITaskManager>();
 
 	public TaskController() {

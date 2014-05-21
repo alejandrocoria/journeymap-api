@@ -1,7 +1,6 @@
 package net.techbrew.journeymap.server;
 
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import se.rupy.http.Daemon;
 
@@ -33,7 +32,7 @@ public class JMServer {
 	private boolean ready = false;
 	
 	public JMServer() {		
-		port = PropertyManager.getInstance().getInteger(PropertyManager.Key.WEBSERVER_PORT);
+		port = JourneyMap.getInstance().webMapProperties.getPort();
 		validatePort();
 	}
 	
@@ -109,7 +108,7 @@ public class JMServer {
 		props.put("threads", Integer.toString(5)); //$NON-NLS-1$
 		
 		// Rupy logging is spammy.  Only enable it if you really need to.
-		Level logLevel = Level.parse(PropertyManager.getInstance().getString(PropertyManager.Key.LOGGING_LEVEL));
+		Level logLevel = Level.parse(JourneyMap.getInstance().configProperties.getLogLevel());
 		if(logLevel.intValue()<=(Level.FINEST.intValue())) {
 			props.put("debug", Boolean.TRUE.toString()); //$NON-NLS-1$
 		} 	

@@ -4,7 +4,6 @@ package net.techbrew.journeymap.cartography;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.BlockUtils;
 import net.techbrew.journeymap.model.ChunkMD;
@@ -19,7 +18,7 @@ import java.util.logging.Level;
  */
 public abstract class BaseRenderer {
 
-	boolean caveLighting = PropertyManager.getInstance().getBoolean(PropertyManager.Key.CAVE_LIGHTING);
+	boolean caveLighting = JourneyMap.getInstance().configProperties.isCaveLighting();
 	final boolean fineLogging = JourneyMap.getLogger().isLoggable(Level.FINE);
 	
 	boolean debug = false;

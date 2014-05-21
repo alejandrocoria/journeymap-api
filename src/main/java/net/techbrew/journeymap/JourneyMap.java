@@ -26,6 +26,10 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockUtils;
 import net.techbrew.journeymap.model.RegionImageCache;
+import net.techbrew.journeymap.properties.ConfigProperties;
+import net.techbrew.journeymap.properties.FullMapProperties;
+import net.techbrew.journeymap.properties.MiniMapProperties;
+import net.techbrew.journeymap.properties.WebMapProperties;
 import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.server.JMServer;
@@ -77,8 +81,8 @@ public class JourneyMap {
     private JMLogger logger;
 
 	private volatile Boolean initialized = false;
-	
-	private final Boolean modAnnounced = false;	
+
+    private boolean enableAnnounceMod = false;
 	private JMServer jmServer;
 	
 	private boolean threadLogging = false;
@@ -89,10 +93,11 @@ public class JourneyMap {
 
     public ModInfo modInfo;
 
-	// Whether webserver is running
-	boolean enableWebserver;
-	public boolean enableMapGui;
-	boolean enableAnnounceMod;
+    // Properties & preferences
+    public ConfigProperties configProperties;
+    public FullMapProperties fullMapProperties;
+    public MiniMapProperties miniMapProperties;
+    public WebMapProperties webMapProperties;
 
 	// Executor for task threads
 	private volatile ScheduledExecutorService taskExecutor;
@@ -149,43 +154,23 @@ public class JourneyMap {
 
             mc = FMLClientHandler.instance().getClient();
 
-            final PropertyManager pm = PropertyManager.getInstance();
-
             // Start logFile
             logger.info(MOD_NAME + " starting " + new Date()); //$NON-NLS-1$ //$NON-NLS-2$
             logger.environment();
-            logger.info("Properties: " + pm.toString()); //$NON-NLS-1$
 
-            // Use property settings
-            enableAnnounceMod = pm.getBoolean(PropertyManager.Key.ANNOUNCE_MODLOADED);
+            // Load properties
+            configProperties = new ConfigProperties().load();
+            fullMapProperties = new FullMapProperties().load();
+            miniMapProperties = new MiniMapProperties().load();
+            webMapProperties = new WebMapProperties().load();
+            PropertyManager.getInstance().migrateLegacyProperties();
 
-            // Register general event handlers
-            EventHandlerManager.registerGeneralHandlers();
+            // Log properties
+            logger.info("Config Properties: " + configProperties.toJsonString()); //$NON-NLS-1$
+            logger.info("FullMap Properties: " + fullMapProperties.toJsonString()); //$NON-NLS-1$
+            logger.info("MiniMap Properties: " + miniMapProperties.toJsonString()); //$NON-NLS-1$
+            logger.info("WebMap Properties: " + webMapProperties.toJsonString()); //$NON-NLS-1$
 
-            // In-Game UI
-            this.enableMapGui = pm.getBoolean(PropertyManager.Key.MAPGUI_ENABLED);
-            if(enableMapGui) {
-                // Register GUI event handlers
-                EventHandlerManager.registerGuiHandlers();
-            }
-
-            // Webserver
-            toggleWebserver(pm.getBoolean(PropertyManager.Key.WEBSERVER_ENABLED), false);
-
-            // Check for newer version online
-            if(VersionCheck.getVersionIsCurrent()==false) {
-                ChatLog.announceI18N(Constants.getString("JourneyMap.new_version_available", "")); //$NON-NLS-1$
-                ChatLog.announceURL(WEBSITE_URL, WEBSITE_URL);
-            }
-
-            initialized = true;
-
-            // Override log level now that loading complete
-            logger.info("Initialization complete."); //$NON-NLS-1$
-            logger.setLevelFromProps();
-
-            // Logging for thread debugging
-            threadLogging = getLogger().isLoggable(Level.FINER);
 
         } catch(Throwable t) {
             System.err.println("Error loading " + JourneyMap.MOD_NAME + " for Minecraft " + JourneyMap.MC_VERSION + ". Ensure compatible Minecraft/Modloader/Forge versions.");
@@ -195,37 +180,65 @@ public class JourneyMap {
 
     @Mod.EventHandler
     public void postInitialize(FMLPostInitializationEvent event) {
+
+        // Register general event handlers
+        EventHandlerManager.registerGeneralHandlers();
+        EventHandlerManager.registerGuiHandlers();
+
+        // Webserver
+        toggleWebserver(webMapProperties.isEnabled(), false);
+
+        // Announce mod?
+        enableAnnounceMod = configProperties.isAnnounceMod();
+
+        // Check for newer version online
+        if(VersionCheck.getVersionIsCurrent()==false) {
+            ChatLog.announceI18N(Constants.getString("JourneyMap.new_version_available", "")); //$NON-NLS-1$
+            ChatLog.announceURL(WEBSITE_URL, WEBSITE_URL);
+        }
+
+        //BlockUtils.initialize();
+
+        initialized = true;
+
+        // Override log level now that loading complete
+        logger.info("Initialization complete."); //$NON-NLS-1$
+        logger.setLevelFromProps();
+
+        // Logging for thread debugging
+        threadLogging = getLogger().isLoggable(Level.FINER);
+
         WaypointsData.reset();
         BlockUtils.initialize();
     }
 	
 	public void toggleWebserver(Boolean enable, boolean forceAnnounce) {
-		PropertyManager.getInstance().setProperty(PropertyManager.Key.WEBSERVER_ENABLED, enable);
-		enableWebserver = enable;
-		if(enableWebserver) {
+
+		webMapProperties.setEnabled(enable);
+
+		if(enable) {
 			try {			
 				jmServer = new JMServer();
 				if(jmServer.isReady()) {
 					jmServer.start();		
 				} else {
-					enableWebserver = false;
+					enable = false;
 				}
 			} catch(Throwable e) {
 				logger.log(Level.SEVERE, LogFormatter.toString(e));				
-				enableWebserver = false;
+				enable = false;
 			}
-			if(!enableWebserver) {
+			if(!enable) {
                 ChatLog.announceError(Constants.getMessageJMERR24());
 			}
 		} else {
-			enableWebserver = false;
 			try {			
 				if(jmServer!=null) {
 					jmServer.stop();
 				}
 			} catch(Throwable e) {
 				logger.log(Level.SEVERE, LogFormatter.toString(e));				
-				enableWebserver = false;
+				enable = false;
 			}
 		}
 		if(forceAnnounce) {
@@ -336,7 +349,7 @@ public class JourneyMap {
         RegionImageCache.getInstance().clear();
         UIManager.getInstance().reset();
 
-        if(PropertyManager.getBooleanProp(PropertyManager.Key.NATIVE_WAYPOINTS_ENABLED))
+        if(configProperties.isWaypointManagementEnabled())
         {
             WaypointStore.instance().load();
         }
@@ -356,11 +369,6 @@ public class JourneyMap {
                 if(!isMapping()) {
                     startMapping();
                 }
-            }
-
-            // If both UIs are disabled, the mod is effectively disabled.
-            if(!enableWebserver && !enableMapGui) {
-                return;
             }
 
             final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof MapOverlay);
@@ -418,20 +426,14 @@ public class JourneyMap {
 
 		if(enableAnnounceMod) {
             ChatLog.announceI18N("JourneyMap.ready", MOD_NAME); //$NON-NLS-1$
-			if(enableWebserver && enableMapGui) {
+			if(webMapProperties.isEnabled()) {
 				String keyName = Constants.getKeyName(Constants.KB_MAP);
 				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
                 String message = Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
                 ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
-			} else if(enableWebserver) {
-				String port = jmServer.getPort()==80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
-                String message = Constants.getString("JourneyMap.webserver_only_ready", port); //$NON-NLS-1$
-                ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
-			} else if(enableMapGui) {
+			} else {
 				String keyName = Constants.getKeyName(Constants.KB_MAP); // Should be KeyCode
                 ChatLog.announceI18N("JourneyMap.mapgui_only_ready", keyName); //$NON-NLS-1$
-			} else {
-                ChatLog.announceI18N("JourneyMap.webserver_and_mapgui_disabled"); //$NON-NLS-1$
 			}
 			enableAnnounceMod = false; // Only queueAnnouncement mod once per runtime
 		}

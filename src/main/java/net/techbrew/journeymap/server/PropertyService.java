@@ -1,7 +1,8 @@
 package net.techbrew.journeymap.server;
 
+import com.google.gson.JsonObject;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.io.PropertyManager;
+import net.techbrew.journeymap.properties.WebMapProperties;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 
@@ -59,7 +60,7 @@ public class PropertyService extends BaseService {
 		}	
 		
 		// Put map into json form
-		jsonData.append(GSON.toJson(PropertyManager.getInstance().getProperties()));
+		jsonData.append(JourneyMap.getInstance().webMapProperties);
 		
 		// Finish function call for JsonP if needed
 		if(useJsonP) {
@@ -79,14 +80,19 @@ public class PropertyService extends BaseService {
 			Query query = event.query();
 			String[] param = query.parameters().split("=");
 			if(param.length!=2) throw new Exception("Expected single key-value pair");
-			PropertyManager pm = PropertyManager.getInstance();
-			PropertyManager.Key key = PropertyManager.Key.lookup(param[0]);
-			if(key!=null) {
-				// todo: type check param value
-				pm.setProperty(key, param[1]);
-				JourneyMap.getLogger().finer("Updated property: " + param[0] + "=" + param[01]);
+            String key = param[0];
+            String value = param[1];
+            JsonObject jsonElement = GSON.toJsonTree(JourneyMap.getInstance().webMapProperties).getAsJsonObject();
+
+            if(jsonElement.has(key))
+            {
+                jsonElement.addProperty(key, value);
+				WebMapProperties webMapProperties = GSON.fromJson(jsonElement, WebMapProperties.class);
+                webMapProperties.save();
+                JourneyMap.getInstance().webMapProperties.load();
+				JourneyMap.getLogger().finer("Updated property: " + key + "=" + value);
 			} else {
-				throw new Exception("Unknown property key: " + param[0]);
+				throw new Exception("Unknown property key: " + key);
 			}
 		} catch(Exception e) {
 			throw e;

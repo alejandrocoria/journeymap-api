@@ -8,8 +8,9 @@ import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.EntityKey;
+import net.techbrew.journeymap.feature.Feature;
+import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.FileHandler;
-import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.io.nbt.ChunkLoader;
 import net.techbrew.journeymap.io.nbt.RegionLoader;
 import net.techbrew.journeymap.log.ChatLog;
@@ -88,7 +89,7 @@ public class MapRegionTask extends BaseMapTask {
 			if(minecraft.isIntegratedServerRunning()) {
 				try {
 					final int dimension = (Integer) DataCache.playerDataValue(EntityKey.dimension);
-					final boolean underground = (Boolean) DataCache.playerDataValue(EntityKey.underground) && PropertyManager.getInstance().getBoolean(PropertyManager.Key.PREF_SHOW_CAVES);
+                    final boolean underground = (Boolean) DataCache.playerDataValue(EntityKey.underground) && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.isShowCaves();
 					MapType mapType;
 					Integer vSlice = null;
 					if(underground) {

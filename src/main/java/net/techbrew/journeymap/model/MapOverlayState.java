@@ -5,11 +5,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.*;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.FileHandler;
-import net.techbrew.journeymap.io.PropertyManager;
+import net.techbrew.journeymap.properties.ConfigProperties;
+import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
 import net.techbrew.journeymap.render.overlay.OverlayRadarRenderer;
@@ -21,26 +23,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-;
-
 public class MapOverlayState {
 
 	// One-time setup
-	final long refreshInterval = PropertyManager.getIntegerProp(PropertyManager.Key.UPDATETIMER_CHUNKS);
+    final ConfigProperties configProperties = JourneyMap.getInstance().configProperties;
+
     public final int minZoom = 0;
     public final int maxZoom = 5;
 	
 	// These can be safely changed at will
 	public boolean follow = true;
 	public int currentZoom;
-    public double minimapFontScale = 1;
-    private double mapFontScale = 1;
-    public boolean mapForceUnicode = false;
+    public String playerLastPos = "0,0"; //$NON-NLS-1$
 
-	public String playerLastPos = "0,0"; //$NON-NLS-1$
-    public boolean minimapEnabled = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_MINIMAP);
-    public boolean minimapHotkeys = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_HOTKEYS);
-	
 	// These must be internally managed
 	private Constants.MapType overrideMapType;
 	private File worldDir = null;
@@ -58,14 +53,9 @@ public class MapOverlayState {
 	public MapOverlayState() {
 	}
 	
-	public void refresh(Minecraft mc, EntityClientPlayerMP player) {
-
-        this.minimapEnabled = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_MINIMAP);
-        this.minimapHotkeys = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_MINIMAP_HOTKEYS);
-        mapFontScale = PropertyManager.getDoubleProp(PropertyManager.Key.PREF_FONTSCALE);
-        mapForceUnicode = PropertyManager.getBooleanProp(PropertyManager.Key.PREF_FORCEUNICODE);
-
-		final MapType lastMapType = getMapType();
+	public void refresh(Minecraft mc, EntityClientPlayerMP player, MapProperties mapProperties)
+    {
+		final MapType lastMapType = getMapType(mapProperties.isShowCaves());
 		final boolean lastUnderground = this.underground;				
 		final int lastDimension = this.currentZoom;
 		final File lastWorldDir = this.worldDir;
@@ -80,7 +70,7 @@ public class MapOverlayState {
 			follow = true;
 		} else if(!worldDir.equals(this.worldDir)) {
 			follow=true;
-		} else if(getMapType()==MapType.underground && lastMapType!=MapType.underground) {
+		} else if(getMapType(mapProperties.isShowCaves())==MapType.underground && lastMapType!=MapType.underground) {
 			follow = true;
 		}
 
@@ -94,8 +84,8 @@ public class MapOverlayState {
         requireRefresh();
 	}
 	
-	public MapType getMapType() {
-		if(underground && caveMappingAllowed && PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_CAVES)) {
+	public MapType getMapType(boolean allowCaves) {
+		if(underground && caveMappingAllowed && allowCaves) {
 			return MapType.underground;
 		} else if(overrideMapType!=null) {
 			return overrideMapType;			
@@ -129,26 +119,25 @@ public class MapOverlayState {
         return drawStepList;
     }
 
-    public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, OverlayWaypointRenderer waypointRenderer, OverlayRadarRenderer radarRenderer, float drawScale) {
+    public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, OverlayWaypointRenderer waypointRenderer, OverlayRadarRenderer radarRenderer, MapProperties mapProperties, float drawScale) {
         drawStepList.clear();
 
         List<Map> entities = new ArrayList<Map>(16);
-        PropertyManager pm = PropertyManager.getInstance();
         if(this.currentZoom>0) {
             if(FeatureManager.isAllowed(Feature.RadarAnimals)) {
-                if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_ANIMALS) || pm.getBoolean(PropertyManager.Key.PREF_SHOW_PETS)) {
+                if(mapProperties.isShowAnimals() || mapProperties.isShowPets()) {
                     Map map = (Map) DataCache.instance().get(AnimalsData.class).get(EntityKey.root);
                     entities.addAll(map.values());
                 }
             }
             if(FeatureManager.isAllowed(Feature.RadarVillagers)) {
-                if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_VILLAGERS)) {
+                if(mapProperties.isShowVillagers()) {
                     Map map = (Map) DataCache.instance().get(VillagersData.class).get(EntityKey.root);
                     entities.addAll(map.values());
                 }
             }
             if(FeatureManager.isAllowed(Feature.RadarMobs)) {
-                if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_MOBS)) {
+                if(mapProperties.isShowMobs()) {
                     Map map = (Map) DataCache.instance().get(MobsData.class).get(EntityKey.root);
                     entities.addAll(map.values());
                 }
@@ -156,7 +145,7 @@ public class MapOverlayState {
         }
 
         if(FeatureManager.isAllowed(Feature.RadarPlayers)) {
-            if(pm.getBoolean(PropertyManager.Key.PREF_SHOW_PLAYERS)) {
+            if(mapProperties.isShowPlayers()) {
                 Map map = (Map) DataCache.instance().get(PlayersData.class).get(EntityKey.root);
                 entities.addAll(map.values());
             }
@@ -165,26 +154,16 @@ public class MapOverlayState {
         // Sort to keep named entities last
         if(!entities.isEmpty()) {
             Collections.sort(entities, new EntityHelper.EntityMapComparator());
-            drawStepList.addAll(radarRenderer.prepareSteps(entities, gridRenderer, drawScale));
+            drawStepList.addAll(radarRenderer.prepareSteps(entities, gridRenderer, drawScale, mapProperties));
         }
 
         // Draw waypoints
-        if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_WAYPOINTS)) {
+        if(mapProperties.isShowWaypoints()) {
             Map map = (Map) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
             List<Waypoint> waypoints = new ArrayList<Waypoint>(map.values());
 
             drawStepList.addAll(waypointRenderer.prepareSteps(waypoints, gridRenderer));
         }
-    }
-
-    public double getMapFontScale()
-    {
-        return mapFontScale * (mapForceUnicode ? 2 : 1);
-    }
-
-    public void setMapFontScale(double fontScale)
-    {
-        this.mapFontScale = fontScale;
     }
 
     public boolean zoomIn(){
@@ -220,7 +199,7 @@ public class MapOverlayState {
 	
 	public boolean shouldRefresh(Minecraft mc) {
 
-		if(System.currentTimeMillis() > (lastRefresh+refreshInterval)) {
+		if(System.currentTimeMillis() > (lastRefresh+configProperties.getChunkPoll())) {
             return true;
         }
 

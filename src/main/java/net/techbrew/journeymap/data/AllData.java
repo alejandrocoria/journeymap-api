@@ -1,6 +1,6 @@
 package net.techbrew.journeymap.data;
 
-import net.techbrew.journeymap.io.PropertyManager;
+import net.techbrew.journeymap.JourneyMap;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -31,7 +31,7 @@ public class AllData implements IDataProvider {
 	 * Constructor.
 	 */
 	public AllData() {
-		TTL = PropertyManager.getInstance().getInteger(PropertyManager.Key.BROWSER_POLL);
+		TTL = JourneyMap.getInstance().configProperties.getChunkPoll();
 	}
 	
 	@Override
@@ -51,7 +51,7 @@ public class AllData implements IDataProvider {
 		props.put(Key.images, cache.get(ImagesData.class, optionalParams));
 		props.put(Key.player, cache.get(PlayerData.class));
 		
-		if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_WAYPOINTS)) {
+		if(JourneyMap.getInstance().webMapProperties.isShowWaypoints()) {
 			props.put(Key.waypoints, cache.get(WaypointsData.class).get(EntityKey.root));
 		} else {
 			props.put(Key.waypoints, Collections.emptyMap());
@@ -59,25 +59,25 @@ public class AllData implements IDataProvider {
 		
 		if(!WorldData.isHardcoreAndMultiplayer()) {
 		
-			if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_ANIMALS)) {
+			if(JourneyMap.getInstance().webMapProperties.isShowAnimals()) {
 				props.put(Key.animals, cache.get(AnimalsData.class).get(EntityKey.root));
 			} else {
 				props.put(Key.animals, Collections.emptyMap());
 			}
 		
-			if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_MOBS)) {
+			if(JourneyMap.getInstance().webMapProperties.isShowMobs()) {
 				props.put(Key.mobs, cache.get(MobsData.class).get(EntityKey.root));
 			} else {
 				props.put(Key.mobs, Collections.emptyMap());
 			}
 		
-			if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_PLAYERS)) {
+			if(JourneyMap.getInstance().webMapProperties.isShowPlayers()) {
 				props.put(Key.players, cache.get(PlayersData.class).get(EntityKey.root));
 			} else {
 				props.put(Key.players, Collections.emptyMap());
 			}
 			
-			if(PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_VILLAGERS)) {
+			if(JourneyMap.getInstance().webMapProperties.isShowVillagers()) {
 				props.put(Key.villagers, cache.get(VillagersData.class).get(EntityKey.root));
 			} else {
 				props.put(Key.villagers, Collections.emptyMap());

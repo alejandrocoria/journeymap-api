@@ -4,32 +4,44 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.properties.*;
 import net.techbrew.journeymap.ui.minimap.DisplayVars;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.logging.Level;
+import java.util.*;
 
+@Deprecated
 public class PropertyManager {
 
+    @Deprecated
 	public static final String FILE_NAME = "journeyMap.properties"; //$NON-NLS-1$
-	
-	private static PropertyManager instance;
+
+    private static class Holder
+    {
+        private static final PropertyManager INSTANCE = new PropertyManager();
+    }
+
+    public static PropertyManager getInstance()
+    {
+        return Holder.INSTANCE;
+    }
+
 	private final SortedProperties properties;
+
 	private Boolean writeNeeded = false;
-	
+
+    @Deprecated
 	public enum Key {
-		MAPGUI_ENABLED(Boolean.class, "mapgui_enabled", true), //$NON-NLS-1$
+
+		// MAPGUI_ENABLED(Boolean.class, "mapgui_enabled", true), //$NON-NLS-1$
+
 		WEBSERVER_ENABLED(Boolean.class, "webserver_enabled", true), //$NON-NLS-1$
 		WEBSERVER_PORT(Integer.class, "webserver_port", 8080), //$NON-NLS-1$
 		CHUNK_OFFSET(Integer.class, "chunk_offset", 5), //$NON-NLS-1$
 		BROWSER_POLL(Integer.class,"browser_poll", 1900), //$NON-NLS-1$
-		UPDATETIMER_PLAYER(Integer.class,"update_timer_entities", 1000), //$NON-NLS-1$
+		//UPDATETIMER_PLAYER(Integer.class,"update_timer_entities", 1000), //$NON-NLS-1$
 		UPDATETIMER_CHUNKS(Integer.class,"update_timer_chunks",2000), //$NON-NLS-1$
 		LOGGING_LEVEL(String.class,"logging_level", "INFO"), //$NON-NLS-1$  //$NON-NLS-2$
 		CAVE_LIGHTING(Boolean.class,"render_cavelighting_enabled",true), //$NON-NLS-1$
@@ -68,15 +80,18 @@ public class PropertyManager {
 			this.property = property;			
 			this.defaultValue = defaultValue.toString();
 		}
-		
+
+        @Deprecated
 		public String getProperty() {
 			return property;
 		}
-		
+
+        @Deprecated
 		String getDefault() {
 			return defaultValue;
 		}
-		
+
+        @Deprecated
 		public static Key lookup(String propName) {
 			for(Key key : Key.values()) {
 				if(key.getProperty().equals(propName)) {
@@ -87,30 +102,24 @@ public class PropertyManager {
 		}
 	}
 	
-	public synchronized static PropertyManager getInstance() {
-		if(instance==null) {
-			instance = new PropertyManager();
-		}
-		return instance;
-	}
 
-	public String getString(Key key) {
+	private String getString(Key key) {
 		return properties.getProperty(key.getProperty());
 	}
-	
-	public Integer getInteger(Key key) {
+
+    private Integer getInteger(Key key) {
 		return Integer.parseInt(properties.getProperty(key.getProperty()));
 	}
 
-    public Double getDouble(Key key) {
+    private Double getDouble(Key key) {
         return Double.parseDouble(properties.getProperty(key.getProperty()));
     }
-	
-	public Boolean getBoolean(Key key) {
+
+    private Boolean getBoolean(Key key) {
 		return Boolean.parseBoolean(properties.getProperty(key.getProperty()));
 	}
-	
-	public void setProperty(Key key, Object value) {
+
+    private void setProperty(Key key, Object value) {
 		Object old = properties.getProperty(key.getProperty());
 		if(old==null || !old.equals(value)) {
 			properties.setProperty(key.getProperty(), value.toString());
@@ -120,42 +129,42 @@ public class PropertyManager {
 			JourneyMap.getLogger().fine("Property unchanged: " + key.getProperty() + "=" + value);
 		}
 	}
-	
-	public static String getStringProp(Key key) {
+
+    private static String getStringProp(Key key) {
 		return getInstance().getString(key);
 	}
-	
-	public static Integer getIntegerProp(Key key) {
+
+    private static Integer getIntegerProp(Key key) {
 		return getInstance().getInteger(key);
 	}
-	
-	public static Boolean getBooleanProp(Key key) {
+
+    private static Boolean getBooleanProp(Key key) {
 		return getInstance().getBoolean(key);
 	}
 
-    public static Double getDoubleProp(Key key) {
+    private static Double getDoubleProp(Key key) {
         return getInstance().getDouble(key);
     }
-	
-	public static Boolean toggle(Key key) {
+
+    private static Boolean toggle(Key key) {
 		boolean flip = !getInstance().getBoolean(key);
 		set(key, flip);
 		return flip;
 	}
-	
-	public static void set(Key key, Boolean value) {
-		getInstance().setProperty(key, value);
-	}
-	
-	public static void set(Key key, Integer value) {
+
+    private static void set(Key key, Boolean value) {
 		getInstance().setProperty(key, value);
 	}
 
-    public static void set(Key key, Double value) {
+    private static void set(Key key, Integer value) {
+		getInstance().setProperty(key, value);
+	}
+
+    private static void set(Key key, Double value) {
         getInstance().setProperty(key, value);
     }
 
-    public static void set(Key key, String value) {
+    private static void set(Key key, String value) {
         getInstance().setProperty(key, value);
     }
 	
@@ -163,7 +172,7 @@ public class PropertyManager {
 	 * Get a normalized, type-safe view of the properties.
 	 * @return
 	 */
-	public Map<String, Object> getProperties() {
+    private Map<String, Object> getProperties() {
 		HashMap<String, Object> map = new HashMap<String,Object>(properties.size());
 		for(Key key : Key.values()) {
 			if(key.type.equals(Boolean.class)) {
@@ -211,10 +220,10 @@ public class PropertyManager {
 		synchronized(properties) {
 			File propFile = getFile();
 			if(!propFile.exists()) {
-				JourneyMap.getLogger().log(Level.INFO, "Property file doesn't exist: " + propFile.getAbsolutePath()); //$NON-NLS-1$
+				JourneyMap.getLogger().fine("Legacy property file doesn't exist: " + propFile.getAbsolutePath()); //$NON-NLS-1$
 				return;
 			}
-			
+
 			try {
 				FileReader in = new FileReader(propFile);
 				properties.load(in);
@@ -222,15 +231,15 @@ public class PropertyManager {
 			} catch (IOException e) {
 				String error = Constants.getMessageJMERR19(propFile.getAbsolutePath());
 				JourneyMap.getLogger().severe(error + ": " + LogFormatter.toString(e));
-				throw new RuntimeException(error);
+				return;
 			}
-			
+
 			// Convert older files if needed
 			HashMap<String, String> temp = new HashMap(properties);
 			for(Map.Entry<String, String> entry: temp.entrySet()) {
 				if(entry.getKey().contains(".")) {
 					writeNeeded = true;
-					properties.put(entry.getKey().replaceAll("\\.", "_"), entry.getValue());	
+					properties.put(entry.getKey().replaceAll("\\.", "_"), entry.getValue());
 					properties.remove(entry.getKey());
 				}
 				if(entry.getKey().equals("use_custom_texturepack")) {
@@ -246,29 +255,85 @@ public class PropertyManager {
                     properties.remove(entry.getKey());
                 }
 			}
-			
-			if(writeNeeded) {
-				JourneyMap.getLogger().info("Property file updated for programmatic changes.");
-			}
 		}
-					
 	}
-	
+
+    public void migrateLegacyProperties()
+    {
+        File propFile = getFile();
+        if(!propFile.exists()) {
+            JourneyMap.getLogger().fine("Legacy property file doesn't exist: " + propFile.getAbsolutePath()); //$NON-NLS-1$
+            return;
+        }
+
+        // Update new property files
+        ConfigProperties configProperties = JourneyMap.getInstance().configProperties.enableSave(false);
+        configProperties.enableSave(false);
+        configProperties.setAnnounceMod(getBoolean(Key.ANNOUNCE_MODLOADED));
+        configProperties.setCaveLighting(getBoolean(Key.CAVE_LIGHTING));
+        configProperties.setCheckUpdates(getBoolean(Key.UPDATE_CHECK_ENABLED));
+        configProperties.setChunkOffset(getInteger(Key.CHUNK_OFFSET));
+        configProperties.setChunkPoll(getInteger(Key.UPDATETIMER_CHUNKS));
+        configProperties.setEntityPoll(getInteger(Key.BROWSER_POLL));
+        configProperties.setPlayerPoll(getInteger(Key.BROWSER_POLL));
+        configProperties.setWaypointManagementEnabled(getBoolean(Key.NATIVE_WAYPOINTS_ENABLED));
+        configProperties.enableSave(true).save();
+        JourneyMap.getLogger().info(String.format("Migrated legacy property file values from %s to %s .", propFile.getName(), configProperties.getFile().getName())); //$NON-NLS-1$
+
+        WebMapProperties webMapProperties = JourneyMap.getInstance().webMapProperties.enableSave(false);
+        webMapProperties.setEnabled(getBoolean(Key.WEBSERVER_ENABLED));
+        webMapProperties.setPort(getInteger(Key.WEBSERVER_PORT));
+
+        MiniMapProperties miniMapProperties = JourneyMap.getInstance().miniMapProperties.enableSave(false);
+        miniMapProperties.setEnabled(getBoolean(Key.PREF_SHOW_MINIMAP));
+        miniMapProperties.setEnableHotkeys(getBoolean(Key.PREF_MINIMAP_HOTKEYS));
+        miniMapProperties.setFontScale(getDouble(Key.PREF_MINIMAP_FONTSCALE));
+        miniMapProperties.setForceUnicode(getBoolean(Key.PREF_MINIMAP_FORCEUNICODE));
+        miniMapProperties.setPosition(getString(Key.PREF_MINIMAP_POSITION));
+        miniMapProperties.setShape(getString(Key.PREF_MINIMAP_SHAPE));
+        miniMapProperties.setShowFps(getBoolean(Key.PREF_MINIMAP_SHOWFPS));
+
+        FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties.enableSave(false);
+        fullMapProperties.setFontScale(getDouble(Key.PREF_FONTSCALE));
+        fullMapProperties.setForceUnicode(getBoolean(Key.PREF_FORCEUNICODE));
+
+        List<MapProperties> propsList = Arrays.asList(fullMapProperties, miniMapProperties, webMapProperties);
+        for(MapProperties props : propsList)
+        {
+            props.setShowAnimals(getBoolean(Key.PREF_SHOW_ANIMALS));
+            props.setShowCaves(getBoolean(Key.PREF_SHOW_CAVES));
+            props.setShowGrid(getBoolean(Key.PREF_SHOW_GRID));
+            props.setShowMobs(getBoolean(Key.PREF_SHOW_MOBS));
+            props.setShowPets(getBoolean(Key.PREF_SHOW_PETS));
+            props.setShowPlayers(getBoolean(Key.PREF_SHOW_PLAYERS));
+            props.setShowVillagers(getBoolean(Key.PREF_SHOW_VILLAGERS));
+            props.setShowWaypoints(getBoolean(Key.PREF_SHOW_WAYPOINTS));
+            props.enableSave(true).save();
+            JourneyMap.getLogger().info(String.format("Migrated legacy property file values from %s to %s .", propFile.getName(), props.getFile().getName())); //$NON-NLS-1$
+        }
+
+        // Delete legacy file
+        // TODO: Enable delete
+        propFile.delete();
+    }
+
+
+    @Deprecated
 	private void writeToFile() {
-		synchronized(properties) {
-			File propFile = getFile();
-			try {
-				FileHandler.getJourneyMapDir().mkdirs();
-				FileWriter out = new FileWriter(propFile);
-				properties.store(out, "Properties for JourneyMap " + JourneyMap.JM_VERSION); //$NON-NLS-1$
-				out.close();
-			} catch(IOException e) {
-				String error = Constants.getMessageJMERR20(propFile.getAbsolutePath());
-				JourneyMap.getLogger().severe(error);
-				JourneyMap.getLogger().severe(LogFormatter.toString(e));
-				throw new RuntimeException(error);
-			}
-		}
+//		synchronized(properties) {
+//			File propFile = getFile();
+//			try {
+//				FileHandler.getJourneyMapDir().mkdirs();
+//				FileWriter out = new FileWriter(propFile);
+//				properties.store(out, "Properties for JourneyMap " + JourneyMap.JM_VERSION); //$NON-NLS-1$
+//				out.close();
+//			} catch(IOException e) {
+//				String error = Constants.getMessageJMERR20(propFile.getAbsolutePath());
+//				JourneyMap.getLogger().severe(error);
+//				JourneyMap.getLogger().severe(LogFormatter.toString(e));
+//				throw new RuntimeException(error);
+//			}
+//		}
 	}
 	
 	@Override

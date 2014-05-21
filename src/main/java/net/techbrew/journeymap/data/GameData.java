@@ -2,7 +2,6 @@ package net.techbrew.journeymap.data;
 
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
-import net.techbrew.journeymap.io.PropertyManager;
 import org.lwjgl.opengl.Display;
 
 import java.util.LinkedHashMap;
@@ -45,14 +44,14 @@ public class GameData implements IDataProvider {
 	@Override
 	public Map getMap(Map optionalParams) {	
 		
-		PropertyManager pm = PropertyManager.getInstance();		
+
 		LinkedHashMap props = new LinkedHashMap();		
 		
 		props.put(Key.mod_name, JourneyMap.MOD_NAME);
 		props.put(Key.jm_version,JourneyMap.JM_VERSION);
 		props.put(Key.latest_journeymap_version, VersionCheck.getVersionAvailable()); 
 		props.put(Key.mc_version, Display.getTitle().split("\\s(?=\\d)")[1]); //$NON-NLS-1$ 		
-		props.put(Key.browser_poll, pm.getInteger(PropertyManager.Key.BROWSER_POLL));
+		props.put(Key.browser_poll, JourneyMap.getInstance().webMapProperties.getBrowserPoll());
         props.put(Key.waypoints_enabled, WaypointsData.isAnyEnabled());
 
 		return props;	

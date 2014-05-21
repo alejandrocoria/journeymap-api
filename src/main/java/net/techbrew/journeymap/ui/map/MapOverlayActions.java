@@ -7,10 +7,10 @@ import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.io.MapSaver;
-import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.MapOverlayState;
+import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.task.MapRegionTask;
 import net.techbrew.journeymap.task.SaveMapTask;
 import net.techbrew.journeymap.ui.Button;
@@ -42,10 +42,10 @@ public class MapOverlayActions extends JmUI {
         String on = Constants.getString("MapOverlay.on");
         String off = Constants.getString("MapOverlay.off");
 
-		buttonSave = new Button(ButtonEnum.Save.ordinal(),0,0,Constants.getString("MapOverlay.save_map")); //$NON-NLS-1$ 
-		buttonClose = new Button(ButtonEnum.Close.ordinal(),0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$ 
-		buttonBrowser = new Button(ButtonEnum.Browser.ordinal(),0,0,Constants.getString("MapOverlay.use_browser")); //$NON-NLS-1$ 	
-		buttonBrowser.enabled = PropertyManager.getBooleanProp(PropertyManager.Key.WEBSERVER_ENABLED);
+		buttonSave = new Button(ButtonEnum.Save.ordinal(),0,0,Constants.getString("MapOverlay.save_map")); //$NON-NLS-1$
+		buttonClose = new Button(ButtonEnum.Close.ordinal(),0,0,Constants.getString("MapOverlay.close")); //$NON-NLS-1$
+		buttonBrowser = new Button(ButtonEnum.Browser.ordinal(),0,0,Constants.getString("MapOverlay.use_browser")); //$NON-NLS-1$
+		buttonBrowser.enabled = JourneyMap.getInstance().webMapProperties.isEnabled();
 		
 		buttonAutomap = new Button(ButtonEnum.Automap.ordinal(),0,0,
 				Constants.getString("MapOverlay.automap_title", on),
@@ -59,8 +59,7 @@ public class MapOverlayActions extends JmUI {
 		buttonList.add(buttonSave);
 		buttonList.add(buttonCheck);
 		buttonList.add(buttonBrowser);
-		buttonList.add(buttonClose);
-		
+		buttonList.add(buttonClose);		
     }
     
     /**
@@ -120,7 +119,7 @@ public class MapOverlayActions extends JmUI {
 	}
     
 	protected void launchLocalhost() {
-		String port = PropertyManager.getInstance().getString(PropertyManager.Key.WEBSERVER_PORT);
+		String port = Integer.toBinaryString(JourneyMap.getInstance().webMapProperties.getPort());
 		String url = "http://localhost:" + port; //$NON-NLS-1$
 		try {
 			java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
@@ -130,9 +129,10 @@ public class MapOverlayActions extends JmUI {
 	}
 	
     void save() {
+        MapProperties mapProperties = JourneyMap.getInstance().fullMapProperties;
 		final MapOverlayState state = MapOverlay.state();
-		final MapType mapType = state.getMapType();
-		final Integer vSlice = state.getMapType()==MapType.underground ? state.getVSlice() : null;
+		final MapType mapType = state.getMapType(mapProperties.isShowCaves());
+		final Integer vSlice = state.getMapType(mapProperties.isShowCaves())==MapType.underground ? state.getVSlice() : null;
 		final MapSaver mapSaver = new MapSaver(state.getWorldDir(), mapType, vSlice, state.getDimension());
 		if(mapSaver.isValid()) {
 			JourneyMap.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);

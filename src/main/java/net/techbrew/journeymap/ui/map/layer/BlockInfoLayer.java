@@ -3,11 +3,12 @@ package net.techbrew.journeymap.ui.map.layer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
+import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
-import net.techbrew.journeymap.ui.map.MapOverlay;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
 {
     private final List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
 
+    FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
     BlockCoordIntPair lastCoord = null;
     long lastClicked = 0;
     int lastMouseX;
@@ -54,8 +56,8 @@ public class BlockInfoLayer implements LayerDelegate.Layer
                 info = Constants.getString("MapOverlay.location_xzy", blockCoord.x, blockCoord.z, "?");
             }
 
-            boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, MapOverlay.state().mapForceUnicode);
-            double infoHeight = DrawUtil.getLabelHeight(mc.fontRenderer, true) * MapOverlay.state().getMapFontScale();
+            boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, fullMapProperties.isForceUnicode());
+            double infoHeight = DrawUtil.getLabelHeight(mc.fontRenderer, true) * getMapFontScale();
             if(unicodeForced) DrawUtil.stopUnicode(mc.fontRenderer);
 
             blockInfoStep.update(info, gridWidth/2, gridHeight - infoHeight);
@@ -66,6 +68,11 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         }
 
         return drawStepList;
+    }
+
+    private double getMapFontScale()
+    {
+        return fullMapProperties.getFontScale() * (fullMapProperties.isForceUnicode() ? 2 : 1);
     }
 
     @Override
@@ -104,7 +111,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
                 alpha-=5; // Fade
             }
             if(alpha>0 && text!=null) {
-                DrawUtil.drawLabel(text, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, bgColor, Math.max(0, alpha), fgColor, Math.max(0, alpha), MapOverlay.state().getMapFontScale(), fontShadow);
+                DrawUtil.drawLabel(text, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, bgColor, Math.max(0, alpha), fgColor, Math.max(0, alpha), getMapFontScale(), fontShadow);
             }
         }
     }

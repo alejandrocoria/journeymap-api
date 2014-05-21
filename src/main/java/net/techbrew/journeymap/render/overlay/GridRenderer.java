@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
+import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import org.lwjgl.opengl.GL11;
@@ -139,7 +140,7 @@ public class GridRenderer {
         return true;
 	}
 
-	public boolean updateTextures(MapType mapType, Integer vSlice, int width, int height, boolean fullUpdate, double xOffset, double yOffset) {
+	public boolean updateTextures(MapType mapType, Integer vSlice, int width, int height, boolean fullUpdate, double xOffset, double yOffset, MapProperties mapProperties) {
 
 		// Update screen dimensions
         updateBounds(width, height);
@@ -203,7 +204,7 @@ public class GridRenderer {
             // Update texture only if on-screen
             if(isOnScreen(pos))
             {
-                if(tile!=null && tile.updateTexture(pos, this.mapType, vSlice))
+                if(tile!=null && tile.updateTexture(pos, this.mapType, vSlice, mapProperties))
                 {
                     updated=true;
                 }

@@ -2,8 +2,8 @@ package net.techbrew.journeymap.log;
 
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
-import net.techbrew.journeymap.io.PropertyManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,10 +70,10 @@ public class JMLogger extends Logger {
 		String propLevel = "";
 		Level level = Level.INFO;
 		try {		
-			propLevel = PropertyManager.getInstance().getString(PropertyManager.Key.LOGGING_LEVEL);
+			propLevel = JourneyMap.getInstance().configProperties.getLogLevel();
 			level = Level.parse(propLevel);		
 			if(level!=getLevel()) {
-				log(level, "Log level (via " + PropertyManager.FILE_NAME + ") set to " + level + "."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				log(level, "Log level (via " + JourneyMap.getInstance().configProperties.getFile().getName() + ") set to " + level + "."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				setLevel(level);				
 				if(level.intValue()<Level.INFO.intValue()) {
 					log(level, ("THIS LOGGING LEVEL WILL SLOW DOWN THE GAME! DO NOT USE IT UNLESS YOU ARE TROUBLESHOOTING AN ISSUE!"));
@@ -81,7 +81,7 @@ public class JMLogger extends Logger {
 			}
 					
 		} catch(IllegalArgumentException e) {
-			warning("Illegal value for " + PropertyManager.Key.LOGGING_LEVEL + " in " + PropertyManager.FILE_NAME + ": " + propLevel); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			warning("Illegal value for logLevel in " + JourneyMap.getInstance().configProperties.getFile().getName() + ": " + propLevel); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} catch(Throwable t) {
 			severe(LogFormatter.toString(t));
 		} finally {

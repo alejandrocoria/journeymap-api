@@ -6,21 +6,21 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.inventory.GuiInventory;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.EntityKey;
-import net.techbrew.journeymap.data.PlayerData;
 import net.techbrew.journeymap.data.WaypointsData;
-import net.techbrew.journeymap.io.PropertyManager;
+import net.techbrew.journeymap.feature.Feature;
+import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.EntityHelper;
 import net.techbrew.journeymap.model.MapOverlayState;
 import net.techbrew.journeymap.model.Waypoint;
+import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -57,8 +57,9 @@ public class MapOverlay extends JmUI {
 	final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
 	final static GridRenderer gridRenderer = new GridRenderer(5);
     final LayerDelegate layerDelegate = new LayerDelegate();
+    final FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
 
-	private enum ButtonEnum{Alert,DayNight,Follow,ZoomIn,ZoomOut,Options,Actions,Close,Mode,WaypointManager}
+    private enum ButtonEnum{Alert,DayNight,Follow,ZoomIn,ZoomOut,Options,Actions,Close,Mode,WaypointManager}
 	
 	Boolean isScrolling = false;
 	int msx, msy, mx, my;
@@ -86,7 +87,7 @@ public class MapOverlay extends JmUI {
 	public MapOverlay() {
         super(null);
         mc = FMLClientHandler.instance().getClient();
-        state.refresh(mc, mc.thePlayer);
+        state.refresh(mc, mc.thePlayer, fullMapProperties);
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
         gridRenderer.setZoom(state.currentZoom);
 	}
@@ -210,7 +211,7 @@ public class MapOverlay extends JmUI {
             buttonDayNight = new Button(ButtonEnum.DayNight.ordinal(),0,0,80,20,
                     Constants.getString("MapOverlay.day"), //$NON-NLS-1$
                     Constants.getString("MapOverlay.night"), //$NON-NLS-1$
-                    state.getMapType() == Constants.MapType.day);
+                    state.getMapType(fullMapProperties.isShowCaves()) == Constants.MapType.day);
             buttonDayNight.fitWidth(fr);
 
             buttonFollow = new Button(ButtonEnum.Follow.ordinal(),0,0,80,20,
@@ -281,11 +282,11 @@ public class MapOverlay extends JmUI {
         buttonZoomIn.setPosition(8, 32);
         buttonZoomOut.below(buttonZoomIn, 8).setX(8);
 
-        final boolean underground = (Boolean) DataCache.instance().get(PlayerData.class).get(EntityKey.underground);
-        buttonDayNight.enabled = !(underground && PropertyManager.getBooleanProp(PropertyManager.Key.PREF_SHOW_CAVES));
+        final boolean underground = (Boolean) DataCache.playerDataValue(EntityKey.underground) && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.isShowCaves();
+        buttonDayNight.enabled = !(underground);
 		buttonDayNight.setPosition(startX,startY);
 
-        buttonWaypointManager.drawButton = PropertyManager.getBooleanProp(PropertyManager.Key.NATIVE_WAYPOINTS_ENABLED);
+        buttonWaypointManager.drawButton = JourneyMap.getInstance().configProperties.isWaypointManagementEnabled();
 
         buttonFollow.rightOf(buttonDayNight, hgap).setY(startY);
 
@@ -386,7 +387,7 @@ public class MapOverlay extends JmUI {
 
             try {
                 gridRenderer.move(-mouseDragX, -mouseDragY);
-                gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
+                gridRenderer.updateTextures(state.getMapType(fullMapProperties.isShowCaves()), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0, fullMapProperties);
                 gridRenderer.setZoom(state.currentZoom);
             } catch(Exception e) {
                 logger.severe("Error moving grid: " + e);
@@ -458,71 +459,70 @@ public class MapOverlay extends JmUI {
 			return;
 		}
 
-        if(i==Keyboard.KEY_ESCAPE) {
+        if(i==Keyboard.KEY_ESCAPE || Constants.isPressed(Constants.KB_MAP)) {
             UIManager.getInstance().closeAll();
             return;
         }
-        else if(i==Constants.getKeyCode(Constants.KB_MAP_ZOOMIN)) {
+        else if(Constants.isPressed(Constants.KB_MAP_ZOOMIN)) {
             zoomIn();
             return;
         }
-        else if(i==Constants.getKeyCode(Constants.KB_MAP_ZOOMOUT)) {
+        else if(Constants.isPressed(Constants.KB_MAP_ZOOMOUT)) {
             zoomOut();
             return;
         }
-        else if(i==Constants.getKeyCode(Constants.KB_MAP_DAY)) {
+        else if(Constants.isPressed(Constants.KB_MAP_DAY)) {
             state.overrideMapType(Constants.MapType.day);
             return;
         }
-        else if(i==Constants.getKeyCode(Constants.KB_MAP_NIGHT)) {
+        else if(Constants.isPressed(Constants.KB_MAP_NIGHT)) {
             state.overrideMapType(Constants.MapType.night);
             return;
         }
-        else if(i==Constants.getKeyCode(Constants.KB_WAYPOINT)) {
+        else if(Constants.isPressed(Constants.KB_WAYPOINT)) {
             Waypoint waypoint = Waypoint.of(mc.thePlayer);
             UIManager.getInstance().openWaypointEditor(waypoint, true, null);
             return;
         }
 
 		// North
-		if(i==Constants.getKeyCode(mc.gameSettings.keyBindForward)) {
+        if(Constants.isPressed(mc.gameSettings.keyBindForward)) {
 			moveCanvas(0,-16);
 			return;
 		}
 		
 		// West
-		if(i==Constants.getKeyCode(mc.gameSettings.keyBindLeft)) {
+        if(Constants.isPressed(mc.gameSettings.keyBindLeft)) {
 			moveCanvas(-16, 0);
 			return;
 		}
 		
 		// South
-		if(i==Constants.getKeyCode(mc.gameSettings.keyBindBack)) {
+        if(Constants.isPressed(mc.gameSettings.keyBindBack)) {
 			moveCanvas(0,16);
 			return;
 		}
 		
 		// East
-		if(i==Constants.getKeyCode(mc.gameSettings.keyBindRight)) {
+        if(Constants.isPressed(mc.gameSettings.keyBindRight)) {
 			moveCanvas(16, 0);
 			return;
 		}
 		
 		// Open inventory
-		if(i==Constants.getKeyCode(mc.gameSettings.keyBindInventory)) { // keyBindInventory
-			UIManager.getInstance().closeAll();
-			mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
+        if(Constants.isPressed(mc.gameSettings.keyBindInventory)) {
+			UIManager.getInstance().openInventory();
 			return;
 		}
 		
 		// Open chat
-		if(i==Constants.getKeyCode(mc.gameSettings.keyBindChat)) {
+        if(Constants.isPressed(mc.gameSettings.keyBindChat)) {
 			openChat("");
 			return;
 		}
 		
 		// Open chat with command prefix (Minecraft.java does this in runTick() )
-		if(i==Constants.getKeyCode(mc.gameSettings.keyBindCommand)) {
+        if(Constants.isPressed(mc.gameSettings.keyBindCommand)) {
 			openChat("/");
 			return;
 		}
@@ -570,25 +570,25 @@ public class MapOverlay extends JmUI {
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
         }
 
-        boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, state.mapForceUnicode);
+        boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, fullMapProperties.isForceUnicode());
 
         if(state.follow) {
             gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
         }
-        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
+        gridRenderer.updateTextures(state.getMapType(fullMapProperties.isShowCaves()), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0, fullMapProperties);
 		gridRenderer.draw(1f, xOffset, yOffset);
-        gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, 1f, state.getMapFontScale());
+        gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, 1f, getMapFontScale());
 
         Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
         if(playerPixel!=null) {
             TextureImpl tex = state.currentZoom==0 ? TextureCache.instance().getPlayerLocatorSmall() : TextureCache.instance().getPlayerLocator();
             DrawStep drawStep = new DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, tex, 8);
-            gridRenderer.draw(xOffset, yOffset, 1f, state.getMapFontScale(), drawStep);
+            gridRenderer.draw(xOffset, yOffset, 1f, getMapFontScale(), drawStep);
         }
 
-        gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, 1f, state.getMapFontScale());
+        gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, 1f, getMapFontScale());
 
-        DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, playerInfoBgColor, 235, playerInfoFgColor, 255, state.getMapFontScale(), true);
+        DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, playerInfoBgColor, 235, playerInfoFgColor, 255, getMapFontScale(), true);
 
         if(unicodeForced) DrawUtil.stopUnicode(mc.fontRenderer);
 
@@ -598,54 +598,11 @@ public class MapOverlay extends JmUI {
 
         timer.stop();
 	}
-	
-	public static void drawMapBackground(JmUI ui) {
-		ui.sizeDisplay(false);
 
-        Minecraft mc = ui.getMinecraft();
-
-        if(state.shouldRefresh(mc)) {
-            EntityClientPlayerMP player = mc.thePlayer;
-            if (player==null) {
-                return;
-            }
-
-            MapOverlayState state = MapOverlay.state();
-
-            // Update the state first
-            state.refresh(mc, player);
-
-            gridRenderer.setContext(state.getWorldDir(), state.getDimension());
-
-            // Center core renderer
-            if(state.follow) {
-                gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
-            } else {
-                gridRenderer.setZoom(state.currentZoom);
-            }
-
-            gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
-        } else {
-            gridRenderer.setContext(state.getWorldDir(), state.getDimension());
-        }
-
-        if(state.follow) {
-            gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
-        }
-        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
-        gridRenderer.draw(1f, 0, 0);
-        gridRenderer.draw(state.getDrawSteps(), 0, 0, 1f, state.getMapFontScale());
-
-        Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
-        if(playerPixel!=null) {
-            TextureImpl tex = state.currentZoom==0 ? TextureCache.instance().getPlayerLocatorSmall() : TextureCache.instance().getPlayerLocator();
-            DrawStep drawStep = new DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, tex, 8);
-            gridRenderer.draw(0, 0, 1f, state.getMapFontScale(), drawStep);
-        }
-
-		DrawUtil.drawImage(TextureCache.instance().getLogo(), 16, 4, false, 1f);
-		ui.sizeDisplay(true);
-	}
+    public double getMapFontScale()
+    {
+        return fullMapProperties.getFontScale() * (fullMapProperties.isForceUnicode() ? 2 : 1);
+    }
 
     public void centerOn(Waypoint waypoint)
     {
@@ -674,7 +631,7 @@ public class MapOverlay extends JmUI {
 		}
 
 		// Update the state first
-		state.refresh(mc, player);
+		state.refresh(mc, player, fullMapProperties);
 
 		if(state.getDimension() != gridRenderer.getDimension()) {
 			setFollow(true);
@@ -688,10 +645,10 @@ public class MapOverlay extends JmUI {
 			gridRenderer.setZoom(state.currentZoom);
 		}
 
-        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+        gridRenderer.updateTextures(state.getMapType(fullMapProperties.isShowCaves()), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0, fullMapProperties);
 
 		// Build list of drawSteps
-		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, 1f);
+		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, 1f);
 		
 		// Update player pos
 		state.playerLastPos = Constants.getString("MapOverlay.location_xzyeb",
@@ -742,7 +699,7 @@ public class MapOverlay extends JmUI {
 	void moveCanvas(int deltaBlockX, int deltaBlockz){
         refreshState();
         gridRenderer.move(deltaBlockX, deltaBlockz);
-        gridRenderer.updateTextures(state.getMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+        gridRenderer.updateTextures(state.getMapType(fullMapProperties.isShowCaves()), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0, fullMapProperties);
 		setFollow(false);
 	}
 

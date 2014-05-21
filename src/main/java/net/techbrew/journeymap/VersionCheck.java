@@ -1,6 +1,5 @@
 package net.techbrew.journeymap;
 
-import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.LogFormatter;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -12,7 +11,7 @@ import java.util.logging.Level;
 
 public class VersionCheck {
 
-	private static volatile Boolean updateCheckEnabled = PropertyManager.getInstance().getBoolean(PropertyManager.Key.UPDATE_CHECK_ENABLED);
+	private static volatile Boolean updateCheckEnabled = JourneyMap.getInstance().configProperties.isCheckUpdates();
 	private static volatile Boolean versionIsCurrent = true;
 	private static volatile Boolean versionIsChecked;
 	private static volatile String versionAvailable;
