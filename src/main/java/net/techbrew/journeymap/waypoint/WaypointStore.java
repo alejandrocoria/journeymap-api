@@ -66,9 +66,24 @@ public class WaypointStore
     {
         cache.put(waypoint.getId(), waypoint);
         boolean saved = writeToFile(waypoint);
-        if(saved)
+        if (saved)
         {
             waypoint.setDirty(false);
+        }
+    }
+
+    public void bulkSave()
+    {
+        for (Waypoint waypoint : cache.asMap().values())
+        {
+            if (waypoint.isDirty())
+            {
+                boolean saved = writeToFile(waypoint);
+                if (saved)
+                {
+                    waypoint.setDirty(false);
+                }
+            }
         }
     }
 
@@ -101,7 +116,7 @@ public class WaypointStore
 
     public void load()
     {
-        synchronized(cache)
+        synchronized (cache)
         {
             cache.invalidateAll();
 
@@ -127,9 +142,9 @@ public class WaypointStore
 
     public void load(Collection<Waypoint> waypoints, boolean forceSave)
     {
-        for(Waypoint waypoint : waypoints)
+        for (Waypoint waypoint : waypoints)
         {
-            if(forceSave || (!waypoint.isReadOnly() && waypoint.isDirty()))
+            if (forceSave || (!waypoint.isReadOnly() && waypoint.isDirty()))
             {
                 save(waypoint);
             }

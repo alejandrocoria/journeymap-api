@@ -8,30 +8,33 @@ import se.rupy.http.Event;
 
 /**
  * Serve debug goodness
- * 
- * @author mwoodman
  *
+ * @author mwoodman
  */
-public class DebugService extends FileService {
+public class DebugService extends FileService
+{
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Default constructor
-	 */
-	public DebugService() {
-	}
-	
-	@Override
-	public String path() {
-		return "/debug"; //$NON-NLS-1$
-	}
-	
-	/**
-	 * Serve it.
-	 */
-	@Override
-	public void filter(Event event) throws Event, Exception {
+    /**
+     * Default constructor
+     */
+    public DebugService()
+    {
+    }
+
+    @Override
+    public String path()
+    {
+        return "/debug"; //$NON-NLS-1$
+    }
+
+    /**
+     * Serve it.
+     */
+    @Override
+    public void filter(Event event) throws Event, Exception
+    {
         ResponseHeader.on(event).contentType(ContentType.html).noCache();
 
         // TODO:  JSON this stuff and don't be a html-generating loser.
@@ -45,7 +48,7 @@ public class DebugService extends FileService {
         sb.append('\n').append("</style></head><body><div>");
         sb.append('\n').append("<h1>").append(JourneyMap.MOD_NAME).append("</h1>");
         sb.append('\n').append("<h1>Properties</h1>");
-        sb.append('\n').append("<div>").append(JourneyMap.getInstance().configProperties.toJsonString()).append("</div>");
+        sb.append('\n').append("<div>").append(JourneyMap.getInstance().coreProperties.toJsonString()).append("</div>");
         sb.append('\n').append("<div>").append(JourneyMap.getInstance().fullMapProperties.toJsonString()).append("</div>");
         sb.append('\n').append("<div>").append(JourneyMap.getInstance().miniMapProperties.toJsonString()).append("</div>");
         sb.append('\n').append("<div>").append(JourneyMap.getInstance().webMapProperties.toJsonString()).append("</div>");
@@ -58,5 +61,5 @@ public class DebugService extends FileService {
 
         sb.append('\n').append("</div></body></html>");
         gzipResponse(event, sb.toString());
-	}
+    }
 }

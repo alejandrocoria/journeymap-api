@@ -1,5 +1,8 @@
 package net.techbrew.journeymap.properties;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Properties for the web map in browser.
  */
@@ -7,11 +10,11 @@ public class WebMapProperties extends MapProperties
 {
     protected transient static final int CURRENT_REVISION = 1;
     protected final String name = "webmap";
-    protected int revision = CURRENT_REVISION;
+    protected AtomicInteger revision = new AtomicInteger(CURRENT_REVISION);
 
-    protected boolean enabled = false;
-    protected int port = 8080;
-    protected int browserPoll = 2000;
+    public final AtomicBoolean enabled = new AtomicBoolean(true);
+    public final AtomicInteger port = new AtomicInteger(8080);
+    public final AtomicInteger browserPoll = new AtomicInteger(2000);
 
     @Override
     protected String getName()
@@ -28,43 +31,7 @@ public class WebMapProperties extends MapProperties
     @Override
     public int getRevision()
     {
-        return revision;
-    }
-
-    public boolean isEnabled()
-    {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled)
-    {
-        this.enabled = enabled;
-    }
-
-    public boolean toggleEnabled()
-    {
-        setEnabled(!enabled);
-        return enabled;
-    }
-
-    public int getPort()
-    {
-        return port;
-    }
-
-    public void setPort(int port)
-    {
-        this.port = port;
-    }
-
-    public int getBrowserPoll()
-    {
-        return browserPoll;
-    }
-
-    public void setBrowserPoll(int browserPoll)
-    {
-        this.browserPoll = browserPoll;
+        return revision.get();
     }
 
     @Override
@@ -84,7 +51,7 @@ public class WebMapProperties extends MapProperties
         }
 
         WebMapProperties that = (WebMapProperties) o;
-        return 0==this.compareTo(that);
+        return 0 == this.compareTo(that);
     }
 
     @Override
@@ -92,10 +59,10 @@ public class WebMapProperties extends MapProperties
     {
         int result = super.hashCode();
         result = 31 * result + name.hashCode();
-        result = 31 * result + revision;
-        result = 31 * result + (enabled ? 1 : 0);
-        result = 31 * result + port;
-        result = 31 * result + browserPoll;
+        result = 31 * result + revision.hashCode();
+        result = 31 * result + enabled.hashCode();
+        result = 31 * result + port.hashCode();
+        result = 31 * result + browserPoll.hashCode();
         return result;
     }
 }

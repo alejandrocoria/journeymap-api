@@ -2,6 +2,9 @@ package net.techbrew.journeymap.properties;
 
 import net.techbrew.journeymap.ui.minimap.DisplayVars;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
  * Properties for the minimap in-game.
  */
@@ -11,18 +14,14 @@ public class MiniMapProperties extends MapProperties
     protected final String name = "minimap";
     protected int revision = CURRENT_REVISION;
 
-    protected boolean enabled = true;
-    protected String shape = DisplayVars.Shape.SmallSquare.name();
-    protected String position = DisplayVars.Position.TopRight.name();
-    protected boolean showFps = false;
-    protected boolean enableHotkeys = true;
-
-    protected boolean forceUnicode = false; // PREF_FORCEUNICODE(Boolean.class,"preference_forceunicode", false), //$NON-NLS-1$
-    protected double fontScale = 1; // PREF_FONTSCALE(Double.class,"preference_fontscale", 1.0), //$NON-NLS-1$
-
-
-
-    protected boolean showWaypointLabels;
+    public final AtomicBoolean enabled = new AtomicBoolean(true);
+    public final AtomicReference<DisplayVars.Shape> shape = new AtomicReference<DisplayVars.Shape>(DisplayVars.Shape.SmallSquare);
+    public final AtomicReference<DisplayVars.Position> position = new AtomicReference<DisplayVars.Position>(DisplayVars.Position.TopRight);
+    public final AtomicBoolean showFps = new AtomicBoolean(false);
+    public final AtomicBoolean enableHotkeys = new AtomicBoolean(true);
+    public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
+    public final AtomicBoolean forceUnicode = new AtomicBoolean(false);
+    public final AtomicBoolean fontSmall = new AtomicBoolean(true);
 
     @Override
     protected String getName()
@@ -40,95 +39,6 @@ public class MiniMapProperties extends MapProperties
     public int getRevision()
     {
         return revision;
-    }
-
-    public boolean isEnabled()
-    {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled)
-    {
-        this.enabled = enabled;
-    }
-
-
-    public boolean isForceUnicode()
-    {
-        return forceUnicode;
-    }
-
-    public void setForceUnicode(boolean forceUnicode)
-    {
-        this.forceUnicode = forceUnicode;
-        save();
-    }
-
-    public boolean toggleForceUnicode()
-    {
-        setForceUnicode(!forceUnicode);
-        return forceUnicode;
-    }
-
-    public double getFontScale()
-    {
-        return fontScale;
-    }
-
-    public void setFontScale(double fontScale)
-    {
-        this.fontScale = fontScale;
-        save();
-    }
-
-    public String getShape()
-    {
-        return shape;
-    }
-
-    public void setShape(String shape)
-    {
-        this.shape = shape;
-    }
-
-    public String getPosition()
-    {
-        return position;
-    }
-
-    public void setPosition(String position)
-    {
-        this.position = position;
-    }
-
-    public boolean isShowFps()
-    {
-        return showFps;
-    }
-
-    public void setShowFps(boolean showFps)
-    {
-        this.showFps = showFps;
-    }
-
-    public boolean isEnableHotkeys()
-    {
-        return enableHotkeys;
-    }
-
-    public void setEnableHotkeys(boolean enableHotkeys)
-    {
-        this.enableHotkeys = enableHotkeys;
-    }
-
-    public boolean isShowWaypointLabels()
-    {
-        return showWaypointLabels;
-    }
-
-    public void setShowWaypointLabels(boolean showWaypointLabels)
-    {
-        this.showWaypointLabels = showWaypointLabels;
     }
 
     @Override
@@ -155,18 +65,16 @@ public class MiniMapProperties extends MapProperties
     public int hashCode()
     {
         int result = super.hashCode();
-        long temp;
         result = 31 * result + name.hashCode();
         result = 31 * result + revision;
-        result = 31 * result + (enabled ? 1 : 0);
+        result = 31 * result + enabled.hashCode();
         result = 31 * result + shape.hashCode();
         result = 31 * result + position.hashCode();
-        result = 31 * result + (showFps ? 1 : 0);
-        result = 31 * result + (enableHotkeys ? 1 : 0);
-        result = 31 * result + (forceUnicode ? 1 : 0);
-        temp = Double.doubleToLongBits(fontScale);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        result = 31 * result + (showWaypointLabels ? 1 : 0);
+        result = 31 * result + showFps.hashCode();
+        result = 31 * result + enableHotkeys.hashCode();
+        result = 31 * result + showWaypointLabels.hashCode();
+        result = 31 * result + forceUnicode.hashCode();
+        result = 31 * result + fontSmall.hashCode();
         return result;
     }
 }

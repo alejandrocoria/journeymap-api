@@ -160,15 +160,15 @@ public class MapOverlay extends JmUI {
 				break;
 			}
 			case Options: { // options
-				UIManager.getInstance().openMapOptions();
-				break;
+                UIManager.getInstance().openMasterOptions();
+                break;
 			}
 			case Actions: { // actions
 				UIManager.getInstance().openMapActions();
 				break;
 			}
             case WaypointManager: {
-                UIManager.getInstance().openWaypointManager();
+                UIManager.getInstance().openWaypointManager(null);
             }
 		}
 	}
@@ -211,7 +211,7 @@ public class MapOverlay extends JmUI {
             buttonDayNight = new Button(ButtonEnum.DayNight.ordinal(),0,0,80,20,
                     Constants.getString("MapOverlay.day"), //$NON-NLS-1$
                     Constants.getString("MapOverlay.night"), //$NON-NLS-1$
-                    state.getMapType(fullMapProperties.isShowCaves()) == Constants.MapType.day);
+                    state.getMapType(fullMapProperties.showCaves.get()) == Constants.MapType.day);
             buttonDayNight.fitWidth(fr);
 
             buttonFollow = new Button(ButtonEnum.Follow.ordinal(),0,0,80,20,
@@ -282,11 +282,11 @@ public class MapOverlay extends JmUI {
         buttonZoomIn.setPosition(8, 32);
         buttonZoomOut.below(buttonZoomIn, 8).setX(8);
 
-        final boolean underground = (Boolean) DataCache.playerDataValue(EntityKey.underground) && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.isShowCaves();
+        final boolean underground = (Boolean) DataCache.playerDataValue(EntityKey.underground) && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.showCaves.get();
         buttonDayNight.enabled = !(underground);
 		buttonDayNight.setPosition(startX,startY);
 
-        buttonWaypointManager.drawButton = JourneyMap.getInstance().configProperties.isWaypointManagementEnabled();
+        buttonWaypointManager.drawButton = JourneyMap.getInstance().waypointProperties.enabled.get();
 
         buttonFollow.rightOf(buttonDayNight, hgap).setY(startY);
 
@@ -387,7 +387,7 @@ public class MapOverlay extends JmUI {
 
             try {
                 gridRenderer.move(-mouseDragX, -mouseDragY);
-                gridRenderer.updateTextures(state.getMapType(fullMapProperties.isShowCaves()), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0, fullMapProperties);
+                gridRenderer.updateTextures(state.getMapType(fullMapProperties.showCaves.get()), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0, fullMapProperties);
                 gridRenderer.setZoom(state.currentZoom);
             } catch(Exception e) {
                 logger.severe("Error moving grid: " + e);
@@ -570,13 +570,13 @@ public class MapOverlay extends JmUI {
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
         }
 
-        boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, fullMapProperties.isForceUnicode());
+        boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, fullMapProperties.forceUnicode.get());
 
         if(state.follow) {
             gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
         }
-        gridRenderer.updateTextures(state.getMapType(fullMapProperties.isShowCaves()), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0, fullMapProperties);
-		gridRenderer.draw(1f, xOffset, yOffset);
+        gridRenderer.updateTextures(state.getMapType(fullMapProperties.showCaves.get()), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0, fullMapProperties);
+        gridRenderer.draw(1f, xOffset, yOffset);
         gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, 1f, getMapFontScale());
 
         Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
@@ -599,9 +599,9 @@ public class MapOverlay extends JmUI {
         timer.stop();
 	}
 
-    public double getMapFontScale()
+    private int getMapFontScale()
     {
-        return fullMapProperties.getFontScale() * (fullMapProperties.isForceUnicode() ? 2 : 1);
+        return (fullMapProperties.fontSmall.get() ? 1 : 2) * (fullMapProperties.forceUnicode.get() ? 2 : 1);
     }
 
     public void centerOn(Waypoint waypoint)
@@ -645,7 +645,7 @@ public class MapOverlay extends JmUI {
 			gridRenderer.setZoom(state.currentZoom);
 		}
 
-        gridRenderer.updateTextures(state.getMapType(fullMapProperties.isShowCaves()), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0, fullMapProperties);
+        gridRenderer.updateTextures(state.getMapType(fullMapProperties.showCaves.get()), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0, fullMapProperties);
 
 		// Build list of drawSteps
 		state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, 1f);
@@ -699,8 +699,8 @@ public class MapOverlay extends JmUI {
 	void moveCanvas(int deltaBlockX, int deltaBlockz){
         refreshState();
         gridRenderer.move(deltaBlockX, deltaBlockz);
-        gridRenderer.updateTextures(state.getMapType(fullMapProperties.isShowCaves()), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0, fullMapProperties);
-		setFollow(false);
+        gridRenderer.updateTextures(state.getMapType(fullMapProperties.showCaves.get()), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0, fullMapProperties);
+        setFollow(false);
 	}
 
     @Override

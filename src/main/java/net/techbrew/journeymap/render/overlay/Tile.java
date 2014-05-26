@@ -17,56 +17,58 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Tile {
-		
-	public final static int TILESIZE = 512;
-	
-	final int dimension;
-	final int zoom;
-	final int tileX; 
-	final int tileZ;
-	final File worldDir;
-	final ChunkCoordIntPair ulChunk;
-	final ChunkCoordIntPair lrChunk;
-	final Point ulBlock;
-	final Point lrBlock;
-	
-	long lastImageTime = 0;
-	
-	Integer lastVSlice;
-	MapType lastMapType;
+public class Tile
+{
+
+    public final static int TILESIZE = 512;
+
+    final int dimension;
+    final int zoom;
+    final int tileX;
+    final int tileZ;
+    final File worldDir;
+    final ChunkCoordIntPair ulChunk;
+    final ChunkCoordIntPair lrChunk;
+    final Point ulBlock;
+    final Point lrBlock;
+
+    long lastImageTime = 0;
+
+    Integer lastVSlice;
+    MapType lastMapType;
 
     Future<DelayedTexture> futureTex;
-	TextureImpl textureImpl;
-	
-	private final Logger logger = JourneyMap.getLogger();
-	private final boolean debug = logger.isLoggable(Level.FINE);
+    TextureImpl textureImpl;
 
-	public Tile(final File worldDir, final MapType mapType, final int tileX, final int tileZ, final int zoom, final int dimension) {
-		this.worldDir = worldDir;
+    private final Logger logger = JourneyMap.getLogger();
+    private final boolean debug = logger.isLoggable(Level.FINE);
+
+    public Tile(final File worldDir, final MapType mapType, final int tileX, final int tileZ, final int zoom, final int dimension)
+    {
+        this.worldDir = worldDir;
         this.lastMapType = mapType;
-		this.tileX = tileX;
-		this.tileZ = tileZ;
-		this.zoom = zoom;
-		this.dimension = dimension;
-		final int distance = 32 / (int) Math.pow(2, zoom);
-		ulChunk = new ChunkCoordIntPair(tileX * distance, tileZ * distance);
-		lrChunk = new ChunkCoordIntPair(ulChunk.chunkXPos + distance - 1, ulChunk.chunkZPos + distance - 1);
-		ulBlock = new Point(ulChunk.chunkXPos*16, ulChunk.chunkZPos*16);
-		lrBlock = new Point((lrChunk.chunkXPos*16)+15, (lrChunk.chunkZPos*16)+15);
-	}
-	
-	public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice, MapProperties mapProperties)
+        this.tileX = tileX;
+        this.tileZ = tileZ;
+        this.zoom = zoom;
+        this.dimension = dimension;
+        final int distance = 32 / (int) Math.pow(2, zoom);
+        ulChunk = new ChunkCoordIntPair(tileX * distance, tileZ * distance);
+        lrChunk = new ChunkCoordIntPair(ulChunk.chunkXPos + distance - 1, ulChunk.chunkZPos + distance - 1);
+        ulBlock = new Point(ulChunk.chunkXPos * 16, ulChunk.chunkZPos * 16);
+        lrBlock = new Point((lrChunk.chunkXPos * 16) + 15, (lrChunk.chunkZPos * 16) + 15);
+    }
+
+    public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice, MapProperties mapProperties)
     {
         boolean forceReset = (lastMapType != mapType || lastVSlice != vSlice);
 
-        if(futureTex != null && forceReset)
+        if (futureTex != null && forceReset)
         {
             futureTex.cancel(true);
             futureTex = null;
         }
 
-        if(futureTex!=null)
+        if (futureTex != null)
         {
             return false;
         }
@@ -76,159 +78,219 @@ public class Tile {
 
         Integer glId = null;
         BufferedImage image = null;
-        if(textureImpl!=null)
+        if (textureImpl != null)
         {
             // Reuse existing buffered image and glId
             glId = textureImpl.getGlTextureId();
             image = textureImpl.getImage();
         }
-        futureTex = TextureCache.instance().prepareImage(glId, image, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE, mapProperties.isShowGrid());
+        futureTex = TextureCache.instance().prepareImage(glId, image, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE, mapProperties.showGrid.get());
 
         return true;
-	}
-	
-	public boolean hasTexture() {
-		if(textureImpl!=null) return true;
-        if(futureTex!=null && futureTex.isDone()){
-            try {
-                if(futureTex.get()==null){
-                    futureTex=null;
+    }
+
+    public boolean hasTexture()
+    {
+        if (textureImpl != null)
+        {
+            return true;
+        }
+        if (futureTex != null && futureTex.isDone())
+        {
+            try
+            {
+                if (futureTex.get() == null)
+                {
+                    futureTex = null;
                     lastImageTime = 0;
                     return false;
-                } else {
+                }
+                else
+                {
                     return true;
                 }
-            } catch (Throwable e) {
+            }
+            catch (Throwable e)
+            {
                 logger.severe(LogFormatter.toString(e));
             }
         }
         return false;
-	}
-	
-	public TextureImpl getTexture() {	
+    }
 
-        if(futureTex!=null && futureTex.isDone()){
-            try {
+    public TextureImpl getTexture()
+    {
+
+        if (futureTex != null && futureTex.isDone())
+        {
+            try
+            {
                 DelayedTexture dt = futureTex.get();
-                if(dt!=null) {
+                if (dt != null)
+                {
                     TextureImpl texture = dt.bindTexture();
-                    if(textureImpl==null){ // new
+                    if (textureImpl == null)
+                    { // new
                         textureImpl = texture;
                     }
                 }
                 futureTex = null;
                 //lastImageTime = new Date().getTime();
                 //logger.info("FutureTex bound for " + this);
-            } catch (Throwable e) {
+            }
+            catch (Throwable e)
+            {
                 logger.severe(LogFormatter.toString(e));
             }
         }
 
         return textureImpl;
-	}
-	
-	public void clear() {
-		if(textureImpl!=null) {
-			textureImpl.deleteTexture();
+    }
+
+    public void clear()
+    {
+        if (textureImpl != null)
+        {
+            textureImpl.deleteTexture();
             textureImpl = null;
-		}
-	}
-
-	@Override
-	public String toString() {
-		return "Tile [ " + tileX + "," + tileZ + " (zoom " + zoom + ") ]";
-	}
-
-	@Override
-	public int hashCode() {
-		return toHashCode(tileX, tileZ, zoom, dimension);
-	}
-	
-	public static int blockPosToTile(int b, int zoom) {
-		int tile = b >> (9-zoom);  // (2 pow 9 = 512)
-		return tile;
-	}
-	
-	private String blockBounds() {
-		return ulBlock.x + "," + ulBlock.y + " - " + lrBlock.x + "," + lrBlock.y;
-	}
-	
-	private int tileToBlock(int t) {
-		return t << (9-zoom);
-	}
-	
-	public static int tileToBlock(int t, int zoom) {
-		return t << (9-zoom);
-	}
-	
-
-	public Point2D blockPixelOffsetInTile(double x, double z) {
-		
-		if(x<ulBlock.x || Math.floor(x)>lrBlock.x || z<ulBlock.y || Math.floor(z)>lrBlock.y) {
-			throw new RuntimeException("Block " + x + "," + z + " isn't in " + this);
-		}
-		
-		double localBlockX = ulBlock.x - x;
-		if(x<0) localBlockX++;
-		
-		double localBlockZ = ulBlock.y - z;
-		if(z<0) localBlockZ++;
-		
-//		int tileCenterBlockX = lrBlock.x-ulBlock.x;
-//		int tileCenterBlockZ = lrBlock.y-ulBlock.y;
-		
-		int blockSize = (int) Math.pow(2,zoom);
-		double pixelOffsetX = (TILESIZE/2) + (localBlockX*blockSize) - (blockSize/2);
-		double pixelOffsetZ = (TILESIZE/2) + (localBlockZ*blockSize) - (blockSize/2);
-		
-		return new Point2D.Double(pixelOffsetX, pixelOffsetZ);
-	}
-	
-	public static int toHashCode(final int tileX, final int tileZ, final int zoom, final int dimension) {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + tileX;
-		result = prime * result + tileZ;
-		result = prime * result + zoom;
-		result = prime * result + dimension;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Tile other = (Tile) obj;
-		if (tileX != other.tileX)
-			return false;
-		if (tileZ != other.tileZ)
-			return false;
-		if (zoom != other.zoom)
-			return false;
-		if (dimension != other.dimension)
-			return false;
-		if (!worldDir.equals(other.worldDir))
-			return false;
-		return true;
-	}
+        }
+    }
 
     @Override
-    protected void finalize()  {
+    public String toString()
+    {
+        return "Tile [ " + tileX + "," + tileZ + " (zoom " + zoom + ") ]";
+    }
 
-        try {
-            if(JourneyMap.getInstance().isMapping()) {
-                if(textureImpl!=null) {
+    @Override
+    public int hashCode()
+    {
+        return toHashCode(tileX, tileZ, zoom, dimension);
+    }
+
+    public static int blockPosToTile(int b, int zoom)
+    {
+        int tile = b >> (9 - zoom);  // (2 pow 9 = 512)
+        return tile;
+    }
+
+    private String blockBounds()
+    {
+        return ulBlock.x + "," + ulBlock.y + " - " + lrBlock.x + "," + lrBlock.y;
+    }
+
+    private int tileToBlock(int t)
+    {
+        return t << (9 - zoom);
+    }
+
+    public static int tileToBlock(int t, int zoom)
+    {
+        return t << (9 - zoom);
+    }
+
+
+    public Point2D blockPixelOffsetInTile(double x, double z)
+    {
+
+        if (x < ulBlock.x || Math.floor(x) > lrBlock.x || z < ulBlock.y || Math.floor(z) > lrBlock.y)
+        {
+            throw new RuntimeException("Block " + x + "," + z + " isn't in " + this);
+        }
+
+        double localBlockX = ulBlock.x - x;
+        if (x < 0)
+        {
+            localBlockX++;
+        }
+
+        double localBlockZ = ulBlock.y - z;
+        if (z < 0)
+        {
+            localBlockZ++;
+        }
+
+//		int tileCenterBlockX = lrBlock.x-ulBlock.x;
+//		int tileCenterBlockZ = lrBlock.y-ulBlock.y;
+
+        int blockSize = (int) Math.pow(2, zoom);
+        double pixelOffsetX = (TILESIZE / 2) + (localBlockX * blockSize) - (blockSize / 2);
+        double pixelOffsetZ = (TILESIZE / 2) + (localBlockZ * blockSize) - (blockSize / 2);
+
+        return new Point2D.Double(pixelOffsetX, pixelOffsetZ);
+    }
+
+    public static int toHashCode(final int tileX, final int tileZ, final int zoom, final int dimension)
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + tileX;
+        result = prime * result + tileZ;
+        result = prime * result + zoom;
+        result = prime * result + dimension;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
+        Tile other = (Tile) obj;
+        if (tileX != other.tileX)
+        {
+            return false;
+        }
+        if (tileZ != other.tileZ)
+        {
+            return false;
+        }
+        if (zoom != other.zoom)
+        {
+            return false;
+        }
+        if (dimension != other.dimension)
+        {
+            return false;
+        }
+        if (!worldDir.equals(other.worldDir))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    protected void finalize()
+    {
+
+        try
+        {
+            if (JourneyMap.getInstance().isMapping())
+            {
+                if (textureImpl != null)
+                {
                     logger.warning("Tile wasn't cleared before finalize() called: " + this);
                     clear();
                 }
             }
-        } catch(NullPointerException e){
+        }
+        catch (NullPointerException e)
+        {
             // Forced shutdown, JM instance already GC'd
-        } catch(Throwable t){
+        }
+        catch (Throwable t)
+        {
             logger.severe(t.getMessage());
         }
     }

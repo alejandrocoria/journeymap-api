@@ -20,93 +20,124 @@ import java.util.Map;
 
 /**
  * Renders an entity image in the MapOverlay.
- * 
- * @author mwoodman
  *
+ * @author mwoodman
  */
-public class OverlayRadarRenderer {
+public class OverlayRadarRenderer
+{
 
-	public List<DrawStep> prepareSteps(List<Map> critters, GridRenderer grid, float drawScale, MapProperties mapProperties) {
-		
-		final boolean showAnimals = mapProperties.isShowAnimals();
-		final boolean showPets = mapProperties.isShowPets();
-		final int fontHeight = 14;
-		final Color labelBg = Color.darkGray.darker();
-		
-		final List<DrawStep> drawStepList = new ArrayList<DrawStep>();
-		
-		try {
-			
-			double heading;
-			TextureImpl entityIcon, locatorImg;
-			String filename, owner;
-			Boolean isHostile, isPet, isPlayer;
-			boolean filterAnimals = (showAnimals!=showPets);
-			//FontMetrics fm = g2D.getFontMetrics();
-			String playername = Minecraft.getMinecraft().thePlayer.getDisplayName();
-			TextureCache tc = TextureCache.instance();
-			
-			for(Map critter : critters) {
-				
-				isHostile = Boolean.TRUE.equals(critter.get(EntityKey.hostile));
-				
-				owner = (String) critter.get(EntityKey.owner);
-				isPet = playername.equals(owner);					
-				
-				// Skip animals/pets if needed
-				if(filterAnimals && !isHostile) {						
-					if(showPets != isPet) {
-						continue;
-					}
-				}
-				
-				double posX = (Double) critter.get(EntityKey.posX);
+    public List<DrawStep> prepareSteps(List<Map> critters, GridRenderer grid, float drawScale, MapProperties mapProperties)
+    {
+
+        final boolean showAnimals = mapProperties.showAnimals.get();
+        final boolean showPets = mapProperties.showPets.get();
+        final int fontHeight = 14;
+        final Color labelBg = Color.darkGray.darker();
+
+        final List<DrawStep> drawStepList = new ArrayList<DrawStep>();
+
+        try
+        {
+
+            double heading;
+            TextureImpl entityIcon, locatorImg;
+            String filename, owner;
+            Boolean isHostile, isPet, isPlayer;
+            boolean filterAnimals = (showAnimals != showPets);
+            //FontMetrics fm = g2D.getFontMetrics();
+            String playername = Minecraft.getMinecraft().thePlayer.getDisplayName();
+            TextureCache tc = TextureCache.instance();
+
+            for (Map critter : critters)
+            {
+
+                isHostile = Boolean.TRUE.equals(critter.get(EntityKey.hostile));
+
+                owner = (String) critter.get(EntityKey.owner);
+                isPet = playername.equals(owner);
+
+                // Skip animals/pets if needed
+                if (filterAnimals && !isHostile)
+                {
+                    if (showPets != isPet)
+                    {
+                        continue;
+                    }
+                }
+
+                double posX = (Double) critter.get(EntityKey.posX);
                 double posZ = (Double) critter.get(EntityKey.posZ);
 
-				if(grid.getPixel(posX, posZ)!=null) {
-					filename = (String) critter.get(EntityKey.filename);
-					heading = (Double) critter.get(EntityKey.heading);					
-					isPlayer = filename.startsWith("/skin/");
+                if (grid.getPixel(posX, posZ) != null)
+                {
+                    filename = (String) critter.get(EntityKey.filename);
+                    heading = (Double) critter.get(EntityKey.heading);
+                    isPlayer = filename.startsWith("/skin/");
 
-					// Determine and draw locator
-					if(isHostile) {
-						locatorImg = tc.getHostileLocator();
-					} else if(isPet) {
-						locatorImg = tc.getPetLocator();
-					} else if(isPlayer) {
-						locatorImg = tc.getOtherLocator();
-					} else {
-						locatorImg = tc.getNeutralLocator();
-					}			
-					
-					drawStepList.add(new DrawEntityStep(posX, posZ, heading, false, locatorImg, (int)(8 * drawScale)));
-					
-					// Draw entity image
-					if(isPlayer) {
-						entityIcon = tc.getPlayerSkin((String) critter.get(EntityKey.username));
-					} else {
-						entityIcon = tc.getEntityImage(filename);
-					}
-					if(entityIcon!=null) {
-						int bottomMargin = isPlayer ? 0 : (int)(8 * drawScale);
-						drawStepList.add(new DrawEntityStep(posX, posZ, heading, true, entityIcon, bottomMargin));
-					}
-					
-					if(isPlayer) {
-						// Draw Label			
-						String username = (String) critter.get(EntityKey.username);
-						drawStepList.add(new DrawCenteredLabelStep(posX, posZ, username, -entityIcon.height, labelBg, Color.green));
-					} else if(critter.containsKey(EntityKey.customName)){
-						String customName = (String) critter.get(EntityKey.customName);
-						drawStepList.add(new DrawCenteredLabelStep(posX, posZ, customName, entityIcon.height/2, labelBg, Color.white));
-					}
-				}
-			}
-		} catch(Throwable t) {
-			JourneyMap.getLogger().severe("Error during prepareSteps: " + LogFormatter.toString(t));
-		}
-		
-		return drawStepList;
-	}
-	
+                    // Determine and draw locator
+                    if (isHostile)
+                    {
+                        locatorImg = tc.getHostileLocator();
+                    }
+                    else
+                    {
+                        if (isPet)
+                        {
+                            locatorImg = tc.getPetLocator();
+                        }
+                        else
+                        {
+                            if (isPlayer)
+                            {
+                                locatorImg = tc.getOtherLocator();
+                            }
+                            else
+                            {
+                                locatorImg = tc.getNeutralLocator();
+                            }
+                        }
+                    }
+
+                    drawStepList.add(new DrawEntityStep(posX, posZ, heading, false, locatorImg, (int) (8 * drawScale)));
+
+                    // Draw entity image
+                    if (isPlayer)
+                    {
+                        entityIcon = tc.getPlayerSkin((String) critter.get(EntityKey.username));
+                    }
+                    else
+                    {
+                        entityIcon = tc.getEntityImage(filename);
+                    }
+                    if (entityIcon != null)
+                    {
+                        int bottomMargin = isPlayer ? 0 : (int) (8 * drawScale);
+                        drawStepList.add(new DrawEntityStep(posX, posZ, heading, true, entityIcon, bottomMargin));
+                    }
+
+                    if (isPlayer)
+                    {
+                        // Draw Label
+                        String username = (String) critter.get(EntityKey.username);
+                        drawStepList.add(new DrawCenteredLabelStep(posX, posZ, username, -entityIcon.height, labelBg, Color.green));
+                    }
+                    else
+                    {
+                        if (critter.containsKey(EntityKey.customName))
+                        {
+                            String customName = (String) critter.get(EntityKey.customName);
+                            drawStepList.add(new DrawCenteredLabelStep(posX, posZ, customName, entityIcon.height / 2, labelBg, Color.white));
+                        }
+                    }
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().severe("Error during prepareSteps: " + LogFormatter.toString(t));
+        }
+
+        return drawStepList;
+    }
+
 }

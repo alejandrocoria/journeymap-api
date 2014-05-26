@@ -131,7 +131,7 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
     {
         if(this.waypoint==null) return;
 
-        boolean hover = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + manager.rowHeight;
+        boolean hover = manager.isSelected(this) || (mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + manager.rowHeight);
 
         buttonListLeft.setOptions(true, hover, true);
         buttonListRight.setOptions(true, hover, true);
@@ -164,7 +164,7 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
         }
 
         int yOffset = 1 +(this.manager.rowHeight-mc.fontRenderer.FONT_HEIGHT)/2;
-        mc.fontRenderer.drawStringWithShadow(Integer.toString(getDistance()), x + manager.colLocation, y+yOffset, color.getRGB());
+        mc.fontRenderer.drawStringWithShadow(String.format("%sm", getDistance()), x + manager.colLocation, y + yOffset, color.getRGB());
 
         String name = waypointValid ? waypoint.getName() : "§m" + waypoint.getName();
         mc.fontRenderer.drawStringWithShadow(name, x + manager.colName, y+yOffset, color.getRGB());
@@ -176,6 +176,16 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
         DrawUtil.drawColoredImage(wpTexture, 255, waypoint.getColor(), x, y - (wpTexture.height / 2));
     }
 
+    protected void enableWaypoint(boolean enable)
+    {
+        buttonEnable.setToggled(enable);
+        waypoint.setEnable(enable);
+    }
+
+    protected int getButtonEnableCenterX()
+    {
+        return buttonEnable.getX() + (buttonEnable.getWidth() / 2);
+    }
 
     @Override
     public void clickScrollable(Minecraft mc, int mouseX, int mouseY) {

@@ -10,6 +10,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -23,10 +24,17 @@ public abstract class JmUI extends GuiScreen {
     protected final int headerHeight = 25;
     protected int scaleFactor = 1;
     protected final Logger logger = JourneyMap.getLogger();
+    protected final Class<? extends JmUI> returnClass;
 
     public JmUI(String title) {
+        this(title, null);
+    }
+
+    public JmUI(String title, Class<? extends JmUI> returnClass)
+    {
         super();
         this.title = title;
+        this.returnClass = returnClass;
     }
 
     public Minecraft getMinecraft() {
@@ -102,6 +110,18 @@ public abstract class JmUI extends GuiScreen {
             guibutton.drawButton(this.mc, x, y);
         }
 
+        for (int k = 0; k < this.buttonList.size(); ++k)
+        {
+            GuiButton guibutton = (GuiButton) this.buttonList.get(k);
+            if (guibutton instanceof Button)
+            {
+                if (!((Button) guibutton).enabled && !((Button) guibutton).noDisableText)
+                {
+                    ((Button) guibutton).drawButton(this.mc, x, y);
+                }
+            }
+        }
+
         drawTitle();
         drawLogo();
     }
@@ -119,5 +139,31 @@ public abstract class JmUI extends GuiScreen {
 
     public void close()
     {
+
+    }
+
+    protected void closeAndReturn()
+    {
+        if (returnClass == null)
+        {
+            UIManager.getInstance().closeAll();
+        }
+        else
+        {
+            UIManager.getInstance().open(returnClass);
+        }
+    }
+
+    @Override
+    protected void keyTyped(char c, int i)
+    {
+        switch (i)
+        {
+            case Keyboard.KEY_ESCAPE:
+            {
+                closeAndReturn();
+                break;
+            }
+        }
     }
 }

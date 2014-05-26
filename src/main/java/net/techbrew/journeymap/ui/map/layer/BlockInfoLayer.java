@@ -38,14 +38,14 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     @Override
     public List<DrawStep> onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
     {
-        if(!blockCoord.equals(lastCoord))
+        if (!blockCoord.equals(lastCoord))
         {
             lastCoord = blockCoord;
 
             // Get block under mouse
             Chunk chunk = mc.theWorld.getChunkFromChunkCoords(blockCoord.x >> 4, blockCoord.z >> 4);
             String info;
-            if(!chunk.isEmpty())
+            if (!chunk.isEmpty())
             {
                 int blockY = chunk.getHeightValue(blockCoord.x & 15, blockCoord.z & 15);
                 String biome = mc.theWorld.getBiomeGenForCoords(blockCoord.x, blockCoord.z).biomeName;
@@ -56,15 +56,18 @@ public class BlockInfoLayer implements LayerDelegate.Layer
                 info = Constants.getString("MapOverlay.location_xzy", blockCoord.x, blockCoord.z, "?");
             }
 
-            boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, fullMapProperties.isForceUnicode());
+            boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, fullMapProperties.forceUnicode.get());
             double infoHeight = DrawUtil.getLabelHeight(mc.fontRenderer, true) * getMapFontScale();
-            if(unicodeForced) DrawUtil.stopUnicode(mc.fontRenderer);
+            if (unicodeForced)
+            {
+                DrawUtil.stopUnicode(mc.fontRenderer);
+            }
 
-            blockInfoStep.update(info, gridWidth/2, gridHeight - infoHeight);
+            blockInfoStep.update(info, gridWidth / 2, gridHeight - infoHeight);
         }
         else
         {
-            blockInfoStep.update(blockInfoStep.text, gridWidth/2, blockInfoStep.y);
+            blockInfoStep.update(blockInfoStep.text, gridWidth / 2, blockInfoStep.y);
         }
 
         return drawStepList;
@@ -72,7 +75,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
 
     private double getMapFontScale()
     {
-        return fullMapProperties.getFontScale() * (fullMapProperties.isForceUnicode() ? 2 : 1);
+        return (fullMapProperties.fontSmall.get() ? 1 : 2) * (fullMapProperties.forceUnicode.get() ? 2 : 1);
     }
 
     @Override
@@ -92,7 +95,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         double fontScale = 1;
         boolean fontShadow = false;
         int alpha = 255;
-        int ticks = 20*5;
+        int ticks = 20 * 5;
 
         void update(String text, double x, double y)
         {
@@ -100,17 +103,18 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             this.x = x;
             this.y = y;
             this.alpha = 255;
-            this.ticks = 20*5;
+            this.ticks = 20 * 5;
         }
 
         @Override
         public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale)
         {
-            if(ticks--<0 && alpha>0)
+            if (ticks-- < 0 && alpha > 0)
             {
-                alpha-=5; // Fade
+                alpha -= 5; // Fade
             }
-            if(alpha>0 && text!=null) {
+            if (alpha > 0 && text != null)
+            {
                 DrawUtil.drawLabel(text, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, bgColor, Math.max(0, alpha), fgColor, Math.max(0, alpha), getMapFontScale(), fontShadow);
             }
         }

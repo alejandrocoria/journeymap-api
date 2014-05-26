@@ -10,67 +10,73 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Provides game-related properties in a Map.
- * 
- * @author mwoodman
  *
+ * @author mwoodman
  */
-public class GameData implements IDataProvider {
-	
-	private static long TTL = TimeUnit.HOURS.toMillis(1);
-	
-	public static enum Key {
-		jm_version,
-		latest_journeymap_version,
-		mc_version,
-		mod_name,
-		browser_poll,
-		waypoints_enabled
-	}
+public class GameData implements IDataProvider
+{
 
-	/**
-	 * Constructor.
-	 */
-	public GameData() {
-	}
-	
-	@Override
-	public Enum[] getKeys() {
-		return Key.values();
-	}
-	
-	/**
-	 * Return a map of game data.
-	 */
-	@Override
-	public Map getMap(Map optionalParams) {	
-		
+    private static long TTL = TimeUnit.HOURS.toMillis(1);
 
-		LinkedHashMap props = new LinkedHashMap();		
-		
-		props.put(Key.mod_name, JourneyMap.MOD_NAME);
-		props.put(Key.jm_version,JourneyMap.JM_VERSION);
-		props.put(Key.latest_journeymap_version, VersionCheck.getVersionAvailable()); 
-		props.put(Key.mc_version, Display.getTitle().split("\\s(?=\\d)")[1]); //$NON-NLS-1$ 		
-		props.put(Key.browser_poll, JourneyMap.getInstance().webMapProperties.getBrowserPoll());
+    public static enum Key
+    {
+        jm_version,
+        latest_journeymap_version,
+        mc_version,
+        mod_name,
+        browser_poll,
+        waypoints_enabled
+    }
+
+    /**
+     * Constructor.
+     */
+    public GameData()
+    {
+    }
+
+    @Override
+    public Enum[] getKeys()
+    {
+        return Key.values();
+    }
+
+    /**
+     * Return a map of game data.
+     */
+    @Override
+    public Map getMap(Map optionalParams)
+    {
+
+
+        LinkedHashMap props = new LinkedHashMap();
+
+        props.put(Key.mod_name, JourneyMap.MOD_NAME);
+        props.put(Key.jm_version, JourneyMap.JM_VERSION);
+        props.put(Key.latest_journeymap_version, VersionCheck.getVersionAvailable());
+        props.put(Key.mc_version, Display.getTitle().split("\\s(?=\\d)")[1]); //$NON-NLS-1$
+        props.put(Key.browser_poll, JourneyMap.getInstance().webMapProperties.browserPoll.get());
         props.put(Key.waypoints_enabled, WaypointsData.isAnyEnabled());
 
-		return props;	
-	}
+        return props;
+    }
 
-	/**
-	 * Return length of time in millis data should be kept.
-	 */
-	@Override
-	public long getTTL() {
-		return TTL;
-	}
-	
-	/**
-	 * Return false by default. Let cache expired based on TTL.
-	 */
-	@Override
-	public boolean dataExpired() {
-		return false;
-	}
+    /**
+     * Return length of time in millis data should be kept.
+     */
+    @Override
+    public long getTTL()
+    {
+        return TTL;
+    }
+
+    /**
+     * Return false by default. Let cache expired based on TTL.
+     */
+    @Override
+    public boolean dataExpired()
+    {
+        return false;
+    }
 
 }

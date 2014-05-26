@@ -80,7 +80,10 @@ public class MiniMap
     {
         // Check player status
         player = mc.thePlayer;
-        if (player == null) return;
+        if (player == null)
+        {
+            return;
+        }
 
         final boolean doStateRefresh = state.shouldRefresh(mc);
         drawTimer.start();
@@ -96,7 +99,7 @@ public class MiniMap
             // Update the grid
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
             gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
-            gridRenderer.updateTextures(state.getMapType(miniMapProperties.isShowCaves()), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0, miniMapProperties);
+            gridRenderer.updateTextures(state.getMapType(miniMapProperties.showCaves.get()), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0, miniMapProperties);
             if (doStateRefresh)
             {
                 //boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, state.mapForceUnicode);
@@ -109,7 +112,7 @@ public class MiniMap
             updateDisplayVars(false);
 
             // Update labels if needed
-            if(System.currentTimeMillis() - lastLabelRefresh > labelRefreshRate)
+            if (System.currentTimeMillis() - lastLabelRefresh > labelRefreshRate)
             {
                 updateLabels();
             }
@@ -145,7 +148,8 @@ public class MiniMap
                     glStencilMask(0x00);
                     //glStencilFunc(GL_EQUAL, 0, 0xFF);
                     glStencilFunc(GL_EQUAL, 1, 0xFF);
-                } catch (Throwable t)
+                }
+                catch (Throwable t)
                 {
                     logger.severe("Stencil buffer failing with circle mask:" + LogFormatter.toString(t));
                     return;
@@ -156,16 +160,19 @@ public class MiniMap
             GL11.glTranslated(dv.translateX, dv.translateY, 0);
 
             // Scissor area that shouldn't be drawn
-            GL11.glScissor((int)dv.scissorX + 1, (int)dv.scissorY + 1, (int)dv.minimapSize - 2, (int)dv.minimapSize - 2);
+            GL11.glScissor((int) dv.scissorX + 1, (int) dv.scissorY + 1, (int) dv.minimapSize - 2, (int) dv.minimapSize - 2);
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
 
             // Draw grid
             gridRenderer.draw(1f, 0, 0);
 
             // Draw entities, etc
-            boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, miniMapProperties.isForceUnicode());
+            boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, miniMapProperties.forceUnicode.get());
             gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, getMapFontScale());
-            if(unicodeForced) DrawUtil.stopUnicode(mc.fontRenderer);
+            if (unicodeForced)
+            {
+                DrawUtil.stopUnicode(mc.fontRenderer);
+            }
 
             // Draw player
             Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
@@ -178,17 +185,17 @@ public class MiniMap
             GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
 
             // Draw labels if scissored
-            if(dv.labelFps.scissor && dv.showFps)
+            if (dv.labelFps.scissor && dv.showFps)
             {
                 dv.labelFps.draw(fpsLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
             }
 
-            if(dv.labelLocation.scissor)
+            if (dv.labelLocation.scissor)
             {
                 dv.labelLocation.draw(locationLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
             }
 
-            if(dv.labelBiome.scissor)
+            if (dv.labelBiome.scissor)
             {
                 dv.labelBiome.draw(biomeLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
             }
@@ -203,17 +210,17 @@ public class MiniMap
             GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
             // Draw labels if not scissored
-            if(!dv.labelFps.scissor && dv.showFps)
+            if (!dv.labelFps.scissor && dv.showFps)
             {
                 dv.labelFps.draw(fpsLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
             }
 
-            if(!dv.labelLocation.scissor)
+            if (!dv.labelLocation.scissor)
             {
                 dv.labelLocation.draw(locationLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
             }
 
-            if(!dv.labelBiome.scissor)
+            if (!dv.labelBiome.scissor)
             {
                 dv.labelBiome.draw(biomeLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
             }
@@ -230,10 +237,12 @@ public class MiniMap
             // Return resolution to how it is normally scaled
             JmUI.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
 
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             logger.severe("Minimap error:" + LogFormatter.toString(t));
-        } finally
+        }
+        finally
         {
             drawTimer.stop();
         }
@@ -258,22 +267,13 @@ public class MiniMap
 
     public boolean isEnabled()
     {
-        return JourneyMap.getInstance().miniMapProperties.isEnabled()
-                    && !WaypointsData.isReiMinimapEnabled() && !WaypointsData.isVoxelMapEnabled();
+        return JourneyMap.getInstance().miniMapProperties.enabled.get()
+                && !WaypointsData.isReiMinimapEnabled() && !WaypointsData.isVoxelMapEnabled();
     }
 
     public double getMapFontScale()
     {
-        return miniMapProperties.getFontScale() * (miniMapProperties.isForceUnicode() ? 2 : 1);
-    }
-
-    public void setForceUnicode(boolean forceUnicode)
-    {
-        if(this.dv!=null)
-        {
-            this.dv.forceUnicode = forceUnicode;
-            JourneyMap.getInstance().miniMapProperties.setForceUnicode(forceUnicode);
-        }
+        return (miniMapProperties.fontSmall.get() ? 1 : 2) * (miniMapProperties.forceUnicode.get() ? 2 : 1);
     }
 
     public void nextPosition()
@@ -293,7 +293,8 @@ public class MiniMap
 
     public void setPosition(DisplayVars.Position position)
     {
-        JourneyMap.getInstance().miniMapProperties.setPosition(position.name());
+        miniMapProperties.position.set(position);
+        miniMapProperties.save();
         if (dv != null)
         {
             updateDisplayVars(dv.shape, position, false);
@@ -329,13 +330,18 @@ public class MiniMap
                 && mc.displayWidth == dv.displayWidth
                 && this.dv.shape == shape
                 && this.dv.position == position
-                && this.dv.fontScale == miniMapProperties.getFontScale())
+                && this.dv.forceUnicode == miniMapProperties.forceUnicode.get()
+                && this.dv.fontScale == (miniMapProperties.fontSmall.get() ? 1 : 2))
         {
             return;
         }
 
+        miniMapProperties.shape.set(shape);
+        miniMapProperties.position.set(position);
+        miniMapProperties.save();
+
         DisplayVars oldDv = this.dv;
-        this.dv = new DisplayVars(mc, shape, position, miniMapProperties.getFontScale());
+        this.dv = new DisplayVars(mc, shape, position, miniMapProperties.fontSmall.get() ? 1 : 2);
 
         if (oldDv == null || oldDv.shape != this.dv.shape)
         {
@@ -375,11 +381,11 @@ public class MiniMap
         final int playerZ = (int) player.posZ;
         final int playerY = (int) player.posY;
 
-        for(String format : locationFormats)
+        for (String format : locationFormats)
         {
             playerInfo = Constants.getString(format, playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
             double infoWidth = mc.fontRenderer.getStringWidth(playerInfo) * dv.fontScale;
-            if (infoWidth <= dv.minimapSize - (dv.viewPortPadX*2))
+            if (infoWidth <= dv.minimapSize - (dv.viewPortPadX * 2))
             {
                 break;
             }

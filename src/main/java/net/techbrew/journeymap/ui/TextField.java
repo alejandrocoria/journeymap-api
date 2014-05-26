@@ -9,7 +9,8 @@ import java.awt.*;
 /**
  * Created by mwoodman on 3/1/14.
  */
-public class TextField extends GuiTextField {
+public class TextField extends GuiTextField
+{
 
     // ReflectionHelper field indices
     protected static final int INDEX_X = 1;
@@ -24,21 +25,27 @@ public class TextField extends GuiTextField {
     protected Integer clampMin;
     protected Integer clampMax;
 
-    public TextField(Object text, FontRenderer fontRenderer, int width, int height) {
+    public TextField(Object text, FontRenderer fontRenderer, int width, int height)
+    {
         this(text, fontRenderer, width, height, false, false);
     }
 
-    public TextField(Object text, FontRenderer fontRenderer, int width, int height, boolean isNumeric, boolean negative) {
+    public TextField(Object text, FontRenderer fontRenderer, int width, int height, boolean isNumeric, boolean negative)
+    {
         super(fontRenderer, 0, 0, width, height);
         setText(text.toString());
         numeric = isNumeric;
         allowNegative = negative;
 
         String regex = null;
-        if(numeric) {
-            if(allowNegative) {
+        if (numeric)
+        {
+            if (allowNegative)
+            {
                 regex = "[^-?\\d]";
-            } else {
+            }
+            else
+            {
                 regex = "[^\\d]";
             }
         }
@@ -46,38 +53,46 @@ public class TextField extends GuiTextField {
         numericRegex = regex;
     }
 
-    public void setClamp(Integer min, Integer max) {
+    public void setClamp(Integer min, Integer max)
+    {
         this.clampMin = min;
         this.clampMax = max;
     }
 
-    public void setMinLength(int minLength) {
+    public void setMinLength(int minLength)
+    {
         this.minLength = minLength;
     }
 
     @Override
-    public void writeText(String par1Str) {
+    public void writeText(String par1Str)
+    {
         super.writeText(par1Str);
-        if(numeric) {
+        if (numeric)
+        {
             String fixed = getText().replaceAll(numericRegex, "");
-            if(allowNegative) {
+            if (allowNegative)
+            {
                 // TODO: figure out how to make regex disallow "-" after first char
                 String start = fixed.startsWith("-") ? "-" : "";
-                fixed = start + fixed.replaceAll("-","");
+                fixed = start + fixed.replaceAll("-", "");
             }
             super.setText(fixed);
         }
     }
 
-    public void setText(Object object) {
+    public void setText(Object object)
+    {
         super.setText(object.toString());
     }
 
-    public boolean isNumeric() {
+    public boolean isNumeric()
+    {
         return numeric;
     }
 
-    public boolean hasMinLength() {
+    public boolean hasMinLength()
+    {
         String text = getText();
         int textLen = text == null ? 0 : text.length();
         return minLength <= textLen;
@@ -86,7 +101,8 @@ public class TextField extends GuiTextField {
     public boolean textboxKeyTyped(char par1, int par2)
     {
         boolean res = super.textboxKeyTyped(par1, par2);
-        if (numeric && this.isFocused()) {
+        if (numeric && this.isFocused())
+        {
             clamp();
         }
         return res;
@@ -100,19 +116,19 @@ public class TextField extends GuiTextField {
         super.drawTextBox();
         if (this.getVisible())
         {
-            if(!hasMinLength())
+            if (!hasMinLength())
             {
                 int red = Color.red.getRGB();
-                int x1 = getX()-1;
-                int y1 = getY()-1;
-                int x2 = x1 + getWidth()+1;
-                int y2 = y1 + getHeight()+1;
+                int x1 = getX() - 1;
+                int y1 = getY() - 1;
+                int x2 = x1 + getWidth() + 1;
+                int y2 = y1 + getHeight() + 1;
 
-                drawRect(x1, y1, x2, y1+1, red);
-                drawRect(x1, y2, x2, y2+1, red);
+                drawRect(x1, y1, x2, y1 + 1, red);
+                drawRect(x1, y2, x2, y2 + 1, red);
 
-                drawRect(x1, y1, x1+1, y2, red);
-                drawRect(x2, y1, x2+1, y2, red);
+                drawRect(x1, y1, x1 + 1, y2, red);
+                drawRect(x2, y1, x2 + 1, y2, red);
             }
         }
 
@@ -121,28 +137,49 @@ public class TextField extends GuiTextField {
     /**
      * If numeric field, clamp values in range.
      */
-    public void clamp() {
-        if(!numeric) return;
+    public Integer clamp()
+    {
+        if (!numeric)
+        {
+            return null;
+        }
 
         String text = getText();
-        if(clampMin!=null) {
+        if (clampMin != null)
+        {
 
-            if(text==null || text.length()==0 || text.equals("-")) {
-                return;
+            if (text == null || text.length() == 0 || text.equals("-"))
+            {
+                return null;
             }
 
-            try {
-                setText(Math.max(clampMin,Integer.parseInt(text)));
-            } catch(Exception e) {
+            try
+            {
+                setText(Math.max(clampMin, Integer.parseInt(text)));
+            }
+            catch (Exception e)
+            {
                 setText(clampMin);
             }
-            if(clampMax!=null) {
-                try {
-                    setText(Math.min(clampMax,Integer.parseInt(text)));
-                } catch(Exception e) {
+            if (clampMax != null)
+            {
+                try
+                {
+                    setText(Math.min(clampMax, Integer.parseInt(text)));
+                }
+                catch (Exception e)
+                {
                     setText(clampMax);
                 }
             }
+        }
+        try
+        {
+            return Integer.parseInt(text);
+        }
+        catch (Exception e)
+        {
+            return null;
         }
     }
 
@@ -166,15 +203,18 @@ public class TextField extends GuiTextField {
         ReflectionHelper.setPrivateValue(GuiTextField.class, this, y, INDEX_Y);
     }
 
-    public int getWidth() {
+    public int getWidth()
+    {
         return ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_WIDTH);
     }
 
-    public void setWidth(int w) {
+    public void setWidth(int w)
+    {
         ReflectionHelper.setPrivateValue(GuiTextField.class, this, w, INDEX_WIDTH);
     }
 
-    public int getHeight() {
+    public int getHeight()
+    {
         return ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_HEIGHT);
     }
 

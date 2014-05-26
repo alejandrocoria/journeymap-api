@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -13,7 +14,7 @@ import java.util.Arrays;
 
 /**
  * Display variables for the Minimap.
- *
+ * <p/>
  * Encapsulates all the layout and display specifics for rendering the Minimap
  * given a Shape, Position, screen size, and user preferences.  All of the values
  * only need to be calculated once after a change of shape/position/screen size,
@@ -21,6 +22,7 @@ import java.util.Arrays;
  */
 public class DisplayVars
 {
+    static final MiniMapProperties miniMapProperties = JourneyMap.getInstance().miniMapProperties;
 
     /**
      * Position of minimap on screen
@@ -36,11 +38,21 @@ public class DisplayVars
 
         public static Position getPreferred()
         {
-            String positionName = JourneyMap.getInstance().miniMapProperties.getPosition();
-            DisplayVars.Position position = DisplayVars.Position.safeValueOf(positionName);
-            if(!position.name().equals(positionName))
+            DisplayVars.Position position = null;
+            try
             {
-                JourneyMap.getInstance().miniMapProperties.setPosition(position.name());
+                position = miniMapProperties.position.get();
+            }
+            catch (IllegalArgumentException e)
+            {
+                JourneyMap.getLogger().warning("Not a valid minimap position in : " + miniMapProperties.getFile());
+            }
+
+            if (position == null)
+            {
+                position = Position.TopRight;
+                miniMapProperties.position.set(position);
+                miniMapProperties.save();
             }
             return position;
         }
@@ -57,7 +69,7 @@ public class DisplayVars
                 JourneyMap.getLogger().warning("Not a valid minimap position: " + name);
             }
 
-            if(value==null)
+            if (value == null)
             {
                 value = Position.TopRight;
             }
@@ -89,11 +101,21 @@ public class DisplayVars
 
         public static Shape getPreferred()
         {
-            String shapeName = JourneyMap.getInstance().miniMapProperties.getShape();
-            DisplayVars.Shape shape = DisplayVars.Shape.safeValueOf(shapeName);
-            if(!shape.name().equals(shapeName))
+            DisplayVars.Shape shape = null;
+            try
             {
-                JourneyMap.getInstance().miniMapProperties.setShape(shape.name());
+                shape = miniMapProperties.shape.get();
+            }
+            catch (IllegalArgumentException e)
+            {
+                JourneyMap.getLogger().warning("Not a valid minimap shape in : " + miniMapProperties.getFile());
+            }
+
+            if (shape == null)
+            {
+                shape = Shape.MediumSquare;
+                miniMapProperties.shape.set(shape);
+                miniMapProperties.save();
             }
             return shape;
         }
@@ -110,7 +132,7 @@ public class DisplayVars
                 JourneyMap.getLogger().warning("Not a valid minimap shape: " + name);
             }
 
-            if(value==null || !value.isEnabled())
+            if (value == null || !value.isEnabled())
             {
                 value = Shape.MediumSquare;
             }
@@ -119,7 +141,7 @@ public class DisplayVars
 
         public boolean isEnabled()
         {
-            return Arrays.binarySearch(DisplayVars.Shape.Enabled, this)>=0;
+            return Arrays.binarySearch(DisplayVars.Shape.Enabled, this) >= 0;
         }
 
         public static Shape[] Enabled = {SmallSquare, MediumSquare, LargeSquare};
@@ -192,17 +214,18 @@ public class DisplayVars
 
     /**
      * Constructor.
-     * @param mc    Minecraft
-     * @param shape Desired shape
-     * @param position  Desired position
-     * @param labelFontScale    Font scale for labels
+     *
+     * @param mc             Minecraft
+     * @param shape          Desired shape
+     * @param position       Desired position
+     * @param labelFontScale Font scale for labels
      */
     DisplayVars(Minecraft mc, Shape shape, Position position, double labelFontScale)
     {
         // Immutable member and local vars
         this.scaledResolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
-        this.forceUnicode = JourneyMap.getInstance().miniMapProperties.isForceUnicode();
-        this.showFps = JourneyMap.getInstance().miniMapProperties.isShowFps();
+        this.forceUnicode = JourneyMap.getInstance().miniMapProperties.forceUnicode.get();
+        this.showFps = JourneyMap.getInstance().miniMapProperties.showFps.get();
         this.shape = shape;
         this.position = position;
         this.displayWidth = mc.displayWidth;
@@ -242,7 +265,8 @@ public class DisplayVars
                 if (fontScale == 1)
                 {
                     bottomTextureYMargin = 10;
-                } else
+                }
+                else
                 {
                     bottomTextureYMargin = 20;
                 }
@@ -261,7 +285,8 @@ public class DisplayVars
                 if (fontScale == 1)
                 {
                     bottomTextureYMargin = 14;
-                } else
+                }
+                else
                 {
                     bottomTextureYMargin = 24;
                 }

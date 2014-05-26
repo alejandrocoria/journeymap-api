@@ -32,11 +32,14 @@ public class ScrollPane extends GuiSlot
     private Minecraft mc;
     private int _mouseX;
     private int _mouseY;
-    private int selected = -1;
+    protected Scrollable selected = null;
     private boolean showFrame = true;
     public int paneWidth = 0;
     public int paneHeight = 0;
     public Point.Double origin = new Point2D.Double();
+
+    private int firstVisibleIndex;
+    private int lastVisibleIndex;
 
     public interface Scrollable
     {
@@ -93,14 +96,23 @@ public class ScrollPane extends GuiSlot
     @Override
     protected void elementClicked(int i, boolean flag, int p1, int p2)
     {
-//        items.get(i).clickScrollable(mc, mouseX, mouseY);
-//        System.out.println(String.format("Width: %s, click: %s,%s", this.getWidth(), mouseX, mouseY));
+        selected = items.get(i);
     }
 
     @Override
     protected boolean isSelected(int i)
     {
-        return false;
+        return items.get(i) == selected;
+    }
+
+    public boolean isSelected(Scrollable item)
+    {
+        return item == selected;
+    }
+
+    public void select(Scrollable item)
+    {
+        selected = item;
     }
 
     @Override
@@ -149,13 +161,16 @@ public class ScrollPane extends GuiSlot
         _mouseX = mX;
         _mouseY = mY;
 
-        if (selected != -1 && !Mouse.isButtonDown(0) && Mouse.getDWheel() == 0)
+        if (selected != null && !Mouse.isButtonDown(0) && Mouse.getDWheel() == 0)
         {
             if (Mouse.next() && Mouse.getEventButtonState())
             {
                 // TODO draw selected?
             }
         }
+
+        firstVisibleIndex = -1;
+        lastVisibleIndex = -1;
 
         super.drawScreen(mX + getX(), mY + getY(), f);
         GL11.glPopMatrix();
@@ -164,6 +179,12 @@ public class ScrollPane extends GuiSlot
     @Override
     protected void drawSlot(int index, int xPosition, int yPosition, int l, Tessellator tessellator, int var6, int var7)
     {
+        if (firstVisibleIndex == -1)
+        {
+            firstVisibleIndex = index;
+        }
+        lastVisibleIndex = Math.max(lastVisibleIndex, index);
+
         GL11.glPushMatrix();
         GL11.glTranslated(-getX(), -getY(), 0);
 
@@ -174,6 +195,8 @@ public class ScrollPane extends GuiSlot
         Scrollable item = items.get(index);
         item.setPosition(itemX, itemY);
         item.setWidth(this.paneWidth - margin);
+
+        //System.out.println(String.format("Item %s = %s", index, itemY));
 
         if(inFullView(item))
         {
@@ -206,9 +229,9 @@ public class ScrollPane extends GuiSlot
         GL11.glPopMatrix();
     }
 
-    protected boolean inFullView(Scrollable item)
+    public boolean inFullView(Scrollable item)
     {
-        return item.getY() >= this.getY() && item.getY() + item.getHeight() <= this.getY() + this.paneHeight;
+        return (item.getY() >= this.getY()) && item.getY() + item.getHeight() <= this.getY() + this.paneHeight;
     }
 
     @Override
@@ -257,5 +280,15 @@ public class ScrollPane extends GuiSlot
             DrawUtil.drawRectangle(-1, -1, 1, paneHeight + 1, frameColor, alpha);
             DrawUtil.drawRectangle(width + 1, -1, 1, paneHeight + 2, frameColor, alpha);
         }
+    }
+
+    public int getFirstVisibleIndex()
+    {
+        return firstVisibleIndex;
+    }
+
+    public int getLastVisibleIndex()
+    {
+        return lastVisibleIndex;
     }
 }

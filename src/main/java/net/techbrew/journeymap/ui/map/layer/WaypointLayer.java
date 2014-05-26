@@ -42,12 +42,12 @@ public class WaypointLayer implements LayerDelegate.Layer
     {
         drawStepList.clear();
 
-        if(!WaypointsData.isNativeEnabled())
+        if (!WaypointsData.isNativeEnabled())
         {
             return drawStepList;
         }
 
-        if(lastCoord==null)
+        if (lastCoord == null)
         {
             lastCoord = blockCoord;
         }
@@ -57,9 +57,9 @@ public class WaypointLayer implements LayerDelegate.Layer
         // Get search area
         int proximity = getProximity();
         AxisAlignedBB area = AxisAlignedBB.getBoundingBox(blockCoord.x - proximity, -1, blockCoord.z - proximity,
-                blockCoord.x + proximity, mc.theWorld.getActualHeight()+1, blockCoord.z + proximity);
+                blockCoord.x + proximity, mc.theWorld.getActualHeight() + 1, blockCoord.z + proximity);
 
-        if(!lastCoord.equals(blockCoord))
+        if (!lastCoord.equals(blockCoord))
         {
             if (!area.isVecInside(Vec3.createVectorHelper(lastCoord.x, 1, lastCoord.z)))
             {
@@ -69,13 +69,16 @@ public class WaypointLayer implements LayerDelegate.Layer
                 return Collections.EMPTY_LIST;
             }
         }
-        else if(selected!=null)
+        else
         {
-            select(selected);
-            return drawStepList;
+            if (selected != null)
+            {
+                select(selected);
+                return drawStepList;
+            }
         }
 
-        if(now-startHover<hoverDelay)
+        if (now - startHover < hoverDelay)
         {
             return Collections.EMPTY_LIST;
         }
@@ -85,20 +88,20 @@ public class WaypointLayer implements LayerDelegate.Layer
         // check for existing
         Collection<Waypoint> waypoints = WaypointsData.getCachedWaypoints();
         ArrayList<Waypoint> proximal = new ArrayList<Waypoint>();
-        for(Waypoint waypoint : waypoints)
+        for (Waypoint waypoint : waypoints)
         {
-            if(!waypoint.isReadOnly() && waypoint.isEnable() && waypoint.isInPlayerDimension())
+            if (!waypoint.isReadOnly() && waypoint.isEnable() && waypoint.isInPlayerDimension())
             {
-                if(area.isVecInside(Vec3.createVectorHelper(waypoint.getX(dimension), waypoint.getY(dimension), waypoint.getZ(dimension))))
+                if (area.isVecInside(Vec3.createVectorHelper(waypoint.getX(dimension), waypoint.getY(dimension), waypoint.getZ(dimension))))
                 {
                     proximal.add(waypoint);
                 }
             }
         }
 
-        if(!proximal.isEmpty())
+        if (!proximal.isEmpty())
         {
-            if(proximal.size()>1)
+            if (proximal.size() > 1)
             {
                 sortByDistance(proximal, blockCoord, dimension);
             }
@@ -111,7 +114,7 @@ public class WaypointLayer implements LayerDelegate.Layer
     @Override
     public List<DrawStep> onMouseClick(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
     {
-        if(!WaypointsData.isNativeEnabled())
+        if (!WaypointsData.isNativeEnabled())
         {
             return drawStepList;
         }
@@ -120,7 +123,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         long sysTime = Minecraft.getSystemTime();
         boolean doubleClick = sysTime - this.lastClicked < 450L;
         this.lastClicked = sysTime;
-        if(!doubleClick)
+        if (!doubleClick)
         {
             return drawStepList;
         }
@@ -128,14 +131,14 @@ public class WaypointLayer implements LayerDelegate.Layer
         // Edit selected waypoint
         if (selected != null)
         {
-            UIManager.getInstance().openWaypointEditor(selected, false, MapOverlay.class);
+            UIManager.getInstance().openWaypointManager(selected);
             return Collections.EMPTY_LIST;
         }
 
         // Check chunk
         Chunk chunk = mc.theWorld.getChunkFromChunkCoords(blockCoord.x >> 4, blockCoord.z >> 4);
         int y = -1;
-        if(!chunk.isEmpty())
+        if (!chunk.isEmpty())
         {
             y = Math.max(1, chunk.getHeightValue(blockCoord.x & 15, blockCoord.z & 15));
         }
@@ -177,6 +180,6 @@ public class WaypointLayer implements LayerDelegate.Layer
     private int getProximity()
     {
         int blockSize = (int) Math.max(1, Math.pow(2, MapOverlay.state().currentZoom));
-        return Math.max(1, 8/blockSize);
+        return Math.max(1, 8 / blockSize);
     }
 }

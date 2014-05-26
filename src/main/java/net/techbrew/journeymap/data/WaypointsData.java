@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
+import net.techbrew.journeymap.properties.WaypointProperties;
 import net.techbrew.journeymap.waypoint.ReiReader;
 import net.techbrew.journeymap.waypoint.VoxelReader;
 import net.techbrew.journeymap.waypoint.WaypointStore;
@@ -20,6 +21,8 @@ public class WaypointsData implements IDataProvider
 {
     private static long TTL = TimeUnit.SECONDS.toMillis(5);
 
+    private static WaypointProperties waypointProperties = JourneyMap.getInstance().waypointProperties;
+
     /**
      * Reset state so classes can be checked again. Useful
      * after post-init of all mods.
@@ -32,6 +35,7 @@ public class WaypointsData implements IDataProvider
 
     /**
      * Whether any waypoint management is enabled.
+     *
      * @return
      */
     public static boolean isAnyEnabled()
@@ -41,6 +45,7 @@ public class WaypointsData implements IDataProvider
 
     /**
      * Whether any other mod's waypoint management is enabled.
+     *
      * @return
      */
     public static boolean isOtherModEnabled()
@@ -51,11 +56,12 @@ public class WaypointsData implements IDataProvider
 
     /**
      * Whether native waypoint management is enabled.
+     *
      * @return
      */
     public static boolean isNativeEnabled()
     {
-        return JourneyMap.getInstance().configProperties.isWaypointManagementEnabled();
+        return waypointProperties.enabled.get();
     }
 
     /**
@@ -133,13 +139,16 @@ public class WaypointsData implements IDataProvider
         {
             return ((HashMap<String, Waypoint>) DataCache.instance().get(WaypointsData.class).get(EntityKey.root)).values();
         }
-        else if(isNativeEnabled()) // No caching needed
-        {
-            return WaypointStore.instance().getAll();
-        }
         else
         {
-            return Collections.EMPTY_LIST;
+            if (isNativeEnabled()) // No caching needed
+            {
+                return WaypointStore.instance().getAll();
+            }
+            else
+            {
+                return Collections.EMPTY_LIST;
+            }
         }
     }
 

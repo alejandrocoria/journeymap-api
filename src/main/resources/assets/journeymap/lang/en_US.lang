@@ -71,6 +71,7 @@ JourneyMap.char_downarrow=>
 
 # %1$s = JourneyMap version
 MapOverlay.options=Options
+MapOverlay.options_button=Options...
 MapOverlay.close=Close
 
 # Added in 3.1.0:
@@ -106,25 +107,25 @@ MapOverlay.save_filename=Saving map to screenshots: %1$s
 MapOverlay.show_caves=Show Caves: %1$s
 
 # %1$s = "On" or "Off"
-MapOverlay.show_monsters=Show Monsters : %1$s
+MapOverlay.show_monsters=Show Monsters: %1$s
 
 # %1$s = "On" or "Off"
-MapOverlay.show_animals=Show Animals : %1$s
+MapOverlay.show_animals=Show Animals: %1$s
 
 # %1$s = "On" or "Off"
-MapOverlay.show_villagers=Show Villagers : %1$s
+MapOverlay.show_villagers=Show Villagers: %1$s
 
 # %1$s = "On" or "Off"
-MapOverlay.show_pets=Show Pets : %1$s
+MapOverlay.show_pets=Show Pets: %1$s
 
 # %1$s = "On" or "Off"
-MapOverlay.show_players=Show Players : %1$s
+MapOverlay.show_players=Show Players: %1$s
 
 # %1$s = "On" or "Off"
-MapOverlay.show_waypoints=Show Waypoints : %1$s
+MapOverlay.show_waypoints=Show Waypoints: %1$s
 
 # %1$s = "On" or "Off"
-MapOverlay.show_grid=Show Grid : %1$s
+MapOverlay.show_grid=Show Grid: %1$s
 
 # Added in 3.1.x.
 MapOverlay.minimap=MiniMap...
@@ -170,10 +171,14 @@ MapOverlay.update_check=Check for Update
 MapOverlay.use_browser=Use Browser
 MapOverlay.zoom_in=Zoom In
 MapOverlay.zoom_out=Zoom Out
+MapOverlay.title=Full Map
+MapOverlay.general_display=General Display
+MapOverlay.general_display_title=General Display Options
 
 # Added in 4.0.0:
 Waypoint.waypoints=Waypoints
 Waypoint.manage_title=Manage Waypoints
+Waypoint.management=Waypoint Management
 Waypoint.new=New...
 Waypoint.new_title=New Waypoint
 Waypoint.edit_title=Edit Waypoint
@@ -192,6 +197,8 @@ Waypoint.g=G
 Waypoint.b=B
 Waypoint.randomize=Random Color
 Waypoint.enable=Enabled: %1$s
+# %1$s = number of waypoints, %2$s = "On" or "Off"
+Waypoint.enable_all=All %1$s: %2$s
 Waypoint.cancel=Cancel
 Waypoint.remove=Remove
 Waypoint.reset=Reset
@@ -210,6 +217,19 @@ Waypoint.import_vox_file_error=Could not import VoxelMap waypoint file: %1$s
 Waypoint.import_vox_success=Imported %1$s waypoints from VoxelMap.
 Waypoint.import_vox_failure=No VoxelMap waypoints were imported. See journeyMap.log for details.
 Waypoint.import_vox_errors=Imported %1$s waypoints from VoxelMap with %1$s errors. See journeyMap.log for details.
+
+Waypoint.options=Waypoint Options
+Waypoint.show_texture=Show Icon: %1$s
+Waypoint.texture_size=Icon Size: %1$s
+Waypoint.show_static_beam=Stationary Beam: %1$s
+Waypoint.show_rotating_beam=Rotating Beam: %1$s
+Waypoint.show_name=Show Name: %1$s
+Waypoint.show_distance=Show Distance: %1$s
+Waypoint.auto_hide_label=Auto-Hide Label: %1$s
+Waypoint.bold_label=Bold Label: %1$s
+Waypoint.force_unicode=Force Unicode: %1$s
+Waypoint.font_size=Font: %1$s
+Waypoint.max_distance=Maximum Distance:
 
 # %1$s = distance in meters. Okay to change parentheses and trailing 'm' (abbreviation for 'meters') Ex: [%1$sM]
 Waypoint.distance_meters=(%1$sm)
@@ -257,6 +277,7 @@ MiniMap.shape_largecircle=Large Circle
 MiniMap.font=Font: %1$s
 MiniMap.font_small=Small
 MiniMap.font_large=Large
+MiniMap.title=Mini Map
 
 # Added in 3.3.x. %1$s = one of "On", "Off". Hot Keys are keyboard shortcuts that can control the minimap.
 MiniMap.hotkeys=Hot Keys: %1$s
@@ -266,6 +287,7 @@ MiniMap.hotkeys_position=Change Minimap Position
 
 # Added in 4.0.0. %1$s = one of "On", "Off".
 MiniMap.force_unicode=Force Unicode: %1$s
+MiniMap.hotkeys_button=MiniMap Hot Keys: %1$s
 
 # Added in 3.3.x.  Used in Minecraft Controls menu and JourneyMap/Options/Minimap.../HotKeys... dialog.
 # {0} is either "Ctrl+" or "^" depending on Windows or MacOS
@@ -285,7 +307,7 @@ MapOverlay.hotkeys_waypoint=Create/Edit Waypoint
 MapOverlay.hotkeys_doubleclick=(Double-click)
 
 # Added in 4.0.0 %1$s = one of "On", "Off".
-MapOverlay.waypoint_manager=Create/Manage Waypoints: %1$s
+MapOverlay.waypoint_manager=Waypoint Manager: %1$s
 
 # Added in 4.0.0
 MapOverlay.help=Help...
@@ -318,6 +340,8 @@ Feature.fair_play=FairPlay
 ########################
 # Web UI messages
 ########################
+
+WebMap.title=Web Map
 
 # Unused, but keep for future use
 WebMap.text_direction=ltr

@@ -1,5 +1,8 @@
 package net.techbrew.journeymap.properties;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Properties for the full map in-game.
  */
@@ -7,10 +10,10 @@ public class FullMapProperties extends MapProperties
 {
     protected transient static final int CURRENT_REVISION = 1;
     protected final String name = "fullmap";
-    protected int revision = CURRENT_REVISION;
+    protected AtomicInteger revision = new AtomicInteger(CURRENT_REVISION);
 
-    protected boolean forceUnicode = false; // PREF_FORCEUNICODE(Boolean.class,"preference_forceunicode", false), //$NON-NLS-1$
-    protected double fontScale = 1; // PREF_FONTSCALE(Double.class,"preference_fontscale", 1.0), //$NON-NLS-1$
+    public AtomicBoolean forceUnicode = new AtomicBoolean(false);
+    public final AtomicBoolean fontSmall = new AtomicBoolean(true);
 
     @Override
     protected String getName()
@@ -27,35 +30,7 @@ public class FullMapProperties extends MapProperties
     @Override
     public int getRevision()
     {
-        return revision;
-    }
-
-    public boolean isForceUnicode()
-    {
-        return forceUnicode;
-    }
-
-    public void setForceUnicode(boolean forceUnicode)
-    {
-        this.forceUnicode = forceUnicode;
-        save();
-    }
-
-    public boolean toggleForceUnicode()
-    {
-        setForceUnicode(!forceUnicode);
-        return forceUnicode;
-    }
-
-    public double getFontScale()
-    {
-        return fontScale;
-    }
-
-    public void setFontScale(double fontScale)
-    {
-        this.fontScale = fontScale;
-        save();
+        return revision.get();
     }
 
     @Override
@@ -82,12 +57,10 @@ public class FullMapProperties extends MapProperties
     public int hashCode()
     {
         int result = super.hashCode();
-        long temp;
         result = 31 * result + name.hashCode();
-        result = 31 * result + revision;
-        result = 31 * result + (forceUnicode ? 1 : 0);
-        temp = Double.doubleToLongBits(fontScale);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + revision.hashCode();
+        result = 31 * result + forceUnicode.hashCode();
+        result = 31 * result + fontSmall.hashCode();
         return result;
     }
 }
