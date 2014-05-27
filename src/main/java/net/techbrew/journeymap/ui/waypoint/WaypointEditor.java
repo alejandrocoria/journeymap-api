@@ -176,18 +176,18 @@ public class WaypointEditor extends JmUI
                 String enableOn = Constants.getString("Waypoint.enable", on);
                 String enableOff = Constants.getString("Waypoint.enable", off);
 
-                buttonRandomize = new Button(ButtonEnum.Randomize.ordinal(), 0, 0, Constants.getString("Waypoint.randomize")); //$NON-NLS-1$
+                buttonRandomize = new Button(ButtonEnum.Randomize, Constants.getString("Waypoint.randomize")); //$NON-NLS-1$
 
-                buttonEnable = new Button(ButtonEnum.Enable.ordinal(), 0, 0, enableOn, enableOff, true); //$NON-NLS-1$
+                buttonEnable = new Button(ButtonEnum.Enable, enableOn, enableOff, true); //$NON-NLS-1$
                 buttonEnable.setToggled(originalWaypoint.isEnable());
 
                 buttonRemove = new Button(ButtonEnum.Remove, Constants.getString("Waypoint.remove")); //$NON-NLS-1$
-                buttonRemove.enabled = !isNew;
-                buttonRemove.noDisableText = true;
+                buttonRemove.setEnabled(!isNew);
+                buttonRemove.setNoDisableText(true);
 
                 buttonReset = new Button(ButtonEnum.Reset, Constants.getString("Waypoint.reset")); //$NON-NLS-1$
                 buttonSave = new Button(ButtonEnum.Save, Constants.getString("Waypoint.save")); //$NON-NLS-1$
-                buttonSave.noDisableText = true;
+                buttonSave.setNoDisableText(true);
 
                 String closeLabel = isNew ? "Waypoint.cancel" : "MapOverlay.close";
                 buttonClose = new Button(ButtonEnum.Close, Constants.getString(closeLabel));
@@ -223,8 +223,8 @@ public class WaypointEditor extends JmUI
     protected void layoutButtons()
     {
         // Buttons
-
         initGui();
+
         final FontRenderer fr = getFontRenderer();
 
         // Margins
@@ -552,7 +552,7 @@ public class WaypointEditor extends JmUI
 
         if (this.buttonSave != null)
         {
-            this.buttonSave.enabled = valid && (isNew || !originalWaypoint.equals(editedWaypoint));
+            this.buttonSave.setEnabled(valid && (isNew || !originalWaypoint.equals(editedWaypoint)));
         }
 
         return valid;

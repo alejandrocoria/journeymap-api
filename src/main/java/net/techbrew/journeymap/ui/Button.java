@@ -3,7 +3,6 @@ package net.techbrew.journeymap.ui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -11,12 +10,14 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
+/**
+ * A glom of extra functionality to try to make buttons less sucky to use.
+ */
 public class Button extends GuiButton implements ScrollPane.Scrollable
 {
-
-    private Boolean toggled = true;
-    String icon;
-    DynamicTexture iconTexture;
+    protected Boolean toggled = true;
+    protected String icon;
+    protected DynamicTexture iconTexture;
     protected String labelOn;
     protected String labelOff;
 
@@ -25,60 +26,66 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected static Color smallBgColor = new Color(100, 100, 100);
     protected static Color smallBgHoverColor = new Color(125, 135, 190);
 
-    public boolean enabled;
-    public boolean drawButton;
-    public boolean noDisableText;
-    public boolean drawFrame;
-    public boolean drawBackground;
-
-    private void tempInit()
-    {
-        this.enabled = true;
-        this.drawButton = true;
-        this.drawFrame = true;
-        this.drawBackground = true;
-    }
+    protected boolean enabled;
+    protected boolean drawButton;
+    protected boolean noDisableText;
+    protected boolean drawFrame;
+    protected boolean drawBackground;
 
     public Button(Enum enumValue, String label)
     {
-        super(enumValue.ordinal(), 0, 0, label);
-        tempInit();
+        this(enumValue.ordinal(), 0, 0, label);
     }
 
     public Button(int id, String label)
     {
-        super(id, 0, 0, label);
-        tempInit();
+        this(id, 0, 0, label);
     }
 
-    public Button(int id, int x, int y, String label)
+    public Button(Enum enumValue, int width, int height, String label)
     {
-        super(id, x, y, label);
-        tempInit();
+        this(enumValue.ordinal(), width, height, label);
     }
 
-    public Button(int id, int x, int y, int width, int height, String label)
+    public Button(Enum enumValue, String labelOn, String labelOff, boolean toggled)
     {
-        super(id, x, y, width, height, label);
-        tempInit();
+        this(enumValue.ordinal(), 0, 0, labelOn, labelOff, toggled);
     }
 
-    public Button(int id, int x, int y, int width, int height, String labelOn, String labelOff, boolean toggled)
+    public Button(int id, String labelOn, String labelOff, boolean toggled)
     {
-        super(id, x, y, width, height, toggled ? labelOn : labelOff);
+        this(id, 0, 0, labelOn, labelOff, toggled);
+    }
+
+    public Button(int id, int width, int height, String label)
+    {
+        super(id, 0, 0, width, height, label);
+        finishInit();
+    }
+
+    public Button(int id, int width, int height, String labelOn, String labelOff, boolean toggled)
+    {
+        super(id, 0, 0, width, height, toggled ? labelOn : labelOff);
         this.labelOn = labelOn;
         this.labelOff = labelOff;
         this.setToggled(toggled);
-        tempInit();
+        finishInit();
     }
 
-    public Button(int id, int x, int y, String labelOn, String labelOff, boolean toggled)
+    private void finishInit()
     {
-        super(id, x, y, toggled ? labelOn : labelOff);
-        this.labelOn = labelOn;
-        this.labelOff = labelOff;
-        this.setToggled(toggled);
-        tempInit();
+        this.setEnabled(true);
+        this.setDrawButton(true);
+        this.setDrawFrame(true);
+        this.setDrawBackground(true);
+        if (height == 0)
+        {
+            height = 20;
+        }
+        if (width == 0)
+        {
+            width = 200;
+        }
     }
 
     private void updateLabel()
@@ -142,7 +149,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     @Override
     public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
     {
-        if (!drawButton)
+        if (!isDrawButton())
         {
             return;
         }
@@ -158,10 +165,10 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             FontRenderer fontrenderer = minecraft.fontRenderer;
             minecraft.getTextureManager().bindTexture(buttonTextures);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            this.field_82253_i = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
 
 
-            if (drawFrame)
+            if (isDrawFrame())
             {
                 DrawUtil.drawRectangle(xPosition, yPosition, width, 1, smallFrameColorLight, 255); // Top
                 DrawUtil.drawRectangle(xPosition, yPosition, 1, height, smallFrameColorLight, 255); // Left
@@ -170,22 +177,22 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
                 DrawUtil.drawRectangle(xPosition + width - 1, yPosition + 1, 1, height - 1, smallFrameColorDark, 255); // Right
             }
 
-            if (drawBackground)
+            if (isDrawBackground())
             {
-                int k = this.getHoverState(this.field_146123_n);
+                int k = this.getHoverState(this.field_82253_i);
                 DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, k == 2 ? smallBgHoverColor : smallBgColor, 255);
             }
 
             this.mouseDragged(minecraft, mouseX, mouseY);
             int l = 14737632;
 
-            if (!this.enabled)
+            if (!this.isEnabled())
             {
                 l = -6250336;
             }
             else
             {
-                if (this.field_146123_n)
+                if (this.field_82253_i)
                 {
                     l = 16777120;
                 }
@@ -194,9 +201,9 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             this.drawCenteredString(fontrenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, l);
         }
 
-        if (!this.enabled)
+        if (!this.isEnabled())
         {
-            boolean drawDisabledText = mouseOver(mouseX, mouseY) && !noDisableText;
+            boolean drawDisabledText = mouseOver(mouseX, mouseY) && !isNoDisableText();
             int alpha = drawDisabledText ? 255 : 185;
             if (this.height >= 20)
             {
@@ -213,48 +220,49 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             }
         }
 
-        if (this.icon != null)
-        {
-            Tessellator tessellator = Tessellator.instance;
-            GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
-            GL11.glDepthMask(false);
-            GL11.glBlendFunc(770, 771);
-            if (enabled)
-            {
-                GL11.glColor4f(1F, 1F, 1F, 1F);
-            }
-            else
-            {
-                GL11.glColor4f(.5F, .5F, .5F, 1F);
-            }
-            GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, iconTexture.getGlTextureId());
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-
-            // Preserve aspect ratio of source image
-            int height = getHeight();
-            int width = getWidth();
-            int w = getToggled() ? width : (int) Math.ceil(width * .6);
-            int h = getToggled() ? height : (int) Math.ceil(height * .6);
-            int widthOffset = (width - w) / 2;
-            int heightOffset = (height - h);
-
-            tessellator.startDrawingQuads();
-            int xPosition = getX();
-            int yPosition = getY();
-            tessellator.addVertexWithUV(xPosition + widthOffset, h + yPosition + heightOffset, 0.0D, 0, 1);
-            tessellator.addVertexWithUV(xPosition + w + widthOffset, h + yPosition + heightOffset, 0.0D, 1, 1);
-            tessellator.addVertexWithUV(xPosition + w + widthOffset, yPosition + heightOffset, 0.0D, 1, 0);
-            tessellator.addVertexWithUV(xPosition + widthOffset, yPosition + heightOffset, 0.0D, 0, 0);
-            tessellator.draw();
-        }
+        // TODO: Revive this
+//        if (this.icon != null)
+//        {
+//            Tessellator tessellator = Tessellator.instance;
+//            GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
+//            GL11.glDepthMask(false);
+//            GL11.glBlendFunc(770, 771);
+//            if (isEnabled())
+//            {
+//                GL11.glColor4f(1F, 1F, 1F, 1F);
+//            }
+//            else
+//            {
+//                GL11.glColor4f(.5F, .5F, .5F, 1F);
+//            }
+//            GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
+//            GL11.glBindTexture(GL11.GL_TEXTURE_2D, iconTexture.getGlTextureId());
+//            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+//            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+//
+//            // Preserve aspect ratio of source image
+//            int height = getHeight();
+//            int width = getWidth();
+//            int w = getToggled() ? width : (int) Math.ceil(width * .6);
+//            int h = getToggled() ? height : (int) Math.ceil(height * .6);
+//            int widthOffset = (width - w) / 2;
+//            int heightOffset = (height - h);
+//
+//            tessellator.startDrawingQuads();
+//            int xPosition = getX();
+//            int yPosition = getY();
+//            tessellator.addVertexWithUV(xPosition + widthOffset, h + yPosition + heightOffset, 0.0D, 0, 1);
+//            tessellator.addVertexWithUV(xPosition + w + widthOffset, h + yPosition + heightOffset, 0.0D, 1, 1);
+//            tessellator.addVertexWithUV(xPosition + w + widthOffset, yPosition + heightOffset, 0.0D, 1, 0);
+//            tessellator.addVertexWithUV(xPosition + widthOffset, yPosition + heightOffset, 0.0D, 0, 0);
+//            tessellator.draw();
+//        }
 
     }
 
     public void drawUnderline()
     {
-        if (drawButton)
+        if (isDrawButton())
         {
             DrawUtil.drawRectangle(xPosition, yPosition + height, width, 1, Button.smallFrameColorDark, 255);
         }
@@ -263,7 +271,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     @Override
     public boolean mousePressed(Minecraft minecraft, int i, int j)
     {
-        return enabled && drawButton && i >= getX() && j >= getY() && i < getX() + getWidth() && j < getY() + getHeight();
+        return isEnabled() && isDrawButton() && i >= getX() && j >= getY() && i < getX() + getWidth() && j < getY() + getHeight();
     }
 
     public boolean mouseOver(int mouseX, int mouseY)
@@ -297,8 +305,8 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     {
         setHeight(fr.FONT_HEIGHT + 1);
         fitWidth(fr);
-        drawBackground = false;
-        drawFrame = false;
+        setDrawBackground(false);
+        setDrawFrame(false);
     }
 
     @Override
@@ -338,6 +346,11 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return this.xPosition + (this.width / 2);
     }
 
+    public int getCenterY()
+    {
+        return this.yPosition + (this.height / 2);
+    }
+
     public void setPosition(int x, int y)
     {
         setX(x);
@@ -358,7 +371,13 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public Button centerHorizontalOn(int x)
     {
-        this.setX(x - (getWidth() / 2));
+        this.setX(x - (width / 2));
+        return this;
+    }
+
+    public Button centerVerticalOn(int y)
+    {
+        this.setY(y + (height / 2));
         return this;
     }
 
@@ -402,5 +421,55 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     {
         this.setY(y);
         return this;
+    }
+
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
+    }
+
+    public boolean isDrawButton()
+    {
+        return drawButton;
+    }
+
+    public void setDrawButton(boolean drawButton)
+    {
+        this.drawButton = drawButton;
+    }
+
+    public boolean isNoDisableText()
+    {
+        return noDisableText;
+    }
+
+    public void setNoDisableText(boolean noDisableText)
+    {
+        this.noDisableText = noDisableText;
+    }
+
+    public boolean isDrawFrame()
+    {
+        return drawFrame;
+    }
+
+    public void setDrawFrame(boolean drawFrame)
+    {
+        this.drawFrame = drawFrame;
+    }
+
+    public boolean isDrawBackground()
+    {
+        return drawBackground;
+    }
+
+    public void setDrawBackground(boolean drawBackground)
+    {
+        this.drawBackground = drawBackground;
     }
 }

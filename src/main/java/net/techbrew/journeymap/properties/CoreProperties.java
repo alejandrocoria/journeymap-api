@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class CoreProperties extends PropertiesBase implements Comparable<CoreProperties>
 {
-    protected transient static final int CURRENT_REVISION = 2;
+    protected transient static final int CURRENT_REVISION = 1;
     protected final String name = "core";
     protected final AtomicInteger revision = new AtomicInteger(CURRENT_REVISION);
     public final AtomicReference<String> logLevel = new AtomicReference<String>("INFO");
@@ -75,5 +75,20 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public int compareTo(CoreProperties o)
     {
         return Integer.compare(this.hashCode(), o.hashCode());
+    }
+
+    @Override
+    public String toString()
+    {
+        return "CoreProperties: " +
+                "revision=" + revision +
+                ", logLevel=" + logLevel +
+                ", chunkOffset=" + chunkOffset +
+                ", entityPoll=" + entityPoll +
+                ", playerPoll=" + playerPoll +
+                ", chunkPoll=" + chunkPoll +
+                ", caveLighting=" + caveLighting +
+                ", announceMod=" + announceMod +
+                ", checkUpdates=" + checkUpdates;
     }
 }

@@ -39,7 +39,6 @@ import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 
-import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
@@ -76,7 +75,7 @@ public class JourneyMap
         return INSTANCE;
     }
 
-    private JMLogger logger;
+    private Logger logger;
 
     private volatile Boolean initialized = false;
 
@@ -149,12 +148,12 @@ public class JourneyMap
     }
 
     @Mod.EventHandler
-    public void initialize(FMLInitializationEvent event)
+    public void initialize(FMLInitializationEvent event) throws Throwable
     {
         try
         {
             // Ensure logger inits
-            logger = new JMLogger();
+            logger = JMLogger.init();
 
             modInfo = new ModInfo("UA-28839029-4", "en_US", MOD_ID, MOD_NAME, getEdition());
 
@@ -166,10 +165,6 @@ public class JourneyMap
 
             mc = FMLClientHandler.instance().getClient();
 
-            // Start logFile
-            logger.info(MOD_NAME + " starting " + new Date()); //$NON-NLS-1$ //$NON-NLS-2$
-            logger.environment();
-
             // Load properties
             coreProperties = new CoreProperties().load();
             fullMapProperties = new FullMapProperties().load();
@@ -178,56 +173,71 @@ public class JourneyMap
             waypointProperties = new WaypointProperties().load();
             PropertyManager.getInstance().migrateLegacyProperties();
 
+            // TODO: Make grid an overlay instead of being backed into Tile cache
+            // Then the minmap and webmap can have their own grid setting
+            miniMapProperties.showGrid.set(fullMapProperties.showGrid.get());
+            miniMapProperties.save();
+            webMapProperties.showGrid.set(fullMapProperties.showGrid.get());
+            webMapProperties.save();
+
             // Log properties
-            logger.info("Core Config: " + coreProperties.toJsonString()); //$NON-NLS-1$
-            logger.info("FullMap Config: " + fullMapProperties.toJsonString()); //$NON-NLS-1$
-            logger.info("MiniMap Config: " + miniMapProperties.toJsonString()); //$NON-NLS-1$
-            logger.info("WebMap Config: " + webMapProperties.toJsonString()); //$NON-NLS-1$
-            logger.info("Waypoint Config: " + waypointProperties.toJsonString()); //$NON-NLS-1$
-
-
+            JMLogger.logProperties();
         }
         catch (Throwable t)
         {
-            System.err.println("Error loading " + JourneyMap.MOD_NAME + " for Minecraft " + JourneyMap.MC_VERSION + ". Ensure compatible Minecraft/Modloader/Forge versions.");
-            t.printStackTrace(System.err);
+            if (logger == null)
+            {
+                logger = Logger.getLogger(MOD_ID);
+            }
+            logger.severe(LogFormatter.toString(t));
+            throw t;
         }
     }
 
     @Mod.EventHandler
     public void postInitialize(FMLPostInitializationEvent event)
     {
-
-        // Register general event handlers
-        EventHandlerManager.registerGeneralHandlers();
-        EventHandlerManager.registerGuiHandlers();
-
-        // Webserver
-        toggleWebserver(webMapProperties.enabled.get(), false);
-
-        // Announce mod?
-        enableAnnounceMod = coreProperties.announceMod.get();
-
-        // Check for newer version online
-        if (VersionCheck.getVersionIsCurrent() == false)
+        try
         {
-            ChatLog.announceI18N(Constants.getString("JourneyMap.new_version_available", "")); //$NON-NLS-1$
-            ChatLog.announceURL(WEBSITE_URL, WEBSITE_URL);
+            // Register general event handlers
+            EventHandlerManager.registerGeneralHandlers();
+            EventHandlerManager.registerGuiHandlers();
+
+            // Webserver
+            toggleWebserver(webMapProperties.enabled.get(), false);
+
+            // Announce mod?
+            enableAnnounceMod = coreProperties.announceMod.get();
+
+            // Check for newer version online
+            if (VersionCheck.getVersionIsCurrent() == false)
+            {
+                ChatLog.announceI18N(Constants.getString("JourneyMap.new_version_available", "")); //$NON-NLS-1$
+                ChatLog.announceURL(WEBSITE_URL, WEBSITE_URL);
+            }
+
+            //BlockUtils.initialize();
+
+            initialized = true;
+
+            // Override log level now that loading complete
+            logger.info("Initialization complete."); //$NON-NLS-1$
+            JMLogger.setLevelFromProps();
+
+            // Logging for thread debugging
+            threadLogging = getLogger().isLoggable(Level.FINER);
+
+            WaypointsData.reset();
+            BlockUtils.initialize();
         }
-
-        //BlockUtils.initialize();
-
-        initialized = true;
-
-        // Override log level now that loading complete
-        logger.info("Initialization complete."); //$NON-NLS-1$
-        logger.setLevelFromProps();
-
-        // Logging for thread debugging
-        threadLogging = getLogger().isLoggable(Level.FINER);
-
-        WaypointsData.reset();
-        BlockUtils.initialize();
+        catch (Throwable t)
+        {
+            if (logger == null)
+            {
+                logger = Logger.getLogger(MOD_ID);
+            }
+            logger.severe(LogFormatter.toString(t));
+        }
     }
 
     public void toggleWebserver(Boolean enable, boolean forceAnnounce)
@@ -272,7 +282,6 @@ public class JourneyMap
             catch (Throwable e)
             {
                 logger.log(Level.SEVERE, LogFormatter.toString(e));
-                enable = false;
             }
         }
         if (forceAnnounce)
@@ -506,7 +515,6 @@ public class JourneyMap
 
     private void announceMod(boolean forced)
     {
-
         if (enableAnnounceMod)
         {
             ChatLog.announceI18N("JourneyMap.ready", MOD_NAME); //$NON-NLS-1$

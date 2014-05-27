@@ -2,12 +2,10 @@ package net.techbrew.journeymap.ui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.techbrew.journeymap.render.draw.DrawUtil;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by mwoodman on 4/2/2014.
@@ -16,12 +14,22 @@ public class ButtonList extends ArrayList<Button>
 {
     private boolean horizontal = true;
 
+    public ButtonList(List<Button> buttons)
+    {
+        super(buttons);
+    }
+
     public ButtonList(Button... buttons)
     {
         super(Arrays.asList(buttons));
     }
 
     public int getWidth(int hgap)
+    {
+        return getWidth(-1, hgap);
+    }
+
+    private int getWidth(int buttonWidth, int hgap)
     {
         if (this.isEmpty())
         {
@@ -32,9 +40,16 @@ public class ButtonList extends ArrayList<Button>
         int visible = 0;
         for (Button button : this)
         {
-            if (button.drawButton)
+            if (button.isDrawButton())
             {
-                total += button.getWidth();
+                if (buttonWidth > 0)
+                {
+                    total += buttonWidth;
+                }
+                else
+                {
+                    total += button.getWidth();
+                }
                 visible++;
             }
         }
@@ -57,7 +72,7 @@ public class ButtonList extends ArrayList<Button>
         int visible = 0;
         for (Button button : this)
         {
-            if (button.drawButton)
+            if (button.isDrawButton())
             {
                 total += button.getHeight();
                 visible++;
@@ -76,7 +91,7 @@ public class ButtonList extends ArrayList<Button>
         int left = Integer.MAX_VALUE;
         for (Button button : this)
         {
-            if (button.drawButton)
+            if (button.isDrawButton())
             {
                 left = Math.min(left, button.getX());
             }
@@ -93,7 +108,7 @@ public class ButtonList extends ArrayList<Button>
         int top = Integer.MAX_VALUE;
         for (Button button : this)
         {
-            if (button.drawButton)
+            if (button.isDrawButton())
             {
                 top = Math.min(top, button.getY());
             }
@@ -110,7 +125,7 @@ public class ButtonList extends ArrayList<Button>
         int bottom = Integer.MIN_VALUE;
         for (Button button : this)
         {
-            if (button.drawButton)
+            if (button.isDrawButton())
             {
                 bottom = Math.max(bottom, button.getY() + button.getHeight());
             }
@@ -127,7 +142,7 @@ public class ButtonList extends ArrayList<Button>
         int right = 0;
         for (Button button : this)
         {
-            if (button.drawButton)
+            if (button.isDrawButton())
             {
                 right = Math.max(right, button.getX() + button.getWidth());
             }
@@ -265,7 +280,7 @@ public class ButtonList extends ArrayList<Button>
             int gaps = hgap * (size());
             int area = (rightX - leftX) - gaps;
             int wider = area / size();
-            setWidths(wider, this);
+            setWidths(wider);
             layoutDistributedHorizontal(leftX, y, rightX, leftToRight);
         }
         else
@@ -280,17 +295,17 @@ public class ButtonList extends ArrayList<Button>
         int max = 0;
         for (Button button : this)
         {
-            if (button.drawButton)
+            if (button.isDrawButton())
             {
                 max = Math.max(max, button.getFitWidth(fr));
             }
         }
-        setWidths(max, this);
+        setWidths(max);
     }
 
     public void setFitWidths(FontRenderer fr)
     {
-        fitWidths(fr, this);
+        fitWidths(fr);
     }
 
     public boolean isHorizontal()
@@ -302,9 +317,9 @@ public class ButtonList extends ArrayList<Button>
     {
         for (Button button : this)
         {
-            button.enabled = enabled;
-            button.drawFrame = drawFrame;
-            button.drawBackground = drawBackground;
+            button.setEnabled(enabled);
+            button.setDrawFrame(drawFrame);
+            button.setDrawBackground(drawBackground);
         }
         return this;
     }
@@ -318,46 +333,80 @@ public class ButtonList extends ArrayList<Button>
         return this;
     }
 
-    public static void setHeights(int height, Collection<Button> collection)
+    public void setHeights(int height)
     {
-        for (Button button : collection)
+        for (Button button : this)
         {
             button.setHeight(height);
         }
     }
 
-    public static void setWidths(int width, Collection<Button> collection)
+    public void setWidths(int width)
     {
-        for (Button button : collection)
+        for (Button button : this)
         {
             button.setWidth(width);
         }
     }
 
-    public static void fitWidths(FontRenderer fr, Collection<Button> collection)
+    public void fitWidths(FontRenderer fr)
     {
-        for (Button button : collection)
+        for (Button button : this)
         {
             button.fitWidth(fr);
         }
     }
 
-    public static void equalizeWidths(FontRenderer fr, Collection<Button> collection)
+    public void equalizeWidths(FontRenderer fr)
     {
         int maxWidth = 0;
-        for (Button button : collection)
+        for (Button button : this)
         {
             button.fitWidth(fr);
             maxWidth = Math.max(maxWidth, button.getWidth());
         }
-        setWidths(maxWidth, collection);
+        setWidths(maxWidth);
     }
 
-    public static void drawOutlines(int thick, Color color, int alpha, Collection<Button> collection)
+    /**
+     * Try to equalize all button widths, but set a max on the total horizontal
+     * space that can be used.  If the fit widths still exceed maxTotalWidth,
+     * they won't be made smaller; you need to provide more room or remove buttons.
+     *
+     * @param fr            font renderer
+     * @param hgap          horizontal gap
+     * @param maxTotalWidth max horizontal space allowed
+     */
+    public void equalizeWidths(FontRenderer fr, int hgap, int maxTotalWidth)
     {
-        for (Button button : collection)
+        int maxWidth = 0;
+        for (Button button : this)
         {
-            DrawUtil.drawRectangle(button.getX() - thick, button.getY() - thick, button.getWidth() + (thick * 2), button.getHeight() + (thick * 2), color, alpha);
+            button.fitWidth(fr);
+            maxWidth = Math.max(maxWidth, button.getWidth());
+        }
+
+        int totalWidth = getWidth(maxWidth, hgap);
+        if (totalWidth <= maxTotalWidth)
+        {
+            setWidths(maxWidth); // same result as setUniformWidths
+        }
+        else
+        {
+            totalWidth = getWidth(hgap);
+        }
+
+        if (totalWidth < maxTotalWidth)
+        {
+            // Pad the buttons to get up to maxTotalWidth
+            int pad = (maxTotalWidth - totalWidth) / this.size();
+            if (pad > 0)
+            {
+                for (Button button : this)
+                {
+                    button.setWidth(button.getWidth() + pad);
+                }
+            }
         }
     }
 }

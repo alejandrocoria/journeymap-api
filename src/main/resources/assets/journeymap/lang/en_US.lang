@@ -65,6 +65,11 @@ JourneyMap.file_updates_complete=File updates complete. Mapping resumed.
 JourneyMap.char_uparrow=<
 JourneyMap.char_downarrow=>
 
+# Added in 4.0.0
+JourneyMap.compatability_error="Incompatability error running %1$s for Forge %2$s. Ensure your version of Forge is compatible."
+JourneyMap.log_warning=Log level %S will slow down the game. Do not use for normal gameplay!
+JourneyMap.memory_warning=Minecraft is running out of memory: %s
+
 ########################
 # In-game Map messages
 ########################

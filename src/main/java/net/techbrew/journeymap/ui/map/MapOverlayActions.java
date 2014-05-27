@@ -46,21 +46,22 @@ public class MapOverlayActions extends JmUI
     public void initGui()
     {
         this.buttonList.clear();
+
         String on = Constants.getString("MapOverlay.on");
         String off = Constants.getString("MapOverlay.off");
 
-        buttonSave = new Button(ButtonEnum.Save.ordinal(), 0, 0, Constants.getString("MapOverlay.save_map")); //$NON-NLS-1$
-        buttonClose = new Button(ButtonEnum.Close.ordinal(), 0, 0, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
-        buttonBrowser = new Button(ButtonEnum.Browser.ordinal(), 0, 0, Constants.getString("MapOverlay.use_browser")); //$NON-NLS-1$
-        buttonBrowser.enabled = JourneyMap.getInstance().webMapProperties.enabled.get();
+        buttonSave = new Button(ButtonEnum.Save, Constants.getString("MapOverlay.save_map")); //$NON-NLS-1$
+        buttonClose = new Button(ButtonEnum.Close, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
+        buttonBrowser = new Button(ButtonEnum.Browser, Constants.getString("MapOverlay.use_browser")); //$NON-NLS-1$
+        buttonBrowser.setEnabled(JourneyMap.getInstance().webMapProperties.enabled.get());
 
-        buttonAutomap = new Button(ButtonEnum.Automap.ordinal(), 0, 0,
+        buttonAutomap = new Button(ButtonEnum.Automap,
                 Constants.getString("MapOverlay.automap_title", on),
                 Constants.getString("MapOverlay.automap_title", off),
                 true); //$NON-NLS-1$ //$NON-NLS-2$
-        buttonAutomap.enabled = Minecraft.getMinecraft().isSingleplayer();
+        buttonAutomap.setEnabled(Minecraft.getMinecraft().isSingleplayer());
 
-        buttonCheck = new Button(ButtonEnum.Check.ordinal(), 0, 0, Constants.getString("MapOverlay.update_check")); //$NON-NLS-1$
+        buttonCheck = new Button(ButtonEnum.Check, Constants.getString("MapOverlay.update_check")); //$NON-NLS-1$
 
         buttonList.add(buttonAutomap);
         buttonList.add(buttonSave);
@@ -83,7 +84,7 @@ public class MapOverlayActions extends JmUI
             initGui();
         }
 
-        buttonSave.enabled = !JourneyMap.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);
+        buttonSave.setEnabled(!JourneyMap.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class));
 
         final int hgap = 4;
         final int vgap = 3;

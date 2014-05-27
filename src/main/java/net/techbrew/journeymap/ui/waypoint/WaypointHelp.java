@@ -55,6 +55,7 @@ public class WaypointHelp extends JmUI
     public void initGui()
     {
         this.buttonList.clear();
+
         String jmWaypointDir = FileHandler.getWaypointDir().toString();
         FontRenderer fr = getFontRenderer();
 
@@ -63,7 +64,7 @@ public class WaypointHelp extends JmUI
         importReiText = Constants.getString("MapOverlay.waypoint_help_import_rei", reiFileName, jmWaypointDir);
         importReiTextWidth = fr.getStringWidth(importReiText);
         buttonRei = new Button(ButtonEnum.ImportRei, Constants.getString("MapOverlay.waypoint_help_import_rei_title"));
-        buttonRei.enabled = WaypointsData.isReiMinimapEnabled();
+        buttonRei.setEnabled(WaypointsData.isReiMinimapEnabled());
         buttonList.add(buttonRei);
 
         // Voxel
@@ -71,14 +72,14 @@ public class WaypointHelp extends JmUI
         importVoxelText = Constants.getString("MapOverlay.waypoint_help_import_voxel", voxFileName, jmWaypointDir);
         importVoxelTextWidth = fr.getStringWidth(importVoxelText);
         buttonVoxel = new Button(ButtonEnum.ImportVoxel, Constants.getString("MapOverlay.waypoint_help_import_voxel_title"));
-        buttonVoxel.enabled = WaypointsData.isVoxelMapEnabled();
+        buttonVoxel.setEnabled(WaypointsData.isVoxelMapEnabled());
         buttonList.add(buttonVoxel);
 
         // Close
         buttonClose = new Button(ButtonEnum.Close.ordinal(), 0, 0, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
         buttonList.add(buttonClose);
 
-        ButtonList.equalizeWidths(mc.fontRenderer, new ButtonList(buttonRei, buttonVoxel));
+        new ButtonList(buttonRei, buttonVoxel).equalizeWidths(getFontRenderer());
     }
 
     /**
@@ -88,7 +89,6 @@ public class WaypointHelp extends JmUI
     protected void layoutButtons()
     {
         // Buttons
-
         if (buttonList.isEmpty())
         {
             initGui();
@@ -168,7 +168,7 @@ public class WaypointHelp extends JmUI
         // Show Voxel Import
         int voxelHeight = fr.listFormattedStringToWidth(importVoxelText, indentWidth).size() * getFontRenderer().FONT_HEIGHT;
         buttonVoxel.setPosition(indentX - 4, y);
-        if (!buttonVoxel.drawButton)
+        if (!buttonVoxel.isDrawButton())
         {
             fr.drawStringWithShadow("§n" + buttonVoxel.displayString, indentX, y, Color.lightGray.getRGB());
         }

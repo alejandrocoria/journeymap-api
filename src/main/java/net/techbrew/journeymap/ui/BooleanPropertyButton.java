@@ -67,15 +67,15 @@ public class BooleanPropertyButton extends Button
         this.properties = properties;
         if (properties == null || valueHolder == null)
         {
-            this.enabled = false;
-            this.noDisableText = true;
+            this.setEnabled(false);
+            this.setNoDisableText(true);
         }
     }
 
     @Override
     public void toggle()
     {
-        if (enabled)
+        if (isEnabled())
         {
             setToggled(properties.toggle(valueHolder));
         }

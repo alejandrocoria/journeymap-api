@@ -16,7 +16,8 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 import java.util.logging.Logger;
 
-public abstract class JmUI extends GuiScreen {
+public abstract class JmUI extends GuiScreen
+{
 
     TextureImpl logo = TextureCache.instance().getLogo();
 
@@ -26,7 +27,8 @@ public abstract class JmUI extends GuiScreen {
     protected final Logger logger = JourneyMap.getLogger();
     protected final Class<? extends JmUI> returnClass;
 
-    public JmUI(String title) {
+    public JmUI(String title)
+    {
         this(title, null);
     }
 
@@ -37,39 +39,47 @@ public abstract class JmUI extends GuiScreen {
         this.returnClass = returnClass;
     }
 
-    public Minecraft getMinecraft() {
+    public Minecraft getMinecraft()
+    {
         return this.mc;
     }
 
     @Override
-    public void setWorldAndResolution(Minecraft minecraft, int width, int height) {
+    public void setWorldAndResolution(Minecraft minecraft, int width, int height)
+    {
         super.setWorldAndResolution(minecraft, width, height);
         ScaledResolution resolution = new ScaledResolution(minecraft.gameSettings, minecraft.displayWidth, minecraft.displayHeight);
         this.scaleFactor = resolution.getScaleFactor();
     }
 
-	@Override
-	public boolean doesGuiPauseGame() {
-		return true;
-	}
-
-    public FontRenderer getFontRenderer() {
-        return this.fontRendererObj;
+    @Override
+    public boolean doesGuiPauseGame()
+    {
+        return true;
     }
 
-    public void sizeDisplay(boolean scaled) {
+    public FontRenderer getFontRenderer()
+    {
+        return this.fontRenderer;
+    }
+
+    public void sizeDisplay(boolean scaled)
+    {
         final int glwidth = scaled ? this.width : mc.displayWidth;
         final int glheight = scaled ? this.height : mc.displayHeight;
         sizeDisplay(glwidth, glheight);
     }
 
-    protected boolean mouseOverButtons(int x, int y) {
+    protected boolean mouseOverButtons(int x, int y)
+    {
 
         for (int k = 0; k < this.buttonList.size(); ++k)
         {
-            GuiButton guibutton = (GuiButton)this.buttonList.get(k);
-            if(guibutton instanceof Button) {
-                if(((Button)guibutton).mouseOver(x, y)) {
+            GuiButton guibutton = (GuiButton) this.buttonList.get(k);
+            if (guibutton instanceof Button)
+            {
+                if (((Button) guibutton).mouseOver(x, y))
+                {
                     return true;
                 }
             }
@@ -77,17 +87,25 @@ public abstract class JmUI extends GuiScreen {
         return false;
     }
 
-    protected void drawLogo() {
+    protected void drawLogo()
+    {
         sizeDisplay(mc.displayWidth, mc.displayHeight);
 
-        final boolean smallScale = (scaleFactor==1);
+        final boolean smallScale = (scaleFactor == 1);
         DrawUtil.drawImage(logo, smallScale ? 8 : 16, 4, false, smallScale ? .5f : 1f);
         sizeDisplay(width, height);
     }
 
-    protected void drawTitle() {
+    protected void drawTitle()
+    {
         DrawUtil.drawRectangle(0, 0, this.width, headerHeight, Color.black, 100);
-        DrawUtil.drawCenteredLabel(this.title, this.width/2, 12, Color.black, 0, Color.CYAN, 255, 1);
+        DrawUtil.drawCenteredLabel(this.title, this.width / 2, 12, Color.black, 0, Color.CYAN, 255, 1);
+    }
+
+    @Override
+    public void initGui()
+    {
+        buttonList.clear();
     }
 
     @Override
@@ -106,7 +124,7 @@ public abstract class JmUI extends GuiScreen {
 
         for (int k = 0; k < this.buttonList.size(); ++k)
         {
-            GuiButton guibutton = (GuiButton)this.buttonList.get(k);
+            GuiButton guibutton = (GuiButton) this.buttonList.get(k);
             guibutton.drawButton(this.mc, x, y);
         }
 
@@ -115,7 +133,7 @@ public abstract class JmUI extends GuiScreen {
             GuiButton guibutton = (GuiButton) this.buttonList.get(k);
             if (guibutton instanceof Button)
             {
-                if (!((Button) guibutton).enabled && !((Button) guibutton).noDisableText)
+                if (!((Button) guibutton).isEnabled() && !((Button) guibutton).isNoDisableText())
                 {
                     ((Button) guibutton).drawButton(this.mc, x, y);
                 }
@@ -126,7 +144,8 @@ public abstract class JmUI extends GuiScreen {
         drawLogo();
     }
 
-    public static void sizeDisplay(double width, double height) {
+    public static void sizeDisplay(double width, double height)
+    {
 
         GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glMatrixMode(GL11.GL_PROJECTION);

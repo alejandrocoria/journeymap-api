@@ -331,7 +331,7 @@ public class PropertyManager
         coreProperties.announceMod.set(getBoolean(Key.ANNOUNCE_MODLOADED));
         coreProperties.caveLighting.set(getBoolean(Key.CAVE_LIGHTING));
         coreProperties.checkUpdates.set(getBoolean(Key.UPDATE_CHECK_ENABLED));
-        coreProperties.chunkOffset.set(getInteger(Key.CHUNK_OFFSET));
+        // coreProperties.chunkOffset.set(getInteger(Key.CHUNK_OFFSET));  Lets put everybody back at the default.
         coreProperties.chunkPoll.set(getInteger(Key.UPDATETIMER_CHUNKS));
         coreProperties.entityPoll.set(getInteger(Key.BROWSER_POLL));
         coreProperties.playerPoll.set(getInteger(Key.BROWSER_POLL));

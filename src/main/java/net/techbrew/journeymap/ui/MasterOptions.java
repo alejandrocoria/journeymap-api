@@ -50,6 +50,8 @@ public class MasterOptions extends JmUI
     @Override
     public void initGui()
     {
+        buttonList.clear();
+
         buttonGeneralDisplayOptions = ButtonEnum.FullMapOptions.create(labelOptions);
         buttonFullMapHelp = ButtonEnum.FullMapHelp.create(labelHelp);
         listGeneral = new ButtonList(buttonGeneralDisplayOptions, buttonFullMapHelp);
@@ -75,7 +77,7 @@ public class MasterOptions extends JmUI
         listWebMap = new ButtonList(buttonWebMapOpen, buttonWebMapEnable);
         buttonList.addAll(listWebMap);
 
-        ButtonList.equalizeWidths(getFontRenderer(), buttonList);
+        new ButtonList(buttonList).equalizeWidths(getFontRenderer());
 
         buttonClose = ButtonEnum.Close.create(Constants.getString("MapOverlay.close"));
         buttonList.add(buttonClose);
@@ -109,19 +111,19 @@ public class MasterOptions extends JmUI
         DrawUtil.drawLabel(titleMiniMap, bx, by, DrawUtil.HAlign.Right, DrawUtil.VAlign.Above, Color.BLACK, 0, Color.cyan, 255, 1, false);
         listMiniMap.layoutHorizontal(bx, by, true, hgap);
         by = listMiniMap.getBottomY() + vgap;
-        buttonMiniMapOptions.enabled = buttonMiniMapEnable.getToggled();
+        buttonMiniMapOptions.setEnabled(buttonMiniMapEnable.getToggled());
 
         // Waypoints
         DrawUtil.drawLabel(titleWaypoints, bx, by, DrawUtil.HAlign.Right, DrawUtil.VAlign.Above, Color.BLACK, 0, Color.cyan, 255, 1, false);
         listWaypoints.layoutHorizontal(bx, by, true, hgap);
         by = listWaypoints.getBottomY() + vgap;
-        buttonWaypointOptions.enabled = buttonWaypointEnable.getToggled();
+        buttonWaypointOptions.setEnabled(buttonWaypointEnable.getToggled());
 
         // Web Map
         DrawUtil.drawLabel(titleWebmap, bx, by, DrawUtil.HAlign.Right, DrawUtil.VAlign.Above, Color.BLACK, 0, Color.cyan, 255, 1, false);
         listWebMap.layoutHorizontal(bx, by, true, hgap);
         by = listWebMap.getBottomY() + 10;
-        buttonWebMapOpen.enabled = buttonWebMapEnable.getToggled();
+        buttonWebMapOpen.setEnabled(buttonWebMapEnable.getToggled());
 
         // Close
         buttonClose.centerHorizontalOn(width / 2).setY(by);

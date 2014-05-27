@@ -21,7 +21,8 @@ import java.util.Comparator;
 /**
  * Created by Mark on 3/15/14.
  */
-public class WaypointManagerItem implements ScrollPane.Scrollable {
+public class WaypointManagerItem implements ScrollPane.Scrollable
+{
 
     final FontRenderer fontRenderer;
     final WaypointManager manager;
@@ -44,11 +45,12 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
     ButtonList buttonListLeft;
     ButtonList buttonListRight;
 
-    static Color background = new Color(20,20,20);
-    static Color backgroundHover = new Color(40,40,40);
+    static Color background = new Color(20, 20, 20);
+    static Color backgroundHover = new Color(40, 40, 40);
 
     public WaypointManagerItem(Waypoint waypoint, FontRenderer fontRenderer, WaypointManager manager)
     {
+        int id = 0;
         this.waypoint = waypoint;
         this.fontRenderer = fontRenderer;
         this.manager = manager;
@@ -56,29 +58,29 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
         String on = Constants.getString("MapOverlay.on");
         String off = Constants.getString("MapOverlay.off");
 
-        buttonEnable = new Button(0,0,0, on, off, true); //$NON-NLS-1$
+        buttonEnable = new Button(id++, on, off, true); //$NON-NLS-1$
         buttonEnable.setToggled(waypoint.isEnable());
-        buttonFind = new Button(2,0,0, Constants.getString("Waypoint.find")); //$NON-NLS-1$
+        buttonFind = new Button(id++, Constants.getString("Waypoint.find")); //$NON-NLS-1$
 
-        buttonTeleport = new Button(2,0,0, Constants.getString("Waypoint.teleport")); //$NON-NLS-1$
-        buttonTeleport.drawButton = manager.canUserTeleport;
+        buttonTeleport = new Button(id++, Constants.getString("Waypoint.teleport")); //$NON-NLS-1$
+        buttonTeleport.setDrawButton(manager.canUserTeleport);
 
         buttonListLeft = new ButtonList(buttonEnable, buttonFind, buttonTeleport);
-        ButtonList.setHeights(manager.rowHeight, buttonListLeft);
-        ButtonList.fitWidths(fontRenderer, buttonListLeft);
+        buttonListLeft.setHeights(manager.rowHeight);
+        buttonListLeft.fitWidths(fontRenderer);
 
-        buttonEdit = new Button(2,0,0, Constants.getString("Waypoint.edit")); //$NON-NLS-1$
-        buttonRemove = new Button(1,0,0, Constants.getString("Waypoint.remove")); //$NON-NLS-1$
+        buttonEdit = new Button(id++, Constants.getString("Waypoint.edit")); //$NON-NLS-1$
+        buttonRemove = new Button(id++, Constants.getString("Waypoint.remove")); //$NON-NLS-1$
 
         buttonListRight = new ButtonList(buttonEdit, buttonRemove);
-        ButtonList.setHeights(manager.rowHeight, buttonListRight);
-        ButtonList.fitWidths(fontRenderer, buttonListRight);
+        buttonListRight.setHeights(manager.rowHeight);
+        buttonListRight.fitWidths(fontRenderer);
 
-        this.internalWidth = fontRenderer.getStringWidth("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-        internalWidth += Math.max(manager.colLocation, manager.colName);
-        internalWidth += buttonListLeft.getWidth(hgap);
-        internalWidth += buttonListRight.getWidth(hgap);
-        internalWidth += 10;
+        this.internalWidth = fontRenderer.getCharWidth('X') * 32; // Label width
+        internalWidth += Math.max(manager.colLocation, manager.colName); // Add other columns
+        internalWidth += buttonListLeft.getWidth(hgap); // Add buttons
+        internalWidth += buttonListRight.getWidth(hgap); // Add buttons
+        internalWidth += 10; // Pad that action
     }
 
     @Override
@@ -95,17 +97,20 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
     }
 
     @Override
-    public int getX() {
+    public int getX()
+    {
         return x;
     }
 
     @Override
-    public int getY() {
+    public int getY()
+    {
         return y;
     }
 
     @Override
-    public int getWidth() {
+    public int getWidth()
+    {
         return width;
     }
 
@@ -116,7 +121,8 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
     }
 
     @Override
-    public int getHeight() {
+    public int getHeight()
+    {
         return manager.rowHeight;
     }
 
@@ -129,7 +135,10 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
     @Override
     public void drawScrollable(Minecraft mc, int mouseX, int mouseY)
     {
-        if(this.waypoint==null) return;
+        if (this.waypoint == null)
+        {
+            return;
+        }
 
         boolean hover = manager.isSelected(this) || (mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + manager.rowHeight);
 
@@ -144,30 +153,33 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
         drawWaypoint(this.x + margin + manager.colWaypoint, this.y + (manager.rowHeight / 2));
         drawLabels(mc, this.x + margin, this.y, null);
 
-        buttonFind.enabled = waypoint.isInPlayerDimension();
+        buttonFind.setEnabled(waypoint.isInPlayerDimension());
 
-        buttonTeleport.enabled = waypoint.isTeleportReady();
+        buttonTeleport.setEnabled(waypoint.isTeleportReady());
 
         buttonListRight.layoutHorizontal(x + width - margin, y, false, hgap).draw(mc, mouseX, mouseY);
-        buttonListLeft.layoutHorizontal(buttonListRight.getLeftX() - (hgap*2), y, false, hgap).draw(mc, mouseX, mouseY);
+        buttonListLeft.layoutHorizontal(buttonListRight.getLeftX() - (hgap * 2), y, false, hgap).draw(mc, mouseX, mouseY);
     }
 
     protected void drawLabels(Minecraft mc, int x, int y, Color color)
     {
-        if(this.waypoint==null) return;
+        if (this.waypoint == null)
+        {
+            return;
+        }
 
         boolean waypointValid = waypoint.isEnable() && waypoint.isInPlayerDimension();
 
-        if(color==null)
+        if (color == null)
         {
             color = waypointValid ? waypoint.getSafeColor() : Color.GRAY;
         }
 
-        int yOffset = 1 +(this.manager.rowHeight-mc.fontRenderer.FONT_HEIGHT)/2;
+        int yOffset = 1 + (this.manager.rowHeight - mc.fontRenderer.FONT_HEIGHT) / 2;
         mc.fontRenderer.drawStringWithShadow(String.format("%sm", getDistance()), x + manager.colLocation, y + yOffset, color.getRGB());
 
         String name = waypointValid ? waypoint.getName() : "§m" + waypoint.getName();
-        mc.fontRenderer.drawStringWithShadow(name, x + manager.colName, y+yOffset, color.getRGB());
+        mc.fontRenderer.drawStringWithShadow(name, x + manager.colName, y + yOffset, color.getRGB());
     }
 
     protected void drawWaypoint(int x, int y)
@@ -188,44 +200,60 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
     }
 
     @Override
-    public void clickScrollable(Minecraft mc, int mouseX, int mouseY) {
+    public void clickScrollable(Minecraft mc, int mouseX, int mouseY)
+    {
 
-        if(waypoint==null) return;
+        if (waypoint == null)
+        {
+            return;
+        }
 
-        if(buttonRemove.mouseOver(mouseX, mouseY))
+        if (buttonRemove.mouseOver(mouseX, mouseY))
         {
             manager.removeWaypoint(this);
             this.waypoint = null;
         }
-        else if(buttonEnable.mouseOver(mouseX, mouseY))
+        else
         {
-            buttonEnable.toggle();
-            waypoint.setEnable(buttonEnable.getToggled());
-            if(waypoint.isDirty())
+            if (buttonEnable.mouseOver(mouseX, mouseY))
             {
-                WaypointStore.instance().save(waypoint);
+                buttonEnable.toggle();
+                waypoint.setEnable(buttonEnable.getToggled());
+                if (waypoint.isDirty())
+                {
+                    WaypointStore.instance().save(waypoint);
+                }
             }
-        }
-        else if(buttonEdit.mouseOver(mouseX, mouseY))
-        {
-            UIManager.getInstance().openWaypointEditor(waypoint, false, WaypointManager.class);
-        }
-        else if(buttonFind.enabled && buttonFind.mouseOver(mouseX, mouseY))
-        {
-            UIManager.getInstance().openMap(waypoint);
-        }
-        else if(buttonTeleport.enabled && buttonTeleport.mouseOver(mouseX, mouseY))
-        {
-            new CmdTeleportWaypoint(waypoint).run();
-            MapOverlay.state().follow = true;
-            UIManager.getInstance().closeAll();
-            return;
+            else
+            {
+                if (buttonEdit.mouseOver(mouseX, mouseY))
+                {
+                    UIManager.getInstance().openWaypointEditor(waypoint, false, WaypointManager.class);
+                }
+                else
+                {
+                    if (buttonFind.isEnabled() && buttonFind.mouseOver(mouseX, mouseY))
+                    {
+                        UIManager.getInstance().openMap(waypoint);
+                    }
+                    else
+                    {
+                        if (buttonTeleport.isEnabled() && buttonTeleport.mouseOver(mouseX, mouseY))
+                        {
+                            new CmdTeleportWaypoint(waypoint).run();
+                            MapOverlay.state().follow = true;
+                            UIManager.getInstance().closeAll();
+                            return;
+                        }
+                    }
+                }
+            }
         }
     }
 
     public int getDistance()
     {
-        return distance==null ? 0 : distance;
+        return distance == null ? 0 : distance;
     }
 
     /**
@@ -233,7 +261,8 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
      */
     public int getDistanceSqToEntity(EntityPlayer player)
     {
-        if(distance==null) {
+        if (distance == null)
+        {
             double d0 = this.waypoint.getX(player.dimension) - player.posX;
             double d1 = this.waypoint.getY(player.dimension) - player.posY;
             double d2 = this.waypoint.getZ(player.dimension) - player.posZ;
@@ -254,8 +283,14 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
         @Override
         public boolean equals(Object o)
         {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o)
+            {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass())
+            {
+                return false;
+            }
             return true;
         }
 
@@ -276,7 +311,7 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
         @Override
         public int compare(WaypointManagerItem o1, WaypointManagerItem o2)
         {
-            if(ascending)
+            if (ascending)
             {
                 return o1.waypoint.getName().compareTo(o2.waypoint.getName());
             }
@@ -300,7 +335,7 @@ public class WaypointManagerItem implements ScrollPane.Scrollable {
         @Override
         public int compare(WaypointManagerItem o1, WaypointManagerItem o2)
         {
-            if(ascending)
+            if (ascending)
             {
                 return Double.compare(o1.getDistanceSqToEntity(player), o2.getDistanceSqToEntity(player));
             }

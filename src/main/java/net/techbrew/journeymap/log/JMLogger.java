@@ -1,83 +1,141 @@
 package net.techbrew.journeymap.log;
 
+import cpw.mods.fml.relauncher.FMLRelaunchLog;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
+import net.techbrew.journeymap.thread.JMThreadFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-;
-
-public class JMLogger extends Logger
+public class JMLogger
 {
+    public static final String DEPRECATED_LOG_FILE = "journeyMap.log"; //$NON-NLS-1$
+    public static final String LOG_FILE = "journeymap.log"; //$NON-NLS-1$
 
-    public static final String LOG_FILE = "journeyMap.log"; //$NON-NLS-1$
-    java.util.logging.ConsoleHandler consoleHandler;
-    java.util.logging.FileHandler logHandler;
+    private static java.util.logging.FileHandler fileHandler;
 
-    public JMLogger()
+    public static Logger init()
     {
-        super("JourneyMap", null); //$NON-NLS-1$
-        setLevel(Level.INFO);
+        FMLRelaunchLog.makeLog(JourneyMap.MOD_ID);
+        final Logger logger = Logger.getLogger(JourneyMap.MOD_ID);
 
-        // Console logging
-        consoleHandler = new java.util.logging.ConsoleHandler();
-        consoleHandler.setFormatter(new LogFormatter());
-        this.addHandler(consoleHandler);
+        if (logger.getLevel() == null || logger.getLevel().intValue() > Level.INFO.intValue())
+        {
+            logger.setLevel(Level.INFO);
+        }
+
+        // Start logFile
+        logger.info(JourneyMap.MOD_NAME + " initializing"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        // Remove deprecated logfile
+        try
+        {
+            File deprecatedLog = new File(FileHandler.getJourneyMapDir(), DEPRECATED_LOG_FILE);
+            if (deprecatedLog.exists())
+            {
+                deprecatedLog.delete();
+            }
+        }
+        catch (Exception e)
+        {
+            logger.severe("Error removing deprecated logfile: " + e.getMessage());
+        }
 
         // File logging
         try
         {
-            File logFile = getLogFile();
+            final File logFile = getLogFile();
             if (logFile.exists())
             {
                 logFile.delete();
             }
             else
             {
-                FileHandler.getJourneyMapDir().mkdirs();
+                logFile.getParentFile().mkdirs();
             }
-            logHandler = new java.util.logging.FileHandler(logFile.getAbsolutePath());
-            logHandler.setFormatter(new LogFormatter());
-            this.addHandler(logHandler);
 
+            fileHandler = new java.util.logging.FileHandler(logFile.getAbsolutePath());
+            fileHandler.setFormatter(new LogFormatter());
+            logger.addHandler(fileHandler);
+
+            // Add shutdown hook
+            Runtime.getRuntime().addShutdownHook(new JMThreadFactory("log").newThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    fileHandler.flush();
+                    fileHandler.close();
+                }
+            }));
         }
         catch (SecurityException e)
         {
-            this.severe(LogFormatter.toString(e));
+            logger.severe("Error adding file handler: " + LogFormatter.toString(e));
         }
         catch (IOException e)
         {
-            this.severe(LogFormatter.toString(e));
+            logger.severe("Error adding file handler: " + LogFormatter.toString(e));
         }
+
+        return logger;
     }
 
     /**
      * Show system properties and those from the PropertyManager.
      */
-    public void environment()
+    public static void logProperties()
     {
-
-        info("os.name = " + System.getProperty("os.name") + //$NON-NLS-1$ //$NON-NLS-2$
-                ", os.arch = " + System.getProperty("os.arch") +  //$NON-NLS-1$ //$NON-NLS-2$
-                ", user.country = " + System.getProperty("user.country") + //$NON-NLS-1$ //$NON-NLS-2$
-                ", user.language = " + System.getProperty("user.language") + //$NON-NLS-1$ //$NON-NLS-2$
-                ", java.version = " + System.getProperty("java.version")); //$NON-NLS-1$ //$NON-NLS-2$
-
-        info("Game settings language: " + Minecraft.getMinecraft().gameSettings.language + " / Locale: " + Constants.getLocale());
-
+        LogRecord record = new LogRecord(Level.INFO, getPropertiesSummary());
+        record.setSourceClassName("JMLogger");
+        record.setSourceMethodName("logProperties");
+        if (fileHandler != null)
+        {
+            fileHandler.publish(record);
+        }
     }
 
+    /**
+     * TODO: Clean up
+     */
+    public static String getPropertiesSummary()
+    {
+        String message = "Environment: os.name=" + System.getProperty("os.name") + //$NON-NLS-1$ //$NON-NLS-2$
+                ", os.arch=" + System.getProperty("os.arch") +  //$NON-NLS-1$ //$NON-NLS-2$
+                ", user.country=" + System.getProperty("user.country") + //$NON-NLS-1$ //$NON-NLS-2$
+                ", user.language=" + System.getProperty("user.language") + //$NON-NLS-1$ //$NON-NLS-2$
+                ", java.version=" + System.getProperty("java.version") +
+                ", Game settings language: " + Minecraft.getMinecraft().gameSettings.language + " / Locale: " + Constants.getLocale();
+
+        long totalMB = Runtime.getRuntime().totalMemory() / 1024 / 1024;
+        long freeMB = Runtime.getRuntime().freeMemory() / 1024 / 1024;
+        message += String.format("\nMemory: %sMB total, %sMB free", totalMB, freeMB);
+
+        JourneyMap jm = JourneyMap.getInstance();
+
+        message += String.format("\n%s\n%s\n%s\n%s\n%s",
+                jm.coreProperties,
+                jm.fullMapProperties,
+                jm.miniMapProperties,
+                jm.waypointProperties,
+                jm.webMapProperties
+        );
+
+        return message;
+    }
 
     /**
      * Set the logging level from the value in the properties file.
      */
-    public void setLevelFromProps()
+    public static void setLevelFromProps()
     {
+        final Logger logger = Logger.getLogger(JourneyMap.MOD_ID);
 
         String propLevel = "";
         Level level = Level.INFO;
@@ -85,30 +143,26 @@ public class JMLogger extends Logger
         {
             propLevel = JourneyMap.getInstance().coreProperties.logLevel.get();
             level = Level.parse(propLevel);
-            if (level != getLevel())
+            if (level != logger.getLevel())
             {
-                log(level, "Log level (via " + JourneyMap.getInstance().coreProperties.getFile().getName() + ") set to " + level + "."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                setLevel(level);
+                logger.setLevel(level);
                 if (level.intValue() < Level.INFO.intValue())
                 {
-                    log(level, ("THIS LOGGING LEVEL WILL SLOW DOWN THE GAME! DO NOT USE IT UNLESS YOU ARE TROUBLESHOOTING AN ISSUE!"));
+                    ChatLog.announceI18N("JourneyMap.log_warning", level.getName());
                 }
             }
-
         }
         catch (IllegalArgumentException e)
         {
-            warning("Illegal value for logLevel in " + JourneyMap.getInstance().coreProperties.getFile().getName() + ": " + propLevel); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            logger.warning("Illegal value for logLevel in " + JourneyMap.getInstance().coreProperties.getFile().getName() + ": " + propLevel); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
         catch (Throwable t)
         {
-            severe(LogFormatter.toString(t));
+            logger.severe(LogFormatter.toString(t));
         }
         finally
         {
-
-            consoleHandler.setLevel(level);
-            logHandler.setLevel(level);
+            logger.setLevel(level);
         }
     }
 
@@ -117,10 +171,8 @@ public class JMLogger extends Logger
      *
      * @return
      */
-    public File getLogFile()
+    public static File getLogFile()
     {
         return new File(FileHandler.getJourneyMapDir(), LOG_FILE);
     }
-
-
 }

@@ -21,7 +21,6 @@ public class MiniMapHotkeysHelp extends JmUI
         Close
     }
 
-    ;
     private Button buttonClose;
 
     private DisplayVars.Shape currentShape;
@@ -48,7 +47,7 @@ public class MiniMapHotkeysHelp extends JmUI
     {
         this.buttonList.clear();
 
-        buttonClose = new net.techbrew.journeymap.ui.Button(ButtonEnum.Close.ordinal(), 0, 0, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
+        buttonClose = new Button(ButtonEnum.Close, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
 
         buttonList.add(buttonClose);
 

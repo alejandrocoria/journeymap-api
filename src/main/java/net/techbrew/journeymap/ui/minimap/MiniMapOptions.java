@@ -42,56 +42,56 @@ public class MiniMapOptions extends JmUI
     public void initGui()
     {
         this.buttonList.clear();
+
         String on = Constants.getString("MapOverlay.on");
         String off = Constants.getString("MapOverlay.off");
 
-
         boolean minimapOn = miniMapProperties.enabled.get();
-        buttonMiniMap = new Button(ButtonEnum.MiniMap.ordinal(), 0, 0,
+        buttonMiniMap = new Button(ButtonEnum.MiniMap,
                 Constants.getString("MiniMap.enable_minimap", on),
                 Constants.getString("MiniMap.enable_minimap", off),
                 minimapOn); //$NON-NLS-1$  //$NON-NLS-2$
         buttonMiniMap.setToggled(minimapOn);
 
         DisplayVars.Position position = DisplayVars.Position.getPreferred();
-        buttonPosition = new Button(ButtonEnum.Position.ordinal(), 0, 0, "");
+        buttonPosition = new Button(ButtonEnum.Position, "");
         setPosition(position);
-        buttonPosition.enabled = minimapOn;
+        buttonPosition.setEnabled(minimapOn);
 
         DisplayVars.Shape shape = DisplayVars.Shape.getPreferred();
-        buttonShape = new Button(ButtonEnum.Shape.ordinal(), 0, 0, "");
+        buttonShape = new Button(ButtonEnum.Shape, "");
         setShape(shape);
-        buttonShape.enabled = minimapOn;
+        buttonShape.setEnabled(minimapOn);
 
-        buttonFont = new Button(ButtonEnum.Font.ordinal(), 0, 0,
+        buttonFont = new Button(ButtonEnum.Font,
                 Constants.getString("MiniMap.font", Constants.getString("MiniMap.font_small")),
                 Constants.getString("MiniMap.font", Constants.getString("MiniMap.font_large")),
                 (miniMapProperties.fontSmall.get()));
-        buttonFont.enabled = minimapOn;
+        buttonFont.setEnabled(minimapOn);
 
         boolean showHotKeys = miniMapProperties.enableHotkeys.get();
-        buttonKeyboard = new Button(ButtonEnum.Keyboard.ordinal(), 0, 0,
+        buttonKeyboard = new Button(ButtonEnum.Keyboard,
                 Constants.getString("MiniMap.hotkeys", on),
                 Constants.getString("MiniMap.hotkeys", off), showHotKeys);
-        buttonKeyboard.enabled = minimapOn;
+        buttonKeyboard.setEnabled(minimapOn);
 
-        buttonKeyboardHelp = new Button(ButtonEnum.KeyboardHelp.ordinal(), 0, 0,
+        buttonKeyboardHelp = new Button(ButtonEnum.KeyboardHelp,
                 Constants.getString("MapOverlay.hotkeys_button"));
 
         boolean isShowFps = miniMapProperties.showFps.get();
-        buttonShowfps = new Button(ButtonEnum.Showfps.ordinal(), 0, 0,
+        buttonShowfps = new Button(ButtonEnum.Showfps,
                 Constants.getString("MiniMap.show_fps", on),
                 Constants.getString("MiniMap.show_fps", off), isShowFps);
-        buttonShowfps.enabled = minimapOn;
+        buttonShowfps.setEnabled(minimapOn);
 
         boolean forceUnicode = miniMapProperties.forceUnicode.get();
-        buttonUnicode = new Button(ButtonEnum.Unicode.ordinal(), 0, 0,
+        buttonUnicode = new Button(ButtonEnum.Unicode,
                 Constants.getString("MiniMap.force_unicode", on),
                 Constants.getString("MiniMap.force_unicode", off), forceUnicode);
 
-        buttonClose = new Button(ButtonEnum.Close.ordinal(), 0, 0, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
+        buttonClose = new Button(ButtonEnum.Close, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
 
-        buttonCloseAll = new Button(ButtonEnum.CloseAll.ordinal(), 0, 0, Constants.getString("MiniMap.return_to_game")); //$NON-NLS-1$
+        buttonCloseAll = new Button(ButtonEnum.CloseAll, Constants.getString("MiniMap.return_to_game")); //$NON-NLS-1$
 
         buttonList.add(buttonMiniMap);
         buttonList.add(buttonPosition);
@@ -132,20 +132,20 @@ public class MiniMapOptions extends JmUI
 
         for (Button button : leftButtons)
         {
-            button.enabled = buttonMiniMap.getToggled();
+            button.setEnabled(buttonMiniMap.getToggled());
         }
 
         for (Button button : rightButtons)
         {
-            button.enabled = buttonMiniMap.getToggled();
+            button.setEnabled(buttonMiniMap.getToggled());
         }
 
-        buttonMiniMap.enabled = true;
+        buttonMiniMap.setEnabled(true);
 
         buttonClose.below(leftButtons, vgap + vgap + vgap).centerHorizontalOn(bx);
         buttonCloseAll.below(buttonClose, vgap).centerHorizontalOn(bx);
 
-        buttonKeyboardHelp.enabled = buttonMiniMap.getToggled() && buttonKeyboard.getToggled();
+        buttonKeyboardHelp.setEnabled(buttonMiniMap.getToggled() && buttonKeyboard.getToggled());
     }
 
     @Override

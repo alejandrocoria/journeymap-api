@@ -201,22 +201,4 @@ public abstract class PropertiesBase
             return (T) this;
         }
     }
-
-    /**
-     * Generates Json string of properties.
-     *
-     * @return String, or null on error.
-     */
-    public String toJsonString()
-    {
-        try
-        {
-            return gson.toJsonTree(this).toString();
-        }
-        catch (Exception e)
-        {
-            JourneyMap.getLogger().severe(String.format("Can't generate Json string of config properties %s", getName()));
-            return null;
-        }
-    }
 }

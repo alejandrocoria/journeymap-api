@@ -84,4 +84,23 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     {
         return Integer.compare(this.hashCode(), o.hashCode());
     }
+
+    @Override
+    public String toString()
+    {
+        return "WaypointProperties: " +
+                "revision=" + revision +
+                ", enabled=" + enabled +
+                ", showTexture=" + showTexture +
+                ", showStaticBeam=" + showStaticBeam +
+                ", showRotatingBeam=" + showRotatingBeam +
+                ", showName=" + showName +
+                ", showDistance=" + showDistance +
+                ", autoHideLabel=" + autoHideLabel +
+                ", boldLabel=" + boldLabel +
+                ", forceUnicode=" + forceUnicode +
+                ", fontSmall=" + fontSmall +
+                ", textureSmall=" + textureSmall +
+                ", maxDistance=" + maxDistance;
+    }
 }

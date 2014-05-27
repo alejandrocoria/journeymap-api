@@ -2,6 +2,7 @@ package net.techbrew.journeymap.server;
 
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.ColorCache;
+import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.StatTimer;
 import se.rupy.http.Event;
 
@@ -48,16 +49,16 @@ public class DebugService extends FileService
         sb.append('\n').append("</style></head><body><div>");
         sb.append('\n').append("<h1>").append(JourneyMap.MOD_NAME).append("</h1>");
         sb.append('\n').append("<h1>Properties</h1>");
-        sb.append('\n').append("<div>").append(JourneyMap.getInstance().coreProperties.toJsonString()).append("</div>");
-        sb.append('\n').append("<div>").append(JourneyMap.getInstance().fullMapProperties.toJsonString()).append("</div>");
-        sb.append('\n').append("<div>").append(JourneyMap.getInstance().miniMapProperties.toJsonString()).append("</div>");
-        sb.append('\n').append("<div>").append(JourneyMap.getInstance().webMapProperties.toJsonString()).append("</div>");
+        sb.append('\n').append("<div>").append(JMLogger.getPropertiesSummary().replaceAll("\n", "<br/>"));
         sb.append('\n').append("</div>");
 
         sb.append('\n').append("<div><h1>Stat Timers</h1>");
         sb.append('\n').append("<pre>").append(StatTimer.getReport()).append("</pre></div>");
 
-        sb.append('\n').append(ColorCache.getInstance().getCacheDebugHtml());
+        if (JourneyMap.getInstance().isMapping())
+        {
+            sb.append('\n').append(ColorCache.getInstance().getCacheDebugHtml());
+        }
 
         sb.append('\n').append("</div></body></html>");
         gzipResponse(event, sb.toString());

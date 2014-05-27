@@ -29,11 +29,10 @@ public class WaypointOptions extends JmUI
     @Override
     public void initGui()
     {
+        buttonList.clear();
+
         WaypointProperties props = JourneyMap.getInstance().waypointProperties;
         int id = 0;
-
-        buttonClose = new Button(id++, Constants.getString("MapOverlay.close"));
-        buttonList.add(buttonClose);
 
         listLeftButtons = new ButtonList(
                 BooleanPropertyButton.create(id++, "Waypoint.auto_hide_label", props, props.autoHideLabel),
@@ -56,7 +55,10 @@ public class WaypointOptions extends JmUI
         maxDistanceField = new TextField(props.maxDistance.toString(), getFontRenderer(), 100, 20, true, true);
         maxDistanceField.setClamp(-1, 10000);
 
-        ButtonList.equalizeWidths(getFontRenderer(), buttonList);
+        new ButtonList(buttonList).equalizeWidths(getFontRenderer());
+
+        buttonClose = new Button(id++, Constants.getString("MapOverlay.close"));
+        buttonList.add(buttonClose);
     }
 
     @Override
@@ -90,8 +92,13 @@ public class WaypointOptions extends JmUI
     @Override
     public void drawDefaultBackground()
     {
+        // Reinforce header since normal mask isn't used
         DrawUtil.drawRectangle(0, 0, this.width, headerHeight, Color.black, 100);
 
+        // Mask behind the label for max distance
+        DrawUtil.drawRectangle(listLeftButtons.getLeftX(), maxDistanceField.getY(), listLeftButtons.get(0).getWidth(), maxDistanceField.getHeight(), Color.black, 150);
+
+        // Add footer to mask the bottom toolbar
         DrawUtil.drawRectangle(0, this.height - headerHeight, this.width, headerHeight, Color.black, 150);
     }
 
@@ -124,6 +131,13 @@ public class WaypointOptions extends JmUI
         }
 
         super.keyTyped(par1, par2);
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton)
+    {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+        maxDistanceField.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     public void close()

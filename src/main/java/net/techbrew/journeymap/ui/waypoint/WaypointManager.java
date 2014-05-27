@@ -18,7 +18,8 @@ import org.lwjgl.input.Keyboard;
 
 import java.util.*;
 
-public class WaypointManager extends JmUI {
+public class WaypointManager extends JmUI
+{
 
     final static String ASCEND = Constants.getString("JourneyMap.char_uparrow");
     final static String DESCEND = Constants.getString("JourneyMap.char_downarrow");
@@ -59,7 +60,7 @@ public class WaypointManager extends JmUI {
 
     private Waypoint focusWaypoint;
 
-	public WaypointManager()
+    public WaypointManager()
     {
         this(null);
     }
@@ -70,11 +71,11 @@ public class WaypointManager extends JmUI {
         this.focusWaypoint = focusWaypoint;
     }
 
-	/**
+    /**
      * Adds the buttons (and other controls) to the screen in question.
      */
     @Override
-	public void initGui()
+    public void initGui()
     {
         try
         {
@@ -83,7 +84,8 @@ public class WaypointManager extends JmUI {
                 if (mc.thePlayer.capabilities.isCreativeMode)
                 {
                     canUserTeleport = true;
-                } else
+                }
+                else
                 {
                     CommandTeleport command = new CommandTeleport();
                     canUserTeleport = command.canCommandSenderUseCommand(mc.thePlayer);
@@ -133,7 +135,7 @@ public class WaypointManager extends JmUI {
                     buttonAdd.setWidth(buttonAdd.getWidth() * 2);
                 }
 
-                if(buttonHelp == null)
+                if (buttonHelp == null)
                 {
                     buttonHelp = new Button(ButtonEnum.Help, Constants.getString("MapOverlay.help"));
                     buttonHelp.fitWidth(getFontRenderer());
@@ -154,19 +156,19 @@ public class WaypointManager extends JmUI {
             if (this.items.isEmpty())
             {
                 updateItems();
-                if(currentSort==null)
+                if (currentSort == null)
                 {
                     updateSort(buttonSortDistance);
                 }
                 else
                 {
-                    if(buttonSortDistance.sort.equals(currentSort))
+                    if (buttonSortDistance.sort.equals(currentSort))
                     {
                         buttonSortDistance.sort.ascending = currentSort.ascending;
                         buttonSortDistance.setActive(true);
                         buttonSortName.setActive(false);
                     }
-                    if(buttonSortName.sort.equals(currentSort))
+                    if (buttonSortName.sort.equals(currentSort))
                     {
                         buttonSortName.sort.ascending = currentSort.ascending;
                         buttonSortName.setActive(true);
@@ -182,25 +184,26 @@ public class WaypointManager extends JmUI {
                 itemScrollPane.setShowSelectionBox(false);
             }
         }
-        catch(Throwable t)
+        catch (Throwable t)
         {
             JourneyMap.getLogger().severe(LogFormatter.toString(t));
             UIManager.getInstance().closeAll();
         }
     }
-    
+
     /**
-	 * Center buttons in UI.
-	 */
+     * Center buttons in UI.
+     */
     @Override
-    protected void layoutButtons() {
+    protected void layoutButtons()
+    {
 
         // Header buttons
         int pad = 3;
         int headerY = headerHeight + pad;
-        if(items.size()>0)
+        if (items.size() > 0)
         {
-            if(items.get(0).y>headerY + 16)
+            if (items.get(0).y > headerY + 16)
             {
                 headerY = items.get(0).y - 16;
             }
@@ -208,7 +211,7 @@ public class WaypointManager extends JmUI {
             buttonToggleAll.setY(headerY);
             buttonToggleAll.centerHorizontalOn(items.get(0).getButtonEnableCenterX());
         }
-        buttonToggleAll.drawButton = !items.isEmpty();
+        buttonToggleAll.setDrawButton(!items.isEmpty());
 
         int margin = getMargin();
         int headerX = itemScrollPane.getX() + margin;
@@ -216,26 +219,19 @@ public class WaypointManager extends JmUI {
         colName = buttonSortDistance.getX() + buttonSortDistance.getWidth() + 5 - headerX;
         buttonSortName.setPosition(headerX + colName, headerY);
 
-        buttonSortDistance.drawButton = !items.isEmpty();
-        buttonSortName.drawButton = !items.isEmpty();
+        buttonSortDistance.setDrawButton(!items.isEmpty());
+        buttonSortName.setDrawButton(!items.isEmpty());
 
         // Scroll pane
         int hgap = 4;
         int vgap = 5;
-        int bottomButtonsHeight = buttonClose.getHeight() + (vgap*2);
+        int bottomButtonsHeight = buttonClose.getHeight() + (vgap * 2);
         final int startY = headerHeight + vgap + getFontRenderer().FONT_HEIGHT;
-        int scrollWidth = this.width-6;
+        int scrollWidth = this.width - 6;
         itemScrollPane.position(scrollWidth, this.height, startY, bottomButtonsHeight, 0, 0);
 
         // Bottom buttons
-        ButtonList.equalizeWidths(mc.fontRenderer, bottomButtons);
-        if(bottomButtons.getWidth(hgap) > this.width)
-        {
-            ButtonList temp = new ButtonList();
-            temp.addAll(bottomButtons);
-            temp.remove(buttonDimensions);
-            ButtonList.equalizeWidths(mc.fontRenderer, temp);
-        }
+        bottomButtons.equalizeWidths(getFontRenderer(), hgap, scrollWidth);
         bottomButtons.layoutCenteredHorizontal(this.width / 2, this.height - bottomButtonsHeight + vgap, true, hgap);
     }
 
@@ -271,7 +267,7 @@ public class WaypointManager extends JmUI {
 
         for (int k = 0; k < this.buttonList.size(); ++k)
         {
-            GuiButton guibutton = (GuiButton)this.buttonList.get(k);
+            GuiButton guibutton = (GuiButton) this.buttonList.get(k);
             guibutton.drawButton(this.mc, x, y);
         }
         buttonToggleAll.drawUnderline();
@@ -282,14 +278,14 @@ public class WaypointManager extends JmUI {
 
     protected int getMargin()
     {
-        return width>itemWidth+2 ? (width-itemWidth)/2 : 0;
+        return width > itemWidth + 2 ? (width - itemWidth) / 2 : 0;
     }
 
     protected void keyTyped(char par1, int par2)
     {
-        switch(par2)
+        switch (par2)
         {
-            case Keyboard.KEY_ESCAPE :
+            case Keyboard.KEY_ESCAPE:
                 refreshAndClose();
                 return;
             // TODO: Arrow keys
@@ -304,7 +300,8 @@ public class WaypointManager extends JmUI {
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton)
+    {
         super.mouseClicked(mouseX, mouseY, mouseButton);
 
         if (buttonToggleAll.mouseOver(mouseX, mouseY))
@@ -317,14 +314,14 @@ public class WaypointManager extends JmUI {
     @Override
     protected void actionPerformed(GuiButton guibutton)
     {
-        switch(ButtonEnum.values()[guibutton.id])
+        switch (ButtonEnum.values()[guibutton.id])
         {
-            case Close :
+            case Close:
             {
                 refreshAndClose();
                 return;
             }
-            case SortName :
+            case SortName:
             {
                 updateSort(buttonSortName);
                 return;
@@ -364,7 +361,7 @@ public class WaypointManager extends JmUI {
                 return;
             }
         }
-	}
+    }
 
     public void removeWaypoint(WaypointManagerItem item)
     {
@@ -404,11 +401,11 @@ public class WaypointManager extends JmUI {
 
         Collection<Waypoint> waypoints = WaypointStore.instance().getAll();
         boolean allOn = true;
-        for(Waypoint waypoint : waypoints)
+        for (Waypoint waypoint : waypoints)
         {
             WaypointManagerItem item = new WaypointManagerItem(waypoint, fr, this);
             item.getDistanceSqToEntity(mc.thePlayer);
-            if(currentDim==null || item.waypoint.getDimensions().contains(currentDim))
+            if (currentDim == null || item.waypoint.getDimensions().contains(currentDim))
             {
                 items.add(item);
                 if (allOn)
@@ -418,7 +415,7 @@ public class WaypointManager extends JmUI {
             }
         }
 
-        if(items.isEmpty())
+        if (items.isEmpty())
         {
             itemWidth = DEFAULT_ITEMWIDTH;
         }
@@ -430,7 +427,7 @@ public class WaypointManager extends JmUI {
         buttonToggleAll.setToggled(!allOn);
         updateCount();
 
-        if(currentSort!=null)
+        if (currentSort != null)
         {
             Collections.sort(items, currentSort);
         }
@@ -438,13 +435,13 @@ public class WaypointManager extends JmUI {
 
     protected void updateSort(SortButton sortButton)
     {
-        for(Button button : (List<Button>) buttonList)
+        for (Button button : (List<Button>) buttonList)
         {
-            if(button instanceof SortButton)
+            if (button instanceof SortButton)
             {
-                if(button == sortButton)
+                if (button == sortButton)
                 {
-                    if(sortButton.sort.equals(currentSort))
+                    if (sortButton.sort.equals(currentSort))
                     {
                         sortButton.toggle();
                     }
@@ -461,7 +458,7 @@ public class WaypointManager extends JmUI {
             }
         }
 
-        if(currentSort!=null)
+        if (currentSort != null)
         {
             Collections.sort(items, currentSort);
         }
@@ -475,7 +472,8 @@ public class WaypointManager extends JmUI {
         buttonToggleAll.setLabels(enableOff, enableOn);
     }
 
-    protected void refreshAndClose() {
+    protected void refreshAndClose()
+    {
         bottomButtons.setOptions(false, true, true);
         WaypointStore.instance().bulkSave();
         DataCache.instance().forceRefresh(WaypointsData.class);
@@ -511,7 +509,7 @@ public class WaypointManager extends JmUI {
 
         public void setActive(boolean active)
         {
-            if(active)
+            if (active)
             {
                 setToggled(sort.ascending);
             }
@@ -531,7 +529,7 @@ public class WaypointManager extends JmUI {
         {
             super(id, 0, 0, "");
             dimensions = WorldData.getDimensions();
-            if(currentDim!=null)
+            if (currentDim != null)
             {
                 currentDim = Minecraft.getMinecraft().thePlayer.dimension;
             }
@@ -545,7 +543,7 @@ public class WaypointManager extends JmUI {
         {
             String dimName;
 
-            if(currentDim!=null)
+            if (currentDim != null)
             {
                 dimName = WorldData.getDimensionName(currentDim);
             }
@@ -560,12 +558,12 @@ public class WaypointManager extends JmUI {
         public int getFitWidth(FontRenderer fr)
         {
             int maxWidth = 0;
-            for(Integer dim : dimensions)
+            for (Integer dim : dimensions)
             {
                 String name = Constants.getString("Waypoint.dimension", WorldData.getDimensionName(dim));
                 maxWidth = Math.max(maxWidth, Minecraft.getMinecraft().fontRenderer.getStringWidth(name));
             }
-            return maxWidth+12;
+            return maxWidth + 12;
         }
 
         @Override
@@ -573,7 +571,7 @@ public class WaypointManager extends JmUI {
         {
             int index;
 
-            if(currentDim==null)
+            if (currentDim == null)
             {
                 index = 0;
             }
@@ -582,7 +580,7 @@ public class WaypointManager extends JmUI {
                 index = Arrays.binarySearch(dimensions, currentDim) + 1;
             }
 
-            if(index==dimensions.length || index==-1)
+            if (index == dimensions.length || index == -1)
             {
                 currentDim = null;
             }

@@ -25,8 +25,6 @@ public class MapOverlayOptions extends JmUI
         Caves, Grid, Close
     }
 
-    ;
-
     Button buttonCaves, buttonGrid, buttonClose;
 
     String labelOn = Constants.getString("MapOverlay.on");
@@ -53,6 +51,7 @@ public class MapOverlayOptions extends JmUI
         this.buttonList.clear();
         this.leftRows.clear();
         this.rightRows.clear();
+
         int id = 0;
 
         String on = Constants.getString("MapOverlay.on");
@@ -115,18 +114,21 @@ public class MapOverlayOptions extends JmUI
 
         for (ButtonRow buttonRow : leftRows)
         {
-            ButtonList.setWidths(commonWidth, buttonRow);
+            buttonRow.setWidths(commonWidth);
             buttonList.addAll(buttonRow);
         }
 
         for (ButtonRow buttonRow : rightRows)
         {
-            ButtonList.setWidths(commonWidth, buttonRow);
+            buttonRow.setWidths(commonWidth);
             buttonList.addAll(buttonRow);
         }
 
         buttonCaves = new BooleanPropertyButton(id++, Constants.getString("MapOverlay.show_caves", on), Constants.getString("MapOverlay.show_caves", off), fullMap, fullMap.showCaves);
+        buttonCaves.setEnabled(FeatureManager.isAllowed(Feature.RadarPlayers));
+
         buttonGrid = new BooleanPropertyButton(id++, Constants.getString("MapOverlay.show_grid", on), Constants.getString("MapOverlay.show_grid", off), fullMap, fullMap.showGrid);
+
         rowOther = new ButtonList(buttonCaves, buttonGrid);
         buttonList.addAll(rowOther);
 
@@ -201,6 +203,12 @@ public class MapOverlayOptions extends JmUI
         if (button instanceof BooleanPropertyButton)
         {
             ((BooleanPropertyButton) button).toggle();
+
+            // TODO: Make grid an overlay instead of being backed into Tile cache
+            // Then the minmap and webmap can have their own grid setting
+            JourneyMap.getInstance().miniMapProperties.showGrid.set(JourneyMap.getInstance().fullMapProperties.showGrid.get());
+            JourneyMap.getInstance().webMapProperties.showGrid.set(JourneyMap.getInstance().fullMapProperties.showGrid.get());
+
             return;
         }
 
@@ -223,7 +231,7 @@ public class MapOverlayOptions extends JmUI
         {
             for (Button button : this)
             {
-                button.enabled = enable;
+                button.setEnabled(enable);
             }
         }
     }

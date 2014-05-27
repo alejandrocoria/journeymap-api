@@ -63,4 +63,21 @@ public class FullMapProperties extends MapProperties
         result = 31 * result + fontSmall.hashCode();
         return result;
     }
+
+    @Override
+    public String toString()
+    {
+        return "FullMapProperties: " +
+                "revision=" + revision +
+                ", showCaves=" + showCaves +
+                ", showMobs=" + showMobs +
+                ", showAnimals=" + showAnimals +
+                ", showVillagers=" + showVillagers +
+                ", showPets=" + showPets +
+                ", showPlayers=" + showPlayers +
+                ", showWaypoints=" + showWaypoints +
+                ", showGrid=" + showGrid +
+                ", forceUnicode=" + forceUnicode +
+                ", fontSmall=" + fontSmall;
+    }
 }

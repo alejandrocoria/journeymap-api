@@ -26,6 +26,10 @@ Changes since 4.0.0b1:
 - Change: Waypoint Manager now has "All:On/All:Off" button to bulk-toggle waypoint visibility
 - Change: Waypoint Manager now has Options button to go to Waypoint Options (in-game display)
 - Change: Double-clicking a waypoint on the full-screen map now takes you to the Waypoint Manager and highlights the waypoint
+- Change: Chat warning now displayed when OutOfMemoryError or LinkageError encountered
+- Change: Chat warning now displayed when logging level set below INFO
+- Change: JourneyMap logger now tied into FML logger for cleaner FML log output
+- Change: JourneyMap logger added shutdown hook to clean up .lck files
 - Bugfix: Waypoint "enable" state (on/off) wasn't saved to file.
 - Bugfix: Waypoint Editor wouldn't open a waypoint with no dimensions selected.
 - Bugfix: Waypoint Editor didn't check for changes to selected dimensions when determining whether Save button enabled.

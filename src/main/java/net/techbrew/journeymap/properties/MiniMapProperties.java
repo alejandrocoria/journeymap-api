@@ -77,4 +77,27 @@ public class MiniMapProperties extends MapProperties
         result = 31 * result + fontSmall.hashCode();
         return result;
     }
+
+    @Override
+    public String toString()
+    {
+        return "MiniMapProperties: " +
+                "revision=" + revision +
+                ", showCaves=" + showCaves +
+                ", showMobs=" + showMobs +
+                ", showAnimals=" + showAnimals +
+                ", showVillagers=" + showVillagers +
+                ", showPets=" + showPets +
+                ", showPlayers=" + showPlayers +
+                ", showWaypoints=" + showWaypoints +
+                ", showGrid=" + showGrid +
+                ", enabled=" + enabled +
+                ", shape=" + shape +
+                ", position=" + position +
+                ", showFps=" + showFps +
+                ", enableHotkeys=" + enableHotkeys +
+                ", showWaypointLabels=" + showWaypointLabels +
+                ", forceUnicode=" + forceUnicode +
+                ", fontSmall=" + fontSmall;
+    }
 }
