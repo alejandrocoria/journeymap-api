@@ -14,6 +14,7 @@ import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.task.MapRegionTask;
 import net.techbrew.journeymap.task.SaveMapTask;
 import net.techbrew.journeymap.ui.Button;
+import net.techbrew.journeymap.ui.ButtonList;
 import net.techbrew.journeymap.ui.JmUI;
 import net.techbrew.journeymap.ui.UIManager;
 import org.lwjgl.input.Keyboard;
@@ -67,6 +68,9 @@ public class MapOverlayActions extends JmUI
         buttonList.add(buttonSave);
         buttonList.add(buttonCheck);
         buttonList.add(buttonBrowser);
+
+        new ButtonList(buttonList).equalizeWidths(getFontRenderer());
+
         buttonList.add(buttonClose);
 
     }
@@ -88,12 +92,12 @@ public class MapOverlayActions extends JmUI
 
         final int hgap = 4;
         final int vgap = 3;
-        final int bx = (this.width - hgap) / 2;
+        final int bx = (this.width) / 2;
         final int by = this.height / 4;
 
-        buttonAutomap.leftOf(bx).setY(by);
+        buttonAutomap.leftOf(bx - 2).setY(by);
         buttonBrowser.rightOf(buttonAutomap, hgap).setY(by);
-        buttonSave.below(buttonAutomap, vgap).leftOf(bx);
+        buttonSave.below(buttonAutomap, vgap).leftOf(bx - 2);
         buttonCheck.below(buttonBrowser, vgap).rightOf(buttonSave, hgap);
         buttonClose.below(buttonSave, vgap * 4).centerHorizontalOn(bx);
     }

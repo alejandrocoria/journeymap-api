@@ -223,7 +223,7 @@ Waypoint.import_vox_success=Imported %1$s waypoints from VoxelMap.
 Waypoint.import_vox_failure=No VoxelMap waypoints were imported. See journeyMap.log for details.
 Waypoint.import_vox_errors=Imported %1$s waypoints from VoxelMap with %1$s errors. See journeyMap.log for details.
 
-Waypoint.options=Waypoint Options
+Waypoint.options=Waypoint Options (In-Game Display)
 Waypoint.show_texture=Show Icon: %1$s
 Waypoint.texture_size=Icon Size: %1$s
 Waypoint.show_static_beam=Stationary Beam: %1$s

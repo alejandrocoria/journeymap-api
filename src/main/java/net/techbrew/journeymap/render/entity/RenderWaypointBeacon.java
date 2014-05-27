@@ -181,7 +181,7 @@ public class RenderWaypointBeacon
                 GL11.glDepthMask(true);
                 GL11.glEnable(GL11.GL_DEPTH_TEST);
                 String label = sb.toString();
-                final int fontScale = waypointProperties.fontSmall.get() ? 1 : 2;
+                final int fontScale = waypointProperties.fontSmall.get() ? 2 : 4;
 
                 boolean forced = DrawUtil.startUnicode(fr, waypointProperties.forceUnicode.get());
                 DrawUtil.drawLabel(label, 0, 0 - halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 150, waypoint.getSafeColor(), 255, fontScale, false);
