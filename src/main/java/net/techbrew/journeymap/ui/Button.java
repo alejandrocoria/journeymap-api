@@ -165,7 +165,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             FontRenderer fontrenderer = minecraft.fontRenderer;
             minecraft.getTextureManager().bindTexture(buttonTextures);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            this.field_82253_i = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
 
 
             if (isDrawFrame())
@@ -179,7 +179,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
             if (isDrawBackground())
             {
-                int k = this.getHoverState(this.field_82253_i);
+                int k = this.getHoverState(this.field_146123_n);
                 DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, k == 2 ? smallBgHoverColor : smallBgColor, 255);
             }
 
@@ -192,7 +192,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             }
             else
             {
-                if (this.field_82253_i)
+                if (this.field_146123_n)
                 {
                     l = 16777120;
                 }

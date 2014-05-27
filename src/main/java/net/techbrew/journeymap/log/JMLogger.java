@@ -1,6 +1,5 @@
 package net.techbrew.journeymap.log;
 
-import cpw.mods.fml.relauncher.FMLRelaunchLog;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -22,7 +21,6 @@ public class JMLogger
 
     public static Logger init()
     {
-        FMLRelaunchLog.makeLog(JourneyMap.MOD_ID);
         final Logger logger = Logger.getLogger(JourneyMap.MOD_ID);
 
         if (logger.getLevel() == null || logger.getLevel().intValue() > Level.INFO.intValue())
