@@ -264,7 +264,7 @@ public class WaypointManager extends JmUI {
             if (index > -1 && index > offset)
             {
                 int delta = index - offset;
-                itemScrollPane.func_77208_b(delta * itemScrollPane.getSlotHeight());
+                itemScrollPane.scrollBy(delta * itemScrollPane.getSlotHeight());
             }
             focusWaypoint = null;
         }

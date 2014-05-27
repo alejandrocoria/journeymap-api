@@ -106,7 +106,7 @@ public class RenderWaypointBeacon
 
             // Adjust waypoint render position if needed
             double viewDistance = actualDistance;
-            double maxRenderDistance = 256 >> mc.gameSettings.renderDistance;
+            double maxRenderDistance = mc.gameSettings.renderDistanceChunks * 16;
             if (viewDistance > maxRenderDistance)
             {
                 Vec3 delta = waypointVec.subtract(playerVec).normalize();

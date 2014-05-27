@@ -1,7 +1,8 @@
 package net.techbrew.journeymap.forgehandler;
 
-import cpw.mods.fml.client.registry.KeyBindingRegistry;
-import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.client.registry.ClientRegistry;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.InputEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.KeyBinding;
@@ -13,39 +14,29 @@ import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
 import org.lwjgl.input.Keyboard;
 
-import java.util.Arrays;
 import java.util.EnumSet;
 
 /**
  * Created by mwoodman on 1/29/14.
  */
-public class KeyEventHandler extends KeyBindingRegistry.KeyHandler {
-
-    private static boolean[] boolarray;
-
-    static
-    {
-        boolarray = new boolean[Constants.KEYBINDINGS.length];
-        Arrays.fill(boolarray, false);
-    }
+public class KeyEventHandler implements EventHandlerManager.EventHandler {
 
     public KeyEventHandler()
     {
-        super(Constants.KEYBINDINGS, boolarray);
-    }
-
-    @Override
-    public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat)
-    {
-    }
-
-    @Override
-    public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd)
-    {
-        if (tickEnd)
+        for(KeyBinding kb : Constants.KEYBINDINGS)
         {
-            KeyEventHandler.onKeypress(false);
+            ClientRegistry.registerKeyBinding(kb);
         }
+    }
+
+    @Override
+    public EnumSet<EventHandlerManager.BusType> getBus() {
+        return EnumSet.of(EventHandlerManager.BusType.FMLCommonHandlerBus);
+    }
+
+    @SubscribeEvent
+    public void onKeyboardEvent(InputEvent.KeyInputEvent event) {
+        KeyEventHandler.onKeypress(false);
     }
 
     public static void onKeypress(boolean minimapOnly)
@@ -143,18 +134,6 @@ public class KeyEventHandler extends KeyBindingRegistry.KeyHandler {
                 }
             }
         }
-    }
-
-    @Override
-    public EnumSet<TickType> ticks()
-    {
-        return EnumSet.of(TickType.CLIENT);
-    }
-
-    @Override
-    public String getLabel()
-    {
-        return getClass().getName();
     }
 }
 

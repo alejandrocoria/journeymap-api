@@ -158,7 +158,7 @@ public class WaypointHelp extends JmUI
         }
 
         // Show Rei Import
-        int reiHeight = fr.listFormattedStringToWidth(importReiText, indentWidth).size() * fontRenderer.FONT_HEIGHT;
+        int reiHeight = fr.listFormattedStringToWidth(importReiText, indentWidth).size() * getFontRenderer().FONT_HEIGHT;
         y += 24;
         buttonRei.setPosition(indentX - 4, y);
         y += buttonRei.getHeight() + 5;
@@ -166,7 +166,7 @@ public class WaypointHelp extends JmUI
         y += reiHeight + 16;
 
         // Show Voxel Import
-        int voxelHeight = fr.listFormattedStringToWidth(importVoxelText, indentWidth).size() * fontRenderer.FONT_HEIGHT;
+        int voxelHeight = fr.listFormattedStringToWidth(importVoxelText, indentWidth).size() * getFontRenderer().FONT_HEIGHT;
         buttonVoxel.setPosition(indentX - 4, y);
         if (!buttonVoxel.drawButton)
         {

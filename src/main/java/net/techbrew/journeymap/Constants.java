@@ -4,7 +4,6 @@ package net.techbrew.journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.util.EnumOS;
 import net.minecraft.util.Util;
 import org.lwjgl.input.Keyboard;
 
@@ -23,15 +22,15 @@ public class Constants {
     public static String MP_DATA_DIR = DATA_DIR + WorldType.mp + File.separator;
     public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
 
-    public static final KeyBinding KB_MAP = new KeyBinding("JourneyMap: " + Constants.getString("MapOverlay.hotkeys_toggle"), Keyboard.KEY_J);
-    public static final KeyBinding KB_MAP_ZOOMIN = new KeyBinding("JourneyMap: " + Constants.getString("MapOverlay.hotkeys_zoom_in"), Keyboard.KEY_EQUALS);
-    public static final KeyBinding KB_MAP_ZOOMOUT = new KeyBinding("JourneyMap: " + Constants.getString("MapOverlay.hotkeys_zoom_out"), Keyboard.KEY_MINUS);
-    public static final KeyBinding KB_MAP_DAY = new KeyBinding("JourneyMap: " + Constants.getString("MapOverlay.hotkeys_day"), Keyboard.KEY_LBRACKET);
-    public static final KeyBinding KB_MAP_NIGHT = new KeyBinding("JourneyMap: " + Constants.getString("MapOverlay.hotkeys_night"), Keyboard.KEY_RBRACKET);
-    public static final KeyBinding KB_MINIMAP_POS = new KeyBinding("JourneyMap: " + Constants.getString("MiniMap.hotkeys_position"), Keyboard.KEY_BACKSLASH);
-    public static final KeyBinding KB_WAYPOINT = new KeyBinding("JourneyMap: " + Constants.getString("Waypoint.new_title"), Keyboard.KEY_B);
-
-    public static final String CONTROL_KEYNAME_COMBO = Util.getOSType()== EnumOS.MACOS ? "^" : "Ctrl+";
+    public static final String CONTROL_KEYNAME_COMBO = Util.getOSType()== Util.EnumOS.MACOS ? "^" : "Ctrl+";
+    public static final String KEYBINDING_CATEGORY = Constants.getString("MapOverlay.hotkeys_keybinding_category", CONTROL_KEYNAME_COMBO);
+    public static final KeyBinding KB_MAP = new KeyBinding("MapOverlay.hotkeys_toggle", Keyboard.KEY_J, KEYBINDING_CATEGORY);
+    public static final KeyBinding KB_MAP_ZOOMIN = new KeyBinding(Constants.getString("MapOverlay.hotkeys_zoom_in"), Keyboard.KEY_EQUALS, KEYBINDING_CATEGORY);
+    public static final KeyBinding KB_MAP_ZOOMOUT = new KeyBinding(Constants.getString("MapOverlay.hotkeys_zoom_out"), Keyboard.KEY_MINUS, KEYBINDING_CATEGORY);
+    public static final KeyBinding KB_MAP_DAY = new KeyBinding(Constants.getString("MapOverlay.hotkeys_day"), Keyboard.KEY_LBRACKET, KEYBINDING_CATEGORY);
+    public static final KeyBinding KB_MAP_NIGHT = new KeyBinding(Constants.getString("MapOverlay.hotkeys_night"), Keyboard.KEY_RBRACKET, KEYBINDING_CATEGORY);
+    public static final KeyBinding KB_MINIMAP_POS = new KeyBinding(Constants.getString("MiniMap.hotkeys_position"), Keyboard.KEY_BACKSLASH, KEYBINDING_CATEGORY);
+    public static final KeyBinding KB_WAYPOINT = new KeyBinding(Constants.getString("Waypoint.new_title"), Keyboard.KEY_B, KEYBINDING_CATEGORY);
 
     public static final KeyBinding[] KEYBINDINGS = new KeyBinding[] {
         KB_MAP, KB_MAP_ZOOMIN, KB_MAP_ZOOMOUT, KB_MAP_DAY, KB_MAP_NIGHT, KB_MINIMAP_POS, KB_WAYPOINT
@@ -52,14 +51,12 @@ public class Constants {
         return locale;
     }
 
-    public static String getString(String key)
-    {
-        return I18n.getString(key);
+    public static String getString(String key) {
+        return I18n.format(key);
     }
 
-    public static String getString(String key, Object... params)
-    {
-        return I18n.getStringParams(key, params);
+    public static String getString(String key, Object... params) {
+        return I18n.format(key, params);
     }
 
     public static String getKeyName(KeyBinding keyBinding)

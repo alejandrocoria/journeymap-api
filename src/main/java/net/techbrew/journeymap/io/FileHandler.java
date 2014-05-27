@@ -2,7 +2,6 @@ package net.techbrew.journeymap.io;
 
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.EnumOS;
 import net.minecraft.util.Util;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -310,7 +309,7 @@ public class FileHandler
 
         String path = file.getAbsolutePath();
 
-        if (Util.getOSType() == EnumOS.MACOS)
+        if (Util.getOSType() == Util.EnumOS.MACOS)
         {
             try
             {
@@ -325,7 +324,7 @@ public class FileHandler
         }
         else
         {
-            if (Util.getOSType() == EnumOS.WINDOWS)
+            if (Util.getOSType() == Util.EnumOS.WINDOWS)
             {
 
                 String cmd = String.format("cmd.exe /C start \"Open file\" \"%s\"", new Object[]{path});
