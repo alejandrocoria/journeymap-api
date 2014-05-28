@@ -1,6 +1,7 @@
 package net.techbrew.journeymap.render.overlay;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.EntityKey;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -98,7 +99,8 @@ public class OverlayRadarRenderer
                         }
                     }
 
-                    drawStepList.add(new DrawEntityStep(posX, posZ, heading, false, locatorImg, (int) (8 * drawScale)));
+                    Entity entity = (Entity) critter.get(EntityKey.entityLiving);
+                    drawStepList.add(new DrawEntityStep(entity, false, locatorImg, (int) (8 * drawScale)));
 
                     // Draw entity image
                     if (isPlayer)
@@ -112,7 +114,7 @@ public class OverlayRadarRenderer
                     if (entityIcon != null)
                     {
                         int bottomMargin = isPlayer ? 0 : (int) (8 * drawScale);
-                        drawStepList.add(new DrawEntityStep(posX, posZ, heading, true, entityIcon, bottomMargin));
+                        drawStepList.add(new DrawEntityStep(entity, true, entityIcon, bottomMargin));
                     }
 
                     if (isPlayer)

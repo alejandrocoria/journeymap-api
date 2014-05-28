@@ -132,6 +132,9 @@ MapOverlay.show_waypoints=Show Waypoints: %1$s
 # %1$s = "On" or "Off"
 MapOverlay.show_grid=Show Grid: %1$s
 
+# %1$s = "On" or "Off"
+MapOverlay.show_self=Show Self: %1$s
+
 # Added in 3.1.x.
 MapOverlay.minimap=MiniMap...
 

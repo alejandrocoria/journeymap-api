@@ -17,6 +17,15 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public final AtomicInteger entityPoll = new AtomicInteger(1800);
     public final AtomicInteger playerPoll = new AtomicInteger(1900);
     public final AtomicInteger chunkPoll = new AtomicInteger(2000);
+    public final AtomicInteger cacheAnimalsData = new AtomicInteger(5000);
+    public final AtomicInteger maxAnimalsData = new AtomicInteger(16);
+    public final AtomicInteger cacheMobsData = new AtomicInteger(5000);
+    public final AtomicInteger maxMobsData = new AtomicInteger(16);
+    public final AtomicInteger cachePlayerData = new AtomicInteger(1000);
+    public final AtomicInteger cachePlayersData = new AtomicInteger(5000);
+    public final AtomicInteger maxPlayersData = new AtomicInteger(32);
+    public final AtomicInteger cacheVillagersData = new AtomicInteger(5000);
+    public final AtomicInteger maxVillagersData = new AtomicInteger(16);
     public final AtomicBoolean caveLighting = new AtomicBoolean(true);
     public final AtomicBoolean announceMod = new AtomicBoolean(true);
     public final AtomicBoolean checkUpdates = new AtomicBoolean(true);
@@ -40,6 +49,12 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     }
 
     @Override
+    public int compareTo(CoreProperties o)
+    {
+        return Integer.compare(this.hashCode(), o.hashCode());
+    }
+
+    @Override
     public boolean equals(Object o)
     {
         if (this == o)
@@ -52,7 +67,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
         }
 
         CoreProperties that = (CoreProperties) o;
-        return 0 == this.compareTo(that);
+        return 0 == that.compareTo(this);
     }
 
     @Override
@@ -65,16 +80,19 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
         result = 31 * result + entityPoll.hashCode();
         result = 31 * result + playerPoll.hashCode();
         result = 31 * result + chunkPoll.hashCode();
+        result = 31 * result + cacheAnimalsData.hashCode();
+        result = 31 * result + maxAnimalsData.hashCode();
+        result = 31 * result + cacheMobsData.hashCode();
+        result = 31 * result + maxMobsData.hashCode();
+        result = 31 * result + cachePlayerData.hashCode();
+        result = 31 * result + cachePlayersData.hashCode();
+        result = 31 * result + maxPlayersData.hashCode();
+        result = 31 * result + cacheVillagersData.hashCode();
+        result = 31 * result + maxVillagersData.hashCode();
         result = 31 * result + caveLighting.hashCode();
         result = 31 * result + announceMod.hashCode();
         result = 31 * result + checkUpdates.hashCode();
         return result;
-    }
-
-    @Override
-    public int compareTo(CoreProperties o)
-    {
-        return Integer.compare(this.hashCode(), o.hashCode());
     }
 
     @Override
@@ -87,6 +105,15 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 ", entityPoll=" + entityPoll +
                 ", playerPoll=" + playerPoll +
                 ", chunkPoll=" + chunkPoll +
+                ", cacheAnimalsData=" + cacheAnimalsData +
+                ", maxAnimalsData=" + maxAnimalsData +
+                ", cacheMobsData=" + cacheMobsData +
+                ", maxMobsData=" + maxMobsData +
+                ", cachePlayerData=" + cachePlayerData +
+                ", cachePlayersData=" + cachePlayersData +
+                ", maxPlayersData=" + maxPlayersData +
+                ", cacheVillagersData=" + cacheVillagersData +
+                ", maxVillagersData=" + maxVillagersData +
                 ", caveLighting=" + caveLighting +
                 ", announceMod=" + announceMod +
                 ", checkUpdates=" + checkUpdates;

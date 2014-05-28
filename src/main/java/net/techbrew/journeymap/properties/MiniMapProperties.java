@@ -83,6 +83,7 @@ public class MiniMapProperties extends MapProperties
     {
         return "MiniMapProperties: " +
                 "revision=" + revision +
+                ", showSelf=" + showSelf +
                 ", showCaves=" + showCaves +
                 ", showMobs=" + showMobs +
                 ", showAnimals=" + showAnimals +

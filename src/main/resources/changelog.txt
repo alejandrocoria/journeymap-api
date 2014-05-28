@@ -14,6 +14,7 @@ Requirements:
 Changes since 4.0.0b1:
 
 - Change: journeyMap.properties file migrated to multiple files in journeyMap/config/
+-- Many properties now configurable instead of hard-coded.
 - Feature: In-game waypoint beacons added.
 - Feature: New Options master dialog provides entry points into multiple option dialogs
 -- New General Display Options dialog allows minimap options to be configured differently than full map options
@@ -30,6 +31,8 @@ Changes since 4.0.0b1:
 - Change: Chat warning now displayed when logging level set below INFO
 - Change: JourneyMap logger now tied into FML logger for cleaner FML log output
 - Change: JourneyMap logger added shutdown hook to clean up .lck files
+- Change: Entity icons/headings now update in real-time, but queries for nearby entities are still on a config-based delay (cache duration)
+- Change: Self icon can now be toggled off in full map and minimap.
 - Bugfix: Waypoint "enable" state (on/off) wasn't saved to file.
 - Bugfix: Waypoint Editor wouldn't open a waypoint with no dimensions selected.
 - Bugfix: Waypoint Editor didn't check for changes to selected dimensions when determining whether Save button enabled.

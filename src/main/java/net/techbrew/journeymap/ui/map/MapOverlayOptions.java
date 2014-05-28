@@ -34,7 +34,7 @@ public class MapOverlayOptions extends JmUI
 
     ArrayList<ButtonRow> leftRows = new ArrayList<ButtonRow>();
     ArrayList<ButtonRow> rightRows = new ArrayList<ButtonRow>();
-    ButtonRow rowMobs, rowAnimals, rowVillagers, rowPets, rowPlayers, rowWaypoints, rowFontSize, rowForceUnicode;
+    ButtonRow rowMobs, rowAnimals, rowVillagers, rowPets, rowSelf, rowPlayers, rowWaypoints, rowFontSize, rowForceUnicode;
     ButtonList rowOther;
 
     public MapOverlayOptions(Class<? extends JmUI> returnClass)
@@ -83,6 +83,11 @@ public class MapOverlayOptions extends JmUI
         rowPets.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showPets));
         rowPets.setEnabled(FeatureManager.isAllowed(Feature.RadarAnimals));
         leftRows.add(rowPets);
+
+        rowSelf = new ButtonRow(Constants.getString("MapOverlay.show_self", ""));
+        rowSelf.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showSelf));
+        rowSelf.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showSelf));
+        rightRows.add(rowSelf);
 
         rowPlayers = new ButtonRow(Constants.getString("MapOverlay.show_players", ""));
         rowPlayers.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showPlayers));
@@ -134,6 +139,8 @@ public class MapOverlayOptions extends JmUI
 
         buttonClose = new Button(ButtonEnum.Close.ordinal(), 0, 0, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
         buttonList.add(buttonClose);
+
+        rowOther.equalizeWidths(getFontRenderer(), 4, buttonClose.getWidth());
     }
 
     /**

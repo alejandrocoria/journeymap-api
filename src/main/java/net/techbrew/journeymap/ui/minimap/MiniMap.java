@@ -175,10 +175,13 @@ public class MiniMap
             }
 
             // Draw player
-            Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
-            if (playerPixel != null)
+            if (miniMapProperties.showSelf.get())
             {
-                DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), EntityHelper.getHeading(mc.thePlayer), false, playerLocatorTex, 8, 1f);
+                Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
+                if (playerPixel != null)
+                {
+                    DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), EntityHelper.getHeading(mc.thePlayer), false, playerLocatorTex, 8, 1f);
+                }
             }
 
             // Return center to mid-screen

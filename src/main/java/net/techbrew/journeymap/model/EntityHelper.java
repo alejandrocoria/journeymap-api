@@ -27,12 +27,10 @@ import java.util.*;
 
 public class EntityHelper
 {
-
-    private static int MAX_ENTITIES = 16;
     private static int lateralDistance = JourneyMap.getInstance().coreProperties.chunkOffset.get() * 8;
     private static int verticalDistance = lateralDistance / 2;
 
-    public static List getEntitiesNearby(String timerName, Class... entityClasses)
+    public static List getEntitiesNearby(String timerName, int maxEntities, Class... entityClasses)
     {
         StatTimer timer = StatTimer.get("EntityHelper." + timerName);
         timer.start();
@@ -48,10 +46,10 @@ public class EntityHelper
                 list.addAll(mc.theWorld.getEntitiesWithinAABB(entityClass, bb));
             }
 
-            if (list.size() > MAX_ENTITIES)
+            if (list.size() > maxEntities)
             {
                 Collections.sort(list, new EntityDistanceComparator(mc.thePlayer));
-                list = list.subList(0, MAX_ENTITIES);
+                list = list.subList(0, maxEntities);
             }
         }
         catch (Throwable t)
@@ -65,17 +63,17 @@ public class EntityHelper
 
     public static List getMobsNearby()
     {
-        return getEntitiesNearby("getMobsNearby", IMob.class);
+        return getEntitiesNearby("getMobsNearby", JourneyMap.getInstance().coreProperties.maxMobsData.get(), IMob.class);
     }
 
     public static List<EntityVillager> getVillagersNearby()
     {
-        return getEntitiesNearby("getVillagersNearby", EntityVillager.class);
+        return getEntitiesNearby("getVillagersNearby", JourneyMap.getInstance().coreProperties.maxVillagersData.get(), EntityVillager.class);
     }
 
     public static List<IAnimals> getAnimalsNearby()
     {
-        return getEntitiesNearby("getAnimalsNearby", EntityAnimal.class, EntityGolem.class, EntityWaterMob.class);
+        return getEntitiesNearby("getAnimalsNearby", JourneyMap.getInstance().coreProperties.maxAnimalsData.get(), EntityAnimal.class, EntityGolem.class, EntityWaterMob.class);
     }
 
     /**
@@ -88,17 +86,23 @@ public class EntityHelper
         Minecraft mc = Minecraft.getMinecraft();
         IntegratedServer server = mc.getIntegratedServer();
         if (server == null || server.getPublic())
-        { // was !mc.isSinglePlayer()
+        {
+            StatTimer timer = StatTimer.get("EntityHelper.getPlayersNearby");
+            timer.start();
+
             int x = mc.thePlayer.chunkCoordX << 4;
             int z = mc.thePlayer.chunkCoordZ << 4;
             int radius = 512;
             AxisAlignedBB bb = AxisAlignedBB.getBoundingBox(x - radius, 0, z - radius, x + radius, mc.theWorld.getHeight(), z + radius);
             List<EntityPlayer> list = mc.theWorld.getEntitiesWithinAABB(EntityOtherPlayerMP.class, bb);
-            if (list.size() > MAX_ENTITIES)
+            int max = JourneyMap.getInstance().coreProperties.maxPlayersData.get();
+            if (list.size() > max)
             {
                 Collections.sort(list, new EntityDistanceComparator(mc.thePlayer));
-                list = list.subList(0, MAX_ENTITIES);
+                list = list.subList(0, max);
             }
+
+            timer.stop();
             return list;
         }
         else

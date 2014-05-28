@@ -17,7 +17,6 @@ import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
-import net.techbrew.journeymap.model.EntityHelper;
 import net.techbrew.journeymap.model.MapOverlayState;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.FullMapProperties;
@@ -693,12 +692,15 @@ public class MapOverlay extends JmUI
         gridRenderer.draw(1f, xOffset, yOffset);
         gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, 1f, getMapFontScale());
 
-        Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
-        if (playerPixel != null)
+        if (fullMapProperties.showSelf.get())
         {
-            TextureImpl tex = state.currentZoom == 0 ? TextureCache.instance().getPlayerLocatorSmall() : TextureCache.instance().getPlayerLocator();
-            DrawStep drawStep = new DrawEntityStep(mc.thePlayer.posX, mc.thePlayer.posZ, EntityHelper.getHeading(mc.thePlayer), false, tex, 8);
-            gridRenderer.draw(xOffset, yOffset, 1f, getMapFontScale(), drawStep);
+            Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
+            if (playerPixel != null)
+            {
+                TextureImpl tex = state.currentZoom == 0 ? TextureCache.instance().getPlayerLocatorSmall() : TextureCache.instance().getPlayerLocator();
+                DrawStep drawStep = new DrawEntityStep(mc.thePlayer, false, tex, 8);
+                gridRenderer.draw(xOffset, yOffset, 1f, getMapFontScale(), drawStep);
+            }
         }
 
         gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, 1f, getMapFontScale());

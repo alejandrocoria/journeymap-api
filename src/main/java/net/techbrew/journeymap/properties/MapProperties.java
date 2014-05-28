@@ -15,6 +15,7 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
     public final AtomicBoolean showPlayers = new AtomicBoolean(true);
     public final AtomicBoolean showWaypoints = new AtomicBoolean(true);
     public final AtomicBoolean showGrid = new AtomicBoolean(true);
+    public final AtomicBoolean showSelf = new AtomicBoolean(true);
 
     @Override
     public boolean equals(Object o)
@@ -43,6 +44,7 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
         result = 31 * result + showPlayers.hashCode();
         result = 31 * result + showWaypoints.hashCode();
         result = 31 * result + showGrid.hashCode();
+        result = 31 * result + showSelf.hashCode();
         return result;
     }
 
