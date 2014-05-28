@@ -9,7 +9,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
-import net.techbrew.journeymap.properties.WebMapProperties;
+import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.render.overlay.Tile;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
@@ -28,7 +28,7 @@ public class TileService extends FileService
 
     private static final long serialVersionUID = 4412225358529161454L;
 
-    private WebMapProperties webMapProperties = JourneyMap.getInstance().webMapProperties;
+    private FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
 
     public static final String CALLBACK_PARAM = "callback";  //$NON-NLS-1$
     public static final String CHARACTER_ENCODING = "UTF-8"; //$NON-NLS-1$
@@ -128,7 +128,7 @@ public class TileService extends FileService
                 final ChunkCoordIntPair startCoord = new ChunkCoordIntPair(minChunkX, minChunkZ);
                 final ChunkCoordIntPair endCoord = new ChunkCoordIntPair(maxChunkX, maxChunkZ);
 
-                boolean showGrid = webMapProperties.showGrid.get();
+                boolean showGrid = fullMapProperties.showGrid.get();
                 final BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, true, null, Tile.TILESIZE, Tile.TILESIZE, false, showGrid);
 
                 ResponseHeader.on(event).contentType(ContentType.png).noCache();

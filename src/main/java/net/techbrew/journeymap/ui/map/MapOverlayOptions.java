@@ -34,8 +34,7 @@ public class MapOverlayOptions extends JmUI
 
     ArrayList<ButtonRow> leftRows = new ArrayList<ButtonRow>();
     ArrayList<ButtonRow> rightRows = new ArrayList<ButtonRow>();
-    ButtonRow rowMobs, rowAnimals, rowVillagers, rowPets, rowSelf, rowPlayers, rowWaypoints, rowFontSize, rowForceUnicode;
-    ButtonList rowOther;
+    ButtonRow rowMobs, rowAnimals, rowVillagers, rowPets, rowGrid, rowCaves, rowSelf, rowPlayers, rowWaypoints, rowFontSize, rowForceUnicode, rowTextureSize;
 
     public MapOverlayOptions(Class<? extends JmUI> returnClass)
     {
@@ -84,6 +83,18 @@ public class MapOverlayOptions extends JmUI
         rowPets.setEnabled(FeatureManager.isAllowed(Feature.RadarAnimals));
         leftRows.add(rowPets);
 
+        buttonCaves = BooleanPropertyButton.create(id++, fullMap, fullMap.showCaves);
+        buttonCaves.setEnabled(FeatureManager.isAllowed(Feature.RadarPlayers));
+
+        rowCaves = new ButtonRow(Constants.getString("MapOverlay.show_caves", ""));
+        rowCaves.add(buttonCaves);
+        leftRows.add(rowCaves);
+
+        buttonGrid = BooleanPropertyButton.create(id++, fullMap, fullMap.showGrid);
+        rowGrid = new ButtonRow(Constants.getString("MapOverlay.show_grid", ""));
+        rowGrid.add(buttonGrid);
+        leftRows.add(rowGrid);
+        
         rowSelf = new ButtonRow(Constants.getString("MapOverlay.show_self", ""));
         rowSelf.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showSelf));
         rowSelf.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showSelf));
@@ -111,6 +122,11 @@ public class MapOverlayOptions extends JmUI
         rowFontSize.add(BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, miniMap, miniMap.fontSmall));
         rightRows.add(rowFontSize);
 
+        rowTextureSize = new ButtonRow(Constants.getString("MiniMap.texture_size", ""));
+        rowTextureSize.add(BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, fullMap, fullMap.textureSmall));
+        rowTextureSize.add(BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, miniMap, miniMap.textureSmall));
+        rightRows.add(rowTextureSize);
+
         int commonWidth = getFontRenderer().getStringWidth(labelOn);
         commonWidth = Math.max(commonWidth, getFontRenderer().getStringWidth(labelOff));
         commonWidth = Math.max(commonWidth, getFontRenderer().getStringWidth(labelFullMap));
@@ -129,18 +145,17 @@ public class MapOverlayOptions extends JmUI
             buttonList.addAll(buttonRow);
         }
 
-        buttonCaves = new BooleanPropertyButton(id++, Constants.getString("MapOverlay.show_caves", on), Constants.getString("MapOverlay.show_caves", off), fullMap, fullMap.showCaves);
-        buttonCaves.setEnabled(FeatureManager.isAllowed(Feature.RadarPlayers));
-
-        buttonGrid = new BooleanPropertyButton(id++, Constants.getString("MapOverlay.show_grid", on), Constants.getString("MapOverlay.show_grid", off), fullMap, fullMap.showGrid);
-
-        rowOther = new ButtonList(buttonCaves, buttonGrid);
-        buttonList.addAll(rowOther);
+        rowCaves.setWidths(rowAnimals.getWidth(4));
+        rowGrid.setWidths(rowAnimals.getWidth(4));
 
         buttonClose = new Button(ButtonEnum.Close.ordinal(), 0, 0, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
+        buttonClose.fitWidth(getFontRenderer());
+        if(buttonClose.getWidth() < 150)
+        {
+            buttonClose.setWidth(150);
+        }
         buttonList.add(buttonClose);
 
-        rowOther.equalizeWidths(getFontRenderer(), 4, buttonClose.getWidth());
     }
 
     /**
@@ -162,6 +177,12 @@ public class MapOverlayOptions extends JmUI
         int bx = (this.width - rowWidth) / 2;
         final int by = Math.max(30, this.height / 4);
 
+        int leftX, rightX, topY, bottomY;
+        leftX = width;
+        rightX = 0;
+        topY = by - 20;
+        bottomY = 0;
+
         ButtonRow lastRow = null;
         for (ButtonRow row : leftRows)
         {
@@ -175,10 +196,12 @@ public class MapOverlayOptions extends JmUI
             }
             lastRow = row;
             DrawUtil.drawLabel(row.label, row.getLeftX() - hgap, lastRow.getTopY() + vgap, DrawUtil.HAlign.Left, DrawUtil.VAlign.Below, Color.black, 0, Color.cyan, 255, 1, true);
+            leftX = Math.min(leftX, row.getLeftX() - hgap - getFontRenderer().getStringWidth(row.label));
+            bottomY = Math.max(bottomY, row.getBottomY());
         }
 
-        DrawUtil.drawCenteredLabel(labelFullMap, lastRow.get(0).getCenterX(), by - 10, Color.black, 0, Color.white, 255, 1);
-        DrawUtil.drawCenteredLabel(labelMiniMap, lastRow.get(1).getCenterX(), by - 10, Color.black, 0, Color.white, 255, 1);
+        DrawUtil.drawCenteredLabel(labelFullMap, leftRows.get(0).get(0).getCenterX(), by - 10, Color.black, 0, Color.white, 255, 1);
+        DrawUtil.drawCenteredLabel(labelMiniMap, leftRows.get(0).get(1).getCenterX(), by - 10, Color.black, 0, Color.white, 255, 1);
 
         lastRow = null;
         bx = (this.width + rowWidth) / 2;
@@ -194,13 +217,39 @@ public class MapOverlayOptions extends JmUI
             }
             lastRow = row;
             DrawUtil.drawLabel(row.label, row.getLeftX() - hgap, lastRow.getTopY() + vgap, DrawUtil.HAlign.Left, DrawUtil.VAlign.Below, Color.black, 0, Color.cyan, 255, 1, true);
+            rightX = Math.max(rightX, row.getRightX());
+            bottomY = Math.max(bottomY, row.getBottomY());
         }
 
-        DrawUtil.drawCenteredLabel(labelFullMap, lastRow.get(0).getCenterX(), by - 10, Color.black, 0, Color.white, 255, 1);
-        DrawUtil.drawCenteredLabel(labelMiniMap, lastRow.get(1).getCenterX(), by - 10, Color.black, 0, Color.white, 255, 1);
+        DrawUtil.drawCenteredLabel(labelFullMap, rightRows.get(0).get(0).getCenterX(), by - 10, Color.black, 0, Color.white, 255, 1);
+        DrawUtil.drawCenteredLabel(labelMiniMap, rightRows.get(0).get(1).getCenterX(), by - 10, Color.black, 0, Color.white, 255, 1);
 
-        rowOther.layoutCenteredHorizontal(width / 2, lastRow.getBottomY() + 20, true, hgap);
-        buttonClose.centerHorizontalOn(width / 2).below(rowOther, vgap + vgap);
+        topY-=5;
+        bottomY+=10;
+        leftX-=5;
+        rightX+=5;
+        DrawUtil.drawRectangle(leftX, topY, rightX-leftX, 1, Color.lightGray, 150);
+        DrawUtil.drawRectangle(leftX, bottomY, rightX-leftX, 1, Color.lightGray, 150);
+
+        if(rightX-leftX>width)
+        {
+            int commonWidth = leftRows.get(0).get(0).getWidth()-4;
+            for (ButtonRow buttonRow : leftRows)
+            {
+                buttonRow.setWidths(commonWidth);
+            }
+
+            for (ButtonRow buttonRow : rightRows)
+            {
+                buttonRow.setWidths(commonWidth);
+            }
+
+            rowCaves.setWidths(rowAnimals.getWidth(4));
+            rowGrid.setWidths(rowAnimals.getWidth(4));
+        }
+
+        int closeY = Math.min(height-vgap-buttonClose.getHeight(), bottomY + (4*vgap));
+        buttonClose.centerHorizontalOn(width / 2).setY(closeY);
     }
 
     @Override
@@ -210,12 +259,6 @@ public class MapOverlayOptions extends JmUI
         if (button instanceof BooleanPropertyButton)
         {
             ((BooleanPropertyButton) button).toggle();
-
-            // TODO: Make grid an overlay instead of being backed into Tile cache
-            // Then the minmap and webmap can have their own grid setting
-            JourneyMap.getInstance().miniMapProperties.showGrid.set(JourneyMap.getInstance().fullMapProperties.showGrid.get());
-            JourneyMap.getInstance().webMapProperties.showGrid.set(JourneyMap.getInstance().fullMapProperties.showGrid.get());
-
             return;
         }
 

@@ -71,15 +71,13 @@ public class WebMapProperties extends MapProperties
     {
         return "WebMapProperties: " +
                 "revision=" + revision +
-                ", showCaves=" + showCaves +
                 ", showMobs=" + showMobs +
                 ", showAnimals=" + showAnimals +
                 ", showVillagers=" + showVillagers +
                 ", showPets=" + showPets +
                 ", showPlayers=" + showPlayers +
                 ", showWaypoints=" + showWaypoints +
-                ", showGrid=" + showGrid +
-                ", enabled=" + enabled +
+                ", managerEnabled=" + enabled +
                 ", port=" + port +
                 ", browserPoll=" + browserPoll;
     }

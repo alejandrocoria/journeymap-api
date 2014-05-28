@@ -319,7 +319,7 @@ public class MapOverlay extends JmUI
         buttonDayNight.setEnabled(!(underground));
         buttonDayNight.setPosition(startX, startY);
 
-        buttonWaypointManager.setDrawButton(JourneyMap.getInstance().waypointProperties.enabled.get());
+        buttonWaypointManager.setDrawButton(JourneyMap.getInstance().waypointProperties.managerEnabled.get());
 
         buttonFollow.rightOf(buttonDayNight, hgap).setY(startY);
 
@@ -683,6 +683,7 @@ public class MapOverlay extends JmUI
         }
 
         boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, fullMapProperties.forceUnicode.get());
+        float drawScale = fullMapProperties.textureSmall.get() ? 1f : 2f;
 
         if (state.follow)
         {
@@ -690,7 +691,7 @@ public class MapOverlay extends JmUI
         }
         gridRenderer.updateTextures(state.getMapType(fullMapProperties.showCaves.get()), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0, fullMapProperties);
         gridRenderer.draw(1f, xOffset, yOffset);
-        gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, 1f, getMapFontScale());
+        gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale());
 
         if (fullMapProperties.showSelf.get())
         {
@@ -703,7 +704,7 @@ public class MapOverlay extends JmUI
             }
         }
 
-        gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, 1f, getMapFontScale());
+        gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale());
 
         DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, playerInfoBgColor, 235, playerInfoFgColor, 255, getMapFontScale(), true);
 

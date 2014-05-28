@@ -17,7 +17,7 @@ public class MasterOptions extends JmUI
 {
     enum ButtonEnum
     {
-        FullMapOptions, FullMapHelp, MiniMapOptions, MiniMapHelp, WaypointOptions, WaypointHelp, MiniMapEnable, WaypointEnable, WebMapEnable, WebMapOpen, Close;
+        FullMapOptions, FullMapHelp, MiniMapOptions, MiniMapHelp, WaypointOptions, WaypointHelp, MiniMapEnable, WaypointManagerEnable, WebMapEnable, WebMapOpen, Close;
 
         Button create(String label)
         {
@@ -27,7 +27,7 @@ public class MasterOptions extends JmUI
 
     String titleGeneral = Constants.getString("MapOverlay.general_display");
     String titleMiniMap = Constants.getString("MiniMap.title");
-    String titleWaypoints = Constants.getString("Waypoint.management");
+    String titleWaypoints = Constants.getString("Waypoint.display_management");
     String titleWebmap = Constants.getString("WebMap.title");
 
     String labelOptions = Constants.getString("MapOverlay.options_button");
@@ -35,7 +35,7 @@ public class MasterOptions extends JmUI
 
     Button buttonGeneralDisplayOptions, buttonFullMapHelp;
     Button buttonMiniMapEnable, buttonMiniMapOptions, buttonMiniMapHelp;
-    Button buttonWaypointOptions, buttonWaypointHelp, buttonWaypointEnable;
+    Button buttonWaypointOptions, buttonWaypointHelp, buttonWaypointManagerEnable;
     Button buttonWebMapEnable, buttonWebMapOpen;
 
     Button buttonClose;
@@ -59,19 +59,19 @@ public class MasterOptions extends JmUI
 
         buttonMiniMapOptions = ButtonEnum.MiniMapOptions.create(labelOptions);
         buttonMiniMapHelp = ButtonEnum.MiniMapHelp.create(labelHelp);
-        buttonMiniMapEnable = BooleanPropertyButton.create(ButtonEnum.MiniMapEnable.ordinal(), BooleanPropertyButton.Type.OnOff, "Waypoint.enable",
+        buttonMiniMapEnable = BooleanPropertyButton.create(ButtonEnum.MiniMapEnable.ordinal(), BooleanPropertyButton.Type.OnOff, "MiniMap.enable",
                 JourneyMap.getInstance().miniMapProperties, JourneyMap.getInstance().miniMapProperties.enabled);
         listMiniMap = new ButtonList(buttonMiniMapOptions, buttonMiniMapEnable, buttonMiniMapHelp);
         buttonList.addAll(listMiniMap);
 
         buttonWaypointOptions = ButtonEnum.WaypointOptions.create(labelOptions);
         buttonWaypointHelp = ButtonEnum.WaypointHelp.create(labelHelp);
-        buttonWaypointEnable = BooleanPropertyButton.create(ButtonEnum.WaypointEnable.ordinal(), BooleanPropertyButton.Type.OnOff, "Waypoint.enable",
-                JourneyMap.getInstance().waypointProperties, JourneyMap.getInstance().waypointProperties.enabled);
-        listWaypoints = new ButtonList(buttonWaypointOptions, buttonWaypointEnable, buttonWaypointHelp);
+        buttonWaypointManagerEnable = BooleanPropertyButton.create(ButtonEnum.WaypointManagerEnable.ordinal(), BooleanPropertyButton.Type.OnOff, "Waypoint.enable_manager",
+                JourneyMap.getInstance().waypointProperties, JourneyMap.getInstance().waypointProperties.managerEnabled);
+        listWaypoints = new ButtonList(buttonWaypointOptions, buttonWaypointManagerEnable, buttonWaypointHelp);
         buttonList.addAll(listWaypoints);
 
-        buttonWebMapEnable = BooleanPropertyButton.create(ButtonEnum.WebMapEnable.ordinal(), BooleanPropertyButton.Type.OnOff, "Waypoint.enable",
+        buttonWebMapEnable = BooleanPropertyButton.create(ButtonEnum.WebMapEnable.ordinal(), BooleanPropertyButton.Type.OnOff, "WebMap.enable",
                 JourneyMap.getInstance().webMapProperties, JourneyMap.getInstance().webMapProperties.enabled);
         buttonWebMapOpen = ButtonEnum.WebMapOpen.create(Constants.getString("MapOverlay.use_browser"));
         listWebMap = new ButtonList(buttonWebMapOpen, buttonWebMapEnable);
@@ -117,7 +117,7 @@ public class MasterOptions extends JmUI
         DrawUtil.drawLabel(titleWaypoints, bx, by, DrawUtil.HAlign.Right, DrawUtil.VAlign.Above, Color.BLACK, 0, Color.cyan, 255, 1, false);
         listWaypoints.layoutHorizontal(bx, by, true, hgap);
         by = listWaypoints.getBottomY() + vgap;
-        buttonWaypointOptions.setEnabled(buttonWaypointEnable.getToggled());
+        buttonWaypointOptions.setEnabled(buttonWaypointManagerEnable.getToggled());
 
         // Web Map
         DrawUtil.drawLabel(titleWebmap, bx, by, DrawUtil.HAlign.Right, DrawUtil.VAlign.Above, Color.BLACK, 0, Color.cyan, 255, 1, false);
@@ -171,7 +171,7 @@ public class MasterOptions extends JmUI
                 UIManager.getInstance().openWaypointOptions(getClass());
                 break;
             }
-            case WaypointEnable:
+            case WaypointManagerEnable:
             {
                 if (WaypointsData.isAnyEnabled())
                 {

@@ -6,14 +6,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Properties for the full map in-game.
  */
-public class FullMapProperties extends MapProperties
+public class FullMapProperties extends InGameMapProperties
 {
     protected transient static final int CURRENT_REVISION = 1;
     protected final String name = "fullmap";
     protected AtomicInteger revision = new AtomicInteger(CURRENT_REVISION);
 
-    public AtomicBoolean forceUnicode = new AtomicBoolean(false);
-    public final AtomicBoolean fontSmall = new AtomicBoolean(true);
+    public final AtomicBoolean showCaves = new AtomicBoolean(true);
+    public final AtomicBoolean showGrid = new AtomicBoolean(true);
 
     @Override
     protected String getName()
@@ -57,10 +57,10 @@ public class FullMapProperties extends MapProperties
     public int hashCode()
     {
         int result = super.hashCode();
+        result = 31 * result + showGrid.hashCode();
+        result = 31 * result + showCaves.hashCode();
         result = 31 * result + name.hashCode();
         result = 31 * result + revision.hashCode();
-        result = 31 * result + forceUnicode.hashCode();
-        result = 31 * result + fontSmall.hashCode();
         return result;
     }
 

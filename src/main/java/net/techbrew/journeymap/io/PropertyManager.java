@@ -354,13 +354,13 @@ public class PropertyManager
         FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties.enableSave(false);
         fullMapProperties.fontSmall.set(getDouble(Key.PREF_FONTSCALE).intValue() == 1);
         fullMapProperties.forceUnicode.set(getBoolean(Key.PREF_FORCEUNICODE));
+        fullMapProperties.showCaves.set(getBoolean(Key.PREF_SHOW_CAVES));
+        fullMapProperties.showGrid.set(getBoolean(Key.PREF_SHOW_GRID));
 
         List<MapProperties> propsList = Arrays.asList(fullMapProperties, miniMapProperties, webMapProperties);
         for (MapProperties props : propsList)
         {
             props.showAnimals.set(getBoolean(Key.PREF_SHOW_ANIMALS));
-            props.showCaves.set(getBoolean(Key.PREF_SHOW_CAVES));
-            props.showGrid.set(getBoolean(Key.PREF_SHOW_GRID));
             props.showMobs.set(getBoolean(Key.PREF_SHOW_MOBS));
             props.showPets.set(getBoolean(Key.PREF_SHOW_PETS));
             props.showPlayers.set(getBoolean(Key.PREF_SHOW_PLAYERS));

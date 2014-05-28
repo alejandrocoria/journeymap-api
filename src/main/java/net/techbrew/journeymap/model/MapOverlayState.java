@@ -57,7 +57,8 @@ public class MapOverlayState
 
     public void refresh(Minecraft mc, EntityClientPlayerMP player, MapProperties mapProperties)
     {
-        final MapType lastMapType = getMapType(mapProperties.showCaves.get());
+        boolean showCaves = JourneyMap.getInstance().fullMapProperties.showCaves.get();
+        final MapType lastMapType = getMapType(showCaves);
         final boolean lastUnderground = this.underground;
         final int lastDimension = this.currentZoom;
         final File lastWorldDir = this.worldDir;
@@ -80,7 +81,7 @@ public class MapOverlayState
             }
             else
             {
-                if (getMapType(mapProperties.showCaves.get()) == MapType.underground && lastMapType != MapType.underground)
+                if (getMapType(showCaves) == MapType.underground && lastMapType != MapType.underground)
                 {
                     follow = true;
                 }

@@ -12,7 +12,8 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     protected final String name = "waypoint";
     protected int revision = CURRENT_REVISION;
 
-    public final AtomicBoolean enabled = new AtomicBoolean(true);
+    public final AtomicBoolean managerEnabled = new AtomicBoolean(true);
+    public final AtomicBoolean beaconEnabled = new AtomicBoolean(true);
     public final AtomicBoolean showTexture = new AtomicBoolean(true);
     public final AtomicBoolean showStaticBeam = new AtomicBoolean(true);
     public final AtomicBoolean showRotatingBeam = new AtomicBoolean(true);
@@ -64,7 +65,8 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     {
         int result = name.hashCode();
         result = 31 * result + revision;
-        result = 31 * result + enabled.hashCode();
+        result = 31 * result + managerEnabled.hashCode();
+        result = 31 * result + beaconEnabled.hashCode();
         result = 31 * result + showTexture.hashCode();
         result = 31 * result + showStaticBeam.hashCode();
         result = 31 * result + showRotatingBeam.hashCode();
@@ -90,7 +92,8 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     {
         return "WaypointProperties: " +
                 "revision=" + revision +
-                ", enabled=" + enabled +
+                ", managerEnabled=" + managerEnabled +
+                ", beaconEnabled=" + beaconEnabled +
                 ", showTexture=" + showTexture +
                 ", showStaticBeam=" + showStaticBeam +
                 ", showRotatingBeam=" + showRotatingBeam +

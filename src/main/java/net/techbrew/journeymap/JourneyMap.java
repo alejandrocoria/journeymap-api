@@ -173,13 +173,6 @@ public class JourneyMap
             waypointProperties = new WaypointProperties().load();
             PropertyManager.getInstance().migrateLegacyProperties();
 
-            // TODO: Make grid an overlay instead of being backed into Tile cache
-            // Then the minmap and webmap can have their own grid setting
-            miniMapProperties.showGrid.set(fullMapProperties.showGrid.get());
-            miniMapProperties.save();
-            webMapProperties.showGrid.set(fullMapProperties.showGrid.get());
-            webMapProperties.save();
-
             // Log properties
             JMLogger.logProperties();
         }
@@ -309,7 +302,7 @@ public class JourneyMap
     }
 
     /**
-     * Checks whether a task manager is enabled.
+     * Checks whether a task manager is managerEnabled.
      *
      * @param managerClass
      * @return
@@ -418,7 +411,7 @@ public class JourneyMap
         RegionImageCache.getInstance().clear();
         UIManager.getInstance().reset();
 
-        if (waypointProperties.enabled.get())
+        if (waypointProperties.managerEnabled.get())
         {
             WaypointStore.instance().load();
         }

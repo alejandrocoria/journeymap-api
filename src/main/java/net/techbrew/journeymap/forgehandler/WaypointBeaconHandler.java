@@ -34,7 +34,7 @@ public class WaypointBeaconHandler implements EventHandlerManager.EventHandler
     @SubscribeEvent
     public void onRenderWorldLastEvent(RenderWorldLastEvent event)
     {
-        if (mc.thePlayer != null && waypointProperties.enabled.get())
+        if (mc.thePlayer != null && waypointProperties.beaconEnabled.get())
         {
             RenderWaypointBeacon.renderAll();
         }

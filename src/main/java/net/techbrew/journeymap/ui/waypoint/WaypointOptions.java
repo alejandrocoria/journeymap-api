@@ -16,10 +16,11 @@ import java.awt.*;
  */
 public class WaypointOptions extends JmUI
 {
-    Button buttonClose;
+    Button buttonEnable, buttonClose;
     TextField maxDistanceField;
     ButtonList listLeftButtons, listRightButtons;
     String labelMaxDistance = Constants.getString("Waypoint.max_distance");
+    WaypointProperties props = JourneyMap.getInstance().waypointProperties;
 
     public WaypointOptions(Class<? extends JmUI> returnClass)
     {
@@ -30,12 +31,12 @@ public class WaypointOptions extends JmUI
     public void initGui()
     {
         buttonList.clear();
-
-        WaypointProperties props = JourneyMap.getInstance().waypointProperties;
         int id = 0;
 
+        buttonEnable = BooleanPropertyButton.create(id++, "Waypoint.enable_beacons", props, props.beaconEnabled);
+
         listLeftButtons = new ButtonList(
-                BooleanPropertyButton.create(id++, "Waypoint.auto_hide_label", props, props.autoHideLabel),
+                buttonEnable,
                 BooleanPropertyButton.create(id++, "Waypoint.show_static_beam", props, props.showStaticBeam),
                 BooleanPropertyButton.create(id++, "Waypoint.show_rotating_beam", props, props.showRotatingBeam),
                 BooleanPropertyButton.create(id++, "Waypoint.show_texture", props, props.showTexture),
@@ -44,9 +45,10 @@ public class WaypointOptions extends JmUI
         buttonList.addAll(listLeftButtons);
 
         listRightButtons = new ButtonList(
+                BooleanPropertyButton.create(id++, "Waypoint.auto_hide_label", props, props.autoHideLabel),
                 BooleanPropertyButton.create(id++, "Waypoint.show_name", props, props.showName),
                 BooleanPropertyButton.create(id++, "Waypoint.show_distance", props, props.showDistance),
-                BooleanPropertyButton.create(id++, "Waypoint.bold_label", props, props.boldLabel),
+                // BooleanPropertyButton.create(id++, "Waypoint.bold_label", props, props.boldLabel),
                 BooleanPropertyButton.create(id++, "Waypoint.force_unicode", props, props.forceUnicode),
                 BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, "Waypoint.font_size", props, props.fontSmall)
         );
@@ -58,7 +60,10 @@ public class WaypointOptions extends JmUI
         new ButtonList(buttonList).equalizeWidths(getFontRenderer());
 
         buttonClose = new Button(id++, Constants.getString("MapOverlay.close"));
+        buttonClose.setWidth((buttonEnable.getWidth()*2)+4);
         buttonList.add(buttonClose);
+
+        updateEnabledButtons();
     }
 
     @Override
@@ -86,7 +91,7 @@ public class WaypointOptions extends JmUI
         maxDistanceField.drawTextBox();
 
         // Close
-        buttonClose.centerHorizontalOn(width / 2).setY(maxDistanceField.getY() + maxDistanceField.getHeight() + vgap + vgap + vgap);
+        buttonClose.centerHorizontalOn(width / 2).setY(maxDistanceField.getY() + maxDistanceField.getHeight() + (vgap*4));
     }
 
     @Override
@@ -100,6 +105,14 @@ public class WaypointOptions extends JmUI
 
         // Add footer to mask the bottom toolbar
         DrawUtil.drawRectangle(0, this.height - headerHeight, this.width, headerHeight, Color.black, 150);
+
+        String fps = mc.debug;
+        final int idx = fps != null ? fps.indexOf(',') : -1;
+        if (idx > 0)
+        {
+            fps = fps.substring(0, idx);
+            DrawUtil.drawLabel(fps, width-5, 5, DrawUtil.HAlign.Left, DrawUtil.VAlign.Below, Color.BLACK, 0, Color.cyan, 255, 1, true);
+        }
     }
 
     @Override
@@ -110,10 +123,24 @@ public class WaypointOptions extends JmUI
             ((BooleanPropertyButton) button).toggle();
         }
 
+        if(button.id == buttonEnable.id)
+        {
+            updateEnabledButtons();
+            return;
+        }
+
         if (button.id == buttonClose.id)
         {
             closeAndReturn();
         }
+    }
+
+    protected void updateEnabledButtons()
+    {
+        boolean enable = buttonEnable.getToggled();
+        listLeftButtons.setOptions(enable, true, true);
+        listRightButtons.setOptions(enable, true, true);
+        buttonEnable.setEnabled(true);
     }
 
     @Override

@@ -157,8 +157,9 @@ public class MapOverlayActions extends JmUI
     {
         MapProperties mapProperties = JourneyMap.getInstance().fullMapProperties;
         final MapOverlayState state = MapOverlay.state();
-        final MapType mapType = state.getMapType(mapProperties.showCaves.get());
-        final Integer vSlice = state.getMapType(mapProperties.showCaves.get()) == MapType.underground ? state.getVSlice() : null;
+        boolean showCaves = JourneyMap.getInstance().fullMapProperties.showCaves.get();
+        final MapType mapType = state.getMapType(showCaves);
+        final Integer vSlice = state.getMapType(showCaves) == MapType.underground ? state.getVSlice() : null;
         final MapSaver mapSaver = new MapSaver(state.getWorldDir(), mapType, vSlice, state.getDimension());
         if (mapSaver.isValid())
         {

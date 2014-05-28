@@ -11,12 +11,11 @@ public class MiniMapOptions extends JmUI
 
     private enum ButtonEnum
     {
-        MiniMap, Position, Shape, Font, Unicode, Keyboard, KeyboardHelp, Close, Showfps, CloseAll
+        MiniMap, Position, Shape, Font, Texture, Unicode, Keyboard, KeyboardHelp, Close, Showfps, CloseAll
     }
 
-    ;
-    private Button buttonPosition, buttonShape, buttonFont, buttonUnicode, buttonMiniMap, buttonKeyboard, buttonKeyboardHelp, buttonShowfps, buttonClose, buttonCloseAll;
-    private BooleanPropertyButton buttonShowWaypoints, buttonShowWaypointLabels, buttonShow;
+    private Button buttonPosition, buttonShape, buttonFont, buttonTexture, buttonUnicode, buttonMiniMap, buttonKeyboard, buttonKeyboardHelp, buttonShowfps, buttonClose, buttonCloseAll;
+
 
     private DisplayVars.Shape currentShape;
     private DisplayVars.Position currentPosition;
@@ -69,6 +68,13 @@ public class MiniMapOptions extends JmUI
                 (miniMapProperties.fontSmall.get()));
         buttonFont.setEnabled(minimapOn);
 
+        buttonTexture = new BooleanPropertyButton(ButtonEnum.Texture.ordinal(),
+                Constants.getString("MiniMap.texture_size", Constants.getString("MiniMap.font_small")),
+                Constants.getString("MiniMap.texture_size", Constants.getString("MiniMap.font_large")),
+                miniMapProperties, miniMapProperties.textureSmall);
+        buttonTexture.setEnabled(minimapOn);
+        buttonTexture.fitWidth(getFontRenderer());
+
         boolean showHotKeys = miniMapProperties.enableHotkeys.get();
         buttonKeyboard = new Button(ButtonEnum.Keyboard,
                 Constants.getString("MiniMap.hotkeys", on),
@@ -89,24 +95,21 @@ public class MiniMapOptions extends JmUI
                 Constants.getString("MiniMap.force_unicode", on),
                 Constants.getString("MiniMap.force_unicode", off), forceUnicode);
 
-        buttonClose = new Button(ButtonEnum.Close, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
+        leftButtons = new ButtonList(buttonMiniMap, buttonPosition, buttonShowfps, buttonKeyboard);
+        leftButtons.setWidths((buttonTexture.getWidth()*2)+2);
 
+        rightButtons = new ButtonList(buttonShape, buttonFont, buttonUnicode, buttonKeyboardHelp);
+        rightButtons.setWidths((buttonTexture.getWidth()*2)+2);
+
+        buttonList.addAll(leftButtons);
+        buttonList.addAll(rightButtons);
+
+        buttonClose = new Button(ButtonEnum.Close, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
         buttonCloseAll = new Button(ButtonEnum.CloseAll, Constants.getString("MiniMap.return_to_game")); //$NON-NLS-1$
 
-        buttonList.add(buttonMiniMap);
-        buttonList.add(buttonPosition);
-        buttonList.add(buttonShape);
-        buttonList.add(buttonFont);
-        buttonList.add(buttonKeyboard);
-        buttonList.add(buttonKeyboardHelp);
-        buttonList.add(buttonShowfps);
-        buttonList.add(buttonUnicode);
-
+        buttonList.add(buttonTexture);
         buttonList.add(buttonClose);
         buttonList.add(buttonCloseAll);
-
-        leftButtons = new ButtonList(buttonMiniMap, buttonPosition, buttonShowfps, buttonKeyboard);
-        rightButtons = new ButtonList(buttonShape, buttonFont, buttonUnicode, buttonKeyboardHelp);
     }
 
     /**
@@ -139,6 +142,12 @@ public class MiniMapOptions extends JmUI
         {
             button.setEnabled(buttonMiniMap.getToggled());
         }
+
+        buttonTexture.setEnabled(buttonMiniMap.getToggled());
+
+        buttonFont.setWidth((buttonMiniMap.getWidth()/2)-2);
+        buttonTexture.setWidth(buttonFont.getWidth());
+        buttonTexture.rightOf(buttonFont, hgap).setY(buttonFont.getY());
 
         buttonMiniMap.setEnabled(true);
 
@@ -182,6 +191,13 @@ public class MiniMapOptions extends JmUI
             case Font:
             {
                 buttonFont.setToggled(miniMapProperties.toggle(miniMapProperties.fontSmall));
+                UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+                break;
+            }
+
+            case Texture:
+            {
+                buttonTexture.toggle();
                 UIManager.getInstance().getMiniMap().updateDisplayVars(true);
                 break;
             }

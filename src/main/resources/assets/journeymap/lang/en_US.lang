@@ -186,7 +186,7 @@ MapOverlay.general_display_title=General Display Options
 # Added in 4.0.0:
 Waypoint.waypoints=Waypoints
 Waypoint.manage_title=Manage Waypoints
-Waypoint.management=Waypoint Management
+Waypoint.display_management=Waypoint In-Game Display and Management
 Waypoint.new=New...
 Waypoint.new_title=New Waypoint
 Waypoint.edit_title=Edit Waypoint
@@ -204,7 +204,7 @@ Waypoint.r=R
 Waypoint.g=G
 Waypoint.b=B
 Waypoint.randomize=Random Color
-Waypoint.enable=Enabled: %1$s
+
 # %1$s = number of waypoints, %2$s = "On" or "Off"
 Waypoint.enable_all=All %1$s: %2$s
 Waypoint.cancel=Cancel
@@ -238,6 +238,9 @@ Waypoint.bold_label=Bold Label: %1$s
 Waypoint.force_unicode=Force Unicode: %1$s
 Waypoint.font_size=Font: %1$s
 Waypoint.max_distance=Maximum Distance:
+Waypoint.enable=Enabled: %1$s
+Waypoint.enable_beacons=Waypoint Beacons: %1$s
+Waypoint.enable_manager=Create/Manage: %1$s
 
 # %1$s = distance in meters. Okay to change parentheses and trailing 'm' (abbreviation for 'meters') Ex: [%1$sM]
 Waypoint.distance_meters=(%1$sm)
@@ -296,6 +299,10 @@ MiniMap.hotkeys_position=Change Minimap Position
 # Added in 4.0.0. %1$s = one of "On", "Off".
 MiniMap.force_unicode=Force Unicode: %1$s
 MiniMap.hotkeys_button=MiniMap Hot Keys: %1$s
+MiniMap.enable=Enabled: %1$s
+
+# Added in 4.0.0. %1$s = one of "On", "Off".
+MiniMap.texture_size=Icons: %1$s
 
 # Added in 3.3.x.  Used in Minecraft Controls menu and JourneyMap/Options/Minimap.../HotKeys... dialog.
 # {0} is either "Ctrl+" or "^" depending on Windows or MacOS
@@ -470,3 +477,5 @@ WebMap.biome_text=Biome:
 
 # Error message if world isn't open in Minecraft
 WebMap.error_world_not_opened=Minecraft World Not Opened
+
+WebMap.enable=Enabled: %1$s

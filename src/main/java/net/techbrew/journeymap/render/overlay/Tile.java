@@ -84,7 +84,8 @@ public class Tile
             glId = textureImpl.getGlTextureId();
             image = textureImpl.getImage();
         }
-        futureTex = TextureCache.instance().prepareImage(glId, image, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE, mapProperties.showGrid.get());
+        boolean showGrid = JourneyMap.getInstance().fullMapProperties.showGrid.get();
+        futureTex = TextureCache.instance().prepareImage(glId, image, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE, showGrid);
 
         return true;
     }

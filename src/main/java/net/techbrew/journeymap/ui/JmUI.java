@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -119,29 +120,37 @@ public abstract class JmUI extends GuiScreen
     @Override
     public void drawScreen(int x, int y, float par3)
     {
-        drawBackground(0);
-        layoutButtons();
-
-        for (int k = 0; k < this.buttonList.size(); ++k)
+        try
         {
-            GuiButton guibutton = (GuiButton) this.buttonList.get(k);
-            guibutton.drawButton(this.mc, x, y);
-        }
+            drawBackground(0);
+            layoutButtons();
 
-        for (int k = 0; k < this.buttonList.size(); ++k)
-        {
-            GuiButton guibutton = (GuiButton) this.buttonList.get(k);
-            if (guibutton instanceof Button)
+            for (int k = 0; k < this.buttonList.size(); ++k)
             {
-                if (!((Button) guibutton).isEnabled() && !((Button) guibutton).isNoDisableText())
+                GuiButton guibutton = (GuiButton) this.buttonList.get(k);
+                guibutton.drawButton(this.mc, x, y);
+            }
+
+            for (int k = 0; k < this.buttonList.size(); ++k)
+            {
+                GuiButton guibutton = (GuiButton) this.buttonList.get(k);
+                if (guibutton instanceof Button)
                 {
-                    ((Button) guibutton).drawButton(this.mc, x, y);
+                    if (!((Button) guibutton).isEnabled() && !((Button) guibutton).isNoDisableText())
+                    {
+                        ((Button) guibutton).drawButton(this.mc, x, y);
+                    }
                 }
             }
-        }
 
-        drawTitle();
-        drawLogo();
+            drawTitle();
+            drawLogo();
+        }
+        catch(Throwable t)
+        {
+            JourneyMap.getLogger().severe("Error in UI: " + LogFormatter.toString(t));
+            closeAndReturn();
+        }
     }
 
     public static void sizeDisplay(double width, double height)

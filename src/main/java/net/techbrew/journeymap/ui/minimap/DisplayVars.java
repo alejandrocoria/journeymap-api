@@ -248,13 +248,14 @@ public class DisplayVars
         DrawUtil.VAlign valignFps = DrawUtil.VAlign.Below;
         DrawUtil.VAlign valignLocation = DrawUtil.VAlign.Above;
         DrawUtil.VAlign valignBiome = DrawUtil.VAlign.Above;
+        float textureScale = (miniMapProperties.textureSmall.get() ? 1 : 2);
 
         // Assign shape
         switch (shape)
         {
             case LargeCircle:
             {
-                drawScale = 1f;
+                drawScale = 1f  * textureScale;
                 borderTexture = TextureCache.instance().getMinimapLargeCircle();
                 maskTexture = TextureCache.instance().getMinimapLargeCircleMask();
                 minimapSize = 512;
@@ -274,7 +275,7 @@ public class DisplayVars
             }
             case SmallCircle:
             {
-                drawScale = 0.5f;
+                drawScale = 1f  * textureScale;
                 borderTexture = TextureCache.instance().getMinimapSmallCircle();
                 maskTexture = TextureCache.instance().getMinimapSmallCircleMask();
                 minimapSize = 256;
@@ -294,7 +295,7 @@ public class DisplayVars
             }
             case LargeSquare:
             {
-                drawScale = 1f;
+                drawScale = 1f  * textureScale;
                 borderTexture = TextureCache.instance().getMinimapLargeSquare();
                 maskTexture = null;
                 minimapSize = 512;
@@ -309,7 +310,7 @@ public class DisplayVars
             }
             case SmallSquare:
             {
-                drawScale = 0.5f;
+                drawScale = 1f  * textureScale;
                 borderTexture = TextureCache.instance().getMinimapSmallSquare();
                 maskTexture = null;
                 minimapSize = 128;
@@ -330,7 +331,7 @@ public class DisplayVars
             case MediumSquare:
             default:
             {
-                drawScale = 0.5f;
+                drawScale = 1f  * textureScale;
                 borderTexture = TextureCache.instance().getMinimapMediumSquare();
                 maskTexture = null;
                 minimapSize = 256;

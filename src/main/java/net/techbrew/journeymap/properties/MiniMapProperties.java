@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Properties for the minimap in-game.
  */
-public class MiniMapProperties extends MapProperties
+public class MiniMapProperties extends InGameMapProperties
 {
     protected transient static final int CURRENT_REVISION = 1;
     protected final String name = "minimap";
@@ -20,8 +20,6 @@ public class MiniMapProperties extends MapProperties
     public final AtomicBoolean showFps = new AtomicBoolean(false);
     public final AtomicBoolean enableHotkeys = new AtomicBoolean(true);
     public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
-    public final AtomicBoolean forceUnicode = new AtomicBoolean(false);
-    public final AtomicBoolean fontSmall = new AtomicBoolean(true);
 
     @Override
     protected String getName()
@@ -73,8 +71,6 @@ public class MiniMapProperties extends MapProperties
         result = 31 * result + showFps.hashCode();
         result = 31 * result + enableHotkeys.hashCode();
         result = 31 * result + showWaypointLabels.hashCode();
-        result = 31 * result + forceUnicode.hashCode();
-        result = 31 * result + fontSmall.hashCode();
         return result;
     }
 
@@ -84,15 +80,13 @@ public class MiniMapProperties extends MapProperties
         return "MiniMapProperties: " +
                 "revision=" + revision +
                 ", showSelf=" + showSelf +
-                ", showCaves=" + showCaves +
                 ", showMobs=" + showMobs +
                 ", showAnimals=" + showAnimals +
                 ", showVillagers=" + showVillagers +
                 ", showPets=" + showPets +
                 ", showPlayers=" + showPlayers +
                 ", showWaypoints=" + showWaypoints +
-                ", showGrid=" + showGrid +
-                ", enabled=" + enabled +
+                ", managerEnabled=" + enabled +
                 ", shape=" + shape +
                 ", position=" + position +
                 ", showFps=" + showFps +

@@ -2,6 +2,7 @@ package net.techbrew.journeymap.render.entity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.MathHelper;
@@ -81,10 +82,11 @@ public class RenderWaypointBeacon
 
     static void doRender(Waypoint waypoint)
     {
+        if(renderManager.livingPlayer==null) return;
+
         timer.start();
 
-        // Start drawing
-        GL11.glPushMatrix();
+        RenderHelper.enableStandardItemLighting();
 
         try
         {
@@ -129,70 +131,102 @@ public class RenderWaypointBeacon
             boolean labelHidden = false;
             if (waypointProperties.autoHideLabel.get())
             {
-                Vec3 playerLookVec = renderManager.livingPlayer.getLook(1.0F).normalize();
-                Vec3 delta = mc.theWorld.getWorldVec3Pool().getVecFromPool(waypointVec.xCoord - renderManager.viewerPosX, waypointVec.yCoord - renderManager.viewerPosY, waypointVec.zCoord - renderManager.viewerPosZ);
-                double distance = delta.lengthVector();
-                delta = delta.normalize();
-                double dp = playerLookVec.dotProduct(delta);
-                labelHidden = dp < (1.0D - (.5D / distance));
+                // 3D algorithm
+//                Vec3 playerLookVec = renderManager.livingPlayer.getLook(1.0F).normalize();
+//                Vec3 delta = mc.theWorld.getWorldVec3Pool().getVecFromPool(waypointVec.xCoord - renderManager.viewerPosX, waypointVec.yCoord - renderManager.viewerPosY, waypointVec.zCoord - renderManager.viewerPosZ);
+//                delta.yCoord = 0;
+//                double distance = delta.lengthVector();
+//                delta = delta.normalize();
+//                double dp = playerLookVec.dotProduct(delta);
+//                labelHidden = dp < (1.0D - (.5D / distance));
+
+
+                // 2D algorithm (ignore pitch)
+                int angle = 5;
+
+                double yaw = Math.atan2(renderManager.viewerPosZ-waypointVec.zCoord-.5, renderManager.viewerPosX-waypointVec.xCoord-.5) ;
+                double degrees = Math.toDegrees(yaw) + 90;
+                if(degrees<0) degrees = 360+degrees;
+                double playerYaw = Math.toRadians(renderManager.livingPlayer.getRotationYawHead()%360);
+                double playerDegrees = Math.toDegrees(playerYaw);
+
+                degrees+=angle;
+                playerDegrees+=angle;
+
+                labelHidden = Math.abs((degrees+angle)-(playerDegrees+angle))>angle;
+
             }
 
-            // Construct label
-            StringBuffer sb = new StringBuffer();
-            if (!labelHidden)
-            {
-                if (waypointProperties.boldLabel.get())
-                {
-                    sb.append("§l");
-                }
 
-                if (waypointProperties.showName.get())
-                {
-                    sb.append(waypoint.getName());
-                }
 
-                if (waypointProperties.showDistance.get())
-                {
-                    sb.append(" ").append(String.format(distanceLabel, actualDistance));
-                }
-            }
+            //waypoint.setName(String.format("vecYaw %1.2f,%1.2f / yaw %1.2f, playerYaw %1.2f / deg %1.1f, playerDeg %1.1f", vecYaw.x, vecYaw.y, yaw, playerYaw, degrees, playerDegrees));
+
 
             // Set render scale (1/64)
             double scale = 0.00390625 * ((viewDistance + 4) / 3);
             FontRenderer fr = renderManager.getFontRenderer();
 
-            // Position
-            GL11.glTranslated(shiftX, shiftY, shiftZ);
-            GL11.glRotatef(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-            GL11.glRotatef(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-            GL11.glScaled(-scale, -scale, scale);
-
-            // Lighting
-            GL11.glDisable(GL11.GL_LIGHTING);
-            GL11.glNormal3d(0, 0, -1.0F * scale);
-            DrawUtil.resetLightMap();
-
             final TextureImpl texture = waypoint.getTexture();
             double halfTexHeight = texture.height / 2;
 
             // Depth-masked and non-masked label
-            if (sb.length() > 0)
+            final boolean showName = waypointProperties.showName.get();
+            final boolean showDistance = waypointProperties.showDistance.get();
+            if (!labelHidden && (showName || showDistance))
             {
-                GL11.glDepthMask(true);
-                GL11.glEnable(GL11.GL_DEPTH_TEST);
-                String label = sb.toString();
-                final int fontScale = waypointProperties.fontSmall.get() ? 2 : 4;
-
-                boolean forced = DrawUtil.startUnicode(fr, waypointProperties.forceUnicode.get());
-                DrawUtil.drawLabel(label, 0, 0 - halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 150, waypoint.getSafeColor(), 255, fontScale, false);
-
-                GL11.glDisable(GL11.GL_DEPTH_TEST);
-                GL11.glDepthMask(false);
-
-                DrawUtil.drawLabel(label, 0, 0 - halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 100, waypoint.getSafeColor(), 200, fontScale, false);
-                if (forced)
+                // Construct label
+                StringBuilder sb = new StringBuilder();
+                if (showName)
                 {
-                    DrawUtil.stopUnicode(fr);
+                    sb.append(waypoint.getName());
+                }
+                if(showName && showDistance)
+                {
+                    sb.append(" ");
+                }
+                if (showDistance)
+                {
+                    sb.append(String.format(distanceLabel, actualDistance));
+                }
+
+                if(sb.length()>0)
+                {
+                    final String label = sb.toString();
+
+                    // Start drawing
+                    GL11.glPushMatrix();
+
+                    // Lighting
+                    GL11.glDisable(GL11.GL_LIGHTING);
+                    GL11.glNormal3d(0, 0, -1.0F * scale);
+
+                    // Position
+                    GL11.glTranslated(shiftX, shiftY, shiftZ);
+                    GL11.glRotatef(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+                    GL11.glRotatef(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+                    GL11.glScaled(-scale, -scale, scale);
+
+                    GL11.glDepthMask(true);
+                    GL11.glEnable(GL11.GL_DEPTH_TEST);
+
+                    final int fontScale = waypointProperties.fontSmall.get() ? 2 : 4;
+
+                    boolean forced = DrawUtil.startUnicode(fr, waypointProperties.forceUnicode.get());
+
+                    // Depth label
+                    DrawUtil.drawLabel(label, 0, 0 - halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 150, waypoint.getSafeColor(), 255, fontScale, false);
+
+                    GL11.glDisable(GL11.GL_DEPTH_TEST);
+                    GL11.glDepthMask(false);
+
+                    // Front label
+                    DrawUtil.drawLabel(label, 0, 0 - halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 100, waypoint.getSafeColor(), 255, fontScale, false);
+                    if (forced)
+                    {
+                        DrawUtil.stopUnicode(fr);
+                    }
+
+                    GL11.glPopMatrix();
                 }
             }
 
@@ -200,8 +234,11 @@ public class RenderWaypointBeacon
             if (waypointProperties.showTexture.get())
             {
                 // Reset scale for the icon
-                GL11.glPopMatrix();
+
                 GL11.glPushMatrix();
+
+                GL11.glDisable(GL11.GL_LIGHTING);
+                GL11.glNormal3d(0, 0, -1.0F * scale);
 
                 GL11.glDisable(GL11.GL_DEPTH_TEST);
                 GL11.glDepthMask(false);
@@ -215,18 +252,29 @@ public class RenderWaypointBeacon
                 GL11.glNormal3d(0, 0, -1.0F * scale);
 
                 DrawUtil.drawColoredImage(texture, 255, waypoint.getColor(), 0 - (texture.width / 2), 0 - halfTexHeight);
+
+                GL11.glPopMatrix();
             }
         }
         finally
         {
+
             GL11.glDepthMask(true);
             GL11.glEnable(GL11.GL_DEPTH_TEST);
             GL11.glEnable(GL11.GL_LIGHTING);
+           // GL11.glEnable(GL11.GL_ALPHA_TEST);
 
             // Reset GL
-            GL11.glPopMatrix();
+
 
             timer.stop();
+
+            GL11.glDepthMask(true);
+            GL11.glEnable(GL11.GL_CULL_FACE);
+            GL11.glDisable(GL11.GL_BLEND);
+            GL11.glDisable(GL11.GL_FOG);
+
+            RenderHelper.disableStandardItemLighting();
         }
     }
 
@@ -248,6 +296,12 @@ public class RenderWaypointBeacon
         GL11.glDepthMask(false);
 
         float time = (float) mc.theWorld.getTotalWorldTime();
+        if(mc.isGamePaused())
+        {
+            // Show rotation for Waypoint Options UI
+            time = Minecraft.getSystemTime()/50;
+        }
+
         float texOffset = -(-time * 0.2F - (float) MathHelper.floor_float(-time * 0.1F)) * .6f;
 
         if (rotatingBeam)
@@ -255,7 +309,7 @@ public class RenderWaypointBeacon
             byte b0 = 1;
             double d3 = (double) time * 0.025D * (1.0D - (double) (b0 & 1) * 2.5D);
             tessellator.startDrawingQuads();
-            tessellator.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 60);
+            tessellator.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 80);
             double d4 = (double) b0 * 0.2D;
             double d5 = 0.5D + Math.cos(d3 + 2.356194490192345D) * d4;
             double d6 = 0.5D + Math.sin(d3 + 2.356194490192345D) * d4;

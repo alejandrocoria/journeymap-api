@@ -10,6 +10,7 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.EntityHelper;
 import net.techbrew.journeymap.model.MapOverlayState;
+import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
@@ -47,6 +48,7 @@ public class MiniMap
     private final String[] locationFormats = {"MapOverlay.location_xzye", "MapOverlay.location_xzy", "MapOverlay.location_xz"};
 
     private final MiniMapProperties miniMapProperties = JourneyMap.getInstance().miniMapProperties;
+    private final FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
     private final MapOverlayState state = MapOverlay.state();
     private final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
     private final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
@@ -96,10 +98,12 @@ public class MiniMap
                 state.refresh(mc, player, miniMapProperties);
             }
 
+            boolean showCaves = fullMapProperties.showCaves.get();
+
             // Update the grid
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
             gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
-            gridRenderer.updateTextures(state.getMapType(miniMapProperties.showCaves.get()), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0, miniMapProperties);
+            gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0, miniMapProperties);
             if (doStateRefresh)
             {
                 //boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, state.mapForceUnicode);
@@ -180,7 +184,7 @@ public class MiniMap
                 Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
                 if (playerPixel != null)
                 {
-                    DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), EntityHelper.getHeading(mc.thePlayer), false, playerLocatorTex, 8, 1f);
+                    DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), EntityHelper.getHeading(mc.thePlayer), false, playerLocatorTex, 8, dv.drawScale);
                 }
             }
 
@@ -228,7 +232,7 @@ public class MiniMap
                 dv.labelBiome.draw(biomeLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
             }
 
-            // Restore GL attrs assumed by Minecraft to be enabled
+            // Restore GL attrs assumed by Minecraft to be managerEnabled
             GL11.glEnable(GL11.GL_DEPTH_TEST);
 
             // Draw border texture
