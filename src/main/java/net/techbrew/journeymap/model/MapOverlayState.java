@@ -153,34 +153,37 @@ public class MapOverlayState
     {
         drawStepList.clear();
 
-        List<Map> entities = new ArrayList<Map>(16);
-        if (this.currentZoom > 0)
+        List<Map> entities = new ArrayList<Map>(32);
+        if(currentZoom==0)
         {
-            if (FeatureManager.isAllowed(Feature.RadarAnimals))
+            drawScale = drawScale*.5f;
+        }
+
+        if (FeatureManager.isAllowed(Feature.RadarAnimals))
+        {
+            if (mapProperties.showAnimals.get() || mapProperties.showPets.get())
             {
-                if (mapProperties.showAnimals.get() || mapProperties.showPets.get())
-                {
-                    Map map = (Map) DataCache.instance().get(AnimalsData.class).get(EntityKey.root);
-                    entities.addAll(map.values());
-                }
-            }
-            if (FeatureManager.isAllowed(Feature.RadarVillagers))
-            {
-                if (mapProperties.showVillagers.get())
-                {
-                    Map map = (Map) DataCache.instance().get(VillagersData.class).get(EntityKey.root);
-                    entities.addAll(map.values());
-                }
-            }
-            if (FeatureManager.isAllowed(Feature.RadarMobs))
-            {
-                if (mapProperties.showMobs.get())
-                {
-                    Map map = (Map) DataCache.instance().get(MobsData.class).get(EntityKey.root);
-                    entities.addAll(map.values());
-                }
+                Map map = (Map) DataCache.instance().get(AnimalsData.class).get(EntityKey.root);
+                entities.addAll(map.values());
             }
         }
+        if (FeatureManager.isAllowed(Feature.RadarVillagers))
+        {
+            if (mapProperties.showVillagers.get())
+            {
+                Map map = (Map) DataCache.instance().get(VillagersData.class).get(EntityKey.root);
+                entities.addAll(map.values());
+            }
+        }
+        if (FeatureManager.isAllowed(Feature.RadarMobs))
+        {
+            if (mapProperties.showMobs.get())
+            {
+                Map map = (Map) DataCache.instance().get(MobsData.class).get(EntityKey.root);
+                entities.addAll(map.values());
+            }
+        }
+
 
         if (FeatureManager.isAllowed(Feature.RadarPlayers))
         {

@@ -1,7 +1,6 @@
 package net.techbrew.journeymap.model;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderFacade;
@@ -13,7 +12,6 @@ import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.*;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import net.techbrew.journeymap.JourneyMap;
@@ -36,21 +34,44 @@ public class EntityHelper
         timer.start();
 
         Minecraft mc = Minecraft.getMinecraft();
+        List<Entity> list = new ArrayList();
+
+        List<Entity> allEntities = new ArrayList<Entity>(mc.theWorld.loadedEntityList);
         AxisAlignedBB bb = getBB(mc.thePlayer);
-        List list = new ArrayList();
+
+        lateralDistance = JourneyMap.getInstance().coreProperties.chunkOffset.get() * 8;
+        verticalDistance = lateralDistance / 2;
 
         try
         {
-            for (Class entityClass : entityClasses)
+            for(Entity entity : allEntities)
             {
-                list.addAll(mc.theWorld.getEntitiesWithinAABB(entityClass, bb));
+                if(!entity.isDead && entity.addedToChunk && bb.intersectsWith(entity.boundingBox))
+                {
+                    for (Class entityClass : entityClasses)
+                    {
+                        if(entityClass.isAssignableFrom(entity.getClass()))
+                        {
+                            list.add(entity);
+                            break;
+                        }
+                    }
+                }
             }
 
-            if (list.size() > maxEntities)
+            if(list.size()>maxEntities)
             {
+                int before = list.size();
                 Collections.sort(list, new EntityDistanceComparator(mc.thePlayer));
                 list = list.subList(0, maxEntities);
+                System.out.println("Entities for " + timerName + ": " + list.size() + " reduced from " + before);
             }
+            else
+            {
+                // TODO remove
+                System.out.println("Entities for " + timerName + ": " + list.size());
+            }
+
         }
         catch (Throwable t)
         {
@@ -83,32 +104,29 @@ public class EntityHelper
      */
     public static List<EntityPlayer> getPlayersNearby()
     {
+        StatTimer timer = StatTimer.get("EntityHelper.getPlayersNearby");
+        timer.start();
+
         Minecraft mc = Minecraft.getMinecraft();
-        IntegratedServer server = mc.getIntegratedServer();
-        if (server == null || server.getPublic())
-        {
-            StatTimer timer = StatTimer.get("EntityHelper.getPlayersNearby");
-            timer.start();
 
-            int x = mc.thePlayer.chunkCoordX << 4;
-            int z = mc.thePlayer.chunkCoordZ << 4;
-            int radius = 512;
-            AxisAlignedBB bb = AxisAlignedBB.getBoundingBox(x - radius, 0, z - radius, x + radius, mc.theWorld.getHeight(), z + radius);
-            List<EntityPlayer> list = mc.theWorld.getEntitiesWithinAABB(EntityOtherPlayerMP.class, bb);
-            int max = JourneyMap.getInstance().coreProperties.maxPlayersData.get();
-            if (list.size() > max)
-            {
-                Collections.sort(list, new EntityDistanceComparator(mc.thePlayer));
-                list = list.subList(0, max);
-            }
+        lateralDistance = JourneyMap.getInstance().coreProperties.chunkOffset.get() * 8;
+        verticalDistance = lateralDistance / 2;
 
-            timer.stop();
-            return list;
-        }
-        else
+        List<EntityPlayer> allPlayers = new ArrayList<EntityPlayer>(mc.theWorld.playerEntities);
+        allPlayers.remove(mc.thePlayer);
+
+        int max = JourneyMap.getInstance().coreProperties.maxPlayersData.get();
+        if(allPlayers.size()>max)
         {
-            return Collections.EMPTY_LIST;
+            Collections.sort(allPlayers, new EntityDistanceComparator(mc.thePlayer));
+            allPlayers = allPlayers.subList(0, max);
         }
+
+        // TODO remove
+        System.out.println("Players: " + allPlayers.size());
+
+        timer.stop();
+        return allPlayers;
     }
 
     /**

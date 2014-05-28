@@ -11,10 +11,10 @@ public class MiniMapOptions extends JmUI
 
     private enum ButtonEnum
     {
-        MiniMap, Position, Shape, Font, Texture, Unicode, Keyboard, KeyboardHelp, Close, Showfps, CloseAll
+        MiniMap, Position, Shape, Font, Texture, Unicode, Keyboard, KeyboardHelp, Close, Showfps, ShowSelf, CloseAll
     }
 
-    private Button buttonPosition, buttonShape, buttonFont, buttonTexture, buttonUnicode, buttonMiniMap, buttonKeyboard, buttonKeyboardHelp, buttonShowfps, buttonClose, buttonCloseAll;
+    private Button buttonPosition, buttonShape, buttonFont, buttonTexture, buttonUnicode, buttonMiniMap, buttonKeyboard, buttonKeyboardHelp, buttonShowSelf, buttonShowfps, buttonClose, buttonCloseAll;
 
 
     private DisplayVars.Shape currentShape;
@@ -73,7 +73,12 @@ public class MiniMapOptions extends JmUI
                 Constants.getString("MiniMap.texture_size", Constants.getString("MiniMap.font_large")),
                 miniMapProperties, miniMapProperties.textureSmall);
         buttonTexture.setEnabled(minimapOn);
-        buttonTexture.fitWidth(getFontRenderer());
+
+        buttonShowSelf= new BooleanPropertyButton(ButtonEnum.ShowSelf.ordinal(),
+                Constants.getString("MapOverlay.show_self", Constants.getString("MapOverlay.on")),
+                Constants.getString("MapOverlay.show_self", Constants.getString("MapOverlay.off")),
+                miniMapProperties, miniMapProperties.showSelf);
+        buttonShowSelf.setEnabled(minimapOn);
 
         boolean showHotKeys = miniMapProperties.enableHotkeys.get();
         buttonKeyboard = new Button(ButtonEnum.Keyboard,
@@ -95,19 +100,17 @@ public class MiniMapOptions extends JmUI
                 Constants.getString("MiniMap.force_unicode", on),
                 Constants.getString("MiniMap.force_unicode", off), forceUnicode);
 
-        leftButtons = new ButtonList(buttonMiniMap, buttonPosition, buttonShowfps, buttonKeyboard);
-        leftButtons.setWidths((buttonTexture.getWidth()*2)+2);
-
-        rightButtons = new ButtonList(buttonShape, buttonFont, buttonUnicode, buttonKeyboardHelp);
-        rightButtons.setWidths((buttonTexture.getWidth()*2)+2);
+        leftButtons = new ButtonList(buttonMiniMap, buttonPosition, buttonShowfps, buttonShowSelf, buttonKeyboard);
+        rightButtons = new ButtonList(buttonShape, buttonTexture, buttonFont, buttonUnicode, buttonKeyboardHelp);
 
         buttonList.addAll(leftButtons);
         buttonList.addAll(rightButtons);
 
+        new ButtonList(buttonList).equalizeWidths(getFontRenderer());
+
         buttonClose = new Button(ButtonEnum.Close, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
         buttonCloseAll = new Button(ButtonEnum.CloseAll, Constants.getString("MiniMap.return_to_game")); //$NON-NLS-1$
 
-        buttonList.add(buttonTexture);
         buttonList.add(buttonClose);
         buttonList.add(buttonCloseAll);
     }
@@ -142,12 +145,6 @@ public class MiniMapOptions extends JmUI
         {
             button.setEnabled(buttonMiniMap.getToggled());
         }
-
-        buttonTexture.setEnabled(buttonMiniMap.getToggled());
-
-        buttonFont.setWidth((buttonMiniMap.getWidth()/2)-2);
-        buttonTexture.setWidth(buttonFont.getWidth());
-        buttonTexture.rightOf(buttonFont, hgap).setY(buttonFont.getY());
 
         buttonMiniMap.setEnabled(true);
 
@@ -192,6 +189,12 @@ public class MiniMapOptions extends JmUI
             {
                 buttonFont.setToggled(miniMapProperties.toggle(miniMapProperties.fontSmall));
                 UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+                break;
+            }
+
+            case ShowSelf:
+            {
+                buttonShowSelf.toggle();
                 break;
             }
 

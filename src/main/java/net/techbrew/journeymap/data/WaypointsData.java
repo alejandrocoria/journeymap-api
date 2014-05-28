@@ -61,7 +61,7 @@ public class WaypointsData implements IDataProvider
      */
     public static boolean isNativeEnabled()
     {
-        return waypointProperties.enabled.get();
+        return waypointProperties.managerEnabled.get();
     }
 
     /**

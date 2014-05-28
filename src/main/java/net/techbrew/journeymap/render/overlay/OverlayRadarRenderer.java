@@ -2,12 +2,14 @@ package net.techbrew.journeymap.render.overlay;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.EntityKey;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.render.draw.DrawCenteredLabelStep;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
+import net.techbrew.journeymap.render.draw.DrawPlayerStep;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -99,32 +101,25 @@ public class OverlayRadarRenderer
                         }
                     }
 
+                    // Draw locator icon
                     Entity entity = (Entity) critter.get(EntityKey.entityLiving);
                     drawStepList.add(new DrawEntityStep(entity, false, locatorImg, (int) (8 * drawScale)));
 
-                    // Draw entity image
+                    // Draw entity icon and label
                     if (isPlayer)
                     {
                         entityIcon = tc.getPlayerSkin((String) critter.get(EntityKey.username));
+                        drawStepList.add(new DrawPlayerStep((EntityPlayer) entity, entityIcon));
                     }
                     else
                     {
                         entityIcon = tc.getEntityImage(filename);
-                    }
-                    if (entityIcon != null)
-                    {
-                        int bottomMargin = isPlayer ? 0 : (int) (8 * drawScale);
-                        drawStepList.add(new DrawEntityStep(entity, true, entityIcon, bottomMargin));
-                    }
+                        if (entityIcon != null)
+                        {
+                            int bottomMargin = isPlayer ? 0 : (int) (8 * drawScale);
+                            drawStepList.add(new DrawEntityStep(entity, true, entityIcon, bottomMargin));
+                        }
 
-                    if (isPlayer)
-                    {
-                        // Draw Label
-                        String username = (String) critter.get(EntityKey.username);
-                        drawStepList.add(new DrawCenteredLabelStep(posX, posZ, username, -entityIcon.height, labelBg, Color.green));
-                    }
-                    else
-                    {
                         if (critter.containsKey(EntityKey.customName))
                         {
                             String customName = (String) critter.get(EntityKey.customName);

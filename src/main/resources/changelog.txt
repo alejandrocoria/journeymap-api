@@ -32,7 +32,8 @@ Changes since 4.0.0b1:
 - Change: JourneyMap logger now tied into FML logger for cleaner FML log output
 - Change: JourneyMap logger added shutdown hook to clean up .lck files
 - Change: Entity icons/headings now update in real-time, but queries for nearby entities are still on a config-based delay (cache duration)
-- Change: Self icon can now be toggled off in full map and minimap.
+- Change: Sneaking entities (usually players) will no longer appear on the radar
+- Bugfix: Other player icons too big on minimap
 - Bugfix: Waypoint "enable" state (on/off) wasn't saved to file.
 - Bugfix: Waypoint Editor wouldn't open a waypoint with no dimensions selected.
 - Bugfix: Waypoint Editor didn't check for changes to selected dimensions when determining whether Save button enabled.

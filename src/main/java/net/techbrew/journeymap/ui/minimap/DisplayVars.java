@@ -248,7 +248,7 @@ public class DisplayVars
         DrawUtil.VAlign valignFps = DrawUtil.VAlign.Below;
         DrawUtil.VAlign valignLocation = DrawUtil.VAlign.Above;
         DrawUtil.VAlign valignBiome = DrawUtil.VAlign.Above;
-        float textureScale = (miniMapProperties.textureSmall.get() ? 1 : 2);
+        float textureScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);
 
         // Assign shape
         switch (shape)

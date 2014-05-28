@@ -83,26 +83,33 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler {
     @SubscribeEvent
     public void onSoundEvent(PlaySoundEvent17 event)
     {
-        if(JourneyMap.getInstance().isMapping())
+        if(JourneyMap.getInstance().isMapping() && event!=null && event.sound!=null)
         {
+            final int x = (int) event.sound.getXPosF() >> 4;
+            final int z = (int) event.sound.getZPosF() >> 4;
             ChunkCoordIntPair coord;
-            if (event.name.contains("explode"))
+            if (event.name != null)
             {
-                final int x = (int) event.sound.getXPosF() >> 4;
-                final int z = (int) event.sound.getZPosF() >> 4;
-                for (int ox = x - 1; ox <= x + 1; ox++)
+                if (event.name.contains("explode"))
                 {
-                    for (int oz = z - 1; oz <= z + 1; oz++)
+                    for (int ox = x - 1; ox <= x + 1; ox++)
                     {
-                        coord = new ChunkCoordIntPair(ox, oz);
-                        queueChunk(event, coord);
+                        for (int oz = z - 1; oz <= z + 1; oz++)
+                        {
+                            coord = new ChunkCoordIntPair(ox, oz);
+                            queueChunk(event, coord);
+                        }
                     }
                 }
+                else
+                    if (event.name.contains("dig"))
+                    {
+                        coord = new ChunkCoordIntPair(x, z);
+                        queueChunk(event, coord);
+                    }
             }
-            else if (event.name.contains("dig"))
+            else
             {
-                final int x = (int) event.sound.getXPosF() >> 4;
-                final int z = (int) event.sound.getZPosF() >> 4;
                 coord = new ChunkCoordIntPair(x, z);
                 queueChunk(event, coord);
             }
