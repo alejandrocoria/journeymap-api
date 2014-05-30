@@ -64,14 +64,7 @@ public class EntityHelper
                 int before = list.size();
                 Collections.sort(list, new EntityDistanceComparator(mc.thePlayer));
                 list = list.subList(0, maxEntities);
-                System.out.println("Entities for " + timerName + ": " + list.size() + " reduced from " + before);
             }
-            else
-            {
-                // TODO remove
-                System.out.println("Entities for " + timerName + ": " + list.size());
-            }
-
         }
         catch (Throwable t)
         {
@@ -121,9 +114,6 @@ public class EntityHelper
             Collections.sort(allPlayers, new EntityDistanceComparator(mc.thePlayer));
             allPlayers = allPlayers.subList(0, max);
         }
-
-        // TODO remove
-        System.out.println("Players: " + allPlayers.size());
 
         timer.stop();
         return allPlayers;

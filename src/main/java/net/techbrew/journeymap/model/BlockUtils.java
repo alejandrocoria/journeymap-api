@@ -21,7 +21,7 @@ public class BlockUtils {
 	public static AlphaComposite SLIGHTLYCLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F);
 	public static Color COLOR_TRANSPARENT = new Color(0,0,0,0);
 
-    public enum Flag {HasAir, BiomeColor, CustomBiomeColor, NotHideSky, NotCeiling, NoShadow, Side2Texture, Transparency, Error}
+    public enum Flag {HasAir, BiomeColor, CustomBiomeColor, NotHideSky, NoShadow, Side2Texture, Transparency, Error}
 
     private final static HashMap<GameRegistry.UniqueIdentifier, EnumSet<Flag>> blockFlags = new HashMap<GameRegistry.UniqueIdentifier, EnumSet<Flag>>(64);
     private final static HashMap<GameRegistry.UniqueIdentifier, Float> blockAlphas = new HashMap<GameRegistry.UniqueIdentifier, Float>(8);
@@ -40,13 +40,13 @@ public class BlockUtils {
         setAlpha(Blocks.torch, .5F);
 
         blockFlags.clear();
-        setFlags(Blocks.air, Flag.HasAir, Flag.NotHideSky, Flag.NoShadow, Flag.NotCeiling);
+        setFlags(Blocks.air, Flag.HasAir, Flag.NotHideSky, Flag.NoShadow, Flag.NotHideSky);
         setFlags(Blocks.fire, Flag.NoShadow, Flag.Side2Texture);
         setFlags(Blocks.flowing_water, Flag.BiomeColor);
         setFlags(Blocks.grass, Flag.BiomeColor);
         setFlags(Blocks.double_plant, Flag.BiomeColor);
-        setFlags(Blocks.glass, Flag.NotCeiling, Flag.NoShadow);
-        setFlags(Blocks.glass_pane, Flag.NotCeiling, Flag.NoShadow);
+        setFlags(Blocks.glass, Flag.NotHideSky, Flag.NoShadow);
+        setFlags(Blocks.glass_pane, Flag.NotHideSky, Flag.NoShadow);
         setFlags(Blocks.ladder, Flag.NotHideSky);
         setFlags(Blocks.lava, Flag.NoShadow);
         setFlags(Blocks.leaves, Flag.NotHideSky, Flag.BiomeColor);
@@ -66,7 +66,7 @@ public class BlockUtils {
             Block block = fmlBlockIter.next();
 
             if(block.getMaterial() == Material.air) {
-                setFlags(block, Flag.HasAir, Flag.NotHideSky, Flag.NoShadow, Flag.NotCeiling);
+                setFlags(block, Flag.HasAir, Flag.NotHideSky, Flag.NoShadow);
                 JourneyMap.getLogger().fine(GameRegistry.findUniqueIdentifierFor(block) + " flags set to hide block");
                 continue;
             }
@@ -131,8 +131,6 @@ public class BlockUtils {
 		while(y>=0) {
             block = chunkMd.getBlock(x, y, z);
 			if(chunkMd.stub.canBlockSeeTheSky(x, y, z)) {
-				y--;
-			} else if(hasFlag(block, Flag.NotCeiling)) {
 				y--;
 			} else if(hasFlag(block, Flag.NotHideSky)) {
                 y--;
@@ -207,5 +205,5 @@ public class BlockUtils {
     {
         return blockAlphas;
     }
-
+	
 }

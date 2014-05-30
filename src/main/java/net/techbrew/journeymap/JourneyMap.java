@@ -400,6 +400,7 @@ public class JourneyMap
         FileHandler.lastJMWorldDir = null;
         //BlockMD.clearCache();
         //ColorCache.getInstance().serializeCache();
+        MapOverlay.state().follow=true;
         ColorCache.getInstance().reset();
         DataCache.instance().purge();
         MapPlayerTask.clearCache();

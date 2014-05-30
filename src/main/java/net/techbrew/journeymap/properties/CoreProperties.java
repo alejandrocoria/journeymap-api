@@ -29,6 +29,8 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public final AtomicBoolean caveLighting = new AtomicBoolean(true);
     public final AtomicBoolean announceMod = new AtomicBoolean(true);
     public final AtomicBoolean checkUpdates = new AtomicBoolean(true);
+    public final AtomicBoolean caveGreySurface = new AtomicBoolean(false);
+    public final AtomicBoolean caveIgnoreGlass = new AtomicBoolean(true);
 
     @Override
     protected String getName()
@@ -92,6 +94,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
         result = 31 * result + caveLighting.hashCode();
         result = 31 * result + announceMod.hashCode();
         result = 31 * result + checkUpdates.hashCode();
+        result = 31 * result + caveGreySurface.hashCode();
         return result;
     }
 
@@ -115,6 +118,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 ", cacheVillagersData=" + cacheVillagersData +
                 ", maxVillagersData=" + maxVillagersData +
                 ", caveLighting=" + caveLighting +
+                ", caveGreySurface=" + caveGreySurface +
                 ", announceMod=" + announceMod +
                 ", checkUpdates=" + checkUpdates;
     }

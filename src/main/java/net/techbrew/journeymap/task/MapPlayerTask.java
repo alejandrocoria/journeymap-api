@@ -76,13 +76,11 @@ public class MapPlayerTask extends BaseMapTask
     {
 
         int missing = 0;
-
-
         int offset = JourneyMap.getInstance().coreProperties.chunkOffset.get();
 
         final ChunkCoordinates playerPos = new ChunkCoordinates(player.chunkCoordX, player.chunkCoordY, player.chunkCoordZ);
         final Map playerData = DataCache.instance().get(PlayerData.class);
-        final boolean underground = (Boolean) playerData.get(EntityKey.underground) && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.showCaves.get();
+        final boolean underground = PlayerData.playerIsUnderground(player) && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.showCaves.get();
         final int dimension = (Integer) playerData.get(EntityKey.dimension);
 
         if (lastUnderground == null)
@@ -113,8 +111,7 @@ public class MapPlayerTask extends BaseMapTask
         lastUnderground = underground;
 
         final int side = offset + offset + 1;
-        final int capacity = (side * side) + (side * side) / 4; // alleviates map growth
-        final ChunkMD.Set chunks = new ChunkMD.Set(capacity);
+        final ChunkMD.Set chunks = new ChunkMD.Set(side*3); // *3 to avoid map growth
         final World world = player.worldObj;
 
         final Integer chunkY = underground ? lastPlayerPos.posY : null;
@@ -253,7 +250,6 @@ public class MapPlayerTask extends BaseMapTask
         }
 
         return new MapPlayerTask(world, dimension, underground, chunkY, chunks);
-
     }
 
     public static void clearCache()

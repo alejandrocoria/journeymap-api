@@ -110,6 +110,7 @@ MapOverlay.save_filename=Saving map to screenshots: %1$s
 
 # %1$s = "On" or "Off"
 MapOverlay.show_caves=Show Caves: %1$s
+MapOverlay.caves=Caves: %1$s
 
 # %1$s = "On" or "Off"
 MapOverlay.show_monsters=Show Monsters: %1$s

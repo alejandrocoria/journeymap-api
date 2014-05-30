@@ -81,7 +81,7 @@ public class WaypointManager extends JmUI
         {
             if (canUserTeleport == null)
             {
-                if (mc.thePlayer.capabilities.isCreativeMode)
+                if (mc.thePlayer.capabilities.isCreativeMode || mc.theWorld.getWorldInfo().areCommandsAllowed())
                 {
                     canUserTeleport = true;
                 }
@@ -371,12 +371,10 @@ public class WaypointManager extends JmUI
 
     protected boolean toggleItems(boolean enable)
     {
-        boolean mixed = false;
         for (WaypointManagerItem item : items)
         {
             if (enable == item.waypoint.isEnable())
             {
-                mixed = true;
                 enable = !enable;
                 break;
             }
@@ -386,7 +384,6 @@ public class WaypointManager extends JmUI
             if (item.waypoint.isEnable() != enable)
             {
                 item.enableWaypoint(enable);
-                System.out.println("Toggled " + item.waypoint);
             }
         }
         return !enable;

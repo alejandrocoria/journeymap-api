@@ -33,10 +33,14 @@ Changes since 4.0.0b1:
 - Change: JourneyMap logger added shutdown hook to clean up .lck files
 - Change: Entity icons/headings now update in real-time, but queries for nearby entities are still on a config-based delay (cache duration)
 - Change: Sneaking entities (usually players) will no longer appear on the radar
+- Change: Added "Caves:On/Off" button to full-screen map (Unlimited Edition)
 - Bugfix: Other player icons too big on minimap
+- Bugfix: Waypoint Manager hid Teleport button when Game world allowed cheats (commands)
+- Bugfix: Crash when sound event didn't have sound or name (NullPointerException)
 - Bugfix: Waypoint "enable" state (on/off) wasn't saved to file.
 - Bugfix: Waypoint Editor wouldn't open a waypoint with no dimensions selected.
 - Bugfix: Waypoint Editor didn't check for changes to selected dimensions when determining whether Save button enabled.
+- Bugfix: Map "Follow" didn't reset to true after changing worlds.
 
 Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 
@@ -54,13 +58,14 @@ Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 -- In-game Full-screen Map: Block coordinates under your mouse are now displayed at the bottom of the screen. Elevation and biome are also shown if that chunk is loaded.
 
 - Notable Changes:
+-- Improved cave-mapping algorithm
 -- In-game map dialogs use the dimmed game world as background instead of the dirt texture.
 -- Minimap Options has a "Tiny Square" size
 -- Minimap Options has a "Force Unicode" option for display of FPS and Location labels
 -- In-game map locations now use explicit coordinate designations.  For example: "x:982, z:-520, y:70"
--- Improved detection of chunk changes via multiple Forge events
 
 - Performance Improvements:
+-- Faster map updates via listeners for block placement, removal, and numerous events like TNT explosions
 -- In-game maps are more efficient about checking render steps are within the active viewport; should improve pan/zoom update speeds on slower machines
 -- Minimap render pass simplified
 

@@ -64,6 +64,7 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
 
         buttonTeleport = new Button(id++, Constants.getString("Waypoint.teleport")); //$NON-NLS-1$
         buttonTeleport.setDrawButton(manager.canUserTeleport);
+        buttonTeleport.setEnabled(manager.canUserTeleport);
 
         buttonListLeft = new ButtonList(buttonEnable, buttonFind, buttonTeleport);
         buttonListLeft.setHeights(manager.rowHeight);
@@ -238,7 +239,7 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
                     }
                     else
                     {
-                        if (buttonTeleport.isEnabled() && buttonTeleport.mouseOver(mouseX, mouseY))
+                        if (manager.canUserTeleport && buttonTeleport.mouseOver(mouseX, mouseY))
                         {
                             new CmdTeleportWaypoint(waypoint).run();
                             MapOverlay.state().follow = true;
