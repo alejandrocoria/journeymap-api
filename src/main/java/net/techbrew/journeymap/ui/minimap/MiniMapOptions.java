@@ -4,7 +4,11 @@ import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.properties.MiniMapProperties;
+import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.ui.*;
+import net.techbrew.journeymap.ui.Button;
+
+import java.awt.*;
 
 public class MiniMapOptions extends JmUI
 {
@@ -101,7 +105,9 @@ public class MiniMapOptions extends JmUI
                 Constants.getString("MiniMap.force_unicode", off), forceUnicode);
 
         leftButtons = new ButtonList(buttonMiniMap, buttonPosition, buttonShowfps, buttonShowSelf, buttonKeyboard);
+        leftButtons.setNoDisableText(true);
         rightButtons = new ButtonList(buttonShape, buttonTexture, buttonFont, buttonUnicode, buttonKeyboardHelp);
+        rightButtons.setNoDisableText(true);
 
         buttonList.addAll(leftButtons);
         buttonList.addAll(rightButtons);
@@ -109,7 +115,10 @@ public class MiniMapOptions extends JmUI
         new ButtonList(buttonList).equalizeWidths(getFontRenderer());
 
         buttonClose = new Button(ButtonEnum.Close, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
+        buttonClose.setWidth(150);
+
         buttonCloseAll = new Button(ButtonEnum.CloseAll, Constants.getString("MiniMap.return_to_game")); //$NON-NLS-1$
+        buttonCloseAll.setWidth(150);
 
         buttonList.add(buttonClose);
         buttonList.add(buttonCloseAll);
@@ -131,7 +140,7 @@ public class MiniMapOptions extends JmUI
         final int hgap = 2;
         final int vgap = 3;
         final int bx = this.width / 2;
-        final int by = this.height / 4;
+        final int by = Math.max(50, (this.height - (7*24)) / 2);
 
         leftButtons.layoutVertical(bx - hgap, by, false, vgap);
         rightButtons.layoutVertical(bx + hgap, by, true, vgap);
@@ -148,8 +157,9 @@ public class MiniMapOptions extends JmUI
 
         buttonMiniMap.setEnabled(true);
 
-        buttonClose.below(leftButtons, vgap + vgap + vgap).centerHorizontalOn(bx);
-        buttonCloseAll.below(buttonClose, vgap).centerHorizontalOn(bx);
+        buttonCloseAll.below(leftButtons, vgap + vgap + vgap).centerHorizontalOn(bx);
+        buttonClose.below(buttonCloseAll, vgap).centerHorizontalOn(bx);
+
 
         buttonKeyboardHelp.setEnabled(buttonMiniMap.getToggled() && buttonKeyboard.getToggled());
     }
@@ -302,6 +312,22 @@ public class MiniMapOptions extends JmUI
         {
             GuiButton guibutton = (GuiButton) this.buttonList.get(k);
             guibutton.drawButton(this.mc, x, y);
+        }
+
+        // Show FPS
+        String fps = mc.debug;
+        final int idx = fps != null ? fps.indexOf(',') : -1;
+        if (idx > 0)
+        {
+            fps = fps.substring(0, idx);
+            if(currentPosition== DisplayVars.Position.TopRight)
+            {
+                DrawUtil.drawLabel(fps, width - 5, height-5, DrawUtil.HAlign.Left, DrawUtil.VAlign.Above, Color.BLACK, 0, Color.cyan, 255, 1, true);
+            }
+            else
+            {
+                DrawUtil.drawLabel(fps, width - 5, 5, DrawUtil.HAlign.Left, DrawUtil.VAlign.Below, Color.BLACK, 0, Color.cyan, 255, 1, true);
+            }
         }
     }
 }

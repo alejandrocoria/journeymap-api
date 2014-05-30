@@ -80,6 +80,7 @@ public class MasterOptions extends JmUI
         new ButtonList(buttonList).equalizeWidths(getFontRenderer());
 
         buttonClose = ButtonEnum.Close.create(Constants.getString("MapOverlay.close"));
+        buttonClose.setWidth(150);
         buttonList.add(buttonClose);
     }
 
@@ -100,7 +101,9 @@ public class MasterOptions extends JmUI
         listWidth = Math.max(listWidth, listWebMap.getWidth(hgap));
 
         final int bx = (this.width - listWidth) / 2;
-        int by = Math.max(50, this.height / 6);
+        int by = Math.max(40, ((this.height - (5*30)) / 2));
+
+        DrawUtil.drawRectangle(bx-5, by-20, listWidth+10, 1, Color.lightGray, 150);
 
         // Full Map
         DrawUtil.drawLabel(titleGeneral, bx, by, DrawUtil.HAlign.Right, DrawUtil.VAlign.Above, Color.BLACK, 0, Color.cyan, 255, 1, false);
@@ -122,8 +125,10 @@ public class MasterOptions extends JmUI
         // Web Map
         DrawUtil.drawLabel(titleWebmap, bx, by, DrawUtil.HAlign.Right, DrawUtil.VAlign.Above, Color.BLACK, 0, Color.cyan, 255, 1, false);
         listWebMap.layoutHorizontal(bx, by, true, hgap);
-        by = listWebMap.getBottomY() + 10;
+        by = listWebMap.getBottomY() + 20;
         buttonWebMapOpen.setEnabled(buttonWebMapEnable.getToggled());
+
+        DrawUtil.drawRectangle(bx-5, by-10, listWidth+10, 1, Color.lightGray, 150);
 
         // Close
         buttonClose.centerHorizontalOn(width / 2).setY(by);

@@ -14,6 +14,13 @@ public class ButtonList extends ArrayList<Button>
 {
     private boolean horizontal = true;
 
+    private String label;
+
+    public ButtonList(String label)
+    {
+        this.label = label;
+    }
+
     public ButtonList(List<Button> buttons)
     {
         super(buttons);
@@ -313,6 +320,24 @@ public class ButtonList extends ArrayList<Button>
         return horizontal;
     }
 
+    public ButtonList setNoDisableText(boolean noDisableText)
+    {
+        for (Button button : this)
+        {
+            button.setNoDisableText(noDisableText);
+        }
+        return this;
+    }
+
+    public ButtonList setEnabled(boolean enabled)
+    {
+        for (Button button : this)
+        {
+            button.setEnabled(enabled);
+        }
+        return this;
+    }
+
     public ButtonList setOptions(boolean enabled, boolean drawBackground, boolean drawFrame)
     {
         for (Button button : this)
@@ -320,6 +345,15 @@ public class ButtonList extends ArrayList<Button>
             button.setEnabled(enabled);
             button.setDrawFrame(drawFrame);
             button.setDrawBackground(drawBackground);
+        }
+        return this;
+    }
+
+    public ButtonList setDefaultStyle(boolean defaultStyle)
+    {
+        for (Button button : this)
+        {
+            button.setDefaultStyle(defaultStyle);
         }
         return this;
     }
@@ -408,5 +442,15 @@ public class ButtonList extends ArrayList<Button>
                 }
             }
         }
+    }
+
+    public String getLabel()
+    {
+        return label;
+    }
+
+    public void setLabel(String label)
+    {
+        this.label = label;
     }
 }

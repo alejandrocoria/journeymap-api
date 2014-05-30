@@ -234,7 +234,7 @@ public class DisplayVars
         final boolean wasUnicode = mc.fontRenderer.getUnicodeFlag();
         final boolean useUnicode = (forceUnicode || wasUnicode);
         this.fontScale = labelFontScale * (useUnicode ? 2 : 1);
-        final double labelHeight = DrawUtil.getLabelHeight(mc.fontRenderer, useFontShadow) * (wasUnicode ? 1 : .7) * this.fontScale;
+        final double labelHeight = DrawUtil.getLabelHeight(mc.fontRenderer, useFontShadow) * (useUnicode ? .7 : 1) * this.fontScale;
 
         // Mutable local vars
         double bottomTextureYMargin = 0;

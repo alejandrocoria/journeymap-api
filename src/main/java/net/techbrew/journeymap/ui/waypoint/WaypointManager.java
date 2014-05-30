@@ -471,7 +471,7 @@ public class WaypointManager extends JmUI
 
     protected void refreshAndClose()
     {
-        bottomButtons.setOptions(false, true, true);
+        bottomButtons.setEnabled(false);
         WaypointStore.instance().bulkSave();
         DataCache.instance().forceRefresh(WaypointsData.class);
         MapOverlay.state().requireRefresh();

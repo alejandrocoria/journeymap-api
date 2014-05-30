@@ -218,4 +218,23 @@ public class TextField extends GuiTextField
         return ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_HEIGHT);
     }
 
+    public int getCenterX()
+    {
+        return getX() + (getWidth() / 2);
+    }
+
+    public int getMiddleY()
+    {
+        return getY() + (getHeight() / 2);
+    }
+
+    public int getBottomY()
+    {
+        return getY() + getHeight();
+    }
+
+    public int getRightX()
+    {
+        return getX() + getWidth();
+    }
 }

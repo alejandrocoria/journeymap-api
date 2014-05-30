@@ -277,8 +277,8 @@ public class MapOverlay extends JmUI
 
             buttonCaves = BooleanPropertyButton.create(ButtonEnum.Caves.ordinal(), "MapOverlay.caves", fullMapProperties, fullMapProperties.showCaves);
             buttonCaves.fitWidth(fr);
+            buttonCaves.setNoDisableText(true);
             buttonCaves.setDrawButton(FeatureManager.isAllowed(Feature.MapCaves));
-
 
 //            buttonMode = new Button(ButtonEnum.Mode,0,0,60,20, Constants.getString("MapOverlay.mode")); //$NON-NLS-1$
 //            buttonMode.fitWidth(fr);

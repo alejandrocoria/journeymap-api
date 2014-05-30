@@ -3,6 +3,7 @@ package net.techbrew.journeymap.ui.waypoint;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumChatFormatting;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.command.CmdTeleportWaypoint;
 import net.techbrew.journeymap.model.Waypoint;
@@ -179,7 +180,7 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
         int yOffset = 1 + (this.manager.rowHeight - mc.fontRenderer.FONT_HEIGHT) / 2;
         mc.fontRenderer.drawStringWithShadow(String.format("%sm", getDistance()), x + manager.colLocation, y + yOffset, color.getRGB());
 
-        String name = waypointValid ? waypoint.getName() : "§m" + waypoint.getName();
+        String name = waypointValid ? waypoint.getName() : EnumChatFormatting.STRIKETHROUGH + waypoint.getName();
         mc.fontRenderer.drawStringWithShadow(name, x + manager.colName, y + yOffset, color.getRGB());
     }
 

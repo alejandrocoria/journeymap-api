@@ -31,6 +31,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected boolean noDisableText;
     protected boolean drawFrame;
     protected boolean drawBackground;
+    protected boolean defaultStyle = true;
 
     public Button(Enum enumValue, String label)
     {
@@ -154,7 +155,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             return;
         }
 
-        if (this.height >= 20)
+        if (defaultStyle)
         {
             // Use resource pack texture
             super.drawButton(minecraft, mouseX, mouseY);
@@ -299,6 +300,10 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public void setHeight(int height)
     {
         this.height = height;
+        if(height!=20)
+        {
+            defaultStyle = false;
+        }
     }
 
     public void setTextOnly(FontRenderer fr)
@@ -346,9 +351,19 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return this.xPosition + (this.width / 2);
     }
 
-    public int getCenterY()
+    public int getMiddleY()
     {
         return this.yPosition + (this.height / 2);
+    }
+
+    public int getBottomY()
+    {
+        return this.yPosition + this.height;
+    }
+
+    public int getRightX()
+    {
+        return this.xPosition + this.width;
     }
 
     public void setPosition(int x, int y)
@@ -423,6 +438,54 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return this;
     }
 
+    public Button alignTo(Button other, DrawUtil.HAlign hAlign, int hgap, DrawUtil.VAlign vAlign, int vgap)
+    {
+        int x = getX();
+        int y = getY();
+
+        switch (hAlign)
+        {
+            case Right:
+            {
+                x = other.getRightX() + hgap;
+                break;
+            }
+            case Left:
+            {
+                x = other.getX() - hgap;
+                break;
+            }
+            case Center:
+            {
+                x = other.getCenterX();
+                break;
+            }
+        }
+
+        switch (vAlign)
+        {
+            case Above:
+            {
+                y = other.getY() - vgap - getHeight();
+                break;
+            }
+            case Below:
+            {
+                y = other.getBottomY() + vgap;
+                break;
+            }
+            case Middle:
+            {
+                y = other.getMiddleY() - (getHeight()/2);
+                break;
+            }
+        }
+
+        setX(x);
+        setY(y);
+        return this;
+    }
+
     public boolean isEnabled()
     {
         return enabled;
@@ -471,5 +534,15 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public void setDrawBackground(boolean drawBackground)
     {
         this.drawBackground = drawBackground;
+    }
+
+    public boolean isDefaultStyle()
+    {
+        return defaultStyle;
+    }
+
+    public void setDefaultStyle(boolean defaultStyle)
+    {
+        this.defaultStyle = defaultStyle;
     }
 }

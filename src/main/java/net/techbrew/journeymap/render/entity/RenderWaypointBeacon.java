@@ -5,6 +5,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
@@ -127,6 +128,8 @@ public class RenderWaypointBeacon
                 renderBeam(shiftX - .5, -renderManager.viewerPosY, shiftZ - .5, waypoint.getColor(), showStaticBeam, showRotatingBeam);
             }
 
+            String label = waypoint.getName();
+
             // Check for auto-hidden labels
             boolean labelHidden = false;
             if (waypointProperties.autoHideLabel.get())
@@ -140,27 +143,28 @@ public class RenderWaypointBeacon
 //                double dp = playerLookVec.dotProduct(delta);
 //                labelHidden = dp < (1.0D - (.5D / distance));
 
-
                 // 2D algorithm (ignore pitch)
                 int angle = 5;
 
                 double yaw = Math.atan2(renderManager.viewerPosZ-waypointVec.zCoord-.5, renderManager.viewerPosX-waypointVec.xCoord-.5) ;
                 double degrees = Math.toDegrees(yaw) + 90;
                 if(degrees<0) degrees = 360+degrees;
-                double playerYaw = Math.toRadians(renderManager.livingPlayer.getRotationYawHead()%360);
+                double playerYaw = renderManager.livingPlayer.getRotationYawHead()%360;
+                if(playerYaw<0)
+                {
+                    playerYaw += 360;
+                }
+                playerYaw = Math.toRadians(playerYaw);
                 double playerDegrees = Math.toDegrees(playerYaw);
 
                 degrees+=angle;
                 playerDegrees+=angle;
 
                 labelHidden = Math.abs((degrees+angle)-(playerDegrees+angle))>angle;
-
+//
+//                label = String.format("degrees %1.2f & playerDegrees %1.2f = %s", degrees, playerDegrees, labelHidden);
+//                labelHidden = false;
             }
-
-
-
-            //waypoint.setName(String.format("vecYaw %1.2f,%1.2f / yaw %1.2f, playerYaw %1.2f / deg %1.1f, playerDeg %1.1f", vecYaw.x, vecYaw.y, yaw, playerYaw, degrees, playerDegrees));
-
 
             // Set render scale (1/64)
             double scale = 0.00390625 * ((viewDistance + 4) / 3);
@@ -176,9 +180,14 @@ public class RenderWaypointBeacon
             {
                 // Construct label
                 StringBuilder sb = new StringBuilder();
+
+                if(waypointProperties.boldLabel.get())
+                {
+                    sb.append(EnumChatFormatting.BOLD);
+                }
                 if (showName)
                 {
-                    sb.append(waypoint.getName());
+                    sb.append(label);
                 }
                 if(showName && showDistance)
                 {
@@ -191,7 +200,7 @@ public class RenderWaypointBeacon
 
                 if(sb.length()>0)
                 {
-                    final String label = sb.toString();
+                    label = sb.toString();
 
                     // Start drawing
                     GL11.glPushMatrix();

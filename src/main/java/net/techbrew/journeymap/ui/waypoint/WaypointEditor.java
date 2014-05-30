@@ -231,7 +231,7 @@ public class WaypointEditor extends JmUI
         final int vpad = 5;
         final int hgap = fr.getStringWidth("X") * 3;
         final int vgap = fieldX.getHeight() + vpad;
-        final int startY = Math.max(30, this.height / 6);
+        final int startY = Math.max(30, (this.height-200) / 2);
 
         // Determine dimension button spacing requirement
         int dcw = fr.getStringWidth(dimensionsTitle);
@@ -327,6 +327,9 @@ public class WaypointEditor extends JmUI
         layoutButtons();
 
         dimScrollPane.drawScreen(x, y, par3);
+
+        String location = Constants.getString("Waypoint.current_location", "  " + MapOverlay.state().playerLastPos);
+        DrawUtil.drawLabel(location, width/2, height, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.BLACK, 255, Color.lightGray, 255, 1, true);
 
         for (int k = 0; k < this.buttonList.size(); ++k)
         {
