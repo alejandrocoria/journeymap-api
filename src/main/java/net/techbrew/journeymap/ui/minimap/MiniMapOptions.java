@@ -15,11 +15,11 @@ public class MiniMapOptions extends JmUI
 
     private enum ButtonEnum
     {
-        MiniMap, Position, Shape, Font, Texture, Unicode, Keyboard, KeyboardHelp, Close, Showfps, ShowSelf, CloseAll
+        MiniMap, Position, Shape, Font, Texture, Unicode, Keyboard, KeyboardHelp, Close, Showfps, ShowSelf, GeneralDisplay, CloseAll
     }
 
-    private Button buttonPosition, buttonShape, buttonFont, buttonTexture, buttonUnicode, buttonMiniMap, buttonKeyboard, buttonKeyboardHelp, buttonShowSelf, buttonShowfps, buttonClose, buttonCloseAll;
-
+    private Button buttonPosition, buttonShape, buttonFont, buttonTexture, buttonUnicode, buttonMiniMap, buttonKeyboard;
+    private Button buttonKeyboardHelp, buttonShowSelf, buttonShowfps, buttonGeneralDisplay, buttonClose, buttonCloseAll;
 
     private DisplayVars.Shape currentShape;
     private DisplayVars.Position currentPosition;
@@ -104,11 +104,16 @@ public class MiniMapOptions extends JmUI
                 Constants.getString("MiniMap.force_unicode", on),
                 Constants.getString("MiniMap.force_unicode", off), forceUnicode);
 
-        leftButtons = new ButtonList(buttonMiniMap, buttonPosition, buttonShowfps, buttonShowSelf, buttonKeyboard);
+        buttonGeneralDisplay = new Button(ButtonEnum.GeneralDisplay,
+                Constants.getString("MapOverlay.general_display_button"));
+
+        leftButtons = new ButtonList(buttonShape, buttonShowfps, buttonShowSelf, buttonKeyboard, buttonKeyboardHelp);
         leftButtons.setNoDisableText(true);
-        rightButtons = new ButtonList(buttonShape, buttonTexture, buttonFont, buttonUnicode, buttonKeyboardHelp);
+
+        rightButtons = new ButtonList(buttonPosition, buttonTexture, buttonFont, buttonUnicode, buttonGeneralDisplay);
         rightButtons.setNoDisableText(true);
 
+        buttonList.add(buttonMiniMap);
         buttonList.addAll(leftButtons);
         buttonList.addAll(rightButtons);
 
@@ -140,10 +145,12 @@ public class MiniMapOptions extends JmUI
         final int hgap = 2;
         final int vgap = 3;
         final int bx = this.width / 2;
-        final int by = Math.max(50, (this.height - (7*24)) / 2);
+        final int by = Math.max(40, (this.height - (8*24)) / 2);
 
-        leftButtons.layoutVertical(bx - hgap, by, false, vgap);
-        rightButtons.layoutVertical(bx + hgap, by, true, vgap);
+        buttonMiniMap.centerHorizontalOn(bx).setY(by);
+
+        leftButtons.layoutVertical(bx - hgap, buttonMiniMap.getBottomY() + vgap, false, vgap);
+        rightButtons.layoutVertical(bx + hgap, buttonMiniMap.getBottomY() + vgap, true, vgap);
 
         for (Button button : leftButtons)
         {
@@ -238,6 +245,12 @@ public class MiniMapOptions extends JmUI
             {
                 buttonUnicode.setToggled(miniMapProperties.toggle(miniMapProperties.forceUnicode));
                 UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+                break;
+            }
+
+            case GeneralDisplay:
+            {
+                UIManager.getInstance().openGeneralDisplayOptions(getClass());
                 break;
             }
 

@@ -185,6 +185,7 @@ MapOverlay.zoom_in=Zoom In
 MapOverlay.zoom_out=Zoom Out
 MapOverlay.title=Full Map
 MapOverlay.general_display=General Display
+MapOverlay.general_display_button=General Display...
 MapOverlay.general_display_title=General Display Options
 
 # Added in 4.0.0:

@@ -9,11 +9,15 @@ import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.draw.DrawStep;
+import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.draw.DrawWayPointStep;
+import net.techbrew.journeymap.render.overlay.GridRenderer;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
+import org.lwjgl.input.Mouse;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.List;
 
@@ -24,9 +28,11 @@ public class WaypointLayer implements LayerDelegate.Layer
 {
     private final long hoverDelay = 100;
     private final List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
+    private final BlockOutlineDrawStep clickDrawStep = new BlockOutlineDrawStep(new BlockCoordIntPair(0,0));
 
     BlockCoordIntPair lastCoord = null;
-    long lastClicked = 0;
+
+    long lastClick = 0;
     long startHover = 0;
 
     DrawWayPointStep selectedWaypointStep = null;
@@ -40,19 +46,26 @@ public class WaypointLayer implements LayerDelegate.Layer
     @Override
     public List<DrawStep> onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
     {
-        drawStepList.clear();
-
         if (!WaypointsData.isNativeEnabled())
         {
-            return drawStepList;
+            return Collections.EMPTY_LIST;
         }
+
+        drawStepList.clear();
+        drawStepList.add(clickDrawStep);
 
         if (lastCoord == null)
         {
             lastCoord = blockCoord;
         }
 
-        long now = System.currentTimeMillis();
+        long now = Minecraft.getSystemTime();
+
+        // Add click draw step
+        if(!blockCoord.equals(clickDrawStep.blockCoord))
+        {
+            unclick();
+        }
 
         // Get search area
         int proximity = getProximity();
@@ -116,15 +129,22 @@ public class WaypointLayer implements LayerDelegate.Layer
     {
         if (!WaypointsData.isNativeEnabled())
         {
-            return drawStepList;
+            return Collections.EMPTY_LIST;
         }
 
         // check for double-click
         long sysTime = Minecraft.getSystemTime();
-        boolean doubleClick = sysTime - this.lastClicked < 450L;
-        this.lastClicked = sysTime;
-        if (!doubleClick)
+        boolean doubleClick = sysTime - this.lastClick < 450L;
+        this.lastClick = sysTime;
+
+        if(!drawStepList.contains(clickDrawStep))
         {
+            drawStepList.add(clickDrawStep);
+        }
+
+        if (!doubleClick || !blockCoord.equals(clickDrawStep.blockCoord))
+        {
+            clickDrawStep.blockCoord = blockCoord;
             return drawStepList;
         }
 
@@ -132,7 +152,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         if (selected != null)
         {
             UIManager.getInstance().openWaypointManager(selected);
-            return Collections.EMPTY_LIST;
+            return drawStepList;
         }
 
         // Check chunk
@@ -148,7 +168,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         Waypoint waypoint = Waypoint.at(cc, Waypoint.Type.Normal, mc.thePlayer.dimension);
         UIManager.getInstance().openWaypointEditor(waypoint, true, MapOverlay.class);
 
-        return Collections.EMPTY_LIST;
+        return drawStepList;
     }
 
     private void sortByDistance(List<Waypoint> waypoints, final BlockCoordIntPair blockCoord, final int dimension)
@@ -181,5 +201,59 @@ public class WaypointLayer implements LayerDelegate.Layer
     {
         int blockSize = (int) Math.max(1, Math.pow(2, MapOverlay.state().currentZoom));
         return Math.max(1, 8 / blockSize);
+    }
+
+    private void unclick()
+    {
+        clickDrawStep.blockCoord = new BlockCoordIntPair(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        drawStepList.remove(clickDrawStep);
+    }
+
+    class BlockOutlineDrawStep implements DrawStep
+    {
+        BlockCoordIntPair blockCoord;
+
+        BlockOutlineDrawStep(BlockCoordIntPair blockCoord)
+        {
+            this.blockCoord = blockCoord;
+        }
+
+        @Override
+        public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale)
+        {
+
+            if(Mouse.isButtonDown(0))
+            {
+                return;
+            }
+
+            if(xOffset!=0 || yOffset!=0)
+            {
+                unclick();
+                return;
+            }
+
+            double x = blockCoord.x;
+            double z = blockCoord.z;
+            double size = Math.pow(2,gridRenderer.getZoom());
+            double thick = gridRenderer.getZoom()<2 ? 1 : 2;
+
+            Point2D.Double pixel = gridRenderer.getBlockPixelInGrid(x, z);
+            pixel.setLocation(pixel.getX() + xOffset, pixel.getY() + yOffset);
+            if (gridRenderer.isOnScreen(pixel))
+            {
+                DrawUtil.drawRectangle(pixel.getX()-(thick*thick), pixel.getY()-(thick*thick), size+(thick*4), thick, Color.black, 150);
+                DrawUtil.drawRectangle(pixel.getX()-thick, pixel.getY()-thick, size+(thick*thick), thick, Color.white, 255);
+
+                DrawUtil.drawRectangle(pixel.getX()-(thick*thick), pixel.getY()-thick, thick, size+(thick*thick), Color.black, 150);
+                DrawUtil.drawRectangle(pixel.getX()-thick, pixel.getY(), thick, size, Color.white, 255);
+
+                DrawUtil.drawRectangle(pixel.getX()+size, pixel.getY(), thick, size, Color.white, 255);
+                DrawUtil.drawRectangle(pixel.getX()+size+thick, pixel.getY()-thick, thick, size+(thick*thick), Color.black, 150);
+
+                DrawUtil.drawRectangle(pixel.getX()-thick, pixel.getY()+size, size+(thick*thick), thick, Color.white, 255);
+                DrawUtil.drawRectangle(pixel.getX()-(thick*thick), pixel.getY()+size+thick, size+(thick*4), thick, Color.black, 150);
+            }
+        }
     }
 }

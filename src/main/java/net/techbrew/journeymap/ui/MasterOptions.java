@@ -153,7 +153,7 @@ public class MasterOptions extends JmUI
         {
             case FullMapOptions:
             {
-                UIManager.getInstance().openFullMapOptions(getClass());
+                UIManager.getInstance().openGeneralDisplayOptions(getClass());
                 break;
             }
             case FullMapHelp:

@@ -174,7 +174,7 @@ public abstract class JmUI extends GuiScreen
     {
         if (returnClass == null)
         {
-            UIManager.getInstance().closeAll();
+            UIManager.getInstance().openMasterOptions();
         }
         else
         {

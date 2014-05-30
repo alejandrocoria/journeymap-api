@@ -375,13 +375,13 @@ public class WaypointEditor extends JmUI
         field.setY(y);
         FontRenderer fr = getFontRenderer();
         int width = fr.getStringWidth(label) + 4;
-        drawString(getFontRenderer(), label, x - width, y + (field.getHeight() - 8) / 2, Color.lightGray.getRGB());
+        drawString(getFontRenderer(), label, x - width, y + (field.getHeight() - 8) / 2, Color.cyan.getRGB());
         field.drawTextBox();
     }
 
     protected void drawLabel(String label, int x, int y)
     {
-        drawString(getFontRenderer(), label, x, y, Color.lightGray.getRGB());
+        drawString(getFontRenderer(), label, x, y, Color.cyan.getRGB());
     }
 
     protected void keyTyped(char par1, int par2)

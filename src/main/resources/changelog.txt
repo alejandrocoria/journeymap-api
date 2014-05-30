@@ -13,34 +13,60 @@ Requirements:
 
 Changes since 4.0.0b1:
 
-- Change: journeyMap.properties file migrated to multiple files in journeyMap/config/
--- Many properties now configurable instead of hard-coded.
 - Feature: In-game waypoint beacons added.
-- Feature: New Options master dialog provides entry points into multiple option dialogs
--- New General Display Options dialog allows minimap options to be configured differently than full map options
+
+- Change: Improved cave-mapping algorithm (via light detection) and surface appearance
+
+- Change: Mob/player radar operations are now an order of magnitude faster.  Should be a dramatic improvement for server worlds.
+
+- Change: Options dialogs overhauled
+-- New Options dialog provides entry points into multiple option dialogs
+-- New General Display Options dialog shows common full-map options and Minimap options side-by-side
 -- New Waypoint Options dialog provides customization of in-game waypoint display
-- Change: When closed, the Waypoint Editor and all Option and Help dialogs now return to whichever UI screen opened them.
-- Change: Waypoint label color will default to dark gray if the waypoint's color is too dark to be readable.
-- Change: Waypoint Editor's name field text now uses the waypoint's color. (Helps you see what the label will look like).
-- Change: Waypoint Manager now uses waypoint colors in the Name column.
-- Change: Waypoint Manager waypoint names use strike-through font when disabled
-- Change: Waypoint Manager now has "All:On/All:Off" button to bulk-toggle waypoint visibility
-- Change: Waypoint Manager now has Options button to go to Waypoint Options (in-game display)
-- Change: Double-clicking a waypoint on the full-screen map now takes you to the Waypoint Manager and highlights the waypoint
-- Change: Chat warning now displayed when OutOfMemoryError or LinkageError encountered
-- Change: Chat warning now displayed when logging level set below INFO
-- Change: JourneyMap logger now tied into FML logger for cleaner FML log output
-- Change: JourneyMap logger added shutdown hook to clean up .lck files
-- Change: Entity icons/headings now update in real-time, but queries for nearby entities are still on a config-based delay (cache duration)
-- Change: Sneaking entities (usually players) will no longer appear on the radar
-- Change: Added "Caves:On/Off" button to full-screen map (Unlimited Edition)
-- Bugfix: Other player icons too big on minimap
-- Bugfix: Waypoint Manager hid Teleport button when Game world allowed cheats (commands)
-- Bugfix: Crash when sound event didn't have sound or name (NullPointerException)
-- Bugfix: Waypoint "enable" state (on/off) wasn't saved to file.
-- Bugfix: Waypoint Editor wouldn't open a waypoint with no dimensions selected.
-- Bugfix: Waypoint Editor didn't check for changes to selected dimensions when determining whether Save button enabled.
-- Bugfix: Map "Follow" didn't reset to true after changing worlds.
+-- All Option and Help dialogs now return to whichever UI screen opened them.
+
+- Change: MiniMap Options dialog updated
+-- Now shows FPS in the upper-left (or lower-left) corner. (Helps you see the performance impact of various options).
+-- Added option to Show/Hide "self" (blue arrow in center) on MiniMap
+-- Added option to change icon sizes on MiniMap
+-- Added button to open General Display dialog for more options
+
+- Change: Waypoint Editor updated
+-- Waypoint label color will default to dark gray if the waypoint's color is too dark to be readable.
+-- Name field text now uses the waypoint's color. (Helps you see what the label will look like).
+-- Now shows your current location at the bottom of the screen.
+-- Bugfix: Wouldn't open a waypoint with no dimensions selected.
+-- Bugfix: Didn't check for changes to selected dimensions when determining whether Save button enabled.
+
+- Change: Waypoint Manager updated
+-- Uses waypoint colors in the Name column.
+-- Names use strike-through font when disabled
+-- Added "All:On/All:Off" column header button to bulk-toggle waypoint visibility
+-- Added Options button to go to Waypoint Options (in-game display)
+-- Bugfix: Waypoint Manager hid Teleport button when Game world allowed cheats (commands)
+-- Bugfix: Waypoint "enable" state (on/off) wasn't saved to file.
+
+- Change: Full-screen map updated
+-- Double-clicking a waypoint now selects it in the Waypoint Manager (instead of opening Waypoint Editor)
+-- A single-click on the full-screen map will highlights the block as long as your mouse is still over it.
+-- Added "Caves:On/Off" button to full-screen map (Unlimited Edition)
+-- Bugfix: Map "Follow" didn't reset to true after changing worlds.
+-- Bugfix: Pressing "J" didn't exit full-screen map for some players.
+-- Bugfix: Clicking rapidly on the full-screen map would open Waypoint Editor, even though it wasn't a double-click on the same block.
+
+- Change: Full-screen map and Minimap
+-- Mob/player locations and headings now update in real-time (Unlimited Edition)
+-- Sneaking entities (usually players) will no longer appear on the radar (Unlimited Edition)
+-- Bugfix: Other player icons too big
+
+- Change: Misc
+-- The journeyMap.properties file has been migrated to multiple files in journeyMap/config/. Many properties are now configurable instead of hard-coded.
+-- Bugfix: Crash when sound event didn't have sound or name (NullPointerException)
+-- Chat warning now displayed when OutOfMemoryError or LinkageError encountered
+-- Chat warning now displayed when logging level set below INFO
+-- JourneyMap logger now tied into FML logger for cleaner FML log output
+-- JourneyMap logger added shutdown hook to clean up .lck files
+
 
 Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 
@@ -66,6 +92,7 @@ Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 
 - Performance Improvements:
 -- Faster map updates via listeners for block placement, removal, and numerous events like TNT explosions
+-- Mob/player radar is significantly more efficient
 -- In-game maps are more efficient about checking render steps are within the active viewport; should improve pan/zoom update speeds on slower machines
 -- Minimap render pass simplified
 

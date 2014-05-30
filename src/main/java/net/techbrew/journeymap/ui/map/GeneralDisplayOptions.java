@@ -17,7 +17,7 @@ import net.techbrew.journeymap.ui.JmUI;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class MapOverlayOptions extends JmUI
+public class GeneralDisplayOptions extends JmUI
 {
 
     private enum ButtonEnum
@@ -36,7 +36,7 @@ public class MapOverlayOptions extends JmUI
     ArrayList<ButtonList> rightRows = new ArrayList<ButtonList>();
     ButtonList rowMobs, rowAnimals, rowVillagers, rowPets, rowGrid, rowCaves, rowSelf, rowPlayers, rowWaypoints, rowFontSize, rowForceUnicode, rowTextureSize;
 
-    public MapOverlayOptions(Class<? extends JmUI> returnClass)
+    public GeneralDisplayOptions(Class<? extends JmUI> returnClass)
     {
         super(Constants.getString("MapOverlay.general_display_title"), returnClass);
     }
