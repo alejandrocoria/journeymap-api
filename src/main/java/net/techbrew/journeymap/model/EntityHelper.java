@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.model;
 
+import com.google.common.collect.ImmutableSortedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.entity.Render;
@@ -8,6 +9,7 @@ import net.minecraft.client.renderer.entity.RenderHorse;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.*;
@@ -15,26 +17,23 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.data.EntityKey;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 
 import java.util.*;
-
-;
 
 public class EntityHelper
 {
     private static int lateralDistance = JourneyMap.getInstance().coreProperties.chunkOffset.get() * 8;
     private static int verticalDistance = lateralDistance / 2;
 
-    public static List getEntitiesNearby(String timerName, int maxEntities, Class... entityClasses)
+    public static List<EntityDTO> getEntitiesNearby(String timerName, int maxEntities, boolean hostile, Class... entityClasses)
     {
         StatTimer timer = StatTimer.get("EntityHelper." + timerName);
         timer.start();
 
         Minecraft mc = Minecraft.getMinecraft();
-        List<Entity> list = new ArrayList();
+        List<EntityDTO> list = new ArrayList();
 
         List<Entity> allEntities = new ArrayList<Entity>(mc.theWorld.loadedEntityList);
         AxisAlignedBB bb = getBB(mc.thePlayer);
@@ -46,13 +45,13 @@ public class EntityHelper
         {
             for(Entity entity : allEntities)
             {
-                if(!entity.isDead && entity.addedToChunk && bb.intersectsWith(entity.boundingBox))
+                if(entity instanceof EntityLivingBase && !entity.isDead && entity.addedToChunk && bb.intersectsWith(entity.boundingBox))
                 {
                     for (Class entityClass : entityClasses)
                     {
                         if(entityClass.isAssignableFrom(entity.getClass()))
                         {
-                            list.add(entity);
+                            list.add(new EntityDTO((EntityLivingBase) entity, hostile));
                             break;
                         }
                     }
@@ -62,7 +61,7 @@ public class EntityHelper
             if(list.size()>maxEntities)
             {
                 int before = list.size();
-                Collections.sort(list, new EntityDistanceComparator(mc.thePlayer));
+                Collections.sort(list, new EntityDTODistanceComparator(mc.thePlayer));
                 list = list.subList(0, maxEntities);
             }
         }
@@ -75,19 +74,19 @@ public class EntityHelper
         return list;
     }
 
-    public static List getMobsNearby()
+    public static List<EntityDTO> getMobsNearby()
     {
-        return getEntitiesNearby("getMobsNearby", JourneyMap.getInstance().coreProperties.maxMobsData.get(), IMob.class);
+        return getEntitiesNearby("getMobsNearby", JourneyMap.getInstance().coreProperties.maxMobsData.get(), true, IMob.class);
     }
 
-    public static List<EntityVillager> getVillagersNearby()
+    public static List<EntityDTO> getVillagersNearby()
     {
-        return getEntitiesNearby("getVillagersNearby", JourneyMap.getInstance().coreProperties.maxVillagersData.get(), EntityVillager.class);
+        return getEntitiesNearby("getVillagersNearby", JourneyMap.getInstance().coreProperties.maxVillagersData.get(), false, EntityVillager.class);
     }
 
-    public static List<IAnimals> getAnimalsNearby()
+    public static List<EntityDTO> getAnimalsNearby()
     {
-        return getEntitiesNearby("getAnimalsNearby", JourneyMap.getInstance().coreProperties.maxAnimalsData.get(), EntityAnimal.class, EntityGolem.class, EntityWaterMob.class);
+        return getEntitiesNearby("getAnimalsNearby", JourneyMap.getInstance().coreProperties.maxAnimalsData.get(), false, EntityAnimal.class, EntityGolem.class, EntityWaterMob.class);
     }
 
     /**
@@ -95,7 +94,7 @@ public class EntityHelper
      *
      * @return
      */
-    public static List<EntityPlayer> getPlayersNearby()
+    public static List<EntityDTO> getPlayersNearby()
     {
         StatTimer timer = StatTimer.get("EntityHelper.getPlayersNearby");
         timer.start();
@@ -115,8 +114,14 @@ public class EntityHelper
             allPlayers = allPlayers.subList(0, max);
         }
 
+        List<EntityDTO> playerDTOs = new ArrayList<EntityDTO>(allPlayers.size());
+        for(EntityPlayer player : allPlayers)
+        {
+            playerDTOs.add(new EntityDTO(player, false));
+        }
+
         timer.stop();
-        return allPlayers;
+        return playerDTOs;
     }
 
     /**
@@ -167,7 +172,7 @@ public class EntityHelper
      * @param list
      * @return
      */
-    public static Map<Object, Map> buildEntityIdMap(List<LinkedHashMap> list, boolean sort)
+    public static Map<String, EntityDTO> buildEntityIdMap(List<? extends EntityDTO> list, boolean sort)
     {
 
         if (list == null || list.isEmpty())
@@ -181,12 +186,12 @@ public class EntityHelper
             Collections.sort(list, new EntityHelper.EntityMapComparator());
         }
 
-        LinkedHashMap<Object, Map> idMap = new LinkedHashMap<Object, Map>(list.size());
-        for (Map entityMap : list)
+        LinkedHashMap<String, EntityDTO> idMap = new LinkedHashMap<String, EntityDTO>(list.size());
+        for (EntityDTO entityMap : list)
         {
-            idMap.put("id" + entityMap.get(EntityKey.entityId), entityMap);
+            idMap.put("id" + entityMap.entityId, entityMap);
         }
-        return idMap;
+        return ImmutableSortedMap.copyOf(idMap);
     }
 
 
@@ -242,33 +247,35 @@ public class EntityHelper
         }
     }
 
-    public static class EntityMapComparator implements Comparator<Map>
+    public static class EntityMapComparator implements Comparator<EntityDTO>
     {
 
         @Override
-        public int compare(Map o1, Map o2)
+        public int compare(EntityDTO o1, EntityDTO o2)
         {
 
             Integer o1rank = 0;
             Integer o2rank = 0;
-            if (o1.containsKey(EntityKey.customName))
+
+            if (o1.customName!=null)
             {
                 o1rank++;
             }
             else
             {
-                if (o1.containsKey(EntityKey.username))
+                if (o1.username!=null)
                 {
                     o1rank += 2;
                 }
             }
-            if (o2.containsKey(EntityKey.customName))
+
+            if (o2.customName!=null)
             {
                 o2rank++;
             }
             else
             {
-                if (o2.containsKey(EntityKey.username))
+                if (o2.username!=null)
                 {
                     o2rank += 2;
                 }
@@ -293,6 +300,22 @@ public class EntityHelper
         public int compare(Entity o1, Entity o2)
         {
             return Double.compare(o1.getDistanceSqToEntity(player), o2.getDistanceSqToEntity(player));
+        }
+    }
+
+    public static class EntityDTODistanceComparator implements Comparator<EntityDTO>
+    {
+        final EntityPlayer player;
+
+        EntityDTODistanceComparator(EntityPlayer player)
+        {
+            this.player = player;
+        }
+
+        @Override
+        public int compare(EntityDTO o1, EntityDTO o2)
+        {
+            return Double.compare(o1.entityLiving.getDistanceSqToEntity(player), o2.entityLiving.getDistanceSqToEntity(player));
         }
     }
 

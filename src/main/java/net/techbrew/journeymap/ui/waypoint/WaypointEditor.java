@@ -5,8 +5,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.data.DataCache;
-import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
@@ -109,7 +107,7 @@ public class WaypointEditor extends JmUI
                 FontRenderer fr = getFontRenderer();
 
                 fieldName = new TextField(originalWaypoint.getName(), fr, 160, 20);
-                fieldName.setMinLength(1);
+                //fieldName.setMinLength(1);
                 fieldName.setFocused(true);
                 if (isNew)
                 {
@@ -654,12 +652,24 @@ public class WaypointEditor extends JmUI
     {
         if (returnClass != null && returnClass.equals(WaypointManager.class))
         {
-            UIManager.getInstance().openWaypointManager(focusWaypoint);
+            UIManager.getInstance().openWaypointManager(focusWaypoint, MapOverlay.class);
             return;
         }
 
-        DataCache.instance().forceRefresh(WaypointsData.class);
+        //DataCache.instance().forceRefresh(WaypointsData.class);
         MapOverlay.state().requireRefresh();
         closeAndReturn();
+    }
+
+    protected void closeAndReturn()
+    {
+        if (returnClass == null)
+        {
+            UIManager.getInstance().closeAll();
+        }
+        else
+        {
+            UIManager.getInstance().open(returnClass);
+        }
     }
 }

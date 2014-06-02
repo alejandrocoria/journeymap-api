@@ -1,145 +1,48 @@
 package net.techbrew.journeymap.data;
 
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.passive.EntityHorse;
-import net.minecraft.entity.passive.EntityTameable;
-import net.minecraft.entity.passive.IAnimals;
-import net.minecraft.util.StringUtils;
+import com.google.common.cache.CacheLoader;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.model.EntityHelper;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Provides nearby mobs in a Map.
+ * CacheLoader for passive mob entities.
  *
  * @author mwoodman
  */
-public class AnimalsData implements IDataProvider
+public class AnimalsData extends CacheLoader<Class, Map<String,EntityDTO>>
 {
-
-    private final boolean includeNonPets;
-    private final boolean includePets;
-
-    /**
-     * Constructor.
-     */
-    public AnimalsData()
-    {
-        includeNonPets = true;
-        includePets = true;
-    }
-
-    /**
-     * Constructor with specific inclusions.
-     *
-     * @param includeNonPets
-     * @param includePets
-     */
-    public AnimalsData(boolean includeNonPets, boolean includePets)
-    {
-        super();
-        this.includeNonPets = includeNonPets;
-        this.includePets = includePets;
-    }
-
-    /**
-     * Provides all possible keys.
-     */
     @Override
-    public Enum[] getKeys()
+    public Map<String, EntityDTO> load(Class aClass) throws Exception
     {
-        return EntityKey.values();
-    }
-
-    /**
-     * Return map of nearby animals data.
-     */
-    @Override
-    public Map getMap(Map optionalParams)
-    {
-
-        // TODO: setFrom includeNonPets, includePets?
-
         if (!FeatureManager.isAllowed(Feature.RadarAnimals))
         {
-            return Collections.emptyMap();
+            return new HashMap<String,EntityDTO>();
         }
 
-        List<IAnimals> animals = EntityHelper.getAnimalsNearby();
-        List<LinkedHashMap> list = new ArrayList<LinkedHashMap>(animals.size());
-        String owner;
-        EntityLiving entity;
-        for (IAnimals animal : animals)
+        List<EntityDTO> list = EntityHelper.getAnimalsNearby();
+        List<EntityDTO> finalList = new ArrayList<EntityDTO>(list);
+        for (EntityDTO entity : list)
         {
-            entity = (EntityLiving) animal;
-
             // Exclude animals being ridden, since their positions lag behind the players on the map
-            if (entity.riddenByEntity != null)
+            if (entity.entityLiving.riddenByEntity != null)
             {
-                continue;
+                finalList.remove(entity);
             }
-
-            LinkedHashMap eProps = new LinkedHashMap();
-            eProps.put(EntityKey.entityId, entity.getUniqueID());
-            eProps.put(EntityKey.entityLiving, entity);
-            eProps.put(EntityKey.filename, EntityHelper.getFileName(entity));
-            eProps.put(EntityKey.hostile, false);
-            eProps.put(EntityKey.posX, entity.posX);
-            eProps.put(EntityKey.posZ, entity.posZ);
-            eProps.put(EntityKey.chunkCoordX, entity.chunkCoordX);
-            eProps.put(EntityKey.chunkCoordZ, entity.chunkCoordZ);
-            eProps.put(EntityKey.heading, EntityHelper.getHeading(entity));
-            if (entity instanceof EntityTameable)
-            {
-                owner = ((EntityTameable) entity).getOwnerName();
-                if (owner != null)
-                {
-                    eProps.put(EntityKey.owner, owner);
-                }
-            }
-            else
-            {
-                if (entity instanceof EntityHorse)
-                {
-                    owner = entity.getDataWatcher().getWatchableObjectString(21);
-                    eProps.put(EntityKey.owner, owner);
-                }
-            }
-
-            // CustomName
-            if (entity.hasCustomNameTag())
-            {
-                eProps.put(EntityKey.customName, StringUtils.stripControlCodes(entity.getCustomNameTag()));
-            }
-
-            list.add(eProps);
         }
 
-        LinkedHashMap props = new LinkedHashMap();
-        props.put(EntityKey.root, EntityHelper.buildEntityIdMap(list, true));
-
-        return props;
+        return EntityHelper.buildEntityIdMap(finalList, true);
     }
 
-
-    /**
-     * Return length of time in millis data should be kept.
-     */
-    @Override
     public long getTTL()
     {
-        return JourneyMap.getInstance().coreProperties.cacheAnimalsData.get();
-    }
-
-    /**
-     * Return false by default. Let cache expired based on TTL.
-     */
-    @Override
-    public boolean dataExpired()
-    {
-        return false;
+        return Math.max(1000, JourneyMap.getInstance().coreProperties.cacheAnimalsData.get());
     }
 }

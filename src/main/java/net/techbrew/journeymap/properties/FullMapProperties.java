@@ -8,15 +8,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class FullMapProperties extends InGameMapProperties
 {
-    protected transient static final int CURRENT_REVISION = 1;
-    protected final String name = "fullmap";
+    protected transient static final int CURRENT_REVISION = 2;
+    protected transient final String name = "fullmap";
     protected AtomicInteger revision = new AtomicInteger(CURRENT_REVISION);
 
     public final AtomicBoolean showCaves = new AtomicBoolean(true);
     public final AtomicBoolean showGrid = new AtomicBoolean(true);
 
     @Override
-    protected String getName()
+    public String getName()
     {
         return name;
     }

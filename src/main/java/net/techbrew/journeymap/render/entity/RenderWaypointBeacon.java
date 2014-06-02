@@ -174,7 +174,7 @@ public class RenderWaypointBeacon
             double halfTexHeight = texture.height / 2;
 
             // Depth-masked and non-masked label
-            final boolean showName = waypointProperties.showName.get();
+            final boolean showName = waypointProperties.showName.get() && label!=null && label.length()>0;
             final boolean showDistance = waypointProperties.showDistance.get();
             if (!labelHidden && (showName || showDistance))
             {

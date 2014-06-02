@@ -315,9 +315,9 @@ public class MiniMapOptions extends JmUI
         drawTitle();
         drawLogo();
 
-        MiniMap miniMap = UIManager.getInstance().getMiniMap();
-        if (miniMap.isEnabled())
+        if(JourneyMap.getInstance().miniMapProperties.enabled.get())
         {
+            MiniMap miniMap = UIManager.getInstance().getMiniMap();
             miniMap.drawMap();
         }
 

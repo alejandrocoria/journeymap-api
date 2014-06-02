@@ -10,8 +10,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class MiniMapProperties extends InGameMapProperties
 {
-    protected transient static final int CURRENT_REVISION = 1;
-    protected final String name = "minimap";
+    protected transient static final int CURRENT_REVISION = 2;
+    protected transient final String name = "minimap";
     protected int revision = CURRENT_REVISION;
 
     public final AtomicBoolean enabled = new AtomicBoolean(true);
@@ -22,7 +22,7 @@ public class MiniMapProperties extends InGameMapProperties
     public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
 
     @Override
-    protected String getName()
+    public String getName()
     {
         return name;
     }

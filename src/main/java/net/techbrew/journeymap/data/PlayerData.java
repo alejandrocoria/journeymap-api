@@ -1,6 +1,8 @@
 package net.techbrew.journeymap.data;
 
 
+import com.google.common.cache.CacheLoader;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -11,71 +13,32 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.nbt.ChunkLoader;
 import net.techbrew.journeymap.model.BlockUtils;
 import net.techbrew.journeymap.model.ChunkMD;
-import net.techbrew.journeymap.model.EntityHelper;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
+import net.techbrew.journeymap.model.EntityDTO;
 
 /**
  * Provides game-related properties in a Map.
  *
  * @author mwoodman
  */
-public class PlayerData implements IDataProvider
+public class PlayerData extends CacheLoader<Class, EntityDTO>
 {
-    /**
-     * Constructor.
-     */
-    public PlayerData()
-    {
-    }
-
-    /**
-     * Provides all possible keys.
-     */
     @Override
-    public Enum[] getKeys()
+    public EntityDTO load(Class aClass) throws Exception
     {
-        return EntityKey.values();
-    }
-
-    /**
-     * Return map of world-related properties.
-     */
-    @Override
-    public Map getMap(Map optionalParams)
-    {
-
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = FMLClientHandler.instance().getClient();
         EntityClientPlayerMP player = mc.thePlayer;
 
-        LinkedHashMap props = new LinkedHashMap();
-        props.put(EntityKey.entityId, player.getUniqueID());
-        props.put(EntityKey.username, player.getDisplayName());
-        props.put(EntityKey.heading, EntityHelper.getHeading(player));
-        props.put(EntityKey.chunkCoordX, player.chunkCoordX);
-        props.put(EntityKey.chunkCoordY, player.chunkCoordY);
-        props.put(EntityKey.chunkCoordZ, player.chunkCoordZ);
-        props.put(EntityKey.posX, player.posX);
-        props.put(EntityKey.posY, player.posY);
-        props.put(EntityKey.posZ, player.posZ);
-
-        props.put(EntityKey.dimension, mc.theWorld.provider.dimensionId);
-        props.put(EntityKey.biome, getPlayerBiome());
-        props.put(EntityKey.underground, playerIsUnderground(player));
-
-        return props;
+        EntityDTO dto = new EntityDTO(player, false);
+        dto.biome = getPlayerBiome(mc, player) ;
+        dto.underground = playerIsUnderground(mc, player) ;
+        return dto;
     }
 
     /**
      * Get the biome name where the player is standing.
      */
-    private String getPlayerBiome()
+    private String getPlayerBiome(Minecraft mc, EntityClientPlayerMP player)
     {
-
-        Minecraft mc = Minecraft.getMinecraft();
-
-        EntityClientPlayerMP player = mc.thePlayer;
         int x = ((int) Math.floor(player.posX) % 16) & 15;
         int z = ((int) Math.floor(player.posZ) % 16) & 15;
 
@@ -92,15 +55,9 @@ public class PlayerData implements IDataProvider
 
     /**
      * Check whether player isn't under sky
-     *
-     * @param player
-     * @return
      */
-    public static boolean playerIsUnderground(EntityPlayer player)
+    public static boolean playerIsUnderground(Minecraft mc, EntityPlayer player)
     {
-
-        Minecraft mc = Minecraft.getMinecraft();
-
         if (player.worldObj.provider.hasNoSky)
         {
             return true;
@@ -141,12 +98,6 @@ public class PlayerData implements IDataProvider
     /**
      * Potentially dangerous to use anywhere other than for player's current position
      * - seems to cause crashes when used with ChunkRenderer.paintUnderground()
-     *
-     * @param world
-     * @param x
-     * @param y
-     * @param z
-     * @return
      */
     private static boolean canSeeSky(World world, final int x, final int y, final int z)
     {
@@ -180,21 +131,8 @@ public class PlayerData implements IDataProvider
         return seeSky;
     }
 
-    /**
-     * Return length of time in millis data should be kept.
-     */
-    @Override
     public long getTTL()
     {
         return JourneyMap.getInstance().coreProperties.cachePlayerData.get();
-    }
-
-    /**
-     * Return false by default. Let cache expired based on TTL.
-     */
-    @Override
-    public boolean dataExpired()
-    {
-        return false;
     }
 }

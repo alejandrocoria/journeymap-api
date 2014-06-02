@@ -1,66 +1,43 @@
 package net.techbrew.journeymap.data;
 
+import com.google.common.cache.CacheLoader;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.io.FileHandler;
 
-import java.util.Enumeration;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 ;
 
 /**
- * Provides game-related properties in a Map.
+ * Provides language strings in a Map.
  *
  * @author mwoodman
  */
-public class MessagesData implements IDataProvider
+public class MessagesData extends CacheLoader<Class, Map<String,Object>>
 {
-
     private static final String KEY_PREFIX = "WebMap."; //$NON-NLS-1$
-
-    private static long TTL = TimeUnit.DAYS.toMillis(1);
-
-    public static enum Key
-    {
-        messages;
-    }
-
-    private final String lang;
 
     /**
      * Constructor.
      */
     public MessagesData()
     {
-        lang = Minecraft.getMinecraft().gameSettings.language;
+
     }
 
-    /**
-     * Provides all possible keys.
-     */
     @Override
-    public Enum[] getKeys()
+    public Map<String, Object> load(Class aClass) throws Exception
     {
-        return Key.values();
-    }
-
-    /**
-     * Return map of web-UI messages.
-     */
-    @Override
-    public Map getMap(Map optionalParams)
-    {
-
-        LinkedHashMap props = new LinkedHashMap();
-
+        HashMap<String, Object> props = new HashMap<String, Object>();
         props.put("locale", Constants.getLocale());
-        Properties properties = FileHandler.getLangFile("en_US.lang");
+        props.put("lang", Minecraft.getMinecraft().gameSettings.language);
 
+        Properties properties = FileHandler.getLangFile("en_US.lang");
         Enumeration<Object> allKeys = properties.keys();
+
         while (allKeys.hasMoreElements())
         {
             String key = (String) allKeys.nextElement();
@@ -72,24 +49,14 @@ public class MessagesData implements IDataProvider
             }
         }
 
-        return props;
+        return ImmutableMap.copyOf(props);
     }
 
     /**
      * Return length of time in millis data should be kept.
      */
-    @Override
     public long getTTL()
     {
-        return TTL;
-    }
-
-    /**
-     * Return true if language has changed.
-     */
-    @Override
-    public boolean dataExpired()
-    {
-        return !Minecraft.getMinecraft().gameSettings.language.equals(lang);
+        return TimeUnit.DAYS.toMillis(1);
     }
 }

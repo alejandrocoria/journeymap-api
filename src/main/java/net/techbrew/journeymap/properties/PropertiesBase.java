@@ -33,7 +33,7 @@ public abstract class PropertiesBase
      *
      * @return name
      */
-    protected abstract String getName();
+    public abstract String getName();
 
     /**
      * Code base revision of props class

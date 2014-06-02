@@ -121,7 +121,7 @@ public class DrawUtil
                 case Above:
                 {
                     rectY = y - height;
-                    textY = rectY + vpad;
+                    textY = rectY + vpad + (fontRenderer.getUnicodeFlag() ? 0 : 1);
                     break;
                 }
                 case Middle:

@@ -41,7 +41,6 @@ var JourneyMap = (function() {
 		debug : false,
 		messages : null,
 		properties : null,
-		game : null,
 		mobs : null,
 		animals : null,
 		players : null,
@@ -120,14 +119,14 @@ var JourneyMap = (function() {
 			JM.properties = data;
 			
 			// Set global vars of prefs
-			showCaves = JM.properties.preference_show_caves;
-			showMobs = JM.properties.preference_show_mobs;
-			showAnimals = JM.properties.preference_show_animals;
-			showVillagers = JM.properties.preference_show_villagers;
-			showPets = JM.properties.preference_show_pets;
-			showPlayers = JM.properties.preference_show_players;
-			showWaypoints = JM.properties.preference_show_waypoints;
-			showGrid = JM.properties.preference_show_grid;
+			showCaves = JM.properties.showCaves.value==1;
+            showGrid = JM.properties.showGrid.value==1;
+            showMobs = JM.properties.showMobs.value==1;
+			showAnimals = JM.properties.showAnimals.value==1;
+			showVillagers = JM.properties.showVillagers.value==1;
+			showPets = JM.properties.showPets.value==1;
+			showPlayers = JM.properties.showPlayers.value==1;
+			showWaypoints = JM.properties.showWaypoints.value==1;
 			
 			// Get L10N messages
 			$.ajax({
@@ -155,23 +154,23 @@ var JourneyMap = (function() {
 			console.log(">>> " + "initGame");
 
 		$.ajax({
-			url : "/data/game",
+			url : "/data/world",
 			dataType : "jsonp",
 			contentType : "application/javascript; charset=utf-8",
 			async : false
 		}).fail(handleError).done(
 			function(data, textStatus, jqXHR) {
 
-				JM.game = data;
-				_gaq.push(['_setCustomVar', 1, 'jm_version', JM.game.jm_version, 2]);
-				_gaq.push(['_setCustomVar', 2, 'mc_version', JM.game.mc_version, 2]);
+				JM.world = data;
+				_gaq.push(['_setCustomVar', 1, 'jm_version', JM.world.jm_version, 2]);
+				_gaq.push(['_setCustomVar', 2, 'mc_version', JM.world.mc_version, 2]);
 
 				// Update UI with game info
-				$("#version").html(JM.game.mod_name);									
+				$("#version").html(JM.world.mod_name);
 				
 				// Splash
 				if(!errorDialog) {
-					splashDialog = createDialog(JM.game.mod_name + "<br><small>by techbrew</small>");
+					splashDialog = createDialog(JM.world.mod_name + "<br><small>by techbrew</small>");
 				}
 
 				// Init UI
@@ -315,7 +314,7 @@ var JourneyMap = (function() {
 		$("#checkShowCaves").prop('checked', showCaves)		
 		$("#checkShowCaves").click(function(event) {
 			showCaves = (this.checked === true);
-			postPreference("preference_show_caves", showCaves);
+			postPreference("showCaves", showCaves);
 			if(playerUnderground) {
 				refreshMap();			
 			}
@@ -324,54 +323,51 @@ var JourneyMap = (function() {
 		$("#checkShowGrid").prop('checked', showGrid)		
 		$("#checkShowGrid").click(function(event) {
 			showGrid = (this.checked === true);
-			postPreference("preference_show_grid", showGrid);
+			postPreference("showGrid", showGrid);
 			refreshMap();
 		});
 		
 		$("#checkShowWaypoints").prop('checked', showWaypoints)		
 		$("#checkShowWaypoints").click(function(event) {
 			showWaypoints = (this.checked === true);
-			postPreference("preference_show_waypoints", showWaypoints);
+			postPreference("showWaypoints", showWaypoints);
 			if(!showWaypoints) {
 				JM.waypoints = null;				
 			}
 		});
-		if(JM.game && JM.game.waypoints_enabled!==true) {
-			$("#checkShowWaypoints").attr("disabled", true);
-		}
 		
 		$("#checkShowAnimals").prop('checked', showAnimals)
 		$("#checkShowAnimals").click(function(event) {
 			showAnimals = (this.checked === true);
-			postPreference("preference_show_animals", showAnimals);			
+			postPreference("showAnimals", showAnimals);
 			drawMobs();
 		});
 
 		$("#checkShowPets").prop('checked', showPets)
 		$("#checkShowPets").click(function(event) {
 			showPets = (this.checked === true);
-			postPreference("preference_show_pets", showPets);			
+			postPreference("showPets", showPets);
 			drawMobs();
 		});
 
 		$("#checkShowMobs").prop('checked', showMobs)
 		$("#checkShowMobs").click(function() {
 			showMobs = (this.checked === true);
-			postPreference("preference_show_mobs", showMobs);			
+			postPreference("showMobs", showMobs);
 			drawMobs();
 		});
 
 		$("#checkShowVillagers").prop('checked', showVillagers)
 		$("#checkShowVillagers").click(function() {
 			showVillagers = (this.checked === true);
-			postPreference("preference_show_villagers", showVillagers);			
+			postPreference("showVillagers", showVillagers);
 			drawMobs();
 		});
 
 		$("#checkShowPlayers").prop('checked', showPlayers)
 		$("#checkShowPlayers").click(function() {
 			showPlayers = (this.checked === true);
-			postPreference("preference_show_players", showPlayers);			
+			postPreference("showPlayers", showPlayers);
 			drawMultiplayers();
 		});
 		
@@ -505,7 +501,7 @@ var JourneyMap = (function() {
 		queryServer(setupMap);
 
 	}
-	
+
 	var setupMap = function() {
 		
 		// Google Map
@@ -540,11 +536,11 @@ var JourneyMap = (function() {
 		setCenterOnPlayer(true);
 		
 		// Show update button
-		if (JM.game.latest_journeymap_version > JM.game.jm_version) {		
+		if (JM.world.latest_journeymap_version > JM.world.jm_version) {
 			window.setTimeout(function(){
 				var text = getMessage('update_button_title');
-				text = text.replace("%1$s", JM.game.latest_journeymap_version);
-				text = text.replace("%2$s", JM.game.mc_version);
+				text = text.replace("%1$s", JM.world.latest_journeymap_version);
+				text = text.replace("%2$s", JM.world.mc_version);
 				var onClickFn = function(e){
 					var url = $('#webLink')[0].href;
 					window.open(url, '_new', '');
@@ -797,7 +793,7 @@ var JourneyMap = (function() {
 			}
 
 			if (timerId === null) {
-				var dur = (JM.game && JM.game.browser_poll) ? JM.game.browser_poll : 1000;
+				var dur = (JM.world && JM.world.browser_poll) ? JM.world.browser_poll : 1000;
 				timerId = setInterval(queryServer, Math.max(1000, dur));
 			}
 			
@@ -1290,7 +1286,7 @@ var JourneyMap = (function() {
 
 		removeObsoleteMarkers(JM.waypoints, markers.waypoints);
 		
-		if(!showWaypoints==true || !JM.game.waypoints_enabled==true || !JM.waypoints) {
+		if(!showWaypoints==true || !JM.waypoints) {
 			return;
 		}	
 

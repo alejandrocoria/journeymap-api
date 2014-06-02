@@ -6,8 +6,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.command.server.CommandTeleport;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.data.DataCache;
-import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
@@ -62,12 +60,12 @@ public class WaypointManager extends JmUI
 
     public WaypointManager()
     {
-        this(null);
+        this(null, null);
     }
 
-    public WaypointManager(Waypoint focusWaypoint)
+    public WaypointManager(Waypoint focusWaypoint, Class<? extends JmUI> returnClass)
     {
-        super(Constants.getString("Waypoint.manage_title"));
+        super(Constants.getString("Waypoint.manage_title"), returnClass);
         this.focusWaypoint = focusWaypoint;
     }
 
@@ -231,7 +229,9 @@ public class WaypointManager extends JmUI
         itemScrollPane.position(scrollWidth, this.height, startY, bottomButtonsHeight, 0, 0);
 
         // Bottom buttons
-        bottomButtons.equalizeWidths(getFontRenderer(), hgap, scrollWidth);
+        bottomButtons.equalizeWidths(getFontRenderer());
+        int bottomButtonWidth = Math.min(bottomButtons.getWidth(hgap)+25, scrollWidth);
+        bottomButtons.equalizeWidths(getFontRenderer(), hgap, bottomButtonWidth);
         bottomButtons.layoutCenteredHorizontal(this.width / 2, this.height - bottomButtonsHeight + vgap, true, hgap);
     }
 
@@ -473,9 +473,21 @@ public class WaypointManager extends JmUI
     {
         bottomButtons.setEnabled(false);
         WaypointStore.instance().bulkSave();
-        DataCache.instance().forceRefresh(WaypointsData.class);
+        //DataCache.instance().getWaypoints(true);
         MapOverlay.state().requireRefresh();
-        UIManager.getInstance().openMap();
+        closeAndReturn();
+    }
+
+    protected void closeAndReturn()
+    {
+        if (returnClass == null)
+        {
+            UIManager.getInstance().closeAll();
+        }
+        else
+        {
+            UIManager.getInstance().open(returnClass);
+        }
     }
 
     protected class SortButton extends Button

@@ -7,7 +7,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class MapProperties extends PropertiesBase implements Comparable<MapProperties>
 {
-
     public final AtomicBoolean showMobs = new AtomicBoolean(true);
     public final AtomicBoolean showAnimals = new AtomicBoolean(true);
     public final AtomicBoolean showVillagers = new AtomicBoolean(true);

@@ -178,7 +178,7 @@ public class MasterOptions extends JmUI
             }
             case WaypointManagerEnable:
             {
-                if (WaypointsData.isAnyEnabled())
+                if(JourneyMap.getInstance().waypointProperties.managerEnabled.get())
                 {
                     WaypointStore.instance().load();
                 }

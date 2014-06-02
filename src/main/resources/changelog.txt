@@ -11,6 +11,25 @@ Requirements:
 - Minecraft @MCVERSION@
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
+Changes since 4.0.0b2:
+
+- Bugfix: Web Map broken in 4.0.0.b1
+- Bugfix: VoxelMap waypoints wouldn't import
+- Bugfix: Block colors didn't reset after resource pack change
+- Bugfix: Death waypoints weren't created in Multiplayer games
+- Bugfix: Minimap wouldn't show if Voxel/Rei's loaded, even if "enabled" manually set to true
+- Bugfix: If Forge build was too old, "JourneyMap.fatal_error" would be shown instead of message text.
+- Bugfix: Waypoint Manager and Waypoint Editor didn't return to game if invoked from game
+- Change: Default chunk_offset changed from 5 to 8
+- Change: Centered buttons in Waypoint Help dialog
+- Change: Waypoint beacon labels more opaque
+- Change: Waypoint Manager's bottom buttons no longer stretch to fill entire screen width in large window sizes.
+- Change: 1.6.4 builds now using Forge 964 Gradle (instead of 965 MCP)
+- Change: Internal refactoring to replace data caches with Guava caches and use JSON-friendly DTOs
+- Change: Minor facelift to web map controls
+- Change: Webmap now has separate preferences for showAnimals, showMobs, showVillagers, showWaypoints, showPlayers
+- Change: Waypoint Editor now allows waypoint name to be blank
+
 Changes since 4.0.0b1:
 
 - Feature: In-game waypoint beacons added.

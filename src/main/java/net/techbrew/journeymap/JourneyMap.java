@@ -8,10 +8,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.gui.GuiMultiplayer;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiSelectWorld;
+import net.minecraft.client.gui.*;
 import net.techbrew.journeymap.cartography.ColorCache;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.WaypointsData;
@@ -26,6 +23,7 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockUtils;
 import net.techbrew.journeymap.model.RegionImageCache;
+import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.*;
 import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
@@ -154,6 +152,7 @@ public class JourneyMap
         {
             // Ensure logger inits
             logger = JMLogger.init();
+            logger.info(JourneyMap.MOD_NAME + " initialize ENTER");
 
             modInfo = new ModInfo("UA-28839029-4", "en_US", MOD_ID, MOD_NAME, getEdition());
 
@@ -175,6 +174,8 @@ public class JourneyMap
 
             // Log properties
             JMLogger.logProperties();
+
+            logger.info(JourneyMap.MOD_NAME + " initialize EXIT");
         }
         catch (Throwable t)
         {
@@ -192,6 +193,8 @@ public class JourneyMap
     {
         try
         {
+            logger.info(JourneyMap.MOD_NAME + " postInitialize ENTER");
+
             // Register general event handlers
             EventHandlerManager.registerGeneralHandlers();
             EventHandlerManager.registerGuiHandlers();
@@ -222,6 +225,8 @@ public class JourneyMap
 
             WaypointsData.reset();
             BlockUtils.initialize();
+
+            logger.info(JourneyMap.MOD_NAME + " postInitialize EXIT");
         }
         catch (Throwable t)
         {
@@ -402,6 +407,7 @@ public class JourneyMap
         //ColorCache.getInstance().serializeCache();
         MapOverlay.state().follow=true;
         ColorCache.getInstance().reset();
+        BlockUtils.initialize();
         DataCache.instance().purge();
         MapPlayerTask.clearCache();
         StatTimer.resetAll();
@@ -428,6 +434,14 @@ public class JourneyMap
                 mc = FMLClientHandler.instance().getClient();
             }
 
+            final boolean isDead = mc.currentScreen != null && mc.currentScreen instanceof GuiGameOver;
+            if(mc.thePlayer!=null && isDead && isMapping())
+            {
+                stopMapping();
+                WaypointStore.instance().save(Waypoint.deathOf(mc.thePlayer));
+                return;
+            }
+
             if (mc.theWorld == null)
             {
                 if (isMapping())
@@ -438,7 +452,7 @@ public class JourneyMap
             }
             else
             {
-                if (!isMapping())
+                if (!isMapping() && !isDead)
                 {
                     startMapping();
                 }

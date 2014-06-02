@@ -268,6 +268,7 @@ public class ColorCache implements IResourceManagerReloadListener {
 	public void reset() {
         biomeColors.clear();
 		baseColors.clear();
+        BlockUtils.initialize();
 	}
 
     public String getCacheDebugHtml() {

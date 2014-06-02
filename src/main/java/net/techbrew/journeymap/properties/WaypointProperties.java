@@ -8,8 +8,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class WaypointProperties extends PropertiesBase implements Comparable<WaypointProperties>
 {
-    protected transient static final int CURRENT_REVISION = 1;
-    protected final String name = "waypoint";
+    protected transient static final int CURRENT_REVISION = 2;
+    protected transient final String name = "waypoint";
     protected int revision = CURRENT_REVISION;
 
     public final AtomicBoolean managerEnabled = new AtomicBoolean(true);
@@ -27,7 +27,7 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     public final AtomicInteger maxDistance = new AtomicInteger(0);
 
     @Override
-    protected String getName()
+    public String getName()
     {
         return name;
     }

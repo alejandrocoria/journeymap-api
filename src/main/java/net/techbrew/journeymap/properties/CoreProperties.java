@@ -9,23 +9,23 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class CoreProperties extends PropertiesBase implements Comparable<CoreProperties>
 {
-    protected transient static final int CURRENT_REVISION = 1;
-    protected final String name = "core";
+    protected transient static final int CURRENT_REVISION = 2;
+    protected transient final String name = "core";
     protected final AtomicInteger revision = new AtomicInteger(CURRENT_REVISION);
     public final AtomicReference<String> logLevel = new AtomicReference<String>("INFO");
-    public final AtomicInteger chunkOffset = new AtomicInteger(5);
+    public final AtomicInteger chunkOffset = new AtomicInteger(8);
     public final AtomicInteger entityPoll = new AtomicInteger(1800);
     public final AtomicInteger playerPoll = new AtomicInteger(1900);
     public final AtomicInteger chunkPoll = new AtomicInteger(2000);
-    public final AtomicInteger cacheAnimalsData = new AtomicInteger(2100);
-    public final AtomicInteger maxAnimalsData = new AtomicInteger(16);
-    public final AtomicInteger cacheMobsData = new AtomicInteger(2000);
-    public final AtomicInteger maxMobsData = new AtomicInteger(16);
+    public final AtomicInteger cacheAnimalsData = new AtomicInteger(3100);
+    public final AtomicInteger maxAnimalsData = new AtomicInteger(32);
+    public final AtomicInteger cacheMobsData = new AtomicInteger(3000);
+    public final AtomicInteger maxMobsData = new AtomicInteger(32);
     public final AtomicInteger cachePlayerData = new AtomicInteger(1000);
     public final AtomicInteger cachePlayersData = new AtomicInteger(2000);
     public final AtomicInteger maxPlayersData = new AtomicInteger(32);
     public final AtomicInteger cacheVillagersData = new AtomicInteger(2200);
-    public final AtomicInteger maxVillagersData = new AtomicInteger(16);
+    public final AtomicInteger maxVillagersData = new AtomicInteger(32);
     public final AtomicBoolean caveLighting = new AtomicBoolean(true);
     public final AtomicBoolean announceMod = new AtomicBoolean(true);
     public final AtomicBoolean checkUpdates = new AtomicBoolean(true);
@@ -33,7 +33,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public final AtomicBoolean caveIgnoreGlass = new AtomicBoolean(true);
 
     @Override
-    protected String getName()
+    public String getName()
     {
         return name;
     }

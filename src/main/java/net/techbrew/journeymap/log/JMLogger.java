@@ -28,9 +28,6 @@ public class JMLogger
             logger.setLevel(Level.INFO);
         }
 
-        // Start logFile
-        logger.info(JourneyMap.MOD_NAME + " initializing"); //$NON-NLS-1$ //$NON-NLS-2$
-
         // Remove deprecated logfile
         try
         {

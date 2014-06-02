@@ -3,7 +3,6 @@ package net.techbrew.journeymap.ui.map;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.properties.FullMapProperties;
@@ -109,7 +108,7 @@ public class GeneralDisplayOptions extends JmUI
         rowWaypoints = new ButtonList(Constants.getString("MapOverlay.show_waypoints", ""));
         rowWaypoints.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showWaypoints));
         rowWaypoints.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showWaypoints));
-        rowWaypoints.setEnabled(WaypointsData.isAnyEnabled());
+        rowWaypoints.setEnabled(JourneyMap.getInstance().waypointProperties.managerEnabled.get());
         rightRows.add(rowWaypoints);
 
         rowForceUnicode = new ButtonList(Constants.getString("MiniMap.force_unicode", ""));

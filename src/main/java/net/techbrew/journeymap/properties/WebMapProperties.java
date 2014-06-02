@@ -8,8 +8,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class WebMapProperties extends MapProperties
 {
-    protected transient static final int CURRENT_REVISION = 1;
-    protected final String name = "webmap";
+    protected transient static final int CURRENT_REVISION = 2;
+    protected transient final String name = "webmap";
     protected AtomicInteger revision = new AtomicInteger(CURRENT_REVISION);
 
     public final AtomicBoolean enabled = new AtomicBoolean(true);
@@ -17,7 +17,7 @@ public class WebMapProperties extends MapProperties
     public final AtomicInteger browserPoll = new AtomicInteger(2000);
 
     @Override
-    protected String getName()
+    public String getName()
     {
         return name;
     }

@@ -1,21 +1,19 @@
 package net.techbrew.journeymap.data;
 
+import com.google.common.cache.CacheLoader;
+import com.google.common.collect.ImmutableMap;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.model.Waypoint;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Provides game-related properties in a Map.
  *
  * @author mwoodman
  */
-public class AllData implements IDataProvider
+public class AllData extends CacheLoader<Long, Map>
 {
-
-    private final long TTL;
-
     public static enum Key
     {
         animals,
@@ -25,7 +23,7 @@ public class AllData implements IDataProvider
         players,
         villagers,
         waypoints,
-        world;
+        world
     }
 
     /**
@@ -33,31 +31,27 @@ public class AllData implements IDataProvider
      */
     public AllData()
     {
-        TTL = JourneyMap.getInstance().coreProperties.chunkPoll.get();
     }
 
     @Override
-    public Enum[] getKeys()
+    public Map load(Long since) throws Exception
     {
-        return Key.values();
-    }
-
-    /**
-     * Return map of world-related properties.
-     */
-    @Override
-    public Map getMap(Map optionalParams)
-    {
-
         DataCache cache = DataCache.instance();
-        LinkedHashMap props = new LinkedHashMap();
-        props.put(Key.world, cache.get(WorldData.class));
-        props.put(Key.images, cache.get(ImagesData.class, optionalParams));
-        props.put(Key.player, cache.get(PlayerData.class));
+        LinkedHashMap<Key, Object> props = new LinkedHashMap<Key, Object>();
+
+        props.put(Key.world, cache.getWorld(false));
+        props.put(Key.player, cache.getPlayer(false));
+        props.put(Key.images, new ImagesData(since));
 
         if (JourneyMap.getInstance().webMapProperties.showWaypoints.get())
         {
-            props.put(Key.waypoints, cache.get(WaypointsData.class).get(EntityKey.root));
+            Collection<Waypoint> waypoints = cache.getWaypoints(false);
+            Map<String,Waypoint> wpMap = new HashMap<String, Waypoint>();
+            for(Waypoint waypoint : waypoints)
+            {
+                wpMap.put(waypoint.getId(), waypoint);
+            }
+            props.put(Key.waypoints, wpMap);
         }
         else
         {
@@ -66,10 +60,9 @@ public class AllData implements IDataProvider
 
         if (!WorldData.isHardcoreAndMultiplayer())
         {
-
             if (JourneyMap.getInstance().webMapProperties.showAnimals.get())
             {
-                props.put(Key.animals, cache.get(AnimalsData.class).get(EntityKey.root));
+                props.put(Key.animals, cache.getAnimals(false));
             }
             else
             {
@@ -78,7 +71,7 @@ public class AllData implements IDataProvider
 
             if (JourneyMap.getInstance().webMapProperties.showMobs.get())
             {
-                props.put(Key.mobs, cache.get(MobsData.class).get(EntityKey.root));
+                props.put(Key.mobs, cache.getMobs(false));
             }
             else
             {
@@ -87,7 +80,7 @@ public class AllData implements IDataProvider
 
             if (JourneyMap.getInstance().webMapProperties.showPlayers.get())
             {
-                props.put(Key.players, cache.get(PlayersData.class).get(EntityKey.root));
+                props.put(Key.players, cache.getPlayers(false));
             }
             else
             {
@@ -96,7 +89,7 @@ public class AllData implements IDataProvider
 
             if (JourneyMap.getInstance().webMapProperties.showVillagers.get())
             {
-                props.put(Key.villagers, cache.get(VillagersData.class).get(EntityKey.root));
+                props.put(Key.villagers, cache.getVillagers(false));
             }
             else
             {
@@ -104,26 +97,14 @@ public class AllData implements IDataProvider
             }
         }
 
-        return props;
+        return ImmutableMap.copyOf(props);
     }
-
 
     /**
      * Return length of time in millis data should be kept.
      */
-    @Override
     public long getTTL()
     {
-        return TTL;
+        return JourneyMap.getInstance().coreProperties.chunkPoll.get();
     }
-
-    /**
-     * Return false by default. Let cache expired based on TTL.
-     */
-    @Override
-    public boolean dataExpired()
-    {
-        return false;
-    }
-
 }

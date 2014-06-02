@@ -2,6 +2,7 @@ package net.techbrew.journeymap.ui.minimap;
 
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.forgehandler.KeyEventHandler;
 import net.techbrew.journeymap.ui.Button;
 import net.techbrew.journeymap.ui.JmUI;
@@ -130,9 +131,9 @@ public class MiniMapHotkeysHelp extends JmUI
     {
         super.drawBackground(layer);
 
-        MiniMap miniMap = UIManager.getInstance().getMiniMap();
-        if (miniMap.isEnabled())
+        if(JourneyMap.getInstance().miniMapProperties.enabled.get())
         {
+            MiniMap miniMap = UIManager.getInstance().getMiniMap();
             miniMap.drawMap();
         }
     }

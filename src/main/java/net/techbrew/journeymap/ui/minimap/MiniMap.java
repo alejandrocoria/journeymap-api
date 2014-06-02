@@ -5,7 +5,6 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.EntityHelper;
@@ -260,22 +259,6 @@ public class MiniMap
     {
         state.requireRefresh();
         gridRenderer.clear();
-    }
-
-    public boolean isVisible()
-    {
-        return visible;
-    }
-
-    public void setVisible(boolean visible)
-    {
-        this.visible = visible;
-    }
-
-    public boolean isEnabled()
-    {
-        return JourneyMap.getInstance().miniMapProperties.enabled.get()
-                && !WaypointsData.isReiMinimapEnabled() && !WaypointsData.isVoxelMapEnabled();
     }
 
     public double getMapFontScale()

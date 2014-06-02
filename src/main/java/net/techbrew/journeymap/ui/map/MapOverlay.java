@@ -10,7 +10,6 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.data.DataCache;
-import net.techbrew.journeymap.data.EntityKey;
 import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
@@ -191,7 +190,7 @@ public class MapOverlay extends JmUI
             }
             case WaypointManager:
             {
-                UIManager.getInstance().openWaypointManager(null);
+                UIManager.getInstance().openWaypointManager(null, getClass());
             }
             case Caves:
             {
@@ -285,7 +284,7 @@ public class MapOverlay extends JmUI
 
             buttonWaypointManager = new Button(ButtonEnum.WaypointManager, Constants.getString("Waypoint.waypoints")); //$NON-NLS-1$
             buttonWaypointManager.fitWidth(fr);
-            buttonWaypointManager.setDrawButton(WaypointsData.isNativeEnabled());
+            buttonWaypointManager.setDrawButton(WaypointsData.isManagerEnabled());
 
             if (buttonAlert.isDrawButton())
             {
@@ -333,8 +332,8 @@ public class MapOverlay extends JmUI
         buttonZoomIn.setPosition(8, 32);
         buttonZoomOut.below(buttonZoomIn, 8).setX(8);
 
-        buttonCaves.setEnabled((Boolean) DataCache.playerDataValue(EntityKey.underground) && FeatureManager.isAllowed(Feature.MapCaves));
-        final boolean underground = (Boolean) DataCache.playerDataValue(EntityKey.underground) && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.showCaves.get();
+        buttonCaves.setEnabled(DataCache.getPlayer().underground && FeatureManager.isAllowed(Feature.MapCaves));
+        final boolean underground = DataCache.getPlayer().underground && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.showCaves.get();
         buttonDayNight.setEnabled(!(underground));
 
         leftButtons.layoutHorizontal(startX, startY, true, hgap);

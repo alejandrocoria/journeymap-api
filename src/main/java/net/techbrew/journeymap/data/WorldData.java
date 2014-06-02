@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.data;
 
+import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
@@ -12,8 +13,11 @@ import net.minecraft.world.WorldProviderSurface;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.VersionCheck;
+import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.log.LogFormatter;
+import org.lwjgl.opengl.Display;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -22,35 +26,26 @@ import java.net.SocketAddress;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-;
 
 /**
- * Provides game-related properties in a Map.
+ * Provides world properties
  *
  * @author mwoodman
  */
-public class WorldData implements IDataProvider
+public class WorldData extends CacheLoader<Class, WorldData>
 {
-
-    private static long TTL = TimeUnit.SECONDS.toMillis(1);
-
-    public static enum Key
-    {
-        dirName, // TODO: Remove?
-        name,
-        dimension,
-        time,
-        //		totalTime,
-        hardcore,
-        singlePlayer,
-        features,
-//		worldType,
-//		gameType
-    }
+    String name;
+    int dimension;
+    long time;
+    boolean hardcore;
+    boolean singlePlayer;
+    Map<Feature,Boolean> features;
+    String jm_version;
+    String latest_journeymap_version;
+    String mc_version;
+    String mod_name = JourneyMap.MOD_NAME;
+    int browser_poll;
 
     /**
      * Constructor.
@@ -60,57 +55,36 @@ public class WorldData implements IDataProvider
     }
 
     @Override
-    public Enum[] getKeys()
+    public WorldData load(Class aClass) throws Exception
     {
-        return Key.values();
-    }
-
-    public static boolean isHardcoreAndMultiplayer()
-    {
-        boolean hardcore = (Boolean) DataCache.instance().get(WorldData.class, null).get(Key.hardcore);
-        boolean multiplayer = (Boolean) DataCache.instance().get(WorldData.class, null).get(Key.singlePlayer) == false;
-        return hardcore && multiplayer;
-    }
-
-    /**
-     * Return map of world-related properties.
-     */
-    @Override
-    public Map getMap(Map optionalParams)
-    {
-
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = FMLClientHandler.instance().getClient();
         WorldInfo worldInfo = mc.theWorld.getWorldInfo();
 
         IntegratedServer server = mc.getIntegratedServer();
         boolean multiplayer = server == null || server.getPublic();
 
-        LinkedHashMap props = new LinkedHashMap();
+        name = getWorldName(mc);
+        dimension = mc.theWorld.provider.dimensionId;
+        hardcore = worldInfo.isHardcoreModeEnabled();
+        singlePlayer = !multiplayer;
+        time = mc.theWorld.getWorldTime() % 24000L;
+        features = FeatureManager.getAllowedFeatures();
 
-        props.put(Key.name, getWorldName(mc));
-        props.put(Key.dimension, mc.theWorld.provider.dimensionId);
-        props.put(Key.hardcore, worldInfo.isHardcoreModeEnabled());
-        props.put(Key.singlePlayer, !multiplayer);
-        props.put(Key.time, mc.theWorld.getWorldTime() % 24000L);
-        props.put(Key.features, FeatureManager.getAllowedFeatures());
+        mod_name = JourneyMap.MOD_NAME;
+        jm_version = JourneyMap.JM_VERSION;
+        latest_journeymap_version = VersionCheck.getVersionAvailable();
+        mc_version = Display.getTitle().split("\\s(?=\\d)")[1];
+        browser_poll = Math.max(1000, JourneyMap.getInstance().webMapProperties.browserPoll.get());
 
-        return props;
+        return this;
     }
 
-//	/**
-//	 * Get the current world data directory name.
-//	 * @param mc
-//	 * @return
-//	 */
-//	private String getWorldDirName(Minecraft mc) {
-//		String worldDirName = null;
-//		try {
-//			worldDirName = FileHandler.getSafeName(mc);
-//		} catch (UnsupportedEncodingException e) {
-//			throw new RuntimeException(e);
-//		}
-//		return worldDirName;
-//	}
+
+    public static boolean isHardcoreAndMultiplayer()
+    {
+        WorldData world = DataCache.instance().getWorld(false);
+        return world.hardcore && !world.singlePlayer;
+    }
 
     private static String getServerHash()
     {
@@ -271,19 +245,8 @@ public class WorldData implements IDataProvider
     /**
      * Return length of time in millis data should be kept.
      */
-    @Override
     public long getTTL()
     {
-        return TTL;
+        return 1000;
     }
-
-    /**
-     * Return false by default. Let cache expired based on TTL.
-     */
-    @Override
-    public boolean dataExpired()
-    {
-        return false;
-    }
-
 }

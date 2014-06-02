@@ -2,7 +2,6 @@ package net.techbrew.journeymap.io;
 
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.properties.*;
 import net.techbrew.journeymap.ui.minimap.DisplayVars;
@@ -63,7 +62,7 @@ public class PropertyManager
         PREF_FONTSCALE(Double.class, "preference_fontscale", 1.0), //$NON-NLS-1$
         PREF_FORCEUNICODE(Boolean.class, "preference_forceunicode", false), //$NON-NLS-1$
 
-        PREF_SHOW_MINIMAP(Boolean.class, "preference_show_minimap", !WaypointsData.isOtherModEnabled()), //$NON-NLS-1$
+        PREF_SHOW_MINIMAP(Boolean.class, "preference_show_minimap", true), //$NON-NLS-1$
 
         PREF_MINIMAP_SHAPE(String.class, "preference_minimap_shape", DisplayVars.Shape.SmallSquare.name()), //$NON-NLS-1$
         PREF_MINIMAP_POSITION(String.class, "preference_minimap_position", DisplayVars.Position.TopRight.name()), //$NON-NLS-1$

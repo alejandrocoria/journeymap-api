@@ -1,88 +1,37 @@
 package net.techbrew.journeymap.data;
 
-import net.minecraft.entity.player.EntityPlayer;
+import com.google.common.cache.CacheLoader;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.model.EntityHelper;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides game-related properties in a Map.
  *
  * @author mwoodman
  */
-public class PlayersData implements IDataProvider
+public class PlayersData extends CacheLoader<Class, Map<String,EntityDTO>>
 {
-
-    /**
-     * Constructor.
-     */
-    public PlayersData()
-    {
-    }
-
-    /**
-     * Provides all possible keys.
-     */
     @Override
-    public Enum[] getKeys()
+    public Map<String, EntityDTO> load(Class aClass) throws Exception
     {
-        return EntityKey.values();
-    }
-
-    /**
-     * Return map of world-related properties.
-     */
-    @Override
-    public Map getMap(Map optionalParams)
-    {
-
         if (!FeatureManager.isAllowed(Feature.RadarPlayers))
         {
-            return Collections.emptyMap();
+            return new HashMap<String,EntityDTO>();
         }
 
-        List<EntityPlayer> others = EntityHelper.getPlayersNearby();
-        List<LinkedHashMap> list = new ArrayList<LinkedHashMap>(others.size());
-        for (EntityPlayer entity : others)
-        {
-            LinkedHashMap eProps = new LinkedHashMap();
-            eProps.put(EntityKey.entityId, entity.getUniqueID());
-            eProps.put(EntityKey.entityLiving, entity);
-            eProps.put(EntityKey.filename, "/skin/" + entity.getDisplayName());
-            eProps.put(EntityKey.username, entity.getDisplayName());
-            eProps.put(EntityKey.posX, entity.posX);
-            eProps.put(EntityKey.posY, entity.posY);
-            eProps.put(EntityKey.posZ, entity.posZ);
-            eProps.put(EntityKey.chunkCoordX, entity.chunkCoordX);
-            eProps.put(EntityKey.chunkCoordZ, entity.chunkCoordZ);
-            eProps.put(EntityKey.heading, EntityHelper.getHeading(entity));
-            list.add(eProps);
-        }
-
-        LinkedHashMap props = new LinkedHashMap();
-        props.put(EntityKey.root, EntityHelper.buildEntityIdMap(list, false));
-
-        return props;
+        List<EntityDTO> list = EntityHelper.getPlayersNearby();
+        return EntityHelper.buildEntityIdMap(list, true);
     }
 
-    /**
-     * Return length of time in millis data should be kept.
-     */
-    @Override
     public long getTTL()
     {
         return JourneyMap.getInstance().coreProperties.cachePlayersData.get();
-    }
-
-    /**
-     * Return false by default. Let cache expired based on TTL.
-     */
-    @Override
-    public boolean dataExpired()
-    {
-        return false;
     }
 }

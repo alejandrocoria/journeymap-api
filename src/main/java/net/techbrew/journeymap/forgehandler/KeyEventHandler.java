@@ -91,7 +91,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler {
                                 {
                                     if (Constants.isPressed(Constants.KB_WAYPOINT))
                                     {
-                                        UIManager.getInstance().openWaypointManager(null);
+                                        UIManager.getInstance().openWaypointManager(null, null);
                                         return;
                                     }
                                 }

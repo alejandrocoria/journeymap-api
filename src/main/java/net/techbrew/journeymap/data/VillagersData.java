@@ -1,98 +1,37 @@
 package net.techbrew.journeymap.data;
 
-import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.util.StringUtils;
+import com.google.common.cache.CacheLoader;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.model.EntityHelper;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides nearby mobs in a Map.
  *
  * @author mwoodman
  */
-public class VillagersData implements IDataProvider
+public class VillagersData extends CacheLoader<Class, Map<String,EntityDTO>>
 {
-
-    /**
-     * Constructor.
-     */
-    public VillagersData()
-    {
-    }
-
-    /**
-     * Provides all possible keys.
-     */
     @Override
-    public Enum[] getKeys()
+    public Map<String, EntityDTO> load(Class aClass) throws Exception
     {
-        return EntityKey.values();
-    }
-
-    /**
-     * Return map of nearby animals data.
-     */
-    @Override
-    public Map getMap(Map optionalParams)
-    {
-
         if (!FeatureManager.isAllowed(Feature.RadarVillagers))
         {
-            return Collections.emptyMap();
+            return new HashMap<String,EntityDTO>();
         }
 
-        List<EntityVillager> villagers = EntityHelper.getVillagersNearby();
-        ArrayList<LinkedHashMap> list = new ArrayList<LinkedHashMap>(villagers.size());
-
-        for (EntityVillager entity : villagers)
-        {
-            LinkedHashMap eProps = new LinkedHashMap();
-            eProps.put(EntityKey.entityId, entity.getUniqueID());
-            eProps.put(EntityKey.entityLiving, entity);
-            eProps.put(EntityKey.filename, EntityHelper.getFileName(entity));
-            eProps.put(EntityKey.hostile, false);
-            eProps.put(EntityKey.posX, entity.posX);
-            eProps.put(EntityKey.posZ, entity.posZ);
-            eProps.put(EntityKey.chunkCoordX, entity.chunkCoordX);
-            eProps.put(EntityKey.chunkCoordZ, entity.chunkCoordZ);
-            eProps.put(EntityKey.heading, EntityHelper.getHeading(entity));
-            eProps.put(EntityKey.profession, entity.getProfession());
-
-            // CustomName
-            if (entity.hasCustomNameTag())
-            {
-                eProps.put(EntityKey.customName, StringUtils.stripControlCodes(entity.getCustomNameTag()));
-            }
-
-            list.add(eProps);
-        }
-
-        LinkedHashMap props = new LinkedHashMap();
-        props.put(EntityKey.root, EntityHelper.buildEntityIdMap(list, true));
-
-        return props;
+        List<EntityDTO> list = EntityHelper.getVillagersNearby();
+        return EntityHelper.buildEntityIdMap(list, true);
     }
 
-
-    /**
-     * Return length of time in millis data should be kept.
-     */
-    @Override
     public long getTTL()
     {
         return JourneyMap.getInstance().coreProperties.cacheVillagersData.get();
-    }
-
-    /**
-     * Return false by default. Let cache expired based on TTL.
-     */
-    @Override
-    public boolean dataExpired()
-    {
-        return false;
     }
 }

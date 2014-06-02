@@ -18,16 +18,11 @@ import java.awt.*;
 
 public class WaypointHelp extends JmUI
 {
-
-    private int lastWidth = 0;
-    private int lastHeight = 0;
-
     private enum ButtonEnum
     {
         ImportRei, ImportVoxel, Close
     }
 
-    ;
     private Button buttonRei, buttonVoxel, buttonClose;
 
     private KeyEventHandler keyEventHandler;
@@ -111,6 +106,13 @@ public class WaypointHelp extends JmUI
                 break;
             }
 
+            case ImportVoxel:
+            {
+                WaypointStore.instance().load(VoxelReader.loadWaypoints(), true);
+                closeAndReturn();
+                break;
+            }
+
             case Close:
             {
                 closeAndReturn();
@@ -160,14 +162,14 @@ public class WaypointHelp extends JmUI
         // Show Rei Import
         int reiHeight = fr.listFormattedStringToWidth(importReiText, indentWidth).size() * getFontRenderer().FONT_HEIGHT;
         y += 24;
-        buttonRei.setPosition(indentX - 4, y);
+        buttonRei.centerHorizontalOn(width/2).setY(y);
         y += buttonRei.getHeight() + 5;
         fr.drawSplitString(importReiText, indentX, y, indentWidth, Color.white.getRGB());
         y += reiHeight + 16;
 
         // Show Voxel Import
         int voxelHeight = fr.listFormattedStringToWidth(importVoxelText, indentWidth).size() * getFontRenderer().FONT_HEIGHT;
-        buttonVoxel.setPosition(indentX - 4, y);
+        buttonVoxel.centerHorizontalOn(width/2).setY(y);
         if (!buttonVoxel.isDrawButton())
         {
             fr.drawStringWithShadow("§n" + buttonVoxel.displayString, indentX, y, Color.lightGray.getRGB());

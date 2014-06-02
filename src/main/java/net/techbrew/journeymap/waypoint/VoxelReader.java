@@ -13,10 +13,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
+import java.util.List;
 
 /**
  * Read VoxelMap's waypoint files and return a collection of the results.
@@ -50,19 +48,20 @@ public class VoxelReader
             for (Object wpObj : voxelWaypoints)
             {
                 com.thevoxelbox.voxelmap.util.Waypoint voxWp = (com.thevoxelbox.voxelmap.util.Waypoint) wpObj;
+
                 String name = voxWp.name.replaceAll("~comma~",",");
-                Waypoint jmWp = new net.techbrew.journeymap.model.Waypoint(
-                        name,
-                        voxWp.x,
-                        voxWp.y,
-                        voxWp.z,
-                        voxWp.enabled,
-                        (int) (voxWp.red * 255.0F) & 255,
-                        (int) (voxWp.green * 255.0F) & 255,
-                        (int) (voxWp.blue * 255.0F) & 255,
-                        "skull".equals(voxWp.imageSuffix) ? Waypoint.Type.Death : Waypoint.Type.Normal,
-                        Waypoint.Origin.VoxelMap,
-                        (Integer[]) voxWp.dimensions.toArray());
+                int x = voxWp.x;
+                int y = voxWp.y;
+                int z = voxWp.z;
+                boolean enabled = voxWp.enabled;
+                int r = (int) (voxWp.red * 255.0F) & 255;
+                int g = (int) (voxWp.green * 255.0F) & 255;
+                int b =  (int) (voxWp.blue * 255.0F) & 255;
+                Waypoint.Type type = ("skull".equals(voxWp.imageSuffix)) ? Waypoint.Type.Death : Waypoint.Type.Normal;
+                List<Integer> dimList = new ArrayList<Integer>(voxWp.dimensions);
+
+                Waypoint jmWp = new net.techbrew.journeymap.model.Waypoint(name,x,y,z,enabled,r,g,b,type,
+                        Waypoint.Origin.VoxelMap,dimList.toArray(new Integer[dimList.size()]));
 
                 jmWp.setReadOnly(true);
 

@@ -53,7 +53,7 @@ public class UIManager
         closeCurrent();
         minecraft.displayGuiScreen(null);
         minecraft.setIngameFocus();
-        miniMap.setVisible(true);
+        //miniMap.setVisible(true);
         TileCache.instance().cleanUp();
     }
 
@@ -111,7 +111,7 @@ public class UIManager
         try
         {
             minecraft.displayGuiScreen(ui);
-            miniMap.setVisible(false);
+            //miniMap.setVisible(false);
         }
         catch (Throwable t)
         {
@@ -133,14 +133,14 @@ public class UIManager
 
     public boolean isMiniMapEnabled()
     {
-        return miniMap.isEnabled();
+        return JourneyMap.getInstance().miniMapProperties.enabled.get();
     }
 
     public void drawMiniMap()
     {
         try
         {
-            if (miniMap.isEnabled() && miniMap.isVisible())
+            if (JourneyMap.getInstance().miniMapProperties.enabled.get())
             {
                 final GuiScreen currentScreen = minecraft.currentScreen;
                 final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat || currentScreen instanceof MiniMapOptions;
@@ -224,13 +224,13 @@ public class UIManager
         open(WaypointHelp.class, returnClass);
     }
 
-    public void openWaypointManager(Waypoint waypoint)
+    public void openWaypointManager(Waypoint waypoint, Class<? extends JmUI> returnClass)
     {
-        if (WaypointsData.isNativeEnabled())
+        if (WaypointsData.isManagerEnabled())
         {
             try
             {
-                WaypointManager manager = new WaypointManager(waypoint);
+                WaypointManager manager = new WaypointManager(waypoint, returnClass);
                 open(manager);
             }
             catch (Throwable e)
@@ -240,9 +240,10 @@ public class UIManager
         }
     }
 
+
     public void openWaypointEditor(Waypoint waypoint, boolean isNew, Class<? extends JmUI> returnClass)
     {
-        if (WaypointsData.isNativeEnabled())
+        if (WaypointsData.isManagerEnabled())
         {
             try
             {

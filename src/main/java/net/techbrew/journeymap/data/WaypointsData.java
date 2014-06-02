@@ -1,6 +1,6 @@
 package net.techbrew.journeymap.data;
 
-import net.minecraft.client.Minecraft;
+import com.google.common.cache.CacheLoader;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
@@ -9,19 +9,24 @@ import net.techbrew.journeymap.waypoint.ReiReader;
 import net.techbrew.journeymap.waypoint.VoxelReader;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Provides waypoint data
  *
  * @author mwoodman
  */
-public class WaypointsData implements IDataProvider
+public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
 {
-    private static long TTL = TimeUnit.SECONDS.toMillis(5);
-
     private static WaypointProperties waypointProperties = JourneyMap.getInstance().waypointProperties;
+
+    @Override
+    public Collection<Waypoint> load(Class aClass) throws Exception
+    {
+        return getWaypoints();
+    }
 
     /**
      * Reset state so classes can be checked again. Useful
@@ -34,32 +39,11 @@ public class WaypointsData implements IDataProvider
     }
 
     /**
-     * Whether any waypoint management is enabled.
-     *
-     * @return
-     */
-    public static boolean isAnyEnabled()
-    {
-        return WaypointsData.isNativeEnabled() || WaypointsData.isReiMinimapEnabled() || WaypointsData.isVoxelMapEnabled();
-    }
-
-    /**
-     * Whether any other mod's waypoint management is enabled.
-     *
-     * @return
-     */
-    public static boolean isOtherModEnabled()
-    {
-        return WaypointsData.isReiMinimapEnabled() || WaypointsData.isVoxelMapEnabled();
-    }
-
-
-    /**
      * Whether native waypoint management is enabled.
      *
      * @return
      */
-    public static boolean isNativeEnabled()
+    public static boolean isManagerEnabled()
     {
         return waypointProperties.managerEnabled.get();
     }
@@ -105,9 +89,8 @@ public class WaypointsData implements IDataProvider
      *
      * @return
      */
-    public static List<net.techbrew.journeymap.model.Waypoint> getWaypoints()
+    protected static List<net.techbrew.journeymap.model.Waypoint> getWaypoints()
     {
-
         ArrayList<Waypoint> list = new ArrayList<net.techbrew.journeymap.model.Waypoint>(0);
 
         if (isReiMinimapEnabled())
@@ -120,38 +103,13 @@ public class WaypointsData implements IDataProvider
             list.addAll(VoxelReader.loadWaypoints());
         }
 
-        if (isNativeEnabled())
+        if (isManagerEnabled())
         {
             list.addAll(WaypointStore.instance().getAll());
         }
 
         return list;
     }
-
-    /**
-     * Get cached waypoints to avoid load overhead.
-     *
-     * @return
-     */
-    public static Collection<Waypoint> getCachedWaypoints()
-    {
-        if (isReiMinimapEnabled() || isVoxelMapEnabled())
-        {
-            return ((HashMap<String, Waypoint>) DataCache.instance().get(WaypointsData.class).get(EntityKey.root)).values();
-        }
-        else
-        {
-            if (isNativeEnabled()) // No caching needed
-            {
-                return WaypointStore.instance().getAll();
-            }
-            else
-            {
-                return Collections.EMPTY_LIST;
-            }
-        }
-    }
-
 
     /**
      * Check to see whether one or more class names have been classloaded.
@@ -197,51 +155,8 @@ public class WaypointsData implements IDataProvider
         return loaded;
     }
 
-    /**
-     * Return map of waypoints data.
-     */
-    @Override
-    public Map getMap(Map optionalParams)
-    {
-
-        List<Waypoint> waypoints = getWaypoints();
-        Map<String, Waypoint> map = new HashMap<String, Waypoint>(waypoints.size());
-        final int dimension = Minecraft.getMinecraft().thePlayer.dimension;
-        for (Waypoint waypoint : waypoints)
-        {
-            if (waypoint.isEnable() && waypoint.getDimensions().contains(dimension))
-            {
-                map.put(waypoint.getId(), waypoint);
-            }
-        }
-
-        LinkedHashMap props = new LinkedHashMap();
-        props.put(EntityKey.root, map);
-
-        return props;
-    }
-
-    @Override
-    public Enum[] getKeys()
-    {
-        return new Enum[0];
-    }
-
-    /**
-     * Return length of time in millis data should be kept.
-     */
-    @Override
     public long getTTL()
     {
-        return TTL;
-    }
-
-    /**
-     * Return false by default. Let cache expired based on TTL.
-     */
-    @Override
-    public boolean dataExpired()
-    {
-        return false;
+        return 5000;
     }
 }

@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.data.EntityKey;
+import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.render.draw.DrawCenteredLabelStep;
@@ -17,7 +17,6 @@ import net.techbrew.journeymap.render.texture.TextureImpl;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 ;
 
@@ -29,7 +28,7 @@ import java.util.Map;
 public class OverlayRadarRenderer
 {
 
-    public List<DrawStep> prepareSteps(List<Map> critters, GridRenderer grid, float drawScale, MapProperties mapProperties)
+    public List<DrawStep> prepareSteps(List<EntityDTO> entityDTOs, GridRenderer grid, float drawScale, MapProperties mapProperties)
     {
 
         final boolean showAnimals = mapProperties.showAnimals.get();
@@ -51,12 +50,10 @@ public class OverlayRadarRenderer
             String playername = Minecraft.getMinecraft().thePlayer.getDisplayName();
             TextureCache tc = TextureCache.instance();
 
-            for (Map critter : critters)
+            for (EntityDTO dto : entityDTOs)
             {
-
-                isHostile = Boolean.TRUE.equals(critter.get(EntityKey.hostile));
-
-                owner = (String) critter.get(EntityKey.owner);
+                isHostile = Boolean.TRUE.equals(dto.hostile);
+                owner = dto.owner;
                 isPet = playername.equals(owner);
 
                 // Skip animals/pets if needed
@@ -68,13 +65,12 @@ public class OverlayRadarRenderer
                     }
                 }
 
-                double posX = (Double) critter.get(EntityKey.posX);
-                double posZ = (Double) critter.get(EntityKey.posZ);
+                double posX = (Double) dto.posX;
+                double posZ = (Double) dto.posZ;
 
                 if (grid.getPixel(posX, posZ) != null)
                 {
-                    filename = (String) critter.get(EntityKey.filename);
-                    heading = (Double) critter.get(EntityKey.heading);
+                    filename = (String) dto.filename;
                     isPlayer = filename.startsWith("/skin/");
 
                     // Determine and draw locator
@@ -102,13 +98,13 @@ public class OverlayRadarRenderer
                     }
 
                     // Draw locator icon
-                    Entity entity = (Entity) critter.get(EntityKey.entityLiving);
+                    Entity entity = (Entity) dto.entityLiving;
                     drawStepList.add(new DrawEntityStep(entity, false, locatorImg, (int) (8 * drawScale)));
 
                     // Draw entity icon and label
                     if (isPlayer)
                     {
-                        entityIcon = tc.getPlayerSkin((String) critter.get(EntityKey.username));
+                        entityIcon = tc.getPlayerSkin(dto.username);
                         drawStepList.add(new DrawPlayerStep((EntityPlayer) entity, entityIcon));
                     }
                     else
@@ -120,10 +116,9 @@ public class OverlayRadarRenderer
                             drawStepList.add(new DrawEntityStep(entity, true, entityIcon, bottomMargin));
                         }
 
-                        if (critter.containsKey(EntityKey.customName))
+                        if (dto.customName!=null)
                         {
-                            String customName = (String) critter.get(EntityKey.customName);
-                            drawStepList.add(new DrawCenteredLabelStep(posX, posZ, customName, entityIcon.height / 2, labelBg, Color.white));
+                            drawStepList.add(new DrawCenteredLabelStep(posX, posZ, dto.customName, entityIcon.height / 2, labelBg, Color.white));
                         }
                     }
                 }

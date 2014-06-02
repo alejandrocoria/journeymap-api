@@ -7,14 +7,15 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
-import net.techbrew.journeymap.data.EntityKey;
-import net.techbrew.journeymap.data.PlayerData;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.nbt.ChunkLoader;
 import net.techbrew.journeymap.model.ChunkMD;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -79,9 +80,8 @@ public class MapPlayerTask extends BaseMapTask
         int offset = JourneyMap.getInstance().coreProperties.chunkOffset.get();
 
         final ChunkCoordinates playerPos = new ChunkCoordinates(player.chunkCoordX, player.chunkCoordY, player.chunkCoordZ);
-        final Map playerData = DataCache.instance().get(PlayerData.class);
-        final boolean underground = PlayerData.playerIsUnderground(player) && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.showCaves.get();
-        final int dimension = (Integer) playerData.get(EntityKey.dimension);
+        final boolean underground = DataCache.getPlayer().underground && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.showCaves.get();
+        final int dimension = DataCache.getPlayer().dimension;
 
         if (lastUnderground == null)
         {

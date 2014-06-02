@@ -6,7 +6,7 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.data.*;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.FileHandler;
@@ -21,7 +21,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class MapOverlayState
 {
@@ -65,7 +64,7 @@ public class MapOverlayState
 
         this.caveMappingAllowed = FeatureManager.isAllowed(Feature.MapCaves);
         this.dimension = player.dimension;
-        this.underground = (Boolean) DataCache.playerDataValue(EntityKey.underground);
+        this.underground = DataCache.getPlayer().underground;
         this.vSlice = this.underground ? player.chunkCoordY : null;
         this.worldDir = FileHandler.getJMWorldDir(mc);
 
@@ -88,7 +87,7 @@ public class MapOverlayState
             }
         }
 
-        playerBiome = (String) DataCache.instance().get(PlayerData.class).get(EntityKey.biome);
+        playerBiome = DataCache.getPlayer().biome;
 
         updateLastRefresh();
     }
@@ -153,7 +152,7 @@ public class MapOverlayState
     {
         drawStepList.clear();
 
-        List<Map> entities = new ArrayList<Map>(32);
+        List<EntityDTO> entities = new ArrayList<EntityDTO>(32);
         if(currentZoom==0)
         {
             drawScale = drawScale*.5f;
@@ -163,24 +162,21 @@ public class MapOverlayState
         {
             if (mapProperties.showAnimals.get() || mapProperties.showPets.get())
             {
-                Map map = (Map) DataCache.instance().get(AnimalsData.class).get(EntityKey.root);
-                entities.addAll(map.values());
+                entities.addAll(DataCache.instance().getAnimals(false).values());
             }
         }
         if (FeatureManager.isAllowed(Feature.RadarVillagers))
         {
             if (mapProperties.showVillagers.get())
             {
-                Map map = (Map) DataCache.instance().get(VillagersData.class).get(EntityKey.root);
-                entities.addAll(map.values());
+                entities.addAll(DataCache.instance().getVillagers(false).values());
             }
         }
         if (FeatureManager.isAllowed(Feature.RadarMobs))
         {
             if (mapProperties.showMobs.get())
             {
-                Map map = (Map) DataCache.instance().get(MobsData.class).get(EntityKey.root);
-                entities.addAll(map.values());
+                entities.addAll(DataCache.instance().getMobs(false).values());
             }
         }
 
@@ -189,8 +185,7 @@ public class MapOverlayState
         {
             if (mapProperties.showPlayers.get())
             {
-                Map map = (Map) DataCache.instance().get(PlayersData.class).get(EntityKey.root);
-                entities.addAll(map.values());
+                entities.addAll(DataCache.instance().getPlayers(false).values());
             }
         }
 
@@ -204,9 +199,7 @@ public class MapOverlayState
         // Draw waypoints
         if (mapProperties.showWaypoints.get())
         {
-            Map map = (Map) DataCache.instance().get(WaypointsData.class).get(EntityKey.root);
-            List<Waypoint> waypoints = new ArrayList<Waypoint>(map.values());
-
+            List<Waypoint> waypoints = new ArrayList<Waypoint>(DataCache.instance().getWaypoints(false));
             drawStepList.addAll(waypointRenderer.prepareSteps(waypoints, gridRenderer));
         }
     }
@@ -263,7 +256,7 @@ public class MapOverlayState
             return true;
         }
 
-        if (this.underground != (Boolean) DataCache.playerDataValue(EntityKey.underground))
+        if (this.underground != DataCache.getPlayer().underground)
         {
             return true;
         }

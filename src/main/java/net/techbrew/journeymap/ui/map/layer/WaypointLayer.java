@@ -5,6 +5,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.chunk.Chunk;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.Waypoint;
@@ -46,7 +47,7 @@ public class WaypointLayer implements LayerDelegate.Layer
     @Override
     public List<DrawStep> onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
     {
-        if (!WaypointsData.isNativeEnabled())
+        if (!WaypointsData.isManagerEnabled())
         {
             return Collections.EMPTY_LIST;
         }
@@ -99,7 +100,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         int dimension = mc.thePlayer.dimension;
 
         // check for existing
-        Collection<Waypoint> waypoints = WaypointsData.getCachedWaypoints();
+        Collection<Waypoint> waypoints = DataCache.instance().getWaypoints(false);
         ArrayList<Waypoint> proximal = new ArrayList<Waypoint>();
         for (Waypoint waypoint : waypoints)
         {
@@ -127,7 +128,7 @@ public class WaypointLayer implements LayerDelegate.Layer
     @Override
     public List<DrawStep> onMouseClick(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
     {
-        if (!WaypointsData.isNativeEnabled())
+        if (!WaypointsData.isManagerEnabled())
         {
             return Collections.EMPTY_LIST;
         }
@@ -151,7 +152,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         // Edit selected waypoint
         if (selected != null)
         {
-            UIManager.getInstance().openWaypointManager(selected);
+            UIManager.getInstance().openWaypointManager(selected, MapOverlay.class);
             return drawStepList;
         }
 
