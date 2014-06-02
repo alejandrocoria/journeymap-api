@@ -38,6 +38,8 @@ public class BlockUtils {
         setAlpha(Blocks.glass_pane, .3F);
         setAlpha(Blocks.vine, .2F);
         setAlpha(Blocks.torch, .5F);
+        setAlpha(Blocks.stained_glass, .5F);
+        setAlpha(Blocks.stained_glass_pane, .5F);
 
         blockFlags.clear();
         setFlags(Blocks.air, Flag.HasAir, Flag.NotHideSky, Flag.NoShadow, Flag.NotHideSky);
@@ -45,23 +47,25 @@ public class BlockUtils {
         setFlags(Blocks.flowing_water, Flag.BiomeColor);
         setFlags(Blocks.grass, Flag.BiomeColor);
         setFlags(Blocks.double_plant, Flag.BiomeColor);
-        setFlags(Blocks.glass, Flag.NotHideSky, Flag.NoShadow);
-        setFlags(Blocks.glass_pane, Flag.NotHideSky, Flag.NoShadow);
+        setFlags(Blocks.glass, Flag.NotHideSky, Flag.Transparency);
+        setFlags(Blocks.glass_pane, Flag.NotHideSky, Flag.Transparency);
         setFlags(Blocks.ladder, Flag.NotHideSky);
         setFlags(Blocks.lava, Flag.NoShadow);
         setFlags(Blocks.leaves, Flag.NotHideSky, Flag.BiomeColor);
         setFlags(Blocks.leaves2, Flag.NotHideSky, Flag.BiomeColor);
         setFlags(Blocks.redstone_torch, Flag.HasAir);
-        setFlags(Blocks.torch, Flag.HasAir);
+        setFlags(Blocks.torch, Flag.HasAir, Flag.NoShadow);
         setFlags(Blocks.tallgrass, Flag.BiomeColor);
         setFlags(Blocks.tripwire_hook, Flag.NoShadow);
         setFlags(Blocks.tripwire, Flag.NoShadow);
-        setFlags(Blocks.unlit_redstone_torch, Flag.HasAir);
+        setFlags(Blocks.unlit_redstone_torch, Flag.HasAir, Flag.NoShadow);
         setFlags(Blocks.vine, Flag.NotHideSky, Flag.NoShadow, Flag.BiomeColor);
         setFlags(Blocks.water, Flag.NoShadow, Flag.BiomeColor);
         setFlags(Blocks.web, Flag.NotHideSky, Flag.Side2Texture);
+        setFlags(Blocks.stained_glass, Flag.NotHideSky, Flag.Transparency);
+        setFlags(Blocks.stained_glass_pane, Flag.NotHideSky, Flag.Transparency);
 
-        Iterator<Block> fmlBlockIter = GameData.blockRegistry.iterator();
+        Iterator<Block> fmlBlockIter = GameData.getBlockRegistry().iterator();
         while(fmlBlockIter.hasNext()) {
             Block block = fmlBlockIter.next();
 
