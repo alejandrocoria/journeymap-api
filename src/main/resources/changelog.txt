@@ -13,6 +13,7 @@ Requirements:
 
 Changes since 4.0.0b3:
 - Bugfix: Waypoints from other dimensions could display on full-screen map
+- Bugfix: Crash via Waypoint Manager's dimensions button when world has custom negative dimensions
 
 Changes since 4.0.0b2:
 

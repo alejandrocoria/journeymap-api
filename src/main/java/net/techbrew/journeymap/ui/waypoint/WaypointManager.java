@@ -589,7 +589,7 @@ public class WaypointManager extends JmUI
                 index = Arrays.binarySearch(dimensions, currentDim) + 1;
             }
 
-            if (index == dimensions.length || index == -1)
+            if (index == dimensions.length || index < 0)
             {
                 currentDim = null;
             }
