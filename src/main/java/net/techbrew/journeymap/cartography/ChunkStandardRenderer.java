@@ -21,7 +21,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
 	static final int alphaDepth = 5;
 
-    private boolean caveGreySurface = JourneyMap.getInstance().coreProperties.caveGreySurface.get();
+    protected boolean caveGreySurface = JourneyMap.getInstance().coreProperties.caveGreySurface.get();
 
 	/**
 	 * Render blocks in the chunk for the standard world.
@@ -71,7 +71,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
      * @param chunkMd
      * @param neighbors
      */
-    private void initSurfaceSlopes(final ChunkMD chunkMd, final ChunkMD.Set neighbors) {
+    protected void initSurfaceSlopes(final ChunkMD chunkMd, final ChunkMD.Set neighbors) {
         StatTimer timer = StatTimer.get("ChunkStandardRenderer.initSurfaceSlopes");
         timer.start();
         float slope, h, hN, hW;
@@ -95,7 +95,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
      * @param chunkMd
      * @param neighbors
      */
-    private void initSliceSlopes(final ChunkMD chunkMd, int sliceMinY, int sliceMaxY, final ChunkMD.Set neighbors) {
+    protected void initSliceSlopes(final ChunkMD chunkMd, int sliceMinY, int sliceMaxY, final ChunkMD.Set neighbors) {
         StatTimer timer = StatTimer.get("ChunkStandardRenderer.initSliceSlopes");
         timer.start();
 
@@ -115,11 +115,19 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
         }
         timer.stop();
     }
-		
+
+    /**
+     * Get the color for a block based on its location, neighbor slopes.
+     */
+    protected RGB getBaseBlockColor(final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int y, int z)
+    {
+        return blockMD.getColor(chunkMd, x, y, z);
+    }
+
 	/**
 	 * Render blocks in the chunk for the surface.
 	 */
-	private boolean renderSurface(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice, final ChunkMD.Set neighbors, final boolean cavePrePass) {
+	protected boolean renderSurface(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice, final ChunkMD.Set neighbors, final boolean cavePrePass) {
 
         StatTimer timer;
         if(cavePrePass)
@@ -158,15 +166,20 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                     }
                 } while(y>=0);
 
-                // Get base color for block
-                RGB color = blockMD.getColor(chunkMd, x, y, z);
-                if(color==null) {
+                if(blockMD==null) {
                     paintBadBlock(x, y, z, g2D);
                     continue blockLoop;
                 }
 
+                // Get base color for block
+                RGB color = getBaseBlockColor(chunkMd, blockMD, neighbors, x, y, z);
+				if(color==null) {
+					paintBadBlock(x, y, z, g2D);
+					continue blockLoop;
+				}
+
 				// Paint deeper blocks if alpha used, but not if this pass is just for underground layer
-				boolean useAlpha = blockMD.hasFlag(BlockUtils.Flag.Transparency);
+				boolean useAlpha = blockMD.hasFlag(BlockUtils.Flag.Transparency) || blockMD.isWater();
 				if (useAlpha) {
 
 					color = renderSurfaceAlpha(g2D, chunkMd, blockMD, neighbors, x, y, z);
@@ -213,9 +226,9 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		return chunkOk;
 	}
 
-    private RGB renderSurfaceAlpha(final Graphics2D g2D, final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int y, int z) {
+    protected RGB renderSurfaceAlpha(final Graphics2D g2D, final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int y, int z) {
 
-        RGB color = blockMD.getColor(chunkMd, x, y, z);
+        RGB color = getBaseBlockColor(chunkMd, blockMD, neighbors, x, y, z);
 
         // Check for surrounding water
         if(blockMD.isWater()) {
@@ -223,12 +236,14 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
             BlockMD be = getBlock(x, y, z, +1, 0, chunkMd, neighbors, blockMD);
             BlockMD bn = getBlock(x, y, z, 0, -1, chunkMd, neighbors, blockMD);
             BlockMD bs = getBlock(x, y, z, 0, +1, chunkMd, neighbors, blockMD);
-            Set<RGB> colors = new HashSet<RGB>(5);
+            Set<RGB> colors = new HashSet<RGB>(6);
             colors.add(color);
-            if(bw.isWater()) colors.add(bw.getColor(chunkMd, x, y, z));
-            if(be.isWater()) colors.add(be.getColor(chunkMd, x, y, z));
-            if(bn.isWater()) colors.add(bn.getColor(chunkMd, x, y, z));
-            if(bs.isWater()) colors.add(bs.getColor(chunkMd, x, y, z));
+
+            if(bw.isWater()) colors.add(getBaseBlockColor(chunkMd, bw, neighbors, x, y, z));
+            if(be.isWater()) colors.add(getBaseBlockColor(chunkMd, bw, neighbors, x, y, z));
+            if(bn.isWater()) colors.add(getBaseBlockColor(chunkMd, bn, neighbors, x, y, z));
+            if(bs.isWater()) colors.add(getBaseBlockColor(chunkMd, bs, neighbors, x, y, z));
+
             if(!colors.isEmpty()) {
                 color = RGB.average(colors);
             }
@@ -240,7 +255,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
         return color;
     }
 
-    private void surfaceSlopeColor(final RGB color, final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int ignored, int z) {
+    protected void surfaceSlopeColor(final RGB color, final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int ignored, int z) {
 
         float slope, bevel, sN, sNW, sW, sS, sE, sAvg;
         slope = chunkMd.surfaceSlopes[x][z];
@@ -290,15 +305,15 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	 * Render blocks in the chunk for underground.
 	 *
 	 */
-	public boolean renderUnderground(final Graphics2D g2D, final ChunkMD chunkMd, final int vSlice, final int sliceMinY, final int sliceMaxY, final ChunkMD.Set neighbors) {
+    protected boolean renderUnderground(final Graphics2D g2D, final ChunkMD chunkMd, final int vSlice, final int sliceMinY, final int sliceMaxY, final ChunkMD.Set neighbors) {
 
         StatTimer timer = StatTimer.get("ChunkStandardRenderer.renderUnderground");
         timer.start();
 
-		boolean hasAir;
-		boolean hasWater;
         boolean hasSolid;
-        BlockMD info;
+        boolean hasAir;
+        boolean hasWater;
+        BlockMD blockMD;
 
 		int paintY;
 		int lightLevel;
@@ -351,10 +366,10 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					// Step downward to find air
 					airloop: for (int y = ceiling; y >= 0; y--) {
 
-                        info = BlockMD.getBlockMD(chunkMd, x, y, z);
+                        blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
 
                         // Water handling
-                        if(info.isWater())
+                        if(blockMD.isWater())
                         {
                             hasWater = true;
                             paintY = y;
@@ -370,7 +385,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 //                        }
 
                         // Lava shortcut
-                        if(info.isLava()) {
+                        if(blockMD.isLava()) {
                             if(!hasAir) {
                                 paintBlock(x, z, Color.black, g2D);
                                 chunkOk = true;
@@ -383,7 +398,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                         }
 
                         // Torch
-                        if(info.isTorch())
+                        if(blockMD.isTorch())
                         {
                             hasAir = true;
                             paintY = y-1;
@@ -401,14 +416,14 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                         }
 
                         // Found air or something treated like air
-                        if (info.isAir())
+                        if (blockMD.isAir())
                         {
                             hasAir = true;
                             continue airloop;
                         }
 
                         // Found transparent
-                        if (info.hasFlag(BlockUtils.Flag.Transparency))
+                        if (blockMD.hasFlag(BlockUtils.Flag.Transparency))
                         {
                             paintY = y;
                             hasAir = true;
@@ -449,10 +464,10 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 					}
 
 					// Get block color
-					info = BlockMD.getBlockMD(chunkMd, x, paintY, z);
-                    RGB color = info.getColor(chunkMd, x, paintY, z);
+					blockMD = BlockMD.getBlockMD(chunkMd, x, paintY, z);
+                    RGB color = getBaseBlockColor(chunkMd, blockMD, neighbors, x, paintY, z);
 
-					boolean keepflat = info.hasFlag(BlockUtils.Flag.NoShadow);
+					boolean keepflat = blockMD.hasFlag(BlockUtils.Flag.NoShadow);
 					if(!keepflat) {
 						// Contour shading
 						// Get slope of block and prepare to bevelSlope
@@ -512,7 +527,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
 	}
 
-    private void paintDimSurface(int x, int z, final Graphics2D g2D)
+    protected void paintDimSurface(int x, int z, final Graphics2D g2D)
     {
         if(!caveGreySurface)
         {
@@ -523,7 +538,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
         }
     }
 
-	private void paintDepth(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, final Graphics2D g2D, final boolean useLighting) {
+    protected void paintDepth(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, final Graphics2D g2D, final boolean useLighting) {
 
 		// See how deep the alpha goes
 
@@ -557,7 +572,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
         boolean isWater = blockMD.isWater();
 
 		// Get color for bottom of stack
-		color = stack.peek().getColor(chunkMd, x, down, z);
+        color = getBaseBlockColor(chunkMd, stack.peek(), null, x, y, z);
 
 		if(useLighting)
         {
@@ -582,8 +597,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
 			while(!stack.isEmpty()) {
 				BlockMD lowerBlock = stack.pop();
-				//g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, lowerBlock.getAlpha()));
-				color = lowerBlock.getColor(chunkMd, x, down, z);
+                color = getBaseBlockColor(chunkMd, lowerBlock, null, x, y, z);
 
                 if(useLighting)
                 {
@@ -603,7 +617,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		}
 	}
 
-    private void adjustColorForDepth(ChunkMD chunkMd, RGB color, int x, int y, int z)
+    protected void adjustColorForDepth(ChunkMD chunkMd, RGB color, int x, int y, int z)
     {
         int lightLevel = Math.max(0, chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y, z));
         if (lightLevel < 15) {
@@ -614,7 +628,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
         }
     }
 
-	public int getHeightInSlice(final ChunkMD chunkMd, final int x, final int z, final int sliceMinY, final int sliceMaxY) {
+    protected int getHeightInSlice(final ChunkMD chunkMd, final int x, final int z, final int sliceMinY, final int sliceMaxY) {
 		return BlockUtils.ceiling(chunkMd, x, sliceMaxY, z) + 1;
 	}
 	
@@ -629,7 +643,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	 * @param defaultVal
 	 * @return
 	 */
-	public Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, float defaultVal, final int sliceMinY, final int sliceMaxY) {
+    protected Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, float defaultVal, final int sliceMinY, final int sliceMaxY) {
 		int newX = x+offsetX;
 		int newZ = z+offsetz;
 		

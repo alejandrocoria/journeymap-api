@@ -27,7 +27,7 @@ public final class RGB {
     public RGB(float red, float green, float blue) {
         frgb[0] = clamp(red);
         frgb[1] = clamp(green);
-        frgb[1] = clamp(blue);
+        frgb[2] = clamp(blue);
     }
 
     /**
@@ -132,6 +132,14 @@ public final class RGB {
      */
     public Color toColor() {
         return new Color(frgb[0], frgb[1], frgb[2]);
+    }
+
+    /**
+     * Provides a copy that's safely mutable
+     * @return
+     */
+    public RGB copy() {
+        return new RGB(frgb[0], frgb[1], frgb[2]);
     }
 
     /**

@@ -36,7 +36,8 @@ public class ChunkRenderController {
 	public ChunkRenderController() {
 		netherRenderer = new ChunkNetherRenderer();
 		endRenderer = new ChunkEndRenderer();
-		standardRenderer = new ChunkStandardRenderer();
+        standardRenderer = new ChunkStandardRenderer();
+		//standardRenderer = new ChunkTopoRenderer();
 	}
 	
 	public BufferedImage getChunkImage(ChunkMD chunkMd,
