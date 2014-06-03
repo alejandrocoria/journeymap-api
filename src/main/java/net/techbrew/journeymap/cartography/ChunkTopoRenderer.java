@@ -12,6 +12,7 @@ import java.util.Stack;
 
 public class ChunkTopoRenderer extends ChunkStandardRenderer implements IChunkRenderer {
 
+    int factor = 3;
 	static final int alphaDepth = 5;
     ArrayList<RGB> water = new ArrayList<RGB>(32);
     ArrayList<RGB> land = new ArrayList<RGB>(32);
@@ -21,7 +22,7 @@ public class ChunkTopoRenderer extends ChunkStandardRenderer implements IChunkRe
     public ChunkTopoRenderer()
     {
 
-        water.add(new RGB(new Color(31,40,79)));
+        //water.add(new RGB(new Color(31,40,79)));
         water.add(new RGB(new Color(38,60,106)));
         water.add(new RGB(new Color(46,80,133)));
         water.add(new RGB(new Color(53,99,160)));
@@ -30,19 +31,8 @@ public class ChunkTopoRenderer extends ChunkStandardRenderer implements IChunkRe
         water.add(new RGB(new Color(90,185,233)));
         water.add(new RGB(new Color(95,198,242)));
         water.add(new RGB(new Color(114,202,238)));
-        water.add(new RGB(new Color(141,210,239)));
+       // water.add(new RGB(new Color(141,210,239)));
 
-
-        land.add(new RGB(new Color(113,171,216)));
-        land.add(new RGB(new Color(121,178,222)));
-        land.add(new RGB(new Color(132,185,227)));
-        land.add(new RGB(new Color(141,193,234)));
-        land.add(new RGB(new Color(150,201,240)));
-        land.add(new RGB(new Color(161,210,247)));
-        land.add(new RGB(new Color(172,219,251)));
-        land.add(new RGB(new Color(185,227,255)));
-        land.add(new RGB(new Color(198,236,255)));
-        land.add(new RGB(new Color(216,242,254)));
         land.add(new RGB(new Color(172,208,165)));
         land.add(new RGB(new Color(148,191,139)));
         land.add(new RGB(new Color(168,198,143)));
@@ -103,11 +93,11 @@ public class ChunkTopoRenderer extends ChunkStandardRenderer implements IChunkRe
                 hS = (y==15)  ? getBlockHeight(x, y, 0, 1, chunkMd, neighbors, h) : chunkMd.getSlopeHeightValue(x, y + 1);
                 hE = (x==15)  ? getBlockHeight(x, y, 1, 0, chunkMd, neighbors, h) : chunkMd.getSlopeHeightValue(x + 1, y);
 
-                h = (int)h>>3;
-                hN = (int)hN>>3;
-                hW = (int)hW>>3;
-                hE = (int)hE>>3;
-                hS = (int)hS>>3;
+                h = (int)h>>factor;
+                hN = (int)hN>>factor;
+                hW = (int)hW>>factor;
+                hE = (int)hE>>factor;
+                hS = (int)hS>>factor;
 
                 slope = ((h/hN)+(h/hW)+(h/hE)+(h/hS))/4f;
                 chunkMd.surfaceSlopes[x][y] = slope;
@@ -121,29 +111,15 @@ public class ChunkTopoRenderer extends ChunkStandardRenderer implements IChunkRe
      */
     protected RGB getBaseBlockColor(final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int y, int z)
     {
-        float orthoY = y>>3;
+        float orthoY = y>>factor;
         if(blockMD.isWater())
         {
-            float saturation = orthoY==0 ? 0 : (orthoY / 32f);
-            return new RGB(saturation,saturation, 1);
+            int index = (int) Math.min(orthoY, water.size()-1);
+            return water.get(index).copy();
         }
         else
         {
-            int index = 0;
-            if(orthoY>0 && y<=63)
-            {
-                // At or below sea level: Use values 1-9 in land
-                index = (int) Math.floor(orthoY/(15f/9)); // 15 orthos in range across 10 values
-            }
-            else
-            {
-                // Above sea level: Use last 20 values in land
-                index = 2 + (int)orthoY;
-            }
-
-            //index = (int) Math.floor((orthoY/20)*(land.size()-1));
-            index = Math.min(index, land.size()-1);
-
+            int index = (int) Math.min(orthoY, land.size()-1);
             return land.get(index).copy();
         }
     }
@@ -160,14 +136,16 @@ public class ChunkTopoRenderer extends ChunkStandardRenderer implements IChunkRe
 
     protected void surfaceSlopeColor(final RGB color, final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int ignored, int z)
     {
+        //super.surfaceSlopeColor(color, chunkMd, blockMD, neighbors, x, ignored, z);
         float slope = chunkMd.surfaceSlopes[x][z];
+
         if(slope<1)
         {
-            color.setFrom(Color.lightGray.getRGB());
+            color.bevelSlope(.1f);
         }
-        if(slope>1)
+        else if(slope>1)
         {
-            color.setFrom(Color.darkGray.getRGB());
+            color.bevelSlope(1.4f);
         }
     }
 
