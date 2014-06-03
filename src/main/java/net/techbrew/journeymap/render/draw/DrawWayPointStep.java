@@ -47,6 +47,11 @@ public class DrawWayPointStep implements DrawStep {
     @Override
     public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale) {
 
+        if(!waypoint.isInPlayerDimension())
+        {
+            return;
+        }
+
         double x = waypoint.getX(gridRenderer.getDimension());
         double z = waypoint.getZ(gridRenderer.getDimension());
         double halfBlock = Math.pow(2,gridRenderer.getZoom())/2;

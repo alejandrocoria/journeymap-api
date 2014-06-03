@@ -368,7 +368,6 @@ public class JourneyMap
      */
     public void stopMapping()
     {
-
         Minecraft minecraft = Minecraft.getMinecraft();
 
         synchronized (this)
@@ -401,10 +400,9 @@ public class JourneyMap
 
     private void reset()
     {
-
         FileHandler.lastJMWorldDir = null;
         //BlockMD.clearCache();
-        //ColorCache.getInstance().serializeCache();
+        DataCache.instance().purge();
         MapOverlay.state().follow=true;
         ColorCache.getInstance().reset();
         BlockUtils.initialize();

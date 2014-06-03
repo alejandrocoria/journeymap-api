@@ -11,6 +11,9 @@ Requirements:
 - Minecraft @MCVERSION@
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
+Changes since 4.0.0b3:
+- Bugfix: Waypoints from other dimensions could display on full-screen map
+
 Changes since 4.0.0b2:
 
 - Bugfix: Web Map broken in 4.0.0.b1

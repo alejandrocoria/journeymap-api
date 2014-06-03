@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.model;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -245,7 +246,7 @@ public class Waypoint implements Serializable
 
     public boolean isInPlayerDimension()
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = FMLClientHandler.instance().getClient();
         return getDimensions().contains(mc.thePlayer.dimension);
     }
 
