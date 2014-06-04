@@ -4,6 +4,7 @@ import java.io.File;
 
 public class ChunkCoord {
 
+    // TODO: worldDir should serialize as a relative path to allow data files to be usable after being moved
 	public final File worldDir;
 	public final int chunkX;
 	public final int chunkZ;

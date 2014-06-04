@@ -7,14 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RegionCoord implements Comparable<RegionCoord>{
-	
+
+    // TODO: worldDir should serialize as a relative path to allow data files to be usable after being moved
 	public final File worldDir;
 	public final int regionX;
 	public final int regionZ;
 	public final Integer vSlice;
 	public final int dimension;
-	public static final int SIZE = 5;
-	private static final int chunkSqRt = (int) Math.pow(2,SIZE);
+	public transient static final int SIZE = 5;
+	private transient static final int chunkSqRt = (int) Math.pow(2,SIZE);
 	
 	public static RegionCoord fromChunkPos(File worldDir, int chunkX, Integer vSlice, int chunkZ, int dimension) {
 		return new RegionCoord(worldDir, getRegionPos(chunkX), vSlice, getRegionPos(chunkZ), dimension);

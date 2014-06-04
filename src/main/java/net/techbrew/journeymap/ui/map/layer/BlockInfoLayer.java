@@ -47,7 +47,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             String info;
             if (!chunk.isEmpty())
             {
-                int blockY = chunk.getHeightValue(blockCoord.x & 15, blockCoord.z & 15);
+                int blockY = chunk.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15);
                 String biome = mc.theWorld.getBiomeGenForCoords(blockCoord.x, blockCoord.z).biomeName;
                 info = Constants.getString("MapOverlay.location_xzyeb", blockCoord.x, blockCoord.z, blockY, (blockY >> 4), biome);
             }

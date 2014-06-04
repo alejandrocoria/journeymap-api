@@ -78,7 +78,7 @@ public class ChunkMD {
     public int getSlopeHeightValue(int x, int z)
     {
     	try {
-	    	int y = stub.getHeightValue(x, z);
+	    	int y = getHeightValue(x, z);
 	    	if(y<1) return 0;
             Block block = getBlock(x,y,z);
             while(y>0 && BlockUtils.hasFlag(block, BlockUtils.Flag.NoShadow)) {
@@ -88,8 +88,18 @@ public class ChunkMD {
 	    	return y;
     	} catch(Exception e) {
             JourneyMap.getLogger().warning("Couldn't get safe height at " + x + "," + z + ": " + e);
-    		return stub.getHeightValue(x,z);
+    		return getHeightValue(x,z);
     	}
+    }
+
+    public int getHeightValue(int x, int z)
+    {
+        return stub.getHeightValue(x,z);
+    }
+
+    public int getAbsoluteHeightValue(int x, int z)
+    {
+        return stub.getPrecipitationHeight(x, z);
     }
 
 	@Override

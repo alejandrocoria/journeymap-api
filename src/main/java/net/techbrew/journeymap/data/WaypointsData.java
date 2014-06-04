@@ -57,10 +57,18 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
     {
         if (ReiReader.modLoaded == null)
         {
-            ReiReader.modLoaded = waypointClassesFound(ReiReader.classNames);
+            try
+            {
+                ReiReader.modLoaded = waypointClassesFound(ReiReader.classNames);
+            }
+            catch (Throwable t)
+            {
+                ReiReader.modLoaded = false;
+                JourneyMap.getLogger().warning("Rei's Minimap Waypoints can't be used: " + LogFormatter.toString(t));
+            }
             if (ReiReader.modLoaded)
             {
-                JourneyMap.getLogger().info("Rei's Minimap detected.  Waypoints enabled.");
+                JourneyMap.getLogger().info("Rei's Minimap Waypoints enabled.");
             }
         }
         return ReiReader.modLoaded;
@@ -75,10 +83,19 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
     {
         if (VoxelReader.modLoaded == null)
         {
-            VoxelReader.modLoaded = waypointClassesFound(VoxelReader.classNames);
+            try
+            {
+                VoxelReader.modLoaded = waypointClassesFound(VoxelReader.classNames);
+            }
+            catch (Throwable t)
+            {
+                VoxelReader.modLoaded = false;
+                JourneyMap.getLogger().warning("VoxelMap Waypoints can't be used: " + t.getMessage());
+            }
+
             if (VoxelReader.modLoaded)
             {
-                JourneyMap.getLogger().info("VoxelMap detected.  Waypoints enabled.");
+                JourneyMap.getLogger().info("VoxelMap Waypoints enabled.");
             }
         }
         return VoxelReader.modLoaded;
@@ -117,7 +134,7 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
      * @param names
      * @return
      */
-    private static boolean waypointClassesFound(String... names)
+    private static boolean waypointClassesFound(String... names) throws Exception
     {
         boolean loaded = true;
 
@@ -136,7 +153,7 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
             }
             catch (NoClassDefFoundError e)
             {
-                JourneyMap.getLogger().warning("Class detected, but is obsolete. Can't use waypoints: " + e.getMessage());
+                throw new Exception("Class detected, but is obsolete: " + e.getMessage());
             }
             catch (ClassNotFoundException e)
             {
@@ -144,11 +161,11 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
             }
             catch (VerifyError v)
             {
-                JourneyMap.getLogger().warning("Class detected, but is obsolete. Can't use waypoints: " + v.getMessage());
+                throw new Exception("Class detected, but is obsolete: " + v.getMessage());
             }
             catch (Throwable t)
             {
-                JourneyMap.getLogger().warning("Class detected, but with errors. Can't use waypoints: " + LogFormatter.toString(t));
+                throw new Exception("Class detected, but produced errors.", t);
             }
         }
 

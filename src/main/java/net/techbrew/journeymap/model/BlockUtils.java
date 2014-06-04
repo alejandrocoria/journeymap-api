@@ -22,7 +22,7 @@ public class BlockUtils {
 	public static AlphaComposite SLIGHTLYCLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F);
 	public static Color COLOR_TRANSPARENT = new Color(0,0,0,0);
 
-    public enum Flag {HasAir, BiomeColor, CustomBiomeColor, NotHideSky, NoShadow, Side2Texture, Transparency, Error}
+    public enum Flag {HasAir, BiomeColor, CustomBiomeColor, NotHideSky, NoShadow, Side2Texture, Transparency, Error, TransparentRoof}
 
     private final static HashMap<GameRegistry.UniqueIdentifier, EnumSet<Flag>> blockFlags = new HashMap<GameRegistry.UniqueIdentifier, EnumSet<Flag>>(64);
     private final static HashMap<GameRegistry.UniqueIdentifier, Float> blockAlphas = new HashMap<GameRegistry.UniqueIdentifier, Float>(8);
@@ -35,14 +35,19 @@ public class BlockUtils {
         blockAlphas.clear();
         setAlpha(Blocks.air, 0F);
         setAlpha(Blocks.ice, .8F);
-        setAlpha(Blocks.glass, .3F);
-        setAlpha(Blocks.glass_pane, .3F);
+        setAlpha(Blocks.glass, .1F);
+        setAlpha(Blocks.glass_pane, .1F);
         setAlpha(Blocks.vine, .2F);
         setAlpha(Blocks.torch, .5F);
-        setAlpha(Blocks.stained_glass, .5F);
-        setAlpha(Blocks.stained_glass_pane, .5F);
+        setAlpha(Blocks.stained_glass, .2F);
+        setAlpha(Blocks.stained_glass_pane, .2F);
         setAlpha(Blocks.flowing_water, .3F);
         setAlpha(Blocks.water, .3F);
+        setAlpha(Blocks.flowing_water, .3F);
+        setAlpha(Blocks.iron_bars, .4F);
+        setAlpha(Blocks.fence, .4F);
+        setAlpha(Blocks.fence_gate, .4F);
+        setAlpha(Blocks.nether_brick_fence, .4F);
         
 
         blockFlags.clear();
@@ -58,8 +63,8 @@ public class BlockUtils {
         }
         
         setFlags(Blocks.double_plant, Flag.BiomeColor);
-        setFlags(Blocks.glass, Flag.NotHideSky, Flag.Transparency);
-        setFlags(Blocks.glass_pane, Flag.NotHideSky, Flag.Transparency);
+        setFlags(Blocks.glass, Flag.TransparentRoof);
+        setFlags(Blocks.glass_pane, Flag.TransparentRoof);
         setFlags(Blocks.ladder, Flag.NotHideSky);
         setFlags(Blocks.lava, Flag.NoShadow);
         setFlags(Blocks.leaves, Flag.NotHideSky, Flag.BiomeColor);
@@ -73,8 +78,10 @@ public class BlockUtils {
         setFlags(Blocks.vine, Flag.NotHideSky, Flag.NoShadow, Flag.BiomeColor);
         setFlags(Blocks.water, Flag.NoShadow, Flag.BiomeColor);
         setFlags(Blocks.web, Flag.NotHideSky, Flag.Side2Texture);
-        setFlags(Blocks.stained_glass, Flag.NotHideSky, Flag.Transparency);
-        setFlags(Blocks.stained_glass_pane, Flag.NotHideSky, Flag.Transparency);
+        setFlags(Blocks.iron_bars, Flag.TransparentRoof);
+        setFlags(Blocks.fence, Flag.TransparentRoof);
+        setFlags(Blocks.stained_glass, Flag.NotHideSky, Flag.TransparentRoof);
+        setFlags(Blocks.stained_glass_pane, Flag.NotHideSky, Flag.TransparentRoof);
 
         Iterator<Block> fmlBlockIter = GameData.getBlockRegistry().iterator();
         while(fmlBlockIter.hasNext()) {

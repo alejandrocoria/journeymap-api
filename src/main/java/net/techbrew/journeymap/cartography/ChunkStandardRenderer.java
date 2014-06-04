@@ -22,6 +22,12 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	static final int alphaDepth = 5;
 
     protected boolean caveGreySurface = JourneyMap.getInstance().coreProperties.caveGreySurface.get();
+    protected boolean advancedSurfaceCheck = JourneyMap.getInstance().coreProperties.advancedSurfaceCheck.get();
+
+    protected StatTimer renderSurfaceTimer = StatTimer.get("ChunkStandardRenderer.renderSurface");
+    protected StatTimer renderSurfacePrepassTimer = StatTimer.get("ChunkStandardRenderer.renderSurface-prepass");
+//    protected StatTimer advancedSurfaceCheckTimer = StatTimer.get("ChunkStandardRenderer.renderSurface.advancedSurfaceCheck");
+//    protected StatTimer advancedSurfaceRenderTimer = StatTimer.get("ChunkStandardRenderer.renderSurface.advancedSurfaceRender");
 
 	/**
 	 * Render blocks in the chunk for the standard world.
@@ -72,9 +78,9 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
      * @param neighbors
      */
     protected void initSurfaceSlopes(final ChunkMD chunkMd, final ChunkMD.Set neighbors) {
-        StatTimer timer = StatTimer.get("ChunkStandardRenderer.initSurfaceSlopes");
-        timer.start();
-        float slope, h, hN, hW;
+//        StatTimer timer = StatTimer.get("ChunkStandardRenderer.initSurfaceSlopes");
+//        timer.start();
+        float slope, h, hN, hW, hNW;
         chunkMd.surfaceSlopes = new float[16][16];
         for(int y=0; y<16; y++)
         {
@@ -83,11 +89,12 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                 h = chunkMd.getSlopeHeightValue(x, y);
                 hN = (y==0)  ? getBlockHeight(x, y, 0, -1, chunkMd, neighbors, h) : chunkMd.getSlopeHeightValue(x, y - 1);
                 hW = (x==0)  ? getBlockHeight(x, y, -1, 0, chunkMd, neighbors, h) : chunkMd.getSlopeHeightValue(x - 1, y);
-                slope = ((h/hN)+(h/hW))/2f;
+                hNW = getBlockHeight(x, y, -1, -1, chunkMd, neighbors, h);
+                slope = ((h/hN)+(h/hW)+(h/hNW))/3f;
                 chunkMd.surfaceSlopes[x][y] = slope;
             }
         }
-        timer.stop();
+//        timer.stop();
     }
 
     /**
@@ -96,8 +103,8 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
      * @param neighbors
      */
     protected void initSliceSlopes(final ChunkMD chunkMd, int sliceMinY, int sliceMaxY, final ChunkMD.Set neighbors) {
-        StatTimer timer = StatTimer.get("ChunkStandardRenderer.initSliceSlopes");
-        timer.start();
+//        StatTimer timer = StatTimer.get("ChunkStandardRenderer.initSliceSlopes");
+//        timer.start();
 
         chunkMd.sliceSlopes = new float[16][16];
         float slope, h, hN, hW;
@@ -113,7 +120,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                 chunkMd.sliceSlopes[x][z] = slope;
             }
         }
-        timer.stop();
+//        timer.stop();
     }
 
     /**
@@ -129,15 +136,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 	 */
 	protected boolean renderSurface(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice, final ChunkMD.Set neighbors, final boolean cavePrePass) {
 
-        StatTimer timer;
-        if(cavePrePass)
-        {
-            timer = StatTimer.get("ChunkStandardRenderer.renderSurface.cavePrePass");
-        }
-        else
-        {
-            timer = StatTimer.get("ChunkStandardRenderer.renderSurface");
-        }
+        StatTimer timer = cavePrePass ? renderSurfacePrepassTimer : renderSurfaceTimer;
         timer.start();
 
         g2D.setComposite(BlockUtils.OPAQUE);
@@ -146,10 +145,44 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 		for (int x = 0; x < 16; x++) {
 			blockLoop : for (int z = 0; z < 16; z++) {
 
-                int y = Math.max(1, chunkMd.stub.getHeightValue(x, z));
+                BlockMD blockMD = null;
+                boolean isUnderRoof = false;
+                int standardY = Math.max(1, chunkMd.getHeightValue(x, z));
+                int roofY = 0;
+                int y = standardY;
 
-                // Get blockinfo for coords
-                BlockMD blockMD;
+                if(advancedSurfaceCheck)
+                {
+                    //advancedSurfaceCheckTimer.start();
+                    roofY = Math.max(1, chunkMd.getAbsoluteHeightValue(x, z));
+
+                    if(standardY<roofY)
+                    {
+                        // Is transparent roof above standard height?
+                        int checkY = roofY;
+                        while(checkY>standardY)
+                        {
+                            blockMD = BlockMD.getBlockMD(chunkMd, x, checkY, z);
+                            if(blockMD!=null && blockMD.isTransparentRoof())
+                            {
+                                isUnderRoof = true;
+                                y = Math.max(standardY, checkY-1); // -1 is needed in 1.7.2!
+                                break;
+                            }
+                            else
+                            {
+                                checkY--;
+                            }
+                        }
+                        //advancedSurfaceCheckTimer.stop();
+                    }
+                    else
+                    {
+                        //advancedSurfaceCheckTimer.cancel();
+                    }
+                }
+
+				// Get blockinfo for coords
                 do {
                     blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
 
@@ -204,6 +237,32 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                     chunkOk = true;
                 }
 
+                // If under glass, color accordingly
+                if(isUnderRoof)
+                {
+                    //advancedSurfaceRenderTimer.start();
+                    while(roofY>y)
+                    {
+                        blockMD = BlockMD.getBlockMD(chunkMd, x, roofY, z);
+                        if(blockMD!=null && !blockMD.isAir())
+                        {
+                            if(blockMD.isTransparent())
+                            {
+                                g2D.setComposite(blockMD.getAlphaComposite());
+                                g2D.setPaint(color.toColor());
+                                g2D.fillRect(x, z, 1, 1);
+                                g2D.setComposite(BlockUtils.OPAQUE);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        roofY--;
+                    }
+                    //advancedSurfaceRenderTimer.stop();
+                }
+
                 // Night color
 				if(!cavePrePass) {
 					int lightLevel = Math.max(1, chunkMd.getSavedLightValue(EnumSkyBlock.Block, x,(y + 1), z));
@@ -240,7 +299,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
             colors.add(color);
 
             if(bw.isWater()) colors.add(getBaseBlockColor(chunkMd, bw, neighbors, x, y, z));
-            if(be.isWater()) colors.add(getBaseBlockColor(chunkMd, bw, neighbors, x, y, z));
+            if(be.isWater()) colors.add(getBaseBlockColor(chunkMd, be, neighbors, x, y, z));
             if(bn.isWater()) colors.add(getBaseBlockColor(chunkMd, bn, neighbors, x, y, z));
             if(bs.isWater()) colors.add(getBaseBlockColor(chunkMd, bs, neighbors, x, y, z));
 
@@ -257,7 +316,8 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
     protected void surfaceSlopeColor(final RGB color, final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int ignored, int z) {
 
-        float slope, bevel, sN, sNW, sW, sS, sE, sAvg;
+        float slope, bevel, sN, sNW, sW, sS, sE, sSE, sAvg;
+        sS = sE = sSE = sNW = 1f;
         slope = chunkMd.surfaceSlopes[x][z];
 
         if(!blockMD.isFoliage()) {
@@ -276,25 +336,37 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
         }
 
         bevel = 1f;
-        if(slope<1) {
-            if(slope<=sAvg) {
-                slope = slope*.6f;
-            } else if(slope>sAvg) {
-                if(!blockMD.isFoliage()){
-                    slope = (slope+sAvg)/2f;
-                }
+        if (slope < 1)
+        {
+            if (slope <= sAvg)
+            {
+                slope = slope * .6f;
             }
-            bevel = Math.max(slope * .8f, .1f);
-        } else if(slope>1) {
-            if(sAvg>1) {
-                if(slope>=sAvg) {
-                    if(!blockMD.isFoliage()){
-                        slope = slope*1.2f;
+            else
+                if (slope > sAvg)
+                {
+                    if (!blockMD.isFoliage())
+                    {
+                        slope = (slope + sAvg) / 2f;
                     }
                 }
-            }
-            bevel = Math.min(slope * 1.2f, 1.4f);
+            bevel = Math.max(slope * .8f, .1f);
         }
+        else
+            if (slope > 1)
+            {
+                if (sAvg > 1)
+                {
+                    if (slope >= sAvg)
+                    {
+                        if (!blockMD.isFoliage())
+                        {
+                            slope = slope * 1.2f;
+                        }
+                    }
+                }
+                bevel = Math.min(slope * 1.2f, 1.4f);
+            }
 
         if(bevel!=1f) {
             color.bevelSlope(bevel);
@@ -597,6 +669,10 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
 			while(!stack.isEmpty()) {
 				BlockMD lowerBlock = stack.pop();
+                if(lowerBlock.isAir())
+                {
+                    continue;
+                }
                 color = getBaseBlockColor(chunkMd, lowerBlock, null, x, y, z);
 
                 if(useLighting)

@@ -74,6 +74,7 @@ public class BlockMD implements Serializable {
     private transient Block block;
 	private Color color;
 	private float alpha;
+    private AlphaComposite alphaComposite;
     private final EnumSet<BlockUtils.Flag> flags;
     private final String name;
 
@@ -193,6 +194,13 @@ public class BlockMD implements Serializable {
     }
 	
 	public RGB getColor(ChunkMD chunkMd, int x, int y, int z) {
+
+        if(isAir())
+        {
+            // This shouldn't be called
+            JourneyMap.getLogger();
+        }
+
 		if(this.color!=null) {
             return new RGB(this.color);
         } else {
@@ -215,13 +223,19 @@ public class BlockMD implements Serializable {
 		this.alpha = alpha;
         if(alpha<1f) {
             this.flags.add(BlockUtils.Flag.Transparency);
+            alphaComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
         } else {
             this.flags.remove(BlockUtils.Flag.Transparency);
+            alphaComposite = null;
         }
 	}
 
     public float getAlpha() {
         return alpha;
+    }
+
+    public AlphaComposite getAlphaComposite() {
+        return (alphaComposite==null) ? BlockUtils.OPAQUE : alphaComposite;
     }
 	
 	public Block getBlock() {
@@ -250,6 +264,10 @@ public class BlockMD implements Serializable {
     public boolean isWater() {
         getBlock();
         return block== Blocks.water||block==Blocks.flowing_water;
+    }
+
+    public boolean isTransparentRoof() {
+        return hasFlag(BlockUtils.Flag.TransparentRoof);
     }
 
     public boolean isLava() {
