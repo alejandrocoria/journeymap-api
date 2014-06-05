@@ -198,51 +198,64 @@ public class WorldData extends CacheLoader<Class, WorldData>
     {
         List<WorldProvider> dimProviders = new ArrayList<WorldProvider>();
 
-        WorldServer[] worlds = DimensionManager.getWorlds();
-        if(worlds.length>0)
+        // If server is local, get worlds and their providers
+//        WorldServer[] worlds = DimensionManager.getWorlds();
+//        if(worlds.length>0)
+//        {
+//            for(WorldServer worldServer : worlds)
+//            {
+//                dimProviders.add(worldServer.provider);
+//            }
+//        }
+
+        // Check other ids
+        Integer[] providerIds = DimensionManager.getIDs();
+        for(int id : providerIds)
         {
-            for(WorldServer worldServer : worlds)
+            if(DimensionManager.getWorld(id)!=null)
             {
-                dimProviders.add(worldServer.provider);
+                dimProviders.add(DimensionManager.getProvider(id));
             }
         }
-        else
-        {
-            try
-            {
-                WorldProvider currentProvider = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider;
-                dimProviders.add(currentProvider);
 
-                Hashtable<Integer, Class<? extends WorldProvider>> classes = ReflectionHelper.getPrivateValue(DimensionManager.class, new DimensionManager(), 0);
-                for (Map.Entry<Integer, Class<? extends WorldProvider>> entry : classes.entrySet())
+        // Also check for providers without worlds - needed for multiplayer TwilightForest and singleplayer Mystcraft
+        try
+        {
+            Hashtable<Integer, Class<? extends WorldProvider>> classes = ReflectionHelper.getPrivateValue(DimensionManager.class, new DimensionManager(), 0);
+            loopClasses : for (Map.Entry<Integer, Class<? extends WorldProvider>> entry : classes.entrySet())
+            {
+                // Skip duplicates
+                for(WorldProvider dimProvider : dimProviders)
                 {
-                    if (currentProvider.getClass().equals(entry.getValue()))
+                    if(dimProvider.getClass().equals(entry.getValue()))
                     {
-                        continue;
-                    }
-                    try
-                    {
-                        WorldProvider provider = entry.getValue().newInstance();
-                        if (entry.getKey() >= -1 && entry.getKey() <= 1)
-                        {
-                            provider.dimensionId = entry.getKey();
-                        }
-                        dimProviders.add(provider);
-                        JourneyMap.getLogger().info("Added WorldProvider " + provider.getDimensionName());
-                    }
-                    catch (Throwable t)
-                    {
-                        JourneyMap.getLogger().warning("Unable to get WorldProvider for " + entry);
+                        continue loopClasses;
                     }
                 }
+
+                // Add instance
+                try
+                {
+                    WorldProvider provider = entry.getValue().newInstance();
+                    if (entry.getKey() >= -1 && entry.getKey() <= 1)
+                    {
+                        provider.dimensionId = entry.getKey();
+                    }
+                    dimProviders.add(provider);
+                    JourneyMap.getLogger().info("Added WorldProvider " + provider.getDimensionName());
+                }
+                catch (Throwable t)
+                {
+                    JourneyMap.getLogger().warning("Unable to get WorldProvider for " + entry);
+                }
             }
-            catch (Throwable t)
-            {
-                JourneyMap.getLogger().warning("Unable to get Dimension Manager providers via reflection");
-                dimProviders.add(new WorldProviderHell());
-                dimProviders.add(new WorldProviderSurface());
-                dimProviders.add(new WorldProviderEnd());
-            }
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().warning("Unable to get Dimension Manager providers via reflection");
+            dimProviders.add(new WorldProviderHell());
+            dimProviders.add(new WorldProviderSurface());
+            dimProviders.add(new WorldProviderEnd());
         }
 
         Collections.sort(dimProviders, new Comparator<WorldProvider>()

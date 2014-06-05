@@ -35,11 +35,11 @@ public abstract class BaseRenderer
      */
     public void paintBadBlock(final int x, final int y, final int z, final Graphics2D g2D)
     {
-        g2D.setComposite(BlockUtils.OPAQUE);
-        g2D.setPaint(Color.magenta);
-        g2D.fillRect(x, z, 1, 1);
+//        g2D.setComposite(BlockUtils.OPAQUE);
+//        g2D.setPaint(Color.magenta);
+//        g2D.fillRect(x, z, 1, 1);
         badBlockCount++;
-        if (badBlockCount % 10 == 0)
+        if (badBlockCount % 100 == 0)
         {
             JourneyMap.getLogger().warning(
                     "Bad block at " + x + "," + y + "," + z //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
