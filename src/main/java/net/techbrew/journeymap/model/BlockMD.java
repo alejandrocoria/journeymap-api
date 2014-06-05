@@ -259,6 +259,10 @@ public class BlockMD implements Serializable {
         return hasFlag(BlockUtils.Flag.HasAir);
     }
 
+    public boolean isIce() {
+        return block==Blocks.ice;
+    }
+
     public boolean isTorch() {
         getBlock();
         return block== Blocks.torch||block==Blocks.redstone_torch||block==Blocks.unlit_redstone_torch;

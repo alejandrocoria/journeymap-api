@@ -1,6 +1,5 @@
 package net.techbrew.journeymap.cartography;
 
-import net.minecraft.init.Blocks;
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -19,8 +18,6 @@ import java.util.Stack;
 
 public class ChunkStandardRenderer extends BaseRenderer implements IChunkRenderer
 {
-    static final int alphaDepth = 5;
-
     protected boolean caveGreySurface = JourneyMap.getInstance().coreProperties.caveGreySurface.get();
     protected boolean advancedSurfaceCheck = JourneyMap.getInstance().coreProperties.advancedSurfaceCheck.get();
 
@@ -669,10 +666,9 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
     protected void paintDepth(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, final Graphics2D g2D, final boolean useLighting)
     {
         // See how deep the alpha goes
-
         Stack<BlockMD> stack = new Stack<BlockMD>();
         stack.push(blockMD);
-        int maxDepth = alphaDepth;
+        int maxDepth = 5;
         int down = y;
         while (down > 0)
         {
@@ -682,13 +678,9 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
             {
                 stack.push(lowerBlock);
 
-                if (lowerBlock.isWater() || lowerBlock.getBlock() == Blocks.ice)
+                if (lowerBlock.isAir())
                 {
-                    maxDepth = 4;
-                }
-                else if (lowerBlock.isAir())
-                {
-                    maxDepth = 256;
+                    maxDepth++;
                 }
 
                 if (lowerBlock.getAlpha() == 1f || y - down > maxDepth)
