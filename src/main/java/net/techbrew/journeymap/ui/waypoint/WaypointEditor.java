@@ -3,6 +3,7 @@ package net.techbrew.journeymap.ui.waypoint;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.world.WorldProvider;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WorldData;
@@ -38,6 +39,8 @@ public class WaypointEditor extends JmUI
     String labelR = Constants.getString("Waypoint.r");
     String labelG = Constants.getString("Waypoint.g");
     String labelB = Constants.getString("Waypoint.b");
+
+    String currentLocation = "";
 
     private enum ButtonEnum
     {
@@ -100,7 +103,14 @@ public class WaypointEditor extends JmUI
     {
         try
         {
-            int dimension = mc.thePlayer.dimension;
+            int dimension = mc.thePlayer.worldObj.provider.dimensionId;
+
+            // Update player pos
+            String pos = Constants.getString("MapOverlay.location_xzy",
+                    Integer.toString((int) mc.thePlayer.posX),
+                    Integer.toString((int) mc.thePlayer.posZ),
+                    Integer.toString((int) mc.thePlayer.posY));
+            currentLocation = Constants.getString("Waypoint.current_location", " dim:" + dimension + " " + pos);
 
             if (this.fieldList.isEmpty())
             {
@@ -152,16 +162,11 @@ public class WaypointEditor extends JmUI
                 Collection<Integer> wpDims = originalWaypoint.getDimensions();
                 int buttonId = ButtonEnum.values().length;
 
-                for (int dim : WorldData.getDimensions())
+                for (WorldProvider provider : WorldData.getDimensionProviders())
                 {
-                    dimButtonList.add(new DimensionButton(buttonId++, dim, wpDims.contains(dim)));
-                }
-
-                if (dimButtonList.isEmpty())
-                {
-                    dimButtonList.add(new DimensionButton(buttonId++, 1, wpDims.contains(1)));
-                    dimButtonList.add(new DimensionButton(buttonId++, 0, wpDims.contains(0)));
-                    dimButtonList.add(new DimensionButton(buttonId++, -1, wpDims.contains(-1)));
+                    int dim = provider.dimensionId;
+                    String dimName = provider.getDimensionName();
+                    dimButtonList.add(new DimensionButton(buttonId++, dim, dimName, wpDims.contains(dim)));
                 }
 
                 dimScrollPane = new ScrollPane(mc, 0, 0, dimButtonList, dimButtonList.get(0).getHeight(), 4);
@@ -229,7 +234,7 @@ public class WaypointEditor extends JmUI
         final int vpad = 5;
         final int hgap = fr.getStringWidth("X") * 3;
         final int vgap = fieldX.getHeight() + vpad;
-        final int startY = Math.max(30, (this.height-200) / 2);
+        final int startY = Math.max(30, (this.height - 200) / 2);
 
         // Determine dimension button spacing requirement
         int dcw = fr.getStringWidth(dimensionsTitle);
@@ -326,8 +331,8 @@ public class WaypointEditor extends JmUI
 
         dimScrollPane.drawScreen(x, y, par3);
 
-        String location = Constants.getString("Waypoint.current_location", "  " + MapOverlay.state().playerLastPos);
-        DrawUtil.drawLabel(location, width/2, height, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.BLACK, 255, Color.lightGray, 255, 1, true);
+
+        DrawUtil.drawLabel(currentLocation, width / 2, height, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.BLACK, 255, Color.lightGray, 255, 1, true);
 
         for (int k = 0; k < this.buttonList.size(); ++k)
         {
@@ -387,7 +392,7 @@ public class WaypointEditor extends JmUI
         switch (par2)
         {
             case Keyboard.KEY_ESCAPE:
-                UIManager.getInstance().openMap();
+                closeAndReturn();
                 return;
             case Keyboard.KEY_RETURN:
                 save();
@@ -661,6 +666,7 @@ public class WaypointEditor extends JmUI
         closeAndReturn();
     }
 
+    @Override
     protected void closeAndReturn()
     {
         if (returnClass == null)
@@ -670,6 +676,18 @@ public class WaypointEditor extends JmUI
         else
         {
             UIManager.getInstance().open(returnClass);
+        }
+    }
+
+    class DimensionButton extends Button
+    {
+        public final int dimension;
+
+        DimensionButton(int id, int dimension, String dimensionName, boolean toggled)
+        {
+            super(id, 0, 0, String.format("%s: %s", dimensionName, Constants.getString("MapOverlay.on")), String.format("%s: %s", dimensionName, Constants.getString("MapOverlay.off")), toggled);
+            this.dimension = dimension;
+            setToggled(toggled);
         }
     }
 }

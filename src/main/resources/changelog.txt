@@ -12,10 +12,14 @@ Requirements:
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 Changes since 4.0.0b3:
-- Bugfix: Waypoints from other dimensions could display on full-screen map
-- Bugfix: Crash via Waypoint Manager's dimensions button when world has custom negative dimensions
 - Change: Improved log messages when detection of Rei's/Voxelmap encounters a problem
-- Change: Significantly improved surface mapping when glass and stained glass is involved.
+- Change: Surface mapping improvements. Floating glass and stained glass now supported.
+- Bugfix: Waypoints from other dimensions shouldn't display on full-screen map
+- Bugfix: Crash via Waypoint Manager's dimensions button when world had custom negative dimensions
+- Bugfix: Waypoints didn't work for custom dimensions in multiplayer
+- Bugfix: Mod announcement wasn't shown in chat
+- Bugfix: Current Location shown in Waypoint Editor wasn't always up-to-date.
+- Bugfix: Hitting ESC in Waypoint Editor wouldn't return to game (if opened from game)
 
 Changes since 4.0.0b2:
 

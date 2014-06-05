@@ -54,7 +54,6 @@ import java.util.logging.Logger;
 @Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = JourneyMap.JM_VERSION)
 public class JourneyMap
 {
-
     static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
 
     public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
@@ -225,6 +224,8 @@ public class JourneyMap
 
             WaypointsData.reset();
             BlockUtils.initialize();
+
+            announceMod(false);
 
             logger.info(JourneyMap.MOD_NAME + " postInitialize EXIT");
         }

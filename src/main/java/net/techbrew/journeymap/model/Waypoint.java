@@ -7,14 +7,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 
 import java.awt.*;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Generic waypoint data holder
@@ -52,20 +51,20 @@ public class Waypoint implements Serializable
     protected Origin origin;
     protected String texture;
 
-    protected Integer[] dimensions;
+    protected TreeSet<Integer> dimensions;
     transient protected boolean readOnly;
     transient protected boolean dirty;
 
     public static Waypoint deathOf(Entity player)
     {
         ChunkCoordinates cc = new ChunkCoordinates((int)Math.floor(player.posX), (int)Math.floor(player.posY), (int)Math.floor(player.posZ));
-        return at(cc, Type.Death, player.dimension);
+        return at(cc, Type.Death, player.worldObj.provider.dimensionId);
     }
 
     public static Waypoint of(EntityPlayer player)
     {
         ChunkCoordinates cc = new ChunkCoordinates((int)Math.floor(player.posX), (int)Math.floor(player.posY), (int)Math.floor(player.posZ));
-        return at(cc, Type.Normal, player.dimension);
+        return at(cc, Type.Normal, player.worldObj.provider.dimensionId);
     }
 
     public static Waypoint at(ChunkCoordinates cc, Type type, int dimension)
@@ -103,29 +102,30 @@ public class Waypoint implements Serializable
 
     /**
      * Main constructor.
-     * @param name
-     * @param x
-     * @param y
-     * @param z
-     * @param enable
-     * @param red
-     * @param green
-     * @param blue
-     * @param type
-     * @param origin
-     * @param dimensions
      */
     public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, Type type, Origin origin, Integer... dimensions)
     {
+        this(name, x, y, z, enable, red, green, blue, type, origin, new TreeSet<Integer>(Arrays.asList(dimensions)));
+    }
+
+    /**
+     * Main constructor.
+     */
+    public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, Type type, Origin origin, Collection<Integer> dimensions)
+    {
         if(name==null) name = createName(x, z);
-        if(dimensions==null || dimensions.length==0)
+        if(dimensions==null || dimensions.size()==0)
         {
-            dimensions = new Integer[]{0};
+            dimensions = new TreeSet<Integer>();
+            Minecraft mc = FMLClientHandler.instance().getClient();
+            dimensions.add(mc.thePlayer.worldObj.provider.dimensionId);
         }
-        this.dimensions = dimensions;
+        this.dimensions = new TreeSet<Integer>(dimensions);
+
+        JourneyMap.getLogger().info("Waypoint created with dimensions " + new ArrayList<Integer>(getDimensions()));
 
         this.name = name;
-        setLocation(x, y, z, dimensions[0]);
+        setLocation(x, y, z, this.dimensions.first());
 
         this.r = red;
         this.g = green;
@@ -134,16 +134,17 @@ public class Waypoint implements Serializable
         this.type = type;
         this.origin = origin;
 
-
         switch(type)
         {
             case Normal:
             {
                 icon = ICON_NORMAL;
+                break;
             }
             case Death:
             {
                 icon = ICON_DEATH;
+                break;
             }
         }
     }
@@ -231,12 +232,12 @@ public class Waypoint implements Serializable
 
     public Collection<Integer> getDimensions()
     {
-        return Arrays.asList(this.dimensions);
+        return this.dimensions;
     }
 
     public void setDimensions(Collection<Integer> dims)
     {
-        this.dimensions = dims.toArray(new Integer[dims.size()]);
+        this.dimensions = new TreeSet<Integer>(dims);
     }
 
     public boolean isTeleportReady()
@@ -247,7 +248,7 @@ public class Waypoint implements Serializable
     public boolean isInPlayerDimension()
     {
         Minecraft mc = FMLClientHandler.instance().getClient();
-        return getDimensions().contains(mc.thePlayer.dimension);
+        return dimensions.contains(mc.thePlayer.worldObj.provider.dimensionId);
     }
 
     public String getId()
@@ -447,7 +448,7 @@ public class Waypoint implements Serializable
         {
             return false;
         }
-        if (!Arrays.equals(dimensions, waypoint.dimensions))
+        if (!(dimensions.equals(waypoint.dimensions)))
         {
             return false;
         }

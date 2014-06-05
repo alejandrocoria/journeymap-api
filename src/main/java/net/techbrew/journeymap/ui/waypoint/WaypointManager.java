@@ -1,9 +1,11 @@
 package net.techbrew.journeymap.ui.waypoint;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.command.server.CommandTeleport;
+import net.minecraft.world.WorldProvider;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WorldData;
@@ -14,7 +16,10 @@ import net.techbrew.journeymap.ui.map.MapOverlay;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.lwjgl.input.Keyboard;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class WaypointManager extends JmUI
 {
@@ -32,8 +37,6 @@ public class WaypointManager extends JmUI
     {
         Add, Find, SortName, SortDistance, Dimensions, ToggleAll, Help, Options, Close
     }
-
-    ;
 
     final String on = Constants.getString("MapOverlay.on");
     final String off = Constants.getString("MapOverlay.off");
@@ -96,7 +99,7 @@ public class WaypointManager extends JmUI
 
                 if (buttonSortDistance == null)
                 {
-                    WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(mc.thePlayer, true);
+                    WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(FMLClientHandler.instance().getClient().thePlayer, true);
                     String distanceLabel = Constants.getString("Waypoint.distance");
                     buttonSortDistance = new SortButton(ButtonEnum.SortDistance, distanceLabel, distanceSort);
                     buttonSortDistance.setTextOnly(fr);
@@ -392,7 +395,7 @@ public class WaypointManager extends JmUI
     protected void updateItems()
     {
         items.clear();
-        Integer currentDim = buttonDimensions.currentDim;
+        Integer currentDim = buttonDimensions.currentWorldProvider == null ? null : buttonDimensions.currentWorldProvider.dimensionId;
         FontRenderer fr = getFontRenderer();
         itemWidth = 0;
 
@@ -531,30 +534,33 @@ public class WaypointManager extends JmUI
 
     protected static class DimensionsButton extends Button
     {
-        final Integer[] dimensions;
-        static Integer currentDim = 0;
+        final List<WorldProvider> worldProviders = WorldData.getDimensionProviders();
+
+        static boolean needInit = true;
+        static WorldProvider currentWorldProvider;
 
         public DimensionsButton(int id)
         {
             super(id, 0, 0, "");
-            dimensions = WorldData.getDimensions();
-            if (currentDim != null)
+
+            if(needInit || currentWorldProvider !=null)
             {
-                currentDim = Minecraft.getMinecraft().thePlayer.dimension;
+                currentWorldProvider = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider;
+                needInit = false;
             }
             updateLabel();
 
             // Determine width
-            fitWidth(Minecraft.getMinecraft().fontRenderer);
+            fitWidth(FMLClientHandler.instance().getClient().fontRenderer);
         }
 
         protected void updateLabel()
         {
             String dimName;
 
-            if (currentDim != null)
+            if (currentWorldProvider != null)
             {
-                dimName = WorldData.getDimensionName(currentDim);
+                dimName = currentWorldProvider.getDimensionName();
             }
             else
             {
@@ -567,9 +573,9 @@ public class WaypointManager extends JmUI
         public int getFitWidth(FontRenderer fr)
         {
             int maxWidth = 0;
-            for (Integer dim : dimensions)
+            for (WorldProvider worldProvider : worldProviders)
             {
-                String name = Constants.getString("Waypoint.dimension", WorldData.getDimensionName(dim));
+                String name = Constants.getString("Waypoint.dimension", worldProvider.getDimensionName());
                 maxWidth = Math.max(maxWidth, Minecraft.getMinecraft().fontRenderer.getStringWidth(name));
             }
             return maxWidth + 12;
@@ -580,22 +586,31 @@ public class WaypointManager extends JmUI
         {
             int index;
 
-            if (currentDim == null)
+            if (currentWorldProvider == null)
             {
                 index = 0;
             }
             else
             {
-                index = Arrays.binarySearch(dimensions, currentDim) + 1;
+                index = -1;
+
+                for (WorldProvider worldProvider : worldProviders)
+                {
+                    if(worldProvider.dimensionId== currentWorldProvider.dimensionId)
+                    {
+                        index = worldProviders.indexOf(worldProvider) + 1;
+                        break;
+                    }
+                }
             }
 
-            if (index == dimensions.length || index < 0)
+            if (index >= worldProviders.size() || index < 0)
             {
-                currentDim = null;
+                currentWorldProvider = null; // "All"
             }
             else
             {
-                currentDim = dimensions[index];
+                currentWorldProvider = worldProviders.get(index);
             }
 
             updateLabel();

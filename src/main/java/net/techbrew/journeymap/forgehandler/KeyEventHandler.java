@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.forgehandler;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
@@ -19,23 +20,26 @@ import java.util.EnumSet;
 /**
  * Created by mwoodman on 1/29/14.
  */
-public class KeyEventHandler implements EventHandlerManager.EventHandler {
+public class KeyEventHandler implements EventHandlerManager.EventHandler
+{
 
     public KeyEventHandler()
     {
-        for(KeyBinding kb : Constants.KEYBINDINGS)
+        for (KeyBinding kb : Constants.KEYBINDINGS)
         {
             ClientRegistry.registerKeyBinding(kb);
         }
     }
 
     @Override
-    public EnumSet<EventHandlerManager.BusType> getBus() {
+    public EnumSet<EventHandlerManager.BusType> getBus()
+    {
         return EnumSet.of(EventHandlerManager.BusType.FMLCommonHandlerBus);
     }
 
     @SubscribeEvent
-    public void onKeyboardEvent(InputEvent.KeyInputEvent event) {
+    public void onKeyboardEvent(InputEvent.KeyInputEvent event)
+    {
         KeyEventHandler.onKeypress(false);
     }
 
@@ -52,54 +56,37 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler {
                 UIManager.getInstance().toggleMinimap();
                 return;
             }
-            else
+            else if (Constants.isPressed(Constants.KB_MAP_ZOOMIN))
             {
-                if (Constants.isPressed(Constants.KB_MAP_ZOOMIN))
-                {
-                    mapOverlayState.zoomIn();
-                    return;
-                }
-                else
-                {
-                    if (Constants.isPressed(Constants.KB_MAP_ZOOMOUT))
-                    {
-                        mapOverlayState.zoomOut();
-                        return;
-                    }
-                    else
-                    {
-                        if (Constants.isPressed(Constants.KB_MAP_DAY))
-                        {
-                            mapOverlayState.overrideMapType(Constants.MapType.day);
-                            return;
-                        }
-                        else
-                        {
-                            if (Constants.isPressed(Constants.KB_MAP_NIGHT))
-                            {
-                                mapOverlayState.overrideMapType(Constants.MapType.night);
-                                return;
-                            }
-                            else
-                            {
-                                if (Constants.isPressed(Constants.KB_MINIMAP_POS))
-                                {
-                                    UIManager.getInstance().getMiniMap().nextPosition();
-                                    return;
-                                }
-                                else
-                                {
-                                    if (Constants.isPressed(Constants.KB_WAYPOINT))
-                                    {
-                                        UIManager.getInstance().openWaypointManager(null, null);
-                                        return;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                mapOverlayState.zoomIn();
+                return;
             }
+            else if (Constants.isPressed(Constants.KB_MAP_ZOOMOUT))
+            {
+                mapOverlayState.zoomOut();
+                return;
+            }
+            else if (Constants.isPressed(Constants.KB_MAP_DAY))
+            {
+                mapOverlayState.overrideMapType(Constants.MapType.day);
+                return;
+            }
+            else if (Constants.isPressed(Constants.KB_MAP_NIGHT))
+            {
+                mapOverlayState.overrideMapType(Constants.MapType.night);
+                return;
+            }
+            else if (Constants.isPressed(Constants.KB_MINIMAP_POS))
+            {
+                UIManager.getInstance().getMiniMap().nextPosition();
+                return;
+            }
+            else if (Constants.isPressed(Constants.KB_WAYPOINT))
+            {
+                UIManager.getInstance().openWaypointManager(null, null);
+                return;
+            }
+
         }
         else
         {
@@ -126,7 +113,8 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler {
                     {
                         if (Minecraft.getMinecraft().currentScreen == null)
                         {
-                            Waypoint waypoint = Waypoint.of(Minecraft.getMinecraft().thePlayer);
+                            Minecraft mc = FMLClientHandler.instance().getClient();
+                            Waypoint waypoint = Waypoint.of(mc.thePlayer);
                             UIManager.getInstance().openWaypointEditor(waypoint, true, null);
                         }
                         return;

@@ -2,14 +2,12 @@ package net.techbrew.journeymap.data;
 
 import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldProviderEnd;
-import net.minecraft.world.WorldProviderHell;
-import net.minecraft.world.WorldProviderSurface;
+import net.minecraft.world.*;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.techbrew.journeymap.JourneyMap;
@@ -25,8 +23,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Provides world properties
@@ -197,49 +194,67 @@ public class WorldData extends CacheLoader<Class, WorldData>
         return worldName;
     }
 
-    public static Integer[] getDimensions()
+    public static List<WorldProvider> getDimensionProviders()
     {
-        Integer[] dims = DimensionManager.getIDs();
-        if (dims.length == 0)
-        {
-            dims = new Integer[]{0, -1, 1};
-        }
-        Arrays.sort(dims);
-        return dims;
-    }
+        List<WorldProvider> dimProviders = new ArrayList<WorldProvider>();
 
-    /**
-     * Get the name of the provided dimension.
-     *
-     * @param dimension
-     * @return
-     */
-    public static String getDimensionName(final int dimension)
-    {
-        if (DimensionManager.getWorld(dimension) != null)
+        WorldServer[] worlds = DimensionManager.getWorlds();
+        if(worlds.length>0)
         {
-            return DimensionManager.getProvider(dimension).getDimensionName();
-        }
-
-        World world = Minecraft.getMinecraft().theWorld;
-        if (world != null && world.provider.dimensionId == dimension)
-        {
-            return world.provider.getDimensionName();
+            for(WorldServer worldServer : worlds)
+            {
+                dimProviders.add(worldServer.provider);
+            }
         }
         else
         {
-            switch (dimension)
+            try
             {
-                case 0:
-                    return new WorldProviderSurface().getDimensionName();
-                case 1:
-                    return new WorldProviderEnd().getDimensionName();
-                case -1:
-                    return new WorldProviderHell().getDimensionName();
+                WorldProvider currentProvider = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider;
+                dimProviders.add(currentProvider);
+
+                Hashtable<Integer, Class<? extends WorldProvider>> classes = ReflectionHelper.getPrivateValue(DimensionManager.class, new DimensionManager(), 0);
+                for (Map.Entry<Integer, Class<? extends WorldProvider>> entry : classes.entrySet())
+                {
+                    if (currentProvider.getClass().equals(entry.getValue()))
+                    {
+                        continue;
+                    }
+                    try
+                    {
+                        WorldProvider provider = entry.getValue().newInstance();
+                        if (entry.getKey() >= -1 && entry.getKey() <= 1)
+                        {
+                            provider.dimensionId = entry.getKey();
+                        }
+                        dimProviders.add(provider);
+                        JourneyMap.getLogger().info("Added WorldProvider " + provider.getDimensionName());
+                    }
+                    catch (Throwable t)
+                    {
+                        JourneyMap.getLogger().warning("Unable to get WorldProvider for " + entry);
+                    }
+                }
+            }
+            catch (Throwable t)
+            {
+                JourneyMap.getLogger().warning("Unable to get Dimension Manager providers via reflection");
+                dimProviders.add(new WorldProviderHell());
+                dimProviders.add(new WorldProviderSurface());
+                dimProviders.add(new WorldProviderEnd());
             }
         }
 
-        return Integer.toString(dimension);
+        Collections.sort(dimProviders, new Comparator<WorldProvider>()
+        {
+            @Override
+            public int compare(WorldProvider o1, WorldProvider o2)
+            {
+                return Integer.compare(o1.dimensionId, o2.dimensionId);
+            }
+        });
+
+        return dimProviders;
     }
 
     /**

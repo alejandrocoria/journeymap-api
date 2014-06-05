@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.ui.waypoint;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.entity.player.EntityPlayer;
@@ -263,11 +264,12 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
      */
     public int getDistanceSqToEntity(EntityPlayer player)
     {
+        int dimension = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider.dimensionId;
         if (distance == null)
         {
-            double d0 = this.waypoint.getX(player.dimension) - player.posX;
-            double d1 = this.waypoint.getY(player.dimension) - player.posY;
-            double d2 = this.waypoint.getZ(player.dimension) - player.posZ;
+            double d0 = this.waypoint.getX(dimension) - player.posX;
+            double d1 = this.waypoint.getY(dimension) - player.posY;
+            double d2 = this.waypoint.getZ(dimension) - player.posZ;
             distance = (int) Math.round(Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2));
         }
         return distance;
