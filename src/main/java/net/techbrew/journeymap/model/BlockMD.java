@@ -225,7 +225,10 @@ public class BlockMD implements Serializable {
             this.flags.add(BlockUtils.Flag.Transparency);
             alphaComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
         } else {
-            this.flags.remove(BlockUtils.Flag.Transparency);
+            if(this.hasFlag(BlockUtils.Flag.Transparency))
+            {
+                this.flags.remove(BlockUtils.Flag.Transparency);
+            }
             alphaComposite = null;
         }
 	}

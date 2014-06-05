@@ -33,58 +33,60 @@ public class BlockUtils {
 	public static void initialize() {
 
         blockAlphas.clear();
+
         setAlpha(Blocks.air, 0F);
-        setAlpha(Blocks.ice, .8F);
-        setAlpha(Blocks.glass, .1F);
-        setAlpha(Blocks.glass_pane, .1F);
-        setAlpha(Blocks.vine, .2F);
-        setAlpha(Blocks.torch, .5F);
-        setAlpha(Blocks.stained_glass, .2F);
-        setAlpha(Blocks.stained_glass_pane, .2F);
-        setAlpha(Blocks.flowing_water, .3F);
-        setAlpha(Blocks.water, .3F);
-        setAlpha(Blocks.flowing_water, .3F);
-        setAlpha(Blocks.iron_bars, .4F);
         setAlpha(Blocks.fence, .4F);
         setAlpha(Blocks.fence_gate, .4F);
+        setAlpha(Blocks.flowing_water, .3F);
+        setAlpha(Blocks.glass, .3F);
+        setAlpha(Blocks.glass_pane, .3F);
+        setAlpha(Blocks.ice, .8F);
+        setAlpha(Blocks.iron_bars, .4F);
         setAlpha(Blocks.nether_brick_fence, .4F);
-        
+        setAlpha(Blocks.stained_glass, .5F);
+        setAlpha(Blocks.stained_glass_pane, .5F);
+        setAlpha(Blocks.torch, .5F);
+        setAlpha(Blocks.vine, .2F);
+        setAlpha(Blocks.water, .3F);
 
         blockFlags.clear();
-        setFlags(Blocks.air, Flag.HasAir, Flag.NotHideSky, Flag.NoShadow, Flag.NotHideSky);
-        setFlags(Blocks.fire, Flag.NoShadow, Flag.Side2Texture);
-        setFlags(Blocks.flowing_water, Flag.BiomeColor);
-        setFlags(Blocks.grass, Flag.BiomeColor);
 
         if(JourneyMap.getInstance().coreProperties.caveIgnoreGlass.get())
         {
             setFlags(Blocks.glass, Flag.NotHideSky);
             setFlags(Blocks.glass_pane, Flag.NotHideSky);
+            setFlags(Blocks.stained_glass, Flag.NotHideSky);
+            setFlags(Blocks.stained_glass, Flag.NotHideSky);
         }
-        
+
+        setFlags(Blocks.air, Flag.HasAir, Flag.NotHideSky, Flag.NoShadow, Flag.NotHideSky);
         setFlags(Blocks.double_plant, Flag.BiomeColor);
+        setFlags(Blocks.fence, Flag.TransparentRoof);
+        setFlags(Blocks.fire, Flag.NoShadow, Flag.Side2Texture);
+        setFlags(Blocks.flowing_water, Flag.BiomeColor);
         setFlags(Blocks.glass, Flag.TransparentRoof);
         setFlags(Blocks.glass_pane, Flag.TransparentRoof);
+        setFlags(Blocks.grass, Flag.BiomeColor);
+        setFlags(Blocks.iron_bars, Flag.TransparentRoof);
         setFlags(Blocks.ladder, Flag.NotHideSky);
         setFlags(Blocks.lava, Flag.NoShadow);
         setFlags(Blocks.leaves, Flag.NotHideSky, Flag.BiomeColor);
         setFlags(Blocks.leaves2, Flag.NotHideSky, Flag.BiomeColor);
         setFlags(Blocks.redstone_torch, Flag.HasAir);
-        setFlags(Blocks.torch, Flag.HasAir, Flag.NoShadow);
+        setFlags(Blocks.stained_glass, Flag.TransparentRoof, Flag.Transparency);
+        setFlags(Blocks.stained_glass_pane, Flag.TransparentRoof, Flag.Transparency);
         setFlags(Blocks.tallgrass, Flag.BiomeColor);
-        setFlags(Blocks.tripwire_hook, Flag.NoShadow);
+        setFlags(Blocks.torch, Flag.HasAir, Flag.NoShadow);
         setFlags(Blocks.tripwire, Flag.NoShadow);
+        setFlags(Blocks.tripwire_hook, Flag.NoShadow);
         setFlags(Blocks.unlit_redstone_torch, Flag.HasAir, Flag.NoShadow);
         setFlags(Blocks.vine, Flag.NotHideSky, Flag.NoShadow, Flag.BiomeColor);
         setFlags(Blocks.water, Flag.NoShadow, Flag.BiomeColor);
         setFlags(Blocks.web, Flag.NotHideSky, Flag.Side2Texture);
-        setFlags(Blocks.iron_bars, Flag.TransparentRoof);
-        setFlags(Blocks.fence, Flag.TransparentRoof);
-        setFlags(Blocks.stained_glass, Flag.NotHideSky, Flag.TransparentRoof);
-        setFlags(Blocks.stained_glass_pane, Flag.NotHideSky, Flag.TransparentRoof);
 
         Iterator<Block> fmlBlockIter = GameData.getBlockRegistry().iterator();
-        while(fmlBlockIter.hasNext()) {
+        while(fmlBlockIter.hasNext())
+        {
             Block block = fmlBlockIter.next();
 
             if(block.getMaterial() == Material.air) {
