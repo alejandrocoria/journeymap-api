@@ -11,8 +11,7 @@ import net.techbrew.journeymap.model.Waypoint;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Disk-backed cache for Waypoints.
@@ -32,6 +31,7 @@ public class WaypointStore
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private boolean loaded = false;
     private final Cache<String, Waypoint> cache = CacheBuilder.newBuilder().build();
+    private final Set<Integer> dimensions = new HashSet<Integer>();
 
     private WaypointStore()
     {
@@ -108,9 +108,10 @@ public class WaypointStore
         }
     }
 
-    public void clear()
+    public void reset()
     {
         cache.invalidateAll();
+        dimensions.clear();
         loaded = false;
     }
 
@@ -152,6 +153,8 @@ public class WaypointStore
             {
                 cache.put(waypoint.getId(), waypoint);
             }
+
+            dimensions.addAll(waypoint.getDimensions());
         }
         loaded = true;
     }
@@ -159,6 +162,11 @@ public class WaypointStore
     public boolean hasLoaded()
     {
         return loaded;
+    }
+
+    public List<Integer> getLoadedDimensions()
+    {
+        return new ArrayList<Integer>(dimensions);
     }
 
 

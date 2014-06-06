@@ -15,6 +15,7 @@ import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.IconLoader;
+import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.BlockUtils;
 import net.techbrew.journeymap.model.ChunkMD;
@@ -134,29 +135,47 @@ public class ColorCache implements IResourceManagerReloadListener {
         return color;
     }
 
-	private Color getFoliageColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z) {
+    private Color getFoliageColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z) {
         Color color = getBiomeColor(blockMD, biome);
-		if(color==null) {
+        if(color==null) {
             int leafColor = blockMD.getBlock().getRenderColor(blockMD.key.meta); // getRenderColor()
-            int biomeColor = biome.getBiomeFoliageColor(x, y, z); // getBiomeFoliageColor()
+            int biomeColor = BiomeGenBase.plains.getBiomeFoliageColor(x,y,z); // Default
+            try
+            {
+                biomeColor = biome.getBiomeFoliageColor(x,y,z);
+            }
+            catch (Throwable t)
+            {
+                blockMD.addFlags(BlockUtils.Flag.Error);
+                JourneyMap.getLogger().severe("Couldn't get biome foliage color: " + LogFormatter.toString(t));
+            }
             int leafTimesBiome = colorMultiplier(biomeColor, leafColor);
             int darker = colorMultiplier(leafTimesBiome, 0xFFAAAAAA); // I added this, I'm sure it'll break with some custom leaf mod somewhere.
             color = new Color(darker);
             putBiomeColor(blockMD, biome, color);
-		}
-		return color;
-	}
-	
-	private Color getGrassColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z) {
+        }
+        return color;
+    }
+
+    private Color getGrassColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z) {
         Color color = getBiomeColor(blockMD, biome);
-		if(color==null) {
+        if(color==null) {
             Color baseColor = getBaseColor(blockMD, x, y, z);
-            int biomeColor = biome.getBiomeGrassColor(x,y,z); // BiomeGenBase.getBiomeGrassColor()
+            int biomeColor = BiomeGenBase.plains.getBiomeGrassColor(x,y,z); // Default
+            try
+            {
+                biomeColor = biome.getBiomeGrassColor(x,y,z);
+            }
+            catch (Throwable t)
+            {
+                blockMD.addFlags(BlockUtils.Flag.Error);
+                JourneyMap.getLogger().severe("Couldn't get biome grass color: " + LogFormatter.toString(t));
+            }
             color = colorMultiplier(baseColor, biomeColor);
             putBiomeColor(blockMD, biome, color);
-		}
-		return color;
-	}
+        }
+        return color;
+    }
 	
 	private Color getWaterColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z) {
         Color color = getBiomeColor(blockMD, biome);

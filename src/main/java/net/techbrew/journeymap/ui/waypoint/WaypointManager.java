@@ -534,7 +534,7 @@ public class WaypointManager extends JmUI
 
     protected static class DimensionsButton extends Button
     {
-        final List<WorldProvider> worldProviders = WorldData.getDimensionProviders();
+        final List<WorldProvider> worldProviders = WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions());
 
         static boolean needInit = true;
         static WorldProvider currentWorldProvider;

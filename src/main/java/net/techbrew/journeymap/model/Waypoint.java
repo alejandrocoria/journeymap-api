@@ -122,7 +122,7 @@ public class Waypoint implements Serializable
         }
         this.dimensions = new TreeSet<Integer>(dimensions);
 
-        JourneyMap.getLogger().info("Waypoint created with dimensions " + new ArrayList<Integer>(getDimensions()));
+        JourneyMap.getLogger().fine("Waypoint created with dimensions " + new ArrayList<Integer>(getDimensions()));
 
         this.name = name;
         setLocation(x, y, z, this.dimensions.first());

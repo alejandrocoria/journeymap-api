@@ -416,6 +416,7 @@ public class JourneyMap
         RegionImageCache.getInstance().flushToDisk();
         RegionImageCache.getInstance().clear();
         UIManager.getInstance().reset();
+        WaypointStore.instance().reset();
 
         if (waypointProperties.managerEnabled.get())
         {
@@ -427,7 +428,6 @@ public class JourneyMap
     {
         try
         {
-
             if (mc == null)
             {
                 mc = FMLClientHandler.instance().getClient();
@@ -437,7 +437,10 @@ public class JourneyMap
             if(mc.thePlayer!=null && isDead && isMapping())
             {
                 stopMapping();
-                WaypointStore.instance().save(Waypoint.deathOf(mc.thePlayer));
+                if (waypointProperties.managerEnabled.get())
+                {
+                    WaypointStore.instance().save(Waypoint.deathOf(mc.thePlayer));
+                }
                 return;
             }
 

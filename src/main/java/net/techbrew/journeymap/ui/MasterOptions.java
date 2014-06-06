@@ -3,7 +3,6 @@ package net.techbrew.journeymap.ui;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.ui.map.MapOverlayActions;
 import net.techbrew.journeymap.waypoint.WaypointStore;
@@ -184,7 +183,7 @@ public class MasterOptions extends JmUI
                 }
                 else
                 {
-                    WaypointStore.instance().clear();
+                    WaypointStore.instance().reset();
                 }
                 break;
             }
@@ -208,6 +207,19 @@ public class MasterOptions extends JmUI
                 UIManager.getInstance().openMap();
                 break;
             }
+        }
+    }
+
+    @Override
+    protected void closeAndReturn()
+    {
+        if (returnClass == null)
+        {
+            UIManager.getInstance().openMap();
+        }
+        else
+        {
+            UIManager.getInstance().open(returnClass);
         }
     }
 }

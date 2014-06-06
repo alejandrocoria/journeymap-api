@@ -11,6 +11,16 @@ Requirements:
 - Minecraft @MCVERSION@
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
+Changes since 4.0.0b4:
+- Bugfix: Pressing ESC in Master Options wouldn't return to full-screen map
+- Bugfix: Biome colors weren't properly caching
+- Bugfix: Removed debug info from Waypoint Editor display
+- Bugfix: Custom dimension handling for Mystcraft was mangled in b3
+- Bugfix: Death waypoints were saved even if Waypoint Management disabled
+- Bugfix: Waypoint cache wasn't cleared when starting a new world
+- Change: Improved handling for waypoints saved with dimensions not currently available in game.
+- Change: Improved handling of errors produced by custom biomes. (Looking at you, Mystcraft).
+
 Changes since 4.0.0b3:
 - Change: Improved log messages when detection of Rei's/Voxelmap encounters a problem
 - Change: Surface mapping improvements. Floating glass and stained glass now supported.
@@ -22,7 +32,6 @@ Changes since 4.0.0b3:
 - Bugfix: Hitting ESC in Waypoint Editor wouldn't return to game (if opened from game)
 
 Changes since 4.0.0b2:
-
 - Bugfix: Web Map broken in 4.0.0.b1
 - Bugfix: VoxelMap waypoints wouldn't import
 - Bugfix: Block colors didn't reset after resource pack change
@@ -41,11 +50,8 @@ Changes since 4.0.0b2:
 - Change: Waypoint Editor now allows waypoint name to be blank
 
 Changes since 4.0.0b1:
-
 - Feature: In-game waypoint beacons added.
-
 - Change: Improved cave-mapping algorithm (via light detection) and surface appearance
-
 - Change: Mob/player radar operations are now an order of magnitude faster.  Should be a dramatic improvement for server worlds.
 
 - Change: Options dialogs overhauled

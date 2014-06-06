@@ -110,7 +110,7 @@ public class WaypointEditor extends JmUI
                     Integer.toString((int) mc.thePlayer.posX),
                     Integer.toString((int) mc.thePlayer.posZ),
                     Integer.toString((int) mc.thePlayer.posY));
-            currentLocation = Constants.getString("Waypoint.current_location", " dim:" + dimension + " " + pos);
+            currentLocation = Constants.getString("Waypoint.current_location", " " + pos);
 
             if (this.fieldList.isEmpty())
             {
@@ -162,7 +162,7 @@ public class WaypointEditor extends JmUI
                 Collection<Integer> wpDims = originalWaypoint.getDimensions();
                 int buttonId = ButtonEnum.values().length;
 
-                for (WorldProvider provider : WorldData.getDimensionProviders())
+                for (WorldProvider provider : WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions()))
                 {
                     int dim = provider.dimensionId;
                     String dimName = provider.getDimensionName();
