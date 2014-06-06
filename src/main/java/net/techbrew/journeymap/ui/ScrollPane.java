@@ -137,7 +137,6 @@ public class ScrollPane extends GuiSlot
                         Button button = (Button) item;
                         if (button.mousePressed(this.mc, mouseX, mouseY))
                         {
-                            //this.mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
                             this.actionPerformed(button);
                             return button;
                         }
@@ -172,7 +171,7 @@ public class ScrollPane extends GuiSlot
         firstVisibleIndex = -1;
         lastVisibleIndex = -1;
 
-        super.drawScreen(mX + getX(), mY + getY(), f);
+        super.drawScreen(mX - getX(), mY - getY(), f);
         GL11.glPopMatrix();
     }
 

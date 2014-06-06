@@ -170,6 +170,7 @@ public class WaypointEditor extends JmUI
                 }
 
                 dimScrollPane = new ScrollPane(mc, 0, 0, dimButtonList, dimButtonList.get(0).getHeight(), 4);
+                dimScrollPane.setShowSelectionBox(false);
             }
 
             if (this.buttonList.isEmpty())

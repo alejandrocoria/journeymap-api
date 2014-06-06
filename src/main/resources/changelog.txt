@@ -13,6 +13,7 @@ Requirements:
 
 Changes since 4.0.0b4:
 - Bugfix: Pressing ESC in Master Options wouldn't return to full-screen map
+- Bugfix: Waypoint Editor dimension list didn't respond to scrollwheel or drag
 - Bugfix: Biome colors weren't properly caching
 - Bugfix: Removed debug info from Waypoint Editor display
 - Bugfix: Custom dimension handling for Mystcraft was mangled in b3
