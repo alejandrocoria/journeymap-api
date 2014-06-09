@@ -185,7 +185,7 @@ public class TextField extends GuiTextField
 
     public int getX()
     {
-        return ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_X);
+        return (Integer) ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_X);
     }
 
     public void setX(int x)
@@ -195,7 +195,7 @@ public class TextField extends GuiTextField
 
     public int getY()
     {
-        return ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_Y);
+        return (Integer) ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_Y);
     }
 
     public void setY(int y)
@@ -205,7 +205,7 @@ public class TextField extends GuiTextField
 
     public int getWidth()
     {
-        return ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_WIDTH);
+        return (Integer) ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_WIDTH);
     }
 
     public void setWidth(int w)
@@ -215,7 +215,7 @@ public class TextField extends GuiTextField
 
     public int getHeight()
     {
-        return ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_HEIGHT);
+        return (Integer) ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_HEIGHT);
     }
 
     public int getCenterX()

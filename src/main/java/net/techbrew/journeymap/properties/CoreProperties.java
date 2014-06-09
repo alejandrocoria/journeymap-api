@@ -52,9 +52,9 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     }
 
     @Override
-    public int compareTo(CoreProperties o)
+    public int compareTo(CoreProperties other)
     {
-        return Integer.compare(this.hashCode(), o.hashCode());
+        return Integer.valueOf(this.hashCode()).compareTo(other.hashCode());
     }
 
     @Override

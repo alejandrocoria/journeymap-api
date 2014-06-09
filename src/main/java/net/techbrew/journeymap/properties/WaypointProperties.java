@@ -82,9 +82,9 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     }
 
     @Override
-    public int compareTo(WaypointProperties o)
+    public int compareTo(WaypointProperties other)
     {
-        return Integer.compare(this.hashCode(), o.hashCode());
+        return Integer.valueOf(this.hashCode()).compareTo(other.hashCode());
     }
 
     @Override

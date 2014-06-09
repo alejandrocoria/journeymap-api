@@ -48,6 +48,6 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
     @Override
     public int compareTo(MapProperties other)
     {
-        return Integer.compare(this.hashCode(), other.hashCode());
+        return Integer.valueOf(this.hashCode()).compareTo(other.hashCode());
     }
 }

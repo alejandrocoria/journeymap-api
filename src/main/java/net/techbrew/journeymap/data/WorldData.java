@@ -276,7 +276,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
             @Override
             public int compare(WorldProvider o1, WorldProvider o2)
             {
-                return Integer.compare(o1.dimensionId, o2.dimensionId);
+                return Integer.valueOf(o1.dimensionId).compareTo(o2.dimensionId);
             }
         });
 
