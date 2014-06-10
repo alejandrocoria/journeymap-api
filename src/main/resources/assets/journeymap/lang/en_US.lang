@@ -1,5 +1,5 @@
 # JourneyMap Resource Bundle - en_US
-# Updated for 3.3.0
+# Updated for 4.0.0
 
 ########################
 # Error messages: Note, translating these are optional, but they may help users diagnose the problem on their own.
@@ -247,7 +247,7 @@ Waypoint.font_size=Font: %1$s
 Waypoint.max_distance=Maximum Distance:
 Waypoint.enable=Enabled: %1$s
 Waypoint.enable_beacons=Waypoint Beacons: %1$s
-Waypoint.enable_manager=Create/Manage: %1$s
+Waypoint.enable_manager=Enabled: %1$s
 
 # %1$s = distance in meters. Okay to change parentheses and trailing 'm' (abbreviation for 'meters') Ex: [%1$sM]
 Waypoint.distance_meters=(%1$sm)

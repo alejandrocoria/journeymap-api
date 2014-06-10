@@ -34,7 +34,7 @@ public class FileService extends BaseService {
 	
 	private static final long serialVersionUID = 2L;
 
-	private String resourcePath;
+	protected final String resourcePath;
 	private boolean useZipEntry;
     private File zipFile;
 	
@@ -44,20 +44,24 @@ public class FileService extends BaseService {
 	public FileService() {
 		
 		URL resourceDir = JourneyMap.class.getResource("/assets/journeymap/web"); //$NON-NLS-1$
-				
+
+        String testPath = null;
+
 		if(resourceDir==null) {
 			JourneyMap.getLogger().severe("Can't determine path to webroot!");
 		} else {
 
             // Format reusable resourcePath
-            resourcePath = resourceDir.getPath();
-            if(resourcePath.endsWith("/")) { //$NON-NLS-1$
-                resourcePath = resourcePath.substring(0, resourcePath.length()-1);
+            testPath = resourceDir.getPath();
+            if(testPath.endsWith("/")) { //$NON-NLS-1$
+                testPath = testPath.substring(0, testPath.length()-1);
             }
 
             // Check whether operating out of a zip/jar
-            useZipEntry = (resourceDir.getProtocol().equals("file") || resourceDir.getProtocol().equals("jar")) && resourcePath.contains("!/"); //$NON-NLS-1$	//$NON-NLS-2$
+            useZipEntry = (resourceDir.getProtocol().equals("file") || resourceDir.getProtocol().equals("jar")) && testPath.contains("!/"); //$NON-NLS-1$	//$NON-NLS-2$
         }
+
+        resourcePath = testPath;
 	}
 	
 	@Override
@@ -74,69 +78,23 @@ public class FileService extends BaseService {
 		try {
 			
 			// Determine request path
-			String requestPath = null;
 			path = event.query().path(); //$NON-NLS-1$
 			
 			if(path.startsWith("/skin/")) {
 				serveSkin(path.split("/skin/")[1], event);
 				return;
 			}
-			
-			if("/".equals(path)) { //$NON-NLS-1$
-				// Default to index
-				requestPath = resourcePath + "/index.html"; //$NON-NLS-1$
-			} else {
-				requestPath = resourcePath + path;
-			}
 
-			if(useZipEntry) { 				
-				// Running out of a Zip archive or jar
-				String[] tokens = requestPath.split("file:")[1].split("!/"); //$NON-NLS-1$ //$NON-NLS-2$
-
-                // Lazy load the file
-                if(zipFile==null) {
-                    zipFile = new File( URI.create(tokens[0]).getPath() );
-                    if(!zipFile.canRead()) {
-                        throw new RuntimeException("Can't read Zip file: " + zipFile + " (originally: " + tokens[0] + ")");
-                    }
-                }
-                String innerName = tokens[1];
-				
-				BufferedOutputStream dest = null;
-		        FileInputStream fis = new FileInputStream(zipFile);
-		        ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fis));
-		        ZipEntry zipEntry;
-		        File destFile;
-		        boolean found = false;
-		        while((zipEntry = zis.getNextEntry()) != null) {
-		            if(innerName.equals(zipEntry.getName())) {
-		            	// Set inputstream
-		            	in = new ZipFile(zipFile).getInputStream(zipEntry);
-		            	ResponseHeader.on(event).content(zipEntry);
-						serveStream(in, event);
-						found = true;
-						break;
-		            }
-		        }
-		        zis.close();
-		        fis.close();
-
-		        // Didn't find it		    
-		        if(!found) {
-					JourneyMap.getLogger().fine("zipEntry not found: " + zipEntry + " in " + zipFile);
-					throwEventException(404, Constants.getMessageJMERR13(requestPath), event, true);
-		        }
-				
-			} else {
-				// Running out of a directory
-				File file = new File(requestPath); 				
-				if(file.exists()) {					
-					serveFile(file, event);
-				} else {
-					JourneyMap.getLogger().fine("Directory not found: " + requestPath);
-					throwEventException(404, Constants.getMessageJMERR13(requestPath), event, true);
-				}
-			}
+            InputStream fileStream = getStream(path, event);
+            if(fileStream==null)
+            {
+                JourneyMap.getLogger().fine("Path not found: " + path);
+                throwEventException(404, Constants.getMessageJMERR13(path), event, true);
+            }
+			else
+            {
+                serveStream(fileStream, event);
+            }
 			
 
 		} catch(Event eventEx) {
@@ -146,8 +104,97 @@ public class FileService extends BaseService {
 			throwEventException(500, Constants.getMessageJMERR12(path), event, true);
 		} 
 	}
-	
-	public void serveSkin(String username, Event event) throws Exception {
+
+    protected InputStream getStream(String path, Event event)
+    {
+        InputStream in = null;
+
+        try
+        {
+            // Determine request path
+            String requestPath = null;
+
+            if ("/".equals(path))
+            {
+                // Default to index
+                requestPath = resourcePath + "/index.html"; //$NON-NLS-1$
+            }
+            else
+            {
+                requestPath = resourcePath + path;
+            }
+
+            if (useZipEntry)
+            {
+                // Running out of a Zip archive or jar
+                String[] tokens = requestPath.split("file:")[1].split("!/"); //$NON-NLS-1$ //$NON-NLS-2$
+
+                // Lazy load the file
+                if (zipFile == null)
+                {
+                    zipFile = new File(URI.create(tokens[0]).getPath());
+                    if (!zipFile.canRead())
+                    {
+                        throw new RuntimeException("Can't read Zip file: " + zipFile + " (originally: " + tokens[0] + ")");
+                    }
+                }
+                String innerName = tokens[1];
+
+                FileInputStream fis = new FileInputStream(zipFile);
+                ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fis));
+                ZipEntry zipEntry;
+
+                boolean found = false;
+                while ((zipEntry = zis.getNextEntry()) != null)
+                {
+                    if (innerName.equals(zipEntry.getName()))
+                    {
+                        // Set inputstream
+                        in = new ZipFile(zipFile).getInputStream(zipEntry);
+                        if (event != null)
+                        {
+                            ResponseHeader.on(event).content(zipEntry);
+                        }
+                        found = true;
+                        break;
+                    }
+                }
+
+                if(!found)
+                {
+                    zis.close();
+                    fis.close();
+                    // Didn't find it
+                    in = null;
+                }
+            }
+            else
+            {
+                // Running out of a directory
+                File file = new File(requestPath);
+                if (file.exists())
+                {
+                    if(event!=null)
+                    {
+                        ResponseHeader.on(event).content(file);
+                    }
+                    in = new FileInputStream(file);
+                }
+                else
+                {
+                    in = null;
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().severe(LogFormatter.toString(t));
+        }
+
+        return in;
+    }
+
+    public void serveSkin(String username, Event event) throws Exception {
 		
 		ResponseHeader.on(event).contentType(ContentType.png);
 		

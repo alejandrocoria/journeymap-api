@@ -14,7 +14,8 @@ import java.util.logging.LogRecord;
 
 public class LogFormatter extends Formatter
 {
-    private static final MessageFormat messageFormat = new MessageFormat("{0,time,HH:mm:ss} {1} [{2}] [{3}.{4}] {5}\n"); //$NON-NLS-1$
+    public static final String LINEBREAK = System.getProperty("line.separator");
+    private static final MessageFormat messageFormat = new MessageFormat("{0,time,HH:mm:ss} {1} [{2}] [{3}.{4}] {5}"+LINEBREAK); //$NON-NLS-1$
     private static final String MINECRAFT_THREADNAME = "Minecraft main thread";
 
     private static int OutOfMemoryWarnings = 0;

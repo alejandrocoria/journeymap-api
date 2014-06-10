@@ -79,7 +79,7 @@ public class StatTimer {
         StringBuffer sb = new StringBuffer();
         for(StatTimer timer : list){
             if(timer.counter.get()>0){
-                sb.append("\n\t").append(timer.getReportString());
+                sb.append(LogFormatter.LINEBREAK).append(timer.getReportString());
             }
         }
         return sb.toString();
@@ -104,8 +104,8 @@ public class StatTimer {
             if(maxed) return this;
 
             if(started !=null) {
-                logger.warning(name + " is already running.");
-                return this;
+                logger.warning(name + " is already running, so resetting first");
+                this.reset();
             }
 
             if(counter.get()==MAX_COUNT) {

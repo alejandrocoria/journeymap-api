@@ -1,13 +1,19 @@
 package net.techbrew.journeymap.log;
 
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.common.ForgeVersion;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
+import net.techbrew.journeymap.properties.PropertiesBase;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -101,20 +107,42 @@ public class JMLogger
      */
     public static String getPropertiesSummary()
     {
-        String message = "Environment: os.name=" + System.getProperty("os.name") + //$NON-NLS-1$ //$NON-NLS-2$
-                ", os.arch=" + System.getProperty("os.arch") +  //$NON-NLS-1$ //$NON-NLS-2$
-                ", user.country=" + System.getProperty("user.country") + //$NON-NLS-1$ //$NON-NLS-2$
-                ", user.language=" + System.getProperty("user.language") + //$NON-NLS-1$ //$NON-NLS-2$
-                ", java.version=" + System.getProperty("java.version") +
-                ", Game settings language: " + Minecraft.getMinecraft().gameSettings.language + " / Locale: " + Constants.getLocale();
+        LinkedHashMap<String,String> props = new LinkedHashMap<String,String>();
 
+        // Versions
+        props.put("Version", JourneyMap.MOD_NAME + ", built with Forge " + JourneyMap.MC_VERSION);
+        props.put("Forge", ForgeVersion.getVersion());
+
+        // Memory
         long totalMB = Runtime.getRuntime().totalMemory() / 1024 / 1024;
         long freeMB = Runtime.getRuntime().freeMemory() / 1024 / 1024;
-        message += String.format("\nMemory: %sMB total, %sMB free", totalMB, freeMB);
+        props.put("Memory", String.format("%sMB total, %sMB free", totalMB, freeMB));
 
+        // Environment
+        List<String> envProps = Arrays.asList("os.name, os.arch, java.version, user.country, user.language");
+        StringBuilder sb = new StringBuilder();
+        for(String env : envProps)
+        {
+            sb.append(env).append("=").append(System.getProperty(env)).append(", ");
+        }
+        sb.append("game language=").append(Minecraft.getMinecraft().gameSettings.language).append(", ");
+        sb.append("locale=").append(Constants.getLocale());
+        props.put("Environment", sb.toString());
+
+        // Put all props in same format
+        sb = new StringBuilder();
+        for(Map.Entry<String,String> prop : props.entrySet())
+        {
+            if(sb.length()>0)
+            {
+                sb.append(LogFormatter.LINEBREAK);
+            }
+            sb.append(prop.getKey()).append(": ").append(prop.getValue());
+        }
+
+        // Add config files
         JourneyMap jm = JourneyMap.getInstance();
-
-        message += String.format("\n%s\n%s\n%s\n%s\n%s",
+        List<? extends PropertiesBase> configs = Arrays.asList(
                 jm.coreProperties,
                 jm.fullMapProperties,
                 jm.miniMapProperties,
@@ -122,7 +150,12 @@ public class JMLogger
                 jm.webMapProperties
         );
 
-        return message;
+        for(PropertiesBase config : configs)
+        {
+            sb.append(LogFormatter.LINEBREAK).append(config);
+        }
+
+        return sb.toString();
     }
 
     /**

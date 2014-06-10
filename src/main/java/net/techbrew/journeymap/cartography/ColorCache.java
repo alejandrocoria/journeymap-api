@@ -292,25 +292,27 @@ public class ColorCache implements IResourceManagerReloadListener {
 
     public String getCacheDebugHtml() {
         StringBuilder sb = new StringBuilder();
-        sb.append('\n').append("<html><head><title>JourneyMap Cached Block Colors</title><style>");
-        sb.append('\n').append("h1{background-color:#ccc; width:100%;text-align:center}");
-        sb.append('\n').append("span{vertical-align:middle; margin:2px}");
-        sb.append('\n').append(".entry{width:300px;display:inline-block;}");
-        sb.append('\n').append(".rgb{display:inline-block;height:32px;width:32px}");
-        sb.append('\n').append("</style></head><body><div>");
+        sb.append(LogFormatter.LINEBREAK).append("<!-- color cache --><div>");
+        sb.append(LogFormatter.LINEBREAK).append("<b>Current Resource Packs: </b>").append(lastResourcePack);
+
+        sb.append(LogFormatter.LINEBREAK).append("<table><tr valign='top'><td width='50%'>");
         sb.append(debugCache(BlockUtils.getAlphaMap(), "Block Transparency"));
-        sb.append(debugCache(BlockUtils.getFlagsMap(), "Block Flags"));
-        sb.append(debugCache(baseColors, "Base Colors"));
+        sb.append(LogFormatter.LINEBREAK).append("</td><td>");
+        sb.append(LogFormatter.LINEBREAK).append(debugCache(BlockUtils.getFlagsMap(), "Block Flags"));
+        sb.append(LogFormatter.LINEBREAK).append("</td></tr></table>");
+
+        sb.append(LogFormatter.LINEBREAK).append(debugCache(baseColors, "Base Colors"));
 
         List<String> biomeNames = new ArrayList<String>(biomeColors.keySet());
         Collections.sort(biomeNames);
 
         for(String biome : biomeNames) {
             HashMap<BlockMD, Color> colorsForBiome = biomeColors.get(biome);
-            sb.append(debugCache(colorsForBiome, "Biome Colors: " + biome));
+            sb.append(LogFormatter.LINEBREAK).append(debugCache(colorsForBiome, "Biome Colors: " + biome));
         }
 
-        sb.append('\n').append("</div></body></html>");
+        sb.append(LogFormatter.LINEBREAK).append("</div><!-- /color cache -->");
+
         return sb.toString();
     }
 
@@ -326,7 +328,7 @@ public class ColorCache implements IResourceManagerReloadListener {
         });
 
         String biome = null;
-        StringBuilder sb = new StringBuilder().append('\n').append("<div><h1>").append(name).append("</h1>");
+        StringBuilder sb = new StringBuilder().append(LogFormatter.LINEBREAK).append("<h2>").append(name).append("</h2><div>");
         for(Object key : keyList) {
             Object value = cache.get(key);
             String info;
@@ -338,25 +340,34 @@ public class ColorCache implements IResourceManagerReloadListener {
                     String[] infoSplit = info.split("\\|");
                     if(!infoSplit[0].equals(biome)) {
                         biome = infoSplit[0];
-                        sb.append("<h2>").append(biome).append("</h2>");
+                        sb.append("<h3>").append(biome).append("</h3>");
                     }
                     info = infoSplit[1];
                 }
             }
 
-            if(value instanceof Color) {
+            if(value instanceof Color)
+            {
                 Color color = (Color) value;
                 String hex = String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
-                sb.append('\n').append("<span class='entry' title='").append(hex).append("'>");
+                sb.append(LogFormatter.LINEBREAK).append("<span class='entry' title='").append(hex).append("'>");
                 sb.append("<span class='rgb' style='background-color:").append(hex).append("'></span>");
                 sb.append(info).append("</span>");
+            }
+            else if(value instanceof Number)
+            {
+                if(Double.parseDouble(value.toString())!=1)
+                {
+                    sb.append(LogFormatter.LINEBREAK).append("<div class='other'><b>").append(info).append("</b>: ");
+                    sb.append(value).append("</div>");
+                }
             } else {
-                sb.append('\n').append("<div class='other'><b>").append(info).append("</b>: ");
+                sb.append(LogFormatter.LINEBREAK).append("<div class='other'><b>").append(info).append("</b>: ");
                 sb.append(value).append("</div>");
             }
 
         }
-        sb.append('\n').append("</div>");
+        sb.append(LogFormatter.LINEBREAK).append("</div><!-- /").append(name).append(" -->");
         return sb.toString();
     }
 

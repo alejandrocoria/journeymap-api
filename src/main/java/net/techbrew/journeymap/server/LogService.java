@@ -47,6 +47,7 @@ public class LogService extends FileService
         if (logFile.exists())
         {
             ResponseHeader.on(event).contentType(ContentType.txt);
+            ResponseHeader.on(event).inlineFilename("journeymap.log");
             serveFile(logFile, event);
         }
         else

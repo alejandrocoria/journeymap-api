@@ -93,7 +93,7 @@ label span {
 }
 
 #worldInfo {
-
+    padding:6px;
     display:inline-block;
 }
 
@@ -257,3 +257,7 @@ label span {
 
 /* Optional responsive image setFrom */
 img { max-width: none; }
+
+/* Debug page */
+.entry{width:300px;display:inline-block;}
+.rgb{display:inline-block;height:32px;width:32px}

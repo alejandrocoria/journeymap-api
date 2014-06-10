@@ -331,15 +331,17 @@ public class DataCache
         StringBuilder sb = new StringBuilder();
 
         sb.append("<pre>");
-        sb.append('\n').append("<b>All:       </b> ").append(toString(all.stats()));
-        sb.append('\n').append("<b>Animals:   </b> ").append(toString(animals.stats()));
-        sb.append('\n').append("<b>Messages:  </b> ").append(toString(messages.stats()));
-        sb.append('\n').append("<b>Mobs:      </b> ").append(toString(mobs.stats()));
-        sb.append('\n').append("<b>Player:    </b> ").append(toString(player.stats()));
-        sb.append('\n').append("<b>Players:   </b> ").append(toString(players.stats()));
-        sb.append('\n').append("<b>Villagers: </b> ").append(toString(villagers.stats()));
-        sb.append('\n').append("<b>Waypoints: </b> ").append(toString(waypoints.stats()));
-        sb.append('\n').append("<b>World:     </b> ").append(toString(world.stats()));
+//        sb.append(LogFormatter.LINEBREAK).append("<b>Block Metadata:</b> ").append(toString(BlockMD.getStats()));
+//        sb.append(LogFormatter.LINEBREAK).append("<hr>");
+        sb.append(LogFormatter.LINEBREAK).append("<b>All (Web only):</b> ").append(toString(all.stats()));
+        sb.append(LogFormatter.LINEBREAK).append("<b>       Animals:</b> ").append(toString(animals.stats()));
+        sb.append(LogFormatter.LINEBREAK).append("<b>      Messages:</b> ").append(toString(messages.stats()));
+        sb.append(LogFormatter.LINEBREAK).append("<b>          Mobs:</b> ").append(toString(mobs.stats()));
+        sb.append(LogFormatter.LINEBREAK).append("<b>        Player:</b> ").append(toString(player.stats()));
+        sb.append(LogFormatter.LINEBREAK).append("<b>       Players:</b> ").append(toString(players.stats()));
+        sb.append(LogFormatter.LINEBREAK).append("<b>     Villagers:</b> ").append(toString(villagers.stats()));
+        sb.append(LogFormatter.LINEBREAK).append("<b>     Waypoints:</b> ").append(toString(waypoints.stats()));
+        sb.append(LogFormatter.LINEBREAK).append("<b>         World:</b> ").append(toString(world.stats()));
         sb.append("</pre>");
 
         return sb.toString();
