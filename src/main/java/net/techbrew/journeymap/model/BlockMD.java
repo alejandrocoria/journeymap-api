@@ -2,6 +2,7 @@ package net.techbrew.journeymap.model;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.cache.CacheStats;
 import com.google.common.cache.LoadingCache;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
@@ -322,6 +323,11 @@ public class BlockMD implements Serializable {
 
     public static void clearCache() {
         cache.invalidateAll();
+    }
+
+    public static CacheStats getStats()
+    {
+        return cache.stats();
     }
 
 }
