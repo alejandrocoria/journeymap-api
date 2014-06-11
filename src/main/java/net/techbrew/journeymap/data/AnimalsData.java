@@ -22,7 +22,7 @@ public class AnimalsData extends CacheLoader<Class, Map<String,EntityDTO>>
     @Override
     public Map<String, EntityDTO> load(Class aClass) throws Exception
     {
-        if (!FeatureManager.isAllowed(Feature.RadarAnimals))
+        if (!FeatureManager.instance().isAllowed(Feature.RadarAnimals))
         {
             return new HashMap<String,EntityDTO>();
         }

@@ -11,6 +11,9 @@ Requirements:
 - Minecraft @MCVERSION@
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
+Changes since 4.0.0b5:
+- Change: Groundwork for server-controlled FeatureSets, server-provided World Hash
+
 Changes since 4.0.0b4:
 - Bugfix: Pressing ESC in Master Options wouldn't return to full-screen map
 - Bugfix: Waypoint Editor dimension list didn't respond to scrollwheel or drag in latest Forge 1112 release

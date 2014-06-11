@@ -66,7 +66,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         hardcore = worldInfo.isHardcoreModeEnabled();
         singlePlayer = !multiplayer;
         time = mc.theWorld.getWorldTime() % 24000L;
-        features = FeatureManager.getAllowedFeatures();
+        features = FeatureManager.instance().getAllowedFeatures();
 
         mod_name = JourneyMap.MOD_NAME;
         jm_version = JourneyMap.JM_VERSION;

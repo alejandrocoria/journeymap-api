@@ -10,6 +10,7 @@ import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.nbt.ChunkLoader;
+import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.model.ChunkMD;
 
 import java.util.Comparator;
@@ -21,12 +22,11 @@ import java.util.logging.Logger;
 
 public class MapPlayerTask extends BaseMapTask
 {
-
     private static final Logger logger = JourneyMap.getLogger();
     private static TreeSet<ChunkCoordIntPair> queuedChunks = new TreeSet<ChunkCoordIntPair>(getDistanceComparator());
     private static ChunkMD.Set lastChunkStubs = new ChunkMD.Set(512);
     private static ChunkCoordinates lastPlayerPos;
-    private static Boolean lastUnderground;
+    private static boolean forceRefresh;
 
     public static boolean queueChunk(ChunkCoordIntPair chunkCoords)
     {
@@ -75,40 +75,18 @@ public class MapPlayerTask extends BaseMapTask
 
     public static BaseMapTask create(EntityPlayer player)
     {
-
         int missing = 0;
         int offset = JourneyMap.getInstance().coreProperties.chunkOffset.get();
 
         final ChunkCoordinates playerPos = new ChunkCoordinates(player.chunkCoordX, player.chunkCoordY, player.chunkCoordZ);
-        final boolean underground = DataCache.getPlayer().underground && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.showCaves.get();
+        final boolean underground = DataCache.getPlayer().underground && FeatureManager.instance().isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.showCaves.get();
         final int dimension = DataCache.getPlayer().dimension;
 
-        if (lastUnderground == null)
+        if (lastPlayerPos!=null && lastPlayerPos.equals(playerPos))
         {
-            lastUnderground = underground;
+            offset = Math.max(2, offset/2);
         }
-        if (lastPlayerPos == null)
-        {
-            lastPlayerPos = playerPos;
-        }
-
-//		boolean skipUnchanged = (lastUnderground==underground);
-//		if(skipUnchanged && underground) {
-//			skipUnchanged = (playerPos.posY==lastPlayerPos.posY);
-//		}
-//
-//        skipUnchanged = false;
-
-        if (lastPlayerPos.equals(playerPos))
-        {
-            if (offset >= 2)
-            {
-                offset = offset / 2;
-            }
-        }
-
         lastPlayerPos = playerPos;
-        lastUnderground = underground;
 
         final int side = offset + offset + 1;
         final ChunkMD.Set chunks = new ChunkMD.Set(side*3); // *3 to avoid map growth
@@ -126,7 +104,10 @@ public class MapPlayerTask extends BaseMapTask
             for (int z = min.chunkZPos; z <= max.chunkZPos; z++)
             {
                 coord = new ChunkCoordIntPair(x, z);
-                chunkMd = lastChunkStubs.get(coord);
+                synchronized (lastChunkStubs)
+                {
+                    chunkMd = lastChunkStubs.get(coord);
+                }
                 if (chunkMd == null)
                 {
                     chunkMd = ChunkLoader.getChunkStubFromMemory(x, z, world);
@@ -170,7 +151,10 @@ public class MapPlayerTask extends BaseMapTask
             {
                 chunkMd.render = true;
                 chunks.add(chunkMd);
-                lastChunkStubs.put(coord, chunkMd);
+                synchronized (lastChunkStubs)
+                {
+                    lastChunkStubs.put(coord, chunkMd);
+                }
                 queued++;
             }
             else
@@ -218,21 +202,13 @@ public class MapPlayerTask extends BaseMapTask
                     }
                     else // if (skipUnchanged)
                     {
-//                        if (newChunk.coord.chunkXPos != lastPlayerPos.posX || newChunk.coord.chunkZPos != lastPlayerPos.posZ)
-//                        {
-//                            if (newChunk.stub.equalTo(oldChunk.stub))
-//                            {
-//                                newChunk.render = false;
-//                                skipped++;
-//                            }
-//                        }
-                    }
-
-                    if (newChunk.render)
-                    {
-                        if (logger.isLoggable(Level.FINE))
+                        if (newChunk.coord.chunkXPos != lastPlayerPos.posX || newChunk.coord.chunkZPos != lastPlayerPos.posZ)
                         {
-                            logger.fine("Mapping chunk: " + newChunk);
+                            if (newChunk.stub.equalTo(oldChunk.stub))
+                            {
+                                newChunk.render = false;
+                                skipped++;
+                            }
                         }
                     }
                 }
@@ -254,14 +230,36 @@ public class MapPlayerTask extends BaseMapTask
 
     public static void clearCache()
     {
-        lastChunkStubs.clear();
+        synchronized (lastChunkStubs)
+        {
+            lastChunkStubs.clear();
+        }
+        synchronized (queuedChunks)
+        {
+            queuedChunks.clear();
+        }
         lastPlayerPos = null;
-        lastUnderground = null;
+    }
+
+    public static boolean refresh()
+    {
+        if(forceRefresh)
+        {
+            return false;
+        }
+        forceRefresh = true;
+        clearCache();
+        return true;
     }
 
     @Override
     public void taskComplete()
     {
+        if(forceRefresh)
+        {
+            forceRefresh = false;
+            ChatLog.announceI18N("MapOverlay.force_refresh_result", chunkMdSet.size());
+        }
         lastChunkStubs.putAll(chunkMdSet);
     }
 

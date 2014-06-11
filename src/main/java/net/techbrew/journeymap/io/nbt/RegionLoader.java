@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.Utils;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.model.ChunkCoord;
@@ -68,7 +67,7 @@ public class RegionLoader {
 	    	return null;
 	    }	        
 	    
-	    final File jmImageWorldDir = FileHandler.getJMWorldDir(mc, Utils.getWorldHash(mc));
+	    final File jmImageWorldDir = FileHandler.getJMWorldDir(mc);
 		final RegionImageHandler rfh = RegionImageHandler.getInstance();
 	    final Stack<RegionCoord> stack = new Stack<RegionCoord>();
 	    	   

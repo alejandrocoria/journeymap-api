@@ -1,48 +1,46 @@
 package net.techbrew.journeymap.feature;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.server.integrated.IntegratedServer;
+import net.techbrew.journeymap.Constants;
 
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-;
-
-public enum Feature {
-
-	/** Default feature is simply a place-holder. **/
-	NoOp(false,false),
-	
-	/** Universal features **/
+/**
+ * Do not re-order the enum values, since the order is implicit in packet data.
+ * Changing the order would break backward compat with the server plugin.
+ */
+public enum Feature
+{
+	/** Universal features (true,true) **/
 	// None
 	
-	/** Singleplayer-only features **/
+	/** Singleplayer-only features (true,false) **/
 	// None
 	
-	/** Multiplayer-only features **/
-	RadarPlayers(false,true),
-	RadarAnimals(false,true),
-	RadarMobs(false,true),
-	RadarVillagers(false,true),
-	MapCaves(false,true);
-	
+	/** Multiplayer-only features (false,true) **/
+    MapCaves("Feature.name_map_caves",false,true),
+    RadarAnimals("Feature.name_radar_animals",false,true),
+    RadarMobs("Feature.name_radar_mobs",false,true),
+    RadarPlayers("Feature.name_radar_players",false,true),
+	RadarVillagers("Feature.name_radar_villagers",false,true);
+
+	private final String key;
 	private final boolean restrictInSingleplayer;
 	private final boolean restrictInMultiplayer;
 	
-	private Feature(boolean singlePlayer, boolean multiPlayer) {
+	private Feature(String key, boolean singlePlayer, boolean multiPlayer) {
+        this.key = key;
 		restrictInMultiplayer = multiPlayer;
 		restrictInSingleplayer = singlePlayer;
 	}
 	
-	public boolean isCurrentlyRestricted() {
+	public boolean isCurrentlyRestricted(Minecraft mc) {
 		if(restrictInMultiplayer && restrictInSingleplayer) {
 			return true;
-		} else {		
-			Minecraft mc = Minecraft.getMinecraft();
-
-            IntegratedServer server = mc.getIntegratedServer();
-            boolean isSinglePlayer = server!=null && !server.getPublic();
+		} else {
+            boolean isSinglePlayer = mc.isSingleplayer() && !mc.getIntegratedServer().getPublic();
 
 			if(restrictInSingleplayer && isSinglePlayer) {
 				return true;
@@ -70,4 +68,9 @@ public enum Feature {
 		}
 		return Collections.unmodifiableSet(subset);
 	}
+
+    public String getLocalizedName()
+    {
+        return Constants.getString(this.key);
+    }
 }

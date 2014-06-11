@@ -14,11 +14,12 @@ import java.util.Set;
 public class FairPlay implements FeatureSet {
 
 	private final Set<Feature> features;
-	private final String name;
+	private final static String name = "FairPlay";
+    private final String localizedName;
 
 	public FairPlay() {
 		features = Feature.getSubset(true, false);
-		name = Constants.getString("Feature.fair_play");
+        localizedName = Constants.getString("Feature.fair_play");
 	}
 	
 	@Override
@@ -31,9 +32,8 @@ public class FairPlay implements FeatureSet {
 		return name;
 	}
 
-	@Override
-	public boolean isUnlimited() {
-		return false;
-	}
-
+    @Override
+    public String getLocalizedName() {
+        return localizedName;
+    }
 }

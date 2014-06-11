@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.Utils;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.log.LogFormatter;
 import org.lwjgl.Sys;
@@ -104,23 +103,9 @@ public class FileHandler
         return new File(Minecraft.getMinecraft().mcDataDir, Constants.JOURNEYMAP_DIR);
     }
 
-
     public static File getJMWorldDir(Minecraft minecraft)
     {
-        if (!minecraft.isSingleplayer())
-        {
-            return getJMWorldDir(minecraft, Utils.getWorldHash(minecraft));
-        }
-        else
-        {
-            return getJMWorldDir(minecraft, -1L);
-        }
-
-    }
-
-    public static File getJMWorldDir(Minecraft minecraft, long hash)
-    {
-
+        long hash = JourneyMap.getInstance().getCurrentWorldHash();
         File mcDir = Minecraft.getMinecraft().mcDataDir;
 
         if (lastJMWorldDir == null)

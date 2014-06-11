@@ -4,8 +4,6 @@ import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
@@ -50,7 +48,6 @@ import java.util.logging.Logger;
  *
  * @author Mark Woodman
  */
-@SideOnly(Side.CLIENT)
 @Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = JourneyMap.JM_VERSION)
 public class JourneyMap
 {
@@ -81,9 +78,7 @@ public class JourneyMap
 
     private boolean threadLogging = false;
 
-    // Time stamp of next chunk update
-    public long nextPlayerUpdate = 0;
-    public long nextChunkUpdate = 0;
+    private long currentWorldHash;
 
     public ModInfo modInfo;
 
@@ -119,7 +114,7 @@ public class JourneyMap
         String ed = null;
         try
         {
-            ed = JM_VERSION + " " + FeatureManager.getFeatureSetName();
+            ed = JM_VERSION + " " + FeatureManager.instance().getFeatureSetName();
         }
         catch (Throwable t)
         {
@@ -127,11 +122,6 @@ public class JourneyMap
             t.printStackTrace(System.err);
         }
         return ed;
-    }
-
-    public Boolean isInitialized()
-    {
-        return initialized;
     }
 
     public Boolean isMapping()
@@ -142,6 +132,30 @@ public class JourneyMap
     public Boolean isThreadLogging()
     {
         return threadLogging;
+    }
+
+    public void setCurrentWorldHash(long hash)
+    {
+        if(currentWorldHash!=hash)
+        {
+            JourneyMap.getLogger().info(String.format("World hash updating from %s to %s",currentWorldHash,hash));
+
+            if(isMapping())
+            {
+                stopMapping();
+                currentWorldHash = hash;
+                startMapping();
+            }
+            else
+            {
+                currentWorldHash = hash;
+            }
+        }
+    }
+
+    public long getCurrentWorldHash()
+    {
+        return currentWorldHash;
     }
 
     @Mod.EventHandler
@@ -336,12 +350,22 @@ public class JourneyMap
      */
     public void startMapping()
     {
+        if(isMapping()) return;
+
         synchronized (this)
         {
 
             if (mc.theWorld == null)
             {
                 return;
+            }
+            else
+            {
+                long seed = mc.theWorld.getSeed();
+                if(currentWorldHash==0 && seed!=0)
+                {
+                    setCurrentWorldHash(seed);
+                }
             }
 
             modInfo.reportAppView();
@@ -360,7 +384,7 @@ public class JourneyMap
             taskController = new TaskController();
             taskController.enableTasks(mc);
 
-            logger.info("Mapping started in " + WorldData.getWorldName(mc) + " dimension " + mc.theWorld.provider.dimensionId + "."); //$NON-NLS-1$
+            logger.info(String.format("Mapping started in %s %s", WorldData.getWorldName(mc), mc.theWorld.provider.getDimensionName())); //$NON-NLS-1$
         }
     }
 
@@ -373,15 +397,14 @@ public class JourneyMap
 
         synchronized (this)
         {
-
             if (taskExecutor != null || taskController != null)
             {
-                String dim = ".";
+                String dim = "";
                 if (minecraft.theWorld != null && minecraft.theWorld.provider != null)
                 {
-                    dim = " dimension " + minecraft.theWorld.provider.dimensionId + "."; //$NON-NLS-1$ //$NON-NLS-2$
+                    dim = minecraft.theWorld.provider.getDimensionName(); //$NON-NLS-1$ //$NON-NLS-2$
                 }
-                logger.info("Mapping halting in " + WorldData.getWorldName(minecraft) + dim); //$NON-NLS-1$
+                logger.info(String.format("Mapping stopped in %s %s", WorldData.getWorldName(minecraft), dim)); //$NON-NLS-1$
             }
 
             if (taskExecutor != null && !taskExecutor.isShutdown())
@@ -396,6 +419,8 @@ public class JourneyMap
                 taskController.clear();
                 taskController = null;
             }
+
+            currentWorldHash = 0;
         }
     }
 

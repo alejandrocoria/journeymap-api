@@ -61,29 +61,29 @@ public class GeneralDisplayOptions extends JmUI
         rowMobs = new ButtonList(Constants.getString("MapOverlay.show_monsters", ""));
         rowMobs.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showMobs));
         rowMobs.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showMobs));
-        rowMobs.setEnabled(FeatureManager.isAllowed(Feature.RadarMobs));
+        rowMobs.setEnabled(FeatureManager.instance().isAllowed(Feature.RadarMobs));
         leftRows.add(rowMobs);
 
         rowAnimals = new ButtonList(Constants.getString("MapOverlay.show_animals", ""));
         rowAnimals.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showAnimals));
         rowAnimals.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showAnimals));
-        rowAnimals.setEnabled(FeatureManager.isAllowed(Feature.RadarAnimals));
+        rowAnimals.setEnabled(FeatureManager.instance().isAllowed(Feature.RadarAnimals));
         leftRows.add(rowAnimals);
 
         rowVillagers = new ButtonList(Constants.getString("MapOverlay.show_villagers", ""));
         rowVillagers.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showVillagers));
         rowVillagers.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showVillagers));
-        rowVillagers.setEnabled(FeatureManager.isAllowed(Feature.RadarVillagers));
+        rowVillagers.setEnabled(FeatureManager.instance().isAllowed(Feature.RadarVillagers));
         leftRows.add(rowVillagers);
 
         rowPets = new ButtonList(Constants.getString("MapOverlay.show_pets", ""));
         rowPets.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showPets));
         rowPets.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showPets));
-        rowPets.setEnabled(FeatureManager.isAllowed(Feature.RadarAnimals));
+        rowPets.setEnabled(FeatureManager.instance().isAllowed(Feature.RadarAnimals));
         leftRows.add(rowPets);
 
         buttonCaves = BooleanPropertyButton.create(id++, fullMap, fullMap.showCaves);
-        buttonCaves.setEnabled(FeatureManager.isAllowed(Feature.RadarPlayers));
+        buttonCaves.setEnabled(FeatureManager.instance().isAllowed(Feature.RadarPlayers));
 
         rowCaves = new ButtonList(Constants.getString("MapOverlay.show_caves", ""));
         rowCaves.add(buttonCaves);
@@ -102,7 +102,7 @@ public class GeneralDisplayOptions extends JmUI
         rowPlayers = new ButtonList(Constants.getString("MapOverlay.show_players", ""));
         rowPlayers.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showPlayers));
         rowPlayers.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showPlayers));
-        rowPlayers.setEnabled(FeatureManager.isAllowed(Feature.RadarPlayers));
+        rowPlayers.setEnabled(FeatureManager.instance().isAllowed(Feature.RadarPlayers));
         rightRows.add(rowPlayers);
 
         rowWaypoints = new ButtonList(Constants.getString("MapOverlay.show_waypoints", ""));

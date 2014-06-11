@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.Utils;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.ChatLog;
@@ -237,8 +236,7 @@ public class LegacyMigrationTask implements IGenericTask
         @Override
         public boolean enableTask(Minecraft minecraft, Object params)
         {
-
-            jmWorldDir = FileHandler.getJMWorldDir(minecraft, Utils.getWorldHash(minecraft));
+            jmWorldDir = FileHandler.getJMWorldDir(minecraft);
             File[] files = jmWorldDir.listFiles(new PngFileFilter());
             if (files.length > 0)
             {

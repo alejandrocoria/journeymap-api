@@ -189,6 +189,10 @@ MapOverlay.general_display=General Display
 MapOverlay.general_display_button=General Display...
 MapOverlay.general_display_title=General Display Options
 
+# Added in 4.0.0
+MapOverlay.force_refresh=Forcing refresh...
+MapOverlay.force_refresh_result=Refreshed %1$s chunks on map
+
 # Added in 4.0.0:
 Waypoint.waypoints=Waypoints
 Waypoint.manage_title=Manage Waypoints
@@ -358,6 +362,21 @@ Feature.unlimited=Unlimited
 
 # Added in 3.1.0. "Fair play" means multiplayer features used for cheating are disabled
 Feature.fair_play=FairPlay
+
+# Added in 4.0.0
+Feature.name_map_caves=Cave Maps
+
+# Added in 4.0.0. "Radar" refers to living entities being shown on the map
+Feature.name_radar_animals=Animals Radar
+Feature.name_radar_mobs=Mobs Radar
+Feature.name_radar_players=Player Radar
+Feature.name_radar_villagers=Villagers Radar
+
+# Added in 4.0.0. %1$s = a comma-delimited list of feature names (above)
+Feature.server_enabled_message=The server has enabled: §a%1$s§r
+
+# Added in 4.0.0. %1$s will be a comma-delimited list of feature names (above)
+Feature.server_disabled_message=The server has disabled: §7%1$s§r
 
 ########################
 # Web UI messages

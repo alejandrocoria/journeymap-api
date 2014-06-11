@@ -62,7 +62,7 @@ public class MapOverlayState
         final int lastDimension = this.currentZoom;
         final File lastWorldDir = this.worldDir;
 
-        this.caveMappingAllowed = FeatureManager.isAllowed(Feature.MapCaves);
+        this.caveMappingAllowed = FeatureManager.instance().isAllowed(Feature.MapCaves);
         this.dimension = player.dimension;
         this.underground = DataCache.getPlayer().underground;
         this.vSlice = this.underground ? player.chunkCoordY : null;
@@ -158,21 +158,21 @@ public class MapOverlayState
             drawScale = drawScale*.5f;
         }
 
-        if (FeatureManager.isAllowed(Feature.RadarAnimals))
+        if (FeatureManager.instance().isAllowed(Feature.RadarAnimals))
         {
             if (mapProperties.showAnimals.get() || mapProperties.showPets.get())
             {
                 entities.addAll(DataCache.instance().getAnimals(false).values());
             }
         }
-        if (FeatureManager.isAllowed(Feature.RadarVillagers))
+        if (FeatureManager.instance().isAllowed(Feature.RadarVillagers))
         {
             if (mapProperties.showVillagers.get())
             {
                 entities.addAll(DataCache.instance().getVillagers(false).values());
             }
         }
-        if (FeatureManager.isAllowed(Feature.RadarMobs))
+        if (FeatureManager.instance().isAllowed(Feature.RadarMobs))
         {
             if (mapProperties.showMobs.get())
             {
@@ -181,7 +181,7 @@ public class MapOverlayState
         }
 
 
-        if (FeatureManager.isAllowed(Feature.RadarPlayers))
+        if (FeatureManager.instance().isAllowed(Feature.RadarPlayers))
         {
             if (mapProperties.showPlayers.get())
             {

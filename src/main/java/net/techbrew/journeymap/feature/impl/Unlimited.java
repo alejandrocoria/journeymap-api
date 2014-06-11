@@ -14,7 +14,8 @@ import java.util.EnumSet;
 public class Unlimited implements FeatureSet {
 	
 	private final EnumSet<Feature> features;
-	private final String name;
+    private static final String localizedName = "Unlimited";
+    private final String name;
 
 	public Unlimited() {
 		features = EnumSet.allOf(Feature.class);
@@ -30,10 +31,9 @@ public class Unlimited implements FeatureSet {
 	public String getName() {
 		return name;
 	}
-	
-	@Override
-	public boolean isUnlimited() {
-		return true;
-	}
 
+    @Override
+    public String getLocalizedName() {
+        return localizedName;
+    }
 }

@@ -18,7 +18,8 @@ public class EventHandlerManager {
 
     public enum BusType {
         FMLCommonHandlerBus(FMLCommonHandler.instance().bus()),
-        MinecraftForgeBus(MinecraftForge.EVENT_BUS);
+        MinecraftForgeBus(MinecraftForge.EVENT_BUS),
+        NetworkRegistry(null);
 
         protected final EventBus eventBus;
         private BusType(EventBus eventBus)
@@ -34,8 +35,15 @@ public class EventHandlerManager {
         EnumSet<BusType> getBus();
     }
 
+    public static interface SelfRegister
+    {
+        void register();
+        void unregister();
+    }
+
     public static void registerGeneralHandlers()
     {
+        register(new NetworkHandler());
         register(new StateTickHandler());
         register(new WorldEventHandler());
         register(new ChunkUpdateHandler());
@@ -72,9 +80,18 @@ public class EventHandlerManager {
             String name = handler.getClass().getName();
             try
             {
-                busType.eventBus.register(handler);
-                registered = true;
-                JourneyMap.getLogger().fine(name + " registered in " + busType);
+                if(handler instanceof SelfRegister)
+                {
+                    ((SelfRegister) handler).register();
+                    registered = true;
+                    JourneyMap.getLogger().fine(name + " registered in " + busType);
+                }
+                else if(busType.eventBus!=null)
+                {
+                    busType.eventBus.register(handler);
+                    registered = true;
+                    JourneyMap.getLogger().fine(name + " registered in " + busType);
+                }
             }
             catch(Throwable t)
             {
@@ -97,10 +114,18 @@ public class EventHandlerManager {
         EventHandler handler = handlers.remove(handlerClass);
         if(handler!=null)
         {
+            String name = handler.getClass().getName();
+
+            if(handler instanceof SelfRegister)
+            {
+                ((SelfRegister) handler).unregister();
+                JourneyMap.getLogger().fine(name + " unregistered.");
+                return;
+            }
+
             EnumSet<BusType> buses = handler.getBus();
             for(BusType busType : handler.getBus())
             {
-                String name = handler.getClass().getName();
                 try
                 {
                     boolean unregistered = false;

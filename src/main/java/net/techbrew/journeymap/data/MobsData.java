@@ -21,7 +21,7 @@ public class MobsData extends CacheLoader<Class, Map<String,EntityDTO>>
     @Override
     public Map<String, EntityDTO> load(Class aClass) throws Exception
     {
-        if (!FeatureManager.isAllowed(Feature.RadarMobs))
+        if (!FeatureManager.instance().isAllowed(Feature.RadarMobs))
         {
             return new HashMap<String,EntityDTO>();
         }

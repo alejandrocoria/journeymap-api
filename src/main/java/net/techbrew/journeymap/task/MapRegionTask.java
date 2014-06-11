@@ -106,7 +106,7 @@ public class MapRegionTask extends BaseMapTask
                 {
                     EntityDTO player =  DataCache.getPlayer();
                     final int dimension = player.dimension;
-                    final boolean underground = player.underground && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.showCaves.get();
+                    final boolean underground = player.underground && FeatureManager.instance().isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.showCaves.get();
                     MapType mapType;
                     Integer vSlice = null;
                     if (underground)
