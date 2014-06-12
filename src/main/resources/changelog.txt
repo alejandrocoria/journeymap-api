@@ -86,6 +86,7 @@ Changelog for JourneyMap @JMVERSION@:
 -- Biome colors weren't properly caching
 -- Minimap wouldn't show if Voxel/Rei's loaded, even if "enabled" manually set to true
 -- Crash when sound event from other mods didn't have an actual sound or name (NullPointerException)
+-- Keybinding customizations sometimes wouldn't save after restart
 
 Known issues:
 
