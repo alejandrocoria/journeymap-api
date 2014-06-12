@@ -45,11 +45,15 @@ public class AllData extends CacheLoader<Long, Map>
 
         if (JourneyMap.getInstance().webMapProperties.showWaypoints.get())
         {
+            int currentDimension = cache.getPlayer(false).dimension;
             Collection<Waypoint> waypoints = cache.getWaypoints(false);
             Map<String,Waypoint> wpMap = new HashMap<String, Waypoint>();
             for(Waypoint waypoint : waypoints)
             {
-                wpMap.put(waypoint.getId(), waypoint);
+                if(waypoint.getDimensions().contains(currentDimension))
+                {
+                    wpMap.put(waypoint.getId(), waypoint);
+                }
             }
             props.put(Key.waypoints, wpMap);
         }
