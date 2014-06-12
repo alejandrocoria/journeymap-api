@@ -205,18 +205,18 @@ MiniMap.font_large=Grande
 MiniMap.hotkeys=Hot Keys: %1$s
 MiniMap.hotkeys_title=Minimap Hot Keys
 MiniMap.hotkeys_toggle=Toggle Minimap
-MiniMap.hotkeys_position=Change Minimap Position
+key.journeymap.minimap_position=Change Minimap Position
 
 # Added in 3.3.x.  Used in Minecraft Controls menu and JourneyMap/Options/Minimap.../HotKeys... dialog.
 # {0} is either "Ctrl+" or "^" depending on Windows or MacOS
 MapOverlay.hotkeys_keybinding_category=JourneyMap (Use %1$s[key] for Minimap)
 MapOverlay.hotkeys_button=Hot Keys...
 MapOverlay.hotkeys_title=Hot Keys
-MapOverlay.hotkeys_toggle=Toggle Map
-MapOverlay.hotkeys_zoom_in=Zoom In
-MapOverlay.hotkeys_zoom_out=Zoom Out
-MapOverlay.hotkeys_day=Show Day Map
-MapOverlay.hotkeys_night=Show Night Map
+key.journeymap.hotkeys_toggle=Toggle Map
+key.journeymap.zoom_in=Zoom In
+key.journeymap.zoom_out=Zoom Out
+key.journeymap.day=Show Day Map
+key.journeymap.night=Show Night Map
 MapOverlay.hotkeys_north=Pan North (16 Blocks)
 MapOverlay.hotkeys_south=Pan South (16 Blocks)
 MapOverlay.hotkeys_east=Pan East (16 Blocks)

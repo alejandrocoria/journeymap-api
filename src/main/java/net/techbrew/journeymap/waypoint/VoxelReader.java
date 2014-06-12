@@ -36,9 +36,9 @@ public class VoxelReader
     {
         try
         {
-            com.thevoxelbox.voxelmap.VoxelMap voxelMap = com.thevoxelbox.voxelmap.VoxelMap.instance;
+            com.thevoxelbox.voxelmap.interfaces.AbstractVoxelMap voxelMap = com.thevoxelbox.voxelmap.VoxelMap.instance;
             java.util.List voxelWaypoints = new ArrayList(0);
-            voxelWaypoints.addAll(voxelMap.waypointManager.wayPts);
+            voxelWaypoints.addAll(voxelMap.getWaypointManager().getWaypoints());
             if (voxelWaypoints.isEmpty())
             {
                 return voxelWaypoints;

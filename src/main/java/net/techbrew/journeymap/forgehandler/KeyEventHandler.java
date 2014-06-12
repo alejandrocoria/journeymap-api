@@ -25,7 +25,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
 
     public KeyEventHandler()
     {
-        for (KeyBinding kb : Constants.KEYBINDINGS)
+        for (KeyBinding kb : Constants.initKeybindings())
         {
             ClientRegistry.registerKeyBinding(kb);
         }
