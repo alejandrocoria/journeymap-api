@@ -11,123 +11,63 @@ Requirements:
 - Minecraft @MCVERSION@
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
-Changes since 4.0.0b4:
-- Bugfix: Pressing ESC in Master Options wouldn't return to full-screen map
-- Bugfix: Waypoint Editor dimension list didn't respond to scrollwheel or drag in latest Forge 1112 release
-- Bugfix: Biome colors weren't properly caching
-- Bugfix: Removed debug info from Waypoint Editor display
-- Bugfix: Custom dimension handling for Mystcraft was mangled in b3
-- Bugfix: Death waypoints were saved even if Waypoint Management disabled
-- Bugfix: Waypoint cache wasn't cleared when starting a new world
-- Change: Improved handling for waypoints saved with dimensions not currently available in game.
-- Change: Improved handling of errors produced by custom biomes. (Looking at you, Mystcraft.)
+Changelog for JourneyMap @JMVERSION@:
 
-Changes since 4.0.0b3:
-- Change: Improved log messages when detection of Rei's/Voxelmap encounters a problem
-- Change: Surface mapping improvements. Floating glass and stained glass now supported.
-- Bugfix: Waypoints from other dimensions shouldn't display on full-screen map
-- Bugfix: Crash via Waypoint Manager's dimensions button when world had custom negative dimensions
-- Bugfix: Waypoints didn't work for custom dimensions in multiplayer
-- Bugfix: Mod announcement wasn't shown in chat
-- Bugfix: Current Location shown in Waypoint Editor wasn't always up-to-date.
-- Bugfix: Hitting ESC in Waypoint Editor wouldn't return to game (if opened from game)
-
-Changes since 4.0.0b2:
-- Bugfix: Web Map broken in 4.0.0.b1
-- Bugfix: VoxelMap waypoints wouldn't import
-- Bugfix: Block colors didn't reset after resource pack change
-- Bugfix: Death waypoints weren't created in Multiplayer games
-- Bugfix: Minimap wouldn't show if Voxel/Rei's loaded, even if "enabled" manually set to true
-- Bugfix: If Forge build was too old, "JourneyMap.fatal_error" would be shown instead of message text.
-- Bugfix: Waypoint Manager and Waypoint Editor didn't return to game if invoked from game
-- Change: Default chunk_offset changed from 5 to 8
-- Change: Centered buttons in Waypoint Help dialog
-- Change: Waypoint beacon labels more opaque
-- Change: Waypoint Manager's bottom buttons no longer stretch to fill entire screen width in large window sizes.
-- Change: 1.6.4 builds now using Forge 964 Gradle (instead of 965 MCP)
-- Change: Internal refactoring to replace data caches with Guava caches and use JSON-friendly DTOs
-- Change: Minor facelift to web map controls
-- Change: Webmap now has separate preferences for showAnimals, showMobs, showVillagers, showWaypoints, showPlayers
-- Change: Waypoint Editor now allows waypoint name to be blank
-
-Changes since 4.0.0b1:
-- Feature: In-game waypoint beacons added.
-- Change: Improved cave-mapping algorithm (via light detection) and surface appearance
-- Change: Mob/player radar operations are now an order of magnitude faster.  Should be a dramatic improvement for server worlds.
-
-- Change: Options dialogs overhauled
--- New Options dialog provides entry points into multiple option dialogs
--- New General Display Options dialog shows common full-map options and Minimap options side-by-side
+- New Feature: In-game Waypoint Markers
+-- Features include: Labels, waypoint icons, beams (beacons), and font size
 -- New Waypoint Options dialog provides customization of in-game waypoint display
--- All Option and Help dialogs now return to whichever UI screen opened them.
 
-- Change: MiniMap Options dialog updated
--- Now shows FPS in the upper-left (or lower-left) corner. (Helps you see the performance impact of various options).
--- Added option to Show/Hide "self" (blue arrow in center) on MiniMap
--- Added option to change icon sizes on MiniMap
--- Added button to open General Display dialog for more options
+- New feature: Waypoint Editor
+-- Multiple dimension support, color picker, error-checking (form validation)
+-- In-game: Use the "B" key to create a Waypoint at your location and open the Waypoint Editor
+-- Full-screen Map: Double-click anywhere on the map to open the Waypoint Editor
 
-- Change: Waypoint Editor updated
--- Waypoint label color will default to dark gray if the waypoint's color is too dark to be readable.
--- Name field text now uses the waypoint's color. (Helps you see what the label will look like).
--- Now shows your current location at the bottom of the screen.
--- Bugfix: Wouldn't open a waypoint with no dimensions selected.
--- Bugfix: Didn't check for changes to selected dimensions when determining whether Save button enabled.
+- New feature: Waypoint Manager
+-- Features include: Find on Map, Teleport To (if permitted), Sort by Name or Distance, Filter by Dimension, Toggle all On/Off, Edit, and Delete
+-- In-game: Use CTRL-"B" to directly open the Waypoint Manager
+-- Full-screen Map: Use the "Waypoints" button to open the Waypoint Manager
+-- Use the Help dialog to import waypoints from Rei's MiniMap or VoxelMap (Zan's MiniMap)
 
-- Change: Waypoint Manager updated
--- Uses waypoint colors in the Name column.
--- Names use strike-through font when disabled
--- Added "All:On/All:Off" column header button to bulk-toggle waypoint visibility
--- Added Options button to go to Waypoint Options (in-game display)
--- Bugfix: Waypoint Manager hid Teleport button when Game world allowed cheats (commands)
--- Bugfix: Waypoint "enable" state (on/off) wasn't saved to file.
+- New feature: Master Options
+-- In-game Master Options dialog provides central point to enable major functions and open specific Options dialogs.
 
-- Change: Full-screen map updated
--- Double-clicking a waypoint now selects it in the Waypoint Manager (instead of opening Waypoint Editor)
--- A single-click on the full-screen map will highlights the block as long as your mouse is still over it.
--- Added "Caves:On/Off" button to full-screen map (Unlimited Edition)
--- Bugfix: Map "Follow" didn't reset to true after changing worlds.
--- Bugfix: Pressing "J" didn't exit full-screen map for some players.
--- Bugfix: Clicking rapidly on the full-screen map would open Waypoint Editor, even though it wasn't a double-click on the same block.
+- New feature: General Display Options
+-- New dialog shows common full-map options and Minimap options side-by-side
 
-- Change: Full-screen map and Minimap
+- MiniMap Improvements
 -- Mob/player locations and headings now update in real-time (Unlimited Edition)
 -- Sneaking entities (usually players) will no longer appear on the radar (Unlimited Edition)
--- Bugfix: Other player icons too big
+-- Uses explicit coordinates designations. For example: "x:982, z:-520, y:70"
+-- MiniMap Options can now be customized differently than the Fullscreen Map options
+-- MiniMap Options dialog shows FPS so you can see performance impact of option changes
+-- New option to Show/Hide "self" (blue arrow in center) on MiniMap
+-- New option to Change icon sizes on MiniMap
+-- New Small Size added, old "Small" is now "Medium"
+-- New option to Force Unicode for display of FPS and Location labels
+-- Player skin icons now smaller
 
-- Change: Misc
+- Full-screen Map Improvements
+-- Block coordinates under your mouse are now displayed at the bottom of the screen. Elevation and biome are also shown if that chunk is loaded.
+-- Double-click anywhere on the map to open the Waypoint Editor
+-- Double-click an existing Waypoint to open it in the Waypoint Manager
+-- Mob/player locations and headings now update in real-time (Unlimited Edition)
+-- Sneaking entities (usually players) will no longer appear on the radar (Unlimited Edition)
+-- Uses explicit coordinates designations. For example: "x:982, z:-520, y:70"
+-- A single-click will highlight the block as long as your mouse is still over it.
+-- Added "Caves:On/Off" button to full-screen map (Unlimited Edition)
+
+- Misc. Improvements:
+-- Improved cave-mapping and surface mapping. Floating glass and stained glass now supported.
+-- Default chunk_offset changed from 5 to 8
+-- Minor facelift to web map controls
 -- The journeyMap.properties file has been migrated to multiple files in journeyMap/config/. Many properties are now configurable instead of hard-coded.
--- Bugfix: Crash when sound event didn't have sound or name (NullPointerException)
 -- Chat warning now displayed when OutOfMemoryError or LinkageError encountered
 -- Chat warning now displayed when logging level set below INFO
 -- JourneyMap logger now tied into FML logger for cleaner FML log output
--- JourneyMap logger added shutdown hook to clean up .lck files
-
-Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
-
-- New feature: Waypoint Editor
--- Features include: Multiple dimension support, color picker, error-checking (form validation)
--- In-game: Use the "B" key to create a Waypoint at your location and open the Waypoint Editor
--- In-game Full-screen Map: Double-click anywhere on the map to open the new Waypoint Editor and create/edit a Waypoint
-
-- New feature: Waypoint Manager
--- Features include: Find on Map, Teleport To (if permitted), Sort by Name or Distance, Filter by Dimension, Enable/Disable, Edit, and Delete
--- In-game: Use CTRL-"B" to directly open the Waypoint Manager
--- In-game Full-screen Map: Use the "Waypoints" button to open the Waypoint Manager
-
-- New feature: Map Coordinates under Mouse
--- In-game Full-screen Map: Block coordinates under your mouse are now displayed at the bottom of the screen. Elevation and biome are also shown if that chunk is loaded.
-
-- Notable Changes:
--- Improved cave-mapping algorithm
--- In-game map dialogs use the dimmed game world as background instead of the dirt texture.
--- Minimap Options has a "Tiny Square" size
--- Minimap Options has a "Force Unicode" option for display of FPS and Location labels
--- In-game map locations now use explicit coordinate designations.  For example: "x:982, z:-520, y:70"
 
 - Performance Improvements:
 -- Faster map updates via listeners for block placement, removal, and numerous events like TNT explosions
--- Mob/player radar is significantly more efficient
+-- Mob/player radar operations are now an order of magnitude faster
 -- In-game maps are more efficient about checking render steps are within the active viewport; should improve pan/zoom update speeds on slower machines
 -- Minimap render pass simplified
 
@@ -135,15 +75,22 @@ Changes in JourneyMap @JMVERSION@ for Minecraft @MCVERSION@:
 -- In-game full-screen map: Waypoint positioning was erratic when panning map
 -- In-game maps: Label positions and Mobs positions were jittery during map movement
 -- In-game maps: Surface map tiles would "show through" in un-mapped underground areas
+-- Full-screen Map "Follow" didn't reset to true after changing worlds.
+-- Pressing "J" didn't exit full-screen map for some players.
 -- Minimap disappeared after opening inventory in full-screen map
 -- Minimap didn't show off-screen waypoint locators along edges
 -- VoxelMap 1.7.2 waypoints were not recognized
 -- Double-high grass color was gray instead of determined by biome
+-- Improved handling of errors produced by custom biomes. (Looking at you, Mystcraft).
+-- Improved log messages when detection of Rei's/Voxelmap encounters a problem
+-- Biome colors weren't properly caching
+-- Minimap wouldn't show if Voxel/Rei's loaded, even if "enabled" manually set to true
+-- Crash when sound event from other mods didn't have an actual sound or name (NullPointerException)
 
 Known issues:
 
 - (AW2-6EE-Z3QB): Maps overwrite on multi-world servers because the world seed is no longer provided by the MC server
   PLEASE SUPPORT THIS FEATURE REQUEST TO MOJANG:  http://www.minecraftforum.net/topic/1759032-world-uid-for-multi-world-servers/
 
-- Languages which still need to be updated:  cs_CZ, de_DE, es_ES, fr_FR, it_IT, nl_NL, ru_RU, zh_CH
+- Languages which need to be updated:  cs_CZ, de_DE, es_ES, fr_FR, it_IT, nl_NL, ru_RU, zh_CH
   Can you help with translations?  See http://journeymap.techbrew.net/helpdesk/knowledgebase.php?article=12
