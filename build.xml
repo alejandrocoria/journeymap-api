@@ -4,7 +4,7 @@
     <!-- Update when new version is going to be released -->
     <property name="jmversion" value="4.0.0" />
     <property name="mcversion" value="1.7.2" />
-    <property name="forgeversion" value="1.7.2-10.12.1.1060" />
+    <property name="forgeversion" value="1.7.2-10.12.1.1118" />
 	<property name="unlimited" value="Unlimited" />
 	<property name="fairplay" value="FairPlay" />
 

@@ -1,20 +1,14 @@
 package net.techbrew.journeymap.forgehandler;
 
-import cpw.mods.fml.common.network.IConnectionHandler;
-import cpw.mods.fml.common.network.IPacketHandler;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.Player;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.NetLoginHandler;
-import net.minecraft.network.packet.NetHandler;
-import net.minecraft.network.packet.Packet1Login;
-import net.minecraft.network.packet.Packet250CustomPayload;
-import net.minecraft.server.MinecraftServer;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.common.PacketData;
+import net.techbrew.journeymap.common.ClientInfoData;
 import net.techbrew.journeymap.common.PacketDataManager;
+import net.techbrew.journeymap.common.ServerInfoData;
 import net.techbrew.journeymap.feature.FeatureManager;
 
 import java.util.EnumSet;
@@ -22,34 +16,55 @@ import java.util.EnumSet;
 /**
  * Handle server-sent packets
  */
-public class NetworkHandler implements EventHandlerManager.EventHandler, EventHandlerManager.SelfRegister, IPacketHandler, IConnectionHandler
+public class NetworkHandler implements EventHandlerManager.EventHandler
 {
-    /**
-     * Does own registration
-     */
-    public void register()
-    {
-        NetworkRegistry.instance().registerChannel(this, PacketData.CHANNEL_JOURNEYMAP);
-        NetworkRegistry.instance().registerConnectionHandler(this);
-        JourneyMap.getLogger().fine("Registered packet channel: " + PacketData.CHANNEL_JOURNEYMAP);
-    }
+
+    private final SimpleNetworkWrapper simpleNetworkWrapper;
 
     /**
-     * Does own unregistration
+     * Constructor.  Delegates message handling to PacketDataManager classes.
      */
-    public void unregister()
+    public NetworkHandler()
     {
+        simpleNetworkWrapper = new SimpleNetworkWrapper(PacketDataManager.CHANNEL_JOURNEYMAP);
+
+        try
+        {
+            simpleNetworkWrapper.registerMessage(PacketDataManager.ServerInfoHandler.class, ServerInfoData.class, 0, Side.CLIENT);
+        }
+        catch (Exception e)
+        {
+            JourneyMap.getLogger().severe("Could not register " + PacketDataManager.ServerInfoHandler.class);
+        }
+
+        try
+        {
+            simpleNetworkWrapper.registerMessage(PacketDataManager.ClientInfoHandler.class, ClientInfoData.class, 1, Side.SERVER);
+        }
+        catch (Exception e)
+        {
+            JourneyMap.getLogger().severe("Could not register " + PacketDataManager.ServerInfoHandler.class);
+        }
+
+        JourneyMap.getLogger().fine("Registered messages for channel: " + PacketDataManager.CHANNEL_JOURNEYMAP);
     }
 
     @SideOnly(Side.CLIENT)
-    @Override
-    public void onPacketData(INetworkManager manager, Packet250CustomPayload packet, Player playerEntity)
+    @SubscribeEvent
+    public void onClientConnectedToServer(FMLNetworkEvent.ClientConnectedToServerEvent event)
     {
-        if (packet.channel.equals(PacketData.CHANNEL_JOURNEYMAP))
-        {
-            PacketDataManager.process(manager, packet, playerEntity);
-        }
+        simpleNetworkWrapper.sendToServer(ClientInfoData.create());
+        JourneyMap.getLogger().info("Sent ClientInfoData to server");
     }
+
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    public void onClientDisconnectionFromServer(FMLNetworkEvent.ClientDisconnectionFromServerEvent event)
+    {
+        JourneyMap.getInstance().stopMapping();
+        FeatureManager.instance().resetOverrides();
+    }
+
 
     /**
      * Only needed for 1.6.4
@@ -57,48 +72,7 @@ public class NetworkHandler implements EventHandlerManager.EventHandler, EventHa
     @Override
     public EnumSet<EventHandlerManager.BusType> getBus()
     {
-        return EnumSet.of(EventHandlerManager.BusType.NetworkRegistry);
+        return EnumSet.of(EventHandlerManager.BusType.FMLCommonHandlerBus);
     }
 
-    @Override
-    public void playerLoggedIn(Player player, NetHandler netHandler, INetworkManager manager)
-    {
-        // Server side only
-    }
-
-    @Override
-    public String connectionReceived(NetLoginHandler netHandler, INetworkManager manager)
-    {
-        // Server side only
-        return null;
-    }
-
-    @Override
-    public void connectionOpened(NetHandler netClientHandler, String server, int port, INetworkManager manager)
-    {
-        // Client side
-    }
-
-    @Override
-    public void connectionOpened(NetHandler netClientHandler, MinecraftServer server, INetworkManager manager)
-    {
-        // Client side, Local server
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void connectionClosed(INetworkManager manager)
-    {
-        // All sides
-        JourneyMap.getInstance().stopMapping();
-        FeatureManager.instance().resetOverrides();
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void clientLoggedIn(NetHandler clientHandler, INetworkManager manager, Packet1Login login)
-    {
-        // Client side, Remote Server
-        PacketDataManager.sendClientInfoData();
-    }
 }
