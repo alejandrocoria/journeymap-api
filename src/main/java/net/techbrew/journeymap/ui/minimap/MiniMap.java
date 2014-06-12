@@ -3,15 +3,20 @@ package net.techbrew.journeymap.ui.minimap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.util.Vec3;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.EntityHelper;
 import net.techbrew.journeymap.model.MapOverlayState;
+import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.properties.MiniMapProperties;
+import net.techbrew.journeymap.properties.WaypointProperties;
+import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
+import net.techbrew.journeymap.render.draw.DrawWayPointStep;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
 import net.techbrew.journeymap.render.overlay.OverlayRadarRenderer;
 import net.techbrew.journeymap.render.overlay.OverlayWaypointRenderer;
@@ -24,6 +29,7 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -48,6 +54,7 @@ public class MiniMap
 
     private final MiniMapProperties miniMapProperties = JourneyMap.getInstance().miniMapProperties;
     private final FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
+    private final WaypointProperties waypointProperties = JourneyMap.getInstance().waypointProperties;
     private final MapOverlayState state = MapOverlay.state();
     private final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
     private final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
@@ -96,7 +103,6 @@ public class MiniMap
             {
                 state.refresh(mc, player, miniMapProperties);
             }
-
             boolean showCaves = fullMapProperties.showCaves.get();
 
             // Update the grid
@@ -118,6 +124,51 @@ public class MiniMap
             if (System.currentTimeMillis() - lastLabelRefresh > labelRefreshRate)
             {
                 updateLabels();
+            }
+
+            // Separate waypoint drawsteps
+            ArrayList<DrawStep> allDrawSteps = new ArrayList<DrawStep>(state.getDrawSteps());
+            ArrayList<DrawStep> offscreenWpDrawSteps = new ArrayList<DrawStep>();
+
+            if(miniMapProperties.showWaypoints.get())
+            {
+                int dimension = mc.thePlayer.dimension;
+                int maxDistance = waypointProperties.maxDistance.get();
+                boolean checkDist = maxDistance>0;
+
+                Vec3 playerVec = checkDist ? mc.thePlayer.getPosition(1) : null;
+                Vec3 waypointVec;
+                DrawWayPointStep drawWayPointStep;
+                Waypoint waypoint;
+
+                for (DrawStep drawStep : state.getDrawSteps())
+                {
+                    if (drawStep instanceof DrawWayPointStep)
+                    {
+                        drawWayPointStep = (DrawWayPointStep) drawStep;
+
+                        if(checkDist)
+                        {
+                            // Get waypoint coords for dimension
+                            waypoint = drawWayPointStep.waypoint;
+                            waypointVec = mc.theWorld.getWorldVec3Pool().getVecFromPool(waypoint.getX(dimension), waypoint.getY(dimension), waypoint.getZ(dimension));
+
+                            // Get view distance from waypoint
+                            final double actualDistance = playerVec.distanceTo(waypointVec);
+                            if(actualDistance>maxDistance)
+                            {
+                                allDrawSteps.remove(drawStep);
+                                continue;
+                            }
+                        }
+
+                        if (!drawWayPointStep.isOnScreen(0, 0, gridRenderer))
+                        {
+                            offscreenWpDrawSteps.add(drawStep);
+                            allDrawSteps.remove(drawStep);
+                        }
+                    }
+                }
             }
 
             // Use 1:1 resolution for minimap regardless of how Minecraft UI is scaled
@@ -171,7 +222,7 @@ public class MiniMap
 
             // Draw entities, etc
             boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, miniMapProperties.forceUnicode.get());
-            gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, getMapFontScale());
+            gridRenderer.draw(allDrawSteps, 0, 0, dv.drawScale, getMapFontScale());
             if (unicodeForced)
             {
                 DrawUtil.stopUnicode(mc.fontRenderer);
@@ -237,6 +288,13 @@ public class MiniMap
             // Draw border texture
             DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, 1f);
 
+            // Draw off-screen waypoints on top of border texture
+            if(!offscreenWpDrawSteps.isEmpty())
+            {
+                // Move center back to corner
+                GL11.glTranslated(dv.translateX, dv.translateY, 0);
+                gridRenderer.draw(offscreenWpDrawSteps, 0, 0, dv.drawScale, getMapFontScale());
+            }
             // Pop matrix changes
             GL11.glPopMatrix();
 
