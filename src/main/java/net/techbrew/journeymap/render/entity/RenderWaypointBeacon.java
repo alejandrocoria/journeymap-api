@@ -252,7 +252,7 @@ public class RenderWaypointBeacon
                 GL11.glDisable(GL11.GL_DEPTH_TEST);
                 GL11.glDepthMask(false);
 
-                scale = 0.5 * scale * (waypointProperties.textureSmall.get() ? 1 : 2);
+                scale = scale * (waypointProperties.textureSmall.get() ? 1 : 2);
 
                 GL11.glTranslated(shiftX, shiftY, shiftZ);
                 GL11.glRotatef(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);

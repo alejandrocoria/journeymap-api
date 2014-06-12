@@ -794,7 +794,7 @@ public class MapOverlay extends JmUI
         gridRenderer.updateTextures(state.getMapType(fullMapProperties.showCaves.get()), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0, fullMapProperties);
 
         // Build list of drawSteps
-        state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, 1f);
+        state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, 1f, false);
 
         // Update player pos
         state.playerLastPos = Constants.getString("MapOverlay.location_xzyeb",

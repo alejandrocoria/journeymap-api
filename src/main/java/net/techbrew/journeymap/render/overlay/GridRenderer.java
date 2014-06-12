@@ -247,7 +247,7 @@ public class GridRenderer {
      * @param xOffset
      * @param yOffset
      */
-    public void draw(final List<DrawStep> drawStepList, double xOffset, double yOffset, float drawScale, double fontScale) {
+    public void draw(final List<? extends DrawStep> drawStepList, double xOffset, double yOffset, float drawScale, double fontScale) {
         if(drawStepList==null || drawStepList.isEmpty()) return;
         draw(xOffset, yOffset, drawScale, fontScale, drawStepList.toArray(new DrawStep[drawStepList.size()]));
     }

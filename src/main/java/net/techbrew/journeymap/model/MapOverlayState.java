@@ -13,6 +13,7 @@ import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.render.draw.DrawStep;
+import net.techbrew.journeymap.render.draw.DrawWayPointStep;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
 import net.techbrew.journeymap.render.overlay.OverlayRadarRenderer;
 import net.techbrew.journeymap.render.overlay.OverlayWaypointRenderer;
@@ -45,6 +46,7 @@ public class MapOverlayState
     private int dimension = Integer.MIN_VALUE;
     private boolean caveMappingAllowed = false;
     private List<DrawStep> drawStepList = new ArrayList<DrawStep>();
+    private List<DrawWayPointStep> drawWaypointStepList = new ArrayList<DrawWayPointStep>();
     private String playerBiome = "";
 
     /**
@@ -148,9 +150,15 @@ public class MapOverlayState
         return drawStepList;
     }
 
-    public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, OverlayWaypointRenderer waypointRenderer, OverlayRadarRenderer radarRenderer, MapProperties mapProperties, float drawScale)
+    public List<DrawWayPointStep> getDrawWaypointSteps()
+    {
+        return drawWaypointStepList;
+    }
+
+    public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, OverlayWaypointRenderer waypointRenderer, OverlayRadarRenderer radarRenderer, MapProperties mapProperties, float drawScale, boolean checkWaypointDistance)
     {
         drawStepList.clear();
+        drawWaypointStepList.clear();
 
         List<EntityDTO> entities = new ArrayList<EntityDTO>(32);
         if(currentZoom==0)
@@ -200,7 +208,7 @@ public class MapOverlayState
         if (mapProperties.showWaypoints.get())
         {
             List<Waypoint> waypoints = new ArrayList<Waypoint>(DataCache.instance().getWaypoints(false));
-            drawStepList.addAll(waypointRenderer.prepareSteps(waypoints, gridRenderer));
+            drawWaypointStepList.addAll(waypointRenderer.prepareSteps(waypoints, gridRenderer, checkWaypointDistance));
         }
     }
 
@@ -246,7 +254,7 @@ public class MapOverlayState
     public boolean shouldRefresh(Minecraft mc)
     {
 
-        if (System.currentTimeMillis() > (lastRefresh + coreProperties.chunkPoll.get()))
+        if (System.currentTimeMillis() > (lastRefresh + 500 + coreProperties.chunkPoll.get()))
         {
             return true;
         }

@@ -17,7 +17,6 @@ public class DrawWayPointStep implements DrawStep {
     final Color color;
     final Color fontColor;
     final TextureImpl texture;
-    final TextureImpl offscreenTexture = TextureCache.instance().getWaypointOffscreen();
     final boolean isEdit;
 
     /**

@@ -3,18 +3,15 @@ package net.techbrew.journeymap.ui.minimap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.util.Vec3;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.EntityHelper;
 import net.techbrew.journeymap.model.MapOverlayState;
-import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.properties.WaypointProperties;
-import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.draw.DrawWayPointStep;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
@@ -63,13 +60,17 @@ public class MiniMap
 
     private EntityClientPlayerMP player;
     private StatTimer drawTimer;
+    private StatTimer refreshStateTimer;
     private DisplayVars dv;
-    private boolean visible = true;
 
     private long lastLabelRefresh = 0;
     private String fpsLabelText;
     private String locationLabelText;
     private String biomeLabelText;
+
+    // Separate waypoint drawsteps
+    private ArrayList<DrawWayPointStep> allWaypointSteps = new ArrayList<DrawWayPointStep>();
+    private ArrayList<DrawWayPointStep> offscreenWpDrawSteps = new ArrayList<DrawWayPointStep>();
 
     /**
      * Default constructor
@@ -94,27 +95,47 @@ public class MiniMap
         }
 
         final boolean doStateRefresh = state.shouldRefresh(mc);
-        drawTimer.start();
+
 
         try
         {
             // Update the state first
             if (doStateRefresh)
             {
+                refreshStateTimer.start();
                 state.refresh(mc, player, miniMapProperties);
             }
-            boolean showCaves = fullMapProperties.showCaves.get();
+            else
+            {
+                drawTimer.start();
+            }
 
             // Update the grid
+            boolean showCaves = fullMapProperties.showCaves.get();
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
             gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
             gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0, miniMapProperties);
             if (doStateRefresh)
             {
-                //boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, state.mapForceUnicode);
-                state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, miniMapProperties, dv.drawScale);
-                //if(unicodeForced) DrawUtil.stopUnicode(mc.fontRenderer);
+                boolean checkWaypointDistance = waypointProperties.maxDistance.get()>0;
+                state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, miniMapProperties, dv.drawScale, checkWaypointDistance);
                 state.updateLastRefresh();
+
+                allWaypointSteps.clear();
+                allWaypointSteps.addAll(state.getDrawWaypointSteps());
+
+                offscreenWpDrawSteps.clear();
+                if(miniMapProperties.showWaypoints.get())
+                {
+                    for (DrawWayPointStep drawWayPointStep : allWaypointSteps)
+                    {
+                        if (!drawWayPointStep.isOnScreen(0, 0, gridRenderer))
+                        {
+                            offscreenWpDrawSteps.add(drawWayPointStep);
+                        }
+                    }
+                    allWaypointSteps.removeAll(offscreenWpDrawSteps);
+                }
             }
 
             // Update display vars if needed
@@ -124,51 +145,6 @@ public class MiniMap
             if (System.currentTimeMillis() - lastLabelRefresh > labelRefreshRate)
             {
                 updateLabels();
-            }
-
-            // Separate waypoint drawsteps
-            ArrayList<DrawStep> allDrawSteps = new ArrayList<DrawStep>(state.getDrawSteps());
-            ArrayList<DrawStep> offscreenWpDrawSteps = new ArrayList<DrawStep>();
-
-            if(miniMapProperties.showWaypoints.get())
-            {
-                int dimension = mc.thePlayer.dimension;
-                int maxDistance = waypointProperties.maxDistance.get();
-                boolean checkDist = maxDistance>0;
-
-                Vec3 playerVec = checkDist ? mc.thePlayer.getPosition(1) : null;
-                Vec3 waypointVec;
-                DrawWayPointStep drawWayPointStep;
-                Waypoint waypoint;
-
-                for (DrawStep drawStep : state.getDrawSteps())
-                {
-                    if (drawStep instanceof DrawWayPointStep)
-                    {
-                        drawWayPointStep = (DrawWayPointStep) drawStep;
-
-                        if(checkDist)
-                        {
-                            // Get waypoint coords for dimension
-                            waypoint = drawWayPointStep.waypoint;
-                            waypointVec = mc.theWorld.getWorldVec3Pool().getVecFromPool(waypoint.getX(dimension), waypoint.getY(dimension), waypoint.getZ(dimension));
-
-                            // Get view distance from waypoint
-                            final double actualDistance = playerVec.distanceTo(waypointVec);
-                            if(actualDistance>maxDistance)
-                            {
-                                allDrawSteps.remove(drawStep);
-                                continue;
-                            }
-                        }
-
-                        if (!drawWayPointStep.isOnScreen(0, 0, gridRenderer))
-                        {
-                            offscreenWpDrawSteps.add(drawStep);
-                            allDrawSteps.remove(drawStep);
-                        }
-                    }
-                }
             }
 
             // Use 1:1 resolution for minimap regardless of how Minecraft UI is scaled
@@ -222,7 +198,11 @@ public class MiniMap
 
             // Draw entities, etc
             boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, miniMapProperties.forceUnicode.get());
-            gridRenderer.draw(allDrawSteps, 0, 0, dv.drawScale, getMapFontScale());
+            gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, getMapFontScale());
+            if(!allWaypointSteps.isEmpty())
+            {
+                gridRenderer.draw(allWaypointSteps, 0, 0, dv.drawScale, getMapFontScale());
+            }
             if (unicodeForced)
             {
                 DrawUtil.stopUnicode(mc.fontRenderer);
@@ -308,9 +288,15 @@ public class MiniMap
         }
         finally
         {
-            drawTimer.stop();
+            if (doStateRefresh)
+            {
+                refreshStateTimer.stop();
+            }
+            else
+            {
+                drawTimer.stop();
+            }
         }
-
     }
 
     public void reset()
@@ -394,6 +380,7 @@ public class MiniMap
         if (oldDv == null || oldDv.shape != this.dv.shape)
         {
             this.drawTimer = StatTimer.get("MiniMap.drawMap." + shape.name(), 200);
+            this.refreshStateTimer =  StatTimer.get("MiniMap.drawMap." + shape.name() + "+refreshState", 2);
         }
 
         // Update labels
