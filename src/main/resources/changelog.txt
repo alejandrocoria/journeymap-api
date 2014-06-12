@@ -37,6 +37,7 @@ Changelog for JourneyMap @JMVERSION@:
 - MiniMap Improvements
 -- Mob/player locations and headings now update in real-time (Unlimited Edition)
 -- Sneaking entities (usually players) will no longer appear on the radar (Unlimited Edition)
+-- Offscreen waypoints now show icons on top of MiniMap frame (instead of half-circles under the frame)
 -- Uses explicit coordinates designations. For example: "x:982, z:-520, y:70"
 -- MiniMap Options can now be customized differently than the Fullscreen Map options
 -- MiniMap Options dialog shows FPS so you can see performance impact of option changes

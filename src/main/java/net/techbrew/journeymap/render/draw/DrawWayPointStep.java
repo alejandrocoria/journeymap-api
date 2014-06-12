@@ -13,7 +13,7 @@ import java.awt.geom.Point2D;
  */
 public class DrawWayPointStep implements DrawStep {
 
-    final Waypoint waypoint;
+    public final Waypoint waypoint;
     final Color color;
     final Color fontColor;
     final TextureImpl texture;
@@ -52,15 +52,10 @@ public class DrawWayPointStep implements DrawStep {
             return;
         }
 
-        double x = waypoint.getX(gridRenderer.getDimension());
-        double z = waypoint.getZ(gridRenderer.getDimension());
-        double halfBlock = Math.pow(2,gridRenderer.getZoom())/2;
-
-        Point2D.Double pixel = gridRenderer.getBlockPixelInGrid(x, z);
-        pixel.setLocation(pixel.getX() + halfBlock + xOffset, pixel.getY() + halfBlock + yOffset);
+        Point2D.Double pixel = getPosition(xOffset, yOffset, gridRenderer);
+        double halfTexHeight = texture.height/2;
         if (gridRenderer.isOnScreen(pixel))
         {
-            double halfTexHeight = texture.height/2;
             DrawUtil.drawLabel(waypoint.getName(), pixel.getX(), pixel.getY()-halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 255, fontColor, 255, fontScale, false);
             if(isEdit)
             {
@@ -72,7 +67,25 @@ public class DrawWayPointStep implements DrawStep {
         else if(!isEdit)
         {
             gridRenderer.ensureOnScreen(pixel);
-            DrawUtil.drawColoredImage(offscreenTexture, 255, color, pixel.getX() - (offscreenTexture.width / 2), pixel.getY() - (offscreenTexture.height / 2));
+            //DrawUtil.drawColoredImage(offscreenTexture, 255, color, pixel.getX() - (offscreenTexture.width / 2), pixel.getY() - (offscreenTexture.height / 2));
+            DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - halfTexHeight);
         }
+    }
+
+    protected Point2D.Double getPosition(double xOffset, double yOffset, GridRenderer gridRenderer)
+    {
+        int dimension = gridRenderer.getDimension();
+        double x = waypoint.getX(dimension);
+        double z = waypoint.getZ(dimension);
+        double halfBlock = Math.pow(2,gridRenderer.getZoom())/2;
+
+        Point2D.Double pixel = gridRenderer.getBlockPixelInGrid(x, z);
+        pixel.setLocation(pixel.getX() + halfBlock + xOffset, pixel.getY() + halfBlock + yOffset);
+        return pixel;
+    }
+
+    public boolean isOnScreen(double xOffset, double yOffset, GridRenderer gridRenderer)
+    {
+        return gridRenderer.isOnScreen(getPosition(xOffset, yOffset, gridRenderer));
     }
 }
