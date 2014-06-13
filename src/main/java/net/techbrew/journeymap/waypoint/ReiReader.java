@@ -18,6 +18,7 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.net.SocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.regex.Matcher;
@@ -63,7 +64,8 @@ public class ReiReader
                         (int) (reiWp.blue * 255.0F) & 255,
                         reiWp.type == 1 ? Waypoint.Type.Death : Waypoint.Type.Normal,
                         Waypoint.Origin.ReiMinimap,
-                        dimension);
+                        dimension,
+                        Arrays.asList(dimension));
                 jmWp.setReadOnly(true);
                 converted.add(jmWp);
             }

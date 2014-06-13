@@ -130,15 +130,15 @@ public class WaypointEditor extends JmUI
                 int width3chars = getFontRenderer().getStringWidth("255") + 10;
                 int h = 20;
 
-                fieldX = new TextField(originalWaypoint.getX(dimension), fr, width9chars, h, true, true);
+                fieldX = new TextField(originalWaypoint.getX(), fr, width9chars, h, true, true);
                 fieldX.setClamp(-30000000, 30000000);
                 fieldList.add(fieldX);
 
-                fieldZ = new TextField(originalWaypoint.getZ(dimension), fr, width9chars, h, true, true);
+                fieldZ = new TextField(originalWaypoint.getZ(), fr, width9chars, h, true, true);
                 fieldZ.setClamp(-30000000, 30000000);
                 fieldList.add(fieldZ);
 
-                int y = originalWaypoint.getY(dimension);
+                int y = originalWaypoint.getY();
                 fieldY = new TextField(y < 0 ? "" : y, fr, width3chars, h, true, true);
                 fieldY.setClamp(0, mc.theWorld.getHeight() - 1);
                 fieldY.setMinLength(1);

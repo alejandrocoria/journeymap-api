@@ -73,9 +73,8 @@ public class DrawWayPointStep implements DrawStep {
 
     protected Point2D.Double getPosition(double xOffset, double yOffset, GridRenderer gridRenderer)
     {
-        int dimension = gridRenderer.getDimension();
-        double x = waypoint.getX(dimension);
-        double z = waypoint.getZ(dimension);
+        double x = waypoint.getX();
+        double z = waypoint.getZ();
         double halfBlock = Math.pow(2,gridRenderer.getZoom())/2;
 
         Point2D.Double pixel = gridRenderer.getBlockPixelInGrid(x, z);

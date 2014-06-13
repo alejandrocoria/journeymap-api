@@ -404,7 +404,7 @@ public class WaypointManager extends JmUI
         for (Waypoint waypoint : waypoints)
         {
             WaypointManagerItem item = new WaypointManagerItem(waypoint, fr, this);
-            item.getDistanceSqToEntity(mc.thePlayer);
+            item.getDistanceTo(mc.thePlayer);
             if (currentDim == null || item.waypoint.getDimensions().contains(currentDim))
             {
                 items.add(item);

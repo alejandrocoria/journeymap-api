@@ -37,10 +37,8 @@ public class OverlayWaypointRenderer
                 {
                     if(checkDistance)
                     {
-                        Vec3 waypointVec = mc.theWorld.getWorldVec3Pool().getVecFromPool(waypoint.getX(dimension), waypoint.getY(dimension), waypoint.getZ(dimension));
-
                         // Get view distance from waypoint
-                        final double actualDistance = playerVec.distanceTo(waypointVec);
+                        final double actualDistance = playerVec.distanceTo(waypoint.getPosition());
                         if(actualDistance>maxDistance)
                         {
                             continue;

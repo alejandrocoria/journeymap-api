@@ -332,7 +332,7 @@ public class MapOverlay extends JmUI
         buttonZoomIn.setPosition(8, 32);
         buttonZoomOut.below(buttonZoomIn, 8).setX(8);
 
-        buttonCaves.setEnabled(DataCache.getPlayer().underground && FeatureManager.isAllowed(Feature.MapCaves));
+        buttonCaves.setEnabled(!mc.theWorld.provider.hasNoSky && (DataCache.getPlayer().underground && FeatureManager.isAllowed(Feature.MapCaves)));
         final boolean underground = DataCache.getPlayer().underground && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.showCaves.get();
         buttonDayNight.setEnabled(!(underground));
 
@@ -750,8 +750,8 @@ public class MapOverlay extends JmUI
         {
             state.follow = false;
             state.requireRefresh();
-            int x = waypoint.getX(mc.thePlayer.dimension);
-            int z = waypoint.getZ(mc.thePlayer.dimension);
+            int x = waypoint.getX();
+            int z = waypoint.getZ();
 
             gridRenderer.center(x, z, state.currentZoom);
             refreshState();

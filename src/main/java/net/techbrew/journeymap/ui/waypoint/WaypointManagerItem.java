@@ -1,6 +1,5 @@
 package net.techbrew.journeymap.ui.waypoint;
 
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.entity.player.EntityPlayer;
@@ -262,15 +261,11 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
     /**
      * Returns the squared distance to the entity. Only calculated once.
      */
-    public int getDistanceSqToEntity(EntityPlayer player)
+    public int getDistanceTo(EntityPlayer player)
     {
-        int dimension = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider.dimensionId;
         if (distance == null)
         {
-            double d0 = this.waypoint.getX(dimension) - player.posX;
-            double d1 = this.waypoint.getY(dimension) - player.posY;
-            double d2 = this.waypoint.getZ(dimension) - player.posZ;
-            distance = (int) Math.round(Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2));
+            distance = (int) player.getPosition(1).distanceTo(waypoint.getPosition());
         }
         return distance;
     }
@@ -328,7 +323,7 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
 
     static class DistanceComparator extends Sort
     {
-        final EntityPlayer player;
+        EntityPlayer player;
 
         public DistanceComparator(EntityPlayer player, boolean ascending)
         {
@@ -339,13 +334,16 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
         @Override
         public int compare(WaypointManagerItem o1, WaypointManagerItem o2)
         {
+            double dist1 = o1.getDistanceTo(player);
+            double dist2 = o2.getDistanceTo(player);
+
             if (ascending)
             {
-                return Double.compare(o1.getDistanceSqToEntity(player), o2.getDistanceSqToEntity(player));
+                return Double.compare(dist1, dist2);
             }
             else
             {
-                return Double.compare(o2.getDistanceSqToEntity(player), o1.getDistanceSqToEntity(player));
+                return Double.compare(dist2, dist1);
             }
         }
     }

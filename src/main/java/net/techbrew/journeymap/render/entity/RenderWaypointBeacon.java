@@ -97,7 +97,8 @@ public class RenderWaypointBeacon
             Vec3 playerVec = renderManager.livingPlayer.getPosition(1);
 
             // Get waypoint coords for dimension
-            Vec3 waypointVec = mc.theWorld.getWorldVec3Pool().getVecFromPool(waypoint.getX(dimension), waypoint.getY(dimension), waypoint.getZ(dimension));
+            Vec3 waypointVec = waypoint.getPosition();
+            waypointVec.yCoord+=.118; // puts icon at eye level
 
             // Get view distance from waypoint
             final double actualDistance = playerVec.distanceTo(waypointVec);
@@ -117,22 +118,22 @@ public class RenderWaypointBeacon
                 viewDistance = maxRenderDistance;
             }
 
-            double shiftX = .5 + (waypointVec.xCoord - renderManager.viewerPosX);
-            double shiftY = .5 + (waypointVec.yCoord - renderManager.viewerPosY);
-            double shiftZ = .5 + (waypointVec.zCoord - renderManager.viewerPosZ);
+            double shiftX = (waypointVec.xCoord - renderManager.viewerPosX);
+            double shiftY = (waypointVec.yCoord - renderManager.viewerPosY);
+            double shiftZ = (waypointVec.zCoord - renderManager.viewerPosZ);
 
             boolean showStaticBeam = waypointProperties.showStaticBeam.get();
             boolean showRotatingBeam = waypointProperties.showRotatingBeam.get();
             if (showStaticBeam || showRotatingBeam)
             {
-                renderBeam(shiftX - .5, -renderManager.viewerPosY, shiftZ - .5, waypoint.getColor(), showStaticBeam, showRotatingBeam);
+                renderBeam(shiftX, -renderManager.viewerPosY, shiftZ, waypoint.getColor(), showStaticBeam, showRotatingBeam);
             }
 
             String label = waypoint.getName();
 
             // Check for auto-hidden labels
             boolean labelHidden = false;
-            if (waypointProperties.autoHideLabel.get())
+            if (viewDistance>.5 && waypointProperties.autoHideLabel.get())
             {
                 // 3D algorithm
 //                Vec3 playerLookVec = renderManager.livingPlayer.getLook(1.0F).normalize();
@@ -146,7 +147,7 @@ public class RenderWaypointBeacon
                 // 2D algorithm (ignore pitch)
                 int angle = 5;
 
-                double yaw = Math.atan2(renderManager.viewerPosZ-waypointVec.zCoord-.5, renderManager.viewerPosX-waypointVec.xCoord-.5) ;
+                double yaw = Math.atan2(renderManager.viewerPosZ-waypointVec.zCoord, renderManager.viewerPosX-waypointVec.xCoord) ;
                 double degrees = Math.toDegrees(yaw) + 90;
                 if(degrees<0) degrees = 360+degrees;
                 double playerYaw = renderManager.livingPlayer.getRotationYawHead()%360;
@@ -222,14 +223,17 @@ public class RenderWaypointBeacon
 
                     boolean forced = DrawUtil.startUnicode(fr, waypointProperties.forceUnicode.get());
 
+                    // Adjust above icon
+                    double labelY = (0-halfTexHeight)-8;
+
                     // Depth label
-                    DrawUtil.drawLabel(label, 0, 0 - halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 150, waypoint.getSafeColor(), 255, fontScale, false);
+                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 150, waypoint.getSafeColor(), 255, fontScale, false);
 
                     GL11.glDisable(GL11.GL_DEPTH_TEST);
                     GL11.glDepthMask(false);
 
                     // Front label
-                    DrawUtil.drawLabel(label, 0, 0 - halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 100, waypoint.getSafeColor(), 255, fontScale, false);
+                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 100, waypoint.getSafeColor(), 255, fontScale, false);
                     if (forced)
                     {
                         DrawUtil.stopUnicode(fr);
@@ -240,7 +244,7 @@ public class RenderWaypointBeacon
             }
 
             // Depth-masked icon
-            if (waypointProperties.showTexture.get())
+            if (viewDistance>.1 && waypointProperties.showTexture.get())
             {
                 // Reset scale for the icon
 
@@ -260,7 +264,8 @@ public class RenderWaypointBeacon
                 GL11.glScaled(-scale, -scale, scale);
                 GL11.glNormal3d(0, 0, -1.0F * scale);
 
-                DrawUtil.drawColoredImage(texture, 255, waypoint.getColor(), 0 - (texture.width / 2), 0 - halfTexHeight);
+                // The .5 and .2 below centers the waypoint diamond icon
+                DrawUtil.drawColoredImage(texture, 255, waypoint.getColor(), 0 - (texture.width / 2) +.5, 0 - halfTexHeight + .2);
 
                 GL11.glPopMatrix();
             }
@@ -320,14 +325,14 @@ public class RenderWaypointBeacon
             tessellator.startDrawingQuads();
             tessellator.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 80);
             double d4 = (double) b0 * 0.2D;
-            double d5 = 0.5D + Math.cos(d3 + 2.356194490192345D) * d4;
-            double d6 = 0.5D + Math.sin(d3 + 2.356194490192345D) * d4;
-            double d7 = 0.5D + Math.cos(d3 + (Math.PI / 4D)) * d4;
-            double d8 = 0.5D + Math.sin(d3 + (Math.PI / 4D)) * d4;
-            double d9 = 0.5D + Math.cos(d3 + 3.9269908169872414D) * d4;
-            double d10 = 0.5D + Math.sin(d3 + 3.9269908169872414D) * d4;
-            double d11 = 0.5D + Math.cos(d3 + 5.497787143782138D) * d4;
-            double d12 = 0.5D + Math.sin(d3 + 5.497787143782138D) * d4;
+            double d5 = Math.cos(d3 + 2.356194490192345D) * d4;
+            double d6 =  Math.sin(d3 + 2.356194490192345D) * d4;
+            double d7 = Math.cos(d3 + (Math.PI / 4D)) * d4;
+            double d8 = Math.sin(d3 + (Math.PI / 4D)) * d4;
+            double d9 = Math.cos(d3 + 3.9269908169872414D) * d4;
+            double d10 = Math.sin(d3 + 3.9269908169872414D) * d4;
+            double d11 = Math.cos(d3 + 5.497787143782138D) * d4;
+            double d12 = Math.sin(d3 + 5.497787143782138D) * d4;
             double d13 = (double) (256.0F * f1);
             double d14 = 0.0D;
             double d15 = 1.0D;
@@ -359,6 +364,9 @@ public class RenderWaypointBeacon
             double d26 = (double) (256.0F * f1);
             double d29 = (double) (-1.0F + texOffset);
             double d30 = (double) (256.0F * f1) + d29;
+
+            x-=.5;
+            z-=.5;
 
             tessellator.startDrawingQuads();
             tessellator.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 40);

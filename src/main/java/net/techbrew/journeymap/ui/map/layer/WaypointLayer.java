@@ -106,7 +106,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         {
             if (!waypoint.isReadOnly() && waypoint.isEnable() && waypoint.isInPlayerDimension())
             {
-                if (area.isVecInside(Vec3.createVectorHelper(waypoint.getX(dimension), waypoint.getY(dimension), waypoint.getZ(dimension))))
+                if (area.isVecInside(Vec3.createVectorHelper(waypoint.getX(), waypoint.getY(), waypoint.getZ())))
                 {
                     proximal.add(waypoint);
                 }
@@ -184,8 +184,8 @@ public class WaypointLayer implements LayerDelegate.Layer
 
             private double getDistance(Waypoint waypoint)
             {
-                double dx = waypoint.getX(dimension) - blockCoord.x;
-                double dz = waypoint.getZ(dimension) - blockCoord.z;
+                double dx = waypoint.getX() - blockCoord.x;
+                double dz = waypoint.getZ() - blockCoord.z;
                 return (Math.sqrt(dx * dx + dz * dz));
             }
         });

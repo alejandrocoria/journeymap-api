@@ -96,7 +96,6 @@ public class MiniMap
 
         final boolean doStateRefresh = state.shouldRefresh(mc);
 
-
         try
         {
             // Update the state first
@@ -104,6 +103,7 @@ public class MiniMap
             {
                 refreshStateTimer.start();
                 state.refresh(mc, player, miniMapProperties);
+
             }
             else
             {
@@ -111,10 +111,14 @@ public class MiniMap
             }
 
             // Update the grid
-            boolean showCaves = fullMapProperties.showCaves.get();
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
-            gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
-            gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0, miniMapProperties);
+            boolean moved = gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
+            if(moved || doStateRefresh)
+            {
+                boolean showCaves = player.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get();
+                gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0, miniMapProperties);
+            }
+
             if (doStateRefresh)
             {
                 boolean checkWaypointDistance = waypointProperties.maxDistance.get()>0;
@@ -124,18 +128,23 @@ public class MiniMap
                 allWaypointSteps.clear();
                 allWaypointSteps.addAll(state.getDrawWaypointSteps());
 
-                offscreenWpDrawSteps.clear();
-                if(miniMapProperties.showWaypoints.get())
-                {
-                    for (DrawWayPointStep drawWayPointStep : allWaypointSteps)
-                    {
-                        if (!drawWayPointStep.isOnScreen(0, 0, gridRenderer))
-                        {
-                            offscreenWpDrawSteps.add(drawWayPointStep);
-                        }
-                    }
-                    allWaypointSteps.removeAll(offscreenWpDrawSteps);
-                }
+//                offscreenWpDrawSteps.clear();
+//                if(miniMapProperties.showWaypoints.get())
+//                {
+//                    for (DrawWayPointStep drawWayPointStep : allWaypointSteps)
+//                    {
+//                        if (!drawWayPointStep.isOnScreen(0, 0, gridRenderer))
+//                        {
+//                            offscreenWpDrawSteps.add(drawWayPointStep);
+//                            allWaypointSteps.remove(drawWayPointStep);
+//                        }
+//                        else
+//                        {
+//                            offscreenWpDrawSteps.remove(drawWayPointStep);
+//                        }
+//                    }
+//                    allWaypointSteps.removeAll(offscreenWpDrawSteps);
+//                }
             }
 
             // Update display vars if needed
@@ -197,11 +206,12 @@ public class MiniMap
             gridRenderer.draw(1f, 0, 0);
 
             // Draw entities, etc
+            final double fontScale = getMapFontScale();
             boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, miniMapProperties.forceUnicode.get());
-            gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, getMapFontScale());
+            gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, fontScale);
             if(!allWaypointSteps.isEmpty())
             {
-                gridRenderer.draw(allWaypointSteps, 0, 0, dv.drawScale, getMapFontScale());
+                gridRenderer.draw(allWaypointSteps, 0, 0, dv.drawScale, fontScale);
             }
             if (unicodeForced)
             {
@@ -269,11 +279,17 @@ public class MiniMap
             DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, 1f);
 
             // Draw off-screen waypoints on top of border texture
-            if(!offscreenWpDrawSteps.isEmpty())
+            if(!allWaypointSteps.isEmpty())
             {
                 // Move center back to corner
                 GL11.glTranslated(dv.translateX, dv.translateY, 0);
-                gridRenderer.draw(offscreenWpDrawSteps, 0, 0, dv.drawScale, getMapFontScale());
+                for (DrawWayPointStep drawWayPointStep : allWaypointSteps)
+                {
+                    if (!drawWayPointStep.isOnScreen(0, 0, gridRenderer))
+                    {
+                        drawWayPointStep.draw(0,0,gridRenderer,dv.drawScale,fontScale);
+                    }
+                }
             }
             // Pop matrix changes
             GL11.glPopMatrix();
@@ -379,8 +395,10 @@ public class MiniMap
 
         if (oldDv == null || oldDv.shape != this.dv.shape)
         {
-            this.drawTimer = StatTimer.get("MiniMap.drawMap." + shape.name(), 200);
-            this.refreshStateTimer =  StatTimer.get("MiniMap.drawMap." + shape.name() + "+refreshState", 2);
+            this.drawTimer = StatTimer.get("MiniMap.drawMap." + shape.name(), 500);
+            this.drawTimer.reset();
+            this.refreshStateTimer =  StatTimer.get("MiniMap.drawMap." + shape.name() + "+refreshState", 5);
+            this.refreshStateTimer.reset();
         }
 
         // Update labels

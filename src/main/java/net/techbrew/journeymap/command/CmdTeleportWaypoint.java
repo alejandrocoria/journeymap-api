@@ -2,6 +2,7 @@ package net.techbrew.journeymap.command;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.server.CommandTeleport;
+import net.minecraft.util.Vec3;
 import net.techbrew.journeymap.model.Waypoint;
 
 /**
@@ -35,7 +36,7 @@ public class CmdTeleportWaypoint
 
     public void run()
     {
-        int dimension = mc.thePlayer.dimension;
-        mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", mc.thePlayer.getCommandSenderName(), waypoint.getX(dimension), waypoint.getY(dimension), waypoint.getZ(dimension)));
+        Vec3 waypointPos = waypoint.getPosition();
+        mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", mc.thePlayer.getCommandSenderName(), waypointPos.xCoord, waypointPos.yCoord, waypointPos.zCoord));
     }
 }

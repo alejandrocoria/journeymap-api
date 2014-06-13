@@ -74,11 +74,16 @@ public class LogFormatter extends Formatter
 
     private static void checkErrors(Throwable thrown)
     {
+        int maxRecursion=5;
         if (thrown != null && OutOfMemoryWarnings < 5 && LinkageErrorWarnings < 5)
         {
-            while (thrown != null)
+            while (thrown != null && maxRecursion>0)
             {
-                if (thrown instanceof OutOfMemoryError)
+                if (thrown instanceof StackOverflowError)
+                {
+                    return;
+                }
+                else if (thrown instanceof OutOfMemoryError)
                 {
                     OutOfMemoryWarnings++;
                     ChatLog.announceI18N("JourneyMap.memory_warning", thrown.toString());
@@ -101,6 +106,7 @@ public class LogFormatter extends Formatter
                         if (thrown instanceof Exception)
                         {
                             thrown = ((Exception) thrown).getCause();
+                            maxRecursion--;
                         }
                     }
                 }

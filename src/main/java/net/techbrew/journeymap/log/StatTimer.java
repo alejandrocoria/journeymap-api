@@ -104,8 +104,8 @@ public class StatTimer {
             if(maxed) return this;
 
             if(started !=null) {
-                logger.warning(name + " is already running, so resetting first");
-                this.reset();
+                logger.warning(name + " is already running, cancelling first");
+                this.cancel();
             }
 
             if(counter.get()==MAX_COUNT) {

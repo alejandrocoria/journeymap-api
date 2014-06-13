@@ -1,13 +1,12 @@
 package net.techbrew.journeymap.waypoint;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.common.io.Files;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.Waypoint;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FilenameFilter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -16,8 +15,6 @@ import java.util.Collection;
  */
 public class JmReader
 {
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
     public Collection<Waypoint> loadWaypoints(File waypointDir)
     {
         ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
@@ -71,31 +68,17 @@ public class JmReader
 
     private Waypoint load(File waypointFile)
     {
+        String waypointString = null;
         Waypoint waypoint = null;
-        FileReader reader = null;
         try
         {
-            reader = new FileReader(waypointFile);
-            waypoint = gson.fromJson(reader, Waypoint.class);
+            waypointString = Files.toString(waypointFile, Charset.forName("UTF-8"));
+            waypoint = Waypoint.fromString(waypointString);
             return waypoint;
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
-            JourneyMap.getLogger().severe(String.format("Can't load waypoint file %s: %s", waypointFile, e.getMessage()));
-        }
-        finally
-        {
-            if(reader!=null)
-            {
-                try
-                {
-                    reader.close();
-                }
-                catch (Exception e)
-                {
-                    JourneyMap.getLogger().severe(String.format("Can't close waypoint file %s: %s", waypointFile, e.getMessage()));
-                }
-            }
+            JourneyMap.getLogger().severe(String.format("Can't load waypoint file %s with contents: %s because %s", waypointFile, waypointString, e.getMessage()));
         }
         return waypoint;
     }

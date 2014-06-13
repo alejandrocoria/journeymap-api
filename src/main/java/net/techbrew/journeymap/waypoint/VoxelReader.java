@@ -1,7 +1,6 @@
 package net.techbrew.journeymap.waypoint;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChunkCoordinates;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.ChatLog;
@@ -13,8 +12,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
-import java.util.*;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 
 /**
  * Read VoxelMap's waypoint files and return a collection of the results.
@@ -58,10 +59,9 @@ public class VoxelReader
                 int g = (int) (voxWp.green * 255.0F) & 255;
                 int b =  (int) (voxWp.blue * 255.0F) & 255;
                 Waypoint.Type type = ("skull".equals(voxWp.imageSuffix)) ? Waypoint.Type.Death : Waypoint.Type.Normal;
-                List<Integer> dimList = new ArrayList<Integer>(voxWp.dimensions);
 
                 Waypoint jmWp = new net.techbrew.journeymap.model.Waypoint(name,x,y,z,enabled,r,g,b,type,
-                        Waypoint.Origin.VoxelMap,dimList.toArray(new Integer[dimList.size()]));
+                        Waypoint.Origin.VoxelMap,0, voxWp.dimensions);
 
                 jmWp.setReadOnly(true);
 
@@ -141,7 +141,7 @@ public class VoxelReader
 
     public static String getPointsFilename()
     {
-        String worldName = Minecraft.getMinecraft().theWorld.getWorldInfo().getWorldName();
+        String worldName = FMLClientHandler.instance().getClient().theWorld.getWorldInfo().getWorldName();
         return String.format("mods\\VoxelMods\\voxelMap\\%s.points", worldName);
     }
 
@@ -207,15 +207,13 @@ public class VoxelReader
             Color color = new Color(Float.parseFloat(map.get("red")), Float.parseFloat(map.get("green")), Float.parseFloat(map.get("blue")));
             Waypoint.Type type = "skull".equals(map.get("suffix")) ? Waypoint.Type.Death : Waypoint.Type.Normal;
             String[] dimStrings = map.get("dimensions").split("\\#");
-            Integer[] dims = new Integer[dimStrings.length];
+            ArrayList<Integer> dims = new ArrayList<Integer>(dimStrings.length);
             for(int i=0;i<dimStrings.length;i++)
             {
-                dims[0] = Integer.parseInt(dimStrings[0]);
+                dims.add(Integer.parseInt(dimStrings[0]));
             }
 
-            Waypoint waypoint = new Waypoint(name, new ChunkCoordinates(x, y, z), color, type, dims);
-            waypoint.setEnable(enable);
-            waypoint.setOrigin(Waypoint.Origin.VoxelMap);
+            Waypoint waypoint = new Waypoint(name, x, y, z, enable, color.getRed(), color.getGreen(), color.getBlue(), type, Waypoint.Origin.VoxelMap, 0, dims);
             waypoint.setDirty(true);
             return waypoint;
         }

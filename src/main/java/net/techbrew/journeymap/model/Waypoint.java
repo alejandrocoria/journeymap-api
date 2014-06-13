@@ -1,76 +1,161 @@
 package net.techbrew.journeymap.model;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Since;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 
 import java.awt.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Random;
+import java.util.TreeSet;
 
 /**
  * Generic waypoint data holder
  */
 public class Waypoint implements Serializable
 {
+    public static final int VERSION = 1;
+    public static final Gson GSON = new GsonBuilder().setVersion(VERSION).create();
+
     protected static final String ICON_NORMAL = "waypoint-normal.png";
     protected static final String ICON_DEATH = "waypoint-death.png";
 
-    public enum Origin
-    {
-        JourneyMap,
-        ReiMinimap,
-        VoxelMap
-    }
+//    @Expose(serialize = false, deserialize = false)
+//    protected int version = 1;
 
-    public enum Type
-    {
-        Normal,
-        Death
-    }
-
-    protected int version = 1;
+    @Since(1)
     protected String id;
-    protected String name;
-    protected String icon;
-    protected int x;
-    protected int y;
-    protected int z;
-    protected int r;
-    protected int g;
-    protected int b;
-    protected boolean enable;
-    protected Type type;
-    protected Origin origin;
-    protected String texture;
 
+    @Since(1)
+    protected String name;
+
+    @Since(1)
+    protected String icon;
+
+    @Since(1)
+    protected int x;
+
+    @Since(1)
+    protected int y;
+
+    @Since(1)
+    protected int z;
+
+    @Since(1)
+    protected int r;
+
+    @Since(1)
+    protected int g;
+
+    @Since(1)
+    protected int b;
+
+    @Since(1)
+    protected boolean enable;
+
+    @Since(1)
+    protected Type type;
+
+    @Since(1)
+    protected Origin origin;
+
+    @Since(1)
     protected TreeSet<Integer> dimensions;
-    transient protected boolean readOnly;
-    transient protected boolean dirty;
+
+    protected transient boolean readOnly;
+    protected transient boolean dirty;
+    protected transient Minecraft mc = FMLClientHandler.instance().getClient();
+
+    /**
+     * Default constructor Required by GSON
+     */
+    private Waypoint()
+    {
+    }
+
+    public Waypoint(Waypoint original)
+    {
+        this(original.name, original.x, original.y, original.z, original.enable, original.r, original.g, original.b, original.type, original.origin, original.dimensions.first(), original.dimensions);
+        this.x = original.x;
+        this.y = original.y;
+        this.z = original.z;
+    }
+
+    public Waypoint(String name, ChunkCoordinates location, Color color, Type type, Integer currentDimension)
+    {
+        this(name, location.posX, location.posY, location.posZ, true, color.getRed(), color.getGreen(), color.getBlue(), type, Origin.JourneyMap, currentDimension, Arrays.asList(currentDimension));
+    }
+
+    /**
+     * Main constructor.
+     */
+    public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, Type type, Origin origin, Integer currentDimension, Collection<Integer> dimensions)
+    {
+        if (name == null)
+        {
+            name = createName(x, z);
+        }
+        if (dimensions == null || dimensions.size() == 0)
+        {
+            dimensions = new TreeSet<Integer>();
+            dimensions.add(mc.thePlayer.worldObj.provider.dimensionId);
+        }
+        this.dimensions = new TreeSet<Integer>(dimensions);
+        this.dimensions.add(currentDimension);
+
+        this.name = name;
+        setLocation(x, y, z, currentDimension);
+
+        this.r = red;
+        this.g = green;
+        this.b = blue;
+        this.enable = enable;
+        this.type = type;
+        this.origin = origin;
+
+        switch (type)
+        {
+            case Normal:
+            {
+                icon = ICON_NORMAL;
+                break;
+            }
+            case Death:
+            {
+                icon = ICON_DEATH;
+                break;
+            }
+        }
+    }
 
     public static Waypoint deathOf(Entity player)
     {
-        ChunkCoordinates cc = new ChunkCoordinates((int)Math.floor(player.posX), (int)Math.floor(player.posY), (int)Math.floor(player.posZ));
+        ChunkCoordinates cc = new ChunkCoordinates((int) player.posX, (int) player.posY, (int) player.posZ);
         return at(cc, Type.Death, player.worldObj.provider.dimensionId);
     }
 
     public static Waypoint of(EntityPlayer player)
     {
-        ChunkCoordinates cc = new ChunkCoordinates((int)Math.floor(player.posX), (int)Math.floor(player.posY), (int)Math.floor(player.posZ));
+        ChunkCoordinates cc = new ChunkCoordinates((int) player.posX, (int) player.posY, (int) player.posZ);
         return at(cc, Type.Normal, player.worldObj.provider.dimensionId);
     }
 
     public static Waypoint at(ChunkCoordinates cc, Type type, int dimension)
     {
         String name;
-        if(type == Type.Death)
+        if (type == Type.Death)
         {
             name = Constants.getString("Waypoint.deathpoint");
         }
@@ -88,77 +173,11 @@ public class Waypoint implements Serializable
         return String.format("%s, %s", x, z);
     }
 
-    public Waypoint(Waypoint original)
-    {
-        this(original.name, original.x, original.y, original.z, original.enable, original.r, original.g, original.b, original.type, original.origin, original.dimensions);
-        this.x = original.x;
-        this.y = original.y;
-        this.z = original.z;
-    }
-
-    public Waypoint(String name, ChunkCoordinates location, Color color, Type type, Integer... dimension) {
-        this(name, location.posX, location.posY, location.posZ, true, color.getRed(), color.getGreen(), color.getBlue(), type, Origin.JourneyMap, dimension);
-    }
-
-    /**
-     * Main constructor.
-     */
-    public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, Type type, Origin origin, Integer... dimensions)
-    {
-        this(name, x, y, z, enable, red, green, blue, type, origin, new TreeSet<Integer>(Arrays.asList(dimensions)));
-    }
-
-    /**
-     * Main constructor.
-     */
-    public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, Type type, Origin origin, Collection<Integer> dimensions)
-    {
-        if(name==null) name = createName(x, z);
-        if(dimensions==null || dimensions.size()==0)
-        {
-            dimensions = new TreeSet<Integer>();
-            Minecraft mc = FMLClientHandler.instance().getClient();
-            dimensions.add(mc.thePlayer.worldObj.provider.dimensionId);
-        }
-        this.dimensions = new TreeSet<Integer>(dimensions);
-
-        JourneyMap.getLogger().fine("Waypoint created with dimensions " + new ArrayList<Integer>(getDimensions()));
-
-        this.name = name;
-        setLocation(x, y, z, this.dimensions.first());
-
-        this.r = red;
-        this.g = green;
-        this.b = blue;
-        this.enable = enable;
-        this.type = type;
-        this.origin = origin;
-
-        switch(type)
-        {
-            case Normal:
-            {
-                icon = ICON_NORMAL;
-                break;
-            }
-            case Death:
-            {
-                icon = ICON_DEATH;
-                break;
-            }
-        }
-    }
-
-    public void setLocation(int x, int y, int z)
-    {
-        setLocation(x, y, z, 0);
-    }
-
     public void setLocation(int x, int y, int z, int currentDimension)
     {
-        this.x = dimensionalValue(x, currentDimension, 0);
-        this.y = dimensionalValue(y, currentDimension, 0);
-        this.z = dimensionalValue(z, currentDimension, 0);
+        this.x = (currentDimension == -1) ? x * 8 : x;
+        this.y = y;
+        this.z = (currentDimension == -1) ? z * 8 : z;
         updateId();
     }
 
@@ -184,13 +203,6 @@ public class Waypoint implements Serializable
         return new ChunkCoordIntPair(x >> 4, z >> 4);
     }
 
-    public void setColor(Color color)
-    {
-        this.r = color.getRed();
-        this.g = color.getGreen();
-        this.b = color.getBlue();
-    }
-
     public void setRandomColor()
     {
         Random random = new Random();
@@ -200,13 +212,13 @@ public class Waypoint implements Serializable
 
         int min = 100;
         int max = Math.max(r, Math.max(g, b));
-        if(max < min)
+        if (max < min)
         {
-            if(r == max)
+            if (r == max)
             {
                 r = min;
             }
-            else if(g == max)
+            else if (g == max)
             {
                 g = min;
             }
@@ -216,17 +228,27 @@ public class Waypoint implements Serializable
             }
         }
 
-        setColor(new Color(r,g,b));
+        setColor(new Color(r, g, b));
     }
 
     public Color getColor()
     {
-        return new Color(r,g,b);
+        return new Color(r, g, b);
+    }
+
+    public void setColor(Color color)
+    {
+        this.r = color.getRed();
+        this.g = color.getGreen();
+        this.b = color.getBlue();
     }
 
     public Color getSafeColor()
     {
-        if(r+g+b>=100) return getColor();
+        if (r + g + b >= 100)
+        {
+            return getColor();
+        }
         return Color.darkGray;
     }
 
@@ -242,7 +264,7 @@ public class Waypoint implements Serializable
 
     public boolean isTeleportReady()
     {
-        return y>=0 && this.isInPlayerDimension();
+        return y >= 0 && this.isInPlayerDimension();
     }
 
     public boolean isInPlayerDimension()
@@ -276,34 +298,41 @@ public class Waypoint implements Serializable
         this.icon = icon;
     }
 
-    private int getX()
+    public int getX()
     {
-        return x;
+        return (mc.thePlayer.dimension == -1) ? x / 8 : x;
     }
 
-    private int getY()
+    public double getBlockCenteredX()
+    {
+        int x = getX();
+        return x + ((x<0) ? -.5 : .5);
+    }
+
+    public int getY()
     {
         return y;
     }
 
-    private int getZ()
+    public double getBlockCenteredY()
     {
-        return z;
+        return getY()+.5;
     }
 
-    public int getX(int dimension)
+    public int getZ()
     {
-        return dimensionalValue(x, 0, dimension);
+        return (mc.thePlayer.dimension == -1) ? z / 8 : z;
     }
 
-    public int getY(int dimension)
+    public double getBlockCenteredZ()
     {
-        return dimensionalValue(y, 0, dimension);
+        int z = getZ();
+        return z + ((z<0) ? -.5 : .5);
     }
 
-    public int getZ(int dimension)
+    public Vec3 getPosition()
     {
-        return dimensionalValue(z, 0, dimension);
+        return mc.theWorld.getWorldVec3Pool().getVecFromPool(getBlockCenteredX(), getBlockCenteredY(), getBlockCenteredZ());
     }
 
     public int getR()
@@ -343,7 +372,7 @@ public class Waypoint implements Serializable
 
     public void setEnable(boolean enable)
     {
-        if(enable!=this.enable)
+        if (enable != this.enable)
         {
             this.enable = enable;
             this.dirty = true;
@@ -365,14 +394,14 @@ public class Waypoint implements Serializable
         return origin;
     }
 
+    public void setOrigin(Origin origin)
+    {
+        this.origin = origin;
+    }
+
     public String getFileName()
     {
         return id.replaceAll("[\\\\/:\"*?<>|]", "_").concat(".json");
-    }
-
-    public int getVersion()
-    {
-        return version;
     }
 
     public boolean isDirty()
@@ -383,11 +412,6 @@ public class Waypoint implements Serializable
     public void setDirty(boolean dirty)
     {
         this.dirty = dirty;
-    }
-
-    public void setOrigin(Origin origin)
-    {
-        this.origin = origin;
     }
 
     public boolean isReadOnly()
@@ -403,7 +427,12 @@ public class Waypoint implements Serializable
     @Override
     public String toString()
     {
-        return name;
+        return GSON.toJson(this);
+    }
+
+    public static Waypoint fromString(String json)
+    {
+        return GSON.fromJson(json, Waypoint.class);
     }
 
     @Override
@@ -448,11 +477,15 @@ public class Waypoint implements Serializable
         {
             return false;
         }
-        if (!(dimensions.equals(waypoint.dimensions)))
+        if (!dimensions.equals(waypoint.dimensions))
         {
             return false;
         }
         if (!icon.equals(waypoint.icon))
+        {
+            return false;
+        }
+        if (!id.equals(waypoint.id))
         {
             return false;
         }
@@ -478,23 +511,16 @@ public class Waypoint implements Serializable
         return id.hashCode();
     }
 
-    private static int dimensionalValue(int original, int currentDimension, int targetDimension)
+    public enum Origin
     {
-        if(targetDimension==currentDimension)
-        {
-            return original;
-        }
-        else if(targetDimension==-1)
-        {
-            return original/8;
-        }
-        else if(currentDimension==-1)
-        {
-            return original*8;
-        }
-        else
-        {
-            return original;
-        }
+        JourneyMap,
+        ReiMinimap,
+        VoxelMap
+    }
+
+    public enum Type
+    {
+        Normal,
+        Death
     }
 }
