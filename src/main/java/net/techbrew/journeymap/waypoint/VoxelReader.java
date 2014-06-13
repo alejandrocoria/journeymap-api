@@ -3,6 +3,7 @@ package net.techbrew.journeymap.waypoint;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
@@ -141,7 +142,7 @@ public class VoxelReader
 
     public static String getPointsFilename()
     {
-        String worldName = FMLClientHandler.instance().getClient().theWorld.getWorldInfo().getWorldName();
+        String worldName = WorldData.getWorldName(FMLClientHandler.instance().getClient());
         return String.format("mods\\VoxelMods\\voxelMap\\%s.points", worldName);
     }
 
