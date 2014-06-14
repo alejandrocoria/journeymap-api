@@ -1,6 +1,5 @@
 package net.techbrew.journeymap.feature.impl;
 
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager.FeatureSet;
 
@@ -14,11 +13,10 @@ import java.util.Set;
 public class FairPlay implements FeatureSet {
 
 	private final Set<Feature> features;
-	private final String name;
+	private final String name = "FairPlay";
 
 	public FairPlay() {
 		features = Feature.getSubset(true, false);
-		name = Constants.getString("Feature.fair_play");
 	}
 	
 	@Override

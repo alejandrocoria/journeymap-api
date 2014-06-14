@@ -76,7 +76,7 @@ public class JourneyMap
 
     private volatile Boolean initialized = false;
 
-    private boolean enableAnnounceMod = false;
+
     private JMServer jmServer;
 
     private boolean threadLogging = false;
@@ -201,18 +201,6 @@ public class JourneyMap
             // Webserver
             toggleWebserver(webMapProperties.enabled.get(), false);
 
-            // Announce mod?
-            enableAnnounceMod = coreProperties.announceMod.get();
-
-            // Check for newer version online
-            if (VersionCheck.getVersionIsCurrent() == false)
-            {
-                ChatLog.announceI18N(Constants.getString("JourneyMap.new_version_available", "")); //$NON-NLS-1$
-                ChatLog.announceURL(WEBSITE_URL, WEBSITE_URL);
-            }
-
-            //BlockUtils.initialize();
-
             initialized = true;
 
             // Override log level now that loading complete
@@ -224,8 +212,6 @@ public class JourneyMap
 
             WaypointsData.reset();
             BlockUtils.initialize();
-
-            announceMod(false);
 
             logger.info(JourneyMap.MOD_NAME + " postInitialize EXIT");
         }
@@ -285,9 +271,14 @@ public class JourneyMap
         }
         if (forceAnnounce)
         {
-            enableAnnounceMod = true;
+            ChatLog.enableAnnounceMod = true;
         }
-        announceMod(forceAnnounce);
+        ChatLog.announceMod(forceAnnounce);
+    }
+
+    public JMServer getJmServer()
+    {
+        return jmServer;
     }
 
     /**
@@ -520,27 +511,6 @@ public class JourneyMap
             String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
             ChatLog.announceError(error);
             logger.severe(LogFormatter.toString(t));
-        }
-    }
-
-    private void announceMod(boolean forced)
-    {
-        if (enableAnnounceMod)
-        {
-            ChatLog.announceI18N("JourneyMap.ready", MOD_NAME); //$NON-NLS-1$
-            if (webMapProperties.enabled.get())
-            {
-                String keyName = Constants.getKeyName(Constants.KB_MAP);
-                String port = jmServer.getPort() == 80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
-                String message = Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
-                ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
-            }
-            else
-            {
-                String keyName = Constants.getKeyName(Constants.KB_MAP); // Should be KeyCode
-                ChatLog.announceI18N("JourneyMap.mapgui_only_ready", keyName); //$NON-NLS-1$
-            }
-            enableAnnounceMod = false; // Only queueAnnouncement mod once per runtime
         }
     }
 

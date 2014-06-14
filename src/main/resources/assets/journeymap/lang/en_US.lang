@@ -223,11 +223,13 @@ Waypoint.find=Find
 Waypoint.teleport=Teleport
 Waypoint.deathpoint=Death
 
+Waypoint.import_rei_version=Your version of Rei's MiniMap is not supported.
 Waypoint.import_rei_file_error=Could not import Rei's MiniMap waypoint file: %1$s
 Waypoint.import_rei_success=Imported %1$s waypoints from of Rei's MiniMap.
 Waypoint.import_rei_failure=No Rei's MiniMap waypoints were imported. See journeyMap.log for details.
 Waypoint.import_rei_errors=Imported %1$s waypoints from Rei's MiniMap with %1$s errors. See journeyMap.log for details.
 
+Waypoint.import_vox_version=Your version of VoxelMap is not supported. Please update to:
 Waypoint.import_vox_file_error=Could not import VoxelMap waypoint file: %1$s
 Waypoint.import_vox_success=Imported %1$s waypoints from VoxelMap.
 Waypoint.import_vox_failure=No VoxelMap waypoints were imported. See journeyMap.log for details.

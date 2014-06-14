@@ -8,6 +8,8 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.util.StringUtils;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.VersionCheck;
+import net.techbrew.journeymap.server.JMServer;
 
 import java.io.File;
 import java.util.Collections;
@@ -19,6 +21,9 @@ import java.util.logging.Level;
  * Provides messages to both chat GUI and log.
  */
 public class ChatLog {
+
+    private static boolean initialized = false;
+    public static boolean enableAnnounceMod = false;
 
     // Announcements
     static final List<ChatComponentTranslation> announcements = Collections.synchronizedList(new LinkedList<ChatComponentTranslation>());
@@ -87,6 +92,22 @@ public class ChatLog {
      * @param mc
      */
     public static void showChatAnnouncements(Minecraft mc) {
+
+        if(!initialized)
+        {
+            // Announce mod?
+            enableAnnounceMod = JourneyMap.getInstance().coreProperties.announceMod.get();
+            announceMod(false);
+
+            // Check for newer version online
+            if (VersionCheck.getVersionIsCurrent() == false)
+            {
+                ChatLog.announceI18N(Constants.getString("JourneyMap.new_version_available", "")); //$NON-NLS-1$
+                ChatLog.announceURL(JourneyMap.WEBSITE_URL, JourneyMap.WEBSITE_URL);
+            }
+            initialized = true;
+        }
+
         while(!announcements.isEmpty()) {
             ChatComponentTranslation message = announcements.remove(0);
             if(message!=null) {
@@ -99,6 +120,28 @@ public class ChatLog {
                     JourneyMap.getLogger().log(logLevel,  StringUtils.stripControlCodes(message.getUnformattedTextForChat()));
                 }
             }
+        }
+    }
+
+    public static void announceMod(boolean forced)
+    {
+        if (enableAnnounceMod)
+        {
+            ChatLog.announceI18N("JourneyMap.ready", JourneyMap.MOD_NAME); //$NON-NLS-1$
+            if (JourneyMap.getInstance().webMapProperties.enabled.get())
+            {
+                JMServer jmServer = JourneyMap.getInstance().getJmServer();
+                String keyName = Constants.getKeyName(Constants.KB_MAP);
+                String port = jmServer.getPort() == 80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
+                String message = Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
+                ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
+            }
+            else
+            {
+                String keyName = Constants.getKeyName(Constants.KB_MAP); // Should be KeyCode
+                ChatLog.announceI18N("JourneyMap.mapgui_only_ready", keyName); //$NON-NLS-1$
+            }
+            enableAnnounceMod = false; // Only queueAnnouncement mod once per runtime
         }
     }
 

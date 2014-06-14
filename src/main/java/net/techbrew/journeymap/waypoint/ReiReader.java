@@ -73,7 +73,8 @@ public class ReiReader
         }
         catch (Throwable e)
         {
-            JourneyMap.getLogger().severe("Exception getting ReiMinimap waypoints: " + LogFormatter.toString(e));
+            JourneyMap.getLogger().warning("Incompatible version of ReiMinimap. Tried reifnsk.minimap.ReiMinimap.instance.getWaypoints(): " + e);
+            ChatLog.announceI18N("Waypoint.import_rei_version");
             modLoaded = false;
             return Collections.EMPTY_LIST;
         }

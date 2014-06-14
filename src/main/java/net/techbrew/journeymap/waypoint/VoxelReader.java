@@ -23,6 +23,10 @@ import java.util.HashMap;
  */
 public class VoxelReader
 {
+    // 1.7.2
+    public static final String VOXEL_JAR_NAME = "voxelmap-1.7.2-1.0 (June 9, 2014)";
+    public static final String VOXEL_JAR_URL = "http://www.mediafire.com/view/8tjjxvghv3jpv18/voxelmap-1.7.2-1.0";
+
     public static final String[] classNames = {"com.thevoxelbox.voxelmap.VoxelMap", "com.thevoxelbox.voxelmap.util.Waypoint"};
     public static Boolean modLoaded;
 
@@ -36,16 +40,27 @@ public class VoxelReader
      */
     public static java.util.List<Waypoint> loadWaypoints()
     {
+        java.util.List voxelWaypoints = new ArrayList(0);
+
         try
         {
-            com.thevoxelbox.voxelmap.interfaces.AbstractVoxelMap voxelMap = com.thevoxelbox.voxelmap.VoxelMap.instance;
-            java.util.List voxelWaypoints = new ArrayList(0);
-            voxelWaypoints.addAll(voxelMap.getWaypointManager().getWaypoints());
-            if (voxelWaypoints.isEmpty())
-            {
-                return voxelWaypoints;
-            }
+            voxelWaypoints.addAll(com.thevoxelbox.voxelmap.VoxelMap.getInstance().getWaypointManager().getWaypoints());
+            modLoaded = true;
+        } catch (Throwable e)
+        {
+            JourneyMap.getLogger().warning("Incompatible version of VoxelMap. Tried com.thevoxelbox.voxelmap.VoxelMap.getInstance().getWaypointManager().getWaypoints(): " + e);
+            ChatLog.announceI18N(Constants.getString("Waypoint.import_vox_version"));
+            ChatLog.announceURL(VOXEL_JAR_NAME, VOXEL_JAR_URL);
+            modLoaded = false;
+        }
 
+        if (voxelWaypoints.isEmpty())
+        {
+            return Collections.EMPTY_LIST;
+        }
+
+        try
+        {
             ArrayList<Waypoint> converted = new ArrayList<Waypoint>(voxelWaypoints.size());
             for (Object wpObj : voxelWaypoints)
             {
@@ -70,7 +85,8 @@ public class VoxelReader
             }
             return converted;
 
-        } catch (Throwable e)
+        }
+        catch (Throwable e)
         {
             JourneyMap.getLogger().severe("Exception getting VoxelMap waypoints: " + LogFormatter.toString(e));
             modLoaded = false;
