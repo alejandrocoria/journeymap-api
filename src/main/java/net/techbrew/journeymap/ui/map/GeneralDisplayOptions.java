@@ -26,10 +26,10 @@ public class GeneralDisplayOptions extends JmUI
 
     Button buttonCaves, buttonGrid, buttonClose;
 
-    String labelOn = Constants.getString("MapOverlay.on");
-    String labelOff = Constants.getString("MapOverlay.off");
-    String labelFullMap = Constants.getString("MapOverlay.title");
-    String labelMiniMap = Constants.getString("MiniMap.title");
+    String labelOn = Constants.getString("jm.common.on");
+    String labelOff = Constants.getString("jm.common.off");
+    String labelFullMap = Constants.getString("jm.fullscreen.title");
+    String labelMiniMap = Constants.getString("jm.minimap.title");
 
     ArrayList<ButtonList> leftRows = new ArrayList<ButtonList>();
     ArrayList<ButtonList> rightRows = new ArrayList<ButtonList>();
@@ -37,7 +37,7 @@ public class GeneralDisplayOptions extends JmUI
 
     public GeneralDisplayOptions(Class<? extends JmUI> returnClass)
     {
-        super(Constants.getString("MapOverlay.general_display_title"), returnClass);
+        super(Constants.getString("jm.common.general_display_title"), returnClass);
     }
 
     /**
@@ -52,31 +52,31 @@ public class GeneralDisplayOptions extends JmUI
 
         int id = 0;
 
-        String on = Constants.getString("MapOverlay.on");
-        String off = Constants.getString("MapOverlay.off");
+        String on = Constants.getString("jm.common.on");
+        String off = Constants.getString("jm.common.off");
 
         FullMapProperties fullMap = JourneyMap.getInstance().fullMapProperties;
         MiniMapProperties miniMap = JourneyMap.getInstance().miniMapProperties;
 
-        rowMobs = new ButtonList(Constants.getString("MapOverlay.show_monsters", ""));
+        rowMobs = new ButtonList(Constants.getString("jm.common.show_monsters", ""));
         rowMobs.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showMobs));
         rowMobs.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showMobs));
         rowMobs.setEnabled(FeatureManager.isAllowed(Feature.RadarMobs));
         leftRows.add(rowMobs);
 
-        rowAnimals = new ButtonList(Constants.getString("MapOverlay.show_animals", ""));
+        rowAnimals = new ButtonList(Constants.getString("jm.common.show_animals", ""));
         rowAnimals.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showAnimals));
         rowAnimals.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showAnimals));
         rowAnimals.setEnabled(FeatureManager.isAllowed(Feature.RadarAnimals));
         leftRows.add(rowAnimals);
 
-        rowVillagers = new ButtonList(Constants.getString("MapOverlay.show_villagers", ""));
+        rowVillagers = new ButtonList(Constants.getString("jm.common.show_villagers", ""));
         rowVillagers.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showVillagers));
         rowVillagers.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showVillagers));
         rowVillagers.setEnabled(FeatureManager.isAllowed(Feature.RadarVillagers));
         leftRows.add(rowVillagers);
 
-        rowPets = new ButtonList(Constants.getString("MapOverlay.show_pets", ""));
+        rowPets = new ButtonList(Constants.getString("jm.common.show_pets", ""));
         rowPets.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showPets));
         rowPets.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showPets));
         rowPets.setEnabled(FeatureManager.isAllowed(Feature.RadarAnimals));
@@ -85,43 +85,43 @@ public class GeneralDisplayOptions extends JmUI
         buttonCaves = BooleanPropertyButton.create(id++, fullMap, fullMap.showCaves);
         buttonCaves.setEnabled(FeatureManager.isAllowed(Feature.RadarPlayers));
 
-        rowCaves = new ButtonList(Constants.getString("MapOverlay.show_caves", ""));
+        rowCaves = new ButtonList(Constants.getString("jm.common.show_caves", ""));
         rowCaves.add(buttonCaves);
         leftRows.add(rowCaves);
 
         buttonGrid = BooleanPropertyButton.create(id++, fullMap, fullMap.showGrid);
-        rowGrid = new ButtonList(Constants.getString("MapOverlay.show_grid", ""));
+        rowGrid = new ButtonList(Constants.getString("jm.common.show_grid", ""));
         rowGrid.add(buttonGrid);
         leftRows.add(rowGrid);
         
-        rowSelf = new ButtonList(Constants.getString("MapOverlay.show_self", ""));
+        rowSelf = new ButtonList(Constants.getString("jm.common.show_self", ""));
         rowSelf.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showSelf));
         rowSelf.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showSelf));
         rightRows.add(rowSelf);
 
-        rowPlayers = new ButtonList(Constants.getString("MapOverlay.show_players", ""));
+        rowPlayers = new ButtonList(Constants.getString("jm.common.show_players", ""));
         rowPlayers.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showPlayers));
         rowPlayers.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showPlayers));
         rowPlayers.setEnabled(FeatureManager.isAllowed(Feature.RadarPlayers));
         rightRows.add(rowPlayers);
 
-        rowWaypoints = new ButtonList(Constants.getString("MapOverlay.show_waypoints", ""));
+        rowWaypoints = new ButtonList(Constants.getString("jm.common.show_waypoints", ""));
         rowWaypoints.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showWaypoints));
         rowWaypoints.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showWaypoints));
         rowWaypoints.setEnabled(JourneyMap.getInstance().waypointProperties.managerEnabled.get());
         rightRows.add(rowWaypoints);
 
-        rowForceUnicode = new ButtonList(Constants.getString("MiniMap.force_unicode", ""));
+        rowForceUnicode = new ButtonList(Constants.getString("jm.minimap.force_unicode", ""));
         rowForceUnicode.add(BooleanPropertyButton.create(id++, fullMap, fullMap.forceUnicode));
         rowForceUnicode.add(BooleanPropertyButton.create(id++, miniMap, miniMap.forceUnicode));
         rightRows.add(rowForceUnicode);
 
-        rowFontSize = new ButtonList(Constants.getString("MiniMap.font", ""));
+        rowFontSize = new ButtonList(Constants.getString("jm.common.font", ""));
         rowFontSize.add(BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, fullMap, fullMap.fontSmall));
         rowFontSize.add(BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, miniMap, miniMap.fontSmall));
         rightRows.add(rowFontSize);
 
-        rowTextureSize = new ButtonList(Constants.getString("MiniMap.texture_size", ""));
+        rowTextureSize = new ButtonList(Constants.getString("jm.minimap.texture_size", ""));
         rowTextureSize.add(BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, fullMap, fullMap.textureSmall));
         rowTextureSize.add(BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, miniMap, miniMap.textureSmall));
         rightRows.add(rowTextureSize);
@@ -147,7 +147,7 @@ public class GeneralDisplayOptions extends JmUI
         rowCaves.setWidths(rowAnimals.getWidth(4));
         rowGrid.setWidths(rowAnimals.getWidth(4));
 
-        buttonClose = new Button(ButtonEnum.Close.ordinal(), 0, 0, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
+        buttonClose = new Button(ButtonEnum.Close.ordinal(), 0, 0, Constants.getString("jm.common.close")); //$NON-NLS-1$
         buttonClose.fitWidth(getFontRenderer());
         if(buttonClose.getWidth() < 150)
         {

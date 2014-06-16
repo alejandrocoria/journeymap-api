@@ -39,7 +39,7 @@ public class WaypointHelp extends JmUI
 
     public WaypointHelp(Class<? extends JmUI> returnClass)
     {
-        super(Constants.getString("MapOverlay.waypoint_help_title"), returnClass);
+        super(Constants.getString("jm.waypoint.help_title"), returnClass);
         keyEventHandler = new KeyEventHandler();
     }
 
@@ -56,22 +56,22 @@ public class WaypointHelp extends JmUI
 
         // Rei
         String reiFileName = ReiReader.getPointsFilename();
-        importReiText = Constants.getString("MapOverlay.waypoint_help_import_rei", reiFileName, jmWaypointDir);
+        importReiText = Constants.getString("jm.waypoint.help_import_rei", reiFileName, jmWaypointDir);
         importReiTextWidth = fr.getStringWidth(importReiText);
-        buttonRei = new Button(ButtonEnum.ImportRei, Constants.getString("MapOverlay.waypoint_help_import_rei_title"));
+        buttonRei = new Button(ButtonEnum.ImportRei, Constants.getString("jm.waypoint.help_import_rei_title"));
         buttonRei.setEnabled(WaypointsData.isReiMinimapEnabled());
         buttonList.add(buttonRei);
 
         // Voxel
         String voxFileName = VoxelReader.getPointsFilename();
-        importVoxelText = Constants.getString("MapOverlay.waypoint_help_import_voxel", voxFileName, jmWaypointDir);
+        importVoxelText = Constants.getString("jm.waypoint.help_import_voxel", voxFileName, jmWaypointDir);
         importVoxelTextWidth = fr.getStringWidth(importVoxelText);
-        buttonVoxel = new Button(ButtonEnum.ImportVoxel, Constants.getString("MapOverlay.waypoint_help_import_voxel_title"));
+        buttonVoxel = new Button(ButtonEnum.ImportVoxel, Constants.getString("jm.waypoint.help_import_voxel_title"));
         buttonVoxel.setEnabled(WaypointsData.isVoxelMapEnabled());
         buttonList.add(buttonVoxel);
 
         // Close
-        buttonClose = new Button(ButtonEnum.Close.ordinal(), 0, 0, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
+        buttonClose = new Button(ButtonEnum.Close.ordinal(), 0, 0, Constants.getString("jm.common.close")); //$NON-NLS-1$
         buttonList.add(buttonClose);
 
         new ButtonList(buttonRei, buttonVoxel).equalizeWidths(getFontRenderer());
@@ -139,12 +139,12 @@ public class WaypointHelp extends JmUI
         int y = Math.max(30, this.height / 8);
 
         // Hotkey help
-        final int x = (this.width) / 2 + (getFontRenderer().getStringWidth(Constants.getString("MapOverlay.waypoint_help_create_ingame")) / 3);
+        final int x = (this.width) / 2 + (getFontRenderer().getStringWidth(Constants.getString("jm.waypoint.help_create_ingame")) / 3);
 
         String waypointKey = Constants.getKeyName(Constants.KB_WAYPOINT);
-        drawHelpStrings(Constants.getString("MapOverlay.waypoint_help_create_ingame"), waypointKey, x, y += 12);
-        drawHelpStrings(Constants.getString("MapOverlay.waypoint_help_create_inmap"), waypointKey, x, y += 12);
-        drawHelpStrings(Constants.getString("MapOverlay.waypoint_help_manage_ingame"), Constants.CONTROL_KEYNAME_COMBO + waypointKey, x, y += 12);
+        drawHelpStrings(Constants.getString("jm.waypoint.help_create_ingame"), waypointKey, x, y += 12);
+        drawHelpStrings(Constants.getString("jm.waypoint.help_create_inmap"), waypointKey, x, y += 12);
+        drawHelpStrings(Constants.getString("jm.waypoint.help_manage_ingame"), Constants.CONTROL_KEYNAME_COMBO + waypointKey, x, y += 12);
 
         FontRenderer fr = getFontRenderer();
         int indentX = this.width / 20;

@@ -28,13 +28,13 @@ public class BooleanPropertyButton extends Button
         String labelOn, labelOff;
         if (Type.OnOff == type)
         {
-            labelOn = Constants.getString("MapOverlay.on");
-            labelOff = Constants.getString("MapOverlay.off");
+            labelOn = Constants.getString("jm.common.on");
+            labelOff = Constants.getString("jm.common.off");
         }
         else
         {
-            labelOn = Constants.getString("MiniMap.font_small");
-            labelOff = Constants.getString("MiniMap.font_large");
+            labelOn = Constants.getString("jm.common.font_small");
+            labelOff = Constants.getString("jm.common.font_large");
         }
         return new BooleanPropertyButton(id, labelOn, labelOff, properties, valueHolder);
     }
@@ -49,13 +49,13 @@ public class BooleanPropertyButton extends Button
         String labelOn, labelOff;
         if (Type.OnOff == type)
         {
-            labelOn = Constants.getString(rawLabel, Constants.getString("MapOverlay.on"));
-            labelOff = Constants.getString(rawLabel, Constants.getString("MapOverlay.off"));
+            labelOn = Constants.getString(rawLabel, Constants.getString("jm.common.on"));
+            labelOff = Constants.getString(rawLabel, Constants.getString("jm.common.off"));
         }
         else
         {
-            labelOn = Constants.getString(rawLabel, Constants.getString("MiniMap.font_small"));
-            labelOff = Constants.getString(rawLabel, Constants.getString("MiniMap.font_large"));
+            labelOn = Constants.getString(rawLabel, Constants.getString("jm.common.font_small"));
+            labelOff = Constants.getString(rawLabel, Constants.getString("jm.common.font_large"));
         }
         return new BooleanPropertyButton(id, labelOn, labelOff, properties, valueHolder);
     }

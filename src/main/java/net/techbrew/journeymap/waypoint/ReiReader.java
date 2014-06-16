@@ -73,8 +73,8 @@ public class ReiReader
         }
         catch (Throwable e)
         {
-            JourneyMap.getLogger().warning("Incompatible version of ReiMinimap. Tried reifnsk.minimap.ReiMinimap.instance.getWaypoints(): " + e);
-            ChatLog.announceI18N("Waypoint.import_rei_version");
+            JourneyMap.getLogger().warning("Incompatible version of Reijm.minimap. Tried reifnsk.jm.minimap.Reijm.minimap.instance.getWaypoints(): " + e);
+            ChatLog.announceI18N("jm.waypoint.import_rei_version");
             modLoaded = false;
             return Collections.EMPTY_LIST;
         }
@@ -170,7 +170,7 @@ public class ReiReader
             }
             catch (Exception e)
             {
-                ChatLog.announceError(Constants.getString("Waypoint.import_rei_file_error", pointsFile.getName()));
+                ChatLog.announceError(Constants.getString("jm.waypoint.import_rei_file_error", pointsFile.getName()));
                 JourneyMap.getLogger().severe(LogFormatter.toString(e));
                 fileErrors++;
             }
@@ -178,15 +178,15 @@ public class ReiReader
 
         if(waypoints.isEmpty())
         {
-            ChatLog.announceI18N("Waypoint.import_rei_failure");
+            ChatLog.announceI18N("jm.waypoint.import_rei_failure");
         }
         else if(fileErrors == 0 && pointErrors==0)
         {
-            ChatLog.announceI18N("Waypoint.import_rei_success", waypoints.size());
+            ChatLog.announceI18N("jm.waypoint.import_rei_success", waypoints.size());
         }
         else
         {
-            ChatLog.announceI18N("Waypoint.import_rei_errors", waypoints.size(), pointErrors);
+            ChatLog.announceI18N("jm.waypoint.import_rei_errors", waypoints.size(), pointErrors);
         }
 
         return waypoints;

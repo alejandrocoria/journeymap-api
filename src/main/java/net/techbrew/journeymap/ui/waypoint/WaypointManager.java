@@ -24,8 +24,8 @@ import java.util.List;
 public class WaypointManager extends JmUI
 {
 
-    final static String ASCEND = Constants.getString("JourneyMap.char_uparrow");
-    final static String DESCEND = Constants.getString("JourneyMap.char_downarrow");
+    final static String ASCEND = Constants.getString("jm.common.char_uparrow");
+    final static String DESCEND = Constants.getString("jm.common.char_downarrow");
     final static int COLWAYPOINT = 0;
     final static int COLLOCATION = 20;
     final static int COLNAME = 60;
@@ -36,10 +36,10 @@ public class WaypointManager extends JmUI
     private enum ButtonEnum
     {
         Add, Find, SortName, SortDistance, Dimensions, ToggleAll, Help, Options, Close
-    }
+    } 
 
-    final String on = Constants.getString("MapOverlay.on");
-    final String off = Constants.getString("MapOverlay.off");
+    final String on = Constants.getString("jm.common.on");
+    final String off = Constants.getString("jm.common.off");
 
     protected int rowHeight = 16;
     protected int colWaypoint = COLWAYPOINT;
@@ -68,7 +68,7 @@ public class WaypointManager extends JmUI
 
     public WaypointManager(Waypoint focusWaypoint, Class<? extends JmUI> returnClass)
     {
-        super(Constants.getString("Waypoint.manage_title"), returnClass);
+        super(Constants.getString("jm.waypoint.manage_title"), returnClass);
         this.focusWaypoint = focusWaypoint;
     }
 
@@ -100,7 +100,7 @@ public class WaypointManager extends JmUI
                 if (buttonSortDistance == null)
                 {
                     WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(FMLClientHandler.instance().getClient().thePlayer, true);
-                    String distanceLabel = Constants.getString("Waypoint.distance");
+                    String distanceLabel = Constants.getString("jm.waypoint.distance");
                     buttonSortDistance = new SortButton(ButtonEnum.SortDistance, distanceLabel, distanceSort);
                     buttonSortDistance.setTextOnly(fr);
                 }
@@ -109,15 +109,15 @@ public class WaypointManager extends JmUI
                 if (buttonSortName == null)
                 {
                     WaypointManagerItem.Sort nameSort = new WaypointManagerItem.NameComparator(true);
-                    buttonSortName = new SortButton(ButtonEnum.SortName, Constants.getString("Waypoint.name"), nameSort);
+                    buttonSortName = new SortButton(ButtonEnum.SortName, Constants.getString("jm.waypoint.name"), nameSort);
                     buttonSortName.setTextOnly(fr);
                 }
                 buttonList.add(buttonSortName);
 
                 if (buttonToggleAll == null)
                 {
-                    String enableOn = Constants.getString("Waypoint.enable_all", "", on);
-                    String enableOff = Constants.getString("Waypoint.enable_all", "", off);
+                    String enableOn = Constants.getString("jm.waypoint.enable_all", "", on);
+                    String enableOff = Constants.getString("jm.waypoint.enable_all", "", off);
                     buttonToggleAll = new Button(ButtonEnum.ToggleAll.ordinal(), 0, 0, enableOff, enableOn, true);
                     buttonToggleAll.setTextOnly(getFontRenderer());
                 }
@@ -131,24 +131,24 @@ public class WaypointManager extends JmUI
 
                 if (buttonAdd == null)
                 {
-                    buttonAdd = new Button(ButtonEnum.Add, Constants.getString("Waypoint.new"));
+                    buttonAdd = new Button(ButtonEnum.Add, Constants.getString("jm.waypoint.new"));
                     buttonAdd.fitWidth(getFontRenderer());
                     buttonAdd.setWidth(buttonAdd.getWidth() * 2);
                 }
 
                 if (buttonHelp == null)
                 {
-                    buttonHelp = new Button(ButtonEnum.Help, Constants.getString("MapOverlay.help"));
+                    buttonHelp = new Button(ButtonEnum.Help, Constants.getString("jm.common.help"));
                     buttonHelp.fitWidth(getFontRenderer());
                 }
 
                 if (buttonOptions == null)
                 {
-                    buttonOptions = new Button(ButtonEnum.Options, Constants.getString("MapOverlay.options_button"));
+                    buttonOptions = new Button(ButtonEnum.Options, Constants.getString("jm.common.options_button"));
                     buttonOptions.fitWidth(getFontRenderer());
                 }
 
-                buttonClose = new Button(ButtonEnum.Close, Constants.getString("MapOverlay.close"));
+                buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close"));
 
                 bottomButtons = new ButtonList(buttonOptions, buttonHelp, buttonAdd, buttonDimensions, buttonClose);
                 buttonList.addAll(bottomButtons);
@@ -467,8 +467,8 @@ public class WaypointManager extends JmUI
     protected void updateCount()
     {
         String itemCount = items.isEmpty() ? "" : Integer.toString(items.size());
-        String enableOn = Constants.getString("Waypoint.enable_all", itemCount, on);
-        String enableOff = Constants.getString("Waypoint.enable_all", itemCount, off);
+        String enableOn = Constants.getString("jm.waypoint.enable_all", itemCount, on);
+        String enableOff = Constants.getString("jm.waypoint.enable_all", itemCount, off);
         buttonToggleAll.setLabels(enableOff, enableOn);
     }
 
@@ -575,7 +575,7 @@ public class WaypointManager extends JmUI
             int maxWidth = 0;
             for (WorldProvider worldProvider : worldProviders)
             {
-                String name = Constants.getString("Waypoint.dimension", worldProvider.getDimensionName());
+                String name = Constants.getString("jm.waypoint.dimension", worldProvider.getDimensionName());
                 maxWidth = Math.max(maxWidth, FMLClientHandler.instance().getClient().fontRenderer.getStringWidth(name));
             }
             return maxWidth + 12;

@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class Constants {
-
+public class Constants
+{
     public static String JOURNEYMAP_DIR = "journeyMap" + File.separator; //$NON-NLS-1$
     public static String CONFIG_DIR = JOURNEYMAP_DIR + "config" + File.separator; //$NON-NLS-1$
     public static String CUSTOM_DIR = JOURNEYMAP_DIR + "custom" + File.separator; //$NON-NLS-1$
@@ -63,12 +63,24 @@ public class Constants {
         return locale;
     }
 
-    public static String getString(String key) {
-        return I18n.format(key);
+    public static String getString(String key)
+    {
+        String result = I18n.format(key);
+        if(result.equals(key))
+        {
+            JourneyMap.getLogger().warning("Message key not found: " + key);
+        }
+        return result;
     }
 
-    public static String getString(String key, Object... params) {
-        return I18n.format(key, params);
+    public static String getString(String key, Object... params)
+    {
+        String result = I18n.format(key, params);
+        if(result.equals(key))
+        {
+            JourneyMap.getLogger().warning("Message key not found: " + key);
+        }
+        return result;
     }
 
     public static String getKeyName(KeyBinding keyBinding)
@@ -147,133 +159,131 @@ public class Constants {
     public enum WorldType
     {
         mp, sp
-    }
-
-    ;
-
+    }    
+    
     public static String getMessageJMERR00(Object... params)
     {
-        return getString("JMERR00", params); //$NON-NLS-1$
+        return getString("jm.error.00", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR01(Object... params)
     {
-        return getString("JMERR01", params); //$NON-NLS-1$
+        return getString("jm.error.01", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR02(Object... params)
     {
-        return getString("JMERR02", params); //$NON-NLS-1$
+        return getString("jm.error.02", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR03(Object... params)
     {
-        return getString("JMERR03", params); //$NON-NLS-1$
+        return getString("jm.error.03", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR04(Object... params)
     {
-        return getString("JMERR04", params); //$NON-NLS-1$
+        return getString("jm.error.04", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR05(Object... params)
     {
-        return getString("JMERR05", params); //$NON-NLS-1$
+        return getString("jm.error.05", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR06(Object... params)
     {
-        return getString("JMERR06", params); //$NON-NLS-1$
+        return getString("jm.error.06", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR07(Object... params)
     {
-        return getString("JMERR07", params); //$NON-NLS-1$
+        return getString("jm.error.07", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR08(Object... params)
     {
-        return getString("JMERR08", params); //$NON-NLS-1$
+        return getString("jm.error.08", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR09(Object... params)
     {
-        return getString("JMERR09", params); //$NON-NLS-1$
+        return getString("jm.error.09", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR10(Object... params)
     {
-        return getString("JMERR10", params); //$NON-NLS-1$
+        return getString("jm.error.10", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR11(Object... params)
     {
-        return getString("JMERR11", params); //$NON-NLS-1$
+        return getString("jm.error.11", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR12(Object... params)
     {
-        return getString("JMERR12", params); //$NON-NLS-1$
+        return getString("jm.error.12", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR13(Object... params)
     {
-        return getString("JMERR13", params); //$NON-NLS-1$
+        return getString("jm.error.13", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR14(Object... params)
     {
-        return getString("JMERR13", params); //$NON-NLS-1$
+        return getString("jm.error.13", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR15(Object... params)
     {
-        return getString("JMERR15", params); //$NON-NLS-1$
+        return getString("jm.error.15", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR16(Object... params)
     {
-        return getString("JMERR16", params); //$NON-NLS-1$
+        return getString("jm.error.16", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR17(Object... params)
     {
-        return getString("JMERR17", params); //$NON-NLS-1$
+        return getString("jm.error.17", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR18(Object... params)
     {
-        return getString("JMERR18", params); //$NON-NLS-1$
+        return getString("jm.error.18", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR19(Object... params)
     {
-        return getString("JMERR19", params); //$NON-NLS-1$
+        return getString("jm.error.19", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR20(Object... params)
     {
-        return getString("JMERR20", params); //$NON-NLS-1$
+        return getString("jm.error.20", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR21(Object... params)
     {
-        return getString("JMERR21", params); //$NON-NLS-1$
+        return getString("jm.error.21", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR22(Object... params)
     {
-        return getString("JMERR22", params); //$NON-NLS-1$
+        return getString("jm.error.22", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR23(Object... params)
     {
-        return getString("JMERR23", params); //$NON-NLS-1$
+        return getString("jm.error.23", params); //$NON-NLS-1$
     }
 
     public static String getMessageJMERR24()
     {
-        return getString("JMERR24"); //$NON-NLS-1$
+        return getString("jm.error.24"); //$NON-NLS-1$
     }
 
 }

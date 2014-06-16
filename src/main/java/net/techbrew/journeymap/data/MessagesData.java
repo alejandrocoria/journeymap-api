@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class MessagesData extends CacheLoader<Class, Map<String,Object>>
 {
-    private static final String KEY_PREFIX = "WebMap."; //$NON-NLS-1$
+    private static final String KEY_PREFIX = "jm.webmap."; //$NON-NLS-1$
 
     /**
      * Constructor.

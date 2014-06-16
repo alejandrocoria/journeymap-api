@@ -157,7 +157,7 @@ public class Waypoint implements Serializable
         String name;
         if (type == Type.Death)
         {
-            name = Constants.getString("Waypoint.deathpoint");
+            name = Constants.getString("jm.waypoint.deathpoint");
         }
         else
         {

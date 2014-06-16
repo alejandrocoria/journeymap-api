@@ -29,16 +29,16 @@ import java.util.Collection;
 public class WaypointEditor extends JmUI
 {
 
-    String labelName = Constants.getString("Waypoint.name");
-    String locationTitle = Constants.getString("Waypoint.location");
-    String colorTitle = Constants.getString("Waypoint.color");
-    String dimensionsTitle = Constants.getString("Waypoint.dimensions");
-    String labelX = Constants.getString("Waypoint.x");
-    String labelY = Constants.getString("Waypoint.y");
-    String labelZ = Constants.getString("Waypoint.z");
-    String labelR = Constants.getString("Waypoint.r");
-    String labelG = Constants.getString("Waypoint.g");
-    String labelB = Constants.getString("Waypoint.b");
+    String labelName = Constants.getString("jm.waypoint.name");
+    String locationTitle = Constants.getString("jm.waypoint.location");
+    String colorTitle = Constants.getString("jm.waypoint.color");
+    String dimensionsTitle = Constants.getString("jm.waypoint.dimensions");
+    String labelX = Constants.getString("jm.waypoint.x");
+    String labelY = Constants.getString("jm.waypoint.y");
+    String labelZ = Constants.getString("jm.waypoint.z");
+    String labelR = Constants.getString("jm.waypoint.red_abbreviated");
+    String labelG = Constants.getString("jm.waypoint.green_abbreviated");
+    String labelB = Constants.getString("jm.waypoint.blue_abbreviated");
 
     String currentLocation = "";
 
@@ -84,7 +84,7 @@ public class WaypointEditor extends JmUI
 
     public WaypointEditor(Waypoint waypoint, boolean isNew, Class<? extends JmUI> returnClass)
     {
-        super(Constants.getString(isNew ? "Waypoint.new_title" : "Waypoint.edit_title"), returnClass);
+        super(Constants.getString(isNew ? "jm.waypoint.new_title" : "jm.waypoint.edit_title"), returnClass);
         this.originalWaypoint = waypoint;
         this.editedWaypoint = new Waypoint(originalWaypoint);
         this.isNew = isNew;
@@ -106,11 +106,11 @@ public class WaypointEditor extends JmUI
             int dimension = mc.thePlayer.worldObj.provider.dimensionId;
 
             // Update player pos
-            String pos = Constants.getString("MapOverlay.location_xzy",
+            String pos = Constants.getString("jm.common.location_xzy",
                     Integer.toString((int) mc.thePlayer.posX),
                     Integer.toString((int) mc.thePlayer.posZ),
                     Integer.toString((int) mc.thePlayer.posY));
-            currentLocation = Constants.getString("Waypoint.current_location", " " + pos);
+            currentLocation = Constants.getString("jm.waypoint.current_location", " " + pos);
 
             if (this.fieldList.isEmpty())
             {
@@ -175,25 +175,25 @@ public class WaypointEditor extends JmUI
 
             if (this.buttonList.isEmpty())
             {
-                String on = Constants.getString("MapOverlay.on");
-                String off = Constants.getString("MapOverlay.off");
-                String enableOn = Constants.getString("Waypoint.enable", on);
-                String enableOff = Constants.getString("Waypoint.enable", off);
+                String on = Constants.getString("jm.common.on");
+                String off = Constants.getString("jm.common.off");
+                String enableOn = Constants.getString("jm.waypoint.enable", on);
+                String enableOff = Constants.getString("jm.waypoint.enable", off);
 
-                buttonRandomize = new Button(ButtonEnum.Randomize, Constants.getString("Waypoint.randomize")); //$NON-NLS-1$
+                buttonRandomize = new Button(ButtonEnum.Randomize, Constants.getString("jm.waypoint.randomize")); //$NON-NLS-1$
 
                 buttonEnable = new Button(ButtonEnum.Enable, enableOn, enableOff, true); //$NON-NLS-1$
                 buttonEnable.setToggled(originalWaypoint.isEnable());
 
-                buttonRemove = new Button(ButtonEnum.Remove, Constants.getString("Waypoint.remove")); //$NON-NLS-1$
+                buttonRemove = new Button(ButtonEnum.Remove, Constants.getString("jm.waypoint.remove")); //$NON-NLS-1$
                 buttonRemove.setEnabled(!isNew);
                 buttonRemove.setNoDisableText(true);
 
-                buttonReset = new Button(ButtonEnum.Reset, Constants.getString("Waypoint.reset")); //$NON-NLS-1$
-                buttonSave = new Button(ButtonEnum.Save, Constants.getString("Waypoint.save")); //$NON-NLS-1$
+                buttonReset = new Button(ButtonEnum.Reset, Constants.getString("jm.waypoint.reset")); //$NON-NLS-1$
+                buttonSave = new Button(ButtonEnum.Save, Constants.getString("jm.waypoint.save")); //$NON-NLS-1$
                 buttonSave.setNoDisableText(true);
 
-                String closeLabel = isNew ? "Waypoint.cancel" : "MapOverlay.close";
+                String closeLabel = isNew ? "jm.waypoint.cancel" : "jm.common.close";
                 buttonClose = new Button(ButtonEnum.Close, Constants.getString(closeLabel));
 
                 buttonList.add(buttonEnable);
@@ -686,7 +686,7 @@ public class WaypointEditor extends JmUI
 
         DimensionButton(int id, int dimension, String dimensionName, boolean toggled)
         {
-            super(id, 0, 0, String.format("%s: %s", dimensionName, Constants.getString("MapOverlay.on")), String.format("%s: %s", dimensionName, Constants.getString("MapOverlay.off")), toggled);
+            super(id, 0, 0, String.format("%s: %s", dimensionName, Constants.getString("jm.common.on")), String.format("%s: %s", dimensionName, Constants.getString("jm.common.off")), toggled);
             this.dimension = dimension;
             setToggled(toggled);
         }

@@ -161,8 +161,6 @@ public class JourneyMap
                 return;
             }
 
-            mc = FMLClientHandler.instance().getClient();
-
             // Load properties
             coreProperties = new CoreProperties().load();
             fullMapProperties = new FullMapProperties().load();
@@ -329,8 +327,7 @@ public class JourneyMap
     {
         synchronized (this)
         {
-
-            if (mc.theWorld == null)
+            if (mc==null || mc.theWorld == null)
             {
                 return;
             }

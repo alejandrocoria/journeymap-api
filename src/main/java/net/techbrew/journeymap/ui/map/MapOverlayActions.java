@@ -37,7 +37,7 @@ public class MapOverlayActions extends JmUI
 
     public MapOverlayActions()
     {
-        super(Constants.getString("MapOverlay.actions"));
+        super(Constants.getString("jm.common.actions"));
     }
 
     /**
@@ -48,21 +48,21 @@ public class MapOverlayActions extends JmUI
     {
         this.buttonList.clear();
 
-        String on = Constants.getString("MapOverlay.on");
-        String off = Constants.getString("MapOverlay.off");
+        String on = Constants.getString("jm.common.on");
+        String off = Constants.getString("jm.common.off");
 
-        buttonSave = new Button(ButtonEnum.Save, Constants.getString("MapOverlay.save_map")); //$NON-NLS-1$
-        buttonClose = new Button(ButtonEnum.Close, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
-        buttonBrowser = new Button(ButtonEnum.Browser, Constants.getString("MapOverlay.use_browser")); //$NON-NLS-1$
+        buttonSave = new Button(ButtonEnum.Save, Constants.getString("jm.common.save_map")); //$NON-NLS-1$
+        buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
+        buttonBrowser = new Button(ButtonEnum.Browser, Constants.getString("jm.common.use_browser")); //$NON-NLS-1$
         buttonBrowser.setEnabled(JourneyMap.getInstance().webMapProperties.enabled.get());
 
         buttonAutomap = new Button(ButtonEnum.Automap,
-                Constants.getString("MapOverlay.automap_title", on),
-                Constants.getString("MapOverlay.automap_title", off),
+                Constants.getString("jm.common.automap_title", on),
+                Constants.getString("jm.common.automap_title", off),
                 true); //$NON-NLS-1$ //$NON-NLS-2$
         buttonAutomap.setEnabled(FMLClientHandler.instance().getClient().isSingleplayer());
 
-        buttonCheck = new Button(ButtonEnum.Check, Constants.getString("MapOverlay.update_check")); //$NON-NLS-1$
+        buttonCheck = new Button(ButtonEnum.Check, Constants.getString("jm.common.update_check")); //$NON-NLS-1$
 
         buttonList.add(buttonAutomap);
         buttonList.add(buttonSave);
@@ -164,7 +164,7 @@ public class MapOverlayActions extends JmUI
         if (mapSaver.isValid())
         {
             JourneyMap.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
-            ChatLog.announceI18N("MapOverlay.save_filename", mapSaver.getSaveFileName()); //$NON-NLS-1$
+            ChatLog.announceI18N("jm.common.save_filename", mapSaver.getSaveFileName()); //$NON-NLS-1$
         }
         close();
     }

@@ -49,7 +49,7 @@ public class LegacyMigrationTask implements IGenericTask
         float total = 1F * pngFilesFound;
         float remaining = total - pngFiles.size();
         String percent = new DecimalFormat("##.#").format(remaining * 100 / total) + "%";
-        ChatLog.announceI18N("JourneyMap.file_updates", percent);
+        ChatLog.announceI18N("jm.common.file_updates", percent);
 
         final long start = System.nanoTime();
         int count = 0;
@@ -285,7 +285,7 @@ public class LegacyMigrationTask implements IGenericTask
 
             if (this.pngFiles.isEmpty())
             {
-                ChatLog.announceI18N("JourneyMap.file_updates_complete");
+                ChatLog.announceI18N("jm.common.file_updates_complete");
                 disableTask(minecraft);
                 return null;
             }

@@ -30,10 +30,10 @@ public class DisplayVars
      */
     public enum Position
     {
-        TopRight("MiniMap.position_topright"),
-        BottomRight("MiniMap.position_bottomright"),
-        BottomLeft("MiniMap.position_bottomleft"),
-        TopLeft("MiniMap.position_topleft");
+        TopRight("jm.minimap.position_topright"),
+        BottomRight("jm.minimap.position_bottomright"),
+        BottomLeft("jm.minimap.position_bottomleft"),
+        TopLeft("jm.minimap.position_topleft");
 
         public final String label;
 
@@ -88,11 +88,11 @@ public class DisplayVars
      */
     public enum Shape
     {
-        SmallSquare("MiniMap.shape_smallsquare"),
-        MediumSquare("MiniMap.shape_mediumsquare"),
-        LargeSquare("MiniMap.shape_largesquare"),
-        SmallCircle("MiniMap.shape_smallcircle"),
-        LargeCircle("MiniMap.shape_largecircle");
+        SmallSquare("jm.minimap.shape_smallsquare"),
+        MediumSquare("jm.minimap.shape_mediumsquare"),
+        LargeSquare("jm.minimap.shape_largesquare"),
+        SmallCircle("jm.minimap.shape_smallcircle"),
+        LargeCircle("jm.minimap.shape_largecircle");
         public final String label;
 
         private Shape(String label)

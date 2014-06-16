@@ -36,7 +36,7 @@ public class MiniMapHotkeysHelp extends JmUI
 
     public MiniMapHotkeysHelp(Class<? extends JmUI> returnClass)
     {
-        super(Constants.getString("MiniMap.hotkeys_title"), returnClass);
+        super(Constants.getString("jm.minimap.hotkeys_title"), returnClass);
         keyEventHandler = new KeyEventHandler();
     }
 
@@ -48,7 +48,7 @@ public class MiniMapHotkeysHelp extends JmUI
     {
         this.buttonList.clear();
 
-        buttonClose = new Button(ButtonEnum.Close, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
+        buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
 
         buttonList.add(buttonClose);
 
@@ -108,7 +108,7 @@ public class MiniMapHotkeysHelp extends JmUI
         // Hotkey help
         y += 12;
         final int x = (this.width) / 2;
-        drawHelpStrings(Constants.getString("MiniMap.hotkeys_toggle"), Constants.getKeyName(Constants.KB_MAP), x, y += 12);
+        drawHelpStrings(Constants.getString("jm.minimap.hotkeys_toggle"), Constants.getKeyName(Constants.KB_MAP), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.zoom_in"), Constants.getKeyName(Constants.KB_MAP_ZOOMIN), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.zoom_out"), Constants.getKeyName(Constants.KB_MAP_ZOOMOUT), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.day"), Constants.getKeyName(Constants.KB_MAP_DAY), x, y += 12);

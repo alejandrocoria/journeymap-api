@@ -1,285 +1,264 @@
-# JourneyMap Resource Bundle - zh_CN
-# Updated for 3.3.0
-
-########################
-# Error messages: Note, translating these are optional, but they may help users diagnose the problem on their own.
-########################
-
-JMERR00=[JMERR00] JourneyMap 遇到一个意外的错误: %1$s
-JMERR01=[JMERR01] JourneyMap %1$s 要求 %2$s
-JMERR02=[JMERR02] JourneyMap 对该世界尚未生效
-JMERR03=[JMERR03] JMServer 无法开启网页服务器
-JMERR04=[JMERR04] FileHandler 无法写入文件: %1$s
-JMERR05=[JMERR05] 浏览器发来一个不正规的请求: %1$s
-JMERR06=[JMERR06] ChunkServlet 无法读取世界的数据目录: %1$s
-JMERR07=[JMERR07] 无法再区块中得到方块: %1$s
-JMERR08=[JMERR08] 无法向文件写入区块映像: %1$s
-JMERR09=[JMERR09] 玩家没有连入任何世界
-JMERR10=[JMERR10] 玩家没有连入世界: %1$s
-JMERR11=[JMERR11] 无法读取玩家数据文件
-JMERR12=[JMERR12] 无法为网络问价提供服务: %1$s
-JMERR13=[JMERR13] 浏览器要求未知文件: %1$s
-JMERR14=[JMERR14] 浏览器尝试了一个不支持HTTP的方法: %1$s
-JMERR15=[JMERR15] 写入玩家文件时发生了意外错误: %1$s
-JMERR16=[JMERR16] 写入区块映像文件时发生了意外错误: %1$s
-JMERR17=[JMERR17] 在游戏中的地图获取实体图标时发生了意外错误: %1$s
-JMERR18=[JMERR18] 错误输出世界地图: %1$s
-JMERR19=[JMERR19] 错误读取性质文件: %1$s
-JMERR20=[JMERR20] 错误写入性质文件: %1$s
-JMERR21=[JMERR21] 错误读取区域文件: %1$s. 错误: %2$s
-JMERR22=[JMERR22] 错误写入区域文件: %1$s. 错误: %2$s
-JMERR23=[JMERR23] 地图 UI 错误: %1$s
-JMERR24=[JMERR24] 启动网络服务器失败
-
-########################
-# In-game chat messages
-# Note: Do not translate or alter chat color changes (§b, §e, §f, etc.)
-########################
-
-# %1$s = JourneyMap version (§e and §f are color changes)
-JourneyMap.chat_announcement=§eJourneyMap:§f %1$s
-
-# %1$s = Key to press ('J')
-JourneyMap.mapgui_only_ready=按下 [§b%1$s§f]. (网络服务器不可用)
-
-# %1$s = JourneyMap version
-JourneyMap.new_version_available=查看更新: %1$s
-
-# %1$s = JourneyMap version (§e is a color change)
-JourneyMap.ready=§e%1$s 已成功载入
-
-JourneyMap.webserver_and_mapgui_disabled=JourneyMap 被 journeyMap.properties 文件禁用
-
-# %1$s = Key to press ('J'), %2$s = website port number (8080) (§b and §f are color changes)
-JourneyMap.webserver_and_mapgui_ready=按下 [§b%1$s§f] 或者在浏览器中打开网址§b http://localhost%2$s §f
-
-# %1$s = website port number (8080) (§e and §f are color changes)
-JourneyMap.webserver_only_ready=在浏览器打开网址§b http://localhost%1$s §f. (游戏内地图禁用)
-
-########################
-# In-game Map messages
-########################
-
-# %1$s = JourneyMap version
-MapOverlay.options=选项
-MapOverlay.close=关闭
-
-MapOverlay.day=白天
-MapOverlay.night=夜间
-
-MapOverlay.on=开
-MapOverlay.off=关
-
-# %1$s = "On" or "Off"
-MapOverlay.follow=跟随玩家位置: %1$s
-
-MapOverlay.save_map=截图
-
-# %1$s = type of map
-MapOverlay.saving_map_to_file=保存 %1$s 地图到文件...
-
-# %1$s = "On" or "Off"
-MapOverlay.show_caves=显示洞穴 : %1$s
-
-# %1$s = "On" or "Off"
-MapOverlay.show_monsters=显示怪物 : %1$s
-
-# %1$s = "On" or "Off"
-MapOverlay.show_animals=显示动物 : %1$s
-
-# %1$s = "On" or "Off"
-MapOverlay.show_villagers=显示村民 : %1$s
-
-# %1$s = "On" or "Off"
-MapOverlay.show_pets=显示宠物 : %1$s
-
-# %1$s = "On" or "Off"
-MapOverlay.show_players=显示玩家 : %1$s
-
-# %1$s = "On" or "Off"
-MapOverlay.show_waypoints=显示路标 : %1$s
-
-# %1$s = "On" or "Off"
-MapOverlay.show_grid=显示网格 : %1$s
-
-MapOverlay.update_available=查看更新
-MapOverlay.update_check=查看更新
-MapOverlay.use_browser=使用浏览器
-MapOverlay.zoom_in=放大
-MapOverlay.zoom_out=缩小
-
-# %1$s = filename
-MapSaver.map_saved=保存地图: %1$s
-
-########################
-# Web UI messages
-########################
-
-# Unused, but keep for future use
-WebMap.text_direction=ltr
-
-# JourneyMap menu / homepage link
-WebMap.web_link_text=journeymap.techbrew.net
-WebMap.web_link_title=JourneyMap homepage
-
-# JourneyMap menu / forums link
-WebMap.forum_link_text=minecraftforum.net
-WebMap.forum_link_title=JourneyMap forum on minecraftforum.net
-
-# JourneyMap menu / RSS feed link
-WebMap.rss_feed_text=JourneyMap news RSS
-WebMap.rss_feed_title=Subscribe to JourneyMap news by RSS feed
-
-# JourneyMap menu / Email subscription link
-WebMap.email_sub_text=JourneyMap news Email
-WebMap.email_sub_title=Subscribe to JourneyMap news by Email
-
-# JourneyMap menu / Follow on Twitter link
-WebMap.follow_twitter_text=Follow JourneyMapMod on Twitter
-WebMap.follow_twitter_title=Follow JourneyMapMod on Twitter
-
-# JourneyMap menu / Donate link
-WebMap.donate_text=Donate to JourneyMap
-WebMap.donate_title=Donate to JourneyMap development using PayPal
-
-# Update button title (shown only when update available)
-WebMap.update_button_title=检查更新: JourneyMap %1$s for Minecraft %2$s
-
-# Day/Night button
-WebMap.day_button_text=白天
-WebMap.day_button_title=模仿地图时间为白天
-WebMap.night_button_text=夜间
-WebMap.night_button_title=模仿地图时间为夜间
-
-# Follow button
-WebMap.follow_button_title=自动将你切换到地图的中心. (关闭以后可以自己调整)
-
-# Show menu
-WebMap.show_menu_text=显示...
-
-# Show menu / Smooth Pixels (Unused)
-WebMap.smooth_pixels_menu_item=平滑像素
-
-# Show menu / Caves
-WebMap.caves_menu_item_text=山洞
-WebMap.caves_menu_item_title=如果你不在室外，则显示洞穴或室内的地图
-
-# Show menu / Grid
-WebMap.grid_menu_item_text=网格
-WebMap.grid_menu_item_title=显示区块网格
-
-# Show menu / Waypoints
-WebMap.waypoints_menu_item_text=路标
-WebMap.waypoints_menu_item_title=显示路标
-
-# Show menu / Animals
-WebMap.animals_menu_item_text=动物
-WebMap.animals_menu_item_title=显示附近的动物
-
-# Show menu / Pets
-WebMap.pets_menu_item_text=宠物
-WebMap.pets_menu_item_title=显示附近的宠物
-
-# Show menu / Mobs (Monsters)
-WebMap.mobs_menu_item_text=怪物
-WebMap.mobs_menu_item_title=显示附近的怪物
-
-# Show menu / Villagers
-WebMap.villagers_menu_item_text=村民
-WebMap.villagers_menu_item_title=显示附近的村民
-
-# Show menu / Other players (multiplayer)
-WebMap.players_menu_item_text=玩家
-WebMap.players_menu_item_title=显示附近的玩家(多人)
-
-# Save Map button
-WebMap.save_button_title=将探索过的地图保存到文件
-
-# Zoom slider
-WebMap.zoom_slider_name=缩放
-
-# World info area
-WebMap.worldname_text=世界名称:
-WebMap.worldtime_text=世界时间:
-WebMap.location_text=坐标:
-WebMap.elevation_text=海拔:
-WebMap.slice_text=纵截面:
-WebMap.biome_text=生物群系:
-
-# Error message if world isn't open in Minecraft
-WebMap.error_world_not_opened=Minecraft 没有打开
-
-# 3.3.0 - Need to be translated
-JourneyMap.file_updates=Files are being updated (%1$s). Mapping suspended.
-JourneyMap.file_updates_complete=File updates complete. Mapping resumed.
-MapOverlay.disabled_feature=Feature not available
-MapOverlay.actions=MapOverlay.actions
-MapOverlay.save_filename=MapOverlay.save_filename
-MapOverlay.minimap=MiniMap...
-MapOverlay.enable_webserver=Webserver: %1$s
-MapOverlay.automap_title=Auto-Map...
-MapOverlay.automap_text=Automatically map regions (single-player
-MapOverlay.automap_dialog=Auto-Map
-MapOverlay.automap_dialog_text=Automatically map all regions or just missing regions?
-MapOverlay.automap_dialog_all=All
-MapOverlay.automap_dialog_missing=Missing
-MapOverlay.automap_dialog_none=None
-MapOverlay.automap_status=Auto-mapping surface (%1$s).
-MapOverlay.automap_status_underground=Auto-mapping slice %1$s (%2$s).
-MapOverlay.automap_complete=Auto-mapping of surface has stopped.
-MapOverlay.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
-MiniMap.options=MiniMap Options
-MiniMap.enable_minimap=MiniMap: %1$s
-MiniMap.position=Position: %1$s
-MiniMap.position_topleft=Top Left
-MiniMap.position_topright=Top Right
-MiniMap.position_bottomleft=Bottom Left
-MiniMap.position_bottomright=Bottom Right
-MiniMap.shape=Shape: %1$s
-MiniMap.shape_smallsquare=Small Square
-MiniMap.shape_largesquare=Large Square
-MiniMap.shape_smallcircle=Small Circle
-MiniMap.shape_largecircle=Large Circle
-MiniMap.font=Font: %1$s
-MiniMap.font_small=Small
-MiniMap.font_large=Large
-
-# Added in 3.3.x. %1$s = one of "On", "Off". Hot Keys are keyboard shortcuts that can control the minimap.
-MiniMap.hotkeys=Hot Keys: %1$s
-MiniMap.hotkeys_title=Minimap Hot Keys
-MiniMap.hotkeys_toggle=Toggle Minimap
-key.journeymap.minimap_position=Change Minimap Position
-
-# Added in 3.3.x.  Used in Minecraft Controls menu and JourneyMap/Options/Minimap.../HotKeys... dialog.
-# {0} is either "Ctrl+" or "^" depending on Windows or MacOS
-MapOverlay.hotkeys_keybinding_category=JourneyMap (Use %1$s[key] for Minimap)
-MapOverlay.hotkeys_button=Hot Keys...
-MapOverlay.hotkeys_title=Hot Keys
+jm.common.actions=Actions
+jm.common.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
+jm.common.automap_complete=Auto-mapping of surface has stopped.
+jm.common.automap_dialog_all=All
+jm.common.automap_dialog_missing=Missing
+jm.common.automap_dialog_none=None
+jm.common.automap_dialog_text=Automatically map all regions or just missing regions?
+jm.common.automap_dialog=Auto-Map
+jm.common.automap_status_underground=Auto-mapping slice %1$s (%2$s).
+jm.common.automap_status=Auto-mapping surface (%1$s).
+jm.common.automap_text=Automatically map regions (single-player
+jm.common.automap_title=Auto-Map...
+jm.common.char_downarrow=>
+jm.common.char_uparrow=<
+jm.common.chat_announcement=§eJourneyMap:§f %1$s
+jm.common.close=关闭
+jm.common.day=白天
+jm.common.dimension=Dimension %1$s
+jm.common.disabled_feature=Feature not available
+jm.common.enable=Enabled: %1$s
+jm.common.file_updates_complete=File updates complete. Mapping resumed.
+jm.common.file_updates=Files are being updated (%1$s). Mapping suspended.
+jm.common.font_large=Large
+jm.common.font_small=Small
+jm.common.font=Font: %1$s
+jm.common.general_display_button=General Display...
+jm.common.general_display_title=General Display Options
+jm.common.general_display=General Display
+jm.common.help=Help...
+jm.common.hide_buttons=Hide Buttons
+jm.common.hotkeys_button=Hot Keys...
+jm.common.hotkeys_keybinding_category=JourneyMap (Use %1%s[key] for Minimap)
+jm.common.location_xz=x: %1$s, z: %2$s
+jm.common.location_xzy=x: %1$s, z: %2$s, y: %3$s
+jm.common.location_xzye=x: %1$s, z: %2$s, y: %3$s (%4$s)
+jm.common.location_xzyeb=x: %1$s, z: %2$s, y: %3$s (%4$s) %5$s
+jm.common.log_warning=Log level %1$s will slow down the game. Do not use for normal gameplay!
+jm.common.map_saved=保存地图: %1$s
+jm.common.mapgui_only_ready=按下 [§b%1$s§f]. (网络服务器不可用)
+jm.common.memory_warning=Minecraft is running out of memory: %1$s
+jm.common.new_version_available=查看更新: %1$s
+jm.common.night=夜间
+jm.common.off=关
+jm.common.on=开
+jm.common.options_button=Options...
+jm.common.options=选项
+jm.common.ready=§e%1$s 已成功载入
+jm.common.save_filename=jm.common.save_filename
+jm.common.save_map=截图
+jm.common.saving_map_to_file=保存 %1$s 地图到文件...
+jm.common.show_animals=显示动物 : %1$s
+jm.common.show_buttons=Show Buttons
+jm.common.show_caves=显示洞穴 : %1$s
+jm.common.show_grid=显示网格 : %1$s
+jm.common.show_monsters=显示怪物 : %1$s
+jm.common.show_pets=显示宠物 : %1$s
+jm.common.show_players=显示玩家 : %1$s
+jm.common.show_self=Show Self: %1$s
+jm.common.show_villagers=显示村民 : %1$s
+jm.common.show_waypoints=显示路标 : %1$s
+jm.common.update_available=查看更新
+jm.common.update_check=查看更新
+jm.common.use_browser=使用浏览器
+jm.common.webserver_and_mapgui_disabled=JourneyMap 被 jm.common.properties 文件禁用
+jm.common.webserver_and_mapgui_ready=按下 [§b%1$s§f] 或者在浏览器中打开网址§b http://localhost%2$s §f
+jm.common.webserver_only_ready=在浏览器打开网址§b http://localhost%1$s §f. (游戏内地图禁用)
+jm.error.00=[ERROR.00] JourneyMap 遇到一个意外的错误: %1$s
+jm.error.01=[ERROR.01] JourneyMap %1$s 要求 %2$s
+jm.error.02=[ERROR.02] JourneyMap 对该世界尚未生效
+jm.error.03=[ERROR.03] JMServer 无法开启网页服务器
+jm.error.04=[ERROR.04] FileHandler 无法写入文件: %1$s
+jm.error.05=[ERROR.05] 浏览器发来一个不正规的请求: %1$s
+jm.error.06=[ERROR.06] ChunkServlet 无法读取世界的数据目录: %1$s
+jm.error.07=[ERROR.07] 无法再区块中得到方块: %1$s
+jm.error.08=[ERROR.08] 无法向文件写入区块映像: %1$s
+jm.error.09=[ERROR.09] 玩家没有连入任何世界
+jm.error.10=[ERROR.10] 玩家没有连入世界: %1$s
+jm.error.11=[ERROR.11] 无法读取玩家数据文件
+jm.error.12=[ERROR.12] 无法为网络问价提供服务: %1$s
+jm.error.13=[ERROR.13] 浏览器要求未知文件: %1$s
+jm.error.14=[ERROR.14] 浏览器尝试了一个不支持HTTP的方法: %1$s
+jm.error.15=[ERROR.15] 写入玩家文件时发生了意外错误: %1$s
+jm.error.16=[ERROR.16] 写入区块映像文件时发生了意外错误: %1$s
+jm.error.17=[ERROR.17] 在游戏中的地图获取实体图标时发生了意外错误: %1$s
+jm.error.18=[ERROR.18] 错误输出世界地图: %1$s
+jm.error.19=[ERROR.19] 错误读取性质文件: %1$s
+jm.error.20=[ERROR.20] 错误写入性质文件: %1$s
+jm.error.21=[ERROR.21] 错误读取区域文件: %1$s. 错误: %2$s
+jm.error.22=[ERROR.22] 错误写入区域文件: %1$s. 错误: %2$s
+jm.error.23=[ERROR.23] 地图 UI 错误: %1$s
+jm.error.24=[ERROR.24] 启动网络服务器失败
+jm.error.compatability=Incompatability error running %1$s for Forge %2$s. Ensure your version of Forge is compatible.
+jm.feature.fairplay=FairPlay
+jm.feature.unlimited=Unlimited
+jm.fullscreen.caves=Caves: %1$s
+jm.fullscreen.enable_webserver=Webserver: %1$s
+jm.fullscreen.follow=跟随玩家位置: %1$s
+jm.fullscreen.hotkeys_doubleclick=(Double-click)
+jm.fullscreen.hotkeys_east=Pan East (16 Blocks)
+jm.fullscreen.hotkeys_north=Pan North (16 Blocks)
+jm.fullscreen.hotkeys_south=Pan South (16 Blocks)
+jm.fullscreen.hotkeys_title=Hot Keys
+jm.fullscreen.hotkeys_waypoint=Create/Edit Waypoint
+jm.fullscreen.hotkeys_west=Pan West (16 Blocks)
+jm.fullscreen.map_day=Day
+jm.fullscreen.map_night=Night
+jm.fullscreen.minimap=Minimap...
+jm.fullscreen.title=Full-screen Map
+jm.fullscreen.zoom_in=放大
+jm.fullscreen.zoom_out=缩小
+jm.minimap.enable_minimap=MiniMap: %1$s
+jm.minimap.force_unicode=Force Unicode: %1$s
+jm.minimap.hotkeys_button=MiniMap Hot Keys: %1$s
+jm.minimap.hotkeys_title=Minimap Hot Keys
+jm.minimap.hotkeys_toggle=Toggle Minimap
+jm.minimap.hotkeys=Hot Keys: %1$s
+jm.minimap.options=MiniMap Options
+jm.minimap.position_bottomleft=Bottom Left
+jm.minimap.position_bottomright=Bottom Right
+jm.minimap.position_topleft=Top Left
+jm.minimap.position_topright=Top Right
+jm.minimap.position=Position: %1$s
+jm.minimap.return_to_game=Return to Game
+jm.minimap.shape_largecircle=Large Circle
+jm.minimap.shape_largesquare=Large Square
+jm.minimap.shape_mediumsquare=Medium Square
+jm.minimap.shape_smallcircle=Small Circle
+jm.minimap.shape_smallsquare=Small Square
+jm.minimap.shape=Shape: %1$s
+jm.minimap.show_fps=Show FPS: %1$s
+jm.minimap.texture_size=Icons: %1$s
+jm.minimap.title=Mini Map
+jm.waypoint.auto_hide_label=Auto-Hide Label: %1$s
+jm.waypoint.blue_abbreviated=B
+jm.waypoint.bold_label=Bold Label: %1$s
+jm.waypoint.cancel=Cancel
+jm.waypoint.color=Color
+jm.waypoint.current_location=Current Location: %1$s
+jm.waypoint.deathpoint=Death
+jm.waypoint.dimension_all=All
+jm.waypoint.dimension=Dimension: %1$s
+jm.waypoint.dimensions=Dimensions
+jm.waypoint.display_management=Waypoint In-Game Display and Management
+jm.waypoint.distance_meters=(%1$sm)
+jm.waypoint.distance=Distance
+jm.waypoint.edit_title=Edit Waypoint
+jm.waypoint.edit=Edit
+jm.waypoint.enable_all=All %1$s: %2$s
+jm.waypoint.enable_beacons=Waypoint Beacons: %1$s
+jm.waypoint.enable_manager=Enabled: %1$s
+jm.waypoint.enable=Enabled: %1$s
+jm.waypoint.find=Find
+jm.waypoint.font_size=Font: %1$s
+jm.waypoint.force_unicode=Force Unicode: %1$s
+jm.waypoint.green_abbreviated=G
+jm.waypoint.help_create_ingame=Create/Edit Waypoint (in game)
+jm.waypoint.help_create_inmap=Create/Edit Waypoint (in map)
+jm.waypoint.help_import_rei_title=Import Rei's MiniMap Waypoints
+jm.waypoint.help_import_rei=Or copy §b%1$s§f to §b%2$s§f and restart Minecraft.
+jm.waypoint.help_import_voxel_title=Import VoxelMap Waypoints
+jm.waypoint.help_import_voxel=Or copy §b%1$s§f to §b%2$s§f and restart Minecraft.
+jm.waypoint.help_manage_ingame=Waypoint Manager (in game)
+jm.waypoint.help_title=Waypoint Help
+jm.waypoint.import_rei_errors=Imported %1$s waypoints from Rei's MiniMap with %1$s errors. See jm.common.log for details.
+jm.waypoint.import_rei_failure=No Rei's MiniMap waypoints were imported. See jm.common.log for details.
+jm.waypoint.import_rei_file_error=Could not import Rei's MiniMap waypoint file: %1$s
+jm.waypoint.import_rei_success=Imported %1$s waypoints from of Rei's Minimap.
+jm.waypoint.import_rei_version=Your version of Rei's MiniMap is not supported.
+jm.waypoint.import_vox_errors=Imported %1$s waypoints from VoxelMap with %1$s errors. See jm.common.log for details.
+jm.waypoint.import_vox_failure=No VoxelMap waypoints were imported. See jm.common.log for details.
+jm.waypoint.import_vox_file_error=Could not import VoxelMap waypoint file: %1$s
+jm.waypoint.import_vox_success=Imported %1$s waypoints from VoxelMap.
+jm.waypoint.import_vox_version=Your version of VoxelMap is not supported. Please update to:
+jm.waypoint.location=Location
+jm.waypoint.manage_title=Manage Waypoints
+jm.waypoint.manager=Waypoint Manager: %1$s
+jm.waypoint.max_distance=Maximum Distance:
+jm.waypoint.name=Name
+jm.waypoint.new_title=New Waypoint
+jm.waypoint.new=New...
+jm.waypoint.options=Waypoint Options (In-Game Display)
+jm.waypoint.randomize=Random Color
+jm.waypoint.red_abbreviated=R
+jm.waypoint.remove=Remove
+jm.waypoint.reset=Reset
+jm.waypoint.save=Save
+jm.waypoint.show_distance=Show Distance: %1$s
+jm.waypoint.show_name=Show Name: %1$s
+jm.waypoint.show_rotating_beam=Rotating Beam: %1$s
+jm.waypoint.show_static_beam=Stationary Beam: %1$s
+jm.waypoint.show_texture=Show Icon: %1$s
+jm.waypoint.teleport=Teleport
+jm.waypoint.texture_size=Icon Size: %1$s
+jm.waypoint.waypoints=Waypoints
+jm.waypoint.x=X
+jm.waypoint.y=Y
+jm.waypoint.z=Z
+jm.webmap.actions_title=Actions...
+jm.webmap.animals_menu_item_text=动物
+jm.webmap.animals_menu_item_title=显示附近的动物
+jm.webmap.automap_already_started=Auto-mapping already in progress.
+jm.webmap.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
+jm.webmap.automap_complete=Auto-mapping has stopped.
+jm.webmap.automap_dialog_all=All
+jm.webmap.automap_dialog_close=Close
+jm.webmap.automap_dialog_missing=Missing
+jm.webmap.automap_dialog_none=None
+jm.webmap.automap_dialog_text=Automatically map all regions or just missing regions?
+jm.webmap.automap_started=Auto-mapping started. Check game chat for progress.
+jm.webmap.automap_text=Auto-Map...
+jm.webmap.automap_title=Automatically map unexplored regions (single-player)
+jm.webmap.biome_text=生物群系:
+jm.webmap.caves_menu_item_text=山洞
+jm.webmap.caves_menu_item_title=如果你不在室外，则显示洞穴或室内的地图
+jm.webmap.day_button_text=白天
+jm.webmap.day_button_title=模仿地图时间为白天
+jm.webmap.donate_text=Donate to JourneyMap
+jm.webmap.donate_title=Donate to JourneyMap development using PayPal
+jm.webmap.elevation_text=海拔:
+jm.webmap.email_sub_text=JourneyMap news Email
+jm.webmap.email_sub_title=Subscribe to JourneyMap news by Email
+jm.webmap.enable=Enabled: %1$s
+jm.webmap.error_world_not_opened=Minecraft 没有打开
+jm.webmap.follow_button_title=自动将你切换到地图的中心. (关闭以后可以自己调整)
+jm.webmap.follow_twitter_text=Follow JourneyMapMod on Twitter
+jm.webmap.follow_twitter_title=Follow JourneyMapMod on Twitter
+jm.webmap.forum_link_text=minecraftforum.net
+jm.webmap.forum_link_title=JourneyMap forum on minecraftforum.net
+jm.webmap.grid_menu_item_text=网格
+jm.webmap.grid_menu_item_title=显示区块网格
+jm.webmap.location_text=坐标:
+jm.webmap.mobs_menu_item_text=怪物
+jm.webmap.mobs_menu_item_title=显示附近的怪物
+jm.webmap.night_button_text=夜间
+jm.webmap.night_button_title=模仿地图时间为夜间
+jm.webmap.pets_menu_item_text=宠物
+jm.webmap.pets_menu_item_title=显示附近的宠物
+jm.webmap.players_menu_item_text=玩家
+jm.webmap.players_menu_item_title=显示附近的玩家(多人)
+jm.webmap.rss_feed_text=JourneyMap news RSS
+jm.webmap.rss_feed_title=Subscribe to JourneyMap news by RSS feed
+jm.webmap.save_button_text=Save Map
+jm.webmap.save_button_title=将探索过的地图保存到文件
+jm.webmap.save_filename=Saving map to screenshots: %1$s
+jm.webmap.show_menu_text=显示...
+jm.webmap.slice_text=纵截面:
+jm.webmap.title=Web Map
+jm.webmap.update_button_title=检查更新: JourneyMap %1$s for Minecraft %2$s
+jm.webmap.villagers_menu_item_text=村民
+jm.webmap.villagers_menu_item_title=显示附近的村民
+jm.webmap.waypoints_menu_item_text=路标
+jm.webmap.waypoints_menu_item_title=显示路标
+jm.webmap.web_link_text=journeymap.techbrew.net
+jm.webmap.web_link_title=JourneyMap homepage
+jm.webmap.worldname_text=世界名称:
+jm.webmap.worldtime_text=世界时间:
+jm.webmap.zoom_slider_name=缩放
+key.journeymap.create_waypoint=Create Waypoint
+key.journeymap.day=Show Day Map
 key.journeymap.hotkeys_toggle=Toggle Map
+key.journeymap.minimap_position=Change Minimap Position
+key.journeymap.night=Show Night Map
 key.journeymap.zoom_in=Zoom In
 key.journeymap.zoom_out=Zoom Out
-key.journeymap.day=Show Day Map
-key.journeymap.night=Show Night Map
-MapOverlay.hotkeys_north=Pan North (16 Blocks)
-MapOverlay.hotkeys_south=Pan South (16 Blocks)
-MapOverlay.hotkeys_east=Pan East (16 Blocks)
-MapOverlay.hotkeys_west=Pan West (16 Blocks)
-
-MiniMap.show_fps=Show FPS: %1$s
-MiniMap.return_to_game=Return to Game
-Feature.unlimited=Unlimited
-Feature.fair_play=FairPlay
-WebMap.automap_text=Auto-Map...
-WebMap.automap_title=Automatically map unexplored regions (single-player)
-WebMap.automap_dialog_text=Automatically map all regions or just missing regions?
-WebMap.automap_dialog_all=All
-WebMap.automap_dialog_missing=Missing
-WebMap.automap_dialog_none=None
-WebMap.automap_dialog_close=Close
-WebMap.automap_already_started=Auto-mapping already in progress.
-WebMap.automap_started=Auto-mapping started. Check game chat for progress.
-WebMap.automap_complete=Auto-mapping has stopped.
-WebMap.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
-WebMap.save_button_text=Save Map
-WebMap.save_filename=Saving map to screenshots: %1$s
-WebMap.actions_title=Actions...

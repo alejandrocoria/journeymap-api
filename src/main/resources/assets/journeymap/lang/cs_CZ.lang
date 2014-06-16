@@ -1,285 +1,264 @@
-# JourneyMap Resource Bundle - cs_CZ
-# Updated for 3.3.0
-
-########################
-# Error messages: Note, translating these are optional, but they may help users diagnose the problem on their own.
-########################
-
-JMERR00=[JMERR00] V JourneyMap došlo k neočekávané chybě: %1$s
-JMERR01=[JMERR01] JourneyMap %1$s vyžaduje %2$s
-JMERR02=[JMERR02] JourneyMap ještě není k dispozici pro tento svět
-JMERR03=[JMERR03] JMServer nemůže spustit webový server
-JMERR04=[JMERR04] FileHandler nemůže zapisovat do souboru: %1$s
-JMERR05=[JMERR05] Web Browser poslal chybný požadavek: %1$s
-JMERR06=[JMERR06] ChunkServlet nemůže přečíst adresář data pro svět: %1$s
-JMERR07=[JMERR07] Nelze získat blok v chunk: %1$s
-JMERR08=[JMERR08] Nelze zapsat chunk image do souboru: %1$s
-JMERR09=[JMERR09] Hráč není připojen k žádnému světu
-JMERR10=[JMERR10] Hráč není připojen k světu: %1$s
-JMERR11=[JMERR11] Nelze číst soubor player data
-JMERR12=[JMERR12] Nelze doručit webový soubor: %1$s
-JMERR13=[JMERR13] Browser požádal o neznámý soubor: %1$s
-JMERR14=[JMERR14] Browser použil nepodporovanou HTTP metodu: %1$s
-JMERR15=[JMERR15] Neočekávaná chyba během zápisu do souboru player data: %1$s
-JMERR16=[JMERR16] Neočekávaná chyba během zápisu do souborů chunk image: %1$s
-JMERR17=[JMERR17] Neočekávaná chyba při čtení ikony entity pro in-game mapu: %1$s
-JMERR18=[JMERR18] Chyba při exportu mapy světa: %1$s
-JMERR19=[JMERR19] Chyba při čtení property souboru: %1$s
-JMERR20=[JMERR20] Chyba při zápisu do property souboru: %1$s
-JMERR21=[JMERR21] Chyba při čtení souboru region: %1$s. Chyba: %2$s
-JMERR22=[JMERR22] Chyba při zápisu souboru region: %1$s. Chyba: %2$s
-JMERR23=[JMERR23] Chyba UI mapy: %1$s
-JMERR24=[JMERR24] Selhalo spuštění webového serveru
-
-########################
-# In-game chat messages
-# Note: Do not translate or alter chat color changes (§b, §e, §f, etc.)
-########################
-
-# %1$s = JourneyMap version (§e and §f are color changes)
-JourneyMap.chat_announcement=§eJourneyMap:§f %1$s
-
-# %1$s = Key to press ('J')
-JourneyMap.mapgui_only_ready=Stiskněte [§b%1$s§f]. (Webový server vypnutý)
-
-# %1$s = JourneyMap version
-JourneyMap.new_version_available=K dispozici je novější verze: %1$s
-
-# %1$s = JourneyMap version (§e is a color change)
-JourneyMap.ready=§e%1$s připraven.
-
-JourneyMap.webserver_and_mapgui_disabled=JourneyMap je vypnutý v souboru journeyMap.properties
-
-# %1$s = Key to press ('J'), %2$s = website port number (8080) (§b and §f are color changes)
-JourneyMap.webserver_and_mapgui_ready=Stiskněte [§b%1$s§f] nebo otevřete webový prohlížeč na adrese §b http://localhost%2$s §f
-
-# %1$s = website port number (8080) (§b and §f are color changes)
-JourneyMap.webserver_only_ready=Otevřete webový prohlížeč na adrese §b http://localhost%1$s §f. (In-game mapa vypnutá)
-
-########################
-# In-game Map messages
-########################
-
-# %1$s = JourneyMap version
-MapOverlay.options=Možnosti
-MapOverlay.close=Zavřít
-
-MapOverlay.day=Den
-MapOverlay.night=Noc
-
-MapOverlay.on=Zap.
-MapOverlay.off=Vyp.
-
-# %1$s = "On" or "Off"
-MapOverlay.follow=Sledovat: %1$s
-
-MapOverlay.save_map=Uložit mapu
-
-# %1$s = type of map
-MapOverlay.saving_map_to_file=Ukládání %1$s mapy do souboru...
-
-# %1$s = "On" or "Off"
-MapOverlay.show_caves=Zobrazit jeskyně: %1$s
-
-# %1$s = "On" or "Off"
-MapOverlay.show_monsters=Zobrazit příšery : %1$s
-
-# %1$s = "On" or "Off"
-MapOverlay.show_animals=Zobrazit zvířata : %1$s
-
-# %1$s = "On" or "Off"
-MapOverlay.show_villagers=Zobrazit vesničany : %1$s
-
-# %1$s = "On" or "Off"
-MapOverlay.show_pets=Zobrazit mazlíčky : %1$s
-
-# %1$s = "On" or "Off"
-MapOverlay.show_players=Zobrazit hráče : %1$s
-
-# %1$s = "On" or "Off"
-MapOverlay.show_waypoints=Zobrazit waypointy: %1$s
-
-# %1$s = "On" or "Off"
-MapOverlay.show_grid=Zobrazit mřížku : %1$s
-
-MapOverlay.update_available=Aktualizace k dispozici!
-MapOverlay.update_check=Zkontrolovat aktualizace
-MapOverlay.use_browser=Použít prohlížeč
-MapOverlay.zoom_in=Přiblížit
-MapOverlay.zoom_out=Oddálit
-
-# %1$s = filename
-MapSaver.map_saved=Mapa uložena: %1$s
-
-########################
-# Web UI messages
-########################
-
-# Unused, but keep for future use
-WebMap.text_direction=ltr
-
-# JourneyMap menu / homepage link
-WebMap.web_link_text=journeymap.techbrew.net
-WebMap.web_link_title=JourneyMap homepage
-
-# JourneyMap menu / forums link
-WebMap.forum_link_text=minecraftforum.net
-WebMap.forum_link_title=JourneyMap fórum na minecraftforum.net
-
-# JourneyMap menu / RSS feed link
-WebMap.rss_feed_text=JourneyMap novinky RSS
-WebMap.rss_feed_title=Přihlásit se k odběru novinek JourneyMap z RSS kanálu
-
-# JourneyMap menu / Email subscription link
-WebMap.email_sub_text=JourneyMap novinky email
-WebMap.email_sub_title=Přihlásit se k odběru novinek JourneyMap emailem
-
-# JourneyMap menu / Follow on Twitter link
-WebMap.follow_twitter_text=Sledovat JourneyMapMod na Twitter
-WebMap.follow_twitter_title=Sledovat JourneyMapMod na Twitter
-
-# JourneyMap menu / Donate link
-WebMap.donate_text=Podpořit JourneyMap
-WebMap.donate_title=Podpořit vývoj JourneyMap pomocí PayPal
-
-# Update button title (shown only when update available)
-WebMap.update_button_title=Aktualizace k dispozici: JourneyMap %1$s pro Minecraft %2$s
-
-# Day/Night button
-WebMap.day_button_text=Den
-WebMap.day_button_title=Mapa světa za denního světla.
-WebMap.night_button_text=Noc
-WebMap.night_button_title=Mapa světa za svitu měsíce.
-
-# Follow button
-WebMap.follow_button_title=Vystředit mapu na vás. (Vypne se při ručním posouvání.)
-
-# Show menu
-WebMap.show_menu_text=Zobrazit...
-
-# Show menu / Smooth Pixels (Unused)
-WebMap.smooth_pixels_menu_item=Vyhlazené pixely
-
-# Show menu / Caves
-WebMap.caves_menu_item_text=Jeskyně
-WebMap.caves_menu_item_title=Zobrazit jeskyně/interiéry, nejste-li pod oblohou.
-
-# Show menu / Grid
-WebMap.grid_menu_item_text=Mřížka
-WebMap.grid_menu_item_title=Zobrazit chunk mřížku
-
-# Show menu / Waypoints
-WebMap.waypoints_menu_item_text=Waypointy
-WebMap.waypoints_menu_item_title=Zobrazit waypointy
-
-# Show menu / Animals
-WebMap.animals_menu_item_text=Zvířata
-WebMap.animals_menu_item_title=Zobrazit zvířata v okolí
-
-# Show menu / Pets
-WebMap.pets_menu_item_text=Mazlíčci
-WebMap.pets_menu_item_title=Zobrazit mazlíčky v okolí
-
-# Show menu / Mobs (Monsters)
-WebMap.mobs_menu_item_text=Příšery
-WebMap.mobs_menu_item_title=Zobrazit příšery v okolí
-
-# Show menu / Villagers
-WebMap.villagers_menu_item_text=Vesničané
-WebMap.villagers_menu_item_title=Zobrazit vesničany v okolí
-
-# Show menu / Other players (multiplayer)
-WebMap.players_menu_item_text=Hráči
-WebMap.players_menu_item_title=Zobrazit hráče v okolí (hra více hráčů)
-
-# Save Map button
-WebMap.save_button_title=Uložit prozkoumanou mapu do souboru
-
-# Zoom slider
-WebMap.zoom_slider_name=Zoom
-
-# World info area
-WebMap.worldname_text=Název světa:
-WebMap.worldtime_text=Čas světa:
-WebMap.location_text=Poloha:
-WebMap.elevation_text=Výška:
-WebMap.slice_text=Vertikální řez:
-WebMap.biome_text=Biom:
-
-# Error message if world isn't open in Minecraft
-WebMap.error_world_not_opened=Svět Minecraftu není otevřen
-
-# 3.3.0 - Need to be translated
-JourneyMap.file_updates=Files are being updated (%1$s). Mapping suspended.
-JourneyMap.file_updates_complete=File updates complete. Mapping resumed.
-MapOverlay.disabled_feature=Feature not available
-MapOverlay.actions=MapOverlay.actions
-MapOverlay.save_filename=MapOverlay.save_filename
-MapOverlay.minimap=MiniMap...
-MapOverlay.enable_webserver=Webserver: %1$s
-MapOverlay.automap_title=Auto-Map...
-MapOverlay.automap_text=Automatically map regions (single-player
-MapOverlay.automap_dialog=Auto-Map
-MapOverlay.automap_dialog_text=Automatically map all regions or just missing regions?
-MapOverlay.automap_dialog_all=All
-MapOverlay.automap_dialog_missing=Missing
-MapOverlay.automap_dialog_none=None
-MapOverlay.automap_status=Auto-mapping surface (%1$s).
-MapOverlay.automap_status_underground=Auto-mapping slice %1$s (%2$s).
-MapOverlay.automap_complete=Auto-mapping of surface has stopped.
-MapOverlay.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
-MiniMap.options=MiniMap Options
-MiniMap.enable_minimap=MiniMap: %1$s
-MiniMap.position=Position: %1$s
-MiniMap.position_topleft=Top Left
-MiniMap.position_topright=Top Right
-MiniMap.position_bottomleft=Bottom Left
-MiniMap.position_bottomright=Bottom Right
-MiniMap.shape=Shape: %1$s
-MiniMap.shape_smallsquare=Small Square
-MiniMap.shape_largesquare=Large Square
-MiniMap.shape_smallcircle=Small Circle
-MiniMap.shape_largecircle=Large Circle
-MiniMap.font=Font: %1$s
-MiniMap.font_small=Small
-MiniMap.font_large=Large
-
-# Added in 3.3.x. %1$s = one of "On", "Off". Hot Keys are keyboard shortcuts that can control the minimap.
-MiniMap.hotkeys=Hot Keys: %1$s
-MiniMap.hotkeys_title=Minimap Hot Keys
-MiniMap.hotkeys_toggle=Toggle Minimap
-key.journeymap.minimap_position=Change Minimap Position
-
-# Added in 3.3.x.  Used in Minecraft Controls menu and JourneyMap/Options/Minimap.../HotKeys... dialog.
-# {0} is either "Ctrl+" or "^" depending on Windows or MacOS
-MapOverlay.hotkeys_keybinding_category=JourneyMap (Use %1$s[key] for Minimap)
-MapOverlay.hotkeys_button=Hot Keys...
-MapOverlay.hotkeys_title=Hot Keys
+jm.common.actions=Actions
+jm.common.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
+jm.common.automap_complete=Auto-mapping of surface has stopped.
+jm.common.automap_dialog_all=All
+jm.common.automap_dialog_missing=Missing
+jm.common.automap_dialog_none=None
+jm.common.automap_dialog_text=Automatically map all regions or just missing regions?
+jm.common.automap_dialog=Auto-Map
+jm.common.automap_status_underground=Auto-mapping slice %1$s (%2$s).
+jm.common.automap_status=Auto-mapping surface (%1$s).
+jm.common.automap_text=Automatically map regions (single-player
+jm.common.automap_title=Auto-Map...
+jm.common.char_downarrow=>
+jm.common.char_uparrow=<
+jm.common.chat_announcement=§eJourneyMap:§f %1$s
+jm.common.close=Zavřít
+jm.common.day=Den
+jm.common.dimension=Dimension %1$s
+jm.common.disabled_feature=Feature not available
+jm.common.enable=Enabled: %1$s
+jm.common.file_updates_complete=File updates complete. Mapping resumed.
+jm.common.file_updates=Files are being updated (%1$s). Mapping suspended.
+jm.common.font_large=Large
+jm.common.font_small=Small
+jm.common.font=Font: %1$s
+jm.common.general_display_button=General Display...
+jm.common.general_display_title=General Display Options
+jm.common.general_display=General Display
+jm.common.help=Help...
+jm.common.hide_buttons=Hide Buttons
+jm.common.hotkeys_button=Hot Keys...
+jm.common.hotkeys_keybinding_category=JourneyMap (Use %1%s[key] for Minimap)
+jm.common.location_xz=x: %1$s, z: %2$s
+jm.common.location_xzy=x: %1$s, z: %2$s, y: %3$s
+jm.common.location_xzye=x: %1$s, z: %2$s, y: %3$s (%4$s)
+jm.common.location_xzyeb=x: %1$s, z: %2$s, y: %3$s (%4$s) %5$s
+jm.common.log_warning=Log level %1$s will slow down the game. Do not use for normal gameplay!
+jm.common.map_saved=Mapa uložena: %1$s
+jm.common.mapgui_only_ready=Stiskněte [§b%1$s§f]. (Webový server vypnutý)
+jm.common.memory_warning=Minecraft is running out of memory: %1$s
+jm.common.new_version_available=K dispozici je novější verze: %1$s
+jm.common.night=Noc
+jm.common.off=Vyp.
+jm.common.on=Zap.
+jm.common.options_button=Options...
+jm.common.options=Možnosti
+jm.common.ready=§e%1$s připraven.
+jm.common.save_filename=jm.common.save_filename
+jm.common.save_map=Uložit mapu
+jm.common.saving_map_to_file=Ukládání %1$s mapy do souboru...
+jm.common.show_animals=Zobrazit zvířata : %1$s
+jm.common.show_buttons=Show Buttons
+jm.common.show_caves=Zobrazit jeskyně: %1$s
+jm.common.show_grid=Zobrazit mřížku : %1$s
+jm.common.show_monsters=Zobrazit příšery : %1$s
+jm.common.show_pets=Zobrazit mazlíčky : %1$s
+jm.common.show_players=Zobrazit hráče : %1$s
+jm.common.show_self=Show Self: %1$s
+jm.common.show_villagers=Zobrazit vesničany : %1$s
+jm.common.show_waypoints=Zobrazit waypointy: %1$s
+jm.common.update_available=Aktualizace k dispozici!
+jm.common.update_check=Zkontrolovat aktualizace
+jm.common.use_browser=Použít prohlížeč
+jm.common.webserver_and_mapgui_disabled=JourneyMap je vypnutý v souboru jm.common.properties
+jm.common.webserver_and_mapgui_ready=Stiskněte [§b%1$s§f] nebo otevřete webový prohlížeč na adrese §b http://localhost%2$s §f
+jm.common.webserver_only_ready=Otevřete webový prohlížeč na adrese §b http://localhost%1$s §f. (In-game mapa vypnutá)
+jm.error.00=[ERROR.00] V JourneyMap došlo k neočekávané chybě: %1$s
+jm.error.01=[ERROR.01] JourneyMap %1$s vyžaduje %2$s
+jm.error.02=[ERROR.02] JourneyMap ještě není k dispozici pro tento svět
+jm.error.03=[ERROR.03] JMServer nemůže spustit webový server
+jm.error.04=[ERROR.04] FileHandler nemůže zapisovat do souboru: %1$s
+jm.error.05=[ERROR.05] Web Browser poslal chybný požadavek: %1$s
+jm.error.06=[ERROR.06] ChunkServlet nemůže přečíst adresář data pro svět: %1$s
+jm.error.07=[ERROR.07] Nelze získat blok v chunk: %1$s
+jm.error.08=[ERROR.08] Nelze zapsat chunk image do souboru: %1$s
+jm.error.09=[ERROR.09] Hráč není připojen k žádnému světu
+jm.error.10=[ERROR.10] Hráč není připojen k světu: %1$s
+jm.error.11=[ERROR.11] Nelze číst soubor player data
+jm.error.12=[ERROR.12] Nelze doručit webový soubor: %1$s
+jm.error.13=[ERROR.13] Browser požádal o neznámý soubor: %1$s
+jm.error.14=[ERROR.14] Browser použil nepodporovanou HTTP metodu: %1$s
+jm.error.15=[ERROR.15] Neočekávaná chyba během zápisu do souboru player data: %1$s
+jm.error.16=[ERROR.16] Neočekávaná chyba během zápisu do souborů chunk image: %1$s
+jm.error.17=[ERROR.17] Neočekávaná chyba při čtení ikony entity pro in-game mapu: %1$s
+jm.error.18=[ERROR.18] Chyba při exportu mapy světa: %1$s
+jm.error.19=[ERROR.19] Chyba při čtení property souboru: %1$s
+jm.error.20=[ERROR.20] Chyba při zápisu do property souboru: %1$s
+jm.error.21=[ERROR.21] Chyba při čtení souboru region: %1$s. Chyba: %2$s
+jm.error.22=[ERROR.22] Chyba při zápisu souboru region: %1$s. Chyba: %2$s
+jm.error.23=[ERROR.23] Chyba UI mapy: %1$s
+jm.error.24=[ERROR.24] Selhalo spuštění webového serveru
+jm.error.compatability=Incompatability error running %1$s for Forge %2$s. Ensure your version of Forge is compatible.
+jm.feature.fairplay=FairPlay
+jm.feature.unlimited=Unlimited
+jm.fullscreen.caves=Caves: %1$s
+jm.fullscreen.enable_webserver=Webserver: %1$s
+jm.fullscreen.follow=Sledovat: %1$s
+jm.fullscreen.hotkeys_doubleclick=(Double-click)
+jm.fullscreen.hotkeys_east=Pan East (16 Blocks)
+jm.fullscreen.hotkeys_north=Pan North (16 Blocks)
+jm.fullscreen.hotkeys_south=Pan South (16 Blocks)
+jm.fullscreen.hotkeys_title=Hot Keys
+jm.fullscreen.hotkeys_waypoint=Create/Edit Waypoint
+jm.fullscreen.hotkeys_west=Pan West (16 Blocks)
+jm.fullscreen.map_day=Day
+jm.fullscreen.map_night=Night
+jm.fullscreen.minimap=MiniMap
+jm.fullscreen.title=Full-screen Map
+jm.fullscreen.zoom_in=Přiblížit
+jm.fullscreen.zoom_out=Oddálit
+jm.minimap.enable_minimap=MiniMap: %1$s
+jm.minimap.force_unicode=Force Unicode: %1$s
+jm.minimap.hotkeys_button=MiniMap Hot Keys: %1$s
+jm.minimap.hotkeys_title=Minimap Hot Keys
+jm.minimap.hotkeys_toggle=Toggle Minimap
+jm.minimap.hotkeys=Hot Keys: %1$s
+jm.minimap.options=MiniMap Options
+jm.minimap.position_bottomleft=Bottom Left
+jm.minimap.position_bottomright=Bottom Right
+jm.minimap.position_topleft=Top Left
+jm.minimap.position_topright=Top Right
+jm.minimap.position=Position: %1$s
+jm.minimap.return_to_game=Return to Game
+jm.minimap.shape_largecircle=Large Circle
+jm.minimap.shape_largesquare=Large Square
+jm.minimap.shape_mediumsquare=Medium Square
+jm.minimap.shape_smallcircle=Small Circle
+jm.minimap.shape_smallsquare=Small Square
+jm.minimap.shape=Shape: %1$s
+jm.minimap.show_fps=Show FPS: %1$s
+jm.minimap.texture_size=Icons: %1$s
+jm.minimap.title=Mini Map
+jm.waypoint.auto_hide_label=Auto-Hide Label: %1$s
+jm.waypoint.blue_abbreviated=B
+jm.waypoint.bold_label=Bold Label: %1$s
+jm.waypoint.cancel=Cancel
+jm.waypoint.color=Color
+jm.waypoint.current_location=Current Location: %1$s
+jm.waypoint.deathpoint=Death
+jm.waypoint.dimension_all=All
+jm.waypoint.dimension=Dimension: %1$s
+jm.waypoint.dimensions=Dimensions
+jm.waypoint.display_management=Waypoint In-Game Display and Management
+jm.waypoint.distance_meters=(%1$sm)
+jm.waypoint.distance=Distance
+jm.waypoint.edit_title=Edit Waypoint
+jm.waypoint.edit=Edit
+jm.waypoint.enable_all=All %1$s: %2$s
+jm.waypoint.enable_beacons=Waypoint Beacons: %1$s
+jm.waypoint.enable_manager=Enabled: %1$s
+jm.waypoint.enable=Enabled: %1$s
+jm.waypoint.find=Find
+jm.waypoint.font_size=Font: %1$s
+jm.waypoint.force_unicode=Force Unicode: %1$s
+jm.waypoint.green_abbreviated=G
+jm.waypoint.help_create_ingame=Create/Edit Waypoint (in game)
+jm.waypoint.help_create_inmap=Create/Edit Waypoint (in map)
+jm.waypoint.help_import_rei_title=Import Rei's MiniMap Waypoints
+jm.waypoint.help_import_rei=Or copy §b%1$s§f to §b%2$s§f and restart Minecraft.
+jm.waypoint.help_import_voxel_title=Import VoxelMap Waypoints
+jm.waypoint.help_import_voxel=Or copy §b%1$s§f to §b%2$s§f and restart Minecraft.
+jm.waypoint.help_manage_ingame=Waypoint Manager (in game)
+jm.waypoint.help_title=Waypoint Help
+jm.waypoint.import_rei_errors=Imported %1$s waypoints from Rei's MiniMap with %1$s errors. See jm.common.log for details.
+jm.waypoint.import_rei_failure=No Rei's MiniMap waypoints were imported. See jm.common.log for details.
+jm.waypoint.import_rei_file_error=Could not import Rei's MiniMap waypoint file: %1$s
+jm.waypoint.import_rei_success=Imported %1$s waypoints from of Rei's Minimap.
+jm.waypoint.import_rei_version=Your version of Rei's MiniMap is not supported.
+jm.waypoint.import_vox_errors=Imported %1$s waypoints from VoxelMap with %1$s errors. See jm.common.log for details.
+jm.waypoint.import_vox_failure=No VoxelMap waypoints were imported. See jm.common.log for details.
+jm.waypoint.import_vox_file_error=Could not import VoxelMap waypoint file: %1$s
+jm.waypoint.import_vox_success=Imported %1$s waypoints from VoxelMap.
+jm.waypoint.import_vox_version=Your version of VoxelMap is not supported. Please update to:
+jm.waypoint.location=Location
+jm.waypoint.manage_title=Manage Waypoints
+jm.waypoint.manager=Waypoint Manager: %1$s
+jm.waypoint.max_distance=Maximum Distance:
+jm.waypoint.name=Name
+jm.waypoint.new_title=New Waypoint
+jm.waypoint.new=New...
+jm.waypoint.options=Waypoint Options (In-Game Display)
+jm.waypoint.randomize=Random Color
+jm.waypoint.red_abbreviated=R
+jm.waypoint.remove=Remove
+jm.waypoint.reset=Reset
+jm.waypoint.save=Save
+jm.waypoint.show_distance=Show Distance: %1$s
+jm.waypoint.show_name=Show Name: %1$s
+jm.waypoint.show_rotating_beam=Rotating Beam: %1$s
+jm.waypoint.show_static_beam=Stationary Beam: %1$s
+jm.waypoint.show_texture=Show Icon: %1$s
+jm.waypoint.teleport=Teleport
+jm.waypoint.texture_size=Icon Size: %1$s
+jm.waypoint.waypoints=Waypoints
+jm.waypoint.x=X
+jm.waypoint.y=Y
+jm.waypoint.z=Z
+jm.webmap.actions_title=Actions...
+jm.webmap.animals_menu_item_text=Zvířata
+jm.webmap.animals_menu_item_title=Zobrazit zvířata v okolí
+jm.webmap.automap_already_started=Auto-mapping already in progress.
+jm.webmap.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
+jm.webmap.automap_complete=Auto-mapping has stopped.
+jm.webmap.automap_dialog_all=All
+jm.webmap.automap_dialog_close=Close
+jm.webmap.automap_dialog_missing=Missing
+jm.webmap.automap_dialog_none=None
+jm.webmap.automap_dialog_text=Automatically map all regions or just missing regions?
+jm.webmap.automap_started=Auto-mapping started. Check game chat for progress.
+jm.webmap.automap_text=Auto-Map...
+jm.webmap.automap_title=Automatically map unexplored regions (single-player)
+jm.webmap.biome_text=Biom:
+jm.webmap.caves_menu_item_text=Jeskyně
+jm.webmap.caves_menu_item_title=Zobrazit jeskyně/interiéry, nejste-li pod oblohou.
+jm.webmap.day_button_text=Den
+jm.webmap.day_button_title=Mapa světa za denního světla.
+jm.webmap.donate_text=Podpořit JourneyMap
+jm.webmap.donate_title=Podpořit vývoj JourneyMap pomocí PayPal
+jm.webmap.elevation_text=Výška:
+jm.webmap.email_sub_text=JourneyMap novinky email
+jm.webmap.email_sub_title=Přihlásit se k odběru novinek JourneyMap emailem
+jm.webmap.enable=Enabled: %1$s
+jm.webmap.error_world_not_opened=Svět Minecraftu není otevřen
+jm.webmap.follow_button_title=Vystředit mapu na vás. (Vypne se při ručním posouvání.)
+jm.webmap.follow_twitter_text=Sledovat JourneyMapMod na Twitter
+jm.webmap.follow_twitter_title=Sledovat JourneyMapMod na Twitter
+jm.webmap.forum_link_text=minecraftforum.net
+jm.webmap.forum_link_title=JourneyMap fórum na minecraftforum.net
+jm.webmap.grid_menu_item_text=Mřížka
+jm.webmap.grid_menu_item_title=Zobrazit chunk mřížku
+jm.webmap.location_text=Poloha:
+jm.webmap.mobs_menu_item_text=Příšery
+jm.webmap.mobs_menu_item_title=Zobrazit příšery v okolí
+jm.webmap.night_button_text=Noc
+jm.webmap.night_button_title=Mapa světa za svitu měsíce.
+jm.webmap.pets_menu_item_text=Mazlíčci
+jm.webmap.pets_menu_item_title=Zobrazit mazlíčky v okolí
+jm.webmap.players_menu_item_text=Hráči
+jm.webmap.players_menu_item_title=Zobrazit hráče v okolí (hra více hráčů)
+jm.webmap.rss_feed_text=JourneyMap novinky RSS
+jm.webmap.rss_feed_title=Přihlásit se k odběru novinek JourneyMap z RSS kanálu
+jm.webmap.save_button_text=Save Map
+jm.webmap.save_button_title=Uložit prozkoumanou mapu do souboru
+jm.webmap.save_filename=Saving map to screenshots: %1$s
+jm.webmap.show_menu_text=Zobrazit...
+jm.webmap.slice_text=Vertikální řez:
+jm.webmap.title=Web Map
+jm.webmap.update_button_title=Aktualizace k dispozici: JourneyMap %1$s pro Minecraft %2$s
+jm.webmap.villagers_menu_item_text=Vesničané
+jm.webmap.villagers_menu_item_title=Zobrazit vesničany v okolí
+jm.webmap.waypoints_menu_item_text=Waypointy
+jm.webmap.waypoints_menu_item_title=Zobrazit waypointy
+jm.webmap.web_link_text=journeymap.techbrew.net
+jm.webmap.web_link_title=JourneyMap homepage
+jm.webmap.worldname_text=Název světa:
+jm.webmap.worldtime_text=Čas světa:
+jm.webmap.zoom_slider_name=Zoom
+key.journeymap.create_waypoint=Create Waypoint
+key.journeymap.day=Show Day Map
 key.journeymap.hotkeys_toggle=Toggle Map
+key.journeymap.minimap_position=Change Minimap Position
+key.journeymap.night=Show Night Map
 key.journeymap.zoom_in=Zoom In
 key.journeymap.zoom_out=Zoom Out
-key.journeymap.day=Show Day Map
-key.journeymap.night=Show Night Map
-MapOverlay.hotkeys_north=Pan North (16 Blocks)
-MapOverlay.hotkeys_south=Pan South (16 Blocks)
-MapOverlay.hotkeys_east=Pan East (16 Blocks)
-MapOverlay.hotkeys_west=Pan West (16 Blocks)
-
-MiniMap.show_fps=Show FPS: %1$s
-MiniMap.return_to_game=Return to Game
-Feature.unlimited=Unlimited
-Feature.fair_play=FairPlay
-WebMap.automap_text=Auto-Map...
-WebMap.automap_title=Automatically map unexplored regions (single-player)
-WebMap.automap_dialog_text=Automatically map all regions or just missing regions?
-WebMap.automap_dialog_all=All
-WebMap.automap_dialog_missing=Missing
-WebMap.automap_dialog_none=None
-WebMap.automap_dialog_close=Close
-WebMap.automap_already_started=Auto-mapping already in progress.
-WebMap.automap_started=Auto-mapping started. Check game chat for progress.
-WebMap.automap_complete=Auto-mapping has stopped.
-WebMap.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
-WebMap.save_button_text=Save Map
-WebMap.save_filename=Saving map to screenshots: %1$s
-WebMap.actions_title=Actions...

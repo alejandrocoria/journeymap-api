@@ -24,13 +24,13 @@ public class MasterOptions extends JmUI
         }
     }
 
-    String titleGeneral = Constants.getString("MapOverlay.general_display");
-    String titleMiniMap = Constants.getString("MiniMap.title");
-    String titleWaypoints = Constants.getString("Waypoint.display_management");
-    String titleWebmap = Constants.getString("WebMap.title");
+    String titleGeneral = Constants.getString("jm.common.general_display");
+    String titleMiniMap = Constants.getString("jm.minimap.title");
+    String titleWaypoints = Constants.getString("jm.waypoint.display_management");
+    String titleWebmap = Constants.getString("jm.webmap.title");
 
-    String labelOptions = Constants.getString("MapOverlay.options_button");
-    String labelHelp = Constants.getString("MapOverlay.help");
+    String labelOptions = Constants.getString("jm.common.options_button");
+    String labelHelp = Constants.getString("jm.common.help");
 
     Button buttonGeneralDisplayOptions, buttonFullMapHelp;
     Button buttonMiniMapEnable, buttonMiniMapOptions, buttonMiniMapHelp;
@@ -43,7 +43,7 @@ public class MasterOptions extends JmUI
 
     public MasterOptions()
     {
-        super(Constants.getString("MapOverlay.options"));
+        super(Constants.getString("jm.common.options"));
     }
 
     @Override
@@ -58,27 +58,27 @@ public class MasterOptions extends JmUI
 
         buttonMiniMapOptions = ButtonEnum.MiniMapOptions.create(labelOptions);
         buttonMiniMapHelp = ButtonEnum.MiniMapHelp.create(labelHelp);
-        buttonMiniMapEnable = BooleanPropertyButton.create(ButtonEnum.MiniMapEnable.ordinal(), BooleanPropertyButton.Type.OnOff, "MiniMap.enable",
+        buttonMiniMapEnable = BooleanPropertyButton.create(ButtonEnum.MiniMapEnable.ordinal(), BooleanPropertyButton.Type.OnOff, "jm.common.enable",
                 JourneyMap.getInstance().miniMapProperties, JourneyMap.getInstance().miniMapProperties.enabled);
         listMiniMap = new ButtonList(buttonMiniMapOptions, buttonMiniMapEnable, buttonMiniMapHelp);
         buttonList.addAll(listMiniMap);
 
         buttonWaypointOptions = ButtonEnum.WaypointOptions.create(labelOptions);
         buttonWaypointHelp = ButtonEnum.WaypointHelp.create(labelHelp);
-        buttonWaypointManagerEnable = BooleanPropertyButton.create(ButtonEnum.WaypointManagerEnable.ordinal(), BooleanPropertyButton.Type.OnOff, "Waypoint.enable_manager",
+        buttonWaypointManagerEnable = BooleanPropertyButton.create(ButtonEnum.WaypointManagerEnable.ordinal(), BooleanPropertyButton.Type.OnOff, "jm.waypoint.enable_manager",
                 JourneyMap.getInstance().waypointProperties, JourneyMap.getInstance().waypointProperties.managerEnabled);
         listWaypoints = new ButtonList(buttonWaypointOptions, buttonWaypointManagerEnable, buttonWaypointHelp);
         buttonList.addAll(listWaypoints);
 
-        buttonWebMapEnable = BooleanPropertyButton.create(ButtonEnum.WebMapEnable.ordinal(), BooleanPropertyButton.Type.OnOff, "WebMap.enable",
+        buttonWebMapEnable = BooleanPropertyButton.create(ButtonEnum.WebMapEnable.ordinal(), BooleanPropertyButton.Type.OnOff, "jm.webmap.enable",
                 JourneyMap.getInstance().webMapProperties, JourneyMap.getInstance().webMapProperties.enabled);
-        buttonWebMapOpen = ButtonEnum.WebMapOpen.create(Constants.getString("MapOverlay.use_browser"));
+        buttonWebMapOpen = ButtonEnum.WebMapOpen.create(Constants.getString("jm.common.use_browser"));
         listWebMap = new ButtonList(buttonWebMapOpen, buttonWebMapEnable);
         buttonList.addAll(listWebMap);
 
         new ButtonList(buttonList).equalizeWidths(getFontRenderer());
 
-        buttonClose = ButtonEnum.Close.create(Constants.getString("MapOverlay.close"));
+        buttonClose = ButtonEnum.Close.create(Constants.getString("jm.common.close"));
         buttonClose.setWidth(150);
         buttonList.add(buttonClose);
     }

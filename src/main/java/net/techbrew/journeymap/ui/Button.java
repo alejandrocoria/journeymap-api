@@ -211,7 +211,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
                 DrawUtil.drawRectangle(this.getX() + 1, this.getY() + 1, width - 3, height - 2, Color.darkGray, alpha);
                 if (drawDisabledText)
                 {
-                    this.drawCenteredString(minecraft.fontRenderer, Constants.getString("MapOverlay.disabled_feature"), this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, -6250336);
+                    this.drawCenteredString(minecraft.fontRenderer, Constants.getString("jm.common.disabled_feature"), this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, -6250336);
                 }
             }
             else

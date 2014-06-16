@@ -86,7 +86,7 @@ public class LogFormatter extends Formatter
                 else if (thrown instanceof OutOfMemoryError)
                 {
                     OutOfMemoryWarnings++;
-                    ChatLog.announceI18N("JourneyMap.memory_warning", thrown.toString());
+                    ChatLog.announceI18N("jm.common.memory_warning", thrown.toString());
                     thrown.printStackTrace(System.err);
                     break;
                 }
@@ -95,7 +95,7 @@ public class LogFormatter extends Formatter
                     if (thrown instanceof LinkageError)
                     {
                         LinkageErrorWarnings++;
-                        String error = Constants.getString("JourneyMap.compatability_error", JourneyMap.MOD_NAME, JourneyMap.MC_VERSION);
+                        String error = Constants.getString("jm.error.compatability", JourneyMap.MOD_NAME, JourneyMap.MC_VERSION);
                         thrown.printStackTrace(System.err);
                         ChatLog.announceError(error);
                         thrown.printStackTrace(System.err);

@@ -26,7 +26,7 @@ public class MapOverlayHotkeysHelp extends JmUI
 
     public MapOverlayHotkeysHelp(Class<? extends JmUI> returnClass)
     {
-        super(Constants.getString("MapOverlay.hotkeys_title"), returnClass);
+        super(Constants.getString("jm.fullscreen.hotkeys_title"), returnClass);
         keyEventHandler = new KeyEventHandler();
     }
 
@@ -38,7 +38,7 @@ public class MapOverlayHotkeysHelp extends JmUI
     {
         this.buttonList.clear();
 
-        buttonClose = new Button(ButtonEnum.Close, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
+        buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
 
         buttonList.add(buttonClose);
 
@@ -108,11 +108,11 @@ public class MapOverlayHotkeysHelp extends JmUI
         drawHelpStrings(Constants.getString("key.journeymap.zoom_out"), Constants.getKeyName(Constants.KB_MAP_ZOOMOUT), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.day"), Constants.getKeyName(Constants.KB_MAP_DAY), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.night"), Constants.getKeyName(Constants.KB_MAP_NIGHT), x, y += 12);
-        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_north"), Constants.getKeyName(mc.gameSettings.keyBindForward), x, y += 12);
-        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_west"), Constants.getKeyName(mc.gameSettings.keyBindLeft), x, y += 12);
-        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_south"), Constants.getKeyName(mc.gameSettings.keyBindBack), x, y += 12);
-        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_east"), Constants.getKeyName(mc.gameSettings.keyBindRight), x, y += 12);
-        drawHelpStrings(Constants.getString("MapOverlay.hotkeys_waypoint"), Constants.getString("MapOverlay.hotkeys_doubleclick"), x, y += 12);
+        drawHelpStrings(Constants.getString("jm.fullscreen.hotkeys_north"), Constants.getKeyName(mc.gameSettings.keyBindForward), x, y += 12);
+        drawHelpStrings(Constants.getString("jm.fullscreen.hotkeys_west"), Constants.getKeyName(mc.gameSettings.keyBindLeft), x, y += 12);
+        drawHelpStrings(Constants.getString("jm.fullscreen.hotkeys_south"), Constants.getKeyName(mc.gameSettings.keyBindBack), x, y += 12);
+        drawHelpStrings(Constants.getString("jm.fullscreen.hotkeys_east"), Constants.getKeyName(mc.gameSettings.keyBindRight), x, y += 12);
+        drawHelpStrings(Constants.getString("jm.fullscreen.hotkeys_waypoint"), Constants.getString("jm.fullscreen.hotkeys_doubleclick"), x, y += 12);
         buttonClose.setY(y + 16);
     }
 

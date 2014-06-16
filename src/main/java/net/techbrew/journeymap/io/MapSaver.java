@@ -77,7 +77,7 @@ public class MapSaver {
 			timer.stop();
 			JourneyMap.getLogger().info("Map filesize:" + saveFile.length()); //$NON-NLS-1$ //$NON-NLS-2$
 
-            String message = Constants.getString("MapSaver.map_saved", saveFile);
+            String message = Constants.getString("jm.common.map_saved", saveFile);
             ChatLog.announceFile(message, saveFile);
 			//FileHandler.open(saveFile);
 		

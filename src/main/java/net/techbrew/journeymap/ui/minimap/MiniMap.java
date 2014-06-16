@@ -48,7 +48,7 @@ public class MiniMap
 
     private final Color playerInfoFgColor = Color.LIGHT_GRAY;
     private final Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
-    private final String[] locationFormats = {"MapOverlay.location_xzye", "MapOverlay.location_xzy", "MapOverlay.location_xz"};
+    private final String[] locationFormats = {"jm.common.location_xzye", "jm.common.location_xzy", "jm.common.location_xz"};
 
     private final MiniMapProperties miniMapProperties = JourneyMap.getInstance().miniMapProperties;
     private final FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
@@ -396,9 +396,9 @@ public class MiniMap
 
         if (oldDv == null || oldDv.shape != this.dv.shape)
         {
-            this.drawTimer = StatTimer.get("MiniMap.drawMap." + shape.name(), 500);
+            this.drawTimer = StatTimer.get("jm.minimap.drawMap." + shape.name(), 500);
             this.drawTimer.reset();
-            this.refreshStateTimer =  StatTimer.get("MiniMap.drawMap." + shape.name() + "+refreshState", 5);
+            this.refreshStateTimer =  StatTimer.get("jm.minimap.drawMap." + shape.name() + "+refreshState", 5);
             this.refreshStateTimer.reset();
         }
 

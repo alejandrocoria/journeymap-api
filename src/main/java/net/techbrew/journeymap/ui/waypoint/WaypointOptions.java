@@ -19,12 +19,12 @@ public class WaypointOptions extends JmUI
     Button buttonEnable, buttonHide, buttonClose;
     TextField maxDistanceField;
     ButtonList listLeftButtons, listRightButtons;
-    String labelMaxDistance = Constants.getString("Waypoint.max_distance");
+    String labelMaxDistance = Constants.getString("jm.waypoint.max_distance");
     WaypointProperties props = JourneyMap.getInstance().waypointProperties;
 
     public WaypointOptions(Class<? extends JmUI> returnClass)
     {
-        super(Constants.getString("Waypoint.options"), returnClass);
+        super(Constants.getString("jm.waypoint.options"), returnClass);
     }
 
     @Override
@@ -33,35 +33,35 @@ public class WaypointOptions extends JmUI
         buttonList.clear();
         int id = 0;
 
-        buttonEnable = BooleanPropertyButton.create(id++, "Waypoint.enable_beacons", props, props.beaconEnabled);
+        buttonEnable = BooleanPropertyButton.create(id++, "jm.waypoint.enable_beacons", props, props.beaconEnabled);
         buttonList.add(buttonEnable);
 
         listLeftButtons = new ButtonList(
-                BooleanPropertyButton.create(id++, "Waypoint.auto_hide_label", props, props.autoHideLabel),
-                BooleanPropertyButton.create(id++, "Waypoint.show_static_beam", props, props.showStaticBeam),
-                BooleanPropertyButton.create(id++, "Waypoint.show_rotating_beam", props, props.showRotatingBeam),
-                BooleanPropertyButton.create(id++, "Waypoint.show_texture", props, props.showTexture),
-                BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, "Waypoint.texture_size", props, props.textureSmall)
+                BooleanPropertyButton.create(id++, "jm.waypoint.auto_hide_label", props, props.autoHideLabel),
+                BooleanPropertyButton.create(id++, "jm.waypoint.show_static_beam", props, props.showStaticBeam),
+                BooleanPropertyButton.create(id++, "jm.waypoint.show_rotating_beam", props, props.showRotatingBeam),
+                BooleanPropertyButton.create(id++, "jm.waypoint.show_texture", props, props.showTexture),
+                BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, "jm.waypoint.texture_size", props, props.textureSmall)
         );
         buttonList.addAll(listLeftButtons);
 
         listRightButtons = new ButtonList(
 
-                BooleanPropertyButton.create(id++, "Waypoint.show_name", props, props.showName),
-                BooleanPropertyButton.create(id++, "Waypoint.show_distance", props, props.showDistance),
-                BooleanPropertyButton.create(id++, "Waypoint.bold_label", props, props.boldLabel),
-                BooleanPropertyButton.create(id++, "Waypoint.force_unicode", props, props.forceUnicode),
-                BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, "Waypoint.font_size", props, props.fontSmall)
+                BooleanPropertyButton.create(id++, "jm.waypoint.show_name", props, props.showName),
+                BooleanPropertyButton.create(id++, "jm.waypoint.show_distance", props, props.showDistance),
+                BooleanPropertyButton.create(id++, "jm.waypoint.bold_label", props, props.boldLabel),
+                BooleanPropertyButton.create(id++, "jm.waypoint.force_unicode", props, props.forceUnicode),
+                BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, "jm.waypoint.font_size", props, props.fontSmall)
         );
         buttonList.addAll(listRightButtons);
 
         maxDistanceField = new TextField(props.maxDistance.toString(), getFontRenderer(), 100, 20, true, true);
         maxDistanceField.setClamp(-1, 10000);
 
-        buttonHide = new Button(id++, Constants.getString("JourneyMap.show_buttons"), Constants.getString("JourneyMap.hide_buttons"), false);
+        buttonHide = new Button(id++, Constants.getString("jm.common.show_buttons"), Constants.getString("jm.common.hide_buttons"), false);
         buttonList.add(buttonHide);
 
-        buttonClose = new Button(id++, Constants.getString("MapOverlay.close"));
+        buttonClose = new Button(id++, Constants.getString("jm.common.close"));
         buttonClose.setWidth(buttonEnable.getWidth());
         buttonList.add(buttonClose);
 

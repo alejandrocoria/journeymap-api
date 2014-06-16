@@ -33,7 +33,7 @@ public class ChatLog {
      * @param chat
      */
     public static void queueAnnouncement(IChatComponent chat) {
-        ChatComponentTranslation wrap = new ChatComponentTranslation("JourneyMap.chat_announcement", new Object[] {chat});
+        ChatComponentTranslation wrap = new ChatComponentTranslation("jm.common.chat_announcement", new Object[] {chat});
         announcements.add(wrap);
     }
 
@@ -102,7 +102,7 @@ public class ChatLog {
             // Check for newer version online
             if (VersionCheck.getVersionIsCurrent() == false)
             {
-                ChatLog.announceI18N(Constants.getString("JourneyMap.new_version_available", "")); //$NON-NLS-1$
+                ChatLog.announceI18N(Constants.getString("jm.common.new_version_available", "")); //$NON-NLS-1$
                 ChatLog.announceURL(JourneyMap.WEBSITE_URL, JourneyMap.WEBSITE_URL);
             }
             initialized = true;
@@ -127,19 +127,19 @@ public class ChatLog {
     {
         if (enableAnnounceMod)
         {
-            ChatLog.announceI18N("JourneyMap.ready", JourneyMap.MOD_NAME); //$NON-NLS-1$
+            ChatLog.announceI18N("jm.common.ready", JourneyMap.MOD_NAME); //$NON-NLS-1$
             if (JourneyMap.getInstance().webMapProperties.enabled.get())
             {
                 JMServer jmServer = JourneyMap.getInstance().getJmServer();
                 String keyName = Constants.getKeyName(Constants.KB_MAP);
                 String port = jmServer.getPort() == 80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
-                String message = Constants.getString("JourneyMap.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
+                String message = Constants.getString("jm.common.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
                 ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
             }
             else
             {
                 String keyName = Constants.getKeyName(Constants.KB_MAP); // Should be KeyCode
-                ChatLog.announceI18N("JourneyMap.mapgui_only_ready", keyName); //$NON-NLS-1$
+                ChatLog.announceI18N("jm.common.mapgui_only_ready", keyName); //$NON-NLS-1$
             }
             enableAnnounceMod = false; // Only queueAnnouncement mod once per runtime
         }

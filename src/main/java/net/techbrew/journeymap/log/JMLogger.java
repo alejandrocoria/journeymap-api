@@ -176,7 +176,7 @@ public class JMLogger
                 logger.setLevel(level);
                 if (level.intValue() < Level.INFO.intValue())
                 {
-                    ChatLog.announceI18N("JourneyMap.log_warning", level.getName());
+                    ChatLog.announceI18N("jm.common.log_warning", level.getName());
                 }
             }
         }

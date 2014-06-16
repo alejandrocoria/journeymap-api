@@ -77,9 +77,9 @@ public class MapOverlay extends JmUI
     Color playerInfoFgColor = Color.lightGray;
     Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
 
-    StatTimer drawScreenTimer = StatTimer.get("MapOverlay.drawScreen");
-    StatTimer drawMapTimer = StatTimer.get("MapOverlay.drawScreen.drawMap");
-    StatTimer drawMapTimerWithRefresh = StatTimer.get("MapOverlay.drawScreen.drawMap+refreshState");
+    StatTimer drawScreenTimer = StatTimer.get("jm.fullscreen.drawScreen");
+    StatTimer drawMapTimer = StatTimer.get("jm.fullscreen.drawScreen.drawMap");
+    StatTimer drawMapTimerWithRefresh = StatTimer.get("jm.fullscreen.drawScreen.drawMap+refreshState");
 
     /**
      * Default constructor
@@ -131,7 +131,7 @@ public class MapOverlay extends JmUI
         }
         catch (Throwable e)
         {
-            logger.log(Level.SEVERE, "Unexpected exception in MapOverlay.drawScreen(): " + LogFormatter.toString(e)); //$NON-NLS-1$
+            logger.log(Level.SEVERE, "Unexpected exception in jm.fullscreen.drawScreen(): " + LogFormatter.toString(e)); //$NON-NLS-1$
             UIManager.getInstance().closeAll();
         }
         finally
@@ -236,23 +236,23 @@ public class MapOverlay extends JmUI
 
             FontRenderer fr = getFontRenderer();
 
-            String on = Constants.getString("MapOverlay.on"); //$NON-NLS-1$
-            String off = Constants.getString("MapOverlay.off"); //$NON-NLS-1$
+            String on = Constants.getString("jm.common.on"); //$NON-NLS-1$
+            String off = Constants.getString("jm.common.off"); //$NON-NLS-1$
 
-            buttonAlert = new Button(ButtonEnum.Alert, Constants.getString("MapOverlay.update_available")); //$NON-NLS-1$
+            buttonAlert = new Button(ButtonEnum.Alert, Constants.getString("jm.common.update_available")); //$NON-NLS-1$
             buttonAlert.fitWidth(fr);
             buttonAlert.setDrawButton(VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent());
 
             buttonDayNight = new Button(ButtonEnum.DayNight,
-                    Constants.getString("MapOverlay.day"), //$NON-NLS-1$
-                    Constants.getString("MapOverlay.night"), //$NON-NLS-1$
+                    Constants.getString("jm.fullscreen.map_day"), //$NON-NLS-1$
+                    Constants.getString("jm.fullscreen.map_night"), //$NON-NLS-1$
                     state.getMapType(fullMapProperties.showCaves.get()) == Constants.MapType.day);
             buttonDayNight.fitWidth(fr);
             buttonDayNight.setNoDisableText(true);
 
             buttonFollow = new Button(ButtonEnum.Follow,
-                    Constants.getString("MapOverlay.follow", on), //$NON-NLS-1$
-                    Constants.getString("MapOverlay.follow", off), //$NON-NLS-1$
+                    Constants.getString("jm.fullscreen.follow", on), //$NON-NLS-1$
+                    Constants.getString("jm.fullscreen.follow", off), //$NON-NLS-1$
                     state.follow); //$NON-NLS-1$ //$NON-NLS-2$
             buttonFollow.fitWidth(fr);
 
@@ -266,15 +266,15 @@ public class MapOverlay extends JmUI
             buttonZoomOut.setWidth(20);
             buttonZoomOut.setEnabled(state.currentZoom > state.minZoom);
 
-            buttonClose = new Button(ButtonEnum.Close, Constants.getString("MapOverlay.close")); //$NON-NLS-1$
+            buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
             buttonClose.fitWidth(fr);
 
-            buttonOptions = new Button(ButtonEnum.Options, Constants.getString("MapOverlay.options")); //$NON-NLS-1$
+            buttonOptions = new Button(ButtonEnum.Options, Constants.getString("jm.common.options")); //$NON-NLS-1$
             buttonOptions.fitWidth(fr);
-            buttonActions = new Button(ButtonEnum.Actions, Constants.getString("MapOverlay.actions")); //$NON-NLS-1$
+            buttonActions = new Button(ButtonEnum.Actions, Constants.getString("jm.common.actions")); //$NON-NLS-1$
             buttonActions.fitWidth(fr);
 
-            buttonCaves = BooleanPropertyButton.create(ButtonEnum.Caves.ordinal(), "MapOverlay.caves", fullMapProperties, fullMapProperties.showCaves);
+            buttonCaves = BooleanPropertyButton.create(ButtonEnum.Caves.ordinal(), "jm.fullscreen.caves", fullMapProperties, fullMapProperties.showCaves);
             buttonCaves.fitWidth(fr);
             buttonCaves.setNoDisableText(true);
             buttonCaves.setDrawButton(FeatureManager.isAllowed(Feature.MapCaves));
@@ -282,7 +282,7 @@ public class MapOverlay extends JmUI
 //            buttonMode = new Button(ButtonEnum.Mode,0,0,60,20, Constants.getString("MapOverlay.mode")); //$NON-NLS-1$
 //            buttonMode.fitWidth(fr);
 
-            buttonWaypointManager = new Button(ButtonEnum.WaypointManager, Constants.getString("Waypoint.waypoints")); //$NON-NLS-1$
+            buttonWaypointManager = new Button(ButtonEnum.WaypointManager, Constants.getString("jm.waypoint.waypoints")); //$NON-NLS-1$
             buttonWaypointManager.fitWidth(fr);
             buttonWaypointManager.setDrawButton(WaypointsData.isManagerEnabled());
 
@@ -797,7 +797,7 @@ public class MapOverlay extends JmUI
         state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, 1f, false);
 
         // Update player pos
-        state.playerLastPos = Constants.getString("MapOverlay.location_xzyeb",
+        state.playerLastPos = Constants.getString("jm.common.location_xzyeb",
                 Integer.toString((int) mc.thePlayer.posX),
                 Integer.toString((int) mc.thePlayer.posZ),
                 Integer.toString((int) mc.thePlayer.posY),

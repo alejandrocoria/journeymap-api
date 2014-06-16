@@ -156,11 +156,11 @@ public class MapRegionTask extends BaseMapTask
             {
                 if (regionLoader.isUnderground())
                 {
-                    ChatLog.announceI18N("MapOverlay.automap_complete_underground", regionLoader.getVSlice());
+                    ChatLog.announceI18N("jm.common.automap_complete_underground", regionLoader.getVSlice());
                 }
                 else
                 {
-                    ChatLog.announceI18N("MapOverlay.automap_complete");
+                    ChatLog.announceI18N("jm.common.automap_complete");
                 }
             }
             enabled = false;
@@ -206,11 +206,11 @@ public class MapRegionTask extends BaseMapTask
                 String percent = new DecimalFormat("##.#").format(remaining * 100 / total) + "%";
                 if (regionLoader.isUnderground())
                 {
-                    ChatLog.announceI18N("MapOverlay.automap_status_underground", regionLoader.getVSlice(), percent);
+                    ChatLog.announceI18N("jm.common.automap_status_underground", regionLoader.getVSlice(), percent);
                 }
                 else
                 {
-                    ChatLog.announceI18N("MapOverlay.automap_status", percent);
+                    ChatLog.announceI18N("jm.common.automap_status", percent);
                 }
             }
         }

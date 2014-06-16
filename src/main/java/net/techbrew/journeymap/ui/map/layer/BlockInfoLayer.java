@@ -49,11 +49,11 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             {
                 int blockY = chunk.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15);
                 String biome = mc.theWorld.getBiomeGenForCoords(blockCoord.x, blockCoord.z).biomeName;
-                info = Constants.getString("MapOverlay.location_xzyeb", blockCoord.x, blockCoord.z, blockY, (blockY >> 4), biome);
+                info = Constants.getString("jm.common.location_xzyeb", blockCoord.x, blockCoord.z, blockY, (blockY >> 4), biome);
             }
             else
             {
-                info = Constants.getString("MapOverlay.location_xzy", blockCoord.x, blockCoord.z, "?");
+                info = Constants.getString("jm.common.location_xzy", blockCoord.x, blockCoord.z, "?");
             }
 
             boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, fullMapProperties.forceUnicode.get());

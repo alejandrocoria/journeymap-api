@@ -48,8 +48,8 @@ public class VoxelReader
             modLoaded = true;
         } catch (Throwable e)
         {
-            JourneyMap.getLogger().warning("Incompatible version of VoxelMap. Tried com.thevoxelbox.voxelmap.VoxelMap.getInstance().getWaypointManager().getWaypoints(): " + e);
-            ChatLog.announceI18N(Constants.getString("Waypoint.import_vox_version"));
+            JourneyMap.getLogger().warning("Incompatible version of VoxelMap. Tried com.thevoxelbox.voxelmap.VoxelMap.instance.waypointManager.wayPts: " + e);
+            ChatLog.announceI18N("jm.waypoint.import_vox_version");
             ChatLog.announceURL(VOXEL_JAR_NAME, VOXEL_JAR_URL);
             modLoaded = false;
         }
@@ -134,7 +134,7 @@ public class VoxelReader
             }
             catch (Exception e)
             {
-                ChatLog.announceError(Constants.getString("Waypoint.import_vox_file_error", pointsFile.getName()));
+                ChatLog.announceError(Constants.getString("jm.waypoint.import_vox_file_error", pointsFile.getName()));
                 JourneyMap.getLogger().severe(LogFormatter.toString(e));
                 fileErrors++;
             }
@@ -142,15 +142,15 @@ public class VoxelReader
 
         if(waypoints.isEmpty())
         {
-            ChatLog.announceI18N("Waypoint.import_vox_failure");
+            ChatLog.announceI18N("jm.waypoint.import_vox_failure");
         }
         else if(fileErrors == 0 && pointErrors==0)
         {
-            ChatLog.announceI18N("Waypoint.import_vox_success", waypoints.size());
+            ChatLog.announceI18N("jm.waypoint.import_vox_success", waypoints.size());
         }
         else
         {
-            ChatLog.announceI18N("Waypoint.import_vox_errors", waypoints.size(), pointErrors);
+            ChatLog.announceI18N("jm.waypoint.import_vox_errors", waypoints.size(), pointErrors);
         }
 
         return waypoints;
