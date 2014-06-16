@@ -576,7 +576,7 @@ public class WaypointManager extends JmUI
             for (WorldProvider worldProvider : worldProviders)
             {
                 String name = Constants.getString("Waypoint.dimension", worldProvider.getDimensionName());
-                maxWidth = Math.max(maxWidth, Minecraft.getMinecraft().fontRenderer.getStringWidth(name));
+                maxWidth = Math.max(maxWidth, FMLClientHandler.instance().getClient().fontRenderer.getStringWidth(name));
             }
             return maxWidth + 12;
         }

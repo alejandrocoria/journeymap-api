@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.ui;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
@@ -46,7 +47,7 @@ public class UIManager
     }
 
     private final Logger logger = JourneyMap.getLogger();
-    Minecraft minecraft = Minecraft.getMinecraft();
+    Minecraft minecraft = FMLClientHandler.instance().getClient();
 
     public void closeAll()
     {

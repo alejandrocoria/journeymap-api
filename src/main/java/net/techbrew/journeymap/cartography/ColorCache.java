@@ -47,7 +47,7 @@ public class ColorCache implements IResourceManagerReloadListener {
 	
 	private ColorCache() {
 		
-		IResourceManager rm = Minecraft.getMinecraft().getResourceManager();
+		IResourceManager rm = FMLClientHandler.instance().getClient().getResourceManager();
 		if(rm instanceof IReloadableResourceManager) {
 			((IReloadableResourceManager) rm).registerReloadListener(this);
 		} else {
@@ -61,7 +61,7 @@ public class ColorCache implements IResourceManagerReloadListener {
 	public void onResourceManagerReload(IResourceManager mgr) {
 		
 		// Check if the resourcepack has changed
-		ResourcePackRepository repo = Minecraft.getMinecraft().getResourcePackRepository();
+		ResourcePackRepository repo = FMLClientHandler.instance().getClient().getResourcePackRepository();
 
     	String currentPack = Arrays.asList(mgr.getResourceDomains().toArray()).toString();
     	

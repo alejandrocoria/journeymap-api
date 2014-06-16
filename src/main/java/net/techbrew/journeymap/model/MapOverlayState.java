@@ -1,6 +1,7 @@
 package net.techbrew.journeymap.model;
 
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.techbrew.journeymap.Constants;
@@ -114,7 +115,7 @@ public class MapOverlayState
             }
             else
             {
-                final long ticks = (Minecraft.getMinecraft().theWorld.getWorldTime() % 24000L);
+                final long ticks = (FMLClientHandler.instance().getClient().theWorld.getWorldTime() % 24000L);
                 return (ticks < 13800) ? Constants.MapType.day : Constants.MapType.night;
             }
         }

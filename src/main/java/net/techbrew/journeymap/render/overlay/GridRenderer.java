@@ -1,6 +1,7 @@
 package net.techbrew.journeymap.render.overlay;
 
 import com.google.common.cache.Cache;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.Constants.MapType;
@@ -128,7 +129,7 @@ public class GridRenderer {
 
 			if(debug) {
                 logger.fine("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
-				Minecraft mc = Minecraft.getMinecraft();
+				Minecraft mc = FMLClientHandler.instance().getClient();
 				BufferedImage tmp = new BufferedImage(mc.displayWidth, mc.displayHeight, BufferedImage.TYPE_INT_ARGB);
 				Graphics2D g = tmp.createGraphics();
 				g.setStroke(new BasicStroke(1));

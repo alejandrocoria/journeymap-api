@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.server;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
@@ -59,7 +60,7 @@ public class TileService extends FileService
         Query query = event.query();
         query.parse();
 
-        Minecraft minecraft = Minecraft.getMinecraft();
+        Minecraft minecraft = FMLClientHandler.instance().getClient();
         World theWorld = minecraft.theWorld;
         if (theWorld == null)
         {

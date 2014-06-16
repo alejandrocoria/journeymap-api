@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.task;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.StatTimer;
@@ -72,7 +73,7 @@ public class TaskController
         ITaskManager taskManager = getManager(managerClass);
         if (taskManager != null)
         {
-            return taskManager.isEnabled(Minecraft.getMinecraft());
+            return taskManager.isEnabled(FMLClientHandler.instance().getClient());
         }
         else
         {
@@ -105,7 +106,7 @@ public class TaskController
 
     private void toggleTask(ITaskManager manager, boolean enable, Object params)
     {
-        Minecraft minecraft = Minecraft.getMinecraft();
+        Minecraft minecraft = FMLClientHandler.instance().getClient();
         if (manager.isEnabled(minecraft))
         {
             if (!enable)

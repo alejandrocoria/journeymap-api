@@ -1,6 +1,7 @@
 package net.techbrew.journeymap.render.draw;
 
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -72,7 +73,7 @@ public class DrawUtil
             return;
         }
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = FMLClientHandler.instance().getClient();
         final FontRenderer fontRenderer = mc.fontRenderer;
         final boolean drawRect = (bgColor != null && alpha>0);
         final int width = fontRenderer.getStringWidth(text);

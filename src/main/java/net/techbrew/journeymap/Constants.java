@@ -1,7 +1,7 @@
 package net.techbrew.journeymap;
 
 
-import net.minecraft.client.Minecraft;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.Util;
@@ -53,7 +53,7 @@ public class Constants {
         Locale locale = Locale.getDefault();
         try
         {
-            String lang = Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode();
+            String lang = FMLClientHandler.instance().getClient().getLanguageManager().getCurrentLanguage().getLanguageCode();
             locale = new Locale(lang);
         }
         catch (Exception e)

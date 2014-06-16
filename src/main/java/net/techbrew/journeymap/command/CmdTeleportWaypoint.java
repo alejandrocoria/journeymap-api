@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.command;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.server.CommandTeleport;
 import net.minecraft.util.Vec3;
@@ -10,7 +11,7 @@ import net.techbrew.journeymap.model.Waypoint;
  */
 public class CmdTeleportWaypoint
 {
-    final Minecraft mc = Minecraft.getMinecraft();
+    final Minecraft mc = FMLClientHandler.instance().getClient();
     final Waypoint waypoint;
 
     public CmdTeleportWaypoint(Waypoint waypoint)

@@ -1,7 +1,7 @@
 package net.techbrew.journeymap.io;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.IIcon;
@@ -182,7 +182,7 @@ public class IconLoader {
                 } else if(block.getRenderBlockPass()>0) {
                     blockAlpha = a * 1.0f/255; // try to use texture alpha
                     if(blockAlpha==1f) { // try to use light opacity
-                        blockAlpha = block.getLightOpacity(Minecraft.getMinecraft().theWorld, 0, 65, 0) / 255f;
+                        blockAlpha = block.getLightOpacity(FMLClientHandler.instance().getClient().theWorld, 0, 65, 0) / 255f;
                     }
                 }
             }
@@ -210,7 +210,7 @@ public class IconLoader {
 		BufferedImage image = null;
 
 		try {
-            int glid = Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
+            int glid = FMLClientHandler.instance().getClient().getTextureManager().getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
 			GL11.glBindTexture(3553, glid);
 		    int width = GL11.glGetTexLevelParameteri(3553, 0, 4096);
 		    int height = GL11.glGetTexLevelParameteri(3553, 0, 4097);

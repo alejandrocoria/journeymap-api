@@ -1,5 +1,6 @@
 package modinfo;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import modinfo.mp.v1.Client;
 import modinfo.mp.v1.Message;
 import modinfo.mp.v1.Payload;
@@ -24,7 +25,7 @@ public class ModInfo {
     public static final String VERSION = "0.1";
     public static final Logger LOGGER = Logger.getLogger("modinfo");
 
-    private final Minecraft minecraft = Minecraft.getMinecraft();
+    private final Minecraft minecraft = FMLClientHandler.instance().getClient();
     private final String trackingId;
     private final String modId;
     private final String modName;

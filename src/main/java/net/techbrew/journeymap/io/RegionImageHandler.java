@@ -1,7 +1,7 @@
 package net.techbrew.journeymap.io;
 
 
-import net.minecraft.client.Minecraft;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
@@ -333,7 +333,7 @@ public class RegionImageHandler {
 	}
 	
 	public static File getBlank512x512ImageFile() {
-		final File dataDir = new File(Minecraft.getMinecraft().mcDataDir, Constants.DATA_DIR);
+		final File dataDir = new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.DATA_DIR);
 		final File tmpFile = new File(dataDir, "blank512x512.png");
 		if(!tmpFile.canRead()) {
 			BufferedImage image;

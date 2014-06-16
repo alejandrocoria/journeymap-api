@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.feature;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.integrated.IntegratedServer;
 
@@ -39,7 +40,7 @@ public enum Feature {
 		if(restrictInMultiplayer && restrictInSingleplayer) {
 			return true;
 		} else {		
-			Minecraft mc = Minecraft.getMinecraft();
+			Minecraft mc = FMLClientHandler.instance().getClient();
 
             IntegratedServer server = mc.getIntegratedServer();
             boolean isSinglePlayer = server!=null && !server.getPublic();

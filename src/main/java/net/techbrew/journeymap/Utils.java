@@ -61,7 +61,7 @@ public class Utils {
 //			
 //			ChunkCoordinates cc = world.getSpawnPoint();
 //			Chunk spawnChunk = Utils.getChunkIfAvailable(world, cc.posX>>4, cc.posZ>>4);
-//			if((spawnChunk==null || spawnChunk instanceof EmptyChunk) && !Minecraft.getMinecraft().isSingleplayer()) {
+//			if((spawnChunk==null || spawnChunk instanceof EmptyChunk) && !FMLClientHandler.instance().getClient().isSingleplayer()) {
 //				spawnChunk = world.getChunkFromBlockCoords(cc.posX, cc.posZ);
 //				//spawnChunk = world.getChunkProvider().loadChunk(cc.posX, cc.posZ);
 //				if(spawnChunk.isTerrainPopulated) {

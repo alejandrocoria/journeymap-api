@@ -2,6 +2,7 @@ package modinfo;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 
 import java.io.*;
@@ -175,7 +176,7 @@ public class Config implements Serializable {
 
     private static File getFile(String modId)
     {
-        Minecraft minecraft = Minecraft.getMinecraft();
+        Minecraft minecraft = FMLClientHandler.instance().getClient();
         File dir = new File(minecraft.mcDataDir, PARENT_DIR);
         if(!dir.exists()) {
             dir.mkdirs();

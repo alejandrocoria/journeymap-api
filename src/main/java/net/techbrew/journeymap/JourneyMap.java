@@ -360,7 +360,7 @@ public class JourneyMap
      */
     public void stopMapping()
     {
-        Minecraft minecraft = Minecraft.getMinecraft();
+        Minecraft minecraft = FMLClientHandler.instance().getClient();
 
         synchronized (this)
         {

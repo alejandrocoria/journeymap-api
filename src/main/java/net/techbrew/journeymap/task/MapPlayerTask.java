@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.task;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChunkCoordinates;
@@ -52,7 +53,7 @@ public class MapPlayerTask extends BaseMapTask
     {
         return new Comparator<ChunkCoordIntPair>()
         {
-            Minecraft minecraft = Minecraft.getMinecraft();
+            Minecraft minecraft = FMLClientHandler.instance().getClient();
 
             @Override
             public int compare(ChunkCoordIntPair o1, ChunkCoordIntPair o2)

@@ -1,6 +1,6 @@
 package net.techbrew.journeymap.waypoint;
 
-import net.minecraft.client.Minecraft;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatAllowedCharacters;
@@ -52,7 +52,7 @@ public class ReiReader
                 return Collections.EMPTY_LIST;
             }
 
-            EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+            EntityPlayer player = FMLClientHandler.instance().getClient().thePlayer;
             int dimension = player != null ? player.dimension : 0;
 
             ArrayList<Waypoint> converted = new ArrayList<Waypoint>(reiWaypoints.size());
@@ -85,7 +85,7 @@ public class ReiReader
         String worldName = null;
         try
         {
-            NetHandlerPlayClient sendQueue = Minecraft.getMinecraft().getNetHandler();
+            NetHandlerPlayClient sendQueue = FMLClientHandler.instance().getClient().getNetHandler();
             SocketAddress addr = sendQueue.getNetworkManager().getSocketAddress();
             String addrStr = addr.toString().replaceAll("[\r\n]", "");
             Matcher matcher = Pattern.compile("(.*)/(.*):([0-9]+)").matcher(addrStr);

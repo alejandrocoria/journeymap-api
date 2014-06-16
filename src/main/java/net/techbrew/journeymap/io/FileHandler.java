@@ -1,6 +1,7 @@
 package net.techbrew.journeymap.io;
 
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
 import net.techbrew.journeymap.Constants;
@@ -101,7 +102,7 @@ public class FileHandler
 
     public static File getJourneyMapDir()
     {
-        return new File(Minecraft.getMinecraft().mcDataDir, Constants.JOURNEYMAP_DIR);
+        return new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.JOURNEYMAP_DIR);
     }
 
 
@@ -121,7 +122,7 @@ public class FileHandler
     public static File getJMWorldDir(Minecraft minecraft, long hash)
     {
 
-        File mcDir = Minecraft.getMinecraft().mcDataDir;
+        File mcDir = FMLClientHandler.instance().getClient().mcDataDir;
 
         if (lastJMWorldDir == null)
         {
@@ -153,7 +154,7 @@ public class FileHandler
 
     public static File getWaypointDir()
     {
-        return getWaypointDir(getJMWorldDir(Minecraft.getMinecraft()));
+        return getWaypointDir(getJMWorldDir(FMLClientHandler.instance().getClient()));
     }
 
     public static File getWaypointDir(File jmWorldDir)
@@ -231,17 +232,17 @@ public class FileHandler
 
     public static File getConfigDir()
     {
-        return new File(Minecraft.getMinecraft().mcDataDir, Constants.CONFIG_DIR);
+        return new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.CONFIG_DIR);
     }
 
     public static File getCacheDir()
     {
-        return new File(Minecraft.getMinecraft().mcDataDir, Constants.CACHE_DIR);
+        return new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.CACHE_DIR);
     }
 
     public static File getCustomDir()
     {
-        return new File(Minecraft.getMinecraft().mcDataDir, Constants.CUSTOM_DIR);
+        return new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.CUSTOM_DIR);
     }
 
     public static BufferedImage getCustomImage(String fileName)

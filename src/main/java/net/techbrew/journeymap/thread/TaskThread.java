@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.thread;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
@@ -70,7 +71,7 @@ public class TaskThread implements Runnable {
 
 		try {
 			final JourneyMap jm = JourneyMap.getInstance();
-			final Minecraft mc = Minecraft.getMinecraft();
+			final Minecraft mc = FMLClientHandler.instance().getClient();
 			final boolean threadLogging = jm.isThreadLogging();
 			
 			// Bail if needed

@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.ui.minimap;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -43,7 +44,7 @@ public class MiniMap
     private static final long labelRefreshRate = 1001;
 
     private final Logger logger = JourneyMap.getLogger();
-    private final Minecraft mc = Minecraft.getMinecraft();
+    private final Minecraft mc = FMLClientHandler.instance().getClient();
 
     private final Color playerInfoFgColor = Color.LIGHT_GRAY;
     private final Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);

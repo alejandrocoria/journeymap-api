@@ -1,6 +1,7 @@
 package net.techbrew.journeymap.model;
 
 import com.google.common.collect.ImmutableSortedMap;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.entity.Render;
@@ -12,7 +13,10 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.IMob;
-import net.minecraft.entity.passive.*;
+import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.entity.passive.EntityHorse;
+import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.entity.passive.EntityWaterMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
@@ -32,7 +36,7 @@ public class EntityHelper
         StatTimer timer = StatTimer.get("EntityHelper." + timerName);
         timer.start();
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = FMLClientHandler.instance().getClient();
         List<EntityDTO> list = new ArrayList();
 
         List<Entity> allEntities = new ArrayList<Entity>(mc.theWorld.loadedEntityList);
@@ -99,7 +103,7 @@ public class EntityHelper
         StatTimer timer = StatTimer.get("EntityHelper.getPlayersNearby");
         timer.start();
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = FMLClientHandler.instance().getClient();
 
         lateralDistance = JourneyMap.getInstance().coreProperties.chunkOffset.get() * 8;
         verticalDistance = lateralDistance / 2;

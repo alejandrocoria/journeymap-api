@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.render.entity;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderHelper;
@@ -32,7 +33,7 @@ public class RenderWaypointBeacon
     static final ResourceLocation beam = new ResourceLocation("textures/entity/beacon_beam.png");
     static StatTimer timer = StatTimer.get("WaypointBeacon.doRender", 100);
     static StatTimer allTimer = StatTimer.get("WaypointBeacon.renderAll", 100);
-    static Minecraft mc = Minecraft.getMinecraft();
+    static Minecraft mc = FMLClientHandler.instance().getClient();
     static RenderManager renderManager = RenderManager.instance;
     static String distanceLabel = Constants.getString("Waypoint.distance_meters", "%1.0f");
     static WaypointProperties waypointProperties;

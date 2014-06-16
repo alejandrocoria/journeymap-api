@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.ui.minimap;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
@@ -177,7 +178,7 @@ public class DisplayVars
             FontRenderer fontRenderer = null;
             if (forceUnicode)
             {
-                fontRenderer = Minecraft.getMinecraft().fontRenderer;
+                fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
                 isUnicode = fontRenderer.getUnicodeFlag();
                 if (!isUnicode)
                 {

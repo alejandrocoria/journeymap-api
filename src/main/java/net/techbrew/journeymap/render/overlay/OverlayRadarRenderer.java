@@ -1,11 +1,11 @@
 package net.techbrew.journeymap.render.overlay;
 
-import net.minecraft.client.Minecraft;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.render.draw.DrawCenteredLabelStep;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
@@ -47,7 +47,7 @@ public class OverlayRadarRenderer
             Boolean isHostile, isPet, isPlayer;
             boolean filterAnimals = (showAnimals != showPets);
             //FontMetrics fm = g2D.getFontMetrics();
-            String playername = Minecraft.getMinecraft().thePlayer.getDisplayName();
+            String playername = FMLClientHandler.instance().getClient().thePlayer.getDisplayName();
             TextureCache tc = TextureCache.instance();
 
             for (EntityDTO dto : entityDTOs)

@@ -1,7 +1,7 @@
 package net.techbrew.journeymap.server;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.registry.GameData;
-import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.*;
@@ -90,7 +90,7 @@ public class DataService extends BaseService
                 }
                 else
                 {
-                    if (Minecraft.getMinecraft().theWorld == null)
+                    if (FMLClientHandler.instance().getClient().theWorld == null)
                     {
                         throwEventException(503, Constants.getMessageJMERR09(), event, false);
                     }

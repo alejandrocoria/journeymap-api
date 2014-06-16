@@ -1,6 +1,6 @@
 package net.techbrew.journeymap.ui.map;
 
-import net.minecraft.client.Minecraft;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
@@ -60,7 +60,7 @@ public class MapOverlayActions extends JmUI
                 Constants.getString("MapOverlay.automap_title", on),
                 Constants.getString("MapOverlay.automap_title", off),
                 true); //$NON-NLS-1$ //$NON-NLS-2$
-        buttonAutomap.setEnabled(Minecraft.getMinecraft().isSingleplayer());
+        buttonAutomap.setEnabled(FMLClientHandler.instance().getClient().isSingleplayer());
 
         buttonCheck = new Button(ButtonEnum.Check, Constants.getString("MapOverlay.update_check")); //$NON-NLS-1$
 

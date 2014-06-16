@@ -1,6 +1,6 @@
 package net.techbrew.journeymap.log;
 
-import net.minecraft.client.Minecraft;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraftforge.common.ForgeVersion;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -125,7 +125,7 @@ public class JMLogger
         {
             sb.append(env).append("=").append(System.getProperty(env)).append(", ");
         }
-        sb.append("game language=").append(Minecraft.getMinecraft().gameSettings.language).append(", ");
+        sb.append("game language=").append(FMLClientHandler.instance().getClient().gameSettings.language).append(", ");
         sb.append("locale=").append(Constants.getLocale());
         props.put("Environment", sb.toString());
 

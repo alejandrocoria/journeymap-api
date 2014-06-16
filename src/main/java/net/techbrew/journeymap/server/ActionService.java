@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.server;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
 import net.techbrew.journeymap.Constants;
@@ -49,7 +50,7 @@ public class ActionService extends BaseService {
 		query.parse();
 
 		// Check world
-		Minecraft minecraft = Minecraft.getMinecraft();
+		Minecraft minecraft = FMLClientHandler.instance().getClient();
 		World theWorld = minecraft.theWorld;
 		if (theWorld == null) {
 			throwEventException(503, Constants.getMessageJMERR09(), event, false);
@@ -84,7 +85,7 @@ public class ActionService extends BaseService {
 		
 		Query query = event.query();
 		
-		Minecraft minecraft = Minecraft.getMinecraft();
+		Minecraft minecraft = FMLClientHandler.instance().getClient();
 		World theWorld = minecraft.theWorld; 
 
 		

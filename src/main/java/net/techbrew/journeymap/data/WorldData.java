@@ -135,7 +135,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
     {
         try
         {
-            NetHandlerPlayClient sendQueue = Minecraft.getMinecraft().getNetHandler();
+            NetHandlerPlayClient sendQueue = FMLClientHandler.instance().getClient().getNetHandler();
             SocketAddress socketAddress = sendQueue.getNetworkManager().getSocketAddress();
             if ((socketAddress != null && socketAddress instanceof InetSocketAddress))
             {

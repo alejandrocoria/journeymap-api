@@ -94,13 +94,13 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             {
                 if (Constants.KB_MAP.isPressed())
                 {
-                    if (Minecraft.getMinecraft().currentScreen == null)
+                    if (FMLClientHandler.instance().getClient().currentScreen == null)
                     {
                         UIManager.getInstance().openMap();
                     }
                     else
                     {
-                        if (Minecraft.getMinecraft().currentScreen instanceof MapOverlay)
+                        if (FMLClientHandler.instance().getClient().currentScreen instanceof MapOverlay)
                         {
                             UIManager.getInstance().closeAll();
                         }
@@ -111,7 +111,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 {
                     if (Constants.KB_WAYPOINT.isPressed())
                     {
-                        if (Minecraft.getMinecraft().currentScreen == null)
+                        if (FMLClientHandler.instance().getClient().currentScreen == null)
                         {
                             Minecraft mc = FMLClientHandler.instance().getClient();
                             Waypoint waypoint = Waypoint.of(mc.thePlayer);

@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.io;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
@@ -117,7 +118,7 @@ public class MapSaver {
 		try {
 			
 			// Build save file name
-			final Minecraft mc = Minecraft.getMinecraft();
+			final Minecraft mc = FMLClientHandler.instance().getClient();
 	        final String date = dateFormat.format(new Date());
 	        final boolean isUnderground = mapType.equals(Constants.MapType.underground);
 	        final StringBuilder sb = new StringBuilder(date).append("_");
@@ -131,7 +132,7 @@ public class MapSaver {
 	        sb.append(".png");	        
 	        
 			// Ensure screenshots directory
-			File screenshotsDir = new File(Minecraft.getMinecraft().mcDataDir, "screenshots");
+			File screenshotsDir = new File(FMLClientHandler.instance().getClient().mcDataDir, "screenshots");
 			if(!screenshotsDir.exists()) {
 				screenshotsDir.mkdir();
 			}

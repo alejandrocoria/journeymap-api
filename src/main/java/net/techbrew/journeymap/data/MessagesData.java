@@ -2,11 +2,14 @@ package net.techbrew.journeymap.data;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.client.Minecraft;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.io.FileHandler;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 ;
@@ -33,7 +36,7 @@ public class MessagesData extends CacheLoader<Class, Map<String,Object>>
     {
         HashMap<String, Object> props = new HashMap<String, Object>();
         props.put("locale", Constants.getLocale());
-        props.put("lang", Minecraft.getMinecraft().gameSettings.language);
+        props.put("lang", FMLClientHandler.instance().getClient().gameSettings.language);
 
         Properties properties = FileHandler.getLangFile("en_US.lang");
         Enumeration<Object> allKeys = properties.keys();
