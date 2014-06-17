@@ -119,7 +119,7 @@ public class JMLogger
         props.put("Memory", String.format("%sMB total, %sMB free", totalMB, freeMB));
 
         // Environment
-        List<String> envProps = Arrays.asList("os.name, os.arch, java.version, user.country, user.language");
+        List<String> envProps = Arrays.asList("os.name", "os.arch", "java.version", "user.country", "user.language");
         StringBuilder sb = new StringBuilder();
         for(String env : envProps)
         {
