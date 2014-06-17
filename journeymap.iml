@@ -30,7 +30,7 @@
     <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../forge/libs/[1.7.2]ReiMinimap_v3.4_03beta.zip!/" />
+          <root url="jar://$MODULE_DIR$/lib/[1.7.2]ReiMinimap_v3.4_03beta.zip!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -39,7 +39,7 @@
     <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../forge/libs/voxelmap-1.7.2-1.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/voxelmap-1.7.2-1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
