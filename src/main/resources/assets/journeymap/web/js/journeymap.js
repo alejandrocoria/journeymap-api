@@ -1054,7 +1054,7 @@ var JourneyMap = (function() {
 					drawWaypoints();
 				}
 				
-				if(map.getZoom()<3) {
+				if(map.getZoom()==0) {
 					$('img.entityLocator').css('visibility','hidden');
 				} else {
 					$('img.entityLocator').css('visibility','visible');
@@ -1208,7 +1208,7 @@ var JourneyMap = (function() {
 		}
 		
 		// Entity icon
-		$(contentDiv).find('.entityIcon').attr('src','/img/entity/' + entity.filename);
+		$(contentDiv).find('.entityIcon').addClass('entity_' + JM.world.iconSetName).attr('src','/icon/entity/' + JM.world.iconSetName + '/' + entity.filename);
 
 		// Entity locator		
 		$(contentDiv).find('.entityLocator').attr('src', locatorUrl).rotate(heading);		

@@ -1,6 +1,10 @@
 package net.techbrew.journeymap.properties;
 
+import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.io.FileHandler;
+
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Shared Properties for the various map types.
@@ -13,8 +17,30 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
     public final AtomicBoolean showPets = new AtomicBoolean(true);
     public final AtomicBoolean showPlayers = new AtomicBoolean(true);
     public final AtomicBoolean showWaypoints = new AtomicBoolean(true);
-
     public final AtomicBoolean showSelf = new AtomicBoolean(true);
+
+    protected MapProperties()
+    {
+    }
+
+    public abstract AtomicReference<String> getEntityIconSetName();
+
+    @Override
+    protected boolean validate()
+    {
+        boolean saveNeeded = super.validate();
+
+        AtomicReference<String> entityIconSetName = getEntityIconSetName();
+
+        if(entityIconSetName.get()==null || !FileHandler.getMobIconSetNames().contains(entityIconSetName.get()))
+        {
+            JourneyMap.getLogger().warning(String.format("Entity Icon Set name '%s' is not valid, will use default instead.", entityIconSetName.get()));
+            entityIconSetName.set(FileHandler.getMobIconSetNames().get(0));
+            saveNeeded = true;
+        }
+
+        return saveNeeded;
+    }
 
     @Override
     public boolean equals(Object o)
@@ -42,6 +68,7 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
         result = 31 * result + showPlayers.hashCode();
         result = 31 * result + showWaypoints.hashCode();
         result = 31 * result + showSelf.hashCode();
+        result = 31 * result + getEntityIconSetName().hashCode();
         return result;
     }
 

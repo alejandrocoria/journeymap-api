@@ -61,7 +61,7 @@ public class JMLogger
                 logFile.getParentFile().mkdirs();
             }
 
-            fileHandler = new java.util.logging.FileHandler(logFile.getAbsolutePath());
+            fileHandler = new java.util.logging.FileHandler(logFile.getAbsolutePath(), 0, 1, false);
             fileHandler.setFormatter(new LogFormatter());
             logger.addHandler(fileHandler);
 

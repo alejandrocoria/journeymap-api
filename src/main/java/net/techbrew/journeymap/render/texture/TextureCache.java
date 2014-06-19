@@ -17,9 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -42,6 +40,10 @@ public class TextureCache {
         return Holder.INSTANCE;
     }
 
+    private TextureCache()
+    {
+    }
+
     public static DynamicTexture newTexture(String path) {
         ResourceLocation loc = new ResourceLocation(path);
         DynamicTexture texture = null;
@@ -62,7 +64,7 @@ public class TextureCache {
     }
     
     public static enum Name {
-        MinimapSmallSquare, MinimapMediumSquare, MinimapLargeSquare, MinimapSmallCircle, MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, LocatorHostile, LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, ColorPicker, UnknownEntity;
+        MinimapSmallSquare, MinimapMediumSquare, MinimapLargeSquare, MinimapCustomSquare, MinimapSmallCircle, MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, LocatorHostile, LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, ColorPicker, UnknownEntity;
     }
     
     private final Map<Name, TextureImpl> namedTextures = Collections.synchronizedMap(new HashMap<Name, TextureImpl>(Name.values().length + (Name.values().length/2) + 1));
@@ -94,26 +96,26 @@ public class TextureCache {
     
     /*************************************************/
 
-    public TextureImpl getCustomTexture(String filename, boolean retain) {
-        synchronized(customTextures)
-        {
-            TextureImpl tex = customTextures.get(filename);
-            if(tex==null || (!tex.hasImage() && retain)) {
-                BufferedImage img = FileHandler.getCustomImage(filename);
-                if(img==null){
-                    img = getUnknownEntity().getImage();
-                }
-                if(img!=null){
-                    if(tex!=null){
-                        tex.deleteTexture();
-                    }
-                    tex = new TextureImpl(img, retain);
-                    customTextures.put(filename, tex);
-                }
-            }
-            return tex;
-        }
-    }
+//    public TextureImpl getCustomTexture(String filename, boolean retain) {
+//        synchronized(customTextures)
+//        {
+//            TextureImpl tex = customTextures.get(filename);
+//            if(tex==null || (!tex.hasImage() && retain)) {
+//                BufferedImage img = FileHandler.getImage(filename);
+//                if(img==null){
+//                    img = getUnknownEntity().getImage();
+//                }
+//                if(img!=null){
+//                    if(tex!=null){
+//                        tex.deleteTexture();
+//                    }
+//                    tex = new TextureImpl(img, retain);
+//                    customTextures.put(filename, tex);
+//                }
+//            }
+//            return tex;
+//        }
+//    }
 
 	private TextureImpl getNamedTexture(Name name, String filename, boolean retain) {
 		synchronized(namedTextures) {
@@ -137,6 +139,26 @@ public class TextureCache {
 
     public TextureImpl getMinimapSmallSquare() {
         return getNamedTexture(Name.MinimapSmallSquare, "minimap/minimap-square-128.png", false); //$NON-NLS-1$
+    }
+
+    public TextureImpl getMinimapSquare(int size)
+    {
+        final BufferedImage original = FileHandler.getWebImage("minimap/minimap-square-512.png");
+        BufferedImage custom = new BufferedImage(size, size, original.getType());
+
+        Graphics2D g = custom.createGraphics();
+        //RegionImageHandler.initRenderingHints(g);
+
+        g.drawImage(custom, 0, 0, null);
+        g.dispose();
+
+        TextureImpl tex = namedTextures.get(Name.MinimapCustomSquare);
+        if(tex!=null){
+            tex.deleteTexture();
+        }
+        tex = new TextureImpl(original, true);
+        namedTextures.put(Name.MinimapCustomSquare, tex);
+        return tex;
     }
 
     public TextureImpl getMinimapMediumSquare() {
@@ -212,23 +234,24 @@ public class TextureCache {
     }
 	
 	public TextureImpl getUnknownEntity() {
-		return getNamedTexture(Name.UnknownEntity, "entity/unknown.png", true); //$NON-NLS-1$
+		return getNamedTexture(Name.UnknownEntity, "unknown.png", true); //$NON-NLS-1$
 	}
 	
 	/*****************************************************/
 	
-	public TextureImpl getEntityImage(String filename) {
-		
+	public TextureImpl getEntityIconTexture(String setName, String iconPath) {
+
+        String texName = String.format("%s/%s", setName, iconPath);
 		synchronized(entityImageMap) {
-			TextureImpl tex = entityImageMap.get(filename);
+			TextureImpl tex = entityImageMap.get(texName);
             if(tex==null || !tex.hasImage()) {
-				BufferedImage img = FileHandler.getCustomizableImage("entity/" + filename, getUnknownEntity().getImage()); //$NON-NLS-1$	
+				BufferedImage img = FileHandler.getEntityIconFromFile(setName, iconPath, getUnknownEntity().getImage()); //$NON-NLS-1$
                 if(img!=null){
                     if(tex!=null) {
                         tex.deleteTexture();
                     }
                     tex = new TextureImpl(img);
-                    entityImageMap.put(filename, tex);
+                    entityImageMap.put(texName, tex);
                 }
 			}
 			return tex;

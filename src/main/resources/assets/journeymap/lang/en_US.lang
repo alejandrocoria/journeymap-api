@@ -44,6 +44,7 @@ jm.common.log_warning=Log level %1$s will slow down the game. Do not use for nor
 jm.common.map_saved=Map saved: %1$s
 jm.common.mapgui_only_ready=Press [§b%1$s§f]. (Webserver disabled.)
 jm.common.memory_warning=Minecraft is running out of memory: %1$s
+jm.common.mob_icon_set=Mob Icons:
 jm.common.new_version_available=Newer version available: %1$s
 jm.common.night=Night
 jm.common.off=Off

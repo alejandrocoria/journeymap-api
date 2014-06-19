@@ -2,6 +2,7 @@ package net.techbrew.journeymap.server;
 
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -31,7 +32,10 @@ import java.util.zip.ZipInputStream;
  *
  */
 public class FileService extends BaseService {
-	
+
+    final String ICON_ENTITY_PATH_PREFIX = "/icon/entity/";
+    final String SKIN_PREFIX = "/skin/";
+
 	private static final long serialVersionUID = 2L;
 
 	protected final String resourcePath;
@@ -43,7 +47,7 @@ public class FileService extends BaseService {
 	 */
 	public FileService() {
 		
-		URL resourceDir = JourneyMap.class.getResource("/assets/journeymap/web"); //$NON-NLS-1$
+		URL resourceDir = JourneyMap.class.getResource(FileHandler.ASSETS_JOURNEYMAP_WEB); //$NON-NLS-1$
 
         String testPath = null;
 
@@ -79,13 +83,48 @@ public class FileService extends BaseService {
 			
 			// Determine request path
 			path = event.query().path(); //$NON-NLS-1$
-			
-			if(path.startsWith("/skin/")) {
-				serveSkin(path.split("/skin/")[1], event);
+
+            // Handle skin request
+			if(path.startsWith(SKIN_PREFIX)) {
+				serveSkin(path.split(SKIN_PREFIX)[1], event);
 				return;
 			}
 
-            InputStream fileStream = getStream(path, event);
+            InputStream fileStream = null;
+
+            // Handle entity icon request
+            if(path.startsWith(ICON_ENTITY_PATH_PREFIX))
+            {
+                String entityIconPath = path.split(ICON_ENTITY_PATH_PREFIX)[1].replace('/', File.separatorChar);
+                File iconFile = new File(FileHandler.getEntityIconDir(), entityIconPath);
+                if(!iconFile.exists())
+                {
+                    // Fallback to jar asset
+                    String setName = entityIconPath.split(File.separator)[0];
+                    String iconPath = entityIconPath.substring(entityIconPath.indexOf(File.separatorChar)+1);
+
+                    if(event!=null)
+                    {
+                        ResponseHeader.on(event).contentType(ContentType.png);
+                    }
+                    fileStream = FileHandler.getEntityIconStream(setName, iconPath);
+                    JourneyMap.getLogger().warning("Couldn't get file for " + path);
+                }
+                else
+                {
+                    if(event!=null)
+                    {
+                        ResponseHeader.on(event).content(iconFile);
+                    }
+                    fileStream = new FileInputStream(iconFile);
+                }
+            }
+            else
+            {
+                // Default file request
+                fileStream = getStream(path, event);
+            }
+
             if(fileStream==null)
             {
                 JourneyMap.getLogger().fine("Path not found: " + path);

@@ -182,6 +182,14 @@ label span {
 
 
 .entityIcon {
+    position:absolute;
+    width: 16px;
+    height: 16px;
+    top: 24px;
+    left: 24px;
+}
+
+.entityIcon.entity_3D {
 	position:absolute;
 	width: 32px;
 	height: 32px;

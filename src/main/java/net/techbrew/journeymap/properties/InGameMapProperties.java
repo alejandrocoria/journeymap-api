@@ -11,6 +11,10 @@ public abstract class InGameMapProperties extends MapProperties
     public final AtomicBoolean fontSmall = new AtomicBoolean(true);
     public final AtomicBoolean textureSmall = new AtomicBoolean(true);
 
+    protected InGameMapProperties()
+    {
+    }
+
     @Override
     public boolean equals(Object o)
     {

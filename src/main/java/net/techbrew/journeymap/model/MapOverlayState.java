@@ -49,6 +49,7 @@ public class MapOverlayState
     private List<DrawStep> drawStepList = new ArrayList<DrawStep>();
     private List<DrawWayPointStep> drawWaypointStepList = new ArrayList<DrawWayPointStep>();
     private String playerBiome = "";
+    private MapProperties lastMapProperties = null;
 
     /**
      * Default constructor
@@ -64,6 +65,7 @@ public class MapOverlayState
         final boolean lastUnderground = this.underground;
         final int lastDimension = this.currentZoom;
         final File lastWorldDir = this.worldDir;
+        lastMapProperties = mapProperties;
 
         this.caveMappingAllowed = FeatureManager.isAllowed(Feature.MapCaves);
         this.dimension = player.dimension;
@@ -158,6 +160,8 @@ public class MapOverlayState
 
     public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, OverlayWaypointRenderer waypointRenderer, OverlayRadarRenderer radarRenderer, MapProperties mapProperties, float drawScale, boolean checkWaypointDistance)
     {
+        lastMapProperties = mapProperties;
+
         drawStepList.clear();
         drawWaypointStepList.clear();
 
@@ -252,7 +256,7 @@ public class MapOverlayState
         this.lastRefresh = System.currentTimeMillis();
     }
 
-    public boolean shouldRefresh(Minecraft mc)
+    public boolean shouldRefresh(Minecraft mc, MapProperties mapProperties)
     {
 
         if (System.currentTimeMillis() > (lastRefresh + 500 + coreProperties.chunkPoll.get()))
@@ -266,6 +270,11 @@ public class MapOverlayState
         }
 
         if (this.underground != DataCache.getPlayer().underground)
+        {
+            return true;
+        }
+
+        if(lastMapProperties == null || !lastMapProperties.equals(mapProperties))
         {
             return true;
         }

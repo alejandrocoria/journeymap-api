@@ -4,6 +4,7 @@ import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import modinfo.ModInfo;
@@ -147,11 +148,14 @@ public class JourneyMap
     @Mod.EventHandler
     public void initialize(FMLInitializationEvent event) throws Throwable
     {
+        StatTimer timer = null;
         try
         {
+            timer = StatTimer.getDisposable("elapsed").start();
+
             // Ensure logger inits
             logger = JMLogger.init();
-            logger.info(JourneyMap.MOD_NAME + " initialize ENTER");
+            logger.info("initialize ENTER");
 
             modInfo = new ModInfo("UA-28839029-4", "en_US", MOD_ID, MOD_NAME, getEdition());
 
@@ -160,6 +164,9 @@ public class JourneyMap
                 logger.warning("Already initialized, aborting");
                 return;
             }
+
+            // Trigger statics on EntityList
+            EntityRegistry.instance();
 
             // Load properties
             coreProperties = new CoreProperties().load();
@@ -171,8 +178,12 @@ public class JourneyMap
 
             // Log properties
             JMLogger.logProperties();
+            JMLogger.setLevelFromProps();
 
-            logger.info(JourneyMap.MOD_NAME + " initialize EXIT");
+            // Logging for thread debugging
+            threadLogging = getLogger().isLoggable(Level.FINER);
+
+            logger.info("initialize EXIT, " + (timer==null ? "" : timer.stopAndReport()));
         }
         catch (Throwable t)
         {
@@ -188,30 +199,29 @@ public class JourneyMap
     @Mod.EventHandler
     public void postInitialize(FMLPostInitializationEvent event)
     {
+        StatTimer timer = null;
         try
         {
-            logger.info(JourneyMap.MOD_NAME + " postInitialize ENTER");
+            logger.info("postInitialize ENTER");
+            timer = StatTimer.getDisposable("elapsed").start();
 
             // Register general event handlers
             EventHandlerManager.registerGeneralHandlers();
             EventHandlerManager.registerGuiHandlers();
 
-            // Webserver
-            toggleWebserver(webMapProperties.enabled.get(), false);
-
-            initialized = true;
-
-            // Override log level now that loading complete
-            logger.info("Initialization complete."); //$NON-NLS-1$
-            JMLogger.setLevelFromProps();
-
-            // Logging for thread debugging
-            threadLogging = getLogger().isLoggable(Level.FINER);
-
+            // Resets detection results of Voxel/Rei's
             WaypointsData.reset();
+
+            // Now that all blocks should be registered, init BlockUtils
             BlockUtils.initialize();
 
-            logger.info(JourneyMap.MOD_NAME + " postInitialize EXIT");
+            // Ensure all mob icons files are ready for use.
+            FileHandler.initMobIconSets();
+
+            // Webserver
+            toggleWebserver(webMapProperties.enabled.get(), false);
+            initialized = true;
+
         }
         catch (Throwable t)
         {
@@ -221,11 +231,14 @@ public class JourneyMap
             }
             logger.severe(LogFormatter.toString(t));
         }
+        finally
+        {
+            logger.info("postInitialize EXIT, " + (timer==null ? "" : timer.stopAndReport()));
+        }
     }
 
     public void toggleWebserver(Boolean enable, boolean forceAnnounce)
     {
-
         webMapProperties.enabled.set(enable);
         waypointProperties.save();
 
@@ -357,19 +370,16 @@ public class JourneyMap
      */
     public void stopMapping()
     {
-        Minecraft minecraft = FMLClientHandler.instance().getClient();
-
         synchronized (this)
         {
-
-            if (taskExecutor != null || taskController != null)
+            if ((taskExecutor != null || taskController != null) && mc!=null)
             {
                 String dim = ".";
-                if (minecraft.theWorld != null && minecraft.theWorld.provider != null)
+                if (mc.theWorld != null && mc.theWorld.provider != null)
                 {
-                    dim = " dimension " + minecraft.theWorld.provider.dimensionId + "."; //$NON-NLS-1$ //$NON-NLS-2$
+                    dim = " dimension " + mc.theWorld.provider.dimensionId + "."; //$NON-NLS-1$ //$NON-NLS-2$
                 }
-                logger.info("Mapping halting in " + WorldData.getWorldName(minecraft) + dim); //$NON-NLS-1$
+                logger.info("Mapping halting in " + WorldData.getWorldName(mc) + dim); //$NON-NLS-1$
             }
 
             if (taskExecutor != null && !taskExecutor.isShutdown())
@@ -380,7 +390,7 @@ public class JourneyMap
 
             if (taskController != null)
             {
-                taskController.disableTasks(minecraft);
+                taskController.disableTasks(mc);
                 taskController.clear();
                 taskController = null;
             }
@@ -521,7 +531,7 @@ public class JourneyMap
      */
     public static Logger getLogger()
     {
-        return INSTANCE.logger;
+        return INSTANCE.logger == null ? Logger.getLogger(MOD_ID) : INSTANCE.logger;
     }
 
 }

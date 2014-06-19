@@ -13,85 +13,28 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 
-### New Feature: In-game Waypoint Markers
-- Features include: Labels, waypoint icons, beams (beacons), and font size
-- New Waypoint Options dialog provides customization of in-game waypoint display
+### New Feature: Optional Flat (2D) Mob Icons
+- General Display Options lets you choose between the new 2D mob icons and the pre-existing 3D icons
+- The Minimap now uses 2D icons by default, but you can change it back under General Display Options
+- The Web Map can also change its mob icon set (Using the options menu in your browser)
+- Don't like an icon?  Find it in journeyMap/icon/entity/[setname]/ and replace it with something you prefer.
+- Icons must be in PNG format. Recommended size is 32x32 pixels.
 
-### New feature: Waypoint Editor
-- Multiple dimension support, color picker, error-checking (form validation)
-- In-game: Use the "B" key to create a Waypoint at your location and open the Waypoint Editor
-- Full-screen Map: Double-click anywhere on the map to open the Waypoint Editor
+### New feature: Custom Icon Set support
+- To get started: Copy and rename the journeyMap/icon/entity/2D/ folder to journeyMap/icon/entity/[new set name]/, then replace the existing icons with your own.
+- Icons must be in PNG format. Recommended size is 32x32 pixels.
+- Afer you restart Minecraft, the General Display Options will allow you to select your custom icon set.
 
-### New feature: Waypoint Manager
-- Features include: Find on Map, Teleport To (if permitted), Sort by Name or Distance, Filter by Dimension, Toggle all On/Off, Edit, and Delete
-- In-game: Use CTRL-"B" to directly open the Waypoint Manager
-- Full-screen Map: Use the "Waypoints" button to open the Waypoint Manager
-- Use the Help dialog to import waypoints from Rei's MiniMap or VoxelMap (Zan's MiniMap)
+### New/Updated Translations
+- ru_RU has been updated courtesy of Vladislav Chaykin
 
-### New feature: Master Options
-- In-game Master Options dialog provides central point to enable major functions and open specific Options dialogs.
-
-### New feature: General Display Options
-- New dialog shows common full-map options and Minimap options side-by-side
-
-### MiniMap Improvements
-- Mob/player locations and headings now update in real-time (Unlimited Edition)
-- Sneaking entities (usually players) will no longer appear on the radar (Unlimited Edition)
-- Offscreen waypoints now show icons on top of MiniMap frame (instead of half-circles under the frame)
-- Uses explicit coordinates designations. For example: "x:982, z:-520, y:70"
-- MiniMap Options can now be customized differently than the Fullscreen Map options
-- MiniMap Options dialog shows FPS so you can see performance impact of option changes
-- New option to Show/Hide "self" (blue arrow in center) on MiniMap
-- New option to Change icon sizes on MiniMap
-- New Small Size added, old "Small" is now "Medium"
-- New option to Force Unicode for display of FPS and Location labels
-- Player skin icons now smaller
-
-### Full-screen Map Improvements
-- Block coordinates under your mouse are now displayed at the bottom of the screen. Elevation and biome are also shown if that chunk is loaded.
-- Double-click anywhere on the map to open the Waypoint Editor
-- Double-click an existing Waypoint to open it in the Waypoint Manager
-- Mob/player locations and headings now update in real-time (Unlimited Edition)
-- Sneaking entities (usually players) will no longer appear on the radar (Unlimited Edition)
-- Uses explicit coordinates designations. For example: "x:982, z:-520, y:70"
-- A single-click will highlight the block as long as your mouse is still over it.
-- Added "Caves:On/Off" button to full-screen map (Unlimited Edition)
-
-### Misc. Improvements:
-- Improved cave-mapping and surface mapping. Floating glass and stained glass now supported.
-- Default chunk_offset changed from 5 to 8
-- Minor facelift to web map controls
-- The journeyMap.properties file has been migrated to multiple files in journeyMap/config/. Many properties are now configurable instead of hard-coded.
-- Chat warning now displayed when OutOfMemoryError or LinkageError encountered
-- Chat warning now displayed when logging level set below INFO
-- JourneyMap logger now tied into FML logger for cleaner FML log output
-
-### Performance Improvements:
-- Faster map updates via listeners for block placement, removal, and numerous events like TNT explosions
-- Mob/player radar operations are now an order of magnitude faster
-- In-game maps are more efficient about checking render steps are within the active viewport; should improve pan/zoom update speeds on slower machines
-- Minimap render pass simplified
-
-## Bugfixes:
-- In-game full-screen map: Waypoint positioning was erratic when panning map
-- In-game maps: Label positions and Mobs positions were jittery during map movement
-- In-game maps: Surface map tiles would "show through" in un-mapped underground areas
-- Full-screen Map "Follow" didn't reset to true after changing worlds.
-- Pressing "J" didn't exit full-screen map for some players.
-- Minimap disappeared after opening inventory in full-screen map
-- Minimap didn't show off-screen waypoint locators along edges
-- VoxelMap 1.7.2 waypoints were not recognized
-- Double-high grass color was gray instead of determined by biome
-- Improved handling of errors produced by custom biomes. (Looking at you, Mystcraft).
-- Improved log messages when detection of Rei's/Voxelmap encounters a problem
-- Biome colors weren't properly caching
-- Minimap wouldn't show if Voxel/Rei's loaded, even if "enabled" manually set to true
-- Crash when sound event from other mods didn't have an actual sound or name (NullPointerException)
-- Keybinding customizations sometimes wouldn't save after restart
+### Misc. Improvements
+- General Display Options are now centered on-screen (for large displays)
+- Language files have been overhauled and cleaned up to make translation easier.
 
 ### Known issues:
 
 - (AW2-6EE-Z3QB): Maps overwrite on multi-world servers because the world seed is no longer provided by the MC server
   PLEASE SUPPORT THIS FEATURE REQUEST TO MOJANG:  http://www.minecraftforum.net/topic/1759032-world-uid-for-multi-world-servers/
-- Languages which need to be updated:  cs_CZ, de_DE, es_ES, fr_FR, it_IT, nl_NL, ru_RU, zh_CH
+- Languages which need to be updated:  cs_CZ, de_DE, es_ES, fr_FR, it_IT, nl_NL, zh_CH
 - Can you help with translations?  See http://journeymap.techbrew.net/helpdesk/knowledgebase.php?article=12

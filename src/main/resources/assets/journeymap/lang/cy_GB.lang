@@ -38,6 +38,7 @@ jm.common.log_warning=Fydd log lefel %S yn arafu'r gêm. Peidiwch â'i defnyddio
 jm.common.map_saved=Map wedi'i chadw: %1$s
 jm.common.mapgui_only_ready=Pwyswch [§b%1$s§f]. (Gweinydd gwe wedi'i anablu.)
 jm.common.memory_warning=Mae Minecraft yn rhedeg allan o gof: %1$s
+jm.common.mob_icon_set=Mob Icons:
 jm.common.new_version_available=Fersiwn newydd ar gael: %1$s
 jm.common.night=Nos
 jm.common.off=I Ffwrdd

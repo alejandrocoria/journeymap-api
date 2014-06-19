@@ -38,6 +38,7 @@ jm.common.log_warning=Log level %1$s will slow down the game. Do not use for nor
 jm.common.map_saved=Mapa uložena: %1$s
 jm.common.mapgui_only_ready=Stiskněte [§b%1$s§f]. (Webový server vypnutý)
 jm.common.memory_warning=Minecraft is running out of memory: %1$s
+jm.common.mob_icon_set=Mob Icons:
 jm.common.new_version_available=K dispozici je novější verze: %1$s
 jm.common.night=Noc
 jm.common.off=Vyp.

@@ -2,19 +2,31 @@ package net.techbrew.journeymap.properties;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Properties for the web map in browser.
  */
 public class WebMapProperties extends MapProperties
 {
-    protected transient static final int CURRENT_REVISION = 2;
+    protected transient static final int CURRENT_REVISION = 3;
     protected transient final String name = "webmap";
     protected AtomicInteger revision = new AtomicInteger(CURRENT_REVISION);
 
     public final AtomicBoolean enabled = new AtomicBoolean(true);
     public final AtomicInteger port = new AtomicInteger(8080);
     public final AtomicInteger browserPoll = new AtomicInteger(2000);
+    public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("3D");
+
+    public WebMapProperties()
+    {
+    }
+
+    @Override
+    public AtomicReference<String> getEntityIconSetName()
+    {
+        return entityIconSetName;
+    }
 
     @Override
     public String getName()
@@ -79,6 +91,7 @@ public class WebMapProperties extends MapProperties
                 ", showWaypoints=" + showWaypoints +
                 ", managerEnabled=" + enabled +
                 ", port=" + port +
-                ", browserPoll=" + browserPoll;
+                ", browserPoll=" + browserPoll +
+                ", entityIconSetName=" + getEntityIconSetName();
     }
 }

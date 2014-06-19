@@ -33,6 +33,10 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public final AtomicBoolean caveIgnoreGlass = new AtomicBoolean(true);
     public final AtomicBoolean advancedSurfaceCheck = new AtomicBoolean(true);
 
+    public CoreProperties()
+    {
+    }
+
     @Override
     public String getName()
     {

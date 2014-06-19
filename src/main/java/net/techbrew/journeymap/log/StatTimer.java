@@ -24,6 +24,7 @@ public class StatTimer {
     private final AtomicLong counter = new AtomicLong();
     private final AtomicDouble totalTime = new AtomicDouble();
     private final String name;
+    private final boolean disposable;
 
     private boolean warmup = true;
     private boolean maxed = false;
@@ -50,10 +51,20 @@ public class StatTimer {
         if(name==null) throw new IllegalArgumentException("StatTimer name required");
         StatTimer timer = timers.get(name);
         if(timer==null){
-            timer = new StatTimer(name, warmupCount);
+            timer = new StatTimer(name, warmupCount, false);
             timers.put(name, timer);
         }
         return timer;
+    }
+
+    /**
+     * Create a disposable timer with a warmupCount of 0.
+     * @param name
+     * @return
+     */
+    public static StatTimer getDisposable(String name)
+    {
+        return new StatTimer(name, 0, true);
     }
 
     /**
@@ -90,9 +101,14 @@ public class StatTimer {
      * @param name
      * @param warmupCount
      */
-    private StatTimer(String name, int warmupCount) {
+    private StatTimer(String name, int warmupCount, boolean disposable) {
         this.name = name;
         this.warmupCount = warmupCount;
+        this.disposable = disposable;
+        if(warmupCount<=0)
+        {
+            warmup = false;
+        }
     }
 
     /**
@@ -159,6 +175,16 @@ public class StatTimer {
     }
 
     /**
+     * Stop the timer, return simple report of results.
+     * @return
+     */
+    public String stopAndReport()
+    {
+        stop();
+        return getSimpleReportString();
+    }
+
+    /**
      * Cancel a started timer.
      */
     public void cancel() {
@@ -198,7 +224,7 @@ public class StatTimer {
             final double total = totalTime.get();
             final double avg = total/count;
 
-            final StringBuffer sb = new StringBuffer(pad(name,50)).append(": ");
+            final StringBuilder sb = new StringBuilder(pad(name,50)).append(": ");
             sb.append("Count: ").append(pad(count,8));
             sb.append("Time: ").append(pad(df.format(total)+"ms", 15));
             sb.append("Min: ").append(pad(df.format(min)+"ms",8));
@@ -207,6 +233,43 @@ public class StatTimer {
             if(warmup) sb.append("(WARMUP NOT MET: ").append(warmupCount).append(")");
             if(maxed) sb.append("(MAXED)");
             return sb.toString();
+        }
+    }
+
+    /**
+     * Gets a simplified report of the timer stats.
+     * @return
+     */
+    public String getSimpleReportString()
+    {
+        try
+        {
+            final DecimalFormat df = new DecimalFormat("###.##");
+            synchronized (counter)
+            {
+                final long count = counter.get();
+                final double total = totalTime.get();
+                final double avg = total / count;
+
+                final StringBuilder sb = new StringBuilder(name).append(" ");
+                if (count > 1)
+                {
+                    sb.append("count: ").append(count);
+                }
+                sb.append("time: ").append(df.format(total) + "ms");
+                if (count > 1)
+                {
+                    sb.append("min: ").append(df.format(min) + "ms");
+                    sb.append("max: ").append(df.format(max) + "ms");
+                    sb.append("avg: ").append(df.format(avg) + "ms");
+                }
+                if (maxed) sb.append("(MAXED)");
+                return sb.toString();
+            }
+        }
+        catch(Throwable t)
+        {
+            return String.format("StatTimer '%s' encountered an error getting its simple report: %s", name, t);
         }
     }
 

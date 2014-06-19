@@ -1,6 +1,9 @@
 package net.techbrew.journeymap.io;
 
 
+import com.google.common.base.Joiner;
+import com.google.common.io.Files;
+import com.google.common.io.InputSupplier;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
@@ -9,19 +12,29 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.Utils;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.log.StatTimer;
 import org.lwjgl.Sys;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URI;
+import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 public class FileHandler
 {
+    public static final String ASSETS_JOURNEYMAP = "/assets/journeymap";
+    public static final String ASSETS_JOURNEYMAP_WEB = "/assets/journeymap/web";
+    public static final String ASSETS_JOURNEYMAP_ICON_ENTITY = "/assets/journeymap/icon/entity";
 
-    public static final String WEB_DIR = "/assets/journeymap/web";
+    public final static String MOB_ICON_SET_2D = "2D";
+    public final static String MOB_ICON_SET_3D = "3D";
+
     public static volatile File lastJMWorldDir;
 
     public static volatile String lastMCFolderName = "";
@@ -188,7 +201,7 @@ public class FileHandler
     {
         try
         {
-            String png = FileHandler.WEB_DIR + "/img/" + fileName;//$NON-NLS-1$
+            String png = FileHandler.ASSETS_JOURNEYMAP_WEB + "/img/" + fileName;//$NON-NLS-1$
             InputStream is = JourneyMap.class.getResourceAsStream(png);
             if (is == null)
             {
@@ -240,21 +253,25 @@ public class FileHandler
         return new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.CACHE_DIR);
     }
 
-    public static File getCustomDir()
+    public static File getEntityIconDir()
     {
-        return new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.CUSTOM_DIR);
+        File dir = new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.ENTITY_ICON_DIR);
+        if(!dir.exists())
+        {
+            dir.mkdirs();
+        }
+        return dir;
     }
 
-    public static BufferedImage getCustomImage(String fileName)
+    public static BufferedImage getImage(File imageFile)
     {
         try
         {
-            File png = new File(getCustomDir(), "img/" + fileName); //$NON-NLS-1$
-            if (!png.canRead())
+            if (!imageFile.canRead())
             {
                 return null;
             }
-            return ImageIO.read(png);
+            return ImageIO.read(imageFile);
         }
         catch (IOException e)
         {
@@ -264,45 +281,162 @@ public class FileHandler
         }
     }
 
-    public static void setCustomImage(String fileName, BufferedImage img)
+    public static boolean isInJar()
     {
-        try
-        {
-            File pngFile = new File(getCustomDir(), "img/" + fileName); //$NON-NLS-1$
-            File parentDir = pngFile.getParentFile();
-            if (!parentDir.exists())
-            {
-                parentDir.mkdirs();
-            }
-            ImageIO.write(img, "png", pngFile);
-        }
-        catch (Exception e)
-        {
-            String error = Constants.getMessageJMERR00("Can't write custom image " + fileName + ": " + e);
-            JourneyMap.getLogger().severe(error);
-        }
+        URL location = JourneyMap.class.getProtectionDomain().getCodeSource().getLocation();
+        return "jar".equals(location.getProtocol());
     }
 
-    public static BufferedImage getCustomizableImage(String fileName, BufferedImage defaultImg)
+    public static void initMobIconSets()
     {
+        JourneyMap.getLogger().info("Initializing mob icon sets...");
+
+        StatTimer timer = StatTimer.getDisposable("initMobIconSets").start();
+
+        final List<String> mobIconSetNames = Arrays.asList(MOB_ICON_SET_2D, MOB_ICON_SET_3D);
+        boolean inJar = FileHandler.isInJar();
+
+        for(String setName : mobIconSetNames)
+        {
+            try
+            {
+                URL resourceDir = JourneyMap.class.getResource(FileHandler.ASSETS_JOURNEYMAP_ICON_ENTITY);
+                String toPath = String.format("%s/%s", ASSETS_JOURNEYMAP_ICON_ENTITY, setName);
+                File toDir = new File(getEntityIconDir(), setName);
+                if(inJar)
+                {
+                    String fromPath = resourceDir.getPath().split("file:")[1].split("!/")[0];
+                    copyFromZip(fromPath, toPath, toDir, false);
+                }
+                else
+                {
+                    File fromDir = new File(JourneyMap.class.getResource(toPath).getFile());
+                    copyFromDirectory(fromDir, toDir, false);
+                }
+            }
+            catch (Throwable t)
+            {
+                JourneyMap.getLogger().warning("Couldn't unzip mob icon set for " + setName + ": " + t);
+            }
+        }
+
+        JourneyMap.getLogger().info(timer.stopAndReport());
+    }
+
+    public static ArrayList<String> getMobIconSetNames()
+    {
+        String[] defaultIconSets = {MOB_ICON_SET_2D, MOB_ICON_SET_3D};
+
+        File entityIconDir = getEntityIconDir();
+
+        try
+        {
+            // Initialize entity iconset folders
+            for (String iconSetName : defaultIconSets)
+            {
+                File iconSetDir = new File(entityIconDir, iconSetName);
+                if (iconSetDir.exists() && !iconSetDir.isDirectory())
+                {
+                    iconSetDir.delete();
+                }
+                iconSetDir.mkdirs();
+            }
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().severe("Could not prepare entity iconset directories: " + LogFormatter.toString(t));
+        }
+
+        // Create list of icon set names
+        ArrayList<String> names = new ArrayList<String>();
+        for(File iconSetDir : entityIconDir.listFiles())
+        {
+            if(iconSetDir.isDirectory())
+            {
+                names.add(iconSetDir.getName());
+            }
+        }
+        Collections.sort(names);
+
+        return names;
+    }
+
+    public static BufferedImage getEntityIconFromFile(String setName, String iconPath, BufferedImage defaultImg)
+    {
+        String filePath = Joiner.on(File.separatorChar).join(setName, iconPath.replace('/', File.separatorChar));
+        File iconFile = new File(getEntityIconDir(), filePath);
 
         BufferedImage img = null;
-        if (getCustomDir().exists())
+        if(iconFile.exists())
         {
-            img = FileHandler.getCustomImage(fileName);
+            img = getImage(iconFile);
         }
+
         if (img == null)
         {
-            img = FileHandler.getWebImage(fileName);
+            img = FileHandler.getEntityIconFromResource(setName, iconPath);
             if (img == null)
             {
                 img = defaultImg;
-                setCustomImage(fileName, img);
-                JourneyMap.getLogger().info("Created placeholder image: " + new File(getCustomDir(), fileName));
             }
+
+            try
+            {
+                iconFile.getParentFile().mkdirs();
+                ImageIO.write(img, "png", iconFile);
+            }
+            catch (Exception e)
+            {
+                String error = Constants.getMessageJMERR00("Can't write entity icon" + iconFile + ": " + e);
+                JourneyMap.getLogger().severe(error);
+            }
+
+            JourneyMap.getLogger().fine("Created entity icon: " + iconFile);
         }
 
         return img;
+    }
+
+    public static BufferedImage getEntityIconFromResource(String setName, String iconPath)
+    {
+        try
+        {
+            InputStream is = getEntityIconStream(setName, iconPath);
+            if (is == null)
+            {
+                return null;
+            }
+            BufferedImage img = ImageIO.read(is);
+            is.close();
+            return img;
+        }
+        catch (IOException e)
+        {
+            String error = Constants.getMessageJMERR17(e.getMessage());
+            JourneyMap.getLogger().severe(error);
+            return null;
+        }
+    }
+
+    public static InputStream getEntityIconStream(String setName, String iconPath)
+    {
+        try
+        {
+            String pngPath = Joiner.on('/').join(ASSETS_JOURNEYMAP_ICON_ENTITY, setName, iconPath);
+            InputStream is = JourneyMap.class.getResourceAsStream(pngPath);
+            if (is == null)
+            {
+                JourneyMap.getLogger().warning(String.format("Entity Icon resource not found: " + pngPath));
+                return null;
+            }
+            return is;
+        }
+        catch (Throwable e)
+        {
+            String error = Constants.getMessageJMERR17(e.getMessage());
+            JourneyMap.getLogger().severe(error);
+            return null;
+        }
     }
 
     public static void open(File file)
@@ -431,4 +565,84 @@ public class FileHandler
         }
     }
 
+    /**
+     * Extracts a zip file specified by the zipFilePath to a directory specified by
+     * destDirectory (will be created if does not exists)
+     * @throws IOException
+     */
+    private static void copyFromZip(String zipFilePath, String zipEntryName, File destDir, boolean overWrite) throws Throwable
+    {
+
+        if(zipEntryName.startsWith("/"))
+        {
+            zipEntryName = zipEntryName.substring(1);
+        }
+        final ZipFile zipFile = new ZipFile(zipFilePath);
+        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
+        ZipEntry entry = zipIn.getNextEntry();
+
+        try
+        {
+            while (entry != null)
+            {
+                if(entry.getName().startsWith(zipEntryName))
+                {
+                    File toFile = new File(destDir, entry.getName().split(zipEntryName)[1]);
+                    if(overWrite || !toFile.exists())
+                    {
+                        if (!entry.isDirectory())
+                        {
+                            toFile.getParentFile().mkdirs();
+                            Files.copy(new ZipEntryInputSupplier(zipFile, entry), toFile);
+                        }
+                    }
+                }
+
+                zipIn.closeEntry();
+                entry = zipIn.getNextEntry();
+            }
+        }
+        finally
+        {
+            zipIn.close();
+        }
+    }
+
+    /**
+     * Copies contents of one directory to another
+     */
+    private static void copyFromDirectory(File fromDir, File toDir, boolean overWrite) throws IOException
+    {
+        toDir.mkdir();
+        for(File from : fromDir.listFiles())
+        {
+            File to = new File(toDir, from.getName());
+            if(from.isDirectory())
+            {
+                copyFromDirectory(from, to, overWrite);
+            }
+            else if(overWrite || !to.exists())
+            {
+                Files.copy(from, to);
+            }
+        }
+    }
+
+    private static class ZipEntryInputSupplier implements InputSupplier<InputStream>
+    {
+        final ZipFile file;
+        final ZipEntry entry;
+
+        ZipEntryInputSupplier(ZipFile file, ZipEntry entry)
+        {
+            this.file = file;
+            this.entry = entry;
+        }
+
+        @Override
+        public InputStream getInput() throws IOException
+        {
+            return file.getInputStream(entry);
+        }
+    }
 }

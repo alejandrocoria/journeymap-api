@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.properties;
 
+import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.techbrew.journeymap.JourneyMap;
@@ -7,8 +8,7 @@ import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -16,6 +16,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class PropertiesBase
 {
+    protected static final Charset UTF8 = Charset.forName("UTF-8");
+
     // Gson for file persistence
     protected transient final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -27,6 +29,10 @@ public abstract class PropertiesBase
             "// To restore the default settings, simply delete this file before starting Minecraft",
             "// For help with this file, see http://journeymap.techbrew.net/help/wiki/Configuration_Files"
     };
+
+    protected PropertiesBase()
+    {
+    }
 
     /**
      * Name used in property file
@@ -109,15 +115,10 @@ public abstract class PropertiesBase
                 String header = sb.toString();
 
                 // Json body
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 String json = gson.toJson(this);
 
                 // Write to file
-                FileWriter fw = new FileWriter(propFile);
-                fw.write(header);
-                fw.write(json);
-                fw.flush();
-                fw.close();
+                Files.write(header + json, propFile, UTF8);
 
                 return true;
             }
@@ -147,14 +148,12 @@ public abstract class PropertiesBase
     {
         T instance = (T) this;
         File propFile = getFile();
-        FileReader reader = null;
         boolean saveNeeded = true;
         try
         {
             if (propFile.canRead())
             {
-                reader = new FileReader(propFile);
-                instance = gson.fromJson(reader, (Class<T>) getClass());
+                instance = gson.fromJson(Files.toString(propFile, UTF8), (Class<T>) getClass());
                 saveNeeded = !instance.isCurrent();
                 if (saveNeeded)
                 {
@@ -170,27 +169,22 @@ public abstract class PropertiesBase
         {
             JourneyMap.getLogger().severe(String.format("Can't load config file %s: %s", propFile, e.getMessage()));
         }
-        finally
-        {
-            if (reader != null)
-            {
-                try
-                {
-                    reader.close();
-                }
-                catch (Exception e)
-                {
-                    JourneyMap.getLogger().severe(String.format("Can't close config file %s: %s", propFile, e.getMessage()));
-                }
-            }
-        }
 
-        if (saveNeeded)
+        if(instance.validate() || saveNeeded)
         {
             instance.save();
         }
 
         return instance;
+    }
+
+    /**
+     * Should return true if save needed after validation.
+     * @return
+     */
+    protected boolean validate()
+    {
+        return false;
     }
 
     public <T extends PropertiesBase> T enableSave(boolean enabled)

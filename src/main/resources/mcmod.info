@@ -9,6 +9,6 @@
   "url": "http://journeymap.techbrew.net",
   "authorList": ["techbrew (Mark Woodman)"],
   "screenshots": [],
-  "dependencies": ["Forge"]
+  "dependencies": ["Forge@[@FORGEVERSION@,)"]
 }
 ]

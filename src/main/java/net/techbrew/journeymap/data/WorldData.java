@@ -14,6 +14,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import org.lwjgl.opengl.Display;
 
@@ -27,7 +28,7 @@ import java.util.*;
 import java.util.logging.Level;
 
 /**
- * Provides world properties
+ * Provides world properties and some game settings.
  *
  * @author mwoodman
  */
@@ -44,6 +45,8 @@ public class WorldData extends CacheLoader<Class, WorldData>
     String mc_version;
     String mod_name = JourneyMap.MOD_NAME;
     int browser_poll;
+    String iconSetName;
+    List<String> iconSetNames;
 
     /**
      * Constructor.
@@ -73,6 +76,9 @@ public class WorldData extends CacheLoader<Class, WorldData>
         latest_journeymap_version = VersionCheck.getVersionAvailable();
         mc_version = Display.getTitle().split("\\s(?=\\d)")[1];
         browser_poll = Math.max(1000, JourneyMap.getInstance().webMapProperties.browserPoll.get());
+
+        iconSetName = JourneyMap.getInstance().webMapProperties.entityIconSetName.get();
+        iconSetNames = FileHandler.getMobIconSetNames();
 
         return this;
     }

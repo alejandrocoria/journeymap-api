@@ -848,7 +848,7 @@ public class MapOverlay extends JmUI
         }
         else
         {
-            return state.shouldRefresh(super.mc);
+            return state.shouldRefresh(super.mc, fullMapProperties);
         }
     }
 

@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class MiniMapProperties extends InGameMapProperties
 {
-    protected transient static final int CURRENT_REVISION = 2;
+    protected transient static final int CURRENT_REVISION = 3;
     protected transient final String name = "minimap";
     protected int revision = CURRENT_REVISION;
 
@@ -20,6 +20,17 @@ public class MiniMapProperties extends InGameMapProperties
     public final AtomicBoolean showFps = new AtomicBoolean(false);
     public final AtomicBoolean enableHotkeys = new AtomicBoolean(true);
     public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
+    public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("2D");
+
+    public MiniMapProperties()
+    {
+    }
+
+    @Override
+    public AtomicReference<String> getEntityIconSetName()
+    {
+        return entityIconSetName;
+    }
 
     @Override
     public String getName()
@@ -93,6 +104,7 @@ public class MiniMapProperties extends InGameMapProperties
                 ", enableHotkeys=" + enableHotkeys +
                 ", showWaypointLabels=" + showWaypointLabels +
                 ", forceUnicode=" + forceUnicode +
-                ", fontSmall=" + fontSmall;
+                ", fontSmall=" + fontSmall +
+                ", entityIconSetName=" + entityIconSetName;
     }
 }

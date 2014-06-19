@@ -1,11 +1,15 @@
 package net.techbrew.journeymap.ui.map;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.properties.FullMapProperties;
+import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.ui.BooleanPropertyButton;
@@ -34,6 +38,7 @@ public class GeneralDisplayOptions extends JmUI
     ArrayList<ButtonList> leftRows = new ArrayList<ButtonList>();
     ArrayList<ButtonList> rightRows = new ArrayList<ButtonList>();
     ButtonList rowMobs, rowAnimals, rowVillagers, rowPets, rowGrid, rowCaves, rowSelf, rowPlayers, rowWaypoints, rowFontSize, rowForceUnicode, rowTextureSize;
+    ButtonList rowIconSets;
 
     public GeneralDisplayOptions(Class<? extends JmUI> returnClass)
     {
@@ -126,6 +131,11 @@ public class GeneralDisplayOptions extends JmUI
         rowTextureSize.add(BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, miniMap, miniMap.textureSmall));
         rightRows.add(rowTextureSize);
 
+        rowIconSets = new ButtonList(Constants.getString("jm.common.mob_icon_set"));
+        rowIconSets.add(new IconSetButton(id++, fullMap));
+        rowIconSets.add(new IconSetButton(id++, miniMap));
+        rightRows.add(rowIconSets);
+
         int commonWidth = getFontRenderer().getStringWidth(labelOn);
         commonWidth = Math.max(commonWidth, getFontRenderer().getStringWidth(labelOff));
         commonWidth = Math.max(commonWidth, getFontRenderer().getStringWidth(labelFullMap));
@@ -172,8 +182,24 @@ public class GeneralDisplayOptions extends JmUI
 
         final int hgap = 4;
         final int vgap = 3;
-        int rowWidth = 10 + ((leftRows.get(0).getWidth(hgap)) * 2);
-        int bx = (this.width - rowWidth) / 2;
+        int rowWidth = 0;
+        int rowLabelWidth = 0;
+        int spacer = 20;
+
+        for (ButtonList row : leftRows)
+        {
+            rowLabelWidth = Math.max(rowLabelWidth, getFontRenderer().getStringWidth(row.getLabel()));
+            rowWidth = Math.max(rowWidth, row.getWidth(hgap));
+
+        }
+
+        for (ButtonList row : rightRows)
+        {
+            rowLabelWidth = Math.max(rowLabelWidth, getFontRenderer().getStringWidth(row.getLabel()));
+            rowWidth = Math.max(rowWidth, row.getWidth(hgap));
+        }
+
+        int bx = ((this.width - ((rowWidth*2) + (rowLabelWidth*2)) - spacer) / 2) + rowLabelWidth;
         final int by = Math.max(50, (this.height - (140)) / 2);
 
         int leftX, rightX, topY, bottomY;
@@ -203,7 +229,7 @@ public class GeneralDisplayOptions extends JmUI
         DrawUtil.drawCenteredLabel(labelMiniMap, leftRows.get(0).get(1).getCenterX(), by - 10, Color.black, 0, Color.white, 255, 1);
 
         lastRow = null;
-        bx = (this.width + rowWidth) / 2;
+        bx = leftRows.get(0).getRightX() + spacer + rowLabelWidth;
         for (ButtonList row : rightRows)
         {
             if (lastRow == null)
@@ -253,17 +279,83 @@ public class GeneralDisplayOptions extends JmUI
 
     @Override
     protected void actionPerformed(GuiButton button)
-    { // actionPerformed
-
-        if (button instanceof BooleanPropertyButton)
+    {
+        if (button instanceof BooleanPropertyButton || button instanceof IconSetButton)
         {
-            ((BooleanPropertyButton) button).toggle();
+            ((Button) button).toggle();
             return;
         }
 
         if (button == buttonClose)
         {
             closeAndReturn();
+        }
+    }
+
+    protected static class IconSetButton extends Button
+    {
+        final MapProperties mapProperties;
+
+        public IconSetButton(int id, MapProperties mapProperties)
+        {
+            super(id, 0, 0, "");
+            this.mapProperties = mapProperties;
+
+            updateLabel();
+
+            // Determine width
+            fitWidth(FMLClientHandler.instance().getClient().fontRenderer);
+        }
+
+        protected void updateLabel()
+        {
+            ArrayList<String> validNames = FileHandler.getMobIconSetNames();
+            if(!validNames.contains(mapProperties.getEntityIconSetName().get()))
+            {
+                mapProperties.getEntityIconSetName().set(validNames.get(0));
+                mapProperties.save();
+            }
+
+            displayString = getSafeLabel(mapProperties.getEntityIconSetName().get());
+        }
+
+        protected String getSafeLabel(String label)
+        {
+            int maxLength = 13;
+            if(label.length()>maxLength)
+            {
+                label = label.substring(0, maxLength - 3).concat("...");
+            }
+            return label;
+        }
+
+        @Override
+        public int getFitWidth(FontRenderer fr)
+        {
+            int maxWidth = 0;
+            for (String iconSetName : FileHandler.getMobIconSetNames())
+            {
+                String name = getSafeLabel(iconSetName);
+                maxWidth = Math.max(maxWidth, FMLClientHandler.instance().getClient().fontRenderer.getStringWidth(name));
+            }
+            return maxWidth + 12;
+        }
+
+        @Override
+        public void toggle()
+        {
+            ArrayList<String> validNames = FileHandler.getMobIconSetNames();
+            int index = validNames.indexOf(mapProperties.getEntityIconSetName().get()) + 1;
+
+            if(index==validNames.size() || index<0)
+            {
+                index = 0;
+            }
+
+            mapProperties.getEntityIconSetName().set(validNames.get(index));
+            mapProperties.save();
+
+            updateLabel();
         }
     }
 }

@@ -95,7 +95,7 @@ public class MiniMap
             return;
         }
 
-        final boolean doStateRefresh = state.shouldRefresh(mc);
+        final boolean doStateRefresh = state.shouldRefresh(mc, miniMapProperties);
 
         try
         {
@@ -104,7 +104,6 @@ public class MiniMap
             {
                 refreshStateTimer.start();
                 state.refresh(mc, player, miniMapProperties);
-
             }
             else
             {

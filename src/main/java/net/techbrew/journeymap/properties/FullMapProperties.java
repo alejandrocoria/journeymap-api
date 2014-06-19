@@ -2,18 +2,30 @@ package net.techbrew.journeymap.properties;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Properties for the full map in-game.
  */
 public class FullMapProperties extends InGameMapProperties
 {
-    protected transient static final int CURRENT_REVISION = 2;
+    protected transient static final int CURRENT_REVISION = 3;
     protected transient final String name = "fullmap";
     protected AtomicInteger revision = new AtomicInteger(CURRENT_REVISION);
 
     public final AtomicBoolean showCaves = new AtomicBoolean(true);
     public final AtomicBoolean showGrid = new AtomicBoolean(true);
+    public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("3D");
+
+    public FullMapProperties()
+    {
+    }
+
+    @Override
+    public AtomicReference<String> getEntityIconSetName()
+    {
+        return entityIconSetName;
+    }
 
     @Override
     public String getName()
@@ -78,6 +90,7 @@ public class FullMapProperties extends InGameMapProperties
                 ", showWaypoints=" + showWaypoints +
                 ", showGrid=" + showGrid +
                 ", forceUnicode=" + forceUnicode +
-                ", fontSmall=" + fontSmall;
+                ", fontSmall=" + fontSmall +
+                ", entityIconSetName=" + entityIconSetName;
     }
 }

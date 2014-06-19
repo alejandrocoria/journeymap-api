@@ -38,6 +38,7 @@ jm.common.log_warning=Log level %1$s will slow down the game. Do not use for nor
 jm.common.map_saved=保存地图: %1$s
 jm.common.mapgui_only_ready=按下 [§b%1$s§f]. (网络服务器不可用)
 jm.common.memory_warning=Minecraft is running out of memory: %1$s
+jm.common.mob_icon_set=Mob Icons:
 jm.common.new_version_available=查看更新: %1$s
 jm.common.night=夜间
 jm.common.off=关

@@ -4,6 +4,7 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.properties.MapProperties;
@@ -49,6 +50,8 @@ public class OverlayRadarRenderer
             //FontMetrics fm = g2D.getFontMetrics();
             String playername = FMLClientHandler.instance().getClient().thePlayer.getDisplayName();
             TextureCache tc = TextureCache.instance();
+            String iconSetName = mapProperties.getEntityIconSetName().get();
+            int iconOffset = iconSetName.equals(FileHandler.MOB_ICON_SET_3D) ? (int)(8*drawScale) : 0;
 
             for (EntityDTO dto : entityDTOs)
             {
@@ -109,10 +112,10 @@ public class OverlayRadarRenderer
                     }
                     else
                     {
-                        entityIcon = tc.getEntityImage(filename);
+                        entityIcon = tc.getEntityIconTexture(iconSetName, filename);
                         if (entityIcon != null)
                         {
-                            int bottomMargin = isPlayer ? 0 : (int) (8 * drawScale);
+                            int bottomMargin = isPlayer ? 0 : iconOffset;
                             drawStepList.add(new DrawEntityStep(entity, true, entityIcon, bottomMargin));
                         }
 
