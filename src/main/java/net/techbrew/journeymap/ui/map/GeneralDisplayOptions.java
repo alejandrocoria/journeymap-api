@@ -1,21 +1,15 @@
 package net.techbrew.journeymap.ui.map;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
-import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.properties.FullMapProperties;
-import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
-import net.techbrew.journeymap.ui.BooleanPropertyButton;
+import net.techbrew.journeymap.ui.*;
 import net.techbrew.journeymap.ui.Button;
-import net.techbrew.journeymap.ui.ButtonList;
-import net.techbrew.journeymap.ui.JmUI;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -131,9 +125,9 @@ public class GeneralDisplayOptions extends JmUI
         rowTextureSize.add(BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, miniMap, miniMap.textureSmall));
         rightRows.add(rowTextureSize);
 
-        rowIconSets = new ButtonList(Constants.getString("jm.common.mob_icon_set"));
-        rowIconSets.add(new IconSetButton(id++, fullMap));
-        rowIconSets.add(new IconSetButton(id++, miniMap));
+        rowIconSets = new ButtonList(Constants.getString("jm.common.mob_icon_set", ""));
+        rowIconSets.add(new IconSetButton(id++, fullMap, "%s"));
+        rowIconSets.add(new IconSetButton(id++, miniMap, "%s"));
         rightRows.add(rowIconSets);
 
         int commonWidth = getFontRenderer().getStringWidth(labelOn);
@@ -292,70 +286,4 @@ public class GeneralDisplayOptions extends JmUI
         }
     }
 
-    protected static class IconSetButton extends Button
-    {
-        final MapProperties mapProperties;
-
-        public IconSetButton(int id, MapProperties mapProperties)
-        {
-            super(id, 0, 0, "");
-            this.mapProperties = mapProperties;
-
-            updateLabel();
-
-            // Determine width
-            fitWidth(FMLClientHandler.instance().getClient().fontRenderer);
-        }
-
-        protected void updateLabel()
-        {
-            ArrayList<String> validNames = FileHandler.getMobIconSetNames();
-            if(!validNames.contains(mapProperties.getEntityIconSetName().get()))
-            {
-                mapProperties.getEntityIconSetName().set(validNames.get(0));
-                mapProperties.save();
-            }
-
-            displayString = getSafeLabel(mapProperties.getEntityIconSetName().get());
-        }
-
-        protected String getSafeLabel(String label)
-        {
-            int maxLength = 13;
-            if(label.length()>maxLength)
-            {
-                label = label.substring(0, maxLength - 3).concat("...");
-            }
-            return label;
-        }
-
-        @Override
-        public int getFitWidth(FontRenderer fr)
-        {
-            int maxWidth = 0;
-            for (String iconSetName : FileHandler.getMobIconSetNames())
-            {
-                String name = getSafeLabel(iconSetName);
-                maxWidth = Math.max(maxWidth, FMLClientHandler.instance().getClient().fontRenderer.getStringWidth(name));
-            }
-            return maxWidth + 12;
-        }
-
-        @Override
-        public void toggle()
-        {
-            ArrayList<String> validNames = FileHandler.getMobIconSetNames();
-            int index = validNames.indexOf(mapProperties.getEntityIconSetName().get()) + 1;
-
-            if(index==validNames.size() || index<0)
-            {
-                index = 0;
-            }
-
-            mapProperties.getEntityIconSetName().set(validNames.get(index));
-            mapProperties.save();
-
-            updateLabel();
-        }
-    }
 }

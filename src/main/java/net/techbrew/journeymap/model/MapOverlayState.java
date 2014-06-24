@@ -35,7 +35,7 @@ public class MapOverlayState
 
     // These can be safely changed at will
     public boolean follow = true;
-    public int currentZoom;
+
     public String playerLastPos = "0,0"; //$NON-NLS-1$
 
     // These must be internally managed
@@ -62,9 +62,6 @@ public class MapOverlayState
     {
         boolean showCaves = JourneyMap.getInstance().fullMapProperties.showCaves.get();
         final MapType lastMapType = getMapType(showCaves);
-        final boolean lastUnderground = this.underground;
-        final int lastDimension = this.currentZoom;
-        final File lastWorldDir = this.worldDir;
         lastMapProperties = mapProperties;
 
         this.caveMappingAllowed = FeatureManager.isAllowed(Feature.MapCaves);
@@ -166,7 +163,7 @@ public class MapOverlayState
         drawWaypointStepList.clear();
 
         List<EntityDTO> entities = new ArrayList<EntityDTO>(32);
-        if(currentZoom==0)
+        if(mapProperties.zoomLevel.get()==0)
         {
             drawScale = drawScale*.5f;
         }
@@ -219,29 +216,29 @@ public class MapOverlayState
 
     public boolean zoomIn()
     {
-        if (currentZoom < maxZoom)
+        if (lastMapProperties.zoomLevel.get() < maxZoom)
         {
-            return setZoom(currentZoom + 1);
+            return setZoom(lastMapProperties.zoomLevel.get() + 1);
         }
         return false;
     }
 
     public boolean zoomOut()
     {
-        if (currentZoom > minZoom)
+        if (lastMapProperties.zoomLevel.get() > minZoom)
         {
-            return setZoom(currentZoom - 1);
+            return setZoom(lastMapProperties.zoomLevel.get() - 1);
         }
         return false;
     }
 
     public boolean setZoom(int zoom)
     {
-        if (zoom > maxZoom || zoom < minZoom || zoom == currentZoom)
+        if (zoom > maxZoom || zoom < minZoom || zoom == lastMapProperties.zoomLevel.get())
         {
             return false;
         }
-        currentZoom = zoom;
+        lastMapProperties.zoomLevel.set(zoom);
         requireRefresh();
         return true;
     }

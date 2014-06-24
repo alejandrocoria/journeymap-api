@@ -51,9 +51,9 @@ public class MapOverlay extends JmUI
     final static MapOverlayState state = new MapOverlayState();
     final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
     final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
-    final static GridRenderer gridRenderer = new GridRenderer(5);
     final LayerDelegate layerDelegate = new LayerDelegate();
-    final FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
+    final static FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
+    final static GridRenderer gridRenderer = new GridRenderer(5, fullMapProperties);
 
     private enum ButtonEnum
     {
@@ -90,7 +90,7 @@ public class MapOverlay extends JmUI
         mc = FMLClientHandler.instance().getClient();
         state.refresh(mc, mc.thePlayer, fullMapProperties);
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
-        gridRenderer.setZoom(state.currentZoom);
+        gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
     }
 
     @Override
@@ -259,12 +259,12 @@ public class MapOverlay extends JmUI
             buttonZoomIn = new Button(ButtonEnum.ZoomIn, "+"); //$NON-NLS-1$ //$NON-NLS-2$
             buttonZoomIn.setNoDisableText(true);
             buttonZoomIn.setWidth(20);
-            buttonZoomIn.setEnabled(state.currentZoom < state.maxZoom);
+            buttonZoomIn.setEnabled(fullMapProperties.zoomLevel.get() < state.maxZoom);
 
             buttonZoomOut = new Button(ButtonEnum.ZoomOut, "-"); //$NON-NLS-1$ //$NON-NLS-2$
             buttonZoomOut.setNoDisableText(true);
             buttonZoomOut.setWidth(20);
-            buttonZoomOut.setEnabled(state.currentZoom > state.minZoom);
+            buttonZoomOut.setEnabled(fullMapProperties.zoomLevel.get() > state.minZoom);
 
             buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
             buttonClose.fitWidth(fr);
@@ -355,7 +355,7 @@ public class MapOverlay extends JmUI
         {
             if (rightButtons.isHorizontal())
             {
-                rightButtons.setUniformWidths(mc.fontRenderer);
+                rightButtons.equalizeWidths(mc.fontRenderer);
             }
             rightButtons.layoutVertical(endX, startY, false, vgap);
         }
@@ -440,7 +440,7 @@ public class MapOverlay extends JmUI
             return;
         }
 
-        int blockSize = (int) Math.pow(2, state.currentZoom);
+        int blockSize = (int) Math.pow(2, fullMapProperties.zoomLevel.get());
 
         if (Mouse.isButtonDown(0) && !isScrolling)
         {
@@ -461,8 +461,9 @@ public class MapOverlay extends JmUI
                 try
                 {
                     gridRenderer.move(-mouseDragX, -mouseDragY);
-                    gridRenderer.updateTextures(state.getMapType(fullMapProperties.showCaves.get()), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0, fullMapProperties);
-                    gridRenderer.setZoom(state.currentZoom);
+                    boolean showCaves = mc.thePlayer.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get();
+                    gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
+                    gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
                 }
                 catch (Exception e)
                 {
@@ -485,17 +486,17 @@ public class MapOverlay extends JmUI
 
     void zoomIn()
     {
-        if (state.currentZoom < state.maxZoom)
+        if (fullMapProperties.zoomLevel.get() < state.maxZoom)
         {
-            setZoom(state.currentZoom + 1);
+            setZoom(fullMapProperties.zoomLevel.get() + 1);
         }
     }
 
     void zoomOut()
     {
-        if (state.currentZoom > state.minZoom)
+        if (fullMapProperties.zoomLevel.get() > state.minZoom)
         {
-            setZoom(state.currentZoom - 1);
+            setZoom(fullMapProperties.zoomLevel.get() - 1);
         }
     }
 
@@ -503,8 +504,8 @@ public class MapOverlay extends JmUI
     {
         if (state.setZoom(zoom))
         {
-            buttonZoomOut.setEnabled(state.currentZoom > state.minZoom);
-            buttonZoomIn.setEnabled(state.currentZoom < state.maxZoom);
+            buttonZoomOut.setEnabled(fullMapProperties.zoomLevel.get() > state.minZoom);
+            buttonZoomIn.setEnabled(fullMapProperties.zoomLevel.get() < state.maxZoom);
             refreshState();
         }
     }
@@ -680,7 +681,7 @@ public class MapOverlay extends JmUI
 
         if (isScrolling)
         {
-            int blockSize = (int) Math.pow(2, state.currentZoom);
+            int blockSize = (int) Math.pow(2, fullMapProperties.zoomLevel.get());
 
             int mouseDragX = (mx - msx) * 2 / blockSize;
             int mouseDragY = (my - msy) * 2 / blockSize;
@@ -706,9 +707,10 @@ public class MapOverlay extends JmUI
 
         if (state.follow)
         {
-            gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
+            gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
         }
-        gridRenderer.updateTextures(state.getMapType(fullMapProperties.showCaves.get()), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0, fullMapProperties);
+        boolean showCaves = mc.thePlayer.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get();
+        gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
         gridRenderer.draw(1f, xOffset, yOffset);
         gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale());
 
@@ -717,7 +719,7 @@ public class MapOverlay extends JmUI
             Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
             if (playerPixel != null)
             {
-                TextureImpl tex = state.currentZoom == 0 ? TextureCache.instance().getPlayerLocatorSmall() : TextureCache.instance().getPlayerLocator();
+                TextureImpl tex = fullMapProperties.zoomLevel.get() == 0 ? TextureCache.instance().getPlayerLocatorSmall() : TextureCache.instance().getPlayerLocator();
                 DrawStep drawStep = new DrawEntityStep(mc.thePlayer, false, tex, 8);
                 gridRenderer.draw(xOffset, yOffset, 1f, getMapFontScale(), drawStep);
             }
@@ -753,7 +755,7 @@ public class MapOverlay extends JmUI
             int x = waypoint.getX();
             int z = waypoint.getZ();
 
-            gridRenderer.center(x, z, state.currentZoom);
+            gridRenderer.center(x, z, fullMapProperties.zoomLevel.get());
             refreshState();
             updateScreen();
         }
@@ -784,14 +786,15 @@ public class MapOverlay extends JmUI
         // Center core renderer
         if (state.follow)
         {
-            gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
+            gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
         }
         else
         {
-            gridRenderer.setZoom(state.currentZoom);
+            gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
         }
 
-        gridRenderer.updateTextures(state.getMapType(fullMapProperties.showCaves.get()), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0, fullMapProperties);
+        boolean showCaves = mc.thePlayer.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get();
+        gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 
         // Build list of drawSteps
         state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, 1f, false);
@@ -856,7 +859,9 @@ public class MapOverlay extends JmUI
     {
         refreshState();
         gridRenderer.move(deltaBlockX, deltaBlockz);
-        gridRenderer.updateTextures(state.getMapType(fullMapProperties.showCaves.get()), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0, fullMapProperties);
+
+        boolean showCaves = mc.thePlayer.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get();
+        gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
         setFollow(false);
     }
 

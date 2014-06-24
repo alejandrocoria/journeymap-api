@@ -17,7 +17,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -80,13 +82,25 @@ public class TextureCache {
     /*************************************************/
 
     public Future<DelayedTexture> prepareImage(final Integer glId, final BufferedImage image, final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType,
-                                               final Integer vSlice, final int dimension, final Boolean useCache, final Integer imageWidth, final Integer imageHeight, final boolean showGrid) {
-        Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>() {
+                                               final Integer vSlice, final int dimension, final Boolean useCache, final Integer imageWidth, final Integer imageHeight, final boolean showGrid, final float alpha)
+    {
+        Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>()
+        {
             @Override
-            public DelayedTexture call() throws Exception {
+            public DelayedTexture call() throws Exception
+            {
                 BufferedImage chunksImage = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, useCache, image, imageWidth, imageHeight, true, showGrid);
                 if(chunksImage==null){
                     chunksImage = RegionImageHandler.createBlankImage(imageWidth, imageHeight);
+                }
+                else if(alpha<1f)
+                {
+                    BufferedImage temp = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
+                    Graphics2D g = (Graphics2D) temp.getGraphics();
+                    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+                    g.drawImage(chunksImage, 0, 0, imageWidth, imageHeight, null);
+                    chunksImage = temp;
+                    g.dispose();
                 }
                 return new DelayedTexture(glId, chunksImage, null);
             }

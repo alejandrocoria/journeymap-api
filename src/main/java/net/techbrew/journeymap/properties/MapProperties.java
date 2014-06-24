@@ -4,6 +4,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -18,6 +19,7 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
     public final AtomicBoolean showPlayers = new AtomicBoolean(true);
     public final AtomicBoolean showWaypoints = new AtomicBoolean(true);
     public final AtomicBoolean showSelf = new AtomicBoolean(true);
+    public final AtomicInteger zoomLevel = new AtomicInteger(0);
 
     protected MapProperties()
     {

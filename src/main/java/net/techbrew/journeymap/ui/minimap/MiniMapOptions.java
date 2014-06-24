@@ -15,17 +15,21 @@ public class MiniMapOptions extends JmUI
 
     private enum ButtonEnum
     {
-        MiniMap, Position, Shape, Font, Texture, Unicode, Keyboard, KeyboardHelp, Close, Showfps, ShowSelf, GeneralDisplay, CloseAll
+        MiniMap, Position, Shape, Font, Texture, IconSet, Unicode, Keyboard, KeyboardHelp, Close, Showfps, ShowSelf, GeneralDisplay, TerrainAlpha, CloseAll
     }
 
     private Button buttonPosition, buttonShape, buttonFont, buttonTexture, buttonUnicode, buttonMiniMap, buttonKeyboard;
     private Button buttonKeyboardHelp, buttonShowSelf, buttonShowfps, buttonGeneralDisplay, buttonClose, buttonCloseAll;
+    private IconSetButton buttonIconSet;
+    private SliderButton buttonTerrainAlpha;
 
     private DisplayVars.Shape currentShape;
     private DisplayVars.Position currentPosition;
     private ButtonList leftButtons;
     private ButtonList rightButtons;
+    private ButtonList bottomButtons;
 
+    private MiniMap miniMap = UIManager.getInstance().getMiniMap();
     private MiniMapProperties miniMapProperties = JourneyMap.getInstance().miniMapProperties;
 
     public MiniMapOptions()
@@ -107,26 +111,27 @@ public class MiniMapOptions extends JmUI
         buttonGeneralDisplay = new Button(ButtonEnum.GeneralDisplay,
                 Constants.getString("jm.common.general_display_button"));
 
-        leftButtons = new ButtonList(buttonShape, buttonShowfps, buttonShowSelf, buttonKeyboard, buttonKeyboardHelp);
+        buttonIconSet = new IconSetButton(ButtonEnum.IconSet.ordinal(), miniMapProperties, "jm.common.mob_icon_set");
+
+        buttonTerrainAlpha = SliderButton.create(ButtonEnum.TerrainAlpha.ordinal(), miniMapProperties.terrainAlpha, 0, 255, "jm.minimap.terrain_alpha");
+
+        leftButtons = new ButtonList(buttonShape, buttonShowfps, buttonShowSelf, buttonKeyboard, buttonKeyboardHelp, buttonGeneralDisplay);
         leftButtons.setNoDisableText(true);
 
-        rightButtons = new ButtonList(buttonPosition, buttonTexture, buttonFont, buttonUnicode, buttonGeneralDisplay);
+        rightButtons = new ButtonList(buttonPosition, buttonFont, buttonUnicode, buttonTexture, buttonIconSet, buttonTerrainAlpha);
         rightButtons.setNoDisableText(true);
+
+        buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
+        buttonCloseAll = new Button(ButtonEnum.CloseAll, Constants.getString("jm.minimap.return_to_game")); //$NON-NLS-1$
+
+        bottomButtons = new ButtonList(buttonClose, buttonCloseAll);
 
         buttonList.add(buttonMiniMap);
         buttonList.addAll(leftButtons);
         buttonList.addAll(rightButtons);
+        buttonList.addAll(bottomButtons);
 
         new ButtonList(buttonList).equalizeWidths(getFontRenderer());
-
-        buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
-        buttonClose.setWidth(150);
-
-        buttonCloseAll = new Button(ButtonEnum.CloseAll, Constants.getString("jm.minimap.return_to_game")); //$NON-NLS-1$
-        buttonCloseAll.setWidth(150);
-
-        buttonList.add(buttonClose);
-        buttonList.add(buttonCloseAll);
     }
 
     /**
@@ -145,7 +150,7 @@ public class MiniMapOptions extends JmUI
         final int hgap = 2;
         final int vgap = 3;
         final int bx = this.width / 2;
-        final int by = Math.max(40, (this.height - (8*24)) / 2);
+        final int by = Math.max(30, (this.height - (8*24)) / 2);
 
         buttonMiniMap.centerHorizontalOn(bx).setY(by);
 
@@ -163,17 +168,15 @@ public class MiniMapOptions extends JmUI
         }
 
         buttonMiniMap.setEnabled(true);
-
-        buttonCloseAll.below(leftButtons, vgap + vgap + vgap).centerHorizontalOn(bx);
-        buttonClose.below(buttonCloseAll, vgap).centerHorizontalOn(bx);
-
-
+        buttonGeneralDisplay.setEnabled(true);
         buttonKeyboardHelp.setEnabled(buttonMiniMap.getToggled() && buttonKeyboard.getToggled());
+
+        bottomButtons.layoutCenteredHorizontal(bx, leftButtons.getBottomY() + (3*vgap), true, hgap);
     }
 
     @Override
     protected void actionPerformed(GuiButton guibutton)
-    { // actionPerformed
+    {
 
         final ButtonEnum id = ButtonEnum.values()[guibutton.id];
         switch (id)
@@ -205,7 +208,7 @@ public class MiniMapOptions extends JmUI
             case Font:
             {
                 buttonFont.setToggled(miniMapProperties.toggle(miniMapProperties.fontSmall));
-                UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+                miniMap.updateDisplayVars(true);
                 break;
             }
 
@@ -218,7 +221,7 @@ public class MiniMapOptions extends JmUI
             case Texture:
             {
                 buttonTexture.toggle();
-                UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+                miniMap.updateDisplayVars(true);
                 break;
             }
 
@@ -237,20 +240,33 @@ public class MiniMapOptions extends JmUI
             case Showfps:
             {
                 buttonShowfps.setToggled(miniMapProperties.toggle(miniMapProperties.showFps));
-                UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+                miniMap.updateDisplayVars(true);
                 break;
             }
 
             case Unicode:
             {
                 buttonUnicode.setToggled(miniMapProperties.toggle(miniMapProperties.forceUnicode));
-                UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+                miniMap.updateDisplayVars(true);
                 break;
             }
 
             case GeneralDisplay:
             {
                 UIManager.getInstance().openGeneralDisplayOptions(getClass());
+                break;
+            }
+
+            case IconSet:
+            {
+                buttonIconSet.toggle();
+                miniMap.forceRefreshState();
+                break;
+            }
+
+            case TerrainAlpha:
+            {
+                miniMap.forceRefreshState();
                 break;
             }
 
@@ -286,7 +302,7 @@ public class MiniMapOptions extends JmUI
         }
         currentShape = shape;
         buttonShape.displayString = Constants.getString("jm.minimap.shape", Constants.getString(currentShape.label));
-        UIManager.getInstance().getMiniMap().setShape(shape);
+        miniMap.setShape(shape);
     }
 
     private void nextPosition()
@@ -303,7 +319,7 @@ public class MiniMapOptions extends JmUI
     {
         currentPosition = position;
         buttonPosition.displayString = Constants.getString("jm.minimap.position", Constants.getString(currentPosition.label));
-        UIManager.getInstance().getMiniMap().setPosition(position);
+        miniMap.setPosition(position);
     }
 
     @Override
@@ -317,7 +333,7 @@ public class MiniMapOptions extends JmUI
 
         if(JourneyMap.getInstance().miniMapProperties.enabled.get())
         {
-            MiniMap miniMap = UIManager.getInstance().getMiniMap();
+            MiniMap miniMap = this.miniMap;
             miniMap.drawMap();
         }
 
@@ -341,6 +357,22 @@ public class MiniMapOptions extends JmUI
             {
                 DrawUtil.drawLabel(fps, width - 5, 5, DrawUtil.HAlign.Left, DrawUtil.VAlign.Below, Color.BLACK, 0, Color.cyan, 255, 1, true);
             }
+        }
+    }
+
+    @Override
+    public void drawDefaultBackground()
+    {
+        // Reinforce header since normal mask isn't used
+        DrawUtil.drawRectangle(0, 0, this.width, headerHeight, Color.black, 100);
+
+        // Add footer to mask the bottom toolbar
+        DrawUtil.drawRectangle(0, this.height - headerHeight, this.width, headerHeight, Color.black, 150);
+
+        // Draw miniMap
+        if(JourneyMap.getInstance().miniMapProperties.enabled.get())
+        {
+            miniMap.drawMap();
         }
     }
 }

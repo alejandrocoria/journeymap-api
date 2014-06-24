@@ -13,24 +13,30 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 
+### New Feature: Minimap Terrain Transparency
+- MiniMap Options now allows you to choose how opaque/transparent the mapped terrain appears
+
 ### New Feature: Optional Flat (2D) Mob Icons
 - General Display Options lets you choose between the new 2D mob icons and the pre-existing 3D icons
 - The Minimap now uses 2D icons by default, but you can change it back under General Display Options
 - The Web Map can also change its mob icon set (Using the options menu in your browser)
-- Don't like an icon?  Find it in journeyMap/icon/entity/[setname]/ and replace it with something you prefer.
-- Icons must be in PNG format. Recommended size is 32x32 pixels.
+- Don't like an icon?  Find it in journeyMap/icon/entity/[setname]/ and replace it with something you prefer. Icons must be in PNG format. Recommended size is 16x16 pixels.
 
 ### New feature: Custom Icon Set support
 - To get started: Copy and rename the journeyMap/icon/entity/2D/ folder to journeyMap/icon/entity/[new set name]/, then replace the existing icons with your own.
-- Icons must be in PNG format. Recommended size is 32x32 pixels.
-- Afer you restart Minecraft, the General Display Options will allow you to select your custom icon set.
+- Icons must be in PNG format. Recommended size is 16x16 pixels.
+- Afer you restart Minecraft, the General Display Options screen or MiniMap Options screen will allow you to select your new custom icon set.
 
 ### New/Updated Translations
 - ru_RU has been updated courtesy of Vladislav Chaykin
+- nl_NL has been updated courtesty of Niels Meijer
 
 ### Misc. Improvements
 - General Display Options are now centered on-screen (for large displays)
 - Language files have been overhauled and cleaned up to make translation easier.
+- Most MiniMap key combinations no longer require you to press CTRL / COMMMAND
+- MiniMap zoom setting is now independent of Full-screen Map zoom setting.
+- MiniMap zoom setting and Full-screen Map zoom setting are now saved between sessions.
 
 ### Known issues:
 

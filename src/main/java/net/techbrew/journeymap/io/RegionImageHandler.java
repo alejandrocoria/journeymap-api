@@ -113,7 +113,6 @@ public class RegionImageHandler {
 	
 	public static BufferedImage createBlankImage(int width, int height) {
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g2D = img.createGraphics();
 		return img;
 	}
 	

@@ -278,7 +278,7 @@ public class ButtonList extends ArrayList<Button>
         }
 
         this.horizontal = true;
-        this.setUniformWidths(fr);
+        this.equalizeWidths(fr);
 
         int width = getWidth(hgap);
         int remaining = (rightX - leftX) - width;
@@ -295,19 +295,6 @@ public class ButtonList extends ArrayList<Button>
             layoutCenteredHorizontal((rightX - leftX) / 2, y, leftToRight, hgap);
         }
         return this;
-    }
-
-    public void setUniformWidths(FontRenderer fr)
-    {
-        int max = 0;
-        for (Button button : this)
-        {
-            if (button.isDrawButton())
-            {
-                max = Math.max(max, button.getFitWidth(fr));
-            }
-        }
-        setWidths(max);
     }
 
     public void setFitWidths(FontRenderer fr)
@@ -396,8 +383,11 @@ public class ButtonList extends ArrayList<Button>
         int maxWidth = 0;
         for (Button button : this)
         {
-            button.fitWidth(fr);
-            maxWidth = Math.max(maxWidth, button.getWidth());
+            if (button.isDrawButton())
+            {
+                button.fitWidth(fr);
+                maxWidth = Math.max(maxWidth, button.getWidth());
+            }
         }
         setWidths(maxWidth);
     }
@@ -423,7 +413,7 @@ public class ButtonList extends ArrayList<Button>
         int totalWidth = getWidth(maxWidth, hgap);
         if (totalWidth <= maxTotalWidth)
         {
-            setWidths(maxWidth); // same result as setUniformWidths
+            setWidths(maxWidth); // same result as equalizeWidths
         }
         else
         {

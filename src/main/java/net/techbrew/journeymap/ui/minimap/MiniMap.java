@@ -56,7 +56,7 @@ public class MiniMap
     private final MapOverlayState state = MapOverlay.state();
     private final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
     private final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
-    private final GridRenderer gridRenderer = new GridRenderer(3);
+    private final GridRenderer gridRenderer = new GridRenderer(3, miniMapProperties);
     private final TextureImpl playerLocatorTex;
 
     private EntityClientPlayerMP player;
@@ -112,11 +112,11 @@ public class MiniMap
 
             // Update the grid
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
-            boolean moved = gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, state.currentZoom);
+            boolean moved = gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
             if(moved || doStateRefresh)
             {
                 boolean showCaves = player.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get();
-                gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0, miniMapProperties);
+                gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0);
             }
 
             if (doStateRefresh)
@@ -409,6 +409,11 @@ public class MiniMap
         double ypad = this.dv.viewPortPadY;
         Rectangle2D.Double viewPort = new Rectangle2D.Double(this.dv.textureX + xpad, this.dv.textureY + ypad, this.dv.minimapSize - (2 * xpad), this.dv.minimapSize - (2 * ypad));
         gridRenderer.setViewPort(viewPort);
+    }
+
+    public void forceRefreshState()
+    {
+        state.requireRefresh();
     }
 
     private void updateLabels()

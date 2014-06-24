@@ -108,7 +108,7 @@ public class MiniMapHotkeysHelp extends JmUI
         // Hotkey help
         y += 12;
         final int x = (this.width) / 2;
-        drawHelpStrings(Constants.getString("jm.minimap.hotkeys_toggle"), Constants.getKeyName(Constants.KB_MAP), x, y += 12);
+        drawHelpStrings(Constants.getString("jm.minimap.hotkeys_toggle"), Constants.CONTROL_KEYNAME_COMBO + Constants.getKeyName(Constants.KB_MAP), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.zoom_in"), Constants.getKeyName(Constants.KB_MAP_ZOOMIN), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.zoom_out"), Constants.getKeyName(Constants.KB_MAP_ZOOMOUT), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.day"), Constants.getKeyName(Constants.KB_MAP_DAY), x, y += 12);
@@ -123,7 +123,7 @@ public class MiniMapHotkeysHelp extends JmUI
         int tWidth = getFontRenderer().getStringWidth(title);
         drawString(getFontRenderer(), title, x - tWidth - hgap, y, 16777215);
 
-        drawString(getFontRenderer(), Constants.CONTROL_KEYNAME_COMBO + key, x + hgap, y, Color.YELLOW.getRGB());
+        drawString(getFontRenderer(), key, x + hgap, y, Color.YELLOW.getRGB());
     }
 
     @Override

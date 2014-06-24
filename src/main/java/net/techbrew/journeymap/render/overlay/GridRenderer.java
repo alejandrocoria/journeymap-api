@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
-import net.techbrew.journeymap.properties.MapProperties;
+import net.techbrew.journeymap.properties.InGameMapProperties;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import org.lwjgl.opengl.GL11;
@@ -55,14 +55,16 @@ public class GridRenderer {
 	private double centerBlockX;
     private double centerBlockZ;
     private final Color bgColor = new Color(0x22, 0x22, 0x22);
-	
+
+    private final InGameMapProperties mapProperties;
 	private final Point2D.Double centerPixelOffset = new Point2D.Double();
 	private Integer dimension;
 	private File worldDir;
 
-	public GridRenderer(final int gridSize) {
+	public GridRenderer(final int gridSize, InGameMapProperties mapProperties) {
         this.gridSize = gridSize;  // Must be an odd number so as to have a center tile.
         srcSize = gridSize*Tile.TILESIZE;
+        this.mapProperties = mapProperties;
 	}
 
     public void setViewPort(Rectangle2D.Double viewPort) {
@@ -141,7 +143,7 @@ public class GridRenderer {
         return true;
 	}
 
-	public boolean updateTextures(MapType mapType, Integer vSlice, int width, int height, boolean fullUpdate, double xOffset, double yOffset, MapProperties mapProperties) {
+	public boolean updateTextures(MapType mapType, Integer vSlice, int width, int height, boolean fullUpdate, double xOffset, double yOffset) {
 
 		// Update screen dimensions
         updateBounds(width, height);
@@ -270,7 +272,7 @@ public class GridRenderer {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
     }
 	
-	public void draw(final float opacity, final double offsetX, final double offsetZ) {		
+	public void draw(final float opacity, final double offsetX, final double offsetZ) {
 		if(!grid.isEmpty()) {	
 								
 			double centerX = offsetX + centerPixelOffset.x;
@@ -298,13 +300,20 @@ public class GridRenderer {
 
         if(isOnScreen(startX, startZ, Tile.TILESIZE, Tile.TILESIZE))
         {
-            DrawUtil.drawRectangle(startX, startZ, Tile.TILESIZE, Tile.TILESIZE, bgColor, 255);
-            if(tile!=null && tile.hasTexture())
+            boolean missingTex = tile==null || ! tile.hasTexture();
+
+            if(missingTex || mapProperties.terrainAlpha.get()==255)
+            {
+                DrawUtil.drawRectangle(startX, startZ, Tile.TILESIZE, Tile.TILESIZE, bgColor, mapProperties.terrainAlpha.get());
+            }
+
+            if(!missingTex)
             {
                 GL11.glDisable(GL11.GL_DEPTH_TEST);
                 GL11.glDepthMask(false);
+
+                GL11.glEnable(GL11.GL_BLEND);
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                GL11.glColor4f(1f, 1f, 1f, 1f);
 
                 GL11.glEnable(GL11.GL_TEXTURE_2D);
                 GL11.glBindTexture(GL11.GL_TEXTURE_2D, tile.getTexture().getGlTextureId());

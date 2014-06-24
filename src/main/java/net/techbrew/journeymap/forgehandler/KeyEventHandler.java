@@ -48,10 +48,10 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
         final int i = Keyboard.getEventKey();
         MapOverlayState mapOverlayState = MapOverlay.state();
 
-        if (GuiScreen.isCtrlKeyDown() && JourneyMap.getInstance().miniMapProperties.enableHotkeys.get())
+        if (JourneyMap.getInstance().miniMapProperties.enableHotkeys.get())
         {
 
-            if (Constants.isPressed(Constants.KB_MAP))
+            if (GuiScreen.isCtrlKeyDown() && Constants.isPressed(Constants.KB_MAP))
             {
                 UIManager.getInstance().toggleMinimap();
                 return;
@@ -81,15 +81,12 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 UIManager.getInstance().getMiniMap().nextPosition();
                 return;
             }
-            else if (Constants.isPressed(Constants.KB_WAYPOINT))
+            else if (GuiScreen.isCtrlKeyDown() && Constants.isPressed(Constants.KB_WAYPOINT))
             {
                 UIManager.getInstance().openWaypointManager(null, null);
                 return;
             }
 
-        }
-        else
-        {
             if (!minimapOnly)
             {
                 if (Constants.KB_MAP.isPressed())

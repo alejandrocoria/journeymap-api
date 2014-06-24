@@ -5,10 +5,12 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.chunk.Chunk;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.Waypoint;
+import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.draw.DrawWayPointStep;
@@ -27,6 +29,7 @@ import java.util.List;
  */
 public class WaypointLayer implements LayerDelegate.Layer
 {
+    FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
     private final long hoverDelay = 100;
     private final List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
     private final BlockOutlineDrawStep clickDrawStep = new BlockOutlineDrawStep(new BlockCoordIntPair(0,0));
@@ -200,7 +203,7 @@ public class WaypointLayer implements LayerDelegate.Layer
 
     private int getProximity()
     {
-        int blockSize = (int) Math.max(1, Math.pow(2, MapOverlay.state().currentZoom));
+        int blockSize = (int) Math.max(1, Math.pow(2, fullMapProperties.zoomLevel.get()));
         return Math.max(1, 8 / blockSize);
     }
 

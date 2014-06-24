@@ -204,7 +204,7 @@ public class WaypointEditor extends JmUI
                 buttonList.add(buttonClose);
 
                 bottomButtons = new ButtonList(buttonRemove, buttonSave, buttonClose);
-                bottomButtons.setUniformWidths(getFontRenderer());
+                bottomButtons.equalizeWidths(getFontRenderer());
 
                 setFormColor(originalWaypoint.getColor());
 
