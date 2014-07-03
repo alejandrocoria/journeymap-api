@@ -37,6 +37,7 @@ http://journeymap.techbrew.net
 - Most MiniMap key combinations no longer require you to press CTRL / COMMMAND
 - MiniMap zoom setting is now independent of Full-screen Map zoom setting.
 - MiniMap zoom setting and Full-screen Map zoom setting are now saved between sessions.
+- Added data caching / object pooling to reduce the number of resources created during mapping tasks.
 
 ### Known issues:
 

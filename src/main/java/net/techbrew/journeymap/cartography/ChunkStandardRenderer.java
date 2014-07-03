@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.cartography;
 
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -8,18 +9,15 @@ import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.BlockUtils;
 import net.techbrew.journeymap.model.ChunkMD;
-import net.techbrew.journeymap.model.RGB;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Stack;
 
 public class ChunkStandardRenderer extends BaseRenderer implements IChunkRenderer
 {
-    protected boolean caveGreySurface = JourneyMap.getInstance().coreProperties.caveGreySurface.get();
     protected boolean advancedSurfaceCheck = JourneyMap.getInstance().coreProperties.advancedSurfaceCheck.get();
+    protected boolean mapBathymetry;
 
     protected StatTimer renderSurfaceTimer = StatTimer.get("ChunkStandardRenderer.renderSurface");
     protected StatTimer renderSurfacePrepassTimer = StatTimer.get("ChunkStandardRenderer.renderSurface-prepass");
@@ -33,47 +31,55 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
     public boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final boolean underground,
                           final Integer vSlice, final ChunkMD.Set neighbors)
     {
+        mapBathymetry = JourneyMap.getInstance().coreProperties.mapBathymetry.get();
 
-        // Initialize ChunkSub slopes if needed
-        if (chunkMd.surfaceSlopes == null)
+        try
         {
-            initSurfaceSlopes(chunkMd, neighbors);
+            // Initialize ChunkSub slopes if needed
+            if (chunkMd.surfaceSlopes == null)
+            {
+                initSurfaceSlopes(chunkMd, neighbors);
+            }
+
+            // Render the chunk image
+            if (underground)
+            {
+
+                boolean ok = renderSurface(g2D, chunkMd, vSlice, neighbors, true);
+                if (!ok)
+                {
+                    JourneyMap.getLogger().fine("The surface chunk didn't paint: " + chunkMd.toString());
+                }
+
+                final int sliceMinY = Math.max((vSlice << 4), 0);
+                final int hardSliceMaxY = ((vSlice + 1) << 4) - 1;
+                int sliceMaxY = Math.min(hardSliceMaxY, chunkMd.worldObj.getActualHeight());
+                if (sliceMinY >= sliceMaxY)
+                {
+                    sliceMaxY = sliceMinY + 2;
+                }
+
+                if (chunkMd.sliceSlopes == null)
+                {
+                    initSliceSlopes(chunkMd, sliceMinY, sliceMaxY, neighbors);
+                }
+
+                ok = renderUnderground(g2D, chunkMd, vSlice, sliceMinY, sliceMaxY, neighbors);
+
+                if (!ok)
+                {
+                    JourneyMap.getLogger().fine("The underground chunk didn't paint: " + chunkMd.toString());
+                }
+                return ok;
+            }
+            else
+            {
+                return renderSurface(g2D, chunkMd, vSlice, neighbors, false);
+            }
         }
-
-        // Render the chunk image
-        if (underground)
+        finally
         {
 
-            boolean ok = renderSurface(g2D, chunkMd, vSlice, neighbors, true);
-            if (!ok)
-            {
-                JourneyMap.getLogger().fine("The surface chunk didn't paint: " + chunkMd.toString());
-            }
-
-            final int sliceMinY = Math.max((vSlice << 4), 0);
-            final int hardSliceMaxY = ((vSlice + 1) << 4) - 1;
-            int sliceMaxY = Math.min(hardSliceMaxY, chunkMd.worldObj.getActualHeight());
-            if (sliceMinY >= sliceMaxY)
-            {
-                sliceMaxY = sliceMinY + 2;
-            }
-
-            if (chunkMd.sliceSlopes == null)
-            {
-                initSliceSlopes(chunkMd, sliceMinY, sliceMaxY, neighbors);
-            }
-
-            ok = renderUnderground(g2D, chunkMd, vSlice, sliceMinY, sliceMaxY, neighbors);
-
-            if (!ok)
-            {
-                JourneyMap.getLogger().fine("The underground chunk didn't paint: " + chunkMd.toString());
-            }
-            return ok;
-        }
-        else
-        {
-            return renderSurface(g2D, chunkMd, vSlice, neighbors, false);
         }
 
     }
@@ -90,16 +96,17 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 //        timer.start();
         float slope, h, hN, hW, hNW;
         chunkMd.surfaceSlopes = new float[16][16];
-        for (int y = 0; y < 16; y++)
+        boolean ignoreWater = mapBathymetry;
+        for (int z = 0; z < 16; z++)
         {
             for (int x = 0; x < 16; x++)
             {
-                h = chunkMd.getSlopeHeightValue(x, y);
-                hN = (y == 0) ? getBlockHeight(x, y, 0, -1, chunkMd, neighbors, h) : chunkMd.getSlopeHeightValue(x, y - 1);
-                hW = (x == 0) ? getBlockHeight(x, y, -1, 0, chunkMd, neighbors, h) : chunkMd.getSlopeHeightValue(x - 1, y);
-                hNW = getBlockHeight(x, y, -1, -1, chunkMd, neighbors, h);
+                h = chunkMd.getSlopeHeightValue(x, z, ignoreWater);
+                hN = (z == 0) ? getBlockHeight(x, z, 0, -1, chunkMd, neighbors, h, ignoreWater) : chunkMd.getSlopeHeightValue(x, z - 1, ignoreWater);
+                hW = (x == 0) ? getBlockHeight(x, z, -1, 0, chunkMd, neighbors, h, ignoreWater) : chunkMd.getSlopeHeightValue(x - 1, z, ignoreWater);
+                hNW = getBlockHeight(x, z, -1, -1, chunkMd, neighbors, h, ignoreWater);
                 slope = ((h / hN) + (h / hW) + (h / hNW)) / 3f;
-                chunkMd.surfaceSlopes[x][y] = slope;
+                chunkMd.surfaceSlopes[x][z] = slope;
             }
         }
 //        timer.stop();
@@ -134,11 +141,57 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
     }
 
     /**
-     * Get the color for a block based on its location, neighbor slopes.
+     * Get the color for a block based on its chunk-local coords, neighbor slopes.
      */
-    protected RGB getBaseBlockColor(final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int y, int z)
+    protected int getBaseBlockColor(final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int y, int z)
     {
-        return blockMD.getColor(chunkMd, x, y, z);
+        return getBaseBlockColor(chunkMd, blockMD, neighbors, x, y, z, true);
+    }
+
+    /**
+     * Get the color for a block based on its chunk-local coords
+     */
+    protected int getBaseBlockColor(final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int y, int z, boolean averageWater)
+    {
+        if (averageWater && blockMD.isWater())
+        {
+            return getAverageWaterColor(neighbors, (chunkMd.coord.chunkXPos<<4) + x, y, (chunkMd.coord.chunkZPos<<4) + z);
+        }
+        else
+        {
+            return blockMD.getColor(chunkMd, x, y, z);
+        }
+    }
+
+    /**
+     * Requires absolute x,y,z coordinates
+     */
+    protected int getAverageWaterColor(final ChunkMD.Set neighbors, int blockX, int blockY, int blockZ)
+    {
+        return RGB.average(
+                getWaterColor(neighbors, blockX, blockY, blockZ),
+                getWaterColor(neighbors, blockX - 1, blockY, blockZ),
+                getWaterColor(neighbors, blockX + 1, blockY, blockZ),
+                getWaterColor(neighbors, blockX, blockY - 1, blockZ),
+                getWaterColor(neighbors, blockX, blockY + 1, blockZ)
+        );
+    }
+
+    /**
+     * Requires absolute x,y,z coordinates
+     */
+    protected int getWaterColor(final ChunkMD.Set neighbors, int blockX, int blockY, int blockZ)
+    {
+        ChunkMD chunk = neighbors.get(new ChunkCoordIntPair(blockX>>4, blockZ>>4));
+        if(chunk!=null)
+        {
+            BlockMD block = BlockMD.getBlockMD(chunk, blockX & 15, blockY, blockZ & 15);
+            if(block!=null && block.isWater())
+            {
+                return block.getColor(chunk, blockX & 15, blockY, blockZ & 15);
+            }
+        }
+        return 0;
     }
 
     /**
@@ -150,6 +203,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
         timer.start();
 
         g2D.setComposite(BlockUtils.OPAQUE);
+        BlockStack blockStack = new BlockStack();
 
         boolean chunkOk = false;
         for (int x = 0; x < 16; x++)
@@ -157,8 +211,9 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
             blockLoop:
             for (int z = 0; z < 16; z++)
             {
+                blockStack.reset();
+                BlockMD topBlockMd = null;
 
-                BlockMD blockMD = null;
                 boolean isUnderRoof = false;
                 int standardY = Math.max(1, chunkMd.getHeightValue(x, z));
                 int roofY = 0;
@@ -175,8 +230,8 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                         int checkY = roofY;
                         while (checkY > standardY)
                         {
-                            blockMD = BlockMD.getBlockMD(chunkMd, x, checkY, z);
-                            if (blockMD != null && blockMD.isTransparentRoof())
+                            topBlockMd = BlockMD.getBlockMD(chunkMd, x, checkY, z);
+                            if (topBlockMd != null && topBlockMd.isTransparentRoof())
                             {
                                 isUnderRoof = true;
                                 y = Math.max(standardY, checkY);
@@ -187,180 +242,139 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                                 checkY--;
                             }
                         }
-                        //advancedSurfaceCheckTimer.stop();
                     }
-                    else
-                    {
-                        //advancedSurfaceCheckTimer.cancel();
-                    }
+                    //advancedSurfaceCheckTimer.stop();
                 }
 
-                // Get blockinfo for coords
-                do
-                {
-                    blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+                // Get top non-roof block
+                topBlockMd = getTopBlockMD(chunkMd, x, y, z);
 
-                    // Null check
-                    if (blockMD == null)
-                    {
-                        paintBadBlock(x, y, z, g2D);
-                        continue blockLoop;
-                    }
-
-                    if (blockMD.isTransparentRoof())
-                    {
-                        y--;
-                        continue;
-                    }
-
-                    if (blockMD.isAir())
-                    {
-                        y--;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                } while (y >= 0);
-
-                if (blockMD == null)
+                if (topBlockMd == null)
                 {
                     paintBadBlock(x, y, z, g2D);
                     continue blockLoop;
                 }
 
-                // Get base color for block
-                RGB color = getBaseBlockColor(chunkMd, blockMD, neighbors, x, y, z);
-                if (color == null)
-                {
-                    paintBadBlock(x, y, z, g2D);
-                    continue blockLoop;
-                }
+                // Start using BlockColors stack
+                buildColorStack(blockStack, neighbors, roofY, chunkMd, x, y, z);
 
-                // Paint deeper blocks if alpha used, but not if this pass is just for underground layer
-                boolean useAlpha = blockMD.hasFlag(BlockUtils.Flag.Transparency) || blockMD.isWater();
-                if (useAlpha)
-                {
-
-                    color = renderSurfaceAlpha(g2D, chunkMd, blockMD, neighbors, x, y, z);
-                    chunkOk = true;
-
-                }
-                else
-                {
-
-                    // Bevel color according to slope
-                    if (!blockMD.hasFlag(BlockUtils.Flag.NoShadow))
-                    {
-                        surfaceSlopeColor(color, chunkMd, blockMD, neighbors, x, y, z);
-                    }
-
-                    // Grey out if used to show outside in underground layer
-                    if (cavePrePass && caveGreySurface)
-                    {
-                        color.ghostSurface();
-                    }
-
-                    // Draw daytime map block
-                    g2D.setPaint(color.toColor());
-                    g2D.fillRect(x, z, 1, 1);
-                    chunkOk = true;
-                }
-
-                // If under glass, color accordingly
-                if (isUnderRoof)
-                {
-                    //advancedSurfaceRenderTimer.start();
-                    while (roofY > y)
-                    {
-                        blockMD = BlockMD.getBlockMD(chunkMd, x, roofY, z);
-                        if (blockMD != null && !blockMD.isAir())
-                        {
-                            if (blockMD.isTransparentRoof())
-                            {
-                                g2D.setComposite(blockMD.getAlphaComposite());
-                                g2D.setPaint(getBaseBlockColor(chunkMd, blockMD, neighbors, x, roofY, z).toColor());
-                                g2D.fillRect(x, z, 1, 1);
-                                g2D.setComposite(BlockUtils.OPAQUE);
-                            }
-                        }
-                        roofY--;
-                    }
-                    //advancedSurfaceRenderTimer.stop();
-                }
-
-                // Night color
-                if (!cavePrePass)
-                {
-                    int lightLevel = Math.max(1, chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, (y + 1), z));
-                    if (lightLevel < 15)
-                    {
-                        float diff = Math.min(1F, (lightLevel / 15F) + .1f);
-                        if (diff != 1.0)
-                        {
-                            color.moonlight(diff);
-                        }
-                    }
-
-                    // Draw nighttime map block
-                    g2D.setPaint(color.toColor());
-                    g2D.fillRect(x + 16, z, 1, 1);
-
-                    chunkOk = true;
-                }
+                chunkOk = paintSurfaceBlockStack(g2D, chunkMd, topBlockMd, vSlice, neighbors, blockStack, x, y, z, cavePrePass) || chunkOk;
             }
         }
+
+        blockStack.reset();
         timer.stop();
         return chunkOk;
     }
 
-    protected RGB renderSurfaceAlpha(final Graphics2D g2D, final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int y, int z)
+    protected BlockMD getTopBlockMD(final ChunkMD chunkMd, final int x, int y, final int z)
     {
+        BlockMD topBlockMd = null;
 
-        RGB color = getBaseBlockColor(chunkMd, blockMD, neighbors, x, y, z);
-
-        // Check for surrounding water
-        if (blockMD.isWater())
+        do
         {
-            BlockMD bw = getBlock(x, y, z, -1, 0, chunkMd, neighbors, blockMD);
-            BlockMD be = getBlock(x, y, z, +1, 0, chunkMd, neighbors, blockMD);
-            BlockMD bn = getBlock(x, y, z, 0, -1, chunkMd, neighbors, blockMD);
-            BlockMD bs = getBlock(x, y, z, 0, +1, chunkMd, neighbors, blockMD);
-            Set<RGB> colors = new HashSet<RGB>(6);
-            colors.add(color);
+            topBlockMd = BlockMD.getBlockMD(chunkMd, x, y, z);
 
-            if (bw.isWater())
+            // Null check
+            if (topBlockMd == null)
             {
-                colors.add(getBaseBlockColor(chunkMd, bw, neighbors, x, y, z));
-            }
-            if (be.isWater())
-            {
-                colors.add(getBaseBlockColor(chunkMd, be, neighbors, x, y, z));
-            }
-            if (bn.isWater())
-            {
-                colors.add(getBaseBlockColor(chunkMd, bn, neighbors, x, y, z));
-            }
-            if (bs.isWater())
-            {
-                colors.add(getBaseBlockColor(chunkMd, bs, neighbors, x, y, z));
+                break;
             }
 
-            if (!colors.isEmpty())
+            if (topBlockMd.isTransparentRoof() || topBlockMd.isAir() || topBlockMd.getAlpha() ==  0)
             {
-                color = RGB.average(colors);
+                y--;
+            }
+            else
+            {
+                break;
+            }
+        } while (y >= 0);
+
+        return topBlockMd;
+    }
+
+    protected boolean paintSurfaceBlockStack(final Graphics2D g2D, final ChunkMD chunkMd, final BlockMD topBlockMd, final Integer vSlice, final ChunkMD.Set neighbors, BlockStack blockStack, final int x, final int y, final int z, final boolean cavePrePass)
+    {
+        if (blockStack.isEmpty())
+        {
+            paintBadBlock(x, y, z, g2D);
+            return false;
+        }
+
+        // Derive colors from stack
+        int depth = blockStack.depth();
+
+        BlockStack.BlockPos blockPos;
+        while (!blockStack.isEmpty())
+        {
+            blockPos = blockStack.pop(true);
+
+            // Simple surface render
+            if(blockStack.renderDayColor==null || blockStack.renderNightColor==null)
+            {
+                blockStack.renderDayColor = blockPos.dayColor;
+                blockStack.renderNightColor = blockPos.nightColor;
+                continue;
+            }
+            else
+            {
+                blockStack.renderDayColor = RGB.blendWith(blockStack.renderDayColor, blockPos.dayColor, blockPos.blockMD.getAlpha());
+                blockStack.renderNightColor = RGB.blendWith(blockStack.renderNightColor, blockPos.dayColor, blockPos.blockMD.getAlpha());
+            }
+
+            blockPos.release();
+
+        } // end color stack
+
+        // Shouldn't happen
+        if(blockStack.renderDayColor==null || blockStack.renderNightColor==null)
+        {
+            paintBadBlock(x, y, z, g2D);
+            return false;
+        }
+
+        // Now add bevel for slope
+        if (!topBlockMd.hasFlag(BlockUtils.Flag.NoShadow))
+        {
+            int slopeY = mapBathymetry ? blockStack.bottomY : y;
+            float slope = getSurfaceSlope(chunkMd, topBlockMd, neighbors, x, slopeY, z);
+            if (slope != 1f)
+            {
+                blockStack.renderDayColor = RGB.bevelSlope(blockStack.renderDayColor, slope);
+                if (!cavePrePass)
+                {
+                    blockStack.renderNightColor = RGB.bevelSlope(blockStack.renderNightColor, slope);
+                }
             }
         }
 
-        // Paint depth layers
-        paintDepth(chunkMd, blockMD, x, y, z, g2D, false);
+        // And draw to the actual chunkimage
+        g2D.setComposite(BlockUtils.OPAQUE);
+        g2D.setPaint(RGB.paintOf(blockStack.renderDayColor));
+        g2D.fillRect(x,z,1,1);
 
+        if (!cavePrePass)
+        {
+            g2D.setPaint(RGB.paintOf(blockStack.renderNightColor));
+            g2D.fillRect(x+16,z,1,1);
+        }
+
+        return true;
+    }
+
+    protected int surfaceSlopeColor(int color, final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int ignored, int z)
+    {
+        float bevel = getSurfaceSlope(chunkMd, blockMD, neighbors, x, ignored, z);
+        if (bevel != 1f)
+        {
+            color = RGB.bevelSlope(color, bevel);
+        }
         return color;
     }
 
-    protected void surfaceSlopeColor(final RGB color, final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int ignored, int z)
+    protected float getSurfaceSlope(final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int ignored, int z)
     {
-
         float slope, bevel, sN, sNW, sW, sS, sE, sSE, sAvg;
         sS = sE = sSE = sNW = 1f;
         slope = chunkMd.surfaceSlopes[x][z];
@@ -414,10 +428,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
             bevel = Math.min(slope * 1.2f, 1.4f);
         }
 
-        if (bevel != 1f)
-        {
-            color.bevelSlope(bevel);
-        }
+        return bevel;
     }
 
     /**
@@ -488,7 +499,8 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                         if (blockMD.isWater())
                         {
                             paintY = y;
-                            paintDepth(chunkMd, BlockMD.getBlockMD(chunkMd, x, y, z), x, paintY, z, g2D, caveLighting);
+                            int color = getDepthColor(chunkMd, BlockMD.getBlockMD(chunkMd, x, y, z), neighbors, x, paintY, z, caveLighting);
+                            paintBlock(x, z, color, g2D);
                             chunkOk = true;
                             continue blockLoop;
                         }
@@ -498,7 +510,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                         {
                             if (!hasAir)
                             {
-                                paintBlock(x, z, Color.black, g2D);
+                                paintBlock(x, z, 0, g2D);
                                 chunkOk = true;
                                 continue blockLoop;
                             }
@@ -535,14 +547,6 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                             continue airloop;
                         }
 
-                        // Found transparent
-                        if (blockMD.hasFlag(BlockUtils.Flag.Transparency))
-                        {
-                            paintY = y;
-                            hasAir = true;
-                            continue airloop;
-                        }
-
                         // Arrived at a solid block with air above it
                         if (hasAir)
                         {
@@ -572,13 +576,13 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                         chunkOk = true;
 
                         //paintDimSurface(x, z, g2D);
-                        paintBlock(x, z, Color.black, g2D);
+                        paintBlock(x, z, 0, g2D);
                         continue blockLoop;
                     }
 
                     // Get block color
                     blockMD = BlockMD.getBlockMD(chunkMd, x, paintY, z);
-                    RGB color = getBaseBlockColor(chunkMd, blockMD, neighbors, x, paintY, z);
+                    int color = getBaseBlockColor(chunkMd, blockMD, neighbors, x, paintY, z);
 
                     boolean keepflat = blockMD.hasFlag(BlockUtils.Flag.NoShadow);
                     if (!keepflat)
@@ -605,7 +609,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                                 slope = (slope + sAvg) / 2f;
                             }
                             s = Math.max(slope * .8f, .1f);
-                            color.bevelSlope(s);
+                            color = RGB.bevelSlope(color, s);
 
                         }
                         else if (slope > 1)
@@ -620,7 +624,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                             }
                             s = slope * 1.2f;
                             s = Math.min(s, 1.4f);
-                            color.bevelSlope(s);
+                            color = RGB.bevelSlope(color, s);
                         }
                     }
 
@@ -628,11 +632,11 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                     if (caveLighting && lightLevel < 15)
                     {
                         float factor = Math.min(1F, (lightLevel / 16F));
-                        color.darken(factor);
+                        color = RGB.darken(color, factor);
                     }
 
                     // Draw block
-                    paintBlock(x, z, color.toColor(), g2D);
+                    paintBlock(x, z, color, g2D);
                     chunkOk = true;
 
                 }
@@ -654,16 +658,55 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
     protected void paintDimSurface(int x, int z, final Graphics2D g2D)
     {
-        if (!caveGreySurface)
+        g2D.setComposite(BlockUtils.SLIGHTLYCLEAR);
+        g2D.setColor(Color.black);
+        g2D.fillRect(x, z, 1, 1);
+        g2D.setComposite(BlockUtils.OPAQUE);
+    }
+
+    protected void buildColorStack(BlockStack blockStack, final ChunkMD.Set neighbors, int roofY, ChunkMD chunkMd, int x, int y, int z)
+    {
+        BlockMD blockMD;
+
+        // If under glass, add to color stack
+        if (roofY>y)
         {
-            g2D.setComposite(BlockUtils.SLIGHTLYCLEAR);
-            g2D.setColor(Color.black);
-            g2D.fillRect(x, z, 1, 1);
-            g2D.setComposite(BlockUtils.OPAQUE);
+            //advancedSurfaceRenderTimer.start();
+            while (roofY > y)
+            {
+                blockMD = BlockMD.getBlockMD(chunkMd, x, roofY, z);
+                if (blockMD != null && !blockMD.isAir())
+                {
+                    if (blockMD.isTransparentRoof())
+                    {
+                        blockStack.push(neighbors, chunkMd, blockMD, x, roofY, z);
+                    }
+                }
+                roofY--;
+            }
+            //advancedSurfaceRenderTimer.stop();
+        }
+
+        boolean fullTransparency = true;
+
+        while(y>0)
+        {
+            blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+
+            if (blockMD != null && !blockMD.isAir())
+            {
+                blockStack.push(neighbors, chunkMd, blockMD, x, y, z);
+
+                if(blockMD.getAlpha()==1f || (!fullTransparency && !blockMD.isWater()))
+                {
+                    break;
+                }
+            }
+            y--;
         }
     }
 
-    protected void paintDepth(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, final Graphics2D g2D, final boolean useLighting)
+    protected int getDepthColor(ChunkMD chunkMd, BlockMD blockMD, final ChunkMD.Set neighbors, int x, int y, int z, final boolean useLighting)
     {
         // See how deep the alpha goes
         Stack<BlockMD> stack = new Stack<BlockMD>();
@@ -696,62 +739,94 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
         }
 
-        RGB color;
+        Integer waterColor = null;
         boolean isWater = blockMD.isWater();
 
+        ArrayList<Integer> colors = new ArrayList<Integer>();
+
         // Get color for bottom of stack
-        color = getBaseBlockColor(chunkMd, stack.peek(), null, x, y, z);
+        int bottomColor = getBaseBlockColor(chunkMd, stack.peek(), neighbors, x, down, z);
 
         if (useLighting)
         {
-            adjustColorForDepth(chunkMd, color, x, down + 1, z);
+            bottomColor = adjustColorForDepth(chunkMd, bottomColor, x, down + 1, z);
         }
         else if (isWater)
         {
-            float factor = .68f;
-            color.darken(factor);
+            //float factor = .5f;
+            bottomColor = RGB.darken(bottomColor, .65f);
         }
 
-        g2D.setComposite(BlockUtils.OPAQUE);
-        g2D.setPaint(color.toColor());
-        g2D.fillRect(x, z, 1, 1);
+        if(isWater)
+        {
+         //   waterColor = bottomColor;
+        }
+
+        colors.add(bottomColor);
 
         // If bottom block is same as the top, don't bother with transparency
         if (stack.peek().getBlock() != blockMD.getBlock())
         {
             stack.pop(); // already used it
 
-            ArrayList<RGB> colors = new ArrayList<RGB>();
-            colors.add(color);
-
             while (!stack.isEmpty())
             {
+                down++;
+                Integer color = null;
                 BlockMD lowerBlock = stack.pop();
                 if (lowerBlock.isAir())
                 {
                     continue;
                 }
-                color = getBaseBlockColor(chunkMd, lowerBlock, null, x, y, z);
+
+//                if(lowerBlock.isWater())
+//                {
+//                    if(waterColor==null)
+//                    {
+//                        waterColor = getBaseBlockColor(chunkMd, blockMD, neighbors, x, y, z, true);
+//                        waterColor = dataCache.getColor(waterColor.darken(.6f));
+//                    }
+//                    color = waterColor;
+//                }
+//                else
+//                {
+//                    color = getBaseBlockColor(chunkMd, lowerBlock, null, x, y, z);
+//                }
+
+                color = getBaseBlockColor(chunkMd, lowerBlock, neighbors, x, down, z, false);
 
                 if (useLighting)
                 {
-                    adjustColorForDepth(chunkMd, color, x, ++down, z);
+                    color = adjustColorForDepth(chunkMd, color, x, ++down, z);
                 }
-                else if (isWater)
+
+                if(color==null)
                 {
-                    float factor = .7f;
-                    color.darken(factor);
+                    continue;
                 }
-                colors.add(color);
+                else
+                {
+                    colors.add(color);
+                }
+            }
+        }
+
+        if(colors.size()>1)
+        {
+            if(isWater)
+            {
+                colors.add(getBaseBlockColor(chunkMd, blockMD, neighbors, x, y, z, true));
             }
 
-            g2D.setComposite(BlockUtils.OPAQUE);
-            g2D.setPaint(RGB.average(colors).toColor());
-            g2D.fillRect(x, z, 1, 1);
+            return RGB.average(colors);
+        }
+        else
+        {
+            return bottomColor;
         }
     }
 
-    protected void adjustColorForDepth(ChunkMD chunkMd, RGB color, int x, int y, int z)
+    protected int adjustColorForDepth(ChunkMD chunkMd, int color, int x, int y, int z)
     {
         int lightLevel = Math.max(0, chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y, z));
         if (lightLevel < 15)
@@ -759,9 +834,10 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
             float diff = Math.min(1F, (lightLevel / 15F) + .05f);
             if (diff != 1.0)
             {
-                color.moonlight(diff);
+                return RGB.moonlight(color, diff);
             }
         }
+        return color;
     }
 
     protected int getHeightInSlice(final ChunkMD chunkMd, final int x, final int z, final int sliceMinY, final int sliceMaxY)

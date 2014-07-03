@@ -83,7 +83,7 @@ public class ColorCache implements IResourceManagerReloadListener {
     	}
 	}
 
-	public Color getBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z) {
+	public Integer getBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z) {
 		if(iconLoader==null) {
 			return null;
 		}
@@ -96,7 +96,7 @@ public class ColorCache implements IResourceManagerReloadListener {
         if(blockMD.isBiomeColored()) {
             color = getBiomeBlockColor(chunkMd, blockMD, x, y, z);
         }
-        return color;
+        return color.getRGB();
 	}
 	
 	private Color getBiomeBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z) {
@@ -225,7 +225,7 @@ public class ColorCache implements IResourceManagerReloadListener {
 	private Color getBaseColor(BlockMD blockMD, int x, int y, int z) {
         Color color = baseColors.get(blockMD);
         if(color==null) {
-            if(blockMD.isTransparent()) {
+            if(blockMD.isAir()) {
                 color = Color.white;
                 blockMD.setAlpha(0f);
                 blockMD.addFlags(BlockUtils.Flag.HasAir, BlockUtils.Flag.NotHideSky, BlockUtils.Flag.NoShadow);

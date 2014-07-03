@@ -1,7 +1,6 @@
 package net.techbrew.journeymap.properties;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -9,9 +8,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class FullMapProperties extends InGameMapProperties
 {
-    protected transient static final int CURRENT_REVISION = 3;
+    protected transient static final int CODE_REVISION = 3;
     protected transient final String name = "fullmap";
-    protected AtomicInteger revision = new AtomicInteger(CURRENT_REVISION);
 
     public final AtomicBoolean showCaves = new AtomicBoolean(true);
     public final AtomicBoolean showGrid = new AtomicBoolean(true);
@@ -34,15 +32,9 @@ public class FullMapProperties extends InGameMapProperties
     }
 
     @Override
-    public int getCurrentRevision()
+    public int getCodeRevision()
     {
-        return CURRENT_REVISION;
-    }
-
-    @Override
-    public int getRevision()
-    {
-        return revision.get();
+        return CODE_REVISION;
     }
 
     @Override
@@ -72,7 +64,7 @@ public class FullMapProperties extends InGameMapProperties
         result = 31 * result + showGrid.hashCode();
         result = 31 * result + showCaves.hashCode();
         result = 31 * result + name.hashCode();
-        result = 31 * result + revision.hashCode();
+        result = 31 * result + fileRevision;
         return result;
     }
 
@@ -80,7 +72,7 @@ public class FullMapProperties extends InGameMapProperties
     public String toString()
     {
         return "FullMapProperties: " +
-                "revision=" + revision +
+                "fileRevision=" + fileRevision +
                 ", showCaves=" + showCaves +
                 ", showMobs=" + showMobs +
                 ", showAnimals=" + showAnimals +
@@ -91,6 +83,8 @@ public class FullMapProperties extends InGameMapProperties
                 ", showGrid=" + showGrid +
                 ", forceUnicode=" + forceUnicode +
                 ", fontSmall=" + fontSmall +
+                ", textureSmall=" + textureSmall +
+                ", terrainAlpha=" + terrainAlpha +
                 ", entityIconSetName=" + entityIconSetName;
     }
 }

@@ -1,6 +1,5 @@
 package net.techbrew.journeymap.io.nbt;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -22,7 +21,7 @@ public class ChunkLoader {
 	
 	private static Logger logger = JourneyMap.getLogger();
 	
-	public static ChunkMD getChunkStubFromDisk(int chunkX, int chunkZ, File worldDir, World world) {
+	public static ChunkMD getChunkMdFromDisk(int chunkX, int chunkZ, File worldDir, World world) {
 		
 		Chunk chunk = getChunkFromDisk(chunkX, chunkZ, worldDir, world);
 		if(chunk==null) {
@@ -32,7 +31,7 @@ public class ChunkLoader {
 		
 	}
 	
-	public static ChunkMD getChunkStubFromMemory(int chunkX, int chunkZ, World world) {
+	public static ChunkMD getChunkMdFromMemory(int chunkX, int chunkZ, World world) {
 		Chunk chunk = getChunkFromMemory(chunkX, chunkZ, world);
 		if(chunk!=null) {
 			return new ChunkMD(chunk, true, world);
@@ -40,23 +39,23 @@ public class ChunkLoader {
 		return null;
 	}
 
-    public static ChunkMD refreshChunkStubFromMemory(ChunkMD chunkMD, World world) {
-        Chunk chunk = getChunkFromMemory(chunkMD.coord.chunkXPos, chunkMD.coord.chunkZPos, world);
+    public static ChunkMD refreshChunkMdFromMemory(ChunkMD chunkMD) {
+        if(chunkMD==null)
+        {
+            return null;
+        }
+
+        Chunk chunk = getChunkFromMemory(chunkMD.coord.chunkXPos, chunkMD.coord.chunkZPos, chunkMD.worldObj);
         if(chunk!=null) {
             chunkMD.stub.updateFrom(chunk);
+            chunkMD.setCurrent(true);
             return chunkMD;
         } else {
             return null;
         }
     }
-
-	public static ChunkMD getChunkStubFromMemory(int chunkX, int chunkZ, Minecraft minecraft) {
-		Chunk chunk = getChunkFromMemory(chunkX, chunkZ, minecraft.theWorld);
-		if(chunk!=null) return new ChunkMD(chunk, true, minecraft.theWorld);
-		return null;
-	}
 	
-	public static Chunk getChunkFromMemory(int chunkX, int chunkZ, World world) {
+	private static Chunk getChunkFromMemory(int chunkX, int chunkZ, World world) {
 		Chunk result  = null;
 		if(world.getChunkProvider().chunkExists(chunkX, chunkZ)) {
 			Chunk theChunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
@@ -68,8 +67,8 @@ public class ChunkLoader {
 		}
 		return result;
 	}
-	
-	public static Chunk getChunkFromDisk(int chunkX, int chunkZ, File worldDir, World world) {
+
+    private static Chunk getChunkFromDisk(int chunkX, int chunkZ, File worldDir, World world) {
 		
 		Chunk chunk = null; // Utils.getChunkIfAvailable(world, coord.chunkXPos, coord.chunkZPos);
 		if(chunk==null) {

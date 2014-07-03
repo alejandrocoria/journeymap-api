@@ -10,7 +10,6 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.BlockUtils;
 import net.techbrew.journeymap.model.ChunkMD;
-import net.techbrew.journeymap.model.RGB;
 
 import java.awt.*;
 
@@ -66,7 +65,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
                     BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
 					boolean isLava = (blockMD.getBlock() == Blocks.lava || blockMD.getBlock() == Blocks.flowing_lava);
 
-					RGB color = blockMD.getColor(chunkMd, x, y, z);
+					int color = blockMD.getColor(chunkMd, x, y, z);
 					
 					// Get light level
 					if(isLava) {
@@ -74,7 +73,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 					} else {
 						lightLevel = chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z);
 						if(y==sliceMaxY) {
-							paintBlock(x, z, Color.BLACK, g2D);							
+							paintBlock(x, z, 0, g2D);
 							continue;
 						} else if (lightLevel < 3) {
 							lightLevel = 3;
@@ -100,7 +99,7 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 								slope = (slope+sAvg)/2f;
 							}
 							s = Math.max(slope * .9f, .2f);
-							color.bevelSlope(s);
+                            color = RGB.bevelSlope(color, s);
 		
 						} else if(slope>1) {
 							
@@ -111,18 +110,18 @@ public class ChunkNetherRenderer extends BaseRenderer implements IChunkRenderer 
 							}
 							s = slope * 1.2f;
 							s = Math.min(s, 1.2f);
-							color.bevelSlope(s);
+                            color = RGB.bevelSlope(color, s);
 						}
 					}
 		
 					// Darken based on light level
 					if (lightLevel < 14) {
-                        color.darken(Math.min(1F, (lightLevel / 15F)));
+                        color = RGB.darken(color, Math.min(1F, (lightLevel / 15F)));
 					}
 		
 					// Draw lighted block
 					g2D.setComposite(BlockUtils.OPAQUE);
-					g2D.setPaint(color.toColor());
+					g2D.setPaint(RGB.paintOf(color));
 					g2D.fillRect(x, z, 1, 1);
 					chunkOk = true;
 		

@@ -1,11 +1,17 @@
 package net.techbrew.journeymap.model;
 
+import com.google.common.base.Optional;
+import com.google.common.cache.CacheLoader;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.io.nbt.ChunkLoader;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -27,7 +33,9 @@ public class ChunkMD {
 	public final ChunkStub stub;
 	public final ChunkCoordIntPair coord;
 	public Boolean render;
-	private int discards;
+    @Deprecated
+    private int discards;
+    protected boolean current;
 	
 	public ChunkMD(Chunk chunk, Boolean render, World worldObj) {
 		this(chunk,render,worldObj,false);
@@ -47,12 +55,24 @@ public class ChunkMD {
 		this.worldHeight = worldObj.getActualHeight();		
 		this.hasNoSky = worldObj.provider.hasNoSky;
 		this.coord = new ChunkCoordIntPair(stub.xPosition, stub.zPosition);
+        this.current = true;
 	}
-	
-	public int discard(int i) {
-		discards = Math.max(0, discards+i);
-		return discards;
-	}
+
+    @Deprecated
+    public int discard(int i) {
+        discards = Math.max(0, discards+i);
+        return discards;
+    }
+
+    public boolean isCurrent()
+    {
+        return current;
+    }
+
+    public void setCurrent(boolean current)
+    {
+        this.current = current;
+    }
 
     public Block getBlock(int x, int y, int z) {
         return stub.getBlock(x, y, z);
@@ -67,7 +87,7 @@ public class ChunkMD {
 	 * @return
 	 */
 	public int getSavedLightValue(EnumSkyBlock par1EnumSkyBlock, int x, int y, int z) {
-		return stub.getSavedLightValue(par1EnumSkyBlock, x, Math.min(y, worldHeight-1), z);
+		return stub.getSavedLightValue(par1EnumSkyBlock, x, Math.min(y, worldHeight - 1), z);
 	}
 	
 	/**
@@ -75,13 +95,13 @@ public class ChunkMD {
      * Returns the value in the height map at this x, z coordinate in the chunk, disregarding
      * blocks that shouldn't be used as the top block.
      */
-    public int getSlopeHeightValue(int x, int z)
+    public int getSlopeHeightValue(int x, int z, boolean ignoreWater)
     {
     	try {
 	    	int y = getHeightValue(x, z);
 	    	if(y<1) return 0;
             Block block = getBlock(x,y,z);
-            while(y>0 && BlockUtils.hasFlag(block, BlockUtils.Flag.NoShadow)) {
+            while(y>0 && block==null || BlockUtils.hasFlag(block, BlockUtils.Flag.NoShadow) || (ignoreWater && (block== Blocks.flowing_water || block==Blocks.water))) {
                 y--;
                 block = getBlock(x,y,z);
             }
@@ -100,6 +120,11 @@ public class ChunkMD {
     public int getAbsoluteHeightValue(int x, int z)
     {
         return stub.getPrecipitationHeight(x, z);
+    }
+
+    public int getLightOpacity(BlockMD blockMD, int localX, int y, int localZ)
+    {
+        return blockMD.getBlock().getLightOpacity(this.worldObj, (this.coord.chunkXPos<<4) + localX, y, (this.coord.chunkZPos<<4) + localZ);
     }
 
 	@Override
@@ -156,4 +181,16 @@ public class ChunkMD {
 		}
 		
 	}
+
+    public static class SimpleCacheLoader extends CacheLoader<ChunkCoordIntPair, Optional<ChunkMD>>
+    {
+        Minecraft mc = FMLClientHandler.instance().getClient();
+
+        @Override
+        public Optional<ChunkMD> load(ChunkCoordIntPair coord) throws Exception
+        {
+            ChunkMD chunkMD = ChunkLoader.getChunkMdFromMemory(coord.chunkXPos, coord.chunkZPos, mc.theWorld);
+            return Optional.fromNullable(chunkMD);
+        }
+    }
 }

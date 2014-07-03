@@ -39,7 +39,7 @@ public abstract class BaseRenderer
 //        g2D.setPaint(Color.magenta);
 //        g2D.fillRect(x, z, 1, 1);
         badBlockCount++;
-        if (badBlockCount % 100 == 0)
+        if (badBlockCount==1 || badBlockCount % 100 == 0)
         {
             JourneyMap.getLogger().warning(
                     "Bad block at " + x + "," + y + "," + z //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -56,11 +56,11 @@ public abstract class BaseRenderer
      * @param color
      * @param g2D
      */
-    public void paintBlock(final int x, final int z, final Color color,
+    public void paintBlock(final int x, final int z, final int color,
                            final Graphics2D g2D)
     {
         g2D.setComposite(BlockUtils.OPAQUE);
-        g2D.setColor(color);
+        g2D.setPaint(RGB.paintOf(color));
         g2D.fillRect(x, z, 1, 1);
     }
 
@@ -76,7 +76,7 @@ public abstract class BaseRenderer
      * @param defaultVal
      * @return
      */
-    protected Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, float defaultVal)
+    protected Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, float defaultVal, boolean ignoreWater)
     {
         int newX = x + offsetX;
         int newZ = z + offsetz;
@@ -107,7 +107,7 @@ public abstract class BaseRenderer
 
         if (chunk != null)
         {
-            return (float) chunk.getSlopeHeightValue(newX, newZ);
+            return (float) chunk.getSlopeHeightValue(newX, newZ, ignoreWater);
         }
         else
         {
@@ -366,7 +366,7 @@ public abstract class BaseRenderer
         }
 
         ChunkMD chunk = null;
-        if (search)
+        if (search && neighbors!=null)
         {
             ChunkCoordIntPair coord = new ChunkCoordIntPair(chunkX, chunkZ);
             chunk = neighbors.get(coord);

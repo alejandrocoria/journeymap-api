@@ -41,7 +41,7 @@ public class MiniMap
 {
     private static final float lightmapS = (float) (15728880 % 65536) / 1f;
     private static final float lightmapT = (float) (15728880 / 65536) / 1f;
-    private static final long labelRefreshRate = 1001;
+    private static final long labelRefreshRate = 400;
 
     private final Logger logger = JourneyMap.getLogger();
     private final Minecraft mc = FMLClientHandler.instance().getClient();

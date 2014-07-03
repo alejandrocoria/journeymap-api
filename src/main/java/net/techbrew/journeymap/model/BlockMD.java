@@ -73,7 +73,7 @@ public class BlockMD implements Serializable {
 
     public final CacheKey key;
     private transient Block block;
-	private Color color;
+	private Integer color;
 	private float alpha;
     private AlphaComposite alphaComposite;
     private final EnumSet<BlockUtils.Flag> flags;
@@ -89,9 +89,9 @@ public class BlockMD implements Serializable {
      */
     public static BlockMD getBlockMD(ChunkMD chunkMd, int x, int y, int z) {
         try {
-            Block block;
-            int meta;
-            boolean isAir = false;
+        Block block;
+        int meta;
+        boolean isAir = false;
             if(y>=0) {
                 block = chunkMd.stub.getBlock(x, y, z);
                 isAir = block.isAir(chunkMd.worldObj, x, y, z);
@@ -123,20 +123,20 @@ public class BlockMD implements Serializable {
 
         Block block = GameRegistry.findBlock(key.uid.modId, key.uid.name);
         if(block==null)
-        {
+    {
             block = GameRegistry.findBlock(null, key.uid.name);
             if(block==null)
-            {
+        {
                 if(!key.uid.name.equals("Air")) {
                     JourneyMap.getLogger().warning("Block not found for " + key.uid);
                     return new BlockMD(key, Blocks.air, "ERROR-" + block.getClass().getName());
                 }
                 else
-                {
+            {
                     return new BlockMD(key, Blocks.air, "Air");
-                }
             }
         }
+    }
 
         String prefix = "";
         String suffix = ":" + key.meta;
@@ -159,7 +159,7 @@ public class BlockMD implements Serializable {
 
         BlockMD blockMD = new BlockMD(key, block, name);
         if(blockMD.isAir()) {
-            blockMD.color = Color.CYAN; // Should be obvious if it gets displayed somehow.
+            blockMD.color = Color.CYAN.getRGB(); // Should be obvious if it gets displayed somehow.
             blockMD.setAlpha(0f);
         } else {
             if(BlockUtils.hasAlpha(block)) {
@@ -193,30 +193,34 @@ public class BlockMD implements Serializable {
             this.flags.add(flag);
         }
     }
-	
-	public RGB getColor(ChunkMD chunkMd, int x, int y, int z) {
+
+    /**
+     * Gets block color using chunk-local coords (x and z in {0-15} )
+     */
+	public int getColor(ChunkMD chunkMd, int x, int y, int z) {
 
         if(isAir())
         {
             // This shouldn't be called
-            JourneyMap.getLogger();
+            return 0;
         }
 
 		if(this.color!=null) {
-            return new RGB(this.color);
+            return this.color;
         } else {
 
-			Color color = ColorCache.getInstance().getBlockColor(chunkMd, this, x, y, z);
-            if(color==null) {
-                return new RGB(Color.BLACK);
+			Integer color = ColorCache.getInstance().getBlockColor(chunkMd, this, x, y, z);
+            if(color==null)
+            {
+                this.color = 0;
             }
 
-            if(isBiomeColored()) {
-                return new RGB(color);
-            } else {
-                this.color = color;
-                return new RGB(color);
+            if(!isBiomeColored())
+            {
+                this.color = color; // save
             }
+
+                return color;
 		}
 	}
 
@@ -252,12 +256,12 @@ public class BlockMD implements Serializable {
         return block;
 	}
 
-    public boolean isTransparent() {
-        return block.getMaterial() == Material.air;
+    public boolean hasTranparency() {
+        return hasFlag(BlockUtils.Flag.Transparency);
     }
 
     public boolean isAir() {
-        return hasFlag(BlockUtils.Flag.HasAir);
+        return hasFlag(BlockUtils.Flag.HasAir) || block.getMaterial() == Material.air;
     }
 
     public boolean isIce() {

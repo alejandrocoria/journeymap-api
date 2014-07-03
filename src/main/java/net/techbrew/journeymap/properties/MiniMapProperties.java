@@ -10,9 +10,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class MiniMapProperties extends InGameMapProperties
 {
-    protected transient static final int CURRENT_REVISION = 3;
+    protected transient static final int CODE_REVISION = 3;
     protected transient final String name = "minimap";
-    protected int revision = CURRENT_REVISION;
 
     public final AtomicBoolean enabled = new AtomicBoolean(true);
     public final AtomicReference<DisplayVars.Shape> shape = new AtomicReference<DisplayVars.Shape>(DisplayVars.Shape.SmallSquare);
@@ -39,15 +38,9 @@ public class MiniMapProperties extends InGameMapProperties
     }
 
     @Override
-    public int getCurrentRevision()
+    public int getCodeRevision()
     {
-        return CURRENT_REVISION;
-    }
-
-    @Override
-    public int getRevision()
-    {
-        return revision;
+        return CODE_REVISION;
     }
 
     @Override
@@ -75,7 +68,7 @@ public class MiniMapProperties extends InGameMapProperties
     {
         int result = super.hashCode();
         result = 31 * result + name.hashCode();
-        result = 31 * result + revision;
+        result = 31 * result + fileRevision;
         result = 31 * result + enabled.hashCode();
         result = 31 * result + shape.hashCode();
         result = 31 * result + position.hashCode();
@@ -89,7 +82,7 @@ public class MiniMapProperties extends InGameMapProperties
     public String toString()
     {
         return "MiniMapProperties: " +
-                "revision=" + revision +
+                "fileRevision=" + fileRevision +
                 ", showSelf=" + showSelf +
                 ", showMobs=" + showMobs +
                 ", showAnimals=" + showAnimals +
@@ -105,6 +98,8 @@ public class MiniMapProperties extends InGameMapProperties
                 ", showWaypointLabels=" + showWaypointLabels +
                 ", forceUnicode=" + forceUnicode +
                 ", fontSmall=" + fontSmall +
+                ", textureSmall=" + textureSmall +
+                ", terrainAlpha=" + terrainAlpha +
                 ", entityIconSetName=" + entityIconSetName;
     }
 }

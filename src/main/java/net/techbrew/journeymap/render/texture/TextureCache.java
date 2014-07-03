@@ -258,7 +258,7 @@ public class TextureCache {
         String texName = String.format("%s/%s", setName, iconPath);
 		synchronized(entityImageMap) {
 			TextureImpl tex = entityImageMap.get(texName);
-            if(tex==null || !tex.hasImage()) {
+            if(tex==null || (!tex.hasImage() && tex.retainImage)) {
 				BufferedImage img = FileHandler.getEntityIconFromFile(setName, iconPath, getUnknownEntity().getImage()); //$NON-NLS-1$
                 if(img!=null){
                     if(tex!=null) {

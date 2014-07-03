@@ -7,10 +7,10 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.io.nbt.ChunkLoader;
 import net.techbrew.journeymap.model.BlockUtils;
 import net.techbrew.journeymap.model.ChunkMD;
 import net.techbrew.journeymap.model.EntityDTO;
@@ -28,7 +28,8 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
         Minecraft mc = FMLClientHandler.instance().getClient();
         EntityClientPlayerMP player = mc.thePlayer;
 
-        EntityDTO dto = new EntityDTO(player, false);
+        EntityDTO dto = DataCache.instance().getEntityDTO(player);
+        dto.update(player, false);
         dto.biome = getPlayerBiome(mc, player) ;
         dto.underground = playerIsUnderground(mc, player) ;
         return dto;
@@ -42,7 +43,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
         int x = ((int) Math.floor(player.posX) % 16) & 15;
         int z = ((int) Math.floor(player.posZ) % 16) & 15;
 
-        ChunkMD playerChunk = ChunkLoader.getChunkStubFromMemory(player.chunkCoordX, player.chunkCoordZ, mc);
+        ChunkMD playerChunk = DataCache.instance().getChunkMD(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ));
         if (playerChunk != null)
         {
             return playerChunk.stub.getBiomeGenForWorldCoords(x, z, mc.theWorld.getWorldChunkManager()).biomeName;

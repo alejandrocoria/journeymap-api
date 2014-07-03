@@ -9,9 +9,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class WebMapProperties extends MapProperties
 {
-    protected transient static final int CURRENT_REVISION = 3;
+    protected transient static final int CODE_REVISION = 3;
     protected transient final String name = "webmap";
-    protected AtomicInteger revision = new AtomicInteger(CURRENT_REVISION);
 
     public final AtomicBoolean enabled = new AtomicBoolean(true);
     public final AtomicInteger port = new AtomicInteger(8080);
@@ -35,15 +34,9 @@ public class WebMapProperties extends MapProperties
     }
 
     @Override
-    public int getCurrentRevision()
+    public int getCodeRevision()
     {
-        return CURRENT_REVISION;
-    }
-
-    @Override
-    public int getRevision()
-    {
-        return revision.get();
+        return CODE_REVISION;
     }
 
     @Override
@@ -71,7 +64,7 @@ public class WebMapProperties extends MapProperties
     {
         int result = super.hashCode();
         result = 31 * result + name.hashCode();
-        result = 31 * result + revision.hashCode();
+        result = 31 * result + fileRevision;
         result = 31 * result + enabled.hashCode();
         result = 31 * result + port.hashCode();
         result = 31 * result + browserPoll.hashCode();
@@ -82,7 +75,7 @@ public class WebMapProperties extends MapProperties
     public String toString()
     {
         return "WebMapProperties: " +
-                "revision=" + revision +
+                "fileRevision=" + fileRevision +
                 ", showMobs=" + showMobs +
                 ", showAnimals=" + showAnimals +
                 ", showVillagers=" + showVillagers +

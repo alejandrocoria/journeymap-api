@@ -8,9 +8,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class WaypointProperties extends PropertiesBase implements Comparable<WaypointProperties>
 {
-    protected transient static final int CURRENT_REVISION = 2;
+    protected transient static final int CODE_REVISION = 3;
     protected transient final String name = "waypoint";
-    protected int revision = CURRENT_REVISION;
 
     public final AtomicBoolean managerEnabled = new AtomicBoolean(true);
     public final AtomicBoolean beaconEnabled = new AtomicBoolean(true);
@@ -33,15 +32,9 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     }
 
     @Override
-    public int getCurrentRevision()
+    public int getCodeRevision()
     {
-        return CURRENT_REVISION;
-    }
-
-    @Override
-    public int getRevision()
-    {
-        return revision;
+        return CODE_REVISION;
     }
 
     @Override
@@ -64,7 +57,7 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     public int hashCode()
     {
         int result = name.hashCode();
-        result = 31 * result + revision;
+        result = 31 * result + fileRevision;
         result = 31 * result + managerEnabled.hashCode();
         result = 31 * result + beaconEnabled.hashCode();
         result = 31 * result + showTexture.hashCode();
@@ -91,7 +84,7 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     public String toString()
     {
         return "WaypointProperties: " +
-                "revision=" + revision +
+                "fileRevision=" + fileRevision +
                 ", managerEnabled=" + managerEnabled +
                 ", beaconEnabled=" + beaconEnabled +
                 ", showTexture=" + showTexture +

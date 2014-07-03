@@ -30,7 +30,6 @@ import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.server.JMServer;
 import net.techbrew.journeymap.task.ITaskManager;
-import net.techbrew.journeymap.task.MapPlayerTask;
 import net.techbrew.journeymap.task.TaskController;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import net.techbrew.journeymap.thread.TaskThread;
@@ -406,7 +405,6 @@ public class JourneyMap
         ColorCache.getInstance().reset();
         BlockUtils.initialize();
         DataCache.instance().purge();
-        MapPlayerTask.clearCache();
         StatTimer.resetAll();
         TaskThread.reset();
         TextureCache.instance().purge();

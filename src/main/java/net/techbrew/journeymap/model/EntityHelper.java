@@ -21,6 +21,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 
@@ -30,6 +31,10 @@ public class EntityHelper
 {
     private static int lateralDistance = JourneyMap.getInstance().coreProperties.chunkOffset.get() * 8;
     private static int verticalDistance = lateralDistance / 2;
+
+    public static EntityDistanceComparator entityDistanceComparator = new EntityDistanceComparator();
+    public static EntityDTODistanceComparator entityDTODistanceComparator = new EntityDTODistanceComparator();
+    public static EntityMapComparator entityMapComparator = new EntityMapComparator();
 
     public static List<EntityDTO> getEntitiesNearby(String timerName, int maxEntities, boolean hostile, Class... entityClasses)
     {
@@ -55,7 +60,10 @@ public class EntityHelper
                     {
                         if(entityClass.isAssignableFrom(entity.getClass()))
                         {
-                            list.add(new EntityDTO((EntityLivingBase) entity, hostile));
+                            EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
+                            EntityDTO dto = DataCache.instance().getEntityDTO(entityLivingBase);
+                            dto.update(entityLivingBase, hostile);
+                            list.add(dto);
                             break;
                         }
                     }
@@ -65,7 +73,8 @@ public class EntityHelper
             if(list.size()>maxEntities)
             {
                 int before = list.size();
-                Collections.sort(list, new EntityDTODistanceComparator(mc.thePlayer));
+                entityDTODistanceComparator.player = mc.thePlayer;
+                Collections.sort(list, entityDTODistanceComparator);
                 list = list.subList(0, maxEntities);
             }
         }
@@ -114,14 +123,17 @@ public class EntityHelper
         int max = JourneyMap.getInstance().coreProperties.maxPlayersData.get();
         if(allPlayers.size()>max)
         {
-            Collections.sort(allPlayers, new EntityDistanceComparator(mc.thePlayer));
+            entityDistanceComparator.player = mc.thePlayer;
+            Collections.sort(allPlayers, entityDistanceComparator);
             allPlayers = allPlayers.subList(0, max);
         }
 
         List<EntityDTO> playerDTOs = new ArrayList<EntityDTO>(allPlayers.size());
         for(EntityPlayer player : allPlayers)
         {
-            playerDTOs.add(new EntityDTO(player, false));
+            EntityDTO dto = DataCache.instance().getEntityDTO(player);
+            dto.update(player, false);
+            playerDTOs.add(dto);
         }
 
         timer.stop();
@@ -251,7 +263,7 @@ public class EntityHelper
         }
     }
 
-    public static class EntityMapComparator implements Comparator<EntityDTO>
+    private static class EntityMapComparator implements Comparator<EntityDTO>
     {
 
         @Override
@@ -290,15 +302,10 @@ public class EntityHelper
 
     }
 
-    public static class EntityDistanceComparator implements Comparator<Entity>
+    private static class EntityDistanceComparator implements Comparator<Entity>
     {
 
-        final EntityPlayer player;
-
-        EntityDistanceComparator(EntityPlayer player)
-        {
-            this.player = player;
-        }
+        EntityPlayer player;
 
         @Override
         public int compare(Entity o1, Entity o2)
@@ -307,14 +314,9 @@ public class EntityHelper
         }
     }
 
-    public static class EntityDTODistanceComparator implements Comparator<EntityDTO>
+    private static class EntityDTODistanceComparator implements Comparator<EntityDTO>
     {
-        final EntityPlayer player;
-
-        EntityDTODistanceComparator(EntityPlayer player)
-        {
-            this.player = player;
-        }
+        EntityPlayer player;
 
         @Override
         public int compare(EntityDTO o1, EntityDTO o2)

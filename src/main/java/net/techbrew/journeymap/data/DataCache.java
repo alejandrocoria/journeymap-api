@@ -1,84 +1,114 @@
 package net.techbrew.journeymap.data;
 
+import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheStats;
 import com.google.common.cache.LoadingCache;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.io.nbt.ChunkLoader;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.model.ChunkMD;
 import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.model.Waypoint;
+import net.techbrew.journeymap.render.draw.DrawEntityStep;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Singleton cache of data produced by IDataProviders.
- * <p/>
- * Uses on-demand-holder pattern for singleton management.
+ * The mother of all cache managers.
  *
  * @author mwoodman
  */
 public class DataCache
 {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-
     final LoadingCache<Long, Map> all;
-    final LoadingCache<Class, Map<String,EntityDTO>> animals;
-    final LoadingCache<Class, Map<String,EntityDTO>> mobs;
-    final LoadingCache<Class, Map<String,EntityDTO>> players;
-    final LoadingCache<Class, Map<String,EntityDTO>> villagers;
+    final LoadingCache<Class, Map<String, EntityDTO>> animals;
+    final LoadingCache<Class, Map<String, EntityDTO>> mobs;
+    final LoadingCache<Class, Map<String, EntityDTO>> players;
+    final LoadingCache<Class, Map<String, EntityDTO>> villagers;
     final LoadingCache<Class, Collection<Waypoint>> waypoints;
     final LoadingCache<Class, EntityDTO> player;
     final LoadingCache<Class, WorldData> world;
-    final LoadingCache<Class, Map<String,Object>> messages;
+    final LoadingCache<Class, Map<String, Object>> messages;
+    final LoadingCache<Entity, DrawEntityStep> entityDrawSteps;
+    final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
+    //final LoadingCache<Integer, RGB> colors;
+    final LoadingCache<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadata;
 
     // Private constructor
     private DataCache()
     {
         AllData allData = new AllData();
-        all = CacheBuilder.newBuilder().recordStats().maximumSize(1).expireAfterWrite(allData.getTTL(), TimeUnit.MILLISECONDS).build(allData);
+        all = getCacheBuilder().maximumSize(1).expireAfterWrite(allData.getTTL(), TimeUnit.MILLISECONDS).build(allData);
 
         AnimalsData animalsData = new AnimalsData();
-        animals = CacheBuilder.newBuilder().recordStats().expireAfterWrite(animalsData.getTTL(), TimeUnit.MILLISECONDS).build(animalsData);
+        animals = getCacheBuilder().expireAfterWrite(animalsData.getTTL(), TimeUnit.MILLISECONDS).build(animalsData);
 
         MobsData mobsData = new MobsData();
-        mobs = CacheBuilder.newBuilder().recordStats().expireAfterWrite(mobsData.getTTL(), TimeUnit.MILLISECONDS).build(mobsData);
+        mobs = getCacheBuilder().expireAfterWrite(mobsData.getTTL(), TimeUnit.MILLISECONDS).build(mobsData);
 
         PlayerData playerData = new PlayerData();
-        player = CacheBuilder.newBuilder().recordStats().expireAfterWrite(playerData.getTTL(), TimeUnit.MILLISECONDS).build(playerData);
+        player = CacheBuilder.newBuilder().expireAfterWrite(playerData.getTTL(), TimeUnit.MILLISECONDS).build(playerData);
 
         PlayersData playersData = new PlayersData();
-        players = CacheBuilder.newBuilder().recordStats().expireAfterWrite(playersData.getTTL(), TimeUnit.MILLISECONDS).build(playersData);
+        players = getCacheBuilder().expireAfterWrite(playersData.getTTL(), TimeUnit.MILLISECONDS).build(playersData);
 
         VillagersData villagersData = new VillagersData();
-        villagers = CacheBuilder.newBuilder().recordStats().expireAfterWrite(villagersData.getTTL(), TimeUnit.MILLISECONDS).build(villagersData);
+        villagers = getCacheBuilder().expireAfterWrite(villagersData.getTTL(), TimeUnit.MILLISECONDS).build(villagersData);
 
         WaypointsData waypointsData = new WaypointsData();
-        waypoints = CacheBuilder.newBuilder().recordStats().expireAfterWrite(waypointsData.getTTL(), TimeUnit.MILLISECONDS).build(waypointsData);
-        
+        waypoints = getCacheBuilder().expireAfterWrite(waypointsData.getTTL(), TimeUnit.MILLISECONDS).build(waypointsData);
+
         WorldData worldData = new WorldData();
-        world = CacheBuilder.newBuilder().recordStats().expireAfterWrite(worldData.getTTL(), TimeUnit.MILLISECONDS).build(worldData);
+        world = getCacheBuilder().expireAfterWrite(worldData.getTTL(), TimeUnit.MILLISECONDS).build(worldData);
 
         MessagesData messagesData = new MessagesData();
-        messages = CacheBuilder.newBuilder().recordStats().expireAfterWrite(messagesData.getTTL(), TimeUnit.MILLISECONDS).build(messagesData);
-    }
+        messages = getCacheBuilder().expireAfterWrite(messagesData.getTTL(), TimeUnit.MILLISECONDS).build(messagesData);
 
-    // On-demand-holder for instance
-    private static class Holder
-    {
-        private static final DataCache INSTANCE = new DataCache();
+        entityDrawSteps = getCacheBuilder().weakKeys().build(new DrawEntityStep.SimpleCacheLoader());
+
+        entityDTOs = getCacheBuilder().weakKeys().build(new EntityDTO.SimpleCacheLoader());
+
+        long colorTimeout = JourneyMap.getInstance().coreProperties.chunkPoll.get() * 5;
+        //colors = getCacheBuilder().expireAfterAccess(colorTimeout, TimeUnit.MILLISECONDS).build(new RGB.SimpleCacheLoader());
+
+        long chunkTimeout = JourneyMap.getInstance().coreProperties.chunkPoll.get() * 3;
+        chunkMetadata = getCacheBuilder().expireAfterWrite(chunkTimeout, TimeUnit.MILLISECONDS).build(new ChunkMD.SimpleCacheLoader());
     }
 
     // Get singleton instance.  Concurrency-safe.
     public static DataCache instance()
     {
         return Holder.INSTANCE;
+    }
+
+    public static EntityDTO getPlayer()
+    {
+        return instance().getPlayer(false);
+    }
+
+    /**
+     * Get a CacheBuilder with common configuration already set.
+     *
+     * @return
+     */
+    private CacheBuilder<Object, Object> getCacheBuilder()
+    {
+        CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
+        if (JourneyMap.getInstance().coreProperties.recordCacheStats.get())
+        {
+            builder.recordStats();
+        }
+        return builder;
     }
 
     public Map getAll(long since)
@@ -157,11 +187,6 @@ public class DataCache
         }
     }
 
-    public static EntityDTO getPlayer()
-    {
-        return instance().getPlayer(false);
-    }
-
     public EntityDTO getPlayer(boolean forceRefresh)
     {
         synchronized (player)
@@ -206,7 +231,7 @@ public class DataCache
     {
         synchronized (waypoints)
         {
-            if(WaypointsData.isReiMinimapEnabled() || WaypointsData.isVoxelMapEnabled())
+            if (WaypointsData.isReiMinimapEnabled() || WaypointsData.isVoxelMapEnabled())
             {
                 // Caching needed
                 try
@@ -224,7 +249,7 @@ public class DataCache
                     return Collections.EMPTY_LIST;
                 }
             }
-            else if(WaypointsData.isManagerEnabled())
+            else if (WaypointsData.isManagerEnabled())
             {
                 // The store is the cache
                 return WaypointStore.instance().getAll();
@@ -273,6 +298,88 @@ public class DataCache
                 JourneyMap.getLogger().severe("ExecutionException in getWorld: " + LogFormatter.toString(e));
                 return new WorldData();
             }
+        }
+    }
+
+    public DrawEntityStep getDrawEntityStep(Entity entity)
+    {
+        synchronized (entityDrawSteps)
+        {
+            return entityDrawSteps.getUnchecked(entity);
+        }
+    }
+
+    public EntityDTO getEntityDTO(EntityLivingBase entity)
+    {
+        synchronized (entityDTOs)
+        {
+            return entityDTOs.getUnchecked(entity);
+        }
+    }
+
+//    public RGB getColor(Color color)
+//    {
+//        return getColor(color.getRGB());
+//    }
+//
+//    public RGB getColor(int rgbInt)
+//    {
+//        synchronized (colors)
+//        {
+//            return colors.getUnchecked(rgbInt);
+//        }
+//    }
+
+    public ChunkMD getChunkMD(ChunkCoordIntPair coord)
+    {
+        return getChunkMD(coord, false);
+    }
+
+    public ChunkMD getChunkMD(ChunkCoordIntPair coord, boolean ensureCurrent)
+    {
+        synchronized (chunkMetadata)
+        {
+            ChunkMD chunkMD = null;
+
+            try
+            {
+                Optional<ChunkMD> optional = chunkMetadata.get(coord);
+                if(optional.isPresent())
+                {
+                    chunkMD = optional.get();
+                }
+                else
+                {
+                    chunkMetadata.invalidate(coord);
+                }
+            }
+            catch(Throwable e)
+            {
+                JourneyMap.getLogger().warning("Unexpected error getting ChunkMD from cache: " + e);
+            }
+
+            if (ensureCurrent && chunkMD != null && !chunkMD.isCurrent())
+            {
+                chunkMD = ChunkLoader.refreshChunkMdFromMemory(chunkMD);
+            }
+
+            return chunkMD;
+        }
+    }
+
+    public Set<ChunkCoordIntPair> getCachedChunkCoordinates()
+    {
+        synchronized (chunkMetadata)
+        {
+            return chunkMetadata.asMap().keySet();
+        }
+    }
+
+    public void invalidateChunkMD(ChunkCoordIntPair coord)
+    {
+        synchronized (chunkMetadata)
+        {
+            chunkMetadata.invalidate(coord);
         }
     }
 
@@ -325,36 +432,71 @@ public class DataCache
         {
             messages.invalidateAll();
         }
+
+        synchronized (entityDrawSteps)
+        {
+            entityDrawSteps.invalidateAll();
+        }
+
+        synchronized (entityDTOs)
+        {
+            entityDTOs.invalidateAll();
+        }
+
+//        synchronized (colors)
+//        {
+//            colors.invalidateAll();
+//        }
+
+        synchronized (chunkMetadata)
+        {
+            chunkMetadata.invalidateAll();
+        }
     }
 
-    public String getDebugHtml() {
+    public String getDebugHtml()
+    {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("<pre>");
-//        sb.append(LogFormatter.LINEBREAK).append("<b>Block Metadata:</b> ").append(toString(BlockMD.getStats()));
-//        sb.append(LogFormatter.LINEBREAK).append("<hr>");
-        sb.append(LogFormatter.LINEBREAK).append("<b>All (Web only):</b> ").append(toString(all.stats()));
-        sb.append(LogFormatter.LINEBREAK).append("<b>       Animals:</b> ").append(toString(animals.stats()));
-        sb.append(LogFormatter.LINEBREAK).append("<b>      Messages:</b> ").append(toString(messages.stats()));
-        sb.append(LogFormatter.LINEBREAK).append("<b>          Mobs:</b> ").append(toString(mobs.stats()));
-        sb.append(LogFormatter.LINEBREAK).append("<b>        Player:</b> ").append(toString(player.stats()));
-        sb.append(LogFormatter.LINEBREAK).append("<b>       Players:</b> ").append(toString(players.stats()));
-        sb.append(LogFormatter.LINEBREAK).append("<b>     Villagers:</b> ").append(toString(villagers.stats()));
-        sb.append(LogFormatter.LINEBREAK).append("<b>     Waypoints:</b> ").append(toString(waypoints.stats()));
-        sb.append(LogFormatter.LINEBREAK).append("<b>         World:</b> ").append(toString(world.stats()));
-        sb.append("</pre>");
-
+        if (JourneyMap.getInstance().coreProperties.recordCacheStats.get())
+        {
+            sb.append("<pre>");
+            sb.append(toString("All (Web only)", all));
+            //sb.append(toString("Colors", colors));
+            sb.append(toString("Chunks", chunkMetadata));
+            sb.append(toString("DrawEntitySteps", entityDrawSteps));
+            sb.append(toString("EntityDTOs", entityDTOs));
+            sb.append(toString("Animals", animals));
+            sb.append(toString("Messages", messages));
+            sb.append(toString("Mobs", mobs));
+            sb.append(toString("Players", players));
+            sb.append(toString("Villagers", villagers));
+            sb.append(toString("Waypoints", waypoints));
+            sb.append(toString("World", world));
+            sb.append("</pre>");
+        }
+        else
+        {
+            sb.append("<b>Cache stat recording disabled.  Set config/journeymap.core.config 'recordCacheStats' to 1.</b>");
+        }
         return sb.toString();
     }
 
-    private String toString(CacheStats cacheStats)
+    private String toString(String label, LoadingCache cache)
     {
         double avgLoadMillis = 0;
-        if(cacheStats.totalLoadTime()>0 && cacheStats.loadSuccessCount()>0)
+        CacheStats cacheStats = cache.stats();
+        if (cacheStats.totalLoadTime() > 0 && cacheStats.loadSuccessCount() > 0)
         {
-            avgLoadMillis = TimeUnit.NANOSECONDS.toMillis(cacheStats.totalLoadTime())*1.0/cacheStats.loadSuccessCount();
+            avgLoadMillis = TimeUnit.NANOSECONDS.toMillis(cacheStats.totalLoadTime()) * 1.0 / cacheStats.loadSuccessCount();
         }
-        
-        return String.format("Hits: %6s, Misses: %6s, Loads: %6s, Errors: %6s, Avg Load Time: %1.2fms", cacheStats.hitCount(), cacheStats.missCount(), cacheStats.loadCount(), cacheStats.loadExceptionCount(), avgLoadMillis);
+
+        return String.format("%s<b>%20s:</b> Size: %9s, Hits: %9s, Misses: %9s, Loads: %9s, Errors: %9s, Avg Load Time: %1.2fms", LogFormatter.LINEBREAK, label, cache.size(), cacheStats.hitCount(), cacheStats.missCount(), cacheStats.loadCount(), cacheStats.loadExceptionCount(), avgLoadMillis);
+    }
+
+    // On-demand-holder for instance
+    private static class Holder
+    {
+        private static final DataCache INSTANCE = new DataCache();
     }
 }

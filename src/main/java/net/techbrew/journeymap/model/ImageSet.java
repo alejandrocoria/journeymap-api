@@ -225,7 +225,7 @@ public abstract class ImageSet {
 		
 		@Override
 		public String toString() {
-			return mapType.name() + delim + imageFile.getPath() + delim + "image=" + (_image==null ? "null" : "ok") + "dirty=" + _dirty;
+			return mapType.name() + delim + (imageFile!=null ? imageFile.getPath() : "") + delim + "image=" + (_image==null ? "null" : "ok") + ", dirty=" + _dirty;
 		}
 
 	}

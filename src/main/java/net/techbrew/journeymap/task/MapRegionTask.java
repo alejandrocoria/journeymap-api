@@ -48,7 +48,7 @@ public class MapRegionTask extends BaseMapTask
         while (!coords.isEmpty())
         {
             ChunkCoordIntPair coord = coords.remove(0);
-            ChunkMD stub = ChunkLoader.getChunkStubFromDisk(coord.chunkXPos, coord.chunkZPos, mcWorldDir, world);
+            ChunkMD stub = ChunkLoader.getChunkMdFromDisk(coord.chunkXPos, coord.chunkZPos, mcWorldDir, world);
             if (stub == null)
             {
                 missing++;

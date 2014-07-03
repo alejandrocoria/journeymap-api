@@ -50,6 +50,7 @@ public class MapOverlayState
     private List<DrawWayPointStep> drawWaypointStepList = new ArrayList<DrawWayPointStep>();
     private String playerBiome = "";
     private MapProperties lastMapProperties = null;
+    private List<EntityDTO> entityList = new ArrayList<EntityDTO>(32);
 
     /**
      * Default constructor
@@ -161,8 +162,8 @@ public class MapOverlayState
 
         drawStepList.clear();
         drawWaypointStepList.clear();
+        entityList.clear();
 
-        List<EntityDTO> entities = new ArrayList<EntityDTO>(32);
         if(mapProperties.zoomLevel.get()==0)
         {
             drawScale = drawScale*.5f;
@@ -172,45 +173,43 @@ public class MapOverlayState
         {
             if (mapProperties.showAnimals.get() || mapProperties.showPets.get())
             {
-                entities.addAll(DataCache.instance().getAnimals(false).values());
+                entityList.addAll(DataCache.instance().getAnimals(false).values());
             }
         }
         if (FeatureManager.isAllowed(Feature.RadarVillagers))
         {
             if (mapProperties.showVillagers.get())
             {
-                entities.addAll(DataCache.instance().getVillagers(false).values());
+                entityList.addAll(DataCache.instance().getVillagers(false).values());
             }
         }
         if (FeatureManager.isAllowed(Feature.RadarMobs))
         {
             if (mapProperties.showMobs.get())
             {
-                entities.addAll(DataCache.instance().getMobs(false).values());
+                entityList.addAll(DataCache.instance().getMobs(false).values());
             }
         }
-
 
         if (FeatureManager.isAllowed(Feature.RadarPlayers))
         {
             if (mapProperties.showPlayers.get())
             {
-                entities.addAll(DataCache.instance().getPlayers(false).values());
+                entityList.addAll(DataCache.instance().getPlayers(false).values());
             }
         }
 
         // Sort to keep named entities last
-        if (!entities.isEmpty())
+        if (!entityList.isEmpty())
         {
-            Collections.sort(entities, new EntityHelper.EntityMapComparator());
-            drawStepList.addAll(radarRenderer.prepareSteps(entities, gridRenderer, drawScale, mapProperties));
+            Collections.sort(entityList, EntityHelper.entityMapComparator);
+            drawStepList.addAll(radarRenderer.prepareSteps(entityList, gridRenderer, drawScale, mapProperties));
         }
 
         // Draw waypoints
         if (mapProperties.showWaypoints.get())
         {
-            List<Waypoint> waypoints = new ArrayList<Waypoint>(DataCache.instance().getWaypoints(false));
-            drawWaypointStepList.addAll(waypointRenderer.prepareSteps(waypoints, gridRenderer, checkWaypointDistance));
+            drawWaypointStepList.addAll(waypointRenderer.prepareSteps(DataCache.instance().getWaypoints(false), gridRenderer, checkWaypointDistance));
         }
     }
 

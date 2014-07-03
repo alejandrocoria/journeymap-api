@@ -10,6 +10,7 @@ import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.draw.DrawWayPointStep;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -19,7 +20,9 @@ import java.util.List;
  */
 public class OverlayWaypointRenderer
 {
-    public List<DrawWayPointStep> prepareSteps(List<Waypoint> waypoints, GridRenderer grid, boolean checkDistance)
+    final List<DrawWayPointStep> drawStepList = new ArrayList<DrawWayPointStep>();
+
+    public List<DrawWayPointStep> prepareSteps(Collection<Waypoint> waypoints, GridRenderer grid, boolean checkDistance)
     {
         Minecraft mc = FMLClientHandler.instance().getClient();
         EntityPlayer player = mc.thePlayer;
@@ -27,8 +30,8 @@ public class OverlayWaypointRenderer
         int maxDistance = JourneyMap.getInstance().waypointProperties.maxDistance.get();
         checkDistance = checkDistance && maxDistance>0;
         Vec3 playerVec = checkDistance ? player.getPosition(1) : null;
+        drawStepList.clear();
 
-        final List<DrawWayPointStep> drawStepList = new ArrayList<DrawWayPointStep>();
         try
         {
             for (Waypoint waypoint : waypoints)

@@ -9,9 +9,9 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class CoreProperties extends PropertiesBase implements Comparable<CoreProperties>
 {
-    protected transient static final int CURRENT_REVISION = 2;
+    protected transient static final int CODE_REVISION = 3;
     protected transient final String name = "core";
-    protected final AtomicInteger revision = new AtomicInteger(CURRENT_REVISION);
+
     public final AtomicReference<String> logLevel = new AtomicReference<String>("INFO");
     public final AtomicInteger chunkOffset = new AtomicInteger(8);
     public final AtomicInteger entityPoll = new AtomicInteger(1800);
@@ -29,9 +29,10 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public final AtomicBoolean caveLighting = new AtomicBoolean(true);
     public final AtomicBoolean announceMod = new AtomicBoolean(true);
     public final AtomicBoolean checkUpdates = new AtomicBoolean(true);
-    public final AtomicBoolean caveGreySurface = new AtomicBoolean(false);
     public final AtomicBoolean caveIgnoreGlass = new AtomicBoolean(true);
     public final AtomicBoolean advancedSurfaceCheck = new AtomicBoolean(true);
+    public final AtomicBoolean recordCacheStats = new AtomicBoolean(false);
+    public final AtomicBoolean mapBathymetry = new AtomicBoolean(false);
 
     public CoreProperties()
     {
@@ -44,15 +45,9 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     }
 
     @Override
-    public int getCurrentRevision()
+    public int getCodeRevision()
     {
-        return CURRENT_REVISION;
-    }
-
-    @Override
-    public int getRevision()
-    {
-        return revision.get();
+        return CODE_REVISION;
     }
 
     @Override
@@ -81,7 +76,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public int hashCode()
     {
         int result = name.hashCode();
-        result = 31 * result + revision.hashCode();
+        result = 31 * result + fileRevision;
         result = 31 * result + logLevel.hashCode();
         result = 31 * result + chunkOffset.hashCode();
         result = 31 * result + entityPoll.hashCode();
@@ -99,7 +94,6 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
         result = 31 * result + caveLighting.hashCode();
         result = 31 * result + announceMod.hashCode();
         result = 31 * result + checkUpdates.hashCode();
-        result = 31 * result + caveGreySurface.hashCode();
         return result;
     }
 
@@ -107,7 +101,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public String toString()
     {
         return "CoreProperties: " +
-                "revision=" + revision +
+                "fileRevision=" + fileRevision +
                 ", logLevel=" + logLevel +
                 ", chunkOffset=" + chunkOffset +
                 ", entityPoll=" + entityPoll +
@@ -123,7 +117,6 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 ", cacheVillagersData=" + cacheVillagersData +
                 ", maxVillagersData=" + maxVillagersData +
                 ", caveLighting=" + caveLighting +
-                ", caveGreySurface=" + caveGreySurface +
                 ", announceMod=" + announceMod +
                 ", checkUpdates=" + checkUpdates;
     }

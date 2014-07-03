@@ -4,6 +4,7 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.EntityDTO;
@@ -17,6 +18,7 @@ import net.techbrew.journeymap.render.texture.TextureImpl;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 ;
@@ -29,6 +31,8 @@ import java.util.List;
 public class OverlayRadarRenderer
 {
 
+    final ArrayList<DrawStep> drawStepList = new ArrayList<DrawStep>();
+
     public List<DrawStep> prepareSteps(List<EntityDTO> entityDTOs, GridRenderer grid, float drawScale, MapProperties mapProperties)
     {
 
@@ -37,7 +41,7 @@ public class OverlayRadarRenderer
         final int fontHeight = 14;
         final Color labelBg = Color.darkGray.darker();
 
-        final List<DrawStep> drawStepList = new ArrayList<DrawStep>();
+        drawStepList.retainAll(Collections.EMPTY_LIST);
 
         try
         {
@@ -102,7 +106,7 @@ public class OverlayRadarRenderer
 
                     // Draw locator icon
                     Entity entity = (Entity) dto.entityLiving;
-                    drawStepList.add(new DrawEntityStep(entity, false, locatorImg, (int) (8 * drawScale)));
+
 
                     // Draw entity icon and label
                     if (isPlayer)
@@ -116,7 +120,11 @@ public class OverlayRadarRenderer
                         if (entityIcon != null)
                         {
                             int bottomMargin = isPlayer ? 0 : iconOffset;
-                            drawStepList.add(new DrawEntityStep(entity, true, entityIcon, bottomMargin));
+
+                            DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(entity);
+                            drawStep.update(false, locatorImg, entityIcon, bottomMargin);
+
+                            drawStepList.add(drawStep);
                         }
 
                         if (dto.customName!=null)

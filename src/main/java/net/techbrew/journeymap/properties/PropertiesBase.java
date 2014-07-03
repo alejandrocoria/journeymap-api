@@ -24,6 +24,8 @@ public abstract class PropertiesBase
     // Toggles whether save() actually does anything.
     protected transient final AtomicBoolean saveEnabled = new AtomicBoolean(true);
 
+    protected int fileRevision;
+
     private static final String[] HEADERS = {
             "// JourneyMap configuration file. Modify at your own risk!",
             "// To restore the default settings, simply delete this file before starting Minecraft",
@@ -42,18 +44,12 @@ public abstract class PropertiesBase
     public abstract String getName();
 
     /**
-     * Code base revision of props class
+     * Code base fileRevision of props class
      *
      * @return rev
      */
-    public abstract int getCurrentRevision();
+    public abstract int getCodeRevision();
 
-    /**
-     * Revision of properties loaded from file
-     *
-     * @return rev
-     */
-    public abstract int getRevision();
 
     /**
      * Gets the property file path.
@@ -66,14 +62,14 @@ public abstract class PropertiesBase
     }
 
     /**
-     * Whether the code base revision of the properties
+     * Whether the code base fileRevision of the properties
      * matches that loaded from the file.
      *
      * @return true if current
      */
     public boolean isCurrent()
     {
-        return getCurrentRevision() == getRevision();
+        return getCodeRevision() == fileRevision;
     }
 
     /**
@@ -83,6 +79,8 @@ public abstract class PropertiesBase
      */
     public boolean save()
     {
+        fileRevision = getCodeRevision();
+
         synchronized (saveEnabled)
         {
             if (!saveEnabled.get())

@@ -91,7 +91,7 @@ public class RegionLoader {
 						if(!rfh.getRegionImageFile(rc,mapType,false).exists()) {	
 							List<ChunkCoordIntPair> chunkCoords = rc.getChunkCoordsInRegion();
 							for(ChunkCoordIntPair coord : chunkCoords) {
-								if(ChunkLoader.getChunkFromDisk(coord.chunkXPos, coord.chunkZPos, mcWorldDir, mc.theWorld)!=null) {
+								if(ChunkLoader.getChunkMdFromDisk(coord.chunkXPos, coord.chunkZPos, mcWorldDir, mc.theWorld)!=null) {
 									stack.add(rc);
 									break;
 								}

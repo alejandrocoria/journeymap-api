@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.model;
 
+import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -14,35 +15,39 @@ import java.io.Serializable;
 /**
  * JSON-safe attributes derived from an EntityLivingBase.
  */
-public final class EntityDTO implements Serializable
+public class EntityDTO implements Serializable
 {
-    public final transient EntityLivingBase entityLiving;
+    public transient EntityLivingBase entityLiving;
     public final String entityId;
-    public final String filename;
-    public final Boolean hostile;
-    public final double posX;
-    public final double posY;
-    public final double posZ;
-    public final int chunkCoordX;
-    public final int chunkCoordY;
-    public final int chunkCoordZ;
-    public final double heading;
-    public final String customName;
-    public final String owner;
-    public final Integer profession;
-    public final String username;
+    public String filename;
+    public Boolean hostile;
+    public double posX;
+    public double posY;
+    public double posZ;
+    public int chunkCoordX;
+    public int chunkCoordY;
+    public int chunkCoordZ;
+    public double heading;
+    public String customName;
+    public String owner;
+    public Integer profession;
+    public String username;
     public String biome;
-    public final int dimension;
+    public int dimension;
     public Boolean underground;
-    public final boolean invisible;
-    public final boolean sneaking;
+    public boolean invisible;
+    public boolean sneaking;
     
-    public EntityDTO(EntityLivingBase entity, boolean hostile)
+    private EntityDTO(EntityLivingBase entity)
+    {
+        this.entityId= entity.getUniqueID().toString();
+        this.entityLiving = entity;
+    }
+    
+    public void update(EntityLivingBase entity, boolean hostile)
     {
         EntityPlayer currentPlayer = FMLClientHandler.instance().getClient().thePlayer;
 
-        this.entityId= entity.getUniqueID().toString();
-        this.entityLiving = entity;
         this.dimension = entity.dimension;
         this.posX= entity.posX;
         this.posY= entity.posY;
@@ -115,6 +120,15 @@ public final class EntityDTO implements Serializable
         else
         {
             this.profession = null;
+        }
+    }
+
+    public static class SimpleCacheLoader extends CacheLoader<EntityLivingBase, EntityDTO>
+    {
+        @Override
+        public EntityDTO load(EntityLivingBase entity) throws Exception
+        {
+            return new EntityDTO(entity);
         }
     }
 }

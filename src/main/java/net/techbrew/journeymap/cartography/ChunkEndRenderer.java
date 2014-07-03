@@ -10,7 +10,6 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.BlockUtils;
 import net.techbrew.journeymap.model.ChunkMD;
-import net.techbrew.journeymap.model.RGB;
 
 import java.awt.*;
 
@@ -34,15 +33,15 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 //			float minNorm = chunkMd.worldHeight;
 //			float maxNorm = 0;
 			float slope, h, hN, hW;
-			for(int y=0; y<16; y++)
+			for(int z=0; z<16; z++)
 			{
 				for(int x=0; x<16; x++)
 				{
-					h = chunkMd.getSlopeHeightValue(x, y);
-					hN = (y==0)  ? getBlockHeight(x, y, 0, -1, chunkMd, neighbors, h) : chunkMd.getSlopeHeightValue(x, y - 1);
-					hW = (x==0)  ? getBlockHeight(x, y, -1, 0, chunkMd, neighbors, h) : chunkMd.getSlopeHeightValue(x - 1, y);
+					h = chunkMd.getSlopeHeightValue(x, z, false);
+					hN = (z==0)  ? getBlockHeight(x, z, 0, -1, chunkMd, neighbors, h, false) : chunkMd.getSlopeHeightValue(x, z - 1, false);
+					hW = (x==0)  ? getBlockHeight(x, z, -1, 0, chunkMd, neighbors, h, false) : chunkMd.getSlopeHeightValue(x - 1, z, false);
 					slope = ((h/hN)+(h/hW))/2f;
-					chunkMd.sliceSlopes[x][y] = slope;
+					chunkMd.sliceSlopes[x][z] = slope;
 				}
 			}
 		}
@@ -82,8 +81,9 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 					}
 		
 					// Block isn't viable to paint
-					if (paintY <=0) {
-                        paintBlock(x, z, Color.BLACK, g2D);
+					if (paintY <=0)
+                    {
+                        paintBlock(x, z, 0, g2D);
                         continue blockloop;
 					}
                     blockMD = BlockMD.getBlockMD(chunkMd, x, paintY, z);
@@ -102,7 +102,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 					}		
 		
 					// Get block color
-					RGB color = blockMD.getColor(chunkMd, x, paintY, z);
+					int color = blockMD.getColor(chunkMd, x, paintY, z);
 					
 					// Get slope of block and prepare to bevelSlope
 					float slope, s, sN, sNW, sW, sAvg, shaded;
@@ -121,7 +121,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 							slope = (slope+sAvg)/2f;
 						}
 						s = Math.max(slope * .8f, .1f);
-						color.bevelSlope(s);
+						color = RGB.bevelSlope(color, s);
 	
 					} else if(slope>1) {
 						
@@ -132,7 +132,7 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 						}
 						s = slope * 1.2f;
 						s = Math.min(s, 1.4f);
-						color.bevelSlope(s);
+                        color = RGB.bevelSlope(color, s);
 					}
 		
 					// Contour shading
@@ -140,13 +140,13 @@ public class ChunkEndRenderer extends BaseRenderer implements IChunkRenderer {
 			
 						// Get light level
 						if (lightLevel < 15) {
-							color.darken(Math.min(1F, lightLevel*1f/14));
+                            color = RGB.darken(color, Math.min(1F, lightLevel*1f/14));
 						}
 					}
 		
 					// Draw 
 					g2D.setComposite(BlockUtils.OPAQUE);
-					g2D.setPaint(color.toColor());
+					g2D.setPaint(RGB.paintOf(color));
 					g2D.fillRect(x, z, 1, 1);
 					chunkOk = true;
 					
