@@ -91,12 +91,7 @@ public class MapPlayerTask extends BaseMapTask
             lastPlayerPos = playerPos;
         }
 
-//		boolean skipUnchanged = (lastUnderground==underground);
-//		if(skipUnchanged && underground) {
-//			skipUnchanged = (playerPos.posY==lastPlayerPos.posY);
-//		}
-//
-//        skipUnchanged = false;
+		boolean forceNearbyChunks = (lastUnderground==underground);
 
         int offset = JourneyMap.getInstance().coreProperties.chunkOffset.get();
 
@@ -152,6 +147,7 @@ public class MapPlayerTask extends BaseMapTask
 
         boolean forceCurrent;
         int renderCount = chunks.size();
+        ChunkCoordIntPair coord;
         for (int x = min.chunkXPos; x <= max.chunkXPos; x++)
         {
             for (int z = min.chunkZPos; z <= max.chunkZPos; z++)
@@ -162,10 +158,10 @@ public class MapPlayerTask extends BaseMapTask
                     break;
                 }
 
-                ChunkCoordIntPair coord = new ChunkCoordIntPair(x, z);
+                coord = new ChunkCoordIntPair(x, z);
                 if(queuedCoords.contains(coord))
                 {
-                    continue; // Was queued
+                    continue; // Already queued
                 }
 
                 // Don't force to be current unless player is in it
@@ -174,7 +170,7 @@ public class MapPlayerTask extends BaseMapTask
 
                 if (chunkMd != null)
                 {
-                    if(chunkMd.isCurrent())
+                    if(chunkMd.isCurrent() || forceNearbyChunks)
                     {
                         chunkMd.render = true;
                         chunkMd.setCurrent(false);
@@ -190,7 +186,7 @@ public class MapPlayerTask extends BaseMapTask
             }
         }
 
-        System.out.println("Queued: " + queuedCoords.size() + ", Total Chunks to render: " + renderCount);
+        //System.out.println("Queued: " + queuedCoords.size() + ", Total Chunks to render: " + renderCount);
 
         return new MapPlayerTask(world, dimension, underground, chunkY, chunks);
     }

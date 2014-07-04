@@ -30,9 +30,11 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public final AtomicBoolean announceMod = new AtomicBoolean(true);
     public final AtomicBoolean checkUpdates = new AtomicBoolean(true);
     public final AtomicBoolean caveIgnoreGlass = new AtomicBoolean(true);
-    public final AtomicBoolean advancedSurfaceCheck = new AtomicBoolean(true);
     public final AtomicBoolean recordCacheStats = new AtomicBoolean(false);
+
     public final AtomicBoolean mapBathymetry = new AtomicBoolean(false);
+    public final AtomicBoolean mapSmoothSlopes = new AtomicBoolean(true);
+    public final AtomicBoolean mapTransparency = new AtomicBoolean(true);
 
     public CoreProperties()
     {

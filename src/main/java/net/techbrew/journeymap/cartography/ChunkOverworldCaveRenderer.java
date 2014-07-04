@@ -14,15 +14,18 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Stack;
 
-public class ChunkStandardRenderer extends BaseRenderer implements IChunkRenderer
+/**
+ * Renders chunk image for caves in the overworld.
+ */
+public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRenderer
 {
-    protected boolean advancedSurfaceCheck = JourneyMap.getInstance().coreProperties.advancedSurfaceCheck.get();
-    protected boolean mapBathymetry;
+    protected ChunkOverworldSurfaceRenderer surfaceRenderer;
+    protected StatTimer renderCaveTimer = StatTimer.get("ChunkOverworldCaveRenderer.render");
 
-    protected StatTimer renderSurfaceTimer = StatTimer.get("ChunkStandardRenderer.renderSurface");
-    protected StatTimer renderSurfacePrepassTimer = StatTimer.get("ChunkStandardRenderer.renderSurface-prepass");
-//    protected StatTimer advancedSurfaceCheckTimer = StatTimer.get("ChunkStandardRenderer.renderSurface.advancedSurfaceCheck");
-//    protected StatTimer advancedSurfaceRenderTimer = StatTimer.get("ChunkStandardRenderer.renderSurface.advancedSurfaceRender");
+    public ChunkOverworldCaveRenderer(ChunkOverworldSurfaceRenderer surfaceRenderer)
+    {
+        this.surfaceRenderer = surfaceRenderer;
+    }
 
     /**
      * Render blocks in the chunk for the standard world.
@@ -31,86 +34,54 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
     public boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final boolean underground,
                           final Integer vSlice, final ChunkMD.Set neighbors)
     {
-        mapBathymetry = JourneyMap.getInstance().coreProperties.mapBathymetry.get();
 
-        try
+        if(!underground || vSlice==null)
+        {
+            JourneyMap.getLogger().warning(String.format("ChunkOverworldCaveRenderer is for caves.  Y u do dis? (%s,%s)", underground, vSlice));
+            return false;
+        }
+
+        boolean ok = false;
+
+        if(!chunkMd.hasNoSky)
         {
             // Initialize ChunkSub slopes if needed
             if (chunkMd.surfaceSlopes == null)
             {
-                initSurfaceSlopes(chunkMd, neighbors);
+                surfaceRenderer.initSurfaceSlopes(chunkMd, neighbors);
             }
 
-            // Render the chunk image
-            if (underground)
+            ok = surfaceRenderer.renderSurface(g2D, chunkMd, vSlice, neighbors, true);
+            if (!ok)
             {
-
-                boolean ok = renderSurface(g2D, chunkMd, vSlice, neighbors, true);
-                if (!ok)
-                {
-                    JourneyMap.getLogger().fine("The surface chunk didn't paint: " + chunkMd.toString());
-                }
-
-                final int sliceMinY = Math.max((vSlice << 4), 0);
-                final int hardSliceMaxY = ((vSlice + 1) << 4) - 1;
-                int sliceMaxY = Math.min(hardSliceMaxY, chunkMd.worldObj.getActualHeight());
-                if (sliceMinY >= sliceMaxY)
-                {
-                    sliceMaxY = sliceMinY + 2;
-                }
-
-                if (chunkMd.sliceSlopes == null)
-                {
-                    initSliceSlopes(chunkMd, sliceMinY, sliceMaxY, neighbors);
-                }
-
-                ok = renderUnderground(g2D, chunkMd, vSlice, sliceMinY, sliceMaxY, neighbors);
-
-                if (!ok)
-                {
-                    JourneyMap.getLogger().fine("The underground chunk didn't paint: " + chunkMd.toString());
-                }
-                return ok;
-            }
-            else
-            {
-                return renderSurface(g2D, chunkMd, vSlice, neighbors, false);
+                JourneyMap.getLogger().fine("The surface chunk didn't paint: " + chunkMd.toString());
             }
         }
-        finally
+
+        final int sliceMinY = Math.max((vSlice << 4), 0);
+        final int hardSliceMaxY = ((vSlice + 1) << 4) - 1;
+        int sliceMaxY = Math.min(hardSliceMaxY, chunkMd.worldObj.getActualHeight());
+        if (sliceMinY >= sliceMaxY)
         {
-
+            sliceMaxY = sliceMinY + 2;
         }
+
+        if (chunkMd.sliceSlopes == null)
+        {
+            initSliceSlopes(chunkMd, sliceMinY, sliceMaxY, neighbors);
+        }
+
+        ok = renderUnderground(g2D, chunkMd, vSlice, sliceMinY, sliceMaxY, neighbors);
+
+        if (!ok)
+        {
+            JourneyMap.getLogger().fine("The underground chunk didn't paint: " + chunkMd.toString());
+        }
+        return ok;
 
     }
 
-    /**
-     * Initialize surface slopes in chunk if needed.
-     *
-     * @param chunkMd
-     * @param neighbors
-     */
-    protected void initSurfaceSlopes(final ChunkMD chunkMd, final ChunkMD.Set neighbors)
-    {
-//        StatTimer timer = StatTimer.get("ChunkStandardRenderer.initSurfaceSlopes");
-//        timer.start();
-        float slope, h, hN, hW, hNW;
-        chunkMd.surfaceSlopes = new float[16][16];
-        boolean ignoreWater = mapBathymetry;
-        for (int z = 0; z < 16; z++)
-        {
-            for (int x = 0; x < 16; x++)
-            {
-                h = chunkMd.getSlopeHeightValue(x, z, ignoreWater);
-                hN = (z == 0) ? getBlockHeight(x, z, 0, -1, chunkMd, neighbors, h, ignoreWater) : chunkMd.getSlopeHeightValue(x, z - 1, ignoreWater);
-                hW = (x == 0) ? getBlockHeight(x, z, -1, 0, chunkMd, neighbors, h, ignoreWater) : chunkMd.getSlopeHeightValue(x - 1, z, ignoreWater);
-                hNW = getBlockHeight(x, z, -1, -1, chunkMd, neighbors, h, ignoreWater);
-                slope = ((h / hN) + (h / hW) + (h / hNW)) / 3f;
-                chunkMd.surfaceSlopes[x][z] = slope;
-            }
-        }
-//        timer.stop();
-    }
+
 
     /**
      * Initialize slice slopes in chunk if needed.
@@ -195,250 +166,11 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
     }
 
     /**
-     * Render blocks in the chunk for the surface.
-     */
-    protected boolean renderSurface(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice, final ChunkMD.Set neighbors, final boolean cavePrePass)
-    {
-        StatTimer timer = cavePrePass ? renderSurfacePrepassTimer : renderSurfaceTimer;
-        timer.start();
-
-        g2D.setComposite(BlockUtils.OPAQUE);
-        BlockStack blockStack = new BlockStack();
-
-        boolean chunkOk = false;
-        for (int x = 0; x < 16; x++)
-        {
-            blockLoop:
-            for (int z = 0; z < 16; z++)
-            {
-                blockStack.reset();
-                BlockMD topBlockMd = null;
-
-                boolean isUnderRoof = false;
-                int standardY = Math.max(1, chunkMd.getHeightValue(x, z));
-                int roofY = 0;
-                int y = standardY;
-
-                if (advancedSurfaceCheck)
-                {
-                    //advancedSurfaceCheckTimer.start();
-                    roofY = Math.max(1, chunkMd.getAbsoluteHeightValue(x, z));
-
-                    if (standardY < roofY)
-                    {
-                        // Is transparent roof above standard height?
-                        int checkY = roofY;
-                        while (checkY > standardY)
-                        {
-                            topBlockMd = BlockMD.getBlockMD(chunkMd, x, checkY, z);
-                            if (topBlockMd != null && topBlockMd.isTransparentRoof())
-                            {
-                                isUnderRoof = true;
-                                y = Math.max(standardY, checkY);
-                                break;
-                            }
-                            else
-                            {
-                                checkY--;
-                            }
-                        }
-                    }
-                    //advancedSurfaceCheckTimer.stop();
-                }
-
-                // Get top non-roof block
-                topBlockMd = getTopBlockMD(chunkMd, x, y, z);
-
-                if (topBlockMd == null)
-                {
-                    paintBadBlock(x, y, z, g2D);
-                    continue blockLoop;
-                }
-
-                // Start using BlockColors stack
-                buildColorStack(blockStack, neighbors, roofY, chunkMd, x, y, z);
-
-                chunkOk = paintSurfaceBlockStack(g2D, chunkMd, topBlockMd, vSlice, neighbors, blockStack, x, y, z, cavePrePass) || chunkOk;
-            }
-        }
-
-        blockStack.reset();
-        timer.stop();
-        return chunkOk;
-    }
-
-    protected BlockMD getTopBlockMD(final ChunkMD chunkMd, final int x, int y, final int z)
-    {
-        BlockMD topBlockMd = null;
-
-        do
-        {
-            topBlockMd = BlockMD.getBlockMD(chunkMd, x, y, z);
-
-            // Null check
-            if (topBlockMd == null)
-            {
-                break;
-            }
-
-            if (topBlockMd.isTransparentRoof() || topBlockMd.isAir() || topBlockMd.getAlpha() ==  0)
-            {
-                y--;
-            }
-            else
-            {
-                break;
-            }
-        } while (y >= 0);
-
-        return topBlockMd;
-    }
-
-    protected boolean paintSurfaceBlockStack(final Graphics2D g2D, final ChunkMD chunkMd, final BlockMD topBlockMd, final Integer vSlice, final ChunkMD.Set neighbors, BlockStack blockStack, final int x, final int y, final int z, final boolean cavePrePass)
-    {
-        if (blockStack.isEmpty())
-        {
-            paintBadBlock(x, y, z, g2D);
-            return false;
-        }
-
-        // Derive colors from stack
-        int depth = blockStack.depth();
-
-        BlockStack.BlockPos blockPos;
-        while (!blockStack.isEmpty())
-        {
-            blockPos = blockStack.pop(true);
-
-            // Simple surface render
-            if(blockStack.renderDayColor==null || blockStack.renderNightColor==null)
-            {
-                blockStack.renderDayColor = blockPos.dayColor;
-                blockStack.renderNightColor = blockPos.nightColor;
-                continue;
-            }
-            else
-            {
-                blockStack.renderDayColor = RGB.blendWith(blockStack.renderDayColor, blockPos.dayColor, blockPos.blockMD.getAlpha());
-                blockStack.renderNightColor = RGB.blendWith(blockStack.renderNightColor, blockPos.dayColor, blockPos.blockMD.getAlpha());
-            }
-
-            blockPos.release();
-
-        } // end color stack
-
-        // Shouldn't happen
-        if(blockStack.renderDayColor==null || blockStack.renderNightColor==null)
-        {
-            paintBadBlock(x, y, z, g2D);
-            return false;
-        }
-
-        // Now add bevel for slope
-        if (!topBlockMd.hasFlag(BlockUtils.Flag.NoShadow))
-        {
-            int slopeY = mapBathymetry ? blockStack.bottomY : y;
-            float slope = getSurfaceSlope(chunkMd, topBlockMd, neighbors, x, slopeY, z);
-            if (slope != 1f)
-            {
-                blockStack.renderDayColor = RGB.bevelSlope(blockStack.renderDayColor, slope);
-                if (!cavePrePass)
-                {
-                    blockStack.renderNightColor = RGB.bevelSlope(blockStack.renderNightColor, slope);
-                }
-            }
-        }
-
-        // And draw to the actual chunkimage
-        g2D.setComposite(BlockUtils.OPAQUE);
-        g2D.setPaint(RGB.paintOf(blockStack.renderDayColor));
-        g2D.fillRect(x,z,1,1);
-
-        if (!cavePrePass)
-        {
-            g2D.setPaint(RGB.paintOf(blockStack.renderNightColor));
-            g2D.fillRect(x+16,z,1,1);
-        }
-
-        return true;
-    }
-
-    protected int surfaceSlopeColor(int color, final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int ignored, int z)
-    {
-        float bevel = getSurfaceSlope(chunkMd, blockMD, neighbors, x, ignored, z);
-        if (bevel != 1f)
-        {
-            color = RGB.bevelSlope(color, bevel);
-        }
-        return color;
-    }
-
-    protected float getSurfaceSlope(final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int ignored, int z)
-    {
-        float slope, bevel, sN, sNW, sW, sS, sE, sSE, sAvg;
-        sS = sE = sSE = sNW = 1f;
-        slope = chunkMd.surfaceSlopes[x][z];
-
-        if (!blockMD.isFoliage())
-        {
-            // Trees look more distinct if just beveled on upper left corners
-            sN = getBlockSlope(x, z, 0, -1, chunkMd, neighbors, slope, false);
-            sNW = getBlockSlope(x, z, -1, -1, chunkMd, neighbors, slope, false);
-            sW = getBlockSlope(x, z, -1, 0, chunkMd, neighbors, slope, false);
-            sAvg = (sN + sNW + sW) / 3f;
-        }
-        else
-        {
-            // Everything else gets beveled based on average slope across n,s,e,w
-            sN = getBlockSlope(x, z, 0, -1, chunkMd, neighbors, slope, false);
-            sS = getBlockSlope(x, z, 0, 1, chunkMd, neighbors, slope, false);
-            sW = getBlockSlope(x, z, -1, 0, chunkMd, neighbors, slope, false);
-            sE = getBlockSlope(x, z, 1, 0, chunkMd, neighbors, slope, false);
-            sAvg = (sN + sS + sW + sE) / 4f;
-        }
-
-        bevel = 1f;
-        if (slope < 1)
-        {
-            if (slope <= sAvg)
-            {
-                slope = slope * .6f;
-            }
-            else if (slope > sAvg)
-            {
-                if (!blockMD.isFoliage())
-                {
-                    slope = (slope + sAvg) / 2f;
-                }
-            }
-            bevel = Math.max(slope * .8f, .1f);
-        }
-        else if (slope > 1)
-        {
-            if (sAvg > 1)
-            {
-                if (slope >= sAvg)
-                {
-                    if (!blockMD.isFoliage())
-                    {
-                        slope = slope * 1.2f;
-                    }
-                }
-            }
-            bevel = Math.min(slope * 1.2f, 1.4f);
-        }
-
-        return bevel;
-    }
-
-    /**
      * Render blocks in the chunk for underground.
      */
     protected boolean renderUnderground(final Graphics2D g2D, final ChunkMD chunkMd, final int vSlice, final int sliceMinY, final int sliceMaxY, final ChunkMD.Set neighbors)
     {
-
-        StatTimer timer = StatTimer.get("ChunkStandardRenderer.renderUnderground");
-        timer.start();
+        renderCaveTimer.start();
 
         boolean hasSolid;
         boolean hasAir;
@@ -448,11 +180,10 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
         int lightLevel;
 
         boolean chunkOk = false;
+
         for (int z = 0; z < 16; z++)
         {
-
-            blockLoop:
-            for (int x = 0; x < 16; x++)
+            blockLoop: for (int x = 0; x < 16; x++)
             {
                 // reset vars
                 lightLevel = 0;
@@ -466,7 +197,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                     if (ceiling < 0)
                     {
                         chunkOk = true;
-                        continue blockLoop;
+                        continue;
                     }
 
                     // Skip if top block is open to the sky
@@ -474,14 +205,14 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                     {
                         chunkOk = true;
                         paintDimSurface(x, z, g2D);
-                        continue blockLoop;
+                        continue;
                     }
 
                     if (ceiling <= sliceMinY)
                     {
                         chunkOk = true;
                         paintDimSurface(x, z, g2D);
-                        continue blockLoop;
+                        continue;
                     }
 
                     // Init variables for airloop
@@ -599,7 +330,6 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
                         if (slope < 1)
                         {
-
                             if (slope <= sAvg)
                             {
                                 slope = slope * .6f;
@@ -642,7 +372,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
                 }
                 catch (Throwable t)
                 {
-                    timer.cancel();
+                    renderCaveTimer.cancel();
                     paintBadBlock(x, vSlice, z, g2D);
                     String error = Constants.getMessageJMERR07("x,vSlice,z = " + x + "," //$NON-NLS-1$ //$NON-NLS-2$
                             + vSlice + "," + z + " : " + LogFormatter.toString(t)); //$NON-NLS-1$ //$NON-NLS-2$
@@ -651,7 +381,7 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
 
             }
         }
-        timer.stop();
+        renderCaveTimer.stop();
         return chunkOk;
 
     }
@@ -664,47 +394,6 @@ public class ChunkStandardRenderer extends BaseRenderer implements IChunkRendere
         g2D.setComposite(BlockUtils.OPAQUE);
     }
 
-    protected void buildColorStack(BlockStack blockStack, final ChunkMD.Set neighbors, int roofY, ChunkMD chunkMd, int x, int y, int z)
-    {
-        BlockMD blockMD;
-
-        // If under glass, add to color stack
-        if (roofY>y)
-        {
-            //advancedSurfaceRenderTimer.start();
-            while (roofY > y)
-            {
-                blockMD = BlockMD.getBlockMD(chunkMd, x, roofY, z);
-                if (blockMD != null && !blockMD.isAir())
-                {
-                    if (blockMD.isTransparentRoof())
-                    {
-                        blockStack.push(neighbors, chunkMd, blockMD, x, roofY, z);
-                    }
-                }
-                roofY--;
-            }
-            //advancedSurfaceRenderTimer.stop();
-        }
-
-        boolean fullTransparency = true;
-
-        while(y>0)
-        {
-            blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
-
-            if (blockMD != null && !blockMD.isAir())
-            {
-                blockStack.push(neighbors, chunkMd, blockMD, x, y, z);
-
-                if(blockMD.getAlpha()==1f || (!fullTransparency && !blockMD.isWater()))
-                {
-                    break;
-                }
-            }
-            y--;
-        }
-    }
 
     protected int getDepthColor(ChunkMD chunkMd, BlockMD blockMD, final ChunkMD.Set neighbors, int x, int y, int z, final boolean useLighting)
     {

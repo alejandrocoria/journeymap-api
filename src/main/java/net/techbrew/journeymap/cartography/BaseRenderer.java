@@ -379,5 +379,31 @@ public abstract class BaseRenderer
         return chunk;
     }
 
+    protected final BlockMD getTopBlockMD(final ChunkMD chunkMd, final int x, int y, final int z)
+    {
+        BlockMD topBlockMd = null;
+
+        do
+        {
+            topBlockMd = BlockMD.getBlockMD(chunkMd, x, y, z);
+
+            // Null check
+            if (topBlockMd == null)
+            {
+                break;
+            }
+
+            if (topBlockMd.isTransparentRoof() || topBlockMd.isAir() || topBlockMd.getAlpha() ==  0)
+            {
+                y--;
+            }
+            else
+            {
+                break;
+            }
+        } while (y >= 0);
+
+        return topBlockMd;
+    }
 
 }

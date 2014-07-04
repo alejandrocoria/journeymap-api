@@ -26,7 +26,8 @@ public class ChunkRenderController {
 	
 	private final IChunkRenderer netherRenderer;
 	private final IChunkRenderer endRenderer;
-	private final IChunkRenderer standardRenderer;
+	private final IChunkRenderer overWorldSurfaceRenderer;
+    private final IChunkRenderer overWorldCaveRenderer;
 	
 	final boolean fineLogging = JourneyMap.getLogger().isLoggable(Level.FINE);
 	
@@ -36,7 +37,9 @@ public class ChunkRenderController {
 	public ChunkRenderController() {
 		netherRenderer = new ChunkNetherRenderer();
 		endRenderer = new ChunkEndRenderer();
-        standardRenderer = new ChunkStandardRenderer();
+        ChunkOverworldSurfaceRenderer surfaceRenderer = new ChunkOverworldSurfaceRenderer();
+        overWorldSurfaceRenderer = surfaceRenderer;
+        overWorldCaveRenderer = new ChunkOverworldCaveRenderer(surfaceRenderer);
 		//standardRenderer = new ChunkTopoRenderer();
 	}
 	
@@ -73,7 +76,11 @@ public class ChunkRenderController {
 					break;
 				}
 				default : {
-					renderOkay = standardRenderer.render(g2D, chunkMd, underground, vSlice, neighbors);
+                    if(!underground || vSlice==null) {
+                        renderOkay = overWorldSurfaceRenderer.render(g2D, chunkMd, underground, null, neighbors);
+                    } else {
+                        renderOkay = overWorldCaveRenderer.render(g2D, chunkMd, underground, vSlice, neighbors);
+                    }
 				}
 			}
 

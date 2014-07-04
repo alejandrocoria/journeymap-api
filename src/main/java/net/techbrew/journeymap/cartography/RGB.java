@@ -11,6 +11,19 @@ public final class RGB
     transient private static final PixelPaint PIXEL_PAINT = new PixelPaint();
 
     /**
+     * Don't instantiate.
+     */
+    private RGB() {}
+
+    /**
+     * Gets the PixelPaint singleton and sets the rgb color.
+     */
+    public static Paint paintOf(int rgb)
+    {
+        return PIXEL_PAINT.setColor(rgb);
+    }
+
+    /**
      * Returns an average color from a collection.
      *
      * @param colors
@@ -145,11 +158,23 @@ public final class RGB
                 ((rgb[2] & 0xFF));
     }
 
+    public static Color toColor(Integer rgb)
+    {
+        return rgb == null ? null : new Color(rgb);
+    }
+
+    public static String toString(Integer rgb)
+    {
+        if(rgb==null)
+        {
+            return "null";
+        }
+        int[] ints = ints(rgb);
+        return String.format("r=%s,g=%s,b=%s", ints[0], ints[1], ints[2]);
+    }
+
     /**
      * Darken a color by a factor.
-     *
-     * @param factor
-     * @return
      */
     public static int darken(int rgb, float factor)
     {
@@ -160,9 +185,6 @@ public final class RGB
     /**
      * Darken or lighten a color by a factor.
      * If darken, add a blue tint to simulate shadow.
-     *
-     * @param factor
-     * @return
      */
     public static int bevelSlope(int rgb, float factor)
     {
@@ -176,9 +198,6 @@ public final class RGB
 
     /**
      * Darken a color by a factor, add a blue tint for moonlight.
-     *
-     * @param factor
-     * @return
      */
     public static int moonlight(int rgb, float factor)
     {
@@ -199,6 +218,9 @@ public final class RGB
         return new float[]{((rgb >> 16) & 0xFF)/255f, ((rgb >> 8) & 0xFF)/255f, ((rgb) & 0xFF)/255f};
     }
 
+    /**
+     * Blends otherRgb into rgb using alpha as a percentage.
+     */
     public static int blendWith(int rgb, int otherRgb, float otherAlpha)
     {
         if(otherAlpha==1f)
@@ -220,11 +242,6 @@ public final class RGB
         return toInteger(floats);
     }
 
-    public static int underWater(int rgb, int waterRgb, float waterAlpha, int lightLevel)
-    {
-        return blendWith(rgb, waterRgb , waterAlpha - ((lightLevel/15f)*waterAlpha) );
-    }
-
     /**
      * Returns a float guaranteed to be between 0 and 1, inclusive.
      *
@@ -236,6 +253,9 @@ public final class RGB
         return value < 0f ? 0f : (value > 1f ? 1f : value);
     }
 
+    /**
+     * Returns an rgb array of floats clamped between 0 and 1 after a factor is applied.
+     */
     public static float[] clampFloats(float[] rgbFloats, float factor)
     {
         float r = rgbFloats[0] * factor;
@@ -259,9 +279,7 @@ public final class RGB
         return value < 0 ? 0 : (value > 255 ? 255 : value);
     }
 
-    public static Paint paintOf(int rgb)
-    {
-        return PIXEL_PAINT.setColor(rgb);
-    }
+
+
 
 }

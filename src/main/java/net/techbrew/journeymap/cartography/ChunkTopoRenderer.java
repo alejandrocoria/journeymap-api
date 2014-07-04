@@ -9,7 +9,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Stack;
 
-public class ChunkTopoRenderer extends ChunkStandardRenderer implements IChunkRenderer {
+public class ChunkTopoRenderer extends ChunkOverworldSurfaceRenderer implements IChunkRenderer {
 
 	static final int alphaDepth = 5;
     ArrayList<Color> water = new ArrayList<Color>(32);
