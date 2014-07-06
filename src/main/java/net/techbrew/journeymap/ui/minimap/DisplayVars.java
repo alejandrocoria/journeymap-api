@@ -223,7 +223,7 @@ public class DisplayVars
     DisplayVars(Minecraft mc, Shape shape, Position position, double labelFontScale)
     {
         // Immutable member and local vars
-        this.scaledResolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
+        this.scaledResolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
         this.forceUnicode = JourneyMap.getInstance().miniMapProperties.forceUnicode.get();
         this.showFps = JourneyMap.getInstance().miniMapProperties.showFps.get();
         this.shape = shape;

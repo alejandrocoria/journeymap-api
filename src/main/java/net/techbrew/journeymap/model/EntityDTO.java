@@ -77,11 +77,11 @@ public final class EntityDTO implements Serializable
         String owner = null;
         if (entity instanceof EntityTameable)
         {
-            owner = ((EntityTameable) entity).getOwnerName();
+            owner = ((EntityTameable) entity).getOwner().getCommandSenderName();
         }
         else if (entity instanceof EntityHorse)
         {
-            owner = ((EntityHorse) entity).getOwnerName();
+            owner = ((EntityHorse) entity).func_152119_ch(); //getOwner();
         }
         this.owner = owner;
 

@@ -309,7 +309,7 @@ public class FileHandler
 
         String path = file.getAbsolutePath();
 
-        if (Util.getOSType() == Util.EnumOS.MACOS)
+        if (Util.getOSType() == Util.EnumOS.OSX)
         {
             try
             {

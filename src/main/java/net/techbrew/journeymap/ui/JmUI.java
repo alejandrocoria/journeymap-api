@@ -49,7 +49,7 @@ public abstract class JmUI extends GuiScreen
     public void setWorldAndResolution(Minecraft minecraft, int width, int height)
     {
         super.setWorldAndResolution(minecraft, width, height);
-        ScaledResolution resolution = new ScaledResolution(minecraft.gameSettings, minecraft.displayWidth, minecraft.displayHeight);
+        ScaledResolution resolution = new ScaledResolution(minecraft, minecraft.displayWidth, minecraft.displayHeight);
         this.scaleFactor = resolution.getScaleFactor();
     }
 
