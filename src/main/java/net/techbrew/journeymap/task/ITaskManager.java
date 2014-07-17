@@ -13,7 +13,7 @@ public interface ITaskManager {
 	
 	public ITask getTask(Minecraft minecraft);
 	
-	public void taskAccepted(boolean accepted);
+	public void taskAccepted(ITask task, boolean accepted);
 	
 	public void disableTask(Minecraft minecraft);
 	

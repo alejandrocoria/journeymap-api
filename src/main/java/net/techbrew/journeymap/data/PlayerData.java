@@ -11,7 +11,7 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.model.BlockUtils;
+import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 import net.techbrew.journeymap.model.EntityDTO;
 
@@ -68,68 +68,37 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
         final int posY = (int) Math.floor(player.posY) - 1;
         final int posZ = (int) Math.floor(player.posZ);
         final int offset = 1;
-        int x = 0, y = 0, z = 0, blockId = 0;
+
         boolean isUnderground = true;
 
-        if (y < 0)
+        if (posY < 0)
         {
             return true;
         }
 
         check:
         {
-            for (x = (posX - offset); x <= (posX + offset); x++)
+            int y = posY;
+            for (int x = (posX - offset); x <= (posX + offset); x++)
             {
-                for (z = (posZ - offset); z <= (posZ + offset); z++)
+                for (int z = (posZ - offset); z <= (posZ + offset); z++)
                 {
                     y = posY + 1;
-                    if (canSeeSky(player.worldObj, x, y, z))
+
+                    ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(x >> 4, z >> 4), true);
+                    if (chunkMD != null)
                     {
-                        isUnderground = false;
-                        break check;
+                        if(chunkMD.ceiling(x & 15, z & 15)<=y)
+                        {
+                            isUnderground = false;
+                            break check;
+                        }
                     }
                 }
-
             }
         }
-        //System.out.println("underground: " + isUnderground);
+
         return isUnderground;
-    }
-
-    /**
-     * Potentially dangerous to use anywhere other than for player's current position
-     * - seems to cause crashes when used with ChunkRenderer.paintUnderground()
-     */
-    private static boolean canSeeSky(World world, final int x, final int y, final int z)
-    {
-        boolean seeSky = true;
-        Block block;
-
-        int topY = world.getTopSolidOrLiquidBlock(x, z);
-        if (y >= topY)
-        {
-            return true;
-        }
-
-        Chunk chunk = world.getChunkFromBlockCoords(x, z);
-        int checkY = topY;
-		while(seeSky && checkY>y) {
-            try {
-                block = chunk.getBlock(x & 15, checkY, z & 15);
-                if(BlockUtils.hasFlag(block, BlockUtils.Flag.NotHideSky)) {
-                    checkY--;
-                } else {
-                        seeSky = false;
-                        break;
-                    }
-            } catch (Exception e) {
-                checkY--;
-                JourneyMap.getLogger().warning(e + " at " + (x & 15) + "," + checkY + "," + (z & 15));
-                continue;
-            }
-
-        }
-        return seeSky;
     }
 
     public long getTTL()

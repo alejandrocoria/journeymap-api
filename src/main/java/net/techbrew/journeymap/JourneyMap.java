@@ -10,6 +10,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
+import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.cartography.ColorCache;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.WaypointsData;
@@ -22,7 +23,6 @@ import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
-import net.techbrew.journeymap.model.BlockUtils;
 import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.*;
@@ -32,7 +32,6 @@ import net.techbrew.journeymap.server.JMServer;
 import net.techbrew.journeymap.task.ITaskManager;
 import net.techbrew.journeymap.task.TaskController;
 import net.techbrew.journeymap.thread.JMThreadFactory;
-import net.techbrew.journeymap.thread.TaskThread;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
 import net.techbrew.journeymap.waypoint.WaypointStore;
@@ -94,11 +93,12 @@ public class JourneyMap
     public WebMapProperties webMapProperties;
     public WaypointProperties waypointProperties;
 
-    // Executor for task threads
-    private volatile ScheduledExecutorService taskExecutor;
+
 
     // Task controller for issuing tasks in executor
     private TaskController taskController;
+
+    private ChunkRenderController chunkRenderController;
 
     private Minecraft mc;
 
@@ -129,6 +129,21 @@ public class JourneyMap
         return ed;
     }
 
+    private static String getVersion()
+    {
+        String ed = null;
+        try
+        {
+            ed = JM_VERSION + " " + FeatureManager.getFeatureSetName();
+        }
+        catch (Throwable t)
+        {
+            ed = JM_VERSION + " ?";
+            t.printStackTrace(System.err);
+        }
+        return ed;
+    }
+
     public Boolean isInitialized()
     {
         return initialized;
@@ -136,7 +151,7 @@ public class JourneyMap
 
     public Boolean isMapping()
     {
-        return taskExecutor != null && !taskExecutor.isShutdown();
+        return taskController!=null && taskController.isMapping();
     }
 
     public Boolean isThreadLogging()
@@ -212,7 +227,7 @@ public class JourneyMap
             WaypointsData.reset();
 
             // Now that all blocks should be registered, init BlockUtils
-            BlockUtils.initialize();
+           // BlockUtils.initialize();
 
             // Ensure all mob icons files are ready for use.
             FileHandler.initMobIconSets();
@@ -348,17 +363,8 @@ public class JourneyMap
 
             this.reset();
 
-            if (taskExecutor == null || taskExecutor.isShutdown())
-            {
-                taskExecutor = Executors.newScheduledThreadPool(1, new JMThreadFactory("task")); //$NON-NLS-1$
-            }
-            else
-            {
-                logger.severe("TaskExecutor in an unexpected state.  Should be null or shutdown.");
-            }
-
             taskController = new TaskController();
-            taskController.enableTasks(mc);
+            taskController.enableTasks();
 
             logger.info("Mapping started in " + WorldData.getWorldName(mc) + " dimension " + mc.theWorld.provider.dimensionId + "."); //$NON-NLS-1$
         }
@@ -371,7 +377,7 @@ public class JourneyMap
     {
         synchronized (this)
         {
-            if ((taskExecutor != null || taskController != null) && mc!=null)
+            if ((isMapping()) && mc!=null)
             {
                 String dim = ".";
                 if (mc.theWorld != null && mc.theWorld.provider != null)
@@ -381,15 +387,9 @@ public class JourneyMap
                 logger.info("Mapping halting in " + WorldData.getWorldName(mc) + dim); //$NON-NLS-1$
             }
 
-            if (taskExecutor != null && !taskExecutor.isShutdown())
-            {
-                taskExecutor.shutdown();
-                taskExecutor = null;
-            }
-
             if (taskController != null)
             {
-                taskController.disableTasks(mc);
+                taskController.disableTasks();
                 taskController.clear();
                 taskController = null;
             }
@@ -399,14 +399,11 @@ public class JourneyMap
     private void reset()
     {
         FileHandler.lastJMWorldDir = null;
-        //BlockMD.clearCache();
+        chunkRenderController = new ChunkRenderController();
         DataCache.instance().purge();
         MapOverlay.state().follow=true;
         ColorCache.getInstance().reset();
-        BlockUtils.initialize();
-        DataCache.instance().purge();
         StatTimer.resetAll();
-        TaskThread.reset();
         TextureCache.instance().purge();
         TileCache.instance().invalidateAll();
         RegionImageCache.getInstance().flushToDisk();
@@ -508,7 +505,7 @@ public class JourneyMap
         {
             if (isMapping())
             {
-                taskController.performTasks(mc, taskExecutor);
+                taskController.performTasks();
             }
         }
         catch (Throwable t)
@@ -519,9 +516,9 @@ public class JourneyMap
         }
     }
 
-    public ScheduledExecutorService getChunkExecutor()
+    public ChunkRenderController getChunkRenderController()
     {
-        return taskExecutor;
+        return chunkRenderController;
     }
 
     /**

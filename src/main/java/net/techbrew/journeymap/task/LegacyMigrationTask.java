@@ -8,6 +8,7 @@ import net.techbrew.journeymap.Utils;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.ChatLog;
+import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageSet;
 
@@ -19,11 +20,8 @@ import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-;
-
-public class LegacyMigrationTask implements IGenericTask
+public class LegacyMigrationTask implements ITask
 {
-
     final int mapTaskDelay = JourneyMap.getInstance().coreProperties.chunkPoll.get();
 
     private static final Logger logger = JourneyMap.getLogger();
@@ -43,8 +41,15 @@ public class LegacyMigrationTask implements IGenericTask
 
 
     @Override
-    public void performTask()
+    public int getMaxRuntime()
     {
+        return 60000;
+    }
+
+    @Override
+    public void performTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging)
+    {
+        StatTimer timer = StatTimer.get(getClass().getSimpleName() + ".performTask").start();
 
         float total = 1F * pngFilesFound;
         float remaining = total - pngFiles.size();
@@ -118,6 +123,8 @@ public class LegacyMigrationTask implements IGenericTask
                 break;
             }
         }
+
+        timer.stop();
 
         logger.info("Processed " + count + " legacy images in " + elapsed + "ms");
     }
@@ -276,7 +283,7 @@ public class LegacyMigrationTask implements IGenericTask
         }
 
         @Override
-        public IGenericTask getTask(Minecraft minecraft)
+        public ITask getTask(Minecraft minecraft)
         {
             if (!enabled)
             {
@@ -297,7 +304,7 @@ public class LegacyMigrationTask implements IGenericTask
         }
 
         @Override
-        public void taskAccepted(boolean accepted)
+        public void taskAccepted(ITask task, boolean accepted)
         {
             // nothing to do
         }

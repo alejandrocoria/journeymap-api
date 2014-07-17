@@ -17,6 +17,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public final AtomicInteger entityPoll = new AtomicInteger(1800);
     public final AtomicInteger playerPoll = new AtomicInteger(1900);
     public final AtomicInteger chunkPoll = new AtomicInteger(2000);
+    public final AtomicInteger autoMapPoll = new AtomicInteger(2000);
     public final AtomicInteger cacheAnimalsData = new AtomicInteger(3100);
     public final AtomicInteger maxAnimalsData = new AtomicInteger(32);
     public final AtomicInteger cacheMobsData = new AtomicInteger(3000);
@@ -26,15 +27,16 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public final AtomicInteger maxPlayersData = new AtomicInteger(32);
     public final AtomicInteger cacheVillagersData = new AtomicInteger(2200);
     public final AtomicInteger maxVillagersData = new AtomicInteger(32);
-    public final AtomicBoolean caveLighting = new AtomicBoolean(true);
     public final AtomicBoolean announceMod = new AtomicBoolean(true);
     public final AtomicBoolean checkUpdates = new AtomicBoolean(true);
     public final AtomicBoolean caveIgnoreGlass = new AtomicBoolean(true);
     public final AtomicBoolean recordCacheStats = new AtomicBoolean(false);
 
     public final AtomicBoolean mapBathymetry = new AtomicBoolean(false);
-    public final AtomicBoolean mapSmoothSlopes = new AtomicBoolean(true);
     public final AtomicBoolean mapTransparency = new AtomicBoolean(true);
+    public final AtomicBoolean mapCaveLighting = new AtomicBoolean(true);
+    public final AtomicBoolean mapAntialiasing = new AtomicBoolean(true);
+    public final AtomicBoolean mapPlantShadows = new AtomicBoolean(false);
 
     public CoreProperties()
     {
@@ -93,17 +95,15 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
         result = 31 * result + maxPlayersData.hashCode();
         result = 31 * result + cacheVillagersData.hashCode();
         result = 31 * result + maxVillagersData.hashCode();
-        result = 31 * result + caveLighting.hashCode();
         result = 31 * result + announceMod.hashCode();
         result = 31 * result + checkUpdates.hashCode();
         return result;
     }
 
     @Override
-    public String toString()
-    {
-        return "CoreProperties: " +
-                "fileRevision=" + fileRevision +
+    public String toString() {
+        return "CoreProperties{" +
+                "name='" + name + '\'' +
                 ", logLevel=" + logLevel +
                 ", chunkOffset=" + chunkOffset +
                 ", entityPoll=" + entityPoll +
@@ -118,8 +118,13 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 ", maxPlayersData=" + maxPlayersData +
                 ", cacheVillagersData=" + cacheVillagersData +
                 ", maxVillagersData=" + maxVillagersData +
-                ", caveLighting=" + caveLighting +
                 ", announceMod=" + announceMod +
-                ", checkUpdates=" + checkUpdates;
+                ", checkUpdates=" + checkUpdates +
+                ", caveIgnoreGlass=" + caveIgnoreGlass +
+                ", recordCacheStats=" + recordCacheStats +
+                ", mapBathymetry=" + mapBathymetry +
+                ", mapTransparency=" + mapTransparency +
+                ", mapCaveLighting=" + mapCaveLighting +
+                '}';
     }
 }

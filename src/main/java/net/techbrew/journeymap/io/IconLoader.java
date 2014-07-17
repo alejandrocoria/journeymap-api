@@ -6,10 +6,10 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.IIcon;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
-import net.techbrew.journeymap.model.BlockUtils;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -24,6 +24,7 @@ public class IconLoader {
 	
 	Logger logger = JourneyMap.getLogger();
 	final BufferedImage blocksTexture;
+    DataCache dataCache = DataCache.instance();
 	HashSet<BlockMD> failed = new HashSet<BlockMD>();
 	
 	/**
@@ -61,11 +62,11 @@ public class IconLoader {
 				logger.fine("Loading color for " + blockMD);
 			}
 
-            int side = blockMD.hasFlag(BlockUtils.Flag.Side2Texture) ? 2 : 1;
+            int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
 
             IIcon blockIcon = null;
             while(blockIcon==null && side>=0) {
-                blockIcon = blockMD.getBlock().getIcon(side, blockMD.key.meta);
+                blockIcon = blockMD.getBlock().getIcon(side, blockMD.meta);
                 side--;
             }
             if(blockIcon==null) {
@@ -158,8 +159,8 @@ public class IconLoader {
             }
 
             if(unusable) {
-                blockMD.addFlags(BlockUtils.Flag.Error);
-                BlockUtils.setFlags(blockMD.getBlock(), BlockUtils.Flag.Error);
+                blockMD.addFlags(BlockMD.Flag.Error);
+                dataCache.getBlockMetadata().setFlags(blockMD.getBlock(), BlockMD.Flag.Error);
                 String pattern = "Unusable texture for %s, icon=%s,texture coords %s,%s - %s,%s";
                 logger.severe(String.format(pattern, blockMD, icon.getIconName(), xStart, yStart, xStop, yStop));
                 r = g = b = 0;
@@ -177,8 +178,8 @@ public class IconLoader {
             }
             else
             {
-                if(BlockUtils.hasAlpha(block)) {
-                    blockAlpha = BlockUtils.getAlpha(block);
+                if(dataCache.getBlockMetadata().hasAlpha(block)) {
+                    blockAlpha = dataCache.getBlockMetadata().getAlpha(block);
                 } else if(block.getRenderBlockPass()>0) {
                     blockAlpha = a * 1.0f/255; // try to use texture alpha
                     if(blockAlpha==1f) { // try to use light opacity
@@ -186,7 +187,7 @@ public class IconLoader {
                     }
                 }
             }
-            BlockUtils.setAlpha(block, blockAlpha);
+            dataCache.getBlockMetadata().setAlpha(block, blockAlpha);
 	        blockMD.setAlpha(blockAlpha);
 							
 		} catch (Throwable e1) {				

@@ -5,6 +5,7 @@ import net.techbrew.journeymap.JourneyMap;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,6 +23,7 @@ public class StatTimer {
     private final Logger logger = JourneyMap.getLogger();
     private final int warmupCount;
     private final AtomicLong counter = new AtomicLong();
+    private final AtomicLong cancelCounter = new AtomicLong();
     private final AtomicDouble totalTime = new AtomicDouble();
     private final String name;
     private final boolean disposable;
@@ -135,6 +137,7 @@ public class StatTimer {
                 max = 0;
                 min = 0;
                 counter.set(0);
+                cancelCounter.set(0);
                 totalTime.set(0);
                 if(logger.isLoggable(Level.FINE)){
                     logger.fine(name + " warmup done, " + warmupCount);
@@ -190,6 +193,7 @@ public class StatTimer {
     public void cancel() {
         synchronized (counter) {
             started = null;
+            cancelCounter.incrementAndGet();
         }
     }
 
@@ -202,6 +206,7 @@ public class StatTimer {
             maxed = false;
             started = null;
             counter.set(0);
+            cancelCounter.set(0);
             totalTime.set(0);
         }
     }
@@ -223,16 +228,15 @@ public class StatTimer {
             final long count = counter.get();
             final double total = totalTime.get();
             final double avg = total/count;
+            final long cancels = cancelCounter.get();
 
-            final StringBuilder sb = new StringBuilder(pad(name,50)).append(": ");
-            sb.append("Count: ").append(pad(count,8));
-            sb.append("Time: ").append(pad(df.format(total)+"ms", 15));
-            sb.append("Min: ").append(pad(df.format(min)+"ms",8));
-            sb.append("Max: ").append(pad(df.format(max)+"ms",12));
-            sb.append("Avg: ").append(pad(df.format(avg)+"ms",10));
-            if(warmup) sb.append("(WARMUP NOT MET: ").append(warmupCount).append(")");
-            if(maxed) sb.append("(MAXED)");
-            return sb.toString();
+            String report = String.format("<b>%50s:</b>   Avg: %8sms, Min: %8sms, Max: %10sms, Total: %10s sec, Count: %8s, Canceled: %8s,",
+                    name, df.format(avg), df.format(min), df.format(max), TimeUnit.MILLISECONDS.toSeconds((long) total), count, cancels);
+
+            if(warmup) report+= String.format("* Warmup of %s not met", warmupCount);
+            if(maxed) report+= "(MAXED)";
+
+            return report;
         }
     }
 

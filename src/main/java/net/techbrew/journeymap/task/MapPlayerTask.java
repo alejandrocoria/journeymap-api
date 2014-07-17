@@ -7,25 +7,24 @@ import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.model.ChunkMD;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.TreeSet;
-import java.util.logging.Logger;
+import java.util.*;
 
 public class MapPlayerTask extends BaseMapTask
 {
-
-    private static final Logger logger = JourneyMap.getLogger();
+    private static volatile long lastTaskCompleted;
     private static Comparator<ChunkCoordIntPair> chunkDistanceComparator = getDistanceComparator();
     private static HashSet<ChunkCoordIntPair> queuedChunks = new HashSet<ChunkCoordIntPair>();
     private static ChunkCoordinates lastPlayerPos;
     private static Boolean lastUnderground;
     private static DataCache dataCache = DataCache.instance();
+
+    private final int maxRuntime = JourneyMap.getInstance().coreProperties.chunkPoll.get() * 3;
 
     public static boolean queueChunk(ChunkCoordIntPair chunkCoords)
     {
@@ -65,12 +64,40 @@ public class MapPlayerTask extends BaseMapTask
         };
     }
 
-    private MapPlayerTask(World world, int dimension, boolean underground, Integer chunkY, ChunkMD.Set chunkStubs)
+    private MapPlayerTask(ChunkRenderController chunkRenderController, World world, int dimension, boolean underground, Integer chunkY, ChunkMD.Set chunkStubs)
     {
-        super(world, dimension, underground, chunkY, chunkStubs, false);
+        super(chunkRenderController, world, dimension, underground, chunkY, chunkStubs, false);
     }
 
-    public static BaseMapTask create(EntityPlayer player)
+    protected void complete(boolean cancelled, boolean hadError)
+    {
+        if(!cancelled)
+        {
+            lastTaskCompleted = System.currentTimeMillis();
+        }
+    }
+
+    public static Collection<BaseMapTask> createCavesBelow(ChunkRenderController chunkRenderController, EntityPlayer player, boolean alreadyUnderground)
+    {
+        List<BaseMapTask> tasks = new ArrayList<BaseMapTask>(2);
+
+        if(FeatureManager.isAllowed(Feature.MapCaves))
+        {
+            int mapY = alreadyUnderground ? player.chunkCoordY-1 : player.chunkCoordY;
+
+            while(mapY>0 && tasks.size()<2)
+            {
+                tasks.add(new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, true, mapY,
+                          new ChunkMD.Set(dataCache.getChunkMD(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ), false))));
+
+                mapY--;
+            }
+        }
+
+        return tasks;
+    }
+
+    public static BaseMapTask create(ChunkRenderController chunkRenderController, EntityPlayer player)
     {
         final ChunkCoordinates playerPos = new ChunkCoordinates(player.chunkCoordX, player.chunkCoordY, player.chunkCoordZ);
         final boolean underground = player.worldObj.provider.hasNoSky || (DataCache.getPlayer().underground && JourneyMap.getInstance().fullMapProperties.showCaves.get());
@@ -91,7 +118,7 @@ public class MapPlayerTask extends BaseMapTask
             lastPlayerPos = playerPos;
         }
 
-		boolean forceNearbyChunks = (lastUnderground==underground);
+        boolean forceNearbyChunks = (lastUnderground==underground);
 
         int offset = JourneyMap.getInstance().coreProperties.chunkOffset.get();
 
@@ -126,7 +153,7 @@ public class MapPlayerTask extends BaseMapTask
         {
             if(chunks.size()>=maxChunks)
             {
-                JourneyMap.getLogger().warning("Max chunks exceeded for MapPlayerTask: " + maxChunks);
+                JourneyMap.getLogger().warning(String.format("%s queued chunks exceeded max of %s for MapPlayerTask", queuedCoords.size(), maxChunks));
                 break;
             }
 
@@ -154,7 +181,7 @@ public class MapPlayerTask extends BaseMapTask
             {
                 if(chunks.size()>=maxChunks)
                 {
-                    JourneyMap.getLogger().warning("Max chunks exceeded for MapPlayerTask: " + maxChunks);
+                    JourneyMap.getLogger().warning(String.format("Combined chunks exceeded max of %s for MapPlayerTask", maxChunks));
                     break;
                 }
 
@@ -165,12 +192,12 @@ public class MapPlayerTask extends BaseMapTask
                 }
 
                 // Don't force to be current unless player is in it
-                forceCurrent = (player.chunkCoordX == x) && (player.chunkCoordZ == z);
+                forceCurrent = forceNearbyChunks || ((player.chunkCoordX == x) && (player.chunkCoordZ == z));
                 chunkMd = dataCache.getChunkMD(coord, forceCurrent);
 
                 if (chunkMd != null)
                 {
-                    if(chunkMd.isCurrent() || forceNearbyChunks)
+                    if(chunkMd.isCurrent())
                     {
                         chunkMd.render = true;
                         chunkMd.setCurrent(false);
@@ -188,13 +215,13 @@ public class MapPlayerTask extends BaseMapTask
 
         //System.out.println("Queued: " + queuedCoords.size() + ", Total Chunks to render: " + renderCount);
 
-        return new MapPlayerTask(world, dimension, underground, chunkY, chunks);
+        return new MapPlayerTask(chunkRenderController, world, dimension, underground, chunkY, chunks);
     }
 
     @Override
-    public void taskComplete()
+    public int getMaxRuntime()
     {
-
+        return maxRuntime;
     }
 
     /**
@@ -204,6 +231,7 @@ public class MapPlayerTask extends BaseMapTask
      */
     public static class Manager implements ITaskManager
     {
+        final int mapTaskDelay = JourneyMap.getInstance().coreProperties.chunkPoll.get();
 
         boolean enabled;
 
@@ -233,27 +261,35 @@ public class MapPlayerTask extends BaseMapTask
         }
 
         @Override
-        public BaseMapTask getTask(Minecraft minecraft)
+        public ITask getTask(Minecraft minecraft)
         {
-            if (!enabled)
+            // Ensure player chunk is loaded
+            if (enabled && minecraft.thePlayer.addedToChunk)
             {
-                return null;
+                if((System.currentTimeMillis()-lastTaskCompleted) >= mapTaskDelay)
+                {
+                    ChunkRenderController chunkRenderController = JourneyMap.getInstance().getChunkRenderController();
+                    BaseMapTask normalPlayerTask = MapPlayerTask.create(chunkRenderController, minecraft.thePlayer);
+
+                    if (normalPlayerTask != null && FeatureManager.isAllowed(Feature.MapCaves))
+                    {
+                        List<ITask> tasks = new ArrayList<ITask>(3);
+                        tasks.add(normalPlayerTask);
+                        tasks.addAll(MapPlayerTask.createCavesBelow(chunkRenderController, minecraft.thePlayer, normalPlayerTask.underground));
+                        return new TaskBatch(tasks);
+                    }
+                    else
+                    {
+                        return normalPlayerTask;
+                    }
+                }
             }
 
-            // Ensure player chunk is loaded
-            if (minecraft.thePlayer.addedToChunk)
-            {
-                BaseMapTask baseMapTask = MapPlayerTask.create(minecraft.thePlayer);
-                return baseMapTask;
-            }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         @Override
-        public void taskAccepted(boolean accepted)
+        public void taskAccepted(ITask task, boolean accepted)
         {
             // nothing to do
         }

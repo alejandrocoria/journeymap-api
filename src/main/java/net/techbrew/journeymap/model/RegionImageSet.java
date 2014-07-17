@@ -4,6 +4,7 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
+import net.techbrew.journeymap.log.StatTimer;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -137,6 +138,7 @@ public class RegionImageSet extends ImageSet {
 		}
 	}
 	private boolean bufferChanged(DataBufferInt before, DataBufferInt after) {
+        StatTimer timer = StatTimer.get("RegionImageSet.bufferChanged").start();
 		boolean changed = false;
 		for (int bank = 0; bank < after.getNumBanks(); bank++) {
 		   int[] afterBank = after.getData(bank);
@@ -148,10 +150,12 @@ public class RegionImageSet extends ImageSet {
 			   break;
 		   }
 		}
+        timer.stop();
 		return changed;
 	}
 	
 	private boolean bufferChanged(DataBufferByte before, DataBufferByte after) {
+        StatTimer timer = StatTimer.get("RegionImageSet.bufferChanged").start();
 		boolean changed = false;
 		for (int bank = 0; bank < after.getNumBanks(); bank++) {
 		   byte[] afterBank = after.getData(bank);
@@ -163,6 +167,7 @@ public class RegionImageSet extends ImageSet {
 			   break;
 		   }
 		}
+        timer.stop();
 		return changed;
 	}
 

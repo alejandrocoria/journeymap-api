@@ -4,15 +4,14 @@ import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheStats;
 import com.google.common.cache.LoadingCache;
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.nbt.ChunkLoader;
 import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.model.ChunkMD;
-import net.techbrew.journeymap.model.EntityDTO;
-import net.techbrew.journeymap.model.Waypoint;
+import net.techbrew.journeymap.model.*;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 
@@ -41,8 +40,9 @@ public class DataCache
     final LoadingCache<Class, Map<String, Object>> messages;
     final LoadingCache<Entity, DrawEntityStep> entityDrawSteps;
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
-    //final LoadingCache<Integer, RGB> colors;
     final LoadingCache<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadata;
+    final LoadingCache<String, BlockMD> blockMetadata;
+    final BlockMDCache blockMetadataLoader;
 
     // Private constructor
     private DataCache()
@@ -83,6 +83,9 @@ public class DataCache
 
         long chunkTimeout = JourneyMap.getInstance().coreProperties.chunkPoll.get() * 3;
         chunkMetadata = getCacheBuilder().expireAfterWrite(chunkTimeout, TimeUnit.MILLISECONDS).build(new ChunkMD.SimpleCacheLoader());
+
+        blockMetadataLoader = new BlockMDCache();
+        blockMetadata = getCacheBuilder().initialCapacity(256).build(blockMetadataLoader);
     }
 
     // Get singleton instance.  Concurrency-safe.
@@ -350,7 +353,7 @@ public class DataCache
                 }
                 else
                 {
-                    chunkMetadata.invalidate(coord);
+                    chunkMetadata.invalidate(coord); // removes empty Optional
                 }
             }
             catch(Throwable e)
@@ -381,6 +384,19 @@ public class DataCache
         {
             chunkMetadata.invalidate(coord);
         }
+    }
+
+    public BlockMDCache getBlockMetadata()
+    {
+        return blockMetadataLoader;
+    }
+
+    /**
+     * Produces a BlockMD instance from chunk-local coords.
+     */
+    public BlockMD getBlockMD(ChunkMD chunkMd, int x, int y, int z)
+    {
+        return blockMetadataLoader.getBlockMD(blockMetadata, chunkMd, x, y, z);
     }
 
     /**
@@ -452,6 +468,12 @@ public class DataCache
         {
             chunkMetadata.invalidateAll();
         }
+
+        synchronized (blockMetadata)
+        {
+            blockMetadataLoader.initialize();
+            blockMetadata.invalidateAll();
+        }
     }
 
     public String getDebugHtml()
@@ -463,6 +485,7 @@ public class DataCache
             sb.append("<pre>");
             sb.append(toString("All (Web only)", all));
             //sb.append(toString("Colors", colors));
+            sb.append(toString("Blocks", blockMetadata));
             sb.append(toString("Chunks", chunkMetadata));
             sb.append(toString("DrawEntitySteps", entityDrawSteps));
             sb.append(toString("EntityDTOs", entityDTOs));

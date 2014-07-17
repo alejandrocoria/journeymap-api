@@ -4,6 +4,7 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.log.StatTimer;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -65,6 +66,7 @@ public abstract class ImageSet {
 	}
 	
 	public void writeToDisk(boolean force) {
+        StatTimer timer = StatTimer.get("ImageSet.writeToDisk").start();
 		synchronized(lock) {
 			List<Wrapper> list = new ArrayList<Wrapper>(imageWrappers.values());
 			Collections.sort(list, new WrapperComparator());
@@ -75,6 +77,7 @@ public abstract class ImageSet {
 			}
 			imageWrappers.remove(MapType.OBSOLETE);
 		}
+        timer.stop();
 	}
 	
 	public boolean isDirty() {

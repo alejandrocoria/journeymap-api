@@ -4,21 +4,24 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.StatTimer;
-import net.techbrew.journeymap.thread.TaskThread;
+import net.techbrew.journeymap.thread.JMThreadFactory;
+import net.techbrew.journeymap.thread.RunnableTask;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TaskController
 {
-
+    final ArrayBlockingQueue<Future> queue = new ArrayBlockingQueue<Future>(1);
     final static Logger logger = JourneyMap.getLogger();
-    final int mapTaskDelay = JourneyMap.getInstance().coreProperties.chunkPoll.get();
     final List<ITaskManager> managers = new LinkedList<ITaskManager>();
+    final Minecraft minecraft = FMLClientHandler.instance().getClient();
+
+    // Executor for task threads
+    private volatile ScheduledExecutorService taskExecutor;
 
     public TaskController()
     {
@@ -28,10 +31,24 @@ public class TaskController
         managers.add(new MapPlayerTask.Manager());
     }
 
-    public void enableTasks(final Minecraft minecraft)
+    private void ensureExecutor()
     {
+        if (taskExecutor == null || taskExecutor.isShutdown())
+        {
+            taskExecutor = Executors.newScheduledThreadPool(2, new JMThreadFactory("task")); //$NON-NLS-1$
+            queue.clear();
+        }
+    }
 
-        TaskThread.reset();
+    public Boolean isMapping()
+    {
+        return taskExecutor != null && !taskExecutor.isShutdown();
+    }
+
+    public void enableTasks()
+    {
+        queue.clear();
+        ensureExecutor();
 
         List<ITaskManager> list = new LinkedList<ITaskManager>(managers);
         for (ITaskManager manager : managers)
@@ -52,6 +69,13 @@ public class TaskController
     public void clear()
     {
         managers.clear();
+        queue.clear();
+
+        if (taskExecutor != null && !taskExecutor.isShutdown())
+        {
+            taskExecutor.shutdown();
+            taskExecutor = null;
+        }
     }
 
     private ITaskManager getManager(Class<? extends ITaskManager> managerClass)
@@ -133,7 +157,7 @@ public class TaskController
         }
     }
 
-    public void disableTasks(final Minecraft minecraft)
+    public void disableTasks()
     {
         for (ITaskManager manager : managers)
         {
@@ -145,34 +169,59 @@ public class TaskController
         }
     }
 
-    public void performTasks(final Minecraft minecraft, final ScheduledExecutorService taskExecutor)
+    public void performTasks()
     {
-
-        if (!TaskThread.hasQueue())
+        synchronized (queue)
         {
-
-            ITask task = null;
-            ITaskManager manager = getNextManager(minecraft);
-            if (manager == null)
+            if(!queue.isEmpty())
             {
-                logger.warning("No task managers enabled!");
-                return;
-            }
-            boolean accepted = false;
-
-            StatTimer timer = StatTimer.get(manager.getTaskClass().getSimpleName() + ".Manager.getTask").start();
-            task = manager.getTask(minecraft);
-
-            if (task != null)
-            {
-                timer.stop();
-                TaskThread thread = TaskThread.createAndQueue(task);
-                if (thread != null)
+                if(queue.peek().isDone())
                 {
+                    try
+                    {
+                        queue.take();
+                    }
+                    catch (InterruptedException e)
+                    {
+                        logger.warning(e.getMessage());
+                    }
+                }
+            }
+
+            if (queue.isEmpty())
+            {
+                ITask task = null;
+                ITaskManager manager = getNextManager(minecraft);
+                if (manager == null)
+                {
+                    logger.warning("No task managers enabled!");
+                    return;
+                }
+                boolean accepted = false;
+
+                StatTimer timer = StatTimer.get(manager.getTaskClass().getSimpleName() + ".Manager.getTask").start();
+                task = manager.getTask(minecraft);
+
+                if(task==null)
+                {
+                    timer.cancel();
+                }
+                else
+                {
+                    timer.stop();
+
+                    ensureExecutor();
+
                     if (taskExecutor != null && !taskExecutor.isShutdown())
                     {
-                        taskExecutor.schedule(thread, mapTaskDelay, TimeUnit.MILLISECONDS);
+                        // Create the runnable wrapper
+                        final RunnableTask runnableTask = new RunnableTask(taskExecutor, task);
+
+                        // Start the task
+                        Future future = taskExecutor.submit(runnableTask);
+                        queue.add(future);
                         accepted = true;
+
                         if (logger.isLoggable(Level.FINE))
                         {
                             logger.fine("Scheduled " + manager.getTaskClass().getSimpleName());
@@ -182,20 +231,11 @@ public class TaskController
                     {
                         logger.warning("TaskExecutor isn't running");
                     }
-                }
-                else
-                {
-                    logger.warning("Could not schedule " + manager.getTaskClass().getSimpleName());
-                }
-            }
-            else
-            {
-                timer.cancel();
-            }
 
-            manager.taskAccepted(accepted);
+                    manager.taskAccepted(task, accepted);
+                }
+            }
         }
-
     }
 
     private ITaskManager getNextManager(final Minecraft minecraft)

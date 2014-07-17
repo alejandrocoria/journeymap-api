@@ -2,8 +2,8 @@ package net.techbrew.journeymap.io;
 
 
 import com.google.common.base.Joiner;
+import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
@@ -25,6 +25,8 @@ import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class FileHandler
 {
@@ -444,7 +446,7 @@ public class FileHandler
 
         String path = file.getAbsolutePath();
 
-        if (Util.getOSType() == Util.EnumOS.MACOS)
+        if (Util.getOSType() == Util.EnumOS.OSX)
         {
             try
             {
@@ -593,7 +595,7 @@ public class FileHandler
                         if (!entry.isDirectory())
                         {
                             toFile.getParentFile().mkdirs();
-                            Files.copy(new ZipEntryInputSupplier(zipFile, entry), toFile);
+                            new ZipEntryByteSource(zipFile, entry).copyTo(Files.asByteSink(toFile));
                         }
                     }
                 }
@@ -628,21 +630,25 @@ public class FileHandler
         }
     }
 
-    private static class ZipEntryInputSupplier implements InputSupplier<InputStream>
+    private static class ZipEntryByteSource extends ByteSource
     {
         final ZipFile file;
         final ZipEntry entry;
 
-        ZipEntryInputSupplier(ZipFile file, ZipEntry entry)
+        ZipEntryByteSource(ZipFile file, ZipEntry entry)
         {
             this.file = file;
             this.entry = entry;
         }
 
         @Override
-        public InputStream getInput() throws IOException
-        {
+        public InputStream openStream() throws IOException {
             return file.getInputStream(entry);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("ZipEntryByteSource( %s / %s )", file, entry);
         }
     }
 }

@@ -332,7 +332,7 @@ public class Waypoint implements Serializable
 
     public Vec3 getPosition()
     {
-        return mc.theWorld.getWorldVec3Pool().getVecFromPool(getBlockCenteredX(), getBlockCenteredY(), getBlockCenteredZ());
+        return Vec3.createVectorHelper(getBlockCenteredX(), getBlockCenteredY(), getBlockCenteredZ());
     }
 
     public int getR()

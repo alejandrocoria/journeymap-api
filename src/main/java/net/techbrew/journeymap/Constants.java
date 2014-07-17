@@ -43,7 +43,7 @@ public class Constants
 
     public static List<KeyBinding> initKeybindings()
     {
-        CONTROL_KEYNAME_COMBO = Util.getOSType()== Util.EnumOS.MACOS ? "^" : "Ctrl+";
+        CONTROL_KEYNAME_COMBO = Util.getOSType()== Util.EnumOS.OSX ? "^" : "Ctrl+";
         KEYBINDING_CATEGORY = Constants.getString("MapOverlay.hotkeys_keybinding_category", CONTROL_KEYNAME_COMBO);
         KB_MAP = new KeyBinding("key.journeymap.hotkeys_toggle", Keyboard.KEY_J, KEYBINDING_CATEGORY);
         KB_MAP_ZOOMIN = new KeyBinding("key.journeymap.zoom_in", Keyboard.KEY_EQUALS, KEYBINDING_CATEGORY);

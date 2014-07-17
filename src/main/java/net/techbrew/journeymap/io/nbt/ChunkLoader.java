@@ -48,6 +48,7 @@ public class ChunkLoader {
         Chunk chunk = getChunkFromMemory(chunkMD.coord.chunkXPos, chunkMD.coord.chunkZPos, chunkMD.worldObj);
         if(chunk!=null) {
             chunkMD.stub.updateFrom(chunk);
+            chunkMD.sliceSlopes.clear();
             chunkMD.setCurrent(true);
             return chunkMD;
         } else {

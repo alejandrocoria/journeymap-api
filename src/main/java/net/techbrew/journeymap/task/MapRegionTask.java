@@ -6,6 +6,7 @@ import net.minecraft.world.World;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
@@ -27,15 +28,17 @@ import java.util.logging.Logger;
 
 public class MapRegionTask extends BaseMapTask
 {
+    private static final int MAX_RUNTIME = 30000;
+    private static volatile long lastTaskCompleted;
 
     private static final Logger logger = JourneyMap.getLogger();
 
-    private MapRegionTask(World world, int dimension, boolean underground, Integer chunkY, ChunkMD.Set chunkMdPool)
+    private MapRegionTask(ChunkRenderController renderController, World world, int dimension, boolean underground, Integer chunkY, ChunkMD.Set chunkMdPool)
     {
-        super(world, dimension, underground, chunkY, chunkMdPool, true);
+        super(renderController, world, dimension, underground, chunkY, chunkMdPool, true);
     }
 
-    public static BaseMapTask create(RegionCoord rCoord, Minecraft minecraft)
+    public static BaseMapTask create(ChunkRenderController renderController, RegionCoord rCoord, Minecraft minecraft)
     {
 
         int missing = 0;
@@ -68,8 +71,20 @@ public class MapRegionTask extends BaseMapTask
         {
             logger.warning("No viable chunks found in region " + rCoord);
         }
-        return new MapRegionTask(world, rCoord.dimension, rCoord.isUnderground(), rCoord.getVerticalSlice(), chunks);
+        return new MapRegionTask(renderController, world, rCoord.dimension, rCoord.isUnderground(), rCoord.getVerticalSlice(), chunks);
 
+    }
+
+    @Override
+    protected void complete(boolean cancelled, boolean hadError)
+    {
+        lastTaskCompleted = System.currentTimeMillis();
+    }
+
+    @Override
+    public int getMaxRuntime()
+    {
+        return MAX_RUNTIME;
     }
 
     /**
@@ -79,6 +94,7 @@ public class MapRegionTask extends BaseMapTask
      */
     public static class Manager implements ITaskManager
     {
+        final int mapTaskDelay = JourneyMap.getInstance().coreProperties.autoMapPoll.get();
 
         RegionLoader regionLoader;
         boolean enabled;
@@ -95,6 +111,11 @@ public class MapRegionTask extends BaseMapTask
 
             enabled = (params != null);
             if (!enabled)
+            {
+                return false;
+            }
+
+            if((System.currentTimeMillis()-lastTaskCompleted) < mapTaskDelay)
             {
                 return false;
             }
@@ -151,7 +172,6 @@ public class MapRegionTask extends BaseMapTask
         @Override
         public void disableTask(Minecraft minecraft)
         {
-
             if (regionLoader != null)
             {
                 if (regionLoader.isUnderground())
@@ -191,12 +211,13 @@ public class MapRegionTask extends BaseMapTask
             }
 
             RegionCoord rCoord = regionLoader.getRegions().peek();
-            BaseMapTask baseMapTask = MapRegionTask.create(rCoord, minecraft);
+            ChunkRenderController chunkRenderController = JourneyMap.getInstance().getChunkRenderController();
+            BaseMapTask baseMapTask = MapRegionTask.create(chunkRenderController, rCoord, minecraft);
             return baseMapTask;
         }
 
         @Override
-        public void taskAccepted(boolean accepted)
+        public void taskAccepted(ITask task, boolean accepted)
         {
             if (accepted)
             {
@@ -214,11 +235,5 @@ public class MapRegionTask extends BaseMapTask
                 }
             }
         }
-    }
-
-    @Override
-    public void taskComplete()
-    {
-
     }
 }

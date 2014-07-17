@@ -95,7 +95,7 @@ public class MiniMap
             return;
         }
 
-        final boolean doStateRefresh = state.shouldRefresh(mc, miniMapProperties);
+        final boolean doStateRefresh = state.shouldRefresh(mc, miniMapProperties) || gridRenderer.hasUnloadedTile();
 
         try
         {
@@ -395,9 +395,9 @@ public class MiniMap
 
         if (oldDv == null || oldDv.shape != this.dv.shape)
         {
-            this.drawTimer = StatTimer.get("jm.minimap.drawMap." + shape.name(), 500);
+            this.drawTimer = StatTimer.get("MiniMap.drawMap." + shape.name(), 500);
             this.drawTimer.reset();
-            this.refreshStateTimer =  StatTimer.get("jm.minimap.drawMap." + shape.name() + "+refreshState", 5);
+            this.refreshStateTimer =  StatTimer.get("MiniMap.drawMap." + shape.name() + "+refreshState", 5);
             this.refreshStateTimer.reset();
         }
 

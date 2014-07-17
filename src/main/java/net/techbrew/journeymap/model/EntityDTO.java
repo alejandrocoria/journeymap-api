@@ -2,6 +2,7 @@ package net.techbrew.journeymap.model;
 
 import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityHorse;
@@ -11,6 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.StringUtils;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * JSON-safe attributes derived from an EntityLivingBase.
@@ -82,11 +84,30 @@ public class EntityDTO implements Serializable
         String owner = null;
         if (entity instanceof EntityTameable)
         {
-            owner = ((EntityTameable) entity).getOwnerName();
+            EntityLivingBase ownerEntity = ((EntityTameable) entity).getOwner();
+            if(ownerEntity!=null)
+            {
+                owner = ownerEntity.getCommandSenderName();
+            }
         }
         else if (entity instanceof EntityHorse)
         {
-            owner = ((EntityHorse) entity).getOwnerName();
+            // TODO: Test this with and without owners
+            String ownerUuidString = ((EntityHorse) entity).func_152119_ch();
+            if(ownerUuidString!=null)
+            {
+                try
+                {
+                    if(currentPlayer.getUniqueID().equals(UUID.fromString(ownerUuidString)))
+                    {
+                        owner = currentPlayer.getCommandSenderName();
+                    }
+                }
+                catch (Throwable t)
+                {
+                    t.printStackTrace();
+                }
+            }
         }
         this.owner = owner;
 

@@ -51,6 +51,8 @@ public class MapOverlayState
     private String playerBiome = "";
     private MapProperties lastMapProperties = null;
     private List<EntityDTO> entityList = new ArrayList<EntityDTO>(32);
+    private int lastPlayerChunkX = 0;
+    private int lastPlayerChunkZ = 0;
 
     /**
      * Default constructor
@@ -71,6 +73,9 @@ public class MapOverlayState
         this.vSlice = this.underground ? player.chunkCoordY : null;
         this.worldDir = FileHandler.getJMWorldDir(mc);
 
+        lastPlayerChunkX = player.chunkCoordX;
+        lastPlayerChunkZ = player.chunkCoordZ;
+
         if (player.dimension != this.dimension)
         {
             follow = true;
@@ -90,7 +95,7 @@ public class MapOverlayState
             }
         }
 
-        playerBiome = DataCache.getPlayer().biome;
+        playerBiome = DataCache.getPlayer().biome;//+ (DataCache.getPlayer().underground ? " Underground" : " Surface");
 
         updateLastRefresh();
     }
@@ -254,6 +259,7 @@ public class MapOverlayState
 
     public boolean shouldRefresh(Minecraft mc, MapProperties mapProperties)
     {
+        EntityDTO player = DataCache.getPlayer();
 
         if (System.currentTimeMillis() > (lastRefresh + 500 + coreProperties.chunkPoll.get()))
         {
@@ -265,15 +271,35 @@ public class MapOverlayState
             return true;
         }
 
-        if (this.underground != DataCache.getPlayer().underground)
+        if (this.underground != player.underground)
         {
             return true;
+        }
+
+        if (this.vSlice != null && (!player.underground || this.vSlice!=player.chunkCoordY))
+        {
+            return true;
+        }
+
+        int diffX = Math.abs(lastPlayerChunkX-player.chunkCoordX);
+        if(diffX>2)
+        {
+            return true; // should happen on a teleport
+        }
+
+        int diffZ = Math.abs(lastPlayerChunkZ-player.chunkCoordZ);
+        if(diffZ>2)
+        {
+            return true; // should happen on a teleport
         }
 
         if(lastMapProperties == null || !lastMapProperties.equals(mapProperties))
         {
             return true;
         }
+
+        lastPlayerChunkX = player.chunkCoordX;
+        lastPlayerChunkZ = player.chunkCoordZ;
 
         return false;
     }

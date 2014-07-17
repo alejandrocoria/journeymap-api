@@ -21,8 +21,9 @@ class Stratum
     boolean isWater;
     Integer dayColor;
     Integer nightColor;
+    Integer caveColor;
 
-    Stratum set(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
+    Stratum set(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, Integer lightLevel)
     {
         this.chunkMd = chunkMd;
         this.blockMD = blockMD;
@@ -30,10 +31,11 @@ class Stratum
         this.y = y;
         this.z = z;
         this.isWater = blockMD!=null && blockMD.isWater();
-        this.lightLevel = (blockMD==null) ? null : chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z);
+        this.lightLevel = (blockMD==null) ? null : (lightLevel!=null) ? lightLevel : chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z);
         this.lightOpacity = (blockMD==null) ? null : chunkMd.getLightOpacity(blockMD, x, y, z);
         dayColor = null;
         nightColor = null;
+        caveColor = null;
         return this;
     }
 
@@ -83,6 +85,7 @@ class Stratum
                 ", isWater=" + isWater +
                 ", dayColor="  + (dayColor==null ? null : new Color(dayColor)) +
                 ", nightColor="  + (nightColor==null ? null : new Color(nightColor)) +
+                ", caveColor="  + (caveColor==null ? null : new Color(caveColor)) +
                 '}';
     }
 }

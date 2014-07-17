@@ -104,6 +104,23 @@ public class GridRenderer {
         return grid.containsValue(tile);
     }
 
+    public boolean hasUnloadedTile()
+    {
+        Tile tile;
+        for(Map.Entry<TilePos,Integer> entry : grid.entrySet())
+        {
+            if(isOnScreen(entry.getKey()))
+            {
+                tile = tc.getIfPresent(entry.getValue());
+                if (tile == null || !tile.hasTexture())
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 	public boolean center(final double blockX, final double blockZ, final int zoom) {
 
         if(blockX==centerBlockX && blockZ==centerBlockZ && zoom==this.zoom && !grid.isEmpty()){

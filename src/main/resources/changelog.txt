@@ -13,6 +13,12 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 
+### Completely Rewritten Map Algorithms
+- Transparency and luminosity (especially under water) are vastly improved
+- Faster cave mapping algorithm
+- Higher-detail Nether and End mapping
+- Night map light levels and colors are now closer to how they appear in-game
+
 ### New Feature: Minimap Terrain Transparency
 - MiniMap Options now allows you to choose how opaque/transparent the mapped terrain appears
 
@@ -27,6 +33,13 @@ http://journeymap.techbrew.net
 - Icons must be in PNG format. Recommended size is 16x16 pixels.
 - Afer you restart Minecraft, the General Display Options screen or MiniMap Options screen will allow you to select your new custom icon set.
 
+### MiniMap Improvements
+- Most MiniMap key combinations no longer require you to press CTRL / COMMMAND
+- MiniMap switches between cave/surface mapping more quickly
+- MiniMap refreshes neighboring tiles more quickly when zoomed in.
+- MiniMap zoom setting is now independent of Full-screen Map zoom setting.
+- MiniMap zoom setting and Full-screen Map zoom setting are now saved between sessions.
+
 ### New/Updated Translations
 - ru_RU has been updated courtesy of Vladislav Chaykin
 - nl_NL has been updated courtesty of Niels Meijer
@@ -34,10 +47,8 @@ http://journeymap.techbrew.net
 ### Misc. Improvements
 - General Display Options are now centered on-screen (for large displays)
 - Language files have been overhauled and cleaned up to make translation easier.
-- Most MiniMap key combinations no longer require you to press CTRL / COMMMAND
-- MiniMap zoom setting is now independent of Full-screen Map zoom setting.
-- MiniMap zoom setting and Full-screen Map zoom setting are now saved between sessions.
 - Added data caching / object pooling to reduce the number of resources created during mapping tasks.
+- Replaced thread management system to allow for task threads interruption
 
 ### Known issues:
 

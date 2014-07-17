@@ -1,9 +1,8 @@
 package net.techbrew.journeymap.cartography;
 
-import net.minecraft.block.Block;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.log.StatTimer;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
@@ -16,16 +15,20 @@ import java.util.Stack;
  */
 class Strata
 {
+    final DataCache dataCache = DataCache.instance();
+    final boolean mapCaveLighting = JourneyMap.getInstance().coreProperties.mapCaveLighting.get();
     final String name;
     final int initialPoolSize;
     final int poolGrowthIncrement;
 
     final List<Stratum> poolFree;
     final List<Stratum> poolUsed;
+    final boolean underground;
 
-    Strata(String name, int initialPoolSize, int poolGrowthIncrement)
+    Strata(String name, int initialPoolSize, int poolGrowthIncrement, boolean underground)
     {
         this.name = name;
+        this.underground = underground;
         this.initialPoolSize = initialPoolSize;
         this.poolGrowthIncrement = poolGrowthIncrement;
         poolFree = new ArrayList<Stratum>(initialPoolSize);
@@ -64,7 +67,9 @@ class Strata
     protected Integer waterColor = null;
     protected Integer renderDayColor = null;
     protected Integer renderNightColor = null;
+    protected Integer renderCaveColor = null;
     protected int lightAttenuation = 0;
+    protected boolean blocksFound = false;
 
     void reset()
     {
@@ -76,7 +81,9 @@ class Strata
         waterColor = null;
         renderDayColor = null;
         renderNightColor = null;
+        renderCaveColor = null;
         lightAttenuation = 0;
+        blocksFound = false;
 
         stack.clear();
 
@@ -88,26 +95,32 @@ class Strata
 
     void release(Stratum stratum)
     {
-        stratum.set(null, null, -1,-1,-1);
+        stratum.set(null, null, -1,-1,-1,null);
         poolUsed.remove(stratum);
         poolFree.add(stratum);
     }
 
     Stratum push(final ChunkMD.Set neighbors, ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
     {
+        return push(neighbors, chunkMd, blockMD, x, y, z, null);
+    }
+
+    Stratum push(final ChunkMD.Set neighbors, ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, Integer lightLevel)
+    {
         try
         {
-            StatTimer timer = blockMD.isWater() ? StatTimer.get("Strata.push-water") : StatTimer.get("Strata.push");
-            timer.start();
+//            StatTimer timer = blockMD.isWater() ? StatTimer.get("Strata.push-water") : StatTimer.get("Strata.push");
+//            timer.start();
 
             // Alocate from pool, push to stack, and set vars on stratum
-            Stratum stratum = stack.push(allocate().set(chunkMd, blockMD, x, y, z));
+            Stratum stratum = stack.push(allocate().set(chunkMd, blockMD, x, y, z, lightLevel));
 
             // Update Strata's basic data
             topY = (topY == null) ? y : Math.max(topY, y);
             bottomY = (bottomY == null) ? y : Math.min(bottomY, y);
             maxLightLevel = (maxLightLevel == null) ? stratum.lightLevel : Math.max(maxLightLevel, stratum.lightLevel);
             lightAttenuation += stratum.lightOpacity;
+            blocksFound = true;
 
             // Update Strata's water data
             if (blockMD.isWater())
@@ -127,7 +140,7 @@ class Strata
                 }
             }
 
-            timer.stop();
+            //timer.stop();
             return stratum;
         }
         catch(Throwable t)
@@ -137,7 +150,7 @@ class Strata
         }
     }
 
-    Stratum pop(boolean ignoreMiddleWater)
+    Stratum pop(IChunkRenderer renderer, boolean ignoreMiddleWater)
     {
         Stratum stratum = stack.pop();
         if(stratum==null)
@@ -150,10 +163,11 @@ class Strata
         // Skip middle water blocks
         if(ignoreMiddleWater && stratum.isWater && isWaterAbove(stratum))
         {
-            return pop(true);
+            return pop(renderer, true);
         }
 
-        return setColors(stratum);
+        renderer.setStratumColors(stratum, lightAttenuation, waterColor, isWaterAbove(stratum), underground, mapCaveLighting);
+        return stratum;
     }
 
     int depth()
@@ -169,66 +183,6 @@ class Strata
     boolean hasWater()
     {
         return topWaterY!=null;
-    }
-
-    private Stratum setColors(Stratum stratum)
-    {
-        if(stratum.lightLevel==null || stratum.y<0)
-        {
-            throw new IllegalStateException("Stratum wasn't initialized");
-        }
-
-        // Daylight is the greater of max light attenuated through the stack / the stratum's inherant light level
-        float daylightDiff = stratum.y==topY ? 1f : Math.max(stratum.lightLevel, Math.max(1, 15-lightAttenuation)) / 15f;
-
-        // Nightlight is the stratum's inherant light level, clamped between 20% and 80% of max light (magic #s to match how it looks in game)
-        float nightLightDiff = Math.max(.2F, Math.min(.8F, ((Math.max(2, stratum.lightLevel)) / 15F)) );
-
-        // Set basic block color
-        if(stratum.isWater)
-        {
-            stratum.dayColor = waterColor;
-        }
-        else
-        {
-            stratum.dayColor = stratum.blockMD.getColor(stratum.chunkMd, stratum.x, stratum.y, stratum.z);
-
-            // Brighten glowstone / redstone lamp
-            if(stratum.blockMD.getBlock()== Block.glowStone || stratum.blockMD.getBlock()== Block.redstoneLampActive)
-            {
-                stratum.dayColor = RGB.darken(stratum.dayColor, 1.2f); // magic # to match how it looks in game
-            }
-        }
-
-        if(isWaterAbove(stratum))
-        {
-            // Darken for daylight filtered down
-            stratum.dayColor = RGB.darken(stratum.dayColor,  Math.max(daylightDiff, .25f)); // magic # to match how it looks in game
-
-            // Darken for night light and blend with watercolor above
-            stratum.nightColor =  RGB.moonlight(RGB.blendWith(waterColor, stratum.dayColor, nightLightDiff), nightLightDiff);
-
-            if(depth()<3)
-            {
-                // magic # cheat to get bluer blend in shallow water
-                daylightDiff = (1-(depth()/4f));
-            }
-
-            // Blend day color with watercolor above
-            stratum.dayColor = RGB.blendWith(waterColor, stratum.dayColor, Math.max(daylightDiff, .2f));
-        }
-        else
-        {
-            // Just darken based on light levels
-            stratum.nightColor = RGB.moonlight(stratum.dayColor, nightLightDiff);
-            if(daylightDiff<1f)
-            {
-                stratum.dayColor = RGB.darken(stratum.dayColor, daylightDiff);
-            }
-        }
-
-
-        return stratum;
     }
 
     boolean isWaterAbove(Stratum stratum)
@@ -258,7 +212,7 @@ class Strata
         ChunkMD chunk = neighbors.get(new ChunkCoordIntPair(blockX>>4, blockZ>>4));
         if(chunk!=null)
         {
-            BlockMD block = BlockMD.getBlockMD(chunk, blockX & 15, blockY, blockZ & 15);
+            BlockMD block = dataCache.getBlockMD(chunk, blockX & 15, blockY, blockZ & 15);
             if(block!=null && block.isWater())
             {
                 return block.getColor(chunk, blockX & 15, blockY, blockZ & 15);

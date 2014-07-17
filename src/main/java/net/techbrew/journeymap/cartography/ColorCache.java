@@ -14,10 +14,11 @@ import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.io.IconLoader;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.BlockMD;
-import net.techbrew.journeymap.model.BlockUtils;
+import net.techbrew.journeymap.model.BlockMDCache;
 import net.techbrew.journeymap.model.ChunkMD;
 
 import java.awt.*;
@@ -126,9 +127,9 @@ public class ColorCache implements IResourceManagerReloadListener {
             int tint = getBiomeColorMultiplier(blockMD, x, y, z);
             if ((tint != 0xFFFFFF) && (tint != 0xFFFFFFFF)) { // white without alpha, white with alpha
                 color = colorMultiplier(color, tint);
-                JourneyMap.getLogger().fine("Custom biome tint set for " + blockMD.key + " in " + biome.biomeName);
+                JourneyMap.getLogger().fine("Custom biome tint set for " + blockMD + " in " + biome.biomeName);
             } else {
-                JourneyMap.getLogger().fine("Custom biome tint not found for " + blockMD.key + " in " + biome.biomeName);
+                JourneyMap.getLogger().fine("Custom biome tint not found for " + blockMD + " in " + biome.biomeName);
             }
             putBiomeColor(blockMD, biome, color);
         }
@@ -138,7 +139,7 @@ public class ColorCache implements IResourceManagerReloadListener {
     private Color getFoliageColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z) {
         Color color = getBiomeColor(blockMD, biome);
         if(color==null) {
-            int leafColor = blockMD.getBlock().getRenderColor(blockMD.key.meta); // getRenderColor()
+            int leafColor = blockMD.getBlock().getRenderColor(blockMD.meta); // getRenderColor()
             int biomeColor = BiomeGenBase.plains.getBiomeFoliageColor(x,y,z); // Default
             try
             {
@@ -146,7 +147,7 @@ public class ColorCache implements IResourceManagerReloadListener {
             }
             catch (Throwable t)
             {
-                blockMD.addFlags(BlockUtils.Flag.Error);
+                blockMD.addFlags(BlockMD.Flag.Error);
                 JourneyMap.getLogger().severe("Couldn't get biome foliage color: " + LogFormatter.toString(t));
             }
             int leafTimesBiome = colorMultiplier(biomeColor, leafColor);
@@ -168,7 +169,7 @@ public class ColorCache implements IResourceManagerReloadListener {
             }
             catch (Throwable t)
             {
-                blockMD.addFlags(BlockUtils.Flag.Error);
+                blockMD.addFlags(BlockMD.Flag.Error);
                 JourneyMap.getLogger().severe("Couldn't get biome grass color: " + LogFormatter.toString(t));
             }
             color = colorMultiplier(baseColor, biomeColor);
@@ -228,7 +229,7 @@ public class ColorCache implements IResourceManagerReloadListener {
             if(blockMD.isAir()) {
                 color = Color.white;
                 blockMD.setAlpha(0f);
-                blockMD.addFlags(BlockUtils.Flag.HasAir, BlockUtils.Flag.NotHideSky, BlockUtils.Flag.NoShadow);
+                blockMD.addFlags(BlockMD.Flag.HasAir, BlockMD.Flag.OpenToSky, BlockMD.Flag.NoShadow);
             } else {
                 color = loadBaseColor(blockMD, x, y, z);
             }
@@ -258,12 +259,12 @@ public class ColorCache implements IResourceManagerReloadListener {
                 // Check for custom biome-based color multiplier
                 int tint = getBiomeColorMultiplier(blockMD, x, y, z);
                 if ((tint != 0xFFFFFF) && (tint != 0xFFFFFFFF)) { // white without alpha, white with alpha
-                    blockMD.addFlags(BlockUtils.Flag.CustomBiomeColor);
-                    BlockUtils.setFlags(blockMD.getBlock(), BlockUtils.Flag.BiomeColor);
+                    blockMD.addFlags(BlockMD.Flag.CustomBiomeColor);
+                    DataCache.instance().getBlockMetadata().setFlags(blockMD.getBlock(), BlockMD.Flag.BiomeColor);
                     JourneyMap.getLogger().fine("Custom biome tint discovered for " + blockMD);
                 } else {
                     // Check for render color
-                    int renderColor = blockMD.getBlock().getRenderColor(blockMD.key.meta & 0xf); // getRenderColor()
+                    int renderColor = blockMD.getBlock().getRenderColor(blockMD.meta & 0xf); // getRenderColor()
                     if(renderColor!=0xffffff && renderColor!=0xffffffff) { // white without alpha or white with alpha
                         baseColor = colorMultiplier(baseColor, 0xff000000 | renderColor); // Force opaque render color
                         JourneyMap.getLogger().fine("Applied render color for " + blockMD);
@@ -287,7 +288,6 @@ public class ColorCache implements IResourceManagerReloadListener {
 	public void reset() {
         biomeColors.clear();
 		baseColors.clear();
-        BlockUtils.initialize();
 	}
 
     public String getCacheDebugHtml() {
@@ -296,9 +296,9 @@ public class ColorCache implements IResourceManagerReloadListener {
         sb.append(LogFormatter.LINEBREAK).append("<b>Current Resource Packs: </b>").append(lastResourcePack);
 
         sb.append(LogFormatter.LINEBREAK).append("<table><tr valign='top'><td width='50%'>");
-        sb.append(debugCache(BlockUtils.getAlphaMap(), "Block Transparency"));
+        sb.append(debugCache(DataCache.instance().getBlockMetadata().getAlphaMap(), "Block Transparency"));
         sb.append(LogFormatter.LINEBREAK).append("</td><td>");
-        sb.append(LogFormatter.LINEBREAK).append(debugCache(BlockUtils.getFlagsMap(), "Block Flags"));
+        sb.append(LogFormatter.LINEBREAK).append(debugCache(DataCache.instance().getBlockMetadata().getFlagsMap(), "Block Flags"));
         sb.append(LogFormatter.LINEBREAK).append("</td></tr></table>");
 
         sb.append(LogFormatter.LINEBREAK).append(debugCache(baseColors, "Base Colors"));

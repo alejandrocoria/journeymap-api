@@ -1,409 +1,343 @@
 package net.techbrew.journeymap.cartography;
 
 
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.BlockMD;
-import net.techbrew.journeymap.model.BlockUtils;
 import net.techbrew.journeymap.model.ChunkMD;
+import net.techbrew.journeymap.properties.CoreProperties;
 
 import java.awt.*;
-import java.util.logging.Level;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Base class for methods reusable across renderers.
  *
  * @author mwoodman
  */
-public abstract class BaseRenderer
+public abstract class BaseRenderer implements IChunkRenderer
 {
+    static final int BLACK = Color.black.getRGB();
+    static final int VOID = RGB.toInteger(17,12,25);
+    public static AlphaComposite OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
 
-    boolean caveLighting = JourneyMap.getInstance().coreProperties.caveLighting.get();
-    final boolean fineLogging = JourneyMap.getLogger().isLoggable(Level.FINE);
+    protected DataCache dataCache = DataCache.instance();
+    protected CoreProperties coreProperties = JourneyMap.getInstance().coreProperties;
 
-    boolean debug = false;
-    long badBlockCount = 0;
+    protected boolean mapBathymetry;
+    protected boolean mapTransparency;
+    protected boolean mapCaveLighting;
+    protected boolean mapAntialiasing;
+
+    volatile AtomicLong badBlockCount = new AtomicLong(0);
+
+    ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
+    ArrayList<BlockCoordIntPair> secondarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
+
+    protected final float[] defaultFog = new float[]{0,0,0};
+
+    public BaseRenderer()
+    {
+        updateOptions();
+
+        // Offsets used for avg heights
+        primarySlopeOffsets.add(new BlockCoordIntPair(0, -1)); // North
+        primarySlopeOffsets.add(new BlockCoordIntPair(-1, 0)); // West
+        primarySlopeOffsets.add(new BlockCoordIntPair(-1, -1)); // NorthWest
+
+        // Offsets used for slope calc on non-foliage
+        secondarySlopeOffsets.add(new BlockCoordIntPair(-1, -2)); // North of NorthWest
+        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -1)); // West of NorthWest
+        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -2)); // NorthWest of NorthWest
+        secondarySlopeOffsets.add(new BlockCoordIntPair(-1, -2)); // South of NorthWest
+    }
 
     /**
-     * Paint the block with magenta to indicate it's a problem.
-     *
-     * @param x
-     * @param y
-     * @param z
-     * @param g2D
+     * Ensures mapping options are up-to-date.
      */
-    public void paintBadBlock(final int x, final int y, final int z, final Graphics2D g2D)
+    protected void updateOptions()
     {
-//        g2D.setComposite(BlockUtils.OPAQUE);
-//        g2D.setPaint(Color.magenta);
-//        g2D.fillRect(x, z, 1, 1);
-        badBlockCount++;
-        if (badBlockCount==1 || badBlockCount % 100 == 0)
+        mapBathymetry = coreProperties.mapBathymetry.get();
+        mapTransparency = coreProperties.mapTransparency.get();
+        mapAntialiasing = coreProperties.mapAntialiasing.get();
+        mapCaveLighting = coreProperties.mapCaveLighting.get();
+    }
+
+    @Override
+    public float[] getFogColor()
+    {
+        return defaultFog;
+    }
+
+    @Override
+    public void setStratumColors(Stratum stratum, int lightAttenuation, Integer waterColor, boolean waterAbove, boolean underground, boolean mapCaveLighting)
+    {
+        if(stratum.lightLevel==null || stratum.y<0)
         {
-            JourneyMap.getLogger().warning(
-                    "Bad block at " + x + "," + y + "," + z //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                            + ". Total bad blocks painted: " + badBlockCount
-            ); //$NON-NLS-1$
+            throw new IllegalStateException("Stratum wasn't initialized");
+        }
+
+        // Daylight is the greater of sun light (15) attenuated through the stack and the stratum's inherant light level
+        float daylightDiff = Math.max(1, Math.max(stratum.lightLevel, 15-lightAttenuation)) / 15f;
+
+        // Nightlight is the greater of moon light (4 attenuated through the stack and the stratum's inherant light level
+        float nightLightDiff = Math.max(5, Math.max(stratum.lightLevel, 4-lightAttenuation)) / 15f;
+
+        int basicColor = stratum.isWater ? waterColor : stratum.blockMD.getColor(stratum.chunkMd, stratum.x, stratum.y, stratum.z);
+        if(stratum.blockMD.getBlock()== Blocks.glowstone || stratum.blockMD.getBlock()== Blocks.lit_redstone_lamp)
+        {
+            basicColor = RGB.darken(basicColor, 1.2f); // magic # to match how it looks in game
+        }
+
+        if(waterAbove && waterColor!=null)
+        {
+            // Blend day color with watercolor above, darken for daylight filtered down
+            stratum.dayColor = RGB.blendWith(waterColor, RGB.darken(basicColor,  Math.max(daylightDiff, nightLightDiff)), Math.max(daylightDiff, nightLightDiff));
+            stratum.dayColor = RGB.blendWith(stratum.dayColor, waterColor, .15f); // cheat to get bluer blend in shallow water
+
+            // Darken for night light and blend with watercolor above
+            stratum.nightColor = RGB.darken(stratum.dayColor, Math.max(nightLightDiff, .25f));
+        }
+        else
+        {
+            // Just darken based on light levels
+            stratum.dayColor =   RGB.darken(basicColor, daylightDiff);
+
+            stratum.nightColor = RGB.darkenFog(basicColor, nightLightDiff, getFogColor());
+        }
+
+        if(underground)
+        {
+            stratum.caveColor = mapCaveLighting ? stratum.nightColor : stratum.dayColor;
         }
     }
 
     /**
+     * Paint the block with magenta to indicate it's a problem.
+     */
+    public void paintBadBlock(final int x, final int y, final int z, final Graphics2D g2D)
+    {
+        long count = badBlockCount.incrementAndGet();
+        if (count==1 || count % 10240 == 0)
+        {
+            JourneyMap.getLogger().warning(
+                    "Bad block at " + x + "," + y + "," + z //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                            + ". Total bad blocks painted: " + count
+            ); //$NON-NLS-1$
+        }
+    }
+
+    protected void paintDimOverlay(int x, int z, float alpha, final Graphics2D g2D)
+    {
+        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+        g2D.setPaint(RGB.paintOf(BLACK));
+        g2D.fillRect(x, z, 1, 1);
+        g2D.setComposite(OPAQUE);
+    }
+
+    /**
      * Paint the block.
-     *
-     * @param x
-     * @param z
-     * @param color
-     * @param g2D
      */
     public void paintBlock(final int x, final int z, final int color,
                            final Graphics2D g2D)
     {
-        g2D.setComposite(BlockUtils.OPAQUE);
+        g2D.setComposite(OPAQUE);
         g2D.setPaint(RGB.paintOf(color));
         g2D.fillRect(x, z, 1, 1);
     }
 
     /**
-     * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
-     *
-     * @param x
-     * @param z
-     * @param offsetX
-     * @param offsetz
-     * @param currentChunk
-     * @param neighbors
-     * @param defaultVal
-     * @return
+     * Paint the void.
      */
-    protected Float getBlockHeight(int x, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, float defaultVal, boolean ignoreWater)
+    public void paintVoidBlock(final int x, final int z, final Graphics2D g2D)
     {
-        int newX = x + offsetX;
-        int newZ = z + offsetz;
-
-        // TODO: I'm sure there's a bitwise way to do this.
-
-        switch (newX)
-        {
-            case -1:
-                newX = 15;
-                break;
-            case 16:
-                newX = 0;
-                break;
-        }
-
-        switch (newZ)
-        {
-            case -1:
-                newZ = 15;
-                break;
-            case 16:
-                newZ = 0;
-                break;
-        }
-
-        ChunkMD chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
-
-        if (chunk != null)
-        {
-            return (float) chunk.getSlopeHeightValue(newX, newZ, ignoreWater);
-        }
-        else
-        {
-            return defaultVal;
-        }
+        g2D.setComposite(OPAQUE);
+        g2D.setPaint(RGB.paintOf(VOID));
+        g2D.fillRect(x, z, 1, 1);
     }
 
     /**
-     * Get the slope of the block at the coordinates + offsets.  Uses chunkMd.slopes.
-     *
-     * @param x
-     * @param z
-     * @param offsetX
-     * @param offsetz
-     * @param currentChunk
-     * @param neighbors
-     * @param defaultVal
-     * @return
+     * Paint the void.
      */
-    public Float getBlockSlope(int x, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, float defaultVal, boolean underground)
+    public void paintBlackBlock(final int x, final int z, final Graphics2D g2D)
     {
-        int newX = x + offsetX;
-        int newZ = z + offsetz;
+        g2D.setComposite(OPAQUE);
+        g2D.setPaint(RGB.paintOf(BLACK));
+        g2D.fillRect(x, z, 1, 1);
+    }
 
-        int chunkX = currentChunk.stub.xPosition;
-        int chunkZ = currentChunk.stub.zPosition;
-        boolean search = false;
 
-        if (newX == -1)
+    /**
+     * Initialize surface slopes in chunk.  This is the black magic
+     * that serves as the stand-in for true bump-mapping.
+     */
+    protected Float[][] populateSlopes(final ChunkMD chunkMd, Integer vSlice, final ChunkMD.Set neighbors)
+    {
+        synchronized (chunkMd)
         {
-            chunkX--;
-            newX = 15;
-            search = true;
-        }
-        else
-        {
-            if (newX == 16)
-            {
-                chunkX++;
-                newX = 0;
-                search = true;
-            }
-        }
-        if (newZ == -1)
-        {
-            chunkZ--;
-            newZ = 15;
-            search = true;
-        }
-        else
-        {
-            if (newZ == 16)
-            {
-                chunkZ++;
-                newZ = 0;
-                search = true;
-            }
-        }
+            int y = 0, sliceMinY = 0, sliceMaxY = 0;
+            Float[][] slopes = new Float[16][16];
+            boolean ignoreWater = mapBathymetry;
+            boolean isSurface = (vSlice == null);
+            float slope, primarySlope, secondarySlope;
+            BlockMD blockMD;
 
-        ChunkMD chunkMd = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
-        if (chunkMd != null)
-        {
-            float[][] slopes = underground ? chunkMd.sliceSlopes : chunkMd.surfaceSlopes;
-            if (slopes == null)
+            if (isSurface)
             {
-                return defaultVal;
+                chunkMd.surfaceSlopes = slopes;
             }
             else
             {
-                return slopes[newX][newZ];
+                chunkMd.sliceSlopes.put(vSlice, slopes);
+                int[] sliceBounds = getVSliceBounds(chunkMd, vSlice);
+                sliceMinY = sliceBounds[0];
+                sliceMaxY = sliceBounds[1];
             }
-        }
-        else
-        {
-            return defaultVal;
+
+            for (int z = 0; z < 16; z++)
+            {
+                for (int x = 0; x < 16; x++)
+                {
+                    // Get block height
+                    if (isSurface)
+                    {
+                        y = chunkMd.getSurfaceBlockHeight(x, z, ignoreWater);
+                    }
+                    else
+                    {
+                        y = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, ignoreWater);
+                    }
+
+
+                    // Calculate primary slope
+                    primarySlope = calculateSlope(chunkMd, neighbors, primarySlopeOffsets, ignoreWater, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY);
+
+                    // Exaggerate primary slope for normal shading
+                    slope = primarySlope;
+                    if (slope < 1)
+                    {
+                        slope *= .5f;
+                    }
+                    else if (slope > 1)
+                    {
+                        slope *= 1.25f;
+                    }
+
+                    // Calculate secondary slope
+                    if (mapAntialiasing)
+                    {
+                        secondarySlope = calculateSlope(chunkMd, neighbors, secondarySlopeOffsets, ignoreWater, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY);
+
+                        if (secondarySlope > primarySlope)
+                        {
+                            slope *= 1.1f;
+                        }
+                        else if (secondarySlope < primarySlope)
+                        {
+                            slope *= .95f;
+                        }
+                    }
+
+                    // Set that slope.  Set it good.  Aw yeah.
+                    slopes[x][z] = Math.min(1.8f, Math.max(0.2f, slope));
+                }
+            }
+
+            return slopes;
         }
     }
 
     /**
-     * Get the slope of the block at the coordinates + offsets.  Uses chunkMd.slopes.
-     *
-     * @param x
-     * @param z
-     * @param offsetX
-     * @param offsetz
-     * @param currentChunk
-     * @param neighbors
-     * @param defaultVal
-     * @return
+     * Get block height within slice.  Should lazy-populate sliceHeights.
      */
-    public int getBlockLight(int x, int y, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, int defaultVal)
-    {
-        int newX = x + offsetX;
-        int newZ = z + offsetz;
+    protected abstract int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater);
 
-        int chunkX = currentChunk.stub.xPosition;
-        int chunkZ = currentChunk.stub.zPosition;
-        boolean search = false;
-
-        if (newX == -1)
-        {
-            chunkX--;
-            newX = 15;
-            search = true;
-        }
-        else
-        {
-            if (newX == 16)
-            {
-                chunkX++;
-                newX = 0;
-                search = true;
-            }
-        }
-        if (newZ == -1)
-        {
-            chunkZ--;
-            newZ = 15;
-            search = true;
-        }
-        else
-        {
-            if (newZ == 16)
-            {
-                chunkZ++;
-                newZ = 0;
-                search = true;
-            }
-        }
-
-        ChunkMD chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
-
-        if (chunk != null)
-        {
-            return chunk.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z);
-        }
-        else
-        {
-            return defaultVal;
-        }
-    }
 
     /**
-     * Get the block at the coordinates + offsets.  Uses chunkMd.slopes.
-     *
-     * @param x
-     * @param z
-     * @param offsetX
-     * @param offsetz
-     * @param currentChunk
-     * @param neighbors
-     * @param defaultVal
-     * @return
+     * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
      */
-    public BlockMD getBlock(int x, int y, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors, BlockMD defaultVal)
+    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater, final int offsetX, int offsetZ, ChunkMD.Set neighbors, int defaultVal)
     {
-        int newX = x + offsetX;
-        int newZ = z + offsetz;
-
-        int chunkX = currentChunk.stub.xPosition;
-        int chunkZ = currentChunk.stub.zPosition;
-        boolean search = false;
-
-        if (newX == -1)
-        {
-            chunkX--;
-            newX = 15;
-            search = true;
-        }
-        else
-        {
-            if (newX == 16)
-            {
-                chunkX++;
-                newX = 0;
-                search = true;
-            }
-        }
-        if (newZ == -1)
-        {
-            chunkZ--;
-            newZ = 15;
-            search = true;
-        }
-        else
-        {
-            if (newZ == 16)
-            {
-                chunkZ++;
-                newZ = 0;
-                search = true;
-            }
-        }
-
-        ChunkMD chunk = getChunk(x, z, offsetX, offsetz, currentChunk, neighbors);
-
-        if (chunk != null)
-        {
-            return BlockMD.getBlockMD(chunk, newX, y, newZ);
-        }
-        else
-        {
-            return defaultVal;
-        }
-    }
-
-    /**
-     * Gets the chunkMd at the coordinates + offsets.
-     *
-     * @param x
-     * @param z
-     * @param offsetX
-     * @param offsetz
-     * @param currentChunk
-     * @param neighbors
-     * @return
-     */
-    ChunkMD getChunk(int x, int z, int offsetX, int offsetz, ChunkMD currentChunk, ChunkMD.Set neighbors)
-    {
-        int newX = x + offsetX;
-        int newZ = z + offsetz;
-
-        int chunkX = currentChunk.stub.xPosition;
-        int chunkZ = currentChunk.stub.zPosition;
-        boolean search = false;
-
-        if (newX == -1)
-        {
-            chunkX--;
-            newX = 15;
-            search = true;
-        }
-        else
-        {
-            if (newX == 16)
-            {
-                chunkX++;
-                newX = 0;
-                search = true;
-            }
-        }
-        if (newZ == -1)
-        {
-            chunkZ--;
-            newZ = 15;
-            search = true;
-        }
-        else
-        {
-            if (newZ == 16)
-            {
-                chunkZ++;
-                newZ = 0;
-                search = true;
-            }
-        }
-
         ChunkMD chunk = null;
-        if (search && neighbors!=null)
+        int blockX = ((chunkMd.coord.chunkXPos<<4) + x + offsetX);
+        int blockZ = ((chunkMd.coord.chunkZPos<<4) + z + offsetZ);
+        int chunkX = blockX >> 4;
+        int chunkZ = blockZ >> 4;
+
+        if(chunkX==chunkMd.coord.chunkXPos && chunkZ==chunkMd.coord.chunkZPos)
+        {
+            chunk = chunkMd;
+        }
+        else
         {
             ChunkCoordIntPair coord = new ChunkCoordIntPair(chunkX, chunkZ);
-            chunk = neighbors.get(coord);
+            chunk =  neighbors.get(coord);
+        }
+
+        if (chunk != null)
+        {
+            return getSliceBlockHeight(chunk, blockX & 15, vSlice, blockZ & 15, sliceMinY, sliceMaxY, ignoreWater);
         }
         else
         {
-            chunk = currentChunk;
+            return defaultVal;
         }
-
-        return chunk;
     }
 
-    protected final BlockMD getTopBlockMD(final ChunkMD chunkMd, final int x, int y, final int z)
+    protected float calculateSlope(final ChunkMD chunkMd, final ChunkMD.Set neighbors, final Collection<BlockCoordIntPair> offsets, boolean ignoreWater, final int x, final int y, final int z,  boolean isSurface, Integer vSlice, int sliceMinY, int sliceMaxY)
     {
-        BlockMD topBlockMd = null;
-
-        do
+        // Calculate slope by dividing height by neighbors' heights
+        float slopeSum = 0;
+        for(BlockCoordIntPair offset : offsets)
         {
-            topBlockMd = BlockMD.getBlockMD(chunkMd, x, y, z);
-
-            // Null check
-            if (topBlockMd == null)
+            if(isSurface)
             {
-                break;
-            }
-
-            if (topBlockMd.isTransparentRoof() || topBlockMd.isAir() || topBlockMd.getAlpha() ==  0)
-            {
-                y--;
+                slopeSum += ((y*1f) / chunkMd.getSurfaceBlockHeight(x, z, offset.x, offset.z, neighbors, y, ignoreWater));
             }
             else
             {
-                break;
+                slopeSum += ((y*1f) / getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, ignoreWater, offset.x, offset.z, neighbors, y));
             }
-        } while (y >= 0);
-
-        return topBlockMd;
+        }
+        return slopeSum / offsets.size();
     }
+
+
+    protected int[] getVSliceBounds(final ChunkMD chunkMd, final Integer vSlice)
+    {
+        if(vSlice==null)
+        {
+            return null;
+        }
+
+        final int sliceMinY = Math.max((vSlice << 4), 0);
+        final int hardSliceMaxY = ((vSlice + 1) << 4) - 1;
+        int sliceMaxY = Math.min(hardSliceMaxY, chunkMd.worldObj.getActualHeight());
+        if (sliceMinY >= sliceMaxY)
+        {
+            sliceMaxY = sliceMinY + 2;
+        }
+
+        return new int[]{sliceMinY, sliceMaxY};
+    }
+
+    protected float getSlope(final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, Integer vSlice, int z)
+    {
+        Float[][] slopes = (vSlice==null) ? chunkMd.surfaceSlopes : chunkMd.sliceSlopes.get(vSlice);
+
+        if(slopes==null)
+        {
+            slopes = populateSlopes(chunkMd, vSlice, neighbors);
+        }
+
+        return slopes[x][z];
+    }
+
 
 }

@@ -4,11 +4,10 @@ import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.MapSaver;
 
+import java.io.File;
 import java.util.logging.Logger;
 
-;
-
-public class SaveMapTask implements IGenericTask {
+public class SaveMapTask implements ITask {
 	
 	private static final Logger logger = JourneyMap.getLogger();
 	
@@ -17,9 +16,16 @@ public class SaveMapTask implements IGenericTask {
 	private SaveMapTask(MapSaver mapSaver) {
 		this.mapSaver = mapSaver;
 	}
-	
-	@Override
-	public void performTask() {
+
+    @Override
+    public int getMaxRuntime()
+    {
+        return 120000;
+    }
+
+    @Override
+	public void performTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging)
+    {
 		mapSaver.saveMap();
 	}
 	
@@ -34,7 +40,7 @@ public class SaveMapTask implements IGenericTask {
 		MapSaver mapSaver;
 		
 		@Override
-		public Class<? extends IGenericTask> getTaskClass() {
+		public Class<? extends ITask> getTaskClass() {
 			return SaveMapTask.class;
 		}
 		
@@ -63,7 +69,7 @@ public class SaveMapTask implements IGenericTask {
 		}
 		
 		@Override
-		public void taskAccepted(boolean accepted) {
+		public void taskAccepted(ITask task, boolean accepted) {
 			mapSaver = null;
 		}
 		

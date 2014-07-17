@@ -76,9 +76,9 @@ public class MapOverlay extends JmUI
     Color playerInfoFgColor = Color.lightGray;
     Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
 
-    StatTimer drawScreenTimer = StatTimer.get("jm.fullscreen.drawScreen");
-    StatTimer drawMapTimer = StatTimer.get("jm.fullscreen.drawScreen.drawMap");
-    StatTimer drawMapTimerWithRefresh = StatTimer.get("jm.fullscreen.drawScreen.drawMap+refreshState");
+    StatTimer drawScreenTimer = StatTimer.get("MapOverlay.drawScreen");
+    StatTimer drawMapTimer = StatTimer.get("MapOverlay.drawScreen.drawMap");
+    StatTimer drawMapTimerWithRefresh = StatTimer.get("MapOverlay.drawMap+refreshState");
 
     /**
      * Default constructor

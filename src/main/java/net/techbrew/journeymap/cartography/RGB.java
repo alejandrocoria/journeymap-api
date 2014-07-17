@@ -1,5 +1,7 @@
 package net.techbrew.journeymap.cartography;
 
+import net.minecraft.util.Vec3;
+
 import java.awt.*;
 import java.util.Collection;
 
@@ -188,7 +190,7 @@ public final class RGB
      */
     public static int bevelSlope(int rgb, float factor)
     {
-        final float bluer = (factor < 1) ? .8f : 1f;
+        final float bluer = (factor < 1) ? .85f : 1f;
         float[] floats = floats(rgb);
         floats[0] = floats[0] * bluer * factor;
         floats[1] = floats[1] * bluer * factor;
@@ -204,7 +206,31 @@ public final class RGB
         float[] floats = floats(rgb);
         floats[0] = floats[0] * factor;
         floats[1] = floats[1] * factor;
-        floats[2] = floats[2] * (factor + .15f);
+        floats[2] = floats[2] * (factor + .10f);
+        return toInteger(clampFloats(floats, 1f));
+    }
+
+    /**
+     * Darken a color by a factor, add a red tint for Nether fog.
+     */
+    public static int netherFog(int rgb, float factor)
+    {
+        float[] floats = floats(rgb);
+        floats[0] = floats[0] * (factor + .20f);
+        floats[1] = floats[1] * factor;
+        floats[2] = floats[2] * factor;
+        return toInteger(clampFloats(floats, 1f));
+    }
+
+    /**
+     * Darken a color by a factor, add a fog tint.
+     */
+    public static int darkenFog(int rgb, float factor, float[] fog)
+    {
+        float[] floats = floats(rgb);
+        floats[0] = floats[0] * (factor + (float) fog[0]);
+        floats[1] = floats[1] * (factor + (float) fog[1]);
+        floats[2] = floats[2] * (factor + (float) fog[2]);
         return toInteger(clampFloats(floats, 1f));
     }
 
