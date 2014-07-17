@@ -11,6 +11,7 @@
     "authorList": ["techbrew (Mark Woodman)"],
     "logoFile": "/assets/journeymap/mod.png",
     "screenshots": [],
+    "dependants":[],
     "dependencies": ["Forge@[@FORGEVERSION@,)"],
     "requiredMods": ["Forge@[@FORGEVERSION@,)"],
     "useDependencyInformation": true
