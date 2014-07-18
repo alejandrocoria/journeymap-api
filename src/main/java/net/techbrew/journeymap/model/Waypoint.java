@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.model;
 
 import com.google.gson.Gson;
@@ -173,6 +181,11 @@ public class Waypoint implements Serializable
         return String.format("%s, %s", x, z);
     }
 
+    public static Waypoint fromString(String json)
+    {
+        return GSON.fromJson(json, Waypoint.class);
+    }
+
     public void setLocation(int x, int y, int z, int currentDimension)
     {
         this.x = (currentDimension == -1) ? x * 8 : x;
@@ -306,7 +319,7 @@ public class Waypoint implements Serializable
     public double getBlockCenteredX()
     {
         int x = getX();
-        return x + ((x<0) ? -.5 : .5);
+        return x + ((x < 0) ? -.5 : .5);
     }
 
     public int getY()
@@ -316,7 +329,7 @@ public class Waypoint implements Serializable
 
     public double getBlockCenteredY()
     {
-        return getY()+.5;
+        return getY() + .5;
     }
 
     public int getZ()
@@ -327,7 +340,7 @@ public class Waypoint implements Serializable
     public double getBlockCenteredZ()
     {
         int z = getZ();
-        return z + ((z<0) ? -.5 : .5);
+        return z + ((z < 0) ? -.5 : .5);
     }
 
     public Vec3 getPosition()
@@ -428,11 +441,6 @@ public class Waypoint implements Serializable
     public String toString()
     {
         return GSON.toJson(this);
-    }
-
-    public static Waypoint fromString(String json)
-    {
-        return GSON.fromJson(json, Waypoint.class);
     }
 
     @Override

@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.map.layer;
 
 import net.minecraft.client.Minecraft;
@@ -29,11 +37,10 @@ import java.util.List;
  */
 public class WaypointLayer implements LayerDelegate.Layer
 {
-    FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
     private final long hoverDelay = 100;
     private final List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
-    private final BlockOutlineDrawStep clickDrawStep = new BlockOutlineDrawStep(new BlockCoordIntPair(0,0));
-
+    private final BlockOutlineDrawStep clickDrawStep = new BlockOutlineDrawStep(new BlockCoordIntPair(0, 0));
+    FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
     BlockCoordIntPair lastCoord = null;
 
     long lastClick = 0;
@@ -66,7 +73,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         long now = Minecraft.getSystemTime();
 
         // Add click draw step
-        if(!blockCoord.equals(clickDrawStep.blockCoord))
+        if (!blockCoord.equals(clickDrawStep.blockCoord))
         {
             unclick();
         }
@@ -141,7 +148,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         boolean doubleClick = sysTime - this.lastClick < 450L;
         this.lastClick = sysTime;
 
-        if(!drawStepList.contains(clickDrawStep))
+        if (!drawStepList.contains(clickDrawStep))
         {
             drawStepList.add(clickDrawStep);
         }
@@ -226,12 +233,12 @@ public class WaypointLayer implements LayerDelegate.Layer
         public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale)
         {
 
-            if(Mouse.isButtonDown(0))
+            if (Mouse.isButtonDown(0))
             {
                 return;
             }
 
-            if(xOffset!=0 || yOffset!=0)
+            if (xOffset != 0 || yOffset != 0)
             {
                 unclick();
                 return;
@@ -239,24 +246,24 @@ public class WaypointLayer implements LayerDelegate.Layer
 
             double x = blockCoord.x;
             double z = blockCoord.z;
-            double size = Math.pow(2,gridRenderer.getZoom());
-            double thick = gridRenderer.getZoom()<2 ? 1 : 2;
+            double size = Math.pow(2, gridRenderer.getZoom());
+            double thick = gridRenderer.getZoom() < 2 ? 1 : 2;
 
             Point2D.Double pixel = gridRenderer.getBlockPixelInGrid(x, z);
             pixel.setLocation(pixel.getX() + xOffset, pixel.getY() + yOffset);
             if (gridRenderer.isOnScreen(pixel))
             {
-                DrawUtil.drawRectangle(pixel.getX()-(thick*thick), pixel.getY()-(thick*thick), size+(thick*4), thick, Color.black, 150);
-                DrawUtil.drawRectangle(pixel.getX()-thick, pixel.getY()-thick, size+(thick*thick), thick, Color.white, 255);
+                DrawUtil.drawRectangle(pixel.getX() - (thick * thick), pixel.getY() - (thick * thick), size + (thick * 4), thick, Color.black, 150);
+                DrawUtil.drawRectangle(pixel.getX() - thick, pixel.getY() - thick, size + (thick * thick), thick, Color.white, 255);
 
-                DrawUtil.drawRectangle(pixel.getX()-(thick*thick), pixel.getY()-thick, thick, size+(thick*thick), Color.black, 150);
-                DrawUtil.drawRectangle(pixel.getX()-thick, pixel.getY(), thick, size, Color.white, 255);
+                DrawUtil.drawRectangle(pixel.getX() - (thick * thick), pixel.getY() - thick, thick, size + (thick * thick), Color.black, 150);
+                DrawUtil.drawRectangle(pixel.getX() - thick, pixel.getY(), thick, size, Color.white, 255);
 
-                DrawUtil.drawRectangle(pixel.getX()+size, pixel.getY(), thick, size, Color.white, 255);
-                DrawUtil.drawRectangle(pixel.getX()+size+thick, pixel.getY()-thick, thick, size+(thick*thick), Color.black, 150);
+                DrawUtil.drawRectangle(pixel.getX() + size, pixel.getY(), thick, size, Color.white, 255);
+                DrawUtil.drawRectangle(pixel.getX() + size + thick, pixel.getY() - thick, thick, size + (thick * thick), Color.black, 150);
 
-                DrawUtil.drawRectangle(pixel.getX()-thick, pixel.getY()+size, size+(thick*thick), thick, Color.white, 255);
-                DrawUtil.drawRectangle(pixel.getX()-(thick*thick), pixel.getY()+size+thick, size+(thick*4), thick, Color.black, 150);
+                DrawUtil.drawRectangle(pixel.getX() - thick, pixel.getY() + size, size + (thick * thick), thick, Color.white, 255);
+                DrawUtil.drawRectangle(pixel.getX() - (thick * thick), pixel.getY() + size + thick, size + (thick * 4), thick, Color.black, 150);
             }
         }
     }

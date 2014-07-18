@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.properties;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -9,8 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class WaypointProperties extends PropertiesBase implements Comparable<WaypointProperties>
 {
     protected transient static final int CODE_REVISION = 3;
-    protected transient final String name = "waypoint";
-
     public final AtomicBoolean managerEnabled = new AtomicBoolean(true);
     public final AtomicBoolean beaconEnabled = new AtomicBoolean(true);
     public final AtomicBoolean showTexture = new AtomicBoolean(true);
@@ -24,6 +30,7 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     public final AtomicBoolean fontSmall = new AtomicBoolean(true);
     public final AtomicBoolean textureSmall = new AtomicBoolean(true);
     public final AtomicInteger maxDistance = new AtomicInteger(0);
+    protected transient final String name = "waypoint";
 
     @Override
     public String getName()

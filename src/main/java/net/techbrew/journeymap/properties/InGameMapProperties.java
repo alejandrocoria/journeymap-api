@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.properties;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -22,12 +30,12 @@ public abstract class InGameMapProperties extends MapProperties
     {
         boolean saveNeeded = super.validate();
 
-        if(terrainAlpha.get()<0)
+        if (terrainAlpha.get() < 0)
         {
             terrainAlpha.set(0);
             saveNeeded = true;
         }
-        else if(terrainAlpha.get()>255)
+        else if (terrainAlpha.get() > 255)
         {
             terrainAlpha.set(255);
             saveNeeded = true;

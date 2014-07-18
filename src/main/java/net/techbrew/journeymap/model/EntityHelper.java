@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.model;
 
 import com.google.common.collect.ImmutableSortedMap;
@@ -29,12 +37,11 @@ import java.util.*;
 
 public class EntityHelper
 {
-    private static int lateralDistance = JourneyMap.getInstance().coreProperties.chunkOffset.get() * 8;
-    private static int verticalDistance = lateralDistance / 2;
-
     public static EntityDistanceComparator entityDistanceComparator = new EntityDistanceComparator();
     public static EntityDTODistanceComparator entityDTODistanceComparator = new EntityDTODistanceComparator();
     public static EntityMapComparator entityMapComparator = new EntityMapComparator();
+    private static int lateralDistance = JourneyMap.getInstance().coreProperties.chunkOffset.get() * 8;
+    private static int verticalDistance = lateralDistance / 2;
 
     public static List<EntityDTO> getEntitiesNearby(String timerName, int maxEntities, boolean hostile, Class... entityClasses)
     {
@@ -52,13 +59,13 @@ public class EntityHelper
 
         try
         {
-            for(Entity entity : allEntities)
+            for (Entity entity : allEntities)
             {
-                if(entity instanceof EntityLivingBase && !entity.isDead && entity.addedToChunk && bb.intersectsWith(entity.boundingBox))
+                if (entity instanceof EntityLivingBase && !entity.isDead && entity.addedToChunk && bb.intersectsWith(entity.boundingBox))
                 {
                     for (Class entityClass : entityClasses)
                     {
-                        if(entityClass.isAssignableFrom(entity.getClass()))
+                        if (entityClass.isAssignableFrom(entity.getClass()))
                         {
                             EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
                             EntityDTO dto = DataCache.instance().getEntityDTO(entityLivingBase);
@@ -70,7 +77,7 @@ public class EntityHelper
                 }
             }
 
-            if(list.size()>maxEntities)
+            if (list.size() > maxEntities)
             {
                 int before = list.size();
                 entityDTODistanceComparator.player = mc.thePlayer;
@@ -121,7 +128,7 @@ public class EntityHelper
         allPlayers.remove(mc.thePlayer);
 
         int max = JourneyMap.getInstance().coreProperties.maxPlayersData.get();
-        if(allPlayers.size()>max)
+        if (allPlayers.size() > max)
         {
             entityDistanceComparator.player = mc.thePlayer;
             Collections.sort(allPlayers, entityDistanceComparator);
@@ -129,7 +136,7 @@ public class EntityHelper
         }
 
         List<EntityDTO> playerDTOs = new ArrayList<EntityDTO>(allPlayers.size());
-        for(EntityPlayer player : allPlayers)
+        for (EntityPlayer player : allPlayers)
         {
             EntityDTO dto = DataCache.instance().getEntityDTO(player);
             dto.update(player, false);
@@ -273,25 +280,25 @@ public class EntityHelper
             Integer o1rank = 0;
             Integer o2rank = 0;
 
-            if (o1.customName!=null)
+            if (o1.customName != null)
             {
                 o1rank++;
             }
             else
             {
-                if (o1.username!=null)
+                if (o1.username != null)
                 {
                     o1rank += 2;
                 }
             }
 
-            if (o2.customName!=null)
+            if (o2.customName != null)
             {
                 o2rank++;
             }
             else
             {
-                if (o2.username!=null)
+                if (o2.username != null)
                 {
                     o2rank += 2;
                 }

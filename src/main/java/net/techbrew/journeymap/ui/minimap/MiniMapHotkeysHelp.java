@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.minimap;
 
 import net.minecraft.client.gui.GuiButton;
@@ -16,17 +24,9 @@ public class MiniMapHotkeysHelp extends JmUI
 
     private int lastWidth = 0;
     private int lastHeight = 0;
-
-    private enum ButtonEnum
-    {
-        Close
-    }
-
     private Button buttonClose;
-
     private DisplayVars.Shape currentShape;
     private DisplayVars.Position currentPosition;
-
     private KeyEventHandler keyEventHandler;
 
     public MiniMapHotkeysHelp()
@@ -131,7 +131,7 @@ public class MiniMapHotkeysHelp extends JmUI
     {
         super.drawBackground(layer);
 
-        if(JourneyMap.getInstance().miniMapProperties.enabled.get())
+        if (JourneyMap.getInstance().miniMapProperties.enabled.get())
         {
             MiniMap miniMap = UIManager.getInstance().getMiniMap();
             miniMap.drawMap();
@@ -143,6 +143,11 @@ public class MiniMapHotkeysHelp extends JmUI
     {
         super.keyTyped(c, i);
         keyEventHandler.onKeypress(true);
+    }
+
+    private enum ButtonEnum
+    {
+        Close
     }
 
 }

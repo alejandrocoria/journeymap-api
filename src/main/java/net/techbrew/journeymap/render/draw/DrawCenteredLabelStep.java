@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.render.draw;
 
 import net.techbrew.journeymap.render.overlay.GridRenderer;
@@ -8,7 +16,8 @@ import java.awt.geom.Point2D;
 /**
  * Created by mwoodman on 12/26/13.
  */
-public class DrawCenteredLabelStep implements DrawStep {
+public class DrawCenteredLabelStep implements DrawStep
+{
 
     final double posX;
     final double posZ;
@@ -17,7 +26,8 @@ public class DrawCenteredLabelStep implements DrawStep {
     final Color bgColor;
     final Color fgColor;
 
-    public DrawCenteredLabelStep(double posX, double posZ, String text, int labelYOffset, Color bgColor, Color fgColor) {
+    public DrawCenteredLabelStep(double posX, double posZ, String text, int labelYOffset, Color bgColor, Color fgColor)
+    {
         this.posX = posX;
         this.posZ = posZ;
         this.text = text;
@@ -27,9 +37,11 @@ public class DrawCenteredLabelStep implements DrawStep {
     }
 
     @Override
-    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale) {
+    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale)
+    {
         Point2D pixel = gridRenderer.getPixel(posX, posZ);
-        if (pixel != null) {
+        if (pixel != null)
+        {
             DrawUtil.drawCenteredLabel(text, pixel.getX() + xOffset, pixel.getY() + yOffset + labelYOffset, bgColor, 205, fgColor, 255, fontScale);
         }
     }

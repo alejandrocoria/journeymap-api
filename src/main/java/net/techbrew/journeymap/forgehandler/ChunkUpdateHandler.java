@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.forgehandler;
 
 import cpw.mods.fml.common.eventhandler.Event;
@@ -22,18 +30,19 @@ import java.util.logging.Level;
 /**
  * Listen for events which are likely to need the map to be updated.
  */
-public class ChunkUpdateHandler implements EventHandlerManager.EventHandler {
+public class ChunkUpdateHandler implements EventHandlerManager.EventHandler
+{
 
+    Level logLevel = Level.FINER;
+    boolean debug = JourneyMap.getLogger().isLoggable(logLevel);
     public ChunkUpdateHandler()
     {
 
     }
 
-    Level logLevel = Level.FINER;
-    boolean debug = JourneyMap.getLogger().isLoggable(logLevel);
-
     @Override
-    public EnumSet<EventHandlerManager.BusType> getBus() {
+    public EnumSet<EventHandlerManager.BusType> getBus()
+    {
         return EnumSet.of(EventHandlerManager.BusType.MinecraftForgeBus);
     }
 
@@ -63,7 +72,10 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler {
     @SubscribeEvent
     public void onBlockBreakEvent(BlockEvent event)
     {
-        if(event instanceof BlockEvent.HarvestDropsEvent) return;
+        if (event instanceof BlockEvent.HarvestDropsEvent)
+        {
+            return;
+        }
         ChunkCoordIntPair coord = new ChunkCoordIntPair(event.x >> 4, event.z >> 4);
         queueChunk(event, coord);
     }
@@ -72,7 +84,7 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler {
     @SubscribeEvent
     public void onBlockPlaceEvent(PlayerInteractEvent event)
     {
-        if(event.getResult()==event.useBlock)
+        if (event.getResult() == event.useBlock)
         {
             ChunkCoordIntPair coord = new ChunkCoordIntPair(event.x >> 4, event.z >> 4);
             queueChunk(event, coord);
@@ -83,7 +95,7 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler {
     @SubscribeEvent
     public void onSoundEvent(PlaySoundEvent17 event)
     {
-        if(JourneyMap.getInstance().isMapping() && event!=null && event.sound!=null)
+        if (JourneyMap.getInstance().isMapping() && event != null && event.sound != null)
         {
             final int x = (int) event.sound.getXPosF() >> 4;
             final int z = (int) event.sound.getZPosF() >> 4;
@@ -101,12 +113,11 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler {
                         }
                     }
                 }
-                else
-                    if (event.name.contains("dig"))
-                    {
-                        coord = new ChunkCoordIntPair(x, z);
-                        queueChunk(event, coord);
-                    }
+                else if (event.name.contains("dig"))
+                {
+                    coord = new ChunkCoordIntPair(x, z);
+                    queueChunk(event, coord);
+                }
             }
             else
             {
@@ -141,14 +152,18 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler {
 
     /**
      * Queue a chunk with the MapPlayerTask
+     *
      * @param event
      * @param coord
      */
     private void queueChunk(Event event, ChunkCoordIntPair coord)
     {
-        if(MapPlayerTask.queueChunk(coord))
+        if (MapPlayerTask.queueChunk(coord))
         {
-            if (debug) JourneyMap.getLogger().log(logLevel, String.format("Queuing chunk via %s: %s", event.getClass().getName(), coord));
+            if (debug)
+            {
+                JourneyMap.getLogger().log(logLevel, String.format("Queuing chunk via %s: %s", event.getClass().getName(), coord));
+            }
         }
         else
         {

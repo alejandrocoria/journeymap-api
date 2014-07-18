@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.cartography;
 
 import net.minecraft.world.ChunkCoordIntPair;
@@ -24,7 +32,18 @@ class Strata
     final List<Stratum> poolFree;
     final List<Stratum> poolUsed;
     final boolean underground;
-
+    protected Integer topY = null;
+    protected Integer bottomY = null;
+    protected Integer topWaterY = null;
+    protected Integer bottomWaterY = null;
+    protected Integer maxLightLevel = null;
+    protected Integer waterColor = null;
+    protected Integer renderDayColor = null;
+    protected Integer renderNightColor = null;
+    protected Integer renderCaveColor = null;
+    protected int lightAttenuation = 0;
+    protected boolean blocksFound = false;
+    private Stack<Stratum> stack = new Stack<Stratum>();
     Strata(String name, int initialPoolSize, int poolGrowthIncrement, boolean underground)
     {
         this.name = name;
@@ -58,19 +77,6 @@ class Strata
         }
     }
 
-    private Stack<Stratum> stack = new Stack<Stratum>();
-    protected Integer topY = null;
-    protected Integer bottomY = null;
-    protected Integer topWaterY = null;
-    protected Integer bottomWaterY = null;
-    protected Integer maxLightLevel = null;
-    protected Integer waterColor = null;
-    protected Integer renderDayColor = null;
-    protected Integer renderNightColor = null;
-    protected Integer renderCaveColor = null;
-    protected int lightAttenuation = 0;
-    protected boolean blocksFound = false;
-
     void reset()
     {
         topY = null;
@@ -95,7 +101,7 @@ class Strata
 
     void release(Stratum stratum)
     {
-        stratum.set(null, null, -1,-1,-1,null);
+        stratum.set(null, null, -1, -1, -1, null);
         poolUsed.remove(stratum);
         poolFree.add(stratum);
     }
@@ -143,7 +149,7 @@ class Strata
             //timer.stop();
             return stratum;
         }
-        catch(Throwable t)
+        catch (Throwable t)
         {
             JourneyMap.getLogger().severe("Couldn't push Stratum into stack: " + t);
             return null;
@@ -153,15 +159,15 @@ class Strata
     Stratum pop(IChunkRenderer renderer, boolean ignoreMiddleWater)
     {
         Stratum stratum = stack.pop();
-        if(stratum==null)
+        if (stratum == null)
         {
             throw new IllegalStateException("Strata empty, can't pop");
         }
 
-        lightAttenuation = Math.max(0, lightAttenuation-stratum.lightOpacity);
+        lightAttenuation = Math.max(0, lightAttenuation - stratum.lightOpacity);
 
         // Skip middle water blocks
-        if(ignoreMiddleWater && stratum.isWater && isWaterAbove(stratum))
+        if (ignoreMiddleWater && stratum.isWater && isWaterAbove(stratum))
         {
             return pop(renderer, true);
         }
@@ -172,7 +178,7 @@ class Strata
 
     int depth()
     {
-        return stack.isEmpty() ? 0 : topY-bottomY+1;
+        return stack.isEmpty() ? 0 : topY - bottomY + 1;
     }
 
     boolean isEmpty()
@@ -182,12 +188,12 @@ class Strata
 
     boolean hasWater()
     {
-        return topWaterY!=null;
+        return topWaterY != null;
     }
 
     boolean isWaterAbove(Stratum stratum)
     {
-        return topWaterY!=null && topWaterY> stratum.y;
+        return topWaterY != null && topWaterY > stratum.y;
     }
 
     /**
@@ -209,11 +215,11 @@ class Strata
      */
     Integer getWaterColor(final ChunkMD.Set neighbors, int blockX, int blockY, int blockZ)
     {
-        ChunkMD chunk = neighbors.get(new ChunkCoordIntPair(blockX>>4, blockZ>>4));
-        if(chunk!=null)
+        ChunkMD chunk = neighbors.get(new ChunkCoordIntPair(blockX >> 4, blockZ >> 4));
+        if (chunk != null)
         {
             BlockMD block = dataCache.getBlockMD(chunk, blockX & 15, blockY, blockZ & 15);
-            if(block!=null && block.isWater())
+            if (block != null && block.isWater())
             {
                 return block.getColor(chunk, blockX & 15, blockY, blockZ & 15);
             }

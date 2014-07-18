@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.render.texture;
 
 
@@ -13,17 +21,18 @@ import java.nio.ByteBuffer;
 /**
  * Created by mwoodman on 12/22/13.
  */
-public class DelayedTexture {
-
-    Integer glId;
-    BufferedImage image;
+public class DelayedTexture
+{
 
     final int width;
     final int height;
     final ByteBuffer buffer;
+    Integer glId;
+    BufferedImage image;
 
     /**
      * Can be safely called without the OpenGL Context.
+     *
      * @param glId
      * @param image
      */
@@ -34,7 +43,8 @@ public class DelayedTexture {
         width = image.getWidth();
         height = image.getHeight();
 
-        if(debugString!=null) {
+        if (debugString != null)
+        {
             Graphics2D g = RegionImageHandler.initRenderingHints(image.createGraphics());
             g.setPaint(Color.WHITE);
             g.setStroke(new BasicStroke(3));
@@ -48,8 +58,10 @@ public class DelayedTexture {
         int[] pixels = new int[width * height];
         image.getRGB(0, 0, width, height, pixels, 0, width);
         buffer = BufferUtils.createByteBuffer(width * height * 4);
-        for(int y = 0; y < height; y++){
-            for(int x = 0; x < width; x++){
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
                 int pixel = pixels[y * width + x];
                 buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red component
                 buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green component
@@ -62,10 +74,13 @@ public class DelayedTexture {
 
     /**
      * Must be called on same thread as OpenGL Context
+     *
      * @return
      */
-    public TextureImpl bindTexture() {
-        if(glId==null) {
+    public TextureImpl bindTexture()
+    {
+        if (glId == null)
+        {
             glId = TextureUtil.glGenTextures();
         }
 

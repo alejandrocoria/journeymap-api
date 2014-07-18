@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.task;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -25,6 +33,11 @@ public class MapPlayerTask extends BaseMapTask
     private static DataCache dataCache = DataCache.instance();
 
     private final int maxRuntime = JourneyMap.getInstance().coreProperties.chunkPoll.get() * 3;
+
+    private MapPlayerTask(ChunkRenderController chunkRenderController, World world, int dimension, boolean underground, Integer chunkY, ChunkMD.Set chunkStubs)
+    {
+        super(chunkRenderController, world, dimension, underground, chunkY, chunkStubs, false);
+    }
 
     public static boolean queueChunk(ChunkCoordIntPair chunkCoords)
     {
@@ -64,31 +77,18 @@ public class MapPlayerTask extends BaseMapTask
         };
     }
 
-    private MapPlayerTask(ChunkRenderController chunkRenderController, World world, int dimension, boolean underground, Integer chunkY, ChunkMD.Set chunkStubs)
-    {
-        super(chunkRenderController, world, dimension, underground, chunkY, chunkStubs, false);
-    }
-
-    protected void complete(boolean cancelled, boolean hadError)
-    {
-        if(!cancelled)
-        {
-            lastTaskCompleted = System.currentTimeMillis();
-        }
-    }
-
     public static Collection<BaseMapTask> createCavesBelow(ChunkRenderController chunkRenderController, EntityPlayer player, boolean alreadyUnderground)
     {
         List<BaseMapTask> tasks = new ArrayList<BaseMapTask>(2);
 
-        if(FeatureManager.isAllowed(Feature.MapCaves))
+        if (FeatureManager.isAllowed(Feature.MapCaves))
         {
-            int mapY = alreadyUnderground ? player.chunkCoordY-1 : player.chunkCoordY;
+            int mapY = alreadyUnderground ? player.chunkCoordY - 1 : player.chunkCoordY;
 
-            while(mapY>0 && tasks.size()<2)
+            while (mapY > 0 && tasks.size() < 2)
             {
                 tasks.add(new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, true, mapY,
-                          new ChunkMD.Set(dataCache.getChunkMD(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ), false))));
+                        new ChunkMD.Set(dataCache.getChunkMD(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ), false))));
 
                 mapY--;
             }
@@ -102,7 +102,7 @@ public class MapPlayerTask extends BaseMapTask
         final ChunkCoordinates playerPos = new ChunkCoordinates(player.chunkCoordX, player.chunkCoordY, player.chunkCoordZ);
         final boolean underground = player.worldObj.provider.hasNoSky || (DataCache.getPlayer().underground && JourneyMap.getInstance().fullMapProperties.showCaves.get());
 
-        if(underground && !FeatureManager.isAllowed(Feature.MapCaves))
+        if (underground && !FeatureManager.isAllowed(Feature.MapCaves))
         {
             return null;
         }
@@ -118,7 +118,7 @@ public class MapPlayerTask extends BaseMapTask
             lastPlayerPos = playerPos;
         }
 
-        boolean forceNearbyChunks = (lastUnderground==underground);
+        boolean forceNearbyChunks = (lastUnderground == underground);
 
         int offset = JourneyMap.getInstance().coreProperties.chunkOffset.get();
 
@@ -134,7 +134,7 @@ public class MapPlayerTask extends BaseMapTask
         lastUnderground = underground;
 
         final int side = offset + offset + 1;
-        final ChunkMD.Set chunks = new ChunkMD.Set(side*3); // *3 to avoid map growth
+        final ChunkMD.Set chunks = new ChunkMD.Set(side * 3); // *3 to avoid map growth
 
         // Pull queued coords with as little delay as possible
         TreeSet<ChunkCoordIntPair> queuedCoords = new TreeSet<ChunkCoordIntPair>(chunkDistanceComparator);
@@ -149,9 +149,9 @@ public class MapPlayerTask extends BaseMapTask
         int maxChunks = 512;
 
         // Get queued chunks
-        for(ChunkCoordIntPair coord : queuedCoords)
+        for (ChunkCoordIntPair coord : queuedCoords)
         {
-            if(chunks.size()>=maxChunks)
+            if (chunks.size() >= maxChunks)
             {
                 JourneyMap.getLogger().warning(String.format("%s queued chunks exceeded max of %s for MapPlayerTask", queuedCoords.size(), maxChunks));
                 break;
@@ -179,14 +179,14 @@ public class MapPlayerTask extends BaseMapTask
         {
             for (int z = min.chunkZPos; z <= max.chunkZPos; z++)
             {
-                if(chunks.size()>=maxChunks)
+                if (chunks.size() >= maxChunks)
                 {
                     JourneyMap.getLogger().warning(String.format("Combined chunks exceeded max of %s for MapPlayerTask", maxChunks));
                     break;
                 }
 
                 coord = new ChunkCoordIntPair(x, z);
-                if(queuedCoords.contains(coord))
+                if (queuedCoords.contains(coord))
                 {
                     continue; // Already queued
                 }
@@ -197,7 +197,7 @@ public class MapPlayerTask extends BaseMapTask
 
                 if (chunkMd != null)
                 {
-                    if(chunkMd.isCurrent())
+                    if (chunkMd.isCurrent())
                     {
                         chunkMd.render = true;
                         chunkMd.setCurrent(false);
@@ -216,6 +216,14 @@ public class MapPlayerTask extends BaseMapTask
         //System.out.println("Queued: " + queuedCoords.size() + ", Total Chunks to render: " + renderCount);
 
         return new MapPlayerTask(chunkRenderController, world, dimension, underground, chunkY, chunks);
+    }
+
+    protected void complete(boolean cancelled, boolean hadError)
+    {
+        if (!cancelled)
+        {
+            lastTaskCompleted = System.currentTimeMillis();
+        }
     }
 
     @Override
@@ -266,7 +274,7 @@ public class MapPlayerTask extends BaseMapTask
             // Ensure player chunk is loaded
             if (enabled && minecraft.thePlayer.addedToChunk)
             {
-                if((System.currentTimeMillis()-lastTaskCompleted) >= mapTaskDelay)
+                if ((System.currentTimeMillis() - lastTaskCompleted) >= mapTaskDelay)
                 {
                     ChunkRenderController chunkRenderController = JourneyMap.getInstance().getChunkRenderController();
                     BaseMapTask normalPlayerTask = MapPlayerTask.create(chunkRenderController, minecraft.thePlayer);

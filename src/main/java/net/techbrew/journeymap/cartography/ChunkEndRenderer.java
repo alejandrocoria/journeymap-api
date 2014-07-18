@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.cartography;
 
 
@@ -8,10 +16,11 @@ import net.techbrew.journeymap.model.ChunkMD;
 
 /**
  * Render a chunk in the End.
- * @author mwoodman
  *
+ * @author mwoodman
  */
-public class ChunkEndRenderer extends ChunkOverworldCaveRenderer implements IChunkRenderer {
+public class ChunkEndRenderer extends ChunkOverworldCaveRenderer implements IChunkRenderer
+{
 
     public ChunkEndRenderer()
     {
@@ -25,7 +34,7 @@ public class ChunkEndRenderer extends ChunkOverworldCaveRenderer implements IChu
     protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater)
     {
         Integer[][] blockSliceHeights = chunkMd.sliceHeights.get(vSlice);
-        if(blockSliceHeights==null)
+        if (blockSliceHeights == null)
         {
             blockSliceHeights = new Integer[16][16];
             chunkMd.sliceHeights.put(vSlice, blockSliceHeights);
@@ -33,7 +42,7 @@ public class ChunkEndRenderer extends ChunkOverworldCaveRenderer implements IChu
 
         Integer y = blockSliceHeights[x][z];
 
-        if(y!=null)
+        if (y != null)
         {
             return y;
         }
@@ -42,7 +51,7 @@ public class ChunkEndRenderer extends ChunkOverworldCaveRenderer implements IChu
         {
             int yOffset;
             int surfaceY = chunkMd.getHeightValue(x, z) + 1;
-            if(sliceMaxY > surfaceY)
+            if (sliceMaxY > surfaceY)
             {
                 y = surfaceY;
                 yOffset = -1;
@@ -54,25 +63,25 @@ public class ChunkEndRenderer extends ChunkOverworldCaveRenderer implements IChu
             }
 
             BlockMD blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
-            BlockMD blockMDAbove = dataCache.getBlockMD(chunkMd, x, y+1, z);
+            BlockMD blockMDAbove = dataCache.getBlockMD(chunkMd, x, y + 1, z);
 
-            while (y > 0 && y<surfaceY)
+            while (y > 0 && y < surfaceY)
             {
-                if(blockMD.isLava())
+                if (blockMD.isLava())
                 {
                     break;
                 }
 
                 if (blockMDAbove.isAir() || blockMDAbove.hasTranparency() || blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky, BlockMD.Flag.TransparentRoof))
                 {
-                    if(!blockMD.isAir())
+                    if (!blockMD.isAir())
                     {
                         break;
                     }
                 }
                 y = y + yOffset;
                 blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
-                blockMDAbove = dataCache.getBlockMD(chunkMd, x, y+1, z);
+                blockMDAbove = dataCache.getBlockMD(chunkMd, x, y + 1, z);
             }
         }
         catch (Exception e)

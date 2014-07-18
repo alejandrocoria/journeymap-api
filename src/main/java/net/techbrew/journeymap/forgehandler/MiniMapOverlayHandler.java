@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.forgehandler;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -16,23 +24,30 @@ import java.util.EnumSet;
  * RenderGameOverlayEvent handler for rendering the MiniMap
  */
 @SideOnly(Side.CLIENT)
-public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler {
+public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
+{
 
     final Minecraft mc = FMLClientHandler.instance().getClient();
 
     @Override
-    public EnumSet<EventHandlerManager.BusType> getBus() {
+    public EnumSet<EventHandlerManager.BusType> getBus()
+    {
         return EnumSet.of(EventHandlerManager.BusType.MinecraftForgeBus);
     }
 
     @SubscribeEvent
-    public void onRenderOverlay(RenderGameOverlayEvent.Pre event) {
+    public void onRenderOverlay(RenderGameOverlayEvent.Pre event)
+    {
 
-        if (event.type == RenderGameOverlayEvent.ElementType.HOTBAR) {
+        if (event.type == RenderGameOverlayEvent.ElementType.HOTBAR)
+        {
             final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof MapOverlay);
-            if(isGamePaused) {
+            if (isGamePaused)
+            {
                 TileCache.pause();
-            } else {
+            }
+            else
+            {
                 TileCache.resume();
             }
             UIManager.getInstance().drawMiniMap();

@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.waypoint;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -27,38 +35,24 @@ public class WaypointManager extends JmUI
     final static String ASCEND = Constants.getString("jm.common.char_uparrow");
     final static String DESCEND = Constants.getString("jm.common.char_downarrow");
     final static int COLWAYPOINT = 0;
+    protected int colWaypoint = COLWAYPOINT;
     final static int COLLOCATION = 20;
+    protected int colLocation = COLLOCATION;
     final static int COLNAME = 60;
+    protected int colName = COLNAME;
     final static int DEFAULT_ITEMWIDTH = 460;
-
+    protected int itemWidth = DEFAULT_ITEMWIDTH;
     private static WaypointManagerItem.Sort currentSort;
-
-    private enum ButtonEnum
-    {
-        Add, Find, SortName, SortDistance, Dimensions, ToggleAll, Help, Options, Close
-    } 
-
     final String on = Constants.getString("jm.common.on");
     final String off = Constants.getString("jm.common.off");
-
     protected int rowHeight = 16;
-    protected int colWaypoint = COLWAYPOINT;
-    protected int colLocation = COLLOCATION;
-    protected int colName = COLNAME;
-    protected int itemWidth = DEFAULT_ITEMWIDTH;
-
     protected Boolean canUserTeleport;
-
     private SortButton buttonSortName, buttonSortDistance;
     private DimensionsButton buttonDimensions;
     private Button buttonClose, buttonAdd, buttonHelp, buttonOptions, buttonToggleAll;
-
     private ButtonList bottomButtons;
-
     private ArrayList<WaypointManagerItem> items = new ArrayList<WaypointManagerItem>();
-
     private ScrollPane itemScrollPane;
-
     private Waypoint focusWaypoint;
 
     public WaypointManager()
@@ -233,7 +227,7 @@ public class WaypointManager extends JmUI
 
         // Bottom buttons
         bottomButtons.equalizeWidths(getFontRenderer());
-        int bottomButtonWidth = Math.min(bottomButtons.getWidth(hgap)+25, scrollWidth);
+        int bottomButtonWidth = Math.min(bottomButtons.getWidth(hgap) + 25, scrollWidth);
         bottomButtons.equalizeWidths(getFontRenderer(), hgap, bottomButtonWidth);
         bottomButtons.layoutCenteredHorizontal(this.width / 2, this.height - bottomButtonsHeight + vgap, true, hgap);
     }
@@ -493,57 +487,22 @@ public class WaypointManager extends JmUI
         }
     }
 
-    protected class SortButton extends Button
+    private enum ButtonEnum
     {
-        final WaypointManagerItem.Sort sort;
-        final String labelInactive;
-
-        public SortButton(Enum enumValue, String label, WaypointManagerItem.Sort sort)
-        {
-            super(enumValue.ordinal(), 0, 0, String.format("%s %s", label, ASCEND), String.format("%s %s", label, DESCEND), sort.ascending);
-            this.labelInactive = label;
-            this.sort = sort;
-        }
-
-        @Override
-        public void toggle()
-        {
-            sort.ascending = !sort.ascending;
-            setActive(true);
-        }
-
-        @Override
-        public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
-        {
-            super.drawButton(minecraft, mouseX, mouseY);
-            super.drawUnderline();
-        }
-
-        public void setActive(boolean active)
-        {
-            if (active)
-            {
-                setToggled(sort.ascending);
-            }
-            else
-            {
-                displayString = String.format("%s %s", labelInactive, " ");
-            }
-        }
+        Add, Find, SortName, SortDistance, Dimensions, ToggleAll, Help, Options, Close
     }
 
     protected static class DimensionsButton extends Button
     {
-        final List<WorldProvider> worldProviders = WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions());
-
         static boolean needInit = true;
         static WorldProvider currentWorldProvider;
+        final List<WorldProvider> worldProviders = WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions());
 
         public DimensionsButton(int id)
         {
             super(id, 0, 0, "");
 
-            if(needInit || currentWorldProvider !=null)
+            if (needInit || currentWorldProvider != null)
             {
                 currentWorldProvider = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider;
                 needInit = false;
@@ -596,7 +555,7 @@ public class WaypointManager extends JmUI
 
                 for (WorldProvider worldProvider : worldProviders)
                 {
-                    if(worldProvider.dimensionId== currentWorldProvider.dimensionId)
+                    if (worldProvider.dimensionId == currentWorldProvider.dimensionId)
                     {
                         index = worldProviders.indexOf(worldProvider) + 1;
                         break;
@@ -614,6 +573,45 @@ public class WaypointManager extends JmUI
             }
 
             updateLabel();
+        }
+    }
+
+    protected class SortButton extends Button
+    {
+        final WaypointManagerItem.Sort sort;
+        final String labelInactive;
+
+        public SortButton(Enum enumValue, String label, WaypointManagerItem.Sort sort)
+        {
+            super(enumValue.ordinal(), 0, 0, String.format("%s %s", label, ASCEND), String.format("%s %s", label, DESCEND), sort.ascending);
+            this.labelInactive = label;
+            this.sort = sort;
+        }
+
+        @Override
+        public void toggle()
+        {
+            sort.ascending = !sort.ascending;
+            setActive(true);
+        }
+
+        @Override
+        public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
+        {
+            super.drawButton(minecraft, mouseX, mouseY);
+            super.drawUnderline();
+        }
+
+        public void setActive(boolean active)
+        {
+            if (active)
+            {
+                setToggled(sort.ascending);
+            }
+            else
+            {
+                displayString = String.format("%s %s", labelInactive, " ");
+            }
         }
     }
 }

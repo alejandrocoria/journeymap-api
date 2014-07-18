@@ -1,8 +1,15 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.model;
 
 import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityHorse;
@@ -19,8 +26,8 @@ import java.util.UUID;
  */
 public class EntityDTO implements Serializable
 {
-    public transient EntityLivingBase entityLiving;
     public final String entityId;
+    public transient EntityLivingBase entityLiving;
     public String filename;
     public Boolean hostile;
     public double posX;
@@ -39,26 +46,26 @@ public class EntityDTO implements Serializable
     public Boolean underground;
     public boolean invisible;
     public boolean sneaking;
-    
+
     private EntityDTO(EntityLivingBase entity)
     {
-        this.entityId= entity.getUniqueID().toString();
+        this.entityId = entity.getUniqueID().toString();
         this.entityLiving = entity;
     }
-    
+
     public void update(EntityLivingBase entity, boolean hostile)
     {
         EntityPlayer currentPlayer = FMLClientHandler.instance().getClient().thePlayer;
 
         this.dimension = entity.dimension;
-        this.posX= entity.posX;
-        this.posY= entity.posY;
-        this.posZ= entity.posZ;
-        this.chunkCoordX= entity.chunkCoordX;
-        this.chunkCoordY= entity.chunkCoordY;
-        this.chunkCoordZ= entity.chunkCoordZ;
+        this.posX = entity.posX;
+        this.posY = entity.posY;
+        this.posZ = entity.posZ;
+        this.chunkCoordX = entity.chunkCoordX;
+        this.chunkCoordY = entity.chunkCoordY;
+        this.chunkCoordZ = entity.chunkCoordZ;
         this.heading = EntityHelper.getHeading(entity);
-        if(currentPlayer!=null)
+        if (currentPlayer != null)
         {
             this.invisible = entity.isInvisibleToPlayer(currentPlayer);
         }
@@ -67,25 +74,25 @@ public class EntityDTO implements Serializable
             this.invisible = false;
         }
         this.sneaking = entity.isSneaking();
-        
+
         // Player check
-        if(entity instanceof EntityPlayer)
+        if (entity instanceof EntityPlayer)
         {
-            this.filename = "/skin/" + ((EntityPlayer)entity).getDisplayName();
-            this.username = ((EntityPlayer)entity).getDisplayName();
+            this.filename = "/skin/" + ((EntityPlayer) entity).getDisplayName();
+            this.username = ((EntityPlayer) entity).getDisplayName();
         }
         else
         {
             this.filename = EntityHelper.getFileName(entity);
             this.username = null;
         }
-        
+
         // Owner
         String owner = null;
         if (entity instanceof EntityTameable)
         {
             EntityLivingBase ownerEntity = ((EntityTameable) entity).getOwner();
-            if(ownerEntity!=null)
+            if (ownerEntity != null)
             {
                 owner = ownerEntity.getCommandSenderName();
             }
@@ -94,11 +101,11 @@ public class EntityDTO implements Serializable
         {
             // TODO: Test this with and without owners
             String ownerUuidString = ((EntityHorse) entity).func_152119_ch();
-            if(ownerUuidString!=null)
+            if (ownerUuidString != null)
             {
                 try
                 {
-                    if(currentPlayer.getUniqueID().equals(UUID.fromString(ownerUuidString)))
+                    if (currentPlayer.getUniqueID().equals(UUID.fromString(ownerUuidString)))
                     {
                         owner = currentPlayer.getCommandSenderName();
                     }
@@ -112,19 +119,19 @@ public class EntityDTO implements Serializable
         this.owner = owner;
 
         String customName = null;
-        if(entity instanceof EntityLiving)
+        if (entity instanceof EntityLiving)
         {
             // CustomName
-            if (((EntityLiving)entity).hasCustomNameTag())
+            if (((EntityLiving) entity).hasCustomNameTag())
             {
-                customName = StringUtils.stripControlCodes(((EntityLiving)entity).getCustomNameTag());
+                customName = StringUtils.stripControlCodes(((EntityLiving) entity).getCustomNameTag());
             }
 
             // Hostile check
-            if(!hostile && currentPlayer!=null)
+            if (!hostile && currentPlayer != null)
             {
                 EntityLivingBase attackTarget = ((EntityLiving) entity).getAttackTarget();
-                if(attackTarget!=null && attackTarget.getUniqueID().equals(currentPlayer.getUniqueID()))
+                if (attackTarget != null && attackTarget.getUniqueID().equals(currentPlayer.getUniqueID()))
                 {
                     hostile = true;
                 }
@@ -134,7 +141,7 @@ public class EntityDTO implements Serializable
         this.hostile = hostile;
 
         // Profession
-        if(entity instanceof EntityVillager)
+        if (entity instanceof EntityVillager)
         {
             this.profession = ((EntityVillager) entity).getProfession();
         }

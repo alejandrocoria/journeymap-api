@@ -1,7 +1,14 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.cartography;
 
 
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.JourneyMap;
@@ -24,23 +31,18 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class BaseRenderer implements IChunkRenderer
 {
     static final int BLACK = Color.black.getRGB();
-    static final int VOID = RGB.toInteger(17,12,25);
+    static final int VOID = RGB.toInteger(17, 12, 25);
     public static AlphaComposite OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
-
+    protected final float[] defaultFog = new float[]{0, 0, 0};
     protected DataCache dataCache = DataCache.instance();
     protected CoreProperties coreProperties = JourneyMap.getInstance().coreProperties;
-
     protected boolean mapBathymetry;
     protected boolean mapTransparency;
     protected boolean mapCaveLighting;
     protected boolean mapAntialiasing;
-
     volatile AtomicLong badBlockCount = new AtomicLong(0);
-
     ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
     ArrayList<BlockCoordIntPair> secondarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
-
-    protected final float[] defaultFog = new float[]{0,0,0};
 
     public BaseRenderer()
     {
@@ -78,27 +80,27 @@ public abstract class BaseRenderer implements IChunkRenderer
     @Override
     public void setStratumColors(Stratum stratum, int lightAttenuation, Integer waterColor, boolean waterAbove, boolean underground, boolean mapCaveLighting)
     {
-        if(stratum.lightLevel==null || stratum.y<0)
+        if (stratum.lightLevel == null || stratum.y < 0)
         {
             throw new IllegalStateException("Stratum wasn't initialized");
         }
 
         // Daylight is the greater of sun light (15) attenuated through the stack and the stratum's inherant light level
-        float daylightDiff = Math.max(1, Math.max(stratum.lightLevel, 15-lightAttenuation)) / 15f;
+        float daylightDiff = Math.max(1, Math.max(stratum.lightLevel, 15 - lightAttenuation)) / 15f;
 
         // Nightlight is the greater of moon light (4 attenuated through the stack and the stratum's inherant light level
-        float nightLightDiff = Math.max(5, Math.max(stratum.lightLevel, 4-lightAttenuation)) / 15f;
+        float nightLightDiff = Math.max(5, Math.max(stratum.lightLevel, 4 - lightAttenuation)) / 15f;
 
         int basicColor = stratum.isWater ? waterColor : stratum.blockMD.getColor(stratum.chunkMd, stratum.x, stratum.y, stratum.z);
-        if(stratum.blockMD.getBlock()== Blocks.glowstone || stratum.blockMD.getBlock()== Blocks.lit_redstone_lamp)
+        if (stratum.blockMD.getBlock() == Blocks.glowstone || stratum.blockMD.getBlock() == Blocks.lit_redstone_lamp)
         {
             basicColor = RGB.darken(basicColor, 1.2f); // magic # to match how it looks in game
         }
 
-        if(waterAbove && waterColor!=null)
+        if (waterAbove && waterColor != null)
         {
             // Blend day color with watercolor above, darken for daylight filtered down
-            stratum.dayColor = RGB.blendWith(waterColor, RGB.darken(basicColor,  Math.max(daylightDiff, nightLightDiff)), Math.max(daylightDiff, nightLightDiff));
+            stratum.dayColor = RGB.blendWith(waterColor, RGB.darken(basicColor, Math.max(daylightDiff, nightLightDiff)), Math.max(daylightDiff, nightLightDiff));
             stratum.dayColor = RGB.blendWith(stratum.dayColor, waterColor, .15f); // cheat to get bluer blend in shallow water
 
             // Darken for night light and blend with watercolor above
@@ -107,12 +109,12 @@ public abstract class BaseRenderer implements IChunkRenderer
         else
         {
             // Just darken based on light levels
-            stratum.dayColor =   RGB.darken(basicColor, daylightDiff);
+            stratum.dayColor = RGB.darken(basicColor, daylightDiff);
 
             stratum.nightColor = RGB.darkenFog(basicColor, nightLightDiff, getFogColor());
         }
 
-        if(underground)
+        if (underground)
         {
             stratum.caveColor = mapCaveLighting ? stratum.nightColor : stratum.dayColor;
         }
@@ -124,7 +126,7 @@ public abstract class BaseRenderer implements IChunkRenderer
     public void paintBadBlock(final int x, final int y, final int z, final Graphics2D g2D)
     {
         long count = badBlockCount.incrementAndGet();
-        if (count==1 || count % 10240 == 0)
+        if (count == 1 || count % 10240 == 0)
         {
             JourneyMap.getLogger().warning(
                     "Bad block at " + x + "," + y + "," + z //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -265,19 +267,19 @@ public abstract class BaseRenderer implements IChunkRenderer
     protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater, final int offsetX, int offsetZ, ChunkMD.Set neighbors, int defaultVal)
     {
         ChunkMD chunk = null;
-        int blockX = ((chunkMd.coord.chunkXPos<<4) + x + offsetX);
-        int blockZ = ((chunkMd.coord.chunkZPos<<4) + z + offsetZ);
+        int blockX = ((chunkMd.coord.chunkXPos << 4) + x + offsetX);
+        int blockZ = ((chunkMd.coord.chunkZPos << 4) + z + offsetZ);
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
 
-        if(chunkX==chunkMd.coord.chunkXPos && chunkZ==chunkMd.coord.chunkZPos)
+        if (chunkX == chunkMd.coord.chunkXPos && chunkZ == chunkMd.coord.chunkZPos)
         {
             chunk = chunkMd;
         }
         else
         {
             ChunkCoordIntPair coord = new ChunkCoordIntPair(chunkX, chunkZ);
-            chunk =  neighbors.get(coord);
+            chunk = neighbors.get(coord);
         }
 
         if (chunk != null)
@@ -290,19 +292,19 @@ public abstract class BaseRenderer implements IChunkRenderer
         }
     }
 
-    protected float calculateSlope(final ChunkMD chunkMd, final ChunkMD.Set neighbors, final Collection<BlockCoordIntPair> offsets, boolean ignoreWater, final int x, final int y, final int z,  boolean isSurface, Integer vSlice, int sliceMinY, int sliceMaxY)
+    protected float calculateSlope(final ChunkMD chunkMd, final ChunkMD.Set neighbors, final Collection<BlockCoordIntPair> offsets, boolean ignoreWater, final int x, final int y, final int z, boolean isSurface, Integer vSlice, int sliceMinY, int sliceMaxY)
     {
         // Calculate slope by dividing height by neighbors' heights
         float slopeSum = 0;
-        for(BlockCoordIntPair offset : offsets)
+        for (BlockCoordIntPair offset : offsets)
         {
-            if(isSurface)
+            if (isSurface)
             {
-                slopeSum += ((y*1f) / chunkMd.getSurfaceBlockHeight(x, z, offset.x, offset.z, neighbors, y, ignoreWater));
+                slopeSum += ((y * 1f) / chunkMd.getSurfaceBlockHeight(x, z, offset.x, offset.z, neighbors, y, ignoreWater));
             }
             else
             {
-                slopeSum += ((y*1f) / getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, ignoreWater, offset.x, offset.z, neighbors, y));
+                slopeSum += ((y * 1f) / getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, ignoreWater, offset.x, offset.z, neighbors, y));
             }
         }
         return slopeSum / offsets.size();
@@ -311,7 +313,7 @@ public abstract class BaseRenderer implements IChunkRenderer
 
     protected int[] getVSliceBounds(final ChunkMD chunkMd, final Integer vSlice)
     {
-        if(vSlice==null)
+        if (vSlice == null)
         {
             return null;
         }
@@ -329,9 +331,9 @@ public abstract class BaseRenderer implements IChunkRenderer
 
     protected float getSlope(final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, Integer vSlice, int z)
     {
-        Float[][] slopes = (vSlice==null) ? chunkMd.surfaceSlopes : chunkMd.sliceSlopes.get(vSlice);
+        Float[][] slopes = (vSlice == null) ? chunkMd.surfaceSlopes : chunkMd.sliceSlopes.get(vSlice);
 
-        if(slopes==null)
+        if (slopes == null)
         {
             slopes = populateSlopes(chunkMd, vSlice, neighbors);
         }

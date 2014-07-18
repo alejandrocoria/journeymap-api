@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.waypoint;
 
 import com.google.common.io.Files;
@@ -33,10 +41,10 @@ public class JmReader
         for (File waypointFile : files)
         {
             Waypoint wp = load(waypointFile);
-            if(wp!=null)
+            if (wp != null)
             {
                 // Check for obsolete filename
-                if(!wp.getFileName().endsWith(waypointFile.getName()))
+                if (!wp.getFileName().endsWith(waypointFile.getName()))
                 {
                     wp.setDirty(true);
                     obsoleteFiles.add(waypointFile);
@@ -45,7 +53,7 @@ public class JmReader
             }
         }
 
-        while(!obsoleteFiles.isEmpty())
+        while (!obsoleteFiles.isEmpty())
         {
             remove(obsoleteFiles.remove(0));
         }

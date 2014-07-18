@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui;
 
 
@@ -20,13 +28,12 @@ import java.util.logging.Logger;
 public abstract class JmUI extends GuiScreen
 {
 
-    TextureImpl logo = TextureCache.instance().getLogo();
-
     protected final String title;
     protected final int headerHeight = 25;
-    protected int scaleFactor = 1;
     protected final Logger logger = JourneyMap.getLogger();
     protected final Class<? extends JmUI> returnClass;
+    protected int scaleFactor = 1;
+    TextureImpl logo = TextureCache.instance().getLogo();
 
     public JmUI(String title)
     {
@@ -38,6 +45,18 @@ public abstract class JmUI extends GuiScreen
         super();
         this.title = title;
         this.returnClass = returnClass;
+    }
+
+    public static void sizeDisplay(double width, double height)
+    {
+
+        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glLoadIdentity();
+        GL11.glOrtho(0.0D, width, height, 0.0D, 1000.0D, 3000.0D);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glLoadIdentity();
+        GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
     }
 
     public Minecraft getMinecraft()
@@ -146,23 +165,11 @@ public abstract class JmUI extends GuiScreen
             drawTitle();
             drawLogo();
         }
-        catch(Throwable t)
+        catch (Throwable t)
         {
             JourneyMap.getLogger().severe("Error in UI: " + LogFormatter.toString(t));
             closeAndReturn();
         }
-    }
-
-    public static void sizeDisplay(double width, double height)
-    {
-
-        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glMatrixMode(GL11.GL_PROJECTION);
-        GL11.glLoadIdentity();
-        GL11.glOrtho(0.0D, width, height, 0.0D, 1000.0D, 3000.0D);
-        GL11.glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadIdentity();
-        GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
     }
 
     public void close()

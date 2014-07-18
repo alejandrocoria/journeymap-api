@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.model;
 
 
@@ -27,12 +35,10 @@ import java.util.List;
 public class MapOverlayState
 {
 
-    // One-time setup
-    final CoreProperties coreProperties = JourneyMap.getInstance().coreProperties;
-
     public final int minZoom = 0;
     public final int maxZoom = 5;
-
+    // One-time setup
+    final CoreProperties coreProperties = JourneyMap.getInstance().coreProperties;
     // These can be safely changed at will
     public boolean follow = true;
 
@@ -169,9 +175,9 @@ public class MapOverlayState
         drawWaypointStepList.clear();
         entityList.clear();
 
-        if(mapProperties.zoomLevel.get()==0)
+        if (mapProperties.zoomLevel.get() == 0)
         {
-            drawScale = drawScale*.5f;
+            drawScale = drawScale * .5f;
         }
 
         if (FeatureManager.isAllowed(Feature.RadarAnimals))
@@ -276,24 +282,24 @@ public class MapOverlayState
             return true;
         }
 
-        if (this.vSlice != null && (!player.underground || this.vSlice!=player.chunkCoordY))
+        if (this.vSlice != null && (!player.underground || this.vSlice != player.chunkCoordY))
         {
             return true;
         }
 
-        int diffX = Math.abs(lastPlayerChunkX-player.chunkCoordX);
-        if(diffX>2)
+        int diffX = Math.abs(lastPlayerChunkX - player.chunkCoordX);
+        if (diffX > 2)
         {
             return true; // should happen on a teleport
         }
 
-        int diffZ = Math.abs(lastPlayerChunkZ-player.chunkCoordZ);
-        if(diffZ>2)
+        int diffZ = Math.abs(lastPlayerChunkZ - player.chunkCoordZ);
+        if (diffZ > 2)
         {
             return true; // should happen on a teleport
         }
 
-        if(lastMapProperties == null || !lastMapProperties.equals(mapProperties))
+        if (lastMapProperties == null || !lastMapProperties.equals(mapProperties))
         {
             return true;
         }

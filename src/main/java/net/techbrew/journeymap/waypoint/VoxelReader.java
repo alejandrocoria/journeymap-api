@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.waypoint;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -46,7 +54,8 @@ public class VoxelReader
         {
             voxelWaypoints.addAll(com.thevoxelbox.voxelmap.VoxelMap.getInstance().getWaypointManager().getWaypoints());
             modLoaded = true;
-        } catch (Throwable e)
+        }
+        catch (Throwable e)
         {
             JourneyMap.getLogger().warning("Incompatible version of VoxelMap. Tried com.thevoxelbox.voxelmap.VoxelMap.instance.waypointManager.wayPts: " + e);
             ChatLog.announceI18N("jm.waypoint.import_vox_version");
@@ -66,18 +75,18 @@ public class VoxelReader
             {
                 com.thevoxelbox.voxelmap.util.Waypoint voxWp = (com.thevoxelbox.voxelmap.util.Waypoint) wpObj;
 
-                String name = voxWp.name.replaceAll("~comma~",",");
+                String name = voxWp.name.replaceAll("~comma~", ",");
                 int x = voxWp.x;
                 int y = voxWp.y;
                 int z = voxWp.z;
                 boolean enabled = voxWp.enabled;
                 int r = (int) (voxWp.red * 255.0F) & 255;
                 int g = (int) (voxWp.green * 255.0F) & 255;
-                int b =  (int) (voxWp.blue * 255.0F) & 255;
+                int b = (int) (voxWp.blue * 255.0F) & 255;
                 Waypoint.Type type = ("skull".equals(voxWp.imageSuffix)) ? Waypoint.Type.Death : Waypoint.Type.Normal;
 
-                Waypoint jmWp = new net.techbrew.journeymap.model.Waypoint(name,x,y,z,enabled,r,g,b,type,
-                        Waypoint.Origin.VoxelMap,0, voxWp.dimensions);
+                Waypoint jmWp = new net.techbrew.journeymap.model.Waypoint(name, x, y, z, enabled, r, g, b, type,
+                        Waypoint.Origin.VoxelMap, 0, voxWp.dimensions);
 
                 jmWp.setReadOnly(true);
 
@@ -92,6 +101,12 @@ public class VoxelReader
             modLoaded = false;
             return Collections.EMPTY_LIST;
         }
+    }
+
+    public static String getPointsFilename()
+    {
+        String worldName = WorldData.getWorldName(FMLClientHandler.instance().getClient());
+        return String.format("mods\\VoxelMods\\voxelMap\\%s.points", worldName);
     }
 
     /**
@@ -114,7 +129,7 @@ public class VoxelReader
             }
         });
 
-        if(files.length==0)
+        if (files.length == 0)
         {
             return waypoints;
         }
@@ -126,7 +141,7 @@ public class VoxelReader
                 int pointErrorCount = pointErrors;
                 loadWaypoints(pointsFile, waypoints);
 
-                if(deleteOnSuccess && pointErrorCount==pointErrors)
+                if (deleteOnSuccess && pointErrorCount == pointErrors)
                 {
                     pointsFile.deleteOnExit();
                     pointsFile.delete();
@@ -140,11 +155,11 @@ public class VoxelReader
             }
         }
 
-        if(waypoints.isEmpty())
+        if (waypoints.isEmpty())
         {
             ChatLog.announceI18N("jm.waypoint.import_vox_failure");
         }
-        else if(fileErrors == 0 && pointErrors==0)
+        else if (fileErrors == 0 && pointErrors == 0)
         {
             ChatLog.announceI18N("jm.waypoint.import_vox_success", waypoints.size());
         }
@@ -156,14 +171,9 @@ public class VoxelReader
         return waypoints;
     }
 
-    public static String getPointsFilename()
-    {
-        String worldName = WorldData.getWorldName(FMLClientHandler.instance().getClient());
-        return String.format("mods\\VoxelMods\\voxelMap\\%s.points", worldName);
-    }
-
     /**
      * Load waypoints for the given dimension from the VoxelMap pointsFile into the provided arraylist.
+     *
      * @param pointsFile
      * @param waypoints
      * @throws Exception
@@ -175,7 +185,7 @@ public class VoxelReader
         while ((line = br.readLine()) != null)
         {
             Waypoint waypoint = loadWaypoint(line);
-            if(waypoint!=null)
+            if (waypoint != null)
             {
                 waypoints.add(waypoint);
             }
@@ -185,6 +195,7 @@ public class VoxelReader
 
     /**
      * Create a waypoint from a VoxelMap line in a .points file.
+     *
      * @param line
      * @return
      */
@@ -198,25 +209,25 @@ public class VoxelReader
         name:Fire~comma~ Death~comma~ Dishonor,x:-488,z:424,y:62,enabled:true,red:0.021238565,green:0.77731663,blue:0.10206258,suffix:,world:,dimensions:-1#
          */
 
-        if(!line.startsWith("name"))
+        if (!line.startsWith("name"))
         {
             return null;
         }
 
         try
         {
-            HashMap<String,String> map = new HashMap<String, String>(16);
+            HashMap<String, String> map = new HashMap<String, String>(16);
             String[] pairs = line.split("\\,");
-            for(String pair : pairs)
+            for (String pair : pairs)
             {
                 String[] kv = pair.split("\\:");
-                if(kv.length==2)
+                if (kv.length == 2)
                 {
                     map.put(kv[0], kv[1]);
                 }
             }
 
-            String name = map.get("name").replaceAll("~comma~",",");
+            String name = map.get("name").replaceAll("~comma~", ",");
             int x = Integer.parseInt(map.get("x"));
             int y = Integer.parseInt(map.get("y"));
             int z = Integer.parseInt(map.get("z"));
@@ -225,7 +236,7 @@ public class VoxelReader
             Waypoint.Type type = "skull".equals(map.get("suffix")) ? Waypoint.Type.Death : Waypoint.Type.Normal;
             String[] dimStrings = map.get("dimensions").split("\\#");
             ArrayList<Integer> dims = new ArrayList<Integer>(dimStrings.length);
-            for(int i=0;i<dimStrings.length;i++)
+            for (int i = 0; i < dimStrings.length; i++)
             {
                 dims.add(Integer.parseInt(dimStrings[0]));
             }
@@ -234,7 +245,7 @@ public class VoxelReader
             waypoint.setDirty(true);
             return waypoint;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             JourneyMap.getLogger().warning("Couldn't parse \"" + line + "\" because: " + e.getMessage());
             pointErrors++;

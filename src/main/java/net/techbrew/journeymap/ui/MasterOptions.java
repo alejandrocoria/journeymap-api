@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui;
 
 import net.minecraft.client.gui.GuiButton;
@@ -14,31 +22,17 @@ import java.awt.*;
  */
 public class MasterOptions extends JmUI
 {
-    enum ButtonEnum
-    {
-        FullMapOptions, FullMapHelp, MiniMapOptions, MiniMapHelp, WaypointOptions, WaypointHelp, MiniMapEnable, WaypointManagerEnable, WebMapEnable, WebMapOpen, Close;
-
-        Button create(String label)
-        {
-            return new Button(this, label);
-        }
-    }
-
     String titleGeneral = Constants.getString("jm.common.general_display");
     String titleMiniMap = Constants.getString("jm.minimap.title");
     String titleWaypoints = Constants.getString("jm.waypoint.display_management");
     String titleWebmap = Constants.getString("jm.webmap.title");
-
     String labelOptions = Constants.getString("jm.common.options_button");
     String labelHelp = Constants.getString("jm.common.help");
-
     Button buttonGeneralDisplayOptions, buttonFullMapHelp;
     Button buttonMiniMapEnable, buttonMiniMapOptions, buttonMiniMapHelp;
     Button buttonWaypointOptions, buttonWaypointHelp, buttonWaypointManagerEnable;
     Button buttonWebMapEnable, buttonWebMapOpen;
-
     Button buttonClose;
-
     ButtonList listGeneral, listMiniMap, listWaypoints, listWebMap;
 
     public MasterOptions()
@@ -100,9 +94,9 @@ public class MasterOptions extends JmUI
         listWidth = Math.max(listWidth, listWebMap.getWidth(hgap));
 
         final int bx = (this.width - listWidth) / 2;
-        int by = Math.max(40, ((this.height - (5*30)) / 2));
+        int by = Math.max(40, ((this.height - (5 * 30)) / 2));
 
-        DrawUtil.drawRectangle(bx-5, by-20, listWidth+10, 1, Color.lightGray, 150);
+        DrawUtil.drawRectangle(bx - 5, by - 20, listWidth + 10, 1, Color.lightGray, 150);
 
         // Full Map
         DrawUtil.drawLabel(titleGeneral, bx, by, DrawUtil.HAlign.Right, DrawUtil.VAlign.Above, Color.BLACK, 0, Color.cyan, 255, 1, false);
@@ -127,7 +121,7 @@ public class MasterOptions extends JmUI
         by = listWebMap.getBottomY() + 20;
         buttonWebMapOpen.setEnabled(buttonWebMapEnable.getToggled());
 
-        DrawUtil.drawRectangle(bx-5, by-10, listWidth+10, 1, Color.lightGray, 150);
+        DrawUtil.drawRectangle(bx - 5, by - 10, listWidth + 10, 1, Color.lightGray, 150);
 
         // Close
         buttonClose.centerHorizontalOn(width / 2).setY(by);
@@ -177,7 +171,7 @@ public class MasterOptions extends JmUI
             }
             case WaypointManagerEnable:
             {
-                if(JourneyMap.getInstance().waypointProperties.managerEnabled.get())
+                if (JourneyMap.getInstance().waypointProperties.managerEnabled.get())
                 {
                     WaypointStore.instance().load();
                 }
@@ -220,6 +214,16 @@ public class MasterOptions extends JmUI
         else
         {
             UIManager.getInstance().open(returnClass);
+        }
+    }
+
+    enum ButtonEnum
+    {
+        FullMapOptions, FullMapHelp, MiniMapOptions, MiniMapHelp, WaypointOptions, WaypointHelp, MiniMapEnable, WaypointManagerEnable, WebMapEnable, WebMapOpen, Close;
+
+        Button create(String label)
+        {
+            return new Button(this, label);
         }
     }
 }

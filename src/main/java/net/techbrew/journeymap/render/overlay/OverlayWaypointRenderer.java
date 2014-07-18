@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.render.overlay;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -28,7 +36,7 @@ public class OverlayWaypointRenderer
         EntityPlayer player = mc.thePlayer;
         int dimension = player.dimension;
         int maxDistance = JourneyMap.getInstance().waypointProperties.maxDistance.get();
-        checkDistance = checkDistance && maxDistance>0;
+        checkDistance = checkDistance && maxDistance > 0;
         Vec3 playerVec = checkDistance ? player.getPosition(1) : null;
         drawStepList.clear();
 
@@ -38,11 +46,11 @@ public class OverlayWaypointRenderer
             {
                 if (waypoint.isEnable())
                 {
-                    if(checkDistance)
+                    if (checkDistance)
                     {
                         // Get view distance from waypoint
                         final double actualDistance = playerVec.distanceTo(waypoint.getPosition());
-                        if(actualDistance>maxDistance)
+                        if (actualDistance > maxDistance)
                         {
                             continue;
                         }

@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.model;
 
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -19,24 +27,59 @@ import java.util.EnumSet;
  */
 public class BlockMD
 {
+    /**
+     * The Uid.
+     */
     public final GameRegistry.UniqueIdentifier uid;
+    /**
+     * The Meta.
+     */
     public final int meta;
+    /**
+     * The Name.
+     */
     public final String name;
     private final EnumSet<Flag> flags;
     private transient Block block;
     private Integer color;
     private float alpha;
 
+    /**
+     * Instantiates a new BlockMD.
+     *
+     * @param block the block
+     * @param meta  the meta
+     * @param alpha the alpha
+     * @param flags the flags
+     */
     BlockMD(Block block, int meta, float alpha, BlockMD.Flag... flags)
     {
         this(null, block, meta, alpha, flags.length == 0 ? EnumSet.noneOf(BlockMD.Flag.class) : EnumSet.copyOf(Arrays.asList(flags)));
     }
 
+    /**
+     * Instantiates a new BlockMD.
+     *
+     * @param displayName the display name
+     * @param block       the block
+     * @param meta        the meta
+     * @param alpha       the alpha
+     * @param flags       the flags
+     */
     BlockMD(String displayName, Block block, int meta, float alpha, BlockMD.Flag... flags)
     {
         this(displayName, block, meta, alpha, flags.length == 0 ? EnumSet.noneOf(BlockMD.Flag.class) : EnumSet.copyOf(Arrays.asList(flags)));
     }
 
+    /**
+     * Instantiates a new BlockMD.
+     *
+     * @param displayName the display name
+     * @param block       the block
+     * @param meta        the meta
+     * @param alpha       the alpha
+     * @param flags       the flags
+     */
     BlockMD(String displayName, Block block, int meta, float alpha, EnumSet<BlockMD.Flag> flags)
     {
         this.uid = GameRegistry.findUniqueIdentifierFor(block);
@@ -47,7 +90,7 @@ public class BlockMD
         this.alpha = alpha;
         if (block == null)
         {
-            if("Void".equals(name))
+            if ("Void".equals(name))
             {
                 color = RGB.toInteger(17, 12, 25);
             }
@@ -58,6 +101,12 @@ public class BlockMD
         }
     }
 
+    /**
+     * Whether BlockMD has any of the flags.
+     *
+     * @param checkFlags the check flags
+     * @return the boolean
+     */
     public boolean hasFlag(Flag... checkFlags)
     {
         for (Flag flag : checkFlags)
@@ -70,6 +119,11 @@ public class BlockMD
         return false;
     }
 
+    /**
+     * Add flags.
+     *
+     * @param addFlags the add flags
+     */
     public void addFlags(Flag... addFlags)
     {
         for (Flag flag : addFlags)
@@ -80,6 +134,12 @@ public class BlockMD
 
     /**
      * Gets block color using chunk-local coords (x and z in {0-15} )
+     *
+     * @param chunkMd the chunk md
+     * @param x       the x
+     * @param y       the y
+     * @param z       the z
+     * @return the color
      */
     public int getColor(ChunkMD chunkMd, int x, int y, int z)
     {
@@ -105,11 +165,21 @@ public class BlockMD
         }
     }
 
+    /**
+     * Gets alpha.
+     *
+     * @return the alpha
+     */
     public float getAlpha()
     {
         return alpha;
     }
 
+    /**
+     * Sets alpha.
+     *
+     * @param alpha the alpha
+     */
     public void setAlpha(float alpha)
     {
         this.alpha = alpha;
@@ -126,60 +196,112 @@ public class BlockMD
         }
     }
 
+    /**
+     * Gets block.
+     *
+     * @return the block
+     */
     public Block getBlock()
     {
-        if(block==null){
+        if (block == null)
+        {
             block = GameRegistry.findBlock(uid.modId, uid.name);
-            if(block==null){
+            if (block == null)
+            {
                 block = Blocks.air;
             }
         }
         return block;
     }
 
+    /**
+     * Has tranparency.
+     *
+     * @return the boolean
+     */
     public boolean hasTranparency()
     {
         return hasFlag(Flag.Transparency);
     }
 
+    /**
+     * Is air.
+     *
+     * @return the boolean
+     */
     public boolean isAir()
     {
-        return getBlock() instanceof BlockAir ||hasFlag(Flag.HasAir) || block.getMaterial() == Material.air;
+        return getBlock() instanceof BlockAir || hasFlag(Flag.HasAir);
     }
 
+    /**
+     * Is ice.
+     *
+     * @return the boolean
+     */
     public boolean isIce()
     {
-        return block==Blocks.ice;
+        return block == Blocks.ice;
     }
 
+    /**
+     * Is torch.
+     *
+     * @return the boolean
+     */
     public boolean isTorch()
     {
         getBlock();
-        return block== Blocks.torch||block==Blocks.redstone_torch||block==Blocks.unlit_redstone_torch;
+        return block == Blocks.torch || block == Blocks.redstone_torch || block == Blocks.unlit_redstone_torch;
     }
 
+    /**
+     * Is water.
+     *
+     * @return the boolean
+     */
     public boolean isWater()
     {
         getBlock();
-        return block== Blocks.water||block==Blocks.flowing_water;
+        return block == Blocks.water || block == Blocks.flowing_water;
     }
 
+    /**
+     * Is transparent roof.
+     *
+     * @return the boolean
+     */
     public boolean isTransparentRoof()
     {
         return hasFlag(Flag.TransparentRoof);
     }
 
+    /**
+     * Is lava.
+     *
+     * @return the boolean
+     */
     public boolean isLava()
     {
         getBlock();
-        return block== Blocks.lava||block==Blocks.flowing_lava;
+        return block == Blocks.lava || block == Blocks.flowing_lava;
     }
 
+    /**
+     * Is foliage.
+     *
+     * @return the boolean
+     */
     public boolean isFoliage()
     {
         return getBlock() instanceof BlockLeaves;
     }
 
+    /**
+     * Is biome colored.
+     *
+     * @return the boolean
+     */
     public boolean isBiomeColored()
     {
         return flags.contains(Flag.BiomeColor) || flags.contains(Flag.CustomBiomeColor);
@@ -219,6 +341,11 @@ public class BlockMD
         return result;
     }
 
+    /**
+     * To cache key string.
+     *
+     * @return the string
+     */
     public String toCacheKeyString()
     {
         return BlockMDCache.toCacheKeyString(uid, meta);
@@ -230,14 +357,65 @@ public class BlockMD
         return String.format("BlockMD [%s]", BlockMDCache.toCacheKeyString(uid, meta));
     }
 
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * Flags indicating special behaviors of Blocks.
+     */
     public enum Flag
     {
-        HasAir, BiomeColor, CustomBiomeColor, OpenToSky, NoShadow, Side2Texture, Transparency, Error, TransparentRoof
+        /**
+         * Block should be treated like air.
+         */
+        HasAir,
+
+        /**
+         * Block color is determined by biome.
+         */
+        BiomeColor,
+
+        /**
+         * Block color is custom + determined by biome.
+         */
+        CustomBiomeColor,
+
+        /**
+         * Block doesn't count as overhead cover.
+         */
+        OpenToSky,
+
+        /**
+         * Block shouldn't cast a shadow.
+         */
+        NoShadow,
+
+        /**
+         * Block's color should come from the side 2 texture.
+         */
+        Side2Texture,
+
+        /**
+         * Block isn't opaque.
+         */
+        Transparency,
+
+        /**
+         * Block was processed with errors.
+         */
+        Error,
+
+        /**
+         * Block is transparent and is ignored by Minecraft's chunk heights.
+         */
+        TransparentRoof
     }
 
 

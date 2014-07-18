@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.waypoint;
 
 import net.minecraft.client.gui.FontRenderer;
@@ -29,6 +37,10 @@ import java.util.Collection;
 public class WaypointEditor extends JmUI
 {
 
+    private final TextureImpl wpTexture;
+    private final TextureImpl colorPickTexture;
+    private final Waypoint originalWaypoint;
+    private final boolean isNew;
     String labelName = Constants.getString("jm.waypoint.name");
     String locationTitle = Constants.getString("jm.waypoint.location");
     String colorTitle = Constants.getString("jm.waypoint.color");
@@ -37,28 +49,17 @@ public class WaypointEditor extends JmUI
     String labelY = Constants.getString("jm.waypoint.y");
     String labelZ = Constants.getString("jm.waypoint.z");
     String labelR = Constants.getString("jm.waypoint.red_abbreviated");
-    String labelG = Constants.getString("jm.waypoint.green_abbreviated");
-    String labelB = Constants.getString("jm.waypoint.blue_abbreviated");
-
-    String currentLocation = "";
-
-    private enum ButtonEnum
-    {
-        Randomize, Enable, Remove, Reset, Save, Close
-    }
 
     ;
-
-    private final TextureImpl wpTexture;
-    private final TextureImpl colorPickTexture;
-
+    String labelG = Constants.getString("jm.waypoint.green_abbreviated");
+    String labelB = Constants.getString("jm.waypoint.blue_abbreviated");
+    String currentLocation = "";
     private Button buttonRandomize;
     private Button buttonEnable;
     private Button buttonRemove;
     private Button buttonReset;
     private Button buttonSave;
     private Button buttonClose;
-
     private TextField fieldName;
     private TextField fieldR;
     private TextField fieldG;
@@ -66,20 +67,13 @@ public class WaypointEditor extends JmUI
     private TextField fieldX;
     private TextField fieldY;
     private TextField fieldZ;
-
     private ArrayList<TextField> fieldList = new ArrayList<TextField>();
-
     private ArrayList<DimensionButton> dimButtonList = new ArrayList<DimensionButton>();
     private ScrollPane dimScrollPane;
-
     private Color currentColor;
     private Rectangle2D.Double colorPickRect;
     private BufferedImage colorPickImg;
-
-    private final Waypoint originalWaypoint;
     private Waypoint editedWaypoint;
-    private final boolean isNew;
-
     private ButtonList bottomButtons;
 
     public WaypointEditor(Waypoint waypoint, boolean isNew, Class<? extends JmUI> returnClass)
@@ -678,6 +672,11 @@ public class WaypointEditor extends JmUI
         {
             UIManager.getInstance().open(returnClass);
         }
+    }
+
+    private enum ButtonEnum
+    {
+        Randomize, Enable, Remove, Reset, Save, Close
     }
 
     class DimensionButton extends Button

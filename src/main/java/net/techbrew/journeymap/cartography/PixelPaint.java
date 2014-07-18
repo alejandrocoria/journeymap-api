@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.cartography;
 
 import sun.awt.image.IntegerComponentRaster;
@@ -12,7 +20,7 @@ import java.util.Arrays;
 /**
  * A simple combo-implementation of Paint and PaintContext designed for frequent reuse.
  * Based on code in java.awt.Color and java.awt.ColorPaintContext.
-*/
+ */
 class PixelPaint implements Paint, PaintContext
 {
     final ColorModel colorModel = ColorModel.getRGBdefault();

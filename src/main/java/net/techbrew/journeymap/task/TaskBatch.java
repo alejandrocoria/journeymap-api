@@ -1,15 +1,20 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.task;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.World;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.model.ChunkMD;
 
 import java.io.File;
-import java.util.*;
+import java.util.List;
 
 /**
  * Created by Mark on 7/16/2014.
@@ -23,9 +28,9 @@ public class TaskBatch implements ITask
     {
         taskList = tasks;
         int timeout = 0;
-        for(ITask task : tasks)
+        for (ITask task : tasks)
         {
-            timeout+=task.getMaxRuntime();
+            timeout += task.getMaxRuntime();
         }
         this.timeout = timeout;
     }
@@ -39,14 +44,15 @@ public class TaskBatch implements ITask
     @Override
     public void performTask(final Minecraft mc, final JourneyMap jm, final File jmWorldDir, final boolean threadLogging) throws InterruptedException
     {
-        if(threadLogging)
+        if (threadLogging)
         {
             JourneyMap.getLogger().fine("START batching tasks");
         }
 
-        while(!taskList.isEmpty())
+        while (!taskList.isEmpty())
         {
-            if (Thread.interrupted()) {
+            if (Thread.interrupted())
+            {
                 JourneyMap.getLogger().warning("BastTask thread interrupted: " + this);
                 throw new InterruptedException();
             }
@@ -54,7 +60,7 @@ public class TaskBatch implements ITask
             ITask task = taskList.remove(0);
             try
             {
-                if(threadLogging)
+                if (threadLogging)
                 {
                     JourneyMap.getLogger().fine("Batching task: " + task);
                 }
@@ -67,7 +73,7 @@ public class TaskBatch implements ITask
             }
         }
 
-        if(threadLogging)
+        if (threadLogging)
         {
             JourneyMap.getLogger().fine("DONE batching tasks");
         }

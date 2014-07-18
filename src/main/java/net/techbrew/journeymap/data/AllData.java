@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.data;
 
 import com.google.common.cache.CacheLoader;
@@ -14,18 +22,6 @@ import java.util.*;
  */
 public class AllData extends CacheLoader<Long, Map>
 {
-    public static enum Key
-    {
-        animals,
-        images,
-        mobs,
-        player,
-        players,
-        villagers,
-        waypoints,
-        world
-    }
-
     /**
      * Constructor.
      */
@@ -47,10 +43,10 @@ public class AllData extends CacheLoader<Long, Map>
         {
             int currentDimension = cache.getPlayer(false).dimension;
             Collection<Waypoint> waypoints = cache.getWaypoints(false);
-            Map<String,Waypoint> wpMap = new HashMap<String, Waypoint>();
-            for(Waypoint waypoint : waypoints)
+            Map<String, Waypoint> wpMap = new HashMap<String, Waypoint>();
+            for (Waypoint waypoint : waypoints)
             {
-                if(waypoint.getDimensions().contains(currentDimension))
+                if (waypoint.getDimensions().contains(currentDimension))
                 {
                     wpMap.put(waypoint.getId(), waypoint);
                 }
@@ -110,5 +106,17 @@ public class AllData extends CacheLoader<Long, Map>
     public long getTTL()
     {
         return JourneyMap.getInstance().coreProperties.chunkPoll.get();
+    }
+
+    public static enum Key
+    {
+        animals,
+        images,
+        mobs,
+        player,
+        players,
+        villagers,
+        waypoints,
+        world
     }
 }

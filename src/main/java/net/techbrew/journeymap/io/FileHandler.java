@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.io;
 
 
@@ -25,8 +33,6 @@ import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class FileHandler
 {
@@ -258,7 +264,7 @@ public class FileHandler
     public static File getEntityIconDir()
     {
         File dir = new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.ENTITY_ICON_DIR);
-        if(!dir.exists())
+        if (!dir.exists())
         {
             dir.mkdirs();
         }
@@ -298,14 +304,14 @@ public class FileHandler
         final List<String> mobIconSetNames = Arrays.asList(MOB_ICON_SET_2D, MOB_ICON_SET_3D);
         boolean inJar = FileHandler.isInJar();
 
-        for(String setName : mobIconSetNames)
+        for (String setName : mobIconSetNames)
         {
             try
             {
                 URL resourceDir = JourneyMap.class.getResource(FileHandler.ASSETS_JOURNEYMAP_ICON_ENTITY);
                 String toPath = String.format("%s/%s", ASSETS_JOURNEYMAP_ICON_ENTITY, setName);
                 File toDir = new File(getEntityIconDir(), setName);
-                if(inJar)
+                if (inJar)
                 {
                     String fromPath = resourceDir.getPath().split("file:")[1].split("!/")[0];
                     copyFromZip(fromPath, toPath, toDir, false);
@@ -351,9 +357,9 @@ public class FileHandler
 
         // Create list of icon set names
         ArrayList<String> names = new ArrayList<String>();
-        for(File iconSetDir : entityIconDir.listFiles())
+        for (File iconSetDir : entityIconDir.listFiles())
         {
-            if(iconSetDir.isDirectory())
+            if (iconSetDir.isDirectory())
             {
                 names.add(iconSetDir.getName());
             }
@@ -369,7 +375,7 @@ public class FileHandler
         File iconFile = new File(getEntityIconDir(), filePath);
 
         BufferedImage img = null;
-        if(iconFile.exists())
+        if (iconFile.exists())
         {
             img = getImage(iconFile);
         }
@@ -570,12 +576,13 @@ public class FileHandler
     /**
      * Extracts a zip file specified by the zipFilePath to a directory specified by
      * destDirectory (will be created if does not exists)
+     *
      * @throws IOException
      */
     private static void copyFromZip(String zipFilePath, String zipEntryName, File destDir, boolean overWrite) throws Throwable
     {
 
-        if(zipEntryName.startsWith("/"))
+        if (zipEntryName.startsWith("/"))
         {
             zipEntryName = zipEntryName.substring(1);
         }
@@ -587,10 +594,10 @@ public class FileHandler
         {
             while (entry != null)
             {
-                if(entry.getName().startsWith(zipEntryName))
+                if (entry.getName().startsWith(zipEntryName))
                 {
                     File toFile = new File(destDir, entry.getName().split(zipEntryName)[1]);
-                    if(overWrite || !toFile.exists())
+                    if (overWrite || !toFile.exists())
                     {
                         if (!entry.isDirectory())
                         {
@@ -616,14 +623,14 @@ public class FileHandler
     private static void copyFromDirectory(File fromDir, File toDir, boolean overWrite) throws IOException
     {
         toDir.mkdir();
-        for(File from : fromDir.listFiles())
+        for (File from : fromDir.listFiles())
         {
             File to = new File(toDir, from.getName());
-            if(from.isDirectory())
+            if (from.isDirectory())
             {
                 copyFromDirectory(from, to, overWrite);
             }
-            else if(overWrite || !to.exists())
+            else if (overWrite || !to.exists())
             {
                 Files.copy(from, to);
             }
@@ -642,12 +649,14 @@ public class FileHandler
         }
 
         @Override
-        public InputStream openStream() throws IOException {
+        public InputStream openStream() throws IOException
+        {
             return file.getInputStream(entry);
         }
 
         @Override
-        public String toString() {
+        public String toString()
+        {
             return String.format("ZipEntryByteSource( %s / %s )", file, entry);
         }
     }

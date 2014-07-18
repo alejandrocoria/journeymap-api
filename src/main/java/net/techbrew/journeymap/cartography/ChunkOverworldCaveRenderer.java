@@ -1,6 +1,13 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.cartography;
 
-import net.minecraft.block.Block;
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -21,7 +28,7 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
     protected ChunkOverworldSurfaceRenderer surfaceRenderer;
     protected StatTimer renderCaveTimer = StatTimer.get("ChunkOverworldCaveRenderer.render");
 
-    protected Strata strata = new Strata("OverworldCave", 40,8, true);
+    protected Strata strata = new Strata("OverworldCave", 40, 8, true);
     protected float defaultDim = .8f;
 
 
@@ -42,7 +49,7 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
     public boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final boolean underground,
                           final Integer vSlice, final ChunkMD.Set neighbors)
     {
-        if(!underground || vSlice==null)
+        if (!underground || vSlice == null)
         {
             JourneyMap.getLogger().warning(String.format("ChunkOverworldCaveRenderer is for caves.  Y u do dis? (%s,%s)", underground, vSlice));
             return false;
@@ -52,7 +59,7 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
         boolean ok = false;
 
         // Surface prepass
-        if(!chunkMd.hasNoSky && surfaceRenderer!=null)
+        if (!chunkMd.hasNoSky && surfaceRenderer != null)
         {
             ok = surfaceRenderer.render(g2D, chunkMd, true, vSlice, neighbors, true);
             if (!ok)
@@ -72,7 +79,7 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
             }
 
             // Render that lovely cave action
-           ok = renderUnderground(g2D, chunkMd, vSlice, neighbors);
+            ok = renderUnderground(g2D, chunkMd, vSlice, neighbors);
 
             if (!ok)
             {
@@ -101,7 +108,8 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
 
         for (int z = 0; z < 16; z++)
         {
-            blockLoop: for (int x = 0; x < 16; x++)
+            blockLoop:
+            for (int x = 0; x < 16; x++)
             {
                 strata.reset();
 
@@ -118,9 +126,9 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
                     }
 
                     // Nothing even in this slice.
-                    if (ceiling<sliceMinY)
+                    if (ceiling < sliceMinY)
                     {
-                        if(surfaceRenderer!=null)
+                        if (surfaceRenderer != null)
                         {
                             // Should be painted by surface renderer already.
                             paintDimOverlay(x, z, defaultDim, g2D);
@@ -132,7 +140,7 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
                         chunkOk = true;
                         continue;
                     }
-                    else if(ceiling>sliceMaxY)
+                    else if (ceiling > sliceMaxY)
                     {
                         // Solid stuff above the slice. Shouldn't be painted by surface renderer.
                         y = sliceMaxY;
@@ -146,12 +154,12 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
                     buildStrata(strata, neighbors, sliceMinY, chunkMd, x, y, z);
 
                     // No lit blocks
-                    if(strata.isEmpty())
+                    if (strata.isEmpty())
                     {
                         // No surface?
-                        if(surfaceRenderer==null)
+                        if (surfaceRenderer == null)
                         {
-                            if(strata.blocksFound)
+                            if (strata.blocksFound)
                             {
                                 paintBlackBlock(x, z, g2D);
                             }
@@ -160,10 +168,10 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
                                 paintVoidBlock(x, z, g2D);
                             }
                         }
-                        else if(ceiling>sliceMaxY)
+                        else if (ceiling > sliceMaxY)
                         {
-                            int distance = ceiling-y;
-                            if(distance<16)
+                            int distance = ceiling - y;
+                            if (distance < 16)
                             {
                                 // Show dimmed surface above
                                 paintDimOverlay(x, z, Math.max(defaultDim, distance / 16), g2D);
@@ -224,13 +232,13 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
                     strata.blocksFound = true;
                     blockAboveMD = dataCache.getBlockMD(chunkMd, x, y + 1, z);
 
-                    if(blockMD.isLava() && blockAboveMD.isLava())
+                    if (blockMD.isLava() && blockAboveMD.isLava())
                     {
                         // Ignores the myriad tiny one-block pockets of lava in the Nether
                         lavaBlockMD = blockMD;
                     }
 
-                    if(blockAboveMD.isAir() || blockAboveMD.hasFlag(BlockMD.Flag.OpenToSky))
+                    if (blockAboveMD.isAir() || blockAboveMD.hasFlag(BlockMD.Flag.OpenToSky))
                     {
                         if (chunkMd.hasNoSky || !chunkMd.stub.canBlockSeeTheSky(x, y + 1, z))
                         {
@@ -258,7 +266,7 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
         {
             // Corner case where the column has lava but no air in it.
             // This is a nether thing
-            if(chunkMd.hasNoSky && strata.isEmpty() && lavaBlockMD!=null)
+            if (chunkMd.hasNoSky && strata.isEmpty() && lavaBlockMD != null)
             {
                 strata.push(neighbors, chunkMd, lavaBlockMD, x, topY, z, 14);
             }
@@ -338,7 +346,7 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
     protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater)
     {
         Integer[][] blockSliceHeights = chunkMd.sliceHeights.get(vSlice);
-        if(blockSliceHeights==null)
+        if (blockSliceHeights == null)
         {
             blockSliceHeights = new Integer[16][16];
             chunkMd.sliceHeights.put(vSlice, blockSliceHeights);
@@ -346,28 +354,28 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
 
         Integer y = blockSliceHeights[x][z];
 
-        if(y!=null)
+        if (y != null)
         {
             return y;
         }
 
         try
         {
-            y = sliceMaxY-1;
+            y = sliceMaxY - 1;
 
             BlockMD blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
-            BlockMD blockMDAbove = dataCache.getBlockMD(chunkMd, x, y+1, z);
+            BlockMD blockMDAbove = dataCache.getBlockMD(chunkMd, x, y + 1, z);
 
             while (y > 0)
             {
-                if(ignoreWater && blockMD.isWater())
+                if (ignoreWater && blockMD.isWater())
                 {
                     y--;
                 }
 
                 if (blockMDAbove.isAir() || blockMDAbove.hasTranparency() || blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky))
                 {
-                    if(!blockMD.isAir())
+                    if (!blockMD.isAir())
                     {
                         break;
                     }
@@ -376,7 +384,7 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
                 y--;
 
                 blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
-                blockMDAbove = dataCache.getBlockMD(chunkMd, x, y+1, z);
+                blockMDAbove = dataCache.getBlockMD(chunkMd, x, y + 1, z);
             }
         }
         catch (Exception e)

@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -31,75 +39,43 @@ import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.server.JMServer;
 import net.techbrew.journeymap.task.ITaskManager;
 import net.techbrew.journeymap.task.TaskController;
-import net.techbrew.journeymap.thread.JMThreadFactory;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * This software is copyright (C) Mark Woodman (mwoodman@techbrew.net) and is
- * provided as-is with no warrantee whatsoever.
- * <p/>
- * Central class for the JourneyMap mod.
- *
- * @author Mark Woodman
- */
 @SideOnly(Side.CLIENT)
 @Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = JourneyMap.JM_VERSION)
 public class JourneyMap
 {
-    static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
-
     public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
     public static final String JM_VERSION = "@JMVERSION@"; //$NON-NLS-1$
     public static final String MC_VERSION = "@MCVERSION@"; //$NON-NLS-1$
-
     public static final String EDITION = getEdition();
     public static final String MOD_ID = "journeymap";
     public static final String SHORT_MOD_NAME = "JourneyMap";
     public static final String MOD_NAME = SHORT_MOD_NAME + " " + EDITION;
-
+    static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
     private static JourneyMap INSTANCE;
-
-    public static JourneyMap getInstance()
-    {
-        return INSTANCE;
-    }
-
-    private Logger logger;
-
-    private volatile Boolean initialized = false;
-
-
-    private JMServer jmServer;
-
-    private boolean threadLogging = false;
-
     // Time stamp of next chunk update
     public long nextPlayerUpdate = 0;
     public long nextChunkUpdate = 0;
-
     public ModInfo modInfo;
-
     // Properties & preferences
     public CoreProperties coreProperties;
     public FullMapProperties fullMapProperties;
     public MiniMapProperties miniMapProperties;
     public WebMapProperties webMapProperties;
     public WaypointProperties waypointProperties;
-
-
-
+    private Logger logger;
+    private volatile Boolean initialized = false;
+    private JMServer jmServer;
+    private boolean threadLogging = false;
     // Task controller for issuing tasks in executor
     private TaskController taskController;
-
     private ChunkRenderController chunkRenderController;
-
     private Minecraft mc;
 
     /**
@@ -112,6 +88,11 @@ public class JourneyMap
             throw new IllegalArgumentException("Use getInstance() after initialization is complete");
         }
         INSTANCE = this;
+    }
+
+    public static JourneyMap getInstance()
+    {
+        return INSTANCE;
     }
 
     private static String getEdition()
@@ -144,6 +125,14 @@ public class JourneyMap
         return ed;
     }
 
+    /**
+     * @return
+     */
+    public static Logger getLogger()
+    {
+        return INSTANCE.logger == null ? Logger.getLogger(MOD_ID) : INSTANCE.logger;
+    }
+
     public Boolean isInitialized()
     {
         return initialized;
@@ -151,7 +140,7 @@ public class JourneyMap
 
     public Boolean isMapping()
     {
-        return taskController!=null && taskController.isMapping();
+        return taskController != null && taskController.isMapping();
     }
 
     public Boolean isThreadLogging()
@@ -197,7 +186,7 @@ public class JourneyMap
             // Logging for thread debugging
             threadLogging = getLogger().isLoggable(Level.FINER);
 
-            logger.info("initialize EXIT, " + (timer==null ? "" : timer.stopAndReport()));
+            logger.info("initialize EXIT, " + (timer == null ? "" : timer.stopAndReport()));
         }
         catch (Throwable t)
         {
@@ -227,7 +216,7 @@ public class JourneyMap
             WaypointsData.reset();
 
             // Now that all blocks should be registered, init BlockUtils
-           // BlockUtils.initialize();
+            // BlockUtils.initialize();
 
             // Ensure all mob icons files are ready for use.
             FileHandler.initMobIconSets();
@@ -247,7 +236,7 @@ public class JourneyMap
         }
         finally
         {
-            logger.info("postInitialize EXIT, " + (timer==null ? "" : timer.stopAndReport()));
+            logger.info("postInitialize EXIT, " + (timer == null ? "" : timer.stopAndReport()));
         }
     }
 
@@ -354,7 +343,7 @@ public class JourneyMap
     {
         synchronized (this)
         {
-            if (mc==null || mc.theWorld == null)
+            if (mc == null || mc.theWorld == null)
             {
                 return;
             }
@@ -377,7 +366,7 @@ public class JourneyMap
     {
         synchronized (this)
         {
-            if ((isMapping()) && mc!=null)
+            if ((isMapping()) && mc != null)
             {
                 String dim = ".";
                 if (mc.theWorld != null && mc.theWorld.provider != null)
@@ -401,7 +390,7 @@ public class JourneyMap
         FileHandler.lastJMWorldDir = null;
         chunkRenderController = new ChunkRenderController();
         DataCache.instance().purge();
-        MapOverlay.state().follow=true;
+        MapOverlay.state().follow = true;
         ColorCache.getInstance().reset();
         StatTimer.resetAll();
         TextureCache.instance().purge();
@@ -427,7 +416,7 @@ public class JourneyMap
             }
 
             final boolean isDead = mc.currentScreen != null && mc.currentScreen instanceof GuiGameOver;
-            if(mc.thePlayer!=null && isDead && isMapping())
+            if (mc.thePlayer != null && isDead && isMapping())
             {
                 stopMapping();
                 if (waypointProperties.managerEnabled.get())
@@ -519,14 +508,6 @@ public class JourneyMap
     public ChunkRenderController getChunkRenderController()
     {
         return chunkRenderController;
-    }
-
-    /**
-     * @return
-     */
-    public static Logger getLogger()
-    {
-        return INSTANCE.logger == null ? Logger.getLogger(MOD_ID) : INSTANCE.logger;
     }
 
 }

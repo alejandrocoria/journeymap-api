@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.minimap;
 
 import net.minecraft.client.gui.GuiButton;
@@ -13,25 +21,17 @@ import java.awt.*;
 public class MiniMapOptions extends JmUI
 {
 
-    private enum ButtonEnum
-    {
-        MiniMap, Position, Shape, Font, Texture, IconSet, Unicode, Keyboard, KeyboardHelp, Close, Showfps, ShowSelf, GeneralDisplay, TerrainAlpha, CloseAll
-    }
-
     private Button buttonPosition, buttonShape, buttonFont, buttonTexture, buttonUnicode, buttonMiniMap, buttonKeyboard;
     private Button buttonKeyboardHelp, buttonShowSelf, buttonShowfps, buttonGeneralDisplay, buttonClose, buttonCloseAll;
     private IconSetButton buttonIconSet;
     private SliderButton buttonTerrainAlpha;
-
     private DisplayVars.Shape currentShape;
     private DisplayVars.Position currentPosition;
     private ButtonList leftButtons;
     private ButtonList rightButtons;
     private ButtonList bottomButtons;
-
     private MiniMap miniMap = UIManager.getInstance().getMiniMap();
     private MiniMapProperties miniMapProperties = JourneyMap.getInstance().miniMapProperties;
-
     public MiniMapOptions()
     {
         this(MasterOptions.class);
@@ -82,7 +82,7 @@ public class MiniMapOptions extends JmUI
                 miniMapProperties, miniMapProperties.textureSmall);
         buttonTexture.setEnabled(minimapOn);
 
-        buttonShowSelf= new BooleanPropertyButton(ButtonEnum.ShowSelf.ordinal(),
+        buttonShowSelf = new BooleanPropertyButton(ButtonEnum.ShowSelf.ordinal(),
                 Constants.getString("jm.common.show_self", Constants.getString("jm.common.on")),
                 Constants.getString("jm.common.show_self", Constants.getString("jm.common.off")),
                 miniMapProperties, miniMapProperties.showSelf);
@@ -150,7 +150,7 @@ public class MiniMapOptions extends JmUI
         final int hgap = 2;
         final int vgap = 3;
         final int bx = this.width / 2;
-        final int by = Math.max(30, (this.height - (8*24)) / 2);
+        final int by = Math.max(30, (this.height - (8 * 24)) / 2);
 
         buttonMiniMap.centerHorizontalOn(bx).setY(by);
 
@@ -171,7 +171,7 @@ public class MiniMapOptions extends JmUI
         buttonGeneralDisplay.setEnabled(true);
         buttonKeyboardHelp.setEnabled(buttonMiniMap.getToggled() && buttonKeyboard.getToggled());
 
-        bottomButtons.layoutCenteredHorizontal(bx, leftButtons.getBottomY() + (3*vgap), true, hgap);
+        bottomButtons.layoutCenteredHorizontal(bx, leftButtons.getBottomY() + (3 * vgap), true, hgap);
     }
 
     @Override
@@ -331,7 +331,7 @@ public class MiniMapOptions extends JmUI
         drawTitle();
         drawLogo();
 
-        if(JourneyMap.getInstance().miniMapProperties.enabled.get())
+        if (JourneyMap.getInstance().miniMapProperties.enabled.get())
         {
             MiniMap miniMap = this.miniMap;
             miniMap.drawMap();
@@ -349,9 +349,9 @@ public class MiniMapOptions extends JmUI
         if (idx > 0)
         {
             fps = fps.substring(0, idx);
-            if(currentPosition== DisplayVars.Position.TopRight)
+            if (currentPosition == DisplayVars.Position.TopRight)
             {
-                DrawUtil.drawLabel(fps, width - 5, height-5, DrawUtil.HAlign.Left, DrawUtil.VAlign.Above, Color.BLACK, 0, Color.cyan, 255, 1, true);
+                DrawUtil.drawLabel(fps, width - 5, height - 5, DrawUtil.HAlign.Left, DrawUtil.VAlign.Above, Color.BLACK, 0, Color.cyan, 255, 1, true);
             }
             else
             {
@@ -370,9 +370,14 @@ public class MiniMapOptions extends JmUI
         DrawUtil.drawRectangle(0, this.height - headerHeight, this.width, headerHeight, Color.black, 150);
 
         // Draw miniMap
-        if(JourneyMap.getInstance().miniMapProperties.enabled.get())
+        if (JourneyMap.getInstance().miniMapProperties.enabled.get())
         {
             miniMap.drawMap();
         }
+    }
+
+    private enum ButtonEnum
+    {
+        MiniMap, Position, Shape, Font, Texture, IconSet, Unicode, Keyboard, KeyboardHelp, Close, Showfps, ShowSelf, GeneralDisplay, TerrainAlpha, CloseAll
     }
 }

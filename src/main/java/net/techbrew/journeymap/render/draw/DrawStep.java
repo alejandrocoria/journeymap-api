@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.render.draw;
 
 import net.techbrew.journeymap.render.overlay.GridRenderer;
@@ -7,7 +15,8 @@ import net.techbrew.journeymap.render.overlay.GridRenderer;
  *
  * @author mwoodman
  */
-public interface DrawStep {
+public interface DrawStep
+{
 
     public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale);
 

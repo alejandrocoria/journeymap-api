@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.server;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -24,12 +32,8 @@ import java.util.Map;
 public class DataService extends BaseService
 {
 
-    private static final long serialVersionUID = 4412225358529161454L;
-
     public static final String combinedPath;
-
     public static final HashMap<String, Class> providerMap;
-
     static
     {
         providerMap = new HashMap<String, Class>(14);
@@ -53,6 +57,7 @@ public class DataService extends BaseService
         }
         combinedPath = sb.toString();
     }
+    private static final long serialVersionUID = 4412225358529161454L;
 
 
     /**
@@ -135,7 +140,7 @@ public class DataService extends BaseService
             {
                 data = new ImagesData(since);
             }
-            else  if (dpClass == MessagesData.class)
+            else if (dpClass == MessagesData.class)
             {
                 data = DataCache.instance().getMessages(false);
             }
@@ -158,8 +163,8 @@ public class DataService extends BaseService
             else if (dpClass == WaypointsData.class)
             {
                 Collection<Waypoint> waypoints = DataCache.instance().getWaypoints(false);
-                Map<String,Waypoint> wpMap = new HashMap<String, Waypoint>();
-                for(Waypoint waypoint : waypoints)
+                Map<String, Waypoint> wpMap = new HashMap<String, Waypoint>();
+                for (Waypoint waypoint : waypoints)
                 {
                     wpMap.put(waypoint.getId(), waypoint);
                 }

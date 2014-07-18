@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.properties;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -10,8 +18,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class CoreProperties extends PropertiesBase implements Comparable<CoreProperties>
 {
     protected transient static final int CODE_REVISION = 3;
-    protected transient final String name = "core";
-
     public final AtomicReference<String> logLevel = new AtomicReference<String>("INFO");
     public final AtomicInteger chunkOffset = new AtomicInteger(8);
     public final AtomicInteger entityPoll = new AtomicInteger(1800);
@@ -31,12 +37,12 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public final AtomicBoolean checkUpdates = new AtomicBoolean(true);
     public final AtomicBoolean caveIgnoreGlass = new AtomicBoolean(true);
     public final AtomicBoolean recordCacheStats = new AtomicBoolean(false);
-
     public final AtomicBoolean mapBathymetry = new AtomicBoolean(false);
     public final AtomicBoolean mapTransparency = new AtomicBoolean(true);
     public final AtomicBoolean mapCaveLighting = new AtomicBoolean(true);
     public final AtomicBoolean mapAntialiasing = new AtomicBoolean(true);
     public final AtomicBoolean mapPlantShadows = new AtomicBoolean(false);
+    protected transient final String name = "core";
 
     public CoreProperties()
     {
@@ -101,7 +107,8 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "CoreProperties{" +
                 "name='" + name + '\'' +
                 ", logLevel=" + logLevel +

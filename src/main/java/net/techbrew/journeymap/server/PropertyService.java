@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.server;
 
 import net.techbrew.journeymap.Constants;
@@ -14,37 +22,37 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Provide player data
- * 
- * @author mwoodman
  *
+ * @author mwoodman
  */
-public class PropertyService extends BaseService {
+public class PropertyService extends BaseService
+{
 
-	private static final long serialVersionUID = 4412225358529161454L;
-
-	public static final String CALLBACK_PARAM = "callback";  //$NON-NLS-1$
-
+    public static final String CALLBACK_PARAM = "callback";  //$NON-NLS-1$
+    private static final long serialVersionUID = 4412225358529161454L;
     FullMapProperties fullMapProperties;
     WebMapProperties webMapProperties;
     HashMap<String, AtomicBoolean> propMap = new HashMap<String, AtomicBoolean>();
-	
-	/**
-	 * Serves / saves property info
-	 */
-	public PropertyService() {
-		super();
+
+    /**
+     * Serves / saves property info
+     */
+    public PropertyService()
+    {
+        super();
 
 
-	}
-	
-	@Override
-	public String path() {
-		return "/properties";
-	}
+    }
+
+    @Override
+    public String path()
+    {
+        return "/properties";
+    }
 
     private void init()
     {
-        if(propMap.isEmpty())
+        if (propMap.isEmpty())
         {
             fullMapProperties = JourneyMap.getInstance().fullMapProperties;
             webMapProperties = JourneyMap.getInstance().webMapProperties;
@@ -58,9 +66,10 @@ public class PropertyService extends BaseService {
             propMap.put("showWaypoints", webMapProperties.showWaypoints);
         }
     }
-	
-	@Override
-	public void filter(Event event) throws Event, Exception {
+
+    @Override
+    public void filter(Event event) throws Event, Exception
+    {
 
         try
         {
@@ -76,11 +85,10 @@ public class PropertyService extends BaseService {
                 post(event);
                 return;
             }
-            else
-                if (query.method() != Query.GET)
-                {
-                    throw new Exception("HTTP method not allowed");
-                }
+            else if (query.method() != Query.GET)
+            {
+                throw new Exception("HTTP method not allowed");
+            }
 
             // Build the response string
             StringBuffer jsonData = new StringBuffer();
@@ -112,26 +120,33 @@ public class PropertyService extends BaseService {
             // Gzip response
             gzipResponse(event, jsonData.toString());
 
-        } catch(Throwable t) {
+        }
+        catch (Throwable t)
+        {
             JourneyMap.getLogger().severe(LogFormatter.toString(t));
             throwEventException(500, Constants.getMessageJMERR12(path), event, true);
         }
     }
-	
-	public void post(Event event) throws Event, Exception {
-		
-		try {
-			Query query = event.query();
-			String[] param = query.parameters().split("=");
-			if(param.length!=2) throw new Exception("Expected single key-value pair");
+
+    public void post(Event event) throws Event, Exception
+    {
+
+        try
+        {
+            Query query = event.query();
+            String[] param = query.parameters().split("=");
+            if (param.length != 2)
+            {
+                throw new Exception("Expected single key-value pair");
+            }
             String key = param[0];
             String value = param[1];
 
-            if(propMap.containsKey(key))
+            if (propMap.containsKey(key))
             {
                 Boolean boolValue = Boolean.parseBoolean(value);
                 propMap.get(key).set(boolValue);
-                if(key.equals("showCaves") || key.equals("showGrid"))
+                if (key.equals("showCaves") || key.equals("showGrid"))
                 {
                     fullMapProperties.save();
                 }
@@ -140,7 +155,9 @@ public class PropertyService extends BaseService {
                     webMapProperties.save();
                 }
             }
-        } catch(Throwable t) {
+        }
+        catch (Throwable t)
+        {
             JourneyMap.getLogger().severe(LogFormatter.toString(t));
             throwEventException(500, Constants.getMessageJMERR12(path), event, true);
         }

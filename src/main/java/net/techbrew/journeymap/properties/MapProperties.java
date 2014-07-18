@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.properties;
 
 import net.techbrew.journeymap.JourneyMap;
@@ -34,7 +42,7 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
 
         AtomicReference<String> entityIconSetName = getEntityIconSetName();
 
-        if(entityIconSetName.get()==null || !FileHandler.getMobIconSetNames().contains(entityIconSetName.get()))
+        if (entityIconSetName.get() == null || !FileHandler.getMobIconSetNames().contains(entityIconSetName.get()))
         {
             JourneyMap.getLogger().warning(String.format("Entity Icon Set name '%s' is not valid, will use default instead.", entityIconSetName.get()));
             entityIconSetName.set(FileHandler.getMobIconSetNames().get(0));

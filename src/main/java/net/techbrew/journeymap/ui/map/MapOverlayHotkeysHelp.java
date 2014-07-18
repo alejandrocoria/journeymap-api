@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.map;
 
 import net.minecraft.client.gui.GuiButton;
@@ -13,15 +21,9 @@ public class MapOverlayHotkeysHelp extends JmUI
 
     private int lastWidth = 0;
     private int lastHeight = 0;
-
-    private enum ButtonEnum
-    {
-        Close
-    }
-
-    ;
     private Button buttonClose;
 
+    ;
     private KeyEventHandler keyEventHandler;
 
     public MapOverlayHotkeysHelp(Class<? extends JmUI> returnClass)
@@ -123,5 +125,10 @@ public class MapOverlayHotkeysHelp extends JmUI
         drawString(getFontRenderer(), title, x - tWidth - hgap, y, 16777215);
 
         drawString(getFontRenderer(), key, x + hgap, y, Color.YELLOW.getRGB());
+    }
+
+    private enum ButtonEnum
+    {
+        Close
     }
 }

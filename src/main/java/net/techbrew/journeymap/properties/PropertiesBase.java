@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.properties;
 
 import com.google.common.io.Files;
@@ -17,20 +25,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class PropertiesBase
 {
     protected static final Charset UTF8 = Charset.forName("UTF-8");
-
-    // Gson for file persistence
-    protected transient final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-    // Toggles whether save() actually does anything.
-    protected transient final AtomicBoolean saveEnabled = new AtomicBoolean(true);
-
-    protected int fileRevision;
-
     private static final String[] HEADERS = {
             "// JourneyMap configuration file. Modify at your own risk!",
             "// To restore the default settings, simply delete this file before starting Minecraft",
             "// For help with this file, see http://journeymap.techbrew.net/help/wiki/Configuration_Files"
     };
+    // Gson for file persistence
+    protected transient final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    // Toggles whether save() actually does anything.
+    protected transient final AtomicBoolean saveEnabled = new AtomicBoolean(true);
+    protected int fileRevision;
 
     protected PropertiesBase()
     {
@@ -168,7 +172,7 @@ public abstract class PropertiesBase
             JourneyMap.getLogger().severe(String.format("Can't load config file %s: %s", propFile, e.getMessage()));
         }
 
-        if(instance.validate() || saveNeeded)
+        if (instance.validate() || saveNeeded)
         {
             instance.save();
         }
@@ -178,6 +182,7 @@ public abstract class PropertiesBase
 
     /**
      * Should return true if save needed after validation.
+     *
      * @return
      */
     protected boolean validate()

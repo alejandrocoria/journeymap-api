@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.properties;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -10,12 +18,11 @@ import java.util.concurrent.atomic.AtomicReference;
 public class WebMapProperties extends MapProperties
 {
     protected transient static final int CODE_REVISION = 3;
-    protected transient final String name = "webmap";
-
     public final AtomicBoolean enabled = new AtomicBoolean(true);
     public final AtomicInteger port = new AtomicInteger(8080);
     public final AtomicInteger browserPoll = new AtomicInteger(2000);
     public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("3D");
+    protected transient final String name = "webmap";
 
     public WebMapProperties()
     {

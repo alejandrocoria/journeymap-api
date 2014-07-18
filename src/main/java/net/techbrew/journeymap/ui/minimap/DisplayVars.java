@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.minimap;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -24,180 +32,10 @@ import java.util.Arrays;
 public class DisplayVars
 {
     static final MiniMapProperties miniMapProperties = JourneyMap.getInstance().miniMapProperties;
-
-    /**
-     * Position of minimap on screen
-     */
-    public enum Position
-    {
-        TopRight("jm.minimap.position_topright"),
-        BottomRight("jm.minimap.position_bottomright"),
-        BottomLeft("jm.minimap.position_bottomleft"),
-        TopLeft("jm.minimap.position_topleft");
-
-        public final String label;
-
-        public static Position getPreferred()
-        {
-            DisplayVars.Position position = null;
-            try
-            {
-                position = miniMapProperties.position.get();
-            }
-            catch (IllegalArgumentException e)
-            {
-                JourneyMap.getLogger().warning("Not a valid minimap position in : " + miniMapProperties.getFile());
-            }
-
-            if (position == null)
-            {
-                position = Position.TopRight;
-                miniMapProperties.position.set(position);
-                miniMapProperties.save();
-            }
-            return position;
-        }
-
-        public static Position safeValueOf(String name)
-        {
-            Position value = null;
-            try
-            {
-                value = Position.valueOf(name);
-            }
-            catch (IllegalArgumentException e)
-            {
-                JourneyMap.getLogger().warning("Not a valid minimap position: " + name);
-            }
-
-            if (value == null)
-            {
-                value = Position.TopRight;
-            }
-            return value;
-        }
-
-        private Position(String label)
-        {
-            this.label = label;
-        }
-    }
-
-    /**
-     * Shape (and size) of minimap
-     */
-    public enum Shape
-    {
-        SmallSquare("jm.minimap.shape_smallsquare"),
-        MediumSquare("jm.minimap.shape_mediumsquare"),
-        LargeSquare("jm.minimap.shape_largesquare"),
-        SmallCircle("jm.minimap.shape_smallcircle"),
-        LargeCircle("jm.minimap.shape_largecircle");
-        public final String label;
-
-        private Shape(String label)
-        {
-            this.label = label;
-        }
-
-        public static Shape getPreferred()
-        {
-            DisplayVars.Shape shape = null;
-            try
-            {
-                shape = miniMapProperties.shape.get();
-            }
-            catch (IllegalArgumentException e)
-            {
-                JourneyMap.getLogger().warning("Not a valid minimap shape in : " + miniMapProperties.getFile());
-            }
-
-            if (shape == null)
-            {
-                shape = Shape.MediumSquare;
-                miniMapProperties.shape.set(shape);
-                miniMapProperties.save();
-            }
-            return shape;
-        }
-
-        public static Shape safeValueOf(String name)
-        {
-            Shape value = null;
-            try
-            {
-                value = Shape.valueOf(name);
-            }
-            catch (IllegalArgumentException e)
-            {
-                JourneyMap.getLogger().warning("Not a valid minimap shape: " + name);
-            }
-
-            if (value == null || !value.isEnabled())
-            {
-                value = Shape.MediumSquare;
-            }
-            return value;
-        }
-
-        public boolean isEnabled()
-        {
-            return Arrays.binarySearch(DisplayVars.Shape.Enabled, this) >= 0;
-        }
-
-        public static Shape[] Enabled = {SmallSquare, MediumSquare, LargeSquare};
-    }
-
-    /**
-     * Encapsulation of label attributes.
-     */
-    class LabelVars
-    {
-        final double x;
-        final double y;
-        DrawUtil.HAlign hAlign;
-        DrawUtil.VAlign vAlign;
-        final double fontScale;
-        final boolean scissor;
-        final boolean fontShadow;
-
-        private LabelVars(double x, double y, DrawUtil.HAlign hAlign, DrawUtil.VAlign vAlign, double fontScale, boolean scissor, boolean fontShadow)
-        {
-            this.x = x;
-            this.y = y;
-            this.hAlign = hAlign;
-            this.vAlign = vAlign;
-            this.fontScale = fontScale;
-            this.scissor = scissor;
-            this.fontShadow = fontShadow;
-        }
-
-        void draw(String text, Color bgColor, int bgAlpha, Color color, int alpha)
-        {
-            boolean isUnicode = false;
-            FontRenderer fontRenderer = null;
-            if (forceUnicode)
-            {
-                fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
-                isUnicode = fontRenderer.getUnicodeFlag();
-                if (!isUnicode)
-                {
-                    fontRenderer.setUnicodeFlag(true);
-                }
-            }
-            DrawUtil.drawLabel(text, x, y, hAlign, vAlign, bgColor, bgAlpha, color, alpha, fontScale, fontShadow);
-            if (forceUnicode && !isUnicode)
-            {
-                fontRenderer.setUnicodeFlag(false);
-            }
-        }
-    }
-
     final Position position;
     final Shape shape;
     final TextureImpl borderTexture;
     final TextureImpl maskTexture;
-
     final float drawScale;
     final double fontScale;
     final int displayWidth;
@@ -210,9 +48,7 @@ public class DisplayVars
     final double viewPortPadY;
     final boolean showFps;
     final LabelVars labelFps, labelLocation, labelBiome;
-
     boolean forceUnicode;
-
     /**
      * Constructor.
      *
@@ -256,7 +92,7 @@ public class DisplayVars
         {
             case LargeCircle:
             {
-                drawScale = 1f  * textureScale;
+                drawScale = 1f * textureScale;
                 borderTexture = TextureCache.instance().getMinimapLargeCircle();
                 maskTexture = TextureCache.instance().getMinimapLargeCircleMask();
                 minimapSize = 512;
@@ -276,7 +112,7 @@ public class DisplayVars
             }
             case SmallCircle:
             {
-                drawScale = 1f  * textureScale;
+                drawScale = 1f * textureScale;
                 borderTexture = TextureCache.instance().getMinimapSmallCircle();
                 maskTexture = TextureCache.instance().getMinimapSmallCircleMask();
                 minimapSize = 256;
@@ -296,7 +132,7 @@ public class DisplayVars
             }
             case LargeSquare:
             {
-                drawScale = 1f  * textureScale;
+                drawScale = 1f * textureScale;
                 borderTexture = TextureCache.instance().getMinimapLargeSquare();
                 maskTexture = null;
                 minimapSize = 512;
@@ -311,7 +147,7 @@ public class DisplayVars
             }
             case SmallSquare:
             {
-                drawScale = 1f  * textureScale;
+                drawScale = 1f * textureScale;
                 borderTexture = TextureCache.instance().getMinimapSmallSquare();
                 maskTexture = null;
                 minimapSize = 128;
@@ -332,7 +168,7 @@ public class DisplayVars
             case MediumSquare:
             default:
             {
-                drawScale = 1f  * textureScale;
+                drawScale = 1f * textureScale;
                 borderTexture = TextureCache.instance().getMinimapMediumSquare();
                 maskTexture = null;
                 minimapSize = 256;
@@ -415,5 +251,171 @@ public class DisplayVars
         labelFps = new LabelVars(centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, scissorFps, useFontShadow);
         labelLocation = new LabelVars(centerX, bottomY + yOffsetLocation, DrawUtil.HAlign.Center, valignLocation, fontScale, scissorLocation, useFontShadow);
         labelBiome = new LabelVars(centerX, bottomY + yOffsetBiome, DrawUtil.HAlign.Center, valignBiome, fontScale, scissorBiome, useFontShadow);
+    }
+    /**
+     * Position of minimap on screen
+     */
+    public enum Position
+    {
+        TopRight("jm.minimap.position_topright"),
+        BottomRight("jm.minimap.position_bottomright"),
+        BottomLeft("jm.minimap.position_bottomleft"),
+        TopLeft("jm.minimap.position_topleft");
+
+        public final String label;
+
+        private Position(String label)
+        {
+            this.label = label;
+        }
+
+        public static Position getPreferred()
+        {
+            DisplayVars.Position position = null;
+            try
+            {
+                position = miniMapProperties.position.get();
+            }
+            catch (IllegalArgumentException e)
+            {
+                JourneyMap.getLogger().warning("Not a valid minimap position in : " + miniMapProperties.getFile());
+            }
+
+            if (position == null)
+            {
+                position = Position.TopRight;
+                miniMapProperties.position.set(position);
+                miniMapProperties.save();
+            }
+            return position;
+        }
+
+        public static Position safeValueOf(String name)
+        {
+            Position value = null;
+            try
+            {
+                value = Position.valueOf(name);
+            }
+            catch (IllegalArgumentException e)
+            {
+                JourneyMap.getLogger().warning("Not a valid minimap position: " + name);
+            }
+
+            if (value == null)
+            {
+                value = Position.TopRight;
+            }
+            return value;
+        }
+    }
+
+    /**
+     * Shape (and size) of minimap
+     */
+    public enum Shape
+    {
+        SmallSquare("jm.minimap.shape_smallsquare"),
+        MediumSquare("jm.minimap.shape_mediumsquare"),
+        LargeSquare("jm.minimap.shape_largesquare"),
+        SmallCircle("jm.minimap.shape_smallcircle"),
+        LargeCircle("jm.minimap.shape_largecircle");
+        public static Shape[] Enabled = {SmallSquare, MediumSquare, LargeSquare};
+        public final String label;
+
+        private Shape(String label)
+        {
+            this.label = label;
+        }
+
+        public static Shape getPreferred()
+        {
+            DisplayVars.Shape shape = null;
+            try
+            {
+                shape = miniMapProperties.shape.get();
+            }
+            catch (IllegalArgumentException e)
+            {
+                JourneyMap.getLogger().warning("Not a valid minimap shape in : " + miniMapProperties.getFile());
+            }
+
+            if (shape == null)
+            {
+                shape = Shape.MediumSquare;
+                miniMapProperties.shape.set(shape);
+                miniMapProperties.save();
+            }
+            return shape;
+        }
+
+        public static Shape safeValueOf(String name)
+        {
+            Shape value = null;
+            try
+            {
+                value = Shape.valueOf(name);
+            }
+            catch (IllegalArgumentException e)
+            {
+                JourneyMap.getLogger().warning("Not a valid minimap shape: " + name);
+            }
+
+            if (value == null || !value.isEnabled())
+            {
+                value = Shape.MediumSquare;
+            }
+            return value;
+        }
+
+        public boolean isEnabled()
+        {
+            return Arrays.binarySearch(DisplayVars.Shape.Enabled, this) >= 0;
+        }
+    }
+
+    /**
+     * Encapsulation of label attributes.
+     */
+    class LabelVars
+    {
+        final double x;
+        final double y;
+        final double fontScale;
+        final boolean scissor;
+        final boolean fontShadow;
+        DrawUtil.HAlign hAlign;
+        DrawUtil.VAlign vAlign;
+
+        private LabelVars(double x, double y, DrawUtil.HAlign hAlign, DrawUtil.VAlign vAlign, double fontScale, boolean scissor, boolean fontShadow)
+        {
+            this.x = x;
+            this.y = y;
+            this.hAlign = hAlign;
+            this.vAlign = vAlign;
+            this.fontScale = fontScale;
+            this.scissor = scissor;
+            this.fontShadow = fontShadow;
+        }
+
+        void draw(String text, Color bgColor, int bgAlpha, Color color, int alpha)
+        {
+            boolean isUnicode = false;
+            FontRenderer fontRenderer = null;
+            if (forceUnicode)
+            {
+                fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
+                isUnicode = fontRenderer.getUnicodeFlag();
+                if (!isUnicode)
+                {
+                    fontRenderer.setUnicodeFlag(true);
+                }
+            }
+            DrawUtil.drawLabel(text, x, y, hAlign, vAlign, bgColor, bgAlpha, color, alpha, fontScale, fontShadow);
+            if (forceUnicode && !isUnicode)
+            {
+                fontRenderer.setUnicodeFlag(false);
+            }
+        }
     }
 }

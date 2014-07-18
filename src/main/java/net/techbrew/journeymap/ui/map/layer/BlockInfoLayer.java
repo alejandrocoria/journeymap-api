@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.map.layer;
 
 import net.minecraft.client.Minecraft;
@@ -87,15 +95,15 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     class BlockInfoStep implements DrawStep
     {
 
-        private double x;
-        private double y;
-        private String text;
         Color bgColor = Color.darkGray;
         Color fgColor = Color.white;
         double fontScale = 1;
         boolean fontShadow = false;
         int alpha = 255;
         int ticks = 20 * 5;
+        private double x;
+        private double y;
+        private String text;
 
         void update(String text, double x, double y)
         {

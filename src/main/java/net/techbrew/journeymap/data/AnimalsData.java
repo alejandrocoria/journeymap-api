@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.data;
 
 import com.google.common.cache.CacheLoader;
@@ -17,14 +25,14 @@ import java.util.Map;
  *
  * @author mwoodman
  */
-public class AnimalsData extends CacheLoader<Class, Map<String,EntityDTO>>
+public class AnimalsData extends CacheLoader<Class, Map<String, EntityDTO>>
 {
     @Override
     public Map<String, EntityDTO> load(Class aClass) throws Exception
     {
         if (!FeatureManager.isAllowed(Feature.RadarAnimals))
         {
-            return new HashMap<String,EntityDTO>();
+            return new HashMap<String, EntityDTO>();
         }
 
         List<EntityDTO> list = EntityHelper.getAnimalsNearby();

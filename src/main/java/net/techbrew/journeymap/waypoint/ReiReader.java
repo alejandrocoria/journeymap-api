@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.waypoint;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -110,12 +118,12 @@ public class ReiReader
                 }
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             JourneyMap.getLogger().warning("Could not derive Rei filename: " + e.getMessage());
         }
 
-        if(worldName==null)
+        if (worldName == null)
         {
             worldName = "WorldName";
         }
@@ -143,7 +151,7 @@ public class ReiReader
             }
         });
 
-        if(files.length==0)
+        if (files.length == 0)
         {
             return waypoints;
         }
@@ -162,7 +170,7 @@ public class ReiReader
 
                 loadWaypoints(dimension, pointsFile, waypoints);
 
-                if(deleteOnSuccess && pointErrorCount==pointErrors)
+                if (deleteOnSuccess && pointErrorCount == pointErrors)
                 {
                     pointsFile.deleteOnExit();
                     pointsFile.delete();
@@ -176,11 +184,11 @@ public class ReiReader
             }
         }
 
-        if(waypoints.isEmpty())
+        if (waypoints.isEmpty())
         {
             ChatLog.announceI18N("jm.waypoint.import_rei_failure");
         }
-        else if(fileErrors == 0 && pointErrors==0)
+        else if (fileErrors == 0 && pointErrors == 0)
         {
             ChatLog.announceI18N("jm.waypoint.import_rei_success", waypoints.size());
         }
@@ -194,6 +202,7 @@ public class ReiReader
 
     /**
      * Load waypoints for the given dimension from the ReiMinimap pointsFile into the provided arraylist.
+     *
      * @param dimension
      * @param pointsFile
      * @param waypoints
@@ -206,7 +215,7 @@ public class ReiReader
         while ((line = br.readLine()) != null)
         {
             Waypoint waypoint = loadWaypoint(dimension, line);
-            if(waypoint!=null)
+            if (waypoint != null)
             {
                 waypoints.add(waypoint);
             }
@@ -216,6 +225,7 @@ public class ReiReader
 
     /**
      * Create a waypoint from a ReiMinimap line in a .points file.
+     *
      * @param dimension
      * @param line
      * @return
@@ -241,9 +251,9 @@ public class ReiReader
             waypoint.setDirty(true);
             return waypoint;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
-            JourneyMap.getLogger().warning("Couldn't parse " + v[i]  + " as " + parts[i] + " in \"" + line + "\" because: " + e.getMessage());
+            JourneyMap.getLogger().warning("Couldn't parse " + v[i] + " as " + parts[i] + " in \"" + line + "\" because: " + e.getMessage());
             pointErrors++;
             return null;
         }

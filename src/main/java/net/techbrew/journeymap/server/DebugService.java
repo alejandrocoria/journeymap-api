@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.server;
 
 import com.google.common.io.CharStreams;
@@ -71,7 +79,7 @@ public class DebugService extends FileService
 
         // Use wrapper from file
         InputStream debugHtmlStream = getStream("/debug.html", null);
-        if(debugHtmlStream!=null)
+        if (debugHtmlStream != null)
         {
             String debugHtml = CharStreams.toString(new InputStreamReader(debugHtmlStream, "UTF-8"));
             debug = debugHtml.replace("<output/>", sb.toString());

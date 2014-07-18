@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui;
 
 import net.minecraft.client.Minecraft;
@@ -12,12 +20,25 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SliderButton extends Button
 {
-    /** Additional ID for this slider control. */
+    /**
+     * Additional ID for this slider control.
+     */
     private final ValueHolder valueHolder;
-    /** Is this slider control being dragged. */
+    /**
+     * Is this slider control being dragged.
+     */
     public boolean dragging;
-    /** The value of this slider control. */
+    /**
+     * The value of this slider control.
+     */
     protected float sliderValue = 1.0F;
+
+    public SliderButton(int buttonId, ValueHolder valueHolder)
+    {
+        super(buttonId, 0, 0, valueHolder.getDisplayString());
+        this.valueHolder = valueHolder;
+        this.sliderValue = valueHolder.getValueForSlider();
+    }
 
     /**
      * Create a SliderField with a ValueHolder to wrap an AtomicInteger and its range.
@@ -29,13 +50,13 @@ public class SliderButton extends Button
             @Override
             public void setValueFromSlider(float sliderValue)
             {
-                property.set((int)(sliderValue*(max+min)));
+                property.set((int) (sliderValue * (max + min)));
             }
 
             @Override
             public float getValueForSlider()
             {
-                return ((property.get()*1f)/(max+min));
+                return ((property.get() * 1f) / (max + min));
             }
 
             @Override
@@ -49,13 +70,6 @@ public class SliderButton extends Button
         };
 
         return new SliderButton(buttonId, intValueHolder);
-    }
-
-    public SliderButton(int buttonId, ValueHolder valueHolder)
-    {
-        super(buttonId, 0, 0, valueHolder.getDisplayString());
-        this.valueHolder = valueHolder;
-        this.sliderValue = valueHolder.getValueForSlider();
     }
 
     /**
@@ -76,7 +90,7 @@ public class SliderButton extends Button
         {
             if (this.dragging)
             {
-                this.sliderValue = (float)(par2 - (this.xPosition + 4)) / (float)(this.width - 8);
+                this.sliderValue = (float) (par2 - (this.xPosition + 4)) / (float) (this.width - 8);
 
                 if (this.sliderValue < 0.0F)
                 {
@@ -93,8 +107,8 @@ public class SliderButton extends Button
             }
 
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            this.drawTexturedModalRect(this.xPosition + (int)(this.sliderValue * (float)(this.width - 8)), this.yPosition, 0, 66, 4, 20);
-            this.drawTexturedModalRect(this.xPosition + (int)(this.sliderValue * (float)(this.width - 8)) + 4, this.yPosition, 196, 66, 4, 20);
+            this.drawTexturedModalRect(this.xPosition + (int) (this.sliderValue * (float) (this.width - 8)), this.yPosition, 0, 66, 4, 20);
+            this.drawTexturedModalRect(this.xPosition + (int) (this.sliderValue * (float) (this.width - 8)) + 4, this.yPosition, 196, 66, 4, 20);
         }
     }
 
@@ -106,7 +120,7 @@ public class SliderButton extends Button
     {
         if (super.mousePressed(par1Minecraft, par2, par3))
         {
-            this.sliderValue = (float)(par2 - (this.xPosition + 4)) / (float)(this.width - 8);
+            this.sliderValue = (float) (par2 - (this.xPosition + 4)) / (float) (this.width - 8);
 
             if (this.sliderValue < 0.0F)
             {
@@ -143,7 +157,9 @@ public class SliderButton extends Button
     interface ValueHolder
     {
         void setValueFromSlider(float sliderValue);
+
         float getValueForSlider();
+
         String getDisplayString();
     }
 }

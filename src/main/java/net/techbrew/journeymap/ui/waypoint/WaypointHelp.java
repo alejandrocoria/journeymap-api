@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.waypoint;
 
 import net.minecraft.client.gui.FontRenderer;
@@ -18,20 +26,12 @@ import java.awt.*;
 
 public class WaypointHelp extends JmUI
 {
-    private enum ButtonEnum
-    {
-        ImportRei, ImportVoxel, Close
-    }
-
-    private Button buttonRei, buttonVoxel, buttonClose;
-
-    private KeyEventHandler keyEventHandler;
-
     String importReiText;
     String importVoxelText;
     int importReiTextWidth;
     int importVoxelTextWidth;
-
+    private Button buttonRei, buttonVoxel, buttonClose;
+    private KeyEventHandler keyEventHandler;
     public WaypointHelp()
     {
         this(MasterOptions.class);
@@ -162,14 +162,14 @@ public class WaypointHelp extends JmUI
         // Show Rei Import
         int reiHeight = fr.listFormattedStringToWidth(importReiText, indentWidth).size() * getFontRenderer().FONT_HEIGHT;
         y += 24;
-        buttonRei.centerHorizontalOn(width/2).setY(y);
+        buttonRei.centerHorizontalOn(width / 2).setY(y);
         y += buttonRei.getHeight() + 5;
         fr.drawSplitString(importReiText, indentX, y, indentWidth, Color.white.getRGB());
         y += reiHeight + 16;
 
         // Show Voxel Import
         int voxelHeight = fr.listFormattedStringToWidth(importVoxelText, indentWidth).size() * getFontRenderer().FONT_HEIGHT;
-        buttonVoxel.centerHorizontalOn(width/2).setY(y);
+        buttonVoxel.centerHorizontalOn(width / 2).setY(y);
         if (!buttonVoxel.isDrawButton())
         {
             fr.drawStringWithShadow("§n" + buttonVoxel.displayString, indentX, y, Color.lightGray.getRGB());
@@ -189,5 +189,10 @@ public class WaypointHelp extends JmUI
         drawString(getFontRenderer(), title, x - tWidth - hgap, y, 16777215);
 
         drawString(getFontRenderer(), key, x + hgap, y, Color.YELLOW.getRGB());
+    }
+
+    private enum ButtonEnum
+    {
+        ImportRei, ImportVoxel, Close
     }
 }

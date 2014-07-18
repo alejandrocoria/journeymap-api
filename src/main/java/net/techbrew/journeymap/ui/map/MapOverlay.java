@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.map;
 
 
@@ -48,38 +56,26 @@ public class MapOverlay extends JmUI
 {
 
     final static MapOverlayState state = new MapOverlayState();
+    final static FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
+    final static GridRenderer gridRenderer = new GridRenderer(5, fullMapProperties);
     final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
     final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
     final LayerDelegate layerDelegate = new LayerDelegate();
-    final static FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
-    final static GridRenderer gridRenderer = new GridRenderer(5, fullMapProperties);
-
-    private enum ButtonEnum
-    {
-        Alert, DayNight, Follow, ZoomIn, ZoomOut, Options, Actions, Close, Mode, WaypointManager, Caves
-    }
-
     Boolean isScrolling = false;
     int msx, msy, mx, my;
-
     Logger logger = JourneyMap.getLogger();
     MapChat chat;
-
     Button buttonDayNight, buttonFollow, buttonZoomIn, buttonZoomOut;
     Button buttonAlert, buttonOptions, buttonActions, buttonClose;
     Button buttonMode, buttonWaypointManager, buttonCaves;
-
     ButtonList leftButtons;
     ButtonList rightButtons;
-
     Color bgColor = new Color(0x22, 0x22, 0x22);
     Color playerInfoFgColor = Color.lightGray;
     Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
-
     StatTimer drawScreenTimer = StatTimer.get("MapOverlay.drawScreen");
     StatTimer drawMapTimer = StatTimer.get("MapOverlay.drawScreen.drawMap");
     StatTimer drawMapTimerWithRefresh = StatTimer.get("MapOverlay.drawMap+refreshState");
-
     /**
      * Default constructor
      */
@@ -90,6 +86,19 @@ public class MapOverlay extends JmUI
         state.refresh(mc, mc.thePlayer, fullMapProperties);
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
         gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
+    }
+
+    public static synchronized MapOverlayState state()
+    {
+        return state;
+    }
+
+    public static void reset()
+    {
+        state.requireRefresh();
+        gridRenderer.clear();
+        TileCache.instance().invalidateAll();
+        TileCache.instance().cleanUp();
     }
 
     @Override
@@ -193,7 +202,7 @@ public class MapOverlay extends JmUI
             }
             case Caves:
             {
-                if(buttonCaves.isEnabled())
+                if (buttonCaves.isEnabled())
                 {
                     buttonCaves.toggle();
                     refreshState();
@@ -291,7 +300,10 @@ public class MapOverlay extends JmUI
             }
             buttonList.add(buttonDayNight);
             buttonList.add(buttonFollow);
-            if(FeatureManager.isAllowed(Feature.MapCaves));
+            if (FeatureManager.isAllowed(Feature.MapCaves))
+            {
+                ;
+            }
             {
                 buttonList.add(buttonCaves);
             }
@@ -302,7 +314,7 @@ public class MapOverlay extends JmUI
             buttonList.add(buttonActions);
             buttonList.add(buttonWaypointManager);
 
-            leftButtons = new ButtonList(buttonDayNight,buttonFollow, buttonCaves);
+            leftButtons = new ButtonList(buttonDayNight, buttonFollow, buttonCaves);
             rightButtons = new ButtonList(buttonAlert, buttonWaypointManager, buttonOptions, buttonActions, buttonClose);
             Collections.reverse(rightButtons);
 
@@ -871,17 +883,9 @@ public class MapOverlay extends JmUI
         return false;
     }
 
-    public static synchronized MapOverlayState state()
+    private enum ButtonEnum
     {
-        return state;
-    }
-
-    public static void reset()
-    {
-        state.requireRefresh();
-        gridRenderer.clear();
-        TileCache.instance().invalidateAll();
-        TileCache.instance().cleanUp();
+        Alert, DayNight, Follow, ZoomIn, ZoomOut, Options, Actions, Close, Mode, WaypointManager, Caves
     }
 
 }

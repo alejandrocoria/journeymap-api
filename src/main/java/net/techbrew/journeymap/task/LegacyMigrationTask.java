@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.task;
 
 import net.minecraft.client.Minecraft;
@@ -22,10 +30,8 @@ import java.util.logging.Logger;
 
 public class LegacyMigrationTask implements ITask
 {
-    final int mapTaskDelay = JourneyMap.getInstance().coreProperties.chunkPoll.get();
-
     private static final Logger logger = JourneyMap.getLogger();
-
+    final int mapTaskDelay = JourneyMap.getInstance().coreProperties.chunkPoll.get();
     final World world;
     final File jmWorldDir;
     final Stack<File> pngFiles;

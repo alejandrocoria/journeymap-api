@@ -27,38 +27,23 @@ import java.util.List;
 
 public class ScrollPane extends GuiSlot
 {
+    public int paneWidth = 0;
+    public int paneHeight = 0;
+    public Point.Double origin = new Point2D.Double();
+    protected Scrollable selected = null;
     private Color frameColor = new Color(-6250336);
     private List<? extends Scrollable> items;
     private Minecraft mc;
     private int _mouseX;
     private int _mouseY;
-    protected Scrollable selected = null;
     private boolean showFrame = true;
-    public int paneWidth = 0;
-    public int paneHeight = 0;
-    public Point.Double origin = new Point2D.Double();
-
     private int firstVisibleIndex;
     private int lastVisibleIndex;
-
-    public interface Scrollable
-    {
-        public void setPosition(int x, int y);
-        public void setWidth(int width);
-        public int getX();
-        public int getY();
-        public int getWidth();
-        public int getFitWidth(FontRenderer fr);
-        public int getHeight();
-        public void drawScrollable(Minecraft mc, int mouseX, int mouseY);
-        public void drawPartialScrollable(Minecraft mc, int x, int y, int width, int height);
-        public void clickScrollable(Minecraft mc, int mouseX, int mouseY);
-    }
 
     public ScrollPane(Minecraft mc, int width, int height, List<? extends Scrollable> items, int itemHeight, int itemGap)
     {
         super(mc, width, height, 16, height, itemHeight + itemGap);
-        this.items  = items;
+        this.items = items;
         paneWidth = width;
         paneHeight = height;
         this.mc = mc;
@@ -81,7 +66,7 @@ public class ScrollPane extends GuiSlot
 
     public void position(int width, int height, int marginTop, int marginBottom, int x, int y)
     {
-        super.func_148122_a(width, height, marginTop, height-marginBottom);
+        super.func_148122_a(width, height, marginTop, height - marginBottom);
         paneWidth = width;
         paneHeight = height;
         origin.setLocation(x, y);
@@ -116,7 +101,9 @@ public class ScrollPane extends GuiSlot
     }
 
     @Override
-    protected void drawBackground() {}
+    protected void drawBackground()
+    {
+    }
 
     /**
      * Call when the mouse is clicked.  Returns a Button if one was clicked.
@@ -126,13 +113,16 @@ public class ScrollPane extends GuiSlot
         if (mouseButton == 0)
         {
             ArrayList<Scrollable> itemsCopy = new ArrayList<Scrollable>(items);
-            for(Scrollable item : itemsCopy)
+            for (Scrollable item : itemsCopy)
             {
-                if(item==null) continue;
-
-                if(inFullView(item))
+                if (item == null)
                 {
-                    if(item instanceof Button)
+                    continue;
+                }
+
+                if (inFullView(item))
+                {
+                    if (item instanceof Button)
                     {
                         Button button = (Button) item;
                         if (button.mousePressed(this.mc, mouseX, mouseY))
@@ -188,7 +178,7 @@ public class ScrollPane extends GuiSlot
         GL11.glTranslated(-getX(), -getY(), 0);
 
         final int margin = 4;
-        final int itemX = getX() + (margin/2);
+        final int itemX = getX() + (margin / 2);
         final int itemY = yPosition + getY();
 
         Scrollable item = items.get(index);
@@ -197,7 +187,7 @@ public class ScrollPane extends GuiSlot
 
         //System.out.println(String.format("Item %s = %s", index, itemY));
 
-        if(inFullView(item))
+        if (inFullView(item))
         {
             item.drawScrollable(mc, _mouseX, _mouseY);
         }
@@ -208,18 +198,18 @@ public class ScrollPane extends GuiSlot
 
             Integer drawY = null;
             int yDiff = 0;
-            if(itemY<this.getY() && itemBottomY>this.getY())
+            if (itemY < this.getY() && itemBottomY > this.getY())
             {
                 drawY = this.getY();
-                yDiff = drawY-itemY;
+                yDiff = drawY - itemY;
             }
-            else if(itemY < paneBottomY && itemBottomY > paneBottomY)
+            else if (itemY < paneBottomY && itemBottomY > paneBottomY)
             {
                 drawY = itemY;
                 yDiff = itemBottomY - paneBottomY;
             }
 
-            if(drawY!=null)
+            if (drawY != null)
             {
                 item.drawPartialScrollable(mc, itemX, drawY, item.getWidth(), item.getHeight() - yDiff);
             }
@@ -248,7 +238,8 @@ public class ScrollPane extends GuiSlot
     public int getFitWidth(FontRenderer fr)
     {
         int fit = 0;
-        for(Scrollable item : items) {
+        for (Scrollable item : items)
+        {
             fit = Math.max(fit, item.getFitWidth(fr));
         }
         return fit;
@@ -267,10 +258,10 @@ public class ScrollPane extends GuiSlot
 
         // Tinted scrollbar area
         DrawUtil.drawRectangle(0, top, width, paneHeight, Color.BLACK, alpha);
-        DrawUtil.drawRectangle(width-6, top, 5, paneHeight, Color.BLACK, alpha);
+        DrawUtil.drawRectangle(width - 6, top, 5, paneHeight, Color.BLACK, alpha);
 
         // Frame
-        if(showFrame)
+        if (showFrame)
         {
             alpha = 255;
             DrawUtil.drawRectangle(-1, -1, width + 2, 1, frameColor, alpha);
@@ -289,5 +280,28 @@ public class ScrollPane extends GuiSlot
     public int getLastVisibleIndex()
     {
         return lastVisibleIndex;
+    }
+
+    public interface Scrollable
+    {
+        public void setPosition(int x, int y);
+
+        public int getX();
+
+        public int getY();
+
+        public int getWidth();
+
+        public void setWidth(int width);
+
+        public int getFitWidth(FontRenderer fr);
+
+        public int getHeight();
+
+        public void drawScrollable(Minecraft mc, int mouseX, int mouseY);
+
+        public void drawPartialScrollable(Minecraft mc, int x, int y, int width, int height);
+
+        public void clickScrollable(Minecraft mc, int mouseX, int mouseY);
     }
 }

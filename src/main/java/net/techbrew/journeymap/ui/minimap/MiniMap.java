@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.minimap;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -51,12 +59,12 @@ public class MiniMap
     private final String[] locationFormats = {"jm.common.location_xzye", "jm.common.location_xzy", "jm.common.location_xz"};
 
     private final MiniMapProperties miniMapProperties = JourneyMap.getInstance().miniMapProperties;
+    private final GridRenderer gridRenderer = new GridRenderer(3, miniMapProperties);
     private final FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
     private final WaypointProperties waypointProperties = JourneyMap.getInstance().waypointProperties;
     private final MapOverlayState state = MapOverlay.state();
     private final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
     private final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
-    private final GridRenderer gridRenderer = new GridRenderer(3, miniMapProperties);
     private final TextureImpl playerLocatorTex;
 
     private EntityClientPlayerMP player;
@@ -113,7 +121,7 @@ public class MiniMap
             // Update the grid
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
             boolean moved = gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
-            if(moved || doStateRefresh)
+            if (moved || doStateRefresh)
             {
                 boolean showCaves = player.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get();
                 gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0);
@@ -121,7 +129,7 @@ public class MiniMap
 
             if (doStateRefresh)
             {
-                boolean checkWaypointDistance = waypointProperties.maxDistance.get()>0;
+                boolean checkWaypointDistance = waypointProperties.maxDistance.get() > 0;
                 state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, miniMapProperties, dv.drawScale, checkWaypointDistance);
                 state.updateLastRefresh();
 
@@ -209,7 +217,7 @@ public class MiniMap
             final double fontScale = getMapFontScale();
             boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, miniMapProperties.forceUnicode.get());
             gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, fontScale);
-            if(!allWaypointSteps.isEmpty())
+            if (!allWaypointSteps.isEmpty())
             {
                 gridRenderer.draw(allWaypointSteps, 0, 0, dv.drawScale, fontScale);
             }
@@ -279,7 +287,7 @@ public class MiniMap
             DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, 1f);
 
             // Draw off-screen waypoints on top of border texture
-            if(!allWaypointSteps.isEmpty())
+            if (!allWaypointSteps.isEmpty())
             {
                 // Move center back to corner
                 GL11.glTranslated(dv.translateX, dv.translateY, 0);
@@ -287,7 +295,7 @@ public class MiniMap
                 {
                     if (!drawWayPointStep.isOnScreen(0, 0, gridRenderer))
                     {
-                        drawWayPointStep.draw(0,0,gridRenderer,dv.drawScale,fontScale);
+                        drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, fontScale);
                     }
                 }
             }
@@ -397,7 +405,7 @@ public class MiniMap
         {
             this.drawTimer = StatTimer.get("MiniMap.drawMap." + shape.name(), 500);
             this.drawTimer.reset();
-            this.refreshStateTimer =  StatTimer.get("MiniMap.drawMap." + shape.name() + "+refreshState", 5);
+            this.refreshStateTimer = StatTimer.get("MiniMap.drawMap." + shape.name() + "+refreshState", 5);
             this.refreshStateTimer.reset();
         }
 

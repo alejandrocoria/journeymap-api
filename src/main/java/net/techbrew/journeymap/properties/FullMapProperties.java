@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.properties;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -9,11 +17,10 @@ import java.util.concurrent.atomic.AtomicReference;
 public class FullMapProperties extends InGameMapProperties
 {
     protected transient static final int CODE_REVISION = 3;
-    protected transient final String name = "fullmap";
-
     public final AtomicBoolean showCaves = new AtomicBoolean(true);
     public final AtomicBoolean showGrid = new AtomicBoolean(true);
     public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("3D");
+    protected transient final String name = "fullmap";
 
     public FullMapProperties()
     {

@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.task;
 
 import net.minecraft.client.Minecraft;
@@ -29,9 +37,8 @@ import java.util.logging.Logger;
 public class MapRegionTask extends BaseMapTask
 {
     private static final int MAX_RUNTIME = 30000;
-    private static volatile long lastTaskCompleted;
-
     private static final Logger logger = JourneyMap.getLogger();
+    private static volatile long lastTaskCompleted;
 
     private MapRegionTask(ChunkRenderController renderController, World world, int dimension, boolean underground, Integer chunkY, ChunkMD.Set chunkMdPool)
     {
@@ -115,7 +122,7 @@ public class MapRegionTask extends BaseMapTask
                 return false;
             }
 
-            if((System.currentTimeMillis()-lastTaskCompleted) < mapTaskDelay)
+            if ((System.currentTimeMillis() - lastTaskCompleted) < mapTaskDelay)
             {
                 return false;
             }
@@ -125,7 +132,7 @@ public class MapRegionTask extends BaseMapTask
             {
                 try
                 {
-                    EntityDTO player =  DataCache.getPlayer();
+                    EntityDTO player = DataCache.getPlayer();
                     final int dimension = player.dimension;
                     final boolean underground = player.underground && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.showCaves.get();
                     MapType mapType;

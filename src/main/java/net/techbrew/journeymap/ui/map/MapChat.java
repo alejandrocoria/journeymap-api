@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.map;
 
 import net.minecraft.client.gui.GuiChat;
@@ -12,18 +20,19 @@ public class MapChat extends GuiChat
 
     public MapChat(String defaultText, boolean hidden)
     {
-    	super(defaultText);
+        super(defaultText);
         this.hidden = hidden;
     }
 
     @Override
-	public void onGuiClosed()
+    public void onGuiClosed()
     {
         super.onGuiClosed();
         hidden = true;
     }
 
-	public void close() {
+    public void close()
+    {
         onGuiClosed();
     }
 
@@ -31,9 +40,12 @@ public class MapChat extends GuiChat
      * Called from the main game loop to update the screen.
      */
     @Override
-	public void updateScreen()
+    public void updateScreen()
     {
-        if(hidden) return;
+        if (hidden)
+        {
+            return;
+        }
         super.updateScreen();
         cursorCounter++;
     }
@@ -42,9 +54,12 @@ public class MapChat extends GuiChat
      * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
      */
     @Override
-	public void keyTyped(char par1, int par2)
+    public void keyTyped(char par1, int par2)
     {
-    	if(hidden) return;
+        if (hidden)
+        {
+            return;
+        }
         super.keyTyped(par1, par2);
     }
 
@@ -54,7 +69,10 @@ public class MapChat extends GuiChat
     @Override
     public void handleMouseInput()
     {
-    	if(hidden) return;
+        if (hidden)
+        {
+            return;
+        }
         super.handleMouseInput();
     }
 
@@ -62,16 +80,22 @@ public class MapChat extends GuiChat
      * Called when the mouse is clicked.
      */
     //@Override
-	public void mouseClicked(int par1, int par2, int par3)
+    public void mouseClicked(int par1, int par2, int par3)
     {
-    	if(hidden) return;
+        if (hidden)
+        {
+            return;
+        }
         super.mouseClicked(par1, par2, par3);
     }
 
     @Override
-	public void confirmClicked(boolean par1, int par2)
+    public void confirmClicked(boolean par1, int par2)
     {
-        if(hidden) return;
+        if (hidden)
+        {
+            return;
+        }
         super.confirmClicked(par1, par2);
     }
 
@@ -79,31 +103,39 @@ public class MapChat extends GuiChat
      * Draws the screen and all the components in it.
      */
     @Override
-	public void drawScreen(int par1, int par2, float par3)
-    {    	    
-    	GL11.glPushMatrix();
+    public void drawScreen(int par1, int par2, float par3)
+    {
+        GL11.glPushMatrix();
         GL11.glTranslatef(0, this.height - 39.5f - bottomMargin, 0.0F);
-        if(this.mc!=null) {
-            if(this.mc.ingameGUI!=null && this.mc.ingameGUI.getChatGUI()!=null) {
+        if (this.mc != null)
+        {
+            if (this.mc.ingameGUI != null && this.mc.ingameGUI.getChatGUI() != null)
+            {
                 this.mc.ingameGUI.getChatGUI().drawChat(hidden ? this.mc.ingameGUI.getUpdateCounter() : this.cursorCounter);
             }
         }
-    	GL11.glPopMatrix();
-    	
-    	if(hidden) return;
-    	
+        GL11.glPopMatrix();
+
+        if (hidden)
+        {
+            return;
+        }
+
         super.drawScreen(par1, par2, par3);
     }
 
-	public boolean isHidden() {
-		return hidden;
-	}
+    public boolean isHidden()
+    {
+        return hidden;
+    }
 
-	public void setHidden(boolean hidden) {
-		this.hidden = hidden;
-	}
+    public void setHidden(boolean hidden)
+    {
+        this.hidden = hidden;
+    }
 
-    public void setText(String defaultText) {
+    public void setText(String defaultText)
+    {
         this.inputField.setText(defaultText);
     }
 }

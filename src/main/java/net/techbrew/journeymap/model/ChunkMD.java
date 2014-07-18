@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.model;
 
 import com.google.common.base.Optional;
@@ -6,7 +14,6 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.client.Minecraft;
-import net.minecraft.init.Blocks;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
@@ -15,7 +22,6 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.io.nbt.ChunkLoader;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -81,7 +87,8 @@ public class ChunkMD
         this.current = current;
     }
 
-    public Block getBlock(int x, int y, int z) {
+    public Block getBlock(int x, int y, int z)
+    {
         return stub.getBlock(x, y, z);
     }
 
@@ -102,7 +109,7 @@ public class ChunkMD
     {
         Integer y = this.surfaceHeights[x][z];
 
-        if(y!=null)
+        if (y != null)
         {
             return this.surfaceHeights[x][z];
         }
@@ -135,19 +142,19 @@ public class ChunkMD
     public Float getSurfaceBlockHeight(int x, int z, int offsetX, int offsetZ, ChunkMD.Set neighbors, float defaultVal, boolean ignoreWater)
     {
         ChunkMD chunk = null;
-        int blockX = ((this.coord.chunkXPos<<4) + x + offsetX);
-        int blockZ = ((this.coord.chunkZPos<<4) + z + offsetZ);
+        int blockX = ((this.coord.chunkXPos << 4) + x + offsetX);
+        int blockZ = ((this.coord.chunkZPos << 4) + z + offsetZ);
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
 
-        if(chunkX==this.coord.chunkXPos && chunkZ==this.coord.chunkZPos)
+        if (chunkX == this.coord.chunkXPos && chunkZ == this.coord.chunkZPos)
         {
             chunk = this;
         }
         else
         {
             ChunkCoordIntPair coord = new ChunkCoordIntPair(chunkX, chunkZ);
-            chunk =  neighbors.get(coord);
+            chunk = neighbors.get(coord);
         }
 
         if (chunk != null)
@@ -159,9 +166,6 @@ public class ChunkMD
             return defaultVal;
         }
     }
-
-
-
 
 
     /**

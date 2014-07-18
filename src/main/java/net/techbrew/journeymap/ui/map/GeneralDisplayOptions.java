@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.map;
 
 import net.minecraft.client.gui.GuiButton;
@@ -17,23 +25,15 @@ import java.util.ArrayList;
 public class GeneralDisplayOptions extends JmUI
 {
 
-    private enum ButtonEnum
-    {
-        Caves, Grid, Close
-    }
-
     Button buttonCaves, buttonGrid, buttonClose;
-
     String labelOn = Constants.getString("jm.common.on");
     String labelOff = Constants.getString("jm.common.off");
     String labelFullMap = Constants.getString("jm.fullscreen.title");
     String labelMiniMap = Constants.getString("jm.minimap.title");
-
     ArrayList<ButtonList> leftRows = new ArrayList<ButtonList>();
     ArrayList<ButtonList> rightRows = new ArrayList<ButtonList>();
     ButtonList rowMobs, rowAnimals, rowVillagers, rowPets, rowGrid, rowCaves, rowSelf, rowPlayers, rowWaypoints, rowFontSize, rowForceUnicode, rowTextureSize;
     ButtonList rowIconSets;
-
     public GeneralDisplayOptions(Class<? extends JmUI> returnClass)
     {
         super(Constants.getString("jm.common.general_display_title"), returnClass);
@@ -92,7 +92,7 @@ public class GeneralDisplayOptions extends JmUI
         rowGrid = new ButtonList(Constants.getString("jm.common.show_grid", ""));
         rowGrid.add(buttonGrid);
         leftRows.add(rowGrid);
-        
+
         rowSelf = new ButtonList(Constants.getString("jm.common.show_self", ""));
         rowSelf.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showSelf));
         rowSelf.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showSelf));
@@ -153,7 +153,7 @@ public class GeneralDisplayOptions extends JmUI
 
         buttonClose = new Button(ButtonEnum.Close.ordinal(), 0, 0, Constants.getString("jm.common.close")); //$NON-NLS-1$
         buttonClose.fitWidth(getFontRenderer());
-        if(buttonClose.getWidth() < 150)
+        if (buttonClose.getWidth() < 150)
         {
             buttonClose.setWidth(150);
         }
@@ -193,7 +193,7 @@ public class GeneralDisplayOptions extends JmUI
             rowWidth = Math.max(rowWidth, row.getWidth(hgap));
         }
 
-        int bx = ((this.width - ((rowWidth*2) + (rowLabelWidth*2)) - spacer) / 2) + rowLabelWidth;
+        int bx = ((this.width - ((rowWidth * 2) + (rowLabelWidth * 2)) - spacer) / 2) + rowLabelWidth;
         final int by = Math.max(50, (this.height - (140)) / 2);
 
         int leftX, rightX, topY, bottomY;
@@ -243,16 +243,16 @@ public class GeneralDisplayOptions extends JmUI
         DrawUtil.drawCenteredLabel(labelFullMap, rightRows.get(0).get(0).getCenterX(), by - 10, Color.black, 0, Color.white, 255, 1);
         DrawUtil.drawCenteredLabel(labelMiniMap, rightRows.get(0).get(1).getCenterX(), by - 10, Color.black, 0, Color.white, 255, 1);
 
-        topY-=5;
-        bottomY+=10;
-        leftX-=5;
-        rightX+=5;
-        DrawUtil.drawRectangle(leftX, topY, rightX-leftX, 1, Color.lightGray, 150);
-        DrawUtil.drawRectangle(leftX, bottomY, rightX-leftX, 1, Color.lightGray, 150);
+        topY -= 5;
+        bottomY += 10;
+        leftX -= 5;
+        rightX += 5;
+        DrawUtil.drawRectangle(leftX, topY, rightX - leftX, 1, Color.lightGray, 150);
+        DrawUtil.drawRectangle(leftX, bottomY, rightX - leftX, 1, Color.lightGray, 150);
 
-        if(rightX-leftX>width)
+        if (rightX - leftX > width)
         {
-            int commonWidth = leftRows.get(0).get(0).getWidth()-4;
+            int commonWidth = leftRows.get(0).get(0).getWidth() - 4;
             for (ButtonList ButtonList : leftRows)
             {
                 ButtonList.setWidths(commonWidth);
@@ -267,7 +267,7 @@ public class GeneralDisplayOptions extends JmUI
             rowGrid.setWidths(rowAnimals.getWidth(4));
         }
 
-        int closeY = Math.min(height-vgap-buttonClose.getHeight(), bottomY + (4*vgap));
+        int closeY = Math.min(height - vgap - buttonClose.getHeight(), bottomY + (4 * vgap));
         buttonClose.centerHorizontalOn(width / 2).setY(closeY);
     }
 
@@ -284,6 +284,11 @@ public class GeneralDisplayOptions extends JmUI
         {
             closeAndReturn();
         }
+    }
+
+    private enum ButtonEnum
+    {
+        Caves, Grid, Close
     }
 
 }

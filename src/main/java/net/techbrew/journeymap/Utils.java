@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap;
 
 
@@ -9,53 +17,61 @@ import java.lang.reflect.Field;
 ;
 
 
-public class Utils {
-	
-	/**
-	 * For int v, return the closest larger power of 2, not to exceed clamp.
-	 * @param v
-	 * @param clamp
-	 * @return
-	 */
-	public static int upperPowerOfTwo(int v, int clamp)
-	{
-	    v--;
-	    v |= v >> 1;
-	    v |= v >> 2;
-	    v |= v >> 4;
-	    v |= v >> 8;
-	    v |= v >> 16;
-	    v++;
-	    return Math.min(v, clamp);
-	}
-	
-	/**
-	 * Returns the larger distance of blocks (x axis or z axis) represented by the coordinate pair.
-	 * @param pair1
-	 * @param pair2
-	 * @return
-	 */
-	public static int upperDistanceInBlocks(ChunkCoordIntPair pair1, ChunkCoordIntPair pair2) {
-		if(pair1.equals(pair2)) {
-			return 16;
-		} else {
-			int dx = pair2.chunkXPos - pair1.chunkXPos;
-			int dz = pair2.chunkZPos - pair1.chunkZPos;
-			return 16 * Math.max(dx,dz);
-		}
-	}
-	
-	/**
-	 * Workaround now that in 1.2.1 you can't get the world seed.
-	 * 
-	 * @param minecraft
-	 * @return
-	 */
-	public static long getWorldHash(Minecraft minecraft) {
-		
-		return minecraft.theWorld.getSeed();
-		
-		// TODO World Hash Fix
+public class Utils
+{
+
+    /**
+     * For int v, return the closest larger power of 2, not to exceed clamp.
+     *
+     * @param v
+     * @param clamp
+     * @return
+     */
+    public static int upperPowerOfTwo(int v, int clamp)
+    {
+        v--;
+        v |= v >> 1;
+        v |= v >> 2;
+        v |= v >> 4;
+        v |= v >> 8;
+        v |= v >> 16;
+        v++;
+        return Math.min(v, clamp);
+    }
+
+    /**
+     * Returns the larger distance of blocks (x axis or z axis) represented by the coordinate pair.
+     *
+     * @param pair1
+     * @param pair2
+     * @return
+     */
+    public static int upperDistanceInBlocks(ChunkCoordIntPair pair1, ChunkCoordIntPair pair2)
+    {
+        if (pair1.equals(pair2))
+        {
+            return 16;
+        }
+        else
+        {
+            int dx = pair2.chunkXPos - pair1.chunkXPos;
+            int dz = pair2.chunkZPos - pair1.chunkZPos;
+            return 16 * Math.max(dx, dz);
+        }
+    }
+
+    /**
+     * Workaround now that in 1.2.1 you can't get the world seed.
+     *
+     * @param minecraft
+     * @return
+     */
+    public static long getWorldHash(Minecraft minecraft)
+    {
+
+        return minecraft.theWorld.getSeed();
+
+        // TODO World Hash Fix
 //		World world = minecraft.theWorld;
 //		if(world.getSeed()==0) {
 //			
@@ -95,21 +111,28 @@ public class Utils {
 //		} else {
 //			return world.getSeed();
 //		}
-	}
+    }
 
-    public static <T> T getPrivateField(Object instance, Class objectType, Class<T> fieldType) {
+    public static <T> T getPrivateField(Object instance, Class objectType, Class<T> fieldType)
+    {
         Class objectClass = instance.getClass();
-        while ((!objectClass.equals(objectType)) && (objectClass.getSuperclass() != null)) {
+        while ((!objectClass.equals(objectType)) && (objectClass.getSuperclass() != null))
+        {
             objectClass = objectClass.getSuperclass();
         }
         int counter = 0;
         Field[] fields = objectClass.getDeclaredFields();
-        for (int i = 0; i < fields.length; i++) {
-            if (fieldType.equals(fields[i].getType())) {
-                try {
+        for (int i = 0; i < fields.length; i++)
+        {
+            if (fieldType.equals(fields[i].getType()))
+            {
+                try
+                {
                     fields[i].setAccessible(true);
                     return (T) fields[i].get(instance);
-                } catch (IllegalAccessException ex) {
+                }
+                catch (IllegalAccessException ex)
+                {
                 }
             }
         }

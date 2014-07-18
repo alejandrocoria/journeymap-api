@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -29,16 +37,8 @@ import java.util.logging.Logger;
 public class UIManager
 {
 
-    private static class Holder
-    {
-        private static final UIManager INSTANCE = new UIManager();
-    }
-
-    public static UIManager getInstance()
-    {
-        return Holder.INSTANCE;
-    }
-
+    private final Logger logger = JourneyMap.getLogger();
+    Minecraft minecraft = FMLClientHandler.instance().getClient();
     private MiniMap miniMap;
 
     private UIManager()
@@ -46,8 +46,10 @@ public class UIManager
         miniMap = new MiniMap();
     }
 
-    private final Logger logger = JourneyMap.getLogger();
-    Minecraft minecraft = FMLClientHandler.instance().getClient();
+    public static UIManager getInstance()
+    {
+        return Holder.INSTANCE;
+    }
 
     public void closeAll()
     {
@@ -126,15 +128,15 @@ public class UIManager
         setMiniMapEnabled(!isMiniMapEnabled());
     }
 
+    public boolean isMiniMapEnabled()
+    {
+        return JourneyMap.getInstance().miniMapProperties.enabled.get();
+    }
+
     public void setMiniMapEnabled(boolean enable)
     {
         JourneyMap.getInstance().miniMapProperties.enabled.set(enable);
         JourneyMap.getInstance().miniMapProperties.save();
-    }
-
-    public boolean isMiniMapEnabled()
-    {
-        return JourneyMap.getInstance().miniMapProperties.enabled.get();
     }
 
     public void drawMiniMap()
@@ -241,7 +243,6 @@ public class UIManager
         }
     }
 
-
     public void openWaypointEditor(Waypoint waypoint, boolean isNew, Class<? extends JmUI> returnClass)
     {
         if (WaypointsData.isManagerEnabled())
@@ -268,5 +269,10 @@ public class UIManager
             this.miniMap.reset();
         }
         this.miniMap = new MiniMap();
+    }
+
+    private static class Holder
+    {
+        private static final UIManager INSTANCE = new UIManager();
     }
 }

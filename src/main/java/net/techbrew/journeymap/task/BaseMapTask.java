@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.task;
 
 import net.minecraft.client.Minecraft;
@@ -18,36 +26,39 @@ import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public abstract class BaseMapTask implements ITask {
+public abstract class BaseMapTask implements ITask
+{
 
-	final World world;
-	final int dimension;
-	final boolean underground;
-	final Integer vSlice;
-	final ChunkMD.Set chunkMdSet;
-	final boolean flushCacheWhenDone;
+    final World world;
+    final int dimension;
+    final boolean underground;
+    final Integer vSlice;
+    final ChunkMD.Set chunkMdSet;
+    final boolean flushCacheWhenDone;
     final ChunkRenderController renderController;
 
     public BaseMapTask(ChunkRenderController renderController, World world, int dimension, boolean underground, Integer vSlice, ChunkMD.Set chunkMdSet, boolean flushCacheWhenDone)
     {
-		this.renderController = renderController;
+        this.renderController = renderController;
         this.world = world;
-		this.dimension = dimension;
-		this.underground = underground;
-		this.vSlice = vSlice;
-		if((vSlice==null || vSlice==-1) && underground) {
-			throw new IllegalStateException("vSlice can't be null (-1) and task be underground");
-		}
-		this.chunkMdSet = chunkMdSet;
-		this.flushCacheWhenDone = flushCacheWhenDone;
-	}
+        this.dimension = dimension;
+        this.underground = underground;
+        this.vSlice = vSlice;
+        if ((vSlice == null || vSlice == -1) && underground)
+        {
+            throw new IllegalStateException("vSlice can't be null (-1) and task be underground");
+        }
+        this.chunkMdSet = chunkMdSet;
+        this.flushCacheWhenDone = flushCacheWhenDone;
+    }
 
     @Override
     public final void performTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
         StatTimer timer = StatTimer.get(getClass().getSimpleName() + ".performTask").start();
 
-        try {
+        try
+        {
             final long start = System.nanoTime();
             final Iterator<ChunkMD> chunkIter = chunkMdSet.iterator();
             final ChunkImageCache chunkImageCache = new ChunkImageCache();
@@ -55,47 +66,66 @@ public abstract class BaseMapTask implements ITask {
 
             // Check the dimension
             int currentDimension = mc.theWorld.provider.dimensionId;
-            if(currentDimension!=dimension) {
-                if(threadLogging) logger.fine("Dimension changed, map task obsolete."); //$NON-NLS-1$
+            if (currentDimension != dimension)
+            {
+                if (threadLogging)
+                {
+                    logger.fine("Dimension changed, map task obsolete."); //$NON-NLS-1$
+                }
                 timer.cancel();
                 this.complete(true, false);
                 return;
             }
 
             // Map the chunks
-            while(chunkIter.hasNext()) {
-                if(!jm.isMapping()) {
-                    if(threadLogging) logger.fine("JM isn't mapping, aborting"); //$NON-NLS-1$
+            while (chunkIter.hasNext())
+            {
+                if (!jm.isMapping())
+                {
+                    if (threadLogging)
+                    {
+                        logger.fine("JM isn't mapping, aborting"); //$NON-NLS-1$
+                    }
                     timer.cancel();
                     this.complete(true, false);
                     return;
                 }
 
-                if (Thread.interrupted()) {
+                if (Thread.interrupted())
+                {
                     throw new InterruptedException();
                 }
 
                 ChunkMD chunkMd = chunkIter.next();
-                if(chunkMd.render) {
+                if (chunkMd.render)
+                {
                     BufferedImage chunkImage = renderController.getChunkImage(chunkMd, underground, vSlice, chunkMdSet);
                     ChunkCoord cCoord = ChunkCoord.fromChunkMD(jmWorldDir, chunkMd, vSlice, dimension);
-                    if(underground) {
+                    if (underground)
+                    {
                         chunkImageCache.put(cCoord, Constants.MapType.underground, chunkImage);
-                    } else {
+                    }
+                    else
+                    {
                         chunkImageCache.put(cCoord, Constants.MapType.day, getSubimage(Constants.MapType.day, chunkImage));
                         chunkImageCache.put(cCoord, Constants.MapType.night, getSubimage(Constants.MapType.night, chunkImage));
                     }
                 }
             }
 
-            if(!jm.isMapping()) {
-                if(threadLogging) logger.fine("JM isn't mapping, aborting.");  //$NON-NLS-1$
+            if (!jm.isMapping())
+            {
+                if (threadLogging)
+                {
+                    logger.fine("JM isn't mapping, aborting.");  //$NON-NLS-1$
+                }
                 timer.cancel();
                 this.complete(true, false);
                 return;
             }
 
-            if (Thread.interrupted()) {
+            if (Thread.interrupted())
+            {
                 throw new InterruptedException();
             }
 
@@ -103,18 +133,23 @@ public abstract class BaseMapTask implements ITask {
             int chunks = chunkImageCache.size();
             RegionImageCache.getInstance().putAll(chunkImageCache.values(), flushCacheWhenDone);
 
-            if(threadLogging) {
-                logger.fine(getClass().getSimpleName() + " mapped " + chunks + " chunks in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start) + "ms with flush:" + flushCacheWhenDone); //$NON-NLS-1$ //$NON-NLS-2$
+            if (threadLogging)
+            {
+                logger.fine(getClass().getSimpleName() + " mapped " + chunks + " chunks in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start) + "ms with flush:" + flushCacheWhenDone); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             chunkMdSet.clear();
             chunkImageCache.clear();
             this.complete(false, false);
 
-        } catch (InterruptedException t) {
+        }
+        catch (InterruptedException t)
+        {
             JourneyMap.getLogger().warning("Task thread interrupted: " + this);
             throw t;
-        } catch (Throwable t) {
+        }
+        catch (Throwable t)
+        {
             String error = Constants.getMessageJMERR16(LogFormatter.toString(t));
             JourneyMap.getLogger().severe(error);
             this.complete(false, true);
@@ -123,7 +158,7 @@ public abstract class BaseMapTask implements ITask {
         {
             timer.stop();
 
-            if(threadLogging)
+            if (threadLogging)
             {
                 timer.report();
             }
@@ -134,12 +169,18 @@ public abstract class BaseMapTask implements ITask {
 
     private BufferedImage getSubimage(Constants.MapType mapType, BufferedImage image)
     {
-        if(image==null) return null;
-        switch(mapType) {
-            case night: {
+        if (image == null)
+        {
+            return null;
+        }
+        switch (mapType)
+        {
+            case night:
+            {
                 return image.getSubimage(16, 0, 16, 16);
             }
-            default: {
+            default:
+            {
                 return image.getSubimage(0, 0, 16, 16);
             }
         }

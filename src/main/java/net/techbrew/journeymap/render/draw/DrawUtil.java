@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.render.draw;
 
 
@@ -19,17 +27,6 @@ public class DrawUtil
     private static final float lightmapS = (float) (15728880 % 65536) / 1f;
     private static final float lightmapT = (float) (15728880 / 65536) / 1f;
 
-    public enum HAlign
-    {
-        Left, Center, Right;
-    }
-
-    public enum VAlign
-    {
-        Above, Middle, Below;
-    }
-
-
     public static void resetLightMap()
     {
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightmapS, lightmapT);
@@ -46,7 +43,7 @@ public class DrawUtil
      * @param color
      * @param bgAlpha
      */
-    public static void drawCenteredLabel(final String text, double x, double y, Color bgColor,  int bgAlpha, Color color, int alpha, double fontScale)
+    public static void drawCenteredLabel(final String text, double x, double y, Color bgColor, int bgAlpha, Color color, int alpha, double fontScale)
     {
         drawLabel(text, x, y, HAlign.Center, VAlign.Middle, bgColor, bgAlpha, color, alpha, fontScale, true);
     }
@@ -67,15 +64,17 @@ public class DrawUtil
      * @param fontScale
      * @param fontShadow
      */
-    public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Color bgColor, int bgAlpha, Color color, int alpha, double fontScale, boolean fontShadow) {
+    public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Color bgColor, int bgAlpha, Color color, int alpha, double fontScale, boolean fontShadow)
+    {
 
-        if (text == null || text.length() == 0) {
+        if (text == null || text.length() == 0)
+        {
             return;
         }
 
         Minecraft mc = FMLClientHandler.instance().getClient();
         final FontRenderer fontRenderer = mc.fontRenderer;
-        final boolean drawRect = (bgColor != null && alpha>0);
+        final boolean drawRect = (bgColor != null && alpha > 0);
         final int width = fontRenderer.getStringWidth(text);
         final int height = drawRect ? getLabelHeight(fontRenderer, fontShadow) : fontRenderer.FONT_HEIGHT;
 
@@ -181,14 +180,16 @@ public class DrawUtil
     public static int getLabelHeight(FontRenderer fr, boolean fontShadow)
     {
         final int vpad = fr.getUnicodeFlag() ? 0 : fontShadow ? 3 : 2;
-        return fr.FONT_HEIGHT + (2*vpad);
+        return fr.FONT_HEIGHT + (2 * vpad);
     }
 
-    private static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, boolean flip) {
+    private static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, boolean flip)
+    {
         drawQuad(texture, x, y, width, height, null, 1f, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    private static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, boolean flip, int glBlendSfactor, int glBlendDFactor) {
+    private static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, boolean flip, int glBlendSfactor, int glBlendDFactor)
+    {
         drawQuad(texture, x, y, width, height, null, 1f, flip, true, glBlendSfactor, glBlendDFactor);
     }
 
@@ -204,15 +205,20 @@ public class DrawUtil
      * @param glBlendSfactor For normal alpha blending: GL11.GL_SRC_ALPHA
      * @param glBlendDFactor For normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
      */
-    public static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, Color color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor) {
+    public static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, Color color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor)
+    {
 
-        if(blend) {
+        if (blend)
+        {
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(glBlendSfactor, glBlendDFactor); // normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
-            if (color != null) {
+            if (color != null)
+            {
                 float[] c = color.getColorComponents(null);
                 GL11.glColor4f(c[0], c[1], c[2], alpha);
-            } else {
+            }
+            else
+            {
                 GL11.glColor4f(alpha, alpha, alpha, alpha);
             }
         }
@@ -234,14 +240,17 @@ public class DrawUtil
         tessellator.draw();
 
         // Ensure normal alpha blending afterward, just in case
-        if(blend) {
-            if (glBlendSfactor != GL11.GL_SRC_ALPHA || glBlendDFactor != GL11.GL_ONE_MINUS_SRC_ALPHA) {
+        if (blend)
+        {
+            if (glBlendSfactor != GL11.GL_SRC_ALPHA || glBlendDFactor != GL11.GL_ONE_MINUS_SRC_ALPHA)
+            {
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             }
         }
     }
 
-    public static void drawRectangle(double x, double y, double width, double height, Color color, int alpha) {
+    public static void drawRectangle(double x, double y, double width, double height, Color color, int alpha)
+    {
 
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glEnable(GL11.GL_BLEND);
@@ -260,15 +269,18 @@ public class DrawUtil
         GL11.glDisable(GL11.GL_BLEND);
     }
 
-    public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float scale) {
+    public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float scale)
+    {
         drawQuad(texture, x, y, (int) (texture.width * scale), (int) (texture.height * scale), flip);
     }
 
-    public static void drawImage(TextureImpl texture, double x, double y, boolean flip, int glBlendSfactor, int glBlendDfactor) {
+    public static void drawImage(TextureImpl texture, double x, double y, boolean flip, int glBlendSfactor, int glBlendDfactor)
+    {
         drawQuad(texture, x, y, texture.width, texture.height, flip, glBlendSfactor, glBlendDfactor);
     }
 
-    public static void drawRotatedImage(TextureImpl texture, double x, double y, float heading, float scale) {
+    public static void drawRotatedImage(TextureImpl texture, double x, double y, float heading, float scale)
+    {
 
         // Start a new matrix for translation/rotation
         GL11.glPushMatrix();
@@ -280,8 +292,8 @@ public class DrawUtil
         GL11.glRotatef(heading, 0, 0, 1.0f);
 
         // Adjust to scale
-        int width = (int)(texture.width * scale);
-        int height = (int)(texture.height * scale);
+        int width = (int) (texture.width * scale);
+        int height = (int) (texture.height * scale);
 
         // Offset the radius
         GL11.glTranslated(-width, -height, 0);
@@ -295,13 +307,15 @@ public class DrawUtil
         GL11.glPopMatrix();
     }
 
-    public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y) {
+    public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y)
+    {
 
         drawQuad(texture, x, y, texture.width, texture.height, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
     }
 
-    public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y, boolean blend) {
+    public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y, boolean blend)
+    {
 
         drawQuad(texture, x, y, texture.width, texture.height, color, alpha, false, false, 0, 0);
 
@@ -318,26 +332,35 @@ public class DrawUtil
      * @param texture
      * @param bottomMargin
      */
-    public static void drawEntity(double x, double y, Double heading, boolean flipInsteadOfRotate, TextureImpl texture, int bottomMargin, float scale) {
+    public static void drawEntity(double x, double y, Double heading, boolean flipInsteadOfRotate, TextureImpl texture, int bottomMargin, float scale)
+    {
 
-        if (heading == null) {
+        if (heading == null)
+        {
             drawImage(texture, x, y, false, scale);
-        } else if (!flipInsteadOfRotate) {
+        }
+        else if (!flipInsteadOfRotate)
+        {
             drawRotatedImage(texture, x, y, heading.floatValue(), scale);
-        } else {
+        }
+        else
+        {
             boolean flip = heading < 90;
-            int width = (int)(texture.width * scale);
-            int height = (int)(texture.height * scale);
+            int width = (int) (texture.width * scale);
+            int height = (int) (texture.height * scale);
             drawImage(texture, x - (width / 2), y - (height / 2) - bottomMargin, flip, scale);
         }
     }
 
     public static boolean startUnicode(FontRenderer fr, boolean force)
     {
-        if(!force) return false;
+        if (!force)
+        {
+            return false;
+        }
 
         boolean isUnicode = fr.getUnicodeFlag();
-        if(!isUnicode)
+        if (!isUnicode)
         {
             fr.setUnicodeFlag(true);
             return true;
@@ -348,6 +371,16 @@ public class DrawUtil
     public static void stopUnicode(FontRenderer fr)
     {
         fr.setUnicodeFlag(false);
+    }
+
+    public enum HAlign
+    {
+        Left, Center, Right;
+    }
+
+    public enum VAlign
+    {
+        Above, Middle, Below;
     }
 
 }

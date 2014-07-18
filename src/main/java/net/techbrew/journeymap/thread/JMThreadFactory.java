@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.thread;
 
 import java.util.concurrent.ThreadFactory;
@@ -5,35 +13,38 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Factory to produce threads labeled as belonging to JourneyMap
- * @author mwoodman
  *
+ * @author mwoodman
  */
-public class JMThreadFactory implements ThreadFactory {
-	
-    final ThreadGroup group;
+public class JMThreadFactory implements ThreadFactory
+{
+
     final static AtomicInteger threadNumber = new AtomicInteger(1);
     final static String namePrefix = "JM-"; //$NON-NLS-1$
+    final ThreadGroup group;
     final String name;
-    
+
     public JMThreadFactory(String name)
     {
-    	this.name = namePrefix + name;
+        this.name = namePrefix + name;
         SecurityManager securitymanager = System.getSecurityManager();
         group = securitymanager == null ? Thread.currentThread().getThreadGroup() : securitymanager.getThreadGroup();
     }
-    
+
     @Override
     public Thread newThread(Runnable runnable)
     {
-		String fullName = name + "-" + threadNumber.getAndIncrement(); //$NON-NLS-1$
+        String fullName = name + "-" + threadNumber.getAndIncrement(); //$NON-NLS-1$
         Thread thread = new Thread(group, runnable, fullName);
-        if(thread.isDaemon()) {
+        if (thread.isDaemon())
+        {
             thread.setDaemon(false);
         }
-        if(thread.getPriority() != 5) {
+        if (thread.getPriority() != 5)
+        {
             thread.setPriority(5);
         }
         return thread;
     }
-	
+
 }

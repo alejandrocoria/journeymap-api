@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.waypoint;
 
 import net.minecraft.client.gui.GuiButton;
@@ -84,7 +92,7 @@ public class WaypointOptions extends JmUI
         final int hgap = 4;
         final int vgap = 3;
         final int bx = this.width / 2;
-        int by = Math.max(30, (this.height-(8*24))/2);
+        int by = Math.max(30, (this.height - (8 * 24)) / 2);
 
         buttonEnable.centerHorizontalOn(bx).setY(by);
         by = buttonEnable.getBottomY() + vgap;
@@ -107,14 +115,14 @@ public class WaypointOptions extends JmUI
         DrawUtil.drawLabel(labelMaxDistance, bx - hgap, maxDistanceField.getMiddleY(), DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, Color.BLACK, 0, Color.cyan, 255, 1, true);
 
         // Close
-        buttonHide.setPosition(bx - leftOffset, maxDistanceField.getBottomY() + (vgap*4));
+        buttonHide.setPosition(bx - leftOffset, maxDistanceField.getBottomY() + (vgap * 4));
         buttonClose.alignTo(buttonHide, DrawUtil.HAlign.Right, hgap, DrawUtil.VAlign.Middle, vgap);
     }
 
     @Override
     public void drawDefaultBackground()
     {
-        if(buttonHide.getToggled())
+        if (buttonHide.getToggled())
         {
             // Reinforce header since normal mask isn't used
             DrawUtil.drawRectangle(0, 0, this.width, headerHeight, Color.black, 100);
@@ -133,7 +141,7 @@ public class WaypointOptions extends JmUI
         if (idx > 0)
         {
             fps = fps.substring(0, idx);
-            DrawUtil.drawLabel(fps, width-5, 5, DrawUtil.HAlign.Left, DrawUtil.VAlign.Below, Color.BLACK, 0, Color.cyan, 255, 1, true);
+            DrawUtil.drawLabel(fps, width - 5, 5, DrawUtil.HAlign.Left, DrawUtil.VAlign.Below, Color.BLACK, 0, Color.cyan, 255, 1, true);
         }
     }
 
@@ -145,13 +153,13 @@ public class WaypointOptions extends JmUI
             ((BooleanPropertyButton) button).toggle();
         }
 
-        if(button.id == buttonEnable.id)
+        if (button.id == buttonEnable.id)
         {
             updateButtons();
             return;
         }
 
-        if(button.id == buttonHide.id)
+        if (button.id == buttonHide.id)
         {
             buttonHide.toggle();
             updateButtons();

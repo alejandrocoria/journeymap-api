@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.io;
 
 import net.techbrew.journeymap.Constants;
@@ -17,132 +25,31 @@ public class PropertyManager
 
     @Deprecated
     public static final String FILE_NAME = "journeyMap.properties"; //$NON-NLS-1$
+    private final SortedProperties properties;
+    private Boolean writeNeeded = false;
 
-    private static class Holder
+    private PropertyManager()
     {
-        private static final PropertyManager INSTANCE = new PropertyManager();
+        properties = new SortedProperties();
+        readFromFile();
+        Properties defaults = getDefaultProperties();
+        for (Object key : defaults.keySet())
+        {
+            if (!properties.containsKey(key))
+            {
+                properties.put(key, defaults.get(key));
+                writeNeeded = true;
+            }
+        }
+        if (writeNeeded)
+        {
+            writeToFile();
+        }
     }
 
     public static PropertyManager getInstance()
     {
         return Holder.INSTANCE;
-    }
-
-    private final SortedProperties properties;
-
-    private Boolean writeNeeded = false;
-
-    @Deprecated
-    public enum Key
-    {
-
-        // MAPGUI_ENABLED(Boolean.class, "mapgui_enabled", true), //$NON-NLS-1$
-
-        WEBSERVER_ENABLED(Boolean.class, "webserver_enabled", true), //$NON-NLS-1$
-        WEBSERVER_PORT(Integer.class, "webserver_port", 8080), //$NON-NLS-1$
-        CHUNK_OFFSET(Integer.class, "chunk_offset", 5), //$NON-NLS-1$
-        BROWSER_POLL(Integer.class, "browser_poll", 1900), //$NON-NLS-1$
-        //UPDATETIMER_PLAYER(Integer.class,"update_timer_entities", 1000), //$NON-NLS-1$
-        UPDATETIMER_CHUNKS(Integer.class, "update_timer_chunks", 2000), //$NON-NLS-1$
-        LOGGING_LEVEL(String.class, "logging_level", "INFO"), //$NON-NLS-1$  //$NON-NLS-2$
-        CAVE_LIGHTING(Boolean.class, "render_cavelighting_enabled", true), //$NON-NLS-1$
-        ANNOUNCE_MODLOADED(Boolean.class, "announce_modloaded", true), //$NON-NLS-1$
-        UPDATE_CHECK_ENABLED(Boolean.class, "update_check_enabled", true), //$NON-NLS-1$
-        NATIVE_WAYPOINTS_ENABLED(Boolean.class, "native_waypoints_enabled", true), //$NON-NLS-1$
-
-        PREF_SHOW_CAVES(Boolean.class, "preference_show_caves", true), //$NON-NLS-1$
-        PREF_SHOW_MOBS(Boolean.class, "preference_show_mobs", true), //$NON-NLS-1$
-        PREF_SHOW_ANIMALS(Boolean.class, "preference_show_animals", true), //$NON-NLS-1$
-        PREF_SHOW_VILLAGERS(Boolean.class, "preference_show_villagers", true), //$NON-NLS-1$
-        PREF_SHOW_PETS(Boolean.class, "preference_show_pets", true), //$NON-NLS-1$
-        PREF_SHOW_PLAYERS(Boolean.class, "preference_show_players", true), //$NON-NLS-1$
-        PREF_SHOW_WAYPOINTS(Boolean.class, "preference_show_waypoints", true), //$NON-NLS-1$
-        PREF_SHOW_GRID(Boolean.class, "preference_show_grid", true), //$NON-NLS-1$
-
-        PREF_FONTSCALE(Double.class, "preference_fontscale", 1.0), //$NON-NLS-1$
-        PREF_FORCEUNICODE(Boolean.class, "preference_forceunicode", false), //$NON-NLS-1$
-
-        PREF_SHOW_MINIMAP(Boolean.class, "preference_show_minimap", true), //$NON-NLS-1$
-
-        PREF_MINIMAP_SHAPE(String.class, "preference_minimap_shape", DisplayVars.Shape.SmallSquare.name()), //$NON-NLS-1$
-        PREF_MINIMAP_POSITION(String.class, "preference_minimap_position", DisplayVars.Position.TopRight.name()), //$NON-NLS-1$
-        PREF_MINIMAP_FONTSCALE(Double.class, "preference_minimap_fontscale", 1.0), //$NON-NLS-1$
-        PREF_MINIMAP_SHOWFPS(Boolean.class, "preference_minimap_showfps", false), //$NON-NLS-1$
-        PREF_MINIMAP_FORCEUNICODE(Boolean.class, "preference_minimap_forceunicode", false), //$NON-NLS-1$
-        PREF_MINIMAP_HOTKEYS(Boolean.class, "preference_minimap_hotkeys", true), //$NON-NLS-1$
-
-        ;
-        private final String property;
-        private final String defaultValue;
-        private final Class type;
-
-        private Key(Class type, String property, Object defaultValue)
-        {
-            this.type = type;
-            this.property = property;
-            this.defaultValue = defaultValue.toString();
-        }
-
-        @Deprecated
-        public String getProperty()
-        {
-            return property;
-        }
-
-        @Deprecated
-        String getDefault()
-        {
-            return defaultValue;
-        }
-
-        @Deprecated
-        public static Key lookup(String propName)
-        {
-            for (Key key : Key.values())
-            {
-                if (key.getProperty().equals(propName))
-                {
-                    return key;
-                }
-            }
-            return null;
-        }
-    }
-
-
-    private String getString(Key key)
-    {
-        return properties.getProperty(key.getProperty());
-    }
-
-    private Integer getInteger(Key key)
-    {
-        return Integer.parseInt(properties.getProperty(key.getProperty()));
-    }
-
-    private Double getDouble(Key key)
-    {
-        return Double.parseDouble(properties.getProperty(key.getProperty()));
-    }
-
-    private Boolean getBoolean(Key key)
-    {
-        return Boolean.parseBoolean(properties.getProperty(key.getProperty()));
-    }
-
-    private void setProperty(Key key, Object value)
-    {
-        Object old = properties.getProperty(key.getProperty());
-        if (old == null || !old.equals(value))
-        {
-            properties.setProperty(key.getProperty(), value.toString());
-            writeToFile();
-            JourneyMap.getLogger().fine("Property changed: " + key.getProperty() + "=" + value);
-        }
-        else
-        {
-            JourneyMap.getLogger().fine("Property unchanged: " + key.getProperty() + "=" + value);
-        }
     }
 
     private static String getStringProp(Key key)
@@ -192,6 +99,41 @@ public class PropertyManager
         getInstance().setProperty(key, value);
     }
 
+    private String getString(Key key)
+    {
+        return properties.getProperty(key.getProperty());
+    }
+
+    private Integer getInteger(Key key)
+    {
+        return Integer.parseInt(properties.getProperty(key.getProperty()));
+    }
+
+    private Double getDouble(Key key)
+    {
+        return Double.parseDouble(properties.getProperty(key.getProperty()));
+    }
+
+    private Boolean getBoolean(Key key)
+    {
+        return Boolean.parseBoolean(properties.getProperty(key.getProperty()));
+    }
+
+    private void setProperty(Key key, Object value)
+    {
+        Object old = properties.getProperty(key.getProperty());
+        if (old == null || !old.equals(value))
+        {
+            properties.setProperty(key.getProperty(), value.toString());
+            writeToFile();
+            JourneyMap.getLogger().fine("Property changed: " + key.getProperty() + "=" + value);
+        }
+        else
+        {
+            JourneyMap.getLogger().fine("Property unchanged: " + key.getProperty() + "=" + value);
+        }
+    }
+
     /**
      * Get a normalized, type-safe view of the properties.
      *
@@ -236,25 +178,6 @@ public class PropertyManager
             defaults.put(key.getProperty(), key.getDefault());
         }
         return defaults;
-    }
-
-    private PropertyManager()
-    {
-        properties = new SortedProperties();
-        readFromFile();
-        Properties defaults = getDefaultProperties();
-        for (Object key : defaults.keySet())
-        {
-            if (!properties.containsKey(key))
-            {
-                properties.put(key, defaults.get(key));
-                writeNeeded = true;
-            }
-        }
-        if (writeNeeded)
-        {
-            writeToFile();
-        }
     }
 
     private File getFile()
@@ -373,7 +296,6 @@ public class PropertyManager
         propFile.delete();
     }
 
-
     @Deprecated
     private void writeToFile()
     {
@@ -397,6 +319,89 @@ public class PropertyManager
     public String toString()
     {
         return properties.toString();
+    }
+
+
+    @Deprecated
+    public enum Key
+    {
+
+        // MAPGUI_ENABLED(Boolean.class, "mapgui_enabled", true), //$NON-NLS-1$
+
+        WEBSERVER_ENABLED(Boolean.class, "webserver_enabled", true), //$NON-NLS-1$
+        WEBSERVER_PORT(Integer.class, "webserver_port", 8080), //$NON-NLS-1$
+        CHUNK_OFFSET(Integer.class, "chunk_offset", 5), //$NON-NLS-1$
+        BROWSER_POLL(Integer.class, "browser_poll", 1900), //$NON-NLS-1$
+        //UPDATETIMER_PLAYER(Integer.class,"update_timer_entities", 1000), //$NON-NLS-1$
+        UPDATETIMER_CHUNKS(Integer.class, "update_timer_chunks", 2000), //$NON-NLS-1$
+        LOGGING_LEVEL(String.class, "logging_level", "INFO"), //$NON-NLS-1$  //$NON-NLS-2$
+        CAVE_LIGHTING(Boolean.class, "render_cavelighting_enabled", true), //$NON-NLS-1$
+        ANNOUNCE_MODLOADED(Boolean.class, "announce_modloaded", true), //$NON-NLS-1$
+        UPDATE_CHECK_ENABLED(Boolean.class, "update_check_enabled", true), //$NON-NLS-1$
+        NATIVE_WAYPOINTS_ENABLED(Boolean.class, "native_waypoints_enabled", true), //$NON-NLS-1$
+
+        PREF_SHOW_CAVES(Boolean.class, "preference_show_caves", true), //$NON-NLS-1$
+        PREF_SHOW_MOBS(Boolean.class, "preference_show_mobs", true), //$NON-NLS-1$
+        PREF_SHOW_ANIMALS(Boolean.class, "preference_show_animals", true), //$NON-NLS-1$
+        PREF_SHOW_VILLAGERS(Boolean.class, "preference_show_villagers", true), //$NON-NLS-1$
+        PREF_SHOW_PETS(Boolean.class, "preference_show_pets", true), //$NON-NLS-1$
+        PREF_SHOW_PLAYERS(Boolean.class, "preference_show_players", true), //$NON-NLS-1$
+        PREF_SHOW_WAYPOINTS(Boolean.class, "preference_show_waypoints", true), //$NON-NLS-1$
+        PREF_SHOW_GRID(Boolean.class, "preference_show_grid", true), //$NON-NLS-1$
+
+        PREF_FONTSCALE(Double.class, "preference_fontscale", 1.0), //$NON-NLS-1$
+        PREF_FORCEUNICODE(Boolean.class, "preference_forceunicode", false), //$NON-NLS-1$
+
+        PREF_SHOW_MINIMAP(Boolean.class, "preference_show_minimap", true), //$NON-NLS-1$
+
+        PREF_MINIMAP_SHAPE(String.class, "preference_minimap_shape", DisplayVars.Shape.SmallSquare.name()), //$NON-NLS-1$
+        PREF_MINIMAP_POSITION(String.class, "preference_minimap_position", DisplayVars.Position.TopRight.name()), //$NON-NLS-1$
+        PREF_MINIMAP_FONTSCALE(Double.class, "preference_minimap_fontscale", 1.0), //$NON-NLS-1$
+        PREF_MINIMAP_SHOWFPS(Boolean.class, "preference_minimap_showfps", false), //$NON-NLS-1$
+        PREF_MINIMAP_FORCEUNICODE(Boolean.class, "preference_minimap_forceunicode", false), //$NON-NLS-1$
+        PREF_MINIMAP_HOTKEYS(Boolean.class, "preference_minimap_hotkeys", true), //$NON-NLS-1$
+
+        ;
+        private final String property;
+        private final String defaultValue;
+        private final Class type;
+
+        private Key(Class type, String property, Object defaultValue)
+        {
+            this.type = type;
+            this.property = property;
+            this.defaultValue = defaultValue.toString();
+        }
+
+        @Deprecated
+        public static Key lookup(String propName)
+        {
+            for (Key key : Key.values())
+            {
+                if (key.getProperty().equals(propName))
+                {
+                    return key;
+                }
+            }
+            return null;
+        }
+
+        @Deprecated
+        public String getProperty()
+        {
+            return property;
+        }
+
+        @Deprecated
+        String getDefault()
+        {
+            return defaultValue;
+        }
+    }
+
+    private static class Holder
+    {
+        private static final PropertyManager INSTANCE = new PropertyManager();
     }
 
 

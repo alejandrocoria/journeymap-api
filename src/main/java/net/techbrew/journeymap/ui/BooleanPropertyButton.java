@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui;
 
 import net.techbrew.journeymap.Constants;
@@ -10,13 +18,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class BooleanPropertyButton extends Button
 {
-    public enum Type
-    {
-        OnOff, SmallLarge
-    }
-
     final PropertiesBase properties;
     final AtomicBoolean valueHolder;
+    public BooleanPropertyButton(int id, String labelOn, String labelOff, PropertiesBase properties, AtomicBoolean valueHolder)
+    {
+        super(id, 0, 0, labelOn, labelOff, valueHolder.get());
+        this.valueHolder = valueHolder;
+        this.properties = properties;
+        if (properties == null || valueHolder == null)
+        {
+            this.setEnabled(false);
+            this.setNoDisableText(true);
+        }
+    }
 
     public static BooleanPropertyButton create(int id, PropertiesBase properties, AtomicBoolean valueHolder)
     {
@@ -60,18 +74,6 @@ public class BooleanPropertyButton extends Button
         return new BooleanPropertyButton(id, labelOn, labelOff, properties, valueHolder);
     }
 
-    public BooleanPropertyButton(int id, String labelOn, String labelOff, PropertiesBase properties, AtomicBoolean valueHolder)
-    {
-        super(id, 0, 0, labelOn, labelOff, valueHolder.get());
-        this.valueHolder = valueHolder;
-        this.properties = properties;
-        if (properties == null || valueHolder == null)
-        {
-            this.setEnabled(false);
-            this.setNoDisableText(true);
-        }
-    }
-
     @Override
     public void toggle()
     {
@@ -79,5 +81,10 @@ public class BooleanPropertyButton extends Button
         {
             setToggled(properties.toggle(valueHolder));
         }
+    }
+
+    public enum Type
+    {
+        OnOff, SmallLarge
     }
 }

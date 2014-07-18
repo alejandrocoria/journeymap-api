@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.data;
 
 import com.google.common.cache.CacheLoader;
@@ -21,12 +29,6 @@ import java.util.List;
 public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
 {
     private static WaypointProperties waypointProperties = JourneyMap.getInstance().waypointProperties;
-
-    @Override
-    public Collection<Waypoint> load(Class aClass) throws Exception
-    {
-        return getWaypoints();
-    }
 
     /**
      * Reset state so classes can be checked again. Useful
@@ -170,6 +172,12 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
         }
 
         return loaded;
+    }
+
+    @Override
+    public Collection<Waypoint> load(Class aClass) throws Exception
+    {
+        return getWaypoints();
     }
 
     public long getTTL()

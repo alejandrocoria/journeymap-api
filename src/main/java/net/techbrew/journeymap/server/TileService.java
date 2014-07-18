@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.server;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -27,13 +35,10 @@ import java.util.logging.Level;
 public class TileService extends FileService
 {
 
-    private static final long serialVersionUID = 4412225358529161454L;
-
-    private FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
-
     public static final String CALLBACK_PARAM = "callback";  //$NON-NLS-1$
     public static final String CHARACTER_ENCODING = "UTF-8"; //$NON-NLS-1$
-
+    private static final long serialVersionUID = 4412225358529161454L;
+    private FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
     private byte[] blankImage;
 
     /**

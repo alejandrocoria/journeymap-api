@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.data;
 
 import com.google.common.cache.CacheLoader;
@@ -19,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author mwoodman
  */
-public class MessagesData extends CacheLoader<Class, Map<String,Object>>
+public class MessagesData extends CacheLoader<Class, Map<String, Object>>
 {
     private static final String KEY_PREFIX = "jm.webmap."; //$NON-NLS-1$
 

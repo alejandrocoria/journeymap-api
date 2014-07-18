@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.model;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
@@ -6,9 +14,11 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
 import java.util.Arrays;
 
-public class ChunkStub extends Chunk {
+public class ChunkStub extends Chunk
+{
 
-	ChunkStub(Chunk chunk) {
+    ChunkStub(Chunk chunk)
+    {
 
         super(chunk.worldObj, chunk.xPosition, chunk.zPosition);
 
@@ -80,10 +90,12 @@ public class ChunkStub extends Chunk {
         // private int queuedLightChecks;
         // ignored
 
-	}
+    }
 
-    public void updateFrom(Chunk chunk) {
-        if(this.xPosition!=chunk.xPosition || this.zPosition!=chunk.zPosition) {
+    public void updateFrom(Chunk chunk)
+    {
+        if (this.xPosition != chunk.xPosition || this.zPosition != chunk.zPosition)
+        {
             throw new IllegalArgumentException("ChunkStub can't be populated from a chunk in a different position");
         }
 
@@ -123,60 +135,82 @@ public class ChunkStub extends Chunk {
 
     /**
      * Compare storage arrays of another chunkStub at the same position.
+     *
      * @param other
      * @return
      */
-    public boolean equalTo(Chunk other) {
-        if(lastSaveTime!=other.lastSaveTime) {
+    public boolean equalTo(Chunk other)
+    {
+        if (lastSaveTime != other.lastSaveTime)
+        {
             return false;
         }
 
-        if(!Arrays.equals(this.heightMap,other.heightMap)) {
+        if (!Arrays.equals(this.heightMap, other.heightMap))
+        {
             return false;
         }
 
         ExtendedBlockStorage[] myEbsArray = getBlockStorageArray();
         ExtendedBlockStorage[] otherEbsArray = other.getBlockStorageArray();
 
-        if(myEbsArray.length!=otherEbsArray.length) {
+        if (myEbsArray.length != otherEbsArray.length)
+        {
             return false;
         }
 
-        for(int i=0;i<myEbsArray.length;i++) {
+        for (int i = 0; i < myEbsArray.length; i++)
+        {
             ExtendedBlockStorage ebs = myEbsArray[i];
             ExtendedBlockStorage otherEbs = otherEbsArray[i];
-            if(!areEqual(ebs, otherEbs)) {
+            if (!areEqual(ebs, otherEbs))
+            {
                 return false;
             }
         }
         return true;
     }
 
-    boolean areEqual(ExtendedBlockStorage a, ExtendedBlockStorage obj) {
+    boolean areEqual(ExtendedBlockStorage a, ExtendedBlockStorage obj)
+    {
         if (a == obj)
+        {
             return true;
-        if (a!=null && obj == null)
+        }
+        if (a != null && obj == null)
+        {
             return false;
-        if (a==null && obj !=null)
+        }
+        if (a == null && obj != null)
+        {
             return false;
+        }
 
 //        if (a.blockRefCount != other.blockRefCount) {
 //            return false;
 //        }
 
-        if (a.getMetadataArray() == null) {
-            if (obj.getMetadataArray() != null) {
+        if (a.getMetadataArray() == null)
+        {
+            if (obj.getMetadataArray() != null)
+            {
                 return false;
             }
-        } else if (!Arrays.equals(a.getMetadataArray().data,obj.getMetadataArray().data)) {
+        }
+        else if (!Arrays.equals(a.getMetadataArray().data, obj.getMetadataArray().data))
+        {
             return false;
         }
 
-        if (a.getBlocklightArray() == null) {
-            if (obj.getBlocklightArray() != null) {
+        if (a.getBlocklightArray() == null)
+        {
+            if (obj.getBlocklightArray() != null)
+            {
                 return false;
             }
-        } else if (!Arrays.equals(a.getBlocklightArray().data, obj.getBlocklightArray().data)) {
+        }
+        else if (!Arrays.equals(a.getBlocklightArray().data, obj.getBlocklightArray().data))
+        {
             return false;
         }
 

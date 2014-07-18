@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.render.overlay;
 
 import net.minecraft.world.ChunkCoordIntPair;
@@ -31,17 +39,13 @@ public class Tile
     final ChunkCoordIntPair lrChunk;
     final Point ulBlock;
     final Point lrBlock;
-
-    long lastImageTime = 0;
-
-    Integer lastVSlice;
-    MapType lastMapType;
-
-    Future<DelayedTexture> futureTex;
-    TextureImpl textureImpl;
-
     private final Logger logger = JourneyMap.getLogger();
     private final boolean debug = logger.isLoggable(Level.FINE);
+    long lastImageTime = 0;
+    Integer lastVSlice;
+    MapType lastMapType;
+    Future<DelayedTexture> futureTex;
+    TextureImpl textureImpl;
 
     public Tile(final File worldDir, final MapType mapType, final int tileX, final int tileZ, final int zoom, final int dimension)
     {
@@ -56,6 +60,28 @@ public class Tile
         lrChunk = new ChunkCoordIntPair(ulChunk.chunkXPos + distance - 1, ulChunk.chunkZPos + distance - 1);
         ulBlock = new Point(ulChunk.chunkXPos * 16, ulChunk.chunkZPos * 16);
         lrBlock = new Point((lrChunk.chunkXPos * 16) + 15, (lrChunk.chunkZPos * 16) + 15);
+    }
+
+    public static int blockPosToTile(int b, int zoom)
+    {
+        int tile = b >> (9 - zoom);  // (2 pow 9 = 512)
+        return tile;
+    }
+
+    public static int tileToBlock(int t, int zoom)
+    {
+        return t << (9 - zoom);
+    }
+
+    public static int toHashCode(final int tileX, final int tileZ, final int zoom, final int dimension)
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + tileX;
+        result = prime * result + tileZ;
+        result = prime * result + zoom;
+        result = prime * result + dimension;
+        return result;
     }
 
     public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice, InGameMapProperties mapProperties)
@@ -171,12 +197,6 @@ public class Tile
         return toHashCode(tileX, tileZ, zoom, dimension);
     }
 
-    public static int blockPosToTile(int b, int zoom)
-    {
-        int tile = b >> (9 - zoom);  // (2 pow 9 = 512)
-        return tile;
-    }
-
     private String blockBounds()
     {
         return ulBlock.x + "," + ulBlock.y + " - " + lrBlock.x + "," + lrBlock.y;
@@ -186,12 +206,6 @@ public class Tile
     {
         return t << (9 - zoom);
     }
-
-    public static int tileToBlock(int t, int zoom)
-    {
-        return t << (9 - zoom);
-    }
-
 
     public Point2D blockPixelOffsetInTile(double x, double z)
     {
@@ -221,17 +235,6 @@ public class Tile
         double pixelOffsetZ = (TILESIZE / 2) + (localBlockZ * blockSize) - (blockSize / 2);
 
         return new Point2D.Double(pixelOffsetX, pixelOffsetZ);
-    }
-
-    public static int toHashCode(final int tileX, final int tileZ, final int zoom, final int dimension)
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + tileX;
-        result = prime * result + tileZ;
-        result = prime * result + zoom;
-        result = prime * result + dimension;
-        return result;
     }
 
     @Override

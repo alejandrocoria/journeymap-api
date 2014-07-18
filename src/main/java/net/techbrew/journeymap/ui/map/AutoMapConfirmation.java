@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.map;
 
 import net.minecraft.client.gui.GuiButton;
@@ -12,13 +20,7 @@ import org.lwjgl.input.Keyboard;
 public class AutoMapConfirmation extends JmUI
 {
 
-    private enum ButtonEnum
-    {
-        All, Missing, None, Close
-    }
-
     Button buttonAll, buttonMissing, buttonNone, buttonClose;
-
 
     public AutoMapConfirmation()
     {
@@ -118,5 +120,10 @@ public class AutoMapConfirmation extends JmUI
                 break;
             }
         }
+    }
+
+    private enum ButtonEnum
+    {
+        All, Missing, None, Close
     }
 }

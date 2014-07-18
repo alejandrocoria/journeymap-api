@@ -1,12 +1,18 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.data;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
 import com.google.common.cache.CacheStats;
 import com.google.common.cache.LoadingCache;
 import cpw.mods.fml.common.registry.GameData;
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -41,7 +47,7 @@ public class DataCache
     final LoadingCache<Entity, DrawEntityStep> entityDrawSteps;
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
     final LoadingCache<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadata;
-    final LoadingCache<Block, HashMap<Integer,BlockMD>> blockMetadata;
+    final LoadingCache<Block, HashMap<Integer, BlockMD>> blockMetadata;
     final BlockMDCache blockMetadataLoader;
 
     // Private constructor
@@ -347,7 +353,7 @@ public class DataCache
             try
             {
                 Optional<ChunkMD> optional = chunkMetadata.get(coord);
-                if(optional.isPresent())
+                if (optional.isPresent())
                 {
                     chunkMD = optional.get();
                 }
@@ -356,7 +362,7 @@ public class DataCache
                     chunkMetadata.invalidate(coord); // removes empty Optional
                 }
             }
-            catch(Throwable e)
+            catch (Throwable e)
             {
                 JourneyMap.getLogger().warning("Unexpected error getting ChunkMD from cache: " + e);
             }

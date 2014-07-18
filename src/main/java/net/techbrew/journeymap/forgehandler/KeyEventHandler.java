@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.forgehandler;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -29,18 +37,6 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
         {
             ClientRegistry.registerKeyBinding(kb);
         }
-    }
-
-    @Override
-    public EnumSet<EventHandlerManager.BusType> getBus()
-    {
-        return EnumSet.of(EventHandlerManager.BusType.FMLCommonHandlerBus);
-    }
-
-    @SubscribeEvent
-    public void onKeyboardEvent(InputEvent.KeyInputEvent event)
-    {
-        KeyEventHandler.onKeypress(false);
     }
 
     public static void onKeypress(boolean minimapOnly)
@@ -119,6 +115,18 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 }
             }
         }
+    }
+
+    @Override
+    public EnumSet<EventHandlerManager.BusType> getBus()
+    {
+        return EnumSet.of(EventHandlerManager.BusType.FMLCommonHandlerBus);
+    }
+
+    @SubscribeEvent
+    public void onKeyboardEvent(InputEvent.KeyInputEvent event)
+    {
+        KeyEventHandler.onKeypress(false);
     }
 }
 

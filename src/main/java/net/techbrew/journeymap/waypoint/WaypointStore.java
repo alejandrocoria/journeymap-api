@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.waypoint;
 
 import com.google.common.cache.Cache;
@@ -18,23 +26,17 @@ import java.util.*;
  */
 public class WaypointStore
 {
-    private static class Holder
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private final Cache<String, Waypoint> cache = CacheBuilder.newBuilder().build();
+    private final Set<Integer> dimensions = new HashSet<Integer>();
+    private boolean loaded = false;
+    private WaypointStore()
     {
-        private static final WaypointStore INSTANCE = new WaypointStore();
     }
 
     public static WaypointStore instance()
     {
         return Holder.INSTANCE;
-    }
-
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private boolean loaded = false;
-    private final Cache<String, Waypoint> cache = CacheBuilder.newBuilder().build();
-    private final Set<Integer> dimensions = new HashSet<Integer>();
-
-    private WaypointStore()
-    {
     }
 
     private boolean writeToFile(Waypoint waypoint)
@@ -167,6 +169,11 @@ public class WaypointStore
     public List<Integer> getLoadedDimensions()
     {
         return new ArrayList<Integer>(dimensions);
+    }
+
+    private static class Holder
+    {
+        private static final WaypointStore INSTANCE = new WaypointStore();
     }
 
 

@@ -1,6 +1,12 @@
-package net.techbrew.journeymap.cartography;
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
 
-import net.minecraft.util.Vec3;
+package net.techbrew.journeymap.cartography;
 
 import java.awt.*;
 import java.util.Collection;
@@ -15,7 +21,9 @@ public final class RGB
     /**
      * Don't instantiate.
      */
-    private RGB() {}
+    private RGB()
+    {
+    }
 
     /**
      * Gets the PixelPaint singleton and sets the rgb color.
@@ -33,7 +41,7 @@ public final class RGB
      */
     public static Integer average(Collection<Integer> colors)
     {
-        int[] out = {0,0,0};
+        int[] out = {0, 0, 0};
 
         int used = 0;
         for (Integer color : colors)
@@ -50,7 +58,7 @@ public final class RGB
             used++;
         }
 
-        if(used==0)
+        if (used == 0)
         {
             return null;
         }
@@ -71,7 +79,7 @@ public final class RGB
      */
     public static Integer average(Integer... colors)
     {
-        int[] out = {0,0,0};
+        int[] out = {0, 0, 0};
 
         int used = 0;
         for (Integer color : colors)
@@ -88,7 +96,7 @@ public final class RGB
             used++;
         }
 
-        if(used==0)
+        if (used == 0)
         {
             return null;
         }
@@ -102,7 +110,7 @@ public final class RGB
 
     public static Integer max(Integer... colors)
     {
-        int[] out = {0,0,0};
+        int[] out = {0, 0, 0};
 
         int used = 0;
         for (Integer color : colors)
@@ -119,7 +127,7 @@ public final class RGB
             used++;
         }
 
-        if(used==0)
+        if (used == 0)
         {
             return null;
         }
@@ -167,7 +175,7 @@ public final class RGB
 
     public static String toString(Integer rgb)
     {
-        if(rgb==null)
+        if (rgb == null)
         {
             return "null";
         }
@@ -180,7 +188,10 @@ public final class RGB
      */
     public static int darken(int rgb, float factor)
     {
-        if(factor==1F) return rgb;
+        if (factor == 1F)
+        {
+            return rgb;
+        }
         return toInteger(clampFloats(floats(rgb), factor));
     }
 
@@ -241,7 +252,7 @@ public final class RGB
 
     public static float[] floats(int rgb)
     {
-        return new float[]{((rgb >> 16) & 0xFF)/255f, ((rgb >> 8) & 0xFF)/255f, ((rgb) & 0xFF)/255f};
+        return new float[]{((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, ((rgb) & 0xFF) / 255f};
     }
 
     /**
@@ -249,11 +260,11 @@ public final class RGB
      */
     public static int blendWith(int rgb, int otherRgb, float otherAlpha)
     {
-        if(otherAlpha==1f)
+        if (otherAlpha == 1f)
         {
             return otherRgb;
         }
-        if(otherAlpha==0f)
+        if (otherAlpha == 0f)
         {
             return rgb;
         }
@@ -304,8 +315,6 @@ public final class RGB
     {
         return value < 0 ? 0 : (value > 255 ? 255 : value);
     }
-
-
 
 
 }

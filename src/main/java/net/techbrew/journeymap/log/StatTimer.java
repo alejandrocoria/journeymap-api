@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.log;
 
 import com.google.common.util.concurrent.AtomicDouble;
@@ -13,13 +21,13 @@ import java.util.logging.Logger;
 /**
  * Utility class for timing whatever needs to be timed.
  */
-public class StatTimer {
+public class StatTimer
+{
 
-    private static Map<String, StatTimer> timers = Collections.synchronizedMap( new HashMap<String, StatTimer>());
-    private static final int WARMUP_COUNT_DEFAULT=10;
-    private static final int MAX_COUNT=1000000;
+    private static final int WARMUP_COUNT_DEFAULT = 10;
+    private static final int MAX_COUNT = 1000000;
     private static final double NS = 1000000D;
-
+    private static Map<String, StatTimer> timers = Collections.synchronizedMap(new HashMap<String, StatTimer>());
     private final Logger logger = JourneyMap.getLogger();
     private final int warmupCount;
     private final AtomicLong counter = new AtomicLong();
@@ -31,28 +39,53 @@ public class StatTimer {
     private boolean warmup = true;
     private boolean maxed = false;
     private Long started;
-    private double max=0;
-    private double min=Double.MAX_VALUE;
+    private double max = 0;
+    private double min = Double.MAX_VALUE;
+
+    /**
+     * Private constructor.
+     *
+     * @param name
+     * @param warmupCount
+     */
+    private StatTimer(String name, int warmupCount, boolean disposable)
+    {
+        this.name = name;
+        this.warmupCount = warmupCount;
+        this.disposable = disposable;
+        if (warmupCount <= 0)
+        {
+            warmup = false;
+        }
+    }
 
     /**
      * Get a timer by name.  If it hasn't been created, it will have WARMUP_COUNT_DEFAULT.
+     *
      * @param name
      * @return
      */
-    public synchronized static StatTimer get(String name) {
+    public synchronized static StatTimer get(String name)
+    {
         return get(name, WARMUP_COUNT_DEFAULT);
     }
 
     /**
      * Get a timer by name.  If it hasn't been created, it will have the warmupCount value provided.
+     *
      * @param name
      * @param warmupCount
      * @return
      */
-    public synchronized static StatTimer get(String name, int warmupCount) {
-        if(name==null) throw new IllegalArgumentException("StatTimer name required");
+    public synchronized static StatTimer get(String name, int warmupCount)
+    {
+        if (name == null)
+        {
+            throw new IllegalArgumentException("StatTimer name required");
+        }
         StatTimer timer = timers.get(name);
-        if(timer==null){
+        if (timer == null)
+        {
             timer = new StatTimer(name, warmupCount, false);
             timers.put(name, timer);
         }
@@ -61,6 +94,7 @@ public class StatTimer {
 
     /**
      * Create a disposable timer with a warmupCount of 0.
+     *
      * @param name
      * @return
      */
@@ -72,8 +106,10 @@ public class StatTimer {
     /**
      * Reset all timers.
      */
-    public synchronized static void resetAll() {
-        for(StatTimer timer : timers.values()){
+    public synchronized static void resetAll()
+    {
+        for (StatTimer timer : timers.values())
+        {
             timer.reset();
         }
     }
@@ -81,17 +117,22 @@ public class StatTimer {
     /**
      * Report all timers via log file.
      */
-    public synchronized static String getReport() {
+    public synchronized static String getReport()
+    {
         List<StatTimer> list = new ArrayList<StatTimer>(timers.values());
-        Collections.sort(list, new Comparator<StatTimer>(){
+        Collections.sort(list, new Comparator<StatTimer>()
+        {
             @Override
-            public int compare(StatTimer o1, StatTimer o2) {
+            public int compare(StatTimer o1, StatTimer o2)
+            {
                 return o1.name.compareTo(o2.name);
             }
         });
         StringBuffer sb = new StringBuffer();
-        for(StatTimer timer : list){
-            if(timer.counter.get()>0){
+        for (StatTimer timer : list)
+        {
+            if (timer.counter.get() > 0)
+            {
                 sb.append(LogFormatter.LINEBREAK).append(timer.getReportString());
             }
         }
@@ -99,47 +140,54 @@ public class StatTimer {
     }
 
     /**
-     * Private constructor.
-     * @param name
-     * @param warmupCount
+     * Pad string s with up to n spaces.
+     *
+     * @param s
+     * @param n
+     * @return
      */
-    private StatTimer(String name, int warmupCount, boolean disposable) {
-        this.name = name;
-        this.warmupCount = warmupCount;
-        this.disposable = disposable;
-        if(warmupCount<=0)
-        {
-            warmup = false;
-        }
+    private static String pad(Object s, int n)
+    {
+        return String.format("%1$-" + n + "s", s);
     }
 
     /**
      * Start the timer.
+     *
      * @return
      */
-    public StatTimer start() {
-        synchronized (counter) {
-            if(maxed) return this;
+    public StatTimer start()
+    {
+        synchronized (counter)
+        {
+            if (maxed)
+            {
+                return this;
+            }
 
-            if(started !=null) {
+            if (started != null)
+            {
                 logger.warning(name + " is already running, cancelling first");
                 this.cancel();
             }
 
-            if(counter.get()==MAX_COUNT) {
-                maxed=true;
+            if (counter.get() == MAX_COUNT)
+            {
+                maxed = true;
                 logger.info(name + " hit max count, " + MAX_COUNT);
                 return this;
             }
 
-            if(warmup && counter.get()>warmupCount){
+            if (warmup && counter.get() > warmupCount)
+            {
                 warmup = false;
                 max = 0;
                 min = 0;
                 counter.set(0);
                 cancelCounter.set(0);
                 totalTime.set(0);
-                if(logger.isLoggable(Level.FINE)){
+                if (logger.isLoggable(Level.FINE))
+                {
                     logger.fine(name + " warmup done, " + warmupCount);
                 }
             }
@@ -152,24 +200,39 @@ public class StatTimer {
     /**
      * Stop the timer, returns elapsed time in milliseconds.
      */
-    public double stop() {
-        synchronized (counter) {
-            if(maxed) return 0;
+    public double stop()
+    {
+        synchronized (counter)
+        {
+            if (maxed)
+            {
+                return 0;
+            }
 
-            if(started == null) {
+            if (started == null)
+            {
                 logger.warning(name + " is not running.");
                 return 0;
             }
 
-            try {
-                final double elapsedMs = (System.nanoTime() - started)/NS;
+            try
+            {
+                final double elapsedMs = (System.nanoTime() - started) / NS;
                 totalTime.getAndAdd(elapsedMs);
                 counter.getAndIncrement();
-                if(elapsedMs<min) min=elapsedMs;
-                if(elapsedMs>max) max=elapsedMs;
+                if (elapsedMs < min)
+                {
+                    min = elapsedMs;
+                }
+                if (elapsedMs > max)
+                {
+                    max = elapsedMs;
+                }
                 started = null;
                 return elapsedMs;
-            } catch(Throwable t) {
+            }
+            catch (Throwable t)
+            {
                 logger.severe("Timer error: " + LogFormatter.toString(t));
                 reset();
                 return 0;
@@ -179,6 +242,7 @@ public class StatTimer {
 
     /**
      * Stop the timer, return simple report of results.
+     *
      * @return
      */
     public String stopAndReport()
@@ -190,8 +254,10 @@ public class StatTimer {
     /**
      * Cancel a started timer.
      */
-    public void cancel() {
-        synchronized (counter) {
+    public void cancel()
+    {
+        synchronized (counter)
+        {
             started = null;
             cancelCounter.incrementAndGet();
         }
@@ -200,8 +266,10 @@ public class StatTimer {
     /**
      * Reset the timer.
      */
-    public void reset() {
-        synchronized (counter) {
+    public void reset()
+    {
+        synchronized (counter)
+        {
             warmup = true;
             maxed = false;
             started = null;
@@ -214,27 +282,37 @@ public class StatTimer {
     /**
      * Log the timer's stats.
      */
-    public void report() {
+    public void report()
+    {
         logger.info(getReportString());
     }
 
     /**
      * Get the timer's stats as a string.
+     *
      * @return
      */
-    public String getReportString() {
+    public String getReportString()
+    {
         final DecimalFormat df = new DecimalFormat("###.##");
-        synchronized(counter) {
+        synchronized (counter)
+        {
             final long count = counter.get();
             final double total = totalTime.get();
-            final double avg = total/count;
+            final double avg = total / count;
             final long cancels = cancelCounter.get();
 
             String report = String.format("<b>%50s:</b>   Avg: %8sms, Min: %8sms, Max: %10sms, Total: %10s sec, Count: %8s, Canceled: %8s,",
                     name, df.format(avg), df.format(min), df.format(max), TimeUnit.MILLISECONDS.toSeconds((long) total), count, cancels);
 
-            if(warmup) report+= String.format("* Warmup of %s not met", warmupCount);
-            if(maxed) report+= "(MAXED)";
+            if (warmup)
+            {
+                report += String.format("* Warmup of %s not met", warmupCount);
+            }
+            if (maxed)
+            {
+                report += "(MAXED)";
+            }
 
             return report;
         }
@@ -242,6 +320,7 @@ public class StatTimer {
 
     /**
      * Gets a simplified report of the timer stats.
+     *
      * @return
      */
     public String getSimpleReportString()
@@ -267,23 +346,16 @@ public class StatTimer {
                     sb.append("max: ").append(df.format(max) + "ms");
                     sb.append("avg: ").append(df.format(avg) + "ms");
                 }
-                if (maxed) sb.append("(MAXED)");
+                if (maxed)
+                {
+                    sb.append("(MAXED)");
+                }
                 return sb.toString();
             }
         }
-        catch(Throwable t)
+        catch (Throwable t)
         {
             return String.format("StatTimer '%s' encountered an error getting its simple report: %s", name, t);
         }
-    }
-
-    /**
-     * Pad string s with up to n spaces.
-     * @param s
-     * @param n
-     * @return
-     */
-    private static String pad(Object s, int n) {
-        return String.format("%1$-" + n + "s", s);
     }
 }

@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.render.draw;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,18 +34,18 @@ public class DrawPlayerStep implements DrawStep
     @Override
     public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale)
     {
-        if(entity.isDead || !entity.addedToChunk || entity.isSneaking())
+        if (entity.isDead || !entity.addedToChunk || entity.isSneaking())
         {
             return;
         }
 
-        float labelOffset = texture!=null ? texture.height : 0;
+        float labelOffset = texture != null ? texture.height : 0;
         Point2D pixel = gridRenderer.getPixel(entity.posX, entity.posZ);
         if (pixel != null)
         {
-            if(texture!=null)
+            if (texture != null)
             {
-                DrawUtil.drawEntity(pixel.getX() + xOffset, pixel.getY() + yOffset, EntityHelper.getHeading(entity), true, texture, 0, drawScale *.75f);
+                DrawUtil.drawEntity(pixel.getX() + xOffset, pixel.getY() + yOffset, EntityHelper.getHeading(entity), true, texture, 0, drawScale * .75f);
             }
             DrawUtil.drawCenteredLabel(entity.getCommandSenderName(), pixel.getX() + xOffset, pixel.getY() + yOffset - labelOffset, Color.black, 205, Color.green, 255, fontScale);
         }

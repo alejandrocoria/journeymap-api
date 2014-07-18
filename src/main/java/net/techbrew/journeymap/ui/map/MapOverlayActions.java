@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.map;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -26,18 +34,26 @@ import java.util.logging.Level;
 public class MapOverlayActions extends JmUI
 {
 
-    private enum ButtonEnum
-    {
-        Automap, Check, Save, Browser, Close
-    }
+    Button buttonAutomap, buttonSave, buttonClose, buttonBrowser, buttonCheck;
 
     ;
-
-    Button buttonAutomap, buttonSave, buttonClose, buttonBrowser, buttonCheck;
 
     public MapOverlayActions()
     {
         super(Constants.getString("jm.common.actions"));
+    }
+
+    public static void launchLocalhost()
+    {
+        String url = "http://localhost:" + JourneyMap.getInstance().webMapProperties.port.get(); //$NON-NLS-1$
+        try
+        {
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+        }
+        catch (IOException e)
+        {
+            JourneyMap.getLogger().log(Level.SEVERE, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e)); //$NON-NLS-1$
+        }
     }
 
     /**
@@ -140,19 +156,6 @@ public class MapOverlayActions extends JmUI
         }
     }
 
-    public static void launchLocalhost()
-    {
-        String url = "http://localhost:" + JourneyMap.getInstance().webMapProperties.port.get(); //$NON-NLS-1$
-        try
-        {
-            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
-        }
-        catch (IOException e)
-        {
-            JourneyMap.getLogger().log(Level.SEVERE, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e)); //$NON-NLS-1$
-        }
-    }
-
     void save()
     {
         MapProperties mapProperties = JourneyMap.getInstance().fullMapProperties;
@@ -169,7 +172,6 @@ public class MapOverlayActions extends JmUI
         close();
     }
 
-
     @Override
     protected void keyTyped(char c, int i)
     {
@@ -181,6 +183,12 @@ public class MapOverlayActions extends JmUI
                 break;
             }
         }
+    }
+
+
+    private enum ButtonEnum
+    {
+        Automap, Check, Save, Browser, Close
     }
 
 }

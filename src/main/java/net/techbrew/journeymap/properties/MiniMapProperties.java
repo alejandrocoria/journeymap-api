@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.properties;
 
 import net.techbrew.journeymap.ui.minimap.DisplayVars;
@@ -11,8 +19,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class MiniMapProperties extends InGameMapProperties
 {
     protected transient static final int CODE_REVISION = 3;
-    protected transient final String name = "minimap";
-
     public final AtomicBoolean enabled = new AtomicBoolean(true);
     public final AtomicReference<DisplayVars.Shape> shape = new AtomicReference<DisplayVars.Shape>(DisplayVars.Shape.SmallSquare);
     public final AtomicReference<DisplayVars.Position> position = new AtomicReference<DisplayVars.Position>(DisplayVars.Position.TopRight);
@@ -20,6 +26,7 @@ public class MiniMapProperties extends InGameMapProperties
     public final AtomicBoolean enableHotkeys = new AtomicBoolean(true);
     public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
     public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("2D");
+    protected transient final String name = "minimap";
 
     public MiniMapProperties()
     {

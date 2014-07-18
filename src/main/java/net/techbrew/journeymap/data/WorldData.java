@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.data;
 
 import com.google.common.cache.CacheLoader;
@@ -39,7 +47,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
     long time;
     boolean hardcore;
     boolean singlePlayer;
-    Map<Feature,Boolean> features;
+    Map<Feature, Boolean> features;
     String jm_version;
     String latest_journeymap_version;
     String mc_version;
@@ -54,35 +62,6 @@ public class WorldData extends CacheLoader<Class, WorldData>
     public WorldData()
     {
     }
-
-    @Override
-    public WorldData load(Class aClass) throws Exception
-    {
-        Minecraft mc = FMLClientHandler.instance().getClient();
-        WorldInfo worldInfo = mc.theWorld.getWorldInfo();
-
-        IntegratedServer server = mc.getIntegratedServer();
-        boolean multiplayer = server == null || server.getPublic();
-
-        name = getWorldName(mc);
-        dimension = mc.theWorld.provider.dimensionId;
-        hardcore = worldInfo.isHardcoreModeEnabled();
-        singlePlayer = !multiplayer;
-        time = mc.theWorld.getWorldTime() % 24000L;
-        features = FeatureManager.getAllowedFeatures();
-
-        mod_name = JourneyMap.MOD_NAME;
-        jm_version = JourneyMap.JM_VERSION;
-        latest_journeymap_version = VersionCheck.getVersionAvailable();
-        mc_version = Display.getTitle().split("\\s(?=\\d)")[1];
-        browser_poll = Math.max(1000, JourneyMap.getInstance().webMapProperties.browserPoll.get());
-
-        iconSetName = JourneyMap.getInstance().webMapProperties.entityIconSetName.get();
-        iconSetNames = FileHandler.getMobIconSetNames();
-
-        return this;
-    }
-
 
     public static boolean isHardcoreAndMultiplayer()
     {
@@ -226,9 +205,9 @@ public class WorldData extends CacheLoader<Class, WorldData>
         JourneyMap.getLogger().log(logLevel, String.format("Using player's provider for dim %s: %s", playerProvider.dimensionId, playerProvider.getDimensionName()));
 
         // Get a provider for the rest
-        for(int dim : requiredDims)
+        for (int dim : requiredDims)
         {
-            if(!dimProviders.containsKey(dim))
+            if (!dimProviders.containsKey(dim))
             {
                 if (DimensionManager.getWorld(dim) != null)
                 {
@@ -265,9 +244,9 @@ public class WorldData extends CacheLoader<Class, WorldData>
         requiredDims.removeAll(dimProviders.keySet());
 
         // Make sure required dimensions are added. Since we got this far without finding providers for them, use fake providers.
-        for(int dim : requiredDims)
+        for (int dim : requiredDims)
         {
-            if(!dimProviders.containsKey(dim))
+            if (!dimProviders.containsKey(dim))
             {
                 WorldProvider provider = new FakeDimensionProvider(dim);
                 dimProviders.put(dim, provider);
@@ -287,6 +266,34 @@ public class WorldData extends CacheLoader<Class, WorldData>
         });
 
         return providerList;
+    }
+
+    @Override
+    public WorldData load(Class aClass) throws Exception
+    {
+        Minecraft mc = FMLClientHandler.instance().getClient();
+        WorldInfo worldInfo = mc.theWorld.getWorldInfo();
+
+        IntegratedServer server = mc.getIntegratedServer();
+        boolean multiplayer = server == null || server.getPublic();
+
+        name = getWorldName(mc);
+        dimension = mc.theWorld.provider.dimensionId;
+        hardcore = worldInfo.isHardcoreModeEnabled();
+        singlePlayer = !multiplayer;
+        time = mc.theWorld.getWorldTime() % 24000L;
+        features = FeatureManager.getAllowedFeatures();
+
+        mod_name = JourneyMap.MOD_NAME;
+        jm_version = JourneyMap.JM_VERSION;
+        latest_journeymap_version = VersionCheck.getVersionAvailable();
+        mc_version = Display.getTitle().split("\\s(?=\\d)")[1];
+        browser_poll = Math.max(1000, JourneyMap.getInstance().webMapProperties.browserPoll.get());
+
+        iconSetName = JourneyMap.getInstance().webMapProperties.entityIconSetName.get();
+        iconSetNames = FileHandler.getMobIconSetNames();
+
+        return this;
     }
 
     /**

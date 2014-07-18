@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.io.nbt;
 
 import net.minecraft.nbt.CompressedStreamTools;
@@ -17,89 +25,110 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.util.logging.Logger;
 
-public class ChunkLoader {
-	
-	private static Logger logger = JourneyMap.getLogger();
-	
-	public static ChunkMD getChunkMdFromDisk(int chunkX, int chunkZ, File worldDir, World world) {
-		
-		Chunk chunk = getChunkFromDisk(chunkX, chunkZ, worldDir, world);
-		if(chunk==null) {
-			return null;
-		}	
-		return new ChunkMD(chunk, true, world, /* do error checks */ true);
-		
-	}
-	
-	public static ChunkMD getChunkMdFromMemory(int chunkX, int chunkZ, World world) {
-		Chunk chunk = getChunkFromMemory(chunkX, chunkZ, world);
-		if(chunk!=null) {
-			return new ChunkMD(chunk, true, world);
-		}
-		return null;
-	}
+public class ChunkLoader
+{
 
-    public static ChunkMD refreshChunkMdFromMemory(ChunkMD chunkMD) {
-        if(chunkMD==null)
+    private static Logger logger = JourneyMap.getLogger();
+
+    public static ChunkMD getChunkMdFromDisk(int chunkX, int chunkZ, File worldDir, World world)
+    {
+
+        Chunk chunk = getChunkFromDisk(chunkX, chunkZ, worldDir, world);
+        if (chunk == null)
+        {
+            return null;
+        }
+        return new ChunkMD(chunk, true, world, /* do error checks */ true);
+
+    }
+
+    public static ChunkMD getChunkMdFromMemory(int chunkX, int chunkZ, World world)
+    {
+        Chunk chunk = getChunkFromMemory(chunkX, chunkZ, world);
+        if (chunk != null)
+        {
+            return new ChunkMD(chunk, true, world);
+        }
+        return null;
+    }
+
+    public static ChunkMD refreshChunkMdFromMemory(ChunkMD chunkMD)
+    {
+        if (chunkMD == null)
         {
             return null;
         }
 
         Chunk chunk = getChunkFromMemory(chunkMD.coord.chunkXPos, chunkMD.coord.chunkZPos, chunkMD.worldObj);
-        if(chunk!=null) {
+        if (chunk != null)
+        {
             chunkMD.stub.updateFrom(chunk);
             chunkMD.sliceSlopes.clear();
             chunkMD.setCurrent(true);
             return chunkMD;
-        } else {
+        }
+        else
+        {
             return null;
         }
     }
-	
-	private static Chunk getChunkFromMemory(int chunkX, int chunkZ, World world) {
-		Chunk result  = null;
-		if(world.getChunkProvider().chunkExists(chunkX, chunkZ)) {
-			Chunk theChunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
-			if(!(theChunk instanceof EmptyChunk)) {
-				if(theChunk.isChunkLoaded && !theChunk.isEmpty()) {
-					result = theChunk;
-				}
-			}			
-		}
-		return result;
-	}
 
-    private static Chunk getChunkFromDisk(int chunkX, int chunkZ, File worldDir, World world) {
-		
-		Chunk chunk = null; // Utils.getChunkIfAvailable(world, coord.chunkXPos, coord.chunkZPos);
-		if(chunk==null) {
-			try {
-				DataInputStream dis = RegionFileCache.getChunkInputStream(worldDir, chunkX, chunkZ);
-				if(dis!=null) {
-					NBTTagCompound chunkNBT = CompressedStreamTools.read(dis);
-					if(chunkNBT!=null) {
-						chunk = checkedReadChunkFromNBT(world, chunkX, chunkZ, chunkNBT);
-						if(chunk!=null) {
-							chunk.generateHeightMap();
-							chunk.generateSkylightMap();
-						}
-					}
-				}
-			} catch (Throwable t) {
-				logger.severe("Error getting chunk from RegionFile: " + LogFormatter.toString(t));
-			}
-		}
-		return chunk;
-	}
+    private static Chunk getChunkFromMemory(int chunkX, int chunkZ, World world)
+    {
+        Chunk result = null;
+        if (world.getChunkProvider().chunkExists(chunkX, chunkZ))
+        {
+            Chunk theChunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
+            if (!(theChunk instanceof EmptyChunk))
+            {
+                if (theChunk.isChunkLoaded && !theChunk.isEmpty())
+                {
+                    result = theChunk;
+                }
+            }
+        }
+        return result;
+    }
 
-	/**
+    private static Chunk getChunkFromDisk(int chunkX, int chunkZ, File worldDir, World world)
+    {
+
+        Chunk chunk = null; // Utils.getChunkIfAvailable(world, coord.chunkXPos, coord.chunkZPos);
+        if (chunk == null)
+        {
+            try
+            {
+                DataInputStream dis = RegionFileCache.getChunkInputStream(worldDir, chunkX, chunkZ);
+                if (dis != null)
+                {
+                    NBTTagCompound chunkNBT = CompressedStreamTools.read(dis);
+                    if (chunkNBT != null)
+                    {
+                        chunk = checkedReadChunkFromNBT(world, chunkX, chunkZ, chunkNBT);
+                        if (chunk != null)
+                        {
+                            chunk.generateHeightMap();
+                            chunk.generateSkylightMap();
+                        }
+                    }
+                }
+            }
+            catch (Throwable t)
+            {
+                logger.severe("Error getting chunk from RegionFile: " + LogFormatter.toString(t));
+            }
+        }
+        return chunk;
+    }
+
+    /**
      * Wraps readChunkFromNBT. Checks the coordinates and several NBT tags.
      */
     protected static Chunk checkedReadChunkFromNBT(World world, int chunkX, int chunkZ, NBTTagCompound par4NBTTagCompound)
     {
-    	final int par2 = chunkX;
-    	final int par3 = chunkZ;
-    	
+        final int par2 = chunkX;
+        final int par3 = chunkZ;
+
         if (!par4NBTTagCompound.hasKey("Level"))
         {
             logger.severe("Chunk file at " + par2 + "," + par3 + " is missing level data, skipping");
@@ -107,7 +136,7 @@ public class ChunkLoader {
         }
         else if (!par4NBTTagCompound.getCompoundTag("Level").hasKey("Sections"))
         {
-        	logger.severe("Chunk file at " + par2 + "," + par3 + " is missing block data, skipping");
+            logger.severe("Chunk file at " + par2 + "," + par3 + " is missing block data, skipping");
             return null;
         }
         else
@@ -116,7 +145,7 @@ public class ChunkLoader {
 
             if (!var5.isAtLocation(par2, par3))
             {
-            	logger.severe("Chunk file at " + par2 + "," + par3 + " is in the wrong location; relocating. (Expected " + par2 + ", " + par3 + ", got " + var5.xPosition + ", " + var5.zPosition + ")");
+                logger.severe("Chunk file at " + par2 + "," + par3 + " is in the wrong location; relocating. (Expected " + par2 + ", " + par3 + ", got " + var5.xPosition + ", " + var5.zPosition + ")");
                 par4NBTTagCompound.setInteger("xPos", par2);
                 par4NBTTagCompound.setInteger("zPos", par3);
                 var5 = readChunkFromNBT(world, par4NBTTagCompound.getCompoundTag("Level"));
@@ -125,7 +154,7 @@ public class ChunkLoader {
             return var5;
         }
     }
-    
+
     /**
      * Reads the data stored in the passed NBTTagCompound and creates a Chunk with that data in the passed World.
      * Returns the created Chunk.

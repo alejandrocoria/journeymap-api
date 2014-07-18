@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -9,8 +17,8 @@ import net.techbrew.journeymap.properties.MapProperties;
 import java.util.ArrayList;
 
 /**
-* Created by mwoodman on 6/24/2014.
-*/
+ * Created by mwoodman on 6/24/2014.
+ */
 public class IconSetButton extends Button
 {
     final String messageKey;
@@ -18,7 +26,7 @@ public class IconSetButton extends Button
 
     public IconSetButton(int id, MapProperties mapProperties, String messageKey)
     {
-        super(id, 0, 0, Constants.getString(messageKey,""));
+        super(id, 0, 0, Constants.getString(messageKey, ""));
         this.mapProperties = mapProperties;
 
         this.messageKey = messageKey;
@@ -31,7 +39,7 @@ public class IconSetButton extends Button
     protected void updateLabel()
     {
         ArrayList<String> validNames = FileHandler.getMobIconSetNames();
-        if(!validNames.contains(mapProperties.getEntityIconSetName().get()))
+        if (!validNames.contains(mapProperties.getEntityIconSetName().get()))
         {
             mapProperties.getEntityIconSetName().set(validNames.get(0));
             mapProperties.save();
@@ -43,12 +51,12 @@ public class IconSetButton extends Button
     protected String getSafeLabel(String label)
     {
         int maxLength = 13;
-        if(label.length()>maxLength)
+        if (label.length() > maxLength)
         {
             label = label.substring(0, maxLength - 3).concat("...");
         }
 
-        return Constants.getString(messageKey,label);
+        return Constants.getString(messageKey, label);
     }
 
     @Override
@@ -69,7 +77,7 @@ public class IconSetButton extends Button
         ArrayList<String> validNames = FileHandler.getMobIconSetNames();
         int index = validNames.indexOf(mapProperties.getEntityIconSetName().get()) + 1;
 
-        if(index==validNames.size() || index<0)
+        if (index == validNames.size() || index < 0)
         {
             index = 0;
         }

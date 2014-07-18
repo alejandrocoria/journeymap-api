@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.map.layer;
 
 import net.minecraft.client.Minecraft;
@@ -12,7 +20,8 @@ import java.util.List;
 /**
  * Delegates mouse actions in MapOverlay to Layer impls.
  */
-public class LayerDelegate {
+public class LayerDelegate
+{
 
     private List<DrawStep> drawSteps = new ArrayList<DrawStep>();
     private List<Layer> layers = new ArrayList<Layer>();
@@ -26,7 +35,7 @@ public class LayerDelegate {
     public void onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
     {
         drawSteps.clear();
-        for(Layer layer : layers)
+        for (Layer layer : layers)
         {
             try
             {
@@ -42,7 +51,7 @@ public class LayerDelegate {
     public void onMouseClicked(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord, int mouseButton)
     {
         drawSteps.clear();
-        for(Layer layer : layers)
+        for (Layer layer : layers)
         {
             try
             {
@@ -55,13 +64,15 @@ public class LayerDelegate {
         }
     }
 
-    public List<DrawStep> getDrawSteps() {
+    public List<DrawStep> getDrawSteps()
+    {
         return drawSteps;
     }
 
     public interface Layer
     {
         public List<DrawStep> onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord);
+
         public List<DrawStep> onMouseClick(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord);
     }
 

@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.render.texture;
 
 import net.minecraft.client.renderer.GLAllocation;
@@ -13,30 +21,37 @@ import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-public class TextureImpl extends AbstractTexture {
-	
-    /** width of this icon in pixels */
+public class TextureImpl extends AbstractTexture
+{
+
+    private static final IntBuffer dataBuffer = GLAllocation.createDirectIntBuffer(4194304);
+    /**
+     * width of this icon in pixels
+     */
     public final int width;
-
-    /** height of this icon in pixels */
+    /**
+     * height of this icon in pixels
+     */
     public final int height;
-    
-    /** keep image with object */
+    /**
+     * keep image with object
+     */
     public final boolean retainImage;
-    
-    /** optionally-retained image **/
+    /**
+     * optionally-retained image *
+     */
     protected BufferedImage image;
-
     protected volatile boolean unbound;
-    
-    public TextureImpl(BufferedImage image) {
-    	this(image, false);
+
+    public TextureImpl(BufferedImage image)
+    {
+        this(image, false);
     }
-    
+
     TextureImpl(BufferedImage image, boolean retainImage)
-    {    	    	
-    	this.retainImage = retainImage;
-    	this.width = image.getWidth();
+    {
+        this.retainImage = retainImage;
+        this.width = image.getWidth();
         this.height = image.getHeight();
         updateTexture(image, true);
     }
@@ -49,76 +64,6 @@ public class TextureImpl extends AbstractTexture {
         this.width = image.getWidth();
         this.height = image.getHeight();
     }
-
-    protected void updateTexture(BufferedImage image, boolean allocateMemory)
-    {
-    	if(image.getWidth()!=width || image.getHeight()!=height) {
-    		throw new IllegalArgumentException("Image dimensions don't match");
-    	}
-    	if(retainImage) this.image = image;
-        try
-        {
-            int glId = getGlTextureId();
-            if(allocateMemory) {
-                TextureUtil.uploadTextureImage(glId, image);
-            } else {
-                GL11.glBindTexture(GL11.GL_TEXTURE_2D, glId);
-                uploadTextureImageSubImpl(image, 0, 0, false, false);
-            }
-        } catch(RuntimeException e) {
-            if(e.getMessage().startsWith("No OpenGL context"))
-            {
-                this.unbound = true;
-            }
-            else
-            {
-                JourneyMap.getLogger().severe("Failed to upload/bind texture: " + e.getMessage());
-            }
-        }
-    }
-
-    public void updateTexture(BufferedImage image)
-    {
-        updateTexture(image, false);
-    }
-
-    @Override
-    public int getGlTextureId() {
-
-        int glId = super.getGlTextureId();
-        if(unbound)
-        {
-            try
-            {
-                TextureUtil.uploadTextureImage(glId, image);
-                unbound = false;
-            }
-            catch(Exception e)
-            {
-                JourneyMap.getLogger().severe("Couldn't use deferred binding: " + e.getMessage());
-            }
-        }
-        return glId;
-    }
-
-    public boolean hasImage() {
-    	return image!=null;
-    }
-    
-    public BufferedImage getImage() {
-    	return image;
-    }
-
-	public void deleteTexture() {
-		if(this.glTextureId!=-1) {
-			GL11.glDeleteTextures(this.getGlTextureId());
-		}
-		if(this.image!=null) {
-			this.image = null;
-		}
-	}
-
-    private static final IntBuffer dataBuffer = GLAllocation.createDirectIntBuffer(4194304);
 
     private static void uploadTextureImageSubImpl(BufferedImage image, int par1, int par2, boolean par3, boolean par4)
     {
@@ -133,8 +78,10 @@ public class TextureImpl extends AbstractTexture {
 
         ByteBuffer buffer = BufferUtils.createByteBuffer(image.getWidth() * image.getHeight() * 4); //4 for RGBA, 3 for RGB
 
-        for(int y = 0; y < image.getHeight(); y++){
-            for(int x = 0; x < image.getWidth(); x++){
+        for (int y = 0; y < image.getHeight(); y++)
+        {
+            for (int x = 0; x < image.getWidth(); x++)
+            {
                 int pixel = pixels[y * image.getWidth() + x];
                 buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red component
                 buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green component
@@ -195,6 +142,91 @@ public class TextureImpl extends AbstractTexture {
         }
     }
 
-	@Override
-	public void loadTexture(IResourceManager par1ResourceManager){}
+    protected void updateTexture(BufferedImage image, boolean allocateMemory)
+    {
+        if (image.getWidth() != width || image.getHeight() != height)
+        {
+            throw new IllegalArgumentException("Image dimensions don't match");
+        }
+        if (retainImage)
+        {
+            this.image = image;
+        }
+        try
+        {
+            int glId = getGlTextureId();
+            if (allocateMemory)
+            {
+                TextureUtil.uploadTextureImage(glId, image);
+            }
+            else
+            {
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, glId);
+                uploadTextureImageSubImpl(image, 0, 0, false, false);
+            }
+        }
+        catch (RuntimeException e)
+        {
+            if (e.getMessage().startsWith("No OpenGL context"))
+            {
+                this.unbound = true;
+            }
+            else
+            {
+                JourneyMap.getLogger().severe("Failed to upload/bind texture: " + e.getMessage());
+            }
+        }
+    }
+
+    public void updateTexture(BufferedImage image)
+    {
+        updateTexture(image, false);
+    }
+
+    @Override
+    public int getGlTextureId()
+    {
+
+        int glId = super.getGlTextureId();
+        if (unbound)
+        {
+            try
+            {
+                TextureUtil.uploadTextureImage(glId, image);
+                unbound = false;
+            }
+            catch (Exception e)
+            {
+                JourneyMap.getLogger().severe("Couldn't use deferred binding: " + e.getMessage());
+            }
+        }
+        return glId;
+    }
+
+    public boolean hasImage()
+    {
+        return image != null;
+    }
+
+    public BufferedImage getImage()
+    {
+        return image;
+    }
+
+    public void deleteTexture()
+    {
+        if (this.glTextureId != -1)
+        {
+            GL11.glDeleteTextures(this.getGlTextureId());
+        }
+        if (this.image != null)
+        {
+            this.image = null;
+        }
+    }
+
+    @Override
+    public void loadTexture(IResourceManager par1ResourceManager)
+    {
+    }
 }

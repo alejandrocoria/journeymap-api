@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.log;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -107,7 +115,7 @@ public class JMLogger
      */
     public static String getPropertiesSummary()
     {
-        LinkedHashMap<String,String> props = new LinkedHashMap<String,String>();
+        LinkedHashMap<String, String> props = new LinkedHashMap<String, String>();
 
         // Versions
         props.put("Version", JourneyMap.MOD_NAME + ", built with Forge " + JourneyMap.MC_VERSION);
@@ -121,7 +129,7 @@ public class JMLogger
         // Environment
         List<String> envProps = Arrays.asList("os.name, os.arch, java.version, user.country, user.language");
         StringBuilder sb = new StringBuilder();
-        for(String env : envProps)
+        for (String env : envProps)
         {
             sb.append(env).append("=").append(System.getProperty(env)).append(", ");
         }
@@ -131,9 +139,9 @@ public class JMLogger
 
         // Put all props in same format
         sb = new StringBuilder();
-        for(Map.Entry<String,String> prop : props.entrySet())
+        for (Map.Entry<String, String> prop : props.entrySet())
         {
-            if(sb.length()>0)
+            if (sb.length() > 0)
             {
                 sb.append(LogFormatter.LINEBREAK);
             }
@@ -150,7 +158,7 @@ public class JMLogger
                 jm.webMapProperties
         );
 
-        for(PropertiesBase config : configs)
+        for (PropertiesBase config : configs)
         {
             sb.append(LogFormatter.LINEBREAK).append(config);
         }

@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.cartography;
 
 import net.minecraft.world.EnumSkyBlock;
@@ -7,8 +15,8 @@ import net.techbrew.journeymap.model.ChunkMD;
 import java.awt.*;
 
 /**
-* Created by mwoodman on 7/3/2014.
-*/
+ * Created by mwoodman on 7/3/2014.
+ */
 class Stratum
 {
     ChunkMD chunkMd;
@@ -30,9 +38,9 @@ class Stratum
         this.x = x;
         this.y = y;
         this.z = z;
-        this.isWater = blockMD!=null && blockMD.isWater();
-        this.lightLevel = (blockMD==null) ? null : (lightLevel!=null) ? lightLevel : chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z);
-        this.lightOpacity = (blockMD==null) ? null : chunkMd.getLightOpacity(blockMD, x, y, z);
+        this.isWater = blockMD != null && blockMD.isWater();
+        this.lightLevel = (blockMD == null) ? null : (lightLevel != null) ? lightLevel : chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z);
+        this.lightOpacity = (blockMD == null) ? null : chunkMd.getLightOpacity(blockMD, x, y, z);
         dayColor = null;
         nightColor = null;
         caveColor = null;
@@ -83,9 +91,9 @@ class Stratum
                 ", lightLevel=" + lightLevel +
                 ", lightOpacity=" + lightOpacity +
                 ", isWater=" + isWater +
-                ", dayColor="  + (dayColor==null ? null : new Color(dayColor)) +
-                ", nightColor="  + (nightColor==null ? null : new Color(nightColor)) +
-                ", caveColor="  + (caveColor==null ? null : new Color(caveColor)) +
+                ", dayColor=" + (dayColor == null ? null : new Color(dayColor)) +
+                ", nightColor=" + (nightColor == null ? null : new Color(nightColor)) +
+                ", caveColor=" + (caveColor == null ? null : new Color(caveColor)) +
                 '}';
     }
 }

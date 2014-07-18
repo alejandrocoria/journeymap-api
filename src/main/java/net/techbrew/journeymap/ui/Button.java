@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui;
 
 import net.minecraft.client.Minecraft;
@@ -15,17 +23,15 @@ import java.awt.*;
  */
 public class Button extends GuiButton implements ScrollPane.Scrollable
 {
+    protected static Color smallFrameColorLight = new Color(160, 160, 160);
+    protected static Color smallFrameColorDark = new Color(120, 120, 120);
+    protected static Color smallBgColor = new Color(100, 100, 100);
+    protected static Color smallBgHoverColor = new Color(125, 135, 190);
     protected Boolean toggled = true;
     protected String icon;
     protected DynamicTexture iconTexture;
     protected String labelOn;
     protected String labelOff;
-
-    protected static Color smallFrameColorLight = new Color(160, 160, 160);
-    protected static Color smallFrameColorDark = new Color(120, 120, 120);
-    protected static Color smallBgColor = new Color(100, 100, 100);
-    protected static Color smallBgHoverColor = new Color(125, 135, 190);
-
     protected boolean enabled;
     protected boolean drawButton;
     protected boolean noDisableText;
@@ -107,17 +113,6 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public void toggle()
     {
         setToggled(!getToggled());
-    }
-
-    public void setToggled(Boolean toggled)
-    {
-        this.toggled = toggled;
-        updateLabel();
-    }
-
-    public void setWidth(int width)
-    {
-        this.width = width;
     }
 
     public int getFitWidth(FontRenderer fr)
@@ -287,9 +282,20 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return toggled;
     }
 
+    public void setToggled(Boolean toggled)
+    {
+        this.toggled = toggled;
+        updateLabel();
+    }
+
     public int getWidth()
     {
         return width;
+    }
+
+    public void setWidth(int width)
+    {
+        this.width = width;
     }
 
     public int getHeight()
@@ -300,7 +306,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public void setHeight(int height)
     {
         this.height = height;
-        if(height!=20)
+        if (height != 20)
         {
             defaultStyle = false;
         }
@@ -331,14 +337,14 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return this.xPosition;
     }
 
-    public int getY()
-    {
-        return this.yPosition;
-    }
-
     public void setX(int x)
     {
         this.xPosition = x;
+    }
+
+    public int getY()
+    {
+        return this.yPosition;
     }
 
     public void setY(int y)
@@ -476,7 +482,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             }
             case Middle:
             {
-                y = other.getMiddleY() - (getHeight()/2);
+                y = other.getMiddleY() - (getHeight() / 2);
                 break;
             }
         }

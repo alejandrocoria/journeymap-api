@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.task;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -9,14 +17,17 @@ import net.techbrew.journeymap.thread.RunnableTask;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TaskController
 {
-    final ArrayBlockingQueue<Future> queue = new ArrayBlockingQueue<Future>(1);
     final static Logger logger = JourneyMap.getLogger();
+    final ArrayBlockingQueue<Future> queue = new ArrayBlockingQueue<Future>(1);
     final List<ITaskManager> managers = new LinkedList<ITaskManager>();
     final Minecraft minecraft = FMLClientHandler.instance().getClient();
 
@@ -173,9 +184,9 @@ public class TaskController
     {
         synchronized (queue)
         {
-            if(!queue.isEmpty())
+            if (!queue.isEmpty())
             {
-                if(queue.peek().isDone())
+                if (queue.peek().isDone())
                 {
                     try
                     {
@@ -202,7 +213,7 @@ public class TaskController
                 StatTimer timer = StatTimer.get(manager.getTaskClass().getSimpleName() + ".Manager.getTask").start();
                 task = manager.getTask(minecraft);
 
-                if(task==null)
+                if (task == null)
                 {
                     timer.cancel();
                 }

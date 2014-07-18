@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.server;
 
 import net.techbrew.journeymap.Constants;
@@ -24,41 +32,44 @@ import java.util.zip.ZipInputStream;
 
 /**
  * Serve files from disk.  Works for zip-archived files
- * when the mod is in normal use, also works for standard 
+ * when the mod is in normal use, also works for standard
  * file-system access when the mod is unzipped or when
  * running from Eclipse during development.
- * 
- * @author mwoodman
  *
+ * @author mwoodman
  */
-public class FileService extends BaseService {
+public class FileService extends BaseService
+{
 
+    private static final long serialVersionUID = 2L;
+    protected final String resourcePath;
     final String ICON_ENTITY_PATH_PREFIX = "/icon/entity/";
     final String SKIN_PREFIX = "/skin/";
-
-	private static final long serialVersionUID = 2L;
-
-	protected final String resourcePath;
-	private boolean useZipEntry;
+    private boolean useZipEntry;
     private File zipFile;
-	
-	/**
-	 * Default constructor
-	 */
-	public FileService() {
-		
-		URL resourceDir = JourneyMap.class.getResource(FileHandler.ASSETS_JOURNEYMAP_WEB); //$NON-NLS-1$
+
+    /**
+     * Default constructor
+     */
+    public FileService()
+    {
+
+        URL resourceDir = JourneyMap.class.getResource(FileHandler.ASSETS_JOURNEYMAP_WEB); //$NON-NLS-1$
 
         String testPath = null;
 
-		if(resourceDir==null) {
-			JourneyMap.getLogger().severe("Can't determine path to webroot!");
-		} else {
+        if (resourceDir == null)
+        {
+            JourneyMap.getLogger().severe("Can't determine path to webroot!");
+        }
+        else
+        {
 
             // Format reusable resourcePath
             testPath = resourceDir.getPath();
-            if(testPath.endsWith("/")) { //$NON-NLS-1$
-                testPath = testPath.substring(0, testPath.length()-1);
+            if (testPath.endsWith("/"))
+            { //$NON-NLS-1$
+                testPath = testPath.substring(0, testPath.length() - 1);
             }
 
             // Check whether operating out of a zip/jar
@@ -66,44 +77,48 @@ public class FileService extends BaseService {
         }
 
         resourcePath = testPath;
-	}
-	
-	@Override
-	public String path() {
-		return null; // Default handler
-	}
-	
-	@Override
-	public void filter(Event event) throws Event, Exception {
-		
-		String path = null;
-		InputStream in = null;
-		
-		try {
-			
-			// Determine request path
-			path = event.query().path(); //$NON-NLS-1$
+    }
+
+    @Override
+    public String path()
+    {
+        return null; // Default handler
+    }
+
+    @Override
+    public void filter(Event event) throws Event, Exception
+    {
+
+        String path = null;
+        InputStream in = null;
+
+        try
+        {
+
+            // Determine request path
+            path = event.query().path(); //$NON-NLS-1$
 
             // Handle skin request
-			if(path.startsWith(SKIN_PREFIX)) {
-				serveSkin(path.split(SKIN_PREFIX)[1], event);
-				return;
-			}
+            if (path.startsWith(SKIN_PREFIX))
+            {
+                serveSkin(path.split(SKIN_PREFIX)[1], event);
+                return;
+            }
 
             InputStream fileStream = null;
 
             // Handle entity icon request
-            if(path.startsWith(ICON_ENTITY_PATH_PREFIX))
+            if (path.startsWith(ICON_ENTITY_PATH_PREFIX))
             {
                 String entityIconPath = path.split(ICON_ENTITY_PATH_PREFIX)[1].replace('/', File.separatorChar);
                 File iconFile = new File(FileHandler.getEntityIconDir(), entityIconPath);
-                if(!iconFile.exists())
+                if (!iconFile.exists())
                 {
                     // Fallback to jar asset
                     String setName = entityIconPath.split(File.separator)[0];
-                    String iconPath = entityIconPath.substring(entityIconPath.indexOf(File.separatorChar)+1);
+                    String iconPath = entityIconPath.substring(entityIconPath.indexOf(File.separatorChar) + 1);
 
-                    if(event!=null)
+                    if (event != null)
                     {
                         ResponseHeader.on(event).contentType(ContentType.png);
                     }
@@ -112,7 +127,7 @@ public class FileService extends BaseService {
                 }
                 else
                 {
-                    if(event!=null)
+                    if (event != null)
                     {
                         ResponseHeader.on(event).content(iconFile);
                     }
@@ -125,24 +140,28 @@ public class FileService extends BaseService {
                 fileStream = getStream(path, event);
             }
 
-            if(fileStream==null)
+            if (fileStream == null)
             {
                 JourneyMap.getLogger().fine("Path not found: " + path);
                 throwEventException(404, Constants.getMessageJMERR13(path), event, true);
             }
-			else
+            else
             {
                 serveStream(fileStream, event);
             }
-			
 
-		} catch(Event eventEx) {
-			throw eventEx;
-		} catch(Throwable t) {				
-			JourneyMap.getLogger().severe(LogFormatter.toString(t));			
-			throwEventException(500, Constants.getMessageJMERR12(path), event, true);
-		} 
-	}
+
+        }
+        catch (Event eventEx)
+        {
+            throw eventEx;
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().severe(LogFormatter.toString(t));
+            throwEventException(500, Constants.getMessageJMERR12(path), event, true);
+        }
+    }
 
     protected InputStream getStream(String path, Event event)
     {
@@ -199,7 +218,7 @@ public class FileService extends BaseService {
                     }
                 }
 
-                if(!found)
+                if (!found)
                 {
                     zis.close();
                     fis.close();
@@ -213,7 +232,7 @@ public class FileService extends BaseService {
                 File file = new File(requestPath);
                 if (file.exists())
                 {
-                    if(event!=null)
+                    if (event != null)
                     {
                         ResponseHeader.on(event).content(file);
                     }
@@ -233,93 +252,109 @@ public class FileService extends BaseService {
         return in;
     }
 
-    public void serveSkin(String username, Event event) throws Exception {
-		
-		ResponseHeader.on(event).contentType(ContentType.png);
-		
-		TextureImpl tex = TextureCache.instance().getPlayerSkin(username);
-		BufferedImage img = tex.getImage();
-		if(img!=null) {			
-			serveImage(event, img);
-		} else {
-			event.reply().code("404 Not Found");
-		}
-		
-	}
-	
-	/**
-	 * Respond with the contents of a file.
-	 * 
-	 * @param sourceFile
-	 * @param event
-	 * @throws Event
-	 * @throws IOException
-	 */
-	public void serveFile(File sourceFile, Event event) throws Event, IOException {
-		
-		// Set content headers
-		ResponseHeader.on(event).content(sourceFile);
-		
-		// Stream file
-		serveStream(new FileInputStream(sourceFile), event);
-	}
+    public void serveSkin(String username, Event event) throws Exception
+    {
+
+        ResponseHeader.on(event).contentType(ContentType.png);
+
+        TextureImpl tex = TextureCache.instance().getPlayerSkin(username);
+        BufferedImage img = tex.getImage();
+        if (img != null)
+        {
+            serveImage(event, img);
+        }
+        else
+        {
+            event.reply().code("404 Not Found");
+        }
+
+    }
+
+    /**
+     * Respond with the contents of a file.
+     *
+     * @param sourceFile
+     * @param event
+     * @throws Event
+     * @throws IOException
+     */
+    public void serveFile(File sourceFile, Event event) throws Event, IOException
+    {
+
+        // Set content headers
+        ResponseHeader.on(event).content(sourceFile);
+
+        // Stream file
+        serveStream(new FileInputStream(sourceFile), event);
+    }
 
     /**
      * Respond with the contents of a file input stream.
+     *
      * @param input
      * @param event
      * @throws Event
      * @throws IOException
      */
-	public void serveStream(final InputStream input, Event event) throws Event, IOException {
-		
-		// Transfer inputstream to event outputstream
-		ReadableByteChannel inputChannel = null;
-		WritableByteChannel outputChannel = null;
-		try {
-			inputChannel = Channels.newChannel(input);
-			
-			ByteArrayOutputStream bout = new ByteArrayOutputStream();
+    public void serveStream(final InputStream input, Event event) throws Event, IOException
+    {
+
+        // Transfer inputstream to event outputstream
+        ReadableByteChannel inputChannel = null;
+        WritableByteChannel outputChannel = null;
+        try
+        {
+            inputChannel = Channels.newChannel(input);
+
+            ByteArrayOutputStream bout = new ByteArrayOutputStream();
             GZIPOutputStream output = new GZIPOutputStream(bout);
-            
-			outputChannel = Channels.newChannel(output);			
-			ByteBuffer buffer = ByteBuffer.allocate(65536); 
-			while (inputChannel.read(buffer) != -1) { 
-				buffer.flip( ); 
-				outputChannel.write(buffer); 
-				buffer.clear( ); 
-			}		
-			
-			output.flush();
+
+            outputChannel = Channels.newChannel(output);
+            ByteBuffer buffer = ByteBuffer.allocate(65536);
+            while (inputChannel.read(buffer) != -1)
+            {
+                buffer.flip();
+                outputChannel.write(buffer);
+                buffer.clear();
+            }
+
+            output.flush();
             output.close();
             bout.close();
-            
+
             byte[] gzbytes = bout.toByteArray();
-            
-            ResponseHeader.on(event).contentLength(gzbytes.length).setHeader("Content-encoding", "gzip");	//$NON-NLS-1$ //$NON-NLS-2$
+
+            ResponseHeader.on(event).contentLength(gzbytes.length).setHeader("Content-encoding", "gzip");    //$NON-NLS-1$ //$NON-NLS-2$
             event.output().write(gzbytes);
-            
-		} catch (IOException e) {
-			JourneyMap.getLogger().severe(LogFormatter.toString(e));
-			throw event;
-		} finally {
-			if (input != null) {
-				input.close();
-			}
-		}
 
-	}
+        }
+        catch (IOException e)
+        {
+            JourneyMap.getLogger().severe(LogFormatter.toString(e));
+            throw event;
+        }
+        finally
+        {
+            if (input != null)
+            {
+                input.close();
+            }
+        }
 
-	/**
-	 * Gzip encode a string and return the byte array.  
-	 * 
-	 * @param data
-	 * @return
-	 */
-	@Override
-	protected byte[] gzip(String data) {
+    }
+
+    /**
+     * Gzip encode a string and return the byte array.
+     *
+     * @param data
+     * @return
+     */
+    @Override
+    protected byte[] gzip(String data)
+    {
         ByteArrayOutputStream bout = null;
-        try {
+        try
+        {
             bout = new ByteArrayOutputStream();
             GZIPOutputStream output = new GZIPOutputStream(bout);
             output.write(data.getBytes());
@@ -327,9 +362,11 @@ public class FileService extends BaseService {
             output.close();
             bout.close();
             return bout.toByteArray();
-        } catch (Exception ex) {
-        	JourneyMap.getLogger().warning("Failed to gzip encode: " + data);
-        	return null;
+        }
+        catch (Exception ex)
+        {
+            JourneyMap.getLogger().warning("Failed to gzip encode: " + data);
+            return null;
         }
     }
 

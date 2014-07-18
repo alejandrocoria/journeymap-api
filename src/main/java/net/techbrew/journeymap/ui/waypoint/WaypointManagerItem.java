@@ -1,3 +1,11 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.ui.waypoint;
 
 import net.minecraft.client.Minecraft;
@@ -25,29 +33,24 @@ import java.util.Comparator;
 public class WaypointManagerItem implements ScrollPane.Scrollable
 {
 
+    static Color background = new Color(20, 20, 20);
+    static Color backgroundHover = new Color(40, 40, 40);
     final FontRenderer fontRenderer;
     final WaypointManager manager;
-
     int x;
     int y;
     int width;
     int internalWidth;
-
     Integer distance;
     Waypoint waypoint;
-
     Button buttonEnable;
     Button buttonRemove;
     Button buttonEdit;
     Button buttonFind;
     Button buttonTeleport;
-
     int hgap = 4;
     ButtonList buttonListLeft;
     ButtonList buttonListRight;
-
-    static Color background = new Color(20, 20, 20);
-    static Color backgroundHover = new Color(40, 40, 40);
 
     public WaypointManagerItem(Waypoint waypoint, FontRenderer fontRenderer, WaypointManager manager)
     {
@@ -93,12 +96,6 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
     }
 
     @Override
-    public void setWidth(int width)
-    {
-        this.width = width;
-    }
-
-    @Override
     public int getX()
     {
         return x;
@@ -114,6 +111,12 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
     public int getWidth()
     {
         return width;
+    }
+
+    @Override
+    public void setWidth(int width)
+    {
+        this.width = width;
     }
 
     @Override
