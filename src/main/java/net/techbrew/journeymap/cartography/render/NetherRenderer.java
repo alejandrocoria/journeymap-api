@@ -6,23 +6,27 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
  */
 
-package net.techbrew.journeymap.cartography;
+package net.techbrew.journeymap.cartography.render;
 
 
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.cartography.IChunkRenderer;
+import net.techbrew.journeymap.cartography.Strata;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
 /**
- * Render a chunk in the End.
+ * Render a chunk in the Nether.
  *
  * @author mwoodman
  */
-public class ChunkEndRenderer extends ChunkOverworldCaveRenderer implements IChunkRenderer
+public class NetherRenderer extends OverworldCaveRenderer implements IChunkRenderer
 {
+    // Taken from WorldProviderHell.getFogColor()
+    private float[] fog = new float[]{0.20000000298023224f, 0.029999999329447746f, 0.029999999329447746f};
 
-    public ChunkEndRenderer()
+    public NetherRenderer()
     {
         super(null);
     }
@@ -49,49 +53,37 @@ public class ChunkEndRenderer extends ChunkOverworldCaveRenderer implements IChu
 
         try
         {
-            int yOffset;
-            int surfaceY = chunkMd.getHeightValue(x, z) + 1;
-            if (sliceMaxY > surfaceY)
-            {
-                y = surfaceY;
-                yOffset = -1;
-            }
-            else
-            {
-                y = sliceMaxY;
-                yOffset = 1;
-            }
+            y = sliceMaxY - 1;
 
             BlockMD blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
             BlockMD blockMDAbove = dataCache.getBlockMD(chunkMd, x, y + 1, z);
 
-            while (y > 0 && y < surfaceY)
+            while (y > 0)
             {
                 if (blockMD.isLava())
                 {
                     break;
                 }
 
-                if (blockMDAbove.isAir() || blockMDAbove.hasTranparency() || blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky, BlockMD.Flag.TransparentRoof))
+                if (blockMDAbove.isAir() || blockMDAbove.hasTranparency() || blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky) || blockMDAbove.hasFlag(BlockMD.Flag.TransparentRoof))
                 {
                     if (!blockMD.isAir())
                     {
                         break;
                     }
                 }
-                y = y + yOffset;
+                y--;
                 blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
                 blockMDAbove = dataCache.getBlockMD(chunkMd, x, y + 1, z);
             }
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warning(String.format("Couldn't get safe slice block height at %s, %s because: %s", (chunkMd.coord.chunkXPos << 4) + x, (chunkMd.coord.chunkZPos << 4) + z, e));
+            JourneyMap.getLogger().warning("Couldn't get safe slice block height at " + x + "," + z + ": " + e);
             y = sliceMaxY;
         }
 
         blockSliceHeights[x][z] = y;
-
         return y;
     }
 
@@ -112,4 +104,9 @@ public class ChunkEndRenderer extends ChunkOverworldCaveRenderer implements IChu
         return Math.max(adjusted ? 2 : 0, chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z));
     }
 
+    @Override
+    public float[] getFogColor()
+    {
+        return fog;
+    }
 }

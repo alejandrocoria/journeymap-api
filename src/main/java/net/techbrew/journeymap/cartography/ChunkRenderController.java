@@ -10,6 +10,10 @@ package net.techbrew.journeymap.cartography;
 
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.cartography.render.EndRenderer;
+import net.techbrew.journeymap.cartography.render.NetherRenderer;
+import net.techbrew.journeymap.cartography.render.OverworldCaveRenderer;
+import net.techbrew.journeymap.cartography.render.OverworldSurfaceRenderer;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.ChunkMD;
@@ -28,7 +32,6 @@ import java.util.logging.Level;
  */
 public class ChunkRenderController
 {
-
     private static AtomicInteger updateCounter = new AtomicInteger(0);
     private static AtomicLong updateTime = new AtomicLong(0);
     final boolean fineLogging = JourneyMap.getLogger().isLoggable(Level.FINE);
@@ -41,11 +44,11 @@ public class ChunkRenderController
 
     public ChunkRenderController()
     {
-        netherRenderer = new ChunkNetherRenderer();
-        endRenderer = new ChunkEndRenderer();
-        ChunkOverworldSurfaceRenderer surfaceRenderer = new ChunkOverworldSurfaceRenderer();
+        netherRenderer = new NetherRenderer();
+        endRenderer = new EndRenderer();
+        OverworldSurfaceRenderer surfaceRenderer = new OverworldSurfaceRenderer();
         overWorldSurfaceRenderer = surfaceRenderer;
-        overWorldCaveRenderer = new ChunkOverworldCaveRenderer(surfaceRenderer);
+        overWorldCaveRenderer = new OverworldCaveRenderer(surfaceRenderer);
         //standardRenderer = new ChunkTopoRenderer();
     }
 

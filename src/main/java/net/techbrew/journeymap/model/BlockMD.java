@@ -102,21 +102,14 @@ public class BlockMD
     }
 
     /**
-     * Whether BlockMD has any of the flags.
+     * Whether BlockMD has the flag.
      *
-     * @param checkFlags the check flags
-     * @return the boolean
+     * @param checkFlag the flag to check for
+     * @return true if found
      */
-    public boolean hasFlag(Flag... checkFlags)
+    public boolean hasFlag(Flag checkFlag)
     {
-        for (Flag flag : checkFlags)
-        {
-            if (flags.contains(flag))
-            {
-                return true;
-            }
-        }
-        return false;
+        return flags.contains(checkFlag);
     }
 
     /**

@@ -295,6 +295,12 @@ public class JourneyMap
         return jmServer;
     }
 
+
+    public boolean hasRunningTask()
+    {
+        return (taskController != null && taskController.hasRunningTask());
+    }
+
     /**
      * Toggles automapping
      *

@@ -180,6 +180,11 @@ public class TaskController
         }
     }
 
+    public boolean hasRunningTask()
+    {
+        return !queue.isEmpty();
+    }
+
     public void performTasks()
     {
         synchronized (queue)

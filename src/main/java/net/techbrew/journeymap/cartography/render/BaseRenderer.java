@@ -6,12 +6,15 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
  */
 
-package net.techbrew.journeymap.cartography;
+package net.techbrew.journeymap.cartography.render;
 
 
 import net.minecraft.init.Blocks;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.cartography.IChunkRenderer;
+import net.techbrew.journeymap.cartography.RGB;
+import net.techbrew.journeymap.cartography.Stratum;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.BlockMD;
@@ -43,6 +46,13 @@ public abstract class BaseRenderer implements IChunkRenderer
     volatile AtomicLong badBlockCount = new AtomicLong(0);
     ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
     ArrayList<BlockCoordIntPair> secondarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
+
+    protected float slopeMin = 0.2f;
+    protected float slopeMax = 1.7f;
+    protected float primaryDownslopeMultiplier = .5f;
+    protected float primaryUpslopeMultiplier = 1.25f;
+    protected float secondaryDownslopeMultiplier = .95f;
+    protected float secondaryUpslopeMultiplier = 1.1f;
 
     public BaseRenderer()
     {
@@ -80,19 +90,19 @@ public abstract class BaseRenderer implements IChunkRenderer
     @Override
     public void setStratumColors(Stratum stratum, int lightAttenuation, Integer waterColor, boolean waterAbove, boolean underground, boolean mapCaveLighting)
     {
-        if (stratum.lightLevel == null || stratum.y < 0)
+        if (stratum.getLightLevel() == null || stratum.getY() < 0)
         {
             throw new IllegalStateException("Stratum wasn't initialized");
         }
 
         // Daylight is the greater of sun light (15) attenuated through the stack and the stratum's inherant light level
-        float daylightDiff = Math.max(1, Math.max(stratum.lightLevel, 15 - lightAttenuation)) / 15f;
+        float daylightDiff = Math.max(1, Math.max(stratum.getLightLevel(), 15 - lightAttenuation)) / 15f;
 
         // Nightlight is the greater of moon light (4 attenuated through the stack and the stratum's inherant light level
-        float nightLightDiff = Math.max(5, Math.max(stratum.lightLevel, 4 - lightAttenuation)) / 15f;
+        float nightLightDiff = Math.max(5, Math.max(stratum.getLightLevel(), 4 - lightAttenuation)) / 15f;
 
-        int basicColor = stratum.isWater ? waterColor : stratum.blockMD.getColor(stratum.chunkMd, stratum.x, stratum.y, stratum.z);
-        if (stratum.blockMD.getBlock() == Blocks.glowstone || stratum.blockMD.getBlock() == Blocks.lit_redstone_lamp)
+        int basicColor = stratum.isWater() ? waterColor : stratum.getBlockMD().getColor(stratum.getChunkMd(), stratum.getX(), stratum.getY(), stratum.getZ());
+        if (stratum.getBlockMD().getBlock() == Blocks.glowstone || stratum.getBlockMD().getBlock() == Blocks.lit_redstone_lamp)
         {
             basicColor = RGB.darken(basicColor, 1.2f); // magic # to match how it looks in game
         }
@@ -100,23 +110,23 @@ public abstract class BaseRenderer implements IChunkRenderer
         if (waterAbove && waterColor != null)
         {
             // Blend day color with watercolor above, darken for daylight filtered down
-            stratum.dayColor = RGB.blendWith(waterColor, RGB.darken(basicColor, Math.max(daylightDiff, nightLightDiff)), Math.max(daylightDiff, nightLightDiff));
-            stratum.dayColor = RGB.blendWith(stratum.dayColor, waterColor, .15f); // cheat to get bluer blend in shallow water
+            stratum.setDayColor(RGB.blendWith(waterColor, RGB.darken(basicColor, Math.max(daylightDiff, nightLightDiff)), Math.max(daylightDiff, nightLightDiff)));
+            stratum.setDayColor(RGB.blendWith(stratum.getDayColor(), waterColor, .15f)); // cheat to get bluer blend in shallow water
 
             // Darken for night light and blend with watercolor above
-            stratum.nightColor = RGB.darken(stratum.dayColor, Math.max(nightLightDiff, .25f));
+            stratum.setNightColor(RGB.darken(stratum.getDayColor(), Math.max(nightLightDiff, .25f)));
         }
         else
         {
             // Just darken based on light levels
-            stratum.dayColor = RGB.darken(basicColor, daylightDiff);
+            stratum.setDayColor(RGB.darken(basicColor, daylightDiff));
 
-            stratum.nightColor = RGB.darkenFog(basicColor, nightLightDiff, getFogColor());
+            stratum.setNightColor(RGB.darkenFog(basicColor, nightLightDiff, getFogColor()));
         }
 
         if (underground)
         {
-            stratum.caveColor = mapCaveLighting ? stratum.nightColor : stratum.dayColor;
+            stratum.setCaveColor(mapCaveLighting ? stratum.getNightColor() : stratum.getDayColor());
         }
     }
 
@@ -224,12 +234,14 @@ public abstract class BaseRenderer implements IChunkRenderer
                     slope = primarySlope;
                     if (slope < 1)
                     {
-                        slope *= .5f;
+                        slope *= primaryDownslopeMultiplier;
                     }
                     else if (slope > 1)
                     {
-                        slope *= 1.25f;
+                        slope *= primaryUpslopeMultiplier;
                     }
+
+
 
                     // Calculate secondary slope
                     if (mapAntialiasing)
@@ -238,16 +250,17 @@ public abstract class BaseRenderer implements IChunkRenderer
 
                         if (secondarySlope > primarySlope)
                         {
-                            slope *= 1.1f;
+                            slope *= secondaryUpslopeMultiplier;
                         }
                         else if (secondarySlope < primarySlope)
                         {
-                            slope *= .95f;
+                            slope *= secondaryDownslopeMultiplier;
                         }
                     }
 
                     // Set that slope.  Set it good.  Aw yeah.
-                    slopes[x][z] = Math.min(1.8f, Math.max(0.2f, slope));
+
+                    slopes[x][z] = Math.min(slopeMax, Math.max(slopeMin, slope));
                 }
             }
 

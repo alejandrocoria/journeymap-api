@@ -6,19 +6,23 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
  */
 
-package net.techbrew.journeymap.cartography;
+package net.techbrew.journeymap.cartography.render;
 
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.cartography.IChunkRenderer;
+import net.techbrew.journeymap.cartography.RGB;
+import net.techbrew.journeymap.cartography.Strata;
+import net.techbrew.journeymap.cartography.Stratum;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
 import java.awt.*;
 
-public class ChunkOverworldSurfaceRenderer extends BaseRenderer implements IChunkRenderer
+public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRenderer
 {
-    protected StatTimer renderSurfaceTimer = StatTimer.get("ChunkOverworldSurfaceRenderer.renderSurface");
-    protected StatTimer renderSurfacePrepassTimer = StatTimer.get("ChunkOverworldSurfaceRenderer.renderSurface.CavePrepass");
+    protected StatTimer renderSurfaceTimer = StatTimer.get("OverworldSurfaceRenderer.renderSurface");
+    protected StatTimer renderSurfacePrepassTimer = StatTimer.get("OverworldSurfaceRenderer.renderSurface.CavePrepass");
     protected Strata strata = new Strata("OverworldSurface", 40, 8, false);
     protected float maxDepth = 16;
 
@@ -213,21 +217,21 @@ public class ChunkOverworldSurfaceRenderer extends BaseRenderer implements IChun
                 stratum = strata.pop(this, true);
 
                 // Simple surface render
-                if (strata.renderDayColor == null || strata.renderNightColor == null)
+                if (strata.getRenderDayColor() == null || strata.getRenderNightColor() == null)
                 {
-                    strata.renderDayColor = stratum.dayColor;
+                    strata.setRenderDayColor(stratum.getDayColor());
                     if (!cavePrePass)
                     {
-                        strata.renderNightColor = stratum.nightColor;
+                        strata.setRenderNightColor(stratum.getNightColor());
                     }
                     continue;
                 }
                 else
                 {
-                    strata.renderDayColor = RGB.blendWith(strata.renderDayColor, stratum.dayColor, stratum.blockMD.getAlpha());
+                    strata.setRenderDayColor(RGB.blendWith(strata.getRenderDayColor(), stratum.getDayColor(), stratum.getBlockMD().getAlpha()));
                     if (!cavePrePass)
                     {
-                        strata.renderNightColor = RGB.blendWith(strata.renderNightColor, stratum.nightColor, stratum.blockMD.getAlpha());
+                        strata.setRenderNightColor(RGB.blendWith(strata.getRenderNightColor(), stratum.getNightColor(), stratum.getBlockMD().getAlpha()));
                     }
                 }
 
@@ -236,7 +240,7 @@ public class ChunkOverworldSurfaceRenderer extends BaseRenderer implements IChun
             } // end color stack
 
             // Shouldn't happen
-            if (strata.renderDayColor == null)
+            if (strata.getRenderDayColor() == null)
             {
                 paintBadBlock(x, y, z, g2D);
                 return false;
@@ -248,22 +252,22 @@ public class ChunkOverworldSurfaceRenderer extends BaseRenderer implements IChun
                 float slope = getSlope(chunkMd, topBlockMd, neighbors, x, null, z);
                 if (slope != 1f)
                 {
-                    strata.renderDayColor = RGB.bevelSlope(strata.renderDayColor, slope);
+                    strata.setRenderDayColor(RGB.bevelSlope(strata.getRenderDayColor(), slope));
                     if (!cavePrePass)
                     {
-                        strata.renderNightColor = RGB.bevelSlope(strata.renderNightColor, slope);
+                        strata.setRenderNightColor(RGB.bevelSlope(strata.getRenderNightColor(), slope));
                     }
                 }
             }
 
             // And draw to the actual chunkimage
             g2D.setComposite(OPAQUE);
-            g2D.setPaint(RGB.paintOf(strata.renderDayColor));
+            g2D.setPaint(RGB.paintOf(strata.getRenderDayColor()));
             g2D.fillRect(x, z, 1, 1);
 
             if (!cavePrePass)
             {
-                g2D.setPaint(RGB.paintOf(strata.renderNightColor));
+                g2D.setPaint(RGB.paintOf(strata.getRenderNightColor()));
                 g2D.fillRect(x + 16, z, 1, 1);
             }
         }

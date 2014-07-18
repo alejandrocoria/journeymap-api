@@ -6,22 +6,24 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
  */
 
-package net.techbrew.journeymap.cartography;
+package net.techbrew.journeymap.cartography.render;
 
+import net.techbrew.journeymap.cartography.IChunkRenderer;
+import net.techbrew.journeymap.cartography.RGB;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
 import java.awt.*;
 import java.util.ArrayList;
 
-public class ChunkTopoRenderer extends ChunkOverworldSurfaceRenderer implements IChunkRenderer
+public class OverworldTopoRenderer extends OverworldSurfaceRenderer implements IChunkRenderer
 {
 
     static final int alphaDepth = 5;
     ArrayList<Color> water = new ArrayList<Color>(32);
     ArrayList<Color> land = new ArrayList<Color>(32);
 
-    public ChunkTopoRenderer()
+    public OverworldTopoRenderer()
     {
 
         water.add(new Color(31, 40, 79));

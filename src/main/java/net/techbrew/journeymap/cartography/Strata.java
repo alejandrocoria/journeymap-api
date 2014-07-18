@@ -21,30 +21,31 @@ import java.util.Stack;
 /**
  * Stack of Stratum with simplistic object pooling to avoid heap thrash, since Stratum are used quite a bit.
  */
-class Strata
+public class Strata
 {
     final DataCache dataCache = DataCache.instance();
-    final boolean mapCaveLighting = JourneyMap.getInstance().coreProperties.mapCaveLighting.get();
+    private final boolean mapCaveLighting = JourneyMap.getInstance().coreProperties.mapCaveLighting.get();
     final String name;
     final int initialPoolSize;
     final int poolGrowthIncrement;
 
     final List<Stratum> poolFree;
     final List<Stratum> poolUsed;
-    final boolean underground;
-    protected Integer topY = null;
-    protected Integer bottomY = null;
-    protected Integer topWaterY = null;
-    protected Integer bottomWaterY = null;
-    protected Integer maxLightLevel = null;
-    protected Integer waterColor = null;
-    protected Integer renderDayColor = null;
-    protected Integer renderNightColor = null;
-    protected Integer renderCaveColor = null;
-    protected int lightAttenuation = 0;
-    protected boolean blocksFound = false;
+    private final boolean underground;
+    private Integer topY = null;
+    private Integer bottomY = null;
+    private Integer topWaterY = null;
+    private Integer bottomWaterY = null;
+    private Integer maxLightLevel = null;
+    private Integer waterColor = null;
+    private Integer renderDayColor = null;
+    private Integer renderNightColor = null;
+    private Integer renderCaveColor = null;
+    private int lightAttenuation = 0;
+    private boolean blocksFound = false;
     private Stack<Stratum> stack = new Stack<Stratum>();
-    Strata(String name, int initialPoolSize, int poolGrowthIncrement, boolean underground)
+
+    public Strata(String name, int initialPoolSize, int poolGrowthIncrement, boolean underground)
     {
         this.name = name;
         this.underground = underground;
@@ -77,19 +78,19 @@ class Strata
         }
     }
 
-    void reset()
+    public void reset()
     {
-        topY = null;
-        bottomY = null;
-        topWaterY = null;
-        bottomWaterY = null;
-        maxLightLevel = null;
-        waterColor = null;
-        renderDayColor = null;
-        renderNightColor = null;
-        renderCaveColor = null;
-        lightAttenuation = 0;
-        blocksFound = false;
+        setTopY(null);
+        setBottomY(null);
+        setTopWaterY(null);
+        setBottomWaterY(null);
+        setMaxLightLevel(null);
+        setWaterColor(null);
+        setRenderDayColor(null);
+        setRenderNightColor(null);
+        setRenderCaveColor(null);
+        setLightAttenuation(0);
+        setBlocksFound(false);
 
         stack.clear();
 
@@ -99,19 +100,19 @@ class Strata
         }
     }
 
-    void release(Stratum stratum)
+    public void release(Stratum stratum)
     {
         stratum.set(null, null, -1, -1, -1, null);
         poolUsed.remove(stratum);
         poolFree.add(stratum);
     }
 
-    Stratum push(final ChunkMD.Set neighbors, ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
+    public Stratum push(final ChunkMD.Set neighbors, ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
     {
         return push(neighbors, chunkMd, blockMD, x, y, z, null);
     }
 
-    Stratum push(final ChunkMD.Set neighbors, ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, Integer lightLevel)
+    public Stratum push(final ChunkMD.Set neighbors, ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, Integer lightLevel)
     {
         try
         {
@@ -122,27 +123,27 @@ class Strata
             Stratum stratum = stack.push(allocate().set(chunkMd, blockMD, x, y, z, lightLevel));
 
             // Update Strata's basic data
-            topY = (topY == null) ? y : Math.max(topY, y);
-            bottomY = (bottomY == null) ? y : Math.min(bottomY, y);
-            maxLightLevel = (maxLightLevel == null) ? stratum.lightLevel : Math.max(maxLightLevel, stratum.lightLevel);
-            lightAttenuation += stratum.lightOpacity;
-            blocksFound = true;
+            setTopY((getTopY() == null) ? y : Math.max(getTopY(), y));
+            setBottomY((getBottomY() == null) ? y : Math.min(getBottomY(), y));
+            setMaxLightLevel((getMaxLightLevel() == null) ? stratum.getLightLevel() : Math.max(getMaxLightLevel(), stratum.getLightLevel()));
+            setLightAttenuation(getLightAttenuation() + stratum.getLightOpacity());
+            setBlocksFound(true);
 
             // Update Strata's water data
             if (blockMD.isWater())
             {
-                topWaterY = (topWaterY == null) ? y : Math.max(topWaterY, y);
-                bottomWaterY = (bottomWaterY == null) ? y : Math.min(bottomWaterY, y);
-                if (waterColor == null)
+                setTopWaterY((getTopWaterY() == null) ? y : Math.max(getTopWaterY(), y));
+                setBottomWaterY((getBottomWaterY() == null) ? y : Math.min(getBottomWaterY(), y));
+                if (getWaterColor() == null)
                 {
-                    waterColor = getAverageWaterColor(neighbors, (chunkMd.coord.chunkXPos << 4) + x, y, (chunkMd.coord.chunkZPos << 4) + z);
-                    if (waterColor == null)
+                    setWaterColor(getAverageWaterColor(neighbors, (chunkMd.coord.chunkXPos << 4) + x, y, (chunkMd.coord.chunkZPos << 4) + z));
+                    if (getWaterColor() == null)
                     {
                         // This shouldn't happen. But if it did, it'd be too spammy to log.
-                        waterColor = 0x2525CD;
+                        setWaterColor(0x2525CD);
                     }
 
-                    waterColor = RGB.darken(waterColor, .85f); // magic # to match how it looks in game
+                    setWaterColor(RGB.darken(getWaterColor(), .85f)); // magic # to match how it looks in game
                 }
             }
 
@@ -156,7 +157,7 @@ class Strata
         }
     }
 
-    Stratum pop(IChunkRenderer renderer, boolean ignoreMiddleWater)
+    public Stratum pop(IChunkRenderer renderer, boolean ignoreMiddleWater)
     {
         Stratum stratum = stack.pop();
         if (stratum == null)
@@ -164,36 +165,36 @@ class Strata
             throw new IllegalStateException("Strata empty, can't pop");
         }
 
-        lightAttenuation = Math.max(0, lightAttenuation - stratum.lightOpacity);
+        setLightAttenuation(Math.max(0, getLightAttenuation() - stratum.getLightOpacity()));
 
         // Skip middle water blocks
-        if (ignoreMiddleWater && stratum.isWater && isWaterAbove(stratum))
+        if (ignoreMiddleWater && stratum.isWater() && isWaterAbove(stratum))
         {
             return pop(renderer, true);
         }
 
-        renderer.setStratumColors(stratum, lightAttenuation, waterColor, isWaterAbove(stratum), underground, mapCaveLighting);
+        renderer.setStratumColors(stratum, getLightAttenuation(), getWaterColor(), isWaterAbove(stratum), isUnderground(), isMapCaveLighting());
         return stratum;
     }
 
     int depth()
     {
-        return stack.isEmpty() ? 0 : topY - bottomY + 1;
+        return stack.isEmpty() ? 0 : getTopY() - getBottomY() + 1;
     }
 
-    boolean isEmpty()
+    public boolean isEmpty()
     {
         return stack.isEmpty();
     }
 
     boolean hasWater()
     {
-        return topWaterY != null;
+        return getTopWaterY() != null;
     }
 
     boolean isWaterAbove(Stratum stratum)
     {
-        return topWaterY != null && topWaterY > stratum.y;
+        return getTopWaterY() != null && getTopWaterY() > stratum.getY();
     }
 
     /**
@@ -237,15 +238,135 @@ class Strata
                 ", poolFree=" + poolFree.size() +
                 ", poolUsed=" + poolUsed.size() +
                 ", stack=" + stack.size() +
-                ", topY=" + topY +
-                ", bottomY=" + bottomY +
-                ", topWaterY=" + topWaterY +
-                ", bottomWaterY=" + bottomWaterY +
-                ", maxLightLevel=" + maxLightLevel +
-                ", waterColor=" + RGB.toString(waterColor) +
-                ", renderDayColor=" + RGB.toString(renderDayColor) +
-                ", renderNightColor=" + RGB.toString(renderNightColor) +
-                ", lightAttenuation=" + lightAttenuation +
+                ", topY=" + getTopY() +
+                ", bottomY=" + getBottomY() +
+                ", topWaterY=" + getTopWaterY() +
+                ", bottomWaterY=" + getBottomWaterY() +
+                ", maxLightLevel=" + getMaxLightLevel() +
+                ", waterColor=" + RGB.toString(getWaterColor()) +
+                ", renderDayColor=" + RGB.toString(getRenderDayColor()) +
+                ", renderNightColor=" + RGB.toString(getRenderNightColor()) +
+                ", lightAttenuation=" + getLightAttenuation() +
                 '}';
+    }
+
+    public boolean isMapCaveLighting()
+    {
+        return mapCaveLighting;
+    }
+
+    public boolean isUnderground()
+    {
+        return underground;
+    }
+
+    public Integer getTopY()
+    {
+        return topY;
+    }
+
+    public void setTopY(Integer topY)
+    {
+        this.topY = topY;
+    }
+
+    public Integer getBottomY()
+    {
+        return bottomY;
+    }
+
+    public void setBottomY(Integer bottomY)
+    {
+        this.bottomY = bottomY;
+    }
+
+    public Integer getTopWaterY()
+    {
+        return topWaterY;
+    }
+
+    public void setTopWaterY(Integer topWaterY)
+    {
+        this.topWaterY = topWaterY;
+    }
+
+    public Integer getBottomWaterY()
+    {
+        return bottomWaterY;
+    }
+
+    public void setBottomWaterY(Integer bottomWaterY)
+    {
+        this.bottomWaterY = bottomWaterY;
+    }
+
+    public Integer getMaxLightLevel()
+    {
+        return maxLightLevel;
+    }
+
+    public void setMaxLightLevel(Integer maxLightLevel)
+    {
+        this.maxLightLevel = maxLightLevel;
+    }
+
+    public Integer getWaterColor()
+    {
+        return waterColor;
+    }
+
+    public void setWaterColor(Integer waterColor)
+    {
+        this.waterColor = waterColor;
+    }
+
+    public Integer getRenderDayColor()
+    {
+        return renderDayColor;
+    }
+
+    public void setRenderDayColor(Integer renderDayColor)
+    {
+        this.renderDayColor = renderDayColor;
+    }
+
+    public Integer getRenderNightColor()
+    {
+        return renderNightColor;
+    }
+
+    public void setRenderNightColor(Integer renderNightColor)
+    {
+        this.renderNightColor = renderNightColor;
+    }
+
+    public Integer getRenderCaveColor()
+    {
+        return renderCaveColor;
+    }
+
+    public void setRenderCaveColor(Integer renderCaveColor)
+    {
+        this.renderCaveColor = renderCaveColor;
+    }
+
+    public int getLightAttenuation()
+    {
+        return lightAttenuation;
+    }
+
+    public void setLightAttenuation(int lightAttenuation)
+    {
+        this.lightAttenuation = lightAttenuation;
+    }
+
+    public boolean isBlocksFound()
+    {
+        return blocksFound;
+    }
+
+    public void setBlocksFound(boolean blocksFound)
+    {
+        this.blocksFound = blocksFound;
     }
 }

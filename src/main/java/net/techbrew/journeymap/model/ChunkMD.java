@@ -203,6 +203,7 @@ public class ChunkMD
      */
     public int ceiling(final int x, final int z)
     {
+        BlockMDCache blockMDCache = dataCache.getBlockMetadata();
         final int chunkHeight = getHeightValue(x, z);
         int y = chunkHeight;
 
@@ -217,7 +218,7 @@ public class ChunkMD
                 {
                     y--;
                 }
-                else if (dataCache.getBlockMetadata().hasAnyFlags(block, BlockMD.Flag.HasAir, BlockMD.Flag.OpenToSky))
+                else if (blockMDCache.hasFlag(block, BlockMD.Flag.HasAir) || blockMDCache.hasFlag(block, BlockMD.Flag.OpenToSky))
                 {
                     y--;
                 }

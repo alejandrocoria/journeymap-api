@@ -6,11 +6,15 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
  */
 
-package net.techbrew.journeymap.cartography;
+package net.techbrew.journeymap.cartography.render;
 
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.cartography.IChunkRenderer;
+import net.techbrew.journeymap.cartography.RGB;
+import net.techbrew.journeymap.cartography.Strata;
+import net.techbrew.journeymap.cartography.Stratum;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
@@ -22,24 +26,30 @@ import java.awt.*;
 /**
  * Renders chunk image for caves in the overworld.
  */
-public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRenderer
+public class OverworldCaveRenderer extends BaseRenderer implements IChunkRenderer
 {
     protected CoreProperties coreProperties = JourneyMap.getInstance().coreProperties;
-    protected ChunkOverworldSurfaceRenderer surfaceRenderer;
-    protected StatTimer renderCaveTimer = StatTimer.get("ChunkOverworldCaveRenderer.render");
+    protected OverworldSurfaceRenderer surfaceRenderer;
+    protected StatTimer renderCaveTimer = StatTimer.get("OverworldCaveRenderer.render");
 
     protected Strata strata = new Strata("OverworldCave", 40, 8, true);
     protected float defaultDim = .8f;
-
 
     /**
      * Takes an instance of the surface renderer in order to do a prepass when the surface
      * intersects the slice being mapped.
      */
-    public ChunkOverworldCaveRenderer(ChunkOverworldSurfaceRenderer surfaceRenderer)
+    public OverworldCaveRenderer(OverworldSurfaceRenderer surfaceRenderer)
     {
         this.surfaceRenderer = surfaceRenderer;
         updateOptions();
+
+        slopeMin = 0.2f;
+        slopeMax = 1.1f;
+        primaryDownslopeMultiplier = .7f;
+        primaryUpslopeMultiplier = 1.05f;
+        secondaryDownslopeMultiplier = .99f;
+        secondaryUpslopeMultiplier = 1.01f;
     }
 
     /**
@@ -159,7 +169,7 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
                         // No surface?
                         if (surfaceRenderer == null)
                         {
-                            if (strata.blocksFound)
+                            if (strata.isBlocksFound())
                             {
                                 paintBlackBlock(x, z, g2D);
                             }
@@ -229,7 +239,7 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
 
                 if (!blockMD.isAir())
                 {
-                    strata.blocksFound = true;
+                    strata.setBlocksFound(true);
                     blockAboveMD = dataCache.getBlockMD(chunkMd, x, y + 1, z);
 
                     if (blockMD.isLava() && blockAboveMD.isLava())
@@ -294,22 +304,22 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
                 stratum = strata.pop(this, true);
 
                 // Simple surface render
-                if (strata.renderCaveColor == null)
+                if (strata.getRenderCaveColor() == null)
                 {
-                    strata.renderCaveColor = stratum.caveColor;
+                    strata.setRenderCaveColor(stratum.getCaveColor());
                 }
                 else
                 {
-                    strata.renderCaveColor = RGB.blendWith(strata.renderCaveColor, stratum.caveColor, stratum.blockMD.getAlpha());
+                    strata.setRenderCaveColor(RGB.blendWith(strata.getRenderCaveColor(), stratum.getCaveColor(), stratum.getBlockMD().getAlpha()));
                 }
 
-                blockMD = stratum.blockMD;
+                blockMD = stratum.getBlockMD();
                 strata.release(stratum);
 
             } // end color stack
 
             // Shouldn't happen
-            if (strata.renderCaveColor == null)
+            if (strata.getRenderCaveColor() == null)
             {
                 paintBadBlock(x, y, z, g2D);
                 return false;
@@ -321,13 +331,13 @@ public class ChunkOverworldCaveRenderer extends BaseRenderer implements IChunkRe
                 float slope = getSlope(chunkMd, blockMD, neighbors, x, vSlice, z);
                 if (slope != 1f)
                 {
-                    strata.renderCaveColor = RGB.bevelSlope(strata.renderCaveColor, slope);
+                    strata.setRenderCaveColor(RGB.bevelSlope(strata.getRenderCaveColor(), slope));
                 }
             }
 
             // And draw to the actual chunkimage
             g2D.setComposite(OPAQUE);
-            g2D.setPaint(RGB.paintOf(strata.renderCaveColor));
+            g2D.setPaint(RGB.paintOf(strata.getRenderCaveColor()));
             g2D.fillRect(x, z, 1, 1);
         }
         catch (RuntimeException e)
