@@ -2,8 +2,11 @@ package net.techbrew.journeymap.data;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import com.google.common.cache.CacheStats;
 import com.google.common.cache.LoadingCache;
+import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -15,10 +18,7 @@ import net.techbrew.journeymap.model.*;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -41,7 +41,7 @@ public class DataCache
     final LoadingCache<Entity, DrawEntityStep> entityDrawSteps;
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
     final LoadingCache<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadata;
-    final LoadingCache<String, BlockMD> blockMetadata;
+    final LoadingCache<Block, HashMap<Integer,BlockMD>> blockMetadata;
     final BlockMDCache blockMetadataLoader;
 
     // Private constructor
@@ -85,7 +85,7 @@ public class DataCache
         chunkMetadata = getCacheBuilder().expireAfterWrite(chunkTimeout, TimeUnit.MILLISECONDS).build(new ChunkMD.SimpleCacheLoader());
 
         blockMetadataLoader = new BlockMDCache();
-        blockMetadata = getCacheBuilder().initialCapacity(256).build(blockMetadataLoader);
+        blockMetadata = getCacheBuilder().initialCapacity(GameData.getBlockRegistry().getKeys().size()).build(blockMetadataLoader);
     }
 
     // Get singleton instance.  Concurrency-safe.

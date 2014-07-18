@@ -27,7 +27,7 @@ import static net.techbrew.journeymap.model.BlockMD.Flag.*;
 /**
  * Created by Mark on 7/14/2014.
  */
-public class BlockMDCache extends CacheLoader<String, BlockMD>
+public class BlockMDCache extends CacheLoader<Block, HashMap<Integer,BlockMD>>
 {
     CoreProperties coreProperties = JourneyMap.getInstance().coreProperties;
 
@@ -138,81 +138,21 @@ public class BlockMDCache extends CacheLoader<String, BlockMD>
 
 
     @Override
-    public BlockMD load(String key) throws Exception
+    public HashMap<Integer,BlockMD> load(Block key) throws Exception
     {
-        String modId = null;
-        String name = null;
-        Integer meta = null;
-
-        try
-        {
-            // Instead of split, defensively use first/last positions
-            // in case some schlub puts a colon in the block name
-            int firstColon = key.indexOf(':');
-            int lastColon = key.lastIndexOf(':');
-            modId = key.substring(0, firstColon);
-            name = key.substring(firstColon+1, lastColon);
-            meta = Integer.valueOf(key.substring(lastColon+1));
-        }
-        catch (Exception e)
-        {
-            JourneyMap.getLogger().warning(String.format("Bad key %s because %s, returning AIR", key, e));
-            return AIRBLOCK;
-        }
-
-        // Find the block
-        Block block = GameRegistry.findBlock(modId, name);
-        if(block==null)
-        {
-            block = GameRegistry.findBlock(null, name);
-            if(block==null)
-            {
-                if(name.equals("Air")) {
-                    return AIRBLOCK;
-                }
-                else
-                {
-                    JourneyMap.getLogger().warning(String.format("Block not found for key %s, returning Error Block", key));
-                    return new BlockMD("ERROR-" + block.getClass().getName(), Blocks.air, meta, 0f, BlockMD.Flag.Error, BlockMD.Flag.HasAir);
-                }
-            }
-        }
-
-        // Get the UID
-        GameRegistry.UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(block);
-
-        // Find the display name
-        try {
-            // Gotta love this.  TODO: Is there a better way?
-            Item item = Item.getItemFromBlock(block);
-            ItemStack stack = new ItemStack(item, 1, block.damageDropped(meta));
-            name = stack.getDisplayName();
-        } catch(Throwable t) {
-            JourneyMap.getLogger().fine("Displayname not available for " + name);
-        }
-
-        String prefix = "minecraft".equals(modId) ? "" : (modId + ":");
-        String displayName = String.format("%s%s:%s", prefix, name, meta);
-
-        BlockMD blockMD = new BlockMD(displayName, block, meta, getAlpha(block), getFlags(uid));
-
-        return blockMD;
+        return new HashMap<Integer,BlockMD>(16);
     }
 
     /**
      * Produces a BlockMD instance from chunk-local coords.
      */
-    public BlockMD getBlockMD(LoadingCache<String, BlockMD> cache, ChunkMD chunkMd, int x, int y, int z)
+    public BlockMD getBlockMD(LoadingCache<Block, HashMap<Integer,BlockMD>> cache, ChunkMD chunkMd, int x, int y, int z)
     {
-        Block block;
-        int meta;
-        boolean isAir;
-
         try
         {
             if (y >= 0)
             {
-                block = chunkMd.getBlock(x, y, z);
+                Block block = chunkMd.getBlock(x, y, z);
 
                 if(block instanceof BlockAir)
                 {
@@ -220,9 +160,20 @@ public class BlockMDCache extends CacheLoader<String, BlockMD>
                 }
                 else
                 {
-                    meta = chunkMd.stub.getBlockMetadata(x, y, z);
-                    String key = toCacheKeyString(block, meta);
-                    return cache.get(key);
+                    HashMap<Integer, BlockMD> map = cache.get(block);
+                    int meta = chunkMd.stub.getBlockMetadata(x, y, z);
+                    BlockMD blockMD = map.get(meta);
+
+                    synchronized (this)
+                    {
+                        if (blockMD == null)
+                        {
+                            blockMD = createBlockMD(block, meta);
+                            map.put(meta, blockMD);
+                        }
+                    }
+
+                    return blockMD;
                 }
             }
             else
@@ -235,6 +186,31 @@ public class BlockMDCache extends CacheLoader<String, BlockMD>
             JourneyMap.getLogger().severe(String.format("Can't get blockId/meta for chunk %s,%s block %s,%s,%s : %s", chunkMd.stub.xPosition, chunkMd.stub.zPosition, x ,y ,z, LogFormatter.toString(e)));
             return BlockMDCache.AIRBLOCK;
         }
+    }
+
+    private BlockMD createBlockMD(Block block, int meta)
+    {
+        // Get the UID
+        GameRegistry.UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(block);
+
+        // Find the display name
+        String name = uid.name;
+        try
+        {
+            // Gotta love this.  TODO: Is there a better way?
+            Item item = Item.getItemFromBlock(block);
+            ItemStack stack = new ItemStack(item, 1, block.damageDropped(meta));
+            name = stack.getDisplayName();
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().fine("Displayname not available for " + name);
+        }
+
+        String prefix = "minecraft".equals(uid.modId) ? "" : (uid.modId + ":");
+        String displayName = String.format("%s%s:%s", prefix, name, meta);
+
+        return new BlockMD(displayName, block, meta, getAlpha(block), getFlags(uid));
     }
 
     public static String toCacheKeyString(Block block, int meta)

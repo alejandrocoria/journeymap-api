@@ -27,7 +27,6 @@ public class BlockMD
     private Integer color;
     private float alpha;
 
-
     BlockMD(Block block, int meta, float alpha, BlockMD.Flag... flags)
     {
         this(null, block, meta, alpha, flags.length == 0 ? EnumSet.noneOf(BlockMD.Flag.class) : EnumSet.copyOf(Arrays.asList(flags)));
@@ -145,7 +144,7 @@ public class BlockMD
 
     public boolean isAir()
     {
-        return getBlock() instanceof BlockAir || hasFlag(Flag.HasAir) || block.getMaterial() == Material.air;
+        return getBlock() instanceof BlockAir ||hasFlag(Flag.HasAir) || block.getMaterial() == Material.air;
     }
 
     public boolean isIce()
