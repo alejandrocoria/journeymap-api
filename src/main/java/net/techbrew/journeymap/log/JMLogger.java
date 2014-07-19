@@ -22,9 +22,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 public class JMLogger
 {
@@ -69,8 +67,28 @@ public class JMLogger
                 logFile.getParentFile().mkdirs();
             }
 
+            LogFormatter formatter = new LogFormatter();
+
+            // Fix console format
+            ConsoleHandler consoleHandler = null;
+            for(Handler handler : logger.getHandlers())
+            {
+                if(handler instanceof ConsoleHandler)
+                {
+                    consoleHandler = (ConsoleHandler) handler;
+                    break;
+                }
+            }
+            if(consoleHandler==null)
+            {
+                consoleHandler = new ConsoleHandler();
+                logger.addHandler(consoleHandler);
+            }
+            consoleHandler.setFormatter(formatter);
+
+            // Set file format
             fileHandler = new java.util.logging.FileHandler(logFile.getAbsolutePath(), 0, 1, false);
-            fileHandler.setFormatter(new LogFormatter());
+            fileHandler.setFormatter(formatter);
             logger.addHandler(fileHandler);
 
             // Add shutdown hook

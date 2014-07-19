@@ -13,37 +13,62 @@ import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
 import java.awt.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by mwoodman on 7/3/2014.
  */
 public class Stratum
 {
+    private static AtomicInteger IDGEN = new AtomicInteger(0);
+
+    private final int id;
+
     private ChunkMD chunkMd;
     private BlockMD blockMD;
     private int x;
     private int y;
     private int z;
-    private Integer lightLevel;
-    private Integer lightOpacity;
+    private int lightLevel;
+    private int lightOpacity;
     private boolean isWater;
     private Integer dayColor;
     private Integer nightColor;
     private Integer caveColor;
+    private boolean uninitialized = true;
+
+    Stratum()
+    {
+        this.id = IDGEN.incrementAndGet();
+    }
 
     Stratum set(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, Integer lightLevel)
     {
-        this.setChunkMd(chunkMd);
-        this.setBlockMD(blockMD);
-        this.setX(x);
-        this.setY(y);
-        this.setZ(z);
-        this.setWater(blockMD != null && blockMD.isWater());
-        this.setLightLevel((blockMD == null) ? null : (lightLevel != null) ? lightLevel : chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z));
-        this.setLightOpacity((blockMD == null) ? null : chunkMd.getLightOpacity(blockMD, x, y, z));
-        setDayColor(null);
-        setNightColor(null);
-        setCaveColor(null);
+        if(chunkMd==null || blockMD==null)
+        {
+            throw new IllegalStateException(String.format("Can't have nulls: %s, %s", chunkMd, blockMD));
+        }
+        try
+        {
+            this.setChunkMd(chunkMd);
+            this.setBlockMD(blockMD);
+            this.setX(x);
+            this.setY(y);
+            this.setZ(z);
+            this.setWater(blockMD.isWater());
+            this.setLightLevel((lightLevel != null) ? lightLevel : chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z));
+            this.setLightOpacity(chunkMd.getLightOpacity(blockMD, x, y, z));
+            setDayColor(null);
+            setNightColor(null);
+            setCaveColor(null);
+            this.uninitialized = false;
+
+           // System.out.println("    SET " + this);
+        }
+        catch(RuntimeException t)
+        {
+            throw t;
+        }
         return this;
     }
 
@@ -84,17 +109,25 @@ public class Stratum
     @Override
     public String toString()
     {
-        return "Stratum{" +
-                "x=" + getX() +
-                ", y=" + getY() +
-                ", z=" + getZ() +
-                ", lightLevel=" + getLightLevel() +
-                ", lightOpacity=" + getLightOpacity() +
-                ", isWater=" + isWater() +
-                ", dayColor=" + (getDayColor() == null ? null : new Color(getDayColor())) +
-                ", nightColor=" + (getNightColor() == null ? null : new Color(getNightColor())) +
-                ", caveColor=" + (getCaveColor() == null ? null : new Color(getCaveColor())) +
-                '}';
+        String common = "Stratum{" + "id=" + id +", uninitialized=" + uninitialized + "%s}";
+
+        if(!uninitialized)
+        {
+            return String.format(common,
+                    ", x=" + getX() +
+                    ", y=" + getY() +
+                    ", z=" + getZ() +
+                    ", lightLevel=" + getLightLevel() +
+                    ", lightOpacity=" + getLightOpacity() +
+                    ", isWater=" + isWater() +
+                    ", dayColor=" + (getDayColor() == null ? null : new Color(getDayColor())) +
+                    ", nightColor=" + (getNightColor() == null ? null : new Color(getNightColor())) +
+                    ", caveColor=" + (getCaveColor() == null ? null : new Color(getCaveColor())) );
+        }
+        else
+        {
+            return String.format(common, "");
+        }
     }
 
     public ChunkMD getChunkMd()
@@ -147,22 +180,22 @@ public class Stratum
         this.z = z;
     }
 
-    public Integer getLightLevel()
+    public int getLightLevel()
     {
         return lightLevel;
     }
 
-    public void setLightLevel(Integer lightLevel)
+    public void setLightLevel(int lightLevel)
     {
         this.lightLevel = lightLevel;
     }
 
-    public Integer getLightOpacity()
+    public int getLightOpacity()
     {
         return lightOpacity;
     }
 
-    public void setLightOpacity(Integer lightOpacity)
+    public void setLightOpacity(int lightOpacity)
     {
         this.lightOpacity = lightOpacity;
     }
@@ -205,5 +238,29 @@ public class Stratum
     public void setCaveColor(Integer caveColor)
     {
         this.caveColor = caveColor;
+    }
+
+    public boolean isUninitialized()
+    {
+        return this.uninitialized;
+    }
+
+    public void clear()
+    {
+        this.uninitialized = true;
+        this.setChunkMd(null);
+        this.setBlockMD(null);
+        this.setX(0);
+        this.setY(-1);
+        this.setZ(0);
+        this.setWater(false);
+        this.setLightLevel(-1);
+        this.setLightOpacity(-1);
+        setDayColor(null);
+        setNightColor(null);
+        setCaveColor(null);
+
+        // TODO REMOVE
+       // System.out.println("CLEARED " + this);
     }
 }

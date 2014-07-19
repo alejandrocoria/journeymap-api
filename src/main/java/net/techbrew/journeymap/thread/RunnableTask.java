@@ -41,7 +41,8 @@ public class RunnableTask implements Runnable
     {
         try
         {
-            taskExecutor.submit(innerRunnable).get(timeout, TimeUnit.MILLISECONDS);
+            // TODO ENABLE WHEN NOT DEBUGGING
+            taskExecutor.submit(innerRunnable);//.get(timeout, TimeUnit.MILLISECONDS);
         }
         catch (Throwable t)
         {

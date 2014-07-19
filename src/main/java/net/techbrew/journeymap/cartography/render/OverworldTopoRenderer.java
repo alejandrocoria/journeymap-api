@@ -109,10 +109,10 @@ public class OverworldTopoRenderer extends OverworldSurfaceRenderer implements I
             for (int x = 0; x < 16; x++)
             {
                 h = chunkMd.getSurfaceBlockHeight(x, z, ignoreWater);
-                hN = (z == 0) ? chunkMd.getSurfaceBlockHeight(x, z, 0, -1, neighbors, h, ignoreWater) : chunkMd.getSurfaceBlockHeight(x, z - 1, ignoreWater);
-                hW = (x == 0) ? chunkMd.getSurfaceBlockHeight(x, z, -1, 0, neighbors, h, ignoreWater) : chunkMd.getSurfaceBlockHeight(x - 1, z, ignoreWater);
-                hS = (z == 15) ? chunkMd.getSurfaceBlockHeight(x, z, 0, 1, neighbors, h, ignoreWater) : chunkMd.getSurfaceBlockHeight(x, z + 1, ignoreWater);
-                hE = (x == 15) ? chunkMd.getSurfaceBlockHeight(x, z, 1, 0, neighbors, h, ignoreWater) : chunkMd.getSurfaceBlockHeight(x + 1, z, ignoreWater);
+                hN = (z == 0) ? chunkMd.getSurfaceBlockHeight(x, z, 0, -1, neighbors, h, ignoreWater, true) : chunkMd.getSurfaceBlockHeight(x, z - 1, ignoreWater, true);
+                hW = (x == 0) ? chunkMd.getSurfaceBlockHeight(x, z, -1, 0, neighbors, h, ignoreWater, true) : chunkMd.getSurfaceBlockHeight(x - 1, z, ignoreWater, true);
+                hS = (z == 15) ? chunkMd.getSurfaceBlockHeight(x, z, 0, 1, neighbors, h, ignoreWater, true) : chunkMd.getSurfaceBlockHeight(x, z + 1, ignoreWater, true);
+                hE = (x == 15) ? chunkMd.getSurfaceBlockHeight(x, z, 1, 0, neighbors, h, ignoreWater, true) : chunkMd.getSurfaceBlockHeight(x + 1, z, ignoreWater, true);
 
                 h = (int) h >> 3;
                 hN = (int) hN >> 3;

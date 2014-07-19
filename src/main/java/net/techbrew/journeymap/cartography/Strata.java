@@ -15,6 +15,7 @@ import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -26,11 +27,10 @@ public class Strata
     final DataCache dataCache = DataCache.instance();
     private final boolean mapCaveLighting = JourneyMap.getInstance().coreProperties.mapCaveLighting.get();
     final String name;
+
     final int initialPoolSize;
     final int poolGrowthIncrement;
 
-    final List<Stratum> poolFree;
-    final List<Stratum> poolUsed;
     private final boolean underground;
     private Integer topY = null;
     private Integer bottomY = null;
@@ -43,6 +43,7 @@ public class Strata
     private Integer renderCaveColor = null;
     private int lightAttenuation = 0;
     private boolean blocksFound = false;
+    private Stack<Stratum> unusedStack = new Stack<Stratum>();
     private Stack<Stratum> stack = new Stack<Stratum>();
 
     public Strata(String name, int initialPoolSize, int poolGrowthIncrement, boolean underground)
@@ -51,30 +52,27 @@ public class Strata
         this.underground = underground;
         this.initialPoolSize = initialPoolSize;
         this.poolGrowthIncrement = poolGrowthIncrement;
-        poolFree = new ArrayList<Stratum>(initialPoolSize);
-        poolUsed = new ArrayList<Stratum>(initialPoolSize);
         growFreePool(initialPoolSize);
     }
 
     private Stratum allocate()
     {
-        if (poolFree.isEmpty())
+        if (unusedStack.isEmpty())
         {
-            int amount = poolUsed.isEmpty() ? initialPoolSize : poolGrowthIncrement;
+            int amount = stack.isEmpty() ? initialPoolSize : poolGrowthIncrement;
             growFreePool(amount);
-            JourneyMap.getLogger().info(String.format("Grew Strata pool for '%s' by '%s'. Free: %s, Used: %s", name, amount, poolFree.size(), poolUsed.size()));
+            JourneyMap.getLogger().info(String.format("Grew Strata pool for '%s' by '%s'. Free: %s, Used: %s", name, amount, unusedStack.size(), stack.size()));
         }
 
-        Stratum bc = poolFree.remove(0);
-        poolUsed.add(bc);
-        return bc;
+        stack.push(unusedStack.pop());
+        return stack.peek();
     }
 
     private void growFreePool(int amount)
     {
         for (int i = 0; i < amount; i++)
         {
-            poolFree.add(new Stratum());
+            unusedStack.push(new Stratum());
         }
     }
 
@@ -92,19 +90,24 @@ public class Strata
         setLightAttenuation(0);
         setBlocksFound(false);
 
-        stack.clear();
-
-        while (!poolUsed.isEmpty())
+        while (!stack.isEmpty())
         {
-            release(poolUsed.get(0));
+            release(stack.peek());
         }
     }
 
     public void release(Stratum stratum)
     {
-        stratum.set(null, null, -1, -1, -1, null);
-        poolUsed.remove(stratum);
-        poolFree.add(stratum);
+        if(stratum==null)
+        {
+            JourneyMap.getLogger().warning("Null stratum in pool.");
+            return;
+        }
+        else
+        {
+            stratum.clear();
+            unusedStack.add(0,stack.pop());
+        }
     }
 
     public Stratum push(final ChunkMD.Set neighbors, ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
@@ -119,8 +122,9 @@ public class Strata
 //            StatTimer timer = blockMD.isWater() ? StatTimer.get("Strata.push-water") : StatTimer.get("Strata.push");
 //            timer.start();
 
-            // Alocate from pool, push to stack, and set vars on stratum
-            Stratum stratum = stack.push(allocate().set(chunkMd, blockMD, x, y, z, lightLevel));
+            // Alocate to stack, and set vars on stratum
+            Stratum stratum = allocate();
+            stratum.set(chunkMd, blockMD, x, y, z, lightLevel);
 
             // Update Strata's basic data
             setTopY((getTopY() == null) ? y : Math.max(getTopY(), y));
@@ -157,24 +161,33 @@ public class Strata
         }
     }
 
-    public Stratum pop(IChunkRenderer renderer, boolean ignoreMiddleWater)
+    public Stratum nextUp(IChunkRenderer renderer, boolean ignoreMiddleWater)
     {
-        Stratum stratum = stack.pop();
-        if (stratum == null)
+        Stratum stratum = null;
+        try
         {
-            throw new IllegalStateException("Strata empty, can't pop");
+            stratum = stack.peek();
+            if (stratum.isUninitialized())
+            {
+                throw new IllegalStateException("Stratum wasn't initialized for Strata.nextUp()");
+            }
+
+            setLightAttenuation(Math.max(0, getLightAttenuation() - stratum.getLightOpacity()));
+
+            // Skip middle water blocks
+            if (ignoreMiddleWater && stratum.isWater() && isWaterAbove(stratum) && !stack.isEmpty())
+            {
+                release(stratum);
+                return nextUp(renderer, true);
+            }
+
+            renderer.setStratumColors(stratum, getLightAttenuation(), getWaterColor(), isWaterAbove(stratum), isUnderground(), isMapCaveLighting());
+            return stratum;
         }
-
-        setLightAttenuation(Math.max(0, getLightAttenuation() - stratum.getLightOpacity()));
-
-        // Skip middle water blocks
-        if (ignoreMiddleWater && stratum.isWater() && isWaterAbove(stratum))
+        catch(RuntimeException t)
         {
-            return pop(renderer, true);
+            throw t;
         }
-
-        renderer.setStratumColors(stratum, getLightAttenuation(), getWaterColor(), isWaterAbove(stratum), isUnderground(), isMapCaveLighting());
-        return stratum;
     }
 
     int depth()
@@ -235,8 +248,8 @@ public class Strata
                 "name='" + name + '\'' +
                 ", initialPoolSize=" + initialPoolSize +
                 ", poolGrowthIncrement=" + poolGrowthIncrement +
-                ", poolFree=" + poolFree.size() +
-                ", poolUsed=" + poolUsed.size() +
+                ", stack=" + stack.size() +
+                ", unusedStack=" + unusedStack.size() +
                 ", stack=" + stack.size() +
                 ", topY=" + getTopY() +
                 ", bottomY=" + getBottomY() +

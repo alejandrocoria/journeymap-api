@@ -33,15 +33,9 @@ public class EndRenderer extends OverworldCaveRenderer implements IChunkRenderer
      * Get block height within slice.
      */
     @Override
-    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater)
+    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater, boolean ignoreNoShadowBlocks)
     {
-        Integer[][] blockSliceHeights = chunkMd.sliceHeights.get(vSlice);
-        if (blockSliceHeights == null)
-        {
-            blockSliceHeights = new Integer[16][16];
-            chunkMd.sliceHeights.put(vSlice, blockSliceHeights);
-        }
-
+        Integer[][] blockSliceHeights = chunkMd.getSliceBlockHeights(vSlice);
         Integer y = blockSliceHeights[x][z];
 
         if (y != null)

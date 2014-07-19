@@ -20,6 +20,7 @@ import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 import net.techbrew.journeymap.properties.CoreProperties;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -58,12 +59,12 @@ public abstract class BaseRenderer implements IChunkRenderer
     {
         updateOptions();
 
-        // Offsets used for avg heights
+        // Offsets used for primary slope
         primarySlopeOffsets.add(new BlockCoordIntPair(0, -1)); // North
         primarySlopeOffsets.add(new BlockCoordIntPair(-1, 0)); // West
         primarySlopeOffsets.add(new BlockCoordIntPair(-1, -1)); // NorthWest
 
-        // Offsets used for slope calc on non-foliage
+        // Offsets used for secondary slope
         secondarySlopeOffsets.add(new BlockCoordIntPair(-1, -2)); // North of NorthWest
         secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -1)); // West of NorthWest
         secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -2)); // NorthWest of NorthWest
@@ -90,9 +91,9 @@ public abstract class BaseRenderer implements IChunkRenderer
     @Override
     public void setStratumColors(Stratum stratum, int lightAttenuation, Integer waterColor, boolean waterAbove, boolean underground, boolean mapCaveLighting)
     {
-        if (stratum.getLightLevel() == null || stratum.getY() < 0)
+        if (stratum.isUninitialized())
         {
-            throw new IllegalStateException("Stratum wasn't initialized");
+            throw new IllegalStateException("Stratum wasn't initialized for setStratumColors");
         }
 
         // Daylight is the greater of sun light (15) attenuated through the stack and the stratum's inherant light level
@@ -219,11 +220,11 @@ public abstract class BaseRenderer implements IChunkRenderer
                     // Get block height
                     if (isSurface)
                     {
-                        y = chunkMd.getSurfaceBlockHeight(x, z, ignoreWater);
+                        y = chunkMd.getSurfaceBlockHeight(x, z, ignoreWater, true);
                     }
                     else
                     {
-                        y = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, ignoreWater);
+                        y = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, ignoreWater, true);
                     }
 
 
@@ -240,7 +241,6 @@ public abstract class BaseRenderer implements IChunkRenderer
                     {
                         slope *= primaryUpslopeMultiplier;
                     }
-
 
 
                     // Calculate secondary slope
@@ -271,13 +271,15 @@ public abstract class BaseRenderer implements IChunkRenderer
     /**
      * Get block height within slice.  Should lazy-populate sliceHeights.
      */
-    protected abstract int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater);
-
+    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater, boolean ignoreNoShadowBlocks)
+    {
+        throw new NotImplementedException();
+    }
 
     /**
      * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
      */
-    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater, final int offsetX, int offsetZ, ChunkMD.Set neighbors, int defaultVal)
+    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater, boolean ignoreNoShadowBlocks, final int offsetX, int offsetZ, ChunkMD.Set neighbors, int defaultVal)
     {
         ChunkMD chunk = null;
         int blockX = ((chunkMd.coord.chunkXPos << 4) + x + offsetX);
@@ -297,7 +299,7 @@ public abstract class BaseRenderer implements IChunkRenderer
 
         if (chunk != null)
         {
-            return getSliceBlockHeight(chunk, blockX & 15, vSlice, blockZ & 15, sliceMinY, sliceMaxY, ignoreWater);
+            return getSliceBlockHeight(chunk, blockX & 15, vSlice, blockZ & 15, sliceMinY, sliceMaxY, ignoreWater, true);
         }
         else
         {
@@ -313,11 +315,11 @@ public abstract class BaseRenderer implements IChunkRenderer
         {
             if (isSurface)
             {
-                slopeSum += ((y * 1f) / chunkMd.getSurfaceBlockHeight(x, z, offset.x, offset.z, neighbors, y, ignoreWater));
+                slopeSum += ((y * 1f) / chunkMd.getSurfaceBlockHeight(x, z, offset.x, offset.z, neighbors, y, ignoreWater, true));
             }
             else
             {
-                slopeSum += ((y * 1f) / getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, ignoreWater, offset.x, offset.z, neighbors, y));
+                slopeSum += ((y * 1f) / getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, ignoreWater, true, offset.x, offset.z, neighbors, y));
             }
         }
         return slopeSum / offsets.size();
@@ -346,12 +348,18 @@ public abstract class BaseRenderer implements IChunkRenderer
     {
         Float[][] slopes = (vSlice == null) ? chunkMd.surfaceSlopes : chunkMd.sliceSlopes.get(vSlice);
 
-        if (slopes == null)
+        if (slopes == null || slopes[x][z]==null)
         {
             slopes = populateSlopes(chunkMd, vSlice, neighbors);
         }
 
-        return slopes[x][z];
+        Float slope = slopes[x][z];
+        if(slope==null)
+        {
+            JourneyMap.getLogger().warning("No slope for " + chunkMd + " at " + x + "," + z);
+            slope = 1f;
+        }
+        return slope;
     }
 
 

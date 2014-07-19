@@ -56,7 +56,7 @@ public class OverworldCaveRenderer extends BaseRenderer implements IChunkRendere
      * Render chunk image for caves in the overworld.
      */
     @Override
-    public boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final boolean underground,
+    public synchronized boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final boolean underground,
                           final Integer vSlice, final ChunkMD.Set neighbors)
     {
         if (!underground || vSlice == null)
@@ -301,7 +301,7 @@ public class OverworldCaveRenderer extends BaseRenderer implements IChunkRendere
 
             while (!strata.isEmpty())
             {
-                stratum = strata.pop(this, true);
+                stratum = strata.nextUp(this, true);
 
                 // Simple surface render
                 if (strata.getRenderCaveColor() == null)
@@ -353,15 +353,9 @@ public class OverworldCaveRenderer extends BaseRenderer implements IChunkRendere
      * Get block height within slice.
      */
     @Override
-    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater)
+    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater, boolean ignoreNoShadowBlocks)
     {
-        Integer[][] blockSliceHeights = chunkMd.sliceHeights.get(vSlice);
-        if (blockSliceHeights == null)
-        {
-            blockSliceHeights = new Integer[16][16];
-            chunkMd.sliceHeights.put(vSlice, blockSliceHeights);
-        }
-
+        Integer[][] blockSliceHeights = chunkMd.getSliceBlockHeights(vSlice);
         Integer y = blockSliceHeights[x][z];
 
         if (y != null)

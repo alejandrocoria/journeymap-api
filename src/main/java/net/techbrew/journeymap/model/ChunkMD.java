@@ -41,10 +41,13 @@ public class ChunkMD
     public final Boolean hasNoSky;
     public final ChunkStub stub;
     public final ChunkCoordIntPair coord;
-    public volatile Integer[][] surfaceHeights;
+
+    private volatile Integer[][] surfaceHeights;
+    private volatile HashMap<Integer, Integer[][]> sliceHeights;
+
     public volatile Float[][] surfaceSlopes;
-    public volatile HashMap<Integer, Integer[][]> sliceHeights;
     public volatile HashMap<Integer, Float[][]> sliceSlopes;
+
     public Boolean render;
     protected boolean current;
 
@@ -101,11 +104,30 @@ public class ChunkMD
     }
 
     /**
+     * Get the height of the block at the x, z coordinate in the chunk, optionally ignoring NoShadow blocks.
+     * Ignoring NoShadow blocks won't change the saved surfaceHeights.
+     */
+    public int getSurfaceBlockHeight(int x, int z, boolean ignoreWater, boolean ignoreNoShadowBlocks)
+    {
+        int y = getSurfaceBlockHeight(x, z, ignoreWater);
+        if(ignoreNoShadowBlocks)
+        {
+            BlockMD blockMD = dataCache.getBlockMD(this, x, y, z);
+            while (y > 0 && blockMD.hasFlag(BlockMD.Flag.NoShadow) || blockMD.isAir() || (ignoreWater && (blockMD.isWater())))
+            {
+                y--;
+                blockMD = dataCache.getBlockMD(this, x, y, z);
+            }
+        }
+        return y;
+    }
+
+    /**
      * Added because getHeightValue() sometimes returns an air block.
      * Returns the value in the height map at this x, z coordinate in the chunk, disregarding
      * blocks that shouldn't be used as the top block.
      */
-    public int getSurfaceBlockHeight(int x, int z, boolean ignoreWater)
+    public Integer getSurfaceBlockHeight(int x, int z, boolean ignoreWater)
     {
         Integer y = this.surfaceHeights[x][z];
 
@@ -120,7 +142,7 @@ public class ChunkMD
         {
             BlockMD blockMD = dataCache.getBlockMD(this, x, y, z);
 
-            while (y > 0 && blockMD != null && (blockMD.isAir() || (ignoreWater && (blockMD.isWater())) || blockMD.hasFlag(BlockMD.Flag.NoShadow)))
+            while (y > 0 && blockMD.isAir() || (ignoreWater && (blockMD.isWater())))
             {
                 y--;
                 blockMD = dataCache.getBlockMD(this, x, y, z);
@@ -131,6 +153,11 @@ public class ChunkMD
             JourneyMap.getLogger().warning("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
         }
 
+        if(y==null)
+        {
+            y = stub.getHeightValue(x, z);
+        }
+
         this.surfaceHeights[x][z] = y;
 
         return Math.max(0, y);
@@ -139,7 +166,7 @@ public class ChunkMD
     /**
      * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
      */
-    public Float getSurfaceBlockHeight(int x, int z, int offsetX, int offsetZ, ChunkMD.Set neighbors, float defaultVal, boolean ignoreWater)
+    public Float getSurfaceBlockHeight(int x, int z, int offsetX, int offsetZ, ChunkMD.Set neighbors, float defaultVal, boolean ignoreWater, boolean ignoreNoShadowBlocks)
     {
         ChunkMD chunk = null;
         int blockX = ((this.coord.chunkXPos << 4) + x + offsetX);
@@ -159,12 +186,23 @@ public class ChunkMD
 
         if (chunk != null)
         {
-            return (float) chunk.getSurfaceBlockHeight(blockX & 15, blockZ & 15, ignoreWater);
+            return (float) chunk.getSurfaceBlockHeight(blockX & 15, blockZ & 15, ignoreWater, ignoreNoShadowBlocks);
         }
         else
         {
             return defaultVal;
         }
+    }
+
+    public Integer[][] getSliceBlockHeights(Integer vSlice)
+    {
+        Integer[][] blockSliceHeights = sliceHeights.get(vSlice);
+        if (blockSliceHeights == null)
+        {
+            blockSliceHeights = new Integer[16][16];
+            sliceHeights.put(vSlice, blockSliceHeights);
+        }
+        return blockSliceHeights;
     }
 
 

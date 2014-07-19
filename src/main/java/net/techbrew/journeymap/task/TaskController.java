@@ -46,7 +46,7 @@ public class TaskController
     {
         if (taskExecutor == null || taskExecutor.isShutdown())
         {
-            taskExecutor = Executors.newScheduledThreadPool(2, new JMThreadFactory("task")); //$NON-NLS-1$
+            taskExecutor = Executors.newScheduledThreadPool(1, new JMThreadFactory("task")); //$NON-NLS-1$
             queue.clear();
         }
     }
