@@ -37,7 +37,7 @@ public abstract class BaseRenderer implements IChunkRenderer
     static final int BLACK = Color.black.getRGB();
     static final int VOID = RGB.toInteger(17, 12, 25);
     public static AlphaComposite OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
-    protected final float[] defaultFog = new float[]{0, 0, 0};
+    protected final float[] defaultFog = new float[]{0, 0, .1f};
     protected DataCache dataCache = DataCache.instance();
     protected CoreProperties coreProperties = JourneyMap.getInstance().coreProperties;
     protected boolean mapBathymetry;
@@ -54,6 +54,8 @@ public abstract class BaseRenderer implements IChunkRenderer
     protected float primaryUpslopeMultiplier = 1.25f;
     protected float secondaryDownslopeMultiplier = .95f;
     protected float secondaryUpslopeMultiplier = 1.1f;
+
+    protected float moonlightLevel = 3.5f;
 
     public BaseRenderer()
     {
@@ -99,8 +101,8 @@ public abstract class BaseRenderer implements IChunkRenderer
         // Daylight is the greater of sun light (15) attenuated through the stack and the stratum's inherant light level
         float daylightDiff = Math.max(1, Math.max(stratum.getLightLevel(), 15 - lightAttenuation)) / 15f;
 
-        // Nightlight is the greater of moon light (4 attenuated through the stack and the stratum's inherant light level
-        float nightLightDiff = Math.max(5, Math.max(stratum.getLightLevel(), 4 - lightAttenuation)) / 15f;
+        // Nightlight is the greater of moon light (4) attenuated through the stack and the stratum's inherant light level
+        float nightLightDiff = Math.max(moonlightLevel, Math.max(stratum.getLightLevel(), moonlightLevel - lightAttenuation)) / 15f;
 
         int basicColor = stratum.isWater() ? waterColor : stratum.getBlockMD().getColor(stratum.getChunkMd(), stratum.getX(), stratum.getY(), stratum.getZ());
         if (stratum.getBlockMD().getBlock() == Blocks.glowstone || stratum.getBlockMD().getBlock() == Blocks.lit_redstone_lamp)
