@@ -1,16 +1,9 @@
-/*
- * JourneyMap mod for Minecraft
- *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
- */
-
 package net.techbrew.journeymap.data;
 
 import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.integrated.IntegratedServer;
@@ -22,7 +15,6 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
-import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import org.lwjgl.opengl.Display;
 
@@ -36,7 +28,7 @@ import java.util.*;
 import java.util.logging.Level;
 
 /**
- * Provides world properties and some game settings.
+ * Provides world properties
  *
  * @author mwoodman
  */
@@ -47,14 +39,12 @@ public class WorldData extends CacheLoader<Class, WorldData>
     long time;
     boolean hardcore;
     boolean singlePlayer;
-    Map<Feature, Boolean> features;
+    Map<Feature,Boolean> features;
     String jm_version;
     String latest_journeymap_version;
     String mc_version;
     String mod_name = JourneyMap.MOD_NAME;
     int browser_poll;
-    String iconSetName;
-    List<String> iconSetNames;
 
     /**
      * Constructor.
@@ -63,38 +53,65 @@ public class WorldData extends CacheLoader<Class, WorldData>
     {
     }
 
+    @Override
+    public WorldData load(Class aClass) throws Exception
+    {
+        Minecraft mc = FMLClientHandler.instance().getClient();
+        WorldInfo worldInfo = mc.theWorld.getWorldInfo();
+
+        IntegratedServer server = mc.getIntegratedServer();
+        boolean multiplayer = server == null || server.getPublic();
+
+        name = getWorldName(mc);
+        dimension = mc.theWorld.provider.dimensionId;
+        hardcore = worldInfo.isHardcoreModeEnabled();
+        singlePlayer = !multiplayer;
+        time = mc.theWorld.getWorldTime() % 24000L;
+        features = FeatureManager.getAllowedFeatures();
+
+        mod_name = JourneyMap.MOD_NAME;
+        jm_version = JourneyMap.JM_VERSION;
+        latest_journeymap_version = VersionCheck.getVersionAvailable();
+        mc_version = Display.getTitle().split("\\s(?=\\d)")[1];
+        browser_poll = Math.max(1000, JourneyMap.getInstance().webMapProperties.browserPoll.get());
+
+        return this;
+    }
+
+
     public static boolean isHardcoreAndMultiplayer()
     {
         WorldData world = DataCache.instance().getWorld(false);
         return world.hardcore && !world.singlePlayer;
     }
 
-    private static String getServerHash()
-    {
-        String serverName = getServerName();
-        try
-        {
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
-            if (md5 != null)
-            {
-                byte[] bServerName = serverName.getBytes("UTF-8");
-                byte[] hashed = md5.digest(bServerName);
-                BigInteger bigInt = new BigInteger(1, hashed);
-                String md5Hash = bigInt.toString(16);
-                while (md5Hash.length() < 32)
-                {
-                    md5Hash = "0" + md5Hash;
-                }
-                return md5Hash;
-            }
-        }
-        catch (Exception ex)
-        {
-        }
-        return serverName;
-    }
 
     private static String getServerName()
+    {
+        try
+        {
+            Minecraft mc = FMLClientHandler.instance().getClient();
+            ServerData serverData = mc.func_147104_D(); // getServerData()
+
+            if(serverData!=null)
+            {
+                String serverName = serverData.serverName;
+                if(serverName!=null)
+                {
+                    return serverName;
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().severe("Couldn't get server name: " + LogFormatter.toString(t));
+        }
+
+        // Fallback
+        return getLegacyServerName();
+    }
+
+    private static String getLegacyServerName()
     {
         try
         {
@@ -116,25 +133,6 @@ public class WorldData extends CacheLoader<Class, WorldData>
         return "server";
     }
 
-    public static int getServerPort()
-    {
-        try
-        {
-            NetHandlerPlayClient sendQueue = FMLClientHandler.instance().getClient().getNetHandler();
-            SocketAddress socketAddress = sendQueue.getNetworkManager().getSocketAddress();
-            if ((socketAddress != null && socketAddress instanceof InetSocketAddress))
-            {
-                InetSocketAddress inetAddr = (InetSocketAddress) socketAddress;
-                return inetAddr.getPort();
-            }
-        }
-        catch (Throwable t)
-        {
-            JourneyMap.getLogger().severe("Couldn't get server port: " + LogFormatter.toString(t));
-        }
-        return 0;
-    }
-
     /**
      * Get the current world name.
      *
@@ -143,7 +141,17 @@ public class WorldData extends CacheLoader<Class, WorldData>
      */
     public static String getWorldName(Minecraft mc)
     {
+        return getWorldName(mc, false);
+    }
 
+    /**
+     * Get the current world name.
+     *
+     * @param mc
+     * @return
+     */
+    public static String getWorldName(Minecraft mc, boolean useLegacyServerName)
+    {
         // Get the name
         String worldName = null;
         if (mc.isSingleplayer())
@@ -157,13 +165,16 @@ public class WorldData extends CacheLoader<Class, WorldData>
                 return "offline";
             }
             worldName = mc.theWorld.getWorldInfo().getWorldName();
+
+            String serverName = useLegacyServerName ? getLegacyServerName() : getServerName();
+
             if (!"MpServer".equals(worldName))
             {
-                worldName = getServerName() + "_" + worldName;
+                worldName = serverName + "_" + worldName;
             }
             else
             {
-                worldName = getServerName();
+                worldName = serverName;
             }
         }
 
@@ -205,9 +216,9 @@ public class WorldData extends CacheLoader<Class, WorldData>
         JourneyMap.getLogger().log(logLevel, String.format("Using player's provider for dim %s: %s", playerProvider.dimensionId, playerProvider.getDimensionName()));
 
         // Get a provider for the rest
-        for (int dim : requiredDims)
+        for(int dim : requiredDims)
         {
-            if (!dimProviders.containsKey(dim))
+            if(!dimProviders.containsKey(dim))
             {
                 if (DimensionManager.getWorld(dim) != null)
                 {
@@ -244,9 +255,9 @@ public class WorldData extends CacheLoader<Class, WorldData>
         requiredDims.removeAll(dimProviders.keySet());
 
         // Make sure required dimensions are added. Since we got this far without finding providers for them, use fake providers.
-        for (int dim : requiredDims)
+        for(int dim : requiredDims)
         {
-            if (!dimProviders.containsKey(dim))
+            if(!dimProviders.containsKey(dim))
             {
                 WorldProvider provider = new FakeDimensionProvider(dim);
                 dimProviders.put(dim, provider);
@@ -266,34 +277,6 @@ public class WorldData extends CacheLoader<Class, WorldData>
         });
 
         return providerList;
-    }
-
-    @Override
-    public WorldData load(Class aClass) throws Exception
-    {
-        Minecraft mc = FMLClientHandler.instance().getClient();
-        WorldInfo worldInfo = mc.theWorld.getWorldInfo();
-
-        IntegratedServer server = mc.getIntegratedServer();
-        boolean multiplayer = server == null || server.getPublic();
-
-        name = getWorldName(mc);
-        dimension = mc.theWorld.provider.dimensionId;
-        hardcore = worldInfo.isHardcoreModeEnabled();
-        singlePlayer = !multiplayer;
-        time = mc.theWorld.getWorldTime() % 24000L;
-        features = FeatureManager.getAllowedFeatures();
-
-        mod_name = JourneyMap.MOD_NAME;
-        jm_version = JourneyMap.JM_VERSION;
-        latest_journeymap_version = VersionCheck.getVersionAvailable();
-        mc_version = Display.getTitle().split("\\s(?=\\d)")[1];
-        browser_poll = Math.max(1000, JourneyMap.getInstance().webMapProperties.browserPoll.get());
-
-        iconSetName = JourneyMap.getInstance().webMapProperties.entityIconSetName.get();
-        iconSetNames = FileHandler.getMobIconSetNames();
-
-        return this;
     }
 
     /**
@@ -317,7 +300,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         @Override
         public String getDimensionName()
         {
-            return Constants.getString("jm.common.dimension", this.dimensionId);
+            return Constants.getString("JourneyMap.dimension", this.dimensionId);
         }
     }
 }
