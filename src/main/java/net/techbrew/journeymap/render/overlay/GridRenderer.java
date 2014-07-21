@@ -267,13 +267,16 @@ public class GridRenderer
 
     public BlockCoordIntPair getBlockUnderMouse(double mouseX, double mouseY, int screenWidth, int screenHeight)
     {
-        double centerPixelX = screenWidth / 2;
-        double centerPixelZ = screenHeight / 2;
+        double centerPixelX = screenWidth/2.0;
+        double centerPixelZ = screenHeight/2.0;
 
-        int blockSize = (int) Math.pow(2, zoom);
+        double blockSize = (int) Math.pow(2,zoom);
 
-        int x = (int) Math.floor(centerBlockX - ((centerPixelX - mouseX) / blockSize * 2));
-        int z = (int) Math.floor(centerBlockZ - ((centerPixelZ - mouseY) / blockSize * 2));
+        double deltaX = (centerPixelX-mouseX) / blockSize;
+        double deltaZ = (centerPixelZ-mouseY) / blockSize;
+
+        int x = (int) Math.floor(centerBlockX - deltaX);
+        int z = (int) Math.floor(centerBlockZ + deltaZ);
         return new BlockCoordIntPair(x, z);
     }
 
