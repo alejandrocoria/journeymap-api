@@ -160,15 +160,7 @@ public class FileHandler
 
                     if(legacyWorldDir.exists())
                     {
-                        try
-                        {
-                            legacyWorldDir.renameTo(worldDir);
-                            JourneyMap.getLogger().info(String.format("Migrated legacy server folder from %s to %s", legacyWorldName, worldName));
-                        }
-                        catch(Exception e)
-                        {
-                            JourneyMap.getLogger().warning(String.format("Failed to migrate legacy server folder from %s to %s", legacyWorldName, worldName));
-                        }
+                        migrateLegacyServerName(legacyWorldDir, worldDir);
                     }
                 }
                 else
@@ -187,6 +179,38 @@ public class FileHandler
             lastJMWorldDir = worldDir;
         }
         return lastJMWorldDir;
+    }
+
+    private static void migrateLegacyServerName(File legacyWorldDir, File worldDir)
+    {
+        boolean success = false;
+        try
+        {
+            success = legacyWorldDir.renameTo(worldDir);
+            if(!success)
+            {
+                throw new IllegalStateException("Need to rename legacy folder, but not able to");
+            }
+            JourneyMap.getLogger().info(String.format("Migrated legacy server folder from %s to %s", legacyWorldDir.getName(), worldDir.getName()));
+        }
+        catch(Exception e)
+        {
+            JourneyMap.getLogger().warning(String.format("Failed to migrate legacy server folder from %s to %s", legacyWorldDir.getName(), worldDir.getName()));
+
+            String tempName = worldDir.getName() + "__OLD";
+            try
+            {
+                success = legacyWorldDir.renameTo(new File(legacyWorldDir.getParentFile(), tempName));
+            }
+            catch (Exception e2)
+            {
+                success = false;
+            }
+            if(!success)
+            {
+                JourneyMap.getLogger().warning(String.format("Failed to even rename legacy server folder from %s to %s", legacyWorldDir.getName(), tempName));
+            }
+        }
     }
 
     public static File getWaypointDir()
