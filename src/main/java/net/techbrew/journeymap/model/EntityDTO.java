@@ -92,7 +92,7 @@ public class EntityDTO implements Serializable
         if (entity instanceof EntityTameable)
         {
             EntityLivingBase ownerEntity = ((EntityTameable) entity).getOwner();
-            if (ownerEntity != null)
+            if(ownerEntity!=null)
             {
                 owner = ownerEntity.getCommandSenderName();
             }
