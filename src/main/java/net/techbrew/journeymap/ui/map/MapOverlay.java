@@ -371,6 +371,7 @@ public class MapOverlay extends JmUI
             //return;
         }
 
+        // Scale mouse position to Gui Scale coords
         mx = (Mouse.getEventX() * width) / mc.displayWidth;
         my = height - (Mouse.getEventY() * height) / mc.displayHeight - 1;
 
@@ -423,10 +424,8 @@ public class MapOverlay extends JmUI
         }
         if (!guiButtonUsed)
         {
-            BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(mouseX, mouseY, width, height);
-            double gridMouseX = (1.0 * mouseX * gridRenderer.getWidth()) / width;
-            double gridMouseY = (1.0 * mouseY * gridRenderer.getHeight()) / height;
-            layerDelegate.onMouseClicked(mc, gridMouseX, gridMouseY, gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord, mouseButton);
+            BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
+            layerDelegate.onMouseClicked(mc, Mouse.getEventX(), Mouse.getEventY(), gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord, mouseButton);
         }
     }
 
@@ -453,8 +452,8 @@ public class MapOverlay extends JmUI
             if (!Mouse.isButtonDown(0) && isScrolling)
             {
                 isScrolling = false;
-                int mouseDragX = (mx - msx) * 2 / blockSize;
-                int mouseDragY = (my - msy) * 2 / blockSize;
+                int mouseDragX = (mx - msx) * Math.max(1,scaleFactor) / blockSize;
+                int mouseDragY = (my - msy) * Math.max(1,scaleFactor) / blockSize;
                 msx = mx;
                 msy = my;
 
@@ -476,10 +475,8 @@ public class MapOverlay extends JmUI
 
         if (!isScrolling && which == -1)
         {
-            BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(mouseX, mouseY, width, height);
-            double gridMouseX = (1.0 * mouseX * gridRenderer.getWidth()) / width;
-            double gridMouseY = (1.0 * mouseY * gridRenderer.getHeight()) / height;
-            layerDelegate.onMouseMove(mc, gridMouseX, gridMouseY, gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord);
+            BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
+            layerDelegate.onMouseMove(mc, Mouse.getEventX(), Mouse.getEventY(), gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord);
         }
     }
 
@@ -682,8 +679,8 @@ public class MapOverlay extends JmUI
         {
             int blockSize = (int) Math.pow(2, state.currentZoom);
 
-            int mouseDragX = (mx - msx) * 2 / blockSize;
-            int mouseDragY = (my - msy) * 2 / blockSize;
+            int mouseDragX = (mx - msx) * Math.max(1,scaleFactor) / blockSize;
+            int mouseDragY = (my - msy) * Math.max(1,scaleFactor) / blockSize;
 
             xOffset = (mouseDragX * blockSize);
             yOffset = (mouseDragY * blockSize);
@@ -711,6 +708,7 @@ public class MapOverlay extends JmUI
         gridRenderer.updateTextures(state.getMapType(fullMapProperties.showCaves.get()), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0, fullMapProperties);
         gridRenderer.draw(1f, xOffset, yOffset);
         gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale());
+        gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, drawScale, getMapFontScale());
 
         if (fullMapProperties.showSelf.get())
         {

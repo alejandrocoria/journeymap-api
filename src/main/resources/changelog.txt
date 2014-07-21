@@ -12,6 +12,17 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Waypoints didn't show on Full-screen Map
+- Bugfix: Block coordinates under mouse on Full-screen Map were wrong if you didn't use [Minecraft Options -> Video Settings -> Gui Scale: Normal]
+- Bugfix: Player icons wouldn't show on radar if "Show Pets" was enabled
+- Bugfix: Wolves and Ocelots wouldn't always display on radar
+
+## Changelog for JourneyMap 4.0.1:
+- Critical bugfix for waypoints that use UTF-8 character encoding
+- Minor logging bugfix
+- Added a translation for Welsh (cy_GB), courtesy of Fergus Elliott
+
+## Changelog for JourneyMap 4.0.0:
 
 ### New Feature: In-game Waypoint Markers
 - Features include: Labels, waypoint icons, beams (beacons), and font size

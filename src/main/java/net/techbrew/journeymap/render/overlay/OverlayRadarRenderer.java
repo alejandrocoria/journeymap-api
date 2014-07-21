@@ -2,6 +2,7 @@ package net.techbrew.journeymap.render.overlay;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.EntityDTO;
@@ -54,12 +55,17 @@ public class OverlayRadarRenderer
             {
                 isHostile = Boolean.TRUE.equals(dto.hostile);
                 owner = dto.owner;
-                isPet = playername.equals(owner);
+                isPet = playername.equals(owner) && dto.entityLiving instanceof EntityTameable;
 
                 // Skip animals/pets if needed
                 if (filterAnimals && !isHostile)
                 {
-                    if (showPets != isPet)
+                    if (!showPets && isPet)
+                    {
+                        continue;
+                    }
+
+                    if(!showAnimals && !isPet)
                     {
                         continue;
                     }
