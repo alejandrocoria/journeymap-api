@@ -15,6 +15,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.io.RealmsHelper;
 import net.techbrew.journeymap.log.LogFormatter;
 import org.lwjgl.opengl.Display;
 
@@ -90,15 +91,24 @@ public class WorldData extends CacheLoader<Class, WorldData>
     {
         try
         {
-            Minecraft mc = FMLClientHandler.instance().getClient();
-            ServerData serverData = mc.func_147104_D(); // getServerData()
+            String serverName = RealmsHelper.getRealmsServerName();
 
-            if(serverData!=null)
+            if(serverName!=null)
             {
-                String serverName = serverData.serverName;
-                if(serverName!=null)
+                return serverName;
+            }
+            else
+            {
+                Minecraft mc = FMLClientHandler.instance().getClient();
+                ServerData serverData = mc.func_147104_D(); // getServerData()
+
+                if (serverData != null)
                 {
-                    return serverName;
+                    serverName = serverData.serverName;
+                    if (serverName != null)
+                    {
+                        return serverName;
+                    }
                 }
             }
         }
