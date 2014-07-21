@@ -12,6 +12,7 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: (1.7.10 only)  Realms Server data folders were changing because of dynamic IP addresses.  Now using server name instead of socket-derived host name.
 - Bugfix: Waypoints didn't show on Full-screen Map
 - Bugfix: Block coordinates under mouse on Full-screen Map were wrong if you didn't use [Minecraft Options -> Video Settings -> Gui Scale: Normal]
 - Bugfix: Player icons wouldn't show on radar if "Show Pets" was enabled

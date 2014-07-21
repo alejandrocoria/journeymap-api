@@ -132,12 +132,28 @@ public class FileHandler
                 String worldName = WorldData.getWorldName(minecraft);
                 if (!minecraft.isSingleplayer())
                 {
+                    String legacyWorldName = WorldData.getWorldName(minecraft, true);
+                    File legacyWorldDir = new File(mcDir, Constants.MP_DATA_DIR + legacyWorldName + "_" + hash); //$NON-NLS-1$
                     worldDir = new File(mcDir, Constants.MP_DATA_DIR + worldName + "_" + hash); //$NON-NLS-1$
+
+                    if(legacyWorldDir.exists())
+                    {
+                        try
+                        {
+                            legacyWorldDir.renameTo(worldDir);
+                            JourneyMap.getLogger().info(String.format("Migrated legacy server folder from %s to %s", legacyWorldName, worldName));
+                        }
+                        catch(Exception e)
+                        {
+                            JourneyMap.getLogger().warning(String.format("Failed to migrate legacy server folder from %s to %s", legacyWorldName, worldName));
+                        }
+                    }
                 }
                 else
                 {
                     worldDir = new File(mcDir, Constants.SP_DATA_DIR + worldName);
                 }
+
                 worldDir.mkdirs();
             }
             catch (Exception e)

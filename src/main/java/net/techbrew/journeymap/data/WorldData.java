@@ -3,6 +3,7 @@ package net.techbrew.journeymap.data;
 import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.integrated.IntegratedServer;
@@ -84,32 +85,33 @@ public class WorldData extends CacheLoader<Class, WorldData>
         return world.hardcore && !world.singlePlayer;
     }
 
-    private static String getServerHash()
-    {
-        String serverName = getServerName();
-        try
-        {
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
-            if (md5 != null)
-            {
-                byte[] bServerName = serverName.getBytes("UTF-8");
-                byte[] hashed = md5.digest(bServerName);
-                BigInteger bigInt = new BigInteger(1, hashed);
-                String md5Hash = bigInt.toString(16);
-                while (md5Hash.length() < 32)
-                {
-                    md5Hash = "0" + md5Hash;
-                }
-                return md5Hash;
-            }
-        }
-        catch (Exception ex)
-        {
-        }
-        return serverName;
-    }
 
     private static String getServerName()
+    {
+        try
+        {
+            Minecraft mc = FMLClientHandler.instance().getClient();
+            ServerData serverData = mc.func_147104_D(); // getServerData()
+
+            if(serverData!=null)
+            {
+                String serverName = serverData.serverName;
+                if(serverName!=null)
+                {
+                    return serverName;
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().severe("Couldn't get server name: " + LogFormatter.toString(t));
+        }
+
+        // Fallback
+        return getLegacyServerName();
+    }
+
+    private static String getLegacyServerName()
     {
         try
         {
@@ -131,25 +133,6 @@ public class WorldData extends CacheLoader<Class, WorldData>
         return "server";
     }
 
-    public static int getServerPort()
-    {
-        try
-        {
-            NetHandlerPlayClient sendQueue = Minecraft.getMinecraft().getNetHandler();
-            SocketAddress socketAddress = sendQueue.getNetworkManager().getSocketAddress();
-            if ((socketAddress != null && socketAddress instanceof InetSocketAddress))
-            {
-                InetSocketAddress inetAddr = (InetSocketAddress) socketAddress;
-                return inetAddr.getPort();
-            }
-        }
-        catch (Throwable t)
-        {
-            JourneyMap.getLogger().severe("Couldn't get server port: " + LogFormatter.toString(t));
-        }
-        return 0;
-    }
-
     /**
      * Get the current world name.
      *
@@ -158,7 +141,17 @@ public class WorldData extends CacheLoader<Class, WorldData>
      */
     public static String getWorldName(Minecraft mc)
     {
+        return getWorldName(mc, false);
+    }
 
+    /**
+     * Get the current world name.
+     *
+     * @param mc
+     * @return
+     */
+    public static String getWorldName(Minecraft mc, boolean useLegacyServerName)
+    {
         // Get the name
         String worldName = null;
         if (mc.isSingleplayer())
@@ -172,13 +165,16 @@ public class WorldData extends CacheLoader<Class, WorldData>
                 return "offline";
             }
             worldName = mc.theWorld.getWorldInfo().getWorldName();
+
+            String serverName = useLegacyServerName ? getLegacyServerName() : getServerName();
+
             if (!"MpServer".equals(worldName))
             {
-                worldName = getServerName() + "_" + worldName;
+                worldName = serverName + "_" + worldName;
             }
             else
             {
-                worldName = getServerName();
+                worldName = serverName;
             }
         }
 
