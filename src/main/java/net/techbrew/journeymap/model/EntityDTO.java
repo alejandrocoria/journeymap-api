@@ -10,6 +10,7 @@ package net.techbrew.journeymap.model;
 
 import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityOwnable;
@@ -100,11 +101,19 @@ public class EntityDTO implements Serializable
         String owner = null;
         if (entity instanceof EntityTameable)
         {
-            owner = ((EntityTameable) entity).getOwnerName();
+            Entity ownerEntity = ((EntityTameable) entity).getOwner();
+            if(ownerEntity!=null)
+            {
+                owner = ownerEntity.getCommandSenderName();
+            }
         }
         else if(entity instanceof IEntityOwnable)
         {
-            owner = ((IEntityOwnable) entity).getOwnerName();
+            Entity ownerEntity = ((IEntityOwnable) entity).getOwner();
+            if(ownerEntity!=null)
+            {
+                owner = ownerEntity.getCommandSenderName();
+            }
         }
         else if (entity instanceof EntityHorse)
         {
