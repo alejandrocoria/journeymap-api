@@ -2,6 +2,7 @@ package net.techbrew.journeymap.server;
 
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -86,8 +87,27 @@ public class FileService extends BaseService {
 			}
 
             InputStream fileStream = getStream(path, event);
+
             if(fileStream==null)
             {
+                // Have to use files instead of textures, since we won't be on the OpenGL context thread.
+                if(path.startsWith("/img/entity/")) {
+                    BufferedImage img = FileHandler.getCustomImage(path.split("/img/")[1]);
+                    if(img==null)
+                    {
+                        img = FileHandler.getWebImage("entity/unknown.png");
+                        // This could be a timing issue, so lets ask the browser not to cache it
+                        ResponseHeader.on(event).noCache();
+
+                        // TODO: Queue a delayed texture in the TextureCache to load the custom image
+                    }
+                    if(img!=null)
+                    {
+                        serveImage(event, img);
+                        return;
+                    }
+                }
+
                 JourneyMap.getLogger().fine("Path not found: " + path);
                 throwEventException(404, Constants.getMessageJMERR13(path), event, true);
             }

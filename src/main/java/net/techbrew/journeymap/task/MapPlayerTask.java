@@ -164,7 +164,7 @@ public class MapPlayerTask extends BaseMapTask
         }
 
         // Add remaining queued chunks
-        int maxChunks = 512;
+        int maxChunks = 1024;
         int queued = 0;
 
         Iterator<ChunkCoordIntPair> iter = tempQueue.iterator();
@@ -185,7 +185,10 @@ public class MapPlayerTask extends BaseMapTask
             }
             if (queued > maxChunks)
             {
-                logger.info(String.format("Exceeded maxChunks, discarding %s", tempQueue.size() - maxChunks));
+                if(logger.isLoggable(Level.FINE))
+                {
+                    logger.fine(String.format("Exceeded maxChunks, discarding %s", tempQueue.size() - maxChunks));
+                }
             }
         }
 
