@@ -12,6 +12,7 @@ import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EntityOwnable;
 import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.EntityVillager;
@@ -44,6 +45,7 @@ public class EntityDTO implements Serializable
     public String biome;
     public int dimension;
     public Boolean underground;
+<<<<<<< HEAD
     public boolean invisible;
     public boolean sneaking;
 
@@ -54,6 +56,13 @@ public class EntityDTO implements Serializable
     }
 
     public void update(EntityLivingBase entity, boolean hostile)
+=======
+    public final boolean invisible;
+    public final boolean sneaking;
+    public final boolean passiveAnimal;
+    
+    public EntityDTO(EntityLivingBase entity, boolean hostile)
+>>>>>>> c8373fc... Bugfixed passive/pet issues for the webmap
     {
         EntityPlayer currentPlayer = FMLClientHandler.instance().getClient().thePlayer;
 
@@ -91,11 +100,11 @@ public class EntityDTO implements Serializable
         String owner = null;
         if (entity instanceof EntityTameable)
         {
-            EntityLivingBase ownerEntity = ((EntityTameable) entity).getOwner();
-            if(ownerEntity!=null)
-            {
-                owner = ownerEntity.getCommandSenderName();
-            }
+            owner = ((EntityTameable) entity).getOwnerName();
+        }
+        else if(entity instanceof EntityOwnable)
+        {
+            owner = ((EntityOwnable) entity).getOwnerName();
         }
         else if (entity instanceof EntityHorse)
         {
@@ -116,10 +125,16 @@ public class EntityDTO implements Serializable
                 }
             }
         }
+
         this.owner = owner;
 
         String customName = null;
+<<<<<<< HEAD
         if (entity instanceof EntityLiving)
+=======
+        boolean passive = false;
+        if(entity instanceof EntityLiving)
+>>>>>>> c8373fc... Bugfixed passive/pet issues for the webmap
         {
             // CustomName
             if (((EntityLiving) entity).hasCustomNameTag())
@@ -136,9 +151,16 @@ public class EntityDTO implements Serializable
                     hostile = true;
                 }
             }
+
+            // Passive check
+            if(EntityHelper.isPassiveAnimal((EntityLiving)entity))
+            {
+                passive = true;
+            }
         }
         this.customName = customName;
         this.hostile = hostile;
+        this.passiveAnimal = passive;
 
         // Profession
         if (entity instanceof EntityVillager)
