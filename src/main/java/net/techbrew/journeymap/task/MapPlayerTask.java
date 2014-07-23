@@ -146,14 +146,14 @@ public class MapPlayerTask extends BaseMapTask
 
         // Load em if you've got em, ensure they're refreshed
         ChunkMD chunkMd = null;
-        int maxChunks = 512;
+        int maxChunks = 1024;
 
         // Get queued chunks
         for (ChunkCoordIntPair coord : queuedCoords)
         {
             if (chunks.size() >= maxChunks)
             {
-                JourneyMap.getLogger().warning(String.format("%s queued chunks exceeded max of %s for MapPlayerTask", queuedCoords.size(), maxChunks));
+                JourneyMap.getLogger().fine(String.format("%s queued chunks exceeded max of %s for MapPlayerTask", queuedCoords.size(), maxChunks));
                 break;
             }
 
@@ -181,7 +181,7 @@ public class MapPlayerTask extends BaseMapTask
             {
                 if (chunks.size() >= maxChunks)
                 {
-                    JourneyMap.getLogger().warning(String.format("Combined chunks exceeded max of %s for MapPlayerTask", maxChunks));
+                    JourneyMap.getLogger().fine(String.format("Combined chunks exceeded max of %s for MapPlayerTask", maxChunks));
                     break;
                 }
 
