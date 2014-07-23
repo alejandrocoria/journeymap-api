@@ -12,7 +12,7 @@ import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EntityOwnable;
+import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.EntityVillager;
@@ -102,9 +102,9 @@ public class EntityDTO implements Serializable
         {
             owner = ((EntityTameable) entity).getOwnerName();
         }
-        else if(entity instanceof EntityOwnable)
+        else if(entity instanceof IEntityOwnable)
         {
-            owner = ((EntityOwnable) entity).getOwnerName();
+            owner = ((IEntityOwnable) entity).getOwnerName();
         }
         else if (entity instanceof EntityHorse)
         {
