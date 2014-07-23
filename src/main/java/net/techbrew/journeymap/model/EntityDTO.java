@@ -3,6 +3,7 @@ package net.techbrew.journeymap.model;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EntityOwnable;
 import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.EntityVillager;
@@ -36,6 +37,7 @@ public final class EntityDTO implements Serializable
     public Boolean underground;
     public final boolean invisible;
     public final boolean sneaking;
+    public final boolean passiveAnimal;
     
     public EntityDTO(EntityLivingBase entity, boolean hostile)
     {
@@ -77,19 +79,21 @@ public final class EntityDTO implements Serializable
         String owner = null;
         if (entity instanceof EntityTameable)
         {
-            EntityLivingBase ownerEntity = ((EntityTameable) entity).getOwner();
-            if(ownerEntity!=null)
-            {
-                owner = ownerEntity.getCommandSenderName();
-            }
+            owner = ((EntityTameable) entity).getOwnerName();
+        }
+        else if(entity instanceof EntityOwnable)
+        {
+            owner = ((EntityOwnable) entity).getOwnerName();
         }
         else if (entity instanceof EntityHorse)
         {
             owner = ((EntityHorse) entity).func_152119_ch(); //getOwner();
         }
+
         this.owner = owner;
 
         String customName = null;
+        boolean passive = false;
         if(entity instanceof EntityLiving)
         {
             // CustomName
@@ -107,9 +111,16 @@ public final class EntityDTO implements Serializable
                     hostile = true;
                 }
             }
+
+            // Passive check
+            if(EntityHelper.isPassiveAnimal((EntityLiving)entity))
+            {
+                passive = true;
+            }
         }
         this.customName = customName;
         this.hostile = hostile;
+        this.passiveAnimal = passive;
 
         // Profession
         if(entity instanceof EntityVillager)

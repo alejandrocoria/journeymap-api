@@ -40,7 +40,7 @@ public class OverlayRadarRenderer
         try
         {
             TextureImpl entityIcon, locatorImg;
-            boolean isPlayer, isPet, isPassiveAnimal;
+            boolean isPlayer, isPet;
 
             String playername = Minecraft.getMinecraft().thePlayer.getDisplayName();
             TextureCache tc = TextureCache.instance();
@@ -50,14 +50,13 @@ public class OverlayRadarRenderer
                 try
                 {
                     isPet = !Strings.isNullOrEmpty(dto.owner);
-                    isPassiveAnimal = EntityHelper.isPassiveAnimal(dto.entityLiving);
 
                     if(!showPets && isPet)
                     {
                         continue;
                     }
 
-                    if(!showAnimals && isPassiveAnimal)
+                    if(!showAnimals && dto.passiveAnimal)
                     {
                         if(!(isPet && showPets))
                         {

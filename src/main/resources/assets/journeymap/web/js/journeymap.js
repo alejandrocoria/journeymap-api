@@ -1142,30 +1142,33 @@ var JourneyMap = (function() {
 		var id = 'id' + entity.entityId;
 		var heading = entity.heading;
 
-		var locatorUrl;
+		var locatorUrl = null;
 		var iconSize = 32;
 		var iconColor = "#cccccc";
 		var iconLabel = null;
 		var marker = markerMap[id];
-		
-		if (entity.hostile !== true && entity.owner) {
-			if(entity.owner === JM.player.username) {			
-				if (showPets === true) {
-					locatorUrl = "/img/locator-pet.png";
-					iconColor = "#0000ff";
-				}
-			} else {
-				locatorUrl = "/img/locator-neutral.png";
-			}
-		} else if (entity.hostile !== true) {
-			if (showAnimals === false && !(entity.filename === 'villager.png')) {
-			} else {
-				locatorUrl = "/img/locator-neutral.png";
-			}
-		} else {
-			locatorUrl = "/img/locator-hostile.png";
-			iconColor = "#ff0000";
-		}
+
+		var isPet = (entity.owner!=null && entity.owner!="");
+
+        if(entity.owner === JM.player.username) {
+            locatorUrl = "/img/locator-pet.png";
+            iconColor = "#0000ff";
+        } else if(entity.hostile==true) {
+            locatorUrl = "/img/locator-hostile.png";
+            iconColor = "#ff0000";
+        } else {
+            locatorUrl = "/img/locator-neutral.png";
+        }
+
+		if(!showPets && isPet==true) {
+            locatorUrl = null;
+        }
+
+        if(!showAnimals && entity.passiveAnimal==true) {
+            if(!(isPet==true && showPets)) {
+                locatorUrl = null;
+            }
+        }
 		
 		// No locator means no marker
 		if(!locatorUrl) {
@@ -1175,7 +1178,7 @@ var JourneyMap = (function() {
 				if(debug) console.log("Marker invalid for " + id + " - " + entity.filename);
 				return;
 			} else {
-				if(debug) console.log("Pending marker invalid for " + id + " - " + entity.filename);
+				//if(debug) console.log("Pending marker invalid for " + id + " - " + entity.filename);
 				return;
 			}		
 		}

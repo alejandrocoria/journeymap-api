@@ -64,7 +64,7 @@ public class AllData extends CacheLoader<Long, Map>
 
         if (!WorldData.isHardcoreAndMultiplayer())
         {
-            if (JourneyMap.getInstance().webMapProperties.showAnimals.get())
+            if (JourneyMap.getInstance().webMapProperties.showAnimals.get() || JourneyMap.getInstance().webMapProperties.showPets.get())
             {
                 props.put(Key.animals, cache.getAnimals(false));
             }

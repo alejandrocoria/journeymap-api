@@ -87,7 +87,7 @@ public class EntityHelper
         return getEntitiesNearby("getAnimalsNearby", JourneyMap.getInstance().coreProperties.maxAnimalsData.get(), false, EntityAnimal.class, EntityGolem.class, EntityWaterMob.class);
     }
 
-    public static boolean isPassiveAnimal(Entity entityLiving)
+    public static boolean isPassiveAnimal(EntityLiving entityLiving)
     {
         if(entityLiving==null)
         {
@@ -104,7 +104,7 @@ public class EntityHelper
             return false;
         }
 
-        if(entityLiving instanceof EntityCreature && ((EntityCreature) entityLiving).getEntityToAttack()!=null)
+        if(entityLiving.getAttackTarget()!=null)
         {
             return false;
         }
