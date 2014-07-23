@@ -1,12 +1,15 @@
 package net.techbrew.journeymap.render.overlay;
 
+import com.google.common.base.Strings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityTameable;
+import net.minecraft.entity.passive.IAnimals;
 import net.minecraft.entity.player.EntityPlayer;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.model.EntityHelper;
 import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.render.draw.DrawCenteredLabelStep;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
@@ -19,8 +22,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-;
-
 /**
  * Renders an entity image in the MapOverlay.
  *
@@ -28,111 +29,104 @@ import java.util.List;
  */
 public class OverlayRadarRenderer
 {
+    final Color labelBg = Color.darkGray.darker();
 
     public List<DrawStep> prepareSteps(List<EntityDTO> entityDTOs, GridRenderer grid, float drawScale, MapProperties mapProperties)
     {
-
         final boolean showAnimals = mapProperties.showAnimals.get();
         final boolean showPets = mapProperties.showPets.get();
-        final int fontHeight = 14;
-        final Color labelBg = Color.darkGray.darker();
-
         final List<DrawStep> drawStepList = new ArrayList<DrawStep>();
 
         try
         {
-
-            double heading;
             TextureImpl entityIcon, locatorImg;
-            String filename, owner;
-            Boolean isHostile, isPet, isPlayer;
-            boolean filterAnimals = (showAnimals != showPets);
-            //FontMetrics fm = g2D.getFontMetrics();
+            boolean isPlayer, isPet, isPassiveAnimal;
+
             String playername = Minecraft.getMinecraft().thePlayer.getDisplayName();
             TextureCache tc = TextureCache.instance();
 
             for (EntityDTO dto : entityDTOs)
             {
-                isHostile = Boolean.TRUE.equals(dto.hostile);
-                owner = dto.owner;
-                isPet = playername.equals(owner) && dto.entityLiving instanceof EntityTameable;
-
-                // Skip animals/pets if needed
-                if (filterAnimals && !isHostile)
+                try
                 {
-                    if (!showPets && isPet)
+                    isPet = !Strings.isNullOrEmpty(dto.owner);
+                    isPassiveAnimal = EntityHelper.isPassiveAnimal(dto.entityLiving);
+
+                    if(!showPets && isPet)
                     {
                         continue;
                     }
 
-                    if(!showAnimals && !isPet)
+                    if(!showAnimals && isPassiveAnimal)
                     {
-                        continue;
-                    }
-                }
-
-                double posX = (Double) dto.posX;
-                double posZ = (Double) dto.posZ;
-
-                if (grid.getPixel(posX, posZ) != null)
-                {
-                    filename = (String) dto.filename;
-                    isPlayer = filename.startsWith("/skin/");
-
-                    // Determine and draw locator
-                    if (isHostile)
-                    {
-                        locatorImg = tc.getHostileLocator();
-                    }
-                    else
-                    {
-                        if (isPet)
+                        if(!(isPet && showPets))
                         {
-                            locatorImg = tc.getPetLocator();
+                            continue;
+                        }
+                    }
+
+                    if (grid.getPixel(dto.posX, dto.posZ) != null)
+                    {
+                        isPlayer = dto.entityLiving instanceof EntityPlayer;
+
+                        // Determine and draw locator
+                        if (dto.hostile)
+                        {
+                            locatorImg = tc.getHostileLocator();
                         }
                         else
                         {
-                            if (isPlayer)
+                            if (!Strings.isNullOrEmpty(dto.owner) && playername.equals(dto.owner))
                             {
-                                locatorImg = tc.getOtherLocator();
+                                locatorImg = tc.getPetLocator();
                             }
                             else
                             {
-                                locatorImg = tc.getNeutralLocator();
+                                if (isPlayer)
+                                {
+                                    locatorImg = tc.getOtherLocator();
+                                }
+                                else
+                                {
+                                    locatorImg = tc.getNeutralLocator();
+                                }
+                            }
+                        }
+
+                        // Draw locator icon
+                        drawStepList.add(new DrawEntityStep(dto.entityLiving, false, locatorImg, (int) (8 * drawScale)));
+
+                        // Draw entity icon and label
+                        if (isPlayer)
+                        {
+                            entityIcon = tc.getPlayerSkin(dto.username);
+                            drawStepList.add(new DrawPlayerStep((EntityPlayer) dto.entityLiving, entityIcon));
+                        }
+                        else
+                        {
+                            entityIcon = tc.getEntityImage(dto.filename);
+                            if (entityIcon != null)
+                            {
+                                int bottomMargin = isPlayer ? 0 : (int) (8 * drawScale);
+                                drawStepList.add(new DrawEntityStep(dto.entityLiving, true, entityIcon, bottomMargin));
+                            }
+
+                            if (dto.customName != null)
+                            {
+                                drawStepList.add(new DrawCenteredLabelStep(dto.posX, dto.posZ, dto.customName, entityIcon.height / 2, labelBg, Color.white));
                             }
                         }
                     }
-
-                    // Draw locator icon
-                    Entity entity = (Entity) dto.entityLiving;
-                    drawStepList.add(new DrawEntityStep(entity, false, locatorImg, (int) (8 * drawScale)));
-
-                    // Draw entity icon and label
-                    if (isPlayer)
-                    {
-                        entityIcon = tc.getPlayerSkin(dto.username);
-                        drawStepList.add(new DrawPlayerStep((EntityPlayer) entity, entityIcon));
-                    }
-                    else
-                    {
-                        entityIcon = tc.getEntityImage(filename);
-                        if (entityIcon != null)
-                        {
-                            int bottomMargin = isPlayer ? 0 : (int) (8 * drawScale);
-                            drawStepList.add(new DrawEntityStep(entity, true, entityIcon, bottomMargin));
-                        }
-
-                        if (dto.customName!=null)
-                        {
-                            drawStepList.add(new DrawCenteredLabelStep(posX, posZ, dto.customName, entityIcon.height / 2, labelBg, Color.white));
-                        }
-                    }
+                }
+                catch(Exception e)
+                {
+                    JourneyMap.getLogger().severe("Exception during prepareSteps: " + LogFormatter.toString(e));
                 }
             }
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe("Error during prepareSteps: " + LogFormatter.toString(t));
+            JourneyMap.getLogger().severe("Throwable during prepareSteps: " + LogFormatter.toString(t));
         }
 
         return drawStepList;

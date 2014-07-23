@@ -7,9 +7,7 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderFacade;
 import net.minecraft.client.renderer.entity.RenderHorse;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.*;
 import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.*;
@@ -87,6 +85,31 @@ public class EntityHelper
     public static List<EntityDTO> getAnimalsNearby()
     {
         return getEntitiesNearby("getAnimalsNearby", JourneyMap.getInstance().coreProperties.maxAnimalsData.get(), false, EntityAnimal.class, EntityGolem.class, EntityWaterMob.class);
+    }
+
+    public static boolean isPassiveAnimal(Entity entityLiving)
+    {
+        if(entityLiving==null)
+        {
+            return false;
+        }
+
+        if(entityLiving instanceof IMob)
+        {
+            return false;
+        }
+
+        if(entityLiving instanceof INpc)
+        {
+            return false;
+        }
+
+        if(entityLiving instanceof EntityCreature && ((EntityCreature) entityLiving).getEntityToAttack()!=null)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     /**
