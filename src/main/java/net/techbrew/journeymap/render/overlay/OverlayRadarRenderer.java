@@ -7,6 +7,8 @@ import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.IAnimals;
 import net.minecraft.entity.player.EntityPlayer;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.EntityHelper;
@@ -29,7 +31,6 @@ import java.util.List;
  */
 public class OverlayRadarRenderer
 {
-    final Color labelBg = Color.darkGray.darker();
 
     public List<DrawStep> prepareSteps(List<EntityDTO> entityDTOs, GridRenderer grid, float drawScale, MapProperties mapProperties)
     {
@@ -44,6 +45,8 @@ public class OverlayRadarRenderer
 
             String playername = Minecraft.getMinecraft().thePlayer.getDisplayName();
             TextureCache tc = TextureCache.instance();
+            String iconSetName = mapProperties.getEntityIconSetName().get();
+            int iconOffset = iconSetName.equals(FileHandler.MOB_ICON_SET_3D) ? (int) (8 * drawScale) : 0;
 
             for (EntityDTO dto : entityDTOs)
             {
@@ -92,9 +95,6 @@ public class OverlayRadarRenderer
                             }
                         }
 
-                        // Draw locator icon
-                        drawStepList.add(new DrawEntityStep(dto.entityLiving, false, locatorImg, (int) (8 * drawScale)));
-
                         // Draw entity icon and label
                         if (isPlayer)
                         {
@@ -103,16 +103,14 @@ public class OverlayRadarRenderer
                         }
                         else
                         {
-                            entityIcon = tc.getEntityImage(dto.filename);
+                            entityIcon = tc.getEntityIconTexture(iconSetName, dto.filename);
                             if (entityIcon != null)
                             {
-                                int bottomMargin = isPlayer ? 0 : (int) (8 * drawScale);
-                                drawStepList.add(new DrawEntityStep(dto.entityLiving, true, entityIcon, bottomMargin));
-                            }
+                                int bottomMargin = isPlayer ? 0 : iconOffset;
 
-                            if (dto.customName != null)
-                            {
-                                drawStepList.add(new DrawCenteredLabelStep(dto.posX, dto.posZ, dto.customName, entityIcon.height / 2, labelBg, Color.white));
+                                DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(dto);
+                                drawStep.update(false, locatorImg, entityIcon, bottomMargin);
+                                drawStepList.add(drawStep);
                             }
                         }
                     }

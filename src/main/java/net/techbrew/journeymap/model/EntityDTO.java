@@ -46,27 +46,19 @@ public class EntityDTO implements Serializable
     public String biome;
     public int dimension;
     public Boolean underground;
-<<<<<<< HEAD
     public boolean invisible;
     public boolean sneaking;
+    public boolean passiveAnimal;
 
     private EntityDTO(EntityLivingBase entity)
     {
-        this.entityId = entity.getUniqueID().toString();
         this.entityLiving = entity;
+        this.entityId = entity.getUniqueID().toString();
     }
 
     public void update(EntityLivingBase entity, boolean hostile)
-=======
-    public final boolean invisible;
-    public final boolean sneaking;
-    public final boolean passiveAnimal;
-    
-    public EntityDTO(EntityLivingBase entity, boolean hostile)
->>>>>>> c8373fc... Bugfixed passive/pet issues for the webmap
     {
         EntityPlayer currentPlayer = FMLClientHandler.instance().getClient().thePlayer;
-
         this.dimension = entity.dimension;
         this.posX = entity.posX;
         this.posY = entity.posY;
@@ -138,12 +130,10 @@ public class EntityDTO implements Serializable
         this.owner = owner;
 
         String customName = null;
-<<<<<<< HEAD
-        if (entity instanceof EntityLiving)
-=======
+
+        // TODO: Recompare to branch to ensure it matches bugfixes
         boolean passive = false;
         if(entity instanceof EntityLiving)
->>>>>>> c8373fc... Bugfixed passive/pet issues for the webmap
         {
             // CustomName
             if (((EntityLiving) entity).hasCustomNameTag())
@@ -162,6 +152,7 @@ public class EntityDTO implements Serializable
             }
 
             // Passive check
+
             if(EntityHelper.isPassiveAnimal((EntityLiving)entity))
             {
                 passive = true;

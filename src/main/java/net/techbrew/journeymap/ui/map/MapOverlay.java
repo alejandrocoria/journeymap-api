@@ -729,7 +729,7 @@ public class MapOverlay extends JmUI
             if (playerPixel != null)
             {
                 TextureImpl tex = fullMapProperties.zoomLevel.get() == 0 ? TextureCache.instance().getPlayerLocatorSmall() : TextureCache.instance().getPlayerLocator();
-                DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(mc.thePlayer);
+                DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(DataCache.getPlayer());
                 drawStep.update(false, null, tex, 8);
                 gridRenderer.draw(xOffset, yOffset, 1f, getMapFontScale(), drawStep);
             }

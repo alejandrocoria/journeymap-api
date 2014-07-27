@@ -44,7 +44,7 @@ public class DataCache
     final LoadingCache<Class, EntityDTO> player;
     final LoadingCache<Class, WorldData> world;
     final LoadingCache<Class, Map<String, Object>> messages;
-    final LoadingCache<Entity, DrawEntityStep> entityDrawSteps;
+    final LoadingCache<EntityDTO, DrawEntityStep> entityDrawSteps;
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
     final LoadingCache<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadata;
     final LoadingCache<Block, HashMap<Integer, BlockMD>> blockMetadata;
@@ -310,11 +310,11 @@ public class DataCache
         }
     }
 
-    public DrawEntityStep getDrawEntityStep(Entity entity)
+    public DrawEntityStep getDrawEntityStep(EntityDTO entityDTO)
     {
         synchronized (entityDrawSteps)
         {
-            return entityDrawSteps.getUnchecked(entity);
+            return entityDrawSteps.getUnchecked(entityDTO);
         }
     }
 

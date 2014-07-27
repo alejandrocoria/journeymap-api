@@ -41,6 +41,7 @@ public class ChunkMD
     public final Boolean hasNoSky;
     public final ChunkStub stub;
     public final ChunkCoordIntPair coord;
+    public final boolean isSlimeChunk;
 
     private volatile Integer[][] surfaceHeights;
     private volatile HashMap<Integer, Integer[][]> sliceHeights;
@@ -77,6 +78,9 @@ public class ChunkMD
         this.sliceSlopes = new HashMap<Integer, Float[][]>(8);
         this.surfaceHeights = new Integer[16][16];
         this.sliceHeights = new HashMap<Integer, Integer[][]>(8);
+
+        // https://github.com/OpenMods/OpenBlocks/blob/master/src/main/java/openblocks/common/item/ItemSlimalyzer.java#L44
+        this.isSlimeChunk = stub.getRandomWithSeed(987234911L).nextInt(10) == 0;
     }
 
 
