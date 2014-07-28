@@ -112,7 +112,7 @@ public abstract class JmUI extends GuiScreen
         sizeDisplay(mc.displayWidth, mc.displayHeight);
 
         final boolean smallScale = (scaleFactor == 1);
-        DrawUtil.drawImage(logo, smallScale ? 8 : 16, 4, false, smallScale ? .5f : 1f);
+        DrawUtil.drawImage(logo, smallScale ? 2 : 4, 0, false, smallScale ? .5f : 1f);
         sizeDisplay(width, height);
     }
 

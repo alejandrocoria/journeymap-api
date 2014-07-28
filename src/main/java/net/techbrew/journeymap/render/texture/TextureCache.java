@@ -244,7 +244,7 @@ public class TextureCache
 
     public TextureImpl getLogo()
     {
-        return getNamedTexture(Name.Logo, "ico/journeymap40.png", false); //$NON-NLS-1$
+        return getNamedTexture(Name.Logo, "ico/journeymap60.png", false); //$NON-NLS-1$
     }
 
     public TextureImpl getHostileLocator()
