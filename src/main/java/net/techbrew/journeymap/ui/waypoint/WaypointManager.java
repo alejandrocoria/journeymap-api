@@ -4,10 +4,10 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.command.server.CommandTeleport;
 import net.minecraft.world.WorldProvider;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.command.CmdTeleportWaypoint;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
@@ -37,6 +37,8 @@ public class WaypointManager extends JmUI
     {
         Add, Find, SortName, SortDistance, Dimensions, ToggleAll, Help, Options, Close
     }
+
+    ;
 
     final String on = Constants.getString("MapOverlay.on");
     final String off = Constants.getString("MapOverlay.off");
@@ -80,18 +82,7 @@ public class WaypointManager extends JmUI
     {
         try
         {
-            if (canUserTeleport == null)
-            {
-                if (mc.thePlayer.capabilities.isCreativeMode || mc.theWorld.getWorldInfo().areCommandsAllowed())
-                {
-                    canUserTeleport = true;
-                }
-                else
-                {
-                    CommandTeleport command = new CommandTeleport();
-                    canUserTeleport = command.canCommandSenderUseCommand(mc.thePlayer);
-                }
-            }
+            canUserTeleport = CmdTeleportWaypoint.isPermitted(mc);
 
             if (this.buttonList.isEmpty())
             {

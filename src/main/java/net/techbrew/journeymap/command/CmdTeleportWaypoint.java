@@ -1,7 +1,6 @@
 package net.techbrew.journeymap.command;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.command.server.CommandTeleport;
 import net.minecraft.util.Vec3;
 import net.techbrew.journeymap.model.Waypoint;
 
@@ -18,25 +17,16 @@ public class CmdTeleportWaypoint
         this.waypoint = waypoint;
     }
 
-    public boolean isPermitted()
+    public static boolean isPermitted(Minecraft mc)
     {
-        if(!waypoint.isTeleportReady())
+        if(mc.getIntegratedServer()!=null)
         {
-            return false;
+            return mc.getIntegratedServer().getConfigurationManager().isPlayerOpped(mc.thePlayer.getCommandSenderName());
         }
-
-        if(mc.thePlayer.capabilities.isCreativeMode)
-        {
-            return true;
-        }
-
-        if(mc.thePlayer.worldObj.getWorldInfo().areCommandsAllowed())
+        else
         {
             return true;
         }
-
-        CommandTeleport command = new CommandTeleport();
-        return command.canCommandSenderUseCommand(mc.thePlayer);
     }
 
     public void run()
