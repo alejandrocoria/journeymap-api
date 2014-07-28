@@ -30,6 +30,11 @@ public class CmdTeleportWaypoint
             return true;
         }
 
+        if(mc.thePlayer.worldObj.getWorldInfo().areCommandsAllowed())
+        {
+            return true;
+        }
+
         CommandTeleport command = new CommandTeleport();
         return command.canCommandSenderUseCommand(mc.thePlayer);
     }
