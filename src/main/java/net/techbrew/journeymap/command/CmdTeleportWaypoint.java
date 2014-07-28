@@ -1,16 +1,7 @@
-/*
- * JourneyMap mod for Minecraft
- *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
- */
-
 package net.techbrew.journeymap.command;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.command.server.CommandTeleport;
 import net.minecraft.util.Vec3;
 import net.techbrew.journeymap.model.Waypoint;
 
@@ -27,20 +18,16 @@ public class CmdTeleportWaypoint
         this.waypoint = waypoint;
     }
 
-    public boolean isPermitted()
+    public static boolean isPermitted(Minecraft mc)
     {
-        if (!waypoint.isTeleportReady())
+        if(mc.getIntegratedServer()!=null)
         {
-            return false;
+            return mc.getIntegratedServer().getConfigurationManager().isPlayerOpped(mc.thePlayer.getCommandSenderName());
         }
-
-        if (mc.thePlayer.capabilities.isCreativeMode)
+        else
         {
             return true;
         }
-
-        CommandTeleport command = new CommandTeleport();
-        return command.canCommandSenderUseCommand(mc.thePlayer);
     }
 
     public void run()

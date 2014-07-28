@@ -12,6 +12,10 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Fixed check to enable waypoint teleporting on local worlds
+- Change: Wayport teleport button now always visibile for remote worlds
+
+## Changelog for JourneyMap 4.0.2:
 - Bugfix: (1.7.10 only)  Realms Server data folders were changing because of dynamic IP addresses.  Now using server name instead of socket-derived host name.
 - Bugfix: Waypoints didn't show on Full-screen Map
 - Bugfix: Block coordinates under mouse on Full-screen Map were wrong if you didn't use [Minecraft Options -> Video Settings -> Gui Scale: Normal]
