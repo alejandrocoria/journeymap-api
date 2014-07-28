@@ -9,7 +9,7 @@
     "url": "http://journeymap.techbrew.net",
     "updateUrl": "",
     "authorList": ["techbrew (Mark Woodman)"],
-    "logoFile": "/assets/journeymap/mod.png",
+    "logoFile": "",
     "screenshots": [],
     "dependants":[],
     "dependencies": ["Forge@[@FORGEVERSION@,)"],
