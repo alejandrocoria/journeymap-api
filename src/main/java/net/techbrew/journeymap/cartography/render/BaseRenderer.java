@@ -44,6 +44,8 @@ public abstract class BaseRenderer implements IChunkRenderer
     protected boolean mapTransparency;
     protected boolean mapCaveLighting;
     protected boolean mapAntialiasing;
+    protected boolean mapCrops;
+    protected boolean mapPlants;
     volatile AtomicLong badBlockCount = new AtomicLong(0);
     ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
     ArrayList<BlockCoordIntPair> secondarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
@@ -52,8 +54,8 @@ public abstract class BaseRenderer implements IChunkRenderer
     protected float slopeMax = 1.7f;
     protected float primaryDownslopeMultiplier = .5f;
     protected float primaryUpslopeMultiplier = 1.25f;
-    protected float secondaryDownslopeMultiplier = .95f;
-    protected float secondaryUpslopeMultiplier = 1.1f;
+    protected float secondaryDownslopeMultiplier = .99f;
+    protected float secondaryUpslopeMultiplier = 1.01f;
 
     protected float moonlightLevel = 3.5f;
 
@@ -63,14 +65,20 @@ public abstract class BaseRenderer implements IChunkRenderer
 
         // Offsets used for primary slope
         primarySlopeOffsets.add(new BlockCoordIntPair(0, -1)); // North
-        primarySlopeOffsets.add(new BlockCoordIntPair(-1, 0)); // West
         primarySlopeOffsets.add(new BlockCoordIntPair(-1, -1)); // NorthWest
+        primarySlopeOffsets.add(new BlockCoordIntPair(-1, 0)); // West
+        //primarySlopeOffsets.add(new BlockCoordIntPair(-1, 1)); // SouthWest
 
         // Offsets used for secondary slope
-        secondarySlopeOffsets.add(new BlockCoordIntPair(-1, -2)); // North of NorthWest
-        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -1)); // West of NorthWest
-        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -2)); // NorthWest of NorthWest
-        secondarySlopeOffsets.add(new BlockCoordIntPair(-1, -2)); // South of NorthWest
+//        secondarySlopeOffsets.add(new BlockCoordIntPair(-1, -2)); // North of NorthWest
+//        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -1)); // West of NorthWest
+//        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -2)); // NorthWest of NorthWest
+//        secondarySlopeOffsets.add(new BlockCoordIntPair(-1, -2)); // South of NorthWest
+
+        secondarySlopeOffsets.add(new BlockCoordIntPair(1, -1)); // NorthEast
+        secondarySlopeOffsets.add(new BlockCoordIntPair(1, 0)); // East
+        secondarySlopeOffsets.add(new BlockCoordIntPair(1, 1)); // SouthEast
+        secondarySlopeOffsets.add(new BlockCoordIntPair(0, 1)); // South
     }
 
     /**
@@ -82,6 +90,8 @@ public abstract class BaseRenderer implements IChunkRenderer
         mapTransparency = coreProperties.mapTransparency.get();
         mapAntialiasing = coreProperties.mapAntialiasing.get();
         mapCaveLighting = coreProperties.mapCaveLighting.get();
+        mapPlants = coreProperties.mapPlants.get();
+        mapCrops = coreProperties.mapCrops.get();
     }
 
     @Override
@@ -198,7 +208,6 @@ public abstract class BaseRenderer implements IChunkRenderer
         {
             int y = 0, sliceMinY = 0, sliceMaxY = 0;
             Float[][] slopes = new Float[16][16];
-            boolean ignoreWater = mapBathymetry;
             boolean isSurface = (vSlice == null);
             float slope, primarySlope, secondarySlope;
             BlockMD blockMD;
@@ -222,16 +231,16 @@ public abstract class BaseRenderer implements IChunkRenderer
                     // Get block height
                     if (isSurface)
                     {
-                        y = chunkMd.getSurfaceBlockHeight(x, z, ignoreWater, true);
+                        y = getSurfaceBlockHeight(chunkMd, x, z);
                     }
                     else
                     {
-                        y = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, ignoreWater, true);
+                        y = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY);
                     }
 
 
                     // Calculate primary slope
-                    primarySlope = calculateSlope(chunkMd, neighbors, primarySlopeOffsets, ignoreWater, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY);
+                    primarySlope = calculateSlope(chunkMd, neighbors, primarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY);
 
                     // Exaggerate primary slope for normal shading
                     slope = primarySlope;
@@ -246,9 +255,9 @@ public abstract class BaseRenderer implements IChunkRenderer
 
 
                     // Calculate secondary slope
-                    if (mapAntialiasing)
+                    if (mapAntialiasing )
                     {
-                        secondarySlope = calculateSlope(chunkMd, neighbors, secondarySlopeOffsets, ignoreWater, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY);
+                        secondarySlope = calculateSlope(chunkMd, neighbors, secondarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY);
 
                         if (secondarySlope > primarySlope)
                         {
@@ -273,7 +282,7 @@ public abstract class BaseRenderer implements IChunkRenderer
     /**
      * Get block height within slice.  Should lazy-populate sliceHeights.
      */
-    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater, boolean ignoreNoShadowBlocks)
+    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY)
     {
         throw new NotImplementedException();
     }
@@ -281,7 +290,7 @@ public abstract class BaseRenderer implements IChunkRenderer
     /**
      * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
      */
-    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater, boolean ignoreNoShadowBlocks, final int offsetX, int offsetZ, ChunkMD.Set neighbors, int defaultVal)
+    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, final int offsetX, int offsetZ, ChunkMD.Set neighbors, int defaultVal)
     {
         ChunkMD chunk = null;
         int blockX = ((chunkMd.coord.chunkXPos << 4) + x + offsetX);
@@ -301,7 +310,7 @@ public abstract class BaseRenderer implements IChunkRenderer
 
         if (chunk != null)
         {
-            return getSliceBlockHeight(chunk, blockX & 15, vSlice, blockZ & 15, sliceMinY, sliceMaxY, ignoreWater, true);
+            return getSliceBlockHeight(chunk, blockX & 15, vSlice, blockZ & 15, sliceMinY, sliceMaxY);
         }
         else
         {
@@ -309,7 +318,7 @@ public abstract class BaseRenderer implements IChunkRenderer
         }
     }
 
-    protected float calculateSlope(final ChunkMD chunkMd, final ChunkMD.Set neighbors, final Collection<BlockCoordIntPair> offsets, boolean ignoreWater, final int x, final int y, final int z, boolean isSurface, Integer vSlice, int sliceMinY, int sliceMaxY)
+    protected float calculateSlope(final ChunkMD chunkMd, final ChunkMD.Set neighbors, final Collection<BlockCoordIntPair> offsets, final int x, final int y, final int z, boolean isSurface, Integer vSlice, int sliceMinY, int sliceMaxY)
     {
         // Calculate slope by dividing height by neighbors' heights
         float slopeSum = 0;
@@ -317,11 +326,11 @@ public abstract class BaseRenderer implements IChunkRenderer
         {
             if (isSurface)
             {
-                slopeSum += ((y * 1f) / chunkMd.getSurfaceBlockHeight(x, z, offset.x, offset.z, neighbors, y, ignoreWater, true));
+                slopeSum += ((y * 1f) / getSurfaceBlockHeight(chunkMd, x, z, offset.x, offset.z, neighbors, y));
             }
             else
             {
-                slopeSum += ((y * 1f) / getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, ignoreWater, true, offset.x, offset.z, neighbors, y));
+                slopeSum += ((y * 1f) / getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, offset.x, offset.z, neighbors, y));
             }
         }
         return slopeSum / offsets.size();
@@ -364,5 +373,102 @@ public abstract class BaseRenderer implements IChunkRenderer
         return slope;
     }
 
+//    /**
+//     * Get the height of the block at the x, z coordinate in the chunk, optionally ignoring NoShadow blocks.
+//     * Ignoring NoShadow blocks won't change the saved surfaceHeights.
+//     */
+//    public int getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, boolean ignoreNoShadowBlocks)
+//    {
+//        int y = getSurfaceBlockHeight(chunkMd, x, z, ignoreWater);
+//        if(ignoreNoShadowBlocks)
+//        {
+//            BlockMD blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
+//            while (y > 0 && blockMD.hasFlag(BlockMD.Flag.NoShadow) || blockMD.isAir() || (ignoreWater && (blockMD.isWater())))
+//            {
+//                y--;
+//                blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
+//            }
+//        }
+//        return y;
+//    }
 
+    /**
+     * Added because getHeightValue() sometimes returns an air block.
+     * Returns the value in the height map at this x, z coordinate in the chunk, disregarding
+     * blocks that shouldn't be used as the top block.
+     */
+    public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z)
+    {
+        Integer y = chunkMd.surfaceHeights[x][z];
+
+        if (y != null)
+        {
+            return chunkMd.surfaceHeights[x][z];
+        }
+
+        y = Math.max(0, chunkMd.stub.getHeightValue(x, z));
+
+        try
+        {
+            BlockMD blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
+
+            while (y > 0)
+            {
+                if(blockMD.isWater() && mapBathymetry)
+                {
+                    break;
+                }
+                if(!blockMD.isAir() && !blockMD.hasFlag(BlockMD.Flag.NoShadow))
+                {
+                    break;
+                }
+                y--;
+                blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
+            }
+        }
+        catch (Exception e)
+        {
+            JourneyMap.getLogger().warning("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
+        }
+
+        if(y==null)
+        {
+            y = chunkMd.stub.getHeightValue(x, z);
+        }
+
+        chunkMd.surfaceHeights[x][z] = y;
+
+        return Math.max(0, y);
+    }
+
+    /**
+     * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
+     */
+    public Float getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, int offsetX, int offsetZ, ChunkMD.Set neighbors, float defaultVal)
+    {
+        ChunkMD chunk = null;
+        int blockX = ((chunkMd.coord.chunkXPos << 4) + x + offsetX);
+        int blockZ = ((chunkMd.coord.chunkZPos << 4) + z + offsetZ);
+        int chunkX = blockX >> 4;
+        int chunkZ = blockZ >> 4;
+
+        if (chunkX == chunkMd.coord.chunkXPos && chunkZ == chunkMd.coord.chunkZPos)
+        {
+            chunk = chunkMd;
+        }
+        else
+        {
+            ChunkCoordIntPair coord = new ChunkCoordIntPair(chunkX, chunkZ);
+            chunk = neighbors.get(coord);
+        }
+
+        if (chunk != null)
+        {
+            return (float) getSurfaceBlockHeight(chunkMd, blockX & 15, blockZ & 15);
+        }
+        else
+        {
+            return defaultVal;
+        }
+    }
 }

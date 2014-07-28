@@ -105,7 +105,8 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
                     strata.reset();
                     BlockMD topBlockMd = null;
 
-                    int standardY = Math.max(1, chunkMd.getSurfaceBlockHeight(x, z, mapBathymetry));
+                    int standardY = Math.max(1, getSurfaceBlockHeight(chunkMd, x, z));
+
 
                     // Should be painted only by cave renderer
                     if (cavePrePass && (standardY > sliceMaxY && (standardY - sliceMaxY) > maxDepth))
@@ -139,6 +140,11 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
                     }
 
                     // Get top non-roof block
+                    if(mapPlants || mapCrops)
+                    {
+                        //standardY++;
+                    }
+
                     topBlockMd = chunkMd.getTopBlockMD(x, standardY, z);
 
                     if (topBlockMd == null)
@@ -148,7 +154,7 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
                     }
 
                     // Start using BlockColors stack
-                    buildStrata(strata, neighbors, roofY, chunkMd, x, y, z);
+                    buildStrata(strata, neighbors, roofY, chunkMd, x, standardY, z);
 
                     chunkOk = paintStrata(strata, g2D, chunkMd, topBlockMd, vSlice, neighbors, x, y, z, cavePrePass) || chunkOk;
                 }

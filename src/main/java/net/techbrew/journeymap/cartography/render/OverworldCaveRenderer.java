@@ -353,7 +353,7 @@ public class OverworldCaveRenderer extends BaseRenderer implements IChunkRendere
      * Get block height within slice.
      */
     @Override
-    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater, boolean ignoreNoShadowBlocks)
+    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY)
     {
         Integer[][] blockSliceHeights = chunkMd.getSliceBlockHeights(vSlice);
         Integer y = blockSliceHeights[x][z];
@@ -372,7 +372,7 @@ public class OverworldCaveRenderer extends BaseRenderer implements IChunkRendere
 
             while (y > 0)
             {
-                if (ignoreWater && blockMD.isWater())
+                if (mapBathymetry && blockMD.isWater())
                 {
                     y--;
                 }

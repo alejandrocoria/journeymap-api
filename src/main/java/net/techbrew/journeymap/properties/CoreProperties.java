@@ -42,6 +42,8 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public final AtomicBoolean mapCaveLighting = new AtomicBoolean(true);
     public final AtomicBoolean mapAntialiasing = new AtomicBoolean(true);
     public final AtomicBoolean mapPlantShadows = new AtomicBoolean(false);
+    public final AtomicBoolean mapPlants = new AtomicBoolean(true);
+    public final AtomicBoolean mapCrops = new AtomicBoolean(true);
     protected transient final String name = "core";
 
     public CoreProperties()

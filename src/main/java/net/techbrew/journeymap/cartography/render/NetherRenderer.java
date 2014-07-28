@@ -35,7 +35,7 @@ public class NetherRenderer extends OverworldCaveRenderer implements IChunkRende
      * Get block height within slice.
      */
     @Override
-    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, boolean ignoreWater, boolean ignoreNoShadowBlocks)
+    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY)
     {
         Integer[][] blockSliceHeights = chunkMd.getSliceBlockHeights(vSlice);
         Integer y = blockSliceHeights[x][z];

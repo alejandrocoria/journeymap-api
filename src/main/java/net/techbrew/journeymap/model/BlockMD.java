@@ -408,7 +408,17 @@ public class BlockMD
         /**
          * Block is transparent and is ignored by Minecraft's chunk heights.
          */
-        TransparentRoof
+        TransparentRoof,
+
+        /**
+         * Block is a non-crop plant
+         */
+        Plant,
+
+        /**
+         * Block is a crop
+         */
+        Crop
     }
 
 

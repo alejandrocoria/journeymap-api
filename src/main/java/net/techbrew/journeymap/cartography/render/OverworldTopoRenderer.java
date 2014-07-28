@@ -18,14 +18,11 @@ import java.util.ArrayList;
 
 public class OverworldTopoRenderer extends OverworldSurfaceRenderer implements IChunkRenderer
 {
-
-    static final int alphaDepth = 5;
     ArrayList<Color> water = new ArrayList<Color>(32);
     ArrayList<Color> land = new ArrayList<Color>(32);
 
     public OverworldTopoRenderer()
     {
-
         water.add(new Color(31, 40, 79));
         water.add(new Color(38, 60, 106));
         water.add(new Color(46, 80, 133));
@@ -103,16 +100,15 @@ public class OverworldTopoRenderer extends OverworldSurfaceRenderer implements I
     {
         float slope, h, hN, hW, hE, hS;
         chunkMd.surfaceSlopes = new Float[16][16];
-        boolean ignoreWater = mapBathymetry;
         for (int z = 0; z < 16; z++)
         {
             for (int x = 0; x < 16; x++)
             {
-                h = chunkMd.getSurfaceBlockHeight(x, z, ignoreWater);
-                hN = (z == 0) ? chunkMd.getSurfaceBlockHeight(x, z, 0, -1, neighbors, h, ignoreWater, true) : chunkMd.getSurfaceBlockHeight(x, z - 1, ignoreWater, true);
-                hW = (x == 0) ? chunkMd.getSurfaceBlockHeight(x, z, -1, 0, neighbors, h, ignoreWater, true) : chunkMd.getSurfaceBlockHeight(x - 1, z, ignoreWater, true);
-                hS = (z == 15) ? chunkMd.getSurfaceBlockHeight(x, z, 0, 1, neighbors, h, ignoreWater, true) : chunkMd.getSurfaceBlockHeight(x, z + 1, ignoreWater, true);
-                hE = (x == 15) ? chunkMd.getSurfaceBlockHeight(x, z, 1, 0, neighbors, h, ignoreWater, true) : chunkMd.getSurfaceBlockHeight(x + 1, z, ignoreWater, true);
+                h = getSurfaceBlockHeight(chunkMd, x, z);
+                hN = (z == 0) ? getSurfaceBlockHeight(chunkMd, x, z, 0, -1, neighbors, h) : getSurfaceBlockHeight(chunkMd, x, z - 1);
+                hW = (x == 0) ? getSurfaceBlockHeight(chunkMd, x, z, -1, 0, neighbors, h) : getSurfaceBlockHeight(chunkMd, x - 1, z);
+                hS = (z == 15) ? getSurfaceBlockHeight(chunkMd, x, z, 0, 1, neighbors, h) : getSurfaceBlockHeight(chunkMd, x, z + 1);
+                hE = (x == 15) ? getSurfaceBlockHeight(chunkMd, x, z, 1, 0, neighbors, h) : getSurfaceBlockHeight(chunkMd, x + 1, z);
 
                 h = (int) h >> 3;
                 hN = (int) hN >> 3;

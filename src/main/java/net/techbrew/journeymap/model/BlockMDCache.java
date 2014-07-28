@@ -130,10 +130,18 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
                 setFlags(block, BiomeColor);
             }
 
-            if (block instanceof IPlantable)
+            if (block instanceof BlockCrops)
             {
+                setFlags(block, Side2Texture, Crop);
+                if (!coreProperties.mapPlantShadows.get())
+                {
+                    setFlags(block, NoShadow);
+                }
+            }
 
-                setFlags(block, Side2Texture);
+            if (block instanceof BlockBush)
+            {
+                setFlags(block, Side2Texture, Plant);
                 if (!coreProperties.mapPlantShadows.get())
                 {
                     setFlags(block, NoShadow);
