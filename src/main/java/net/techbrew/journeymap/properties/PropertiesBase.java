@@ -1,5 +1,14 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.properties;
 
+import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.techbrew.journeymap.JourneyMap;
@@ -7,8 +16,7 @@ import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -16,17 +24,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class PropertiesBase
 {
-    // Gson for file persistence
-    protected transient final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-    // Toggles whether save() actually does anything.
-    protected transient final AtomicBoolean saveEnabled = new AtomicBoolean(true);
-
+    protected static final Charset UTF8 = Charset.forName("UTF-8");
     private static final String[] HEADERS = {
             "// JourneyMap configuration file. Modify at your own risk!",
             "// To restore the default settings, simply delete this file before starting Minecraft",
             "// For help with this file, see http://journeymap.techbrew.net/help/wiki/Configuration_Files"
     };
+    // Gson for file persistence
+    protected transient final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    // Toggles whether save() actually does anything.
+    protected transient final AtomicBoolean saveEnabled = new AtomicBoolean(true);
+    protected int fileRevision;
+
+    protected PropertiesBase()
+    {
+    }
 
     /**
      * Name used in property file
@@ -36,18 +48,12 @@ public abstract class PropertiesBase
     public abstract String getName();
 
     /**
-     * Code base revision of props class
+     * Code base fileRevision of props class
      *
      * @return rev
      */
-    public abstract int getCurrentRevision();
+    public abstract int getCodeRevision();
 
-    /**
-     * Revision of properties loaded from file
-     *
-     * @return rev
-     */
-    public abstract int getRevision();
 
     /**
      * Gets the property file path.
@@ -60,14 +66,14 @@ public abstract class PropertiesBase
     }
 
     /**
-     * Whether the code base revision of the properties
+     * Whether the code base fileRevision of the properties
      * matches that loaded from the file.
      *
      * @return true if current
      */
     public boolean isCurrent()
     {
-        return getCurrentRevision() == getRevision();
+        return getCodeRevision() == fileRevision;
     }
 
     /**
@@ -77,6 +83,8 @@ public abstract class PropertiesBase
      */
     public boolean save()
     {
+        fileRevision = getCodeRevision();
+
         synchronized (saveEnabled)
         {
             if (!saveEnabled.get())
@@ -109,15 +117,10 @@ public abstract class PropertiesBase
                 String header = sb.toString();
 
                 // Json body
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 String json = gson.toJson(this);
 
                 // Write to file
-                FileWriter fw = new FileWriter(propFile);
-                fw.write(header);
-                fw.write(json);
-                fw.flush();
-                fw.close();
+                Files.write(header + json, propFile, UTF8);
 
                 return true;
             }
@@ -147,14 +150,12 @@ public abstract class PropertiesBase
     {
         T instance = (T) this;
         File propFile = getFile();
-        FileReader reader = null;
         boolean saveNeeded = true;
         try
         {
             if (propFile.canRead())
             {
-                reader = new FileReader(propFile);
-                instance = gson.fromJson(reader, (Class<T>) getClass());
+                instance = gson.fromJson(Files.toString(propFile, UTF8), (Class<T>) getClass());
                 saveNeeded = !instance.isCurrent();
                 if (saveNeeded)
                 {
@@ -169,28 +170,49 @@ public abstract class PropertiesBase
         catch (Exception e)
         {
             JourneyMap.getLogger().severe(String.format("Can't load config file %s: %s", propFile, e.getMessage()));
-        }
-        finally
-        {
-            if (reader != null)
+
+            try
             {
-                try
-                {
-                    reader.close();
-                }
-                catch (Exception e)
-                {
-                    JourneyMap.getLogger().severe(String.format("Can't close config file %s: %s", propFile, e.getMessage()));
-                }
+                File badPropFile = new File(propFile.getParentFile(), propFile.getName() + ".bad");
+                propFile.renameTo(badPropFile);
+            }
+            catch(Exception e3)
+            {
+                JourneyMap.getLogger().severe(String.format("Can't rename config file %s: %s", propFile, e3.getMessage()));
+            }
+
+        }
+
+        if(instance==null)
+        {
+            try
+            {
+                instance = (T) getClass().newInstance();
+                saveNeeded = true;
+            }
+            catch (Exception e)
+            {
+                // This isn't really the reason for this exception, just the root cause of the trouble.
+                throw new RuntimeException("Config file corrupted.  Please fix or remove: " + propFile);
             }
         }
 
-        if (saveNeeded)
+        if (instance!=null && (instance.validate() || saveNeeded))
         {
             instance.save();
         }
 
         return instance;
+    }
+
+    /**
+     * Should return true if save needed after validation.
+     *
+     * @return
+     */
+    protected boolean validate()
+    {
+        return false;
     }
 
     public <T extends PropertiesBase> T enableSave(boolean enabled)

@@ -12,6 +12,9 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Graceful recovery (instead of crash) when a config file isn't readable
+
+## Changelog for JourneyMap 4.0.3:
 - Bugfix: Fixed check to enable waypoint teleporting on local worlds
 - Change: Wayport teleport button now always visibile for remote worlds
 
