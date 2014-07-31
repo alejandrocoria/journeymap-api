@@ -22,7 +22,7 @@ group= "net.techbrew.journeymap" // http://maven.apache.org/guides/mini/guide-na
 archivesBaseName = "journeymap"
 
 minecraft {
-    version = "@FORGEVERSION@"
+    version = "@MCVERSION@-@FORGEVERSION@"
     assetDir = "eclipse/assets"
 }
 
