@@ -52,8 +52,14 @@ public abstract class PropertiesBase
      *
      * @return rev
      */
-    public abstract int getCodeRevision();
+    public abstract int getCurrentRevision();
 
+    /**
+     * Revision of properties loaded from file
+     *
+     * @return rev
+     */
+    public abstract int getRevision();
 
     /**
      * Gets the property file path.
@@ -73,7 +79,7 @@ public abstract class PropertiesBase
      */
     public boolean isCurrent()
     {
-        return getCodeRevision() == fileRevision;
+        return getCurrentRevision() == getRevision();
     }
 
     /**
@@ -83,8 +89,6 @@ public abstract class PropertiesBase
      */
     public boolean save()
     {
-        fileRevision = getCodeRevision();
-
         synchronized (saveEnabled)
         {
             if (!saveEnabled.get())
