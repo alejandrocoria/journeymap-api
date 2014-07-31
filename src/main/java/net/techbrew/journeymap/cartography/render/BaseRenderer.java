@@ -279,6 +279,11 @@ public abstract class BaseRenderer implements IChunkRenderer
                     // Set that slope.  Set it good.  Aw yeah.
 
                     slopes[x][z] = Math.min(slopeMax, Math.max(slopeMin, slope));
+
+                    if(slopes[x][z].isNaN())
+                    {
+                        slopes[x][z] = 1f;
+                    }
                 }
             }
 
@@ -327,6 +332,12 @@ public abstract class BaseRenderer implements IChunkRenderer
 
     protected float calculateSlope(final ChunkMD chunkMd, final ChunkMD.Set neighbors, final Collection<BlockCoordIntPair> offsets, final int x, final int y, final int z, boolean isSurface, Integer vSlice, int sliceMinY, int sliceMaxY)
     {
+        // Shortcut
+        if(y<=0)
+        {
+            return 1f;
+        }
+
         // Calculate slope by dividing height by neighbors' heights
         float slopeSum = 0;
         for (BlockCoordIntPair offset : offsets)
@@ -340,7 +351,12 @@ public abstract class BaseRenderer implements IChunkRenderer
                 slopeSum += ((y * 1f) / getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, offset.x, offset.z, neighbors, y));
             }
         }
-        return slopeSum / offsets.size();
+        Float slope =  slopeSum / offsets.size();
+        if(slope.isNaN())
+        {
+            slope = 1f;
+        }
+        return slope;
     }
 
 
@@ -372,7 +388,7 @@ public abstract class BaseRenderer implements IChunkRenderer
         }
 
         Float slope = slopes[x][z];
-        if(slope==null)
+        if(slope==null || slope.isNaN())
         {
             JourneyMap.getLogger().warning("No slope for " + chunkMd + " at " + x + "," + z);
             slope = 1f;
