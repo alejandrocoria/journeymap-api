@@ -50,12 +50,12 @@ public abstract class BaseRenderer implements IChunkRenderer
     ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
     ArrayList<BlockCoordIntPair> secondarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
 
-    protected float slopeMin = 0.2f;
-    protected float slopeMax = 1.7f;
-    protected float primaryDownslopeMultiplier = .5f;
-    protected float primaryUpslopeMultiplier = 1.25f;
-    protected float secondaryDownslopeMultiplier = .99f;
-    protected float secondaryUpslopeMultiplier = 1.01f;
+    protected float slopeMin;
+    protected float slopeMax;
+    protected float primaryDownslopeMultiplier;
+    protected float primaryUpslopeMultiplier;
+    protected float secondaryDownslopeMultiplier;
+    protected float secondaryUpslopeMultiplier;
 
     protected float moonlightLevel = 3.5f;
 
@@ -63,22 +63,23 @@ public abstract class BaseRenderer implements IChunkRenderer
     {
         updateOptions();
 
-        // Offsets used for primary slope
+        this.slopeMin = 0.2f;
+        this.slopeMax = 1.7f;
+        this.primaryDownslopeMultiplier = .65f;
+        this.primaryUpslopeMultiplier = 1.20f;
+        this.secondaryDownslopeMultiplier = .95f;
+        this.secondaryUpslopeMultiplier = 1.05f;
+
+        primarySlopeOffsets.clear();
         primarySlopeOffsets.add(new BlockCoordIntPair(0, -1)); // North
         primarySlopeOffsets.add(new BlockCoordIntPair(-1, -1)); // NorthWest
         primarySlopeOffsets.add(new BlockCoordIntPair(-1, 0)); // West
-        //primarySlopeOffsets.add(new BlockCoordIntPair(-1, 1)); // SouthWest
 
-        // Offsets used for secondary slope
-//        secondarySlopeOffsets.add(new BlockCoordIntPair(-1, -2)); // North of NorthWest
-//        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -1)); // West of NorthWest
-//        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -2)); // NorthWest of NorthWest
-//        secondarySlopeOffsets.add(new BlockCoordIntPair(-1, -2)); // South of NorthWest
-
-        secondarySlopeOffsets.add(new BlockCoordIntPair(1, -1)); // NorthEast
-        secondarySlopeOffsets.add(new BlockCoordIntPair(1, 0)); // East
-        secondarySlopeOffsets.add(new BlockCoordIntPair(1, 1)); // SouthEast
-        secondarySlopeOffsets.add(new BlockCoordIntPair(0, 1)); // South
+        secondarySlopeOffsets.clear();
+        secondarySlopeOffsets.add(new BlockCoordIntPair(-1, -2)); // North of NorthWest
+        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -1)); // West of NorthWest
+        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -2)); // NorthWest of NorthWest
+        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, 0)); // SouthWest of NorthWest
     }
 
     /**
@@ -92,6 +93,14 @@ public abstract class BaseRenderer implements IChunkRenderer
         mapCaveLighting = coreProperties.mapCaveLighting.get();
         mapPlants = coreProperties.mapPlants.get();
         mapCrops = coreProperties.mapCrops.get();
+
+        this.slopeMin = 0.2f;
+        this.slopeMax = 1.7f;
+        this.primaryDownslopeMultiplier = .65f;
+        this.primaryUpslopeMultiplier = 1.20f;
+        this.secondaryDownslopeMultiplier = .95f;
+        this.secondaryUpslopeMultiplier = 1.05f;
+
     }
 
     @Override
@@ -238,7 +247,6 @@ public abstract class BaseRenderer implements IChunkRenderer
                         y = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY);
                     }
 
-
                     // Calculate primary slope
                     primarySlope = calculateSlope(chunkMd, neighbors, primarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY);
 
@@ -253,9 +261,8 @@ public abstract class BaseRenderer implements IChunkRenderer
                         slope *= primaryUpslopeMultiplier;
                     }
 
-
                     // Calculate secondary slope
-                    if (mapAntialiasing )
+                    if (mapAntialiasing && primarySlope==1f )
                     {
                         secondarySlope = calculateSlope(chunkMd, neighbors, secondarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY);
 
@@ -414,11 +421,14 @@ public abstract class BaseRenderer implements IChunkRenderer
 
             while (y > 0)
             {
-                if(blockMD.isWater() && mapBathymetry)
+                if(blockMD.isWater())
                 {
-                    break;
+                    if(!mapBathymetry)
+                    {
+                        break;
+                    }
                 }
-                if(!blockMD.isAir() && !blockMD.hasFlag(BlockMD.Flag.NoShadow))
+                else if(!blockMD.isAir() && !blockMD.hasFlag(BlockMD.Flag.NoShadow))
                 {
                     break;
                 }

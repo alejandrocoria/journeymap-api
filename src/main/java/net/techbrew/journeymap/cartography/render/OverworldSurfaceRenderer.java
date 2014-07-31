@@ -139,11 +139,7 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
                         }
                     }
 
-                    // Get top non-roof block
-                    if(mapPlants || mapCrops)
-                    {
-                        //standardY++;
-                    }
+
 
                     topBlockMd = chunkMd.getTopBlockMD(x, standardY, z);
 
@@ -151,6 +147,17 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
                     {
                         paintBadBlock(x, standardY, z, g2D);
                         continue blockLoop;
+                    }
+
+                    // Check a block up
+                    if(mapPlants || mapCrops)
+                    {
+                        BlockMD temp = chunkMd.getTopBlockMD(x, standardY+1, z);
+                        if((mapPlants && temp.hasFlag(BlockMD.Flag.Plant)) ||
+                           (mapCrops && temp.hasFlag(BlockMD.Flag.Crop)))
+                        {
+                            standardY++;
+                        }
                     }
 
                     // Start using BlockColors stack
@@ -201,7 +208,7 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
 
         if (mapTransparency || strata.isEmpty())
         {
-            while (y > 0)
+            while (y >= 0)
             {
                 blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
 
