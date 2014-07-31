@@ -170,9 +170,34 @@ public abstract class PropertiesBase
         catch (Exception e)
         {
             JourneyMap.getLogger().severe(String.format("Can't load config file %s: %s", propFile, e.getMessage()));
+
+            try
+            {
+                File badPropFile = new File(propFile.getParentFile(), propFile.getName() + ".bad");
+                propFile.renameTo(badPropFile);
+            }
+            catch(Exception e3)
+            {
+                JourneyMap.getLogger().severe(String.format("Can't rename config file %s: %s", propFile, e3.getMessage()));
+            }
+
         }
 
-        if (instance.validate() || saveNeeded)
+        if(instance==null)
+        {
+            try
+            {
+                instance = (T) getClass().newInstance();
+                saveNeeded = true;
+            }
+            catch (Exception e)
+            {
+                // This isn't really the reason for this exception, just the root cause of the trouble.
+                throw new RuntimeException("Config file corrupted.  Please fix or remove: " + propFile);
+            }
+        }
+
+        if (instance!=null && (instance.validate() || saveNeeded))
         {
             instance.save();
         }
