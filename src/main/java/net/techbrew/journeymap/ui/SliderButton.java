@@ -43,14 +43,27 @@ public class SliderButton extends Button
     /**
      * Create a SliderField with a ValueHolder to wrap an AtomicInteger and its range.
      */
-    public static SliderButton create(int buttonId, final AtomicInteger property, final int min, final int max, final String messageKey)
+    public static SliderButton create(int buttonId, final AtomicInteger property, final int min, final int max, final String messageKey, final boolean displayAsPercent)
     {
         ValueHolder intValueHolder = new ValueHolder()
         {
+            boolean displayPercentage = displayAsPercent;
+
             @Override
             public void setValueFromSlider(float sliderValue)
             {
-                property.set((int) (sliderValue * (max + min)));
+                if(sliderValue==0)
+                {
+                    property.set(min);
+                }
+                else if(sliderValue==1)
+                {
+                    property.set(max);
+                }
+                else
+                {
+                    property.set((int) (sliderValue * (max + min)));
+                }
             }
 
             @Override
@@ -62,10 +75,18 @@ public class SliderButton extends Button
             @Override
             public String getDisplayString()
             {
-                NumberFormat percentFormat = NumberFormat.getPercentInstance();
-                percentFormat.setMaximumFractionDigits(0);
-                String result = percentFormat.format(getValueForSlider());
-                return Constants.getString(messageKey, result);
+                Object displayValue = null;
+                if(displayPercentage)
+                {
+                    NumberFormat percentFormat = NumberFormat.getPercentInstance();
+                    percentFormat.setMaximumFractionDigits(0);
+                    displayValue = percentFormat.format(getValueForSlider());
+                }
+                else
+                {
+                    displayValue = property.get();
+                }
+                return Constants.getString(messageKey, displayValue);
             }
         };
 
@@ -121,19 +142,7 @@ public class SliderButton extends Button
         if (super.mousePressed(par1Minecraft, par2, par3))
         {
             this.sliderValue = (float) (par2 - (this.xPosition + 4)) / (float) (this.width - 8);
-
-            if (this.sliderValue < 0.0F)
-            {
-                this.sliderValue = 0.0F;
-            }
-
-            if (this.sliderValue > 1.0F)
-            {
-                this.sliderValue = 1.0F;
-            }
-
-            valueHolder.setValueFromSlider(this.sliderValue);
-            this.displayString = valueHolder.getDisplayString();
+            updateValue();
             this.dragging = true;
             return true;
         }
@@ -149,6 +158,26 @@ public class SliderButton extends Button
     public void mouseReleased(int par1, int par2)
     {
         this.dragging = false;
+        updateValue();
+    }
+
+    /**
+     * Clamps the slider value, sets the value from the slider, updates display string.
+     */
+    public void updateValue()
+    {
+        if (this.sliderValue < 0.0F)
+        {
+            this.sliderValue = 0.0F;
+        }
+
+        if (this.sliderValue > 1.0F)
+        {
+            this.sliderValue = 1.0F;
+        }
+
+        valueHolder.setValueFromSlider(this.sliderValue);
+        this.displayString = valueHolder.getDisplayString();
     }
 
     /**

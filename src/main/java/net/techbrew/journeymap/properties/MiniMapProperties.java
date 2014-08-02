@@ -11,6 +11,7 @@ package net.techbrew.journeymap.properties;
 import net.techbrew.journeymap.ui.minimap.DisplayVars;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -18,7 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class MiniMapProperties extends InGameMapProperties
 {
-    protected transient static final int CODE_REVISION = 3;
+    protected transient static final int CODE_REVISION = 4;
     public final AtomicBoolean enabled = new AtomicBoolean(true);
     public final AtomicReference<DisplayVars.Shape> shape = new AtomicReference<DisplayVars.Shape>(DisplayVars.Shape.SmallSquare);
     public final AtomicReference<DisplayVars.Position> position = new AtomicReference<DisplayVars.Position>(DisplayVars.Position.TopRight);
@@ -26,6 +27,8 @@ public class MiniMapProperties extends InGameMapProperties
     public final AtomicBoolean enableHotkeys = new AtomicBoolean(true);
     public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
     public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("2D");
+    public final AtomicInteger customSize = new AtomicInteger(0);
+    public final AtomicInteger frameAlpha = new AtomicInteger(255);
     protected transient final String name = "minimap";
 
     public MiniMapProperties()
@@ -48,6 +51,53 @@ public class MiniMapProperties extends InGameMapProperties
     public int getCodeRevision()
     {
         return CODE_REVISION;
+    }
+
+
+    @Override
+    protected boolean validate()
+    {
+        boolean saveNeeded = super.validate();
+
+        if (frameAlpha.get() < 0)
+        {
+            frameAlpha.set(0);
+            saveNeeded = true;
+        }
+        else if (frameAlpha.get() > 255)
+        {
+            frameAlpha.set(255);
+            saveNeeded = true;
+        }
+
+        if (customSize.get() == 0)
+        {
+            int inferredSize;
+            switch(this.shape.get())
+            {
+                case SmallSquare:
+                    inferredSize = 128;
+                    break;
+                case MediumSquare:
+                    inferredSize = 256;
+                    break;
+                case LargeSquare:
+                    inferredSize = 512;
+                    break;
+                case SmallCircle:
+                    inferredSize = 128;
+                    break;
+                case LargeCircle:
+                    inferredSize = 512;
+                    break;
+                default:
+                    inferredSize = 256;
+            }
+            this.customSize.set(inferredSize);
+            saveNeeded = true;
+        }
+
+        return saveNeeded;
     }
 
     @Override

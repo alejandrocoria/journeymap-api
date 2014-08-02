@@ -283,8 +283,14 @@ public class MiniMap
             // Restore GL attrs assumed by Minecraft to be managerEnabled
             GL11.glEnable(GL11.GL_DEPTH_TEST);
 
-            // Draw border texture
-            DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, 1f);
+//            // Draw border texture
+//            if(dv.borderTexture!=null)
+//            {
+//                GL11.glPushMatrix();
+//                GL11.glTranslated(512-dv.minimapSize, 0, 0);
+//                DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, (float) (dv.minimapSize / 512.0));
+//                GL11.glPopMatrix();
+//            }
 
             // Draw off-screen waypoints on top of border texture
             if (!allWaypointSteps.isEmpty())

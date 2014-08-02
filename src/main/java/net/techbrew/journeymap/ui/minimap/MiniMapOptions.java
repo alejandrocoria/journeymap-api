@@ -24,7 +24,7 @@ public class MiniMapOptions extends JmUI
     private Button buttonPosition, buttonShape, buttonFont, buttonTexture, buttonUnicode, buttonMiniMap, buttonKeyboard;
     private Button buttonKeyboardHelp, buttonShowSelf, buttonShowfps, buttonGeneralDisplay, buttonClose, buttonCloseAll;
     private IconSetButton buttonIconSet;
-    private SliderButton buttonTerrainAlpha;
+    private SliderButton buttonTerrainAlpha, buttonFrameAlpha, buttonCustomSize;
     private DisplayVars.Shape currentShape;
     private DisplayVars.Position currentPosition;
     private ButtonList leftButtons;
@@ -32,6 +32,10 @@ public class MiniMapOptions extends JmUI
     private ButtonList bottomButtons;
     private MiniMap miniMap = UIManager.getInstance().getMiniMap();
     private MiniMapProperties miniMapProperties = JourneyMap.getInstance().miniMapProperties;
+
+    private int lastTerrainAlpha;
+    private int lastCustomSize;
+
     public MiniMapOptions()
     {
         this(MasterOptions.class);
@@ -113,12 +117,14 @@ public class MiniMapOptions extends JmUI
 
         buttonIconSet = new IconSetButton(ButtonEnum.IconSet.ordinal(), miniMapProperties, "jm.common.mob_icon_set");
 
-        buttonTerrainAlpha = SliderButton.create(ButtonEnum.TerrainAlpha.ordinal(), miniMapProperties.terrainAlpha, 0, 255, "jm.minimap.terrain_alpha");
+        buttonCustomSize = SliderButton.create(ButtonEnum.CustomSize.ordinal(), miniMapProperties.customSize, 64, 1024, "jm.minimap.custom_size", false);
+        buttonTerrainAlpha = SliderButton.create(ButtonEnum.TerrainAlpha.ordinal(), miniMapProperties.terrainAlpha, 1, 255, "jm.minimap.terrain_alpha", true);
+        buttonFrameAlpha = SliderButton.create(ButtonEnum.FrameAlpha.ordinal(), miniMapProperties.frameAlpha, 1, 255, "jm.minimap.frame_alpha", true);
 
-        leftButtons = new ButtonList(buttonShape, buttonShowfps, buttonShowSelf, buttonKeyboard, buttonKeyboardHelp, buttonGeneralDisplay);
+        leftButtons = new ButtonList(buttonShape, buttonCustomSize, buttonShowfps, buttonShowSelf, buttonKeyboard, buttonKeyboardHelp, buttonGeneralDisplay);
         leftButtons.setNoDisableText(true);
 
-        rightButtons = new ButtonList(buttonPosition, buttonFont, buttonUnicode, buttonTexture, buttonIconSet, buttonTerrainAlpha);
+        rightButtons = new ButtonList(buttonPosition, buttonFont, buttonUnicode, buttonTexture, buttonIconSet, buttonTerrainAlpha, buttonFrameAlpha);
         rightButtons.setNoDisableText(true);
 
         buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
@@ -171,7 +177,29 @@ public class MiniMapOptions extends JmUI
         buttonGeneralDisplay.setEnabled(true);
         buttonKeyboardHelp.setEnabled(buttonMiniMap.getToggled() && buttonKeyboard.getToggled());
 
-        bottomButtons.layoutCenteredHorizontal(bx, leftButtons.getBottomY() + (3 * vgap), true, hgap);
+        buttonCustomSize.setEnabled(miniMapProperties.shape.get() == DisplayVars.Shape.CustomSquare);
+
+        bottomButtons.layoutCenteredHorizontal(bx, rightButtons.getBottomY() + (3 * vgap), true, hgap);
+    }
+
+    /**
+     * Called when the mouse is moved or a mouse button is released.  Signature: (mouseX, mouseY, which) which==-1 is
+     * mouseMove, which==0 or which==1 is mouseUp
+     */
+    protected void mouseMovedOrUp(int mouseX, int mouseY, int which)
+    {
+        // See if either slider was dragging before state is updated
+        boolean sliderWasInUse = buttonCustomSize.dragging || buttonTerrainAlpha.dragging || buttonFrameAlpha.dragging;
+
+        super.mouseMovedOrUp(mouseX, mouseY, which);
+
+        // See if sliders no longer in use.
+        boolean sliderNotInUse = !buttonCustomSize.dragging && !buttonTerrainAlpha.dragging && !buttonFrameAlpha.dragging;
+
+        if(sliderWasInUse && sliderNotInUse)
+        {
+            miniMap.updateDisplayVars(true);
+        }
     }
 
     @Override
@@ -267,6 +295,13 @@ public class MiniMapOptions extends JmUI
             case TerrainAlpha:
             {
                 miniMap.forceRefreshState();
+                break;
+            }
+
+            case CustomSize:
+            {
+                miniMap.forceRefreshState();
+                miniMap.updateDisplayVars(true);
                 break;
             }
 
@@ -378,6 +413,6 @@ public class MiniMapOptions extends JmUI
 
     private enum ButtonEnum
     {
-        MiniMap, Position, Shape, Font, Texture, IconSet, Unicode, Keyboard, KeyboardHelp, Close, Showfps, ShowSelf, GeneralDisplay, TerrainAlpha, CloseAll
+        MiniMap, Position, Shape, Font, Texture, IconSet, Unicode, Keyboard, KeyboardHelp, Close, Showfps, ShowSelf, GeneralDisplay, TerrainAlpha, FrameAlpha, CustomSize, CloseAll
     }
 }

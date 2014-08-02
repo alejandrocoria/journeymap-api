@@ -15,11 +15,13 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
+import net.techbrew.journeymap.render.texture.DelayedTexture;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.concurrent.Future;
 
 /**
  * Display variables for the Minimap.
@@ -165,6 +167,27 @@ public class DisplayVars
                 labelsOutside = true;
                 break;
             }
+            case CustomSquare:
+            {
+                drawScale = 1f * textureScale;
+                maskTexture = null;
+                minimapSize = miniMapProperties.customSize.get();
+                float minimapAlpha = (1f * miniMapProperties.frameAlpha.get()) / 255f;
+                borderTexture = TextureCache.instance().getMinimapCustomSquare((int) minimapSize, minimapAlpha);
+                marginX = 0;
+                marginY = 0;
+                viewPortPadX = 2;
+                viewPortPadY = 2;
+                valignLocation = DrawUtil.VAlign.Below;
+                valignBiome = DrawUtil.VAlign.Below;
+                yOffsetFps = 3;
+                yOffsetLocation = 1;
+                yOffsetBiome = yOffsetLocation + labelHeight;
+                scissorLocation = false;
+                scissorBiome = false;
+                labelsOutside = true;
+                break;
+            }
             case MediumSquare:
             default:
             {
@@ -190,8 +213,8 @@ public class DisplayVars
         {
             case BottomRight:
             {
-                textureX = mc.displayWidth - borderTexture.width - marginX;
-                textureY = mc.displayHeight - (borderTexture.height) - marginY - bottomTextureYMargin;
+                textureX = mc.displayWidth - minimapSize - marginX;
+                textureY = mc.displayHeight - (minimapSize) - marginY - bottomTextureYMargin;
                 translateX = (mc.displayWidth / 2) - minimapOffset;
                 translateY = (mc.displayHeight / 2) - minimapOffset - bottomTextureYMargin;
                 scissorX = mc.displayWidth - minimapSize - marginX;
@@ -218,7 +241,7 @@ public class DisplayVars
             case BottomLeft:
             {
                 textureX = marginX;
-                textureY = mc.displayHeight - (borderTexture.height) - marginY - bottomTextureYMargin;
+                textureY = mc.displayHeight - (minimapSize) - marginY - bottomTextureYMargin;
                 translateX = -(mc.displayWidth / 2) + minimapOffset;
                 translateY = (mc.displayHeight / 2) - minimapOffset - bottomTextureYMargin;
                 scissorX = marginX;
@@ -235,7 +258,7 @@ public class DisplayVars
             case TopRight:
             default:
             {
-                textureX = mc.displayWidth - borderTexture.width + marginX;
+                textureX = mc.displayWidth - minimapSize + marginX;
                 textureY = marginY;
                 translateX = (mc.displayWidth / 2) - minimapOffset;
                 translateY = -(mc.displayHeight / 2) + minimapOffset;
@@ -252,6 +275,7 @@ public class DisplayVars
         labelLocation = new LabelVars(centerX, bottomY + yOffsetLocation, DrawUtil.HAlign.Center, valignLocation, fontScale, scissorLocation, useFontShadow);
         labelBiome = new LabelVars(centerX, bottomY + yOffsetBiome, DrawUtil.HAlign.Center, valignBiome, fontScale, scissorBiome, useFontShadow);
     }
+
     /**
      * Position of minimap on screen
      */
@@ -318,9 +342,10 @@ public class DisplayVars
         SmallSquare("jm.minimap.shape_smallsquare"),
         MediumSquare("jm.minimap.shape_mediumsquare"),
         LargeSquare("jm.minimap.shape_largesquare"),
+        CustomSquare("jm.minimap.shape_customsquare"),
         SmallCircle("jm.minimap.shape_smallcircle"),
         LargeCircle("jm.minimap.shape_largecircle");
-        public static Shape[] Enabled = {SmallSquare, MediumSquare, LargeSquare};
+        public static Shape[] Enabled = {SmallSquare, MediumSquare, LargeSquare, CustomSquare};
         public final String label;
 
         private Shape(String label)

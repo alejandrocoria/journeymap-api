@@ -28,10 +28,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 
 /**
  * TODO:  Make this actually act like a cache.
@@ -116,6 +113,30 @@ public class TextureCache
         return future;
     }
 
+//    public Future<DelayedTexture> updateTexture(TextureImpl texture, final Integer imageWidth, final Integer imageHeight, final float alpha)
+//    {
+//        return updateImage(texture.getGlTextureId(), texture.getImage(), imageWidth, imageHeight, alpha);
+//    }
+//
+//    public Future<DelayedTexture> updateImage(final Integer glId, final BufferedImage image, final Integer imageWidth, final Integer imageHeight, final float alpha)
+//    {
+//        Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>()
+//        {
+//            @Override
+//            public DelayedTexture call() throws Exception
+//            {
+//                BufferedImage updatedImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
+//                Graphics2D g = (Graphics2D) updatedImage.getGraphics();
+//                g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+//                g.drawImage(image, 0, 0, imageWidth, imageHeight, null);
+//                g.dispose();
+//
+//                return new DelayedTexture(glId, updatedImage, null);
+//            }
+//        });
+//        return future;
+//    }
+
     /**
      * *********************************************
      */
@@ -166,30 +187,66 @@ public class TextureCache
         }
     }
 
-    public TextureImpl getMinimapSmallSquare()
+    public TextureImpl getMinimapCustomSquare(int size, float alpha)
     {
-        return getNamedTexture(Name.MinimapSmallSquare, "minimap/minimap-square-128.png", false); //$NON-NLS-1$
-    }
+        size = Math.max(64, Math.min(size, 1024));
+        alpha = Math.max(0, Math.min(alpha, 1));
 
-    public TextureImpl getMinimapSquare(int size)
-    {
-        final BufferedImage original = FileHandler.getWebImage("minimap/minimap-square-512.png");
-        BufferedImage custom = new BufferedImage(size, size, original.getType());
+        final String frameImg;
+        if(size<=128)
+        {
+            frameImg = "minimap/minimap-square-128.png";
+        }
+        else if(size<=256)
+        {
+            frameImg = "minimap/minimap-square-256.png";
+        }
+        else if(size<=512)
+        {
+            frameImg = "minimap/minimap-square-512.png";
+        }
+        else
+        {
+            frameImg = "minimap/minimap-square-128.png";
+        }
 
-        Graphics2D g = custom.createGraphics();
-        //RegionImageHandler.initRenderingHints(g);
-
-        g.drawImage(custom, 0, 0, null);
+        BufferedImage img = FileHandler.getWebImage(frameImg);
+        BufferedImage resizedImg = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = (Graphics2D) resizedImg.getGraphics();
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+        g.drawImage(img, 0, 0, size, size, null);
         g.dispose();
 
         TextureImpl tex = namedTextures.get(Name.MinimapCustomSquare);
-        if (tex != null)
+        if(tex!=null)
         {
             tex.deleteTexture();
         }
-        tex = new TextureImpl(original, true);
+
+        tex = new TextureImpl(resizedImg, false);
         namedTextures.put(Name.MinimapCustomSquare, tex);
         return tex;
+    }
+
+    public TextureImpl bindMinimapCustomSquare(Future<DelayedTexture> delayedCustomTex)
+    {
+        if(delayedCustomTex.isDone())
+        {
+            try
+            {
+                return delayedCustomTex.get().bindTexture();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public TextureImpl getMinimapSmallSquare()
+    {
+        return getNamedTexture(Name.MinimapSmallSquare, "minimap/minimap-square-128.png", false); //$NON-NLS-1$
     }
 
     public TextureImpl getMinimapMediumSquare()

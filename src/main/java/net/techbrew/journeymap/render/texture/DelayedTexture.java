@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
  */
 public class DelayedTexture
 {
-
     final int width;
     final int height;
     final ByteBuffer buffer;
