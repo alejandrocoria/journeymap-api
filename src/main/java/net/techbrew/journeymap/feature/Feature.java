@@ -1,73 +1,30 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.feature;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.integrated.IntegratedServer;
-
-import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Set;
 
-;
+public enum Feature
+{
+	RadarPlayers,
+	RadarAnimals,
+	RadarMobs,
+	RadarVillagers,
+	MapCaves;
 
-public enum Feature {
+    public static EnumSet<Feature> radar()
+    {
+        return EnumSet.of(RadarPlayers, RadarAnimals, RadarMobs, RadarVillagers);
+    }
 
-	/** Default feature is simply a place-holder. **/
-	NoOp(false,false),
-	
-	/** Universal features **/
-	// None
-	
-	/** Singleplayer-only features **/
-	// None
-	
-	/** Multiplayer-only features **/
-	RadarPlayers(false,true),
-	RadarAnimals(false,true),
-	RadarMobs(false,true),
-	RadarVillagers(false,true),
-	MapCaves(false,true);
-	
-	private final boolean restrictInSingleplayer;
-	private final boolean restrictInMultiplayer;
-	
-	private Feature(boolean singlePlayer, boolean multiPlayer) {
-		restrictInMultiplayer = multiPlayer;
-		restrictInSingleplayer = singlePlayer;
-	}
-	
-	public boolean isCurrentlyRestricted() {
-		if(restrictInMultiplayer && restrictInSingleplayer) {
-			return true;
-		} else {		
-			Minecraft mc = Minecraft.getMinecraft();
-
-            IntegratedServer server = mc.getIntegratedServer();
-            boolean isSinglePlayer = server!=null && !server.getPublic();
-
-			if(restrictInSingleplayer && isSinglePlayer) {
-				return true;
-			}
-			if(restrictInMultiplayer && !isSinglePlayer) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * Get a subset of features by what they restrict.
-	 * @param restrictSingleplayer
-	 * @param restrictMultiplayer
-	 * @return
-	 */
-	public static Set<Feature> getSubset(boolean restrictSingleplayer, boolean restrictMultiplayer) {
-		Set<Feature> subset = EnumSet.noneOf(Feature.class);
-		for(Feature feature : Feature.values()) {
-			if((restrictSingleplayer && feature.restrictInSingleplayer)
-					|| restrictMultiplayer && feature.restrictInMultiplayer) {
-				subset.add(feature);
-			}
-		}
-		return Collections.unmodifiableSet(subset);
-	}
+    public static EnumSet<Feature> all()
+    {
+        return EnumSet.allOf(Feature.class);
+    }
 }

@@ -83,7 +83,7 @@ public class GeneralDisplayOptions extends JmUI
         leftRows.add(rowPets);
 
         buttonCaves = BooleanPropertyButton.create(id++, fullMap, fullMap.showCaves);
-        buttonCaves.setEnabled(FeatureManager.isAllowed(Feature.RadarPlayers));
+        buttonCaves.setEnabled(FeatureManager.isAllowed(Feature.MapCaves));
 
         rowCaves = new ButtonList(Constants.getString("MapOverlay.show_caves", ""));
         rowCaves.add(buttonCaves);

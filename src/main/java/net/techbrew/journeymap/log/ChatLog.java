@@ -100,11 +100,7 @@ public class ChatLog {
             announceMod(false);
 
             // Check for newer version online
-            if (VersionCheck.getVersionIsCurrent() == false)
-            {
-                ChatLog.announceI18N(Constants.getString("JourneyMap.new_version_available", "")); //$NON-NLS-1$
-                ChatLog.announceURL(JourneyMap.WEBSITE_URL, JourneyMap.WEBSITE_URL);
-            }
+            VersionCheck.getVersionIsCurrent();
             initialized = true;
         }
 

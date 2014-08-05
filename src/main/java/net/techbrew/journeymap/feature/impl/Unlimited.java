@@ -1,37 +1,43 @@
+/*
+ * JourneyMap mod for Minecraft
+ *
+ * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ */
+
 package net.techbrew.journeymap.feature.impl;
 
-import net.techbrew.journeymap.feature.Feature;
-import net.techbrew.journeymap.feature.FeatureManager.FeatureSet;
+import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.feature.Policy;
 
-import java.util.EnumSet;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Unlimited features.
  * @author mwoodman
  *
  */
-public class Unlimited implements FeatureSet {
-	
-	private final EnumSet<Feature> features;
-	private final String name = "Unlimited";
+public class Unlimited implements FeatureManager.PolicySet
+{
+
+    private final Set<Policy> policies;
+    private final String name = "Unlimited";
 
 	public Unlimited() {
-		features = EnumSet.allOf(Feature.class);
-	}
+        policies = Collections.unmodifiableSet(Policy.bulkCreate(true, true));
+    }
 	
 	@Override
-	public EnumSet<Feature> getFeatures() {
-		return features;
-	}
+    public Set<Policy> getPolicies()
+    {
+        return policies;
+    }
 	
 	@Override
 	public String getName() {
 		return name;
-	}
-	
-	@Override
-	public boolean isUnlimited() {
-		return true;
 	}
 
 }

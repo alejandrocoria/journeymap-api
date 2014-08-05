@@ -1,5 +1,7 @@
 package modinfo;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.Loader;
 import modinfo.mp.v1.Client;
 import modinfo.mp.v1.Message;
 import modinfo.mp.v1.Payload;
@@ -24,7 +26,7 @@ public class ModInfo {
     public static final String VERSION = "0.1";
     public static final Logger LOGGER = Logger.getLogger("modinfo");
 
-    private final Minecraft minecraft = Minecraft.getMinecraft();
+    private final Minecraft minecraft = FMLClientHandler.instance().getClient();
     private final String trackingId;
     private final String modId;
     private final String modName;
@@ -33,7 +35,7 @@ public class ModInfo {
     private Config config;
     private Client client;
 
-    public ModInfo(String trackingId, String languageCode, String modId, String modName, String modVersion)
+    public ModInfo(String trackingId, String reportingLanguageCode, String modId, String modName, String modVersion)
     {
         this.trackingId = trackingId;
         this.modId = modId;
@@ -42,7 +44,7 @@ public class ModInfo {
 
         try
         {
-            this.reportingLocale = getLocale(languageCode);
+            this.reportingLocale = getLocale(reportingLanguageCode);
             this.config = Config.getInstance(this.modId);
             if(this.config.isEnabled())
             {
@@ -190,8 +192,9 @@ public class ModInfo {
         {
             if(isEnabled())
             {
-                Payload payload = new Payload(Payload.Type.AppView);
-                payload.add(appViewParams());
+                Payload payload = new Payload(Payload.Type.Event);
+                payload.put(Payload.Parameter.EventCategory, "ModInfo");
+                payload.put(Payload.Parameter.EventAction, "KeepAlive");
                 payload.put(Payload.Parameter.NonInteractionHit, "1");
                 client.send(payload);
             }
@@ -226,7 +229,7 @@ public class ModInfo {
         String salt = config.getSalt();
         String username = minecraft.getSession().getUsername();
         UUID clientId = createUUID(salt, username, modId);
-        return new Client(trackingId, clientId, config);
+        return new Client(trackingId, clientId, config, FMLClientHandler.instance().getCurrentLanguage());
     }
 
     private Map<Payload.Parameter, String> minecraftParams()
@@ -238,7 +241,7 @@ public class ModInfo {
         DisplayMode displayMode = Display.getDesktopDisplayMode();
         map.put(Payload.Parameter.ScreenResolution, displayMode.getWidth() + "x" + displayMode.getHeight());
 
-        StringBuilder desc = new StringBuilder(Display.getTitle());
+        StringBuilder desc = new StringBuilder(Loader.MC_VERSION);
         if(minecraft.theWorld != null)
         {
             IntegratedServer server = minecraft.getIntegratedServer();

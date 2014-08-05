@@ -54,11 +54,11 @@ import java.util.logging.Logger;
 @Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = JourneyMap.JM_VERSION)
 public class JourneyMap
 {
-    static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
+    static final String VERSION_URL = "https://docs.google.com/uc?id=0B-PlFsIS9WoCWGNLWUZPSl9KNHc"; //$NON-NLS-1$
 
     public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
     public static final String JM_VERSION = "@JMVERSION@"; //$NON-NLS-1$
-    public static final String MC_VERSION = "@MCVERSION@"; //$NON-NLS-1$
+    public static final String FORGE_VERSION = "@FORGEVERSION@"; //$NON-NLS-1$
 
     public static final String EDITION = getEdition();
     public static final String MOD_ID = "journeymap";
@@ -86,6 +86,7 @@ public class JourneyMap
     public long nextChunkUpdate = 0;
 
     public ModInfo modInfo;
+    private long lastModInfoKeepAlive = System.currentTimeMillis();
 
     // Properties & preferences
     public CoreProperties coreProperties;
@@ -119,7 +120,7 @@ public class JourneyMap
         String ed = null;
         try
         {
-            ed = JM_VERSION + " " + FeatureManager.getFeatureSetName();
+            ed = JM_VERSION + " " + FeatureManager.getPolicySetName();
         }
         catch (Throwable t)
         {
@@ -335,7 +336,11 @@ public class JourneyMap
                 return;
             }
 
-            modInfo.reportAppView();
+            if(modInfo!=null)
+            {
+                modInfo.reportAppView();
+                lastModInfoKeepAlive = System.currentTimeMillis();
+            }
 
             this.reset();
 
@@ -364,7 +369,6 @@ public class JourneyMap
 
         synchronized (this)
         {
-
             if (taskExecutor != null || taskController != null)
             {
                 String dim = ".";
@@ -422,6 +426,15 @@ public class JourneyMap
             if (mc == null)
             {
                 mc = FMLClientHandler.instance().getClient();
+            }
+
+            if(modInfo!=null)
+            {
+                if (System.currentTimeMillis() - lastModInfoKeepAlive > 600000) // 10 minutes
+                {
+                    lastModInfoKeepAlive = System.currentTimeMillis();
+                    modInfo.keepAlive();
+                }
             }
 
             final boolean isDead = mc.currentScreen != null && mc.currentScreen instanceof GuiGameOver;
