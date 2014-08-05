@@ -8,91 +8,23 @@
 
 package net.techbrew.journeymap.feature;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.integrated.IntegratedServer;
-
-import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Set;
-
-;
 
 public enum Feature
 {
+	RadarPlayers,
+	RadarAnimals,
+	RadarMobs,
+	RadarVillagers,
+	MapCaves;
 
-    /**
-     * Default feature is simply a place-holder. *
-     */
-    NoOp(false, false),
-
-    /** Universal features **/
-    // None
-
-    /** Singleplayer-only features **/
-    // None
-
-    /**
-     * Multiplayer-only features *
-     */
-    RadarPlayers(false, true),
-    RadarAnimals(false, true),
-    RadarMobs(false, true),
-    RadarVillagers(false, true),
-    MapCaves(false, true);
-
-    private final boolean restrictInSingleplayer;
-    private final boolean restrictInMultiplayer;
-
-    private Feature(boolean singlePlayer, boolean multiPlayer)
+    public static EnumSet<Feature> radar()
     {
-        restrictInMultiplayer = multiPlayer;
-        restrictInSingleplayer = singlePlayer;
+        return EnumSet.of(RadarPlayers, RadarAnimals, RadarMobs, RadarVillagers);
     }
 
-    /**
-     * Get a subset of features by what they restrict.
-     *
-     * @param restrictSingleplayer
-     * @param restrictMultiplayer
-     * @return
-     */
-    public static Set<Feature> getSubset(boolean restrictSingleplayer, boolean restrictMultiplayer)
+    public static EnumSet<Feature> all()
     {
-        Set<Feature> subset = EnumSet.noneOf(Feature.class);
-        for (Feature feature : Feature.values())
-        {
-            if ((restrictSingleplayer && feature.restrictInSingleplayer)
-                    || restrictMultiplayer && feature.restrictInMultiplayer)
-            {
-                subset.add(feature);
-            }
-        }
-        return Collections.unmodifiableSet(subset);
-    }
-
-    public boolean isCurrentlyRestricted()
-    {
-        if (restrictInMultiplayer && restrictInSingleplayer)
-        {
-            return true;
-        }
-        else
-        {
-            Minecraft mc = FMLClientHandler.instance().getClient();
-
-            IntegratedServer server = mc.getIntegratedServer();
-            boolean isSinglePlayer = server != null && !server.getPublic();
-
-            if (restrictInSingleplayer && isSinglePlayer)
-            {
-                return true;
-            }
-            if (restrictInMultiplayer && !isSinglePlayer)
-            {
-                return true;
-            }
-        }
-        return false;
+        return EnumSet.allOf(Feature.class);
     }
 }

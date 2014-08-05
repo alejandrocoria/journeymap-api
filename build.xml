@@ -2,11 +2,12 @@
 <project name="JourneyMap" basedir="." default="all">
 
     <!-- Update when new version is going to be released -->
-    <property name="jmversion" value="4.1.0dev" />
+    <property name="jmversion" value="4.0.4" />
     <property name="mcversion" value="1.7.10" />
     <property name="forgeversion" value="10.13.0.1180" />
 	<property name="unlimited" value="Unlimited" />
 	<property name="fairplay" value="FairPlay" />
+    <property name="noradar" value="NoRadar" />
 
     <property name="java.dir" location="${basedir}/src/main/java" />
     <property name="resources.dir" location="${basedir}/src/main/resources" />
@@ -27,20 +28,39 @@
         <format property="TODAY" pattern="yyyy-MM-dd.HHMM"/>
     </tstamp>
 
-    <target name="all" description="All" depends="init, build-unlimited, build-fairplay">
+    <target name="all" description="All" depends="init, build-unlimited, build-fairplay, build-noradar">
     </target>
 
     <target name="build-unlimited" description="Build Unlimited Edition" depends="init">
         <stage edition="${unlimited}"/>
+
+        <delete>
+            <fileset dir="${forge.src.dir}/net/techbrew/journeymap/feature/impl/" includes="*.java" excludes="Unlimited.java"/>
+        </delete>
+
         <dist edition="${unlimited}"/>
         <ant target="cleanforge" />
     </target>
 
     <target name="build-fairplay" description="Build FairPlay Edition" depends="init">
         <stage edition="${fairplay}"/>
-        <delete file="${forge.src.dir}/net/techbrew/journeymap/feature/impl/Unlimited.java" failonerror="true" />
-        <delete file="${forge.classes.dir}/net/techbrew/journeymap/feature/impl/Unlimited.class"/>
+
+        <delete>
+            <fileset dir="${forge.src.dir}/net/techbrew/journeymap/feature/impl/" includes="*.java" />
+        </delete>
+
         <dist edition="${fairplay}"/>
+        <ant target="cleanforge" />
+    </target>
+
+    <target name="build-noradar" description="Build NoRadar Edition" depends="init">
+        <stage edition="${noradar}"/>
+
+        <delete>
+            <fileset dir="${forge.src.dir}/net/techbrew/journeymap/feature/impl/" includes="*.java" excludes="NoRadar.java"/>
+        </delete>
+
+        <dist edition="${noradar}"/>
         <ant target="cleanforge" />
     </target>
 

@@ -8,43 +8,36 @@
 
 package net.techbrew.journeymap.feature.impl;
 
-import net.techbrew.journeymap.feature.Feature;
-import net.techbrew.journeymap.feature.FeatureManager.FeatureSet;
+import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.feature.Policy;
 
-import java.util.EnumSet;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Unlimited features.
- *
  * @author mwoodman
+ *
  */
-public class Unlimited implements FeatureSet
+public class Unlimited implements FeatureManager.PolicySet
 {
 
-    private final EnumSet<Feature> features;
+    private final Set<Policy> policies;
     private final String name = "Unlimited";
 
-    public Unlimited()
-    {
-        features = EnumSet.allOf(Feature.class);
+	public Unlimited() {
+        policies = Collections.unmodifiableSet(Policy.bulkCreate(true, true));
     }
-
-    @Override
-    public EnumSet<Feature> getFeatures()
+	
+	@Override
+    public Set<Policy> getPolicies()
     {
-        return features;
+        return policies;
     }
-
-    @Override
-    public String getName()
-    {
-        return name;
-    }
-
-    @Override
-    public boolean isUnlimited()
-    {
-        return true;
-    }
+	
+	@Override
+	public String getName() {
+		return name;
+	}
 
 }

@@ -12,6 +12,8 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New Edition: "NoRadar" disables all radar features in Multiplayer
+- Change: Check for newer version is now asynchronous and won't cause game to freeze while waiting for the connection
 - Bugfix: Graceful recovery (instead of crash) when a config file isn't readable
 
 ## Changelog for JourneyMap 4.0.3:

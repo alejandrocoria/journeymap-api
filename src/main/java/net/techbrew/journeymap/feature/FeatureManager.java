@@ -8,45 +8,81 @@
 
 package net.techbrew.journeymap.feature;
 
-import net.techbrew.journeymap.feature.impl.FairPlay;
+import com.google.common.reflect.ClassPath;
+import net.techbrew.journeymap.JourneyMap;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
+/**
+ * Governs what features are available at runtime.
+ */
 public class FeatureManager
 {
+    private static final String NAME_FAIRPLAY = "FairPlay";
+    private static final String IMPL_PACKAGE = "net.techbrew.journeymap.feature.impl";
+    private static final String CLASS_UNLIMITED = String.format("%s.Unlimited", IMPL_PACKAGE);
+    private final PolicySet policySet;
+    private final HashMap<Feature, Policy> policyMap = new HashMap<Feature, Policy>();
 
-    private final FeatureSet featureSet;
-
+    /**
+     * Private constructure.  Use instance()
+     */
     private FeatureManager()
     {
-
-        FeatureSet fs = null;
-        try
+        policySet = locatePolicySet();
+        for (Policy policy : policySet.getPolicies())
         {
-            Class fsClass = Class.forName("net.techbrew.journeymap.feature.impl.Unlimited");
-            fs = (FeatureSet) fsClass.newInstance();
+            policyMap.put(policy.feature, policy);
         }
-        catch (Throwable e)
-        {
-            fs = new FairPlay();
-        }
-        featureSet = fs;
     }
 
+    /**
+     * Gets a detailed description of all policies.
+     */
+    public static String getPolicyDetails()
+    {
+        StringBuilder sb = new StringBuilder(String.format("%s Features: ", getPolicySetName()));
+        for (Feature feature : Feature.values())
+        {
+            boolean single = false;
+            boolean multi = false;
+            if(Holder.INSTANCE.policyMap.containsKey(feature))
+            {
+                single = Holder.INSTANCE.policyMap.get(feature).allowInSingleplayer;
+                multi = Holder.INSTANCE.policyMap.get(feature).allowInMultiplayer;
+            }
+
+            sb.append(String.format("\n\t%s : singleplayer = %s , multiplayer = %s", feature.name(), single, multi));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Gets the singleton.
+     */
     public static FeatureManager instance()
     {
         return Holder.INSTANCE;
     }
 
+    /**
+     * Whether the specified feature is currently permitted.
+     * @param feature the feature to check
+     * @return  true if permitted
+     */
     public static boolean isAllowed(Feature feature)
     {
-        return Holder.INSTANCE.featureSet.isUnlimited()
-                || !feature.isCurrentlyRestricted()
-                || Holder.INSTANCE.featureSet.getFeatures().contains(feature);
+        Policy policy = Holder.INSTANCE.policyMap.get(feature);
+        return (policy != null) && policy.isCurrentlyAllowed();
     }
 
+    /**
+     * Returns a map of all features and whether they are currently permitted.
+     * @return
+     */
     public static Map<Feature, Boolean> getAllowedFeatures()
     {
         Map<Feature, Boolean> map = new HashMap<Feature, Boolean>(Feature.values().length * 2);
@@ -57,20 +93,100 @@ public class FeatureManager
         return map;
     }
 
-    public static String getFeatureSetName()
+    /**
+     * Gets the name of the PolicySet.
+     * @return
+     */
+    public static String getPolicySetName()
     {
-        return instance().featureSet.getName();
+        return instance().policySet.getName();
     }
 
-    public static interface FeatureSet
+
+    /**
+     * Finds the FeatureSet via reflection.
+     * @return
+     */
+    private PolicySet locatePolicySet()
     {
-        public Set<Feature> getFeatures();
+        PolicySet fs = null;
+        try
+        {
+            ClassPath cp = ClassPath.from(getClass().getClassLoader());
+            Set<ClassPath.ClassInfo> classInfos = cp.getTopLevelClasses(IMPL_PACKAGE);
+            if (classInfos.size() > 1)
+            {
+                try
+                {
+                    Class fsClass = Class.forName(CLASS_UNLIMITED);
+                    fs = (PolicySet) fsClass.newInstance();
+                }
+                catch (Throwable e)
+                {
+                }
+            }
+
+            if (fs == null)
+            {
+                for (ClassPath.ClassInfo classInfo : classInfos)
+                {
+                    Class aClass = classInfo.load();
+                    if (PolicySet.class.isAssignableFrom(aClass))
+                    {
+                        fs = (PolicySet) aClass.newInstance();
+                        break;
+                    }
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            t.printStackTrace(System.err);
+        }
+
+        return (fs != null) ? fs : createFairPlay();
+    }
+
+    /**
+     * Generates a FeatureSet that disables all features in multiplayer.
+     * @return
+     */
+    private PolicySet createFairPlay()
+    {
+        return new PolicySet()
+        {
+            // All features allowed in singleplayer, but none in multiplayer
+            private final Set<Policy> policies = Policy.bulkCreate(true, false);
+            private final String name = NAME_FAIRPLAY;
+
+            @Override
+            public Set<Policy> getPolicies()
+            {
+                return policies;
+            }
+
+            @Override
+            public String getName()
+            {
+                return name;
+            }
+
+        };
+    }
+
+    /**
+     * Interface for a named set of Policies.
+     */
+    public static interface PolicySet
+    {
+        public Set<Policy> getPolicies();
 
         public String getName();
-
-        public boolean isUnlimited();
     }
 
+    /**
+     * Instance holder.
+     */
     private static class Holder
     {
         private static final FeatureManager INSTANCE = new FeatureManager();

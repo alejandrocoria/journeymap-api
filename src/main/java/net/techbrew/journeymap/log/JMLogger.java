@@ -9,9 +9,12 @@
 package net.techbrew.journeymap.log;
 
 import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.ForgeVersion;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.properties.PropertiesBase;
 import net.techbrew.journeymap.thread.JMThreadFactory;
@@ -136,7 +139,7 @@ public class JMLogger
         LinkedHashMap<String, String> props = new LinkedHashMap<String, String>();
 
         // Versions
-        props.put("Version", JourneyMap.MOD_NAME + ", built with Forge " + JourneyMap.MC_VERSION);
+        props.put("Version", JourneyMap.MOD_NAME + ", built with Forge " + JourneyMap.FORGE_VERSION);
         props.put("Forge", ForgeVersion.getVersion());
 
         // Memory
@@ -151,7 +154,7 @@ public class JMLogger
         {
             sb.append(env).append("=").append(System.getProperty(env)).append(", ");
         }
-        sb.append("game language=").append(FMLClientHandler.instance().getClient().gameSettings.language).append(", ");
+        sb.append("game language=").append(Minecraft.getMinecraft().gameSettings.language).append(", ");
         sb.append("locale=").append(Constants.getLocale());
         props.put("Environment", sb.toString());
 
@@ -165,6 +168,9 @@ public class JMLogger
             }
             sb.append(prop.getKey()).append(": ").append(prop.getValue());
         }
+
+        // Add Features
+        sb.append(LogFormatter.LINEBREAK).append(FeatureManager.getPolicyDetails());
 
         // Add config files
         JourneyMap jm = JourneyMap.getInstance();

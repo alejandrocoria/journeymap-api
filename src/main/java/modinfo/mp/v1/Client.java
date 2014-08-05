@@ -1,5 +1,6 @@
 package modinfo.mp.v1;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import modinfo.Config;
 
 import java.util.UUID;
@@ -33,12 +34,12 @@ public class Client {
 
     private AtomicInteger messageCount = new AtomicInteger(0);
 
-    public Client(String trackingId, UUID clientId, Config config)
+    public Client(String trackingId, UUID clientId, Config config, String defaultUserLanguage)
     {
         this.trackingId = trackingId;
         this.clientId = clientId;
         this.config = config;
-        this.userAgent = createUserAgent();
+        this.userAgent = createUserAgent(defaultUserLanguage);
         this.service = Executors.newFixedThreadPool(2);
 
         if(config.isVerbose())
@@ -118,7 +119,7 @@ public class Client {
         };
     }
     
-    private String createUserAgent() 
+    private String createUserAgent(String defaultUserLanguage)
     {
         String agent = null;
         
@@ -136,6 +137,9 @@ public class Client {
             if(arch.equals("amd64")) arch = "WOW64";
 
             String lang = String.format("%s_%s", System.getProperty("user.language"), System.getProperty("user.country"));
+            if(lang.contains("null")) {
+                lang = defaultUserLanguage;
+            }
 
             // Build user agent string
             if(os.startsWith("Mac")) // Mac OS X, x86_64, ?

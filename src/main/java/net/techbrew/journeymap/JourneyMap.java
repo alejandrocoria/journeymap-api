@@ -46,23 +46,33 @@ import net.techbrew.journeymap.waypoint.WaypointStore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * This software is copyright (C) Mark Woodman (mwoodman@techbrew.net) and is
+ * provided as-is with no warrantee whatsoever.
+ * <p/>
+ * Central class for the JourneyMap mod.
+ *
+ * @author Mark Woodman
+ */
 @SideOnly(Side.CLIENT)
 @Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = JourneyMap.JM_VERSION)
 public class JourneyMap
 {
     public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
     public static final String JM_VERSION = "@JMVERSION@"; //$NON-NLS-1$
-    public static final String MC_VERSION = "@MCVERSION@"; //$NON-NLS-1$
+    public static final String FORGE_VERSION = "@FORGEVERSION@"; //$NON-NLS-1$
     public static final String EDITION = getEdition();
     public static final String MOD_ID = "journeymap";
     public static final String SHORT_MOD_NAME = "JourneyMap";
     public static final String MOD_NAME = SHORT_MOD_NAME + " " + EDITION;
-    static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-version.js"; //$NON-NLS-1$
+    static final String VERSION_URL = "https://docs.google.com/uc?id=0B-PlFsIS9WoCWGNLWUZPSl9KNHc"; //$NON-NLS-1$
     private static JourneyMap INSTANCE;
+
     // Time stamp of next chunk update
     public long nextPlayerUpdate = 0;
     public long nextChunkUpdate = 0;
     public ModInfo modInfo;
+
     // Properties & preferences
     public CoreProperties coreProperties;
     public FullMapProperties fullMapProperties;
@@ -73,6 +83,8 @@ public class JourneyMap
     private volatile Boolean initialized = false;
     private JMServer jmServer;
     private boolean threadLogging = false;
+    private long lastModInfoKeepAlive = System.currentTimeMillis();
+
     // Task controller for issuing tasks in executor
     private TaskController taskController;
     private ChunkRenderController chunkRenderController;
@@ -100,7 +112,7 @@ public class JourneyMap
         String ed = null;
         try
         {
-            ed = JM_VERSION + " " + FeatureManager.getFeatureSetName();
+            ed = JM_VERSION + " " + FeatureManager.getPolicySetName();
         }
         catch (Throwable t)
         {
@@ -115,7 +127,7 @@ public class JourneyMap
         String ed = null;
         try
         {
-            ed = JM_VERSION + " " + FeatureManager.getFeatureSetName();
+            ed = JM_VERSION + " " + FeatureManager.getPolicySetName();
         }
         catch (Throwable t)
         {
@@ -354,7 +366,11 @@ public class JourneyMap
                 return;
             }
 
-            modInfo.reportAppView();
+            if (modInfo != null)
+            {
+                modInfo.reportAppView();
+                lastModInfoKeepAlive = System.currentTimeMillis();
+            }
 
             this.reset();
 
@@ -419,6 +435,15 @@ public class JourneyMap
             if (mc == null)
             {
                 mc = FMLClientHandler.instance().getClient();
+            }
+
+            if (modInfo != null)
+            {
+                if (System.currentTimeMillis() - lastModInfoKeepAlive > 600000) // 10 minutes
+                {
+                    lastModInfoKeepAlive = System.currentTimeMillis();
+                    modInfo.keepAlive();
+                }
             }
 
             final boolean isDead = mc.currentScreen != null && mc.currentScreen instanceof GuiGameOver;

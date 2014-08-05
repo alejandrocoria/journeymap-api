@@ -166,7 +166,7 @@ var JourneyMap = (function() {
 				_gaq.push(['_setCustomVar', 2, 'mc_version', JM.world.mc_version, 2]);
 
 				// Update UI with game info
-				$("#version").html(JM.world.mod_name);
+				$("#version").html("JourneyMap " + JM.world.jm_version);
 				
 				// Splash
 				if(!errorDialog) {

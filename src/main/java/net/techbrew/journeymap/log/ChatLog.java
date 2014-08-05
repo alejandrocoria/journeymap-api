@@ -30,7 +30,6 @@ import java.util.logging.Level;
  */
 public class ChatLog
 {
-
     // Announcements
     static final List<ChatComponentTranslation> announcements = Collections.synchronizedList(new LinkedList<ChatComponentTranslation>());
     public static boolean enableAnnounceMod = false;
@@ -122,11 +121,7 @@ public class ChatLog
             announceMod(false);
 
             // Check for newer version online
-            if (VersionCheck.getVersionIsCurrent() == false)
-            {
-                ChatLog.announceI18N(Constants.getString("jm.common.new_version_available", "")); //$NON-NLS-1$
-                ChatLog.announceURL(JourneyMap.WEBSITE_URL, JourneyMap.WEBSITE_URL);
-            }
+            VersionCheck.getVersionIsCurrent();
             initialized = true;
         }
 

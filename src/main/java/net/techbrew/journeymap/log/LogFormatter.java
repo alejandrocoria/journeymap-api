@@ -67,7 +67,7 @@ public class LogFormatter extends Formatter
                     if (thrown instanceof LinkageError)
                     {
                         LinkageErrorWarnings++;
-                        String error = Constants.getString("jm.error.compatability", JourneyMap.MOD_NAME, JourneyMap.MC_VERSION);
+                        String error = Constants.getString("jm.error.compatability", JourneyMap.MOD_NAME, JourneyMap.FORGE_VERSION);
                         thrown.printStackTrace(System.err);
                         ChatLog.announceError(error);
                         thrown.printStackTrace(System.err);
