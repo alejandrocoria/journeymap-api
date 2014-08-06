@@ -9,12 +9,10 @@
 package net.techbrew.journeymap.feature;
 
 import com.google.common.reflect.ClassPath;
-import net.techbrew.journeymap.JourneyMap;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * Governs what features are available at runtime.
@@ -25,7 +23,7 @@ public class FeatureManager
     private static final String IMPL_PACKAGE = "net.techbrew.journeymap.feature.impl";
     private static final String CLASS_UNLIMITED = String.format("%s.Unlimited", IMPL_PACKAGE);
     private final PolicySet policySet;
-    private final HashMap<Feature, Policy> policyMap = new HashMap<Feature, Policy>();
+    private final HashMap<Feature, Policy2> policyMap = new HashMap<Feature, Policy2>();
 
     /**
      * Private constructure.  Use instance()
@@ -33,7 +31,7 @@ public class FeatureManager
     private FeatureManager()
     {
         policySet = locatePolicySet();
-        for (Policy policy : policySet.getPolicies())
+        for (Policy2 policy : policySet.getPolicies())
         {
             policyMap.put(policy.feature, policy);
         }
@@ -75,7 +73,7 @@ public class FeatureManager
      */
     public static boolean isAllowed(Feature feature)
     {
-        Policy policy = Holder.INSTANCE.policyMap.get(feature);
+        Policy2 policy = Holder.INSTANCE.policyMap.get(feature);
         return (policy != null) && policy.isCurrentlyAllowed();
     }
 
@@ -156,11 +154,11 @@ public class FeatureManager
         return new PolicySet()
         {
             // All features allowed in singleplayer, but none in multiplayer
-            private final Set<Policy> policies = Policy.bulkCreate(true, false);
+            private final Set<Policy2> policies = Policy2.bulkCreate(true, false);
             private final String name = NAME_FAIRPLAY;
 
             @Override
-            public Set<Policy> getPolicies()
+            public Set<Policy2> getPolicies()
             {
                 return policies;
             }
@@ -179,7 +177,7 @@ public class FeatureManager
      */
     public static interface PolicySet
     {
-        public Set<Policy> getPolicies();
+        public Set<Policy2> getPolicies();
 
         public String getName();
     }

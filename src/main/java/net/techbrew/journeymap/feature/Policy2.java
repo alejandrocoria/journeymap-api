@@ -19,7 +19,7 @@ import java.util.Set;
 /**
  * Couples a feature with the contexts in which it is permitted.
  */
-public class Policy
+public class Policy2
 {
     static Minecraft mc = FMLClientHandler.instance().getClient();
     final Feature feature;
@@ -29,7 +29,7 @@ public class Policy
     /**
      * Constructor.
      */
-    public Policy(Feature feature, boolean allowInSingleplayer, boolean allowInMultiplayer)
+    public Policy2(Feature feature, boolean allowInSingleplayer, boolean allowInMultiplayer)
     {
         this.feature = feature;
         this.allowInSingleplayer = allowInSingleplayer;
@@ -43,7 +43,7 @@ public class Policy
      * @param allowInMultiplayer
      * @return
      */
-    public static Set<Policy> bulkCreate(boolean allowInSingleplayer, boolean allowInMultiplayer)
+    public static Set<Policy2> bulkCreate(boolean allowInSingleplayer, boolean allowInMultiplayer)
     {
         return bulkCreate(Feature.all(), allowInSingleplayer, allowInMultiplayer);
     }
@@ -55,12 +55,12 @@ public class Policy
      * @param allowInMultiplayer
      * @return
      */
-    public static Set<Policy> bulkCreate(EnumSet<Feature> features, boolean allowInSingleplayer, boolean allowInMultiplayer)
+    public static Set<Policy2> bulkCreate(EnumSet<Feature> features, boolean allowInSingleplayer, boolean allowInMultiplayer)
     {
-        Set<Policy> policies = new HashSet<Policy>();
+        Set<Policy2> policies = new HashSet<Policy2>();
         for (Feature feature : features)
         {
-            policies.add(new Policy(feature, allowInSingleplayer, allowInMultiplayer));
+            policies.add(new Policy2(feature, allowInSingleplayer, allowInMultiplayer));
         }
         return policies;
     }
@@ -105,7 +105,7 @@ public class Policy
             return false;
         }
 
-        Policy policy = (Policy) o;
+        Policy2 policy = (Policy2) o;
 
         if (allowInMultiplayer != policy.allowInMultiplayer)
         {

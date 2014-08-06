@@ -9,7 +9,7 @@
 package net.techbrew.journeymap.feature.impl;
 
 import net.techbrew.journeymap.feature.FeatureManager;
-import net.techbrew.journeymap.feature.Policy;
+import net.techbrew.journeymap.feature.Policy2;
 
 import java.util.Collections;
 import java.util.Set;
@@ -22,15 +22,15 @@ import java.util.Set;
 public class Unlimited implements FeatureManager.PolicySet
 {
 
-    private final Set<Policy> policies;
+    private final Set<Policy2> policies;
     private final String name = "Unlimited";
 
 	public Unlimited() {
-        policies = Collections.unmodifiableSet(Policy.bulkCreate(true, true));
+        policies = Collections.unmodifiableSet(Policy2.bulkCreate(true, true));
     }
 	
 	@Override
-    public Set<Policy> getPolicies()
+    public Set<Policy2> getPolicies()
     {
         return policies;
     }
