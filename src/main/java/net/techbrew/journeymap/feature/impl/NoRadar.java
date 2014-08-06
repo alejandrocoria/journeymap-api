@@ -10,7 +10,7 @@ package net.techbrew.journeymap.feature.impl;
 
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
-import net.techbrew.journeymap.feature.Policy2;
+import net.techbrew.journeymap.feature.Policy;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -21,7 +21,7 @@ import java.util.Set;
  */
 public class NoRadar implements FeatureManager.PolicySet
 {
-    private final Set<Policy2> policies;
+    private final Set<Policy> policies;
     private final String name = "NoRadar";
 
     public NoRadar()
@@ -30,12 +30,12 @@ public class NoRadar implements FeatureManager.PolicySet
         EnumSet<Feature> nonRadar = Feature.all();
         nonRadar.removeAll(radar);
 
-        policies = Policy2.bulkCreate(radar, true, false);
-        policies.addAll(Policy2.bulkCreate(nonRadar, true, true));
+        policies = Policy.bulkCreate(radar, true, false);
+        policies.addAll(Policy.bulkCreate(nonRadar, true, true));
     }
 
     @Override
-    public Set<Policy2> getPolicies()
+    public Set<Policy> getPolicies()
     {
         return Collections.unmodifiableSet(policies);
     }
