@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.model;
 
+import cpw.mods.fml.common.registry.FMLControlledNamespacedRegistry;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.*;
@@ -32,6 +33,7 @@ public class BlockUtils {
 	 */
 	public static void initialize() {
 
+        BlockMD.blockUids.clear();
         blockAlphas.clear();
 
         setAlpha(Blocks.air, 0F);
@@ -83,30 +85,32 @@ public class BlockUtils {
         setFlags(Blocks.water, Flag.NoShadow, Flag.BiomeColor);
         setFlags(Blocks.web, Flag.NotHideSky, Flag.Side2Texture);
 
-        Iterator<Block> fmlBlockIter = GameData.getBlockRegistry().iterator();
+        FMLControlledNamespacedRegistry<Block> blockRegistry = GameData.getBlockRegistry();
+        Iterator<Block> fmlBlockIter = blockRegistry.iterator();
         while(fmlBlockIter.hasNext())
         {
             Block block = fmlBlockIter.next();
+            BlockMD.blockUids.put(block, new GameRegistry.UniqueIdentifier(blockRegistry.getNameForObject(block)));
 
             if(block.getMaterial() == Material.air) {
                 setFlags(block, Flag.HasAir, Flag.NotHideSky, Flag.NoShadow);
-                JourneyMap.getLogger().fine(GameRegistry.findUniqueIdentifierFor(block) + " flags set to hide block");
+                JourneyMap.getLogger().fine(BlockMD.findUniqueIdentifierFor(block) + " flags set to hide block");
                 continue;
             }
 
             if(block instanceof BlockLeavesBase || block instanceof BlockGrass || block instanceof BlockTallGrass ||block instanceof BlockVine || block instanceof BlockLilyPad) {
                 setFlags(block, Flag.BiomeColor);
-                JourneyMap.getLogger().fine(GameRegistry.findUniqueIdentifierFor(block) + " flag set: Flag.BiomeColor");
+                JourneyMap.getLogger().fine(BlockMD.findUniqueIdentifierFor(block) + " flag set: Flag.BiomeColor");
             }
 
             if(block instanceof IPlantable) {
                 setFlags(block, Flag.Side2Texture, Flag.NoShadow);
-                JourneyMap.getLogger().fine(GameRegistry.findUniqueIdentifierFor(block) + " flags set: Flag.Side2Texture, Flag.NoShadow");
+                JourneyMap.getLogger().fine(BlockMD.findUniqueIdentifierFor(block) + " flags set: Flag.Side2Texture, Flag.NoShadow");
             }
 
             if(block instanceof BlockStem) {
                 setFlags(block, Flag.MetaBasedColor, Flag.NoShadow);
-                JourneyMap.getLogger().fine(GameRegistry.findUniqueIdentifierFor(block) + " flags set: Flag.MetaBasedColor, Flag.NoShadow");
+                JourneyMap.getLogger().fine(BlockMD.findUniqueIdentifierFor(block) + " flags set: Flag.MetaBasedColor, Flag.NoShadow");
             }
         }
     }
@@ -199,7 +203,7 @@ public class BlockUtils {
 
     public static void setFlags(Block block, Flag... flags)
     {
-        GameRegistry.UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(block);
+        GameRegistry.UniqueIdentifier uid = BlockMD.findUniqueIdentifierFor(block);
         EnumSet<Flag> eset = getFlags(uid);
         eset.addAll(Arrays.asList(flags));
         blockFlags.put(uid, eset);
@@ -207,13 +211,13 @@ public class BlockUtils {
 
     public static boolean hasFlag(Block block, Flag flag)
     {
-        EnumSet<Flag> flags = blockFlags.get(GameRegistry.findUniqueIdentifierFor(block));
+        EnumSet<Flag> flags = blockFlags.get(BlockMD.findUniqueIdentifierFor(block));
         return flags!=null && flags.contains(flag);
     }
 
     public static boolean hasAnyFlags(Block block, Flag... flags)
     {
-        EnumSet<Flag> flagSet = blockFlags.get(GameRegistry.findUniqueIdentifierFor(block));
+        EnumSet<Flag> flagSet = blockFlags.get(BlockMD.findUniqueIdentifierFor(block));
         if(flagSet==null) return false;
         for(Flag flag : flags) {
             if(flagSet.contains(flag)){
@@ -231,18 +235,18 @@ public class BlockUtils {
 
     public static boolean hasAlpha(Block block)
     {
-        return blockAlphas.containsKey(GameRegistry.findUniqueIdentifierFor(block));
+        return blockAlphas.containsKey(BlockMD.findUniqueIdentifierFor(block));
     }
 
     public static float getAlpha(Block block)
     {
-        Float alpha = blockAlphas.get(GameRegistry.findUniqueIdentifierFor(block));
+        Float alpha = blockAlphas.get(BlockMD.findUniqueIdentifierFor(block));
         return alpha==null ? 1F : alpha;
     }
 
     public static void setAlpha(Block block, Float alpha)
     {
-        blockAlphas.put(GameRegistry.findUniqueIdentifierFor(block), alpha);
+        blockAlphas.put(BlockMD.findUniqueIdentifierFor(block), alpha);
     }
 
     public static HashMap getFlagsMap()
@@ -254,5 +258,4 @@ public class BlockUtils {
     {
         return blockAlphas;
     }
-
 }

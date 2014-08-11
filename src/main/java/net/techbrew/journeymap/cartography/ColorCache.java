@@ -142,7 +142,7 @@ public class ColorCache implements IResourceManagerReloadListener {
             {
                 continue;
             }
-            GameRegistry.UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(block);
+            GameRegistry.UniqueIdentifier uid = BlockMD.findUniqueIdentifierFor(block);
 
             ArrayList<ItemStack> subBlocks = new ArrayList<ItemStack>();
             try

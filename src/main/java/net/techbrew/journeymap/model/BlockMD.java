@@ -17,14 +17,14 @@ import net.techbrew.journeymap.log.LogFormatter;
 
 import java.awt.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.Random;
+import java.util.HashMap;
 
 
 public class BlockMD implements Serializable {
 
 	private static final long serialVersionUID = 2L;
+    final static HashMap<Block, GameRegistry.UniqueIdentifier> blockUids = new HashMap<Block, GameRegistry.UniqueIdentifier>();
 
     public final static class CacheKey implements Serializable
     {
@@ -103,7 +103,7 @@ public class BlockMD implements Serializable {
                 meta = 0;
             }
 
-            CacheKey key = new CacheKey(GameRegistry.findUniqueIdentifierFor(block), meta);
+            CacheKey key = new CacheKey(findUniqueIdentifierFor(block), meta);
             return cache.get(key);
 
         } catch (Exception e) {
@@ -119,6 +119,11 @@ public class BlockMD implements Serializable {
             JourneyMap.getLogger().severe("Can't get BlockMD for block " + uid + " meta " + meta + ": " + LogFormatter.toString(e));
             return null;
         }
+    }
+
+    public static GameRegistry.UniqueIdentifier findUniqueIdentifierFor(Block block)
+    {
+        return blockUids.get(block);
     }
 
     private static final BlockMD createBlockMD(CacheKey key) {
@@ -140,24 +145,23 @@ public class BlockMD implements Serializable {
             }
         }
 
-        String name = block.getUnlocalizedName();
+        String prefix = "";
+        String suffix = ":" + key.meta;
+        String name = key.uid.toString() + suffix;
         try {
             // Gotta love this.
             Item item = Item.getItemFromBlock(block);
-            if(item==null) {
-                item = block.getItemDropped(0,new Random(), 0);
+            ItemStack stack = new ItemStack(item, 1, block.damageDropped(key.meta));
+            String displayName = stack.getDisplayName();
+
+            if(!key.uid.modId.equals("minecraft")){
+                prefix = key.uid.modId+":";
             }
-            if(item!=null)
-            {
-                ItemStack stack = new ItemStack(item, 1, block.damageDropped(key.meta));
-                name = stack.getDisplayName();
-            }
+
+            name = prefix + displayName + suffix;
+
         } catch(Throwable t) {
             JourneyMap.getLogger().fine("Displayname not available for " + name);
-        }
-
-        if(name.startsWith("tile")) {
-            name = block.getClass().getSimpleName().replaceAll("Block", "");
         }
 
         BlockMD blockMD = new BlockMD(key, block, name);

@@ -12,8 +12,9 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Compatibility added for mods that have blocks registered with custom Item Stacks (TooManyBiomes, MultiWorld, etc.)
 - Bugfix: Colors were wrong for double-tall flowers and melon/pumpkin stems
-- New Feature: Actions -> Generate Color Palette lets you have a customizable, shareable, fixed set of colors that won't change when you switch resource packs.
+- New Feature: Options -> Color Palette lets you have a customizable, shareable, fixed set of colors that won't change when you switch resource packs.
 
 ## Changelog for JourneyMap 4.0.4:
 - New Edition: "NoRadar" disables all radar features in Multiplayer
