@@ -1,21 +1,23 @@
 package net.techbrew.journeymap.cartography;
 
 import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.common.registry.GameRegistry;
 import modinfo.ModInfo;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockBush;
-import net.minecraft.block.BlockGrass;
-import net.minecraft.block.BlockVine;
+import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
-import net.minecraft.client.resources.ResourcePackRepository;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.IconLoader;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.BlockUtils;
 import net.techbrew.journeymap.model.ChunkMD;
@@ -58,13 +60,11 @@ public class ColorCache implements IResourceManagerReloadListener {
 	}
 	
 	@Override
-	public void onResourceManagerReload(IResourceManager mgr) {
-		
-		// Check if the resourcepack has changed
-		ResourcePackRepository repo = Minecraft.getMinecraft().getResourcePackRepository();
-
+	public void onResourceManagerReload(IResourceManager mgr)
+    {
     	String currentPack = Arrays.asList(mgr.getResourceDomains().toArray()).toString();
-    	
+
+        // Check if the resourcepack has changed
     	if(JourneyMap.getInstance().isMapping() || iconLoader==null) {
     		if(currentPack.equals(lastResourcePack)) {
     			JourneyMap.getLogger().fine("ResourcePack unchanged: " + currentPack);
@@ -76,12 +76,126 @@ public class ColorCache implements IResourceManagerReloadListener {
                 }
     			reset();
     			lastResourcePack = currentPack;
-        		// TODO: avoid this?
-        		iconLoader = new IconLoader();			
+        		iconLoader = new IconLoader();
+
+                if(ColorPalette.paletteFileFound())
+                {
+                    loadColorPalette();
+                }
     		}
-    		
     	}
 	}
+
+    private void loadColorPalette()
+    {
+        try
+        {
+            long start = System.currentTimeMillis();
+            ColorPalette colorPalette = ColorPalette.loadFromFile();
+            if (colorPalette != null)
+            {
+                BlockUtils.initialize();
+                this.baseColors.putAll(colorPalette.getBasicColorMap());
+                this.biomeColors.putAll(colorPalette.getBiomeColorMap());
+                long elapsed = System.currentTimeMillis()-start;
+                JourneyMap.getLogger().info(String.format("Color palette loaded %d colors from '%s' in %dms", colorPalette.size(), colorPalette.getOrigin(), elapsed));
+            }
+        }
+        catch (Exception e)
+        {
+            JourneyMap.getLogger().warning("Could not load color palette: " + e);
+        }
+    }
+
+    public ColorPalette generateColorPalette(boolean global)
+    {
+        BlockUtils.initialize();
+        prefetchResourcePackColors();
+        ColorPalette palette = null;
+        try
+        {
+            String resourcePackNames = Arrays.asList(FMLClientHandler.instance().getClient().getResourceManager().getResourceDomains().toArray()).toString();
+            palette = new ColorPalette(resourcePackNames, baseColors, biomeColors);
+            if(palette.writeToFile(global))
+            {
+                return palette;
+            }
+        }
+        catch (Exception e)
+        {
+            JourneyMap.getLogger().severe("Couldn't create ColorPalette: " + LogFormatter.toString(e));
+        }
+        return null;
+    }
+
+    // Force load all block colors
+    public void prefetchResourcePackColors()
+    {
+        StatTimer timer = StatTimer.get("prefetchResourcePackColors", 0).start();
+
+        int count = 0;
+        Iterator<Block> fmlBlockIter = GameData.getBlockRegistry().iterator();
+        while(fmlBlockIter.hasNext())
+        {
+            Block block = fmlBlockIter.next();
+            if(block.getMaterial().equals(Material.air))
+            {
+                continue;
+            }
+            GameRegistry.UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(block);
+
+            ArrayList<ItemStack> subBlocks = new ArrayList<ItemStack>();
+            try
+            {
+                Item item = Item.getItemFromBlock(block);
+                if(item==null)
+                {
+                    count += prefetchColors(BlockMD.getBlockMD(uid, 0));
+                    continue;
+                }
+
+                block.getSubBlocks(item, null, subBlocks);
+                for(ItemStack subBlockStack : subBlocks)
+                {
+                    int meta = subBlockStack.getItemDamage();
+                    count += prefetchColors(BlockMD.getBlockMD(uid, meta));
+                }
+            }
+            catch(Exception e)
+            {
+                JourneyMap.getLogger().severe("Couldn't get subblocks for block " + block + ": " + e);
+                count += prefetchColors(BlockMD.getBlockMD(uid, 0));
+            }
+        }
+
+        timer.stop();
+
+        JourneyMap.getLogger().info("Prefectched " + count + " colors for all blocks in all biomes: " + timer.getReportString());
+    }
+
+    private int prefetchColors(BlockMD blockMD)
+    {
+        int count = 0;
+        if(blockMD.isBiomeColored())
+        {
+            for(BiomeGenBase biome : BiomeGenBase.getBiomeGenArray())
+            {
+                if(biome!=null)
+                {
+                    getBiomeBlockColor(biome, blockMD, 0, 64, 0);
+                    count++;
+                }
+                //JourneyMap.getLogger().info("Prefectched color for " + blockMD.getBlock().getUnlocalizedName() + " in " + biome.biomeName);
+            }
+        }
+        else
+        {
+            getBaseColor(blockMD, 0, 78, 0);
+            count++;
+            //JourneyMap.getLogger().info("Prefectched color for " + blockMD.getBlock().getUnlocalizedName());
+        }
+        return count;
+    }
 
 	public Color getBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z) {
 		if(iconLoader==null) {
@@ -98,12 +212,17 @@ public class ColorCache implements IResourceManagerReloadListener {
         }
         return color;
 	}
-	
-	private Color getBiomeBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z) {
-		BiomeGenBase biome = chunkMd.stub.getBiomeGenForWorldCoords(x, z, chunkMd.worldObj.getWorldChunkManager());
+
+    private Color getBiomeBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
+    {
+        BiomeGenBase biome = chunkMd.stub.getBiomeGenForWorldCoords(x, z, chunkMd.worldObj.getWorldChunkManager());
+        return getBiomeBlockColor(biome, blockMD, x, y, z);
+    }
+
+	public Color getBiomeBlockColor(BiomeGenBase biome, BlockMD blockMD, int x, int y, int z) {
 		Block block = blockMD.getBlock();
 
-        if(block instanceof BlockGrass || block instanceof BlockBush) {
+        if(block instanceof BlockGrass || block instanceof BlockTallGrass) {
             return getGrassColor(blockMD, biome, x, y, z);
         }
 
@@ -161,10 +280,10 @@ public class ColorCache implements IResourceManagerReloadListener {
         Color color = getBiomeColor(blockMD, biome);
         if(color==null) {
             Color baseColor = getBaseColor(blockMD, x, y, z);
-            int biomeColor = BiomeGenBase.plains.getBiomeGrassColor(x,y,z); // Default
+            int biomeColor = BiomeGenBase.plains.getBiomeGrassColor(0,64,0); // Default
             try
             {
-                biomeColor = biome.getBiomeGrassColor(x,y,z);
+                biomeColor = biome.getBiomeGrassColor(0,64,0);
             }
             catch (Throwable t)
             {
@@ -255,19 +374,26 @@ public class ColorCache implements IResourceManagerReloadListener {
         // Some blocks may have custom biome-based tints as well.
         if(baseColor!=null) {
             if(!blockMD.isBiomeColored()){
-                // Check for custom biome-based color multiplier
+
                 int tint = getBiomeColorMultiplier(blockMD, x, y, z);
-                if ((tint != 0xFFFFFF) && (tint != 0xFFFFFFFF)) { // white without alpha, white with alpha
-                    blockMD.addFlags(BlockUtils.Flag.CustomBiomeColor);
-                    BlockUtils.setFlags(blockMD.getBlock(), BlockUtils.Flag.BiomeColor);
-                    JourneyMap.getLogger().fine("Custom biome tint discovered for " + blockMD);
-                } else {
+                boolean tintIsWhite = (tint == 0xFFFFFF) || (tint == 0xFFFFFFFF);
+
+                // Check if block is meta-colored
+                if(blockMD.hasFlag(BlockUtils.Flag.MetaBasedColor) || tintIsWhite)
+                {
                     // Check for render color
                     int renderColor = blockMD.getBlock().getRenderColor(blockMD.key.meta & 0xf); // getRenderColor()
                     if(renderColor!=0xffffff && renderColor!=0xffffffff) { // white without alpha or white with alpha
                         baseColor = colorMultiplier(baseColor, 0xff000000 | renderColor); // Force opaque render color
                         JourneyMap.getLogger().fine("Applied render color for " + blockMD);
                     }
+                }
+                else
+                {
+                    // Custom biome-based color multiplier
+                    blockMD.addFlags(BlockUtils.Flag.CustomBiomeColor);
+                    BlockUtils.setFlags(blockMD.getBlock(), BlockUtils.Flag.BiomeColor);
+                    JourneyMap.getLogger().fine("Custom biome tint discovered for " + blockMD);
                 }
             }
         }

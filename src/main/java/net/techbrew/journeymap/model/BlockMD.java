@@ -17,7 +17,9 @@ import net.techbrew.journeymap.log.LogFormatter;
 
 import java.awt.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.Random;
 
 
 public class BlockMD implements Serializable {
@@ -138,23 +140,24 @@ public class BlockMD implements Serializable {
             }
         }
 
-        String prefix = "";
-        String suffix = ":" + key.meta;
-        String name = key.uid.toString() + suffix;
+        String name = block.getUnlocalizedName();
         try {
             // Gotta love this.
             Item item = Item.getItemFromBlock(block);
-            ItemStack stack = new ItemStack(item, 1, block.damageDropped(key.meta));
-            String displayName = stack.getDisplayName();
-
-            if(!key.uid.modId.equals("minecraft")){
-                prefix = key.uid.modId+":";
+            if(item==null) {
+                item = block.getItemDropped(0,new Random(), 0);
             }
-
-            name = prefix + displayName + suffix;
-
+            if(item!=null)
+            {
+                ItemStack stack = new ItemStack(item, 1, block.damageDropped(key.meta));
+                name = stack.getDisplayName();
+            }
         } catch(Throwable t) {
             JourneyMap.getLogger().fine("Displayname not available for " + name);
+        }
+
+        if(name.startsWith("tile")) {
+            name = block.getClass().getSimpleName().replaceAll("Block", "");
         }
 
         BlockMD blockMD = new BlockMD(key, block, name);

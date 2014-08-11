@@ -22,7 +22,7 @@ public class BlockUtils {
 	public static AlphaComposite SLIGHTLYCLEAR = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F);
 	public static Color COLOR_TRANSPARENT = new Color(0,0,0,0);
 
-    public enum Flag {HasAir, BiomeColor, CustomBiomeColor, NotHideSky, NoShadow, Side2Texture, Transparency, Error, TransparentRoof}
+    public enum Flag {HasAir, BiomeColor, CustomBiomeColor, MetaBasedColor, NotHideSky, NoShadow, Side2Texture, Transparency, Error, TransparentRoof}
 
     private final static HashMap<GameRegistry.UniqueIdentifier, EnumSet<Flag>> blockFlags = new HashMap<GameRegistry.UniqueIdentifier, EnumSet<Flag>>(64);
     private final static HashMap<GameRegistry.UniqueIdentifier, Float> blockAlphas = new HashMap<GameRegistry.UniqueIdentifier, Float>(8);
@@ -60,7 +60,6 @@ public class BlockUtils {
         }
 
         setFlags(Blocks.air, Flag.HasAir, Flag.NotHideSky, Flag.NoShadow, Flag.NotHideSky);
-        setFlags(Blocks.double_plant, Flag.BiomeColor);
         setFlags(Blocks.fence, Flag.TransparentRoof);
         setFlags(Blocks.fire, Flag.NoShadow, Flag.Side2Texture);
         setFlags(Blocks.flowing_water, Flag.BiomeColor);
@@ -95,7 +94,7 @@ public class BlockUtils {
                 continue;
             }
 
-            if(block instanceof BlockLeavesBase || block instanceof BlockGrass || block instanceof BlockVine || block instanceof BlockLilyPad) {
+            if(block instanceof BlockLeavesBase || block instanceof BlockGrass || block instanceof BlockTallGrass ||block instanceof BlockVine || block instanceof BlockLilyPad) {
                 setFlags(block, Flag.BiomeColor);
                 JourneyMap.getLogger().fine(GameRegistry.findUniqueIdentifierFor(block) + " flag set: Flag.BiomeColor");
             }
@@ -103,6 +102,11 @@ public class BlockUtils {
             if(block instanceof IPlantable) {
                 setFlags(block, Flag.Side2Texture, Flag.NoShadow);
                 JourneyMap.getLogger().fine(GameRegistry.findUniqueIdentifierFor(block) + " flags set: Flag.Side2Texture, Flag.NoShadow");
+            }
+
+            if(block instanceof BlockStem) {
+                setFlags(block, Flag.MetaBasedColor, Flag.NoShadow);
+                JourneyMap.getLogger().fine(GameRegistry.findUniqueIdentifierFor(block) + " flags set: Flag.MetaBasedColor, Flag.NoShadow");
             }
         }
     }

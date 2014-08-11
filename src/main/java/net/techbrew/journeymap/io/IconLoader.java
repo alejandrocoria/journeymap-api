@@ -1,6 +1,7 @@
 package net.techbrew.journeymap.io;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -61,13 +62,34 @@ public class IconLoader {
 				logger.fine("Loading color for " + blockMD);
 			}
 
-            int side = blockMD.hasFlag(BlockUtils.Flag.Side2Texture) ? 2 : 1;
-
             IIcon blockIcon = null;
-            while(blockIcon==null && side>=0) {
-                blockIcon = blockMD.getBlock().getIcon(side, blockMD.key.meta);
-                side--;
+
+            if(blockMD.getBlock() instanceof BlockDoublePlant)
+            {
+                BlockDoublePlant blockDoublePlant = ((BlockDoublePlant) blockMD.getBlock());
+
+                // Sunflower gets to be so special.
+                if("sunflower".equals(BlockDoublePlant.field_149892_a[blockMD.key.meta]))
+                {
+                    // Sunflower front
+                    blockIcon = blockDoublePlant.sunflowerIcons[0];
+                }
+                else
+                {
+                    // Get the top icon
+                    blockIcon = blockDoublePlant.func_149888_a(true, blockMD.key.meta);
+                }
             }
+            else
+            {
+                int side = blockMD.hasFlag(BlockUtils.Flag.Side2Texture) ? 2 : 1;
+                while (blockIcon == null && side >= 0)
+                {
+                    blockIcon = blockMD.getBlock().getIcon(side, blockMD.key.meta);
+                    side--;
+                }
+            }
+
             if(blockIcon==null) {
                 logger.warning("Could not get Icon for " + blockMD);
             } else {

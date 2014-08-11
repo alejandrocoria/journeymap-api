@@ -343,6 +343,7 @@ public class JourneyMap
             }
 
             this.reset();
+            ColorCache.getInstance().prefetchResourcePackColors();
 
             if (taskExecutor == null || taskExecutor.isShutdown())
             {

@@ -1,6 +1,8 @@
 package net.techbrew.journeymap.io;
 
 
+import com.google.common.io.ByteSource;
+import com.google.common.io.Files;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
 import net.techbrew.journeymap.Constants;
@@ -14,11 +16,17 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URI;
+import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 public class FileHandler
 {
+    public static final String ASSETS_JOURNEYMAP = "/assets/journeymap";
+    public static final String ASSETS_JOURNEYMAP_WEB = "/assets/journeymap/web";
 
     public static final String WEB_DIR = "/assets/journeymap/web";
     public static volatile File lastJMWorldDir;
@@ -344,6 +352,23 @@ public class FileHandler
         return img;
     }
 
+    public static File copyColorPaletteHtmlFile(File toDir, String fileName)
+    {
+        try
+        {
+            File outFile = new File(toDir, fileName);
+            String htmlPath = FileHandler.ASSETS_JOURNEYMAP_WEB + "/" + fileName;
+            File htmlFile = new File(JourneyMap.class.getResource(htmlPath).getFile());
+            Files.copy(htmlFile, outFile);
+            return outFile;
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().warning("Couldn't copy color palette html: " + t);
+            return null;
+        }
+    }
+
     public static void open(File file)
     {
 
@@ -394,79 +419,98 @@ public class FileHandler
         }
     }
 
-    public static boolean serializeCache(String name, Serializable cache)
+    public static boolean isInJar()
     {
+        URL location = JourneyMap.class.getProtectionDomain().getCodeSource().getLocation();
+        return "jar".equals(location.getProtocol());
+    }
+
+
+    /**
+     * Extracts a zip file specified by the zipFilePath to a directory specified by
+     * destDirectory (will be created if does not exists)
+     *
+     * @throws IOException
+     */
+    private static void copyFromZip(String zipFilePath, String zipEntryName, File destDir, boolean overWrite) throws Throwable
+    {
+
+        if (zipEntryName.startsWith("/"))
+        {
+            zipEntryName = zipEntryName.substring(1);
+        }
+        final ZipFile zipFile = new ZipFile(zipFilePath);
+        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
+        ZipEntry entry = zipIn.getNextEntry();
+
         try
         {
-            File cacheDir = getCacheDir();
-            if (!cacheDir.exists())
+            while (entry != null)
             {
-                cacheDir.mkdirs();
+                if (entry.getName().startsWith(zipEntryName))
+                {
+                    File toFile = new File(destDir, entry.getName().split(zipEntryName)[1]);
+                    if (overWrite || !toFile.exists())
+                    {
+                        if (!entry.isDirectory())
+                        {
+                            toFile.getParentFile().mkdirs();
+                            new ZipEntryByteSource(zipFile, entry).copyTo(Files.asByteSink(toFile));
+                        }
+                    }
+                }
+
+                zipIn.closeEntry();
+                entry = zipIn.getNextEntry();
             }
-
-            File cacheFile = new File(cacheDir, name);
-
-            FileOutputStream fileOut = new FileOutputStream(cacheFile);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(cache);
-            out.close();
-            fileOut.close();
-            return true;
         }
-        catch (IOException e)
+        finally
         {
-            JourneyMap.getLogger().severe("Could not serialize cache: " + name + " : " + LogFormatter.toString(e));
-            return false;
+            zipIn.close();
         }
     }
 
-    public static boolean writeDebugFile(String name, String contents)
+    /**
+     * Copies contents of one directory to another
+     */
+    private static void copyFromDirectory(File fromDir, File toDir, boolean overWrite) throws IOException
     {
-        try
+        toDir.mkdir();
+        for (File from : fromDir.listFiles())
         {
-            File debugFile = new File(getJourneyMapDir(), "DEBUG-" + name);
-            FileWriter writer = new FileWriter(debugFile, false);
-            writer.write(contents);
-            writer.flush();
-            writer.close();
-            return true;
-        }
-        catch (IOException e)
-        {
-            JourneyMap.getLogger().severe("Could not write debug file: " + name + " : " + LogFormatter.toString(e));
-            return false;
+            File to = new File(toDir, from.getName());
+            if (from.isDirectory())
+            {
+                copyFromDirectory(from, to, overWrite);
+            }
+            else if (overWrite || !to.exists())
+            {
+                Files.copy(from, to);
+            }
         }
     }
 
-    public static <C extends Serializable> C deserializeCache(String name, Class<C> cacheClass)
+    private static class ZipEntryByteSource extends ByteSource
     {
+        final ZipFile file;
+        final ZipEntry entry;
 
-        File cacheFile = new File(getCacheDir(), name);
-        if (!cacheFile.exists())
+        ZipEntryByteSource(ZipFile file, ZipEntry entry)
         {
-            return null;
+            this.file = file;
+            this.entry = entry;
         }
-        try
+
+        @Override
+        public InputStream openStream() throws IOException
         {
-            FileInputStream fileIn = new FileInputStream(cacheFile);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            C cache = (C) in.readObject();
-            in.close();
-            fileIn.close();
-            if (cache.getClass() != cacheClass)
-            {
-                throw new ClassCastException(cache.getClass() + " can't be cast to " + cacheClass);
-            }
-            return cache;
+            return file.getInputStream(entry);
         }
-        catch (Exception e)
+
+        @Override
+        public String toString()
         {
-            JourneyMap.getLogger().warning("Could not deserialize cache: " + name + " : " + e);
-            if (cacheFile.exists())
-            {
-                cacheFile.delete();
-            }
-            return null;
+            return String.format("ZipEntryByteSource( %s / %s )", file, entry);
         }
     }
 
