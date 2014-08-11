@@ -10,6 +10,8 @@ package net.techbrew.journeymap.io;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDoublePlant;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.IIcon;
@@ -18,6 +20,7 @@ import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
+import net.techbrew.journeymap.model.BlockMDCache;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -79,14 +82,34 @@ public class IconLoader
                 logger.fine("Loading color for " + blockMD);
             }
 
-            int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
-
             IIcon blockIcon = null;
-            while (blockIcon == null && side >= 0)
+
+            if (blockMD.getBlock() instanceof BlockDoublePlant)
             {
-                blockIcon = blockMD.getBlock().getIcon(side, blockMD.meta);
-                side--;
+                BlockDoublePlant blockDoublePlant = ((BlockDoublePlant) blockMD.getBlock());
+
+                // Sunflower gets to be so special.
+                if ("sunflower".equals(BlockDoublePlant.field_149892_a[blockMD.meta]))
+                {
+                    // Sunflower front
+                    blockIcon = blockDoublePlant.sunflowerIcons[0];
+                }
+                else
+                {
+                    // Get the top icon
+                    blockIcon = blockDoublePlant.func_149888_a(true, blockMD.meta);
+                }
             }
+            else
+            {
+                int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
+                while (blockIcon == null && side >= 0)
+                {
+                    blockIcon = blockMD.getBlock().getIcon(side, blockMD.meta);
+                    side--;
+                }
+            }
+
             if (blockIcon == null)
             {
                 logger.warning("Could not get Icon for " + blockMD);

@@ -53,10 +53,7 @@ public class StatTimer
         this.name = name;
         this.warmupCount = warmupCount;
         this.disposable = disposable;
-        if (warmupCount <= 0)
-        {
-            warmup = false;
-        }
+        this.warmup = warmupCount>0;
     }
 
     /**
@@ -182,7 +179,7 @@ public class StatTimer
             {
                 warmup = false;
                 max = 0;
-                min = 0;
+                min = Double.MAX_VALUE;
                 counter.set(0);
                 cancelCounter.set(0);
                 totalTime.set(0);

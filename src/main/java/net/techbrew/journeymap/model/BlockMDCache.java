@@ -19,13 +19,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.IPlantable;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.properties.CoreProperties;
 
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
+import java.util.*;
 
 import static net.techbrew.journeymap.model.BlockMD.Flag.*;
 
@@ -34,25 +33,25 @@ import static net.techbrew.journeymap.model.BlockMD.Flag.*;
  */
 public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 {
-    public final static BlockMD AIRBLOCK = new BlockMD("Air", Blocks.air, 0, 0f, BlockMD.Flag.HasAir);
-    public final static BlockMD VOIDBLOCK = new BlockMD("Void", null, 0, 1f);
-    private final static HashMap<GameRegistry.UniqueIdentifier, EnumSet<BlockMD.Flag>> blockFlags = new HashMap<GameRegistry.UniqueIdentifier, EnumSet<BlockMD.Flag>>(64);
-    private final static HashMap<GameRegistry.UniqueIdentifier, Float> blockAlphas = new HashMap<GameRegistry.UniqueIdentifier, Float>(8);
-    CoreProperties coreProperties = JourneyMap.getInstance().coreProperties;
+    public final BlockMD AIRBLOCK;
+    public final BlockMD VOIDBLOCK;
+    private final HashMap<GameRegistry.UniqueIdentifier, EnumSet<BlockMD.Flag>> blockFlags;
+    private final HashMap<GameRegistry.UniqueIdentifier, Float> blockAlphas;
+    private final HashMap<Block, GameRegistry.UniqueIdentifier> blockUids;
+    private final CoreProperties coreProperties;
 
     public BlockMDCache()
     {
-        initialize();
-    }
+        GameRegistry.UniqueIdentifier airUid = new GameRegistry.UniqueIdentifier(GameData.getBlockRegistry().getNameForObject(Blocks.air));
+        AIRBLOCK = new BlockMD("Air", airUid, Blocks.air, 0, 0f, EnumSet.of(BlockMD.Flag.HasAir));
 
-    public static String toCacheKeyString(Block block, int meta)
-    {
-        return toCacheKeyString(GameRegistry.findUniqueIdentifierFor(block), meta);
-    }
+        GameRegistry.UniqueIdentifier voidUid = new GameRegistry.UniqueIdentifier("journeymap:void");
+        VOIDBLOCK = new BlockMD("Void", voidUid, null, 0, 1f, null);
 
-    public static String toCacheKeyString(GameRegistry.UniqueIdentifier uid, int meta)
-    {
-        return String.format("%s:%s:%s", uid.modId, uid.name, meta);
+        blockFlags = new HashMap<GameRegistry.UniqueIdentifier, EnumSet<BlockMD.Flag>>(64);
+        blockAlphas = new HashMap<GameRegistry.UniqueIdentifier, Float>(8);
+        blockUids = new HashMap<Block, GameRegistry.UniqueIdentifier>();
+        coreProperties = JourneyMap.getInstance().coreProperties;
     }
 
     /**
@@ -64,6 +63,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
         blockAlphas.clear();
         blockFlags.clear();
+        blockUids.clear();
 
         // Set alphas
         setAlpha(Blocks.air, 0F);
@@ -119,6 +119,8 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         // Set flags based on inheritance
         for (Block block : GameData.getBlockRegistry().typeSafeIterable())
         {
+            blockUids.put(block, new GameRegistry.UniqueIdentifier(GameData.getBlockRegistry().getNameForObject(block)));
+
             if (block.getMaterial() == Material.air)
             {
                 setFlags(block, HasAir, OpenToSky, NoShadow);
@@ -163,6 +165,18 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         return new HashMap<Integer, BlockMD>(16);
     }
 
+
+    public GameRegistry.UniqueIdentifier findUniqueIdentifierFor(Block block)
+    {
+        GameRegistry.UniqueIdentifier uid = blockUids.get(block);
+        if (uid == null)
+        {
+            uid = new GameRegistry.UniqueIdentifier(GameData.getBlockRegistry().getNameForObject(block));
+            blockUids.put(block, uid);
+        }
+        return uid;
+    }
+
     /**
      * Produces a BlockMD instance from chunk-local coords.
      */
@@ -176,60 +190,65 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
                 if (block instanceof BlockAir)
                 {
-                    return BlockMDCache.AIRBLOCK;
+                    return AIRBLOCK;
                 }
                 else
                 {
-                    HashMap<Integer, BlockMD> map = cache.get(block);
                     int meta = chunkMd.stub.getBlockMetadata(x, y, z);
-                    BlockMD blockMD = map.get(meta);
-
-                    synchronized (this)
-                    {
-                        if (blockMD == null)
-                        {
-                            blockMD = createBlockMD(block, meta);
-                            map.put(meta, blockMD);
-                        }
-                    }
-
-                    return blockMD;
+                    return getBlockMD(cache, block, meta);
                 }
             }
             else
             {
-                return BlockMDCache.VOIDBLOCK;
+                return VOIDBLOCK;
             }
         }
         catch (Exception e)
         {
             JourneyMap.getLogger().severe(String.format("Can't get blockId/meta for chunk %s,%s block %s,%s,%s : %s", chunkMd.stub.xPosition, chunkMd.stub.zPosition, x, y, z, LogFormatter.toString(e)));
-            return BlockMDCache.AIRBLOCK;
+            return AIRBLOCK;
+        }
+    }
+
+    /**
+     * Produces a BlockMD instance from chunk-local coords.
+     */
+    public BlockMD getBlockMD(LoadingCache<Block, HashMap<Integer, BlockMD>> cache, Block block, int meta)
+    {
+        try
+        {
+            if (block instanceof BlockAir)
+            {
+                return AIRBLOCK;
+            }
+            else
+            {
+                HashMap<Integer, BlockMD> map = cache.get(block);
+                BlockMD blockMD = map.get(meta);
+
+                synchronized (this)
+                {
+                    if (blockMD == null)
+                    {
+                        blockMD = createBlockMD(block, meta);
+                        map.put(meta, blockMD);
+                    }
+                }
+
+                return blockMD;
+            }
+        }
+        catch (Exception e)
+        {
+            JourneyMap.getLogger().severe(String.format("Can't get blockId/meta for block %s meta %s : %s", block, meta, LogFormatter.toString(e)));
+            return AIRBLOCK;
         }
     }
 
     private BlockMD createBlockMD(Block block, int meta)
     {
-        // Get the UID
-        GameRegistry.UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(block);
-
-        // Find the display name
-        String name = uid.name;
-        try
-        {
-            // Gotta love this.  TODO: Is there a better way?
-            Item item = Item.getItemFromBlock(block);
-            ItemStack stack = new ItemStack(item, 1, block.damageDropped(meta));
-            name = stack.getDisplayName();
-        }
-        catch (Throwable t)
-        {
-            JourneyMap.getLogger().fine("Displayname not available for " + name);
-        }
-
-        String prefix = "minecraft".equals(uid.modId) ? "" : (uid.modId + ":");
-        String displayName = String.format("%s%s:%s", prefix, name, meta);
-
+        GameRegistry.UniqueIdentifier uid = findUniqueIdentifierFor(block);
+        String displayName = BlockMD.getBlockName(block, meta);
         return new BlockMD(displayName, block, meta, getAlpha(block), getFlags(uid));
     }
 
@@ -241,7 +260,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
     public void setFlags(Block block, BlockMD.Flag... flags)
     {
-        GameRegistry.UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(block);
+        GameRegistry.UniqueIdentifier uid = findUniqueIdentifierFor(block);
         EnumSet<BlockMD.Flag> eset = getFlags(uid);
         eset.addAll(Arrays.asList(flags));
         blockFlags.put(uid, eset);
@@ -250,13 +269,13 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
     public boolean hasFlag(Block block, BlockMD.Flag flag)
     {
-        EnumSet<BlockMD.Flag> flags = blockFlags.get(GameRegistry.findUniqueIdentifierFor(block));
+        EnumSet<BlockMD.Flag> flags = blockFlags.get(findUniqueIdentifierFor(block));
         return flags != null && flags.contains(flag);
     }
 
     public boolean hasAnyFlags(Block block, BlockMD.Flag... flags)
     {
-        EnumSet<BlockMD.Flag> flagSet = blockFlags.get(GameRegistry.findUniqueIdentifierFor(block));
+        EnumSet<BlockMD.Flag> flagSet = blockFlags.get(findUniqueIdentifierFor(block));
         if (flagSet == null)
         {
             return false;
@@ -279,18 +298,18 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
     public boolean hasAlpha(Block block)
     {
-        return blockAlphas.containsKey(GameRegistry.findUniqueIdentifierFor(block));
+        return blockAlphas.containsKey(findUniqueIdentifierFor(block));
     }
 
     public float getAlpha(Block block)
     {
-        Float alpha = blockAlphas.get(GameRegistry.findUniqueIdentifierFor(block));
+        Float alpha = blockAlphas.get(findUniqueIdentifierFor(block));
         return alpha == null ? 1F : alpha;
     }
 
     public void setAlpha(Block block, Float alpha)
     {
-        blockAlphas.put(GameRegistry.findUniqueIdentifierFor(block), alpha);
+        blockAlphas.put(findUniqueIdentifierFor(block), alpha);
     }
 
     public HashMap getFlagsMap()

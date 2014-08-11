@@ -14,13 +14,19 @@ import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.ColorCache;
 import net.techbrew.journeymap.cartography.RGB;
+import net.techbrew.journeymap.data.DataCache;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.Random;
 
 /**
  * Block Metadata
@@ -47,19 +53,6 @@ public class BlockMD
     /**
      * Instantiates a new BlockMD.
      *
-     * @param block the block
-     * @param meta  the meta
-     * @param alpha the alpha
-     * @param flags the flags
-     */
-    BlockMD(Block block, int meta, float alpha, BlockMD.Flag... flags)
-    {
-        this(null, block, meta, alpha, flags.length == 0 ? EnumSet.noneOf(BlockMD.Flag.class) : EnumSet.copyOf(Arrays.asList(flags)));
-    }
-
-    /**
-     * Instantiates a new BlockMD.
-     *
      * @param displayName the display name
      * @param block       the block
      * @param meta        the meta
@@ -82,7 +75,21 @@ public class BlockMD
      */
     BlockMD(String displayName, Block block, int meta, float alpha, EnumSet<BlockMD.Flag> flags)
     {
-        this.uid = GameRegistry.findUniqueIdentifierFor(block);
+        this(displayName, DataCache.instance().getBlockMetadata().findUniqueIdentifierFor(block), block, meta, alpha, flags);
+    }
+
+    /**
+     * Instantiates a new BlockMD.
+     *
+     * @param displayName the display name
+     * @param block       the block
+     * @param meta        the meta
+     * @param alpha       the alpha
+     * @param flags       the flags
+     */
+    BlockMD(String displayName, GameRegistry.UniqueIdentifier uid,  Block block, int meta, float alpha, EnumSet<BlockMD.Flag> flags)
+    {
+        this.uid = uid;
         this.meta = meta;
         this.block = block;
         this.name = (displayName == null) ? this.uid.name : displayName;
@@ -90,13 +97,10 @@ public class BlockMD
         this.alpha = alpha;
         if (block == null)
         {
+            // TODO: Get this out of here.
             if ("Void".equals(name))
             {
                 color = RGB.toInteger(17, 12, 25);
-            }
-            else
-            {
-                color = Color.black.getRGB();
             }
         }
     }
@@ -339,15 +343,15 @@ public class BlockMD
      *
      * @return the string
      */
-    public String toCacheKeyString()
+    public String toCacheKeyString(GameRegistry.UniqueIdentifier uid, int meta)
     {
-        return BlockMDCache.toCacheKeyString(uid, meta);
+        return String.format("%s:%s:%s", uid.modId, uid.name, meta);
     }
 
     @Override
     public String toString()
     {
-        return String.format("BlockMD [%s]", BlockMDCache.toCacheKeyString(uid, meta));
+        return String.format("BlockMD [%s]", toCacheKeyString(uid, meta));
     }
 
     /**
@@ -357,6 +361,30 @@ public class BlockMD
      */
     public String getName()
     {
+        return name;
+    }
+
+    public static String getBlockName(Block block, int meta)
+    {
+        String name = block.getUnlocalizedName();
+        try {
+            // Gotta love this.
+            Item item = Item.getItemFromBlock(block);
+            if(item==null) {
+                item = block.getItemDropped(0,new Random(), 0);
+            }
+            if(item!=null)
+            {
+                ItemStack stack = new ItemStack(item, 1, block.damageDropped(meta));
+                name = stack.getDisplayName();
+            }
+        } catch(Throwable t) {
+            JourneyMap.getLogger().fine("Displayname not available for " + name);
+        }
+
+        if(name.startsWith("tile")) {
+            name = block.getClass().getSimpleName().replaceAll("Block", "");
+        }
         return name;
     }
 

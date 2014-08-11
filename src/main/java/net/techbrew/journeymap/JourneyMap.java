@@ -373,6 +373,7 @@ public class JourneyMap
             }
 
             this.reset();
+            ColorCache.getInstance().prefetchResourcePackColors();
 
             taskController = new TaskController();
             taskController.enableTasks();

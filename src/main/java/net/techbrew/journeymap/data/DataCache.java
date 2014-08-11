@@ -392,6 +392,12 @@ public class DataCache
         }
     }
 
+    public void resetBlockMetadata()
+    {
+        blockMetadata.invalidateAll();
+        blockMetadataLoader.initialize();
+    }
+
     public BlockMDCache getBlockMetadata()
     {
         return blockMetadataLoader;
@@ -403,6 +409,14 @@ public class DataCache
     public BlockMD getBlockMD(ChunkMD chunkMd, int x, int y, int z)
     {
         return blockMetadataLoader.getBlockMD(blockMetadata, chunkMd, x, y, z);
+    }
+
+    /**
+     * Produces a BlockMD instance from chunk-local coords.
+     */
+    public BlockMD getBlockMD(Block block, int meta)
+    {
+        return blockMetadataLoader.getBlockMD(blockMetadata, block, meta);
     }
 
     /**

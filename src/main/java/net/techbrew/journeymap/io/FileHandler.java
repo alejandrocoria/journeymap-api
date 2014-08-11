@@ -487,6 +487,23 @@ public class FileHandler
         }
     }
 
+    public static File copyColorPaletteHtmlFile(File toDir, String fileName)
+    {
+        try
+        {
+            File outFile = new File(toDir, fileName);
+            String htmlPath = FileHandler.ASSETS_JOURNEYMAP_WEB + "/" + fileName;
+            File htmlFile = new File(JourneyMap.class.getResource(htmlPath).getFile());
+            Files.copy(htmlFile, outFile);
+            return outFile;
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().warning("Couldn't copy color palette html: " + t);
+            return null;
+        }
+    }
+
     public static void open(File file)
     {
 

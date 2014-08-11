@@ -4,6 +4,16 @@
 # Do not translate or alter the codes used for color changes (§b, §e, §f, etc.)
 # Positional parameters (%1$s, %2$s, %3$s, etc.) may be reordered to suit your language's sentence structure
 
+jm.colorpalette.file_error=The color palette file has errors and cannot be used: %1$s
+jm.colorpalette.file_title=JourneyMap Color Palette
+jm.colorpalette.file_header_1=This file can be used to keep map colors consistent when changing resource packs.
+jm.colorpalette.file_header_2=Edit at your own risk. You can view it using the %1$s file.
+jm.colorpalette.file_header_3=To use this palette with a single world, place '%1$s' in: %2$s
+jm.colorpalette.file_header_4=To use this palette with all worlds, place '%1$s' in: %2$s
+jm.colorpalette.file_missing_data=Put this file in the same directory as %1$s to view the color palette.
+jm.colorpalette.resource_packs=Resource Packs
+jm.colorpalette.basic_colors=Basic Colors
+jm.colorpalette.biome_colors=Biome Colors
 jm.common.actions=Actions
 jm.common.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
 jm.common.automap_complete=Auto-mapping of surface has stopped.
