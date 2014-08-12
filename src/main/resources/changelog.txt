@@ -12,6 +12,7 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Keybindings would get duplicated if overridden and then viewed in Options->Help screens
 - Bugfix: Colors were wrong for double-tall flowers and melon/pumpkin stems
 - New Feature: Actions -> Generate Color Palette lets you have a customizable, shareable, fixed set of colors that won't change when you switch resource packs.
 
