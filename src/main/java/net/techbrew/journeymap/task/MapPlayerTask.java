@@ -161,7 +161,6 @@ public class MapPlayerTask extends BaseMapTask
             if (chunkMd != null)
             {
                 chunkMd.render = true;
-                chunkMd.setCurrent(false);
                 chunks.add(chunkMd);
             }
         }
@@ -173,7 +172,7 @@ public class MapPlayerTask extends BaseMapTask
         final ChunkCoordIntPair max = new ChunkCoordIntPair(lastPlayerPos.posX + offset, lastPlayerPos.posZ + offset);
 
         boolean forceCurrent;
-        int renderCount = chunks.size();
+        int alive = 0;
         ChunkCoordIntPair coord;
         for (int x = min.chunkXPos; x <= max.chunkXPos; x++)
         {
@@ -197,25 +196,22 @@ public class MapPlayerTask extends BaseMapTask
 
                 if (chunkMd != null)
                 {
-                    if (chunkMd.isCurrent())
-                    {
-                        chunkMd.render = true;
-                        chunkMd.setCurrent(false);
-                        chunks.add(chunkMd);
-                        renderCount++;
-                    }
-                    else
-                    {
-                        chunkMd.render = false;
-                        chunks.add(chunkMd);
-                    }
+                    chunkMd.render = false;
+                    alive++;
                 }
             }
         }
 
-        //System.out.println("Queued: " + queuedCoords.size() + ", Total Chunks to render: " + renderCount);
-
-        return new MapPlayerTask(chunkRenderController, world, dimension, underground, chunkY, chunks);
+        if(chunks.size()==0)
+        {
+            return null;
+        }
+        else
+        {
+            // TODO: comment out
+            System.out.println("Queued to Render: " + chunks.size() + ", Kept alive: " + alive);
+            return new MapPlayerTask(chunkRenderController, world, dimension, underground, chunkY, chunks);
+        }
     }
 
     protected void complete(boolean cancelled, boolean hadError)

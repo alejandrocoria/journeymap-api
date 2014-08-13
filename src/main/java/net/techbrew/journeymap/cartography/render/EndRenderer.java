@@ -21,21 +21,28 @@ import net.techbrew.journeymap.model.ChunkMD;
  *
  * @author mwoodman
  */
-public class EndRenderer extends OverworldCaveRenderer implements IChunkRenderer
+public class EndRenderer extends CaveRenderer implements IChunkRenderer
 {
 
     public EndRenderer()
     {
         super(null);
+        cachePrefix = "End";
     }
 
     /**
      * Get block height within slice.
      */
     @Override
-    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY)
+    protected Integer getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY,
+                                          final HeightsCache chunkHeights)
     {
-        Integer[][] blockSliceHeights = chunkMd.getSliceBlockHeights(vSlice);
+        Integer[][] blockSliceHeights = chunkHeights.getIfPresent(chunkMd.coord);
+        if(blockSliceHeights==null)
+        {
+            return null;
+        }
+
         Integer y = blockSliceHeights[x][z];
 
         if (y != null)
@@ -94,9 +101,9 @@ public class EndRenderer extends OverworldCaveRenderer implements IChunkRenderer
     /**
      * Create Strata for caves, using first lit blocks found.
      */
-    protected void buildStrata(Strata strata, final ChunkMD.Set neighbors, int minY, ChunkMD chunkMd, int x, final int topY, int z)
+    protected void buildStrata(Strata strata, int minY, ChunkMD chunkMd, int x, final int topY, int z, HeightsCache chunkHeights, SlopesCache chunkSlopes)
     {
-        super.buildStrata(strata, neighbors, minY, chunkMd, x, topY, z);
+        super.buildStrata(strata, minY, chunkMd, x, topY, z, chunkHeights, chunkSlopes);
     }
 
     /**

@@ -21,7 +21,7 @@ import net.techbrew.journeymap.model.ChunkMD;
  *
  * @author mwoodman
  */
-public class NetherRenderer extends OverworldCaveRenderer implements IChunkRenderer
+public class NetherRenderer extends CaveRenderer implements IChunkRenderer
 {
     // Taken from WorldProviderHell.getFogColor()
     private float[] fog = new float[]{0.20000000298023224f, 0.029999999329447746f, 0.029999999329447746f};
@@ -29,15 +29,22 @@ public class NetherRenderer extends OverworldCaveRenderer implements IChunkRende
     public NetherRenderer()
     {
         super(null);
+        cachePrefix = "Nether";
     }
 
     /**
      * Get block height within slice.
      */
     @Override
-    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY)
+    protected Integer getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY,
+                                          final HeightsCache chunkHeights)
     {
-        Integer[][] blockSliceHeights = chunkMd.getSliceBlockHeights(vSlice);
+        Integer[][] blockSliceHeights = chunkHeights.getIfPresent(chunkMd.coord);
+        if(blockSliceHeights==null)
+        {
+            return null;
+        }
+
         Integer y = blockSliceHeights[x][z];
 
         if (y != null)
@@ -84,11 +91,10 @@ public class NetherRenderer extends OverworldCaveRenderer implements IChunkRende
     /**
      * Create Strata for caves, using first lit blocks found.
      */
-    protected void buildStrata(Strata strata, final ChunkMD.Set neighbors, int minY, ChunkMD chunkMd, int x, final int topY, int z)
+    protected void buildStrata(Strata strata, int minY, ChunkMD chunkMd, int x, final int topY, int z, HeightsCache chunkHeights, SlopesCache chunkSlopes)
     {
-        super.buildStrata(strata, neighbors, minY, chunkMd, x, topY, z);
+        super.buildStrata(strata, minY, chunkMd, x, topY, z, chunkHeights, chunkSlopes);
     }
-
     /**
      * Get the light level for the block in the slice.  Can be overridden to provide an ambient light minimum.
      */

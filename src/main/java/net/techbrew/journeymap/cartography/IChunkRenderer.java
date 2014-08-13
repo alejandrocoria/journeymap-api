@@ -14,10 +14,7 @@ import java.awt.*;
 
 public interface IChunkRenderer
 {
-
-    public boolean render(final Graphics2D g2D, final ChunkMD chunkStub, final boolean underground,
-                          final Integer vSlice, final ChunkMD.Set neighbors);
-
+    public boolean render(final Graphics2D g2D, final ChunkMD chunkStub, final Integer vSlice);
 
     public void setStratumColors(Stratum stratum, int lightAttenuation, Integer waterColor, boolean waterAbove, boolean underground, boolean mapCaveLighting);
 

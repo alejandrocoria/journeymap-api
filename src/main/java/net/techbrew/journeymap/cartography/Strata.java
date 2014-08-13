@@ -110,12 +110,12 @@ public class Strata
         }
     }
 
-    public Stratum push(final ChunkMD.Set neighbors, ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
+    public Stratum push(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
     {
-        return push(neighbors, chunkMd, blockMD, x, y, z, null);
+        return push(chunkMd, blockMD, x, y, z, null);
     }
 
-    public Stratum push(final ChunkMD.Set neighbors, ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, Integer lightLevel)
+    public Stratum push(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, Integer lightLevel)
     {
         try
         {
@@ -140,7 +140,7 @@ public class Strata
                 setBottomWaterY((getBottomWaterY() == null) ? y : Math.min(getBottomWaterY(), y));
                 if (getWaterColor() == null)
                 {
-                    setWaterColor(getAverageWaterColor(neighbors, (chunkMd.coord.chunkXPos << 4) + x, y, (chunkMd.coord.chunkZPos << 4) + z));
+                    setWaterColor(getAverageWaterColor((chunkMd.coord.chunkXPos << 4) + x, y, (chunkMd.coord.chunkZPos << 4) + z));
                     if (getWaterColor() == null)
                     {
                         // This shouldn't happen. But if it did, it'd be too spammy to log.
@@ -213,23 +213,23 @@ public class Strata
     /**
      * Requires absolute x,y,z coordinates. Returns null if water not at checked locations.
      */
-    Integer getAverageWaterColor(final ChunkMD.Set neighbors, int blockX, int blockY, int blockZ)
+    Integer getAverageWaterColor(int blockX, int blockY, int blockZ)
     {
         return RGB.average(
-                getWaterColor(neighbors, blockX, blockY, blockZ),
-                getWaterColor(neighbors, blockX - 1, blockY, blockZ),
-                getWaterColor(neighbors, blockX + 1, blockY, blockZ),
-                getWaterColor(neighbors, blockX, blockY - 1, blockZ),
-                getWaterColor(neighbors, blockX, blockY + 1, blockZ)
+                getWaterColor(blockX, blockY, blockZ),
+                getWaterColor(blockX - 1, blockY, blockZ),
+                getWaterColor(blockX + 1, blockY, blockZ),
+                getWaterColor(blockX, blockY - 1, blockZ),
+                getWaterColor(blockX, blockY + 1, blockZ)
         );
     }
 
     /**
      * Requires absolute x,y,z coordinates. Returns null if water not at that location.
      */
-    Integer getWaterColor(final ChunkMD.Set neighbors, int blockX, int blockY, int blockZ)
+    Integer getWaterColor(int blockX, int blockY, int blockZ)
     {
-        ChunkMD chunk = neighbors.get(new ChunkCoordIntPair(blockX >> 4, blockZ >> 4));
+        ChunkMD chunk = dataCache.getChunkMD(new ChunkCoordIntPair(blockX >> 4, blockZ >> 4));
         if (chunk != null)
         {
             BlockMD block = dataCache.getBlockMD(chunk, blockX & 15, blockY, blockZ & 15);

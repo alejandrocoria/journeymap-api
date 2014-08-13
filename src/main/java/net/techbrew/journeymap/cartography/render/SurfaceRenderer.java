@@ -8,11 +8,15 @@
 
 package net.techbrew.journeymap.cartography.render;
 
+import com.google.common.base.Optional;
+import com.google.common.cache.*;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.IChunkRenderer;
 import net.techbrew.journeymap.cartography.RGB;
 import net.techbrew.journeymap.cartography.Strata;
 import net.techbrew.journeymap.cartography.Stratum;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
@@ -21,28 +25,40 @@ import net.techbrew.journeymap.model.ChunkMD;
 import java.awt.*;
 import java.util.logging.Level;
 
-public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRenderer
+public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 {
-    protected StatTimer renderSurfaceTimer = StatTimer.get("OverworldSurfaceRenderer.renderSurface");
-    protected StatTimer renderSurfacePrepassTimer = StatTimer.get("OverworldSurfaceRenderer.renderSurface.CavePrepass");
-    protected Strata strata = new Strata("OverworldSurface", 40, 8, false);
+    protected StatTimer renderSurfaceTimer = StatTimer.get("SurfaceRenderer.renderSurface");
+    protected StatTimer renderSurfacePrepassTimer = StatTimer.get("SurfaceRenderer.renderSurface.CavePrepass");
+    protected Strata strata = new Strata("Surface", 40, 8, false);
     protected float maxDepth = 8;
 
-    /**
-     * Render blocks in the chunk for the standard world.
-     */
-    @Override
-    public boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final boolean underground,
-                          final Integer vSlice, final ChunkMD.Set neighbors)
+    private final Object chunkLock = new Object();
+
+    private final HeightsCache chunkSurfaceHeights;
+    private final SlopesCache chunkSurfaceSlopes;
+
+    public SurfaceRenderer()
     {
-        return render(g2D, chunkMd, underground, vSlice, neighbors, false);
+        // TODO: Write the caches to disk and we'll have some useful data available.
+
+        chunkSurfaceHeights = new HeightsCache("SurfaceHeights");
+        chunkSurfaceSlopes = new SlopesCache("SurfaceSlopes");
+        DataCache.instance().addChunkMDListener(this);
     }
 
     /**
      * Render blocks in the chunk for the standard world.
      */
-    public synchronized boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final boolean underground,
-                          final Integer vSlice, final ChunkMD.Set neighbors, final boolean cavePrePass)
+    @Override
+    public boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice)
+    {
+        return render(g2D, chunkMd, null, false);
+    }
+
+    /**
+     * Render blocks in the chunk for the standard world.
+     */
+    public synchronized boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
     {
         StatTimer timer = cavePrePass ? renderSurfacePrepassTimer : renderSurfaceTimer;
 
@@ -52,19 +68,14 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
 
             updateOptions();
 
-            if (!cavePrePass && (underground || vSlice != null))
-            {
-                JourneyMap.getLogger().warning(String.format("ChunkOverworldSurfaceRenderer is for surface.  Y u do dis? (%s,%s)", underground, vSlice));
-            }
-
             // Initialize ChunkSub slopes if needed
-            if (chunkMd.surfaceSlopes == null)
+            if (chunkSurfaceSlopes.getIfPresent(chunkMd.coord) == null)
             {
-                populateSlopes(chunkMd, null, neighbors);
+                populateSlopes(chunkMd, null, chunkSurfaceHeights, chunkSurfaceSlopes);
             }
 
             // Render the chunk image
-            return renderSurface(g2D, chunkMd, vSlice, neighbors, cavePrePass);
+            return renderSurface(g2D, chunkMd, vSlice, cavePrePass);
         }
         catch (Throwable e)
         {
@@ -82,7 +93,7 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
     /**
      * Render blocks in the chunk for the surface.
      */
-    protected boolean renderSurface(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice, final ChunkMD.Set neighbors, final boolean cavePrePass)
+    protected boolean renderSurface(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
     {
         boolean chunkOk = false;
 
@@ -105,8 +116,7 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
                     strata.reset();
                     BlockMD topBlockMd = null;
 
-                    int standardY = Math.max(1, getSurfaceBlockHeight(chunkMd, x, z));
-
+                    int standardY = Math.max(1, getSurfaceBlockHeight(chunkMd, x, z, chunkSurfaceHeights));
 
                     // Should be painted only by cave renderer
                     if (cavePrePass && (standardY > sliceMaxY && (standardY - sliceMaxY) > maxDepth))
@@ -161,9 +171,9 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
                     }
 
                     // Start using BlockColors stack
-                    buildStrata(strata, neighbors, roofY, chunkMd, x, standardY, z);
+                    buildStrata(strata, roofY, chunkMd, x, standardY, z);
 
-                    chunkOk = paintStrata(strata, g2D, chunkMd, topBlockMd, vSlice, neighbors, x, y, z, cavePrePass) || chunkOk;
+                    chunkOk = paintStrata(strata, g2D, chunkMd, topBlockMd, vSlice, x, y, z, cavePrePass) || chunkOk;
                 }
             }
         }
@@ -181,7 +191,7 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
     /**
      * Create a BlockStack.
      */
-    protected void buildStrata(Strata strata, final ChunkMD.Set neighbors, int roofY, ChunkMD chunkMd, int x, int y, int z)
+    protected void buildStrata(Strata strata, int roofY, ChunkMD chunkMd, int x, int y, int z)
     {
         BlockMD blockMD;
 
@@ -195,7 +205,7 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
                 {
                     if (blockMD.isTransparentRoof())
                     {
-                        strata.push(neighbors, chunkMd, blockMD, x, roofY, z);
+                        strata.push(chunkMd, blockMD, x, roofY, z);
                         if (!mapTransparency)
                         {
                             break;
@@ -214,7 +224,7 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
 
                 if (!blockMD.isAir())
                 {
-                    strata.push(neighbors, chunkMd, blockMD, x, y, z);
+                    strata.push(chunkMd, blockMD, x, y, z);
 
                     if (blockMD.getAlpha() == 1f || !mapTransparency)
                     {
@@ -229,7 +239,7 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
     /**
      * Paint the image with the color derived from a BlockStack
      */
-    protected boolean paintStrata(final Strata strata, final Graphics2D g2D, final ChunkMD chunkMd, final BlockMD topBlockMd, final Integer vSlice, final ChunkMD.Set neighbors, final int x, final int y, final int z, final boolean cavePrePass)
+    protected boolean paintStrata(final Strata strata, final Graphics2D g2D, final ChunkMD chunkMd, final BlockMD topBlockMd, final Integer vSlice, final int x, final int y, final int z, final boolean cavePrePass)
     {
         if (strata.isEmpty())
         {
@@ -286,7 +296,7 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
             // Now add bevel for slope
             if (!topBlockMd.hasFlag(BlockMD.Flag.NoShadow))
             {
-                float slope = getSlope(chunkMd, topBlockMd, neighbors, x, null, z);
+                float slope = getSlope(chunkMd, topBlockMd, x, null, z, chunkSurfaceHeights, chunkSurfaceSlopes);
                 if (slope != 1f)
                 {
                     strata.setRenderDayColor(RGB.bevelSlope(strata.getRenderDayColor(), slope));
@@ -314,5 +324,18 @@ public class OverworldSurfaceRenderer extends BaseRenderer implements IChunkRend
         }
 
         return true;
+    }
+
+    @Override
+    public void onRemoval(RemovalNotification<ChunkCoordIntPair, Optional<ChunkMD>> notification)
+    {
+        synchronized (chunkLock)
+        {
+            ChunkCoordIntPair coord = notification.getKey();
+            chunkSurfaceHeights.invalidate(coord);
+            chunkSurfaceSlopes.invalidate(coord);
+
+            //JourneyMap.getLogger().info("Invalidated data related to chunk " + coord);
+        }
     }
 }

@@ -9,9 +9,7 @@
 package net.techbrew.journeymap.data;
 
 import com.google.common.base.Optional;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheStats;
-import com.google.common.cache.LoadingCache;
+import com.google.common.cache.*;
 import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -50,48 +48,64 @@ public class DataCache
     final LoadingCache<Block, HashMap<Integer, BlockMD>> blockMetadata;
     final BlockMDCache blockMetadataLoader;
 
+    final ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadataRemovalListener;
+
+    final HashMap<Cache, String> managedCaches = new HashMap<Cache, String>();
+    final WeakHashMap<Cache, String> privateCaches = new WeakHashMap<Cache, String>();
+
     // Private constructor
     private DataCache()
     {
         AllData allData = new AllData();
         all = getCacheBuilder().maximumSize(1).expireAfterWrite(allData.getTTL(), TimeUnit.MILLISECONDS).build(allData);
+        managedCaches.put(all, "AllData (web)");
 
         AnimalsData animalsData = new AnimalsData();
         animals = getCacheBuilder().expireAfterWrite(animalsData.getTTL(), TimeUnit.MILLISECONDS).build(animalsData);
+        managedCaches.put(animals, "Animals");
 
         MobsData mobsData = new MobsData();
         mobs = getCacheBuilder().expireAfterWrite(mobsData.getTTL(), TimeUnit.MILLISECONDS).build(mobsData);
+        managedCaches.put(mobs, "Mobs");
 
         PlayerData playerData = new PlayerData();
-        player = CacheBuilder.newBuilder().expireAfterWrite(playerData.getTTL(), TimeUnit.MILLISECONDS).build(playerData);
+        player = getCacheBuilder().expireAfterWrite(playerData.getTTL(), TimeUnit.MILLISECONDS).build(playerData);
+        managedCaches.put(player, "Player");
 
         PlayersData playersData = new PlayersData();
         players = getCacheBuilder().expireAfterWrite(playersData.getTTL(), TimeUnit.MILLISECONDS).build(playersData);
+        managedCaches.put(players, "Players");
 
         VillagersData villagersData = new VillagersData();
         villagers = getCacheBuilder().expireAfterWrite(villagersData.getTTL(), TimeUnit.MILLISECONDS).build(villagersData);
+        managedCaches.put(villagers, "Villagers");
 
         WaypointsData waypointsData = new WaypointsData();
         waypoints = getCacheBuilder().expireAfterWrite(waypointsData.getTTL(), TimeUnit.MILLISECONDS).build(waypointsData);
+        managedCaches.put(waypoints, "Waypoints");
 
         WorldData worldData = new WorldData();
         world = getCacheBuilder().expireAfterWrite(worldData.getTTL(), TimeUnit.MILLISECONDS).build(worldData);
+        managedCaches.put(world, "World");
 
         MessagesData messagesData = new MessagesData();
         messages = getCacheBuilder().expireAfterWrite(messagesData.getTTL(), TimeUnit.MILLISECONDS).build(messagesData);
+        managedCaches.put(messages, "Messages (web)");
 
         entityDrawSteps = getCacheBuilder().weakKeys().build(new DrawEntityStep.SimpleCacheLoader());
+        managedCaches.put(entityDrawSteps, "DrawEntityStep");
 
         entityDTOs = getCacheBuilder().weakKeys().build(new EntityDTO.SimpleCacheLoader());
+        managedCaches.put(entityDTOs, "EntityDTO");
 
-        long colorTimeout = JourneyMap.getInstance().coreProperties.chunkPoll.get() * 5;
-        //colors = getCacheBuilder().expireAfterAccess(colorTimeout, TimeUnit.MILLISECONDS).build(new RGB.SimpleCacheLoader());
-
+        chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>>();
         long chunkTimeout = JourneyMap.getInstance().coreProperties.chunkPoll.get() * 3;
-        chunkMetadata = getCacheBuilder().expireAfterWrite(chunkTimeout, TimeUnit.MILLISECONDS).build(new ChunkMD.SimpleCacheLoader());
+        chunkMetadata = getCacheBuilder().removalListener(chunkMetadataRemovalListener).expireAfterAccess(chunkTimeout, TimeUnit.MILLISECONDS).build(new ChunkMD.SimpleCacheLoader());
+        managedCaches.put(chunkMetadata, "ChunkMD");
 
         blockMetadataLoader = new BlockMDCache();
         blockMetadata = getCacheBuilder().initialCapacity(GameData.getBlockRegistry().getKeys().size()).build(blockMetadataLoader);
+        managedCaches.put(blockMetadata, "BlockMD");
     }
 
     // Get singleton instance.  Concurrency-safe.
@@ -118,6 +132,15 @@ public class DataCache
             builder.recordStats();
         }
         return builder;
+    }
+
+    public void addPrivateCache(String name, Cache cache)
+    {
+        if(privateCaches.containsValue(name))
+        {
+            JourneyMap.getLogger().warning("Overriding private cache: " + name);
+        }
+        privateCaches.put(cache, name);
     }
 
     public Map getAll(long since)
@@ -352,6 +375,11 @@ public class DataCache
 
             try
             {
+                if(ensureCurrent)
+                {
+                    chunkMetadata.refresh(coord);
+                }
+
                 Optional<ChunkMD> optional = chunkMetadata.get(coord);
                 if (optional.isPresent())
                 {
@@ -367,10 +395,10 @@ public class DataCache
                 JourneyMap.getLogger().warning("Unexpected error getting ChunkMD from cache: " + e);
             }
 
-            if (ensureCurrent && chunkMD != null && !chunkMD.isCurrent())
-            {
-                chunkMD = ChunkLoader.refreshChunkMdFromMemory(chunkMD);
-            }
+//            if (ensureCurrent && chunkMD != null)
+//            {
+//                chunkMD = ChunkLoader.refreshChunkMdFromMemory(chunkMD);
+//            }
 
             return chunkMD;
         }
@@ -389,6 +417,14 @@ public class DataCache
         synchronized (chunkMetadata)
         {
             chunkMetadata.invalidate(coord);
+        }
+    }
+
+    public void addChunkMDListener(RemovalListener<ChunkCoordIntPair, Optional<ChunkMD>> listener)
+    {
+        synchronized (chunkMetadataRemovalListener)
+        {
+            chunkMetadataRemovalListener.addDelegateListener(listener);
         }
     }
 
@@ -424,99 +460,44 @@ public class DataCache
      */
     public void purge()
     {
-        synchronized (all)
+        synchronized (managedCaches)
         {
-            all.invalidateAll();
+            for(Cache cache : managedCaches.keySet())
+            {
+                try
+                {
+                    cache.invalidateAll();
+                }
+                catch (Exception e)
+                {
+                    JourneyMap.getLogger().warning("Couldn't purge managed cache: " + cache);
+                }
+            }
         }
 
-        synchronized (animals)
+        synchronized (privateCaches)
         {
-            animals.invalidateAll();
-        }
-
-        synchronized (mobs)
-        {
-            mobs.invalidateAll();
-        }
-
-        synchronized (players)
-        {
-            players.invalidateAll();
-        }
-
-        synchronized (player)
-        {
-            player.invalidateAll();
-        }
-
-        synchronized (villagers)
-        {
-            villagers.invalidateAll();
-        }
-
-        synchronized (waypoints)
-        {
-            waypoints.invalidateAll();
-        }
-
-        synchronized (world)
-        {
-            world.invalidateAll();
-        }
-
-        synchronized (messages)
-        {
-            messages.invalidateAll();
-        }
-
-        synchronized (entityDrawSteps)
-        {
-            entityDrawSteps.invalidateAll();
-        }
-
-        synchronized (entityDTOs)
-        {
-            entityDTOs.invalidateAll();
-        }
-
-//        synchronized (colors)
-//        {
-//            colors.invalidateAll();
-//        }
-
-        synchronized (chunkMetadata)
-        {
-            chunkMetadata.invalidateAll();
-        }
-
-        synchronized (blockMetadata)
-        {
-            blockMetadataLoader.initialize();
-            blockMetadata.invalidateAll();
+            for(Cache cache : privateCaches.keySet())
+            {
+                try
+                {
+                    cache.invalidateAll();
+                }
+                catch (Exception e)
+                {
+                    JourneyMap.getLogger().warning("Couldn't purge private cache: " + cache);
+                }
+            }
         }
     }
 
     public String getDebugHtml()
     {
-        StringBuilder sb = new StringBuilder();
-
+        StringBuffer sb = new StringBuffer();
         if (JourneyMap.getInstance().coreProperties.recordCacheStats.get())
         {
-            sb.append("<pre>");
-            sb.append(toString("All (Web only)", all));
-            //sb.append(toString("Colors", colors));
-            sb.append(toString("Blocks", blockMetadata));
-            sb.append(toString("Chunks", chunkMetadata));
-            sb.append(toString("DrawEntitySteps", entityDrawSteps));
-            sb.append(toString("EntityDTOs", entityDTOs));
-            sb.append(toString("Animals", animals));
-            sb.append(toString("Messages", messages));
-            sb.append(toString("Mobs", mobs));
-            sb.append(toString("Players", players));
-            sb.append(toString("Villagers", villagers));
-            sb.append(toString("Waypoints", waypoints));
-            sb.append(toString("World", world));
-            sb.append("</pre>");
+            appendDebugHtml(sb, "Managed", managedCaches);
+            appendDebugHtml(sb, "Private", privateCaches);
         }
         else
         {
@@ -525,7 +506,28 @@ public class DataCache
         return sb.toString();
     }
 
-    private String toString(String label, LoadingCache cache)
+    private void appendDebugHtml(StringBuffer sb, String name, Map<Cache, String> cacheMap)
+    {
+        ArrayList<Map.Entry<Cache, String>> list = new ArrayList<Map.Entry<Cache, String>>(cacheMap.entrySet());
+        Collections.sort(list, new Comparator<Map.Entry<Cache, String>>()
+        {
+            @Override
+            public int compare(Map.Entry<Cache, String> o1, Map.Entry<Cache, String> o2)
+            {
+                return o1.getValue().compareTo(o2.getValue());
+            }
+        });
+
+        sb.append("<b>").append(name).append(":</b>");
+        sb.append("<pre>");
+        for(Map.Entry<Cache, String> entry : list)
+        {
+            sb.append(toString(entry.getValue(), entry.getKey()));
+        }
+        sb.append("</pre>");
+    }
+
+    private String toString(String label, Cache cache)
     {
         double avgLoadMillis = 0;
         CacheStats cacheStats = cache.stats();
@@ -535,6 +537,37 @@ public class DataCache
         }
 
         return String.format("%s<b>%20s:</b> Size: %9s, Hits: %9s, Misses: %9s, Loads: %9s, Errors: %9s, Avg Load Time: %1.2fms", LogFormatter.LINEBREAK, label, cache.size(), cacheStats.hitCount(), cacheStats.missCount(), cacheStats.loadCount(), cacheStats.loadExceptionCount(), avgLoadMillis);
+    }
+
+    class ProxyRemovalListener<K,V> implements RemovalListener<K,V>
+    {
+        final Map<RemovalListener<K,V>, Void> delegates = Collections.synchronizedMap(new WeakHashMap<RemovalListener<K,V>, Void>());
+
+        void addDelegateListener(RemovalListener<K,V> delegate)
+        {
+            if(delegates.containsKey(delegate))
+            {
+                JourneyMap.getLogger().warning("RemovalListener already added: " + delegate.getClass());
+            }
+            else
+            {
+                delegates.put(delegate, null);
+            }
+        }
+
+        void removeDelegateListener(RemovalListener<K,V> delegate)
+        {
+            delegates.remove(delegate);
+        }
+
+        @Override
+        public void onRemoval(RemovalNotification<K, V> notification)
+        {
+            for(RemovalListener<K,V> delegate : delegates.keySet())
+            {
+                delegate.onRemoval(notification);
+            }
+        }
     }
 
     // On-demand-holder for instance

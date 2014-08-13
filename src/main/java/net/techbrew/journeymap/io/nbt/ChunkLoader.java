@@ -52,26 +52,25 @@ public class ChunkLoader
         return null;
     }
 
-    public static ChunkMD refreshChunkMdFromMemory(ChunkMD chunkMD)
-    {
-        if (chunkMD == null)
-        {
-            return null;
-        }
-
-        Chunk chunk = getChunkFromMemory(chunkMD.coord.chunkXPos, chunkMD.coord.chunkZPos, chunkMD.worldObj);
-        if (chunk != null)
-        {
-            chunkMD.stub.updateFrom(chunk);
-            chunkMD.sliceSlopes.clear();
-            chunkMD.setCurrent(true);
-            return chunkMD;
-        }
-        else
-        {
-            return null;
-        }
-    }
+//    public static ChunkMD refreshChunkMdFromMemory(ChunkMD chunkMD)
+//    {
+//        if (chunkMD == null)
+//        {
+//            return null;
+//        }
+//
+//        Chunk chunk = getChunkFromMemory(chunkMD.coord.chunkXPos, chunkMD.coord.chunkZPos, chunkMD.worldObj);
+//        if (chunk != null)
+//        {
+//            chunkMD.stub.updateFrom(chunk);
+//            chunkMD.sliceSlopes.clear();
+//            return chunkMD;
+//        }
+//        else
+//        {
+//            return null;
+//        }
+//    }
 
     private static Chunk getChunkFromMemory(int chunkX, int chunkZ, World world)
     {

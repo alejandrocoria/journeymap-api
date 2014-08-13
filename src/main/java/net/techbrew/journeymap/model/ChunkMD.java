@@ -43,14 +43,7 @@ public class ChunkMD
     public final ChunkCoordIntPair coord;
     public final boolean isSlimeChunk;
 
-    public volatile Integer[][] surfaceHeights;
-    public volatile HashMap<Integer, Integer[][]> sliceHeights;
-
-    public volatile Float[][] surfaceSlopes;
-    public volatile HashMap<Integer, Float[][]> sliceSlopes;
-
     public Boolean render;
-    protected boolean current;
 
     public ChunkMD(Chunk chunk, Boolean render, World worldObj)
     {
@@ -74,25 +67,11 @@ public class ChunkMD
         this.worldHeight = worldObj.getActualHeight();
         this.hasNoSky = worldObj.provider.hasNoSky;
         this.coord = new ChunkCoordIntPair(stub.xPosition, stub.zPosition);
-        this.current = true;
-        this.sliceSlopes = new HashMap<Integer, Float[][]>(8);
-        this.surfaceHeights = new Integer[16][16];
-        this.sliceHeights = new HashMap<Integer, Integer[][]>(8);
 
         // https://github.com/OpenMods/OpenBlocks/blob/master/src/main/java/openblocks/common/item/ItemSlimalyzer.java#L44
         this.isSlimeChunk = stub.getRandomWithSeed(987234911L).nextInt(10) == 0;
     }
 
-
-    public boolean isCurrent()
-    {
-        return current;
-    }
-
-    public void setCurrent(boolean current)
-    {
-        this.current = current;
-    }
 
     public Block getBlock(int x, int y, int z)
     {
@@ -105,18 +84,6 @@ public class ChunkMD
     public int getSavedLightValue(EnumSkyBlock par1EnumSkyBlock, int x, int y, int z)
     {
         return stub.getSavedLightValue(par1EnumSkyBlock, x, Math.min(y, worldHeight - 1), z);
-    }
-
-
-    public Integer[][] getSliceBlockHeights(Integer vSlice)
-    {
-        Integer[][] blockSliceHeights = sliceHeights.get(vSlice);
-        if (blockSliceHeights == null)
-        {
-            blockSliceHeights = new Integer[16][16];
-            sliceHeights.put(vSlice, blockSliceHeights);
-        }
-        return blockSliceHeights;
     }
 
 

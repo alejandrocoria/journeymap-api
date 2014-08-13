@@ -8,6 +8,7 @@
 
 package net.techbrew.journeymap.model;
 
+import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.entity.Entity;
@@ -111,7 +112,7 @@ public class EntityDTO implements Serializable
         {
             // TODO: Test this with and without owners
             String ownerUuidString = ((EntityHorse) entity).func_152119_ch();
-            if (ownerUuidString != null)
+            if (!Strings.isNullOrEmpty(ownerUuidString))
             {
                 try
                 {

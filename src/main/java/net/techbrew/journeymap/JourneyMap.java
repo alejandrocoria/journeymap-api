@@ -413,6 +413,7 @@ public class JourneyMap
         FileHandler.lastJMWorldDir = null;
         chunkRenderController = new ChunkRenderController();
         DataCache.instance().purge();
+        DataCache.instance().resetBlockMetadata();
         MapOverlay.state().follow = true;
         ColorCache.getInstance().reset();
         StatTimer.resetAll();

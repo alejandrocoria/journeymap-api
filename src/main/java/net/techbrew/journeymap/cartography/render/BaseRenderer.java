@@ -9,6 +9,8 @@
 package net.techbrew.journeymap.cartography.render;
 
 
+import com.google.common.base.Optional;
+import com.google.common.cache.*;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.JourneyMap;
@@ -32,7 +34,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author mwoodman
  */
-public abstract class BaseRenderer implements IChunkRenderer
+public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<ChunkCoordIntPair, Optional<ChunkMD>>
 {
     static final int BLACK = Color.black.getRGB();
     static final int VOID = RGB.toInteger(17, 12, 25);
@@ -211,90 +213,87 @@ public abstract class BaseRenderer implements IChunkRenderer
      * Initialize surface slopes in chunk.  This is the black magic
      * that serves as the stand-in for true bump-mapping.
      */
-    protected Float[][] populateSlopes(final ChunkMD chunkMd, Integer vSlice, final ChunkMD.Set neighbors)
+    protected Float[][] populateSlopes(final ChunkMD chunkMd, Integer vSlice,
+                                       final HeightsCache chunkHeights,
+                                       final SlopesCache chunkSlopes)
     {
-        synchronized (chunkMd)
+
+        Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.coord);
+        int y = 0, sliceMinY = 0, sliceMaxY = 0;
+        boolean isSurface = (vSlice == null);
+        float slope, primarySlope, secondarySlope;
+        BlockMD blockMD;
+
+        if (!isSurface)
         {
-            int y = 0, sliceMinY = 0, sliceMaxY = 0;
-            Float[][] slopes = new Float[16][16];
-            boolean isSurface = (vSlice == null);
-            float slope, primarySlope, secondarySlope;
-            BlockMD blockMD;
+            int[] sliceBounds = getVSliceBounds(chunkMd, vSlice);
+            sliceMinY = sliceBounds[0];
+            sliceMaxY = sliceBounds[1];
+        }
 
-            if (isSurface)
+        for (int z = 0; z < 16; z++)
+        {
+            for (int x = 0; x < 16; x++)
             {
-                chunkMd.surfaceSlopes = slopes;
-            }
-            else
-            {
-                chunkMd.sliceSlopes.put(vSlice, slopes);
-                int[] sliceBounds = getVSliceBounds(chunkMd, vSlice);
-                sliceMinY = sliceBounds[0];
-                sliceMaxY = sliceBounds[1];
-            }
-
-            for (int z = 0; z < 16; z++)
-            {
-                for (int x = 0; x < 16; x++)
+                // Get block height
+                if (isSurface)
                 {
-                    // Get block height
-                    if (isSurface)
+                    y = getSurfaceBlockHeight(chunkMd, x, z, chunkHeights);
+                }
+                else
+                {
+                    y = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, chunkHeights);
+                }
+
+                // Calculate primary slope
+                primarySlope = calculateSlope(chunkMd, primarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY, chunkHeights, chunkSlopes);
+
+                // Exaggerate primary slope for normal shading
+                slope = primarySlope;
+                if (slope < 1)
+                {
+                    slope *= primaryDownslopeMultiplier;
+                }
+                else if (slope > 1)
+                {
+                    slope *= primaryUpslopeMultiplier;
+                }
+
+                // Calculate secondary slope
+                if (mapAntialiasing && primarySlope==1f )
+                {
+                    secondarySlope = calculateSlope(chunkMd, secondarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY, chunkHeights, chunkSlopes);
+
+                    if (secondarySlope > primarySlope)
                     {
-                        y = getSurfaceBlockHeight(chunkMd, x, z);
+                        slope *= secondaryUpslopeMultiplier;
                     }
-                    else
+                    else if (secondarySlope < primarySlope)
                     {
-                        y = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY);
-                    }
-
-                    // Calculate primary slope
-                    primarySlope = calculateSlope(chunkMd, neighbors, primarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY);
-
-                    // Exaggerate primary slope for normal shading
-                    slope = primarySlope;
-                    if (slope < 1)
-                    {
-                        slope *= primaryDownslopeMultiplier;
-                    }
-                    else if (slope > 1)
-                    {
-                        slope *= primaryUpslopeMultiplier;
-                    }
-
-                    // Calculate secondary slope
-                    if (mapAntialiasing && primarySlope==1f )
-                    {
-                        secondarySlope = calculateSlope(chunkMd, neighbors, secondarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY);
-
-                        if (secondarySlope > primarySlope)
-                        {
-                            slope *= secondaryUpslopeMultiplier;
-                        }
-                        else if (secondarySlope < primarySlope)
-                        {
-                            slope *= secondaryDownslopeMultiplier;
-                        }
-                    }
-
-                    // Set that slope.  Set it good.  Aw yeah.
-
-                    slopes[x][z] = Math.min(slopeMax, Math.max(slopeMin, slope));
-
-                    if(slopes[x][z].isNaN())
-                    {
-                        slopes[x][z] = 1f;
+                        slope *= secondaryDownslopeMultiplier;
                     }
                 }
-            }
 
-            return slopes;
+                // Set that slope.  Set it good.  Aw yeah.
+
+                slopes[x][z] = Math.min(slopeMax, Math.max(slopeMin, slope));
+
+                if(slopes[x][z].isNaN())
+                {
+                    slopes[x][z] = 1f;
+                }
+            }
         }
+
+        return slopes;
+
     }
 
     /**
-     * Get block height within slice.  Should lazy-populate sliceHeights.
+     * Get block height within slice.  Should lazy-populate sliceHeights. Can return null.
      */
-    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY)
+    protected Integer getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY,
+                                      final HeightsCache chunkHeights)
     {
         throw new NotImplementedException();
     }
@@ -302,7 +301,9 @@ public abstract class BaseRenderer implements IChunkRenderer
     /**
      * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
      */
-    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY, final int offsetX, int offsetZ, ChunkMD.Set neighbors, int defaultVal)
+    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY,
+                                      final int sliceMaxY, final int offsetX, int offsetZ, int defaultVal,
+                                      final HeightsCache chunkHeights)
     {
         ChunkMD chunk = null;
         int blockX = ((chunkMd.coord.chunkXPos << 4) + x + offsetX);
@@ -316,13 +317,12 @@ public abstract class BaseRenderer implements IChunkRenderer
         }
         else
         {
-            ChunkCoordIntPair coord = new ChunkCoordIntPair(chunkX, chunkZ);
-            chunk = neighbors.get(coord);
+            chunk = dataCache.getChunkMD(new ChunkCoordIntPair(chunkX, chunkZ));
         }
 
         if (chunk != null)
         {
-            return getSliceBlockHeight(chunk, blockX & 15, vSlice, blockZ & 15, sliceMinY, sliceMaxY);
+            return getSliceBlockHeight(chunk, blockX & 15, vSlice, blockZ & 15, sliceMinY, sliceMaxY, chunkHeights);
         }
         else
         {
@@ -330,25 +330,30 @@ public abstract class BaseRenderer implements IChunkRenderer
         }
     }
 
-    protected float calculateSlope(final ChunkMD chunkMd, final ChunkMD.Set neighbors, final Collection<BlockCoordIntPair> offsets, final int x, final int y, final int z, boolean isSurface, Integer vSlice, int sliceMinY, int sliceMaxY)
+    protected float calculateSlope(final ChunkMD chunkMd, final Collection<BlockCoordIntPair> offsets, final int x, final int y, final int z, boolean isSurface,
+                                   Integer vSlice, int sliceMinY, int sliceMaxY,
+                                   final HeightsCache chunkHeights,
+                                   final SlopesCache chunkSlopes)
     {
-        // Shortcut
         if(y<=0)
         {
+            // Flat
             return 1f;
         }
 
         // Calculate slope by dividing height by neighbors' heights
         float slopeSum = 0;
+        int defaultHeight = y;
+
         for (BlockCoordIntPair offset : offsets)
         {
             if (isSurface)
             {
-                slopeSum += ((y * 1f) / getSurfaceBlockHeight(chunkMd, x, z, offset.x, offset.z, neighbors, y));
+                slopeSum += ((y * 1f) / getSurfaceBlockHeight(chunkMd, x, z, offset.x, offset.z, defaultHeight, chunkHeights));
             }
             else
             {
-                slopeSum += ((y * 1f) / getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, offset.x, offset.z, neighbors, y));
+                slopeSum += ((y * 1f) / getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, offset.x, offset.z, defaultHeight, chunkHeights));
             }
         }
         Float slope =  slopeSum / offsets.size();
@@ -356,6 +361,7 @@ public abstract class BaseRenderer implements IChunkRenderer
         {
             slope = 1f;
         }
+
         return slope;
     }
 
@@ -378,13 +384,15 @@ public abstract class BaseRenderer implements IChunkRenderer
         return new int[]{sliceMinY, sliceMaxY};
     }
 
-    protected float getSlope(final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, Integer vSlice, int z)
+    protected float getSlope(final ChunkMD chunkMd, final BlockMD blockMD, int x, Integer vSlice, int z,
+                             final HeightsCache chunkHeights,
+                             final SlopesCache chunkSlopes)
     {
-        Float[][] slopes = (vSlice == null) ? chunkMd.surfaceSlopes : chunkMd.sliceSlopes.get(vSlice);
+        Float[][] slopes = chunkSlopes.getIfPresent(chunkMd.coord);
 
         if (slopes == null || slopes[x][z]==null)
         {
-            slopes = populateSlopes(chunkMd, vSlice, neighbors);
+            slopes = populateSlopes(chunkMd, vSlice, chunkHeights, chunkSlopes);
         }
 
         Float slope = slopes[x][z];
@@ -420,15 +428,24 @@ public abstract class BaseRenderer implements IChunkRenderer
      * Returns the value in the height map at this x, z coordinate in the chunk, disregarding
      * blocks that shouldn't be used as the top block.
      */
-    public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z)
+    public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, final HeightsCache chunkHeights)
     {
-        Integer y = chunkMd.surfaceHeights[x][z];
+        Integer[][] heights = chunkHeights.getUnchecked(chunkMd.coord);
+        if(heights==null)
+        {
+            // Not in cache anymore
+            return null;
+        }
+
+        Integer y = heights[x][z];
 
         if (y != null)
         {
-            return chunkMd.surfaceHeights[x][z];
+            // Already set
+            return y;
         }
 
+        // Find the height.
         y = Math.max(0, chunkMd.stub.getHeightValue(x, z));
 
         try
@@ -457,20 +474,18 @@ public abstract class BaseRenderer implements IChunkRenderer
             JourneyMap.getLogger().warning("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
         }
 
-        if(y==null)
-        {
-            y = chunkMd.stub.getHeightValue(x, z);
-        }
+        y = Math.max(0, y);
 
-        chunkMd.surfaceHeights[x][z] = y;
+        chunkHeights.getIfPresent(chunkMd.coord)[x][z] = y;
 
-        return Math.max(0, y);
+        return y;
     }
 
     /**
      * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
      */
-    public Float getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, int offsetX, int offsetZ, ChunkMD.Set neighbors, float defaultVal)
+    public int getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, int offsetX, int offsetZ, int defaultVal,
+                                       final HeightsCache chunkHeights)
     {
         ChunkMD chunk = null;
         int blockX = ((chunkMd.coord.chunkXPos << 4) + x + offsetX);
@@ -484,17 +499,89 @@ public abstract class BaseRenderer implements IChunkRenderer
         }
         else
         {
-            ChunkCoordIntPair coord = new ChunkCoordIntPair(chunkX, chunkZ);
-            chunk = neighbors.get(coord);
+            chunk = dataCache.getChunkMD(new ChunkCoordIntPair(chunkX, chunkZ));
         }
 
         if (chunk != null)
         {
-            return (float) getSurfaceBlockHeight(chunkMd, blockX & 15, blockZ & 15);
+            Integer height = getSurfaceBlockHeight(chunkMd, blockX & 15, blockZ & 15, chunkHeights);
+            if(height==null)
+            {
+                return defaultVal;
+            }
+            else
+            {
+                return height;
+            }
         }
         else
         {
             return defaultVal;
+        }
+    }
+
+    /**
+     * Get a CacheBuilder with common configuration already set.
+     *
+     * @return
+     */
+    private CacheBuilder<Object, Object> getCacheBuilder()
+    {
+        CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
+        if (JourneyMap.getInstance().coreProperties.recordCacheStats.get())
+        {
+            builder.recordStats();
+        }
+        return builder;
+    }
+
+    class HeightsCache extends ForwardingLoadingCache<ChunkCoordIntPair, Integer[][]>
+    {
+        final LoadingCache<ChunkCoordIntPair, Integer[][]> internal;
+
+        protected HeightsCache(String name)
+        {
+            this.internal = getCacheBuilder().build(new CacheLoader<ChunkCoordIntPair, Integer[][]>()
+            {
+                @Override
+                public Integer[][] load(ChunkCoordIntPair key) throws Exception
+                {
+                    //JourneyMap.getLogger().info("Initialized heights for chunk " + key);
+                    return new Integer[16][16];
+                }
+            });
+            DataCache.instance().addPrivateCache(name, this);
+        }
+
+        @Override
+        protected LoadingCache<ChunkCoordIntPair, Integer[][]> delegate()
+        {
+            return internal;
+        }
+    }
+
+    class SlopesCache extends ForwardingLoadingCache<ChunkCoordIntPair, Float[][]>
+    {
+        final LoadingCache<ChunkCoordIntPair, Float[][]> internal;
+
+        protected SlopesCache(String name)
+        {
+            this.internal = getCacheBuilder().build(new CacheLoader<ChunkCoordIntPair, Float[][]>()
+            {
+                @Override
+                public Float[][] load(ChunkCoordIntPair key) throws Exception
+                {
+                    //JourneyMap.getLogger().info("Initialized slopes for chunk " + key);
+                    return new Float[16][16];
+                }
+            });
+            DataCache.instance().addPrivateCache(name, this);
+        }
+
+        @Override
+        protected LoadingCache<ChunkCoordIntPair, Float[][]> delegate()
+        {
+            return internal;
         }
     }
 }

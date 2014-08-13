@@ -10,10 +10,10 @@ package net.techbrew.journeymap.cartography;
 
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.cartography.render.CaveRenderer;
 import net.techbrew.journeymap.cartography.render.EndRenderer;
 import net.techbrew.journeymap.cartography.render.NetherRenderer;
-import net.techbrew.journeymap.cartography.render.OverworldCaveRenderer;
-import net.techbrew.journeymap.cartography.render.OverworldSurfaceRenderer;
+import net.techbrew.journeymap.cartography.render.SurfaceRenderer;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.ChunkMD;
@@ -46,16 +46,15 @@ public class ChunkRenderController
     {
         netherRenderer = new NetherRenderer();
         endRenderer = new EndRenderer();
-        OverworldSurfaceRenderer surfaceRenderer = new OverworldSurfaceRenderer();
+        SurfaceRenderer surfaceRenderer = new SurfaceRenderer();
         overWorldSurfaceRenderer = surfaceRenderer;
-        overWorldCaveRenderer = new OverworldCaveRenderer(surfaceRenderer);
+        overWorldCaveRenderer = new CaveRenderer(surfaceRenderer);
         //standardRenderer = new ChunkTopoRenderer();
     }
 
-    public BufferedImage getChunkImage(ChunkMD chunkMd,
-                                       boolean underground, Integer vSlice,
-                                       ChunkMD.Set neighbors)
+    public BufferedImage getChunkImage(ChunkMD chunkMd, Integer vSlice)
     {
+        boolean underground = vSlice!=null;
 
         // Initialize image for the chunk
         BufferedImage chunkImage = new BufferedImage(underground ? 16 : 32, 16, BufferedImage.TYPE_INT_ARGB);
@@ -78,7 +77,7 @@ public class ChunkRenderController
                     }
                     else
                     {
-                        renderOkay = netherRenderer.render(g2D, chunkMd, underground, vSlice, neighbors);
+                        renderOkay = netherRenderer.render(g2D, chunkMd, vSlice);
                     }
                     break;
                 }
@@ -91,7 +90,7 @@ public class ChunkRenderController
                     }
                     else
                     {
-                        renderOkay = endRenderer.render(g2D, chunkMd, underground, vSlice, neighbors);
+                        renderOkay = endRenderer.render(g2D, chunkMd, vSlice);
                     }
                     break;
                 }
@@ -99,11 +98,11 @@ public class ChunkRenderController
                 {
                     if (!underground || vSlice == null)
                     {
-                        renderOkay = overWorldSurfaceRenderer.render(g2D, chunkMd, underground, null, neighbors);
+                        renderOkay = overWorldSurfaceRenderer.render(g2D, chunkMd, null);
                     }
                     else
                     {
-                        renderOkay = overWorldCaveRenderer.render(g2D, chunkMd, underground, vSlice, neighbors);
+                        renderOkay = overWorldCaveRenderer.render(g2D, chunkMd, vSlice);
                     }
                 }
             }
@@ -116,8 +115,7 @@ public class ChunkRenderController
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe(Constants.getMessageJMERR07(LogFormatter.toString(t)));
-
+            JourneyMap.getLogger().severe(Constants.getMessageJMERR16(LogFormatter.toString(t)));
         }
         finally
         {

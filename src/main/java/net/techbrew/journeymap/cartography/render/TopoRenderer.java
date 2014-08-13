@@ -10,18 +10,25 @@ package net.techbrew.journeymap.cartography.render;
 
 import net.techbrew.journeymap.cartography.IChunkRenderer;
 import net.techbrew.journeymap.cartography.RGB;
+import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
 import java.awt.*;
 import java.util.ArrayList;
 
-public class OverworldTopoRenderer extends OverworldSurfaceRenderer implements IChunkRenderer
+public class TopoRenderer extends SurfaceRenderer implements IChunkRenderer
 {
+    protected StatTimer renderTopoTimer = StatTimer.get("TopoRenderer.renderSurface");
+
     ArrayList<Color> water = new ArrayList<Color>(32);
     ArrayList<Color> land = new ArrayList<Color>(32);
 
-    public OverworldTopoRenderer()
+    private final HeightsCache chunkSurfaceHeights;
+    private final SlopesCache chunkSurfaceSlopes;
+
+    public TopoRenderer()
     {
         water.add(new Color(31, 40, 79));
         water.add(new Color(38, 60, 106));
@@ -65,62 +72,78 @@ public class OverworldTopoRenderer extends OverworldSurfaceRenderer implements I
         land.add(new Color(224, 222, 216));
         land.add(new Color(245, 244, 242));
         land.add(new Color(255, 255, 255));
+
+        chunkSurfaceHeights = new HeightsCache("TopoHeights");
+        chunkSurfaceSlopes = new SlopesCache("TopoSlopes");
+        DataCache.instance().addChunkMDListener(this);
     }
 
     /**
      * Render blocks in the chunk for the standard world.
      */
     @Override
-    public boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final boolean underground,
-                          final Integer vSlice, final ChunkMD.Set neighbors)
+    public boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice)
     {
+        StatTimer timer = renderTopoTimer;
 
-        if (underground)
+        try
         {
+            timer.start();
+
+            updateOptions();
+
+            // Initialize ChunkSub slopes if needed
+            if (chunkSurfaceSlopes.getIfPresent(chunkMd.coord) == null)
+            {
+                populateSlopes(chunkMd, null, chunkSurfaceHeights, chunkSurfaceSlopes);
+            }
+
+            // Render the chunk image
+            return renderSurface(g2D, chunkMd, vSlice, false);
+        }
+        catch (Throwable e)
+        {
+            e.printStackTrace();
             return false;
         }
-
-        // Initialize ChunkSub slopes if needed
-        if (chunkMd.surfaceSlopes == null)
+        finally
         {
-            populateSlopes(chunkMd, null, neighbors);
+            strata.reset();
+            timer.stop();
         }
-
-        return renderSurface(g2D, chunkMd, vSlice, neighbors, false);
     }
 
     /**
      * Initialize surface slopes in chunk if needed.
-     *
-     * @param chunkMd
-     * @param neighbors
      */
-    @Override
-    protected Float[][] populateSlopes(final ChunkMD chunkMd, Integer vSlice, final ChunkMD.Set neighbors)
+    protected Float[][] populateSlopes(final ChunkMD chunkMd, Integer vSlice,
+                                       final HeightsCache chunkHeights,
+                                       final SlopesCache chunkSlopes)
     {
-        float slope, h, hN, hW, hE, hS;
-        chunkMd.surfaceSlopes = new Float[16][16];
+        Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.coord);
+        int h;
+        float slope, hN, hW, hE, hS;
         for (int z = 0; z < 16; z++)
         {
             for (int x = 0; x < 16; x++)
             {
-                h = getSurfaceBlockHeight(chunkMd, x, z);
-                hN = (z == 0) ? getSurfaceBlockHeight(chunkMd, x, z, 0, -1, neighbors, h) : getSurfaceBlockHeight(chunkMd, x, z - 1);
-                hW = (x == 0) ? getSurfaceBlockHeight(chunkMd, x, z, -1, 0, neighbors, h) : getSurfaceBlockHeight(chunkMd, x - 1, z);
-                hS = (z == 15) ? getSurfaceBlockHeight(chunkMd, x, z, 0, 1, neighbors, h) : getSurfaceBlockHeight(chunkMd, x, z + 1);
-                hE = (x == 15) ? getSurfaceBlockHeight(chunkMd, x, z, 1, 0, neighbors, h) : getSurfaceBlockHeight(chunkMd, x + 1, z);
+                h = getSurfaceBlockHeight(chunkMd, x, z, chunkHeights);
+                hN = getSurfaceBlockHeight(chunkMd, x, z, 0, -1, h, chunkHeights);
+                hW = getSurfaceBlockHeight(chunkMd, x, z, -1, 0, h, chunkHeights);
+                hS = getSurfaceBlockHeight(chunkMd, x, z, 0, 1, h, chunkHeights);
+                hE = getSurfaceBlockHeight(chunkMd, x, z, 1, 0, h, chunkHeights);
 
-                h = (int) h >> 3;
+                h = h >> 3;
                 hN = (int) hN >> 3;
                 hW = (int) hW >> 3;
                 hE = (int) hE >> 3;
                 hS = (int) hS >> 3;
 
                 slope = ((h / hN) + (h / hW) + (h / hE) + (h / hS)) / 4f;
-                chunkMd.surfaceSlopes[x][z] = slope;
+                slopes[x][z] = slope;
             }
         }
-        return chunkMd.surfaceSlopes;
+        return slopes;
     }
 
     /**
@@ -166,19 +189,19 @@ public class OverworldTopoRenderer extends OverworldSurfaceRenderer implements I
         return color;
     }
 
-    protected int surfaceSlopeColor(final int color, final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int ignored, int z)
-    {
-        float slope = chunkMd.surfaceSlopes[x][z];
-        if (slope < 1)
-        {
-            return Color.lightGray.getRGB();
-        }
-        else if (slope > 1)
-        {
-            return Color.darkGray.getRGB();
-        }
-        return color;
-    }
+//    protected int surfaceSlopeColor(final int color, final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int ignored, int z)
+//    {
+//        float slope = chunkMd.surfaceSlopes[x][z];
+//        if (slope < 1)
+//        {
+//            return Color.lightGray.getRGB();
+//        }
+//        else if (slope > 1)
+//        {
+//            return Color.darkGray.getRGB();
+//        }
+//        return color;
+//    }
 
     protected void getDepthColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, final Graphics2D g2D, final boolean caveLighting)
     {
