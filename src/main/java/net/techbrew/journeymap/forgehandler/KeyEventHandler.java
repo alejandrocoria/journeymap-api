@@ -43,94 +43,103 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
         }
     }
 
-    public static void onKeypress(boolean minimapOnly)
-    {
-        final int i = Keyboard.getEventKey();
-        MapOverlayState mapOverlayState = MapOverlay.state();
-
-        if (JourneyMap.getInstance().miniMapProperties.enableHotkeys.get())
-        {
-
-            if (GuiScreen.isCtrlKeyDown() && Constants.isPressed(Constants.KB_MAP))
-            {
-                UIManager.getInstance().toggleMinimap();
-                return;
-            }
-            else if (Constants.isPressed(Constants.KB_MAP_ZOOMIN))
-            {
-                mapOverlayState.zoomIn();
-                return;
-            }
-            else if (Constants.isPressed(Constants.KB_MAP_ZOOMOUT))
-            {
-                mapOverlayState.zoomOut();
-                return;
-            }
-            else if (Constants.isPressed(Constants.KB_MAP_DAY))
-            {
-                mapOverlayState.overrideMapType(Constants.MapType.day);
-                return;
-            }
-            else if (Constants.isPressed(Constants.KB_MAP_NIGHT))
-            {
-                mapOverlayState.overrideMapType(Constants.MapType.night);
-                return;
-            }
-            else if (Constants.isPressed(Constants.KB_MINIMAP_POS))
-            {
-                UIManager.getInstance().getMiniMap().nextPosition();
-                return;
-            }
-            else if (GuiScreen.isCtrlKeyDown() && Constants.isPressed(Constants.KB_WAYPOINT))
-            {
-                UIManager.getInstance().openWaypointManager(null, null);
-                return;
-            }
-
-            if (!minimapOnly)
-            {
-                if (Constants.KB_MAP.isPressed())
-                {
-                    if (FMLClientHandler.instance().getClient().currentScreen == null)
-                    {
-                        UIManager.getInstance().openMap();
-                    }
-                    else
-                    {
-                        if (FMLClientHandler.instance().getClient().currentScreen instanceof MapOverlay)
-                        {
-                            UIManager.getInstance().closeAll();
-                        }
-                    }
-                    return;
-                }
-                else
-                {
-                    if (Constants.KB_WAYPOINT.isPressed())
-                    {
-                        if (FMLClientHandler.instance().getClient().currentScreen == null)
-                        {
-                            Minecraft mc = FMLClientHandler.instance().getClient();
-                            Waypoint waypoint = Waypoint.of(mc.thePlayer);
-                            UIManager.getInstance().openWaypointEditor(waypoint, true, null);
-                        }
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
     @Override
     public EnumSet<EventHandlerManager.BusType> getBus()
     {
         return EnumSet.of(EventHandlerManager.BusType.FMLCommonHandlerBus);
     }
 
-    @SubscribeEvent
+    @SubscribeEvent()
     public void onKeyboardEvent(InputEvent.KeyInputEvent event)
     {
         KeyEventHandler.onKeypress(false);
+    }
+
+    public static void onKeypress(boolean minimapOnly)
+    {
+        final int i = Keyboard.getEventKey();
+        MapOverlayState mapOverlayState = MapOverlay.state();
+
+        try
+        {
+            if (JourneyMap.getInstance().miniMapProperties.enableHotkeys.get())
+            {
+                // This seems to prevent the keycode from "staying"
+                GuiScreen.isCtrlKeyDown();
+
+                if (GuiScreen.isCtrlKeyDown() && Constants.isPressed(Constants.KB_MAP))
+                {
+                    UIManager.getInstance().toggleMinimap();
+                    return;
+                }
+                else if (Constants.isPressed(Constants.KB_MAP_ZOOMIN))
+                {
+                    mapOverlayState.zoomIn();
+                    return;
+                }
+                else if (Constants.isPressed(Constants.KB_MAP_ZOOMOUT))
+                {
+                    mapOverlayState.zoomOut();
+                    return;
+                }
+                else if (Constants.isPressed(Constants.KB_MAP_DAY))
+                {
+                    mapOverlayState.overrideMapType(Constants.MapType.day);
+                    return;
+                }
+                else if (Constants.isPressed(Constants.KB_MAP_NIGHT))
+                {
+                    mapOverlayState.overrideMapType(Constants.MapType.night);
+                    return;
+                }
+                else if (Constants.isPressed(Constants.KB_MINIMAP_POS))
+                {
+                    UIManager.getInstance().getMiniMap().nextPosition();
+                    return;
+                }
+                else if (GuiScreen.isCtrlKeyDown() && Constants.isPressed(Constants.KB_WAYPOINT))
+                {
+                    UIManager.getInstance().openWaypointManager(null, null);
+                    return;
+                }
+
+                if (!minimapOnly)
+                {
+                    if (Constants.KB_MAP.isPressed())
+                    {
+                        if (FMLClientHandler.instance().getClient().currentScreen == null)
+                        {
+                            UIManager.getInstance().openMap();
+                        }
+                        else
+                        {
+                            if (FMLClientHandler.instance().getClient().currentScreen instanceof MapOverlay)
+                            {
+                                UIManager.getInstance().closeAll();
+                            }
+                        }
+                        return;
+                    }
+                    else
+                    {
+                        if (Constants.KB_WAYPOINT.isPressed())
+                        {
+                            if (FMLClientHandler.instance().getClient().currentScreen == null)
+                            {
+                                Minecraft mc = FMLClientHandler.instance().getClient();
+                                Waypoint waypoint = Waypoint.of(mc.thePlayer);
+                                UIManager.getInstance().openWaypointEditor(waypoint, true, null);
+                            }
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        finally
+        {
+
+        }
     }
 }
 
