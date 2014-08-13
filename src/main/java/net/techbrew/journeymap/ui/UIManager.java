@@ -18,6 +18,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
+import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.ui.map.GeneralDisplayOptions;
 import net.techbrew.journeymap.ui.map.MapOverlay;
@@ -36,13 +37,14 @@ import java.util.logging.Logger;
 
 public class UIManager
 {
-
     private final Logger logger = JourneyMap.getLogger();
     Minecraft minecraft = FMLClientHandler.instance().getClient();
     private MiniMap miniMap;
+    private MiniMapProperties miniMapProperties;
 
     private UIManager()
     {
+        miniMapProperties = JourneyMap.getInstance().miniMapProperties;
         miniMap = new MiniMap();
     }
 
@@ -130,20 +132,20 @@ public class UIManager
 
     public boolean isMiniMapEnabled()
     {
-        return JourneyMap.getInstance().miniMapProperties.enabled.get();
+        return miniMapProperties.enabled.get();
     }
 
     public void setMiniMapEnabled(boolean enable)
     {
-        JourneyMap.getInstance().miniMapProperties.enabled.set(enable);
-        JourneyMap.getInstance().miniMapProperties.save();
+        miniMapProperties.enabled.set(enable);
+        miniMapProperties.save();
     }
 
     public void drawMiniMap()
     {
         try
         {
-            if (JourneyMap.getInstance().miniMapProperties.enabled.get())
+            if (miniMapProperties.enabled.get())
             {
                 final GuiScreen currentScreen = minecraft.currentScreen;
                 final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat || currentScreen instanceof MiniMapOptions;

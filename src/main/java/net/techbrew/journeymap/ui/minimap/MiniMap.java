@@ -12,6 +12,7 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.profiler.Profiler;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -96,26 +97,29 @@ public class MiniMap
      */
     public void drawMap()
     {
-        // Check player status
-        player = mc.thePlayer;
-        if (player == null)
-        {
-            return;
-        }
-
-        final boolean doStateRefresh = state.shouldRefresh(mc, miniMapProperties) || gridRenderer.hasUnloadedTile();
+        StatTimer timer = drawTimer;
 
         try
         {
+            // Check player status
+            player = mc.thePlayer;
+            if (player == null)
+            {
+                return;
+            }
+
+            // Check state
+            final boolean doStateRefresh = state.shouldRefresh(mc, miniMapProperties) || gridRenderer.hasUnloadedTile();
+
             // Update the state first
             if (doStateRefresh)
             {
-                refreshStateTimer.start();
+                timer = refreshStateTimer.start();
                 state.refresh(mc, player, miniMapProperties);
             }
             else
             {
-                drawTimer.start();
+                timer.start();
             }
 
             // Update the grid
@@ -199,7 +203,7 @@ public class MiniMap
                 catch (Throwable t)
                 {
                     logger.severe("Stencil buffer failing with circle mask:" + LogFormatter.toString(t));
-                    return;
+                    //return;
                 }
             }
 
@@ -318,14 +322,7 @@ public class MiniMap
         }
         finally
         {
-            if (doStateRefresh)
-            {
-                refreshStateTimer.stop();
-            }
-            else
-            {
-                drawTimer.stop();
-            }
+            timer.stop();
         }
     }
 

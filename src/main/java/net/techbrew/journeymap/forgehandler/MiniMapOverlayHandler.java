@@ -35,12 +35,14 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
         return EnumSet.of(EventHandlerManager.BusType.MinecraftForgeBus);
     }
 
-    @SubscribeEvent
+    @SubscribeEvent()
     public void onRenderOverlay(RenderGameOverlayEvent.Pre event)
     {
-
         if (event.type == RenderGameOverlayEvent.ElementType.HOTBAR)
         {
+            mc.mcProfiler.startSection("journeymap");
+
+            mc.mcProfiler.startSection("tileCache");
             final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof MapOverlay);
             if (isGamePaused)
             {
@@ -50,7 +52,11 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
             {
                 TileCache.resume();
             }
+            mc.mcProfiler.endStartSection("minimap");
             UIManager.getInstance().drawMiniMap();
+            mc.mcProfiler.endSection();
+
+            mc.mcProfiler.endSection();
         }
     }
 }

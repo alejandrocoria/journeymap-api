@@ -15,6 +15,10 @@ http://journeymap.techbrew.net
 - Bugfix: Keybindings would get duplicated if overridden and then viewed in Options->Help screens
 - Bugfix: Colors were wrong for double-tall flowers and melon/pumpkin stems
 - New Feature: Actions -> Generate Color Palette lets you have a customizable, shareable, fixed set of colors that won't change when you switch resource packs.
+- Change: The Minecraft Profiler (Shift+F3) now shows JourneyMap activity in these nodes:
+-- root.tick.journeymap
+-- root.gameRenderer.gui.journeymap
+-- root.gameRenderer.level.FRenderLast.journeymap
 
 ## Changelog for JourneyMap 4.0.4:
 - New Edition: "NoRadar" disables all radar features in Multiplayer

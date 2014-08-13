@@ -34,31 +34,49 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         return EnumSet.of(EventHandlerManager.BusType.FMLCommonHandlerBus);
     }
 
-    @SubscribeEvent
+    @SubscribeEvent()
     public void onClientTick(TickEvent.ClientTickEvent event)
     {
 
-        if (event.phase != TickEvent.Phase.END)
+        if (event.phase == TickEvent.Phase.END)
         {
             return;
         }
 
-        if (counter == 20)
+        mc.mcProfiler.startSection("journeymap");
+
+        try
         {
-            JourneyMap.getInstance().updateState();
-            counter = 0;
-        }
-        else if (counter == 10)
-        {
-            if (JourneyMap.getInstance().isMapping() && mc.theWorld != null)
+            if (counter == 20)
             {
-                JourneyMap.getInstance().performTasks();
+                mc.mcProfiler.startSection("updateState");
+                JourneyMap.getInstance().updateState();
+                counter = 0;
+                mc.mcProfiler.endSection();
             }
-            counter++;
+            else if (counter == 10)
+            {
+                mc.mcProfiler.startSection("performTasks");
+                if (JourneyMap.getInstance().isMapping() && mc.theWorld != null)
+                {
+                    JourneyMap.getInstance().performTasks();
+                }
+                counter++;
+                mc.mcProfiler.endSection();
+            }
+            else
+            {
+                counter++;
+            }
+
         }
-        else
+        catch(Exception e)
         {
-            counter++;
+            JourneyMap.getLogger().warning("Error during onClientTick: " + e);
+        }
+        finally
+        {
+            mc.mcProfiler.endSection();
         }
     }
 }

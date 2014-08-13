@@ -10,6 +10,7 @@ package net.techbrew.journeymap.task;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.profiler.Profiler;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.thread.JMThreadFactory;
@@ -187,6 +188,9 @@ public class TaskController
 
     public void performTasks()
     {
+        Profiler profiler = FMLClientHandler.instance().getClient().mcProfiler;
+        profiler.startSection("journeymapTask");
+
         synchronized (queue)
         {
             if (!queue.isEmpty())
@@ -252,6 +256,8 @@ public class TaskController
                 }
             }
         }
+
+       profiler.endSection();
     }
 
     private ITaskManager getNextManager(final Minecraft minecraft)
