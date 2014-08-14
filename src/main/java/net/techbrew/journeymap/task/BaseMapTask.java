@@ -44,7 +44,11 @@ public abstract class BaseMapTask implements ITask
         this.dimension = dimension;
         this.underground = underground;
         this.vSlice = vSlice;
-        if ((vSlice == null || vSlice == -1) && underground)
+        if(vSlice!=null && vSlice==-1)
+        {
+            vSlice = null;
+        }
+        if ((vSlice == null) && underground)
         {
             throw new IllegalStateException("vSlice can't be null (-1) and task be underground");
         }

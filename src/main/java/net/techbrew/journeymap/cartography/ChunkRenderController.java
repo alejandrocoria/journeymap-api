@@ -96,7 +96,7 @@ public class ChunkRenderController
                 }
                 default:
                 {
-                    if (!underground || vSlice == null)
+                    if (!underground || vSlice == null || vSlice == -1)
                     {
                         renderOkay = overWorldSurfaceRenderer.render(g2D, chunkMd, null);
                     }

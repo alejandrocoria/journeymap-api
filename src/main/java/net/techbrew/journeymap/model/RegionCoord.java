@@ -159,14 +159,7 @@ public class RegionCoord implements Comparable<RegionCoord>
 
     public Integer getVerticalSlice()
     {
-        if (vSlice == null)
-        {
-            return -1;
-        }
-        else
-        {
-            return vSlice;
-        }
+        return vSlice;
     }
 
     @Override
@@ -174,7 +167,8 @@ public class RegionCoord implements Comparable<RegionCoord>
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + getVerticalSlice();
+        Integer vSlice = getVerticalSlice();
+        result = prime * result + (vSlice==null ? -1 : vSlice);
         result = prime * result + regionX;
         result = prime * result + regionZ;
         result = prime * result
