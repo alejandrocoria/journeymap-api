@@ -25,11 +25,27 @@ public class StatTimer {
     private final AtomicDouble totalTime = new AtomicDouble();
     private final String name;
 
+    private final boolean doWarmup;
     private boolean warmup = true;
     private boolean maxed = false;
     private Long started;
     private double max=0;
     private double min=Double.MAX_VALUE;
+
+    /**
+     * Private constructor.
+     *
+     * @param name
+     * @param warmupCount
+     */
+    private StatTimer(String name, int warmupCount, boolean disposable)
+    {
+        this.name = name;
+        this.warmupCount = warmupCount;
+        this.disposable = disposable;
+        this.doWarmup = warmupCount>0;
+        this.warmup = warmupCount>0;
+    }
 
     /**
      * Get a timer by name.  If it hasn't been created, it will have WARMUP_COUNT_DEFAULT.
@@ -170,9 +186,11 @@ public class StatTimer {
     /**
      * Reset the timer.
      */
-    public void reset() {
-        synchronized (counter) {
-            warmup = true;
+    public void reset()
+    {
+        synchronized (counter)
+        {
+            warmup = doWarmup;
             maxed = false;
             started = null;
             counter.set(0);

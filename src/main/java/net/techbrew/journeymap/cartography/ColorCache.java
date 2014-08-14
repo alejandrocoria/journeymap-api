@@ -1,13 +1,16 @@
 package net.techbrew.journeymap.cartography;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.registry.GameData;
-import cpw.mods.fml.common.registry.GameRegistry;
 import modinfo.ModInfo;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.resources.*;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
@@ -31,10 +34,28 @@ import java.util.List;
  * @author mwoodman
  *
  */
-public class ColorCache implements IResourceManagerReloadListener {
-	
-	private static class Holder {
-        private static final ColorCache INSTANCE = new ColorCache();
+public class ColorCache implements IResourceManagerReloadListener
+{
+
+    private final HashMap<BlockMD, Color> baseColors = new HashMap<BlockMD, Color>(256);
+    private final HashMap<String, HashMap<BlockMD, Color>> biomeColors = new HashMap<String, HashMap<BlockMD, Color>>(32);
+    private volatile IconLoader iconLoader;
+    private String lastResourcePack;
+
+    private ColorCache()
+    {
+
+        IResourceManager rm = FMLClientHandler.instance().getClient().getResourceManager();
+        if (rm instanceof IReloadableResourceManager)
+        {
+            ((IReloadableResourceManager) rm).registerReloadListener(this);
+        }
+        else
+        {
+            JourneyMap.getLogger().warning("Could not register ResourcePack ReloadListener.  Changing resource packs will require restart");
+        }
+
+        this.onResourceManagerReload(rm);
     }
 	
 	public static ColorCache getInstance() {
@@ -62,14 +83,16 @@ public class ColorCache implements IResourceManagerReloadListener {
 	@Override
 	public void onResourceManagerReload(IResourceManager mgr)
     {
-    	String currentPack = Arrays.asList(mgr.getResourceDomains().toArray()).toString();
-
-        // Check if the resourcepack has changed
-    	if(JourneyMap.getInstance().isMapping() || iconLoader==null) {
-    		if(currentPack.equals(lastResourcePack)) {
-    			JourneyMap.getLogger().fine("ResourcePack unchanged: " + currentPack);
-    		} else {
-    			JourneyMap.getLogger().info("ResourcePack: " + lastResourcePack + " --> " + currentPack);
+        if (JourneyMap.getInstance().isMapping() || iconLoader == null)
+        {
+            String currentPack = getResourceDomains(mgr);
+            if (currentPack.equals(lastResourcePack))
+            {
+                JourneyMap.getLogger().fine("ResourcePack unchanged: " + currentPack);
+            }
+            else
+            {
+                JourneyMap.getLogger().info("ResourcePack: " + lastResourcePack + " --> " + currentPack);
                 ModInfo modInfo = JourneyMap.getInstance().getModInfo();
                 if(modInfo!=null) {
                     modInfo.reportEvent("Resource Pack", "Load", currentPack);
@@ -107,6 +130,17 @@ public class ColorCache implements IResourceManagerReloadListener {
         }
     }
 
+    private String getResourcePackNames()
+    {
+        ResourcePackRepository resourcepackrepository = FMLClientHandler.instance().getClient().getResourcePackRepository();
+        String packs = Joiner.on(",").join(Lists.reverse(resourcepackrepository.getRepositoryEntries()));
+        if(Strings.isNullOrEmpty(packs))
+        {
+            packs = "Default";
+        }
+        return packs;
+    }
+
     public ColorPalette generateColorPalette(boolean global)
     {
         BlockUtils.initialize();
@@ -114,7 +148,7 @@ public class ColorCache implements IResourceManagerReloadListener {
         ColorPalette palette = null;
         try
         {
-            String resourcePackNames = Arrays.asList(FMLClientHandler.instance().getClient().getResourceManager().getResourceDomains().toArray()).toString();
+            String resourcePackNames = getResourcePackNames();
             palette = new ColorPalette(resourcePackNames, baseColors, biomeColors);
             if(palette.writeToFile(global))
             {
@@ -131,7 +165,7 @@ public class ColorCache implements IResourceManagerReloadListener {
     // Force load all block colors
     public void prefetchResourcePackColors()
     {
-        StatTimer timer = StatTimer.get("prefetchResourcePackColors", 0).start();
+        StatTimer timer = StatTimer.get("prefetchResourcePackColors", -1).start();
 
         int count = 0;
         Iterator<Block> fmlBlockIter = GameData.getBlockRegistry().iterator();
