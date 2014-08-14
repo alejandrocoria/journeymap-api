@@ -14,6 +14,7 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.ChunkMD;
@@ -36,9 +37,9 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
             return true;
         }
 
-        final int posX = (int) Math.floor(player.posX);
-        final int posY = (int) Math.floor(player.posY) - 1;
-        final int posZ = (int) Math.floor(player.posZ);
+        final int posX = MathHelper.floor_double(player.posX);
+        final int posY = MathHelper.floor_double(player.boundingBox.minY);
+        final int posZ =  MathHelper.floor_double(player.posZ);
         final int offset = 1;
 
         boolean isUnderground = true;

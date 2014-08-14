@@ -12,11 +12,19 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New Feature: MiniMap can now be sized anywhere from 64px to 1024px
+- New Feature: MiniMap can now be partly transparent
+- TODO: MiniMap can now be centered
 - New Feature: Actions -> Generate Color Palette lets you have a customizable, shareable, fixed set of colors that won't change when you switch resource packs.
 - Bugfix: Compatibility added for mods that have blocks registered with custom Item Stacks (TooManyBiomes, MultiWorld, etc.)
 - Bugfix: Keybindings get duplicated if overridden and then viewed in JourneyMap>Options>Help... screens
 - Bugfix: Colors wrong for double-tall flowers and melon/pumpkin stems
 - Bugfix: Pressing CTRL (or Command) without another key is "remembered" for the next keypress.
+- Bugfix: Errors reported with some texturepacks (Sphax 128)
+- Bugfix: Minimap coordinates didn't match player coordinates in debug screen (F3) when location numbers were negative
+- Change: Minimap's Y coordinate now reflects feet position, not eye position
+- Change: Completely rewrote surface, cave, nether, and end renderers.
+-- TODO: Describe new options
 - Change: All possible map colors are now pre-loaded when the world is joined.
 - Change: Multiple object pools and caches added to reduce the number of new objects put on the heap
 - Change: The Minecraft Profiler (Shift+F3) now shows JourneyMap activity in these nodes:
