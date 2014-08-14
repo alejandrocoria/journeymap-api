@@ -101,6 +101,7 @@ public class DataCache
         chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>>();
         long chunkTimeout = JourneyMap.getInstance().coreProperties.chunkPoll.get() * 3;
         chunkMetadata = getCacheBuilder().removalListener(chunkMetadataRemovalListener).expireAfterAccess(chunkTimeout, TimeUnit.MILLISECONDS).build(new ChunkMD.SimpleCacheLoader());
+        //chunkMetadata = getCacheBuilder().removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
         managedCaches.put(chunkMetadata, "ChunkMD");
 
         blockMetadataLoader = new BlockMDCache();

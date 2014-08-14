@@ -22,6 +22,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ChunkDataEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.task.MapPlayerTask;
 
 import java.util.EnumSet;
@@ -57,7 +58,9 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler
     @SubscribeEvent
     public void onChunkUnloadEvent(ChunkEvent.Unload event)
     {
-        MapPlayerTask.dequeueChunk(event.getChunk().getChunkCoordIntPair());
+        ChunkCoordIntPair coord = event.getChunk().getChunkCoordIntPair();
+        MapPlayerTask.dequeueChunk(coord);
+        DataCache.instance().invalidateChunkMD(coord);
     }
 
     @SideOnly(Side.CLIENT)
