@@ -488,6 +488,8 @@ public class DataCache
                     JourneyMap.getLogger().warning("Couldn't purge private cache: " + cache);
                 }
             }
+
+            privateCaches.clear();
         }
     }
 
