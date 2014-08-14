@@ -36,6 +36,7 @@ public class StatTimer
     private final String name;
     private final boolean disposable;
 
+    private final boolean doWarmup;
     private boolean warmup = true;
     private boolean maxed = false;
     private Long started;
@@ -53,6 +54,7 @@ public class StatTimer
         this.name = name;
         this.warmupCount = warmupCount;
         this.disposable = disposable;
+        this.doWarmup = warmupCount>0;
         this.warmup = warmupCount>0;
     }
 
@@ -267,7 +269,7 @@ public class StatTimer
     {
         synchronized (counter)
         {
-            warmup = true;
+            warmup = doWarmup;
             maxed = false;
             started = null;
             counter.set(0);

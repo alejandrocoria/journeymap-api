@@ -8,17 +8,16 @@
 
 package net.techbrew.journeymap.cartography;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.registry.GameData;
-import cpw.mods.fml.common.registry.GameRegistry;
 import modinfo.ModInfo;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.resources.IReloadableResourceManager;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.client.resources.IResourceManagerReloadListener;
-import net.minecraft.client.resources.ResourcePackRepository;
+import net.minecraft.client.resources.*;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -28,7 +27,6 @@ import net.techbrew.journeymap.io.IconLoader;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
-import net.techbrew.journeymap.model.BlockMDCache;
 import net.techbrew.journeymap.model.ChunkMD;
 
 import java.awt.*;
@@ -50,7 +48,6 @@ public class ColorCache implements IResourceManagerReloadListener
 
     private ColorCache()
     {
-
         IResourceManager rm = FMLClientHandler.instance().getClient().getResourceManager();
         if (rm instanceof IReloadableResourceManager)
         {
@@ -74,7 +71,7 @@ public class ColorCache implements IResourceManagerReloadListener
     {
         if (JourneyMap.getInstance().isMapping() || iconLoader == null)
         {
-            String currentPack = getResourceDomains(mgr);
+            String currentPack = getResourcePackNames();
             if (currentPack.equals(lastResourcePack))
             {
                 JourneyMap.getLogger().fine("ResourcePack unchanged: " + currentPack);
@@ -124,9 +121,15 @@ public class ColorCache implements IResourceManagerReloadListener
         }
     }
 
-    private String getResourceDomains(IResourceManager mgr)
+    private String getResourcePackNames()
     {
-        return Arrays.asList(mgr.getResourceDomains().toArray()).toString();
+        ResourcePackRepository resourcepackrepository = FMLClientHandler.instance().getClient().getResourcePackRepository();
+        String packs = Joiner.on(",").join(Lists.reverse(resourcepackrepository.getRepositoryEntries()));
+        if(Strings.isNullOrEmpty(packs))
+        {
+            packs = "Default";
+        }
+        return packs;
     }
 
     public ColorPalette generateColorPalette(boolean global)
@@ -136,7 +139,7 @@ public class ColorCache implements IResourceManagerReloadListener
         ColorPalette palette = null;
         try
         {
-            String resourcePackNames = getResourceDomains(FMLClientHandler.instance().getClient().getResourceManager());
+            String resourcePackNames = getResourcePackNames();
             palette = new ColorPalette(resourcePackNames, baseColors, biomeColors);
             if(palette.writeToFile(global))
             {
@@ -153,7 +156,7 @@ public class ColorCache implements IResourceManagerReloadListener
     // Force load all block colors
     public void prefetchResourcePackColors()
     {
-        StatTimer timer = StatTimer.get("prefetchResourcePackColors", 0).start();
+        StatTimer timer = StatTimer.get("prefetchResourcePackColors", -1).start();
 
         int count = 0;
         Iterator<Block> fmlBlockIter = GameData.getBlockRegistry().iterator();
