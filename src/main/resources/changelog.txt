@@ -21,7 +21,8 @@ http://journeymap.techbrew.net
 - Bugfix: Colors wrong for double-tall flowers and melon/pumpkin stems
 - Bugfix: Pressing CTRL (or Command) without another key is "remembered" for the next keypress.
 - Bugfix: Errors reported with some texturepacks (Sphax 128)
-- Bugfix: Minimap coordinates didn't match player coordinates in debug screen (F3) when location numbers were negative
+- Bugfix: MiniMap coordinates off by one when location numbers were negative
+- Bugfix: Waypoint display coordinates off by one when location numbers were negative
 - Change: Minimap's Y coordinate now reflects feet position, not eye position
 - Change: Completely rewrote surface, cave, nether, and end renderers.
 -- TODO: Describe new options

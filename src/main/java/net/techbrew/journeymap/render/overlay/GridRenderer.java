@@ -12,6 +12,7 @@ import com.google.common.cache.Cache;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
@@ -275,8 +276,8 @@ public class GridRenderer
         double deltaX = (centerPixelX-mouseX) / blockSize;
         double deltaZ = (centerPixelZ-mouseY) / blockSize;
 
-        int x = (int) Math.floor(centerBlockX - deltaX);
-        int z = (int) Math.floor(centerBlockZ + deltaZ);
+        int x = MathHelper.floor_double(centerBlockX - deltaX);
+        int z = MathHelper.floor_double(centerBlockZ + deltaZ);
         return new BlockCoordIntPair(x, z);
     }
 

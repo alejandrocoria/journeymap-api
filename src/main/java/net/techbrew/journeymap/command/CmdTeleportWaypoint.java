@@ -40,7 +40,6 @@ public class CmdTeleportWaypoint
 
     public void run()
     {
-        Vec3 waypointPos = waypoint.getPosition();
-        mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", mc.thePlayer.getCommandSenderName(), waypointPos.xCoord, waypointPos.yCoord, waypointPos.zCoord));
+        mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", mc.thePlayer.getCommandSenderName(), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
     }
 }

@@ -11,6 +11,7 @@ package net.techbrew.journeymap.cartography.render;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.*;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.JourneyMap;
@@ -73,15 +74,15 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         this.secondaryUpslopeMultiplier = 1.05f;
 
         primarySlopeOffsets.clear();
-        primarySlopeOffsets.add(new BlockCoordIntPair(0, -1)); // North
-        primarySlopeOffsets.add(new BlockCoordIntPair(-1, -1)); // NorthWest
-        primarySlopeOffsets.add(new BlockCoordIntPair(-1, 0)); // West
+       // primarySlopeOffsets.add(new BlockCoordIntPair(0, -1)); // North
+       // primarySlopeOffsets.add(new BlockCoordIntPair(-1, -1)); // NorthWest
+       // primarySlopeOffsets.add(new BlockCoordIntPair(-1, 0)); // West
 
-        secondarySlopeOffsets.clear();
-        secondarySlopeOffsets.add(new BlockCoordIntPair(-1, -2)); // North of NorthWest
-        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -1)); // West of NorthWest
-        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -2)); // NorthWest of NorthWest
-        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, 0)); // SouthWest of NorthWest
+//        secondarySlopeOffsets.clear();
+//        secondarySlopeOffsets.add(new BlockCoordIntPair(-1, -2)); // North of NorthWest
+//        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -1)); // West of NorthWest
+//        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -2)); // NorthWest of NorthWest
+//        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, 0)); // SouthWest of NorthWest
     }
 
     /**
@@ -96,12 +97,19 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         mapPlants = coreProperties.mapPlants.get();
         mapCrops = coreProperties.mapCrops.get();
 
+        // TODO: Move back to constructor
         this.slopeMin = 0.2f;
         this.slopeMax = 1.7f;
         this.primaryDownslopeMultiplier = .65f;
         this.primaryUpslopeMultiplier = 1.20f;
         this.secondaryDownslopeMultiplier = .95f;
         this.secondaryUpslopeMultiplier = 1.05f;
+
+        // TODO: Move back to constructor
+        primarySlopeOffsets.clear();
+        // primarySlopeOffsets.add(new BlockCoordIntPair(0, -1)); // North
+        // primarySlopeOffsets.add(new BlockCoordIntPair(-1, -1)); // NorthWest
+        primarySlopeOffsets.add(new BlockCoordIntPair(-1, 0)); // West
 
     }
 
@@ -221,7 +229,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.coord);
         int y = 0, sliceMinY = 0, sliceMaxY = 0;
         boolean isSurface = (vSlice == null);
-        float slope, primarySlope, secondarySlope;
+        Float slope, primarySlope, secondarySlope;
         BlockMD blockMD;
 
         if (!isSurface)
@@ -245,6 +253,11 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                     y = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, chunkHeights);
                 }
 
+                if(Blocks.glowstone==DataCache.instance().getBlockMD(chunkMd, x, y, z).getBlock())
+                {
+                    slope = 0f;
+                }
+
                 // Calculate primary slope
                 primarySlope = calculateSlope(chunkMd, primarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY, chunkHeights, chunkSlopes);
 
@@ -259,29 +272,29 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                     slope *= primaryUpslopeMultiplier;
                 }
 
+                // TODO RESTORE
                 // Calculate secondary slope
-                if (mapAntialiasing && primarySlope==1f )
-                {
-                    secondarySlope = calculateSlope(chunkMd, secondarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY, chunkHeights, chunkSlopes);
-
-                    if (secondarySlope > primarySlope)
-                    {
-                        slope *= secondaryUpslopeMultiplier;
-                    }
-                    else if (secondarySlope < primarySlope)
-                    {
-                        slope *= secondaryDownslopeMultiplier;
-                    }
-                }
+//                if (mapAntialiasing && primarySlope==1f )
+//                {
+//                    secondarySlope = calculateSlope(chunkMd, secondarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY, chunkHeights, chunkSlopes);
+//
+//                    if (secondarySlope > primarySlope)
+//                    {
+//                        slope *= secondaryUpslopeMultiplier;
+//                    }
+//                    else if (secondarySlope < primarySlope)
+//                    {
+//                        slope *= secondaryDownslopeMultiplier;
+//                    }
+//                }
 
                 // Set that slope.  Set it good.  Aw yeah.
+                if(slope.isNaN())
+                {
+                    slope = 1f;
+                }
 
                 slopes[x][z] = Math.min(slopeMax, Math.max(slopeMin, slope));
-
-                if(slopes[x][z].isNaN())
-                {
-                    slopes[x][z] = 1f;
-                }
             }
         }
 
@@ -345,11 +358,22 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         float slopeSum = 0;
         int defaultHeight = y;
 
+        Block block = DataCache.instance().getBlockMD(chunkMd, x, y, z).getBlock();
+        if(block==Blocks.glowstone)
+        {
+            slopeSum = 0;
+        }
+
         for (BlockCoordIntPair offset : offsets)
         {
             if (isSurface)
             {
+
                 slopeSum += ((y * 1f) / getSurfaceBlockHeight(chunkMd, x, z, offset.x, offset.z, defaultHeight, chunkHeights));
+                if(slopeSum==0.0f)
+                {
+                    block = null;
+                }
             }
             else
             {
@@ -436,8 +460,15 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
             // Not in cache anymore
             return null;
         }
+        Integer y;
 
-        Integer y = heights[x][z];
+         // TODO: Remove after you find the grid bug
+        if(x==0 || z==0)
+        {
+            y = 0;
+        }
+
+        y = heights[x][z];
 
         if (y != null)
         {
@@ -474,9 +505,10 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
             JourneyMap.getLogger().warning("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
         }
 
+        //why is height 4 set on a chunk to the left?
         y = Math.max(0, y);
 
-        chunkHeights.getIfPresent(chunkMd.coord)[x][z] = y;
+        heights[x][z] = y;
 
         return y;
     }
@@ -487,15 +519,24 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     public int getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, int offsetX, int offsetZ, int defaultVal,
                                        final HeightsCache chunkHeights)
     {
+        int originalBlockX = ((chunkMd.coord.chunkXPos << 4) + x);
+        int originalBlockZ = ((chunkMd.coord.chunkZPos << 4) + z);
+
         ChunkMD chunk = null;
-        int blockX = ((chunkMd.coord.chunkXPos << 4) + x + offsetX);
-        int blockZ = ((chunkMd.coord.chunkZPos << 4) + z + offsetZ);
+        int blockX = originalBlockX + offsetX;
+        int blockZ = originalBlockZ + offsetZ;
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
+
+        int newLocalX = blockX & 15;
+        int newLocalZ = blockZ & 15;
+
+        Integer height;
 
         if (chunkX == chunkMd.coord.chunkXPos && chunkZ == chunkMd.coord.chunkZPos)
         {
             chunk = chunkMd;
+
         }
         else
         {
@@ -504,7 +545,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 
         if (chunk != null)
         {
-            Integer height = getSurfaceBlockHeight(chunkMd, blockX & 15, blockZ & 15, chunkHeights);
+            height = getSurfaceBlockHeight(chunkMd, newLocalX, newLocalZ, chunkHeights);
             if(height==null)
             {
                 return defaultVal;

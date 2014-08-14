@@ -14,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
@@ -24,6 +25,7 @@ import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
+import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.model.MapOverlayState;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.FullMapProperties;
@@ -811,9 +813,9 @@ public class MapOverlay extends JmUI
 
         // Update player pos
         state.playerLastPos = Constants.getString("jm.common.location_xzyeb",
-                Integer.toString((int) mc.thePlayer.posX),
-                Integer.toString((int) mc.thePlayer.posZ),
-                Integer.toString((int) mc.thePlayer.posY),
+                MathHelper.floor_double(mc.thePlayer.posX),
+                MathHelper.floor_double(mc.thePlayer.posZ),
+                MathHelper.floor_double(mc.thePlayer.boundingBox.minY),
                 mc.thePlayer.chunkCoordY,
                 state.getPlayerBiome()); //$NON-NLS-1$
 
