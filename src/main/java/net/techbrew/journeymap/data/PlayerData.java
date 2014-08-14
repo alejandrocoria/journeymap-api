@@ -7,6 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.JourneyMap;
@@ -63,9 +64,9 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
             return true;
         }
 
-        final int posX = (int) Math.floor(player.posX);
-        final int posY = (int) Math.floor(player.posY) - 1;
-        final int posZ = (int) Math.floor(player.posZ);
+        final int posX = MathHelper.floor_double(player.posX);
+        final int posY = MathHelper.floor_double(player.boundingBox.minY);
+        final int posZ = MathHelper.floor_double(player.posZ);
         final int offset = 1;
         int x = 0, y = 0, z = 0, blockId = 0;
         boolean isUnderground = true;

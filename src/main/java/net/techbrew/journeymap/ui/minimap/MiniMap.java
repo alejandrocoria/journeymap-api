@@ -3,6 +3,7 @@ package net.techbrew.journeymap.ui.minimap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -430,9 +431,9 @@ public class MiniMap
 
         // Location label
         String playerInfo = "";
-        final int playerX = (int) player.posX;
-        final int playerZ = (int) player.posZ;
-        final int playerY = (int) player.posY;
+        final int playerX = MathHelper.floor_double(player.posX);
+        final int playerY = MathHelper.floor_double(player.boundingBox.minY);
+        final int playerZ = MathHelper.floor_double(player.posZ);
 
         for (String format : locationFormats)
         {
