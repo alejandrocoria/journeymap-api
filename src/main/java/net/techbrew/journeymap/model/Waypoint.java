@@ -305,8 +305,7 @@ public class Waypoint implements Serializable
 
     public double getBlockCenteredX()
     {
-        int x = getX();
-        return x + ((x<0) ? -.5 : .5);
+        return getX() + .5d;
     }
 
     public int getY()
@@ -316,7 +315,7 @@ public class Waypoint implements Serializable
 
     public double getBlockCenteredY()
     {
-        return getY()+.5;
+        return getY() + .5d;
     }
 
     public int getZ()
@@ -326,8 +325,7 @@ public class Waypoint implements Serializable
 
     public double getBlockCenteredZ()
     {
-        int z = getZ();
-        return z + ((z<0) ? -.5 : .5);
+        return getZ() + .5d;
     }
 
     public Vec3 getPosition()

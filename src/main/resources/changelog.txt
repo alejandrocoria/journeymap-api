@@ -16,12 +16,14 @@ http://journeymap.techbrew.net
 - Change: Version check info moved to DropBox after exceeding Google Drive's quota
 - Change: Version check no longer announces a new version is available in chat.(UI elements still display in Fullscreen Map and Webmap.)
 - Change: Improved handling of resource pack changes to ensure the color palette is regenerated
+- Bugfix: Couldn't teleport to waypoint on server using Essentials because of coordinate precision
 - Bugfix: Waypoint Manager wouldn't open because of error (created by a Forge build that came after the recommended release)
 - Bugfix: Keybindings get duplicated if overridden and then viewed in JourneyMap>Options>Help... screens
 - Bugfix: Colors wrong for double-tall flowers and melon/pumpkin stems
 - Bugfix: Pressing CTRL (or Command) without another key was "remembered" for the next keypress.
 - Bugfix: Errors reported with some texturepacks (Sphax 128)
-- Bugfix: Minimap coordinates didn't match player coordinates in debug screen (F3) when location numbers were negative
+- Bugfix: MiniMap coordinates off by one when location numbers were negative
+- Bugfix: Waypoint display coordinates off by one when location numbers were negative
 - Change: Minimap's Y coordinate now reflects feet position, not eye position
 
 

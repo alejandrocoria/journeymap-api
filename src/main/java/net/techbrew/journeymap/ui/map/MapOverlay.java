@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
@@ -194,7 +195,7 @@ public class MapOverlay extends JmUI
             }
             case Caves:
             {
-                if(buttonCaves.isEnabled())
+                if (buttonCaves.isEnabled())
                 {
                     buttonCaves.toggle();
                     refreshState();
@@ -292,7 +293,10 @@ public class MapOverlay extends JmUI
             }
             buttonList.add(buttonDayNight);
             buttonList.add(buttonFollow);
-            if(FeatureManager.isAllowed(Feature.MapCaves));
+            if (FeatureManager.isAllowed(Feature.MapCaves))
+            {
+                ;
+            }
             {
                 buttonList.add(buttonCaves);
             }
@@ -303,7 +307,7 @@ public class MapOverlay extends JmUI
             buttonList.add(buttonActions);
             buttonList.add(buttonWaypointManager);
 
-            leftButtons = new ButtonList(buttonDayNight,buttonFollow, buttonCaves);
+            leftButtons = new ButtonList(buttonDayNight, buttonFollow, buttonCaves);
             rightButtons = new ButtonList(buttonAlert, buttonWaypointManager, buttonOptions, buttonActions, buttonClose);
             Collections.reverse(rightButtons);
 
@@ -452,8 +456,8 @@ public class MapOverlay extends JmUI
             if (!Mouse.isButtonDown(0) && isScrolling)
             {
                 isScrolling = false;
-                int mouseDragX = (mx - msx) * Math.max(1,scaleFactor) / blockSize;
-                int mouseDragY = (my - msy) * Math.max(1,scaleFactor) / blockSize;
+                int mouseDragX = (mx - msx) * Math.max(1, scaleFactor) / blockSize;
+                int mouseDragY = (my - msy) * Math.max(1, scaleFactor) / blockSize;
                 msx = mx;
                 msy = my;
 
@@ -679,8 +683,8 @@ public class MapOverlay extends JmUI
         {
             int blockSize = (int) Math.pow(2, state.currentZoom);
 
-            int mouseDragX = (mx - msx) * Math.max(1,scaleFactor) / blockSize;
-            int mouseDragY = (my - msy) * Math.max(1,scaleFactor) / blockSize;
+            int mouseDragX = (mx - msx) * Math.max(1, scaleFactor) / blockSize;
+            int mouseDragY = (my - msy) * Math.max(1, scaleFactor) / blockSize;
 
             xOffset = (mouseDragX * blockSize);
             yOffset = (mouseDragY * blockSize);
@@ -796,9 +800,9 @@ public class MapOverlay extends JmUI
 
         // Update player pos
         state.playerLastPos = Constants.getString("MapOverlay.location_xzyeb",
-                Integer.toString((int) mc.thePlayer.posX),
-                Integer.toString((int) mc.thePlayer.posZ),
-                Integer.toString((int) mc.thePlayer.posY),
+                MathHelper.floor_double(mc.thePlayer.posX),
+                MathHelper.floor_double(mc.thePlayer.posZ),
+                MathHelper.floor_double(mc.thePlayer.boundingBox.minY),
                 mc.thePlayer.chunkCoordY,
                 state.getPlayerBiome()); //$NON-NLS-1$
 

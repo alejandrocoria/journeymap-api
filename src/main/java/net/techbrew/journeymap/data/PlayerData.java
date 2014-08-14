@@ -40,8 +40,8 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
      */
     private String getPlayerBiome(Minecraft mc, EntityClientPlayerMP player)
     {
-        int x = ((int) Math.floor(player.posX) % 16) & 15;
-        int z = ((int) Math.floor(player.posZ) % 16) & 15;
+        int x = (MathHelper.floor_double(player.posX) >> 4) & 15;
+        int z = (MathHelper.floor_double(player.posZ) >> 4) & 15;
 
         ChunkMD playerChunk = ChunkLoader.getChunkStubFromMemory(player.chunkCoordX, player.chunkCoordZ, mc);
         if (playerChunk != null)

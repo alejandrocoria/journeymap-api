@@ -12,7 +12,6 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.management.ServerConfigurationManager;
-import net.minecraft.util.Vec3;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
@@ -32,7 +31,7 @@ public class CmdTeleportWaypoint
 
     public static boolean isPermitted(Minecraft mc)
     {
-        if(mc.getIntegratedServer()!=null)
+        if (mc.getIntegratedServer() != null)
         {
             IntegratedServer mcServer = mc.getIntegratedServer();
             ServerConfigurationManager configurationManager = null;
@@ -71,7 +70,6 @@ public class CmdTeleportWaypoint
 
     public void run()
     {
-        Vec3 waypointPos = waypoint.getPosition();
-        mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", mc.thePlayer.getCommandSenderName(), waypointPos.xCoord, waypointPos.yCoord, waypointPos.zCoord));
+        mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", mc.thePlayer.getCommandSenderName(), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
     }
 }
