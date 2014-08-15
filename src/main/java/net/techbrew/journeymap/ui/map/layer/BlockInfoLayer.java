@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.cartography.render.BaseRenderer;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.ChunkMD;
@@ -55,9 +56,10 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             // Get block under mouse
             Chunk chunk = mc.theWorld.getChunkFromChunkCoords(blockCoord.x >> 4, blockCoord.z >> 4);
             String info;
+            Integer blockY = null;
             if (!chunk.isEmpty())
             {
-                int blockY = chunk.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15);
+                blockY = Math.max(chunk.getHeightValue(blockCoord.x & 15, blockCoord.z & 15), chunk.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15));
                 String biome = mc.theWorld.getBiomeGenForCoords(blockCoord.x, blockCoord.z).biomeName;
                 info = Constants.getString("jm.common.location_xzyeb", blockCoord.x, blockCoord.z, blockY, (blockY >> 4), biome);
             }
@@ -121,7 +123,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         {
             if (ticks-- < 0 && alpha > 0)
             {
-                alpha -= 5; // Fade
+                alpha -= 1; // Fade
             }
             if (alpha > 0 && text != null)
             {
