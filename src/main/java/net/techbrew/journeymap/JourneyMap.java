@@ -411,9 +411,9 @@ public class JourneyMap
     private void reset()
     {
         FileHandler.lastJMWorldDir = null;
-        chunkRenderController = new ChunkRenderController();
         DataCache.instance().purge();
         DataCache.instance().resetBlockMetadata();
+        chunkRenderController = new ChunkRenderController();
         MapOverlay.state().follow = true;
         ColorCache.getInstance().reset();
         StatTimer.resetAll();

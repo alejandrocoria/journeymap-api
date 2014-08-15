@@ -144,6 +144,18 @@ public class DataCache
         privateCaches.put(cache, name);
     }
 
+    public Cache getPrivateCache(String name)
+    {
+        for(Map.Entry<Cache, String> entry : privateCaches.entrySet())
+        {
+            if(entry.getValue().equals(name))
+            {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
     public Map getAll(long since)
     {
         synchronized (all)
@@ -402,6 +414,14 @@ public class DataCache
 //            }
 
             return chunkMD;
+        }
+    }
+
+    public void addChunkMD(ChunkMD chunkMD)
+    {
+        synchronized (chunkMetadata)
+        {
+            chunkMetadata.put(chunkMD.coord, Optional.of(chunkMD));
         }
     }
 

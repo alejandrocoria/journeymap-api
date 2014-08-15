@@ -65,7 +65,9 @@ public class MapRegionTask extends BaseMapTask
             }
             else
             {
+                DataCache.instance().addChunkMD(stub);
                 chunks.add(stub);
+                stub.render = true;
             }
         }
 

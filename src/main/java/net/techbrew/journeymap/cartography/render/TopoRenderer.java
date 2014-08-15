@@ -8,10 +8,12 @@
 
 package net.techbrew.journeymap.cartography.render;
 
+import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.cartography.IChunkRenderer;
 import net.techbrew.journeymap.cartography.RGB;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.StatTimer;
+import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
@@ -120,6 +122,11 @@ public class TopoRenderer extends SurfaceRenderer implements IChunkRenderer
                                        final HeightsCache chunkHeights,
                                        final SlopesCache chunkSlopes)
     {
+        BlockCoordIntPair offsetN = new BlockCoordIntPair(0, -1);
+        BlockCoordIntPair offsetW = new BlockCoordIntPair(-1, 0);
+        BlockCoordIntPair offsetS = new BlockCoordIntPair(0, 1);
+        BlockCoordIntPair offsetE = new BlockCoordIntPair(1, 0);
+
         Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.coord);
         int h;
         float slope, hN, hW, hE, hS;
@@ -128,10 +135,10 @@ public class TopoRenderer extends SurfaceRenderer implements IChunkRenderer
             for (int x = 0; x < 16; x++)
             {
                 h = getSurfaceBlockHeight(chunkMd, x, z, chunkHeights);
-                hN = getSurfaceBlockHeight(chunkMd, x, z, 0, -1, h, chunkHeights);
-                hW = getSurfaceBlockHeight(chunkMd, x, z, -1, 0, h, chunkHeights);
-                hS = getSurfaceBlockHeight(chunkMd, x, z, 0, 1, h, chunkHeights);
-                hE = getSurfaceBlockHeight(chunkMd, x, z, 1, 0, h, chunkHeights);
+                hN = getSurfaceBlockHeight(chunkMd, x, z, offsetN, h, chunkHeights);
+                hW = getSurfaceBlockHeight(chunkMd, x, z, offsetW, h, chunkHeights);
+                hS = getSurfaceBlockHeight(chunkMd, x, z, offsetS, h, chunkHeights);
+                hE = getSurfaceBlockHeight(chunkMd, x, z, offsetE, h, chunkHeights);
 
                 h = h >> 3;
                 hN = (int) hN >> 3;
