@@ -11,7 +11,6 @@ package net.techbrew.journeymap.cartography.render;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.*;
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.JourneyMap;
@@ -453,7 +452,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 
         // Find the height.
         // TODO: This doesn't catch glass or all that anymore, does it?  Use precip height?
-        y = Math.max(0, chunkMd.stub.getHeightValue(x, z));
+        y = Math.max(0, chunkMd.getChunk().getHeightValue(x, z));
 
         try
         {

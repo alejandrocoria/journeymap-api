@@ -15,11 +15,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.IPlantable;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.properties.CoreProperties;
@@ -194,7 +190,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
                 }
                 else
                 {
-                    int meta = chunkMd.stub.getBlockMetadata(x, y, z);
+                    int meta = chunkMd.getChunk().getBlockMetadata(x, y, z);
                     return getBlockMD(cache, block, meta);
                 }
             }
@@ -205,7 +201,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().severe(String.format("Can't get blockId/meta for chunk %s,%s block %s,%s,%s : %s", chunkMd.stub.xPosition, chunkMd.stub.zPosition, x, y, z, LogFormatter.toString(e)));
+            JourneyMap.getLogger().severe(String.format("Can't get blockId/meta for chunk %s,%s block %s,%s,%s : %s", chunkMd.getChunk().xPosition, chunkMd.getChunk().zPosition, x, y, z, LogFormatter.toString(e)));
             return AIRBLOCK;
         }
     }

@@ -266,7 +266,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
                     if (blockAboveMD.isAir() || blockAboveMD.hasFlag(BlockMD.Flag.OpenToSky))
                     {
-                        if (chunkMd.hasNoSky || !chunkMd.stub.canBlockSeeTheSky(x, y + 1, z))
+                        if (chunkMd.hasNoSky || !chunkMd.getChunk().canBlockSeeTheSky(x, y + 1, z))
                         {
                             lightLevel = getSliceLightLevel(chunkMd, x, y, z, true);
 

@@ -98,7 +98,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
         ChunkMD playerChunk = DataCache.instance().getChunkMD(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ));
         if (playerChunk != null)
         {
-            return playerChunk.stub.getBiomeGenForWorldCoords(x, z, mc.theWorld.getWorldChunkManager()).biomeName;
+            return playerChunk.getChunk().getBiomeGenForWorldCoords(x, z, mc.theWorld.getWorldChunkManager()).biomeName;
         }
         else
         {

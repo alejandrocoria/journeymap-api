@@ -129,8 +129,9 @@ public class MapPlayerTask extends BaseMapTask
             renderCoords.addAll(queuedChunks);
             queuedChunks.clear();
         }
-        final int queuedSize = renderCoords.size();
 
+        // TODO: Remove after debugging slope bug done
+        forceNearbyChunks = true;
 
         int forced = 0;
         if(forceNearbyChunks)
@@ -180,7 +181,6 @@ public class MapPlayerTask extends BaseMapTask
             chunkMd = dataCache.getChunkMD(coord, true);
             if (chunkMd != null)
             {
-                chunkMd.render = true;
                 renderChunks.add(chunkMd);
             }
             else

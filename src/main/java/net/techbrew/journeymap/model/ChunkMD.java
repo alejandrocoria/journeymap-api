@@ -22,7 +22,6 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.io.nbt.ChunkLoader;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
@@ -39,43 +38,29 @@ public class ChunkMD
     public final World worldObj;
     public final int worldHeight;
     public final Boolean hasNoSky;
-    public final ChunkStub stub;
+    private final Chunk chunk;
     public final ChunkCoordIntPair coord;
     public final boolean isSlimeChunk;
 
-    public Boolean render;
-
-    public ChunkMD(Chunk chunk, Boolean render, World worldObj)
+    public ChunkMD(Chunk chunk)
     {
-        this(chunk, render, worldObj, false);
-    }
-
-    public ChunkMD(Chunk chunk, Boolean render, World worldObj, boolean doErrorChecks)
-    {
-        this(new ChunkStub(chunk), render, worldObj);
-        if (chunk.isEmpty() || !chunk.isChunkLoaded)
+        if(chunk==null)
         {
-            render = false;
+            throw new IllegalArgumentException("Chunk can't be null");
         }
-    }
-
-    public ChunkMD(ChunkStub stub, Boolean render, World worldObj)
-    {
-        this.stub = stub;
-        this.render = render;
-        this.worldObj = worldObj;
+        this.chunk = chunk;
+        this.worldObj = chunk.worldObj;
         this.worldHeight = worldObj.getActualHeight();
         this.hasNoSky = worldObj.provider.hasNoSky;
-        this.coord = new ChunkCoordIntPair(stub.xPosition, stub.zPosition);
+        this.coord = new ChunkCoordIntPair(chunk.xPosition, chunk.zPosition);
 
         // https://github.com/OpenMods/OpenBlocks/blob/master/src/main/java/openblocks/common/item/ItemSlimalyzer.java#L44
-        this.isSlimeChunk = stub.getRandomWithSeed(987234911L).nextInt(10) == 0;
+        this.isSlimeChunk = chunk.getRandomWithSeed(987234911L).nextInt(10) == 0;
     }
-
 
     public Block getBlock(int x, int y, int z)
     {
-        return stub.getBlock(x, y, z);
+        return getChunk().getBlock(x, y, z);
     }
 
     /**
@@ -83,9 +68,8 @@ public class ChunkMD
      */
     public int getSavedLightValue(EnumSkyBlock par1EnumSkyBlock, int x, int y, int z)
     {
-        return stub.getSavedLightValue(par1EnumSkyBlock, x, Math.min(y, worldHeight - 1), z);
+        return getChunk().getSavedLightValue(par1EnumSkyBlock, x, Math.min(y, worldHeight - 1), z);
     }
-
 
     /**
      * Get the top block ignoring transparent roof blocks, air. etc.
@@ -141,7 +125,7 @@ public class ChunkMD
                 {
                     y--;
                 }
-                else if (stub.canBlockSeeTheSky(x, y, z))
+                else if (getChunk().canBlockSeeTheSky(x, y, z))
                 {
                     y--;
                 }
@@ -159,14 +143,19 @@ public class ChunkMD
         return Math.max(0, y);
     }
 
+    public boolean hasChunk()
+    {
+        return getChunk()!=null;
+    }
+
     public int getHeightValue(int x, int z)
     {
-        return stub.getHeightValue(x, z);
+        return getChunk().getHeightValue(x, z);
     }
 
     public int getAbsoluteHeightValue(int x, int z)
     {
-        return stub.getPrecipitationHeight(x, z);
+        return getChunk().getPrecipitationHeight(x, z);
     }
 
     public int getLightOpacity(BlockMD blockMD, int localX, int y, int localZ)
@@ -196,21 +185,18 @@ public class ChunkMD
             return false;
         }
         ChunkMD other = (ChunkMD) obj;
-        if (stub.xPosition != other.stub.xPosition)
-        {
-            return false;
-        }
-        if (stub.zPosition != other.stub.zPosition)
-        {
-            return false;
-        }
-        return true;
+        return coord.equals(other.coord);
     }
 
     @Override
     public String toString()
     {
-        return "ChunkStubMD [" + stub.xPosition + ", " + stub.zPosition + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+        return String.format("ChunkMD[%s]", coord); //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
+    public Chunk getChunk()
+    {
+        return chunk;
     }
 
     public static class Set extends LinkedHashMap<ChunkCoordIntPair, ChunkMD> implements Iterable<ChunkMD>

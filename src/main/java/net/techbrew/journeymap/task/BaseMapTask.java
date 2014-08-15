@@ -101,7 +101,7 @@ public abstract class BaseMapTask implements ITask
                 }
 
                 ChunkMD chunkMd = chunkIter.next();
-                if (chunkMd.render)
+                if(chunkMd.hasChunk())
                 {
                     BufferedImage chunkImage = renderController.getChunkImage(chunkMd, vSlice);
                     ChunkCoord cCoord = ChunkCoord.fromChunkMD(jmWorldDir, chunkMd, vSlice, dimension);

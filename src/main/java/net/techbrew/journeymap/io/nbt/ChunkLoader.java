@@ -38,7 +38,7 @@ public class ChunkLoader
         {
             return null;
         }
-        return new ChunkMD(chunk, true, world, /* do error checks */ true);
+        return new ChunkMD(chunk);
 
     }
 
@@ -47,7 +47,7 @@ public class ChunkLoader
         Chunk chunk = getChunkFromMemory(chunkX, chunkZ, world);
         if (chunk != null)
         {
-            return new ChunkMD(chunk, true, world);
+            return new ChunkMD(chunk);
         }
         return null;
     }

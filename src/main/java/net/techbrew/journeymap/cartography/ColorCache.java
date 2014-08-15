@@ -241,7 +241,7 @@ public class ColorCache implements IResourceManagerReloadListener
 
     private Color getBiomeBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
     {
-        BiomeGenBase biome = chunkMd.stub.getBiomeGenForWorldCoords(x, z, chunkMd.worldObj.getWorldChunkManager());
+        BiomeGenBase biome = chunkMd.getChunk().getBiomeGenForWorldCoords(x, z, chunkMd.worldObj.getWorldChunkManager());
         return getBiomeBlockColor(biome, blockMD, x, y, z);
     }
 
