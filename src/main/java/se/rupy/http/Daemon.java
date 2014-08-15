@@ -713,7 +713,7 @@ public class Daemon implements Runnable {
 			}
 		} catch (Exception e) {
 			e.printStackTrace(out);
-			System.exit(1);
+			throw new RuntimeException(e);
 		}
 
 		int index = 0;
