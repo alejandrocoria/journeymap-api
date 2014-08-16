@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.IIcon;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
@@ -22,45 +23,53 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class IconLoader {
-	
-	Logger logger = JourneyMap.getLogger();
-	final BufferedImage blocksTexture;
-	HashSet<BlockMD> failed = new HashSet<BlockMD>();
-	
-	/**
-	 * Must be instantiated on main minecraft thread where GL context is viable.
-	 */
-	public IconLoader() {
-		blocksTexture = initBlocksTexture();
-	}	
-	
-	public boolean failedFor(BlockMD blockMD) {
-		return failed.contains(blockMD);
-	}
-	
-	/**
-	 * Derive block color from the corresponding texture.
-	 * @param blockMD
-	 * @return
-	 */
-	public Color loadBlockColor(BlockMD blockMD) {
-		
-		Color color = null;
-		
-		if(blocksTexture==null) {
-			logger.warning("BlocksTexture not yet loaded");
-			return null;					
-		}
-		
-		if(failed.contains(blockMD)){
-			return null;
-		}
-		
-		try {
-				
-			if(logger.isLoggable(Level.FINE)){
-				logger.fine("Loading color for " + blockMD);
-			}
+
+    final BufferedImage blocksTexture;
+    Logger logger = JourneyMap.getLogger();
+    DataCache dataCache = DataCache.instance();
+    HashSet<BlockMD> failed = new HashSet<BlockMD>();
+
+    /**
+     * Must be instantiated on main minecraft thread where GL context is viable.
+     */
+    public IconLoader()
+    {
+        blocksTexture = initBlocksTexture();
+    }
+
+    public boolean failedFor(BlockMD blockMD)
+    {
+        return failed.contains(blockMD);
+    }
+
+    /**
+     * Derive block color from the corresponding texture.
+     *
+     * @param blockMD
+     * @return
+     */
+    public Color loadBlockColor(BlockMD blockMD)
+    {
+
+        Color color = null;
+
+        if (blocksTexture == null)
+        {
+            logger.warning("BlocksTexture not yet loaded");
+            return null;
+        }
+
+        if (failed.contains(blockMD))
+        {
+            return null;
+        }
+
+        try
+        {
+            if (logger.isLoggable(Level.FINE))
+            {
+                logger.fine("Loading color for " + blockMD);
+            }
 
             IIcon blockIcon = null;
 
@@ -68,16 +77,12 @@ public class IconLoader {
             {
                 BlockDoublePlant blockDoublePlant = ((BlockDoublePlant) blockMD.getBlock());
 
-                // Sunflower gets to be so special.
-                if("sunflower".equals(BlockDoublePlant.field_149892_a[blockMD.key.meta]))
+                // Get the top icon
+                blockIcon = blockDoublePlant.func_149888_a(true, blockMD.key.meta & BlockDoublePlant.field_149892_a.length);
+                if (blockIcon.getIconName().contains("sunflower"))
                 {
                     // Sunflower front
                     blockIcon = blockDoublePlant.sunflowerIcons[0];
-                }
-                else
-                {
-                    // Get the top icon
-                    blockIcon = blockDoublePlant.func_149888_a(true, blockMD.key.meta);
                 }
             }
             else
@@ -95,30 +100,32 @@ public class IconLoader {
             } else {
                 color = getColorForIcon(blockMD, blockIcon);
             }
-			
-            if(color==null) {
-            	failed.add(blockMD);
+
+            if (blockIcon == null || color == null)
+            {
+                failed.add(blockMD);
             }
-			return color;                           
 
-		} catch (Throwable t) {
-			failed.add(blockMD);
-			logger.severe("Error getting color: " + LogFormatter.toString(t));
-			return null;
-		}
-	}
-	
+            return color;
+        }
+        catch (Throwable t)
+        {
+            failed.add(blockMD);
+            logger.severe("Error getting color: " + LogFormatter.toString(t));
+            return null;
+        }
+    }
 
-	
-	Color getColorForIcon(BlockMD blockMD, IIcon icon) {
-		
-		Color color = null;		
+    Color getColorForIcon(BlockMD blockMD, IIcon icon)
+    {
+        Color color = null;
 
-        try {	    	
-	        int count = 0;
-	        int argb, alpha;
-	    	int a=0, r=0, g=0, b=0;
-	    	int x=0, y=0;
+        try
+        {
+            int count = 0;
+            int argb, alpha;
+            int a = 0, r = 0, g = 0, b = 0;
+            int x = 0, y = 0;
 
             int xStart, yStart, xStop, yStop;
             BufferedImage textureImg;

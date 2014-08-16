@@ -19,7 +19,7 @@ http://journeymap.techbrew.net
 - Bugfix: Couldn't teleport to waypoint on server using Essentials because of coordinate precision
 - Bugfix: Waypoint Manager wouldn't open because of error (created by a Forge build that came after the recommended release)
 - Bugfix: Keybindings get duplicated if overridden and then viewed in JourneyMap>Options>Help... screens
-- Bugfix: Colors wrong for double-tall flowers and melon/pumpkin stems
+- Bugfix: Colors wrong for double-tall flowers, double grass and double ferns, and melon/pumpkin stems
 - Bugfix: Pressing CTRL (or Command) without another key was "remembered" for the next keypress.
 - Bugfix: Errors reported with some texturepacks (Sphax 128)
 - Bugfix: MiniMap coordinates off by one when location numbers were negative

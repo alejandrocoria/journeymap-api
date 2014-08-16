@@ -7,10 +7,7 @@ import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import modinfo.ModInfo;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockGrass;
-import net.minecraft.block.BlockTallGrass;
-import net.minecraft.block.BlockVine;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -246,7 +243,8 @@ public class ColorCache implements IResourceManagerReloadListener
 	public Color getBiomeBlockColor(BiomeGenBase biome, BlockMD blockMD, int x, int y, int z) {
 		Block block = blockMD.getBlock();
 
-        if(block instanceof BlockGrass || block instanceof BlockTallGrass) {
+        if (block instanceof BlockGrass || block instanceof BlockTallGrass || block instanceof BlockDoublePlant)
+        {
             return getGrassColor(blockMD, biome, x, y, z);
         }
 
