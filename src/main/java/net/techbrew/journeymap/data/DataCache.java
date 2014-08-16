@@ -12,11 +12,9 @@ import com.google.common.base.Optional;
 import com.google.common.cache.*;
 import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.io.nbt.ChunkLoader;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.*;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
@@ -421,7 +419,7 @@ public class DataCache
     {
         synchronized (chunkMetadata)
         {
-            chunkMetadata.put(chunkMD.coord, Optional.of(chunkMD));
+            chunkMetadata.put(chunkMD.getCoord(), Optional.of(chunkMD));
         }
     }
 

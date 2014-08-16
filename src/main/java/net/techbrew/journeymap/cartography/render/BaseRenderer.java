@@ -218,7 +218,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                                        final SlopesCache chunkSlopes)
     {
 
-        Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.coord);
+        Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
         int y = 0, sliceMinY = 0, sliceMaxY = 0;
         boolean isSurface = (vSlice == null);
         Float slope, primarySlope, secondarySlope;
@@ -309,12 +309,12 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                                       final int sliceMaxY, BlockCoordIntPair offset, int defaultVal,
                                       final HeightsCache chunkHeights)
     {
-        final int blockX = (chunkMd.coord.chunkXPos << 4) + (x + offset.x);
-        final int blockZ = (chunkMd.coord.chunkZPos << 4) + (z + offset.z);
+        final int blockX = (chunkMd.getCoord().chunkXPos << 4) + (x + offset.x);
+        final int blockZ = (chunkMd.getCoord().chunkZPos << 4) + (z + offset.z);
         final ChunkCoordIntPair targetCoord = new ChunkCoordIntPair(blockX >> 4, blockZ >> 4);
         ChunkMD targetChunkMd = null;
 
-        if(targetCoord.equals(chunkMd.coord))
+        if(targetCoord.equals(chunkMd.getCoord()))
         {
             targetChunkMd = chunkMd;
         }
@@ -379,7 +379,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 
         final int sliceMinY = Math.max((vSlice << 4), 0);
         final int hardSliceMaxY = ((vSlice + 1) << 4) - 1;
-        int sliceMaxY = Math.min(hardSliceMaxY, chunkMd.worldObj.getActualHeight());
+        int sliceMaxY = Math.min(hardSliceMaxY, chunkMd.getWorldObj().getActualHeight());
         if (sliceMinY >= sliceMaxY)
         {
             sliceMaxY = sliceMinY + 2;
@@ -392,7 +392,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                              final HeightsCache chunkHeights,
                              final SlopesCache chunkSlopes)
     {
-        Float[][] slopes = chunkSlopes.getIfPresent(chunkMd.coord);
+        Float[][] slopes = chunkSlopes.getIfPresent(chunkMd.getCoord());
 
         if (slopes == null || slopes[x][z]==null)
         {
@@ -434,7 +434,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      */
     public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, final HeightsCache chunkHeights)
     {
-        Integer[][] heights = chunkHeights.getUnchecked(chunkMd.coord);
+        Integer[][] heights = chunkHeights.getUnchecked(chunkMd.getCoord());
         if(heights==null)
         {
             // Not in cache anymore
@@ -495,12 +495,12 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     public int getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, BlockCoordIntPair offset, int defaultVal,
                                      final HeightsCache chunkHeights)
     {
-        final int blockX = (chunkMd.coord.chunkXPos << 4) + (x + offset.x);
-        final int blockZ = (chunkMd.coord.chunkZPos << 4) + (z + offset.z);
+        final int blockX = (chunkMd.getCoord().chunkXPos << 4) + (x + offset.x);
+        final int blockZ = (chunkMd.getCoord().chunkZPos << 4) + (z + offset.z);
         final ChunkCoordIntPair targetCoord = new ChunkCoordIntPair(blockX >> 4, blockZ >> 4);
         ChunkMD targetChunkMd = null;
 
-        if(targetCoord.equals(chunkMd.coord))
+        if(targetCoord.equals(chunkMd.getCoord()))
         {
             targetChunkMd = chunkMd;
         }

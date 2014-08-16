@@ -14,9 +14,6 @@ import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Stack;
 
 /**
@@ -140,7 +137,7 @@ public class Strata
                 setBottomWaterY((getBottomWaterY() == null) ? y : Math.min(getBottomWaterY(), y));
                 if (getWaterColor() == null)
                 {
-                    setWaterColor(getAverageWaterColor((chunkMd.coord.chunkXPos << 4) + x, y, (chunkMd.coord.chunkZPos << 4) + z));
+                    setWaterColor(getAverageWaterColor((chunkMd.getCoord().chunkXPos << 4) + x, y, (chunkMd.getCoord().chunkZPos << 4) + z));
                     if (getWaterColor() == null)
                     {
                         // This shouldn't happen. But if it did, it'd be too spammy to log.

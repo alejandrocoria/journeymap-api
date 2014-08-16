@@ -78,7 +78,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         boolean ok = false;
 
         // Surface prepass
-        if (!chunkMd.hasNoSky && surfaceRenderer != null)
+        if (!chunkMd.getHasNoSky() && surfaceRenderer != null)
         {
             ok = surfaceRenderer.render(g2D, chunkMd, vSlice, true);
             if (!ok)
@@ -141,7 +141,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
                 try
                 {
-                    final int ceiling = chunkMd.hasNoSky ? sliceMaxY : chunkMd.ceiling(x, z);
+                    final int ceiling = chunkMd.getHasNoSky() ? sliceMaxY : chunkMd.ceiling(x, z);
 
                     // Oh look, a hole in the world.
                     if (ceiling < 0)
@@ -266,7 +266,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
                     if (blockAboveMD.isAir() || blockAboveMD.hasFlag(BlockMD.Flag.OpenToSky))
                     {
-                        if (chunkMd.hasNoSky || !chunkMd.getChunk().canBlockSeeTheSky(x, y + 1, z))
+                        if (chunkMd.getHasNoSky() || !chunkMd.getChunk().canBlockSeeTheSky(x, y + 1, z))
                         {
                             lightLevel = getSliceLightLevel(chunkMd, x, y, z, true);
 
@@ -292,7 +292,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         {
             // Corner case where the column has lava but no air in it.
             // This is a nether thing
-            if (chunkMd.hasNoSky && strata.isEmpty() && lavaBlockMD != null)
+            if (chunkMd.getHasNoSky() && strata.isEmpty() && lavaBlockMD != null)
             {
                 strata.push(chunkMd, lavaBlockMD, x, topY, z, 14);
             }
@@ -372,7 +372,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     protected Integer getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY,
                                       final HeightsCache chunkHeights)
     {
-        Integer[][] blockSliceHeights = chunkHeights.getUnchecked(chunkMd.coord);
+        Integer[][] blockSliceHeights = chunkHeights.getUnchecked(chunkMd.getCoord());
         if(blockSliceHeights==null)
         {
             return null;

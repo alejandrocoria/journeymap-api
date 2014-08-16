@@ -31,12 +31,12 @@ public class MapPlayerTask extends BaseMapTask
     private static ChunkCoordinates lastPlayerPos;
     private static Boolean lastUnderground;
     private static DataCache dataCache = DataCache.instance();
-    private static ChunkCoordIntPair[] keepAliveOffsets = new ChunkCoordIntPair[]{new ChunkCoordIntPair(0,-1), new ChunkCoordIntPair(-1,0), new ChunkCoordIntPair(-1,-1)};
+
     private final int maxRuntime = JourneyMap.getInstance().coreProperties.chunkPoll.get() * 3;
 
-    private MapPlayerTask(ChunkRenderController chunkRenderController, World world, int dimension, boolean underground, Integer chunkY, ChunkMD.Set chunkStubs)
+    private MapPlayerTask(ChunkRenderController chunkRenderController, World world, int dimension, boolean underground, Integer chunkY, Collection<ChunkCoordIntPair> chunkCoords)
     {
-        super(chunkRenderController, world, dimension, underground, chunkY, chunkStubs, false);
+        super(chunkRenderController, world, dimension, underground, chunkY, chunkCoords, false);
     }
 
     public static boolean queueChunk(ChunkCoordIntPair chunkCoords)
@@ -87,8 +87,9 @@ public class MapPlayerTask extends BaseMapTask
 
             while (mapY > 0 && tasks.size() < 2)
             {
-                tasks.add(new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, true, mapY,
-                        new ChunkMD.Set(dataCache.getChunkMD(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ), false))));
+                ArrayList<ChunkCoordIntPair> list = new ArrayList<ChunkCoordIntPair>(1);
+                list.add(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ));
+                tasks.add(new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, true, mapY, list));
 
                 mapY--;
             }
@@ -123,15 +124,12 @@ public class MapPlayerTask extends BaseMapTask
         lastUnderground = underground;
 
         // Pull queued coords with as little delay as possible
-        TreeSet<ChunkCoordIntPair> renderCoords = new TreeSet<ChunkCoordIntPair>(chunkDistanceComparator);
+        TreeSet<ChunkCoordIntPair> queuedCoords = new TreeSet<ChunkCoordIntPair>(chunkDistanceComparator);
         synchronized (queuedChunks)
         {
-            renderCoords.addAll(queuedChunks);
+            queuedCoords.addAll(queuedChunks);
             queuedChunks.clear();
         }
-
-        // TODO: Remove after debugging slope bug done
-        forceNearbyChunks = true;
 
         int forced = 0;
         if(forceNearbyChunks)
@@ -142,7 +140,7 @@ public class MapPlayerTask extends BaseMapTask
             {
                 for (int z = (player.chunkCoordZ - offset); z <= (player.chunkCoordZ + offset); z++)
                 {
-                    renderCoords.add(new ChunkCoordIntPair(x, z));
+                    queuedCoords.add(new ChunkCoordIntPair(x, z));
                     forced++;
                 }
             }
@@ -150,14 +148,9 @@ public class MapPlayerTask extends BaseMapTask
         else
         {
             // Add just player's coords
-            renderCoords.add(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ));
+            queuedCoords.add(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ));
             forced++;
         }
-
-
-
-
-
 
         // Load em if you've got em, ensure they're refreshed
         ChunkMD chunkMd = null;
@@ -168,11 +161,11 @@ public class MapPlayerTask extends BaseMapTask
         int keptAliveMissed = 0;
         int keptAliveUnnecessary = 0;
         int missed = 0;
-        final ChunkMD.Set renderChunks = new ChunkMD.Set(renderCoords.size());
+        final TreeSet<ChunkCoordIntPair> renderCoords = new TreeSet<ChunkCoordIntPair>(chunkDistanceComparator);
 
-        for (ChunkCoordIntPair coord : renderCoords)
+        for (ChunkCoordIntPair coord : queuedCoords)
         {
-            if (renderChunks.size() >= maxChunks)
+            if (renderCoords.size() >= maxChunks)
             {
                 JourneyMap.getLogger().fine(String.format("%s queued chunks exceeded max of %s for MapPlayerTask", renderCoords.size(), maxChunks));
                 break;
@@ -181,7 +174,29 @@ public class MapPlayerTask extends BaseMapTask
             chunkMd = dataCache.getChunkMD(coord, true);
             if (chunkMd != null)
             {
-                renderChunks.add(chunkMd);
+                renderCoords.add(coord);
+
+                // Ensure chunks north, west, nw are kept alive for slope calculations
+                for(ChunkCoordIntPair keepAliveOffset : keepAliveOffsets)
+                {
+                    ChunkCoordIntPair keepAliveCoord = new ChunkCoordIntPair(coord.chunkXPos + keepAliveOffset.chunkXPos, coord.chunkZPos + keepAliveOffset.chunkZPos);
+                    if (!renderCoords.contains(keepAliveCoord))
+                    {
+                        ChunkMD keepAliveChunk = dataCache.getChunkMD(keepAliveCoord, false);
+                        if(keepAliveChunk!=null)
+                        {
+                            keptAlive++;
+                        }
+                        else
+                        {
+                            keptAliveMissed++;
+                        }
+                    }
+                    else
+                    {
+                        keptAliveUnnecessary++;
+                    }
+                }
             }
             else
             {
@@ -189,33 +204,9 @@ public class MapPlayerTask extends BaseMapTask
             }
         }
 
-        for (ChunkMD renderChunkMD : renderChunks)
+        if(renderCoords.size()==0)
         {
-            // Ensure chunks north, west, nw are kept alive for slope calculations
-            for(ChunkCoordIntPair keepAliveOffset : keepAliveOffsets)
-            {
-                ChunkCoordIntPair keepAliveCoord = new ChunkCoordIntPair(renderChunkMD.coord.chunkXPos + keepAliveOffset.chunkXPos, renderChunkMD.coord.chunkZPos + keepAliveOffset.chunkZPos);
-                if (!renderChunks.containsKey(keepAliveCoord))
-                {
-                    ChunkMD keepAliveChunk = dataCache.getChunkMD(keepAliveCoord, false);
-                    if(keepAliveChunk!=null)
-                    {
-                        keptAlive++;
-                    }
-                    else
-                    {
-                        keptAliveMissed++;
-                    }
-                }
-                else
-                {
-                    keptAliveUnnecessary++;
-                }
-            }
-        }
-
-        if(renderChunks.size()==0)
-        {
+            // TODO: Comment this out
             System.out.println("No chunks to render");
             return null;
         }
@@ -226,7 +217,7 @@ public class MapPlayerTask extends BaseMapTask
 
             // TODO: Always map surface
             final Integer vSlice = underground ? lastPlayerPos.posY : null;
-            return new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, underground, vSlice, renderChunks);
+            return new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, underground, vSlice, renderCoords);
         }
     }
 

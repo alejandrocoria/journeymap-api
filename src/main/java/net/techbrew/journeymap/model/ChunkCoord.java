@@ -37,7 +37,7 @@ public class ChunkCoord
 
     public static ChunkCoord fromChunkMD(File worldDir, ChunkMD chunkMd, Integer vSlice, int dimension)
     {
-        return ChunkCoord.fromChunkPos(worldDir, chunkMd.getChunk().xPosition, vSlice, chunkMd.getChunk().zPosition, dimension);
+        return ChunkCoord.fromChunkPos(worldDir, chunkMd.getCoord().chunkXPos, vSlice, chunkMd.getCoord().chunkZPos, dimension);
     }
 
     public static ChunkCoord fromChunkPos(File worldDir, int xPosition, Integer vSlice, int zPosition, int dimension)

@@ -22,8 +22,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.io.nbt.ChunkLoader;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.lang.ref.SoftReference;
 
 /**
  * ChunkStub MetaData wrapper for the various bits
@@ -34,13 +33,9 @@ import java.util.LinkedHashMap;
 public class ChunkMD
 {
     final static DataCache dataCache = DataCache.instance();
-
-    public final World worldObj;
-    public final int worldHeight;
-    public final Boolean hasNoSky;
-    private final Chunk chunk;
-    public final ChunkCoordIntPair coord;
-    public final boolean isSlimeChunk;
+    private final SoftReference<Chunk> chunkReference;
+    private final ChunkCoordIntPair coord;
+    private final boolean isSlimeChunk;
 
     public ChunkMD(Chunk chunk)
     {
@@ -48,10 +43,8 @@ public class ChunkMD
         {
             throw new IllegalArgumentException("Chunk can't be null");
         }
-        this.chunk = chunk;
-        this.worldObj = chunk.worldObj;
-        this.worldHeight = worldObj.getActualHeight();
-        this.hasNoSky = worldObj.provider.hasNoSky;
+        this.chunkReference = new SoftReference<Chunk>(chunk);
+
         this.coord = new ChunkCoordIntPair(chunk.xPosition, chunk.zPosition);
 
         // https://github.com/OpenMods/OpenBlocks/blob/master/src/main/java/openblocks/common/item/ItemSlimalyzer.java#L44
@@ -68,7 +61,7 @@ public class ChunkMD
      */
     public int getSavedLightValue(EnumSkyBlock par1EnumSkyBlock, int x, int y, int z)
     {
-        return getChunk().getSavedLightValue(par1EnumSkyBlock, x, Math.min(y, worldHeight - 1), z);
+        return getChunk().getSavedLightValue(par1EnumSkyBlock, x, Math.min(y, getWorldActualHeight() - 1), z);
     }
 
     /**
@@ -145,7 +138,7 @@ public class ChunkMD
 
     public boolean hasChunk()
     {
-        return getChunk()!=null;
+        return chunkReference.get()!=null;
     }
 
     public int getHeightValue(int x, int z)
@@ -160,13 +153,13 @@ public class ChunkMD
 
     public int getLightOpacity(BlockMD blockMD, int localX, int y, int localZ)
     {
-        return blockMD.getBlock().getLightOpacity(this.worldObj, (this.coord.chunkXPos << 4) + localX, y, (this.coord.chunkZPos << 4) + localZ);
+        return blockMD.getBlock().getLightOpacity(this.getWorldObj(), (this.getCoord().chunkXPos << 4) + localX, y, (this.getCoord().chunkZPos << 4) + localZ);
     }
 
     @Override
     public int hashCode()
     {
-        return coord.hashCode();
+        return getCoord().hashCode();
     }
 
     @Override
@@ -185,62 +178,56 @@ public class ChunkMD
             return false;
         }
         ChunkMD other = (ChunkMD) obj;
-        return coord.equals(other.coord);
+        return getCoord().equals(other.getCoord());
     }
 
     @Override
     public String toString()
     {
-        return String.format("ChunkMD[%s]", coord); //$NON-NLS-1$ //$NON-NLS-2$
+        return String.format("ChunkMD[%s]", getCoord()); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     public Chunk getChunk()
     {
+        Chunk chunk = chunkReference.get();
+        if(chunk==null)
+        {
+            throw new ChunkMissingException(getCoord());
+        }
         return chunk;
     }
 
-    public static class Set extends LinkedHashMap<ChunkCoordIntPair, ChunkMD> implements Iterable<ChunkMD>
+    public World getWorldObj()
     {
+        return getChunk().worldObj;
+    }
 
-        public Set(int i)
+    public int getWorldActualHeight()
+    {
+        return getChunk().worldObj.getActualHeight();
+    }
+
+    public Boolean getHasNoSky()
+    {
+        return getChunk().worldObj.provider.hasNoSky;
+    }
+
+    public ChunkCoordIntPair getCoord()
+    {
+        return coord;
+    }
+
+    public boolean isSlimeChunk()
+    {
+        return isSlimeChunk;
+    }
+
+    public static class ChunkMissingException extends RuntimeException
+    {
+        ChunkMissingException(ChunkCoordIntPair coord)
         {
-            super(i);
+            super("Chunk missing: " + coord);
         }
-
-        public Set(ChunkMD... chunkMDs)
-        {
-            for (ChunkMD chunkMD : chunkMDs)
-            {
-                super.put(chunkMD.coord, chunkMD);
-            }
-        }
-
-        public void put(ChunkMD chunkMd)
-        {
-            super.put(chunkMd.coord, chunkMd);
-        }
-
-        public void add(ChunkMD chunkMd)
-        {
-            super.put(chunkMd.coord, chunkMd);
-        }
-
-        public ChunkMD remove(ChunkMD chunkMd)
-        {
-            return super.remove(chunkMd.coord);
-        }
-
-        public ChunkMD remove(ChunkCoordIntPair coord)
-        {
-            return super.remove(coord);
-        }
-
-        @Override
-        public Iterator<ChunkMD> iterator()
-        {
-            return this.values().iterator();
-        }
-
     }
 
     public static class SimpleCacheLoader extends CacheLoader<ChunkCoordIntPair, Optional<ChunkMD>>

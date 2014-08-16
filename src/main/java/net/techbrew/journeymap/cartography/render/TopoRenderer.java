@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap.cartography.render;
 
-import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.cartography.IChunkRenderer;
 import net.techbrew.journeymap.cartography.RGB;
 import net.techbrew.journeymap.data.DataCache;
@@ -95,7 +94,7 @@ public class TopoRenderer extends SurfaceRenderer implements IChunkRenderer
             updateOptions();
 
             // Initialize ChunkSub slopes if needed
-            if (chunkSurfaceSlopes.getIfPresent(chunkMd.coord) == null)
+            if (chunkSurfaceSlopes.getIfPresent(chunkMd.getCoord()) == null)
             {
                 populateSlopes(chunkMd, null, chunkSurfaceHeights, chunkSurfaceSlopes);
             }
@@ -127,7 +126,7 @@ public class TopoRenderer extends SurfaceRenderer implements IChunkRenderer
         BlockCoordIntPair offsetS = new BlockCoordIntPair(0, 1);
         BlockCoordIntPair offsetE = new BlockCoordIntPair(1, 0);
 
-        Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.coord);
+        Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
         int h;
         float slope, hN, hW, hE, hS;
         for (int z = 0; z < 16; z++)
@@ -156,7 +155,7 @@ public class TopoRenderer extends SurfaceRenderer implements IChunkRenderer
     /**
      * Get the color for a block based on its location, neighbor slopes.
      */
-    protected int getBaseBlockColor(final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int y, int z)
+    protected int getBaseBlockColor(final ChunkMD chunkMd, final BlockMD blockMD, int x, int y, int z)
     {
         float orthoY = y >> 3;
         if (blockMD.isWater())
@@ -185,10 +184,10 @@ public class TopoRenderer extends SurfaceRenderer implements IChunkRenderer
         }
     }
 
-    protected int paintSurfaceAlpha(final Graphics2D g2D, final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int y, int z)
+    protected int paintSurfaceAlpha(final Graphics2D g2D, final ChunkMD chunkMd, final BlockMD blockMD, int x, int y, int z)
     {
 
-        int color = getBaseBlockColor(chunkMd, blockMD, neighbors, x, y, z);
+        int color = getBaseBlockColor(chunkMd, blockMD, x, y, z);
 
         // Paint depth layers
         getDepthColor(chunkMd, blockMD, x, y, z, g2D, false);
@@ -239,7 +238,7 @@ public class TopoRenderer extends SurfaceRenderer implements IChunkRenderer
             }
         }
 
-        int color = getBaseBlockColor(chunkMd, blockMD, null, x, down, z);
+        int color = getBaseBlockColor(chunkMd, blockMD, x, down, z);
 
         g2D.setComposite(OPAQUE);
         g2D.setPaint(RGB.paintOf(color));

@@ -39,7 +39,7 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
     protected Integer getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY,
                                           final HeightsCache chunkHeights)
     {
-        Integer[][] blockSliceHeights = chunkHeights.getIfPresent(chunkMd.coord);
+        Integer[][] blockSliceHeights = chunkHeights.getIfPresent(chunkMd.getCoord());
         if(blockSliceHeights==null)
         {
             return null;

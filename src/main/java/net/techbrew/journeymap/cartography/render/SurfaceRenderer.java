@@ -69,7 +69,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
             updateOptions();
 
             // Initialize ChunkSub slopes if needed
-            if (chunkSurfaceSlopes.getIfPresent(chunkMd.coord) == null)
+            if (chunkSurfaceSlopes.getIfPresent(chunkMd.getCoord()) == null)
             {
                 populateSlopes(chunkMd, null, chunkSurfaceHeights, chunkSurfaceSlopes);
             }

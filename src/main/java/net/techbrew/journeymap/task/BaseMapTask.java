@@ -9,10 +9,12 @@
 package net.techbrew.journeymap.task;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.ChunkRenderController;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.ChunkCoord;
@@ -22,22 +24,24 @@ import net.techbrew.journeymap.model.RegionImageCache;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public abstract class BaseMapTask implements ITask
 {
+    protected static ChunkCoordIntPair[] keepAliveOffsets = new ChunkCoordIntPair[]{new ChunkCoordIntPair(0,-1), new ChunkCoordIntPair(-1,0), new ChunkCoordIntPair(-1,-1)};
 
     final World world;
     final int dimension;
     final boolean underground;
     final Integer vSlice;
-    final ChunkMD.Set chunkMdSet;
+    final Collection<ChunkCoordIntPair> chunkCoords;
     final boolean flushCacheWhenDone;
     final ChunkRenderController renderController;
 
-    public BaseMapTask(ChunkRenderController renderController, World world, int dimension, boolean underground, Integer vSlice, ChunkMD.Set chunkMdSet, boolean flushCacheWhenDone)
+    public BaseMapTask(ChunkRenderController renderController, World world, int dimension, boolean underground, Integer vSlice, Collection<ChunkCoordIntPair> chunkCoords, boolean flushCacheWhenDone)
     {
         this.renderController = renderController;
         this.world = world;
@@ -52,7 +56,7 @@ public abstract class BaseMapTask implements ITask
         {
             throw new IllegalStateException("vSlice can't be null (-1) and task be underground");
         }
-        this.chunkMdSet = chunkMdSet;
+        this.chunkCoords = chunkCoords;
         this.flushCacheWhenDone = flushCacheWhenDone;
     }
 
@@ -64,7 +68,7 @@ public abstract class BaseMapTask implements ITask
         try
         {
             final long start = System.nanoTime();
-            final Iterator<ChunkMD> chunkIter = chunkMdSet.iterator();
+            final Iterator<ChunkCoordIntPair> chunkIter = chunkCoords.iterator();
             final ChunkImageCache chunkImageCache = new ChunkImageCache();
             final Logger logger = JourneyMap.getLogger();
 
@@ -100,19 +104,29 @@ public abstract class BaseMapTask implements ITask
                     throw new InterruptedException();
                 }
 
-                ChunkMD chunkMd = chunkIter.next();
-                if(chunkMd.hasChunk())
+                ChunkMD chunkMd = DataCache.instance().getChunkMD(chunkIter.next());
+                if(chunkMd!=null && chunkMd.hasChunk())
                 {
-                    BufferedImage chunkImage = renderController.getChunkImage(chunkMd, vSlice);
-                    ChunkCoord cCoord = ChunkCoord.fromChunkMD(jmWorldDir, chunkMd, vSlice, dimension);
-                    if (underground)
+                    try
                     {
-                        chunkImageCache.put(cCoord, Constants.MapType.underground, chunkImage);
+                        ChunkCoord cCoord = ChunkCoord.fromChunkMD(jmWorldDir, chunkMd, vSlice, dimension);
+                        BufferedImage chunkImage = renderController.getChunkImage(chunkMd, vSlice);
+                        if (chunkImage != null)
+                        {
+                            if (underground)
+                            {
+                                chunkImageCache.put(cCoord, Constants.MapType.underground, chunkImage);
+                            }
+                            else
+                            {
+                                chunkImageCache.put(cCoord, Constants.MapType.day, getSubimage(Constants.MapType.day, chunkImage));
+                                chunkImageCache.put(cCoord, Constants.MapType.night, getSubimage(Constants.MapType.night, chunkImage));
+                            }
+                        }
                     }
-                    else
+                    catch (ChunkMD.ChunkMissingException e)
                     {
-                        chunkImageCache.put(cCoord, Constants.MapType.day, getSubimage(Constants.MapType.day, chunkImage));
-                        chunkImageCache.put(cCoord, Constants.MapType.night, getSubimage(Constants.MapType.night, chunkImage));
+                        logger.info(e.getMessage());
                     }
                 }
             }
@@ -142,7 +156,7 @@ public abstract class BaseMapTask implements ITask
                 logger.fine(getClass().getSimpleName() + " mapped " + chunks + " chunks in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start) + "ms with flush:" + flushCacheWhenDone); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
-            chunkMdSet.clear();
+            chunkCoords.clear();
             chunkImageCache.clear();
             this.complete(false, false);
 
@@ -198,7 +212,7 @@ public abstract class BaseMapTask implements ITask
                 ", dimension=" + dimension +
                 ", underground=" + underground +
                 ", vSlice=" + vSlice +
-                ", chunkMdSet=" + chunkMdSet +
+                ", chunkCoords=" + chunkCoords +
                 ", flushCacheWhenDone=" + flushCacheWhenDone +
                 '}';
     }

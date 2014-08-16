@@ -60,7 +60,7 @@ public class ChunkRenderController
         BufferedImage chunkImage = new BufferedImage(underground ? 16 : 32, 16, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2D = RegionImageHandler.initRenderingHints(chunkImage.createGraphics());
 
-        int dimension = chunkMd.worldObj.provider.dimensionId;
+        int dimension = chunkMd.getWorldObj().provider.dimensionId;
         boolean renderOkay = false;
 
         long start = System.nanoTime();

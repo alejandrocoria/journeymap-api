@@ -37,7 +37,7 @@ public class EndRenderer extends CaveRenderer implements IChunkRenderer
     protected Integer getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY,
                                           final HeightsCache chunkHeights)
     {
-        Integer[][] blockSliceHeights = chunkHeights.getIfPresent(chunkMd.coord);
+        Integer[][] blockSliceHeights = chunkHeights.getIfPresent(chunkMd.getCoord());
         if(blockSliceHeights==null)
         {
             return null;
@@ -89,7 +89,7 @@ public class EndRenderer extends CaveRenderer implements IChunkRenderer
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warning(String.format("Couldn't get safe slice block height at %s, %s because: %s", (chunkMd.coord.chunkXPos << 4) + x, (chunkMd.coord.chunkZPos << 4) + z, e));
+            JourneyMap.getLogger().warning(String.format("Couldn't get safe slice block height at %s, %s because: %s", (chunkMd.getCoord().chunkXPos << 4) + x, (chunkMd.getCoord().chunkZPos << 4) + z, e));
             y = sliceMaxY;
         }
 
