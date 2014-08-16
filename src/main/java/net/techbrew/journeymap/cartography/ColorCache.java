@@ -248,7 +248,7 @@ public class ColorCache implements IResourceManagerReloadListener
     public Color getBiomeBlockColor(BiomeGenBase biome, BlockMD blockMD, int x, int y, int z) {
         Block block = blockMD.getBlock();
 
-        if(block instanceof BlockGrass || block instanceof BlockTallGrass) {
+        if(block instanceof BlockGrass || block instanceof BlockTallGrass || block instanceof BlockDoublePlant) {
             return getGrassColor(blockMD, biome, x, y, z);
         }
 

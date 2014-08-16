@@ -76,7 +76,6 @@ public class IconLoader
 
         try
         {
-
             if (logger.isLoggable(Level.FINE))
             {
                 logger.fine("Loading color for " + blockMD);
@@ -88,16 +87,12 @@ public class IconLoader
             {
                 BlockDoublePlant blockDoublePlant = ((BlockDoublePlant) blockMD.getBlock());
 
-                // Sunflower gets to be so special.
-                if ("sunflower".equals(BlockDoublePlant.field_149892_a[blockMD.meta]))
+                // Get the top icon
+                blockIcon = blockDoublePlant.func_149888_a(true, blockMD.meta & BlockDoublePlant.field_149892_a.length);
+                if(blockIcon.getIconName().contains("sunflower"))
                 {
                     // Sunflower front
                     blockIcon = blockDoublePlant.sunflowerIcons[0];
-                }
-                else
-                {
-                    // Get the top icon
-                    blockIcon = blockDoublePlant.func_149888_a(true, blockMD.meta);
                 }
             }
             else
@@ -119,12 +114,12 @@ public class IconLoader
                 color = getColorForIcon(blockMD, blockIcon);
             }
 
-            if (color == null)
+            if (blockIcon==null || color == null)
             {
                 failed.add(blockMD);
             }
-            return color;
 
+            return color;
         }
         catch (Throwable t)
         {
@@ -137,7 +132,6 @@ public class IconLoader
 
     Color getColorForIcon(BlockMD blockMD, IIcon icon)
     {
-
         Color color = null;
 
         try
