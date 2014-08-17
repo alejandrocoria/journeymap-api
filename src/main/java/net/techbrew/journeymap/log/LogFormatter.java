@@ -109,12 +109,12 @@ public class LogFormatter extends Formatter
 
         if (record.getLevel() == Level.SEVERE)
         {
-            ModInfo modInfo = JourneyMap.getInstance().getModInfo();
-            if (modInfo != null)
-            {
-                String action = shortClassName + "." + record.getSourceMethodName();
-                modInfo.reportEvent("Log: " + record.getLevel(), action, record.getMessage());
-            }
+//            ModInfo modInfo = JourneyMap.getInstance().getModInfo();
+//            if (modInfo != null)
+//            {
+//                String action = shortClassName + "." + record.getSourceMethodName();
+//                modInfo.reportEvent("Log: " + record.getLevel(), action, record.getMessage());
+//            }
         }
 
         checkErrors(record.getThrown());

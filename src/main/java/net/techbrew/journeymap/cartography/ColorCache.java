@@ -79,11 +79,11 @@ public class ColorCache implements IResourceManagerReloadListener
             else
             {
                 JourneyMap.getLogger().info("ResourcePack: " + lastResourcePack + " --> " + currentPack);
-                ModInfo modInfo = JourneyMap.getInstance().getModInfo();
-                if (modInfo != null)
-                {
-                    modInfo.reportEvent("Resource Pack", "Load", currentPack);
-                }
+//                ModInfo modInfo = JourneyMap.getInstance().getModInfo();
+//                if (modInfo != null)
+//                {
+//                    modInfo.reportEvent("Resource Pack", "Load", currentPack);
+//                }
                 reset();
                 lastResourcePack = currentPack;
                 iconLoader = new IconLoader();

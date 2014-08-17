@@ -439,14 +439,14 @@ public class JourneyMap
                 mc = FMLClientHandler.instance().getClient();
             }
 
-            if (modInfo != null)
-            {
-                if (System.currentTimeMillis() - lastModInfoKeepAlive > 600000) // 10 minutes
-                {
-                    lastModInfoKeepAlive = System.currentTimeMillis();
-                    modInfo.keepAlive();
-                }
-            }
+//            if (modInfo != null)
+//            {
+//                if (System.currentTimeMillis() - lastModInfoKeepAlive > 600000) // 10 minutes
+//                {
+//                    lastModInfoKeepAlive = System.currentTimeMillis();
+//                    modInfo.keepAlive();
+//                }
+//            }
 
             final boolean isDead = mc.currentScreen != null && mc.currentScreen instanceof GuiGameOver;
             if (mc.thePlayer != null && isDead && isMapping())
