@@ -19,7 +19,7 @@ http://journeymap.techbrew.net
 - New Feature: Actions -> Generate Color Palette lets you have a customizable, shareable, fixed set of colors that won't change when you switch resource packs.
 - Bugfix: Compatibility added for mods that have blocks registered with custom Item Stacks (TooManyBiomes, MultiWorld, etc.)
 - Bugfix: Keybindings get duplicated if overridden and then viewed in JourneyMap>Options>Help... screens
-- Bugfix: Colors wrong for double-tall flowers and melon/pumpkin stems
+- Bugfix: Colors wrong for double-tall plants and melon/pumpkin stems
 - Bugfix: Pressing CTRL (or Command) without another key is "remembered" for the next keypress.
 - Bugfix: Errors reported with some texturepacks (Sphax 128)
 - Bugfix: MiniMap coordinates off by one when location numbers were negative

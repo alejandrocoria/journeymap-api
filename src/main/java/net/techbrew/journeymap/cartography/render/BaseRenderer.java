@@ -95,14 +95,6 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         mapCaveLighting = coreProperties.mapCaveLighting.get();
         mapPlants = coreProperties.mapPlants.get();
         mapCrops = coreProperties.mapCrops.get();
-
-        // TODO: Move back to constructor
-        this.slopeMin = 0.2f;
-        this.slopeMax = 1.7f;
-        this.primaryDownslopeMultiplier = .65f;
-        this.primaryUpslopeMultiplier = 1.20f;
-        this.secondaryDownslopeMultiplier = .95f;
-        this.secondaryUpslopeMultiplier = 1.05f;
     }
 
     @Override
