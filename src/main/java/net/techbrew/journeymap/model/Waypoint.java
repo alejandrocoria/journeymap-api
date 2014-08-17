@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.Constants;
@@ -150,13 +151,13 @@ public class Waypoint implements Serializable
 
     public static Waypoint deathOf(Entity player)
     {
-        ChunkCoordinates cc = new ChunkCoordinates((int) player.posX, (int) player.posY, (int) player.posZ);
+        ChunkCoordinates cc = new ChunkCoordinates(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
         return at(cc, Type.Death, player.worldObj.provider.dimensionId);
     }
 
     public static Waypoint of(EntityPlayer player)
     {
-        ChunkCoordinates cc = new ChunkCoordinates((int) player.posX, (int) player.posY, (int) player.posZ);
+        ChunkCoordinates cc = new ChunkCoordinates(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
         return at(cc, Type.Normal, player.worldObj.provider.dimensionId);
     }
 

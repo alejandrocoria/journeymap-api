@@ -24,10 +24,7 @@ import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
-import net.techbrew.journeymap.model.BlockCoordIntPair;
-import net.techbrew.journeymap.model.EntityDTO;
-import net.techbrew.journeymap.model.MapOverlayState;
-import net.techbrew.journeymap.model.Waypoint;
+import net.techbrew.journeymap.model.*;
 import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -69,7 +66,8 @@ public class MapOverlay extends JmUI
     MapChat chat;
     Button buttonDayNight, buttonFollow, buttonZoomIn, buttonZoomOut;
     Button buttonAlert, buttonOptions, buttonActions, buttonClose;
-    Button buttonMode, buttonWaypointManager, buttonCaves;
+    Button buttonMode, buttonWaypointManager;
+    BooleanPropertyButton buttonCaves;
     ButtonList leftButtons;
     ButtonList rightButtons;
     Color bgColor = new Color(0x22, 0x22, 0x22);
@@ -304,9 +302,6 @@ public class MapOverlay extends JmUI
             buttonList.add(buttonFollow);
             if (FeatureManager.isAllowed(Feature.MapCaves))
             {
-                ;
-            }
-            {
                 buttonList.add(buttonCaves);
             }
             buttonList.add(buttonZoomIn);
@@ -316,7 +311,11 @@ public class MapOverlay extends JmUI
             buttonList.add(buttonActions);
             buttonList.add(buttonWaypointManager);
 
-            leftButtons = new ButtonList(buttonDayNight, buttonFollow, buttonCaves);
+            leftButtons = new ButtonList(buttonDayNight, buttonFollow);
+            if (FeatureManager.isAllowed(Feature.MapCaves))
+            {
+                leftButtons.add(buttonCaves);
+            }
             rightButtons = new ButtonList(buttonAlert, buttonWaypointManager, buttonOptions, buttonActions, buttonClose);
             Collections.reverse(rightButtons);
 
@@ -345,9 +344,8 @@ public class MapOverlay extends JmUI
         buttonZoomIn.setPosition(8, 32);
         buttonZoomOut.below(buttonZoomIn, 8).setX(8);
 
-        buttonCaves.setEnabled(!mc.theWorld.provider.hasNoSky && (DataCache.getPlayer().underground && FeatureManager.isAllowed(Feature.MapCaves)));
-        final boolean underground = DataCache.getPlayer().underground && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.showCaves.get();
-        buttonDayNight.setEnabled(!(underground));
+        buttonCaves.setEnabled(FeatureManager.isAllowed(Feature.MapCaves) && !mc.theWorld.provider.hasNoSky && DataCache.getPlayer().underground);
+        buttonDayNight.setEnabled(!DataCache.getPlayer().underground || !FeatureManager.isAllowed(Feature.MapCaves));
 
         leftButtons.layoutHorizontal(startX, startY, true, hgap);
         buttonDayNight.setPosition(startX, startY);
@@ -730,10 +728,7 @@ public class MapOverlay extends JmUI
             Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
             if (playerPixel != null)
             {
-                TextureImpl tex = fullMapProperties.zoomLevel.get() == 0 ? TextureCache.instance().getPlayerLocatorSmall() : TextureCache.instance().getPlayerLocator();
-                DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(DataCache.getPlayer());
-                drawStep.update(false, null, tex, 8);
-                gridRenderer.draw(xOffset, yOffset, 1f, getMapFontScale(), drawStep);
+                DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocatorSmall(), 8, drawScale);
             }
         }
 

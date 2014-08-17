@@ -12,51 +12,17 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
-- New Feature: MiniMap can now be sized anywhere from 64px to 1024px
-- New Feature: MiniMap can now be partly transparent
-- TODO: MiniMap can now be centered
-- TODO: Fire not showing.  This isn't for the changelog, just a reminder to myself.
-- New Feature: Actions -> Generate Color Palette lets you have a customizable, shareable, fixed set of colors that won't change when you switch resource packs.
-- Bugfix: Compatibility added for mods that have blocks registered with custom Item Stacks (TooManyBiomes, MultiWorld, etc.)
-- Bugfix: Keybindings get duplicated if overridden and then viewed in JourneyMap>Options>Help... screens
-- Bugfix: Colors wrong for double-tall plants and melon/pumpkin stems
-- Bugfix: Pressing CTRL (or Command) without another key is "remembered" for the next keypress.
-- Bugfix: Errors reported with some texturepacks (Sphax 128)
-- Bugfix: MiniMap coordinates off by one when location numbers were negative
-- Bugfix: Waypoint display coordinates off by one when location numbers were negative
-- Change: Minimap's Y coordinate now reflects feet position, not eye position
-- Change: Completely rewrote surface, cave, nether, and end renderers.
-- Change: New algorithm for determining chunks to map has significantly reduced the average MapPlayerTask workload.
--- TODO: Describe new options
-- Change: All possible map colors are now pre-loaded when the world is joined.
-- Change: Multiple object pools and caches added to reduce the number of new objects put on the heap
-- Change: The Minecraft Profiler (Shift+F3) now shows JourneyMap activity in these nodes:
--- root.tick.journeymap
--- root.gameRenderer.gui.journeymap
--- root.gameRenderer.level.FRenderLast.journeymap
+- Bugfix: Missing message keys fixed
+- Waypoint Editor used wrong coordinates when based on player's position.
 
-## Changelog for JourneyMap 4.0.4:
-- New Edition: "NoRadar" disables all radar features in Multiplayer
-- Change: Check for newer version is now asynchronous and won't cause game to freeze while waiting for the connection
-- Bugfix: Graceful recovery (instead of crash) when a config file isn't readable
 
-## Changelog for JourneyMap 4.0.3:
-- Bugfix: Fixed check to enable waypoint teleporting on local worlds
-- Change: Wayport teleport button now always visibile for remote worlds
+## Changelog for JourneyMap 4.1.0alpha2:
 
-## Changelog for JourneyMap 4.0.2:
-- Bugfix: (1.7.10 only)  Realms Server data folders were changing because of dynamic IP addresses.  Now using server name instead of socket-derived host name.
-- Bugfix: Waypoints didn't show on Full-screen Map
-- Bugfix: Block coordinates under mouse on Full-screen Map were wrong if you didn't use [Minecraft Options -> Video Settings -> Gui Scale: Normal]
-- Bugfix: Player icons wouldn't show on radar if "Show Pets" was enabled
-- Bugfix: Wolves and Ocelots wouldn't always display on radar
+- Bugfix: Surrounding chunks weren't force-updated far enough when underground
+- Bugfix: Self icon in full-screen map didn't show correct rotation
+- Bugfix: Nether/End renderers were throwing errors
 
-## Changelog for JourneyMap 4.0.1:
-- Critical bugfix for waypoints that use UTF-8 character encoding
-- Minor logging bugfix
-- Added a translation for Welsh (cy_GB), courtesy of Fergus Elliott
-
-## Changelog for JourneyMap 4.0.0:
+## Changelog for JourneyMap 4.1.0alpha1:
 
 ### Completely Rewritten Map Algorithms
 - Transparency and luminosity (especially under water) are vastly improved
@@ -79,11 +45,14 @@ http://journeymap.techbrew.net
 - Afer you restart Minecraft, the General Display Options screen or MiniMap Options screen will allow you to select your new custom icon set.
 
 ### MiniMap Improvements
+- New "Custom Size": Choose your own MiniMap size between 64px and 1024px
+- New transparency option: Choose to make the MiniMap partially transparent
 - Most MiniMap key combinations no longer require you to press CTRL / COMMMAND
 - MiniMap switches between cave/surface mapping more quickly
 - MiniMap refreshes neighboring tiles more quickly when zoomed in.
 - MiniMap zoom setting is now independent of Full-screen Map zoom setting.
 - MiniMap zoom setting and Full-screen Map zoom setting are now saved between sessions.
+- Minimap's Y coordinate now reflects feet position, not eye position
 
 ### New/Updated Translations
 - ru_RU has been updated courtesy of Vladislav Chaykin
@@ -93,7 +62,23 @@ http://journeymap.techbrew.net
 - General Display Options are now centered on-screen (for large displays)
 - Language files have been overhauled and cleaned up to make translation easier.
 - Added data caching / object pooling to reduce the number of resources created during mapping tasks.
-- Replaced thread management system to allow for task threads interruption
+
+### Bug Fixes:
+
+- Bugfix: Compatibility added for mods that have blocks registered with custom Item Stacks (TooManyBiomes, MultiWorld, etc.)
+- Bugfix: Keybindings get duplicated if overridden and then viewed in JourneyMap>Options>Help... screens
+- Bugfix: Colors wrong for double-tall plants and melon/pumpkin stems
+- Bugfix: Pressing CTRL (or Command) without another key is "remembered" for the next keypress.
+- Bugfix: Errors reported with some texturepacks (Sphax 128)
+- Bugfix: MiniMap coordinates off by one when location numbers were negative
+- Bugfix: Waypoint display coordinates off by one when location numbers were negative
+- Change: All possible map colors are now pre-loaded when the world is joined.
+- Change: Multiple object pools and caches added to reduce the number of new objects put on the heap
+- Change: Minimap switches between surface/cave map view much more quickly
+- Change: The Minecraft Profiler (Shift+F3) now shows JourneyMap activity in these nodes:
+-- root.tick.journeymap
+-- root.gameRenderer.gui.journeymap
+-- root.gameRenderer.level.FRenderLast.journeymap
 
 ### Known issues:
 

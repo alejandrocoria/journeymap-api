@@ -140,7 +140,7 @@ public class VersionCheck
                     // Announce newer version
                     if (!versionIsCurrent)
                     {
-                        ChatLog.announceI18N(Constants.getString("JourneyMap.new_version_available", versionAvailable)); //$NON-NLS-1$
+                        ChatLog.announceI18N(Constants.getString("jm.common.new_version_available", versionAvailable)); //$NON-NLS-1$
                         ChatLog.announceURL(JourneyMap.WEBSITE_URL, JourneyMap.WEBSITE_URL);
                     }
                 }

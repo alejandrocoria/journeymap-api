@@ -39,7 +39,7 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
     protected Integer getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY,
                                           final HeightsCache chunkHeights)
     {
-        Integer[][] blockSliceHeights = chunkHeights.getIfPresent(chunkMd.getCoord());
+        Integer[][] blockSliceHeights = chunkHeights.getUnchecked(chunkMd.getCoord());
         if(blockSliceHeights==null)
         {
             return null;
@@ -66,14 +66,16 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
                     break;
                 }
 
-                if (blockMDAbove.isAir() || blockMDAbove.hasTranparency() || blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky) || blockMDAbove.hasFlag(BlockMD.Flag.TransparentRoof))
+                if (blockMDAbove.isAir() || blockMDAbove.hasTranparency() || blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky))
                 {
                     if (!blockMD.isAir())
                     {
                         break;
                     }
                 }
+
                 y--;
+
                 blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
                 blockMDAbove = dataCache.getBlockMD(chunkMd, x, y + 1, z);
             }
@@ -83,6 +85,8 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
             JourneyMap.getLogger().warning("Couldn't get safe slice block height at " + x + "," + z + ": " + e);
             y = sliceMaxY;
         }
+
+        y = Math.max(0, y);
 
         blockSliceHeights[x][z] = y;
         return y;

@@ -19,6 +19,7 @@ import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.model.ChunkMD;
 
 import java.util.*;
@@ -110,8 +111,10 @@ public class MapPlayerTask extends BaseMapTask
 
         // Should we force the chunks around the player to be rendered?
         boolean forceNearbyChunks = false;
+        boolean caveSurfaceSwitched = false;
         if(lastUnderground==null || lastUnderground!=underground)
         {
+            caveSurfaceSwitched = true;
             forceNearbyChunks = true;
         }
         if (lastPlayerPos == null || !playerPos.equals(lastPlayerPos))
@@ -132,10 +135,11 @@ public class MapPlayerTask extends BaseMapTask
         }
 
         int forced = 0;
-        if(forceNearbyChunks)
+        if(underground && forceNearbyChunks)
         {
+            // TODO:  This has got to be done more efficiently.  Jeez.
             // Add peripheral coords around player
-            final int offset = 1;
+            final int offset = JourneyMap.getInstance().coreProperties.chunkOffset.get();
             for (int x = (player.chunkCoordX - offset); x <= (player.chunkCoordX + offset); x++)
             {
                 for (int z = (player.chunkCoordZ - offset); z <= (player.chunkCoordZ + offset); z++)

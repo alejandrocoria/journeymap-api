@@ -512,9 +512,9 @@ public class WaypointManager extends JmUI
             }
             else
             {
-                dimName = Constants.getString("Waypoint.dimension_all");
+                dimName = Constants.getString("jm.waypoint.dimension_all");
             }
-            displayString = Constants.getString("Waypoint.dimension", dimName);
+            displayString = Constants.getString("jm.waypoint.dimension", dimName);
         }
 
         @Override

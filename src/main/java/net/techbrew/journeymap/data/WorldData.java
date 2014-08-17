@@ -310,7 +310,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         @Override
         public String getDimensionName()
         {
-            return Constants.getString("JourneyMap.dimension", this.dimensionId);
+            return Constants.getString("jm.common.dimension", this.dimensionId);
         }
     }
 }
