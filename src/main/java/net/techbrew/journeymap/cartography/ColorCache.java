@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
-import modinfo.ModInfo;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -80,12 +79,12 @@ public class ColorCache implements IResourceManagerReloadListener
             else
             {
                 JourneyMap.getLogger().info("ResourcePack: " + lastResourcePack + " --> " + currentPack);
-                ModInfo modInfo = JourneyMap.getInstance().getModInfo();
-                if(modInfo!=null) {
-                    modInfo.reportEvent("Resource Pack", "Load", currentPack);
-                }
-    			reset();
-    			lastResourcePack = currentPack;
+//                ModInfo modInfo = JourneyMap.getInstance().getModInfo();
+//                if(modInfo!=null) {
+//                    modInfo.reportEvent("Resource Pack", "Load", currentPack);
+//                }
+                reset();
+                lastResourcePack = currentPack;
         		iconLoader = new IconLoader();
 
                 if(ColorPalette.paletteFileFound())
@@ -280,10 +279,10 @@ public class ColorCache implements IResourceManagerReloadListener
         Color color = getBiomeColor(blockMD, biome);
         if(color==null) {
             int leafColor = blockMD.getBlock().getRenderColor(blockMD.key.meta); // getRenderColor()
-            int biomeColor = BiomeGenBase.plains.getBiomeFoliageColor(x,y,z); // Default
+            int biomeColor = BiomeGenBase.plains.getBiomeFoliageColor(x, y, z); // Default
             try
             {
-                biomeColor = biome.getBiomeFoliageColor(x,y,z);
+                biomeColor = biome.getBiomeFoliageColor(x, y, z);
             }
             catch (Throwable t)
             {
