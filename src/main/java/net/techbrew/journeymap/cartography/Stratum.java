@@ -56,7 +56,14 @@ public class Stratum
             this.setY(y);
             this.setZ(z);
             this.setWater(blockMD.isWater());
-            this.setLightLevel((lightLevel != null) ? lightLevel : chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z));
+            if(blockMD.isLava())
+            {
+                this.setLightLevel(14);
+            }
+            else
+            {
+                this.setLightLevel((lightLevel != null) ? lightLevel : chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z));
+            }
             this.setLightOpacity(chunkMd.getLightOpacity(blockMD, x, y, z));
             setDayColor(null);
             setNightColor(null);

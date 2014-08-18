@@ -271,13 +271,20 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                 // Override stratum color for bathymetry.  I don't like doing this here.
                 if(mapBathymetry && waterHeight!=null)
                 {
-                    strata.determineWaterColor(chunkMd, x, waterHeight, z);
-                    stratum.setWater(true);
-                    setStratumColors(stratum, 0, strata.getWaterColor(), true, false, false);
                     strata.setRenderDayColor(stratum.getDayColor());
                     if (!cavePrePass)
                     {
                         strata.setRenderNightColor(stratum.getNightColor());
+                    }
+
+                    strata.determineWaterColor(chunkMd, x, waterHeight, z);
+                    stratum.setWater(true);
+                    setStratumColors(stratum, 0, strata.getWaterColor(), true, false, false);
+
+                    strata.setRenderDayColor(RGB.blendWith(strata.getRenderDayColor(), stratum.getDayColor(), .9f)); // TODO: Use light attenuation
+                    if (!cavePrePass)
+                    {
+                        strata.setRenderNightColor(RGB.blendWith(strata.getRenderNightColor(), stratum.getNightColor(), .9f)); // TODO: Use light attenuation
                     }
                 }
                 // Simple surface render

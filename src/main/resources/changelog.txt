@@ -12,6 +12,11 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Change: Derpy light level data for lava in Nether is now ignored.
+- Change: "Show Ocean Floor" is now "Show Bathymetry"
+- Change: Bathymetry now blends in the color of the material below the water.
+
+## Changelog for JourneyMap 4.1.0alpha4:
 - New UI:  General Display / Map Style... lets you:
 -- Toggle contour mapping of the ocean floor (bathymetry)
 -- Toggle transparency of blocks
