@@ -9,6 +9,7 @@
 package net.techbrew.journeymap;
 
 import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -182,6 +183,17 @@ public class JourneyMap
 
             // Trigger statics on EntityList
             EntityRegistry.instance();
+
+            // TODO: REMOVE AFTER DEBUG BOTANIA
+//            RenderingRegistry.registerBlockHandler(new RenderAltar());
+//            RenderingRegistry.registerBlockHandler(new RenderSpecialFlower(LibRenderIDs.idSpecialFlower));
+//            RenderingRegistry.registerBlockHandler(new RenderSpreader());
+//            RenderingRegistry.registerBlockHandler(new RenderPool());
+//            RenderingRegistry.registerBlockHandler(new RenderPylon());
+//            RenderingRegistry.registerBlockHandler(new RenderMiniIsland());
+//            RenderingRegistry.registerBlockHandler(new RenderTinyPotato());
+//            RenderingRegistry.registerBlockHandler(new RenderSpawnerClaw());
+
 
             // Load properties
             coreProperties = new CoreProperties().load();

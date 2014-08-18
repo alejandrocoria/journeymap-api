@@ -110,16 +110,15 @@ public class MapPlayerTask extends BaseMapTask
         }
 
         // Should we force the chunks around the player to be rendered?
-        boolean forceNearbyChunks = false;
-        boolean caveSurfaceSwitched = false;
+        boolean sliceChanged = false;
         if(lastUnderground==null || lastUnderground!=underground)
         {
-            caveSurfaceSwitched = true;
-            forceNearbyChunks = true;
+            sliceChanged = true;
         }
-        if (lastPlayerPos == null || !playerPos.equals(lastPlayerPos))
+
+        if(lastPlayerPos==null || lastPlayerPos.posY != playerPos.posY)
         {
-            forceNearbyChunks = true;
+            sliceChanged = true;
         }
 
         // Update last values
@@ -134,10 +133,44 @@ public class MapPlayerTask extends BaseMapTask
             queuedChunks.clear();
         }
 
-        int forced = 0;
-        if(underground && forceNearbyChunks)
+        // Always add player's coords
+        queuedCoords.add(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ));
+
+        // Add chunks not recently rendered
+        int neverRendered = 0;
+        int stale = 0;
+        final long expiryLength = JourneyMap.getInstance().coreProperties.chunkPoll.get() * 5;
+        final long maxStale = 200;
+        long now = System.currentTimeMillis();
+        Set<ChunkCoordIntPair> allCachedCoords = DataCache.instance().getCachedChunkCoordinates();
+        for(ChunkCoordIntPair coord : allCachedCoords)
         {
-            // TODO:  This has got to be done more efficiently.  Jeez.
+            if(!queuedCoords.contains(coord))
+            {
+                ChunkMD chunkMD = dataCache.getChunkMD(coord, false);
+                if (chunkMD != null)
+                {
+                    long lastRendered = chunkMD.getLastRendered();
+                    if( now - lastRendered > expiryLength)
+                    {
+                        if(lastRendered==0L)
+                        {
+                            queuedCoords.add(coord);
+                            neverRendered++;
+                        }
+                        else if(stale<maxStale)
+                        {
+                            queuedCoords.add(coord);
+                            stale++;
+                        }
+                    }
+                }
+            }
+        }
+
+        int forced = 0;
+        if(sliceChanged)
+        {
             // Add peripheral coords around player
             final int offset = JourneyMap.getInstance().coreProperties.chunkOffset.get();
             for (int x = (player.chunkCoordX - offset); x <= (player.chunkCoordX + offset); x++)
@@ -149,21 +182,12 @@ public class MapPlayerTask extends BaseMapTask
                 }
             }
         }
-        else
-        {
-            // Add just player's coords
-            queuedCoords.add(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ));
-            forced++;
-        }
 
         // Load em if you've got em, ensure they're refreshed
         ChunkMD chunkMd = null;
         int maxChunks = 1024;
 
         // Get queued chunks
-        int keptAlive = 0;
-        int keptAliveMissed = 0;
-        int keptAliveUnnecessary = 0;
         int missed = 0;
         final TreeSet<ChunkCoordIntPair> renderCoords = new TreeSet<ChunkCoordIntPair>(chunkDistanceComparator);
 
@@ -179,28 +203,6 @@ public class MapPlayerTask extends BaseMapTask
             if (chunkMd != null)
             {
                 renderCoords.add(coord);
-
-                // Ensure chunks north, west, nw are kept alive for slope calculations
-                for(ChunkCoordIntPair keepAliveOffset : keepAliveOffsets)
-                {
-                    ChunkCoordIntPair keepAliveCoord = new ChunkCoordIntPair(coord.chunkXPos + keepAliveOffset.chunkXPos, coord.chunkZPos + keepAliveOffset.chunkZPos);
-                    if (!renderCoords.contains(keepAliveCoord))
-                    {
-                        ChunkMD keepAliveChunk = dataCache.getChunkMD(keepAliveCoord, false);
-                        if(keepAliveChunk!=null)
-                        {
-                            keptAlive++;
-                        }
-                        else
-                        {
-                            keptAliveMissed++;
-                        }
-                    }
-                    else
-                    {
-                        keptAliveUnnecessary++;
-                    }
-                }
             }
             else
             {
@@ -217,7 +219,7 @@ public class MapPlayerTask extends BaseMapTask
         else
         {
             // TODO: log fine or some kinda cool stat
-            //System.out.println(String.format("Chunks to Render: %d (Queued: %d, Forced: %d, Missed: %d), Kept Alive: %d, Kept Alive Missed: %d, Kept Alive Unnecessary: %d", renderChunks.size(), queuedSize, forced, missed, keptAlive, keptAliveMissed, keptAliveUnnecessary));
+            System.out.println(String.format("Chunks to Render: %d (Queued: %d, New: %d, Forced: %d, Stale: %d)", renderCoords.size(), queuedCoords.size(), neverRendered, forced, stale));
 
             // TODO: Always map surface
             final Integer vSlice = underground ? lastPlayerPos.posY : null;

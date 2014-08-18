@@ -25,8 +25,10 @@ import net.techbrew.journeymap.properties.CoreProperties;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -36,48 +38,75 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<ChunkCoordIntPair, Optional<ChunkMD>>
 {
-    static final int BLACK = Color.black.getRGB();
-    static final int VOID = RGB.toInteger(17, 12, 25);
-    public static AlphaComposite OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
-    protected final float[] defaultFog = new float[]{0, 0, .1f};
-    protected DataCache dataCache = DataCache.instance();
-    protected CoreProperties coreProperties = JourneyMap.getInstance().coreProperties;
+    protected static final int COLOR_BLACK = Color.black.getRGB();
+    protected static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
+    protected static final AlphaComposite ALPHA_OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
+    protected static final float[] DEFAULT_FOG = new float[]{0, 0, .1f};
+
+    protected final DataCache dataCache = DataCache.instance();
+    protected final CoreProperties coreProperties = JourneyMap.getInstance().coreProperties;
+    protected final BlockColumnPropertiesCache columnPropertiesCache;
+
+    public static final String PROP_WATER_HEIGHT = "waterHeight";
+
+    // Updated in updateOptions()
     protected boolean mapBathymetry;
     protected boolean mapTransparency;
     protected boolean mapCaveLighting;
     protected boolean mapAntialiasing;
     protected boolean mapCrops;
     protected boolean mapPlants;
-    volatile AtomicLong badBlockCount = new AtomicLong(0);
-    ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
-    ArrayList<BlockCoordIntPair> secondarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
+    protected float[] ambientColor;
 
-    protected float slopeMin;
-    protected float slopeMax;
-    protected float primaryDownslopeMultiplier;
-    protected float primaryUpslopeMultiplier;
-    protected float secondaryDownslopeMultiplier;
-    protected float secondaryUpslopeMultiplier;
+    protected volatile AtomicLong badBlockCount = new AtomicLong(0);
+    protected ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
+    protected ArrayList<BlockCoordIntPair> secondarySlopeOffsets = new ArrayList<BlockCoordIntPair>(4);
 
-    protected float moonlightLevel = 3.5f;
+    // Need to go in properties
+    protected float shadingSlopeMin; // Range: 0-1
+    protected float shadingSlopeMax; // Range: 0-?
+    protected float shadingPrimaryDownslopeMultiplier; // Range: 0-1
+    protected float shadingPrimaryUpslopeMultiplier; // Range: 1-?
+    protected float shadingSecondaryDownslopeMultiplier; // Range: 0-1
+    protected float shadingSecondaryUpslopeMultiplier; // Range: 1-?
+
+    protected float tweakMoonlightLevel; // Range: 0 - 15
+    protected float tweakBrightenLightsourceBlock; // Range: 0 - 1.5
+    protected float tweakBlendShallowWater; // Range: 0 - 1
+    protected float tweakMinimumDarkenNightWater; // Range: 0 - 1
+    protected int tweakSurfaceAmbientColor; // Range: int rgb
+    protected int tweakCaveAmbientColor; // Range: int rgb
+    protected int tweakNetherAmbientColor; // Range: int rgb
+    protected int tweakEndAmbientColor; // Range: int rgb
 
     public BaseRenderer()
     {
         updateOptions();
 
-        this.slopeMin = 0.2f;
-        this.slopeMax = 1.7f;
-        this.primaryDownslopeMultiplier = .65f;
-        this.primaryUpslopeMultiplier = 1.20f;
-        this.secondaryDownslopeMultiplier = .95f;
-        this.secondaryUpslopeMultiplier = 1.05f;
+        columnPropertiesCache = new BlockColumnPropertiesCache("columnProps");
 
-        primarySlopeOffsets.clear();
+        // TODO: Put in properties
+        this.shadingSlopeMin = 0.2f;
+        this.shadingSlopeMax = 1.7f;
+        this.shadingPrimaryDownslopeMultiplier = .65f;
+        this.shadingPrimaryUpslopeMultiplier = 1.20f;
+        this.shadingSecondaryDownslopeMultiplier = .95f;
+        this.shadingSecondaryUpslopeMultiplier = 1.05f;
+
+        this.tweakMoonlightLevel = 3.5f;
+        this.tweakBrightenLightsourceBlock = 1.2f;
+        this.tweakBlendShallowWater = .15f;
+        this.tweakMinimumDarkenNightWater = .25f;
+        this.tweakSurfaceAmbientColor = 0x00001A;
+        this.tweakCaveAmbientColor = 0x000000;
+        this.tweakNetherAmbientColor = 0x330808;
+        this.tweakEndAmbientColor = 0x00001A;
+
+        // Slope offsets
         primarySlopeOffsets.add(new BlockCoordIntPair(0, -1)); // North
         primarySlopeOffsets.add(new BlockCoordIntPair(-1, -1)); // NorthWest
         primarySlopeOffsets.add(new BlockCoordIntPair(-1, 0)); // West
 
-        secondarySlopeOffsets.clear();
         secondarySlopeOffsets.add(new BlockCoordIntPair(-1, -2)); // North of NorthWest
         secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -1)); // West of NorthWest
         secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -2)); // NorthWest of NorthWest
@@ -95,12 +124,15 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         mapCaveLighting = coreProperties.mapCaveLighting.get();
         mapPlants = coreProperties.mapPlants.get();
         mapCrops = coreProperties.mapCrops.get();
+
+        // Subclasses should override
+        this.ambientColor = new float[]{0,0,0};
     }
 
     @Override
-    public float[] getFogColor()
+    public float[] getAmbientColor()
     {
-        return defaultFog;
+        return DEFAULT_FOG;
     }
 
     @Override
@@ -115,29 +147,29 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         float daylightDiff = Math.max(1, Math.max(stratum.getLightLevel(), 15 - lightAttenuation)) / 15f;
 
         // Nightlight is the greater of moon light (4) attenuated through the stack and the stratum's inherant light level
-        float nightLightDiff = Math.max(moonlightLevel, Math.max(stratum.getLightLevel(), moonlightLevel - lightAttenuation)) / 15f;
+        float nightLightDiff = Math.max(tweakMoonlightLevel, Math.max(stratum.getLightLevel(), tweakMoonlightLevel - lightAttenuation)) / 15f;
 
         int basicColor = stratum.isWater() ? waterColor : stratum.getBlockMD().getColor(stratum.getChunkMd(), stratum.getX(), stratum.getY(), stratum.getZ());
         if (stratum.getBlockMD().getBlock() == Blocks.glowstone || stratum.getBlockMD().getBlock() == Blocks.lit_redstone_lamp)
         {
-            basicColor = RGB.darken(basicColor, 1.2f); // magic # to match how it looks in game
+            basicColor = RGB.darken(basicColor, tweakBrightenLightsourceBlock); // magic #
         }
 
-        if (waterAbove && waterColor != null)
+        if ((waterAbove) && waterColor != null)
         {
             // Blend day color with watercolor above, darken for daylight filtered down
             stratum.setDayColor(RGB.blendWith(waterColor, RGB.darken(basicColor, Math.max(daylightDiff, nightLightDiff)), Math.max(daylightDiff, nightLightDiff)));
-            stratum.setDayColor(RGB.blendWith(stratum.getDayColor(), waterColor, .15f)); // cheat to get bluer blend in shallow water
+            stratum.setDayColor(RGB.blendWith(stratum.getDayColor(), waterColor, tweakBlendShallowWater)); // magic #
 
             // Darken for night light and blend with watercolor above
-            stratum.setNightColor(RGB.darken(stratum.getDayColor(), Math.max(nightLightDiff, .25f)));
+            stratum.setNightColor(RGB.darken(stratum.getDayColor(), Math.max(nightLightDiff, tweakMinimumDarkenNightWater)));
         }
         else
         {
             // Just darken based on light levels
             stratum.setDayColor(RGB.darken(basicColor, daylightDiff));
 
-            stratum.setNightColor(RGB.darkenFog(basicColor, nightLightDiff, getFogColor()));
+            stratum.setNightColor(RGB.darkenAmbient(basicColor, nightLightDiff, getAmbientColor()));
         }
 
         if (underground)
@@ -164,9 +196,9 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     protected void paintDimOverlay(int x, int z, float alpha, final Graphics2D g2D)
     {
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-        g2D.setPaint(RGB.paintOf(BLACK));
+        g2D.setPaint(RGB.paintOf(COLOR_BLACK));
         g2D.fillRect(x, z, 1, 1);
-        g2D.setComposite(OPAQUE);
+        g2D.setComposite(ALPHA_OPAQUE);
     }
 
     /**
@@ -175,7 +207,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     public void paintBlock(final int x, final int z, final int color,
                            final Graphics2D g2D)
     {
-        g2D.setComposite(OPAQUE);
+        g2D.setComposite(ALPHA_OPAQUE);
         g2D.setPaint(RGB.paintOf(color));
         g2D.fillRect(x, z, 1, 1);
     }
@@ -185,8 +217,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      */
     public void paintVoidBlock(final int x, final int z, final Graphics2D g2D)
     {
-        g2D.setComposite(OPAQUE);
-        g2D.setPaint(RGB.paintOf(VOID));
+        g2D.setComposite(ALPHA_OPAQUE);
+        g2D.setPaint(RGB.paintOf(COLOR_VOID));
         g2D.fillRect(x, z, 1, 1);
     }
 
@@ -195,8 +227,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      */
     public void paintBlackBlock(final int x, final int z, final Graphics2D g2D)
     {
-        g2D.setComposite(OPAQUE);
-        g2D.setPaint(RGB.paintOf(BLACK));
+        g2D.setComposite(ALPHA_OPAQUE);
+        g2D.setPaint(RGB.paintOf(COLOR_BLACK));
         g2D.fillRect(x, z, 1, 1);
     }
 
@@ -249,11 +281,11 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                 slope = primarySlope;
                 if (slope < 1)
                 {
-                    slope *= primaryDownslopeMultiplier;
+                    slope *= shadingPrimaryDownslopeMultiplier;
                 }
                 else if (slope > 1)
                 {
-                    slope *= primaryUpslopeMultiplier;
+                    slope *= shadingPrimaryUpslopeMultiplier;
                 }
 
                 // Calculate secondary slope
@@ -263,11 +295,11 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 
                     if (secondarySlope > primarySlope)
                     {
-                        slope *= secondaryUpslopeMultiplier;
+                        slope *= shadingSecondaryUpslopeMultiplier;
                     }
                     else if (secondarySlope < primarySlope)
                     {
-                        slope *= secondaryDownslopeMultiplier;
+                        slope *= shadingSecondaryDownslopeMultiplier;
                     }
                 }
 
@@ -277,7 +309,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                     slope = 1f;
                 }
 
-                slopes[x][z] = Math.min(slopeMax, Math.max(slopeMin, slope));
+                slopes[x][z] = Math.min(shadingSlopeMax, Math.max(shadingSlopeMin, slope));
             }
         }
 
@@ -449,6 +481,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         try
         {
             BlockMD blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
+            boolean propUnsetWaterHeight = true;
 
             while (y > 0)
             {
@@ -457,6 +490,11 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                     if(!mapBathymetry)
                     {
                         break;
+                    }
+                    else if(propUnsetWaterHeight)
+                    {
+                        setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, x, z);
+                        propUnsetWaterHeight = false;
                     }
                 }
                 else if(!blockMD.isAir() && !blockMD.hasFlag(BlockMD.Flag.NoShadow))
@@ -534,6 +572,9 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         return builder;
     }
 
+    /**
+     * Cache for storing block heights in a 2-dimensional array, keyed to chunk coordinates.
+     */
     public class HeightsCache extends ForwardingLoadingCache<ChunkCoordIntPair, Integer[][]>
     {
         final LoadingCache<ChunkCoordIntPair, Integer[][]> internal;
@@ -559,6 +600,9 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
     }
 
+    /**
+     * Cache for storing block slopes in a 2-dimensional array, keyed to chunk coordinates.
+     */
     public class SlopesCache extends ForwardingLoadingCache<ChunkCoordIntPair, Float[][]>
     {
         final LoadingCache<ChunkCoordIntPair, Float[][]> internal;
@@ -579,6 +623,75 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 
         @Override
         protected LoadingCache<ChunkCoordIntPair, Float[][]> delegate()
+        {
+            return internal;
+        }
+    }
+
+    protected void setColumnProperty(String name, Serializable value, ChunkMD chunkMD, int x, int z)
+    {
+        getColumnProperties(chunkMD, x, z, true).put(name, value);
+    }
+
+    protected <V extends Serializable> V getColumnProperty(String name, V defaultValue, ChunkMD chunkMD, int x, int z)
+    {
+        HashMap<String,Serializable> props = getColumnProperties(chunkMD, x, z);
+        V value = null;
+        if(props!=null)
+        {
+            value = (V) props.get(name);
+        }
+        return (value!=null) ? value : defaultValue;
+    }
+
+    protected HashMap<String,Serializable> getColumnProperties(ChunkMD chunkMD, int x, int z)
+    {
+        return getColumnProperties(chunkMD, x, z, false);
+    }
+
+    protected HashMap<String,Serializable> getColumnProperties(ChunkMD chunkMD, int x, int z, boolean forceCreation)
+    {
+        try
+        {
+            HashMap<String,Serializable>[][] propArr = columnPropertiesCache.get(chunkMD.getCoord());
+            HashMap<String,Serializable> props = propArr[x][z];
+            if(props==null && forceCreation)
+            {
+                props = new HashMap<String,Serializable>();
+                propArr[x][z] = props;
+            }
+            return props;
+        }
+        catch (Exception e)
+        {
+            JourneyMap.getLogger().warning(e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Cache for storing block properties in a 2-dimensional array, keyed to chunk coordinates.
+     */
+    public class BlockColumnPropertiesCache extends ForwardingLoadingCache<ChunkCoordIntPair, HashMap<String,Serializable>[][]>
+    {
+        final LoadingCache<ChunkCoordIntPair, HashMap<String,Serializable>[][]> internal;
+
+        protected BlockColumnPropertiesCache(String name)
+        {
+            this.internal = getCacheBuilder().build(new CacheLoader<ChunkCoordIntPair, HashMap<String,Serializable>[][]>()
+            {
+                @Override
+                public HashMap<String,Serializable>[][] load(ChunkCoordIntPair key) throws Exception
+                {
+                    //JourneyMap.getLogger().info("Initialized column properties for chunk " + key);
+                    return new HashMap[16][16];
+                }
+            });
+            DataCache.instance().addPrivateCache(name, this);
+        }
+
+        @Override
+        protected LoadingCache<ChunkCoordIntPair, HashMap<String,Serializable>[][]> delegate()
         {
             return internal;
         }

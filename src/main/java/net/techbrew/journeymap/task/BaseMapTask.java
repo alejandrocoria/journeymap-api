@@ -22,6 +22,7 @@ import net.techbrew.journeymap.model.ChunkImageCache;
 import net.techbrew.journeymap.model.ChunkMD;
 import net.techbrew.journeymap.model.RegionImageCache;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Collection;
@@ -40,6 +41,9 @@ public abstract class BaseMapTask implements ITask
     final Collection<ChunkCoordIntPair> chunkCoords;
     final boolean flushCacheWhenDone;
     final ChunkRenderController renderController;
+
+    private static BufferedImage blankChunkImage = null;
+    private static BufferedImage blankChunkImageUnderground = null;
 
     public BaseMapTask(ChunkRenderController renderController, World world, int dimension, boolean underground, Integer vSlice, Collection<ChunkCoordIntPair> chunkCoords, boolean flushCacheWhenDone)
     {
@@ -113,16 +117,23 @@ public abstract class BaseMapTask implements ITask
                         BufferedImage chunkImage = renderController.getChunkImage(chunkMd, vSlice);
                         if (chunkImage != null)
                         {
-                            if (underground)
-                            {
-                                chunkImageCache.put(cCoord, Constants.MapType.underground, chunkImage);
-                            }
-                            else
-                            {
-                                chunkImageCache.put(cCoord, Constants.MapType.day, getSubimage(Constants.MapType.day, chunkImage));
-                                chunkImageCache.put(cCoord, Constants.MapType.night, getSubimage(Constants.MapType.night, chunkImage));
-                            }
+                            chunkMd.setRendered();
                         }
+                        else
+                        {
+                            chunkImage = underground ? getBlankChunkImageUnderground() : getBlankChunkImage();
+                        }
+
+                        if (underground)
+                        {
+                            chunkImageCache.put(cCoord, Constants.MapType.underground, chunkImage);
+                        }
+                        else
+                        {
+                            chunkImageCache.put(cCoord, Constants.MapType.day, getSubimage(Constants.MapType.day, chunkImage));
+                            chunkImageCache.put(cCoord, Constants.MapType.night, getSubimage(Constants.MapType.night, chunkImage));
+                        }
+
                     }
                     catch (ChunkMD.ChunkMissingException e)
                     {
@@ -202,6 +213,36 @@ public abstract class BaseMapTask implements ITask
                 return image.getSubimage(0, 0, 16, 16);
             }
         }
+    }
+
+    private BufferedImage getBlankChunkImage()
+    {
+        if (blankChunkImage == null)
+        {
+            blankChunkImage = new BufferedImage(32, 16, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2D = blankChunkImage.createGraphics();
+            g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F));
+            g2D.setColor(Color.white);
+            g2D.fillRect(0, 0, 16, 16);
+            g2D.setColor(Color.black);
+            g2D.fillRect(16, 0, 16, 16);
+            g2D.dispose();
+        }
+        return blankChunkImage;
+    }
+
+    private BufferedImage getBlankChunkImageUnderground()
+    {
+        if (blankChunkImageUnderground == null)
+        {
+            blankChunkImageUnderground = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2D = blankChunkImageUnderground.createGraphics();
+            g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F));
+            g2D.setColor(Color.black);
+            g2D.fillRect(0, 0, 16, 16);
+            g2D.dispose();
+        }
+        return blankChunkImageUnderground;
     }
 
     @Override

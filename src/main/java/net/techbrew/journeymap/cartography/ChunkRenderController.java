@@ -39,8 +39,7 @@ public class ChunkRenderController
     private final IChunkRenderer endRenderer;
     private final IChunkRenderer overWorldSurfaceRenderer;
     private final IChunkRenderer overWorldCaveRenderer;
-    private BufferedImage blankChunkImage = null;
-    private BufferedImage blankChunkImageUnderground = null;
+
 
     public ChunkRenderController()
     {
@@ -137,7 +136,7 @@ public class ChunkRenderController
                 JourneyMap.getLogger().log(Level.WARNING, "Chunk didn't render for dimension " + dimension + ": " + chunkMd);
             }
             // Use blank
-            chunkImage = underground ? getBlankChunkImageUnderground() : getBlankChunkImage();
+            // chunkImage = underground ? getBlankChunkImageUnderground() : getBlankChunkImage();
         }
 
         if (fineLogging)
@@ -159,35 +158,4 @@ public class ChunkRenderController
         return chunkImage;
 
     }
-
-    private BufferedImage getBlankChunkImage()
-    {
-        if (blankChunkImage == null)
-        {
-            blankChunkImage = new BufferedImage(32, 16, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2D = blankChunkImage.createGraphics();
-            g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F));
-            g2D.setColor(Color.white);
-            g2D.fillRect(0, 0, 16, 16);
-            g2D.setColor(Color.black);
-            g2D.fillRect(16, 0, 16, 16);
-            g2D.dispose();
-        }
-        return blankChunkImage;
-    }
-
-    private BufferedImage getBlankChunkImageUnderground()
-    {
-        if (blankChunkImageUnderground == null)
-        {
-            blankChunkImageUnderground = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2D = blankChunkImageUnderground.createGraphics();
-            g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8F));
-            g2D.setColor(Color.black);
-            g2D.fillRect(0, 0, 16, 16);
-            g2D.dispose();
-        }
-        return blankChunkImageUnderground;
-    }
-
 }

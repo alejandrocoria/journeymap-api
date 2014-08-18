@@ -240,7 +240,7 @@ public class TopoRenderer extends SurfaceRenderer implements IChunkRenderer
 
         int color = getBaseBlockColor(chunkMd, blockMD, x, down, z);
 
-        g2D.setComposite(OPAQUE);
+        g2D.setComposite(ALPHA_OPAQUE);
         g2D.setPaint(RGB.paintOf(color));
         g2D.fillRect(x, z, 1, 1);
     }

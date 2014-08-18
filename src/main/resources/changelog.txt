@@ -12,9 +12,17 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New UI:  General Display / Map Style... lets you:
+-- Toggle contour mapping of the ocean floor (bathymetry)
+-- Toggle transparency of blocks
+-- Toggle mapping of plants (AKA Nude Maps)
+-- Toggle mapping of crops
+- Bugfix from Alpha 3:  Full-screen map player locator (self) didn't move when panning the map.
+- Change: Significant changes in the way chunk data is cached/checked for being stale.  Should provide more consistent map coverage.  This may make things unstable, perform badly, use insane amounts or memory, or possibly work as intended.
+
+## Changelog for JourneyMap 4.1.0alpha3:
 - Bugfix: Missing message keys fixed
 - Waypoint Editor used wrong coordinates when based on player's position.
-
 
 ## Changelog for JourneyMap 4.1.0alpha2:
 

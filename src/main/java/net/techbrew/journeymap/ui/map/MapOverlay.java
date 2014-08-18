@@ -728,7 +728,7 @@ public class MapOverlay extends JmUI
             Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
             if (playerPixel != null)
             {
-                DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocatorSmall(), 8, drawScale);
+                DrawUtil.drawEntity(playerPixel.getX() + xOffset, playerPixel.getY() + yOffset, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocatorSmall(), 8, drawScale);
             }
         }
 

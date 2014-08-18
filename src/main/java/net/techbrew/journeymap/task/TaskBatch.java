@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.model.ChunkMD;
 
 import java.io.File;
 import java.util.List;
@@ -65,6 +66,10 @@ public class TaskBatch implements ITask
                     JourneyMap.getLogger().fine("Batching task: " + task);
                 }
                 task.performTask(mc, jm, jmWorldDir, threadLogging);
+            }
+            catch (ChunkMD.ChunkMissingException e)
+            {
+                JourneyMap.getLogger().warning(e.getMessage());
             }
             catch (Throwable t)
             {

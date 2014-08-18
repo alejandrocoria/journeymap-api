@@ -46,6 +46,13 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
         DataCache.instance().addChunkMDListener(this);
     }
 
+    @Override
+    protected void updateOptions()
+    {
+        super.updateOptions();
+        this.ambientColor = RGB.floats(tweakSurfaceAmbientColor);
+    }
+
     /**
      * Render blocks in the chunk for the standard world.
      */
@@ -99,7 +106,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 
         try
         {
-            g2D.setComposite(OPAQUE);
+            g2D.setComposite(ALPHA_OPAQUE);
             int sliceMaxY = 0;
 
             if (cavePrePass)
@@ -254,8 +261,27 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
             {
                 stratum = strata.nextUp(this, true);
 
+                // Bathymetry check
+                Integer waterHeight = null;
+                if(mapBathymetry)
+                {
+                    waterHeight = getColumnProperty(PROP_WATER_HEIGHT, null, chunkMd, x, z);
+                }
+
+                // Override stratum color for bathymetry.  I don't like doing this here.
+                if(mapBathymetry && waterHeight!=null)
+                {
+                    strata.determineWaterColor(chunkMd, x, waterHeight, z);
+                    stratum.setWater(true);
+                    setStratumColors(stratum, 0, strata.getWaterColor(), true, false, false);
+                    strata.setRenderDayColor(stratum.getDayColor());
+                    if (!cavePrePass)
+                    {
+                        strata.setRenderNightColor(stratum.getNightColor());
+                    }
+                }
                 // Simple surface render
-                if (strata.getRenderDayColor() == null || strata.getRenderNightColor() == null)
+                else if (strata.getRenderDayColor() == null || strata.getRenderNightColor() == null)
                 {
                     strata.setRenderDayColor(stratum.getDayColor());
                     if (!cavePrePass)
@@ -308,7 +334,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
             }
 
             // And draw to the actual chunkimage
-            g2D.setComposite(OPAQUE);
+            g2D.setComposite(ALPHA_OPAQUE);
             g2D.setPaint(RGB.paintOf(strata.getRenderDayColor()));
             g2D.fillRect(x, z, 1, 1);
 

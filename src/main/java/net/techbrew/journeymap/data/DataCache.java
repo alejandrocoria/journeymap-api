@@ -439,6 +439,14 @@ public class DataCache
         }
     }
 
+    public void invalidateChunkMDCache()
+    {
+        synchronized (chunkMetadata)
+        {
+            chunkMetadata.invalidateAll();
+        }
+    }
+
     public void addChunkMDListener(RemovalListener<ChunkCoordIntPair, Optional<ChunkMD>> listener)
     {
         synchronized (chunkMetadataRemovalListener)

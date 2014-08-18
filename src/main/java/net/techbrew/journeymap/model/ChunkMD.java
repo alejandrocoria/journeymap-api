@@ -22,10 +22,12 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.io.nbt.ChunkLoader;
 
+import java.io.Serializable;
 import java.lang.ref.SoftReference;
+import java.util.HashMap;
 
 /**
- * ChunkStub MetaData wrapper for the various bits
+ * ChunkMD is a MetaData wrapper for a chunk and the various bits
  * of metadata that need to accompany a ChunkStub.
  *
  * @author mwoodman
@@ -35,7 +37,11 @@ public class ChunkMD
     final static DataCache dataCache = DataCache.instance();
     private final SoftReference<Chunk> chunkReference;
     private final ChunkCoordIntPair coord;
-    private final boolean isSlimeChunk;
+    private final HashMap<String, Serializable> properties = new HashMap<String, Serializable>();
+
+    public static final String PROP_IS_SLIME_CHUNK = "isSlimeChunk";
+    public static final String PROP_LOADED = "loaded";
+    public static final String PROP_LAST_RENDERED = "lastRendered";
 
     public ChunkMD(Chunk chunk)
     {
@@ -44,11 +50,13 @@ public class ChunkMD
             throw new IllegalArgumentException("Chunk can't be null");
         }
         this.chunkReference = new SoftReference<Chunk>(chunk);
+        this.coord = new ChunkCoordIntPair(chunk.xPosition, chunk.zPosition); // avoid GC issue holding onto chunk's coord ref
 
-        this.coord = new ChunkCoordIntPair(chunk.xPosition, chunk.zPosition);
+        // Set load time
+        setProperty(PROP_LOADED, System.currentTimeMillis());
 
         // https://github.com/OpenMods/OpenBlocks/blob/master/src/main/java/openblocks/common/item/ItemSlimalyzer.java#L44
-        this.isSlimeChunk = chunk.getRandomWithSeed(987234911L).nextInt(10) == 0;
+        properties.put(PROP_IS_SLIME_CHUNK, chunk.getRandomWithSeed(987234911L).nextInt(10) == 0);
     }
 
     public Block getBlock(int x, int y, int z)
@@ -156,6 +164,27 @@ public class ChunkMD
         return blockMD.getBlock().getLightOpacity(this.getWorldObj(), (this.getCoord().chunkXPos << 4) + localX, y, (this.getCoord().chunkZPos << 4) + localZ);
     }
 
+    public Serializable getProperty(String name)
+    {
+        return properties.get(name);
+    }
+
+    public Serializable getProperty(String name, Serializable defaultValue)
+    {
+        Serializable currentValue = getProperty(name);
+        if(currentValue==null)
+        {
+            setProperty(name, defaultValue);
+            currentValue = defaultValue;
+        }
+        return currentValue;
+    }
+
+    public Serializable setProperty(String name, Serializable value)
+    {
+        return properties.put(name, value);
+    }
+
     @Override
     public int hashCode()
     {
@@ -179,12 +208,6 @@ public class ChunkMD
         }
         ChunkMD other = (ChunkMD) obj;
         return getCoord().equals(other.getCoord());
-    }
-
-    @Override
-    public String toString()
-    {
-        return String.format("ChunkMD[%s]", getCoord()); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     public Chunk getChunk()
@@ -219,7 +242,33 @@ public class ChunkMD
 
     public boolean isSlimeChunk()
     {
-        return isSlimeChunk;
+        return (Boolean) getProperty(PROP_IS_SLIME_CHUNK, Boolean.FALSE);
+    }
+
+    public long getLoaded()
+    {
+        return (Long) getProperty(PROP_LOADED, 0L);
+    }
+
+    public long getLastRendered()
+    {
+        return (Long) getProperty(PROP_LAST_RENDERED, 0L);
+    }
+
+    public long setRendered()
+    {
+        long now = System.currentTimeMillis();
+        setProperty(PROP_LAST_RENDERED, now);
+        return now;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "ChunkMD{" +
+                "coord=" + coord +
+                ", properties=" + properties +
+                '}';
     }
 
     public static class ChunkMissingException extends RuntimeException
@@ -241,4 +290,6 @@ public class ChunkMD
             return Optional.fromNullable(chunkMD);
         }
     }
+
+
 }

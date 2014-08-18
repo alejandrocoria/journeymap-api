@@ -12,6 +12,7 @@ package net.techbrew.journeymap.cartography.render;
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.IChunkRenderer;
+import net.techbrew.journeymap.cartography.RGB;
 import net.techbrew.journeymap.cartography.Strata;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
@@ -23,13 +24,19 @@ import net.techbrew.journeymap.model.ChunkMD;
  */
 public class NetherRenderer extends CaveRenderer implements IChunkRenderer
 {
-    // Taken from WorldProviderHell.getFogColor()
-    private float[] fog = new float[]{0.20000000298023224f, 0.029999999329447746f, 0.029999999329447746f};
+    // Taken from WorldProviderHell.getFogColor(): {0.20000000298023224f, 0.029999999329447746f, 0.029999999329447746f};
 
     public NetherRenderer()
     {
         super(null);
         cachePrefix = "Nether";
+    }
+
+    @Override
+    protected void updateOptions()
+    {
+        super.updateOptions();
+        this.ambientColor = RGB.floats(tweakNetherAmbientColor);
     }
 
     /**
@@ -109,8 +116,8 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
     }
 
     @Override
-    public float[] getFogColor()
+    public float[] getAmbientColor()
     {
-        return fog;
+        return ambientColor;
     }
 }

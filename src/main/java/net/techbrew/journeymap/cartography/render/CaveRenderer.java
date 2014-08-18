@@ -54,12 +54,18 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         updateOptions();
 
         // TODO: Put these in properties?
-        slopeMin = 0.2f;
-        slopeMax = 1.1f;
-        primaryDownslopeMultiplier = .7f;
-        primaryUpslopeMultiplier = 1.05f;
-        secondaryDownslopeMultiplier = .99f;
-        secondaryUpslopeMultiplier = 1.01f;
+        shadingSlopeMin = 0.2f;
+        shadingSlopeMax = 1.1f;
+        shadingPrimaryDownslopeMultiplier = .7f;
+        shadingPrimaryUpslopeMultiplier = 1.05f;
+        shadingSecondaryDownslopeMultiplier = .99f;
+        shadingSecondaryUpslopeMultiplier = 1.01f;
+    }
+
+    @Override
+    protected void updateOptions()
+    {
+        super.updateOptions();
     }
 
     /**
@@ -352,7 +358,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             }
 
             // And draw to the actual chunkimage
-            g2D.setComposite(OPAQUE);
+            g2D.setComposite(ALPHA_OPAQUE);
             g2D.setPaint(RGB.paintOf(strata.getRenderCaveColor()));
             g2D.fillRect(x, z, 1, 1);
         }

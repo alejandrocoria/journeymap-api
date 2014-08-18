@@ -12,6 +12,7 @@ package net.techbrew.journeymap.cartography.render;
 import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.IChunkRenderer;
+import net.techbrew.journeymap.cartography.RGB;
 import net.techbrew.journeymap.cartography.Strata;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
@@ -23,11 +24,17 @@ import net.techbrew.journeymap.model.ChunkMD;
  */
 public class EndRenderer extends CaveRenderer implements IChunkRenderer
 {
-
     public EndRenderer()
     {
         super(null);
         cachePrefix = "End";
+    }
+
+    @Override
+    protected void updateOptions()
+    {
+        super.updateOptions();
+        this.ambientColor = RGB.floats(tweakEndAmbientColor);
     }
 
     /**

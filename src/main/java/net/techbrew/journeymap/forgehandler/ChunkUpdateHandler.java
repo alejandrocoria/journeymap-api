@@ -49,18 +49,18 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public void onChunkLoadEvent(ChunkEvent.Load event)
-    {
-        queueChunk(event, event.getChunk().getChunkCoordIntPair());
-    }
-
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public void onChunkUnloadEvent(ChunkEvent.Unload event)
+    public void onChunkEvent(ChunkEvent event)
     {
         ChunkCoordIntPair coord = event.getChunk().getChunkCoordIntPair();
-        MapPlayerTask.dequeueChunk(coord);
-        DataCache.instance().invalidateChunkMD(coord);
+        if(event instanceof ChunkEvent.Unload)
+        {
+            MapPlayerTask.dequeueChunk(coord);
+            DataCache.instance().invalidateChunkMD(coord);
+        }
+        else
+        {
+            queueChunk(event, coord);
+        }
     }
 
     @SideOnly(Side.CLIENT)

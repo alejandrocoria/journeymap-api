@@ -20,10 +20,7 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.overlay.TileCache;
-import net.techbrew.journeymap.ui.map.GeneralDisplayOptions;
-import net.techbrew.journeymap.ui.map.MapOverlay;
-import net.techbrew.journeymap.ui.map.MapOverlayActions;
-import net.techbrew.journeymap.ui.map.MapOverlayHotkeysHelp;
+import net.techbrew.journeymap.ui.map.*;
 import net.techbrew.journeymap.ui.minimap.MiniMap;
 import net.techbrew.journeymap.ui.minimap.MiniMapHotkeysHelp;
 import net.techbrew.journeymap.ui.minimap.MiniMapOptions;
@@ -212,6 +209,11 @@ public class UIManager
     public void openGeneralDisplayOptions(Class<? extends JmUI> returnClass)
     {
         open(GeneralDisplayOptions.class, returnClass);
+    }
+
+    public void openStyleOptions(Class<? extends JmUI> returnClass)
+    {
+        open(StyleOptions.class, returnClass);
     }
 
     public void openMasterOptions()

@@ -68,7 +68,7 @@ public class MapRegionTask extends BaseMapTask
         {
             ChunkCoordIntPair coord = coords.remove(0);
             ChunkMD chunkMD = ChunkLoader.getChunkMdFromDisk(coord.chunkXPos, coord.chunkZPos, mcWorldDir, world);
-            if (chunkMD == null || !chunkMD.hasChunk())
+            if (chunkMD == null)
             {
                 missing++;
             }
@@ -117,6 +117,7 @@ public class MapRegionTask extends BaseMapTask
     {
         lastTaskCompleted = System.currentTimeMillis();
         retainChunks.clear();
+        DataCache.instance().invalidateChunkMDCache();
     }
 
     @Override

@@ -18,6 +18,6 @@ public interface IChunkRenderer
 
     public void setStratumColors(Stratum stratum, int lightAttenuation, Integer waterColor, boolean waterAbove, boolean underground, boolean mapCaveLighting);
 
-    public float[] getFogColor();
+    public float[] getAmbientColor();
 
 }

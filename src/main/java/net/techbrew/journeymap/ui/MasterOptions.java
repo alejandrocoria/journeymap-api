@@ -28,10 +28,12 @@ public class MasterOptions extends JmUI
     String titleWebmap = Constants.getString("jm.webmap.title");
     String labelOptions = Constants.getString("jm.common.options_button");
     String labelHelp = Constants.getString("jm.common.help");
+    String labelStyle = Constants.getString("jm.common.map_style_button");
     Button buttonGeneralDisplayOptions, buttonFullMapHelp;
     Button buttonMiniMapEnable, buttonMiniMapOptions, buttonMiniMapHelp;
     Button buttonWaypointOptions, buttonWaypointHelp, buttonWaypointManagerEnable;
     Button buttonWebMapEnable, buttonWebMapOpen;
+    Button buttonStyleOptions;
     Button buttonClose;
     ButtonList listGeneral, listMiniMap, listWaypoints, listWebMap;
 
@@ -47,7 +49,8 @@ public class MasterOptions extends JmUI
 
         buttonGeneralDisplayOptions = ButtonEnum.FullMapOptions.create(labelOptions);
         buttonFullMapHelp = ButtonEnum.FullMapHelp.create(labelHelp);
-        listGeneral = new ButtonList(buttonGeneralDisplayOptions, buttonFullMapHelp);
+        buttonStyleOptions = ButtonEnum.StyleOptions.create(labelStyle);
+        listGeneral = new ButtonList(buttonGeneralDisplayOptions, buttonStyleOptions, buttonFullMapHelp);
         buttonList.addAll(listGeneral);
 
         buttonMiniMapOptions = ButtonEnum.MiniMapOptions.create(labelOptions);
@@ -164,6 +167,11 @@ public class MasterOptions extends JmUI
                 UIManager.getInstance().openMiniMapHotkeyHelp(getClass());
                 break;
             }
+            case StyleOptions:
+            {
+                UIManager.getInstance().openStyleOptions(getClass());
+                break;
+            }
             case WaypointOptions:
             {
                 UIManager.getInstance().openWaypointOptions(getClass());
@@ -219,7 +227,7 @@ public class MasterOptions extends JmUI
 
     enum ButtonEnum
     {
-        FullMapOptions, FullMapHelp, MiniMapOptions, MiniMapHelp, WaypointOptions, WaypointHelp, MiniMapEnable, WaypointManagerEnable, WebMapEnable, WebMapOpen, Close;
+        FullMapOptions, FullMapHelp, MiniMapOptions, MiniMapHelp, StyleOptions, WaypointOptions, WaypointHelp, MiniMapEnable, WaypointManagerEnable, WebMapEnable, WebMapOpen, Close;
 
         Button create(String label)
         {

@@ -45,7 +45,11 @@ public class ChunkLoader
     public static ChunkMD getChunkMdFromMemory(int chunkX, int chunkZ, World world)
     {
         Chunk chunk = getChunkFromMemory(chunkX, chunkZ, world);
-        if (chunk != null)
+        if(chunk !=null && chunk.isEmpty())
+        {
+            return null;
+        }
+        if (chunk != null && !chunk.isEmpty())
         {
             return new ChunkMD(chunk);
         }

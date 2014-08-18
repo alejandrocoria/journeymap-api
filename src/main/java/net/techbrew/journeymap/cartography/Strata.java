@@ -22,7 +22,8 @@ import java.util.Stack;
 public class Strata
 {
     final DataCache dataCache = DataCache.instance();
-    private final boolean mapCaveLighting = JourneyMap.getInstance().coreProperties.mapCaveLighting.get();
+    private boolean mapCaveLighting = JourneyMap.getInstance().coreProperties.mapCaveLighting.get();
+    private boolean mapBathymetry = JourneyMap.getInstance().coreProperties.mapBathymetry.get();
     final String name;
 
     final int initialPoolSize;
@@ -58,7 +59,7 @@ public class Strata
         {
             int amount = stack.isEmpty() ? initialPoolSize : poolGrowthIncrement;
             growFreePool(amount);
-            JourneyMap.getLogger().info(String.format("Grew Strata pool for '%s' by '%s'. Free: %s, Used: %s", name, amount, unusedStack.size(), stack.size()));
+            JourneyMap.getLogger().fine(String.format("Grew Strata pool for '%s' by '%s'. Free: %s, Used: %s", name, amount, unusedStack.size(), stack.size()));
         }
 
         stack.push(unusedStack.pop());
@@ -86,6 +87,9 @@ public class Strata
         setRenderCaveColor(null);
         setLightAttenuation(0);
         setBlocksFound(false);
+
+        mapCaveLighting = JourneyMap.getInstance().coreProperties.mapCaveLighting.get();
+        mapBathymetry = JourneyMap.getInstance().coreProperties.mapBathymetry.get();
 
         while (!stack.isEmpty())
         {
@@ -137,19 +141,16 @@ public class Strata
                 setBottomWaterY((getBottomWaterY() == null) ? y : Math.min(getBottomWaterY(), y));
                 if (getWaterColor() == null)
                 {
-                    setWaterColor(getAverageWaterColor((chunkMd.getCoord().chunkXPos << 4) + x, y, (chunkMd.getCoord().chunkZPos << 4) + z));
-                    if (getWaterColor() == null)
-                    {
-                        // This shouldn't happen. But if it did, it'd be too spammy to log.
-                        setWaterColor(0x2525CD);
-                    }
-
-                    setWaterColor(RGB.darken(getWaterColor(), .85f)); // magic # to match how it looks in game
+                    determineWaterColor(chunkMd, x, y, z);
                 }
             }
 
             //timer.stop();
             return stratum;
+        }
+        catch(ChunkMD.ChunkMissingException e)
+        {
+            throw e;
         }
         catch (Throwable t)
         {
@@ -323,6 +324,18 @@ public class Strata
     public Integer getWaterColor()
     {
         return waterColor;
+    }
+
+    public void determineWaterColor(ChunkMD chunkMD, int x, int y, int z)
+    {
+        setWaterColor(getAverageWaterColor((chunkMD.getCoord().chunkXPos << 4) + x, y, (chunkMD.getCoord().chunkZPos << 4) + z));
+        if (waterColor == null)
+        {
+            // This shouldn't happen. But if it did, it'd be too spammy to log.
+            setWaterColor(0x2525CD);
+        }
+
+        setWaterColor(RGB.darken(getWaterColor(), .85f)); // magic # to match how it looks in game
     }
 
     public void setWaterColor(Integer waterColor)
