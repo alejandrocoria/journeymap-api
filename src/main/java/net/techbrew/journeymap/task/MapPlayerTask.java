@@ -213,13 +213,13 @@ public class MapPlayerTask extends BaseMapTask
         if(renderCoords.size()==0)
         {
             // TODO: Comment this out
-            System.out.println("No chunks to render");
+            //System.out.println("No chunks to render");
             return null;
         }
         else
         {
             // TODO: log fine or some kinda cool stat
-            System.out.println(String.format("Chunks to Render: %d (Queued: %d, New: %d, Forced: %d, Stale: %d)", renderCoords.size(), queuedCoords.size(), neverRendered, forced, stale));
+            //System.out.println(String.format("Chunks to Render: %d (Queued: %d, New: %d, Forced: %d, Stale: %d)", renderCoords.size(), queuedCoords.size(), neverRendered, forced, stale));
 
             // TODO: Always map surface
             final Integer vSlice = underground ? lastPlayerPos.posY : null;

@@ -109,7 +109,7 @@ public class IconLoader
             {
                 logger.warning("Could not get Icon for " + blockMD);
             }
-            else
+            else if(!blockMD.hasFlag(BlockMD.Flag.Error))
             {
                 color = getColorForIcon(blockMD, blockIcon);
             }
@@ -186,7 +186,7 @@ public class IconLoader
                         }
                         catch (Throwable e)
                         {
-                            logger.severe("Couldn't get RGB from BlocksTexture at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
+                            logger.warning("Couldn't get RGB from BlocksTexture at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
                             break outer;
                         }
                         alpha = (argb >> 24) & 0xFF;
@@ -232,7 +232,7 @@ public class IconLoader
                 blockMD.addFlags(BlockMD.Flag.Error);
                 dataCache.getBlockMetadata().setFlags(blockMD.getBlock(), BlockMD.Flag.Error);
                 String pattern = "Unusable texture for %s, icon=%s,texture coords %s,%s - %s,%s";
-                logger.severe(String.format(pattern, blockMD, icon.getIconName(), xStart, yStart, xStop, yStop));
+                logger.fine(String.format(pattern, blockMD, icon.getIconName(), xStart, yStart, xStop, yStop));
                 r = g = b = 0;
             }
 

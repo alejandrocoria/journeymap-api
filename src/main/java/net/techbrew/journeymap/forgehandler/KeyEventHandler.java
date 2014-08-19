@@ -65,9 +65,10 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             if (JourneyMap.getInstance().miniMapProperties.enableHotkeys.get())
             {
                 // This seems to prevent the keycode from "staying"
-                GuiScreen.isCtrlKeyDown();
+                boolean controlDown =  Keyboard.isKeyDown(29) || Keyboard.isKeyDown(157);
+                //GuiScreen.isCtrlKeyDown();
 
-                if (GuiScreen.isCtrlKeyDown() && Constants.isPressed(Constants.KB_MAP))
+                if (controlDown && Constants.isPressed(Constants.KB_MAP))
                 {
                     UIManager.getInstance().toggleMinimap();
                     return;
@@ -97,7 +98,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                     UIManager.getInstance().getMiniMap().nextPosition();
                     return;
                 }
-                else if (GuiScreen.isCtrlKeyDown() && Constants.isPressed(Constants.KB_WAYPOINT))
+                else if (controlDown && Constants.isPressed(Constants.KB_WAYPOINT))
                 {
                     UIManager.getInstance().openWaypointManager(null, null);
                     return;

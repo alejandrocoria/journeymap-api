@@ -123,7 +123,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                     strata.reset();
                     BlockMD topBlockMd = null;
 
-                    int standardY = Math.max(1, getSurfaceBlockHeight(chunkMd, x, z, chunkSurfaceHeights));
+                    int standardY = Math.max(0, getSurfaceBlockHeight(chunkMd, x, z, chunkSurfaceHeights));
 
                     // Should be painted only by cave renderer
                     if (cavePrePass && (standardY > sliceMaxY && (standardY - sliceMaxY) > maxDepth))
@@ -136,7 +136,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                     int roofY = 0;
                     int y = standardY;
 
-                    roofY = Math.max(1, chunkMd.getAbsoluteHeightValue(x, z));
+                    roofY = Math.max(0, chunkMd.getAbsoluteHeightValue(x, z));
                     if (standardY < roofY)
                     {
                         // Is transparent roof above standard height?
@@ -156,7 +156,18 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                         }
                     }
 
+                    if(roofY==0 || standardY==0)
+                    {
+                        paintVoidBlock(x, z, g2D);
+                        chunkOk = true;
+                        continue blockLoop;
+                    }
 
+                    // Bathymetry - need to use water height instead of standardY, so we get the color blend
+                    if(mapBathymetry)
+                    {
+                        standardY = getColumnProperty(PROP_WATER_HEIGHT, standardY, chunkMd, x, z);
+                    }
 
                     topBlockMd = chunkMd.getTopBlockMD(x, standardY, z);
 
@@ -261,34 +272,35 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
             {
                 stratum = strata.nextUp(this, true);
 
-                // Bathymetry check
-                Integer waterHeight = null;
-                if(mapBathymetry)
-                {
-                    waterHeight = getColumnProperty(PROP_WATER_HEIGHT, null, chunkMd, x, z);
-                }
-
-                // Override stratum color for bathymetry.  I don't like doing this here.
-                if(mapBathymetry && waterHeight!=null)
-                {
-                    strata.setRenderDayColor(stratum.getDayColor());
-                    if (!cavePrePass)
-                    {
-                        strata.setRenderNightColor(stratum.getNightColor());
-                    }
-
-                    strata.determineWaterColor(chunkMd, x, waterHeight, z);
-                    stratum.setWater(true);
-                    setStratumColors(stratum, 0, strata.getWaterColor(), true, false, false);
-
-                    strata.setRenderDayColor(RGB.blendWith(strata.getRenderDayColor(), stratum.getDayColor(), .9f)); // TODO: Use light attenuation
-                    if (!cavePrePass)
-                    {
-                        strata.setRenderNightColor(RGB.blendWith(strata.getRenderNightColor(), stratum.getNightColor(), .9f)); // TODO: Use light attenuation
-                    }
-                }
+//                // Bathymetry check
+//                Integer waterHeight = null;
+//                if(mapBathymetry)
+//                {
+//                    waterHeight = getColumnProperty(PROP_WATER_HEIGHT, null, chunkMd, x, z);
+//                }
+//
+//                // Override stratum color for bathymetry.  I don't like doing this here.
+//                if(mapBathymetry && waterHeight!=null)
+//                {
+//                    strata.setRenderDayColor(stratum.getDayColor());
+//                    if (!cavePrePass)
+//                    {
+//                        strata.setRenderNightColor(stratum.getNightColor());
+//                    }
+//
+//                    strata.determineWaterColor(chunkMd, x, waterHeight, z);
+//                    stratum.setWater(true);
+//                    setStratumColors(stratum, 0, strata.getWaterColor(), true, false, false);
+//
+//                    strata.setRenderDayColor(RGB.blendWith(strata.getRenderDayColor(), stratum.getDayColor(), .9f)); // TODO: Use light attenuation
+//                    if (!cavePrePass)
+//                    {
+//                        strata.setRenderNightColor(RGB.blendWith(strata.getRenderNightColor(), stratum.getNightColor(), .9f)); // TODO: Use light attenuation
+//                    }
+//                }
+//                else
                 // Simple surface render
-                else if (strata.getRenderDayColor() == null || strata.getRenderNightColor() == null)
+                if (strata.getRenderDayColor() == null || strata.getRenderNightColor() == null)
                 {
                     strata.setRenderDayColor(stratum.getDayColor());
                     if (!cavePrePass)
@@ -327,7 +339,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
             }
 
             // Now add bevel for slope
-            if (!topBlockMd.hasFlag(BlockMD.Flag.NoShadow))
+            if ((topBlockMd.isWater() && mapBathymetry) || !topBlockMd.hasFlag(BlockMD.Flag.NoShadow))
             {
                 float slope = getSlope(chunkMd, topBlockMd, x, null, z, chunkSurfaceHeights, chunkSurfaceSlopes);
                 if (slope != 1f)
