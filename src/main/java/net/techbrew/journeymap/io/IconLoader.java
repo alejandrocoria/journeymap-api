@@ -1,8 +1,9 @@
 package net.techbrew.journeymap.io;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
-import net.minecraft.client.Minecraft;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.IIcon;
@@ -59,51 +60,38 @@ public class IconLoader {
             return null;
         }
 
-        if (failed.contains(blockMD))
-        {
-            return null;
-        }
+//        if (failed.contains(blockMD))
+//        {
+//            return null;
+//        }
 
         try
         {
-            if (logger.isLoggable(Level.FINE))
+
+            IIcon blockIcon = getDirectIcon(blockMD);
+
+            if (blockIcon == null)
             {
-                logger.fine("Loading color for " + blockMD);
-            }
-
-            IIcon blockIcon = null;
-
-            if(blockMD.getBlock() instanceof BlockDoublePlant)
-            {
-                BlockDoublePlant blockDoublePlant = ((BlockDoublePlant) blockMD.getBlock());
-
-                // Get the top icon
-                blockIcon = blockDoublePlant.func_149888_a(true, blockMD.key.meta & BlockDoublePlant.field_149892_a.length);
-                if (blockIcon.getIconName().contains("sunflower"))
+                if (blockMD.getBlock() instanceof ITileEntityProvider)
                 {
-                    // Sunflower front
-                    blockIcon = blockDoublePlant.sunflowerIcons[0];
-                }
-            }
-            else
-            {
-                int side = blockMD.hasFlag(BlockUtils.Flag.Side2Texture) ? 2 : 1;
-                while (blockIcon == null && side >= 0)
-                {
-                    blockIcon = blockMD.getBlock().getIcon(side, blockMD.key.meta);
-                    side--;
+                    logger.info("Ignoring TitleEntity without standard block texture: " + blockMD);
+                    blockMD.addFlags(BlockUtils.Flag.TileEntity, BlockUtils.Flag.HasAir);
+                    return null;
                 }
             }
 
-            if(blockIcon==null) {
-                logger.warning("Could not get Icon for " + blockMD);
-            } else {
-                color = getColorForIcon(blockMD, blockIcon);
+            if (blockIcon == null)
+            {
+                blockMD.addFlags(BlockUtils.Flag.Error);
+                failed.add(blockMD);
+                return null;
             }
 
-            if (blockIcon == null || color == null)
+            color = getColorForIcon(blockMD, blockIcon);
+            if (color == null)
             {
                 failed.add(blockMD);
+                return null;
             }
 
             return color;
@@ -114,6 +102,35 @@ public class IconLoader {
             logger.severe("Error getting color: " + LogFormatter.toString(t));
             return null;
         }
+    }
+
+    private IIcon getDirectIcon(BlockMD blockMD)
+    {
+        IIcon blockIcon = null;
+
+        if (blockMD.getBlock() instanceof BlockDoublePlant)
+        {
+            BlockDoublePlant blockDoublePlant = ((BlockDoublePlant) blockMD.getBlock());
+
+            // Get the top icon
+            blockIcon = blockDoublePlant.func_149888_a(true, blockMD.key.meta & BlockDoublePlant.field_149892_a.length);
+            if (blockIcon.getIconName().contains("sunflower"))
+            {
+                // Sunflower front
+                blockIcon = blockDoublePlant.sunflowerIcons[0];
+            }
+        }
+        else
+        {
+            int side = blockMD.hasFlag(BlockUtils.Flag.Side2Texture) ? 2 : 1;
+            while (blockIcon == null && side >= 0)
+            {
+                blockIcon = blockMD.getBlock().getIcon(side, blockMD.key.meta);
+                side--;
+            }
+        }
+
+        return blockIcon;
     }
 
     Color getColorForIcon(BlockMD blockMD, IIcon icon)
@@ -211,7 +228,7 @@ public class IconLoader {
                 } else if(block.getRenderBlockPass()>0) {
                     blockAlpha = a * 1.0f/255; // try to use texture alpha
                     if(blockAlpha==1f) { // try to use light opacity
-                        blockAlpha = block.getLightOpacity(Minecraft.getMinecraft().theWorld, 0, 65, 0) / 255f;
+                        blockAlpha = block.getLightOpacity(FMLClientHandler.instance().getClient().theWorld, 0, 65, 0) / 255f;
                     }
                 }
             }
@@ -239,9 +256,9 @@ public class IconLoader {
 		BufferedImage image = null;
 
 		try {
-            int glid = Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
-			GL11.glBindTexture(3553, glid);
-		    int width = GL11.glGetTexLevelParameteri(3553, 0, 4096);
+            int glid = FMLClientHandler.instance().getClient().getTextureManager().getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
+            GL11.glBindTexture(3553, glid);
+            int width = GL11.glGetTexLevelParameteri(3553, 0, 4096);
 		    int height = GL11.glGetTexLevelParameteri(3553, 0, 4097);
 		    ByteBuffer byteBuffer = ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.nativeOrder());
 		

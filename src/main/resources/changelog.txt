@@ -16,6 +16,7 @@ http://journeymap.techbrew.net
 - Change: Version check info moved to DropBox after exceeding Google Drive's quota
 - Change: Version check no longer announces a new version is available in chat.(UI elements still display in Fullscreen Map and Webmap.)
 - Change: Improved handling of resource pack changes to ensure the color palette is regenerated
+- Change: Better handling of modded TileEntities that don't have Block icons (Botania:spawnerClaw, etc.) They're now just ignored rather than showing up as black.
 - Bugfix: Couldn't teleport to waypoint on server using Essentials because of coordinate precision
 - Bugfix: Waypoint Manager wouldn't open because of error (created by a Forge build that came after the recommended release)
 - Bugfix: Keybindings get duplicated if overridden and then viewed in JourneyMap>Options>Help... screens

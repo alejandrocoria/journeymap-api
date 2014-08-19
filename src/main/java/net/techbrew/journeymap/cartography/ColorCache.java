@@ -422,7 +422,12 @@ public class ColorCache implements IResourceManagerReloadListener
         if(baseColor==null)
         {
             baseColor = Color.BLACK;
-            if(iconLoader.failedFor(blockMD)) {
+            if (blockMD.hasFlag(BlockUtils.Flag.TileEntity))
+            {
+
+            }
+            else if (iconLoader.failedFor(blockMD))
+            {
                 JourneyMap.getLogger().warning("Iconloader failed to get base color for " + blockMD);
             } else {
                 JourneyMap.getLogger().warning("Unknown failure, could not get base color for " + blockMD);
