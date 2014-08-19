@@ -446,7 +446,12 @@ public class BlockMD
         /**
          * Block is a crop
          */
-        Crop
+        Crop,
+
+        /**
+         * Block is a tile entity
+         */
+        TileEntity
     }
 
 

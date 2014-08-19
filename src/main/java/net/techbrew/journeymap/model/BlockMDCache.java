@@ -31,9 +31,9 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 {
     public final BlockMD AIRBLOCK;
     public final BlockMD VOIDBLOCK;
-    private final HashMap<GameRegistry.UniqueIdentifier, EnumSet<BlockMD.Flag>> blockFlags;
-    private final HashMap<GameRegistry.UniqueIdentifier, Float> blockAlphas;
-    private final HashMap<Block, GameRegistry.UniqueIdentifier> blockUids;
+    private final HashMap<Block, EnumSet<BlockMD.Flag>> blockFlags;
+    private final HashMap<Block, Float> blockAlphas;
+    //private final HashMap<Block, GameRegistry.UniqueIdentifier> blockUids;
     private final CoreProperties coreProperties;
 
     public BlockMDCache()
@@ -44,9 +44,9 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         GameRegistry.UniqueIdentifier voidUid = new GameRegistry.UniqueIdentifier("journeymap:void");
         VOIDBLOCK = new BlockMD("Void", voidUid, null, 0, 1f, null);
 
-        blockFlags = new HashMap<GameRegistry.UniqueIdentifier, EnumSet<BlockMD.Flag>>(64);
-        blockAlphas = new HashMap<GameRegistry.UniqueIdentifier, Float>(8);
-        blockUids = new HashMap<Block, GameRegistry.UniqueIdentifier>();
+        blockFlags = new HashMap<Block, EnumSet<BlockMD.Flag>>(64);
+        blockAlphas = new HashMap<Block, Float>(8);
+        //blockUids = new HashMap<Block, GameRegistry.UniqueIdentifier>();
         coreProperties = JourneyMap.getInstance().coreProperties;
     }
 
@@ -57,9 +57,9 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
     {
         StatTimer timer = StatTimer.get("BlockMDCache.initialize").start();
 
-        blockAlphas.clear();
-        blockFlags.clear();
-        blockUids.clear();
+//        blockAlphas.clear();
+//        blockFlags.clear();
+//        blockUids.clear();
 
         // Set alphas
         setAlpha(Blocks.air, 0F);
@@ -115,7 +115,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         // Set flags based on inheritance
         for (Block block : GameData.getBlockRegistry().typeSafeIterable())
         {
-            blockUids.put(block, new GameRegistry.UniqueIdentifier(GameData.getBlockRegistry().getNameForObject(block)));
+            //blockUids.put(block, new GameRegistry.UniqueIdentifier(GameData.getBlockRegistry().getNameForObject(block)));
 
             if (block.getMaterial() == Material.air)
             {
@@ -163,13 +163,14 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
     public GameRegistry.UniqueIdentifier findUniqueIdentifierFor(Block block)
     {
-        GameRegistry.UniqueIdentifier uid = blockUids.get(block);
-        if (uid == null)
-        {
-            uid = new GameRegistry.UniqueIdentifier(GameData.getBlockRegistry().getNameForObject(block));
-            blockUids.put(block, uid);
-        }
-        return uid;
+//        GameRegistry.UniqueIdentifier uid = blockUids.get(block);
+//        if (uid == null)
+//        {
+//            uid = new GameRegistry.UniqueIdentifier(GameData.getBlockRegistry().getNameForObject(block));
+//            blockUids.put(block, uid);
+//        }
+//        return uid;
+        return new GameRegistry.UniqueIdentifier(GameData.getBlockRegistry().getNameForObject(block));
     }
 
     /**
@@ -225,7 +226,8 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
                 {
                     if (blockMD == null)
                     {
-                        blockMD = createBlockMD(block, meta);
+                        String displayName = BlockMD.getBlockName(block, meta);
+                        blockMD = new BlockMD(displayName, block, meta, getAlpha(block), getFlags(block));
                         map.put(meta, blockMD);
                     }
                 }
@@ -240,37 +242,29 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         }
     }
 
-    private BlockMD createBlockMD(Block block, int meta)
+    public EnumSet<BlockMD.Flag> getFlags(Block block)
     {
-        GameRegistry.UniqueIdentifier uid = findUniqueIdentifierFor(block);
-        String displayName = BlockMD.getBlockName(block, meta);
-        return new BlockMD(displayName, block, meta, getAlpha(block), getFlags(uid));
-    }
-
-    public EnumSet<BlockMD.Flag> getFlags(GameRegistry.UniqueIdentifier uid)
-    {
-        EnumSet<BlockMD.Flag> flags = blockFlags.get(uid);
+        EnumSet<BlockMD.Flag> flags = blockFlags.get(block);
         return flags == null ? EnumSet.noneOf(BlockMD.Flag.class) : flags;
     }
 
     public void setFlags(Block block, BlockMD.Flag... flags)
     {
-        GameRegistry.UniqueIdentifier uid = findUniqueIdentifierFor(block);
-        EnumSet<BlockMD.Flag> eset = getFlags(uid);
+        EnumSet<BlockMD.Flag> eset = getFlags(block);
         eset.addAll(Arrays.asList(flags));
-        blockFlags.put(uid, eset);
-        JourneyMap.getLogger().fine(uid + " flags set: " + eset);
+        blockFlags.put(block, eset);
+        JourneyMap.getLogger().fine(block.getUnlocalizedName() + " flags set: " + eset);
     }
 
     public boolean hasFlag(Block block, BlockMD.Flag flag)
     {
-        EnumSet<BlockMD.Flag> flags = blockFlags.get(findUniqueIdentifierFor(block));
+        EnumSet<BlockMD.Flag> flags = blockFlags.get(block);
         return flags != null && flags.contains(flag);
     }
 
     public boolean hasAnyFlags(Block block, BlockMD.Flag... flags)
     {
-        EnumSet<BlockMD.Flag> flagSet = blockFlags.get(findUniqueIdentifierFor(block));
+        EnumSet<BlockMD.Flag> flagSet = blockFlags.get(block);
         if (flagSet == null)
         {
             return false;
@@ -285,26 +279,20 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         return false;
     }
 
-    public boolean hasFlag(GameRegistry.UniqueIdentifier uid, BlockMD.Flag flag)
-    {
-        EnumSet<BlockMD.Flag> flags = blockFlags.get(uid);
-        return flags != null && flags.contains(flag);
-    }
-
     public boolean hasAlpha(Block block)
     {
-        return blockAlphas.containsKey(findUniqueIdentifierFor(block));
+        return blockAlphas.containsKey(block);
     }
 
     public float getAlpha(Block block)
     {
-        Float alpha = blockAlphas.get(findUniqueIdentifierFor(block));
+        Float alpha = blockAlphas.get(block);
         return alpha == null ? 1F : alpha;
     }
 
     public void setAlpha(Block block, Float alpha)
     {
-        blockAlphas.put(findUniqueIdentifierFor(block), alpha);
+        blockAlphas.put(block, alpha);
     }
 
     public HashMap getFlagsMap()

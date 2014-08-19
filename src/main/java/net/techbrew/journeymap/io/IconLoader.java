@@ -11,16 +11,16 @@ package net.techbrew.journeymap.io;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
-import net.minecraft.client.Minecraft;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
-import net.techbrew.journeymap.model.BlockMDCache;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -69,54 +69,38 @@ public class IconLoader
             return null;
         }
 
-        if (failed.contains(blockMD))
-        {
-            return null;
-        }
+//        if (failed.contains(blockMD))
+//        {
+//            return null;
+//        }
 
         try
         {
-            if (logger.isLoggable(Level.FINE))
+
+            IIcon blockIcon = getDirectIcon(blockMD);
+
+            if(blockIcon == null)
             {
-                logger.fine("Loading color for " + blockMD);
-            }
-
-            IIcon blockIcon = null;
-
-            if (blockMD.getBlock() instanceof BlockDoublePlant)
-            {
-                BlockDoublePlant blockDoublePlant = ((BlockDoublePlant) blockMD.getBlock());
-
-                // Get the top icon
-                blockIcon = blockDoublePlant.func_149888_a(true, blockMD.meta & BlockDoublePlant.field_149892_a.length);
-                if(blockIcon.getIconName().contains("sunflower"))
+                if(blockMD.getBlock() instanceof ITileEntityProvider)
                 {
-                    // Sunflower front
-                    blockIcon = blockDoublePlant.sunflowerIcons[0];
-                }
-            }
-            else
-            {
-                int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
-                while (blockIcon == null && side >= 0)
-                {
-                    blockIcon = blockMD.getBlock().getIcon(side, blockMD.meta);
-                    side--;
+                    logger.info("Ignoring TitleEntity without standard block texture: " + blockMD);
+                    blockMD.addFlags(BlockMD.Flag.TileEntity, BlockMD.Flag.HasAir);
+                    return null;
                 }
             }
 
             if (blockIcon == null)
             {
-                logger.warning("Could not get Icon for " + blockMD);
-            }
-            else if(!blockMD.hasFlag(BlockMD.Flag.Error))
-            {
-                color = getColorForIcon(blockMD, blockIcon);
+                blockMD.addFlags(BlockMD.Flag.Error);
+                failed.add(blockMD);
+                return null;
             }
 
-            if (blockIcon==null || color == null)
+            color = getColorForIcon(blockMD, blockIcon);
+            if (color == null)
             {
                 failed.add(blockMD);
+                return null;
             }
 
             return color;
@@ -127,6 +111,35 @@ public class IconLoader
             logger.severe("Error getting color: " + LogFormatter.toString(t));
             return null;
         }
+    }
+
+    private IIcon getDirectIcon(BlockMD blockMD)
+    {
+        IIcon blockIcon = null;
+
+        if (blockMD.getBlock() instanceof BlockDoublePlant)
+        {
+            BlockDoublePlant blockDoublePlant = ((BlockDoublePlant) blockMD.getBlock());
+
+            // Get the top icon
+            blockIcon = blockDoublePlant.func_149888_a(true, blockMD.meta & BlockDoublePlant.field_149892_a.length);
+            if(blockIcon.getIconName().contains("sunflower"))
+            {
+                // Sunflower front
+                blockIcon = blockDoublePlant.sunflowerIcons[0];
+            }
+        }
+        else
+        {
+            int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
+            while (blockIcon == null && side >= 0)
+            {
+                blockIcon = blockMD.getBlock().getIcon(side, blockMD.meta);
+                side--;
+            }
+        }
+
+        return blockIcon;
     }
 
 

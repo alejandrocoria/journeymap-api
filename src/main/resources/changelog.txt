@@ -12,6 +12,9 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Better handling of modded TileEntities that don't have Block icons (Botania:spawnerClaw, etc.) They're now just ignored rather than showing up as black.
+
+## Changelog for JourneyMap 4.1.0alpha6:
 - Change: Bathymetry now uses the same blended water colors as normal water, just with the contour of the land below.
 - Bugfix: Areas open to the void in the Overworld now paint the void color, instead of black with errors in the log
 - Change: Suppressed logging of a bunch of stuff you didn't want to read anyway.
