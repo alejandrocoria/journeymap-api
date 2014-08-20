@@ -35,7 +35,7 @@ public class OverlayWaypointRenderer
         Minecraft mc = FMLClientHandler.instance().getClient();
         EntityPlayer player = mc.thePlayer;
         int dimension = player.dimension;
-        int maxDistance = JourneyMap.getInstance().waypointProperties.maxDistance.get();
+        int maxDistance = JourneyMap.getWaypointProperties().maxDistance.get();
         checkDistance = checkDistance && maxDistance > 0;
         Vec3 playerVec = checkDistance ? player.getPosition(1) : null;
         drawStepList.clear();

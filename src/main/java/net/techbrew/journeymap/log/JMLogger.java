@@ -8,9 +8,6 @@
 
 package net.techbrew.journeymap.log;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLLog;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.ForgeVersion;
 import net.techbrew.journeymap.Constants;
@@ -18,10 +15,8 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.properties.PropertiesBase;
-import net.techbrew.journeymap.thread.JMThreadFactory;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,20 +24,13 @@ import java.util.Map;
 
 import org.apache.logging.log4j.*;
 
-import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.appender.RandomAccessFileAppender;
-import org.apache.logging.log4j.core.appender.RandomAccessFileManager;
 import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.ConfigurationFactory;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.impl.Log4jLogEvent;
 import org.apache.logging.log4j.core.layout.PatternLayout;
-import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.SimpleMessage;
 
 
@@ -193,11 +181,11 @@ public class JMLogger
         // Add config files
         JourneyMap jm = JourneyMap.getInstance();
         List<? extends PropertiesBase> configs = Arrays.asList(
-                jm.coreProperties,
-                jm.fullMapProperties,
-                jm.miniMapProperties,
-                jm.waypointProperties,
-                jm.webMapProperties
+                jm.getCoreProperties(),
+                jm.getFullMapProperties(),
+                jm.getMiniMapProperties(),
+                jm.getWaypointProperties(),
+                jm.getWebMapProperties()
         );
 
         for (PropertiesBase config : configs)

@@ -40,7 +40,6 @@ public class WaypointLayer implements LayerDelegate.Layer
     private final long hoverDelay = 100;
     private final List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
     private final BlockOutlineDrawStep clickDrawStep = new BlockOutlineDrawStep(new BlockCoordIntPair(0, 0));
-    FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
     BlockCoordIntPair lastCoord = null;
 
     long lastClick = 0;
@@ -210,6 +209,7 @@ public class WaypointLayer implements LayerDelegate.Layer
 
     private int getProximity()
     {
+        FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
         int blockSize = (int) Math.max(1, Math.pow(2, fullMapProperties.zoomLevel.get()));
         return Math.max(1, 8 / blockSize);
     }

@@ -249,7 +249,7 @@ public class PropertyManager
         }
 
         // Update new property files
-        CoreProperties coreProperties = JourneyMap.getInstance().coreProperties;
+        CoreProperties coreProperties = JourneyMap.getCoreProperties();
         coreProperties.announceMod.set(getBoolean(Key.ANNOUNCE_MODLOADED));
         coreProperties.mapCaveLighting.set(getBoolean(Key.CAVE_LIGHTING));
         coreProperties.checkUpdates.set(getBoolean(Key.UPDATE_CHECK_ENABLED));
@@ -260,11 +260,11 @@ public class PropertyManager
         coreProperties.save();
         JourneyMap.getLogger().info(String.format("Migrated legacy property file values from %s to %s .", propFile.getName(), coreProperties.getFile().getName())); //$NON-NLS-1$
 
-        WebMapProperties webMapProperties = JourneyMap.getInstance().webMapProperties.enableSave(false);
+        WebMapProperties webMapProperties = JourneyMap.getWebMapProperties().enableSave(false);
         webMapProperties.enabled.set(getBoolean(Key.WEBSERVER_ENABLED));
         webMapProperties.port.set(getInteger(Key.WEBSERVER_PORT));
 
-        MiniMapProperties miniMapProperties = JourneyMap.getInstance().miniMapProperties.enableSave(false);
+        MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties().enableSave(false);
         miniMapProperties.enabled.set(getBoolean(Key.PREF_SHOW_MINIMAP));
         miniMapProperties.enableHotkeys.set(getBoolean(Key.PREF_MINIMAP_HOTKEYS));
         miniMapProperties.fontSmall.set(getDouble(Key.PREF_MINIMAP_FONTSCALE).intValue() == 1);
@@ -273,7 +273,7 @@ public class PropertyManager
         miniMapProperties.shape.set(DisplayVars.Shape.safeValueOf(getString(Key.PREF_MINIMAP_SHAPE)));
         miniMapProperties.showFps.set(getBoolean(Key.PREF_MINIMAP_SHOWFPS));
 
-        FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties.enableSave(false);
+        FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties().enableSave(false);
         fullMapProperties.fontSmall.set(getDouble(Key.PREF_FONTSCALE).intValue() == 1);
         fullMapProperties.forceUnicode.set(getBoolean(Key.PREF_FORCEUNICODE));
         fullMapProperties.showCaves.set(getBoolean(Key.PREF_SHOW_CAVES));

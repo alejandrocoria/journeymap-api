@@ -13,7 +13,6 @@ import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -62,7 +61,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
 
         try
         {
-            if (JourneyMap.getInstance().miniMapProperties.enableHotkeys.get())
+            if (JourneyMap.getMiniMapProperties().enableHotkeys.get())
             {
                 // This seems to prevent the keycode from "staying"
                 boolean controlDown =  Keyboard.isKeyDown(29) || Keyboard.isKeyDown(157);

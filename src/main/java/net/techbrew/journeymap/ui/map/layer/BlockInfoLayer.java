@@ -12,10 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.cartography.render.BaseRenderer;
-import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
-import net.techbrew.journeymap.model.ChunkMD;
 import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -33,7 +30,6 @@ public class BlockInfoLayer implements LayerDelegate.Layer
 {
     private final List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
 
-    FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
     BlockCoordIntPair lastCoord = null;
     long lastClicked = 0;
     int lastMouseX;
@@ -51,6 +47,8 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     {
         if (!blockCoord.equals(lastCoord))
         {
+            FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
+
             lastCoord = blockCoord;
 
             // Get block under mouse
@@ -87,6 +85,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
 
     private double getMapFontScale()
     {
+        FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
         return (fullMapProperties.fontSmall.get() ? 1 : 2) * (fullMapProperties.forceUnicode.get() ? 2 : 1);
     }
 

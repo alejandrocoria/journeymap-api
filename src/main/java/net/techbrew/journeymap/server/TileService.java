@@ -38,7 +38,6 @@ public class TileService extends FileService
     public static final String CALLBACK_PARAM = "callback";  //$NON-NLS-1$
     public static final String CHARACTER_ENCODING = "UTF-8"; //$NON-NLS-1$
     private static final long serialVersionUID = 4412225358529161454L;
-    private FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
     private byte[] blankImage;
 
     /**
@@ -134,7 +133,7 @@ public class TileService extends FileService
                 final ChunkCoordIntPair startCoord = new ChunkCoordIntPair(minChunkX, minChunkZ);
                 final ChunkCoordIntPair endCoord = new ChunkCoordIntPair(maxChunkX, maxChunkZ);
 
-                boolean showGrid = fullMapProperties.showGrid.get();
+                boolean showGrid = JourneyMap.getFullMapProperties().showGrid.get();
                 final BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, true, null, Tile.TILESIZE, Tile.TILESIZE, false, showGrid);
 
                 ResponseHeader.on(event).contentType(ContentType.png).noCache();

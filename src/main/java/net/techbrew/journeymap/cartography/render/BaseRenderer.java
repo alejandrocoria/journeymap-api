@@ -44,7 +44,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     protected static final float[] DEFAULT_FOG = new float[]{0, 0, .1f};
 
     protected final DataCache dataCache = DataCache.instance();
-    protected final CoreProperties coreProperties = JourneyMap.getInstance().coreProperties;
+    protected CoreProperties coreProperties;
     protected BlockColumnPropertiesCache columnPropertiesCache = null;
 
     public static final String PROP_WATER_HEIGHT = "waterHeight";
@@ -117,6 +117,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      */
     protected void updateOptions()
     {
+        coreProperties = JourneyMap.getCoreProperties();
         mapBathymetry = coreProperties.mapBathymetry.get();
         mapTransparency = coreProperties.mapTransparency.get();
         mapAntialiasing = coreProperties.mapAntialiasing.get();
@@ -564,7 +565,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     private CacheBuilder<Object, Object> getCacheBuilder()
     {
         CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
-        if (JourneyMap.getInstance().coreProperties.recordCacheStats.get())
+        if (JourneyMap.getCoreProperties().recordCacheStats.get())
         {
             builder.recordStats();
         }

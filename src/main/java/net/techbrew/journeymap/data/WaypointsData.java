@@ -28,8 +28,6 @@ import java.util.List;
  */
 public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
 {
-    private static WaypointProperties waypointProperties = JourneyMap.getInstance().waypointProperties;
-
     /**
      * Reset state so classes can be checked again. Useful
      * after post-init of all mods.
@@ -47,7 +45,7 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
      */
     public static boolean isManagerEnabled()
     {
-        return waypointProperties.managerEnabled.get();
+        return JourneyMap.getWaypointProperties().managerEnabled.get();
     }
 
     /**

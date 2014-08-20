@@ -37,11 +37,9 @@ public class UIManager
     private final Logger logger = JourneyMap.getLogger();
     Minecraft minecraft = FMLClientHandler.instance().getClient();
     private MiniMap miniMap;
-    private MiniMapProperties miniMapProperties;
 
     private UIManager()
     {
-        miniMapProperties = JourneyMap.getInstance().miniMapProperties;
         miniMap = new MiniMap();
     }
 
@@ -129,20 +127,20 @@ public class UIManager
 
     public boolean isMiniMapEnabled()
     {
-        return miniMapProperties.enabled.get();
+        return JourneyMap.getMiniMapProperties().enabled.get();
     }
 
     public void setMiniMapEnabled(boolean enable)
     {
-        miniMapProperties.enabled.set(enable);
-        miniMapProperties.save();
+        JourneyMap.getMiniMapProperties().enabled.set(enable);
+        JourneyMap.getMiniMapProperties().save();
     }
 
     public void drawMiniMap()
     {
         try
         {
-            if (miniMapProperties.enabled.get())
+            if (JourneyMap.getMiniMapProperties().enabled.get())
             {
                 final GuiScreen currentScreen = minecraft.currentScreen;
                 final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat || currentScreen instanceof MiniMapOptions;

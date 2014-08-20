@@ -54,8 +54,8 @@ public class PropertyService extends BaseService
     {
         if (propMap.isEmpty())
         {
-            fullMapProperties = JourneyMap.getInstance().fullMapProperties;
-            webMapProperties = JourneyMap.getInstance().webMapProperties;
+            fullMapProperties = JourneyMap.getFullMapProperties();
+            webMapProperties = JourneyMap.getWebMapProperties();
             propMap.put("showCaves", fullMapProperties.showCaves);
             propMap.put("showGrid", fullMapProperties.showGrid);
             propMap.put("showAnimals", webMapProperties.showAnimals);

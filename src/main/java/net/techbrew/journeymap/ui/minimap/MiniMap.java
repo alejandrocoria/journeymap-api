@@ -12,7 +12,6 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.profiler.Profiler;
 import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -60,10 +59,10 @@ public class MiniMap
     private final Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
     private final String[] locationFormats = {"jm.common.location_xzye", "jm.common.location_xzy", "jm.common.location_xz"};
 
-    private final MiniMapProperties miniMapProperties = JourneyMap.getInstance().miniMapProperties;
-    private final GridRenderer gridRenderer = new GridRenderer(3, miniMapProperties);
-    private final FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
-    private final WaypointProperties waypointProperties = JourneyMap.getInstance().waypointProperties;
+    private MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties();
+    private final GridRenderer gridRenderer = new GridRenderer(3, JourneyMap.getMiniMapProperties());
+    private FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
+    private WaypointProperties waypointProperties = JourneyMap.getWaypointProperties();
     private final MapOverlayState state = MapOverlay.state();
     private final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
     private final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
@@ -116,6 +115,10 @@ public class MiniMap
             if (doStateRefresh)
             {
                 timer = refreshStateTimer.start();
+                miniMapProperties = JourneyMap.getMiniMapProperties();
+                gridRenderer.setMapProperties(JourneyMap.getMiniMapProperties());
+                fullMapProperties = JourneyMap.getFullMapProperties();
+                waypointProperties = JourneyMap.getWaypointProperties();
                 state.refresh(mc, player, miniMapProperties);
             }
             else

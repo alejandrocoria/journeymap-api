@@ -38,7 +38,7 @@ public class MapOverlayState
     public final int minZoom = 0;
     public final int maxZoom = 5;
     // One-time setup
-    final CoreProperties coreProperties = JourneyMap.getInstance().coreProperties;
+    final CoreProperties coreProperties = JourneyMap.getCoreProperties();
     // These can be safely changed at will
     public boolean follow = true;
 
@@ -69,7 +69,7 @@ public class MapOverlayState
 
     public void refresh(Minecraft mc, EntityClientPlayerMP player, MapProperties mapProperties)
     {
-        boolean showCaves = JourneyMap.getInstance().fullMapProperties.showCaves.get();
+        boolean showCaves = JourneyMap.getFullMapProperties().showCaves.get();
         final MapType lastMapType = getMapType(showCaves);
         lastMapProperties = mapProperties;
 

@@ -22,8 +22,8 @@ import java.util.Stack;
 public class Strata
 {
     final DataCache dataCache = DataCache.instance();
-    private boolean mapCaveLighting = JourneyMap.getInstance().coreProperties.mapCaveLighting.get();
-    private boolean mapBathymetry = JourneyMap.getInstance().coreProperties.mapBathymetry.get();
+    private boolean mapCaveLighting = JourneyMap.getCoreProperties().mapCaveLighting.get();
+    private boolean mapBathymetry = JourneyMap.getCoreProperties().mapBathymetry.get();
     final String name;
 
     final int initialPoolSize;
@@ -88,8 +88,8 @@ public class Strata
         setLightAttenuation(0);
         setBlocksFound(false);
 
-        mapCaveLighting = JourneyMap.getInstance().coreProperties.mapCaveLighting.get();
-        mapBathymetry = JourneyMap.getInstance().coreProperties.mapBathymetry.get();
+        mapCaveLighting = JourneyMap.getCoreProperties().mapCaveLighting.get();
+        mapBathymetry = JourneyMap.getCoreProperties().mapBathymetry.get();
 
         while (!stack.isEmpty())
         {

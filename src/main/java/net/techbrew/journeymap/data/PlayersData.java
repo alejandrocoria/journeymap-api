@@ -40,6 +40,6 @@ public class PlayersData extends CacheLoader<Class, Map<String, EntityDTO>>
 
     public long getTTL()
     {
-        return JourneyMap.getInstance().coreProperties.cachePlayersData.get();
+        return JourneyMap.getCoreProperties().cachePlayersData.get();
     }
 }

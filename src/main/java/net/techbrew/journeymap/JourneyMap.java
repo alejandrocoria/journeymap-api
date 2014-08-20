@@ -46,6 +46,9 @@ import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tv.twitch.Core;
+
+import java.io.File;
 
 
 /**
@@ -71,18 +74,16 @@ public class JourneyMap
     private static JourneyMap INSTANCE;
 
     // Time stamp of next chunk update
-    public long nextPlayerUpdate = 0;
-    public long nextChunkUpdate = 0;
     public ModInfo modInfo;
 
     // Properties & preferences
-    public CoreProperties coreProperties;
-    public FullMapProperties fullMapProperties;
-    public MiniMapProperties miniMapProperties;
-    public WebMapProperties webMapProperties;
-    public WaypointProperties waypointProperties;
-    private Logger logger;
+    private volatile CoreProperties coreProperties;
+    private volatile FullMapProperties fullMapProperties;
+    private volatile MiniMapProperties miniMapProperties;
+    private volatile WebMapProperties webMapProperties;
+    private volatile WaypointProperties waypointProperties;
     private volatile Boolean initialized = false;
+    private Logger logger;
     private JMServer jmServer;
     private boolean threadLogging = false;
     private long lastModInfoKeepAlive = System.currentTimeMillis();
@@ -174,34 +175,20 @@ public class JourneyMap
             logger = JMLogger.init();
             logger.info("initialize ENTER");
 
-            modInfo = new ModInfo("UA-28839029-4", "en_US", MOD_ID, MOD_NAME, getEdition());
-
             if (initialized)
             {
                 logger.warn("Already initialized, aborting");
                 return;
             }
 
-            // Trigger statics on EntityList
+            // Init ModInfo
+            modInfo = new ModInfo("UA-28839029-4", "en_US", MOD_ID, MOD_NAME, getEdition());
+
+            // Trigger statics on EntityList (may not be needed anymore?)
             EntityRegistry.instance();
 
-            // TODO: REMOVE AFTER DEBUG BOTANIA
-//            RenderingRegistry.registerBlockHandler(new RenderAltar());
-//            RenderingRegistry.registerBlockHandler(new RenderSpecialFlower(LibRenderIDs.idSpecialFlower));
-//            RenderingRegistry.registerBlockHandler(new RenderSpreader());
-//            RenderingRegistry.registerBlockHandler(new RenderPool());
-//            RenderingRegistry.registerBlockHandler(new RenderPylon());
-//            RenderingRegistry.registerBlockHandler(new RenderMiniIsland());
-//            RenderingRegistry.registerBlockHandler(new RenderTinyPotato());
-//            RenderingRegistry.registerBlockHandler(new RenderSpawnerClaw());
-
-
             // Load properties
-            coreProperties = new CoreProperties().load();
-            fullMapProperties = new FullMapProperties().load();
-            miniMapProperties = new MiniMapProperties().load();
-            webMapProperties = new WebMapProperties().load();
-            waypointProperties = new WaypointProperties().load();
+            loadConfigProperties();
             PropertyManager.getInstance().migrateLegacyProperties();
 
             // Log properties
@@ -246,7 +233,7 @@ public class JourneyMap
             FileHandler.initMobIconSets();
 
             // Webserver
-            toggleWebserver(webMapProperties.enabled.get(), false);
+            jmServer = JMServer.setEnabled(jmServer, webMapProperties.enabled.get(), false);
             initialized = true;
 
            // threadLogging = getLogger().isTraceEnabled();
@@ -265,65 +252,9 @@ public class JourneyMap
         }
     }
 
-    public void toggleWebserver(Boolean enable, boolean forceAnnounce)
-    {
-        webMapProperties.enabled.set(enable);
-        waypointProperties.save();
-
-        if (enable)
-        {
-            try
-            {
-                jmServer = new JMServer();
-                if (jmServer.isReady())
-                {
-                    jmServer.start();
-                }
-                else
-                {
-                    enable = false;
-                }
-            }
-            catch (Throwable e)
-            {
-                logger.log(Level.ERROR, LogFormatter.toString(e));
-                enable = false;
-            }
-            if (!enable)
-            {
-                ChatLog.announceError(Constants.getMessageJMERR24());
-            }
-        }
-        else
-        {
-            try
-            {
-                if (jmServer != null)
-                {
-                    jmServer.stop();
-                }
-            }
-            catch (Throwable e)
-            {
-                logger.log(Level.ERROR, LogFormatter.toString(e));
-            }
-        }
-        if (forceAnnounce)
-        {
-            ChatLog.enableAnnounceMod = true;
-        }
-        ChatLog.announceMod(forceAnnounce);
-    }
-
     public JMServer getJmServer()
     {
         return jmServer;
-    }
-
-
-    public boolean hasRunningTask()
-    {
-        return (taskController != null && taskController.hasRunningTask());
     }
 
     /**
@@ -360,11 +291,6 @@ public class JourneyMap
             logger.warn("taskController not available");
             return false;
         }
-    }
-
-    public ModInfo getModInfo()
-    {
-        return this.modInfo;
     }
 
     /**
@@ -423,6 +349,7 @@ public class JourneyMap
 
     private void reset()
     {
+        loadConfigProperties();
         FileHandler.lastJMWorldDir = null;
         DataCache.instance().purge();
         DataCache.instance().resetBlockMetadata();
@@ -556,4 +483,37 @@ public class JourneyMap
         return chunkRenderController;
     }
 
+    private void loadConfigProperties()
+    {
+        coreProperties = PropertiesBase.reload(coreProperties, CoreProperties.class);
+        fullMapProperties = PropertiesBase.reload(fullMapProperties, FullMapProperties.class);
+        miniMapProperties = PropertiesBase.reload(miniMapProperties, MiniMapProperties.class);
+        webMapProperties = PropertiesBase.reload(webMapProperties, WebMapProperties.class);
+        waypointProperties = PropertiesBase.reload(waypointProperties, WaypointProperties.class);
+    }
+
+    public static CoreProperties getCoreProperties()
+    {
+        return INSTANCE.coreProperties;
+    }
+
+    public static FullMapProperties getFullMapProperties()
+    {
+        return INSTANCE.fullMapProperties;
+    }
+
+    public static MiniMapProperties getMiniMapProperties()
+    {
+        return INSTANCE.miniMapProperties;
+    }
+
+    public static WebMapProperties getWebMapProperties()
+    {
+        return INSTANCE.webMapProperties;
+    }
+
+    public static WaypointProperties getWaypointProperties()
+    {
+        return INSTANCE.waypointProperties;
+    }
 }

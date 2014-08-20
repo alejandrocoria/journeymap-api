@@ -70,7 +70,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     {
         super.updateOptions();
 
-        mapSurfaceAboveCaves = JourneyMap.getInstance().coreProperties.mapSurfaceAboveCaves.get();
+        mapSurfaceAboveCaves = JourneyMap.getCoreProperties().mapSurfaceAboveCaves.get();
     }
 
     /**

@@ -39,7 +39,7 @@ public class AllData extends CacheLoader<Long, Map>
         props.put(Key.player, cache.getPlayer(false));
         props.put(Key.images, new ImagesData(since));
 
-        if (JourneyMap.getInstance().webMapProperties.showWaypoints.get())
+        if (JourneyMap.getWebMapProperties().showWaypoints.get())
         {
             int currentDimension = cache.getPlayer(false).dimension;
             Collection<Waypoint> waypoints = cache.getWaypoints(false);
@@ -60,7 +60,7 @@ public class AllData extends CacheLoader<Long, Map>
 
         if (!WorldData.isHardcoreAndMultiplayer())
         {
-            if (JourneyMap.getInstance().webMapProperties.showAnimals.get() || JourneyMap.getInstance().webMapProperties.showPets.get())
+            if (JourneyMap.getWebMapProperties().showAnimals.get() || JourneyMap.getWebMapProperties().showPets.get())
             {
                 props.put(Key.animals, cache.getAnimals(false));
             }
@@ -69,7 +69,7 @@ public class AllData extends CacheLoader<Long, Map>
                 props.put(Key.animals, Collections.emptyMap());
             }
 
-            if (JourneyMap.getInstance().webMapProperties.showMobs.get())
+            if (JourneyMap.getWebMapProperties().showMobs.get())
             {
                 props.put(Key.mobs, cache.getMobs(false));
             }
@@ -78,7 +78,7 @@ public class AllData extends CacheLoader<Long, Map>
                 props.put(Key.mobs, Collections.emptyMap());
             }
 
-            if (JourneyMap.getInstance().webMapProperties.showPlayers.get())
+            if (JourneyMap.getWebMapProperties().showPlayers.get())
             {
                 props.put(Key.players, cache.getPlayers(false));
             }
@@ -87,7 +87,7 @@ public class AllData extends CacheLoader<Long, Map>
                 props.put(Key.players, Collections.emptyMap());
             }
 
-            if (JourneyMap.getInstance().webMapProperties.showVillagers.get())
+            if (JourneyMap.getWebMapProperties().showVillagers.get())
             {
                 props.put(Key.villagers, cache.getVillagers(false));
             }
@@ -105,7 +105,7 @@ public class AllData extends CacheLoader<Long, Map>
      */
     public long getTTL()
     {
-        return JourneyMap.getInstance().coreProperties.chunkPoll.get();
+        return JourneyMap.getCoreProperties().chunkPoll.get();
     }
 
     public static enum Key

@@ -54,8 +54,8 @@ public class GeneralDisplayOptions extends JmUI
         String on = Constants.getString("jm.common.on");
         String off = Constants.getString("jm.common.off");
 
-        FullMapProperties fullMap = JourneyMap.getInstance().fullMapProperties;
-        MiniMapProperties miniMap = JourneyMap.getInstance().miniMapProperties;
+        FullMapProperties fullMap = JourneyMap.getFullMapProperties();
+        MiniMapProperties miniMap = JourneyMap.getMiniMapProperties();
 
         rowMobs = new ButtonList(Constants.getString("jm.common.show_monsters", ""));
         rowMobs.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showMobs));
@@ -107,7 +107,7 @@ public class GeneralDisplayOptions extends JmUI
         rowWaypoints = new ButtonList(Constants.getString("jm.common.show_waypoints", ""));
         rowWaypoints.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showWaypoints));
         rowWaypoints.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showWaypoints));
-        rowWaypoints.setEnabled(JourneyMap.getInstance().waypointProperties.managerEnabled.get());
+        rowWaypoints.setEnabled(JourneyMap.getWaypointProperties().managerEnabled.get());
         rightRows.add(rowWaypoints);
 
         rowForceUnicode = new ButtonList(Constants.getString("jm.minimap.force_unicode", ""));

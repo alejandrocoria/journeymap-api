@@ -26,14 +26,12 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.*;
 import net.techbrew.journeymap.properties.FullMapProperties;
-import net.techbrew.journeymap.render.draw.DrawEntityStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
 import net.techbrew.journeymap.render.overlay.OverlayRadarRenderer;
 import net.techbrew.journeymap.render.overlay.OverlayWaypointRenderer;
 import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
-import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.ui.*;
 import net.techbrew.journeymap.ui.Button;
 import net.techbrew.journeymap.ui.map.layer.LayerDelegate;
@@ -53,13 +51,12 @@ import org.apache.logging.log4j.Logger;
  */
 public class MapOverlay extends JmUI
 {
-
     final static MapOverlayState state = new MapOverlayState();
-    final static FullMapProperties fullMapProperties = JourneyMap.getInstance().fullMapProperties;
-    final static GridRenderer gridRenderer = new GridRenderer(5, fullMapProperties);
+    final static GridRenderer gridRenderer = new GridRenderer(5, JourneyMap.getFullMapProperties());
     final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
     final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
     final LayerDelegate layerDelegate = new LayerDelegate();
+    FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
     Boolean isScrolling = false;
     int msx, msy, mx, my;
     Logger logger = JourneyMap.getLogger();
@@ -83,6 +80,7 @@ public class MapOverlay extends JmUI
     {
         super(null);
         mc = FMLClientHandler.instance().getClient();
+        fullMapProperties = JourneyMap.getFullMapProperties();
         state.refresh(mc, mc.thePlayer, fullMapProperties);
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
         gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
@@ -97,6 +95,7 @@ public class MapOverlay extends JmUI
     {
         state.requireRefresh();
         gridRenderer.clear();
+        gridRenderer.setMapProperties(JourneyMap.getFullMapProperties());
         TileCache.instance().invalidateAll();
         TileCache.instance().cleanUp();
     }
@@ -104,6 +103,9 @@ public class MapOverlay extends JmUI
     @Override
     public void initGui()
     {
+        fullMapProperties = JourneyMap.getFullMapProperties();
+        gridRenderer.setMapProperties(JourneyMap.getFullMapProperties());
+
         Keyboard.enableRepeatEvents(true);
         initButtons();
 
@@ -350,7 +352,7 @@ public class MapOverlay extends JmUI
         leftButtons.layoutHorizontal(startX, startY, true, hgap);
         buttonDayNight.setPosition(startX, startY);
 
-        buttonWaypointManager.setDrawButton(JourneyMap.getInstance().waypointProperties.managerEnabled.get());
+        buttonWaypointManager.setDrawButton(JourneyMap.getWaypointProperties().managerEnabled.get());
 
 
         int rightX = leftButtons.getRightX() + hgap;
@@ -782,12 +784,15 @@ public class MapOverlay extends JmUI
         }
 
         // Update the state first
+        fullMapProperties = JourneyMap.getFullMapProperties();
         state.refresh(mc, player, fullMapProperties);
 
         if (state.getDimension() != gridRenderer.getDimension())
         {
             setFollow(true);
         }
+
+        gridRenderer.setMapProperties(fullMapProperties);
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
 
         // Center core renderer

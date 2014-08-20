@@ -38,7 +38,7 @@ public class EntityHelper
     public static EntityDistanceComparator entityDistanceComparator = new EntityDistanceComparator();
     public static EntityDTODistanceComparator entityDTODistanceComparator = new EntityDTODistanceComparator();
     public static EntityMapComparator entityMapComparator = new EntityMapComparator();
-    private static int lateralDistance = JourneyMap.getInstance().coreProperties.chunkOffset.get() * 8;
+    private static int lateralDistance = JourneyMap.getCoreProperties().chunkOffset.get() * 8;
     private static int verticalDistance = lateralDistance / 2;
 
     public static List<EntityDTO> getEntitiesNearby(String timerName, int maxEntities, boolean hostile, Class... entityClasses)
@@ -52,7 +52,7 @@ public class EntityHelper
         List<Entity> allEntities = new ArrayList<Entity>(mc.theWorld.loadedEntityList);
         AxisAlignedBB bb = getBB(mc.thePlayer);
 
-        lateralDistance = JourneyMap.getInstance().coreProperties.chunkOffset.get() * 8;
+        lateralDistance = JourneyMap.getCoreProperties().chunkOffset.get() * 8;
         verticalDistance = lateralDistance / 2;
 
         try
@@ -94,17 +94,17 @@ public class EntityHelper
 
     public static List<EntityDTO> getMobsNearby()
     {
-        return getEntitiesNearby("getMobsNearby", JourneyMap.getInstance().coreProperties.maxMobsData.get(), true, IMob.class);
+        return getEntitiesNearby("getMobsNearby", JourneyMap.getCoreProperties().maxMobsData.get(), true, IMob.class);
     }
 
     public static List<EntityDTO> getVillagersNearby()
     {
-        return getEntitiesNearby("getVillagersNearby", JourneyMap.getInstance().coreProperties.maxVillagersData.get(), false, EntityVillager.class);
+        return getEntitiesNearby("getVillagersNearby", JourneyMap.getCoreProperties().maxVillagersData.get(), false, EntityVillager.class);
     }
 
     public static List<EntityDTO> getAnimalsNearby()
     {
-        return getEntitiesNearby("getAnimalsNearby", JourneyMap.getInstance().coreProperties.maxAnimalsData.get(), false, EntityAnimal.class, EntityGolem.class, EntityWaterMob.class);
+        return getEntitiesNearby("getAnimalsNearby", JourneyMap.getCoreProperties().maxAnimalsData.get(), false, EntityAnimal.class, EntityGolem.class, EntityWaterMob.class);
     }
 
     public static boolean isPassiveAnimal(EntityLiving entityLiving)
@@ -144,13 +144,13 @@ public class EntityHelper
 
         Minecraft mc = FMLClientHandler.instance().getClient();
 
-        lateralDistance = JourneyMap.getInstance().coreProperties.chunkOffset.get() * 8;
+        lateralDistance = JourneyMap.getCoreProperties().chunkOffset.get() * 8;
         verticalDistance = lateralDistance / 2;
 
         List<EntityPlayer> allPlayers = new ArrayList<EntityPlayer>(mc.theWorld.playerEntities);
         allPlayers.remove(mc.thePlayer);
 
-        int max = JourneyMap.getInstance().coreProperties.maxPlayersData.get();
+        int max = JourneyMap.getCoreProperties().maxPlayersData.get();
         if (allPlayers.size() > max)
         {
             entityDistanceComparator.player = mc.thePlayer;

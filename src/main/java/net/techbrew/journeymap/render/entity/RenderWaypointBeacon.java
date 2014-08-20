@@ -56,10 +56,7 @@ public class RenderWaypointBeacon
     {
         try
         {
-            if (waypointProperties == null)
-            {
-                waypointProperties = JourneyMap.getInstance().waypointProperties;
-            }
+            waypointProperties = JourneyMap.getWaypointProperties();
 
             Collection<Waypoint> waypoints = WaypointStore.instance().getAll();
             allTimer.start();

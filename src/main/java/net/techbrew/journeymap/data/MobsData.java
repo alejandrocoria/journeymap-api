@@ -43,6 +43,6 @@ public class MobsData extends CacheLoader<Class, Map<String, EntityDTO>>
      */
     public long getTTL()
     {
-        return JourneyMap.getInstance().coreProperties.cacheMobsData.get();
+        return JourneyMap.getCoreProperties().cacheMobsData.get();
     }
 }

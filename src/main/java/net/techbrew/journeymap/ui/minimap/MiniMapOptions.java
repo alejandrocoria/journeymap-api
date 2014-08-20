@@ -31,10 +31,7 @@ public class MiniMapOptions extends JmUI
     private ButtonList rightButtons;
     private ButtonList bottomButtons;
     private MiniMap miniMap = UIManager.getInstance().getMiniMap();
-    private MiniMapProperties miniMapProperties = JourneyMap.getInstance().miniMapProperties;
-
-    private int lastTerrainAlpha;
-    private int lastCustomSize;
+    private MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties();
 
     public MiniMapOptions()
     {
@@ -366,7 +363,7 @@ public class MiniMapOptions extends JmUI
         drawTitle();
         drawLogo();
 
-        if (JourneyMap.getInstance().miniMapProperties.enabled.get())
+        if (JourneyMap.getMiniMapProperties().enabled.get())
         {
             MiniMap miniMap = this.miniMap;
             miniMap.drawMap();
@@ -405,7 +402,7 @@ public class MiniMapOptions extends JmUI
         DrawUtil.drawRectangle(0, this.height - headerHeight, this.width, headerHeight, Color.black, 150);
 
         // Draw miniMap
-        if (JourneyMap.getInstance().miniMapProperties.enabled.get())
+        if (JourneyMap.getMiniMapProperties().enabled.get())
         {
             miniMap.drawMap();
         }

@@ -97,7 +97,7 @@ public class DataCache
         managedCaches.put(entityDTOs, "EntityDTO");
 
         chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>>();
-        long chunkTimeout = JourneyMap.getInstance().coreProperties.chunkPoll.get() * 3;
+        long chunkTimeout = JourneyMap.getCoreProperties().chunkPoll.get() * 3;
         chunkMetadata = getCacheBuilder().removalListener(chunkMetadataRemovalListener).expireAfterAccess(chunkTimeout, TimeUnit.MILLISECONDS).build(new ChunkMD.SimpleCacheLoader());
         //chunkMetadata = getCacheBuilder().removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
         managedCaches.put(chunkMetadata, "ChunkMD");
@@ -126,7 +126,7 @@ public class DataCache
     private CacheBuilder<Object, Object> getCacheBuilder()
     {
         CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
-        if (JourneyMap.getInstance().coreProperties.recordCacheStats.get())
+        if (JourneyMap.getCoreProperties().recordCacheStats.get())
         {
             builder.recordStats();
         }
@@ -523,7 +523,7 @@ public class DataCache
     public String getDebugHtml()
     {
         StringBuffer sb = new StringBuffer();
-        if (JourneyMap.getInstance().coreProperties.recordCacheStats.get())
+        if (JourneyMap.getCoreProperties().recordCacheStats.get())
         {
             appendDebugHtml(sb, "Managed", managedCaches);
             appendDebugHtml(sb, "Private", privateCaches);

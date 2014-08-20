@@ -9,7 +9,6 @@
 package net.techbrew.journeymap;
 
 import com.google.common.base.Strings;
-import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import cpw.mods.fml.client.FMLClientHandler;
@@ -19,7 +18,6 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -27,12 +25,11 @@ import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 
 public class VersionCheck
 {
     private static ExecutorService executorService;
-    private static volatile Boolean updateCheckEnabled = JourneyMap.getInstance().coreProperties.checkUpdates.get();
+    private static volatile Boolean updateCheckEnabled = JourneyMap.getCoreProperties().checkUpdates.get();
     private static volatile Boolean versionIsCurrent = true;
     private static volatile Boolean versionIsChecked;
     private static volatile String versionAvailable;

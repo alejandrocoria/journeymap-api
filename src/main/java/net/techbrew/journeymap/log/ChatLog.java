@@ -117,7 +117,7 @@ public class ChatLog
         if (!initialized)
         {
             // Announce mod?
-            enableAnnounceMod = JourneyMap.getInstance().coreProperties.announceMod.get();
+            enableAnnounceMod = JourneyMap.getCoreProperties().announceMod.get();
             announceMod(false);
 
             // Check for newer version online
@@ -152,7 +152,7 @@ public class ChatLog
         if (enableAnnounceMod)
         {
             ChatLog.announceI18N("jm.common.ready", JourneyMap.MOD_NAME); //$NON-NLS-1$
-            if (JourneyMap.getInstance().webMapProperties.enabled.get())
+            if (JourneyMap.getWebMapProperties().enabled.get())
             {
                 JMServer jmServer = JourneyMap.getInstance().getJmServer();
                 String keyName = Constants.getKeyName(Constants.KB_MAP);

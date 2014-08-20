@@ -56,19 +56,19 @@ public class MasterOptions extends JmUI
         buttonMiniMapOptions = ButtonEnum.MiniMapOptions.create(labelOptions);
         buttonMiniMapHelp = ButtonEnum.MiniMapHelp.create(labelHelp);
         buttonMiniMapEnable = BooleanPropertyButton.create(ButtonEnum.MiniMapEnable.ordinal(), BooleanPropertyButton.Type.OnOff, "jm.common.enable",
-                JourneyMap.getInstance().miniMapProperties, JourneyMap.getInstance().miniMapProperties.enabled);
+                JourneyMap.getMiniMapProperties(), JourneyMap.getMiniMapProperties().enabled);
         listMiniMap = new ButtonList(buttonMiniMapOptions, buttonMiniMapEnable, buttonMiniMapHelp);
         buttonList.addAll(listMiniMap);
 
         buttonWaypointOptions = ButtonEnum.WaypointOptions.create(labelOptions);
         buttonWaypointHelp = ButtonEnum.WaypointHelp.create(labelHelp);
         buttonWaypointManagerEnable = BooleanPropertyButton.create(ButtonEnum.WaypointManagerEnable.ordinal(), BooleanPropertyButton.Type.OnOff, "jm.waypoint.enable_manager",
-                JourneyMap.getInstance().waypointProperties, JourneyMap.getInstance().waypointProperties.managerEnabled);
+                JourneyMap.getWaypointProperties(), JourneyMap.getWaypointProperties().managerEnabled);
         listWaypoints = new ButtonList(buttonWaypointOptions, buttonWaypointManagerEnable, buttonWaypointHelp);
         buttonList.addAll(listWaypoints);
 
         buttonWebMapEnable = BooleanPropertyButton.create(ButtonEnum.WebMapEnable.ordinal(), BooleanPropertyButton.Type.OnOff, "jm.webmap.enable",
-                JourneyMap.getInstance().webMapProperties, JourneyMap.getInstance().webMapProperties.enabled);
+                JourneyMap.getWebMapProperties(), JourneyMap.getWebMapProperties().enabled);
         buttonWebMapOpen = ButtonEnum.WebMapOpen.create(Constants.getString("jm.common.use_browser"));
         listWebMap = new ButtonList(buttonWebMapOpen, buttonWebMapEnable);
         buttonList.addAll(listWebMap);
@@ -179,7 +179,7 @@ public class MasterOptions extends JmUI
             }
             case WaypointManagerEnable:
             {
-                if (JourneyMap.getInstance().waypointProperties.managerEnabled.get())
+                if (JourneyMap.getWaypointProperties().managerEnabled.get())
                 {
                     WaypointStore.instance().load();
                 }

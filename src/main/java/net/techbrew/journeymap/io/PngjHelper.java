@@ -43,7 +43,7 @@ public class PngjHelper
         final ImageLine destLine = new ImageLine(destImgInfo, ImageLine.SampleType.INT, false);
         final int lineLen = tileSize * 4; // 4=bytesPixel
         final int gridColor = 135;
-        final boolean showGrid = JourneyMap.getInstance().fullMapProperties.showGrid.get();
+        final boolean showGrid = JourneyMap.getFullMapProperties().showGrid.get();
 
         int destRow = 0;
 

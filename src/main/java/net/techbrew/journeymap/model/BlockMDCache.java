@@ -33,8 +33,6 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
     public final BlockMD VOIDBLOCK;
     private final HashMap<Block, EnumSet<BlockMD.Flag>> blockFlags;
     private final HashMap<Block, Float> blockAlphas;
-    //private final HashMap<Block, GameRegistry.UniqueIdentifier> blockUids;
-    private final CoreProperties coreProperties;
 
     public BlockMDCache()
     {
@@ -46,8 +44,6 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
         blockFlags = new HashMap<Block, EnumSet<BlockMD.Flag>>(64);
         blockAlphas = new HashMap<Block, Float>(8);
-        //blockUids = new HashMap<Block, GameRegistry.UniqueIdentifier>();
-        coreProperties = JourneyMap.getInstance().coreProperties;
     }
 
     /**
@@ -78,7 +74,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         setAlpha(Blocks.water, .3F);
 
         // Set optional flags
-        if (JourneyMap.getInstance().coreProperties.caveIgnoreGlass.get())
+        if (JourneyMap.getCoreProperties().caveIgnoreGlass.get())
         {
             setFlags(Blocks.glass, OpenToSky);
             setFlags(Blocks.glass_pane, OpenToSky);
@@ -131,7 +127,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
             if (block instanceof BlockCrops)
             {
                 setFlags(block, Side2Texture, Crop);
-                if (!coreProperties.mapPlantShadows.get())
+                if (!JourneyMap.getCoreProperties().mapPlantShadows.get())
                 {
                     setFlags(block, NoShadow);
                 }
@@ -139,7 +135,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
             else if (block instanceof BlockBush)
             {
                 setFlags(block, Side2Texture, Plant);
-                if (!coreProperties.mapPlantShadows.get())
+                if (!JourneyMap.getCoreProperties().mapPlantShadows.get())
                 {
                     setFlags(block, NoShadow);
                 }

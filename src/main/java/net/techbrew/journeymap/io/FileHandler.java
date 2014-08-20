@@ -129,6 +129,11 @@ public class FileHandler
 
     public static File getJMWorldDir(Minecraft minecraft)
     {
+        if(minecraft.theWorld==null)
+        {
+            return null;
+        }
+
         if (!minecraft.isSingleplayer())
         {
             return getJMWorldDir(minecraft, Utils.getWorldHash(minecraft));
@@ -137,13 +142,16 @@ public class FileHandler
         {
             return getJMWorldDir(minecraft, -1L);
         }
-
     }
 
     public static File getJMWorldDir(Minecraft minecraft, long hash)
     {
+        if(minecraft.theWorld==null)
+        {
+            return null;
+        }
 
-        File mcDir = FMLClientHandler.instance().getClient().mcDataDir;
+        File mcDir = minecraft.mcDataDir;
 
         if (lastJMWorldDir == null)
         {
@@ -291,7 +299,23 @@ public class FileHandler
         }
     }
 
-    public static File getConfigDir()
+    public static File getWorldConfigDir(boolean fallbackToStandardConfigDir)
+    {
+        File worldDir = getJMWorldDir(FMLClientHandler.instance().getClient());
+        if(worldDir!=null)
+        {
+            File worldConfigDir = new File(worldDir, "config");
+            boolean found = worldConfigDir.exists() ||  worldConfigDir.mkdirs();
+            if(found)
+            {
+                return worldConfigDir;
+            }
+        }
+
+        return fallbackToStandardConfigDir ? getStandardConfigDir() : null;
+    }
+
+    public static File getStandardConfigDir()
     {
         return new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.CONFIG_DIR);
     }

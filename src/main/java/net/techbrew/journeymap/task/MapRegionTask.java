@@ -33,9 +33,8 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import org.apache.logging.log4j.Level;
+
 import org.apache.logging.log4j.Logger;
 
 public class MapRegionTask extends BaseMapTask
@@ -133,7 +132,7 @@ public class MapRegionTask extends BaseMapTask
      */
     public static class Manager implements ITaskManager
     {
-        final int mapTaskDelay = JourneyMap.getInstance().coreProperties.autoMapPoll.get();
+        final int mapTaskDelay = JourneyMap.getCoreProperties().autoMapPoll.get();
 
         RegionLoader regionLoader;
         boolean enabled;
@@ -166,7 +165,7 @@ public class MapRegionTask extends BaseMapTask
                 {
                     EntityDTO player = DataCache.getPlayer();
                     final int dimension = player.dimension;
-                    final boolean underground = player.underground && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getInstance().fullMapProperties.showCaves.get();
+                    final boolean underground = player.underground && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getFullMapProperties().showCaves.get();
                     MapType mapType;
                     Integer vSlice = null;
                     if (underground)

@@ -131,7 +131,7 @@ public class MiniMapHotkeysHelp extends JmUI
     {
         super.drawBackground(layer);
 
-        if (JourneyMap.getInstance().miniMapProperties.enabled.get())
+        if (JourneyMap.getMiniMapProperties().enabled.get())
         {
             MiniMap miniMap = UIManager.getInstance().getMiniMap();
             miniMap.drawMap();

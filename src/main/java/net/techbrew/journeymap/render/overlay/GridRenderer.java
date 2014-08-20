@@ -50,7 +50,7 @@ public class GridRenderer
     private final TreeMap<TilePos, Integer> grid = new TreeMap<TilePos, Integer>();
     private final int gridSize; // 5 = 2560px.
     private final Color bgColor = new Color(0x22, 0x22, 0x22);
-    private final InGameMapProperties mapProperties;
+    private InGameMapProperties mapProperties;
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
     private Rectangle2D.Double viewPort = null;
     private Rectangle2D.Double screenBounds = null;
@@ -68,6 +68,11 @@ public class GridRenderer
     {
         this.gridSize = gridSize;  // Must be an odd number so as to have a center tile.
         srcSize = gridSize * Tile.TILESIZE;
+        this.mapProperties = mapProperties;
+    }
+
+    public void setMapProperties(InGameMapProperties mapProperties)
+    {
         this.mapProperties = mapProperties;
     }
 

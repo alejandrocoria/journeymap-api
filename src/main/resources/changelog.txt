@@ -12,6 +12,10 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Change: Infrastructure work to make per-world configs/preferences possible
+
+
+## Changelog for JourneyMap 4.1.0alpha7:
 - Bugfix: Cave mapping now stays in the vertical slice where it's supposed to.
 - Bugfix: "columnProps" warning dealt with severely and sent to bed without dinner
 - Change: Better handling of modded TileEntities that don't have Block icons (Botania:spawnerClaw, etc.) They're now just ignored rather than showing up as black.

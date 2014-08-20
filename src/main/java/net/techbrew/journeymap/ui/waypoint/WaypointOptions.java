@@ -28,7 +28,7 @@ public class WaypointOptions extends JmUI
     TextField maxDistanceField;
     ButtonList listLeftButtons, listRightButtons;
     String labelMaxDistance = Constants.getString("jm.waypoint.max_distance");
-    WaypointProperties props = JourneyMap.getInstance().waypointProperties;
+    WaypointProperties props = JourneyMap.getWaypointProperties();
 
     public WaypointOptions(Class<? extends JmUI> returnClass)
     {
@@ -198,7 +198,7 @@ public class WaypointOptions extends JmUI
             Integer maxDistance = maxDistanceField.clamp();
             if (maxDistance != null)
             {
-                JourneyMap.getInstance().waypointProperties.maxDistance.set(maxDistance);
+                JourneyMap.getWaypointProperties().maxDistance.set(maxDistance);
                 // Don't save until close()
             }
             return;
@@ -216,6 +216,6 @@ public class WaypointOptions extends JmUI
 
     public void close()
     {
-        JourneyMap.getInstance().waypointProperties.save();
+        JourneyMap.getWaypointProperties().save();
     }
 }

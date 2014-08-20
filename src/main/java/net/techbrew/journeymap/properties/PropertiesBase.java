@@ -11,11 +11,14 @@ package net.techbrew.journeymap.properties;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
+import org.apache.logging.log4j.util.PropertiesUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -27,15 +30,30 @@ public abstract class PropertiesBase
     protected static final Charset UTF8 = Charset.forName("UTF-8");
     private static final String[] HEADERS = {
             "// JourneyMap configuration file. Modify at your own risk!",
+            "// To use in all worlds, place here: " + Constants.CONFIG_DIR,
+            "// To override configuration for a single world, place here: " + Constants.DATA_DIR + "**" + File.separator + "(worldname)",
             "// To restore the default settings, simply delete this file before starting Minecraft",
             "// For help with this file, see http://journeymap.techbrew.net/help/wiki/Configuration_Files"
     };
+
     // Gson for file persistence
     protected transient final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    // Current file reference
+    protected transient File sourceFile = null;
+
     // Toggles whether save() actually does anything.
     protected transient final AtomicBoolean saveEnabled = new AtomicBoolean(true);
+
+    // Set by subclass
     protected int fileRevision;
 
+    // Whether it's disabled
+    protected final AtomicBoolean disabled = new AtomicBoolean(false);
+
+    /**
+     * Default constructor.
+     */
     protected PropertiesBase()
     {
     }
@@ -54,15 +72,132 @@ public abstract class PropertiesBase
      */
     public abstract int getCodeRevision();
 
-
     /**
-     * Gets the property file path.
+     * Gets the property file.
      *
      * @return file
      */
     public File getFile()
     {
-        return new File(FileHandler.getConfigDir(), String.format("journeymap.%s.config", this.getName()));
+        return getFile(true);
+    }
+
+    /**
+     * Gets the property file.  If it isn't set, looks first in world config dir before standard dir.
+     * @param fallbackToStandardConfigDir   true if fallback needed.
+     * @return null if not found
+     */
+    protected File getFile(boolean fallbackToStandardConfigDir)
+    {
+        if(sourceFile==null)
+        {
+            sourceFile = new File(FileHandler.getWorldConfigDir(fallbackToStandardConfigDir), getFileName());
+        }
+        return sourceFile;
+    }
+
+    /**
+     * Gets the filename for the instance.
+     * @return
+     */
+    protected String getFileName()
+    {
+        return String.format("journeymap.%s.config", this.getName());
+    }
+
+    /**
+     * Whethere the current source file is associated with a specific world.
+     * @return
+     */
+    public boolean isWorldConfig()
+    {
+        File worldConfigDir = FileHandler.getWorldConfigDir(false);
+        return (worldConfigDir!=null && worldConfigDir.equals(getFile().getParentFile()));
+    }
+
+    /**
+     * Whether this config is disabled and shouldn't be used.
+     * @return
+     */
+    public boolean isDisabled()
+    {
+        return disabled.get();
+    }
+
+    /**
+     * Set disabled - only works for world configs.
+     * Saves after the set.
+     * @param disable
+     */
+    public void setDisabled(boolean disable)
+    {
+        if(isWorldConfig())
+        {
+            disabled.set(disable);
+            save();
+        }
+        else
+        {
+            throw new IllegalStateException("Can't disable standard config.");
+        }
+    }
+
+    /**
+     * Copies standard config to world config.
+     * @param overwrite true if current world config should be overwritten
+     * @return true if copy succeeded
+     */
+    public boolean copyToWorldConfig(boolean overwrite)
+    {
+        if(!isWorldConfig())
+        {
+            try
+            {
+                File worldConfig = getFile(false);
+                if(overwrite || !worldConfig.exists())
+                {
+                    save();
+                    Files.copy(sourceFile, worldConfig);
+                    return worldConfig.canRead();
+                }
+            }
+            catch (IOException e)
+            {
+                JourneyMap.getLogger().error("Couldn't copy config to world config: " + LogFormatter.toString(e));
+            }
+            return false;
+        }
+        else
+        {
+            throw new IllegalStateException("Can't create World config from itself.");
+        }
+    }
+
+    /**
+     * Copies world config over standard config
+     * @return
+     */
+    public boolean copyToStandardConfig()
+    {
+        if(isWorldConfig())
+        {
+            try
+            {
+                save();
+                File standardConfig = new File(FileHandler.getStandardConfigDir(), getFileName());
+                Files.copy(sourceFile, standardConfig);
+                return standardConfig.canRead();
+            }
+            catch (IOException e)
+            {
+                JourneyMap.getLogger().error("Couldn't copy config to world config: " + LogFormatter.toString(e));
+                return false;
+            }
+        }
+        else
+        {
+            throw new IllegalStateException("Can't replace standard config with itself.");
+        }
     }
 
     /**
@@ -212,6 +347,12 @@ public abstract class PropertiesBase
      */
     protected boolean validate()
     {
+        // Only world configs should be disabled.
+        if(!isWorldConfig() && isDisabled())
+        {
+            disabled.set(false);
+            return true;
+        }
         return false;
     }
 
@@ -221,6 +362,31 @@ public abstract class PropertiesBase
         {
             saveEnabled.set(enabled);
             return (T) this;
+        }
+    }
+
+    public static <T extends PropertiesBase> T reload(T properties, Class<T> propertiesClass)
+    {
+        if(properties!=null)
+        {
+            properties.save();
+        }
+
+        T reloadedProperties = null;
+        try
+        {
+            reloadedProperties = propertiesClass.newInstance().load();
+            boolean sourceChanged = (properties==null) || properties.isWorldConfig() != reloadedProperties.isWorldConfig();
+            if(sourceChanged)
+            {
+                JourneyMap.getLogger().info("Loaded " + propertiesClass.getSimpleName() + " from " + reloadedProperties.getFile());
+            }
+            return reloadedProperties;
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().error("Failed to reload " + propertiesClass.getName() + ": " + LogFormatter.toString(t));
+            return (properties!=null) ? properties : reloadedProperties;
         }
     }
 }

@@ -26,7 +26,6 @@ import java.util.EnumSet;
 public class WaypointBeaconHandler implements EventHandlerManager.EventHandler
 {
     final Minecraft mc = FMLClientHandler.instance().getClient();
-    final WaypointProperties waypointProperties = JourneyMap.getInstance().waypointProperties;
 
     public WaypointBeaconHandler()
     {
@@ -42,7 +41,7 @@ public class WaypointBeaconHandler implements EventHandlerManager.EventHandler
     @SubscribeEvent
     public void onRenderWorldLastEvent(RenderWorldLastEvent event)
     {
-        if (mc.thePlayer != null && waypointProperties.beaconEnabled.get())
+        if (mc.thePlayer != null && JourneyMap.getWaypointProperties().beaconEnabled.get())
         {
             mc.mcProfiler.startSection("journeymap");
             mc.mcProfiler.startSection("beacons");

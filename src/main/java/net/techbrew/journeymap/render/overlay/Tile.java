@@ -22,7 +22,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.concurrent.Future;
-import org.apache.logging.log4j.Level;
+
 import org.apache.logging.log4j.Logger;
 
 public class Tile
@@ -110,7 +110,7 @@ public class Tile
             glId = textureImpl.getGlTextureId();
             image = textureImpl.getImage();
         }
-        boolean showGrid = JourneyMap.getInstance().fullMapProperties.showGrid.get();
+        boolean showGrid = JourneyMap.getFullMapProperties().showGrid.get();
 
         float alpha = mapProperties.terrainAlpha.get() / 255f;
         futureTex = TextureCache.instance().prepareImage(glId, image, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE, showGrid, alpha);

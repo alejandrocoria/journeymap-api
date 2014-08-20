@@ -4,7 +4,6 @@ import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.world.WorldProvider;
@@ -20,11 +19,9 @@ import net.techbrew.journeymap.log.LogFormatter;
 import org.lwjgl.opengl.Display;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URLEncoder;
-import java.security.MessageDigest;
 import java.util.*;
 import org.apache.logging.log4j.Level;
 
@@ -74,7 +71,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         jm_version = JourneyMap.JM_VERSION;
         latest_journeymap_version = VersionCheck.getVersionAvailable();
         mc_version = Display.getTitle().split("\\s(?=\\d)")[1];
-        browser_poll = Math.max(1000, JourneyMap.getInstance().webMapProperties.browserPoll.get());
+        browser_poll = Math.max(1000, JourneyMap.getWebMapProperties().browserPoll.get());
 
         return this;
     }

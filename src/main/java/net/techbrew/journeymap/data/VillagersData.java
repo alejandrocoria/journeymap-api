@@ -40,6 +40,6 @@ public class VillagersData extends CacheLoader<Class, Map<String, EntityDTO>>
 
     public long getTTL()
     {
-        return JourneyMap.getInstance().coreProperties.cacheVillagersData.get();
+        return JourneyMap.getCoreProperties().cacheVillagersData.get();
     }
 }

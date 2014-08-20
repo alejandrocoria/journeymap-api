@@ -31,7 +31,7 @@ import org.apache.logging.log4j.Logger;
 public class LegacyMigrationTask implements ITask
 {
     private static final Logger logger = JourneyMap.getLogger();
-    final int mapTaskDelay = JourneyMap.getInstance().coreProperties.chunkPoll.get();
+    final int mapTaskDelay = JourneyMap.getCoreProperties().chunkPoll.get();
     final World world;
     final File jmWorldDir;
     final Stack<File> pngFiles;

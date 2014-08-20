@@ -15,13 +15,11 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
-import net.techbrew.journeymap.render.texture.DelayedTexture;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 
 import java.awt.*;
 import java.util.Arrays;
-import java.util.concurrent.Future;
 
 /**
  * Display variables for the Minimap.
@@ -33,7 +31,6 @@ import java.util.concurrent.Future;
  */
 public class DisplayVars
 {
-    static final MiniMapProperties miniMapProperties = JourneyMap.getInstance().miniMapProperties;
     final Position position;
     final Shape shape;
     final TextureImpl borderTexture;
@@ -62,9 +59,10 @@ public class DisplayVars
     DisplayVars(Minecraft mc, Shape shape, Position position, double labelFontScale)
     {
         // Immutable member and local vars
+        final MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties();
         this.scaledResolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
-        this.forceUnicode = JourneyMap.getInstance().miniMapProperties.forceUnicode.get();
-        this.showFps = JourneyMap.getInstance().miniMapProperties.showFps.get();
+        this.forceUnicode = JourneyMap.getMiniMapProperties().forceUnicode.get();
+        this.showFps = JourneyMap.getMiniMapProperties().showFps.get();
         this.shape = shape;
         this.position = position;
         this.displayWidth = mc.displayWidth;
@@ -295,6 +293,8 @@ public class DisplayVars
 
         public static Position getPreferred()
         {
+            final MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties();
+
             DisplayVars.Position position = null;
             try
             {
@@ -355,6 +355,8 @@ public class DisplayVars
 
         public static Shape getPreferred()
         {
+            final MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties();
+
             DisplayVars.Shape shape = null;
             try
             {

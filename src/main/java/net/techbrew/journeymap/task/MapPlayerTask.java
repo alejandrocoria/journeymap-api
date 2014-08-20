@@ -19,7 +19,6 @@ import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
-import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.model.ChunkMD;
 
 import java.util.*;
@@ -33,7 +32,7 @@ public class MapPlayerTask extends BaseMapTask
     private static Boolean lastUnderground;
     private static DataCache dataCache = DataCache.instance();
 
-    private final int maxRuntime = JourneyMap.getInstance().coreProperties.chunkPoll.get() * 3;
+    private final int maxRuntime = JourneyMap.getCoreProperties().chunkPoll.get() * 3;
 
     private MapPlayerTask(ChunkRenderController chunkRenderController, World world, int dimension, boolean underground, Integer chunkY, Collection<ChunkCoordIntPair> chunkCoords)
     {
@@ -102,7 +101,7 @@ public class MapPlayerTask extends BaseMapTask
     public static BaseMapTask create(ChunkRenderController chunkRenderController, EntityPlayer player)
     {
         final ChunkCoordinates playerPos = new ChunkCoordinates(player.chunkCoordX, player.chunkCoordY, player.chunkCoordZ);
-        final boolean underground = player.worldObj.provider.hasNoSky || (DataCache.getPlayer().underground && JourneyMap.getInstance().fullMapProperties.showCaves.get());
+        final boolean underground = player.worldObj.provider.hasNoSky || (DataCache.getPlayer().underground && JourneyMap.getFullMapProperties().showCaves.get());
 
         if (underground && !FeatureManager.isAllowed(Feature.MapCaves))
         {
@@ -139,7 +138,7 @@ public class MapPlayerTask extends BaseMapTask
         // Add chunks not recently rendered
         int neverRendered = 0;
         int stale = 0;
-        final long expiryLength = JourneyMap.getInstance().coreProperties.chunkPoll.get() * 5;
+        final long expiryLength = JourneyMap.getCoreProperties().chunkPoll.get() * 5;
         final long maxStale = 200;
         long now = System.currentTimeMillis();
         Set<ChunkCoordIntPair> allCachedCoords = DataCache.instance().getCachedChunkCoordinates();
@@ -172,7 +171,7 @@ public class MapPlayerTask extends BaseMapTask
         if(sliceChanged)
         {
             // Add peripheral coords around player
-            final int offset = JourneyMap.getInstance().coreProperties.chunkOffset.get();
+            final int offset = JourneyMap.getCoreProperties().chunkOffset.get();
             for (int x = (player.chunkCoordX - offset); x <= (player.chunkCoordX + offset); x++)
             {
                 for (int z = (player.chunkCoordZ - offset); z <= (player.chunkCoordZ + offset); z++)
@@ -248,7 +247,7 @@ public class MapPlayerTask extends BaseMapTask
      */
     public static class Manager implements ITaskManager
     {
-        final int mapTaskDelay = JourneyMap.getInstance().coreProperties.chunkPoll.get();
+        final int mapTaskDelay = JourneyMap.getCoreProperties().chunkPoll.get();
 
         boolean enabled;
 

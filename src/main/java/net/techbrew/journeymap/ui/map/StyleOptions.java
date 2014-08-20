@@ -11,17 +11,9 @@ package net.techbrew.journeymap.ui.map;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.feature.Feature;
-import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.properties.CoreProperties;
-import net.techbrew.journeymap.properties.FullMapProperties;
-import net.techbrew.journeymap.properties.MiniMapProperties;
-import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.ui.*;
 import net.techbrew.journeymap.ui.Button;
-
-import java.awt.*;
-import java.util.ArrayList;
 
 public class StyleOptions extends JmUI
 {
@@ -47,7 +39,7 @@ public class StyleOptions extends JmUI
 
         int id = 0;
 
-        CoreProperties core = JourneyMap.getInstance().coreProperties;
+        CoreProperties core = JourneyMap.getCoreProperties();
 
         leftButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_bathymetry", core, core.mapBathymetry));
         leftButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_transparency", core, core.mapTransparency));

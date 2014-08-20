@@ -45,7 +45,7 @@ public class MapOverlayActions extends JmUI
 
     public static void launchLocalhost()
     {
-        String url = "http://localhost:" + JourneyMap.getInstance().webMapProperties.port.get(); //$NON-NLS-1$
+        String url = "http://localhost:" + JourneyMap.getWebMapProperties().port.get(); //$NON-NLS-1$
         try
         {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
@@ -70,7 +70,7 @@ public class MapOverlayActions extends JmUI
         buttonSave = new Button(ButtonEnum.Save, Constants.getString("jm.common.save_map")); //$NON-NLS-1$
         buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
         buttonBrowser = new Button(ButtonEnum.Browser, Constants.getString("jm.common.use_browser")); //$NON-NLS-1$
-        buttonBrowser.setEnabled(JourneyMap.getInstance().webMapProperties.enabled.get());
+        buttonBrowser.setEnabled(JourneyMap.getWebMapProperties().enabled.get());
 
         buttonAutomap = new Button(ButtonEnum.Automap,
                 Constants.getString("jm.common.automap_title", on),
@@ -158,9 +158,8 @@ public class MapOverlayActions extends JmUI
 
     void save()
     {
-        MapProperties mapProperties = JourneyMap.getInstance().fullMapProperties;
         final MapOverlayState state = MapOverlay.state();
-        boolean showCaves = JourneyMap.getInstance().fullMapProperties.showCaves.get();
+        boolean showCaves = JourneyMap.getFullMapProperties().showCaves.get();
         final MapType mapType = state.getMapType(showCaves);
         final Integer vSlice = state.getMapType(showCaves) == MapType.underground ? state.getVSlice() : null;
         final MapSaver mapSaver = new MapSaver(state.getWorldDir(), mapType, vSlice, state.getDimension());

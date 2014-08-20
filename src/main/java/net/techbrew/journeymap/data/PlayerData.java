@@ -108,6 +108,6 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
 
     public long getTTL()
     {
-        return JourneyMap.getInstance().coreProperties.cachePlayerData.get();
+        return JourneyMap.getCoreProperties().cachePlayerData.get();
     }
 }
