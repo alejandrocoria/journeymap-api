@@ -29,7 +29,7 @@ import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
-import java.util.logging.Level;
+import org.apache.logging.log4j.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -172,7 +172,7 @@ public class FileHandler
             }
             catch (Exception e)
             {
-                JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(e));
+                JourneyMap.getLogger().log(Level.ERROR, LogFormatter.toString(e));
                 throw new RuntimeException(e);
             }
 
@@ -195,7 +195,7 @@ public class FileHandler
         }
         catch(Exception e)
         {
-            JourneyMap.getLogger().warning(String.format("Failed to migrate legacy server folder from %s to %s", legacyWorldDir.getName(), worldDir.getName()));
+            JourneyMap.getLogger().warn(String.format("Failed to migrate legacy server folder from %s to %s", legacyWorldDir.getName(), worldDir.getName()));
 
             String tempName = worldDir.getName() + "__OLD";
             try
@@ -208,7 +208,7 @@ public class FileHandler
             }
             if(!success)
             {
-                JourneyMap.getLogger().warning(String.format("Failed to even rename legacy server folder from %s to %s", legacyWorldDir.getName(), tempName));
+                JourneyMap.getLogger().warn(String.format("Failed to even rename legacy server folder from %s to %s", legacyWorldDir.getName(), tempName));
             }
         }
     }
@@ -253,7 +253,7 @@ public class FileHandler
             InputStream is = JourneyMap.class.getResourceAsStream(png);
             if (is == null)
             {
-                JourneyMap.getLogger().warning("Image not found: " + png);
+                JourneyMap.getLogger().warn("Image not found: " + png);
                 return null;
             }
             BufferedImage img = ImageIO.read(is);
@@ -263,7 +263,7 @@ public class FileHandler
         catch (IOException e)
         {
             String error = Constants.getMessageJMERR17(e.getMessage());
-            JourneyMap.getLogger().severe(error);
+            JourneyMap.getLogger().error(error);
             return null;
         }
     }
@@ -275,7 +275,7 @@ public class FileHandler
             InputStream is = JourneyMap.class.getResourceAsStream("/assets/journeymap/lang/" + fileName);
             if (is == null)
             {
-                JourneyMap.getLogger().warning("Language file not found: " + fileName);
+                JourneyMap.getLogger().warn("Language file not found: " + fileName);
                 return null;
             }
             Properties properties = new Properties();
@@ -286,7 +286,7 @@ public class FileHandler
         catch (IOException e)
         {
             String error = Constants.getMessageJMERR17(e.getMessage());
-            JourneyMap.getLogger().severe(error);
+            JourneyMap.getLogger().error(error);
             return null;
         }
     }
@@ -324,7 +324,7 @@ public class FileHandler
         catch (IOException e)
         {
             String error = Constants.getMessageJMERR17(e.getMessage());
-            JourneyMap.getLogger().severe(error);
+            JourneyMap.getLogger().error(error);
             return null;
         }
     }
@@ -364,7 +364,7 @@ public class FileHandler
             }
             catch (Throwable t)
             {
-                JourneyMap.getLogger().warning("Couldn't unzip mob icon set for " + setName + ": " + t);
+                JourneyMap.getLogger().warn("Couldn't unzip mob icon set for " + setName + ": " + t);
             }
         }
 
@@ -392,7 +392,7 @@ public class FileHandler
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe("Could not prepare entity iconset directories: " + LogFormatter.toString(t));
+            JourneyMap.getLogger().error("Could not prepare entity iconset directories: " + LogFormatter.toString(t));
         }
 
         // Create list of icon set names
@@ -436,10 +436,10 @@ public class FileHandler
             catch (Exception e)
             {
                 String error = Constants.getMessageJMERR00("Can't write entity icon" + iconFile + ": " + e);
-                JourneyMap.getLogger().severe(error);
+                JourneyMap.getLogger().error(error);
             }
 
-            JourneyMap.getLogger().fine("Created entity icon: " + iconFile);
+            JourneyMap.getLogger().debug("Created entity icon: " + iconFile);
         }
 
         return img;
@@ -461,7 +461,7 @@ public class FileHandler
         catch (IOException e)
         {
             String error = Constants.getMessageJMERR17(e.getMessage());
-            JourneyMap.getLogger().severe(error);
+            JourneyMap.getLogger().error(error);
             return null;
         }
     }
@@ -474,7 +474,7 @@ public class FileHandler
             InputStream is = JourneyMap.class.getResourceAsStream(pngPath);
             if (is == null)
             {
-                JourneyMap.getLogger().warning(String.format("Entity Icon resource not found: " + pngPath));
+                JourneyMap.getLogger().warn(String.format("Entity Icon resource not found: " + pngPath));
                 return null;
             }
             return is;
@@ -482,7 +482,7 @@ public class FileHandler
         catch (Throwable e)
         {
             String error = Constants.getMessageJMERR17(e.getMessage());
-            JourneyMap.getLogger().severe(error);
+            JourneyMap.getLogger().error(error);
             return null;
         }
     }
@@ -499,7 +499,7 @@ public class FileHandler
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().warning("Couldn't copy color palette html: " + t);
+            JourneyMap.getLogger().warn("Couldn't copy color palette html: " + t);
             return null;
         }
     }
@@ -518,7 +518,7 @@ public class FileHandler
             }
             catch (IOException e)
             {
-                JourneyMap.getLogger().severe("Could not open path with /usr/bin/open: " + path + " : " + LogFormatter.toString(e));
+                JourneyMap.getLogger().error("Could not open path with /usr/bin/open: " + path + " : " + LogFormatter.toString(e));
             }
 
         }
@@ -536,7 +536,7 @@ public class FileHandler
                 }
                 catch (IOException e)
                 {
-                    JourneyMap.getLogger().severe("Could not open path with cmd.exe: " + path + " : " + LogFormatter.toString(e));
+                    JourneyMap.getLogger().error("Could not open path with cmd.exe: " + path + " : " + LogFormatter.toString(e));
                 }
             }
         }
@@ -549,7 +549,7 @@ public class FileHandler
         }
         catch (Throwable e)
         {
-            JourneyMap.getLogger().severe("Could not open path with Desktop: " + path + " : " + LogFormatter.toString(e));
+            JourneyMap.getLogger().error("Could not open path with Desktop: " + path + " : " + LogFormatter.toString(e));
             Sys.openURL("file://" + path);
         }
     }
@@ -575,7 +575,7 @@ public class FileHandler
         }
         catch (IOException e)
         {
-            JourneyMap.getLogger().severe("Could not serialize cache: " + name + " : " + LogFormatter.toString(e));
+            JourneyMap.getLogger().error("Could not serialize cache: " + name + " : " + LogFormatter.toString(e));
             return false;
         }
     }
@@ -593,7 +593,7 @@ public class FileHandler
         }
         catch (IOException e)
         {
-            JourneyMap.getLogger().severe("Could not write debug file: " + name + " : " + LogFormatter.toString(e));
+            JourneyMap.getLogger().error("Could not write debug file: " + name + " : " + LogFormatter.toString(e));
             return false;
         }
     }
@@ -621,7 +621,7 @@ public class FileHandler
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warning("Could not deserialize cache: " + name + " : " + e);
+            JourneyMap.getLogger().warn("Could not deserialize cache: " + name + " : " + e);
             if (cacheFile.exists())
             {
                 cacheFile.delete();

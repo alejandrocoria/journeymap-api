@@ -25,7 +25,7 @@ import se.rupy.http.Query;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.logging.Level;
+import org.apache.logging.log4j.Level;
 
 /**
  * Provides a map image by combining region files.
@@ -142,9 +142,9 @@ public class TileService extends FileService
             }
 
             final long stop = System.currentTimeMillis();
-            if (JourneyMap.getLogger().isLoggable(Level.FINE))
+            if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
             {
-                JourneyMap.getLogger().fine((stop - start) + "ms to serve tile");
+                JourneyMap.getLogger().debug((stop - start) + "ms to serve tile");
             }
 
         }

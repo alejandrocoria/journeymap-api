@@ -150,7 +150,7 @@ public class BlockMD
             if (color == null)
             {
                 this.color = Color.black.getRGB();
-                JourneyMap.getLogger().warning("Could not get color for " + block);
+                JourneyMap.getLogger().warn("Could not get color for " + block);
                 addFlags(Flag.Error);
             }
             else if (!isBiomeColored())
@@ -379,7 +379,7 @@ public class BlockMD
                 name = stack.getDisplayName();
             }
         } catch(Throwable t) {
-            JourneyMap.getLogger().fine("Displayname not available for " + name);
+            JourneyMap.getLogger().debug("Displayname not available for " + name);
         }
 
         if(name.startsWith("tile")) {

@@ -23,7 +23,7 @@ import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
 import java.awt.*;
-import java.util.logging.Level;
+import org.apache.logging.log4j.Level;
 
 public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 {
@@ -197,7 +197,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().log(Level.WARNING, LogFormatter.toString(t));
+            JourneyMap.getLogger().log(Level.WARN, LogFormatter.toString(t));
         }
         finally
         {

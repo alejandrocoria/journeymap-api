@@ -26,7 +26,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Logger;
 
 public class LegacyMigrationTask implements ITask
 {
@@ -118,7 +118,7 @@ public class LegacyMigrationTask implements ITask
             }
             catch (Exception e)
             {
-                logger.warning("Problem processing " + fileName + ": " + e);
+                logger.warn("Problem processing " + fileName + ": " + e);
                 processJunk(png);
             }
 
@@ -211,16 +211,16 @@ public class LegacyMigrationTask implements ITask
             boolean moved = file.renameTo(junkFile);
             if (!moved)
             {
-                logger.warning("Couldn't move to junk folder: " + file);
+                logger.warn("Couldn't move to junk folder: " + file);
             }
             else
             {
-                logger.warning("Junked file: " + file);
+                logger.warn("Junked file: " + file);
             }
         }
         catch (Exception e)
         {
-            logger.warning("Couldn't move to junk folder: " + file);
+            logger.warn("Couldn't move to junk folder: " + file);
         }
     }
 

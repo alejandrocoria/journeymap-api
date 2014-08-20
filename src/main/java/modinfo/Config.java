@@ -7,7 +7,7 @@ import net.minecraft.client.Minecraft;
 
 import java.io.*;
 import java.util.UUID;
-import java.util.logging.Level;
+import org.apache.logging.log4j.Level;
 
 /**
  * Created by mwoodman on 2/20/14.
@@ -43,7 +43,7 @@ public class Config implements Serializable {
             }
             catch(Exception e)
             {
-                ModInfo.LOGGER.log(Level.SEVERE, "Can't read file " + configFile, e.getMessage());
+                ModInfo.LOGGER.log(Level.ERROR, "Can't read file " + configFile, e.getMessage());
                 if(configFile.exists())
                 {
                     configFile.delete();
@@ -127,7 +127,7 @@ public class Config implements Serializable {
         }
         catch (IOException e)
         {
-            ModInfo.LOGGER.log(Level.SEVERE, "Can't save file " + configFile, e);
+            ModInfo.LOGGER.log(Level.ERROR, "Can't save file " + configFile, e);
         }
     }
 

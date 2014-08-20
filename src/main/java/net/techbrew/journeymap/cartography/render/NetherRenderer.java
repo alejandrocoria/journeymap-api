@@ -89,7 +89,7 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warning("Couldn't get safe slice block height at " + x + "," + z + ": " + e);
+            JourneyMap.getLogger().warn("Couldn't get safe slice block height at " + x + "," + z + ": " + e);
             y = sliceMaxY;
         }
 

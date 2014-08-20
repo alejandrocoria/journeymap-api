@@ -11,7 +11,7 @@ import java.security.ProtectionDomain;
 import java.text.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Logger;
 
 import java.nio.channels.*;
 

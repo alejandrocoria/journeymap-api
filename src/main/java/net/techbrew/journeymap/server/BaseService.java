@@ -24,8 +24,8 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 
@@ -58,15 +58,15 @@ public abstract class BaseService extends Service
         String out = code + " " + message; //$NON-NLS-1$ //$NON-NLS-2$
         if (isError)
         {
-            logger.warning(this.getClass().getName() + ": " + out); //$NON-NLS-1$
+            logger.warn(this.getClass().getName() + ": " + out); //$NON-NLS-1$
             if (code != 404)
             {
-                logger.warning(debugRequestHeaders(event));
+                logger.warn(debugRequestHeaders(event));
             }
         }
-        else if (logger.isLoggable(Level.FINER))
+        else if (logger.isTraceEnabled())
         {
-            JourneyMap.getLogger().finer(out);
+            JourneyMap.getLogger().trace(out);
         }
 
         // Set the error code on the response
@@ -83,7 +83,7 @@ public abstract class BaseService extends Service
         }
         catch (IOException e)
         {
-            logger.warning("Can't set response code: " + out); //$NON-NLS-1$
+            logger.warn("Can't set response code: " + out); //$NON-NLS-1$
         }
         throw event;
     }
@@ -165,7 +165,7 @@ public abstract class BaseService extends Service
             }
             catch (NumberFormatException e)
             {
-                JourneyMap.getLogger().warning("Didn't get numeric query parameter for '" + key + "': " + val);
+                JourneyMap.getLogger().warn("Didn't get numeric query parameter for '" + key + "': " + val);
             }
         }
         return (intVal != null) ? intVal : defaultValue;
@@ -191,7 +191,7 @@ public abstract class BaseService extends Service
             }
             catch (NumberFormatException e)
             {
-                JourneyMap.getLogger().warning("Didn't get numeric query parameter for '" + key + "': " + val);
+                JourneyMap.getLogger().warn("Didn't get numeric query parameter for '" + key + "': " + val);
             }
         }
         return (longVal != null) ? longVal : defaultValue;
@@ -310,7 +310,7 @@ public abstract class BaseService extends Service
         }
         catch (Exception ex)
         {
-            JourneyMap.getLogger().warning("Failed to UTF8 encode: " + data);
+            JourneyMap.getLogger().warn("Failed to UTF8 encode: " + data);
             return null;
         }
     }
@@ -337,7 +337,7 @@ public abstract class BaseService extends Service
         }
         catch (Exception ex)
         {
-            JourneyMap.getLogger().warning("Failed to gzip encode: " + data);
+            JourneyMap.getLogger().warn("Failed to gzip encode: " + data);
             return null;
         }
     }
@@ -395,7 +395,7 @@ public abstract class BaseService extends Service
             }
             catch (Exception e)
             {
-                JourneyMap.getLogger().warning("No ContentType match for file: " + name); //$NON-NLS-1$
+                JourneyMap.getLogger().warn("No ContentType match for file: " + name); //$NON-NLS-1$
                 return null;
             }
         }
@@ -510,7 +510,7 @@ public abstract class BaseService extends Service
             }
             catch (IOException e)
             {
-                JourneyMap.getLogger().warning("Couldn't get content length for FileInputStream"); //$NON-NLS-1$
+                JourneyMap.getLogger().warn("Couldn't get content length for FileInputStream"); //$NON-NLS-1$
             }
             return this;
         }

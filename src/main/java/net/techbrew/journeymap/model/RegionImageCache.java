@@ -18,7 +18,7 @@ import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
+import org.apache.logging.log4j.Level;
 
 public class RegionImageCache
 {
@@ -49,9 +49,9 @@ public class RegionImageCache
             public void run()
             {
                 flushToDisk();
-                if (JourneyMap.getLogger().isLoggable(Level.FINE))
+                if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
                 {
-                    JourneyMap.getLogger().fine("RegionImageCache flushing to disk on shutdown"); //$NON-NLS-1$
+                    JourneyMap.getLogger().debug("RegionImageCache flushing to disk on shutdown"); //$NON-NLS-1$
                 }
             }
         }));
@@ -132,9 +132,9 @@ public class RegionImageCache
         {
             if (lastFlush + flushInterval < System.currentTimeMillis())
             {
-                if (JourneyMap.getLogger().isLoggable(Level.FINE))
+                if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
                 {
-                    JourneyMap.getLogger().fine("RegionImageCache auto-flushing"); //$NON-NLS-1$
+                    JourneyMap.getLogger().debug("RegionImageCache auto-flushing"); //$NON-NLS-1$
                 }
                 flushToDisk();
             }
@@ -165,9 +165,9 @@ public class RegionImageCache
     {
         if (time <= lastFlush)
         {
-            if (JourneyMap.getLogger().isLoggable(Level.FINE))
+            if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
             {
-                JourneyMap.getLogger().fine("Nothing dirty, last flush was " + (time - lastFlush) + "ms before " + time);
+                JourneyMap.getLogger().debug("Nothing dirty, last flush was " + (time - lastFlush) + "ms before " + time);
             }
             return Collections.EMPTY_LIST;
         }
@@ -183,9 +183,9 @@ public class RegionImageCache
                         list.add(entry.getKey());
                     }
                 }
-                if (JourneyMap.getLogger().isLoggable(Level.FINE))
+                if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
                 {
-                    JourneyMap.getLogger().fine("Dirty regions: " + list.size() + " of " + imageSets.size());
+                    JourneyMap.getLogger().debug("Dirty regions: " + list.size() + " of " + imageSets.size());
                 }
             }
             return list;
@@ -252,15 +252,15 @@ public class RegionImageCache
             Boolean remove = size() > capacity;
             if (remove)
             {
-                if (JourneyMap.getLogger().isLoggable(Level.FINE))
+                if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
                 {
-                    JourneyMap.getLogger().fine("RegionImageCache purging " + entry.getKey()); //$NON-NLS-1$
+                    JourneyMap.getLogger().debug("RegionImageCache purging " + entry.getKey()); //$NON-NLS-1$
                 }
                 entry.getValue().writeToDisk(false);
             }
-            if (JourneyMap.getLogger().isLoggable(Level.FINE))
+            if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
             {
-                JourneyMap.getLogger().fine("RegionImageCache size: " + (this.size() - 1)); //$NON-NLS-1$
+                JourneyMap.getLogger().debug("RegionImageCache size: " + (this.size() - 1)); //$NON-NLS-1$
             }
             return remove;
         }

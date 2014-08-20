@@ -201,7 +201,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().severe(String.format("Can't get blockId/meta for chunk %s,%s block %s,%s,%s : %s", chunkMd.getChunk().xPosition, chunkMd.getChunk().zPosition, x, y, z, LogFormatter.toString(e)));
+            JourneyMap.getLogger().error(String.format("Can't get blockId/meta for chunk %s,%s block %s,%s,%s : %s", chunkMd.getChunk().xPosition, chunkMd.getChunk().zPosition, x, y, z, LogFormatter.toString(e)));
             return AIRBLOCK;
         }
     }
@@ -237,7 +237,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().severe(String.format("Can't get blockId/meta for block %s meta %s : %s", block, meta, LogFormatter.toString(e)));
+            JourneyMap.getLogger().error(String.format("Can't get blockId/meta for block %s meta %s : %s", block, meta, LogFormatter.toString(e)));
             return AIRBLOCK;
         }
     }
@@ -253,7 +253,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         EnumSet<BlockMD.Flag> eset = getFlags(block);
         eset.addAll(Arrays.asList(flags));
         blockFlags.put(block, eset);
-        JourneyMap.getLogger().fine(block.getUnlocalizedName() + " flags set: " + eset);
+        JourneyMap.getLogger().debug(block.getUnlocalizedName() + " flags set: " + eset);
     }
 
     public boolean hasFlag(Block block, BlockMD.Flag flag)

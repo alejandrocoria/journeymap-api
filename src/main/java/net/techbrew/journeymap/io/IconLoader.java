@@ -28,8 +28,8 @@ import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 public class IconLoader
 {
@@ -65,7 +65,7 @@ public class IconLoader
 
         if (blocksTexture == null)
         {
-            logger.warning("BlocksTexture not yet loaded");
+            logger.warn("BlocksTexture not yet loaded");
             return null;
         }
 
@@ -108,7 +108,7 @@ public class IconLoader
         catch (Throwable t)
         {
             failed.add(blockMD);
-            logger.severe("Error getting color: " + LogFormatter.toString(t));
+            logger.error("Error getting color: " + LogFormatter.toString(t));
             return null;
         }
     }
@@ -194,12 +194,12 @@ public class IconLoader
                         }
                         catch (ArrayIndexOutOfBoundsException e)
                         {
-                            logger.warning("Bad index at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
+                            logger.warn("Bad index at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
                             continue; // Bugfix for some texturepacks that may not be reporting correct size?
                         }
                         catch (Throwable e)
                         {
-                            logger.warning("Couldn't get RGB from BlocksTexture at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
+                            logger.warn("Couldn't get RGB from BlocksTexture at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
                             break outer;
                         }
                         alpha = (argb >> 24) & 0xFF;
@@ -237,7 +237,7 @@ public class IconLoader
             }
             else
             {
-                logger.warning("Couldn't get texture for " + icon.getIconName() + " using blockid ");
+                logger.warn("Couldn't get texture for " + icon.getIconName() + " using blockid ");
             }
 
             if (unusable)
@@ -245,7 +245,7 @@ public class IconLoader
                 blockMD.addFlags(BlockMD.Flag.Error);
                 dataCache.getBlockMetadata().setFlags(blockMD.getBlock(), BlockMD.Flag.Error);
                 String pattern = "Unusable texture for %s, icon=%s,texture coords %s,%s - %s,%s";
-                logger.fine(String.format(pattern, blockMD, icon.getIconName(), xStart, yStart, xStop, yStop));
+                logger.debug(String.format(pattern, blockMD, icon.getIconName(), xStart, yStart, xStop, yStop));
                 r = g = b = 0;
             }
 
@@ -281,14 +281,14 @@ public class IconLoader
         }
         catch (Throwable e1)
         {
-            logger.warning("Error deriving color for " + blockMD + ": " + LogFormatter.toString(e1));
+            logger.warn("Error deriving color for " + blockMD + ": " + LogFormatter.toString(e1));
         }
 
         if (color != null)
         {
-            if (logger.isLoggable(Level.FINE))
+            if (logger.isTraceEnabled())
             {
-                logger.fine("Derived color for " + blockMD + ": " + Integer.toHexString(color.getRGB()));
+                logger.debug("Derived color for " + blockMD + ": " + Integer.toHexString(color.getRGB()));
             }
         }
 
@@ -336,7 +336,7 @@ public class IconLoader
         }
         catch (Throwable t)
         {
-            logger.severe("Could not load blocksTexture :" + t);
+            logger.error("Could not load blocksTexture :" + t);
             timer.cancel();
         }
 

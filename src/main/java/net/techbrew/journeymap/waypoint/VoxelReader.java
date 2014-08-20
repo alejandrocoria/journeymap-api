@@ -57,7 +57,7 @@ public class VoxelReader
         }
         catch (Throwable e)
         {
-            JourneyMap.getLogger().warning("Incompatible version of VoxelMap. Tried com.thevoxelbox.voxelmap.VoxelMap.instance.waypointManager.wayPts: " + e);
+            JourneyMap.getLogger().warn("Incompatible version of VoxelMap. Tried com.thevoxelbox.voxelmap.VoxelMap.instance.waypointManager.wayPts: " + e);
             ChatLog.announceI18N("jm.waypoint.import_vox_version");
             ChatLog.announceURL(VOXEL_JAR_NAME, VOXEL_JAR_URL);
             modLoaded = false;
@@ -97,7 +97,7 @@ public class VoxelReader
         }
         catch (Throwable e)
         {
-            JourneyMap.getLogger().severe("Exception getting VoxelMap waypoints: " + LogFormatter.toString(e));
+            JourneyMap.getLogger().error("Exception getting VoxelMap waypoints: " + LogFormatter.toString(e));
             modLoaded = false;
             return Collections.EMPTY_LIST;
         }
@@ -150,7 +150,7 @@ public class VoxelReader
             catch (Exception e)
             {
                 ChatLog.announceError(Constants.getString("jm.waypoint.import_vox_file_error", pointsFile.getName()));
-                JourneyMap.getLogger().severe(LogFormatter.toString(e));
+                JourneyMap.getLogger().error(LogFormatter.toString(e));
                 fileErrors++;
             }
         }
@@ -247,7 +247,7 @@ public class VoxelReader
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warning("Couldn't parse \"" + line + "\" because: " + e.getMessage());
+            JourneyMap.getLogger().warn("Couldn't parse \"" + line + "\" because: " + e.getMessage());
             pointErrors++;
             return null;
         }

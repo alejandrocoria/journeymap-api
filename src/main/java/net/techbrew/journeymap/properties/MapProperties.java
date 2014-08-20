@@ -44,7 +44,7 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
 
         if (entityIconSetName.get() == null || !FileHandler.getMobIconSetNames().contains(entityIconSetName.get()))
         {
-            JourneyMap.getLogger().warning(String.format("Entity Icon Set name '%s' is not valid, will use default instead.", entityIconSetName.get()));
+            JourneyMap.getLogger().warn(String.format("Entity Icon Set name '%s' is not valid, will use default instead.", entityIconSetName.get()));
             entityIconSetName.set(FileHandler.getMobIconSetNames().get(0));
             saveNeeded = true;
         }

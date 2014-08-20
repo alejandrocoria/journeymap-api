@@ -59,7 +59,7 @@ public class Strata
         {
             int amount = stack.isEmpty() ? initialPoolSize : poolGrowthIncrement;
             growFreePool(amount);
-            JourneyMap.getLogger().fine(String.format("Grew Strata pool for '%s' by '%s'. Free: %s, Used: %s", name, amount, unusedStack.size(), stack.size()));
+            JourneyMap.getLogger().debug(String.format("Grew Strata pool for '%s' by '%s'. Free: %s, Used: %s", name, amount, unusedStack.size(), stack.size()));
         }
 
         stack.push(unusedStack.pop());
@@ -101,7 +101,7 @@ public class Strata
     {
         if(stratum==null)
         {
-            JourneyMap.getLogger().warning("Null stratum in pool.");
+            JourneyMap.getLogger().warn("Null stratum in pool.");
             return;
         }
         else
@@ -154,7 +154,7 @@ public class Strata
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe("Couldn't push Stratum into stack: " + t);
+            JourneyMap.getLogger().error("Couldn't push Stratum into stack: " + t);
             return null;
         }
     }

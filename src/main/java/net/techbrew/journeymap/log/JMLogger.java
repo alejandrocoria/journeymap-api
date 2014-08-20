@@ -10,6 +10,7 @@ package net.techbrew.journeymap.log;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.FMLLog;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.ForgeVersion;
 import net.techbrew.journeymap.Constants;
@@ -19,28 +20,46 @@ import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.properties.PropertiesBase;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.*;
+
+import org.apache.logging.log4j.*;
+
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.appender.RandomAccessFileAppender;
+import org.apache.logging.log4j.core.appender.RandomAccessFileManager;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.ConfigurationFactory;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.impl.Log4jLogEvent;
+import org.apache.logging.log4j.core.layout.PatternLayout;
+import org.apache.logging.log4j.message.Message;
+import org.apache.logging.log4j.message.SimpleMessage;
+
 
 public class JMLogger
 {
     public static final String DEPRECATED_LOG_FILE = "journeyMap.log"; //$NON-NLS-1$
     public static final String LOG_FILE = "journeymap.log"; //$NON-NLS-1$
 
-    private static java.util.logging.FileHandler fileHandler;
+    private static RandomAccessFileAppender fileAppender;
 
     public static Logger init()
     {
-        final Logger logger = Logger.getLogger(JourneyMap.MOD_ID);
+        final Logger logger = LogManager.getLogger(JourneyMap.MOD_ID);
 
-        if (logger.getLevel() == null || logger.getLevel().intValue() > Level.INFO.intValue())
+        if(!logger.isInfoEnabled())
         {
-            logger.setLevel(Level.INFO);
+            logger.warn("Forge is surpressing INFO-level logging. If you need technical support for JourneyMap, you must return logging to INFO.");
         }
 
         // Remove deprecated logfile
@@ -54,7 +73,7 @@ public class JMLogger
         }
         catch (Exception e)
         {
-            logger.severe("Error removing deprecated logfile: " + e.getMessage());
+            logger.error("Error removing deprecated logfile: " + e.getMessage());
         }
 
         // File logging
@@ -70,48 +89,49 @@ public class JMLogger
                 logFile.getParentFile().mkdirs();
             }
 
-            LogFormatter formatter = new LogFormatter();
+            LoggerContext context = (LoggerContext) LogManager.getContext(false);
+            Configuration config = context.getConfiguration();
 
-            // Fix console format
-            ConsoleHandler consoleHandler = null;
-            for(Handler handler : logger.getHandlers())
+            PatternLayout layout = PatternLayout.createLayout(
+                    "[%d{HH:mm:ss}] [%t/%level] [%C{1}] %msg%n", null,
+                    null, "UTF-8", "true");
+
+            fileAppender = RandomAccessFileAppender
+                    .createAppender(
+                            logFile.getAbsolutePath(),// filename
+                            "true",// append
+                            "journeymap-logfile",// name
+                            "true",// immediateFlush
+                            "true",// ignoreExceptions
+                            layout,
+                            null,// filter
+                            "false",// advertise
+                            null,// advertiseURI
+                            null// config
+                    );
+
+            LoggerConfig loggerConfig = config.getLoggerConfig(logger.getName());
+            //String stringLogLevel = JourneyMap.getInstance().coreProperties.logLevel.get();
+            //Level logLevel = Level.toLevel(stringLogLevel, Level.INFO);
+            loggerConfig.setLevel(Level.INFO);
+            loggerConfig.addAppender(fileAppender, Level.ALL, null);
+            context.updateLoggers();
+
+            if(!fileAppender.isStarted())
             {
-                if(handler instanceof ConsoleHandler)
-                {
-                    consoleHandler = (ConsoleHandler) handler;
-                    break;
-                }
+                fileAppender.start();
             }
-            if(consoleHandler==null)
-            {
-                consoleHandler = new ConsoleHandler();
-                logger.addHandler(consoleHandler);
-            }
-            consoleHandler.setFormatter(formatter);
 
-            // Set file format
-            fileHandler = new java.util.logging.FileHandler(logFile.getAbsolutePath(), 0, 1, false);
-            fileHandler.setFormatter(formatter);
-            logger.addHandler(fileHandler);
+            logger.info("JourneyMap log initialized.");
 
-            // Add shutdown hook
-            Runtime.getRuntime().addShutdownHook(new JMThreadFactory("log").newThread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    fileHandler.flush();
-                    fileHandler.close();
-                }
-            }));
         }
         catch (SecurityException e)
         {
-            logger.severe("Error adding file handler: " + LogFormatter.toString(e));
+            logger.error("Error adding file handler: " + LogFormatter.toString(e));
         }
-        catch (IOException e)
+        catch (Throwable e)
         {
-            logger.severe("Error adding file handler: " + LogFormatter.toString(e));
+            logger.error("Error adding file handler: " + LogFormatter.toString(e));
         }
 
         return logger;
@@ -122,12 +142,10 @@ public class JMLogger
      */
     public static void logProperties()
     {
-        LogRecord record = new LogRecord(Level.INFO, getPropertiesSummary());
-        record.setSourceClassName("JMLogger");
-        record.setSourceMethodName("logProperties");
-        if (fileHandler != null)
+        LogEvent record = new Log4jLogEvent(JourneyMap.MOD_NAME, MarkerManager.getMarker(JourneyMap.MOD_NAME), null, Level.INFO, new SimpleMessage(getPropertiesSummary()), null);
+        if (fileAppender != null)
         {
-            fileHandler.publish(record);
+            fileAppender.append(record);
         }
     }
 
@@ -188,42 +206,6 @@ public class JMLogger
         }
 
         return sb.toString();
-    }
-
-    /**
-     * Set the logging level from the value in the properties file.
-     */
-    public static void setLevelFromProps()
-    {
-        final Logger logger = Logger.getLogger(JourneyMap.MOD_ID);
-
-        String propLevel = "";
-        Level level = Level.INFO;
-        try
-        {
-            propLevel = JourneyMap.getInstance().coreProperties.logLevel.get();
-            level = Level.parse(propLevel);
-            if (level != logger.getLevel())
-            {
-                logger.setLevel(level);
-                if (level.intValue() < Level.INFO.intValue())
-                {
-                    ChatLog.announceI18N("jm.common.log_warning", level.getName());
-                }
-            }
-        }
-        catch (IllegalArgumentException e)
-        {
-            logger.warning("Illegal value for logLevel in " + JourneyMap.getInstance().coreProperties.getFile().getName() + ": " + propLevel); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        }
-        catch (Throwable t)
-        {
-            logger.severe(LogFormatter.toString(t));
-        }
-        finally
-        {
-            logger.setLevel(level);
-        }
     }
 
     /**

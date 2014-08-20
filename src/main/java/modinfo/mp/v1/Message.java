@@ -6,8 +6,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import modinfo.ModInfo;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Created by mwoodman on 2/18/14.
@@ -65,13 +67,13 @@ public class Message implements Callable<Object>
             catch (MalformedURLException ex)
             {
                 exception = ex;
-                Logger.getLogger("modinfo").log(Level.SEVERE, "ModInfo got a bad URL: " + endpoint);
+                ModInfo.LOGGER.log(Level.ERROR, "ModInfo got a bad URL: " + endpoint);
                 break;
             }
             catch (IOException ex)
             {
                 exception = ex;
-                Logger.getLogger("modinfo").log(Level.SEVERE, "ModInfo can't send message", ex);
+                ModInfo.LOGGER.log(Level.ERROR, "ModInfo can't send message", ex);
             }
             finally
             {

@@ -43,7 +43,7 @@ public class LayerDelegate
             }
             catch (Exception e)
             {
-                JourneyMap.getLogger().severe(LogFormatter.toString(e));
+                JourneyMap.getLogger().error(LogFormatter.toString(e));
             }
         }
     }
@@ -59,7 +59,7 @@ public class LayerDelegate
             }
             catch (Exception e)
             {
-                JourneyMap.getLogger().severe(LogFormatter.toString(e));
+                JourneyMap.getLogger().error(LogFormatter.toString(e));
             }
         }
     }

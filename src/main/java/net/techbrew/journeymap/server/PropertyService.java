@@ -123,7 +123,7 @@ public class PropertyService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe(LogFormatter.toString(t));
+            JourneyMap.getLogger().error(LogFormatter.toString(t));
             throwEventException(500, Constants.getMessageJMERR12(path), event, true);
         }
     }
@@ -158,7 +158,7 @@ public class PropertyService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe(LogFormatter.toString(t));
+            JourneyMap.getLogger().error(LogFormatter.toString(t));
             throwEventException(500, Constants.getMessageJMERR12(path), event, true);
         }
     }

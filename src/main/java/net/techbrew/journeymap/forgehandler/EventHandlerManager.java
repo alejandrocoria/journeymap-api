@@ -55,7 +55,7 @@ public class EventHandlerManager
     {
         if (handlers.containsKey(handler.getClass()))
         {
-            JourneyMap.getLogger().warning("Handler already registered: " + handler.getClass().getName());
+            JourneyMap.getLogger().warn("Handler already registered: " + handler.getClass().getName());
             return;
         }
 
@@ -68,11 +68,11 @@ public class EventHandlerManager
             {
                 busType.eventBus.register(handler);
                 registered = true;
-                JourneyMap.getLogger().fine(name + " registered in " + busType);
+                JourneyMap.getLogger().debug(name + " registered in " + busType);
             }
             catch (Throwable t)
             {
-                JourneyMap.getLogger().severe(name + " registration FAILED in " + busType + ": " + LogFormatter.toString(t));
+                JourneyMap.getLogger().error(name + " registration FAILED in " + busType + ": " + LogFormatter.toString(t));
             }
         }
 
@@ -82,7 +82,7 @@ public class EventHandlerManager
         }
         else
         {
-            JourneyMap.getLogger().warning("Handler was not registered at all: " + handler.getClass().getName());
+            JourneyMap.getLogger().warn("Handler was not registered at all: " + handler.getClass().getName());
         }
     }
 
@@ -107,12 +107,12 @@ public class EventHandlerManager
                     }
                     if (unregistered)
                     {
-                        JourneyMap.getLogger().fine(name + " unregistered from " + busType);
+                        JourneyMap.getLogger().debug(name + " unregistered from " + busType);
                     }
                 }
                 catch (Throwable t)
                 {
-                    JourneyMap.getLogger().severe(name + " unregistration FAILED from " + busType + ": " + LogFormatter.toString(t));
+                    JourneyMap.getLogger().error(name + " unregistration FAILED from " + busType + ": " + LogFormatter.toString(t));
                 }
             }
         }

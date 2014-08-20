@@ -29,8 +29,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Contains a set of 9 tiles organized along compass Point2D.Doubles.
@@ -46,7 +46,7 @@ public class GridRenderer
     final Cache<Integer, Tile> tc = TileCache.instance();
     final TilePos centerPos = new TilePos(0, 0);
     private final Logger logger = JourneyMap.getLogger();
-    private final boolean debug = logger.isLoggable(Level.FINE);
+    private final boolean debug = logger.isTraceEnabled();
     private final TreeMap<TilePos, Integer> grid = new TreeMap<TilePos, Integer>();
     private final int gridSize; // 5 = 2560px.
     private final Color bgColor = new Color(0x22, 0x22, 0x22);
@@ -162,7 +162,7 @@ public class GridRenderer
 
             if (debug)
             {
-                logger.fine("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
+                logger.debug("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
                 Minecraft mc = FMLClientHandler.instance().getClient();
                 BufferedImage tmp = new BufferedImage(mc.displayWidth, mc.displayHeight, BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g = tmp.createGraphics();

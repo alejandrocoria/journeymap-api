@@ -22,8 +22,8 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 public class Tile
 {
@@ -40,7 +40,7 @@ public class Tile
     final Point ulBlock;
     final Point lrBlock;
     private final Logger logger = JourneyMap.getLogger();
-    private final boolean debug = logger.isLoggable(Level.FINE);
+    private final boolean debug = logger.isTraceEnabled();
     long lastImageTime = 0;
     Integer lastVSlice;
     MapType lastMapType;
@@ -141,7 +141,7 @@ public class Tile
             }
             catch (Throwable e)
             {
-                logger.severe(LogFormatter.toString(e));
+                logger.error(LogFormatter.toString(e));
             }
         }
         return false;
@@ -169,7 +169,7 @@ public class Tile
             }
             catch (Throwable e)
             {
-                logger.severe(LogFormatter.toString(e));
+                logger.error(LogFormatter.toString(e));
             }
         }
 
@@ -286,7 +286,7 @@ public class Tile
             {
                 if (textureImpl != null)
                 {
-                    logger.warning("Tile wasn't cleared before finalize() called: " + this);
+                    logger.warn("Tile wasn't cleared before finalize() called: " + this);
                     clear();
                 }
             }
@@ -297,7 +297,7 @@ public class Tile
         }
         catch (Throwable t)
         {
-            logger.severe(t.getMessage());
+            logger.error(t.getMessage());
         }
     }
 }

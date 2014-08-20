@@ -28,7 +28,7 @@ import net.techbrew.journeymap.ui.UIManager;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
-import java.util.logging.Level;
+import org.apache.logging.log4j.Level;
 
 
 public class MapOverlayActions extends JmUI
@@ -52,7 +52,7 @@ public class MapOverlayActions extends JmUI
         }
         catch (IOException e)
         {
-            JourneyMap.getLogger().log(Level.SEVERE, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e)); //$NON-NLS-1$
+            JourneyMap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e)); //$NON-NLS-1$
         }
     }
 

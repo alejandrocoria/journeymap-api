@@ -47,14 +47,14 @@ public class TaskBatch implements ITask
     {
         if (threadLogging)
         {
-            JourneyMap.getLogger().fine("START batching tasks");
+            JourneyMap.getLogger().debug("START batching tasks");
         }
 
         while (!taskList.isEmpty())
         {
             if (Thread.interrupted())
             {
-                JourneyMap.getLogger().warning("BastTask thread interrupted: " + this);
+                JourneyMap.getLogger().warn("BastTask thread interrupted: " + this);
                 throw new InterruptedException();
             }
 
@@ -63,24 +63,24 @@ public class TaskBatch implements ITask
             {
                 if (threadLogging)
                 {
-                    JourneyMap.getLogger().fine("Batching task: " + task);
+                    JourneyMap.getLogger().debug("Batching task: " + task);
                 }
                 task.performTask(mc, jm, jmWorldDir, threadLogging);
             }
             catch (ChunkMD.ChunkMissingException e)
             {
-                JourneyMap.getLogger().warning(e.getMessage());
+                JourneyMap.getLogger().warn(e.getMessage());
             }
             catch (Throwable t)
             {
                 String error = Constants.getMessageJMERR16(LogFormatter.toString(t));
-                JourneyMap.getLogger().severe(error);
+                JourneyMap.getLogger().error(error);
             }
         }
 
         if (threadLogging)
         {
-            JourneyMap.getLogger().fine("DONE batching tasks");
+            JourneyMap.getLogger().debug("DONE batching tasks");
         }
     }
 }

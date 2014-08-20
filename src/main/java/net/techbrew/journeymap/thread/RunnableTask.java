@@ -19,7 +19,7 @@ import net.techbrew.journeymap.task.ITask;
 import java.io.File;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Logger;
 
 public class RunnableTask implements Runnable
 {
@@ -46,7 +46,7 @@ public class RunnableTask implements Runnable
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().warning("Interrupted task that ran too long:" + task);
+            JourneyMap.getLogger().warn("Interrupted task that ran too long:" + task);
         }
     }
 
@@ -65,14 +65,14 @@ public class RunnableTask implements Runnable
                 // Bail if needed
                 if (!jm.isMapping())
                 {
-                    logger.fine("JM not mapping, aborting");
+                    logger.debug("JM not mapping, aborting");
                     return;
                 }
 
                 final File jmWorldDir = FileHandler.getJMWorldDir(mc);
                 if (jmWorldDir == null)
                 {
-                    logger.fine("JM world dir not found, aborting");
+                    logger.debug("JM world dir not found, aborting");
                     return;
                 }
 
@@ -82,7 +82,7 @@ public class RunnableTask implements Runnable
             catch (Throwable t)
             {
                 String error = Constants.getMessageJMERR16(LogFormatter.toString(t));
-                logger.severe(error);
+                logger.error(error);
             }
         }
     }

@@ -60,7 +60,7 @@ public class FileService extends BaseService
 
         if (resourceDir == null)
         {
-            JourneyMap.getLogger().severe("Can't determine path to webroot!");
+            JourneyMap.getLogger().error("Can't determine path to webroot!");
         }
         else
         {
@@ -123,7 +123,7 @@ public class FileService extends BaseService
                         ResponseHeader.on(event).contentType(ContentType.png);
                     }
                     fileStream = FileHandler.getEntityIconStream(setName, iconPath);
-                    JourneyMap.getLogger().warning("Couldn't get file for " + path);
+                    JourneyMap.getLogger().warn("Couldn't get file for " + path);
                 }
                 else
                 {
@@ -142,7 +142,7 @@ public class FileService extends BaseService
 
             if (fileStream == null)
             {
-                JourneyMap.getLogger().fine("Path not found: " + path);
+                JourneyMap.getLogger().debug("Path not found: " + path);
                 throwEventException(404, Constants.getMessageJMERR13(path), event, true);
             }
             else
@@ -158,7 +158,7 @@ public class FileService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe(LogFormatter.toString(t));
+            JourneyMap.getLogger().error(LogFormatter.toString(t));
             throwEventException(500, Constants.getMessageJMERR12(path), event, true);
         }
     }
@@ -246,7 +246,7 @@ public class FileService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe(LogFormatter.toString(t));
+            JourneyMap.getLogger().error(LogFormatter.toString(t));
         }
 
         return in;
@@ -330,7 +330,7 @@ public class FileService extends BaseService
         }
         catch (IOException e)
         {
-            JourneyMap.getLogger().severe(LogFormatter.toString(e));
+            JourneyMap.getLogger().error(LogFormatter.toString(e));
             throw event;
         }
         finally
@@ -365,7 +365,7 @@ public class FileService extends BaseService
         }
         catch (Exception ex)
         {
-            JourneyMap.getLogger().warning("Failed to gzip encode: " + data);
+            JourneyMap.getLogger().warn("Failed to gzip encode: " + data);
             return null;
         }
     }

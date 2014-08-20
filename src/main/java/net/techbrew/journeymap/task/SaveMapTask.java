@@ -13,7 +13,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.MapSaver;
 
 import java.io.File;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Logger;
 
 public class SaveMapTask implements ITask
 {

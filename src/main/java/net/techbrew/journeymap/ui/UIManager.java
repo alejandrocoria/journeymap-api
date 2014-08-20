@@ -29,8 +29,8 @@ import net.techbrew.journeymap.ui.waypoint.WaypointHelp;
 import net.techbrew.journeymap.ui.waypoint.WaypointManager;
 import net.techbrew.journeymap.ui.waypoint.WaypointOptions;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 public class UIManager
 {
@@ -63,7 +63,7 @@ public class UIManager
     {
         if (minecraft.currentScreen != null && minecraft.currentScreen instanceof JmUI)
         {
-            logger.fine("Closing " + minecraft.currentScreen.getClass());
+            logger.debug("Closing " + minecraft.currentScreen.getClass());
             ((JmUI) minecraft.currentScreen).close();
         }
         KeyBinding.unPressAllKeys();
@@ -71,7 +71,7 @@ public class UIManager
 
     public void openInventory()
     {
-        logger.fine("Opening inventory");
+        logger.debug("Opening inventory");
         closeAll();
         minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer)); // displayGuiScreen
     }
@@ -85,7 +85,7 @@ public class UIManager
         }
         catch (Throwable e)
         {
-            logger.log(Level.SEVERE, "Unexpected exception creating UI with return class: " + LogFormatter.toString(e)); //$NON-NLS-1$
+            logger.log(Level.ERROR, "Unexpected exception creating UI with return class: " + LogFormatter.toString(e)); //$NON-NLS-1$
             closeCurrent();
             return null;
         }
@@ -100,7 +100,7 @@ public class UIManager
         }
         catch (Throwable e)
         {
-            logger.log(Level.SEVERE, "Unexpected exception creating UI: " + LogFormatter.toString(e)); //$NON-NLS-1$
+            logger.log(Level.ERROR, "Unexpected exception creating UI: " + LogFormatter.toString(e)); //$NON-NLS-1$
             closeCurrent();
             return null;
         }
@@ -109,7 +109,7 @@ public class UIManager
     public <T extends JmUI> T open(T ui)
     {
         closeCurrent();
-        logger.fine("Opening UI " + ui.getClass().getSimpleName());
+        logger.debug("Opening UI " + ui.getClass().getSimpleName());
         try
         {
             minecraft.displayGuiScreen(ui);
@@ -117,7 +117,7 @@ public class UIManager
         }
         catch (Throwable t)
         {
-            logger.severe(String.format("Unexpected exception opening UI %s: %s", ui.getClass(), LogFormatter.toString(t)));
+            logger.error(String.format("Unexpected exception opening UI %s: %s", ui.getClass(), LogFormatter.toString(t)));
         }
         return ui;
     }
@@ -154,7 +154,7 @@ public class UIManager
         }
         catch (Throwable e)
         {
-            JourneyMap.getLogger().severe("Error drawing minimap: " + LogFormatter.toString(e));
+            JourneyMap.getLogger().error("Error drawing minimap: " + LogFormatter.toString(e));
         }
     }
 
@@ -182,7 +182,7 @@ public class UIManager
         }
         catch (Throwable e)
         {
-            JourneyMap.getLogger().severe("Error opening map on waypoint: " + LogFormatter.toString(e));
+            JourneyMap.getLogger().error("Error opening map on waypoint: " + LogFormatter.toString(e));
         }
     }
 
@@ -242,7 +242,7 @@ public class UIManager
             }
             catch (Throwable e)
             {
-                JourneyMap.getLogger().severe("Error opening waypoint manager: " + LogFormatter.toString(e));
+                JourneyMap.getLogger().error("Error opening waypoint manager: " + LogFormatter.toString(e));
             }
         }
     }
@@ -258,7 +258,7 @@ public class UIManager
             }
             catch (Throwable e)
             {
-                JourneyMap.getLogger().severe("Error opening waypoint editor: " + LogFormatter.toString(e));
+                JourneyMap.getLogger().error("Error opening waypoint editor: " + LogFormatter.toString(e));
             }
         }
     }

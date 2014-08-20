@@ -43,8 +43,8 @@ import org.lwjgl.input.Mouse;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Displays the map as a full-screen overlay in-game.
@@ -139,7 +139,7 @@ public class MapOverlay extends JmUI
         }
         catch (Throwable e)
         {
-            logger.log(Level.SEVERE, "Unexpected exception in jm.fullscreen.drawScreen(): " + LogFormatter.toString(e)); //$NON-NLS-1$
+            logger.log(Level.ERROR, "Unexpected exception in jm.fullscreen.drawScreen(): " + LogFormatter.toString(e)); //$NON-NLS-1$
             UIManager.getInstance().closeAll();
         }
         finally
@@ -477,7 +477,7 @@ public class MapOverlay extends JmUI
                 }
                 catch (Exception e)
                 {
-                    logger.severe("Error moving grid: " + e);
+                    logger.error("Error moving grid: " + e);
                 }
 
                 setFollow(false);
@@ -777,7 +777,7 @@ public class MapOverlay extends JmUI
         EntityClientPlayerMP player = mc.thePlayer;
         if (player == null)
         {
-            logger.warning("Could not get player"); //$NON-NLS-1$
+            logger.warn("Could not get player"); //$NON-NLS-1$
             return;
         }
 

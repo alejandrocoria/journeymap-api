@@ -302,7 +302,7 @@ public class DisplayVars
             }
             catch (IllegalArgumentException e)
             {
-                JourneyMap.getLogger().warning("Not a valid minimap position in : " + miniMapProperties.getFile());
+                JourneyMap.getLogger().warn("Not a valid minimap position in : " + miniMapProperties.getFile());
             }
 
             if (position == null)
@@ -323,7 +323,7 @@ public class DisplayVars
             }
             catch (IllegalArgumentException e)
             {
-                JourneyMap.getLogger().warning("Not a valid minimap position: " + name);
+                JourneyMap.getLogger().warn("Not a valid minimap position: " + name);
             }
 
             if (value == null)
@@ -362,7 +362,7 @@ public class DisplayVars
             }
             catch (IllegalArgumentException e)
             {
-                JourneyMap.getLogger().warning("Not a valid minimap shape in : " + miniMapProperties.getFile());
+                JourneyMap.getLogger().warn("Not a valid minimap shape in : " + miniMapProperties.getFile());
             }
 
             if (shape == null)
@@ -383,7 +383,7 @@ public class DisplayVars
             }
             catch (IllegalArgumentException e)
             {
-                JourneyMap.getLogger().warning("Not a valid minimap shape: " + name);
+                JourneyMap.getLogger().warn("Not a valid minimap shape: " + name);
             }
 
             if (value == null || !value.isEnabled())

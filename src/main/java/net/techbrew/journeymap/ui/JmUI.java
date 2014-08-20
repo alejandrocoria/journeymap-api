@@ -23,7 +23,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Logger;
 
 public abstract class JmUI extends GuiScreen
 {
@@ -167,7 +167,7 @@ public abstract class JmUI extends GuiScreen
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe("Error in UI: " + LogFormatter.toString(t));
+            JourneyMap.getLogger().error("Error in UI: " + LogFormatter.toString(t));
             closeAndReturn();
         }
     }

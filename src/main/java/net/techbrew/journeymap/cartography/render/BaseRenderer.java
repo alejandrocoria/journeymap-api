@@ -186,7 +186,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         long count = badBlockCount.incrementAndGet();
         if (count == 1 || count % 10240 == 0)
         {
-            JourneyMap.getLogger().warning(
+            JourneyMap.getLogger().warn(
                     "Bad block at " + x + "," + y + "," + z //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                             + ". Total bad blocks painted: " + count
             ); //$NON-NLS-1$
@@ -426,7 +426,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         Float slope = slopes[x][z];
         if(slope==null || slope.isNaN())
         {
-            JourneyMap.getLogger().warning("No slope for " + chunkMd + " at " + x + "," + z);
+            JourneyMap.getLogger().warn("No slope for " + chunkMd + " at " + x + "," + z);
             slope = 1f;
         }
         return slope;
@@ -507,7 +507,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warning("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
+            JourneyMap.getLogger().warn("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
         }
 
         //why is height 4 set on a chunk to the left?
@@ -664,7 +664,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warning(e.getMessage());
+            JourneyMap.getLogger().warn(e.getMessage());
             return null;
         }
     }

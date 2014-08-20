@@ -23,7 +23,7 @@ import net.techbrew.journeymap.model.ChunkMD;
 
 import java.io.DataInputStream;
 import java.io.File;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Logger;
 
 public class ChunkLoader
 {
@@ -118,7 +118,7 @@ public class ChunkLoader
             }
             catch (Throwable t)
             {
-                logger.severe("Error getting chunk from RegionFile: " + LogFormatter.toString(t));
+                logger.error("Error getting chunk from RegionFile: " + LogFormatter.toString(t));
             }
         }
         return chunk;
@@ -134,12 +134,12 @@ public class ChunkLoader
 
         if (!par4NBTTagCompound.hasKey("Level"))
         {
-            logger.severe("Chunk file at " + par2 + "," + par3 + " is missing level data, skipping");
+            logger.error("Chunk file at " + par2 + "," + par3 + " is missing level data, skipping");
             return null;
         }
         else if (!par4NBTTagCompound.getCompoundTag("Level").hasKey("Sections"))
         {
-            logger.severe("Chunk file at " + par2 + "," + par3 + " is missing block data, skipping");
+            logger.error("Chunk file at " + par2 + "," + par3 + " is missing block data, skipping");
             return null;
         }
         else
@@ -148,7 +148,7 @@ public class ChunkLoader
 
             if (!var5.isAtLocation(par2, par3))
             {
-                logger.severe("Chunk file at " + par2 + "," + par3 + " is in the wrong location; relocating. (Expected " + par2 + ", " + par3 + ", got " + var5.xPosition + ", " + var5.zPosition + ")");
+                logger.error("Chunk file at " + par2 + "," + par3 + " is in the wrong location; relocating. (Expected " + par2 + ", " + par3 + ", got " + var5.xPosition + ", " + var5.zPosition + ")");
                 par4NBTTagCompound.setInteger("xPos", par2);
                 par4NBTTagCompound.setInteger("zPos", par3);
                 var5 = readChunkFromNBT(world, par4NBTTagCompound.getCompoundTag("Level"));

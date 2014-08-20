@@ -76,7 +76,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     {
         if (vSlice == null)
         {
-            JourneyMap.getLogger().warning("ChunkOverworldCaveRenderer is for caves. vSlice can't be null");
+            JourneyMap.getLogger().warn("ChunkOverworldCaveRenderer is for caves. vSlice can't be null");
             return false;
         }
 
@@ -89,7 +89,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             ok = surfaceRenderer.render(g2D, chunkMd, vSlice, true);
             if (!ok)
             {
-                JourneyMap.getLogger().fine("The surface chunk didn't paint: " + chunkMd.toString());
+                JourneyMap.getLogger().debug("The surface chunk didn't paint: " + chunkMd.toString());
             }
         }
 
@@ -115,7 +115,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
             if (!ok)
             {
-                JourneyMap.getLogger().fine("The underground chunk didn't paint: " + chunkMd.toString());
+                JourneyMap.getLogger().debug("The underground chunk didn't paint: " + chunkMd.toString());
             }
             return ok;
         }
@@ -233,7 +233,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     paintBadBlock(x, vSlice, z, g2D);
                     String error = Constants.getMessageJMERR07("x,vSlice,z = " + x + "," //$NON-NLS-1$ //$NON-NLS-2$
                             + vSlice + "," + z + " : " + LogFormatter.toString(t)); //$NON-NLS-1$ //$NON-NLS-2$
-                    JourneyMap.getLogger().severe(error);
+                    JourneyMap.getLogger().error(error);
                 }
             }
         }
@@ -421,7 +421,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warning("Couldn't get safe slice block height at " + x + "," + z + ": " + e);
+            JourneyMap.getLogger().warn("Couldn't get safe slice block height at " + x + "," + z + ": " + e);
             y = sliceMaxY;
         }
 

@@ -81,7 +81,7 @@ public class ReiReader
         }
         catch (Throwable e)
         {
-            JourneyMap.getLogger().warning("Incompatible version of Reijm.minimap. Tried reifnsk.jm.minimap.Reijm.minimap.instance.getWaypoints(): " + e);
+            JourneyMap.getLogger().warn("Incompatible version of Reijm.minimap. Tried reifnsk.jm.minimap.Reijm.minimap.instance.getWaypoints(): " + e);
             ChatLog.announceI18N("jm.waypoint.import_rei_version");
             modLoaded = false;
             return Collections.EMPTY_LIST;
@@ -120,7 +120,7 @@ public class ReiReader
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warning("Could not derive Rei filename: " + e.getMessage());
+            JourneyMap.getLogger().warn("Could not derive Rei filename: " + e.getMessage());
         }
 
         if (worldName == null)
@@ -179,7 +179,7 @@ public class ReiReader
             catch (Exception e)
             {
                 ChatLog.announceError(Constants.getString("jm.waypoint.import_rei_file_error", pointsFile.getName()));
-                JourneyMap.getLogger().severe(LogFormatter.toString(e));
+                JourneyMap.getLogger().error(LogFormatter.toString(e));
                 fileErrors++;
             }
         }
@@ -253,7 +253,7 @@ public class ReiReader
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warning("Couldn't parse " + v[i] + " as " + parts[i] + " in \"" + line + "\" because: " + e.getMessage());
+            JourneyMap.getLogger().warn("Couldn't parse " + v[i] + " as " + parts[i] + " in \"" + line + "\" because: " + e.getMessage());
             pointErrors++;
             return null;
         }

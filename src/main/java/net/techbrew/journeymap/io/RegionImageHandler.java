@@ -25,7 +25,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.logging.Level;
+import org.apache.logging.log4j.Level;
 
 public class RegionImageHandler
 {
@@ -150,7 +150,7 @@ public class RegionImageHandler
             catch (Exception e)
             {
                 String error = Constants.getMessageJMERR21(regionFile, LogFormatter.toString(e));
-                JourneyMap.getLogger().severe(error);
+                JourneyMap.getLogger().error(error);
             }
         }
 
@@ -180,7 +180,7 @@ public class RegionImageHandler
         catch (IOException e)
         {
             String error = Constants.getMessageJMERR17(e.getMessage());
-            JourneyMap.getLogger().severe(error);
+            JourneyMap.getLogger().error(error);
             return null;
         }
     }
@@ -309,10 +309,10 @@ public class RegionImageHandler
 
         g2D.dispose();
 
-        if (JourneyMap.getLogger().isLoggable(Level.FINE))
+        if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
         {
             stop = System.currentTimeMillis();
-            JourneyMap.getLogger().fine("getMergedChunks time: " + (stop - start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
+            JourneyMap.getLogger().debug("getMergedChunks time: " + (stop - start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         if (allowNullImage && !imageDrawn)
@@ -411,7 +411,7 @@ public class RegionImageHandler
             }
             catch (IOException e)
             {
-                JourneyMap.getLogger().severe(Constants.getMessageJMERR22(tmpFile, LogFormatter.toString(e)));
+                JourneyMap.getLogger().error(Constants.getMessageJMERR22(tmpFile, LogFormatter.toString(e)));
             }
         }
         return tmpFile;

@@ -9,8 +9,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import modinfo.ModInfo;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Created by mwoodman on 2/17/14.
@@ -89,7 +91,7 @@ public class Client {
                 }
                 catch(Throwable t)
                 {
-                    Logger.getLogger("modinfo").log(Level.SEVERE, "ModInfo couldn't send message", t);
+                    ModInfo.LOGGER.log(Level.ERROR, "ModInfo couldn't send message", t);
                 }
 
                 try
@@ -101,7 +103,7 @@ public class Client {
                 }
                 catch(Throwable t)
                 {
-                    Logger.getLogger("modinfo").log(Level.SEVERE, "ModInfo couldn't do verbose output", t);
+                    ModInfo.LOGGER.log(Level.ERROR, "ModInfo couldn't do verbose output", t);
                 }
 
                 try
@@ -113,7 +115,7 @@ public class Client {
                 }
                 catch(Throwable t)
                 {
-                    Logger.getLogger("modinfo").log(Level.SEVERE, "ModInfo couldn't use callback", t);
+                    ModInfo.LOGGER.log(Level.ERROR, "ModInfo couldn't use callback", t);
                 }
             }
         };
@@ -162,7 +164,7 @@ public class Client {
         }
         catch(Throwable t)
         {
-            Logger.getLogger("modinfo").log(Level.SEVERE, "ModInfo couldn't create useragent string", t);
+            ModInfo.LOGGER.log(Level.ERROR, "ModInfo couldn't create useragent string", t);
             agent = "Mozilla/5.0 (Unknown)";
         }
 

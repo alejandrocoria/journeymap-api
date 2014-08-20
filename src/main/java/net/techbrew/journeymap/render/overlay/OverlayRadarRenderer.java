@@ -117,13 +117,13 @@ public class OverlayRadarRenderer
                 }
                 catch(Exception e)
                 {
-                    JourneyMap.getLogger().severe("Exception during prepareSteps: " + LogFormatter.toString(e));
+                    JourneyMap.getLogger().error("Exception during prepareSteps: " + LogFormatter.toString(e));
                 }
             }
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe("Throwable during prepareSteps: " + LogFormatter.toString(t));
+            JourneyMap.getLogger().error("Throwable during prepareSteps: " + LogFormatter.toString(t));
         }
 
         return drawStepList;

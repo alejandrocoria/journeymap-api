@@ -38,7 +38,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -203,7 +203,7 @@ public class MiniMap
                 }
                 catch (Throwable t)
                 {
-                    logger.severe("Stencil buffer failing with circle mask:" + LogFormatter.toString(t));
+                    logger.error("Stencil buffer failing with circle mask:" + LogFormatter.toString(t));
                     //return;
                 }
             }
@@ -319,7 +319,7 @@ public class MiniMap
         }
         catch (Throwable t)
         {
-            logger.severe("Minimap error:" + LogFormatter.toString(t));
+            logger.error("Minimap error:" + LogFormatter.toString(t));
         }
         finally
         {

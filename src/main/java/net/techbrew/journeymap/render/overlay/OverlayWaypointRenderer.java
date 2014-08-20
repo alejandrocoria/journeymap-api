@@ -62,7 +62,7 @@ public class OverlayWaypointRenderer
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe("Error during prepareSteps: " + LogFormatter.toString(t));
+            JourneyMap.getLogger().error("Error during prepareSteps: " + LogFormatter.toString(t));
         }
 
         return drawStepList;

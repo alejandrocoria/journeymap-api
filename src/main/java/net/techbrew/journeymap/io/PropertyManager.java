@@ -126,11 +126,11 @@ public class PropertyManager
         {
             properties.setProperty(key.getProperty(), value.toString());
             writeToFile();
-            JourneyMap.getLogger().fine("Property changed: " + key.getProperty() + "=" + value);
+            JourneyMap.getLogger().debug("Property changed: " + key.getProperty() + "=" + value);
         }
         else
         {
-            JourneyMap.getLogger().fine("Property unchanged: " + key.getProperty() + "=" + value);
+            JourneyMap.getLogger().debug("Property unchanged: " + key.getProperty() + "=" + value);
         }
     }
 
@@ -193,7 +193,7 @@ public class PropertyManager
             File propFile = getFile();
             if (!propFile.exists())
             {
-                JourneyMap.getLogger().fine("Legacy property file doesn't exist: " + propFile.getAbsolutePath()); //$NON-NLS-1$
+                JourneyMap.getLogger().debug("Legacy property file doesn't exist: " + propFile.getAbsolutePath()); //$NON-NLS-1$
                 return;
             }
 
@@ -206,7 +206,7 @@ public class PropertyManager
             catch (IOException e)
             {
                 String error = Constants.getMessageJMERR19(propFile.getAbsolutePath());
-                JourneyMap.getLogger().severe(error + ": " + LogFormatter.toString(e));
+                JourneyMap.getLogger().error(error + ": " + LogFormatter.toString(e));
                 return;
             }
 
@@ -244,7 +244,7 @@ public class PropertyManager
         File propFile = getFile();
         if (!propFile.exists())
         {
-            JourneyMap.getLogger().fine("Legacy property file doesn't exist: " + propFile.getAbsolutePath()); //$NON-NLS-1$
+            JourneyMap.getLogger().debug("Legacy property file doesn't exist: " + propFile.getAbsolutePath()); //$NON-NLS-1$
             return;
         }
 
@@ -308,8 +308,8 @@ public class PropertyManager
 //				out.close();
 //			} catch(IOException e) {
 //				String error = Constants.getMessageJMERR20(propFile.getAbsolutePath());
-//				JourneyMap.getLogger().severe(error);
-//				JourneyMap.getLogger().severe(LogFormatter.toString(e));
+//				JourneyMap.getLogger().error(error);
+//				JourneyMap.getLogger().error(LogFormatter.toString(e));
 //				throw new RuntimeException(error);
 //			}
 //		}

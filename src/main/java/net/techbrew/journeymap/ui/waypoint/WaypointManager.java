@@ -170,7 +170,7 @@ public class WaypointManager extends JmUI
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe(LogFormatter.toString(t));
+            JourneyMap.getLogger().error(LogFormatter.toString(t));
             UIManager.getInstance().closeAll();
         }
     }

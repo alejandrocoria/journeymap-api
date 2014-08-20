@@ -74,7 +74,7 @@ public class RenderWaypointBeacon
                     }
                     catch (Throwable t)
                     {
-                        JourneyMap.getLogger().severe("EntityWaypoint failed to render for " + wp + ": " + LogFormatter.toString(t));
+                        JourneyMap.getLogger().error("EntityWaypoint failed to render for " + wp + ": " + LogFormatter.toString(t));
                     }
                 }
             }
@@ -82,7 +82,7 @@ public class RenderWaypointBeacon
         catch (Throwable t)
         {
             allTimer.cancel();
-            JourneyMap.getLogger().severe("Error rendering waypoints: " + LogFormatter.toString(t));
+            JourneyMap.getLogger().error("Error rendering waypoints: " + LogFormatter.toString(t));
         }
         finally
         {

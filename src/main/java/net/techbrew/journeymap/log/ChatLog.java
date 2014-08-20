@@ -23,7 +23,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
+import org.apache.logging.log4j.Level;
 
 /**
  * Provides messages to both chat GUI and log.
@@ -76,7 +76,7 @@ public class ChatLog
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warning("Couldn't build ClickEvent for file: " + LogFormatter.toString(e));
+            JourneyMap.getLogger().warn("Couldn't build ClickEvent for file: " + LogFormatter.toString(e));
         }
         queueAnnouncement(chat);
     }
@@ -136,11 +136,11 @@ public class ChatLog
                 }
                 catch (Exception e)
                 {
-                    JourneyMap.getLogger().severe("Could not display announcement in chat: " + LogFormatter.toString(e));
+                    JourneyMap.getLogger().error("Could not display announcement in chat: " + LogFormatter.toString(e));
                 }
                 finally
                 {
-                    Level logLevel = message.getFormatArgs()[0] instanceof ErrorChat ? Level.SEVERE : Level.INFO;
+                    Level logLevel = message.getFormatArgs()[0] instanceof ErrorChat ? Level.ERROR : Level.INFO;
                     JourneyMap.getLogger().log(logLevel, StringUtils.stripControlCodes(message.getUnformattedTextForChat()));
                 }
             }

@@ -19,8 +19,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Provides a common cache for multiple GridRenderers to make use of.
@@ -107,9 +107,9 @@ public class TileCache implements RemovalListener<Integer, Tile>
         Tile oldTile = notification.getValue();
         if (!retained.containsValue(oldTile))
         {
-            if (logger.isLoggable(Level.FINER))
+            if (logger.isEnabled(Level.DEBUG))
             {
-                logger.finer("Expired:" + notification.getValue() + " because: " + notification.getCause() + ". Size now: " + cache.size());
+                logger.debug("Expired:" + notification.getValue() + " because: " + notification.getCause() + ". Size now: " + cache.size());
             }
             oldTile.clear();
         }

@@ -25,7 +25,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.logging.Level;
+import org.apache.logging.log4j.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,7 +74,7 @@ public class MapSaver
 
             if (!isValid())
             {
-                JourneyMap.getLogger().warning("No images found in " + getImageDir());
+                JourneyMap.getLogger().warn("No images found in " + getImageDir());
                 return null;
             }
 
@@ -98,13 +98,13 @@ public class MapSaver
         catch (java.lang.OutOfMemoryError e)
         {
             String error = Constants.getMessageJMERR18("Out Of Memory: Increase Java Heap Size for Minecraft to save large maps.");
-            JourneyMap.getLogger().severe(error);
+            JourneyMap.getLogger().error(error);
             ChatLog.announceError(error);
             timer.cancel();
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe(LogFormatter.toString(t));
+            JourneyMap.getLogger().error(LogFormatter.toString(t));
             ChatLog.announceError(Constants.getMessageJMERR18(t.getMessage()));
             timer.cancel();
             return null;
@@ -204,7 +204,7 @@ public class MapSaver
 
             if (minX == null || maxX == null || minZ == null || maxZ == null)
             {
-                JourneyMap.getLogger().warning("No region files to save in " + imageDir);
+                JourneyMap.getLogger().warn("No region files to save in " + imageDir);
                 return;
             }
             // Create blank
@@ -237,7 +237,7 @@ public class MapSaver
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().log(Level.SEVERE, LogFormatter.toString(t));
+            JourneyMap.getLogger().log(Level.ERROR, LogFormatter.toString(t));
         }
 
     }

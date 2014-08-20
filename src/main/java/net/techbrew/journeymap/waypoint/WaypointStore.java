@@ -54,7 +54,7 @@ public class WaypointStore
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().severe(String.format("Can't save waypoint file %s: %s", waypointFile, LogFormatter.toString(e)));
+            JourneyMap.getLogger().error(String.format("Can't save waypoint file %s: %s", waypointFile, LogFormatter.toString(e)));
             return false;
         }
     }
@@ -105,7 +105,7 @@ public class WaypointStore
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warning(String.format("Can't delete waypoint file %s: %s", waypointFile, e.getMessage()));
+            JourneyMap.getLogger().warn(String.format("Can't delete waypoint file %s: %s", waypointFile, e.getMessage()));
             waypointFile.deleteOnExit();
         }
     }
@@ -138,7 +138,7 @@ public class WaypointStore
             }
             catch (Exception e)
             {
-                JourneyMap.getLogger().severe(String.format("Error loading waypoints: %s", LogFormatter.toString(e)));
+                JourneyMap.getLogger().error(String.format("Error loading waypoints: %s", LogFormatter.toString(e)));
             }
         }
     }

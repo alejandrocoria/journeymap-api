@@ -126,7 +126,7 @@ public abstract class PropertiesBase
             }
             catch (Exception e)
             {
-                JourneyMap.getLogger().severe(String.format("Can't save config file %s: %s", propFile, LogFormatter.toString(e)));
+                JourneyMap.getLogger().error(String.format("Can't save config file %s: %s", propFile, LogFormatter.toString(e)));
                 return false;
             }
         }
@@ -169,7 +169,7 @@ public abstract class PropertiesBase
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().severe(String.format("Can't load config file %s: %s", propFile, e.getMessage()));
+            JourneyMap.getLogger().error(String.format("Can't load config file %s: %s", propFile, e.getMessage()));
 
             try
             {
@@ -178,7 +178,7 @@ public abstract class PropertiesBase
             }
             catch(Exception e3)
             {
-                JourneyMap.getLogger().severe(String.format("Can't rename config file %s: %s", propFile, e3.getMessage()));
+                JourneyMap.getLogger().error(String.format("Can't rename config file %s: %s", propFile, e3.getMessage()));
             }
 
         }

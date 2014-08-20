@@ -18,8 +18,8 @@ import java.nio.channels.ServerSocketChannel;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Wraps Rupy Daemon and provides thread management.  Tests webserver_port
@@ -67,12 +67,12 @@ public class JMServer
             }
             catch (java.net.BindException e)
             {
-                logger.warning("Port " + testPort + " already in use");
+                logger.warn("Port " + testPort + " already in use");
                 testPort += 10;
             }
             catch (Throwable t)
             {
-                logger.severe("Error when testing port " + testPort + ": " + t);
+                logger.error("Error when testing port " + testPort + ": " + t);
                 hardFails++;
             }
             finally
@@ -100,12 +100,12 @@ public class JMServer
 
         if (!ready && hardFails > MAXFAILS)
         {
-            logger.severe("Gave up finding a port for webserver after " + hardFails + " failures to test ports!");
+            logger.error("Gave up finding a port for webserver after " + hardFails + " failures to test ports!");
         }
 
         if (!ready && testPort > MAXPORT)
         {
-            logger.severe("Gave up finding a port for webserver after testing ports " + port + " - " + maxPort + " without finding one open!");
+            logger.error("Gave up finding a port for webserver after testing ports " + port + " - " + maxPort + " without finding one open!");
         }
 
     }
@@ -139,12 +139,12 @@ public class JMServer
         props.put("threads", Integer.toString(5)); //$NON-NLS-1$
 
         // Rupy logging is spammy.  Only enable it if you really need to.
-        Level logLevel = Level.parse(JourneyMap.getInstance().coreProperties.logLevel.get());
-        if (logLevel.intValue() <= (Level.FINEST.intValue()))
+        Level logLevel = Level.toLevel(JourneyMap.getInstance().coreProperties.logLevel.get(), Level.INFO);
+        if (logLevel.intLevel() >= (Level.TRACE.intLevel()))
         {
             props.put("debug", Boolean.TRUE.toString()); //$NON-NLS-1$
         }
-        if (logLevel.intValue() <= (Level.FINER.intValue()))
+        if (logLevel.intLevel() >= (Level.TRACE.intLevel()))
         {
             props.put("verbose", Boolean.TRUE.toString()); //$NON-NLS-1$
         }

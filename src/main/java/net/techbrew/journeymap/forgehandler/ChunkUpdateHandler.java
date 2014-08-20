@@ -26,7 +26,7 @@ import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.task.MapPlayerTask;
 
 import java.util.EnumSet;
-import java.util.logging.Level;
+import org.apache.logging.log4j.Level;
 
 /**
  * Listen for events which are likely to need the map to be updated.
@@ -34,8 +34,8 @@ import java.util.logging.Level;
 public class ChunkUpdateHandler implements EventHandlerManager.EventHandler
 {
 
-    Level logLevel = Level.FINER;
-    boolean debug = JourneyMap.getLogger().isLoggable(logLevel);
+    Level logLevel = Level.TRACE;
+    boolean debug = JourneyMap.getLogger().isEnabled(logLevel);
     public ChunkUpdateHandler()
     {
 

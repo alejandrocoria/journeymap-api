@@ -23,7 +23,7 @@ import java.awt.image.BufferedImage;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Level;
+import org.apache.logging.log4j.Level;
 
 /**
  * Delegates rendering job to one or more renderer.
@@ -34,7 +34,7 @@ public class ChunkRenderController
 {
     private static AtomicInteger updateCounter = new AtomicInteger(0);
     private static AtomicLong updateTime = new AtomicLong(0);
-    final boolean fineLogging = JourneyMap.getLogger().isLoggable(Level.FINE);
+    final boolean fineLogging = JourneyMap.getLogger().isDebugEnabled();
     private final IChunkRenderer netherRenderer;
     private final IChunkRenderer endRenderer;
     private final IChunkRenderer overWorldSurfaceRenderer;
@@ -71,7 +71,7 @@ public class ChunkRenderController
                 {
                     if (!underground || vSlice == null)
                     {
-                        JourneyMap.getLogger().warning("Map task isn't underground, can't perform in Nether.");
+                        JourneyMap.getLogger().warn("Map task isn't underground, can't perform in Nether.");
                         renderOkay = false;
                     }
                     else
@@ -84,7 +84,7 @@ public class ChunkRenderController
                 {
                     if (!underground || vSlice == null)
                     {
-                        JourneyMap.getLogger().warning("Map task isn't underground, can't perform in End.");
+                        JourneyMap.getLogger().warn("Map task isn't underground, can't perform in End.");
                         renderOkay = false;
                     }
                     else
@@ -109,12 +109,12 @@ public class ChunkRenderController
         }
         catch (ArrayIndexOutOfBoundsException e)
         {
-            JourneyMap.getLogger().log(Level.WARNING, LogFormatter.toString(e));
+            JourneyMap.getLogger().log(Level.WARN, LogFormatter.toString(e));
             return null; // Can happen when server isn't connected, just wait for next tick
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe(Constants.getMessageJMERR16(LogFormatter.toString(t)));
+            JourneyMap.getLogger().error(Constants.getMessageJMERR16(LogFormatter.toString(t)));
         }
         finally
         {
@@ -133,7 +133,7 @@ public class ChunkRenderController
         {
             if (fineLogging)
             {
-                JourneyMap.getLogger().log(Level.WARNING, "Chunk didn't render for dimension " + dimension + ": " + chunkMd);
+                JourneyMap.getLogger().log(Level.WARN, "Chunk didn't render for dimension " + dimension + ": " + chunkMd);
             }
             // Use blank
             // chunkImage = underground ? getBlankChunkImageUnderground() : getBlankChunkImage();

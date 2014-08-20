@@ -62,7 +62,7 @@ public class RealmsHelper
             }
             catch (Throwable t)
             {
-                JourneyMap.getLogger().severe("Unable to get Realms server name: " + LogFormatter.toString(t));
+                JourneyMap.getLogger().error("Unable to get Realms server name: " + LogFormatter.toString(t));
             }
         }
 

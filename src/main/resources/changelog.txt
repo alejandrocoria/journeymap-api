@@ -12,7 +12,8 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
-- Better handling of modded TileEntities that don't have Block icons (Botania:spawnerClaw, etc.) They're now just ignored rather than showing up as black.
+- Change: Better handling of modded TileEntities that don't have Block icons (Botania:spawnerClaw, etc.) They're now just ignored rather than showing up as black.
+- Change: Logging moved to Log4j2 just like Forge and Minecraft are now using.
 
 ## Changelog for JourneyMap 4.1.0alpha6:
 - Change: Bathymetry now uses the same blended water colors as normal water, just with the contour of the land below.

@@ -22,8 +22,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 public class TaskController
 {
@@ -68,11 +68,11 @@ public class TaskController
             boolean enabled = manager.enableTask(minecraft, null);
             if (!enabled)
             {
-                logger.fine("Task not initially enabled: " + manager.getTaskClass().getSimpleName());
+                logger.debug("Task not initially enabled: " + manager.getTaskClass().getSimpleName());
             }
             else
             {
-                logger.fine("Task ready: " + manager.getTaskClass().getSimpleName());
+                logger.debug("Task ready: " + manager.getTaskClass().getSimpleName());
             }
         }
 
@@ -113,7 +113,7 @@ public class TaskController
         }
         else
         {
-            logger.warning("Couldn't toggle task; manager not in controller: " + managerClass.getClass().getName());
+            logger.warn("Couldn't toggle task; manager not in controller: " + managerClass.getClass().getName());
             return false;
         }
     }
@@ -136,7 +136,7 @@ public class TaskController
         }
         else
         {
-            logger.warning("Couldn't toggle task; manager not in controller: " + managerClass.getClass().getName());
+            logger.warn("Couldn't toggle task; manager not in controller: " + managerClass.getClass().getName());
         }
     }
 
@@ -147,24 +147,24 @@ public class TaskController
         {
             if (!enable)
             {
-                logger.fine("Disabling task: " + manager.getTaskClass().getSimpleName());
+                logger.debug("Disabling task: " + manager.getTaskClass().getSimpleName());
                 manager.disableTask(minecraft);
             }
             else
             {
-                logger.fine("Task already enabled: " + manager.getTaskClass().getSimpleName());
+                logger.debug("Task already enabled: " + manager.getTaskClass().getSimpleName());
             }
         }
         else
         {
             if (enable)
             {
-                logger.fine("Enabling task: " + manager.getTaskClass().getSimpleName());
+                logger.debug("Enabling task: " + manager.getTaskClass().getSimpleName());
                 manager.enableTask(minecraft, params);
             }
             else
             {
-                logger.fine("Task already disabled: " + manager.getTaskClass().getSimpleName());
+                logger.debug("Task already disabled: " + manager.getTaskClass().getSimpleName());
             }
         }
     }
@@ -176,7 +176,7 @@ public class TaskController
             if (manager.isEnabled(minecraft))
             {
                 manager.disableTask(minecraft);
-                logger.fine("Task disabled: " + manager.getTaskClass().getSimpleName());
+                logger.debug("Task disabled: " + manager.getTaskClass().getSimpleName());
             }
         }
     }
@@ -203,7 +203,7 @@ public class TaskController
                     }
                     catch (InterruptedException e)
                     {
-                        logger.warning(e.getMessage());
+                        logger.warn(e.getMessage());
                     }
                 }
             }
@@ -214,7 +214,7 @@ public class TaskController
                 ITaskManager manager = getNextManager(minecraft);
                 if (manager == null)
                 {
-                    logger.warning("No task managers enabled!");
+                    logger.warn("No task managers enabled!");
                     return;
                 }
                 boolean accepted = false;
@@ -242,14 +242,14 @@ public class TaskController
                         queue.add(future);
                         accepted = true;
 
-                        if (logger.isLoggable(Level.FINE))
+                        if (logger.isTraceEnabled())
                         {
-                            logger.fine("Scheduled " + manager.getTaskClass().getSimpleName());
+                            logger.debug("Scheduled " + manager.getTaskClass().getSimpleName());
                         }
                     }
                     else
                     {
-                        logger.warning("TaskExecutor isn't running");
+                        logger.warn("TaskExecutor isn't running");
                     }
 
                     manager.taskAccepted(task, accepted);

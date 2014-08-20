@@ -66,7 +66,7 @@ public class TextureCache
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().severe("Can't get icon for " + loc + ": " + LogFormatter.toString(e));
+            JourneyMap.getLogger().error("Can't get icon for " + loc + ": " + LogFormatter.toString(e));
             if (is != null)
             {
                 try
@@ -400,7 +400,7 @@ public class TextureCache
                     }
                     catch (Throwable e2)
                     {
-                        JourneyMap.getLogger().warning("Can't get skin image for " + username + ": " + e2.getMessage());
+                        JourneyMap.getLogger().warn("Can't get skin image for " + username + ": " + e2.getMessage());
                     }
                 }
 

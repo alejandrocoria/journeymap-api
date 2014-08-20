@@ -26,8 +26,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 public class VersionCheck
 {
@@ -113,14 +113,14 @@ public class VersionCheck
                         }
                         else
                         {
-                            JourneyMap.getLogger().warning("Version URL had no data!"); //$NON-NLS-1$
+                            JourneyMap.getLogger().warn("Version URL had no data!"); //$NON-NLS-1$
                         }
 
                         JourneyMap.getLogger().info("For Minecraft " + Loader.MC_VERSION + ", JourneyMap version available online: " + versionAvailable); //$NON-NLS-1$
                     }
                     catch (Throwable e)
                     {
-                        JourneyMap.getLogger().log(Level.SEVERE, "Could not check version URL", e); //$NON-NLS-1$
+                        JourneyMap.getLogger().log(Level.ERROR, "Could not check version URL", e); //$NON-NLS-1$
                         updateCheckEnabled = false;
                     }
                     finally
@@ -211,7 +211,7 @@ public class VersionCheck
 
         if(errorsFound)
         {
-            JourneyMap.getLogger().warning(String.format("Version had problems when parsed. In: %s , Out: %s", versionString, ints)); //$NON-NLS-1$
+            JourneyMap.getLogger().warn(String.format("Version had problems when parsed. In: %s , Out: %s", versionString, ints)); //$NON-NLS-1$
         }
         return ints;
     }
@@ -274,7 +274,7 @@ public class VersionCheck
         }
         catch (Throwable e)
         {
-            JourneyMap.getLogger().log(Level.SEVERE, "Could not launch browser with URL: " + url, LogFormatter.toString(e)); //$NON-NLS-1$
+            JourneyMap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url, LogFormatter.toString(e)); //$NON-NLS-1$
         }
     }
 }

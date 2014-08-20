@@ -22,7 +22,7 @@ import net.techbrew.journeymap.model.RegionImageCache;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -82,7 +82,7 @@ public class RegionLoader
         final File regionDir = new File(mcWorldDir, "region");
         if (!regionDir.exists() || regionDir.isFile())
         {
-            logger.warning("MC world region directory doesn't exist: " + regionDir);
+            logger.warn("MC world region directory doesn't exist: " + regionDir);
             return null;
         }
 
@@ -134,7 +134,7 @@ public class RegionLoader
         }
         if (stack.isEmpty() && (validFileCount != existingImageCount))
         {
-            logger.warning("Anvil region files in " + regionDir + ": " + validFileCount + ", matching image files: " + existingImageCount + ", but found nothing to do for mapType " + mapType);
+            logger.warn("Anvil region files in " + regionDir + ": " + validFileCount + ", matching image files: " + existingImageCount + ", but found nothing to do for mapType " + mapType);
         }
 
         // Add player's current region

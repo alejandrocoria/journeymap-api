@@ -113,7 +113,7 @@ public class DataService extends BaseService
                 }
                 catch (Exception e)
                 {
-                    JourneyMap.getLogger().warning("Bad value for images.since: " + sinceVal);
+                    JourneyMap.getLogger().warn("Bad value for images.since: " + sinceVal);
                     since = new Date().getTime();
                 }
             }
@@ -209,7 +209,7 @@ public class DataService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe(LogFormatter.toString(t));
+            JourneyMap.getLogger().error(LogFormatter.toString(t));
             throwEventException(500, Constants.getMessageJMERR12(path), event, true);
         }
     }

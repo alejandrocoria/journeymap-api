@@ -22,8 +22,8 @@ import java.awt.image.DataBufferInt;
 import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 /**
  * A RegionImageSet contains one or more Wrappers of image, file, and maptype.
@@ -139,9 +139,9 @@ public class RegionImageSet extends ImageSet
             if (before.getClass() != after.getClass())
             {
                 dirty = true;
-                if (logger.isLoggable(Level.FINER))
+                if (logger.isEnabled(Level.DEBUG))
                 {
-                    logger.finer("Classes don't match: " + before.getClass() + " vs " + after.getClass());
+                    logger.debug("Classes don't match: " + before.getClass() + " vs " + after.getClass());
                 }
             }
             else
@@ -165,10 +165,10 @@ public class RegionImageSet extends ImageSet
         {
             if (!wasDirty)
             {
-                if (logger.isLoggable(Level.FINER))
+                if (logger.isEnabled(Level.DEBUG))
                 {
                     long stop = System.nanoTime();
-                    logger.finer(rCoord + " dirty after chunk insert " + cCoord + ": " + dirty + ", compared in: " + TimeUnit.NANOSECONDS.toMicros(stop - start) + "micros");
+                    logger.debug(rCoord + " dirty after chunk insert " + cCoord + ": " + dirty + ", compared in: " + TimeUnit.NANOSECONDS.toMicros(stop - start) + "micros");
                 }
             }
             wrapper.setDirty(); // updates the timestamp

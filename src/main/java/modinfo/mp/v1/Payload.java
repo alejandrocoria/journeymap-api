@@ -6,8 +6,10 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import modinfo.ModInfo;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Created by mwoodman on 2/19/14.
@@ -120,7 +122,7 @@ public class Payload
         }
         catch (UnsupportedEncodingException e)
         {
-            Logger.getLogger("modinfo").log(Level.SEVERE, "Can't encode: " + value);
+            ModInfo.LOGGER.log(Level.ERROR, "Can't encode: " + value);
         }
         return value;
     }

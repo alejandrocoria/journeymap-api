@@ -43,9 +43,10 @@ import net.techbrew.journeymap.task.TaskController;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.map.MapOverlay;
 import net.techbrew.journeymap.waypoint.WaypointStore;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This software is copyright (C) Mark Woodman (mwoodman@techbrew.net) and is
@@ -143,7 +144,7 @@ public class JourneyMap
      */
     public static Logger getLogger()
     {
-        return INSTANCE.logger == null ? Logger.getLogger(MOD_ID) : INSTANCE.logger;
+        return INSTANCE.logger == null ? LogManager.getLogger(JourneyMap.MOD_ID) : INSTANCE.logger;
     }
 
     public Boolean isInitialized()
@@ -177,7 +178,7 @@ public class JourneyMap
 
             if (initialized)
             {
-                logger.warning("Already initialized, aborting");
+                logger.warn("Already initialized, aborting");
                 return;
             }
 
@@ -205,10 +206,9 @@ public class JourneyMap
 
             // Log properties
             JMLogger.logProperties();
-            JMLogger.setLevelFromProps();
 
             // Logging for thread debugging
-            threadLogging = getLogger().isLoggable(Level.FINER);
+            threadLogging = false;
 
             logger.info("initialize EXIT, " + (timer == null ? "" : timer.stopAndReport()));
         }
@@ -216,9 +216,9 @@ public class JourneyMap
         {
             if (logger == null)
             {
-                logger = Logger.getLogger(MOD_ID);
+                logger = LogManager.getLogger(JourneyMap.MOD_ID);
             }
-            logger.severe(LogFormatter.toString(t));
+            logger.error(LogFormatter.toString(t));
             throw t;
         }
     }
@@ -249,14 +249,15 @@ public class JourneyMap
             toggleWebserver(webMapProperties.enabled.get(), false);
             initialized = true;
 
+           // threadLogging = getLogger().isTraceEnabled();
         }
         catch (Throwable t)
         {
             if (logger == null)
             {
-                logger = Logger.getLogger(MOD_ID);
+                logger = LogManager.getLogger(JourneyMap.MOD_ID);
             }
-            logger.severe(LogFormatter.toString(t));
+            logger.error(LogFormatter.toString(t));
         }
         finally
         {
@@ -285,7 +286,7 @@ public class JourneyMap
             }
             catch (Throwable e)
             {
-                logger.log(Level.SEVERE, LogFormatter.toString(e));
+                logger.log(Level.ERROR, LogFormatter.toString(e));
                 enable = false;
             }
             if (!enable)
@@ -304,7 +305,7 @@ public class JourneyMap
             }
             catch (Throwable e)
             {
-                logger.log(Level.SEVERE, LogFormatter.toString(e));
+                logger.log(Level.ERROR, LogFormatter.toString(e));
             }
         }
         if (forceAnnounce)
@@ -338,7 +339,7 @@ public class JourneyMap
         }
         else
         {
-            logger.warning("taskController not available");
+            logger.warn("taskController not available");
         }
     }
 
@@ -356,7 +357,7 @@ public class JourneyMap
         }
         else
         {
-            logger.warning("taskController not available");
+            logger.warn("taskController not available");
             return false;
         }
     }
@@ -529,7 +530,7 @@ public class JourneyMap
         }
         catch (Throwable t)
         {
-            logger.severe(Constants.getMessageJMERR00(LogFormatter.toString(t)));
+            logger.error(Constants.getMessageJMERR00(LogFormatter.toString(t)));
         }
     }
 
@@ -546,7 +547,7 @@ public class JourneyMap
         {
             String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
             ChatLog.announceError(error);
-            logger.severe(LogFormatter.toString(t));
+            logger.error(LogFormatter.toString(t));
         }
     }
 

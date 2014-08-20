@@ -188,7 +188,7 @@ public class ColorPalette
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().severe(String.format("Can't save color pallete file %s: %s", palleteFile, LogFormatter.toString(e)));
+            JourneyMap.getLogger().error(String.format("Can't save color pallete file %s: %s", palleteFile, LogFormatter.toString(e)));
             return false;
         }
     }

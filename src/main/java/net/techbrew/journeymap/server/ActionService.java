@@ -168,7 +168,7 @@ public class ActionService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe(LogFormatter.toString(t));
+            JourneyMap.getLogger().error(LogFormatter.toString(t));
             throwEventException(500, Constants.getMessageJMERR19(path), event, true);
         }
     }

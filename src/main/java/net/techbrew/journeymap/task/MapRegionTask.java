@@ -35,8 +35,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 public class MapRegionTask extends BaseMapTask
 {
@@ -99,14 +99,14 @@ public class MapRegionTask extends BaseMapTask
             }
         }
 
-        if (logger.isLoggable(Level.FINE))
+        if (logger.isTraceEnabled())
         {
-            logger.fine("Chunks: " + missing + " skipped, " + renderCoords.size() + " used");
+            logger.debug("Chunks: " + missing + " skipped, " + renderCoords.size() + " used");
         }
 
         if (renderCoords.size() > 0)
         {
-            logger.warning("No viable chunks found in region " + rCoord);
+            logger.warn("No viable chunks found in region " + rCoord);
         }
         return new MapRegionTask(renderController, world, rCoord.dimension, rCoord.isUnderground(), rCoord.getVerticalSlice(), renderCoords, retainedChunks);
 
@@ -196,7 +196,7 @@ public class MapRegionTask extends BaseMapTask
                 {
                     String error = Constants.getMessageJMERR00("Couldn't Auto-Map: " + t.getMessage()); //$NON-NLS-1$
                     ChatLog.announceError(error);
-                    logger.severe(error + ": " + LogFormatter.toString(t));
+                    logger.error(error + ": " + LogFormatter.toString(t));
                 }
             }
             return this.enabled;

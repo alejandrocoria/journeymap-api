@@ -15,8 +15,8 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Utility class for timing whatever needs to be timed.
@@ -166,7 +166,7 @@ public class StatTimer
 
             if (started != null)
             {
-                logger.warning(name + " is already running, cancelling first");
+                logger.warn(name + " is already running, cancelling first");
                 this.cancel();
             }
 
@@ -185,9 +185,9 @@ public class StatTimer
                 counter.set(0);
                 cancelCounter.set(0);
                 totalTime.set(0);
-                if (logger.isLoggable(Level.FINE))
+                if (logger.isTraceEnabled())
                 {
-                    logger.fine(name + " warmup done, " + warmupCount);
+                    logger.debug(name + " warmup done, " + warmupCount);
                 }
             }
 
@@ -210,7 +210,7 @@ public class StatTimer
 
             if (started == null)
             {
-                logger.warning(name + " is not running.");
+                logger.warn(name + " is not running.");
                 return 0;
             }
 
@@ -232,7 +232,7 @@ public class StatTimer
             }
             catch (Throwable t)
             {
-                logger.severe("Timer error: " + LogFormatter.toString(t));
+                logger.error("Timer error: " + LogFormatter.toString(t));
                 reset();
                 return 0;
             }

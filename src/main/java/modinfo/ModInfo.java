@@ -9,14 +9,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.Language;
 import net.minecraft.client.resources.Locale;
 import net.minecraft.server.integrated.IntegratedServer;
+import org.apache.logging.log4j.LogManager;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Created by mwoodman on 2/18/14.
@@ -24,7 +25,7 @@ import java.util.logging.Logger;
 public class ModInfo {
 
     public static final String VERSION = "0.1";
-    public static final Logger LOGGER = Logger.getLogger("modinfo");
+    public static final Logger LOGGER = LogManager.getLogger("modinfo");
 
     private final Minecraft minecraft = FMLClientHandler.instance().getClient();
     private final String trackingId;
@@ -65,7 +66,7 @@ public class ModInfo {
         }
         catch (Throwable t)
         {
-            LOGGER.log(Level.SEVERE, "Unable to configure ModInfo", t);
+            LOGGER.log(Level.ERROR, "Unable to configure ModInfo", t);
         }
     }
 
@@ -88,7 +89,7 @@ public class ModInfo {
         }
         catch (Throwable t)
         {
-            LOGGER.log(Level.SEVERE, t.getMessage(), t);
+            LOGGER.log(Level.ERROR, t.getMessage(), t);
         }
     }
 
@@ -162,7 +163,7 @@ public class ModInfo {
         }
         catch (Throwable t)
         {
-            LOGGER.log(Level.SEVERE, t.getMessage(), t);
+            LOGGER.log(Level.ERROR, t.getMessage(), t);
         }
     }
 
@@ -182,7 +183,7 @@ public class ModInfo {
         }
         catch (Throwable t)
         {
-            LOGGER.log(Level.SEVERE, t.getMessage(), t);
+            LOGGER.log(Level.ERROR, t.getMessage(), t);
         }
     }
 
@@ -201,7 +202,7 @@ public class ModInfo {
         }
         catch (Throwable t)
         {
-            LOGGER.log(Level.SEVERE, t.getMessage(), t);
+            LOGGER.log(Level.ERROR, t.getMessage(), t);
         }
     }
 

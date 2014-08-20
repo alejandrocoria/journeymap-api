@@ -28,7 +28,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Logger;
 
 public abstract class BaseMapTask implements ITask
 {
@@ -82,7 +82,7 @@ public abstract class BaseMapTask implements ITask
             {
                 if (threadLogging)
                 {
-                    logger.fine("Dimension changed, map task obsolete."); //$NON-NLS-1$
+                    logger.debug("Dimension changed, map task obsolete."); //$NON-NLS-1$
                 }
                 timer.cancel();
                 this.complete(true, false);
@@ -96,7 +96,7 @@ public abstract class BaseMapTask implements ITask
                 {
                     if (threadLogging)
                     {
-                        logger.fine("JM isn't mapping, aborting"); //$NON-NLS-1$
+                        logger.debug("JM isn't mapping, aborting"); //$NON-NLS-1$
                     }
                     timer.cancel();
                     this.complete(true, false);
@@ -146,7 +146,7 @@ public abstract class BaseMapTask implements ITask
             {
                 if (threadLogging)
                 {
-                    logger.fine("JM isn't mapping, aborting.");  //$NON-NLS-1$
+                    logger.debug("JM isn't mapping, aborting.");  //$NON-NLS-1$
                 }
                 timer.cancel();
                 this.complete(true, false);
@@ -164,7 +164,7 @@ public abstract class BaseMapTask implements ITask
 
             if (threadLogging)
             {
-                logger.fine(getClass().getSimpleName() + " mapped " + chunks + " chunks in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start) + "ms with flush:" + flushCacheWhenDone); //$NON-NLS-1$ //$NON-NLS-2$
+                logger.debug(getClass().getSimpleName() + " mapped " + chunks + " chunks in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start) + "ms with flush:" + flushCacheWhenDone); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             chunkCoords.clear();
@@ -174,13 +174,13 @@ public abstract class BaseMapTask implements ITask
         }
         catch (InterruptedException t)
         {
-            JourneyMap.getLogger().warning("Task thread interrupted: " + this);
+            JourneyMap.getLogger().warn("Task thread interrupted: " + this);
             throw t;
         }
         catch (Throwable t)
         {
             String error = Constants.getMessageJMERR16(LogFormatter.toString(t));
-            JourneyMap.getLogger().severe(error);
+            JourneyMap.getLogger().error(error);
             this.complete(false, true);
         }
         finally

@@ -21,7 +21,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.*;
 import java.util.List;
-import java.util.logging.Level;
+import org.apache.logging.log4j.Level;
 
 /**
  * An ImageSet contains one or more Wrappers of image, file, and maptype.
@@ -266,7 +266,7 @@ public abstract class ImageSet
 
                 if (_image == null)
                 {
-                    JourneyMap.getLogger().warning("Null image for " + this);
+                    JourneyMap.getLogger().warn("Null image for " + this);
                 }
                 else
                 {
@@ -276,9 +276,9 @@ public abstract class ImageSet
                         dir.mkdirs();
                     }
                     ImageIO.write(_image, "png", new FileOutputStream(imageFile));
-                    if (JourneyMap.getLogger().isLoggable(Level.FINE))
+                    if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
                     {
-                        JourneyMap.getLogger().fine("Wrote to disk: " + imageFile); //$NON-NLS-1$
+                        JourneyMap.getLogger().debug("Wrote to disk: " + imageFile); //$NON-NLS-1$
                     }
                     _dirty = false;
                 }
@@ -286,7 +286,7 @@ public abstract class ImageSet
             catch (Throwable e)
             {
                 String error = Constants.getMessageJMERR22(imageFile, LogFormatter.toString(e));
-                JourneyMap.getLogger().severe(error);
+                JourneyMap.getLogger().error(error);
                 throw new RuntimeException(e);
             }
         }

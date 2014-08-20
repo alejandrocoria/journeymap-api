@@ -26,7 +26,7 @@ import java.net.SocketAddress;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.*;
-import java.util.logging.Level;
+import org.apache.logging.log4j.Level;
 
 /**
  * Provides world properties
@@ -114,7 +114,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe("Couldn't get server name: " + LogFormatter.toString(t));
+            JourneyMap.getLogger().error("Couldn't get server name: " + LogFormatter.toString(t));
         }
 
         // Fallback
@@ -138,7 +138,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().severe("Couldn't get server name: " + LogFormatter.toString(t));
+            JourneyMap.getLogger().error("Couldn't get server name: " + LogFormatter.toString(t));
         }
         return "server";
     }
@@ -206,7 +206,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         HashSet<Integer> requiredDims = new HashSet<Integer>(requiredDimensionList);
         HashMap<Integer, WorldProvider> dimProviders = new HashMap<Integer, WorldProvider>();
 
-        Level logLevel = Level.FINE;
+        Level logLevel = Level.DEBUG;
         JourneyMap.getLogger().log(logLevel, String.format("Required dimensions from waypoints: %s", requiredDimensionList));
 
         // DimensionIDs works for local servers
@@ -240,7 +240,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                     }
                     catch (Throwable t)
                     {
-                        JourneyMap.getLogger().warning(String.format("Couldn't DimensionManager.getProvider(%s) because of error: %s", dim, t.getMessage()));
+                        JourneyMap.getLogger().warn(String.format("Couldn't DimensionManager.getProvider(%s) because of error: %s", dim, t.getMessage()));
                     }
                 }
                 else
@@ -255,7 +255,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                     }
                     catch (Throwable t)
                     {
-                        JourneyMap.getLogger().warning(String.format("Couldn't DimensionManager.createProviderFor(%s) because of error: %s", dim, t.getMessage()));
+                        JourneyMap.getLogger().warn(String.format("Couldn't DimensionManager.createProviderFor(%s) because of error: %s", dim, t.getMessage()));
                     }
                 }
             }
@@ -271,7 +271,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
             {
                 WorldProvider provider = new FakeDimensionProvider(dim);
                 dimProviders.put(dim, provider);
-                JourneyMap.getLogger().warning(String.format("Used fake provider for required dim: %s", dim));
+                JourneyMap.getLogger().warn(String.format("Used fake provider for required dim: %s", dim));
             }
         }
 

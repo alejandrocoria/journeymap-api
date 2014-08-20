@@ -72,7 +72,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         }
         catch(Exception e)
         {
-            JourneyMap.getLogger().warning("Error during onClientTick: " + e);
+            JourneyMap.getLogger().warn("Error during onClientTick: " + e);
         }
         finally
         {

@@ -195,7 +195,7 @@ public class MapPlayerTask extends BaseMapTask
         {
             if (renderCoords.size() >= maxChunks)
             {
-                JourneyMap.getLogger().fine(String.format("%s queued chunks exceeded max of %s for MapPlayerTask", renderCoords.size(), maxChunks));
+                JourneyMap.getLogger().debug(String.format("%s queued chunks exceeded max of %s for MapPlayerTask", renderCoords.size(), maxChunks));
                 break;
             }
 

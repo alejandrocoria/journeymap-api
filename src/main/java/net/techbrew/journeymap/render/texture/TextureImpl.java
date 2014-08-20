@@ -173,7 +173,7 @@ public class TextureImpl extends AbstractTexture
             }
             else
             {
-                JourneyMap.getLogger().severe("Failed to upload/bind texture: " + e.getMessage());
+                JourneyMap.getLogger().error("Failed to upload/bind texture: " + e.getMessage());
             }
         }
     }
@@ -197,7 +197,7 @@ public class TextureImpl extends AbstractTexture
             }
             catch (Exception e)
             {
-                JourneyMap.getLogger().severe("Couldn't use deferred binding: " + e.getMessage());
+                JourneyMap.getLogger().error("Couldn't use deferred binding: " + e.getMessage());
             }
         }
         return glId;
