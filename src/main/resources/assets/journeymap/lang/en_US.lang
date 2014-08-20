@@ -58,6 +58,7 @@ jm.common.map_style_bathymetry=Show Bathymetry: %1$s
 jm.common.map_style_transparency=Use Transparency: %1$s
 jm.common.map_style_antialiasing=Use Antialiasing: %1$s
 jm.common.map_style_cavelighting=Use Cave Lighting: %1$s
+jm.common.map_style_caveshowsurface=Show Surface Above Caves: %1$s
 jm.common.map_style_plants=Show Plants: %1$s
 jm.common.map_style_plantshadows=Show Plant Shadows: %1$s
 jm.common.map_style_crops=Show Crops: %1$s

@@ -37,6 +37,7 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
     {
         super.updateOptions();
         this.ambientColor = RGB.floats(tweakNetherAmbientColor);
+        this.mapSurfaceAboveCaves = false;
     }
 
     /**

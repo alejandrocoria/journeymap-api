@@ -31,7 +31,7 @@ import java.awt.*;
  */
 public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 {
-    protected CoreProperties coreProperties = JourneyMap.getInstance().coreProperties;
+    protected CoreProperties coreProperties;
     protected SurfaceRenderer surfaceRenderer;
     protected StatTimer renderCaveTimer = StatTimer.get("CaveRenderer.render");
 
@@ -42,6 +42,8 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
     private final HeightsCache[] chunkSliceHeights = new HeightsCache[16];
     private final SlopesCache[] chunkSliceSlopes = new SlopesCache[16];
+
+    protected boolean mapSurfaceAboveCaves;
 
     /**
      * Takes an instance of the surface renderer in order to do a prepass when the surface
@@ -67,6 +69,8 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     protected void updateOptions()
     {
         super.updateOptions();
+
+        mapSurfaceAboveCaves = JourneyMap.getInstance().coreProperties.mapSurfaceAboveCaves.get();
     }
 
     /**
@@ -85,12 +89,15 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         boolean ok = false;
 
         // Surface prepass
-        if (!chunkMd.getHasNoSky() && surfaceRenderer != null)
+        if(mapSurfaceAboveCaves)
         {
-            ok = surfaceRenderer.render(g2D, chunkMd, vSlice, true);
-            if (!ok)
+            if (!chunkMd.getHasNoSky() && surfaceRenderer != null)
             {
-                JourneyMap.getLogger().debug("The surface chunk didn't paint: " + chunkMd.toString());
+                ok = surfaceRenderer.render(g2D, chunkMd, vSlice, true);
+                if (!ok)
+                {
+                    JourneyMap.getLogger().debug("The surface chunk didn't paint: " + chunkMd.toString());
+                }
             }
         }
 

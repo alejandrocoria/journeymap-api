@@ -52,19 +52,19 @@ public class StyleOptions extends JmUI
         leftButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_bathymetry", core, core.mapBathymetry));
         leftButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_transparency", core, core.mapTransparency));
         leftButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_cavelighting", core, core.mapCaveLighting));
+        leftButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_caveshowsurface", core, core.mapSurfaceAboveCaves));
+
         buttonList.addAll(leftButtons);
 
+        rightButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_antialiasing", core, core.mapAntialiasing));
         rightButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_crops", core, core.mapCrops));
         rightButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_plants", core, core.mapPlants));
         rightButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_plantshadows", core, core.mapPlantShadows));
         buttonList.addAll(rightButtons);
 
-        //leftButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_antialiasing", core, core.mapAntialiasing));
-
         ButtonList all = new ButtonList(leftButtons);
         all.addAll(rightButtons);
         all.equalizeWidths(getFontRenderer());
-
 
         buttonClose = new Button(ButtonEnum.Close.ordinal(), 0, 0, Constants.getString("jm.common.close")); //$NON-NLS-1$
         buttonClose.fitWidth(getFontRenderer());

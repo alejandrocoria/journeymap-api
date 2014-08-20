@@ -35,6 +35,7 @@ public class EndRenderer extends CaveRenderer implements IChunkRenderer
     {
         super.updateOptions();
         this.ambientColor = RGB.floats(tweakEndAmbientColor);
+        this.mapSurfaceAboveCaves = false;
     }
 
     /**
