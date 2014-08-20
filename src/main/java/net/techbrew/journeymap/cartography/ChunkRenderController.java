@@ -17,13 +17,13 @@ import net.techbrew.journeymap.cartography.render.SurfaceRenderer;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.ChunkMD;
+import org.apache.logging.log4j.Level;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import org.apache.logging.log4j.Level;
 
 /**
  * Delegates rendering job to one or more renderer.

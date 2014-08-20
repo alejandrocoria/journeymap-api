@@ -13,7 +13,6 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.ui.*;
-import net.techbrew.journeymap.ui.Button;
 
 public class StyleOptions extends JmUI
 {

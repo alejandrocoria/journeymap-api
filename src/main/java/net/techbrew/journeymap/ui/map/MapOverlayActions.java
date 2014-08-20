@@ -18,17 +18,16 @@ import net.techbrew.journeymap.io.MapSaver;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.MapOverlayState;
-import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.task.MapRegionTask;
 import net.techbrew.journeymap.task.SaveMapTask;
 import net.techbrew.journeymap.ui.Button;
 import net.techbrew.journeymap.ui.ButtonList;
 import net.techbrew.journeymap.ui.JmUI;
 import net.techbrew.journeymap.ui.UIManager;
+import org.apache.logging.log4j.Level;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
-import org.apache.logging.log4j.Level;
 
 
 public class MapOverlayActions extends JmUI

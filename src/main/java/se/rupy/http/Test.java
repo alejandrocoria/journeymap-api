@@ -1,7 +1,8 @@
 package se.rupy.http;
 
 import java.io.*;
-import java.net.*;
+import java.net.ConnectException;
+import java.net.URL;
 
 /* TODO: On some platforms if chunk, fixed, 
  * and error finishes before comet the test 

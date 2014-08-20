@@ -12,7 +12,6 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockLeaves;
-import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -23,8 +22,6 @@ import net.techbrew.journeymap.data.DataCache;
 
 import java.awt.*;
 import java.util.Arrays;
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Random;
 

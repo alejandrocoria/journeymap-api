@@ -1,23 +1,14 @@
 package ar.com.hjg.pngj;
 
+import ar.com.hjg.pngj.ImageLine.SampleType;
+import ar.com.hjg.pngj.chunks.*;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
-
-import ar.com.hjg.pngj.ImageLine.SampleType;
-import ar.com.hjg.pngj.chunks.ChunkCopyBehaviour;
-import ar.com.hjg.pngj.chunks.ChunkHelper;
-import ar.com.hjg.pngj.chunks.ChunksList;
-import ar.com.hjg.pngj.chunks.ChunksListForWrite;
-import ar.com.hjg.pngj.chunks.PngChunk;
-import ar.com.hjg.pngj.chunks.PngChunkIEND;
-import ar.com.hjg.pngj.chunks.PngChunkIHDR;
-import ar.com.hjg.pngj.chunks.PngChunkSkipped;
-import ar.com.hjg.pngj.chunks.PngChunkTextVar;
-import ar.com.hjg.pngj.chunks.PngMetadata;
 
 /**
  * Writes a PNG image

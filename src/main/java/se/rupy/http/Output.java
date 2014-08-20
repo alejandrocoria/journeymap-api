@@ -1,8 +1,11 @@
 package se.rupy.http;
 
-import java.io.*;
-import java.nio.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Handles the outgoing response data.

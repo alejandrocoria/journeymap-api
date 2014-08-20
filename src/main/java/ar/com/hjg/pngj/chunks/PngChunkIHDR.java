@@ -1,10 +1,10 @@
 package ar.com.hjg.pngj.chunks;
 
-import java.io.ByteArrayInputStream;
-
 import ar.com.hjg.pngj.ImageInfo;
 import ar.com.hjg.pngj.PngHelperInternal;
 import ar.com.hjg.pngj.PngjException;
+
+import java.io.ByteArrayInputStream;
 
 /**
  * IHDR chunk.

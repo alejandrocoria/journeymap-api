@@ -1,15 +1,14 @@
 package modinfo.mp.v1;
 
+import modinfo.ModInfo;
+import org.apache.logging.log4j.Level;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.Callable;
-
-import modinfo.ModInfo;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Created by mwoodman on 2/18/14.

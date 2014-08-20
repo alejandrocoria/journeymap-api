@@ -19,6 +19,7 @@ import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageSet;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -26,7 +27,6 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
-import org.apache.logging.log4j.Logger;
 
 public class LegacyMigrationTask implements ITask
 {

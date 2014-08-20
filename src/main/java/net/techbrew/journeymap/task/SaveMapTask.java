@@ -11,9 +11,9 @@ package net.techbrew.journeymap.task;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.MapSaver;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import org.apache.logging.log4j.Logger;
 
 public class SaveMapTask implements ITask
 {

@@ -1,19 +1,19 @@
 package se.rupy.http;
 
-import java.io.*;
-import java.net.*;
-import java.security.AccessControlContext;
-import java.security.AccessController;
-import java.security.PermissionCollection;
-import java.security.Permissions;
-import java.security.PrivilegedExceptionAction;
-import java.security.ProtectionDomain;
-import java.text.*;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.InetSocketAddress;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.security.*;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.logging.log4j.Logger;
-
-import java.nio.channels.*;
 
 /**
  * A tiny HTTP daemon. The whole server is non-static so that you can launch

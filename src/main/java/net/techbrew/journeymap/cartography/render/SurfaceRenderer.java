@@ -9,7 +9,7 @@
 package net.techbrew.journeymap.cartography.render;
 
 import com.google.common.base.Optional;
-import com.google.common.cache.*;
+import com.google.common.cache.RemovalNotification;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.IChunkRenderer;
@@ -21,9 +21,9 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
+import org.apache.logging.log4j.Level;
 
 import java.awt.*;
-import org.apache.logging.log4j.Level;
 
 public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 {

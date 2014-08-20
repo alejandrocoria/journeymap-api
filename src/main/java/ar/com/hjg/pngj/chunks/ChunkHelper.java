@@ -3,19 +3,16 @@ package ar.com.hjg.pngj.chunks;
 // see http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html
 // http://www.w3.org/TR/PNG/#5Chunk-naming-conventions
 // http://www.w3.org/TR/PNG/#table53
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+
+import ar.com.hjg.pngj.PngHelperInternal;
+import ar.com.hjg.pngj.PngjException;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
-
-import ar.com.hjg.pngj.PngHelperInternal;
-import ar.com.hjg.pngj.PngjException;
 
 public class ChunkHelper {
 	public static final String IHDR = "IHDR";

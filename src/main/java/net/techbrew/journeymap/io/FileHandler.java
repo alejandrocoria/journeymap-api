@@ -21,6 +21,7 @@ import net.techbrew.journeymap.Utils;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
+import org.apache.logging.log4j.Level;
 import org.lwjgl.Sys;
 
 import javax.imageio.ImageIO;
@@ -29,7 +30,6 @@ import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
-import org.apache.logging.log4j.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;

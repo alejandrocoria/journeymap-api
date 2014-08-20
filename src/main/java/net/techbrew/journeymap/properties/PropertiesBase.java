@@ -15,7 +15,6 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
-import org.apache.logging.log4j.util.PropertiesUtil;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,16 +1,10 @@
 package se.rupy.http;
 
-import java.io.File;
-import java.io.FilePermission;
-import java.net.SocketPermission;
-import java.security.AccessControlContext;
 import java.security.AccessController;
-import java.security.PermissionCollection;
-import java.security.Permissions;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.security.ProtectionDomain;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
  * This is the {@link Event} filter chain implementation, it has dynamic size with positional integrity.

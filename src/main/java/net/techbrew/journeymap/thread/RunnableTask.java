@@ -15,11 +15,10 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.task.ITask;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import org.apache.logging.log4j.Logger;
 
 public class RunnableTask implements Runnable
 {

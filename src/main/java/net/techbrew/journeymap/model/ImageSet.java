@@ -13,6 +13,7 @@ import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
+import org.apache.logging.log4j.Level;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -21,7 +22,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.*;
 import java.util.List;
-import org.apache.logging.log4j.Level;
 
 /**
  * An ImageSet contains one or more Wrappers of image, file, and maptype.

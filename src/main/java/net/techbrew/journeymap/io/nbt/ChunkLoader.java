@@ -20,10 +20,10 @@ import net.minecraft.world.chunk.storage.RegionFileCache;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.ChunkMD;
+import org.apache.logging.log4j.Logger;
 
 import java.io.DataInputStream;
 import java.io.File;
-import org.apache.logging.log4j.Logger;
 
 public class ChunkLoader
 {

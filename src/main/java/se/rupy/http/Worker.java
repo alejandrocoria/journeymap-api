@@ -1,8 +1,6 @@
 package se.rupy.http;
 
-import java.io.IOException;
-import java.nio.*;
-import java.nio.channels.CancelledKeyException;
+import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;

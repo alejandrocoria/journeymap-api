@@ -13,12 +13,12 @@ import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.thread.JMThreadFactory;
+import org.apache.logging.log4j.Level;
 
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
-import org.apache.logging.log4j.Level;
 
 public class RegionImageCache
 {

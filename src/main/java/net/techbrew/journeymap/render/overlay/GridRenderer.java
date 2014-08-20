@@ -19,6 +19,7 @@ import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.properties.InGameMapProperties;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -29,8 +30,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Contains a set of 9 tiles organized along compass Point2D.Doubles.

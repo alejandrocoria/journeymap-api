@@ -1,7 +1,8 @@
 package modinfo.mp.v1;
 
-import cpw.mods.fml.client.FMLClientHandler;
 import modinfo.Config;
+import modinfo.ModInfo;
+import org.apache.logging.log4j.Level;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -9,10 +10,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import modinfo.ModInfo;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Created by mwoodman on 2/17/14.

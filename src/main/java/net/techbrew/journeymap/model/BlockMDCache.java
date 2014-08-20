@@ -18,9 +18,10 @@ import net.minecraft.init.Blocks;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
-import net.techbrew.journeymap.properties.CoreProperties;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashMap;
 
 import static net.techbrew.journeymap.model.BlockMD.Flag.*;
 

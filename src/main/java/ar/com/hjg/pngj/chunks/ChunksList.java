@@ -1,11 +1,11 @@
 package ar.com.hjg.pngj.chunks;
 
+import ar.com.hjg.pngj.ImageInfo;
+import ar.com.hjg.pngj.PngjException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import ar.com.hjg.pngj.ImageInfo;
-import ar.com.hjg.pngj.PngjException;
 
 /**
  * All chunks that form an image, read or to be written.

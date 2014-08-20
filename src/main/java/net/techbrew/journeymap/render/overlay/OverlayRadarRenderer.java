@@ -2,25 +2,19 @@ package net.techbrew.journeymap.render.overlay;
 
 import com.google.common.base.Strings;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.EntityTameable;
-import net.minecraft.entity.passive.IAnimals;
 import net.minecraft.entity.player.EntityPlayer;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.io.FileHandler;
-import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.model.EntityHelper;
+import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.properties.MapProperties;
-import net.techbrew.journeymap.render.draw.DrawCenteredLabelStep;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
 import net.techbrew.journeymap.render.draw.DrawPlayerStep;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 

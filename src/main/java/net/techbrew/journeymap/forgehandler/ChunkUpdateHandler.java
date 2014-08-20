@@ -24,9 +24,9 @@ import net.minecraftforge.event.world.ChunkEvent;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.task.MapPlayerTask;
+import org.apache.logging.log4j.Level;
 
 import java.util.EnumSet;
-import org.apache.logging.log4j.Level;
 
 /**
  * Listen for events which are likely to need the map to be updated.

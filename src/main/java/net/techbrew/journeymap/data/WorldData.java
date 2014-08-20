@@ -16,6 +16,7 @@ import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.RealmsHelper;
 import net.techbrew.journeymap.log.LogFormatter;
+import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.Display;
 
 import java.io.UnsupportedEncodingException;
@@ -23,7 +24,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URLEncoder;
 import java.util.*;
-import org.apache.logging.log4j.Level;
 
 /**
  * Provides world properties

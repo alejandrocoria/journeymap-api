@@ -10,13 +10,12 @@ package net.techbrew.journeymap.log;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import net.techbrew.journeymap.JourneyMap;
+import org.apache.logging.log4j.Logger;
 
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Utility class for timing whatever needs to be timed.

@@ -1,22 +1,14 @@
 package ar.com.hjg.pngj;
 
+import ar.com.hjg.pngj.ImageLine.SampleType;
+import ar.com.hjg.pngj.chunks.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.zip.CRC32;
 import java.util.zip.InflaterInputStream;
-
-import ar.com.hjg.pngj.ImageLine.SampleType;
-import ar.com.hjg.pngj.chunks.ChunkHelper;
-import ar.com.hjg.pngj.chunks.ChunkLoadBehaviour;
-import ar.com.hjg.pngj.chunks.ChunkRaw;
-import ar.com.hjg.pngj.chunks.ChunksList;
-import ar.com.hjg.pngj.chunks.PngChunk;
-import ar.com.hjg.pngj.chunks.PngChunkIDAT;
-import ar.com.hjg.pngj.chunks.PngChunkIHDR;
-import ar.com.hjg.pngj.chunks.PngChunkSkipped;
-import ar.com.hjg.pngj.chunks.PngMetadata;
 
 /**
  * Reads a PNG image, line by line.

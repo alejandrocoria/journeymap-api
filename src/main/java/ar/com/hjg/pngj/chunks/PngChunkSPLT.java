@@ -1,11 +1,11 @@
 package ar.com.hjg.pngj.chunks;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
 import ar.com.hjg.pngj.ImageInfo;
 import ar.com.hjg.pngj.PngHelperInternal;
 import ar.com.hjg.pngj.PngjException;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * sPLT chunk.

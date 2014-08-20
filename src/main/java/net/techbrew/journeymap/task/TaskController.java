@@ -15,6 +15,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import net.techbrew.journeymap.thread.RunnableTask;
+import org.apache.logging.log4j.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,8 +23,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 
 public class TaskController
 {

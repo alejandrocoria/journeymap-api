@@ -18,11 +18,11 @@ import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.model.ChunkCoord;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageCache;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import org.apache.logging.log4j.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

@@ -14,6 +14,8 @@ import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.properties.WebMapProperties;
 import net.techbrew.journeymap.thread.JMThreadFactory;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 import se.rupy.http.Daemon;
 
 import java.io.IOException;
@@ -22,8 +24,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Wraps Rupy Daemon and provides thread management.  Tests webserver_port

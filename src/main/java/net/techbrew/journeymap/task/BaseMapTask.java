@@ -21,6 +21,7 @@ import net.techbrew.journeymap.model.ChunkCoord;
 import net.techbrew.journeymap.model.ChunkImageCache;
 import net.techbrew.journeymap.model.ChunkMD;
 import net.techbrew.journeymap.model.RegionImageCache;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -28,7 +29,6 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
-import org.apache.logging.log4j.Logger;
 
 public abstract class BaseMapTask implements ITask
 {

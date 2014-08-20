@@ -1,15 +1,14 @@
 package modinfo.mp.v1;
 
+import modinfo.ModInfo;
+import org.apache.logging.log4j.Level;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-
-import modinfo.ModInfo;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Created by mwoodman on 2/19/14.

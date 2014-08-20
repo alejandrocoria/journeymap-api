@@ -10,7 +10,6 @@ package net.techbrew.journeymap.command;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Vec3;
 import net.techbrew.journeymap.model.Waypoint;
 
 /**

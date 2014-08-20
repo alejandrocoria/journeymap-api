@@ -10,11 +10,9 @@ package net.techbrew.journeymap.cartography.render;
 
 
 import net.minecraft.world.EnumSkyBlock;
-import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.IChunkRenderer;
 import net.techbrew.journeymap.cartography.RGB;
 import net.techbrew.journeymap.cartography.Strata;
-import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
 /**

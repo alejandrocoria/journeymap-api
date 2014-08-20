@@ -1,14 +1,18 @@
 package se.rupy.http;
 
-import java.io.*;
-import java.net.*;
-import java.nio.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.InetSocketAddress;
+import java.nio.channels.CancelledKeyException;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
-import java.text.*;
-import java.util.*;
-
-import java.nio.channels.*;
+import java.util.Properties;
+import java.util.Random;
+import java.util.StringTokenizer;
 
 /**
  * Asynchronous HTTP request/response, this virtually represents a client

@@ -1,7 +1,8 @@
 package se.rupy.http;
 
-import java.io.*;
-import java.nio.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 /**
  * Handles the incoming request data.

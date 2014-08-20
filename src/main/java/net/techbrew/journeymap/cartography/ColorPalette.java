@@ -26,6 +26,7 @@ import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.BlockMD;
+
 import java.awt.*;
 import java.io.File;
 import java.nio.charset.Charset;

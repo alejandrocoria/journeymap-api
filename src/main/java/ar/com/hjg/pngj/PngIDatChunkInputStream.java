@@ -1,13 +1,13 @@
 package ar.com.hjg.pngj;
 
+import ar.com.hjg.pngj.chunks.ChunkHelper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.CRC32;
-
-import ar.com.hjg.pngj.chunks.ChunkHelper;
 
 /**
  * Reads a sequence of contiguous IDAT chunks

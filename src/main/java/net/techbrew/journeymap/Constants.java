@@ -12,7 +12,6 @@ package net.techbrew.journeymap;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.util.Util;
 import org.lwjgl.input.Keyboard;
 
 import java.io.File;

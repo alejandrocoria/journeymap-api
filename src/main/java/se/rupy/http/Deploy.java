@@ -1,11 +1,15 @@
 package se.rupy.http;
 
 import java.io.*;
-import java.net.*;
+import java.net.ConnectException;
+import java.net.HttpURLConnection;
+import java.net.SocketPermission;
+import java.net.URL;
 import java.security.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.jar.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 
 /**
  * Hot-deploys an application containing one or many service filters from disk

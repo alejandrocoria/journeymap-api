@@ -1,12 +1,12 @@
 package ar.com.hjg.pngj.chunks;
 
+import ar.com.hjg.pngj.ImageInfo;
+import ar.com.hjg.pngj.PngjExceptionInternal;
+
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
-
-import ar.com.hjg.pngj.ImageInfo;
-import ar.com.hjg.pngj.PngjExceptionInternal;
 
 /**
  * Represents a instance of a PNG chunk.

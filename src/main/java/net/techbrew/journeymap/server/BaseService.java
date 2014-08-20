@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import org.apache.logging.log4j.Logger;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 import se.rupy.http.Reply;
@@ -24,8 +25,6 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 

@@ -28,14 +28,13 @@ import net.techbrew.journeymap.model.ChunkMD;
 import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageCache;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.apache.logging.log4j.Logger;
 
 public class MapRegionTask extends BaseMapTask
 {

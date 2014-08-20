@@ -24,7 +24,10 @@ import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
-import net.techbrew.journeymap.model.*;
+import net.techbrew.journeymap.model.BlockCoordIntPair;
+import net.techbrew.journeymap.model.EntityHelper;
+import net.techbrew.journeymap.model.MapOverlayState;
+import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
@@ -35,14 +38,14 @@ import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.ui.*;
 import net.techbrew.journeymap.ui.Button;
 import net.techbrew.journeymap.ui.map.layer.LayerDelegate;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Collections;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Displays the map as a full-screen overlay in-game.

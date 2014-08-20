@@ -16,6 +16,7 @@ import cpw.mods.fml.common.Loader;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.thread.JMThreadFactory;
+import org.apache.logging.log4j.Level;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
@@ -24,7 +25,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.apache.logging.log4j.Level;
 
 public class VersionCheck
 {

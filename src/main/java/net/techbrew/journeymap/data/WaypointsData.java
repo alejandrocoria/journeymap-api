@@ -12,7 +12,6 @@ import com.google.common.cache.CacheLoader;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
-import net.techbrew.journeymap.properties.WaypointProperties;
 import net.techbrew.journeymap.waypoint.ReiReader;
 import net.techbrew.journeymap.waypoint.VoxelReader;
 import net.techbrew.journeymap.waypoint.WaypointStore;

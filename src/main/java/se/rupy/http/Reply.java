@@ -1,8 +1,7 @@
 package se.rupy.http;
 
-import java.io.*;
-import java.nio.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * HTTP response. Non-blocking asynchronous; if you don't change the code or write output, 

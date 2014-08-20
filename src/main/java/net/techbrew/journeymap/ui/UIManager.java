@@ -18,7 +18,6 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
-import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.ui.map.*;
 import net.techbrew.journeymap.ui.minimap.MiniMap;
@@ -28,7 +27,6 @@ import net.techbrew.journeymap.ui.waypoint.WaypointEditor;
 import net.techbrew.journeymap.ui.waypoint.WaypointHelp;
 import net.techbrew.journeymap.ui.waypoint.WaypointManager;
 import net.techbrew.journeymap.ui.waypoint.WaypointOptions;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 

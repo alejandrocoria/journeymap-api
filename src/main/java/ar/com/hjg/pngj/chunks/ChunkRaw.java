@@ -1,13 +1,13 @@
 package ar.com.hjg.pngj.chunks;
 
+import ar.com.hjg.pngj.PngHelperInternal;
+import ar.com.hjg.pngj.PngjBadCrcException;
+import ar.com.hjg.pngj.PngjOutputException;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.CRC32;
-
-import ar.com.hjg.pngj.PngHelperInternal;
-import ar.com.hjg.pngj.PngjBadCrcException;
-import ar.com.hjg.pngj.PngjOutputException;
 
 /**
  * Raw (physical) chunk.

@@ -4,10 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
+import org.apache.logging.log4j.Level;
 
 import java.io.*;
 import java.util.UUID;
-import org.apache.logging.log4j.Level;
 
 /**
  * Created by mwoodman on 2/20/14.

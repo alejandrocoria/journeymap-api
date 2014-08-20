@@ -9,7 +9,6 @@
 package net.techbrew.journeymap.render.draw;
 
 import com.google.common.cache.CacheLoader;
-import net.minecraft.entity.Entity;
 import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.model.EntityHelper;
 import net.techbrew.journeymap.render.overlay.GridRenderer;

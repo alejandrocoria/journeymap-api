@@ -18,12 +18,12 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.server.JMServer;
+import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.logging.log4j.Level;
 
 /**
  * Provides messages to both chat GUI and log.

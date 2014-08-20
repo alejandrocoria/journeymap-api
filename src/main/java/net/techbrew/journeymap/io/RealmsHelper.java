@@ -11,7 +11,6 @@ package net.techbrew.journeymap.io;
 import com.mojang.realmsclient.RealmsMainScreen;
 import com.mojang.realmsclient.dto.McoServer;
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;

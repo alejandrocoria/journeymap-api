@@ -16,14 +16,13 @@ import net.techbrew.journeymap.properties.InGameMapProperties;
 import net.techbrew.journeymap.render.texture.DelayedTexture;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.concurrent.Future;
-
-import org.apache.logging.log4j.Logger;
 
 public class Tile
 {
