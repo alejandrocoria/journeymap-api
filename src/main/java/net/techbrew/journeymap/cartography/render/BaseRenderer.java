@@ -45,7 +45,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 
     protected final DataCache dataCache = DataCache.instance();
     protected final CoreProperties coreProperties = JourneyMap.getInstance().coreProperties;
-    protected final BlockColumnPropertiesCache columnPropertiesCache;
+    protected BlockColumnPropertiesCache columnPropertiesCache = null;
 
     public static final String PROP_WATER_HEIGHT = "waterHeight";
 
@@ -61,6 +61,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     protected volatile AtomicLong badBlockCount = new AtomicLong(0);
     protected ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
     protected ArrayList<BlockCoordIntPair> secondarySlopeOffsets = new ArrayList<BlockCoordIntPair>(4);
+    protected String cachePrefix = "";
 
     // Need to go in properties
     protected float shadingSlopeMin; // Range: 0-1
@@ -82,8 +83,6 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     public BaseRenderer()
     {
         updateOptions();
-
-        columnPropertiesCache = new BlockColumnPropertiesCache("columnProps");
 
         // TODO: Put in properties
         this.shadingSlopeMin = 0.2f;

@@ -37,7 +37,6 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
     protected Strata strata = new Strata("Cave", 40, 8, true);
     protected float defaultDim = .8f;
-    protected String cachePrefix = "Cave";
 
     private final Object chunkLock = new Object();
 
@@ -51,6 +50,8 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     public CaveRenderer(SurfaceRenderer surfaceRenderer)
     {
         this.surfaceRenderer = surfaceRenderer;
+        cachePrefix = "Cave";
+
         updateOptions();
 
         // TODO: Put these in properties?
@@ -147,7 +148,8 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
                 try
                 {
-                    final int ceiling = chunkMd.getHasNoSky() ? sliceMaxY : chunkMd.ceiling(x, z);
+                    //final int ceiling = chunkMd.getHasNoSky() ? sliceMaxY : chunkMd.ceiling(x, z);
+                    final int ceiling = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, chunkHeights);
 
                     // Oh look, a hole in the world.
                     if (ceiling < 0)
@@ -398,12 +400,16 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             BlockMD blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
             BlockMD blockMDAbove = dataCache.getBlockMD(chunkMd, x, y + 1, z);
 
+            boolean inAirPocket = false;
+
             while (y > 0)
             {
                 if (mapBathymetry && blockMD.isWater())
                 {
                     y--;
                 }
+
+                inAirPocket = blockMD.isAir();
 
                 if (blockMDAbove.isAir() || blockMDAbove.hasTranparency() || blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky))
                 {
@@ -417,6 +423,11 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
                 blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
                 blockMDAbove = dataCache.getBlockMD(chunkMd, x, y + 1, z);
+
+                if(y<sliceMinY && !inAirPocket)
+                {
+                    break;
+                }
             }
         }
         catch (Exception e)

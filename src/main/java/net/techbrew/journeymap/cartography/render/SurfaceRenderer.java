@@ -40,9 +40,10 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
     public SurfaceRenderer()
     {
         // TODO: Write the caches to disk and we'll have some useful data available.
-
-        chunkSurfaceHeights = new HeightsCache("SurfaceHeights");
-        chunkSurfaceSlopes = new SlopesCache("SurfaceSlopes");
+        cachePrefix = "Surface";
+        columnPropertiesCache = new BlockColumnPropertiesCache(cachePrefix + "ColumnProps");
+        chunkSurfaceHeights = new HeightsCache(cachePrefix + "Heights");
+        chunkSurfaceSlopes = new SlopesCache(cachePrefix + "Slopes");
         DataCache.instance().addChunkMDListener(this);
     }
 

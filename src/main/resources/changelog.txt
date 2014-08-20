@@ -12,6 +12,8 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Cave mapping now stays in the vertical slice where it's supposed to.
+- Bugfix: "columnProps" warning dealt with severely and sent to bed without dinner
 - Change: Better handling of modded TileEntities that don't have Block icons (Botania:spawnerClaw, etc.) They're now just ignored rather than showing up as black.
 - Change: Logging moved to Log4j2 just like Forge and Minecraft are now using.
 
