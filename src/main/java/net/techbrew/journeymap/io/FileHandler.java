@@ -310,8 +310,7 @@ public class FileHandler
         if(worldDir!=null)
         {
             File worldConfigDir = new File(worldDir, "config");
-            boolean found = worldConfigDir.exists() ||  worldConfigDir.mkdirs();
-            if(found)
+            if(worldConfigDir.exists())
             {
                 return worldConfigDir;
             }
