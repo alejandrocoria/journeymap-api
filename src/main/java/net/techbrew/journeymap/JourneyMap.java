@@ -8,10 +8,13 @@
 
 package net.techbrew.journeymap;
 
+import com.google.common.base.Strings;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -25,6 +28,7 @@ import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.forgehandler.EventHandlerManager;
+import net.techbrew.journeymap.forgehandler.WorldUidHandler;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.ChatLog;
@@ -68,7 +72,6 @@ public class JourneyMap
     static final String VERSION_URL = "https://docs.google.com/uc?id=0B-PlFsIS9WoCWGNLWUZPSl9KNHc"; //$NON-NLS-1$
     private static JourneyMap INSTANCE;
 
-    // Time stamp of next chunk update
     public ModInfo modInfo;
 
     // Properties & preferences
@@ -78,6 +81,7 @@ public class JourneyMap
     private volatile WebMapProperties webMapProperties;
     private volatile WaypointProperties waypointProperties;
     private volatile Boolean initialized = false;
+    private volatile String currentWorldUid = null;
     private Logger logger;
     private JMServer jmServer;
     private boolean threadLogging = false;
@@ -252,6 +256,11 @@ public class JourneyMap
         return jmServer;
     }
 
+    public void toggleWebserver(boolean enable, boolean announce)
+    {
+        jmServer = JMServer.setEnabled(jmServer, enable, announce);
+    }
+
     /**
      * Toggles automapping
      *
@@ -339,6 +348,8 @@ public class JourneyMap
                 taskController.clear();
                 taskController = null;
             }
+
+            currentWorldUid = null;
         }
     }
 
@@ -448,7 +459,6 @@ public class JourneyMap
             {
                 startMapping();
             }
-
         }
         catch (Throwable t)
         {
@@ -510,5 +520,23 @@ public class JourneyMap
     public static WaypointProperties getWaypointProperties()
     {
         return INSTANCE.waypointProperties;
+    }
+
+    public String getCurrentWorldUid()
+    {
+        return this.currentWorldUid;
+    }
+
+    public void setCurrentWorldUid(String worldUid)
+    {
+        if(!Strings.isNullOrEmpty(worldUid))
+        {
+            if(!worldUid.equals(this.currentWorldUid))
+            {
+                stopMapping();
+                this.currentWorldUid = worldUid;
+                startMapping();
+            }
+        }
     }
 }

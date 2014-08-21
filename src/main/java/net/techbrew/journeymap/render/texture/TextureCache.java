@@ -16,6 +16,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 
 import javax.imageio.ImageIO;
@@ -379,20 +380,38 @@ public class TextureCache
      * *************************************************
      */
 
-    public TextureImpl getPlayerSkin(String username)
+    public TextureImpl getPlayerSkin(final String username)
     {
-
+        TextureImpl tex = null;
         synchronized (skinImageMap)
         {
-            TextureImpl tex = skinImageMap.get(username);
-            if (tex == null)
+            tex = skinImageMap.get(username);
+            if (tex != null)
+            {
+                return tex;
+            }
+            else
+            {
+                // Create blank to return immediately
+                BufferedImage blank = new BufferedImage(24, 24, BufferedImage.TYPE_INT_ARGB);
+                tex = new TextureImpl(blank, true);
+                skinImageMap.put(username, tex);
+            }
+        }
+
+        final TextureImpl playerSkinTex = tex;
+
+        // Load it async
+        texExec.submit(new Callable<Void>()
+        {
+            @Override
+            public Void call() throws Exception
             {
                 BufferedImage img = null;
                 try
                 {
                     URL url = new URL("http://s3.amazonaws.com/MinecraftSkins/" + username + ".png");
                     img = ImageIO.read(url).getSubimage(8, 8, 8, 8);
-
                 }
                 catch (Throwable e)
                 {
@@ -413,16 +432,13 @@ public class TextureCache
                     final Graphics2D g = RegionImageHandler.initRenderingHints(scaledImage.createGraphics());
                     g.drawImage(img, 0, 0, 24, 24, null);
                     g.dispose();
-                    tex = new TextureImpl(scaledImage, true);
+                    playerSkinTex.updateTexture(scaledImage);
                 }
-                else
-                {
-                    tex = getUnknownEntity();
-                }
-                skinImageMap.put(username, tex);
+                return null;
             }
-            return tex;
-        }
+        });
+
+        return playerSkinTex;
     }
 
     public void purge()

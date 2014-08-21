@@ -17,7 +17,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.Utils;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
@@ -136,15 +135,15 @@ public class FileHandler
 
         if (!minecraft.isSingleplayer())
         {
-            return getJMWorldDir(minecraft, Utils.getWorldHash(minecraft));
+            return getJMWorldDir(minecraft, JourneyMap.getInstance().getCurrentWorldUid());
         }
         else
         {
-            return getJMWorldDir(minecraft, -1L);
+            return getJMWorldDir(minecraft, null);
         }
     }
 
-    public static File getJMWorldDir(Minecraft minecraft, long hash)
+    public static File getJMWorldDir(Minecraft minecraft, String worldUid)
     {
         if(minecraft.theWorld==null)
         {
@@ -163,8 +162,14 @@ public class FileHandler
                 if (!minecraft.isSingleplayer())
                 {
                     String legacyWorldName = WorldData.getWorldName(minecraft, true);
-                    File legacyWorldDir = new File(mcDir, Constants.MP_DATA_DIR + legacyWorldName + "_" + hash); //$NON-NLS-1$
-                    worldDir = new File(mcDir, Constants.MP_DATA_DIR + worldName + "_" + hash); //$NON-NLS-1$
+                    File legacyWorldDir = new File(mcDir, Constants.MP_DATA_DIR + legacyWorldName + "_0"); //$NON-NLS-1$
+
+                    String suffix = "";
+                    if(worldUid!=null)
+                    {
+                        suffix = "_" + worldUid;
+                    }
+                    worldDir = new File(mcDir, Constants.MP_DATA_DIR + worldName + suffix); //$NON-NLS-1$
 
                     if(legacyWorldDir.exists())
                     {
@@ -301,7 +306,7 @@ public class FileHandler
 
     public static File getWorldConfigDir(boolean fallbackToStandardConfigDir)
     {
-        File worldDir = getJMWorldDir(FMLClientHandler.instance().getClient());
+        File worldDir = getJMWorldDir(FMLClientHandler.instance().getClient(), null); // always use the "base" folder for multiplayer
         if(worldDir!=null)
         {
             File worldConfigDir = new File(worldDir, "config");
@@ -320,10 +325,10 @@ public class FileHandler
         return new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.CONFIG_DIR);
     }
 
-    public static File getCacheDir()
-    {
-        return new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.CACHE_DIR);
-    }
+//    public static File getCacheDir()
+//    {
+//        return new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.CACHE_DIR);
+//    }
 
     public static File getEntityIconDir()
     {
@@ -578,81 +583,81 @@ public class FileHandler
         }
     }
 
-    public static boolean serializeCache(String name, Serializable cache)
-    {
-        try
-        {
-            File cacheDir = getCacheDir();
-            if (!cacheDir.exists())
-            {
-                cacheDir.mkdirs();
-            }
+//    public static boolean serializeCache(String name, Serializable cache)
+//    {
+//        try
+//        {
+//            File cacheDir = getCacheDir();
+//            if (!cacheDir.exists())
+//            {
+//                cacheDir.mkdirs();
+//            }
+//
+//            File cacheFile = new File(cacheDir, name);
+//
+//            FileOutputStream fileOut = new FileOutputStream(cacheFile);
+//            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+//            out.writeObject(cache);
+//            out.close();
+//            fileOut.close();
+//            return true;
+//        }
+//        catch (IOException e)
+//        {
+//            JourneyMap.getLogger().error("Could not serialize cache: " + name + " : " + LogFormatter.toString(e));
+//            return false;
+//        }
+//    }
+//
+//    public static boolean writeDebugFile(String name, String contents)
+//    {
+//        try
+//        {
+//            File debugFile = new File(getJourneyMapDir(), "DEBUG-" + name);
+//            FileWriter writer = new FileWriter(debugFile, false);
+//            writer.write(contents);
+//            writer.flush();
+//            writer.close();
+//            return true;
+//        }
+//        catch (IOException e)
+//        {
+//            JourneyMap.getLogger().error("Could not write debug file: " + name + " : " + LogFormatter.toString(e));
+//            return false;
+//        }
+//    }
 
-            File cacheFile = new File(cacheDir, name);
-
-            FileOutputStream fileOut = new FileOutputStream(cacheFile);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(cache);
-            out.close();
-            fileOut.close();
-            return true;
-        }
-        catch (IOException e)
-        {
-            JourneyMap.getLogger().error("Could not serialize cache: " + name + " : " + LogFormatter.toString(e));
-            return false;
-        }
-    }
-
-    public static boolean writeDebugFile(String name, String contents)
-    {
-        try
-        {
-            File debugFile = new File(getJourneyMapDir(), "DEBUG-" + name);
-            FileWriter writer = new FileWriter(debugFile, false);
-            writer.write(contents);
-            writer.flush();
-            writer.close();
-            return true;
-        }
-        catch (IOException e)
-        {
-            JourneyMap.getLogger().error("Could not write debug file: " + name + " : " + LogFormatter.toString(e));
-            return false;
-        }
-    }
-
-    public static <C extends Serializable> C deserializeCache(String name, Class<C> cacheClass)
-    {
-
-        File cacheFile = new File(getCacheDir(), name);
-        if (!cacheFile.exists())
-        {
-            return null;
-        }
-        try
-        {
-            FileInputStream fileIn = new FileInputStream(cacheFile);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            C cache = (C) in.readObject();
-            in.close();
-            fileIn.close();
-            if (cache.getClass() != cacheClass)
-            {
-                throw new ClassCastException(cache.getClass() + " can't be cast to " + cacheClass);
-            }
-            return cache;
-        }
-        catch (Exception e)
-        {
-            JourneyMap.getLogger().warn("Could not deserialize cache: " + name + " : " + e);
-            if (cacheFile.exists())
-            {
-                cacheFile.delete();
-            }
-            return null;
-        }
-    }
+//    public static <C extends Serializable> C deserializeCache(String name, Class<C> cacheClass)
+//    {
+//
+//        File cacheFile = new File(getCacheDir(), name);
+//        if (!cacheFile.exists())
+//        {
+//            return null;
+//        }
+//        try
+//        {
+//            FileInputStream fileIn = new FileInputStream(cacheFile);
+//            ObjectInputStream in = new ObjectInputStream(fileIn);
+//            C cache = (C) in.readObject();
+//            in.close();
+//            fileIn.close();
+//            if (cache.getClass() != cacheClass)
+//            {
+//                throw new ClassCastException(cache.getClass() + " can't be cast to " + cacheClass);
+//            }
+//            return cache;
+//        }
+//        catch (Exception e)
+//        {
+//            JourneyMap.getLogger().warn("Could not deserialize cache: " + name + " : " + e);
+//            if (cacheFile.exists())
+//            {
+//                cacheFile.delete();
+//            }
+//            return null;
+//        }
+//    }
 
     /**
      * Extracts a zip file specified by the zipFilePath to a directory specified by

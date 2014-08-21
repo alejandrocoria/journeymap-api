@@ -72,25 +72,20 @@ public abstract class PropertiesBase
     public abstract int getCodeRevision();
 
     /**
-     * Gets the property file.
+     * Gets the property file, looking first in the world config dir,
+     * then falling back to look in the standard config dir.
      *
      * @return file
      */
     public File getFile()
     {
-        return getFile(true);
-    }
-
-    /**
-     * Gets the property file.  If it isn't set, looks first in world config dir before standard dir.
-     * @param fallbackToStandardConfigDir   true if fallback needed.
-     * @return null if not found
-     */
-    protected File getFile(boolean fallbackToStandardConfigDir)
-    {
         if(sourceFile==null)
         {
-            sourceFile = new File(FileHandler.getWorldConfigDir(fallbackToStandardConfigDir), getFileName());
+            sourceFile = new File(FileHandler.getWorldConfigDir(false), getFileName());
+            if(!sourceFile.canRead())
+            {
+                sourceFile = new File(FileHandler.getStandardConfigDir(), getFileName());
+            }
         }
         return sourceFile;
     }
@@ -152,7 +147,7 @@ public abstract class PropertiesBase
         {
             try
             {
-                File worldConfig = getFile(false);
+                File worldConfig = getFile();
                 if(overwrite || !worldConfig.exists())
                 {
                     save();

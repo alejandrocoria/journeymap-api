@@ -24,6 +24,7 @@ import java.util.HashMap;
  */
 public class EventHandlerManager
 {
+    static WorldUidHandler worldUidHandler;
 
     private static HashMap<Class<? extends EventHandler>, EventHandler> handlers = new HashMap<Class<? extends EventHandler>, EventHandler>();
 
@@ -33,6 +34,7 @@ public class EventHandlerManager
         register(new WorldEventHandler());
         register(new ChunkUpdateHandler());
         register(new WaypointBeaconHandler());
+        worldUidHandler = new WorldUidHandler();
     }
 
     public static void registerGuiHandlers()
