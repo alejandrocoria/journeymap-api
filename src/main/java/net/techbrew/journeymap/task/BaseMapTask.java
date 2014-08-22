@@ -71,6 +71,12 @@ public abstract class BaseMapTask implements ITask
 
         try
         {
+            if(mc.theWorld==null)
+            {
+                this.complete(true, false);
+                return;
+            }
+
             final long start = System.nanoTime();
             final Iterator<ChunkCoordIntPair> chunkIter = chunkCoords.iterator();
             final ChunkImageCache chunkImageCache = new ChunkImageCache();

@@ -23,16 +23,16 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.techbrew.journeymap.JourneyMap;
 
 /**
- * Sample Forge Client class for handling WorldId custom packets.
+ * Sample Forge Client class for handling World Info custom packets.
  * @author techbrew
  */
-public class WorldIdHandler
+public class WorldInfoHandler
 {
     // Channel name
-    public static final String CHANNEL_NAME = "world_id";
+    public static final String CHANNEL_NAME = "world_info";
 
-    // Packet discriminator
-    public static final int PACKET_DISCRIMINATOR = 0;
+    // Packet discriminator for World ID message
+    public static final int PACKET_WORLDID = 0;
 
     // Minimum time in millis that must pass before subsequent requests can be made
     public static final int MIN_DELAY_MS = 1000;
@@ -52,14 +52,14 @@ public class WorldIdHandler
     /**
      * Default constructor.
      */
-    public WorldIdHandler()
+    public WorldInfoHandler()
     {
         try
         {
             channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL_NAME);
             if (channel != null)
             {
-                channel.registerMessage(WorldIdListener.class, WorldIdMessage.class, PACKET_DISCRIMINATOR, Side.CLIENT);
+                channel.registerMessage(WorldIdListener.class, WorldIdMessage.class, PACKET_WORLDID, Side.CLIENT);
                 FMLLog.info("Registered channel: %s", CHANNEL_NAME);
                 MinecraftForge.EVENT_BUS.register(this);
             }
@@ -107,7 +107,7 @@ public class WorldIdHandler
     @SubscribeEvent
     public void on(EntityJoinWorldEvent event)
     {
-        if(!mc.isSingleplayer() && mc.thePlayer!=null)
+        if(!mc.isSingleplayer() && mc.thePlayer!=null && !mc.thePlayer.isDead)
         {
             if(event.entity.getUniqueID().equals(mc.thePlayer.getUniqueID()))
             {
@@ -127,7 +127,7 @@ public class WorldIdHandler
         {
             lastResponse = System.currentTimeMillis();
             FMLLog.info("Got the worldUid from server: %s" , message.worldUid);
-            JourneyMap.getInstance().setCurrentWorldUid(message.worldUid);
+            JourneyMap.getInstance().setCurrentWorldId(message.worldUid);
             return null;
         }
     }
@@ -152,15 +152,29 @@ public class WorldIdHandler
         @Override
         public void fromBytes(ByteBuf buf)
         {
-            worldUid = ByteBufUtils.readUTF8String(buf);
+            try
+            {
+                worldUid = ByteBufUtils.readUTF8String(buf);
+            }
+            catch(Throwable t)
+            {
+                FMLLog.severe("Failed to read message: %s", t);
+            }
         }
 
         @Override
         public void toBytes(ByteBuf buf)
         {
-            if(worldUid!=null)
+            try
             {
-                ByteBufUtils.writeUTF8String(buf, worldUid);
+                if(worldUid!=null)
+                {
+                    ByteBufUtils.writeUTF8String(buf, worldUid);
+                }
+            }
+            catch(Throwable t)
+            {
+                FMLLog.severe("Failed to read message: %s", t);
             }
         }
     }

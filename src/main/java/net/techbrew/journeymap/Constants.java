@@ -9,6 +9,7 @@
 package net.techbrew.journeymap;
 
 
+import com.google.common.collect.Ordering;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
@@ -22,6 +23,7 @@ import java.util.TimeZone;
 
 public class Constants
 {
+    public static final Ordering<String> CASE_INSENSITIVE_NULL_SAFE_ORDER = Ordering.from(String.CASE_INSENSITIVE_ORDER).nullsLast(); // or nullsFirst()
     public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
     public static String JOURNEYMAP_DIR = "journeyMap" + File.separator; //$NON-NLS-1$
     public static String CONFIG_DIR = JOURNEYMAP_DIR + "config" + File.separator; //$NON-NLS-1$
@@ -117,7 +119,14 @@ public class Constants
         return getString("jm.error.00", params); //$NON-NLS-1$
     }
 
-    ;
+    public static boolean safeEqual(String first, String second)
+    {
+        int result = CASE_INSENSITIVE_NULL_SAFE_ORDER.compare(first, second);
+        if (result != 0) {
+            return false;
+        }
+        return CASE_INSENSITIVE_NULL_SAFE_ORDER.compare(first, second)==0;
+    }
 
     public static String getMessageJMERR01(Object... params)
     {

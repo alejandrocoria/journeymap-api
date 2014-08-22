@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap;
 
-import com.google.common.base.Strings;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -46,6 +45,8 @@ import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+
 
 /**
  * This software is copyright (C) Mark Woodman (mwoodman@techbrew.net) and is
@@ -78,7 +79,7 @@ public class JourneyMap
     private volatile WebMapProperties webMapProperties;
     private volatile WaypointProperties waypointProperties;
     private volatile Boolean initialized = false;
-    private volatile String currentWorldUid = null;
+    private volatile String currentWorldId = null;
     private Logger logger;
     private JMServer jmServer;
     private boolean threadLogging = false;
@@ -318,7 +319,7 @@ public class JourneyMap
             taskController = new TaskController();
             taskController.enableTasks();
 
-            logger.info("Mapping started in " + WorldData.getWorldName(mc) + " dimension " + mc.theWorld.provider.dimensionId + "."); //$NON-NLS-1$
+            logger.info(String.format("Mapping started in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, mc.theWorld.provider.dimensionId)); //$NON-NLS-1$
         }
     }
 
@@ -336,7 +337,7 @@ public class JourneyMap
                 {
                     dim = " dimension " + mc.theWorld.provider.dimensionId + "."; //$NON-NLS-1$ //$NON-NLS-2$
                 }
-                logger.info("Mapping halting in " + WorldData.getWorldName(mc) + dim); //$NON-NLS-1$
+                logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, mc.theWorld.provider.dimensionId)); //$NON-NLS-1$
             }
 
             if (taskController != null)
@@ -346,14 +347,13 @@ public class JourneyMap
                 taskController = null;
             }
 
-            currentWorldUid = null;
+            currentWorldId = null;
         }
     }
 
     private void reset()
     {
         loadConfigProperties();
-        FileHandler.lastJMWorldDir = null;
         DataCache.instance().purge();
         DataCache.instance().resetBlockMetadata();
         chunkRenderController = new ChunkRenderController();
@@ -519,21 +519,32 @@ public class JourneyMap
         return INSTANCE.waypointProperties;
     }
 
-    public String getCurrentWorldUid()
+    public String getCurrentWorldId()
     {
-        return this.currentWorldUid;
+        return this.currentWorldId;
     }
 
-    public void setCurrentWorldUid(String worldUid)
+    public void setCurrentWorldId(String worldId)
     {
-        if(!Strings.isNullOrEmpty(worldUid))
+        boolean unchanged = Constants.safeEqual(worldId, currentWorldId);
+        if(unchanged)
         {
-            if(!worldUid.equals(this.currentWorldUid))
-            {
-                stopMapping();
-                this.currentWorldUid = worldUid;
-                startMapping();
-            }
+            getLogger().info("World UID hasn't changed: " + worldId);
+            return;
+        }
+
+        boolean restartMapping = isMapping();
+
+        if(restartMapping)
+        {
+            stopMapping();
+        }
+
+        this.currentWorldId = worldId;
+
+        if(restartMapping)
+        {
+            startMapping();
         }
     }
 }

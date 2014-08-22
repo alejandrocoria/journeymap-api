@@ -42,20 +42,13 @@ public class FileHandler
     public final static String MOB_ICON_SET_2D = "2D";
     public final static String MOB_ICON_SET_3D = "3D";
 
-    public static volatile File lastJMWorldDir;
-
-    public static volatile String lastMCFolderName = "";
-    public static volatile File lastMCWorldDir = null;
 
     public static File getMCWorldDir(Minecraft minecraft)
     {
         if (minecraft.isIntegratedServerRunning())
         {
-            if (lastMCWorldDir == null || !lastMCFolderName.equals(minecraft.getIntegratedServer().getFolderName()))
-            {
-                lastMCFolderName = minecraft.getIntegratedServer().getFolderName();
-                lastMCWorldDir = new File(minecraft.mcDataDir, "saves" + File.separator + lastMCFolderName);
-            }
+            String lastMCFolderName = minecraft.getIntegratedServer().getFolderName();
+            File lastMCWorldDir = new File(minecraft.mcDataDir, "saves" + File.separator + lastMCFolderName);
             return lastMCWorldDir;
         }
         return null;
@@ -135,7 +128,7 @@ public class FileHandler
 
         if (!minecraft.isSingleplayer())
         {
-            return getJMWorldDir(minecraft, JourneyMap.getInstance().getCurrentWorldUid());
+            return getJMWorldDir(minecraft, JourneyMap.getInstance().getCurrentWorldId());
         }
         else
         {
@@ -152,46 +145,42 @@ public class FileHandler
 
         File mcDir = minecraft.mcDataDir;
 
-        if (lastJMWorldDir == null)
+        File worldDir = null;
+
+        try
         {
-            File worldDir = null;
-
-            try
+            String worldName = WorldData.getWorldName(minecraft);
+            if (!minecraft.isSingleplayer())
             {
-                String worldName = WorldData.getWorldName(minecraft);
-                if (!minecraft.isSingleplayer())
+                String legacyWorldName = WorldData.getWorldName(minecraft, true);
+                File legacyWorldDir = new File(mcDir, Constants.MP_DATA_DIR + legacyWorldName + "_0"); //$NON-NLS-1$
+
+                String suffix = "";
+                if(worldUid!=null)
                 {
-                    String legacyWorldName = WorldData.getWorldName(minecraft, true);
-                    File legacyWorldDir = new File(mcDir, Constants.MP_DATA_DIR + legacyWorldName + "_0"); //$NON-NLS-1$
-
-                    String suffix = "";
-                    if(worldUid!=null)
-                    {
-                        suffix = "_" + worldUid;
-                    }
-                    worldDir = new File(mcDir, Constants.MP_DATA_DIR + worldName + suffix); //$NON-NLS-1$
-
-                    if(legacyWorldDir.exists())
-                    {
-                        migrateLegacyServerName(legacyWorldDir, worldDir);
-                    }
+                    suffix = "_" + worldUid;
                 }
-                else
+                worldDir = new File(mcDir, Constants.MP_DATA_DIR + worldName + suffix); //$NON-NLS-1$
+
+                if(legacyWorldDir.exists())
                 {
-                    worldDir = new File(mcDir, Constants.SP_DATA_DIR + worldName);
+                    migrateLegacyServerName(legacyWorldDir, worldDir);
                 }
-
-                worldDir.mkdirs();
             }
-            catch (Exception e)
+            else
             {
-                JourneyMap.getLogger().log(Level.ERROR, LogFormatter.toString(e));
-                throw new RuntimeException(e);
+                worldDir = new File(mcDir, Constants.SP_DATA_DIR + worldName);
             }
 
-            lastJMWorldDir = worldDir;
+            worldDir.mkdirs();
         }
-        return lastJMWorldDir;
+        catch (Exception e)
+        {
+            JourneyMap.getLogger().log(Level.ERROR, LogFormatter.toString(e));
+            throw new RuntimeException(e);
+        }
+
+        return worldDir;
     }
 
     private static void migrateLegacyServerName(File legacyWorldDir, File worldDir)
