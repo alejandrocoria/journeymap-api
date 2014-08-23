@@ -11,7 +11,7 @@ package net.techbrew.journeymap.task;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
@@ -19,7 +19,6 @@ import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
-import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.nbt.ChunkLoader;
 import net.techbrew.journeymap.io.nbt.RegionLoader;
 import net.techbrew.journeymap.log.ChatLog;
@@ -42,12 +41,12 @@ public class MapRegionTask extends BaseMapTask
     private static final Logger logger = JourneyMap.getLogger();
     private static volatile long lastTaskCompleted;
 
-    final Collection<Chunk> retainChunks;
+    final Collection<ChunkCoordIntPair> retainedCoords;
 
-    private MapRegionTask(ChunkRenderController renderController, World world, int dimension, boolean underground, Integer chunkY, Collection<ChunkCoordIntPair> chunkMdPool,  Collection<Chunk> retainChunks)
+    private MapRegionTask(ChunkRenderController renderController, World world, int dimension, boolean underground, Integer chunkY, Collection<ChunkCoordIntPair> chunkCoords, Collection<ChunkCoordIntPair> retainCoords)
     {
-        super(renderController, world, dimension, underground, chunkY, chunkMdPool, true);
-        this.retainChunks = retainChunks;
+        super(renderController, world, dimension, underground, chunkY, chunkCoords, true);
+        this.retainedCoords = retainCoords;
     }
 
     public static BaseMapTask create(ChunkRenderController renderController, RegionCoord rCoord, Minecraft minecraft)
@@ -56,30 +55,11 @@ public class MapRegionTask extends BaseMapTask
         int missing = 0;
 
         final World world = minecraft.theWorld;
-        final File mcWorldDir = FileHandler.getMCWorldDir(minecraft, rCoord.dimension);
-        //final HashSet<ChunkCoordIntPair> chunks = new HashSet<ChunkCoordIntPair>(1280); // 1024 * 1.25 alleviates map growth
-        final List<ChunkCoordIntPair> coords = rCoord.getChunkCoordsInRegion();
-        final List<ChunkCoordIntPair> renderCoords = new ArrayList<ChunkCoordIntPair>(coords.size());
-        final List<Chunk> retainedChunks = new ArrayList<Chunk>(coords.size());
 
-        while (!coords.isEmpty())
-        {
-            ChunkCoordIntPair coord = coords.remove(0);
-            ChunkMD chunkMD = ChunkLoader.getChunkMdFromDisk(coord.chunkXPos, coord.chunkZPos, mcWorldDir, world);
-            if (chunkMD == null)
-            {
-                missing++;
-            }
-            else
-            {
-                DataCache.instance().addChunkMD(chunkMD);
-                retainedChunks.add(chunkMD.getChunk());
-                renderCoords.add(coord);
-            }
-        }
+        final List<ChunkCoordIntPair> renderCoords = rCoord.getChunkCoordsInRegion();
+        final List<ChunkCoordIntPair> retainedCoords = new ArrayList<ChunkCoordIntPair>(renderCoords.size());
 
         // Ensure chunks north, west, nw are kept alive for slope calculations
-        // TODO: Just do this for the upper and leftmost coordsy
         for(ChunkCoordIntPair coord : renderCoords)
         {
             for(ChunkCoordIntPair keepAliveOffset : keepAliveOffsets)
@@ -87,35 +67,61 @@ public class MapRegionTask extends BaseMapTask
                 ChunkCoordIntPair keepAliveCoord = new ChunkCoordIntPair(coord.chunkXPos + keepAliveOffset.chunkXPos, coord.chunkZPos + keepAliveOffset.chunkZPos);
                 if (!renderCoords.contains(keepAliveCoord))
                 {
-                    ChunkMD keepAliveChunk = ChunkLoader.getChunkMdFromDisk(coord.chunkXPos, coord.chunkZPos, mcWorldDir, world);
-                    if(keepAliveChunk!=null && keepAliveChunk.hasChunk())
-                    {
-                        DataCache.instance().addChunkMD(keepAliveChunk);
-                        retainedChunks.add(keepAliveChunk.getChunk());
-                    }
+                    retainedCoords.add(keepAliveCoord);
                 }
             }
         }
 
-        if (logger.isTraceEnabled())
+        return new MapRegionTask(renderController, world, rCoord.dimension, rCoord.isUnderground(), rCoord.getVerticalSlice(), renderCoords, retainedCoords);
+
+    }
+
+    @Override
+    public final void performTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
+    {
+        AnvilChunkLoader loader = ChunkLoader.getAnvilChunkLoader(mc);
+
+        int missing = 0;
+        for (ChunkCoordIntPair coord : retainedCoords)
         {
-            logger.debug("Chunks: " + missing + " skipped, " + renderCoords.size() + " used");
+            ChunkMD chunkMD = ChunkLoader.getChunkMD(loader, mc, coord);
+            if (chunkMD != null)
+            {
+                DataCache.instance().addChunkMD(chunkMD);
+            }
         }
 
-        if (renderCoords.size() > 0)
+        for (ChunkCoordIntPair coord : chunkCoords)
         {
-            logger.warn("No viable chunks found in region " + rCoord);
+            ChunkMD chunkMD = ChunkLoader.getChunkMD(loader, mc, coord);
+            if (chunkMD != null)
+            {
+                DataCache.instance().addChunkMD(chunkMD);
+            }
+            else
+            {
+                missing++;
+            }
         }
-        return new MapRegionTask(renderController, world, rCoord.dimension, rCoord.isUnderground(), rCoord.getVerticalSlice(), renderCoords, retainedChunks);
 
+        logger.debug("Chunks: " + missing + " missing out of " + chunkCoords.size());
+
+        if (chunkCoords.size() > missing)
+        {
+            super.performTask(mc, jm, jmWorldDir, threadLogging);
+        }
     }
 
     @Override
     protected void complete(boolean cancelled, boolean hadError)
     {
         lastTaskCompleted = System.currentTimeMillis();
-        retainChunks.clear();
+        RegionImageCache.getInstance().flushToDisk();
         DataCache.instance().invalidateChunkMDCache();
+        if (hadError || cancelled)
+        {
+            logger.warn("MapRegionTask cancelled %s hadError %s", cancelled, hadError);
+        }
     }
 
     @Override

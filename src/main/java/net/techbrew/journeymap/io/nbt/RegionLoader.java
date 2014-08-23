@@ -10,6 +10,7 @@ package net.techbrew.journeymap.io.nbt;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
@@ -91,6 +92,8 @@ public class RegionLoader
 
         RegionImageCache.getInstance().clear();
 
+        AnvilChunkLoader anvilChunkLoader = ChunkLoader.getAnvilChunkLoader(mc);
+
         int validFileCount = 0;
         int existingImageCount = 0;
         final File[] anvilFiles = regionDir.listFiles();
@@ -116,7 +119,7 @@ public class RegionLoader
                             List<ChunkCoordIntPair> chunkCoords = rc.getChunkCoordsInRegion();
                             for (ChunkCoordIntPair coord : chunkCoords)
                             {
-                                if (ChunkLoader.getChunkMdFromDisk(coord.chunkXPos, coord.chunkZPos, mcWorldDir, mc.theWorld) != null)
+                                if (anvilChunkLoader.chunkExists(mc.theWorld, coord.chunkXPos, coord.chunkZPos))
                                 {
                                     stack.add(rc);
                                     break;

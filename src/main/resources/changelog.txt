@@ -12,6 +12,9 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Automap was missing areas due to chunk caching issues
+
+## Changelog for JourneyMap 4.1.0alpha8:
 - Change: Infrastructure work to make per-world configs/preferences possible
 - Change: Multiplayer skins icon now downloaded asynchronously - should alleviate FPS hits on very busy servers.
 - New Feature: Experimental support for World Id Bukkit Plugin for multiverse servers

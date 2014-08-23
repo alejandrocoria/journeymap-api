@@ -33,7 +33,8 @@ import java.util.concurrent.TimeUnit;
 public abstract class BaseMapTask implements ITask
 {
     protected static ChunkCoordIntPair[] keepAliveOffsets = new ChunkCoordIntPair[]{new ChunkCoordIntPair(0,-1), new ChunkCoordIntPair(-1,0), new ChunkCoordIntPair(-1,-1)};
-
+    private static BufferedImage blankChunkImage = null;
+    private static BufferedImage blankChunkImageUnderground = null;
     final World world;
     final int dimension;
     final boolean underground;
@@ -41,9 +42,6 @@ public abstract class BaseMapTask implements ITask
     final Collection<ChunkCoordIntPair> chunkCoords;
     final boolean flushCacheWhenDone;
     final ChunkRenderController renderController;
-
-    private static BufferedImage blankChunkImage = null;
-    private static BufferedImage blankChunkImageUnderground = null;
 
     public BaseMapTask(ChunkRenderController renderController, World world, int dimension, boolean underground, Integer vSlice, Collection<ChunkCoordIntPair> chunkCoords, boolean flushCacheWhenDone)
     {
@@ -65,7 +63,7 @@ public abstract class BaseMapTask implements ITask
     }
 
     @Override
-    public final void performTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
+    public void performTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
         StatTimer timer = StatTimer.get(getClass().getSimpleName() + ".performTask").start();
 
@@ -114,7 +112,8 @@ public abstract class BaseMapTask implements ITask
                     throw new InterruptedException();
                 }
 
-                ChunkMD chunkMd = DataCache.instance().getChunkMD(chunkIter.next());
+                ChunkCoordIntPair coord = chunkIter.next();
+                ChunkMD chunkMd = DataCache.instance().getChunkMD(coord);
                 if(chunkMd!=null && chunkMd.hasChunk())
                 {
                     try
@@ -145,6 +144,10 @@ public abstract class BaseMapTask implements ITask
                     {
                         logger.info(e.getMessage());
                     }
+                }
+                else
+                {
+                    //logger.info(String.format("Chunk not available: %s", coord));
                 }
             }
 

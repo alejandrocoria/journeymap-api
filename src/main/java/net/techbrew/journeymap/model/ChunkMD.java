@@ -34,14 +34,13 @@ import java.util.HashMap;
  */
 public class ChunkMD
 {
+    public static final String PROP_IS_SLIME_CHUNK = "isSlimeChunk";
+    public static final String PROP_LOADED = "loaded";
+    public static final String PROP_LAST_RENDERED = "lastRendered";
     final static DataCache dataCache = DataCache.instance();
     private final SoftReference<Chunk> chunkReference;
     private final ChunkCoordIntPair coord;
     private final HashMap<String, Serializable> properties = new HashMap<String, Serializable>();
-
-    public static final String PROP_IS_SLIME_CHUNK = "isSlimeChunk";
-    public static final String PROP_LOADED = "loaded";
-    public static final String PROP_LAST_RENDERED = "lastRendered";
 
     public ChunkMD(Chunk chunk)
     {
@@ -286,7 +285,7 @@ public class ChunkMD
         @Override
         public Optional<ChunkMD> load(ChunkCoordIntPair coord) throws Exception
         {
-            ChunkMD chunkMD = ChunkLoader.getChunkMdFromMemory(coord.chunkXPos, coord.chunkZPos, mc.theWorld);
+            ChunkMD chunkMD = ChunkLoader.getChunkMdFromMemory(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
             return Optional.fromNullable(chunkMD);
         }
     }

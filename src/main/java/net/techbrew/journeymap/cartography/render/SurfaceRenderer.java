@@ -27,15 +27,13 @@ import java.awt.*;
 
 public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 {
+    private final Object chunkLock = new Object();
+    private final HeightsCache chunkSurfaceHeights;
+    private final SlopesCache chunkSurfaceSlopes;
     protected StatTimer renderSurfaceTimer = StatTimer.get("SurfaceRenderer.renderSurface");
     protected StatTimer renderSurfacePrepassTimer = StatTimer.get("SurfaceRenderer.renderSurface.CavePrepass");
     protected Strata strata = new Strata("Surface", 40, 8, false);
     protected float maxDepth = 8;
-
-    private final Object chunkLock = new Object();
-
-    private final HeightsCache chunkSurfaceHeights;
-    private final SlopesCache chunkSurfaceSlopes;
 
     public SurfaceRenderer()
     {
@@ -203,7 +201,8 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
         finally
         {
             strata.reset();
-            return chunkOk;
+            // return chunkOk;
+            return true;
         }
     }
 
