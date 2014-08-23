@@ -235,7 +235,12 @@ public class Daemon implements Runnable {
 		alive = true;
 
 	}
-	
+
+    public boolean isAlive()
+    {
+        return alive;
+    }
+
 	public void start() {
 		try {
 			init();

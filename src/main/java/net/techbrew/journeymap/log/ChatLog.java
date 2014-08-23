@@ -154,11 +154,18 @@ public class ChatLog
             ChatLog.announceI18N("jm.common.ready", JourneyMap.MOD_NAME); //$NON-NLS-1$
             if (JourneyMap.getWebMapProperties().enabled.get())
             {
-                JMServer jmServer = JourneyMap.getInstance().getJmServer();
-                String keyName = Constants.getKeyName(Constants.KB_MAP);
-                String port = jmServer.getPort() == 80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
-                String message = Constants.getString("jm.common.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
-                ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
+                try
+                {
+                    JMServer jmServer = JourneyMap.getInstance().getJmServer();
+                    String keyName = Constants.getKeyName(Constants.KB_MAP);
+                    String port = jmServer.getPort() == 80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
+                    String message = Constants.getString("jm.common.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
+                    ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
+                }
+                catch(Throwable t)
+                {
+                    JourneyMap.getLogger().error("Couldn't check webserver: " + LogFormatter.toString(t));
+                }
             }
             else
             {

@@ -33,9 +33,9 @@ import java.util.concurrent.Executors;
  */
 public class JMServer
 {
-
     private final static int MAXPORT = 9990;
     private final static int MAXFAILS = 5;
+    private static volatile JMServer instance;
 
     private final Logger logger = JourneyMap.getLogger();
 
@@ -43,23 +43,23 @@ public class JMServer
     private int port;
     private boolean ready = false;
 
-    public JMServer()
+    private JMServer()
     {
         port = JourneyMap.getWebMapProperties().port.get();
         validatePort();
     }
 
-    public static JMServer setEnabled(JMServer oldInstance, Boolean enable, boolean forceAnnounce)
+    public static void setEnabled(Boolean enable, boolean forceAnnounce)
     {
         WebMapProperties webMapProperties = JourneyMap.getWebMapProperties();
         webMapProperties.enabled.set(enable);
         webMapProperties.save();
 
-        if(oldInstance!=null)
+        if(instance!=null)
         {
             try
             {
-                oldInstance.stop();
+                instance.stop();
             }
             catch (Throwable e)
             {
@@ -67,15 +67,14 @@ public class JMServer
             }
         }
 
-        JMServer jmServer = null;
         if (enable)
         {
             try
             {
-                jmServer = new JMServer();
-                if (jmServer.isReady())
+                instance = new JMServer();
+                if (instance.isReady())
                 {
-                    jmServer.start();
+                    instance.start();
                 }
                 else
                 {
@@ -98,8 +97,11 @@ public class JMServer
             ChatLog.enableAnnounceMod = true;
         }
         ChatLog.announceMod(forceAnnounce);
+    }
 
-        return jmServer;
+    public static JMServer getInstance()
+    {
+        return instance;
     }
 
     /**
@@ -243,8 +245,11 @@ public class JMServer
     {
         try
         {
-            rupy.stop();
-            logger.info("Stopped webserver without errors"); //$NON-NLS-1$
+            if(rupy.isAlive())
+            {
+                rupy.stop();
+                logger.info("Stopped webserver without errors"); //$NON-NLS-1$
+            }
         }
         catch (Throwable t)
         {

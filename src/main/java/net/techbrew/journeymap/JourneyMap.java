@@ -81,7 +81,6 @@ public class JourneyMap
     private volatile Boolean initialized = false;
     private volatile String currentWorldId = null;
     private Logger logger;
-    private JMServer jmServer;
     private boolean threadLogging = false;
     private long lastModInfoKeepAlive = System.currentTimeMillis();
 
@@ -230,7 +229,7 @@ public class JourneyMap
             FileHandler.initMobIconSets();
 
             // Webserver
-            jmServer = JMServer.setEnabled(jmServer, webMapProperties.enabled.get(), false);
+            JMServer.setEnabled(webMapProperties.enabled.get(), false);
             initialized = true;
 
            // threadLogging = getLogger().isTraceEnabled();
@@ -251,12 +250,12 @@ public class JourneyMap
 
     public JMServer getJmServer()
     {
-        return jmServer;
+        return JMServer.getInstance();
     }
 
     public void toggleWebserver(boolean enable, boolean announce)
     {
-        jmServer = JMServer.setEnabled(jmServer, enable, announce);
+        JMServer.setEnabled(enable, announce);
     }
 
     /**
