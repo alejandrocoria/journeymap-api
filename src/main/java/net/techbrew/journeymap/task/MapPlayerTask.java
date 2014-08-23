@@ -211,8 +211,6 @@ public class MapPlayerTask extends BaseMapTask
 
         if(renderCoords.size()==0)
         {
-            // TODO: Comment this out
-            //System.out.println("No chunks to render");
             return null;
         }
         else

@@ -15,6 +15,8 @@ http://journeymap.techbrew.net
 - Change: Infrastructure work to make per-world configs/preferences possible
 - Change: Multiplayer skins icon now downloaded asynchronously - should alleviate FPS hits on very busy servers.
 - New Feature: Experimental support for World Id Bukkit Plugin for multiverse servers
+- Bugfix: Waypoints Button was toggling Show Caves as a side effect.
+- Bugfix: Cave mapping was still going too deep.
 - Bugfix: Webmap icons were broken.  Currently using same icons as fullmap, will add dropdown menu to maintain own preference later.
 
 ## Changelog for JourneyMap 4.1.0alpha7:

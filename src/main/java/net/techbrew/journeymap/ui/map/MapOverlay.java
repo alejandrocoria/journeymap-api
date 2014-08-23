@@ -204,6 +204,7 @@ public class MapOverlay extends JmUI
             case WaypointManager:
             {
                 UIManager.getInstance().openWaypointManager(null, getClass());
+                break; // <--- I forgot this
             }
             case Caves:
             {

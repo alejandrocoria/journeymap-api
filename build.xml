@@ -2,7 +2,7 @@
 <project name="JourneyMap" basedir="." default="all">
 
     <!-- Update when new version is going to be released -->
-    <property name="jmversion" value="4.1.0alpha7" />
+    <property name="jmversion" value="4.1.0alpha8" />
     <property name="mcversion" value="1.7.10" />
     <property name="forgeversion" value="10.13.0.1198" />
 	<property name="unlimited" value="Unlimited" />

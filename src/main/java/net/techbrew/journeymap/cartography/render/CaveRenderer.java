@@ -299,6 +299,10 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                             }
                         }
                     }
+                    else
+                    {
+                        break;
+                    }
                 }
                 y--;
             }
@@ -409,8 +413,9 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
             boolean inAirPocket = false;
 
-            while (y > 0)
+            while (y > 0 && y> sliceMinY)
             {
+
                 if (mapBathymetry && blockMD.isWater())
                 {
                     y--;

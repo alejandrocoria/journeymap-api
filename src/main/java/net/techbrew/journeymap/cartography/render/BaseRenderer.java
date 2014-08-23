@@ -56,6 +56,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     protected boolean mapAntialiasing;
     protected boolean mapCrops;
     protected boolean mapPlants;
+    protected boolean mapPlantShadows;
     protected float[] ambientColor;
 
     protected volatile AtomicLong badBlockCount = new AtomicLong(0);
@@ -123,6 +124,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         mapAntialiasing = coreProperties.mapAntialiasing.get();
         mapCaveLighting = coreProperties.mapCaveLighting.get();
         mapPlants = coreProperties.mapPlants.get();
+        mapPlantShadows = coreProperties.mapPlantShadows.get();
         mapCrops = coreProperties.mapCrops.get();
 
         // Subclasses should override
@@ -497,8 +499,26 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                         propUnsetWaterHeight = false;
                     }
                 }
-                else if(!blockMD.isAir() && !blockMD.hasFlag(BlockMD.Flag.NoShadow))
+                else if(!blockMD.isAir())// && !blockMD.hasFlag(BlockMD.Flag.NoShadow))
                 {
+                    if(mapPlants && blockMD.hasFlag(BlockMD.Flag.Plant))
+                    {
+                        if(!mapPlantShadows)
+                        {
+                            y--;
+                        }
+                    }
+                    else if(mapCrops && blockMD.hasFlag(BlockMD.Flag.Crop))
+                    {
+                        if(!mapPlantShadows)
+                        {
+                            y--;
+                        }
+                    }
+                    else if(!blockMD.isLava() && blockMD.hasFlag(BlockMD.Flag.NoShadow))
+                    {
+                        y--;
+                    }
                     break;
                 }
                 y--;
