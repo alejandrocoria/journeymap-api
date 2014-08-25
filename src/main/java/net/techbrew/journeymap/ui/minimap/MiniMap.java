@@ -58,16 +58,14 @@ public class MiniMap
     private final Color playerInfoFgColor = Color.LIGHT_GRAY;
     private final Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
     private final String[] locationFormats = {"jm.common.location_xzye", "jm.common.location_xzy", "jm.common.location_xz"};
-
-    private MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties();
     private final GridRenderer gridRenderer = new GridRenderer(3, JourneyMap.getMiniMapProperties());
-    private FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
-    private WaypointProperties waypointProperties = JourneyMap.getWaypointProperties();
     private final MapOverlayState state = MapOverlay.state();
     private final OverlayWaypointRenderer waypointRenderer = new OverlayWaypointRenderer();
     private final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
     private final TextureImpl playerLocatorTex;
-
+    private MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties();
+    private FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
+    private WaypointProperties waypointProperties = JourneyMap.getWaypointProperties();
     private EntityClientPlayerMP player;
     private StatTimer drawTimer;
     private StatTimer refreshStateTimer;
@@ -410,9 +408,9 @@ public class MiniMap
 
         if (oldDv == null || oldDv.shape != this.dv.shape)
         {
-            this.drawTimer = StatTimer.get("MiniMap.drawMap." + shape.name(), 500);
+            this.drawTimer = StatTimer.get("MiniMap." + shape.name(), 500);
             this.drawTimer.reset();
-            this.refreshStateTimer = StatTimer.get("MiniMap.drawMap." + shape.name() + "+refreshState", 5);
+            this.refreshStateTimer = StatTimer.get("MiniMap." + shape.name() + "+refreshState", 5);
             this.refreshStateTimer.reset();
         }
 

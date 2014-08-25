@@ -22,7 +22,6 @@ import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.cartography.ColorCache;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.WaypointsData;
-import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.forgehandler.EventHandlerManager;
 import net.techbrew.journeymap.io.FileHandler;
@@ -144,6 +143,31 @@ public class JourneyMap
         return INSTANCE.logger == null ? LogManager.getLogger(JourneyMap.MOD_ID) : INSTANCE.logger;
     }
 
+    public static CoreProperties getCoreProperties()
+    {
+        return INSTANCE.coreProperties;
+    }
+
+    public static FullMapProperties getFullMapProperties()
+    {
+        return INSTANCE.fullMapProperties;
+    }
+
+    public static MiniMapProperties getMiniMapProperties()
+    {
+        return INSTANCE.miniMapProperties;
+    }
+
+    public static WebMapProperties getWebMapProperties()
+    {
+        return INSTANCE.webMapProperties;
+    }
+
+    public static WaypointProperties getWaypointProperties()
+    {
+        return INSTANCE.waypointProperties;
+    }
+
     public Boolean isInitialized()
     {
         return initialized;
@@ -223,7 +247,7 @@ public class JourneyMap
             WaypointsData.reset();
 
             // Now that all blocks should be registered, init BlockUtils
-            // BlockUtils.initialize();
+            ColorCache.getInstance().loadColorPalette();
 
             // Ensure all mob icons files are ready for use.
             FileHandler.initMobIconSets();
@@ -232,7 +256,7 @@ public class JourneyMap
             JMServer.setEnabled(webMapProperties.enabled.get(), false);
             initialized = true;
 
-           // threadLogging = getLogger().isTraceEnabled();
+            // threadLogging = getLogger().isTraceEnabled();
         }
         catch (Throwable t)
         {
@@ -357,7 +381,6 @@ public class JourneyMap
         DataCache.instance().resetBlockMetadata();
         chunkRenderController = new ChunkRenderController();
         MapOverlay.state().follow = true;
-        ColorCache.getInstance().reset();
         StatTimer.resetAll();
         TextureCache.instance().purge();
         TileCache.instance().invalidateAll();
@@ -493,31 +516,6 @@ public class JourneyMap
         waypointProperties = PropertiesBase.reload(waypointProperties, WaypointProperties.class);
     }
 
-    public static CoreProperties getCoreProperties()
-    {
-        return INSTANCE.coreProperties;
-    }
-
-    public static FullMapProperties getFullMapProperties()
-    {
-        return INSTANCE.fullMapProperties;
-    }
-
-    public static MiniMapProperties getMiniMapProperties()
-    {
-        return INSTANCE.miniMapProperties;
-    }
-
-    public static WebMapProperties getWebMapProperties()
-    {
-        return INSTANCE.webMapProperties;
-    }
-
-    public static WaypointProperties getWaypointProperties()
-    {
-        return INSTANCE.waypointProperties;
-    }
-
     public String getCurrentWorldId()
     {
         return this.currentWorldId;
@@ -526,7 +524,7 @@ public class JourneyMap
     public void setCurrentWorldId(String worldId)
     {
         boolean unchanged = Constants.safeEqual(worldId, currentWorldId);
-        if(unchanged)
+        if (unchanged)
         {
             getLogger().info("World UID hasn't changed: " + worldId);
             return;
@@ -534,14 +532,14 @@ public class JourneyMap
 
         boolean restartMapping = isMapping();
 
-        if(restartMapping)
+        if (restartMapping)
         {
             stopMapping();
         }
 
         this.currentWorldId = worldId;
 
-        if(restartMapping)
+        if (restartMapping)
         {
             startMapping();
         }

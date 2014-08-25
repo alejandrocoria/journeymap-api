@@ -253,6 +253,7 @@ public class LegacyMigrationTask implements ITask
             File[] files = jmWorldDir.listFiles(new PngFileFilter());
             if (files.length > 0)
             {
+                logger.info("Legacy files found: " + files.length);
                 this.pngFiles = new Stack<File>();
                 this.pngFiles.addAll(Arrays.asList(files));
                 this.pngFilesFound = pngFiles.size();
@@ -260,7 +261,6 @@ public class LegacyMigrationTask implements ITask
             }
             else
             {
-                logger.info("No legacy files found.");
                 enabled = false;
             }
 

@@ -8,9 +8,6 @@
 
 package net.techbrew.journeymap.cartography;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.block.*;
@@ -19,10 +16,10 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
-import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.io.IconLoader;
@@ -42,10 +39,10 @@ import java.util.List;
  */
 public class ColorCache implements IResourceManagerReloadListener
 {
-
     private final HashMap<BlockMD, Color> baseColors = new HashMap<BlockMD, Color>(256);
     private final HashMap<String, HashMap<BlockMD, Color>> biomeColors = new HashMap<String, HashMap<BlockMD, Color>>(32);
     private volatile IconLoader iconLoader;
+    private volatile ColorPalette currentPalette;
     private String lastResourcePack;
 
     private ColorCache()
@@ -73,7 +70,7 @@ public class ColorCache implements IResourceManagerReloadListener
     {
         if (JourneyMap.getInstance().isMapping() || iconLoader == null)
         {
-            String currentPack = getResourcePackNames();
+            String currentPack = Constants.getResourcePackNames();
             if (currentPack.equals(lastResourcePack))
             {
                 JourneyMap.getLogger().debug("ResourcePack unchanged: " + currentPack);
@@ -81,40 +78,24 @@ public class ColorCache implements IResourceManagerReloadListener
             else
             {
                 JourneyMap.getLogger().info("ResourcePack: " + lastResourcePack + " --> " + currentPack);
-//                ModInfo modInfo = JourneyMap.getInstance().getModInfo();
-//                if (modInfo != null)
-//                {
-//                    modInfo.reportEvent("Resource Pack", "Load", currentPack);
-//                }
                 reset();
                 lastResourcePack = currentPack;
-                iconLoader = new IconLoader();
-
-                if(ColorPalette.paletteFileFound())
-                {
-                    loadColorPalette();
-                }
-                else
-                {
-                    prefetchResourcePackColors();
-                }
+                loadColorPalette();
             }
-
         }
     }
 
-    private void loadColorPalette()
+    private void initCacheFromPalette(ColorPalette colorPalette)
     {
         try
         {
             long start = System.currentTimeMillis();
-            ColorPalette colorPalette = ColorPalette.loadFromFile();
             if (colorPalette != null)
             {
                 this.baseColors.putAll(colorPalette.getBasicColorMap());
                 this.biomeColors.putAll(colorPalette.getBiomeColorMap());
                 long elapsed = System.currentTimeMillis()-start;
-                JourneyMap.getLogger().info(String.format("Color palette loaded %d colors from '%s' in %dms", colorPalette.size(), colorPalette.getOrigin(), elapsed));
+                JourneyMap.getLogger().info(String.format("Color palette loaded %d colors in %dms from file: %s", colorPalette.size(), elapsed, colorPalette.getOrigin()));
             }
         }
         catch (Exception e)
@@ -123,30 +104,41 @@ public class ColorCache implements IResourceManagerReloadListener
         }
     }
 
-    private String getResourcePackNames()
+    public void loadColorPalette()
     {
-        ResourcePackRepository resourcepackrepository = FMLClientHandler.instance().getClient().getResourcePackRepository();
-        String packs = Joiner.on(",").join(Lists.reverse(resourcepackrepository.getRepositoryEntries()));
-        if(Strings.isNullOrEmpty(packs))
+        ColorPalette palette = ColorPalette.getActiveColorPalette();
+        if (palette != null)
         {
-            packs = "Default";
+            initCacheFromPalette(palette);
         }
-        return packs;
+        else
+        {
+            palette = generateColorPalette(true, false);
+        }
+
+        this.currentPalette = palette;
     }
 
-    public ColorPalette generateColorPalette(boolean global)
+    public ColorPalette getCurrentPalette()
     {
+        return currentPalette;
+    }
+
+    public ColorPalette generateColorPalette(boolean standard, boolean permanent)
+    {
+        long start = System.currentTimeMillis();
         DataCache.instance().resetBlockMetadata();
         prefetchResourcePackColors();
         ColorPalette palette = null;
         try
         {
-            String resourcePackNames = getResourcePackNames();
+            String resourcePackNames = Constants.getResourcePackNames();
             palette = new ColorPalette(resourcePackNames, baseColors, biomeColors);
-            if(palette.writeToFile(global))
-            {
-                return palette;
-            }
+            palette.setPermanent(permanent);
+            palette.writeToFile(standard);
+            long elapsed = System.currentTimeMillis() - start;
+            JourneyMap.getLogger().info(String.format("Color palette generated with %d colors in %dms for: %s", palette.size(), elapsed, palette.getOrigin()));
+            return palette;
         }
         catch (Exception e)
         {
@@ -473,8 +465,9 @@ public class ColorCache implements IResourceManagerReloadListener
         return baseColor;
     }
 
-    public void reset()
+    protected void reset()
     {
+        iconLoader = new IconLoader();
         biomeColors.clear();
         baseColors.clear();
     }
@@ -490,18 +483,6 @@ public class ColorCache implements IResourceManagerReloadListener
         sb.append(LogFormatter.LINEBREAK).append("</td><td>");
         sb.append(LogFormatter.LINEBREAK).append(debugCache(DataCache.instance().getBlockMetadata().getFlagsMap(), "Block Flags"));
         sb.append(LogFormatter.LINEBREAK).append("</td></tr></table>");
-
-        sb.append(LogFormatter.LINEBREAK).append(debugCache(baseColors, "Base Colors"));
-
-        List<String> biomeNames = new ArrayList<String>(biomeColors.keySet());
-        Collections.sort(biomeNames);
-
-        for (String biome : biomeNames)
-        {
-            HashMap<BlockMD, Color> colorsForBiome = biomeColors.get(biome);
-            sb.append(LogFormatter.LINEBREAK).append(debugCache(colorsForBiome, "Biome Colors: " + biome));
-        }
-
         sb.append(LogFormatter.LINEBREAK).append("</div><!-- /color cache -->");
 
         return sb.toString();

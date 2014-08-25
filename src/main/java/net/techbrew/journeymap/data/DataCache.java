@@ -525,8 +525,8 @@ public class DataCache
         StringBuffer sb = new StringBuffer();
         if (JourneyMap.getCoreProperties().recordCacheStats.get())
         {
-            appendDebugHtml(sb, "Managed", managedCaches);
-            appendDebugHtml(sb, "Private", privateCaches);
+            appendDebugHtml(sb, "Managed Caches", managedCaches);
+            appendDebugHtml(sb, "Private Caches", privateCaches);
         }
         else
         {
@@ -568,13 +568,19 @@ public class DataCache
         return String.format("%s<b>%20s:</b> Size: %9s, Hits: %9s, Misses: %9s, Loads: %9s, Errors: %9s, Avg Load Time: %1.2fms", LogFormatter.LINEBREAK, label, cache.size(), cacheStats.hitCount(), cacheStats.missCount(), cacheStats.loadCount(), cacheStats.loadExceptionCount(), avgLoadMillis);
     }
 
-    class ProxyRemovalListener<K,V> implements RemovalListener<K,V>
+    // On-demand-holder for instance
+    private static class Holder
     {
-        final Map<RemovalListener<K,V>, Void> delegates = Collections.synchronizedMap(new WeakHashMap<RemovalListener<K,V>, Void>());
+        private static final DataCache INSTANCE = new DataCache();
+    }
 
-        void addDelegateListener(RemovalListener<K,V> delegate)
+    class ProxyRemovalListener<K, V> implements RemovalListener<K, V>
+    {
+        final Map<RemovalListener<K, V>, Void> delegates = Collections.synchronizedMap(new WeakHashMap<RemovalListener<K, V>, Void>());
+
+        void addDelegateListener(RemovalListener<K, V> delegate)
         {
-            if(delegates.containsKey(delegate))
+            if (delegates.containsKey(delegate))
             {
                 JourneyMap.getLogger().warn("RemovalListener already added: " + delegate.getClass());
             }
@@ -584,7 +590,7 @@ public class DataCache
             }
         }
 
-        void removeDelegateListener(RemovalListener<K,V> delegate)
+        void removeDelegateListener(RemovalListener<K, V> delegate)
         {
             delegates.remove(delegate);
         }
@@ -592,16 +598,10 @@ public class DataCache
         @Override
         public void onRemoval(RemovalNotification<K, V> notification)
         {
-            for(RemovalListener<K,V> delegate : delegates.keySet())
+            for (RemovalListener<K, V> delegate : delegates.keySet())
             {
                 delegate.onRemoval(notification);
             }
         }
-    }
-
-    // On-demand-holder for instance
-    private static class Holder
-    {
-        private static final DataCache INSTANCE = new DataCache();
     }
 }

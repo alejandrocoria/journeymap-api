@@ -57,14 +57,12 @@ public class DebugService extends FileService
         StringBuilder sb = new StringBuilder();
         sb.append(LogFormatter.LINEBREAK).append("<div id='accordion'>");
 
+        sb.append(LogFormatter.LINEBREAK).append("<h1>Performance Metrics</h1>");
+        sb.append(LogFormatter.LINEBREAK).append("<div><b>Stat Timers:</b><pre>").append(StatTimer.getReport()).append("</pre>");
+        sb.append(LogFormatter.LINEBREAK).append(DataCache.instance().getDebugHtml()).append("</div>");
+
         sb.append(LogFormatter.LINEBREAK).append("<h1>Properties</h1><div>");
         sb.append(LogFormatter.LINEBREAK).append(JMLogger.getPropertiesSummary().replaceAll(LogFormatter.LINEBREAK, "<p>")).append("</div>");
-
-        sb.append(LogFormatter.LINEBREAK).append("<h1>Performance Metrics</h1>");
-        sb.append(LogFormatter.LINEBREAK).append("<div><pre>").append(StatTimer.getReport()).append("</pre></div>");
-
-        sb.append(LogFormatter.LINEBREAK).append("<h1>Data Cache Metrics</h1>");
-        sb.append(LogFormatter.LINEBREAK).append("<div>").append(DataCache.instance().getDebugHtml()).append("</div>");
 
         if (JourneyMap.getInstance().isMapping())
         {

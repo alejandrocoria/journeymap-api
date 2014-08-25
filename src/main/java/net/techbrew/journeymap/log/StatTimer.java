@@ -300,7 +300,7 @@ public class StatTimer
             final double avg = total / count;
             final long cancels = cancelCounter.get();
 
-            String report = String.format("<b>%50s:</b>   Avg: %8sms, Min: %8sms, Max: %10sms, Total: %10s sec, Count: %8s, Canceled: %8s,",
+            String report = String.format("<b>%40s:</b> Avg: %8sms, Min: %8sms, Max: %10sms, Total: %10s sec, Count: %8s, Canceled: %8s,",
                     name, df.format(avg), df.format(min), df.format(max), TimeUnit.MILLISECONDS.toSeconds((long) total), count, cancels);
 
             if (warmup)

@@ -9,9 +9,13 @@
 package net.techbrew.journeymap;
 
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.input.Keyboard;
 
@@ -122,10 +126,22 @@ public class Constants
     public static boolean safeEqual(String first, String second)
     {
         int result = CASE_INSENSITIVE_NULL_SAFE_ORDER.compare(first, second);
-        if (result != 0) {
+        if (result != 0)
+        {
             return false;
         }
-        return CASE_INSENSITIVE_NULL_SAFE_ORDER.compare(first, second)==0;
+        return CASE_INSENSITIVE_NULL_SAFE_ORDER.compare(first, second) == 0;
+    }
+
+    public static String getResourcePackNames()
+    {
+        ResourcePackRepository resourcepackrepository = FMLClientHandler.instance().getClient().getResourcePackRepository();
+        String packs = Joiner.on(",").join(Lists.reverse(resourcepackrepository.getRepositoryEntries()));
+        if (Strings.isNullOrEmpty(packs))
+        {
+            packs = "Default";
+        }
+        return packs;
     }
 
     public static String getMessageJMERR01(Object... params)

@@ -10,6 +10,8 @@ package net.techbrew.journeymap.server;
 
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.cartography.ColorCache;
+import net.techbrew.journeymap.cartography.ColorPalette;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.texture.TextureCache;
@@ -43,6 +45,8 @@ public class FileService extends BaseService
 
     private static final long serialVersionUID = 2L;
     protected final String resourcePath;
+    final String COLOR_PALETTE_JSON = "/" + ColorPalette.JSON_FILENAME;
+    final String COLOR_PALETTE_HTML = "/" + ColorPalette.HTML_FILENAME;
     final String ICON_ENTITY_PATH_PREFIX = "/icon/entity/";
     final String SKIN_PREFIX = "/skin/";
     private boolean useZipEntry;
@@ -107,8 +111,35 @@ public class FileService extends BaseService
 
             InputStream fileStream = null;
 
+            // Handle colorpalette reques
+            if (path.startsWith(COLOR_PALETTE_JSON))
+            {
+                ColorPalette colorPalette = ColorCache.getInstance().getCurrentPalette();
+                if (colorPalette != null)
+                {
+                    File jsonFile = colorPalette.getOrigin();
+                    if (jsonFile.canRead())
+                    {
+                        ResponseHeader.on(event).contentType(ContentType.js);
+                        fileStream = new FileInputStream(jsonFile);
+                    }
+                }
+            }
+            else if (path.startsWith(COLOR_PALETTE_HTML))
+            {
+                ColorPalette colorPalette = ColorCache.getInstance().getCurrentPalette();
+                if (colorPalette != null)
+                {
+                    File htmlFile = colorPalette.getOriginHtml(true, false);
+                    if (htmlFile.canRead())
+                    {
+                        ResponseHeader.on(event).contentType(ContentType.html);
+                        fileStream = new FileInputStream(htmlFile);
+                    }
+                }
+            }
             // Handle entity icon request
-            if (path.startsWith(ICON_ENTITY_PATH_PREFIX))
+            else if (path.startsWith(ICON_ENTITY_PATH_PREFIX))
             {
                 String entityIconPath = path.split(ICON_ENTITY_PATH_PREFIX)[1].replace('/', File.separatorChar);
                 File iconFile = new File(FileHandler.getEntityIconDir(), entityIconPath);

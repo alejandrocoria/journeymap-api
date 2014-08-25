@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap.cartography;
 
-import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -38,8 +37,8 @@ import java.util.regex.Matcher;
  */
 public class ColorPalette
 {
-    public static final String SAMPLE_GLOBAL_PATH = Joiner.on(File.separator).join(".minecraft", "journeyMap");
-    public static final String SAMPLE_WORLD_PATH = Joiner.on(File.separator).join(SAMPLE_GLOBAL_PATH, "data", "*", "(worldname)");
+    public static final String SAMPLE_STANDARD_PATH = ".minecraft/journeyMap/";
+    public static final String SAMPLE_WORLD_PATH = SAMPLE_STANDARD_PATH + "data/*/worldname/";
     public static final String JSON_FILENAME = "colorpalette.json";
     public static final String HTML_FILENAME = "colorpalette.html";
     public static final String VARIABLE = "var colorpalette=";
@@ -47,18 +46,28 @@ public class ColorPalette
 
     public static final int VERSION = 1;
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).setPrettyPrinting().create();
+
     @Since(1)
     String name;
-    @Since(1)
-    String[] description;
+
     @Since(1)
     String generated;
+
+    @Since(1)
+    String[] description;
+
+    @Since(1)
+    boolean permanent;
+
     @Since(1)
     String resourcePacks;
+
     @Since(1)
     ArrayList<BlockColor> basicColors = new ArrayList<BlockColor>(0);
+
     @Since(1)
     LinkedHashMap<String, ArrayList<BlockColor>> biomeColors = new LinkedHashMap<String, ArrayList<BlockColor>>(60);
+
     private transient File origin;
 
     ColorPalette()
@@ -75,7 +84,7 @@ public class ColorPalette
         lines.add(Constants.getString("jm.colorpalette.file_header_1"));
         lines.add(Constants.getString("jm.colorpalette.file_header_2", HTML_FILENAME));
         lines.add(Constants.getString("jm.colorpalette.file_header_3", JSON_FILENAME, SAMPLE_WORLD_PATH));
-        lines.add(Constants.getString("jm.colorpalette.file_header_4", JSON_FILENAME, SAMPLE_GLOBAL_PATH));
+        lines.add(Constants.getString("jm.colorpalette.file_header_4", JSON_FILENAME, SAMPLE_STANDARD_PATH));
         this.description = lines.toArray(new String[4]);
 
         this.basicColors = toList(basicColorMap);
@@ -89,9 +98,34 @@ public class ColorPalette
         }
     }
 
-    public static boolean paletteFileFound()
+    public static ColorPalette getActiveColorPalette()
     {
-        return getWorldPaletteFile().canRead() || getGlobalPaletteFile().canRead();
+        String resourcePackNames = Constants.getResourcePackNames();
+
+        File worldPaletteFile = ColorPalette.getWorldPaletteFile();
+        if (worldPaletteFile.canRead())
+        {
+            ColorPalette palette = ColorPalette.loadFromFile(worldPaletteFile);
+            if (palette != null)
+            {
+                return palette;
+            }
+        }
+
+        File standardPaletteFile = ColorPalette.getStandardPaletteFile();
+        if (standardPaletteFile.canRead())
+        {
+            ColorPalette palette = ColorPalette.loadFromFile(standardPaletteFile);
+            if (palette != null)
+            {
+                if (palette.isPermanent() || resourcePackNames.equals(palette.resourcePacks))
+                {
+                    return palette;
+                }
+            }
+        }
+
+        return null;
     }
 
     static File getWorldPaletteFile()
@@ -100,34 +134,9 @@ public class ColorPalette
         return new File(FileHandler.getJMWorldDir(mc), JSON_FILENAME);
     }
 
-    static File getGlobalPaletteFile()
+    static File getStandardPaletteFile()
     {
         return new File(FileHandler.getJourneyMapDir(), JSON_FILENAME);
-    }
-
-    public static ColorPalette loadFromFile()
-    {
-        File worldPaletteFile = getWorldPaletteFile();
-        if (worldPaletteFile.canRead())
-        {
-            ColorPalette palette = loadFromFile(worldPaletteFile);
-            if (palette != null)
-            {
-                return palette;
-            }
-        }
-
-        File globalPaletteFile = getGlobalPaletteFile();
-        if (globalPaletteFile.canRead())
-        {
-            ColorPalette palette = loadFromFile(globalPaletteFile);
-            if (palette != null)
-            {
-                return palette;
-            }
-        }
-
-        return null;
     }
 
     protected static ColorPalette loadFromFile(File file)
@@ -143,6 +152,14 @@ public class ColorPalette
         catch (Throwable e)
         {
             ChatLog.announceError(Constants.getString("jm.colorpalette.file_error", file.getPath()));
+            try
+            {
+                file.renameTo(new File(file.getParentFile(), file.getName() + ".bad"));
+            }
+            catch (Exception e2)
+            {
+                JourneyMap.getLogger().error("Couldn't rename bad palette file: " + e2);
+            }
             return null;
         }
     }
@@ -164,27 +181,18 @@ public class ColorPalette
         return list;
     }
 
-    public boolean writeToFile(boolean global)
+    public boolean writeToFile(boolean standard)
     {
         File palleteFile = null;
         try
         {
             // Write JSON
-            palleteFile = global ? getGlobalPaletteFile() : getWorldPaletteFile();
+            palleteFile = standard ? getStandardPaletteFile() : getWorldPaletteFile();
             Files.write(VARIABLE + GSON.toJson(this), palleteFile, UTF8);
+            this.origin = palleteFile;
 
-            // Copy HTML file
-            File htmlFile = FileHandler.copyColorPaletteHtmlFile(palleteFile.getParentFile(), HTML_FILENAME);
-            String htmlString = Files.toString(htmlFile, UTF8);
-
-            // Substitutions in HTML file
-            htmlString = substituteValueInContents(htmlString, "jm.colorpalette.file_title");
-            htmlString = substituteValueInContents(htmlString, "jm.colorpalette.file_missing_data", JSON_FILENAME);
-            htmlString = substituteValueInContents(htmlString, "jm.colorpalette.resource_packs");
-            htmlString = substituteValueInContents(htmlString, "jm.colorpalette.basic_colors");
-            htmlString = substituteValueInContents(htmlString, "jm.colorpalette.biome_colors");
-            Files.write(htmlString, htmlFile, UTF8);
-
+            // Write HTML
+            getOriginHtml(true, true);
             return true;
         }
         catch (Exception e)
@@ -193,6 +201,7 @@ public class ColorPalette
             return false;
         }
     }
+
 
     private HashMap<BlockMD, Color> listToMap(ArrayList<BlockColor> list)
     {
@@ -233,7 +242,54 @@ public class ColorPalette
         return origin;
     }
 
-    public boolean isGlobal()
+    public File getOriginHtml(boolean createIfMissing, boolean overwriteExisting)
+    {
+        try
+        {
+            if (origin == null)
+            {
+                return null;
+            }
+
+            File htmlFile = new File(origin.getParentFile(), HTML_FILENAME);
+            if ((!htmlFile.exists() && createIfMissing) || overwriteExisting)
+            {
+                // Copy HTML file
+                htmlFile = FileHandler.copyColorPaletteHtmlFile(origin.getParentFile(), HTML_FILENAME);
+                String htmlString = Files.toString(htmlFile, UTF8);
+
+                // Substitutions in HTML file
+                htmlString = substituteValueInContents(htmlString, "jm.colorpalette.file_title");
+                htmlString = substituteValueInContents(htmlString, "jm.colorpalette.file_missing_data", JSON_FILENAME);
+                htmlString = substituteValueInContents(htmlString, "jm.colorpalette.resource_packs");
+                htmlString = substituteValueInContents(htmlString, "jm.colorpalette.basic_colors");
+                htmlString = substituteValueInContents(htmlString, "jm.colorpalette.biome_colors");
+                Files.write(htmlString, htmlFile, UTF8);
+
+            }
+            else
+            {
+                return htmlFile;
+            }
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().error("Can't get colorpalette.html: " + t);
+        }
+        return null;
+    }
+
+    public boolean isPermanent()
+    {
+        return permanent;
+    }
+
+    public void setPermanent(boolean permanent)
+    {
+        this.permanent = permanent;
+    }
+
+    public boolean isStandard()
     {
         return origin != null && origin.getParentFile().getAbsoluteFile().equals(FileHandler.getJourneyMapDir().getAbsoluteFile());
     }
@@ -241,7 +297,8 @@ public class ColorPalette
     public int size()
     {
         int count = basicColors.size();
-        if(biomeColors.size()>0) {
+        if (biomeColors.size() > 0)
+        {
             count += ((biomeColors.size() * biomeColors.entrySet().iterator().next().getValue().size()));
         }
         return count;
