@@ -31,7 +31,7 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
      * Reset state so classes can be checked again. Useful
      * after post-init of all mods.
      */
-    public static void reset()
+    public static void enableRecheck()
     {
         ReiReader.modLoaded = null;
         VoxelReader.modLoaded = null;

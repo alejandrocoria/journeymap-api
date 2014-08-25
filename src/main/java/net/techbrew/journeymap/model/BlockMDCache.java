@@ -52,11 +52,10 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
      */
     public void initialize()
     {
-        StatTimer timer = StatTimer.get("BlockMDCache.initialize").start();
+        StatTimer timer = StatTimer.get("BlockMDCache.ensureCurrent").start();
 
-//        blockAlphas.clear();
-//        blockFlags.clear();
-//        blockUids.clear();
+        blockAlphas.clear();
+        blockFlags.clear();
 
         // Set alphas
         setAlpha(Blocks.air, 0F);

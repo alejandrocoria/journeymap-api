@@ -40,6 +40,7 @@ public class Constants
     public static String DATA_DIR = JOURNEYMAP_DIR + "data" + File.separator; //$NON-NLS-1$
     public static String SP_DATA_DIR = DATA_DIR + WorldType.sp + File.separator;
     public static String MP_DATA_DIR = DATA_DIR + WorldType.mp + File.separator;
+    public static String RESOURCE_PACKS_DEFAULT = "Default";
     public static String CONTROL_KEYNAME_COMBO;
     public static String KEYBINDING_CATEGORY;
     public static KeyBinding KB_MAP;
@@ -136,10 +137,10 @@ public class Constants
     public static String getResourcePackNames()
     {
         ResourcePackRepository resourcepackrepository = FMLClientHandler.instance().getClient().getResourcePackRepository();
-        String packs = Joiner.on(",").join(Lists.reverse(resourcepackrepository.getRepositoryEntries()));
+        String packs = Joiner.on(", ").join(Lists.reverse(resourcepackrepository.getRepositoryEntries()));
         if (Strings.isNullOrEmpty(packs))
         {
-            packs = "Default";
+            packs = RESOURCE_PACKS_DEFAULT;
         }
         return packs;
     }

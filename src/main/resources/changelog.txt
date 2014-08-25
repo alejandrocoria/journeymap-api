@@ -12,6 +12,16 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New Feature: Generated colors for the active resource packs are saved to /journeyMap/colorpalette.json
+-- If your resource pack selection doesn't change, the file will be used instead of re-scanning the resource packs each time you start Minecraft.
+-- If your resource pack selection is changed, the textures will be scanned and a new color palette file will be generated.
+-- You can view the palette with /journeyMap/colorpalette.html in your browser, or if the game is running: http://localhost:8080/debug (new Colors tab)
+-- Not implemented yet: A UI to let you set a palette as permanent; it won't be replaced if resource packs change.
+-- Not implemented yet: A UI to let you set a palette to be used in a specific world only.
+- Change: Block metadata should no longer reload when you die/respawn
+- Change: Map Style dialog will now force chunks around you to remap (if you click any buttons). Show Plant Shadows no longer requires a restart to take effect.
+
+## Changelog for JourneyMap 4.1.0alpha9:
 - Bugfix: Automap was missing areas due to chunk caching issues
 
 ## Changelog for JourneyMap 4.1.0alpha8:

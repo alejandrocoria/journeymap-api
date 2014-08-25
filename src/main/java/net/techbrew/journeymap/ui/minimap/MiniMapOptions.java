@@ -77,16 +77,12 @@ public class MiniMapOptions extends JmUI
                 (miniMapProperties.fontSmall.get()));
         buttonFont.setEnabled(minimapOn);
 
-        buttonTexture = new BooleanPropertyButton(ButtonEnum.Texture.ordinal(),
-                Constants.getString("jm.minimap.texture_size", Constants.getString("jm.common.font_small")),
-                Constants.getString("jm.minimap.texture_size", Constants.getString("jm.common.font_large")),
-                miniMapProperties, miniMapProperties.textureSmall);
+        buttonTexture = BooleanPropertyButton.create(ButtonEnum.Texture.ordinal(), BooleanPropertyButton.Type.SmallLarge,
+                "jm.minimap.texture_size", miniMapProperties, miniMapProperties.textureSmall);
         buttonTexture.setEnabled(minimapOn);
 
-        buttonShowSelf = new BooleanPropertyButton(ButtonEnum.ShowSelf.ordinal(),
-                Constants.getString("jm.common.show_self", Constants.getString("jm.common.on")),
-                Constants.getString("jm.common.show_self", Constants.getString("jm.common.off")),
-                miniMapProperties, miniMapProperties.showSelf);
+        buttonShowSelf = BooleanPropertyButton.create(ButtonEnum.ShowSelf.ordinal(), BooleanPropertyButton.Type.SmallLarge,
+                "jm.common.show_self", miniMapProperties, miniMapProperties.showSelf);
         buttonShowSelf.setEnabled(minimapOn);
 
         boolean showHotKeys = miniMapProperties.enableHotkeys.get();
@@ -193,7 +189,7 @@ public class MiniMapOptions extends JmUI
         // See if sliders no longer in use.
         boolean sliderNotInUse = !buttonCustomSize.dragging && !buttonTerrainAlpha.dragging && !buttonFrameAlpha.dragging;
 
-        if(sliderWasInUse && sliderNotInUse)
+        if (sliderWasInUse && sliderNotInUse)
         {
             miniMap.updateDisplayVars(true);
         }

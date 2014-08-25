@@ -114,7 +114,7 @@ public class FileService extends BaseService
             // Handle colorpalette reques
             if (path.startsWith(COLOR_PALETTE_JSON))
             {
-                ColorPalette colorPalette = ColorCache.getInstance().getCurrentPalette();
+                ColorPalette colorPalette = ColorCache.instance().getCurrentPalette();
                 if (colorPalette != null)
                 {
                     File jsonFile = colorPalette.getOrigin();
@@ -127,7 +127,7 @@ public class FileService extends BaseService
             }
             else if (path.startsWith(COLOR_PALETTE_HTML))
             {
-                ColorPalette colorPalette = ColorCache.getInstance().getCurrentPalette();
+                ColorPalette colorPalette = ColorCache.instance().getCurrentPalette();
                 if (colorPalette != null)
                 {
                     File htmlFile = colorPalette.getOriginHtml(true, false);

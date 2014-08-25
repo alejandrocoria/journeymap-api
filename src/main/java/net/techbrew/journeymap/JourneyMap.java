@@ -95,7 +95,7 @@ public class JourneyMap
     {
         if (INSTANCE != null)
         {
-            throw new IllegalArgumentException("Use getInstance() after initialization is complete");
+            throw new IllegalArgumentException("Use instance() after initialization is complete");
         }
         INSTANCE = this;
     }
@@ -193,7 +193,7 @@ public class JourneyMap
 
             // Ensure logger inits
             logger = JMLogger.init();
-            logger.info("initialize ENTER");
+            logger.info("ensureCurrent ENTER");
 
             if (initialized)
             {
@@ -217,7 +217,7 @@ public class JourneyMap
             // Logging for thread debugging
             threadLogging = false;
 
-            logger.info("initialize EXIT, " + (timer == null ? "" : timer.stopAndReport()));
+            logger.info("ensureCurrent EXIT, " + (timer == null ? "" : timer.stopAndReport()));
         }
         catch (Throwable t)
         {
@@ -244,10 +244,7 @@ public class JourneyMap
             EventHandlerManager.registerGuiHandlers();
 
             // Resets detection results of Voxel/Rei's
-            WaypointsData.reset();
-
-            // Now that all blocks should be registered, init BlockUtils
-            ColorCache.getInstance().loadColorPalette();
+            WaypointsData.enableRecheck();
 
             // Ensure all mob icons files are ready for use.
             FileHandler.initMobIconSets();
@@ -337,7 +334,7 @@ public class JourneyMap
             }
 
             this.reset();
-            ColorCache.getInstance().prefetchResourcePackColors();
+            ColorCache.instance().ensureCurrent();
 
             taskController = new TaskController();
             taskController.enableTasks();
@@ -378,7 +375,6 @@ public class JourneyMap
     {
         loadConfigProperties();
         DataCache.instance().purge();
-        DataCache.instance().resetBlockMetadata();
         chunkRenderController = new ChunkRenderController();
         MapOverlay.state().follow = true;
         StatTimer.resetAll();

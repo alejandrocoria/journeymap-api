@@ -17,7 +17,7 @@
         body{font-family: Helvetica,Arial,sans-serif; font-size:11px}
         .entry{width:300px;margin-bottom:4px;display:inline-block;text-align:middle}
         .rgb{display:inline;float:left;height:40px;width:40px;margin-right:5px}
-        .blockName{}
+        .blockName{font-weight:bold;}
         .blockInfo{font-size:10px;}
 
         #header {text-align: center; border: 1px solid green; background-color: #efefef; padding-bottom: 10px;}
@@ -33,7 +33,6 @@
 
     <div id="overview">
         <div id="generated"></div>
-        <b>$jm.colorpalette.resource_packs$:</b><span id="resourcePacks"></span>
     </div>
 
 </div>
@@ -41,8 +40,14 @@
 <div id="description">$jm.colorpalette.file_missing_data$</div>
 
 <div id="contents">
+    <h2>$jm.colorpalette.resource_packs$:</h2>
+
+    <div id="resourcePacks"></div>
+
     <h2>$jm.colorpalette.basic_colors$:</h2>
     <div id="basicColors"></div>
+
+    <hr/>
 
     <h2>$jm.colorpalette.biome_colors$</h2>
     <div id="biomeColors"></div>
@@ -64,10 +69,13 @@ function createColorSpan(blockColor) {
     var strippedColor = blockColor.color.split("#")[1];
     var span = document.createElement("span");
     span.className='entry';
-    span.innerHTML = "<a target='_rgb' href='http://www.colorcodehex.com/" + strippedColor + "/'>" +
+    var alphaInfo = (blockColor.alpha) ? ("Alpha: " + blockColor.alpha) : "&nbsp;";
+    var html = "<a target='_rgb' href='http://www.colorcodehex.com/" + strippedColor + "/'>" +
                      "<span class='rgb' style='background-color:" + blockColor.color +"' title='" + blockColor.color +"'></span></a>" +
                      "<span class='blockName'>" + blockColor.name + "</span><br/>" +
-                     "<span class='blockInfo'>" + blockColor.uid + " " + blockColor.meta +"</span>";
+                     "<span class='blockInfo'>" + blockColor.uid + " " + blockColor.meta +"</span><br/>" +
+                     "<span class='blockInfo'>" + alphaInfo + "</span>";
+    span.innerHTML = html;
     return span;
 }
 

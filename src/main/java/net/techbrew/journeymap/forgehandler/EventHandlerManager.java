@@ -13,6 +13,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.EventBus;
 import net.minecraftforge.common.MinecraftForge;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.cartography.ColorCache;
 import net.techbrew.journeymap.log.LogFormatter;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 public class EventHandlerManager
 {
     static WorldInfoHandler worldInfoHandler;
+    static ResourceManagerHandler resourceManagerHandler;
 
     private static HashMap<Class<? extends EventHandler>, EventHandler> handlers = new HashMap<Class<? extends EventHandler>, EventHandler>();
 
@@ -35,6 +37,8 @@ public class EventHandlerManager
         register(new ChunkUpdateHandler());
         register(new WaypointBeaconHandler());
         worldInfoHandler = new WorldInfoHandler();
+        resourceManagerHandler = new ResourceManagerHandler();
+        ColorCache.instance();
     }
 
     public static void registerGuiHandlers()

@@ -147,6 +147,9 @@ public class ColorPalette
             jsonString = Files.toString(file, UTF8).replaceFirst(VARIABLE, "");
             ColorPalette palette = GSON.fromJson(jsonString, ColorPalette.class);
             palette.origin = file;
+
+            // Ensure current HTML file accompanies the data
+            palette.getOriginHtml(true, true);
             return palette;
         }
         catch (Throwable e)
@@ -267,10 +270,7 @@ public class ColorPalette
                 Files.write(htmlString, htmlFile, UTF8);
 
             }
-            else
-            {
-                return htmlFile;
-            }
+            return htmlFile;
         }
         catch (Throwable t)
         {

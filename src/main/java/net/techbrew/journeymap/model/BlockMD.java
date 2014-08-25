@@ -84,7 +84,7 @@ public class BlockMD
      * @param alpha       the alpha
      * @param flags       the flags
      */
-    BlockMD(String displayName, GameRegistry.UniqueIdentifier uid,  Block block, int meta, float alpha, EnumSet<BlockMD.Flag> flags)
+    BlockMD(String displayName, GameRegistry.UniqueIdentifier uid, Block block, int meta, float alpha, EnumSet<BlockMD.Flag> flags)
     {
         this.uid = uid;
         this.meta = meta;
@@ -100,6 +100,35 @@ public class BlockMD
                 color = RGB.toInteger(17, 12, 25);
             }
         }
+    }
+
+    public static String getBlockName(Block block, int meta)
+    {
+        String name = block.getUnlocalizedName();
+        try
+        {
+            // Gotta love this.
+            Item item = Item.getItemFromBlock(block);
+            if (item == null)
+            {
+                item = block.getItemDropped(0, new Random(), 0);
+            }
+            if (item != null)
+            {
+                ItemStack stack = new ItemStack(item, 1, block.damageDropped(meta));
+                name = stack.getDisplayName();
+            }
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().debug("Displayname not available for " + name);
+        }
+
+        if (name.startsWith("tile"))
+        {
+            name = block.getClass().getSimpleName().replaceAll("Block", "");
+        }
+        return name;
     }
 
     /**
@@ -143,7 +172,7 @@ public class BlockMD
         }
         else
         {
-            Integer color = ColorCache.getInstance().getBlockColor(chunkMd, this, x, y, z);
+            Integer color = ColorCache.instance().getBlockColor(chunkMd, this, x, y, z);
             if (color == null)
             {
                 this.color = Color.black.getRGB();
@@ -358,30 +387,6 @@ public class BlockMD
      */
     public String getName()
     {
-        return name;
-    }
-
-    public static String getBlockName(Block block, int meta)
-    {
-        String name = block.getUnlocalizedName();
-        try {
-            // Gotta love this.
-            Item item = Item.getItemFromBlock(block);
-            if(item==null) {
-                item = block.getItemDropped(0,new Random(), 0);
-            }
-            if(item!=null)
-            {
-                ItemStack stack = new ItemStack(item, 1, block.damageDropped(meta));
-                name = stack.getDisplayName();
-            }
-        } catch(Throwable t) {
-            JourneyMap.getLogger().debug("Displayname not available for " + name);
-        }
-
-        if(name.startsWith("tile")) {
-            name = block.getClass().getSimpleName().replaceAll("Block", "");
-        }
         return name;
     }
 

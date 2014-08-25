@@ -20,9 +20,12 @@ public class BooleanPropertyButton extends Button
 {
     final PropertiesBase properties;
     final AtomicBoolean valueHolder;
-    public BooleanPropertyButton(int id, String labelOn, String labelOff, PropertiesBase properties, AtomicBoolean valueHolder)
+    final Type type;
+
+    protected BooleanPropertyButton(int id, Type type, String labelOn, String labelOff, PropertiesBase properties, AtomicBoolean valueHolder)
     {
         super(id, 0, 0, labelOn, labelOff, valueHolder.get());
+        this.type = type;
         this.valueHolder = valueHolder;
         this.properties = properties;
         if (properties == null || valueHolder == null)
@@ -50,7 +53,7 @@ public class BooleanPropertyButton extends Button
             labelOn = Constants.getString("jm.common.font_small");
             labelOff = Constants.getString("jm.common.font_large");
         }
-        return new BooleanPropertyButton(id, labelOn, labelOff, properties, valueHolder);
+        return new BooleanPropertyButton(id, type, labelOn, labelOff, properties, valueHolder);
     }
 
     public static BooleanPropertyButton create(int id, String rawLabel, PropertiesBase properties, AtomicBoolean valueHolder)
@@ -71,7 +74,17 @@ public class BooleanPropertyButton extends Button
             labelOn = Constants.getString(rawLabel, Constants.getString("jm.common.font_small"));
             labelOff = Constants.getString(rawLabel, Constants.getString("jm.common.font_large"));
         }
-        return new BooleanPropertyButton(id, labelOn, labelOff, properties, valueHolder);
+        return new BooleanPropertyButton(id, type, labelOn, labelOff, properties, valueHolder);
+    }
+
+    public Type getType()
+    {
+        return type;
+    }
+
+    public AtomicBoolean getValueHolder()
+    {
+        return valueHolder;
     }
 
     @Override

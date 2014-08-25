@@ -38,6 +38,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected boolean drawFrame;
     protected boolean drawBackground;
     protected boolean defaultStyle = true;
+    protected ToggleListener toggleListener;
 
     public Button(Enum enumValue, String label)
     {
@@ -113,6 +114,11 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public void toggle()
     {
         setToggled(!getToggled());
+    }
+
+    public void setToggleListener(ToggleListener toggleListener)
+    {
+        this.toggleListener = toggleListener;
     }
 
     public int getFitWidth(FontRenderer fr)
@@ -286,6 +292,10 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     {
         this.toggled = toggled;
         updateLabel();
+        if (toggleListener != null)
+        {
+            toggleListener.onToggle(this, toggled);
+        }
     }
 
     public int getWidth()
@@ -550,5 +560,10 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public void setDefaultStyle(boolean defaultStyle)
     {
         this.defaultStyle = defaultStyle;
+    }
+
+    public static interface ToggleListener<T extends Button>
+    {
+        public void onToggle(T button, boolean toggled);
     }
 }

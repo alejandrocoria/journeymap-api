@@ -11,13 +11,15 @@ package net.techbrew.journeymap.ui.map;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.ui.*;
 
 public class StyleOptions extends JmUI
 {
+    boolean refreshChunks = false;
+    boolean refreshBlockMetadata = false;
     Button buttonClose;
-
     ButtonList leftButtons = new ButtonList();
     ButtonList rightButtons = new ButtonList();
 
@@ -50,7 +52,18 @@ public class StyleOptions extends JmUI
         rightButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_antialiasing", core, core.mapAntialiasing));
         rightButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_crops", core, core.mapCrops));
         rightButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_plants", core, core.mapPlants));
-        rightButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_plantshadows", core, core.mapPlantShadows));
+
+        BooleanPropertyButton buttonMapPlantShadows = BooleanPropertyButton.create(id++, "jm.common.map_style_plantshadows", core, core.mapPlantShadows);
+        buttonMapPlantShadows.setToggleListener(new Button.ToggleListener()
+        {
+            @Override
+            public void onToggle(Button button, boolean toggled)
+            {
+                refreshBlockMetadata = true;
+            }
+        });
+
+        rightButtons.add(buttonMapPlantShadows);
         buttonList.addAll(rightButtons);
 
         ButtonList all = new ButtonList(leftButtons);
@@ -97,6 +110,7 @@ public class StyleOptions extends JmUI
         if (button instanceof BooleanPropertyButton || button instanceof IconSetButton)
         {
             ((Button) button).toggle();
+            refreshChunks = true;
             return;
         }
 
@@ -104,6 +118,24 @@ public class StyleOptions extends JmUI
         {
             closeAndReturn();
         }
+    }
+
+    @Override
+    protected void closeAndReturn()
+    {
+        if (refreshBlockMetadata)
+        {
+            JourneyMap.getLogger().info("Refreshing block metadata after map style changes.");
+            DataCache.instance().resetBlockMetadata();
+        }
+
+        if (refreshChunks)
+        {
+            JourneyMap.getLogger().info("Chunks need to remap after map style changes.");
+            DataCache.instance().invalidateChunkMDCache();
+        }
+
+        super.closeAndReturn();
     }
 
     private enum ButtonEnum

@@ -67,7 +67,7 @@ public class DebugService extends FileService
         if (JourneyMap.getInstance().isMapping())
         {
             sb.append(LogFormatter.LINEBREAK).append("<h1>Block Data</h1><div>");
-            sb.append(LogFormatter.LINEBREAK).append(ColorCache.getInstance().getCacheDebugHtml());
+            sb.append(LogFormatter.LINEBREAK).append(ColorCache.instance().getCacheDebugHtml());
             sb.append(LogFormatter.LINEBREAK).append("</div><!-- / Block Data -->");
         }
 
