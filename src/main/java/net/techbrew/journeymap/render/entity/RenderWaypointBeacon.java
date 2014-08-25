@@ -21,7 +21,6 @@ import net.minecraft.util.Vec3;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.WaypointProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -39,8 +38,8 @@ import java.util.Collection;
 public class RenderWaypointBeacon
 {
     static final ResourceLocation beam = new ResourceLocation("textures/entity/beacon_beam.png");
-    static StatTimer timer = StatTimer.get("WaypointBeacon.doRender", 100);
-    static StatTimer allTimer = StatTimer.get("WaypointBeacon.renderAll", 100);
+    //    static StatTimer timer = StatTimer.get("WaypointBeacon.doRender", 100);
+//    static StatTimer allTimer = StatTimer.get("WaypointBeacon.renderAll", 100);
     static Minecraft mc = FMLClientHandler.instance().getClient();
     static RenderManager renderManager = RenderManager.instance;
     static String distanceLabel = Constants.getString("jm.waypoint.distance_meters", "%1.0f");
@@ -48,8 +47,8 @@ public class RenderWaypointBeacon
 
     public static void resetStatTimers()
     {
-        timer.reset();
-        allTimer.reset();
+//        timer.reset();
+//        allTimer.reset();
     }
 
     public static void renderAll()
@@ -59,7 +58,7 @@ public class RenderWaypointBeacon
             waypointProperties = JourneyMap.getWaypointProperties();
 
             Collection<Waypoint> waypoints = WaypointStore.instance().getAll();
-            allTimer.start();
+            //allTimer.start();
             final int playerDim = mc.thePlayer.dimension;
             for (Waypoint wp : waypoints)
             {
@@ -78,12 +77,12 @@ public class RenderWaypointBeacon
         }
         catch (Throwable t)
         {
-            allTimer.cancel();
+            //allTimer.cancel();
             JourneyMap.getLogger().error("Error rendering waypoints: " + LogFormatter.toString(t));
         }
         finally
         {
-            allTimer.stop();
+            //allTimer.stop();
         }
     }
 
@@ -94,7 +93,7 @@ public class RenderWaypointBeacon
             return;
         }
 
-        timer.start();
+        //timer.start();
 
         RenderHelper.enableStandardItemLighting();
 
@@ -293,7 +292,7 @@ public class RenderWaypointBeacon
             // Reset GL
 
 
-            timer.stop();
+            //timer.stop();
 
             GL11.glDepthMask(true);
             GL11.glEnable(GL11.GL_CULL_FACE);
