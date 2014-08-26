@@ -13,6 +13,7 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 - Bugfix: Version checker was being dumb.  4.1.0alphaX is newer than 4.0.4
+- Change: Faster results of remapping nearby chunks when forced by Map Style change / resource pack change
 
 ## Changelog for JourneyMap 4.1.0alpha10:
 - New Feature: Generated colors for the active resource packs are saved to /journeyMap/colorpalette.json

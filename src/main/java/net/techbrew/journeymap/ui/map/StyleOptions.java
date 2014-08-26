@@ -13,6 +13,7 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.properties.CoreProperties;
+import net.techbrew.journeymap.task.MapPlayerTask;
 import net.techbrew.journeymap.ui.*;
 
 public class StyleOptions extends JmUI
@@ -125,14 +126,14 @@ public class StyleOptions extends JmUI
     {
         if (refreshBlockMetadata)
         {
-            JourneyMap.getLogger().info("Refreshing block metadata after map style changes.");
+            JourneyMap.getLogger().debug("Refreshing block metadata after map style changes.");
             DataCache.instance().resetBlockMetadata();
         }
 
         if (refreshChunks)
         {
-            JourneyMap.getLogger().info("Chunks need to remap after map style changes.");
-            DataCache.instance().invalidateChunkMDCache();
+            JourneyMap.getLogger().debug("Chunks need to remap after map style changes.");
+            MapPlayerTask.forceNearbyRemap();
         }
 
         super.closeAndReturn();

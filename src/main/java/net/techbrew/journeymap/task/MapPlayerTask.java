@@ -25,9 +25,9 @@ import java.util.*;
 
 public class MapPlayerTask extends BaseMapTask
 {
+    private static final HashSet<ChunkCoordIntPair> queuedChunks = new HashSet<ChunkCoordIntPair>();
     private static volatile long lastTaskCompleted;
     private static Comparator<ChunkCoordIntPair> chunkDistanceComparator = getDistanceComparator();
-    private static HashSet<ChunkCoordIntPair> queuedChunks = new HashSet<ChunkCoordIntPair>();
     private static ChunkCoordinates lastPlayerPos;
     private static Boolean lastUnderground;
     private static DataCache dataCache = DataCache.instance();
@@ -37,6 +37,15 @@ public class MapPlayerTask extends BaseMapTask
     private MapPlayerTask(ChunkRenderController chunkRenderController, World world, int dimension, boolean underground, Integer chunkY, Collection<ChunkCoordIntPair> chunkCoords)
     {
         super(chunkRenderController, world, dimension, underground, chunkY, chunkCoords, false);
+    }
+
+    public static void forceNearbyRemap()
+    {
+        synchronized (MapPlayerTask.class)
+        {
+            DataCache.instance().invalidateChunkMDCache();
+            lastPlayerPos = null;
+        }
     }
 
     public static boolean queueChunk(ChunkCoordIntPair chunkCoords)
@@ -115,14 +124,17 @@ public class MapPlayerTask extends BaseMapTask
             sliceChanged = true;
         }
 
-        if(lastPlayerPos==null || lastPlayerPos.posY != playerPos.posY)
+        synchronized (MapPlayerTask.class)
         {
-            sliceChanged = true;
-        }
+            if (lastPlayerPos == null || lastPlayerPos.posY != playerPos.posY)
+            {
+                sliceChanged = true;
+            }
 
-        // Update last values
-        lastPlayerPos = playerPos;
-        lastUnderground = underground;
+            // Update last values
+            lastPlayerPos = playerPos;
+            lastUnderground = underground;
+        }
 
         // Pull queued coords with as little delay as possible
         TreeSet<ChunkCoordIntPair> queuedCoords = new TreeSet<ChunkCoordIntPair>(chunkDistanceComparator);

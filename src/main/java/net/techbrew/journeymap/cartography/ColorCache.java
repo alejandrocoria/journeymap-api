@@ -24,6 +24,7 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
+import net.techbrew.journeymap.task.MapPlayerTask;
 
 import java.awt.*;
 import java.util.*;
@@ -71,6 +72,9 @@ public class ColorCache
             }
             else
             {
+                // Remap if pack changed while playing
+                boolean forceRemap = (lastResourcePack != null && JourneyMap.getInstance().isMapping());
+
                 reset();
                 lastResourcePack = currentPack;
 
@@ -80,6 +84,12 @@ public class ColorCache
                 // Load the cache from a color palette
                 JourneyMap.getLogger().info(String.format("Getting color palette for Resource Pack(s): %s", currentPack));
                 loadColorPalette();
+
+                // Remap around player?
+                if (forceRemap)
+                {
+                    MapPlayerTask.forceNearbyRemap();
+                }
             }
         }
     }
