@@ -145,36 +145,29 @@ public class VersionCheck
         }
     }
 
-    class VersionData
-    {
-        VersionLine[] versions;
-    }
-
-    class VersionLine
-    {
-        String minecraft;
-        String journeymap;
-    }
-
     private static boolean isCurrent(String thisVersion, String availableVersion)
     {
-        if(thisVersion.startsWith("@"))
+        if (thisVersion.startsWith("@"))
         {
             thisVersion = availableVersion + "dev";
         }
 
-        if(thisVersion.equals(availableVersion))
+        if (thisVersion.equals(availableVersion))
         {
             return true;
         }
 
         int[] thisVersionArr = toVersionArray(thisVersion);
         int[] availableVersionArr = toVersionArray(availableVersion);
-        for(int i=0; i<availableVersionArr.length; i++)
+        for (int i = 0; i < availableVersionArr.length; i++)
         {
-            if(availableVersionArr[i] > thisVersionArr[i])
+            if (thisVersionArr[i] < availableVersionArr[i])
             {
                 return false;
+            }
+            if (thisVersionArr[i] > availableVersionArr[i])
+            {
+                return true;
             }
         }
         return true;
@@ -185,11 +178,11 @@ public class VersionCheck
         String[] strings = versionString.trim().split("\\D+"); // split on all non-numerics
         int[] ints = new int[strings.length];
         boolean errorsFound = false;
-        for(int i=0; i<strings.length; i++)
+        for (int i = 0; i < strings.length; i++)
         {
             try
             {
-                if(Strings.isNullOrEmpty(strings[i]))
+                if (Strings.isNullOrEmpty(strings[i]))
                 {
                     ints[i] = 0;
                     errorsFound = true;
@@ -199,14 +192,14 @@ public class VersionCheck
                     ints[i] = Integer.parseInt(strings[i]);
                 }
             }
-            catch(NumberFormatException e)
+            catch (NumberFormatException e)
             {
                 ints[i] = 0;
                 errorsFound = true;
             }
         }
 
-        if(errorsFound)
+        if (errorsFound)
         {
             JourneyMap.getLogger().warn(String.format("Version had problems when parsed. In: %s , Out: %s", versionString, ints)); //$NON-NLS-1$
         }
@@ -221,31 +214,44 @@ public class VersionCheck
         {
             // Get system properties
             String os = System.getProperty("os.name");
-            if(os==null) os = "";
+            if (os == null)
+            {
+                os = "";
+            }
 
             String version = System.getProperty("os.version");
-            if(version==null) version = "";
+            if (version == null)
+            {
+                version = "";
+            }
 
             String arch = System.getProperty("os.arch");
-            if(arch==null) arch = "";
-            if(arch.equals("amd64")) arch = "WOW64";
+            if (arch == null)
+            {
+                arch = "";
+            }
+            if (arch.equals("amd64"))
+            {
+                arch = "WOW64";
+            }
 
             String lang = String.format("%s_%s", System.getProperty("user.language"), System.getProperty("user.country"));
-            if(lang.contains("null")) {
+            if (lang.contains("null"))
+            {
                 lang = FMLClientHandler.instance().getCurrentLanguage();
             }
 
             // Build user agent string
-            if(os.startsWith("Mac")) // Mac OS X, x86_64, ?
+            if (os.startsWith("Mac")) // Mac OS X, x86_64, ?
             {
-                version = version.replace(".","_");
+                version = version.replace(".", "_");
                 agent = String.format("Mozilla/5.0 (Macintosh; U; Intel Mac OS X %s; %s)", version, lang);
             }
-            else if(os.startsWith("Win")) // Windows 7, amd64, 6.1
+            else if (os.startsWith("Win")) // Windows 7, amd64, 6.1
             {
                 agent = String.format("Mozilla/5.0 (Windows; U; Windows NT %s; %s; %s)", version, arch, lang);
             }
-            else if(os.startsWith("Linux")) // Linux, os.version = kernel version, os.arch = amd64
+            else if (os.startsWith("Linux")) // Linux, os.version = kernel version, os.arch = amd64
             {
                 agent = String.format("Mozilla/5.0 (Linux; U; Linux %s; %s; %s)", version, arch, lang);
             }
@@ -254,7 +260,7 @@ public class VersionCheck
                 agent = String.format("Mozilla/5.0 (%s; U; %s %s; %s, %s)", os, os, version, arch, lang);
             }
         }
-        catch(Throwable t)
+        catch (Throwable t)
         {
             agent = "Mozilla/5.0 (Unknown)";
         }
@@ -273,5 +279,16 @@ public class VersionCheck
         {
             JourneyMap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url, LogFormatter.toString(e)); //$NON-NLS-1$
         }
+    }
+
+    class VersionData
+    {
+        VersionLine[] versions;
+    }
+
+    class VersionLine
+    {
+        String minecraft;
+        String journeymap;
     }
 }

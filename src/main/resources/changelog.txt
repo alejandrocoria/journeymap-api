@@ -12,6 +12,9 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Version checker was being dumb.  4.1.0alphaX is newer than 4.0.4
+
+## Changelog for JourneyMap 4.1.0alpha10:
 - New Feature: Generated colors for the active resource packs are saved to /journeyMap/colorpalette.json
 -- If your resource pack selection doesn't change, the file will be used instead of re-scanning the resource packs each time you start Minecraft.
 -- If your resource pack selection is changed, the textures will be scanned and a new color palette file will be generated.
