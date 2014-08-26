@@ -10,6 +10,7 @@ package net.techbrew.journeymap.io;
 
 
 import com.google.common.base.Joiner;
+import com.google.common.io.ByteSink;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import cpw.mods.fml.client.FMLClientHandler;
@@ -508,10 +509,20 @@ public class FileHandler
     {
         try
         {
-            File outFile = new File(toDir, fileName);
+            final File outFile = new File(toDir, fileName);
             String htmlPath = FileHandler.ASSETS_JOURNEYMAP_WEB + "/" + fileName;
-            File htmlFile = new File(JourneyMap.class.getResource(htmlPath).getFile());
-            Files.copy(htmlFile, outFile);
+            InputStream inputStream = JourneyMap.class.getResource(htmlPath).openStream();
+
+            ByteSink out = new ByteSink()
+            {
+                @Override
+                public OutputStream openStream() throws IOException
+                {
+                    return new FileOutputStream(outFile);
+                }
+            };
+            out.writeFrom(inputStream);
+
             return outFile;
         }
         catch (Throwable t)
