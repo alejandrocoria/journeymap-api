@@ -12,6 +12,10 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Change: Secondary shading (antialiasing) tweaked slightly for better northwesterly shadows.
+
+## Changelog for JourneyMap 4.1.0alpha11:
+- Bugfix: In Alpha 10, colorpalette.html wasn't copied out of jar file
 - Bugfix: Version checker was being dumb.  4.1.0alphaX is newer than 4.0.4
 - Change: Faster results of remapping nearby chunks when forced by Map Style change / resource pack change
 

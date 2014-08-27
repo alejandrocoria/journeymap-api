@@ -38,17 +38,14 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<ChunkCoordIntPair, Optional<ChunkMD>>
 {
+    public static final String PROP_WATER_HEIGHT = "waterHeight";
     protected static final int COLOR_BLACK = Color.black.getRGB();
     protected static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
     protected static final AlphaComposite ALPHA_OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
     protected static final float[] DEFAULT_FOG = new float[]{0, 0, .1f};
-
     protected final DataCache dataCache = DataCache.instance();
     protected CoreProperties coreProperties;
     protected BlockColumnPropertiesCache columnPropertiesCache = null;
-
-    public static final String PROP_WATER_HEIGHT = "waterHeight";
-
     // Updated in updateOptions()
     protected boolean mapBathymetry;
     protected boolean mapTransparency;
@@ -110,7 +107,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         secondarySlopeOffsets.add(new BlockCoordIntPair(-1, -2)); // North of NorthWest
         secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -1)); // West of NorthWest
         secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -2)); // NorthWest of NorthWest
-        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, 0)); // SouthWest of NorthWest
+        //secondarySlopeOffsets.add(new BlockCoordIntPair(-2, 0)); // SouthWest of NorthWest
+        //secondarySlopeOffsets.add(new BlockCoordIntPair(0, -2)); // West of West
     }
 
     /**
@@ -592,6 +590,47 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         return builder;
     }
 
+    protected void setColumnProperty(String name, Serializable value, ChunkMD chunkMD, int x, int z)
+    {
+        getColumnProperties(chunkMD, x, z, true).put(name, value);
+    }
+
+    protected <V extends Serializable> V getColumnProperty(String name, V defaultValue, ChunkMD chunkMD, int x, int z)
+    {
+        HashMap<String, Serializable> props = getColumnProperties(chunkMD, x, z);
+        V value = null;
+        if (props != null)
+        {
+            value = (V) props.get(name);
+        }
+        return (value != null) ? value : defaultValue;
+    }
+
+    protected HashMap<String, Serializable> getColumnProperties(ChunkMD chunkMD, int x, int z)
+    {
+        return getColumnProperties(chunkMD, x, z, false);
+    }
+
+    protected HashMap<String, Serializable> getColumnProperties(ChunkMD chunkMD, int x, int z, boolean forceCreation)
+    {
+        try
+        {
+            HashMap<String, Serializable>[][] propArr = columnPropertiesCache.get(chunkMD.getCoord());
+            HashMap<String, Serializable> props = propArr[x][z];
+            if (props == null && forceCreation)
+            {
+                props = new HashMap<String, Serializable>();
+                propArr[x][z] = props;
+            }
+            return props;
+        }
+        catch (Exception e)
+        {
+            JourneyMap.getLogger().warn(e.getMessage());
+            return null;
+        }
+    }
+
     /**
      * Cache for storing block heights in a 2-dimensional array, keyed to chunk coordinates.
      */
@@ -645,47 +684,6 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         protected LoadingCache<ChunkCoordIntPair, Float[][]> delegate()
         {
             return internal;
-        }
-    }
-
-    protected void setColumnProperty(String name, Serializable value, ChunkMD chunkMD, int x, int z)
-    {
-        getColumnProperties(chunkMD, x, z, true).put(name, value);
-    }
-
-    protected <V extends Serializable> V getColumnProperty(String name, V defaultValue, ChunkMD chunkMD, int x, int z)
-    {
-        HashMap<String,Serializable> props = getColumnProperties(chunkMD, x, z);
-        V value = null;
-        if(props!=null)
-        {
-            value = (V) props.get(name);
-        }
-        return (value!=null) ? value : defaultValue;
-    }
-
-    protected HashMap<String,Serializable> getColumnProperties(ChunkMD chunkMD, int x, int z)
-    {
-        return getColumnProperties(chunkMD, x, z, false);
-    }
-
-    protected HashMap<String,Serializable> getColumnProperties(ChunkMD chunkMD, int x, int z, boolean forceCreation)
-    {
-        try
-        {
-            HashMap<String,Serializable>[][] propArr = columnPropertiesCache.get(chunkMD.getCoord());
-            HashMap<String,Serializable> props = propArr[x][z];
-            if(props==null && forceCreation)
-            {
-                props = new HashMap<String,Serializable>();
-                propArr[x][z] = props;
-            }
-            return props;
-        }
-        catch (Exception e)
-        {
-            JourneyMap.getLogger().warn(e.getMessage());
-            return null;
         }
     }
 
