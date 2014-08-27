@@ -81,7 +81,7 @@ public class IconLoader
             {
                 if(blockMD.getBlock() instanceof ITileEntityProvider)
                 {
-                    logger.info("Ignoring TitleEntity without standard block texture: " + blockMD);
+                    logger.debug("Ignoring TitleEntity without standard block texture: " + blockMD);
                     blockMD.addFlags(BlockMD.Flag.TileEntity, BlockMD.Flag.HasAir);
                     return null;
                 }
