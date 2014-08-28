@@ -5,12 +5,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
-import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
-import net.techbrew.journeymap.render.draw.DrawPlayerStep;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -40,7 +38,6 @@ public class OverlayRadarRenderer
             String playername = Minecraft.getMinecraft().thePlayer.getDisplayName();
             TextureCache tc = TextureCache.instance();
             String iconSetName = mapProperties.getEntityIconSetName().get();
-            int iconOffset = iconSetName.equals(FileHandler.MOB_ICON_SET_3D) ? (int) (8 * drawScale) : 0;
 
             for (EntityDTO dto : entityDTOs)
             {
@@ -48,14 +45,14 @@ public class OverlayRadarRenderer
                 {
                     isPet = !Strings.isNullOrEmpty(dto.owner);
 
-                    if(!showPets && isPet)
+                    if (!showPets && isPet)
                     {
                         continue;
                     }
 
-                    if(!showAnimals && dto.passiveAnimal)
+                    if (!showAnimals && dto.passiveAnimal)
                     {
-                        if(!(isPet && showPets))
+                        if (!(isPet && showPets))
                         {
                             continue;
                         }
@@ -93,23 +90,23 @@ public class OverlayRadarRenderer
                         if (isPlayer)
                         {
                             entityIcon = tc.getPlayerSkin(dto.username);
-                            drawStepList.add(new DrawPlayerStep((EntityPlayer) dto.entityLiving, entityIcon));
+                            DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(dto);
+                            drawStep.update(false, locatorImg, entityIcon);
+                            drawStepList.add(drawStep);
                         }
                         else
                         {
                             entityIcon = tc.getEntityIconTexture(iconSetName, dto.filename);
                             if (entityIcon != null)
                             {
-                                int bottomMargin = isPlayer ? 0 : iconOffset;
-
                                 DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(dto);
-                                drawStep.update(false, locatorImg, entityIcon, bottomMargin);
+                                drawStep.update(false, locatorImg, entityIcon);
                                 drawStepList.add(drawStep);
                             }
                         }
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     JourneyMap.getLogger().error("Exception during prepareSteps: " + LogFormatter.toString(e));
                 }

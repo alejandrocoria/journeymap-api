@@ -34,6 +34,7 @@ public class GeneralDisplayOptions extends JmUI
     ArrayList<ButtonList> rightRows = new ArrayList<ButtonList>();
     ButtonList rowMobs, rowAnimals, rowVillagers, rowPets, rowGrid, rowCaves, rowSelf, rowPlayers, rowWaypoints, rowFontSize, rowForceUnicode, rowTextureSize;
     ButtonList rowIconSets;
+
     public GeneralDisplayOptions(Class<? extends JmUI> returnClass)
     {
         super(Constants.getString("jm.common.general_display_title"), returnClass);
@@ -235,7 +236,7 @@ public class GeneralDisplayOptions extends JmUI
                 row.layoutHorizontal(bx, lastRow.getBottomY() + vgap, true, hgap);
             }
             lastRow = row;
-            DrawUtil.drawLabel(row.getLabel(), row.getLeftX() - hgap, lastRow.getTopY() + vgap, DrawUtil.HAlign.Left, DrawUtil.VAlign.Below, Color.black, 0, Color.cyan, 255, 1, true);
+            DrawUtil.drawLabel(row.getLabel(), row.getLeftX() - hgap, lastRow.getTopY() + vgap, DrawUtil.HAlign.Left, DrawUtil.VAlign.Below, Color.black, 0, Color.cyan, 255, 1, true, 0);
             rightX = Math.max(rightX, row.getRightX());
             bottomY = Math.max(bottomY, row.getBottomY());
         }

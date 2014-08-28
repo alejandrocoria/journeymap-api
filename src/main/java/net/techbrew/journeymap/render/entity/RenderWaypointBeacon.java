@@ -276,7 +276,7 @@ public class RenderWaypointBeacon
                 GL11.glNormal3d(0, 0, -1.0F * scale);
 
                 // The .5 and .2 below centers the waypoint diamond icon
-                DrawUtil.drawColoredImage(texture, 255, waypoint.getColor(), 0 - (texture.width / 2) + .5, 0 - halfTexHeight + .2);
+                DrawUtil.drawColoredImage(texture, 255, waypoint.getColor(), 0 - (texture.width / 2) + .5, 0 - halfTexHeight + .2, 0);
 
                 GL11.glPopMatrix();
             }

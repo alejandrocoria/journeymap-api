@@ -112,22 +112,22 @@ public class EntityHelper
 
     public static boolean isPassiveAnimal(EntityLiving entityLiving)
     {
-        if(entityLiving==null)
+        if (entityLiving == null)
         {
             return false;
         }
 
-        if(entityLiving instanceof IMob)
+        if (entityLiving instanceof IMob)
         {
             return false;
         }
 
-        if(entityLiving instanceof INpc)
+        if (entityLiving instanceof INpc)
         {
             return false;
         }
 
-        if(entityLiving.getAttackTarget()!=null)
+        if (entityLiving.getAttackTarget() != null)
         {
             return false;
         }
@@ -185,37 +185,6 @@ public class EntityHelper
     }
 
     /**
-     * Get the entity's heading in degrees
-     *
-     * @param entity
-     * @return
-     */
-    public static double getHeading(Entity entity)
-    {
-        if (entity instanceof EntityLiving)
-        {
-            return getHeading(((EntityLiving) entity).rotationYawHead);
-        }
-        else
-        {
-            return getHeading(entity.rotationYaw);
-        }
-    }
-
-    /**
-     * Get the entity's heading in degrees,
-     * normalized to be between 0 and 360.
-     *
-     * @param rotationYaw
-     * @return
-     */
-    public static double getHeading(float rotationYaw)
-    {
-        double degrees = Math.round(rotationYaw % 360);
-        return degrees;
-    }
-
-    /**
      * Put entities into map, preserving the order, using entityId as key
      *
      * @param list
@@ -223,7 +192,6 @@ public class EntityHelper
      */
     public static Map<String, EntityDTO> buildEntityIdMap(List<? extends EntityDTO> list, boolean sort)
     {
-
         if (list == null || list.isEmpty())
         {
             return Collections.emptyMap();
@@ -337,7 +305,6 @@ public class EntityHelper
 
     private static class EntityDistanceComparator implements Comparator<Entity>
     {
-
         EntityPlayer player;
 
         @Override

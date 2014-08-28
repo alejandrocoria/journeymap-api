@@ -118,7 +118,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         }
 
         @Override
-        public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale)
+        public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
         {
             if (ticks-- < 0 && alpha > 0)
             {

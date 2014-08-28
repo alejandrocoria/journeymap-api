@@ -342,7 +342,7 @@ public class WaypointEditor extends JmUI
 
     protected void drawWaypoint(int x, int y)
     {
-        DrawUtil.drawColoredImage(wpTexture, 255, currentColor, x, y - (wpTexture.height / 2));
+        DrawUtil.drawColoredImage(wpTexture, 255, currentColor, x, y - (wpTexture.height / 2), 0);
     }
 
     protected void drawColorPicker(int x, int y, float size)
@@ -362,7 +362,7 @@ public class WaypointEditor extends JmUI
         }
         colorPickRect.setRect(x, y, size, size);
         float scale = size / colorPickTexture.width;
-        DrawUtil.drawImage(colorPickTexture, x, y, false, scale);
+        DrawUtil.drawImage(colorPickTexture, x, y, false, scale, 0);
 
 
         //drawRect(x, y, x + sizeI, y + sizeI, -16777216);

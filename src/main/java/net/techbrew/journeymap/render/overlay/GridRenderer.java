@@ -49,8 +49,8 @@ public class GridRenderer
     private final TreeMap<TilePos, Integer> grid = new TreeMap<TilePos, Integer>();
     private final int gridSize; // 5 = 2560px.
     private final Color bgColor = new Color(0x22, 0x22, 0x22);
-    private InGameMapProperties mapProperties;
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
+    private InGameMapProperties mapProperties;
     private Rectangle2D.Double viewPort = null;
     private Rectangle2D.Double screenBounds = null;
     private int lastHeight = -1;
@@ -272,13 +272,13 @@ public class GridRenderer
 
     public BlockCoordIntPair getBlockUnderMouse(double mouseX, double mouseY, int screenWidth, int screenHeight)
     {
-        double centerPixelX = screenWidth/2.0;
-        double centerPixelZ = screenHeight/2.0;
+        double centerPixelX = screenWidth / 2.0;
+        double centerPixelZ = screenHeight / 2.0;
 
-        double blockSize = (int) Math.pow(2,zoom);
+        double blockSize = (int) Math.pow(2, zoom);
 
-        double deltaX = (centerPixelX-mouseX) / blockSize;
-        double deltaZ = (centerPixelZ-mouseY) / blockSize;
+        double deltaX = (centerPixelX - mouseX) / blockSize;
+        double deltaZ = (centerPixelZ - mouseY) / blockSize;
 
         int x = MathHelper.floor_double(centerBlockX - deltaX);
         int z = MathHelper.floor_double(centerBlockZ + deltaZ);
@@ -305,19 +305,19 @@ public class GridRenderer
      * @param xOffset
      * @param yOffset
      */
-    public void draw(final List<? extends DrawStep> drawStepList, double xOffset, double yOffset, float drawScale, double fontScale)
+    public void draw(final List<? extends DrawStep> drawStepList, double xOffset, double yOffset, float drawScale, double fontScale, double rotation)
     {
         if (drawStepList == null || drawStepList.isEmpty())
         {
             return;
         }
-        draw(xOffset, yOffset, drawScale, fontScale, drawStepList.toArray(new DrawStep[drawStepList.size()]));
+        draw(xOffset, yOffset, drawScale, fontScale, rotation, drawStepList.toArray(new DrawStep[drawStepList.size()]));
     }
 
     /**
      * Draw an array of steps
      */
-    public void draw(double xOffset, double yOffset, float drawScale, double fontScale, DrawStep... drawSteps)
+    public void draw(double xOffset, double yOffset, float drawScale, double fontScale, double rotation, DrawStep... drawSteps)
     {
 
         GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -326,7 +326,7 @@ public class GridRenderer
 
         for (DrawStep drawStep : drawSteps)
         {
-            drawStep.draw(xOffset, yOffset, this, drawScale, fontScale);
+            drawStep.draw(xOffset, yOffset, this, drawScale, fontScale, rotation);
         }
 
         GL11.glDepthMask(true);

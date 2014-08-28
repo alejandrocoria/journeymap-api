@@ -230,7 +230,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         }
 
         @Override
-        public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale)
+        public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
         {
 
             if (Mouse.isButtonDown(0))

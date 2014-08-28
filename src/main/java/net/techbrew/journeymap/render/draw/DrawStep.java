@@ -18,6 +18,6 @@ import net.techbrew.journeymap.render.overlay.GridRenderer;
 public interface DrawStep
 {
 
-    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale);
+    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation);
 
 }

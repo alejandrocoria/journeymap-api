@@ -20,7 +20,6 @@ import java.awt.*;
 
 public class MiniMapOptions extends JmUI
 {
-
     private Button buttonPosition, buttonShape, buttonFont, buttonTexture, buttonUnicode, buttonMiniMap, buttonKeyboard;
     private Button buttonKeyboardHelp, buttonShowSelf, buttonShowfps, buttonGeneralDisplay, buttonClose, buttonCloseAll;
     private IconSetButton buttonIconSet;

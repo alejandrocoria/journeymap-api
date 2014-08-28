@@ -25,7 +25,6 @@ import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
-import net.techbrew.journeymap.model.EntityHelper;
 import net.techbrew.journeymap.model.MapOverlayState;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.FullMapProperties;
@@ -726,19 +725,19 @@ public class MapOverlay extends JmUI
         boolean showCaves = mc.thePlayer.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get();
         gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
         gridRenderer.draw(1f, xOffset, yOffset);
-        gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale());
-        gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, drawScale, getMapFontScale());
+        gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
+        gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
 
         if (fullMapProperties.showSelf.get())
         {
             Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
             if (playerPixel != null)
             {
-                DrawUtil.drawEntity(playerPixel.getX() + xOffset, playerPixel.getY() + yOffset, EntityHelper.getHeading(mc.thePlayer), false, TextureCache.instance().getPlayerLocatorSmall(), 8, drawScale);
+                DrawUtil.drawEntity(playerPixel.getX() + xOffset, playerPixel.getY() + yOffset, mc.thePlayer.rotationYawHead, false, TextureCache.instance().getPlayerLocatorSmall(), drawScale, 0);
             }
         }
 
-        gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale());
+        gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
 
         DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, playerInfoBgColor, 235, playerInfoFgColor, 255, getMapFontScale(), true);
 

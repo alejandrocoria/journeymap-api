@@ -112,14 +112,14 @@ public abstract class JmUI extends GuiScreen
         sizeDisplay(mc.displayWidth, mc.displayHeight);
 
         final boolean smallScale = (scaleFactor == 1);
-        DrawUtil.drawImage(logo, smallScale ? 2 : 4, 0, false, smallScale ? .5f : 1f);
+        DrawUtil.drawImage(logo, smallScale ? 2 : 4, 0, false, smallScale ? .5f : 1f, 0);
         sizeDisplay(width, height);
     }
 
     protected void drawTitle()
     {
         DrawUtil.drawRectangle(0, 0, this.width, headerHeight, Color.black, 100);
-        DrawUtil.drawCenteredLabel(this.title, this.width / 2, 12, Color.black, 0, Color.CYAN, 255, 1);
+        DrawUtil.drawCenteredLabel(this.title, this.width / 2, 12, Color.black, 0, Color.CYAN, 255, 1, 0);
     }
 
     @Override

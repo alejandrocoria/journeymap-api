@@ -12,7 +12,6 @@ package net.techbrew.journeymap.render.draw;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
@@ -24,14 +23,6 @@ import java.awt.*;
  */
 public class DrawUtil
 {
-    private static final float lightmapS = (float) (15728880 % 65536) / 1f;
-    private static final float lightmapT = (float) (15728880 / 65536) / 1f;
-
-    public static void resetLightMap()
-    {
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightmapS, lightmapT);
-    }
-
     /**
      * Draw a text label, centered on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
@@ -45,7 +36,24 @@ public class DrawUtil
      */
     public static void drawCenteredLabel(final String text, double x, double y, Color bgColor, int bgAlpha, Color color, int alpha, double fontScale)
     {
-        drawLabel(text, x, y, HAlign.Center, VAlign.Middle, bgColor, bgAlpha, color, alpha, fontScale, true);
+        drawLabel(text, x, y, HAlign.Center, VAlign.Middle, bgColor, bgAlpha, color, alpha, fontScale, true, 0);
+    }
+
+    /**
+     * Draw a text label, centered on x,z.  If bgColor not null,
+     * a rectangle will be drawn behind the text.
+     *
+     * @param text
+     * @param x
+     * @param y
+     * @param bgColor
+     * @param color
+     * @param bgAlpha
+     * @param rotation
+     */
+    public static void drawCenteredLabel(final String text, double x, double y, Color bgColor, int bgAlpha, Color color, int alpha, double fontScale, double rotation)
+    {
+        drawLabel(text, x, y, HAlign.Center, VAlign.Middle, bgColor, bgAlpha, color, alpha, fontScale, true, rotation);
     }
 
     /**
@@ -66,7 +74,28 @@ public class DrawUtil
      */
     public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Color bgColor, int bgAlpha, Color color, int alpha, double fontScale, boolean fontShadow)
     {
+        drawLabel(text, x, y, hAlign, vAlign, bgColor, bgAlpha, color, alpha, fontScale, fontShadow, 0);
+    }
 
+    /**
+     * Draw a text label, aligned on x,z.  If bgColor not null,
+     * a rectangle will be drawn behind the text.
+     *
+     * @param text
+     * @param x
+     * @param y
+     * @param hAlign
+     * @param vAlign
+     * @param bgColor
+     * @param bgAlpha
+     * @param color
+     * @param alpha
+     * @param fontScale
+     * @param fontShadow
+     * @param rotation
+     */
+    public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Color bgColor, int bgAlpha, Color color, int alpha, double fontScale, boolean fontShadow, double rotation)
+    {
         if (text == null || text.length() == 0)
         {
             return;
@@ -82,7 +111,6 @@ public class DrawUtil
 
         try
         {
-
             if (fontScale != 1)
             {
                 x = x / fontScale;
@@ -138,6 +166,18 @@ public class DrawUtil
                 }
             }
 
+            if (rotation != 0)
+            {
+                // Move origin to x,y
+                GL11.glTranslated(x, y, 0);
+
+                // Rotatate around origin
+                GL11.glRotated(-rotation, 0, 0, 1.0f);
+
+                // Offset the radius
+                GL11.glTranslated(-x, -y, 0);
+            }
+
             // Draw background
             if (bgColor != null && bgAlpha > 0)
             {
@@ -183,14 +223,9 @@ public class DrawUtil
         return fr.FONT_HEIGHT + (2 * vpad);
     }
 
-    private static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, boolean flip)
+    private static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, boolean flip, double rotation)
     {
-        drawQuad(texture, x, y, width, height, null, 1f, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-    }
-
-    private static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, boolean flip, int glBlendSfactor, int glBlendDFactor)
-    {
-        drawQuad(texture, x, y, width, height, null, 1f, flip, true, glBlendSfactor, glBlendDFactor);
+        drawQuad(texture, x, y, width, height, rotation, null, 1f, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     /**
@@ -205,8 +240,9 @@ public class DrawUtil
      * @param glBlendSfactor For normal alpha blending: GL11.GL_SRC_ALPHA
      * @param glBlendDFactor For normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
      */
-    public static void drawQuad(TextureImpl texture, final double x, final double y, final int width, final int height, Color color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor)
+    public static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, double rotation, Color color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor)
     {
+        GL11.glPushMatrix();
 
         if (blend)
         {
@@ -229,6 +265,21 @@ public class DrawUtil
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 
+        if (rotation != 0)
+        {
+            double transX = x + (width / 2);
+            double transY = y + (height / 2);
+
+            // Move origin to center of texture
+            GL11.glTranslated(transX, transY, 0);
+
+            // Rotatate around origin
+            GL11.glRotated(rotation, 0, 0, 1.0f);
+
+            // Return origin
+            GL11.glTranslated(-transX, -transY, 0);
+        }
+
         final int direction = flip ? -1 : 1;
 
         Tessellator tessellator = Tessellator.instance;
@@ -247,11 +298,12 @@ public class DrawUtil
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             }
         }
+
+        GL11.glPopMatrix();
     }
 
     public static void drawRectangle(double x, double y, double width, double height, Color color, int alpha)
     {
-
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glDisable(GL11.GL_ALPHA_TEST);
@@ -269,56 +321,14 @@ public class DrawUtil
         GL11.glDisable(GL11.GL_BLEND);
     }
 
-    public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float scale)
+    public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float scale, double rotation)
     {
-        drawQuad(texture, x, y, (int) (texture.width * scale), (int) (texture.height * scale), flip);
+        drawQuad(texture, x, y, (int) (texture.width * scale), (int) (texture.height * scale), flip, rotation);
     }
 
-    public static void drawImage(TextureImpl texture, double x, double y, boolean flip, int glBlendSfactor, int glBlendDfactor)
+    public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y, double rotation)
     {
-        drawQuad(texture, x, y, texture.width, texture.height, flip, glBlendSfactor, glBlendDfactor);
-    }
-
-    public static void drawRotatedImage(TextureImpl texture, double x, double y, float heading, float scale)
-    {
-
-        // Start a new matrix for translation/rotation
-        GL11.glPushMatrix();
-
-        // Move origin to x,y
-        GL11.glTranslated(x, y, 0);
-
-        // Rotatate around origin
-        GL11.glRotatef(heading, 0, 0, 1.0f);
-
-        // Adjust to scale
-        int width = (int) (texture.width * scale);
-        int height = (int) (texture.height * scale);
-
-        // Offset the radius
-        GL11.glTranslated(-width, -height, 0);
-
-        // Draw texture in rotated position
-        drawQuad(texture, width / 2, height / 2, width, height, false);
-
-        GL11.glDisable(GL11.GL_BLEND);
-
-        // Drop out of the translated+rotated matrix
-        GL11.glPopMatrix();
-    }
-
-    public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y)
-    {
-
-        drawQuad(texture, x, y, texture.width, texture.height, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-    }
-
-    public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y, boolean blend)
-    {
-
-        drawQuad(texture, x, y, texture.width, texture.height, color, alpha, false, false, 0, 0);
-
+        drawQuad(texture, x, y, texture.width, texture.height, rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     /**
@@ -330,25 +340,24 @@ public class DrawUtil
      * @param heading
      * @param flipInsteadOfRotate
      * @param texture
-     * @param bottomMargin
      */
-    public static void drawEntity(double x, double y, Double heading, boolean flipInsteadOfRotate, TextureImpl texture, int bottomMargin, float scale)
+    public static void drawEntity(double x, double y, double heading, boolean flipInsteadOfRotate, TextureImpl texture, float scale, double rotation)
     {
+        // Adjust to scale
+        double width = (texture.width * scale);
+        double height = (texture.height * scale);
+        double drawX = x - (width / 2);
+        double drawY = y - (height / 2);
 
-        if (heading == null)
+        if (flipInsteadOfRotate)
         {
-            drawImage(texture, x, y, false, scale);
-        }
-        else if (!flipInsteadOfRotate)
-        {
-            drawRotatedImage(texture, x, y, heading.floatValue(), scale);
+            boolean flip = (heading % 180) < 90;
+            drawImage(texture, drawX, drawY, flip, scale, -rotation);
         }
         else
         {
-            boolean flip = heading < 90;
-            int width = (int) (texture.width * scale);
-            int height = (int) (texture.height * scale);
-            drawImage(texture, x - (width / 2), y - (height / 2) - bottomMargin, flip, scale);
+            // Draw texture in rotated position
+            drawImage(texture, drawX, drawY, false, scale, heading);
         }
     }
 

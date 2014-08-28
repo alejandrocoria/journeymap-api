@@ -17,7 +17,6 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
-import net.techbrew.journeymap.model.EntityHelper;
 import net.techbrew.journeymap.model.MapOverlayState;
 import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.properties.MiniMapProperties;
@@ -195,7 +194,7 @@ public class MiniMap
                     glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
                     glStencilMask(0xFF);
                     glClear(GL_STENCIL_BUFFER_BIT);
-                    DrawUtil.drawQuad(dv.maskTexture, dv.textureX, dv.textureY, dv.maskTexture.width, dv.maskTexture.height, null, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                    DrawUtil.drawQuad(dv.maskTexture, dv.textureX, dv.textureY, dv.maskTexture.width, dv.maskTexture.height, 9, null, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                     glColorMask(true, true, true, true);
                     glDepthMask(true);
                     glStencilMask(0x00);
@@ -207,6 +206,20 @@ public class MiniMap
                     logger.error("Stencil buffer failing with circle mask:" + LogFormatter.toString(t));
                     //return;
                 }
+            }
+
+            // Rotatate around player heading
+            double rotation = 0;
+            if (miniMapProperties.rotateHeading.get())
+            {
+                rotation = (180 - mc.thePlayer.rotationYawHead);
+                double width = dv.displayWidth / 2 + (dv.translateX);
+                double height = dv.displayHeight / 2 + (dv.translateY);
+                GL11.glPushMatrix();
+                GL11.glTranslated(width, height, 0);
+                GL11.glRotated(rotation, 0, 0, 1.0f);
+                GL11.glTranslated(-width, -height, 0);
+                //rotation+=180;
             }
 
             // Move center to corner
@@ -222,10 +235,10 @@ public class MiniMap
             // Draw entities, etc
             final double fontScale = getMapFontScale();
             boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, miniMapProperties.forceUnicode.get());
-            gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, fontScale);
+            gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, fontScale, rotation);
             if (!allWaypointSteps.isEmpty())
             {
-                gridRenderer.draw(allWaypointSteps, 0, 0, dv.drawScale, fontScale);
+                gridRenderer.draw(allWaypointSteps, 0, 0, dv.drawScale, fontScale, rotation);
             }
             if (unicodeForced)
             {
@@ -238,28 +251,12 @@ public class MiniMap
                 Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
                 if (playerPixel != null)
                 {
-                    DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), EntityHelper.getHeading(mc.thePlayer), false, playerLocatorTex, 8, dv.drawScale);
+                    DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), mc.thePlayer.rotationYawHead, false, playerLocatorTex, dv.drawScale, rotation);
                 }
             }
 
             // Return center to mid-screen
             GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
-
-            // Draw labels if scissored
-            if (dv.labelFps.scissor && dv.showFps)
-            {
-                dv.labelFps.draw(fpsLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
-            }
-
-            if (dv.labelLocation.scissor)
-            {
-                dv.labelLocation.draw(locationLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
-            }
-
-            if (dv.labelBiome.scissor)
-            {
-                dv.labelBiome.draw(biomeLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
-            }
 
             // If using a mask, turn off the stencil test
             if (dv.maskTexture != null)
@@ -269,22 +266,6 @@ public class MiniMap
 
             // Finish Scissor
             GL11.glDisable(GL11.GL_SCISSOR_TEST);
-
-            // Draw labels if not scissored
-            if (!dv.labelFps.scissor && dv.showFps)
-            {
-                dv.labelFps.draw(fpsLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
-            }
-
-            if (!dv.labelLocation.scissor)
-            {
-                dv.labelLocation.draw(locationLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
-            }
-
-            if (!dv.labelBiome.scissor)
-            {
-                dv.labelBiome.draw(biomeLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
-            }
 
             // Restore GL attrs assumed by Minecraft to be managerEnabled
             GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -307,10 +288,32 @@ public class MiniMap
                 {
                     if (!drawWayPointStep.isOnScreen(0, 0, gridRenderer))
                     {
-                        drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, fontScale);
+                        drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, fontScale, rotation);
                     }
                 }
             }
+
+            if (miniMapProperties.rotateHeading.get())
+            {
+                GL11.glPopMatrix();
+            }
+
+            // Draw labels if not scissored
+            if (!dv.labelFps.scissor && dv.showFps)
+            {
+                dv.labelFps.draw(fpsLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
+            }
+
+            if (!dv.labelLocation.scissor)
+            {
+                dv.labelLocation.draw(locationLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
+            }
+
+            if (!dv.labelBiome.scissor)
+            {
+                dv.labelBiome.draw(biomeLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
+            }
+
             // Pop matrix changes
             GL11.glPopMatrix();
 

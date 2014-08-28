@@ -67,7 +67,7 @@ public class EntityDTO implements Serializable
         this.chunkCoordX = entity.chunkCoordX;
         this.chunkCoordY = entity.chunkCoordY;
         this.chunkCoordZ = entity.chunkCoordZ;
-        this.heading = EntityHelper.getHeading(entity);
+        this.heading = Math.round(entityLiving.rotationYawHead % 360);
         if (currentPlayer != null)
         {
             this.invisible = entity.isInvisibleToPlayer(currentPlayer);
@@ -95,15 +95,15 @@ public class EntityDTO implements Serializable
         if (entity instanceof EntityTameable)
         {
             Entity ownerEntity = ((EntityTameable) entity).getOwner();
-            if(ownerEntity!=null)
+            if (ownerEntity != null)
             {
                 owner = ownerEntity.getCommandSenderName();
             }
         }
-        else if(entity instanceof IEntityOwnable)
+        else if (entity instanceof IEntityOwnable)
         {
             Entity ownerEntity = ((IEntityOwnable) entity).getOwner();
-            if(ownerEntity!=null)
+            if (ownerEntity != null)
             {
                 owner = ownerEntity.getCommandSenderName();
             }
@@ -134,7 +134,7 @@ public class EntityDTO implements Serializable
 
         // TODO: Recompare to branch to ensure it matches bugfixes
         boolean passive = false;
-        if(entity instanceof EntityLiving)
+        if (entity instanceof EntityLiving)
         {
             // CustomName
             if (((EntityLiving) entity).hasCustomNameTag())
@@ -154,7 +154,7 @@ public class EntityDTO implements Serializable
 
             // Passive check
 
-            if(EntityHelper.isPassiveAnimal((EntityLiving)entity))
+            if (EntityHelper.isPassiveAnimal((EntityLiving) entity))
             {
                 passive = true;
             }

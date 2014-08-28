@@ -9,8 +9,8 @@
 package net.techbrew.journeymap.render.draw;
 
 import com.google.common.cache.CacheLoader;
+import net.minecraft.entity.player.EntityPlayer;
 import net.techbrew.journeymap.model.EntityDTO;
-import net.techbrew.journeymap.model.EntityHelper;
 import net.techbrew.journeymap.render.overlay.GridRenderer;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 
@@ -30,7 +30,6 @@ public class DrawEntityStep implements DrawStep
     EntityDTO entityDTO;
     TextureImpl texture;
     TextureImpl locatorTexture;
-    int bottomMargin;
     boolean flip;
 
     private DrawEntityStep(EntityDTO entityDTO)
@@ -39,16 +38,15 @@ public class DrawEntityStep implements DrawStep
         this.entityDTO = entityDTO;
     }
 
-    public void update(boolean flip, TextureImpl locatorTexture, TextureImpl texture, int bottomMargin)
+    public void update(boolean flip, TextureImpl locatorTexture, TextureImpl texture)
     {
         this.locatorTexture = locatorTexture;
         this.texture = texture;
         this.flip = flip;
-        this.bottomMargin = bottomMargin;
     }
 
     @Override
-    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale)
+    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
         if (entityDTO.entityLiving==null || entityDTO.entityLiving.isDead || !entityDTO.entityLiving.addedToChunk || entityDTO.entityLiving.isSneaking())
         {
@@ -58,26 +56,47 @@ public class DrawEntityStep implements DrawStep
         Point2D pixel = gridRenderer.getPixel(entityDTO.entityLiving.posX, entityDTO.entityLiving.posZ);
         if (pixel != null)
         {
-            double heading = EntityHelper.getHeading(entityDTO.entityLiving);
+            double heading = entityDTO.entityLiving.rotationYawHead;
             double drawX = pixel.getX() + xOffset;
             double drawY = pixel.getY() + yOffset;
 
-            if (locatorTexture != null)
+            if (entityDTO.entityLiving instanceof EntityPlayer)
             {
-                DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, bottomMargin * 8, drawScale);
+                drawPlayer(drawX, drawY, heading, drawScale, fontScale, rotation);
             }
-
-            if(texture != null)
+            else
             {
-                DrawUtil.drawEntity(drawX, drawY, heading, true, texture, bottomMargin, drawScale);
+                drawCreature(drawX, drawY, heading, drawScale, fontScale, rotation);
             }
+        }
+    }
 
-            int labelYOffset = (texture != null) ? (texture.height/2) : 8;
-            if (entityDTO.customName != null)
-            {
-                DrawUtil.drawCenteredLabel(entityDTO.customName, drawX, drawY + labelYOffset, labelBg, labelBgAlpha, labelFg, labelFgAlpha, fontScale);
-            }
+    private void drawPlayer(double drawX, double drawY, double heading, float drawScale, double fontScale, double rotation)
+    {
+        if (texture != null)
+        {
+            DrawUtil.drawEntity(drawX, drawY, heading, true, texture, drawScale * .75f, rotation);
+        }
+        float labelOffset = texture != null ? texture.height : 0;
+        DrawUtil.drawCenteredLabel(entityDTO.entityLiving.getCommandSenderName(), drawX, drawY - labelOffset, Color.black, 205, Color.green, 255, fontScale, rotation);
+    }
 
+    private void drawCreature(double drawX, double drawY, double heading, float drawScale, double fontScale, double rotation)
+    {
+        if (locatorTexture != null)
+        {
+            DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, drawScale, rotation);
+        }
+
+        if (texture != null)
+        {
+            DrawUtil.drawEntity(drawX, drawY, heading, true, texture, drawScale, rotation);
+        }
+
+        int labelYOffset = (texture != null) ? (texture.height / 2) : 8;
+        if (entityDTO.customName != null)
+        {
+            DrawUtil.drawCenteredLabel(entityDTO.customName, drawX, drawY + labelYOffset, labelBg, labelBgAlpha, labelFg, labelFgAlpha, fontScale, rotation);
         }
     }
 

@@ -55,9 +55,8 @@ public class DrawWayPointStep implements DrawStep
     }
 
     @Override
-    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale)
+    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
-
         if (!waypoint.isInPlayerDimension())
         {
             return;
@@ -67,19 +66,19 @@ public class DrawWayPointStep implements DrawStep
         double halfTexHeight = texture.height / 2;
         if (gridRenderer.isOnScreen(pixel))
         {
-            DrawUtil.drawLabel(waypoint.getName(), pixel.getX(), pixel.getY() - halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 255, fontColor, 255, fontScale, false);
+            DrawUtil.drawLabel(waypoint.getName(), pixel.getX(), pixel.getY() - halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 255, fontColor, 255, fontScale, false, rotation);
             if (isEdit)
             {
                 TextureImpl editTex = TextureCache.instance().getWaypointEdit();
-                DrawUtil.drawColoredImage(editTex, 255, color, pixel.getX() - (editTex.width / 2), pixel.getY() - editTex.height / 2);
+                DrawUtil.drawColoredImage(editTex, 255, color, pixel.getX() - (editTex.width / 2), pixel.getY() - editTex.height / 2, -rotation);
             }
-            DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - halfTexHeight);
+            DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - halfTexHeight, -rotation);
         }
         else if (!isEdit)
         {
             gridRenderer.ensureOnScreen(pixel);
             //DrawUtil.drawColoredImage(offscreenTexture, 255, color, pixel.getX() - (offscreenTexture.width / 2), pixel.getY() - (offscreenTexture.height / 2));
-            DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - halfTexHeight);
+            DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - halfTexHeight, -rotation);
         }
     }
 
