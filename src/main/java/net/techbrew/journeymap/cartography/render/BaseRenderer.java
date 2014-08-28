@@ -107,8 +107,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         secondarySlopeOffsets.add(new BlockCoordIntPair(-1, -2)); // North of NorthWest
         secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -1)); // West of NorthWest
         secondarySlopeOffsets.add(new BlockCoordIntPair(-2, -2)); // NorthWest of NorthWest
-        //secondarySlopeOffsets.add(new BlockCoordIntPair(-2, 0)); // SouthWest of NorthWest
-        //secondarySlopeOffsets.add(new BlockCoordIntPair(0, -2)); // West of West
+        secondarySlopeOffsets.add(new BlockCoordIntPair(-2, 0)); // SouthWest of NorthWest
+        secondarySlopeOffsets.add(new BlockCoordIntPair(0, -2)); // West of West
     }
 
     /**
