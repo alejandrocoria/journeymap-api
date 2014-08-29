@@ -29,7 +29,7 @@ public class MiniMapProperties extends InGameMapProperties
     public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("2D");
     public final AtomicInteger customSize = new AtomicInteger(0);
     public final AtomicInteger frameAlpha = new AtomicInteger(255);
-    public final AtomicBoolean rotateHeading = new AtomicBoolean(true);
+    public final AtomicReference<DisplayVars.Orientation> orientation = new AtomicReference<DisplayVars.Orientation>(DisplayVars.Orientation.North);
     protected transient final String name = "minimap";
 
     public MiniMapProperties()

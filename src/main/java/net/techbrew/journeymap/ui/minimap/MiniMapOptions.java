@@ -23,6 +23,7 @@ public class MiniMapOptions extends JmUI
     private Button buttonPosition, buttonShape, buttonFont, buttonTexture, buttonUnicode, buttonMiniMap, buttonKeyboard;
     private Button buttonKeyboardHelp, buttonShowSelf, buttonShowfps, buttonGeneralDisplay, buttonClose, buttonCloseAll;
     private IconSetButton buttonIconSet;
+    private EnumPropertyButton<DisplayVars.Orientation> buttonOrientation;
     private SliderButton buttonTerrainAlpha, buttonFrameAlpha, buttonCustomSize;
     private DisplayVars.Shape currentShape;
     private DisplayVars.Position currentPosition;
@@ -113,10 +114,13 @@ public class MiniMapOptions extends JmUI
         buttonTerrainAlpha = SliderButton.create(ButtonEnum.TerrainAlpha.ordinal(), miniMapProperties.terrainAlpha, 1, 255, "jm.minimap.terrain_alpha", true);
         buttonFrameAlpha = SliderButton.create(ButtonEnum.FrameAlpha.ordinal(), miniMapProperties.frameAlpha, 1, 255, "jm.minimap.frame_alpha", true);
 
+        buttonOrientation = new EnumPropertyButton<DisplayVars.Orientation>(ButtonEnum.Orientation.ordinal(), DisplayVars.Orientation.values(),
+                "jm.minimap.orientation.button", miniMapProperties, miniMapProperties.orientation);
+
         leftButtons = new ButtonList(buttonShape, buttonCustomSize, buttonShowfps, buttonShowSelf, buttonKeyboard, buttonKeyboardHelp, buttonGeneralDisplay);
         leftButtons.setNoDisableText(true);
 
-        rightButtons = new ButtonList(buttonPosition, buttonFont, buttonUnicode, buttonTexture, buttonIconSet, buttonTerrainAlpha, buttonFrameAlpha);
+        rightButtons = new ButtonList(buttonPosition, buttonFont, buttonUnicode, buttonTexture, buttonOrientation, buttonIconSet, buttonTerrainAlpha, buttonFrameAlpha);
         rightButtons.setNoDisableText(true);
 
         buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
@@ -297,6 +301,12 @@ public class MiniMapOptions extends JmUI
                 break;
             }
 
+            case Orientation:
+            {
+                miniMap.updateDisplayVars(true);
+                break;
+            }
+
             case Close:
             {
                 closeAndReturn();
@@ -405,6 +415,6 @@ public class MiniMapOptions extends JmUI
 
     private enum ButtonEnum
     {
-        MiniMap, Position, Shape, Font, Texture, IconSet, Unicode, Keyboard, KeyboardHelp, Close, Showfps, ShowSelf, GeneralDisplay, TerrainAlpha, FrameAlpha, CustomSize, CloseAll
+        MiniMap, Position, Shape, Font, Texture, IconSet, Unicode, Keyboard, KeyboardHelp, Close, Showfps, ShowSelf, GeneralDisplay, Orientation, TerrainAlpha, FrameAlpha, CustomSize, CloseAll
     }
 }

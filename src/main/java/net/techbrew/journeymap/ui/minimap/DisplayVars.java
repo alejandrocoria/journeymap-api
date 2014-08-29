@@ -12,6 +12,7 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -33,6 +34,7 @@ public class DisplayVars
 {
     final Position position;
     final Shape shape;
+    final Orientation orientation;
     final TextureImpl borderTexture;
     final TextureImpl maskTexture;
     final float drawScale;
@@ -65,6 +67,7 @@ public class DisplayVars
         this.showFps = JourneyMap.getMiniMapProperties().showFps.get();
         this.shape = shape;
         this.position = position;
+        this.orientation = JourneyMap.getMiniMapProperties().orientation.get();
         this.displayWidth = mc.displayWidth;
         this.displayHeight = mc.displayHeight;
         final boolean useFontShadow = false;
@@ -331,6 +334,26 @@ public class DisplayVars
                 value = Position.TopRight;
             }
             return value;
+        }
+    }
+
+    public enum Orientation
+    {
+        North("jm.minimap.orientation.north"),
+        OldNorth("jm.minimap.orientation.oldnorth"),
+        PlayerHeading("jm.minimap.orientation.playerheading");
+
+        public final String label;
+
+        private Orientation(String label)
+        {
+            this.label = label;
+        }
+
+        @Override
+        public String toString()
+        {
+            return Constants.getString(this.label);
         }
     }
 

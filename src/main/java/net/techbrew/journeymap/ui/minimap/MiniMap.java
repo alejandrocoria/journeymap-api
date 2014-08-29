@@ -210,9 +210,27 @@ public class MiniMap
 
             // Rotatate around player heading
             double rotation = 0;
-            if (miniMapProperties.rotateHeading.get())
+            switch (dv.orientation)
             {
-                rotation = (180 - mc.thePlayer.rotationYawHead);
+                case North:
+                {
+                    rotation = 0;
+                    break;
+                }
+                case OldNorth:
+                {
+                    rotation = -90;
+                    break;
+                }
+                case PlayerHeading:
+                {
+                    rotation = (180 - mc.thePlayer.rotationYawHead);
+                    break;
+                }
+            }
+
+            if (rotation != 0)
+            {
                 double width = dv.displayWidth / 2 + (dv.translateX);
                 double height = dv.displayHeight / 2 + (dv.translateY);
                 GL11.glPushMatrix();
@@ -270,15 +288,7 @@ public class MiniMap
             // Restore GL attrs assumed by Minecraft to be managerEnabled
             GL11.glEnable(GL11.GL_DEPTH_TEST);
 
-//            // Draw border texture
-//            if(dv.borderTexture!=null)
-//            {
-//                GL11.glPushMatrix();
-//                GL11.glTranslated(512-dv.minimapSize, 0, 0);
-//                DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, (float) (dv.minimapSize / 512.0));
-//                GL11.glPopMatrix();
-//            }
-
+            // TODO: These need to be checked for straying outside the scissor
             // Draw off-screen waypoints on top of border texture
             if (!allWaypointSteps.isEmpty())
             {
@@ -293,8 +303,17 @@ public class MiniMap
                 }
             }
 
-            if (miniMapProperties.rotateHeading.get())
+            if (rotation != 0)
             {
+                GL11.glPopMatrix();
+            }
+
+            // Draw border texture
+            if (dv.borderTexture != null)
+            {
+                GL11.glPushMatrix();
+                //GL11.glTranslated(512-dv.minimapSize, 0, 0);
+                DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, (float) (dv.minimapSize / 512.0), 0);
                 GL11.glPopMatrix();
             }
 
