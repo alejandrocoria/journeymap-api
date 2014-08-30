@@ -8,23 +8,18 @@
 
 package net.techbrew.journeymap.render.texture;
 
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
+import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
-import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,9 +39,10 @@ public class TextureCache
 {
 
     private final Map<Name, TextureImpl> namedTextures = Collections.synchronizedMap(new HashMap<Name, TextureImpl>(Name.values().length + (Name.values().length / 2) + 1));
-    private final Map<String, TextureImpl> customTextures = Collections.synchronizedMap(new HashMap<String, TextureImpl>(3));
-    private final Map<String, TextureImpl> skinImageMap = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
-    private final Map<String, TextureImpl> entityImageMap = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
+    //private final Map<String, TextureImpl> customTextures = Collections.synchronizedMap(new HashMap<String, TextureImpl>(3));
+    private final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
+    private final Map<String, TextureImpl> entityIcons = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
+    private final Map<String, TextureImpl> uiSkinIcons = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private ThreadPoolExecutor texExec = (ThreadPoolExecutor) Executors.newFixedThreadPool(3, new JMThreadFactory("texture"));
 
     private TextureCache()
@@ -58,32 +54,32 @@ public class TextureCache
         return Holder.INSTANCE;
     }
 
-    public static DynamicTexture newTexture(String path)
-    {
-        ResourceLocation loc = new ResourceLocation(path);
-        DynamicTexture texture = null;
-        InputStream is = null;
-        try
-        {
-            is = JourneyMap.class.getResourceAsStream(path);
-            texture = new DynamicTexture(ImageIO.read(is));
-        }
-        catch (Exception e)
-        {
-            JourneyMap.getLogger().error("Can't get icon for " + loc + ": " + LogFormatter.toString(e));
-            if (is != null)
-            {
-                try
-                {
-                    is.close();
-                }
-                catch (IOException e1)
-                {
-                }
-            }
-        }
-        return texture;
-    }
+//    public static DynamicTexture newTexture(String path)
+//    {
+//        ResourceLocation loc = new ResourceLocation(path);
+//        DynamicTexture texture = null;
+//        InputStream is = null;
+//        try
+//        {
+//            is = JourneyMap.class.getResourceAsStream(path);
+//            texture = new DynamicTexture(ImageIO.read(is));
+//        }
+//        catch (Exception e)
+//        {
+//            JourneyMap.getLogger().error("Can't get icon for " + loc + ": " + LogFormatter.toString(e));
+//            if (is != null)
+//            {
+//                try
+//                {
+//                    is.close();
+//                }
+//                catch (IOException e1)
+//                {
+//                }
+//            }
+//        }
+//        return texture;
+//    }
 
     /**
      * *********************************************
@@ -197,15 +193,15 @@ public class TextureCache
         alpha = Math.max(0, Math.min(alpha, 1));
 
         final String frameImg;
-        if(size<=128)
+        if (size <= 128)
         {
             frameImg = "minimap/minimap-square-128.png";
         }
-        else if(size<=256)
+        else if (size <= 256)
         {
             frameImg = "minimap/minimap-square-256.png";
         }
-        else if(size<=512)
+        else if (size <= 512)
         {
             frameImg = "minimap/minimap-square-512.png";
         }
@@ -222,7 +218,7 @@ public class TextureCache
         g.dispose();
 
         TextureImpl tex = namedTextures.get(Name.MinimapCustomSquare);
-        if(tex!=null)
+        if (tex != null)
         {
             tex.deleteTexture();
         }
@@ -234,7 +230,7 @@ public class TextureCache
 
     public TextureImpl bindMinimapCustomSquare(Future<DelayedTexture> delayedCustomTex)
     {
-        if(delayedCustomTex.isDone())
+        if (delayedCustomTex.isDone())
         {
             try
             {
@@ -356,12 +352,14 @@ public class TextureCache
     {
 
         String texName = String.format("%s/%s", setName, iconPath);
-        synchronized (entityImageMap)
+        synchronized (entityIcons)
         {
-            TextureImpl tex = entityImageMap.get(texName);
+            TextureImpl tex = entityIcons.get(texName);
             if (tex == null || (!tex.hasImage() && tex.retainImage))
             {
-                BufferedImage img = FileHandler.getEntityIconFromFile(setName, iconPath, getUnknownEntity().getImage()); //$NON-NLS-1$
+                File parentDir = IconSetFileHandler.getEntityIconDir();
+                String assetPath = IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_ENTITY;
+                BufferedImage img = IconSetFileHandler.getIconFromFile(parentDir, assetPath, setName, iconPath, getUnknownEntity().getImage()); //$NON-NLS-1$
                 if (img != null)
                 {
                     if (tex != null)
@@ -369,7 +367,32 @@ public class TextureCache
                         tex.deleteTexture();
                     }
                     tex = new TextureImpl(img);
-                    entityImageMap.put(texName, tex);
+                    entityIcons.put(texName, tex);
+                }
+            }
+            return tex;
+        }
+    }
+
+    public TextureImpl getUiSkinTexture(String setName, String iconPath)
+    {
+        String texName = String.format("%s/%s", setName, iconPath);
+        synchronized (uiSkinIcons)
+        {
+            TextureImpl tex = uiSkinIcons.get(texName);
+            if (tex == null || (!tex.hasImage() && tex.retainImage))
+            {
+                File parentDir = IconSetFileHandler.getSkinIconDir();
+                String assetPath = IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_SKIN;
+                BufferedImage img = IconSetFileHandler.getIconFromFile(parentDir, assetPath, setName, iconPath, getUnknownEntity().getImage()); //$NON-NLS-1$
+                if (img != null)
+                {
+                    if (tex != null)
+                    {
+                        tex.deleteTexture();
+                    }
+                    tex = new TextureImpl(img);
+                    uiSkinIcons.put(texName, tex);
                 }
             }
             return tex;
@@ -383,9 +406,9 @@ public class TextureCache
     public TextureImpl getPlayerSkin(final String username)
     {
         TextureImpl tex = null;
-        synchronized (skinImageMap)
+        synchronized (playerSkins)
         {
-            tex = skinImageMap.get(username);
+            tex = playerSkins.get(username);
             if (tex != null)
             {
                 return tex;
@@ -395,7 +418,7 @@ public class TextureCache
                 // Create blank to return immediately
                 BufferedImage blank = new BufferedImage(24, 24, BufferedImage.TYPE_INT_ARGB);
                 tex = new TextureImpl(blank, true);
-                skinImageMap.put(username, tex);
+                playerSkins.put(username, tex);
             }
         }
 

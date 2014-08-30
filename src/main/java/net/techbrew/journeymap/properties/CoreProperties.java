@@ -8,6 +8,10 @@
 
 package net.techbrew.journeymap.properties;
 
+import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.io.IconSetFileHandler;
+
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -45,10 +49,27 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public final AtomicBoolean mapPlants = new AtomicBoolean(true);
     public final AtomicBoolean mapCrops = new AtomicBoolean(true);
     public final AtomicBoolean mapSurfaceAboveCaves = new AtomicBoolean(true);
+    public final AtomicReference<String> skinIconSetName = new AtomicReference<String>("Victorian");
     protected transient final String name = "core";
 
     public CoreProperties()
     {
+    }
+
+    @Override
+    protected boolean validate()
+    {
+        boolean saveNeeded = super.validate();
+
+        List<String> validNames = IconSetFileHandler.getEntityIconSetNames();
+        if (skinIconSetName.get() == null || !validNames.contains(skinIconSetName.get()))
+        {
+            JourneyMap.getLogger().warn(String.format("Skin Icon Set name '%s' is not valid, will use default instead.", skinIconSetName.get()));
+            skinIconSetName.set(validNames.get(0));
+            saveNeeded = true;
+        }
+
+        return saveNeeded;
     }
 
     @Override

@@ -13,6 +13,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.ColorCache;
 import net.techbrew.journeymap.cartography.ColorPalette;
 import net.techbrew.journeymap.io.FileHandler;
+import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -48,6 +49,7 @@ public class FileService extends BaseService
     final String COLOR_PALETTE_JSON = "/" + ColorPalette.JSON_FILENAME;
     final String COLOR_PALETTE_HTML = "/" + ColorPalette.HTML_FILENAME;
     final String ICON_ENTITY_PATH_PREFIX = "/icon/entity/";
+    final String ICON_SKIN_PATH_PREFIX = "/icon/skin/";
     final String SKIN_PREFIX = "/skin/";
     private boolean useZipEntry;
     private File zipFile;
@@ -142,7 +144,7 @@ public class FileService extends BaseService
             else if (path.startsWith(ICON_ENTITY_PATH_PREFIX))
             {
                 String entityIconPath = path.split(ICON_ENTITY_PATH_PREFIX)[1].replace('/', File.separatorChar);
-                File iconFile = new File(FileHandler.getEntityIconDir(), entityIconPath);
+                File iconFile = new File(IconSetFileHandler.getEntityIconDir(), entityIconPath);
                 if (!iconFile.exists())
                 {
                     // Fallback to jar asset
@@ -153,7 +155,34 @@ public class FileService extends BaseService
                     {
                         ResponseHeader.on(event).contentType(ContentType.png);
                     }
-                    fileStream = FileHandler.getEntityIconStream(setName, iconPath);
+                    fileStream = IconSetFileHandler.getIconStream(IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_ENTITY, setName, iconPath);
+                    JourneyMap.getLogger().warn("Couldn't get file for " + path);
+                }
+                else
+                {
+                    if (event != null)
+                    {
+                        ResponseHeader.on(event).content(iconFile);
+                    }
+                    fileStream = new FileInputStream(iconFile);
+                }
+            }
+            // Handle skin icon request
+            else if (path.startsWith(ICON_SKIN_PATH_PREFIX))
+            {
+                String skinIconPath = path.split(ICON_SKIN_PATH_PREFIX)[1].replace('/', File.separatorChar);
+                File iconFile = new File(IconSetFileHandler.getSkinIconDir(), skinIconPath);
+                if (!iconFile.exists())
+                {
+                    // Fallback to jar asset
+                    String setName = skinIconPath.split(File.separator)[0];
+                    String iconPath = skinIconPath.substring(skinIconPath.indexOf(File.separatorChar) + 1);
+
+                    if (event != null)
+                    {
+                        ResponseHeader.on(event).contentType(ContentType.png);
+                    }
+                    fileStream = IconSetFileHandler.getIconStream(IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_SKIN, setName, iconPath);
                     JourneyMap.getLogger().warn("Couldn't get file for " + path);
                 }
                 else

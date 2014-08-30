@@ -11,10 +11,10 @@ package net.techbrew.journeymap.ui;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.io.FileHandler;
-import net.techbrew.journeymap.properties.MapProperties;
+import net.techbrew.journeymap.properties.PropertiesBase;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by mwoodman on 6/24/2014.
@@ -22,13 +22,16 @@ import java.util.ArrayList;
 public class IconSetButton extends Button
 {
     final String messageKey;
-    final MapProperties mapProperties;
+    final PropertiesBase baseProperties;
+    final AtomicReference<String> valueHolder;
+    final ArrayList<String> validNames;
 
-    public IconSetButton(int id, MapProperties mapProperties, String messageKey)
+    public IconSetButton(int id, PropertiesBase baseProperties, AtomicReference<String> valueHolder, ArrayList<String> validNames, String messageKey)
     {
         super(id, 0, 0, Constants.getString(messageKey, ""));
-        this.mapProperties = mapProperties;
-
+        this.baseProperties = baseProperties;
+        this.valueHolder = valueHolder;
+        this.validNames = validNames;
         this.messageKey = messageKey;
         updateLabel();
 
@@ -38,14 +41,13 @@ public class IconSetButton extends Button
 
     protected void updateLabel()
     {
-        ArrayList<String> validNames = FileHandler.getMobIconSetNames();
-        if (!validNames.contains(mapProperties.getEntityIconSetName().get()))
+        if (!validNames.contains(valueHolder.get()))
         {
-            mapProperties.getEntityIconSetName().set(validNames.get(0));
-            mapProperties.save();
+            valueHolder.set(validNames.get(0));
+            baseProperties.save();
         }
 
-        displayString = getSafeLabel(mapProperties.getEntityIconSetName().get());
+        displayString = getSafeLabel(valueHolder.get());
     }
 
     protected String getSafeLabel(String label)
@@ -63,7 +65,7 @@ public class IconSetButton extends Button
     public int getFitWidth(FontRenderer fr)
     {
         int maxWidth = 0;
-        for (String iconSetName : FileHandler.getMobIconSetNames())
+        for (String iconSetName : validNames)
         {
             String name = getSafeLabel(iconSetName);
             maxWidth = Math.max(maxWidth, FMLClientHandler.instance().getClient().fontRenderer.getStringWidth(name));
@@ -74,16 +76,15 @@ public class IconSetButton extends Button
     @Override
     public void toggle()
     {
-        ArrayList<String> validNames = FileHandler.getMobIconSetNames();
-        int index = validNames.indexOf(mapProperties.getEntityIconSetName().get()) + 1;
+        int index = validNames.indexOf(valueHolder.get()) + 1;
 
         if (index == validNames.size() || index < 0)
         {
             index = 0;
         }
 
-        mapProperties.getEntityIconSetName().set(validNames.get(index));
-        mapProperties.save();
+        valueHolder.set(validNames.get(index));
+        baseProperties.save();
 
         updateLabel();
     }

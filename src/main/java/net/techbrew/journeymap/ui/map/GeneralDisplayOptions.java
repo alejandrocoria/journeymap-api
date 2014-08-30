@@ -13,6 +13,7 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -127,8 +128,8 @@ public class GeneralDisplayOptions extends JmUI
         rightRows.add(rowTextureSize);
 
         rowIconSets = new ButtonList(Constants.getString("jm.common.mob_icon_set", ""));
-        rowIconSets.add(new IconSetButton(id++, fullMap, "%s"));
-        rowIconSets.add(new IconSetButton(id++, miniMap, "%s"));
+        rowIconSets.add(new IconSetButton(id++, fullMap, fullMap.entityIconSetName, IconSetFileHandler.getEntityIconSetNames(), "%s"));
+        rowIconSets.add(new IconSetButton(id++, miniMap, miniMap.entityIconSetName, IconSetFileHandler.getEntityIconSetNames(), "%s"));
         rightRows.add(rowIconSets);
 
         int commonWidth = getFontRenderer().getStringWidth(labelOn);

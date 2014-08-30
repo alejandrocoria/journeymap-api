@@ -36,6 +36,7 @@ public class Constants
     public static String ICON_DIR = JOURNEYMAP_DIR + "icon" + File.separator; //$NON-NLS-1$
     public static String ENTITY_ICON_DIR = ICON_DIR + File.separator + "entity" + File.separator; //$NON-NLS-1$
     public static String WAYPOINT_ICON_DIR = ICON_DIR + File.separator + "waypoint" + File.separator; //$NON-NLS-1$
+    public static String SKIN_ICON_DIR = ICON_DIR + File.separator + "skin" + File.separator; //$NON-NLS-1$
     public static String CACHE_DIR = JOURNEYMAP_DIR + "cache" + File.separator; //$NON-NLS-1$
     public static String DATA_DIR = JOURNEYMAP_DIR + "data" + File.separator; //$NON-NLS-1$
     public static String SP_DATA_DIR = DATA_DIR + WorldType.sp + File.separator;

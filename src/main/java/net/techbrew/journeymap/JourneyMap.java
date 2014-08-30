@@ -25,6 +25,7 @@ import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.forgehandler.EventHandlerManager;
 import net.techbrew.journeymap.io.FileHandler;
+import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.JMLogger;
@@ -246,8 +247,8 @@ public class JourneyMap
             // Resets detection results of Voxel/Rei's
             WaypointsData.enableRecheck();
 
-            // Ensure all mob icons files are ready for use.
-            FileHandler.initMobIconSets();
+            // Ensure all icons are ready for use.
+            IconSetFileHandler.initialize();
 
             // Webserver
             JMServer.setEnabled(webMapProperties.enabled.get(), false);

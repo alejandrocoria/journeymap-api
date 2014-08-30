@@ -9,8 +9,9 @@
 package net.techbrew.journeymap.properties;
 
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.io.FileHandler;
+import net.techbrew.journeymap.io.IconSetFileHandler;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -42,10 +43,11 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
 
         AtomicReference<String> entityIconSetName = getEntityIconSetName();
 
-        if (entityIconSetName.get() == null || !FileHandler.getMobIconSetNames().contains(entityIconSetName.get()))
+        List<String> validNames = IconSetFileHandler.getEntityIconSetNames();
+        if (entityIconSetName.get() == null || !validNames.contains(entityIconSetName.get()))
         {
             JourneyMap.getLogger().warn(String.format("Entity Icon Set name '%s' is not valid, will use default instead.", entityIconSetName.get()));
-            entityIconSetName.set(FileHandler.getMobIconSetNames().get(0));
+            entityIconSetName.set(validNames.get(0));
             saveNeeded = true;
         }
 

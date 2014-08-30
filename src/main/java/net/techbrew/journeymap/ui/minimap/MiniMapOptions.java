@@ -11,6 +11,7 @@ package net.techbrew.journeymap.ui.minimap;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.ui.*;
@@ -108,7 +109,7 @@ public class MiniMapOptions extends JmUI
         buttonGeneralDisplay = new Button(ButtonEnum.GeneralDisplay,
                 Constants.getString("jm.common.general_display_button"));
 
-        buttonIconSet = new IconSetButton(ButtonEnum.IconSet.ordinal(), miniMapProperties, "jm.common.mob_icon_set");
+        buttonIconSet = new IconSetButton(ButtonEnum.IconSet.ordinal(), miniMapProperties, miniMapProperties.entityIconSetName, IconSetFileHandler.getEntityIconSetNames(), "jm.common.mob_icon_set");
 
         buttonCustomSize = SliderButton.create(ButtonEnum.CustomSize.ordinal(), miniMapProperties.customSize, 64, 1024, "jm.minimap.custom_size", false);
         buttonTerrainAlpha = SliderButton.create(ButtonEnum.TerrainAlpha.ordinal(), miniMapProperties.terrainAlpha, 1, 255, "jm.minimap.terrain_alpha", true);
