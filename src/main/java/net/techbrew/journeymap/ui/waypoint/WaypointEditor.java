@@ -182,11 +182,9 @@ public class WaypointEditor extends JmUI
 
                 buttonRemove = new Button(ButtonEnum.Remove, Constants.getString("jm.waypoint.remove")); //$NON-NLS-1$
                 buttonRemove.setEnabled(!isNew);
-                buttonRemove.setNoDisableText(true);
 
                 buttonReset = new Button(ButtonEnum.Reset, Constants.getString("jm.waypoint.reset")); //$NON-NLS-1$
                 buttonSave = new Button(ButtonEnum.Save, Constants.getString("jm.waypoint.save")); //$NON-NLS-1$
-                buttonSave.setNoDisableText(true);
 
                 String closeLabel = isNew ? "jm.waypoint.cancel" : "jm.common.close";
                 buttonClose = new Button(ButtonEnum.Close, Constants.getString(closeLabel));

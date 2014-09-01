@@ -36,16 +36,9 @@ public class AutoMapConfirmation extends JmUI
         buttonList.clear();
 
         buttonAll = new Button(ButtonEnum.All.ordinal(), Constants.getString("jm.common.automap_dialog_all"));
-        buttonAll.setNoDisableText(true);
-
         buttonMissing = new Button(ButtonEnum.Missing.ordinal(), Constants.getString("jm.common.automap_dialog_missing"));
-        buttonMissing.setNoDisableText(true);
-
         buttonNone = new Button(ButtonEnum.None.ordinal(), Constants.getString("jm.common.automap_dialog_none"));
-        buttonNone.setNoDisableText(true);
-
         buttonClose = new Button(ButtonEnum.None.ordinal(), Constants.getString("jm.common.close"));
-        buttonClose.setNoDisableText(true);
 
         boolean enable = !JourneyMap.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);
         buttonAll.setEnabled(enable);

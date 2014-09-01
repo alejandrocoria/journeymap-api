@@ -75,9 +75,6 @@ public class WaypointOptions extends JmUI
 
         new ButtonList(buttonList).equalizeWidths(getFontRenderer());
 
-        listLeftButtons.setNoDisableText(true);
-        listRightButtons.setNoDisableText(true);
-
         updateButtons();
     }
 

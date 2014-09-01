@@ -246,7 +246,7 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
                         if (manager.canUserTeleport && buttonTeleport.mouseOver(mouseX, mouseY))
                         {
                             new CmdTeleportWaypoint(waypoint).run();
-                            MapOverlay.state().follow = true;
+                            MapOverlay.state().follow.set(true);
                             UIManager.getInstance().closeAll();
                             return;
                         }

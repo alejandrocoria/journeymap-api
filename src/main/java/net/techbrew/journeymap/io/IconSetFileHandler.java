@@ -26,7 +26,7 @@ public class IconSetFileHandler
     public final static String MOB_ICON_SET_3D = "3D";
 
     public static final String ASSETS_JOURNEYMAP_ICON_SKIN = "/assets/journeymap/icon/skin";
-    public final static String SKIN_VICTORIAN = "Victorian";
+    public final static String SKIN_VICTORIAN = "Victorian1_0";
 
     public static void initialize()
     {

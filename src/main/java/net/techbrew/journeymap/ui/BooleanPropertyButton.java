@@ -31,7 +31,6 @@ public class BooleanPropertyButton extends Button
         if (properties == null || valueHolder == null)
         {
             this.setEnabled(false);
-            this.setNoDisableText(true);
         }
     }
 

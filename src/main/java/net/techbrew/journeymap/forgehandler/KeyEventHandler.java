@@ -42,18 +42,6 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
         }
     }
 
-    @Override
-    public EnumSet<EventHandlerManager.BusType> getBus()
-    {
-        return EnumSet.of(EventHandlerManager.BusType.FMLCommonHandlerBus);
-    }
-
-    @SubscribeEvent()
-    public void onKeyboardEvent(InputEvent.KeyInputEvent event)
-    {
-        KeyEventHandler.onKeypress(false);
-    }
-
     public static void onKeypress(boolean minimapOnly)
     {
         final int i = Keyboard.getEventKey();
@@ -64,7 +52,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             if (JourneyMap.getMiniMapProperties().enableHotkeys.get())
             {
                 // This seems to prevent the keycode from "staying"
-                boolean controlDown =  Keyboard.isKeyDown(29) || Keyboard.isKeyDown(157);
+                boolean controlDown = Keyboard.isKeyDown(29) || Keyboard.isKeyDown(157);
                 //GuiScreen.isCtrlKeyDown();
 
                 if (controlDown && Constants.isPressed(Constants.KB_MAP))
@@ -84,12 +72,12 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 }
                 else if (Constants.isPressed(Constants.KB_MAP_DAY))
                 {
-                    mapOverlayState.overrideMapType(Constants.MapType.day);
+                    mapOverlayState.setMapType(Constants.MapType.day);
                     return;
                 }
                 else if (Constants.isPressed(Constants.KB_MAP_NIGHT))
                 {
-                    mapOverlayState.overrideMapType(Constants.MapType.night);
+                    mapOverlayState.setMapType(Constants.MapType.night);
                     return;
                 }
                 else if (Constants.isPressed(Constants.KB_MINIMAP_POS))
@@ -140,6 +128,18 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
         {
 
         }
+    }
+
+    @Override
+    public EnumSet<EventHandlerManager.BusType> getBus()
+    {
+        return EnumSet.of(EventHandlerManager.BusType.FMLCommonHandlerBus);
+    }
+
+    @SubscribeEvent()
+    public void onKeyboardEvent(InputEvent.KeyInputEvent event)
+    {
+        KeyEventHandler.onKeypress(false);
     }
 }
 

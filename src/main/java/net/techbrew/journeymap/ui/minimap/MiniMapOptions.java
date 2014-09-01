@@ -119,10 +119,8 @@ public class MiniMapOptions extends JmUI
                 "jm.minimap.orientation.button", miniMapProperties, miniMapProperties.orientation);
 
         leftButtons = new ButtonList(buttonShape, buttonCustomSize, buttonShowfps, buttonShowSelf, buttonKeyboard, buttonKeyboardHelp, buttonGeneralDisplay);
-        leftButtons.setNoDisableText(true);
 
         rightButtons = new ButtonList(buttonPosition, buttonFont, buttonUnicode, buttonTexture, buttonOrientation, buttonIconSet, buttonTerrainAlpha, buttonFrameAlpha);
-        rightButtons.setNoDisableText(true);
 
         buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
         buttonCloseAll = new Button(ButtonEnum.CloseAll, Constants.getString("jm.minimap.return_to_game")); //$NON-NLS-1$

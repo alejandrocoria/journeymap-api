@@ -377,7 +377,7 @@ public class JourneyMap
         loadConfigProperties();
         DataCache.instance().purge();
         chunkRenderController = new ChunkRenderController();
-        MapOverlay.state().follow = true;
+        MapOverlay.state().follow.set(true);
         StatTimer.resetAll();
         TextureCache.instance().purge();
         TileCache.instance().invalidateAll();

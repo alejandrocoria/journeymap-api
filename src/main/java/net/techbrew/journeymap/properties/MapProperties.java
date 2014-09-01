@@ -8,6 +8,7 @@
 
 package net.techbrew.journeymap.properties;
 
+import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 
@@ -35,6 +36,8 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
     }
 
     public abstract AtomicReference<String> getEntityIconSetName();
+
+    public abstract AtomicReference<Constants.MapType> getPreferredMapType();
 
     @Override
     protected boolean validate()

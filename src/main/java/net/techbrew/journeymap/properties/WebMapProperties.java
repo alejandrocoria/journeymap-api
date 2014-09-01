@@ -8,6 +8,8 @@
 
 package net.techbrew.journeymap.properties;
 
+import net.techbrew.journeymap.Constants;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -22,6 +24,7 @@ public class WebMapProperties extends MapProperties
     public final AtomicInteger port = new AtomicInteger(8080);
     public final AtomicInteger browserPoll = new AtomicInteger(2000);
     public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("3D");
+    public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
     protected transient final String name = "webmap";
 
     public WebMapProperties()
@@ -32,6 +35,12 @@ public class WebMapProperties extends MapProperties
     public AtomicReference<String> getEntityIconSetName()
     {
         return entityIconSetName;
+    }
+
+    @Override
+    public AtomicReference<Constants.MapType> getPreferredMapType()
+    {
+        return preferredMapType;
     }
 
     @Override

@@ -8,6 +8,7 @@
 
 package net.techbrew.journeymap.properties;
 
+import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.ui.minimap.DisplayVars;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -27,6 +28,7 @@ public class MiniMapProperties extends InGameMapProperties
     public final AtomicBoolean enableHotkeys = new AtomicBoolean(true);
     public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
     public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("2D");
+    public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
     public final AtomicInteger customSize = new AtomicInteger(0);
     public final AtomicInteger frameAlpha = new AtomicInteger(255);
     public final AtomicReference<DisplayVars.Orientation> orientation = new AtomicReference<DisplayVars.Orientation>(DisplayVars.Orientation.North);
@@ -40,6 +42,12 @@ public class MiniMapProperties extends InGameMapProperties
     public AtomicReference<String> getEntityIconSetName()
     {
         return entityIconSetName;
+    }
+
+    @Override
+    public AtomicReference<Constants.MapType> getPreferredMapType()
+    {
+        return preferredMapType;
     }
 
     @Override

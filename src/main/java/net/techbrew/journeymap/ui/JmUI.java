@@ -14,6 +14,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.RenderHelper;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -24,6 +25,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 public abstract class JmUI extends GuiScreen
 {
@@ -33,7 +35,7 @@ public abstract class JmUI extends GuiScreen
     protected final Logger logger = JourneyMap.getLogger();
     protected final Class<? extends JmUI> returnClass;
     protected int scaleFactor = 1;
-    TextureImpl logo = TextureCache.instance().getLogo();
+    protected TextureImpl logo = TextureCache.instance().getLogo();
 
     public JmUI(String title)
     {
@@ -90,15 +92,15 @@ public abstract class JmUI extends GuiScreen
         sizeDisplay(glwidth, glheight);
     }
 
-    protected boolean mouseOverButtons(int x, int y)
+    protected boolean isMouseOverButton(int mouseX, int mouseY, int which)
     {
-
         for (int k = 0; k < this.buttonList.size(); ++k)
         {
             GuiButton guibutton = (GuiButton) this.buttonList.get(k);
             if (guibutton instanceof Button)
             {
-                if (((Button) guibutton).mouseOver(x, y))
+                Button button = (Button) guibutton;
+                if (button.mouseOver(mouseX, mouseY))
                 {
                     return true;
                 }
@@ -106,6 +108,23 @@ public abstract class JmUI extends GuiScreen
         }
         return false;
     }
+
+    //    protected boolean mouseOverButtons(int x, int y)
+//    {
+//        for (int k = 0; k < this.buttonList.size(); ++k)
+//        {
+//            GuiButton guibutton = (GuiButton) this.buttonList.get(k);
+//            if (guibutton instanceof Button)
+//            {
+//                Button button = (Button) guibutton;
+//                if (button.mouseOver(x, y))
+//                {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
     protected void drawLogo()
     {
@@ -144,22 +163,28 @@ public abstract class JmUI extends GuiScreen
             drawBackground(0);
             layoutButtons();
 
+            ArrayList<String> tooltip = null;
             for (int k = 0; k < this.buttonList.size(); ++k)
             {
                 GuiButton guibutton = (GuiButton) this.buttonList.get(k);
                 guibutton.drawButton(this.mc, x, y);
-            }
-
-            for (int k = 0; k < this.buttonList.size(); ++k)
-            {
-                GuiButton guibutton = (GuiButton) this.buttonList.get(k);
-                if (guibutton instanceof Button)
+                if (tooltip == null)
                 {
-                    if (!((Button) guibutton).isEnabled() && !((Button) guibutton).isNoDisableText())
+                    if (guibutton instanceof Button)
                     {
-                        ((Button) guibutton).drawButton(this.mc, x, y);
+                        Button button = (Button) guibutton;
+                        if (button.mouseOver(x, y))
+                        {
+                            tooltip = button.getTooltip();
+                        }
                     }
                 }
+            }
+
+            if (tooltip != null && !tooltip.isEmpty())
+            {
+                drawHoveringText(tooltip, x, y, getFontRenderer());
+                RenderHelper.disableStandardItemLighting();
             }
 
             drawTitle();

@@ -384,7 +384,7 @@ public class TextureCache
             {
                 File parentDir = IconSetFileHandler.getSkinIconDir();
                 String assetPath = IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_SKIN;
-                BufferedImage img = IconSetFileHandler.getIconFromFile(parentDir, assetPath, setName, iconPath, getUnknownEntity().getImage()); //$NON-NLS-1$
+                BufferedImage img = IconSetFileHandler.getIconFromFile(parentDir, assetPath, setName, iconPath, null); //$NON-NLS-1$
                 if (img != null)
                 {
                     if (tex != null)
@@ -393,6 +393,11 @@ public class TextureCache
                     }
                     tex = new TextureImpl(img);
                     uiSkinIcons.put(texName, tex);
+                }
+                else
+                {
+                    JourneyMap.getLogger().error("Unknown skin UI image: " + setName + "/" + iconPath);
+                    return getUnknownEntity();
                 }
             }
             return tex;

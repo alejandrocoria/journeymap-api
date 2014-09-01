@@ -13,6 +13,7 @@ import net.minecraft.client.gui.FontRenderer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -315,15 +316,6 @@ public class ButtonList extends ArrayList<Button>
         return horizontal;
     }
 
-    public ButtonList setNoDisableText(boolean noDisableText)
-    {
-        for (Button button : this)
-        {
-            button.setNoDisableText(noDisableText);
-        }
-        return this;
-    }
-
     public ButtonList setEnabled(boolean enabled)
     {
         for (Button button : this)
@@ -450,5 +442,11 @@ public class ButtonList extends ArrayList<Button>
     public void setLabel(String label)
     {
         this.label = label;
+    }
+
+    public ButtonList reverse()
+    {
+        Collections.reverse(this);
+        return this;
     }
 }

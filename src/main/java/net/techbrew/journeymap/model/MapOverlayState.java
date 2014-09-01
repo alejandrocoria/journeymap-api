@@ -9,7 +9,6 @@
 package net.techbrew.journeymap.model;
 
 
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.techbrew.journeymap.Constants;
@@ -31,6 +30,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MapOverlayState
 {
@@ -40,12 +40,12 @@ public class MapOverlayState
     // One-time setup
     final CoreProperties coreProperties = JourneyMap.getCoreProperties();
     // These can be safely changed at will
-    public boolean follow = true;
+    public AtomicBoolean follow = new AtomicBoolean(true);
 
     public String playerLastPos = "0,0"; //$NON-NLS-1$
 
     // These must be internally managed
-    private Constants.MapType overrideMapType;
+    private Constants.MapType preferredMapType;
     private File worldDir = null;
     private long lastRefresh = 0;
     private Integer vSlice = null;
@@ -73,6 +73,7 @@ public class MapOverlayState
         final MapType lastMapType = getMapType(showCaves);
         lastMapProperties = mapProperties;
 
+        this.preferredMapType = mapProperties.getPreferredMapType().get();
         this.caveMappingAllowed = FeatureManager.isAllowed(Feature.MapCaves);
         this.dimension = player.dimension;
         this.underground = DataCache.getPlayer().underground;
@@ -84,19 +85,19 @@ public class MapOverlayState
 
         if (player.dimension != this.dimension)
         {
-            follow = true;
+            follow.set(true);
         }
         else
         {
             if (!worldDir.equals(this.worldDir))
             {
-                follow = true;
+                follow.set(true);
             }
             else
             {
                 if (getMapType(showCaves) == MapType.underground && lastMapType != MapType.underground)
                 {
-                    follow = true;
+                    follow.set(true);
                 }
             }
         }
@@ -106,9 +107,13 @@ public class MapOverlayState
         updateLastRefresh();
     }
 
-    public void overrideMapType(MapType mapType)
+    public void setMapType(MapType mapType)
     {
-        overrideMapType = mapType;
+        if (mapType == MapType.day || mapType == MapType.night)
+        {
+            lastMapProperties.getPreferredMapType().set(mapType);
+        }
+        preferredMapType = mapType;
         requireRefresh();
     }
 
@@ -120,15 +125,7 @@ public class MapOverlayState
         }
         else
         {
-            if (overrideMapType != null)
-            {
-                return overrideMapType;
-            }
-            else
-            {
-                final long ticks = (FMLClientHandler.instance().getClient().theWorld.getWorldTime() % 24000L);
-                return (ticks < 13800) ? Constants.MapType.day : Constants.MapType.night;
-            }
+            return preferredMapType;
         }
     }
 
@@ -310,4 +307,8 @@ public class MapOverlayState
         return false;
     }
 
+    public boolean isCaveMappingAllowed()
+    {
+        return caveMappingAllowed;
+    }
 }

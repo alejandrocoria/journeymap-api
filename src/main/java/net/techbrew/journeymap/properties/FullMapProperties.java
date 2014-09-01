@@ -8,6 +8,8 @@
 
 package net.techbrew.journeymap.properties;
 
+import net.techbrew.journeymap.Constants;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -20,6 +22,7 @@ public class FullMapProperties extends InGameMapProperties
     public final AtomicBoolean showCaves = new AtomicBoolean(true);
     public final AtomicBoolean showGrid = new AtomicBoolean(true);
     public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("3D");
+    public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
     protected transient final String name = "fullmap";
 
     public FullMapProperties()
@@ -30,6 +33,12 @@ public class FullMapProperties extends InGameMapProperties
     public AtomicReference<String> getEntityIconSetName()
     {
         return entityIconSetName;
+    }
+
+    @Override
+    public AtomicReference<Constants.MapType> getPreferredMapType()
+    {
+        return preferredMapType;
     }
 
     @Override

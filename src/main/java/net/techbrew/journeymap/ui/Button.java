@@ -11,12 +11,14 @@ package net.techbrew.journeymap.ui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.util.EnumChatFormatting;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.render.draw.DrawUtil;
+import net.techbrew.journeymap.ui.adapter.PropertyAdapter;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * A glom of extra functionality to try to make buttons less sucky to use.
@@ -28,17 +30,16 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected static Color smallBgColor = new Color(100, 100, 100);
     protected static Color smallBgHoverColor = new Color(125, 135, 190);
     protected Boolean toggled = true;
-    protected String icon;
-    protected DynamicTexture iconTexture;
     protected String labelOn;
     protected String labelOff;
     protected boolean enabled;
     protected boolean drawButton;
-    protected boolean noDisableText;
     protected boolean drawFrame;
     protected boolean drawBackground;
+    protected boolean showDisabledHoverText;
     protected boolean defaultStyle = true;
     protected ToggleListener toggleListener;
+    protected PropertyAdapter propertyAdapter;
 
     public Button(Enum enumValue, String label)
     {
@@ -121,6 +122,12 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         this.toggleListener = toggleListener;
     }
 
+    public void setPropertyAdapter(PropertyAdapter propertyAdapter, String rawLabel)
+    {
+        this.propertyAdapter = propertyAdapter;
+        propertyAdapter.setButton(this, rawLabel);
+    }
+
     public int getFitWidth(FontRenderer fr)
     {
         int max = fr.getStringWidth(displayString);
@@ -148,6 +155,11 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         this.drawTexturedModalRect(x + width / 2, y, 200 - width / 2, 46 + k * 20, width / 2, height);
     }
 
+    public void showDisabledOnHover(boolean show)
+    {
+        showDisabledHoverText = show;
+    }
+
     @Override
     public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
     {
@@ -168,7 +180,6 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             minecraft.getTextureManager().bindTexture(buttonTextures);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
-
 
             if (isDrawFrame())
             {
@@ -191,6 +202,10 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             if (!this.isEnabled())
             {
                 l = -6250336;
+
+                int alpha = 185;
+                int widthOffset = width - ((this.height >= 20) ? 3 : 2);
+                DrawUtil.drawRectangle(this.getX() + 1, this.getY() + 1, widthOffset, height - 2, Color.darkGray, alpha);
             }
             else
             {
@@ -202,64 +217,6 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
             this.drawCenteredString(fontrenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, l);
         }
-
-        if (!this.isEnabled())
-        {
-            boolean drawDisabledText = mouseOver(mouseX, mouseY) && !isNoDisableText();
-            int alpha = drawDisabledText ? 255 : 185;
-            if (this.height >= 20)
-            {
-                DrawUtil.drawRectangle(this.getX() + 1, this.getY() + 1, width - 3, height - 2, Color.darkGray, alpha);
-                if (drawDisabledText)
-                {
-                    this.drawCenteredString(minecraft.fontRenderer, Constants.getString("jm.common.disabled_feature"), this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, -6250336);
-                }
-            }
-            else
-            {
-                DrawUtil.drawRectangle(this.getX() + 1, this.getY() + 1, width - 2, height - 2, Color.darkGray, alpha);
-                this.drawCenteredString(minecraft.fontRenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, Color.darkGray.brighter().getRGB());
-            }
-        }
-
-        // TODO: Revive this
-//        if (this.icon != null)
-//        {
-//            Tessellator tessellator = Tessellator.instance;
-//            GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
-//            GL11.glDepthMask(false);
-//            GL11.glBlendFunc(770, 771);
-//            if (isEnabled())
-//            {
-//                GL11.glColor4f(1F, 1F, 1F, 1F);
-//            }
-//            else
-//            {
-//                GL11.glColor4f(.5F, .5F, .5F, 1F);
-//            }
-//            GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
-//            GL11.glBindTexture(GL11.GL_TEXTURE_2D, iconTexture.getGlTextureId());
-//            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-//            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-//
-//            // Preserve aspect ratio of source image
-//            int height = getHeight();
-//            int width = getWidth();
-//            int w = getToggled() ? width : (int) Math.ceil(width * .6);
-//            int h = getToggled() ? height : (int) Math.ceil(height * .6);
-//            int widthOffset = (width - w) / 2;
-//            int heightOffset = (height - h);
-//
-//            tessellator.startDrawingQuads();
-//            int xPosition = getX();
-//            int yPosition = getY();
-//            tessellator.addVertexWithUV(xPosition + widthOffset, h + yPosition + heightOffset, 0.0D, 0, 1);
-//            tessellator.addVertexWithUV(xPosition + w + widthOffset, h + yPosition + heightOffset, 0.0D, 1, 1);
-//            tessellator.addVertexWithUV(xPosition + w + widthOffset, yPosition + heightOffset, 0.0D, 1, 0);
-//            tessellator.addVertexWithUV(xPosition + widthOffset, yPosition + heightOffset, 0.0D, 0, 0);
-//            tessellator.draw();
-//        }
-
     }
 
     public void drawUnderline()
@@ -276,6 +233,16 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return isEnabled() && isDrawButton() && i >= getX() && j >= getY() && i < getX() + getWidth() && j < getY() + getHeight();
     }
 
+    public ArrayList<String> getTooltip()
+    {
+        ArrayList<String> list = new ArrayList<String>();
+        if (!this.enabled && showDisabledHoverText)
+        {
+            list.add(EnumChatFormatting.ITALIC + Constants.getString("jm.common.disabled_feature"));
+        }
+        return list;
+    }
+
     public boolean mouseOver(int mouseX, int mouseY)
     {
         return mouseX >= this.xPosition && mouseY >= this.yPosition
@@ -290,9 +257,14 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public void setToggled(Boolean toggled)
     {
+        setToggled(toggled, true);
+    }
+
+    public void setToggled(Boolean toggled, boolean notifyToggleListener)
+    {
         this.toggled = toggled;
         updateLabel();
-        if (toggleListener != null)
+        if (notifyToggleListener && toggleListener != null)
         {
             toggleListener.onToggle(this, toggled);
         }
@@ -520,16 +492,6 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public void setDrawButton(boolean drawButton)
     {
         this.drawButton = drawButton;
-    }
-
-    public boolean isNoDisableText()
-    {
-        return noDisableText;
-    }
-
-    public void setNoDisableText(boolean noDisableText)
-    {
-        this.noDisableText = noDisableText;
     }
 
     public boolean isDrawFrame()
