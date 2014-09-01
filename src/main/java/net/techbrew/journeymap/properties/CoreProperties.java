@@ -49,7 +49,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public final AtomicBoolean mapPlants = new AtomicBoolean(true);
     public final AtomicBoolean mapCrops = new AtomicBoolean(true);
     public final AtomicBoolean mapSurfaceAboveCaves = new AtomicBoolean(true);
-    public final AtomicReference<String> skinIconSetName = new AtomicReference<String>("Victorian1_0");
+    public final AtomicReference<String> themeName = new AtomicReference<String>("Victorian1_0");
     protected transient final String name = "core";
 
     public CoreProperties()
@@ -61,11 +61,11 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     {
         boolean saveNeeded = super.validate();
 
-        List<String> validNames = IconSetFileHandler.getSkinIconSetNames();
-        if (skinIconSetName.get() == null || !validNames.contains(skinIconSetName.get()))
+        List<String> validNames = IconSetFileHandler.getThemeNames();
+        if (themeName.get() == null || !validNames.contains(themeName.get()))
         {
-            JourneyMap.getLogger().warn(String.format("Skin Icon Set name '%s' is not valid, will use default instead.", skinIconSetName.get()));
-            skinIconSetName.set(validNames.get(0));
+            JourneyMap.getLogger().warn(String.format("Skin Icon Set name '%s' is not valid, will use default instead.", themeName.get()));
+            themeName.set(validNames.get(0));
             saveNeeded = true;
         }
 

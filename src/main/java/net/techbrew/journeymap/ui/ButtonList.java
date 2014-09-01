@@ -25,6 +25,11 @@ public class ButtonList extends ArrayList<Button>
 
     private String label;
 
+    public ButtonList()
+    {
+
+    }
+
     public ButtonList(String label)
     {
         this.label = label;

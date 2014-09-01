@@ -25,27 +25,27 @@ public class IconSetFileHandler
     public final static String MOB_ICON_SET_2D = "2D";
     public final static String MOB_ICON_SET_3D = "3D";
 
-    public static final String ASSETS_JOURNEYMAP_ICON_SKIN = "/assets/journeymap/icon/skin";
-    public final static String SKIN_VICTORIAN = "Victorian1_0";
+    public static final String ASSETS_JOURNEYMAP_ICON_THEME = "/assets/journeymap/icon/theme";
+    public final static String THEME_VICTORIAN = "Victorian1_0";
 
     public static void initialize()
     {
         JourneyMap.getLogger().info("Initializing icon sets...");
 
-        // Skin icons
-        for (String setName : Arrays.asList(SKIN_VICTORIAN))
+        // Theme icons
+        for (String setName : Arrays.asList(THEME_VICTORIAN))
         {
-            copyResources(getSkinIconDir(), ASSETS_JOURNEYMAP_ICON_SKIN, setName);
+            copyResources(getThemeIconDir(), ASSETS_JOURNEYMAP_ICON_THEME, setName, true);
         }
 
         // Mob icons
         for (String setName : Arrays.asList(MOB_ICON_SET_2D, MOB_ICON_SET_3D))
         {
-            copyResources(getEntityIconDir(), ASSETS_JOURNEYMAP_ICON_ENTITY, setName);
+            copyResources(getEntityIconDir(), ASSETS_JOURNEYMAP_ICON_ENTITY, setName, false);
         }
     }
 
-    private static void copyResources(File targetDirectory, String assetsPath, String setName)
+    private static void copyResources(File targetDirectory, String assetsPath, String setName, boolean overwrite)
     {
         try
         {
@@ -56,12 +56,12 @@ public class IconSetFileHandler
             if (inJar)
             {
                 String fromPath = resourceDir.getPath().split("file:")[1].split("!/")[0];
-                FileHandler.copyFromZip(fromPath, toPath, toDir, false);
+                FileHandler.copyFromZip(fromPath, toPath, toDir, overwrite);
             }
             else
             {
                 File fromDir = new File(JourneyMap.class.getResource(toPath).getFile());
-                FileHandler.copyFromDirectory(fromDir, toDir, false);
+                FileHandler.copyFromDirectory(fromDir, toDir, overwrite);
             }
         }
         catch (Throwable t)
@@ -80,9 +80,9 @@ public class IconSetFileHandler
         return dir;
     }
 
-    public static File getSkinIconDir()
+    public static File getThemeIconDir()
     {
-        File dir = new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.SKIN_ICON_DIR);
+        File dir = new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.THEME_ICON_DIR);
         if (!dir.exists())
         {
             dir.mkdirs();
@@ -95,9 +95,9 @@ public class IconSetFileHandler
         return getIconSetNames(getEntityIconDir(), MOB_ICON_SET_2D, MOB_ICON_SET_3D);
     }
 
-    public static ArrayList<String> getSkinIconSetNames()
+    public static ArrayList<String> getThemeNames()
     {
-        return getIconSetNames(getSkinIconDir(), SKIN_VICTORIAN);
+        return getIconSetNames(getThemeIconDir(), THEME_VICTORIAN);
     }
 
     public static ArrayList<String> getIconSetNames(File parentDir, String... defaultIconSets)

@@ -171,7 +171,7 @@ public class FileService extends BaseService
             else if (path.startsWith(ICON_SKIN_PATH_PREFIX))
             {
                 String skinIconPath = path.split(ICON_SKIN_PATH_PREFIX)[1].replace('/', File.separatorChar);
-                File iconFile = new File(IconSetFileHandler.getSkinIconDir(), skinIconPath);
+                File iconFile = new File(IconSetFileHandler.getThemeIconDir(), skinIconPath);
                 if (!iconFile.exists())
                 {
                     // Fallback to jar asset
@@ -182,8 +182,8 @@ public class FileService extends BaseService
                     {
                         ResponseHeader.on(event).contentType(ContentType.png);
                     }
-                    fileStream = IconSetFileHandler.getIconStream(IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_SKIN, setName, iconPath);
-                    JourneyMap.getLogger().warn("Couldn't get file for " + path);
+                    fileStream = IconSetFileHandler.getIconStream(IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_THEME, setName, iconPath);
+                    JourneyMap.getLogger().warn("Couldn't get theme file for " + path);
                 }
                 else
                 {

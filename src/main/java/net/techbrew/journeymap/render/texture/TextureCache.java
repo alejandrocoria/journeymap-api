@@ -42,7 +42,7 @@ public class TextureCache
     //private final Map<String, TextureImpl> customTextures = Collections.synchronizedMap(new HashMap<String, TextureImpl>(3));
     private final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<String, TextureImpl> entityIcons = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
-    private final Map<String, TextureImpl> uiSkinIcons = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
+    private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private ThreadPoolExecutor texExec = (ThreadPoolExecutor) Executors.newFixedThreadPool(3, new JMThreadFactory("texture"));
 
     private TextureCache()
@@ -374,17 +374,17 @@ public class TextureCache
         }
     }
 
-    public TextureImpl getUiSkinTexture(String setName, String iconPath)
+    public TextureImpl getThemeTexture(String themeName, String iconPath)
     {
-        String texName = String.format("%s/%s", setName, iconPath);
-        synchronized (uiSkinIcons)
+        String texName = String.format("%s/%s", themeName, iconPath);
+        synchronized (themeImages)
         {
-            TextureImpl tex = uiSkinIcons.get(texName);
+            TextureImpl tex = themeImages.get(texName);
             if (tex == null || (!tex.hasImage() && tex.retainImage))
             {
-                File parentDir = IconSetFileHandler.getSkinIconDir();
-                String assetPath = IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_SKIN;
-                BufferedImage img = IconSetFileHandler.getIconFromFile(parentDir, assetPath, setName, iconPath, null); //$NON-NLS-1$
+                File parentDir = IconSetFileHandler.getThemeIconDir();
+                String assetPath = IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_THEME;
+                BufferedImage img = IconSetFileHandler.getIconFromFile(parentDir, assetPath, themeName, iconPath, null); //$NON-NLS-1$
                 if (img != null)
                 {
                     if (tex != null)
@@ -392,11 +392,11 @@ public class TextureCache
                         tex.deleteTexture();
                     }
                     tex = new TextureImpl(img);
-                    uiSkinIcons.put(texName, tex);
+                    themeImages.put(texName, tex);
                 }
                 else
                 {
-                    JourneyMap.getLogger().error("Unknown skin UI image: " + setName + "/" + iconPath);
+                    JourneyMap.getLogger().error("Unknown theme image: " + themeName + "/" + iconPath);
                     return getUnknownEntity();
                 }
             }

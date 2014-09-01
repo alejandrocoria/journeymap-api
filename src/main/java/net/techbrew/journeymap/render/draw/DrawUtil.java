@@ -323,7 +323,12 @@ public class DrawUtil
 
     public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float scale, double rotation)
     {
-        drawQuad(texture, x, y, (int) (texture.width * scale), (int) (texture.height * scale), flip, rotation);
+        drawQuad(texture, x, y, (texture.width * scale), (texture.height * scale), flip, rotation);
+    }
+
+    public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y, float scale, double rotation)
+    {
+        drawQuad(texture, x, y, (texture.width * scale), (texture.height * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y, double rotation)

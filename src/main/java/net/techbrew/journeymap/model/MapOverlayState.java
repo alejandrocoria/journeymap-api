@@ -117,6 +117,12 @@ public class MapOverlayState
         requireRefresh();
     }
 
+    public MapType getCurrentMapType()
+    {
+        boolean showCaves = JourneyMap.getFullMapProperties().showCaves.get();
+        return getMapType(showCaves);
+    }
+
     public MapType getMapType(boolean allowCaves)
     {
         if (underground && caveMappingAllowed && allowCaves)

@@ -34,9 +34,13 @@ import net.techbrew.journeymap.render.overlay.OverlayWaypointRenderer;
 import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.ui.Button;
-import net.techbrew.journeymap.ui.*;
+import net.techbrew.journeymap.ui.ButtonList;
+import net.techbrew.journeymap.ui.JmUI;
+import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.adapter.BooleanPropertyAdapter;
 import net.techbrew.journeymap.ui.map.layer.LayerDelegate;
+import net.techbrew.journeymap.ui.theme.ThemeButton;
+import net.techbrew.journeymap.ui.theme.ThemeToolbar;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
@@ -63,10 +67,11 @@ public class MapOverlay extends JmUI
     int msx, msy, mx, my;
     Logger logger = JourneyMap.getLogger();
     MapChat chat;
-    IconButton buttonFollow, buttonZoomIn, buttonZoomOut, buttonDay, buttonNight, buttonCaves;
-    IconButton buttonAlert, buttonOptions, buttonActions, buttonClose;
-    IconButton buttonMode, buttonWaypointManager;
-    ButtonList northWestButtons, northEastButtons, westButtons;
+    ThemeButton buttonFollow, buttonZoomIn, buttonZoomOut, buttonDay, buttonNight, buttonCaves;
+    ThemeButton buttonAlert, buttonOptions, buttonActions, buttonClose;
+    ThemeButton buttonMode, buttonWaypointManager;
+    ButtonList northEastButtons, westButtons;
+    ThemeToolbar northWestToolbar;
     Color bgColor = new Color(0x22, 0x22, 0x22);
     Color playerInfoFgColor = Color.lightGray;
     Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
@@ -176,14 +181,20 @@ public class MapOverlay extends JmUI
         switch (id)
         {
             case Day:
-            { // day or night
-                setMapType(Constants.MapType.day);
+            {
+                if (Constants.MapType.day != state.getCurrentMapType())
+                {
+                    setMapType(Constants.MapType.day);
+                }
                 break;
             }
 
             case Night:
-            { // day or night
-                setMapType(Constants.MapType.night);
+            {
+                if (Constants.MapType.night != state.getCurrentMapType())
+                {
+                    setMapType(Constants.MapType.night);
+                }
                 break;
             }
 
@@ -231,8 +242,10 @@ public class MapOverlay extends JmUI
             {
                 if (buttonCaves.isEnabled())
                 {
-                    buttonCaves.toggle();
-                    setMapType(Constants.MapType.underground);
+                    if (Constants.MapType.underground != state.getCurrentMapType())
+                    {
+                        setMapType(Constants.MapType.underground);
+                    }
                 }
                 break;
             }
@@ -278,44 +291,45 @@ public class MapOverlay extends JmUI
             Constants.MapType mapType = state.getMapType(fullMapProperties.showCaves.get());
             boolean underground = DataCache.getPlayer().underground;
 
-            buttonAlert = new IconButton(ButtonEnum.Alert, Constants.getString("jm.common.update_available"), IconButton.Style.Button, "alert"); 
+            buttonAlert = new ThemeButton(ButtonEnum.Alert, Constants.getString("jm.common.update_available"), ThemeButton.Style.Button, "alert");
             buttonAlert.setDrawButton(VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent());
 
-            buttonDay = new IconButton(ButtonEnum.Day, Constants.getString("jm.fullscreen.map_day"), IconButton.Style.Toggle, "day");
+            buttonDay = new ThemeButton(ButtonEnum.Day, Constants.getString("jm.fullscreen.map_day"), ThemeButton.Style.Toggle, "day");
             buttonDay.setEnabled(!mc.theWorld.provider.hasNoSky);
             buttonDay.setToggled(mapType == Constants.MapType.day, false);
 
-            buttonNight = new IconButton(ButtonEnum.Night, Constants.getString("jm.fullscreen.map_night"), IconButton.Style.Toggle, "night");
+            buttonNight = new ThemeButton(ButtonEnum.Night, Constants.getString("jm.fullscreen.map_night"), ThemeButton.Style.Toggle, "night");
             buttonNight.setEnabled(!mc.theWorld.provider.hasNoSky);
             buttonNight.setToggled(mapType == Constants.MapType.night, false);
 
-            buttonCaves = new IconButton(ButtonEnum.Caves, IconButton.Style.Toggle, "caves");
-            buttonCaves.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showCaves), "jm.common.show_caves");
+            buttonCaves = new ThemeButton(ButtonEnum.Caves, ThemeButton.Style.Toggle, "caves");
+            buttonCaves.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showCaves), "jm.fullscreen.map_caves");
             buttonCaves.setDrawButton(state.isCaveMappingAllowed());
             buttonCaves.setEnabled(underground && state.isCaveMappingAllowed() && !mc.theWorld.provider.hasNoSky);
 
-            buttonFollow = new IconButton(ButtonEnum.Follow, Constants.getString("jm.fullscreen.follow"), IconButton.Style.Button, "follow");
+            buttonFollow = new ThemeButton(ButtonEnum.Follow, Constants.getString("jm.fullscreen.follow"), ThemeButton.Style.Button, "follow");
 
-            buttonZoomIn = new IconButton(ButtonEnum.ZoomIn, Constants.getString("jm.fullscreen.zoom_in"), IconButton.Style.Button, "zoomin");
+            buttonZoomIn = new ThemeButton(ButtonEnum.ZoomIn, Constants.getString("jm.fullscreen.zoom_in"), ThemeButton.Style.Button, "zoomin");
             buttonZoomIn.setEnabled(fullMapProperties.zoomLevel.get() < state.maxZoom);
 
-            buttonZoomOut = new IconButton(ButtonEnum.ZoomOut, Constants.getString("jm.fullscreen.zoom_out"), IconButton.Style.Button, "zoomout");
+            buttonZoomOut = new ThemeButton(ButtonEnum.ZoomOut, Constants.getString("jm.fullscreen.zoom_out"), ThemeButton.Style.Button, "zoomout");
             buttonZoomOut.setEnabled(fullMapProperties.zoomLevel.get() > state.minZoom);
 
-            buttonWaypointManager = new IconButton(ButtonEnum.WaypointManager, Constants.getString("jm.waypoint.waypoints"), IconButton.Style.Button, "waypoints");
+            buttonWaypointManager = new ThemeButton(ButtonEnum.WaypointManager, Constants.getString("jm.waypoint.waypoints"), ThemeButton.Style.Button, "waypoints");
             buttonWaypointManager.setDrawButton(WaypointsData.isManagerEnabled());
 
-            buttonOptions = new IconButton(ButtonEnum.Options, Constants.getString("jm.common.options"), IconButton.Style.Button, "options");
+            buttonOptions = new ThemeButton(ButtonEnum.Options, Constants.getString("jm.common.options"), ThemeButton.Style.Button, "options");
 
-            buttonActions = new IconButton(ButtonEnum.Actions, Constants.getString("jm.common.actions"), IconButton.Style.Button, "actions");
+            buttonActions = new ThemeButton(ButtonEnum.Actions, Constants.getString("jm.common.actions"), ThemeButton.Style.Button, "actions");
 
-            buttonClose = new IconButton(ButtonEnum.Close, Constants.getString("jm.common.close"), IconButton.Style.Button, "close");
+            buttonClose = new ThemeButton(ButtonEnum.Close, Constants.getString("jm.common.close"), ThemeButton.Style.Button, "close");
 
-            northWestButtons = new ButtonList(buttonDay, buttonNight, buttonCaves);
+            northWestToolbar = new ThemeToolbar(0, buttonDay, buttonNight, buttonCaves);
             northEastButtons = new ButtonList(buttonAlert, buttonWaypointManager, buttonOptions, buttonActions, buttonClose).reverse();
             westButtons = new ButtonList(buttonFollow, buttonZoomIn, buttonZoomOut);
 
-            buttonList.addAll(northWestButtons);
+            buttonList.add(northWestToolbar);
+            buttonList.addAll(northWestToolbar.getButtonList());
             buttonList.addAll(northEastButtons);
             buttonList.addAll(westButtons);
         }
@@ -335,7 +349,7 @@ public class MapOverlay extends JmUI
 
         final int startX = 40;
         final int endX = width - 3;
-        final int startY = 3;
+        final int startY = 10;
         final int hgap = 3;
         final int vgap = 3;
 
@@ -344,10 +358,10 @@ public class MapOverlay extends JmUI
 
         westButtons.layoutVertical(3, 32, true, vgap);
 
-        northWestButtons.layoutHorizontal(startX, startY, true, hgap);
+        northWestToolbar.getButtonList().layoutHorizontal(startX, startY, true, hgap);
 
 
-        int rightX = northWestButtons.getRightX() + hgap;
+        int rightX = northWestToolbar.getButtonList().getRightX() + hgap;
         if (rightX <= width - northEastButtons.getWidth(hgap))
         {
             if (!northEastButtons.isHorizontal())
@@ -517,6 +531,8 @@ public class MapOverlay extends JmUI
         buttonDay.setToggled(mapType == Constants.MapType.day);
         buttonNight.setToggled(mapType == Constants.MapType.night);
         buttonCaves.setToggled(mapType == Constants.MapType.underground);
+
+        // TODO: ButtonCaves doesn't update as expected
         state.setMapType(mapType);
         refreshState();
     }

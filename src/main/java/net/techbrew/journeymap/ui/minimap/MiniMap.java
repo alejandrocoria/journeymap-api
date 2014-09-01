@@ -472,7 +472,7 @@ public class MiniMap
         String playerInfo = "";
         final int playerX = MathHelper.floor_double(player.posX);
         final int playerY = MathHelper.floor_double(player.boundingBox.minY);
-        final int playerZ =  MathHelper.floor_double(player.posZ);
+        final int playerZ = MathHelper.floor_double(player.posZ);
 
         for (String format : locationFormats)
         {
@@ -492,6 +492,5 @@ public class MiniMap
         // Update timestamp
         lastLabelRefresh = System.currentTimeMillis();
     }
-
 }
 

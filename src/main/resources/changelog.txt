@@ -12,6 +12,7 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New Feature: Full-screen Map UI now uses Theme (Skin) image buttons and tooltips
 - New Feature: MiniMap can now rotate based on your heading.  See MiniMap Options
 - Change: Secondary shading (antialiasing) tweaked slightly for better northwesterly shadows.
 - Change: Quieted info logging about "Ignoring TitleEntity without standard block texture"
