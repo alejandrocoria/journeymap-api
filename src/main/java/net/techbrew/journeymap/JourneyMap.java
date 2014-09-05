@@ -27,6 +27,7 @@ import net.techbrew.journeymap.forgehandler.EventHandlerManager;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.PropertyManager;
+import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -249,6 +250,9 @@ public class JourneyMap
 
             // Ensure all icons are ready for use.
             IconSetFileHandler.initialize();
+
+            // Ensure all themese are ready for use
+            ThemeFileHandler.initialize();
 
             // Webserver
             JMServer.setEnabled(webMapProperties.enabled.get(), false);

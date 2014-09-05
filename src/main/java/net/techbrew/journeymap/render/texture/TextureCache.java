@@ -14,7 +14,9 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
+import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.thread.JMThreadFactory;
+import net.techbrew.journeymap.ui.theme.Theme;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -359,7 +361,7 @@ public class TextureCache
             {
                 File parentDir = IconSetFileHandler.getEntityIconDir();
                 String assetPath = IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_ENTITY;
-                BufferedImage img = IconSetFileHandler.getIconFromFile(parentDir, assetPath, setName, iconPath, getUnknownEntity().getImage()); //$NON-NLS-1$
+                BufferedImage img = FileHandler.getIconFromFile(parentDir, assetPath, setName, iconPath, getUnknownEntity().getImage()); //$NON-NLS-1$
                 if (img != null)
                 {
                     if (tex != null)
@@ -374,17 +376,17 @@ public class TextureCache
         }
     }
 
-    public TextureImpl getThemeTexture(String themeName, String iconPath, int width, int height)
+    public TextureImpl getThemeTexture(Theme theme, String iconPath, int width, int height)
     {
-        String texName = String.format("%s/%s", themeName, iconPath);
+        String texName = String.format("%s/%s", theme.directory, iconPath);
         synchronized (themeImages)
         {
             TextureImpl tex = themeImages.get(texName);
             if (tex == null || (!tex.hasImage() && tex.retainImage))
             {
-                File parentDir = IconSetFileHandler.getThemeIconDir();
-                String assetPath = IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_THEME;
-                BufferedImage img = IconSetFileHandler.getIconFromFile(parentDir, assetPath, themeName, iconPath, null); //$NON-NLS-1$
+                File parentDir = ThemeFileHandler.getThemeIconDir();
+                String assetPath = ThemeFileHandler.ASSETS_JOURNEYMAP_ICON_THEME;
+                BufferedImage img = FileHandler.getIconFromFile(parentDir, assetPath, theme.directory, iconPath, null); //$NON-NLS-1$
                 if (img != null)
                 {
 //                    if(img.getWidth()!=width || img.getHeight()!=height)
@@ -407,7 +409,7 @@ public class TextureCache
                 }
                 else
                 {
-                    JourneyMap.getLogger().error("Unknown theme image: " + themeName + "/" + iconPath);
+                    JourneyMap.getLogger().error("Unknown theme image: " + texName);
                     return getUnknownEntity();
                 }
             }

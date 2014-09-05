@@ -55,12 +55,12 @@ public class ThemeButton extends net.techbrew.journeymap.ui.Button
         this.buttonSpec = getButtonSpec(theme);
         TextureCache tc = TextureCache.instance();
 
-        if(buttonSpec.show)
+        if(buttonSpec.useBackgroundImage)
         {
             String pattern = getPathPattern();
-            textureOn = tc.getThemeTexture(theme.name, String.format(pattern, "on"), buttonSpec.width, buttonSpec.height);
-            textureOff = tc.getThemeTexture(theme.name, String.format(pattern, "off"), buttonSpec.width, buttonSpec.height);
-            textureDisabled = tc.getThemeTexture(theme.name, String.format(pattern, "disabled"), buttonSpec.width, buttonSpec.height);
+            textureOn = tc.getThemeTexture(theme, String.format(pattern, "on"), buttonSpec.width, buttonSpec.height);
+            textureOff = tc.getThemeTexture(theme, String.format(pattern, "off"), buttonSpec.width, buttonSpec.height);
+            textureDisabled = tc.getThemeTexture(theme, String.format(pattern, "disabled"), buttonSpec.width, buttonSpec.height);
         }
         else
         {
@@ -74,7 +74,7 @@ public class ThemeButton extends net.techbrew.journeymap.ui.Button
         iconHoverColor = theme.getColor(buttonSpec.iconHoverColor);
         iconDisabledColor = theme.getColor(buttonSpec.iconDisabledColor);
 
-        textureIcon = tc.getThemeTexture(theme.name, String.format("icon/%s.png", iconName), theme.icon.width, theme.icon.height);
+        textureIcon = tc.getThemeTexture(theme, String.format("icon/%s.png", iconName), theme.icon.width, theme.icon.height);
 
         setWidth(buttonSpec.width);
         setHeight(buttonSpec.height);
@@ -135,21 +135,22 @@ public class ThemeButton extends net.techbrew.journeymap.ui.Button
 
         TextureImpl activeTexture = getActiveTexture(isMouseOver);
 
-        float buttonScale = 1f;
-        if(buttonSpec.width!=activeTexture.width) {
-            buttonScale = (1f*buttonSpec.width / activeTexture.width);
-        }
-
         int drawX = getX();
         int drawY = getY();
 
-        if (buttonSpec.show)
+        if (buttonSpec.useBackgroundImage)
         {
+            float buttonScale = 1f;
+            if(buttonSpec.width!=activeTexture.width) {
+                buttonScale = (1f*buttonSpec.width / activeTexture.width);
+            }
+
             // Theme Button Background
             DrawUtil.drawImage(activeTexture, drawX, drawY, false, buttonScale, 0);
         }
         else
         {
+            // Use resourcepack textures
             drawNativeButton(minecraft, mouseX, mouseY);
         }
 
@@ -163,7 +164,7 @@ public class ThemeButton extends net.techbrew.journeymap.ui.Button
         //drawY += (((height - textureIcon.height)/2));
         //DrawUtil.drawImage(textureIcon, drawX, drawY, false, scale, 0);
 
-        if (!buttonSpec.show)
+        if (!buttonSpec.useBackgroundImage)
         {
             DrawUtil.drawColoredImage(textureIcon, 255, Color.black, drawX + .5, drawY + .5, iconScale, 0);
         }

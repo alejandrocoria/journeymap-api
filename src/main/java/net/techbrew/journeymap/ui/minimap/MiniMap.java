@@ -245,7 +245,7 @@ public class MiniMap
 
             // Scissor area that shouldn't be drawn
             GL11.glScissor((int) dv.scissorX + 1, (int) dv.scissorY + 1, (int) dv.minimapSize - 2, (int) dv.minimapSize - 2);
-            GL11.glEnable(GL11.GL_SCISSOR_TEST);
+            //GL11.glEnable(GL11.GL_SCISSOR_TEST);
 
             // Draw grid
             gridRenderer.draw(1f, 0, 0);
@@ -313,8 +313,8 @@ public class MiniMap
             {
                 GL11.glPushMatrix();
                 //GL11.glTranslated(512-dv.minimapSize, 0, 0);
-                // TODO: Draw Frame
-                //DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, (float) (dv.minimapSize / 512.0), 0);
+                // TODO: Draw Frame scaled
+                DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, (float) (dv.minimapSize / 512.0), 0);
                 GL11.glPopMatrix();
             }
 

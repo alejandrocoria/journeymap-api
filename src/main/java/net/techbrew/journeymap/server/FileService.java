@@ -14,6 +14,7 @@ import net.techbrew.journeymap.cartography.ColorCache;
 import net.techbrew.journeymap.cartography.ColorPalette;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
+import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -155,7 +156,7 @@ public class FileService extends BaseService
                     {
                         ResponseHeader.on(event).contentType(ContentType.png);
                     }
-                    fileStream = IconSetFileHandler.getIconStream(IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_ENTITY, setName, iconPath);
+                    fileStream = FileHandler.getIconStream(IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_ENTITY, setName, iconPath);
                     JourneyMap.getLogger().warn("Couldn't get file for " + path);
                 }
                 else
@@ -171,7 +172,7 @@ public class FileService extends BaseService
             else if (path.startsWith(ICON_SKIN_PATH_PREFIX))
             {
                 String skinIconPath = path.split(ICON_SKIN_PATH_PREFIX)[1].replace('/', File.separatorChar);
-                File iconFile = new File(IconSetFileHandler.getThemeIconDir(), skinIconPath);
+                File iconFile = new File(ThemeFileHandler.getThemeIconDir(), skinIconPath);
                 if (!iconFile.exists())
                 {
                     // Fallback to jar asset
@@ -182,7 +183,7 @@ public class FileService extends BaseService
                     {
                         ResponseHeader.on(event).contentType(ContentType.png);
                     }
-                    fileStream = IconSetFileHandler.getIconStream(IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_THEME, setName, iconPath);
+                    fileStream = FileHandler.getIconStream(ThemeFileHandler.ASSETS_JOURNEYMAP_ICON_THEME, setName, iconPath);
                     JourneyMap.getLogger().warn("Couldn't get theme file for " + path);
                 }
                 else

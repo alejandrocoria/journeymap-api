@@ -19,6 +19,7 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.data.WaypointsData;
+import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
@@ -226,9 +227,14 @@ public class MapOverlay extends JmUI
         {
             firstLayoutPass = true;
             hideOptionsToolbar = false;
-            Theme theme = Theme.getCurrentTheme();
+            Theme theme = ThemeFileHandler.getCurrentTheme();
             Constants.MapType mapType = state.getCurrentMapType();
             int id = 0;
+
+            // UI Colors
+            bgColor = Theme.getColor(theme.fullscreen.mapBackgroundColor);
+            playerInfoFgColor = Theme.getColor(theme.fullscreen.statusForegroundColor);
+            playerInfoBgColor = Theme.getColor(theme.fullscreen.statusBackgroundColor);
 
             // Day Toggle
             buttonDay = new ThemeToggle(id++, theme, Constants.getString("jm.fullscreen.map_day"), "day");

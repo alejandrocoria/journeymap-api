@@ -8,10 +8,10 @@
 
 package net.techbrew.journeymap.properties;
 
-import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.io.IconSetFileHandler;
+import net.techbrew.journeymap.io.ThemeFileHandler;
+import net.techbrew.journeymap.ui.theme.Theme;
+import net.techbrew.journeymap.ui.theme.ThemePresets;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -49,7 +49,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public final AtomicBoolean mapPlants = new AtomicBoolean(true);
     public final AtomicBoolean mapCrops = new AtomicBoolean(true);
     public final AtomicBoolean mapSurfaceAboveCaves = new AtomicBoolean(true);
-    public final AtomicReference<String> themeName = new AtomicReference<String>(IconSetFileHandler.THEME_VICTORIAN48);
+    public final AtomicReference<String> themeName = new AtomicReference<String>(ThemePresets.THEME_VICTORIAN.name);
     protected transient final String name = "core";
 
     public CoreProperties()
@@ -61,11 +61,10 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     {
         boolean saveNeeded = super.validate();
 
-        List<String> validNames = IconSetFileHandler.getThemeNames();
-        if (themeName.get() == null || !validNames.contains(themeName.get()))
+        Theme theme = ThemeFileHandler.getThemeByName(themeName.get());
+        if(!theme.name.equals(themeName.get()))
         {
-            JourneyMap.getLogger().warn(String.format("Thene name '%s' is not valid, will use default instead.", themeName.get()));
-            themeName.set(validNames.get(0));
+            themeName.set(theme.name);
             saveNeeded = true;
         }
 

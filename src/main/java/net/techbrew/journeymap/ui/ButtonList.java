@@ -465,6 +465,19 @@ public class ButtonList extends ArrayList<Button>
         }
     }
 
+    public int getVisibleButtonCount()
+    {
+        int count = 0;
+        for (Button button : this)
+        {
+           if(button.drawButton)
+           {
+               count++;
+           }
+        }
+        return count;
+    }
+
     public String getLabel()
     {
         return label;

@@ -9,6 +9,7 @@
 package net.techbrew.journeymap.io;
 
 
+import com.google.common.base.Joiner;
 import com.google.common.io.ByteSink;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
@@ -491,6 +492,34 @@ public class FileHandler
 //        }
 //    }
 
+    public static void copyResources(File targetDirectory, String assetsPath, String setName, boolean overwrite)
+    {
+        String fromPath = null;
+        File toDir = null;
+        try
+        {
+            URL resourceDir = JourneyMap.class.getResource(assetsPath);
+            String toPath = String.format("%s/%s", assetsPath, setName);
+            toDir = new File(targetDirectory, setName);
+            boolean inJar = FileHandler.isInJar();
+            if (inJar)
+            {
+                fromPath = resourceDir.getPath().split("file:")[1].split("!/")[0];
+                FileHandler.copyFromZip(fromPath, toPath, toDir, overwrite);
+            }
+            else
+            {
+                File fromDir = new File(JourneyMap.class.getResource(toPath).getFile());
+                fromPath = fromDir.getPath();
+                FileHandler.copyFromDirectory(fromDir, toDir, overwrite);
+            }
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().error(String.format("Couldn't unzip resource set from %s to %s: %s", fromPath, toDir, t));
+        }
+    }
+
     /**
      * Extracts a zip file specified by the zipFilePath to a directory specified by
      * destDirectory (will be created if does not exists)
@@ -576,6 +605,93 @@ public class FileHandler
         public String toString()
         {
             return String.format("ZipEntryByteSource( %s / %s )", file, entry);
+        }
+    }
+
+    public static BufferedImage getIconFromFile(File parentdir, String assetsPath, String setName, String iconPath, BufferedImage defaultImg)
+    {
+        BufferedImage img = null;
+
+        try
+        {
+            String filePath = Joiner.on(File.separatorChar).join(setName, iconPath.replace('/', File.separatorChar));
+            File iconFile = new File(parentdir, filePath);
+
+
+            if (iconFile.exists())
+            {
+                img = FileHandler.getImage(iconFile);
+            }
+
+            if (img == null)
+            {
+                img = FileHandler.getIconFromResource(assetsPath, setName, iconPath);
+                if (img == null)
+                {
+                    img = defaultImg;
+                }
+
+                try
+                {
+                    iconFile.getParentFile().mkdirs();
+                    ImageIO.write(img, "png", iconFile);
+                }
+                catch (Exception e)
+                {
+                    String error = Constants.getMessageJMERR00("Can't write icon" + iconFile + ": " + e);
+                    JourneyMap.getLogger().error(error);
+                }
+
+                JourneyMap.getLogger().debug("Created icon: " + iconFile);
+            }
+        }
+        catch(Exception e)
+        {
+            JourneyMap.getLogger().error("Couldn't load iconset file: " + LogFormatter.toString(e));
+        }
+
+        return img;
+    }
+
+    public static BufferedImage getIconFromResource(String assetsPath, String setName, String iconPath)
+    {
+        try
+        {
+            InputStream is = getIconStream(assetsPath, setName, iconPath);
+            if (is == null)
+            {
+                return null;
+            }
+            BufferedImage img = ImageIO.read(is);
+            is.close();
+            return img;
+        }
+        catch (IOException e)
+        {
+            String error = Constants.getMessageJMERR17(e.getMessage());
+            JourneyMap.getLogger().error(error);
+            return null;
+        }
+    }
+
+    public static InputStream getIconStream(String assetsPath, String setName, String iconPath)
+    {
+        try
+        {
+            String pngPath = Joiner.on('/').join(assetsPath, setName, iconPath);
+            InputStream is = JourneyMap.class.getResourceAsStream(pngPath);
+            if (is == null)
+            {
+                JourneyMap.getLogger().warn(String.format("Icon Set asset not found: " + pngPath));
+                return null;
+            }
+            return is;
+        }
+        catch (Throwable e)
+        {
+            String error = Constants.getMessageJMERR17(e.getMessage());
+            JourneyMap.getLogger().error(error);
+            return null;
         }
     }
 }
