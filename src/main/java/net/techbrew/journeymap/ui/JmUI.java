@@ -129,9 +129,7 @@ public abstract class JmUI extends GuiScreen
     protected void drawLogo()
     {
         sizeDisplay(mc.displayWidth, mc.displayHeight);
-
-        final boolean smallScale = (scaleFactor == 1);
-        DrawUtil.drawImage(logo, smallScale ? 2 : 4, 0, false, smallScale ? .5f : 1f, 0);
+        DrawUtil.drawImage(logo, 8,8, false, 1, 0);
         sizeDisplay(width, height);
     }
 
@@ -183,6 +181,7 @@ public abstract class JmUI extends GuiScreen
 
             if (tooltip != null && !tooltip.isEmpty())
             {
+                drawHoveringText(tooltip, x, y, getFontRenderer());
                 drawHoveringText(tooltip, x, y, getFontRenderer());
                 RenderHelper.disableStandardItemLighting();
             }

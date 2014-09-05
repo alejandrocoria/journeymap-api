@@ -12,14 +12,12 @@ package net.techbrew.journeymap.ui.map;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
-import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
@@ -34,12 +32,13 @@ import net.techbrew.journeymap.render.overlay.OverlayWaypointRenderer;
 import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.ui.Button;
-import net.techbrew.journeymap.ui.ButtonList;
 import net.techbrew.journeymap.ui.JmUI;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.adapter.BooleanPropertyAdapter;
 import net.techbrew.journeymap.ui.map.layer.LayerDelegate;
+import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemeButton;
+import net.techbrew.journeymap.ui.theme.ThemeToggle;
 import net.techbrew.journeymap.ui.theme.ThemeToolbar;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
@@ -63,6 +62,8 @@ public class MapOverlay extends JmUI
     final OverlayRadarRenderer radarRenderer = new OverlayRadarRenderer();
     final LayerDelegate layerDelegate = new LayerDelegate();
     FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
+    boolean firstLayoutPass = true;
+    boolean hideOptionsToolbar = false;
     Boolean isScrolling = false;
     int msx, msy, mx, my;
     Logger logger = JourneyMap.getLogger();
@@ -70,8 +71,8 @@ public class MapOverlay extends JmUI
     ThemeButton buttonFollow, buttonZoomIn, buttonZoomOut, buttonDay, buttonNight, buttonCaves;
     ThemeButton buttonAlert, buttonOptions, buttonActions, buttonClose;
     ThemeButton buttonMode, buttonWaypointManager;
-    ButtonList northEastButtons, westButtons;
-    ThemeToolbar northWestToolbar;
+    ThemeButton buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid;
+    ThemeToolbar mapTypeToolbar, optionsToolbar, menuToolbar, zoomToolbar;//, northEastToolbar;
     Color bgColor = new Color(0x22, 0x22, 0x22);
     Color playerInfoFgColor = Color.lightGray;
     Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
@@ -177,78 +178,19 @@ public class MapOverlay extends JmUI
     protected void actionPerformed(GuiButton guibutton)
     { // actionPerformed
 
-        final ButtonEnum id = ButtonEnum.values()[guibutton.id];
-        switch (id)
+        if(guibutton instanceof ThemeToolbar)
         {
-            case Day:
-            {
-                if (Constants.MapType.day != state.getCurrentMapType())
-                {
-                    setMapType(Constants.MapType.day);
-                }
-                break;
-            }
+            return;
+        }
 
-            case Night:
-            {
-                if (Constants.MapType.night != state.getCurrentMapType())
-                {
-                    setMapType(Constants.MapType.night);
-                }
-                break;
-            }
+        if(guibutton instanceof Button)
+        {
+            ((Button) guibutton).toggle();
+        }
 
-            case Follow:
-            { // follow
-                toggleFollow();
-                break;
-            }
-            case ZoomIn:
-            { // zoom in
-                zoomIn();
-                break;
-            }
-            case ZoomOut:
-            { // zoom out
-                zoomOut();
-                break;
-            }
-            case Close:
-            { // close
-                UIManager.getInstance().closeAll();
-                break;
-            }
-            case Alert:
-            { // alert
-                VersionCheck.launchWebsite();
-                break;
-            }
-            case Options:
-            { // options
-                UIManager.getInstance().openMasterOptions();
-                break;
-            }
-            case Actions:
-            { // actions
-                UIManager.getInstance().openMapActions();
-                break;
-            }
-            case WaypointManager:
-            {
-                UIManager.getInstance().openWaypointManager(null, getClass());
-                break;
-            }
-            case Caves:
-            {
-                if (buttonCaves.isEnabled())
-                {
-                    if (Constants.MapType.underground != state.getCurrentMapType())
-                    {
-                        setMapType(Constants.MapType.underground);
-                    }
-                }
-                break;
-            }
+        if(optionsToolbar.getButtonList().contains(guibutton))
+        {
+            refreshState();
         }
     }
 
@@ -282,56 +224,237 @@ public class MapOverlay extends JmUI
     {
         if (buttonList.isEmpty())
         {
+            firstLayoutPass = true;
+            hideOptionsToolbar = false;
+            Theme theme = Theme.getCurrentTheme();
+            Constants.MapType mapType = state.getCurrentMapType();
+            int id = 0;
 
-            FontRenderer fr = getFontRenderer();
-
-            String on = Constants.getString("jm.common.on");
-            String off = Constants.getString("jm.common.off");
-
-            Constants.MapType mapType = state.getMapType(fullMapProperties.showCaves.get());
-            boolean underground = DataCache.getPlayer().underground;
-
-            buttonAlert = new ThemeButton(ButtonEnum.Alert, Constants.getString("jm.common.update_available"), ThemeButton.Style.Button, "alert");
-            buttonAlert.setDrawButton(VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent());
-
-            buttonDay = new ThemeButton(ButtonEnum.Day, Constants.getString("jm.fullscreen.map_day"), ThemeButton.Style.Toggle, "day");
-            buttonDay.setEnabled(!mc.theWorld.provider.hasNoSky);
+            // Day Toggle
+            buttonDay = new ThemeToggle(id++, theme, Constants.getString("jm.fullscreen.map_day"), "day");
             buttonDay.setToggled(mapType == Constants.MapType.day, false);
+            buttonDay.addToggleListener(new Button.ToggleListener()
+            {
+                @Override
+                public boolean onToggle(Button button, boolean toggled)
+                {
+                    if(toggled)
+                    {
+                        state.setMapType(Constants.MapType.day);
+                        buttonNight.setToggled(false);
+                        if(state.isUnderground()) {
+                            buttonCaves.setToggled(false);
+                        }
+                        state.requireRefresh();
+                    }
+                    else if(state.getCurrentMapType()==Constants.MapType.day)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+            });
 
-            buttonNight = new ThemeButton(ButtonEnum.Night, Constants.getString("jm.fullscreen.map_night"), ThemeButton.Style.Toggle, "night");
-            buttonNight.setEnabled(!mc.theWorld.provider.hasNoSky);
+            // Night Toggle
+            buttonNight = new ThemeToggle(id++, theme, Constants.getString("jm.fullscreen.map_night"), "night");
             buttonNight.setToggled(mapType == Constants.MapType.night, false);
+            buttonNight.addToggleListener(new Button.ToggleListener()
+            {
+                @Override
+                public boolean onToggle(Button button, boolean toggled)
+                {
+                    if(toggled)
+                    {
+                        state.setMapType(Constants.MapType.night);
+                        buttonDay.setToggled(false);
+                        if(state.isUnderground()) {
+                            buttonCaves.setToggled(false);
+                        }
+                        state.requireRefresh();
+                    }
+                    else if(state.getCurrentMapType()==Constants.MapType.night)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+            });
 
-            buttonCaves = new ThemeButton(ButtonEnum.Caves, ThemeButton.Style.Toggle, "caves");
-            buttonCaves.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showCaves), "jm.fullscreen.map_caves");
+            // Caves Toggle
+            buttonCaves = new ThemeToggle(id++, theme, Constants.getString("jm.fullscreen.map_caves"), "caves");
             buttonCaves.setDrawButton(state.isCaveMappingAllowed());
-            buttonCaves.setEnabled(underground && state.isCaveMappingAllowed() && !mc.theWorld.provider.hasNoSky);
+            buttonCaves.addToggleListener(new Button.ToggleListener()
+            {
+                @Override
+                public boolean onToggle(Button button, boolean toggled)
+                {
+                    fullMapProperties.showCaves.set(toggled);
+                    fullMapProperties.save();
+                    state.requireRefresh();
+                    return true;
+                }
+            });
 
-            buttonFollow = new ThemeButton(ButtonEnum.Follow, Constants.getString("jm.fullscreen.follow"), ThemeButton.Style.Button, "follow");
+            // Follow
+            buttonFollow = new ThemeButton(id++, theme, Constants.getString("jm.fullscreen.follow"), "follow");
+            buttonFollow.addToggleListener(new Button.ToggleListener()
+            {
+                @Override
+                public boolean onToggle(Button button, boolean toggled)
+                {
+                    toggleFollow();
+                    return true;
+                }
+            });
 
-            buttonZoomIn = new ThemeButton(ButtonEnum.ZoomIn, Constants.getString("jm.fullscreen.zoom_in"), ThemeButton.Style.Button, "zoomin");
+            // Zoom In
+            buttonZoomIn = new ThemeButton(id++, theme, Constants.getString("jm.fullscreen.zoom_in"), "zoomin");
             buttonZoomIn.setEnabled(fullMapProperties.zoomLevel.get() < state.maxZoom);
+            buttonZoomIn.addToggleListener(new Button.ToggleListener()
+            {
+                @Override
+                public boolean onToggle(Button button, boolean toggled)
+                {
+                    zoomIn();
+                    return true;
+                }
+            });
 
-            buttonZoomOut = new ThemeButton(ButtonEnum.ZoomOut, Constants.getString("jm.fullscreen.zoom_out"), ThemeButton.Style.Button, "zoomout");
+            // Zoom Out
+            buttonZoomOut = new ThemeButton(id++, theme, Constants.getString("jm.fullscreen.zoom_out"), "zoomout");
             buttonZoomOut.setEnabled(fullMapProperties.zoomLevel.get() > state.minZoom);
+            buttonZoomOut.addToggleListener(new Button.ToggleListener()
+            {
+                @Override
+                public boolean onToggle(Button button, boolean toggled)
+                {
+                    zoomOut();
+                    return true;
+                }
+            });
 
-            buttonWaypointManager = new ThemeButton(ButtonEnum.WaypointManager, Constants.getString("jm.waypoint.waypoints"), ThemeButton.Style.Button, "waypoints");
+            // Waypoints
+            buttonWaypointManager = new ThemeButton(id++, theme, Constants.getString("jm.waypoint.waypoints"), "waypoints");
             buttonWaypointManager.setDrawButton(WaypointsData.isManagerEnabled());
+            buttonWaypointManager.addToggleListener(new Button.ToggleListener()
+            {
+                @Override
+                public boolean onToggle(Button button, boolean toggled)
+                {
+                    UIManager.getInstance().openWaypointManager(null, MapOverlay.class);
+                    return true;
+                }
+            });
 
-            buttonOptions = new ThemeButton(ButtonEnum.Options, Constants.getString("jm.common.options"), ThemeButton.Style.Button, "options");
+            // Options
+            buttonOptions = new ThemeButton(id++, theme, Constants.getString("jm.common.options"), "options");
+            buttonOptions.addToggleListener(new Button.ToggleListener()
+            {
+                @Override
+                public boolean onToggle(Button button, boolean toggled)
+                {
+                    UIManager.getInstance().openMasterOptions();
+                    return true;
+                }
+            });
 
-            buttonActions = new ThemeButton(ButtonEnum.Actions, Constants.getString("jm.common.actions"), ThemeButton.Style.Button, "actions");
+            // Actions
+            buttonActions = new ThemeButton(id++, theme, Constants.getString("jm.common.actions"), "actions");
+            buttonActions.addToggleListener(new Button.ToggleListener()
+            {
+                @Override
+                public boolean onToggle(Button button, boolean toggled)
+                {
+                    UIManager.getInstance().openMapActions();
+                    return true;
+                }
+            });
 
-            buttonClose = new ThemeButton(ButtonEnum.Close, Constants.getString("jm.common.close"), ThemeButton.Style.Button, "close");
+            // Alert
+            buttonAlert = new ThemeToggle(id++, theme, Constants.getString("jm.common.update_available"), "alert");
+            buttonAlert.setDrawButton(VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent());
+            buttonAlert.setToggled(true);
+            buttonAlert.addToggleListener(new Button.ToggleListener()
+            {
+                @Override
+                public boolean onToggle(Button button, boolean toggled)
+                {
+                    VersionCheck.launchWebsite();
+                    buttonAlert.setDrawButton(false);
+                    return true;
+                }
+            });
 
-            northWestToolbar = new ThemeToolbar(0, buttonDay, buttonNight, buttonCaves);
-            northEastButtons = new ButtonList(buttonAlert, buttonWaypointManager, buttonOptions, buttonActions, buttonClose).reverse();
-            westButtons = new ButtonList(buttonFollow, buttonZoomIn, buttonZoomOut);
+            // Close
+            buttonClose = new ThemeButton(id++, theme, Constants.getString("jm.common.close"), "close");
+            buttonClose.addToggleListener(new Button.ToggleListener()
+            {
+                @Override
+                public boolean onToggle(Button button, boolean toggled)
+                {
+                    UIManager.getInstance().closeAll();
+                    return true;
+                }
+            });
 
-            buttonList.add(northWestToolbar);
-            buttonList.addAll(northWestToolbar.getButtonList());
-            buttonList.addAll(northEastButtons);
-            buttonList.addAll(westButtons);
+            buttonMobs = new ThemeToggle(id++, theme, "", "monsters");
+            buttonMobs.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showMobs), "jm.common.show_monsters");
+
+            buttonAnimals = new ThemeToggle(id++, theme, "", "animals");
+            buttonAnimals.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showAnimals), "jm.common.show_animals");
+
+            buttonPets = new ThemeToggle(id++, theme, "", "pets");
+            buttonPets.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showPets), "jm.common.show_pets");
+
+            buttonVillagers = new ThemeToggle(id++, theme, "", "villagers");
+            buttonVillagers.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showVillagers), "jm.common.show_villagers");
+
+            buttonPlayers = new ThemeToggle(id++, theme, "", "players");
+            buttonPlayers.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showPlayers), "jm.common.show_players");
+
+            buttonGrid = new ThemeToggle(id++, theme, "", "grid");
+            buttonGrid.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showGrid), "jm.common.show_grid");
+
+            // Toolbars
+            mapTypeToolbar = new ThemeToolbar(id++, theme, buttonDay, buttonNight, buttonCaves);
+            mapTypeToolbar.getButtonList().setHorizontal(true);
+            mapTypeToolbar.getButtonList().reverse();
+            mapTypeToolbar.updateTextures();
+
+//            northEastToolbar = new ThemeToolbar(id++, theme, buttonClose);
+//            northEastToolbar.getButtonList().setHorizontal(true);
+//            northEastToolbar.updateTextures();
+
+            zoomToolbar = new ThemeToolbar(id++, theme, buttonFollow, buttonZoomIn, buttonZoomOut);
+            zoomToolbar.getButtonList().setHorizontal(false);
+            zoomToolbar.updateTextures();
+
+            menuToolbar = new ThemeToolbar(id++, theme,  buttonWaypointManager, buttonOptions, buttonActions);
+            menuToolbar.getButtonList().setHorizontal(false);
+            menuToolbar.updateTextures();
+
+            optionsToolbar = new ThemeToolbar(id++, theme, buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid);
+            optionsToolbar.getButtonList().setHorizontal(true);
+            optionsToolbar.updateTextures();
+
+            // Buttonlist
+            buttonList.add(mapTypeToolbar);
+            buttonList.addAll(mapTypeToolbar.getButtonList());
+
+            buttonList.add(menuToolbar);
+            buttonList.addAll(menuToolbar.getButtonList());
+
+            buttonList.add(optionsToolbar);
+            buttonList.addAll(optionsToolbar.getButtonList());
+
+            buttonList.add(buttonClose);
+            buttonList.add(buttonAlert);
+//            buttonList.add(northEastToolbar);
+//            buttonList.addAll(northEastToolbar.getButtonList());
+
+            buttonList.add(zoomToolbar);
+            buttonList.addAll(zoomToolbar.getButtonList());
+            buttonList.add(buttonClose);
         }
     }
 
@@ -347,36 +470,53 @@ public class MapOverlay extends JmUI
             initButtons();
         }
 
-        final int startX = 40;
-        final int endX = width - 3;
-        final int startY = 10;
-        final int hgap = 3;
-        final int vgap = 3;
+        // Update toggles
+        boolean isSky = !mc.theWorld.provider.hasNoSky;
+        buttonDay.setEnabled(isSky);
+        buttonNight.setEnabled(isSky);
+        buttonCaves.setEnabled(isSky && state.isUnderground() && state.isCaveMappingAllowed());
+        buttonFollow.setEnabled(!state.follow.get());
 
-        buttonZoomIn.setPosition(8, 32);
-        buttonZoomOut.below(buttonZoomIn, 8).setX(8);
+        int padding = mapTypeToolbar.getToolbarSpec().padding;
 
-        westButtons.layoutVertical(3, 32, true, vgap);
+        zoomToolbar.getButtonList().layoutCenteredVertical(zoomToolbar.getHMargin(), height/2, true, padding);
 
-        northWestToolbar.getButtonList().layoutHorizontal(startX, startY, true, hgap);
+        int topY = mapTypeToolbar.getVMargin();
 
-
-        int rightX = northWestToolbar.getButtonList().getRightX() + hgap;
-        if (rightX <= width - northEastButtons.getWidth(hgap))
+        if(firstLayoutPass)
         {
-            if (!northEastButtons.isHorizontal())
-            {
-                northEastButtons.setFitWidths(mc.fontRenderer);
-            }
-            northEastButtons.layoutHorizontal(endX, startY, false, hgap);
+            topY = -200;
+        }
+
+        int interToolbarPadding = mapTypeToolbar.getHMargin();
+
+        if(hideOptionsToolbar)
+        {
+            mapTypeToolbar.getButtonList().layoutHorizontal((width / 2) - interToolbarPadding, topY, false, padding);
+            menuToolbar.getButtonList().layoutHorizontal((width / 2) + interToolbarPadding, topY, true, padding);
         }
         else
         {
-            if (northEastButtons.isHorizontal())
-            {
-                northEastButtons.equalizeWidths(mc.fontRenderer);
-            }
-            northEastButtons.layoutVertical(endX, startY, false, vgap);
+            optionsToolbar.getButtonList().layoutCenteredHorizontal((width / 2), topY, true, padding);
+            mapTypeToolbar.getButtonList().layoutHorizontal(optionsToolbar.getX() - interToolbarPadding, topY, false, padding);
+            menuToolbar.getButtonList().layoutHorizontal(optionsToolbar.getRightX() + interToolbarPadding, topY, true, padding);
+        }
+
+        //northEastToolbar.getButtonList().layoutHorizontal(width - northEastToolbar.getHMargin() - northEastToolbar.getWidth(), northEastToolbar.getVMargin(), true, padding);
+        buttonClose.leftOf(width-padding).below(mapTypeToolbar.getVMargin());
+        buttonAlert.leftOf(width-padding).below(buttonClose, padding);
+
+        if(!hideOptionsToolbar && menuToolbar.getRightX() + (padding*2)>= buttonClose.getX())
+        {
+            optionsToolbar.setDrawButton(false);
+            optionsToolbar.getButtonList().setDrawButtons(false);
+            mapTypeToolbar.getButtonList().reverse();
+            hideOptionsToolbar = true;
+        }
+
+        if(firstLayoutPass)
+        {
+            firstLayoutPass = false;
         }
     }
 
@@ -479,8 +619,7 @@ public class MapOverlay extends JmUI
                 try
                 {
                     gridRenderer.move(-mouseDragX, -mouseDragY);
-                    boolean showCaves = mc.thePlayer.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get();
-                    gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
+                    gridRenderer.updateTextures(state.getCurrentMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
                     gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
                 }
                 catch (Exception e)
@@ -524,17 +663,6 @@ public class MapOverlay extends JmUI
             buttonZoomIn.setEnabled(fullMapProperties.zoomLevel.get() < state.maxZoom);
             refreshState();
         }
-    }
-
-    void setMapType(Constants.MapType mapType)
-    {
-        buttonDay.setToggled(mapType == Constants.MapType.day);
-        buttonNight.setToggled(mapType == Constants.MapType.night);
-        buttonCaves.setToggled(mapType == Constants.MapType.underground);
-
-        // TODO: ButtonCaves doesn't update as expected
-        state.setMapType(mapType);
-        refreshState();
     }
 
     void toggleFollow()
@@ -717,8 +845,7 @@ public class MapOverlay extends JmUI
         {
             gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
         }
-        boolean showCaves = mc.thePlayer.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get();
-        gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
+        gridRenderer.updateTextures(state.getCurrentMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
         gridRenderer.draw(1f, xOffset, yOffset);
         gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
         gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
@@ -803,8 +930,7 @@ public class MapOverlay extends JmUI
             gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
         }
 
-        boolean showCaves = mc.thePlayer.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get();
-        gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+        gridRenderer.updateTextures(state.getCurrentMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 
         // Build list of drawSteps
         state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, 1f, false);
@@ -861,7 +987,7 @@ public class MapOverlay extends JmUI
         }
         else
         {
-            return state.shouldRefresh(super.mc, fullMapProperties);
+            return state.shouldRefresh(super.mc, fullMapProperties) || gridRenderer.hasUnloadedTile();
         }
     }
 
@@ -869,31 +995,22 @@ public class MapOverlay extends JmUI
     {
         refreshState();
         gridRenderer.move(deltaBlockX, deltaBlockz);
-
-        boolean showCaves = mc.thePlayer.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get();
-        gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+        gridRenderer.updateTextures(state.getCurrentMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
         setFollow(false);
     }
 
     @Override
     protected void drawLogo()
     {
-        //sizeDisplay(mc.displayWidth, mc.displayHeight);
-
-        final boolean smallScale = (scaleFactor == 1);
-        DrawUtil.drawImage(logo, smallScale ? 2 : 4, 0, false, smallScale ? .5f : 1f, 0);
-        //sizeDisplay(width, height);
+        sizeDisplay(mc.displayWidth, mc.displayHeight);
+        DrawUtil.drawImage(logo, 8,8, false, 1, 0);
+        sizeDisplay(width, height);
     }
 
     @Override
     public final boolean doesGuiPauseGame()
     {
         return false;
-    }
-
-    private enum ButtonEnum
-    {
-        Alert, Day, Night, Follow, ZoomIn, ZoomOut, Options, Actions, Close, Mode, WaypointManager, Caves
     }
 
 }

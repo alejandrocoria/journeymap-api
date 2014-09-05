@@ -374,7 +374,7 @@ public class TextureCache
         }
     }
 
-    public TextureImpl getThemeTexture(String themeName, String iconPath)
+    public TextureImpl getThemeTexture(String themeName, String iconPath, int width, int height)
     {
         String texName = String.format("%s/%s", themeName, iconPath);
         synchronized (themeImages)
@@ -387,6 +387,17 @@ public class TextureCache
                 BufferedImage img = IconSetFileHandler.getIconFromFile(parentDir, assetPath, themeName, iconPath, null); //$NON-NLS-1$
                 if (img != null)
                 {
+//                    if(img.getWidth()!=width || img.getHeight()!=height)
+//                    {
+//                        BufferedImage tmp = new BufferedImage(width, height, img.getType());
+//                        Graphics2D g = tmp.createGraphics();
+//                        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+//                        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//                        g.drawImage(img, 0, 0, width, height, null);
+//                        g.dispose();
+//                        img = tmp;
+//                    }
+
                     if (tex != null)
                     {
                         tex.deleteTexture();

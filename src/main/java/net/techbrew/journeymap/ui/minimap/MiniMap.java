@@ -313,7 +313,8 @@ public class MiniMap
             {
                 GL11.glPushMatrix();
                 //GL11.glTranslated(512-dv.minimapSize, 0, 0);
-                DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, (float) (dv.minimapSize / 512.0), 0);
+                // TODO: Draw Frame
+                //DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, (float) (dv.minimapSize / 512.0), 0);
                 GL11.glPopMatrix();
             }
 

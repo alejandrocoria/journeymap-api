@@ -1,11 +1,12 @@
 package net.techbrew.journeymap.ui.theme;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.EnumChatFormatting;
-import net.techbrew.journeymap.JourneyMap;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -15,53 +16,106 @@ import java.util.ArrayList;
  */
 public class ThemeButton extends net.techbrew.journeymap.ui.Button
 {
-    private final TextureImpl textureOn;
-    private final TextureImpl textureOff;
-    private final TextureImpl textureDisabled;
-    private final TextureImpl textureIcon;
-    private final Style style;
+    protected final Theme theme;
+    protected final Theme.Control.ButtonSpec buttonSpec;
+    protected final TextureImpl textureOn;
+    protected final TextureImpl textureOff;
+    protected final TextureImpl textureDisabled;
+    protected final TextureImpl textureIcon;
+    protected final Color iconOnColor;
+    protected final Color iconOffColor;
+    protected final Color iconHoverColor;
+    protected final Color iconDisabledColor;
 
-    public ThemeButton(Enum enumId, Style style, String iconName)
+    public ThemeButton(Enum enumId, Theme theme, String iconName)
     {
-        this(enumId.ordinal(), "", "", false, style, iconName);
+        this(enumId.ordinal(), theme, "", "", false, iconName);
     }
 
-
-    public ThemeButton(Enum enumId, String label, Style style, String iconName)
+    public ThemeButton(Enum enumId, Theme theme, String label, String iconName)
     {
-        this(enumId.ordinal(), label, label, false, style, iconName);
+        this(enumId.ordinal(), theme, label, label, false, iconName);
     }
 
-    public ThemeButton(int id, String label, Style style, String iconName)
+    public ThemeButton(int id, Theme theme, String label, String iconName)
     {
-        this(id, label, label, false, style, iconName);
+        this(id, theme, label, label, false, iconName);
     }
 
-    public ThemeButton(Enum enumId, String labelOn, String labelOff, boolean toggled, Style style, String iconName)
+    public ThemeButton(Enum enumId, Theme theme, String labelOn, String labelOff, boolean toggled, String iconName)
     {
-        this(enumId.ordinal(), labelOn, labelOff, toggled, style, iconName);
+        this(enumId.ordinal(), theme, labelOn, labelOff, toggled, iconName);
     }
 
-    public ThemeButton(int id, String labelOn, String labelOff, boolean toggled, Style style, String iconName)
+    public ThemeButton(int id, Theme theme, String labelOn, String labelOff, boolean toggled, String iconName)
     {
-        super(id, 20, 20, toggled ? labelOn : labelOff);
+        super(id, 0, 0, toggled ? labelOn : labelOff);
 
-        String themeSetName = JourneyMap.getCoreProperties().themeName.get();
-
-        String styleName = style.name().toLowerCase();
-        String pathPattern = "button/%s_%s.png";
+        this.theme = theme;
+        this.buttonSpec = getButtonSpec(theme);
         TextureCache tc = TextureCache.instance();
 
-        this.style = style;
-        textureOn = tc.getThemeTexture(themeSetName, String.format(pathPattern, styleName, "on"));
-        textureOff = tc.getThemeTexture(themeSetName, String.format(pathPattern, styleName, "off"));
-        textureDisabled = tc.getThemeTexture(themeSetName, String.format(pathPattern, styleName, "disabled"));
-        textureIcon = tc.getThemeTexture(themeSetName, String.format("icon/%s.png", iconName));
-
-        if (style == Style.Button)
+        if(buttonSpec.show)
         {
-            setToggled(false, false);
+            String pattern = getPathPattern();
+            textureOn = tc.getThemeTexture(theme.name, String.format(pattern, "on"), buttonSpec.width, buttonSpec.height);
+            textureOff = tc.getThemeTexture(theme.name, String.format(pattern, "off"), buttonSpec.width, buttonSpec.height);
+            textureDisabled = tc.getThemeTexture(theme.name, String.format(pattern, "disabled"), buttonSpec.width, buttonSpec.height);
         }
+        else
+        {
+            textureOn = null;
+            textureOff = null;
+            textureDisabled = null;
+        }
+
+        iconOnColor = theme.getColor(buttonSpec.iconOnColor);
+        iconOffColor = theme.getColor(buttonSpec.iconOffColor);
+        iconHoverColor = theme.getColor(buttonSpec.iconHoverColor);
+        iconDisabledColor = theme.getColor(buttonSpec.iconDisabledColor);
+
+        textureIcon = tc.getThemeTexture(theme.name, String.format("icon/%s.png", iconName), theme.icon.width, theme.icon.height);
+
+        setWidth(buttonSpec.width);
+        setHeight(buttonSpec.height);
+        setToggled(false, false);
+    }
+
+    protected String getPathPattern()
+    {
+        return "control/button_%s.png";
+    }
+
+    protected Theme.Control.ButtonSpec getButtonSpec(Theme theme)
+    {
+        return theme.control.button;
+    }
+
+    protected TextureImpl getActiveTexture(boolean isMouseOver)
+    {
+        if(isEnabled())
+        {
+            TextureImpl activeTexture = isMouseOver & Mouse.isButtonDown(0) ? textureOn : textureOff;
+            return activeTexture;
+        }
+        else
+        {
+            return textureDisabled;
+        }
+    }
+
+    protected Color getIconColor(boolean isMouseOver)
+    {
+        if(!isEnabled()) {
+            return iconDisabledColor;
+        }
+
+        if(isMouseOver)
+        {
+            return iconHoverColor;
+        }
+
+        return toggled ? iconOnColor : iconOffColor;
     }
 
     @Override
@@ -74,77 +128,85 @@ public class ThemeButton extends net.techbrew.journeymap.ui.Button
 
         // Check hover
         this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
-        int k = this.getHoverState(this.field_146123_n);
-        boolean isMouseOver = this.field_146123_n;
 
-        TextureImpl activeTexture = null;
-        if (this.isEnabled())
-        {
-            if (style == Style.Button)
-            {
-                activeTexture = textureOff;
-            }
-            else
-            {
-                activeTexture = this.toggled ? textureOn : textureOff;
-            }
-        }
-        else
-        {
-            activeTexture = this.textureDisabled;
+        // Returns 0 if the button is disabled, 1 if the mouse is NOT hovering over this button and 2 if it IS hovering over
+        int hoverState = this.getHoverState(this.field_146123_n);
+        boolean isMouseOver = (hoverState==2);
+
+        TextureImpl activeTexture = getActiveTexture(isMouseOver);
+
+        float buttonScale = 1f;
+        if(buttonSpec.width!=activeTexture.width) {
+            buttonScale = (1f*buttonSpec.width / activeTexture.width);
         }
 
-        float scale;
         int drawX = getX();
         int drawY = getY();
-        //setWidth(activeTexture.width);
-        //setHeight(activeTexture.height);
 
-        boolean useThemeButton = true;
-
-        if (useThemeButton)
+        if (buttonSpec.show)
         {
             // Theme Button Background
-            scale = width / (activeTexture.width * 1F);
-            DrawUtil.drawImage(activeTexture, drawX, drawY, false, scale, 0);
+            DrawUtil.drawImage(activeTexture, drawX, drawY, false, buttonScale, 0);
         }
         else
         {
-            // Resourcepack Button Background
-            String label = this.displayString;
-            this.displayString = "";
-            this.height = 20;
-            this.width = 20;
-            scale = (this.width - 2) / (textureIcon.width * 1.0F);
-            super.drawButton(minecraft, mouseX, mouseY);
-            this.displayString = label;
+            drawNativeButton(minecraft, mouseX, mouseY);
         }
 
         // Icon
-        scale = scale * .8f;
-        drawX += ((width - (textureIcon.width * scale)) / 2);
-        drawY += ((height - (textureIcon.height * scale)) / 2);
-        DrawUtil.drawImage(textureIcon, drawX, drawY, false, scale, 0);
-
-        if (!useThemeButton)
-        {
-            DrawUtil.drawColoredImage(textureIcon, 255, Color.black, drawX + .5, drawY + .5, scale, 0);
+        float iconScale = 1f;
+        if(theme.icon.width!=textureIcon.width) {
+            iconScale = (1f*theme.icon.width / textureIcon.width);
         }
-        showDisabledHoverText = true;
-        Color iconColor = isMouseOver && isEnabled() ? Color.white : Color.lightGray;
-        DrawUtil.drawColoredImage(textureIcon, 255, iconColor, drawX, drawY, scale, 0);
+
+        //drawX += (((width - textureIcon.width)/2));
+        //drawY += (((height - textureIcon.height)/2));
+        //DrawUtil.drawImage(textureIcon, drawX, drawY, false, scale, 0);
+
+        if (!buttonSpec.show)
+        {
+            DrawUtil.drawColoredImage(textureIcon, 255, Color.black, drawX + .5, drawY + .5, iconScale, 0);
+        }
+
+        Color iconColor = getIconColor(isMouseOver);
+        DrawUtil.drawColoredImage(textureIcon, 255, iconColor, drawX, drawY, iconScale, 0);
+    }
+
+    public void drawNativeButton(Minecraft minecraft, int mouseX, int mouseY)
+    {
+        int magic = 20;
+        minecraft.getTextureManager().bindTexture(buttonTextures);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        int k = this.getHoverState(this.field_146123_n);
+        GL11.glEnable(GL11.GL_BLEND);
+        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 46 + k * magic, this.width / 2, this.height);
+        this.drawTexturedModalRect(this.xPosition + this.width / 2, this.yPosition, 200 - this.width / 2, 46 + k * magic, this.width / 2, this.height);
+        this.mouseDragged(minecraft, mouseX, mouseY);
+        int l = 14737632;
     }
 
     @Override
     public ArrayList<String> getTooltip()
     {
+        if(!drawButton)
+        {
+            return null;
+        }
         ArrayList<String> list = super.getTooltip();
-        list.add(0, EnumChatFormatting.DARK_PURPLE + displayString);
-        return list;
-    }
 
-    public enum Style
-    {
-        Button, Toggle
+        String style = null;
+        if(!isEnabled())
+        {
+            style = buttonSpec.tooltipDisabledStyle;
+        }
+        else
+        {
+            style = toggled ? buttonSpec.tooltipOnStyle : buttonSpec.tooltipOffStyle;
+        }
+
+        list.add(0, style + displayString);
+        return list;
     }
 }

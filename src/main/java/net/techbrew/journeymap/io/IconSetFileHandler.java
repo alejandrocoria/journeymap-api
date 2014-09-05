@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by Mark on 8/29/2014.
@@ -24,22 +25,24 @@ public class IconSetFileHandler
     public static final String ASSETS_JOURNEYMAP_ICON_ENTITY = "/assets/journeymap/icon/entity";
     public final static String MOB_ICON_SET_2D = "2D";
     public final static String MOB_ICON_SET_3D = "3D";
+    public final static List<String> MOB_ICON_SETS = Arrays.asList(MOB_ICON_SET_2D, MOB_ICON_SET_3D);
 
     public static final String ASSETS_JOURNEYMAP_ICON_THEME = "/assets/journeymap/icon/theme";
-    public final static String THEME_VICTORIAN = "Victorian1_0";
+    public final static String THEME_VICTORIAN48 = "Victorian48";
+    public final static List<String> THEMES = Arrays.asList(THEME_VICTORIAN48);
 
     public static void initialize()
     {
         JourneyMap.getLogger().info("Initializing icon sets...");
 
         // Theme icons
-        for (String setName : Arrays.asList(THEME_VICTORIAN))
+        for (String setName : THEMES)
         {
             copyResources(getThemeIconDir(), ASSETS_JOURNEYMAP_ICON_THEME, setName, true);
         }
 
         // Mob icons
-        for (String setName : Arrays.asList(MOB_ICON_SET_2D, MOB_ICON_SET_3D))
+        for (String setName : MOB_ICON_SETS)
         {
             copyResources(getEntityIconDir(), ASSETS_JOURNEYMAP_ICON_ENTITY, setName, false);
         }
@@ -92,15 +95,15 @@ public class IconSetFileHandler
 
     public static ArrayList<String> getEntityIconSetNames()
     {
-        return getIconSetNames(getEntityIconDir(), MOB_ICON_SET_2D, MOB_ICON_SET_3D);
+        return getIconSetNames(getEntityIconDir(), MOB_ICON_SETS);
     }
 
     public static ArrayList<String> getThemeNames()
     {
-        return getIconSetNames(getThemeIconDir(), THEME_VICTORIAN);
+        return getIconSetNames(getThemeIconDir(), THEMES);
     }
 
-    public static ArrayList<String> getIconSetNames(File parentDir, String... defaultIconSets)
+    public static ArrayList<String> getIconSetNames(File parentDir, List<String> defaultIconSets)
     {
         try
         {
@@ -136,35 +139,44 @@ public class IconSetFileHandler
 
     public static BufferedImage getIconFromFile(File parentdir, String assetsPath, String setName, String iconPath, BufferedImage defaultImg)
     {
-        String filePath = Joiner.on(File.separatorChar).join(setName, iconPath.replace('/', File.separatorChar));
-        File iconFile = new File(parentdir, filePath);
-
         BufferedImage img = null;
-        if (iconFile.exists())
-        {
-            img = FileHandler.getImage(iconFile);
-        }
 
-        if (img == null)
+        try
         {
-            img = getIconFromResource(assetsPath, setName, iconPath);
+            String filePath = Joiner.on(File.separatorChar).join(setName, iconPath.replace('/', File.separatorChar));
+            File iconFile = new File(parentdir, filePath);
+
+
+            if (iconFile.exists())
+            {
+                img = FileHandler.getImage(iconFile);
+            }
+
             if (img == null)
             {
-                img = defaultImg;
-            }
+                img = getIconFromResource(assetsPath, setName, iconPath);
+                if (img == null)
+                {
+                    img = defaultImg;
+                }
 
-            try
-            {
-                iconFile.getParentFile().mkdirs();
-                ImageIO.write(img, "png", iconFile);
-            }
-            catch (Exception e)
-            {
-                String error = Constants.getMessageJMERR00("Can't write entity icon" + iconFile + ": " + e);
-                JourneyMap.getLogger().error(error);
-            }
+                try
+                {
+                    iconFile.getParentFile().mkdirs();
+                    ImageIO.write(img, "png", iconFile);
+                }
+                catch (Exception e)
+                {
+                    String error = Constants.getMessageJMERR00("Can't write entity icon" + iconFile + ": " + e);
+                    JourneyMap.getLogger().error(error);
+                }
 
-            JourneyMap.getLogger().debug("Created entity icon: " + iconFile);
+                JourneyMap.getLogger().debug("Created entity icon: " + iconFile);
+            }
+        }
+        catch(Exception e)
+        {
+            JourneyMap.getLogger().error("Couldn't load iconset file: " + LogFormatter.toString(e));
         }
 
         return img;

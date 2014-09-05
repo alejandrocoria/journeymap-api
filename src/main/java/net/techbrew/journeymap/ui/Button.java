@@ -9,10 +9,13 @@
 package net.techbrew.journeymap.ui;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.EnumChatFormatting;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.ui.adapter.PropertyAdapter;
 import org.lwjgl.opengl.GL11;
@@ -38,7 +41,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected boolean drawBackground;
     protected boolean showDisabledHoverText;
     protected boolean defaultStyle = true;
-    protected ToggleListener toggleListener;
+    protected ArrayList<ToggleListener> toggleListeners = new ArrayList<ToggleListener>(0);
     protected PropertyAdapter propertyAdapter;
 
     public Button(Enum enumValue, String label)
@@ -117,9 +120,9 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         setToggled(!getToggled());
     }
 
-    public void setToggleListener(ToggleListener toggleListener)
+    public void addToggleListener(ToggleListener toggleListener)
     {
-        this.toggleListener = toggleListener;
+        this.toggleListeners.add(toggleListener);
     }
 
     public void setPropertyAdapter(PropertyAdapter propertyAdapter, String rawLabel)
@@ -158,6 +161,16 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public void showDisabledOnHover(boolean show)
     {
         showDisabledHoverText = show;
+    }
+
+    @Override
+    public void func_146113_a(SoundHandler soundHandler)
+    {
+        // Play button click
+        if(isEnabled())
+        {
+            super.func_146113_a(soundHandler);
+        }
     }
 
     @Override
@@ -245,6 +258,10 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public boolean mouseOver(int mouseX, int mouseY)
     {
+        if(!drawButton)
+        {
+            return false;
+        }
         return mouseX >= this.xPosition && mouseY >= this.yPosition
                 && mouseX <= (this.xPosition + this.width)
                 && mouseY <= (this.yPosition + this.height);
@@ -262,11 +279,36 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public void setToggled(Boolean toggled, boolean notifyToggleListener)
     {
-        this.toggled = toggled;
-        updateLabel();
-        if (notifyToggleListener && toggleListener != null)
+        if(this.toggled==toggled || !this.enabled || !this.drawButton)
         {
-            toggleListener.onToggle(this, toggled);
+            return;
+        }
+
+        boolean allowChange = true;
+        try
+        {
+            if (notifyToggleListener && !toggleListeners.isEmpty())
+            {
+                for (ToggleListener listener : toggleListeners)
+                {
+                    allowChange = listener.onToggle(this, toggled);
+                    if (!allowChange)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().error("Error trying to toggle button '" + displayString + "': " + LogFormatter.toString(t));
+            allowChange = false;
+        }
+
+        if(allowChange)
+        {
+            this.toggled = toggled;
+            updateLabel();
         }
     }
 
@@ -526,6 +568,6 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public static interface ToggleListener<T extends Button>
     {
-        public void onToggle(T button, boolean toggled);
+        public boolean onToggle(T button, boolean toggled);
     }
 }

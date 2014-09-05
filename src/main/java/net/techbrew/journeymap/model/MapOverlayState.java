@@ -109,11 +109,17 @@ public class MapOverlayState
 
     public void setMapType(MapType mapType)
     {
-        if (mapType == MapType.day || mapType == MapType.night)
+        if(mapType != getCurrentMapType())
         {
-            lastMapProperties.getPreferredMapType().set(mapType);
+            if (mapType!=MapType.underground)
+            {
+                lastMapProperties.getPreferredMapType().set(mapType);
+                lastMapProperties.save();
+                preferredMapType = mapType;
+            }
         }
-        preferredMapType = mapType;
+
+
         requireRefresh();
     }
 
@@ -123,9 +129,9 @@ public class MapOverlayState
         return getMapType(showCaves);
     }
 
-    public MapType getMapType(boolean allowCaves)
+    public MapType getMapType(boolean showCaves)
     {
-        if (underground && caveMappingAllowed && allowCaves)
+        if (underground && caveMappingAllowed && showCaves)
         {
             return MapType.underground;
         }

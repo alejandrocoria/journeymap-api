@@ -55,12 +55,13 @@ public class StyleOptions extends JmUI
         rightButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_plants", core, core.mapPlants));
 
         BooleanPropertyButton buttonMapPlantShadows = BooleanPropertyButton.create(id++, "jm.common.map_style_plantshadows", core, core.mapPlantShadows);
-        buttonMapPlantShadows.setToggleListener(new Button.ToggleListener()
+        buttonMapPlantShadows.addToggleListener(new Button.ToggleListener()
         {
             @Override
-            public void onToggle(Button button, boolean toggled)
+            public boolean onToggle(Button button, boolean toggled)
             {
                 refreshBlockMetadata = true;
+                return true;
             }
         });
 

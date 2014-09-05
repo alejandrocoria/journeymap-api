@@ -262,6 +262,7 @@ public class GridRenderer
                 }
             }
         }
+
         return updated;
     }
 

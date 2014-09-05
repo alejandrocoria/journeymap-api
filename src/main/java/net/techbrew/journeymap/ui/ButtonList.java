@@ -190,6 +190,11 @@ public class ButtonList extends ArrayList<Button>
         Button last = null;
         for (Button button : this)
         {
+            if(!button.drawButton)
+            {
+                continue;
+            }
+
             if (last == null)
             {
                 if (leftToRight)
@@ -214,6 +219,14 @@ public class ButtonList extends ArrayList<Button>
             }
             last = button;
         }
+        return this;
+    }
+
+    public ButtonList layoutCenteredVertical(final int x, final int centerY, final boolean leftToRight, final int vgap)
+    {
+        this.horizontal = false;
+        int height = getHeight(vgap);
+        layoutVertical(x, centerY - (height / 2), leftToRight, vgap);
         return this;
     }
 
@@ -250,6 +263,11 @@ public class ButtonList extends ArrayList<Button>
         }
 
         return this;
+    }
+
+    public void setHorizontal(boolean horizontal)
+    {
+        this.horizontal = horizontal;
     }
 
     public ButtonList layoutCenteredHorizontal(final int centerX, final int y, final boolean leftToRight, final int hgap)
@@ -380,6 +398,14 @@ public class ButtonList extends ArrayList<Button>
         for (Button button : this)
         {
             button.fitWidth(fr);
+        }
+    }
+
+    public void setDrawButtons(boolean draw)
+    {
+        for (Button button : this)
+        {
+            button.setDrawButton(draw);
         }
     }
 

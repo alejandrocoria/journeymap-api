@@ -49,7 +49,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public final AtomicBoolean mapPlants = new AtomicBoolean(true);
     public final AtomicBoolean mapCrops = new AtomicBoolean(true);
     public final AtomicBoolean mapSurfaceAboveCaves = new AtomicBoolean(true);
-    public final AtomicReference<String> themeName = new AtomicReference<String>("Victorian1_0");
+    public final AtomicReference<String> themeName = new AtomicReference<String>(IconSetFileHandler.THEME_VICTORIAN48);
     protected transient final String name = "core";
 
     public CoreProperties()
@@ -64,7 +64,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
         List<String> validNames = IconSetFileHandler.getThemeNames();
         if (themeName.get() == null || !validNames.contains(themeName.get()))
         {
-            JourneyMap.getLogger().warn(String.format("Skin Icon Set name '%s' is not valid, will use default instead.", themeName.get()));
+            JourneyMap.getLogger().warn(String.format("Thene name '%s' is not valid, will use default instead.", themeName.get()));
             themeName.set(validNames.get(0));
             saveNeeded = true;
         }
@@ -109,13 +109,12 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Override
     public int hashCode()
     {
-        int result = name.hashCode();
-        result = 31 * result + fileRevision;
-        result = 31 * result + logLevel.hashCode();
+        int result = logLevel.hashCode();
         result = 31 * result + chunkOffset.hashCode();
         result = 31 * result + entityPoll.hashCode();
         result = 31 * result + playerPoll.hashCode();
         result = 31 * result + chunkPoll.hashCode();
+        result = 31 * result + autoMapPoll.hashCode();
         result = 31 * result + cacheAnimalsData.hashCode();
         result = 31 * result + maxAnimalsData.hashCode();
         result = 31 * result + cacheMobsData.hashCode();
@@ -127,6 +126,18 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
         result = 31 * result + maxVillagersData.hashCode();
         result = 31 * result + announceMod.hashCode();
         result = 31 * result + checkUpdates.hashCode();
+        result = 31 * result + caveIgnoreGlass.hashCode();
+        result = 31 * result + recordCacheStats.hashCode();
+        result = 31 * result + mapBathymetry.hashCode();
+        result = 31 * result + mapTransparency.hashCode();
+        result = 31 * result + mapCaveLighting.hashCode();
+        result = 31 * result + mapAntialiasing.hashCode();
+        result = 31 * result + mapPlantShadows.hashCode();
+        result = 31 * result + mapPlants.hashCode();
+        result = 31 * result + mapCrops.hashCode();
+        result = 31 * result + mapSurfaceAboveCaves.hashCode();
+        result = 31 * result + themeName.hashCode();
+        result = 31 * result + name.hashCode();
         return result;
     }
 
@@ -134,12 +145,12 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public String toString()
     {
         return "CoreProperties{" +
-                "name='" + name + '\'' +
                 ", logLevel=" + logLevel +
                 ", chunkOffset=" + chunkOffset +
                 ", entityPoll=" + entityPoll +
                 ", playerPoll=" + playerPoll +
                 ", chunkPoll=" + chunkPoll +
+                ", autoMapPoll=" + autoMapPoll +
                 ", cacheAnimalsData=" + cacheAnimalsData +
                 ", maxAnimalsData=" + maxAnimalsData +
                 ", cacheMobsData=" + cacheMobsData +
@@ -156,6 +167,12 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 ", mapBathymetry=" + mapBathymetry +
                 ", mapTransparency=" + mapTransparency +
                 ", mapCaveLighting=" + mapCaveLighting +
+                ", mapAntialiasing=" + mapAntialiasing +
+                ", mapPlantShadows=" + mapPlantShadows +
+                ", mapPlants=" + mapPlants +
+                ", mapCrops=" + mapCrops +
+                ", mapSurfaceAboveCaves=" + mapSurfaceAboveCaves +
+                ", themeName=" + themeName + '\'' +
                 '}';
     }
 }

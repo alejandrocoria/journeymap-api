@@ -63,17 +63,17 @@ public class BooleanPropertyAdapter implements PropertyAdapter
         else
         {
             button.setEnabled(true);
-            button.setToggled(valueHolder.get());
-            button.setToggleListener(new Button.ToggleListener()
+            button.setToggled(valueHolder.get(), false);
+            button.addToggleListener(new Button.ToggleListener()
             {
                 @Override
-                public void onToggle(Button button, boolean toggled)
+                public boolean onToggle(Button button, boolean toggled)
                 {
-                    if (button.isEnabled())
+                    if (valueHolder.get() != toggled)
                     {
                         if (properties != null)
                         {
-                            button.setToggled(properties.toggle(valueHolder), false);
+                            properties.toggle(valueHolder);
                         }
                         else
                         {
@@ -81,6 +81,7 @@ public class BooleanPropertyAdapter implements PropertyAdapter
                             button.setToggled(toggled, false);
                         }
                     }
+                    return true;
                 }
             });
         }
