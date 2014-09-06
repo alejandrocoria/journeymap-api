@@ -574,24 +574,16 @@ public class MapOverlay extends JmUI
         }
 
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        Boolean guiButtonUsed = false;
-        if (mouseButton == 0)
+
+        // Bail if over a button
+        if(isMouseOverButton(mouseX, mouseY))
         {
-            for (int l = 0; l < buttonList.size(); l++)
-            {
-                GuiButton guibutton = (GuiButton) buttonList.get(l);
-                if (guibutton.mousePressed(mc, mouseX, mouseY))
-                {
-                    guiButtonUsed = true;
-                    break;
-                }
-            }
+            return;
         }
-        if (!guiButtonUsed)
-        {
-            BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
-            layerDelegate.onMouseClicked(mc, Mouse.getEventX(), Mouse.getEventY(), gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord, mouseButton);
-        }
+
+        // Invoke layer delegate
+        BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
+        layerDelegate.onMouseClicked(mc, Mouse.getEventX(), Mouse.getEventY(), gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord, mouseButton);
     }
 
     @Override
@@ -599,7 +591,7 @@ public class MapOverlay extends JmUI
     {
         super.mouseMovedOrUp(mouseX, mouseY, which);
 
-        if (isMouseOverButton(mouseX, mouseY, which) && which == 0)
+        if (isMouseOverButton(mouseX, mouseY))
         {
             return;
         }

@@ -92,7 +92,7 @@ public abstract class JmUI extends GuiScreen
         sizeDisplay(glwidth, glheight);
     }
 
-    protected boolean isMouseOverButton(int mouseX, int mouseY, int which)
+    protected boolean isMouseOverButton(int mouseX, int mouseY)
     {
         for (int k = 0; k < this.buttonList.size(); ++k)
         {
