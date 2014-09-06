@@ -23,6 +23,9 @@ import java.awt.*;
  */
 public class DrawUtil
 {
+    public static int Default_glTexParameteri = GL11.GL_LINEAR;
+
+
     /**
      * Draw a text label, centered on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
@@ -262,8 +265,8 @@ public class DrawUtil
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
 
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, Default_glTexParameteri);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, Default_glTexParameteri);
 
         if (rotation != 0)
         {

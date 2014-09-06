@@ -6,6 +6,7 @@ import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.ui.Button;
 import net.techbrew.journeymap.ui.ButtonList;
+import org.lwjgl.opengl.GL11;
 import scala.actors.threadpool.Arrays;
 
 import java.util.ArrayList;
@@ -147,49 +148,62 @@ public class ThemeToolbar extends Button
 
         float scale = 1f;
 
-        // Draw Begin
-        if(toolbarSpec.beginWidth!=textureBegin.width) {
-            scale = (1f*toolbarSpec.beginWidth / textureBegin.width);
-        }
-        DrawUtil.drawImage(textureBegin, drawX, drawY, false, scale, 0);
+        DrawUtil.Default_glTexParameteri = GL11.GL_NEAREST;
 
-        if(isHorizontal)
+        try
         {
-            drawX += (toolbarSpec.beginWidth);
-        }
-        else
-        {
-            drawY += (toolbarSpec.beginHeight);
-        }
 
-        // Draw Inner
-        scale = 1f;
-        if (toolbarSpec.innerWidth != textureInner.width)
-        {
-            scale = (1f * toolbarSpec.innerWidth / textureInner.width);
-        }
-        for (Button button : buttonList)
-        {
-            if(button.isDrawButton())
+            // Draw Begin
+            if (toolbarSpec.beginWidth != textureBegin.width)
             {
-                DrawUtil.drawImage(textureInner, drawX, drawY, false, scale, 0);
-                if(isHorizontal)
+                scale = (1f * toolbarSpec.beginWidth / textureBegin.width);
+            }
+            DrawUtil.drawImage(textureBegin, drawX, drawY, false, scale, 0);
+
+            if (isHorizontal)
+            {
+                drawX += (toolbarSpec.beginWidth);
+            }
+            else
+            {
+                drawY += (toolbarSpec.beginHeight);
+            }
+
+            // Draw Inner
+            scale = 1f;
+            if (toolbarSpec.innerWidth != textureInner.width)
+            {
+                scale = (1f * toolbarSpec.innerWidth / textureInner.width);
+            }
+            for (Button button : buttonList)
+            {
+                if (button.isDrawButton())
                 {
-                    drawX += toolbarSpec.innerWidth;
-                }
-                else
-                {
-                    drawY += toolbarSpec.innerHeight;
+                    DrawUtil.drawImage(textureInner, drawX, drawY, false, scale, 0);
+                    if (isHorizontal)
+                    {
+                        drawX += toolbarSpec.innerWidth;
+                    }
+                    else
+                    {
+                        drawY += toolbarSpec.innerHeight;
+                    }
                 }
             }
-        }
 
-        // Draw End
-        scale = 1f;
-        if(toolbarSpec.endWidth!=textureEnd.width) {
-            scale = (1f*toolbarSpec.endWidth / textureEnd.width);
+            // Draw End
+            scale = 1f;
+            if (toolbarSpec.endWidth != textureEnd.width)
+            {
+                scale = (1f * toolbarSpec.endWidth / textureEnd.width);
+            }
+            DrawUtil.drawImage(textureEnd, drawX, drawY, false, scale, 0);
+
         }
-        DrawUtil.drawImage(textureEnd, drawX, drawY, false, scale, 0);
+        finally
+        {
+            DrawUtil.Default_glTexParameteri = GL11.GL_LINEAR;
+        }
     }
 
     public int getCenterX()
