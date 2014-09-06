@@ -383,8 +383,8 @@ public class GridRenderer
                 GL11.glEnable(GL11.GL_TEXTURE_2D);
                 GL11.glBindTexture(GL11.GL_TEXTURE_2D, tile.getTexture().getGlTextureId());
 
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, DrawUtil.Default_glTexParameteri);
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, DrawUtil.Default_glTexParameteri);
 
                 Tessellator tessellator = Tessellator.instance;
                 tessellator.startDrawingQuads();
