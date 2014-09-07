@@ -28,6 +28,7 @@ public class Tile
 {
 
     public final static int TILESIZE = 512;
+    public final static int LOAD_RADIUS = (int) (TILESIZE * 1.5);
 
     final int dimension;
     final int zoom;

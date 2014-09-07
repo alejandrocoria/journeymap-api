@@ -246,7 +246,7 @@ public class MiniMap
 
             // Scissor area that shouldn't be drawn
             GL11.glScissor((int) dv.scissorX + 1, (int) dv.scissorY + 1, (int) dv.minimapSize - 2, (int) dv.minimapSize - 2);
-            //GL11.glEnable(GL11.GL_SCISSOR_TEST);
+            GL11.glEnable(GL11.GL_SCISSOR_TEST);
 
             // Draw grid
             gridRenderer.draw(1f, 0, 0);
@@ -310,17 +310,17 @@ public class MiniMap
             }
 
             // Draw border texture
-            if (dv.borderTexture != null)
+            if (dv.borderTexture != null && !dv.shape.equals(DisplayVars.Shape.CustomSquare))
             {
                 GL11.glPushMatrix();
                 //GL11.glTranslated(512-dv.minimapSize, 0, 0);
                 // TODO: Draw Frame scaled
-                DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, (float) (dv.minimapSize / 512.0), 0);
+                DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, 1, 0);
                 GL11.glPopMatrix();
             }
 
             // Draw labels if not scissored
-            if (!dv.labelFps.scissor && dv.showFps)
+            if (/*!dv.labelFps.scissor &&*/ dv.showFps)
             {
                 dv.labelFps.draw(fpsLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
             }

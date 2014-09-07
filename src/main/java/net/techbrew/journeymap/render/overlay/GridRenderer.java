@@ -363,7 +363,7 @@ public class GridRenderer
         final double endX = offsetX + pos.endX;
         final double endZ = offsetZ + pos.endZ;
 
-        if (isOnScreen(startX, startZ, Tile.TILESIZE, Tile.TILESIZE))
+        //if (isOnScreen(startX, startZ, Tile.TILESIZE, Tile.TILESIZE))
         {
             boolean missingTex = tile == null || !tile.hasTexture();
 
@@ -476,7 +476,8 @@ public class GridRenderer
      */
     private boolean isOnScreen(TilePos pos)
     {
-        return isOnScreen(pos.startX + centerPixelOffset.x, pos.startZ + centerPixelOffset.y, Tile.TILESIZE, Tile.TILESIZE);
+        return true;
+        //return isOnScreen(pos.startX + centerPixelOffset.x, pos.startZ + centerPixelOffset.y, Tile.LOAD_RADIUS, Tile.LOAD_RADIUS);
     }
 
     /**

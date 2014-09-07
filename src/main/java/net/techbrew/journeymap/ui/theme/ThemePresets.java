@@ -12,11 +12,11 @@ import java.util.List;
 public class ThemePresets
 {
     public static final Theme THEME_VICTORIAN = createVictorian();
-    public static final Theme THEME_FAITHFUL = createFaithful();
+    public static final Theme THEME_PURIST = createPurist();
 
     public static List<Theme> getPresets()
     {
-        return Arrays.asList(THEME_FAITHFUL, THEME_VICTORIAN);
+        return Arrays.asList(THEME_PURIST, THEME_VICTORIAN);
     }
 
     private static Theme createVictorian()
@@ -80,10 +80,10 @@ public class ThemePresets
         return theme;
     }
 
-    private static Theme createFaithful()
+    private static Theme createPurist()
     {
-        Theme theme = createVictorian();
-        theme.name = "Faithful";
+        Theme theme = new Theme();
+        theme.name = "Purist";
         theme.directory = "Victorian";
 
         Theme.Icon icon = theme.icon;

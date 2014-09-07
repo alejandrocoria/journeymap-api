@@ -106,6 +106,12 @@ public class MiniMapProperties extends InGameMapProperties
             saveNeeded = true;
         }
 
+        if(customSize.get()>768)
+        {
+            customSize.set(768);
+            saveNeeded = true;
+        }
+
         return saveNeeded;
     }
 

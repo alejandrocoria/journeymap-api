@@ -174,7 +174,7 @@ public class DisplayVars
                 maskTexture = null;
                 minimapSize = miniMapProperties.customSize.get();
                 float minimapAlpha = (1f * miniMapProperties.frameAlpha.get()) / 255f;
-                borderTexture = TextureCache.instance().getMinimapCustomSquare((int) minimapSize, minimapAlpha);
+                borderTexture = TextureCache.instance().getUnknownEntity();
                 marginX = 0;
                 marginY = 0;
                 viewPortPadX = 2;
@@ -218,7 +218,7 @@ public class DisplayVars
                 textureY = mc.displayHeight - (minimapSize) - marginY - bottomTextureYMargin;
                 translateX = (mc.displayWidth / 2) - minimapOffset;
                 translateY = (mc.displayHeight / 2) - minimapOffset - bottomTextureYMargin;
-                scissorX = mc.displayWidth - minimapSize - marginX;
+                scissorX = textureX;
                 scissorY = marginY + bottomTextureYMargin;
                 if (labelsOutside)
                 {
@@ -235,7 +235,7 @@ public class DisplayVars
                 textureY = marginY;
                 translateX = -(mc.displayWidth / 2) + minimapOffset;
                 translateY = -(mc.displayHeight / 2) + minimapOffset;
-                scissorX = marginX;
+                scissorX = textureX;
                 scissorY = mc.displayHeight - minimapSize - marginY;
                 break;
             }
@@ -245,7 +245,7 @@ public class DisplayVars
                 textureY = mc.displayHeight - (minimapSize) - marginY - bottomTextureYMargin;
                 translateX = -(mc.displayWidth / 2) + minimapOffset;
                 translateY = (mc.displayHeight / 2) - minimapOffset - bottomTextureYMargin;
-                scissorX = marginX;
+                scissorX = textureX;
                 scissorY = marginY + bottomTextureYMargin;
                 if (labelsOutside)
                 {
@@ -254,6 +254,16 @@ public class DisplayVars
                     valignBiome = DrawUtil.VAlign.Above;
                     yOffsetBiome = yOffsetLocation - labelHeight;
                 }
+                break;
+            }
+            case Center:
+            {
+                textureX = (mc.displayWidth - minimapSize - marginX)/2;
+                textureY = (mc.displayHeight - minimapSize - marginY)/2;
+                translateX = 0;
+                translateY = 0;
+                scissorX = textureX;
+                scissorY = textureY;
                 break;
             }
             case TopRight:
@@ -285,7 +295,8 @@ public class DisplayVars
         TopRight("jm.minimap.position_topright"),
         BottomRight("jm.minimap.position_bottomright"),
         BottomLeft("jm.minimap.position_bottomleft"),
-        TopLeft("jm.minimap.position_topleft");
+        TopLeft("jm.minimap.position_topleft"),
+        Center("jm.minimap.position_center");
 
         public final String label;
 

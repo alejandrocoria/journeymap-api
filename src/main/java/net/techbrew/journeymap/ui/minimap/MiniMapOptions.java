@@ -111,28 +111,31 @@ public class MiniMapOptions extends JmUI
 
         buttonIconSet = new IconSetButton(ButtonEnum.IconSet.ordinal(), miniMapProperties, miniMapProperties.entityIconSetName, IconSetFileHandler.getEntityIconSetNames(), "jm.common.mob_icon_set");
 
-        buttonCustomSize = SliderButton.create(ButtonEnum.CustomSize.ordinal(), miniMapProperties.customSize, 64, 1024, "jm.minimap.custom_size", false);
+        buttonCustomSize = SliderButton.create(ButtonEnum.CustomSize.ordinal(), miniMapProperties.customSize, 32, 758, "jm.minimap.custom_size", false);
         buttonTerrainAlpha = SliderButton.create(ButtonEnum.TerrainAlpha.ordinal(), miniMapProperties.terrainAlpha, 1, 255, "jm.minimap.terrain_alpha", true);
         buttonFrameAlpha = SliderButton.create(ButtonEnum.FrameAlpha.ordinal(), miniMapProperties.frameAlpha, 1, 255, "jm.minimap.frame_alpha", true);
 
         buttonOrientation = new EnumPropertyButton<DisplayVars.Orientation>(ButtonEnum.Orientation.ordinal(), DisplayVars.Orientation.values(),
                 "jm.minimap.orientation.button", miniMapProperties, miniMapProperties.orientation);
 
-        leftButtons = new ButtonList(buttonShape, buttonCustomSize, buttonShowfps, buttonShowSelf, buttonKeyboard, buttonKeyboardHelp, buttonGeneralDisplay);
+        leftButtons = new ButtonList(buttonShape, buttonCustomSize, buttonTerrainAlpha, buttonFrameAlpha, buttonShowfps, buttonShowSelf, buttonKeyboard);
 
-        rightButtons = new ButtonList(buttonPosition, buttonFont, buttonUnicode, buttonTexture, buttonOrientation, buttonIconSet, buttonTerrainAlpha, buttonFrameAlpha);
+        rightButtons = new ButtonList(buttonPosition, buttonOrientation, buttonIconSet, buttonFont, buttonUnicode, buttonTexture, buttonKeyboardHelp);
 
         buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
         buttonCloseAll = new Button(ButtonEnum.CloseAll, Constants.getString("jm.minimap.return_to_game")); //$NON-NLS-1$
 
-        bottomButtons = new ButtonList(buttonClose, buttonCloseAll);
+        bottomButtons = new ButtonList(buttonGeneralDisplay, buttonClose, buttonCloseAll);
+        bottomButtons.equalizeWidths(getFontRenderer());
 
         buttonList.add(buttonMiniMap);
         buttonList.addAll(leftButtons);
         buttonList.addAll(rightButtons);
+        new ButtonList(buttonList).equalizeWidths(getFontRenderer());
+
         buttonList.addAll(bottomButtons);
 
-        new ButtonList(buttonList).equalizeWidths(getFontRenderer());
+
     }
 
     /**
@@ -151,7 +154,7 @@ public class MiniMapOptions extends JmUI
         final int hgap = 2;
         final int vgap = 3;
         final int bx = this.width / 2;
-        final int by = Math.max(30, (this.height - (8 * 24)) / 2);
+        final int by = Math.max(25, (this.height - (8 * 24)) / 2);
 
         buttonMiniMap.centerHorizontalOn(bx).setY(by);
 
@@ -364,14 +367,15 @@ public class MiniMapOptions extends JmUI
         drawBackground(0);
         layoutButtons();
 
-        drawTitle();
-        drawLogo();
 
         if (JourneyMap.getMiniMapProperties().enabled.get())
         {
             MiniMap miniMap = this.miniMap;
             miniMap.drawMap();
         }
+
+        drawTitle();
+        drawLogo();
 
         for (int k = 0; k < this.buttonList.size(); ++k)
         {

@@ -12,8 +12,12 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
-- New Feature: Full-screen Map UI now uses Theme (Skin) image buttons and tooltips
-- New Feature: MiniMap can now rotate based on your heading.  See MiniMap Options
+- New Feature: Full-screen Map UI now uses "Themes" to skin image buttons and tooltips.
+-- Two themes provided: Victorian and Purist.  New themes can be added.
+-- Currently hardcoded to Victorian.  You can change "themeName" in journeymap.core.config to "Purist" to use that.
+- New Feature: MiniMap Options > Orientation.  Values are North, Old North, and My Heading.
+- New Feature: MiniMap positions now include "Center".  This will facilitate a feature coming later.
+- Change: Buttons reorganized in MiniMap Options.
 - Change: Secondary shading (antialiasing) tweaked slightly for better northwesterly shadows.
 - Change: Quieted info logging about "Ignoring TitleEntity without standard block texture"
 
