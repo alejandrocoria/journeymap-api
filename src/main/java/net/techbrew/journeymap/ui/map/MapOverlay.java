@@ -45,7 +45,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -845,11 +844,7 @@ public class MapOverlay extends JmUI
             gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
         }
         gridRenderer.updateTextures(state.getCurrentMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
-
-        DrawUtil.Default_glTexParameteri = GL11.GL_NEAREST;
         gridRenderer.draw(1f, xOffset, yOffset);
-        DrawUtil.Default_glTexParameteri = GL11.GL_LINEAR;
-
         gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
         gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
 

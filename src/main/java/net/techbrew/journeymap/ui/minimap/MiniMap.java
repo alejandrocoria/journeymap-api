@@ -124,7 +124,6 @@ public class MiniMap
             }
 
             // Update the grid
-            DrawUtil.Default_glTexParameteri = GL11.GL_LINEAR;
             gridRenderer.setContext(state.getWorldDir(), state.getDimension());
             boolean moved = gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
             if (moved || doStateRefresh)

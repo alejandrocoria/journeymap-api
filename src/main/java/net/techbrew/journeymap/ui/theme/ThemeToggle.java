@@ -36,7 +36,7 @@ public class ThemeToggle extends ThemeButton
     @Override
     protected String getPathPattern()
     {
-        return "control/toggle_%s.png";
+        return "control/%stoggle_%s.png";
     }
 
     @Override

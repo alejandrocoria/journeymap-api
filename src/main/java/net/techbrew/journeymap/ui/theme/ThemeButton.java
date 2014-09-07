@@ -58,9 +58,10 @@ public class ThemeButton extends net.techbrew.journeymap.ui.Button
         if(buttonSpec.useBackgroundImage)
         {
             String pattern = getPathPattern();
-            textureOn = tc.getThemeTexture(theme, String.format(pattern, "on"), buttonSpec.width, buttonSpec.height);
-            textureOff = tc.getThemeTexture(theme, String.format(pattern, "off"), buttonSpec.width, buttonSpec.height);
-            textureDisabled = tc.getThemeTexture(theme, String.format(pattern, "disabled"), buttonSpec.width, buttonSpec.height);
+            String prefix = buttonSpec.prefix;
+            textureOn = tc.getThemeTexture(theme, String.format(pattern, prefix, "on"), buttonSpec.width, buttonSpec.height);
+            textureOff = tc.getThemeTexture(theme, String.format(pattern, prefix, "off"), buttonSpec.width, buttonSpec.height);
+            textureDisabled = tc.getThemeTexture(theme, String.format(pattern, prefix, "disabled"), buttonSpec.width, buttonSpec.height);
         }
         else
         {
@@ -83,7 +84,7 @@ public class ThemeButton extends net.techbrew.journeymap.ui.Button
 
     protected String getPathPattern()
     {
-        return "control/button_%s.png";
+        return "control/%sbutton_%s.png";
     }
 
     protected Theme.Control.ButtonSpec getButtonSpec(Theme theme)

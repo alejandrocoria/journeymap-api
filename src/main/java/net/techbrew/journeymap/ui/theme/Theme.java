@@ -93,6 +93,8 @@ public class Theme implements Comparable<Theme>
             @Since(1)
             public int height;
             @Since(1)
+            public String prefix = "";
+            @Since(1)
             public String tooltipOnStyle = "";
             @Since(1)
             public String tooltipOffStyle = "";
