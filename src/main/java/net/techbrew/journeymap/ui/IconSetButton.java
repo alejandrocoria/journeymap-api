@@ -14,6 +14,7 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.properties.PropertiesBase;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -24,14 +25,14 @@ public class IconSetButton extends Button
     final String messageKey;
     final PropertiesBase baseProperties;
     final AtomicReference<String> valueHolder;
-    final ArrayList<String> validNames;
+    final ArrayList<Object> validNames;
 
-    public IconSetButton(int id, PropertiesBase baseProperties, AtomicReference<String> valueHolder, ArrayList<String> validNames, String messageKey)
+    public IconSetButton(int id, PropertiesBase baseProperties, AtomicReference<String> valueHolder, List validNames, String messageKey)
     {
         super(id, 0, 0, Constants.getString(messageKey, ""));
         this.baseProperties = baseProperties;
         this.valueHolder = valueHolder;
-        this.validNames = validNames;
+        this.validNames = new ArrayList<Object>(validNames);
         this.messageKey = messageKey;
         updateLabel();
 
@@ -43,7 +44,7 @@ public class IconSetButton extends Button
     {
         if (!validNames.contains(valueHolder.get()))
         {
-            valueHolder.set(validNames.get(0));
+            valueHolder.set(validNames.get(0).toString());
             baseProperties.save();
         }
 
@@ -65,9 +66,9 @@ public class IconSetButton extends Button
     public int getFitWidth(FontRenderer fr)
     {
         int maxWidth = 0;
-        for (String iconSetName : validNames)
+        for (Object iconSetName : validNames)
         {
-            String name = getSafeLabel(iconSetName);
+            String name = getSafeLabel(iconSetName.toString());
             maxWidth = Math.max(maxWidth, FMLClientHandler.instance().getClient().fontRenderer.getStringWidth(name));
         }
         return maxWidth + 12;
@@ -83,7 +84,7 @@ public class IconSetButton extends Button
             index = 0;
         }
 
-        valueHolder.set(validNames.get(index));
+        valueHolder.set(validNames.get(index).toString());
         baseProperties.save();
 
         updateLabel();

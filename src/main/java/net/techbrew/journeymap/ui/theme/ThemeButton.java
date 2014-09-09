@@ -10,22 +10,25 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Mark on 8/30/2014.
  */
 public class ThemeButton extends net.techbrew.journeymap.ui.Button
 {
-    protected final Theme theme;
-    protected final Theme.Control.ButtonSpec buttonSpec;
-    protected final TextureImpl textureOn;
-    protected final TextureImpl textureOff;
-    protected final TextureImpl textureDisabled;
-    protected final TextureImpl textureIcon;
-    protected final Color iconOnColor;
-    protected final Color iconOffColor;
-    protected final Color iconHoverColor;
-    protected final Color iconDisabledColor;
+    protected Theme theme;
+    protected Theme.Control.ButtonSpec buttonSpec;
+    protected TextureImpl textureOn;
+    protected TextureImpl textureOff;
+    protected TextureImpl textureDisabled;
+    protected TextureImpl textureIcon;
+    protected Color iconOnColor;
+    protected Color iconOffColor;
+    protected Color iconHoverColor;
+    protected Color iconDisabledColor;
+    protected String iconName;
+    protected List<String> additionalTooltips;
 
     public ThemeButton(Enum enumId, Theme theme, String iconName)
     {
@@ -50,7 +53,12 @@ public class ThemeButton extends net.techbrew.journeymap.ui.Button
     public ThemeButton(int id, Theme theme, String labelOn, String labelOff, boolean toggled, String iconName)
     {
         super(id, 0, 0, toggled ? labelOn : labelOff);
+        this.iconName = iconName;
+        updateTheme(theme);
+    }
 
+    public void updateTheme(Theme theme)
+    {
         this.theme = theme;
         this.buttonSpec = getButtonSpec(theme);
         TextureCache tc = TextureCache.instance();
@@ -70,10 +78,10 @@ public class ThemeButton extends net.techbrew.journeymap.ui.Button
             textureDisabled = null;
         }
 
-        iconOnColor = theme.getColor(buttonSpec.iconOnColor);
-        iconOffColor = theme.getColor(buttonSpec.iconOffColor);
-        iconHoverColor = theme.getColor(buttonSpec.iconHoverColor);
-        iconDisabledColor = theme.getColor(buttonSpec.iconDisabledColor);
+        iconOnColor = Theme.getColor(buttonSpec.iconOnColor);
+        iconOffColor = Theme.getColor(buttonSpec.iconOffColor);
+        iconHoverColor = Theme.getColor(buttonSpec.iconHoverColor);
+        iconDisabledColor = Theme.getColor(buttonSpec.iconDisabledColor);
 
         textureIcon = tc.getThemeTexture(theme, String.format("icon/%s.png", iconName), theme.icon.width, theme.icon.height);
 
@@ -189,10 +197,15 @@ public class ThemeButton extends net.techbrew.journeymap.ui.Button
         int l = 14737632;
     }
 
+    public void setAdditionalTooltips(List<String> additionalTooltips)
+    {
+        this.additionalTooltips = additionalTooltips;
+    }
+
     @Override
     public ArrayList<String> getTooltip()
     {
-        if(!drawButton)
+        if(!visible)
         {
             return null;
         }
@@ -209,6 +222,11 @@ public class ThemeButton extends net.techbrew.journeymap.ui.Button
         }
 
         list.add(0, style + displayString);
+
+        if(additionalTooltips!=null)
+        {
+            list.addAll(additionalTooltips);
+        }
         return list;
     }
 }

@@ -36,7 +36,6 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected String labelOn;
     protected String labelOff;
     protected boolean enabled;
-    protected boolean drawButton;
     protected boolean drawFrame;
     protected boolean drawBackground;
     protected boolean showDisabledHoverText;
@@ -258,7 +257,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public boolean mouseOver(int mouseX, int mouseY)
     {
-        if(!drawButton)
+        if(!visible)
         {
             return false;
         }
@@ -279,7 +278,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public void setToggled(Boolean toggled, boolean notifyToggleListener)
     {
-        if(this.toggled==toggled || !this.enabled || !this.drawButton)
+        if(this.toggled==toggled || !this.enabled || !this.visible)
         {
             return;
         }
@@ -528,12 +527,12 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public boolean isDrawButton()
     {
-        return drawButton;
+        return visible;
     }
 
     public void setDrawButton(boolean drawButton)
     {
-        this.drawButton = drawButton;
+        this.visible = drawButton;
     }
 
     public boolean isDrawFrame()

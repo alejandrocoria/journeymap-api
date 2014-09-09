@@ -153,6 +153,11 @@ public abstract class JmUI extends GuiScreen
 
     protected abstract void layoutButtons();
 
+    public java.util.List getButtonList()
+    {
+        return buttonList;
+    }
+
     @Override
     public void drawScreen(int x, int y, float par3)
     {

@@ -121,6 +121,17 @@ public class ThemeFileHandler
         return themes;
     }
 
+    public static List<String> getThemeNames()
+    {
+        List<Theme> themes = getThemes();
+        ArrayList<String> names = new ArrayList<String>(themes.size());
+        for(Theme theme : themes)
+        {
+            names.add(theme.name);
+        }
+        return names;
+    }
+
     public static Theme getCurrentTheme()
     {
         return getCurrentTheme(false);

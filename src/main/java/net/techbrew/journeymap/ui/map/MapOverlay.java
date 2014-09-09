@@ -33,6 +33,7 @@ import net.techbrew.journeymap.render.overlay.OverlayWaypointRenderer;
 import net.techbrew.journeymap.render.overlay.TileCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.ui.Button;
+import net.techbrew.journeymap.ui.ButtonList;
 import net.techbrew.journeymap.ui.JmUI;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.adapter.BooleanPropertyAdapter;
@@ -80,6 +81,8 @@ public class MapOverlay extends JmUI
     StatTimer drawScreenTimer = StatTimer.get("MapOverlay.drawScreen");
     StatTimer drawMapTimer = StatTimer.get("MapOverlay.drawScreen.drawMap");
     StatTimer drawMapTimerWithRefresh = StatTimer.get("MapOverlay.drawMap+refreshState");
+
+    int lastWidth;
     /**
      * Default constructor
      */
@@ -114,13 +117,14 @@ public class MapOverlay extends JmUI
         gridRenderer.setMapProperties(JourneyMap.getFullMapProperties());
 
         Keyboard.enableRepeatEvents(true);
-        initButtons();
 
         // When switching dimensions, reset grid
         if (state.getDimension() != mc.thePlayer.dimension)
         {
             gridRenderer.clear();
         }
+
+        initButtons();
     }
 
     @Override
@@ -135,18 +139,27 @@ public class MapOverlay extends JmUI
             layoutButtons();
 
             ArrayList<String> tooltip = null;
-            for (int k = 0; k < this.buttonList.size(); ++k)
+
+            if(firstLayoutPass)
             {
-                GuiButton guibutton = (GuiButton) this.buttonList.get(k);
-                guibutton.drawButton(this.mc, width, height);
-                if (tooltip == null)
+                layoutButtons();
+                firstLayoutPass = false;
+            }
+            else
+            {
+                for (int k = 0; k < this.buttonList.size(); ++k)
                 {
-                    if (guibutton instanceof Button)
+                    GuiButton guibutton = (GuiButton) this.buttonList.get(k);
+                    guibutton.drawButton(this.mc, width, height);
+                    if (tooltip == null)
                     {
-                        Button button = (Button) guibutton;
-                        if (button.mouseOver(mx, my))
+                        if (guibutton instanceof Button)
                         {
-                            tooltip = button.getTooltip();
+                            Button button = (Button) guibutton;
+                            if (button.mouseOver(mx, my))
+                            {
+                                tooltip = button.getTooltip();
+                            }
                         }
                     }
                 }
@@ -189,7 +202,7 @@ public class MapOverlay extends JmUI
             ((Button) guibutton).toggle();
         }
 
-        if(optionsToolbar.getButtonList().contains(guibutton))
+        if(optionsToolbar.contains(guibutton))
         {
             refreshState();
         }
@@ -199,10 +212,7 @@ public class MapOverlay extends JmUI
     public void setWorldAndResolution(Minecraft minecraft, int width, int height)
     {
         super.setWorldAndResolution(minecraft, width, height);
-
         state.requireRefresh();
-
-        layoutButtons();
 
         if (chat == null)
         {
@@ -422,44 +432,21 @@ public class MapOverlay extends JmUI
             buttonGrid.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showGrid), "jm.common.show_grid");
 
             // Toolbars
-            mapTypeToolbar = new ThemeToolbar(id++, theme, buttonDay, buttonNight, buttonCaves);
-            mapTypeToolbar.getButtonList().setHorizontal(true);
-            mapTypeToolbar.getButtonList().reverse();
-            mapTypeToolbar.updateTextures();
-
-//            northEastToolbar = new ThemeToolbar(id++, theme, buttonClose);
-//            northEastToolbar.getButtonList().setHorizontal(true);
-//            northEastToolbar.updateTextures();
-
-            zoomToolbar = new ThemeToolbar(id++, theme, buttonFollow, buttonZoomIn, buttonZoomOut);
-            zoomToolbar.getButtonList().setHorizontal(false);
-            zoomToolbar.updateTextures();
-
-            menuToolbar = new ThemeToolbar(id++, theme,  buttonWaypointManager, buttonOptions, buttonActions);
-            menuToolbar.getButtonList().setHorizontal(false);
-            menuToolbar.updateTextures();
+            mapTypeToolbar = new ThemeToolbar(id++, theme, buttonCaves, buttonNight, buttonDay);
+            mapTypeToolbar.addAllButtons(this);
 
             optionsToolbar = new ThemeToolbar(id++, theme, buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid);
-            optionsToolbar.getButtonList().setHorizontal(true);
-            optionsToolbar.updateTextures();
+            optionsToolbar.addAllButtons(this);
 
-            // Buttonlist
-            buttonList.add(mapTypeToolbar);
-            buttonList.addAll(mapTypeToolbar.getButtonList());
+            menuToolbar = new ThemeToolbar(id++, theme,  buttonWaypointManager, buttonOptions, buttonActions);
+            menuToolbar.addAllButtons(this);
 
-            buttonList.add(menuToolbar);
-            buttonList.addAll(menuToolbar.getButtonList());
+            zoomToolbar = new ThemeToolbar(id++, theme, buttonFollow, buttonZoomIn, buttonZoomOut);
+            zoomToolbar.setLayout(ButtonList.Layout.Vertical, ButtonList.Direction.LeftToRight);
+            zoomToolbar.addAllButtons(this);
 
-            buttonList.add(optionsToolbar);
-            buttonList.addAll(optionsToolbar.getButtonList());
-
-            buttonList.add(buttonClose);
+            // Buttons not in toolbars
             buttonList.add(buttonAlert);
-//            buttonList.add(northEastToolbar);
-//            buttonList.addAll(northEastToolbar.getButtonList());
-
-            buttonList.add(zoomToolbar);
-            buttonList.addAll(zoomToolbar.getButtonList());
             buttonList.add(buttonClose);
         }
     }
@@ -470,8 +457,7 @@ public class MapOverlay extends JmUI
     @Override
     protected void layoutButtons()
     {
-        // Buttons
-        if (buttonList.isEmpty())
+        if(buttonList.isEmpty())
         {
             initButtons();
         }
@@ -485,44 +471,43 @@ public class MapOverlay extends JmUI
 
         int padding = mapTypeToolbar.getToolbarSpec().padding;
 
-        zoomToolbar.getButtonList().layoutCenteredVertical(zoomToolbar.getHMargin(), height/2, true, padding);
+        zoomToolbar.layoutCenteredVertical(zoomToolbar.getHMargin(), height/2, true, padding);
 
         int topY = mapTypeToolbar.getVMargin();
 
-        if(firstLayoutPass)
-        {
-            topY = -200;
-        }
+        int margin = mapTypeToolbar.getHMargin();
 
-        int interToolbarPadding = mapTypeToolbar.getHMargin();
-
-        if(hideOptionsToolbar)
-        {
-            mapTypeToolbar.getButtonList().layoutHorizontal((width / 2) - interToolbarPadding, topY, false, padding);
-            menuToolbar.getButtonList().layoutHorizontal((width / 2) + interToolbarPadding, topY, true, padding);
-        }
-        else
-        {
-            optionsToolbar.getButtonList().layoutCenteredHorizontal((width / 2), topY, true, padding);
-            mapTypeToolbar.getButtonList().layoutHorizontal(optionsToolbar.getX() - interToolbarPadding, topY, false, padding);
-            menuToolbar.getButtonList().layoutHorizontal(optionsToolbar.getRightX() + interToolbarPadding, topY, true, padding);
-        }
-
-        //northEastToolbar.getButtonList().layoutHorizontal(width - northEastToolbar.getHMargin() - northEastToolbar.getWidth(), northEastToolbar.getVMargin(), true, padding);
+        layoutToolbars(margin, topY, padding, hideOptionsToolbar);
         buttonClose.leftOf(width-padding).below(mapTypeToolbar.getVMargin());
         buttonAlert.leftOf(width-padding).below(buttonClose, padding);
 
-        if(!hideOptionsToolbar && menuToolbar.getRightX() + (padding*2)>= buttonClose.getX())
-        {
-            optionsToolbar.setDrawButton(false);
-            optionsToolbar.getButtonList().setDrawButtons(false);
-            mapTypeToolbar.getButtonList().reverse();
-            hideOptionsToolbar = true;
+
+
+        if(!hideOptionsToolbar) {
+            if (menuToolbar.getRightX() + margin >= buttonClose.getX())
+            {
+                optionsToolbar.setDrawToolbar(false);
+                hideOptionsToolbar = true;
+                layoutToolbars(margin, topY, padding, hideOptionsToolbar);
+            }
         }
 
-        if(firstLayoutPass)
+    }
+
+    protected void layoutToolbars(int margin, int topY, int padding, boolean hideOptionsToolbar)
+    {
+        if(hideOptionsToolbar)
         {
-            firstLayoutPass = false;
+            int centerX = width/2;
+            mapTypeToolbar.layoutHorizontal(centerX - margin, topY, false, padding);
+            menuToolbar.layoutHorizontal(centerX + margin, topY, true, padding);
+        }
+        else
+        {
+            optionsToolbar.layoutCenteredHorizontal((width / 2), topY, true, padding);
+
+            mapTypeToolbar.layoutHorizontal(optionsToolbar.getX() - margin, topY, false, padding);
+            menuToolbar.layoutHorizontal(optionsToolbar.getRightX() + margin, topY, true, padding);
         }
     }
 
@@ -792,7 +777,7 @@ public class MapOverlay extends JmUI
         {
             chat.updateScreen();
         }
-        layoutButtons();
+        //layoutButtons();
     }
 
     @Override

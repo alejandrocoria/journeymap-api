@@ -21,7 +21,12 @@ import java.util.List;
  */
 public class ButtonList extends ArrayList<Button>
 {
-    private boolean horizontal = true;
+    public enum Layout {Horizontal, Vertical, CenteredHorizontal, CenteredVertical, DistributedHorizontal, FilledHorizontal}
+    public enum Direction {LeftToRight, RightToLeft}
+
+
+    private Layout layout = Layout.Horizontal;
+    private Direction direction = Direction.LeftToRight;
 
     private String label;
 
@@ -183,14 +188,21 @@ public class ButtonList extends ArrayList<Button>
         return null;
     }
 
+    public void setLayout(Layout layout, Direction direction)
+    {
+        this.layout = layout;
+        this.direction = direction;
+    }
+
     public ButtonList layoutHorizontal(int startX, final int y, boolean leftToRight, int hgap)
     {
-        this.horizontal = true;
+        this.layout = Layout.Horizontal;
+        this.direction = leftToRight ? Direction.LeftToRight : Direction.RightToLeft;
 
         Button last = null;
         for (Button button : this)
         {
-            if(!button.drawButton)
+            if(!button.visible)
             {
                 continue;
             }
@@ -222,17 +234,10 @@ public class ButtonList extends ArrayList<Button>
         return this;
     }
 
-    public ButtonList layoutCenteredVertical(final int x, final int centerY, final boolean leftToRight, final int vgap)
-    {
-        this.horizontal = false;
-        int height = getHeight(vgap);
-        layoutVertical(x, centerY - (height / 2), leftToRight, vgap);
-        return this;
-    }
-
     public ButtonList layoutVertical(final int x, int startY, boolean leftToRight, int vgap)
     {
-        this.horizontal = false;
+        this.layout = Layout.Vertical;
+        this.direction = leftToRight ? Direction.LeftToRight : Direction.RightToLeft;
 
         Button last = null;
         for (Button button : this)
@@ -265,16 +270,19 @@ public class ButtonList extends ArrayList<Button>
         return this;
     }
 
-    public void setHorizontal(boolean horizontal)
+    public ButtonList layoutCenteredVertical(final int x, final int centerY, final boolean leftToRight, final int vgap)
     {
-        this.horizontal = horizontal;
+        int height = getHeight(vgap);
+        layoutVertical(x, centerY - (height / 2), leftToRight, vgap);
+        this.layout = Layout.CenteredVertical;
+        return this;
     }
 
     public ButtonList layoutCenteredHorizontal(final int centerX, final int y, final boolean leftToRight, final int hgap)
     {
-        this.horizontal = true;
         int width = getWidth(hgap);
         layoutHorizontal(centerX - (width / 2), y, leftToRight, hgap);
+        this.layout = Layout.CenteredHorizontal;
         return this;
     }
 
@@ -285,7 +293,6 @@ public class ButtonList extends ArrayList<Button>
             return this;
         }
 
-        this.horizontal = true;
         int width = getWidth(0);
         int filler = (rightX - leftX) - width;
         int gaps = this.size() - 1;
@@ -299,6 +306,7 @@ public class ButtonList extends ArrayList<Button>
         {
             layoutHorizontal(rightX, y, false, hgap);
         }
+        this.layout = Layout.DistributedHorizontal;
         return this;
     }
 
@@ -309,7 +317,6 @@ public class ButtonList extends ArrayList<Button>
             return this;
         }
 
-        this.horizontal = true;
         this.equalizeWidths(fr);
 
         int width = getWidth(hgap);
@@ -326,6 +333,7 @@ public class ButtonList extends ArrayList<Button>
         {
             layoutCenteredHorizontal((rightX - leftX) / 2, y, leftToRight, hgap);
         }
+        this.layout = Layout.FilledHorizontal;
         return this;
     }
 
@@ -336,7 +344,7 @@ public class ButtonList extends ArrayList<Button>
 
     public boolean isHorizontal()
     {
-        return horizontal;
+        return layout!=Layout.Vertical && layout!=Layout.CenteredVertical;
     }
 
     public ButtonList setEnabled(boolean enabled)
@@ -470,7 +478,7 @@ public class ButtonList extends ArrayList<Button>
         int count = 0;
         for (Button button : this)
         {
-           if(button.drawButton)
+           if(button.visible)
            {
                count++;
            }

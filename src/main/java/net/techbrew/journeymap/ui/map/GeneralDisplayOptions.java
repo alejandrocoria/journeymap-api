@@ -9,23 +9,35 @@
 package net.techbrew.journeymap.ui.map;
 
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.util.EnumChatFormatting;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.IconSetFileHandler;
+import net.techbrew.journeymap.io.ThemeFileHandler;
+import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.ui.*;
 import net.techbrew.journeymap.ui.Button;
+import net.techbrew.journeymap.ui.theme.Theme;
+import net.techbrew.journeymap.ui.theme.ThemeButton;
+import net.techbrew.journeymap.ui.theme.ThemeToolbar;
+import scala.actors.threadpool.Arrays;
 
 import java.awt.*;
 import java.util.ArrayList;
 
 public class GeneralDisplayOptions extends JmUI
 {
-
+    int commonButtonHeight = 20;
+    int bottomLineY = 0;
+    ThemeToolbar themeToolbar;
+    ThemeButton themeExampleButton;
+    IconSetButton buttonTheme;
+    ButtonSpacer themeSpacer;
     Button buttonCaves, buttonGrid, buttonClose;
     String labelOn = Constants.getString("jm.common.on");
     String labelOff = Constants.getString("jm.common.off");
@@ -33,7 +45,7 @@ public class GeneralDisplayOptions extends JmUI
     String labelMiniMap = Constants.getString("jm.minimap.title");
     ArrayList<ButtonList> leftRows = new ArrayList<ButtonList>();
     ArrayList<ButtonList> rightRows = new ArrayList<ButtonList>();
-    ButtonList rowMobs, rowAnimals, rowVillagers, rowPets, rowGrid, rowCaves, rowSelf, rowPlayers, rowWaypoints, rowFontSize, rowForceUnicode, rowTextureSize;
+    ButtonList rowMobs, rowAnimals, rowVillagers, rowPets, rowGrid, rowTheme, rowCaves, rowSelf, rowPlayers, rowWaypoints, rowFontSize, rowForceUnicode, rowTextureSize;
     ButtonList rowIconSets;
 
     public GeneralDisplayOptions(Class<? extends JmUI> returnClass)
@@ -53,9 +65,10 @@ public class GeneralDisplayOptions extends JmUI
 
         int id = 0;
 
-        String on = Constants.getString("jm.common.on");
-        String off = Constants.getString("jm.common.off");
+        commonButtonHeight = 20;
+        bottomLineY = 0;
 
+        CoreProperties core = JourneyMap.getCoreProperties();
         FullMapProperties fullMap = JourneyMap.getFullMapProperties();
         MiniMapProperties miniMap = JourneyMap.getMiniMapProperties();
 
@@ -94,6 +107,23 @@ public class GeneralDisplayOptions extends JmUI
         rowGrid = new ButtonList(Constants.getString("jm.common.show_grid", ""));
         rowGrid.add(buttonGrid);
         leftRows.add(rowGrid);
+
+
+        buttonTheme = (new IconSetButton(id++, core, core.themeName, ThemeFileHandler.getThemeNames(), "%s"));
+        rowTheme = new ButtonList(Constants.getString("jm.common.ui_theme", ""));
+        //rowTheme.add(buttonTheme);
+        themeSpacer = new ButtonSpacer();
+        rowTheme.add(themeSpacer);
+        leftRows.add(rowTheme);
+
+        Theme theme = ThemeFileHandler.getCurrentTheme();
+        String[] tooltips = new String[]{EnumChatFormatting.ITALIC + Constants.getString("jm.common.ui_theme_author", theme.author)};
+        themeExampleButton = new ThemeButton(id, theme, theme.name, "options");
+        themeExampleButton.setAdditionalTooltips(Arrays.asList(tooltips));
+
+        themeToolbar = new ThemeToolbar(id++, ThemeFileHandler.getCurrentTheme(), themeExampleButton);
+        themeToolbar.addAllButtons(this);
+        //themeToolbar.add(buttonTheme);
 
         rowSelf = new ButtonList(Constants.getString("jm.common.show_self", ""));
         rowSelf.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showSelf));
@@ -150,14 +180,15 @@ public class GeneralDisplayOptions extends JmUI
             buttonList.addAll(ButtonList);
         }
 
+
         rowCaves.setWidths(rowAnimals.getWidth(4));
         rowGrid.setWidths(rowAnimals.getWidth(4));
 
         buttonClose = new Button(ButtonEnum.Close.ordinal(), 0, 0, Constants.getString("jm.common.close")); //$NON-NLS-1$
         buttonClose.fitWidth(getFontRenderer());
-        if (buttonClose.getWidth() < 150)
+        if (buttonClose.getWidth() < 100)
         {
-            buttonClose.setWidth(150);
+            buttonClose.setWidth(100);
         }
         buttonList.add(buttonClose);
 
@@ -196,7 +227,7 @@ public class GeneralDisplayOptions extends JmUI
         }
 
         int bx = ((this.width - ((rowWidth * 2) + (rowLabelWidth * 2)) - spacer) / 2) + rowLabelWidth;
-        final int by = Math.max(50, (this.height - (140)) / 2);
+        final int by = Math.max(50, (this.height - (150)) / 2);
 
         int leftX, rightX, topY, bottomY;
         leftX = width;
@@ -216,13 +247,11 @@ public class GeneralDisplayOptions extends JmUI
                 row.layoutHorizontal(bx, lastRow.getBottomY() + vgap, true, hgap);
             }
             lastRow = row;
-            DrawUtil.drawLabel(row.getLabel(), row.getLeftX() - hgap, lastRow.getTopY() + vgap, DrawUtil.HAlign.Left, DrawUtil.VAlign.Below, Color.black, 0, Color.cyan, 255, 1, true);
+            int labelMiddle = lastRow.getTopY() + ((lastRow.getBottomY()-lastRow.getTopY())/2);
+            DrawUtil.drawLabel(row.getLabel(), row.getLeftX() - hgap, labelMiddle, DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, Color.black, 0, Color.cyan, 255, 1, true, 0);
             leftX = Math.min(leftX, row.getLeftX() - hgap - getFontRenderer().getStringWidth(row.getLabel()));
             bottomY = Math.max(bottomY, row.getBottomY());
         }
-
-        DrawUtil.drawCenteredLabel(labelFullMap, leftRows.get(0).get(0).getCenterX(), by - 10, Color.black, 0, Color.white, 255, 1);
-        DrawUtil.drawCenteredLabel(labelMiniMap, leftRows.get(0).get(1).getCenterX(), by - 10, Color.black, 0, Color.white, 255, 1);
 
         lastRow = null;
         bx = leftRows.get(0).getRightX() + spacer + rowLabelWidth;
@@ -237,48 +266,98 @@ public class GeneralDisplayOptions extends JmUI
                 row.layoutHorizontal(bx, lastRow.getBottomY() + vgap, true, hgap);
             }
             lastRow = row;
-            DrawUtil.drawLabel(row.getLabel(), row.getLeftX() - hgap, lastRow.getTopY() + vgap, DrawUtil.HAlign.Left, DrawUtil.VAlign.Below, Color.black, 0, Color.cyan, 255, 1, true, 0);
+
+            int labelMiddle = lastRow.getTopY() + ((lastRow.getBottomY()-lastRow.getTopY())/2);
+            DrawUtil.drawLabel(row.getLabel(), row.getLeftX() - hgap, labelMiddle, DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, Color.black, 0, Color.cyan, 255, 1, true, 0);
             rightX = Math.max(rightX, row.getRightX());
             bottomY = Math.max(bottomY, row.getBottomY());
         }
-
-        DrawUtil.drawCenteredLabel(labelFullMap, rightRows.get(0).get(0).getCenterX(), by - 10, Color.black, 0, Color.white, 255, 1);
-        DrawUtil.drawCenteredLabel(labelMiniMap, rightRows.get(0).get(1).getCenterX(), by - 10, Color.black, 0, Color.white, 255, 1);
 
         topY -= 5;
         bottomY += 10;
         leftX -= 5;
         rightX += 5;
-        DrawUtil.drawRectangle(leftX, topY, rightX - leftX, 1, Color.lightGray, 150);
-        DrawUtil.drawRectangle(leftX, bottomY, rightX - leftX, 1, Color.lightGray, 150);
 
         if (rightX - leftX > width)
         {
+            commonButtonHeight = 13;
             int commonWidth = leftRows.get(0).get(0).getWidth() - 4;
-            for (ButtonList ButtonList : leftRows)
+            for (ButtonList buttonList : leftRows)
             {
-                ButtonList.setWidths(commonWidth);
+                buttonList.setWidths(commonWidth);
+                buttonList.setHeights(commonButtonHeight);
             }
 
-            for (ButtonList ButtonList : rightRows)
+            for (ButtonList buttonList : rightRows)
             {
-                ButtonList.setWidths(commonWidth);
+                buttonList.setWidths(commonWidth);
+                buttonList.setHeights(commonButtonHeight);
             }
 
             rowCaves.setWidths(rowAnimals.getWidth(4));
             rowGrid.setWidths(rowAnimals.getWidth(4));
+
+            layoutButtons();
+            return;
         }
 
-        int closeY = Math.min(height - vgap - buttonClose.getHeight(), bottomY + (4 * vgap));
-        buttonClose.centerHorizontalOn(width / 2).setY(closeY);
+        themeSpacer.setWidth(rowAnimals.getWidth(4));
+        themeToolbar.layoutCenteredHorizontal(themeSpacer.getCenterX(), rowGrid.getBottomY() + themeToolbar.getVMargin(), true, themeToolbar.getToolbarSpec().padding);
+        bottomY = Math.max(bottomY, themeToolbar.getBottomY() + themeToolbar.getVMargin());
+
+        bottomLineY = Math.max(bottomY, bottomLineY);
+        int closeY = Math.min(height - vgap - buttonClose.getHeight(), bottomLineY + (4 * vgap));
+
+        if(closeY<bottomY && commonButtonHeight==20)
+        {
+            commonButtonHeight = 13;
+            for (ButtonList buttonList : leftRows)
+            {
+                buttonList.setHeights(commonButtonHeight);
+            }
+
+            for (ButtonList buttonList : rightRows)
+            {
+                buttonList.setHeights(commonButtonHeight);
+            }
+
+            layoutButtons();
+            return;
+        }
+
+        buttonClose.centerHorizontalOn(width/2).setY(closeY);
+
+        DrawUtil.drawLabel(labelFullMap, leftRows.get(0).get(0).getRightX(), by - 10, DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, Color.black, 0, Color.white, 255, 1, true);
+        DrawUtil.drawCenteredLabel(labelMiniMap, leftRows.get(0).get(1).getCenterX(), by - 10, Color.black, 0, Color.lightGray, 255, 1);
+
+        DrawUtil.drawLabel(labelFullMap, rightRows.get(0).get(0).getRightX(), by - 10, DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, Color.black, 0, Color.white, 255, 1, true);
+        DrawUtil.drawCenteredLabel(labelMiniMap, rightRows.get(0).get(1).getCenterX(), by - 10, Color.black, 0, Color.lightGray, 255, 1);
+
+        DrawUtil.drawRectangle(leftX, topY, rightX - leftX, 1, Color.lightGray, 150);
+        DrawUtil.drawRectangle(leftX, bottomLineY, rightX - leftX, 1, Color.lightGray, 150);
     }
 
     @Override
     protected void actionPerformed(GuiButton button)
     {
-        if (button instanceof BooleanPropertyButton || button instanceof IconSetButton)
+        if (button instanceof BooleanPropertyButton || button instanceof IconSetButton || button instanceof ThemeButton)
         {
             ((Button) button).toggle();
+
+            if(button == themeExampleButton)
+            {
+                buttonTheme.toggle();
+            }
+
+            if(button == buttonTheme || button == themeExampleButton)
+            {
+                Theme theme = ThemeFileHandler.getCurrentTheme();
+                String[] tooltips = new String[]{EnumChatFormatting.ITALIC + Constants.getString("jm.common.ui_theme_author", theme.author)};
+                themeExampleButton.displayString = theme.name;
+                themeExampleButton.setAdditionalTooltips(Arrays.asList(tooltips));
+                themeExampleButton.updateTheme(theme);
+                themeToolbar.updateTheme(theme);
+            }
             return;
         }
 

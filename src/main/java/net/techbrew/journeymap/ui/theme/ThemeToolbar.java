@@ -1,11 +1,14 @@
 package net.techbrew.journeymap.ui.theme;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.ui.Button;
 import net.techbrew.journeymap.ui.ButtonList;
+import net.techbrew.journeymap.ui.JmUI;
 import scala.actors.threadpool.Arrays;
 
 import java.util.ArrayList;
@@ -15,7 +18,7 @@ import java.util.ArrayList;
  */
 public class ThemeToolbar extends Button
 {
-    private final Theme theme;
+    private Theme theme;
     private Theme.Container.Toolbar.ToolbarSpec toolbarSpec;
     private TextureImpl textureBegin;
     private TextureImpl textureInner;
@@ -35,9 +38,14 @@ public class ThemeToolbar extends Button
     public ThemeToolbar(int id, Theme theme, ButtonList buttonList)
     {
         super(id, 0, 0, "");
-        this.theme = theme;
         this.buttonList = buttonList;
         setToggled(false, false);
+        updateTheme(theme);
+    }
+
+    public void updateTheme(Theme theme)
+    {
+        this.theme = theme;
         updateTextures();
     }
 
@@ -57,7 +65,7 @@ public class ThemeToolbar extends Button
             setHeight(toolbarSpec.beginHeight + (toolbarSpec.innerHeight*buttonList.getVisibleButtonCount()) + toolbarSpec.endHeight);
         }
 
-        //if(this.toolbarSpec==null || toolbarSpec!=this.toolbarSpec)
+        if(this.toolbarSpec==null || toolbarSpec!=this.toolbarSpec)
         {
             this.toolbarSpec = toolbarSpec;
 
@@ -74,14 +82,40 @@ public class ThemeToolbar extends Button
         return this.toolbarSpec;
     }
 
+    public void updateLayout()
+    {
+        updateTextures();
+
+        boolean isHorizontal = buttonList.isHorizontal();
+
+        int drawX, drawY;
+        if(isHorizontal)
+        {
+            drawX = buttonList.getLeftX() - ((width-buttonList.getWidth(toolbarSpec.padding)) / 2);
+            drawY = buttonList.getTopY() - ((height - theme.control.button.height) / 2);
+        }
+        else
+        {
+            drawX = buttonList.getLeftX() - ((toolbarSpec.innerWidth - theme.control.button.width) / 2);
+            drawY = buttonList.getTopY() - ((height - buttonList.getHeight(toolbarSpec.padding)) / 2);
+        }
+
+        this.setPosition(drawX, drawY);
+    }
+
     public Theme.Container.Toolbar.ToolbarSpec getToolbarSpec()
     {
         return toolbarSpec;
     }
 
-    public ButtonList getButtonList()
+    private ButtonList getButtonList()
     {
         return buttonList;
+    }
+
+    public boolean contains(GuiButton button)
+    {
+        return buttonList.contains(button);
     }
 
     public <B extends Button> void add(B... buttons)
@@ -115,84 +149,81 @@ public class ThemeToolbar extends Button
         }
     }
 
+    public void setDrawToolbar(boolean draw)
+    {
+        super.setDrawButton(draw);
+        for(Button button : buttonList)
+        {
+            button.setDrawButton(draw);
+        }
+    }
+
     @Override
     public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
     {
-        if(!drawButton)
-        {
-            return;
-        }
+        if(!visible) return;
 
-        updateTextures();
         boolean isHorizontal = buttonList.isHorizontal();
 
-        double drawX, drawY;
-        if(isHorizontal)
-        {
-            drawX = buttonList.getLeftX() - ((width-buttonList.getWidth(toolbarSpec.padding)) / 2);
-            drawY = buttonList.getTopY() - ((height - theme.control.button.height) / 2);
-        }
-        else
-        {
-            drawX = buttonList.getLeftX() - ((toolbarSpec.innerWidth - theme.control.button.width) / 2);
-            drawY = buttonList.getTopY() - ((height - buttonList.getHeight(toolbarSpec.padding)) / 2);
-        }
-
-        this.setPosition((int)drawX, (int)drawY);
+        double drawX = getX();
+        double drawY = getY();
 
         if(!toolbarSpec.useBackgroundImages)
         {
             return;
         }
 
-        float scale = 1f;
+        // Draw self
+        if(visible)
+        {
+            float scale = 1f;
 
-        // Draw Begin
-        if (toolbarSpec.beginWidth != textureBegin.width)
-        {
-            scale = (1f * toolbarSpec.beginWidth / textureBegin.width);
-        }
-        DrawUtil.drawClampedImage(textureBegin, drawX, drawY, scale, 0);
-
-        if (isHorizontal)
-        {
-            drawX += (toolbarSpec.beginWidth);
-        }
-        else
-        {
-            drawY += (toolbarSpec.beginHeight);
-        }
-
-        // Draw Inner
-        scale = 1f;
-        if (toolbarSpec.innerWidth != textureInner.width)
-        {
-            scale = (1f * toolbarSpec.innerWidth / textureInner.width);
-        }
-        for (Button button : buttonList)
-        {
-            if (button.isDrawButton())
+            // Draw Begin
+            if (toolbarSpec.beginWidth != textureBegin.width)
             {
-                DrawUtil.drawClampedImage(textureInner, drawX, drawY, scale, 0);
-                if (isHorizontal)
+                scale = (1f * toolbarSpec.beginWidth / textureBegin.width);
+            }
+            DrawUtil.drawClampedImage(textureBegin, drawX, drawY, scale, 0);
+
+            if (isHorizontal)
+            {
+                drawX += (toolbarSpec.beginWidth);
+            }
+            else
+            {
+                drawY += (toolbarSpec.beginHeight);
+            }
+
+            // Draw Inner
+            scale = 1f;
+            if (toolbarSpec.innerWidth != textureInner.width)
+            {
+                scale = (1f * toolbarSpec.innerWidth / textureInner.width);
+            }
+            for (Button button : buttonList)
+            {
+                if (button.isDrawButton())
                 {
-                    drawX += toolbarSpec.innerWidth;
-                }
-                else
-                {
-                    drawY += toolbarSpec.innerHeight;
+                    DrawUtil.drawClampedImage(textureInner, drawX, drawY, scale, 0);
+                    if (isHorizontal)
+                    {
+                        drawX += toolbarSpec.innerWidth;
+                    }
+                    else
+                    {
+                        drawY += toolbarSpec.innerHeight;
+                    }
                 }
             }
-        }
 
-        // Draw End
-        scale = 1f;
-        if (toolbarSpec.endWidth != textureEnd.width)
-        {
-            scale = (1f * toolbarSpec.endWidth / textureEnd.width);
+            // Draw End
+            scale = 1f;
+            if (toolbarSpec.endWidth != textureEnd.width)
+            {
+                scale = (1f * toolbarSpec.endWidth / textureEnd.width);
+            }
+            DrawUtil.drawClampedImage(textureEnd, drawX, drawY, scale, 0);
         }
-        DrawUtil.drawClampedImage(textureEnd, drawX, drawY, scale, 0);
-
     }
 
     public int getCenterX()
@@ -219,5 +250,66 @@ public class ThemeToolbar extends Button
     public ArrayList<String> getTooltip()
     {
         return null;
+    }
+
+    public ButtonList layoutHorizontal(int startX, final int y, boolean leftToRight, int hgap)
+    {
+        buttonList.layoutHorizontal(startX, y, leftToRight, hgap);
+        updateLayout();
+        return buttonList;
+    }
+
+    public ButtonList layoutCenteredVertical(final int x, final int centerY, final boolean leftToRight, final int vgap)
+    {
+        buttonList.layoutCenteredVertical(x, centerY, leftToRight, vgap);
+        updateLayout();
+        return buttonList;
+    }
+
+    public ButtonList layoutVertical(final int x, int startY, boolean leftToRight, int vgap)
+    {
+        buttonList.layoutVertical(x, startY, leftToRight, vgap);
+        updateLayout();
+        return buttonList;
+    }
+
+    public ButtonList layoutCenteredHorizontal(final int centerX, final int y, final boolean leftToRight, final int hgap)
+    {
+        buttonList.layoutCenteredHorizontal(centerX, y, leftToRight, hgap);
+        updateLayout();
+        return buttonList;
+    }
+
+    public ButtonList layoutDistributedHorizontal(final int leftX, final int y, final int rightX, final boolean leftToRight)
+    {
+        buttonList.layoutDistributedHorizontal(leftX, y, rightX, leftToRight);
+        updateLayout();
+        return buttonList;
+    }
+
+    public ButtonList layoutFilledHorizontal(FontRenderer fr, final int leftX, final int y, final int rightX, final int hgap, final boolean leftToRight)
+    {
+        buttonList.layoutFilledHorizontal(fr, leftX, y, rightX, hgap, leftToRight);
+        updateLayout();
+        return buttonList;
+    }
+
+    public void setLayout(ButtonList.Layout layout, ButtonList.Direction direction)
+    {
+        buttonList.setLayout(layout, direction);
+        updateLayout();
+    }
+
+    public ButtonList reverse()
+    {
+        buttonList.reverse();
+        updateLayout();
+        return buttonList;
+    }
+
+    public void addAllButtons(JmUI gui)
+    {
+        gui.getButtonList().add(this);
+        gui.getButtonList().addAll(this.buttonList);
     }
 }

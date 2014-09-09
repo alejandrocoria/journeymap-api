@@ -188,6 +188,16 @@ public class Theme implements Comparable<Theme>
     }
 
     @Override
+    public String toString()
+    {
+        if(Strings.isNullOrEmpty(name)) {
+            return "???";
+        } else {
+            return name;
+        }
+    }
+
+    @Override
     public int compareTo(Theme other)
     {
         if(Strings.isNullOrEmpty(name)) {

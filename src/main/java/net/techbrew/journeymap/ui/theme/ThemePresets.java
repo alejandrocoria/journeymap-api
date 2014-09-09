@@ -91,6 +91,7 @@ public class ThemePresets
     {
         Theme theme = new Theme();
         theme.name = "Purist";
+        theme.author = "techbrew";
         theme.directory = "Victorian";
 
         Theme.ImageSpec icon = theme.icon;
