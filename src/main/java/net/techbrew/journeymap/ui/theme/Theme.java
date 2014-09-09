@@ -27,17 +27,10 @@ public class Theme implements Comparable<Theme>
     @Since(1)
     public Fullscreen fullscreen = new Fullscreen();
     @Since(1)
-    public Icon icon = new Icon();
+    public ImageSpec icon = new ImageSpec();
+    @Since(1)
+    public Minimap minimap = new Minimap();
 
-    public static class Fullscreen
-    {
-        @Since(1)
-        public String mapBackgroundColor = "";
-        @Since(1)
-        public String statusBackgroundColor = "";
-        @Since(1)
-        public String statusForegroundColor = "";
-    }
 
     public static class Container
     {
@@ -111,12 +104,58 @@ public class Theme implements Comparable<Theme>
         }
     }
 
-    public static class Icon
+    public static class Fullscreen
+    {
+        @Since(1)
+        public String mapBackgroundColor = "";
+        @Since(1)
+        public String statusBackgroundColor = "";
+        @Since(1)
+        public String statusForegroundColor = "";
+
+    }
+
+    public static class ImageSpec
     {
         @Since(1)
         public int width;
         @Since(1)
         public int height;
+
+        public ImageSpec()
+        {
+        }
+
+        public ImageSpec(int width, int height)
+        {
+            this.width = width;
+            this.height = height;
+        }
+    }
+
+    public static class Minimap
+    {
+        @Since(1)
+        public String prefix = "";
+        @Since(1)
+        public int margin;
+        @Since(1)
+        public ImageSpec topLeft = new ImageSpec();
+        @Since(1)
+        public ImageSpec top = new ImageSpec();
+        @Since(1)
+        public ImageSpec topRight = new ImageSpec();
+        @Since(1)
+        public ImageSpec right = new ImageSpec();
+        @Since(1)
+        public ImageSpec bottomRight = new ImageSpec();
+        @Since(1)
+        public ImageSpec bottom = new ImageSpec();
+        @Since(1)
+        public ImageSpec bottomLeft = new ImageSpec();
+        @Since(1)
+        public ImageSpec left = new ImageSpec();
+
     }
 
     public static String toHexColor(Color color)

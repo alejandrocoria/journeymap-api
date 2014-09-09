@@ -194,7 +194,7 @@ public class MiniMap
                     glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
                     glStencilMask(0xFF);
                     glClear(GL_STENCIL_BUFFER_BIT);
-                    DrawUtil.drawQuad(dv.maskTexture, dv.textureX, dv.textureY, dv.maskTexture.width, dv.maskTexture.height, 9, null, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                    DrawUtil.drawQuad(dv.maskTexture, dv.textureX, dv.textureY, dv.maskTexture.width, dv.maskTexture.height, 9, null, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
                     glColorMask(true, true, true, true);
                     glDepthMask(true);
                     glStencilMask(0x00);
@@ -309,13 +309,18 @@ public class MiniMap
             }
 
             // Draw border texture
-            if (dv.borderTexture != null && !dv.shape.equals(DisplayVars.Shape.CustomSquare))
+//            if (dv.borderTexture != null && !dv.shape.equals(DisplayVars.Shape.CustomSquare))
+//            {
+//                GL11.glPushMatrix();
+//                //GL11.glTranslated(512-dv.minimapSize, 0, 0);
+//                // TODO: Draw Frame scaled
+//                DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, 1, 0);
+//                GL11.glPopMatrix();
+//            }
+
+            if(dv.minimapFrame != null)
             {
-                GL11.glPushMatrix();
-                //GL11.glTranslated(512-dv.minimapSize, 0, 0);
-                // TODO: Draw Frame scaled
-                DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, 1, 0);
-                GL11.glPopMatrix();
+                dv.minimapFrame.draw(dv.textureX, dv.textureY);
             }
 
             // Draw labels if not scissored

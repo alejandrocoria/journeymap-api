@@ -12,10 +12,12 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
-- Change: Experimental use of GL12 texture params to prevent white lines between tiles with some screen sizes
+- Change: Experimental use of GL12 texture params to try to prevent white lines between tiles with some screen sizes
 - Change: Theme data structure changes to support skinning the minimap
 - Change: Minimap frames added for Victorian and Purist themes
 - Change: Minimap frame now scales to fit custom minimap sizes.
+- Change: Minimap frame opacity can now be changed in Minimap Options
+- Known problem: Player names and waypoint labels rotate stupidly when Minimap Orientation is set to "My Heading"
 
 ## Changelog for JourneyMap 4.1.0alpha12:
 - New Feature: Full-screen Map UI now uses "Themes" to skin image buttons and tooltips.

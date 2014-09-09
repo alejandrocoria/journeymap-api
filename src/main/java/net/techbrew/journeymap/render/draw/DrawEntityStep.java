@@ -62,7 +62,10 @@ public class DrawEntityStep implements DrawStep
 
             if (entityDTO.entityLiving instanceof EntityPlayer)
             {
+                int blockSize = (int) Math.pow(2, gridRenderer.getZoom());
+                float labelOffset = texture != null ? texture.height / blockSize : 0;
                 drawPlayer(drawX, drawY, heading, drawScale, fontScale, rotation);
+
             }
             else
             {
@@ -78,7 +81,11 @@ public class DrawEntityStep implements DrawStep
             DrawUtil.drawEntity(drawX, drawY, heading, true, texture, drawScale * .75f, rotation);
         }
         float labelOffset = texture != null ? texture.height : 0;
-        DrawUtil.drawCenteredLabel(entityDTO.entityLiving.getCommandSenderName(), drawX, drawY - labelOffset, Color.black, 205, Color.green, 255, fontScale, rotation);
+        double labelX = drawX + (Math.cos(rotation+90));
+        double labelY = drawY - labelOffset + (Math.sin(rotation+90));
+
+        DrawUtil.drawLabel(entityDTO.entityLiving.getCommandSenderName(), drawX, drawY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 205, Color.green, 255, fontScale, false, rotation);
+        //DrawUtil.drawCenteredLabel(entityDTO.entityLiving.getCommandSenderName(), drawX, drawY - labelOffset, Color.black, 205, Color.green, 255, fontScale, rotation);
     }
 
     private void drawCreature(double drawX, double drawY, double heading, float drawScale, double fontScale, double rotation)

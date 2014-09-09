@@ -152,7 +152,7 @@ public class ThemeToolbar extends Button
         {
             scale = (1f * toolbarSpec.beginWidth / textureBegin.width);
         }
-        DrawUtil.drawImage(textureBegin, drawX, drawY, false, scale, 0);
+        DrawUtil.drawClampedImage(textureBegin, drawX, drawY, scale, 0);
 
         if (isHorizontal)
         {
@@ -173,7 +173,7 @@ public class ThemeToolbar extends Button
         {
             if (button.isDrawButton())
             {
-                DrawUtil.drawImage(textureInner, drawX, drawY, false, scale, 0);
+                DrawUtil.drawClampedImage(textureInner, drawX, drawY, scale, 0);
                 if (isHorizontal)
                 {
                     drawX += toolbarSpec.innerWidth;
@@ -191,7 +191,7 @@ public class ThemeToolbar extends Button
         {
             scale = (1f * toolbarSpec.endWidth / textureEnd.width);
         }
-        DrawUtil.drawImage(textureEnd, drawX, drawY, false, scale, 0);
+        DrawUtil.drawClampedImage(textureEnd, drawX, drawY, scale, 0);
 
     }
 

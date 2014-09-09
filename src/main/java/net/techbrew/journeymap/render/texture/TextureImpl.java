@@ -43,6 +43,8 @@ public class TextureImpl extends AbstractTexture
     protected BufferedImage image;
     protected volatile boolean unbound;
 
+    public float alpha;
+
     public TextureImpl(BufferedImage image)
     {
         this(image, false);

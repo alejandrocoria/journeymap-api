@@ -226,7 +226,7 @@ public class DrawUtil
 
     private static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, boolean flip, double rotation)
     {
-        drawQuad(texture, x, y, width, height, rotation, null, 1f, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        drawQuad(texture, x, y, width, height, rotation, null, 1f, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }
 
     /**
@@ -241,7 +241,7 @@ public class DrawUtil
      * @param glBlendSfactor For normal alpha blending: GL11.GL_SRC_ALPHA
      * @param glBlendDFactor For normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
      */
-    public static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, double rotation, Color color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor)
+    public static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, double rotation, Color color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor, boolean clampTexture)
     {
         GL11.glPushMatrix();
 
@@ -265,8 +265,10 @@ public class DrawUtil
 
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+
+        int texEdgeBehavior = clampTexture ? GL12.GL_CLAMP_TO_EDGE : GL11.GL_REPEAT;
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, texEdgeBehavior);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, texEdgeBehavior);
 
         if (rotation != 0)
         {
@@ -329,14 +331,19 @@ public class DrawUtil
         drawQuad(texture, x, y, (texture.width * scale), (texture.height * scale), flip, rotation);
     }
 
+    public static void drawClampedImage(TextureImpl texture, double x, double y, float scale, double rotation)
+    {
+        drawQuad(texture, x, y, (texture.width * scale), (texture.height * scale), rotation, null, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
+    }
+
     public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y, float scale, double rotation)
     {
-        drawQuad(texture, x, y, (texture.width * scale), (texture.height * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        drawQuad(texture, x, y, (texture.width * scale), (texture.height * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }
 
     public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y, double rotation)
     {
-        drawQuad(texture, x, y, texture.width, texture.height, rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        drawQuad(texture, x, y, texture.width, texture.height, rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }
 
     /**

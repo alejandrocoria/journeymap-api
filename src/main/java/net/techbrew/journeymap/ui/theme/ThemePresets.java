@@ -26,7 +26,7 @@ public class ThemePresets
         theme.author = "techbrew";
         theme.directory = "Victorian";
 
-        Theme.Icon icon = theme.icon;
+        Theme.ImageSpec icon = theme.icon;
         icon.height = 24;
         icon.width = 24;
 
@@ -77,6 +77,13 @@ public class ThemePresets
         fullscreen.statusBackgroundColor = Theme.toHexColor(new Color(0x22, 0x22, 0x22));
         fullscreen.statusForegroundColor = Theme.toHexColor(Color.lightGray);
 
+        Theme.Minimap minimap = theme.minimap;
+        minimap.prefix = "vic_";
+        minimap.margin = 8;
+        minimap.top = minimap.bottom = new Theme.ImageSpec(1,20);
+        minimap.left = minimap.right = new Theme.ImageSpec(20,1);
+        minimap.topLeft = minimap.topRight = minimap.bottomRight = minimap.bottomLeft = new Theme.ImageSpec(20,20);
+
         return theme;
     }
 
@@ -86,7 +93,7 @@ public class ThemePresets
         theme.name = "Purist";
         theme.directory = "Victorian";
 
-        Theme.Icon icon = theme.icon;
+        Theme.ImageSpec icon = theme.icon;
         icon.height = 20;
         icon.width = 20;
 
@@ -136,6 +143,13 @@ public class ThemePresets
         fullscreen.mapBackgroundColor = Theme.toHexColor(new Color(0x22, 0x22, 0x22));
         fullscreen.statusBackgroundColor = Theme.toHexColor(new Color(0x22, 0x22, 0x22));
         fullscreen.statusForegroundColor = Theme.toHexColor(Color.lightGray);
+
+        Theme.Minimap minimap = theme.minimap;
+        minimap.prefix = "pur_";
+        minimap.margin = 4;
+        minimap.top = minimap.bottom = new Theme.ImageSpec(1,8);
+        minimap.left = minimap.right = new Theme.ImageSpec(8,1);
+        minimap.topLeft = minimap.topRight = minimap.bottomRight = minimap.bottomLeft = new Theme.ImageSpec(8,8);
 
         return theme;
     }

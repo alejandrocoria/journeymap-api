@@ -378,33 +378,43 @@ public class TextureCache
 
     public TextureImpl getThemeTexture(Theme theme, String iconPath, int width, int height)
     {
+        return getThemeTexture(theme, iconPath, 0, 0, false, 1f);
+    }
+
+    public TextureImpl getThemeTexture(Theme theme, String iconPath, int width, int height, boolean resize, float alpha)
+    {
         String texName = String.format("%s/%s", theme.directory, iconPath);
         synchronized (themeImages)
         {
             TextureImpl tex = themeImages.get(texName);
-            if (tex == null || (!tex.hasImage() && tex.retainImage))
+            if (tex == null || (!tex.hasImage() && tex.retainImage) || (resize && (width!=tex.width || height!=tex.height)) || tex.alpha!=alpha)
             {
                 File parentDir = ThemeFileHandler.getThemeIconDir();
                 String assetPath = ThemeFileHandler.ASSETS_JOURNEYMAP_ICON_THEME;
                 BufferedImage img = FileHandler.getIconFromFile(parentDir, assetPath, theme.directory, iconPath, null); //$NON-NLS-1$
                 if (img != null)
                 {
-//                    if(img.getWidth()!=width || img.getHeight()!=height)
-//                    {
-//                        BufferedImage tmp = new BufferedImage(width, height, img.getType());
-//                        Graphics2D g = tmp.createGraphics();
-//                        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-//                        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-//                        g.drawImage(img, 0, 0, width, height, null);
-//                        g.dispose();
-//                        img = tmp;
-//                    }
+                    if(resize || alpha<1f)
+                    {
+                        if (alpha<1f || img.getWidth() != width || img.getHeight() != height)
+                        {
+                            BufferedImage tmp = new BufferedImage(width, height, img.getType());
+                            Graphics2D g = tmp.createGraphics();
+                            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+                            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                            g.drawImage(img, 0, 0, width, height, null);
+                            g.dispose();
+                            img = tmp;
+                        }
+                    }
 
                     if (tex != null)
                     {
                         tex.deleteTexture();
                     }
                     tex = new TextureImpl(img);
+                    tex.alpha = alpha;
                     themeImages.put(texName, tex);
                 }
                 else

@@ -14,10 +14,12 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
+import net.techbrew.journeymap.ui.theme.ThemeMinimapFrame;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -49,6 +51,7 @@ public class DisplayVars
     final double viewPortPadY;
     final boolean showFps;
     final LabelVars labelFps, labelLocation, labelBiome;
+    final ThemeMinimapFrame minimapFrame;
     boolean forceUnicode;
     /**
      * Constructor.
@@ -99,8 +102,6 @@ public class DisplayVars
                 borderTexture = TextureCache.instance().getMinimapLargeCircle();
                 maskTexture = TextureCache.instance().getMinimapLargeCircleMask();
                 minimapSize = 512;
-                marginX = 3;
-                marginY = 3;
                 viewPortPadX = 5;
                 viewPortPadY = 5;
                 if (fontScale == 1)
@@ -111,6 +112,7 @@ public class DisplayVars
                 {
                     bottomTextureYMargin = 20;
                 }
+                minimapFrame = null;
                 break;
             }
             case SmallCircle:
@@ -119,8 +121,6 @@ public class DisplayVars
                 borderTexture = TextureCache.instance().getMinimapSmallCircle();
                 maskTexture = TextureCache.instance().getMinimapSmallCircleMask();
                 minimapSize = 256;
-                marginX = 2;
-                marginY = 2;
                 viewPortPadX = 5;
                 viewPortPadY = 5;
                 if (fontScale == 1)
@@ -131,6 +131,7 @@ public class DisplayVars
                 {
                     bottomTextureYMargin = 24;
                 }
+                minimapFrame = null;
                 break;
             }
             case LargeSquare:
@@ -139,13 +140,12 @@ public class DisplayVars
                 borderTexture = TextureCache.instance().getMinimapLargeSquare();
                 maskTexture = null;
                 minimapSize = 512;
-                marginX = 0;
-                marginY = 0;
                 viewPortPadX = 5;
                 viewPortPadY = 5;
                 yOffsetFps = 5;
                 yOffsetLocation = -5;
                 yOffsetBiome = yOffsetLocation - labelHeight;
+                minimapFrame = new ThemeMinimapFrame(ThemeFileHandler.getCurrentTheme(), (int) minimapSize);
                 break;
             }
             case SmallSquare:
@@ -154,8 +154,6 @@ public class DisplayVars
                 borderTexture = TextureCache.instance().getMinimapSmallSquare();
                 maskTexture = null;
                 minimapSize = 128;
-                marginX = 0;
-                marginY = 0;
                 viewPortPadX = 2;
                 viewPortPadY = 2;
                 valignLocation = DrawUtil.VAlign.Below;
@@ -166,6 +164,7 @@ public class DisplayVars
                 scissorLocation = false;
                 scissorBiome = false;
                 labelsOutside = true;
+                minimapFrame = new ThemeMinimapFrame(ThemeFileHandler.getCurrentTheme(), (int) minimapSize);
                 break;
             }
             case CustomSquare:
@@ -175,8 +174,6 @@ public class DisplayVars
                 minimapSize = miniMapProperties.customSize.get();
                 float minimapAlpha = (1f * miniMapProperties.frameAlpha.get()) / 255f;
                 borderTexture = TextureCache.instance().getUnknownEntity();
-                marginX = 0;
-                marginY = 0;
                 viewPortPadX = 2;
                 viewPortPadY = 2;
                 valignLocation = DrawUtil.VAlign.Below;
@@ -187,6 +184,7 @@ public class DisplayVars
                 scissorLocation = false;
                 scissorBiome = false;
                 labelsOutside = true;
+                minimapFrame = new ThemeMinimapFrame(ThemeFileHandler.getCurrentTheme(), (int) minimapSize);
                 break;
             }
             case MediumSquare:
@@ -196,17 +194,17 @@ public class DisplayVars
                 borderTexture = TextureCache.instance().getMinimapMediumSquare();
                 maskTexture = null;
                 minimapSize = 256;
-                marginX = 0;
-                marginY = 0;
                 viewPortPadX = 4;
                 viewPortPadY = 5;
                 yOffsetFps = 5;
                 yOffsetLocation = -5;
                 yOffsetBiome = yOffsetLocation - labelHeight;
+                minimapFrame = new ThemeMinimapFrame(ThemeFileHandler.getCurrentTheme(), (int) minimapSize);
                 break;
             }
         }
 
+        marginX = marginY = ThemeFileHandler.getCurrentTheme().minimap.margin;
         minimapOffset = minimapSize * 0.5;
 
         // Assign position
@@ -258,8 +256,8 @@ public class DisplayVars
             }
             case Center:
             {
-                textureX = (mc.displayWidth - minimapSize - marginX)/2;
-                textureY = (mc.displayHeight - minimapSize - marginY)/2;
+                textureX = (mc.displayWidth - minimapSize)/2;
+                textureY = (mc.displayHeight - minimapSize)/2;
                 translateX = 0;
                 translateY = 0;
                 scissorX = textureX;
@@ -269,7 +267,7 @@ public class DisplayVars
             case TopRight:
             default:
             {
-                textureX = mc.displayWidth - minimapSize + marginX;
+                textureX = mc.displayWidth - minimapSize - marginX;
                 textureY = marginY;
                 translateX = (mc.displayWidth / 2) - minimapOffset;
                 translateY = -(mc.displayHeight / 2) + minimapOffset;
