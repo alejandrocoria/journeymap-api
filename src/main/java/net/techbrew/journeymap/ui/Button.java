@@ -35,7 +35,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected Boolean toggled = true;
     protected String labelOn;
     protected String labelOff;
-    protected boolean enabled;
+    //protected boolean enabled;
     protected boolean drawFrame;
     protected boolean drawBackground;
     protected boolean showDisabledHoverText;
@@ -182,6 +182,10 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
         if (defaultStyle)
         {
+            if(!enabled)
+            {
+                enabled = false;
+            }
             // Use resource pack texture
             super.drawButton(minecraft, mouseX, mouseY);
         }

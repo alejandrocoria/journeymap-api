@@ -354,7 +354,7 @@ public class PropertyManager
 
         PREF_SHOW_MINIMAP(Boolean.class, "preference_show_minimap", true), //$NON-NLS-1$
 
-        PREF_MINIMAP_SHAPE(String.class, "preference_minimap_shape", DisplayVars.Shape.SmallSquare.name()), //$NON-NLS-1$
+        PREF_MINIMAP_SHAPE(String.class, "preference_minimap_shape", DisplayVars.Shape.Square.name()), //$NON-NLS-1$
         PREF_MINIMAP_POSITION(String.class, "preference_minimap_position", DisplayVars.Position.TopRight.name()), //$NON-NLS-1$
         PREF_MINIMAP_FONTSCALE(Double.class, "preference_minimap_fontscale", 1.0), //$NON-NLS-1$
         PREF_MINIMAP_SHOWFPS(Boolean.class, "preference_minimap_showfps", false), //$NON-NLS-1$

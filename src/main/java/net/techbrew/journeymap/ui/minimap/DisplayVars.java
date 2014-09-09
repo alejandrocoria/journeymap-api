@@ -37,7 +37,6 @@ public class DisplayVars
     final Position position;
     final Shape shape;
     final Orientation orientation;
-    final TextureImpl borderTexture;
     final TextureImpl maskTexture;
     final float drawScale;
     final double fontScale;
@@ -96,10 +95,9 @@ public class DisplayVars
         // Assign shape
         switch (shape)
         {
-            case LargeCircle:
+            case Circle:
             {
                 drawScale = 1f * textureScale;
-                borderTexture = TextureCache.instance().getMinimapLargeCircle();
                 maskTexture = TextureCache.instance().getMinimapLargeCircleMask();
                 minimapSize = 512;
                 viewPortPadX = 5;
@@ -115,65 +113,12 @@ public class DisplayVars
                 minimapFrame = null;
                 break;
             }
-            case SmallCircle:
-            {
-                drawScale = 1f * textureScale;
-                borderTexture = TextureCache.instance().getMinimapSmallCircle();
-                maskTexture = TextureCache.instance().getMinimapSmallCircleMask();
-                minimapSize = 256;
-                viewPortPadX = 5;
-                viewPortPadY = 5;
-                if (fontScale == 1)
-                {
-                    bottomTextureYMargin = 14;
-                }
-                else
-                {
-                    bottomTextureYMargin = 24;
-                }
-                minimapFrame = null;
-                break;
-            }
-            case LargeSquare:
-            {
-                drawScale = 1f * textureScale;
-                borderTexture = TextureCache.instance().getMinimapLargeSquare();
-                maskTexture = null;
-                minimapSize = 512;
-                viewPortPadX = 5;
-                viewPortPadY = 5;
-                yOffsetFps = 5;
-                yOffsetLocation = -5;
-                yOffsetBiome = yOffsetLocation - labelHeight;
-                minimapFrame = new ThemeMinimapFrame(ThemeFileHandler.getCurrentTheme(), (int) minimapSize);
-                break;
-            }
-            case SmallSquare:
-            {
-                drawScale = 1f * textureScale;
-                borderTexture = TextureCache.instance().getMinimapSmallSquare();
-                maskTexture = null;
-                minimapSize = 128;
-                viewPortPadX = 2;
-                viewPortPadY = 2;
-                valignLocation = DrawUtil.VAlign.Below;
-                valignBiome = DrawUtil.VAlign.Below;
-                yOffsetFps = 3;
-                yOffsetLocation = 1;
-                yOffsetBiome = yOffsetLocation + labelHeight;
-                scissorLocation = false;
-                scissorBiome = false;
-                labelsOutside = true;
-                minimapFrame = new ThemeMinimapFrame(ThemeFileHandler.getCurrentTheme(), (int) minimapSize);
-                break;
-            }
-            case CustomSquare:
+            case Square:
+            default:
             {
                 drawScale = 1f * textureScale;
                 maskTexture = null;
                 minimapSize = miniMapProperties.customSize.get();
-                float minimapAlpha = (1f * miniMapProperties.frameAlpha.get()) / 255f;
-                borderTexture = TextureCache.instance().getUnknownEntity();
                 viewPortPadX = 2;
                 viewPortPadY = 2;
                 valignLocation = DrawUtil.VAlign.Below;
@@ -184,21 +129,6 @@ public class DisplayVars
                 scissorLocation = false;
                 scissorBiome = false;
                 labelsOutside = true;
-                minimapFrame = new ThemeMinimapFrame(ThemeFileHandler.getCurrentTheme(), (int) minimapSize);
-                break;
-            }
-            case MediumSquare:
-            default:
-            {
-                drawScale = 1f * textureScale;
-                borderTexture = TextureCache.instance().getMinimapMediumSquare();
-                maskTexture = null;
-                minimapSize = 256;
-                viewPortPadX = 4;
-                viewPortPadY = 5;
-                yOffsetFps = 5;
-                yOffsetLocation = -5;
-                yOffsetBiome = yOffsetLocation - labelHeight;
                 minimapFrame = new ThemeMinimapFrame(ThemeFileHandler.getCurrentTheme(), (int) minimapSize);
                 break;
             }
@@ -371,13 +301,9 @@ public class DisplayVars
      */
     public enum Shape
     {
-        SmallSquare("jm.minimap.shape_smallsquare"),
-        MediumSquare("jm.minimap.shape_mediumsquare"),
-        LargeSquare("jm.minimap.shape_largesquare"),
-        CustomSquare("jm.minimap.shape_customsquare"),
-        SmallCircle("jm.minimap.shape_smallcircle"),
-        LargeCircle("jm.minimap.shape_largecircle");
-        public static Shape[] Enabled = {SmallSquare, MediumSquare, LargeSquare, CustomSquare};
+        Square("jm.minimap.shape_square"),
+        Circle("jm.minimap.shape_circle");
+        public static Shape[] Enabled = {Square};
         public final String label;
 
         private Shape(String label)
@@ -401,7 +327,7 @@ public class DisplayVars
 
             if (shape == null)
             {
-                shape = Shape.MediumSquare;
+                shape = Shape.Square;
                 miniMapProperties.shape.set(shape);
                 miniMapProperties.save();
             }
@@ -422,7 +348,7 @@ public class DisplayVars
 
             if (value == null || !value.isEnabled())
             {
-                value = Shape.MediumSquare;
+                value = Shape.Square;
             }
             return value;
         }

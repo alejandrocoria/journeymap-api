@@ -22,7 +22,7 @@ public class MiniMapProperties extends InGameMapProperties
 {
     protected transient static final int CODE_REVISION = 4;
     public final AtomicBoolean enabled = new AtomicBoolean(true);
-    public final AtomicReference<DisplayVars.Shape> shape = new AtomicReference<DisplayVars.Shape>(DisplayVars.Shape.SmallSquare);
+    public final AtomicReference<DisplayVars.Shape> shape = new AtomicReference<DisplayVars.Shape>(DisplayVars.Shape.Square);
     public final AtomicReference<DisplayVars.Position> position = new AtomicReference<DisplayVars.Position>(DisplayVars.Position.TopRight);
     public final AtomicBoolean showFps = new AtomicBoolean(false);
     public final AtomicBoolean enableHotkeys = new AtomicBoolean(true);
@@ -81,28 +81,7 @@ public class MiniMapProperties extends InGameMapProperties
 
         if (customSize.get() == 0)
         {
-            int inferredSize;
-            switch(this.shape.get())
-            {
-                case SmallSquare:
-                    inferredSize = 128;
-                    break;
-                case MediumSquare:
-                    inferredSize = 256;
-                    break;
-                case LargeSquare:
-                    inferredSize = 512;
-                    break;
-                case SmallCircle:
-                    inferredSize = 128;
-                    break;
-                case LargeCircle:
-                    inferredSize = 512;
-                    break;
-                default:
-                    inferredSize = 256;
-            }
-            this.customSize.set(inferredSize);
+            this.customSize.set(256);
             saveNeeded = true;
         }
 
