@@ -44,9 +44,9 @@ public class DisplayVars
     final int displayWidth;
     final int displayHeight;
     final ScaledResolution scaledResolution;
-    final double minimapSize, textureX, textureY;
-    final double minimapOffset, translateX, translateY;
-    final double marginX, marginY, scissorX, scissorY;
+    final int minimapSize, textureX, textureY;
+    final int minimapOffset, translateX, translateY;
+    final int marginX, marginY, scissorX, scissorY;
     final double viewPortPadX;
     final double viewPortPadY;
     final boolean showFps;
@@ -77,17 +77,17 @@ public class DisplayVars
         final boolean wasUnicode = mc.fontRenderer.getUnicodeFlag();
         final boolean useUnicode = (forceUnicode || wasUnicode);
         this.fontScale = labelFontScale * (useUnicode ? 2 : 1);
-        final double labelHeight = DrawUtil.getLabelHeight(mc.fontRenderer, useFontShadow) * (useUnicode ? .7 : 1) * this.fontScale;
+        final int labelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, useFontShadow) * (useUnicode ? .7 : 1) * this.fontScale);
 
         // Mutable local vars
-        double bottomTextureYMargin = 0;
+        int bottomTextureYMargin = 0;
         boolean labelsOutside = false;
         boolean scissorFps = true;
         boolean scissorLocation = false;
         boolean scissorBiome = true;
-        double yOffsetFps = 4;
-        double yOffsetBiome = -3;
-        double yOffsetLocation = yOffsetBiome + -labelHeight;
+        int yOffsetFps = 4;
+        int yOffsetBiome = -3;
+        int yOffsetLocation = yOffsetBiome + -labelHeight;
         DrawUtil.VAlign valignFps = DrawUtil.VAlign.Below;
         DrawUtil.VAlign valignLocation = DrawUtil.VAlign.Above;
         DrawUtil.VAlign valignBiome = DrawUtil.VAlign.Above;
@@ -137,7 +137,7 @@ public class DisplayVars
         }
 
         marginX = marginY = ThemeFileHandler.getCurrentTheme().minimap.margin;
-        minimapOffset = minimapSize * 0.5;
+        minimapOffset = minimapSize/2;
 
         // Assign position
         switch (position)
@@ -195,7 +195,7 @@ public class DisplayVars
             }
         }
 
-        double centerX = textureX + (minimapSize / 2);
+        double centerX = Math.floor(textureX + (minimapSize / 2));
         double topY = textureY;
         double bottomY = textureY + minimapSize;
         labelFps = new LabelVars(centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, scissorFps, useFontShadow);

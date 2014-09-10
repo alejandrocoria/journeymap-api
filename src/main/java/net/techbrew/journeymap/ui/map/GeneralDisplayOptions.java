@@ -108,7 +108,6 @@ public class GeneralDisplayOptions extends JmUI
         rowGrid.add(buttonGrid);
         leftRows.add(rowGrid);
 
-
         buttonTheme = (new IconSetButton(id++, core, core.themeName, ThemeFileHandler.getThemeNames(), "%s"));
         rowTheme = new ButtonList(Constants.getString("jm.common.ui_theme", ""));
         //rowTheme.add(buttonTheme);
@@ -357,6 +356,8 @@ public class GeneralDisplayOptions extends JmUI
                 themeExampleButton.setAdditionalTooltips(Arrays.asList(tooltips));
                 themeExampleButton.updateTheme(theme);
                 themeToolbar.updateTheme(theme);
+
+                UIManager.getInstance().getMiniMap().updateDisplayVars(true);
             }
             return;
         }
