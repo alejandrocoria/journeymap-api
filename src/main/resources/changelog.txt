@@ -12,6 +12,11 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: General Display Options wouldn't open.  Thanks insidious scala import!
+- Bugfix: Snapped minimap positions to ints, avoiding subpixel ugliness with text labels
+- Change: Minor tweaks to the toolbar textures in the Victorian theme
+
+## Changelog for JourneyMap 4.1.0alpha14:
 - New Feature: Added UI Theme selection to General Display Options
 - Change: Minimap shape now just "Square" with a size slider.  Circle will come later.
 - Change: General Display Options layout improvements for smaller screen sizes

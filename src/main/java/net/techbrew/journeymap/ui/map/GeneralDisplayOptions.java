@@ -25,10 +25,10 @@ import net.techbrew.journeymap.ui.Button;
 import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemeButton;
 import net.techbrew.journeymap.ui.theme.ThemeToolbar;
-import scala.actors.threadpool.Arrays;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class GeneralDisplayOptions extends JmUI
 {
