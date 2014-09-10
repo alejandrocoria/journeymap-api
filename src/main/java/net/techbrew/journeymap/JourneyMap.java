@@ -35,13 +35,13 @@ import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.*;
-import net.techbrew.journeymap.render.overlay.TileCache;
+import net.techbrew.journeymap.render.map.TileCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.server.JMServer;
 import net.techbrew.journeymap.task.ITaskManager;
 import net.techbrew.journeymap.task.TaskController;
 import net.techbrew.journeymap.ui.UIManager;
-import net.techbrew.journeymap.ui.map.MapOverlay;
+import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -381,7 +381,7 @@ public class JourneyMap
         loadConfigProperties();
         DataCache.instance().purge();
         chunkRenderController = new ChunkRenderController();
-        MapOverlay.state().follow.set(true);
+        Fullscreen.state().follow.set(true);
         StatTimer.resetAll();
         TextureCache.instance().purge();
         TileCache.instance().invalidateAll();
@@ -441,7 +441,7 @@ public class JourneyMap
                 }
             }
 
-            final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof MapOverlay);
+            final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof Fullscreen);
             if (isGamePaused)
             {
                 TileCache.pause();

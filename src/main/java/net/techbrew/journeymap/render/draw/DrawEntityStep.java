@@ -11,7 +11,7 @@ package net.techbrew.journeymap.render.draw;
 import com.google.common.cache.CacheLoader;
 import net.minecraft.entity.player.EntityPlayer;
 import net.techbrew.journeymap.model.EntityDTO;
-import net.techbrew.journeymap.render.overlay.GridRenderer;
+import net.techbrew.journeymap.render.map.GridRenderer;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 
 import java.awt.*;

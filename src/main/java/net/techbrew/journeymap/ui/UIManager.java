@@ -18,8 +18,10 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
-import net.techbrew.journeymap.render.overlay.TileCache;
-import net.techbrew.journeymap.ui.map.*;
+import net.techbrew.journeymap.render.map.TileCache;
+import net.techbrew.journeymap.ui.component.JmUI;
+import net.techbrew.journeymap.ui.dialog.*;
+import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import net.techbrew.journeymap.ui.minimap.MiniMap;
 import net.techbrew.journeymap.ui.minimap.MiniMapHotkeysHelp;
 import net.techbrew.journeymap.ui.minimap.MiniMapOptions;
@@ -162,7 +164,7 @@ public class UIManager
     public void openMap()
     {
         KeyBinding.unPressAllKeys();
-        open(MapOverlay.class);
+        open(Fullscreen.class);
     }
 
     public void openMap(Waypoint waypoint)
@@ -172,7 +174,7 @@ public class UIManager
             if (waypoint.isInPlayerDimension())
             {
                 KeyBinding.unPressAllKeys();
-                MapOverlay map = open(MapOverlay.class);
+                Fullscreen map = open(Fullscreen.class);
                 map.centerOn(waypoint);
             }
         }
@@ -184,7 +186,7 @@ public class UIManager
 
     public void openMapHotkeyHelp(Class<? extends JmUI> returnClass)
     {
-        open(MapOverlayHotkeysHelp.class, returnClass);
+        open(FullscreenHotkeysHelp.class, returnClass);
     }
 
     public void openMiniMapOptions(Class<? extends JmUI> returnClass)
@@ -219,7 +221,7 @@ public class UIManager
 
     public void openMapActions()
     {
-        open(MapOverlayActions.class);
+        open(FullscreenActions.class);
     }
 
     public void openWaypointHelp(Class<? extends JmUI> returnClass)
@@ -261,7 +263,7 @@ public class UIManager
 
     public void reset()
     {
-        MapOverlay.reset();
+        Fullscreen.reset();
         TileCache.instance().invalidateAll();
         TileCache.instance().cleanUp();
         if (this.miniMap != null)

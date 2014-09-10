@@ -13,9 +13,9 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.properties.WaypointProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
-import net.techbrew.journeymap.ui.*;
-import net.techbrew.journeymap.ui.Button;
-import net.techbrew.journeymap.ui.TextField;
+import net.techbrew.journeymap.ui.component.*;
+import net.techbrew.journeymap.ui.component.Button;
+import net.techbrew.journeymap.ui.component.TextField;
 
 import java.awt.*;
 

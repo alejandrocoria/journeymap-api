@@ -9,7 +9,7 @@
 package net.techbrew.journeymap.render.draw;
 
 import net.techbrew.journeymap.model.Waypoint;
-import net.techbrew.journeymap.render.overlay.GridRenderer;
+import net.techbrew.journeymap.render.map.GridRenderer;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 

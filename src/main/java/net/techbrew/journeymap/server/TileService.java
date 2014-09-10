@@ -18,7 +18,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
-import net.techbrew.journeymap.render.overlay.Tile;
+import net.techbrew.journeymap.render.map.Tile;
 import org.apache.logging.log4j.Level;
 import se.rupy.http.Event;
 import se.rupy.http.Query;

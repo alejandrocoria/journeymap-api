@@ -19,8 +19,12 @@ import net.techbrew.journeymap.command.CmdTeleportWaypoint;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
-import net.techbrew.journeymap.ui.*;
-import net.techbrew.journeymap.ui.map.MapOverlay;
+import net.techbrew.journeymap.ui.UIManager;
+import net.techbrew.journeymap.ui.component.Button;
+import net.techbrew.journeymap.ui.component.ButtonList;
+import net.techbrew.journeymap.ui.component.JmUI;
+import net.techbrew.journeymap.ui.component.ScrollPane;
+import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.lwjgl.input.Keyboard;
 
@@ -460,7 +464,7 @@ public class WaypointManager extends JmUI
         bottomButtons.setEnabled(false);
         WaypointStore.instance().bulkSave();
         //DataCache.instance().getWaypoints(true);
-        MapOverlay.state().requireRefresh();
+        Fullscreen.state().requireRefresh();
         closeAndReturn();
     }
 

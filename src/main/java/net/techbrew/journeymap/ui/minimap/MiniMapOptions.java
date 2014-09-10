@@ -14,8 +14,10 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
-import net.techbrew.journeymap.ui.*;
-import net.techbrew.journeymap.ui.Button;
+import net.techbrew.journeymap.ui.UIManager;
+import net.techbrew.journeymap.ui.component.*;
+import net.techbrew.journeymap.ui.component.Button;
+import net.techbrew.journeymap.ui.dialog.MasterOptions;
 
 import java.awt.*;
 

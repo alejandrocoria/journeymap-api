@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by Mark on 8/30/2014.
  */
-public class ThemeButton extends net.techbrew.journeymap.ui.Button
+public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
 {
     protected Theme theme;
     protected Theme.Control.ButtonSpec buttonSpec;

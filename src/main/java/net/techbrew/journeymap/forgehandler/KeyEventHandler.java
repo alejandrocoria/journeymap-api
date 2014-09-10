@@ -19,7 +19,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.MapOverlayState;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.ui.UIManager;
-import net.techbrew.journeymap.ui.map.MapOverlay;
+import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import org.lwjgl.input.Keyboard;
 
 import java.util.EnumSet;
@@ -45,7 +45,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
     public static void onKeypress(boolean minimapOnly)
     {
         final int i = Keyboard.getEventKey();
-        MapOverlayState mapOverlayState = MapOverlay.state();
+        MapOverlayState mapOverlayState = Fullscreen.state();
 
         try
         {
@@ -101,7 +101,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                         }
                         else
                         {
-                            if (FMLClientHandler.instance().getClient().currentScreen instanceof MapOverlay)
+                            if (FMLClientHandler.instance().getClient().currentScreen instanceof Fullscreen)
                             {
                                 UIManager.getInstance().closeAll();
                             }

@@ -21,11 +21,12 @@ import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
-import net.techbrew.journeymap.ui.Button;
-import net.techbrew.journeymap.ui.*;
-import net.techbrew.journeymap.ui.ScrollPane;
-import net.techbrew.journeymap.ui.TextField;
-import net.techbrew.journeymap.ui.map.MapOverlay;
+import net.techbrew.journeymap.ui.UIManager;
+import net.techbrew.journeymap.ui.component.Button;
+import net.techbrew.journeymap.ui.component.*;
+import net.techbrew.journeymap.ui.component.ScrollPane;
+import net.techbrew.journeymap.ui.component.TextField;
+import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.lwjgl.input.Keyboard;
 
@@ -651,12 +652,12 @@ public class WaypointEditor extends JmUI
     {
         if (returnClass != null && returnClass.equals(WaypointManager.class))
         {
-            UIManager.getInstance().openWaypointManager(focusWaypoint, MapOverlay.class);
+            UIManager.getInstance().openWaypointManager(focusWaypoint, Fullscreen.class);
             return;
         }
 
         //DataCache.instance().forceRefresh(WaypointsData.class);
-        MapOverlay.state().requireRefresh();
+        Fullscreen.state().requireRefresh();
         closeAndReturn();
     }
 

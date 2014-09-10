@@ -6,37 +6,29 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
  */
 
-package net.techbrew.journeymap.ui.minimap;
+package net.techbrew.journeymap.ui.dialog;
 
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.forgehandler.KeyEventHandler;
-import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.JmUI;
-import net.techbrew.journeymap.ui.dialog.MasterOptions;
 
 import java.awt.*;
 
-public class MiniMapHotkeysHelp extends JmUI
+public class FullscreenHotkeysHelp extends JmUI
 {
 
     private int lastWidth = 0;
     private int lastHeight = 0;
     private Button buttonClose;
-    private DisplayVars.Shape currentShape;
-    private DisplayVars.Position currentPosition;
+
+    ;
     private KeyEventHandler keyEventHandler;
 
-    public MiniMapHotkeysHelp()
+    public FullscreenHotkeysHelp(Class<? extends JmUI> returnClass)
     {
-        this(MasterOptions.class);
-    }
-
-    public MiniMapHotkeysHelp(Class<? extends JmUI> returnClass)
-    {
-        super(Constants.getString("jm.minimap.hotkeys_title"), returnClass);
+        super(Constants.getString("jm.fullscreen.hotkeys_title"), returnClass);
         keyEventHandler = new KeyEventHandler();
     }
 
@@ -85,13 +77,18 @@ public class MiniMapHotkeysHelp extends JmUI
         switch (id)
         {
 
-
             case Close:
             {
                 closeAndReturn();
                 break;
             }
         }
+    }
+
+    @Override
+    public void updateScreen()
+    {
+        super.updateScreen();
     }
 
     /**
@@ -108,12 +105,16 @@ public class MiniMapHotkeysHelp extends JmUI
         // Hotkey help
         y += 12;
         final int x = (this.width) / 2;
-        drawHelpStrings(Constants.getString("jm.minimap.hotkeys_toggle"), Constants.CONTROL_KEYNAME_COMBO + Constants.getKeyName(Constants.KB_MAP), x, y += 12);
+        drawHelpStrings(Constants.getString("key.journeymap.hotkeys_toggle"), Constants.getKeyName(Constants.KB_MAP), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.zoom_in"), Constants.getKeyName(Constants.KB_MAP_ZOOMIN), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.zoom_out"), Constants.getKeyName(Constants.KB_MAP_ZOOMOUT), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.day"), Constants.getKeyName(Constants.KB_MAP_DAY), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.night"), Constants.getKeyName(Constants.KB_MAP_NIGHT), x, y += 12);
-        drawHelpStrings(Constants.getString("key.journeymap.minimap_position"), Constants.getKeyName(Constants.KB_MINIMAP_POS), x, y += 12);
+        drawHelpStrings(Constants.getString("jm.fullscreen.hotkeys_north"), Constants.getKeyName(mc.gameSettings.keyBindForward), x, y += 12);
+        drawHelpStrings(Constants.getString("jm.fullscreen.hotkeys_west"), Constants.getKeyName(mc.gameSettings.keyBindLeft), x, y += 12);
+        drawHelpStrings(Constants.getString("jm.fullscreen.hotkeys_south"), Constants.getKeyName(mc.gameSettings.keyBindBack), x, y += 12);
+        drawHelpStrings(Constants.getString("jm.fullscreen.hotkeys_east"), Constants.getKeyName(mc.gameSettings.keyBindRight), x, y += 12);
+        drawHelpStrings(Constants.getString("jm.fullscreen.hotkeys_waypoint"), Constants.getString("jm.fullscreen.hotkeys_doubleclick"), x, y += 12);
         buttonClose.setY(y + 16);
     }
 
@@ -126,28 +127,8 @@ public class MiniMapHotkeysHelp extends JmUI
         drawString(getFontRenderer(), key, x + hgap, y, Color.YELLOW.getRGB());
     }
 
-    @Override
-    public void drawBackground(int layer)
-    {
-        super.drawBackground(layer);
-
-        if (JourneyMap.getMiniMapProperties().enabled.get())
-        {
-            MiniMap miniMap = UIManager.getInstance().getMiniMap();
-            miniMap.drawMap();
-        }
-    }
-
-    @Override
-    protected void keyTyped(char c, int i)
-    {
-        super.keyTyped(c, i);
-        keyEventHandler.onKeypress(true);
-    }
-
     private enum ButtonEnum
     {
         Close
     }
-
 }

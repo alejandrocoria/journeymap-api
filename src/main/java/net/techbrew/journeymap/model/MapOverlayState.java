@@ -22,9 +22,9 @@ import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawWayPointStep;
-import net.techbrew.journeymap.render.overlay.GridRenderer;
-import net.techbrew.journeymap.render.overlay.OverlayRadarRenderer;
-import net.techbrew.journeymap.render.overlay.OverlayWaypointRenderer;
+import net.techbrew.journeymap.render.draw.RadarDrawStepFactory;
+import net.techbrew.journeymap.render.draw.WaypointDrawStepFactory;
+import net.techbrew.journeymap.render.map.GridRenderer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -176,7 +176,7 @@ public class MapOverlayState
         return drawWaypointStepList;
     }
 
-    public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, OverlayWaypointRenderer waypointRenderer, OverlayRadarRenderer radarRenderer, MapProperties mapProperties, float drawScale, boolean checkWaypointDistance)
+    public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, WaypointDrawStepFactory waypointRenderer, RadarDrawStepFactory radarRenderer, MapProperties mapProperties, float drawScale, boolean checkWaypointDistance)
     {
         lastMapProperties = mapProperties;
 

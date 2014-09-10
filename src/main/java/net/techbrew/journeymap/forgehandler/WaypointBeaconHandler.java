@@ -15,7 +15,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.render.entity.RenderWaypointBeacon;
+import net.techbrew.journeymap.render.ingame.RenderWaypointBeacon;
 
 import java.util.EnumSet;
 

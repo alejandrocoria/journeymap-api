@@ -6,9 +6,9 @@ import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
-import net.techbrew.journeymap.ui.Button;
-import net.techbrew.journeymap.ui.ButtonList;
-import net.techbrew.journeymap.ui.JmUI;
+import net.techbrew.journeymap.ui.component.Button;
+import net.techbrew.journeymap.ui.component.ButtonList;
+import net.techbrew.journeymap.ui.component.JmUI;
 import scala.actors.threadpool.Arrays;
 
 import java.util.ArrayList;

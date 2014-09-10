@@ -14,9 +14,9 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.techbrew.journeymap.render.overlay.TileCache;
+import net.techbrew.journeymap.render.map.TileCache;
 import net.techbrew.journeymap.ui.UIManager;
-import net.techbrew.journeymap.ui.map.MapOverlay;
+import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 
 import java.util.EnumSet;
 
@@ -43,7 +43,7 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
             mc.mcProfiler.startSection("journeymap");
 
             mc.mcProfiler.startSection("tileCache");
-            final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof MapOverlay);
+            final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof Fullscreen);
             if (isGamePaused)
             {
                 TileCache.pause();

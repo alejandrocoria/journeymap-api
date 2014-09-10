@@ -17,11 +17,11 @@ import net.techbrew.journeymap.command.CmdTeleportWaypoint;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureImpl;
-import net.techbrew.journeymap.ui.Button;
-import net.techbrew.journeymap.ui.ButtonList;
-import net.techbrew.journeymap.ui.ScrollPane;
 import net.techbrew.journeymap.ui.UIManager;
-import net.techbrew.journeymap.ui.map.MapOverlay;
+import net.techbrew.journeymap.ui.component.Button;
+import net.techbrew.journeymap.ui.component.ButtonList;
+import net.techbrew.journeymap.ui.component.ScrollPane;
+import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 
 import java.awt.*;
@@ -246,7 +246,7 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
                         if (manager.canUserTeleport && buttonTeleport.mouseOver(mouseX, mouseY))
                         {
                             new CmdTeleportWaypoint(waypoint).run();
-                            MapOverlay.state().follow.set(true);
+                            Fullscreen.state().follow.set(true);
                             UIManager.getInstance().closeAll();
                             return;
                         }

@@ -106,13 +106,8 @@ public class RegionImageCache
         {
             for (ChunkImageSet cis : chunkImageSets)
             {
-                final ChunkCoord cCoord = cis.getCCoord();
                 final RegionCoord rCoord = cis.getCCoord().getRegionCoord();
                 final RegionImageSet ris = getRegionImageSet(rCoord);
-                if (ris.hasLegacy())
-                {
-                    ris.writeToDisk(true);
-                }
                 ris.insertChunk(cis, forceFlush);
             }
             if (forceFlush)
