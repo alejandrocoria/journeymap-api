@@ -80,6 +80,7 @@ public class ThemePresets
         Theme.Minimap minimap = theme.minimap;
         minimap.prefix = "vic_";
         minimap.margin = 8;
+        minimap.padding = 4;
         minimap.top = minimap.bottom = new Theme.ImageSpec(1,20);
         minimap.left = minimap.right = new Theme.ImageSpec(20,1);
         minimap.topLeft = minimap.topRight = minimap.bottomRight = minimap.bottomLeft = new Theme.ImageSpec(20,20);
@@ -148,6 +149,7 @@ public class ThemePresets
         Theme.Minimap minimap = theme.minimap;
         minimap.prefix = "pur_";
         minimap.margin = 4;
+        minimap.padding = 4;
         minimap.top = minimap.bottom = new Theme.ImageSpec(1,8);
         minimap.left = minimap.right = new Theme.ImageSpec(8,1);
         minimap.topLeft = minimap.topRight = minimap.bottomRight = minimap.bottomLeft = new Theme.ImageSpec(8,8);

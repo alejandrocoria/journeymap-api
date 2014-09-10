@@ -13,8 +13,11 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 - New Feature: Added UI Theme selection to General Display Options
+- Change: Minimap shape now just "Square" with a size slider.  Circle will come later.
 - Change: General Display Options layout improvements for smaller screen sizes
 - Change: Layout improvements to reduce initial flicker in Fullscreen Map if screen size forces a toolbar to be hidden.
+- Bugfix: Disabled buttons in various Options dialogs weren't rendered as such.
+- Bugfix: Minimap frame and labels weren't positioned correctly in several scenarios
 
 ## Changelog for JourneyMap 4.1.0alpha13:
 - Change: Experimental use of GL12 texture params to try to prevent white lines between tiles with some screen sizes

@@ -19,6 +19,7 @@ import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
+import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemeMinimapFrame;
 
 import java.awt.*;
@@ -91,6 +92,7 @@ public class DisplayVars
         DrawUtil.VAlign valignLocation = DrawUtil.VAlign.Above;
         DrawUtil.VAlign valignBiome = DrawUtil.VAlign.Above;
         float textureScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);
+        Theme theme = ThemeFileHandler.getCurrentTheme();
 
         // Assign shape
         switch (shape)
@@ -121,15 +123,15 @@ public class DisplayVars
                 minimapSize = miniMapProperties.customSize.get();
                 viewPortPadX = 2;
                 viewPortPadY = 2;
-                valignLocation = DrawUtil.VAlign.Below;
-                valignBiome = DrawUtil.VAlign.Below;
-                yOffsetFps = 3;
-                yOffsetLocation = 1;
-                yOffsetBiome = yOffsetLocation + labelHeight;
+                minimapFrame = new ThemeMinimapFrame(theme, (int) minimapSize);
+                valignLocation = DrawUtil.VAlign.Above;
+                valignBiome = DrawUtil.VAlign.Above;
+                yOffsetFps = theme.minimap.padding;
+                yOffsetLocation = -theme.minimap.padding;
+                yOffsetBiome = -(theme.minimap.padding + labelHeight);
                 scissorLocation = false;
                 scissorBiome = false;
-                labelsOutside = true;
-                minimapFrame = new ThemeMinimapFrame(ThemeFileHandler.getCurrentTheme(), (int) minimapSize);
+
                 break;
             }
         }
@@ -148,13 +150,6 @@ public class DisplayVars
                 translateY = (mc.displayHeight / 2) - minimapOffset - bottomTextureYMargin;
                 scissorX = textureX;
                 scissorY = marginY + bottomTextureYMargin;
-                if (labelsOutside)
-                {
-                    yOffsetLocation = -minimapSize;
-                    valignLocation = DrawUtil.VAlign.Above;
-                    valignBiome = DrawUtil.VAlign.Above;
-                    yOffsetBiome = yOffsetLocation - labelHeight;
-                }
                 break;
             }
             case TopLeft:
@@ -175,13 +170,6 @@ public class DisplayVars
                 translateY = (mc.displayHeight / 2) - minimapOffset - bottomTextureYMargin;
                 scissorX = textureX;
                 scissorY = marginY + bottomTextureYMargin;
-                if (labelsOutside)
-                {
-                    yOffsetLocation = -minimapSize;
-                    valignLocation = DrawUtil.VAlign.Above;
-                    valignBiome = DrawUtil.VAlign.Above;
-                    yOffsetBiome = yOffsetLocation - labelHeight;
-                }
                 break;
             }
             case Center:

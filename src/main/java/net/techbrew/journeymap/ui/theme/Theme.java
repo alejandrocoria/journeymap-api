@@ -140,6 +140,8 @@ public class Theme implements Comparable<Theme>
         @Since(1)
         public int margin;
         @Since(1)
+        public int padding;
+        @Since(1)
         public ImageSpec topLeft = new ImageSpec();
         @Since(1)
         public ImageSpec top = new ImageSpec();

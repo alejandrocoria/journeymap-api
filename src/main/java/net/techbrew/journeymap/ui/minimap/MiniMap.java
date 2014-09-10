@@ -308,15 +308,8 @@ public class MiniMap
                 GL11.glPopMatrix();
             }
 
-            // Draw border texture
-//            if (dv.borderTexture != null && !dv.shape.equals(DisplayVars.Shape.CustomSquare))
-//            {
-//                GL11.glPushMatrix();
-//                //GL11.glTranslated(512-dv.minimapSize, 0, 0);
-//                // TODO: Draw Frame scaled
-//                DrawUtil.drawImage(dv.borderTexture, dv.textureX, dv.textureY, false, 1, 0);
-//                GL11.glPopMatrix();
-//            }
+            // Pop matrix changes
+            GL11.glPopMatrix();
 
             if(dv.minimapFrame != null)
             {
@@ -339,8 +332,6 @@ public class MiniMap
                 dv.labelBiome.draw(biomeLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
             }
 
-            // Pop matrix changes
-            GL11.glPopMatrix();
 
             // Return resolution to how it is normally scaled
             JmUI.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());

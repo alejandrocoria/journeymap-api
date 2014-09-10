@@ -49,20 +49,15 @@ public class ThemeMinimapFrame
 
     public void draw(final double x, final double y)
     {
-        DrawUtil.drawClampedImage(textureTop, x + (textureTopLeft.width / 2), y - (textureTop.height / 2), 1, 0);
-        DrawUtil.drawClampedImage(textureLeft, x - (textureLeft.width / 2), y + (textureTopLeft.height / 2), 1, 0);
-        DrawUtil.drawClampedImage(textureTopLeft, x - (textureTopLeft.width / 2), y - (textureTopLeft.height / 2), 1, 0);
-
-
-        DrawUtil.drawClampedImage(textureBottom, x + (textureBottomLeft.width / 2), y + height - (textureBottom.height / 2), 1, 0);
-
-        DrawUtil.drawClampedImage(textureRight, x + width - (textureRight.width / 2), y + (textureTopRight.height / 2), 1, 0);
-
-
-        DrawUtil.drawClampedImage(textureTopLeft, x - (textureTopLeft.width / 2), y - (textureTopLeft.height / 2), 1, 0);
-        DrawUtil.drawClampedImage(textureTopRight, x + width - (textureTopRight.width / 2), y - (textureTopRight.height / 2), 1, 0);
-        DrawUtil.drawClampedImage(textureBottomLeft, x - (textureBottomLeft.width / 2), y + height - (textureBottomLeft.height / 2), 1, 0);
-        DrawUtil.drawClampedImage(textureBottomRight, x + width - (textureBottomRight.width / 2), y + height - (textureBottomRight.height / 2), 1, 0);
+        DrawUtil.drawClampedImage(textureTop, x + (textureTopLeft.width  / 2D), y - (textureTop.height  / 2D), 1, 0);
+        DrawUtil.drawClampedImage(textureLeft, x - (textureLeft.width  / 2D), y + (textureTopLeft.height  / 2D), 1, 0);
+        DrawUtil.drawClampedImage(textureTopLeft, x - (textureTopLeft.width  / 2D), y - (textureTopLeft.height  / 2D), 1, 0);
+        DrawUtil.drawClampedImage(textureBottom, x + (textureBottomLeft.width  / 2D), y + height - (textureBottom.height  / 2D), 1, 0);
+        DrawUtil.drawClampedImage(textureRight, x + width - (textureRight.width  / 2D), y + (textureTopRight.height  / 2D), 1, 0);
+        DrawUtil.drawClampedImage(textureTopLeft, x - (textureTopLeft.width  / 2D), y - (textureTopLeft.height  / 2D), 1, 0);
+        DrawUtil.drawClampedImage(textureTopRight, x + width - (textureTopRight.width  / 2D), y - (textureTopRight.height  / 2D), 1, 0);
+        DrawUtil.drawClampedImage(textureBottomLeft, x - (textureBottomLeft.width  / 2D), y + height - (textureBottomLeft.height  / 2D), 1, 0);
+        DrawUtil.drawClampedImage(textureBottomRight, x + width - (textureBottomRight.width  / 2D), y + height - (textureBottomRight.height  / 2D), 1, 0);
     }
 
     private TextureImpl getTexture(String suffix, Theme.ImageSpec imageSpec)
