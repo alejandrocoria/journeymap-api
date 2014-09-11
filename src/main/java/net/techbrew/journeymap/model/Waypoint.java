@@ -25,10 +25,8 @@ import net.techbrew.journeymap.render.texture.TextureImpl;
 
 import java.awt.*;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Random;
-import java.util.TreeSet;
+import java.text.DateFormat;
+import java.util.*;
 
 /**
  * Generic waypoint data holder
@@ -166,7 +164,7 @@ public class Waypoint implements Serializable
         String name;
         if (type == Type.Death)
         {
-            name = Constants.getString("jm.waypoint.deathpoint");
+            name = String.format("%s %s", Constants.getString("jm.waypoint.deathpoint"), DateFormat.getTimeInstance().format(new Date()));
         }
         else
         {
