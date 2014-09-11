@@ -24,7 +24,7 @@ import java.awt.*;
  */
 public class WaypointOptions extends JmUI
 {
-    Button buttonEnable, buttonHide, buttonClose;
+    Button buttonEnable, buttonDeathpoints, buttonHide, buttonClose;
     TextField maxDistanceField;
     ButtonList listLeftButtons, listRightButtons;
     String labelMaxDistance = Constants.getString("jm.waypoint.max_distance");
@@ -59,7 +59,8 @@ public class WaypointOptions extends JmUI
                 BooleanPropertyButton.create(id++, "jm.waypoint.show_distance", props, props.showDistance),
                 BooleanPropertyButton.create(id++, "jm.waypoint.bold_label", props, props.boldLabel),
                 BooleanPropertyButton.create(id++, "jm.waypoint.force_unicode", props, props.forceUnicode),
-                BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, "jm.waypoint.font_size", props, props.fontSmall)
+                BooleanPropertyButton.create(id++, BooleanPropertyButton.Type.SmallLarge, "jm.waypoint.font_size", props, props.fontSmall),
+                BooleanPropertyButton.create(id++, "jm.waypoint.create_deathpoints", props, props.createDeathpoints)
         );
         buttonList.addAll(listRightButtons);
 
@@ -100,16 +101,13 @@ public class WaypointOptions extends JmUI
         listRightButtons.layoutVertical(bx + (hgap / 2), by, true, vgap);
 
         // Max Distance Field
-        maxDistanceField.setX(bx + hgap);
+        maxDistanceField.setWidth(getFontRenderer().getStringWidth("9999999"));
+        maxDistanceField.setX(bx - hgap - maxDistanceField.width);
         maxDistanceField.setY(listLeftButtons.getBottomY() + vgap);
-        maxDistanceField.setWidth(buttonEnable.getWidth() - hgap);
         maxDistanceField.drawTextBox();
 
-        // Mask behind the label for max distance
-        DrawUtil.drawRectangle(listLeftButtons.getLeftX(), maxDistanceField.getY(), listLeftButtons.get(0).getWidth(), maxDistanceField.getHeight(), Color.black, 150);
-
         // Label
-        DrawUtil.drawLabel(labelMaxDistance, bx - hgap, maxDistanceField.getMiddleY(), DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, Color.BLACK, 0, Color.cyan, 255, 1, true);
+        DrawUtil.drawLabel(labelMaxDistance, maxDistanceField.getX()-hgap, maxDistanceField.getMiddleY(), DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, Color.BLACK, 0, Color.cyan, 255, 1, true);
 
         // Close
         buttonHide.setPosition(bx - leftOffset, maxDistanceField.getBottomY() + (vgap * 4));

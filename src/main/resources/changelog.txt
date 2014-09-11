@@ -13,7 +13,7 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 - Bugfix: Enchanted items in toolbar rendered incorrectly because the minimap wasn't cleaning up after itself
-
+- New Feature: "Create Deathpoints" is now an option you can disable in Waypoint Options
 
 ## Changelog for JourneyMap 4.1.0alpha15:
 - New Feature: Added Circle minimap shape, along with theme-based frame coloring.

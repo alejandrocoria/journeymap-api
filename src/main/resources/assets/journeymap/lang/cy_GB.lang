@@ -145,6 +145,7 @@ jm.waypoint.blue_abbreviated=B
 jm.waypoint.bold_label=Bold Label: %1$s
 jm.waypoint.cancel=Canslo
 jm.waypoint.color=Lliw
+jm.waypoint.create_deathpoints=Create Deathpoints: %1$s
 jm.waypoint.current_location=Lleoliad Presennol: %1$s
 jm.waypoint.deathpoint=Marwolaeth
 jm.waypoint.dimension_all=Holl

@@ -418,7 +418,7 @@ public class JourneyMap
             if (mc.thePlayer != null && isDead && isMapping())
             {
                 stopMapping();
-                if (waypointProperties.managerEnabled.get())
+                if (waypointProperties.managerEnabled.get() && waypointProperties.createDeathpoints.get())
                 {
                     WaypointStore.instance().save(Waypoint.deathOf(mc.thePlayer));
                 }

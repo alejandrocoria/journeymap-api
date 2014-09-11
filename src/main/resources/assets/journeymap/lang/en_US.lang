@@ -169,6 +169,7 @@ jm.waypoint.blue_abbreviated=B
 jm.waypoint.bold_label=Bold Label: %1$s
 jm.waypoint.cancel=Cancel
 jm.waypoint.color=Color
+jm.waypoint.create_deathpoints=Create Deathpoints: %1$s
 jm.waypoint.current_location=Current Location: %1$s
 jm.waypoint.deathpoint=Death
 jm.waypoint.dimension_all=All

@@ -30,6 +30,7 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     public final AtomicBoolean fontSmall = new AtomicBoolean(true);
     public final AtomicBoolean textureSmall = new AtomicBoolean(true);
     public final AtomicInteger maxDistance = new AtomicInteger(0);
+    public final AtomicBoolean createDeathpoints = new AtomicBoolean(true);
     protected transient final String name = "waypoint";
 
     @Override

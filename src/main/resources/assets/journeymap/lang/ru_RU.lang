@@ -151,6 +151,7 @@ jm.waypoint.blue_abbreviated=B
 jm.waypoint.bold_label=Жирный шрифт: %1$s
 jm.waypoint.cancel=Отмена
 jm.waypoint.color=Цвет
+jm.waypoint.create_deathpoints=Create Deathpoints: %1$s
 jm.waypoint.current_location=Текущие координаты: %1$s
 jm.waypoint.deathpoint=Смерть
 jm.waypoint.dimension_all=Все

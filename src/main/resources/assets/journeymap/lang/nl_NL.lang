@@ -145,6 +145,7 @@ jm.waypoint.blue_abbreviated=B
 jm.waypoint.bold_label=Vetgedrukte Label: %1$s
 jm.waypoint.cancel=Annuleer
 jm.waypoint.color=Kleur
+jm.waypoint.create_deathpoints=Create Deathpoints: %1$s
 jm.waypoint.current_location=Huidige Locatie: %1$s
 jm.waypoint.deathpoint=Dood
 jm.waypoint.dimension_all=Alle
