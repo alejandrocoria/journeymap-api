@@ -331,7 +331,7 @@ public class MiniMap
         Tessellator.instance.addTranslation(0,0,1000);
         if(dv.shape == DisplayVars.Shape.Circle)
         {
-            int margin = 4;
+            double margin = dv.minimapSize/192D;
             DrawUtil.drawQuad(dv.maskTexture, dv.textureX+margin, dv.textureY+margin, dv.minimapSize-(2*margin), dv.minimapSize-(2*margin), 0, null, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
         }
         else
@@ -346,26 +346,8 @@ public class MiniMap
 
     public static void endStencil() {
         GL11.glDepthMask(true);
-        GL11.glDepthFunc(GL11.GL_LEQUAL);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-    }
-
-    public static void drawCircle(double x, double y, double r, double zDepth, double circleSteps) {
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        Tessellator tes = Tessellator.instance;
-        tes.startDrawing(GL11.GL_TRIANGLE_FAN);
-        tes.addVertex(x, y, zDepth);
-        // for some the circle is only drawn if theta is decreasing rather than ascending
-        double end = Math.PI * 2.0;
-        double incr = end / circleSteps;
-        for (double theta = -incr; theta < end; theta += incr) {
-            tes.addVertex(x + (r * Math.cos(-theta)), y + (r * Math.sin(-theta)), zDepth);
-        }
-        tes.draw();
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glDepthFunc(GL11.GL_ALWAYS);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
     }
 
     public void reset()
