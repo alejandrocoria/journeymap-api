@@ -178,7 +178,7 @@ public class MiniMapOptions extends JmUI
         buttonGeneralDisplay.setEnabled(true);
         buttonKeyboardHelp.setEnabled(buttonMiniMap.getToggled() && buttonKeyboard.getToggled());
 
-        buttonShape.setEnabled(false);
+        //buttonShape.setEnabled(false);
         buttonSize.setEnabled(minimapOn);
 
         bottomButtons.layoutCenteredHorizontal(bx, rightButtons.getBottomY() + (3 * vgap), true, hgap);

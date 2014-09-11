@@ -5,6 +5,8 @@ import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 
+import java.awt.*;
+
 /**
  * Created by Mark on 9/7/2014.
  */
@@ -21,6 +23,8 @@ public class ThemeMinimapFrame
     private final TextureImpl textureBottom;
     private final TextureImpl textureBottomLeft;
     private final TextureImpl textureLeft;
+    private final TextureImpl textureCircle;
+    private final Color circleColor;
 
     private double x;
     private double y;
@@ -32,8 +36,6 @@ public class ThemeMinimapFrame
         this.theme = theme;
         this.width = size;
         this.height = size;
-
-        TextureCache tc = TextureCache.instance();
         resourcePattern = "minimap/" + theme.minimap.prefix + "%s.png";
 
         textureTopLeft = getTexture("topleft", theme.minimap.topLeft);
@@ -45,9 +47,15 @@ public class ThemeMinimapFrame
         textureBottomLeft = getTexture("bottomleft", theme.minimap.bottomLeft);
         textureLeft = getTexture("left", theme.minimap.left.width, height - (theme.minimap.topLeft.height/2) - (theme.minimap.bottomLeft.height/2), true);
 
+        textureCircle = TextureCache.instance().getScaledCopy("scaledMinimap",
+                TextureCache.instance().getMinimapLargeCircle(), size, size,
+                JourneyMap.getMiniMapProperties().frameAlpha.get()/255f);
+
+        circleColor = Theme.getColor(theme.minimap.circleFrameColor);
+
     }
 
-    public void draw(final double x, final double y)
+    public void drawSquare(final double x, final double y)
     {
         DrawUtil.drawClampedImage(textureTop, x + (textureTopLeft.width  / 2D), y - (textureTop.height  / 2D), 1, 0);
         DrawUtil.drawClampedImage(textureLeft, x - (textureLeft.width  / 2D), y + (textureTopLeft.height  / 2D), 1, 0);
@@ -58,6 +66,10 @@ public class ThemeMinimapFrame
         DrawUtil.drawClampedImage(textureTopRight, x + width - (textureTopRight.width  / 2D), y - (textureTopRight.height  / 2D), 1, 0);
         DrawUtil.drawClampedImage(textureBottomLeft, x - (textureBottomLeft.width  / 2D), y + height - (textureBottomLeft.height  / 2D), 1, 0);
         DrawUtil.drawClampedImage(textureBottomRight, x + width - (textureBottomRight.width  / 2D), y + height - (textureBottomRight.height  / 2D), 1, 0);
+    }
+
+    public void drawCircle(final double x, final double y) {
+        DrawUtil.drawColoredImage(textureCircle, 255, circleColor, x, y, 0);
     }
 
     private TextureImpl getTexture(String suffix, Theme.ImageSpec imageSpec)

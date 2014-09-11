@@ -12,6 +12,7 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -37,8 +38,6 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Displays the map as a minimap overlay in-game.
@@ -181,32 +180,8 @@ public class MiniMap
             // Push matrix for translation to corner
             GL11.glPushMatrix();
 
-            // Draw mask (if present) using stencil buffer
-            if (dv.maskTexture != null)
-            {
-                try
-                {
-                    glClear(GL_DEPTH_BUFFER_BIT);
-                    glEnable(GL_STENCIL_TEST);
-                    glColorMask(false, false, false, false);
-                    glDepthMask(false);
-                    glStencilFunc(GL_NEVER, 1, 0xFF);
-                    glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
-                    glStencilMask(0xFF);
-                    glClear(GL_STENCIL_BUFFER_BIT);
-                    DrawUtil.drawQuad(dv.maskTexture, dv.textureX, dv.textureY, dv.maskTexture.width, dv.maskTexture.height, 9, null, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
-                    glColorMask(true, true, true, true);
-                    glDepthMask(true);
-                    glStencilMask(0x00);
-                    //glStencilFunc(GL_EQUAL, 0, 0xFF);
-                    glStencilFunc(GL_EQUAL, 1, 0xFF);
-                }
-                catch (Throwable t)
-                {
-                    logger.error("Stencil buffer failing with circle mask:" + LogFormatter.toString(t));
-                    //return;
-                }
-            }
+            // Start the stencil
+            startStencil();
 
             // Rotatate around player heading
             double rotation = 0;
@@ -235,6 +210,7 @@ public class MiniMap
                 double height = dv.displayHeight / 2 + (dv.translateY);
                 GL11.glPushMatrix();
                 GL11.glTranslated(width, height, 0);
+
                 GL11.glRotated(rotation, 0, 0, 1.0f);
                 GL11.glTranslated(-width, -height, 0);
                 //rotation+=180;
@@ -243,9 +219,14 @@ public class MiniMap
             // Move center to corner
             GL11.glTranslated(dv.translateX, dv.translateY, 0);
 
+
+
+
             // Scissor area that shouldn't be drawn
-            GL11.glScissor((int) dv.scissorX + 1, (int) dv.scissorY + 1, (int) dv.minimapSize - 2, (int) dv.minimapSize - 2);
-            GL11.glEnable(GL11.GL_SCISSOR_TEST);
+           // GL11.glScissor((int) dv.scissorX + 1, (int) dv.scissorY + 1, (int) dv.minimapSize - 2, (int) dv.minimapSize - 2);
+            //GL11.glEnable(GL11.GL_SCISSOR_TEST);
+
+
 
             // Draw grid
             gridRenderer.draw(1f, 0, 0);
@@ -276,18 +257,6 @@ public class MiniMap
             // Return center to mid-screen
             GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
 
-            // If using a mask, turn off the stencil test
-            if (dv.maskTexture != null)
-            {
-                glDisable(GL_STENCIL_TEST);
-            }
-
-            // Finish Scissor
-            GL11.glDisable(GL11.GL_SCISSOR_TEST);
-
-            // Restore GL attrs assumed by Minecraft to be managerEnabled
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
-
             // TODO: These need to be checked for straying outside the scissor
             // Draw off-screen waypoints on top of border texture
             if (!allWaypointSteps.isEmpty())
@@ -308,16 +277,22 @@ public class MiniMap
                 GL11.glPopMatrix();
             }
 
+            endStencil();
+
             // Pop matrix changes
             GL11.glPopMatrix();
 
-            if(dv.minimapFrame != null)
+            if(dv.shape == DisplayVars.Shape.Square)
             {
-                dv.minimapFrame.draw(dv.textureX, dv.textureY);
+                dv.minimapFrame.drawSquare(dv.textureX, dv.textureY);
+            }
+            else if(dv.shape== DisplayVars.Shape.Circle)
+            {
+                dv.minimapFrame.drawCircle(dv.textureX, dv.textureY);
             }
 
             // Draw labels if not scissored
-            if (/*!dv.labelFps.scissor &&*/ dv.showFps)
+            if (dv.showFps)
             {
                 dv.labelFps.draw(fpsLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
             }
@@ -332,7 +307,6 @@ public class MiniMap
                 dv.labelBiome.draw(biomeLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
             }
 
-
             // Return resolution to how it is normally scaled
             JmUI.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
 
@@ -345,6 +319,53 @@ public class MiniMap
         {
             timer.stop();
         }
+    }
+
+
+    public void startStencil() {
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glColorMask(false, false, false, false);
+        GL11.glDepthMask(true);
+        GL11.glDepthFunc(GL11.GL_ALWAYS);
+        GL11.glColor4f(1, 1, 1, 1);
+        Tessellator.instance.addTranslation(0,0,1000);
+        if(dv.shape == DisplayVars.Shape.Circle)
+        {
+            int margin = 4;
+            DrawUtil.drawQuad(dv.maskTexture, dv.textureX+margin, dv.textureY+margin, dv.minimapSize-(2*margin), dv.minimapSize-(2*margin), 0, null, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
+        }
+        else
+        {
+            DrawUtil.drawRectangle(dv.textureX, dv.textureY, dv.minimapSize, dv.minimapSize, Color.white, 255);
+        }
+        Tessellator.instance.addTranslation(0,0,-1000);
+        GL11.glColorMask(true, true, true, true);
+        GL11.glDepthMask(false);
+        GL11.glDepthFunc(GL11.GL_GREATER);
+    }
+
+    public static void endStencil() {
+        GL11.glDepthMask(true);
+        GL11.glDepthFunc(GL11.GL_LEQUAL);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+    }
+
+    public static void drawCircle(double x, double y, double r, double zDepth, double circleSteps) {
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        Tessellator tes = Tessellator.instance;
+        tes.startDrawing(GL11.GL_TRIANGLE_FAN);
+        tes.addVertex(x, y, zDepth);
+        // for some the circle is only drawn if theta is decreasing rather than ascending
+        double end = Math.PI * 2.0;
+        double incr = end / circleSteps;
+        for (double theta = -incr; theta < end; theta += incr) {
+            tes.addVertex(x + (r * Math.cos(-theta)), y + (r * Math.sin(-theta)), zDepth);
+        }
+        tes.draw();
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_BLEND);
     }
 
     public void reset()

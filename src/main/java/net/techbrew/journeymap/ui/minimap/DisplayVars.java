@@ -53,6 +53,7 @@ public class DisplayVars
     final LabelVars labelFps, labelLocation, labelBiome;
     final ThemeMinimapFrame minimapFrame;
     boolean forceUnicode;
+
     /**
      * Constructor.
      *
@@ -100,8 +101,8 @@ public class DisplayVars
             case Circle:
             {
                 drawScale = 1f * textureScale;
-                maskTexture = TextureCache.instance().getMinimapLargeCircleMask();
-                minimapSize = 512;
+                maskTexture = TextureCache.instance().getMinimapSmallCircleMask();
+                minimapSize = miniMapProperties.customSize.get();
                 viewPortPadX = 5;
                 viewPortPadY = 5;
                 if (fontScale == 1)
@@ -112,7 +113,6 @@ public class DisplayVars
                 {
                     bottomTextureYMargin = 20;
                 }
-                minimapFrame = null;
                 break;
             }
             case Square:
@@ -123,7 +123,6 @@ public class DisplayVars
                 minimapSize = miniMapProperties.customSize.get();
                 viewPortPadX = 2;
                 viewPortPadY = 2;
-                minimapFrame = new ThemeMinimapFrame(theme, (int) minimapSize);
                 valignLocation = DrawUtil.VAlign.Above;
                 valignBiome = DrawUtil.VAlign.Above;
                 yOffsetFps = theme.minimap.padding;
@@ -135,7 +134,7 @@ public class DisplayVars
                 break;
             }
         }
-
+        minimapFrame = new ThemeMinimapFrame(theme, minimapSize);
         marginX = marginY = ThemeFileHandler.getCurrentTheme().minimap.margin;
         minimapOffset = minimapSize/2;
 
@@ -291,7 +290,7 @@ public class DisplayVars
     {
         Square("jm.minimap.shape_square"),
         Circle("jm.minimap.shape_circle");
-        public static Shape[] Enabled = {Square};
+        public static Shape[] Enabled = {Square, Circle};
         public final String label;
 
         private Shape(String label)

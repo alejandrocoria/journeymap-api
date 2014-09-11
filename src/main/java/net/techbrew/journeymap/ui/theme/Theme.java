@@ -157,6 +157,8 @@ public class Theme implements Comparable<Theme>
         public ImageSpec bottomLeft = new ImageSpec();
         @Since(1)
         public ImageSpec left = new ImageSpec();
+        @Since(1)
+        public String circleFrameColor = "";
 
     }
 

@@ -50,7 +50,7 @@ public class FileService extends BaseService
     final String COLOR_PALETTE_JSON = "/" + ColorPalette.JSON_FILENAME;
     final String COLOR_PALETTE_HTML = "/" + ColorPalette.HTML_FILENAME;
     final String ICON_ENTITY_PATH_PREFIX = "/icon/entity/";
-    final String ICON_SKIN_PATH_PREFIX = "/icon/skin/";
+    final String ICON_THEME_PATH_PREFIX = "/icon/theme/";
     final String SKIN_PREFIX = "/skin/";
     private boolean useZipEntry;
     private File zipFile;
@@ -169,15 +169,16 @@ public class FileService extends BaseService
                 }
             }
             // Handle skin icon request
-            else if (path.startsWith(ICON_SKIN_PATH_PREFIX))
+            else if (path.startsWith(ICON_THEME_PATH_PREFIX))
             {
-                String skinIconPath = path.split(ICON_SKIN_PATH_PREFIX)[1].replace('/', File.separatorChar);
-                File iconFile = new File(ThemeFileHandler.getThemeIconDir(), skinIconPath);
+                String themeIconPath = path.split(ICON_THEME_PATH_PREFIX)[1].replace('/', File.separatorChar);
+                File themeDir = new File(ThemeFileHandler.getThemeIconDir(), ThemeFileHandler.getCurrentTheme().directory);
+                File iconFile = new File(themeDir, themeIconPath);
                 if (!iconFile.exists())
                 {
                     // Fallback to jar asset
-                    String setName = skinIconPath.split(File.separator)[0];
-                    String iconPath = skinIconPath.substring(skinIconPath.indexOf(File.separatorChar) + 1);
+                    String setName = themeIconPath.split(File.separator)[0];
+                    String iconPath = themeIconPath.substring(themeIconPath.indexOf(File.separatorChar) + 1);
 
                     if (event != null)
                     {

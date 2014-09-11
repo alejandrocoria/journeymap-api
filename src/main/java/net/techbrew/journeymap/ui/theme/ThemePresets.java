@@ -84,6 +84,7 @@ public class ThemePresets
         minimap.top = minimap.bottom = new Theme.ImageSpec(1,20);
         minimap.left = minimap.right = new Theme.ImageSpec(20,1);
         minimap.topLeft = minimap.topRight = minimap.bottomRight = minimap.bottomLeft = new Theme.ImageSpec(20,20);
+        minimap.circleFrameColor = Theme.toHexColor(new Color(132, 125, 102));
 
         return theme;
     }
@@ -153,6 +154,7 @@ public class ThemePresets
         minimap.top = minimap.bottom = new Theme.ImageSpec(1,8);
         minimap.left = minimap.right = new Theme.ImageSpec(8,1);
         minimap.topLeft = minimap.topRight = minimap.bottomRight = minimap.bottomLeft = new Theme.ImageSpec(8,8);
+        minimap.circleFrameColor = Theme.toHexColor(Color.lightGray);
 
         return theme;
     }

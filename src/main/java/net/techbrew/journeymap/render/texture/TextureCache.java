@@ -273,7 +273,7 @@ public class TextureCache
 
     public TextureImpl getMinimapLargeCircle()
     {
-        return getNamedTexture(Name.MinimapLargeCircle, "minimap/minimap-circle-512.png", false); //$NON-NLS-1$
+        return getNamedTexture(Name.MinimapLargeCircle, "minimap/minimap-circle-512.png", true); //$NON-NLS-1$
     }
 
     public TextureImpl getMinimapLargeCircleMask()
@@ -420,6 +420,46 @@ public class TextureCache
                 else
                 {
                     JourneyMap.getLogger().error("Unknown theme image: " + texName);
+                    return getUnknownEntity();
+                }
+            }
+            return tex;
+        }
+    }
+
+    public TextureImpl getScaledCopy(String texName, TextureImpl original, int width, int height, float alpha)
+    {
+        synchronized (themeImages)
+        {
+            TextureImpl tex = themeImages.get(texName);
+            if (tex == null || (!tex.hasImage() && tex.retainImage) || (width!=tex.width || height!=tex.height) || tex.alpha!=alpha)
+            {
+                BufferedImage img = original.getImage();
+                if (img != null)
+                {
+                    if (alpha<1f || img.getWidth() != width || img.getHeight() != height)
+                    {
+                        BufferedImage tmp = new BufferedImage(width, height, img.getType());
+                        Graphics2D g = tmp.createGraphics();
+                        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+                        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                        g.drawImage(img, 0, 0, width, height, null);
+                        g.dispose();
+                        img = tmp;
+                    }
+
+                    if (tex != null)
+                    {
+                        tex.deleteTexture();
+                    }
+                    tex = new TextureImpl(img);
+                    tex.alpha = alpha;
+                    themeImages.put(texName, tex);
+                }
+                else
+                {
+                    JourneyMap.getLogger().error("Unable to get scaled image: " + texName);
                     return getUnknownEntity();
                 }
             }

@@ -12,6 +12,10 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New Feature: Added Circle minimap shape, along with theme-based frame coloring.
+- Known problem: Player names and waypoint labels rotate stupidly and stray outside minimap frame
+
+## Changelog for JourneyMap 4.1.0alpha15:
 - Bugfix: General Display Options wouldn't open.  Thanks insidious scala import!
 - Bugfix: Snapped minimap positions to ints, avoiding subpixel ugliness with text labels
 - Change: Minor tweaks to the toolbar textures in the Victorian theme
