@@ -12,9 +12,10 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
-- Bugfix: Enchanted items in toolbar rendered incorrectly because the minimap wasn't cleaning up after itself
+- Bugfix: Enchanted items in toolbar and fullmap in Nether/End rendered incorrectly, because the minimap wasn't cleaning up after itself
 - New Feature: "Create Deathpoints" is now an option you can disable in Waypoint Options
 - Change: Deathpoint now has timestamp in the name.  "Death 4:03:12pm"
+- Known problem: End and Nether have rendering issues for lower layers. This was probably introduced in alpha7 and we hadn't noticed.
 
 ## Changelog for JourneyMap 4.1.0alpha15:
 - New Feature: Added Circle minimap shape, along with theme-based frame coloring.

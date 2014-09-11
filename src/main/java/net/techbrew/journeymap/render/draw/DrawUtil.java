@@ -24,6 +24,9 @@ import java.awt.*;
  */
 public class DrawUtil
 {
+
+    public static double zLevel = 0;
+
     /**
      * Draw a text label, centered on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
@@ -289,10 +292,10 @@ public class DrawUtil
 
         Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(x, height + y, 0.0D, 0, 1);
-        tessellator.addVertexWithUV(x + width, height + y, 0.0D, direction, 1);
-        tessellator.addVertexWithUV(x + width, y, 0.0D, direction, 0);
-        tessellator.addVertexWithUV(x, y, 0.0D, 0, 0);
+        tessellator.addVertexWithUV(x, height + y, zLevel, 0, 1);
+        tessellator.addVertexWithUV(x + width, height + y, zLevel, direction, 1);
+        tessellator.addVertexWithUV(x + width, y, zLevel, direction, 0);
+        tessellator.addVertexWithUV(x, y, zLevel, 0, 0);
         tessellator.draw();
 
         // Ensure normal alpha blending afterward, just in case
@@ -316,10 +319,10 @@ public class DrawUtil
         Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawingQuads();
         tessellator.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), alpha);
-        tessellator.addVertexWithUV(x, height + y, 0.0D, 0, 1);
-        tessellator.addVertexWithUV(x + width, height + y, 0.0D, 1, 1);
-        tessellator.addVertexWithUV(x + width, y, 0.0D, 1, 0);
-        tessellator.addVertexWithUV(x, y, 0.0D, 0, 0);
+        tessellator.addVertexWithUV(x, height + y, zLevel, 0, 1);
+        tessellator.addVertexWithUV(x + width, height + y, zLevel, 1, 1);
+        tessellator.addVertexWithUV(x + width, y, zLevel, 1, 0);
+        tessellator.addVertexWithUV(x, y, zLevel, 0, 0);
         tessellator.draw();
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_ALPHA_TEST);

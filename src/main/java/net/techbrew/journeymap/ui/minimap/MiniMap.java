@@ -12,7 +12,6 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -282,6 +281,7 @@ public class MiniMap
             // Pop matrix changes
             GL11.glPopMatrix();
 
+
             if(dv.shape == DisplayVars.Shape.Square)
             {
                 dv.minimapFrame.drawSquare(dv.textureX, dv.textureY);
@@ -321,18 +321,20 @@ public class MiniMap
         {
             GL11.glDepthMask(true);
             GL11.glDepthFunc(GL11.GL_LEQUAL);
+            //GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
             timer.stop();
         }
     }
 
 
     public void startStencil() {
+       // GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glColorMask(false, false, false, false);
         GL11.glDepthMask(true);
         GL11.glDepthFunc(GL11.GL_ALWAYS);
         GL11.glColor4f(1, 1, 1, 1);
-        Tessellator.instance.addTranslation(0,0,1000);
+        DrawUtil.zLevel = 1000;
         if(dv.shape == DisplayVars.Shape.Circle)
         {
             double margin = dv.minimapSize/192D;
@@ -342,7 +344,7 @@ public class MiniMap
         {
             DrawUtil.drawRectangle(dv.textureX, dv.textureY, dv.minimapSize, dv.minimapSize, Color.white, 255);
         }
-        Tessellator.instance.addTranslation(0,0,-1000);
+        DrawUtil.zLevel = 0;
         GL11.glColorMask(true, true, true, true);
         GL11.glDepthMask(false);
         GL11.glDepthFunc(GL11.GL_GREATER);
@@ -350,8 +352,8 @@ public class MiniMap
 
     public static void endStencil() {
         GL11.glDepthMask(true);
-        GL11.glDepthFunc(GL11.GL_ALWAYS);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glDepthFunc(GL11.GL_LEQUAL);
     }
 
     public void reset()
