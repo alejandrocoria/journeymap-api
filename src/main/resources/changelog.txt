@@ -17,7 +17,7 @@ http://journeymap.techbrew.net
 - Change: Deathpoint now has timestamp in the name.  "Death 4:03:12pm"
 - Known problem: End and Nether have rendering issues for lower layers. This was probably introduced in alpha7 and we hadn't noticed.
 
-## Changelog for JourneyMap 4.1.0alpha15:
+## Changelog for JourneyMap 4.1.0alpha16:
 - New Feature: Added Circle minimap shape, along with theme-based frame coloring.
 - Known problem: Player names and waypoint labels rotate stupidly and stray outside minimap frame
 
