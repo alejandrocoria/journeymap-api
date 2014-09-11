@@ -291,6 +291,8 @@ public class MiniMap
                 dv.minimapFrame.drawCircle(dv.textureX, dv.textureY);
             }
 
+
+
             // Draw labels if not scissored
             if (dv.showFps)
             {
@@ -317,6 +319,8 @@ public class MiniMap
         }
         finally
         {
+            GL11.glDepthMask(true);
+            GL11.glDepthFunc(GL11.GL_LEQUAL);
             timer.stop();
         }
     }
