@@ -84,6 +84,10 @@ public class ThemePresets
         minimapSquare.left = minimapSquare.right = new Theme.ImageSpec(20,1);
         minimapSquare.topLeft = minimapSquare.topRight = minimapSquare.bottomRight = minimapSquare.bottomLeft = new Theme.ImageSpec(20,20);
         minimapSquare.frameColor = Theme.toHexColor(new Color(132, 125, 102));
+        minimapSquare.labelShadow = true;
+        minimapSquare.labelBackgroundAlpha = 100;
+        minimapSquare.labelBackgroundColor = Theme.toHexColor(Color.black);
+        minimapSquare.labelForegroundColor = Theme.toHexColor(Color.lightGray);
 
         Theme.Minimap.MinimapCircle minimapCircle = theme.minimap.circle;
         minimapCircle.prefix = "";
@@ -91,6 +95,10 @@ public class ThemePresets
         minimapCircle.labelTopMargin = 4;
         minimapCircle.labelBottomMargin = 4;
         minimapCircle.frameColor = Theme.toHexColor(new Color(132, 125, 102));
+        minimapCircle.labelShadow = true;
+        minimapCircle.labelBackgroundAlpha = 100;
+        minimapCircle.labelBackgroundColor = Theme.toHexColor(Color.black);
+        minimapCircle.labelForegroundColor = Theme.toHexColor(Color.lightGray);
 
         return theme;
     }
@@ -162,6 +170,9 @@ public class ThemePresets
         minimapSquare.left = minimapSquare.right = new Theme.ImageSpec(8,1);
         minimapSquare.topLeft = minimapSquare.topRight = minimapSquare.bottomRight = minimapSquare.bottomLeft = new Theme.ImageSpec(8,8);
         minimapSquare.frameColor = Theme.toHexColor(Color.lightGray);
+        minimapSquare.labelBackgroundAlpha = 200;
+        minimapSquare.labelBackgroundColor = Theme.toHexColor(Color.darkGray);
+        minimapSquare.labelForegroundColor = Theme.toHexColor(Color.lightGray);
 
         Theme.Minimap.MinimapCircle minimapCircle = theme.minimap.circle;
         minimapCircle.prefix = "";
@@ -169,6 +180,9 @@ public class ThemePresets
         minimapCircle.labelTopMargin = 4;
         minimapCircle.labelBottomMargin = 4;
         minimapCircle.frameColor = Theme.toHexColor(Color.white);
+        minimapCircle.labelBackgroundAlpha = 200;
+        minimapCircle.labelBackgroundColor = Theme.toHexColor(Color.darkGray);
+        minimapCircle.labelForegroundColor = Theme.toHexColor(Color.lightGray);
 
         return theme;
     }

@@ -336,7 +336,12 @@ public class DrawUtil
 
     public static void drawClampedImage(TextureImpl texture, double x, double y, float scale, double rotation)
     {
-        drawQuad(texture, x, y, (texture.width * scale), (texture.height * scale), rotation, null, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
+        drawClampedImage(texture, null, x, y, scale, rotation);
+    }
+
+    public static void drawClampedImage(TextureImpl texture, Color color, double x, double y, float scale, double rotation)
+    {
+        drawQuad(texture, x, y, (texture.width * scale), (texture.height * scale), rotation, color, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
     }
 
     public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y, float scale, double rotation)

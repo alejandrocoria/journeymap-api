@@ -97,29 +97,20 @@ public class ThemeMinimapFrame
     {
         if(isSquare)
         {
-            drawSquare(x,y);
+            DrawUtil.drawClampedImage(textureTop, frameColor, x + (textureTopLeft.width  / 2D), y - (textureTop.height  / 2D), 1, 0);
+            DrawUtil.drawClampedImage(textureLeft, frameColor, x - (textureLeft.width  / 2D), y + (textureTopLeft.height  / 2D), 1, 0);
+            DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.width  / 2D), y - (textureTopLeft.height  / 2D), 1, 0);
+            DrawUtil.drawClampedImage(textureBottom, frameColor, x + (textureBottomLeft.width  / 2D), y + height - (textureBottom.height  / 2D), 1, 0);
+            DrawUtil.drawClampedImage(textureRight, frameColor, x + width - (textureRight.width  / 2D), y + (textureTopRight.height  / 2D), 1, 0);
+            DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.width  / 2D), y - (textureTopLeft.height  / 2D), 1, 0);
+            DrawUtil.drawClampedImage(textureTopRight, frameColor, x + width - (textureTopRight.width  / 2D), y - (textureTopRight.height  / 2D), 1, 0);
+            DrawUtil.drawClampedImage(textureBottomLeft, frameColor, x - (textureBottomLeft.width  / 2D), y + height - (textureBottomLeft.height  / 2D), 1, 0);
+            DrawUtil.drawClampedImage(textureBottomRight, frameColor, x + width - (textureBottomRight.width  / 2D), y + height - (textureBottomRight.height  / 2D), 1, 0);
         }
         else
         {
-            DrawUtil.drawQuad(textureCircle, x, y, this.width, this.height, 0, null, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
+            DrawUtil.drawQuad(textureCircle, x, y, this.width, this.height, 0, frameColor, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
         }
-    }
-
-    protected void drawSquare(final double x, final double y)
-    {
-        DrawUtil.drawClampedImage(textureTop, x + (textureTopLeft.width  / 2D), y - (textureTop.height  / 2D), 1, 0);
-        DrawUtil.drawClampedImage(textureLeft, x - (textureLeft.width  / 2D), y + (textureTopLeft.height  / 2D), 1, 0);
-        DrawUtil.drawClampedImage(textureTopLeft, x - (textureTopLeft.width  / 2D), y - (textureTopLeft.height  / 2D), 1, 0);
-        DrawUtil.drawClampedImage(textureBottom, x + (textureBottomLeft.width  / 2D), y + height - (textureBottom.height  / 2D), 1, 0);
-        DrawUtil.drawClampedImage(textureRight, x + width - (textureRight.width  / 2D), y + (textureTopRight.height  / 2D), 1, 0);
-        DrawUtil.drawClampedImage(textureTopLeft, x - (textureTopLeft.width  / 2D), y - (textureTopLeft.height  / 2D), 1, 0);
-        DrawUtil.drawClampedImage(textureTopRight, x + width - (textureTopRight.width  / 2D), y - (textureTopRight.height  / 2D), 1, 0);
-        DrawUtil.drawClampedImage(textureBottomLeft, x - (textureBottomLeft.width  / 2D), y + height - (textureBottomLeft.height  / 2D), 1, 0);
-        DrawUtil.drawClampedImage(textureBottomRight, x + width - (textureBottomRight.width  / 2D), y + height - (textureBottomRight.height  / 2D), 1, 0);
-    }
-
-    public void drawCircle(final double x, final double y) {
-        DrawUtil.drawColoredImage(textureCircle, 255, frameColor, x, y, 0);
     }
 
     private TextureImpl getTexture(String suffix, Theme.ImageSpec imageSpec)

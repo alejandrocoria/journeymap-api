@@ -72,13 +72,6 @@ public class DisplayVars
         this.displayHeight = mc.displayHeight;
         this.minimapSize = miniMapProperties.customSize.get();
 
-        final boolean useFontShadow = false;
-        final boolean wasUnicode = mc.fontRenderer.getUnicodeFlag();
-        final boolean useUnicode = (forceUnicode || wasUnicode);
-        this.fontScale = labelFontScale * (useUnicode ? 2 : 1);
-        final int labelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, useFontShadow) * (useUnicode ? .7 : 1) * this.fontScale);
-        drawScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);
-
         Theme theme = ThemeFileHandler.getCurrentTheme();
         Theme.Minimap.MinimapSpec minimapSpec = null;
 
@@ -97,6 +90,13 @@ public class DisplayVars
                 break;
             }
         }
+
+        final boolean useFontShadow = minimapSpec.labelShadow;
+        final boolean wasUnicode = mc.fontRenderer.getUnicodeFlag();
+        final boolean useUnicode = (forceUnicode || wasUnicode);
+        this.fontScale = labelFontScale * (useUnicode ? 2 : 1);
+        final int labelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, useFontShadow) * (useUnicode ? .7 : 1) * this.fontScale);
+        drawScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);
 
         minimapFrame = new ThemeMinimapFrame(theme, minimapSpec, minimapSize);
         marginX = marginY = minimapSpec.margin;
@@ -177,18 +177,21 @@ public class DisplayVars
         double centerX = Math.floor(textureX + (minimapSize / 2));
         double topY = textureY;
         double bottomY = textureY + minimapSize;
+        Color bgColor = Theme.getColor(minimapSpec.labelBackgroundColor);
+        Color fgColor = Theme.getColor(minimapSpec.labelForegroundColor);
+        int bgAlpha = minimapSpec.labelBackgroundAlpha;
 
         int yOffsetFps = minimapSpec.labelTopInside ? minimapSpec.labelTopMargin : -minimapSpec.labelTopMargin;
         DrawUtil.VAlign valignFps = minimapSpec.labelTopInside ? DrawUtil.VAlign.Below : DrawUtil.VAlign.Above;
-        labelFps = new LabelVars(centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, useFontShadow);
+        labelFps = new LabelVars(centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, useFontShadow, bgColor, bgAlpha, fgColor);
 
         int yOffsetBiome = minimapSpec.labelBottomInside ? -(minimapSpec.labelBottomMargin + (labelHeight*2)) : minimapSpec.labelBottomMargin + labelHeight;
         DrawUtil.VAlign valignBiome = minimapSpec.labelBottomInside ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
-        labelBiome = new LabelVars(centerX, bottomY + yOffsetBiome, DrawUtil.HAlign.Center, valignBiome, fontScale, useFontShadow);
+        labelBiome = new LabelVars(centerX, bottomY + yOffsetBiome, DrawUtil.HAlign.Center, valignBiome, fontScale, useFontShadow, bgColor, bgAlpha, fgColor);
 
         int yOffsetLocation = minimapSpec.labelBottomInside ? -(minimapSpec.labelBottomMargin + (labelHeight)) : minimapSpec.labelBottomMargin ;
         DrawUtil.VAlign valignLocation = minimapSpec.labelBottomInside ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
-        labelLocation = new LabelVars(centerX, bottomY + yOffsetLocation, DrawUtil.HAlign.Center, valignLocation, fontScale, useFontShadow);
+        labelLocation = new LabelVars(centerX, bottomY + yOffsetLocation, DrawUtil.HAlign.Center, valignLocation, fontScale, useFontShadow, bgColor, bgAlpha, fgColor);
     }
 
     /**
@@ -346,8 +349,11 @@ public class DisplayVars
         final boolean fontShadow;
         DrawUtil.HAlign hAlign;
         DrawUtil.VAlign vAlign;
+        Color bgColor;
+        int bgAlpha;
+        Color fgColor;
 
-        private LabelVars(double x, double y, DrawUtil.HAlign hAlign, DrawUtil.VAlign vAlign, double fontScale, boolean fontShadow)
+        private LabelVars(double x, double y, DrawUtil.HAlign hAlign, DrawUtil.VAlign vAlign, double fontScale, boolean fontShadow, Color bgColor, int bgAlpha, Color fgColor)
         {
             this.x = x;
             this.y = y;
@@ -355,9 +361,12 @@ public class DisplayVars
             this.vAlign = vAlign;
             this.fontScale = fontScale;
             this.fontShadow = fontShadow;
+            this.bgColor = bgColor;
+            this.bgAlpha = bgAlpha;
+            this.fgColor = fgColor;
         }
 
-        void draw(String text, Color bgColor, int bgAlpha, Color color, int alpha)
+        void draw(String text)
         {
             boolean isUnicode = false;
             FontRenderer fontRenderer = null;
@@ -370,7 +379,7 @@ public class DisplayVars
                     fontRenderer.setUnicodeFlag(true);
                 }
             }
-            DrawUtil.drawLabel(text, x, y, hAlign, vAlign, bgColor, bgAlpha, color, alpha, fontScale, fontShadow);
+            DrawUtil.drawLabel(text, x, y, hAlign, vAlign, bgColor, bgAlpha, fgColor, 255, fontScale, fontShadow);
             if (forceUnicode && !isUnicode)
             {
                 fontRenderer.setUnicodeFlag(false);

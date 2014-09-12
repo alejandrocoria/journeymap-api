@@ -113,7 +113,7 @@ public class MiniMapOptions extends JmUI
 
         buttonIconSet = new IconSetButton(ButtonEnum.IconSet.ordinal(), miniMapProperties, miniMapProperties.entityIconSetName, IconSetFileHandler.getEntityIconSetNames(), "jm.common.mob_icon_set");
 
-        buttonSize = SliderButton.create(ButtonEnum.CustomSize.ordinal(), miniMapProperties.customSize, 32, 758, "jm.minimap.size", false);
+        buttonSize = SliderButton.create(ButtonEnum.CustomSize.ordinal(), miniMapProperties.customSize, 128, 758, "jm.minimap.size", false);
         buttonTerrainAlpha = SliderButton.create(ButtonEnum.TerrainAlpha.ordinal(), miniMapProperties.terrainAlpha, 1, 255, "jm.minimap.terrain_alpha", true);
         buttonFrameAlpha = SliderButton.create(ButtonEnum.FrameAlpha.ordinal(), miniMapProperties.frameAlpha, 1, 255, "jm.minimap.frame_alpha", true);
 

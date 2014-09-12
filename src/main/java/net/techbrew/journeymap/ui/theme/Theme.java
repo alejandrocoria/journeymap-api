@@ -258,7 +258,6 @@ public class Theme implements Comparable<Theme>
          */
         @Since(1)
         public String statusForegroundColor = "";
-
     }
 
     /**
@@ -342,6 +341,30 @@ public class Theme implements Comparable<Theme>
              */
             @Since(1)
             public int labelBottomMargin;
+
+            /**
+             * Hex color for background of labels (fps, biome, location).
+             */
+            @Since(1)
+            public String labelBackgroundColor = "";
+
+            /**
+             * Alpha transparency (0-255) of background
+             */
+            @Since(1)
+            public int labelBackgroundAlpha;
+
+            /**
+             * Hex color for foreground of labels (fps, biome, location).
+             */
+            @Since(1)
+            public String labelForegroundColor = "";
+
+            /**
+             * Whether to use font shadows with the labels.
+             */
+            @Since(1)
+            public boolean labelShadow;
 
             /***
              * Hex color to apply to frame image. Use #ffffff to keep unchanged.

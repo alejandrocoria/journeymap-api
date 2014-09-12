@@ -322,17 +322,17 @@ public class GridRenderer
     public void draw(double xOffset, double yOffset, float drawScale, double fontScale, double rotation, DrawStep... drawSteps)
     {
 
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glDepthMask(false);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+//        GL11.glDisable(GL11.GL_DEPTH_TEST);
+//        GL11.glDepthMask(false);
+//        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         for (DrawStep drawStep : drawSteps)
         {
             drawStep.draw(xOffset, yOffset, this, drawScale, fontScale, rotation);
         }
 
-        GL11.glDepthMask(true);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
+//        GL11.glDepthMask(true);
+//        GL11.glEnable(GL11.GL_DEPTH_TEST);
     }
 
     public void draw(final float opacity, final double offsetX, final double offsetZ)

@@ -33,7 +33,6 @@ import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -52,8 +51,6 @@ public class MiniMap
     private final Logger logger = JourneyMap.getLogger();
     private final Minecraft mc = FMLClientHandler.instance().getClient();
 
-    private final Color playerInfoFgColor = Color.LIGHT_GRAY;
-    private final Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
     private final String[] locationFormats = {"jm.common.location_xzye", "jm.common.location_xzy", "jm.common.location_xz"};
     private final GridRenderer gridRenderer = new GridRenderer(3, JourneyMap.getMiniMapProperties());
     private final MapOverlayState state = Fullscreen.state();
@@ -218,15 +215,6 @@ public class MiniMap
             // Move center to corner
             GL11.glTranslated(dv.translateX, dv.translateY, 0);
 
-
-
-
-            // Scissor area that shouldn't be drawn
-           // GL11.glScissor((int) dv.scissorX + 1, (int) dv.scissorY + 1, (int) dv.minimapSize - 2, (int) dv.minimapSize - 2);
-            //GL11.glEnable(GL11.GL_SCISSOR_TEST);
-
-
-
             // Draw grid
             gridRenderer.draw(1f, 0, 0);
 
@@ -287,10 +275,10 @@ public class MiniMap
             // Draw labels
             if (dv.showFps)
             {
-                dv.labelFps.draw(fpsLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
+                dv.labelFps.draw(fpsLabelText);
             }
-            dv.labelLocation.draw(locationLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
-            dv.labelBiome.draw(biomeLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
+            dv.labelLocation.draw(locationLabelText);
+            dv.labelBiome.draw(biomeLabelText);
 
             // Return resolution to how it is normally scaled
             JmUI.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());

@@ -13,6 +13,9 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 - More experimentation to try to make the pandora's box of circular minimaps play nicely.
+- Moved control of minimap label positions, colors, etc. to Theme
+- Bugfix: Minimap labels should no longer be missing
+- Change: Minimum size of minimap is now 128
 
 ## Changelog for JourneyMap 4.1.0alpha17:
 - Bugfix: Enchanted items in toolbar and fullmap in Nether/End rendered incorrectly, because the minimap wasn't cleaning up after itself
