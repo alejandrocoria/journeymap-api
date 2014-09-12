@@ -12,6 +12,9 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- More experimentation to try to make the pandora's box of circular minimaps play nicely.
+
+## Changelog for JourneyMap 4.1.0alpha17:
 - Bugfix: Enchanted items in toolbar and fullmap in Nether/End rendered incorrectly, because the minimap wasn't cleaning up after itself
 - New Feature: "Create Deathpoints" is now an option you can disable in Waypoint Options
 - Change: Deathpoint now has timestamp in the name.  "Death 4:03:12pm"

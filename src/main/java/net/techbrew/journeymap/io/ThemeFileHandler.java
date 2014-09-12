@@ -175,7 +175,7 @@ public class ThemeFileHandler
                 JourneyMap.getLogger().info("Generating Theme json file: " + themeFile);
                 Theme theme = new Theme();
                 theme.name = themeFile.getName();
-                theme.save();
+                save(theme);
                 return theme;
             }
         }

@@ -246,41 +246,6 @@ public class TextureCache
         return null;
     }
 
-    public TextureImpl getMinimapSmallSquare()
-    {
-        return getNamedTexture(Name.MinimapSmallSquare, "minimap/minimap-square-128.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getMinimapMediumSquare()
-    {
-        return getNamedTexture(Name.MinimapMediumSquare, "minimap/minimap-square-256.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getMinimapLargeSquare()
-    {
-        return getNamedTexture(Name.MinimapLargeSquare, "minimap/minimap-square-512.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getMinimapSmallCircle()
-    {
-        return getNamedTexture(Name.MinimapSmallCircle, "minimap/minimap-circle-256.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getMinimapSmallCircleMask()
-    {
-        return getNamedTexture(Name.MinimapSmallCircle, "minimap/minimap-circle-mask-256.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getMinimapLargeCircle()
-    {
-        return getNamedTexture(Name.MinimapLargeCircle, "minimap/minimap-circle-512.png", true); //$NON-NLS-1$
-    }
-
-    public TextureImpl getMinimapLargeCircleMask()
-    {
-        return getNamedTexture(Name.MinimapLargeCircle, "minimap/minimap-circle-mask-512.png", false); //$NON-NLS-1$
-    }
-
     public TextureImpl getWaypoint()
     {
         return getNamedTexture(Name.Waypoint, "waypoint.png", false); //$NON-NLS-1$
@@ -376,12 +341,12 @@ public class TextureCache
         }
     }
 
-    public TextureImpl getThemeTexture(Theme theme, String iconPath, int width, int height)
+    public TextureImpl getThemeTexture(Theme theme, String iconPath)
     {
-        return getThemeTexture(theme, iconPath, 0, 0, false, 1f);
+        return getThemeTexture(theme, iconPath, 0, 0, false, 1f, false);
     }
 
-    public TextureImpl getThemeTexture(Theme theme, String iconPath, int width, int height, boolean resize, float alpha)
+    public TextureImpl getThemeTexture(Theme theme, String iconPath, int width, int height, boolean resize, float alpha, boolean retainImage)
     {
         String texName = String.format("%s/%s", theme.directory, iconPath);
         synchronized (themeImages)
@@ -413,7 +378,7 @@ public class TextureCache
                     {
                         tex.deleteTexture();
                     }
-                    tex = new TextureImpl(img);
+                    tex = new TextureImpl(img, retainImage);
                     tex.alpha = alpha;
                     themeImages.put(texName, tex);
                 }

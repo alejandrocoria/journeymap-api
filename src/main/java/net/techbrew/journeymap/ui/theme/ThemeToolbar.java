@@ -55,14 +55,14 @@ public class ThemeToolbar extends Button
         if(buttonList.isHorizontal())
         {
             toolbarSpec = theme.container.toolbar.horizontal;
-            setWidth(toolbarSpec.beginWidth + (toolbarSpec.innerWidth*buttonList.getVisibleButtonCount()) + toolbarSpec.endWidth);
-            setHeight(toolbarSpec.innerHeight);
+            setWidth(toolbarSpec.begin.width + (toolbarSpec.inner.width*buttonList.getVisibleButtonCount()) + toolbarSpec.end.width);
+            setHeight(toolbarSpec.inner.height);
         }
         else
         {
             toolbarSpec = theme.container.toolbar.vertical;
-            setWidth(toolbarSpec.innerWidth);
-            setHeight(toolbarSpec.beginHeight + (toolbarSpec.innerHeight*buttonList.getVisibleButtonCount()) + toolbarSpec.endHeight);
+            setWidth(toolbarSpec.inner.width);
+            setHeight(toolbarSpec.begin.width + (toolbarSpec.inner.height*buttonList.getVisibleButtonCount()) + toolbarSpec.end.height);
         }
 
         if(this.toolbarSpec==null || toolbarSpec!=this.toolbarSpec)
@@ -71,11 +71,11 @@ public class ThemeToolbar extends Button
 
             if(toolbarSpec.useBackgroundImages)
             {
-                String pathPattern = "container/" + toolbarSpec.prefix + "%s.png";
+                String pathPattern = "container/" + toolbarSpec.prefix + "toolbar_%s.png";
                 TextureCache tc = TextureCache.instance();
-                textureBegin = tc.getThemeTexture(theme, String.format(pathPattern, "begin"), toolbarSpec.beginWidth, toolbarSpec.beginHeight);
-                textureInner = tc.getThemeTexture(theme, String.format(pathPattern, "inner"), toolbarSpec.innerWidth, toolbarSpec.innerHeight);
-                textureEnd = tc.getThemeTexture(theme, String.format(pathPattern, "end"), toolbarSpec.endWidth, toolbarSpec.endHeight);
+                textureBegin = tc.getThemeTexture(theme, String.format(pathPattern, "begin"));
+                textureInner = tc.getThemeTexture(theme, String.format(pathPattern, "inner"));
+                textureEnd = tc.getThemeTexture(theme, String.format(pathPattern, "end"));
             }
         }
 
@@ -96,7 +96,7 @@ public class ThemeToolbar extends Button
         }
         else
         {
-            drawX = buttonList.getLeftX() - ((toolbarSpec.innerWidth - theme.control.button.width) / 2);
+            drawX = buttonList.getLeftX() - ((toolbarSpec.inner.width - theme.control.button.width) / 2);
             drawY = buttonList.getTopY() - ((height - buttonList.getHeight(toolbarSpec.padding)) / 2);
         }
 
@@ -127,7 +127,7 @@ public class ThemeToolbar extends Button
     {
         if(buttonList.isHorizontal())
         {
-            int heightDiff = (toolbarSpec.innerHeight - theme.control.button.height) / 2;
+            int heightDiff = (toolbarSpec.inner.height - theme.control.button.height) / 2;
             return heightDiff + toolbarSpec.margin;
         }
         else
@@ -140,11 +140,11 @@ public class ThemeToolbar extends Button
     {
         if(buttonList.isHorizontal())
         {
-            return toolbarSpec.beginWidth + toolbarSpec.margin;
+            return toolbarSpec.begin.width + toolbarSpec.margin;
         }
         else
         {
-            int widthDiff = (toolbarSpec.innerWidth - theme.control.button.width) / 2;
+            int widthDiff = (toolbarSpec.inner.width - theme.control.button.width) / 2;
             return widthDiff + toolbarSpec.margin;
         }
     }
@@ -179,26 +179,26 @@ public class ThemeToolbar extends Button
             float scale = 1f;
 
             // Draw Begin
-            if (toolbarSpec.beginWidth != textureBegin.width)
+            if (toolbarSpec.begin.width != textureBegin.width)
             {
-                scale = (1f * toolbarSpec.beginWidth / textureBegin.width);
+                scale = (1f * toolbarSpec.begin.width / textureBegin.width);
             }
             DrawUtil.drawClampedImage(textureBegin, drawX, drawY, scale, 0);
 
             if (isHorizontal)
             {
-                drawX += (toolbarSpec.beginWidth);
+                drawX += (toolbarSpec.begin.width);
             }
             else
             {
-                drawY += (toolbarSpec.beginHeight);
+                drawY += (toolbarSpec.begin.height);
             }
 
             // Draw Inner
             scale = 1f;
-            if (toolbarSpec.innerWidth != textureInner.width)
+            if (toolbarSpec.inner.width != textureInner.width)
             {
-                scale = (1f * toolbarSpec.innerWidth / textureInner.width);
+                scale = (1f * toolbarSpec.inner.width / textureInner.width);
             }
             for (Button button : buttonList)
             {
@@ -207,20 +207,20 @@ public class ThemeToolbar extends Button
                     DrawUtil.drawClampedImage(textureInner, drawX, drawY, scale, 0);
                     if (isHorizontal)
                     {
-                        drawX += toolbarSpec.innerWidth;
+                        drawX += toolbarSpec.inner.width;
                     }
                     else
                     {
-                        drawY += toolbarSpec.innerHeight;
+                        drawY += toolbarSpec.inner.height;
                     }
                 }
             }
 
             // Draw End
             scale = 1f;
-            if (toolbarSpec.endWidth != textureEnd.width)
+            if (toolbarSpec.end.width != textureEnd.width)
             {
-                scale = (1f * toolbarSpec.endWidth / textureEnd.width);
+                scale = (1f * toolbarSpec.end.width / textureEnd.width);
             }
             DrawUtil.drawClampedImage(textureEnd, drawX, drawY, scale, 0);
         }

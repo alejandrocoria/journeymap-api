@@ -56,35 +56,41 @@ public class ThemePresets
 
         Theme.Container.Toolbar.ToolbarSpec hToolbar = theme.container.toolbar.horizontal;
         hToolbar.useBackgroundImages = true;
-        hToolbar.prefix = "htoolbar_";
+        hToolbar.prefix = "h_";
         hToolbar.margin = 4;
         hToolbar.padding = 4;
-        hToolbar.beginHeight = hToolbar.innerHeight = hToolbar.endHeight = 32;
-        hToolbar.beginWidth = hToolbar.endWidth = 8;
-        hToolbar.innerWidth = 28;
+        hToolbar.begin = hToolbar.end = new Theme.ImageSpec(8,32);
+        hToolbar.inner = new Theme.ImageSpec(28,32);
 
         Theme.Container.Toolbar.ToolbarSpec vToolbar = theme.container.toolbar.vertical;
         vToolbar.useBackgroundImages = true;
-        vToolbar.prefix = "vtoolbar_";
+        vToolbar.prefix = "v_";
         vToolbar.margin = 4;
         vToolbar.padding = 4;
-        vToolbar.beginHeight = vToolbar.endHeight = 8;
-        vToolbar.innerHeight = 28;
-        vToolbar.beginWidth = vToolbar.innerWidth = vToolbar.endWidth = 32;
+        vToolbar.begin = vToolbar.end = new Theme.ImageSpec(32,8);
+        vToolbar.inner = new Theme.ImageSpec(32,28);
 
         Theme.Fullscreen fullscreen = theme.fullscreen;
         fullscreen.mapBackgroundColor = Theme.toHexColor(new Color(0x22, 0x22, 0x22));
         fullscreen.statusBackgroundColor = Theme.toHexColor(new Color(0x22, 0x22, 0x22));
         fullscreen.statusForegroundColor = Theme.toHexColor(Color.lightGray);
 
-        Theme.Minimap minimap = theme.minimap;
-        minimap.prefix = "vic_";
-        minimap.margin = 8;
-        minimap.padding = 4;
-        minimap.top = minimap.bottom = new Theme.ImageSpec(1,20);
-        minimap.left = minimap.right = new Theme.ImageSpec(20,1);
-        minimap.topLeft = minimap.topRight = minimap.bottomRight = minimap.bottomLeft = new Theme.ImageSpec(20,20);
-        minimap.circleFrameColor = Theme.toHexColor(new Color(132, 125, 102));
+        Theme.Minimap.MinimapSquare minimapSquare = theme.minimap.square;
+        minimapSquare.prefix = "vic_";
+        minimapSquare.margin = 8;
+        minimapSquare.labelTopMargin = 4;
+        minimapSquare.labelBottomMargin = 4;
+        minimapSquare.top = minimapSquare.bottom = new Theme.ImageSpec(1,20);
+        minimapSquare.left = minimapSquare.right = new Theme.ImageSpec(20,1);
+        minimapSquare.topLeft = minimapSquare.topRight = minimapSquare.bottomRight = minimapSquare.bottomLeft = new Theme.ImageSpec(20,20);
+        minimapSquare.frameColor = Theme.toHexColor(new Color(132, 125, 102));
+
+        Theme.Minimap.MinimapCircle minimapCircle = theme.minimap.circle;
+        minimapCircle.prefix = "";
+        minimapCircle.margin = 8;
+        minimapCircle.labelTopMargin = 4;
+        minimapCircle.labelBottomMargin = 4;
+        minimapCircle.frameColor = Theme.toHexColor(new Color(132, 125, 102));
 
         return theme;
     }
@@ -126,35 +132,43 @@ public class ThemePresets
 
         Theme.Container.Toolbar.ToolbarSpec hToolbar = theme.container.toolbar.horizontal;
         hToolbar.useBackgroundImages = false;
-        hToolbar.prefix = "htoolbar_";
+        hToolbar.prefix = "h_";
         hToolbar.margin = 4;
         hToolbar.padding = 2;
-        hToolbar.beginHeight = hToolbar.innerHeight = hToolbar.endHeight = 24;
-        hToolbar.beginWidth = hToolbar.endWidth = 4;
-        hToolbar.innerWidth = 24;
+        hToolbar.begin = hToolbar.end = new Theme.ImageSpec(4,24);
+        hToolbar.inner = new Theme.ImageSpec(24,24);
 
         Theme.Container.Toolbar.ToolbarSpec vToolbar = theme.container.toolbar.vertical;
         vToolbar.useBackgroundImages = false;
-        vToolbar.prefix = "vtoolbar_";
+        vToolbar.prefix = "v_";
         vToolbar.margin = 4;
         vToolbar.padding = 2;
-        vToolbar.beginHeight = vToolbar.endHeight = 4;
-        vToolbar.innerHeight = 24;
-        vToolbar.beginWidth = vToolbar.innerWidth = vToolbar.endWidth = 24;
+        vToolbar.begin = vToolbar.end = new Theme.ImageSpec(24,4);
+        vToolbar.inner = new Theme.ImageSpec(24,24);
 
         Theme.Fullscreen fullscreen = theme.fullscreen;
         fullscreen.mapBackgroundColor = Theme.toHexColor(new Color(0x22, 0x22, 0x22));
         fullscreen.statusBackgroundColor = Theme.toHexColor(new Color(0x22, 0x22, 0x22));
         fullscreen.statusForegroundColor = Theme.toHexColor(Color.lightGray);
 
-        Theme.Minimap minimap = theme.minimap;
-        minimap.prefix = "pur_";
-        minimap.margin = 4;
-        minimap.padding = 4;
-        minimap.top = minimap.bottom = new Theme.ImageSpec(1,8);
-        minimap.left = minimap.right = new Theme.ImageSpec(8,1);
-        minimap.topLeft = minimap.topRight = minimap.bottomRight = minimap.bottomLeft = new Theme.ImageSpec(8,8);
-        minimap.circleFrameColor = Theme.toHexColor(Color.lightGray);
+        Theme.Minimap.MinimapSquare minimapSquare = theme.minimap.square;
+        minimapSquare.prefix = "pur_";
+        minimapSquare.margin = 8;
+        minimapSquare.labelTopInside = false;
+        minimapSquare.labelTopMargin = 4;
+        minimapSquare.labelBottomInside = false;
+        minimapSquare.labelBottomMargin = 4;
+        minimapSquare.top = minimapSquare.bottom = new Theme.ImageSpec(1,8);
+        minimapSquare.left = minimapSquare.right = new Theme.ImageSpec(8,1);
+        minimapSquare.topLeft = minimapSquare.topRight = minimapSquare.bottomRight = minimapSquare.bottomLeft = new Theme.ImageSpec(8,8);
+        minimapSquare.frameColor = Theme.toHexColor(Color.lightGray);
+
+        Theme.Minimap.MinimapCircle minimapCircle = theme.minimap.circle;
+        minimapCircle.prefix = "";
+        minimapCircle.margin = 8;
+        minimapCircle.labelTopMargin = 4;
+        minimapCircle.labelBottomMargin = 4;
+        minimapCircle.frameColor = Theme.toHexColor(Color.white);
 
         return theme;
     }

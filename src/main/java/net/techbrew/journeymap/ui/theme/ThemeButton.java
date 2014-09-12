@@ -67,9 +67,9 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
         {
             String pattern = getPathPattern();
             String prefix = buttonSpec.prefix;
-            textureOn = tc.getThemeTexture(theme, String.format(pattern, prefix, "on"), buttonSpec.width, buttonSpec.height);
-            textureOff = tc.getThemeTexture(theme, String.format(pattern, prefix, "off"), buttonSpec.width, buttonSpec.height);
-            textureDisabled = tc.getThemeTexture(theme, String.format(pattern, prefix, "disabled"), buttonSpec.width, buttonSpec.height);
+            textureOn = tc.getThemeTexture(theme, String.format(pattern, prefix, "on"));
+            textureOff = tc.getThemeTexture(theme, String.format(pattern, prefix, "off"));
+            textureDisabled = tc.getThemeTexture(theme, String.format(pattern, prefix, "disabled"));
         }
         else
         {
@@ -83,7 +83,7 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
         iconHoverColor = Theme.getColor(buttonSpec.iconHoverColor);
         iconDisabledColor = Theme.getColor(buttonSpec.iconDisabledColor);
 
-        textureIcon = tc.getThemeTexture(theme, String.format("icon/%s.png", iconName), theme.icon.width, theme.icon.height);
+        textureIcon = tc.getThemeTexture(theme, String.format("icon/%s.png", iconName));
 
         setWidth(buttonSpec.width);
         setHeight(buttonSpec.height);

@@ -258,18 +258,18 @@ public class MiniMap
 
             // TODO: These need to be checked for straying outside the scissor
             // Draw off-screen waypoints on top of border texture
-            if (!allWaypointSteps.isEmpty())
-            {
-                // Move center back to corner
-                GL11.glTranslated(dv.translateX, dv.translateY, 0);
-                for (DrawWayPointStep drawWayPointStep : allWaypointSteps)
-                {
-                    if (!drawWayPointStep.isOnScreen(0, 0, gridRenderer))
-                    {
-                        drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, fontScale, rotation);
-                    }
-                }
-            }
+//            if (!allWaypointSteps.isEmpty())
+//            {
+//                // Move center back to corner
+//                GL11.glTranslated(dv.translateX, dv.translateY, 0);
+//                for (DrawWayPointStep drawWayPointStep : allWaypointSteps)
+//                {
+//                    if (!drawWayPointStep.isOnScreen(0, 0, gridRenderer))
+//                    {
+//                        drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, fontScale, rotation);
+//                    }
+//                }
+//            }
 
             if (rotation != 0)
             {
@@ -281,33 +281,16 @@ public class MiniMap
             // Pop matrix changes
             GL11.glPopMatrix();
 
+            // Draw Minimap Frame
+            dv.minimapFrame.drawFrame();
 
-            if(dv.shape == DisplayVars.Shape.Square)
-            {
-                dv.minimapFrame.drawSquare(dv.textureX, dv.textureY);
-            }
-            else if(dv.shape== DisplayVars.Shape.Circle)
-            {
-                dv.minimapFrame.drawCircle(dv.textureX, dv.textureY);
-            }
-
-
-
-            // Draw labels if not scissored
+            // Draw labels
             if (dv.showFps)
             {
                 dv.labelFps.draw(fpsLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
             }
-
-            if (!dv.labelLocation.scissor)
-            {
-                dv.labelLocation.draw(locationLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
-            }
-
-            if (!dv.labelBiome.scissor)
-            {
-                dv.labelBiome.draw(biomeLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
-            }
+            dv.labelLocation.draw(locationLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
+            dv.labelBiome.draw(biomeLabelText, playerInfoBgColor, 200, playerInfoFgColor, 255);
 
             // Return resolution to how it is normally scaled
             JmUI.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
@@ -319,31 +302,23 @@ public class MiniMap
         }
         finally
         {
-            GL11.glDepthMask(true);
+            GL11.glDepthMask(false);
             GL11.glDepthFunc(GL11.GL_LEQUAL);
-            //GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
             timer.stop();
         }
     }
 
 
     public void startStencil() {
-       // GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glColorMask(false, false, false, false);
         GL11.glDepthMask(true);
         GL11.glDepthFunc(GL11.GL_ALWAYS);
         GL11.glColor4f(1, 1, 1, 1);
         DrawUtil.zLevel = 1000;
-        if(dv.shape == DisplayVars.Shape.Circle)
-        {
-            double margin = dv.minimapSize/192D;
-            DrawUtil.drawQuad(dv.maskTexture, dv.textureX+margin, dv.textureY+margin, dv.minimapSize-(2*margin), dv.minimapSize-(2*margin), 0, null, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
-        }
-        else
-        {
-            DrawUtil.drawRectangle(dv.textureX, dv.textureY, dv.minimapSize, dv.minimapSize, Color.white, 255);
-        }
+        dv.minimapFrame.drawMask();
         DrawUtil.zLevel = 0;
         GL11.glColorMask(true, true, true, true);
         GL11.glDepthMask(false);
@@ -351,9 +326,10 @@ public class MiniMap
     }
 
     public static void endStencil() {
-        GL11.glDepthMask(true);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glDepthMask(false);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glDepthFunc(GL11.GL_LEQUAL);
+        GL11.glColor4f(1, 1, 1, 1);
     }
 
     public void reset()
@@ -446,8 +422,8 @@ public class MiniMap
         updateLabels();
 
         // Set viewport
-        double xpad = this.dv.viewPortPadX;
-        double ypad = this.dv.viewPortPadY;
+        double xpad = 0;
+        double ypad = 0;
         Rectangle2D.Double viewPort = new Rectangle2D.Double(this.dv.textureX + xpad, this.dv.textureY + ypad, this.dv.minimapSize - (2 * xpad), this.dv.minimapSize - (2 * ypad));
         gridRenderer.setViewPort(viewPort);
     }
@@ -484,7 +460,7 @@ public class MiniMap
         {
             playerInfo = Constants.getString(format, playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
             double infoWidth = mc.fontRenderer.getStringWidth(playerInfo) * dv.fontScale;
-            if (infoWidth <= dv.minimapSize - (dv.viewPortPadX * 2))
+            if (infoWidth <= dv.minimapSize)
             {
                 break;
             }

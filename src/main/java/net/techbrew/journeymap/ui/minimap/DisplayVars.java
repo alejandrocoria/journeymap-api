@@ -17,8 +17,6 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
-import net.techbrew.journeymap.render.texture.TextureCache;
-import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemeMinimapFrame;
 
@@ -38,17 +36,15 @@ public class DisplayVars
     final Position position;
     final Shape shape;
     final Orientation orientation;
-    final TextureImpl maskTexture;
-    final float drawScale;
     final double fontScale;
+    final float drawScale;
     final int displayWidth;
     final int displayHeight;
     final ScaledResolution scaledResolution;
     final int minimapSize, textureX, textureY;
     final int minimapOffset, translateX, translateY;
     final int marginX, marginY, scissorX, scissorY;
-    final double viewPortPadX;
-    final double viewPortPadY;
+
     final boolean showFps;
     final LabelVars labelFps, labelLocation, labelBiome;
     final ThemeMinimapFrame minimapFrame;
@@ -74,69 +70,49 @@ public class DisplayVars
         this.orientation = JourneyMap.getMiniMapProperties().orientation.get();
         this.displayWidth = mc.displayWidth;
         this.displayHeight = mc.displayHeight;
+        this.minimapSize = miniMapProperties.customSize.get();
+
         final boolean useFontShadow = false;
         final boolean wasUnicode = mc.fontRenderer.getUnicodeFlag();
         final boolean useUnicode = (forceUnicode || wasUnicode);
         this.fontScale = labelFontScale * (useUnicode ? 2 : 1);
         final int labelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, useFontShadow) * (useUnicode ? .7 : 1) * this.fontScale);
+        drawScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);
 
-        // Mutable local vars
-        int bottomTextureYMargin = 0;
-        boolean labelsOutside = false;
-        boolean scissorFps = true;
-        boolean scissorLocation = false;
-        boolean scissorBiome = true;
-        int yOffsetFps = 4;
-        int yOffsetBiome = -3;
-        int yOffsetLocation = yOffsetBiome + -labelHeight;
-        DrawUtil.VAlign valignFps = DrawUtil.VAlign.Below;
-        DrawUtil.VAlign valignLocation = DrawUtil.VAlign.Above;
-        DrawUtil.VAlign valignBiome = DrawUtil.VAlign.Above;
-        float textureScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);
         Theme theme = ThemeFileHandler.getCurrentTheme();
+        Theme.Minimap.MinimapSpec minimapSpec = null;
 
         // Assign shape
         switch (shape)
         {
             case Circle:
             {
-                drawScale = 1f * textureScale;
-                maskTexture = TextureCache.instance().getMinimapSmallCircleMask();
-                minimapSize = miniMapProperties.customSize.get();
-                viewPortPadX = 5;
-                viewPortPadY = 5;
-                if (fontScale == 1)
-                {
-                    bottomTextureYMargin = 10;
-                }
-                else
-                {
-                    bottomTextureYMargin = 20;
-                }
+                minimapSpec = theme.minimap.circle;
                 break;
             }
             case Square:
             default:
             {
-                drawScale = 1f * textureScale;
-                maskTexture = null;
-                minimapSize = miniMapProperties.customSize.get();
-                viewPortPadX = 2;
-                viewPortPadY = 2;
-                valignLocation = DrawUtil.VAlign.Above;
-                valignBiome = DrawUtil.VAlign.Above;
-                yOffsetFps = theme.minimap.padding;
-                yOffsetLocation = -theme.minimap.padding;
-                yOffsetBiome = -(theme.minimap.padding + labelHeight);
-                scissorLocation = false;
-                scissorBiome = false;
-
+                minimapSpec = theme.minimap.square;
                 break;
             }
         }
-        minimapFrame = new ThemeMinimapFrame(theme, minimapSize);
-        marginX = marginY = ThemeFileHandler.getCurrentTheme().minimap.margin;
+
+        minimapFrame = new ThemeMinimapFrame(theme, minimapSpec, minimapSize);
+        marginX = marginY = minimapSpec.margin;
         minimapOffset = minimapSize/2;
+
+        int topTextureYMargin = 0;
+        if(!minimapSpec.labelTopInside)
+        {
+            topTextureYMargin = Math.max(marginX, labelHeight);
+        }
+
+        int bottomTextureYMargin = 0;
+        if(!minimapSpec.labelBottomInside)
+        {
+            bottomTextureYMargin = Math.max(marginX, minimapSpec.labelBottomMargin + (2*labelHeight));
+        }
 
         // Assign position
         switch (position)
@@ -154,7 +130,7 @@ public class DisplayVars
             case TopLeft:
             {
                 textureX = marginX;
-                textureY = marginY;
+                textureY = marginY + topTextureYMargin;
                 translateX = -(mc.displayWidth / 2) + minimapOffset;
                 translateY = -(mc.displayHeight / 2) + minimapOffset;
                 scissorX = textureX;
@@ -185,7 +161,7 @@ public class DisplayVars
             default:
             {
                 textureX = mc.displayWidth - minimapSize - marginX;
-                textureY = marginY;
+                textureY = marginY + topTextureYMargin;
                 translateX = (mc.displayWidth / 2) - minimapOffset;
                 translateY = -(mc.displayHeight / 2) + minimapOffset;
                 scissorX = mc.displayWidth - minimapSize - marginX;
@@ -194,12 +170,25 @@ public class DisplayVars
             }
         }
 
+        // Set frame position
+        this.minimapFrame.setPosition(textureX, textureY);
+
+        // Set up label positions
         double centerX = Math.floor(textureX + (minimapSize / 2));
         double topY = textureY;
         double bottomY = textureY + minimapSize;
-        labelFps = new LabelVars(centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, scissorFps, useFontShadow);
-        labelLocation = new LabelVars(centerX, bottomY + yOffsetLocation, DrawUtil.HAlign.Center, valignLocation, fontScale, scissorLocation, useFontShadow);
-        labelBiome = new LabelVars(centerX, bottomY + yOffsetBiome, DrawUtil.HAlign.Center, valignBiome, fontScale, scissorBiome, useFontShadow);
+
+        int yOffsetFps = minimapSpec.labelTopInside ? minimapSpec.labelTopMargin : -minimapSpec.labelTopMargin;
+        DrawUtil.VAlign valignFps = minimapSpec.labelTopInside ? DrawUtil.VAlign.Below : DrawUtil.VAlign.Above;
+        labelFps = new LabelVars(centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, useFontShadow);
+
+        int yOffsetBiome = minimapSpec.labelBottomInside ? -(minimapSpec.labelBottomMargin + (labelHeight*2)) : minimapSpec.labelBottomMargin + labelHeight;
+        DrawUtil.VAlign valignBiome = minimapSpec.labelBottomInside ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
+        labelBiome = new LabelVars(centerX, bottomY + yOffsetBiome, DrawUtil.HAlign.Center, valignBiome, fontScale, useFontShadow);
+
+        int yOffsetLocation = minimapSpec.labelBottomInside ? -(minimapSpec.labelBottomMargin + (labelHeight)) : minimapSpec.labelBottomMargin ;
+        DrawUtil.VAlign valignLocation = minimapSpec.labelBottomInside ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
+        labelLocation = new LabelVars(centerX, bottomY + yOffsetLocation, DrawUtil.HAlign.Center, valignLocation, fontScale, useFontShadow);
     }
 
     /**
@@ -354,19 +343,17 @@ public class DisplayVars
         final double x;
         final double y;
         final double fontScale;
-        final boolean scissor;
         final boolean fontShadow;
         DrawUtil.HAlign hAlign;
         DrawUtil.VAlign vAlign;
 
-        private LabelVars(double x, double y, DrawUtil.HAlign hAlign, DrawUtil.VAlign vAlign, double fontScale, boolean scissor, boolean fontShadow)
+        private LabelVars(double x, double y, DrawUtil.HAlign hAlign, DrawUtil.VAlign vAlign, double fontScale, boolean fontShadow)
         {
             this.x = x;
             this.y = y;
             this.hAlign = hAlign;
             this.vAlign = vAlign;
             this.fontScale = fontScale;
-            this.scissor = scissor;
             this.fontShadow = fontShadow;
         }
 
