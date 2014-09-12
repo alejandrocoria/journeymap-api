@@ -9,9 +9,9 @@ import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.ButtonList;
 import net.techbrew.journeymap.ui.component.JmUI;
-import scala.actors.threadpool.Arrays;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by Mark on 8/30/2014.
