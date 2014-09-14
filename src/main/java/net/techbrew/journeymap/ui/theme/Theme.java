@@ -105,7 +105,7 @@ public class Theme implements Comparable<Theme>
                  * True to use theme images, false for invisible.
                  */
                 @Since(1)
-                public boolean useBackgroundImages;
+                public boolean useThemeImages;
 
                 /**
                  * Filename prefix. Example: "h" for horizontal, "v" for vertical.
@@ -169,10 +169,10 @@ public class Theme implements Comparable<Theme>
         public static class ButtonSpec
         {
             /**
-             * True to use theme image.  False to use current resource pack's button texture.
+             * True to use theme images.  False to use current resource pack's button texture.
              */
             @Since(1)
-            public boolean useBackgroundImage;
+            public boolean useThemeImages;
 
             /**
              * Button width.

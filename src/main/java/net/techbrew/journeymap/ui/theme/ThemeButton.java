@@ -63,7 +63,7 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
         this.buttonSpec = getButtonSpec(theme);
         TextureCache tc = TextureCache.instance();
 
-        if(buttonSpec.useBackgroundImage)
+        if(buttonSpec.useThemeImages)
         {
             String pattern = getPathPattern();
             String prefix = buttonSpec.prefix;
@@ -147,7 +147,7 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
         int drawX = getX();
         int drawY = getY();
 
-        if (buttonSpec.useBackgroundImage)
+        if (buttonSpec.useThemeImages)
         {
             float buttonScale = 1f;
             if(buttonSpec.width!=activeTexture.width) {
@@ -173,7 +173,7 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
         //drawY += (((height - textureIcon.height)/2));
         //DrawUtil.drawImage(textureIcon, drawX, drawY, false, scale, 0);
 
-        if (!buttonSpec.useBackgroundImage)
+        if (!buttonSpec.useThemeImages)
         {
             DrawUtil.drawColoredImage(textureIcon, 255, Color.black, drawX + .5, drawY + .5, iconScale, 0);
         }

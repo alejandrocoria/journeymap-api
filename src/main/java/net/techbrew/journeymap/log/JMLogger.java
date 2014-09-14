@@ -29,16 +29,16 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.message.SimpleMessage;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class JMLogger
 {
     public static final String DEPRECATED_LOG_FILE = "journeyMap.log"; //$NON-NLS-1$
     public static final String LOG_FILE = "journeymap.log"; //$NON-NLS-1$
+
+    // Singleton error hashcodes
+    static private final HashSet<Integer> singletonErrors = new HashSet<Integer>();
 
     private static RandomAccessFileAppender fileAppender;
 
@@ -205,5 +205,15 @@ public class JMLogger
     public static File getLogFile()
     {
         return new File(FileHandler.getJourneyMapDir(), LOG_FILE);
+    }
+
+    public static void logOnce(String text, Throwable throwable)
+    {
+        if(!singletonErrors.contains(text.hashCode()))
+        {
+            singletonErrors.add(text.hashCode());
+            JourneyMap.getLogger().error(text + " (SUPPRESSED FROM NOW ON)");
+            JourneyMap.getLogger().error(LogFormatter.toString(throwable));
+        }
     }
 }

@@ -15,7 +15,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.MapOverlayState;
 import net.techbrew.journeymap.properties.FullMapProperties;
@@ -176,8 +176,8 @@ public class MiniMap
             // Push matrix for translation to corner
             GL11.glPushMatrix();
 
-            // Start the stencil
-            startStencil();
+            // Mask the stencil
+            beginStencil();
 
             // Rotatate around player heading
             double rotation = 0;
@@ -264,6 +264,7 @@ public class MiniMap
                 GL11.glPopMatrix();
             }
 
+            // Finished stencil
             endStencil();
 
             // Pop matrix changes
@@ -286,38 +287,69 @@ public class MiniMap
         }
         catch (Throwable t)
         {
-            logger.error("Minimap error:" + LogFormatter.toString(t));
+            JMLogger.logOnce("Error during MiniMap.drawMap()", t);
         }
         finally
         {
-            GL11.glDepthMask(false);
-            GL11.glDepthFunc(GL11.GL_LEQUAL);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
+
+            cleanup();
             timer.stop();
         }
     }
 
 
-    public void startStencil() {
+    private void beginStencil()
+    {
+        try
+        {
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            GL11.glColorMask(false, false, false, false);
+            GL11.glDepthMask(true);
+            GL11.glDepthFunc(GL11.GL_ALWAYS);
+            GL11.glColor4f(1, 1, 1, 1);
+            DrawUtil.zLevel = 1000;
+            dv.minimapFrame.drawMask();
+            DrawUtil.zLevel = 0;
+            GL11.glColorMask(true, true, true, true);
+            GL11.glDepthMask(false);
+            GL11.glDepthFunc(GL11.GL_GREATER);
+        }
+        catch (Throwable t)
+        {
+            JMLogger.logOnce("Error during MiniMap.beginStencil()", t);
+        }
 
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glColorMask(false, false, false, false);
-        GL11.glDepthMask(true);
-        GL11.glDepthFunc(GL11.GL_ALWAYS);
-        GL11.glColor4f(1, 1, 1, 1);
-        DrawUtil.zLevel = 1000;
-        dv.minimapFrame.drawMask();
-        DrawUtil.zLevel = 0;
-        GL11.glColorMask(true, true, true, true);
-        GL11.glDepthMask(false);
-        GL11.glDepthFunc(GL11.GL_GREATER);
     }
 
-    public static void endStencil() {
-        GL11.glDepthMask(false);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glDepthFunc(GL11.GL_LEQUAL);
-        GL11.glColor4f(1, 1, 1, 1);
+    private void endStencil() {
+        try
+        {
+            GL11.glDepthMask(false);
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            GL11.glDepthFunc(GL11.GL_LEQUAL);
+            GL11.glColor4f(1, 1, 1, 1);
+        }
+        catch (Throwable t)
+        {
+            JMLogger.logOnce("Error during MiniMap.endStencil()", t);
+        }
+    }
+
+    private void cleanup()
+    {
+        try
+        {
+            DrawUtil.zLevel = 0;
+            GL11.glDepthFunc(GL11.GL_LEQUAL);
+            GL11.glDepthMask(true);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            GL11.glEnable(GL11.GL_ALPHA_TEST);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        }
+        catch (Throwable t)
+        {
+            JMLogger.logOnce("Error during MiniMap.cleanup()", t);
+        }
     }
 
     public void reset()

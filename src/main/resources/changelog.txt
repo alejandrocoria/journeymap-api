@@ -12,6 +12,12 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Minimap was rendered over inventory bar
+- Bugfix: Broken enchanted item effects in inventory slot #1
+- Bugfix: Margins in vertical toolbars on Fullscreen map were wrong
+- Change: Victorian theme disabled button is now darker
+
+## Changelog for JourneyMap 4.1.0alpha19:
 - More experimentation to try to make the pandora's box of circular minimaps play nicely.
 - Moved control of minimap label positions, colors, etc. to Theme
 - Bugfix: Minimap labels should no longer be missing

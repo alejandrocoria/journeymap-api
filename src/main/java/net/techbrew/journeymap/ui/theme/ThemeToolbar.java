@@ -62,14 +62,14 @@ public class ThemeToolbar extends Button
         {
             toolbarSpec = theme.container.toolbar.vertical;
             setWidth(toolbarSpec.inner.width);
-            setHeight(toolbarSpec.begin.width + (toolbarSpec.inner.height*buttonList.getVisibleButtonCount()) + toolbarSpec.end.height);
+            setHeight(toolbarSpec.begin.height + (toolbarSpec.inner.height*buttonList.getVisibleButtonCount()) + toolbarSpec.end.height);
         }
 
         if(this.toolbarSpec==null || toolbarSpec!=this.toolbarSpec)
         {
             this.toolbarSpec = toolbarSpec;
 
-            if(toolbarSpec.useBackgroundImages)
+            if(toolbarSpec.useThemeImages)
             {
                 String pathPattern = "container/" + toolbarSpec.prefix + "toolbar_%s.png";
                 TextureCache tc = TextureCache.instance();
@@ -168,7 +168,7 @@ public class ThemeToolbar extends Button
         double drawX = getX();
         double drawY = getY();
 
-        if(!toolbarSpec.useBackgroundImages)
+        if(!toolbarSpec.useThemeImages)
         {
             return;
         }

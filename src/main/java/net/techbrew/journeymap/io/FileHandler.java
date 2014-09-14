@@ -626,23 +626,27 @@ public class FileHandler
             if (img == null)
             {
                 img = FileHandler.getIconFromResource(assetsPath, setName, iconPath);
-                if (img == null)
+                if (img == null && defaultImg!=null)
                 {
                     img = defaultImg;
-                }
+                    try
+                    {
+                        iconFile.getParentFile().mkdirs();
+                        ImageIO.write(img, "png", iconFile);
+                    }
+                    catch (Exception e)
+                    {
+                        String error = Constants.getMessageJMERR00("Can't write image: " + iconFile + ": " + e);
+                        JourneyMap.getLogger().error(error);
+                    }
 
-                try
-                {
-                    iconFile.getParentFile().mkdirs();
-                    ImageIO.write(img, "png", iconFile);
+                    JourneyMap.getLogger().debug("Created image: " + iconFile);
                 }
-                catch (Exception e)
+                else
                 {
-                    String error = Constants.getMessageJMERR00("Can't write icon" + iconFile + ": " + e);
-                    JourneyMap.getLogger().error(error);
+                    String pngPath = Joiner.on('/').join(assetsPath, setName, iconPath);
+                    JourneyMap.getLogger().error(String.format("Can't get image from file (%s) nor resource (%s) ", iconFile, pngPath));
                 }
-
-                JourneyMap.getLogger().debug("Created icon: " + iconFile);
             }
         }
         catch(Exception e)

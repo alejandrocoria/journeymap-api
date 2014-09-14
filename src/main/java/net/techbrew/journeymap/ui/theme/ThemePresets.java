@@ -31,7 +31,7 @@ public class ThemePresets
         icon.width = 24;
 
         Theme.Control.ButtonSpec button = theme.control.button;
-        button.useBackgroundImage = true;
+        button.useThemeImages = true;
         button.width = 24;
         button.height = 24;
         button.tooltipOnStyle = EnumChatFormatting.WHITE.toString();
@@ -43,7 +43,7 @@ public class ThemePresets
         button.iconDisabledColor = Theme.toHexColor(Color.darkGray);
 
         Theme.Control.ButtonSpec toggle = theme.control.toggle;
-        toggle.useBackgroundImage = true;
+        toggle.useThemeImages = true;
         toggle.width = 24;
         toggle.height = 24;
         toggle.tooltipOnStyle = EnumChatFormatting.WHITE.toString();
@@ -55,16 +55,16 @@ public class ThemePresets
         toggle.iconDisabledColor = Theme.toHexColor(Color.darkGray);
 
         Theme.Container.Toolbar.ToolbarSpec hToolbar = theme.container.toolbar.horizontal;
-        hToolbar.useBackgroundImages = true;
-        hToolbar.prefix = "h_";
+        hToolbar.useThemeImages = true;
+        hToolbar.prefix = "h";
         hToolbar.margin = 4;
         hToolbar.padding = 4;
         hToolbar.begin = hToolbar.end = new Theme.ImageSpec(8,32);
         hToolbar.inner = new Theme.ImageSpec(28,32);
 
         Theme.Container.Toolbar.ToolbarSpec vToolbar = theme.container.toolbar.vertical;
-        vToolbar.useBackgroundImages = true;
-        vToolbar.prefix = "v_";
+        vToolbar.useThemeImages = true;
+        vToolbar.prefix = "v";
         vToolbar.margin = 4;
         vToolbar.padding = 4;
         vToolbar.begin = vToolbar.end = new Theme.ImageSpec(32,8);
@@ -115,7 +115,7 @@ public class ThemePresets
         icon.width = 20;
 
         Theme.Control.ButtonSpec button = theme.control.button;
-        button.useBackgroundImage = false;
+        button.useThemeImages = false;
         button.width = 20;
         button.height = 20;
         button.tooltipOnStyle = EnumChatFormatting.WHITE.toString();
@@ -127,7 +127,7 @@ public class ThemePresets
         button.iconDisabledColor = Theme.toHexColor(new Color(10526880));
 
         Theme.Control.ButtonSpec toggle = theme.control.toggle;
-        toggle.useBackgroundImage = false;
+        toggle.useThemeImages = false;
         toggle.width = 20;
         toggle.height = 20;
         toggle.tooltipOnStyle = EnumChatFormatting.WHITE.toString();
@@ -139,7 +139,7 @@ public class ThemePresets
         toggle.iconDisabledColor = Theme.toHexColor(Color.darkGray);
 
         Theme.Container.Toolbar.ToolbarSpec hToolbar = theme.container.toolbar.horizontal;
-        hToolbar.useBackgroundImages = false;
+        hToolbar.useThemeImages = false;
         hToolbar.prefix = "h_";
         hToolbar.margin = 4;
         hToolbar.padding = 2;
@@ -147,7 +147,7 @@ public class ThemePresets
         hToolbar.inner = new Theme.ImageSpec(24,24);
 
         Theme.Container.Toolbar.ToolbarSpec vToolbar = theme.container.toolbar.vertical;
-        vToolbar.useBackgroundImages = false;
+        vToolbar.useThemeImages = false;
         vToolbar.prefix = "v_";
         vToolbar.margin = 4;
         vToolbar.padding = 2;
