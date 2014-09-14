@@ -12,6 +12,9 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Margin above minimap was too big if FPS wasn't shown
+
+## Changelog for JourneyMap 4.1.0alpha19:
 - Bugfix: Minimap was rendered over inventory bar
 - Bugfix: Broken enchanted item effects in inventory slot #1, chests, and who knows what else
 - Bugfix: Margins in vertical toolbars on Fullscreen map were wrong

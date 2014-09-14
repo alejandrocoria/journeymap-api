@@ -103,7 +103,7 @@ public class DisplayVars
         minimapOffset = minimapSize/2;
 
         int topTextureYMargin = 0;
-        if(!minimapSpec.labelTopInside)
+        if(!minimapSpec.labelTopInside && showFps)
         {
             topTextureYMargin = Math.max(marginX, labelHeight);
         }
