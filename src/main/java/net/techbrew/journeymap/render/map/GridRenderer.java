@@ -20,14 +20,18 @@ import net.techbrew.journeymap.properties.InGameMapProperties;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.lwjgl.util.glu.GLU;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -64,11 +68,24 @@ public class GridRenderer
     private Integer dimension;
     private File worldDir;
 
+    private double currentRotation;
+    private IntBuffer viewportBuf;
+    private FloatBuffer modelMatrixBuf;
+    private FloatBuffer projMatrixBuf;
+    private FloatBuffer winPosBuf;
+    private FloatBuffer objPosBuf;
+
     public GridRenderer(final int gridSize, InGameMapProperties mapProperties)
     {
         this.gridSize = gridSize;  // Must be an odd number so as to have a center tile.
         srcSize = gridSize * Tile.TILESIZE;
         this.mapProperties = mapProperties;
+
+        viewportBuf = BufferUtils.createIntBuffer(16);
+        modelMatrixBuf = BufferUtils.createFloatBuffer(16);
+        projMatrixBuf = BufferUtils.createFloatBuffer(16);
+        winPosBuf = BufferUtils.createFloatBuffer(16);
+        objPosBuf = BufferUtils.createFloatBuffer(16);
     }
 
     public void setMapProperties(InGameMapProperties mapProperties)
@@ -575,6 +592,28 @@ public class GridRenderer
     {
         this.worldDir = worldDir;
         this.dimension = dimension;
+    }
+
+    public void updateGL(double rotation)
+    {
+        currentRotation = rotation;
+        GL11.glGetInteger(GL11.GL_VIEWPORT, viewportBuf);
+        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, modelMatrixBuf);
+        GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, projMatrixBuf);
+    }
+
+    public Point2D shiftWindowPosition(double x, double y, int shiftX, int shiftY)
+    {
+        if(currentRotation==0)
+        {
+            return new Point2D.Double(x+shiftX, y+shiftY);
+        }
+        else
+        {
+            GLU.gluProject((float) x, (float) y, 0f, modelMatrixBuf, projMatrixBuf, viewportBuf, winPosBuf);
+            GLU.gluUnProject(winPosBuf.get(0) + shiftX, winPosBuf.get(1) + shiftY, 0, modelMatrixBuf, projMatrixBuf, viewportBuf, objPosBuf);
+            return new Point2D.Float(objPosBuf.get(0), objPosBuf.get(1));
+        }
     }
 
     public double getCenterBlockX()

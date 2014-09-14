@@ -821,6 +821,7 @@ public class Fullscreen extends JmUI
             }
         }
 
+        gridRenderer.updateGL(0);
         boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, fullMapProperties.forceUnicode.get());
         float drawScale = fullMapProperties.textureSmall.get() ? 1f : 2f;
 

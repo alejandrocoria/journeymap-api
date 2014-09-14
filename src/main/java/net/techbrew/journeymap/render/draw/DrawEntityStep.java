@@ -64,31 +64,30 @@ public class DrawEntityStep implements DrawStep
             {
                 int blockSize = (int) Math.pow(2, gridRenderer.getZoom());
                 float labelOffset = texture != null ? texture.height / blockSize : 0;
-                drawPlayer(drawX, drawY, heading, drawScale, fontScale, rotation);
+                drawPlayer(drawX, drawY, gridRenderer, heading, drawScale, fontScale, rotation);
 
             }
             else
             {
-                drawCreature(drawX, drawY, heading, drawScale, fontScale, rotation);
+                drawCreature(drawX, drawY, gridRenderer, heading, drawScale, fontScale, rotation);
             }
         }
     }
 
-    private void drawPlayer(double drawX, double drawY, double heading, float drawScale, double fontScale, double rotation)
+    private void drawPlayer(double drawX, double drawY, GridRenderer gridRenderer, double heading, float drawScale, double fontScale, double rotation)
     {
         if (texture != null)
         {
             DrawUtil.drawEntity(drawX, drawY, heading, true, texture, drawScale * .75f, rotation);
         }
-        float labelOffset = texture != null ? texture.height : 0;
-        double labelX = drawX + (Math.cos(rotation+90));
-        double labelY = drawY - labelOffset + (Math.sin(rotation+90));
+        int labelOffset = texture == null ? 0 : rotation==0 ? -texture.height/2 : texture.height/2;
+        Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, -labelOffset);
 
-        DrawUtil.drawLabel(entityDTO.entityLiving.getCommandSenderName(), drawX, drawY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 205, Color.green, 255, fontScale, false, rotation);
+        DrawUtil.drawLabel(entityDTO.entityLiving.getCommandSenderName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 205, Color.green, 255, fontScale, false, rotation);
         //DrawUtil.drawCenteredLabel(entityDTO.entityLiving.getCommandSenderName(), drawX, drawY - labelOffset, Color.black, 205, Color.green, 255, fontScale, rotation);
     }
 
-    private void drawCreature(double drawX, double drawY, double heading, float drawScale, double fontScale, double rotation)
+    private void drawCreature(double drawX, double drawY, GridRenderer gridRenderer, double heading, float drawScale, double fontScale, double rotation)
     {
         if (locatorTexture != null)
         {
@@ -100,10 +99,11 @@ public class DrawEntityStep implements DrawStep
             DrawUtil.drawEntity(drawX, drawY, heading, true, texture, drawScale, rotation);
         }
 
-        int labelYOffset = (texture != null) ? (texture.height / 2) : 8;
+        int labelOffset = texture == null ? 8 : rotation==0 ? texture.height : -texture.height;
         if (entityDTO.customName != null)
         {
-            DrawUtil.drawCenteredLabel(entityDTO.customName, drawX, drawY + labelYOffset, labelBg, labelBgAlpha, labelFg, labelFgAlpha, fontScale, rotation);
+            Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, labelOffset);
+            DrawUtil.drawCenteredLabel(entityDTO.customName, labelPoint.getX(), labelPoint.getY(), labelBg, labelBgAlpha, labelFg, labelFgAlpha, fontScale, rotation);
         }
     }
 

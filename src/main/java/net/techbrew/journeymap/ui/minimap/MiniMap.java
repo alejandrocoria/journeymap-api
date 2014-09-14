@@ -111,6 +111,7 @@ public class MiniMap
                 gridRenderer.setMapProperties(JourneyMap.getMiniMapProperties());
                 fullMapProperties = JourneyMap.getFullMapProperties();
                 waypointProperties = JourneyMap.getWaypointProperties();
+                gridRenderer.setContext(state.getWorldDir(), state.getDimension());
                 state.refresh(mc, player, miniMapProperties);
             }
             else
@@ -119,7 +120,6 @@ public class MiniMap
             }
 
             // Update the grid
-            gridRenderer.setContext(state.getWorldDir(), state.getDimension());
             boolean moved = gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
             if (moved || doStateRefresh)
             {
@@ -215,6 +215,8 @@ public class MiniMap
             // Move center to corner
             GL11.glTranslated(dv.translateX, dv.translateY, 0);
 
+            gridRenderer.updateGL(rotation);
+
             // Draw grid
             gridRenderer.draw(1f, 0, 0);
 
@@ -224,7 +226,13 @@ public class MiniMap
             gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, fontScale, rotation);
             if (!allWaypointSteps.isEmpty())
             {
-                gridRenderer.draw(allWaypointSteps, 0, 0, dv.drawScale, fontScale, rotation);
+                for (DrawWayPointStep drawWayPointStep : allWaypointSteps)
+                {
+                    if (drawWayPointStep.isOnScreen(0, 0, gridRenderer))
+                    {
+                        drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, fontScale, rotation);
+                    }
+                }
             }
             if (unicodeForced)
             {
@@ -239,25 +247,30 @@ public class MiniMap
                 {
                     DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), mc.thePlayer.rotationYawHead, false, playerLocatorTex, dv.drawScale, rotation);
                 }
+
+
+                //DrawUtil.drawLabel("Loser", labelPixel.getX(), labelPixel.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 200, Color.white, 255, fontScale, false, rotation);
             }
 
             // Return center to mid-screen
             GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
 
+            gridRenderer.updateGL(rotation);
+
             // TODO: These need to be checked for straying outside the scissor
             // Draw off-screen waypoints on top of border texture
-//            if (!allWaypointSteps.isEmpty())
-//            {
-//                // Move center back to corner
-//                GL11.glTranslated(dv.translateX, dv.translateY, 0);
-//                for (DrawWayPointStep drawWayPointStep : allWaypointSteps)
-//                {
-//                    if (!drawWayPointStep.isOnScreen(0, 0, gridRenderer))
-//                    {
-//                        drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, fontScale, rotation);
-//                    }
-//                }
-//            }
+            if (!allWaypointSteps.isEmpty())
+            {
+                // Move center back to corner
+                GL11.glTranslated(dv.translateX, dv.translateY, 0);
+                for (DrawWayPointStep drawWayPointStep : allWaypointSteps)
+                {
+                    if (!drawWayPointStep.isOnScreen(0, 0, gridRenderer))
+                    {
+                        drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, fontScale, rotation);
+                    }
+                }
+            }
 
             if (rotation != 0)
             {
@@ -351,6 +364,8 @@ public class MiniMap
             JMLogger.logOnce("Error during MiniMap.cleanup()", t);
         }
     }
+
+
 
     public void reset()
     {

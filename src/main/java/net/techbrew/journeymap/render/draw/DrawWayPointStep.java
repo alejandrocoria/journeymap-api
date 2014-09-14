@@ -63,26 +63,27 @@ public class DrawWayPointStep implements DrawStep
         }
 
         Point2D.Double pixel = getPosition(xOffset, yOffset, gridRenderer);
-        double halfTexHeight = texture.height / 2;
         if (gridRenderer.isOnScreen(pixel))
         {
-            DrawUtil.drawLabel(waypoint.getName(), pixel.getX(), pixel.getY() - halfTexHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 255, fontColor, 255, fontScale, false, rotation);
+            Point2D labelPoint = gridRenderer.shiftWindowPosition(pixel.getX(), pixel.getY(), 0, rotation==0 ? -texture.height : texture.height);
+
+            DrawUtil.drawLabel(waypoint.getName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 255, fontColor, 255, fontScale, false, rotation);
             if (isEdit)
             {
                 TextureImpl editTex = TextureCache.instance().getWaypointEdit();
                 DrawUtil.drawColoredImage(editTex, 255, color, pixel.getX() - (editTex.width / 2), pixel.getY() - editTex.height / 2, -rotation);
             }
-            DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - halfTexHeight, -rotation);
+            DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - (texture.height/2), -rotation);
         }
         else if (!isEdit)
         {
             gridRenderer.ensureOnScreen(pixel);
             //DrawUtil.drawColoredImage(offscreenTexture, 255, color, pixel.getX() - (offscreenTexture.width / 2), pixel.getY() - (offscreenTexture.height / 2));
-            DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - halfTexHeight, -rotation);
+            DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - (texture.height/2), -rotation);
         }
     }
 
-    protected Point2D.Double getPosition(double xOffset, double yOffset, GridRenderer gridRenderer)
+    public Point2D.Double getPosition(double xOffset, double yOffset, GridRenderer gridRenderer)
     {
         double x = waypoint.getX();
         double z = waypoint.getZ();
@@ -96,5 +97,10 @@ public class DrawWayPointStep implements DrawStep
     public boolean isOnScreen(double xOffset, double yOffset, GridRenderer gridRenderer)
     {
         return gridRenderer.isOnScreen(getPosition(xOffset, yOffset, gridRenderer));
+    }
+
+    public int getTextureHeight()
+    {
+        return texture.height;
     }
 }
