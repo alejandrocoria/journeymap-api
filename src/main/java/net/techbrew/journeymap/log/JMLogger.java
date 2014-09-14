@@ -213,7 +213,10 @@ public class JMLogger
         {
             singletonErrors.add(text.hashCode());
             JourneyMap.getLogger().error(text + " (SUPPRESSED FROM NOW ON)");
-            JourneyMap.getLogger().error(LogFormatter.toString(throwable));
+            if(throwable!=null)
+            {
+                JourneyMap.getLogger().error(LogFormatter.toString(throwable));
+            }
         }
     }
 }

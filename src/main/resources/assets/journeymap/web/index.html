@@ -8,7 +8,7 @@
         <meta name="description" content="">
         <meta name="author" content="Mark Woodman - Techbrew.net">
         <link href="http://feeds.feedburner.com/JourneyMap" id="rssfeed" rel="alternate" type="application/rss+xml" />
-        <link href="http://code.jquery.com/ui/1.10.4/themes/flick/jquery-ui.css" rel="stylesheet" type="text/css" />
+        <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/dark-hive/jquery-ui.min.css" rel="stylesheet" type="text/css" />
         <link href="css/journeymap.css?v=@JMVERSION@" rel="stylesheet" type="text/css" />
         <link rel="shortcut icon" href="favicon.ico">
         <link rel="apple-touch-icon-precomposed" href="img/ico/journeymap144.png">
@@ -19,7 +19,9 @@
     <body>
 
         <div id="nav-holder" style="display:none">
-            <img src="img/ico/journeymap60.png" alt="" id="jm-logo" class="nav">
+            <span id="jm-logo-span">
+                <img src="img/ico/journeymap144.png" alt="JourneyMap" id="jm-logo" class="nav">
+            </span>
             <div id="jm-toolbar" class="nav">
                 <button id="jm-button" class="nav-button"><div id="version">JourneyMap</div></button>
                 <ul id="jm-menu">
@@ -31,12 +33,15 @@
                     <li><a target="_blank" id="donateLink" title="" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=D5KK9FRAQG6DE"><img src="img/paypal.png" alt=""><span id="donateLinkText">Donate to JourneyMap</span></a></li>
                 </ul>
             </div>
-            <div id="jm-toggles" class="nav"><button id="dayNightButton" class="nav-button"><img id="dayNightButtonImg" src="img/sun.png"></button><button id="followButton"><img id="followButtonImg" class="nav-button" src="img/follow.png"></button></div>
-            <div id="jm-alerts" class="nav"><button id="jm-update-button" class="nav-button"><img src="img/alert.png"></button></div>
+            <div id="jm-toggles" class="nav">
+                <button id="dayNightButton" class="nav-button"><img id="dayNightButtonImg" src="/theme/icon/day.png"></button>
+                <button id="followButton"><img id="followButtonImg" class="nav-button" src="/theme/icon/follow.png"></button>
+            </div>
+            <div id="jm-alerts" class="nav"><button id="jm-update-button" class="nav-button"><img src="/theme/icon/alert.png"></button></div>
             <div id="jm-rt-menus" class="nav">
-	            <div id="jm-options"><button id="jm-options-button" class="nav-button"><img src="img/options.png"><span class="caret"></span></button></div>
+	            <div id="jm-options"><button id="jm-options-button" class="nav-button"><img src="/theme/icon/options.png"><span class="caret"></span></button></div>
 	            <div id="jm-actions">
-	                <button id="jm-actions-button" class="nav-button"><img src="img/actions.png"><span class="caret"></span></button>
+	                <button id="jm-actions-button" class="nav-button"><img src="/theme/icon/actions.png"><span class="caret"></span></button>
 	            </div>
 	            <ul id="jm-options-menu">
                     <li><label><input id="checkShowCaves" type="checkbox"><span id="cavesMenuItem">[Caves]</span></label> </li>
@@ -50,8 +55,8 @@
                     <li><label><input id="checkShowPlayers" type="checkbox"><span id="playersMenuItem">[Players]</span></label></li>
                 </ul>
 	            <ul id="jm-actions-menu">
-	                <li><a href="#" id="autoMapButton"><img src="img/magic.png"><span id="autoMapButtonText">[Auto-Map World]</span></a></li>
-	                <li><a href="#" id="saveButton"><img src="img/save.png"><span id="saveButtonText">[Save Map]</span></a></li>
+	                <li><a href="#" id="autoMapButton"><img src="/theme/icon/automap.png"><span id="autoMapButtonText">[Auto-Map World]</span></a></li>
+	                <li><a href="#" id="saveButton"><img src="/theme/icon/savemap.png"><span id="saveButtonText">[Save Map]</span></a></li>
 	            </ul>
             </div>
             <div id="worldInfo" class="nav ui-state-highlight ui-corner-all">
@@ -71,7 +76,7 @@
 
         <script src="http://maps.google.com/maps/api/js?libraries=geometry&sensor=false"></script>
         <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-        <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+        <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
 
         <script src="js/jquery.rotate.min.js?v=@JMVERSION@"></script>
         <script src="js/richmarker-compiled.js?v=@JMVERSION@"></script>

@@ -324,7 +324,9 @@ var JourneyMap = (function() {
 		$("#checkShowGrid").click(function(event) {
 			showGrid = (this.checked === true);
 			postPreference("showGrid", showGrid);
-			refreshMap();
+			setTimeout(function() {
+                window.location = window.location;
+            }, 1500);
 		});
 		
 		$("#checkShowWaypoints").prop('checked', showWaypoints)		
@@ -507,10 +509,10 @@ var JourneyMap = (function() {
 		// Google Map
 		map = initMap($('#map-canvas')[0]);
 		
-		map.controls[google.maps.ControlPosition.TOP_LEFT].push($('#jm-logo')[0]);
-		map.controls[google.maps.ControlPosition.TOP_LEFT].push($('#jm-toolbar')[0]);
-		map.controls[google.maps.ControlPosition.TOP_LEFT].push($('#jm-toggles')[0]);			
-		map.controls[google.maps.ControlPosition.TOP_RIGHT].push($('#jm-rt-menus')[0]);	
+		map.controls[google.maps.ControlPosition.TOP_LEFT].push($('#jm-logo-span')[0]);
+		map.controls[google.maps.ControlPosition.TOP_CENTER].push($('#jm-toolbar')[0]);
+		map.controls[google.maps.ControlPosition.TOP_CENTER].push($('#jm-toggles')[0]);
+		map.controls[google.maps.ControlPosition.TOP_CENTER].push($('#jm-rt-menus')[0]);
 		map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push($('#worldInfo')[0]);
 					
 		google.maps.event.addListener(map, 'click', function(event) {
@@ -654,7 +656,7 @@ var JourneyMap = (function() {
 
 			$("#dayNightText").html(getMessage('day_button_text'));
 			$("#dayNightButton").attr("title", getMessage('day_button_title'));
-			$("#dayNightButtonImg").attr('src', '/img/sun.png');
+			$("#dayNightButtonImg").attr('src', '/theme/icon/day.png')
 
 		} else if (mapType === "night") {
 			if (isNightMap === true) return;
@@ -663,7 +665,7 @@ var JourneyMap = (function() {
 
 			$("#dayNightText").html(getMessage('night_button_text'));
 			$("#dayNightButton").attr("title", getMessage('night_button_title'));
-			$("#dayNightButtonImg").attr('src', '/img/moon.png');
+			$("#dayNightButtonImg").attr('src', '/theme/icon/night.png');
 	
 		} else {
 			if (debug)
@@ -681,7 +683,7 @@ var JourneyMap = (function() {
 		centerOnPlayer = onPlayer;
 		
 		if(onPlayer) {
-			$("#followButtonImg").attr('src', '/img/follow.png');
+			$("#followButtonImg").attr('src', '/theme/icon/follow.png');
 			if(markers.playerMarker) {
 				map.panTo(markers.playerMarker.getPosition());
 				drawPlayer();
@@ -689,7 +691,7 @@ var JourneyMap = (function() {
 				refreshMap();
 			}	
 		} else {
-			$("#followButtonImg").attr('src', '/img/follow-off.png');
+			$("#followButtonImg").attr('src', '/theme/icon/follow.png');
 		}
 
 	}
@@ -829,7 +831,7 @@ var JourneyMap = (function() {
 		if(!map) return;
 		
 		delay(function(){			
-			console.log(">>> " + "delayed refreshMap");
+			if (debug) console.log(">>> " + "delayed refreshMap");
 			
 			lastImageCheck = 1;
 			var zoom = map.getZoom();		

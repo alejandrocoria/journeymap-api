@@ -15,9 +15,11 @@ import net.techbrew.journeymap.cartography.ColorPalette;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
+import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
+import net.techbrew.journeymap.ui.theme.ThemePresets;
 import se.rupy.http.Event;
 
 import java.awt.image.BufferedImage;
@@ -50,7 +52,7 @@ public class FileService extends BaseService
     final String COLOR_PALETTE_JSON = "/" + ColorPalette.JSON_FILENAME;
     final String COLOR_PALETTE_HTML = "/" + ColorPalette.HTML_FILENAME;
     final String ICON_ENTITY_PATH_PREFIX = "/icon/entity/";
-    final String ICON_THEME_PATH_PREFIX = "/icon/theme/";
+    final String ICON_THEME_PATH_PREFIX = "/theme/";
     final String SKIN_PREFIX = "/skin/";
     private boolean useZipEntry;
     private File zipFile;
@@ -157,7 +159,7 @@ public class FileService extends BaseService
                         ResponseHeader.on(event).contentType(ContentType.png);
                     }
                     fileStream = FileHandler.getIconStream(IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_ENTITY, setName, iconPath);
-                    JourneyMap.getLogger().warn("Couldn't get file for " + path);
+                    JMLogger.logOnce("Couldn't get file for " + path, null);
                 }
                 else
                 {
@@ -172,7 +174,7 @@ public class FileService extends BaseService
             else if (path.startsWith(ICON_THEME_PATH_PREFIX))
             {
                 String themeIconPath = path.split(ICON_THEME_PATH_PREFIX)[1].replace('/', File.separatorChar);
-                File themeDir = new File(ThemeFileHandler.getThemeIconDir(), ThemeFileHandler.getCurrentTheme().directory);
+                File themeDir = new File(ThemeFileHandler.getThemeIconDir(), ThemePresets.THEME_VICTORIAN.directory);
                 File iconFile = new File(themeDir, themeIconPath);
                 if (!iconFile.exists())
                 {
@@ -204,7 +206,7 @@ public class FileService extends BaseService
 
             if (fileStream == null)
             {
-                JourneyMap.getLogger().debug("Path not found: " + path);
+                JMLogger.logOnce("Path not found: " + path, null);
                 throwEventException(404, Constants.getMessageJMERR13(path), event, true);
             }
             else

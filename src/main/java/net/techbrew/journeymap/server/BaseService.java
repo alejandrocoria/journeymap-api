@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.log.JMLogger;
 import org.apache.logging.log4j.Logger;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
@@ -57,11 +58,12 @@ public abstract class BaseService extends Service
         String out = code + " " + message; //$NON-NLS-1$ //$NON-NLS-2$
         if (isError)
         {
-            logger.warn(this.getClass().getName() + ": " + out); //$NON-NLS-1$
+            Exception ex = null;
             if (code != 404)
             {
-                logger.warn(debugRequestHeaders(event));
+                ex = new Exception(debugRequestHeaders(event));
             }
+            JMLogger.logOnce(this.getClass().getName() + ": " + out, ex);
         }
         else if (logger.isTraceEnabled())
         {

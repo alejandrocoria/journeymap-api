@@ -257,6 +257,11 @@ label span {
     float: none;
 }
 
+.ui-button-text img {
+    width: 24px;
+    height: 24px;
+}
+
 /* Fix Google Maps canvas */
 .google-map-canvas,
 .google-map-canvas * { 
