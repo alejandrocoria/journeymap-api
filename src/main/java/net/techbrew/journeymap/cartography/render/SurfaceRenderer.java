@@ -27,9 +27,9 @@ import java.awt.*;
 
 public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 {
-    private final Object chunkLock = new Object();
-    private final HeightsCache chunkSurfaceHeights;
-    private final SlopesCache chunkSurfaceSlopes;
+    protected final Object chunkLock = new Object();
+    protected final HeightsCache chunkSurfaceHeights;
+    protected final SlopesCache chunkSurfaceSlopes;
     protected StatTimer renderSurfaceTimer = StatTimer.get("SurfaceRenderer.renderSurface");
     protected StatTimer renderSurfacePrepassTimer = StatTimer.get("SurfaceRenderer.renderSurface.CavePrepass");
     protected Strata strata = new Strata("Surface", 40, 8, false);
@@ -271,35 +271,6 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
             while (!strata.isEmpty())
             {
                 stratum = strata.nextUp(this, true);
-
-//                // Bathymetry check
-//                Integer waterHeight = null;
-//                if(mapBathymetry)
-//                {
-//                    waterHeight = getColumnProperty(PROP_WATER_HEIGHT, null, chunkMd, x, z);
-//                }
-//
-//                // Override stratum color for bathymetry.  I don't like doing this here.
-//                if(mapBathymetry && waterHeight!=null)
-//                {
-//                    strata.setRenderDayColor(stratum.getDayColor());
-//                    if (!cavePrePass)
-//                    {
-//                        strata.setRenderNightColor(stratum.getNightColor());
-//                    }
-//
-//                    strata.determineWaterColor(chunkMd, x, waterHeight, z);
-//                    stratum.setWater(true);
-//                    setStratumColors(stratum, 0, strata.getWaterColor(), true, false, false);
-//
-//                    strata.setRenderDayColor(RGB.blendWith(strata.getRenderDayColor(), stratum.getDayColor(), .9f)); // TODO: Use light attenuation
-//                    if (!cavePrePass)
-//                    {
-//                        strata.setRenderNightColor(RGB.blendWith(strata.getRenderNightColor(), stratum.getNightColor(), .9f)); // TODO: Use light attenuation
-//                    }
-//                }
-//                else
-                // Simple surface render
                 if (strata.getRenderDayColor() == null || strata.getRenderNightColor() == null)
                 {
                     strata.setRenderDayColor(stratum.getDayColor());
@@ -352,15 +323,18 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                 }
             }
 
-            // And draw to the actual chunkimage
-            g2D.setComposite(ALPHA_OPAQUE);
-            g2D.setPaint(RGB.paintOf(strata.getRenderDayColor()));
-            g2D.fillRect(x, z, 1, 1);
-
-            if (!cavePrePass)
+            if(chunkMd.getHasNoSky())
             {
-                g2D.setPaint(RGB.paintOf(strata.getRenderNightColor()));
-                g2D.fillRect(x + 16, z, 1, 1);
+                // End: Only use night color
+                paintBlock(x, z, strata.getRenderNightColor(), g2D, false);
+            }
+            else
+            {
+                paintBlock(x, z, strata.getRenderDayColor(), g2D, false);
+                if (!cavePrePass)
+                {
+                    paintBlock(x + 16, z, strata.getRenderNightColor(), g2D, false);
+                }
             }
         }
         catch (RuntimeException e)

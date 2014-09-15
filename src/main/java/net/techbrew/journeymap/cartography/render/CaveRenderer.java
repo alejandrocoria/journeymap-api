@@ -155,8 +155,8 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
                 try
                 {
-                    //final int ceiling = chunkMd.getHasNoSky() ? sliceMaxY : chunkMd.ceiling(x, z);
-                    final int ceiling = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, chunkHeights);
+                    final int ceiling = chunkMd.getHasNoSky() ? sliceMaxY : getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, chunkHeights);
+                    //final int ceiling = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, chunkHeights);
 
                     // Oh look, a hole in the world.
                     if (ceiling < 0)

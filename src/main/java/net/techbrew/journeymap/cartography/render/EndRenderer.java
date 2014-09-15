@@ -9,22 +9,26 @@
 package net.techbrew.journeymap.cartography.render;
 
 
-import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.cartography.IChunkRenderer;
 import net.techbrew.journeymap.cartography.RGB;
 import net.techbrew.journeymap.cartography.Strata;
+import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
+
+import java.awt.*;
 
 /**
  * Render a chunk in the End.
  *
  * @author mwoodman
  */
-public class EndRenderer extends CaveRenderer implements IChunkRenderer
+public class EndRenderer extends SurfaceRenderer implements IChunkRenderer
 {
+    private static final int MIN_LIGHT_LEVEL = 2;
+
     public EndRenderer()
     {
-        super(null);
+        super();
         cachePrefix = "End";
     }
 
@@ -33,24 +37,25 @@ public class EndRenderer extends CaveRenderer implements IChunkRenderer
     {
         super.updateOptions();
         this.ambientColor = RGB.floats(tweakEndAmbientColor);
-        this.mapSurfaceAboveCaves = false;
+        this.tweakMoonlightLevel = 5f;
     }
 
     /**
-     * Create Strata for caves, using first lit blocks found.
-     */
-    protected void buildStrata(Strata strata, int minY, ChunkMD chunkMd, int x, final int topY, int z, HeightsCache chunkHeights, SlopesCache chunkSlopes)
-    {
-        super.buildStrata(strata, minY, chunkMd, x, topY, z, chunkHeights, chunkSlopes);
-    }
-
-    /**
-     * Get the light level for the block in the slice.  Can be overridden to provide an ambient light minimum.
+     * Create Strata.
      */
     @Override
-    protected int getSliceLightLevel(ChunkMD chunkMd, int x, int y, int z, boolean adjusted)
+    protected void buildStrata(Strata strata, int minY, ChunkMD chunkMd, int x, final int topY, int z)//, HeightsCache chunkHeights, SlopesCache chunkSlopes)
     {
-        return Math.max(adjusted ? 2 : 0, chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z));
+        super.buildStrata(strata, minY, chunkMd, x, topY, z);//, chunkHeights, chunkSlopes);
+    }
+
+
+    /**
+     * Paint the image with the color derived from a BlockStack
+     */
+    protected boolean paintStrata(final Strata strata, final Graphics2D g2D, final ChunkMD chunkMd, final BlockMD topBlockMd, final Integer vSlice, final int x, final int y, final int z, final boolean cavePrePass)
+    {
+        return super.paintStrata(strata, g2D, chunkMd, topBlockMd, vSlice, x, y, z, cavePrePass);
     }
 
 }

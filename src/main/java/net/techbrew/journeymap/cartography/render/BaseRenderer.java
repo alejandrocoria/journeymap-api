@@ -179,7 +179,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     }
 
     /**
-     * Paint the block with magenta to indicate it's a problem.
+     * It's a problem
      */
     public void paintBadBlock(final int x, final int y, final int z, final Graphics2D g2D)
     {
@@ -188,11 +188,14 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         {
             JourneyMap.getLogger().warn(
                     "Bad block at " + x + "," + y + "," + z //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                            + ". Total bad blocks painted: " + count
+                            + ". Total bad blocks: " + count
             ); //$NON-NLS-1$
         }
     }
 
+    /**
+     * Darken the existing color.
+     */
     protected void paintDimOverlay(int x, int z, float alpha, final Graphics2D g2D)
     {
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
@@ -205,11 +208,15 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      * Paint the block.
      */
     public void paintBlock(final int x, final int z, final int color,
-                           final Graphics2D g2D)
+                           final Graphics2D g2D, boolean alsoPaintNight)
     {
         g2D.setComposite(ALPHA_OPAQUE);
         g2D.setPaint(RGB.paintOf(color));
         g2D.fillRect(x, z, 1, 1);
+        if(alsoPaintNight)
+        {
+            g2D.fillRect(x + 16, z, 1, 1);
+        }
     }
 
     /**
@@ -217,9 +224,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      */
     public void paintVoidBlock(final int x, final int z, final Graphics2D g2D)
     {
-        g2D.setComposite(ALPHA_OPAQUE);
-        g2D.setPaint(RGB.paintOf(COLOR_VOID));
-        g2D.fillRect(x, z, 1, 1);
+        paintBlock(x, z, COLOR_VOID, g2D, true);
+
     }
 
     /**
