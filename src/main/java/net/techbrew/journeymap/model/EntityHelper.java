@@ -41,6 +41,7 @@ public class EntityHelper
     public static EntityDistanceComparator entityDistanceComparator = new EntityDistanceComparator();
     public static EntityDTODistanceComparator entityDTODistanceComparator = new EntityDTODistanceComparator();
     public static EntityMapComparator entityMapComparator = new EntityMapComparator();
+    private static String[] horseVariantTextures = new String[] {"horse/horse_white.png", "horse/horse_creamy.png", "horse/horse_chestnut.png", "horse/horse_brown.png", "horse/horse_black.png", "horse/horse_gray.png", "/horse/horse_darkbrown.png"};
     private static int lateralDistance = JourneyMap.getCoreProperties().chunkOffset.get() * 8;
     private static int verticalDistance = lateralDistance / 2;
 
@@ -226,7 +227,9 @@ public class EntityHelper
         // Manually handle horses
         if (entityRender instanceof RenderHorse)
         {
-            switch (((EntityHorse) entity).getHorseType())
+            EntityHorse horse = ((EntityHorse) entity);
+            final int type = ((EntityHorse) entity).getHorseType();
+            switch (type)
             {
                 case 1:
                     return "horse/donkey.png";
@@ -235,13 +238,20 @@ public class EntityHelper
                     return "horse/mule.png";
 
                 case 3:
-                    return "horse/zombiehorse.png";
+                    return "horse/horse_zombie.png";
 
                 case 4:
-                    return "horse/skeletonhorse.png";
+                    return "horse/horse_skeleton.png";
                 case 0:
+                {
+                    String variantTexture = horse.getVariantTexturePaths()[0];
+                    if(variantTexture.startsWith("textures/entity/"))
+                    {
+                        return variantTexture.split("textures/entity/")[1];
+                    }
+                }
                 default:
-                    return "horse/horse.png";
+                    return "horse/horse_brown.png";
             }
         }
 
