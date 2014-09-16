@@ -12,13 +12,15 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+
+## Changelog for JourneyMap 4.1.0alpha21:
 - Bugfix: Margin above minimap was too big if FPS wasn't shown
 - Bugfix: Nether and End renderers weren't following depth correctly
 - Bugfix: Horse icons weren't showing on radar
 - Change: Web map got a minor facelift to use new icons
 - Change: Theme buttons now have rollover state for the background image
 
-## Changelog for JourneyMap 4.1.0alpha19:
+## Changelog for JourneyMap 4.1.0alpha20:
 - Bugfix: Minimap was rendered over inventory bar
 - Bugfix: Broken enchanted item effects in inventory slot #1, chests, and who knows what else
 - Bugfix: Margins in vertical toolbars on Fullscreen map were wrong
