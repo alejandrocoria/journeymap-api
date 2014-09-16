@@ -20,6 +20,7 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
     protected Theme theme;
     protected Theme.Control.ButtonSpec buttonSpec;
     protected TextureImpl textureOn;
+    protected TextureImpl textureHover;
     protected TextureImpl textureOff;
     protected TextureImpl textureDisabled;
     protected TextureImpl textureIcon;
@@ -69,12 +70,14 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
             String prefix = buttonSpec.prefix;
             textureOn = tc.getThemeTexture(theme, String.format(pattern, prefix, "on"));
             textureOff = tc.getThemeTexture(theme, String.format(pattern, prefix, "off"));
+            textureHover = tc.getThemeTexture(theme, String.format(pattern, prefix, "hover"));
             textureDisabled = tc.getThemeTexture(theme, String.format(pattern, prefix, "disabled"));
         }
         else
         {
             textureOn = null;
             textureOff = null;
+            textureHover = null;
             textureDisabled = null;
         }
 
@@ -104,7 +107,7 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
     {
         if(isEnabled())
         {
-            TextureImpl activeTexture = isMouseOver & Mouse.isButtonDown(0) ? textureOn : textureOff;
+            TextureImpl activeTexture = isMouseOver ? Mouse.isButtonDown(0) ? textureOn : textureHover : textureOff;
             return activeTexture;
         }
         else

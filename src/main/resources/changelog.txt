@@ -13,9 +13,10 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 - Bugfix: Margin above minimap was too big if FPS wasn't shown
-- Change: Web map got a minor facelift to use new icons
-- Bugfix: Nether and End renderers working again.
+- Bugfix: Nether and End renderers weren't following depth correctly
 - Bugfix: Horse icons weren't showing on radar
+- Change: Web map got a minor facelift to use new icons
+- Change: Theme buttons now have rollover state for the background image
 
 ## Changelog for JourneyMap 4.1.0alpha19:
 - Bugfix: Minimap was rendered over inventory bar

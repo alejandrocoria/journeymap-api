@@ -165,6 +165,8 @@ public class Theme implements Comparable<Theme>
 
         /**
          * Specification for a button.
+         * Filenames expected by the Theme loader are:
+         * on.png, off.png, hover.png, disabled.png
          */
         public static class ButtonSpec
         {
