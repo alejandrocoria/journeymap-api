@@ -47,7 +47,7 @@ public class DisplayVars
     final ScaledResolution scaledResolution;
     final int minimapSize, textureX, textureY;
     final int minimapOffset, translateX, translateY;
-    final int marginX, marginY, scissorX, scissorY;
+    final int marginX, marginY;
     final Rectangle2D.Double frameRect;
     final AxisAlignedBB frameAABB;
     final Point2D.Double centerPoint;
@@ -118,7 +118,7 @@ public class DisplayVars
         int bottomTextureYMargin = 0;
         if(!minimapSpec.labelBottomInside)
         {
-            bottomTextureYMargin = Math.max(marginX, minimapSpec.labelBottomMargin + (2*labelHeight));
+            bottomTextureYMargin = Math.max(marginY, minimapSpec.labelBottomMargin + (2*labelHeight));
         }
 
         // Assign position
@@ -128,30 +128,24 @@ public class DisplayVars
             {
                 textureX = mc.displayWidth - minimapSize - marginX;
                 textureY = mc.displayHeight - (minimapSize) - marginY - bottomTextureYMargin;
-                translateX = (mc.displayWidth / 2) - minimapOffset;
-                translateY = (mc.displayHeight / 2) - minimapOffset - bottomTextureYMargin;
-                scissorX = textureX;
-                scissorY = marginY + bottomTextureYMargin;
+                translateX = (mc.displayWidth / 2) - minimapOffset - marginX;
+                translateY = (mc.displayHeight / 2) - minimapOffset - marginY - bottomTextureYMargin;
                 break;
             }
             case TopLeft:
             {
                 textureX = marginX;
                 textureY = marginY + topTextureYMargin;
-                translateX = -(mc.displayWidth / 2) + minimapOffset;
-                translateY = -(mc.displayHeight / 2) + minimapOffset;
-                scissorX = textureX;
-                scissorY = mc.displayHeight - minimapSize - marginY;
+                translateX = -(mc.displayWidth / 2) + minimapOffset + marginX;
+                translateY = -(mc.displayHeight / 2) + minimapOffset + topTextureYMargin;
                 break;
             }
             case BottomLeft:
             {
                 textureX = marginX;
                 textureY = mc.displayHeight - (minimapSize) - marginY - bottomTextureYMargin;
-                translateX = -(mc.displayWidth / 2) + minimapOffset;
-                translateY = (mc.displayHeight / 2) - minimapOffset - bottomTextureYMargin;
-                scissorX = textureX;
-                scissorY = marginY + bottomTextureYMargin;
+                translateX = -(mc.displayWidth / 2) + minimapOffset + marginX;
+                translateY = (mc.displayHeight / 2) - minimapOffset - marginY - bottomTextureYMargin;
                 break;
             }
             case Center:
@@ -160,8 +154,6 @@ public class DisplayVars
                 textureY = (mc.displayHeight - minimapSize)/2;
                 translateX = 0;
                 translateY = 0;
-                scissorX = textureX;
-                scissorY = textureY;
                 break;
             }
             case TopRight:
@@ -169,10 +161,8 @@ public class DisplayVars
             {
                 textureX = mc.displayWidth - minimapSize - marginX;
                 textureY = marginY + topTextureYMargin;
-                translateX = (mc.displayWidth / 2) - minimapOffset;
-                translateY = -(mc.displayHeight / 2) + minimapOffset;
-                scissorX = mc.displayWidth - minimapSize - marginX;
-                scissorY = mc.displayHeight - minimapSize - marginY;
+                translateX = (mc.displayWidth / 2) - minimapOffset - marginX;
+                translateY = -(mc.displayHeight / 2) + minimapOffset + topTextureYMargin;
                 break;
             }
         }

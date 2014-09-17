@@ -12,6 +12,7 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Minimap wasn't centered correctly when in Top Left or Top Right positions
 
 ## Changelog for JourneyMap 4.1.0alpha21:
 - Bugfix: Margin above minimap was too big if FPS wasn't shown
