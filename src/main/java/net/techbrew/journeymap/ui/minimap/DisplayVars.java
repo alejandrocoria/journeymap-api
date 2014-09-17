@@ -12,6 +12,8 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Vec3;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.ThemeFileHandler;
@@ -21,6 +23,8 @@ import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemeMinimapFrame;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 
 /**
@@ -44,7 +48,10 @@ public class DisplayVars
     final int minimapSize, textureX, textureY;
     final int minimapOffset, translateX, translateY;
     final int marginX, marginY, scissorX, scissorY;
-
+    final Rectangle2D.Double frameRect;
+    final AxisAlignedBB frameAABB;
+    final Point2D.Double centerPoint;
+    final Vec3 centerVec;
     final boolean showFps;
     final LabelVars labelFps, labelLocation, labelBiome;
     final ThemeMinimapFrame minimapFrame;
@@ -172,6 +179,12 @@ public class DisplayVars
 
         // Set frame position
         this.minimapFrame.setPosition(textureX, textureY);
+
+        // Assign frame rectangle and centers
+        this.centerPoint = new Point2D.Double(textureX + minimapOffset, textureY + minimapOffset);
+        this.centerVec = Vec3.createVectorHelper(centerPoint.getX(), centerPoint.getY(), 0);
+        this.frameRect = new Rectangle2D.Double(textureX, textureY, minimapSize, minimapSize);
+        this.frameAABB = AxisAlignedBB.getBoundingBox(frameRect.x, frameRect.y, 0, frameRect.getMaxX(), frameRect.getMaxY(), 0);
 
         // Set up label positions
         double centerX = Math.floor(textureX + (minimapSize / 2));

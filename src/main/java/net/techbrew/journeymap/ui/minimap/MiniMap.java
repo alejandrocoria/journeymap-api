@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.JMLogger;
@@ -133,26 +134,26 @@ public class MiniMap
                 state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, miniMapProperties, dv.drawScale, checkWaypointDistance);
                 state.updateLastRefresh();
 
+                offscreenWpDrawSteps.clear();
                 allWaypointSteps.clear();
                 allWaypointSteps.addAll(state.getDrawWaypointSteps());
 
-//                offscreenWpDrawSteps.clear();
-//                if(miniMapProperties.showWaypoints.get())
-//                {
-//                    for (DrawWayPointStep drawWayPointStep : allWaypointSteps)
-//                    {
-//                        if (!drawWayPointStep.isOnScreen(0, 0, gridRenderer))
-//                        {
-//                            offscreenWpDrawSteps.add(drawWayPointStep);
-//                            allWaypointSteps.remove(drawWayPointStep);
-//                        }
-//                        else
-//                        {
-//                            offscreenWpDrawSteps.remove(drawWayPointStep);
-//                        }
-//                    }
-//                    allWaypointSteps.removeAll(offscreenWpDrawSteps);
-//                }
+                offscreenWpDrawSteps.clear();
+                if(miniMapProperties.showWaypoints.get())
+                {
+                    for (DrawWayPointStep drawWayPointStep : allWaypointSteps)
+                    {
+                        if (!isOnScreen(drawWayPointStep.getPosition(0,0,gridRenderer)))
+                        {
+                            offscreenWpDrawSteps.add(drawWayPointStep);
+                        }
+                        else
+                        {
+                            offscreenWpDrawSteps.remove(drawWayPointStep);
+                        }
+                    }
+                    allWaypointSteps.removeAll(offscreenWpDrawSteps);
+                }
             }
 
             // Update display vars if needed
@@ -200,11 +201,12 @@ public class MiniMap
                 }
             }
 
+            GL11.glPushMatrix();
             if (rotation != 0)
             {
                 double width = dv.displayWidth / 2 + (dv.translateX);
                 double height = dv.displayHeight / 2 + (dv.translateY);
-                GL11.glPushMatrix();
+
                 GL11.glTranslated(width, height, 0);
 
                 GL11.glRotated(rotation, 0, 0, 1.0f);
@@ -212,12 +214,11 @@ public class MiniMap
                 //rotation+=180;
             }
 
-            // Move center to corner
+            // Move centerPoint to corner
             GL11.glTranslated(dv.translateX, dv.translateY, 0);
 
-            gridRenderer.updateGL(rotation);
-
             // Draw grid
+            gridRenderer.updateGL(rotation);
             gridRenderer.draw(1f, 0, 0);
 
             // Draw entities, etc
@@ -228,10 +229,7 @@ public class MiniMap
             {
                 for (DrawWayPointStep drawWayPointStep : allWaypointSteps)
                 {
-                    if (drawWayPointStep.isOnScreen(0, 0, gridRenderer))
-                    {
-                        drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, fontScale, rotation);
-                    }
+                    drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, fontScale, rotation);
                 }
             }
             if (unicodeForced)
@@ -242,51 +240,44 @@ public class MiniMap
             // Draw player
             if (miniMapProperties.showSelf.get())
             {
+                // Get player position
                 Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
                 if (playerPixel != null)
                 {
                     DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), mc.thePlayer.rotationYawHead, false, playerLocatorTex, dv.drawScale, rotation);
                 }
-
-
-                //DrawUtil.drawLabel("Loser", labelPixel.getX(), labelPixel.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 200, Color.white, 255, fontScale, false, rotation);
             }
 
-            // Return center to mid-screen
+            // Return centerPoint to mid-screen
             GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
 
             gridRenderer.updateGL(rotation);
 
-            // TODO: These need to be checked for straying outside the scissor
-            // Draw off-screen waypoints on top of border texture
-            if (!allWaypointSteps.isEmpty())
-            {
-                // Move center back to corner
-                GL11.glTranslated(dv.translateX, dv.translateY, 0);
-                for (DrawWayPointStep drawWayPointStep : allWaypointSteps)
-                {
-                    if (!drawWayPointStep.isOnScreen(0, 0, gridRenderer))
-                    {
-                        drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, fontScale, rotation);
-                    }
-                }
-            }
-
-            if (rotation != 0)
-            {
-                GL11.glPopMatrix();
-            }
-
             // Finished stencil
             endStencil();
 
-            // Pop matrix changes
+            // Pop rotation
+            GL11.glPopMatrix();
+
+            // Pop matrix centering
             GL11.glPopMatrix();
 
             // Draw Minimap Frame
             dv.minimapFrame.drawFrame();
 
-            // Draw labels
+            // Draw off-screen waypoints on top of frame
+            if (!offscreenWpDrawSteps.isEmpty())
+            {
+                // Move centerPoint back to corner
+                //GL11.glTranslated(dv.translateX, dv.translateY, 0);
+                for (DrawWayPointStep drawWayPointStep : offscreenWpDrawSteps)
+                {
+                    Point2D framePos = getPointOnFrame(drawWayPointStep.getPosition(0,0,gridRenderer));
+                    drawWayPointStep.drawOffscreen(framePos, 0);
+                }
+            }
+
+            // Draw minimap labels
             if (dv.showFps)
             {
                 dv.labelFps.draw(fpsLabelText);
@@ -310,6 +301,34 @@ public class MiniMap
         }
     }
 
+    private boolean isOnScreen(Point2D objectPixel)
+    {
+        if(dv.shape == DisplayVars.Shape.Circle)
+        {
+            return dv.centerPoint.distance(gridRenderer.getWindowPosition(objectPixel)) < dv.minimapSize/2;
+        }
+        else
+        {
+            return dv.frameRect.contains(gridRenderer.getWindowPosition(objectPixel));
+        }
+    }
+
+    private Point2D.Double getPointOnFrame(Point2D objectPixel)
+    {
+        Vec3 objectWindowVec = gridRenderer.getWindowVec(objectPixel);
+        if(dv.shape == DisplayVars.Shape.Circle)
+        {
+            Vec3 delta = dv.centerVec.subtract(objectWindowVec).normalize();
+            objectWindowVec = dv.centerVec.addVector(delta.xCoord * dv.minimapOffset, delta.yCoord * dv.minimapOffset, delta.zCoord * dv.minimapOffset);
+            return new Point2D.Double(objectWindowVec.xCoord, objectWindowVec.yCoord);
+        }
+        else
+        {
+
+            Vec3 hitVec = dv.frameAABB.calculateIntercept(dv.centerVec, objectWindowVec).hitVec;
+            return new Point2D.Double(hitVec.xCoord, hitVec.yCoord);
+        }
+    }
 
     private void beginStencil()
     {

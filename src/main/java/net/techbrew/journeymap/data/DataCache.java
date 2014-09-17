@@ -18,6 +18,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.*;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
+import net.techbrew.journeymap.render.draw.DrawWayPointStep;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 
 import java.util.*;
@@ -41,6 +42,7 @@ public class DataCache
     final LoadingCache<Class, WorldData> world;
     final LoadingCache<Class, Map<String, Object>> messages;
     final LoadingCache<EntityDTO, DrawEntityStep> entityDrawSteps;
+    final LoadingCache<Waypoint, DrawWayPointStep> waypointDrawSteps;
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
     final LoadingCache<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadata;
     final LoadingCache<Block, HashMap<Integer, BlockMD>> blockMetadata;
@@ -92,6 +94,9 @@ public class DataCache
 
         entityDrawSteps = getCacheBuilder().weakKeys().build(new DrawEntityStep.SimpleCacheLoader());
         managedCaches.put(entityDrawSteps, "DrawEntityStep");
+
+        waypointDrawSteps = getCacheBuilder().weakKeys().build(new DrawWayPointStep.SimpleCacheLoader());
+        managedCaches.put(waypointDrawSteps, "DrawWaypointStep");
 
         entityDTOs = getCacheBuilder().weakKeys().build(new EntityDTO.SimpleCacheLoader());
         managedCaches.put(entityDTOs, "EntityDTO");
@@ -360,6 +365,13 @@ public class DataCache
         }
     }
 
+    public DrawWayPointStep getDrawWayPointStep(Waypoint waypoint)
+    {
+        synchronized (waypointDrawSteps)
+        {
+            return waypointDrawSteps.getUnchecked(waypoint);
+        }
+    }
 //    public RGB getColor(Color color)
 //    {
 //        return getColor(color.getRGB());

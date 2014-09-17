@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Vec3;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.map.GridRenderer;
@@ -44,7 +45,7 @@ public class WaypointDrawStepFactory
         {
             for (Waypoint waypoint : waypoints)
             {
-                if (waypoint.isEnable())
+                if (waypoint.isEnable() && waypoint.isInPlayerDimension())
                 {
                     if (checkDistance)
                     {
@@ -56,7 +57,7 @@ public class WaypointDrawStepFactory
                         }
                     }
 
-                    drawStepList.add(new DrawWayPointStep(waypoint));
+                    drawStepList.add(DataCache.instance().getDrawWayPointStep(waypoint));
                 }
             }
         }

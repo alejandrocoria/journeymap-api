@@ -13,6 +13,7 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
@@ -604,7 +605,7 @@ public class GridRenderer
 
     public Point2D shiftWindowPosition(double x, double y, int shiftX, int shiftY)
     {
-        if(currentRotation==0)
+        if(currentRotation % 360 == 0)
         {
             return new Point2D.Double(x+shiftX, y+shiftY);
         }
@@ -613,6 +614,32 @@ public class GridRenderer
             GLU.gluProject((float) x, (float) y, 0f, modelMatrixBuf, projMatrixBuf, viewportBuf, winPosBuf);
             GLU.gluUnProject(winPosBuf.get(0) + shiftX, winPosBuf.get(1) + shiftY, 0, modelMatrixBuf, projMatrixBuf, viewportBuf, objPosBuf);
             return new Point2D.Float(objPosBuf.get(0), objPosBuf.get(1));
+        }
+    }
+
+    public Point2D getWindowPosition(Point2D matrixPixel)
+    {
+        if(currentRotation % 360 ==0)
+        {
+            return matrixPixel;
+        }
+        else
+        {
+            GLU.gluProject((float) matrixPixel.getX(), (float) matrixPixel.getY(), 0f, modelMatrixBuf, projMatrixBuf, viewportBuf, winPosBuf);
+            return new Point2D.Float(winPosBuf.get(0), winPosBuf.get(1));
+        }
+    }
+
+    public Vec3 getWindowVec(Point2D matrixPixel)
+    {
+        if(currentRotation % 360 ==0)
+        {
+            return Vec3.createVectorHelper(matrixPixel.getX(), matrixPixel.getY(), 0);
+        }
+        else
+        {
+            GLU.gluProject((float) matrixPixel.getX(), (float) matrixPixel.getY(), 0f, modelMatrixBuf, projMatrixBuf, viewportBuf, winPosBuf);
+            return Vec3.createVectorHelper(winPosBuf.get(0), winPosBuf.get(1), 0);
         }
     }
 

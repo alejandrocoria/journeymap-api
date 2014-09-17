@@ -8,6 +8,7 @@
 
 package net.techbrew.journeymap.render.draw;
 
+import com.google.common.cache.CacheLoader;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.map.GridRenderer;
 import net.techbrew.journeymap.render.texture.TextureCache;
@@ -83,8 +84,18 @@ public class DrawWayPointStep implements DrawStep
         }
     }
 
+    public void drawOffscreen(Point2D pixel, double rotation)
+    {
+        DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - (texture.height/2), -rotation);
+    }
+
     public Point2D.Double getPosition(double xOffset, double yOffset, GridRenderer gridRenderer)
     {
+        if (!waypoint.isInPlayerDimension())
+        {
+            return null;
+        }
+
         double x = waypoint.getX();
         double z = waypoint.getZ();
         double halfBlock = Math.pow(2, gridRenderer.getZoom()) / 2;
@@ -102,5 +113,14 @@ public class DrawWayPointStep implements DrawStep
     public int getTextureHeight()
     {
         return texture.height;
+    }
+
+    public static class SimpleCacheLoader extends CacheLoader<Waypoint, DrawWayPointStep>
+    {
+        @Override
+        public DrawWayPointStep load(Waypoint waypoint) throws Exception
+        {
+            return new DrawWayPointStep(waypoint);
+        }
     }
 }
