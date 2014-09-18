@@ -60,6 +60,7 @@ public class DisplayVars
     final boolean showBiome;
     final boolean showLocation;
     final boolean showCompass;
+    final boolean showReticle;
     final LabelVars labelFps, labelLocation, labelBiome;
     final ThemeMinimapFrame minimapFrame;
     final ThemeCompassPoints minimapCompassPoints;
@@ -79,11 +80,12 @@ public class DisplayVars
         // Immutable member and local vars
         final MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties();
         this.scaledResolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
-        this.forceUnicode = JourneyMap.getMiniMapProperties().forceUnicode.get();
-        this.showFps = JourneyMap.getMiniMapProperties().showFps.get();
-        this.showBiome = JourneyMap.getMiniMapProperties().showBiome.get();
-        this.showLocation = JourneyMap.getMiniMapProperties().showLocation.get();
-        this.showCompass = JourneyMap.getMiniMapProperties().showCompass.get();
+        this.forceUnicode = miniMapProperties.forceUnicode.get();
+        this.showFps = miniMapProperties.showFps.get();
+        this.showBiome = miniMapProperties.showBiome.get();
+        this.showLocation = miniMapProperties.showLocation.get();
+        this.showCompass = miniMapProperties.showCompass.get();
+        this.showReticle = miniMapProperties.showReticle.get();
         this.shape = shape;
         this.position = position;
         this.orientation = JourneyMap.getMiniMapProperties().orientation.get();

@@ -113,9 +113,9 @@ public class ThemeMinimapFrame
         }
     }
 
-    public void drawFrame()
+    public void drawReticle()
     {
-        if(showReticle)
+        if(showReticle && reticleAlpha>0)
         {
             // North
             DrawUtil.drawRectangle(x + (width/2), y - reticleOffset, reticleThickness, reticleSegmentLength, reticleColor, reticleAlpha);
@@ -129,22 +129,28 @@ public class ThemeMinimapFrame
             // East
             DrawUtil.drawRectangle(x + width - reticleSegmentLength + reticleOffset, y + (height/2), reticleSegmentLength, reticleThickness, reticleColor, reticleAlpha);
         }
+    }
 
-        if(isSquare)
+    public void drawFrame()
+    {
+        if(frameAlpha>0)
         {
-            DrawUtil.drawClampedImage(textureTop, frameColor, x + (textureTopLeft.width  / 2D), y - (textureTop.height  / 2D), 1, 0);
-            DrawUtil.drawClampedImage(textureLeft, frameColor, x - (textureLeft.width  / 2D), y + (textureTopLeft.height  / 2D), 1, 0);
-            DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.width  / 2D), y - (textureTopLeft.height  / 2D), 1, 0);
-            DrawUtil.drawClampedImage(textureBottom, frameColor, x + (textureBottomLeft.width  / 2D), y + height - (textureBottom.height  / 2D), 1, 0);
-            DrawUtil.drawClampedImage(textureRight, frameColor, x + width - (textureRight.width  / 2D), y + (textureTopRight.height  / 2D), 1, 0);
-            DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.width  / 2D), y - (textureTopLeft.height  / 2D), 1, 0);
-            DrawUtil.drawClampedImage(textureTopRight, frameColor, x + width - (textureTopRight.width  / 2D), y - (textureTopRight.height  / 2D), 1, 0);
-            DrawUtil.drawClampedImage(textureBottomLeft, frameColor, x - (textureBottomLeft.width  / 2D), y + height - (textureBottomLeft.height  / 2D), 1, 0);
-            DrawUtil.drawClampedImage(textureBottomRight, frameColor, x + width - (textureBottomRight.width  / 2D), y + height - (textureBottomRight.height  / 2D), 1, 0);
-        }
-        else
-        {
-            DrawUtil.drawQuad(textureCircle, x, y, this.width, this.height, 0, frameColor, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
+            if (isSquare)
+            {
+                DrawUtil.drawClampedImage(textureTop, frameColor, x + (textureTopLeft.width / 2D), y - (textureTop.height / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureLeft, frameColor, x - (textureLeft.width / 2D), y + (textureTopLeft.height / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.width / 2D), y - (textureTopLeft.height / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureBottom, frameColor, x + (textureBottomLeft.width / 2D), y + height - (textureBottom.height / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureRight, frameColor, x + width - (textureRight.width / 2D), y + (textureTopRight.height / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.width / 2D), y - (textureTopLeft.height / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureTopRight, frameColor, x + width - (textureTopRight.width / 2D), y - (textureTopRight.height / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureBottomLeft, frameColor, x - (textureBottomLeft.width / 2D), y + height - (textureBottomLeft.height / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureBottomRight, frameColor, x + width - (textureBottomRight.width / 2D), y + height - (textureBottomRight.height / 2D), 1, 0);
+            }
+            else
+            {
+                DrawUtil.drawQuad(textureCircle, x, y, this.width, this.height, 0, frameColor, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
+            }
         }
     }
 

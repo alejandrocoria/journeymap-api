@@ -233,10 +233,37 @@ public class MiniMap
 
             // Return centerPoint to mid-screen
             GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
-            //gridRenderer.updateGL(rotation); // TODO: needed?
 
-            // Draw Minimap Frame
-            dv.minimapFrame.drawFrame();
+            if(dv.shape == DisplayVars.Shape.Circle || rotation==0)
+            {
+                dv.minimapFrame.drawReticle();
+                dv.minimapFrame.drawFrame();
+            }
+            else
+            {
+                dv.minimapFrame.drawReticle();
+
+                /***** END MATRIX: ROTATION *****/
+                GL11.glPopMatrix();
+
+                // Draw Minimap Frame
+                dv.minimapFrame.drawFrame();
+
+                /***** BEGIN MATRIX: ROTATION *****/
+                GL11.glPushMatrix();
+
+                if (rotation != 0)
+                {
+                    double width = dv.displayWidth / 2 + (dv.translateX);
+                    double height = dv.displayHeight / 2 + (dv.translateY);
+
+                    GL11.glTranslated(width, height, 0);
+
+                    GL11.glRotated(rotation, 0, 0, 1.0f);
+                    GL11.glTranslated(-width, -height, 0);
+                    //rotation+=180;
+                }
+            }
 
             // Draw cardinal compass points
             if(dv.showCompass)
