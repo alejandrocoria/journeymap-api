@@ -20,6 +20,7 @@ import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.ui.theme.Theme;
+import net.techbrew.journeymap.ui.theme.ThemeCompassPoints;
 import net.techbrew.journeymap.ui.theme.ThemeMinimapFrame;
 
 import java.awt.*;
@@ -46,15 +47,20 @@ public class DisplayVars
     final int displayHeight;
     final ScaledResolution scaledResolution;
     final int minimapSize, textureX, textureY;
-    final int minimapOffset, translateX, translateY;
-    final int marginX, marginY;
+    final int minimapRadius, translateX, translateY;
+    int marginX, marginY;
+    final int fpsLabelHeight;
+    final int locationLabelHeight;
     final Rectangle2D.Double frameRect;
     final AxisAlignedBB frameAABB;
     final Point2D.Double centerPoint;
     final Vec3 centerVec;
     final boolean showFps;
+    final boolean showCompass;
     final LabelVars labelFps, labelLocation, labelBiome;
     final ThemeMinimapFrame minimapFrame;
+    final ThemeCompassPoints minimapCompassPoints;
+    final Theme.Minimap.MinimapSpec minimapSpec;
     boolean forceUnicode;
 
     /**
@@ -72,6 +78,7 @@ public class DisplayVars
         this.scaledResolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
         this.forceUnicode = JourneyMap.getMiniMapProperties().forceUnicode.get();
         this.showFps = JourneyMap.getMiniMapProperties().showFps.get();
+        this.showCompass = JourneyMap.getMiniMapProperties().showCompass.get();
         this.shape = shape;
         this.position = position;
         this.orientation = JourneyMap.getMiniMapProperties().orientation.get();
@@ -80,7 +87,6 @@ public class DisplayVars
         this.minimapSize = miniMapProperties.customSize.get();
 
         Theme theme = ThemeFileHandler.getCurrentTheme();
-        Theme.Minimap.MinimapSpec minimapSpec = null;
 
         // Assign shape
         switch (shape)
@@ -98,27 +104,28 @@ public class DisplayVars
             }
         }
 
-        final boolean useFontShadow = minimapSpec.labelShadow;
         final boolean wasUnicode = mc.fontRenderer.getUnicodeFlag();
         final boolean useUnicode = (forceUnicode || wasUnicode);
         this.fontScale = labelFontScale * (useUnicode ? 2 : 1);
-        final int labelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, useFontShadow) * (useUnicode ? .7 : 1) * this.fontScale);
+
+        fpsLabelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, minimapSpec.fpsLabel.shadow) * (useUnicode ? .7 : 1) * this.fontScale);
+        locationLabelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, minimapSpec.locationLabel.shadow) * (useUnicode ? .7 : 1) * this.fontScale);
+
+        int compassFontScale = (JourneyMap.getMiniMapProperties().compassFontSmall.get() ? 1 : 2) * (useUnicode ? 2 : 1);
+        int compassLabelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, minimapSpec.compassLabel.shadow) * (useUnicode ? .7 : 1) * compassFontScale);
+
         drawScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);
 
         minimapFrame = new ThemeMinimapFrame(theme, minimapSpec, minimapSize);
         marginX = marginY = minimapSpec.margin;
-        minimapOffset = minimapSize/2;
+        minimapRadius = minimapSize/2;
 
-        int topTextureYMargin = 0;
-        if(!minimapSpec.labelTopInside && showFps)
-        {
-            topTextureYMargin = Math.max(marginX, labelHeight);
-        }
+        boolean showCompass = minimapSpec.compassPoint!=null && minimapSpec.compassPoint.width>0;
 
-        int bottomTextureYMargin = 0;
-        if(!minimapSpec.labelBottomInside)
+        if(showCompass)
         {
-            bottomTextureYMargin = Math.max(marginY, minimapSpec.labelBottomMargin + (2*labelHeight));
+            marginX = Math.max(marginX, compassLabelHeight + minimapSpec.compassPointPad);
+            marginY = Math.max(marginY, compassLabelHeight + minimapSpec.compassPointPad);
         }
 
         // Assign position
@@ -126,26 +133,41 @@ public class DisplayVars
         {
             case BottomRight:
             {
+                if(!minimapSpec.labelBottomInside)
+                {
+                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (2*locationLabelHeight));
+                }
+
                 textureX = mc.displayWidth - minimapSize - marginX;
-                textureY = mc.displayHeight - (minimapSize) - marginY - bottomTextureYMargin;
-                translateX = (mc.displayWidth / 2) - minimapOffset - marginX;
-                translateY = (mc.displayHeight / 2) - minimapOffset - marginY - bottomTextureYMargin;
+                textureY = mc.displayHeight - (minimapSize) - marginY;
+                translateX = (mc.displayWidth / 2) - minimapRadius - marginX;
+                translateY = (mc.displayHeight / 2) - minimapRadius - marginY;
                 break;
             }
             case TopLeft:
             {
+                if(!minimapSpec.labelTopInside && showFps)
+                {
+                    marginY = Math.max(marginY, fpsLabelHeight);
+                }
+
                 textureX = marginX;
-                textureY = marginY + topTextureYMargin;
-                translateX = -(mc.displayWidth / 2) + minimapOffset + marginX;
-                translateY = -(mc.displayHeight / 2) + minimapOffset + topTextureYMargin;
+                textureY = marginY;
+                translateX = -(mc.displayWidth / 2) + minimapRadius + marginX;
+                translateY = -(mc.displayHeight / 2) + minimapRadius + marginY;
                 break;
             }
             case BottomLeft:
             {
+                if(!minimapSpec.labelBottomInside)
+                {
+                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (2*locationLabelHeight));
+                }
+
                 textureX = marginX;
-                textureY = mc.displayHeight - (minimapSize) - marginY - bottomTextureYMargin;
-                translateX = -(mc.displayWidth / 2) + minimapOffset + marginX;
-                translateY = (mc.displayHeight / 2) - minimapOffset - marginY - bottomTextureYMargin;
+                textureY = mc.displayHeight - (minimapSize) - marginY;
+                translateX = -(mc.displayWidth / 2) + minimapRadius + marginX;
+                translateY = (mc.displayHeight / 2) - minimapRadius - marginY;
                 break;
             }
             case Center:
@@ -159,10 +181,15 @@ public class DisplayVars
             case TopRight:
             default:
             {
+                if(!minimapSpec.labelTopInside && showFps)
+                {
+                    marginY = Math.max(marginY, fpsLabelHeight);
+                }
+
                 textureX = mc.displayWidth - minimapSize - marginX;
-                textureY = marginY + topTextureYMargin;
-                translateX = (mc.displayWidth / 2) - minimapOffset - marginX;
-                translateY = -(mc.displayHeight / 2) + minimapOffset + topTextureYMargin;
+                textureY = marginY;
+                translateX = (mc.displayWidth / 2) - minimapRadius - marginX;
+                translateY = -(mc.displayHeight / 2) + minimapRadius + marginY;
                 break;
             }
         }
@@ -171,30 +198,37 @@ public class DisplayVars
         this.minimapFrame.setPosition(textureX, textureY);
 
         // Assign frame rectangle and centers
-        this.centerPoint = new Point2D.Double(textureX + minimapOffset, textureY + minimapOffset);
+        this.centerPoint = new Point2D.Double(textureX + minimapRadius, textureY + minimapRadius);
         this.centerVec = Vec3.createVectorHelper(centerPoint.getX(), centerPoint.getY(), 0);
         this.frameRect = new Rectangle2D.Double(textureX, textureY, minimapSize, minimapSize);
         this.frameAABB = AxisAlignedBB.getBoundingBox(frameRect.x, frameRect.y, 0, frameRect.getMaxX(), frameRect.getMaxY(), 0);
+
+        // Set up compass poionts
+        if(showCompass)
+        {
+            this.minimapCompassPoints = new ThemeCompassPoints(textureX, textureY, minimapRadius, minimapSpec, this.minimapFrame.getCompassPoint(), useUnicode, compassLabelHeight);
+        }
+        else
+        {
+            this.minimapCompassPoints = null;
+        }
 
         // Set up label positions
         double centerX = Math.floor(textureX + (minimapSize / 2));
         double topY = textureY;
         double bottomY = textureY + minimapSize;
-        Color bgColor = Theme.getColor(minimapSpec.labelBackgroundColor);
-        Color fgColor = Theme.getColor(minimapSpec.labelForegroundColor);
-        int bgAlpha = minimapSpec.labelBackgroundAlpha;
 
-        int yOffsetFps = minimapSpec.labelTopInside ? minimapSpec.labelTopMargin : -minimapSpec.labelTopMargin;
+        int yOffsetFps = minimapSpec.labelTopInside ? minimapSpec.labelTopMargin : -marginY;
         DrawUtil.VAlign valignFps = minimapSpec.labelTopInside ? DrawUtil.VAlign.Below : DrawUtil.VAlign.Above;
-        labelFps = new LabelVars(centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, useFontShadow, bgColor, bgAlpha, fgColor);
+        labelFps = new LabelVars(centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, minimapSpec.fpsLabel);
 
-        int yOffsetBiome = minimapSpec.labelBottomInside ? -(minimapSpec.labelBottomMargin + (labelHeight*2)) : minimapSpec.labelBottomMargin + labelHeight;
+        int yOffsetBiome = minimapSpec.labelBottomInside ? -(minimapSpec.labelBottomMargin + (locationLabelHeight*2)) :marginY + locationLabelHeight;
         DrawUtil.VAlign valignBiome = minimapSpec.labelBottomInside ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
-        labelBiome = new LabelVars(centerX, bottomY + yOffsetBiome, DrawUtil.HAlign.Center, valignBiome, fontScale, useFontShadow, bgColor, bgAlpha, fgColor);
+        labelBiome = new LabelVars(centerX, bottomY + yOffsetBiome, DrawUtil.HAlign.Center, valignBiome, fontScale, minimapSpec.fpsLabel);
 
-        int yOffsetLocation = minimapSpec.labelBottomInside ? -(minimapSpec.labelBottomMargin + (labelHeight)) : minimapSpec.labelBottomMargin ;
+        int yOffsetLocation = minimapSpec.labelBottomInside ? -(minimapSpec.labelBottomMargin + (locationLabelHeight)) : marginY ;
         DrawUtil.VAlign valignLocation = minimapSpec.labelBottomInside ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
-        labelLocation = new LabelVars(centerX, bottomY + yOffsetLocation, DrawUtil.HAlign.Center, valignLocation, fontScale, useFontShadow, bgColor, bgAlpha, fgColor);
+        labelLocation = new LabelVars(centerX, bottomY + yOffsetLocation, DrawUtil.HAlign.Center, valignLocation, fontScale, minimapSpec.fpsLabel);
     }
 
     /**
@@ -341,6 +375,8 @@ public class DisplayVars
         }
     }
 
+
+
     /**
      * Encapsulation of label attributes.
      */
@@ -356,17 +392,17 @@ public class DisplayVars
         int bgAlpha;
         Color fgColor;
 
-        private LabelVars(double x, double y, DrawUtil.HAlign hAlign, DrawUtil.VAlign vAlign, double fontScale, boolean fontShadow, Color bgColor, int bgAlpha, Color fgColor)
+        private LabelVars(double x, double y, DrawUtil.HAlign hAlign, DrawUtil.VAlign vAlign, double fontScale, Theme.LabelSpec labelSpec)
         {
             this.x = x;
             this.y = y;
             this.hAlign = hAlign;
             this.vAlign = vAlign;
             this.fontScale = fontScale;
-            this.fontShadow = fontShadow;
-            this.bgColor = bgColor;
-            this.bgAlpha = bgAlpha;
-            this.fgColor = fgColor;
+            this.fontShadow = labelSpec.shadow;
+            this.bgColor = Theme.getColor(labelSpec.backgroundColor);
+            this.bgAlpha = labelSpec.backgroundAlpha;
+            this.fgColor = Theme.getColor(labelSpec.foregroundColor);
         }
 
         void draw(String text)

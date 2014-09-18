@@ -57,7 +57,11 @@ public class WaypointDrawStepFactory
                         }
                     }
 
-                    drawStepList.add(DataCache.instance().getDrawWayPointStep(waypoint));
+                    DrawWayPointStep wayPointStep = DataCache.instance().getDrawWayPointStep(waypoint);
+                    if(wayPointStep!=null)
+                    {
+                        drawStepList.add(wayPointStep);
+                    }
                 }
             }
         }

@@ -244,7 +244,7 @@ public class Theme implements Comparable<Theme>
     public static class Fullscreen
     {
         /**
-         * Hex color for map background.
+         * Hex color for map background (behind tiles).
          */
         @Since(1)
         public String mapBackgroundColor = "";
@@ -253,13 +253,7 @@ public class Theme implements Comparable<Theme>
          * Hex color for background of status text on the bottom of the screen.
          */
         @Since(1)
-        public String statusBackgroundColor = "";
-
-        /**
-         * Hex color for foreground of status text on the bottom of the screen.
-         */
-        @Since(1)
-        public String statusForegroundColor = "";
+        public LabelSpec statusLabel = new LabelSpec();
     }
 
     /**
@@ -345,28 +339,53 @@ public class Theme implements Comparable<Theme>
             public int labelBottomMargin;
 
             /**
-             * Hex color for background of labels (fps, biome, location).
+             * Label spec for showing FPS
              */
             @Since(1)
-            public String labelBackgroundColor = "";
+            public LabelSpec fpsLabel = new LabelSpec();
 
             /**
-             * Alpha transparency (0-255) of background
+             * Label spec for showing location
              */
             @Since(1)
-            public int labelBackgroundAlpha;
+            public LabelSpec locationLabel = new LabelSpec();
 
             /**
-             * Hex color for foreground of labels (fps, biome, location).
+             * Label spec for showing compass points
              */
             @Since(1)
-            public String labelForegroundColor = "";
+            public LabelSpec compassLabel = new LabelSpec();
 
             /**
-             * Whether to use font shadows with the labels.
+             * Background image on which to place compass points.
+             * Expecting filename "compass_point.png"
              */
             @Since(1)
-            public boolean labelShadow;
+            public ImageSpec compassPoint = new ImageSpec();
+
+            /***
+             * Hex color used to draw compass point. Use #ffffff to leave unchanged.
+             */
+            @Since(1)
+            public String compassPointColor = "#ffffff";
+
+            /**
+             * Number of pixels to pad around a compass point's label. Effects the scaled size of the compass point image.
+             */
+            public int compassPointPad;
+
+            /***
+             * Hex color used to draw reticle.
+             */
+            @Since(1)
+            public String reticleColor = "";
+
+            /**
+             * Alpha transparency (0-255) of label background.
+             * Default is 200.
+             */
+            @Since(1)
+            public int reticleAlpha = 200;
 
             /***
              * Hex color to apply to frame image. Use #ffffff to keep unchanged.
@@ -388,7 +407,7 @@ public class Theme implements Comparable<Theme>
          * The rim is the frame/overlay placed atop the minimap.
          *
          * Filenames expected by the Theme loader are:
-         * mask_256.png, rim_256.png, mask_512.png, rim_512.png
+         * mask_256.png, rim_256.png, mask_512.png, rim_512.png, compass_point.png
          *
          * Minimap sizes <=256 will use mask_256 and rim_256. Anything
          * larger will use mask_512 and rim_512.
@@ -424,7 +443,8 @@ public class Theme implements Comparable<Theme>
          * Class for images in /minimap/square.
          *
          * Filenames expected by the Theme loader are:
-         * topleft.png, top.png, topright.png, left.png, right.png, bottomleft.png, bottom.png, bottomright.png
+         * topleft.png, top.png, topright.png, left.png, right.png,
+         * bottomleft.png, bottom.png, bottomright.png, compass_point.png
          *
          * Images are centered along the edges of the minimap area.
          */
@@ -441,7 +461,6 @@ public class Theme implements Comparable<Theme>
              */
             @Since(1)
             public ImageSpec top = new ImageSpec();
-
 
             /**
              * Dimensions of topright.png
@@ -480,6 +499,47 @@ public class Theme implements Comparable<Theme>
             @Since(1)
             public ImageSpec left = new ImageSpec();
         }
+    }
+
+    /**
+     * Class for defining label characteristics.
+     */
+    public static class LabelSpec
+    {
+        /**
+         * Hex color for label background.
+         * Default is black.
+         */
+        @Since(1)
+        public String backgroundColor = toHexColor(Color.black);
+
+        /**
+         * Alpha transparency (0-255) of label background.
+         * Default is 200.
+         */
+        @Since(1)
+        public int backgroundAlpha = 200;
+
+        /**
+         * Hex color for label foreground.
+         * Default is white.
+         */
+        @Since(1)
+        public String foregroundColor = toHexColor(Color.white);
+
+        /**
+         * Alpha transparency (0-255) of label background.
+         * Default is 255.
+         */
+        @Since(1)
+        public int foregroundAlpha = 255;
+
+        /**
+         * Whether to use font shadow.
+         * Default is false.
+         */
+        @Since(1)
+        public boolean shadow = false;
     }
 
     /**

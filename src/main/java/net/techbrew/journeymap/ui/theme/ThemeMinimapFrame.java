@@ -28,6 +28,7 @@ public class ThemeMinimapFrame
 
     private TextureImpl textureCircle;
     private TextureImpl textureCircleMask;
+    private TextureImpl textureCompassPoint;
 
     private double x;
     private double y;
@@ -36,6 +37,9 @@ public class ThemeMinimapFrame
     private Color frameColor;
     private float frameAlpha;
     private boolean isSquare;
+    private boolean showReticle;
+    private int reticleAlpha;
+    private Color reticleColor;
 
     public ThemeMinimapFrame(Theme theme, Theme.Minimap.MinimapSpec minimapSpec, int size)
     {
@@ -73,6 +77,15 @@ public class ThemeMinimapFrame
             TextureImpl tempCircle = getTexture("rim_" + imgSize, imgSize, imgSize, false, true);
             textureCircle = TextureCache.instance().getScaledCopy("scaledCircleRim", tempCircle, size, size, frameAlpha);
         }
+
+        if(minimapSpec.compassPoint != null && minimapSpec.compassPoint.width>0 && minimapSpec.compassPoint.height>0)
+        {
+            textureCompassPoint = getTexture("compass_point", minimapSpec.compassPoint);
+        }
+
+        this.showReticle = JourneyMap.getMiniMapProperties().showReticle.get();
+        this.reticleColor = Theme.getColor(minimapSpec.reticleColor);
+        this.reticleAlpha = minimapSpec.reticleAlpha;
     }
 
     public void setPosition(final double x, final double y)
@@ -95,6 +108,18 @@ public class ThemeMinimapFrame
 
     public void drawFrame()
     {
+        if(showReticle)
+        {
+            double thick = 2.25d;
+            double vlen = (height/2)-16;
+            DrawUtil.drawRectangle(x + (width/2), y, thick, vlen, reticleColor, reticleAlpha);
+            DrawUtil.drawRectangle(x + (width/2), y + height-vlen, thick, vlen, reticleColor, reticleAlpha);
+
+            double hlen = (width/2)-16;
+            DrawUtil.drawRectangle(x, y + (height/2), hlen, thick, reticleColor, reticleAlpha);
+            DrawUtil.drawRectangle(x + width - hlen, y + (height/2), hlen, thick, reticleColor, reticleAlpha);
+        }
+
         if(isSquare)
         {
             DrawUtil.drawClampedImage(textureTop, frameColor, x + (textureTopLeft.width  / 2D), y - (textureTop.height  / 2D), 1, 0);
@@ -111,6 +136,11 @@ public class ThemeMinimapFrame
         {
             DrawUtil.drawQuad(textureCircle, x, y, this.width, this.height, 0, frameColor, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
         }
+    }
+
+    public TextureImpl getCompassPoint()
+    {
+        return textureCompassPoint;
     }
 
     private TextureImpl getTexture(String suffix, Theme.ImageSpec imageSpec)

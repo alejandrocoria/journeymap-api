@@ -24,6 +24,8 @@ public class DrawWayPointStep implements DrawStep
 {
 
     public final Waypoint waypoint;
+    Point2D.Double lastPosition;
+    boolean lastOnScreen;
     final Color color;
     final Color fontColor;
     final TextureImpl texture;
@@ -63,7 +65,7 @@ public class DrawWayPointStep implements DrawStep
             return;
         }
 
-        Point2D.Double pixel = getPosition(xOffset, yOffset, gridRenderer);
+        Point2D.Double pixel = getPosition(xOffset, yOffset, gridRenderer, false);
         if (gridRenderer.isOnScreen(pixel))
         {
             Point2D labelPoint = gridRenderer.shiftWindowPosition(pixel.getX(), pixel.getY(), 0, rotation==0 ? -texture.height : texture.height);
@@ -89,11 +91,16 @@ public class DrawWayPointStep implements DrawStep
         DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - (texture.height/2), -rotation);
     }
 
-    public Point2D.Double getPosition(double xOffset, double yOffset, GridRenderer gridRenderer)
+    public Point2D.Double getPosition(double xOffset, double yOffset, GridRenderer gridRenderer, boolean forceUpdate)
     {
         if (!waypoint.isInPlayerDimension())
         {
             return null;
+        }
+
+        if(!forceUpdate && lastPosition!=null)
+        {
+            return lastPosition;
         }
 
         double x = waypoint.getX();
@@ -102,17 +109,23 @@ public class DrawWayPointStep implements DrawStep
 
         Point2D.Double pixel = gridRenderer.getBlockPixelInGrid(x, z);
         pixel.setLocation(pixel.getX() + halfBlock + xOffset, pixel.getY() + halfBlock + yOffset);
+        lastPosition = pixel;
         return pixel;
-    }
-
-    public boolean isOnScreen(double xOffset, double yOffset, GridRenderer gridRenderer)
-    {
-        return gridRenderer.isOnScreen(getPosition(xOffset, yOffset, gridRenderer));
     }
 
     public int getTextureHeight()
     {
         return texture.height;
+    }
+
+    public boolean isOnScreen()
+    {
+        return lastOnScreen;
+    }
+
+    public void setOnScreen(boolean lastOnScreen)
+    {
+        this.lastOnScreen = lastOnScreen;
     }
 
     public static class SimpleCacheLoader extends CacheLoader<Waypoint, DrawWayPointStep>

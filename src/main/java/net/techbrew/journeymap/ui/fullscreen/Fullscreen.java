@@ -76,8 +76,10 @@ public class Fullscreen extends JmUI
     ThemeButton buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid;
     ThemeToolbar mapTypeToolbar, optionsToolbar, menuToolbar, zoomToolbar;//, northEastToolbar;
     Color bgColor = new Color(0x22, 0x22, 0x22);
-    Color playerInfoFgColor = Color.lightGray;
-    Color playerInfoBgColor = new Color(0x22, 0x22, 0x22);
+    Color statusForegroundColor;
+    Color statusBackgroundColor;
+    int statusForegroundAlpha;
+    int statusBackgroundAlpha;
     StatTimer drawScreenTimer = StatTimer.get("MapOverlay.drawScreen");
     StatTimer drawMapTimer = StatTimer.get("MapOverlay.drawScreen.drawMap");
     StatTimer drawMapTimerWithRefresh = StatTimer.get("MapOverlay.drawMap+refreshState");
@@ -243,8 +245,10 @@ public class Fullscreen extends JmUI
 
             // UI Colors
             bgColor = Theme.getColor(theme.fullscreen.mapBackgroundColor);
-            playerInfoFgColor = Theme.getColor(theme.fullscreen.statusForegroundColor);
-            playerInfoBgColor = Theme.getColor(theme.fullscreen.statusBackgroundColor);
+            statusForegroundColor = Theme.getColor(theme.fullscreen.statusLabel.foregroundColor);
+            statusForegroundAlpha = theme.fullscreen.statusLabel.foregroundAlpha;
+            statusBackgroundColor = Theme.getColor(theme.fullscreen.statusLabel.backgroundColor);
+            statusBackgroundAlpha = theme.fullscreen.statusLabel.backgroundAlpha;
 
             // Day Toggle
             buttonDay = new ThemeToggle(id++, theme, Constants.getString("jm.fullscreen.map_day"), "day");
@@ -845,7 +849,8 @@ public class Fullscreen extends JmUI
 
         gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
 
-        DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, playerInfoBgColor, 235, playerInfoFgColor, 255, getMapFontScale(), true);
+        DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above,
+                statusBackgroundColor, statusBackgroundAlpha, statusForegroundColor, statusForegroundAlpha, getMapFontScale(), true);
 
         if (unicodeForced)
         {

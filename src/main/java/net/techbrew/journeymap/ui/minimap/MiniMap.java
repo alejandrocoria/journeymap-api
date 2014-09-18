@@ -36,7 +36,6 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 
 /**
  * Displays the map as a minimap overlay in-game.
@@ -70,10 +69,6 @@ public class MiniMap
     private String fpsLabelText;
     private String locationLabelText;
     private String biomeLabelText;
-
-    // Separate waypoint drawsteps
-    private ArrayList<DrawWayPointStep> allWaypointSteps = new ArrayList<DrawWayPointStep>();
-    private ArrayList<DrawWayPointStep> offscreenWpDrawSteps = new ArrayList<DrawWayPointStep>();
 
     /**
      * Default constructor
@@ -133,27 +128,6 @@ public class MiniMap
                 boolean checkWaypointDistance = waypointProperties.maxDistance.get() > 0;
                 state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, miniMapProperties, dv.drawScale, checkWaypointDistance);
                 state.updateLastRefresh();
-
-                offscreenWpDrawSteps.clear();
-                allWaypointSteps.clear();
-                allWaypointSteps.addAll(state.getDrawWaypointSteps());
-
-                offscreenWpDrawSteps.clear();
-                if(miniMapProperties.showWaypoints.get())
-                {
-                    for (DrawWayPointStep drawWayPointStep : allWaypointSteps)
-                    {
-                        if (!isOnScreen(drawWayPointStep.getPosition(0,0,gridRenderer)))
-                        {
-                            offscreenWpDrawSteps.add(drawWayPointStep);
-                        }
-                        else
-                        {
-                            offscreenWpDrawSteps.remove(drawWayPointStep);
-                        }
-                    }
-                    allWaypointSteps.removeAll(offscreenWpDrawSteps);
-                }
             }
 
             // Update display vars if needed
@@ -225,13 +199,19 @@ public class MiniMap
             final double fontScale = getMapFontScale();
             boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, miniMapProperties.forceUnicode.get());
             gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, fontScale, rotation);
-            if (!allWaypointSteps.isEmpty())
+
+            // Draw waypoints
+            for (DrawWayPointStep drawWayPointStep : state.getDrawWaypointSteps())
             {
-                for (DrawWayPointStep drawWayPointStep : allWaypointSteps)
+                Point2D waypointPos = drawWayPointStep.getPosition(0,0,gridRenderer,true);
+                boolean onScreen = isOnScreen(waypointPos);
+                drawWayPointStep.setOnScreen(onScreen);
+                if (onScreen)
                 {
-                    drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, fontScale, rotation);
+                    drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, dv.fontScale, rotation);
                 }
             }
+
             if (unicodeForced)
             {
                 DrawUtil.stopUnicode(mc.fontRenderer);
@@ -250,32 +230,39 @@ public class MiniMap
 
             // Return centerPoint to mid-screen
             GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
-
             gridRenderer.updateGL(rotation);
+
 
             // Finished stencil
             endStencil();
 
-            // Pop rotation
-            GL11.glPopMatrix();
-
-            // Pop matrix centering
-            GL11.glPopMatrix();
-
             // Draw Minimap Frame
             dv.minimapFrame.drawFrame();
 
-            // Draw off-screen waypoints on top of frame
-            if (!offscreenWpDrawSteps.isEmpty())
+            // Draw cardinal compass points
+            if(dv.showCompass)
             {
-                // Move centerPoint back to corner
-                //GL11.glTranslated(dv.translateX, dv.translateY, 0);
-                for (DrawWayPointStep drawWayPointStep : offscreenWpDrawSteps)
+                dv.minimapCompassPoints.drawPoints(rotation);
+            }
+
+            // Draw off-screen waypoints on top of frame
+            for (DrawWayPointStep drawWayPointStep : state.getDrawWaypointSteps())
+            {
+                if(!drawWayPointStep.isOnScreen())
                 {
-                    Point2D framePos = getPointOnFrame(drawWayPointStep.getPosition(0,0,gridRenderer));
-                    drawWayPointStep.drawOffscreen(framePos, 0);
+                    Point2D framePos = getPointOnFrame(drawWayPointStep.getPosition(0,0,gridRenderer,false));
+                    drawWayPointStep.drawOffscreen(framePos, rotation);
                 }
             }
+
+            // Draw cardinal compass point labels
+            if(dv.showCompass)
+            {
+                dv.minimapCompassPoints.drawLabels(rotation);
+            }
+
+            // Pop rotation
+            GL11.glPopMatrix();
 
             // Draw minimap labels
             if (dv.showFps)
@@ -284,6 +271,11 @@ public class MiniMap
             }
             dv.labelLocation.draw(locationLabelText);
             dv.labelBiome.draw(biomeLabelText);
+
+            // Pop matrix centering
+            GL11.glPopMatrix();
+
+
 
             // Return resolution to how it is normally scaled
             JmUI.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
@@ -315,17 +307,23 @@ public class MiniMap
 
     private Point2D.Double getPointOnFrame(Point2D objectPixel)
     {
-        Vec3 objectWindowVec = gridRenderer.getWindowVec(objectPixel);
+        Point2D objectWindowPixel = gridRenderer.getWindowPosition(objectPixel);
         if(dv.shape == DisplayVars.Shape.Circle)
         {
-            Vec3 delta = dv.centerVec.subtract(objectWindowVec).normalize();
-            objectWindowVec = dv.centerVec.addVector(delta.xCoord * dv.minimapOffset, delta.yCoord * dv.minimapOffset, delta.zCoord * dv.minimapOffset);
-            return new Point2D.Double(objectWindowVec.xCoord, objectWindowVec.yCoord);
+            double bearing = Math.atan2(
+                    objectPixel.getY() - dv.centerPoint.getY(),
+                    objectPixel.getX() - dv.centerPoint.getX()
+            );
+
+            return new Point2D.Double(
+                    (dv.minimapRadius * Math.cos(bearing)) + dv.centerPoint.getX(),
+                    (dv.minimapRadius * Math.sin(bearing)) + dv.centerPoint.getY()
+            );
         }
         else
         {
 
-            Vec3 hitVec = dv.frameAABB.calculateIntercept(dv.centerVec, objectWindowVec).hitVec;
+            Vec3 hitVec = dv.frameAABB.calculateIntercept(dv.centerVec, gridRenderer.getWindowVec(objectPixel)).hitVec;
             return new Point2D.Double(hitVec.xCoord, hitVec.yCoord);
         }
     }

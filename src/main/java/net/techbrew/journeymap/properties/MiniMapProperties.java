@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class MiniMapProperties extends InGameMapProperties
 {
-    protected transient static final int CODE_REVISION = 4;
+    protected transient static final int CODE_REVISION = 5;
     public final AtomicBoolean enabled = new AtomicBoolean(true);
     public final AtomicReference<DisplayVars.Shape> shape = new AtomicReference<DisplayVars.Shape>(DisplayVars.Shape.Square);
     public final AtomicReference<DisplayVars.Position> position = new AtomicReference<DisplayVars.Position>(DisplayVars.Position.TopRight);
@@ -32,6 +32,10 @@ public class MiniMapProperties extends InGameMapProperties
     public final AtomicInteger customSize = new AtomicInteger(0);
     public final AtomicInteger frameAlpha = new AtomicInteger(255);
     public final AtomicReference<DisplayVars.Orientation> orientation = new AtomicReference<DisplayVars.Orientation>(DisplayVars.Orientation.North);
+    public final AtomicBoolean compassFontSmall = new AtomicBoolean(false);
+    public final AtomicBoolean showCompass = new AtomicBoolean(true);
+    public final AtomicBoolean showReticle = new AtomicBoolean(true);
+
     protected transient final String name = "minimap";
 
     public MiniMapProperties()
