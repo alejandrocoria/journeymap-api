@@ -351,7 +351,7 @@ public class GeneralDisplayOptions extends JmUI
 
             if(button == buttonTheme || button == themeExampleButton)
             {
-                Theme theme = ThemeFileHandler.getCurrentTheme();
+                Theme theme = ThemeFileHandler.getCurrentTheme(true);
                 String[] tooltips = new String[]{EnumChatFormatting.ITALIC + Constants.getString("jm.common.ui_theme_author", theme.author)};
                 themeExampleButton.displayString = theme.name;
                 themeExampleButton.setAdditionalTooltips(Arrays.asList(tooltips));

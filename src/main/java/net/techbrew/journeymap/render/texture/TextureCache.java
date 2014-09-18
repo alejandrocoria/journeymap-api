@@ -502,6 +502,18 @@ public class TextureCache
 
     }
 
+    public void purgeThemeImages()
+    {
+        synchronized (themeImages)
+        {
+            for (TextureImpl texture : themeImages.values())
+            {
+                texture.deleteTexture();
+            }
+            themeImages.clear();
+        }
+    }
+
     public static enum Name
     {
         MinimapSmallSquare, MinimapMediumSquare, MinimapLargeSquare, MinimapCustomSquare, MinimapSmallCircle, MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, LocatorHostile, LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, ColorPicker, UnknownEntity;

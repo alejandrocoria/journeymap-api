@@ -7,6 +7,7 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemePresets;
 
@@ -139,6 +140,11 @@ public class ThemeFileHandler
 
     public synchronized static Theme getCurrentTheme(boolean forceReload)
     {
+        if(forceReload)
+        {
+            TextureCache.instance().purgeThemeImages();
+        }
+
         String themeName = JourneyMap.getCoreProperties().themeName.get();
         if(forceReload || currentTheme==null || !themeName.equals(currentTheme.name))
         {
