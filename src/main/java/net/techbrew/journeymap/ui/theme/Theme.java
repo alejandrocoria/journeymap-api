@@ -351,6 +351,12 @@ public class Theme implements Comparable<Theme>
             public LabelSpec locationLabel = new LabelSpec();
 
             /**
+             * Label spec for showing location
+             */
+            @Since(1)
+            public LabelSpec biomeLabel = new LabelSpec();
+
+            /**
              * Label spec for showing compass points
              */
             @Since(1)
@@ -372,7 +378,22 @@ public class Theme implements Comparable<Theme>
             /**
              * Number of pixels to pad around a compass point's label. Effects the scaled size of the compass point image.
              */
-            public int compassPointPad;
+            @Since(1)
+            public int compassPointLabelPad;
+
+            /**
+             * Number of pixels to shift the center of a compass point away from the map center.
+             * Use this to adjust how it overlays the minimap frame.
+             */
+            @Since(1)
+            public double compassPointOffset;
+
+            /**
+             * Number of pixels to shift the center of an "off-map" waypoint away from the map center.
+             * Use this to adjust how it overlays the minimap frame.
+             */
+            @Since(1)
+            public double waypointOffset;
 
             /***
              * Hex color used to draw reticle.
@@ -382,16 +403,33 @@ public class Theme implements Comparable<Theme>
 
             /**
              * Alpha transparency (0-255) of label background.
-             * Default is 200.
+             * Default is 128.
              */
             @Since(1)
-            public int reticleAlpha = 200;
+            public int reticleAlpha = 128;
+
+            /**
+             * Reticle thickness in pixels.
+             * Default is 2.25 pixels.
+             */
+            @Since(1)
+            public double reticleThickness = 2.25;
+
+            /**
+             * Number of pixels to shift the outer endpoint of a reticle segment away from the map center.
+             * Negative values move the end closer to the center.
+             * Use this to adjust how it underlays the minimap frame.
+             */
+            @Since(1)
+            public int reticleOffset;
 
             /***
              * Hex color to apply to frame image. Use #ffffff to keep unchanged.
              */
             @Since(1)
             public String frameColor = "";
+
+
 
             /**
              * Image prefix (optional) for images in /minimap/square

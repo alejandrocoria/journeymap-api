@@ -93,11 +93,6 @@ public class DrawWayPointStep implements DrawStep
 
     public Point2D.Double getPosition(double xOffset, double yOffset, GridRenderer gridRenderer, boolean forceUpdate)
     {
-        if (!waypoint.isInPlayerDimension())
-        {
-            return null;
-        }
-
         if(!forceUpdate && lastPosition!=null)
         {
             return lastPosition;
@@ -116,6 +111,11 @@ public class DrawWayPointStep implements DrawStep
     public int getTextureHeight()
     {
         return texture.height;
+    }
+
+    public int getTextureSize()
+    {
+        return Math.max(texture.height, texture.width);
     }
 
     public boolean isOnScreen()

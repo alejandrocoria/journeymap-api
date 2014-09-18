@@ -148,9 +148,6 @@ public class MiniMap
             // Ensure colors and alpha reset
             GL11.glColor4f(1, 1, 1, 1);
 
-            // Push matrix for translation to corner
-            GL11.glPushMatrix();
-
             // Mask the stencil
             beginStencil();
 
@@ -175,7 +172,9 @@ public class MiniMap
                 }
             }
 
+            /***** BEGIN MATRIX: ROTATION *****/
             GL11.glPushMatrix();
+
             if (rotation != 0)
             {
                 double width = dv.displayWidth / 2 + (dv.translateX);
@@ -188,7 +187,7 @@ public class MiniMap
                 //rotation+=180;
             }
 
-            // Move centerPoint to corner
+            // Move origin to corner
             GL11.glTranslated(dv.translateX, dv.translateY, 0);
 
             // Draw grid
@@ -200,11 +199,14 @@ public class MiniMap
             boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, miniMapProperties.forceUnicode.get());
             gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, fontScale, rotation);
 
+            // Get player position
+            Point2D centerPoint = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
+
             // Draw waypoints
             for (DrawWayPointStep drawWayPointStep : state.getDrawWaypointSteps())
             {
                 Point2D waypointPos = drawWayPointStep.getPosition(0,0,gridRenderer,true);
-                boolean onScreen = isOnScreen(waypointPos);
+                boolean onScreen = isOnScreen(waypointPos, centerPoint);
                 drawWayPointStep.setOnScreen(onScreen);
                 if (onScreen)
                 {
@@ -220,21 +222,18 @@ public class MiniMap
             // Draw player
             if (miniMapProperties.showSelf.get())
             {
-                // Get player position
-                Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
-                if (playerPixel != null)
+                if (centerPoint != null)
                 {
-                    DrawUtil.drawEntity(playerPixel.getX(), playerPixel.getY(), mc.thePlayer.rotationYawHead, false, playerLocatorTex, dv.drawScale, rotation);
+                    DrawUtil.drawEntity(centerPoint.getX(), centerPoint.getY(), mc.thePlayer.rotationYawHead, false, playerLocatorTex, dv.drawScale, rotation);
                 }
             }
 
+            // Finish stencil
+            endStencil();
+
             // Return centerPoint to mid-screen
             GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
-            gridRenderer.updateGL(rotation);
-
-
-            // Finished stencil
-            endStencil();
+            //gridRenderer.updateGL(rotation); // TODO: needed?
 
             // Draw Minimap Frame
             dv.minimapFrame.drawFrame();
@@ -245,23 +244,32 @@ public class MiniMap
                 dv.minimapCompassPoints.drawPoints(rotation);
             }
 
+            // Move origin to corner
+            GL11.glTranslated(dv.translateX, dv.translateY, 0);
+
             // Draw off-screen waypoints on top of frame
             for (DrawWayPointStep drawWayPointStep : state.getDrawWaypointSteps())
             {
                 if(!drawWayPointStep.isOnScreen())
                 {
-                    Point2D framePos = getPointOnFrame(drawWayPointStep.getPosition(0,0,gridRenderer,false));
-                    drawWayPointStep.drawOffscreen(framePos, rotation);
+                    drawWayPointStep.drawOffscreen(
+                            getPointOnFrame(
+                                drawWayPointStep.getPosition(0,0,gridRenderer,false),
+                                centerPoint,
+                                dv.minimapSpec.waypointOffset),
+                            rotation);
                 }
             }
 
             // Draw cardinal compass point labels
             if(dv.showCompass)
             {
+                // Return centerPoint to mid-screen
+                GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
                 dv.minimapCompassPoints.drawLabels(rotation);
             }
 
-            // Pop rotation
+            /***** END MATRIX: ROTATION *****/
             GL11.glPopMatrix();
 
             // Draw minimap labels
@@ -269,21 +277,21 @@ public class MiniMap
             {
                 dv.labelFps.draw(fpsLabelText);
             }
-            dv.labelLocation.draw(locationLabelText);
-            dv.labelBiome.draw(biomeLabelText);
-
-            // Pop matrix centering
-            GL11.glPopMatrix();
-
-
+            if(dv.showBiome)
+            {
+                dv.labelLocation.draw(locationLabelText);
+            }
+            if(dv.showLocation)
+            {
+                dv.labelBiome.draw(biomeLabelText);
+            }
 
             // Return resolution to how it is normally scaled
             JmUI.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
-
         }
         catch (Throwable t)
         {
-            JMLogger.logOnce("Error during MiniMap.drawMap()", t);
+            JMLogger.logOnce("Error during MiniMap.drawMap(): " + t.getMessage(), t);
         }
         finally
         {
@@ -293,11 +301,11 @@ public class MiniMap
         }
     }
 
-    private boolean isOnScreen(Point2D objectPixel)
+    private boolean isOnScreen(Point2D objectPixel, Point2D centerPixel)
     {
         if(dv.shape == DisplayVars.Shape.Circle)
         {
-            return dv.centerPoint.distance(gridRenderer.getWindowPosition(objectPixel)) < dv.minimapSize/2;
+            return centerPixel.distance(objectPixel) < dv.minimapRadius;
         }
         else
         {
@@ -305,19 +313,21 @@ public class MiniMap
         }
     }
 
-    private Point2D.Double getPointOnFrame(Point2D objectPixel)
+    private Point2D.Double getPointOnFrame(Point2D objectPixel, Point2D centerPixel, double offset)
     {
-        Point2D objectWindowPixel = gridRenderer.getWindowPosition(objectPixel);
+        //Point2D objectWindowPixel = gridRenderer.getWindowPosition(objectPixel);
         if(dv.shape == DisplayVars.Shape.Circle)
         {
             double bearing = Math.atan2(
-                    objectPixel.getY() - dv.centerPoint.getY(),
-                    objectPixel.getX() - dv.centerPoint.getX()
+                    objectPixel.getY() - centerPixel.getY(),
+                    objectPixel.getX() - centerPixel.getX()
             );
 
+            double radius = dv.minimapRadius + offset;
+
             return new Point2D.Double(
-                    (dv.minimapRadius * Math.cos(bearing)) + dv.centerPoint.getX(),
-                    (dv.minimapRadius * Math.sin(bearing)) + dv.centerPoint.getY()
+                    (radius * Math.cos(bearing)) + centerPixel.getX(),
+                    (radius * Math.sin(bearing)) + centerPixel.getY()
             );
         }
         else

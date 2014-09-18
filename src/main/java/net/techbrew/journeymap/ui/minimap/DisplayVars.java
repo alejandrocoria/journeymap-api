@@ -19,6 +19,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
+import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemeCompassPoints;
 import net.techbrew.journeymap.ui.theme.ThemeMinimapFrame;
@@ -56,6 +57,8 @@ public class DisplayVars
     final Point2D.Double centerPoint;
     final Vec3 centerVec;
     final boolean showFps;
+    final boolean showBiome;
+    final boolean showLocation;
     final boolean showCompass;
     final LabelVars labelFps, labelLocation, labelBiome;
     final ThemeMinimapFrame minimapFrame;
@@ -78,6 +81,8 @@ public class DisplayVars
         this.scaledResolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
         this.forceUnicode = JourneyMap.getMiniMapProperties().forceUnicode.get();
         this.showFps = JourneyMap.getMiniMapProperties().showFps.get();
+        this.showBiome = JourneyMap.getMiniMapProperties().showBiome.get();
+        this.showLocation = JourneyMap.getMiniMapProperties().showLocation.get();
         this.showCompass = JourneyMap.getMiniMapProperties().showCompass.get();
         this.shape = shape;
         this.position = position;
@@ -124,8 +129,11 @@ public class DisplayVars
 
         if(showCompass)
         {
-            marginX = Math.max(marginX, compassLabelHeight + minimapSpec.compassPointPad);
-            marginY = Math.max(marginY, compassLabelHeight + minimapSpec.compassPointPad);
+            TextureImpl compassPointTex = this.minimapFrame.getCompassPoint();
+            float compassPointScale = ThemeCompassPoints.getCompassPointScale(compassLabelHeight, minimapSpec, compassPointTex);
+            double compassPointMargin = compassPointTex.width/2 * compassPointScale;
+            marginX = (int) Math.max(marginX, Math.ceil(compassPointMargin));
+            marginY = (int) Math.max(marginY, Math.ceil(compassPointMargin));
         }
 
         // Assign position
@@ -133,9 +141,11 @@ public class DisplayVars
         {
             case BottomRight:
             {
-                if(!minimapSpec.labelBottomInside)
+                if(!minimapSpec.labelBottomInside && (showLocation || showBiome))
                 {
-                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (2*locationLabelHeight));
+                    int labels = showLocation ? 1 : 0;
+                    labels += showBiome ? 1 : 0;
+                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels*locationLabelHeight));
                 }
 
                 textureX = mc.displayWidth - minimapSize - marginX;
@@ -159,9 +169,12 @@ public class DisplayVars
             }
             case BottomLeft:
             {
-                if(!minimapSpec.labelBottomInside)
+                if(!minimapSpec.labelBottomInside && (showLocation || showBiome))
                 {
-                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (2*locationLabelHeight));
+                    int labels = showLocation ? 1 : 0;
+                    labels += showBiome ? 1 : 0;
+
+                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels*locationLabelHeight));
                 }
 
                 textureX = marginX;
@@ -218,17 +231,41 @@ public class DisplayVars
         double topY = textureY;
         double bottomY = textureY + minimapSize;
 
-        int yOffsetFps = minimapSpec.labelTopInside ? minimapSpec.labelTopMargin : -marginY;
-        DrawUtil.VAlign valignFps = minimapSpec.labelTopInside ? DrawUtil.VAlign.Below : DrawUtil.VAlign.Above;
-        labelFps = new LabelVars(centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, minimapSpec.fpsLabel);
+        if(showFps)
+        {
+            int yOffsetFps = minimapSpec.labelTopInside ? minimapSpec.labelTopMargin : -marginY;
+            DrawUtil.VAlign valignFps = minimapSpec.labelTopInside ? DrawUtil.VAlign.Below : DrawUtil.VAlign.Above;
+            labelFps = new LabelVars(centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, minimapSpec.fpsLabel);
+        }
+        else
+        {
+            labelFps = null;
+        }
 
-        int yOffsetBiome = minimapSpec.labelBottomInside ? -(minimapSpec.labelBottomMargin + (locationLabelHeight*2)) :marginY + locationLabelHeight;
-        DrawUtil.VAlign valignBiome = minimapSpec.labelBottomInside ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
-        labelBiome = new LabelVars(centerX, bottomY + yOffsetBiome, DrawUtil.HAlign.Center, valignBiome, fontScale, minimapSpec.fpsLabel);
 
-        int yOffsetLocation = minimapSpec.labelBottomInside ? -(minimapSpec.labelBottomMargin + (locationLabelHeight)) : marginY ;
-        DrawUtil.VAlign valignLocation = minimapSpec.labelBottomInside ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
-        labelLocation = new LabelVars(centerX, bottomY + yOffsetLocation, DrawUtil.HAlign.Center, valignLocation, fontScale, minimapSpec.fpsLabel);
+        int labelMargin = minimapSpec.labelBottomMargin + locationLabelHeight;
+        int yOffset = minimapSpec.labelBottomInside ? -labelMargin : labelMargin;
+
+        if(showLocation)
+        {
+            DrawUtil.VAlign vAlign = minimapSpec.labelBottomInside ? DrawUtil.VAlign.Below : DrawUtil.VAlign.Above;
+            labelLocation = new LabelVars(centerX, bottomY + yOffset, DrawUtil.HAlign.Center, vAlign, fontScale, minimapSpec.locationLabel);
+        }
+        else
+        {
+            labelLocation = null;
+        }
+
+        if(showBiome)
+        {
+            DrawUtil.VAlign vAlign = minimapSpec.labelBottomInside && showLocation ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
+            labelBiome = new LabelVars(centerX, bottomY + yOffset, DrawUtil.HAlign.Center, vAlign, fontScale, minimapSpec.biomeLabel);
+        }
+        else
+        {
+            labelBiome = null;
+        }
+
     }
 
     /**

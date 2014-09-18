@@ -25,6 +25,8 @@ public class MiniMapProperties extends InGameMapProperties
     public final AtomicReference<DisplayVars.Shape> shape = new AtomicReference<DisplayVars.Shape>(DisplayVars.Shape.Square);
     public final AtomicReference<DisplayVars.Position> position = new AtomicReference<DisplayVars.Position>(DisplayVars.Position.TopRight);
     public final AtomicBoolean showFps = new AtomicBoolean(false);
+    public final AtomicBoolean showBiome = new AtomicBoolean(true);
+    public final AtomicBoolean showLocation = new AtomicBoolean(true);
     public final AtomicBoolean enableHotkeys = new AtomicBoolean(true);
     public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
     public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("2D");

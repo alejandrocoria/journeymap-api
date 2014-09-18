@@ -30,8 +30,10 @@ public class ThemeCompassPoints
     final Color compassPointColor;
     final TextureImpl compassPointTex;
     final float compassPointScale;
-    final int compassPointXOffset;
-    final int compassPointYOffset;
+    final int xOffset;
+    final int yOffset;
+    final double shiftVert;
+    final double shiftHorz;
     private double x;
     private double y;
 
@@ -39,6 +41,7 @@ public class ThemeCompassPoints
     {
         this.x = x;
         this.y = y;
+
         pointNorth = new Point2D.Double(x + radius, y);
         pointSouth = new Point2D.Double(x + radius, y + radius + radius);
         pointWest = new Point2D.Double(x, y + radius);
@@ -55,17 +58,36 @@ public class ThemeCompassPoints
         compassPointColor = Theme.getColor(minimapSpec.compassPointColor);
         if(this.compassPointTex != null)
         {
-            compassPointScale = (compassLabelHeight + minimapSpec.compassPointPad) / (compassPointTex.height *1f);
-            compassPointXOffset = (int)(compassPointTex.width * compassPointScale) / 2;
-            compassPointYOffset = (int)(compassPointTex.height * compassPointScale) / 2;
+            // Scale to accommodate font
+            compassPointScale = getCompassPointScale(compassLabelHeight, minimapSpec, compassPointTex);
+
+            // Deal with theme-specified offsets
+            this.shiftVert = minimapSpec.compassPointOffset * compassPointScale;
+            this.shiftHorz = minimapSpec.compassPointOffset * compassPointScale;
+
+            pointNorth.setLocation(pointNorth.getX(), pointNorth.getY() - shiftVert);
+            pointSouth.setLocation(pointSouth.getX(), pointSouth.getY() + shiftVert);
+
+            pointWest.setLocation(pointWest.getX() - shiftHorz, pointWest.getY());
+            pointEast.setLocation(pointEast.getX() + shiftHorz, pointEast.getY());
+
+            xOffset = (int) (((compassPointTex.width * compassPointScale) / 2));
+            yOffset = (int) (((compassPointTex.height * compassPointScale) / 2));
+
         }
         else
         {
             compassPointScale = 0;
-            compassPointXOffset = 0;
-            compassPointYOffset = 0;
+            xOffset = 0;
+            yOffset = 0;
+            shiftHorz = 0;
+            shiftVert = 0;
         }
+    }
 
+    public static float getCompassPointScale(int compassLabelHeight, Theme.Minimap.MinimapSpec minimapSpec, TextureImpl compassPointTex)
+    {
+        return (compassLabelHeight + minimapSpec.compassPointLabelPad) / (compassPointTex.height *1f);
     }
 
     public void setPosition(final double x, final double y)
@@ -78,10 +100,10 @@ public class ThemeCompassPoints
     {
         if(compassPointTex !=null)
         {
-            DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointNorth.getX() - compassPointXOffset, pointNorth.getY() - compassPointYOffset, compassPointScale, 0);
-            DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointSouth.getX() - compassPointXOffset, pointSouth.getY() - compassPointYOffset, compassPointScale, 0);
-            DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointWest.getX() - compassPointXOffset, pointWest.getY() - compassPointYOffset, compassPointScale, 0);
-            DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointEast.getX() - compassPointXOffset, pointEast.getY() - compassPointYOffset, compassPointScale, 0);
+            DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointNorth.getX() - xOffset, pointNorth.getY() - yOffset, compassPointScale, 0);
+            DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointSouth.getX() - xOffset, pointSouth.getY() - yOffset, compassPointScale, 180);
+            DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointWest.getX() - xOffset, pointWest.getY() - yOffset, compassPointScale, -90);
+            DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointEast.getX() - xOffset, pointEast.getY() - yOffset, compassPointScale, 90);
         }
     }
 

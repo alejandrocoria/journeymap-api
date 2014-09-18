@@ -39,6 +39,9 @@ public class ThemeMinimapFrame
     private boolean isSquare;
     private boolean showReticle;
     private int reticleAlpha;
+    private double reticleThickness;
+    private double reticleSegmentLength;
+    private double reticleOffset;
     private Color reticleColor;
 
     public ThemeMinimapFrame(Theme theme, Theme.Minimap.MinimapSpec minimapSpec, int size)
@@ -86,6 +89,10 @@ public class ThemeMinimapFrame
         this.showReticle = JourneyMap.getMiniMapProperties().showReticle.get();
         this.reticleColor = Theme.getColor(minimapSpec.reticleColor);
         this.reticleAlpha = minimapSpec.reticleAlpha;
+        this.reticleThickness = minimapSpec.reticleThickness;
+        this.reticleOffset = minimapSpec.reticleOffset;
+        this.reticleSegmentLength = (height/2)-16+reticleOffset;
+
     }
 
     public void setPosition(final double x, final double y)
@@ -110,14 +117,17 @@ public class ThemeMinimapFrame
     {
         if(showReticle)
         {
-            double thick = 2.25d;
-            double vlen = (height/2)-16;
-            DrawUtil.drawRectangle(x + (width/2), y, thick, vlen, reticleColor, reticleAlpha);
-            DrawUtil.drawRectangle(x + (width/2), y + height-vlen, thick, vlen, reticleColor, reticleAlpha);
+            // North
+            DrawUtil.drawRectangle(x + (width/2), y - reticleOffset, reticleThickness, reticleSegmentLength, reticleColor, reticleAlpha);
 
-            double hlen = (width/2)-16;
-            DrawUtil.drawRectangle(x, y + (height/2), hlen, thick, reticleColor, reticleAlpha);
-            DrawUtil.drawRectangle(x + width - hlen, y + (height/2), hlen, thick, reticleColor, reticleAlpha);
+            // South
+            DrawUtil.drawRectangle(x + (width/2), y + height-reticleSegmentLength+reticleOffset, reticleThickness, reticleSegmentLength, reticleColor, reticleAlpha);
+
+            // West
+            DrawUtil.drawRectangle(x - reticleOffset, y + (height/2), reticleSegmentLength, reticleThickness, reticleColor, reticleAlpha);
+
+            // East
+            DrawUtil.drawRectangle(x + width - reticleSegmentLength + reticleOffset, y + (height/2), reticleSegmentLength, reticleThickness, reticleColor, reticleAlpha);
         }
 
         if(isSquare)
