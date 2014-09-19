@@ -12,7 +12,12 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New Feature: Minimap now has compass points
+- Change: Theme options expanded to control styling of the Minimap's compass points.
+- Change: Off-map waypoints now stick to the perimeter of the Minimap frame (circle and square)
+- Change: Orientation of "My Heading" is no longer enabled for the Square shape.  (To many issues getting waypoints to stick to the perimeter.)
 - Bugfix: Minimap wasn't centered correctly when in Top Left or Top Right positions
+- Bugfix: In "Old North" orientation, North should be on the right, not the left.
 - Change: New option in CoreProperties: "hideSneakingEntities", defaults to true (1) to match current functionality
 
 ## Changelog for JourneyMap 4.1.0alpha21:

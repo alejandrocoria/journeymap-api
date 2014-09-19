@@ -25,6 +25,7 @@ public class DrawWayPointStep implements DrawStep
 
     public final Waypoint waypoint;
     Point2D.Double lastPosition;
+    Point2D.Double lastWindowPosition;
     boolean lastOnScreen;
     final Color color;
     final Color fontColor;
@@ -105,7 +106,13 @@ public class DrawWayPointStep implements DrawStep
         Point2D.Double pixel = gridRenderer.getBlockPixelInGrid(x, z);
         pixel.setLocation(pixel.getX() + halfBlock + xOffset, pixel.getY() + halfBlock + yOffset);
         lastPosition = pixel;
+        lastWindowPosition = gridRenderer.getWindowPosition(lastPosition);
         return pixel;
+    }
+
+    public Point2D.Double getLastWindowPosition()
+    {
+        return lastWindowPosition;
     }
 
     public int getTextureHeight()

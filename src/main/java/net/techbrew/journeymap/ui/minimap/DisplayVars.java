@@ -12,8 +12,6 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Vec3;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.ThemeFileHandler;
@@ -26,7 +24,6 @@ import net.techbrew.journeymap.ui.theme.ThemeMinimapFrame;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 
 /**
@@ -52,10 +49,7 @@ public class DisplayVars
     int marginX, marginY;
     final int fpsLabelHeight;
     final int locationLabelHeight;
-    final Rectangle2D.Double frameRect;
-    final AxisAlignedBB frameAABB;
     final Point2D.Double centerPoint;
-    final Vec3 centerVec;
     final boolean showFps;
     final boolean showBiome;
     final boolean showLocation;
@@ -214,9 +208,7 @@ public class DisplayVars
 
         // Assign frame rectangle and centers
         this.centerPoint = new Point2D.Double(textureX + minimapRadius, textureY + minimapRadius);
-        this.centerVec = Vec3.createVectorHelper(centerPoint.getX(), centerPoint.getY(), 0);
-        this.frameRect = new Rectangle2D.Double(textureX, textureY, minimapSize, minimapSize);
-        this.frameAABB = AxisAlignedBB.getBoundingBox(frameRect.x, frameRect.y, 0, frameRect.getMaxX(), frameRect.getMaxY(), 0);
+
 
         // Set up compass poionts
         if(showCompass)

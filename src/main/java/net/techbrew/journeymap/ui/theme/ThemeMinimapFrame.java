@@ -7,6 +7,7 @@ import net.techbrew.journeymap.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 /**
  * Created by Mark on 9/7/2014.
@@ -43,6 +44,7 @@ public class ThemeMinimapFrame
     private double reticleSegmentLength;
     private double reticleOffset;
     private Color reticleColor;
+    private Rectangle.Double frameBounds;
 
     public ThemeMinimapFrame(Theme theme, Theme.Minimap.MinimapSpec minimapSpec, int size)
     {
@@ -99,6 +101,7 @@ public class ThemeMinimapFrame
     {
         this.x = x;
         this.y = y;
+        this.frameBounds = new Rectangle2D.Double(x, y, width, height);
     }
 
     public void drawMask()
@@ -167,6 +170,11 @@ public class ThemeMinimapFrame
     private TextureImpl getTexture(String suffix, int width, int height, boolean resize, boolean retain)
     {
         return TextureCache.instance().getThemeTexture(theme, String.format(resourcePattern, suffix), width, height, resize, frameAlpha, retain);
+    }
+
+    public Rectangle.Double getFrameBounds()
+    {
+        return frameBounds;
     }
 
     public double getX()
