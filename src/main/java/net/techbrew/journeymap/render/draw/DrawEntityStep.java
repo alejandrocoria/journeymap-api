@@ -10,6 +10,7 @@ package net.techbrew.journeymap.render.draw;
 
 import com.google.common.cache.CacheLoader;
 import net.minecraft.entity.player.EntityPlayer;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.render.map.GridRenderer;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -26,6 +27,7 @@ public class DrawEntityStep implements DrawStep
     static final int labelBgAlpha = 205;
     static final Color labelFg = Color.white;
     static final int labelFgAlpha = 225;
+    boolean hideSneaks = JourneyMap.getCoreProperties().hideSneakingEntities.get();
 
     EntityDTO entityDTO;
     TextureImpl texture;
@@ -48,7 +50,7 @@ public class DrawEntityStep implements DrawStep
     @Override
     public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
-        if (entityDTO.entityLiving==null || entityDTO.entityLiving.isDead || !entityDTO.entityLiving.addedToChunk || entityDTO.entityLiving.isSneaking())
+        if (entityDTO.entityLiving==null || entityDTO.entityLiving.isDead || !entityDTO.entityLiving.addedToChunk || (hideSneaks &&entityDTO.entityLiving.isSneaking()))
         {
             return;
         }

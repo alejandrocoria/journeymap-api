@@ -13,6 +13,7 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 - Bugfix: Minimap wasn't centered correctly when in Top Left or Top Right positions
+- Change: New option in CoreProperties: "hideSneakingEntities", defaults to true (1) to match current functionality
 
 ## Changelog for JourneyMap 4.1.0alpha21:
 - Bugfix: Margin above minimap was too big if FPS wasn't shown
