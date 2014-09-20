@@ -209,16 +209,8 @@ public class DisplayVars
         // Assign frame rectangle and centers
         this.centerPoint = new Point2D.Double(textureX + minimapRadius, textureY + minimapRadius);
 
-
         // Set up compass poionts
-        if(showCompass)
-        {
-            this.minimapCompassPoints = new ThemeCompassPoints(textureX, textureY, minimapRadius, minimapSpec, this.minimapFrame.getCompassPoint(), useUnicode, compassLabelHeight);
-        }
-        else
-        {
-            this.minimapCompassPoints = null;
-        }
+        this.minimapCompassPoints = new ThemeCompassPoints(textureX, textureY, minimapRadius, minimapSpec, this.minimapFrame.getCompassPoint(), useUnicode, compassLabelHeight);
 
         // Set up label positions
         double centerX = Math.floor(textureX + (minimapSize / 2));
