@@ -252,7 +252,7 @@ public class DisplayVars
 
         if(showBiome)
         {
-            DrawUtil.VAlign vAlign = minimapSpec.labelBottomInside && showLocation ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
+            DrawUtil.VAlign vAlign = (minimapSpec.labelBottomInside == showLocation) ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
             labelBiome = new LabelVars(centerX, bottomY + yOffset, DrawUtil.HAlign.Center, vAlign, fontScale, minimapSpec.biomeLabel);
         }
         else

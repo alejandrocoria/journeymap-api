@@ -274,11 +274,11 @@ public class MiniMap
             {
                 dv.labelFps.draw(fpsLabelText);
             }
-            if(dv.showBiome)
+            if(dv.showLocation)
             {
                 dv.labelLocation.draw(locationLabelText);
             }
-            if(dv.showLocation)
+            if(dv.showBiome)
             {
                 dv.labelBiome.draw(biomeLabelText);
             }
