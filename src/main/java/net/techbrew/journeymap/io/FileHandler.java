@@ -28,6 +28,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -504,7 +505,7 @@ public class FileHandler
             boolean inJar = FileHandler.isInJar();
             if (inJar)
             {
-                fromPath = resourceDir.getPath().split("file:")[1].split("!/")[0];
+                fromPath = URLDecoder.decode(resourceDir.getPath(), "utf-8").split("file:")[1].split("!/")[0];
                 FileHandler.copyFromZip(fromPath, toPath, toDir, overwrite);
             }
             else
@@ -548,7 +549,7 @@ public class FileHandler
                     {
                         if (!entry.isDirectory())
                         {
-                            toFile.getParentFile().mkdirs();
+                            Files.createParentDirs(toFile);
                             new ZipEntryByteSource(zipFile, entry).copyTo(Files.asByteSink(toFile));
                         }
                     }

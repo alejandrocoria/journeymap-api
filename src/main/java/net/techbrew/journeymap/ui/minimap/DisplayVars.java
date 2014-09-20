@@ -113,7 +113,11 @@ public class DisplayVars
         locationLabelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, minimapSpec.locationLabel.shadow) * (useUnicode ? .7 : 1) * this.fontScale);
 
         int compassFontScale = (JourneyMap.getMiniMapProperties().compassFontSmall.get() ? 1 : 2) * (useUnicode ? 2 : 1);
-        int compassLabelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, minimapSpec.compassLabel.shadow) * (useUnicode ? .7 : 1) * compassFontScale);
+        int compassLabelHeight = 0;
+        if(showCompass)
+        {
+            compassLabelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, minimapSpec.compassLabel.shadow) * (useUnicode ? .7 : 1) * compassFontScale);
+        }
 
         drawScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);
 
@@ -121,15 +125,24 @@ public class DisplayVars
         marginX = marginY = minimapSpec.margin;
         minimapRadius = minimapSize/2;
 
-        boolean showCompass = minimapSpec.compassPoint!=null && minimapSpec.compassPoint.width>0;
+
 
         if(showCompass)
         {
-            TextureImpl compassPointTex = this.minimapFrame.getCompassPoint();
-            float compassPointScale = ThemeCompassPoints.getCompassPointScale(compassLabelHeight, minimapSpec, compassPointTex);
-            double compassPointMargin = compassPointTex.width/2 * compassPointScale;
+            double compassPointMargin;
+            boolean compassExists = minimapSpec.compassPoint!=null && minimapSpec.compassPoint.width>0;
+            if(compassExists)
+            {
+                TextureImpl compassPointTex = this.minimapFrame.getCompassPoint();
+                float compassPointScale = ThemeCompassPoints.getCompassPointScale(compassLabelHeight, minimapSpec, compassPointTex);
+                compassPointMargin = compassPointTex.width / 2 * compassPointScale;
+            }
+            else
+            {
+                compassPointMargin = compassLabelHeight;
+            }
             marginX = (int) Math.max(marginX, Math.ceil(compassPointMargin));
-            marginY = (int) Math.max(marginY, Math.ceil(compassPointMargin));
+            marginY = (int) Math.max(marginY, Math.ceil(compassPointMargin) + compassLabelHeight/2);
         }
 
         // Assign position
@@ -141,7 +154,7 @@ public class DisplayVars
                 {
                     int labels = showLocation ? 1 : 0;
                     labels += showBiome ? 1 : 0;
-                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels*locationLabelHeight));
+                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels*locationLabelHeight) + compassLabelHeight/2);
                 }
 
                 textureX = mc.displayWidth - minimapSize - marginX;
@@ -154,7 +167,7 @@ public class DisplayVars
             {
                 if(!minimapSpec.labelTopInside && showFps)
                 {
-                    marginY = Math.max(marginY, fpsLabelHeight);
+                    marginY = Math.max(marginY, Math.max(compassLabelHeight/2, minimapSpec.labelTopMargin) + fpsLabelHeight);
                 }
 
                 textureX = marginX;
@@ -170,7 +183,7 @@ public class DisplayVars
                     int labels = showLocation ? 1 : 0;
                     labels += showBiome ? 1 : 0;
 
-                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels*locationLabelHeight));
+                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels*locationLabelHeight) + compassLabelHeight/2);
                 }
 
                 textureX = marginX;
@@ -192,7 +205,7 @@ public class DisplayVars
             {
                 if(!minimapSpec.labelTopInside && showFps)
                 {
-                    marginY = Math.max(marginY, fpsLabelHeight);
+                    marginY = Math.max(marginY, Math.max(compassLabelHeight/2, minimapSpec.labelTopMargin) + fpsLabelHeight);
                 }
 
                 textureX = mc.displayWidth - minimapSize - marginX;
@@ -219,7 +232,8 @@ public class DisplayVars
 
         if(showFps)
         {
-            int yOffsetFps = minimapSpec.labelTopInside ? minimapSpec.labelTopMargin : -marginY;
+            int topMargin = Math.max(compassLabelHeight/2, minimapSpec.labelTopMargin);
+            int yOffsetFps = minimapSpec.labelTopInside ? minimapSpec.labelTopMargin : -topMargin;
             DrawUtil.VAlign valignFps = minimapSpec.labelTopInside ? DrawUtil.VAlign.Below : DrawUtil.VAlign.Above;
             labelFps = new LabelVars(centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, minimapSpec.fpsLabel);
         }
@@ -229,13 +243,17 @@ public class DisplayVars
         }
 
 
-        int labelMargin = minimapSpec.labelBottomMargin + locationLabelHeight;
+        int labelMargin = Math.max(compassLabelHeight/2, minimapSpec.labelBottomMargin);
         int yOffset = minimapSpec.labelBottomInside ? -labelMargin : labelMargin;
 
         if(showLocation)
         {
-            DrawUtil.VAlign vAlign = minimapSpec.labelBottomInside ? DrawUtil.VAlign.Below : DrawUtil.VAlign.Above;
+            DrawUtil.VAlign vAlign = minimapSpec.labelBottomInside ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
             labelLocation = new LabelVars(centerX, bottomY + yOffset, DrawUtil.HAlign.Center, vAlign, fontScale, minimapSpec.locationLabel);
+            if(showBiome)
+            {
+                yOffset += locationLabelHeight;
+            }
         }
         else
         {
@@ -244,7 +262,7 @@ public class DisplayVars
 
         if(showBiome)
         {
-            DrawUtil.VAlign vAlign = (minimapSpec.labelBottomInside == showLocation) ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
+            DrawUtil.VAlign vAlign = (minimapSpec.labelBottomInside) ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
             labelBiome = new LabelVars(centerX, bottomY + yOffset, DrawUtil.HAlign.Center, vAlign, fontScale, minimapSpec.biomeLabel);
         }
         else

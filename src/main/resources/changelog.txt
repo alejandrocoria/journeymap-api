@@ -12,6 +12,11 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Minimap broke if "show compass" was on in Purist theme
+- Bugfix: Minimap margins were wrong, hid FPS text
+- Bugfix: File operations to unzip theme files from jar would break on Linux if the target path had spaces or characters that might be URL encoded
+
+## Changelog for JourneyMap 4.1.0alpha21:
 - New Feature: Minimap now has (optional) compass points and an (optional) reticle
 - Change: Minimap Options expanded to display multiple new options
 - Change: Theme options expanded to control styling of the Minimap's compass points and reticle
