@@ -29,6 +29,7 @@ public class MiniMapOptions extends JmUI
     private Button buttonShowLocation, buttonShowBiome, buttonCompass, buttonCompassFont, buttonReticle;
     private IconSetButton buttonIconSet;
     private EnumPropertyButton<DisplayVars.Orientation> buttonOrientation;
+    private EnumPropertyButton<DisplayVars.ReticleOrientation> buttonReticleOrientation;
     private SliderButton buttonTerrainAlpha, buttonFrameAlpha, buttonSize;
     private ArrayList<ButtonList> buttonRows;
 
@@ -137,6 +138,8 @@ public class MiniMapOptions extends JmUI
         buttonOrientation = new EnumPropertyButton<DisplayVars.Orientation>(ButtonEnum.Orientation.ordinal(), DisplayVars.Orientation.values(),
                 "jm.minimap.orientation.button", miniMapProperties, miniMapProperties.orientation);
 
+        buttonReticleOrientation = new EnumPropertyButton<DisplayVars.ReticleOrientation>(ButtonEnum.ReticleOrientation.ordinal(), DisplayVars.ReticleOrientation.values(),
+                "jm.minimap.reticle_orientation", miniMapProperties, miniMapProperties.reticleOrientation);
 
         /** Button lists **/
 
@@ -144,10 +147,12 @@ public class MiniMapOptions extends JmUI
         buttonRows = new ArrayList<ButtonList>();
 
         buttonRows.add(new ButtonList(buttonPosition, buttonShape, buttonOrientation));
+        ButtonList reticleRow = new ButtonList(buttonReticle, buttonReticleOrientation, buttonCompass);
+        buttonReticleOrientation.setDrawButton(false);
+        buttonRows.add(reticleRow);
         buttonRows.add(new ButtonList(buttonShowfps, buttonShowLocation, buttonShowBiome));
-        buttonRows.add(new ButtonList(buttonShowSelf, buttonReticle, buttonCompass));
+        buttonRows.add(new ButtonList(buttonIconSet, buttonShowSelf, buttonTextureSize));
         buttonRows.add(new ButtonList(buttonUnicode, buttonFontSize, buttonCompassFont));
-        buttonRows.add(new ButtonList(buttonIconSet, buttonTextureSize, buttonKeyboard));
 
         buttonList.add(buttonMiniMap);
         for(ButtonList row : buttonRows)
@@ -155,16 +160,23 @@ public class MiniMapOptions extends JmUI
             buttonList.addAll(row);
         }
         new ButtonList(buttonList).equalizeWidths(getFontRenderer());
+        buttonReticleOrientation.setDrawButton(true);
+        reticleRow.equalizeWidths(getFontRenderer(), 3, buttonRows.get(0).getWidth(3));
 
-        ButtonList sliders = new ButtonList(buttonSize, buttonTerrainAlpha, buttonFrameAlpha);
-        sliders.equalizeWidths(getFontRenderer(), 3, buttonRows.get(0).getWidth(3));
-        buttonRows.add(0, sliders);
-        buttonList.addAll(sliders);
+        ButtonList keyboardRow = new ButtonList(buttonKeyboard, buttonKeyboardHelp);
+        keyboardRow.setWidths(buttonMiniMap.getWidth());
+        buttonRows.add(keyboardRow);
+        buttonList.addAll(keyboardRow);
+
+        ButtonList slidersRow = new ButtonList(buttonSize, buttonTerrainAlpha, buttonFrameAlpha);
+        slidersRow.setWidths(buttonMiniMap.getWidth());
+        buttonRows.add(0, slidersRow);
+        buttonList.addAll(slidersRow);
 
         buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
         buttonCloseAll = new Button(ButtonEnum.CloseAll, Constants.getString("jm.minimap.return_to_game")); //$NON-NLS-1$
 
-        bottomButtons = new ButtonList(buttonKeyboardHelp, buttonGeneralDisplay, buttonClose, buttonCloseAll);
+        bottomButtons = new ButtonList(buttonGeneralDisplay, buttonClose, buttonCloseAll);
         bottomButtons.equalizeWidths(getFontRenderer());
         buttonList.addAll(bottomButtons);
 
@@ -381,6 +393,12 @@ public class MiniMapOptions extends JmUI
                 break;
             }
 
+            case ReticleOrientation:
+            {
+                miniMap.updateDisplayVars(true);
+                break;
+            }
+
             case Close:
             {
                 closeAndReturn();
@@ -491,7 +509,7 @@ public class MiniMapOptions extends JmUI
     private enum ButtonEnum
     {
         MiniMap, Position, Shape, Font, Texture, IconSet, Unicode, Keyboard, KeyboardHelp, Close, Showfps, ShowSelf,
-        Location, Biome, Compass, CompassFont, Reticle,
+        Location, Biome, Compass, CompassFont, Reticle,ReticleOrientation,
         GeneralDisplay, Orientation, TerrainAlpha, FrameAlpha, CustomSize, CloseAll
     }
 }

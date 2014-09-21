@@ -12,6 +12,9 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New Option: "Reticle Orientation" in Minimap Options. Can be "Compass" (the default) or "My Heading"
+
+## Changelog for JourneyMap 4.1.0alpha24:
 - Bugfix: Waypoint labels fixed on minimap
 - Bugfix: Waypoints now update position when panning fullscreen map
 - Change: Fullscreen Map toolbar buttons no longer shown if the Feature isn't allowed

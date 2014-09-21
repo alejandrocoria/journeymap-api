@@ -219,7 +219,23 @@ public class MiniMap
                 GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
 
                 // Draw Reticle
-                dv.minimapFrame.drawReticle();
+                DisplayVars.ReticleOrientation reticleOrientation = null;
+                if(dv.showReticle)
+                {
+                    reticleOrientation = dv.minimapFrame.getReticleOrientation();
+                    if (reticleOrientation==DisplayVars.ReticleOrientation.Compass)
+                    {
+                        dv.minimapFrame.drawReticle();
+                    }
+                    else
+                    {
+                        /***** BEGIN MATRIX: ROTATION *****/
+                        startMapRotation(player.rotationYawHead);
+                        dv.minimapFrame.drawReticle();
+                        /***** END MATRIX: ROTATION *****/
+                        stopMapRotation(player.rotationYawHead);
+                    }
+                }
 
                 // Draw Frame
                 if (dv.shape == DisplayVars.Shape.Circle || rotation == 0)

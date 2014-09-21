@@ -37,6 +37,7 @@ public class MiniMapProperties extends InGameMapProperties
     public final AtomicBoolean compassFontSmall = new AtomicBoolean(false);
     public final AtomicBoolean showCompass = new AtomicBoolean(true);
     public final AtomicBoolean showReticle = new AtomicBoolean(true);
+    public final AtomicReference<DisplayVars.ReticleOrientation> reticleOrientation = new AtomicReference<DisplayVars.ReticleOrientation>(DisplayVars.ReticleOrientation.Compass);
 
     protected transient final String name = "minimap";
 

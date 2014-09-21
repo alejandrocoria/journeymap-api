@@ -4,6 +4,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
+import net.techbrew.journeymap.ui.minimap.DisplayVars;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -16,6 +17,7 @@ public class ThemeMinimapFrame
 {
     private final Theme theme;
     private final Theme.Minimap.MinimapSpec minimapSpec;
+    private final DisplayVars.ReticleOrientation reticleOrientation;
 
     private final String resourcePattern;
     private TextureImpl textureTopLeft;
@@ -54,6 +56,7 @@ public class ThemeMinimapFrame
         this.height = size;
         this.frameColor = Theme.getColor(minimapSpec.frameColor);
         this.frameAlpha = JourneyMap.getMiniMapProperties().frameAlpha.get()/255f;
+        this.reticleOrientation = JourneyMap.getMiniMapProperties().reticleOrientation.get();
 
         if(minimapSpec instanceof Theme.Minimap.MinimapSquare)
         {
@@ -205,5 +208,10 @@ public class ThemeMinimapFrame
     public double getHeight()
     {
         return height;
+    }
+
+    public DisplayVars.ReticleOrientation getReticleOrientation()
+    {
+        return reticleOrientation;
     }
 }

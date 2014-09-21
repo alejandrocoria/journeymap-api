@@ -353,6 +353,25 @@ public class DisplayVars
         }
     }
 
+    public enum ReticleOrientation
+    {
+        Compass("jm.minimap.orientation.compass"),
+        PlayerHeading("jm.minimap.orientation.playerheading");
+
+        public final String label;
+
+        private ReticleOrientation(String label)
+        {
+            this.label = label;
+        }
+
+        @Override
+        public String toString()
+        {
+            return Constants.getString(this.label);
+        }
+    }
+
     /**
      * Shape (and size) of minimap
      */
