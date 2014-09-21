@@ -19,6 +19,8 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.data.WaypointsData;
+import net.techbrew.journeymap.feature.Feature;
+import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
@@ -419,18 +421,23 @@ public class Fullscreen extends JmUI
 
             buttonMobs = new ThemeToggle(id++, theme, "", "monsters");
             buttonMobs.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showMobs), "jm.common.show_monsters");
+            buttonMobs.setDrawButton(FeatureManager.isAllowed(Feature.RadarMobs));
 
             buttonAnimals = new ThemeToggle(id++, theme, "", "animals");
             buttonAnimals.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showAnimals), "jm.common.show_animals");
+            buttonAnimals.setDrawButton(FeatureManager.isAllowed(Feature.RadarAnimals));
 
             buttonPets = new ThemeToggle(id++, theme, "", "pets");
             buttonPets.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showPets), "jm.common.show_pets");
+            buttonPets.setDrawButton(FeatureManager.isAllowed(Feature.RadarAnimals));
 
             buttonVillagers = new ThemeToggle(id++, theme, "", "villagers");
             buttonVillagers.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showVillagers), "jm.common.show_villagers");
+            buttonVillagers.setDrawButton(FeatureManager.isAllowed(Feature.RadarVillagers));
 
             buttonPlayers = new ThemeToggle(id++, theme, "", "players");
             buttonPlayers.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showPlayers), "jm.common.show_players");
+            buttonPlayers.setDrawButton(!mc.isSingleplayer() && FeatureManager.isAllowed(Feature.RadarPlayers));
 
             buttonGrid = new ThemeToggle(id++, theme, "", "grid");
             buttonGrid.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showGrid), "jm.common.show_grid");

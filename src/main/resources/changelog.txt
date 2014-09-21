@@ -14,6 +14,7 @@ http://journeymap.techbrew.net
 ## Changelog for JourneyMap @JMVERSION@:
 - Bugfix: Waypoint labels fixed on minimap
 - Bugfix: Waypoints now update position when panning fullscreen map
+- Change: Fullscreen Map toolbar buttons no longer shown if the Feature isn't allowed
 
 ## Changelog for JourneyMap 4.1.0alpha23:
 - Bugfix: Minimap broke if "show compass" was on in Purist theme
