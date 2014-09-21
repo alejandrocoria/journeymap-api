@@ -66,7 +66,7 @@ public class DrawWayPointStep implements DrawStep
             return;
         }
 
-        Point2D.Double pixel = getPosition(xOffset, yOffset, gridRenderer, false);
+        Point2D.Double pixel = getPosition(xOffset, yOffset, gridRenderer, true);
         if (gridRenderer.isOnScreen(pixel))
         {
             Point2D labelPoint = gridRenderer.shiftWindowPosition(pixel.getX(), pixel.getY(), 0, rotation==0 ? -texture.height : texture.height);

@@ -335,8 +335,6 @@ public class MiniMap
     private void startMapRotation(double rotation)
     {
         GL11.glPushMatrix();
-        gridRenderer.updateGL(rotation);
-
         if (rotation % 360 != 0)
         {
             double width = dv.displayWidth / 2 + (dv.translateX);
@@ -347,6 +345,8 @@ public class MiniMap
             GL11.glRotated(rotation, 0, 0, 1.0f);
             GL11.glTranslated(-width, -height, 0);
         }
+
+        gridRenderer.updateGL(rotation);
     }
 
     private void stopMapRotation(double rotation)
