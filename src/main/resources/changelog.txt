@@ -13,6 +13,9 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 - New Option: "Reticle Orientation" in Minimap Options. Can be "Compass" (the default) or "My Heading"
+- Change: [Pulled from 4.0.5] Version check info moved to DropBox after exceeding Google Drive's quota
+- Change: [Pulled from 4.0.5] Version check no longer announces a new version is available in chat.(UI elements still display in Fullscreen Map and Webmap.)
+- Bugfix: [Pulled from 4.0.5] Waypoint Manager wouldn't open because of error (created by a Forge build that came after the recommended release)
 
 ## Changelog for JourneyMap 4.1.0alpha24:
 - Bugfix: Waypoint labels fixed on minimap
