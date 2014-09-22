@@ -8,8 +8,13 @@
 
 package net.techbrew.journeymap.command;
 
+import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.Vec3;
+import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 
 /**
@@ -29,12 +34,39 @@ public class CmdTeleportWaypoint
     {
         if(mc.getIntegratedServer()!=null)
         {
-            return mc.getIntegratedServer().getConfigurationManager().func_152596_g(mc.thePlayer.getGameProfile());
+            IntegratedServer mcServer = mc.getIntegratedServer();
+            ServerConfigurationManager configurationManager = null;
+            GameProfile profile = null;
+            try
+            {
+                profile = new GameProfile(mc.thePlayer.getUniqueID(), mc.thePlayer.getCommandSenderName());
+                configurationManager = mcServer.getConfigurationManager();
+                return configurationManager.func_152596_g(profile);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                try
+                {
+                    if (profile != null && configurationManager != null)
+                    {
+                        return mcServer.isSinglePlayer()
+                                && mcServer.worldServers[0].getWorldInfo().areCommandsAllowed()
+                                && mcServer.getServerOwner().equalsIgnoreCase(profile.getName());
+                    }
+                    else
+                    {
+                        JourneyMap.getLogger().warning("Failed to check teleport permission both ways: " + LogFormatter.toString(e) + ", and profile or configManager were null.");
+                    }
+                }
+                catch (Exception e2)
+                {
+                    JourneyMap.getLogger().warning("Failed to check teleport permission. Both ways failed: " + LogFormatter.toString(e) + ", and " + LogFormatter.toString(e2));
+                }
+            }
         }
-        else
-        {
-            return true;
-        }
+
+        return true;
     }
 
     public void run()
