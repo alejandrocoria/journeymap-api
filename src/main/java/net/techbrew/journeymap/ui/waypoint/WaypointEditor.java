@@ -3,6 +3,7 @@ package net.techbrew.journeymap.ui.waypoint;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.WorldProvider;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -107,9 +108,9 @@ public class WaypointEditor extends JmUI
 
             // Update player pos
             String pos = Constants.getString("MapOverlay.location_xzy",
-                    Integer.toString((int) mc.thePlayer.posX),
-                    Integer.toString((int) mc.thePlayer.posZ),
-                    Integer.toString((int) mc.thePlayer.posY));
+                    MathHelper.floor_double(mc.thePlayer.posX),
+                    MathHelper.floor_double(mc.thePlayer.posZ),
+                    MathHelper.floor_double(mc.thePlayer.posY));
             currentLocation = Constants.getString("Waypoint.current_location", " " + pos);
 
             if (this.fieldList.isEmpty())
