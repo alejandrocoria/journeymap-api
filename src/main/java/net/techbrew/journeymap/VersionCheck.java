@@ -9,14 +9,13 @@
 package net.techbrew.journeymap;
 
 import com.google.common.base.Strings;
+import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.Loader;
-import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.thread.JMThreadFactory;
-import org.apache.logging.log4j.Level;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
@@ -82,6 +81,7 @@ public class VersionCheck
                     JourneyMap.getLogger().info("Checking for updated version: " + JourneyMap.VERSION_URL); //$NON-NLS-1$
                     InputStreamReader in = null;
                     HttpsURLConnection connection = null;
+                    String rawResponse = null;
                     try
                     {
                         URL uri = URI.create(JourneyMap.VERSION_URL).toURL();
@@ -91,9 +91,10 @@ public class VersionCheck
                         connection.setRequestMethod("GET");
                         connection.setRequestProperty("User-Agent", createUserAgent());
                         in = new InputStreamReader(uri.openStream());
+                        rawResponse = CharStreams.toString(in);
 
                         Gson gson = new GsonBuilder().create();
-                        VersionData versionData = gson.fromJson(in, VersionData.class);
+                        VersionData versionData = gson.fromJson(rawResponse, VersionData.class);
 
                         if(versionData.versions!=null)
                         {
@@ -117,7 +118,7 @@ public class VersionCheck
                     }
                     catch (Throwable e)
                     {
-                        JourneyMap.getLogger().log(Level.ERROR, "Could not check version URL", e); //$NON-NLS-1$
+                        JourneyMap.getLogger().error("Could not check version URL", e); //$NON-NLS-1$
                         updateCheckEnabled = false;
                     }
                     finally
@@ -134,11 +135,10 @@ public class VersionCheck
                         }
                     }
 
-                    // Announce newer version
+                    // Log newer version
                     if (!versionIsCurrent)
                     {
-                        ChatLog.announceI18N(Constants.getString("jm.common.new_version_available", versionAvailable)); //$NON-NLS-1$
-                        ChatLog.announceURL(JourneyMap.WEBSITE_URL, JourneyMap.WEBSITE_URL);
+                        JourneyMap.getLogger().warn(Constants.getString("JourneyMap.new_version_available", versionAvailable) + "\n" + JourneyMap.WEBSITE_URL);
                     }
                 }
             });
@@ -277,7 +277,7 @@ public class VersionCheck
         }
         catch (Throwable e)
         {
-            JourneyMap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url, LogFormatter.toString(e)); //$NON-NLS-1$
+            JourneyMap.getLogger().error("Could not launch browser with URL: " + url, LogFormatter.toString(e)); //$NON-NLS-1$
         }
     }
 

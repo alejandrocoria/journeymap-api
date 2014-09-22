@@ -68,7 +68,7 @@ public class JourneyMap
     public static final String MOD_ID = "journeymap";
     public static final String SHORT_MOD_NAME = "JourneyMap";
     public static final String MOD_NAME = SHORT_MOD_NAME + " " + EDITION;
-    static final String VERSION_URL = "https://docs.google.com/uc?id=0B-PlFsIS9WoCWGNLWUZPSl9KNHc"; //$NON-NLS-1$
+    static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-versions.json";
     private static JourneyMap INSTANCE;
 
     public ModInfo modInfo;
