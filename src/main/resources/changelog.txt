@@ -15,9 +15,11 @@ http://journeymap.techbrew.net
 - Change: Compatibility build for Forge 1208
 - Change: Version check info moved to DropBox after exceeding Google Drive's quota
 - Change: Version check no longer announces a new version is available in chat.(UI elements still display in Fullscreen Map and Webmap.)
+- Change: Improved handling of resource pack changes to ensure the color palette is regenerated
 - Bugfix: Waypoint Manager wouldn't open because of error (created by a Forge build that came after the recommended release)
 - Bugfix: Compatibility added for mods that have blocks registered with custom Item Stacks (TooManyBiomes, MultiWorld, etc.)
 - Bugfix: Colors were wrong for double-tall flowers and melon/pumpkin stems
+- Bugfix: Keybinding overrides would be duplicated if certain "Help..." dialogs were opened in JourneyMap Options
 
 ## Changelog for JourneyMap 4.0.4:
 - New Edition: "NoRadar" disables all radar features in Multiplayer

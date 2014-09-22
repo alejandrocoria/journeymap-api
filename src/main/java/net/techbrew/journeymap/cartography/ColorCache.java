@@ -5,15 +5,18 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.common.registry.GameRegistry;
 import modinfo.ModInfo;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockGrass;
+import net.minecraft.block.BlockTallGrass;
+import net.minecraft.block.BlockVine;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.resources.*;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
+import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -36,6 +39,15 @@ import java.util.List;
  */
 public class ColorCache implements IResourceManagerReloadListener
 {
+    private static class Holder
+    {
+        private static final ColorCache INSTANCE = new ColorCache();
+    }
+
+    public static ColorCache getInstance()
+    {
+        return Holder.INSTANCE;
+    }
 
     private final HashMap<BlockMD, Color> baseColors = new HashMap<BlockMD, Color>(256);
     private final HashMap<String, HashMap<BlockMD, Color>> biomeColors = new HashMap<String, HashMap<BlockMD, Color>>(32);
@@ -57,35 +69,13 @@ public class ColorCache implements IResourceManagerReloadListener
 
         this.onResourceManagerReload(rm);
     }
-	
-	public static ColorCache getInstance() {
-        return Holder.INSTANCE;
-    }
-	
-	private final HashMap<BlockMD, Color> baseColors = new HashMap<BlockMD, Color>(256);
-    private final HashMap<String, HashMap<BlockMD, Color>> biomeColors = new HashMap<String, HashMap<BlockMD, Color>>(32);
-	
-	private volatile IconLoader iconLoader;
-	private String lastResourcePack;
-	
-	private ColorCache() {
-		
-		IResourceManager rm = Minecraft.getMinecraft().getResourceManager();
-		if(rm instanceof IReloadableResourceManager) {
-			((IReloadableResourceManager) rm).registerReloadListener(this);
-		} else {
-			JourneyMap.getLogger().warning("Could not register ResourcePack ReloadListener.  Changing resource packs will require restart");
-		}		
 
-		this.onResourceManagerReload(rm);
-	}
-	
 	@Override
 	public void onResourceManagerReload(IResourceManager mgr)
     {
         if (JourneyMap.getInstance().isMapping() || iconLoader == null)
         {
-            String currentPack = getResourceDomains(mgr);
+            String currentPack = getResourcePackNames();
             if (currentPack.equals(lastResourcePack))
             {
                 JourneyMap.getLogger().fine("ResourcePack unchanged: " + currentPack);
@@ -134,7 +124,7 @@ public class ColorCache implements IResourceManagerReloadListener
     {
         ResourcePackRepository resourcepackrepository = FMLClientHandler.instance().getClient().getResourcePackRepository();
         String packs = Joiner.on(",").join(Lists.reverse(resourcepackrepository.getRepositoryEntries()));
-        if(Strings.isNullOrEmpty(packs))
+        if (Strings.isNullOrEmpty(packs))
         {
             packs = "Default";
         }

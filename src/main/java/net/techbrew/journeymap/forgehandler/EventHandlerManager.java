@@ -14,13 +14,16 @@ import java.util.HashMap;
 /**
  * Created by mwoodman on 1/29/14.
  */
-public class EventHandlerManager {
+public class EventHandlerManager
+{
 
-    public enum BusType {
+    public enum BusType
+    {
         FMLCommonHandlerBus(FMLCommonHandler.instance().bus()),
         MinecraftForgeBus(MinecraftForge.EVENT_BUS);
 
         protected final EventBus eventBus;
+
         private BusType(EventBus eventBus)
         {
             this.eventBus = eventBus;
@@ -52,7 +55,7 @@ public class EventHandlerManager {
     public static void unregisterAll()
     {
         ArrayList<Class<? extends EventHandler>> list = new ArrayList<Class<? extends EventHandler>>(handlers.keySet());
-        for(Class<? extends EventHandler> handlerClass : list)
+        for (Class<? extends EventHandler> handlerClass : list)
         {
             unregister(handlerClass);
         }
@@ -60,7 +63,7 @@ public class EventHandlerManager {
 
     private static void register(EventHandler handler)
     {
-        if(handlers.containsKey(handler.getClass()))
+        if (handlers.containsKey(handler.getClass()))
         {
             JourneyMap.getLogger().warning("Handler already registered: " + handler.getClass().getName());
             return;
@@ -68,7 +71,7 @@ public class EventHandlerManager {
 
         boolean registered = false;
         EnumSet<BusType> buses = handler.getBus();
-        for(BusType busType : handler.getBus())
+        for (BusType busType : handler.getBus())
         {
             String name = handler.getClass().getName();
             try
@@ -77,13 +80,13 @@ public class EventHandlerManager {
                 registered = true;
                 JourneyMap.getLogger().fine(name + " registered in " + busType);
             }
-            catch(Throwable t)
+            catch (Throwable t)
             {
                 JourneyMap.getLogger().severe(name + " registration FAILED in " + busType + ": " + LogFormatter.toString(t));
             }
         }
 
-        if(registered)
+        if (registered)
         {
             handlers.put(handler.getClass(), handler);
         }
@@ -96,26 +99,28 @@ public class EventHandlerManager {
     public static void unregister(Class<? extends EventHandler> handlerClass)
     {
         EventHandler handler = handlers.remove(handlerClass);
-        if(handler!=null)
+        if (handler != null)
         {
             EnumSet<BusType> buses = handler.getBus();
-            for(BusType busType : handler.getBus())
+            for (BusType busType : handler.getBus())
             {
                 String name = handler.getClass().getName();
                 try
                 {
                     boolean unregistered = false;
-                    switch(busType) {
+                    switch (busType)
+                    {
                         case MinecraftForgeBus:
                             MinecraftForge.EVENT_BUS.unregister(handler);
                             unregistered = true;
                             break;
                     }
-                    if(unregistered) {
+                    if (unregistered)
+                    {
                         JourneyMap.getLogger().fine(name + " unregistered from " + busType);
                     }
                 }
-                catch(Throwable t)
+                catch (Throwable t)
                 {
                     JourneyMap.getLogger().severe(name + " unregistration FAILED from " + busType + ": " + LogFormatter.toString(t));
                 }

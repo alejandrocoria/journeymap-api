@@ -26,6 +26,7 @@ public class StatTimer {
     private final String name;
 
     private final boolean doWarmup;
+    private boolean disposable;
     private boolean warmup = true;
     private boolean maxed = false;
     private Long started;
@@ -43,8 +44,8 @@ public class StatTimer {
         this.name = name;
         this.warmupCount = warmupCount;
         this.disposable = disposable;
-        this.doWarmup = warmupCount>0;
-        this.warmup = warmupCount>0;
+        this.doWarmup = warmupCount > 0;
+        this.warmup = warmupCount > 0;
     }
 
     /**
@@ -107,8 +108,7 @@ public class StatTimer {
      * @param warmupCount
      */
     private StatTimer(String name, int warmupCount) {
-        this.name = name;
-        this.warmupCount = warmupCount;
+        this(name, warmupCount, false);
     }
 
     /**
