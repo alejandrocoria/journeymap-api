@@ -184,7 +184,7 @@ public class BlockMD implements Serializable
             JourneyMap.getLogger().fine("Displayname not available for " + name);
         }
 
-        if (name.startsWith("tile"))
+        if (name == null || name.startsWith("tile"))
         {
             name = block.getClass().getSimpleName().replaceAll("Block", "");
         }

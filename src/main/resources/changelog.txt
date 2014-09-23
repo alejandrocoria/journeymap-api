@@ -12,6 +12,13 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Debug page wasn't displaying due to NullPointerException in ColorCache
+- Bugfix: NullPointerException in BlockMD caused by some other mods' blocks
+
+## Changelog for JourneyMap 4.0.5b2
+- Bugfix: Not all features disabled correctly by VoxelMap control codes
+
+## Changelog for JourneyMap 4.0.5b1
 - New Feature: All versions now honor VoxelMap control codes (sent by server) to disable cave mapping and radar
 - Change: Compatibility build for Forge 1208
 - Change: Version check info moved to DropBox after exceeding Google Drive's quota
