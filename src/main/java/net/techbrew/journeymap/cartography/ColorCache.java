@@ -195,6 +195,10 @@ public class ColorCache implements IResourceManagerReloadListener
 
     private int prefetchColors(BlockMD blockMD)
     {
+        if (blockMD == null)
+        {
+            return 0;
+        }
         int count = 0;
         if(blockMD.isBiomeColored())
         {
@@ -475,6 +479,18 @@ public class ColorCache implements IResourceManagerReloadListener
         Collections.sort(keyList, new Comparator<Object>(){
             @Override
             public int compare(Object o1, Object o2) {
+                if (o1 == null)
+                {
+                    if (o2 == null)
+                    {
+                        return 0;
+                    }
+                    return -1;
+                }
+                if (o2 == null)
+                {
+                    return 1;
+                }
                 return o1.toString().compareTo(o2.toString());
             }
         });
@@ -484,6 +500,10 @@ public class ColorCache implements IResourceManagerReloadListener
         for(Object key : keyList) {
             Object value = cache.get(key);
             String info;
+            if (key == null)
+            {
+                continue;
+            }
             if(key instanceof BlockMD) {
                 info = ((BlockMD) key).getName();
             } else {
