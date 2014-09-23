@@ -9,15 +9,12 @@
 package net.techbrew.journeymap.feature;
 
 import com.google.common.reflect.ClassPath;
-import cpw.mods.fml.client.FMLClientHandler;
-import net.minecraft.server.integrated.IntegratedServer;
 import net.techbrew.journeymap.JourneyMap;
 
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * Governs what features are available at runtime.
@@ -52,22 +49,12 @@ public class FeatureManager
     {
         if (disableControlCodes.containsKey(controlCode))
         {
-            IntegratedServer server = FMLClientHandler.instance().getClient().getIntegratedServer();
-            boolean isSinglePlayer = (server != null) && !server.getPublic();
-
+            controlCodeAltered = true;
             for (Feature feature : disableControlCodes.get(controlCode))
             {
-                if (FeatureManager.isAllowed(feature))
-                {
-                    controlCodeAltered = true;
-                    Policy oldPolicy = Holder.INSTANCE.policyMap.get(feature);
-                    boolean allowSinglePlayer = isSinglePlayer ? false : oldPolicy.allowInSingleplayer;
-                    boolean allowMultiPlayer = !isSinglePlayer ? false : oldPolicy.allowInMultiplayer;
-                    Policy newPolicy = new Policy(feature, allowSinglePlayer, allowMultiPlayer);
-                    Holder.INSTANCE.policyMap.put(feature, newPolicy);
-                    JourneyMap.getLogger().info("Features changed via control code: " + getPolicyDetails());
-                }
+                Holder.INSTANCE.policyMap.put(feature, new Policy(feature, true, false));
             }
+            JourneyMap.getLogger().info("Features changed via control code: " + getPolicyDetails());
         }
     }
 
