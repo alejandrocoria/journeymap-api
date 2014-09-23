@@ -9,10 +9,15 @@
 package net.techbrew.journeymap.feature;
 
 import com.google.common.reflect.ClassPath;
+import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraft.server.integrated.IntegratedServer;
+import net.techbrew.journeymap.JourneyMap;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * Governs what features are available at runtime.
@@ -24,16 +29,67 @@ public class FeatureManager
     private static final String CLASS_UNLIMITED = String.format("%s.Unlimited", IMPL_PACKAGE);
     private final PolicySet policySet;
     private final HashMap<Feature, Policy> policyMap = new HashMap<Feature, Policy>();
+    private final HashMap<String, EnumSet<Feature>> disableControlCodes = new HashMap<String, EnumSet<Feature>>();
+    private Boolean controlCodeAltered = null;
 
     /**
      * Private constructure.  Use instance()
      */
     private FeatureManager()
     {
+        disableControlCodes.put("§3 §6 §3 §6 §3 §6 §e", Feature.radar());
+        disableControlCodes.put("§3 §6 §3 §6 §3 §6 §d", EnumSet.of(Feature.MapCaves));
         policySet = locatePolicySet();
-        for (Policy policy : policySet.getPolicies())
+        reset();
+    }
+
+    public Set<String> getControlCodes()
+    {
+        return disableControlCodes.keySet();
+    }
+
+    public void handleControlCode(String controlCode)
+    {
+        if (disableControlCodes.containsKey(controlCode))
         {
-            policyMap.put(policy.feature, policy);
+            IntegratedServer server = FMLClientHandler.instance().getClient().getIntegratedServer();
+            boolean isSinglePlayer = (server != null) && !server.getPublic();
+
+            for (Feature feature : disableControlCodes.get(controlCode))
+            {
+                if (FeatureManager.isAllowed(feature))
+                {
+                    controlCodeAltered = true;
+                    Policy oldPolicy = Holder.INSTANCE.policyMap.get(feature);
+                    boolean allowSinglePlayer = isSinglePlayer ? false : oldPolicy.allowInSingleplayer;
+                    boolean allowMultiPlayer = !isSinglePlayer ? false : oldPolicy.allowInMultiplayer;
+                    Policy newPolicy = new Policy(feature, allowSinglePlayer, allowMultiPlayer);
+                    Holder.INSTANCE.policyMap.put(feature, newPolicy);
+                    JourneyMap.getLogger().info("Features changed via control code: " + getPolicyDetails());
+                }
+            }
+        }
+    }
+
+    /**
+     * Restores FeatureSet if a control code has altered the policy map
+     */
+    public void reset()
+    {
+        synchronized (policySet)
+        {
+            if (controlCodeAltered == null || controlCodeAltered)
+            {
+                for (Policy policy : policySet.getPolicies())
+                {
+                    policyMap.put(policy.feature, policy);
+                }
+                if (controlCodeAltered != null)
+                {
+                    JourneyMap.getLogger().info("Reset " + getPolicyDetails());
+                }
+                controlCodeAltered = false;
+            }
         }
     }
 

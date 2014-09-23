@@ -27,11 +27,11 @@ public class EventHandlerManager
 {
     static WorldInfoHandler worldInfoHandler;
     static ResourceManagerHandler resourceManagerHandler;
-
     private static HashMap<Class<? extends EventHandler>, EventHandler> handlers = new HashMap<Class<? extends EventHandler>, EventHandler>();
 
     public static void registerGeneralHandlers()
     {
+        register(new ChatEventHandler());
         register(new StateTickHandler());
         register(new WorldEventHandler());
         register(new ChunkUpdateHandler());
@@ -66,7 +66,6 @@ public class EventHandlerManager
         }
 
         boolean registered = false;
-        EnumSet<BusType> buses = handler.getBus();
         for (BusType busType : handler.getBus())
         {
             String name = handler.getClass().getName();

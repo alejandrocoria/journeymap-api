@@ -13,6 +13,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraftforge.event.world.WorldEvent;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.feature.FeatureManager;
 
 import java.util.EnumSet;
 
@@ -36,5 +37,6 @@ public class WorldEventHandler implements EventHandlerManager.EventHandler
     public void invoke(WorldEvent.Unload event)
     {
         JourneyMap.getInstance().stopMapping();
+        FeatureManager.instance().reset();
     }
 }
