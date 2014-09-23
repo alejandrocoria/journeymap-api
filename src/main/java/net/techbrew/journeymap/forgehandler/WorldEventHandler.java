@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraftforge.event.world.WorldEvent;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.feature.FeatureManager;
 
 import java.util.EnumSet;
 
@@ -12,7 +13,8 @@ import java.util.EnumSet;
  * Created by mwoodman on 1/29/14.
  */
 @SideOnly(Side.CLIENT)
-public class WorldEventHandler implements EventHandlerManager.EventHandler {
+public class WorldEventHandler implements EventHandlerManager.EventHandler
+{
 
     String playerName;
 
@@ -27,5 +29,6 @@ public class WorldEventHandler implements EventHandlerManager.EventHandler {
     public void invoke(WorldEvent.Unload event)
     {
         JourneyMap.getInstance().stopMapping();
+        FeatureManager.instance().reset();
     }
 }

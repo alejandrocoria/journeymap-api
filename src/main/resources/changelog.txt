@@ -12,11 +12,13 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New Feature: All versions now honor VoxelMap control codes (sent by server) to disable cave mapping and radar
 - Change: Compatibility build for Forge 1208
 - Change: Version check info moved to DropBox after exceeding Google Drive's quota
 - Change: Version check no longer announces a new version is available in chat.(UI elements still display in Fullscreen Map and Webmap.)
 - Change: Improved handling of resource pack changes to ensure the color palette is regenerated
 - Change: Better handling of modded TileEntities that don't have Block icons (Botania:spawnerClaw, etc.) They're now just ignored rather than showing up as black.
+- Change: Minimap's Y coordinate now reflects feet position, not eye position
 - Bugfix: Couldn't teleport to waypoint on server using Essentials because of coordinate precision
 - Bugfix: Waypoint Manager wouldn't open because of error (created by a Forge build that came after the recommended release)
 - Bugfix: Keybindings get duplicated if overridden and then viewed in JourneyMap>Options>Help... screens
@@ -25,7 +27,7 @@ http://journeymap.techbrew.net
 - Bugfix: Errors reported with some texturepacks (Sphax 128)
 - Bugfix: MiniMap coordinates off by one when location numbers were negative
 - Bugfix: Waypoint display coordinates off by one when location numbers were negative
-- Change: Minimap's Y coordinate now reflects feet position, not eye position
+
 
 
 ## Changelog for JourneyMap 4.0.4:

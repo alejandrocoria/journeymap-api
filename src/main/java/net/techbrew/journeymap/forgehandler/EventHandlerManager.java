@@ -16,7 +16,6 @@ import java.util.HashMap;
  */
 public class EventHandlerManager
 {
-
     public enum BusType
     {
         FMLCommonHandlerBus(FMLCommonHandler.instance().bus()),
@@ -39,6 +38,7 @@ public class EventHandlerManager
 
     public static void registerGeneralHandlers()
     {
+        register(new ChatEventHandler());
         register(new StateTickHandler());
         register(new WorldEventHandler());
         register(new ChunkUpdateHandler());
