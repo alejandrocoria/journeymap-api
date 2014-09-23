@@ -16,41 +16,102 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static net.techbrew.journeymap.properties.Config.Category.*;
+
 /**
  * Properties for basic mod configuration.
  */
 public class CoreProperties extends PropertiesBase implements Comparable<CoreProperties>
 {
     protected transient static final int CODE_REVISION = 3;
+
+    @Config(category = Advanced)
     public final AtomicReference<String> logLevel = new AtomicReference<String>("INFO");
+
+    @Config(category = Advanced)
     public final AtomicInteger chunkOffset = new AtomicInteger(8);
+
+    @Config(category = Advanced)
     public final AtomicInteger entityPoll = new AtomicInteger(1800);
+
+    @Config(category = Advanced)
     public final AtomicInteger playerPoll = new AtomicInteger(1900);
+
+    @Config(category = Advanced)
     public final AtomicInteger chunkPoll = new AtomicInteger(2000);
+
+    @Config(category = Advanced)
     public final AtomicInteger autoMapPoll = new AtomicInteger(2000);
+
+    @Config(category = Advanced)
     public final AtomicInteger cacheAnimalsData = new AtomicInteger(3100);
-    public final AtomicInteger maxAnimalsData = new AtomicInteger(32);
+
+    @Config(category = Advanced)
     public final AtomicInteger cacheMobsData = new AtomicInteger(3000);
-    public final AtomicInteger maxMobsData = new AtomicInteger(32);
+
+    @Config(category = Advanced)
     public final AtomicInteger cachePlayerData = new AtomicInteger(1000);
+
+    @Config(category = Advanced)
     public final AtomicInteger cachePlayersData = new AtomicInteger(2000);
-    public final AtomicInteger maxPlayersData = new AtomicInteger(32);
+
+    @Config(category = Advanced)
     public final AtomicInteger cacheVillagersData = new AtomicInteger(2200);
-    public final AtomicInteger maxVillagersData = new AtomicInteger(32);
+
+    @Config(category = Advanced)
     public final AtomicBoolean announceMod = new AtomicBoolean(true);
+
+    @Config(category = Advanced)
     public final AtomicBoolean checkUpdates = new AtomicBoolean(true);
-    public final AtomicBoolean caveIgnoreGlass = new AtomicBoolean(true);
+
+    @Config(category = Advanced)
     public final AtomicBoolean recordCacheStats = new AtomicBoolean(false);
-    public final AtomicBoolean hideSneakingEntities = new AtomicBoolean(true);
-    public final AtomicBoolean mapBathymetry = new AtomicBoolean(false);
-    public final AtomicBoolean mapTransparency = new AtomicBoolean(true);
-    public final AtomicBoolean mapCaveLighting = new AtomicBoolean(true);
-    public final AtomicBoolean mapAntialiasing = new AtomicBoolean(true);
-    public final AtomicBoolean mapPlantShadows = new AtomicBoolean(false);
-    public final AtomicBoolean mapPlants = new AtomicBoolean(true);
-    public final AtomicBoolean mapCrops = new AtomicBoolean(true);
-    public final AtomicBoolean mapSurfaceAboveCaves = new AtomicBoolean(true);
+
+    @Config(category = General, key="jm.common.ui_theme")
     public final AtomicReference<String> themeName = new AtomicReference<String>(ThemePresets.THEME_VICTORIAN.name);
+
+    @Config(category = MapStyle, key="jm.common.map_style_caveignoreglass")
+    public final AtomicBoolean caveIgnoreGlass = new AtomicBoolean(true);
+
+    @Config(category = MapStyle, key="jm.common.map_style_bathymetry")
+    public final AtomicBoolean mapBathymetry = new AtomicBoolean(false);
+
+    @Config(category = MapStyle, key="jm.common.map_style_transparency")
+    public final AtomicBoolean mapTransparency = new AtomicBoolean(true);
+
+    @Config(category = MapStyle, key="jm.common.map_style_cavelighting")
+    public final AtomicBoolean mapCaveLighting = new AtomicBoolean(true);
+
+    @Config(category = MapStyle, key="jm.common.map_style_antialiasing")
+    public final AtomicBoolean mapAntialiasing = new AtomicBoolean(true);
+
+    @Config(category = MapStyle, key="jm.common.map_style_plantshadows")
+    public final AtomicBoolean mapPlantShadows = new AtomicBoolean(false);
+
+    @Config(category = MapStyle, key="jm.common.map_style_plants")
+    public final AtomicBoolean mapPlants = new AtomicBoolean(true);
+
+    @Config(category = MapStyle, key="jm.common.map_style_crops")
+    public final AtomicBoolean mapCrops = new AtomicBoolean(true);
+
+    @Config(category = MapStyle, key="jm.common.map_style_caveshowsurface")
+    public final AtomicBoolean mapSurfaceAboveCaves = new AtomicBoolean(true);
+
+    @Config(category = Radar, key="jm.common.radar_max_animals")
+    public final AtomicInteger maxAnimalsData = new AtomicInteger(32);
+
+    @Config(category = Radar, key="jm.common.radar_max_mobs")
+    public final AtomicInteger maxMobsData = new AtomicInteger(32);
+
+    @Config(category = Radar, key="jm.common.radar_max_players")
+    public final AtomicInteger maxPlayersData = new AtomicInteger(32);
+
+    @Config(category = Radar, key="jm.common.radar_max_villagers")
+    public final AtomicInteger maxVillagersData = new AtomicInteger(32);
+
+    @Config(category = Radar, key="jm.common.radar_hide_sneaking")
+    public final AtomicBoolean hideSneakingEntities = new AtomicBoolean(true);
+
     protected transient final String name = "core";
 
     public CoreProperties()

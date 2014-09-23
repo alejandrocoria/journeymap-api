@@ -26,6 +26,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class PropertiesBase
 {
+    protected static final String ADVANCED = "jm.config.category.advanced";
+    protected static final String MAPSTYLE = "jm.config.category.mapstyle";
+
     protected static final Charset UTF8 = Charset.forName("UTF-8");
     private static final String[] HEADERS = {
             "// JourneyMap configuration file. Modify at your own risk!",
