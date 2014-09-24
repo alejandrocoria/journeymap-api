@@ -15,6 +15,8 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.feature.Feature;
+import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.MapOverlayState;
@@ -123,7 +125,7 @@ public class MiniMap
             boolean moved = gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
             if (moved || doStateRefresh)
             {
-                boolean showCaves = player.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get();
+                boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get());
                 gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh, 0, 0);
             }
 
