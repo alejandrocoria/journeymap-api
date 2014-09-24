@@ -12,6 +12,9 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Map state / caches weren't immediately reset when features were disabled by VoxelMap control codes
+
+## Changelog for JourneyMap 4.0.5b3
 - Bugfix: Debug page wasn't displaying due to NullPointerException in ColorCache
 - Bugfix: NullPointerException in BlockMD caused by some other mods' blocks
 

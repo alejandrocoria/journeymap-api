@@ -73,7 +73,7 @@ public class FeatureManager
                 }
                 if (controlCodeAltered != null)
                 {
-                    JourneyMap.getLogger().info("Reset " + getPolicyDetails());
+                    JourneyMap.getLogger().info("Features changed via control code: " + getPolicyDetails());
                 }
                 controlCodeAltered = false;
             }
