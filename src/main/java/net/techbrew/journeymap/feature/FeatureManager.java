@@ -34,8 +34,8 @@ public class FeatureManager
      */
     private FeatureManager()
     {
-        disableControlCodes.put("§3 §6 §3 §6 §3 §6 §e", Feature.radar());
-        disableControlCodes.put("§3 §6 §3 §6 §3 §6 §d", EnumSet.of(Feature.MapCaves));
+        disableControlCodes.put("\u00a73 \u00a76 \u00a73 \u00a76 \u00a73 \u00a76 \u00a7e", Feature.radar());
+        disableControlCodes.put("\u00a73 \u00a76 \u00a73 \u00a76 \u00a73 \u00a76 \u00a7d", EnumSet.of(Feature.MapCaves));
         policySet = locatePolicySet();
         reset();
     }
