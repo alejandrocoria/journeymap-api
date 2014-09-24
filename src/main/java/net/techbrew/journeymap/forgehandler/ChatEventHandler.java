@@ -32,7 +32,7 @@ public class ChatEventHandler implements EventHandlerManager.EventHandler
     {
         if (event.message != null)
         {
-            checkForControlCode(event.message.getFormattedText());
+            checkForControlCode(event.message.getFormattedText().replaceAll("§r", ""));
         }
     }
 
@@ -41,7 +41,6 @@ public class ChatEventHandler implements EventHandlerManager.EventHandler
         if (text.contains("§"))
         {
             boolean resetRequired = false;
-            text = text.replaceAll("§r", "");
             for (String code : featureControlCodes)
             {
                 if (text.contains(code))
