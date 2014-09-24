@@ -4,7 +4,9 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.ui.UIManager;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -36,15 +38,22 @@ public class ChatEventHandler implements EventHandlerManager.EventHandler
 
     private void checkForControlCode(String text)
     {
-        if (text.contains("§3"))
+        if (text.contains("§"))
         {
+            boolean resetRequired = false;
             text = text.replaceAll("§r", "");
             for (String code : featureControlCodes)
             {
                 if (text.contains(code))
                 {
                     FeatureManager.instance().handleControlCode(code);
+                    resetRequired = true;
                 }
+            }
+            if (resetRequired)
+            {
+                DataCache.instance().purge();
+                UIManager.getInstance().reset();
             }
         }
     }

@@ -16,6 +16,7 @@ http://journeymap.techbrew.net
 - Change: [Pulled from 4.0.5] Version check info moved to DropBox after exceeding Google Drive's quota
 - Change: [Pulled from 4.0.5] Version check no longer announces a new version is available in chat.(UI elements still display in Fullscreen Map and Webmap.)
 - Bugfix: [Pulled from 4.0.5] Waypoint Manager wouldn't open because of error (created by a Forge build that came after the recommended release)
+- Bugfix: [Pulled from 4.0.5] Map state / caches weren't immediately reset when features were disabled by VoxelMap control codes
 
 ## Changelog for JourneyMap 4.1.0alpha24:
 - Bugfix: Waypoint labels fixed on minimap
