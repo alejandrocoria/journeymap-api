@@ -12,6 +12,7 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Surface wasn't mapped if you were underground while Cave Mapping was disabled
 - Bugfix: Map state / caches weren't immediately reset when features were disabled by VoxelMap control codes
 
 ## Changelog for JourneyMap 4.0.5b3

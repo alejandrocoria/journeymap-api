@@ -80,11 +80,15 @@ public class MapPlayerTask extends BaseMapTask
         int offset = JourneyMap.getInstance().coreProperties.chunkOffset.get();
 
         final ChunkCoordinates playerPos = new ChunkCoordinates(player.chunkCoordX, player.chunkCoordY, player.chunkCoordZ);
-        final boolean underground = player.worldObj.provider.hasNoSky || (DataCache.getPlayer().underground && JourneyMap.getInstance().fullMapProperties.showCaves.get());
+        boolean underground = player.worldObj.provider.hasNoSky || (DataCache.getPlayer().underground && JourneyMap.getInstance().fullMapProperties.showCaves.get());
 
         if(underground && !FeatureManager.isAllowed(Feature.MapCaves))
         {
-            return null;
+            if (player.worldObj.provider.hasNoSky)
+            {
+                return null;
+            }
+            underground = false;
         }
 
         final int dimension = DataCache.getPlayer().dimension;
