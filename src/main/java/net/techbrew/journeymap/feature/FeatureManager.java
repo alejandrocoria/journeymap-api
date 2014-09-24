@@ -52,9 +52,10 @@ public class FeatureManager
             controlCodeAltered = true;
             for (Feature feature : disableControlCodes.get(controlCode))
             {
+                JourneyMap.getLogger().info("Feature disabled in multiplayer via control code: " + feature);
                 Holder.INSTANCE.policyMap.put(feature, new Policy(feature, true, false));
             }
-            JourneyMap.getLogger().info("Features changed via control code: " + getPolicyDetails());
+
         }
     }
 
@@ -73,7 +74,7 @@ public class FeatureManager
                 }
                 if (controlCodeAltered != null)
                 {
-                    JourneyMap.getLogger().info("Features changed via control code: " + getPolicyDetails());
+                    JourneyMap.getLogger().info("Returning to default " + getPolicyDetails());
                 }
                 controlCodeAltered = false;
             }
