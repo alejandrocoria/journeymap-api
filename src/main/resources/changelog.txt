@@ -12,6 +12,10 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: UTF-8 encoding issues resolved, VoxelMap control codes should now work in normal launcher environment
+- Bugfix: Waypoint distance language property missing, showed "jm.waypoint.distance_meters"
+
+## Changelog for JourneyMap 4.0.5b4
 - Bugfix: Surface wasn't mapped if you were underground while Cave Mapping was disabled
 - Bugfix: Minimap didn't show surface if you were underground while Cave Mapping was disabled
 - Bugfix: Map state / caches weren't immediately reset when features were disabled by VoxelMap control codes

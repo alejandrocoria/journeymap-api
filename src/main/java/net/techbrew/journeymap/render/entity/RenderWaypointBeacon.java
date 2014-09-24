@@ -42,7 +42,7 @@ public class RenderWaypointBeacon
 //    static StatTimer allTimer = StatTimer.get("WaypointBeacon.renderAll", 100);
     static Minecraft mc = FMLClientHandler.instance().getClient();
     static RenderManager renderManager = RenderManager.instance;
-    static String distanceLabel = Constants.getString("jm.waypoint.distance_meters", "%1.0f");
+    static String distanceLabel = Constants.getString("Waypoint.distance_meters", "%1.0f");
     static WaypointProperties waypointProperties;
 
     public static void resetStatTimers()
