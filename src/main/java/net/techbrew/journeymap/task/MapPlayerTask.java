@@ -110,11 +110,15 @@ public class MapPlayerTask extends BaseMapTask
     public static BaseMapTask create(ChunkRenderController chunkRenderController, EntityPlayer player)
     {
         final ChunkCoordinates playerPos = new ChunkCoordinates(player.chunkCoordX, player.chunkCoordY, player.chunkCoordZ);
-        final boolean underground = player.worldObj.provider.hasNoSky || (DataCache.getPlayer().underground && JourneyMap.getFullMapProperties().showCaves.get());
+        boolean underground = player.worldObj.provider.hasNoSky || (DataCache.getPlayer().underground && JourneyMap.getFullMapProperties().showCaves.get());
 
-        if (underground && !FeatureManager.isAllowed(Feature.MapCaves))
+        if(underground && !FeatureManager.isAllowed(Feature.MapCaves))
         {
-            return null;
+            if (player.worldObj.provider.hasNoSky)
+            {
+                return null;
+            }
+            underground = false;
         }
 
         // Should we force the chunks around the player to be rendered?
