@@ -101,8 +101,7 @@ jm.common.webserver_and_mapgui_ready=Press [§b%1$s§f] or open browser to§b ht
 jm.common.webserver_only_ready=Open browser to§b http://localhost%1$s §f. (In-game map disabled)
 
 jm.config.category.advanced=Advanced
-jm.config.category.general=General
-jm.config.category.mapstyle=Map Style
+jm.config.category.mapui=Map Interface
 jm.config.category.radar=Radar
 
 jm.error.00=[ERROR.00] JourneyMap encountered an unexpected error: %1$s

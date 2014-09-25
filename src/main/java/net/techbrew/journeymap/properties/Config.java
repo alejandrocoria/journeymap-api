@@ -6,14 +6,26 @@ package net.techbrew.journeymap.properties;
 public @interface Config
 {
     Category category();
+    String subcategory() default "";
     String key() default "";
+    String onKey() default "jm.common.on";
+    String offKey() default "jm.common.off";
+    int minInt() default 0;
+    int maxInt() default 0;
+    float minFloat() default 0f;
+    float maxFloat() default 0f;
 
     public enum Category
     {
         Advanced("jm.config.category.advanced"),
-        General("jm.config.category.general"),
-        MapStyle("jm.config.category.mapstyle"),
-        Radar("jm.config.category.radar");
+        General("jm.common.general_display_title"),
+        MapStyle("jm.common.map_style_title"),
+        MapUI("jm.config.category.mapui"),
+        MiniMap("jm.minimap.options"),
+        Radar("jm.config.category.radar"),
+        Waypoint("jm.waypoint.options"),
+        WebMap("jm.webmap.enable")
+        ;
 
         public final String key;
         private Category(String key)

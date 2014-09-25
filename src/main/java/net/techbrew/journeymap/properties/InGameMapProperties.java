@@ -11,14 +11,23 @@ package net.techbrew.journeymap.properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static net.techbrew.journeymap.properties.Config.Category.MapUI;
+
 /**
  * Shared Properties for in-game map types.
  */
 public abstract class InGameMapProperties extends MapProperties
 {
+    @Config(category = MapUI, key="jm.minimap.force_unicode")
     public final AtomicBoolean forceUnicode = new AtomicBoolean(false);
+
+    @Config(category = MapUI, key="jm.common.font", onKey = "jm.common.font_small", offKey = "jm.common.font_large")
     public final AtomicBoolean fontSmall = new AtomicBoolean(true);
+
+    @Config(category = MapUI, key="jm.minimap.force_unicode", onKey = "jm.common.font_small", offKey = "jm.common.font_large")
     public final AtomicBoolean textureSmall = new AtomicBoolean(true);
+
+    @Config(category = MapUI, key="jm.minimap.force_unicode", minInt = 0, maxInt = 255)
     public final AtomicInteger terrainAlpha = new AtomicInteger(255);
 
     protected InGameMapProperties()

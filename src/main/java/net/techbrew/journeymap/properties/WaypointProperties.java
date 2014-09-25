@@ -11,26 +11,57 @@ package net.techbrew.journeymap.properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static net.techbrew.journeymap.properties.Config.Category.Waypoint;
+
 /**
  * Properties for in-game waypoint management and display.
  */
 public class WaypointProperties extends PropertiesBase implements Comparable<WaypointProperties>
 {
     protected transient static final int CODE_REVISION = 3;
+
+    @Config(category = Waypoint, key="jm.waypoint.enable_manager")
     public final AtomicBoolean managerEnabled = new AtomicBoolean(true);
+
+    @Config(category = Waypoint, key="jm.waypoint.enable_beacons")
     public final AtomicBoolean beaconEnabled = new AtomicBoolean(true);
+
+    @Config(category = Waypoint, key="jm.waypoint.show_texture")
     public final AtomicBoolean showTexture = new AtomicBoolean(true);
+
+    @Config(category = Waypoint, key="jm.waypoint.show_static_beam")
     public final AtomicBoolean showStaticBeam = new AtomicBoolean(true);
+
+    @Config(category = Waypoint, key="jm.waypoint.show_rotating_beam")
     public final AtomicBoolean showRotatingBeam = new AtomicBoolean(true);
+
+    @Config(category = Waypoint, key="jm.waypoint.show_name")
     public final AtomicBoolean showName = new AtomicBoolean(true);
+
+    @Config(category = Waypoint, key="jm.waypoint.show_distance")
     public final AtomicBoolean showDistance = new AtomicBoolean(true);
+
+    @Config(category = Waypoint, key="jm.waypoint.auto_hide_label")
     public final AtomicBoolean autoHideLabel = new AtomicBoolean(true);
+
+    @Config(category = Waypoint, key="jm.waypoint.bold_label")
     public final AtomicBoolean boldLabel = new AtomicBoolean(false);
+
+    @Config(category = Waypoint, key="jm.waypoint.force_unicode")
     public final AtomicBoolean forceUnicode = new AtomicBoolean(false);
+
+    @Config(category = Waypoint, key="jm.common.font", onKey = "jm.common.font_small", offKey = "jm.common.font_large")
     public final AtomicBoolean fontSmall = new AtomicBoolean(true);
+
+    @Config(category = Waypoint, key="jm.waypoint.force_unicode", onKey = "jm.common.font_small", offKey = "jm.common.font_large")
     public final AtomicBoolean textureSmall = new AtomicBoolean(true);
+
+    @Config(category = Waypoint, key="jm.waypoint.max_distance", minInt = -1, maxInt = 10000)
     public final AtomicInteger maxDistance = new AtomicInteger(0);
+
+    @Config(category = Waypoint, key="jm.waypoint.create_deathpoints")
     public final AtomicBoolean createDeathpoints = new AtomicBoolean(true);
+
     protected transient final String name = "waypoint";
 
     @Override

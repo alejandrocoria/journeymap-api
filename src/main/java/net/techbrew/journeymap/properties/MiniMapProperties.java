@@ -15,28 +15,60 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static net.techbrew.journeymap.properties.Config.Category.MiniMap;
+
 /**
  * Properties for the minimap in-game.
  */
 public class MiniMapProperties extends InGameMapProperties
 {
     protected transient static final int CODE_REVISION = 5;
+
+    @Config(category = MiniMap, key="jm.minimap.enable_minimap")
     public final AtomicBoolean enabled = new AtomicBoolean(true);
+
+    @Config(category = MiniMap, key="jm.minimap.shape")
     public final AtomicReference<DisplayVars.Shape> shape = new AtomicReference<DisplayVars.Shape>(DisplayVars.Shape.Square);
+
+    @Config(category = MiniMap, key="jm.minimap.position")
     public final AtomicReference<DisplayVars.Position> position = new AtomicReference<DisplayVars.Position>(DisplayVars.Position.TopRight);
+
+    @Config(category = MiniMap, key="jm.minimap.show_fps")
     public final AtomicBoolean showFps = new AtomicBoolean(false);
+
+    @Config(category = MiniMap, key="jm.minimap.show_biome")
     public final AtomicBoolean showBiome = new AtomicBoolean(true);
+
+    @Config(category = MiniMap, key="jm.minimap.show_location")
     public final AtomicBoolean showLocation = new AtomicBoolean(true);
+
+    @Config(category = MiniMap, key="jm.minimap.hotkeys")
     public final AtomicBoolean enableHotkeys = new AtomicBoolean(true);
+
+    // TODO
     public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
     public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("2D");
     public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
+
+    @Config(category = MiniMap, key="jm.minimap.size")
     public final AtomicInteger customSize = new AtomicInteger(0);
+
+    @Config(category = MiniMap, key="jm.minimap.frame_alpha", minInt = 0, maxInt = 255)
     public final AtomicInteger frameAlpha = new AtomicInteger(255);
+
+    @Config(category = MiniMap, key="jm.minimap.orientation.button")
     public final AtomicReference<DisplayVars.Orientation> orientation = new AtomicReference<DisplayVars.Orientation>(DisplayVars.Orientation.North);
+
+    @Config(category = MiniMap, key="jm.minimap.compass_font", onKey = "jm.common.font_small", offKey = "jm.common.font_large")
     public final AtomicBoolean compassFontSmall = new AtomicBoolean(false);
+
+    @Config(category = MiniMap, key="jm.minimap.show_compass")
     public final AtomicBoolean showCompass = new AtomicBoolean(true);
+
+    @Config(category = MiniMap, key="jm.minimap.show_reticle")
     public final AtomicBoolean showReticle = new AtomicBoolean(true);
+
+    @Config(category = MiniMap, key="jm.minimap.reticle_orientation")
     public final AtomicReference<DisplayVars.ReticleOrientation> reticleOrientation = new AtomicReference<DisplayVars.ReticleOrientation>(DisplayVars.ReticleOrientation.Compass);
 
     protected transient final String name = "minimap";

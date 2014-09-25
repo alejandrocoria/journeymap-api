@@ -14,15 +14,24 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static net.techbrew.journeymap.properties.Config.Category.WebMap;
+
 /**
  * Properties for the web map in browser.
  */
 public class WebMapProperties extends MapProperties
 {
     protected transient static final int CODE_REVISION = 3;
+
+    @Config(category = WebMap, key="jm.webmap.enable")
     public final AtomicBoolean enabled = new AtomicBoolean(true);
+
+    @Config(category = WebMap)
     public final AtomicInteger port = new AtomicInteger(8080);
+
+    @Config(category = WebMap)
     public final AtomicInteger browserPoll = new AtomicInteger(2000);
+
     public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("3D");
     public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
     protected transient final String name = "webmap";
