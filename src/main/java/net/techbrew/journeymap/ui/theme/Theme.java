@@ -11,7 +11,9 @@ import java.awt.*;
  */
 public class Theme implements Comparable<Theme>
 {
-    /** Current version of this specification */
+    /**
+     * Current version of this specification
+     */
     public static final int VERSION = 1;
 
     /**
@@ -47,7 +49,7 @@ public class Theme implements Comparable<Theme>
     public Control control = new Control();
 
     /**
-     * Fullscreen Map specs for images in the /fullscreen directory.
+     * FullMap Map specs for images in the /fullscreen directory.
      */
     @Since(1)
     public Fullscreen fullscreen = new Fullscreen();
@@ -95,7 +97,7 @@ public class Theme implements Comparable<Theme>
             /**
              * ToolbarSpec class. A toolbar consists of a beginning image, a
              * repeating inner image (one rep per button), and an end image.
-             *
+             * <p/>
              * Filenames expected by the Theme loader are:
              * toolbar_begin.png, toolbar_inner.png, toolbar_end.png
              */
@@ -239,7 +241,7 @@ public class Theme implements Comparable<Theme>
     }
 
     /**
-     * Fullscreen class for images in /fullscreen.
+     * FullMap class for images in /fullscreen.
      */
     public static class Fullscreen
     {
@@ -313,7 +315,7 @@ public class Theme implements Comparable<Theme>
             public int margin;
 
             /**
-             * Whether label shown at the top of the minimap (FPS) should
+             * Whether key shown at the top of the minimap (FPS) should
              * be inside the frame (true), or outside/above it (false)
              */
             @Since(1)
@@ -369,14 +371,14 @@ public class Theme implements Comparable<Theme>
             @Since(1)
             public ImageSpec compassPoint = new ImageSpec();
 
-            /***
+            /**
              * Hex color used to draw compass point. Use #ffffff to leave unchanged.
              */
             @Since(1)
             public String compassPointColor = "#ffffff";
 
             /**
-             * Number of pixels to pad around a compass point's label. Effects the scaled size of the compass point image.
+             * Number of pixels to pad around a compass point's key. Effects the scaled size of the compass point image.
              */
             @Since(1)
             public int compassPointLabelPad;
@@ -395,14 +397,14 @@ public class Theme implements Comparable<Theme>
             @Since(1)
             public double waypointOffset;
 
-            /***
+            /**
              * Hex color used to draw reticle.
              */
             @Since(1)
             public String reticleColor = "";
 
             /**
-             * Alpha transparency (0-255) of label background.
+             * Alpha transparency (0-255) of key background.
              * Default is 128.
              */
             @Since(1)
@@ -423,12 +425,11 @@ public class Theme implements Comparable<Theme>
             @Since(1)
             public int reticleOffset;
 
-            /***
+            /**
              * Hex color to apply to frame image. Use #ffffff to keep unchanged.
              */
             @Since(1)
             public String frameColor = "";
-
 
 
             /**
@@ -440,13 +441,13 @@ public class Theme implements Comparable<Theme>
 
         /**
          * Class for images in /minimap/circle.
-         *
+         * <p/>
          * The mask defines the area of the minimap that will be shown.
          * The rim is the frame/overlay placed atop the minimap.
-         *
+         * <p/>
          * Filenames expected by the Theme loader are:
          * mask_256.png, rim_256.png, mask_512.png, rim_512.png, compass_point.png
-         *
+         * <p/>
          * Minimap sizes <=256 will use mask_256 and rim_256. Anything
          * larger will use mask_512 and rim_512.
          */
@@ -456,34 +457,34 @@ public class Theme implements Comparable<Theme>
              * Size of rim_256.png (Ideally 256x256px)
              */
             @Since(1)
-            public ImageSpec rim256 = new ImageSpec(256,256);
+            public ImageSpec rim256 = new ImageSpec(256, 256);
 
             /**
              * Size of mask_256.png (Ideally 256x256px)
              */
             @Since(1)
-            public ImageSpec mask256 = new ImageSpec(256,256);
+            public ImageSpec mask256 = new ImageSpec(256, 256);
 
             /**
              * Size of rim_512.png (Ideally 512x512px)
              */
             @Since(1)
-            public ImageSpec rim512 = new ImageSpec(512,512);
+            public ImageSpec rim512 = new ImageSpec(512, 512);
 
             /**
              * Size of mask_512.png (Ideally 512x512px)
              */
             @Since(1)
-            public ImageSpec mask512 = new ImageSpec(512,512);
+            public ImageSpec mask512 = new ImageSpec(512, 512);
         }
 
         /**
          * Class for images in /minimap/square.
-         *
+         * <p/>
          * Filenames expected by the Theme loader are:
          * topleft.png, top.png, topright.png, left.png, right.png,
          * bottomleft.png, bottom.png, bottomright.png, compass_point.png
-         *
+         * <p/>
          * Images are centered along the edges of the minimap area.
          */
         public static class MinimapSquare extends MinimapSpec
@@ -540,33 +541,33 @@ public class Theme implements Comparable<Theme>
     }
 
     /**
-     * Class for defining label characteristics.
+     * Class for defining key characteristics.
      */
     public static class LabelSpec
     {
         /**
-         * Hex color for label background.
+         * Hex color for key background.
          * Default is black.
          */
         @Since(1)
         public String backgroundColor = toHexColor(Color.black);
 
         /**
-         * Alpha transparency (0-255) of label background.
+         * Alpha transparency (0-255) of key background.
          * Default is 200.
          */
         @Since(1)
         public int backgroundAlpha = 200;
 
         /**
-         * Hex color for label foreground.
+         * Hex color for key foreground.
          * Default is white.
          */
         @Since(1)
         public String foregroundColor = toHexColor(Color.white);
 
         /**
-         * Alpha transparency (0-255) of label background.
+         * Alpha transparency (0-255) of key background.
          * Default is 255.
          */
         @Since(1)
@@ -593,7 +594,7 @@ public class Theme implements Comparable<Theme>
      */
     public static Color getColor(String hexColor)
     {
-        if(!Strings.isNullOrEmpty(hexColor))
+        if (!Strings.isNullOrEmpty(hexColor))
         {
             try
             {
@@ -612,9 +613,12 @@ public class Theme implements Comparable<Theme>
     @Override
     public String toString()
     {
-        if(Strings.isNullOrEmpty(name)) {
+        if (Strings.isNullOrEmpty(name))
+        {
             return "???";
-        } else {
+        }
+        else
+        {
             return name;
         }
     }
@@ -622,7 +626,8 @@ public class Theme implements Comparable<Theme>
     @Override
     public int compareTo(Theme other)
     {
-        if(Strings.isNullOrEmpty(name)) {
+        if (Strings.isNullOrEmpty(name))
+        {
             return Strings.isNullOrEmpty(other.name) ? 0 : 1;
         }
         return name.compareTo(other.name);

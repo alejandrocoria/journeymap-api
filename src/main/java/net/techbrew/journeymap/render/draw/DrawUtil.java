@@ -28,7 +28,7 @@ public class DrawUtil
     public static double zLevel = 0;
 
     /**
-     * Draw a text label, centered on x,z.  If bgColor not null,
+     * Draw a text key, centered on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
      *
      * @param text
@@ -44,7 +44,7 @@ public class DrawUtil
     }
 
     /**
-     * Draw a text label, centered on x,z.  If bgColor not null,
+     * Draw a text key, centered on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
      *
      * @param text
@@ -61,7 +61,7 @@ public class DrawUtil
     }
 
     /**
-     * Draw a text label, aligned on x,z.  If bgColor not null,
+     * Draw a text key, aligned on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
      *
      * @param text
@@ -82,7 +82,7 @@ public class DrawUtil
     }
 
     /**
-     * Draw a text label, aligned on x,z.  If bgColor not null,
+     * Draw a text key, aligned on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
      *
      * @param text
@@ -403,6 +403,18 @@ public class DrawUtil
     public static void stopUnicode(FontRenderer fr)
     {
         fr.setUnicodeFlag(false);
+    }
+
+    public static void sizeDisplay(double width, double height)
+    {
+
+        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glLoadIdentity();
+        GL11.glOrtho(0.0D, width, height, 0.0D, 1000.0D, 3000.0D);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glLoadIdentity();
+        GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
     }
 
     public enum HAlign

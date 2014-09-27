@@ -58,7 +58,7 @@ import java.io.File;
  * @author Mark Woodman
  */
 @SideOnly(Side.CLIENT)
-@Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = JourneyMap.JM_VERSION)
+@Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = JourneyMap.JM_VERSION, guiFactory = "net.techbrew.journeymap.ui.config.ConfigManagerFactory")
 public class JourneyMap
 {
     public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
@@ -68,7 +68,7 @@ public class JourneyMap
     public static final String MOD_ID = "journeymap";
     public static final String SHORT_MOD_NAME = "JourneyMap";
     public static final String MOD_NAME = SHORT_MOD_NAME + " " + EDITION;
-    static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-versions.json";
+    public static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-versions.json";
     private static JourneyMap INSTANCE;
 
     public ModInfo modInfo;

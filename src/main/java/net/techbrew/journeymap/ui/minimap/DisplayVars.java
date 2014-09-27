@@ -18,6 +18,7 @@ import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureImpl;
+import net.techbrew.journeymap.ui.config.KeyedEnum;
 import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemeCompassPoints;
 import net.techbrew.journeymap.ui.theme.ThemeMinimapFrame;
@@ -114,7 +115,7 @@ public class DisplayVars
 
         int compassFontScale = (JourneyMap.getMiniMapProperties().compassFontSmall.get() ? 1 : 2) * (useUnicode ? 2 : 1);
         int compassLabelHeight = 0;
-        if(showCompass)
+        if (showCompass)
         {
             compassLabelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, minimapSpec.compassLabel.shadow) * (useUnicode ? .7 : 1) * compassFontScale);
         }
@@ -123,15 +124,14 @@ public class DisplayVars
 
         minimapFrame = new ThemeMinimapFrame(theme, minimapSpec, minimapSize);
         marginX = marginY = minimapSpec.margin;
-        minimapRadius = minimapSize/2;
+        minimapRadius = minimapSize / 2;
 
 
-
-        if(showCompass)
+        if (showCompass)
         {
             double compassPointMargin;
-            boolean compassExists = minimapSpec.compassPoint!=null && minimapSpec.compassPoint.width>0;
-            if(compassExists)
+            boolean compassExists = minimapSpec.compassPoint != null && minimapSpec.compassPoint.width > 0;
+            if (compassExists)
             {
                 TextureImpl compassPointTex = this.minimapFrame.getCompassPoint();
                 float compassPointScale = ThemeCompassPoints.getCompassPointScale(compassLabelHeight, minimapSpec, compassPointTex);
@@ -142,7 +142,7 @@ public class DisplayVars
                 compassPointMargin = compassLabelHeight;
             }
             marginX = (int) Math.max(marginX, Math.ceil(compassPointMargin));
-            marginY = (int) Math.max(marginY, Math.ceil(compassPointMargin) + compassLabelHeight/2);
+            marginY = (int) Math.max(marginY, Math.ceil(compassPointMargin) + compassLabelHeight / 2);
         }
 
         // Assign position
@@ -150,11 +150,11 @@ public class DisplayVars
         {
             case BottomRight:
             {
-                if(!minimapSpec.labelBottomInside && (showLocation || showBiome))
+                if (!minimapSpec.labelBottomInside && (showLocation || showBiome))
                 {
                     int labels = showLocation ? 1 : 0;
                     labels += showBiome ? 1 : 0;
-                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels*locationLabelHeight) + compassLabelHeight/2);
+                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels * locationLabelHeight) + compassLabelHeight / 2);
                 }
 
                 textureX = mc.displayWidth - minimapSize - marginX;
@@ -165,9 +165,9 @@ public class DisplayVars
             }
             case TopLeft:
             {
-                if(!minimapSpec.labelTopInside && showFps)
+                if (!minimapSpec.labelTopInside && showFps)
                 {
-                    marginY = Math.max(marginY, Math.max(compassLabelHeight/2, minimapSpec.labelTopMargin) + fpsLabelHeight);
+                    marginY = Math.max(marginY, Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin) + fpsLabelHeight);
                 }
 
                 textureX = marginX;
@@ -178,12 +178,12 @@ public class DisplayVars
             }
             case BottomLeft:
             {
-                if(!minimapSpec.labelBottomInside && (showLocation || showBiome))
+                if (!minimapSpec.labelBottomInside && (showLocation || showBiome))
                 {
                     int labels = showLocation ? 1 : 0;
                     labels += showBiome ? 1 : 0;
 
-                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels*locationLabelHeight) + compassLabelHeight/2);
+                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels * locationLabelHeight) + compassLabelHeight / 2);
                 }
 
                 textureX = marginX;
@@ -194,8 +194,8 @@ public class DisplayVars
             }
             case Center:
             {
-                textureX = (mc.displayWidth - minimapSize)/2;
-                textureY = (mc.displayHeight - minimapSize)/2;
+                textureX = (mc.displayWidth - minimapSize) / 2;
+                textureY = (mc.displayHeight - minimapSize) / 2;
                 translateX = 0;
                 translateY = 0;
                 break;
@@ -203,9 +203,9 @@ public class DisplayVars
             case TopRight:
             default:
             {
-                if(!minimapSpec.labelTopInside && showFps)
+                if (!minimapSpec.labelTopInside && showFps)
                 {
-                    marginY = Math.max(marginY, Math.max(compassLabelHeight/2, minimapSpec.labelTopMargin) + fpsLabelHeight);
+                    marginY = Math.max(marginY, Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin) + fpsLabelHeight);
                 }
 
                 textureX = mc.displayWidth - minimapSize - marginX;
@@ -225,14 +225,14 @@ public class DisplayVars
         // Set up compass poionts
         this.minimapCompassPoints = new ThemeCompassPoints(textureX, textureY, minimapRadius, minimapSpec, this.minimapFrame.getCompassPoint(), useUnicode, compassLabelHeight);
 
-        // Set up label positions
+        // Set up key positions
         double centerX = Math.floor(textureX + (minimapSize / 2));
         double topY = textureY;
         double bottomY = textureY + minimapSize;
 
-        if(showFps)
+        if (showFps)
         {
-            int topMargin = Math.max(compassLabelHeight/2, minimapSpec.labelTopMargin);
+            int topMargin = Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin);
             int yOffsetFps = minimapSpec.labelTopInside ? minimapSpec.labelTopMargin : -topMargin;
             DrawUtil.VAlign valignFps = minimapSpec.labelTopInside ? DrawUtil.VAlign.Below : DrawUtil.VAlign.Above;
             labelFps = new LabelVars(centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, minimapSpec.fpsLabel);
@@ -243,14 +243,14 @@ public class DisplayVars
         }
 
 
-        int labelMargin = Math.max(compassLabelHeight/2, minimapSpec.labelBottomMargin);
+        int labelMargin = Math.max(compassLabelHeight / 2, minimapSpec.labelBottomMargin);
         int yOffset = minimapSpec.labelBottomInside ? -labelMargin : labelMargin;
 
-        if(showLocation)
+        if (showLocation)
         {
             DrawUtil.VAlign vAlign = minimapSpec.labelBottomInside ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
             labelLocation = new LabelVars(centerX, bottomY + yOffset, DrawUtil.HAlign.Center, vAlign, fontScale, minimapSpec.locationLabel);
-            if(showBiome)
+            if (showBiome)
             {
                 yOffset += locationLabelHeight;
             }
@@ -260,7 +260,7 @@ public class DisplayVars
             labelLocation = null;
         }
 
-        if(showBiome)
+        if (showBiome)
         {
             DrawUtil.VAlign vAlign = (minimapSpec.labelBottomInside) ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
             labelBiome = new LabelVars(centerX, bottomY + yOffset, DrawUtil.HAlign.Center, vAlign, fontScale, minimapSpec.biomeLabel);
@@ -272,10 +272,11 @@ public class DisplayVars
 
     }
 
+
     /**
      * Position of minimap on screen
      */
-    public enum Position
+    public enum Position implements KeyedEnum
     {
         TopRight("jm.minimap.position_topright"),
         BottomRight("jm.minimap.position_bottomright"),
@@ -283,11 +284,11 @@ public class DisplayVars
         TopLeft("jm.minimap.position_topleft"),
         Center("jm.minimap.position_center");
 
-        public final String label;
+        public final String key;
 
-        private Position(String label)
+        private Position(String key)
         {
-            this.label = label;
+            this.key = key;
         }
 
         public static Position getPreferred()
@@ -313,6 +314,12 @@ public class DisplayVars
             return position;
         }
 
+        @Override
+        public String getKey()
+        {
+            return key;
+        }
+
         public static Position safeValueOf(String name)
         {
             Position value = null;
@@ -333,58 +340,70 @@ public class DisplayVars
         }
     }
 
-    public enum Orientation
+    public enum Orientation implements KeyedEnum
     {
         North("jm.minimap.orientation.north"),
         OldNorth("jm.minimap.orientation.oldnorth"),
         PlayerHeading("jm.minimap.orientation.playerheading");
 
-        public final String label;
+        public final String key;
 
-        private Orientation(String label)
+        private Orientation(String key)
         {
-            this.label = label;
+            this.key = key;
+        }
+
+        @Override
+        public String getKey()
+        {
+            return key;
         }
 
         @Override
         public String toString()
         {
-            return Constants.getString(this.label);
+            return Constants.getString(this.key);
         }
     }
 
-    public enum ReticleOrientation
+    public enum ReticleOrientation implements KeyedEnum
     {
         Compass("jm.minimap.orientation.compass"),
         PlayerHeading("jm.minimap.orientation.playerheading");
 
-        public final String label;
+        public final String key;
 
-        private ReticleOrientation(String label)
+        private ReticleOrientation(String key)
         {
-            this.label = label;
+            this.key = key;
+        }
+
+        @Override
+        public String getKey()
+        {
+            return key;
         }
 
         @Override
         public String toString()
         {
-            return Constants.getString(this.label);
+            return Constants.getString(this.key);
         }
     }
 
     /**
      * Shape (and size) of minimap
      */
-    public enum Shape
+    public enum Shape implements KeyedEnum
     {
         Square("jm.minimap.shape_square"),
         Circle("jm.minimap.shape_circle");
         public static Shape[] Enabled = {Square, Circle};
-        public final String label;
+        public final String key;
 
-        private Shape(String label)
+        private Shape(String key)
         {
-            this.label = label;
+            this.key = key;
         }
 
         public static Shape getPreferred()
@@ -433,12 +452,23 @@ public class DisplayVars
         {
             return Arrays.binarySearch(DisplayVars.Shape.Enabled, this) >= 0;
         }
+
+        @Override
+        public String getKey()
+        {
+            return key;
+        }
+
+        @Override
+        public String toString()
+        {
+            return Constants.getString(this.key);
+        }
     }
 
 
-
     /**
-     * Encapsulation of label attributes.
+     * Encapsulation of key attributes.
      */
     class LabelVars
     {

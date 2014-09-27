@@ -45,7 +45,7 @@ public class JMServer
 
     private JMServer()
     {
-        port = JourneyMap.getWebMapProperties().port.get();
+        port = JourneyMap.getCoreProperties().port.get();
         validatePort();
     }
 
@@ -55,7 +55,7 @@ public class JMServer
         webMapProperties.enabled.set(enable);
         webMapProperties.save();
 
-        if(instance!=null)
+        if (instance != null)
         {
             try
             {
@@ -245,7 +245,7 @@ public class JMServer
     {
         try
         {
-            if(rupy.isAlive())
+            if (rupy.isAlive())
             {
                 rupy.stop();
                 logger.info("Stopped webserver without errors"); //$NON-NLS-1$

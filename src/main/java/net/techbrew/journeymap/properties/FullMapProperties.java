@@ -9,20 +9,27 @@
 package net.techbrew.journeymap.properties;
 
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.io.IconSetFileHandler;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static net.techbrew.journeymap.properties.Config.Category.FullMap;
 
 /**
  * Properties for the full map in-game.
  */
 public class FullMapProperties extends InGameMapProperties
 {
-    protected transient static final int CODE_REVISION = 3;
+    protected transient static final int CODE_REVISION = 4;
+
+    @Config(category = FullMap, key = "jm.common.mob_icon_set", stringListProvider = IconSetFileHandler.IconSetStringListProvider.class)
+    public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("3D");
+
     public final AtomicBoolean showCaves = new AtomicBoolean(true);
     public final AtomicBoolean showGrid = new AtomicBoolean(true);
-    public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("3D");
     public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
+
     protected transient final String name = "fullmap";
 
     public FullMapProperties()
@@ -100,7 +107,6 @@ public class FullMapProperties extends InGameMapProperties
                 ", forceUnicode=" + forceUnicode +
                 ", fontSmall=" + fontSmall +
                 ", textureSmall=" + textureSmall +
-                ", terrainAlpha=" + terrainAlpha +
                 ", entityIconSetName=" + entityIconSetName;
     }
 }

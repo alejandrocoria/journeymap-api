@@ -11,26 +11,19 @@ package net.techbrew.journeymap.properties;
 import net.techbrew.journeymap.Constants;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static net.techbrew.journeymap.properties.Config.Category.WebMap;
+import static net.techbrew.journeymap.properties.Config.Category.General;
 
 /**
  * Properties for the web map in browser.
  */
 public class WebMapProperties extends MapProperties
 {
-    protected transient static final int CODE_REVISION = 3;
+    protected transient static final int CODE_REVISION = 4;
 
-    @Config(category = WebMap, key="jm.webmap.enable")
+    @Config(category = General, key = "jm.webmap.enable")
     public final AtomicBoolean enabled = new AtomicBoolean(true);
-
-    @Config(category = WebMap)
-    public final AtomicInteger port = new AtomicInteger(8080);
-
-    @Config(category = WebMap)
-    public final AtomicInteger browserPoll = new AtomicInteger(2000);
 
     public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("3D");
     public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
@@ -91,8 +84,6 @@ public class WebMapProperties extends MapProperties
         result = 31 * result + name.hashCode();
         result = 31 * result + fileRevision;
         result = 31 * result + enabled.hashCode();
-        result = 31 * result + port.hashCode();
-        result = 31 * result + browserPoll.hashCode();
         return result;
     }
 
@@ -108,8 +99,6 @@ public class WebMapProperties extends MapProperties
                 ", showPlayers=" + showPlayers +
                 ", showWaypoints=" + showWaypoints +
                 ", managerEnabled=" + enabled +
-                ", port=" + port +
-                ", browserPoll=" + browserPoll +
                 ", entityIconSetName=" + getEntityIconSetName();
     }
 }

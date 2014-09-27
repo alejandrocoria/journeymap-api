@@ -8,6 +8,7 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.texture.TextureCache;
+import net.techbrew.journeymap.ui.config.StringListProvider;
 import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemePresets;
 
@@ -80,12 +81,12 @@ public class ThemeFileHandler
     public static List<Theme> getThemes()
     {
         File[] themeDirs = getThemeDirectories();
-        if(themeDirs==null || themeDirs.length==0)
+        if (themeDirs == null || themeDirs.length == 0)
         {
             // This shouldn't happen unless somebody deleted a directory.
             initialize();
             themeDirs = getThemeDirectories();
-            if(themeDirs==null || themeDirs.length==0)
+            if (themeDirs == null || themeDirs.length == 0)
             {
                 JourneyMap.getLogger().error("Couldn't find theme directories.");
                 return Collections.emptyList();
@@ -105,12 +106,12 @@ public class ThemeFileHandler
                 }
             });
 
-            if(themeFiles!=null && themeFiles.length>0)
+            if (themeFiles != null && themeFiles.length > 0)
             {
-                for(File themeFile : themeFiles)
+                for (File themeFile : themeFiles)
                 {
                     Theme theme = loadThemeFromFile(themeFile, false);
-                    if(theme!=null)
+                    if (theme != null)
                     {
                         themes.add(theme);
                     }
@@ -126,7 +127,7 @@ public class ThemeFileHandler
     {
         List<Theme> themes = getThemes();
         ArrayList<String> names = new ArrayList<String>(themes.size());
-        for(Theme theme : themes)
+        for (Theme theme : themes)
         {
             names.add(theme.name);
         }
@@ -140,13 +141,13 @@ public class ThemeFileHandler
 
     public synchronized static Theme getCurrentTheme(boolean forceReload)
     {
-        if(forceReload)
+        if (forceReload)
         {
             TextureCache.instance().purgeThemeImages();
         }
 
         String themeName = JourneyMap.getCoreProperties().themeName.get();
-        if(forceReload || currentTheme==null || !themeName.equals(currentTheme.name))
+        if (forceReload || currentTheme == null || !themeName.equals(currentTheme.name))
         {
             currentTheme = getThemeByName(themeName);
         }
@@ -155,9 +156,9 @@ public class ThemeFileHandler
 
     public static Theme getThemeByName(String themeName)
     {
-        for(Theme theme : getThemes())
+        for (Theme theme : getThemes())
         {
-            if(theme.name.equals(themeName))
+            if (theme.name.equals(themeName))
             {
                 return theme;
             }
@@ -176,7 +177,7 @@ public class ThemeFileHandler
                 String json = Files.toString(themeFile, UTF8);
                 return GSON.fromJson(json, Theme.class);
             }
-            else if(createIfMissing)
+            else if (createIfMissing)
             {
                 JourneyMap.getLogger().info("Generating Theme json file: " + themeFile);
                 Theme theme = new Theme();
@@ -185,7 +186,7 @@ public class ThemeFileHandler
                 return theme;
             }
         }
-        catch(Throwable t)
+        catch (Throwable t)
         {
             JourneyMap.getLogger().error("Could not load Theme json file: " + LogFormatter.toString(t));
         }
@@ -208,9 +209,24 @@ public class ThemeFileHandler
             Charset UTF8 = Charset.forName("UTF-8");
             Files.write(GSON.toJson(theme), themeFile, UTF8);
         }
-        catch(Throwable t)
+        catch (Throwable t)
         {
             JourneyMap.getLogger().error("Could not save Theme json file: " + t);
+        }
+    }
+
+    public static class ThemeStringListProvider implements StringListProvider
+    {
+        @Override
+        public String[] getStrings()
+        {
+            return ThemeFileHandler.getThemeNames().toArray(new String[0]);
+        }
+
+        @Override
+        public String getDefaultString()
+        {
+            return ThemePresets.THEME_VICTORIAN.name;
         }
     }
 }

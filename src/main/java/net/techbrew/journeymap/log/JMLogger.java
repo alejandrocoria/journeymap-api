@@ -15,6 +15,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.properties.PropertiesBase;
+import net.techbrew.journeymap.ui.config.StringListProvider;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,7 +47,7 @@ public class JMLogger
     {
         final Logger logger = LogManager.getLogger(JourneyMap.MOD_ID);
 
-        if(!logger.isInfoEnabled())
+        if (!logger.isInfoEnabled())
         {
             logger.warn("Forge is surpressing INFO-level logging. If you need technical support for JourneyMap, you must return logging to INFO.");
         }
@@ -106,7 +107,7 @@ public class JMLogger
             loggerConfig.addAppender(fileAppender, Level.ALL, null);
             context.updateLoggers();
 
-            if(!fileAppender.isStarted())
+            if (!fileAppender.isStarted())
             {
                 fileAppender.start();
             }
@@ -209,14 +210,35 @@ public class JMLogger
 
     public static void logOnce(String text, Throwable throwable)
     {
-        if(!singletonErrors.contains(text.hashCode()))
+        if (!singletonErrors.contains(text.hashCode()))
         {
             singletonErrors.add(text.hashCode());
             JourneyMap.getLogger().error(text + " (SUPPRESSED FROM NOW ON)");
-            if(throwable!=null)
+            if (throwable != null)
             {
                 JourneyMap.getLogger().error(LogFormatter.toString(throwable));
             }
+        }
+    }
+
+    public static class LogLevelStringProvider implements StringListProvider
+    {
+        @Override
+        public String[] getStrings()
+        {
+            Level[] levels = Level.values();
+            String[] levelStrings = new String[levels.length];
+            for (int i = 0; i < levels.length; i++)
+            {
+                levelStrings[i] = levels[i].toString();
+            }
+            return levelStrings;
+        }
+
+        @Override
+        public String getDefaultString()
+        {
+            return Level.INFO.toString();
         }
     }
 }

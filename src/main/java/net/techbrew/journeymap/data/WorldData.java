@@ -38,7 +38,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
     long time;
     boolean hardcore;
     boolean singlePlayer;
-    Map<Feature,Boolean> features;
+    Map<Feature, Boolean> features;
     String jm_version;
     String latest_journeymap_version;
     String mc_version;
@@ -282,7 +282,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         jm_version = JourneyMap.JM_VERSION;
         latest_journeymap_version = VersionCheck.getVersionAvailable();
         mc_version = Display.getTitle().split("\\s(?=\\d)")[1];
-        browser_poll = Math.max(1000, JourneyMap.getWebMapProperties().browserPoll.get());
+        browser_poll = Math.max(1000, JourneyMap.getCoreProperties().browserPoll.get());
 
         iconSetName = JourneyMap.getFullMapProperties().getEntityIconSetName().get();
         iconSetNames = IconSetFileHandler.getEntityIconSetNames().toArray(new String[0]);

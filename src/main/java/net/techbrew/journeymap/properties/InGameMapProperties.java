@@ -9,26 +9,22 @@
 package net.techbrew.journeymap.properties;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static net.techbrew.journeymap.properties.Config.Category.MapUI;
+import static net.techbrew.journeymap.properties.Config.Category.Inherit;
 
 /**
  * Shared Properties for in-game map types.
  */
 public abstract class InGameMapProperties extends MapProperties
 {
-    @Config(category = MapUI, key="jm.minimap.force_unicode")
+    @Config(category = Inherit, key = "jm.minimap.force_unicode", defaultBoolean = false)
     public final AtomicBoolean forceUnicode = new AtomicBoolean(false);
 
-    @Config(category = MapUI, key="jm.common.font", onKey = "jm.common.font_small", offKey = "jm.common.font_large")
+    @Config(category = Inherit, key = "jm.common.font")
     public final AtomicBoolean fontSmall = new AtomicBoolean(true);
 
-    @Config(category = MapUI, key="jm.minimap.force_unicode", onKey = "jm.common.font_small", offKey = "jm.common.font_large")
+    @Config(category = Inherit, key = "jm.minimap.force_unicode")
     public final AtomicBoolean textureSmall = new AtomicBoolean(true);
-
-    @Config(category = MapUI, key="jm.minimap.force_unicode", minInt = 0, maxInt = 255)
-    public final AtomicInteger terrainAlpha = new AtomicInteger(255);
 
     protected InGameMapProperties()
     {
@@ -39,16 +35,6 @@ public abstract class InGameMapProperties extends MapProperties
     {
         boolean saveNeeded = super.validate();
 
-        if (terrainAlpha.get() < 0)
-        {
-            terrainAlpha.set(0);
-            saveNeeded = true;
-        }
-        else if (terrainAlpha.get() > 255)
-        {
-            terrainAlpha.set(255);
-            saveNeeded = true;
-        }
 
         return saveNeeded;
     }
@@ -76,7 +62,6 @@ public abstract class InGameMapProperties extends MapProperties
         result = 31 * result + forceUnicode.hashCode();
         result = 31 * result + fontSmall.hashCode();
         result = 31 * result + textureSmall.hashCode();
-        result = 31 * result + terrainAlpha.hashCode();
         return result;
     }
 }

@@ -385,12 +385,11 @@ public class GridRenderer
         {
             boolean missingTex = tile == null || !tile.hasTexture();
 
-            if (missingTex || mapProperties.terrainAlpha.get() == 255)
+            if (missingTex)
             {
-                DrawUtil.drawRectangle(startX, startZ, Tile.TILESIZE, Tile.TILESIZE, bgColor, mapProperties.terrainAlpha.get());
+                DrawUtil.drawRectangle(startX, startZ, Tile.TILESIZE, Tile.TILESIZE, bgColor, 255);
             }
-
-            if (!missingTex)
+            else
             {
                 //GL11.glDisable(GL11.GL_DEPTH_TEST);
                 //GL11.glDepthMask(false);
@@ -604,9 +603,9 @@ public class GridRenderer
 
     public Point2D shiftWindowPosition(double x, double y, int shiftX, int shiftY)
     {
-        if(currentRotation % 360 == 0)
+        if (currentRotation % 360 == 0)
         {
-            return new Point2D.Double(x+shiftX, y+shiftY);
+            return new Point2D.Double(x + shiftX, y + shiftY);
         }
         else
         {
@@ -618,7 +617,7 @@ public class GridRenderer
 
     public Point2D.Double getWindowPosition(Point2D.Double matrixPixel)
     {
-        if(currentRotation % 360 ==0)
+        if (currentRotation % 360 == 0)
         {
             return matrixPixel;
         }

@@ -30,7 +30,6 @@ import net.techbrew.journeymap.render.draw.WaypointDrawStepFactory;
 import net.techbrew.journeymap.render.map.GridRenderer;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
-import net.techbrew.journeymap.ui.component.JmUI;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
@@ -146,7 +145,7 @@ public class MiniMap
             }
 
             // Use 1:1 resolution for minimap regardless of how Minecraft UI is scaled
-            JmUI.sizeDisplay(mc.displayWidth, mc.displayHeight);
+            DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
 
             // Experimental fix for overly-dark screens with some graphics cards
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightmapS, lightmapT);
@@ -173,7 +172,7 @@ public class MiniMap
                 }
                 case PlayerHeading:
                 {
-                    if(dv.shape== DisplayVars.Shape.Circle)
+                    if (dv.shape == DisplayVars.Shape.Circle)
                     {
                         rotation = (180 - mc.thePlayer.rotationYawHead);
                     }
@@ -222,10 +221,10 @@ public class MiniMap
 
                 // Draw Reticle
                 DisplayVars.ReticleOrientation reticleOrientation = null;
-                if(dv.showReticle)
+                if (dv.showReticle)
                 {
                     reticleOrientation = dv.minimapFrame.getReticleOrientation();
-                    if (reticleOrientation==DisplayVars.ReticleOrientation.Compass)
+                    if (reticleOrientation == DisplayVars.ReticleOrientation.Compass)
                     {
                         dv.minimapFrame.drawReticle();
                     }
@@ -292,17 +291,17 @@ public class MiniMap
             {
                 dv.labelFps.draw(fpsLabelText);
             }
-            if(dv.showLocation)
+            if (dv.showLocation)
             {
                 dv.labelLocation.draw(locationLabelText);
             }
-            if(dv.showBiome)
+            if (dv.showBiome)
             {
                 dv.labelBiome.draw(biomeLabelText);
             }
 
             // Return resolution to how it is normally scaled
-            JmUI.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
+            DrawUtil.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
         }
         catch (Throwable t)
         {
@@ -340,7 +339,7 @@ public class MiniMap
             if (!drawWayPointStep.isOnScreen())
             {
                 Point2D.Double point = getPointOnFrame(
-                        drawWayPointStep.getPosition(0,0,gridRenderer,false),
+                        drawWayPointStep.getPosition(0, 0, gridRenderer, false),
                         centerPoint,
                         dv.minimapSpec.waypointOffset);
 
@@ -375,7 +374,7 @@ public class MiniMap
 
     private boolean isOnScreen(Point2D.Double objectPixel, Point2D centerPixel, Rectangle2D.Double centerRect)
     {
-        if(dv.shape == DisplayVars.Shape.Circle)
+        if (dv.shape == DisplayVars.Shape.Circle)
         {
             return centerPixel.distance(objectPixel) < dv.minimapRadius;
         }
@@ -396,12 +395,12 @@ public class MiniMap
         // Use radius for circle, or enlarge radius 40% to encapsulate the square within a circle
         double radius = offset + ((dv.shape == DisplayVars.Shape.Circle) ? dv.minimapRadius : (dv.minimapRadius * 1.4));
 
-        Point2D.Double framePos =  new Point2D.Double(
+        Point2D.Double framePos = new Point2D.Double(
                 (radius * Math.cos(bearing)) + centerPixel.getX(),
                 (radius * Math.sin(bearing)) + centerPixel.getY()
         );
 
-        if(dv.shape == DisplayVars.Shape.Circle)
+        if (dv.shape == DisplayVars.Shape.Circle)
         {
             // TODO: I probably broke this by passing in widow position
             return framePos;
@@ -410,20 +409,20 @@ public class MiniMap
         {
             Rectangle2D.Double rect = new Rectangle2D.Double(dv.textureX, dv.textureY, dv.minimapSize, dv.minimapSize);
 
-            if(framePos.x>rect.getMaxX())
+            if (framePos.x > rect.getMaxX())
             {
                 framePos.x = rect.getMaxX();
             }
-            else if(framePos.x<rect.getMinX())
+            else if (framePos.x < rect.getMinX())
             {
                 framePos.x = rect.getMinX();
             }
 
-            if(framePos.y>rect.getMaxY())
+            if (framePos.y > rect.getMaxY())
             {
                 framePos.y = rect.getMaxY();
             }
-            else if(framePos.y<rect.getMinY())
+            else if (framePos.y < rect.getMinY())
             {
                 framePos.y = rect.getMinY();
             }
@@ -454,7 +453,8 @@ public class MiniMap
 
     }
 
-    private void endStencil() {
+    private void endStencil()
+    {
         try
         {
             GL11.glDepthMask(false);
@@ -484,7 +484,6 @@ public class MiniMap
             JMLogger.logOnce("Error during MiniMap.cleanup()", t);
         }
     }
-
 
 
     public void reset()
@@ -585,7 +584,7 @@ public class MiniMap
 
     private void updateLabels()
     {
-        // FPS label
+        // FPS key
         if (dv.showFps)
         {
             String fps = mc.debug;
@@ -600,7 +599,7 @@ public class MiniMap
             }
         }
 
-        // Location label
+        // Location key
         String playerInfo = "";
         final int playerX = MathHelper.floor_double(player.posX);
         final int playerY = MathHelper.floor_double(player.boundingBox.minY);
@@ -618,7 +617,7 @@ public class MiniMap
 
         locationLabelText = playerInfo;
 
-        // Biome label
+        // Biome key
         biomeLabelText = state.getPlayerBiome();
 
         // Update timestamp

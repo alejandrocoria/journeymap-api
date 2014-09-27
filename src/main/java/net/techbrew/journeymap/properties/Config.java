@@ -1,36 +1,80 @@
 package net.techbrew.journeymap.properties;
 
+import net.techbrew.journeymap.ui.config.StringListProvider;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * Created by Mark on 9/21/2014.
  */
+@Target({ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Config
 {
     Category category();
-    String subcategory() default "";
-    String key() default "";
-    String onKey() default "jm.common.on";
-    String offKey() default "jm.common.off";
+
+    String key();
+
+    Class<? extends Enum> enumClass() default None.class;
+
+    Class<? extends StringListProvider> stringListProvider() default NoStringProvider.class;
+
     int minInt() default 0;
+
     int maxInt() default 0;
+
     float minFloat() default 0f;
+
     float maxFloat() default 0f;
+
+    String defaultEnum() default "";
+
+    int defaultInt() default 0;
+
+    boolean defaultBoolean() default true;
+
+    String defaultString() default "";
 
     public enum Category
     {
-        Advanced("jm.config.category.advanced"),
-        General("jm.common.general_display_title"),
-        MapStyle("jm.common.map_style_title"),
-        MapUI("jm.config.category.mapui"),
-        MiniMap("jm.minimap.options"),
+        General("jm.config.category.general"),
+        Inherit(""),
+        MiniMap("jm.config.category.minimap"),
+        FullMap("jm.config.category.fullmap"),
+        WebMap("jm.config.category.webmap"),
         Radar("jm.config.category.radar"),
-        Waypoint("jm.waypoint.options"),
-        WebMap("jm.webmap.enable")
-        ;
+        Waypoint("jm.config.category.waypoint"),
+        Cartography("jm.config.category.cartography"),
+        Advanced("jm.config.category.advanced");
 
         public final String key;
+
         private Category(String key)
         {
             this.key = key;
+        }
+    }
+
+    public enum None
+    {
+        NONE
+    }
+
+    class NoStringProvider implements StringListProvider
+    {
+        @Override
+        public String[] getStrings()
+        {
+            return new String[0];
+        }
+
+        @Override
+        public String getDefaultString()
+        {
+            return null;
         }
     }
 }

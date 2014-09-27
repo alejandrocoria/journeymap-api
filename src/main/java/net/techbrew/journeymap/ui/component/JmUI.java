@@ -23,7 +23,6 @@ import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.ui.UIManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -50,17 +49,6 @@ public abstract class JmUI extends GuiScreen
         this.returnClass = returnClass;
     }
 
-    public static void sizeDisplay(double width, double height)
-    {
-
-        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glMatrixMode(GL11.GL_PROJECTION);
-        GL11.glLoadIdentity();
-        GL11.glOrtho(0.0D, width, height, 0.0D, 1000.0D, 3000.0D);
-        GL11.glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadIdentity();
-        GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
-    }
 
     public Minecraft getMinecraft()
     {
@@ -90,7 +78,7 @@ public abstract class JmUI extends GuiScreen
     {
         final int glwidth = scaled ? this.width : mc.displayWidth;
         final int glheight = scaled ? this.height : mc.displayHeight;
-        sizeDisplay(glwidth, glheight);
+        DrawUtil.sizeDisplay(glwidth, glheight);
     }
 
     protected boolean isMouseOverButton(int mouseX, int mouseY)
@@ -129,9 +117,9 @@ public abstract class JmUI extends GuiScreen
 
     protected void drawLogo()
     {
-        sizeDisplay(mc.displayWidth, mc.displayHeight);
-        DrawUtil.drawImage(logo, 8,8, false, 1, 0);
-        sizeDisplay(width, height);
+        DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
+        DrawUtil.drawImage(logo, 8, 8, false, 1, 0);
+        DrawUtil.sizeDisplay(width, height);
     }
 
     protected void drawTitle()

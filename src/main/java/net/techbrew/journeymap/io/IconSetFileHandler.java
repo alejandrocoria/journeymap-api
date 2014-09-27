@@ -12,6 +12,7 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.ui.config.StringListProvider;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -87,6 +88,21 @@ public class IconSetFileHandler
         Collections.sort(names);
 
         return names;
+    }
+
+    public static class IconSetStringListProvider implements StringListProvider
+    {
+        @Override
+        public String[] getStrings()
+        {
+            return IconSetFileHandler.getEntityIconSetNames().toArray(new String[0]);
+        }
+
+        @Override
+        public String getDefaultString()
+        {
+            return MOB_ICON_SET_2D;
+        }
     }
 
 }

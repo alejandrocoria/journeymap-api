@@ -39,6 +39,7 @@ import net.techbrew.journeymap.ui.component.BooleanPropertyAdapter;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.ButtonList;
 import net.techbrew.journeymap.ui.component.JmUI;
+import net.techbrew.journeymap.ui.config.ConfigManager;
 import net.techbrew.journeymap.ui.fullscreen.layer.LayerDelegate;
 import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemeButton;
@@ -87,6 +88,7 @@ public class Fullscreen extends JmUI
     StatTimer drawMapTimerWithRefresh = StatTimer.get("MapOverlay.drawMap+refreshState");
 
     int lastWidth;
+
     /**
      * Default constructor
      */
@@ -144,7 +146,7 @@ public class Fullscreen extends JmUI
 
             ArrayList<String> tooltip = null;
 
-            if(firstLayoutPass)
+            if (firstLayoutPass)
             {
                 layoutButtons();
                 firstLayoutPass = false;
@@ -183,7 +185,7 @@ public class Fullscreen extends JmUI
         }
         catch (Throwable e)
         {
-            logger.log(Level.ERROR, "Unexpected exception in jm.fullscreen.drawScreen(): " + LogFormatter.toString(e)); 
+            logger.log(Level.ERROR, "Unexpected exception in jm.fullscreen.drawScreen(): " + LogFormatter.toString(e));
             UIManager.getInstance().closeAll();
         }
         finally
@@ -196,17 +198,17 @@ public class Fullscreen extends JmUI
     protected void actionPerformed(GuiButton guibutton)
     { // actionPerformed
 
-        if(guibutton instanceof ThemeToolbar)
+        if (guibutton instanceof ThemeToolbar)
         {
             return;
         }
 
-        if(guibutton instanceof Button)
+        if (guibutton instanceof Button)
         {
             ((Button) guibutton).toggle();
         }
 
-        if(optionsToolbar.contains(guibutton))
+        if (optionsToolbar.contains(guibutton))
         {
             refreshState();
         }
@@ -260,16 +262,17 @@ public class Fullscreen extends JmUI
                 @Override
                 public boolean onToggle(Button button, boolean toggled)
                 {
-                    if(toggled)
+                    if (toggled)
                     {
                         state.setMapType(Constants.MapType.day);
                         buttonNight.setToggled(false);
-                        if(state.isUnderground()) {
+                        if (state.isUnderground())
+                        {
                             buttonCaves.setToggled(false);
                         }
                         state.requireRefresh();
                     }
-                    else if(state.getCurrentMapType()==Constants.MapType.day)
+                    else if (state.getCurrentMapType() == Constants.MapType.day)
                     {
                         return false;
                     }
@@ -285,16 +288,17 @@ public class Fullscreen extends JmUI
                 @Override
                 public boolean onToggle(Button button, boolean toggled)
                 {
-                    if(toggled)
+                    if (toggled)
                     {
                         state.setMapType(Constants.MapType.night);
                         buttonDay.setToggled(false);
-                        if(state.isUnderground()) {
+                        if (state.isUnderground())
+                        {
                             buttonCaves.setToggled(false);
                         }
                         state.requireRefresh();
                     }
-                    else if(state.getCurrentMapType()==Constants.MapType.night)
+                    else if (state.getCurrentMapType() == Constants.MapType.night)
                     {
                         return false;
                     }
@@ -375,7 +379,10 @@ public class Fullscreen extends JmUI
                 @Override
                 public boolean onToggle(Button button, boolean toggled)
                 {
-                    UIManager.getInstance().openMasterOptions();
+                    mc.displayGuiScreen(new ConfigManager(Fullscreen.this));
+                    // TODO
+
+                    //UIManager.getInstance().openMasterOptions();
                     return true;
                 }
             });
@@ -449,7 +456,7 @@ public class Fullscreen extends JmUI
             optionsToolbar = new ThemeToolbar(id++, theme, buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid);
             optionsToolbar.addAllButtons(this);
 
-            menuToolbar = new ThemeToolbar(id++, theme,  buttonWaypointManager, buttonOptions, buttonActions);
+            menuToolbar = new ThemeToolbar(id++, theme, buttonWaypointManager, buttonOptions, buttonActions);
             menuToolbar.addAllButtons(this);
 
             zoomToolbar = new ThemeToolbar(id++, theme, buttonFollow, buttonZoomIn, buttonZoomOut);
@@ -468,7 +475,7 @@ public class Fullscreen extends JmUI
     @Override
     protected void layoutButtons()
     {
-        if(buttonList.isEmpty())
+        if (buttonList.isEmpty())
         {
             initButtons();
         }
@@ -482,19 +489,19 @@ public class Fullscreen extends JmUI
 
         int padding = mapTypeToolbar.getToolbarSpec().padding;
 
-        zoomToolbar.layoutCenteredVertical(zoomToolbar.getHMargin(), height/2, true, padding);
+        zoomToolbar.layoutCenteredVertical(zoomToolbar.getHMargin(), height / 2, true, padding);
 
         int topY = mapTypeToolbar.getVMargin();
 
         int margin = mapTypeToolbar.getHMargin();
 
         layoutToolbars(margin, topY, padding, hideOptionsToolbar);
-        buttonClose.leftOf(width-padding).below(mapTypeToolbar.getVMargin());
-        buttonAlert.leftOf(width-padding).below(buttonClose, padding);
+        buttonClose.leftOf(width - padding).below(mapTypeToolbar.getVMargin());
+        buttonAlert.leftOf(width - padding).below(buttonClose, padding);
 
 
-
-        if(!hideOptionsToolbar) {
+        if (!hideOptionsToolbar)
+        {
             if (menuToolbar.getRightX() + margin >= buttonClose.getX())
             {
                 optionsToolbar.setDrawToolbar(false);
@@ -507,9 +514,9 @@ public class Fullscreen extends JmUI
 
     protected void layoutToolbars(int margin, int topY, int padding, boolean hideOptionsToolbar)
     {
-        if(hideOptionsToolbar)
+        if (hideOptionsToolbar)
         {
-            int centerX = width/2;
+            int centerX = width / 2;
             mapTypeToolbar.layoutHorizontal(centerX - margin, topY, false, padding);
             menuToolbar.layoutHorizontal(centerX + margin, topY, true, padding);
         }
@@ -572,7 +579,7 @@ public class Fullscreen extends JmUI
         super.mouseClicked(mouseX, mouseY, mouseButton);
 
         // Bail if over a button
-        if(isMouseOverButton(mouseX, mouseY))
+        if (isMouseOverButton(mouseX, mouseY))
         {
             return;
         }
@@ -605,8 +612,8 @@ public class Fullscreen extends JmUI
             if (!Mouse.isButtonDown(0) && isScrolling)
             {
                 isScrolling = false;
-                int mouseDragX = (mx - msx) * Math.max(1,scaleFactor) / blockSize;
-                int mouseDragY = (my - msy) * Math.max(1,scaleFactor) / blockSize;
+                int mouseDragX = (mx - msx) * Math.max(1, scaleFactor) / blockSize;
+                int mouseDragY = (my - msy) * Math.max(1, scaleFactor) / blockSize;
                 msx = mx;
                 msy = my;
 
@@ -813,8 +820,8 @@ public class Fullscreen extends JmUI
         {
             int blockSize = (int) Math.pow(2, fullMapProperties.zoomLevel.get());
 
-            int mouseDragX = (mx - msx) * Math.max(1,scaleFactor) / blockSize;
-            int mouseDragY = (my - msy) * Math.max(1,scaleFactor) / blockSize;
+            int mouseDragX = (mx - msx) * Math.max(1, scaleFactor) / blockSize;
+            int mouseDragY = (my - msy) * Math.max(1, scaleFactor) / blockSize;
 
             xOffset = (mouseDragX * blockSize);
             yOffset = (mouseDragY * blockSize);
@@ -900,7 +907,7 @@ public class Fullscreen extends JmUI
         EntityClientPlayerMP player = mc.thePlayer;
         if (player == null)
         {
-            logger.warn("Could not get player"); 
+            logger.warn("Could not get player");
             return;
         }
 
@@ -937,7 +944,7 @@ public class Fullscreen extends JmUI
                 MathHelper.floor_double(mc.thePlayer.posZ),
                 MathHelper.floor_double(mc.thePlayer.boundingBox.minY),
                 mc.thePlayer.chunkCoordY,
-                state.getPlayerBiome()); 
+                state.getPlayerBiome());
 
         // Reset timer
         state.updateLastRefresh();
@@ -998,9 +1005,9 @@ public class Fullscreen extends JmUI
     @Override
     protected void drawLogo()
     {
-        sizeDisplay(mc.displayWidth, mc.displayHeight);
-        DrawUtil.drawImage(logo, 8,8, false, 1, 0);
-        sizeDisplay(width, height);
+        DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
+        DrawUtil.drawImage(logo, 8, 8, false, 1, 0);
+        DrawUtil.sizeDisplay(width, height);
     }
 
     @Override

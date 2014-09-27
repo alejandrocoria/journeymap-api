@@ -12,6 +12,7 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New Feature:  Options management moved to Forge's Config UI framework.  It's ugly, and a lot of options need to have tooltips written, but there's a lot more exposed options than ever before.  This will be a work in progress.
 - New Option: "Reticle Orientation" in Minimap Options. Can be "Compass" (the default) or "My Heading"
 - Change: [Pulled from 4.0.5] Version check info moved to DropBox after exceeding Google Drive's quota
 - Change: [Pulled from 4.0.5] Version check no longer announces a new version is available in chat.(UI elements still display in Fullscreen Map and Webmap.)
@@ -56,7 +57,7 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap 4.1.0alpha19:
 - More experimentation to try to make the pandora's box of circular minimaps play nicely.
-- Moved control of minimap label positions, colors, etc. to Theme
+- Moved control of minimap key positions, colors, etc. to Theme
 - Bugfix: Minimap labels should no longer be missing
 - Change: Minimum size of minimap is now 128
 

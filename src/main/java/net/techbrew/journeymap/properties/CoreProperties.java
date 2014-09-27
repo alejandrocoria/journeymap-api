@@ -9,8 +9,8 @@
 package net.techbrew.journeymap.properties;
 
 import net.techbrew.journeymap.io.ThemeFileHandler;
+import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.ui.theme.Theme;
-import net.techbrew.journeymap.ui.theme.ThemePresets;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,93 +23,93 @@ import static net.techbrew.journeymap.properties.Config.Category.*;
  */
 public class CoreProperties extends PropertiesBase implements Comparable<CoreProperties>
 {
-    protected transient static final int CODE_REVISION = 3;
+    protected transient static final int CODE_REVISION = 4;
 
-    @Config(category = Advanced)
+    @Config(category = Advanced, key = "jm.advanced.loglevel", stringListProvider = JMLogger.LogLevelStringProvider.class)
     public final AtomicReference<String> logLevel = new AtomicReference<String>("INFO");
 
-    @Config(category = Advanced)
+    @Config(category = Advanced, key = "jm.advanced.chunkoffset", minInt = 1, maxInt = 20, defaultInt = 8)
     public final AtomicInteger chunkOffset = new AtomicInteger(8);
 
-    @Config(category = Advanced)
-    public final AtomicInteger entityPoll = new AtomicInteger(1800);
-
-    @Config(category = Advanced)
-    public final AtomicInteger playerPoll = new AtomicInteger(1900);
-
-    @Config(category = Advanced)
+    @Config(category = Advanced, key = "jm.advanced.chunkpoll", minInt = 1000, maxInt = 10000, defaultInt = 2000)
     public final AtomicInteger chunkPoll = new AtomicInteger(2000);
 
-    @Config(category = Advanced)
+    @Config(category = Advanced, key = "jm.advanced.automappoll", minInt = 500, maxInt = 10000, defaultInt = 2000)
     public final AtomicInteger autoMapPoll = new AtomicInteger(2000);
 
-    @Config(category = Advanced)
+    @Config(category = Radar, key = "jm.advanced.cache_animals", minInt = 1000, maxInt = 10000, defaultInt = 3100)
     public final AtomicInteger cacheAnimalsData = new AtomicInteger(3100);
 
-    @Config(category = Advanced)
+    @Config(category = Radar, key = "jm.advanced.cache_mobs", defaultInt = 3000)
     public final AtomicInteger cacheMobsData = new AtomicInteger(3000);
 
-    @Config(category = Advanced)
+    @Config(category = Advanced, key = "jm.advanced.cache_player", defaultInt = 1000)
     public final AtomicInteger cachePlayerData = new AtomicInteger(1000);
 
-    @Config(category = Advanced)
+    @Config(category = Radar, key = "jm.advanced.cache_players", defaultInt = 2000)
     public final AtomicInteger cachePlayersData = new AtomicInteger(2000);
 
-    @Config(category = Advanced)
+    @Config(category = Radar, key = "jm.advanced.cache_villagers", defaultInt = 2200)
     public final AtomicInteger cacheVillagersData = new AtomicInteger(2200);
 
-    @Config(category = Advanced)
+    @Config(category = Advanced, key = "jm.advanced.announcemod", defaultBoolean = true)
     public final AtomicBoolean announceMod = new AtomicBoolean(true);
 
-    @Config(category = Advanced)
+    @Config(category = Advanced, key = "jm.advanced.checkupdates", defaultBoolean = true)
     public final AtomicBoolean checkUpdates = new AtomicBoolean(true);
 
-    @Config(category = Advanced)
+    @Config(category = Advanced, key = "jm.advanced.recordcachestats", defaultBoolean = false)
     public final AtomicBoolean recordCacheStats = new AtomicBoolean(false);
 
-    @Config(category = General, key="jm.common.ui_theme")
-    public final AtomicReference<String> themeName = new AtomicReference<String>(ThemePresets.THEME_VICTORIAN.name);
+    @Config(category = Advanced, key = "jm.advanced.port", defaultInt = 8080)
+    public final AtomicInteger port = new AtomicInteger(8080);
 
-    @Config(category = MapStyle, key="jm.common.map_style_caveignoreglass")
+    @Config(category = Advanced, key = "jm.advanced.browserpoll", defaultInt = 2000)
+    public final AtomicInteger browserPoll = new AtomicInteger(2000);
+
+    @Config(category = General, key = "jm.common.ui_theme", stringListProvider = ThemeFileHandler.ThemeStringListProvider.class)
+    public final AtomicReference<String> themeName = new AtomicReference<String>(new ThemeFileHandler.ThemeStringListProvider().getDefaultString());
+
+    @Config(category = Cartography, key = "jm.common.map_style_caveignoreglass", defaultBoolean = true)
     public final AtomicBoolean caveIgnoreGlass = new AtomicBoolean(true);
 
-    @Config(category = MapStyle, key="jm.common.map_style_bathymetry")
+    @Config(category = Cartography, key = "jm.common.map_style_bathymetry", defaultBoolean = false)
     public final AtomicBoolean mapBathymetry = new AtomicBoolean(false);
 
-    @Config(category = MapStyle, key="jm.common.map_style_transparency")
+    @Config(category = Cartography, key = "jm.common.map_style_transparency", defaultBoolean = true)
     public final AtomicBoolean mapTransparency = new AtomicBoolean(true);
 
-    @Config(category = MapStyle, key="jm.common.map_style_cavelighting")
+    @Config(category = Cartography, key = "jm.common.map_style_cavelighting", defaultBoolean = true)
     public final AtomicBoolean mapCaveLighting = new AtomicBoolean(true);
 
-    @Config(category = MapStyle, key="jm.common.map_style_antialiasing")
+    @Config(category = Cartography, key = "jm.common.map_style_antialiasing", defaultBoolean = true)
     public final AtomicBoolean mapAntialiasing = new AtomicBoolean(true);
 
-    @Config(category = MapStyle, key="jm.common.map_style_plantshadows")
+    @Config(category = Cartography, key = "jm.common.map_style_plantshadows", defaultBoolean = false)
     public final AtomicBoolean mapPlantShadows = new AtomicBoolean(false);
 
-    @Config(category = MapStyle, key="jm.common.map_style_plants")
+    @Config(category = Cartography, key = "jm.common.map_style_plants", defaultBoolean = true)
     public final AtomicBoolean mapPlants = new AtomicBoolean(true);
 
-    @Config(category = MapStyle, key="jm.common.map_style_crops")
+    @Config(category = Cartography, key = "jm.common.map_style_crops", defaultBoolean = true)
     public final AtomicBoolean mapCrops = new AtomicBoolean(true);
 
-    @Config(category = MapStyle, key="jm.common.map_style_caveshowsurface")
+    @Config(category = Cartography, key = "jm.common.map_style_caveshowsurface", defaultBoolean = true)
     public final AtomicBoolean mapSurfaceAboveCaves = new AtomicBoolean(true);
 
-    @Config(category = Radar, key="jm.common.radar_max_animals")
+    @Config(category = Radar, key = "jm.common.radar_max_animals", defaultInt = 32)
     public final AtomicInteger maxAnimalsData = new AtomicInteger(32);
 
-    @Config(category = Radar, key="jm.common.radar_max_mobs")
+    @Config(category = Radar, key = "jm.common.radar_max_mobs", defaultInt = 32)
     public final AtomicInteger maxMobsData = new AtomicInteger(32);
 
-    @Config(category = Radar, key="jm.common.radar_max_players")
+    @Config(category = Radar, key = "jm.common.radar_max_players", defaultInt = 32)
     public final AtomicInteger maxPlayersData = new AtomicInteger(32);
 
-    @Config(category = Radar, key="jm.common.radar_max_villagers")
+    @Config(category = Radar, key = "jm.common.radar_max_villagers", defaultInt = 32)
     public final AtomicInteger maxVillagersData = new AtomicInteger(32);
 
-    @Config(category = Radar, key="jm.common.radar_hide_sneaking")
+    @Config(category = Radar, key = "jm.common.radar_hide_sneaking", defaultBoolean = true)
     public final AtomicBoolean hideSneakingEntities = new AtomicBoolean(true);
 
     protected transient final String name = "core";
@@ -124,7 +124,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
         boolean saveNeeded = super.validate();
 
         Theme theme = ThemeFileHandler.getThemeByName(themeName.get());
-        if(!theme.name.equals(themeName.get()))
+        if (!theme.name.equals(themeName.get()))
         {
             themeName.set(theme.name);
             saveNeeded = true;
@@ -172,23 +172,20 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     {
         int result = logLevel.hashCode();
         result = 31 * result + chunkOffset.hashCode();
-        result = 31 * result + entityPoll.hashCode();
-        result = 31 * result + playerPoll.hashCode();
         result = 31 * result + chunkPoll.hashCode();
         result = 31 * result + autoMapPoll.hashCode();
         result = 31 * result + cacheAnimalsData.hashCode();
-        result = 31 * result + maxAnimalsData.hashCode();
         result = 31 * result + cacheMobsData.hashCode();
-        result = 31 * result + maxMobsData.hashCode();
         result = 31 * result + cachePlayerData.hashCode();
         result = 31 * result + cachePlayersData.hashCode();
-        result = 31 * result + maxPlayersData.hashCode();
         result = 31 * result + cacheVillagersData.hashCode();
-        result = 31 * result + maxVillagersData.hashCode();
         result = 31 * result + announceMod.hashCode();
         result = 31 * result + checkUpdates.hashCode();
-        result = 31 * result + caveIgnoreGlass.hashCode();
         result = 31 * result + recordCacheStats.hashCode();
+        result = 31 * result + port.hashCode();
+        result = 31 * result + browserPoll.hashCode();
+        result = 31 * result + themeName.hashCode();
+        result = 31 * result + caveIgnoreGlass.hashCode();
         result = 31 * result + mapBathymetry.hashCode();
         result = 31 * result + mapTransparency.hashCode();
         result = 31 * result + mapCaveLighting.hashCode();
@@ -197,7 +194,11 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
         result = 31 * result + mapPlants.hashCode();
         result = 31 * result + mapCrops.hashCode();
         result = 31 * result + mapSurfaceAboveCaves.hashCode();
-        result = 31 * result + themeName.hashCode();
+        result = 31 * result + maxAnimalsData.hashCode();
+        result = 31 * result + maxMobsData.hashCode();
+        result = 31 * result + maxPlayersData.hashCode();
+        result = 31 * result + maxVillagersData.hashCode();
+        result = 31 * result + hideSneakingEntities.hashCode();
         result = 31 * result + name.hashCode();
         return result;
     }
@@ -206,25 +207,22 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public String toString()
     {
         return "CoreProperties{" +
-                ", logLevel=" + logLevel +
+                "logLevel=" + logLevel +
                 ", chunkOffset=" + chunkOffset +
-                ", entityPoll=" + entityPoll +
-                ", playerPoll=" + playerPoll +
                 ", chunkPoll=" + chunkPoll +
                 ", autoMapPoll=" + autoMapPoll +
                 ", cacheAnimalsData=" + cacheAnimalsData +
-                ", maxAnimalsData=" + maxAnimalsData +
                 ", cacheMobsData=" + cacheMobsData +
-                ", maxMobsData=" + maxMobsData +
                 ", cachePlayerData=" + cachePlayerData +
                 ", cachePlayersData=" + cachePlayersData +
-                ", maxPlayersData=" + maxPlayersData +
                 ", cacheVillagersData=" + cacheVillagersData +
-                ", maxVillagersData=" + maxVillagersData +
                 ", announceMod=" + announceMod +
                 ", checkUpdates=" + checkUpdates +
-                ", caveIgnoreGlass=" + caveIgnoreGlass +
                 ", recordCacheStats=" + recordCacheStats +
+                ", port=" + port +
+                ", browserPoll=" + browserPoll +
+                ", themeName=" + themeName +
+                ", caveIgnoreGlass=" + caveIgnoreGlass +
                 ", mapBathymetry=" + mapBathymetry +
                 ", mapTransparency=" + mapTransparency +
                 ", mapCaveLighting=" + mapCaveLighting +
@@ -233,7 +231,11 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 ", mapPlants=" + mapPlants +
                 ", mapCrops=" + mapCrops +
                 ", mapSurfaceAboveCaves=" + mapSurfaceAboveCaves +
-                ", themeName=" + themeName + '\'' +
+                ", maxAnimalsData=" + maxAnimalsData +
+                ", maxMobsData=" + maxMobsData +
+                ", maxPlayersData=" + maxPlayersData +
+                ", maxVillagersData=" + maxVillagersData +
+                ", hideSneakingEntities=" + hideSneakingEntities +
                 '}';
     }
 }

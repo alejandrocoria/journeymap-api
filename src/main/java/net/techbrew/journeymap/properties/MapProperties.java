@@ -17,32 +17,32 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static net.techbrew.journeymap.properties.Config.Category.Radar;
+import static net.techbrew.journeymap.properties.Config.Category.Inherit;
 
 /**
  * Shared Properties for the various map types.
  */
 public abstract class MapProperties extends PropertiesBase implements Comparable<MapProperties>
 {
-    @Config(category = Radar, key="jm.common.show_monsters")
+    @Config(category = Inherit, key = "jm.common.show_monsters")
     public final AtomicBoolean showMobs = new AtomicBoolean(true);
 
-    @Config(category = Radar, key="jm.common.show_animals")
+    @Config(category = Inherit, key = "jm.common.show_animals")
     public final AtomicBoolean showAnimals = new AtomicBoolean(true);
 
-    @Config(category = Radar, key="jm.common.show_villagers")
+    @Config(category = Inherit, key = "jm.common.show_villagers")
     public final AtomicBoolean showVillagers = new AtomicBoolean(true);
 
-    @Config(category = Radar, key="jm.common.show_pets")
+    @Config(category = Inherit, key = "jm.common.show_pets")
     public final AtomicBoolean showPets = new AtomicBoolean(true);
 
-    @Config(category = Radar, key="jm.common.show_players")
+    @Config(category = Inherit, key = "jm.common.show_players")
     public final AtomicBoolean showPlayers = new AtomicBoolean(true);
 
-    @Config(category = Radar, key="jm.common.show_waypoints")
+    @Config(category = Inherit, key = "jm.common.show_waypoints")
     public final AtomicBoolean showWaypoints = new AtomicBoolean(true);
 
-    @Config(category = Radar, key="jm.common.show_self")
+    @Config(category = Inherit, key = "jm.common.show_self")
     public final AtomicBoolean showSelf = new AtomicBoolean(true);
 
     public final AtomicInteger zoomLevel = new AtomicInteger(0);

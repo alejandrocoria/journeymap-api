@@ -155,7 +155,7 @@ public class MiniMapOptions extends JmUI
         buttonRows.add(new ButtonList(buttonUnicode, buttonFontSize, buttonCompassFont));
 
         buttonList.add(buttonMiniMap);
-        for(ButtonList row : buttonRows)
+        for (ButtonList row : buttonRows)
         {
             buttonList.addAll(row);
         }
@@ -205,7 +205,7 @@ public class MiniMapOptions extends JmUI
         by = buttonMiniMap.getBottomY() + vgap;
 
         boolean minimapOn = miniMapProperties.enabled.get();
-        for(ButtonList row : buttonRows)
+        for (ButtonList row : buttonRows)
         {
             row.layoutCenteredHorizontal(bx, by, true, hgap);
             for (Button button : row)
@@ -236,7 +236,7 @@ public class MiniMapOptions extends JmUI
         // See if sliders no longer in use.
         boolean sliderNotInUse = !buttonSize.dragging && !buttonTerrainAlpha.dragging && !buttonFrameAlpha.dragging;
 
-        if(sliderWasInUse)
+        if (sliderWasInUse)
         {
             buttonSize.updateValue();
             buttonTerrainAlpha.updateValue();
@@ -430,7 +430,7 @@ public class MiniMapOptions extends JmUI
             shape = DisplayVars.Shape.Enabled[0];
         }
         currentShape = shape;
-        buttonShape.displayString = Constants.getString("jm.minimap.shape", Constants.getString(currentShape.label));
+        buttonShape.displayString = Constants.getString("jm.minimap.shape", Constants.getString(currentShape.key));
         miniMap.setShape(shape);
     }
 
@@ -447,7 +447,7 @@ public class MiniMapOptions extends JmUI
     private void setPosition(DisplayVars.Position position)
     {
         currentPosition = position;
-        buttonPosition.displayString = Constants.getString("jm.minimap.position", Constants.getString(currentPosition.label));
+        buttonPosition.displayString = Constants.getString("jm.minimap.position", Constants.getString(currentPosition.key));
         miniMap.setPosition(position);
     }
 
@@ -509,7 +509,7 @@ public class MiniMapOptions extends JmUI
     private enum ButtonEnum
     {
         MiniMap, Position, Shape, Font, Texture, IconSet, Unicode, Keyboard, KeyboardHelp, Close, Showfps, ShowSelf,
-        Location, Biome, Compass, CompassFont, Reticle,ReticleOrientation,
+        Location, Biome, Compass, CompassFont, Reticle, ReticleOrientation,
         GeneralDisplay, Orientation, TerrainAlpha, FrameAlpha, CustomSize, CloseAll
     }
 }

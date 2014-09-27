@@ -13,6 +13,7 @@ import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.properties.InGameMapProperties;
+import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.texture.DelayedTexture;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -112,7 +113,11 @@ public class Tile
         }
         boolean showGrid = JourneyMap.getFullMapProperties().showGrid.get();
 
-        float alpha = mapProperties.terrainAlpha.get() / 255f;
+        float alpha = 1f;
+        if (mapProperties instanceof MiniMapProperties)
+        {
+            alpha = ((MiniMapProperties) mapProperties).terrainAlpha.get() / 255f;
+        }
         futureTex = TextureCache.instance().prepareImage(glId, image, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE, showGrid, alpha);
 
         return true;
