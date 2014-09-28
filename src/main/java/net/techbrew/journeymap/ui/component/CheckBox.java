@@ -10,7 +10,7 @@ import net.minecraft.client.gui.FontRenderer;
  */
 public class CheckBox extends Button
 {
-    private final int boxWidth = 11;
+    public int boxWidth = 11;
 
     public CheckBox(int id, String displayString)
     {
@@ -41,7 +41,8 @@ public class CheckBox extends Button
         if (this.visible)
         {
             this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.boxWidth && mouseY < this.yPosition + this.height;
-            GuiUtils.drawContinuousTexturedBox(buttonTextures, this.xPosition, this.yPosition, 0, 46, this.boxWidth, this.height, 200, 20, 2, 3, 2, 2, this.zLevel);
+            int yoffset = (this.height - this.boxWidth) / 2;
+            GuiUtils.drawContinuousTexturedBox(buttonTextures, this.xPosition, this.yPosition + yoffset, 0, 46, this.boxWidth, this.boxWidth, 200, 20, 2, 3, 2, 2, this.zLevel);
             this.mouseDragged(mc, mouseX, mouseY);
             int color = 14737632;
 
@@ -58,10 +59,10 @@ public class CheckBox extends Button
 
             if (this.toggled)
             {
-                this.drawCenteredString(mc.fontRenderer, "x", this.xPosition + this.boxWidth / 2 + 1, this.yPosition + 1, 14737632);
+                this.drawCenteredString(mc.fontRenderer, "x", this.xPosition + this.boxWidth / 2 + 1, this.yPosition + 1 + yoffset, 14737632);
             }
 
-            this.drawString(mc.fontRenderer, displayString, xPosition + this.boxWidth + labelPad, yPosition + 2, color);
+            this.drawString(mc.fontRenderer, displayString, xPosition + this.boxWidth + labelPad, yPosition + 2 + yoffset, color);
         }
     }
 

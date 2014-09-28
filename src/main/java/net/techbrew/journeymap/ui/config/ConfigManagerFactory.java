@@ -488,6 +488,7 @@ public class ConfigManagerFactory implements IModGuiFactory
             this.btnValue.width = drawLabel ? this.owningEntryList.controlWidth : (this.owningEntryList.controlWidth + this.owningEntryList.maxLabelTextWidth);
             this.btnValue.xPosition = drawLabel ? this.owningScreen.entryList.controlX : this.owningScreen.entryList.labelX + 16;
             this.btnValue.yPosition = y;
+            this.btnValue.height = slotHeight;
             this.btnValue.enabled = enabled();
             this.btnValue.drawButton(this.mc, mouseX, mouseY);
         }
