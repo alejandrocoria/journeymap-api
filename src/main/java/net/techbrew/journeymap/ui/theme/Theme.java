@@ -404,18 +404,32 @@ public class Theme implements Comparable<Theme>
             public String reticleColor = "";
 
             /**
-             * Alpha transparency (0-255) of key background.
+             * General alpha transparency (0-255) of reticle.
              * Default is 128.
              */
             @Since(1)
-            public int reticleAlpha = 128;
+            public int reticleAlpha = 96;
 
             /**
-             * Reticle thickness in pixels.
+             * Alpha transparency (0-255) for the heading segment of reticle.
+             * Default is 150.
+             */
+            @Since(1)
+            public int reticleHeadingAlpha = 128;
+
+            /**
+             * General reticle thickness in pixels.
              * Default is 2.25 pixels.
              */
             @Since(1)
             public double reticleThickness = 2.25;
+
+            /**
+             * Reticle thickness in pixels for the heading segment of reticle.
+             * Default is 3 pixels.
+             */
+            @Since(1)
+            public double reticleHeadingThickness = 3;
 
             /**
              * Number of pixels to shift the outer endpoint of a reticle segment away from the map center.

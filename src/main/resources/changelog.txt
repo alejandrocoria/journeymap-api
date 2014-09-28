@@ -12,6 +12,13 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Change: Theme has more settings for the reticle's heading segment (alpha/thickness)
+- Change: Preset themes now have slightly thicker/more opaque heading segments
+- Change: Reticle now extends to edges of square map when the reticle orientation set to "My Heading"
+- Change: Boolean options now show as checkboxes in the Options menu
+- Change: Category buttons now appear as text "links" instead of as big horsey buttons
+
+## Changelog for JourneyMap 5.0.0a1:
 - New Feature:  Options management moved to Forge's Config UI framework.  It's ugly, and a lot of options need to have tooltips written, but there's a lot more exposed options than ever before.  This will be a work in progress.
 - New Option: "Reticle Orientation" in Minimap Options. Can be "Compass" (the default) or "My Heading"
 - Change: [Pulled from 4.0.5] Version check info moved to DropBox after exceeding Google Drive's quota

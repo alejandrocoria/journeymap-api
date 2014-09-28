@@ -126,6 +126,9 @@ public class ThemePresets
             minimapSquare.compassPoint = new Theme.ImageSpec(28,28);
             minimapSquare.compassPointLabelPad = 6;
             minimapSquare.compassPointColor = Theme.toHexColor(Color.white);
+            minimapSquare.reticleThickness = 2;
+            minimapSquare.reticleHeadingThickness = 2.75;
+            minimapSquare.reticleOffset = -3;
             minimapSquare.reticleColor = vicRed;
         }
 
@@ -146,6 +149,8 @@ public class ThemePresets
             minimapCircle.compassPointColor = Theme.toHexColor(Color.white);
             minimapCircle.reticleColor = vicRed;
             minimapCircle.reticleOffset = -3;
+            minimapCircle.reticleThickness = 2;
+            minimapCircle.reticleHeadingThickness = 2.75;
             minimapCircle.waypointOffset = -2.5;
         }
 

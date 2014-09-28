@@ -4,7 +4,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
-import net.techbrew.journeymap.ui.minimap.DisplayVars;
+import net.techbrew.journeymap.ui.minimap.ReticleOrientation;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -17,7 +17,7 @@ public class ThemeMinimapFrame
 {
     private final Theme theme;
     private final Theme.Minimap.MinimapSpec minimapSpec;
-    private final DisplayVars.ReticleOrientation reticleOrientation;
+    private final ReticleOrientation reticleOrientation;
 
     private final String resourcePattern;
     private TextureImpl textureTopLeft;
@@ -42,7 +42,9 @@ public class ThemeMinimapFrame
     private boolean isSquare;
     private boolean showReticle;
     private int reticleAlpha;
+    private int reticleHeadingAlpha;
     private double reticleThickness;
+    private double reticleHeadingThickness;
     private double reticleSegmentLength;
     private double reticleOffset;
     private Color reticleColor;
@@ -94,9 +96,18 @@ public class ThemeMinimapFrame
         this.showReticle = JourneyMap.getMiniMapProperties().showReticle.get();
         this.reticleColor = Theme.getColor(minimapSpec.reticleColor);
         this.reticleAlpha = minimapSpec.reticleAlpha;
+        this.reticleHeadingAlpha = minimapSpec.reticleHeadingAlpha;
         this.reticleThickness = minimapSpec.reticleThickness;
+        this.reticleHeadingThickness = minimapSpec.reticleHeadingThickness;
         this.reticleOffset = minimapSpec.reticleOffset;
-        this.reticleSegmentLength = (height/2)-16+reticleOffset;
+        if (isSquare)
+        {
+            reticleSegmentLength += (height * .75) + reticleOffset;
+        }
+        else
+        {
+            reticleSegmentLength += (height * .5) + reticleOffset;
+        }
 
     }
 
@@ -123,17 +134,53 @@ public class ThemeMinimapFrame
     {
         if(showReticle && reticleAlpha>0)
         {
+            double centerX = x + (width / 2);
+            double centerY = y + (height / 2);
+
+            double thick = reticleThickness;
+            int alpha = reticleAlpha;
+            if (reticleOrientation == ReticleOrientation.Compass)
+            {
+                thick = reticleHeadingThickness;
+                alpha = reticleHeadingAlpha;
+            }
+
             // North
-            DrawUtil.drawRectangle(x + (width/2), y - reticleOffset, reticleThickness, reticleSegmentLength, reticleColor, reticleAlpha);
+            if (thick > 0 && alpha > 0)
+            {
+                DrawUtil.drawRectangle(centerX - (thick / 2), centerY - reticleSegmentLength - 16, thick, reticleSegmentLength, reticleColor, reticleAlpha);
+            }
+
+            if (reticleOrientation == ReticleOrientation.PlayerHeading)
+            {
+                thick = reticleHeadingThickness;
+                alpha = reticleHeadingAlpha;
+            }
+            else
+            {
+                thick = reticleThickness;
+                alpha = reticleAlpha;
+            }
 
             // South
-            DrawUtil.drawRectangle(x + (width/2), y + height-reticleSegmentLength+reticleOffset, reticleThickness, reticleSegmentLength, reticleColor, reticleAlpha);
+            if (thick > 0 && alpha > 0)
+            {
+                DrawUtil.drawRectangle(centerX - (thick / 2), centerY + 16, thick, reticleSegmentLength, reticleColor, reticleAlpha);
+            }
+            thick = reticleThickness;
+            alpha = reticleAlpha;
 
             // West
-            DrawUtil.drawRectangle(x - reticleOffset, y + (height/2), reticleSegmentLength, reticleThickness, reticleColor, reticleAlpha);
+            if (thick > 0 && alpha > 0)
+            {
+                DrawUtil.drawRectangle(centerX - reticleSegmentLength - 16, centerY - (thick / 2), reticleSegmentLength, reticleThickness, reticleColor, reticleAlpha);
+            }
 
             // East
-            DrawUtil.drawRectangle(x + width - reticleSegmentLength + reticleOffset, y + (height/2), reticleSegmentLength, reticleThickness, reticleColor, reticleAlpha);
+            if (thick > 0 && alpha > 0)
+            {
+                DrawUtil.drawRectangle(centerX + 16, centerY - (thick / 2), reticleSegmentLength, reticleThickness, reticleColor, reticleAlpha);
+            }
         }
     }
 
@@ -210,7 +257,7 @@ public class ThemeMinimapFrame
         return height;
     }
 
-    public DisplayVars.ReticleOrientation getReticleOrientation()
+    public ReticleOrientation getReticleOrientation()
     {
         return reticleOrientation;
     }
