@@ -80,7 +80,7 @@ public class MiniMap
     {
         player = mc.thePlayer;
         playerLocatorTex = TextureCache.instance().getPlayerLocatorSmall();
-        updateDisplayVars(DisplayVars.Shape.getPreferred(), DisplayVars.Position.getPreferred(), true);
+        updateDisplayVars(Shape.getPreferred(), Position.getPreferred(), true);
     }
 
     /**
@@ -172,7 +172,7 @@ public class MiniMap
                 }
                 case PlayerHeading:
                 {
-                    if (dv.shape == DisplayVars.Shape.Circle)
+                    if (dv.shape == Shape.Circle)
                     {
                         rotation = (180 - mc.thePlayer.rotationYawHead);
                     }
@@ -213,18 +213,16 @@ public class MiniMap
                     }
                 }
 
-                // Finish stencil
-                endStencil();
 
                 // Return centerPoint to mid-screen
                 GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
 
                 // Draw Reticle
-                DisplayVars.ReticleOrientation reticleOrientation = null;
+                ReticleOrientation reticleOrientation = null;
                 if (dv.showReticle)
                 {
                     reticleOrientation = dv.minimapFrame.getReticleOrientation();
-                    if (reticleOrientation == DisplayVars.ReticleOrientation.Compass)
+                    if (reticleOrientation == ReticleOrientation.Compass)
                     {
                         dv.minimapFrame.drawReticle();
                     }
@@ -238,8 +236,11 @@ public class MiniMap
                     }
                 }
 
+                // Finish stencil
+                endStencil();
+
                 // Draw Frame
-                if (dv.shape == DisplayVars.Shape.Circle || rotation == 0)
+                if (dv.shape == Shape.Circle || rotation == 0)
                 {
                     dv.minimapFrame.drawFrame();
                 }
@@ -374,7 +375,7 @@ public class MiniMap
 
     private boolean isOnScreen(Point2D.Double objectPixel, Point2D centerPixel, Rectangle2D.Double centerRect)
     {
-        if (dv.shape == DisplayVars.Shape.Circle)
+        if (dv.shape == Shape.Circle)
         {
             return centerPixel.distance(objectPixel) < dv.minimapRadius;
         }
@@ -393,14 +394,14 @@ public class MiniMap
         );
 
         // Use radius for circle, or enlarge radius 40% to encapsulate the square within a circle
-        double radius = offset + ((dv.shape == DisplayVars.Shape.Circle) ? dv.minimapRadius : (dv.minimapRadius * 1.4));
+        double radius = offset + ((dv.shape == Shape.Circle) ? dv.minimapRadius : (dv.minimapRadius * 1.4));
 
         Point2D.Double framePos = new Point2D.Double(
                 (radius * Math.cos(bearing)) + centerPixel.getX(),
                 (radius * Math.sin(bearing)) + centerPixel.getY()
         );
 
-        if (dv.shape == DisplayVars.Shape.Circle)
+        if (dv.shape == Shape.Circle)
         {
             // TODO: I probably broke this by passing in widow position
             return framePos;
@@ -495,19 +496,19 @@ public class MiniMap
     public void nextPosition()
     {
         int nextIndex = dv.position.ordinal() + 1;
-        if (nextIndex == DisplayVars.Position.values().length)
+        if (nextIndex == Position.values().length)
         {
             nextIndex = 0;
         }
-        setPosition(DisplayVars.Position.values()[nextIndex]);
+        setPosition(Position.values()[nextIndex]);
     }
 
-    public DisplayVars.Position getPosition()
+    public Position getPosition()
     {
         return dv.position;
     }
 
-    public void setPosition(DisplayVars.Position position)
+    public void setPosition(Position position)
     {
         miniMapProperties.position.set(position);
         miniMapProperties.save();
@@ -517,12 +518,12 @@ public class MiniMap
         }
     }
 
-    public DisplayVars.Shape getShape()
+    public Shape getShape()
     {
         return dv.shape;
     }
 
-    public void setShape(DisplayVars.Shape shape)
+    public void setShape(Shape shape)
     {
         if (dv != null)
         {
@@ -538,7 +539,7 @@ public class MiniMap
         }
     }
 
-    public void updateDisplayVars(DisplayVars.Shape shape, DisplayVars.Position position, boolean force)
+    public void updateDisplayVars(Shape shape, Position position, boolean force)
     {
         if (dv != null
                 && !force

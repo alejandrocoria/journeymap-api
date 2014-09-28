@@ -28,13 +28,13 @@ public class MiniMapOptions extends JmUI
     private Button buttonKeyboardHelp, buttonShowSelf, buttonShowfps, buttonGeneralDisplay, buttonClose, buttonCloseAll;
     private Button buttonShowLocation, buttonShowBiome, buttonCompass, buttonCompassFont, buttonReticle;
     private IconSetButton buttonIconSet;
-    private EnumPropertyButton<DisplayVars.Orientation> buttonOrientation;
-    private EnumPropertyButton<DisplayVars.ReticleOrientation> buttonReticleOrientation;
+    private EnumPropertyButton<Orientation> buttonOrientation;
+    private EnumPropertyButton<ReticleOrientation> buttonReticleOrientation;
     private SliderButton buttonTerrainAlpha, buttonFrameAlpha, buttonSize;
     private ArrayList<ButtonList> buttonRows;
 
-    private DisplayVars.Shape currentShape;
-    private DisplayVars.Position currentPosition;
+    private Shape currentShape;
+    private Position currentPosition;
     private ButtonList bottomButtons;
     private MiniMap miniMap = UIManager.getInstance().getMiniMap();
     private MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties();
@@ -67,12 +67,12 @@ public class MiniMapOptions extends JmUI
                 minimapOn); //$NON-NLS-1$  //$NON-NLS-2$
         buttonMiniMap.setToggled(minimapOn);
 
-        DisplayVars.Position position = DisplayVars.Position.getPreferred();
+        Position position = Position.getPreferred();
         buttonPosition = new Button(ButtonEnum.Position, "");
         setPosition(position);
         buttonPosition.setEnabled(minimapOn);
 
-        DisplayVars.Shape shape = DisplayVars.Shape.getPreferred();
+        Shape shape = Shape.getPreferred();
         buttonShape = new Button(ButtonEnum.Shape, "");
         setShape(shape);
         buttonShape.setEnabled(false);
@@ -135,10 +135,10 @@ public class MiniMapOptions extends JmUI
         buttonTerrainAlpha = SliderButton.create(ButtonEnum.TerrainAlpha.ordinal(), miniMapProperties.terrainAlpha, 1, 255, "jm.minimap.terrain_alpha", true);
         buttonFrameAlpha = SliderButton.create(ButtonEnum.FrameAlpha.ordinal(), miniMapProperties.frameAlpha, 1, 255, "jm.minimap.frame_alpha", true);
 
-        buttonOrientation = new EnumPropertyButton<DisplayVars.Orientation>(ButtonEnum.Orientation.ordinal(), DisplayVars.Orientation.values(),
+        buttonOrientation = new EnumPropertyButton<Orientation>(ButtonEnum.Orientation.ordinal(), Orientation.values(),
                 "jm.minimap.orientation.button", miniMapProperties, miniMapProperties.orientation);
 
-        buttonReticleOrientation = new EnumPropertyButton<DisplayVars.ReticleOrientation>(ButtonEnum.ReticleOrientation.ordinal(), DisplayVars.ReticleOrientation.values(),
+        buttonReticleOrientation = new EnumPropertyButton<ReticleOrientation>(ButtonEnum.ReticleOrientation.ordinal(), ReticleOrientation.values(),
                 "jm.minimap.reticle_orientation", miniMapProperties, miniMapProperties.reticleOrientation);
 
         /** Button lists **/
@@ -416,18 +416,18 @@ public class MiniMapOptions extends JmUI
     public void nextShape()
     {
         int nextIndex = currentShape.ordinal() + 1;
-        if (nextIndex == DisplayVars.Shape.Enabled.length)
+        if (nextIndex == Shape.Enabled.length)
         {
             nextIndex = 0;
         }
-        setShape(DisplayVars.Shape.Enabled[nextIndex]);
+        setShape(Shape.Enabled[nextIndex]);
     }
 
-    private void setShape(DisplayVars.Shape shape)
+    private void setShape(Shape shape)
     {
         if (!shape.isEnabled())
         {
-            shape = DisplayVars.Shape.Enabled[0];
+            shape = Shape.Enabled[0];
         }
         currentShape = shape;
         buttonShape.displayString = Constants.getString("jm.minimap.shape", Constants.getString(currentShape.key));
@@ -437,14 +437,14 @@ public class MiniMapOptions extends JmUI
     private void nextPosition()
     {
         int nextIndex = currentPosition.ordinal() + 1;
-        if (nextIndex == DisplayVars.Position.values().length)
+        if (nextIndex == Position.values().length)
         {
             nextIndex = 0;
         }
-        setPosition(DisplayVars.Position.values()[nextIndex]);
+        setPosition(Position.values()[nextIndex]);
     }
 
-    private void setPosition(DisplayVars.Position position)
+    private void setPosition(Position position)
     {
         currentPosition = position;
         buttonPosition.displayString = Constants.getString("jm.minimap.position", Constants.getString(currentPosition.key));
@@ -479,7 +479,7 @@ public class MiniMapOptions extends JmUI
         if (idx > 0)
         {
             fps = fps.substring(0, idx);
-            if (currentPosition == DisplayVars.Position.TopRight)
+            if (currentPosition == Position.TopRight)
             {
                 DrawUtil.drawLabel(fps, width - 5, height - 5, DrawUtil.HAlign.Left, DrawUtil.VAlign.Above, Color.BLACK, 0, Color.cyan, 255, 1, true);
             }

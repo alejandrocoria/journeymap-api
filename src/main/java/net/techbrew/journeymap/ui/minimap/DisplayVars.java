@@ -8,24 +8,18 @@
 
 package net.techbrew.journeymap.ui.minimap;
 
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureImpl;
-import net.techbrew.journeymap.ui.config.KeyedEnum;
 import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemeCompassPoints;
 import net.techbrew.journeymap.ui.theme.ThemeMinimapFrame;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.Arrays;
 
 /**
  * Display variables for the Minimap.
@@ -235,7 +229,7 @@ public class DisplayVars
             int topMargin = Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin);
             int yOffsetFps = minimapSpec.labelTopInside ? minimapSpec.labelTopMargin : -topMargin;
             DrawUtil.VAlign valignFps = minimapSpec.labelTopInside ? DrawUtil.VAlign.Below : DrawUtil.VAlign.Above;
-            labelFps = new LabelVars(centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, minimapSpec.fpsLabel);
+            labelFps = new LabelVars(this, centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, minimapSpec.fpsLabel);
         }
         else
         {
@@ -249,7 +243,7 @@ public class DisplayVars
         if (showLocation)
         {
             DrawUtil.VAlign vAlign = minimapSpec.labelBottomInside ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
-            labelLocation = new LabelVars(centerX, bottomY + yOffset, DrawUtil.HAlign.Center, vAlign, fontScale, minimapSpec.locationLabel);
+            labelLocation = new LabelVars(this, centerX, bottomY + yOffset, DrawUtil.HAlign.Center, vAlign, fontScale, minimapSpec.locationLabel);
             if (showBiome)
             {
                 yOffset += locationLabelHeight;
@@ -263,7 +257,7 @@ public class DisplayVars
         if (showBiome)
         {
             DrawUtil.VAlign vAlign = (minimapSpec.labelBottomInside) ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
-            labelBiome = new LabelVars(centerX, bottomY + yOffset, DrawUtil.HAlign.Center, vAlign, fontScale, minimapSpec.biomeLabel);
+            labelBiome = new LabelVars(this, centerX, bottomY + yOffset, DrawUtil.HAlign.Center, vAlign, fontScale, minimapSpec.biomeLabel);
         }
         else
         {
@@ -273,246 +267,4 @@ public class DisplayVars
     }
 
 
-    /**
-     * Position of minimap on screen
-     */
-    public enum Position implements KeyedEnum
-    {
-        TopRight("jm.minimap.position_topright"),
-        BottomRight("jm.minimap.position_bottomright"),
-        BottomLeft("jm.minimap.position_bottomleft"),
-        TopLeft("jm.minimap.position_topleft"),
-        Center("jm.minimap.position_center");
-
-        public final String key;
-
-        private Position(String key)
-        {
-            this.key = key;
-        }
-
-        public static Position getPreferred()
-        {
-            final MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties();
-
-            DisplayVars.Position position = null;
-            try
-            {
-                position = miniMapProperties.position.get();
-            }
-            catch (IllegalArgumentException e)
-            {
-                JourneyMap.getLogger().warn("Not a valid minimap position in : " + miniMapProperties.getFile());
-            }
-
-            if (position == null)
-            {
-                position = Position.TopRight;
-                miniMapProperties.position.set(position);
-                miniMapProperties.save();
-            }
-            return position;
-        }
-
-        @Override
-        public String getKey()
-        {
-            return key;
-        }
-
-        public static Position safeValueOf(String name)
-        {
-            Position value = null;
-            try
-            {
-                value = Position.valueOf(name);
-            }
-            catch (IllegalArgumentException e)
-            {
-                JourneyMap.getLogger().warn("Not a valid minimap position: " + name);
-            }
-
-            if (value == null)
-            {
-                value = Position.TopRight;
-            }
-            return value;
-        }
-    }
-
-    public enum Orientation implements KeyedEnum
-    {
-        North("jm.minimap.orientation.north"),
-        OldNorth("jm.minimap.orientation.oldnorth"),
-        PlayerHeading("jm.minimap.orientation.playerheading");
-
-        public final String key;
-
-        private Orientation(String key)
-        {
-            this.key = key;
-        }
-
-        @Override
-        public String getKey()
-        {
-            return key;
-        }
-
-        @Override
-        public String toString()
-        {
-            return Constants.getString(this.key);
-        }
-    }
-
-    public enum ReticleOrientation implements KeyedEnum
-    {
-        Compass("jm.minimap.orientation.compass"),
-        PlayerHeading("jm.minimap.orientation.playerheading");
-
-        public final String key;
-
-        private ReticleOrientation(String key)
-        {
-            this.key = key;
-        }
-
-        @Override
-        public String getKey()
-        {
-            return key;
-        }
-
-        @Override
-        public String toString()
-        {
-            return Constants.getString(this.key);
-        }
-    }
-
-    /**
-     * Shape (and size) of minimap
-     */
-    public enum Shape implements KeyedEnum
-    {
-        Square("jm.minimap.shape_square"),
-        Circle("jm.minimap.shape_circle");
-        public static Shape[] Enabled = {Square, Circle};
-        public final String key;
-
-        private Shape(String key)
-        {
-            this.key = key;
-        }
-
-        public static Shape getPreferred()
-        {
-            final MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties();
-
-            DisplayVars.Shape shape = null;
-            try
-            {
-                shape = miniMapProperties.shape.get();
-            }
-            catch (IllegalArgumentException e)
-            {
-                JourneyMap.getLogger().warn("Not a valid minimap shape in : " + miniMapProperties.getFile());
-            }
-
-            if (shape == null)
-            {
-                shape = Shape.Square;
-                miniMapProperties.shape.set(shape);
-                miniMapProperties.save();
-            }
-            return shape;
-        }
-
-        public static Shape safeValueOf(String name)
-        {
-            Shape value = null;
-            try
-            {
-                value = Shape.valueOf(name);
-            }
-            catch (IllegalArgumentException e)
-            {
-                JourneyMap.getLogger().warn("Not a valid minimap shape: " + name);
-            }
-
-            if (value == null || !value.isEnabled())
-            {
-                value = Shape.Square;
-            }
-            return value;
-        }
-
-        public boolean isEnabled()
-        {
-            return Arrays.binarySearch(DisplayVars.Shape.Enabled, this) >= 0;
-        }
-
-        @Override
-        public String getKey()
-        {
-            return key;
-        }
-
-        @Override
-        public String toString()
-        {
-            return Constants.getString(this.key);
-        }
-    }
-
-
-    /**
-     * Encapsulation of key attributes.
-     */
-    class LabelVars
-    {
-        final double x;
-        final double y;
-        final double fontScale;
-        final boolean fontShadow;
-        DrawUtil.HAlign hAlign;
-        DrawUtil.VAlign vAlign;
-        Color bgColor;
-        int bgAlpha;
-        Color fgColor;
-
-        private LabelVars(double x, double y, DrawUtil.HAlign hAlign, DrawUtil.VAlign vAlign, double fontScale, Theme.LabelSpec labelSpec)
-        {
-            this.x = x;
-            this.y = y;
-            this.hAlign = hAlign;
-            this.vAlign = vAlign;
-            this.fontScale = fontScale;
-            this.fontShadow = labelSpec.shadow;
-            this.bgColor = Theme.getColor(labelSpec.backgroundColor);
-            this.bgAlpha = labelSpec.backgroundAlpha;
-            this.fgColor = Theme.getColor(labelSpec.foregroundColor);
-        }
-
-        void draw(String text)
-        {
-            boolean isUnicode = false;
-            FontRenderer fontRenderer = null;
-            if (forceUnicode)
-            {
-                fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
-                isUnicode = fontRenderer.getUnicodeFlag();
-                if (!isUnicode)
-                {
-                    fontRenderer.setUnicodeFlag(true);
-                }
-            }
-            DrawUtil.drawLabel(text, x, y, hAlign, vAlign, bgColor, bgAlpha, fgColor, 255, fontScale, fontShadow);
-            if (forceUnicode && !isUnicode)
-            {
-                fontRenderer.setUnicodeFlag(false);
-            }
-        }
-    }
 }

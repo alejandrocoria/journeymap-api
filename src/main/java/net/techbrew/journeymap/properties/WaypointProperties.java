@@ -24,7 +24,7 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     @Config(category = General, key = "jm.waypoint.enable_manager")
     public final AtomicBoolean managerEnabled = new AtomicBoolean(true);
 
-    @Config(category = Waypoint, key = "jm.waypoint.enable_beacons")
+    @Config(category = General, key = "jm.waypoint.enable_beacons")
     public final AtomicBoolean beaconEnabled = new AtomicBoolean(true);
 
     @Config(category = Waypoint, key = "jm.waypoint.show_texture")
@@ -45,7 +45,7 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     @Config(category = Waypoint, key = "jm.waypoint.auto_hide_label")
     public final AtomicBoolean autoHideLabel = new AtomicBoolean(true);
 
-    @Config(category = Waypoint, key = "jm.waypoint.bold_label")
+    @Config(category = Waypoint, key = "jm.waypoint.bold_label", defaultBoolean = false)
     public final AtomicBoolean boldLabel = new AtomicBoolean(false);
 
     @Config(category = Waypoint, key = "jm.waypoint.force_unicode", defaultBoolean = false)

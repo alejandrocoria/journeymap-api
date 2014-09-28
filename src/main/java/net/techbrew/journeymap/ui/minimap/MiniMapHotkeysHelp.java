@@ -25,8 +25,8 @@ public class MiniMapHotkeysHelp extends JmUI
     private int lastWidth = 0;
     private int lastHeight = 0;
     private Button buttonClose;
-    private DisplayVars.Shape currentShape;
-    private DisplayVars.Position currentPosition;
+    private Shape currentShape;
+    private Position currentPosition;
     private KeyEventHandler keyEventHandler;
 
     public MiniMapHotkeysHelp()

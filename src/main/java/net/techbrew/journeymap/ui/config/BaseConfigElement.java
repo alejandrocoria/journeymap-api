@@ -3,6 +3,7 @@ package net.techbrew.journeymap.ui.config;
 import cpw.mods.fml.client.config.ConfigGuiType;
 import cpw.mods.fml.client.config.DummyConfigElement;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.EnumChatFormatting;
 import net.techbrew.journeymap.properties.PropertiesBase;
 
 import java.util.regex.Pattern;
@@ -73,7 +74,7 @@ public abstract class BaseConfigElement<P, T> extends DummyConfigElement<T> impl
         String tooltip = I18n.format(tooltipKey);
         if (tooltip.equals(tooltipKey))
         {
-            return "?";
+            return EnumChatFormatting.RESET.toString();
         }
         else
         {

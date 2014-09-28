@@ -29,13 +29,13 @@ public class BooleanConfigElement extends BaseConfigElement<AtomicBoolean, Boole
         }
     }
 
-
     private BooleanConfigElement(String name, PropertiesBase properties, AtomicBoolean property, Boolean defaultValue, String langKey)
     {
         super(name, defaultValue, ConfigGuiType.BOOLEAN, langKey);
         super.set(property.get());
         super.setProperties(properties);
         super.setProperty(property);
+        super.setConfigEntryClass(ConfigManagerFactory.CheckBooleanEntry.class);
     }
 
     @Override

@@ -9,12 +9,9 @@
 package net.techbrew.journeymap.properties;
 
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.io.IconSetFileHandler;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static net.techbrew.journeymap.properties.Config.Category.FullMap;
 
 /**
  * Properties for the full map in-game.
@@ -22,9 +19,6 @@ import static net.techbrew.journeymap.properties.Config.Category.FullMap;
 public class FullMapProperties extends InGameMapProperties
 {
     protected transient static final int CODE_REVISION = 4;
-
-    @Config(category = FullMap, key = "jm.common.mob_icon_set", stringListProvider = IconSetFileHandler.IconSetStringListProvider.class)
-    public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("3D");
 
     public final AtomicBoolean showCaves = new AtomicBoolean(true);
     public final AtomicBoolean showGrid = new AtomicBoolean(true);

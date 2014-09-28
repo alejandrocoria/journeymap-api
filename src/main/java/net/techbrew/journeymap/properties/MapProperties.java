@@ -45,6 +45,9 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
     @Config(category = Inherit, key = "jm.common.show_self")
     public final AtomicBoolean showSelf = new AtomicBoolean(true);
 
+    @Config(category = Inherit, key = "jm.common.mob_icon_set", stringListProvider = IconSetFileHandler.IconSetStringListProvider.class)
+    public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("2D");
+
     public final AtomicInteger zoomLevel = new AtomicInteger(0);
 
     protected MapProperties()

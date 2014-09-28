@@ -12,7 +12,8 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.properties.*;
-import net.techbrew.journeymap.ui.minimap.DisplayVars;
+import net.techbrew.journeymap.ui.minimap.Position;
+import net.techbrew.journeymap.ui.minimap.Shape;
 
 import java.io.File;
 import java.io.FileReader;
@@ -267,8 +268,8 @@ public class PropertyManager
         miniMapProperties.enableHotkeys.set(getBoolean(Key.PREF_MINIMAP_HOTKEYS));
         miniMapProperties.fontSmall.set(getDouble(Key.PREF_MINIMAP_FONTSCALE).intValue() == 1);
         miniMapProperties.forceUnicode.set(getBoolean(Key.PREF_MINIMAP_FORCEUNICODE));
-        miniMapProperties.position.set(DisplayVars.Position.safeValueOf(getString(Key.PREF_MINIMAP_POSITION)));
-        miniMapProperties.shape.set(DisplayVars.Shape.safeValueOf(getString(Key.PREF_MINIMAP_SHAPE)));
+        miniMapProperties.position.set(Position.safeValueOf(getString(Key.PREF_MINIMAP_POSITION)));
+        miniMapProperties.shape.set(Shape.safeValueOf(getString(Key.PREF_MINIMAP_SHAPE)));
         miniMapProperties.showFps.set(getBoolean(Key.PREF_MINIMAP_SHOWFPS));
 
         FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties().enableSave(false);
@@ -352,8 +353,8 @@ public class PropertyManager
 
         PREF_SHOW_MINIMAP(Boolean.class, "preference_show_minimap", true), //$NON-NLS-1$
 
-        PREF_MINIMAP_SHAPE(String.class, "preference_minimap_shape", DisplayVars.Shape.Square.name()), //$NON-NLS-1$
-        PREF_MINIMAP_POSITION(String.class, "preference_minimap_position", DisplayVars.Position.TopRight.name()), //$NON-NLS-1$
+        PREF_MINIMAP_SHAPE(String.class, "preference_minimap_shape", Shape.Square.name()), //$NON-NLS-1$
+        PREF_MINIMAP_POSITION(String.class, "preference_minimap_position", Position.TopRight.name()), //$NON-NLS-1$
         PREF_MINIMAP_FONTSCALE(Double.class, "preference_minimap_fontscale", 1.0), //$NON-NLS-1$
         PREF_MINIMAP_SHOWFPS(Boolean.class, "preference_minimap_showfps", false), //$NON-NLS-1$
         PREF_MINIMAP_FORCEUNICODE(Boolean.class, "preference_minimap_forceunicode", false), //$NON-NLS-1$

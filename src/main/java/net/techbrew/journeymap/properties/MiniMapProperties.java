@@ -9,8 +9,10 @@
 package net.techbrew.journeymap.properties;
 
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.io.IconSetFileHandler;
-import net.techbrew.journeymap.ui.minimap.DisplayVars;
+import net.techbrew.journeymap.ui.minimap.Orientation;
+import net.techbrew.journeymap.ui.minimap.Position;
+import net.techbrew.journeymap.ui.minimap.ReticleOrientation;
+import net.techbrew.journeymap.ui.minimap.Shape;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,11 +31,11 @@ public class MiniMapProperties extends InGameMapProperties
     @Config(category = General, key = "jm.minimap.enable_minimap")
     public final AtomicBoolean enabled = new AtomicBoolean(true);
 
-    @Config(category = MiniMap, key = "jm.minimap.shape")
-    public final AtomicReference<DisplayVars.Shape> shape = new AtomicReference<DisplayVars.Shape>(DisplayVars.Shape.Square);
+    @Config(category = MiniMap, key = "jm.minimap.shape", defaultEnum = "Circle")
+    public final AtomicReference<Shape> shape = new AtomicReference<Shape>(Shape.Circle);
 
-    @Config(category = MiniMap, key = "jm.minimap.position")
-    public final AtomicReference<DisplayVars.Position> position = new AtomicReference<DisplayVars.Position>(DisplayVars.Position.TopRight);
+    @Config(category = MiniMap, key = "jm.minimap.position", defaultEnum = "TopRight")
+    public final AtomicReference<Position> position = new AtomicReference<Position>(Position.TopRight);
 
     @Config(category = MiniMap, key = "jm.minimap.show_fps", defaultBoolean = false)
     public final AtomicBoolean showFps = new AtomicBoolean(false);
@@ -60,7 +62,7 @@ public class MiniMapProperties extends InGameMapProperties
     public final AtomicInteger terrainAlpha = new AtomicInteger(255);
 
     @Config(category = MiniMap, key = "jm.minimap.orientation.button", defaultEnum = "North")
-    public final AtomicReference<DisplayVars.Orientation> orientation = new AtomicReference<DisplayVars.Orientation>(DisplayVars.Orientation.North);
+    public final AtomicReference<Orientation> orientation = new AtomicReference<Orientation>(Orientation.North);
 
     @Config(category = MiniMap, key = "jm.minimap.compass_font")
     public final AtomicBoolean compassFontSmall = new AtomicBoolean(true);
@@ -71,11 +73,8 @@ public class MiniMapProperties extends InGameMapProperties
     @Config(category = MiniMap, key = "jm.minimap.show_reticle")
     public final AtomicBoolean showReticle = new AtomicBoolean(true);
 
-    @Config(category = MiniMap, key = "jm.minimap.reticle_orientation")
-    public final AtomicReference<DisplayVars.ReticleOrientation> reticleOrientation = new AtomicReference<DisplayVars.ReticleOrientation>(DisplayVars.ReticleOrientation.Compass);
-
-    @Config(category = MiniMap, key = "jm.common.mob_icon_set", stringListProvider = IconSetFileHandler.IconSetStringListProvider.class)
-    public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("2D");
+    @Config(category = MiniMap, key = "jm.minimap.reticle_orientation", defaultEnum = "Compass")
+    public final AtomicReference<ReticleOrientation> reticleOrientation = new AtomicReference<ReticleOrientation>(ReticleOrientation.Compass);
 
     public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
 

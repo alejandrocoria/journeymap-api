@@ -163,6 +163,23 @@ jm.config.category.waypoint.tooltip=Configure how waypoints are displayed in-gam
 jm.config.category.webmap=Web Map
 jm.config.category.webmap.tooltip=Configure the appearance of the Web Map
 
+
+gui.done=Done
+fml.configgui.applyGlobally=Apply globally
+fml.configgui.confirmRestartMessage=I Understand
+fml.configgui.gameRestartRequired=One or more changed settings requires that Minecraft be restarted before taking effect.
+fml.configgui.gameRestartTitle=Minecraft Restart Required
+fml.configgui.sampletext=Sample Text
+fml.configgui.tooltip.addNewEntryAbove=Add New Entry Above
+fml.configgui.tooltip.applyGlobally=Apply Undo Changes or Reset to Default globally.
+fml.configgui.tooltip.removeEntry=Remove Entry
+fml.configgui.tooltip.resetAll=Reset All to Default. If the Apply globally checkbox is checked values on child screens will also be reset.
+fml.configgui.tooltip.resetToDefault=Reset to Default
+fml.configgui.tooltip.undoAll=Undo All Changes. If the Apply globally checkbox is checked changes to child screens will also be undone.
+fml.configgui.tooltip.undoChanges=Undo Changes
+fml.configgui.tooltip.default=[default: %s]
+fml.configgui.tooltip.defaultNumeric=[range: %s ~ %s, default: %s]
+
 jm.error.00=[ERROR.00] JourneyMap encountered an unexpected error: %1$s
 jm.error.01=[ERROR.01] JourneyMap %1$s requires %2$s
 jm.error.02=[ERROR.02] JourneyMap not yet available for world

@@ -18,21 +18,20 @@ public class ConfigManager extends GuiConfig
     public ConfigManager(GuiScreen parent)
     {
         super(parent, ConfigManagerFactory.getConfigElements(), JourneyMap.MOD_ID, false, false, "JourneyMap " + Constants.getString("jm.common.options"));
+        this.needsRefresh = true;
     }
 
     public ConfigManager(GuiScreen parentScreen, List<IConfigElement> configElements, String modID, boolean allRequireWorldRestart, boolean allRequireMcRestart, String title, String titleLine2)
     {
         super(parentScreen, configElements, modID, allRequireWorldRestart, allRequireMcRestart, title, titleLine2);
+        this.needsRefresh = true;
     }
 
+    @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         super.drawScreen(mouseX, mouseY, partialTicks);
         drawLogo();
-//        if (JourneyMap.getMiniMapProperties().enabled.get())
-//        {
-//            UIManager.getInstance().getMiniMap().drawMap();
-//        }
     }
 
     protected void drawLogo()
@@ -47,6 +46,4 @@ public class ConfigManager extends GuiConfig
     {
         // this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
     }
-
-
 }

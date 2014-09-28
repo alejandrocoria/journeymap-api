@@ -26,6 +26,7 @@ public class WebMapProperties extends MapProperties
     public final AtomicBoolean enabled = new AtomicBoolean(true);
 
     public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("3D");
+
     public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
     protected transient final String name = "webmap";
 

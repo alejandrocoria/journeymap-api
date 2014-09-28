@@ -41,6 +41,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected boolean defaultStyle = true;
     protected ArrayList<ToggleListener> toggleListeners = new ArrayList<ToggleListener>(0);
     protected PropertyAdapter propertyAdapter;
+    protected int WIDTH_PAD = 12;
 
     public Button(Enum enumValue, String label)
     {
@@ -140,7 +141,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         {
             max = Math.max(max, fr.getStringWidth(labelOff));
         }
-        return max + 12;
+        return max + WIDTH_PAD;
     }
 
     public void fitWidth(FontRenderer fr)
@@ -165,7 +166,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public void func_146113_a(SoundHandler soundHandler)
     {
         // Play button click
-        if(isEnabled())
+        if (isEnabled())
         {
             super.func_146113_a(soundHandler);
         }
@@ -181,7 +182,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
         if (defaultStyle)
         {
-            if(!enabled)
+            if (!enabled)
             {
                 enabled = false;
             }
@@ -260,7 +261,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public boolean mouseOver(int mouseX, int mouseY)
     {
-        if(!visible)
+        if (!visible)
         {
             return false;
         }
@@ -281,7 +282,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public void setToggled(Boolean toggled, boolean notifyToggleListener)
     {
-        if(this.toggled==toggled || !this.enabled || !this.visible)
+        if (this.toggled == toggled || !this.enabled || !this.visible)
         {
             return;
         }
@@ -307,7 +308,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             allowChange = false;
         }
 
-        if(allowChange)
+        if (allowChange)
         {
             this.toggled = toggled;
             updateLabel();
