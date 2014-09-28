@@ -391,6 +391,34 @@ public class Theme implements Comparable<Theme>
             public double compassPointOffset;
 
             /**
+             * Whether to show the North compass point.
+             * Defaults to true.
+             */
+            @Since(1)
+            public boolean compassShowNorth = true;
+
+            /**
+             * Whether to show the South compass point.
+             * Defaults to true.
+             */
+            @Since(1)
+            public boolean compassShowSouth = true;
+
+            /**
+             * Whether to show the East compass point.
+             * Defaults to true.
+             */
+            @Since(1)
+            public boolean compassShowEast = true;
+
+            /**
+             * Whether to show the West compass point.
+             * Defaults to true.
+             */
+            @Since(1)
+            public boolean compassShowWest = true;
+
+            /**
              * Number of pixels to shift the center of an "off-map" waypoint away from the map center.
              * Use this to adjust how it overlays the minimap frame.
              */

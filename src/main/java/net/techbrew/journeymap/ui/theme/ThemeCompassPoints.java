@@ -21,6 +21,10 @@ public class ThemeCompassPoints
     final Point2D pointSouth;
     final Point2D pointWest;
     final Point2D pointEast;
+    final boolean showNorth;
+    final boolean showSouth;
+    final boolean showEast;
+    final boolean showWest;
     final int bgAlpha;
     final Color bgColor;
     final int fgAlpha;
@@ -83,6 +87,11 @@ public class ThemeCompassPoints
             shiftHorz = 0;
             shiftVert = 0;
         }
+
+        showNorth = minimapSpec.compassShowNorth;
+        showSouth = minimapSpec.compassShowSouth;
+        showEast = minimapSpec.compassShowEast;
+        showWest = minimapSpec.compassShowWest;
     }
 
     public static float getCompassPointScale(int compassLabelHeight, Theme.Minimap.MinimapSpec minimapSpec, TextureImpl compassPointTex)
@@ -100,18 +109,48 @@ public class ThemeCompassPoints
     {
         if(compassPointTex !=null)
         {
-            DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointNorth.getX() - xOffset, pointNorth.getY() - yOffset, compassPointScale, 0);
-            DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointSouth.getX() - xOffset, pointSouth.getY() - yOffset, compassPointScale, 180);
-            DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointWest.getX() - xOffset, pointWest.getY() - yOffset, compassPointScale, -90);
-            DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointEast.getX() - xOffset, pointEast.getY() - yOffset, compassPointScale, 90);
+            if (showNorth)
+            {
+                DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointNorth.getX() - xOffset, pointNorth.getY() - yOffset, compassPointScale, 0);
+            }
+
+            if (showSouth)
+            {
+                DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointSouth.getX() - xOffset, pointSouth.getY() - yOffset, compassPointScale, 180);
+            }
+
+            if (showWest)
+            {
+                DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointWest.getX() - xOffset, pointWest.getY() - yOffset, compassPointScale, -90);
+            }
+
+            if (showEast)
+            {
+                DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointEast.getX() - xOffset, pointEast.getY() - yOffset, compassPointScale, 90);
+            }
         }
     }
 
     public void drawLabels(double rotation)
     {
-        DrawUtil.drawLabel(textNorth, pointNorth.getX(), pointNorth.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
-        DrawUtil.drawLabel(textSouth, pointSouth.getX(), pointSouth.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
-        DrawUtil.drawLabel(textWest, pointWest.getX(), pointWest.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
-        DrawUtil.drawLabel(textEast, pointEast.getX(), pointEast.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
+        if (showNorth)
+        {
+            DrawUtil.drawLabel(textNorth, pointNorth.getX(), pointNorth.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
+        }
+
+        if (showSouth)
+        {
+            DrawUtil.drawLabel(textSouth, pointSouth.getX(), pointSouth.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
+        }
+
+        if (showWest)
+        {
+            DrawUtil.drawLabel(textWest, pointWest.getX(), pointWest.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
+        }
+
+        if (showEast)
+        {
+            DrawUtil.drawLabel(textEast, pointEast.getX(), pointEast.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
+        }
     }
 }
