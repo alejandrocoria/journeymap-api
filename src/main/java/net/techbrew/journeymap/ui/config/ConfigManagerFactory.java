@@ -376,9 +376,11 @@ public class ConfigManagerFactory implements IModGuiFactory
      * <p/>
      * Provides a basic GuiButton entry to be used as a base for other entries that require a button for the value.
      */
-    public static abstract class JmButtonEntry extends GuiConfigEntries.ListEntryBase
+    public static class JmButtonEntry<T> extends GuiConfigEntries.ListEntryBase
     {
         protected final Button btnValue;
+        protected final T beforeValue;
+        protected T currentValue;
 
         public JmButtonEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement<?> configElement)
         {
@@ -388,26 +390,17 @@ public class ConfigManagerFactory implements IModGuiFactory
         public JmButtonEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement<?> configElement, Button button)
         {
             super(owningScreen, owningEntryList, configElement);
+            this.beforeValue = (T) configElement.get();
             this.btnValue = button;
         }
-
-        /**
-         * Updates the displayString of the value button.
-         */
-        public abstract void updateValueButtonText();
-
-        /**
-         * Called when the value button has been clicked.
-         */
-        public abstract void valueButtonPressed(int slotIndex);
 
         @Override
         public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
         {
             super.drawEntry(slotIndex, x, y, listWidth, slotHeight, tessellator, mouseX, mouseY, isSelected);
-            this.btnValue.width = drawLabel ? this.owningEntryList.controlWidth : (this.owningEntryList.controlWidth + this.owningEntryList.maxLabelTextWidth);
-            this.btnValue.xPosition = drawLabel ? this.owningScreen.entryList.controlX : this.owningScreen.entryList.labelX + 16;
+            this.btnValue.width = Math.min(this.owningEntryList.controlWidth, 200);
             this.btnValue.yPosition = y;
+            this.btnValue.centerHorizontalOn(this.owningEntryList.controlX + ((this.owningEntryList.controlWidth / 2)));
             this.btnValue.enabled = enabled();
             this.btnValue.drawButton(this.mc, mouseX, mouseY);
         }
@@ -428,9 +421,6 @@ public class ConfigManagerFactory implements IModGuiFactory
             }
         }
 
-        /**
-         * Fired when the mouse button is released. Arguments: index, x, y, mouseEvent, relativeX, relativeY
-         */
         /**
          * Fired when the mouse button is released. Arguments: index, x, y, mouseEvent, relativeX, relativeY
          */
@@ -455,56 +445,14 @@ public class ConfigManagerFactory implements IModGuiFactory
         public void mouseClicked(int x, int y, int mouseEvent)
         {
         }
-    }
 
-    /**
-     * CheckBooleanEntry
-     * <p/>
-     * Provides a Checkbutton that toggles between true and false.
-     */
-    public static class CheckBooleanEntry extends JmButtonEntry
-    {
-        protected final boolean beforeValue;
-        protected boolean currentValue;
-
-        public CheckBooleanEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement<Boolean> configElement)
-        {
-            this(owningScreen, owningEntryList, configElement, new CheckBox(0, ""));
-        }
-
-        public CheckBooleanEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement<?> configElement, Button button)
-        {
-            super(owningScreen, owningEntryList, configElement, button);
-            this.beforeValue = Boolean.valueOf(configElement.get().toString());
-            this.currentValue = beforeValue;
-            this.btnValue.enabled = enabled();
-            this.drawLabel = true;
-        }
-
-        @Override
-        public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
-        {
-            super.drawEntry(slotIndex, x, y, listWidth, slotHeight, tessellator, mouseX, mouseY, isSelected);
-            this.btnValue.width = drawLabel ? this.owningEntryList.controlWidth : (this.owningEntryList.controlWidth + this.owningEntryList.maxLabelTextWidth);
-            this.btnValue.xPosition = drawLabel ? this.owningScreen.entryList.controlX : this.owningScreen.entryList.labelX + 16;
-            this.btnValue.yPosition = y;
-            this.btnValue.height = slotHeight;
-            this.btnValue.enabled = enabled();
-            this.btnValue.drawButton(this.mc, mouseX, mouseY);
-        }
-
-        @Override
         public void updateValueButtonText()
         {
         }
 
-        @Override
         public void valueButtonPressed(int slotIndex)
         {
-            if (enabled())
-            {
-                currentValue = !currentValue;
-            }
+
         }
 
         @Override
@@ -518,7 +466,7 @@ public class ConfigManagerFactory implements IModGuiFactory
         {
             if (enabled())
             {
-                currentValue = Boolean.valueOf(configElement.getDefault().toString());
+                currentValue = (T) configElement.getDefault();
                 updateValueButtonText();
             }
         }
@@ -526,7 +474,7 @@ public class ConfigManagerFactory implements IModGuiFactory
         @Override
         public boolean isChanged()
         {
-            return currentValue != beforeValue;
+            return !Objects.equals(currentValue, beforeValue);
         }
 
         @Override
@@ -551,9 +499,66 @@ public class ConfigManagerFactory implements IModGuiFactory
         }
 
         @Override
-        public Boolean getCurrentValue()
+        public T getCurrentValue()
         {
             return currentValue;
+        }
+
+        @Override
+        public Object[] getCurrentValues()
+        {
+            return new Object[]{currentValue};
+        }
+    }
+
+    /**
+     * CheckBooleanEntry
+     * <p/>
+     * Provides a Checkbutton that toggles between true and false.
+     */
+    public static class CheckBooleanEntry extends JmButtonEntry<Boolean>
+    {
+        public CheckBooleanEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement<Boolean> configElement)
+        {
+            this(owningScreen, owningEntryList, configElement, new CheckBox(0, ""));
+        }
+
+        public CheckBooleanEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement<?> configElement, Button button)
+        {
+            super(owningScreen, owningEntryList, configElement, button);
+            this.btnValue.enabled = enabled();
+        }
+
+        @Override
+        public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
+        {
+            super.drawEntry(slotIndex, x, y, listWidth, slotHeight, tessellator, mouseX, mouseY, isSelected);
+        }
+
+        @Override
+        public void valueButtonPressed(int slotIndex)
+        {
+            if (enabled())
+            {
+                currentValue = !currentValue;
+            }
+        }
+
+        @Override
+        public boolean isChanged()
+        {
+            return currentValue != beforeValue;
+        }
+
+        @Override
+        public boolean saveConfigElement()
+        {
+            if (enabled() && isChanged())
+            {
+                configElement.set(currentValue);
+                return configElement.requiresMcRestart();
+            }
+            return false;
         }
 
         @Override
