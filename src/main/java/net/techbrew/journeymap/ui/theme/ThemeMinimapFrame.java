@@ -57,10 +57,10 @@ public class ThemeMinimapFrame
         this.width = size;
         this.height = size;
         this.frameColor = Theme.getColor(minimapSpec.frameColor);
-        this.frameAlpha = JourneyMap.getMiniMapProperties().frameAlpha.get()/255f;
+        this.frameAlpha = JourneyMap.getMiniMapProperties().frameAlpha.get() / 255f;
         this.reticleOrientation = JourneyMap.getMiniMapProperties().reticleOrientation.get();
 
-        if(minimapSpec instanceof Theme.Minimap.MinimapSquare)
+        if (minimapSpec instanceof Theme.Minimap.MinimapSquare)
         {
             isSquare = true;
             Theme.Minimap.MinimapSquare minimapSquare = (Theme.Minimap.MinimapSquare) minimapSpec;
@@ -78,7 +78,7 @@ public class ThemeMinimapFrame
         else
         {
             Theme.Minimap.MinimapCircle minimapCircle = (Theme.Minimap.MinimapCircle) minimapSpec;
-            int imgSize = size<=256 ? 256 : 512;
+            int imgSize = size <= 256 ? 256 : 512;
             resourcePattern = "minimap/circle/" + minimapCircle.prefix + "%s.png";
 
             TextureImpl tempMask = getTexture("mask_" + imgSize, imgSize, imgSize, false, true);
@@ -88,7 +88,7 @@ public class ThemeMinimapFrame
             textureCircle = TextureCache.instance().getScaledCopy("scaledCircleRim", tempCircle, size, size, frameAlpha);
         }
 
-        if(minimapSpec.compassPoint != null && minimapSpec.compassPoint.width>0 && minimapSpec.compassPoint.height>0)
+        if (minimapSpec.compassPoint != null && minimapSpec.compassPoint.width > 0 && minimapSpec.compassPoint.height > 0)
         {
             textureCompassPoint = getTexture("compass_point", minimapSpec.compassPoint);
         }
@@ -120,7 +120,7 @@ public class ThemeMinimapFrame
 
     public void drawMask()
     {
-        if(isSquare)
+        if (isSquare)
         {
             DrawUtil.drawRectangle(x, y, this.width, this.height, Color.white, 255);
         }
@@ -132,7 +132,8 @@ public class ThemeMinimapFrame
 
     public void drawReticle()
     {
-        if(showReticle && reticleAlpha>0)
+        reticleHeadingAlpha = 255;
+        if (showReticle && reticleAlpha > 0)
         {
             double centerX = x + (width / 2);
             double centerY = y + (height / 2);
@@ -148,7 +149,7 @@ public class ThemeMinimapFrame
             // North
             if (thick > 0 && alpha > 0)
             {
-                DrawUtil.drawRectangle(centerX - (thick / 2), centerY - reticleSegmentLength - 16, thick, reticleSegmentLength, reticleColor, reticleAlpha);
+                DrawUtil.drawRectangle(centerX - (thick / 2), centerY - reticleSegmentLength - 16, thick, reticleSegmentLength, reticleColor, alpha);
             }
 
             if (reticleOrientation == ReticleOrientation.PlayerHeading)
@@ -165,7 +166,7 @@ public class ThemeMinimapFrame
             // South
             if (thick > 0 && alpha > 0)
             {
-                DrawUtil.drawRectangle(centerX - (thick / 2), centerY + 16, thick, reticleSegmentLength, reticleColor, reticleAlpha);
+                DrawUtil.drawRectangle(centerX - (thick / 2), centerY + 16, thick, reticleSegmentLength, reticleColor, alpha);
             }
             thick = reticleThickness;
             alpha = reticleAlpha;
@@ -173,20 +174,20 @@ public class ThemeMinimapFrame
             // West
             if (thick > 0 && alpha > 0)
             {
-                DrawUtil.drawRectangle(centerX - reticleSegmentLength - 16, centerY - (thick / 2), reticleSegmentLength, reticleThickness, reticleColor, reticleAlpha);
+                DrawUtil.drawRectangle(centerX - reticleSegmentLength - 16, centerY - (thick / 2), reticleSegmentLength, reticleThickness, reticleColor, alpha);
             }
 
             // East
             if (thick > 0 && alpha > 0)
             {
-                DrawUtil.drawRectangle(centerX + 16, centerY - (thick / 2), reticleSegmentLength, reticleThickness, reticleColor, reticleAlpha);
+                DrawUtil.drawRectangle(centerX + 16, centerY - (thick / 2), reticleSegmentLength, reticleThickness, reticleColor, alpha);
             }
         }
     }
 
     public void drawFrame()
     {
-        if(frameAlpha>0)
+        if (frameAlpha > 0)
         {
             if (isSquare)
             {
