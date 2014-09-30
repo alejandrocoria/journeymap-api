@@ -261,7 +261,7 @@ public class FileHandler
         }
         catch (IOException e)
         {
-            String error = Constants.getMessageJMERR17(e.getMessage());
+            String error = "Could not get web image " + fileName + ": " + e.getMessage();
             JourneyMap.getLogger().error(error);
             return null;
         }
@@ -284,7 +284,7 @@ public class FileHandler
         }
         catch (IOException e)
         {
-            String error = Constants.getMessageJMERR17(e.getMessage());
+            String error = "Could not get language file " + fileName + ": " + (e.getMessage());
             JourneyMap.getLogger().error(error);
             return null;
         }
@@ -328,7 +328,7 @@ public class FileHandler
         }
         catch (IOException e)
         {
-            String error = Constants.getMessageJMERR17(e.getMessage());
+            String error = "Could not get imageFile " + imageFile + ": " + (e.getMessage());
             JourneyMap.getLogger().error(error);
             return null;
         }
@@ -627,7 +627,7 @@ public class FileHandler
             if (img == null)
             {
                 img = FileHandler.getIconFromResource(assetsPath, setName, iconPath);
-                if (img == null && defaultImg!=null)
+                if (img == null && defaultImg != null)
                 {
                     img = defaultImg;
                     try
@@ -650,7 +650,7 @@ public class FileHandler
                 }
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             JourneyMap.getLogger().error("Couldn't load iconset file: " + LogFormatter.toString(e));
         }
@@ -673,7 +673,7 @@ public class FileHandler
         }
         catch (IOException e)
         {
-            String error = Constants.getMessageJMERR17(e.getMessage());
+            String error = String.format("Could not get icon from resource: %s, %s, %s : %s", assetsPath, setName, iconPath, e.getMessage());
             JourneyMap.getLogger().error(error);
             return null;
         }
@@ -694,7 +694,7 @@ public class FileHandler
         }
         catch (Throwable e)
         {
-            String error = Constants.getMessageJMERR17(e.getMessage());
+            String error = String.format("Could not get icon stream: %s, %s, %s : %s", assetsPath, setName, iconPath, e.getMessage());
             JourneyMap.getLogger().error(error);
             return null;
         }

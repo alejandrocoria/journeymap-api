@@ -9,7 +9,6 @@
 package net.techbrew.journeymap.task;
 
 import net.minecraft.client.Minecraft;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.ChunkMD;
@@ -73,8 +72,7 @@ public class TaskBatch implements ITask
             }
             catch (Throwable t)
             {
-                String error = Constants.getMessageJMERR16(LogFormatter.toString(t));
-                JourneyMap.getLogger().error(error);
+                JourneyMap.getLogger().error(String.format("Unexpected error during task batch: %s", LogFormatter.toString(t)));
             }
         }
 

@@ -97,7 +97,7 @@ public class MapSaver
         }
         catch (java.lang.OutOfMemoryError e)
         {
-            String error = Constants.getMessageJMERR18("Out Of Memory: Increase Java Heap Size for Minecraft to save large maps.");
+            String error = "Out Of Memory: Increase Java Heap Size for Minecraft to save large maps.";
             JourneyMap.getLogger().error(error);
             ChatLog.announceError(error);
             timer.cancel();
@@ -105,7 +105,6 @@ public class MapSaver
         catch (Throwable t)
         {
             JourneyMap.getLogger().error(LogFormatter.toString(t));
-            ChatLog.announceError(Constants.getMessageJMERR18(t.getMessage()));
             timer.cancel();
             return null;
         }

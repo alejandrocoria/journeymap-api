@@ -65,13 +65,13 @@ public class ActionService extends BaseService
         World theWorld = minecraft.theWorld;
         if (theWorld == null)
         {
-            throwEventException(503, Constants.getMessageJMERR09(), event, false);
+            throwEventException(503, "World not connected", event, false);
         }
 
         // Ensure world is loaded
         if (!JourneyMap.getInstance().isMapping())
         {
-            throwEventException(503, Constants.getMessageJMERR02(), event, false);
+            throwEventException(503, "JourneyMap not mapping", event, false);
         }
 
         // Use type param to delegate
@@ -86,7 +86,7 @@ public class ActionService extends BaseService
         }
         else
         {
-            String error = Constants.getMessageJMERR05("type=" + type); //$NON-NLS-1$
+            String error = "Bad request: type=" + type; //$NON-NLS-1$
             throwEventException(400, error, event, true);
         }
 
@@ -115,7 +115,7 @@ public class ActionService extends BaseService
             File worldDir = FileHandler.getJMWorldDir(minecraft);
             if (!worldDir.exists() || !worldDir.isDirectory())
             {
-                String error = Constants.getMessageJMERR10(worldDir.getAbsolutePath());
+                String error = "World unknown: " + (worldDir.getAbsolutePath());
             }
 
             Integer vSlice = getParameter(query, "depth", (Integer) null); //$NON-NLS-1$
@@ -128,7 +128,7 @@ public class ActionService extends BaseService
             }
             catch (Exception e)
             {
-                String error = Constants.getMessageJMERR05("mapType=" + mapType); //$NON-NLS-1$
+                String error = "Bad request: mapType=" + mapType; //$NON-NLS-1$
                 throwEventException(400, error, event, true);
             }
             if (mapType != MapType.underground)
@@ -169,7 +169,7 @@ public class ActionService extends BaseService
         catch (Throwable t)
         {
             JourneyMap.getLogger().error(LogFormatter.toString(t));
-            throwEventException(500, Constants.getMessageJMERR19(path), event, true);
+            throwEventException(500, "Unexpected error handling path: " + (path), event, true);
         }
     }
 

@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap.server;
 
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.ColorCache;
 import net.techbrew.journeymap.cartography.ColorPalette;
@@ -207,7 +206,7 @@ public class FileService extends BaseService
             if (fileStream == null)
             {
                 JMLogger.logOnce("Path not found: " + path, null);
-                throwEventException(404, Constants.getMessageJMERR13(path), event, true);
+                throwEventException(404, "Unknown: " + path, event, true);
             }
             else
             {
@@ -223,7 +222,7 @@ public class FileService extends BaseService
         catch (Throwable t)
         {
             JourneyMap.getLogger().error(LogFormatter.toString(t));
-            throwEventException(500, Constants.getMessageJMERR12(path), event, true);
+            throwEventException(500, "Error: " + path, event, true);
         }
     }
 

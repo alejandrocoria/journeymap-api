@@ -128,8 +128,9 @@ public abstract class BaseService extends Service
      */
     protected void reportMalformedRequest(Event event) throws Event, Exception
     {
-        String error = Constants.getMessageJMERR05("queryString=" + event.query().path()); //$NON-NLS-1$
-        throwEventException(400, Constants.getMessageJMERR02(), event, false);
+        String error = "Bad Request: " + event.query().path(); //$NON-NLS-1$
+        JourneyMap.getLogger().error(error);
+        throwEventException(400, error, event, false);
     }
 
     /**
@@ -427,6 +428,7 @@ public abstract class BaseService extends Service
             dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Constants.getLocale()); //$NON-NLS-1$
             dateFormat.setTimeZone(Constants.GMT);
         }
+
         private Reply reply;
 
         private ResponseHeader(Event event)

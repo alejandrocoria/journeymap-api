@@ -67,21 +67,20 @@ public class TileService extends FileService
         World theWorld = minecraft.theWorld;
         if (theWorld == null)
         {
-            throwEventException(503, Constants.getMessageJMERR09(), event, false);
+            throwEventException(503, "World not connected", event, false);
         }
 
         // Ensure world is loaded
         if (!JourneyMap.getInstance().isMapping())
         {
-            throwEventException(503, Constants.getMessageJMERR02(), event, false);
+            throwEventException(503, "JourneyMap not started", event, false);
         }
 
         // Ensure world dir is found
         File worldDir = FileHandler.getJMWorldDir(minecraft);
         if (!worldDir.exists() || !worldDir.isDirectory())
         {
-            String error = Constants.getMessageJMERR06("worldDir=" + worldDir.getAbsolutePath()); //$NON-NLS-1$
-            throwEventException(400, error, event, true);
+            throwEventException(400, "World not found", event, true);
         }
 
         try
@@ -103,7 +102,7 @@ public class TileService extends FileService
             }
             catch (Exception e)
             {
-                String error = Constants.getMessageJMERR05("mapType=" + mapType); //$NON-NLS-1$
+                String error = "Bad request: mapType=" + mapType; //$NON-NLS-1$
                 throwEventException(400, error, event, true);
             }
             if (mapType != MapType.underground)

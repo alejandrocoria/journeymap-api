@@ -10,7 +10,6 @@ package net.techbrew.journeymap.thread;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -80,7 +79,7 @@ public class RunnableTask implements Runnable
             }
             catch (Throwable t)
             {
-                String error = Constants.getMessageJMERR16(LogFormatter.toString(t));
+                String error = "Unexpected error during RunnableTask: " + LogFormatter.toString(t);
                 logger.error(error);
             }
         }

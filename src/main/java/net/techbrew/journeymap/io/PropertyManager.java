@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap.io;
 
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.properties.*;
@@ -206,7 +205,7 @@ public class PropertyManager
             }
             catch (IOException e)
             {
-                String error = Constants.getMessageJMERR19(propFile.getAbsolutePath());
+                String error = "Error getting property file: " + propFile.getAbsolutePath();
                 JourneyMap.getLogger().error(error + ": " + LogFormatter.toString(e));
                 return;
             }

@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap.cartography;
 
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.render.CaveRenderer;
 import net.techbrew.journeymap.cartography.render.EndRenderer;
@@ -53,7 +52,7 @@ public class ChunkRenderController
 
     public BufferedImage getChunkImage(ChunkMD chunkMd, Integer vSlice)
     {
-        boolean underground = vSlice!=null;
+        boolean underground = vSlice != null;
 
         // Initialize image for the chunk
         BufferedImage chunkImage = new BufferedImage(underground ? 16 : 32, 16, BufferedImage.TYPE_INT_ARGB);
@@ -114,7 +113,7 @@ public class ChunkRenderController
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error(Constants.getMessageJMERR16(LogFormatter.toString(t)));
+            JourneyMap.getLogger().error("Unexpected error in ChunkRenderController: " + (LogFormatter.toString(t)));
         }
         finally
         {

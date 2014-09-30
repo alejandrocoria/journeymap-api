@@ -285,7 +285,7 @@ public abstract class ImageSet
             }
             catch (Throwable e)
             {
-                String error = Constants.getMessageJMERR22(imageFile, LogFormatter.toString(e));
+                String error = "Unexpected error writing to disk: " + imageFile + ": " + LogFormatter.toString(e);
                 JourneyMap.getLogger().error(error);
                 throw new RuntimeException(e);
             }

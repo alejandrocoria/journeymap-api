@@ -12,12 +12,12 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New Feature: Options management moved to my own framework. Forge's Config UI framework was too unwieldy.
 - Change: Reticle's heading segment is now slightly thicker/more opaque
 - Change: Reticle's heading segment thickness/opacity is controlled via Theme
 - Change: Compass points can now be individually hidden via Theme
+- Change: A bunch of unnecessary log messages removed from the language files
 - Bugfix: Reticle now extends to edges of square map when the reticle orientation set to "My Heading"
-- Change: Options Menu -> Boolean options now show as checkboxes
-- Change: Options Menu -> Category buttons now appear as text "links" instead of as big horsey buttons
 
 ## Changelog for JourneyMap 5.0.0a1:
 - New Feature:  Options management moved to Forge's Config UI framework.  It's ugly, and a lot of options need to have tooltips written, but there's a lot more exposed options than ever before.  This will be a work in progress.

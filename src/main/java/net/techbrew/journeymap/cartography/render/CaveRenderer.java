@@ -12,7 +12,6 @@ import com.google.common.base.Optional;
 import com.google.common.cache.RemovalNotification;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.EnumSkyBlock;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.IChunkRenderer;
 import net.techbrew.journeymap.cartography.RGB;
@@ -89,7 +88,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         boolean ok = false;
 
         // Surface prepass
-        if(mapSurfaceAboveCaves)
+        if (mapSurfaceAboveCaves)
         {
             if (!chunkMd.getHasNoSky() && surfaceRenderer != null)
             {
@@ -110,7 +109,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             {
                 chunkSliceHeights[vSlice] = new HeightsCache(String.format("%sHeights_%d", cachePrefix, vSlice));
             }
-            
+
             // Init slopes within slice
             if (chunkSliceSlopes[vSlice] == null)
             {
@@ -240,8 +239,8 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                 catch (Throwable t)
                 {
                     paintBadBlock(x, vSlice, z, g2D);
-                    String error = Constants.getMessageJMERR07("x,vSlice,z = " + x + "," //$NON-NLS-1$ //$NON-NLS-2$
-                            + vSlice + "," + z + " : " + LogFormatter.toString(t)); //$NON-NLS-1$ //$NON-NLS-2$
+                    String error = "CaveRenderer error at x,vSlice,z = " + x + "," //$NON-NLS-1$ //$NON-NLS-2$
+                            + vSlice + "," + z + " : " + LogFormatter.toString(t); //$NON-NLS-1$ //$NON-NLS-2$
                     JourneyMap.getLogger().error(error);
                 }
             }
@@ -389,10 +388,10 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
      */
     @Override
     protected Integer getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY,
-                                      final HeightsCache chunkHeights)
+                                          final HeightsCache chunkHeights)
     {
         Integer[][] blockSliceHeights = chunkHeights.getUnchecked(chunkMd.getCoord());
-        if(blockSliceHeights==null)
+        if (blockSliceHeights == null)
         {
             return null;
         }
@@ -413,7 +412,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
             boolean inAirPocket = false;
 
-            while (y > 0 && y> sliceMinY)
+            while (y > 0 && y > sliceMinY)
             {
 
                 if (mapBathymetry && blockMD.isWater())
@@ -436,7 +435,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                 blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
                 blockMDAbove = dataCache.getBlockMD(chunkMd, x, y + 1, z);
 
-                if(y<sliceMinY && !inAirPocket)
+                if (y < sliceMinY && !inAirPocket)
                 {
                     break;
                 }
@@ -468,17 +467,17 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         synchronized (chunkLock)
         {
             ChunkCoordIntPair coord = notification.getKey();
-            for(HeightsCache heightsCache : chunkSliceHeights)
+            for (HeightsCache heightsCache : chunkSliceHeights)
             {
-                if(heightsCache!=null)
+                if (heightsCache != null)
                 {
                     heightsCache.invalidate(coord);
                 }
             }
 
-            for(SlopesCache slopesCache : chunkSliceSlopes)
+            for (SlopesCache slopesCache : chunkSliceSlopes)
             {
-                if(slopesCache!=null)
+                if (slopesCache != null)
                 {
                     slopesCache.invalidate(coord);
                 }

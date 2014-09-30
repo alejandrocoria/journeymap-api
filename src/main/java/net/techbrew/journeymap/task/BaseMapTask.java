@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class BaseMapTask implements ITask
 {
-    protected static ChunkCoordIntPair[] keepAliveOffsets = new ChunkCoordIntPair[]{new ChunkCoordIntPair(0,-1), new ChunkCoordIntPair(-1,0), new ChunkCoordIntPair(-1,-1)};
+    protected static ChunkCoordIntPair[] keepAliveOffsets = new ChunkCoordIntPair[]{new ChunkCoordIntPair(0, -1), new ChunkCoordIntPair(-1, 0), new ChunkCoordIntPair(-1, -1)};
     private static BufferedImage blankChunkImage = null;
     private static BufferedImage blankChunkImageUnderground = null;
     final World world;
@@ -50,7 +50,7 @@ public abstract class BaseMapTask implements ITask
         this.dimension = dimension;
         this.underground = underground;
         this.vSlice = vSlice;
-        if(vSlice!=null && vSlice==-1)
+        if (vSlice != null && vSlice == -1)
         {
             vSlice = null;
         }
@@ -69,7 +69,7 @@ public abstract class BaseMapTask implements ITask
 
         try
         {
-            if(mc.theWorld==null)
+            if (mc.theWorld == null)
             {
                 this.complete(true, false);
                 return;
@@ -114,7 +114,7 @@ public abstract class BaseMapTask implements ITask
 
                 ChunkCoordIntPair coord = chunkIter.next();
                 ChunkMD chunkMd = DataCache.instance().getChunkMD(coord);
-                if(chunkMd!=null && chunkMd.hasChunk())
+                if (chunkMd != null && chunkMd.hasChunk())
                 {
                     try
                     {
@@ -188,7 +188,7 @@ public abstract class BaseMapTask implements ITask
         }
         catch (Throwable t)
         {
-            String error = Constants.getMessageJMERR16(LogFormatter.toString(t));
+            String error = "Unexpected error in BaseMapTask: " + (LogFormatter.toString(t));
             JourneyMap.getLogger().error(error);
             this.complete(false, true);
         }

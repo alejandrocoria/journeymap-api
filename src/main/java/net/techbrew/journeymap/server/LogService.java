@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap.server;
 
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.log.JMLogger;
 import se.rupy.http.Event;
 
@@ -60,7 +59,7 @@ public class LogService extends FileService
         }
         else
         {
-            throwEventException(404, Constants.getMessageJMERR13(logFile.getPath()), event, true);
+            throwEventException(404, "Not found: " + logFile.getPath(), event, true);
         }
 
     }

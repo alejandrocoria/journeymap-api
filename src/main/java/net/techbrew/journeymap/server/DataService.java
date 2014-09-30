@@ -10,7 +10,6 @@ package net.techbrew.journeymap.server;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.registry.GameData;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.*;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -34,6 +33,7 @@ public class DataService extends BaseService
 
     public static final String combinedPath;
     public static final HashMap<String, Class> providerMap;
+
     static
     {
         providerMap = new HashMap<String, Class>(14);
@@ -57,6 +57,7 @@ public class DataService extends BaseService
         }
         combinedPath = sb.toString();
     }
+
     private static final long serialVersionUID = 4412225358529161454L;
 
 
@@ -91,13 +92,13 @@ public class DataService extends BaseService
                 // Ensure JourneyMap and World is loaded
                 if (!JourneyMap.getInstance().isMapping())
                 {
-                    throwEventException(503, Constants.getMessageJMERR02(), event, false);
+                    throwEventException(503, "JourneyMap not mapping", event, false);
                 }
                 else
                 {
                     if (FMLClientHandler.instance().getClient().theWorld == null)
                     {
-                        throwEventException(503, Constants.getMessageJMERR09(), event, false);
+                        throwEventException(503, "World not connected", event, false);
                     }
                 }
             }
@@ -209,8 +210,8 @@ public class DataService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error(LogFormatter.toString(t));
-            throwEventException(500, Constants.getMessageJMERR12(path), event, true);
+            JourneyMap.getLogger().error(String.format("Unexpected error in data service: %s", LogFormatter.toString(t)));
+            throwEventException(500, "Error retrieving " + path, event, true);
         }
     }
 

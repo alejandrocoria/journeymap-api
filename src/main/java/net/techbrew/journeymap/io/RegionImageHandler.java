@@ -149,7 +149,7 @@ public class RegionImageHandler
             }
             catch (Exception e)
             {
-                String error = Constants.getMessageJMERR21(regionFile, LogFormatter.toString(e));
+                String error = "Region file produced error: " + regionFile + ": " + LogFormatter.toString(e);
                 JourneyMap.getLogger().error(error);
             }
         }
@@ -179,7 +179,7 @@ public class RegionImageHandler
         }
         catch (IOException e)
         {
-            String error = Constants.getMessageJMERR17(e.getMessage());
+            String error = "Could not get image from file: " + file + ": " + (e.getMessage());
             JourneyMap.getLogger().error(error);
             return null;
         }
@@ -411,7 +411,7 @@ public class RegionImageHandler
             }
             catch (IOException e)
             {
-                JourneyMap.getLogger().error(Constants.getMessageJMERR22(tmpFile, LogFormatter.toString(e)));
+                JourneyMap.getLogger().error("Could not create blank temp file " + tmpFile + ": " + LogFormatter.toString(e));
             }
         }
         return tmpFile;

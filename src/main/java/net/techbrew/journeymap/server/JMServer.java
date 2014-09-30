@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap.server;
 
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -88,7 +87,7 @@ public class JMServer
             }
             if (!enable)
             {
-                ChatLog.announceError(Constants.getMessageJMERR24());
+                JourneyMap.getLogger().error("Unexpected error, JMServer couldn't be started.");
             }
         }
 

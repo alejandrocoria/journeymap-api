@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap.server;
 
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.properties.FullMapProperties;
@@ -124,7 +123,7 @@ public class PropertyService extends BaseService
         catch (Throwable t)
         {
             JourneyMap.getLogger().error(LogFormatter.toString(t));
-            throwEventException(500, Constants.getMessageJMERR12(path), event, true);
+            throwEventException(500, "Error trying " + path, event, true);
         }
     }
 
@@ -159,7 +158,7 @@ public class PropertyService extends BaseService
         catch (Throwable t)
         {
             JourneyMap.getLogger().error(LogFormatter.toString(t));
-            throwEventException(500, Constants.getMessageJMERR12(path), event, true);
+            throwEventException(500, "Error trying " + path, event, true);
         }
     }
 }
