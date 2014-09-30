@@ -19,24 +19,28 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     SlotMetadata metadata;
     Config.Category category;
     int currentSlotIndex;
-    boolean selected;
+    private boolean selected;
     Button button;
     int currentWidth;
     int currentColumns;
     int columnWidth;
-    LinkedHashSet<SlotMetadata> childMetadataList = new LinkedHashSet<SlotMetadata>();
+    final String name;
+    LinkedList<SlotMetadata> childMetadataList = new LinkedList<SlotMetadata>();
     List<ScrollListPane.ISlot> childSlots = new ArrayList<ScrollListPane.ISlot>();
+    String glyphDown = "\u25BC";
+    String glyphUp = "\u25B2";
 
     public CategorySlot(Config.Category category)
     {
         this.category = category;
-        String name = Constants.getString(category.key);
+        this.name = Constants.getString(category.key);
         String tooltip = Constants.getString(category.key + ".tooltip");
         boolean advanced = category == Config.Category.Advanced;
 
         button = new Button(0, name);
         button.setDefaultStyle(false);
         metadata = new SlotMetadata(button, name, tooltip, advanced);
+        updateButtonLabel();
     }
 
     public CategorySlot add(ScrollListPane.ISlot slot)
@@ -58,33 +62,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
 
     public void sort()
     {
-        Collections.sort(childSlots, new Comparator<ScrollListPane.ISlot>()
-        {
-            @Override
-            public int compare(ScrollListPane.ISlot o1, ScrollListPane.ISlot o2)
-            {
-                if (o1 instanceof CategorySlot)
-                {
-                    if (o2 instanceof CategorySlot)
-                    {
-                        return ((CategorySlot) o1).category.compareTo(((CategorySlot) o2).category);
-                    }
-                    return -1;
-                }
-
-                if (o2 instanceof CategorySlot)
-                {
-                    return 1;
-                }
-
-                if (o1 instanceof ButtonListSlot && o2 instanceof ButtonListSlot)
-                {
-                    return ((ButtonListSlot) o1).compareTo((ButtonListSlot) o2);
-                }
-
-                return 0;
-            }
-        });
+        Collections.sort(childMetadataList);
     }
 
     public List<ScrollListPane.ISlot> getChildSlots()
@@ -133,6 +111,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
 
         // Rebuild slots
         childSlots.clear();
+        sort();
         Iterator<SlotMetadata> iterator = childMetadataList.iterator();
         while (iterator.hasNext())
         {
@@ -177,6 +156,12 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         button.drawButton(mc, mouseX, mouseY);
     }
 
+    private void updateButtonLabel()
+    {
+        String glyph = selected ? glyphUp : glyphDown;
+        this.button.displayString = String.format("%1$s  %2$s  %1$s", glyph, name);
+    }
+
     @Override
     public boolean mousePressed(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY)
     {
@@ -184,6 +169,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         if (pressed)
         {
             selected = !selected;
+            updateButtonLabel();
         }
         return pressed;
     }

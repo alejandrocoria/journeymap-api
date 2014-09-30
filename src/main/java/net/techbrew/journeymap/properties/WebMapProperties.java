@@ -11,9 +11,10 @@ package net.techbrew.journeymap.properties;
 import net.techbrew.journeymap.Constants;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static net.techbrew.journeymap.properties.Config.Category.General;
+import static net.techbrew.journeymap.properties.Config.Category.WebMap;
 
 /**
  * Properties for the web map in browser.
@@ -22,8 +23,11 @@ public class WebMapProperties extends MapProperties
 {
     protected transient static final int CODE_REVISION = 4;
 
-    @Config(category = General, key = "jm.webmap.enable")
+    @Config(category = WebMap, master = true, key = "jm.webmap.enable")
     public final AtomicBoolean enabled = new AtomicBoolean(true);
+
+    @Config(category = WebMap, key = "jm.advanced.port", minInt = 80, maxInt = 10000, defaultInt = 8080)
+    public final AtomicInteger port = new AtomicInteger(8080);
 
     public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
     protected transient final String name = "webmap";
@@ -82,6 +86,7 @@ public class WebMapProperties extends MapProperties
         int result = super.hashCode();
         result = 31 * result + name.hashCode();
         result = 31 * result + fileRevision;
+        result = 31 * result + port.hashCode();
         result = 31 * result + enabled.hashCode();
         return result;
     }
@@ -91,13 +96,14 @@ public class WebMapProperties extends MapProperties
     {
         return "WebMapProperties: " +
                 "fileRevision=" + fileRevision +
+                ", enabled=" + enabled +
+                ", port=" + port +
                 ", showMobs=" + showMobs +
                 ", showAnimals=" + showAnimals +
                 ", showVillagers=" + showVillagers +
                 ", showPets=" + showPets +
                 ", showPlayers=" + showPlayers +
                 ", showWaypoints=" + showWaypoints +
-                ", managerEnabled=" + enabled +
                 ", entityIconSetName=" + getEntityIconSetName();
     }
 }

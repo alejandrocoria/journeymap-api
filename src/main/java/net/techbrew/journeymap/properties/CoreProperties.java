@@ -37,19 +37,19 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Advanced, key = "jm.advanced.automappoll", minInt = 500, maxInt = 10000, defaultInt = 2000)
     public final AtomicInteger autoMapPoll = new AtomicInteger(2000);
 
-    @Config(category = Radar, key = "jm.advanced.cache_animals", minInt = 1000, maxInt = 10000, defaultInt = 3100)
+    @Config(category = Advanced, key = "jm.advanced.cache_animals", minInt = 1000, maxInt = 10000, defaultInt = 3100)
     public final AtomicInteger cacheAnimalsData = new AtomicInteger(3100);
 
-    @Config(category = Radar, key = "jm.advanced.cache_mobs", minInt = 1000, maxInt = 10000, defaultInt = 3000)
+    @Config(category = Advanced, key = "jm.advanced.cache_mobs", minInt = 1000, maxInt = 10000, defaultInt = 3000)
     public final AtomicInteger cacheMobsData = new AtomicInteger(3000);
 
     @Config(category = Advanced, key = "jm.advanced.cache_player", minInt = 500, maxInt = 2000, defaultInt = 1000)
     public final AtomicInteger cachePlayerData = new AtomicInteger(1000);
 
-    @Config(category = Radar, key = "jm.advanced.cache_players", minInt = 1000, maxInt = 10000, defaultInt = 2000)
+    @Config(category = Advanced, key = "jm.advanced.cache_players", minInt = 1000, maxInt = 10000, defaultInt = 2000)
     public final AtomicInteger cachePlayersData = new AtomicInteger(2000);
 
-    @Config(category = Radar, key = "jm.advanced.cache_villagers", minInt = 1000, maxInt = 10000, defaultInt = 2200)
+    @Config(category = Advanced, key = "jm.advanced.cache_villagers", minInt = 1000, maxInt = 10000, defaultInt = 2200)
     public final AtomicInteger cacheVillagersData = new AtomicInteger(2200);
 
     @Config(category = Advanced, key = "jm.advanced.announcemod", defaultBoolean = true)
@@ -61,13 +61,10 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Advanced, key = "jm.advanced.recordcachestats", defaultBoolean = false)
     public final AtomicBoolean recordCacheStats = new AtomicBoolean(false);
 
-    @Config(category = Advanced, key = "jm.advanced.port", minInt = 80, maxInt = 10000, defaultInt = 8080)
-    public final AtomicInteger port = new AtomicInteger(8080);
-
     @Config(category = Advanced, key = "jm.advanced.browserpoll", minInt = 1000, maxInt = 10000, defaultInt = 2000)
     public final AtomicInteger browserPoll = new AtomicInteger(2000);
 
-    @Config(category = General, key = "jm.common.ui_theme", stringListProvider = ThemeFileHandler.ThemeStringListProvider.class)
+    @Config(category = FullMap, key = "jm.common.ui_theme", stringListProvider = ThemeFileHandler.ThemeStringListProvider.class)
     public final AtomicReference<String> themeName = new AtomicReference<String>(new ThemeFileHandler.ThemeStringListProvider().getDefaultString());
 
     @Config(category = Cartography, key = "jm.common.map_style_caveignoreglass", defaultBoolean = true)
@@ -97,19 +94,19 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Cartography, key = "jm.common.map_style_caveshowsurface", defaultBoolean = true)
     public final AtomicBoolean mapSurfaceAboveCaves = new AtomicBoolean(true);
 
-    @Config(category = Radar, key = "jm.common.radar_max_animals", minInt = 1, maxInt = 128, defaultInt = 32)
+    @Config(category = Advanced, key = "jm.common.radar_max_animals", minInt = 1, maxInt = 128, defaultInt = 32)
     public final AtomicInteger maxAnimalsData = new AtomicInteger(32);
 
-    @Config(category = Radar, key = "jm.common.radar_max_mobs", minInt = 1, maxInt = 128, defaultInt = 32)
+    @Config(category = Advanced, key = "jm.common.radar_max_mobs", minInt = 1, maxInt = 128, defaultInt = 32)
     public final AtomicInteger maxMobsData = new AtomicInteger(32);
 
-    @Config(category = Radar, key = "jm.common.radar_max_players", minInt = 1, maxInt = 128, defaultInt = 32)
+    @Config(category = Advanced, key = "jm.common.radar_max_players", minInt = 1, maxInt = 128, defaultInt = 32)
     public final AtomicInteger maxPlayersData = new AtomicInteger(32);
 
-    @Config(category = Radar, key = "jm.common.radar_max_villagers", minInt = 1, maxInt = 128, defaultInt = 32)
+    @Config(category = Advanced, key = "jm.common.radar_max_villagers", minInt = 1, maxInt = 128, defaultInt = 32)
     public final AtomicInteger maxVillagersData = new AtomicInteger(32);
 
-    @Config(category = Radar, key = "jm.common.radar_hide_sneaking", defaultBoolean = true)
+    @Config(category = Advanced, key = "jm.common.radar_hide_sneaking", defaultBoolean = true)
     public final AtomicBoolean hideSneakingEntities = new AtomicBoolean(true);
 
     protected transient final String name = "core";
@@ -182,7 +179,6 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
         result = 31 * result + announceMod.hashCode();
         result = 31 * result + checkUpdates.hashCode();
         result = 31 * result + recordCacheStats.hashCode();
-        result = 31 * result + port.hashCode();
         result = 31 * result + browserPoll.hashCode();
         result = 31 * result + themeName.hashCode();
         result = 31 * result + caveIgnoreGlass.hashCode();
@@ -219,7 +215,6 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 ", announceMod=" + announceMod +
                 ", checkUpdates=" + checkUpdates +
                 ", recordCacheStats=" + recordCacheStats +
-                ", port=" + port +
                 ", browserPoll=" + browserPoll +
                 ", themeName=" + themeName +
                 ", caveIgnoreGlass=" + caveIgnoreGlass +

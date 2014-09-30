@@ -8,14 +8,20 @@ import java.util.ArrayList;
 /**
  * Created by Mark on 9/29/2014.
  */
-public class SlotMetadata<T>
+public class SlotMetadata<T> implements Comparable<SlotMetadata>
 {
+    public enum ValueType
+    {
+        Boolean, Set, Integer
+    }
     protected final Button button;
     protected final String name;
     protected final String tooltip;
     protected final String range;
     protected final T defaultValue;
     protected final boolean advanced;
+    protected final ValueType valueType;
+    protected boolean master;
 
     public SlotMetadata(Button button, String name, String tooltip, boolean advanced)
     {
@@ -35,6 +41,23 @@ public class SlotMetadata<T>
         this.range = range;
         this.defaultValue = defaultValue;
         this.advanced = advanced;
+        if (defaultValue instanceof Boolean)
+        {
+            valueType = ValueType.Boolean;
+        }
+        else if (defaultValue instanceof Integer)
+        {
+            valueType = ValueType.Integer;
+        }
+        else
+        {
+            valueType = ValueType.Set;
+        }
+    }
+
+    public void setMasterPropertyForCategory(boolean master)
+    {
+        this.master = master;
     }
 
     public Button getButton()
@@ -68,5 +91,23 @@ public class SlotMetadata<T>
         }
 
         return lines.toArray(new String[lines.size()]);
+    }
+
+    @Override
+    public int compareTo(SlotMetadata other)
+    {
+        int result = Boolean.compare(other.master, this.master);
+
+        if (result == 0)
+        {
+            result = this.valueType.compareTo(other.valueType);
+        }
+
+        if (result == 0)
+        {
+            result = this.name.compareTo(other.name);
+        }
+
+        return result;
     }
 }

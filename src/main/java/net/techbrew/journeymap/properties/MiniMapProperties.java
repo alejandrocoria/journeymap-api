@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static net.techbrew.journeymap.properties.Config.Category.General;
 import static net.techbrew.journeymap.properties.Config.Category.MiniMap;
 
 /**
@@ -28,7 +27,7 @@ public class MiniMapProperties extends InGameMapProperties
 {
     protected transient static final int CODE_REVISION = 6;
 
-    @Config(category = General, key = "jm.minimap.enable_minimap")
+    @Config(category = MiniMap, master = true, key = "jm.minimap.enable_minimap")
     public final AtomicBoolean enabled = new AtomicBoolean(true);
 
     @Config(category = MiniMap, key = "jm.minimap.shape", defaultEnum = "Circle")

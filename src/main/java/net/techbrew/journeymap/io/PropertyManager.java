@@ -255,12 +255,12 @@ public class PropertyManager
         coreProperties.checkUpdates.set(getBoolean(Key.UPDATE_CHECK_ENABLED));
         // coreProperties.chunkOffset.set(getInteger(Key.CHUNK_OFFSET));  Lets put everybody back at the default.
         coreProperties.chunkPoll.set(getInteger(Key.UPDATETIMER_CHUNKS));
-        coreProperties.port.set(getInteger(Key.WEBSERVER_PORT));
         coreProperties.save();
         JourneyMap.getLogger().info(String.format("Migrated legacy property file values from %s to %s .", propFile.getName(), coreProperties.getFile().getName())); //$NON-NLS-1$
 
         WebMapProperties webMapProperties = JourneyMap.getWebMapProperties().enableSave(false);
         webMapProperties.enabled.set(getBoolean(Key.WEBSERVER_ENABLED));
+        webMapProperties.port.set(getInteger(Key.WEBSERVER_PORT));
 
         MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties().enableSave(false);
         miniMapProperties.enabled.set(getBoolean(Key.PREF_SHOW_MINIMAP));

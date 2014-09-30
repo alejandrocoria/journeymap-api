@@ -10,32 +10,32 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Created by Mark on 8/28/2014.
  */
-public class EnumPropertyButton<E extends Enum> extends Button
+public class StringPropertyButton extends Button
 {
     final PropertiesBase properties;
-    final AtomicReference<E> valueHolder;
-    final List<E> values;
+    final AtomicReference<String> valueHolder;
+    final List<String> values;
     final String baseLabel;
     final String glyph = "\u21D5";
 
-    public EnumPropertyButton(int id, E[] enumValues, String label, PropertiesBase properties, AtomicReference<E> valueHolder)
+    public StringPropertyButton(int id, String[] stringValues, String label, PropertiesBase properties, AtomicReference<String> valueHolder)
     {
         super(id, "");
         this.valueHolder = valueHolder;
         this.properties = properties;
-        this.values = Arrays.asList(enumValues);
+        this.values = Arrays.asList(stringValues);
         this.baseLabel = label;
         setValue(valueHolder.get());
     }
 
-    public void setValue(E value)
+    public void setValue(String value)
     {
         valueHolder.set(value);
         properties.save();
         displayString = String.format("%1$s:  %2$s %3$s %2$s", baseLabel, glyph, value.toString());
     }
 
-    public AtomicReference<E> getValueHolder()
+    public AtomicReference<String> getValueHolder()
     {
         return valueHolder;
     }

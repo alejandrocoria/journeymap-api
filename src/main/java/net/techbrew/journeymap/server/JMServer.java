@@ -44,7 +44,7 @@ public class JMServer
 
     private JMServer()
     {
-        port = JourneyMap.getCoreProperties().port.get();
+        port = JourneyMap.getWebMapProperties().port.get();
         validatePort();
     }
 

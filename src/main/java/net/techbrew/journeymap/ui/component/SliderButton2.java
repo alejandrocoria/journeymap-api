@@ -38,9 +38,6 @@ public class SliderButton2 extends Button
     public SliderButton2(int id, PropertiesBase properties, AtomicInteger property, String prefix, String suf, double minVal, double maxVal, boolean drawStr)
     {
         super(id, prefix);
-        setDefaultStyle(false);
-        setDrawBackground(false);
-
         minValue = minVal;
         maxValue = maxVal;
         sliderValue = (property.get() - minValue) / (maxValue - minValue);

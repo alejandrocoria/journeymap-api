@@ -12,7 +12,7 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.ui.config.StringListProvider;
+import net.techbrew.journeymap.ui.option.StringListProvider;
 
 import java.io.File;
 import java.util.ArrayList;

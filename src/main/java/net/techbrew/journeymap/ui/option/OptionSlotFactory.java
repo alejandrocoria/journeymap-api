@@ -4,9 +4,7 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.properties.Config;
 import net.techbrew.journeymap.properties.PropertiesBase;
-import net.techbrew.journeymap.ui.component.CheckBox;
-import net.techbrew.journeymap.ui.component.ScrollListPane;
-import net.techbrew.journeymap.ui.component.SliderButton2;
+import net.techbrew.journeymap.ui.component.*;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -21,65 +19,63 @@ public class OptionSlotFactory
 {
     public static List<ScrollListPane.ISlot> getSlots()
     {
-        CategorySlot root = new CategorySlot(Config.Category.General);
+
+
+        HashMap<Config.Category, List<SlotMetadata>> mergedMap = new HashMap<Config.Category, List<SlotMetadata>>();
+
+        addSlots(mergedMap, Config.Category.MiniMap, JourneyMap.getMiniMapProperties());
+        addSlots(mergedMap, Config.Category.FullMap, JourneyMap.getFullMapProperties());
+        addSlots(mergedMap, Config.Category.WebMap, JourneyMap.getWebMapProperties());
+        addSlots(mergedMap, Config.Category.Waypoint, JourneyMap.getWaypointProperties());
+        addSlots(mergedMap, Config.Category.Advanced, JourneyMap.getCoreProperties());
+
         List<CategorySlot> categories = new ArrayList<CategorySlot>();
-
-        addSlots(root, categories, Config.Category.MiniMap, JourneyMap.getMiniMapProperties());
-        //categories.get(0).getChildElements().add(0, new ConfigCategoryElement(Config.Category.MiniMap, null).setConfigEntryClass(new IConfigEt))
-
-        addSlots(root, categories, Config.Category.FullMap, JourneyMap.getFullMapProperties());
-        addSlots(root, categories, Config.Category.WebMap, JourneyMap.getWebMapProperties());
-        addSlots(root, categories, Config.Category.Waypoint, JourneyMap.getWaypointProperties());
-        addSlots(root, categories, Config.Category.Advanced, JourneyMap.getCoreProperties());
+        for (Map.Entry<Config.Category, List<SlotMetadata>> entry : mergedMap.entrySet())
+        {
+            Config.Category category = entry.getKey();
+            CategorySlot categorySlot = new CategorySlot(category);
+            for (SlotMetadata val : entry.getValue())
+            {
+                categorySlot.add(new ButtonListSlot().add(val));
+            }
+            categories.add(categorySlot);
+        }
 
         Collections.sort(categories);
 
-        int count = root.size();
-        root.sort();
-
+        int count = 0;
         for (CategorySlot categorySlot : categories)
         {
             count += categorySlot.size();
-            categorySlot.sort();
         }
 
-        List<ScrollListPane.ISlot> slots = new ArrayList<ScrollListPane.ISlot>(categories.size() + root.size());
-
-        slots.addAll(categories);
-        slots.addAll(root.getChildSlots());
-
         JourneyMap.getLogger().info("Configurable properties: " + count);
-
-
-        return slots;
+        return new ArrayList<ScrollListPane.ISlot>(categories);
     }
 
-    protected static void addSlots(CategorySlot root, List<CategorySlot> categories, Config.Category inheritedCategory, PropertiesBase properties)
+    protected static void addSlots(HashMap<Config.Category, List<SlotMetadata>> mergedMap, Config.Category inheritedCategory, PropertiesBase properties)
     {
         Class<? extends PropertiesBase> propertiesClass = properties.getClass();
         for (Map.Entry<Config.Category, List<SlotMetadata>> entry : buildSlots(null, inheritedCategory, propertiesClass, properties).entrySet())
         {
             Config.Category category = entry.getKey();
-            if (category == Config.Category.General)
+            if (category == Config.Category.Inherit)
             {
-                for (SlotMetadata val : entry.getValue())
-                {
-                    root.add(new ButtonListSlot().add(val));
-                }
+                category = inheritedCategory;
+            }
+
+            List<SlotMetadata> slotMetadataList = null;
+            if (mergedMap.containsKey(category))
+            {
+                slotMetadataList = mergedMap.get(category);
             }
             else
             {
-                if (category == Config.Category.Inherit)
-                {
-                    category = inheritedCategory;
-                }
-                CategorySlot categorySlot = new CategorySlot(category);
-                for (SlotMetadata val : entry.getValue())
-                {
-                    categorySlot.add(new ButtonListSlot().add(val));
-                }
-                categories.add(categorySlot);
+                slotMetadataList = new ArrayList<SlotMetadata>();
+                mergedMap.put(category, slotMetadataList);
             }
+
+            slotMetadataList.addAll(entry.getValue());
         }
     }
 
@@ -108,13 +104,12 @@ public class OptionSlotFactory
                 {
                     if (!config.stringListProvider().equals(Config.NoStringProvider.class))
                     {
-                        // TODO
-                        //slotMetadata = StringConfigElement.create(properties, field);
+                        slotMetadata = getStringSlotMetadata(properties, field);
                     }
                     else
                     {
                         // TODO
-                        //slotMetadata = EnumConfigElement.create(properties, field);
+                        slotMetadata = getEnumSlotMetadata(properties, field);
                     }
                 }
 
@@ -167,6 +162,13 @@ public class OptionSlotFactory
         return tooltip;
     }
 
+    /**
+     * Create a slot for a boolean property
+     *
+     * @param properties
+     * @param field
+     * @return
+     */
     static SlotMetadata<Boolean> getBooleanSlotMetadata(PropertiesBase properties, Field field)
     {
         Config annotation = field.getAnnotation(Config.class);
@@ -180,6 +182,7 @@ public class OptionSlotFactory
 
             CheckBox button = new CheckBox(0, name, property, properties);
             SlotMetadata<Boolean> slotMetadata = new SlotMetadata<Boolean>(button, name, tooltip, defaultTip, annotation.defaultBoolean(), advanced);
+            slotMetadata.setMasterPropertyForCategory(annotation.master());
             return slotMetadata;
         }
         catch (IllegalAccessException e)
@@ -189,6 +192,12 @@ public class OptionSlotFactory
         }
     }
 
+    /**
+     * Create a slot for an Integer property
+     * @param properties
+     * @param field
+     * @return
+     */
     static SlotMetadata<Integer> getIntegerSlotMetadata(PropertiesBase properties, Field field)
     {
         Config annotation = field.getAnnotation(Config.class);
@@ -201,10 +210,71 @@ public class OptionSlotFactory
             boolean advanced = annotation.category() == Config.Category.Advanced;
 
             SliderButton2 button = new SliderButton2(0, properties, property, name + ": ", "", annotation.minInt(), annotation.maxInt(), true);
+            button.setDefaultStyle(false);
+            button.setDrawBackground(false);
             SlotMetadata<Integer> slotMetadata = new SlotMetadata<Integer>(button, name, tooltip, defaultTip, annotation.defaultInt(), advanced);
             return slotMetadata;
         }
         catch (IllegalAccessException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Create a slot for a bound list of strings property
+     *
+     * @param properties
+     * @param field
+     * @return
+     */
+    static SlotMetadata<String> getStringSlotMetadata(PropertiesBase properties, Field field)
+    {
+        Config annotation = field.getAnnotation(Config.class);
+        try
+        {
+            AtomicReference<String> property = (AtomicReference<String>) field.get(properties);
+            String name = getName(annotation);
+            String tooltip = getTooltip(annotation);
+            StringListProvider slp = annotation.stringListProvider().newInstance();
+            String defaultTip = Constants.getString("jm.config.default", slp.getDefaultString());
+            boolean advanced = annotation.category() == Config.Category.Advanced;
+
+            StringPropertyButton button = new StringPropertyButton(0, slp.getStrings(), name, properties, property);
+            button.setDefaultStyle(false);
+            button.setDrawBackground(false);
+            SlotMetadata<String> slotMetadata = new SlotMetadata<String>(button, name, tooltip, defaultTip, slp.getDefaultString(), advanced);
+            return slotMetadata;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    static SlotMetadata<Enum> getEnumSlotMetadata(PropertiesBase properties, Field field)
+    {
+        Config annotation = field.getAnnotation(Config.class);
+        try
+        {
+            AtomicReference<Enum> property = (AtomicReference<Enum>) field.get(properties);
+            String name = getName(annotation);
+            String tooltip = getTooltip(annotation);
+            Class<? extends Enum> enumClass = property.get().getClass();
+            EnumSet<?> enumSet = EnumSet.allOf(enumClass);
+
+            String defaultTip = Constants.getString("jm.config.default", annotation.defaultEnum());
+            boolean advanced = annotation.category() == Config.Category.Advanced;
+
+            EnumPropertyButton button = new EnumPropertyButton(0, enumSet.toArray(new Enum[enumSet.size()]), name, properties, property);
+            button.setDefaultStyle(false);
+            button.setDrawBackground(false);
+            SlotMetadata<Enum> slotMetadata = new SlotMetadata<Enum>(button, name, tooltip, defaultTip, property.get(), advanced);
+            return slotMetadata;
+        }
+        catch (Exception e)
         {
             e.printStackTrace();
             return null;

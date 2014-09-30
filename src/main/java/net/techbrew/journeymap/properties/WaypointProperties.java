@@ -11,7 +11,6 @@ package net.techbrew.journeymap.properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static net.techbrew.journeymap.properties.Config.Category.General;
 import static net.techbrew.journeymap.properties.Config.Category.Waypoint;
 
 /**
@@ -21,10 +20,10 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
 {
     protected transient static final int CODE_REVISION = 4;
 
-    @Config(category = General, key = "jm.waypoint.enable_manager")
+    @Config(category = Waypoint, master = true, key = "jm.waypoint.enable_manager")
     public final AtomicBoolean managerEnabled = new AtomicBoolean(true);
 
-    @Config(category = General, key = "jm.waypoint.enable_beacons")
+    @Config(category = Waypoint, key = "jm.waypoint.enable_beacons")
     public final AtomicBoolean beaconEnabled = new AtomicBoolean(true);
 
     @Config(category = Waypoint, key = "jm.waypoint.show_texture")

@@ -9,7 +9,10 @@ import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.ButtonList;
 import net.techbrew.journeymap.ui.component.ScrollListPane;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Mark on 9/29/2014.
@@ -31,21 +34,6 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     {
         buttons.add(slotMetadata.getButton());
         buttonOptionMetadata.put(slotMetadata.getButton(), slotMetadata);
-        if (buttons.size() > 0)
-        {
-            Collections.sort(buttons, new Comparator<Button>()
-            {
-                @Override
-                public int compare(Button o1, Button o2)
-                {
-                    if (o1.displayString != null)
-                    {
-                        return o1.displayString.compareTo(o2.displayString);
-                    }
-                    return (o2.displayString != null) ? 1 : 0;
-                }
-            });
-        }
         return this;
     }
 
@@ -144,6 +132,8 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     @Override
     public int compareTo(ButtonListSlot o)
     {
+
+
         String buttonString = getFirstButtonString();
         String otherButtonString = o.getFirstButtonString();
         if (!Strings.isNullOrEmpty(buttonString))

@@ -1,6 +1,6 @@
 package net.techbrew.journeymap.properties;
 
-import net.techbrew.journeymap.ui.config.StringListProvider;
+import net.techbrew.journeymap.ui.option.StringListProvider;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -15,6 +15,8 @@ import java.lang.annotation.Target;
 public @interface Config
 {
     Category category();
+
+    boolean master() default false;
 
     String key();
 
@@ -40,7 +42,6 @@ public @interface Config
 
     public enum Category
     {
-        General("jm.config.category.general"),
         Inherit(""),
         MiniMap("jm.config.category.minimap"),
         FullMap("jm.config.category.fullmap"),

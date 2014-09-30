@@ -3,7 +3,7 @@ package net.techbrew.journeymap.ui.minimap;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.properties.MiniMapProperties;
-import net.techbrew.journeymap.ui.config.KeyedEnum;
+import net.techbrew.journeymap.ui.option.KeyedEnum;
 
 /**
  * Position of minimap on screen

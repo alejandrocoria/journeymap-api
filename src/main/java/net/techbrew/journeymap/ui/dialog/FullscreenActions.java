@@ -45,7 +45,7 @@ public class FullscreenActions extends JmUI
 
     public static void launchLocalhost()
     {
-        String url = "http://localhost:" + JourneyMap.getCoreProperties().port.get(); //$NON-NLS-1$
+        String url = "http://localhost:" + JourneyMap.getWebMapProperties().port.get(); //$NON-NLS-1$
         try
         {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));

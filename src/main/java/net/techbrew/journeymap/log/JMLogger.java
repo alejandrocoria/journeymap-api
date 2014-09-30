@@ -15,7 +15,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.properties.PropertiesBase;
-import net.techbrew.journeymap.ui.config.StringListProvider;
+import net.techbrew.journeymap.ui.option.StringListProvider;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -8,7 +8,7 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.texture.TextureCache;
-import net.techbrew.journeymap.ui.config.StringListProvider;
+import net.techbrew.journeymap.ui.option.StringListProvider;
 import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemePresets;
 
