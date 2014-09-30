@@ -21,8 +21,15 @@ import java.util.List;
  */
 public class ButtonList extends ArrayList<Button>
 {
-    public enum Layout {Horizontal, Vertical, CenteredHorizontal, CenteredVertical, DistributedHorizontal, FilledHorizontal}
-    public enum Direction {LeftToRight, RightToLeft}
+    public enum Layout
+    {
+        Horizontal, Vertical, CenteredHorizontal, CenteredVertical, DistributedHorizontal, FilledHorizontal
+    }
+
+    public enum Direction
+    {
+        LeftToRight, RightToLeft
+    }
 
 
     private Layout layout = Layout.Horizontal;
@@ -202,7 +209,7 @@ public class ButtonList extends ArrayList<Button>
         Button last = null;
         for (Button button : this)
         {
-            if(!button.visible)
+            if (!button.visible)
             {
                 continue;
             }
@@ -296,7 +303,7 @@ public class ButtonList extends ArrayList<Button>
         int width = getWidth(0);
         int filler = (rightX - leftX) - width;
         int gaps = this.size() - 1;
-        int hgap = (filler >= gaps) ? filler / gaps : 0;
+        int hgap = gaps == 0 ? 0 : (filler >= gaps) ? filler / gaps : 0;
 
         if (leftToRight)
         {
@@ -344,7 +351,7 @@ public class ButtonList extends ArrayList<Button>
 
     public boolean isHorizontal()
     {
-        return layout!=Layout.Vertical && layout!=Layout.CenteredVertical;
+        return layout != Layout.Vertical && layout != Layout.CenteredVertical;
     }
 
     public ButtonList setEnabled(boolean enabled)
@@ -478,10 +485,10 @@ public class ButtonList extends ArrayList<Button>
         int count = 0;
         for (Button button : this)
         {
-           if(button.visible)
-           {
-               count++;
-           }
+            if (button.visible)
+            {
+                count++;
+            }
         }
         return count;
     }

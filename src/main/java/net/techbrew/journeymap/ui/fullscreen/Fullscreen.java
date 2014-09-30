@@ -39,7 +39,6 @@ import net.techbrew.journeymap.ui.component.BooleanPropertyAdapter;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.ButtonList;
 import net.techbrew.journeymap.ui.component.JmUI;
-import net.techbrew.journeymap.ui.config.ConfigManager;
 import net.techbrew.journeymap.ui.fullscreen.layer.LayerDelegate;
 import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemeButton;
@@ -379,11 +378,16 @@ public class Fullscreen extends JmUI
                 @Override
                 public boolean onToggle(Button button, boolean toggled)
                 {
-                    mc.displayGuiScreen(new ConfigManager(Fullscreen.this));
-                    // TODO
-
-                    //UIManager.getInstance().openMasterOptions();
-                    return true;
+                    try
+                    {
+                        UIManager.getInstance().openMasterOptions();
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        return false;
+                    }
                 }
             });
 

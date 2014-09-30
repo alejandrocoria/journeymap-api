@@ -10,7 +10,6 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.properties.Config;
 import net.techbrew.journeymap.properties.PropertiesBase;
 import net.techbrew.journeymap.ui.component.Button;
-import net.techbrew.journeymap.ui.component.CheckBox;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -518,10 +517,7 @@ public class ConfigManagerFactory implements IModGuiFactory
      */
     public static class CheckBooleanEntry extends JmButtonEntry<Boolean>
     {
-        public CheckBooleanEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement<Boolean> configElement)
-        {
-            this(owningScreen, owningEntryList, configElement, new CheckBox(0, ""));
-        }
+
 
         public CheckBooleanEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement<?> configElement, Button button)
         {

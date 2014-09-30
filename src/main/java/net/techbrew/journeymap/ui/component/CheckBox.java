@@ -4,23 +4,30 @@ import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.config.GuiUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.techbrew.journeymap.properties.PropertiesBase;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Based on GuiCheckBox
  */
 public class CheckBox extends Button
 {
+    AtomicBoolean property;
+    PropertiesBase properties;
     public int boxWidth = 11;
 
-    public CheckBox(int id, String displayString)
+    public CheckBox(int id, String displayString, AtomicBoolean property, PropertiesBase properties)
     {
-        this(id, displayString, false);
+        this(id, displayString, property.get());
+        this.property = property;
+        this.properties = properties;
     }
 
-    public CheckBox(int id, String displayString, boolean isChecked)
+    public CheckBox(int id, String displayString, boolean checked)
     {
         super(id, displayString);
-        this.toggled = isChecked;
+        this.toggled = checked;
         FontRenderer fr = FMLClientHandler.instance().getClient().fontRenderer;
         this.height = fr.FONT_HEIGHT + 2;
         this.width = getFitWidth(fr);
@@ -76,19 +83,18 @@ public class CheckBox extends Button
         if (this.enabled && this.visible && p_146116_2_ >= this.xPosition && p_146116_3_ >= this.yPosition && p_146116_2_ < this.xPosition + this.width && p_146116_3_ < this.yPosition + this.height)
         {
             toggle();
+            if (property != null)
+            {
+                property.set(this.toggled);
+            }
+            if (properties != null)
+            {
+                properties.save();
+            }
             return true;
         }
 
         return false;
     }
 
-    public boolean isChecked()
-    {
-        return this.toggled;
-    }
-
-    public void setIsChecked(boolean isChecked)
-    {
-        this.toggled = isChecked;
-    }
 }

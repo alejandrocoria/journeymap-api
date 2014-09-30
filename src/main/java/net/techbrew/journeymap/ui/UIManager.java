@@ -216,7 +216,7 @@ public class UIManager
 
     public void openMasterOptions()
     {
-        open(MasterOptions.class);
+        open(MasterOptions2.class);
     }
 
     public void openMapActions()

@@ -163,6 +163,9 @@ jm.config.category.waypoint.tooltip=Configure how waypoints are displayed in-gam
 jm.config.category.webmap=Web Map
 jm.config.category.webmap.tooltip=Configure the appearance of the Web Map
 
+jm.config.default=[Default: %1$s]
+jm.config.default_numeric=[Range: %1$s ~ %2$s, Default: %3$s]
+
 
 gui.done=Done
 fml.configgui.applyGlobally=Apply globally
