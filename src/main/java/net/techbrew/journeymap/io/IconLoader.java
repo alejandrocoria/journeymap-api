@@ -74,7 +74,7 @@ public class IconLoader {
             {
                 if (blockMD.getBlock() instanceof ITileEntityProvider)
                 {
-                    logger.info("Ignoring TitleEntity without standard block texture: " + blockMD);
+                    logger.config("Ignoring TitleEntity without standard block texture: " + blockMD);
                     blockMD.addFlags(BlockUtils.Flag.TileEntity, BlockUtils.Flag.HasAir);
                     return null;
                 }
@@ -200,14 +200,14 @@ public class IconLoader {
                 }
             }
             else {
-                logger.warning("Couldn't get texture for " + icon.getIconName() + " using blockid ");
+                logger.config("Couldn't get texture for " + icon.getIconName() + " using blockid ");
             }
 
             if(unusable) {
                 blockMD.addFlags(BlockUtils.Flag.Error);
                 BlockUtils.setFlags(blockMD.getBlock(), BlockUtils.Flag.Error);
                 String pattern = "Unusable texture for %s, icon=%s,texture coords %s,%s - %s,%s";
-                logger.severe(String.format(pattern, blockMD, icon.getIconName(), xStart, yStart, xStop, yStop));
+                logger.config(String.format(pattern, blockMD, icon.getIconName(), xStart, yStart, xStop, yStop));
                 r = g = b = 0;
             }
 
@@ -241,8 +241,8 @@ public class IconLoader {
         
         if(color!=null) {
         	if(logger.isLoggable(Level.FINE)){
-        		logger.fine("Derived color for " + blockMD + ": " + Integer.toHexString(color.getRGB()));
-        	}
+                logger.config("Derived color for " + blockMD + ": " + Integer.toHexString(color.getRGB()));
+            }
         } 
         
         return color;
