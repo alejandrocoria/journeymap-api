@@ -24,7 +24,7 @@ import static net.techbrew.journeymap.properties.Config.Category.Inherit;
  */
 public abstract class MapProperties extends PropertiesBase implements Comparable<MapProperties>
 {
-    @Config(category = Inherit, key = "jm.common.show_monsters")
+    @Config(category = Inherit, key = "jm.common.show_mobs")
     public final AtomicBoolean showMobs = new AtomicBoolean(true);
 
     @Config(category = Inherit, key = "jm.common.show_animals")

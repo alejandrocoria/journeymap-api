@@ -48,6 +48,7 @@ public @interface Config
         WebMap("jm.config.category.webmap"),
         Radar("jm.config.category.radar"),
         Waypoint("jm.config.category.waypoint"),
+        WaypointBeacon("jm.config.category.waypoint_beacons"),
         Cartography("jm.config.category.cartography"),
         Advanced("jm.config.category.advanced");
 

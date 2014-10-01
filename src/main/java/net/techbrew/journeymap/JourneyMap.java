@@ -272,6 +272,8 @@ public class JourneyMap
         {
             logger.info("postInitialize EXIT, " + (timer == null ? "" : timer.stopAndReport()));
         }
+
+        JMLogger.setLevelFromProperties();
     }
 
     public JMServer getJmServer()
@@ -394,6 +396,24 @@ public class JourneyMap
         {
             WaypointStore.instance().load();
         }
+    }
+
+    public void softReset()
+    {
+        loadConfigProperties();
+        JMLogger.setLevelFromProperties();
+        DataCache.instance().purge();
+        RegionImageCache.getInstance().flushToDisk();
+        RegionImageCache.getInstance().clear();
+        UIManager.getInstance().reset();
+        WaypointStore.instance().reset();
+
+        if (waypointProperties.managerEnabled.get())
+        {
+            WaypointStore.instance().load();
+        }
+        ThemeFileHandler.getCurrentTheme(true);
+        UIManager.getInstance().getMiniMap().updateDisplayVars(true);
     }
 
     public void updateState()

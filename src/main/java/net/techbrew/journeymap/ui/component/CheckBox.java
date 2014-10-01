@@ -13,9 +13,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class CheckBox extends Button
 {
+    public int boxWidth = 11;
     AtomicBoolean property;
     PropertiesBase properties;
-    public int boxWidth = 11;
 
     public CheckBox(int id, String displayString, AtomicBoolean property, PropertiesBase properties)
     {
@@ -47,19 +47,21 @@ public class CheckBox extends Button
     {
         if (this.visible)
         {
-            this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.boxWidth && mouseY < this.yPosition + this.height;
+
+            this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+
             int yoffset = (this.height - this.boxWidth) / 2;
             GuiUtils.drawContinuousTexturedBox(buttonTextures, this.xPosition, this.yPosition + yoffset, 0, 46, this.boxWidth, this.boxWidth, 200, 20, 2, 3, 2, 2, this.zLevel);
             this.mouseDragged(mc, mouseX, mouseY);
             int color = 14737632;
 
-            if (packedFGColour != 0)
+            if (this.field_146123_n)
             {
-                color = packedFGColour;
+                color = 16777120;
             }
-            else if (!this.enabled)
+            else if (packedFGColour != 0)
             {
-                color = 10526880;
+                //color = packedFGColour;
             }
 
             int labelPad = 4;

@@ -26,6 +26,7 @@ import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public abstract class JmUI extends GuiScreen
 {
@@ -223,5 +224,10 @@ public abstract class JmUI extends GuiScreen
                 break;
             }
         }
+    }
+
+    public void drawHoveringText(String[] tooltip, int mouseX, int mouseY)
+    {
+        super.drawHoveringText(Arrays.asList(tooltip), mouseX, mouseY, getFontRenderer());
     }
 }

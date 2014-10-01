@@ -73,7 +73,7 @@ public class GeneralDisplayOptions extends JmUI
         FullMapProperties fullMap = JourneyMap.getFullMapProperties();
         MiniMapProperties miniMap = JourneyMap.getMiniMapProperties();
 
-        rowMobs = new ButtonList(Constants.getString("jm.common.show_monsters", ""));
+        rowMobs = new ButtonList(Constants.getString("jm.common.show_mobs", ""));
         rowMobs.add(BooleanPropertyButton.create(id++, fullMap, fullMap.showMobs));
         rowMobs.add(BooleanPropertyButton.create(id++, miniMap, miniMap.showMobs));
         rowMobs.setEnabled(FeatureManager.isAllowed(Feature.RadarMobs));
@@ -247,7 +247,7 @@ public class GeneralDisplayOptions extends JmUI
                 row.layoutHorizontal(bx, lastRow.getBottomY() + vgap, true, hgap);
             }
             lastRow = row;
-            int labelMiddle = lastRow.getTopY() + ((lastRow.getBottomY()-lastRow.getTopY())/2);
+            int labelMiddle = lastRow.getTopY() + ((lastRow.getBottomY() - lastRow.getTopY()) / 2);
             DrawUtil.drawLabel(row.getLabel(), row.getLeftX() - hgap, labelMiddle, DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, Color.black, 0, Color.cyan, 255, 1, true, 0);
             leftX = Math.min(leftX, row.getLeftX() - hgap - getFontRenderer().getStringWidth(row.getLabel()));
             bottomY = Math.max(bottomY, row.getBottomY());
@@ -267,7 +267,7 @@ public class GeneralDisplayOptions extends JmUI
             }
             lastRow = row;
 
-            int labelMiddle = lastRow.getTopY() + ((lastRow.getBottomY()-lastRow.getTopY())/2);
+            int labelMiddle = lastRow.getTopY() + ((lastRow.getBottomY() - lastRow.getTopY()) / 2);
             DrawUtil.drawLabel(row.getLabel(), row.getLeftX() - hgap, labelMiddle, DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, Color.black, 0, Color.cyan, 255, 1, true, 0);
             rightX = Math.max(rightX, row.getRightX());
             bottomY = Math.max(bottomY, row.getBottomY());
@@ -308,7 +308,7 @@ public class GeneralDisplayOptions extends JmUI
         bottomLineY = Math.max(bottomY, bottomLineY);
         int closeY = Math.min(height - vgap - buttonClose.getHeight(), bottomLineY + (4 * vgap));
 
-        if(closeY<bottomY && commonButtonHeight==20)
+        if (closeY < bottomY && commonButtonHeight == 20)
         {
             commonButtonHeight = 13;
             for (ButtonList buttonList : leftRows)
@@ -325,7 +325,7 @@ public class GeneralDisplayOptions extends JmUI
             return;
         }
 
-        buttonClose.centerHorizontalOn(width/2).setY(closeY);
+        buttonClose.centerHorizontalOn(width / 2).setY(closeY);
 
         DrawUtil.drawLabel(labelFullMap, leftRows.get(0).get(0).getRightX(), by - 10, DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, Color.black, 0, Color.white, 255, 1, true);
         DrawUtil.drawCenteredLabel(labelMiniMap, leftRows.get(0).get(1).getCenterX(), by - 10, Color.black, 0, Color.lightGray, 255, 1);
@@ -344,12 +344,12 @@ public class GeneralDisplayOptions extends JmUI
         {
             ((Button) button).toggle();
 
-            if(button == themeExampleButton)
+            if (button == themeExampleButton)
             {
                 buttonTheme.toggle();
             }
 
-            if(button == buttonTheme || button == themeExampleButton)
+            if (button == buttonTheme || button == themeExampleButton)
             {
                 Theme theme = ThemeFileHandler.getCurrentTheme(true);
                 String[] tooltips = new String[]{EnumChatFormatting.ITALIC + Constants.getString("jm.common.ui_theme_author", theme.author)};

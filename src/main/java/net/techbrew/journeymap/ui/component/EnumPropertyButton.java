@@ -1,6 +1,7 @@
 package net.techbrew.journeymap.ui.component;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.techbrew.journeymap.properties.PropertiesBase;
 
 import java.util.Arrays;
@@ -17,6 +18,7 @@ public class EnumPropertyButton<E extends Enum> extends Button
     final List<E> values;
     final String baseLabel;
     final String glyph = "\u21D5";
+    final String labelPattern = "%1$s:  %2$s %3$s %2$s";
 
     public EnumPropertyButton(int id, E[] enumValues, String label, PropertiesBase properties, AtomicReference<E> valueHolder)
     {
@@ -32,7 +34,7 @@ public class EnumPropertyButton<E extends Enum> extends Button
     {
         valueHolder.set(value);
         properties.save();
-        displayString = String.format("%1$s:  %2$s %3$s %2$s", baseLabel, glyph, value.toString());
+        displayString = getFormattedLabel(value.toString());
     }
 
     public AtomicReference<E> getValueHolder()
@@ -59,5 +61,21 @@ public class EnumPropertyButton<E extends Enum> extends Button
             return true;
         }
         return false;
+    }
+
+    private String getFormattedLabel(String value)
+    {
+        return String.format(labelPattern, baseLabel, glyph, value);
+    }
+
+    @Override
+    public int getFitWidth(FontRenderer fr)
+    {
+        int max = fr.getStringWidth(displayString);
+        for (E value : values)
+        {
+            max = Math.max(max, fr.getStringWidth(getFormattedLabel(value.toString())));
+        }
+        return max + WIDTH_PAD;
     }
 }

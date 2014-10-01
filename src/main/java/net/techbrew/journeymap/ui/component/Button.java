@@ -31,6 +31,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected static Color smallFrameColorDark = new Color(120, 120, 120);
     protected static Color smallBgColor = new Color(100, 100, 100);
     protected static Color smallBgHoverColor = new Color(125, 135, 190);
+    protected static Color smallBgHoverColor2 = new Color(0, 0, 100);
     protected Boolean toggled = true;
     protected String labelOn;
     protected String labelOff;
@@ -206,10 +207,15 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
                 DrawUtil.drawRectangle(xPosition + width - 1, yPosition + 1, 1, height - 1, smallFrameColorDark, 255); // Right
             }
 
+            int k = this.getHoverState(this.field_146123_n);
+
             if (isDrawBackground())
             {
-                int k = this.getHoverState(this.field_146123_n);
                 DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, k == 2 ? smallBgHoverColor : smallBgColor, 255);
+            }
+            else if (this.field_146123_n)
+            {
+                DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, smallBgHoverColor2, 128);
             }
 
             this.mouseDragged(minecraft, mouseX, mouseY);
@@ -228,6 +234,10 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
                 if (this.field_146123_n)
                 {
                     l = 16777120;
+                }
+                else if (packedFGColour != 0)
+                {
+                    l = packedFGColour;
                 }
             }
 

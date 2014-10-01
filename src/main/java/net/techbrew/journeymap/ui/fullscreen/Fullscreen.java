@@ -431,7 +431,7 @@ public class Fullscreen extends JmUI
             });
 
             buttonMobs = new ThemeToggle(id++, theme, "", "monsters");
-            buttonMobs.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showMobs), "jm.common.show_monsters");
+            buttonMobs.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showMobs), "jm.common.show_mobs");
             buttonMobs.setDrawButton(FeatureManager.isAllowed(Feature.RadarMobs));
 
             buttonAnimals = new ThemeToggle(id++, theme, "", "animals");

@@ -101,8 +101,6 @@ public class JMLogger
                     );
 
             LoggerConfig loggerConfig = config.getLoggerConfig(logger.getName());
-            //String stringLogLevel = JourneyMap.getInstance().coreProperties.logLevel.get();
-            //Level logLevel = Level.toLevel(stringLogLevel, Level.INFO);
             loggerConfig.setLevel(Level.INFO);
             loggerConfig.addAppender(fileAppender, Level.ALL, null);
             context.updateLoggers();
@@ -125,6 +123,23 @@ public class JMLogger
         }
 
         return logger;
+    }
+
+    public static void setLevelFromProperties()
+    {
+        try
+        {
+            final Logger logger = LogManager.getLogger(JourneyMap.MOD_ID);
+            LoggerContext context = (LoggerContext) LogManager.getContext(false);
+            Configuration config = context.getConfiguration();
+            LoggerConfig loggerConfig = config.getLoggerConfig(logger.getName());
+            Level logLevel = Level.toLevel(JourneyMap.getCoreProperties().logLevel.get(), Level.INFO);
+            loggerConfig.setLevel(logLevel);
+        }
+        catch (Throwable t)
+        {
+            t.printStackTrace();
+        }
     }
 
     /**

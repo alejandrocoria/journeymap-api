@@ -67,6 +67,58 @@ public class Theme implements Comparable<Theme>
     public Minimap minimap = new Minimap();
 
     /**
+     * Color to hex string.
+     */
+    public static String toHexColor(Color color)
+    {
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+    }
+
+    /**
+     * Hex string to Color.
+     */
+    public static Color getColor(String hexColor)
+    {
+        if (!Strings.isNullOrEmpty(hexColor))
+        {
+            try
+            {
+                int color = Integer.parseInt(hexColor.replaceFirst("#", ""), 16);
+                return new Color(color);
+            }
+            catch (Exception e)
+            {
+                FMLLog.warning("Journeymap theme has an invalid color string: " + hexColor);
+
+            }
+        }
+        return Color.white;
+    }
+
+    @Override
+    public String toString()
+    {
+        if (Strings.isNullOrEmpty(name))
+        {
+            return "???";
+        }
+        else
+        {
+            return name;
+        }
+    }
+
+    @Override
+    public int compareTo(Theme other)
+    {
+        if (Strings.isNullOrEmpty(name))
+        {
+            return Strings.isNullOrEmpty(other.name) ? 0 : 1;
+        }
+        return name.compareTo(other.name);
+    }
+
+    /**
      * Container class for images in /container.
      */
     public static class Container
@@ -443,7 +495,7 @@ public class Theme implements Comparable<Theme>
              * Default is 150.
              */
             @Since(1)
-            public int reticleHeadingAlpha = 128;
+            public int reticleHeadingAlpha = 112;
 
             /**
              * General reticle thickness in pixels.
@@ -621,57 +673,5 @@ public class Theme implements Comparable<Theme>
          */
         @Since(1)
         public boolean shadow = false;
-    }
-
-    /**
-     * Color to hex string.
-     */
-    public static String toHexColor(Color color)
-    {
-        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
-    }
-
-    /**
-     * Hex string to Color.
-     */
-    public static Color getColor(String hexColor)
-    {
-        if (!Strings.isNullOrEmpty(hexColor))
-        {
-            try
-            {
-                int color = Integer.parseInt(hexColor.replaceFirst("#", ""), 16);
-                return new Color(color);
-            }
-            catch (Exception e)
-            {
-                FMLLog.warning("Journeymap theme has an invalid color string: " + hexColor);
-
-            }
-        }
-        return Color.white;
-    }
-
-    @Override
-    public String toString()
-    {
-        if (Strings.isNullOrEmpty(name))
-        {
-            return "???";
-        }
-        else
-        {
-            return name;
-        }
-    }
-
-    @Override
-    public int compareTo(Theme other)
-    {
-        if (Strings.isNullOrEmpty(name))
-        {
-            return Strings.isNullOrEmpty(other.name) ? 0 : 1;
-        }
-        return name.compareTo(other.name);
     }
 }

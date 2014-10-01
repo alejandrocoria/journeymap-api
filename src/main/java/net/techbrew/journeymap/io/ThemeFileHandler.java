@@ -32,7 +32,7 @@ public class ThemeFileHandler
 
     public static void initialize()
     {
-        JourneyMap.getLogger().info("Initializing themes ...");
+        JourneyMap.getLogger().trace("Initializing themes ...");
 
         // Theme dirs
         Set<String> themeDirNames = new HashSet<String>();

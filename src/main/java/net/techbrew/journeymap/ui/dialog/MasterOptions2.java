@@ -10,12 +10,14 @@ package net.techbrew.journeymap.ui.dialog;
 
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.JmUI;
 import net.techbrew.journeymap.ui.component.ScrollListPane;
 import net.techbrew.journeymap.ui.option.OptionSlotFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,7 +31,7 @@ public class MasterOptions2 extends JmUI
 
     public MasterOptions2()
     {
-        super(Constants.getString("jm.common.options"));
+        super("JourneyMap " + Constants.getString("jm.common.options"));
     }
 
     @Override
@@ -72,9 +74,24 @@ public class MasterOptions2 extends JmUI
     @Override
     public void drawScreen(int x, int y, float par3)
     {
-
+        String[] lastTooltip = optionsListPane.lastTooltip;
+        long lastTooltipTime = optionsListPane.lastTooltipTime;
+        optionsListPane.lastTooltip = null;
         optionsListPane.drawScreen(x, y, par3);
         super.drawScreen(x, y, par3);
+
+        if (optionsListPane.lastTooltip != null)
+        {
+            if (Arrays.equals(optionsListPane.lastTooltip, lastTooltip))
+            {
+                optionsListPane.lastTooltipTime = lastTooltipTime;
+                if (System.currentTimeMillis() - optionsListPane.lastTooltipTime > optionsListPane.hoverDelay)
+                {
+                    Button button = optionsListPane.lastTooltipMetadata.getButton();
+                    drawHoveringText(optionsListPane.lastTooltip, x, button.getBottomY() + 15);
+                }
+            }
+        }
     }
 
     @Override
@@ -108,6 +125,7 @@ public class MasterOptions2 extends JmUI
     {
         if (button == buttonClose)
         {
+            JourneyMap.getInstance().softReset();
             UIManager.getInstance().openMap();
             return;
         }

@@ -12,28 +12,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SliderButton2 extends Button
 {
-    PropertiesBase properties;
-    AtomicInteger property;
-
     /**
      * The value of this slider control.
      */
     public double sliderValue = 1.0F;
-
     public String dispString = "";
-
     /**
      * Is this slider control being dragged.
      */
     public boolean dragging = false;
-
     public double minValue = 0.0D;
     public double maxValue = 5.0D;
     public int precision = 1;
-
     public String suffix = "";
-
     public boolean drawString = true;
+    PropertiesBase properties;
+    AtomicInteger property;
 
     public SliderButton2(int id, PropertiesBase properties, AtomicInteger property, String prefix, String suf, double minVal, double maxVal, boolean drawStr)
     {
@@ -88,11 +82,17 @@ public class SliderButton2 extends Button
                 updateSlider();
             }
 
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            int k = this.getHoverState(this.field_146123_n);
 
-            GuiUtils.drawContinuousTexturedBox(buttonTextures, this.xPosition + 1 + (int) (this.sliderValue * (float) (this.width - 10)), this.yPosition + 1, 0, 66, 8, height - 2, 200, 20, 2, 3, 2, 2, this.zLevel);
-            //this.drawTexturedModalRect(this.xPosition + (int)(this.sliderValue * (float)(this.width - 8)), this.yPosition, 0, 66, 4, height);
-            //this.drawTexturedModalRect(this.xPosition + (int)(this.sliderValue * (float)(this.width - 8)) + 4, this.yPosition, 196, 66, 4, height);
+            if (this.field_146123_n || this.dragging)
+            {
+
+                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+
+                GuiUtils.drawContinuousTexturedBox(buttonTextures, this.xPosition + 1 + (int) (this.sliderValue * (float) (this.width - 10)), this.yPosition + 1, 0, 66, 8, height - 2, 200, 20, 2, 3, 2, 2, this.zLevel);
+                //this.drawTexturedModalRect(this.xPosition + (int)(this.sliderValue * (float)(this.width - 8)), this.yPosition, 0, 66, 4, height);
+                //this.drawTexturedModalRect(this.xPosition + (int)(this.sliderValue * (float)(this.width - 8)) + 4, this.yPosition, 196, 66, 4, height);
+            }
         }
     }
 

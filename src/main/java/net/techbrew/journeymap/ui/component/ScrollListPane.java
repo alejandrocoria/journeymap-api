@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.ui.option.SlotMetadata;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -14,8 +15,12 @@ import java.util.List;
  */
 public class ScrollListPane extends GuiSlot
 {
-    int hpad = 12;
     final JmUI parent;
+    public SlotMetadata lastTooltipMetadata;
+    public String[] lastTooltip;
+    public long lastTooltipTime;
+    public long hoverDelay = 800;
+    int hpad = 12;
     List<ISlot> rootSlots;
     List<ISlot> currentSlots = new ArrayList<ISlot>(0);
     int lastClickedSlot;
@@ -91,8 +96,15 @@ public class ScrollListPane extends GuiSlot
 
     protected void drawSlot(int slotIndex, int x, int y, int slotHeight, Tessellator tessellator, int mouseX, int mouseY)
     {
-        this.getSlot(slotIndex).drawSlot(slotIndex, x, y, this.getListWidth(), slotHeight, tessellator, mouseX, mouseY,
+        SlotMetadata tooltipMetadata = this.getSlot(slotIndex).drawSlot(slotIndex, x, y, this.getListWidth(), slotHeight, tessellator, mouseX, mouseY,
                 this.func_148124_c(mouseX, mouseY) == slotIndex); // getSlotIndexFromScreenCoords
+
+        if (tooltipMetadata != null && !Arrays.equals(tooltipMetadata.getTooltip(), lastTooltip))
+        {
+            lastTooltipMetadata = tooltipMetadata;
+            lastTooltip = tooltipMetadata.getTooltip();
+            lastTooltipTime = System.currentTimeMillis();
+        }
     }
 
     /**
@@ -169,7 +181,7 @@ public class ScrollListPane extends GuiSlot
     {
         Collection<SlotMetadata> getMetadata();
 
-        void drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected);
+        SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected);
 
         /**
          * Returns true if the mouse has been pressed on a control in this slot.
@@ -187,6 +199,8 @@ public class ScrollListPane extends GuiSlot
         void mouseReleased(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY);
 
         List<ISlot> getChildSlots(int listWidth);
+
+        void setEnabled(boolean enabled);
 
         int getMinimumWidth();
     }

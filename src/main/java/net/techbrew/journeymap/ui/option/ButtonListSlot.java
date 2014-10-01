@@ -19,11 +19,11 @@ import java.util.List;
  */
 public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonListSlot>
 {
+    static int hgap = 8;
     Minecraft mc = FMLClientHandler.instance().getClient();
     FontRenderer fontRenderer = mc.fontRenderer;
     ButtonList buttons = new ButtonList();
     HashMap<Button, SlotMetadata> buttonOptionMetadata = new HashMap<Button, SlotMetadata>();
-    static int hgap = 8;
 
     public ButtonListSlot()
     {
@@ -59,8 +59,9 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     }
 
     @Override
-    public void drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
+    public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
     {
+        SlotMetadata tooltipMetadata = null;
         if (buttons.size() > 0)
         {
             buttons.setHeights(slotHeight);
@@ -68,8 +69,17 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
             for (Button button : buttons)
             {
                 button.drawButton(mc, mouseX, mouseY);
+                if (tooltipMetadata == null)
+                {
+                    if (button.mouseOver(mouseX, mouseY))
+                    {
+                        tooltipMetadata = buttonOptionMetadata.get(button);
+                    }
+                }
             }
         }
+
+        return tooltipMetadata;
     }
 
     @Override
@@ -108,6 +118,18 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     }
 
     @Override
+    public void setEnabled(boolean enabled)
+    {
+        for (SlotMetadata slot : buttonOptionMetadata.values())
+        {
+            if (!slot.isMasterPropertyForCategory())
+            {
+                slot.button.setEnabled(enabled);
+            }
+        }
+    }
+
+    @Override
     public List<ScrollListPane.ISlot> getChildSlots(int listWidth)
     {
         return Collections.EMPTY_LIST;
@@ -132,8 +154,6 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     @Override
     public int compareTo(ButtonListSlot o)
     {
-
-
         String buttonString = getFirstButtonString();
         String otherButtonString = o.getFirstButtonString();
         if (!Strings.isNullOrEmpty(buttonString))

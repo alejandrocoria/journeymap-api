@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.techbrew.journeymap.properties.Config.Category.Waypoint;
+import static net.techbrew.journeymap.properties.Config.Category.WaypointBeacon;
 
 /**
  * Properties for in-game waypoint management and display.
@@ -23,40 +24,40 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     @Config(category = Waypoint, master = true, key = "jm.waypoint.enable_manager")
     public final AtomicBoolean managerEnabled = new AtomicBoolean(true);
 
-    @Config(category = Waypoint, key = "jm.waypoint.enable_beacons")
+    @Config(category = WaypointBeacon, master = true, key = "jm.waypoint.enable_beacons")
     public final AtomicBoolean beaconEnabled = new AtomicBoolean(true);
 
-    @Config(category = Waypoint, key = "jm.waypoint.show_texture")
+    @Config(category = WaypointBeacon, key = "jm.waypoint.show_texture")
     public final AtomicBoolean showTexture = new AtomicBoolean(true);
 
-    @Config(category = Waypoint, key = "jm.waypoint.show_static_beam")
+    @Config(category = WaypointBeacon, key = "jm.waypoint.show_static_beam")
     public final AtomicBoolean showStaticBeam = new AtomicBoolean(true);
 
-    @Config(category = Waypoint, key = "jm.waypoint.show_rotating_beam")
+    @Config(category = WaypointBeacon, key = "jm.waypoint.show_rotating_beam")
     public final AtomicBoolean showRotatingBeam = new AtomicBoolean(true);
 
-    @Config(category = Waypoint, key = "jm.waypoint.show_name")
+    @Config(category = WaypointBeacon, key = "jm.waypoint.show_name")
     public final AtomicBoolean showName = new AtomicBoolean(true);
 
-    @Config(category = Waypoint, key = "jm.waypoint.show_distance")
+    @Config(category = WaypointBeacon, key = "jm.waypoint.show_distance")
     public final AtomicBoolean showDistance = new AtomicBoolean(true);
 
-    @Config(category = Waypoint, key = "jm.waypoint.auto_hide_label")
+    @Config(category = WaypointBeacon, key = "jm.waypoint.auto_hide_label")
     public final AtomicBoolean autoHideLabel = new AtomicBoolean(true);
 
-    @Config(category = Waypoint, key = "jm.waypoint.bold_label", defaultBoolean = false)
+    @Config(category = WaypointBeacon, key = "jm.waypoint.bold_label", defaultBoolean = false)
     public final AtomicBoolean boldLabel = new AtomicBoolean(false);
 
-    @Config(category = Waypoint, key = "jm.waypoint.force_unicode", defaultBoolean = false)
+    @Config(category = WaypointBeacon, key = "jm.waypoint.force_unicode", defaultBoolean = false)
     public final AtomicBoolean forceUnicode = new AtomicBoolean(false);
 
-    @Config(category = Waypoint, key = "jm.common.font")
+    @Config(category = WaypointBeacon, key = "jm.common.font")
     public final AtomicBoolean fontSmall = new AtomicBoolean(true);
 
-    @Config(category = Waypoint, key = "jm.waypoint.force_unicode")
+    @Config(category = WaypointBeacon, key = "jm.waypoint.texture_size")
     public final AtomicBoolean textureSmall = new AtomicBoolean(true);
 
-    @Config(category = Waypoint, key = "jm.waypoint.max_distance", minInt = -1, maxInt = 10000, defaultInt = 0)
+    @Config(category = Waypoint, key = "jm.waypoint.max_distance", minInt = 0, maxInt = 10000, defaultInt = 0)
     public final AtomicInteger maxDistance = new AtomicInteger(0);
 
     @Config(category = Waypoint, key = "jm.waypoint.create_deathpoints")

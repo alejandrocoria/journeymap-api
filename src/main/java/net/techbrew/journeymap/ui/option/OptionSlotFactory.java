@@ -6,8 +6,10 @@ import net.techbrew.journeymap.properties.Config;
 import net.techbrew.journeymap.properties.PropertiesBase;
 import net.techbrew.journeymap.ui.component.*;
 
+import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -183,6 +185,10 @@ public class OptionSlotFactory
             CheckBox button = new CheckBox(0, name, property, properties);
             SlotMetadata<Boolean> slotMetadata = new SlotMetadata<Boolean>(button, name, tooltip, defaultTip, annotation.defaultBoolean(), advanced);
             slotMetadata.setMasterPropertyForCategory(annotation.master());
+            if (annotation.master())
+            {
+                button.packedFGColour = Color.cyan.getRGB();
+            }
             return slotMetadata;
         }
         catch (IllegalAccessException e)
@@ -194,6 +200,7 @@ public class OptionSlotFactory
 
     /**
      * Create a slot for an Integer property
+     *
      * @param properties
      * @param field
      * @return

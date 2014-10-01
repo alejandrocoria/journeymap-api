@@ -1,19 +1,18 @@
 package net.techbrew.journeymap.ui.option;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.EnumChatFormatting;
 import net.techbrew.journeymap.ui.component.Button;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Mark on 9/29/2014.
  */
 public class SlotMetadata<T> implements Comparable<SlotMetadata>
 {
-    public enum ValueType
-    {
-        Boolean, Set, Integer
-    }
     protected final Button button;
     protected final String name;
     protected final String tooltip;
@@ -55,6 +54,11 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         }
     }
 
+    public boolean isMasterPropertyForCategory()
+    {
+        return this.master;
+    }
+
     public void setMasterPropertyForCategory(boolean master)
     {
         this.master = master;
@@ -78,12 +82,23 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
             lines.add((advanced ? EnumChatFormatting.RED : EnumChatFormatting.AQUA) + this.name);
             if (this.tooltip != null)
             {
-                lines.add(EnumChatFormatting.YELLOW + this.tooltip);
+                FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
+                int lineWidth = 200;
+                if (this.range != null)
+                {
+                    lineWidth = Math.max(lineWidth, fontRenderer.getStringWidth(this.range));
+                }
+
+                List<String> tooltipList = fontRenderer.listFormattedStringToWidth(tooltip, lineWidth);
+                for (String tooltipLine : tooltipList)
+                {
+                    lines.add(EnumChatFormatting.YELLOW + tooltipLine);
+                }
             }
-            if (this.tooltip != null)
-            {
-                lines.add(EnumChatFormatting.GRAY + this.defaultValue.toString());
-            }
+//            if (this.defaultValue != null)
+//            {
+//                lines.add(EnumChatFormatting.GRAY + this.defaultValue.toString());
+//            }
             if (this.range != null)
             {
                 lines.add(EnumChatFormatting.WHITE + this.range);
@@ -109,5 +124,10 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         }
 
         return result;
+    }
+
+    public enum ValueType
+    {
+        Boolean, Set, Integer
     }
 }
