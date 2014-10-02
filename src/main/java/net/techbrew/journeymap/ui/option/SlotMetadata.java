@@ -3,7 +3,9 @@ package net.techbrew.journeymap.ui.option;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.EnumChatFormatting;
+import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.ui.component.Button;
+import net.techbrew.journeymap.ui.component.IntSliderButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
     protected final T defaultValue;
     protected final boolean advanced;
     protected final ValueType valueType;
+    protected String[] tooltipLines;
     protected boolean master;
 
     public SlotMetadata(Button button, String name, String tooltip, boolean advanced)
@@ -76,36 +79,47 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
 
     public String[] getTooltip()
     {
-        ArrayList<String> lines = new ArrayList<String>(4);
-        if (this.tooltip != null || this.range != null || this.defaultValue != null || advanced)
+        if (tooltipLines == null)
         {
-            lines.add((advanced ? EnumChatFormatting.RED : EnumChatFormatting.AQUA) + this.name);
-            if (this.tooltip != null)
+            ArrayList<String> lines = new ArrayList<String>(4);
+            if (this.tooltip != null || this.range != null || this.defaultValue != null || advanced)
             {
-                FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
-                int lineWidth = 200;
+                lines.add((advanced ? EnumChatFormatting.RED : EnumChatFormatting.AQUA) + this.name);
+                if (this.tooltip != null)
+                {
+                    lines.addAll(getWordWrappedLines(EnumChatFormatting.YELLOW.toString(), this.tooltip));
+                }
+
+                if (button instanceof IntSliderButton)
+                {
+                    lines.addAll(getWordWrappedLines(EnumChatFormatting.GRAY.toString() + EnumChatFormatting.ITALIC,
+                            Constants.getString("jm.config.control_arrowkeys")));
+                }
+
                 if (this.range != null)
                 {
-                    lineWidth = Math.max(lineWidth, fontRenderer.getStringWidth(this.range));
-                }
-
-                List<String> tooltipList = fontRenderer.listFormattedStringToWidth(tooltip, lineWidth);
-                for (String tooltipLine : tooltipList)
-                {
-                    lines.add(EnumChatFormatting.YELLOW + tooltipLine);
+                    lines.add(EnumChatFormatting.WHITE + this.range);
                 }
             }
-//            if (this.defaultValue != null)
-//            {
-//                lines.add(EnumChatFormatting.GRAY + this.defaultValue.toString());
-//            }
-            if (this.range != null)
+
+            if (!lines.isEmpty())
             {
-                lines.add(EnumChatFormatting.WHITE + this.range);
+                tooltipLines = lines.toArray(new String[lines.size()]);
             }
         }
+        return tooltipLines;
+    }
 
-        return lines.toArray(new String[lines.size()]);
+    protected List<String> getWordWrappedLines(String color, String original)
+    {
+        FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
+        List<String> list = new ArrayList<String>();
+
+        for (Object line : fontRenderer.listFormattedStringToWidth(original, 250))
+        {
+            list.add(color + line);
+        }
+        return list;
     }
 
     @Override

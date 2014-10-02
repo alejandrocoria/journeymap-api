@@ -125,15 +125,22 @@ public class MasterOptions2 extends JmUI
     {
         if (button == buttonClose)
         {
-            JourneyMap.getInstance().softReset();
-            UIManager.getInstance().openMap();
+            closeAndReturn();
             return;
         }
     }
 
     @Override
+    protected void keyTyped(char c, int i)
+    {
+        super.keyTyped(c, i);
+        optionsListPane.keyTyped(c, i);
+    }
+
+    @Override
     protected void closeAndReturn()
     {
+        JourneyMap.getInstance().softReset();
         if (returnClass == null)
         {
             UIManager.getInstance().openMap();

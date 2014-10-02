@@ -5,6 +5,7 @@ import cpw.mods.fml.client.config.GuiUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.techbrew.journeymap.properties.PropertiesBase;
+import org.lwjgl.input.Keyboard;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -16,6 +17,7 @@ public class CheckBox extends Button
     public int boxWidth = 11;
     AtomicBoolean property;
     PropertiesBase properties;
+    String glyph = "\u2714";
 
     public CheckBox(int id, String displayString, AtomicBoolean property, PropertiesBase properties)
     {
@@ -68,7 +70,7 @@ public class CheckBox extends Button
 
             if (this.toggled)
             {
-                this.drawCenteredString(mc.fontRenderer, "x", this.xPosition + this.boxWidth / 2 + 1, this.yPosition + 1 + yoffset, 14737632);
+                this.drawCenteredString(mc.fontRenderer, glyph, this.xPosition + this.boxWidth / 2 + 1, this.yPosition + 1 + yoffset, 14737632);
             }
 
             this.drawString(mc.fontRenderer, displayString, xPosition + this.boxWidth + labelPad, yPosition + 2 + yoffset, color);
@@ -96,6 +98,19 @@ public class CheckBox extends Button
             return true;
         }
 
+        return false;
+    }
+
+    public boolean keyTyped(char c, int i)
+    {
+        if (this.field_146123_n)
+        {
+            if (i == Keyboard.KEY_SPACE)
+            {
+                toggle();
+                return true;
+            }
+        }
         return false;
     }
 

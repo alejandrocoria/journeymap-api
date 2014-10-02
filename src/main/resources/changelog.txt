@@ -12,11 +12,21 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Change: Pressing "O" in the Fullscreen map will open the Options Manager
+- Change: Options with boolean values now drawn with a check instead of an X
+- Change: Options with int values can now be adjusted using the arrow keys when the option has focus
+- Change: Options with enumerated values can also be adjusted using the arrow keys when the option has focus
+- Change: Options with boolean values can be toggled using the spacebar when the option has focus
+- Bugfix: Options didn't take immediate effect if Escape key used instead of Close button.
+- Bugfix: Options based on Enums showed the default Enum's actual name rather than its localized name
+
+## Changelog for JourneyMap 5.0.0a2:
 - New Feature: Options management moved to my own framework. Forge's Config UI framework was too unwieldy.
 - Change: Reticle's heading segment is now slightly thicker/more opaque
 - Change: Reticle's heading segment thickness/opacity is controlled via Theme
 - Change: Compass points can now be individually hidden via Theme
 - Change: A bunch of unnecessary log messages removed from the language files
+- Change: All language files other than English removed.  Too out-of-date to be worth retaining.
 - Bugfix: Reticle now extends to edges of square map when the reticle orientation set to "My Heading"
 
 ## Changelog for JourneyMap 5.0.0a1:

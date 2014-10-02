@@ -579,6 +579,11 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         this.defaultStyle = defaultStyle;
     }
 
+    public boolean keyTyped(char c, int i)
+    {
+        return false;
+    }
+
     public static interface ToggleListener<T extends Button>
     {
         public boolean onToggle(T button, boolean toggled);

@@ -216,7 +216,7 @@ public class OptionSlotFactory
             String defaultTip = Constants.getString("jm.config.default_numeric", annotation.minInt(), annotation.maxInt(), annotation.defaultInt());
             boolean advanced = annotation.category() == Config.Category.Advanced;
 
-            SliderButton2 button = new SliderButton2(0, properties, property, name + ": ", "", annotation.minInt(), annotation.maxInt(), true);
+            IntSliderButton button = new IntSliderButton(0, properties, property, name + ": ", "", annotation.minInt(), annotation.maxInt(), true);
             button.setDefaultStyle(false);
             button.setDrawBackground(false);
             SlotMetadata<Integer> slotMetadata = new SlotMetadata<Integer>(button, name, tooltip, defaultTip, annotation.defaultInt(), advanced);
@@ -271,8 +271,7 @@ public class OptionSlotFactory
             String tooltip = getTooltip(annotation);
             Class<? extends Enum> enumClass = property.get().getClass();
             EnumSet<?> enumSet = EnumSet.allOf(enumClass);
-
-            String defaultTip = Constants.getString("jm.config.default", annotation.defaultEnum());
+            String defaultTip = Constants.getString("jm.config.default", Enum.valueOf(enumClass, annotation.defaultEnum()));
             boolean advanced = annotation.category() == Config.Category.Advanced;
 
             EnumPropertyButton button = new EnumPropertyButton(0, enumSet.toArray(new Enum[enumSet.size()]), name, properties, property);

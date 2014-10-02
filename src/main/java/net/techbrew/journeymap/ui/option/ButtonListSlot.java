@@ -118,6 +118,19 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     }
 
     @Override
+    public boolean keyTyped(char c, int i)
+    {
+        for (SlotMetadata slot : buttonOptionMetadata.values())
+        {
+            if (slot.button.keyTyped(c, i))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public void setEnabled(boolean enabled)
     {
         for (SlotMetadata slot : buttonOptionMetadata.values())

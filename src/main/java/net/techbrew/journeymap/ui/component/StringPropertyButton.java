@@ -3,6 +3,7 @@ package net.techbrew.journeymap.ui.component;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.techbrew.journeymap.properties.PropertiesBase;
+import org.lwjgl.input.Keyboard;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,6 +48,16 @@ public class StringPropertyButton extends Button
         return valueHolder;
     }
 
+    public void prevOption()
+    {
+        int index = values.indexOf(valueHolder.get()) - 1;
+        if (index == -1)
+        {
+            index = values.size() - 1;
+        }
+        setValue(values.get(index));
+    }
+
     public void nextOption()
     {
         int index = values.indexOf(valueHolder.get()) + 1;
@@ -77,5 +88,23 @@ public class StringPropertyButton extends Button
             max = Math.max(max, fr.getStringWidth(getFormattedLabel(value)));
         }
         return max + WIDTH_PAD;
+    }
+
+    public boolean keyTyped(char c, int i)
+    {
+        if (this.field_146123_n)
+        {
+            if (i == Keyboard.KEY_LEFT || i == Keyboard.KEY_DOWN || i == Keyboard.KEY_SUBTRACT)
+            {
+                prevOption();
+                return true;
+            }
+            if (i == Keyboard.KEY_RIGHT || i == Keyboard.KEY_UP || i == Keyboard.KEY_ADD)
+            {
+                nextOption();
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -165,6 +165,14 @@ public class ScrollListPane extends GuiSlot
         return currentSlots.get(index);
     }
 
+    public void keyTyped(char c, int i)
+    {
+        for (int slotIndex = 0; slotIndex < this.getSize(); ++slotIndex)
+        {
+            this.getSlot(slotIndex).keyTyped(c, i);
+        }
+    }
+
     @Override
     protected int getScrollBarX()
     {
@@ -197,6 +205,11 @@ public class ScrollListPane extends GuiSlot
          * Fired when the mouse button is released. Arguments: index, x, y, mouseEvent, relativeX, relativeY
          */
         void mouseReleased(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY);
+
+        /**
+         * Called when a key is pressed. Return true to prevent event propagation further.
+         */
+        boolean keyTyped(char c, int i);
 
         List<ISlot> getChildSlots(int listWidth);
 

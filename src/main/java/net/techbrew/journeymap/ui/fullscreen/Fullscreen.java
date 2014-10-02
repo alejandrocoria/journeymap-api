@@ -693,6 +693,12 @@ public class Fullscreen extends JmUI
             return;
         }
 
+        if (i == Keyboard.KEY_O)
+        {
+            UIManager.getInstance().openMasterOptions();
+            return;
+        }
+
         if (i == Keyboard.KEY_ESCAPE || Constants.isPressed(Constants.KB_MAP))
         {
             UIManager.getInstance().closeAll();

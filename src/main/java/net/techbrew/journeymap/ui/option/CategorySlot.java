@@ -217,6 +217,12 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     }
 
     @Override
+    public boolean keyTyped(char c, int i)
+    {
+        return false;
+    }
+
+    @Override
     public int compareTo(CategorySlot other)
     {
         return category.compareTo(other.category);

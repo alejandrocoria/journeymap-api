@@ -166,6 +166,7 @@ jm.config.category.webmap=Web Map
 jm.config.category.webmap.tooltip=Configure the appearance of the Web Map
 jm.config.default=[ Default: %1$s ]
 jm.config.default_numeric=[ Range: %1$s ~ %2$s , Default: %3$s ]
+jm.config.control_arrowkeys=This value can be adjusted with arrow keys for finer control
 jm.error.compatability=Incompatability error running %1$s for Forge %2$s. Ensure your version of Forge is compatible.
 jm.feature.fairplay=FairPlay
 jm.feature.unlimited=Unlimited

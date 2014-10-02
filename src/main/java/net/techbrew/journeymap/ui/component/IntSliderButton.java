@@ -3,6 +3,7 @@ package net.techbrew.journeymap.ui.component;
 import cpw.mods.fml.client.config.GuiUtils;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.properties.PropertiesBase;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -10,47 +11,30 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by Mark on 9/29/2014.
  */
-public class SliderButton2 extends Button
+public class IntSliderButton extends Button
 {
-    /**
-     * The value of this slider control.
-     */
-    public double sliderValue = 1.0F;
-    public String dispString = "";
+    public String prefix = "";
     /**
      * Is this slider control being dragged.
      */
     public boolean dragging = false;
-    public double minValue = 0.0D;
-    public double maxValue = 5.0D;
-    public int precision = 1;
+    public int minValue = 0;
+    public int maxValue = 0;
     public String suffix = "";
     public boolean drawString = true;
     PropertiesBase properties;
     AtomicInteger property;
 
-    public SliderButton2(int id, PropertiesBase properties, AtomicInteger property, String prefix, String suf, double minVal, double maxVal, boolean drawStr)
+    public IntSliderButton(int id, PropertiesBase properties, AtomicInteger property, String prefix, String suf, int minVal, int maxVal, boolean drawStr)
     {
         super(id, prefix);
         minValue = minVal;
         maxValue = maxVal;
-        sliderValue = (property.get() - minValue) / (maxValue - minValue);
-        dispString = prefix;
+        this.prefix = prefix;
         suffix = suf;
-        String val;
         this.property = property;
         this.properties = properties;
-
-        val = Integer.toString((int) Math.round(sliderValue * (maxValue - minValue) + minValue));
-        precision = 0;
-
-        displayString = dispString + val + suffix;
-
-        drawString = drawStr;
-        if (!drawString)
-        {
-            displayString = "";
-        }
+        setValue(property.get());
     }
 
     /**
@@ -78,8 +62,7 @@ public class SliderButton2 extends Button
         {
             if (this.dragging)
             {
-                this.sliderValue = (par2 - (this.xPosition + 4)) / (float) (this.width - 8);
-                updateSlider();
+                setSliderValue((par2 - (this.xPosition + 4)) / (float) (this.width - 8));
             }
 
             int k = this.getHoverState(this.field_146123_n);
@@ -89,7 +72,8 @@ public class SliderButton2 extends Button
 
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
-                GuiUtils.drawContinuousTexturedBox(buttonTextures, this.xPosition + 1 + (int) (this.sliderValue * (float) (this.width - 10)), this.yPosition + 1, 0, 66, 8, height - 2, 200, 20, 2, 3, 2, 2, this.zLevel);
+                double sliderValue = getSliderValue();
+                GuiUtils.drawContinuousTexturedBox(buttonTextures, this.xPosition + 1 + (int) (sliderValue * (float) (this.width - 10)), this.yPosition + 1, 0, 66, 8, height - 2, 200, 20, 2, 3, 2, 2, this.zLevel);
                 //this.drawTexturedModalRect(this.xPosition + (int)(this.sliderValue * (float)(this.width - 8)), this.yPosition, 0, 66, 4, height);
                 //this.drawTexturedModalRect(this.xPosition + (int)(this.sliderValue * (float)(this.width - 8)) + 4, this.yPosition, 196, 66, 4, height);
             }
@@ -108,8 +92,7 @@ public class SliderButton2 extends Button
     {
         if (super.mousePressed(par1Minecraft, par2, par3))
         {
-            this.sliderValue = (float) (par2 - (this.xPosition + 4)) / (float) (this.width - 8);
-            updateSlider();
+            setSliderValue((float) (par2 - (this.xPosition + 4)) / (float) (this.width - 8));
             this.dragging = true;
             return true;
         }
@@ -119,32 +102,33 @@ public class SliderButton2 extends Button
         }
     }
 
-    public void updateSlider()
+    public double getSliderValue()
     {
-        if (this.sliderValue < 0.0F)
+        return (property.get() - minValue * 1d) / (maxValue - minValue);
+    }
+
+    public void setSliderValue(double sliderValue)
+    {
+        if (sliderValue < 0.0F)
         {
-            this.sliderValue = 0.0F;
+            sliderValue = 0.0F;
         }
 
-        if (this.sliderValue > 1.0F)
+        if (sliderValue > 1.0F)
         {
-            this.sliderValue = 1.0F;
+            sliderValue = 1.0F;
         }
 
         int intVal = (int) Math.round(sliderValue * (maxValue - minValue) + minValue);
-        String val = Integer.toString(intVal);
+        setValue(intVal);
+    }
 
+    public void updateLabel()
+    {
         if (drawString)
         {
-            displayString = dispString + val + suffix;
+            displayString = prefix + property.get() + suffix;
         }
-
-        if (property.get() != intVal)
-        {
-            property.set(intVal);
-            properties.save();
-        }
-
     }
 
     /**
@@ -155,21 +139,48 @@ public class SliderButton2 extends Button
      */
     public void mouseReleased(int par1, int par2)
     {
-        this.dragging = false;
+        if (this.dragging)
+        {
+            this.dragging = false;
+            properties.save();
+        }
     }
 
-    public int getValueInt()
+    public boolean keyTyped(char c, int i)
     {
-        return (int) Math.round(sliderValue * (maxValue - minValue) + minValue);
+        if (this.field_146123_n)
+        {
+            if (i == Keyboard.KEY_LEFT || i == Keyboard.KEY_DOWN || i == Keyboard.KEY_SUBTRACT)
+            {
+                setValue(Math.max(minValue, getValue() - 1));
+                return true;
+            }
+            if (i == Keyboard.KEY_RIGHT || i == Keyboard.KEY_UP || i == Keyboard.KEY_ADD)
+            {
+                setValue(Math.min(maxValue, getValue() + 1));
+                return true;
+            }
+        }
+        return false;
     }
 
-    public double getValue()
+    public int getValue()
     {
-        return sliderValue * (maxValue - minValue) + minValue;
+        return this.property.get();
     }
 
-    public void setValue(double d)
+    public void setValue(int value)
     {
-        this.sliderValue = (d - minValue) / (maxValue - minValue);
+        value = Math.min(value, maxValue);
+        value = Math.max(value, minValue);
+        if (property.get() != value)
+        {
+            property.set(value);
+            if (!dragging)
+            {
+                properties.save();
+            }
+        }
+        updateLabel();
     }
 }
