@@ -506,10 +506,10 @@ public class Theme implements Comparable<Theme>
 
             /**
              * Reticle thickness in pixels for the heading segment of reticle.
-             * Default is 3 pixels.
+             * Default is 2.5 pixels.
              */
             @Since(1)
-            public double reticleHeadingThickness = 3;
+            public double reticleHeadingThickness = 2.5;
 
             /**
              * Number of pixels to shift the outer endpoint of a reticle segment away from the map center.

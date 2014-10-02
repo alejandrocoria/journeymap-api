@@ -19,10 +19,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class OptionSlotFactory
 {
-    public static List<ScrollListPane.ISlot> getSlots()
+    public static List<ScrollListPane.ISlot> getSlots(Map<Config.Category, List<SlotMetadata>> toolbars)
     {
-
-
         HashMap<Config.Category, List<SlotMetadata>> mergedMap = new HashMap<Config.Category, List<SlotMetadata>>();
 
         addSlots(mergedMap, Config.Category.MiniMap, JourneyMap.getMiniMapProperties());
@@ -40,6 +38,17 @@ public class OptionSlotFactory
             {
                 categorySlot.add(new ButtonListSlot().add(val));
             }
+
+            if (toolbars.containsKey(category))
+            {
+                ButtonListSlot toolbarSlot = new ButtonListSlot();
+                for (SlotMetadata toolbar : toolbars.get(category))
+                {
+                    toolbarSlot.add(toolbar);
+                }
+                categorySlot.add(toolbarSlot);
+            }
+
             categories.add(categorySlot);
         }
 

@@ -253,6 +253,13 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         }
     }
 
+    /**
+     * Secondary draw call which can be overridden for use in toolbars, etc.
+     */
+    public void secondaryDrawButton()
+    {
+    }
+
     @Override
     public boolean mousePressed(Minecraft minecraft, int i, int j)
     {

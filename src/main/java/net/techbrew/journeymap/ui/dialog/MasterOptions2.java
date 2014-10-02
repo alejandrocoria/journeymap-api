@@ -9,16 +9,21 @@
 package net.techbrew.journeymap.ui.dialog;
 
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.renderer.RenderHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.properties.Config;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.JmUI;
 import net.techbrew.journeymap.ui.component.ScrollListPane;
 import net.techbrew.journeymap.ui.option.OptionSlotFactory;
+import net.techbrew.journeymap.ui.option.SlotMetadata;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Master options UI
@@ -28,6 +33,7 @@ public class MasterOptions2 extends JmUI
     Button buttonClose;
     ScrollListPane optionsListPane;
     List<ScrollListPane.ISlot> optionSlots;
+    Map<Config.Category, List<SlotMetadata>> toolbars;
 
     public MasterOptions2()
     {
@@ -42,7 +48,7 @@ public class MasterOptions2 extends JmUI
         if (optionsListPane == null)
         {
             optionsListPane = new ScrollListPane(this, mc, this.width, this.height, this.headerHeight, this.height - 30, 20);
-            optionsListPane.setSlots(OptionSlotFactory.getSlots());
+            optionsListPane.setSlots(OptionSlotFactory.getSlots(getToolbars()));
         }
         else
         {
@@ -90,6 +96,14 @@ public class MasterOptions2 extends JmUI
                     Button button = optionsListPane.lastTooltipMetadata.getButton();
                     drawHoveringText(optionsListPane.lastTooltip, x, button.getBottomY() + 15);
                 }
+            }
+        }
+
+        for (List<SlotMetadata> toolbar : getToolbars().values())
+        {
+            for (SlotMetadata slotMetadata : toolbar)
+            {
+                slotMetadata.getButton().secondaryDrawButton();
             }
         }
     }
@@ -148,6 +162,43 @@ public class MasterOptions2 extends JmUI
         else
         {
             UIManager.getInstance().open(returnClass);
+        }
+    }
+
+    Map<Config.Category, List<SlotMetadata>> getToolbars()
+    {
+        if (toolbars == null)
+        {
+            String name = Constants.getString("jm.minimap.preview");
+            String tooltip = Constants.getString("jm.minimap.preview.tooltip");
+            MinimapPreviewButton minimapPreviewButton = new MinimapPreviewButton(name);
+            SlotMetadata toolbarSlotMetadata = new SlotMetadata(minimapPreviewButton, name, tooltip);
+
+            this.toolbars = new HashMap<Config.Category, List<SlotMetadata>>();
+            toolbars.put(Config.Category.MiniMap, Arrays.asList(toolbarSlotMetadata));
+        }
+        return toolbars;
+    }
+
+    static class MinimapPreviewButton extends Button
+    {
+        public MinimapPreviewButton(String label)
+        {
+            super(0, label);
+        }
+
+        /**
+         * Called at the end of drawScreen
+         */
+        @Override
+        public void secondaryDrawButton()
+        {
+            if (this.field_146123_n)
+            {
+                RenderHelper.enableStandardItemLighting();
+                UIManager.getInstance().getMiniMap().drawMap();
+                RenderHelper.enableStandardItemLighting();
+            }
         }
     }
 }

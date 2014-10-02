@@ -228,6 +228,12 @@ public abstract class JmUI extends GuiScreen
 
     public void drawHoveringText(String[] tooltip, int mouseX, int mouseY)
     {
-        super.drawHoveringText(Arrays.asList(tooltip), mouseX, mouseY, getFontRenderer());
+        drawHoveringText(Arrays.asList(tooltip), mouseX, mouseY, getFontRenderer());
+    }
+
+    @Override
+    protected void drawHoveringText(java.util.List tooltip, int mouseX, int mouseY, FontRenderer fontRenderer)
+    {
+        super.drawHoveringText(tooltip, mouseX, mouseY, fontRenderer);
     }
 }

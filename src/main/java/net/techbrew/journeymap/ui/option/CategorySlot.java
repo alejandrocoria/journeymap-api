@@ -23,9 +23,9 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     Config.Category category;
     int currentSlotIndex;
     Button button;
-    int currentWidth;
+    int currentListWidth;
     int currentColumns;
-    int columnWidth;
+    int currentColumnWidth;
     SlotMetadata masterSlot;
     LinkedList<SlotMetadata> childMetadataList = new LinkedList<SlotMetadata>();
     List<ScrollListPane.ISlot> childSlots = new ArrayList<ScrollListPane.ISlot>();
@@ -76,62 +76,61 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         Collections.sort(childMetadataList);
     }
 
-    public List<ScrollListPane.ISlot> getChildSlots()
+    @Override
+    public int getColumnWidth()
     {
-        if (selected)
+        int columnWidth = 100;
+        for (ScrollListPane.ISlot slot : childSlots)
         {
-            return childSlots;
+            columnWidth = Math.max(columnWidth, slot.getColumnWidth());
         }
-        else
-        {
-            return Collections.EMPTY_LIST;
-        }
+        return columnWidth;
     }
 
     @Override
-    public List<ScrollListPane.ISlot> getChildSlots(int listWidth)
+    public List<ScrollListPane.ISlot> getChildSlots(int listWidth, int columnWidth)
     {
         if (!selected)
         {
             return Collections.EMPTY_LIST;
         }
 
-        if (listWidth == currentWidth)
+        int columns = listWidth / (columnWidth + ButtonListSlot.hgap);
+        if (columnWidth == currentColumnWidth && columns == currentColumns)
         {
             return childSlots;
         }
 
-        currentWidth = listWidth;
-
-        if (columnWidth == 0)
-        {
-            columnWidth = 100;
-            for (ScrollListPane.ISlot slot : childSlots)
-            {
-                columnWidth = Math.max(columnWidth, slot.getMinimumWidth());
-            }
-
-        }
-
-        int columns = currentWidth / (columnWidth + ButtonListSlot.hgap);
-        if (columns == currentColumns)
-        {
-            return childSlots;
-        }
+        currentListWidth = listWidth;
         currentColumns = columns;
 
         // Rebuild slots
         childSlots.clear();
         sort();
-        Iterator<SlotMetadata> iterator = childMetadataList.iterator();
-        while (iterator.hasNext())
+
+        ArrayList<SlotMetadata> remaining = new ArrayList<SlotMetadata>(childMetadataList);
+        while (!remaining.isEmpty())
         {
             ButtonListSlot row = new ButtonListSlot();
+            SlotMetadata.ValueType lastType = null;
             for (int i = 0; i < columns; i++)
             {
-                if (iterator.hasNext())
+                if (!remaining.isEmpty())
                 {
-                    row.add(iterator.next());
+                    SlotMetadata.ValueType thisType = remaining.get(0).valueType;
+                    if (lastType != null && lastType != thisType)
+                    {
+                        if (lastType == SlotMetadata.ValueType.Boolean || thisType == SlotMetadata.ValueType.Toolbar)
+                        {
+                            if (remaining.size() > columns - i)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    SlotMetadata column = remaining.remove(0);
+                    lastType = column.valueType;
+                    row.add(column);
                 }
                 else
                 {
@@ -143,12 +142,6 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         }
 
         return childSlots;
-    }
-
-    @Override
-    public int getMinimumWidth()
-    {
-        return currentWidth;
     }
 
     @Override

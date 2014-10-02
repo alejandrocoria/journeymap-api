@@ -143,13 +143,13 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     }
 
     @Override
-    public List<ScrollListPane.ISlot> getChildSlots(int listWidth)
+    public List<ScrollListPane.ISlot> getChildSlots(int listWidth, int columnWidth)
     {
         return Collections.EMPTY_LIST;
     }
 
     @Override
-    public int getMinimumWidth()
+    public int getColumnWidth()
     {
         buttons.equalizeWidths(fontRenderer);
         return buttons.get(0).getWidth();

@@ -57,10 +57,18 @@ public class ScrollListPane extends GuiSlot
     {
         int sizeBefore = currentSlots.size();
         this.currentSlots.clear();
+
+        int columnWidth = 0;
+        for (ISlot slot : rootSlots)
+        {
+            System.out.println("Column Width: " + columnWidth);
+            columnWidth = Math.max(columnWidth, slot.getColumnWidth());
+        }
+
         for (ISlot slot : rootSlots)
         {
             currentSlots.add(slot);
-            List<ISlot> children = slot.getChildSlots(listWidth);
+            List<ISlot> children = slot.getChildSlots(listWidth, columnWidth);
             if (children != null && !children.isEmpty())
             {
                 currentSlots.addAll(children);
@@ -211,10 +219,10 @@ public class ScrollListPane extends GuiSlot
          */
         boolean keyTyped(char c, int i);
 
-        List<ISlot> getChildSlots(int listWidth);
+        List<ISlot> getChildSlots(int listWidth, int columnWidth);
 
         void setEnabled(boolean enabled);
 
-        int getMinimumWidth();
+        int getColumnWidth();
     }
 }

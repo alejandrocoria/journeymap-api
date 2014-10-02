@@ -30,9 +30,9 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         this(button, name, tooltip, null, null, advanced);
     }
 
-    public SlotMetadata(Button button, String name, String tooltip, String range, T defaultValue)
+    public SlotMetadata(Button button, String name, String tooltip)
     {
-        this(button, name, tooltip, range, defaultValue, false);
+        this(button, name, tooltip, null, null, false);
     }
 
     public SlotMetadata(Button button, String name, String tooltip, String range, T defaultValue, boolean advanced)
@@ -43,7 +43,12 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         this.range = range;
         this.defaultValue = defaultValue;
         this.advanced = advanced;
-        if (defaultValue instanceof Boolean)
+
+        if (defaultValue == null && range == null && !advanced)
+        {
+            valueType = ValueType.Toolbar;
+        }
+        else if (defaultValue instanceof Boolean)
         {
             valueType = ValueType.Boolean;
         }
@@ -77,6 +82,11 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         return defaultValue;
     }
 
+    public boolean isToolbar()
+    {
+        return valueType == ValueType.Toolbar;
+    }
+
     public String[] getTooltip()
     {
         if (tooltipLines == null)
@@ -84,7 +94,8 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
             ArrayList<String> lines = new ArrayList<String>(4);
             if (this.tooltip != null || this.range != null || this.defaultValue != null || advanced)
             {
-                lines.add((advanced ? EnumChatFormatting.RED : EnumChatFormatting.AQUA) + this.name);
+                EnumChatFormatting nameColor = isToolbar() ? EnumChatFormatting.GREEN : (advanced ? EnumChatFormatting.RED : EnumChatFormatting.AQUA);
+                lines.add(nameColor + this.name);
                 if (this.tooltip != null)
                 {
                     lines.addAll(getWordWrappedLines(EnumChatFormatting.YELLOW.toString(), this.tooltip));
@@ -125,7 +136,12 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
     @Override
     public int compareTo(SlotMetadata other)
     {
-        int result = Boolean.compare(other.master, this.master);
+        int result = 0;//Boolean.compare(this.isToolbar(), other.isToolbar());
+
+        if (result == 0)
+        {
+            result = Boolean.compare(other.master, this.master);
+        }
 
         if (result == 0)
         {
@@ -142,6 +158,6 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
 
     public enum ValueType
     {
-        Boolean, Set, Integer
+        Boolean, Set, Integer, Toolbar
     }
 }
