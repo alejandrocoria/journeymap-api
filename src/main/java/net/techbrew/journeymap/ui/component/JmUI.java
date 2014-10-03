@@ -25,8 +25,8 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public abstract class JmUI extends GuiScreen
 {
@@ -156,7 +156,7 @@ public abstract class JmUI extends GuiScreen
             drawBackground(0);
             layoutButtons();
 
-            ArrayList<String> tooltip = null;
+            List<String> tooltip = null;
             for (int k = 0; k < this.buttonList.size(); ++k)
             {
                 GuiButton guibutton = (GuiButton) this.buttonList.get(k);

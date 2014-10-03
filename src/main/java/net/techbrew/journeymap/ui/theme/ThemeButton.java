@@ -12,7 +12,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -206,13 +205,13 @@ public class ThemeButton extends BooleanPropertyButton
     }
 
     @Override
-    public ArrayList<String> getTooltip()
+    public List<String> getTooltip()
     {
         if (!visible)
         {
             return null;
         }
-        ArrayList<String> list = super.getTooltip();
+        List<String> list = super.getTooltip();
 
         String style = null;
         if (!isEnabled())
