@@ -274,7 +274,7 @@ public class GridRenderer
             // Update texture only if on-screen
             if (isOnScreen(pos))
             {
-                if (tile != null && tile.updateTexture(pos, this.mapType, vSlice, mapProperties))
+                if (tile != null && tile.updateTexture(pos, this.mapType, vSlice))
                 {
                     updated = true;
                 }
@@ -352,7 +352,7 @@ public class GridRenderer
 //        GL11.glEnable(GL11.GL_DEPTH_TEST);
     }
 
-    public void draw(final float opacity, final double offsetX, final double offsetZ)
+    public void draw(final float alpha, final double offsetX, final double offsetZ)
     {
         if (!grid.isEmpty())
         {
@@ -368,14 +368,13 @@ public class GridRenderer
                 index++;
                 TilePos pos = entry.getKey();
                 Tile tile = tc.getIfPresent(entry.getValue());
-                drawTile(pos, tile, centerX, centerZ);
+                drawTile(pos, tile, centerX, centerZ, alpha);
             }
         }
     }
 
-    private void drawTile(final TilePos pos, final Tile tile, final double offsetX, final double offsetZ)
+    private void drawTile(final TilePos pos, final Tile tile, final double offsetX, final double offsetZ, float alpha)
     {
-
         final double startX = offsetX + pos.startX;
         final double startZ = offsetZ + pos.startZ;
         final double endX = offsetX + pos.endX;
@@ -399,6 +398,8 @@ public class GridRenderer
 
                 GL11.glEnable(GL11.GL_TEXTURE_2D);
                 GL11.glBindTexture(GL11.GL_TEXTURE_2D, tile.getTexture().getGlTextureId());
+
+                GL11.glColor4f(1, 1, 1, alpha);
 
                 GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
                 GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);

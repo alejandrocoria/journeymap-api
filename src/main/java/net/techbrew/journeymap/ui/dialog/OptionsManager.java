@@ -11,6 +11,7 @@ package net.techbrew.journeymap.ui.dialog;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.forgehandler.KeyEventHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
@@ -28,6 +29,9 @@ import java.util.*;
 
 /**
  * Master options UI
+ *
+ * // TODO: Theme switch derps?
+ * // TODO: Black image for cave map
  */
 public class OptionsManager extends JmUI
 {
@@ -40,12 +44,12 @@ public class OptionsManager extends JmUI
 
     public OptionsManager()
     {
-        this(null, null);
+        this(null);
     }
 
     public OptionsManager(Class<? extends JmUI> returnClass)
     {
-        this(returnClass, null);
+        this(returnClass, null, null);
     }
 
     public OptionsManager(Class<? extends JmUI> returnClass, Config.Category... initialCategories)
@@ -134,8 +138,8 @@ public class OptionsManager extends JmUI
 
         if (minimapPreviewButton.getToggled())
         {
-            RenderHelper.enableStandardItemLighting();
             UIManager.getInstance().getMiniMap().drawMap();
+            RenderHelper.disableStandardItemLighting();
         }
 
         if (optionsListPane.lastTooltip != null)
@@ -165,26 +169,7 @@ public class OptionsManager extends JmUI
         boolean pressed = optionsListPane.mousePressed(mouseX, mouseY, mouseEvent);
         if (pressed)
         {
-            SlotMetadata slotMetadata = optionsListPane.getLastPressed();
-            if (slotMetadata != null)
-            {
-                if (slotMetadata.getName().equals(Constants.getString("jm.common.ui_theme")))
-                {
-                    ThemeFileHandler.getCurrentTheme(true);
-                }
-            }
-
-            CategorySlot categorySlot = (CategorySlot) optionsListPane.getLastPressedParentSlot();
-            if (categorySlot != null)
-            {
-                Config.Category category = categorySlot.getCategory();
-                changedCategories.add(category);
-
-                if (category.equals(Config.Category.MiniMap))
-                {
-                    UIManager.getInstance().getMiniMap().updateDisplayVars(true);
-                }
-            }
+            checkPressedButton();
         }
     }
 
@@ -193,12 +178,48 @@ public class OptionsManager extends JmUI
     {
         super.mouseMovedOrUp(mouseX, mouseY, mouseEvent);
         optionsListPane.mouseReleased(mouseX, mouseY, mouseEvent);
+
     }
 
     @Override
     protected void mouseClickMove(int p_146273_1_, int p_146273_2_, int p_146273_3_, long p_146273_4_)
     {
         super.mouseClickMove(p_146273_1_, p_146273_2_, p_146273_3_, p_146273_4_);
+        checkPressedButton();
+    }
+
+    /**
+     * Check the pressed button in the scroll pane and determine if something needs to be updated or refreshed
+     */
+    protected void checkPressedButton()
+    {
+        SlotMetadata slotMetadata = optionsListPane.getLastPressed();
+        if (slotMetadata != null)
+        {
+            // Theme button: Force update
+            if (slotMetadata.getName().equals(Constants.getString("jm.common.ui_theme")))
+            {
+                ThemeFileHandler.getCurrentTheme(true);
+                if (minimapPreviewButton.getToggled())
+                {
+                    UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+                }
+            }
+        }
+
+        CategorySlot categorySlot = (CategorySlot) optionsListPane.getLastPressedParentSlot();
+        if (categorySlot != null)
+        {
+            // Track the category of the button so resets can happen when OptionsManager is closed
+            Config.Category category = categorySlot.getCategory();
+            changedCategories.add(category);
+
+            // If the button is MiniMap-related, force it to update
+            if (category == Config.Category.MiniMap)
+            {
+                UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+            }
+        }
     }
 
     @Override
@@ -297,6 +318,13 @@ public class OptionsManager extends JmUI
                 }
             }
         }
+
+        // Just in case a property changed but wasn't saved.
+        JourneyMap.getCoreProperties().save();
+        JourneyMap.getWebMapProperties().save();
+        JourneyMap.getFullMapProperties().save();
+        JourneyMap.getMiniMapProperties().save();
+        JourneyMap.getWaypointProperties().save();
 
         if (returnClass == null)
         {

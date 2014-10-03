@@ -20,25 +20,17 @@ public @interface Config
 
     String key();
 
-    Class<? extends Enum> enumClass() default None.class;
+    String defaultEnum() default "";
 
     Class<? extends StringListProvider> stringListProvider() default NoStringProvider.class;
 
-    int minInt() default 0;
+    double minValue() default 0;
 
-    int maxInt() default 0;
+    double maxValue() default 0;
 
-    float minFloat() default 0f;
-
-    float maxFloat() default 0f;
-
-    String defaultEnum() default "";
-
-    int defaultInt() default 0;
+    double defaultValue() default 0;
 
     boolean defaultBoolean() default true;
-
-    String defaultString() default "";
 
     public enum Category
     {

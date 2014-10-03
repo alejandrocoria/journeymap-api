@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.ui.option;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.properties.Config;
@@ -110,6 +111,10 @@ public class OptionSlotFactory
                 else if (field.getType().equals(AtomicInteger.class))
                 {
                     slotMetadata = getIntegerSlotMetadata(properties, field);
+                }
+                else if (field.getType().equals(AtomicDouble.class))
+                {
+                    slotMetadata = getDoubleSlotMetadata(properties, field);
                 }
                 else if (field.getType().equals(AtomicReference.class))
                 {
@@ -222,13 +227,44 @@ public class OptionSlotFactory
             AtomicInteger property = (AtomicInteger) field.get(properties);
             String name = getName(annotation);
             String tooltip = getTooltip(annotation);
-            String defaultTip = Constants.getString("jm.config.default_numeric", annotation.minInt(), annotation.maxInt(), annotation.defaultInt());
+            String defaultTip = Constants.getString("jm.config.default_numeric", (int) annotation.minValue(), (int) annotation.maxValue(), (int) annotation.defaultValue());
             boolean advanced = annotation.category() == Config.Category.Advanced;
 
-            IntSliderButton button = new IntSliderButton(0, properties, property, name + ": ", "", annotation.minInt(), annotation.maxInt(), true);
+            IntSliderButton button = new IntSliderButton(0, properties, property, name + ": ", "", (int) annotation.minValue(), (int) annotation.maxValue(), true);
             button.setDefaultStyle(false);
             button.setDrawBackground(false);
-            SlotMetadata<Integer> slotMetadata = new SlotMetadata<Integer>(button, name, tooltip, defaultTip, annotation.defaultInt(), advanced);
+            SlotMetadata<Integer> slotMetadata = new SlotMetadata<Integer>(button, name, tooltip, defaultTip, (int) annotation.defaultValue(), advanced);
+            return slotMetadata;
+        }
+        catch (IllegalAccessException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Create a slot for an Integer property
+     *
+     * @param properties
+     * @param field
+     * @return
+     */
+    static SlotMetadata<Double> getDoubleSlotMetadata(PropertiesBase properties, Field field)
+    {
+        Config annotation = field.getAnnotation(Config.class);
+        try
+        {
+            AtomicDouble property = (AtomicDouble) field.get(properties);
+            String name = getName(annotation);
+            String tooltip = getTooltip(annotation);
+            String defaultTip = Constants.getString("jm.config.default_numeric", annotation.minValue(), annotation.maxValue(), annotation.defaultValue());
+            boolean advanced = annotation.category() == Config.Category.Advanced;
+
+            DoubleSliderButton button = new DoubleSliderButton(0, properties, property, name + ": ", "", (double) annotation.minValue(), (double) annotation.maxValue(), true);
+            button.setDefaultStyle(false);
+            button.setDrawBackground(false);
+            SlotMetadata<Double> slotMetadata = new SlotMetadata<Double>(button, name, tooltip, defaultTip, (double) annotation.defaultValue(), advanced);
             return slotMetadata;
         }
         catch (IllegalAccessException e)

@@ -57,7 +57,7 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     @Config(category = WaypointBeacon, key = "jm.waypoint.texture_size")
     public final AtomicBoolean textureSmall = new AtomicBoolean(true);
 
-    @Config(category = Waypoint, key = "jm.waypoint.max_distance", minInt = 0, maxInt = 10000, defaultInt = 0)
+    @Config(category = Waypoint, key = "jm.waypoint.max_distance", minValue = 0, maxValue = 10000, defaultValue = 0)
     public final AtomicInteger maxDistance = new AtomicInteger(0);
 
     @Config(category = Waypoint, key = "jm.waypoint.create_deathpoints")

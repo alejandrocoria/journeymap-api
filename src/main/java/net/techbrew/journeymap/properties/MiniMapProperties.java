@@ -25,7 +25,7 @@ import static net.techbrew.journeymap.properties.Config.Category.MiniMap;
  */
 public class MiniMapProperties extends InGameMapProperties
 {
-    protected transient static final int CODE_REVISION = 6;
+    protected transient static final int CODE_REVISION = 7;
 
     @Config(category = MiniMap, master = true, key = "jm.minimap.enable_minimap")
     public final AtomicBoolean enabled = new AtomicBoolean(true);
@@ -51,14 +51,14 @@ public class MiniMapProperties extends InGameMapProperties
     @Config(category = MiniMap, key = "jm.minimap.show_waypointlabels")
     public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
 
-    @Config(category = MiniMap, key = "jm.minimap.size", minInt = 128, maxInt = 768, defaultInt = 192)
+    @Config(category = MiniMap, key = "jm.minimap.size", minValue = 128, maxValue = 768, defaultValue = 192)
     public final AtomicInteger customSize = new AtomicInteger(192);
 
-    @Config(category = MiniMap, key = "jm.minimap.frame_alpha", minInt = 0, maxInt = 255, defaultInt = 255)
-    public final AtomicInteger frameAlpha = new AtomicInteger(255);
+    @Config(category = MiniMap, key = "jm.minimap.frame_alpha", minValue = 0, maxValue = 100, defaultValue = 100)
+    public final AtomicInteger frameAlpha = new AtomicInteger(100);
 
-    @Config(category = MiniMap, key = "jm.minimap.terrain_alpha", minInt = 0, maxInt = 255, defaultInt = 255)
-    public final AtomicInteger terrainAlpha = new AtomicInteger(255);
+    @Config(category = MiniMap, key = "jm.minimap.terrain_alpha", minValue = 0, maxValue = 100, defaultValue = 100)
+    public final AtomicInteger terrainAlpha = new AtomicInteger(100);
 
     @Config(category = MiniMap, key = "jm.minimap.orientation.button", defaultEnum = "North")
     public final AtomicReference<Orientation> orientation = new AtomicReference<Orientation>(Orientation.North);
@@ -118,9 +118,9 @@ public class MiniMapProperties extends InGameMapProperties
             frameAlpha.set(0);
             saveNeeded = true;
         }
-        else if (frameAlpha.get() > 255)
+        else if (frameAlpha.get() > 100)
         {
-            frameAlpha.set(255);
+            frameAlpha.set(100);
             saveNeeded = true;
         }
 
@@ -147,9 +147,9 @@ public class MiniMapProperties extends InGameMapProperties
             terrainAlpha.set(0);
             saveNeeded = true;
         }
-        else if (terrainAlpha.get() > 255)
+        else if (terrainAlpha.get() > 100)
         {
-            terrainAlpha.set(255);
+            terrainAlpha.set(100);
             saveNeeded = true;
         }
 

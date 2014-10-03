@@ -252,6 +252,13 @@ public class DrawUtil
         {
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(glBlendSfactor, glBlendDFactor); // normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
+        }
+
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
+
+        if (blend)
+        {
             if (color != null)
             {
                 float[] c = color.getColorComponents(null);
@@ -259,12 +266,9 @@ public class DrawUtil
             }
             else
             {
-                GL11.glColor4f(alpha, alpha, alpha, alpha);
+                GL11.glColor4f(1, 1, 1, alpha);
             }
         }
-
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
 
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
@@ -336,12 +340,12 @@ public class DrawUtil
 
     public static void drawClampedImage(TextureImpl texture, double x, double y, float scale, double rotation)
     {
-        drawClampedImage(texture, null, x, y, scale, rotation);
+        drawClampedImage(texture, null, x, y, scale, 1f, rotation);
     }
 
-    public static void drawClampedImage(TextureImpl texture, Color color, double x, double y, float scale, double rotation)
+    public static void drawClampedImage(TextureImpl texture, Color color, double x, double y, float scale, float alpha, double rotation)
     {
-        drawQuad(texture, x, y, (texture.width * scale), (texture.height * scale), rotation, color, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
+        drawQuad(texture, x, y, (texture.width * scale), (texture.height * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
     }
 
     public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y, float scale, double rotation)

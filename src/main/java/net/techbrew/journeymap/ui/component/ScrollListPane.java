@@ -168,6 +168,7 @@ public class ScrollListPane extends GuiSlot
         }
 
         this.func_148143_b(true); // setEnabled
+        lastPressed = null;
         return false;
     }
 

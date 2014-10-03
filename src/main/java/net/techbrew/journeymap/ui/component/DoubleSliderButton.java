@@ -1,31 +1,30 @@
 package net.techbrew.journeymap.ui.component;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import cpw.mods.fml.client.config.GuiUtils;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.properties.PropertiesBase;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * Created by Mark on 9/29/2014.
  */
-public class IntSliderButton extends Button
+public class DoubleSliderButton extends Button
 {
     public String prefix = "";
     /**
      * Is this slider control being dragged.
      */
     public boolean dragging = false;
-    public int minValue = 0;
-    public int maxValue = 0;
+    public double minValue = 0;
+    public double maxValue = 0;
     public String suffix = "";
     public boolean drawString = true;
     PropertiesBase properties;
-    AtomicInteger property;
+    AtomicDouble property;
 
-    public IntSliderButton(int id, PropertiesBase properties, AtomicInteger property, String prefix, String suf, int minVal, int maxVal, boolean drawStr)
+    public DoubleSliderButton(int id, PropertiesBase properties, AtomicDouble property, String prefix, String suf, double minVal, double maxVal, boolean drawStr)
     {
         super(id, prefix);
         minValue = minVal;
@@ -143,10 +142,7 @@ public class IntSliderButton extends Button
         if (this.dragging)
         {
             this.dragging = false;
-            if (properties != null)
-            {
-                properties.save();
-            }
+            properties.save();
         }
     }
 
@@ -168,12 +164,12 @@ public class IntSliderButton extends Button
         return false;
     }
 
-    public int getValue()
+    public double getValue()
     {
         return this.property.get();
     }
 
-    public void setValue(int value)
+    public void setValue(double value)
     {
         value = Math.min(value, maxValue);
         value = Math.max(value, minValue);

@@ -57,7 +57,7 @@ public class ThemeMinimapFrame
         this.width = size;
         this.height = size;
         this.frameColor = Theme.getColor(minimapSpec.frameColor);
-        this.frameAlpha = JourneyMap.getMiniMapProperties().frameAlpha.get() / 255f;
+        this.frameAlpha = Math.max(0f, Math.min(1f, JourneyMap.getMiniMapProperties().frameAlpha.get() / 100f));
         this.reticleOrientation = JourneyMap.getMiniMapProperties().reticleOrientation.get();
 
         if (minimapSpec instanceof Theme.Minimap.MinimapSquare)
@@ -191,15 +191,15 @@ public class ThemeMinimapFrame
         {
             if (isSquare)
             {
-                DrawUtil.drawClampedImage(textureTop, frameColor, x + (textureTopLeft.width / 2D), y - (textureTop.height / 2D), 1, 0);
-                DrawUtil.drawClampedImage(textureLeft, frameColor, x - (textureLeft.width / 2D), y + (textureTopLeft.height / 2D), 1, 0);
-                DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.width / 2D), y - (textureTopLeft.height / 2D), 1, 0);
-                DrawUtil.drawClampedImage(textureBottom, frameColor, x + (textureBottomLeft.width / 2D), y + height - (textureBottom.height / 2D), 1, 0);
-                DrawUtil.drawClampedImage(textureRight, frameColor, x + width - (textureRight.width / 2D), y + (textureTopRight.height / 2D), 1, 0);
-                DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.width / 2D), y - (textureTopLeft.height / 2D), 1, 0);
-                DrawUtil.drawClampedImage(textureTopRight, frameColor, x + width - (textureTopRight.width / 2D), y - (textureTopRight.height / 2D), 1, 0);
-                DrawUtil.drawClampedImage(textureBottomLeft, frameColor, x - (textureBottomLeft.width / 2D), y + height - (textureBottomLeft.height / 2D), 1, 0);
-                DrawUtil.drawClampedImage(textureBottomRight, frameColor, x + width - (textureBottomRight.width / 2D), y + height - (textureBottomRight.height / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureTop, frameColor, x + (textureTopLeft.width / 2D), y - (textureTop.height / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureLeft, frameColor, x - (textureLeft.width / 2D), y + (textureTopLeft.height / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.width / 2D), y - (textureTopLeft.height / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureBottom, frameColor, x + (textureBottomLeft.width / 2D), y + height - (textureBottom.height / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureRight, frameColor, x + width - (textureRight.width / 2D), y + (textureTopRight.height / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.width / 2D), y - (textureTopLeft.height / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureTopRight, frameColor, x + width - (textureTopRight.width / 2D), y - (textureTopRight.height / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureBottomLeft, frameColor, x - (textureBottomLeft.width / 2D), y + height - (textureBottomLeft.height / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureBottomRight, frameColor, x + width - (textureBottomRight.width / 2D), y + height - (textureBottomRight.height / 2D), 1, frameAlpha, 0);
             }
             else
             {
@@ -220,7 +220,7 @@ public class ThemeMinimapFrame
 
     private TextureImpl getTexture(String suffix, int width, int height, boolean resize, boolean retain)
     {
-        return TextureCache.instance().getThemeTexture(theme, String.format(resourcePattern, suffix), width, height, resize, frameAlpha, retain);
+        return TextureCache.instance().getThemeTexture(theme, String.format(resourcePattern, suffix), width, height, resize, 1f, retain);
     }
 
     public Rectangle.Double getFrameBounds()

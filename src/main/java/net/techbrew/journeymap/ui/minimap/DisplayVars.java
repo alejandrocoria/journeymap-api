@@ -38,10 +38,10 @@ public class DisplayVars
     final float drawScale;
     final int displayWidth;
     final int displayHeight;
+    final float terrainAlpha;
     final ScaledResolution scaledResolution;
     final int minimapSize, textureX, textureY;
     final int minimapRadius, translateX, translateY;
-    int marginX, marginY;
     final int fpsLabelHeight;
     final int locationLabelHeight;
     final Point2D.Double centerPoint;
@@ -54,6 +54,7 @@ public class DisplayVars
     final ThemeMinimapFrame minimapFrame;
     final ThemeCompassPoints minimapCompassPoints;
     final Theme.Minimap.MinimapSpec minimapSpec;
+    int marginX, marginY;
     boolean forceUnicode;
 
     /**
@@ -77,11 +78,11 @@ public class DisplayVars
         this.showReticle = miniMapProperties.showReticle.get();
         this.shape = shape;
         this.position = position;
-        this.orientation = JourneyMap.getMiniMapProperties().orientation.get();
+        this.orientation = miniMapProperties.orientation.get();
         this.displayWidth = mc.displayWidth;
         this.displayHeight = mc.displayHeight;
         this.minimapSize = miniMapProperties.customSize.get();
-
+        this.terrainAlpha = Math.max(0f, Math.min(1f, miniMapProperties.terrainAlpha.get() / 100f));
         Theme theme = ThemeFileHandler.getCurrentTheme();
 
         // Assign shape
