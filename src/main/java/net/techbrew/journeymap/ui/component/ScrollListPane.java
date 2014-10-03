@@ -54,6 +54,11 @@ public class ScrollListPane extends GuiSlot
         updateSlots();
     }
 
+    public List<ISlot> getRootSlots()
+    {
+        return rootSlots;
+    }
+
     public void updateSlots()
     {
         int sizeBefore = currentSlots.size();
@@ -194,12 +199,16 @@ public class ScrollListPane extends GuiSlot
         return null;
     }
 
-    public void keyTyped(char c, int i)
+    public boolean keyTyped(char c, int i)
     {
         for (int slotIndex = 0; slotIndex < this.getSize(); ++slotIndex)
         {
-            this.getSlot(slotIndex).keyTyped(c, i);
+            if (this.getSlot(slotIndex).keyTyped(c, i))
+            {
+                return true;
+            }
         }
+        return false;
     }
 
     @Override

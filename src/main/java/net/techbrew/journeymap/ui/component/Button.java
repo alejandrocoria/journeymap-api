@@ -8,6 +8,7 @@
 
 package net.techbrew.journeymap.ui.component;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.FontRenderer;
@@ -19,7 +20,6 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -224,11 +224,16 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public List<String> getTooltip()
     {
+        ArrayList<String> list = new ArrayList<String>();
         if (tooltip != null)
         {
-            return Arrays.asList(tooltip);
+            for (String line : tooltip)
+            {
+                list.addAll(FMLClientHandler.instance().getClient().fontRenderer.listFormattedStringToWidth(line, 200));
+            }
+            return list;
         }
-        ArrayList<String> list = new ArrayList<String>();
+
         if (!this.enabled && showDisabledHoverText)
         {
             list.add(EnumChatFormatting.ITALIC + Constants.getString("jm.common.disabled_feature"));
@@ -509,5 +514,9 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public boolean keyTyped(char c, int i)
     {
         return false;
+    }
+
+    public void refresh()
+    {
     }
 }

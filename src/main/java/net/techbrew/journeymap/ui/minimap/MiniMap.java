@@ -553,6 +553,12 @@ public class MiniMap
             return;
         }
 
+        if (force)
+        {
+            shape = miniMapProperties.shape.get();
+            position = miniMapProperties.position.get();
+        }
+
         miniMapProperties.shape.set(shape);
         miniMapProperties.position.set(position);
         miniMapProperties.save();

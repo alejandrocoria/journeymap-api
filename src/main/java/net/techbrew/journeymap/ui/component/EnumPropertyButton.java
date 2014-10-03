@@ -33,8 +33,11 @@ public class EnumPropertyButton<E extends Enum> extends Button
 
     public void setValue(E value)
     {
-        valueHolder.set(value);
-        properties.save();
+        if (!valueHolder.get().equals(value))
+        {
+            valueHolder.set(value);
+            properties.save();
+        }
         displayString = getFormattedLabel(value.toString());
     }
 
@@ -106,5 +109,11 @@ public class EnumPropertyButton<E extends Enum> extends Button
             }
         }
         return false;
+    }
+
+    @Override
+    public void refresh()
+    {
+        setValue(valueHolder.get());
     }
 }

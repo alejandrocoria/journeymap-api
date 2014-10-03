@@ -150,6 +150,11 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         return Arrays.asList(metadata);
     }
 
+    public List<SlotMetadata> getAllChildMetadata()
+    {
+        return childMetadataList;
+    }
+
     @Override
     public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
     {
@@ -179,6 +184,11 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     {
         String glyph = selected ? glyphUp : glyphDown;
         this.button.displayString = String.format("%1$s  %2$s  %1$s", glyph, name);
+    }
+
+    public void setSelected(boolean selected)
+    {
+        this.selected = selected;
     }
 
     @Override

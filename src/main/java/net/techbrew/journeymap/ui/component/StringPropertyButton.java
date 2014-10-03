@@ -33,8 +33,11 @@ public class StringPropertyButton extends Button
 
     public void setValue(String value)
     {
-        valueHolder.set(value);
-        properties.save();
+        if (!valueHolder.get().equals(value))
+        {
+            valueHolder.set(value);
+            properties.save();
+        }
         displayString = getFormattedLabel(value);
     }
 
@@ -106,5 +109,11 @@ public class StringPropertyButton extends Button
             }
         }
         return false;
+    }
+
+    @Override
+    public void refresh()
+    {
+        setValue(valueHolder.get());
     }
 }

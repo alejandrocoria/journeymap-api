@@ -42,7 +42,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
         }
     }
 
-    public static void onKeypress(boolean minimapOnly)
+    public static boolean onKeypress(boolean minimapOnly)
     {
         final int i = Keyboard.getEventKey();
         MapOverlayState mapOverlayState = Fullscreen.state();
@@ -58,37 +58,37 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 if (controlDown && Constants.isPressed(Constants.KB_MAP))
                 {
                     UIManager.getInstance().toggleMinimap();
-                    return;
+                    return true;
                 }
                 else if (Constants.isPressed(Constants.KB_MAP_ZOOMIN))
                 {
                     mapOverlayState.zoomIn();
-                    return;
+                    return true;
                 }
                 else if (Constants.isPressed(Constants.KB_MAP_ZOOMOUT))
                 {
                     mapOverlayState.zoomOut();
-                    return;
+                    return true;
                 }
                 else if (Constants.isPressed(Constants.KB_MAP_DAY))
                 {
                     mapOverlayState.setMapType(Constants.MapType.day);
-                    return;
+                    return true;
                 }
                 else if (Constants.isPressed(Constants.KB_MAP_NIGHT))
                 {
                     mapOverlayState.setMapType(Constants.MapType.night);
-                    return;
+                    return true;
                 }
                 else if (Constants.isPressed(Constants.KB_MINIMAP_POS))
                 {
                     UIManager.getInstance().getMiniMap().nextPosition();
-                    return;
+                    return true;
                 }
                 else if (controlDown && Constants.isPressed(Constants.KB_WAYPOINT))
                 {
                     UIManager.getInstance().openWaypointManager(null, null);
-                    return;
+                    return true;
                 }
 
                 if (!minimapOnly)
@@ -106,7 +106,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                                 UIManager.getInstance().closeAll();
                             }
                         }
-                        return;
+                        return true;
                     }
                     else
                     {
@@ -118,7 +118,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                                 Waypoint waypoint = Waypoint.of(mc.thePlayer);
                                 UIManager.getInstance().openWaypointEditor(waypoint, true, null);
                             }
-                            return;
+                            return true;
                         }
                     }
                 }
@@ -128,6 +128,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
         {
 
         }
+        return false;
     }
 
     @Override

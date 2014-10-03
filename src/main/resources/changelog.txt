@@ -14,12 +14,14 @@ http://journeymap.techbrew.net
 ## Changelog for JourneyMap @JMVERSION@:
 - Change: Pressing "O" in the Fullscreen map will open the Options Manager
 - Change: Closing the Options Manager now only resets what actually needs to be reset.
-- Change: Added a "Preview Minimap" checkbox to the bottom of the Options Manager
+- Change: Added a "Preview Minimap" checkbox to the bottom of the Options Manager.  Minimap's Hotkeys will also function when the preview is enabled.
 - Change: Options with sliders or enumerated values will now start on a new row if they can't all fit in the last row.
 - Change: Options with boolean values now drawn with a check instead of an X
 - Change: Options with int values can now be adjusted using the arrow keys when the option has focus. Since this may often be necessary, the tooltips remind you as well.
 - Change: Options with enumerated values can also be adjusted using the arrow keys when the option has focus
 - Change: Options with boolean values can be toggled using the spacebar when the option has focus
+- Change: Waypoint Manager -> Options now goes to the Options Manager and pre-opens the Waypoints and Waypoint Beacons sections.  Close returns to the Waypoint Manager.
+- Change: Victorian theme fullscreen.statusLabel.backgroundColor is now dark gray
 - Bugfix: Options didn't take immediate effect if Escape key used instead of Close button.
 - Bugfix: Options based on Enums showed the default Enum's actual name rather than its localized name
 

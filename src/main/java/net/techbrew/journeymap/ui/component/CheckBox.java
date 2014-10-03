@@ -113,5 +113,4 @@ public class CheckBox extends ToggleButton
         }
         return false;
     }
-
 }

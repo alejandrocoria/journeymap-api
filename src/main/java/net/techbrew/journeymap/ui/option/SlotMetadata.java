@@ -77,6 +77,36 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         return button;
     }
 
+    public String getName()
+    {
+        return name;
+    }
+
+    public String getRange()
+    {
+        return range;
+    }
+
+    public boolean isAdvanced()
+    {
+        return advanced;
+    }
+
+    public ValueType getValueType()
+    {
+        return valueType;
+    }
+
+    public String[] getTooltipLines()
+    {
+        return tooltipLines;
+    }
+
+    public boolean isMaster()
+    {
+        return master;
+    }
+
     public T getDefaultValue()
     {
         return defaultValue;

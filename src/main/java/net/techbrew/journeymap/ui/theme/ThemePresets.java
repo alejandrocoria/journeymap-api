@@ -95,7 +95,7 @@ public class ThemePresets
             fullscreen.statusLabel = new Theme.LabelSpec();
             fullscreen.statusLabel.backgroundAlpha = 235;
             fullscreen.statusLabel.foregroundAlpha = 255;
-            fullscreen.statusLabel.backgroundColor = vicRed;
+            fullscreen.statusLabel.backgroundColor = veryDarkGray;
             fullscreen.statusLabel.foregroundColor = Theme.toHexColor(Color.lightGray);
             fullscreen.statusLabel.shadow = true;
         }

@@ -18,6 +18,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
+import net.techbrew.journeymap.properties.Config;
 import net.techbrew.journeymap.render.map.TileCache;
 import net.techbrew.journeymap.ui.component.JmUI;
 import net.techbrew.journeymap.ui.dialog.*;
@@ -217,6 +218,18 @@ public class UIManager
     public void openMasterOptions()
     {
         open(MasterOptions2.class);
+    }
+
+    public void openMasterOptions(Class<? extends JmUI> returnClass, Config.Category... initialCategories)
+    {
+        try
+        {
+            open(new MasterOptions2(returnClass, initialCategories));
+        }
+        catch (Throwable e)
+        {
+            logger.log(Level.ERROR, "Unexpected exception creating MasterOptions with return class: " + LogFormatter.toString(e));
+        }
     }
 
     public void openMapActions()

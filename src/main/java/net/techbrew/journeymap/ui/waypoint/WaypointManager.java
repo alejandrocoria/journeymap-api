@@ -19,6 +19,7 @@ import net.techbrew.journeymap.command.CmdTeleportWaypoint;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
+import net.techbrew.journeymap.properties.Config;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.*;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
@@ -345,7 +346,7 @@ public class WaypointManager extends JmUI
             }
             case Options:
             {
-                UIManager.getInstance().openWaypointOptions(getClass());
+                UIManager.getInstance().openMasterOptions(getClass(), Config.Category.Waypoint, Config.Category.WaypointBeacon);
                 return;
             }
         }

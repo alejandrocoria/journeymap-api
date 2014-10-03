@@ -98,6 +98,15 @@ public class BooleanPropertyButton extends ToggleButton
         }
     }
 
+    @Override
+    public void refresh()
+    {
+        if (valueHolder != null)
+        {
+            setToggled(valueHolder.get());
+        }
+    }
+
     public enum Type
     {
         OnOff, SmallLarge
