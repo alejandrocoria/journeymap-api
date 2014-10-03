@@ -13,9 +13,8 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.ui.UIManager;
-import net.techbrew.journeymap.ui.component.BooleanPropertyButton;
-import net.techbrew.journeymap.ui.component.ButtonList;
-import net.techbrew.journeymap.ui.component.JmUI;
+import net.techbrew.journeymap.ui.component.*;
+import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 
 import java.awt.*;
@@ -32,12 +31,12 @@ public class MasterOptions extends JmUI
     String labelOptions = Constants.getString("jm.common.options_button");
     String labelHelp = Constants.getString("jm.common.help");
     String labelStyle = Constants.getString("jm.common.map_style_button");
-    net.techbrew.journeymap.ui.component.Button buttonGeneralDisplayOptions, buttonFullMapHelp;
-    net.techbrew.journeymap.ui.component.Button buttonMiniMapEnable, buttonMiniMapOptions, buttonMiniMapHelp;
-    net.techbrew.journeymap.ui.component.Button buttonWaypointOptions, buttonWaypointHelp, buttonWaypointManagerEnable;
-    net.techbrew.journeymap.ui.component.Button buttonWebMapEnable, buttonWebMapOpen;
-    net.techbrew.journeymap.ui.component.Button buttonStyleOptions;
-    net.techbrew.journeymap.ui.component.Button buttonClose;
+    Button buttonGeneralDisplayOptions, buttonFullMapHelp;
+    Button buttonMiniMapOptions, buttonMiniMapHelp, buttonWaypointOptions, buttonWaypointHelp;
+    ToggleButton buttonMiniMapEnable, buttonWaypointManagerEnable, buttonWebMapEnable;
+    Button buttonWebMapOpen;
+    Button buttonStyleOptions;
+    Button buttonClose;
     ButtonList listGeneral, listMiniMap, listWaypoints, listWebMap;
 
     public MasterOptions()
@@ -232,9 +231,9 @@ public class MasterOptions extends JmUI
     {
         FullMapOptions, FullMapHelp, MiniMapOptions, MiniMapHelp, StyleOptions, WaypointOptions, WaypointHelp, MiniMapEnable, WaypointManagerEnable, WebMapEnable, WebMapOpen, Close;
 
-        net.techbrew.journeymap.ui.component.Button create(String label)
+        Button create(String label)
         {
-            return new net.techbrew.journeymap.ui.component.Button(this, label);
+            return new Button(this, label);
         }
     }
 }

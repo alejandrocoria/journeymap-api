@@ -20,10 +20,7 @@ import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.ui.UIManager;
-import net.techbrew.journeymap.ui.component.Button;
-import net.techbrew.journeymap.ui.component.ButtonList;
-import net.techbrew.journeymap.ui.component.JmUI;
-import net.techbrew.journeymap.ui.component.ScrollPane;
+import net.techbrew.journeymap.ui.component.*;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.lwjgl.input.Keyboard;
@@ -51,9 +48,10 @@ public class WaypointManager extends JmUI
     final String off = Constants.getString("jm.common.off");
     protected int rowHeight = 16;
     protected Boolean canUserTeleport;
+    ToggleButton buttonToggleAll;
     private SortButton buttonSortName, buttonSortDistance;
     private DimensionsButton buttonDimensions;
-    private Button buttonClose, buttonAdd, buttonHelp, buttonOptions, buttonToggleAll;
+    private Button buttonClose, buttonAdd, buttonHelp, buttonOptions;
     private ButtonList bottomButtons;
     private ArrayList<WaypointManagerItem> items = new ArrayList<WaypointManagerItem>();
     private ScrollPane itemScrollPane;
@@ -105,7 +103,7 @@ public class WaypointManager extends JmUI
                 {
                     String enableOn = Constants.getString("jm.waypoint.enable_all", "", on);
                     String enableOff = Constants.getString("jm.waypoint.enable_all", "", off);
-                    buttonToggleAll = new Button(ButtonEnum.ToggleAll.ordinal(), 0, 0, enableOff, enableOn, true);
+                    buttonToggleAll = new ToggleButton(ButtonEnum.ToggleAll.ordinal(), enableOff, enableOn, true);
                     buttonToggleAll.setTextOnly(getFontRenderer());
                 }
                 buttonList.add(buttonToggleAll);
@@ -323,7 +321,7 @@ public class WaypointManager extends JmUI
             }
             case Dimensions:
             {
-                buttonDimensions.toggle();
+                buttonDimensions.nextValue();
                 updateItems();
                 return;
             }
@@ -533,8 +531,8 @@ public class WaypointManager extends JmUI
             return maxWidth + 12;
         }
 
-        @Override
-        public void toggle()
+
+        public void nextValue()
         {
             int index;
 
@@ -569,14 +567,14 @@ public class WaypointManager extends JmUI
         }
     }
 
-    protected class SortButton extends Button
+    protected class SortButton extends ToggleButton
     {
         final WaypointManagerItem.Sort sort;
         final String labelInactive;
 
         public SortButton(Enum enumValue, String label, WaypointManagerItem.Sort sort)
         {
-            super(enumValue.ordinal(), 0, 0, String.format("%s %s", label, ASCEND), String.format("%s %s", label, DESCEND), sort.ascending);
+            super(enumValue.ordinal(), String.format("%s %s", label, ASCEND), String.format("%s %s", label, DESCEND), sort.ascending);
             this.labelInactive = label;
             this.sort = sort;
         }

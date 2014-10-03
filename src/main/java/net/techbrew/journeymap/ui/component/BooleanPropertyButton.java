@@ -16,22 +16,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Button that wraps and syncs with an AtomicBoolean value owned by a config instance.
  */
-public class BooleanPropertyButton extends Button
+public class BooleanPropertyButton extends ToggleButton
 {
     final PropertiesBase properties;
     final AtomicBoolean valueHolder;
     final Type type;
 
-    protected BooleanPropertyButton(int id, Type type, String labelOn, String labelOff, PropertiesBase properties, AtomicBoolean valueHolder)
+    protected BooleanPropertyButton(int id, Type type, String labelOn, String labelOff, PropertiesBase properties, AtomicBoolean valueHolderParam)
     {
-        super(id, 0, 0, labelOn, labelOff, valueHolder.get());
+        super(id, labelOn, labelOff, (valueHolderParam != null) && valueHolderParam.get());
         this.type = type;
-        this.valueHolder = valueHolder;
+        this.valueHolder = valueHolderParam;
         this.properties = properties;
-        if (properties == null || valueHolder == null)
-        {
-            this.setEnabled(false);
-        }
     }
 
     public static BooleanPropertyButton create(int id, PropertiesBase properties, AtomicBoolean valueHolder)
@@ -91,7 +87,14 @@ public class BooleanPropertyButton extends Button
     {
         if (isEnabled())
         {
-            setToggled(properties.toggle(valueHolder));
+            if (properties != null)
+            {
+                setToggled(properties.toggle(valueHolder));
+            }
+            else
+            {
+                setToggled(!toggled);
+            }
         }
     }
 

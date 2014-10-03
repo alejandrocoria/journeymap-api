@@ -72,10 +72,7 @@ public class FullscreenActions extends JmUI
         buttonBrowser = new Button(ButtonEnum.Browser, Constants.getString("jm.common.use_browser")); //$NON-NLS-1$
         buttonBrowser.setEnabled(JourneyMap.getWebMapProperties().enabled.get());
 
-        buttonAutomap = new Button(ButtonEnum.Automap,
-                Constants.getString("jm.common.automap_title", on),
-                Constants.getString("jm.common.automap_title", off),
-                true); //$NON-NLS-1$ //$NON-NLS-2$
+        buttonAutomap = new Button(ButtonEnum.Automap, Constants.getString("jm.common.automap_title"));
         buttonAutomap.setEnabled(FMLClientHandler.instance().getClient().isSingleplayer());
 
         buttonCheck = new Button(ButtonEnum.Check, Constants.getString("jm.common.update_check")); //$NON-NLS-1$

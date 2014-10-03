@@ -23,7 +23,8 @@ public class ScrollListPane extends GuiSlot
     int hpad = 12;
     List<ISlot> rootSlots;
     List<ISlot> currentSlots = new ArrayList<ISlot>(0);
-    int lastClickedSlot;
+    SlotMetadata lastPressed;
+    int lastClickedIndex;
     int scrollbarX;
     int listWidth;
 
@@ -61,7 +62,6 @@ public class ScrollListPane extends GuiSlot
         int columnWidth = 0;
         for (ISlot slot : rootSlots)
         {
-            System.out.println("Column Width: " + columnWidth);
             columnWidth = Math.max(columnWidth, slot.getColumnWidth());
         }
 
@@ -79,7 +79,7 @@ public class ScrollListPane extends GuiSlot
         if (sizeBefore < sizeAfter)
         {
             scrollBy(-(sizeAfter * slotHeight));
-            scrollBy(lastClickedSlot * slotHeight);
+            scrollBy(lastClickedIndex * slotHeight);
         }
     }
 
@@ -135,11 +135,12 @@ public class ScrollListPane extends GuiSlot
                 int j1 = this.top + 4 - this.getAmountScrolled() + slotIndex * this.slotHeight + this.headerPadding;
                 int relativeX = mouseX - i1;
                 int relativeY = mouseY - j1;
-
+                lastClickedIndex = -1;
                 if (this.getSlot(slotIndex).mousePressed(slotIndex, mouseX, mouseY, mouseEvent, relativeX, relativeY))
                 {
                     this.func_148143_b(false); // setEnabled
-                    lastClickedSlot = slotIndex;
+                    lastClickedIndex = slotIndex;
+                    lastPressed = this.getSlot(slotIndex).getLastPressed();
                     updateSlots();
                     return true;
                 }
@@ -171,6 +172,26 @@ public class ScrollListPane extends GuiSlot
     public ISlot getSlot(int index)
     {
         return currentSlots.get(index);
+    }
+
+    public SlotMetadata getLastPressed()
+    {
+        return lastPressed;
+    }
+
+    public ISlot getLastPressedParentSlot()
+    {
+        if (lastPressed != null)
+        {
+            for (ISlot slot : rootSlots)
+            {
+                if (slot.contains(lastPressed))
+                {
+                    return slot;
+                }
+            }
+        }
+        return null;
     }
 
     public void keyTyped(char c, int i)
@@ -221,8 +242,12 @@ public class ScrollListPane extends GuiSlot
 
         List<ISlot> getChildSlots(int listWidth, int columnWidth);
 
+        SlotMetadata getLastPressed();
+
         void setEnabled(boolean enabled);
 
         int getColumnWidth();
+
+        boolean contains(SlotMetadata slotMetadata);
     }
 }

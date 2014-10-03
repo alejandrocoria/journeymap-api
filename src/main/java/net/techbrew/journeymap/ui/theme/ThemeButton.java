@@ -2,20 +2,24 @@ package net.techbrew.journeymap.ui.theme;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.properties.PropertiesBase;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
+import net.techbrew.journeymap.ui.component.BooleanPropertyButton;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by Mark on 8/30/2014.
  */
-public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
+public class ThemeButton extends BooleanPropertyButton
 {
     protected Theme theme;
     protected Theme.Control.ButtonSpec buttonSpec;
@@ -31,29 +35,22 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
     protected String iconName;
     protected List<String> additionalTooltips;
 
-    public ThemeButton(Enum enumId, Theme theme, String iconName)
+    public ThemeButton(int id, Theme theme, String rawLabel, String iconName)
     {
-        this(enumId.ordinal(), theme, "", "", false, iconName);
-    }
-
-    public ThemeButton(Enum enumId, Theme theme, String label, String iconName)
-    {
-        this(enumId.ordinal(), theme, label, label, false, iconName);
-    }
-
-    public ThemeButton(int id, Theme theme, String label, String iconName)
-    {
-        this(id, theme, label, label, false, iconName);
-    }
-
-    public ThemeButton(Enum enumId, Theme theme, String labelOn, String labelOff, boolean toggled, String iconName)
-    {
-        this(enumId.ordinal(), theme, labelOn, labelOff, toggled, iconName);
+        this(id, theme, Constants.getString(rawLabel), Constants.getString(rawLabel), false, iconName);
     }
 
     public ThemeButton(int id, Theme theme, String labelOn, String labelOff, boolean toggled, String iconName)
     {
-        super(id, 0, 0, toggled ? labelOn : labelOff);
+        super(id, Type.OnOff, labelOn, labelOff, null, null);
+        this.iconName = iconName;
+        this.setToggled(toggled);
+        updateTheme(theme);
+    }
+
+    protected ThemeButton(int id, Theme theme, String labelOn, String labelOff, String iconName, PropertiesBase properties, AtomicBoolean property)
+    {
+        super(id, Type.OnOff, labelOn, labelOff, properties, property);
         this.iconName = iconName;
         updateTheme(theme);
     }
@@ -64,7 +61,7 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
         this.buttonSpec = getButtonSpec(theme);
         TextureCache tc = TextureCache.instance();
 
-        if(buttonSpec.useThemeImages)
+        if (buttonSpec.useThemeImages)
         {
             String pattern = getPathPattern();
             String prefix = buttonSpec.prefix;
@@ -105,7 +102,7 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
 
     protected TextureImpl getActiveTexture(boolean isMouseOver)
     {
-        if(isEnabled())
+        if (isEnabled())
         {
             TextureImpl activeTexture = isMouseOver ? Mouse.isButtonDown(0) ? textureOn : textureHover : textureOff;
             return activeTexture;
@@ -118,11 +115,12 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
 
     protected Color getIconColor(boolean isMouseOver)
     {
-        if(!isEnabled()) {
+        if (!isEnabled())
+        {
             return iconDisabledColor;
         }
 
-        if(isMouseOver)
+        if (isMouseOver)
         {
             return iconHoverColor;
         }
@@ -143,7 +141,7 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
 
         // Returns 0 if the button is disabled, 1 if the mouse is NOT hovering over this button and 2 if it IS hovering over
         int hoverState = this.getHoverState(this.field_146123_n);
-        boolean isMouseOver = (hoverState==2);
+        boolean isMouseOver = (hoverState == 2);
 
         TextureImpl activeTexture = getActiveTexture(isMouseOver);
 
@@ -153,8 +151,9 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
         if (buttonSpec.useThemeImages)
         {
             float buttonScale = 1f;
-            if(buttonSpec.width!=activeTexture.width) {
-                buttonScale = (1f*buttonSpec.width / activeTexture.width);
+            if (buttonSpec.width != activeTexture.width)
+            {
+                buttonScale = (1f * buttonSpec.width / activeTexture.width);
             }
 
             // Theme Button Background
@@ -168,8 +167,9 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
 
         // Icon
         float iconScale = 1f;
-        if(theme.icon.width!=textureIcon.width) {
-            iconScale = (1f*theme.icon.width / textureIcon.width);
+        if (theme.icon.width != textureIcon.width)
+        {
+            iconScale = (1f * theme.icon.width / textureIcon.width);
         }
 
         //drawX += (((width - textureIcon.width)/2));
@@ -208,14 +208,14 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
     @Override
     public ArrayList<String> getTooltip()
     {
-        if(!visible)
+        if (!visible)
         {
             return null;
         }
         ArrayList<String> list = super.getTooltip();
 
         String style = null;
-        if(!isEnabled())
+        if (!isEnabled())
         {
             style = buttonSpec.tooltipDisabledStyle;
         }
@@ -226,7 +226,7 @@ public class ThemeButton extends net.techbrew.journeymap.ui.component.Button
 
         list.add(0, style + displayString);
 
-        if(additionalTooltips!=null)
+        if (additionalTooltips != null)
         {
             list.addAll(additionalTooltips);
         }

@@ -14,13 +14,13 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.EnumChatFormatting;
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A glom of extra functionality to try to make buttons less sucky to use.
@@ -32,17 +32,15 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected static Color smallBgColor = new Color(100, 100, 100);
     protected static Color smallBgHoverColor = new Color(125, 135, 190);
     protected static Color smallBgHoverColor2 = new Color(0, 0, 100);
-    protected Boolean toggled = true;
-    protected String labelOn;
-    protected String labelOff;
+
     //protected boolean enabled;
     protected boolean drawFrame;
     protected boolean drawBackground;
     protected boolean showDisabledHoverText;
     protected boolean defaultStyle = true;
-    protected ArrayList<ToggleListener> toggleListeners = new ArrayList<ToggleListener>(0);
     protected PropertyAdapter propertyAdapter;
     protected int WIDTH_PAD = 12;
+    protected String[] tooltip;
 
     public Button(Enum enumValue, String label)
     {
@@ -59,32 +57,13 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         this(enumValue.ordinal(), width, height, label);
     }
 
-    public Button(Enum enumValue, String labelOn, String labelOff, boolean toggled)
-    {
-        this(enumValue.ordinal(), 0, 0, labelOn, labelOff, toggled);
-    }
-
-    public Button(int id, String labelOn, String labelOff, boolean toggled)
-    {
-        this(id, 0, 0, labelOn, labelOff, toggled);
-    }
-
     public Button(int id, int width, int height, String label)
     {
         super(id, 0, 0, width, height, label);
         finishInit();
     }
 
-    public Button(int id, int width, int height, String labelOn, String labelOff, boolean toggled)
-    {
-        super(id, 0, 0, width, height, toggled ? labelOn : labelOff);
-        this.labelOn = labelOn;
-        this.labelOff = labelOff;
-        this.setToggled(toggled);
-        finishInit();
-    }
-
-    private void finishInit()
+    protected void finishInit()
     {
         this.setEnabled(true);
         this.setDrawButton(true);
@@ -100,29 +79,13 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         }
     }
 
-    private void updateLabel()
+    protected void updateLabel()
     {
-        if (labelOn != null && labelOff != null)
-        {
-            super.displayString = getToggled() ? labelOn : labelOff;
-        }
     }
 
-    public void setLabels(String labelOn, String labelOff)
+    public boolean isActive()
     {
-        this.labelOn = labelOn;
-        this.labelOff = labelOff;
-        updateLabel();
-    }
-
-    public void toggle()
-    {
-        setToggled(!getToggled());
-    }
-
-    public void addToggleListener(ToggleListener toggleListener)
-    {
-        this.toggleListeners.add(toggleListener);
+        return enabled;
     }
 
     public void setPropertyAdapter(PropertyAdapter propertyAdapter, String rawLabel)
@@ -134,14 +97,6 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public int getFitWidth(FontRenderer fr)
     {
         int max = fr.getStringWidth(displayString);
-        if (this.labelOn != null)
-        {
-            max = Math.max(max, fr.getStringWidth(labelOn));
-        }
-        if (this.labelOff != null)
-        {
-            max = Math.max(max, fr.getStringWidth(labelOff));
-        }
         return max + WIDTH_PAD;
     }
 
@@ -263,17 +218,27 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     @Override
     public boolean mousePressed(Minecraft minecraft, int i, int j)
     {
-        return isEnabled() && isDrawButton() && i >= getX() && j >= getY() && i < getX() + getWidth() && j < getY() + getHeight();
+        boolean pressed = isEnabled() && isDrawButton() && i >= getX() && j >= getY() && i < getX() + getWidth() && j < getY() + getHeight();
+        return pressed;
     }
 
-    public ArrayList<String> getTooltip()
+    public List<String> getTooltip()
     {
+        if (tooltip != null)
+        {
+            return Arrays.asList(tooltip);
+        }
         ArrayList<String> list = new ArrayList<String>();
         if (!this.enabled && showDisabledHoverText)
         {
             list.add(EnumChatFormatting.ITALIC + Constants.getString("jm.common.disabled_feature"));
         }
         return list;
+    }
+
+    public void setTooltip(String... tooltip)
+    {
+        this.tooltip = tooltip;
     }
 
     public boolean mouseOver(int mouseX, int mouseY)
@@ -285,51 +250,6 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return mouseX >= this.xPosition && mouseY >= this.yPosition
                 && mouseX <= (this.xPosition + this.width)
                 && mouseY <= (this.yPosition + this.height);
-    }
-
-    public Boolean getToggled()
-    {
-        return toggled;
-    }
-
-    public void setToggled(Boolean toggled)
-    {
-        setToggled(toggled, true);
-    }
-
-    public void setToggled(Boolean toggled, boolean notifyToggleListener)
-    {
-        if (this.toggled == toggled || !this.enabled || !this.visible)
-        {
-            return;
-        }
-
-        boolean allowChange = true;
-        try
-        {
-            if (notifyToggleListener && !toggleListeners.isEmpty())
-            {
-                for (ToggleListener listener : toggleListeners)
-                {
-                    allowChange = listener.onToggle(this, toggled);
-                    if (!allowChange)
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-        catch (Throwable t)
-        {
-            JourneyMap.getLogger().error("Error trying to toggle button '" + displayString + "': " + LogFormatter.toString(t));
-            allowChange = false;
-        }
-
-        if (allowChange)
-        {
-            this.toggled = toggled;
-            updateLabel();
-        }
     }
 
     public int getWidth()
@@ -589,10 +509,5 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public boolean keyTyped(char c, int i)
     {
         return false;
-    }
-
-    public static interface ToggleListener<T extends Button>
-    {
-        public boolean onToggle(T button, boolean toggled);
     }
 }

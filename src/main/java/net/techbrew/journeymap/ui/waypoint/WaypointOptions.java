@@ -24,7 +24,8 @@ import java.awt.*;
  */
 public class WaypointOptions extends JmUI
 {
-    Button buttonEnable, buttonDeathpoints, buttonHide, buttonClose;
+    ToggleButton buttonEnable, buttonDeathpoints, buttonHide;
+    Button buttonClose;
     TextField maxDistanceField;
     ButtonList listLeftButtons, listRightButtons;
     String labelMaxDistance = Constants.getString("jm.waypoint.max_distance");
@@ -67,7 +68,7 @@ public class WaypointOptions extends JmUI
         maxDistanceField = new TextField(props.maxDistance.toString(), getFontRenderer(), 100, 20, true, true);
         maxDistanceField.setClamp(-1, 10000);
 
-        buttonHide = new Button(id++, Constants.getString("jm.common.show_buttons"), Constants.getString("jm.common.hide_buttons"), false);
+        buttonHide = new ToggleButton(id++, Constants.getString("jm.common.show_buttons"), Constants.getString("jm.common.hide_buttons"), false);
         buttonList.add(buttonHide);
 
         buttonClose = new Button(id++, Constants.getString("jm.common.close"));
@@ -107,7 +108,7 @@ public class WaypointOptions extends JmUI
         maxDistanceField.drawTextBox();
 
         // Label
-        DrawUtil.drawLabel(labelMaxDistance, maxDistanceField.getX()-hgap, maxDistanceField.getMiddleY(), DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, Color.BLACK, 0, Color.cyan, 255, 1, true);
+        DrawUtil.drawLabel(labelMaxDistance, maxDistanceField.getX() - hgap, maxDistanceField.getMiddleY(), DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, Color.BLACK, 0, Color.cyan, 255, 1, true);
 
         // Close
         buttonHide.setPosition(bx - leftOffset, maxDistanceField.getBottomY() + (vgap * 4));

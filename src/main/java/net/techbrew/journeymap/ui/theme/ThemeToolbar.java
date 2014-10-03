@@ -18,12 +18,12 @@ import java.util.Arrays;
  */
 public class ThemeToolbar extends Button
 {
+    private final ButtonList buttonList;
     private Theme theme;
     private Theme.Container.Toolbar.ToolbarSpec toolbarSpec;
     private TextureImpl textureBegin;
     private TextureImpl textureInner;
     private TextureImpl textureEnd;
-    private final ButtonList buttonList;
 
     public ThemeToolbar(Enum enumId, Theme theme, Button... buttons)
     {
@@ -39,7 +39,7 @@ public class ThemeToolbar extends Button
     {
         super(id, 0, 0, "");
         this.buttonList = buttonList;
-        setToggled(false, false);
+        //setToggled(false, false);
         updateTheme(theme);
     }
 
@@ -52,24 +52,24 @@ public class ThemeToolbar extends Button
     public Theme.Container.Toolbar.ToolbarSpec updateTextures()
     {
         Theme.Container.Toolbar.ToolbarSpec toolbarSpec;
-        if(buttonList.isHorizontal())
+        if (buttonList.isHorizontal())
         {
             toolbarSpec = theme.container.toolbar.horizontal;
-            setWidth(toolbarSpec.begin.width + (toolbarSpec.inner.width*buttonList.getVisibleButtonCount()) + toolbarSpec.end.width);
+            setWidth(toolbarSpec.begin.width + (toolbarSpec.inner.width * buttonList.getVisibleButtonCount()) + toolbarSpec.end.width);
             setHeight(toolbarSpec.inner.height);
         }
         else
         {
             toolbarSpec = theme.container.toolbar.vertical;
             setWidth(toolbarSpec.inner.width);
-            setHeight(toolbarSpec.begin.height + (toolbarSpec.inner.height*buttonList.getVisibleButtonCount()) + toolbarSpec.end.height);
+            setHeight(toolbarSpec.begin.height + (toolbarSpec.inner.height * buttonList.getVisibleButtonCount()) + toolbarSpec.end.height);
         }
 
-        if(this.toolbarSpec==null || toolbarSpec!=this.toolbarSpec)
+        if (this.toolbarSpec == null || toolbarSpec != this.toolbarSpec)
         {
             this.toolbarSpec = toolbarSpec;
 
-            if(toolbarSpec.useThemeImages)
+            if (toolbarSpec.useThemeImages)
             {
                 String pathPattern = "container/" + toolbarSpec.prefix + "toolbar_%s.png";
                 TextureCache tc = TextureCache.instance();
@@ -89,9 +89,9 @@ public class ThemeToolbar extends Button
         boolean isHorizontal = buttonList.isHorizontal();
 
         int drawX, drawY;
-        if(isHorizontal)
+        if (isHorizontal)
         {
-            drawX = buttonList.getLeftX() - ((width-buttonList.getWidth(toolbarSpec.padding)) / 2);
+            drawX = buttonList.getLeftX() - ((width - buttonList.getWidth(toolbarSpec.padding)) / 2);
             drawY = buttonList.getTopY() - ((height - theme.control.button.height) / 2);
         }
         else
@@ -125,7 +125,7 @@ public class ThemeToolbar extends Button
 
     public int getVMargin()
     {
-        if(buttonList.isHorizontal())
+        if (buttonList.isHorizontal())
         {
             int heightDiff = (toolbarSpec.inner.height - theme.control.button.height) / 2;
             return heightDiff + toolbarSpec.margin;
@@ -138,7 +138,7 @@ public class ThemeToolbar extends Button
 
     public int getHMargin()
     {
-        if(buttonList.isHorizontal())
+        if (buttonList.isHorizontal())
         {
             return toolbarSpec.begin.width + toolbarSpec.margin;
         }
@@ -152,7 +152,7 @@ public class ThemeToolbar extends Button
     public void setDrawToolbar(boolean draw)
     {
         super.setDrawButton(draw);
-        for(Button button : buttonList)
+        for (Button button : buttonList)
         {
             button.setDrawButton(draw);
         }
@@ -161,20 +161,23 @@ public class ThemeToolbar extends Button
     @Override
     public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
     {
-        if(!visible) return;
+        if (!visible)
+        {
+            return;
+        }
 
         boolean isHorizontal = buttonList.isHorizontal();
 
         double drawX = getX();
         double drawY = getY();
 
-        if(!toolbarSpec.useThemeImages)
+        if (!toolbarSpec.useThemeImages)
         {
             return;
         }
 
         // Draw self
-        if(visible)
+        if (visible)
         {
             float scale = 1f;
 

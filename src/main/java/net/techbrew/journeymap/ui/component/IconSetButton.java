@@ -74,8 +74,7 @@ public class IconSetButton extends Button
         return maxWidth + 12;
     }
 
-    @Override
-    public void toggle()
+    public void nextValue()
     {
         int index = validNames.indexOf(valueHolder.get()) + 1;
 

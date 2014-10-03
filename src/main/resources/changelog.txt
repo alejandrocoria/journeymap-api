@@ -13,9 +13,11 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 - Change: Pressing "O" in the Fullscreen map will open the Options Manager
-- Change: Options with sliders or enumerated values will now start on a new row after the boolean options, provided a new row was going to be needed for the remaining options anyway
+- Change: Closing the Options Manager now only resets what actually needs to be reset.
+- Change: Added a "Preview Minimap" checkbox to the bottom of the Options Manager
+- Change: Options with sliders or enumerated values will now start on a new row if they can't all fit in the last row.
 - Change: Options with boolean values now drawn with a check instead of an X
-- Change: Options with int values can now be adjusted using the arrow keys when the option has focus
+- Change: Options with int values can now be adjusted using the arrow keys when the option has focus. Since this may often be necessary, the tooltips remind you as well.
 - Change: Options with enumerated values can also be adjusted using the arrow keys when the option has focus
 - Change: Options with boolean values can be toggled using the spacebar when the option has focus
 - Bugfix: Options didn't take immediate effect if Escape key used instead of Close button.

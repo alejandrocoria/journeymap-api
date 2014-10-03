@@ -58,7 +58,7 @@ import java.io.File;
  * @author Mark Woodman
  */
 @SideOnly(Side.CLIENT)
-@Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = JourneyMap.JM_VERSION, guiFactory = "net.techbrew.journeymap.ui.config.ConfigManagerFactory")
+@Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = JourneyMap.JM_VERSION)
 public class JourneyMap
 {
     public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
@@ -403,6 +403,7 @@ public class JourneyMap
         loadConfigProperties();
         JMLogger.setLevelFromProperties();
         DataCache.instance().purge();
+        DataCache.instance().resetBlockMetadata();
         RegionImageCache.getInstance().flushToDisk();
         RegionImageCache.getInstance().clear();
         UIManager.getInstance().reset();

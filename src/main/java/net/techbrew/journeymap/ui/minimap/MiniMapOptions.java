@@ -24,9 +24,10 @@ import java.util.ArrayList;
 
 public class MiniMapOptions extends JmUI
 {
-    private Button buttonPosition, buttonShape, buttonFontSize, buttonTextureSize, buttonUnicode, buttonMiniMap, buttonKeyboard;
-    private Button buttonKeyboardHelp, buttonShowSelf, buttonShowfps, buttonGeneralDisplay, buttonClose, buttonCloseAll;
-    private Button buttonShowLocation, buttonShowBiome, buttonCompass, buttonCompassFont, buttonReticle;
+    private Button buttonPosition, buttonShape, buttonKeyboardHelp, buttonGeneralDisplay, buttonClose, buttonCloseAll;
+    private ToggleButton buttonFontSize, buttonTextureSize, buttonUnicode, buttonMiniMap, buttonKeyboard;
+    private ToggleButton buttonShowSelf, buttonShowfps;
+    private ToggleButton buttonShowLocation, buttonShowBiome, buttonCompass, buttonCompassFont, buttonReticle;
     private IconSetButton buttonIconSet;
     private EnumPropertyButton<Orientation> buttonOrientation;
     private EnumPropertyButton<ReticleOrientation> buttonReticleOrientation;
@@ -61,7 +62,7 @@ public class MiniMapOptions extends JmUI
         String off = Constants.getString("jm.common.off");
 
         boolean minimapOn = miniMapProperties.enabled.get();
-        buttonMiniMap = new Button(ButtonEnum.MiniMap,
+        buttonMiniMap = new ToggleButton(ButtonEnum.MiniMap,
                 Constants.getString("jm.minimap.enable_minimap", on),
                 Constants.getString("jm.minimap.enable_minimap", off),
                 minimapOn); //$NON-NLS-1$  //$NON-NLS-2$
@@ -77,7 +78,7 @@ public class MiniMapOptions extends JmUI
         setShape(shape);
         buttonShape.setEnabled(false);
 
-        buttonFontSize = new Button(ButtonEnum.Font,
+        buttonFontSize = new ToggleButton(ButtonEnum.Font,
                 Constants.getString("jm.common.font", Constants.getString("jm.common.font_small")),
                 Constants.getString("jm.common.font", Constants.getString("jm.common.font_large")),
                 (miniMapProperties.fontSmall.get()));
@@ -92,7 +93,7 @@ public class MiniMapOptions extends JmUI
         buttonShowSelf.setEnabled(minimapOn);
 
         boolean showHotKeys = miniMapProperties.enableHotkeys.get();
-        buttonKeyboard = new Button(ButtonEnum.Keyboard,
+        buttonKeyboard = new ToggleButton(ButtonEnum.Keyboard,
                 Constants.getString("jm.minimap.hotkeys", on),
                 Constants.getString("jm.minimap.hotkeys", off), showHotKeys);
         buttonKeyboard.setEnabled(minimapOn);
@@ -101,13 +102,13 @@ public class MiniMapOptions extends JmUI
                 Constants.getString("jm.common.hotkeys_button"));
 
         boolean isShowFps = miniMapProperties.showFps.get();
-        buttonShowfps = new Button(ButtonEnum.Showfps,
+        buttonShowfps = new ToggleButton(ButtonEnum.Showfps,
                 Constants.getString("jm.minimap.show_fps", on),
                 Constants.getString("jm.minimap.show_fps", off), isShowFps);
         buttonShowfps.setEnabled(minimapOn);
 
         boolean forceUnicode = miniMapProperties.forceUnicode.get();
-        buttonUnicode = new Button(ButtonEnum.Unicode,
+        buttonUnicode = new ToggleButton(ButtonEnum.Unicode,
                 Constants.getString("jm.minimap.force_unicode", on),
                 Constants.getString("jm.minimap.force_unicode", off), forceUnicode);
 
@@ -333,7 +334,7 @@ public class MiniMapOptions extends JmUI
 
             case IconSet:
             {
-                buttonIconSet.toggle();
+                buttonIconSet.nextValue();
                 miniMap.forceRefreshState();
                 break;
             }

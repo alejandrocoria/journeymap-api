@@ -340,13 +340,15 @@ public class GeneralDisplayOptions extends JmUI
     @Override
     protected void actionPerformed(GuiButton button)
     {
-        if (button instanceof BooleanPropertyButton || button instanceof IconSetButton || button instanceof ThemeButton)
+        if (button instanceof ToggleButton || button instanceof IconSetButton)
         {
-            ((Button) button).toggle();
-
             if (button == themeExampleButton)
             {
-                buttonTheme.toggle();
+                buttonTheme.nextValue();
+            }
+            else
+            {
+                ((ToggleButton) button).toggle();
             }
 
             if (button == buttonTheme || button == themeExampleButton)

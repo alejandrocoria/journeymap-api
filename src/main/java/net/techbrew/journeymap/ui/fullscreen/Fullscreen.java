@@ -35,10 +35,10 @@ import net.techbrew.journeymap.render.map.GridRenderer;
 import net.techbrew.journeymap.render.map.TileCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.ui.UIManager;
-import net.techbrew.journeymap.ui.component.BooleanPropertyAdapter;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.ButtonList;
 import net.techbrew.journeymap.ui.component.JmUI;
+import net.techbrew.journeymap.ui.component.ToggleButton;
 import net.techbrew.journeymap.ui.fullscreen.layer.LayerDelegate;
 import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemeButton;
@@ -51,7 +51,7 @@ import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Displays the map as a full-screen overlay in-game.
@@ -143,7 +143,7 @@ public class Fullscreen extends JmUI
 
             layoutButtons();
 
-            ArrayList<String> tooltip = null;
+            List<String> tooltip = null;
 
             if (firstLayoutPass)
             {
@@ -202,9 +202,9 @@ public class Fullscreen extends JmUI
             return;
         }
 
-        if (guibutton instanceof Button)
+        if (guibutton instanceof ToggleButton)
         {
-            ((Button) guibutton).toggle();
+            ((ToggleButton) guibutton).toggle();
         }
 
         if (optionsToolbar.contains(guibutton))
@@ -254,12 +254,12 @@ public class Fullscreen extends JmUI
             statusBackgroundAlpha = theme.fullscreen.statusLabel.backgroundAlpha;
 
             // Day Toggle
-            buttonDay = new ThemeToggle(id++, theme, Constants.getString("jm.fullscreen.map_day"), "day");
+            buttonDay = new ThemeToggle(id++, theme, "jm.fullscreen.map_day", "day", null, null);
             buttonDay.setToggled(mapType == Constants.MapType.day, false);
-            buttonDay.addToggleListener(new Button.ToggleListener()
+            buttonDay.addToggleListener(new ToggleButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(Button button, boolean toggled)
+                public boolean onToggle(ToggleButton button, boolean toggled)
                 {
                     if (toggled)
                     {
@@ -280,12 +280,12 @@ public class Fullscreen extends JmUI
             });
 
             // Night Toggle
-            buttonNight = new ThemeToggle(id++, theme, Constants.getString("jm.fullscreen.map_night"), "night");
+            buttonNight = new ThemeToggle(id++, theme, "jm.fullscreen.map_night", "night");
             buttonNight.setToggled(mapType == Constants.MapType.night, false);
-            buttonNight.addToggleListener(new Button.ToggleListener()
+            buttonNight.addToggleListener(new ToggleButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(Button button, boolean toggled)
+                public boolean onToggle(ToggleButton button, boolean toggled)
                 {
                     if (toggled)
                     {
@@ -306,26 +306,24 @@ public class Fullscreen extends JmUI
             });
 
             // Caves Toggle
-            buttonCaves = new ThemeToggle(id++, theme, Constants.getString("jm.fullscreen.map_caves"), "caves");
+            buttonCaves = new ThemeToggle(id++, theme, "jm.fullscreen.map_caves", "caves", fullMapProperties, fullMapProperties.showCaves);
             buttonCaves.setDrawButton(state.isCaveMappingAllowed());
-            buttonCaves.addToggleListener(new Button.ToggleListener()
+            buttonCaves.addToggleListener(new ToggleButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(Button button, boolean toggled)
+                public boolean onToggle(ToggleButton button, boolean toggled)
                 {
-                    fullMapProperties.showCaves.set(toggled);
-                    fullMapProperties.save();
                     state.requireRefresh();
                     return true;
                 }
             });
 
             // Follow
-            buttonFollow = new ThemeButton(id++, theme, Constants.getString("jm.fullscreen.follow"), "follow");
-            buttonFollow.addToggleListener(new Button.ToggleListener()
+            buttonFollow = new ThemeButton(id++, theme, "jm.fullscreen.follow", "follow");
+            buttonFollow.addToggleListener(new ToggleButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(Button button, boolean toggled)
+                public boolean onToggle(ToggleButton button, boolean toggled)
                 {
                     toggleFollow();
                     return true;
@@ -333,12 +331,12 @@ public class Fullscreen extends JmUI
             });
 
             // Zoom In
-            buttonZoomIn = new ThemeButton(id++, theme, Constants.getString("jm.fullscreen.zoom_in"), "zoomin");
+            buttonZoomIn = new ThemeButton(id++, theme, "jm.fullscreen.zoom_in", "zoomin");
             buttonZoomIn.setEnabled(fullMapProperties.zoomLevel.get() < state.maxZoom);
-            buttonZoomIn.addToggleListener(new Button.ToggleListener()
+            buttonZoomIn.addToggleListener(new ToggleButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(Button button, boolean toggled)
+                public boolean onToggle(ToggleButton button, boolean toggled)
                 {
                     zoomIn();
                     return true;
@@ -346,12 +344,12 @@ public class Fullscreen extends JmUI
             });
 
             // Zoom Out
-            buttonZoomOut = new ThemeButton(id++, theme, Constants.getString("jm.fullscreen.zoom_out"), "zoomout");
+            buttonZoomOut = new ThemeButton(id++, theme, "jm.fullscreen.zoom_out", "zoomout");
             buttonZoomOut.setEnabled(fullMapProperties.zoomLevel.get() > state.minZoom);
-            buttonZoomOut.addToggleListener(new Button.ToggleListener()
+            buttonZoomOut.addToggleListener(new ToggleButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(Button button, boolean toggled)
+                public boolean onToggle(ToggleButton button, boolean toggled)
                 {
                     zoomOut();
                     return true;
@@ -359,12 +357,12 @@ public class Fullscreen extends JmUI
             });
 
             // Waypoints
-            buttonWaypointManager = new ThemeButton(id++, theme, Constants.getString("jm.waypoint.waypoints"), "waypoints");
+            buttonWaypointManager = new ThemeButton(id++, theme, "jm.waypoint.waypoints", "waypoints");
             buttonWaypointManager.setDrawButton(WaypointsData.isManagerEnabled());
-            buttonWaypointManager.addToggleListener(new Button.ToggleListener()
+            buttonWaypointManager.addToggleListener(new ToggleButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(Button button, boolean toggled)
+                public boolean onToggle(ToggleButton button, boolean toggled)
                 {
                     UIManager.getInstance().openWaypointManager(null, Fullscreen.class);
                     return true;
@@ -372,11 +370,11 @@ public class Fullscreen extends JmUI
             });
 
             // Options
-            buttonOptions = new ThemeButton(id++, theme, Constants.getString("jm.common.options"), "options");
-            buttonOptions.addToggleListener(new Button.ToggleListener()
+            buttonOptions = new ThemeButton(id++, theme, "jm.common.options", "options");
+            buttonOptions.addToggleListener(new ToggleButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(Button button, boolean toggled)
+                public boolean onToggle(ToggleButton button, boolean toggled)
                 {
                     try
                     {
@@ -392,11 +390,11 @@ public class Fullscreen extends JmUI
             });
 
             // Actions
-            buttonActions = new ThemeButton(id++, theme, Constants.getString("jm.common.actions"), "actions");
-            buttonActions.addToggleListener(new Button.ToggleListener()
+            buttonActions = new ThemeButton(id++, theme, "jm.common.actions", "actions");
+            buttonActions.addToggleListener(new ToggleButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(Button button, boolean toggled)
+                public boolean onToggle(ToggleButton button, boolean toggled)
                 {
                     UIManager.getInstance().openMapActions();
                     return true;
@@ -404,13 +402,13 @@ public class Fullscreen extends JmUI
             });
 
             // Alert
-            buttonAlert = new ThemeToggle(id++, theme, Constants.getString("jm.common.update_available"), "alert");
+            buttonAlert = new ThemeToggle(id++, theme, "jm.common.update_available", "alert");
             buttonAlert.setDrawButton(VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent());
             buttonAlert.setToggled(true);
-            buttonAlert.addToggleListener(new Button.ToggleListener()
+            buttonAlert.addToggleListener(new ToggleButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(Button button, boolean toggled)
+                public boolean onToggle(ToggleButton button, boolean toggled)
                 {
                     VersionCheck.launchWebsite();
                     buttonAlert.setDrawButton(false);
@@ -419,39 +417,33 @@ public class Fullscreen extends JmUI
             });
 
             // Close
-            buttonClose = new ThemeButton(id++, theme, Constants.getString("jm.common.close"), "close");
-            buttonClose.addToggleListener(new Button.ToggleListener()
+            buttonClose = new ThemeButton(id++, theme, "jm.common.close", "close");
+            buttonClose.addToggleListener(new ToggleButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(Button button, boolean toggled)
+                public boolean onToggle(ToggleButton button, boolean toggled)
                 {
                     UIManager.getInstance().closeAll();
                     return true;
                 }
             });
 
-            buttonMobs = new ThemeToggle(id++, theme, "", "monsters");
-            buttonMobs.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showMobs), "jm.common.show_mobs");
+            buttonMobs = new ThemeToggle(id++, theme, "jm.common.show_mobs", "monsters", fullMapProperties, fullMapProperties.showMobs);
             buttonMobs.setDrawButton(FeatureManager.isAllowed(Feature.RadarMobs));
 
-            buttonAnimals = new ThemeToggle(id++, theme, "", "animals");
-            buttonAnimals.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showAnimals), "jm.common.show_animals");
+            buttonAnimals = new ThemeToggle(id++, theme, "jm.common.show_animals", "animals", fullMapProperties, fullMapProperties.showAnimals);
             buttonAnimals.setDrawButton(FeatureManager.isAllowed(Feature.RadarAnimals));
 
-            buttonPets = new ThemeToggle(id++, theme, "", "pets");
-            buttonPets.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showPets), "jm.common.show_pets");
+            buttonPets = new ThemeToggle(id++, theme, "jm.common.show_pets", "pets", fullMapProperties, fullMapProperties.showPets);
             buttonPets.setDrawButton(FeatureManager.isAllowed(Feature.RadarAnimals));
 
-            buttonVillagers = new ThemeToggle(id++, theme, "", "villagers");
-            buttonVillagers.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showVillagers), "jm.common.show_villagers");
+            buttonVillagers = new ThemeToggle(id++, theme, "jm.common.show_villagers", "villagers", fullMapProperties, fullMapProperties.showVillagers);
             buttonVillagers.setDrawButton(FeatureManager.isAllowed(Feature.RadarVillagers));
 
-            buttonPlayers = new ThemeToggle(id++, theme, "", "players");
-            buttonPlayers.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showPlayers), "jm.common.show_players");
+            buttonPlayers = new ThemeToggle(id++, theme, "jm.common.show_players", "players", fullMapProperties, fullMapProperties.showPlayers);
             buttonPlayers.setDrawButton(!mc.isSingleplayer() && FeatureManager.isAllowed(Feature.RadarPlayers));
 
-            buttonGrid = new ThemeToggle(id++, theme, "", "grid");
-            buttonGrid.setPropertyAdapter(new BooleanPropertyAdapter(fullMapProperties, fullMapProperties.showGrid), "jm.common.show_grid");
+            buttonGrid = new ThemeToggle(id++, theme, "jm.common.show_grid", "grid", fullMapProperties, fullMapProperties.showGrid);
 
             // Toolbars
             mapTypeToolbar = new ThemeToolbar(id++, theme, buttonCaves, buttonNight, buttonDay);

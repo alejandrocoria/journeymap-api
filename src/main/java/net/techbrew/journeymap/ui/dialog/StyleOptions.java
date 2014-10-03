@@ -55,10 +55,10 @@ public class StyleOptions extends JmUI
         rightButtons.add(BooleanPropertyButton.create(id++, "jm.common.map_style_plants", core, core.mapPlants));
 
         BooleanPropertyButton buttonMapPlantShadows = BooleanPropertyButton.create(id++, "jm.common.map_style_plantshadows", core, core.mapPlantShadows);
-        buttonMapPlantShadows.addToggleListener(new Button.ToggleListener()
+        buttonMapPlantShadows.addToggleListener(new ToggleButton.ToggleListener()
         {
             @Override
-            public boolean onToggle(Button button, boolean toggled)
+            public boolean onToggle(ToggleButton button, boolean toggled)
             {
                 refreshBlockMetadata = true;
                 return true;
@@ -97,10 +97,10 @@ public class StyleOptions extends JmUI
 
         final int hgap = 4;
         final int vgap = 3;
-        int by = (this.height - (leftButtons.getHeight(vgap) + buttonClose.getHeight() + (4*vgap)))/2;
+        int by = (this.height - (leftButtons.getHeight(vgap) + buttonClose.getHeight() + (4 * vgap))) / 2;
 
-        leftButtons.layoutVertical((this.width/2)-hgap, by, false, vgap);
-        rightButtons.layoutVertical((this.width/2)+hgap, by, true, vgap);
+        leftButtons.layoutVertical((this.width / 2) - hgap, by, false, vgap);
+        rightButtons.layoutVertical((this.width / 2) + hgap, by, true, vgap);
 
         int closeY = Math.min(height - vgap - buttonClose.getHeight(), leftButtons.getBottomY() + (4 * vgap));
         buttonClose.centerHorizontalOn(width / 2).setY(closeY);
@@ -109,9 +109,9 @@ public class StyleOptions extends JmUI
     @Override
     protected void actionPerformed(GuiButton button)
     {
-        if (button instanceof BooleanPropertyButton || button instanceof IconSetButton)
+        if (button instanceof BooleanPropertyButton)
         {
-            ((Button) button).toggle();
+            ((BooleanPropertyButton) button).toggle();
             refreshChunks = true;
             return;
         }

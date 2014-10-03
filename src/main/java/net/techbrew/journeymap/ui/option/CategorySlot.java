@@ -161,7 +161,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
 
         if (masterSlot != null)
         {
-            boolean enabled = masterSlot.button.getToggled();
+            boolean enabled = masterSlot.button.isActive();
             for (ScrollListPane.ISlot slot : childSlots)
             {
                 slot.setEnabled(enabled);
@@ -225,5 +225,20 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     public void setEnabled(boolean enabled)
     {
 
+    }
+
+    public SlotMetadata getLastPressed()
+    {
+        return null;
+    }
+
+    public boolean contains(SlotMetadata slotMetadata)
+    {
+        return childMetadataList.contains(slotMetadata);
+    }
+
+    public Config.Category getCategory()
+    {
+        return category;
     }
 }

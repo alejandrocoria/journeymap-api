@@ -1,36 +1,28 @@
 package net.techbrew.journeymap.ui.theme;
 
+import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.properties.PropertiesBase;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
- * Created by Mark on 8/30/2014.
+ * Toggle-type button for Theme
  */
 public class ThemeToggle extends ThemeButton
 {
-    public ThemeToggle(Enum enumId, Theme theme, String iconName)
+    public ThemeToggle(int id, Theme theme, String rawlabel, String iconName)
     {
-        super(enumId.ordinal(), theme, "", "", false, iconName);
+        super(id, theme, Constants.getString(rawlabel), Constants.getString(rawlabel), iconName, null, null);
     }
 
-    public ThemeToggle(Enum enumId, Theme theme, String label, String iconName)
+    public ThemeToggle(int id, Theme theme, String rawlabel, String iconName, PropertiesBase properties, AtomicBoolean property)
     {
-        this(enumId.ordinal(), theme, label, label, false, iconName);
-    }
-
-    public ThemeToggle(int id,Theme theme,  String label, String iconName)
-    {
-        this(id, theme, label, label, false, iconName);
-    }
-
-    public ThemeToggle(Enum enumId, Theme theme, String labelOn, String labelOff, boolean toggled, String iconName)
-    {
-        this(enumId.ordinal(), theme, labelOn, labelOff, toggled, iconName);
-    }
-
-    public ThemeToggle(int id, Theme theme, String labelOn, String labelOff, boolean toggled, String iconName)
-    {
-        super(id, theme, labelOn, labelOff, toggled, iconName);
-        setToggled(toggled);
+        super(id, theme, Constants.getString(rawlabel), Constants.getString(rawlabel), iconName, properties, property);
+        if (property != null)
+        {
+            setToggled(property.get());
+        }
     }
 
     @Override
@@ -48,7 +40,7 @@ public class ThemeToggle extends ThemeButton
     @Override
     protected TextureImpl getActiveTexture(boolean isMouseOver)
     {
-        if(isEnabled())
+        if (isEnabled())
         {
             TextureImpl activeTexture = this.toggled ? textureOn : textureOff;
             return activeTexture;

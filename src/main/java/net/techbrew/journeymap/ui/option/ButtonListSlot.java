@@ -24,6 +24,7 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     FontRenderer fontRenderer = mc.fontRenderer;
     ButtonList buttons = new ButtonList();
     HashMap<Button, SlotMetadata> buttonOptionMetadata = new HashMap<Button, SlotMetadata>();
+    SlotMetadata lastPressed = null;
 
     public ButtonListSlot()
     {
@@ -89,6 +90,7 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
         {
             if (button.mousePressed(mc, x, y))
             {
+                lastPressed = buttonOptionMetadata.get(button);
                 return true;
             }
         }
@@ -148,11 +150,22 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
         return Collections.EMPTY_LIST;
     }
 
+    public SlotMetadata getLastPressed()
+    {
+        return lastPressed;
+    }
+
     @Override
     public int getColumnWidth()
     {
         buttons.equalizeWidths(fontRenderer);
         return buttons.get(0).getWidth();
+    }
+
+    @Override
+    public boolean contains(SlotMetadata slotMetadata)
+    {
+        return buttonOptionMetadata.values().contains(slotMetadata);
     }
 
     protected String getFirstButtonString()

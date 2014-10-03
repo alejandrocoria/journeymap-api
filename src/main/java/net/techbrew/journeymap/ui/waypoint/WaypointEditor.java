@@ -57,7 +57,7 @@ public class WaypointEditor extends JmUI
     String labelB = Constants.getString("jm.waypoint.blue_abbreviated");
     String currentLocation = "";
     private Button buttonRandomize;
-    private Button buttonEnable;
+    private ToggleButton buttonEnable;
     private Button buttonRemove;
     private Button buttonReset;
     private Button buttonSave;
@@ -178,7 +178,7 @@ public class WaypointEditor extends JmUI
 
                 buttonRandomize = new Button(ButtonEnum.Randomize, Constants.getString("jm.waypoint.randomize")); //$NON-NLS-1$
 
-                buttonEnable = new Button(ButtonEnum.Enable, enableOn, enableOff, true); //$NON-NLS-1$
+                buttonEnable = new ToggleButton(ButtonEnum.Enable, enableOn, enableOff, true); //$NON-NLS-1$
                 buttonEnable.setToggled(originalWaypoint.isEnable());
 
                 buttonRemove = new Button(ButtonEnum.Remove, Constants.getString("jm.waypoint.remove")); //$NON-NLS-1$
@@ -679,13 +679,13 @@ public class WaypointEditor extends JmUI
         Randomize, Enable, Remove, Reset, Save, Close
     }
 
-    class DimensionButton extends Button
+    class DimensionButton extends ToggleButton
     {
         public final int dimension;
 
         DimensionButton(int id, int dimension, String dimensionName, boolean toggled)
         {
-            super(id, 0, 0, String.format("%s: %s", dimensionName, Constants.getString("jm.common.on")), String.format("%s: %s", dimensionName, Constants.getString("jm.common.off")), toggled);
+            super(id, String.format("%s: %s", dimensionName, Constants.getString("jm.common.on")), String.format("%s: %s", dimensionName, Constants.getString("jm.common.off")), toggled);
             this.dimension = dimension;
             setToggled(toggled);
         }

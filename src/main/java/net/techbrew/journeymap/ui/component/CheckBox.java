@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Based on GuiCheckBox
  */
-public class CheckBox extends Button
+public class CheckBox extends ToggleButton
 {
     public int boxWidth = 11;
     AtomicBoolean property;
@@ -28,7 +28,7 @@ public class CheckBox extends Button
 
     public CheckBox(int id, String displayString, boolean checked)
     {
-        super(id, displayString);
+        super(id, displayString, displayString, checked);
         this.toggled = checked;
         FontRenderer fr = FMLClientHandler.instance().getClient().fontRenderer;
         this.height = fr.FONT_HEIGHT + 2;

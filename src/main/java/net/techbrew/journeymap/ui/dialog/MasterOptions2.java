@@ -11,19 +11,18 @@ package net.techbrew.journeymap.ui.dialog;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.properties.Config;
+import net.techbrew.journeymap.task.MapPlayerTask;
 import net.techbrew.journeymap.ui.UIManager;
-import net.techbrew.journeymap.ui.component.Button;
-import net.techbrew.journeymap.ui.component.JmUI;
-import net.techbrew.journeymap.ui.component.ScrollListPane;
+import net.techbrew.journeymap.ui.component.*;
+import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
+import net.techbrew.journeymap.ui.option.CategorySlot;
 import net.techbrew.journeymap.ui.option.OptionSlotFactory;
 import net.techbrew.journeymap.ui.option.SlotMetadata;
+import net.techbrew.journeymap.waypoint.WaypointStore;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Master options UI
@@ -34,6 +33,9 @@ public class MasterOptions2 extends JmUI
     ScrollListPane optionsListPane;
     List<ScrollListPane.ISlot> optionSlots;
     Map<Config.Category, List<SlotMetadata>> toolbars;
+    EnumSet<Config.Category> changedCategories = EnumSet.noneOf(Config.Category.class);
+
+    MinimapPreviewButton minimapPreviewButton;
 
     public MasterOptions2()
     {
@@ -58,7 +60,21 @@ public class MasterOptions2 extends JmUI
 
         buttonClose = new Button(0, Constants.getString("jm.common.close"));
         buttonClose.setWidth(150);
+
+        String name = Constants.getString("jm.minimap.preview");
+        String tooltip = Constants.getString("jm.minimap.preview.tooltip");
+        minimapPreviewButton = new MinimapPreviewButton(name);
+        minimapPreviewButton.setTooltip(tooltip);
+
         buttonList.add(buttonClose);
+        buttonList.add(buttonClose);
+        buttonList.add(minimapPreviewButton);
+
+        ButtonList bottomRow = new ButtonList(buttonList);
+        bottomRow.equalizeWidths(getFontRenderer());
+
+        bottomRow.layoutCenteredHorizontal(width / 2, height - 25, true, 4);
+        minimapPreviewButton.setY(minimapPreviewButton.getY() + 4);
     }
 
     @Override
@@ -68,13 +84,6 @@ public class MasterOptions2 extends JmUI
         {
             initGui();
         }
-
-        final int hgap = 4;
-        final int vgap = (getFontRenderer().FONT_HEIGHT * 2) + 4;
-
-
-        // Close
-        buttonClose.centerHorizontalOn(width / 2).setY(height - 25);
     }
 
     @Override
@@ -106,6 +115,8 @@ public class MasterOptions2 extends JmUI
                 slotMetadata.getButton().secondaryDrawButton();
             }
         }
+
+        minimapPreviewButton.secondaryDrawButton();
     }
 
     @Override
@@ -118,7 +129,26 @@ public class MasterOptions2 extends JmUI
     protected void mouseClicked(int mouseX, int mouseY, int mouseEvent)
     {
         super.mouseClicked(mouseX, mouseY, mouseEvent);
-        optionsListPane.mousePressed(mouseX, mouseY, mouseEvent);
+        boolean pressed = optionsListPane.mousePressed(mouseX, mouseY, mouseEvent);
+        if (pressed)
+        {
+            CategorySlot categorySlot = (CategorySlot) optionsListPane.getLastPressedParentSlot();
+            if (categorySlot != null)
+            {
+                Config.Category category = categorySlot.getCategory();
+                changedCategories.add(category);
+            }
+
+            SlotMetadata slotMetadata = optionsListPane.getLastPressed();
+            if (slotMetadata != null)
+            {
+                Button button = slotMetadata.getButton();
+//                if(minimapPreviewButton == button)
+//                {
+//                    minimapPreviewButton.toggle();
+//                }
+            }
+        }
     }
 
     @Override
@@ -142,6 +172,11 @@ public class MasterOptions2 extends JmUI
             closeAndReturn();
             return;
         }
+
+        if (button == minimapPreviewButton)
+        {
+            //minimapPreviewButton.toggle();
+        }
     }
 
     @Override
@@ -154,7 +189,45 @@ public class MasterOptions2 extends JmUI
     @Override
     protected void closeAndReturn()
     {
-        JourneyMap.getInstance().softReset();
+        for (Config.Category category : changedCategories)
+        {
+            switch (category)
+            {
+                case MiniMap:
+                {
+                    UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+                    break;
+                }
+                case FullMap:
+                {
+                    Fullscreen.reset();
+                    break;
+                }
+                case WebMap:
+                {
+                    break;
+                }
+                case Waypoint:
+                {
+                    WaypointStore.instance().reset();
+                }
+                case WaypointBeacon:
+                {
+                    break;
+                }
+                case Cartography:
+                {
+                    MapPlayerTask.forceNearbyRemap();
+                    break;
+                }
+                case Advanced:
+                {
+                    DataCache.instance().purge();
+                    break;
+                }
+            }
+        }
+
         if (returnClass == null)
         {
             UIManager.getInstance().openMap();
@@ -169,22 +242,23 @@ public class MasterOptions2 extends JmUI
     {
         if (toolbars == null)
         {
-            String name = Constants.getString("jm.minimap.preview");
-            String tooltip = Constants.getString("jm.minimap.preview.tooltip");
-            MinimapPreviewButton minimapPreviewButton = new MinimapPreviewButton(name);
-            SlotMetadata toolbarSlotMetadata = new SlotMetadata(minimapPreviewButton, name, tooltip);
-
-            this.toolbars = new HashMap<Config.Category, List<SlotMetadata>>();
-            toolbars.put(Config.Category.MiniMap, Arrays.asList(toolbarSlotMetadata));
+            toolbars = Collections.EMPTY_MAP;
+//            String name = Constants.getString("jm.minimap.preview");
+//            String tooltip = Constants.getString("jm.minimap.preview.tooltip");
+//            minimapPreviewButton = new MinimapPreviewButton(name);
+//            SlotMetadata toolbarSlotMetadata = new SlotMetadata(minimapPreviewButton, name, tooltip);
+//
+//            this.toolbars = new HashMap<Config.Category, List<SlotMetadata>>();
+//            toolbars.put(Config.Category.MiniMap, Arrays.asList(toolbarSlotMetadata));
         }
         return toolbars;
     }
 
-    static class MinimapPreviewButton extends Button
+    static class MinimapPreviewButton extends CheckBox
     {
         public MinimapPreviewButton(String label)
         {
-            super(0, label);
+            super(0, label, false);
         }
 
         /**
@@ -193,7 +267,7 @@ public class MasterOptions2 extends JmUI
         @Override
         public void secondaryDrawButton()
         {
-            if (this.field_146123_n)
+            if (this.toggled)
             {
                 RenderHelper.enableStandardItemLighting();
                 UIManager.getInstance().getMiniMap().drawMap();
