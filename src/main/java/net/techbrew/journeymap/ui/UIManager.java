@@ -21,11 +21,13 @@ import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.Config;
 import net.techbrew.journeymap.render.map.TileCache;
 import net.techbrew.journeymap.ui.component.JmUI;
-import net.techbrew.journeymap.ui.dialog.*;
+import net.techbrew.journeymap.ui.dialog.FullscreenActions;
+import net.techbrew.journeymap.ui.dialog.FullscreenHotkeysHelp;
+import net.techbrew.journeymap.ui.dialog.OptionsManager;
+import net.techbrew.journeymap.ui.dialog.StyleOptions;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import net.techbrew.journeymap.ui.minimap.MiniMap;
 import net.techbrew.journeymap.ui.minimap.MiniMapHotkeysHelp;
-import net.techbrew.journeymap.ui.minimap.MiniMapOptions;
 import net.techbrew.journeymap.ui.waypoint.WaypointEditor;
 import net.techbrew.journeymap.ui.waypoint.WaypointHelp;
 import net.techbrew.journeymap.ui.waypoint.WaypointManager;
@@ -144,7 +146,7 @@ public class UIManager
             if (JourneyMap.getMiniMapProperties().enabled.get())
             {
                 final GuiScreen currentScreen = minecraft.currentScreen;
-                final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat || currentScreen instanceof MiniMapOptions;
+                final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat;
                 if (doDraw)
                 {
                     miniMap.drawMap();
@@ -190,11 +192,6 @@ public class UIManager
         open(FullscreenHotkeysHelp.class, returnClass);
     }
 
-    public void openMiniMapOptions(Class<? extends JmUI> returnClass)
-    {
-        open(MiniMapOptions.class, returnClass);
-    }
-
     public void openMiniMapHotkeyHelp(Class<? extends JmUI> returnClass)
     {
         open(MiniMapHotkeysHelp.class, returnClass);
@@ -205,11 +202,6 @@ public class UIManager
         open(WaypointOptions.class, returnClass);
     }
 
-    public void openGeneralDisplayOptions(Class<? extends JmUI> returnClass)
-    {
-        open(GeneralDisplayOptions.class, returnClass);
-    }
-
     public void openStyleOptions(Class<? extends JmUI> returnClass)
     {
         open(StyleOptions.class, returnClass);
@@ -217,14 +209,14 @@ public class UIManager
 
     public void openMasterOptions()
     {
-        open(MasterOptions2.class);
+        open(OptionsManager.class);
     }
 
     public void openMasterOptions(Class<? extends JmUI> returnClass, Config.Category... initialCategories)
     {
         try
         {
-            open(new MasterOptions2(returnClass, initialCategories));
+            open(new OptionsManager(returnClass, initialCategories));
         }
         catch (Throwable e)
         {

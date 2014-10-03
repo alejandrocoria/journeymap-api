@@ -15,7 +15,7 @@ import net.techbrew.journeymap.forgehandler.KeyEventHandler;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.JmUI;
-import net.techbrew.journeymap.ui.dialog.MasterOptions;
+import net.techbrew.journeymap.ui.dialog.OptionsManager;
 
 import java.awt.*;
 
@@ -31,7 +31,7 @@ public class MiniMapHotkeysHelp extends JmUI
 
     public MiniMapHotkeysHelp()
     {
-        this(MasterOptions.class);
+        this(OptionsManager.class);
     }
 
     public MiniMapHotkeysHelp(Class<? extends JmUI> returnClass)

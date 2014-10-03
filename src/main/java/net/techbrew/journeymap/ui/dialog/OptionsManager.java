@@ -29,7 +29,7 @@ import java.util.*;
 /**
  * Master options UI
  */
-public class MasterOptions2 extends JmUI
+public class OptionsManager extends JmUI
 {
     protected Config.Category[] initialCategories;
     protected CheckBox minimapPreviewButton;
@@ -38,17 +38,17 @@ public class MasterOptions2 extends JmUI
     protected Map<Config.Category, List<SlotMetadata>> toolbars;
     protected EnumSet<Config.Category> changedCategories = EnumSet.noneOf(Config.Category.class);
 
-    public MasterOptions2()
+    public OptionsManager()
     {
         this(null, null);
     }
 
-    public MasterOptions2(Class<? extends JmUI> returnClass)
+    public OptionsManager(Class<? extends JmUI> returnClass)
     {
         this(returnClass, null);
     }
 
-    public MasterOptions2(Class<? extends JmUI> returnClass, Config.Category... initialCategories)
+    public OptionsManager(Class<? extends JmUI> returnClass, Config.Category... initialCategories)
     {
         super("JourneyMap " + Constants.getString("jm.common.options"), returnClass);
         this.initialCategories = initialCategories;
