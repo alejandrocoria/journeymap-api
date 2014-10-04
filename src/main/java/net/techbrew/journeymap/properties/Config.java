@@ -36,6 +36,7 @@ public @interface Config
     {
         Inherit(""),
         MiniMap("jm.config.category.minimap"),
+        MiniMap2("jm.config.category.minimap2"),
         FullMap("jm.config.category.fullmap"),
         WebMap("jm.config.category.webmap"),
         Radar("jm.config.category.radar"),

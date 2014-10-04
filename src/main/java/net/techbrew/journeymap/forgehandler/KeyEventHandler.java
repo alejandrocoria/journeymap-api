@@ -82,7 +82,8 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 }
                 else if (Constants.isPressed(Constants.KB_MINIMAP_POS))
                 {
-                    UIManager.getInstance().getMiniMap().nextPosition();
+                    JourneyMap.toggleMiniMapPreset();
+                    UIManager.getInstance().resetMinimap();
                     return true;
                 }
                 else if (controlDown && Constants.isPressed(Constants.KB_WAYPOINT))

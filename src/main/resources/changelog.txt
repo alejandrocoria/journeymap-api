@@ -12,13 +12,15 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New Feature: MiniMap Presets.  You can now toggle between two completely unique Minimap configurations using the \ key in-game.  Options Manager has settings for both.
 - Bugfix: Options Manager / Minimap / Slider controls didn't take effect while dragging
 - Change: Minimap opacity and Frame opacity are now drawn using a completely different alpha technique, but the net result is the same.
 - Change: Options for Minimap Opacity and Frame Opacity are now 1-100 expressed as a percentage.
 - Bugfix: Changing the UI Theme option no longer makes the previewed minimap go all derpy
+- Bugfix: Options Manager preview of MiniMap was so dark, it made Batman movies feel like My Little Ponies
 
 
-## Changelog for JourneyMap 5.0.0a2:
+## Changelog for JourneyMap 5.0.0a3:
 - Change: Pressing "O" in the Fullscreen map will open the Options Manager
 - Change: Closing the Options Manager now only resets what actually needs to be reset.
 - Change: Added a "Preview Minimap" checkbox to the bottom of the Options Manager.  Minimap's Hotkeys will also function when the preview is enabled.

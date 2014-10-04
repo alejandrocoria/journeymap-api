@@ -271,6 +271,11 @@ public class UIManager
         Fullscreen.reset();
         TileCache.instance().invalidateAll();
         TileCache.instance().cleanUp();
+        resetMinimap();
+    }
+
+    public void resetMinimap()
+    {
         if (this.miniMap != null)
         {
             this.miniMap.reset();

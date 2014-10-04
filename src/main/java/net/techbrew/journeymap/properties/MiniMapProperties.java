@@ -8,6 +8,7 @@
 
 package net.techbrew.journeymap.properties;
 
+import com.google.common.base.Objects;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.ui.minimap.Orientation;
 import net.techbrew.journeymap.ui.minimap.Position;
@@ -18,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static net.techbrew.journeymap.properties.Config.Category.MiniMap;
+import static net.techbrew.journeymap.properties.Config.Category.Inherit;
 
 /**
  * Properties for the minimap in-game.
@@ -27,60 +28,66 @@ public class MiniMapProperties extends InGameMapProperties
 {
     protected transient static final int CODE_REVISION = 7;
 
-    @Config(category = MiniMap, master = true, key = "jm.minimap.enable_minimap")
+    @Config(category = Inherit, master = true, key = "jm.minimap.enable_minimap")
     public final AtomicBoolean enabled = new AtomicBoolean(true);
 
-    @Config(category = MiniMap, key = "jm.minimap.shape", defaultEnum = "Circle")
+    @Config(category = Inherit, key = "jm.minimap.shape", defaultEnum = "Circle")
     public final AtomicReference<Shape> shape = new AtomicReference<Shape>(Shape.Circle);
 
-    @Config(category = MiniMap, key = "jm.minimap.position", defaultEnum = "TopRight")
+    @Config(category = Inherit, key = "jm.minimap.position", defaultEnum = "TopRight")
     public final AtomicReference<Position> position = new AtomicReference<Position>(Position.TopRight);
 
-    @Config(category = MiniMap, key = "jm.minimap.show_fps", defaultBoolean = false)
+    @Config(category = Inherit, key = "jm.minimap.show_fps", defaultBoolean = false)
     public final AtomicBoolean showFps = new AtomicBoolean(false);
 
-    @Config(category = MiniMap, key = "jm.minimap.show_biome")
+    @Config(category = Inherit, key = "jm.minimap.show_biome")
     public final AtomicBoolean showBiome = new AtomicBoolean(true);
 
-    @Config(category = MiniMap, key = "jm.minimap.show_location")
+    @Config(category = Inherit, key = "jm.minimap.show_location")
     public final AtomicBoolean showLocation = new AtomicBoolean(true);
 
-    @Config(category = MiniMap, key = "jm.minimap.hotkeys")
+    @Config(category = Inherit, key = "jm.minimap.hotkeys")
     public final AtomicBoolean enableHotkeys = new AtomicBoolean(true);
 
-    @Config(category = MiniMap, key = "jm.minimap.show_waypointlabels")
+    @Config(category = Inherit, key = "jm.minimap.show_waypointlabels")
     public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
 
-    @Config(category = MiniMap, key = "jm.minimap.size", minValue = 128, maxValue = 768, defaultValue = 192)
+    @Config(category = Inherit, key = "jm.minimap.size", minValue = 128, maxValue = 768, defaultValue = 192)
     public final AtomicInteger customSize = new AtomicInteger(192);
 
-    @Config(category = MiniMap, key = "jm.minimap.frame_alpha", minValue = 0, maxValue = 100, defaultValue = 100)
+    @Config(category = Inherit, key = "jm.minimap.frame_alpha", minValue = 0, maxValue = 100, defaultValue = 100)
     public final AtomicInteger frameAlpha = new AtomicInteger(100);
 
-    @Config(category = MiniMap, key = "jm.minimap.terrain_alpha", minValue = 0, maxValue = 100, defaultValue = 100)
+    @Config(category = Inherit, key = "jm.minimap.terrain_alpha", minValue = 0, maxValue = 100, defaultValue = 100)
     public final AtomicInteger terrainAlpha = new AtomicInteger(100);
 
-    @Config(category = MiniMap, key = "jm.minimap.orientation.button", defaultEnum = "North")
+    @Config(category = Inherit, key = "jm.minimap.orientation.button", defaultEnum = "North")
     public final AtomicReference<Orientation> orientation = new AtomicReference<Orientation>(Orientation.North);
 
-    @Config(category = MiniMap, key = "jm.minimap.compass_font")
+    @Config(category = Inherit, key = "jm.minimap.compass_font")
     public final AtomicBoolean compassFontSmall = new AtomicBoolean(true);
 
-    @Config(category = MiniMap, key = "jm.minimap.show_compass")
+    @Config(category = Inherit, key = "jm.minimap.show_compass")
     public final AtomicBoolean showCompass = new AtomicBoolean(true);
 
-    @Config(category = MiniMap, key = "jm.minimap.show_reticle")
+    @Config(category = Inherit, key = "jm.minimap.show_reticle")
     public final AtomicBoolean showReticle = new AtomicBoolean(true);
 
-    @Config(category = MiniMap, key = "jm.minimap.reticle_orientation", defaultEnum = "Compass")
+    @Config(category = Inherit, key = "jm.minimap.reticle_orientation", defaultEnum = "Compass")
     public final AtomicReference<ReticleOrientation> reticleOrientation = new AtomicReference<ReticleOrientation>(ReticleOrientation.Compass);
 
     public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
-
-    protected transient final String name = "minimap";
+    protected transient final String name;
+    protected boolean active = true;
 
     public MiniMapProperties()
     {
+        this("minimap");
+    }
+
+    protected MiniMapProperties(String name)
+    {
+        this.name = name;
     }
 
     @Override
@@ -107,6 +114,16 @@ public class MiniMapProperties extends InGameMapProperties
         return CODE_REVISION;
     }
 
+    public boolean isActive()
+    {
+        return active;
+    }
+
+    public void setActive(boolean active)
+    {
+        this.active = active;
+        save();
+    }
 
     @Override
     protected boolean validate()
@@ -205,25 +222,25 @@ public class MiniMapProperties extends InGameMapProperties
     @Override
     public String toString()
     {
-        return "MiniMapProperties: " +
-                "fileRevision=" + fileRevision +
-                ", showSelf=" + showSelf +
-                ", showMobs=" + showMobs +
-                ", showAnimals=" + showAnimals +
-                ", showVillagers=" + showVillagers +
-                ", showPets=" + showPets +
-                ", showPlayers=" + showPlayers +
-                ", showWaypoints=" + showWaypoints +
-                ", managerEnabled=" + enabled +
-                ", shape=" + shape +
-                ", position=" + position +
-                ", showFps=" + showFps +
-                ", enableHotkeys=" + enableHotkeys +
-                ", showWaypointLabels=" + showWaypointLabels +
-                ", forceUnicode=" + forceUnicode +
-                ", fontSmall=" + fontSmall +
-                ", textureSmall=" + textureSmall +
-                ", terrainAlpha=" + terrainAlpha +
-                ", entityIconSetName=" + entityIconSetName;
+        return Objects.toStringHelper(this)
+                .add("enabled", enabled)
+                .add("shape", shape)
+                .add("position", position)
+                .add("showFps", showFps)
+                .add("showBiome", showBiome)
+                .add("showLocation", showLocation)
+                .add("enableHotkeys", enableHotkeys)
+                .add("showWaypointLabels", showWaypointLabels)
+                .add("customSize", customSize)
+                .add("frameAlpha", frameAlpha)
+                .add("terrainAlpha", terrainAlpha)
+                .add("orientation", orientation)
+                .add("compassFontSmall", compassFontSmall)
+                .add("showCompass", showCompass)
+                .add("showReticle", showReticle)
+                .add("reticleOrientation", reticleOrientation)
+                .add("preferredMapType", preferredMapType)
+                .add("name", name)
+                .toString();
     }
 }

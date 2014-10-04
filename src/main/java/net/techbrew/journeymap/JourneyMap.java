@@ -76,7 +76,8 @@ public class JourneyMap
     // Properties & preferences
     private volatile CoreProperties coreProperties;
     private volatile FullMapProperties fullMapProperties;
-    private volatile MiniMapProperties miniMapProperties;
+    private volatile MiniMapProperties miniMapProperties1;
+    private volatile MiniMapProperties2 miniMapProperties2;
     private volatile WebMapProperties webMapProperties;
     private volatile WaypointProperties waypointProperties;
     private volatile Boolean initialized = false;
@@ -157,7 +158,38 @@ public class JourneyMap
 
     public static MiniMapProperties getMiniMapProperties()
     {
-        return INSTANCE.miniMapProperties;
+        if (INSTANCE.miniMapProperties1.isActive())
+        {
+            return INSTANCE.miniMapProperties1;
+        }
+        else
+        {
+            return INSTANCE.miniMapProperties2;
+        }
+    }
+
+    public static void toggleMiniMapPreset()
+    {
+        if (INSTANCE.miniMapProperties1.isActive())
+        {
+            INSTANCE.miniMapProperties2.setActive(true);
+            INSTANCE.miniMapProperties1.setActive(false);
+        }
+        else
+        {
+            INSTANCE.miniMapProperties1.setActive(true);
+            INSTANCE.miniMapProperties2.setActive(false);
+        }
+    }
+
+    public static MiniMapProperties getMiniMapProperties1()
+    {
+        return INSTANCE.miniMapProperties1;
+    }
+
+    public static MiniMapProperties getMiniMapProperties2()
+    {
+        return INSTANCE.miniMapProperties2;
     }
 
     public static WebMapProperties getWebMapProperties()
@@ -533,9 +565,18 @@ public class JourneyMap
     {
         coreProperties = PropertiesBase.reload(coreProperties, CoreProperties.class);
         fullMapProperties = PropertiesBase.reload(fullMapProperties, FullMapProperties.class);
-        miniMapProperties = PropertiesBase.reload(miniMapProperties, MiniMapProperties.class);
+        miniMapProperties1 = PropertiesBase.reload(miniMapProperties1, MiniMapProperties.class);
+        miniMapProperties2 = PropertiesBase.reload(miniMapProperties2, MiniMapProperties2.class);
         webMapProperties = PropertiesBase.reload(webMapProperties, WebMapProperties.class);
         waypointProperties = PropertiesBase.reload(waypointProperties, WaypointProperties.class);
+
+        if (!miniMapProperties1.isActive() || !miniMapProperties2.isActive())
+        {
+            // First time running with presets
+            miniMapProperties1.setActive(true);
+            miniMapProperties2.initSuggestions();
+            miniMapProperties2.setActive(false);
+        }
     }
 
     public String getCurrentWorldId()

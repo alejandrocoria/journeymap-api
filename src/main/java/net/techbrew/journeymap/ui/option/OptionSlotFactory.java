@@ -24,7 +24,8 @@ public class OptionSlotFactory
     {
         HashMap<Config.Category, List<SlotMetadata>> mergedMap = new HashMap<Config.Category, List<SlotMetadata>>();
 
-        addSlots(mergedMap, Config.Category.MiniMap, JourneyMap.getMiniMapProperties());
+        addSlots(mergedMap, Config.Category.MiniMap, JourneyMap.getMiniMapProperties1());
+        addSlots(mergedMap, Config.Category.MiniMap2, JourneyMap.getMiniMapProperties2());
         addSlots(mergedMap, Config.Category.FullMap, JourneyMap.getFullMapProperties());
         addSlots(mergedMap, Config.Category.WebMap, JourneyMap.getWebMapProperties());
         addSlots(mergedMap, Config.Category.Waypoint, JourneyMap.getWaypointProperties());
@@ -124,7 +125,6 @@ public class OptionSlotFactory
                     }
                     else
                     {
-                        // TODO
                         slotMetadata = getEnumSlotMetadata(properties, field);
                     }
                 }
