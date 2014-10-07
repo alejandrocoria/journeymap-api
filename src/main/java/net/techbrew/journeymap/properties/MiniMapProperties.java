@@ -9,6 +9,7 @@
 package net.techbrew.journeymap.properties;
 
 import com.google.common.base.Objects;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.ui.minimap.Orientation;
 import net.techbrew.journeymap.ui.minimap.Position;
@@ -26,7 +27,7 @@ import static net.techbrew.journeymap.properties.Config.Category.Inherit;
  */
 public class MiniMapProperties extends InGameMapProperties
 {
-    protected transient static final int CODE_REVISION = 7;
+    protected transient static final int CODE_REVISION = 8;
 
     @Config(category = Inherit, master = true, key = "jm.minimap.enable_minimap")
     public final AtomicBoolean enabled = new AtomicBoolean(true);
@@ -52,7 +53,7 @@ public class MiniMapProperties extends InGameMapProperties
     @Config(category = Inherit, key = "jm.minimap.show_waypointlabels")
     public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
 
-    @Config(category = Inherit, key = "jm.minimap.size", minValue = 128, maxValue = 768, defaultValue = 192)
+    @Config(category = Inherit, key = "jm.minimap.size", minValue = 128, maxValue = 2048, defaultValue = 192)
     public final AtomicInteger customSize = new AtomicInteger(192);
 
     @Config(category = Inherit, key = "jm.minimap.frame_alpha", minValue = 0, maxValue = 100, defaultValue = 100)
@@ -64,8 +65,8 @@ public class MiniMapProperties extends InGameMapProperties
     @Config(category = Inherit, key = "jm.minimap.orientation.button", defaultEnum = "North")
     public final AtomicReference<Orientation> orientation = new AtomicReference<Orientation>(Orientation.North);
 
-    @Config(category = Inherit, key = "jm.minimap.compass_font")
-    public final AtomicBoolean compassFontSmall = new AtomicBoolean(true);
+    @Config(category = Inherit, key = "jm.minimap.compass_font", defaultBoolean = false)
+    public final AtomicBoolean compassFontSmall = new AtomicBoolean(false);
 
     @Config(category = Inherit, key = "jm.minimap.show_compass")
     public final AtomicBoolean showCompass = new AtomicBoolean(true);
@@ -75,6 +76,9 @@ public class MiniMapProperties extends InGameMapProperties
 
     @Config(category = Inherit, key = "jm.minimap.reticle_orientation", defaultEnum = "Compass")
     public final AtomicReference<ReticleOrientation> reticleOrientation = new AtomicReference<ReticleOrientation>(ReticleOrientation.Compass);
+
+    public final AtomicReference<String> renderOverlayEventTypeName = new AtomicReference<String>(RenderGameOverlayEvent.ElementType.HOTBAR.name());
+    public final AtomicBoolean renderOverlayPreEvent = new AtomicBoolean(true);
 
     public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
     protected transient final String name;
@@ -125,6 +129,16 @@ public class MiniMapProperties extends InGameMapProperties
         save();
     }
 
+    public String getId()
+    {
+        return "1";
+    }
+
+    public RenderGameOverlayEvent.ElementType getRenderOverlayEventType()
+    {
+        return Enum.valueOf(RenderGameOverlayEvent.ElementType.class, renderOverlayEventTypeName.get());
+    }
+
     @Override
     protected boolean validate()
     {
@@ -167,6 +181,17 @@ public class MiniMapProperties extends InGameMapProperties
         else if (terrainAlpha.get() > 100)
         {
             terrainAlpha.set(100);
+            saveNeeded = true;
+        }
+
+        try
+        {
+            Enum.valueOf(RenderGameOverlayEvent.ElementType.class, renderOverlayEventTypeName.get());
+        }
+        catch (Exception e)
+        {
+            renderOverlayEventTypeName.set(RenderGameOverlayEvent.ElementType.HOTBAR.name());
+            renderOverlayPreEvent.set(true);
             saveNeeded = true;
         }
 

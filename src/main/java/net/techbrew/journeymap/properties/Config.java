@@ -6,6 +6,8 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by Mark on 9/21/2014.
@@ -35,7 +37,7 @@ public @interface Config
     public enum Category
     {
         Inherit(""),
-        MiniMap("jm.config.category.minimap"),
+        MiniMap1("jm.config.category.minimap"),
         MiniMap2("jm.config.category.minimap2"),
         FullMap("jm.config.category.fullmap"),
         WebMap("jm.config.category.webmap"),
@@ -61,9 +63,9 @@ public @interface Config
     class NoStringProvider implements StringListProvider
     {
         @Override
-        public String[] getStrings()
+        public List<String> getStrings()
         {
-            return new String[0];
+            return Collections.emptyList();
         }
 
         @Override

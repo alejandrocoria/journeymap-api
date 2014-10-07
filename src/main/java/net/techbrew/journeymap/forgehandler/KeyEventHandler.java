@@ -16,10 +16,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.model.MapOverlayState;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
+import net.techbrew.journeymap.ui.minimap.MiniMap;
 import org.lwjgl.input.Keyboard;
 
 import java.util.EnumSet;
@@ -45,7 +45,6 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
     public static boolean onKeypress(boolean minimapOnly)
     {
         final int i = Keyboard.getEventKey();
-        MapOverlayState mapOverlayState = Fullscreen.state();
 
         try
         {
@@ -62,22 +61,22 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 }
                 else if (Constants.isPressed(Constants.KB_MAP_ZOOMIN))
                 {
-                    mapOverlayState.zoomIn();
+                    MiniMap.state().zoomIn();
                     return true;
                 }
                 else if (Constants.isPressed(Constants.KB_MAP_ZOOMOUT))
                 {
-                    mapOverlayState.zoomOut();
+                    MiniMap.state().zoomOut();
                     return true;
                 }
                 else if (Constants.isPressed(Constants.KB_MAP_DAY))
                 {
-                    mapOverlayState.setMapType(Constants.MapType.day);
+                    MiniMap.state().setMapType(Constants.MapType.day);
                     return true;
                 }
                 else if (Constants.isPressed(Constants.KB_MAP_NIGHT))
                 {
-                    mapOverlayState.setMapType(Constants.MapType.night);
+                    MiniMap.state().setMapType(Constants.MapType.night);
                     return true;
                 }
                 else if (Constants.isPressed(Constants.KB_MINIMAP_POS))

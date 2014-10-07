@@ -16,7 +16,6 @@ import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
-import net.techbrew.journeymap.properties.InGameMapProperties;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import org.apache.logging.log4j.Logger;
@@ -55,7 +54,6 @@ public class GridRenderer
     private final int gridSize; // 5 = 2560px.
     private final Color bgColor = new Color(0x22, 0x22, 0x22);
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
-    private InGameMapProperties mapProperties;
     private Rectangle2D.Double viewPort = null;
     private Rectangle2D.Double screenBounds = null;
     private int lastHeight = -1;
@@ -75,22 +73,16 @@ public class GridRenderer
     private FloatBuffer winPosBuf;
     private FloatBuffer objPosBuf;
 
-    public GridRenderer(final int gridSize, InGameMapProperties mapProperties)
+    public GridRenderer(final int gridSize)
     {
         this.gridSize = gridSize;  // Must be an odd number so as to have a center tile.
         srcSize = gridSize * Tile.TILESIZE;
-        this.mapProperties = mapProperties;
 
         viewportBuf = BufferUtils.createIntBuffer(16);
         modelMatrixBuf = BufferUtils.createFloatBuffer(16);
         projMatrixBuf = BufferUtils.createFloatBuffer(16);
         winPosBuf = BufferUtils.createFloatBuffer(16);
         objPosBuf = BufferUtils.createFloatBuffer(16);
-    }
-
-    public void setMapProperties(InGameMapProperties mapProperties)
-    {
-        this.mapProperties = mapProperties;
     }
 
     public void setViewPort(Rectangle2D.Double viewPort)
@@ -139,13 +131,18 @@ public class GridRenderer
 
     public boolean hasUnloadedTile()
     {
+        return hasUnloadedTile(false);
+    }
+
+    public boolean hasUnloadedTile(boolean preview)
+    {
         Tile tile;
         for (Map.Entry<TilePos, Integer> entry : grid.entrySet())
         {
             if (isOnScreen(entry.getKey()))
             {
                 tile = tc.getIfPresent(entry.getValue());
-                if (tile == null || !tile.hasTexture())
+                if (tile == null || (!preview && !tile.hasTexture()))
                 {
                     return true;
                 }

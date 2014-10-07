@@ -111,7 +111,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         ArrayList<SlotMetadata> remaining = new ArrayList<SlotMetadata>(childMetadataList);
         while (!remaining.isEmpty())
         {
-            ButtonListSlot row = new ButtonListSlot();
+            ButtonListSlot row = new ButtonListSlot(this);
             SlotMetadata.ValueType lastType = null;
             for (int i = 0; i < columns; i++)
             {
@@ -120,7 +120,11 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
                     SlotMetadata.ValueType thisType = remaining.get(0).valueType;
                     if (lastType != null && lastType != thisType)
                     {
-                        if (lastType == SlotMetadata.ValueType.Boolean || thisType == SlotMetadata.ValueType.Toolbar)
+                        if (thisType == SlotMetadata.ValueType.Toolbar)
+                        {
+                            break;
+                        }
+                        if (lastType == SlotMetadata.ValueType.Boolean)
                         {
                             if (remaining.size() > columns - i)
                             {
@@ -155,6 +159,16 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         return childMetadataList;
     }
 
+    public int getCurrentColumns()
+    {
+        return currentColumns;
+    }
+
+    public int getCurrentColumnWidth()
+    {
+        return currentColumnWidth;
+    }
+
     @Override
     public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
     {
@@ -164,7 +178,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         button.setHeight(slotHeight);
         button.drawButton(mc, mouseX, mouseY);
 
-        if (masterSlot != null)
+        if (masterSlot != null && selected)
         {
             boolean enabled = masterSlot.button.isActive();
             for (ScrollListPane.ISlot slot : childSlots)

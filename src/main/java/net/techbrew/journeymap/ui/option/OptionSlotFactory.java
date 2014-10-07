@@ -24,7 +24,7 @@ public class OptionSlotFactory
     {
         HashMap<Config.Category, List<SlotMetadata>> mergedMap = new HashMap<Config.Category, List<SlotMetadata>>();
 
-        addSlots(mergedMap, Config.Category.MiniMap, JourneyMap.getMiniMapProperties1());
+        addSlots(mergedMap, Config.Category.MiniMap1, JourneyMap.getMiniMapProperties1());
         addSlots(mergedMap, Config.Category.MiniMap2, JourneyMap.getMiniMapProperties2());
         addSlots(mergedMap, Config.Category.FullMap, JourneyMap.getFullMapProperties());
         addSlots(mergedMap, Config.Category.WebMap, JourneyMap.getWebMapProperties());
@@ -38,12 +38,12 @@ public class OptionSlotFactory
             CategorySlot categorySlot = new CategorySlot(category);
             for (SlotMetadata val : entry.getValue())
             {
-                categorySlot.add(new ButtonListSlot().add(val));
+                categorySlot.add(new ButtonListSlot(categorySlot).add(val));
             }
 
             if (toolbars.containsKey(category))
             {
-                ButtonListSlot toolbarSlot = new ButtonListSlot();
+                ButtonListSlot toolbarSlot = new ButtonListSlot(categorySlot);
                 for (SlotMetadata toolbar : toolbars.get(category))
                 {
                     toolbarSlot.add(toolbar);
@@ -62,7 +62,6 @@ public class OptionSlotFactory
             count += categorySlot.size();
         }
 
-        JourneyMap.getLogger().info("Configurable properties: " + count);
         return new ArrayList<ScrollListPane.ISlot>(categories);
     }
 
@@ -293,7 +292,7 @@ public class OptionSlotFactory
             String defaultTip = Constants.getString("jm.config.default", slp.getDefaultString());
             boolean advanced = annotation.category() == Config.Category.Advanced;
 
-            StringPropertyButton button = new StringPropertyButton(0, slp.getStrings(), name, properties, property);
+            ListPropertyButton<String> button = new ListPropertyButton<String>(0, slp.getStrings(), name, properties, property);
             button.setDefaultStyle(false);
             button.setDrawBackground(false);
             SlotMetadata<String> slotMetadata = new SlotMetadata<String>(button, name, tooltip, defaultTip, slp.getDefaultString(), advanced);
@@ -315,11 +314,11 @@ public class OptionSlotFactory
             String name = getName(annotation);
             String tooltip = getTooltip(annotation);
             Class<? extends Enum> enumClass = property.get().getClass();
-            EnumSet<?> enumSet = EnumSet.allOf(enumClass);
+            Collection<Enum> enumSet = new ArrayList<Enum>(EnumSet.allOf(enumClass));
             String defaultTip = Constants.getString("jm.config.default", Enum.valueOf(enumClass, annotation.defaultEnum()));
             boolean advanced = annotation.category() == Config.Category.Advanced;
 
-            EnumPropertyButton button = new EnumPropertyButton(0, enumSet.toArray(new Enum[enumSet.size()]), name, properties, property);
+            ListPropertyButton<Enum> button = new ListPropertyButton<Enum>(0, enumSet, name, properties, property);
             button.setDefaultStyle(false);
             button.setDrawBackground(false);
             SlotMetadata<Enum> slotMetadata = new SlotMetadata<Enum>(button, name, tooltip, defaultTip, property.get(), advanced);

@@ -25,7 +25,7 @@ import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
-import net.techbrew.journeymap.model.MapOverlayState;
+import net.techbrew.journeymap.model.MapState;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -38,7 +38,7 @@ import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.ButtonList;
 import net.techbrew.journeymap.ui.component.JmUI;
-import net.techbrew.journeymap.ui.component.ToggleButton;
+import net.techbrew.journeymap.ui.component.OnOffButton;
 import net.techbrew.journeymap.ui.fullscreen.layer.LayerDelegate;
 import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemeButton;
@@ -60,8 +60,8 @@ import java.util.List;
  */
 public class Fullscreen extends JmUI
 {
-    final static MapOverlayState state = new MapOverlayState();
-    final static GridRenderer gridRenderer = new GridRenderer(5, JourneyMap.getFullMapProperties());
+    final static MapState state = new MapState();
+    final static GridRenderer gridRenderer = new GridRenderer(5);
     final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
     final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
     final LayerDelegate layerDelegate = new LayerDelegate();
@@ -101,7 +101,7 @@ public class Fullscreen extends JmUI
         gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
     }
 
-    public static synchronized MapOverlayState state()
+    public static synchronized MapState state()
     {
         return state;
     }
@@ -110,7 +110,6 @@ public class Fullscreen extends JmUI
     {
         state.requireRefresh();
         gridRenderer.clear();
-        gridRenderer.setMapProperties(JourneyMap.getFullMapProperties());
         TileCache.instance().invalidateAll();
         TileCache.instance().cleanUp();
     }
@@ -119,8 +118,6 @@ public class Fullscreen extends JmUI
     public void initGui()
     {
         fullMapProperties = JourneyMap.getFullMapProperties();
-        gridRenderer.setMapProperties(JourneyMap.getFullMapProperties());
-
         Keyboard.enableRepeatEvents(true);
 
         // When switching dimensions, reset grid
@@ -202,9 +199,9 @@ public class Fullscreen extends JmUI
             return;
         }
 
-        if (guibutton instanceof ToggleButton)
+        if (guibutton instanceof OnOffButton)
         {
-            ((ToggleButton) guibutton).toggle();
+            ((OnOffButton) guibutton).toggle();
         }
 
         if (optionsToolbar.contains(guibutton))
@@ -256,10 +253,10 @@ public class Fullscreen extends JmUI
             // Day Toggle
             buttonDay = new ThemeToggle(id++, theme, "jm.fullscreen.map_day", "day", null, null);
             buttonDay.setToggled(mapType == Constants.MapType.day, false);
-            buttonDay.addToggleListener(new ToggleButton.ToggleListener()
+            buttonDay.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(ToggleButton button, boolean toggled)
+                public boolean onToggle(OnOffButton button, boolean toggled)
                 {
                     if (toggled)
                     {
@@ -282,10 +279,10 @@ public class Fullscreen extends JmUI
             // Night Toggle
             buttonNight = new ThemeToggle(id++, theme, "jm.fullscreen.map_night", "night");
             buttonNight.setToggled(mapType == Constants.MapType.night, false);
-            buttonNight.addToggleListener(new ToggleButton.ToggleListener()
+            buttonNight.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(ToggleButton button, boolean toggled)
+                public boolean onToggle(OnOffButton button, boolean toggled)
                 {
                     if (toggled)
                     {
@@ -308,10 +305,10 @@ public class Fullscreen extends JmUI
             // Caves Toggle
             buttonCaves = new ThemeToggle(id++, theme, "jm.fullscreen.map_caves", "caves", fullMapProperties, fullMapProperties.showCaves);
             buttonCaves.setDrawButton(state.isCaveMappingAllowed());
-            buttonCaves.addToggleListener(new ToggleButton.ToggleListener()
+            buttonCaves.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(ToggleButton button, boolean toggled)
+                public boolean onToggle(OnOffButton button, boolean toggled)
                 {
                     state.requireRefresh();
                     return true;
@@ -320,10 +317,10 @@ public class Fullscreen extends JmUI
 
             // Follow
             buttonFollow = new ThemeButton(id++, theme, "jm.fullscreen.follow", "follow");
-            buttonFollow.addToggleListener(new ToggleButton.ToggleListener()
+            buttonFollow.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(ToggleButton button, boolean toggled)
+                public boolean onToggle(OnOffButton button, boolean toggled)
                 {
                     toggleFollow();
                     return true;
@@ -333,10 +330,10 @@ public class Fullscreen extends JmUI
             // Zoom In
             buttonZoomIn = new ThemeButton(id++, theme, "jm.fullscreen.zoom_in", "zoomin");
             buttonZoomIn.setEnabled(fullMapProperties.zoomLevel.get() < state.maxZoom);
-            buttonZoomIn.addToggleListener(new ToggleButton.ToggleListener()
+            buttonZoomIn.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(ToggleButton button, boolean toggled)
+                public boolean onToggle(OnOffButton button, boolean toggled)
                 {
                     zoomIn();
                     return true;
@@ -346,10 +343,10 @@ public class Fullscreen extends JmUI
             // Zoom Out
             buttonZoomOut = new ThemeButton(id++, theme, "jm.fullscreen.zoom_out", "zoomout");
             buttonZoomOut.setEnabled(fullMapProperties.zoomLevel.get() > state.minZoom);
-            buttonZoomOut.addToggleListener(new ToggleButton.ToggleListener()
+            buttonZoomOut.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(ToggleButton button, boolean toggled)
+                public boolean onToggle(OnOffButton button, boolean toggled)
                 {
                     zoomOut();
                     return true;
@@ -359,10 +356,10 @@ public class Fullscreen extends JmUI
             // Waypoints
             buttonWaypointManager = new ThemeButton(id++, theme, "jm.waypoint.waypoints", "waypoints");
             buttonWaypointManager.setDrawButton(WaypointsData.isManagerEnabled());
-            buttonWaypointManager.addToggleListener(new ToggleButton.ToggleListener()
+            buttonWaypointManager.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(ToggleButton button, boolean toggled)
+                public boolean onToggle(OnOffButton button, boolean toggled)
                 {
                     UIManager.getInstance().openWaypointManager(null, Fullscreen.class);
                     return true;
@@ -371,14 +368,14 @@ public class Fullscreen extends JmUI
 
             // Options
             buttonOptions = new ThemeButton(id++, theme, "jm.common.options", "options");
-            buttonOptions.addToggleListener(new ToggleButton.ToggleListener()
+            buttonOptions.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(ToggleButton button, boolean toggled)
+                public boolean onToggle(OnOffButton button, boolean toggled)
                 {
                     try
                     {
-                        UIManager.getInstance().openMasterOptions();
+                        UIManager.getInstance().openOptionsManager();
                         return true;
                     }
                     catch (Exception e)
@@ -391,10 +388,10 @@ public class Fullscreen extends JmUI
 
             // Actions
             buttonActions = new ThemeButton(id++, theme, "jm.common.actions", "actions");
-            buttonActions.addToggleListener(new ToggleButton.ToggleListener()
+            buttonActions.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(ToggleButton button, boolean toggled)
+                public boolean onToggle(OnOffButton button, boolean toggled)
                 {
                     UIManager.getInstance().openMapActions();
                     return true;
@@ -405,10 +402,10 @@ public class Fullscreen extends JmUI
             buttonAlert = new ThemeToggle(id++, theme, "jm.common.update_available", "alert");
             buttonAlert.setDrawButton(VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent());
             buttonAlert.setToggled(true);
-            buttonAlert.addToggleListener(new ToggleButton.ToggleListener()
+            buttonAlert.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(ToggleButton button, boolean toggled)
+                public boolean onToggle(OnOffButton button, boolean toggled)
                 {
                     VersionCheck.launchWebsite();
                     buttonAlert.setDrawButton(false);
@@ -418,10 +415,10 @@ public class Fullscreen extends JmUI
 
             // Close
             buttonClose = new ThemeButton(id++, theme, "jm.common.close", "close");
-            buttonClose.addToggleListener(new ToggleButton.ToggleListener()
+            buttonClose.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
-                public boolean onToggle(ToggleButton button, boolean toggled)
+                public boolean onToggle(OnOffButton button, boolean toggled)
                 {
                     UIManager.getInstance().closeAll();
                     return true;
@@ -687,7 +684,7 @@ public class Fullscreen extends JmUI
 
         if (i == Keyboard.KEY_O)
         {
-            UIManager.getInstance().openMasterOptions();
+            UIManager.getInstance().openOptionsManager();
             return;
         }
 
@@ -922,7 +919,6 @@ public class Fullscreen extends JmUI
             setFollow(true);
         }
 
-        gridRenderer.setMapProperties(fullMapProperties);
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
 
         // Center core renderer

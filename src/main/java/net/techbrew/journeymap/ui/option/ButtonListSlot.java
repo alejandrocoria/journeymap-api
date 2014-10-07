@@ -5,10 +5,12 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
+import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.ButtonList;
 import net.techbrew.journeymap.ui.component.ScrollListPane;
 
+import java.awt.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,11 +26,12 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     FontRenderer fontRenderer = mc.fontRenderer;
     ButtonList buttons = new ButtonList();
     HashMap<Button, SlotMetadata> buttonOptionMetadata = new HashMap<Button, SlotMetadata>();
+    CategorySlot parent;
     SlotMetadata lastPressed = null;
 
-    public ButtonListSlot()
+    public ButtonListSlot(CategorySlot parent)
     {
-
+        this.parent = parent;
     }
 
     public ButtonListSlot add(SlotMetadata slotMetadata)
@@ -62,11 +65,29 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     @Override
     public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
     {
+        if (parent.getCurrentColumnWidth() > 0)
+        {
+            int cols = listWidth / parent.currentColumnWidth;
+            int margin = (listWidth - ((hgap * cols - 1) + cols * parent.getCurrentColumnWidth())) / 2;
+
+            x += margin;
+        }
         SlotMetadata tooltipMetadata = null;
         if (buttons.size() > 0)
         {
             buttons.setHeights(slotHeight);
-            buttons.layoutHorizontal(x, y, true, hgap);
+
+            if (buttonOptionMetadata.get(buttons.get(0)).isToolbar())
+            {
+                buttons.fitWidths(fontRenderer);
+                buttons.layoutHorizontal(listWidth, y, false, hgap);
+                DrawUtil.drawGradientRect(x, y, listWidth, slotHeight, new Color(0, 0, 100), 40, new Color(0, 0, 100), 150);
+            }
+            else
+            {
+                buttons.layoutHorizontal(x, y, true, hgap);
+            }
+
             for (Button button : buttons)
             {
                 button.drawButton(mc, mouseX, mouseY);

@@ -15,6 +15,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.forgehandler.KeyEventHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
+import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.properties.Config;
 import net.techbrew.journeymap.task.MapPlayerTask;
 import net.techbrew.journeymap.ui.UIManager;
@@ -24,23 +25,25 @@ import net.techbrew.journeymap.ui.option.CategorySlot;
 import net.techbrew.journeymap.ui.option.OptionSlotFactory;
 import net.techbrew.journeymap.ui.option.SlotMetadata;
 import net.techbrew.journeymap.waypoint.WaypointStore;
+import org.lwjgl.input.Keyboard;
 
 import java.util.*;
 
 /**
  * Master options UI
- *
- * // TODO: Theme switch derps?
+ * <p/>
  * // TODO: Black image for cave map
  */
 public class OptionsManager extends JmUI
 {
     protected Config.Category[] initialCategories;
-    protected CheckBox minimapPreviewButton;
+    protected CheckBox minimap1PreviewButton;
+    protected CheckBox minimap2PreviewButton;
     protected Button buttonClose;
     protected ScrollListPane optionsListPane;
     protected Map<Config.Category, List<SlotMetadata>> toolbars;
     protected EnumSet<Config.Category> changedCategories = EnumSet.noneOf(Config.Category.class);
+    protected boolean forceMinimapUpdate;
 
     public OptionsManager()
     {
@@ -61,53 +64,104 @@ public class OptionsManager extends JmUI
     @Override
     public void initGui()
     {
-        buttonList.clear();
-
-        if (optionsListPane == null)
+        try
         {
-            optionsListPane = new ScrollListPane(this, mc, this.width, this.height, this.headerHeight, this.height - 30, 20);
-            optionsListPane.setSlots(OptionSlotFactory.getSlots(getToolbars()));
-            if (initialCategories != null)
+            buttonList.clear();
+
+            if (minimap1PreviewButton == null)
             {
-                for (Config.Category initialCategory : initialCategories)
+                String name = String.format("%s %s", Constants.getString("jm.minimap.preview"), "1");
+                String tooltip = Constants.getString("jm.minimap.preview.tooltip");
+                minimap1PreviewButton = new CheckBox(0, name, false);
+                minimap1PreviewButton.setTooltip(tooltip);
+            }
+
+            if (minimap2PreviewButton == null)
+            {
+                String name = String.format("%s %s", Constants.getString("jm.minimap.preview"), "2");
+                String tooltip = Constants.getString("jm.minimap.preview.tooltip");
+                minimap2PreviewButton = new CheckBox(0, name, false);
+                minimap2PreviewButton.setTooltip(tooltip);
+            }
+
+            if (optionsListPane == null)
+            {
+                List<ScrollListPane.ISlot> categorySlots = new ArrayList<ScrollListPane.ISlot>();
+                optionsListPane = new ScrollListPane(this, mc, this.width, this.height, this.headerHeight, this.height - 30, 20);
+                optionsListPane.setSlots(OptionSlotFactory.getSlots(getToolbars()));
+                if (initialCategories != null)
                 {
-                    for (ScrollListPane.ISlot slot : optionsListPane.getRootSlots())
+                    for (Config.Category initialCategory : initialCategories)
                     {
-                        if (slot instanceof CategorySlot && ((CategorySlot) slot).getCategory() == initialCategory)
+                        for (ScrollListPane.ISlot slot : optionsListPane.getRootSlots())
                         {
-                            ((CategorySlot) slot).setSelected(true);
+                            if (slot instanceof CategorySlot && ((CategorySlot) slot).getCategory() == initialCategory)
+                            {
+                                ((CategorySlot) slot).setSelected(true);
+                                categorySlots.add(slot);
+                            }
                         }
                     }
                 }
+
+                // Add Toolbar buttons
+                for (ScrollListPane.ISlot rootSlot : optionsListPane.getRootSlots())
+                {
+                    if (rootSlot instanceof CategorySlot)
+                    {
+                        CategorySlot categorySlot = (CategorySlot) rootSlot;
+                        Config.Category category = categorySlot.getCategory();
+                        switch (category)
+                        {
+                            case MiniMap1:
+                            {
+                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1PreviewButton,
+                                        minimap1PreviewButton.displayString,
+                                        minimap1PreviewButton.getUnformattedTooltip()));
+                                break;
+                            }
+                            case MiniMap2:
+                            {
+                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2PreviewButton,
+                                        minimap2PreviewButton.displayString,
+                                        minimap2PreviewButton.getUnformattedTooltip()));
+                                break;
+                            }
+                        }
+                    }
+                }
+
+
+                // Update slots
+                optionsListPane.updateSlots();
+
+                if (!categorySlots.isEmpty())
+                {
+                    // Scroll to first
+                    optionsListPane.scrollTo(categorySlots.get(0));
+                }
             }
-            optionsListPane.updateSlots();
+            else
+            {
+                optionsListPane.func_148122_a(width, height, headerHeight, this.height - 30);
+                optionsListPane.updateSlots();
+            }
+
+            buttonClose = new Button(0, Constants.getString("jm.common.close"));
+            buttonClose.setWidth(150);
+
+            buttonList.add(buttonClose);
+
+            ButtonList bottomRow = new ButtonList(buttonList);
+            //bottomRow.equalizeWidths(getFontRenderer());
+
+            bottomRow.layoutCenteredHorizontal(width / 2, height - 25, true, 4);
+
         }
-        else
+        catch (Throwable t)
         {
-            optionsListPane.func_148122_a(width, height, headerHeight, this.height - 30);
-            optionsListPane.updateSlots();
+            JMLogger.logOnce("Error in OptionsManager.initGui(): " + t, t);
         }
-
-        buttonClose = new Button(0, Constants.getString("jm.common.close"));
-        buttonClose.setWidth(150);
-
-        if (minimapPreviewButton == null)
-        {
-            String name = Constants.getString("jm.minimap.preview");
-            String tooltip = Constants.getString("jm.minimap.preview.tooltip");
-            minimapPreviewButton = new CheckBox(0, name, false);
-            minimapPreviewButton.setTooltip(tooltip);
-        }
-
-        buttonList.add(buttonClose);
-        buttonList.add(buttonClose);
-        buttonList.add(minimapPreviewButton);
-
-        ButtonList bottomRow = new ButtonList(buttonList);
-        bottomRow.equalizeWidths(getFontRenderer());
-
-        bottomRow.layoutCenteredHorizontal(width / 2, height - 25, true, 4);
-        minimapPreviewButton.setY(minimapPreviewButton.getY() + 4);
     }
 
     @Override
@@ -122,37 +176,66 @@ public class OptionsManager extends JmUI
     @Override
     public void drawScreen(int x, int y, float par3)
     {
-        String[] lastTooltip = optionsListPane.lastTooltip;
-        long lastTooltipTime = optionsListPane.lastTooltipTime;
-        optionsListPane.lastTooltip = null;
-        optionsListPane.drawScreen(x, y, par3);
-        super.drawScreen(x, y, par3);
-
-        for (List<SlotMetadata> toolbar : getToolbars().values())
+        try
         {
-            for (SlotMetadata slotMetadata : toolbar)
+            if (forceMinimapUpdate)
             {
-                slotMetadata.getButton().secondaryDrawButton();
-            }
-        }
-
-        if (minimapPreviewButton.getToggled())
-        {
-            UIManager.getInstance().getMiniMap().drawMap();
-            RenderHelper.disableStandardItemLighting();
-        }
-
-        if (optionsListPane.lastTooltip != null)
-        {
-            if (Arrays.equals(optionsListPane.lastTooltip, lastTooltip))
-            {
-                optionsListPane.lastTooltipTime = lastTooltipTime;
-                if (System.currentTimeMillis() - optionsListPane.lastTooltipTime > optionsListPane.hoverDelay)
+                // Minimap buttons:  Force minimap toggles
+                if (minimap1PreviewButton.isActive())
                 {
-                    Button button = optionsListPane.lastTooltipMetadata.getButton();
-                    drawHoveringText(optionsListPane.lastTooltip, x, button.getBottomY() + 15);
+                    JourneyMap.toggleMiniMapPreset(1);
+                }
+                else if (minimap2PreviewButton.isActive())
+                {
+                    JourneyMap.toggleMiniMapPreset(2);
                 }
             }
+
+            String[] lastTooltip = optionsListPane.lastTooltip;
+            long lastTooltipTime = optionsListPane.lastTooltipTime;
+            optionsListPane.lastTooltip = null;
+            optionsListPane.drawScreen(x, y, par3);
+
+            super.drawScreen(x, y, par3);
+
+            for (List<SlotMetadata> toolbar : getToolbars().values())
+            {
+                for (SlotMetadata slotMetadata : toolbar)
+                {
+                    slotMetadata.getButton().secondaryDrawButton();
+                }
+            }
+
+            if (previewMiniMap())
+            {
+                mc.entityRenderer.setupOverlayRendering(); // TODO DOES THIS HELP?!
+                UIManager.getInstance().getMiniMap().drawMap(true);
+                RenderHelper.disableStandardItemLighting();
+//
+//                GL11.glEnable(GL11.GL_BLEND);
+//                OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+//                GL11.glDisable(GL11.GL_ALPHA_TEST);
+//                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+//                GL11.glDisable(GL11.GL_LIGHTING);
+//                GL11.glEnable(GL11.GL_ALPHA_TEST);
+            }
+
+            if (optionsListPane.lastTooltip != null)
+            {
+                if (Arrays.equals(optionsListPane.lastTooltip, lastTooltip))
+                {
+                    optionsListPane.lastTooltipTime = lastTooltipTime;
+                    if (System.currentTimeMillis() - optionsListPane.lastTooltipTime > optionsListPane.hoverDelay)
+                    {
+                        Button button = optionsListPane.lastTooltipMetadata.getButton();
+                        drawHoveringText(optionsListPane.lastTooltip, x, button.getBottomY() + 15);
+                    }
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            JMLogger.logOnce("Error in OptionsManager.drawScreen(): " + t, t);
         }
     }
 
@@ -200,10 +283,23 @@ public class OptionsManager extends JmUI
             if (slotMetadata.getName().equals(Constants.getString("jm.common.ui_theme")))
             {
                 ThemeFileHandler.getCurrentTheme(true);
-                if (minimapPreviewButton.getToggled())
+                if (previewMiniMap())
                 {
                     UIManager.getInstance().getMiniMap().updateDisplayVars(true);
                 }
+            }
+
+            // Minimap buttons:  Force minimap toggles
+            if (slotMetadata.getButton() == minimap1PreviewButton)
+            {
+                minimap2PreviewButton.setToggled(false);
+                JourneyMap.toggleMiniMapPreset(1);
+            }
+
+            if (slotMetadata.getButton() == minimap2PreviewButton)
+            {
+                minimap1PreviewButton.setToggled(false);
+                JourneyMap.toggleMiniMapPreset(2);
             }
         }
 
@@ -214,9 +310,10 @@ public class OptionsManager extends JmUI
             Config.Category category = categorySlot.getCategory();
             changedCategories.add(category);
 
-            // If the button is MiniMap-related, force it to update
-            if (category == Config.Category.MiniMap)
+            // If the button is MiniMap1-related, force it to update
+            if (category == Config.Category.MiniMap1 || category == Config.Category.MiniMap2)
             {
+                refreshMinimapOptions();
                 UIManager.getInstance().getMiniMap().updateDisplayVars(true);
             }
         }
@@ -231,24 +328,47 @@ public class OptionsManager extends JmUI
             return;
         }
 
-        if (button == minimapPreviewButton)
+        if (button == minimap1PreviewButton)
         {
-            //minimapPreviewButton.toggle();
+            minimap2PreviewButton.setToggled(false);
+            JourneyMap.toggleMiniMapPreset(1);
+        }
+
+        if (button == minimap2PreviewButton)
+        {
+            minimap1PreviewButton.setToggled(false);
+            JourneyMap.toggleMiniMapPreset(2);
         }
     }
 
     @Override
     protected void keyTyped(char c, int i)
     {
-        super.keyTyped(c, i);
+        switch (i)
+        {
+            case Keyboard.KEY_ESCAPE:
+            {
+                if (previewMiniMap())
+                {
+                    minimap1PreviewButton.setToggled(false);
+                    minimap2PreviewButton.setToggled(false);
+                }
+                else
+                {
+                    closeAndReturn();
+                }
+                break;
+            }
+        }
 
         boolean optionUpdated = optionsListPane.keyTyped(c, i);
-        if (optionUpdated && minimapPreviewButton.getToggled())
+        if (optionUpdated && previewMiniMap())
         {
             UIManager.getInstance().getMiniMap().updateDisplayVars(true);
         }
 
-        if (minimapPreviewButton.getToggled())
+        // Check for any minimap-related keypresses
+        if (previewMiniMap())
         {
             boolean pressed = KeyEventHandler.onKeypress(true);
             if (pressed)
@@ -258,13 +378,19 @@ public class OptionsManager extends JmUI
         }
     }
 
+    protected boolean previewMiniMap()
+    {
+        return minimap1PreviewButton.getToggled() || minimap2PreviewButton.getToggled();
+    }
+
     protected void refreshMinimapOptions()
     {
+        EnumSet cats = EnumSet.of(Config.Category.MiniMap1, Config.Category.MiniMap2);
         for (ScrollListPane.ISlot slot : optionsListPane.getRootSlots())
         {
             if (slot instanceof CategorySlot)
             {
-                if (((CategorySlot) slot).getCategory() == Config.Category.MiniMap)
+                if (cats.contains(((CategorySlot) slot).getCategory()))
                 {
                     for (SlotMetadata slotMetadata : ((CategorySlot) slot).getAllChildMetadata())
                     {
@@ -282,7 +408,12 @@ public class OptionsManager extends JmUI
         {
             switch (category)
             {
-                case MiniMap:
+                case MiniMap1:
+                {
+                    UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+                    break;
+                }
+                case MiniMap2:
                 {
                     UIManager.getInstance().getMiniMap().updateDisplayVars(true);
                     break;
@@ -323,7 +454,8 @@ public class OptionsManager extends JmUI
         JourneyMap.getCoreProperties().save();
         JourneyMap.getWebMapProperties().save();
         JourneyMap.getFullMapProperties().save();
-        JourneyMap.getMiniMapProperties().save();
+        JourneyMap.getMiniMapProperties1().save();
+        JourneyMap.getMiniMapProperties2().save();
         JourneyMap.getWaypointProperties().save();
 
         if (returnClass == null)
@@ -343,11 +475,11 @@ public class OptionsManager extends JmUI
             toolbars = Collections.EMPTY_MAP;
 //            String name = Constants.getString("jm.minimap.preview");
 //            String tooltip = Constants.getString("jm.minimap.preview.tooltip");
-//            minimapPreviewButton = new MinimapPreviewButton(name);
-//            SlotMetadata toolbarSlotMetadata = new SlotMetadata(minimapPreviewButton, name, tooltip);
+//            minimap1PreviewButton = new MinimapPreviewButton(name);
+//            SlotMetadata toolbarSlotMetadata = new SlotMetadata(minimap1PreviewButton, name, tooltip);
 //
 //            this.toolbars = new HashMap<Config.Category, List<SlotMetadata>>();
-//            toolbars.put(Config.Category.MiniMap, Arrays.asList(toolbarSlotMetadata));
+//            toolbars.put(Config.Category.MiniMap1, Arrays.asList(toolbarSlotMetadata));
         }
         return toolbars;
     }

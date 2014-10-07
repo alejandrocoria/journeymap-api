@@ -33,6 +33,9 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected static Color smallBgHoverColor = new Color(125, 135, 190);
     protected static Color smallBgHoverColor2 = new Color(0, 0, 100);
 
+    protected Color disabledBgColor = Color.darkGray;
+    protected Color disabledLabelColor = Color.lightGray;
+
     //protected boolean enabled;
     protected boolean drawFrame;
     protected boolean drawBackground;
@@ -168,35 +171,38 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             {
                 DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, k == 2 ? smallBgHoverColor : smallBgColor, 255);
             }
-            else if (this.field_146123_n)
+            else if (this.field_146123_n && enabled)
             {
                 DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, smallBgHoverColor2, 128);
             }
 
             this.mouseDragged(minecraft, mouseX, mouseY);
-            int l = 14737632;
+            int labelColor = 14737632;
 
             if (!this.isEnabled())
             {
-                l = -6250336;
+                labelColor = disabledLabelColor.getRGB();
 
-                int alpha = 185;
-                int widthOffset = width - ((this.height >= 20) ? 3 : 2);
-                DrawUtil.drawRectangle(this.getX() + 1, this.getY() + 1, widthOffset, height - 2, Color.darkGray, alpha);
+                if (drawBackground)
+                {
+                    int alpha = 185;
+                    int widthOffset = width - ((this.height >= 20) ? 3 : 2);
+                    DrawUtil.drawRectangle(this.getX() + 1, this.getY() + 1, widthOffset, height - 2, disabledBgColor, alpha);
+                }
             }
             else
             {
                 if (this.field_146123_n)
                 {
-                    l = 16777120;
+                    labelColor = 16777120;
                 }
                 else if (packedFGColour != 0)
                 {
-                    l = packedFGColour;
+                    labelColor = packedFGColour;
                 }
             }
 
-            this.drawCenteredString(fontrenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, l);
+            this.drawCenteredString(fontrenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, labelColor);
         }
     }
 
@@ -220,6 +226,11 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     {
         boolean pressed = isEnabled() && isDrawButton() && i >= getX() && j >= getY() && i < getX() + getWidth() && j < getY() + getHeight();
         return pressed;
+    }
+
+    public String getUnformattedTooltip()
+    {
+        return tooltip[0];
     }
 
     public List<String> getTooltip()
@@ -367,7 +378,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public Button centerVerticalOn(int y)
     {
-        this.setY(y + (height / 2));
+        this.setY(y - (height / 2));
         return this;
     }
 

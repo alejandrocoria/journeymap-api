@@ -20,8 +20,8 @@ import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.ButtonList;
+import net.techbrew.journeymap.ui.component.OnOffButton;
 import net.techbrew.journeymap.ui.component.ScrollPane;
-import net.techbrew.journeymap.ui.component.ToggleButton;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 
@@ -44,7 +44,7 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
     int internalWidth;
     Integer distance;
     Waypoint waypoint;
-    ToggleButton buttonEnable;
+    OnOffButton buttonEnable;
     Button buttonRemove;
     Button buttonEdit;
     Button buttonFind;
@@ -63,7 +63,7 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
         String on = Constants.getString("jm.common.on");
         String off = Constants.getString("jm.common.off");
 
-        buttonEnable = new ToggleButton(id++, on, off, true); //$NON-NLS-1$
+        buttonEnable = new OnOffButton(id++, on, off, true); //$NON-NLS-1$
         buttonEnable.setToggled(waypoint.isEnable());
         buttonFind = new Button(id++, Constants.getString("jm.waypoint.find")); //$NON-NLS-1$
 

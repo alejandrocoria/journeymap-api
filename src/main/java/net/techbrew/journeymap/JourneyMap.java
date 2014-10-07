@@ -172,14 +172,32 @@ public class JourneyMap
     {
         if (INSTANCE.miniMapProperties1.isActive())
         {
-            INSTANCE.miniMapProperties2.setActive(true);
-            INSTANCE.miniMapProperties1.setActive(false);
+            toggleMiniMapPreset(2);
         }
         else
         {
-            INSTANCE.miniMapProperties1.setActive(true);
-            INSTANCE.miniMapProperties2.setActive(false);
+            toggleMiniMapPreset(1);
         }
+    }
+
+    public static void toggleMiniMapPreset(int which)
+    {
+        switch (which)
+        {
+            case 2:
+            {
+                INSTANCE.miniMapProperties2.setActive(true);
+                INSTANCE.miniMapProperties1.setActive(false);
+                break;
+            }
+            default:
+            {
+                INSTANCE.miniMapProperties1.setActive(true);
+                INSTANCE.miniMapProperties2.setActive(false);
+            }
+        }
+
+        UIManager.getInstance().resetMinimap();
     }
 
     public static MiniMapProperties getMiniMapProperties1()

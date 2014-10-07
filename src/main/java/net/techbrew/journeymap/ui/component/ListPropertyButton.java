@@ -5,60 +5,48 @@ import net.minecraft.client.gui.FontRenderer;
 import net.techbrew.journeymap.properties.PropertiesBase;
 import org.lwjgl.input.Keyboard;
 
-import java.util.Arrays;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Created by Mark on 8/28/2014.
+ * Base class for a property that has a list of values.
  */
-public class StringPropertyButton extends Button
+public class ListPropertyButton<T> extends Button
 {
     final PropertiesBase properties;
-    final AtomicReference<String> valueHolder;
-    final List<String> values;
+    final AtomicReference<T> valueHolder;
+    final List<T> values;
     final String baseLabel;
     final String glyph = "\u21D5";
     final String labelPattern = "%1$s:  %2$s %3$s %2$s";
 
-    public StringPropertyButton(int id, String[] stringValues, String label, PropertiesBase properties, AtomicReference<String> valueHolder)
+    public ListPropertyButton(int id, Collection<T> enumValues, String label, PropertiesBase properties, AtomicReference<T> valueHolder)
     {
         super(id, "");
         this.valueHolder = valueHolder;
         this.properties = properties;
-        this.values = Arrays.asList(stringValues);
+        this.values = new ArrayList<T>(enumValues);
         this.baseLabel = label;
         setValue(valueHolder.get());
+        disabledLabelColor = Color.darkGray;
     }
 
-    public void setValue(String value)
+    public void setValue(T value)
     {
         if (!valueHolder.get().equals(value))
         {
             valueHolder.set(value);
             properties.save();
         }
-        displayString = getFormattedLabel(value);
+        displayString = getFormattedLabel(value.toString());
     }
 
-    private String getFormattedLabel(String value)
-    {
-        return String.format(labelPattern, baseLabel, glyph, value);
-    }
-
-    public AtomicReference<String> getValueHolder()
+    public AtomicReference<T> getValueHolder()
     {
         return valueHolder;
-    }
-
-    public void prevOption()
-    {
-        int index = values.indexOf(valueHolder.get()) - 1;
-        if (index == -1)
-        {
-            index = values.size() - 1;
-        }
-        setValue(values.get(index));
     }
 
     public void nextOption()
@@ -67,6 +55,16 @@ public class StringPropertyButton extends Button
         if (index == values.size())
         {
             index = 0;
+        }
+        setValue(values.get(index));
+    }
+
+    public void prevOption()
+    {
+        int index = values.indexOf(valueHolder.get()) - 1;
+        if (index == -1)
+        {
+            index = values.size() - 1;
         }
         setValue(values.get(index));
     }
@@ -82,13 +80,18 @@ public class StringPropertyButton extends Button
         return false;
     }
 
+    private String getFormattedLabel(String value)
+    {
+        return String.format(labelPattern, baseLabel, glyph, value);
+    }
+
     @Override
     public int getFitWidth(FontRenderer fr)
     {
         int max = fr.getStringWidth(displayString);
-        for (String value : values)
+        for (T value : values)
         {
-            max = Math.max(max, fr.getStringWidth(getFormattedLabel(value)));
+            max = Math.max(max, fr.getStringWidth(getFormattedLabel(value.toString())));
         }
         return max + WIDTH_PAD;
     }

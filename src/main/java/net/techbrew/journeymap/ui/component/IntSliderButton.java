@@ -6,6 +6,7 @@ import net.techbrew.journeymap.properties.PropertiesBase;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -35,6 +36,7 @@ public class IntSliderButton extends Button
         this.property = property;
         this.properties = properties;
         setValue(property.get());
+        super.disabledLabelColor = Color.darkGray;
     }
 
     /**
@@ -58,7 +60,7 @@ public class IntSliderButton extends Button
      */
     protected void mouseDragged(Minecraft par1Minecraft, int par2, int par3)
     {
-        if (this.visible)
+        if (this.visible && this.enabled)
         {
             if (this.dragging)
             {

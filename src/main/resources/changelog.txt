@@ -12,6 +12,13 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Multiple bugfixes and improvements to keep the two Minimap Presets properly separated
+- Change: Introduced an optional toolbar structure at the bottom of Option Manager sections.  Minimap Preview buttons moved there.
+- Change Minimap Preset previews in Option Manager now briefly show the number of the Preset
+- Change: Minimap rendering moved to display before F3 Debug text and Scoreboard displays.
+- Change: Lots of refactoring and moving code stuff around.  Hopefully no bugs introduced as a result.  Hahahaha.
+
+## Changelog for JourneyMap 5.0.0a4:
 - New Feature: MiniMap Presets.  You can now toggle between two completely unique Minimap configurations using the \ key in-game.  Options Manager has settings for both.
 - Bugfix: Options Manager / Minimap / Slider controls didn't take effect while dragging
 - Change: Minimap opacity and Frame opacity are now drawn using a completely different alpha technique, but the net result is the same.

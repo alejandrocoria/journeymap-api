@@ -60,9 +60,9 @@ public class MapRegionTask extends BaseMapTask
         final List<ChunkCoordIntPair> retainedCoords = new ArrayList<ChunkCoordIntPair>(renderCoords.size());
 
         // Ensure chunks north, west, nw are kept alive for slope calculations
-        for(ChunkCoordIntPair coord : renderCoords)
+        for (ChunkCoordIntPair coord : renderCoords)
         {
-            for(ChunkCoordIntPair keepAliveOffset : keepAliveOffsets)
+            for (ChunkCoordIntPair keepAliveOffset : keepAliveOffsets)
             {
                 ChunkCoordIntPair keepAliveCoord = new ChunkCoordIntPair(coord.chunkXPos + keepAliveOffset.chunkXPos, coord.chunkZPos + keepAliveOffset.chunkZPos);
                 if (!renderCoords.contains(keepAliveCoord))
@@ -137,7 +137,7 @@ public class MapRegionTask extends BaseMapTask
      */
     public static class Manager implements ITaskManager
     {
-        final int mapTaskDelay = JourneyMap.getCoreProperties().autoMapPoll.get();
+        final int mapTaskDelay = 0;
 
         RegionLoader regionLoader;
         boolean enabled;
@@ -158,7 +158,7 @@ public class MapRegionTask extends BaseMapTask
                 return false;
             }
 
-            if ((System.currentTimeMillis() - lastTaskCompleted) < mapTaskDelay)
+            if ((System.currentTimeMillis() - lastTaskCompleted) < JourneyMap.getCoreProperties().autoMapPoll.get())
             {
                 return false;
             }

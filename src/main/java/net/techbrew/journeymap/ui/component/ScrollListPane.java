@@ -88,6 +88,12 @@ public class ScrollListPane extends GuiSlot
         }
     }
 
+    public void scrollTo(ISlot slot)
+    {
+        scrollBy(-(currentSlots.size() * slotHeight));
+        scrollBy(currentSlots.indexOf(slot) * slotHeight);
+    }
+
     /**
      * The element in the slot that was clicked, boolean for whether it was double clicked or not
      */

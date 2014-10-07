@@ -57,7 +57,7 @@ public class WaypointEditor extends JmUI
     String labelB = Constants.getString("jm.waypoint.blue_abbreviated");
     String currentLocation = "";
     private Button buttonRandomize;
-    private ToggleButton buttonEnable;
+    private OnOffButton buttonEnable;
     private Button buttonRemove;
     private Button buttonReset;
     private Button buttonSave;
@@ -178,7 +178,7 @@ public class WaypointEditor extends JmUI
 
                 buttonRandomize = new Button(ButtonEnum.Randomize, Constants.getString("jm.waypoint.randomize")); //$NON-NLS-1$
 
-                buttonEnable = new ToggleButton(ButtonEnum.Enable, enableOn, enableOff, true); //$NON-NLS-1$
+                buttonEnable = new OnOffButton(ButtonEnum.Enable, enableOn, enableOff, true); //$NON-NLS-1$
                 buttonEnable.setToggled(originalWaypoint.isEnable());
 
                 buttonRemove = new Button(ButtonEnum.Remove, Constants.getString("jm.waypoint.remove")); //$NON-NLS-1$
@@ -679,7 +679,7 @@ public class WaypointEditor extends JmUI
         Randomize, Enable, Remove, Reset, Save, Close
     }
 
-    class DimensionButton extends ToggleButton
+    class DimensionButton extends OnOffButton
     {
         public final int dimension;
 

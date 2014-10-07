@@ -19,7 +19,6 @@ import java.awt.*;
  */
 public class TextField extends GuiTextField
 {
-
     // ReflectionHelper field indices
     protected static final int INDEX_X = 1;
     protected static final int INDEX_Y = 2;

@@ -32,9 +32,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MapOverlayState
+public class MapState
 {
-
     public final int minZoom = 0;
     public final int maxZoom = 5;
     // One-time setup
@@ -63,7 +62,7 @@ public class MapOverlayState
     /**
      * Default constructor
      */
-    public MapOverlayState()
+    public MapState()
     {
     }
 

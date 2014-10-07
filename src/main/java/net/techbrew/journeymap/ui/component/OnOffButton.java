@@ -9,19 +9,19 @@ import java.util.ArrayList;
 /**
  * Created by Mark on 10/2/2014.
  */
-public class ToggleButton extends Button
+public class OnOffButton extends Button
 {
     protected Boolean toggled = true;
     protected String labelOn;
     protected String labelOff;
     protected ArrayList<ToggleListener> toggleListeners = new ArrayList<ToggleListener>(0);
 
-    public ToggleButton(Enum enumValue, String labelOn, String labelOff, boolean toggled)
+    public OnOffButton(Enum enumValue, String labelOn, String labelOff, boolean toggled)
     {
         this(enumValue.ordinal(), labelOn, labelOff, toggled);
     }
 
-    public ToggleButton(int id, String labelOn, String labelOff, boolean toggled)
+    public OnOffButton(int id, String labelOn, String labelOff, boolean toggled)
     {
         super(id, toggled ? labelOn : labelOff);
         this.labelOn = labelOn;
@@ -122,7 +122,7 @@ public class ToggleButton extends Button
 
     public static interface ToggleListener
     {
-        public boolean onToggle(ToggleButton button, boolean toggled);
+        public boolean onToggle(OnOffButton button, boolean toggled);
     }
 }
 

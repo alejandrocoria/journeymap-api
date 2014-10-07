@@ -7,29 +7,30 @@ import net.minecraft.client.gui.FontRenderer;
 import net.techbrew.journeymap.properties.PropertiesBase;
 import org.lwjgl.input.Keyboard;
 
+import java.awt.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Based on GuiCheckBox
  */
-public class CheckBox extends ToggleButton
+public class CheckBox extends BooleanPropertyButton
 {
     public int boxWidth = 11;
     AtomicBoolean property;
     PropertiesBase properties;
     String glyph = "\u2714";
 
-    public CheckBox(int id, String displayString, AtomicBoolean property, PropertiesBase properties)
-    {
-        this(id, displayString, property.get());
-        this.property = property;
-        this.properties = properties;
-    }
-
     public CheckBox(int id, String displayString, boolean checked)
     {
-        super(id, displayString, displayString, checked);
+        this(id, displayString, null, null);
         this.toggled = checked;
+    }
+
+    public CheckBox(int id, String displayString, AtomicBoolean property, PropertiesBase properties)
+    {
+        super(id, displayString, displayString, properties, property);
+        this.property = property;
+        this.properties = properties;
         FontRenderer fr = FMLClientHandler.instance().getClient().fontRenderer;
         this.height = fr.FONT_HEIGHT + 2;
         this.width = getFitWidth(fr);
@@ -50,7 +51,7 @@ public class CheckBox extends ToggleButton
         if (this.visible)
         {
 
-            this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            this.field_146123_n = enabled && mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
 
             int yoffset = (this.height - this.boxWidth) / 2;
             GuiUtils.drawContinuousTexturedBox(buttonTextures, this.xPosition, this.yPosition + yoffset, 0, 46, this.boxWidth, this.boxWidth, 200, 20, 2, 3, 2, 2, this.zLevel);
@@ -61,16 +62,20 @@ public class CheckBox extends ToggleButton
             {
                 color = 16777120;
             }
+            else if (!enabled)
+            {
+                color = Color.DARK_GRAY.getRGB();
+            }
             else if (packedFGColour != 0)
             {
-                //color = packedFGColour;
+                color = packedFGColour;
             }
 
             int labelPad = 4;
 
             if (this.toggled)
             {
-                this.drawCenteredString(mc.fontRenderer, glyph, this.xPosition + this.boxWidth / 2 + 1, this.yPosition + 1 + yoffset, 14737632);
+                this.drawCenteredString(mc.fontRenderer, glyph, this.xPosition + this.boxWidth / 2 + 1, this.yPosition + 1 + yoffset, color);
             }
 
             this.drawString(mc.fontRenderer, displayString, xPosition + this.boxWidth + labelPad, yPosition + 2 + yoffset, color);

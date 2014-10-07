@@ -218,9 +218,9 @@ public class ThemeFileHandler
     public static class ThemeStringListProvider implements StringListProvider
     {
         @Override
-        public String[] getStrings()
+        public List<String> getStrings()
         {
-            return ThemeFileHandler.getThemeNames().toArray(new String[0]);
+            return ThemeFileHandler.getThemeNames();
         }
 
         @Override

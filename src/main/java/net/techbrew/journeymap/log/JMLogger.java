@@ -31,6 +31,7 @@ import org.apache.logging.log4j.message.SimpleMessage;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class JMLogger
@@ -40,6 +41,7 @@ public class JMLogger
 
     // Singleton error hashcodes
     static private final HashSet<Integer> singletonErrors = new HashSet<Integer>();
+    static private final AtomicInteger singletonErrorsCounter = new AtomicInteger(0);
 
     private static RandomAccessFileAppender fileAppender;
 
@@ -198,11 +200,12 @@ public class JMLogger
         // Add config files
         JourneyMap jm = JourneyMap.getInstance();
         List<? extends PropertiesBase> configs = Arrays.asList(
-                jm.getCoreProperties(),
+                jm.getMiniMapProperties1(),
+                jm.getMiniMapProperties2(),
                 jm.getFullMapProperties(),
-                jm.getMiniMapProperties(),
                 jm.getWaypointProperties(),
-                jm.getWebMapProperties()
+                jm.getWebMapProperties(),
+                jm.getCoreProperties()
         );
 
         for (PropertiesBase config : configs)
@@ -228,10 +231,19 @@ public class JMLogger
         if (!singletonErrors.contains(text.hashCode()))
         {
             singletonErrors.add(text.hashCode());
-            JourneyMap.getLogger().error(text + " (SUPPRESSED FROM NOW ON)");
+            JourneyMap.getLogger().error(text + " (SUPPRESSED)");
             if (throwable != null)
             {
                 JourneyMap.getLogger().error(LogFormatter.toString(throwable));
+            }
+        }
+        else
+        {
+            int count = singletonErrorsCounter.incrementAndGet();
+            if (count > 100)
+            {
+                singletonErrors.clear();
+                singletonErrorsCounter.set(0);
             }
         }
     }
@@ -239,7 +251,7 @@ public class JMLogger
     public static class LogLevelStringProvider implements StringListProvider
     {
         @Override
-        public String[] getStrings()
+        public List<String> getStrings()
         {
             Level[] levels = Level.values();
             String[] levelStrings = new String[levels.length];
@@ -247,7 +259,7 @@ public class JMLogger
             {
                 levelStrings[i] = levels[i].toString();
             }
-            return levelStrings;
+            return Arrays.asList(levelStrings);
         }
 
         @Override

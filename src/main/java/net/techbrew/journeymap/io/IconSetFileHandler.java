@@ -93,9 +93,9 @@ public class IconSetFileHandler
     public static class IconSetStringListProvider implements StringListProvider
     {
         @Override
-        public String[] getStrings()
+        public List<String> getStrings()
         {
-            return IconSetFileHandler.getEntityIconSetNames().toArray(new String[0]);
+            return IconSetFileHandler.getEntityIconSetNames();
         }
 
         @Override

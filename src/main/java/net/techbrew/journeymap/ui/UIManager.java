@@ -24,14 +24,12 @@ import net.techbrew.journeymap.ui.component.JmUI;
 import net.techbrew.journeymap.ui.dialog.FullscreenActions;
 import net.techbrew.journeymap.ui.dialog.FullscreenHotkeysHelp;
 import net.techbrew.journeymap.ui.dialog.OptionsManager;
-import net.techbrew.journeymap.ui.dialog.StyleOptions;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import net.techbrew.journeymap.ui.minimap.MiniMap;
 import net.techbrew.journeymap.ui.minimap.MiniMapHotkeysHelp;
 import net.techbrew.journeymap.ui.waypoint.WaypointEditor;
 import net.techbrew.journeymap.ui.waypoint.WaypointHelp;
 import net.techbrew.journeymap.ui.waypoint.WaypointManager;
-import net.techbrew.journeymap.ui.waypoint.WaypointOptions;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
@@ -197,17 +195,7 @@ public class UIManager
         open(MiniMapHotkeysHelp.class, returnClass);
     }
 
-    public void openWaypointOptions(Class<? extends JmUI> returnClass)
-    {
-        open(WaypointOptions.class, returnClass);
-    }
-
-    public void openStyleOptions(Class<? extends JmUI> returnClass)
-    {
-        open(StyleOptions.class, returnClass);
-    }
-
-    public void openMasterOptions()
+    public void openOptionsManager()
     {
         open(OptionsManager.class);
     }

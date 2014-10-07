@@ -12,6 +12,7 @@ package net.techbrew.journeymap.render.draw;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
@@ -251,7 +252,7 @@ public class DrawUtil
         if (blend)
         {
             GL11.glEnable(GL11.GL_BLEND);
-            GL11.glBlendFunc(glBlendSfactor, glBlendDFactor); // normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
+            OpenGlHelper.glBlendFunc(glBlendSfactor, glBlendDFactor, 1, 0);
         }
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -307,7 +308,8 @@ public class DrawUtil
         {
             if (glBlendSfactor != GL11.GL_SRC_ALPHA || glBlendDFactor != GL11.GL_ONE_MINUS_SRC_ALPHA)
             {
-                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                GL11.glEnable(GL11.GL_BLEND);
+                OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
             }
         }
 
@@ -316,8 +318,8 @@ public class DrawUtil
 
     public static void drawRectangle(double x, double y, double width, double height, Color color, int alpha)
     {
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glEnable(GL11.GL_BLEND);
+        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
         GL11.glDisable(GL11.GL_ALPHA_TEST);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         Tessellator tessellator = Tessellator.instance;
@@ -328,6 +330,36 @@ public class DrawUtil
         tessellator.addVertexWithUV(x + width, y, zLevel, 1, 0);
         tessellator.addVertexWithUV(x, y, zLevel, 0, 0);
         tessellator.draw();
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GL11.glDisable(GL11.GL_BLEND);
+    }
+
+    /**
+     * Draws a rectangle with a vertical gradient between the specified colors.
+     * 0, top, this.width, this.height - top, -1072689136, -804253680
+     */
+    public static void drawGradientRect(double x, double y, double width, double height, Color startColor, int startAlpha, Color endColor, int endAlpha)
+    {
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glDisable(GL11.GL_ALPHA_TEST);
+        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+
+        GL11.glShadeModel(GL11.GL_SMOOTH);
+
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawingQuads();
+        tessellator.setColorRGBA_I(endColor.getRGB(), endAlpha);
+        tessellator.addVertexWithUV(x, height + y, zLevel, 0, 1);
+        tessellator.addVertexWithUV(x + width, height + y, zLevel, 1, 1);
+        tessellator.setColorRGBA_I(startColor.getRGB(), startAlpha);
+        tessellator.addVertexWithUV(x + width, y, zLevel, 1, 0);
+        tessellator.addVertexWithUV(x, y, zLevel, 0, 0);
+        tessellator.draw();
+
+        GL11.glShadeModel(GL11.GL_FLAT);
+
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_ALPHA_TEST);
         GL11.glDisable(GL11.GL_BLEND);

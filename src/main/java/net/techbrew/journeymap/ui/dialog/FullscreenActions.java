@@ -17,7 +17,7 @@ import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.io.MapSaver;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.model.MapOverlayState;
+import net.techbrew.journeymap.model.MapState;
 import net.techbrew.journeymap.task.MapRegionTask;
 import net.techbrew.journeymap.task.SaveMapTask;
 import net.techbrew.journeymap.ui.UIManager;
@@ -155,7 +155,7 @@ public class FullscreenActions extends JmUI
 
     void save()
     {
-        final MapOverlayState state = Fullscreen.state();
+        final MapState state = Fullscreen.state();
         boolean showCaves = JourneyMap.getFullMapProperties().showCaves.get();
         final MapType mapType = state.getMapType(showCaves);
         final Integer vSlice = state.getMapType(showCaves) == MapType.underground ? state.getVSlice() : null;

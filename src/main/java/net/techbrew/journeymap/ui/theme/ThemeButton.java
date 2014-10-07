@@ -41,7 +41,7 @@ public class ThemeButton extends BooleanPropertyButton
 
     public ThemeButton(int id, Theme theme, String labelOn, String labelOff, boolean toggled, String iconName)
     {
-        super(id, Type.OnOff, labelOn, labelOff, null, null);
+        super(id, labelOn, labelOff, null, null);
         this.iconName = iconName;
         this.setToggled(toggled);
         updateTheme(theme);
@@ -49,7 +49,7 @@ public class ThemeButton extends BooleanPropertyButton
 
     protected ThemeButton(int id, Theme theme, String labelOn, String labelOff, String iconName, PropertiesBase properties, AtomicBoolean property)
     {
-        super(id, Type.OnOff, labelOn, labelOff, properties, property);
+        super(id, labelOn, labelOff, properties, property);
         this.iconName = iconName;
         updateTheme(theme);
     }

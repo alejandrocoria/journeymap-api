@@ -49,7 +49,7 @@ public class WaypointManager extends JmUI
     final String off = Constants.getString("jm.common.off");
     protected int rowHeight = 16;
     protected Boolean canUserTeleport;
-    ToggleButton buttonToggleAll;
+    OnOffButton buttonToggleAll;
     private SortButton buttonSortName, buttonSortDistance;
     private DimensionsButton buttonDimensions;
     private Button buttonClose, buttonAdd, buttonHelp, buttonOptions;
@@ -104,7 +104,7 @@ public class WaypointManager extends JmUI
                 {
                     String enableOn = Constants.getString("jm.waypoint.enable_all", "", on);
                     String enableOff = Constants.getString("jm.waypoint.enable_all", "", off);
-                    buttonToggleAll = new ToggleButton(ButtonEnum.ToggleAll.ordinal(), enableOff, enableOn, true);
+                    buttonToggleAll = new OnOffButton(ButtonEnum.ToggleAll.ordinal(), enableOff, enableOn, true);
                     buttonToggleAll.setTextOnly(getFontRenderer());
                 }
                 buttonList.add(buttonToggleAll);
@@ -568,7 +568,7 @@ public class WaypointManager extends JmUI
         }
     }
 
-    protected class SortButton extends ToggleButton
+    protected class SortButton extends OnOffButton
     {
         final WaypointManagerItem.Sort sort;
         final String labelInactive;
