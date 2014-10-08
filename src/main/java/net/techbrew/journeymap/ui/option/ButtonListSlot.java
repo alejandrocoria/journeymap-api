@@ -28,6 +28,8 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     HashMap<Button, SlotMetadata> buttonOptionMetadata = new HashMap<Button, SlotMetadata>();
     CategorySlot parent;
     SlotMetadata lastPressed = null;
+    Color colorToolbarBgStart = new Color(0, 0, 100);
+    Color colorToolbarBgEnd = new Color(0, 0, 100);
 
     public ButtonListSlot(CategorySlot parent)
     {
@@ -38,6 +40,15 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     {
         buttons.add(slotMetadata.getButton());
         buttonOptionMetadata.put(slotMetadata.getButton(), slotMetadata);
+        return this;
+    }
+
+    public ButtonListSlot addAll(Collection<SlotMetadata> slotMetadataCollection)
+    {
+        for (SlotMetadata slotMetadata : slotMetadataCollection)
+        {
+            add(slotMetadata);
+        }
         return this;
     }
 
@@ -65,12 +76,14 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     @Override
     public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
     {
+        int margin = 0;
         if (parent.getCurrentColumnWidth() > 0)
         {
             int cols = listWidth / parent.currentColumnWidth;
-            int margin = (listWidth - ((hgap * cols - 1) + cols * parent.getCurrentColumnWidth())) / 2;
+            margin = (listWidth - ((hgap * cols - 1) + cols * parent.getCurrentColumnWidth())) / 2;
 
             x += margin;
+            listWidth -= (margin * 2);
         }
         SlotMetadata tooltipMetadata = null;
         if (buttons.size() > 0)
@@ -80,11 +93,12 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
             if (buttonOptionMetadata.get(buttons.get(0)).isToolbar())
             {
                 buttons.fitWidths(fontRenderer);
-                buttons.layoutHorizontal(listWidth, y, false, hgap);
-                DrawUtil.drawGradientRect(x, y, listWidth, slotHeight, new Color(0, 0, 100), 40, new Color(0, 0, 100), 150);
+                buttons.layoutHorizontal(x + listWidth - hgap, y, false, hgap);
+                DrawUtil.drawGradientRect(x, y, listWidth, slotHeight, colorToolbarBgStart, 40, colorToolbarBgEnd, 150);
             }
             else
             {
+                buttons.setWidths(parent.currentColumnWidth);
                 buttons.layoutHorizontal(x, y, true, hgap);
             }
 

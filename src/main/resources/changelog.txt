@@ -14,6 +14,8 @@ http://journeymap.techbrew.net
 ## Changelog for JourneyMap @JMVERSION@:
 - Bugfix: Cacti now treated as plants with respect to Cartography options
 - Change: Options Manager now has "Hot Keys..." buttons in the toolbars for MiniMap Preset 1, 2, and Fullscreen Map sections
+- Change: Options Manager layout now adjusts rows to be centered in the screen, toolbars are now right-justified
+- Change: Options Manager minor style / color tweaks.
 
 ## Changelog for JourneyMap 5.0.0a6:
 - New Feature: Rectangle Shape for MiniMap. Because Mitchel, that's why.

@@ -97,7 +97,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                     {
                         if (FMLClientHandler.instance().getClient().currentScreen == null)
                         {
-                            UIManager.getInstance().openMap();
+                            UIManager.getInstance().openFullscreenMap();
                         }
                         else
                         {

@@ -361,7 +361,7 @@ public class Fullscreen extends JmUI
                 @Override
                 public boolean onToggle(OnOffButton button, boolean toggled)
                 {
-                    UIManager.getInstance().openWaypointManager(null, Fullscreen.class);
+                    UIManager.getInstance().openWaypointManager(null, Fullscreen.this);
                     return true;
                 }
             });

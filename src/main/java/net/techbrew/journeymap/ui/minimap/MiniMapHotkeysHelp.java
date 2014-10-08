@@ -10,12 +10,9 @@ package net.techbrew.journeymap.ui.minimap;
 
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.forgehandler.KeyEventHandler;
-import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.JmUI;
-import net.techbrew.journeymap.ui.dialog.OptionsManager;
 
 import java.awt.*;
 
@@ -29,14 +26,9 @@ public class MiniMapHotkeysHelp extends JmUI
     private Position currentPosition;
     private KeyEventHandler keyEventHandler;
 
-    public MiniMapHotkeysHelp()
+    public MiniMapHotkeysHelp(JmUI returnDisplay)
     {
-        this(OptionsManager.class);
-    }
-
-    public MiniMapHotkeysHelp(Class<? extends JmUI> returnClass)
-    {
-        super(Constants.getString("jm.minimap.hotkeys_title"), returnClass);
+        super(Constants.getString("jm.minimap.hotkeys_title"), returnDisplay);
         keyEventHandler = new KeyEventHandler();
     }
 
@@ -49,6 +41,7 @@ public class MiniMapHotkeysHelp extends JmUI
         this.buttonList.clear();
 
         buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
+        buttonClose.setWidth(150);
 
         buttonList.add(buttonClose);
 
@@ -130,12 +123,6 @@ public class MiniMapHotkeysHelp extends JmUI
     public void drawBackground(int layer)
     {
         super.drawBackground(layer);
-
-        if (JourneyMap.getMiniMapProperties().enabled.get())
-        {
-            MiniMap miniMap = UIManager.getInstance().getMiniMap();
-            miniMap.drawMap();
-        }
     }
 
     @Override

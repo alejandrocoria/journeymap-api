@@ -161,7 +161,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         // Edit selected waypoint
         if (selected != null)
         {
-            UIManager.getInstance().openWaypointManager(selected, Fullscreen.class);
+            UIManager.getInstance().openWaypointManager(selected, new Fullscreen()); // TODO: This could be a problem
             return drawStepList;
         }
 
@@ -176,7 +176,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         // Create waypoint
         ChunkCoordinates cc = new ChunkCoordinates(blockCoord.x, y, blockCoord.z);
         Waypoint waypoint = Waypoint.at(cc, Waypoint.Type.Normal, mc.thePlayer.dimension);
-        UIManager.getInstance().openWaypointEditor(waypoint, true, Fullscreen.class);
+        UIManager.getInstance().openWaypointEditor(waypoint, true, new Fullscreen()); // TODO: This could be a problem
 
         return drawStepList;
     }

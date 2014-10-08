@@ -102,6 +102,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         }
 
         currentListWidth = listWidth;
+        currentColumnWidth = columnWidth;
         currentColumns = columns;
 
         // Rebuild slots
@@ -118,6 +119,13 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
                 if (!remaining.isEmpty())
                 {
                     SlotMetadata.ValueType thisType = remaining.get(0).valueType;
+                    if (lastType == null && thisType == SlotMetadata.ValueType.Toolbar)
+                    {
+                        row.addAll(remaining);
+                        remaining.clear();
+                        break;
+                    }
+
                     if (lastType != null && lastType != thisType)
                     {
                         if (thisType == SlotMetadata.ValueType.Toolbar)

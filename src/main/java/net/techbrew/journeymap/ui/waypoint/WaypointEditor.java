@@ -78,9 +78,9 @@ public class WaypointEditor extends JmUI
     private Waypoint editedWaypoint;
     private ButtonList bottomButtons;
 
-    public WaypointEditor(Waypoint waypoint, boolean isNew, Class<? extends JmUI> returnClass)
+    public WaypointEditor(Waypoint waypoint, boolean isNew, JmUI returnDisplay)
     {
-        super(Constants.getString(isNew ? "jm.waypoint.new_title" : "jm.waypoint.edit_title"), returnClass);
+        super(Constants.getString(isNew ? "jm.waypoint.new_title" : "jm.waypoint.edit_title"), returnDisplay);
         this.originalWaypoint = waypoint;
         this.editedWaypoint = new Waypoint(originalWaypoint);
         this.isNew = isNew;
@@ -650,9 +650,9 @@ public class WaypointEditor extends JmUI
 
     protected void refreshAndClose(Waypoint focusWaypoint)
     {
-        if (returnClass != null && returnClass.equals(WaypointManager.class))
+        if (returnDisplay != null && returnDisplay.equals(WaypointManager.class))
         {
-            UIManager.getInstance().openWaypointManager(focusWaypoint, Fullscreen.class);
+            UIManager.getInstance().openWaypointManager(focusWaypoint, new Fullscreen());
             return;
         }
 
@@ -664,13 +664,13 @@ public class WaypointEditor extends JmUI
     @Override
     protected void closeAndReturn()
     {
-        if (returnClass == null)
+        if (returnDisplay == null)
         {
             UIManager.getInstance().closeAll();
         }
         else
         {
-            UIManager.getInstance().open(returnClass);
+            UIManager.getInstance().open(returnDisplay);
         }
     }
 

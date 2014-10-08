@@ -34,7 +34,7 @@ public abstract class JmUI extends GuiScreen
     protected final String title;
     protected final int headerHeight = 25;
     protected final Logger logger = JourneyMap.getLogger();
-    protected final Class<? extends JmUI> returnClass;
+    protected final JmUI returnDisplay;
     protected int scaleFactor = 1;
     protected TextureImpl logo = TextureCache.instance().getLogo();
 
@@ -43,11 +43,11 @@ public abstract class JmUI extends GuiScreen
         this(title, null);
     }
 
-    public JmUI(String title, Class<? extends JmUI> returnClass)
+    public JmUI(String title, JmUI returnDisplay)
     {
         super();
         this.title = title;
-        this.returnClass = returnClass;
+        this.returnDisplay = returnDisplay;
     }
 
 
@@ -203,13 +203,13 @@ public abstract class JmUI extends GuiScreen
 
     protected void closeAndReturn()
     {
-        if (returnClass == null)
+        if (returnDisplay == null)
         {
             UIManager.getInstance().openOptionsManager();
         }
         else
         {
-            UIManager.getInstance().open(returnClass);
+            UIManager.getInstance().open(returnDisplay);
         }
     }
 

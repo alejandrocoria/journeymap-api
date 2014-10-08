@@ -17,7 +17,6 @@ import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.ButtonList;
 import net.techbrew.journeymap.ui.component.JmUI;
-import net.techbrew.journeymap.ui.dialog.OptionsManager;
 import net.techbrew.journeymap.waypoint.ReiReader;
 import net.techbrew.journeymap.waypoint.VoxelReader;
 import net.techbrew.journeymap.waypoint.WaypointStore;
@@ -32,14 +31,10 @@ public class WaypointHelp extends JmUI
     int importVoxelTextWidth;
     private Button buttonRei, buttonVoxel, buttonClose;
     private KeyEventHandler keyEventHandler;
-    public WaypointHelp()
-    {
-        this(OptionsManager.class);
-    }
 
-    public WaypointHelp(Class<? extends JmUI> returnClass)
+    public WaypointHelp(JmUI returnDisplay)
     {
-        super(Constants.getString("jm.waypoint.help_title"), returnClass);
+        super(Constants.getString("jm.waypoint.help_title"), returnDisplay);
         keyEventHandler = new KeyEventHandler();
     }
 

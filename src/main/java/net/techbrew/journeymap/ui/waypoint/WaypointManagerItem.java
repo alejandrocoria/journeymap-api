@@ -234,13 +234,13 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
             {
                 if (buttonEdit.mouseOver(mouseX, mouseY))
                 {
-                    UIManager.getInstance().openWaypointEditor(waypoint, false, WaypointManager.class);
+                    UIManager.getInstance().openWaypointEditor(waypoint, false, manager);
                 }
                 else
                 {
                     if (buttonFind.isEnabled() && buttonFind.mouseOver(mouseX, mouseY))
                     {
-                        UIManager.getInstance().openMap(waypoint);
+                        UIManager.getInstance().openFullscreenMap(waypoint);
                     }
                     else
                     {

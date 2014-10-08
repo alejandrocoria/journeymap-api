@@ -75,11 +75,11 @@ public class UIManager
         minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer)); // displayGuiScreen
     }
 
-    public <T extends JmUI> T open(Class<T> uiClass, Class<? extends JmUI> returnClass)
+    public <T extends JmUI> T open(Class<T> uiClass, JmUI returnDisplay)
     {
         try
         {
-            T ui = uiClass.getConstructor(Class.class).newInstance(returnClass);
+            T ui = uiClass.getConstructor(JmUI.class).newInstance(returnDisplay);
             return open(ui);
         }
         catch (Throwable e)
@@ -162,13 +162,13 @@ public class UIManager
         return miniMap;
     }
 
-    public void openMap()
+    public void openFullscreenMap()
     {
         KeyBinding.unPressAllKeys();
         open(Fullscreen.class);
     }
 
-    public void openMap(Waypoint waypoint)
+    public void openFullscreenMap(Waypoint waypoint)
     {
         try
         {
@@ -185,14 +185,14 @@ public class UIManager
         }
     }
 
-    public void openMapHotkeyHelp(Class<? extends JmUI> returnClass)
+    public void openMapHotkeyHelp(JmUI returnDisplay)
     {
-        open(FullscreenHotkeysHelp.class, returnClass);
+        open(FullscreenHotkeysHelp.class, returnDisplay);
     }
 
-    public void openMiniMapHotkeyHelp(Class<? extends JmUI> returnClass)
+    public void openMiniMapHotkeyHelp(JmUI returnDisplay)
     {
-        open(MiniMapHotkeysHelp.class, returnClass);
+        open(MiniMapHotkeysHelp.class, returnDisplay);
     }
 
     public void openOptionsManager()
@@ -200,11 +200,11 @@ public class UIManager
         open(OptionsManager.class);
     }
 
-    public void openMasterOptions(Class<? extends JmUI> returnClass, Config.Category... initialCategories)
+    public void openMasterOptions(JmUI returnDisplay, Config.Category... initialCategories)
     {
         try
         {
-            open(new OptionsManager(returnClass, initialCategories));
+            open(new OptionsManager(returnDisplay, initialCategories));
         }
         catch (Throwable e)
         {
@@ -217,18 +217,18 @@ public class UIManager
         open(FullscreenActions.class);
     }
 
-    public void openWaypointHelp(Class<? extends JmUI> returnClass)
+    public void openWaypointHelp(JmUI returnDisplay)
     {
-        open(WaypointHelp.class, returnClass);
+        open(WaypointHelp.class, returnDisplay);
     }
 
-    public void openWaypointManager(Waypoint waypoint, Class<? extends JmUI> returnClass)
+    public void openWaypointManager(Waypoint waypoint, JmUI returnDisplay)
     {
         if (WaypointsData.isManagerEnabled())
         {
             try
             {
-                WaypointManager manager = new WaypointManager(waypoint, returnClass);
+                WaypointManager manager = new WaypointManager(waypoint, returnDisplay);
                 open(manager);
             }
             catch (Throwable e)
@@ -238,13 +238,13 @@ public class UIManager
         }
     }
 
-    public void openWaypointEditor(Waypoint waypoint, boolean isNew, Class<? extends JmUI> returnClass)
+    public void openWaypointEditor(Waypoint waypoint, boolean isNew, JmUI returnDisplay)
     {
         if (WaypointsData.isManagerEnabled())
         {
             try
             {
-                WaypointEditor editor = new WaypointEditor(waypoint, isNew, returnClass);
+                WaypointEditor editor = new WaypointEditor(waypoint, isNew, returnDisplay);
                 open(editor);
             }
             catch (Throwable e)

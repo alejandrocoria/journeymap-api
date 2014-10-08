@@ -52,14 +52,14 @@ public class OptionsManager extends JmUI
         this(null);
     }
 
-    public OptionsManager(Class<? extends JmUI> returnClass)
+    public OptionsManager(JmUI returnDisplay)
     {
-        this(returnClass, null, null);
+        this(returnDisplay, null, null);
     }
 
-    public OptionsManager(Class<? extends JmUI> returnClass, Config.Category... initialCategories)
+    public OptionsManager(JmUI returnDisplay, Config.Category... initialCategories)
     {
-        super("JourneyMap " + Constants.getString("jm.common.options"), returnClass);
+        super("JourneyMap " + Constants.getString("jm.common.options"), returnDisplay);
         this.initialCategories = initialCategories;
     }
 
@@ -92,6 +92,7 @@ public class OptionsManager extends JmUI
                 String tooltip = Constants.getString("jm.common.hotkeys.tooltip");
                 minimap1KeysButton = new Button(0, name);
                 minimap1KeysButton.setTooltip(tooltip);
+                minimap1KeysButton.setDrawBackground(false);
             }
 
             if (minimap2KeysButton == null)
@@ -100,6 +101,7 @@ public class OptionsManager extends JmUI
                 String tooltip = Constants.getString("jm.common.hotkeys.tooltip");
                 minimap2KeysButton = new Button(0, name);
                 minimap2KeysButton.setTooltip(tooltip);
+                minimap2KeysButton.setDrawBackground(false);
             }
 
             if (fullscreenKeysButton == null)
@@ -108,6 +110,7 @@ public class OptionsManager extends JmUI
                 String tooltip = Constants.getString("jm.common.hotkeys.tooltip");
                 fullscreenKeysButton = new Button(0, name);
                 fullscreenKeysButton.setTooltip(tooltip);
+                fullscreenKeysButton.setDrawBackground(false);
             }
 
             if (optionsListPane == null)
@@ -343,13 +346,15 @@ public class OptionsManager extends JmUI
 
             if (slotMetadata.getButton() == minimap1KeysButton || slotMetadata.getButton() == minimap2KeysButton)
             {
-                UIManager.getInstance().openMiniMapHotkeyHelp(OptionsManager.class);
+                optionsListPane.resetLastPressed();
+                UIManager.getInstance().openMiniMapHotkeyHelp(this);
                 return;
             }
 
             if (slotMetadata.getButton() == fullscreenKeysButton)
             {
-                UIManager.getInstance().openMapHotkeyHelp(OptionsManager.class);
+                optionsListPane.resetLastPressed();
+                UIManager.getInstance().openMapHotkeyHelp(this);
                 return;
             }
         }
@@ -510,13 +515,13 @@ public class OptionsManager extends JmUI
         JourneyMap.getMiniMapProperties2().save();
         JourneyMap.getWaypointProperties().save();
 
-        if (returnClass == null)
+        if (returnDisplay == null)
         {
-            UIManager.getInstance().openMap();
+            UIManager.getInstance().openFullscreenMap();
         }
         else
         {
-            UIManager.getInstance().open(returnClass);
+            UIManager.getInstance().open(returnDisplay);
         }
     }
 

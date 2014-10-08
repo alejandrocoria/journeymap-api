@@ -31,7 +31,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected static Color smallFrameColorDark = new Color(120, 120, 120);
     protected static Color smallBgColor = new Color(100, 100, 100);
     protected static Color smallBgHoverColor = new Color(125, 135, 190);
-    protected static Color smallBgHoverColor2 = new Color(0, 0, 100);
+    protected static Color smallBgHoverColor2 = new Color(100, 100, 100);
 
     protected Color disabledBgColor = Color.darkGray;
     protected Color disabledLabelColor = Color.lightGray;

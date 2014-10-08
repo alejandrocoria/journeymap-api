@@ -125,18 +125,18 @@ public class FullscreenActions extends JmUI
             case Save:
             {
                 save();
-                UIManager.getInstance().openMap();
+                UIManager.getInstance().openFullscreenMap();
                 break;
             }
             case Close:
             {
-                UIManager.getInstance().openMap();
+                UIManager.getInstance().openFullscreenMap();
                 break;
             }
             case Browser:
             {
                 launchLocalhost();
-                UIManager.getInstance().openMap();
+                UIManager.getInstance().openFullscreenMap();
                 break;
             }
             case Automap:
@@ -147,7 +147,7 @@ public class FullscreenActions extends JmUI
             case Check:
             {
                 VersionCheck.launchWebsite();
-                UIManager.getInstance().openMap();
+                UIManager.getInstance().openFullscreenMap();
                 break;
             }
         }
@@ -175,7 +175,7 @@ public class FullscreenActions extends JmUI
         {
             case Keyboard.KEY_ESCAPE:
             {
-                UIManager.getInstance().openMap();
+                UIManager.getInstance().openFullscreenMap();
                 break;
             }
         }

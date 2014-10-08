@@ -18,17 +18,15 @@ import java.awt.*;
 
 public class FullscreenHotkeysHelp extends JmUI
 {
-
     private int lastWidth = 0;
     private int lastHeight = 0;
     private Button buttonClose;
 
-    ;
     private KeyEventHandler keyEventHandler;
 
-    public FullscreenHotkeysHelp(Class<? extends JmUI> returnClass)
+    public FullscreenHotkeysHelp(JmUI returnDisplay)
     {
-        super(Constants.getString("jm.fullscreen.hotkeys_title"), returnClass);
+        super(Constants.getString("jm.fullscreen.hotkeys_title"), returnDisplay);
         keyEventHandler = new KeyEventHandler();
     }
 
@@ -41,6 +39,7 @@ public class FullscreenHotkeysHelp extends JmUI
         this.buttonList.clear();
 
         buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
+        buttonClose.setWidth(150);
 
         buttonList.add(buttonClose);
 

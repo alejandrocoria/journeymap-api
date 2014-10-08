@@ -191,6 +191,11 @@ public class ScrollListPane extends GuiSlot
         return lastPressed;
     }
 
+    public void resetLastPressed()
+    {
+        lastPressed = null;
+    }
+
     public ISlot getLastPressedParentSlot()
     {
         if (lastPressed != null)

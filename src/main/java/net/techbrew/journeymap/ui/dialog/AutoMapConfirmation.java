@@ -99,7 +99,7 @@ public class AutoMapConfirmation extends JmUI
                 break;
             }
         }
-        UIManager.getInstance().openMap();
+        UIManager.getInstance().openFullscreenMap();
     }
 
     @Override

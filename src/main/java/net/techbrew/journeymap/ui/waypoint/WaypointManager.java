@@ -63,9 +63,9 @@ public class WaypointManager extends JmUI
         this(null, null);
     }
 
-    public WaypointManager(Waypoint focusWaypoint, Class<? extends JmUI> returnClass)
+    public WaypointManager(Waypoint focusWaypoint, JmUI returnDisplay)
     {
-        super(Constants.getString("jm.waypoint.manage_title"), returnClass);
+        super(Constants.getString("jm.waypoint.manage_title"), returnDisplay);
         this.focusWaypoint = focusWaypoint;
     }
 
@@ -329,12 +329,12 @@ public class WaypointManager extends JmUI
             case Add:
             {
                 Waypoint waypoint = Waypoint.of(mc.thePlayer);
-                UIManager.getInstance().openWaypointEditor(waypoint, true, WaypointManager.class);
+                UIManager.getInstance().openWaypointEditor(waypoint, true, this);
                 return;
             }
             case Help:
             {
-                UIManager.getInstance().openWaypointHelp(getClass());
+                UIManager.getInstance().openWaypointHelp(this);
                 return;
             }
             case ToggleAll:
@@ -346,7 +346,7 @@ public class WaypointManager extends JmUI
             }
             case Options:
             {
-                UIManager.getInstance().openMasterOptions(getClass(), Config.Category.Waypoint, Config.Category.WaypointBeacon);
+                UIManager.getInstance().openMasterOptions(this, Config.Category.Waypoint, Config.Category.WaypointBeacon);
                 return;
             }
         }
@@ -469,13 +469,13 @@ public class WaypointManager extends JmUI
 
     protected void closeAndReturn()
     {
-        if (returnClass == null)
+        if (returnDisplay == null)
         {
             UIManager.getInstance().closeAll();
         }
         else
         {
-            UIManager.getInstance().open(returnClass);
+            UIManager.getInstance().open(returnDisplay);
         }
     }
 
