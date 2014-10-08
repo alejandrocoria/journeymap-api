@@ -12,6 +12,10 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Cacti now treated as plants with respect to Cartography options
+- Change: Options Manager now has "Hot Keys..." buttons in the toolbars for MiniMap Preset 1, 2, and Fullscreen Map sections
+
+## Changelog for JourneyMap 5.0.0a6:
 - New Feature: Rectangle Shape for MiniMap. Because Mitchel, that's why.
 - Bugfix: MiniMap terrain wasn't scrolling smoothly with current position.
 - Bugfix: Updating some Cartography options didn't take effect until restart.  Now they do when Options Manager closed.

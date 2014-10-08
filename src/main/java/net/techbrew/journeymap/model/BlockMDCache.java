@@ -140,6 +140,14 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
                     setFlags(block, NoShadow);
                 }
             }
+            else if (block instanceof BlockCactus)
+            {
+                setFlags(block, Side2Texture, Plant);
+                if (!JourneyMap.getCoreProperties().mapPlantShadows.get())
+                {
+                    setFlags(block, NoShadow);
+                }
+            }
 
             if (block instanceof BlockRailBase)
             {

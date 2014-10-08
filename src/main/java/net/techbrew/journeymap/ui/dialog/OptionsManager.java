@@ -38,6 +38,9 @@ public class OptionsManager extends JmUI
     protected Config.Category[] initialCategories;
     protected CheckBox minimap1PreviewButton;
     protected CheckBox minimap2PreviewButton;
+    protected Button minimap1KeysButton, minimap2KeysButton;
+    protected Button fullscreenKeysButton;
+
     protected Button buttonClose;
     protected ScrollListPane optionsListPane;
     protected Map<Config.Category, List<SlotMetadata>> toolbars;
@@ -83,6 +86,30 @@ public class OptionsManager extends JmUI
                 minimap2PreviewButton.setTooltip(tooltip);
             }
 
+            if (minimap1KeysButton == null)
+            {
+                String name = Constants.getString("jm.common.hotkeys");
+                String tooltip = Constants.getString("jm.common.hotkeys.tooltip");
+                minimap1KeysButton = new Button(0, name);
+                minimap1KeysButton.setTooltip(tooltip);
+            }
+
+            if (minimap2KeysButton == null)
+            {
+                String name = Constants.getString("jm.common.hotkeys");
+                String tooltip = Constants.getString("jm.common.hotkeys.tooltip");
+                minimap2KeysButton = new Button(0, name);
+                minimap2KeysButton.setTooltip(tooltip);
+            }
+
+            if (fullscreenKeysButton == null)
+            {
+                String name = Constants.getString("jm.common.hotkeys");
+                String tooltip = Constants.getString("jm.common.hotkeys.tooltip");
+                fullscreenKeysButton = new Button(0, name);
+                fullscreenKeysButton.setTooltip(tooltip);
+            }
+
             if (optionsListPane == null)
             {
                 List<ScrollListPane.ISlot> categorySlots = new ArrayList<ScrollListPane.ISlot>();
@@ -117,6 +144,9 @@ public class OptionsManager extends JmUI
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1PreviewButton,
                                         minimap1PreviewButton.displayString,
                                         minimap1PreviewButton.getUnformattedTooltip()));
+                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1KeysButton,
+                                        minimap1KeysButton.displayString,
+                                        minimap1KeysButton.getUnformattedTooltip()));
                                 break;
                             }
                             case MiniMap2:
@@ -124,6 +154,16 @@ public class OptionsManager extends JmUI
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2PreviewButton,
                                         minimap2PreviewButton.displayString,
                                         minimap2PreviewButton.getUnformattedTooltip()));
+                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2KeysButton,
+                                        minimap2KeysButton.displayString,
+                                        minimap2KeysButton.getUnformattedTooltip()));
+                                break;
+                            }
+                            case FullMap:
+                            {
+                                categorySlot.getAllChildMetadata().add(new SlotMetadata(fullscreenKeysButton,
+                                        fullscreenKeysButton.displayString,
+                                        fullscreenKeysButton.getUnformattedTooltip()));
                                 break;
                             }
                         }
@@ -299,6 +339,18 @@ public class OptionsManager extends JmUI
             {
                 minimap1PreviewButton.setToggled(false);
                 JourneyMap.toggleMiniMapPreset(2);
+            }
+
+            if (slotMetadata.getButton() == minimap1KeysButton || slotMetadata.getButton() == minimap2KeysButton)
+            {
+                UIManager.getInstance().openMiniMapHotkeyHelp(OptionsManager.class);
+                return;
+            }
+
+            if (slotMetadata.getButton() == fullscreenKeysButton)
+            {
+                UIManager.getInstance().openMapHotkeyHelp(OptionsManager.class);
+                return;
             }
         }
 
