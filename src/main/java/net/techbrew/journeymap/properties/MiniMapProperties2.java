@@ -13,7 +13,6 @@ import net.techbrew.journeymap.ui.minimap.Orientation;
 import net.techbrew.journeymap.ui.minimap.Position;
 import net.techbrew.journeymap.ui.minimap.ReticleOrientation;
 import net.techbrew.journeymap.ui.minimap.Shape;
-import org.lwjgl.opengl.Display;
 
 /**
  * Properties for the minimap in-game.
@@ -34,7 +33,7 @@ public class MiniMapProperties2 extends MiniMapProperties
         this.terrainAlpha.set(30);
         this.orientation.set(Orientation.PlayerHeading);
         this.reticleOrientation.set(ReticleOrientation.Compass);
-        this.customSize.set(Display.getHeight() - 50);
+        this.sizePercent.set(50);
     }
 
     public String getId()
@@ -54,7 +53,7 @@ public class MiniMapProperties2 extends MiniMapProperties
                 .add("showLocation", showLocation)
                 .add("enableHotkeys", enableHotkeys)
                 .add("showWaypointLabels", showWaypointLabels)
-                .add("customSize", customSize)
+                .add("sizePercent", sizePercent)
                 .add("frameAlpha", frameAlpha)
                 .add("terrainAlpha", terrainAlpha)
                 .add("orientation", orientation)

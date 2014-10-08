@@ -625,7 +625,7 @@ public class MiniMap
 
     private void initGridRenderer()
     {
-        this.gridRenderer = new GridRenderer(miniMapProperties.customSize.get() <= 768 ? 3 : 5);
+        this.gridRenderer = new GridRenderer(miniMapProperties.getSize() <= 768 ? 3 : 5);
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
         gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
         boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get());

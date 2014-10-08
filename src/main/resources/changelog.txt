@@ -12,6 +12,7 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- BIG CHANGE:  Minimap Size is now expressed as a percentage
 - Bugfix: Cacti now treated as plants with respect to Cartography options
 - Change: Options Manager now has "Hot Keys..." buttons in the toolbars for MiniMap Preset 1, 2, and Fullscreen Map sections
 - Change: Options Manager layout now adjusts rows to be centered in the screen, toolbars are now right-justified

@@ -9,6 +9,7 @@
 package net.techbrew.journeymap.properties;
 
 import com.google.common.base.Objects;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.ui.minimap.Orientation;
@@ -53,8 +54,8 @@ public class MiniMapProperties extends InGameMapProperties
     @Config(category = Inherit, key = "jm.minimap.show_waypointlabels")
     public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
 
-    @Config(category = Inherit, key = "jm.minimap.size", minValue = 128, maxValue = 2048, defaultValue = 192)
-    public final AtomicInteger customSize = new AtomicInteger(192);
+    @Config(category = Inherit, key = "jm.minimap.size", minValue = 1, maxValue = 100, defaultValue = 20)
+    public final AtomicInteger sizePercent = new AtomicInteger(20);
 
     @Config(category = Inherit, key = "jm.minimap.frame_alpha", minValue = 0, maxValue = 100, defaultValue = 100)
     public final AtomicInteger frameAlpha = new AtomicInteger(100);
@@ -155,21 +156,21 @@ public class MiniMapProperties extends InGameMapProperties
             saveNeeded = true;
         }
 
-        if (customSize.get() == 0)
+        if (sizePercent.get() == 0)
         {
-            this.customSize.set(256);
+            this.sizePercent.set(20);
             saveNeeded = true;
         }
 
-        if (customSize.get() < 128)
+        if (sizePercent.get() < 1)
         {
-            customSize.set(128);
+            sizePercent.set(1);
             saveNeeded = true;
         }
 
-        if (customSize.get() > 768)
+        if (sizePercent.get() > 100)
         {
-            customSize.set(768);
+            sizePercent.set(100);
             saveNeeded = true;
         }
 
@@ -196,6 +197,11 @@ public class MiniMapProperties extends InGameMapProperties
         }
 
         return saveNeeded;
+    }
+
+    public int getSize()
+    {
+        return (int) Math.max(128, Math.floor((sizePercent.get() / 100.0) * FMLClientHandler.instance().getClient().displayHeight));
     }
 
     @Override
@@ -230,7 +236,7 @@ public class MiniMapProperties extends InGameMapProperties
         result = 31 * result + (showLocation != null ? showLocation.hashCode() : 0);
         result = 31 * result + (enableHotkeys != null ? enableHotkeys.hashCode() : 0);
         result = 31 * result + showWaypointLabels.hashCode();
-        result = 31 * result + customSize.hashCode();
+        result = 31 * result + sizePercent.hashCode();
         result = 31 * result + frameAlpha.hashCode();
         result = 31 * result + terrainAlpha.hashCode();
         result = 31 * result + orientation.hashCode();
@@ -256,7 +262,7 @@ public class MiniMapProperties extends InGameMapProperties
                 .add("showLocation", showLocation)
                 .add("enableHotkeys", enableHotkeys)
                 .add("showWaypointLabels", showWaypointLabels)
-                .add("customSize", customSize)
+                .add("sizePercent", sizePercent)
                 .add("frameAlpha", frameAlpha)
                 .add("terrainAlpha", terrainAlpha)
                 .add("orientation", orientation)

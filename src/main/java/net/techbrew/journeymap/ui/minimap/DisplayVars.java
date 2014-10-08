@@ -83,7 +83,6 @@ public class DisplayVars
         this.orientation = miniMapProperties.orientation.get();
         this.displayWidth = mc.displayWidth;
         this.displayHeight = mc.displayHeight;
-        this.minimapWidth = miniMapProperties.customSize.get();
         this.terrainAlpha = Math.max(0f, Math.min(1f, miniMapProperties.terrainAlpha.get() / 100f));
         Theme theme = ThemeFileHandler.getCurrentTheme();
 
@@ -93,16 +92,17 @@ public class DisplayVars
             case Circle:
             {
                 minimapSpec = theme.minimap.circle;
-                minimapHeight = miniMapProperties.customSize.get();
+                minimapWidth = miniMapProperties.getSize();
+                minimapHeight = miniMapProperties.getSize();
                 reticleSegmentLength = minimapHeight / 2;
                 break;
             }
             case Rectangle:
             {
                 minimapSpec = theme.minimap.square;
-
                 double ratio = mc.displayWidth * 1D / mc.displayHeight;
-                minimapHeight = (int) (minimapWidth / ratio);
+                minimapHeight = miniMapProperties.getSize();
+                minimapWidth = (int) (minimapHeight * ratio);
                 reticleSegmentLength = Math.sqrt((minimapHeight * minimapHeight) + (minimapWidth * minimapWidth)) / 2;
                 break;
             }
@@ -110,6 +110,7 @@ public class DisplayVars
             default:
             {
                 minimapSpec = theme.minimap.square;
+                minimapWidth = miniMapProperties.getSize();
                 minimapHeight = minimapWidth;
                 reticleSegmentLength = Math.sqrt((minimapHeight * minimapHeight) + (minimapWidth * minimapWidth)) / 2;
                 break;
