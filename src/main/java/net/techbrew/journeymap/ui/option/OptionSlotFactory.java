@@ -3,8 +3,8 @@ package net.techbrew.journeymap.ui.option;
 import com.google.common.util.concurrent.AtomicDouble;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.properties.Config;
 import net.techbrew.journeymap.properties.PropertiesBase;
+import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.ui.component.*;
 
 import java.awt.*;

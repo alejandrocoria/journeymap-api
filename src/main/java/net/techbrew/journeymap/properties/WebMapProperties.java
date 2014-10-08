@@ -9,12 +9,13 @@
 package net.techbrew.journeymap.properties;
 
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.properties.config.Config;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static net.techbrew.journeymap.properties.Config.Category.WebMap;
+import static net.techbrew.journeymap.properties.config.Config.Category.WebMap;
 
 /**
  * Properties for the web map in browser.

@@ -9,15 +9,14 @@
 package net.techbrew.journeymap.properties;
 
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.IconSetFileHandler;
+import net.techbrew.journeymap.properties.config.Config;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static net.techbrew.journeymap.properties.Config.Category.Inherit;
+import static net.techbrew.journeymap.properties.config.Config.Category.Inherit;
 
 /**
  * Shared Properties for the various map types.
@@ -57,24 +56,6 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
     public abstract AtomicReference<String> getEntityIconSetName();
 
     public abstract AtomicReference<Constants.MapType> getPreferredMapType();
-
-    @Override
-    protected boolean validate()
-    {
-        boolean saveNeeded = super.validate();
-
-        AtomicReference<String> entityIconSetName = getEntityIconSetName();
-
-        List<String> validNames = IconSetFileHandler.getEntityIconSetNames();
-        if (entityIconSetName.get() == null || !validNames.contains(entityIconSetName.get()))
-        {
-            JourneyMap.getLogger().warn(String.format("Entity Icon Set name '%s' is not valid, will use default instead.", entityIconSetName.get()));
-            entityIconSetName.set(validNames.get(0));
-            saveNeeded = true;
-        }
-
-        return saveNeeded;
-    }
 
     @Override
     public boolean equals(Object o)

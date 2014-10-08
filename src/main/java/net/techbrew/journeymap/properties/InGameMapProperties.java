@@ -8,9 +8,11 @@
 
 package net.techbrew.journeymap.properties;
 
+import net.techbrew.journeymap.properties.config.Config;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static net.techbrew.journeymap.properties.Config.Category.Inherit;
+import static net.techbrew.journeymap.properties.config.Config.Category.Inherit;
 
 /**
  * Shared Properties for in-game map types.
@@ -28,15 +30,6 @@ public abstract class InGameMapProperties extends MapProperties
 
     protected InGameMapProperties()
     {
-    }
-
-    @Override
-    protected boolean validate()
-    {
-        boolean saveNeeded = super.validate();
-
-
-        return saveNeeded;
     }
 
     @Override

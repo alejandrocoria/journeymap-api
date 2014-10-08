@@ -8,11 +8,13 @@
 
 package net.techbrew.journeymap.properties;
 
+import net.techbrew.journeymap.properties.config.Config;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static net.techbrew.journeymap.properties.Config.Category.Waypoint;
-import static net.techbrew.journeymap.properties.Config.Category.WaypointBeacon;
+import static net.techbrew.journeymap.properties.config.Config.Category.Waypoint;
+import static net.techbrew.journeymap.properties.config.Config.Category.WaypointBeacon;
 
 /**
  * Properties for in-game waypoint management and display.

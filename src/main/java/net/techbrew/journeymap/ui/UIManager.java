@@ -16,9 +16,10 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WaypointsData;
+import net.techbrew.journeymap.forgehandler.MiniMapOverlayHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
-import net.techbrew.journeymap.properties.Config;
+import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.render.map.TileCache;
 import net.techbrew.journeymap.ui.component.JmUI;
 import net.techbrew.journeymap.ui.dialog.FullscreenActions;
@@ -269,6 +270,7 @@ public class UIManager
             this.miniMap.reset();
         }
         this.miniMap = new MiniMap();
+        MiniMapOverlayHandler.checkEventConfig();
     }
 
     private static class Holder

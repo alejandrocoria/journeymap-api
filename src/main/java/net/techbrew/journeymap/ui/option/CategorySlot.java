@@ -4,7 +4,7 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.properties.Config;
+import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.ScrollListPane;
 

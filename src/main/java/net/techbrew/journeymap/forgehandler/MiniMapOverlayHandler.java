@@ -38,6 +38,7 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
     {
         EVENT_TYPE = JourneyMap.getMiniMapProperties().getRenderOverlayEventType();
         EVENT_PRE = JourneyMap.getMiniMapProperties().renderOverlayPreEvent.get();
+        System.out.println(EVENT_TYPE + " pre=" + EVENT_PRE); // TODO REMOVE
     }
 
     @Override

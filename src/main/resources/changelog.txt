@@ -17,6 +17,9 @@ http://journeymap.techbrew.net
 - Change: Options Manager now has "Hot Keys..." buttons in the toolbars for MiniMap Preset 1, 2, and Fullscreen Map sections
 - Change: Options Manager layout now adjusts rows to be centered in the screen, toolbars are now right-justified
 - Change: Options Manager minor style / color tweaks.
+- Change: Config file format is now more compact
+- Change: All options in config files are now validated when loaded - defensive measure against derpy users typing bad values
+- Change: Defensive coded added to ensure keybindings can't be duplicated, ever.
 
 ## Changelog for JourneyMap 5.0.0a6:
 - New Feature: Rectangle Shape for MiniMap. Because Mitchel, that's why.

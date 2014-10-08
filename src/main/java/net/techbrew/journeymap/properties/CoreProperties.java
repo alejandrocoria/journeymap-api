@@ -10,13 +10,13 @@ package net.techbrew.journeymap.properties;
 
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
-import net.techbrew.journeymap.ui.theme.Theme;
+import net.techbrew.journeymap.properties.config.Config;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static net.techbrew.journeymap.properties.Config.Category.*;
+import static net.techbrew.journeymap.properties.config.Config.Category.*;
 
 /**
  * Properties for basic mod configuration.
@@ -113,21 +113,6 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
 
     public CoreProperties()
     {
-    }
-
-    @Override
-    protected boolean validate()
-    {
-        boolean saveNeeded = super.validate();
-
-        Theme theme = ThemeFileHandler.getThemeByName(themeName.get());
-        if (!theme.name.equals(themeName.get()))
-        {
-            themeName.set(theme.name);
-            saveNeeded = true;
-        }
-
-        return saveNeeded;
     }
 
     @Override

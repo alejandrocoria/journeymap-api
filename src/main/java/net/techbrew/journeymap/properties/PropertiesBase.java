@@ -15,19 +15,26 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.properties.config.AtomicBooleanSerializer;
+import net.techbrew.journeymap.properties.config.AtomicIntegerSerializer;
+import net.techbrew.journeymap.properties.config.AtomicReferenceSerializer;
+import net.techbrew.journeymap.properties.config.ConfigValidation;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Base GSON-backed properties class.
  */
 public abstract class PropertiesBase
 {
-
     protected static final Charset UTF8 = Charset.forName("UTF-8");
+    // Flag the serializers can use to signal the file format needs to be updated
+    protected static transient final AtomicBoolean configFormatChanged = new AtomicBoolean(false);
     private static final String[] HEADERS = {
             "// JourneyMap configuration file. Modify at your own risk!",
             "// To use in all worlds, place here: " + Constants.CONFIG_DIR,
@@ -35,27 +42,52 @@ public abstract class PropertiesBase
             "// To restore the default settings, simply delete this file before starting Minecraft",
             "// For help with this file, see http://journeymap.techbrew.net/help/wiki/Configuration_Files"
     };
-
     // Gson for file persistence
-    protected transient final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-    // Current file reference
-    protected transient File sourceFile = null;
-
+    protected transient final Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeAdapter(AtomicBoolean.class, new AtomicBooleanSerializer(configFormatChanged))
+            .registerTypeAdapter(AtomicInteger.class, new AtomicIntegerSerializer(configFormatChanged))
+            .registerTypeAdapter(AtomicReference.class, new AtomicReferenceSerializer(configFormatChanged))
+            .create();
     // Toggles whether save() actually does anything.
     protected transient final AtomicBoolean saveEnabled = new AtomicBoolean(true);
-
-    // Set by subclass
-    protected int fileRevision;
-
     // Whether it's disabled
     protected final AtomicBoolean disabled = new AtomicBoolean(false);
+    // Current file reference
+    protected transient File sourceFile = null;
+    // Set by subclass
+    protected int fileRevision;
 
     /**
      * Default constructor.
      */
     protected PropertiesBase()
     {
+    }
+
+    public static <T extends PropertiesBase> T reload(T properties, Class<T> propertiesClass)
+    {
+        if (properties != null)
+        {
+            properties.save();
+        }
+
+        T reloadedProperties = null;
+        try
+        {
+            reloadedProperties = propertiesClass.newInstance().load();
+            boolean sourceChanged = (properties == null) || properties.isWorldConfig() != reloadedProperties.isWorldConfig();
+            if (sourceChanged)
+            {
+                JourneyMap.getLogger().info("Loaded " + propertiesClass.getSimpleName() + " from " + reloadedProperties.getFile());
+            }
+            return reloadedProperties;
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().error("Failed to reload " + propertiesClass.getName() + ": " + LogFormatter.toString(t));
+            return (properties != null) ? properties : reloadedProperties;
+        }
     }
 
     /**
@@ -80,10 +112,10 @@ public abstract class PropertiesBase
      */
     public File getFile()
     {
-        if(sourceFile==null)
+        if (sourceFile == null)
         {
             sourceFile = new File(FileHandler.getWorldConfigDir(false), getFileName());
-            if(!sourceFile.canRead())
+            if (!sourceFile.canRead())
             {
                 sourceFile = new File(FileHandler.getStandardConfigDir(), getFileName());
             }
@@ -93,6 +125,7 @@ public abstract class PropertiesBase
 
     /**
      * Gets the filename for the instance.
+     *
      * @return
      */
     protected String getFileName()
@@ -102,16 +135,18 @@ public abstract class PropertiesBase
 
     /**
      * Whethere the current source file is associated with a specific world.
+     *
      * @return
      */
     public boolean isWorldConfig()
     {
         File worldConfigDir = FileHandler.getWorldConfigDir(false);
-        return (worldConfigDir!=null && worldConfigDir.equals(getFile().getParentFile()));
+        return (worldConfigDir != null && worldConfigDir.equals(getFile().getParentFile()));
     }
 
     /**
      * Whether this config is disabled and shouldn't be used.
+     *
      * @return
      */
     public boolean isDisabled()
@@ -122,11 +157,12 @@ public abstract class PropertiesBase
     /**
      * Set disabled - only works for world configs.
      * Saves after the set.
+     *
      * @param disable
      */
     public void setDisabled(boolean disable)
     {
-        if(isWorldConfig())
+        if (isWorldConfig())
         {
             disabled.set(disable);
             save();
@@ -139,17 +175,18 @@ public abstract class PropertiesBase
 
     /**
      * Copies standard config to world config.
+     *
      * @param overwrite true if current world config should be overwritten
      * @return true if copy succeeded
      */
     public boolean copyToWorldConfig(boolean overwrite)
     {
-        if(!isWorldConfig())
+        if (!isWorldConfig())
         {
             try
             {
                 File worldConfig = getFile();
-                if(overwrite || !worldConfig.exists())
+                if (overwrite || !worldConfig.exists())
                 {
                     save();
                     Files.copy(sourceFile, worldConfig);
@@ -170,11 +207,12 @@ public abstract class PropertiesBase
 
     /**
      * Copies world config over standard config
+     *
      * @return
      */
     public boolean copyToStandardConfig()
     {
-        if(isWorldConfig())
+        if (isWorldConfig())
         {
             try
             {
@@ -306,14 +344,14 @@ public abstract class PropertiesBase
                 File badPropFile = new File(propFile.getParentFile(), propFile.getName() + ".bad");
                 propFile.renameTo(badPropFile);
             }
-            catch(Exception e3)
+            catch (Exception e3)
             {
                 JourneyMap.getLogger().error(String.format("Can't rename config file %s: %s", propFile, e3.getMessage()));
             }
 
         }
 
-        if(instance==null)
+        if (instance == null)
         {
             try
             {
@@ -327,7 +365,7 @@ public abstract class PropertiesBase
             }
         }
 
-        if (instance!=null && (instance.validate() || saveNeeded))
+        if (instance != null && (instance.validate() || saveNeeded))
         {
             instance.save();
         }
@@ -342,13 +380,34 @@ public abstract class PropertiesBase
      */
     protected boolean validate()
     {
+        // Use annotations
+        boolean saveNeeded = validateConfigs();
+
         // Only world configs should be disabled.
-        if(!isWorldConfig() && isDisabled())
+        if (!isWorldConfig() && isDisabled())
         {
             disabled.set(false);
-            return true;
+            saveNeeded = true;
         }
-        return false;
+
+        if (configFormatChanged.get())
+        {
+            saveNeeded = true;
+            configFormatChanged.set(false);
+            JourneyMap.getLogger().info("File format will be updated for " + this.getFileName());
+        }
+
+        return saveNeeded;
+    }
+
+    /**
+     * Use @Config annotations to validate value ranges
+     *
+     * @return
+     */
+    protected boolean validateConfigs()
+    {
+        return ConfigValidation.validateConfigs(this);
     }
 
     public <T extends PropertiesBase> T enableSave(boolean enabled)
@@ -357,31 +416,6 @@ public abstract class PropertiesBase
         {
             saveEnabled.set(enabled);
             return (T) this;
-        }
-    }
-
-    public static <T extends PropertiesBase> T reload(T properties, Class<T> propertiesClass)
-    {
-        if(properties!=null)
-        {
-            properties.save();
-        }
-
-        T reloadedProperties = null;
-        try
-        {
-            reloadedProperties = propertiesClass.newInstance().load();
-            boolean sourceChanged = (properties==null) || properties.isWorldConfig() != reloadedProperties.isWorldConfig();
-            if(sourceChanged)
-            {
-                JourneyMap.getLogger().info("Loaded " + propertiesClass.getSimpleName() + " from " + reloadedProperties.getFile());
-            }
-            return reloadedProperties;
-        }
-        catch (Throwable t)
-        {
-            JourneyMap.getLogger().error("Failed to reload " + propertiesClass.getName() + ": " + LogFormatter.toString(t));
-            return (properties!=null) ? properties : reloadedProperties;
         }
     }
 }

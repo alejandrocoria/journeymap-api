@@ -23,6 +23,7 @@ import net.techbrew.journeymap.ui.minimap.MiniMap;
 import org.lwjgl.input.Keyboard;
 
 import java.util.EnumSet;
+import java.util.HashSet;
 
 /**
  * Created by mwoodman on 1/29/14.
@@ -36,9 +37,22 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
 
     public static void initKeyBindings()
     {
+        HashSet<String> keyDescs = new HashSet<String>();
+        for (KeyBinding existing : Minecraft.getMinecraft().gameSettings.keyBindings)
+        {
+            keyDescs.add(existing.getKeyDescription());
+        }
+
         for (KeyBinding kb : Constants.initKeybindings())
         {
-            ClientRegistry.registerKeyBinding(kb);
+            if (!keyDescs.contains(kb.getKeyDescription()))
+            {
+                ClientRegistry.registerKeyBinding(kb);
+            }
+            else
+            {
+                JourneyMap.getLogger().warn("Avoided duplicate keybinding that was already registered: " + kb.getKeyDescription());
+            }
         }
     }
 

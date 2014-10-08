@@ -1,4 +1,4 @@
-package net.techbrew.journeymap.properties;
+package net.techbrew.journeymap.properties.config;
 
 import net.techbrew.journeymap.ui.option.StringListProvider;
 
@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by Mark on 9/21/2014.
+ * Used to configure the OptionsManager and provide validation.
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -33,6 +33,8 @@ public @interface Config
     double defaultValue() default 0;
 
     boolean defaultBoolean() default true;
+
+    int sortOrder() default 100;
 
     public enum Category
     {

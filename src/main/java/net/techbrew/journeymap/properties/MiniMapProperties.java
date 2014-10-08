@@ -12,6 +12,7 @@ import com.google.common.base.Objects;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.ui.minimap.Orientation;
 import net.techbrew.journeymap.ui.minimap.Position;
 import net.techbrew.journeymap.ui.minimap.ReticleOrientation;
@@ -21,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static net.techbrew.journeymap.properties.Config.Category.Inherit;
+import static net.techbrew.journeymap.properties.config.Config.Category.Inherit;
 
 /**
  * Properties for the minimap in-game.
@@ -66,8 +67,8 @@ public class MiniMapProperties extends InGameMapProperties
     @Config(category = Inherit, key = "jm.minimap.orientation.button", defaultEnum = "North")
     public final AtomicReference<Orientation> orientation = new AtomicReference<Orientation>(Orientation.North);
 
-    @Config(category = Inherit, key = "jm.minimap.compass_font", defaultBoolean = false)
-    public final AtomicBoolean compassFontSmall = new AtomicBoolean(false);
+    @Config(category = Inherit, key = "jm.minimap.compass_font", defaultBoolean = true)
+    public final AtomicBoolean compassFontSmall = new AtomicBoolean(true);
 
     @Config(category = Inherit, key = "jm.minimap.show_compass")
     public final AtomicBoolean showCompass = new AtomicBoolean(true);
@@ -78,12 +79,12 @@ public class MiniMapProperties extends InGameMapProperties
     @Config(category = Inherit, key = "jm.minimap.reticle_orientation", defaultEnum = "Compass")
     public final AtomicReference<ReticleOrientation> reticleOrientation = new AtomicReference<ReticleOrientation>(ReticleOrientation.Compass);
 
-    public final AtomicReference<String> renderOverlayEventTypeName = new AtomicReference<String>(RenderGameOverlayEvent.ElementType.HOTBAR.name());
+    public final AtomicReference<String> renderOverlayEventTypeName = new AtomicReference<String>(RenderGameOverlayEvent.ElementType.ALL.name());
     public final AtomicBoolean renderOverlayPreEvent = new AtomicBoolean(true);
 
     public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
     protected transient final String name;
-    protected boolean active = true;
+    protected boolean active = false;
 
     public MiniMapProperties()
     {
@@ -144,55 +145,14 @@ public class MiniMapProperties extends InGameMapProperties
     protected boolean validate()
     {
         boolean saveNeeded = super.validate();
-
-        if (frameAlpha.get() < 0)
-        {
-            frameAlpha.set(0);
-            saveNeeded = true;
-        }
-        else if (frameAlpha.get() > 100)
-        {
-            frameAlpha.set(100);
-            saveNeeded = true;
-        }
-
-        if (sizePercent.get() == 0)
-        {
-            this.sizePercent.set(20);
-            saveNeeded = true;
-        }
-
-        if (sizePercent.get() < 1)
-        {
-            sizePercent.set(1);
-            saveNeeded = true;
-        }
-
-        if (sizePercent.get() > 100)
-        {
-            sizePercent.set(100);
-            saveNeeded = true;
-        }
-
-        if (terrainAlpha.get() < 0)
-        {
-            terrainAlpha.set(0);
-            saveNeeded = true;
-        }
-        else if (terrainAlpha.get() > 100)
-        {
-            terrainAlpha.set(100);
-            saveNeeded = true;
-        }
-
         try
         {
-            Enum.valueOf(RenderGameOverlayEvent.ElementType.class, renderOverlayEventTypeName.get());
+//            Enum.valueOf(RenderGameOverlayEvent.ElementType.class, renderOverlayEventTypeName.get());
         }
         catch (Exception e)
         {
-            renderOverlayEventTypeName.set(RenderGameOverlayEvent.ElementType.HOTBAR.name());
-            renderOverlayPreEvent.set(true);
+//            renderOverlayEventTypeName.set(RenderGameOverlayEvent.ElementType.HOTBAR.name());
+//            renderOverlayPreEvent.set(true);
             saveNeeded = true;
         }
 
