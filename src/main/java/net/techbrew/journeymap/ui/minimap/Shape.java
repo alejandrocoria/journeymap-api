@@ -13,8 +13,9 @@ import java.util.Arrays;
 public enum Shape implements KeyedEnum
 {
     Square("jm.minimap.shape_square"),
+    Rectangle("jm.minimap.shape_rectangle"),
     Circle("jm.minimap.shape_circle");
-    public static Shape[] Enabled = {Square, Circle};
+    public static Shape[] Enabled = {Square, Rectangle, Circle};
     public final String key;
 
     Shape(String key)

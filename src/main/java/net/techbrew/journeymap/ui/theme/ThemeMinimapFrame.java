@@ -50,12 +50,12 @@ public class ThemeMinimapFrame
     private Color reticleColor;
     private Rectangle.Double frameBounds;
 
-    public ThemeMinimapFrame(Theme theme, Theme.Minimap.MinimapSpec minimapSpec, int size)
+    public ThemeMinimapFrame(Theme theme, Theme.Minimap.MinimapSpec minimapSpec, int width, int height)
     {
         this.theme = theme;
         this.minimapSpec = minimapSpec;
-        this.width = size;
-        this.height = size;
+        this.width = width;
+        this.height = height;
         this.frameColor = Theme.getColor(minimapSpec.frameColor);
         this.frameAlpha = Math.max(0f, Math.min(1f, JourneyMap.getMiniMapProperties().frameAlpha.get() / 100f));
         this.reticleOrientation = JourneyMap.getMiniMapProperties().reticleOrientation.get();
@@ -78,14 +78,14 @@ public class ThemeMinimapFrame
         else
         {
             Theme.Minimap.MinimapCircle minimapCircle = (Theme.Minimap.MinimapCircle) minimapSpec;
-            int imgSize = size <= 256 ? 256 : 512;
+            int imgSize = width <= 256 ? 256 : 512;
             resourcePattern = "minimap/circle/" + minimapCircle.prefix + "%s.png";
 
             TextureImpl tempMask = getTexture("mask_" + imgSize, imgSize, imgSize, false, true);
-            textureCircleMask = TextureCache.instance().getScaledCopy("scaledCircleMask", tempMask, size, size, 1f);
+            textureCircleMask = TextureCache.instance().getScaledCopy("scaledCircleMask", tempMask, width, width, 1f);
 
             TextureImpl tempCircle = getTexture("rim_" + imgSize, imgSize, imgSize, false, true);
-            textureCircle = TextureCache.instance().getScaledCopy("scaledCircleRim", tempCircle, size, size, frameAlpha);
+            textureCircle = TextureCache.instance().getScaledCopy("scaledCircleRim", tempCircle, width, width, frameAlpha);
         }
 
         if (minimapSpec.compassPoint != null && minimapSpec.compassPoint.width > 0 && minimapSpec.compassPoint.height > 0)

@@ -40,8 +40,10 @@ public class DisplayVars
     final int displayHeight;
     final float terrainAlpha;
     final ScaledResolution scaledResolution;
-    final int minimapSize, textureX, textureY;
-    final int minimapRadius, translateX, translateY;
+    final int minimapWidth, minimapHeight;
+    final int textureX, textureY;
+    final int translateX, translateY;
+    final double reticleSegmentLength;
     final int fpsLabelHeight;
     final int locationLabelHeight;
     final Point2D.Double centerPoint;
@@ -81,7 +83,7 @@ public class DisplayVars
         this.orientation = miniMapProperties.orientation.get();
         this.displayWidth = mc.displayWidth;
         this.displayHeight = mc.displayHeight;
-        this.minimapSize = miniMapProperties.customSize.get();
+        this.minimapWidth = miniMapProperties.customSize.get();
         this.terrainAlpha = Math.max(0f, Math.min(1f, miniMapProperties.terrainAlpha.get() / 100f));
         Theme theme = ThemeFileHandler.getCurrentTheme();
 
@@ -91,12 +93,23 @@ public class DisplayVars
             case Circle:
             {
                 minimapSpec = theme.minimap.circle;
+                minimapHeight = miniMapProperties.customSize.get();
+                reticleSegmentLength = minimapHeight / 2;
+                break;
+            }
+            case Rectangle:
+            {
+                minimapSpec = theme.minimap.square;
+                minimapHeight = (int) (minimapWidth / 1.55);
+                reticleSegmentLength = Math.sqrt((minimapHeight * minimapHeight) + (minimapWidth * minimapWidth)) / 2;
                 break;
             }
             case Square:
             default:
             {
                 minimapSpec = theme.minimap.square;
+                minimapHeight = minimapWidth;
+                reticleSegmentLength = Math.sqrt((minimapHeight * minimapHeight) + (minimapWidth * minimapWidth)) / 2;
                 break;
             }
         }
@@ -117,10 +130,11 @@ public class DisplayVars
 
         drawScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);
 
-        minimapFrame = new ThemeMinimapFrame(theme, minimapSpec, minimapSize);
+        minimapFrame = new ThemeMinimapFrame(theme, minimapSpec, minimapWidth, minimapHeight);
         marginX = marginY = minimapSpec.margin;
-        minimapRadius = minimapSize / 2;
 
+        int halfWidth = minimapWidth / 2;
+        int halfHeight = minimapHeight / 2;
 
         if (showCompass)
         {
@@ -152,10 +166,10 @@ public class DisplayVars
                     marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels * locationLabelHeight) + compassLabelHeight / 2);
                 }
 
-                textureX = mc.displayWidth - minimapSize - marginX;
-                textureY = mc.displayHeight - (minimapSize) - marginY;
-                translateX = (mc.displayWidth / 2) - minimapRadius - marginX;
-                translateY = (mc.displayHeight / 2) - minimapRadius - marginY;
+                textureX = mc.displayWidth - minimapWidth - marginX;
+                textureY = mc.displayHeight - (minimapHeight) - marginY;
+                translateX = (mc.displayWidth / 2) - halfWidth - marginX;
+                translateY = (mc.displayHeight / 2) - halfHeight - marginY;
                 break;
             }
             case TopLeft:
@@ -167,8 +181,8 @@ public class DisplayVars
 
                 textureX = marginX;
                 textureY = marginY;
-                translateX = -(mc.displayWidth / 2) + minimapRadius + marginX;
-                translateY = -(mc.displayHeight / 2) + minimapRadius + marginY;
+                translateX = -(mc.displayWidth / 2) + halfWidth + marginX;
+                translateY = -(mc.displayHeight / 2) + halfHeight + marginY;
                 break;
             }
             case BottomLeft:
@@ -182,15 +196,15 @@ public class DisplayVars
                 }
 
                 textureX = marginX;
-                textureY = mc.displayHeight - (minimapSize) - marginY;
-                translateX = -(mc.displayWidth / 2) + minimapRadius + marginX;
-                translateY = (mc.displayHeight / 2) - minimapRadius - marginY;
+                textureY = mc.displayHeight - (minimapHeight) - marginY;
+                translateX = -(mc.displayWidth / 2) + halfWidth + marginX;
+                translateY = (mc.displayHeight / 2) - halfHeight - marginY;
                 break;
             }
             case Center:
             {
-                textureX = (mc.displayWidth - minimapSize) / 2;
-                textureY = (mc.displayHeight - minimapSize) / 2;
+                textureX = (mc.displayWidth - minimapWidth) / 2;
+                textureY = (mc.displayHeight - minimapHeight) / 2;
                 translateX = 0;
                 translateY = 0;
                 break;
@@ -203,10 +217,10 @@ public class DisplayVars
                     marginY = Math.max(marginY, Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin) + fpsLabelHeight);
                 }
 
-                textureX = mc.displayWidth - minimapSize - marginX;
+                textureX = mc.displayWidth - minimapWidth - marginX;
                 textureY = marginY;
-                translateX = (mc.displayWidth / 2) - minimapRadius - marginX;
-                translateY = -(mc.displayHeight / 2) + minimapRadius + marginY;
+                translateX = (mc.displayWidth / 2) - halfWidth - marginX;
+                translateY = -(mc.displayHeight / 2) + halfHeight + marginY;
                 break;
             }
         }
@@ -215,15 +229,15 @@ public class DisplayVars
         this.minimapFrame.setPosition(textureX, textureY);
 
         // Assign frame rectangle and centers
-        this.centerPoint = new Point2D.Double(textureX + minimapRadius, textureY + minimapRadius);
+        this.centerPoint = new Point2D.Double(textureX + halfWidth, textureY + halfHeight);
 
         // Set up compass poionts
-        this.minimapCompassPoints = new ThemeCompassPoints(textureX, textureY, minimapRadius, minimapSpec, this.minimapFrame.getCompassPoint(), useUnicode, compassLabelHeight);
+        this.minimapCompassPoints = new ThemeCompassPoints(textureX, textureY, halfWidth, halfHeight, minimapSpec, this.minimapFrame.getCompassPoint(), useUnicode, compassLabelHeight);
 
         // Set up key positions
-        double centerX = Math.floor(textureX + (minimapSize / 2));
+        double centerX = Math.floor(textureX + (minimapWidth / 2));
         double topY = textureY;
-        double bottomY = textureY + minimapSize;
+        double bottomY = textureY + minimapHeight;
 
         if (showFps)
         {

@@ -142,13 +142,10 @@ public class MiniMap
 
             // Update the grid
             boolean moved = gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
-            if (!moved || doStateRefresh)
+            if (moved || doStateRefresh)
             {
                 boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get());
-                if (doStateRefresh || gridRenderer.hasUnloadedTile(preview))
-                {
-                    gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh || preview, 0, 0);
-                }
+                gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh || preview, 0, 0);
             }
 
             if (doStateRefresh)
@@ -222,7 +219,7 @@ public class MiniMap
 
                 // Get center of minimap and rect of minimap
                 centerPoint = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
-                centerRect = new Rectangle2D.Double(centerPoint.x - dv.minimapRadius, centerPoint.y - dv.minimapRadius, dv.minimapSize, dv.minimapSize);
+                centerRect = new Rectangle2D.Double(centerPoint.x - dv.minimapWidth / 2, centerPoint.y - dv.minimapHeight / 2, dv.minimapWidth, dv.minimapHeight);
 
                 // Draw waypoints
                 drawOnMapWaypoints(rotation);
@@ -414,7 +411,7 @@ public class MiniMap
     {
         if (dv.shape == Shape.Circle)
         {
-            return centerPixel.distance(objectPixel) < dv.minimapRadius;
+            return centerPixel.distance(objectPixel) < dv.minimapWidth / 2;
         }
         else
         {
@@ -422,49 +419,48 @@ public class MiniMap
         }
     }
 
-    private Point2D.Double getPointOnFrame(Point2D objectPixel, Point2D centerPixel, double offset)
+    private Point2D.Double getPointOnFrame(Point2D.Double objectPixel, Point2D centerPixel, double offset)
     {
-        // Get the bearing from center to object
-        double bearing = Math.atan2(
-                objectPixel.getY() - centerPixel.getY(),
-                objectPixel.getX() - centerPixel.getX()
-        );
-
-        // Use radius for circle, or enlarge radius 40% to encapsulate the square within a circle
-        double radius = offset + ((dv.shape == Shape.Circle) ? dv.minimapRadius : (dv.minimapRadius * 1.4));
-
-        Point2D.Double framePos = new Point2D.Double(
-                (radius * Math.cos(bearing)) + centerPixel.getX(),
-                (radius * Math.sin(bearing)) + centerPixel.getY()
-        );
-
         if (dv.shape == Shape.Circle)
         {
+
+            // Get the bearing from center to object
+            double bearing = Math.atan2(
+                    objectPixel.getY() - centerPixel.getY(),
+                    objectPixel.getX() - centerPixel.getX()
+            );
+
+
+            Point2D.Double framePos = new Point2D.Double(
+                    (dv.minimapWidth / 2 * Math.cos(bearing)) + centerPixel.getX(),
+                    (dv.minimapHeight / 2 * Math.sin(bearing)) + centerPixel.getY()
+            );
+
             // TODO: I probably broke this by passing in widow position
             return framePos;
         }
         else
         {
-            Rectangle2D.Double rect = new Rectangle2D.Double(dv.textureX, dv.textureY, dv.minimapSize, dv.minimapSize);
+            Rectangle2D.Double rect = new Rectangle2D.Double(dv.textureX - dv.translateX, dv.textureY - dv.translateY, dv.minimapWidth, dv.minimapHeight);
 
-            if (framePos.x > rect.getMaxX())
+            if (objectPixel.x > rect.getMaxX())
             {
-                framePos.x = rect.getMaxX();
+                objectPixel.x = rect.getMaxX();
             }
-            else if (framePos.x < rect.getMinX())
+            else if (objectPixel.x < rect.getMinX())
             {
-                framePos.x = rect.getMinX();
+                objectPixel.x = rect.getMinX();
             }
 
-            if (framePos.y > rect.getMaxY())
+            if (objectPixel.y > rect.getMaxY())
             {
-                framePos.y = rect.getMaxY();
+                objectPixel.y = rect.getMaxY();
             }
-            else if (framePos.y < rect.getMinY())
+            else if (objectPixel.y < rect.getMinY())
             {
-                framePos.y = rect.getMinY();
+                objectPixel.y = rect.getMinY();
             }
-            return framePos;
+            return objectPixel;
         }
     }
 
@@ -618,7 +614,7 @@ public class MiniMap
         // Set viewport
         double xpad = 0;
         double ypad = 0;
-        Rectangle2D.Double viewPort = new Rectangle2D.Double(this.dv.textureX + xpad, this.dv.textureY + ypad, this.dv.minimapSize - (2 * xpad), this.dv.minimapSize - (2 * ypad));
+        Rectangle2D.Double viewPort = new Rectangle2D.Double(this.dv.textureX + xpad, this.dv.textureY + ypad, this.dv.minimapWidth - (2 * xpad), this.dv.minimapHeight - (2 * ypad));
         gridRenderer.setViewPort(viewPort);
     }
 
@@ -665,7 +661,7 @@ public class MiniMap
         {
             playerInfo = Constants.getString(format, playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
             double infoWidth = mc.fontRenderer.getStringWidth(playerInfo) * dv.fontScale;
-            if (infoWidth <= dv.minimapSize)
+            if (infoWidth <= dv.minimapWidth)
             {
                 break;
             }

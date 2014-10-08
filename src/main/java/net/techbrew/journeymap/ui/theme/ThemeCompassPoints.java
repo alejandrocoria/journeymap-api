@@ -41,15 +41,15 @@ public class ThemeCompassPoints
     private double x;
     private double y;
 
-    public ThemeCompassPoints(int x, int y, int radius, Theme.Minimap.MinimapSpec minimapSpec, TextureImpl compassPointTex, boolean useUnicode, int labelHeight)
+    public ThemeCompassPoints(int x, int y, int halfWidth, int halfHeight, Theme.Minimap.MinimapSpec minimapSpec, TextureImpl compassPointTex, boolean useUnicode, int labelHeight)
     {
         this.x = x;
         this.y = y;
 
-        pointNorth = new Point2D.Double(x + radius, y);
-        pointSouth = new Point2D.Double(x + radius, y + radius + radius);
-        pointWest = new Point2D.Double(x, y + radius);
-        pointEast = new Point2D.Double(x + radius + radius, y + radius);
+        pointNorth = new Point2D.Double(x + halfWidth, y);
+        pointSouth = new Point2D.Double(x + halfWidth, y + halfHeight + halfHeight);
+        pointWest = new Point2D.Double(x, y + halfHeight);
+        pointEast = new Point2D.Double(x + halfWidth + halfWidth, y + halfHeight);
         this.fontScale = (JourneyMap.getMiniMapProperties().compassFontSmall.get() ? 1 : 2) * (useUnicode ? 2 : 1);
         this.compassLabelHeight = labelHeight;
 

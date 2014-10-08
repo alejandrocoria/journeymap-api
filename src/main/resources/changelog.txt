@@ -12,6 +12,12 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New Feature: Rectangle Shape for MiniMap. Because Mitchel, that's why.
+- Bugfix: MiniMap terrain wasn't scrolling smoothly with current position.
+- Bugfix: Updating some Cartography options didn't take effect until restart.  Now they do when Options Manager closed.
+- Bugfix: Waypoints weren't sticking to Square Minimap frames. We mustn't keep disappointing Ian, Square Minimap.
+
+## Changelog for JourneyMap 5.0.0a5:
 - Multiple bugfixes and improvements to keep the two Minimap Presets properly separated
 - Change: Introduced an optional toolbar structure at the bottom of Option Manager sections.  Minimap Preview buttons moved there.
 - Change Minimap Preset previews in Option Manager now briefly show the number of the Preset

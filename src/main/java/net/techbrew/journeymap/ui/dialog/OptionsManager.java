@@ -12,7 +12,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.forgehandler.KeyEventHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
@@ -439,12 +438,13 @@ public class OptionsManager extends JmUI
                 }
                 case Cartography:
                 {
+                    JourneyMap.getInstance().softReset();
                     MapPlayerTask.forceNearbyRemap();
                     break;
                 }
                 case Advanced:
                 {
-                    DataCache.instance().purge();
+                    JourneyMap.getInstance().softReset();
                     break;
                 }
             }
