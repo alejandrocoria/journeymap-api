@@ -250,16 +250,8 @@ public class OptionsManager extends JmUI
 
             if (previewMiniMap())
             {
-                mc.entityRenderer.setupOverlayRendering(); // TODO DOES THIS HELP?!
                 UIManager.getInstance().getMiniMap().drawMap(true);
                 RenderHelper.disableStandardItemLighting();
-//
-//                GL11.glEnable(GL11.GL_BLEND);
-//                OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-//                GL11.glDisable(GL11.GL_ALPHA_TEST);
-//                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-//                GL11.glDisable(GL11.GL_LIGHTING);
-//                GL11.glEnable(GL11.GL_ALPHA_TEST);
             }
 
             if (optionsListPane.lastTooltip != null)
@@ -307,9 +299,9 @@ public class OptionsManager extends JmUI
     }
 
     @Override
-    protected void mouseClickMove(int p_146273_1_, int p_146273_2_, int p_146273_3_, long p_146273_4_)
+    protected void mouseClickMove(int mouseX, int mouseY, int lastButtonClicked, long timeSinceMouseClick)
     {
-        super.mouseClickMove(p_146273_1_, p_146273_2_, p_146273_3_, p_146273_4_);
+        super.mouseClickMove(mouseX, mouseY, lastButtonClicked, timeSinceMouseClick);
         checkPressedButton();
     }
 
