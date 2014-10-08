@@ -100,7 +100,9 @@ public class DisplayVars
             case Rectangle:
             {
                 minimapSpec = theme.minimap.square;
-                minimapHeight = (int) (minimapWidth / 1.55);
+
+                double ratio = mc.displayWidth * 1D / mc.displayHeight;
+                minimapHeight = (int) (minimapWidth / ratio);
                 reticleSegmentLength = Math.sqrt((minimapHeight * minimapHeight) + (minimapWidth * minimapWidth)) / 2;
                 break;
             }
