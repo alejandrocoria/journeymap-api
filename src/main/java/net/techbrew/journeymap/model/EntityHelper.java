@@ -41,9 +41,7 @@ public class EntityHelper
     public static EntityDistanceComparator entityDistanceComparator = new EntityDistanceComparator();
     public static EntityDTODistanceComparator entityDTODistanceComparator = new EntityDTODistanceComparator();
     public static EntityMapComparator entityMapComparator = new EntityMapComparator();
-    private static String[] horseVariantTextures = new String[] {"horse/horse_white.png", "horse/horse_creamy.png", "horse/horse_chestnut.png", "horse/horse_brown.png", "horse/horse_black.png", "horse/horse_gray.png", "/horse/horse_darkbrown.png"};
-    private static int lateralDistance = JourneyMap.getCoreProperties().chunkOffset.get() * 8;
-    private static int verticalDistance = lateralDistance / 2;
+    //private static String[] horseVariantTextures = new String[] {"horse/horse_white.png", "horse/horse_creamy.png", "horse/horse_chestnut.png", "horse/horse_brown.png", "horse/horse_black.png", "horse/horse_gray.png", "/horse/horse_darkbrown.png"};
 
     public static List<EntityDTO> getEntitiesNearby(String timerName, int maxEntities, boolean hostile, Class... entityClasses)
     {
@@ -55,9 +53,6 @@ public class EntityHelper
 
         List<Entity> allEntities = new ArrayList<Entity>(mc.theWorld.loadedEntityList);
         AxisAlignedBB bb = getBB(mc.thePlayer);
-
-        lateralDistance = JourneyMap.getCoreProperties().chunkOffset.get() * 8;
-        verticalDistance = lateralDistance / 2;
 
         try
         {
@@ -147,10 +142,6 @@ public class EntityHelper
         timer.start();
 
         Minecraft mc = FMLClientHandler.instance().getClient();
-
-        lateralDistance = JourneyMap.getCoreProperties().chunkOffset.get() * 8;
-        verticalDistance = lateralDistance / 2;
-
         List<EntityPlayer> allPlayers = new ArrayList<EntityPlayer>(mc.theWorld.playerEntities);
         allPlayers.remove(mc.thePlayer);
 
@@ -182,6 +173,8 @@ public class EntityHelper
      */
     private static AxisAlignedBB getBB(EntityPlayerSP player)
     {
+        int lateralDistance = JourneyMap.getCoreProperties().radarLateralDistance.get();
+        int verticalDistance = JourneyMap.getCoreProperties().radarVerticalDistance.get();
         return AxisAlignedBB.getBoundingBox(player.posX, player.posY, player.posZ, player.posX, player.posY, player.posZ).expand(lateralDistance, verticalDistance, lateralDistance);
     }
 

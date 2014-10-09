@@ -15,6 +15,7 @@ http://journeymap.techbrew.net
 - New Feature: Minimap Size is now expressed as a percentage of your screen height.  This means it will scale if you resize the window.
 - New Feature: New "Top Center" Position added as an option for MiniMap Presets
 - New Feature: "Show Caves" added to MiniMap Preset options, so each Preset can have caves enabled/disabled independently from Fullscreen Map
+- New Feature: "Radar Lateral Range" and "Radar Vertical Range" options added to the Advanced Options
 - Bugfix: Cacti now treated as plants with respect to Cartography options
 - Bugfix: Fixed bug that had caused "Couldn't purge private cache:" warnings
 - Bugfix: Rectangle MiniMap's reticle wasn't extending to edges if Reticle Heading set to "My Heading"

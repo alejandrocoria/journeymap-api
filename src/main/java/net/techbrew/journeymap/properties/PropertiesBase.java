@@ -283,7 +283,7 @@ public abstract class PropertiesBase
                 // Write to file
                 Files.write(header + json, propFile, UTF8);
 
-                JourneyMap.getLogger().info("Saved " + getFileName());
+                JourneyMap.getLogger().debug("Saved " + getFileName());
 
                 return true;
             }

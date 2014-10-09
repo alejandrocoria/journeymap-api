@@ -109,6 +109,12 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Advanced, key = "jm.common.radar_hide_sneaking", defaultBoolean = true)
     public final AtomicBoolean hideSneakingEntities = new AtomicBoolean(true);
 
+    @Config(category = Advanced, key = "jm.common.radar_lateral_distance", minValue = 16, maxValue = 512, defaultValue = 64)
+    public final AtomicInteger radarLateralDistance = new AtomicInteger(64);
+
+    @Config(category = Advanced, key = "jm.common.radar_vertical_distance", minValue = 8, maxValue = 256, defaultValue = 16)
+    public final AtomicInteger radarVerticalDistance = new AtomicInteger(16);
+
     protected transient final String name = "core";
 
     public CoreProperties()
