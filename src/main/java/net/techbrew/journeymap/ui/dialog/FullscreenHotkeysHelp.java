@@ -104,7 +104,7 @@ public class FullscreenHotkeysHelp extends JmUI
         // Hotkey help
         y += 12;
         final int x = (this.width) / 2;
-        drawHelpStrings(Constants.getString("key.journeymap.hotkeys_toggle"), Constants.getKeyName(Constants.KB_MAP), x, y += 12);
+        drawHelpStrings(Constants.getString("key.journeymap.map_toggle_alt"), Constants.getKeyName(Constants.KB_MAP), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.zoom_in"), Constants.getKeyName(Constants.KB_MAP_ZOOMIN), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.zoom_out"), Constants.getKeyName(Constants.KB_MAP_ZOOMOUT), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.day"), Constants.getKeyName(Constants.KB_MAP_DAY), x, y += 12);

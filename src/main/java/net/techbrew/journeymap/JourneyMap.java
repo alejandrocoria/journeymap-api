@@ -24,7 +24,6 @@ import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.forgehandler.EventHandlerManager;
-import net.techbrew.journeymap.forgehandler.MiniMapOverlayHandler;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.PropertyManager;
@@ -157,31 +156,31 @@ public class JourneyMap
         return INSTANCE.fullMapProperties;
     }
 
-    public static MiniMapProperties getMiniMapProperties()
-    {
-        if (INSTANCE.miniMapProperties1.isActive())
-        {
-            return INSTANCE.miniMapProperties1;
-        }
-        else
-        {
-            return INSTANCE.miniMapProperties2;
-        }
-    }
+//    public static MiniMapProperties getMiniMapProperties()
+//    {
+//        if (INSTANCE.miniMapProperties1.isActive())
+//        {
+//            return INSTANCE.miniMapProperties1;
+//        }
+//        else
+//        {
+//            return INSTANCE.miniMapProperties2;
+//        }
+//    }
+//
+//    public static void toggleMiniMapPreset()
+//    {
+//        if (INSTANCE.miniMapProperties1.isActive())
+//        {
+//            toggleMiniMapPreset(2);
+//        }
+//        else
+//        {
+//            toggleMiniMapPreset(1);
+//        }
+//    }
 
-    public static void toggleMiniMapPreset()
-    {
-        if (INSTANCE.miniMapProperties1.isActive())
-        {
-            toggleMiniMapPreset(2);
-        }
-        else
-        {
-            toggleMiniMapPreset(1);
-        }
-    }
-
-    public static void toggleMiniMapPreset(int which)
+    public static MiniMapProperties getMiniMapProperties(int which)
     {
         switch (which)
         {
@@ -189,16 +188,15 @@ public class JourneyMap
             {
                 INSTANCE.miniMapProperties2.setActive(true);
                 INSTANCE.miniMapProperties1.setActive(false);
-                break;
+                return getMiniMapProperties2();
             }
             default:
             {
                 INSTANCE.miniMapProperties1.setActive(true);
                 INSTANCE.miniMapProperties2.setActive(false);
+                return getMiniMapProperties1();
             }
         }
-
-        UIManager.getInstance().resetMinimap();
     }
 
     public static MiniMapProperties getMiniMapProperties1()
@@ -588,16 +586,6 @@ public class JourneyMap
         miniMapProperties2 = PropertiesBase.reload(miniMapProperties2, MiniMapProperties2.class);
         webMapProperties = PropertiesBase.reload(webMapProperties, WebMapProperties.class);
         waypointProperties = PropertiesBase.reload(waypointProperties, WaypointProperties.class);
-
-        if (!miniMapProperties1.isActive() || !miniMapProperties2.isActive())
-        {
-            // First time running with presets
-            miniMapProperties1.setActive(true);
-            miniMapProperties2.initSuggestions();
-            miniMapProperties2.setActive(false);
-        }
-
-        MiniMapOverlayHandler.checkEventConfig();
     }
 
     public String getCurrentWorldId()

@@ -17,12 +17,11 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.forgehandler.MiniMapOverlayHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.MapState;
-import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.properties.MiniMapProperties;
-import net.techbrew.journeymap.properties.WaypointProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.draw.DrawWayPointStep;
 import net.techbrew.journeymap.render.draw.RadarDrawStepFactory;
@@ -56,9 +55,7 @@ public class MiniMap
     private final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
     private final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
     private final TextureImpl playerLocatorTex;
-    private MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties();
-    private FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
-    private WaypointProperties waypointProperties = JourneyMap.getWaypointProperties();
+    private MiniMapProperties miniMapProperties;
     private EntityClientPlayerMP player;
     private StatTimer drawTimer;
     private StatTimer refreshStateTimer;
@@ -78,19 +75,28 @@ public class MiniMap
     /**
      * Default constructor
      */
-    public MiniMap()
+    public MiniMap(MiniMapProperties miniMapProperties)
     {
         initTime = System.currentTimeMillis();
         player = mc.thePlayer;
         playerLocatorTex = TextureCache.instance().getPlayerLocatorSmall();
-        initGridRenderer();
-        state.refresh(mc, player, miniMapProperties);
-        updateDisplayVars(Shape.getPreferred(), Position.getPreferred(), true);
+        setMiniMapProperties(miniMapProperties);
     }
 
     public static synchronized MapState state()
     {
         return state;
+    }
+
+    public void setMiniMapProperties(MiniMapProperties miniMapProperties)
+    {
+        this.miniMapProperties = miniMapProperties;
+        reset();
+    }
+
+    public MiniMapProperties getCurrentMinimapProperties()
+    {
+        return miniMapProperties;
     }
 
     /**
@@ -126,9 +132,6 @@ public class MiniMap
             if (doStateRefresh)
             {
                 timer = refreshStateTimer.start();
-                miniMapProperties = JourneyMap.getMiniMapProperties();
-                fullMapProperties = JourneyMap.getFullMapProperties();
-                waypointProperties = JourneyMap.getWaypointProperties();
                 gridRenderer.setContext(state.getWorldDir(), state.getDimension());
                 if (!preview)
                 {
@@ -144,13 +147,13 @@ public class MiniMap
             boolean moved = gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
             if (moved || doStateRefresh)
             {
-                boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get());
+                boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || miniMapProperties.showCaves.get());
                 gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh || preview, 0, 0);
             }
 
             if (doStateRefresh)
             {
-                boolean checkWaypointDistance = waypointProperties.maxDistance.get() > 0;
+                boolean checkWaypointDistance = JourneyMap.getWaypointProperties().maxDistance.get() > 0;
                 state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, miniMapProperties, dv.drawScale, checkWaypointDistance);
                 state.updateLastRefresh();
             }
@@ -241,7 +244,7 @@ public class MiniMap
                         DrawUtil.startUnicode(mc.fontRenderer, true);
                     }
                     int alpha = (int) Math.min(255, Math.max(0, 2100 - (System.currentTimeMillis() - initTime)));
-                    DrawUtil.drawLabel(miniMapProperties.getId(), centerPoint.getX(), centerPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, Math.max(0, alpha - 100), Color.white, alpha, 8, false, rotation);
+                    DrawUtil.drawLabel(Integer.toString(miniMapProperties.getId()), centerPoint.getX(), centerPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, Math.max(0, alpha - 100), Color.white, alpha, 8, false, rotation);
                     if (!unicodeForced)
                     {
                         DrawUtil.stopUnicode(mc.fontRenderer);
@@ -436,7 +439,6 @@ public class MiniMap
                     (dv.minimapHeight / 2 * Math.sin(bearing)) + centerPixel.getY()
             );
 
-            // TODO: I probably broke this by passing in widow position
             return framePos;
         }
         else
@@ -521,47 +523,11 @@ public class MiniMap
 
     public void reset()
     {
-        state.requireRefresh();
-        gridRenderer.clear();
+        initGridRenderer();
+        updateDisplayVars(miniMapProperties.shape.get(), miniMapProperties.position.get(), true);
+        MiniMapOverlayHandler.checkEventConfig(miniMapProperties);
     }
 
-    public void nextPosition()
-    {
-        int nextIndex = dv.position.ordinal() + 1;
-        if (nextIndex == Position.values().length)
-        {
-            nextIndex = 0;
-        }
-        setPosition(Position.values()[nextIndex]);
-    }
-
-    public Position getPosition()
-    {
-        return dv.position;
-    }
-
-    public void setPosition(Position position)
-    {
-        miniMapProperties.position.set(position);
-        miniMapProperties.save();
-        if (dv != null)
-        {
-            updateDisplayVars(dv.shape, position, false);
-        }
-    }
-
-    public Shape getShape()
-    {
-        return dv.shape;
-    }
-
-    public void setShape(Shape shape)
-    {
-        if (dv != null)
-        {
-            updateDisplayVars(shape, dv.position, false);
-        }
-    }
 
     public void updateDisplayVars(boolean force)
     {
@@ -598,7 +564,7 @@ public class MiniMap
         miniMapProperties.save();
 
         DisplayVars oldDv = this.dv;
-        this.dv = new DisplayVars(mc, shape, position, miniMapProperties.fontSmall.get() ? 1 : 2);
+        this.dv = new DisplayVars(mc, shape, position, miniMapProperties.fontSmall.get() ? 1 : 2, miniMapProperties);
 
         if (oldDv == null || oldDv.shape != this.dv.shape)
         {
@@ -618,18 +584,14 @@ public class MiniMap
         gridRenderer.setViewPort(viewPort);
     }
 
-    public void forceRefreshState()
-    {
-        state.requireRefresh();
-    }
-
     private void initGridRenderer()
     {
         this.gridRenderer = new GridRenderer(miniMapProperties.getSize() <= 768 ? 3 : 5);
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
         gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
-        boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || fullMapProperties.showCaves.get());
+        boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || miniMapProperties.showCaves.get());
         gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+        state.requireRefresh();
         state.refresh(mc, player, miniMapProperties);
         initTime = System.currentTimeMillis();
     }

@@ -20,7 +20,6 @@ public class FullMapProperties extends InGameMapProperties
 {
     protected transient static final int CODE_REVISION = 4;
 
-    public final AtomicBoolean showCaves = new AtomicBoolean(true);
     public final AtomicBoolean showGrid = new AtomicBoolean(true);
     public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
 

@@ -49,21 +49,21 @@ public class Constants
     public static KeyBinding KB_MAP_ZOOMOUT;
     public static KeyBinding KB_MAP_DAY;
     public static KeyBinding KB_MAP_NIGHT;
-    public static KeyBinding KB_MINIMAP_POS;
+    public static KeyBinding KB_MINIMAP_PRESET;
     public static KeyBinding KB_WAYPOINT;
 
     public static List<KeyBinding> initKeybindings()
     {
         CONTROL_KEYNAME_COMBO = "Ctrl+";
         KEYBINDING_CATEGORY = Constants.getString("jm.common.hotkeys_keybinding_category", CONTROL_KEYNAME_COMBO);
-        KB_MAP = new KeyBinding("key.journeymap.hotkeys_toggle", Keyboard.KEY_J, KEYBINDING_CATEGORY);
+        KB_MAP = new KeyBinding("key.journeymap.map_toggle", Keyboard.KEY_J, KEYBINDING_CATEGORY);
         KB_MAP_ZOOMIN = new KeyBinding("key.journeymap.zoom_in", Keyboard.KEY_EQUALS, KEYBINDING_CATEGORY);
         KB_MAP_ZOOMOUT = new KeyBinding("key.journeymap.zoom_out", Keyboard.KEY_MINUS, KEYBINDING_CATEGORY);
         KB_MAP_DAY = new KeyBinding("key.journeymap.day", Keyboard.KEY_LBRACKET, KEYBINDING_CATEGORY);
         KB_MAP_NIGHT = new KeyBinding("key.journeymap.night", Keyboard.KEY_RBRACKET, KEYBINDING_CATEGORY);
-        KB_MINIMAP_POS = new KeyBinding("key.journeymap.minimap_position", Keyboard.KEY_BACKSLASH, KEYBINDING_CATEGORY);
+        KB_MINIMAP_PRESET = new KeyBinding("key.journeymap.minimap_preset", Keyboard.KEY_BACKSLASH, KEYBINDING_CATEGORY);
         KB_WAYPOINT = new KeyBinding("key.journeymap.create_waypoint", Keyboard.KEY_B, KEYBINDING_CATEGORY);
-        return Arrays.asList(KB_MAP, KB_MAP_ZOOMIN, KB_MAP_ZOOMOUT, KB_MAP_DAY, KB_MAP_NIGHT, KB_MINIMAP_POS, KB_WAYPOINT);
+        return Arrays.asList(KB_MAP, KB_MAP_ZOOMIN, KB_MAP_ZOOMOUT, KB_MAP_DAY, KB_MAP_NIGHT, KB_MINIMAP_PRESET, KB_WAYPOINT);
     }
 
     public static Locale getLocale()

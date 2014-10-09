@@ -14,12 +14,18 @@ http://journeymap.techbrew.net
 ## Changelog for JourneyMap @JMVERSION@:
 - BIG CHANGE:  Minimap Size is now expressed as a percentage
 - Bugfix: Cacti now treated as plants with respect to Cartography options
+- Bugfix: Fixed bug that had caused "Couldn't purge private cache:" warnings
+- Bugfix: Rectangle MiniMap's reticle wasn't extending to edges if Reticle Heading set to "My Heading"
+- Bugfix: Minimap Preset 2 was getting reset to initial config after disconnecting/reconnecting.
+- Change: "Show Caves" added to MiniMap Preset options
 - Change: Options Manager now has "Hot Keys..." buttons in the toolbars for MiniMap Preset 1, 2, and Fullscreen Map sections
 - Change: Options Manager layout now adjusts rows to be centered in the screen, toolbars are now right-justified
 - Change: Options Manager minor style / color tweaks.
 - Change: Config file format is now more compact
 - Change: All options in config files are now validated when loaded - defensive measure against derpy users typing bad values
 - Change: Defensive coded added to ensure keybindings can't be duplicated, ever.
+- Change: Removed MiniMap config option: "Enable Hot Keys"
+- Change: Some Keybindings renamed. Keep an eye open for any issues with Keybindings as a result.
 
 ## Changelog for JourneyMap 5.0.0a6:
 - New Feature: Rectangle Shape for MiniMap. Because Mitchel, that's why.

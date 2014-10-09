@@ -19,6 +19,9 @@ import static net.techbrew.journeymap.properties.config.Config.Category.Inherit;
  */
 public abstract class InGameMapProperties extends MapProperties
 {
+    @Config(category = Inherit, key = "jm.common.show_caves", defaultBoolean = true)
+    public final AtomicBoolean showCaves = new AtomicBoolean(true);
+
     @Config(category = Inherit, key = "jm.minimap.force_unicode", defaultBoolean = false)
     public final AtomicBoolean forceUnicode = new AtomicBoolean(false);
 

@@ -49,8 +49,6 @@ public abstract class PropertiesBase
             .registerTypeAdapter(AtomicInteger.class, new AtomicIntegerSerializer(configFormatChanged))
             .registerTypeAdapter(AtomicReference.class, new AtomicReferenceSerializer(configFormatChanged))
             .create();
-    // Toggles whether save() actually does anything.
-    protected transient final AtomicBoolean saveEnabled = new AtomicBoolean(true);
     // Whether it's disabled
     protected final AtomicBoolean disabled = new AtomicBoolean(false);
     // Current file reference
@@ -253,13 +251,8 @@ public abstract class PropertiesBase
     {
         fileRevision = getCodeRevision();
 
-        synchronized (saveEnabled)
+        synchronized (gson)
         {
-            if (!saveEnabled.get())
-            {
-                return false;
-            }
-
             File propFile = null;
             try
             {
@@ -289,6 +282,8 @@ public abstract class PropertiesBase
 
                 // Write to file
                 Files.write(header + json, propFile, UTF8);
+
+                JourneyMap.getLogger().info("Saved " + getFileName());
 
                 return true;
             }
@@ -333,6 +328,7 @@ public abstract class PropertiesBase
             else
             {
                 JourneyMap.getLogger().info(String.format("Config file not found: %s", propFile));
+                instance.newFileInit();
             }
         }
         catch (Exception e)
@@ -356,6 +352,7 @@ public abstract class PropertiesBase
             try
             {
                 instance = (T) getClass().newInstance();
+                instance.newFileInit();
                 saveNeeded = true;
             }
             catch (Exception e)
@@ -371,6 +368,14 @@ public abstract class PropertiesBase
         }
 
         return instance;
+    }
+
+    /**
+     * Override if a new file should have special configuration.
+     */
+    protected void newFileInit()
+    {
+
     }
 
     /**
@@ -408,14 +413,5 @@ public abstract class PropertiesBase
     protected boolean validateConfigs()
     {
         return ConfigValidation.validateConfigs(this);
-    }
-
-    public <T extends PropertiesBase> T enableSave(boolean enabled)
-    {
-        synchronized (saveEnabled)
-        {
-            saveEnabled.set(enabled);
-            return (T) this;
-        }
     }
 }

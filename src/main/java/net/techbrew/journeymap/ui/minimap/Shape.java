@@ -2,7 +2,6 @@ package net.techbrew.journeymap.ui.minimap;
 
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.ui.option.KeyedEnum;
 
 import java.util.Arrays;
@@ -21,29 +20,6 @@ public enum Shape implements KeyedEnum
     Shape(String key)
     {
         this.key = key;
-    }
-
-    public static Shape getPreferred()
-    {
-        final MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties();
-
-        Shape shape = null;
-        try
-        {
-            shape = miniMapProperties.shape.get();
-        }
-        catch (IllegalArgumentException e)
-        {
-            JourneyMap.getLogger().warn("Not a valid minimap shape in : " + miniMapProperties.getFile());
-        }
-
-        if (shape == null)
-        {
-            shape = Shape.Square;
-            miniMapProperties.shape.set(shape);
-            miniMapProperties.save();
-        }
-        return shape;
     }
 
     public static Shape safeValueOf(String name)

@@ -10,7 +10,10 @@ package net.techbrew.journeymap.io;
 
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.properties.*;
+import net.techbrew.journeymap.properties.CoreProperties;
+import net.techbrew.journeymap.properties.FullMapProperties;
+import net.techbrew.journeymap.properties.MapProperties;
+import net.techbrew.journeymap.properties.WebMapProperties;
 import net.techbrew.journeymap.ui.minimap.Position;
 import net.techbrew.journeymap.ui.minimap.Shape;
 
@@ -258,26 +261,26 @@ public class PropertyManager
         coreProperties.save();
         JourneyMap.getLogger().info(String.format("Migrated legacy property file values from %s to %s .", propFile.getName(), coreProperties.getFile().getName())); //$NON-NLS-1$
 
-        WebMapProperties webMapProperties = JourneyMap.getWebMapProperties().enableSave(false);
+        WebMapProperties webMapProperties = JourneyMap.getWebMapProperties();
         webMapProperties.enabled.set(getBoolean(Key.WEBSERVER_ENABLED));
         webMapProperties.port.set(getInteger(Key.WEBSERVER_PORT));
 
-        MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties().enableSave(false);
-        miniMapProperties.enabled.set(getBoolean(Key.PREF_SHOW_MINIMAP));
-        miniMapProperties.enableHotkeys.set(getBoolean(Key.PREF_MINIMAP_HOTKEYS));
-        miniMapProperties.fontSmall.set(getDouble(Key.PREF_MINIMAP_FONTSCALE).intValue() == 1);
-        miniMapProperties.forceUnicode.set(getBoolean(Key.PREF_MINIMAP_FORCEUNICODE));
-        miniMapProperties.position.set(Position.safeValueOf(getString(Key.PREF_MINIMAP_POSITION)));
-        miniMapProperties.shape.set(Shape.safeValueOf(getString(Key.PREF_MINIMAP_SHAPE)));
-        miniMapProperties.showFps.set(getBoolean(Key.PREF_MINIMAP_SHOWFPS));
+//        MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties().enableSave(false);
+//        miniMapProperties.enabled.set(getBoolean(Key.PREF_SHOW_MINIMAP));
+//        miniMapProperties.enableHotkeys.set(getBoolean(Key.PREF_MINIMAP_HOTKEYS));
+//        miniMapProperties.fontSmall.set(getDouble(Key.PREF_MINIMAP_FONTSCALE).intValue() == 1);
+//        miniMapProperties.forceUnicode.set(getBoolean(Key.PREF_MINIMAP_FORCEUNICODE));
+//        miniMapProperties.position.set(Position.safeValueOf(getString(Key.PREF_MINIMAP_POSITION)));
+//        miniMapProperties.shape.set(Shape.safeValueOf(getString(Key.PREF_MINIMAP_SHAPE)));
+//        miniMapProperties.showFps.set(getBoolean(Key.PREF_MINIMAP_SHOWFPS));
 
-        FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties().enableSave(false);
+        FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
         fullMapProperties.fontSmall.set(getDouble(Key.PREF_FONTSCALE).intValue() == 1);
         fullMapProperties.forceUnicode.set(getBoolean(Key.PREF_FORCEUNICODE));
         fullMapProperties.showCaves.set(getBoolean(Key.PREF_SHOW_CAVES));
         fullMapProperties.showGrid.set(getBoolean(Key.PREF_SHOW_GRID));
 
-        List<MapProperties> propsList = Arrays.asList(fullMapProperties, miniMapProperties, webMapProperties);
+        List<MapProperties> propsList = Arrays.asList(fullMapProperties, webMapProperties);
         for (MapProperties props : propsList)
         {
             props.showAnimals.set(getBoolean(Key.PREF_SHOW_ANIMALS));
@@ -286,7 +289,7 @@ public class PropertyManager
             props.showPlayers.set(getBoolean(Key.PREF_SHOW_PLAYERS));
             props.showVillagers.set(getBoolean(Key.PREF_SHOW_VILLAGERS));
             props.showWaypoints.set(getBoolean(Key.PREF_SHOW_WAYPOINTS));
-            props.enableSave(true).save();
+            props.save();
             JourneyMap.getLogger().info(String.format("Migrated legacy property file values from %s to %s .", propFile.getName(), props.getFile().getName())); //$NON-NLS-1$
         }
 

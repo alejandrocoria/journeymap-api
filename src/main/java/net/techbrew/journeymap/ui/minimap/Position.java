@@ -2,7 +2,6 @@ package net.techbrew.journeymap.ui.minimap;
 
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.ui.option.KeyedEnum;
 
 /**
@@ -23,41 +22,6 @@ public enum Position implements KeyedEnum
         this.key = key;
     }
 
-    public static Position getPreferred()
-    {
-        final MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties();
-
-        Position position = null;
-        try
-        {
-            position = miniMapProperties.position.get();
-        }
-        catch (IllegalArgumentException e)
-        {
-            JourneyMap.getLogger().warn("Not a valid minimap position in : " + miniMapProperties.getFile());
-        }
-
-        if (position == null)
-        {
-            position = Position.TopRight;
-            miniMapProperties.position.set(position);
-            miniMapProperties.save();
-        }
-        return position;
-    }
-
-    @Override
-    public String getKey()
-    {
-        return key;
-    }
-
-    @Override
-    public String toString()
-    {
-        return Constants.getString(this.key);
-    }
-
     public static Position safeValueOf(String name)
     {
         Position value = null;
@@ -75,5 +39,17 @@ public enum Position implements KeyedEnum
             value = Position.TopRight;
         }
         return value;
+    }
+
+    @Override
+    public String getKey()
+    {
+        return key;
+    }
+
+    @Override
+    public String toString()
+    {
+        return Constants.getString(this.key);
     }
 }

@@ -62,78 +62,74 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
 
         try
         {
-            if (JourneyMap.getMiniMapProperties().enableHotkeys.get())
+            // This seems to prevent the keycode from "staying"
+            boolean controlDown = Keyboard.isKeyDown(29) || Keyboard.isKeyDown(157);
+            //GuiScreen.isCtrlKeyDown();
+
+            if (controlDown && Constants.isPressed(Constants.KB_MAP))
             {
-                // This seems to prevent the keycode from "staying"
-                boolean controlDown = Keyboard.isKeyDown(29) || Keyboard.isKeyDown(157);
-                //GuiScreen.isCtrlKeyDown();
+                UIManager.getInstance().toggleMinimap();
+                return true;
+            }
+            else if (Constants.isPressed(Constants.KB_MAP_ZOOMIN))
+            {
+                MiniMap.state().zoomIn();
+                return true;
+            }
+            else if (Constants.isPressed(Constants.KB_MAP_ZOOMOUT))
+            {
+                MiniMap.state().zoomOut();
+                return true;
+            }
+            else if (Constants.isPressed(Constants.KB_MAP_DAY))
+            {
+                MiniMap.state().setMapType(Constants.MapType.day);
+                return true;
+            }
+            else if (Constants.isPressed(Constants.KB_MAP_NIGHT))
+            {
+                MiniMap.state().setMapType(Constants.MapType.night);
+                return true;
+            }
+            else if (Constants.isPressed(Constants.KB_MINIMAP_PRESET))
+            {
+                UIManager.getInstance().switchMiniMapPreset();
+                return true;
+            }
+            else if (controlDown && Constants.isPressed(Constants.KB_WAYPOINT))
+            {
+                UIManager.getInstance().openWaypointManager(null, null);
+                return true;
+            }
 
-                if (controlDown && Constants.isPressed(Constants.KB_MAP))
+            if (!minimapOnly)
+            {
+                if (Constants.KB_MAP.isPressed())
                 {
-                    UIManager.getInstance().toggleMinimap();
-                    return true;
-                }
-                else if (Constants.isPressed(Constants.KB_MAP_ZOOMIN))
-                {
-                    MiniMap.state().zoomIn();
-                    return true;
-                }
-                else if (Constants.isPressed(Constants.KB_MAP_ZOOMOUT))
-                {
-                    MiniMap.state().zoomOut();
-                    return true;
-                }
-                else if (Constants.isPressed(Constants.KB_MAP_DAY))
-                {
-                    MiniMap.state().setMapType(Constants.MapType.day);
-                    return true;
-                }
-                else if (Constants.isPressed(Constants.KB_MAP_NIGHT))
-                {
-                    MiniMap.state().setMapType(Constants.MapType.night);
-                    return true;
-                }
-                else if (Constants.isPressed(Constants.KB_MINIMAP_POS))
-                {
-                    JourneyMap.toggleMiniMapPreset();
-                    UIManager.getInstance().resetMinimap();
-                    return true;
-                }
-                else if (controlDown && Constants.isPressed(Constants.KB_WAYPOINT))
-                {
-                    UIManager.getInstance().openWaypointManager(null, null);
-                    return true;
-                }
-
-                if (!minimapOnly)
-                {
-                    if (Constants.KB_MAP.isPressed())
+                    if (FMLClientHandler.instance().getClient().currentScreen == null)
                     {
-                        if (FMLClientHandler.instance().getClient().currentScreen == null)
-                        {
-                            UIManager.getInstance().openFullscreenMap();
-                        }
-                        else
-                        {
-                            if (FMLClientHandler.instance().getClient().currentScreen instanceof Fullscreen)
-                            {
-                                UIManager.getInstance().closeAll();
-                            }
-                        }
-                        return true;
+                        UIManager.getInstance().openFullscreenMap();
                     }
                     else
                     {
-                        if (Constants.KB_WAYPOINT.isPressed())
+                        if (FMLClientHandler.instance().getClient().currentScreen instanceof Fullscreen)
                         {
-                            if (FMLClientHandler.instance().getClient().currentScreen == null)
-                            {
-                                Minecraft mc = FMLClientHandler.instance().getClient();
-                                Waypoint waypoint = Waypoint.of(mc.thePlayer);
-                                UIManager.getInstance().openWaypointEditor(waypoint, true, null);
-                            }
-                            return true;
+                            UIManager.getInstance().closeAll();
                         }
+                    }
+                    return true;
+                }
+                else
+                {
+                    if (Constants.KB_WAYPOINT.isPressed())
+                    {
+                        if (FMLClientHandler.instance().getClient().currentScreen == null)
+                        {
+                            Minecraft mc = FMLClientHandler.instance().getClient();
+                            Waypoint waypoint = Waypoint.of(mc.thePlayer);
+                            UIManager.getInstance().openWaypointEditor(waypoint, true, null);
+                        }
+                        return true;
                     }
                 }
             }

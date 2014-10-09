@@ -1,6 +1,6 @@
 package net.techbrew.journeymap.ui.theme;
 
-import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -50,15 +50,15 @@ public class ThemeMinimapFrame
     private Color reticleColor;
     private Rectangle.Double frameBounds;
 
-    public ThemeMinimapFrame(Theme theme, Theme.Minimap.MinimapSpec minimapSpec, int width, int height)
+    public ThemeMinimapFrame(Theme theme, Theme.Minimap.MinimapSpec minimapSpec, MiniMapProperties miniMapProperties, int width, int height)
     {
         this.theme = theme;
         this.minimapSpec = minimapSpec;
         this.width = width;
         this.height = height;
         this.frameColor = Theme.getColor(minimapSpec.frameColor);
-        this.frameAlpha = Math.max(0f, Math.min(1f, JourneyMap.getMiniMapProperties().frameAlpha.get() / 100f));
-        this.reticleOrientation = JourneyMap.getMiniMapProperties().reticleOrientation.get();
+        this.frameAlpha = Math.max(0f, Math.min(1f, miniMapProperties.frameAlpha.get() / 100f));
+        this.reticleOrientation = miniMapProperties.reticleOrientation.get();
 
         if (minimapSpec instanceof Theme.Minimap.MinimapSquare)
         {
@@ -93,7 +93,7 @@ public class ThemeMinimapFrame
             textureCompassPoint = getTexture("compass_point", minimapSpec.compassPoint);
         }
 
-        this.showReticle = JourneyMap.getMiniMapProperties().showReticle.get();
+        this.showReticle = miniMapProperties.showReticle.get();
         this.reticleColor = Theme.getColor(minimapSpec.reticleColor);
         this.reticleAlpha = minimapSpec.reticleAlpha;
         this.reticleHeadingAlpha = minimapSpec.reticleHeadingAlpha;
@@ -102,7 +102,7 @@ public class ThemeMinimapFrame
         this.reticleOffset = minimapSpec.reticleOffset;
         if (isSquare)
         {
-            reticleSegmentLength += (height * .75) + reticleOffset;
+            reticleSegmentLength += (width * .75) + reticleOffset;
         }
         else
         {

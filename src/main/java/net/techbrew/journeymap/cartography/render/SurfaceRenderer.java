@@ -37,8 +37,13 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 
     public SurfaceRenderer()
     {
+        this("Surface");
+    }
+
+    protected SurfaceRenderer(String cachePrefix)
+    {
         // TODO: Write the caches to disk and we'll have some useful data available.
-        cachePrefix = "Surface";
+        this.cachePrefix = cachePrefix;
         columnPropertiesCache = new BlockColumnPropertiesCache(cachePrefix + "ColumnProps");
         chunkSurfaceHeights = new HeightsCache(cachePrefix + "Heights");
         chunkSurfaceSlopes = new SlopesCache(cachePrefix + "Slopes");
@@ -155,7 +160,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                         }
                     }
 
-                    if(roofY==0 || standardY==0)
+                    if (roofY == 0 || standardY == 0)
                     {
                         paintVoidBlock(x, z, g2D);
                         chunkOk = true;
@@ -163,7 +168,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                     }
 
                     // Bathymetry - need to use water height instead of standardY, so we get the color blend
-                    if(mapBathymetry)
+                    if (mapBathymetry)
                     {
                         standardY = getColumnProperty(PROP_WATER_HEIGHT, standardY, chunkMd, x, z);
                     }
@@ -177,11 +182,11 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                     }
 
                     // Check a block up
-                    if(mapPlants || mapCrops)
+                    if (mapPlants || mapCrops)
                     {
-                        BlockMD temp = chunkMd.getTopBlockMD(x, standardY+1, z);
-                        if((mapPlants && temp.hasFlag(BlockMD.Flag.Plant)) ||
-                           (mapCrops && temp.hasFlag(BlockMD.Flag.Crop)))
+                        BlockMD temp = chunkMd.getTopBlockMD(x, standardY + 1, z);
+                        if ((mapPlants && temp.hasFlag(BlockMD.Flag.Plant)) ||
+                                (mapCrops && temp.hasFlag(BlockMD.Flag.Crop)))
                         {
                             standardY++;
                         }
@@ -323,7 +328,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                 }
             }
 
-            if(chunkMd.getHasNoSky())
+            if (chunkMd.getHasNoSky())
             {
                 // End: Only use night color
                 paintBlock(x, z, strata.getRenderNightColor(), g2D, false);

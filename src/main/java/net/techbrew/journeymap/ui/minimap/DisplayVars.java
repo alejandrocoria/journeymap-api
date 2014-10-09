@@ -10,7 +10,6 @@ package net.techbrew.journeymap.ui.minimap;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
-import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -67,10 +66,9 @@ public class DisplayVars
      * @param position       Desired position
      * @param labelFontScale Font scale for labels
      */
-    DisplayVars(Minecraft mc, Shape shape, Position position, double labelFontScale)
+    DisplayVars(Minecraft mc, Shape shape, Position position, double labelFontScale, final MiniMapProperties miniMapProperties)
     {
         // Immutable member and local vars
-        final MiniMapProperties miniMapProperties = JourneyMap.getMiniMapProperties();
         this.scaledResolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
         this.forceUnicode = miniMapProperties.forceUnicode.get();
         this.showFps = miniMapProperties.showFps.get();
@@ -103,7 +101,7 @@ public class DisplayVars
                 double ratio = mc.displayWidth * 1D / mc.displayHeight;
                 minimapHeight = miniMapProperties.getSize();
                 minimapWidth = (int) (minimapHeight * ratio);
-                reticleSegmentLength = Math.sqrt((minimapHeight * minimapHeight) + (minimapWidth * minimapWidth)) / 2;
+                reticleSegmentLength = minimapWidth / 1.5;
                 break;
             }
             case Square:
@@ -124,7 +122,7 @@ public class DisplayVars
         fpsLabelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, minimapSpec.fpsLabel.shadow) * (useUnicode ? .7 : 1) * this.fontScale);
         locationLabelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, minimapSpec.locationLabel.shadow) * (useUnicode ? .7 : 1) * this.fontScale);
 
-        int compassFontScale = (JourneyMap.getMiniMapProperties().compassFontSmall.get() ? 1 : 2) * (useUnicode ? 2 : 1);
+        int compassFontScale = (miniMapProperties.compassFontSmall.get() ? 1 : 2) * (useUnicode ? 2 : 1);
         int compassLabelHeight = 0;
         if (showCompass)
         {
@@ -133,7 +131,7 @@ public class DisplayVars
 
         drawScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);
 
-        minimapFrame = new ThemeMinimapFrame(theme, minimapSpec, minimapWidth, minimapHeight);
+        minimapFrame = new ThemeMinimapFrame(theme, minimapSpec, miniMapProperties, minimapWidth, minimapHeight);
         marginX = marginY = minimapSpec.margin;
 
         int halfWidth = minimapWidth / 2;
@@ -235,7 +233,8 @@ public class DisplayVars
         this.centerPoint = new Point2D.Double(textureX + halfWidth, textureY + halfHeight);
 
         // Set up compass poionts
-        this.minimapCompassPoints = new ThemeCompassPoints(textureX, textureY, halfWidth, halfHeight, minimapSpec, this.minimapFrame.getCompassPoint(), useUnicode, compassLabelHeight);
+        this.minimapCompassPoints = new ThemeCompassPoints(textureX, textureY, halfWidth, halfHeight, minimapSpec,
+                miniMapProperties, this.minimapFrame.getCompassPoint(), useUnicode, compassLabelHeight);
 
         // Set up key positions
         double centerX = Math.floor(textureX + (minimapWidth / 2));

@@ -28,8 +28,7 @@ public class EndRenderer extends SurfaceRenderer implements IChunkRenderer
 
     public EndRenderer()
     {
-        super();
-        cachePrefix = "End";
+        super("End");
     }
 
     @Override

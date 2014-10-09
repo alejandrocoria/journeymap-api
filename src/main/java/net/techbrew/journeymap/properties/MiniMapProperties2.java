@@ -24,21 +24,23 @@ public class MiniMapProperties2 extends MiniMapProperties
         super("minimap2");
     }
 
-    public void initSuggestions()
+    @Override
+    public void newFileInit()
     {
         // Initial settings to give people an idea of what can be done
         this.position.set(Position.Center);
-        this.shape.set(Shape.Circle);
+        this.shape.set(Shape.Rectangle);
         this.frameAlpha.set(30);
-        this.terrainAlpha.set(30);
+        this.terrainAlpha.set(40);
         this.orientation.set(Orientation.PlayerHeading);
         this.reticleOrientation.set(ReticleOrientation.Compass);
         this.sizePercent.set(50);
     }
 
-    public String getId()
+    @Override
+    public int getId()
     {
-        return "2";
+        return 2;
     }
 
     @Override
@@ -51,7 +53,6 @@ public class MiniMapProperties2 extends MiniMapProperties
                 .add("showFps", showFps)
                 .add("showBiome", showBiome)
                 .add("showLocation", showLocation)
-                .add("enableHotkeys", enableHotkeys)
                 .add("showWaypointLabels", showWaypointLabels)
                 .add("sizePercent", sizePercent)
                 .add("frameAlpha", frameAlpha)
@@ -63,6 +64,7 @@ public class MiniMapProperties2 extends MiniMapProperties
                 .add("reticleOrientation", reticleOrientation)
                 .add("preferredMapType", preferredMapType)
                 .add("name", name)
+                .add("id", getId())
                 .toString();
     }
 }

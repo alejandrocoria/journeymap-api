@@ -1,7 +1,7 @@
 package net.techbrew.journeymap.ui.theme;
 
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 
@@ -41,7 +41,7 @@ public class ThemeCompassPoints
     private double x;
     private double y;
 
-    public ThemeCompassPoints(int x, int y, int halfWidth, int halfHeight, Theme.Minimap.MinimapSpec minimapSpec, TextureImpl compassPointTex, boolean useUnicode, int labelHeight)
+    public ThemeCompassPoints(int x, int y, int halfWidth, int halfHeight, Theme.Minimap.MinimapSpec minimapSpec, MiniMapProperties miniMapProperties, TextureImpl compassPointTex, boolean useUnicode, int labelHeight)
     {
         this.x = x;
         this.y = y;
@@ -50,7 +50,7 @@ public class ThemeCompassPoints
         pointSouth = new Point2D.Double(x + halfWidth, y + halfHeight + halfHeight);
         pointWest = new Point2D.Double(x, y + halfHeight);
         pointEast = new Point2D.Double(x + halfWidth + halfWidth, y + halfHeight);
-        this.fontScale = (JourneyMap.getMiniMapProperties().compassFontSmall.get() ? 1 : 2) * (useUnicode ? 2 : 1);
+        this.fontScale = (miniMapProperties.compassFontSmall.get() ? 1 : 2) * (useUnicode ? 2 : 1);
         this.compassLabelHeight = labelHeight;
 
         bgAlpha = minimapSpec.compassLabel.backgroundAlpha;
@@ -60,7 +60,7 @@ public class ThemeCompassPoints
 
         this.compassPointTex = compassPointTex;
         compassPointColor = Theme.getColor(minimapSpec.compassPointColor);
-        if(this.compassPointTex != null)
+        if (this.compassPointTex != null)
         {
             // Scale to accommodate font
             compassPointScale = getCompassPointScale(compassLabelHeight, minimapSpec, compassPointTex);
@@ -96,7 +96,7 @@ public class ThemeCompassPoints
 
     public static float getCompassPointScale(int compassLabelHeight, Theme.Minimap.MinimapSpec minimapSpec, TextureImpl compassPointTex)
     {
-        return (compassLabelHeight + minimapSpec.compassPointLabelPad) / (compassPointTex.height *1f);
+        return (compassLabelHeight + minimapSpec.compassPointLabelPad) / (compassPointTex.height * 1f);
     }
 
     public void setPosition(final double x, final double y)
@@ -107,7 +107,7 @@ public class ThemeCompassPoints
 
     public void drawPoints(double rotation)
     {
-        if(compassPointTex !=null)
+        if (compassPointTex != null)
         {
             if (showNorth)
             {

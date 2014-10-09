@@ -225,11 +225,11 @@ public class OptionsManager extends JmUI
                 // Minimap buttons:  Force minimap toggles
                 if (minimap1PreviewButton.isActive())
                 {
-                    JourneyMap.toggleMiniMapPreset(1);
+                    UIManager.getInstance().switchMiniMapPreset(1);
                 }
                 else if (minimap2PreviewButton.isActive())
                 {
-                    JourneyMap.toggleMiniMapPreset(2);
+                    UIManager.getInstance().switchMiniMapPreset(2);
                 }
             }
 
@@ -327,13 +327,13 @@ public class OptionsManager extends JmUI
             if (slotMetadata.getButton() == minimap1PreviewButton)
             {
                 minimap2PreviewButton.setToggled(false);
-                JourneyMap.toggleMiniMapPreset(1);
+                UIManager.getInstance().switchMiniMapPreset(1);
             }
 
             if (slotMetadata.getButton() == minimap2PreviewButton)
             {
                 minimap1PreviewButton.setToggled(false);
-                JourneyMap.toggleMiniMapPreset(2);
+                UIManager.getInstance().switchMiniMapPreset(2);
             }
 
             if (slotMetadata.getButton() == minimap1KeysButton || slotMetadata.getButton() == minimap2KeysButton)
@@ -379,13 +379,13 @@ public class OptionsManager extends JmUI
         if (button == minimap1PreviewButton)
         {
             minimap2PreviewButton.setToggled(false);
-            JourneyMap.toggleMiniMapPreset(1);
+            UIManager.getInstance().switchMiniMapPreset(1);
         }
 
         if (button == minimap2PreviewButton)
         {
             minimap1PreviewButton.setToggled(false);
-            JourneyMap.toggleMiniMapPreset(2);
+            UIManager.getInstance().switchMiniMapPreset(2);
         }
     }
 

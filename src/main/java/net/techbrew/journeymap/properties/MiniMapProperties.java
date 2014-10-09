@@ -49,9 +49,6 @@ public class MiniMapProperties extends InGameMapProperties
     @Config(category = Inherit, key = "jm.minimap.show_location")
     public final AtomicBoolean showLocation = new AtomicBoolean(true);
 
-    @Config(category = Inherit, key = "jm.minimap.hotkeys")
-    public final AtomicBoolean enableHotkeys = new AtomicBoolean(true);
-
     @Config(category = Inherit, key = "jm.minimap.show_waypointlabels")
     public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
 
@@ -131,9 +128,9 @@ public class MiniMapProperties extends InGameMapProperties
         save();
     }
 
-    public String getId()
+    public int getId()
     {
-        return "1";
+        return 1;
     }
 
     public RenderGameOverlayEvent.ElementType getRenderOverlayEventType()
@@ -141,24 +138,11 @@ public class MiniMapProperties extends InGameMapProperties
         return Enum.valueOf(RenderGameOverlayEvent.ElementType.class, renderOverlayEventTypeName.get());
     }
 
-    @Override
-    protected boolean validate()
-    {
-        boolean saveNeeded = super.validate();
-        try
-        {
-//            Enum.valueOf(RenderGameOverlayEvent.ElementType.class, renderOverlayEventTypeName.get());
-        }
-        catch (Exception e)
-        {
-//            renderOverlayEventTypeName.set(RenderGameOverlayEvent.ElementType.HOTBAR.name());
-//            renderOverlayPreEvent.set(true);
-            saveNeeded = true;
-        }
-
-        return saveNeeded;
-    }
-
+    /**
+     * Gets the size relative to current screen height.
+     *
+     * @return
+     */
     public int getSize()
     {
         return (int) Math.max(128, Math.floor((sizePercent.get() / 100.0) * FMLClientHandler.instance().getClient().displayHeight));
@@ -194,7 +178,6 @@ public class MiniMapProperties extends InGameMapProperties
         result = 31 * result + (showFps != null ? showFps.hashCode() : 0);
         result = 31 * result + (showBiome != null ? showBiome.hashCode() : 0);
         result = 31 * result + (showLocation != null ? showLocation.hashCode() : 0);
-        result = 31 * result + (enableHotkeys != null ? enableHotkeys.hashCode() : 0);
         result = 31 * result + showWaypointLabels.hashCode();
         result = 31 * result + sizePercent.hashCode();
         result = 31 * result + frameAlpha.hashCode();
@@ -220,7 +203,6 @@ public class MiniMapProperties extends InGameMapProperties
                 .add("showFps", showFps)
                 .add("showBiome", showBiome)
                 .add("showLocation", showLocation)
-                .add("enableHotkeys", enableHotkeys)
                 .add("showWaypointLabels", showWaypointLabels)
                 .add("sizePercent", sizePercent)
                 .add("frameAlpha", frameAlpha)
@@ -232,6 +214,7 @@ public class MiniMapProperties extends InGameMapProperties
                 .add("reticleOrientation", reticleOrientation)
                 .add("preferredMapType", preferredMapType)
                 .add("name", name)
+                .add("id", getId())
                 .toString();
     }
 }

@@ -16,7 +16,6 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WaypointsData;
-import net.techbrew.journeymap.forgehandler.MiniMapOverlayHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.config.Config;
@@ -37,12 +36,13 @@ import org.apache.logging.log4j.Logger;
 public class UIManager
 {
     private final Logger logger = JourneyMap.getLogger();
+    private final MiniMap miniMap;
     Minecraft minecraft = FMLClientHandler.instance().getClient();
-    private MiniMap miniMap;
 
     private UIManager()
     {
-        miniMap = new MiniMap();
+        int preset = JourneyMap.getMiniMapProperties1().isActive() ? 1 : 2;
+        miniMap = new MiniMap(JourneyMap.getMiniMapProperties(preset));
     }
 
     public static UIManager getInstance()
@@ -129,20 +129,20 @@ public class UIManager
 
     public boolean isMiniMapEnabled()
     {
-        return JourneyMap.getMiniMapProperties().enabled.get();
+        return miniMap.getCurrentMinimapProperties().enabled.get();
     }
 
     public void setMiniMapEnabled(boolean enable)
     {
-        JourneyMap.getMiniMapProperties().enabled.set(enable);
-        JourneyMap.getMiniMapProperties().save();
+        miniMap.getCurrentMinimapProperties().enabled.set(enable);
+        miniMap.getCurrentMinimapProperties().save();
     }
 
     public void drawMiniMap()
     {
         try
         {
-            if (JourneyMap.getMiniMapProperties().enabled.get())
+            if (miniMap.getCurrentMinimapProperties().enabled.get())
             {
                 final GuiScreen currentScreen = minecraft.currentScreen;
                 final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat;
@@ -260,17 +260,18 @@ public class UIManager
         Fullscreen.reset();
         TileCache.instance().invalidateAll();
         TileCache.instance().cleanUp();
-        resetMinimap();
+        miniMap.reset();
     }
 
-    public void resetMinimap()
+    public void switchMiniMapPreset()
     {
-        if (this.miniMap != null)
-        {
-            this.miniMap.reset();
-        }
-        this.miniMap = new MiniMap();
-        MiniMapOverlayHandler.checkEventConfig();
+        int currentPreset = miniMap.getCurrentMinimapProperties().getId();
+        switchMiniMapPreset(currentPreset == 1 ? 2 : 1);
+    }
+
+    public void switchMiniMapPreset(int which)
+    {
+        miniMap.setMiniMapProperties(JourneyMap.getMiniMapProperties(which));
     }
 
     private static class Holder

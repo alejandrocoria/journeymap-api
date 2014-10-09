@@ -106,7 +106,7 @@ public class MiniMapHotkeysHelp extends JmUI
         drawHelpStrings(Constants.getString("key.journeymap.zoom_out"), Constants.getKeyName(Constants.KB_MAP_ZOOMOUT), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.day"), Constants.getKeyName(Constants.KB_MAP_DAY), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.night"), Constants.getKeyName(Constants.KB_MAP_NIGHT), x, y += 12);
-        drawHelpStrings(Constants.getString("key.journeymap.minimap_position"), Constants.getKeyName(Constants.KB_MINIMAP_POS), x, y += 12);
+        drawHelpStrings(Constants.getString("key.journeymap.minimap_preset"), Constants.getKeyName(Constants.KB_MINIMAP_PRESET), x, y += 12);
         buttonClose.setY(y + 16);
     }
 
