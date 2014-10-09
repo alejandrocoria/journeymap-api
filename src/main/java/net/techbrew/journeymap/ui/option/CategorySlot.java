@@ -40,7 +40,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         String tooltip = Constants.getString(category.key + ".tooltip");
         boolean advanced = category == Config.Category.Advanced;
 
-        button = new Button(0, name);
+        button = new Button(name);
         button.setDefaultStyle(false);
         button.packedFGColour = Color.white.getRGB();
         metadata = new SlotMetadata(button, name, tooltip, advanced);

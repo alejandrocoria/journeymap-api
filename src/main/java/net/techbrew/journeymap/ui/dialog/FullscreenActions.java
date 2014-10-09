@@ -36,8 +36,6 @@ public class FullscreenActions extends JmUI
 
     Button buttonAutomap, buttonSave, buttonClose, buttonBrowser, buttonCheck;
 
-    ;
-
     public FullscreenActions()
     {
         super(Constants.getString("jm.common.actions"));
@@ -67,15 +65,15 @@ public class FullscreenActions extends JmUI
         String on = Constants.getString("jm.common.on");
         String off = Constants.getString("jm.common.off");
 
-        buttonSave = new Button(ButtonEnum.Save, Constants.getString("jm.common.save_map")); //$NON-NLS-1$
-        buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
-        buttonBrowser = new Button(ButtonEnum.Browser, Constants.getString("jm.common.use_browser")); //$NON-NLS-1$
+        buttonSave = new Button(Constants.getString("jm.common.save_map")); //$NON-NLS-1$
+        buttonClose = new Button(Constants.getString("jm.common.close")); //$NON-NLS-1$
+        buttonBrowser = new Button(Constants.getString("jm.common.use_browser")); //$NON-NLS-1$
         buttonBrowser.setEnabled(JourneyMap.getWebMapProperties().enabled.get());
 
-        buttonAutomap = new Button(ButtonEnum.Automap, Constants.getString("jm.common.automap_title"));
+        buttonAutomap = new Button(Constants.getString("jm.common.automap_title"));
         buttonAutomap.setEnabled(FMLClientHandler.instance().getClient().isSingleplayer());
 
-        buttonCheck = new Button(ButtonEnum.Check, Constants.getString("jm.common.update_check")); //$NON-NLS-1$
+        buttonCheck = new Button(Constants.getString("jm.common.update_check")); //$NON-NLS-1$
 
         buttonList.add(buttonAutomap);
         buttonList.add(buttonSave);
@@ -119,38 +117,35 @@ public class FullscreenActions extends JmUI
     protected void actionPerformed(GuiButton guibutton)
     { // actionPerformed
 
-        final ButtonEnum id = ButtonEnum.values()[guibutton.id];
-        switch (id)
+        if (guibutton == buttonSave)
         {
-            case Save:
-            {
-                save();
-                UIManager.getInstance().openFullscreenMap();
-                break;
-            }
-            case Close:
-            {
-                UIManager.getInstance().openFullscreenMap();
-                break;
-            }
-            case Browser:
-            {
-                launchLocalhost();
-                UIManager.getInstance().openFullscreenMap();
-                break;
-            }
-            case Automap:
-            {
-                UIManager.getInstance().open(AutoMapConfirmation.class);
-                break;
-            }
-            case Check:
-            {
-                VersionCheck.launchWebsite();
-                UIManager.getInstance().openFullscreenMap();
-                break;
-            }
+            save();
+            UIManager.getInstance().openFullscreenMap();
+            return;
         }
+        if (guibutton == buttonClose)
+        {
+            UIManager.getInstance().openFullscreenMap();
+            return;
+        }
+        if (guibutton == buttonBrowser)
+        {
+            launchLocalhost();
+            UIManager.getInstance().openFullscreenMap();
+            return;
+        }
+        if (guibutton == buttonAutomap)
+        {
+            UIManager.getInstance().open(AutoMapConfirmation.class);
+            return;
+        }
+        if (guibutton == buttonCheck)
+        {
+            VersionCheck.launchWebsite();
+            UIManager.getInstance().openFullscreenMap();
+            return;
+        }
+
     }
 
     void save()
@@ -180,11 +175,4 @@ public class FullscreenActions extends JmUI
             }
         }
     }
-
-
-    private enum ButtonEnum
-    {
-        Automap, Check, Save, Browser, Close
-    }
-
 }

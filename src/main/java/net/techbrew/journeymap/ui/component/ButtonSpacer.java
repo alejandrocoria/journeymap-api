@@ -11,12 +11,12 @@ public class ButtonSpacer extends Button
 {
     public ButtonSpacer()
     {
-        super(Integer.MIN_VALUE, "");
+        super("");
     }
 
     public ButtonSpacer(int size)
     {
-        super(Integer.MIN_VALUE, size, size, "");
+        super(size, size, "");
     }
 
     public void drawPartialScrollable(Minecraft minecraft, int x, int y, int width, int height)

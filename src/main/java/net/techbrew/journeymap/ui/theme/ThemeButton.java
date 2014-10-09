@@ -34,22 +34,22 @@ public class ThemeButton extends BooleanPropertyButton
     protected String iconName;
     protected List<String> additionalTooltips;
 
-    public ThemeButton(int id, Theme theme, String rawLabel, String iconName)
+    public ThemeButton(Theme theme, String rawLabel, String iconName)
     {
-        this(id, theme, Constants.getString(rawLabel), Constants.getString(rawLabel), false, iconName);
+        this(theme, Constants.getString(rawLabel), Constants.getString(rawLabel), false, iconName);
     }
 
-    public ThemeButton(int id, Theme theme, String labelOn, String labelOff, boolean toggled, String iconName)
+    public ThemeButton(Theme theme, String labelOn, String labelOff, boolean toggled, String iconName)
     {
-        super(id, labelOn, labelOff, null, null);
+        super(labelOn, labelOff, null, null);
         this.iconName = iconName;
         this.setToggled(toggled);
         updateTheme(theme);
     }
 
-    protected ThemeButton(int id, Theme theme, String labelOn, String labelOff, String iconName, PropertiesBase properties, AtomicBoolean property)
+    protected ThemeButton(Theme theme, String labelOn, String labelOff, String iconName, PropertiesBase properties, AtomicBoolean property)
     {
-        super(id, labelOn, labelOff, properties, property);
+        super(labelOn, labelOff, properties, property);
         this.iconName = iconName;
         updateTheme(theme);
     }

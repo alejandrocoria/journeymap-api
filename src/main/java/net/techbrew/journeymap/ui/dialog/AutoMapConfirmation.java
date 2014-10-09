@@ -35,10 +35,10 @@ public class AutoMapConfirmation extends JmUI
     {
         buttonList.clear();
 
-        buttonAll = new Button(ButtonEnum.All.ordinal(), Constants.getString("jm.common.automap_dialog_all"));
-        buttonMissing = new Button(ButtonEnum.Missing.ordinal(), Constants.getString("jm.common.automap_dialog_missing"));
-        buttonNone = new Button(ButtonEnum.None.ordinal(), Constants.getString("jm.common.automap_dialog_none"));
-        buttonClose = new Button(ButtonEnum.None.ordinal(), Constants.getString("jm.common.close"));
+        buttonAll = new Button(Constants.getString("jm.common.automap_dialog_all"));
+        buttonMissing = new Button(Constants.getString("jm.common.automap_dialog_missing"));
+        buttonNone = new Button(Constants.getString("jm.common.automap_dialog_none"));
+        buttonClose = new Button(Constants.getString("jm.common.close"));
 
         boolean enable = !JourneyMap.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);
         buttonAll.setEnabled(enable);
@@ -74,31 +74,23 @@ public class AutoMapConfirmation extends JmUI
 
     @Override
     protected void actionPerformed(GuiButton guibutton)
-    { // actionPerformed
-
-        final ButtonEnum id = ButtonEnum.values()[guibutton.id];
-        switch (id)
+    {
+        if (guibutton == buttonAll)
         {
-            case All:
-            {
-                JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.TRUE);
-                break;
-            }
-            case Missing:
-            {
-                JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.FALSE);
-                break;
-            }
-            case None:
-            {
-                JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, false, null);
-                break;
-            }
-            case Close:
-            {
-                break;
-            }
+            JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.TRUE);
         }
+        if (guibutton == buttonMissing)
+        {
+            JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.FALSE);
+        }
+        if (guibutton == buttonNone)
+        {
+            JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, false, null);
+        }
+        if (guibutton == buttonClose)
+        {
+        }
+
         UIManager.getInstance().openFullscreenMap();
     }
 
@@ -113,10 +105,5 @@ public class AutoMapConfirmation extends JmUI
                 break;
             }
         }
-    }
-
-    private enum ButtonEnum
-    {
-        All, Missing, None, Close
     }
 }

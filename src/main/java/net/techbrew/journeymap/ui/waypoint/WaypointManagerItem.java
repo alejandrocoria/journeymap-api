@@ -63,11 +63,11 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
         String on = Constants.getString("jm.common.on");
         String off = Constants.getString("jm.common.off");
 
-        buttonEnable = new OnOffButton(id++, on, off, true); //$NON-NLS-1$
+        buttonEnable = new OnOffButton(on, off, true); //$NON-NLS-1$
         buttonEnable.setToggled(waypoint.isEnable());
-        buttonFind = new Button(id++, Constants.getString("jm.waypoint.find")); //$NON-NLS-1$
+        buttonFind = new Button(Constants.getString("jm.waypoint.find")); //$NON-NLS-1$
 
-        buttonTeleport = new Button(id++, Constants.getString("jm.waypoint.teleport")); //$NON-NLS-1$
+        buttonTeleport = new Button(Constants.getString("jm.waypoint.teleport")); //$NON-NLS-1$
         buttonTeleport.setDrawButton(manager.canUserTeleport);
         buttonTeleport.setEnabled(manager.canUserTeleport);
 
@@ -75,8 +75,8 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
         buttonListLeft.setHeights(manager.rowHeight);
         buttonListLeft.fitWidths(fontRenderer);
 
-        buttonEdit = new Button(id++, Constants.getString("jm.waypoint.edit")); //$NON-NLS-1$
-        buttonRemove = new Button(id++, Constants.getString("jm.waypoint.remove")); //$NON-NLS-1$
+        buttonEdit = new Button(Constants.getString("jm.waypoint.edit")); //$NON-NLS-1$
+        buttonRemove = new Button(Constants.getString("jm.waypoint.remove")); //$NON-NLS-1$
 
         buttonListRight = new ButtonList(buttonEdit, buttonRemove);
         buttonListRight.setHeights(manager.rowHeight);

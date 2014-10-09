@@ -16,14 +16,14 @@ public class OnOffButton extends Button
     protected String labelOff;
     protected ArrayList<ToggleListener> toggleListeners = new ArrayList<ToggleListener>(0);
 
-    public OnOffButton(Enum enumValue, String labelOn, String labelOff, boolean toggled)
+    public OnOffButton(String labelOn, String labelOff, boolean toggled)
     {
-        this(enumValue.ordinal(), labelOn, labelOff, toggled);
+        this(0, labelOn, labelOff, toggled);
     }
 
     public OnOffButton(int id, String labelOn, String labelOff, boolean toggled)
     {
-        super(id, toggled ? labelOn : labelOff);
+        super(toggled ? labelOn : labelOff);
         this.labelOn = labelOn;
         this.labelOff = labelOff;
         this.setToggled(toggled);

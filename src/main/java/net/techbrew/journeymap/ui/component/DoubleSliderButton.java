@@ -24,9 +24,9 @@ public class DoubleSliderButton extends Button
     PropertiesBase properties;
     AtomicDouble property;
 
-    public DoubleSliderButton(int id, PropertiesBase properties, AtomicDouble property, String prefix, String suf, double minVal, double maxVal, boolean drawStr)
+    public DoubleSliderButton(PropertiesBase properties, AtomicDouble property, String prefix, String suf, double minVal, double maxVal, boolean drawStr)
     {
-        super(id, prefix);
+        super(prefix);
         minValue = minVal;
         maxValue = maxVal;
         this.prefix = prefix;

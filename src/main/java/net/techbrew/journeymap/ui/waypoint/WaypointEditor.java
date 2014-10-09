@@ -156,13 +156,12 @@ public class WaypointEditor extends JmUI
                 fieldList.add(fieldB);
 
                 Collection<Integer> wpDims = originalWaypoint.getDimensions();
-                int buttonId = ButtonEnum.values().length;
 
                 for (WorldProvider provider : WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions()))
                 {
                     int dim = provider.dimensionId;
                     String dimName = provider.getDimensionName();
-                    dimButtonList.add(new DimensionButton(buttonId++, dim, dimName, wpDims.contains(dim)));
+                    dimButtonList.add(new DimensionButton(0, dim, dimName, wpDims.contains(dim)));
                 }
 
                 dimScrollPane = new ScrollPane(mc, 0, 0, dimButtonList, dimButtonList.get(0).getHeight(), 4);
@@ -176,19 +175,19 @@ public class WaypointEditor extends JmUI
                 String enableOn = Constants.getString("jm.waypoint.enable", on);
                 String enableOff = Constants.getString("jm.waypoint.enable", off);
 
-                buttonRandomize = new Button(ButtonEnum.Randomize, Constants.getString("jm.waypoint.randomize")); //$NON-NLS-1$
+                buttonRandomize = new Button(Constants.getString("jm.waypoint.randomize")); //$NON-NLS-1$
 
-                buttonEnable = new OnOffButton(ButtonEnum.Enable, enableOn, enableOff, true); //$NON-NLS-1$
+                buttonEnable = new OnOffButton(enableOn, enableOff, true); //$NON-NLS-1$
                 buttonEnable.setToggled(originalWaypoint.isEnable());
 
-                buttonRemove = new Button(ButtonEnum.Remove, Constants.getString("jm.waypoint.remove")); //$NON-NLS-1$
+                buttonRemove = new Button(Constants.getString("jm.waypoint.remove")); //$NON-NLS-1$
                 buttonRemove.setEnabled(!isNew);
 
-                buttonReset = new Button(ButtonEnum.Reset, Constants.getString("jm.waypoint.reset")); //$NON-NLS-1$
-                buttonSave = new Button(ButtonEnum.Save, Constants.getString("jm.waypoint.save")); //$NON-NLS-1$
+                buttonReset = new Button(Constants.getString("jm.waypoint.reset")); //$NON-NLS-1$
+                buttonSave = new Button(Constants.getString("jm.waypoint.save")); //$NON-NLS-1$
 
                 String closeLabel = isNew ? "jm.waypoint.cancel" : "jm.common.close";
-                buttonClose = new Button(ButtonEnum.Close, Constants.getString(closeLabel));
+                buttonClose = new Button(Constants.getString(closeLabel));
 
                 buttonList.add(buttonEnable);
                 buttonList.add(buttonRandomize);
@@ -469,41 +468,37 @@ public class WaypointEditor extends JmUI
         }
         else
         {
-            final ButtonEnum id = ButtonEnum.values()[guibutton.id];
-            switch (id)
+            if (guibutton == buttonRandomize)
             {
-
-                case Randomize:
-                {
-                    setRandomColor();
-                    break;
-                }
-                case Enable:
-                {
-                    buttonEnable.toggle();
-                    break;
-                }
-                case Remove:
-                {
-                    remove();
-                    break;
-                }
-                case Reset:
-                {
-                    resetForm();
-                    break;
-                }
-                case Save:
-                {
-                    save();
-                    break;
-                }
-                case Close:
-                {
-                    refreshAndClose(originalWaypoint);
-                    break;
-                }
+                setRandomColor();
+                return;
             }
+            if (guibutton == buttonEnable)
+            {
+                buttonEnable.toggle();
+                return;
+            }
+            if (guibutton == buttonRemove)
+            {
+                remove();
+                return;
+            }
+            if (guibutton == buttonReset)
+            {
+                resetForm();
+                return;
+            }
+            if (guibutton == buttonSave)
+            {
+                save();
+                return;
+            }
+            if (guibutton == buttonClose)
+            {
+                refreshAndClose(originalWaypoint);
+                return;
+            }
+
         }
     }
 
@@ -672,11 +667,6 @@ public class WaypointEditor extends JmUI
         {
             UIManager.getInstance().open(returnDisplay);
         }
-    }
-
-    private enum ButtonEnum
-    {
-        Randomize, Enable, Remove, Reset, Save, Close
     }
 
     class DimensionButton extends OnOffButton

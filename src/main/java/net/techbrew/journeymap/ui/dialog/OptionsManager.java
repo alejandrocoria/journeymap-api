@@ -74,7 +74,7 @@ public class OptionsManager extends JmUI
             {
                 String name = String.format("%s %s", Constants.getString("jm.minimap.preview"), "1");
                 String tooltip = Constants.getString("jm.minimap.preview.tooltip");
-                minimap1PreviewButton = new CheckBox(0, name, false);
+                minimap1PreviewButton = new CheckBox(name, false);
                 minimap1PreviewButton.setTooltip(tooltip);
             }
 
@@ -82,7 +82,7 @@ public class OptionsManager extends JmUI
             {
                 String name = String.format("%s %s", Constants.getString("jm.minimap.preview"), "2");
                 String tooltip = Constants.getString("jm.minimap.preview.tooltip");
-                minimap2PreviewButton = new CheckBox(0, name, false);
+                minimap2PreviewButton = new CheckBox(name, false);
                 minimap2PreviewButton.setTooltip(tooltip);
             }
 
@@ -90,7 +90,7 @@ public class OptionsManager extends JmUI
             {
                 String name = Constants.getString("jm.common.hotkeys");
                 String tooltip = Constants.getString("jm.common.hotkeys.tooltip");
-                minimap1KeysButton = new Button(0, name);
+                minimap1KeysButton = new Button(name);
                 minimap1KeysButton.setTooltip(tooltip);
                 minimap1KeysButton.setDrawBackground(false);
             }
@@ -99,7 +99,7 @@ public class OptionsManager extends JmUI
             {
                 String name = Constants.getString("jm.common.hotkeys");
                 String tooltip = Constants.getString("jm.common.hotkeys.tooltip");
-                minimap2KeysButton = new Button(0, name);
+                minimap2KeysButton = new Button(name);
                 minimap2KeysButton.setTooltip(tooltip);
                 minimap2KeysButton.setDrawBackground(false);
             }
@@ -108,7 +108,7 @@ public class OptionsManager extends JmUI
             {
                 String name = Constants.getString("jm.common.hotkeys");
                 String tooltip = Constants.getString("jm.common.hotkeys.tooltip");
-                fullscreenKeysButton = new Button(0, name);
+                fullscreenKeysButton = new Button(name);
                 fullscreenKeysButton.setTooltip(tooltip);
                 fullscreenKeysButton.setDrawBackground(false);
             }
@@ -189,7 +189,7 @@ public class OptionsManager extends JmUI
                 optionsListPane.updateSlots();
             }
 
-            buttonClose = new Button(0, Constants.getString("jm.common.close"));
+            buttonClose = new Button(Constants.getString("jm.common.close"));
             buttonClose.setWidth(150);
 
             buttonList.add(buttonClose);

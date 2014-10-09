@@ -12,7 +12,6 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.data.WaypointsData;
-import net.techbrew.journeymap.forgehandler.KeyEventHandler;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.ButtonList;
@@ -30,12 +29,10 @@ public class WaypointHelp extends JmUI
     int importReiTextWidth;
     int importVoxelTextWidth;
     private Button buttonRei, buttonVoxel, buttonClose;
-    private KeyEventHandler keyEventHandler;
 
     public WaypointHelp(JmUI returnDisplay)
     {
         super(Constants.getString("jm.waypoint.help_title"), returnDisplay);
-        keyEventHandler = new KeyEventHandler();
     }
 
     /**
@@ -53,7 +50,7 @@ public class WaypointHelp extends JmUI
         String reiFileName = ReiReader.getPointsFilename();
         importReiText = Constants.getString("jm.waypoint.help_import_rei", reiFileName, jmWaypointDir);
         importReiTextWidth = fr.getStringWidth(importReiText);
-        buttonRei = new Button(ButtonEnum.ImportRei, Constants.getString("jm.waypoint.help_import_rei_title"));
+        buttonRei = new Button(Constants.getString("jm.waypoint.help_import_rei_title"));
         buttonRei.setEnabled(WaypointsData.isReiMinimapEnabled());
         buttonList.add(buttonRei);
 
@@ -61,12 +58,12 @@ public class WaypointHelp extends JmUI
         String voxFileName = VoxelReader.getPointsFilename();
         importVoxelText = Constants.getString("jm.waypoint.help_import_voxel", voxFileName, jmWaypointDir);
         importVoxelTextWidth = fr.getStringWidth(importVoxelText);
-        buttonVoxel = new Button(ButtonEnum.ImportVoxel, Constants.getString("jm.waypoint.help_import_voxel_title"));
+        buttonVoxel = new Button(Constants.getString("jm.waypoint.help_import_voxel_title"));
         buttonVoxel.setEnabled(WaypointsData.isVoxelMapEnabled());
         buttonList.add(buttonVoxel);
 
         // Close
-        buttonClose = new Button(ButtonEnum.Close.ordinal(), 0, 0, Constants.getString("jm.common.close")); //$NON-NLS-1$
+        buttonClose = new Button(Constants.getString("jm.common.close")); //$NON-NLS-1$
         buttonList.add(buttonClose);
 
         new ButtonList(buttonRei, buttonVoxel).equalizeWidths(getFontRenderer());
@@ -88,31 +85,25 @@ public class WaypointHelp extends JmUI
 
     @Override
     protected void actionPerformed(GuiButton guibutton)
-    { // actionPerformed
-
-        final ButtonEnum id = ButtonEnum.values()[guibutton.id];
-        switch (id)
+    {
+        if (guibutton == buttonClose)
         {
+            WaypointStore.instance().load(ReiReader.loadWaypoints(), true);
+            closeAndReturn();
+            return;
+        }
 
-            case ImportRei:
-            {
-                WaypointStore.instance().load(ReiReader.loadWaypoints(), true);
-                closeAndReturn();
-                break;
-            }
+        if (guibutton == buttonVoxel)
+        {
+            WaypointStore.instance().load(VoxelReader.loadWaypoints(), true);
+            closeAndReturn();
+            return;
+        }
 
-            case ImportVoxel:
-            {
-                WaypointStore.instance().load(VoxelReader.loadWaypoints(), true);
-                closeAndReturn();
-                break;
-            }
-
-            case Close:
-            {
-                closeAndReturn();
-                break;
-            }
+        if (guibutton == buttonRei)
+        {
+            closeAndReturn();
+            return;
         }
     }
 
@@ -186,8 +177,4 @@ public class WaypointHelp extends JmUI
         drawString(getFontRenderer(), key, x + hgap, y, Color.YELLOW.getRGB());
     }
 
-    private enum ButtonEnum
-    {
-        ImportRei, ImportVoxel, Close
-    }
 }

@@ -40,7 +40,7 @@ public class MiniMapHotkeysHelp extends JmUI
     {
         this.buttonList.clear();
 
-        buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
+        buttonClose = new Button(Constants.getString("jm.common.close")); //$NON-NLS-1$
         buttonClose.setWidth(150);
 
         buttonList.add(buttonClose);
@@ -72,18 +72,10 @@ public class MiniMapHotkeysHelp extends JmUI
 
     @Override
     protected void actionPerformed(GuiButton guibutton)
-    { // actionPerformed
-
-        final ButtonEnum id = ButtonEnum.values()[guibutton.id];
-        switch (id)
+    {
+        if (guibutton == buttonClose)
         {
-
-
-            case Close:
-            {
-                closeAndReturn();
-                break;
-            }
+            closeAndReturn();
         }
     }
 
@@ -131,10 +123,4 @@ public class MiniMapHotkeysHelp extends JmUI
         super.keyTyped(c, i);
         keyEventHandler.onKeypress(true);
     }
-
-    private enum ButtonEnum
-    {
-        Close
-    }
-
 }

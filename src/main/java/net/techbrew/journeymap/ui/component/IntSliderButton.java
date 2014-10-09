@@ -26,9 +26,9 @@ public class IntSliderButton extends Button
     PropertiesBase properties;
     AtomicInteger property;
 
-    public IntSliderButton(int id, PropertiesBase properties, AtomicInteger property, String prefix, String suf, int minVal, int maxVal, boolean drawStr)
+    public IntSliderButton(PropertiesBase properties, AtomicInteger property, String prefix, String suf, int minVal, int maxVal, boolean drawStr)
     {
-        super(id, prefix);
+        super(prefix);
         minValue = minVal;
         maxValue = maxVal;
         this.prefix = prefix;

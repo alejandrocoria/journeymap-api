@@ -20,15 +20,15 @@ public class CheckBox extends BooleanPropertyButton
     PropertiesBase properties;
     String glyph = "\u2714";
 
-    public CheckBox(int id, String displayString, boolean checked)
+    public CheckBox(String displayString, boolean checked)
     {
-        this(id, displayString, null, null);
+        this(displayString, null, null);
         this.toggled = checked;
     }
 
-    public CheckBox(int id, String displayString, AtomicBoolean property, PropertiesBase properties)
+    public CheckBox(String displayString, AtomicBoolean property, PropertiesBase properties)
     {
-        super(id, displayString, displayString, properties, property);
+        super(displayString, displayString, properties, property);
         this.property = property;
         this.properties = properties;
         FontRenderer fr = FMLClientHandler.instance().getClient().fontRenderer;

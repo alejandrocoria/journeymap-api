@@ -38,7 +38,7 @@ public class FullscreenHotkeysHelp extends JmUI
     {
         this.buttonList.clear();
 
-        buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close")); //$NON-NLS-1$
+        buttonClose = new Button(Constants.getString("jm.common.close")); //$NON-NLS-1$
         buttonClose.setWidth(150);
 
         buttonList.add(buttonClose);
@@ -70,17 +70,10 @@ public class FullscreenHotkeysHelp extends JmUI
 
     @Override
     protected void actionPerformed(GuiButton guibutton)
-    { // actionPerformed
-
-        final ButtonEnum id = ButtonEnum.values()[guibutton.id];
-        switch (id)
+    {
+        if (guibutton == buttonClose)
         {
-
-            case Close:
-            {
-                closeAndReturn();
-                break;
-            }
+            closeAndReturn();
         }
     }
 
@@ -124,10 +117,5 @@ public class FullscreenHotkeysHelp extends JmUI
         drawString(getFontRenderer(), title, x - tWidth - hgap, y, 16777215);
 
         drawString(getFontRenderer(), key, x + hgap, y, Color.YELLOW.getRGB());
-    }
-
-    private enum ButtonEnum
-    {
-        Close
     }
 }

@@ -11,14 +11,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class ThemeToggle extends ThemeButton
 {
-    public ThemeToggle(int id, Theme theme, String rawlabel, String iconName)
+    public ThemeToggle(Theme theme, String rawlabel, String iconName)
     {
-        super(id, theme, Constants.getString(rawlabel), Constants.getString(rawlabel), iconName, null, null);
+        super(theme, Constants.getString(rawlabel), Constants.getString(rawlabel), iconName, null, null);
     }
 
-    public ThemeToggle(int id, Theme theme, String rawlabel, String iconName, PropertiesBase properties, AtomicBoolean property)
+    public ThemeToggle(Theme theme, String rawlabel, String iconName, PropertiesBase properties, AtomicBoolean property)
     {
-        super(id, theme, Constants.getString(rawlabel), Constants.getString(rawlabel), iconName, properties, property);
+        super(theme, Constants.getString(rawlabel), Constants.getString(rawlabel), iconName, properties, property);
         if (property != null)
         {
             setToggled(property.get());

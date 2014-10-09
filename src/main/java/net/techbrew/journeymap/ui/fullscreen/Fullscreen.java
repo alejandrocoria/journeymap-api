@@ -251,7 +251,7 @@ public class Fullscreen extends JmUI
             statusBackgroundAlpha = theme.fullscreen.statusLabel.backgroundAlpha;
 
             // Day Toggle
-            buttonDay = new ThemeToggle(id++, theme, "jm.fullscreen.map_day", "day", null, null);
+            buttonDay = new ThemeToggle(theme, "jm.fullscreen.map_day", "day", null, null);
             buttonDay.setToggled(mapType == Constants.MapType.day, false);
             buttonDay.addToggleListener(new OnOffButton.ToggleListener()
             {
@@ -277,7 +277,7 @@ public class Fullscreen extends JmUI
             });
 
             // Night Toggle
-            buttonNight = new ThemeToggle(id++, theme, "jm.fullscreen.map_night", "night");
+            buttonNight = new ThemeToggle(theme, "jm.fullscreen.map_night", "night");
             buttonNight.setToggled(mapType == Constants.MapType.night, false);
             buttonNight.addToggleListener(new OnOffButton.ToggleListener()
             {
@@ -303,7 +303,7 @@ public class Fullscreen extends JmUI
             });
 
             // Caves Toggle
-            buttonCaves = new ThemeToggle(id++, theme, "jm.fullscreen.map_caves", "caves", fullMapProperties, fullMapProperties.showCaves);
+            buttonCaves = new ThemeToggle(theme, "jm.fullscreen.map_caves", "caves", fullMapProperties, fullMapProperties.showCaves);
             buttonCaves.setDrawButton(state.isCaveMappingAllowed());
             buttonCaves.addToggleListener(new OnOffButton.ToggleListener()
             {
@@ -316,7 +316,7 @@ public class Fullscreen extends JmUI
             });
 
             // Follow
-            buttonFollow = new ThemeButton(id++, theme, "jm.fullscreen.follow", "follow");
+            buttonFollow = new ThemeButton(theme, "jm.fullscreen.follow", "follow");
             buttonFollow.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
@@ -328,7 +328,7 @@ public class Fullscreen extends JmUI
             });
 
             // Zoom In
-            buttonZoomIn = new ThemeButton(id++, theme, "jm.fullscreen.zoom_in", "zoomin");
+            buttonZoomIn = new ThemeButton(theme, "jm.fullscreen.zoom_in", "zoomin");
             buttonZoomIn.setEnabled(fullMapProperties.zoomLevel.get() < state.maxZoom);
             buttonZoomIn.addToggleListener(new OnOffButton.ToggleListener()
             {
@@ -341,7 +341,7 @@ public class Fullscreen extends JmUI
             });
 
             // Zoom Out
-            buttonZoomOut = new ThemeButton(id++, theme, "jm.fullscreen.zoom_out", "zoomout");
+            buttonZoomOut = new ThemeButton(theme, "jm.fullscreen.zoom_out", "zoomout");
             buttonZoomOut.setEnabled(fullMapProperties.zoomLevel.get() > state.minZoom);
             buttonZoomOut.addToggleListener(new OnOffButton.ToggleListener()
             {
@@ -354,7 +354,7 @@ public class Fullscreen extends JmUI
             });
 
             // Waypoints
-            buttonWaypointManager = new ThemeButton(id++, theme, "jm.waypoint.waypoints", "waypoints");
+            buttonWaypointManager = new ThemeButton(theme, "jm.waypoint.waypoints", "waypoints");
             buttonWaypointManager.setDrawButton(WaypointsData.isManagerEnabled());
             buttonWaypointManager.addToggleListener(new OnOffButton.ToggleListener()
             {
@@ -367,7 +367,7 @@ public class Fullscreen extends JmUI
             });
 
             // Options
-            buttonOptions = new ThemeButton(id++, theme, "jm.common.options", "options");
+            buttonOptions = new ThemeButton(theme, "jm.common.options", "options");
             buttonOptions.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
@@ -387,7 +387,7 @@ public class Fullscreen extends JmUI
             });
 
             // Actions
-            buttonActions = new ThemeButton(id++, theme, "jm.common.actions", "actions");
+            buttonActions = new ThemeButton(theme, "jm.common.actions", "actions");
             buttonActions.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
@@ -399,7 +399,7 @@ public class Fullscreen extends JmUI
             });
 
             // Alert
-            buttonAlert = new ThemeToggle(id++, theme, "jm.common.update_available", "alert");
+            buttonAlert = new ThemeToggle(theme, "jm.common.update_available", "alert");
             buttonAlert.setDrawButton(VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent());
             buttonAlert.setToggled(true);
             buttonAlert.addToggleListener(new OnOffButton.ToggleListener()
@@ -414,7 +414,7 @@ public class Fullscreen extends JmUI
             });
 
             // Close
-            buttonClose = new ThemeButton(id++, theme, "jm.common.close", "close");
+            buttonClose = new ThemeButton(theme, "jm.common.close", "close");
             buttonClose.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
@@ -425,34 +425,34 @@ public class Fullscreen extends JmUI
                 }
             });
 
-            buttonMobs = new ThemeToggle(id++, theme, "jm.common.show_mobs", "monsters", fullMapProperties, fullMapProperties.showMobs);
+            buttonMobs = new ThemeToggle(theme, "jm.common.show_mobs", "monsters", fullMapProperties, fullMapProperties.showMobs);
             buttonMobs.setDrawButton(FeatureManager.isAllowed(Feature.RadarMobs));
 
-            buttonAnimals = new ThemeToggle(id++, theme, "jm.common.show_animals", "animals", fullMapProperties, fullMapProperties.showAnimals);
+            buttonAnimals = new ThemeToggle(theme, "jm.common.show_animals", "animals", fullMapProperties, fullMapProperties.showAnimals);
             buttonAnimals.setDrawButton(FeatureManager.isAllowed(Feature.RadarAnimals));
 
-            buttonPets = new ThemeToggle(id++, theme, "jm.common.show_pets", "pets", fullMapProperties, fullMapProperties.showPets);
+            buttonPets = new ThemeToggle(theme, "jm.common.show_pets", "pets", fullMapProperties, fullMapProperties.showPets);
             buttonPets.setDrawButton(FeatureManager.isAllowed(Feature.RadarAnimals));
 
-            buttonVillagers = new ThemeToggle(id++, theme, "jm.common.show_villagers", "villagers", fullMapProperties, fullMapProperties.showVillagers);
+            buttonVillagers = new ThemeToggle(theme, "jm.common.show_villagers", "villagers", fullMapProperties, fullMapProperties.showVillagers);
             buttonVillagers.setDrawButton(FeatureManager.isAllowed(Feature.RadarVillagers));
 
-            buttonPlayers = new ThemeToggle(id++, theme, "jm.common.show_players", "players", fullMapProperties, fullMapProperties.showPlayers);
+            buttonPlayers = new ThemeToggle(theme, "jm.common.show_players", "players", fullMapProperties, fullMapProperties.showPlayers);
             buttonPlayers.setDrawButton(!mc.isSingleplayer() && FeatureManager.isAllowed(Feature.RadarPlayers));
 
-            buttonGrid = new ThemeToggle(id++, theme, "jm.common.show_grid", "grid", fullMapProperties, fullMapProperties.showGrid);
+            buttonGrid = new ThemeToggle(theme, "jm.common.show_grid", "grid", fullMapProperties, fullMapProperties.showGrid);
 
             // Toolbars
-            mapTypeToolbar = new ThemeToolbar(id++, theme, buttonCaves, buttonNight, buttonDay);
+            mapTypeToolbar = new ThemeToolbar(theme, buttonCaves, buttonNight, buttonDay);
             mapTypeToolbar.addAllButtons(this);
 
-            optionsToolbar = new ThemeToolbar(id++, theme, buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid);
+            optionsToolbar = new ThemeToolbar(theme, buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid);
             optionsToolbar.addAllButtons(this);
 
-            menuToolbar = new ThemeToolbar(id++, theme, buttonWaypointManager, buttonOptions, buttonActions);
+            menuToolbar = new ThemeToolbar(theme, buttonWaypointManager, buttonOptions, buttonActions);
             menuToolbar.addAllButtons(this);
 
-            zoomToolbar = new ThemeToolbar(id++, theme, buttonFollow, buttonZoomIn, buttonZoomOut);
+            zoomToolbar = new ThemeToolbar(theme, buttonFollow, buttonZoomIn, buttonZoomOut);
             zoomToolbar.setLayout(ButtonList.Layout.Vertical, ButtonList.Direction.LeftToRight);
             zoomToolbar.addAllButtons(this);
 

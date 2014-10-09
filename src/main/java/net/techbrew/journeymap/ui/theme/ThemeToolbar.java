@@ -25,19 +25,14 @@ public class ThemeToolbar extends Button
     private TextureImpl textureInner;
     private TextureImpl textureEnd;
 
-    public ThemeToolbar(Enum enumId, Theme theme, Button... buttons)
+    public ThemeToolbar(Theme theme, Button... buttons)
     {
-        this(enumId.ordinal(), theme, buttons);
+        this(theme, new ButtonList(buttons));
     }
 
-    public ThemeToolbar(int id, Theme theme, Button... buttons)
+    public ThemeToolbar(Theme theme, ButtonList buttonList)
     {
-        this(id, theme, new ButtonList(buttons));
-    }
-
-    public ThemeToolbar(int id, Theme theme, ButtonList buttonList)
-    {
-        super(id, 0, 0, "");
+        super(0, 0, "");
         this.buttonList = buttonList;
         //setToggled(false, false);
         updateTheme(theme);

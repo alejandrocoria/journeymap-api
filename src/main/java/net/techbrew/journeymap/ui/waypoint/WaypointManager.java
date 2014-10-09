@@ -87,7 +87,7 @@ public class WaypointManager extends JmUI
                 {
                     WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(FMLClientHandler.instance().getClient().thePlayer, true);
                     String distanceLabel = Constants.getString("jm.waypoint.distance");
-                    buttonSortDistance = new SortButton(ButtonEnum.SortDistance, distanceLabel, distanceSort);
+                    buttonSortDistance = new SortButton(distanceLabel, distanceSort);
                     buttonSortDistance.setTextOnly(fr);
                 }
                 buttonList.add(buttonSortDistance);
@@ -95,7 +95,7 @@ public class WaypointManager extends JmUI
                 if (buttonSortName == null)
                 {
                     WaypointManagerItem.Sort nameSort = new WaypointManagerItem.NameComparator(true);
-                    buttonSortName = new SortButton(ButtonEnum.SortName, Constants.getString("jm.waypoint.name"), nameSort);
+                    buttonSortName = new SortButton(Constants.getString("jm.waypoint.name"), nameSort);
                     buttonSortName.setTextOnly(fr);
                 }
                 buttonList.add(buttonSortName);
@@ -104,7 +104,7 @@ public class WaypointManager extends JmUI
                 {
                     String enableOn = Constants.getString("jm.waypoint.enable_all", "", on);
                     String enableOff = Constants.getString("jm.waypoint.enable_all", "", off);
-                    buttonToggleAll = new OnOffButton(ButtonEnum.ToggleAll.ordinal(), enableOff, enableOn, true);
+                    buttonToggleAll = new OnOffButton(enableOff, enableOn, true);
                     buttonToggleAll.setTextOnly(getFontRenderer());
                 }
                 buttonList.add(buttonToggleAll);
@@ -112,29 +112,29 @@ public class WaypointManager extends JmUI
                 // Bottom buttons
                 if (buttonDimensions == null)
                 {
-                    buttonDimensions = new DimensionsButton(ButtonEnum.Dimensions.ordinal());
+                    buttonDimensions = new DimensionsButton();
                 }
 
                 if (buttonAdd == null)
                 {
-                    buttonAdd = new Button(ButtonEnum.Add, Constants.getString("jm.waypoint.new"));
+                    buttonAdd = new Button(Constants.getString("jm.waypoint.new"));
                     buttonAdd.fitWidth(getFontRenderer());
                     buttonAdd.setWidth(buttonAdd.getWidth() * 2);
                 }
 
                 if (buttonHelp == null)
                 {
-                    buttonHelp = new Button(ButtonEnum.Help, Constants.getString("jm.common.help"));
+                    buttonHelp = new Button(Constants.getString("jm.common.help"));
                     buttonHelp.fitWidth(getFontRenderer());
                 }
 
                 if (buttonOptions == null)
                 {
-                    buttonOptions = new Button(ButtonEnum.Options, Constants.getString("jm.common.options_button"));
+                    buttonOptions = new Button(Constants.getString("jm.common.options_button"));
                     buttonOptions.fitWidth(getFontRenderer());
                 }
 
-                buttonClose = new Button(ButtonEnum.Close, Constants.getString("jm.common.close"));
+                buttonClose = new Button(Constants.getString("jm.common.close"));
 
                 bottomButtons = new ButtonList(buttonOptions, buttonHelp, buttonAdd, buttonDimensions, buttonClose);
                 buttonList.addAll(bottomButtons);
@@ -303,53 +303,51 @@ public class WaypointManager extends JmUI
     @Override
     protected void actionPerformed(GuiButton guibutton)
     {
-        switch (ButtonEnum.values()[guibutton.id])
+        if (guibutton == buttonClose)
         {
-            case Close:
-            {
-                refreshAndClose();
-                return;
-            }
-            case SortName:
-            {
-                updateSort(buttonSortName);
-                return;
-            }
-            case SortDistance:
-            {
-                updateSort(buttonSortDistance);
-                return;
-            }
-            case Dimensions:
-            {
-                buttonDimensions.nextValue();
-                updateItems();
-                return;
-            }
-            case Add:
-            {
-                Waypoint waypoint = Waypoint.of(mc.thePlayer);
-                UIManager.getInstance().openWaypointEditor(waypoint, true, this);
-                return;
-            }
-            case Help:
-            {
-                UIManager.getInstance().openWaypointHelp(this);
-                return;
-            }
-            case ToggleAll:
-            {
-                boolean state = buttonToggleAll.getToggled();
-                state = toggleItems(state);
-                buttonToggleAll.setToggled(state);
-                return;
-            }
-            case Options:
-            {
-                UIManager.getInstance().openMasterOptions(this, Config.Category.Waypoint, Config.Category.WaypointBeacon);
-                return;
-            }
+            refreshAndClose();
+            return;
         }
+        if (guibutton == buttonSortName)
+        {
+            updateSort(buttonSortName);
+            return;
+        }
+        if (guibutton == buttonSortDistance)
+        {
+            updateSort(buttonSortDistance);
+            return;
+        }
+        if (guibutton == buttonDimensions)
+        {
+            buttonDimensions.nextValue();
+            updateItems();
+            return;
+        }
+        if (guibutton == buttonAdd)
+        {
+            Waypoint waypoint = Waypoint.of(mc.thePlayer);
+            UIManager.getInstance().openWaypointEditor(waypoint, true, this);
+            return;
+        }
+        if (guibutton == buttonHelp)
+        {
+            UIManager.getInstance().openWaypointHelp(this);
+            return;
+        }
+        if (guibutton == buttonToggleAll)
+        {
+            boolean state = buttonToggleAll.getToggled();
+            state = toggleItems(state);
+            buttonToggleAll.setToggled(state);
+            return;
+        }
+        if (guibutton == buttonOptions)
+        {
+            UIManager.getInstance().openMasterOptions(this, Config.Category.Waypoint, Config.Category.WaypointBeacon);
+            return;
+        }
+
     }
 
     public void removeWaypoint(WaypointManagerItem item)
@@ -479,20 +477,15 @@ public class WaypointManager extends JmUI
         }
     }
 
-    private enum ButtonEnum
-    {
-        Add, Find, SortName, SortDistance, Dimensions, ToggleAll, Help, Options, Close
-    }
-
     protected static class DimensionsButton extends Button
     {
         static boolean needInit = true;
         static WorldProvider currentWorldProvider;
         final List<WorldProvider> worldProviders = WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions());
 
-        public DimensionsButton(int id)
+        public DimensionsButton()
         {
-            super(id, 0, 0, "");
+            super(0, 0, "");
 
             if (needInit || currentWorldProvider != null)
             {
@@ -573,9 +566,9 @@ public class WaypointManager extends JmUI
         final WaypointManagerItem.Sort sort;
         final String labelInactive;
 
-        public SortButton(Enum enumValue, String label, WaypointManagerItem.Sort sort)
+        public SortButton(String label, WaypointManagerItem.Sort sort)
         {
-            super(enumValue.ordinal(), String.format("%s %s", label, ASCEND), String.format("%s %s", label, DESCEND), sort.ascending);
+            super(String.format("%s %s", label, ASCEND), String.format("%s %s", label, DESCEND), sort.ascending);
             this.labelInactive = label;
             this.sort = sort;
         }

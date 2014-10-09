@@ -35,7 +35,7 @@ public class SliderButton extends Button
 
     public SliderButton(int buttonId, ValueHolder valueHolder)
     {
-        super(buttonId, 0, 0, valueHolder.getDisplayString());
+        super(valueHolder.getDisplayString());
         this.valueHolder = valueHolder;
         this.sliderValue = valueHolder.getValueForSlider();
     }
@@ -52,11 +52,11 @@ public class SliderButton extends Button
             @Override
             public void setValueFromSlider(float sliderValue)
             {
-                if(sliderValue==0)
+                if (sliderValue == 0)
                 {
                     property.set(min);
                 }
-                else if(sliderValue==1)
+                else if (sliderValue == 1)
                 {
                     property.set(max);
                 }
@@ -76,7 +76,7 @@ public class SliderButton extends Button
             public String getDisplayString()
             {
                 Object displayValue = null;
-                if(displayPercentage)
+                if (displayPercentage)
                 {
                     NumberFormat percentFormat = NumberFormat.getPercentInstance();
                     percentFormat.setMaximumFractionDigits(0);

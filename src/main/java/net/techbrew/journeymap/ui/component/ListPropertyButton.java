@@ -23,9 +23,9 @@ public class ListPropertyButton<T> extends Button
     final String glyph = "\u21D5";
     final String labelPattern = "%1$s:  %2$s %3$s %2$s";
 
-    public ListPropertyButton(int id, Collection<T> enumValues, String label, PropertiesBase properties, AtomicReference<T> valueHolder)
+    public ListPropertyButton(Collection<T> enumValues, String label, PropertiesBase properties, AtomicReference<T> valueHolder)
     {
-        super(id, "");
+        super("");
         this.valueHolder = valueHolder;
         this.properties = properties;
         this.values = new ArrayList<T>(enumValues);

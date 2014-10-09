@@ -27,9 +27,9 @@ public class IconSetButton extends Button
     final AtomicReference<String> valueHolder;
     final ArrayList<Object> validNames;
 
-    public IconSetButton(int id, PropertiesBase baseProperties, AtomicReference<String> valueHolder, List validNames, String messageKey)
+    public IconSetButton(PropertiesBase baseProperties, AtomicReference<String> valueHolder, List validNames, String messageKey)
     {
-        super(id, 0, 0, Constants.getString(messageKey, ""));
+        super(0, 0, Constants.getString(messageKey, ""));
         this.baseProperties = baseProperties;
         this.valueHolder = valueHolder;
         this.validNames = new ArrayList<Object>(validNames);

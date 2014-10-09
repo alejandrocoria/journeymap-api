@@ -45,24 +45,14 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected int WIDTH_PAD = 12;
     protected String[] tooltip;
 
-    public Button(Enum enumValue, String label)
+    public Button(String label)
     {
-        this(enumValue.ordinal(), 0, 0, label);
+        this(0, 0, label);
     }
 
-    public Button(int id, String label)
+    public Button(int width, int height, String label)
     {
-        this(id, 0, 0, label);
-    }
-
-    public Button(Enum enumValue, int width, int height, String label)
-    {
-        this(enumValue.ordinal(), width, height, label);
-    }
-
-    public Button(int id, int width, int height, String label)
-    {
-        super(id, 0, 0, width, height, label);
+        super(0, 0, 0, width, height, label);
         finishInit();
     }
 
