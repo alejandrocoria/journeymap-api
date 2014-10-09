@@ -12,6 +12,7 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New Feature: journeyMap/icon/theme/default.theme.config can be used by modpacks to define a default Theme. Does not override user preferences.
 - Bugfix: Changing Theme didn't properly update MiniMap until restart
 - Change: Internal refactoring, code cleanup
 

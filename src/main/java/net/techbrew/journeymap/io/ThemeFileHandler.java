@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.ui.option.StringListProvider;
@@ -25,6 +26,7 @@ public class ThemeFileHandler
 {
     public static final String ASSETS_JOURNEYMAP_ICON_THEME = "/assets/journeymap/icon/theme";
     public static final String THEME_FILE_SUFFIX = ".theme.json";
+    public static final String DEFAULT_THEME_FILE = "default.theme.config";
 
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().setVersion(Theme.VERSION).create();
 
@@ -52,6 +54,9 @@ public class ThemeFileHandler
         {
             save(theme);
         }
+
+        // Create a default.theme.json file only if it doesn't already exist
+        ensureDefaultThemeFile();
     }
 
     public static File getThemeIconDir()
@@ -171,7 +176,7 @@ public class ThemeFileHandler
     {
         try
         {
-            if (themeFile.exists())
+            if (themeFile != null && themeFile.exists())
             {
                 Charset UTF8 = Charset.forName("UTF-8");
                 String json = Files.toString(themeFile, UTF8);
@@ -193,10 +198,10 @@ public class ThemeFileHandler
         return null;
     }
 
-    private static File getThemeFile(String themeDirName, String themeName)
+    private static File getThemeFile(String themeDirName, String themeFileName)
     {
         File themeDir = new File(getThemeIconDir(), themeDirName);
-        String fileName = String.format("%s%s", themeName.replaceAll("[\\\\/:\"*?<>|]", "_"), THEME_FILE_SUFFIX);
+        String fileName = String.format("%s%s", themeFileName.replaceAll("[\\\\/:\"*?<>|]", "_"), THEME_FILE_SUFFIX);
         return new File(themeDir, fileName);
     }
 
@@ -215,6 +220,69 @@ public class ThemeFileHandler
         }
     }
 
+    /**
+     * Create default theme file if it doesn't exist
+     */
+    private static void ensureDefaultThemeFile()
+    {
+        File defaultThemeFile = new File(getThemeIconDir(), DEFAULT_THEME_FILE);
+        if (!defaultThemeFile.exists())
+        {
+            try
+            {
+                Theme.DefaultPointer defaultPointer = new Theme.DefaultPointer(ThemePresets.THEME_VICTORIAN);
+                Charset UTF8 = Charset.forName("UTF-8");
+                Files.write(GSON.toJson(defaultPointer), defaultThemeFile, UTF8);
+            }
+            catch (Throwable t)
+            {
+                JourneyMap.getLogger().error("Could not save DefaultTheme json file: " + t);
+            }
+        }
+    }
+
+    public static Theme getDefaultTheme()
+    {
+        Theme.DefaultPointer pointer = loadDefaultPointer();
+        pointer.filename = pointer.filename.replace(THEME_FILE_SUFFIX, "");
+
+        File themeFile = getThemeFile(pointer.directory, pointer.filename);
+        Theme theme = loadThemeFromFile(themeFile, false);
+        if (theme == null)
+        {
+            JMLogger.logOnce(String.format("Default theme not found in %s: %s", themeFile, pointer.name), null);
+            theme = ThemePresets.THEME_VICTORIAN;
+        }
+        return theme;
+    }
+
+    /**
+     * Get the DefaultPointer needed to load a theme.
+     */
+    private static Theme.DefaultPointer loadDefaultPointer()
+    {
+        ensureDefaultThemeFile();
+        try
+        {
+            File defaultThemeFile = new File(getThemeIconDir(), DEFAULT_THEME_FILE);
+            if (defaultThemeFile.exists())
+            {
+                Charset UTF8 = Charset.forName("UTF-8");
+                String json = Files.toString(defaultThemeFile, UTF8);
+                return GSON.fromJson(json, Theme.DefaultPointer.class);
+            }
+            else
+            {
+                return new Theme.DefaultPointer(ThemePresets.THEME_VICTORIAN);
+            }
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().error("Could not load Theme.DefaultTheme json file: " + LogFormatter.toString(t));
+        }
+        return null;
+    }
+
     public static class ThemeStringListProvider implements StringListProvider
     {
         @Override
@@ -226,7 +294,7 @@ public class ThemeFileHandler
         @Override
         public String getDefaultString()
         {
-            return ThemePresets.THEME_VICTORIAN.name;
+            return getDefaultTheme().name;
         }
     }
 }

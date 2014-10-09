@@ -35,12 +35,13 @@ public abstract class PropertiesBase
     protected static final Charset UTF8 = Charset.forName("UTF-8");
     // Flag the serializers can use to signal the file format needs to be updated
     protected static transient final AtomicBoolean configFormatChanged = new AtomicBoolean(false);
+
     private static final String[] HEADERS = {
-            "// JourneyMap configuration file. Modify at your own risk!",
-            "// To use in all worlds, place here: " + Constants.CONFIG_DIR,
-            "// To override configuration for a single world, place here: " + Constants.DATA_DIR + "**" + File.separator + "(worldname)",
-            "// To restore the default settings, simply delete this file before starting Minecraft",
-            "// For help with this file, see http://journeymap.techbrew.net/help/wiki/Configuration_Files"
+            "// " + Constants.getString("jm.config.file_header_1"),
+            "// " + Constants.getString("jm.config.file_header_2", Constants.CONFIG_DIR),
+            "// " + Constants.getString("jm.config.file_header_3", Constants.DATA_DIR + "**" + File.separator),
+            "// " + Constants.getString("jm.config.file_header_4"),
+            "// " + Constants.getString("jm.config.file_header_5", "http://journeymap.techbrew.net/help/wiki/Configuration_Files")
     };
     // Gson for file persistence
     protected transient final Gson gson = new GsonBuilder()

@@ -28,8 +28,8 @@ public class Client {
     private final ExecutorService service;
 
     private int retries = 5;
-    private int connectTimeout = 2000;
-    private int readTimeout = 1000;
+    private int connectTimeout = 5000;
+    private int readTimeout = 2000;
 
     private AtomicInteger messageCount = new AtomicInteger(0);
 

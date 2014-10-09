@@ -674,4 +674,40 @@ public class Theme implements Comparable<Theme>
         @Since(1)
         public boolean shadow = false;
     }
+
+    /**
+     * The basis of default.theme.json, which
+     * is used to load a specific theme as the default.
+     */
+    public static class DefaultPointer
+    {
+        /**
+         * Parent directory name of theme files.
+         */
+        @Since(1)
+        public String directory;
+
+        /**
+         * Theme filename.
+         */
+        @Since(1)
+        public String filename;
+
+        /**
+         * Theme name.
+         */
+        @Since(1)
+        public String name;
+
+        protected DefaultPointer()
+        {
+        }
+
+        public DefaultPointer(Theme theme)
+        {
+            this.name = theme.name;
+            this.filename = theme.name;
+            this.directory = theme.directory;
+        }
+    }
 }
