@@ -45,15 +45,15 @@ public class GridRenderer
 {
 
     // Update pixel offsets for center
-    final double srcSize;
-    final Cache<Integer, Tile> tc = TileCache.instance();
-    final TilePos centerPos = new TilePos(0, 0);
+    private final Cache<Integer, Tile> tc = TileCache.instance();
+    private final TilePos centerPos = new TilePos(0, 0);
     private final Logger logger = JourneyMap.getLogger();
     private final boolean debug = logger.isTraceEnabled();
     private final TreeMap<TilePos, Integer> grid = new TreeMap<TilePos, Integer>();
-    private final int gridSize; // 5 = 2560px.
     private final Color bgColor = new Color(0x22, 0x22, 0x22);
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
+    private int gridSize; // 5 = 2560px.
+    private double srcSize;
     private Rectangle2D.Double viewPort = null;
     private Rectangle2D.Double screenBounds = null;
     private int lastHeight = -1;
@@ -73,16 +73,14 @@ public class GridRenderer
     private FloatBuffer winPosBuf;
     private FloatBuffer objPosBuf;
 
-    public GridRenderer(final int gridSize)
+    public GridRenderer(int gridSize)
     {
-        this.gridSize = gridSize;  // Must be an odd number so as to have a center tile.
-        srcSize = gridSize * Tile.TILESIZE;
-
         viewportBuf = BufferUtils.createIntBuffer(16);
         modelMatrixBuf = BufferUtils.createFloatBuffer(16);
         projMatrixBuf = BufferUtils.createFloatBuffer(16);
         winPosBuf = BufferUtils.createFloatBuffer(16);
         objPosBuf = BufferUtils.createFloatBuffer(16);
+        setGridSize(gridSize);
     }
 
     public void setViewPort(Rectangle2D.Double viewPort)
@@ -132,6 +130,17 @@ public class GridRenderer
     public boolean hasUnloadedTile()
     {
         return hasUnloadedTile(false);
+    }
+
+    public int getGridSize()
+    {
+        return gridSize;
+    }
+
+    public void setGridSize(int gridSize)
+    {
+        this.gridSize = gridSize;  // Must be an odd number so as to have a center tile.
+        srcSize = gridSize * Tile.TILESIZE;
     }
 
     public boolean hasUnloadedTile(boolean preview)

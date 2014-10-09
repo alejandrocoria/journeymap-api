@@ -47,10 +47,9 @@ public class MiniMap
     private static final float lightmapS = (float) (15728880 % 65536) / 1f;
     private static final float lightmapT = (float) (15728880 / 65536) / 1f;
     private static final long labelRefreshRate = 400;
-
+    private final static GridRenderer gridRenderer = new GridRenderer(3);
     private final Logger logger = JourneyMap.getLogger();
     private final Minecraft mc = FMLClientHandler.instance().getClient();
-
     private final String[] locationFormats = {"jm.common.location_xzye", "jm.common.location_xzy", "jm.common.location_xz"};
     private final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
     private final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
@@ -60,8 +59,6 @@ public class MiniMap
     private StatTimer drawTimer;
     private StatTimer refreshStateTimer;
     private DisplayVars dv;
-    private GridRenderer gridRenderer;
-
     private long lastLabelRefresh = 0;
     private String fpsLabelText;
     private String locationLabelText;
@@ -86,6 +83,19 @@ public class MiniMap
     public static synchronized MapState state()
     {
         return state;
+    }
+
+    private void initGridRenderer()
+    {
+        int gridSize = miniMapProperties.getSize() <= 768 ? 3 : 5;
+        gridRenderer.setGridSize(gridSize);
+        gridRenderer.setContext(state.getWorldDir(), state.getDimension());
+        gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
+        boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || miniMapProperties.showCaves.get());
+        gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+        state.requireRefresh();
+        state.refresh(mc, player, miniMapProperties);
+        initTime = System.currentTimeMillis();
     }
 
     public void setMiniMapProperties(MiniMapProperties miniMapProperties)
@@ -358,6 +368,7 @@ public class MiniMap
 
     private void drawOnMapWaypoints(double rotation)
     {
+        boolean showLabel = miniMapProperties.showWaypointLabels.get();
         for (DrawWayPointStep drawWayPointStep : state.getDrawWaypointSteps())
         {
             Point2D.Double waypointPos = drawWayPointStep.getPosition(0, 0, gridRenderer, true);
@@ -365,6 +376,7 @@ public class MiniMap
             drawWayPointStep.setOnScreen(onScreen);
             if (onScreen)
             {
+                drawWayPointStep.setShowLabel(showLabel);
                 drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, dv.fontScale, rotation);
             }
         }
@@ -582,18 +594,6 @@ public class MiniMap
         double ypad = 0;
         Rectangle2D.Double viewPort = new Rectangle2D.Double(this.dv.textureX + xpad, this.dv.textureY + ypad, this.dv.minimapWidth - (2 * xpad), this.dv.minimapHeight - (2 * ypad));
         gridRenderer.setViewPort(viewPort);
-    }
-
-    private void initGridRenderer()
-    {
-        this.gridRenderer = new GridRenderer(miniMapProperties.getSize() <= 768 ? 3 : 5);
-        gridRenderer.setContext(state.getWorldDir(), state.getDimension());
-        gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
-        boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || miniMapProperties.showCaves.get());
-        gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
-        state.requireRefresh();
-        state.refresh(mc, player, miniMapProperties);
-        initTime = System.currentTimeMillis();
     }
 
     private void updateLabels()

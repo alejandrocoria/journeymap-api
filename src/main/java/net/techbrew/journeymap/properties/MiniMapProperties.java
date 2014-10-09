@@ -49,9 +49,6 @@ public class MiniMapProperties extends InGameMapProperties
     @Config(category = Inherit, key = "jm.minimap.show_location")
     public final AtomicBoolean showLocation = new AtomicBoolean(true);
 
-    @Config(category = Inherit, key = "jm.minimap.show_waypointlabels")
-    public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
-
     @Config(category = Inherit, key = "jm.minimap.size", minValue = 1, maxValue = 100, defaultValue = 20)
     public final AtomicInteger sizePercent = new AtomicInteger(20);
 

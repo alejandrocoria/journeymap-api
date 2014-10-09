@@ -24,13 +24,14 @@ public class DrawWayPointStep implements DrawStep
 {
 
     public final Waypoint waypoint;
-    Point2D.Double lastPosition;
-    Point2D.Double lastWindowPosition;
-    boolean lastOnScreen;
     final Color color;
     final Color fontColor;
     final TextureImpl texture;
     final boolean isEdit;
+    Point2D.Double lastPosition;
+    Point2D.Double lastWindowPosition;
+    boolean lastOnScreen;
+    boolean showLabel;
 
     /**
      * Draw a waypoint on the map.
@@ -58,6 +59,11 @@ public class DrawWayPointStep implements DrawStep
         this.texture = waypoint.getTexture();
     }
 
+    public void setShowLabel(boolean showLabel)
+    {
+        this.showLabel = showLabel;
+    }
+
     @Override
     public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
@@ -69,9 +75,11 @@ public class DrawWayPointStep implements DrawStep
         Point2D.Double pixel = getPosition(xOffset, yOffset, gridRenderer, true);
         if (gridRenderer.isOnScreen(pixel))
         {
-            Point2D labelPoint = gridRenderer.shiftWindowPosition(pixel.getX(), pixel.getY(), 0, rotation==0 ? -texture.height : texture.height);
-
-            DrawUtil.drawLabel(waypoint.getName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 255, fontColor, 255, fontScale, false, rotation);
+            if (showLabel)
+            {
+                Point2D labelPoint = gridRenderer.shiftWindowPosition(pixel.getX(), pixel.getY(), 0, rotation == 0 ? -texture.height : texture.height);
+                DrawUtil.drawLabel(waypoint.getName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 255, fontColor, 255, fontScale, false, rotation);
+            }
             if (isEdit)
             {
                 TextureImpl editTex = TextureCache.instance().getWaypointEdit();

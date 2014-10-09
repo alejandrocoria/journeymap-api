@@ -452,25 +452,32 @@ public class OptionsManager extends JmUI
     @Override
     protected void closeAndReturn()
     {
+        // Just in case a property changed but wasn't saved.
+        JourneyMap.getCoreProperties().save();
+        JourneyMap.getWebMapProperties().save();
+        JourneyMap.getFullMapProperties().save();
+        JourneyMap.getMiniMapProperties1().save();
+        JourneyMap.getMiniMapProperties2().save();
+        JourneyMap.getWaypointProperties().save();
+
         for (Config.Category category : changedCategories)
         {
             switch (category)
             {
                 case MiniMap1:
                 {
-                    UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+                    UIManager.getInstance().getMiniMap().reset();
                     break;
                 }
                 case MiniMap2:
                 {
-                    UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+                    UIManager.getInstance().getMiniMap().reset();
                     break;
                 }
                 case FullMap:
                 {
                     Fullscreen.reset();
                     ThemeFileHandler.getCurrentTheme(true);
-                    UIManager.getInstance().getMiniMap().updateDisplayVars(true);
                     break;
                 }
                 case WebMap:
@@ -499,13 +506,6 @@ public class OptionsManager extends JmUI
             }
         }
 
-        // Just in case a property changed but wasn't saved.
-        JourneyMap.getCoreProperties().save();
-        JourneyMap.getWebMapProperties().save();
-        JourneyMap.getFullMapProperties().save();
-        JourneyMap.getMiniMapProperties1().save();
-        JourneyMap.getMiniMapProperties2().save();
-        JourneyMap.getWaypointProperties().save();
 
         if (returnDisplay == null)
         {

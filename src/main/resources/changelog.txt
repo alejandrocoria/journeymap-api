@@ -20,6 +20,7 @@ http://journeymap.techbrew.net
 - Bugfix: Fixed bug that had caused "Couldn't purge private cache:" warnings
 - Bugfix: Rectangle MiniMap's reticle wasn't extending to edges if Reticle Heading set to "My Heading"
 - Bugfix: Minimap Preset 2 was getting reset to initial config after disconnecting/reconnecting.
+- Bugfix: "Show Waypoint Labels" option was ignored.  No longer!
 - Change: Options Manager now has "Hot Keys..." buttons in the toolbars for MiniMap Preset 1, 2, and Fullscreen Map sections
 - Change: Options Manager layout now adjusts rows to be centered in the screen, toolbars are now right-justified
 - Change: Options Manager minor style / color tweaks.

@@ -31,7 +31,7 @@ public class WaypointDrawStepFactory
 {
     final List<DrawWayPointStep> drawStepList = new ArrayList<DrawWayPointStep>();
 
-    public List<DrawWayPointStep> prepareSteps(Collection<Waypoint> waypoints, GridRenderer grid, boolean checkDistance)
+    public List<DrawWayPointStep> prepareSteps(Collection<Waypoint> waypoints, GridRenderer grid, boolean checkDistance, boolean showLabel)
     {
         Minecraft mc = FMLClientHandler.instance().getClient();
         EntityPlayer player = mc.thePlayer;
@@ -58,9 +58,10 @@ public class WaypointDrawStepFactory
                     }
 
                     DrawWayPointStep wayPointStep = DataCache.instance().getDrawWayPointStep(waypoint);
-                    if(wayPointStep!=null)
+                    if (wayPointStep != null)
                     {
                         drawStepList.add(wayPointStep);
+                        wayPointStep.setShowLabel(showLabel);
                     }
                 }
             }

@@ -31,6 +31,9 @@ public abstract class InGameMapProperties extends MapProperties
     @Config(category = Inherit, key = "jm.minimap.texture_size")
     public final AtomicBoolean textureSmall = new AtomicBoolean(true);
 
+    @Config(category = Inherit, key = "jm.minimap.show_waypointlabels")
+    public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
+
     protected InGameMapProperties()
     {
     }

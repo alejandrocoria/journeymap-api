@@ -19,6 +19,7 @@ import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.properties.CoreProperties;
+import net.techbrew.journeymap.properties.InGameMapProperties;
 import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawWayPointStep;
@@ -175,7 +176,7 @@ public class MapState
         return drawWaypointStepList;
     }
 
-    public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, WaypointDrawStepFactory waypointRenderer, RadarDrawStepFactory radarRenderer, MapProperties mapProperties, float drawScale, boolean checkWaypointDistance)
+    public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, WaypointDrawStepFactory waypointRenderer, RadarDrawStepFactory radarRenderer, InGameMapProperties mapProperties, float drawScale, boolean checkWaypointDistance)
     {
         lastMapProperties = mapProperties;
 
@@ -228,7 +229,8 @@ public class MapState
         // Draw waypoints
         if (mapProperties.showWaypoints.get())
         {
-            drawWaypointStepList.addAll(waypointRenderer.prepareSteps(DataCache.instance().getWaypoints(false), gridRenderer, checkWaypointDistance));
+            boolean showLabel = mapProperties.showWaypointLabels.get();
+            drawWaypointStepList.addAll(waypointRenderer.prepareSteps(DataCache.instance().getWaypoints(false), gridRenderer, checkWaypointDistance, showLabel));
         }
     }
 
