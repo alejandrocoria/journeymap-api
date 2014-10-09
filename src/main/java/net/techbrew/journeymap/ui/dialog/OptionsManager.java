@@ -506,6 +506,8 @@ public class OptionsManager extends JmUI
             }
         }
 
+        // Ensure MiniMap is reset, regardless
+        UIManager.getInstance().getMiniMap().updateDisplayVars(true);
 
         if (returnDisplay == null)
         {

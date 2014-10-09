@@ -12,6 +12,10 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Changing Theme didn't properly update MiniMap until restart
+- Change: Internal refactoring, code cleanup
+
+## Changelog for JourneyMap 5.0.0a7:
 - New Feature: Minimap Size is now expressed as a percentage of your screen height.  This means it will scale if you resize the window.
 - New Feature: New "Top Center" Position added as an option for MiniMap Presets
 - New Feature: "Show Caves" added to MiniMap Preset options, so each Preset can have caves enabled/disabled independently from Fullscreen Map
