@@ -202,6 +202,18 @@ public class DisplayVars
                 translateY = (mc.displayHeight / 2) - halfHeight - marginY;
                 break;
             }
+            case TopCenter:
+            {
+                if (!minimapSpec.labelTopInside && showFps)
+                {
+                    marginY = Math.max(marginY, Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin) + fpsLabelHeight);
+                }
+                textureX = (mc.displayWidth - minimapWidth) / 2;
+                textureY = marginY;
+                translateX = 0;
+                translateY = -(mc.displayHeight / 2) + halfHeight + marginY;
+                break;
+            }
             case Center:
             {
                 textureX = (mc.displayWidth - minimapWidth) / 2;

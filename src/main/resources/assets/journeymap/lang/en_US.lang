@@ -217,6 +217,7 @@ jm.minimap.position.tooltip=Change the position of the MiniMap on your screen
 jm.minimap.position_bottomleft=Bottom Left
 jm.minimap.position_bottomright=Bottom Right
 jm.minimap.position_center=Center
+jm.minimap.position_topcenter=Top Center
 jm.minimap.position_topleft=Top Left
 jm.minimap.position_topright=Top Right
 jm.minimap.preview=Preview

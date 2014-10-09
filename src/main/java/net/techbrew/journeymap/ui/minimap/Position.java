@@ -1,7 +1,6 @@
 package net.techbrew.journeymap.ui.minimap;
 
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.ui.option.KeyedEnum;
 
 /**
@@ -13,6 +12,7 @@ public enum Position implements KeyedEnum
     BottomRight("jm.minimap.position_bottomright"),
     BottomLeft("jm.minimap.position_bottomleft"),
     TopLeft("jm.minimap.position_topleft"),
+    TopCenter("jm.minimap.position_topcenter"),
     Center("jm.minimap.position_center");
 
     public final String key;
@@ -20,25 +20,6 @@ public enum Position implements KeyedEnum
     Position(String key)
     {
         this.key = key;
-    }
-
-    public static Position safeValueOf(String name)
-    {
-        Position value = null;
-        try
-        {
-            value = Position.valueOf(name);
-        }
-        catch (IllegalArgumentException e)
-        {
-            JourneyMap.getLogger().warn("Not a valid minimap position: " + name);
-        }
-
-        if (value == null)
-        {
-            value = Position.TopRight;
-        }
-        return value;
     }
 
     @Override

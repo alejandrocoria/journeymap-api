@@ -111,10 +111,10 @@ public class ThemePresets
             Theme.Minimap.MinimapSquare minimapSquare = theme.minimap.square;
             minimapSquare.prefix = "vic_";
             minimapSquare.margin = 4;
-            minimapSquare.labelBottomInside = true;
+            minimapSquare.labelBottomInside = false;
             minimapSquare.labelTopInside = true;
             minimapSquare.labelTopMargin = 4;
-            minimapSquare.labelBottomMargin = 4;
+            minimapSquare.labelBottomMargin = 8;
             minimapSquare.top = minimapSquare.bottom = new Theme.ImageSpec(1, 20);
             minimapSquare.left = minimapSquare.right = new Theme.ImageSpec(20, 1);
             minimapSquare.topLeft = minimapSquare.topRight = minimapSquare.bottomRight = minimapSquare.bottomLeft = new Theme.ImageSpec(20, 20);
