@@ -13,7 +13,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.MathHelper;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
@@ -614,22 +613,11 @@ public class MiniMap
         }
 
         // Location key
-        String playerInfo = "";
         final int playerX = MathHelper.floor_double(player.posX);
-        final int playerY = MathHelper.floor_double(player.boundingBox.minY);
         final int playerZ = MathHelper.floor_double(player.posZ);
+        final int playerY = MathHelper.floor_double(player.boundingBox.minY);
 
-        for (String format : locationFormats)
-        {
-            playerInfo = Constants.getString(format, playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
-            double infoWidth = mc.fontRenderer.getStringWidth(playerInfo) * dv.fontScale;
-            if (infoWidth <= dv.minimapWidth)
-            {
-                break;
-            }
-        }
-
-        locationLabelText = playerInfo;
+        locationLabelText = dv.locationFormatKeys.format(dv.locationFormatVerbose, playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
 
         // Biome key
         biomeLabelText = state.getPlayerBiome();

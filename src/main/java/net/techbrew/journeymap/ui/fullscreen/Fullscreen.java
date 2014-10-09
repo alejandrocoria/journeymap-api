@@ -40,6 +40,7 @@ import net.techbrew.journeymap.ui.component.ButtonList;
 import net.techbrew.journeymap.ui.component.JmUI;
 import net.techbrew.journeymap.ui.component.OnOffButton;
 import net.techbrew.journeymap.ui.fullscreen.layer.LayerDelegate;
+import net.techbrew.journeymap.ui.option.LocationFormat;
 import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemeButton;
 import net.techbrew.journeymap.ui.theme.ThemeToggle;
@@ -85,6 +86,7 @@ public class Fullscreen extends JmUI
     StatTimer drawScreenTimer = StatTimer.get("MapOverlay.drawScreen");
     StatTimer drawMapTimer = StatTimer.get("MapOverlay.drawScreen.drawMap");
     StatTimer drawMapTimerWithRefresh = StatTimer.get("MapOverlay.drawMap+refreshState");
+    LocationFormat locationFormat = new LocationFormat();
 
     int lastWidth;
 
@@ -937,12 +939,12 @@ public class Fullscreen extends JmUI
         state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, 1f, false);
 
         // Update player pos
-        state.playerLastPos = Constants.getString("jm.common.location_xzyeb",
+        LocationFormat.LocationFormatKeys locationFormatKeys = locationFormat.getFormatKeys(fullMapProperties.locationFormat.get());
+        state.playerLastPos = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
                 MathHelper.floor_double(mc.thePlayer.posX),
                 MathHelper.floor_double(mc.thePlayer.posZ),
                 MathHelper.floor_double(mc.thePlayer.boundingBox.minY),
-                mc.thePlayer.chunkCoordY,
-                state.getPlayerBiome());
+                mc.thePlayer.chunkCoordY) + " " + state.getPlayerBiome();
 
         // Reset timer
         state.updateLastRefresh();

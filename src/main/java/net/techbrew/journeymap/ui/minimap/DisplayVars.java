@@ -14,6 +14,7 @@ import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureImpl;
+import net.techbrew.journeymap.ui.option.LocationFormat;
 import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemeCompassPoints;
 import net.techbrew.journeymap.ui.theme.ThemeMinimapFrame;
@@ -55,6 +56,8 @@ public class DisplayVars
     final ThemeMinimapFrame minimapFrame;
     final ThemeCompassPoints minimapCompassPoints;
     final Theme.Minimap.MinimapSpec minimapSpec;
+    final LocationFormat.LocationFormatKeys locationFormatKeys;
+    final boolean locationFormatVerbose;
     int marginX, marginY;
     boolean forceUnicode;
 
@@ -82,6 +85,8 @@ public class DisplayVars
         this.displayWidth = mc.displayWidth;
         this.displayHeight = mc.displayHeight;
         this.terrainAlpha = Math.max(0f, Math.min(1f, miniMapProperties.terrainAlpha.get() / 100f));
+        this.locationFormatKeys = new LocationFormat().getFormatKeys(miniMapProperties.locationFormat.get());
+        this.locationFormatVerbose = miniMapProperties.locationFormatVerbose.get();
         Theme theme = ThemeFileHandler.getCurrentTheme();
 
         // Assign shape

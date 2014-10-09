@@ -17,6 +17,7 @@ import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.map.GridRenderer;
+import net.techbrew.journeymap.ui.option.LocationFormat;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -29,7 +30,8 @@ import java.util.List;
 public class BlockInfoLayer implements LayerDelegate.Layer
 {
     private final List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
-
+    LocationFormat locationFormat = new LocationFormat();
+    LocationFormat.LocationFormatKeys locationFormatKeys;
     BlockCoordIntPair lastCoord = null;
     long lastClicked = 0;
     int lastMouseX;
@@ -49,6 +51,8 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         {
             FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
 
+            locationFormatKeys = locationFormat.getFormatKeys(fullMapProperties.locationFormat.get());
+
             lastCoord = blockCoord;
 
             // Get block under mouse
@@ -59,11 +63,16 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             {
                 blockY = Math.max(chunk.getHeightValue(blockCoord.x & 15, blockCoord.z & 15), chunk.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15));
                 String biome = mc.theWorld.getBiomeGenForCoords(blockCoord.x, blockCoord.z).biomeName;
-                info = Constants.getString("jm.common.location_xzyeb", blockCoord.x, blockCoord.z, blockY, (blockY >> 4), biome);
+
+                info = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
+                        blockCoord.x,
+                        blockCoord.z,
+                        blockY,
+                        (blockY >> 4)) + " " + biome;
             }
             else
             {
-                info = Constants.getString("jm.common.location_xzy", blockCoord.x, blockCoord.z, "?");
+                info = Constants.getString("jm.common.location_xz_verbose", blockCoord.x, blockCoord.z);
             }
 
             boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, fullMapProperties.forceUnicode.get());

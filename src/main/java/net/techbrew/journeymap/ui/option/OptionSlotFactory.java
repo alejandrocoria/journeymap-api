@@ -289,10 +289,22 @@ public class OptionSlotFactory
             String name = getName(annotation);
             String tooltip = getTooltip(annotation);
             StringListProvider slp = annotation.stringListProvider().newInstance();
-            String defaultTip = Constants.getString("jm.config.default", slp.getDefaultString());
             boolean advanced = annotation.category() == Config.Category.Advanced;
 
-            ListPropertyButton<String> button = new ListPropertyButton<String>(slp.getStrings(), name, properties, property);
+            ListPropertyButton<String> button = null;
+            String defaultTip = null;
+
+            // Exception: LocationProperty gets its own button
+            if (slp instanceof LocationFormat.IdProvider)
+            {
+                button = new LocationFormat.Button(properties, property);
+                defaultTip = Constants.getString("jm.config.default", ((LocationFormat.Button) button).getLabel(slp.getDefaultString()));
+            }
+            else
+            {
+                button = new ListPropertyButton<String>(slp.getStrings(), name, properties, property);
+                defaultTip = Constants.getString("jm.config.default", slp.getDefaultString());
+            }
             button.setDefaultStyle(false);
             button.setDrawBackground(false);
             SlotMetadata<String> slotMetadata = new SlotMetadata<String>(button, name, tooltip, defaultTip, slp.getDefaultString(), advanced);

@@ -9,8 +9,10 @@
 package net.techbrew.journeymap.properties;
 
 import net.techbrew.journeymap.properties.config.Config;
+import net.techbrew.journeymap.ui.option.LocationFormat;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static net.techbrew.journeymap.properties.config.Config.Category.Inherit;
 
@@ -33,6 +35,12 @@ public abstract class InGameMapProperties extends MapProperties
 
     @Config(category = Inherit, key = "jm.minimap.show_waypointlabels")
     public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
+
+    @Config(category = Inherit, key = "jm.common.location_format_verbose")
+    public final AtomicBoolean locationFormatVerbose = new AtomicBoolean(true);
+
+    @Config(category = Inherit, key = "jm.common.location_format", stringListProvider = LocationFormat.IdProvider.class)
+    public final AtomicReference<String> locationFormat = new AtomicReference<String>(new LocationFormat.IdProvider().getDefaultString());
 
     protected InGameMapProperties()
     {

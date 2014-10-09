@@ -16,19 +16,19 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ListPropertyButton<T> extends Button
 {
-    final PropertiesBase properties;
-    final AtomicReference<T> valueHolder;
-    final List<T> values;
-    final String baseLabel;
-    final String glyph = "\u21D5";
-    final String labelPattern = "%1$s:  %2$s %3$s %2$s";
+    protected final PropertiesBase properties;
+    protected final AtomicReference<T> valueHolder;
+    protected final List<T> values;
+    protected final String baseLabel;
+    protected final String glyph = "\u21D5";
+    protected final String labelPattern = "%1$s:  %2$s %3$s %2$s";
 
-    public ListPropertyButton(Collection<T> enumValues, String label, PropertiesBase properties, AtomicReference<T> valueHolder)
+    public ListPropertyButton(Collection<T> values, String label, PropertiesBase properties, AtomicReference<T> valueHolder)
     {
         super("");
         this.valueHolder = valueHolder;
         this.properties = properties;
-        this.values = new ArrayList<T>(enumValues);
+        this.values = new ArrayList<T>(values);
         this.baseLabel = label;
         setValue(valueHolder.get());
         disabledLabelColor = Color.darkGray;
@@ -80,7 +80,7 @@ public class ListPropertyButton<T> extends Button
         return false;
     }
 
-    private String getFormattedLabel(String value)
+    protected String getFormattedLabel(String value)
     {
         return String.format(labelPattern, baseLabel, glyph, value);
     }
