@@ -256,6 +256,26 @@ public class ThemeFileHandler
         return theme;
     }
 
+    public synchronized static void loadNextTheme()
+    {
+        List<String> themeNames = getThemeNames();
+        int index = themeNames.indexOf(getCurrentTheme().name);
+        if (index < 0 || index >= themeNames.size() - 1)
+        {
+            index = 0;
+        }
+        else
+        {
+            index++;
+        }
+
+        TextureCache.instance().purgeThemeImages();
+        currentTheme = getThemes().get(index);
+        JourneyMap.getCoreProperties().themeName.set(currentTheme.name);
+        getCurrentTheme(true);
+        System.out.println(index + ": " + currentTheme.name); // TODO
+    }
+
     /**
      * Get the DefaultPointer needed to load a theme.
      */

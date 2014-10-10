@@ -14,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -52,6 +53,7 @@ import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -75,7 +77,7 @@ public class Fullscreen extends JmUI
     MapChat chat;
     ThemeButton buttonFollow, buttonZoomIn, buttonZoomOut, buttonDay, buttonNight, buttonCaves;
     ThemeButton buttonAlert, buttonOptions, buttonActions, buttonClose;
-    ThemeButton buttonMode, buttonWaypointManager;
+    ThemeButton buttonTheme, buttonWaypointManager;
     ThemeButton buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid;
     ThemeToolbar mapTypeToolbar, optionsToolbar, menuToolbar, zoomToolbar;//, northEastToolbar;
     Color bgColor = new Color(0x22, 0x22, 0x22);
@@ -368,6 +370,26 @@ public class Fullscreen extends JmUI
                 }
             });
 
+            // Waypoints
+            buttonTheme = new ThemeButton(theme, "jm.common.ui_theme", "theme");
+            buttonTheme.addToggleListener(new OnOffButton.ToggleListener()
+            {
+                @Override
+                public boolean onToggle(OnOffButton button, boolean toggled)
+                {
+                    ThemeFileHandler.loadNextTheme();
+                    UIManager.getInstance().getMiniMap().reset();
+                    buttonList.clear();
+                    return false;
+                }
+            });
+
+            String[] tooltips = new String[]{
+                    EnumChatFormatting.ITALIC + Constants.getString("jm.common.ui_theme_name", theme.name),
+                    EnumChatFormatting.ITALIC + Constants.getString("jm.common.ui_theme_author", theme.author)
+            };
+            buttonTheme.setAdditionalTooltips(Arrays.asList(tooltips));
+
             // Options
             buttonOptions = new ThemeButton(theme, "jm.common.options", "options");
             buttonOptions.addToggleListener(new OnOffButton.ToggleListener()
@@ -451,7 +473,7 @@ public class Fullscreen extends JmUI
             optionsToolbar = new ThemeToolbar(theme, buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid);
             optionsToolbar.addAllButtons(this);
 
-            menuToolbar = new ThemeToolbar(theme, buttonWaypointManager, buttonOptions, buttonActions);
+            menuToolbar = new ThemeToolbar(theme, buttonWaypointManager, buttonTheme, buttonOptions, buttonActions);
             menuToolbar.addAllButtons(this);
 
             zoomToolbar = new ThemeToolbar(theme, buttonFollow, buttonZoomIn, buttonZoomOut);

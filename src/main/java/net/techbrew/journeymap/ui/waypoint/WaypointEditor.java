@@ -18,6 +18,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
+import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -27,6 +28,7 @@ import net.techbrew.journeymap.ui.component.*;
 import net.techbrew.journeymap.ui.component.ScrollPane;
 import net.techbrew.journeymap.ui.component.TextField;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
+import net.techbrew.journeymap.ui.option.LocationFormat;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.lwjgl.input.Keyboard;
 
@@ -56,6 +58,7 @@ public class WaypointEditor extends JmUI
     String labelG = Constants.getString("jm.waypoint.green_abbreviated");
     String labelB = Constants.getString("jm.waypoint.blue_abbreviated");
     String currentLocation = "";
+    LocationFormat.LocationFormatKeys locationFormatKeys;
     private Button buttonRandomize;
     private OnOffButton buttonEnable;
     private Button buttonRemove;
@@ -99,13 +102,16 @@ public class WaypointEditor extends JmUI
     {
         try
         {
-            int dimension = mc.thePlayer.worldObj.provider.dimensionId;
+            FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
+            LocationFormat locationFormat = new LocationFormat();
+            locationFormatKeys = locationFormat.getFormatKeys(fullMapProperties.locationFormat.get());
 
             // Update player pos
-            String pos = Constants.getString("jm.common.location_xzy",
+            String pos = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
                     MathHelper.floor_double(mc.thePlayer.posX),
                     MathHelper.floor_double(mc.thePlayer.posZ),
-                    MathHelper.floor_double(mc.thePlayer.posY));
+                    MathHelper.floor_double(mc.thePlayer.boundingBox.minY),
+                    MathHelper.floor_double(mc.thePlayer.chunkCoordY));
             currentLocation = Constants.getString("jm.waypoint.current_location", " " + pos);
 
             if (this.fieldList.isEmpty())

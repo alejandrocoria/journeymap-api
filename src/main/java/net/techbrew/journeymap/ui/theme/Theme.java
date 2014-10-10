@@ -118,6 +118,40 @@ public class Theme implements Comparable<Theme>
         return name.compareTo(other.name);
     }
 
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        Theme theme = (Theme) o;
+
+        if (directory != null ? !directory.equals(theme.directory) : theme.directory != null)
+        {
+            return false;
+        }
+        if (name != null ? !name.equals(theme.name) : theme.name != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (directory != null ? directory.hashCode() : 0);
+        return result;
+    }
+
     /**
      * Container class for images in /container.
      */

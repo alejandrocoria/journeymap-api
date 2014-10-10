@@ -49,7 +49,6 @@ public class MiniMap
     private final static GridRenderer gridRenderer = new GridRenderer(3);
     private final Logger logger = JourneyMap.getLogger();
     private final Minecraft mc = FMLClientHandler.instance().getClient();
-    private final String[] locationFormats = {"jm.common.location_xzye", "jm.common.location_xzy", "jm.common.location_xz"};
     private final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
     private final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
     private final TextureImpl playerLocatorTex;
