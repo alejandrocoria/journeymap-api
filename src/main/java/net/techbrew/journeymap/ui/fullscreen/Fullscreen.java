@@ -521,7 +521,7 @@ public class Fullscreen extends JmUI
         {
             if (menuToolbar.getRightX() + margin >= buttonClose.getX())
             {
-                optionsToolbar.setDrawToolbar(false);
+                //optionsToolbar.setDrawToolbar(false);
                 hideOptionsToolbar = true;
                 layoutToolbars(margin, topY, padding, hideOptionsToolbar);
             }
@@ -533,14 +533,18 @@ public class Fullscreen extends JmUI
     {
         if (hideOptionsToolbar)
         {
-            int centerX = width / 2;
-            mapTypeToolbar.layoutHorizontal(centerX - margin, topY, false, padding);
-            menuToolbar.layoutHorizontal(centerX + margin, topY, true, padding);
+
+            int toolbarsWidth = mapTypeToolbar.getWidth() + optionsToolbar.getWidth() + margin + padding;
+            int startX = (width - toolbarsWidth) / 2;
+
+            mapTypeToolbar.layoutHorizontal(startX + mapTypeToolbar.getWidth(), topY, false, padding);
+            optionsToolbar.layoutHorizontal(mapTypeToolbar.getRightX() + margin, topY, true, padding);
+
+            menuToolbar.layoutCenteredVertical(width - menuToolbar.getWidth(), height / 2, true, padding);
         }
         else
         {
             optionsToolbar.layoutCenteredHorizontal((width / 2), topY, true, padding);
-
             mapTypeToolbar.layoutHorizontal(optionsToolbar.getX() - margin, topY, false, padding);
             menuToolbar.layoutHorizontal(optionsToolbar.getRightX() + margin, topY, true, padding);
         }

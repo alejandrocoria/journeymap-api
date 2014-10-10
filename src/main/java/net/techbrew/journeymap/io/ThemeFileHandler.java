@@ -273,7 +273,6 @@ public class ThemeFileHandler
         currentTheme = getThemes().get(index);
         JourneyMap.getCoreProperties().themeName.set(currentTheme.name);
         getCurrentTheme(true);
-        System.out.println(index + ": " + currentTheme.name); // TODO
     }
 
     /**

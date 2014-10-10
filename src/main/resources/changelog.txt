@@ -14,6 +14,7 @@ http://journeymap.techbrew.net
 ## Changelog for JourneyMap @JMVERSION@:
 - New Feature: Options Manager sections now have Reset buttons
 - New Feature: Added a Theme selector button on Fullscreen Map (icon is a paint palette)
+- Change: When the screen size is too small in Fullscreen Map, instead of hiding the third toolbar, it is now moved to the right edge of the screen
 - Bugfix: Waypoint Editor wasn't showing current location
 - Bugfix: NullPointerException in BlockMD.getBlockName() because ic2.core.block.machine.BlockMachine is too shy to tell its name.
 - Bugfix: If minimap config files were missing, Preset 2 would be shown when first entering game.  Now it's Preset 1.
