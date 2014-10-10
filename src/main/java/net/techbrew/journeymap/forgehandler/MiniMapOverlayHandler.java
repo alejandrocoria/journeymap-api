@@ -15,8 +15,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.JMLogger;
-import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.map.TileCache;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
@@ -34,10 +34,10 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
 
     private final Minecraft mc = FMLClientHandler.instance().getClient();
 
-    public static void checkEventConfig(MiniMapProperties miniMapProperties)
+    public static void checkEventConfig()
     {
-        EVENT_TYPE = miniMapProperties.getRenderOverlayEventType();
-        EVENT_PRE = miniMapProperties.renderOverlayPreEvent.get();
+        EVENT_TYPE = JourneyMap.getCoreProperties().getRenderOverlayEventType();
+        EVENT_PRE = JourneyMap.getCoreProperties().renderOverlayPreEvent.get();
     }
 
     @Override

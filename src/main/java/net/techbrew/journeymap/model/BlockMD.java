@@ -8,6 +8,7 @@
 
 package net.techbrew.journeymap.model;
 
+import com.google.common.base.Strings;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
@@ -116,7 +117,11 @@ public class BlockMD
             if (item != null)
             {
                 ItemStack stack = new ItemStack(item, 1, block.damageDropped(meta));
-                name = stack.getDisplayName();
+                String displayName = stack.getDisplayName();
+                if (!Strings.isNullOrEmpty(displayName))
+                {
+                    name = displayName;
+                }
             }
         }
         catch (Throwable t)
@@ -124,7 +129,7 @@ public class BlockMD
             JourneyMap.getLogger().debug("Displayname not available for " + name);
         }
 
-        if (name.startsWith("tile"))
+        if (Strings.isNullOrEmpty(name) || name.startsWith("tile"))
         {
             name = block.getClass().getSimpleName().replaceAll("Block", "");
         }

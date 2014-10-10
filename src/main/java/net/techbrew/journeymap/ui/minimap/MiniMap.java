@@ -536,7 +536,7 @@ public class MiniMap
     {
         initGridRenderer();
         updateDisplayVars(miniMapProperties.shape.get(), miniMapProperties.position.get(), true);
-        MiniMapOverlayHandler.checkEventConfig(miniMapProperties);
+        MiniMapOverlayHandler.checkEventConfig();
     }
 
 

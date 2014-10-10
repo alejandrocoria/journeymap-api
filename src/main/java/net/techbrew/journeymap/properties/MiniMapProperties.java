@@ -10,7 +10,6 @@ package net.techbrew.journeymap.properties;
 
 import com.google.common.base.Objects;
 import cpw.mods.fml.client.FMLClientHandler;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.ui.minimap.Orientation;
@@ -29,7 +28,7 @@ import static net.techbrew.journeymap.properties.config.Config.Category.Inherit;
  */
 public class MiniMapProperties extends InGameMapProperties
 {
-    protected transient static final int CODE_REVISION = 8;
+    protected transient static final int CODE_REVISION = 9;
 
     @Config(category = Inherit, master = true, key = "jm.minimap.enable_minimap")
     public final AtomicBoolean enabled = new AtomicBoolean(true);
@@ -72,9 +71,6 @@ public class MiniMapProperties extends InGameMapProperties
 
     @Config(category = Inherit, key = "jm.minimap.reticle_orientation", defaultEnum = "Compass")
     public final AtomicReference<ReticleOrientation> reticleOrientation = new AtomicReference<ReticleOrientation>(ReticleOrientation.Compass);
-
-    public final AtomicReference<String> renderOverlayEventTypeName = new AtomicReference<String>(RenderGameOverlayEvent.ElementType.ALL.name());
-    public final AtomicBoolean renderOverlayPreEvent = new AtomicBoolean(true);
 
     public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
     protected transient final String name;
@@ -130,11 +126,6 @@ public class MiniMapProperties extends InGameMapProperties
         return 1;
     }
 
-    public RenderGameOverlayEvent.ElementType getRenderOverlayEventType()
-    {
-        return Enum.valueOf(RenderGameOverlayEvent.ElementType.class, renderOverlayEventTypeName.get());
-    }
-
     /**
      * Gets the size relative to current screen height.
      *
@@ -143,6 +134,12 @@ public class MiniMapProperties extends InGameMapProperties
     public int getSize()
     {
         return (int) Math.max(128, Math.floor((sizePercent.get() / 100.0) * FMLClientHandler.instance().getClient().displayHeight));
+    }
+
+    @Override
+    public void newFileInit()
+    {
+        this.setActive(true);
     }
 
     @Override

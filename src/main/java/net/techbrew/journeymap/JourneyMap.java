@@ -24,6 +24,7 @@ import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.forgehandler.EventHandlerManager;
+import net.techbrew.journeymap.forgehandler.MiniMapOverlayHandler;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.PropertyManager;
@@ -457,6 +458,7 @@ public class JourneyMap
         RegionImageCache.getInstance().clear();
         UIManager.getInstance().reset();
         WaypointStore.instance().reset();
+        MiniMapOverlayHandler.checkEventConfig();
 
         if (waypointProperties.managerEnabled.get())
         {

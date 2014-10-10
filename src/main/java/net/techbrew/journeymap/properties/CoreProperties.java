@@ -8,6 +8,8 @@
 
 package net.techbrew.journeymap.properties;
 
+import com.google.common.base.Objects;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.properties.config.Config;
@@ -115,6 +117,9 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Advanced, key = "jm.common.radar_vertical_distance", minValue = 8, maxValue = 256, defaultValue = 16)
     public final AtomicInteger radarVerticalDistance = new AtomicInteger(16);
 
+    public final AtomicReference<String> renderOverlayEventTypeName = new AtomicReference<String>(RenderGameOverlayEvent.ElementType.ALL.name());
+    public final AtomicBoolean renderOverlayPreEvent = new AtomicBoolean(true);
+
     protected transient final String name = "core";
 
     public CoreProperties()
@@ -137,6 +142,11 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public int compareTo(CoreProperties other)
     {
         return Integer.valueOf(this.hashCode()).compareTo(other.hashCode());
+    }
+
+    public RenderGameOverlayEvent.ElementType getRenderOverlayEventType()
+    {
+        return Enum.valueOf(RenderGameOverlayEvent.ElementType.class, renderOverlayEventTypeName.get());
     }
 
     @Override
@@ -186,42 +196,52 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
         result = 31 * result + maxPlayersData.hashCode();
         result = 31 * result + maxVillagersData.hashCode();
         result = 31 * result + hideSneakingEntities.hashCode();
+        result = 31 * result + radarLateralDistance.hashCode();
+        result = 31 * result + radarVerticalDistance.hashCode();
+        result = 31 * result + renderOverlayEventTypeName.hashCode();
+        result = 31 * result + renderOverlayPreEvent.hashCode();
         result = 31 * result + name.hashCode();
         return result;
     }
 
+
     @Override
     public String toString()
     {
-        return "CoreProperties{" +
-                "logLevel=" + logLevel +
-                ", chunkOffset=" + chunkOffset +
-                ", chunkPoll=" + chunkPoll +
-                ", autoMapPoll=" + autoMapPoll +
-                ", cacheAnimalsData=" + cacheAnimalsData +
-                ", cacheMobsData=" + cacheMobsData +
-                ", cachePlayerData=" + cachePlayerData +
-                ", cachePlayersData=" + cachePlayersData +
-                ", cacheVillagersData=" + cacheVillagersData +
-                ", announceMod=" + announceMod +
-                ", checkUpdates=" + checkUpdates +
-                ", recordCacheStats=" + recordCacheStats +
-                ", browserPoll=" + browserPoll +
-                ", themeName=" + themeName +
-                ", caveIgnoreGlass=" + caveIgnoreGlass +
-                ", mapBathymetry=" + mapBathymetry +
-                ", mapTransparency=" + mapTransparency +
-                ", mapCaveLighting=" + mapCaveLighting +
-                ", mapAntialiasing=" + mapAntialiasing +
-                ", mapPlantShadows=" + mapPlantShadows +
-                ", mapPlants=" + mapPlants +
-                ", mapCrops=" + mapCrops +
-                ", mapSurfaceAboveCaves=" + mapSurfaceAboveCaves +
-                ", maxAnimalsData=" + maxAnimalsData +
-                ", maxMobsData=" + maxMobsData +
-                ", maxPlayersData=" + maxPlayersData +
-                ", maxVillagersData=" + maxVillagersData +
-                ", hideSneakingEntities=" + hideSneakingEntities +
-                '}';
+        return Objects.toStringHelper(this)
+                .add("logLevel", logLevel)
+                .add("chunkOffset", chunkOffset)
+                .add("chunkPoll", chunkPoll)
+                .add("autoMapPoll", autoMapPoll)
+                .add("cacheAnimalsData", cacheAnimalsData)
+                .add("cacheMobsData", cacheMobsData)
+                .add("cachePlayerData", cachePlayerData)
+                .add("cachePlayersData", cachePlayersData)
+                .add("cacheVillagersData", cacheVillagersData)
+                .add("announceMod", announceMod)
+                .add("checkUpdates", checkUpdates)
+                .add("recordCacheStats", recordCacheStats)
+                .add("browserPoll", browserPoll)
+                .add("themeName", themeName)
+                .add("caveIgnoreGlass", caveIgnoreGlass)
+                .add("mapBathymetry", mapBathymetry)
+                .add("mapTransparency", mapTransparency)
+                .add("mapCaveLighting", mapCaveLighting)
+                .add("mapAntialiasing", mapAntialiasing)
+                .add("mapPlantShadows", mapPlantShadows)
+                .add("mapPlants", mapPlants)
+                .add("mapCrops", mapCrops)
+                .add("mapSurfaceAboveCaves", mapSurfaceAboveCaves)
+                .add("maxAnimalsData", maxAnimalsData)
+                .add("maxMobsData", maxMobsData)
+                .add("maxPlayersData", maxPlayersData)
+                .add("maxVillagersData", maxVillagersData)
+                .add("hideSneakingEntities", hideSneakingEntities)
+                .add("radarLateralDistance", radarLateralDistance)
+                .add("radarVerticalDistance", radarVerticalDistance)
+                .add("renderOverlayEventTypeName", renderOverlayEventTypeName)
+                .add("renderOverlayPreEvent", renderOverlayPreEvent)
+                .add("name", name)
+                .toString();
     }
 }

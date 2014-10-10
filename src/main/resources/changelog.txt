@@ -13,6 +13,9 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 - New Feature: Options Manager sections now have Reset buttons
+- Bugfix: NullPointerException in BlockMD.getBlockName() because ic2.core.block.machine.BlockMachine is too shy to tell its name.
+- Bugfix: If minimap config files were missing, Preset 2 would be shown when first entering game.  Now it's Preset 1.
+- Change: Render event config setting moved to Core config.
 
 ## Changelog for JourneyMap 5.0.0a8:
 - New Feature: Location labels on Fullscreen Map and MiniMap Presets can now be configured via two new options: "Verbose Location" and "Location Format"

@@ -28,13 +28,14 @@ public class MiniMapProperties2 extends MiniMapProperties
     public void newFileInit()
     {
         // Initial settings to give people an idea of what can be done
-        this.position.set(Position.Center);
+        this.position.set(Position.TopCenter);
         this.shape.set(Shape.Rectangle);
-        this.frameAlpha.set(30);
-        this.terrainAlpha.set(40);
+        this.frameAlpha.set(60);
+        this.terrainAlpha.set(60);
         this.orientation.set(Orientation.PlayerHeading);
         this.reticleOrientation.set(ReticleOrientation.Compass);
-        this.sizePercent.set(50);
+        this.sizePercent.set(30);
+        this.setActive(false);
     }
 
     @Override
