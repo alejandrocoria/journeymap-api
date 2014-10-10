@@ -5,6 +5,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.EnumChatFormatting;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.ui.component.Button;
+import net.techbrew.journeymap.ui.component.IPropertyHolder;
 import net.techbrew.journeymap.ui.component.IntSliderButton;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
     protected final ValueType valueType;
     protected String[] tooltipLines;
     protected boolean master;
+    protected int order;
 
     public SlotMetadata(Button button, String name, String tooltip, boolean advanced)
     {
@@ -33,6 +35,12 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
     public SlotMetadata(Button button, String name, String tooltip)
     {
         this(button, name, tooltip, null, null, false);
+    }
+
+    public SlotMetadata(Button button, String name, String tooltip, int order)
+    {
+        this(button, name, tooltip, null, null, false);
+        this.order = order;
     }
 
     public SlotMetadata(Button button, String name, String tooltip, String range, T defaultValue, boolean advanced)
@@ -117,6 +125,16 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         return valueType == ValueType.Toolbar;
     }
 
+    public int getOrder()
+    {
+        return order;
+    }
+
+    public void setOrder(int order)
+    {
+        this.order = order;
+    }
+
     public String[] getTooltip()
     {
         if (tooltipLines == null)
@@ -163,10 +181,23 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         return list;
     }
 
+    public void resetToDefaultValue()
+    {
+        if (button instanceof IPropertyHolder)
+        {
+            ((IPropertyHolder) button).setPropertyValue(defaultValue);
+        }
+    }
+
     @Override
     public int compareTo(SlotMetadata other)
     {
-        int result = 0;//Boolean.compare(this.isToolbar(), other.isToolbar());
+        int result = Boolean.compare(this.isToolbar(), other.isToolbar());
+
+        if (result == 0)
+        {
+            result = Integer.compare(this.order, other.order);
+        }
 
         if (result == 0)
         {

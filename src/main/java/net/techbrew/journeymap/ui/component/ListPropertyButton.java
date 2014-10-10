@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Base class for a property that has a list of values.
  */
-public class ListPropertyButton<T> extends Button
+public class ListPropertyButton<T> extends Button implements IPropertyHolder<T>
 {
     protected final PropertiesBase properties;
     protected final AtomicReference<T> valueHolder;
@@ -118,5 +118,22 @@ public class ListPropertyButton<T> extends Button
     public void refresh()
     {
         setValue(valueHolder.get());
+    }
+
+    @Override
+    public T getPropertyValue()
+    {
+        return valueHolder.get();
+    }
+
+    @Override
+    public void setPropertyValue(T value)
+    {
+        if (valueHolder == null)
+        {
+            return;
+        }
+        valueHolder.set(value);
+        properties.save();
     }
 }

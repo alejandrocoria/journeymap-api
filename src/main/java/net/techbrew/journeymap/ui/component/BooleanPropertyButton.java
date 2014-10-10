@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Button that wraps and syncs with an AtomicBoolean value owned by a config instance.
  */
-public class BooleanPropertyButton extends OnOffButton
+public class BooleanPropertyButton extends OnOffButton implements IPropertyHolder<Boolean>
 {
     final PropertiesBase properties;
     final AtomicBoolean valueHolder;
@@ -55,5 +55,22 @@ public class BooleanPropertyButton extends OnOffButton
         {
             setToggled(valueHolder.get());
         }
+    }
+
+    @Override
+    public Boolean getPropertyValue()
+    {
+        return valueHolder.get();
+    }
+
+    @Override
+    public void setPropertyValue(Boolean value)
+    {
+        if (valueHolder == null)
+        {
+            return;
+        }
+        valueHolder.set(value);
+        properties.save();
     }
 }

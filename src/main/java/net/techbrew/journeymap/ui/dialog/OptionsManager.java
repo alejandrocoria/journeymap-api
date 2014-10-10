@@ -18,6 +18,7 @@ import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.task.MapPlayerTask;
 import net.techbrew.journeymap.ui.UIManager;
+import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.*;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import net.techbrew.journeymap.ui.option.CategorySlot;
@@ -26,7 +27,9 @@ import net.techbrew.journeymap.ui.option.SlotMetadata;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.lwjgl.input.Keyboard;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * Master options UI
@@ -140,34 +143,48 @@ public class OptionsManager extends JmUI
                     {
                         CategorySlot categorySlot = (CategorySlot) rootSlot;
                         Config.Category category = categorySlot.getCategory();
+
+                        // Reset button
+                        ResetButton resetButton = new ResetButton(category);
+                        SlotMetadata resetSlotMetadata = new SlotMetadata(resetButton,
+                                resetButton.displayString,
+                                resetButton.getUnformattedTooltip(), 1);
+
                         switch (category)
                         {
                             case MiniMap1:
                             {
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1PreviewButton,
                                         minimap1PreviewButton.displayString,
-                                        minimap1PreviewButton.getUnformattedTooltip()));
+                                        minimap1PreviewButton.getUnformattedTooltip(), 3));
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1KeysButton,
                                         minimap1KeysButton.displayString,
-                                        minimap1KeysButton.getUnformattedTooltip()));
+                                        minimap1KeysButton.getUnformattedTooltip(), 2));
+                                categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                                 break;
                             }
                             case MiniMap2:
                             {
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2PreviewButton,
                                         minimap2PreviewButton.displayString,
-                                        minimap2PreviewButton.getUnformattedTooltip()));
+                                        minimap2PreviewButton.getUnformattedTooltip(), 3));
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2KeysButton,
                                         minimap2KeysButton.displayString,
-                                        minimap2KeysButton.getUnformattedTooltip()));
+                                        minimap2KeysButton.getUnformattedTooltip(), 2));
+                                categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                                 break;
                             }
                             case FullMap:
                             {
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(fullscreenKeysButton,
                                         fullscreenKeysButton.displayString,
-                                        fullscreenKeysButton.getUnformattedTooltip()));
+                                        fullscreenKeysButton.getUnformattedTooltip(), 2));
+                                categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                                 break;
+                            }
+                            default:
+                            {
+                                categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                             }
                         }
                     }
@@ -313,6 +330,12 @@ public class OptionsManager extends JmUI
         SlotMetadata slotMetadata = optionsListPane.getLastPressed();
         if (slotMetadata != null)
         {
+            // If it's a reset button, reset that action
+            if (slotMetadata.getButton() instanceof ResetButton)
+            {
+                resetOptions(((ResetButton) slotMetadata.getButton()).category);
+            }
+
             // Theme button: Force update
             if (slotMetadata.getName().equals(Constants.getString("jm.common.ui_theme")))
             {
@@ -426,6 +449,25 @@ public class OptionsManager extends JmUI
         }
     }
 
+    protected void resetOptions(Config.Category category)
+    {
+        for (ScrollListPane.ISlot slot : optionsListPane.getRootSlots())
+        {
+            if (slot instanceof CategorySlot)
+            {
+                if (category.equals(((CategorySlot) slot).getCategory()))
+                {
+                    for (SlotMetadata slotMetadata : ((CategorySlot) slot).getAllChildMetadata())
+                    {
+                        slotMetadata.resetToDefaultValue();
+                        slotMetadata.getButton().refresh(); // TODO move into reset
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
     protected boolean previewMiniMap()
     {
         return minimap1PreviewButton.getToggled() || minimap2PreviewButton.getToggled();
@@ -523,15 +565,29 @@ public class OptionsManager extends JmUI
     {
         if (toolbars == null)
         {
-            toolbars = Collections.EMPTY_MAP;
-//            String name = Constants.getString("jm.minimap.preview");
-//            String tooltip = Constants.getString("jm.minimap.preview.tooltip");
-//            minimap1PreviewButton = new MinimapPreviewButton(name);
-//            SlotMetadata toolbarSlotMetadata = new SlotMetadata(minimap1PreviewButton, name, tooltip);
-//
-//            this.toolbars = new HashMap<Config.Category, List<SlotMetadata>>();
-//            toolbars.put(Config.Category.MiniMap1, Arrays.asList(toolbarSlotMetadata));
+            this.toolbars = new HashMap<Config.Category, List<SlotMetadata>>();
+            for (Config.Category category : Config.Category.values())
+            {
+//                String name = Constants.getString("jm.config.reset");
+//                String tooltip = Constants.getString("jm.config.reset.tooltip");
+//                SlotMetadata toolbarSlotMetadata = new SlotMetadata(new ResetButton(), name, tooltip);
+//                toolbars.put(category, Arrays.asList(toolbarSlotMetadata));
+            }
         }
         return toolbars;
+    }
+
+    public static class ResetButton extends Button
+    {
+        public final Config.Category category;
+
+        public ResetButton(Config.Category category)
+        {
+            super(Constants.getString("jm.config.reset"));
+            this.category = category;
+            setTooltip(Constants.getString("jm.config.reset.tooltip"));
+            setDrawBackground(false);
+            packedFGColour = Color.red.getRGB();
+        }
     }
 }

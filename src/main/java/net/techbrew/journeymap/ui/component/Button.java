@@ -41,7 +41,6 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected boolean drawBackground;
     protected boolean showDisabledHoverText;
     protected boolean defaultStyle = true;
-    protected PropertyAdapter propertyAdapter;
     protected int WIDTH_PAD = 12;
     protected String[] tooltip;
 
@@ -79,12 +78,6 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public boolean isActive()
     {
         return enabled;
-    }
-
-    public void setPropertyAdapter(PropertyAdapter propertyAdapter, String rawLabel)
-    {
-        this.propertyAdapter = propertyAdapter;
-        propertyAdapter.setButton(this, rawLabel);
     }
 
     public int getFitWidth(FontRenderer fr)
@@ -220,7 +213,11 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public String getUnformattedTooltip()
     {
-        return tooltip[0];
+        if (tooltip != null && tooltip.length > 0)
+        {
+            return tooltip[0];
+        }
+        return null;
     }
 
     public List<String> getTooltip()
