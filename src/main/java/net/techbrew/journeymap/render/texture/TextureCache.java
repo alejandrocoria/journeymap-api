@@ -352,16 +352,16 @@ public class TextureCache
         synchronized (themeImages)
         {
             TextureImpl tex = themeImages.get(texName);
-            if (tex == null || (!tex.hasImage() && tex.retainImage) || (resize && (width!=tex.width || height!=tex.height)) || tex.alpha!=alpha)
+            if (tex == null || (!tex.hasImage() && tex.retainImage) || (resize && (width != tex.width || height != tex.height)) || tex.alpha != alpha)
             {
                 File parentDir = ThemeFileHandler.getThemeIconDir();
                 String assetPath = ThemeFileHandler.ASSETS_JOURNEYMAP_ICON_THEME;
                 BufferedImage img = FileHandler.getIconFromFile(parentDir, assetPath, theme.directory, iconPath, null); //$NON-NLS-1$
                 if (img != null)
                 {
-                    if(resize || alpha<1f)
+                    if (resize || alpha < 1f)
                     {
-                        if (alpha<1f || img.getWidth() != width || img.getHeight() != height)
+                        if (alpha < 1f || img.getWidth() != width || img.getHeight() != height)
                         {
                             BufferedImage tmp = new BufferedImage(width, height, img.getType());
                             Graphics2D g = tmp.createGraphics();
@@ -397,12 +397,12 @@ public class TextureCache
         synchronized (themeImages)
         {
             TextureImpl tex = themeImages.get(texName);
-            if (tex == null || (!tex.hasImage() && tex.retainImage) || (width!=tex.width || height!=tex.height) || tex.alpha!=alpha)
+            if (tex == null || (!tex.hasImage() && tex.retainImage) || (width != tex.width || height != tex.height) || tex.alpha != alpha)
             {
                 BufferedImage img = original.getImage();
                 if (img != null)
                 {
-                    if (alpha<1f || img.getWidth() != width || img.getHeight() != height)
+                    if (alpha < 1f || img.getWidth() != width || img.getHeight() != height)
                     {
                         BufferedImage tmp = new BufferedImage(width, height, img.getType());
                         Graphics2D g = tmp.createGraphics();
@@ -516,7 +516,7 @@ public class TextureCache
 
     public static enum Name
     {
-        MinimapSmallSquare, MinimapMediumSquare, MinimapLargeSquare, MinimapCustomSquare, MinimapSmallCircle, MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, LocatorHostile, LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, ColorPicker, UnknownEntity;
+        MinimapSmallSquare, MinimapMediumSquare, MinimapLargeSquare, MinimapCustomSquare, MinimapSmallCircle, MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, LocatorHostile, LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, ColorPicker, UnknownEntity
     }
 
     private static class Holder

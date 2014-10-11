@@ -163,64 +163,52 @@ public class RegionCoord implements Comparable<RegionCoord>
     }
 
     @Override
-    public int hashCode()
+    public boolean equals(Object o)
     {
-        final int prime = 31;
-        int result = 1;
-        Integer vSlice = getVerticalSlice();
-        result = prime * result + (vSlice==null ? -1 : vSlice);
-        result = prime * result + regionX;
-        result = prime * result + regionZ;
-        result = prime * result
-                + ((worldDir == null) ? 0 : worldDir.hashCode());
-        result = prime * result + dimension;
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
+        if (this == o)
         {
             return true;
         }
-        if (obj == null)
+        if (o == null || getClass() != o.getClass())
         {
             return false;
         }
-        if (getClass() != obj.getClass())
+
+        RegionCoord that = (RegionCoord) o;
+
+        if (dimension != that.dimension)
         {
             return false;
         }
-        RegionCoord other = (RegionCoord) obj;
-        if (dimension != other.dimension)
+        if (regionX != that.regionX)
         {
             return false;
         }
-        if (regionX != other.regionX)
+        if (regionZ != that.regionZ)
         {
             return false;
         }
-        if (regionZ != other.regionZ)
+        if (vSlice != null ? !vSlice.equals(that.vSlice) : that.vSlice != null)
         {
             return false;
         }
-        if (other.getVerticalSlice() != getVerticalSlice())
+        if (worldDir != null ? !worldDir.equals(that.worldDir) : that.worldDir != null)
         {
             return false;
         }
-        if (worldDir == null)
-        {
-            if (other.worldDir != null)
-            {
-                return false;
-            }
-        }
-        else if (!worldDir.equals(other.worldDir))
-        {
-            return false;
-        }
+
         return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = worldDir != null ? worldDir.hashCode() : 0;
+        result = 31 * result + regionX;
+        result = 31 * result + regionZ;
+        result = 31 * result + (vSlice != null ? vSlice.hashCode() : 0);
+        result = 31 * result + dimension;
+        return result;
     }
 
     @Override

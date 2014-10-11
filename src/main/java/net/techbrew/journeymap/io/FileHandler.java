@@ -571,7 +571,14 @@ public class FileHandler
     static void copyFromDirectory(File fromDir, File toDir, boolean overWrite) throws IOException
     {
         toDir.mkdir();
-        for (File from : fromDir.listFiles())
+        File[] files = fromDir.listFiles();
+
+        if (files == null)
+        {
+            throw new IOException(fromDir + " nas no files");
+        }
+
+        for (File from : files)
         {
             File to = new File(toDir, from.getName());
             if (from.isDirectory())
@@ -582,30 +589,6 @@ public class FileHandler
             {
                 Files.copy(from, to);
             }
-        }
-    }
-
-    private static class ZipEntryByteSource extends ByteSource
-    {
-        final ZipFile file;
-        final ZipEntry entry;
-
-        ZipEntryByteSource(ZipFile file, ZipEntry entry)
-        {
-            this.file = file;
-            this.entry = entry;
-        }
-
-        @Override
-        public InputStream openStream() throws IOException
-        {
-            return file.getInputStream(entry);
-        }
-
-        @Override
-        public String toString()
-        {
-            return String.format("ZipEntryByteSource( %s / %s )", file, entry);
         }
     }
 
@@ -637,7 +620,7 @@ public class FileHandler
                     }
                     catch (Exception e)
                     {
-                        String error = Constants.getMessageJMERR00("Can't write image: " + iconFile + ": " + e);
+                        String error = "FileHandler can't write image: " + iconFile + ": " + e;
                         JourneyMap.getLogger().error(error);
                     }
 
@@ -697,6 +680,30 @@ public class FileHandler
             String error = String.format("Could not get icon stream: %s, %s, %s : %s", assetsPath, setName, iconPath, e.getMessage());
             JourneyMap.getLogger().error(error);
             return null;
+        }
+    }
+
+    private static class ZipEntryByteSource extends ByteSource
+    {
+        final ZipFile file;
+        final ZipEntry entry;
+
+        ZipEntryByteSource(ZipFile file, ZipEntry entry)
+        {
+            this.file = file;
+            this.entry = entry;
+        }
+
+        @Override
+        public InputStream openStream() throws IOException
+        {
+            return file.getInputStream(entry);
+        }
+
+        @Override
+        public String toString()
+        {
+            return String.format("ZipEntryByteSource( %s / %s )", file, entry);
         }
     }
 }

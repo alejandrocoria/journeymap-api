@@ -54,7 +54,6 @@ public class WaypointEditor extends JmUI
     String labelZ = Constants.getString("jm.waypoint.z");
     String labelR = Constants.getString("jm.waypoint.red_abbreviated");
 
-    ;
     String labelG = Constants.getString("jm.waypoint.green_abbreviated");
     String labelB = Constants.getString("jm.waypoint.blue_abbreviated");
     String currentLocation = "";
@@ -250,12 +249,12 @@ public class WaypointEditor extends JmUI
         final int rightXEnd = rightX + rightWidth;
 
         // Left column starting Y
-        int leftRow = startY;
-        drawLabel(labelName, leftX, leftRow);
-        leftRow += 12;
+        int leftRowY = startY;
+        drawLabel(labelName, leftX, leftRowY);
+        leftRowY += 12;
         fieldName.setWidth(leftWidth);
         fieldName.setX(leftX);
-        fieldName.setY(leftRow);
+        fieldName.setY(leftRowY);
         if (!fieldName.isFocused())
         {
             fieldName.setSelectionPos(fieldName.getText().length());
@@ -263,22 +262,22 @@ public class WaypointEditor extends JmUI
         fieldName.drawTextBox();
 
         // Coordinates
-        leftRow += vgap + vpad;
-        drawLabel(locationTitle, leftX, leftRow);
-        leftRow += 12;
-        drawLabelAndField(labelX, fieldX, leftX, leftRow);
-        drawLabelAndField(labelZ, fieldZ, fieldX.getX() + fieldX.getWidth() + hgap, leftRow);
-        drawLabelAndField(labelY, fieldY, fieldZ.getX() + fieldZ.getWidth() + hgap, leftRow);
+        leftRowY += vgap + vpad;
+        drawLabel(locationTitle, leftX, leftRowY);
+        leftRowY += 12;
+        drawLabelAndField(labelX, fieldX, leftX, leftRowY);
+        drawLabelAndField(labelZ, fieldZ, fieldX.getX() + fieldX.getWidth() + hgap, leftRowY);
+        drawLabelAndField(labelY, fieldY, fieldZ.getX() + fieldZ.getWidth() + hgap, leftRowY);
 
         // Color
-        leftRow += vgap + vpad;
-        drawLabel(colorTitle, leftX, leftRow);
-        leftRow += 12;
-        drawLabelAndField(labelR, fieldR, leftX, leftRow);
-        drawLabelAndField(labelG, fieldG, fieldR.getX() + fieldR.getWidth() + hgap, leftRow);
-        drawLabelAndField(labelB, fieldB, fieldG.getX() + fieldG.getWidth() + hgap, leftRow);
+        leftRowY += vgap + vpad;
+        drawLabel(colorTitle, leftX, leftRowY);
+        leftRowY += 12;
+        drawLabelAndField(labelR, fieldR, leftX, leftRowY);
+        drawLabelAndField(labelG, fieldG, fieldR.getX() + fieldR.getWidth() + hgap, leftRowY);
+        drawLabelAndField(labelB, fieldB, fieldG.getX() + fieldG.getWidth() + hgap, leftRowY);
         buttonRandomize.setWidth(4 + Math.max(fieldB.getX() + fieldB.getWidth() - fieldR.getX(), 10 + fr.getStringWidth(buttonRandomize.displayString)));
-        buttonRandomize.setPosition(fieldR.getX() - 2, leftRow += vgap);
+        buttonRandomize.setPosition(fieldR.getX() - 2, leftRowY += vgap);
 
         // Color picker
         int cpY = fieldB.getY();
@@ -294,14 +293,14 @@ public class WaypointEditor extends JmUI
         drawWaypoint(iconX, iconY);
 
         // Enable
-        leftRow += (vgap);
+        leftRowY += (vgap);
         buttonEnable.fitWidth(fr);
         buttonEnable.setWidth(Math.max(leftWidth / 2, buttonEnable.getWidth()));
-        buttonEnable.setPosition(leftX - 2, leftRow);
+        buttonEnable.setPosition(leftX - 2, leftRowY);
 
         // Reset
         buttonReset.setWidth(leftWidth - buttonEnable.getWidth() - 2);
-        buttonReset.setPosition(leftXEnd - buttonReset.getWidth() + 2, leftRow);
+        buttonReset.setPosition(leftXEnd - buttonReset.getWidth() + 2, leftRowY);
 
         // Dimensions column
         int rightRow = startY;
@@ -315,7 +314,7 @@ public class WaypointEditor extends JmUI
         dimScrollPane.position(dcw, scrollHeight, 0, 0, rightX, rightRow);
 
         // Remove(Cancel) / Save
-        int totalRow = Math.max(leftRow + vgap, rightRow + vgap);
+        int totalRow = Math.max(leftRowY + vgap, rightRow + vgap);
 
         bottomButtons.layoutFilledHorizontal(fr, leftX - 2, totalRow, rightXEnd + 2, 4, true);
     }
@@ -651,7 +650,7 @@ public class WaypointEditor extends JmUI
 
     protected void refreshAndClose(Waypoint focusWaypoint)
     {
-        if (returnDisplay != null && returnDisplay.equals(WaypointManager.class))
+        if (returnDisplay != null && returnDisplay instanceof WaypointManager)
         {
             UIManager.getInstance().openWaypointManager(focusWaypoint, new Fullscreen());
             return;

@@ -114,7 +114,7 @@ public class RegionLoader
                     }
                     else
                     {
-                        if (!rfh.getRegionImageFile(rc, mapType, false).exists())
+                        if (!RegionImageHandler.getRegionImageFile(rc, mapType, false).exists())
                         {
                             List<ChunkCoordIntPair> chunkCoords = rc.getChunkCoordsInRegion();
                             for (ChunkCoordIntPair coord : chunkCoords)

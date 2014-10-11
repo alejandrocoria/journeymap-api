@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-;
-
 /**
  * Provides language strings in a Map.
  *

@@ -455,12 +455,12 @@ public class DrawUtil
 
     public enum HAlign
     {
-        Left, Center, Right;
+        Left, Center, Right
     }
 
     public enum VAlign
     {
-        Above, Middle, Below;
+        Above, Middle, Below
     }
 
 }

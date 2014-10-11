@@ -120,11 +120,6 @@ public class Constants
         return keyBinding.isPressed() || Keyboard.isKeyDown(getKeyCode(keyBinding));
     }
 
-    public static String getMessageJMERR00(Object... params)
-    {
-        return getString("jm.error.00", params); //$NON-NLS-1$
-    }
-
     public static boolean safeEqual(String first, String second)
     {
         int result = CASE_INSENSITIVE_NULL_SAFE_ORDER.compare(first, second);

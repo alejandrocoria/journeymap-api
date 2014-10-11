@@ -82,10 +82,10 @@ public class ThemeMinimapFrame
             resourcePattern = "minimap/circle/" + minimapCircle.prefix + "%s.png";
 
             TextureImpl tempMask = getTexture("mask_" + imgSize, imgSize, imgSize, false, true);
-            textureCircleMask = TextureCache.instance().getScaledCopy("scaledCircleMask", tempMask, width, width, 1f);
+            textureCircleMask = TextureCache.instance().getScaledCopy("scaledCircleMask", tempMask, width, height, 1f);
 
             TextureImpl tempCircle = getTexture("rim_" + imgSize, imgSize, imgSize, false, true);
-            textureCircle = TextureCache.instance().getScaledCopy("scaledCircleRim", tempCircle, width, width, frameAlpha);
+            textureCircle = TextureCache.instance().getScaledCopy("scaledCircleRim", tempCircle, width, height, frameAlpha);
         }
 
         if (minimapSpec.compassPoint != null && minimapSpec.compassPoint.width > 0 && minimapSpec.compassPoint.height > 0)

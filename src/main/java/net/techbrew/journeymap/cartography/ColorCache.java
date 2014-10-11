@@ -426,10 +426,7 @@ public class ColorCache
         Color baseColor = null;
 
         // Get the color from the texture
-        synchronized (iconLoader)
-        {
-            baseColor = iconLoader.loadBlockColor(blockMD);
-        }
+        baseColor = iconLoader.loadBlockColor(blockMD);
 
         // Non-biome block colors get multiplied by their render color.
         // Some blocks may have custom biome-based tints as well.
@@ -580,12 +577,12 @@ public class ColorCache
         int alpha1 = rgb >> 24 & 0xFF;
         int red1 = rgb >> 16 & 0xFF;
         int green1 = rgb >> 8 & 0xFF;
-        int blue1 = rgb >> 0 & 0xFF;
+        int blue1 = rgb & 0xFF;
 
         int alpha2 = mult >> 24 & 0xFF;
         int red2 = mult >> 16 & 0xFF;
         int green2 = mult >> 8 & 0xFF;
-        int blue2 = mult >> 0 & 0xFF;
+        int blue2 = mult & 0xFF;
 
         int alpha = alpha1 * alpha2 / 255;
         int red = red1 * red2 / 255;

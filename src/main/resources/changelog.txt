@@ -12,6 +12,9 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+
+
+## Changelog for JourneyMap 5.0.0a9:
 - New Feature: Options Manager sections now have Reset buttons
 - New Feature: Added a Theme selector button on Fullscreen Map (icon is a paint palette)
 - Change: When the screen size is too small in Fullscreen Map, instead of hiding the third toolbar, it is now moved to the right edge of the screen

@@ -206,9 +206,8 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
         finally
         {
             strata.reset();
-            // return chunkOk;
-            return true;
         }
+        return true;  // todo: return chunkok
     }
 
     /**

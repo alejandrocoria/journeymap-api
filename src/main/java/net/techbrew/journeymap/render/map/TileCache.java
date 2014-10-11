@@ -32,6 +32,7 @@ public class TileCache implements RemovalListener<Integer, Tile>
     private final Cache<Integer, Tile> cache;
     private final Map<Integer, Tile> retained;
     private boolean paused;
+
     private TileCache()
     {
         this.cache = CacheBuilder.newBuilder()
@@ -111,7 +112,10 @@ public class TileCache implements RemovalListener<Integer, Tile>
             {
                 logger.debug("Expired:" + notification.getValue() + " because: " + notification.getCause() + ". Size now: " + cache.size());
             }
-            oldTile.clear();
+            if (oldTile != null)
+            {
+                oldTile.clear();
+            }
         }
     }
 

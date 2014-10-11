@@ -22,7 +22,8 @@ import java.util.*;
 /**
  * Created by mwoodman on 2/18/14.
  */
-public class ModInfo {
+public class ModInfo
+{
 
     public static final String VERSION = "0.1";
     public static final Logger LOGGER = LogManager.getLogger("modinfo");
@@ -47,10 +48,10 @@ public class ModInfo {
         {
             this.reportingLocale = getLocale(reportingLanguageCode);
             this.config = Config.getInstance(this.modId);
-            if(this.config.isEnabled())
+            if (this.config.isEnabled())
             {
                 this.client = createClient();
-                if(Config.generateStatusString(modId, false).equals(config.getStatus()))
+                if (Config.generateStatusString(modId, false).equals(config.getStatus()))
                 {
                     optIn();
                 }
@@ -70,16 +71,59 @@ public class ModInfo {
         }
     }
 
+    /**
+     * Adapted from UUID.nameUUIDFromBytes();
+     *
+     * @param parts
+     * @return
+     */
+    static UUID createUUID(String... parts)
+    {
+        MessageDigest md;
+        try
+        {
+            md = MessageDigest.getInstance("MD5");
+        }
+        catch (NoSuchAlgorithmException nsae)
+        {
+            throw new InternalError("MD5 not supported");
+        }
+
+        for (String part : parts)
+        {
+            md.update(part.getBytes());
+        }
+
+        byte[] md5Bytes = md.digest();
+        md5Bytes[6] &= 0x0f;  /* clear version        */
+        md5Bytes[6] |= 0x30;  /* set to version 3     */
+        md5Bytes[8] &= 0x3f;  /* clear variant        */
+        md5Bytes[8] |= 0x80;  /* set to IETF variant  */
+
+        long msb = 0;
+        long lsb = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            msb = (msb << 8) | (md5Bytes[i] & 0xff);
+        }
+        for (int i = 8; i < 16; i++)
+        {
+            lsb = (lsb << 8) | (md5Bytes[i] & 0xff);
+        }
+
+        return new UUID(msb, lsb);
+    }
+
     public final boolean isEnabled()
     {
-        return client !=null;
+        return client != null;
     }
 
     public void reportAppView()
     {
         try
         {
-            if(isEnabled())
+            if (isEnabled())
             {
                 Payload payload = new Payload(Payload.Type.AppView);
                 payload.add(appViewParams());
@@ -98,9 +142,9 @@ public class ModInfo {
     {
         try
         {
-            if(isEnabled())
+            if (isEnabled())
             {
-                final String category =  "Exception: " + e.toString();
+                final String category = "Exception: " + e.toString();
                 final String lineDelim = " / ";
                 final int actionMaxBytes = Payload.Parameter.EventAction.getMaxBytes();
                 final int labelMaxBytes = Payload.Parameter.EventLabel.getMaxBytes();
@@ -110,10 +154,10 @@ public class ModInfo {
                 StackTraceElement[] stackTrace = e.getStackTrace();
                 ArrayList<Integer> byteLengths = new ArrayList<Integer>(stackTrace.length);
                 int total = 0;
-                for(int i = 0; i < stackTrace.length; i++)
+                for (int i = 0; i < stackTrace.length; i++)
                 {
                     int byteLength = Payload.encode(stackTrace[i].toString() + lineDelim).getBytes().length;
-                    if(total + byteLength > maxBytes)
+                    if (total + byteLength > maxBytes)
                     {
                         break;
                     }
@@ -124,13 +168,13 @@ public class ModInfo {
                 int index = 0;
 
                 // Put as many stack trace lines as possible into EventAction
-                StringBuilder action = new StringBuilder(actionMaxBytes/11);
+                StringBuilder action = new StringBuilder(actionMaxBytes / 11);
                 {
                     int actionTotal = 0;
-                    for(; index < byteLengths.size(); index++)
+                    for (; index < byteLengths.size(); index++)
                     {
                         int byteLength = byteLengths.get(index);
-                        if(actionTotal + byteLength > actionMaxBytes)
+                        if (actionTotal + byteLength > actionMaxBytes)
                         {
                             break;
                         }
@@ -141,13 +185,13 @@ public class ModInfo {
                 }
 
                 // Put as many stack trace lines as possible into EventLabel
-                StringBuilder label = new StringBuilder(labelMaxBytes/11);
+                StringBuilder label = new StringBuilder(labelMaxBytes / 11);
                 {
                     int labelTotal = 0;
-                    for(; index < byteLengths.size(); index++)
+                    for (; index < byteLengths.size(); index++)
                     {
                         int byteLength = byteLengths.get(index);
-                        if(labelTotal + byteLength > labelMaxBytes)
+                        if (labelTotal + byteLength > labelMaxBytes)
                         {
                             break;
                         }
@@ -171,7 +215,7 @@ public class ModInfo {
     {
         try
         {
-            if(isEnabled())
+            if (isEnabled())
             {
                 Payload payload = new Payload(Payload.Type.Event);
                 payload.add(appViewParams());
@@ -191,7 +235,7 @@ public class ModInfo {
     {
         try
         {
-            if(isEnabled())
+            if (isEnabled())
             {
                 Payload payload = new Payload(Payload.Type.Event);
                 payload.put(Payload.Parameter.EventCategory, "ModInfo");
@@ -210,7 +254,7 @@ public class ModInfo {
     {
         String english = "en_US";
         List<String> langs = Arrays.asList(english);
-        if(!english.equals(languageCode))
+        if (!english.equals(languageCode))
         {
             langs.add(languageCode);
         }
@@ -225,7 +269,7 @@ public class ModInfo {
         return reportingLocale.formatMessage(translationKey, parms);
     }
 
-    private final Client createClient()
+    private Client createClient()
     {
         String salt = config.getSalt();
         String username = minecraft.getSession().getUsername();
@@ -243,10 +287,10 @@ public class ModInfo {
         map.put(Payload.Parameter.ScreenResolution, displayMode.getWidth() + "x" + displayMode.getHeight());
 
         StringBuilder desc = new StringBuilder(Loader.MC_VERSION);
-        if(minecraft.theWorld != null)
+        if (minecraft.theWorld != null)
         {
             IntegratedServer server = minecraft.getIntegratedServer();
-            boolean multiplayer = server==null || server.getPublic();
+            boolean multiplayer = server == null || server.getPublic();
             desc.append(", ").append(multiplayer ? this.I18n("menu.multiplayer") : this.I18n("menu.singleplayer"));
         }
 
@@ -262,8 +306,6 @@ public class ModInfo {
         return map;
     }
 
-
-
     private void optIn()
     {
         // Send opt-in message and confirm.
@@ -271,10 +313,14 @@ public class ModInfo {
         payload.put(Payload.Parameter.EventCategory, "ModInfo");
         payload.put(Payload.Parameter.EventAction, "Opt In");
 
-        createClient().send(payload, new Message.Callback() {
-            public void onResult(Object result) {
-                if (Boolean.TRUE.equals(result)) {
-                    if (config.isEnabled()) {
+        createClient().send(payload, new Message.Callback()
+        {
+            public void onResult(Object result)
+            {
+                if (Boolean.TRUE.equals(result))
+                {
+                    if (config.isEnabled())
+                    {
                         config.confirmStatus();
                         LOGGER.info("ModInfo for " + config.getModId() + " has been re-enabled. Thank you!");
                     }
@@ -285,22 +331,26 @@ public class ModInfo {
 
     private void optOut()
     {
-        if(Config.isConfirmedDisabled(config))
+        if (Config.isConfirmedDisabled(config))
         {
             // Disabled and confirmed, do nothing
             LOGGER.info("ModInfo for " + this.modId + " is disabled");
         }
-        else if(!config.isEnabled())
+        else if (!config.isEnabled())
         {
             // Disabled.  Send opt-out message and confirm.
             Payload payload = new Payload(Payload.Type.Event);
             payload.put(Payload.Parameter.EventCategory, "ModInfo");
             payload.put(Payload.Parameter.EventAction, "Opt Out");
 
-            createClient().send(payload, new Message.Callback() {
-                public void onResult(Object result) {
-                    if (Boolean.TRUE.equals(result)) {
-                        if (!config.isEnabled()) {
+            createClient().send(payload, new Message.Callback()
+            {
+                public void onResult(Object result)
+                {
+                    if (Boolean.TRUE.equals(result))
+                    {
+                        if (!config.isEnabled())
+                        {
                             config.confirmStatus();
                             LOGGER.info("ModInfo for " + config.getModId() + " has been disabled");
                         }
@@ -308,39 +358,5 @@ public class ModInfo {
                 }
             });
         }
-    }
-
-    /**
-     * Adapted from UUID.nameUUIDFromBytes();
-     * @param parts
-     * @return
-     */
-    static UUID createUUID(String... parts) {
-        MessageDigest md;
-        try {
-            md = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException nsae) {
-            throw new InternalError("MD5 not supported");
-        }
-
-        for(String part : parts)
-        {
-            md.update(part.getBytes());
-        }
-
-        byte[] md5Bytes = md.digest();
-        md5Bytes[6]  &= 0x0f;  /* clear version        */
-        md5Bytes[6]  |= 0x30;  /* set to version 3     */
-        md5Bytes[8]  &= 0x3f;  /* clear variant        */
-        md5Bytes[8]  |= 0x80;  /* set to IETF variant  */
-
-        long msb = 0;
-        long lsb = 0;
-        for (int i=0; i<8; i++)
-            msb = (msb << 8) | (md5Bytes[i] & 0xff);
-        for (int i=8; i<16; i++)
-            lsb = (lsb << 8) | (md5Bytes[i] & 0xff);
-
-        return new UUID(msb, lsb);
     }
 }

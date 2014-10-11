@@ -29,12 +29,8 @@ import java.io.IOException;
 
 public class RegionImageHandler
 {
-
-    private final Object lock;
-
     private RegionImageHandler()
     {
-        lock = new Object();
     }
 
     // Get singleton instance.  Concurrency-safe.

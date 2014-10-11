@@ -200,16 +200,17 @@ public class JMLogger
         // Add config files
         JourneyMap jm = JourneyMap.getInstance();
         List<? extends PropertiesBase> configs = Arrays.asList(
-                jm.getMiniMapProperties1(),
-                jm.getMiniMapProperties2(),
-                jm.getFullMapProperties(),
-                jm.getWaypointProperties(),
-                jm.getWebMapProperties(),
-                jm.getCoreProperties()
+                JourneyMap.getMiniMapProperties1(),
+                JourneyMap.getMiniMapProperties2(),
+                JourneyMap.getFullMapProperties(),
+                JourneyMap.getWaypointProperties(),
+                JourneyMap.getWebMapProperties(),
+                JourneyMap.getCoreProperties()
         );
 
         for (PropertiesBase config : configs)
         {
+            // TODO: Only show non-default values?
             sb.append(LogFormatter.LINEBREAK).append(config);
         }
 

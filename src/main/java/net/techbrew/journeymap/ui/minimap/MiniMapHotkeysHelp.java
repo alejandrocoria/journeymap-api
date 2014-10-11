@@ -121,6 +121,6 @@ public class MiniMapHotkeysHelp extends JmUI
     protected void keyTyped(char c, int i)
     {
         super.keyTyped(c, i);
-        keyEventHandler.onKeypress(true);
+        KeyEventHandler.onKeypress(true);
     }
 }

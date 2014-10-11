@@ -339,7 +339,7 @@ public abstract class BaseService extends Service
         }
         catch (Exception ex)
         {
-            JourneyMap.getLogger().warn("Failed to gzip encode: " + data);
+            JourneyMap.getLogger().warn("Failed to gzip encode: " + Arrays.toString(data));
             return null;
         }
     }

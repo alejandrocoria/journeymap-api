@@ -12,7 +12,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.ChunkRenderController;
@@ -198,7 +197,7 @@ public class MapRegionTask extends BaseMapTask
                 }
                 catch (Throwable t)
                 {
-                    String error = Constants.getMessageJMERR00("Couldn't Auto-Map: " + t.getMessage()); //$NON-NLS-1$
+                    String error = "Couldn't Auto-Map: " + t.getMessage(); //$NON-NLS-1$
                     ChatLog.announceError(error);
                     logger.error(error + ": " + LogFormatter.toString(t));
                 }

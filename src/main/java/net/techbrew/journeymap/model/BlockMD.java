@@ -23,6 +23,7 @@ import net.techbrew.journeymap.data.DataCache;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Random;
 
@@ -154,10 +155,7 @@ public class BlockMD
      */
     public void addFlags(Flag... addFlags)
     {
-        for (Flag flag : addFlags)
-        {
-            this.flags.add(flag);
-        }
+        Collections.addAll(this.flags, addFlags);
     }
 
     /**
@@ -180,7 +178,7 @@ public class BlockMD
             Integer color = ColorCache.instance().getBlockColor(chunkMd, this, x, y, z);
             if (color == null)
             {
-                this.color = Color.black.getRGB();
+                this.color = color = Color.black.getRGB();
                 JourneyMap.getLogger().warn("Could not get color for " + block);
                 addFlags(Flag.Error);
             }

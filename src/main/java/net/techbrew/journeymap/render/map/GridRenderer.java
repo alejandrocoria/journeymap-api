@@ -122,11 +122,6 @@ public class GridRenderer
         return center(centerBlockX, centerBlockZ, zoom);
     }
 
-    public boolean hasTile(Tile tile)
-    {
-        return grid.containsValue(tile);
-    }
-
     public boolean hasUnloadedTile()
     {
         return hasUnloadedTile(false);

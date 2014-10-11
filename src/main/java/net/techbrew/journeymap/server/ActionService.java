@@ -26,8 +26,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Properties;
 
-;
-
 /**
  * Service delegate for special actions.
  */
@@ -128,7 +126,7 @@ public class ActionService extends BaseService
             }
             catch (Exception e)
             {
-                String error = "Bad request: mapType=" + mapType; //$NON-NLS-1$
+                String error = "Bad request: mapType=" + mapTypeString; //$NON-NLS-1$
                 throwEventException(400, error, event, true);
             }
             if (mapType != MapType.underground)

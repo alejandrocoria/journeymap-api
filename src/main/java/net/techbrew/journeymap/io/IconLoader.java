@@ -77,9 +77,9 @@ public class IconLoader
 
             IIcon blockIcon = getDirectIcon(blockMD);
 
-            if(blockIcon == null)
+            if (blockIcon == null)
             {
-                if(blockMD.getBlock() instanceof ITileEntityProvider)
+                if (blockMD.getBlock() instanceof ITileEntityProvider)
                 {
                     logger.debug("Ignoring TitleEntity without standard block texture: " + blockMD);
                     blockMD.addFlags(BlockMD.Flag.TileEntity, BlockMD.Flag.HasAir);
@@ -121,7 +121,7 @@ public class IconLoader
 
             // Get the top icon
             blockIcon = blockDoublePlant.func_149888_a(true, blockMD.meta & BlockDoublePlant.field_149892_a.length);
-            if(blockIcon.getIconName().contains("sunflower"))
+            if (blockIcon.getIconName().contains("sunflower"))
             {
                 // Sunflower front
                 blockIcon = blockDoublePlant.sunflowerIcons[0];
@@ -207,7 +207,7 @@ public class IconLoader
                             a += alpha;
                             r += (argb >> 16) & 0xFF;
                             g += (argb >> 8) & 0xFF;
-                            b += (argb >> 0) & 0xFF;
+                            b += (argb) & 0xFF;
                         }
                     }
                 }
@@ -321,7 +321,7 @@ public class IconLoader
                 {
                     int var7 = var6 * width * 4 + var5 * 4;
                     byte var8 = 0;
-                    int var10 = var8 | (var4[(var7 + 2)] & 0xFF) << 0;
+                    int var10 = var8 | (var4[(var7 + 2)] & 0xFF);
                     var10 |= (var4[(var7 + 1)] & 0xFF) << 8;
                     var10 |= (var4[(var7 + 0)] & 0xFF) << 16;
                     var10 |= (var4[(var7 + 3)] & 0xFF) << 24;

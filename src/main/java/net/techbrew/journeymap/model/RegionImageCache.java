@@ -25,11 +25,10 @@ public class RegionImageCache
 
     private static final int SIZE = 25;
     private static final long flushInterval = TimeUnit.SECONDS.toMillis(30);
-    private volatile Map<RegionCoord, RegionImageSet> imageSets;
-
-    private volatile long lastFlush;
     //private volatile Set<RegionCoord> dirty;
-    private volatile Object lock = new Object();
+    private final Object lock = new Object();
+    private volatile Map<RegionCoord, RegionImageSet> imageSets;
+    private volatile long lastFlush;
 
     // Private constructor
     private RegionImageCache()

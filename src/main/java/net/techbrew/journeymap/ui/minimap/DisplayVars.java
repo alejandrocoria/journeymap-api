@@ -114,7 +114,7 @@ public class DisplayVars
             {
                 minimapSpec = theme.minimap.square;
                 minimapWidth = miniMapProperties.getSize();
-                minimapHeight = minimapWidth;
+                minimapHeight = miniMapProperties.getSize();
                 reticleSegmentLength = Math.sqrt((minimapHeight * minimapHeight) + (minimapWidth * minimapWidth)) / 2;
                 break;
             }

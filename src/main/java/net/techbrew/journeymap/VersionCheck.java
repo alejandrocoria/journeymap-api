@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -96,11 +97,11 @@ public class VersionCheck
                         Gson gson = new GsonBuilder().create();
                         VersionData versionData = gson.fromJson(rawResponse, VersionData.class);
 
-                        if(versionData.versions!=null)
+                        if (versionData.versions != null)
                         {
                             for (VersionLine versionLine : versionData.versions)
                             {
-                                if(Loader.MC_VERSION.equals(versionLine.minecraft))
+                                if (Loader.MC_VERSION.equals(versionLine.minecraft))
                                 {
                                     versionAvailable = versionLine.journeymap;
                                     versionIsCurrent = isCurrent(JourneyMap.JM_VERSION, versionAvailable);
@@ -123,7 +124,7 @@ public class VersionCheck
                     }
                     finally
                     {
-                        if(in!=null)
+                        if (in != null)
                         {
                             try
                             {
@@ -201,7 +202,7 @@ public class VersionCheck
 
         if (errorsFound)
         {
-            JourneyMap.getLogger().warn(String.format("Version had problems when parsed. In: %s , Out: %s", versionString, ints)); //$NON-NLS-1$
+            JourneyMap.getLogger().warn(String.format("Version had problems when parsed. In: %s , Out: %s", versionString, Arrays.toString(ints))); //$NON-NLS-1$
         }
         return ints;
     }

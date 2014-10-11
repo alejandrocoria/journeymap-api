@@ -134,8 +134,7 @@ public class ChunkCoord
     @Override
     public String toString()
     {
-        StringBuilder builder = new StringBuilder();
-//		builder.append("ChunkCoord [worldDir=");
+        //		builder.append("ChunkCoord [worldDir=");
 //		builder.append(worldDir.getName());
 //		builder.append(", chunkX=");
 //		builder.append(chunkX);
@@ -146,12 +145,7 @@ public class ChunkCoord
 //		builder.append(", worldProviderType=");
 //		builder.append(worldProviderType);
 //		builder.append("]");
-        builder.append("ChunkCoord ["); //$NON-NLS-1$
-        builder.append(chunkX);
-        builder.append(","); //$NON-NLS-1$
-        builder.append(chunkZ);
-        builder.append("]"); //$NON-NLS-1$
-        return builder.toString();
+        return "ChunkCoord [" + chunkX + "," + chunkZ + "]";
     }
 
 }

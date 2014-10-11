@@ -85,7 +85,6 @@ public class JourneyMap
     private volatile String currentWorldId = null;
     private Logger logger;
     private boolean threadLogging = false;
-    private long lastModInfoKeepAlive = System.currentTimeMillis();
 
     // Task controller for issuing tasks in executor
     private TaskController taskController;
@@ -387,7 +386,7 @@ public class JourneyMap
             if (modInfo != null)
             {
                 modInfo.reportAppView();
-                lastModInfoKeepAlive = System.currentTimeMillis();
+                //lastModInfoKeepAlive = System.currentTimeMillis();
             }
 
             this.reset();
@@ -554,7 +553,7 @@ public class JourneyMap
         }
         catch (Throwable t)
         {
-            logger.error(Constants.getMessageJMERR00(LogFormatter.toString(t)));
+            logger.error("Error in JourneyMap.updateState(): " + LogFormatter.toString(t));
         }
     }
 
@@ -569,7 +568,7 @@ public class JourneyMap
         }
         catch (Throwable t)
         {
-            String error = Constants.getMessageJMERR00(t.getMessage()); //$NON-NLS-1$
+            String error = "Error in JourneyMap.performTasks(): " + t.getMessage(); //$NON-NLS-1$
             ChatLog.announceError(error);
             logger.error(LogFormatter.toString(t));
         }

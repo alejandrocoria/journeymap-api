@@ -14,7 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by mwoodman on 2/17/14.
  */
-public class Client {
+public class Client
+{
 
     public static final String ENDPOINT = "http://www.google-analytics.com/collect";
 
@@ -41,7 +42,7 @@ public class Client {
         this.userAgent = createUserAgent(defaultUserLanguage);
         this.service = Executors.newFixedThreadPool(2);
 
-        if(config.isVerbose())
+        if (config.isVerbose())
         {
             showVerboseMessage("User-Agent: " + this.userAgent);
         }
@@ -54,7 +55,7 @@ public class Client {
 
     public Future send(Payload payload, final Message.Callback callback)
     {
-        if(config.isEnabled())
+        if (config.isEnabled())
         {
             // Ensure required parameters
             payload.put(Payload.Parameter.Version, Payload.VERSION);
@@ -86,71 +87,84 @@ public class Client {
                 {
                     result = message.call();
                 }
-                catch(Throwable t)
+                catch (Throwable t)
                 {
                     ModInfo.LOGGER.log(Level.ERROR, "ModInfo couldn't send message", t);
                 }
 
                 try
                 {
-                    if(config.isVerbose() && Boolean.TRUE.equals(result))
+                    if (config.isVerbose() && Boolean.TRUE.equals(result))
                     {
                         showVerboseMessage(payload.toVerboseString());
                     }
                 }
-                catch(Throwable t)
+                catch (Throwable t)
                 {
                     ModInfo.LOGGER.log(Level.ERROR, "ModInfo couldn't do verbose output", t);
                 }
 
                 try
                 {
-                    if(callback!=null)
+                    if (callback != null)
                     {
                         callback.onResult(result);
                     }
                 }
-                catch(Throwable t)
+                catch (Throwable t)
                 {
                     ModInfo.LOGGER.log(Level.ERROR, "ModInfo couldn't use callback", t);
                 }
             }
         };
     }
-    
+
     private String createUserAgent(String defaultUserLanguage)
     {
         String agent = null;
-        
+
         try
         {
             // Get system properties
             String os = System.getProperty("os.name");
-            if(os==null) os = "";
+            if (os == null)
+            {
+                os = "";
+            }
 
             String version = System.getProperty("os.version");
-            if(version==null) version = "";
+            if (version == null)
+            {
+                version = "";
+            }
 
             String arch = System.getProperty("os.arch");
-            if(arch==null) arch = "";
-            if(arch.equals("amd64")) arch = "WOW64";
+            if (arch == null)
+            {
+                arch = "";
+            }
+            if (arch.equals("amd64"))
+            {
+                arch = "WOW64";
+            }
 
             String lang = String.format("%s_%s", System.getProperty("user.language"), System.getProperty("user.country"));
-            if(lang.contains("null")) {
+            if (lang.contains("null"))
+            {
                 lang = defaultUserLanguage;
             }
 
             // Build user agent string
-            if(os.startsWith("Mac")) // Mac OS X, x86_64, ?
+            if (os.startsWith("Mac")) // Mac OS X, x86_64, ?
             {
-                version = version.replace(".","_");
+                version = version.replace(".", "_");
                 agent = String.format("Mozilla/5.0 (Macintosh; U; Intel Mac OS X %s; %s)", version, lang);
             }
-            else if(os.startsWith("Win")) // Windows 7, amd64, 6.1
+            else if (os.startsWith("Win")) // Windows 7, amd64, 6.1
             {
                 agent = String.format("Mozilla/5.0 (Windows; U; Windows NT %s; %s; %s)", version, arch, lang);
             }
-            else if(os.startsWith("Linux")) // Linux, os.version = kernel version, os.arch = amd64
+            else if (os.startsWith("Linux")) // Linux, os.version = kernel version, os.arch = amd64
             {
                 agent = String.format("Mozilla/5.0 (Linux; U; Linux %s; %s; %s)", version, arch, lang);
             }
@@ -159,7 +173,7 @@ public class Client {
                 agent = String.format("Mozilla/5.0 (%s; U; %s %s; %s, %s)", os, os, version, arch, lang);
             }
         }
-        catch(Throwable t)
+        catch (Throwable t)
         {
             ModInfo.LOGGER.log(Level.ERROR, "ModInfo couldn't create useragent string", t);
             agent = "Mozilla/5.0 (Unknown)";
@@ -174,8 +188,10 @@ public class Client {
     }
 
     @Override
-    protected void finalize() throws Throwable {
-        if(this.service!=null)
+    protected void finalize() throws Throwable
+    {
+        super.finalize();
+        if (this.service != null)
         {
             this.service.shutdown();
         }
