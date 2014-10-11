@@ -1,7 +1,7 @@
 ### JourneyMap Resource Bundle - en_US
-### Notes for translators ###
-# Do not translate or alter the codes used for color changes (§b, §e, §f, etc.)
-# Positional parameters (%1$s, %2$s, %3$s, etc.) may be reordered to suit your language's sentence structure
+### Notes for translators:
+### Do not translate or alter the codes used for color changes (§b, §e, §f, etc.)
+### Positional parameters (%1$s, %2$s, %3$s, etc.) may be reordered to suit your language's sentence structure
 
 jm.advanced.announcemod=Announce Mod
 jm.advanced.announcemod.tooltip=Announces in the chat window that JourneyMap is ready.
@@ -75,33 +75,25 @@ jm.common.hide_buttons=Hide Buttons
 jm.common.hotkeys=Hot Keys...
 jm.common.hotkeys.tooltip=View the Hot Keys which can be used with this map
 jm.common.hotkeys_keybinding_category=JourneyMap
-
 jm.common.location_format=Location
 jm.common.location_format.tooltip=Format of how location coordinates are displayed. Note: 'v' stands for vertical slice (or vertical chunk).
-
 jm.common.location_format_verbose=Verbose Location
 jm.common.location_format_verbose.tooltip=Location shows coordinate names (x,y,z) with the numbers
-
 jm.common.location_xyvz_label=x, y (v), z
-jm.common.location_xyvz_verbose=x: %1$s, y: %3$s (%4$s), z: %2$s
 jm.common.location_xyvz_plain=%1$s, %3$s (%4$s), %2$s
-
+jm.common.location_xyvz_verbose=x: %1$s, y: %3$s (%4$s), z: %2$s
 jm.common.location_xyz_label=x, y, z
-jm.common.location_xyz_verbose=x: %1$s, y: %3$s, z: %2$s
 jm.common.location_xyz_plain=%1$s, %3$s, %2$s
-
-jm.common.location_xzyv_label=x, z, y (v)
-jm.common.location_xzyv_verbose=x: %1$s, z: %2$s, y: %3$s (%4$s)
-jm.common.location_xzyv_plain=%1$s, %2$s, %3$s (%4$s)
-
-jm.common.location_xzy_label=x, z, y
-jm.common.location_xzy_verbose=x: %1$s, z: %2$s, y: %3$s
-jm.common.location_xzy_plain=%1$s, %2$s, %3$s
-
+jm.common.location_xyz_verbose=x: %1$s, y: %3$s, z: %2$s
 jm.common.location_xz_label=x, z
-jm.common.location_xz_verbose=x: %1$s, z: %2$s
 jm.common.location_xz_plain=%1$s, %2$s
-
+jm.common.location_xz_verbose=x: %1$s, z: %2$s
+jm.common.location_xzy_label=x, z, y
+jm.common.location_xzy_plain=%1$s, %2$s, %3$s
+jm.common.location_xzy_verbose=x: %1$s, z: %2$s, y: %3$s
+jm.common.location_xzyv_label=x, z, y (v)
+jm.common.location_xzyv_plain=%1$s, %2$s, %3$s (%4$s)
+jm.common.location_xzyv_verbose=x: %1$s, z: %2$s, y: %3$s (%4$s)
 jm.common.log_warning=Log level %1$s will slow down the game. Do not use for normal gameplay!
 jm.common.map_saved=Map saved: %1$s
 jm.common.map_style_antialiasing=Use Antialiasing
@@ -136,6 +128,8 @@ jm.common.options=Options
 jm.common.options_button=Options...
 jm.common.radar_hide_sneaking=Hide Sneaking Entities
 jm.common.radar_hide_sneaking.tooltip=Whether to hide creatures that are trying to sneak (crouch). Changing this setting is harmless.
+jm.common.radar_lateral_distance=Radar Range Lateral
+jm.common.radar_lateral_distance.tooltip=Lateral distance (in blocks) to search for and display entities on Radar. Larger numbers may cause significant lag.
 jm.common.radar_max_animals=Maximum Animals
 jm.common.radar_max_animals.tooltip=The maximum number of passive mobs displayed on Radar. Larger numbers may cause lag.
 jm.common.radar_max_mobs=Maximum Mobs
@@ -144,8 +138,6 @@ jm.common.radar_max_players=Maximum Players
 jm.common.radar_max_players.tooltip=The maximum number of players displayed on Radar. Larger numbers may cause lag.
 jm.common.radar_max_villagers=Maximum Villagers
 jm.common.radar_max_villagers.tooltip=The maximum number of villagers displayed on Radar. Larger numbers may cause lag.
-jm.common.radar_lateral_distance=Radar Range Lateral
-jm.common.radar_lateral_distance.tooltip=Lateral distance (in blocks) to search for and display entities on Radar. Larger numbers may cause significant lag.
 jm.common.radar_vertical_distance=Radar Range Vertical
 jm.common.radar_vertical_distance.tooltip=Vertical distance (in blocks) to search for and display entities on Radar. Larger numbers may cause significant lag.
 jm.common.ready=§e%1$s ready.
@@ -172,8 +164,8 @@ jm.common.show_waypoints=Show Waypoints
 jm.common.show_waypoints.tooltip=Nearby waypoints are shown on the map
 jm.common.ui_theme=UI Theme
 jm.common.ui_theme.tooltip=The Theme used to display UI controls in the Fullscreen Map and to style the MiniMap
-jm.common.ui_theme_name=Name: §b%1$s§f
 jm.common.ui_theme_author=Author: §b%1$s§f
+jm.common.ui_theme_name=Name: §b%1$s§f
 jm.common.update_available=Update Available!
 jm.common.update_check=Check for Update
 jm.common.use_browser=Use Browser
@@ -196,18 +188,16 @@ jm.config.category.waypoint_beacons=Waypoint Beacons
 jm.config.category.waypoint_beacons.tooltip=Configure how waypoint beacons are displayed in-game
 jm.config.category.webmap=Web Map
 jm.config.category.webmap.tooltip=Configure the appearance of the Web Map
+jm.config.control_arrowkeys=This value can be adjusted with arrow keys for finer control
 jm.config.default=[ Default: %1$s ]
 jm.config.default_numeric=[ Range: %1$d ~ %2$d , Default: %3$d ]
-jm.config.control_arrowkeys=This value can be adjusted with arrow keys for finer control
 jm.config.file_header_1=JourneyMap configuration file. Modify at your own risk!
 jm.config.file_header_2=To use in all worlds, place here: %1$s
 jm.config.file_header_3=To override configuration for a single world, place here: %1$s(world name)
 jm.config.file_header_4=To restore the default settings, simply delete this file before starting Minecraft
 jm.config.file_header_5=For more information, go to: %1$s
-
 jm.config.reset=Reset
 jm.config.reset.tooltip=Reset all options in this section back to their default values
-
 jm.error.compatability=Incompatability error running %1$s for Forge %2$s. Ensure your version of Forge is compatible.
 jm.feature.fairplay=FairPlay
 jm.feature.unlimited=Unlimited
@@ -265,8 +255,8 @@ jm.minimap.return_to_game=Return to Game
 jm.minimap.shape=Shape
 jm.minimap.shape.tooltip=The shape of the MiniMap. Note: Only Circle supports the "My Heading" Map Heading.
 jm.minimap.shape_circle=Circle
-jm.minimap.shape_square=Square
 jm.minimap.shape_rectangle=Rectangle
+jm.minimap.shape_square=Square
 jm.minimap.show_biome=Show Biome
 jm.minimap.show_biome.tooltip=Show the biome of your location
 jm.minimap.show_compass=Show Compass
