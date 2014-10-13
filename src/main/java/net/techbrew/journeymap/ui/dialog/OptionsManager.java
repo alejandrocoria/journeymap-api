@@ -494,6 +494,8 @@ public class OptionsManager extends JmUI
     @Override
     protected void closeAndReturn()
     {
+        JourneyMap.getCoreProperties().optionsManagerUsed.set(true);
+
         // Just in case a property changed but wasn't saved.
         JourneyMap.getCoreProperties().save();
         JourneyMap.getWebMapProperties().save();

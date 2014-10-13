@@ -12,6 +12,7 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Change: The first time J is pressed by a new user, the Options Manager will immediately display. This will hopefully bring all the new options to everyone's attention.
 - Change: Waypoint Manager refactored to (hopefully) resolve scrolling issues some people have reported.
 - Change: Slight adjustment to position of Close button in Fullscreen Map
 - Bugfix: JourneyMap now creates data folders for singleplayer using the world's folder name, not the world name. Pre-existing folders will be renamed accordingly.

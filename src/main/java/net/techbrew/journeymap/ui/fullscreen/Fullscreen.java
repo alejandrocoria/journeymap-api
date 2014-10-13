@@ -29,6 +29,7 @@ import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.MapState;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.FullMapProperties;
+import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.draw.RadarDrawStepFactory;
 import net.techbrew.journeymap.render.draw.WaypointDrawStepFactory;
@@ -131,6 +132,12 @@ public class Fullscreen extends JmUI
         }
 
         initButtons();
+
+        // Check for first-time use
+        if (!JourneyMap.getCoreProperties().optionsManagerUsed.get())
+        {
+            UIManager.getInstance().openMasterOptions(this, Config.Category.MiniMap1, Config.Category.FullMap);
+        }
     }
 
     @Override
