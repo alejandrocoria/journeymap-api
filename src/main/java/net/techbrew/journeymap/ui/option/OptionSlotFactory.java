@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.ui.option;
 
+import com.google.common.io.Files;
 import com.google.common.util.concurrent.AtomicDouble;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -8,7 +9,11 @@ import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.ui.component.*;
 
 import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -20,6 +25,11 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class OptionSlotFactory
 {
+    protected static final Charset UTF8 = Charset.forName("UTF-8");
+    protected static BufferedWriter docWriter;
+    protected static File docFile;
+    protected static boolean generateDocs = false;
+
     public static List<ScrollListPane.ISlot> getSlots(Map<Config.Category, List<SlotMetadata>> toolbars)
     {
         HashMap<Config.Category, List<SlotMetadata>> mergedMap = new HashMap<Config.Category, List<SlotMetadata>>();
@@ -60,6 +70,26 @@ public class OptionSlotFactory
         for (CategorySlot categorySlot : categories)
         {
             count += categorySlot.size();
+        }
+
+        if (generateDocs)
+        {
+            ensureDocFile();
+
+            for (ScrollListPane.ISlot rootSlot : categories)
+            {
+                CategorySlot categorySlot = (CategorySlot) rootSlot;
+                Config.Category category = categorySlot.getCategory();
+
+                doc(categorySlot);
+
+                for (SlotMetadata childSlot : categorySlot.getAllChildMetadata())
+                {
+                    doc(childSlot);
+                }
+            }
+
+            endDoc();
         }
 
         return new ArrayList<ScrollListPane.ISlot>(categories);
@@ -340,6 +370,84 @@ public class OptionSlotFactory
         {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    static void ensureDocFile()
+    {
+        if (docFile == null)
+        {
+            docFile = new File(Constants.JOURNEYMAP_DIR, "journeymap-options-wiki.txt");
+
+            try
+            {
+                if (docFile.exists())
+                {
+                    docFile.delete();
+                }
+                Files.createParentDirs(docFile);
+
+                docWriter = Files.newWriter(docFile, UTF8);
+                docWriter.append(String.format("<!-- Generated %s -->", new Date()));
+                docWriter.newLine();
+                docWriter.newLine();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    static void doc(CategorySlot categorySlot)
+    {
+        ensureDocFile();
+
+        try
+        {
+            docWriter.append(String.format("===%s===", categorySlot.category.name()));
+            docWriter.newLine();
+            docWriter.append(String.format("''%s''", categorySlot.getMetadata().iterator().next().tooltip));
+            docWriter.newLine();
+            docWriter.newLine();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void doc(SlotMetadata slotMetadata)
+    {
+        ensureDocFile();
+
+        try
+        {
+            docWriter.append(String.format(";%s", slotMetadata.getName()));
+            docWriter.newLine();
+            docWriter.append(String.format(":: %s", slotMetadata.tooltip));
+            docWriter.newLine();
+            docWriter.append(String.format(":: <code>%s</code>", slotMetadata.range.replace("[", "").replace("]", "").trim()));
+            docWriter.newLine();
+            docWriter.newLine();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void endDoc()
+    {
+        try
+        {
+            docFile = null;
+            docWriter.flush();
+            docWriter.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
         }
     }
 }

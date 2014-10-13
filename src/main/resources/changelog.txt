@@ -12,6 +12,9 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Change: Added some code to generate a wiki doc for 5.0.0 options: http://journeymap.techbrew.net/help/wiki/Configuration_Files
+
+## Changelog for JourneyMap 5.0.0b1:
 - Change: The first time J is pressed by a new user, the Options Manager will immediately display. This will hopefully bring all the new options to everyone's attention.
 - Change: Waypoint Manager refactored to (hopefully) resolve scrolling issues some people have reported.
 - Change: Slight adjustment to position of Close button in Fullscreen Map
