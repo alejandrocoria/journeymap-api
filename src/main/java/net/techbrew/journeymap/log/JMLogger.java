@@ -241,7 +241,7 @@ public class JMLogger
         else
         {
             int count = singletonErrorsCounter.incrementAndGet();
-            if (count > 100)
+            if (count > 1000)
             {
                 singletonErrors.clear();
                 singletonErrorsCounter.set(0);

@@ -19,6 +19,7 @@ import net.minecraft.util.Util;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WorldData;
+import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.Sys;
@@ -167,13 +168,18 @@ public class FileHandler
             {
                 File legacyWorldDir = new File(mcDir, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, true));
                 worldDir = new File(mcDir, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, false));
+
+                if (!legacyWorldDir.getName().equals(worldDir.getName()))
+                {
+                    if (legacyWorldDir.exists() && worldDir.exists())
+                    {
+                        JMLogger.logOnce(String.format("Found two directories that might be in conflict. Using:  %s , Ignoring: %s", worldDir, legacyWorldDir), null);
+                    }
+                }
+
                 if (legacyWorldDir.exists() && !worldDir.exists())
                 {
                     migrateLegacyFolderName(legacyWorldDir, worldDir);
-                }
-                else if (legacyWorldDir.exists() && worldDir.exists())
-                {
-                    JourneyMap.getLogger().warn(String.format("Found two directories that might be in conflict. Using:  %s , Ignoring: %s", worldDir, legacyWorldDir));
                 }
             }
 
