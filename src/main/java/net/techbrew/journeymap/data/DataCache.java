@@ -349,6 +349,19 @@ public class DataCache
         }
     }
 
+    /**
+     * Purge radar caches to ensure changed options are immediately seen.
+     */
+    public void resetRadarCaches()
+    {
+        animals.invalidateAll();
+        mobs.invalidateAll();
+        players.invalidateAll();
+        villagers.invalidateAll();
+        entityDrawSteps.invalidateAll();
+        entityDTOs.invalidateAll();
+    }
+
     public DrawEntityStep getDrawEntityStep(EntityDTO entityDTO)
     {
         synchronized (entityDrawSteps)

@@ -12,6 +12,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.forgehandler.KeyEventHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
@@ -388,6 +389,7 @@ public class OptionsManager extends JmUI
             if (category == Config.Category.MiniMap1 || category == Config.Category.MiniMap2)
             {
                 refreshMinimapOptions();
+                DataCache.instance().resetRadarCaches();
                 UIManager.getInstance().getMiniMap().updateDisplayVars(true);
             }
         }
@@ -516,22 +518,26 @@ public class OptionsManager extends JmUI
             {
                 case MiniMap1:
                 {
+                    DataCache.instance().resetRadarCaches();
                     UIManager.getInstance().getMiniMap().reset();
                     break;
                 }
                 case MiniMap2:
                 {
+                    DataCache.instance().resetRadarCaches();
                     UIManager.getInstance().getMiniMap().reset();
                     break;
                 }
                 case FullMap:
                 {
+                    DataCache.instance().resetRadarCaches();
                     Fullscreen.reset();
                     ThemeFileHandler.getCurrentTheme(true);
                     break;
                 }
                 case WebMap:
                 {
+                    DataCache.instance().resetRadarCaches();
                     break;
                 }
                 case Waypoint:
