@@ -37,6 +37,7 @@ import java.util.regex.Matcher;
  */
 public class ColorPalette
 {
+    public static final String HELP_PAGE = "http://journeymap.techbrew.net/help/wiki/Color_Palette";
     public static final String SAMPLE_STANDARD_PATH = ".minecraft/journeyMap/";
     public static final String SAMPLE_WORLD_PATH = SAMPLE_STANDARD_PATH + "data/*/worldname/";
     public static final String JSON_FILENAME = "colorpalette.json";
@@ -85,6 +86,7 @@ public class ColorPalette
         lines.add(Constants.getString("jm.colorpalette.file_header_2", HTML_FILENAME));
         lines.add(Constants.getString("jm.colorpalette.file_header_3", JSON_FILENAME, SAMPLE_WORLD_PATH));
         lines.add(Constants.getString("jm.colorpalette.file_header_4", JSON_FILENAME, SAMPLE_STANDARD_PATH));
+        lines.add(Constants.getString("jm.config.file_header_5", HELP_PAGE));
         this.description = lines.toArray(new String[4]);
 
         this.basicColors = toList(basicColorMap);
