@@ -32,7 +32,7 @@ public abstract class JmUI extends GuiScreen
 {
 
     protected final String title;
-    protected final int headerHeight = 25;
+    protected final int headerHeight = 35;
     protected final Logger logger = JourneyMap.getLogger();
     protected final JmUI returnDisplay;
     protected int scaleFactor = 1;
@@ -156,6 +156,9 @@ public abstract class JmUI extends GuiScreen
             drawBackground(0);
             layoutButtons();
 
+            drawTitle();
+            drawLogo();
+
             List<String> tooltip = null;
             for (int k = 0; k < this.buttonList.size(); ++k)
             {
@@ -181,8 +184,7 @@ public abstract class JmUI extends GuiScreen
                 RenderHelper.disableStandardItemLighting();
             }
 
-            drawTitle();
-            drawLogo();
+
         }
         catch (Throwable t)
         {

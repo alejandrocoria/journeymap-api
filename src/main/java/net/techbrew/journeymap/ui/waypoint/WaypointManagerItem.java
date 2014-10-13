@@ -10,6 +10,7 @@ package net.techbrew.journeymap.ui.waypoint;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 import net.techbrew.journeymap.Constants;
@@ -21,17 +22,20 @@ import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.ButtonList;
 import net.techbrew.journeymap.ui.component.OnOffButton;
-import net.techbrew.journeymap.ui.component.ScrollPane;
+import net.techbrew.journeymap.ui.component.ScrollListPane;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
+import net.techbrew.journeymap.ui.option.SlotMetadata;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 
 import java.awt.*;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by Mark on 3/15/14.
  */
-public class WaypointManagerItem implements ScrollPane.Scrollable
+public class WaypointManagerItem implements ScrollListPane.ISlot
 {
 
     static Color background = new Color(20, 20, 20);
@@ -52,6 +56,8 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
     int hgap = 4;
     ButtonList buttonListLeft;
     ButtonList buttonListRight;
+    int slotIndex; // TODO
+    SlotMetadata<Waypoint> slotMetadata;
 
     public WaypointManagerItem(Waypoint waypoint, FontRenderer fontRenderer, WaypointManager manager)
     {
@@ -59,6 +65,9 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
         this.waypoint = waypoint;
         this.fontRenderer = fontRenderer;
         this.manager = manager;
+
+        SlotMetadata<Waypoint> slotMetadata = new SlotMetadata<Waypoint>(null, null, null, false); // TODO
+
 
         String on = Constants.getString("jm.common.on");
         String off = Constants.getString("jm.common.off");
@@ -89,61 +98,205 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
         internalWidth += 10; // Pad that action
     }
 
-    @Override
+    public int getSlotIndex()
+    {
+        return slotIndex;
+    }
+
+    public void setSlotIndex(int slotIndex)
+    {
+        this.slotIndex = slotIndex;
+    }
+
+    //@Override
     public void setPosition(int x, int y)
     {
         this.x = x;
         this.y = y;
     }
 
-    @Override
+    //@Override
     public int getX()
     {
         return x;
     }
 
-    @Override
+    //@Override
     public int getY()
     {
         return y;
     }
 
-    @Override
+    //@Override
     public int getWidth()
     {
         return width;
     }
 
-    @Override
+    //@Override
     public void setWidth(int width)
     {
         this.width = width;
     }
 
-    @Override
+    //@Override
     public int getFitWidth(FontRenderer fr)
     {
         return width;
     }
 
-    @Override
+    //@Override
     public int getHeight()
     {
         return manager.rowHeight;
     }
 
-    @Override
+    //@Override
     public void drawPartialScrollable(Minecraft mc, int x, int y, int width, int height)
     {
         DrawUtil.drawRectangle(this.x, this.y, this.width, manager.rowHeight, background, 100);
     }
 
-    @Override
-    public void drawScrollable(Minecraft mc, int mouseX, int mouseY)
+    protected void drawLabels(Minecraft mc, int x, int y, Color color)
     {
         if (this.waypoint == null)
         {
             return;
+        }
+
+        boolean waypointValid = waypoint.isEnable() && waypoint.isInPlayerDimension();
+
+        if (color == null)
+        {
+            color = waypointValid ? waypoint.getSafeColor() : Color.GRAY;
+        }
+
+        int yOffset = 1 + (this.manager.rowHeight - mc.fontRenderer.FONT_HEIGHT) / 2;
+        mc.fontRenderer.drawStringWithShadow(String.format("%sm", getDistance()), x + manager.colLocation, y + yOffset, color.getRGB());
+
+        String name = waypointValid ? waypoint.getName() : EnumChatFormatting.STRIKETHROUGH + waypoint.getName();
+        mc.fontRenderer.drawStringWithShadow(name, manager.colName, y + yOffset, color.getRGB());
+    }
+
+    protected void drawWaypoint(int x, int y)
+    {
+        TextureImpl wpTexture = waypoint.getTexture();
+        DrawUtil.drawColoredImage(wpTexture, 255, waypoint.getColor(), x, y - (wpTexture.height / 2), 0);
+    }
+
+    protected void enableWaypoint(boolean enable)
+    {
+        buttonEnable.setToggled(enable);
+        waypoint.setEnable(enable);
+    }
+
+    protected int getButtonEnableCenterX()
+    {
+        return buttonEnable.getCenterX();
+    }
+
+    protected int getNameLeftX()
+    {
+        return this.x + manager.getMargin() + manager.colName;
+    }
+
+    protected int getLocationLeftX()
+    {
+        return this.x + manager.getMargin() + manager.colLocation;
+    }
+
+    //@Override
+    public boolean clickScrollable(int mouseX, int mouseY)
+    {
+        boolean mouseOver = false;
+        if (waypoint == null)
+        {
+            return false;
+        }
+
+        if (buttonRemove.mouseOver(mouseX, mouseY))
+        {
+            manager.removeWaypoint(this);
+            this.waypoint = null;
+            mouseOver = true;
+        }
+        else
+        {
+            if (buttonEnable.mouseOver(mouseX, mouseY))
+            {
+                buttonEnable.toggle();
+                waypoint.setEnable(buttonEnable.getToggled());
+                if (waypoint.isDirty())
+                {
+                    WaypointStore.instance().save(waypoint);
+                }
+                mouseOver = true;
+            }
+            else
+            {
+                if (buttonEdit.mouseOver(mouseX, mouseY))
+                {
+                    UIManager.getInstance().openWaypointEditor(waypoint, false, manager);
+                    mouseOver = true;
+                }
+                else
+                {
+                    if (buttonFind.isEnabled() && buttonFind.mouseOver(mouseX, mouseY))
+                    {
+                        UIManager.getInstance().openFullscreenMap(waypoint);
+                        mouseOver = true;
+                    }
+                    else
+                    {
+                        if (manager.canUserTeleport && buttonTeleport.mouseOver(mouseX, mouseY))
+                        {
+                            new CmdTeleportWaypoint(waypoint).run();
+                            Fullscreen.state().follow.set(true);
+                            UIManager.getInstance().closeAll();
+                            mouseOver = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return mouseOver;
+    }
+
+    public int getDistance()
+    {
+        return distance == null ? 0 : distance;
+    }
+
+    /**
+     * Returns the squared distance to the entity. Only calculated once.
+     */
+    public int getDistanceTo(EntityPlayer player)
+    {
+        if (distance == null)
+        {
+            distance = (int) player.getPosition(1).distanceTo(waypoint.getPosition());
+        }
+        return distance;
+    }
+
+    @Override
+    public Collection<SlotMetadata> getMetadata()
+    {
+        return null;
+    }
+
+    @Override
+    public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
+    {
+        Minecraft mc = manager.getMinecraft();
+        this.width = listWidth;
+        setPosition(x, y);
+
+
+        if (this.waypoint == null)
+        {
+            return null;
         }
 
         boolean hover = manager.isSelected(this) || (mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + manager.rowHeight);
@@ -165,113 +318,63 @@ public class WaypointManagerItem implements ScrollPane.Scrollable
 
         buttonListRight.layoutHorizontal(x + width - margin, y, false, hgap).draw(mc, mouseX, mouseY);
         buttonListLeft.layoutHorizontal(buttonListRight.getLeftX() - (hgap * 2), y, false, hgap).draw(mc, mouseX, mouseY);
-    }
 
-    protected void drawLabels(Minecraft mc, int x, int y, Color color)
-    {
-        if (this.waypoint == null)
-        {
-            return;
-        }
 
-        boolean waypointValid = waypoint.isEnable() && waypoint.isInPlayerDimension();
-
-        if (color == null)
-        {
-            color = waypointValid ? waypoint.getSafeColor() : Color.GRAY;
-        }
-
-        int yOffset = 1 + (this.manager.rowHeight - mc.fontRenderer.FONT_HEIGHT) / 2;
-        mc.fontRenderer.drawStringWithShadow(String.format("%sm", getDistance()), x + manager.colLocation, y + yOffset, color.getRGB());
-
-        String name = waypointValid ? waypoint.getName() : EnumChatFormatting.STRIKETHROUGH + waypoint.getName();
-        mc.fontRenderer.drawStringWithShadow(name, x + manager.colName, y + yOffset, color.getRGB());
-    }
-
-    protected void drawWaypoint(int x, int y)
-    {
-        TextureImpl wpTexture = waypoint.getTexture();
-        DrawUtil.drawColoredImage(wpTexture, 255, waypoint.getColor(), x, y - (wpTexture.height / 2), 0);
-    }
-
-    protected void enableWaypoint(boolean enable)
-    {
-        buttonEnable.setToggled(enable);
-        waypoint.setEnable(enable);
-    }
-
-    protected int getButtonEnableCenterX()
-    {
-        return buttonEnable.getX() + (buttonEnable.getWidth() / 2);
+        return null; // TODO return hovered SlotMetadata
     }
 
     @Override
-    public void clickScrollable(Minecraft mc, int mouseX, int mouseY)
+    public boolean mousePressed(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY)
     {
-
-        if (waypoint == null)
-        {
-            return;
-        }
-
-        if (buttonRemove.mouseOver(mouseX, mouseY))
-        {
-            manager.removeWaypoint(this);
-            this.waypoint = null;
-        }
-        else
-        {
-            if (buttonEnable.mouseOver(mouseX, mouseY))
-            {
-                buttonEnable.toggle();
-                waypoint.setEnable(buttonEnable.getToggled());
-                if (waypoint.isDirty())
-                {
-                    WaypointStore.instance().save(waypoint);
-                }
-            }
-            else
-            {
-                if (buttonEdit.mouseOver(mouseX, mouseY))
-                {
-                    UIManager.getInstance().openWaypointEditor(waypoint, false, manager);
-                }
-                else
-                {
-                    if (buttonFind.isEnabled() && buttonFind.mouseOver(mouseX, mouseY))
-                    {
-                        UIManager.getInstance().openFullscreenMap(waypoint);
-                    }
-                    else
-                    {
-                        if (manager.canUserTeleport && buttonTeleport.mouseOver(mouseX, mouseY))
-                        {
-                            new CmdTeleportWaypoint(waypoint).run();
-                            Fullscreen.state().follow.set(true);
-                            UIManager.getInstance().closeAll();
-                            return;
-                        }
-                    }
-                }
-            }
-        }
+        return this.clickScrollable(x, y);
     }
 
-    public int getDistance()
+    @Override
+    public String[] mouseHover(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY)
     {
-        return distance == null ? 0 : distance;
+        return new String[0]; // TODO
     }
 
-    /**
-     * Returns the squared distance to the entity. Only calculated once.
-     */
-    public int getDistanceTo(EntityPlayer player)
+    @Override
+    public void mouseReleased(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY)
     {
-        if (distance == null)
-        {
-            distance = (int) player.getPosition(1).distanceTo(waypoint.getPosition());
-        }
-        return distance;
+        // TODO
+    }
+
+    @Override
+    public boolean keyTyped(char c, int i)
+    {
+        return false; // TODO
+    }
+
+    @Override
+    public List<ScrollListPane.ISlot> getChildSlots(int listWidth, int columnWidth)
+    {
+        return null; // TODO
+    }
+
+    @Override
+    public SlotMetadata getLastPressed()
+    {
+        return null; // TODO
+    }
+
+    @Override
+    public void setEnabled(boolean enabled)
+    {
+        buttonEnable.setToggled(waypoint.isEnable());
+    }
+
+    @Override
+    public int getColumnWidth()
+    {
+        return width;
+    }
+
+    @Override
+    public boolean contains(SlotMetadata slotMetadata)
+    {
+        return false;
     }
 
     abstract static class Sort implements Comparator<WaypointManagerItem>

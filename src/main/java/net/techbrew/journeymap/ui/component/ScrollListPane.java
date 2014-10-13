@@ -21,7 +21,7 @@ public class ScrollListPane extends GuiSlot
     public long lastTooltipTime;
     public long hoverDelay = 800;
     int hpad = 12;
-    List<ISlot> rootSlots;
+    List<? extends ISlot> rootSlots;
     List<ISlot> currentSlots = new ArrayList<ISlot>(0);
     SlotMetadata lastPressed;
     int lastClickedIndex;
@@ -48,13 +48,13 @@ public class ScrollListPane extends GuiSlot
         return this.currentSlots == null ? 0 : currentSlots.size();
     }
 
-    public void setSlots(List<ISlot> slots)
+    public void setSlots(List<? extends ISlot> slots)
     {
         this.rootSlots = slots;
         updateSlots();
     }
 
-    public List<ISlot> getRootSlots()
+    public List<? extends ISlot> getRootSlots()
     {
         return rootSlots;
     }
@@ -73,7 +73,7 @@ public class ScrollListPane extends GuiSlot
         for (ISlot slot : rootSlots)
         {
             currentSlots.add(slot);
-            List<ISlot> children = slot.getChildSlots(listWidth, columnWidth);
+            List<? extends ISlot> children = slot.getChildSlots(listWidth, columnWidth);
             if (children != null && !children.isEmpty())
             {
                 currentSlots.addAll(children);
@@ -103,7 +103,7 @@ public class ScrollListPane extends GuiSlot
     }
 
     @Override
-    protected boolean isSelected(int p_148131_1_)
+    public boolean isSelected(int p_148131_1_)
     {
         return false;
     }
@@ -239,6 +239,9 @@ public class ScrollListPane extends GuiSlot
     {
         Collection<SlotMetadata> getMetadata();
 
+        /**
+         * Returns SlotMetadata of item hovered, if any.
+         */
         SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected);
 
         /**
@@ -261,7 +264,7 @@ public class ScrollListPane extends GuiSlot
          */
         boolean keyTyped(char c, int i);
 
-        List<ISlot> getChildSlots(int listWidth, int columnWidth);
+        List<? extends ISlot> getChildSlots(int listWidth, int columnWidth);
 
         SlotMetadata getLastPressed();
 

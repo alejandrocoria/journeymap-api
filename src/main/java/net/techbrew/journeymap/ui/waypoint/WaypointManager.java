@@ -9,31 +9,28 @@
 package net.techbrew.journeymap.ui.waypoint;
 
 import cpw.mods.fml.client.FMLClientHandler;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.world.WorldProvider;
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.command.CmdTeleportWaypoint;
-import net.techbrew.journeymap.data.WorldData;
-import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.*;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
+import net.techbrew.journeymap.ui.option.CategorySlot;
+import net.techbrew.journeymap.ui.option.SlotMetadata;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.lwjgl.input.Keyboard;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
+/**
+ * Waypoint Manager 2nd Edition
+ */
 public class WaypointManager extends JmUI
 {
-
     final static String ASCEND = Constants.getString("jm.common.char_uparrow");
     final static String DESCEND = Constants.getString("jm.common.char_downarrow");
     final static int COLWAYPOINT = 0;
@@ -45,100 +42,113 @@ public class WaypointManager extends JmUI
     final static int DEFAULT_ITEMWIDTH = 460;
     protected int itemWidth = DEFAULT_ITEMWIDTH;
     private static WaypointManagerItem.Sort currentSort;
-    final String on = Constants.getString("jm.common.on");
-    final String off = Constants.getString("jm.common.off");
+    private final String on = Constants.getString("jm.common.on");
+    private final String off = Constants.getString("jm.common.off");
+    protected ScrollListPane itemScrollPane;
     protected int rowHeight = 16;
-    protected Boolean canUserTeleport;
-    OnOffButton buttonToggleAll;
+    Boolean canUserTeleport;
     private SortButton buttonSortName, buttonSortDistance;
     private DimensionsButton buttonDimensions;
     private Button buttonClose, buttonAdd, buttonHelp, buttonOptions;
+    private OnOffButton buttonToggleAll;
     private ButtonList bottomButtons;
-    private ArrayList<WaypointManagerItem> items = new ArrayList<WaypointManagerItem>();
-    private ScrollPane itemScrollPane;
     private Waypoint focusWaypoint;
+    private ArrayList<WaypointManagerItem> items = new ArrayList<WaypointManagerItem>();
 
     public WaypointManager()
     {
         this(null, null);
     }
 
+    public WaypointManager(JmUI returnDisplay)
+    {
+        this(null, returnDisplay);
+    }
+
     public WaypointManager(Waypoint focusWaypoint, JmUI returnDisplay)
     {
-        super(Constants.getString("jm.waypoint.manage_title"), returnDisplay);
+        super("JourneyMap " + Constants.getString("jm.waypoint.manage_title"), returnDisplay);
         this.focusWaypoint = focusWaypoint;
     }
 
-    /**
-     * Adds the buttons (and other controls) to the screen in question.
-     */
     @Override
     public void initGui()
     {
         try
         {
+            buttonList.clear();
+
             canUserTeleport = CmdTeleportWaypoint.isPermitted(mc);
+            FontRenderer fr = getFontRenderer();
 
-            if (this.buttonList.isEmpty())
+            if (buttonSortDistance == null)
             {
-                FontRenderer fr = getFontRenderer();
-
-                if (buttonSortDistance == null)
-                {
-                    WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(FMLClientHandler.instance().getClient().thePlayer, true);
-                    String distanceLabel = Constants.getString("jm.waypoint.distance");
-                    buttonSortDistance = new SortButton(distanceLabel, distanceSort);
-                    buttonSortDistance.setTextOnly(fr);
-                }
-                buttonList.add(buttonSortDistance);
-
-                if (buttonSortName == null)
-                {
-                    WaypointManagerItem.Sort nameSort = new WaypointManagerItem.NameComparator(true);
-                    buttonSortName = new SortButton(Constants.getString("jm.waypoint.name"), nameSort);
-                    buttonSortName.setTextOnly(fr);
-                }
-                buttonList.add(buttonSortName);
-
-                if (buttonToggleAll == null)
-                {
-                    String enableOn = Constants.getString("jm.waypoint.enable_all", "", on);
-                    String enableOff = Constants.getString("jm.waypoint.enable_all", "", off);
-                    buttonToggleAll = new OnOffButton(enableOff, enableOn, true);
-                    buttonToggleAll.setTextOnly(getFontRenderer());
-                }
-                buttonList.add(buttonToggleAll);
-
-                // Bottom buttons
-                if (buttonDimensions == null)
-                {
-                    buttonDimensions = new DimensionsButton();
-                }
-
-                if (buttonAdd == null)
-                {
-                    buttonAdd = new Button(Constants.getString("jm.waypoint.new"));
-                    buttonAdd.fitWidth(getFontRenderer());
-                    buttonAdd.setWidth(buttonAdd.getWidth() * 2);
-                }
-
-                if (buttonHelp == null)
-                {
-                    buttonHelp = new Button(Constants.getString("jm.common.help"));
-                    buttonHelp.fitWidth(getFontRenderer());
-                }
-
-                if (buttonOptions == null)
-                {
-                    buttonOptions = new Button(Constants.getString("jm.common.options_button"));
-                    buttonOptions.fitWidth(getFontRenderer());
-                }
-
-                buttonClose = new Button(Constants.getString("jm.common.close"));
-
-                bottomButtons = new ButtonList(buttonOptions, buttonHelp, buttonAdd, buttonDimensions, buttonClose);
-                buttonList.addAll(bottomButtons);
+                WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(FMLClientHandler.instance().getClient().thePlayer, true);
+                String distanceLabel = Constants.getString("jm.waypoint.distance");
+                buttonSortDistance = new SortButton(distanceLabel, distanceSort);
+                buttonSortDistance.setTextOnly(fr);
+                String tooltip = Constants.getString("jm.waypoint.distance.tooltip");
+                buttonSortDistance.setTooltip(tooltip);
             }
+            buttonList.add(buttonSortDistance);
+
+            if (buttonSortName == null)
+            {
+                WaypointManagerItem.Sort nameSort = new WaypointManagerItem.NameComparator(true);
+                buttonSortName = new SortButton(Constants.getString("jm.waypoint.name"), nameSort);
+                buttonSortName.setTextOnly(fr);
+                String tooltip = Constants.getString("jm.waypoint.name.tooltip");
+                buttonSortName.setTooltip(tooltip);
+            }
+            buttonList.add(buttonSortName);
+
+            if (buttonToggleAll == null)
+            {
+                String enableOn = Constants.getString("jm.waypoint.enable_all", "", on);
+                String enableOff = Constants.getString("jm.waypoint.enable_all", "", off);
+                buttonToggleAll = new OnOffButton(enableOff, enableOn, true);
+                buttonToggleAll.setTextOnly(getFontRenderer());
+                String tooltip = Constants.getString("jm.waypoint.enable_all.tooltip");
+                buttonToggleAll.setTooltip(tooltip);
+            }
+            buttonList.add(buttonToggleAll);
+
+            // Bottom buttons
+            if (buttonDimensions == null)
+            {
+                buttonDimensions = new DimensionsButton();
+            }
+
+            if (buttonAdd == null)
+            {
+                buttonAdd = new Button(Constants.getString("jm.waypoint.new"));
+                buttonAdd.fitWidth(getFontRenderer());
+                buttonAdd.setWidth(buttonAdd.getWidth() * 2);
+                String tooltip = Constants.getString("jm.waypoint.new.tooltip");
+                buttonAdd.setTooltip(tooltip);
+            }
+
+            if (buttonHelp == null)
+            {
+                buttonHelp = new Button(Constants.getString("jm.common.help"));
+                buttonHelp.fitWidth(getFontRenderer());
+                String tooltip = Constants.getString("jm.waypoint.help.tooltip");
+                buttonHelp.setTooltip(tooltip);
+            }
+
+            if (buttonOptions == null)
+            {
+                buttonOptions = new Button(Constants.getString("jm.common.options_button"));
+                buttonOptions.fitWidth(getFontRenderer());
+                String tooltip = Constants.getString("jm.waypoint.help.tooltip");
+                buttonOptions.setTooltip(tooltip);
+            }
+
+            buttonClose = new Button(Constants.getString("jm.common.close"));
+
+            bottomButtons = new ButtonList(buttonOptions, buttonHelp, buttonAdd, buttonDimensions, buttonClose);
+            buttonList.addAll(bottomButtons);
+
 
             if (this.items.isEmpty())
             {
@@ -163,141 +173,163 @@ public class WaypointManager extends JmUI
                     }
                 }
             }
+            else
+            {
+
+            }
 
             if (itemScrollPane == null)
             {
-                itemScrollPane = new ScrollPane(mc, 0, 0, items, rowHeight, 2);
-                itemScrollPane.setShowFrame(false);
-                itemScrollPane.setShowSelectionBox(false);
+                this.itemScrollPane = new ScrollListPane(this, mc, this.width, this.height, headerHeight, this.height - 30, 20);
             }
+            else
+            {
+                itemScrollPane.func_148122_a(width, height, headerHeight, this.height - 30);
+                itemScrollPane.updateSlots();
+            }
+
+            // Update slots
+            itemScrollPane.setSlots(items);
+            itemScrollPane.scrollTo(items.get(0));
+
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error(LogFormatter.toString(t));
-            UIManager.getInstance().closeAll();
+            JMLogger.logOnce("Error in OptionsManager.initGui(): " + t, t);
         }
     }
 
-    /**
-     * Center buttons in UI.
-     */
     @Override
     protected void layoutButtons()
     {
-
-        // Header buttons
-        int pad = 3;
-        int headerY = headerHeight + pad;
-        if (items.size() > 0)
+        if (buttonList.isEmpty() || itemScrollPane == null)
         {
-            if (items.get(0).y > headerY + 16)
-            {
-                headerY = items.get(0).y - 16;
-            }
-
-            buttonToggleAll.setY(headerY);
-            buttonToggleAll.centerHorizontalOn(items.get(0).getButtonEnableCenterX());
+            initGui();
         }
+
         buttonToggleAll.setDrawButton(!items.isEmpty());
-
-        int margin = getMargin();
-        int headerX = itemScrollPane.getX() + margin;
-        buttonSortDistance.setPosition(headerX + colWaypoint, headerY);
-        colName = buttonSortDistance.getX() + buttonSortDistance.getWidth() + 5 - headerX;
-        buttonSortName.setPosition(headerX + colName, headerY);
-
         buttonSortDistance.setDrawButton(!items.isEmpty());
         buttonSortName.setDrawButton(!items.isEmpty());
 
-        // Scroll pane
-        int hgap = 4;
-        int vgap = 5;
-        int bottomButtonsHeight = buttonClose.getHeight() + (vgap * 2);
-        final int startY = headerHeight + vgap + getFontRenderer().FONT_HEIGHT;
-        int scrollWidth = this.width - 6;
-        itemScrollPane.position(scrollWidth, this.height, startY, bottomButtonsHeight, 0, 0);
-
-        // Bottom buttons
         bottomButtons.equalizeWidths(getFontRenderer());
-        int bottomButtonWidth = Math.min(bottomButtons.getWidth(hgap) + 25, scrollWidth);
-        bottomButtons.equalizeWidths(getFontRenderer(), hgap, bottomButtonWidth);
-        bottomButtons.layoutCenteredHorizontal(this.width / 2, this.height - bottomButtonsHeight + vgap, true, hgap);
+        int bottomButtonWidth = Math.min(bottomButtons.getWidth(4) + 25, itemScrollPane.getListWidth());
+        bottomButtons.equalizeWidths(getFontRenderer(), 4, bottomButtonWidth);
+        bottomButtons.layoutCenteredHorizontal(width / 2, height - 25, true, 4);
     }
 
     @Override
     public void drawScreen(int x, int y, float par3)
     {
-        drawBackground(0);
-        layoutButtons();
-
-        itemScrollPane.drawScreen(x, y, par3);
-
-        // Check for focused waypoint, scroll if needed for next pass
-        if (focusWaypoint != null && !items.isEmpty() && itemScrollPane != null)
-        {
-            int index = -1;
-            for (WaypointManagerItem item : items)
-            {
-                if (item.waypoint.equals(focusWaypoint))
-                {
-                    itemScrollPane.select(item);
-                    index = items.indexOf(item);
-                    break;
-                }
-            }
-            int offset = Math.max(1, itemScrollPane.getLastVisibleIndex() - 2);
-            if (index > -1 && index > offset)
-            {
-                int delta = index - offset;
-                itemScrollPane.scrollBy(delta * itemScrollPane.getSlotHeight());
-            }
-            focusWaypoint = null;
-        }
-
-        for (int k = 0; k < this.buttonList.size(); ++k)
-        {
-            GuiButton guibutton = (GuiButton) this.buttonList.get(k);
-            guibutton.drawButton(this.mc, x, y);
-        }
-        buttonToggleAll.drawUnderline();
-
-        drawTitle();
-        drawLogo();
-    }
-
-    protected int getMargin()
-    {
-        return width > itemWidth + 2 ? (width - itemWidth) / 2 : 0;
-    }
-
-    protected void keyTyped(char par1, int par2)
-    {
-        switch (par2)
-        {
-            case Keyboard.KEY_ESCAPE:
-                refreshAndClose();
-                return;
-            // TODO: Arrow keys
-            default:
-                break;
-        }
-    }
-
-    protected boolean isSelected(WaypointManagerItem item)
-    {
-        return itemScrollPane.isSelected(item);
-    }
-
-    @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton)
-    {
-        super.mouseClicked(mouseX, mouseY, mouseButton);
-
-        if (buttonToggleAll.mouseOver(mouseX, mouseY))
+        if (mc == null)
         {
             return;
         }
-        itemScrollPane.mouseClicked(mouseX, mouseY, mouseButton);
+
+        try
+        {
+            itemScrollPane.func_148122_a(width, height, headerHeight, this.height - 30);
+            String[] lastTooltip = itemScrollPane.lastTooltip;
+            long lastTooltipTime = itemScrollPane.lastTooltipTime;
+            itemScrollPane.lastTooltip = null;
+            itemScrollPane.drawScreen(x, y, par3);
+
+            super.drawScreen(x, y, par3);
+
+            // Header buttons
+
+            if (!items.isEmpty())
+            {
+                int headerY = headerHeight - getFontRenderer().FONT_HEIGHT;
+                WaypointManagerItem firstRow = items.get(0);
+                if (firstRow.y > headerY + 16)
+                {
+                    headerY = firstRow.y - 16;
+                }
+
+                buttonToggleAll.centerHorizontalOn(firstRow.getButtonEnableCenterX()).setY(headerY);
+                buttonSortDistance.centerHorizontalOn(firstRow.getLocationLeftX()).setY(headerY);
+                colName = buttonSortDistance.getRightX() + 10;
+
+                buttonSortName.setPosition(colName - 5, headerY);
+            }
+            buttonToggleAll.drawUnderline();
+
+            for (List<SlotMetadata> toolbar : getToolbars().values())
+            {
+                for (SlotMetadata slotMetadata : toolbar)
+                {
+                    slotMetadata.getButton().secondaryDrawButton();
+                }
+            }
+
+            if (itemScrollPane.lastTooltip != null)
+            {
+                if (Arrays.equals(itemScrollPane.lastTooltip, lastTooltip))
+                {
+                    itemScrollPane.lastTooltipTime = lastTooltipTime;
+                    if (System.currentTimeMillis() - itemScrollPane.lastTooltipTime > itemScrollPane.hoverDelay)
+                    {
+                        Button button = itemScrollPane.lastTooltipMetadata.getButton();
+                        drawHoveringText(itemScrollPane.lastTooltip, x, button.getBottomY() + 15);
+                    }
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            JMLogger.logOnce("Error in OptionsManager.drawScreen(): " + t, t);
+        }
+    }
+
+    @Override
+    public void drawBackground(int layer)
+    {
+        //drawDefaultBackground();
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseEvent)
+    {
+        super.mouseClicked(mouseX, mouseY, mouseEvent);
+        boolean pressed = itemScrollPane.mousePressed(mouseX, mouseY, mouseEvent);
+        if (pressed)
+        {
+            checkPressedButton();
+        }
+    }
+
+    @Override
+    protected void mouseMovedOrUp(int mouseX, int mouseY, int mouseEvent)
+    {
+        super.mouseMovedOrUp(mouseX, mouseY, mouseEvent);
+        itemScrollPane.mouseReleased(mouseX, mouseY, mouseEvent);
+
+    }
+
+    @Override
+    protected void mouseClickMove(int mouseX, int mouseY, int lastButtonClicked, long timeSinceMouseClick)
+    {
+        super.mouseClickMove(mouseX, mouseY, lastButtonClicked, timeSinceMouseClick);
+        checkPressedButton();
+    }
+
+    /**
+     * Check the pressed button in the scroll pane and determine if something needs to be updated or refreshed
+     */
+    protected void checkPressedButton()
+    {
+        SlotMetadata slotMetadata = itemScrollPane.getLastPressed();
+        if (slotMetadata != null) // TODO
+        {
+
+
+        }
+
+        ScrollListPane.ISlot parentSlot = (CategorySlot) itemScrollPane.getLastPressedParentSlot();
+        if (parentSlot != null)
+        {
+            // TODO
+        }
     }
 
     @Override
@@ -340,6 +372,7 @@ public class WaypointManager extends JmUI
             boolean state = buttonToggleAll.getToggled();
             state = toggleItems(state);
             buttonToggleAll.setToggled(state);
+            //buttonList.clear(); // todo no hack
             return;
         }
         if (guibutton == buttonOptions)
@@ -347,13 +380,25 @@ public class WaypointManager extends JmUI
             UIManager.getInstance().openMasterOptions(this, Config.Category.Waypoint, Config.Category.WaypointBeacon);
             return;
         }
-
     }
 
-    public void removeWaypoint(WaypointManagerItem item)
+    @Override
+    protected void keyTyped(char c, int i)
     {
-        WaypointStore.instance().remove(item.waypoint);
-        this.items.remove(item);
+        switch (i)
+        {
+            case Keyboard.KEY_ESCAPE:
+            {
+                closeAndReturn();
+                break;
+            }
+        }
+
+        boolean keyUsed = itemScrollPane.keyTyped(c, i);
+        if (keyUsed)
+        {
+            // TODO
+        }
     }
 
     protected boolean toggleItems(boolean enable)
@@ -446,6 +491,9 @@ public class WaypointManager extends JmUI
         {
             Collections.sort(items, currentSort);
         }
+
+        itemScrollPane.setSlots(items);
+        //layoutButtons();
     }
 
     protected void updateCount()
@@ -454,6 +502,22 @@ public class WaypointManager extends JmUI
         String enableOn = Constants.getString("jm.waypoint.enable_all", itemCount, on);
         String enableOff = Constants.getString("jm.waypoint.enable_all", itemCount, off);
         buttonToggleAll.setLabels(enableOff, enableOn);
+    }
+
+    protected boolean isSelected(WaypointManagerItem item)
+    {
+        return itemScrollPane.isSelected(item.getSlotIndex()); // TODO
+    }
+
+    protected int getMargin()
+    {
+        return width > itemWidth + 2 ? (width - itemWidth) / 2 : 0;
+    }
+
+    public void removeWaypoint(WaypointManagerItem item)
+    {
+        WaypointStore.instance().remove(item.waypoint);
+        this.items.remove(item);
     }
 
     protected void refreshAndClose()
@@ -465,6 +529,7 @@ public class WaypointManager extends JmUI
         closeAndReturn();
     }
 
+    @Override
     protected void closeAndReturn()
     {
         if (returnDisplay == null)
@@ -477,126 +542,8 @@ public class WaypointManager extends JmUI
         }
     }
 
-    protected static class DimensionsButton extends Button
+    Map<Config.Category, List<SlotMetadata>> getToolbars()
     {
-        static boolean needInit = true;
-        static WorldProvider currentWorldProvider;
-        final List<WorldProvider> worldProviders = WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions());
-
-        public DimensionsButton()
-        {
-            super(0, 0, "");
-
-            if (needInit || currentWorldProvider != null)
-            {
-                currentWorldProvider = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider;
-                needInit = false;
-            }
-            updateLabel();
-
-            // Determine width
-            fitWidth(FMLClientHandler.instance().getClient().fontRenderer);
-        }
-
-        protected void updateLabel()
-        {
-            String dimName;
-
-            if (currentWorldProvider != null)
-            {
-                dimName = currentWorldProvider.getDimensionName();
-            }
-            else
-            {
-                dimName = Constants.getString("jm.waypoint.dimension_all");
-            }
-            displayString = Constants.getString("jm.waypoint.dimension", dimName);
-        }
-
-        @Override
-        public int getFitWidth(FontRenderer fr)
-        {
-            int maxWidth = 0;
-            for (WorldProvider worldProvider : worldProviders)
-            {
-                String name = Constants.getString("jm.waypoint.dimension", worldProvider.getDimensionName());
-                maxWidth = Math.max(maxWidth, FMLClientHandler.instance().getClient().fontRenderer.getStringWidth(name));
-            }
-            return maxWidth + 12;
-        }
-
-
-        public void nextValue()
-        {
-            int index;
-
-            if (currentWorldProvider == null)
-            {
-                index = 0;
-            }
-            else
-            {
-                index = -1;
-
-                for (WorldProvider worldProvider : worldProviders)
-                {
-                    if (worldProvider.dimensionId == currentWorldProvider.dimensionId)
-                    {
-                        index = worldProviders.indexOf(worldProvider) + 1;
-                        break;
-                    }
-                }
-            }
-
-            if (index >= worldProviders.size() || index < 0)
-            {
-                currentWorldProvider = null; // "All"
-            }
-            else
-            {
-                currentWorldProvider = worldProviders.get(index);
-            }
-
-            updateLabel();
-        }
-    }
-
-    protected class SortButton extends OnOffButton
-    {
-        final WaypointManagerItem.Sort sort;
-        final String labelInactive;
-
-        public SortButton(String label, WaypointManagerItem.Sort sort)
-        {
-            super(String.format("%s %s", label, ASCEND), String.format("%s %s", label, DESCEND), sort.ascending);
-            this.labelInactive = label;
-            this.sort = sort;
-        }
-
-        @Override
-        public void toggle()
-        {
-            sort.ascending = !sort.ascending;
-            setActive(true);
-        }
-
-        @Override
-        public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
-        {
-            super.drawButton(minecraft, mouseX, mouseY);
-            super.drawUnderline();
-        }
-
-        public void setActive(boolean active)
-        {
-            if (active)
-            {
-                setToggled(sort.ascending);
-            }
-            else
-            {
-                displayString = String.format("%s %s", labelInactive, " ");
-            }
-        }
+        return Collections.EMPTY_MAP;
     }
 }
