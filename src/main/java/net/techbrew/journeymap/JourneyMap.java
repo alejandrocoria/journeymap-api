@@ -199,6 +199,18 @@ public class JourneyMap
         }
     }
 
+    public static int getActiveMinimapId()
+    {
+        if (INSTANCE.miniMapProperties1.isActive())
+        {
+            return 1;
+        }
+        else
+        {
+            return 2;
+        }
+    }
+
     public static MiniMapProperties getMiniMapProperties1()
     {
         return INSTANCE.miniMapProperties1;

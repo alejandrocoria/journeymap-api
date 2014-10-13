@@ -14,6 +14,7 @@ http://journeymap.techbrew.net
 ## Changelog for JourneyMap @JMVERSION@:
 - Bugfix: Options Manager - Minimap preview label wasn't hiding after 2 seconds
 - Bugfix: "Found two directories that might be in conflict" was erroneous and spamming the log
+- Bugfix: Minimap Preset used prior to opening Options Manager would be overridden by previewing the other Preset
 
 ## Changelog for JourneyMap 5.0.0b2:
 - Bugfix: NPE thrown by Waypoint Manager will crash game

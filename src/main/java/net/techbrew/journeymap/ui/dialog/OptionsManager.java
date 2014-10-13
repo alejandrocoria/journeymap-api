@@ -38,12 +38,12 @@ import java.util.List;
  */
 public class OptionsManager extends JmUI
 {
+    protected final int inGameMinimapId;
     protected Config.Category[] initialCategories;
     protected CheckBox minimap1PreviewButton;
     protected CheckBox minimap2PreviewButton;
     protected Button minimap1KeysButton, minimap2KeysButton;
     protected Button fullscreenKeysButton;
-
     protected Button buttonClose;
     protected ScrollListPane optionsListPane;
     protected Map<Config.Category, List<SlotMetadata>> toolbars;
@@ -64,6 +64,7 @@ public class OptionsManager extends JmUI
     {
         super("JourneyMap " + Constants.getString("jm.common.options"), returnDisplay);
         this.initialCategories = initialCategories;
+        this.inGameMinimapId = JourneyMap.getActiveMinimapId();
     }
 
     @Override
@@ -505,6 +506,9 @@ public class OptionsManager extends JmUI
         JourneyMap.getMiniMapProperties1().save();
         JourneyMap.getMiniMapProperties2().save();
         JourneyMap.getWaypointProperties().save();
+
+        // Ensure minimap is back to the one used before this opened
+        UIManager.getInstance().getMiniMap().setMiniMapProperties(JourneyMap.getMiniMapProperties(this.inGameMinimapId));
 
         for (Config.Category category : changedCategories)
         {
