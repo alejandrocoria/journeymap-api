@@ -12,7 +12,8 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
-- Change: Added some code to generate a wiki doc for 5.0.0 options: http://journeymap.techbrew.net/help/wiki/Configuration_Files
+- Bugfix: NPE thrown by Waypoint Manager will crash game
+- Change: Added some code to generate a wiki doc for 5.0.0 options, resulting in http://journeymap.techbrew.net/help/wiki/JourneyMap_5.0.0_Options
 - Change: colorpalette.json file now includes a link to the wiki page: http://journeymap.techbrew.net/help/wiki/Color_Palette
 - Typo fixes in en_US.lang:  jm.minimap.show_waypointlabels.tooltip, jm.minimap.texture_size.tooltip
 
