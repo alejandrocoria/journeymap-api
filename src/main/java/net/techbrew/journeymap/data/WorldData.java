@@ -133,13 +133,20 @@ public class WorldData extends CacheLoader<Class, WorldData>
      * @param mc
      * @return
      */
-    public static String getWorldName(Minecraft mc, boolean useLegacyServerName)
+    public static String getWorldName(Minecraft mc, boolean useLegacyName)
     {
         // Get the name
         String worldName = null;
         if (mc.isSingleplayer())
         {
-            worldName = mc.getIntegratedServer().getWorldName();
+            if (useLegacyName)
+            {
+                worldName = mc.getIntegratedServer().getWorldName();
+            }
+            else
+            {
+                worldName = mc.getIntegratedServer().getFolderName();
+            }
         }
         else
         {
@@ -149,7 +156,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
             }
             worldName = mc.theWorld.getWorldInfo().getWorldName();
 
-            String serverName = useLegacyServerName ? getLegacyServerName() : getServerName();
+            String serverName = useLegacyName ? getLegacyServerName() : getServerName();
 
             if (!"MpServer".equals(worldName))
             {

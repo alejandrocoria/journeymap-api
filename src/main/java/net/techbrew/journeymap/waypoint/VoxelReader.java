@@ -105,7 +105,7 @@ public class VoxelReader
 
     public static String getPointsFilename()
     {
-        String worldName = WorldData.getWorldName(FMLClientHandler.instance().getClient());
+        String worldName = WorldData.getWorldName(FMLClientHandler.instance().getClient(), true);
         return String.format("mods\\VoxelMods\\voxelMap\\%s.points", worldName);
     }
 

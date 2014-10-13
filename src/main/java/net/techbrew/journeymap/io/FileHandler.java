@@ -146,7 +146,6 @@ public class FileHandler
 
         try
         {
-            String worldName = WorldData.getWorldName(minecraft);
             if (!minecraft.isSingleplayer())
             {
                 String legacyWorldName = WorldData.getWorldName(minecraft, true);
@@ -157,16 +156,25 @@ public class FileHandler
                 {
                     suffix = "_" + worldUid;
                 }
-                worldDir = new File(mcDir, Constants.MP_DATA_DIR + worldName + suffix); //$NON-NLS-1$
+                worldDir = new File(mcDir, Constants.MP_DATA_DIR + WorldData.getWorldName(minecraft, false) + suffix); //$NON-NLS-1$
 
                 if (legacyWorldDir.exists())
                 {
-                    migrateLegacyServerName(legacyWorldDir, worldDir);
+                    migrateLegacyFolderName(legacyWorldDir, worldDir);
                 }
             }
             else
             {
-                worldDir = new File(mcDir, Constants.SP_DATA_DIR + worldName);
+                File legacyWorldDir = new File(mcDir, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, true));
+                worldDir = new File(mcDir, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, false));
+                if (legacyWorldDir.exists() && !worldDir.exists())
+                {
+                    migrateLegacyFolderName(legacyWorldDir, worldDir);
+                }
+                else if (legacyWorldDir.exists() && worldDir.exists())
+                {
+                    JourneyMap.getLogger().warn(String.format("Found two directories that might be in conflict. Using:  %s , Ignoring: %s", worldDir, legacyWorldDir));
+                }
             }
 
             worldDir.mkdirs();
@@ -180,7 +188,7 @@ public class FileHandler
         return worldDir;
     }
 
-    private static void migrateLegacyServerName(File legacyWorldDir, File worldDir)
+    private static void migrateLegacyFolderName(File legacyWorldDir, File worldDir)
     {
         boolean success = false;
         try
@@ -190,11 +198,11 @@ public class FileHandler
             {
                 throw new IllegalStateException("Need to rename legacy folder, but not able to");
             }
-            JourneyMap.getLogger().info(String.format("Migrated legacy server folder from %s to %s", legacyWorldDir.getName(), worldDir.getName()));
+            JourneyMap.getLogger().info(String.format("Migrated legacy folder from %s to %s", legacyWorldDir.getName(), worldDir.getName()));
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn(String.format("Failed to migrate legacy server folder from %s to %s", legacyWorldDir.getName(), worldDir.getName()));
+            JourneyMap.getLogger().warn(String.format("Failed to migrate legacy folder from %s to %s", legacyWorldDir.getName(), worldDir.getName()));
 
             String tempName = worldDir.getName() + "__OLD";
             try
@@ -207,7 +215,7 @@ public class FileHandler
             }
             if (!success)
             {
-                JourneyMap.getLogger().warn(String.format("Failed to even rename legacy server folder from %s to %s", legacyWorldDir.getName(), tempName));
+                JourneyMap.getLogger().warn(String.format("Failed to even rename legacy folder from %s to %s", legacyWorldDir.getName(), tempName));
             }
         }
     }
