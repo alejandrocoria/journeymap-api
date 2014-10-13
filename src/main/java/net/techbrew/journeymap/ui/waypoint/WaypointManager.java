@@ -492,7 +492,10 @@ public class WaypointManager extends JmUI
             Collections.sort(items, currentSort);
         }
 
-        itemScrollPane.setSlots(items);
+        if (itemScrollPane != null)
+        {
+            itemScrollPane.setSlots(items);
+        }
         //layoutButtons();
     }
 
