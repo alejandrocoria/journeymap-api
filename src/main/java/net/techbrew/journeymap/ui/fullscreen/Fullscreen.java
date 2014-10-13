@@ -513,8 +513,8 @@ public class Fullscreen extends JmUI
         int margin = mapTypeToolbar.getHMargin();
 
         layoutToolbars(margin, topY, padding, hideOptionsToolbar);
-        buttonClose.leftOf(width - padding).below(mapTypeToolbar.getVMargin());
-        buttonAlert.leftOf(width - padding).below(buttonClose, padding);
+        buttonClose.leftOf(width - zoomToolbar.getHMargin()).below(mapTypeToolbar.getVMargin());
+        buttonAlert.leftOf(width - zoomToolbar.getHMargin()).below(buttonClose, padding);
 
 
         if (!hideOptionsToolbar)
