@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.ui.option;
 
+import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import com.google.common.util.concurrent.AtomicDouble;
 import net.techbrew.journeymap.Constants;
@@ -79,14 +80,20 @@ public class OptionSlotFactory
             for (ScrollListPane.ISlot rootSlot : categories)
             {
                 CategorySlot categorySlot = (CategorySlot) rootSlot;
-                Config.Category category = categorySlot.getCategory();
 
+                if (categorySlot.category == Config.Category.MiniMap2)
+                {
+                    continue;
+                }
                 doc(categorySlot);
+                docTable(true);
 
+                categorySlot.sort();
                 for (SlotMetadata childSlot : categorySlot.getAllChildMetadata())
                 {
-                    doc(childSlot);
+                    doc(childSlot, categorySlot.getCategory() == Config.Category.Advanced);
                 }
+                docTable(false);
             }
 
             endDoc();
@@ -338,6 +345,7 @@ public class OptionSlotFactory
             button.setDefaultStyle(false);
             button.setDrawBackground(false);
             SlotMetadata<String> slotMetadata = new SlotMetadata<String>(button, name, tooltip, defaultTip, slp.getDefaultString(), advanced);
+            slotMetadata.setValueList(slp.getStrings());
             return slotMetadata;
         }
         catch (Exception e)
@@ -356,7 +364,7 @@ public class OptionSlotFactory
             String name = getName(annotation);
             String tooltip = getTooltip(annotation);
             Class<? extends Enum> enumClass = property.get().getClass();
-            Collection<Enum> enumSet = new ArrayList<Enum>(EnumSet.allOf(enumClass));
+            ArrayList<Enum> enumSet = new ArrayList<Enum>(EnumSet.allOf(enumClass));
             String defaultTip = Constants.getString("jm.config.default", Enum.valueOf(enumClass, annotation.defaultEnum()));
             boolean advanced = annotation.category() == Config.Category.Advanced;
 
@@ -364,6 +372,7 @@ public class OptionSlotFactory
             button.setDefaultStyle(false);
             button.setDrawBackground(false);
             SlotMetadata<Enum> slotMetadata = new SlotMetadata<Enum>(button, name, tooltip, defaultTip, property.get(), advanced);
+            slotMetadata.setValueList(enumSet);
             return slotMetadata;
         }
         catch (Exception e)
@@ -390,6 +399,12 @@ public class OptionSlotFactory
                 docWriter = Files.newWriter(docFile, UTF8);
                 docWriter.append(String.format("<!-- Generated %s -->", new Date()));
                 docWriter.newLine();
+                docWriter.append("=== Overview ===");
+                docWriter.newLine();
+                docWriter.append("{{version|5.0.0|page}}");
+                docWriter.newLine();
+                docWriter.append("This page lists all of the available options which can be configured in-game using the JourneyMap [[Options Manager]].");
+                docWriter.append("(Note: All of this information can also be obtained from the tooltips within the [[Options Manager]] itself.) <br clear/> <br clear/>");
                 docWriter.newLine();
             }
             catch (IOException e)
@@ -401,13 +416,12 @@ public class OptionSlotFactory
 
     static void doc(CategorySlot categorySlot)
     {
-        ensureDocFile();
-
         try
         {
-            docWriter.append(String.format("===%s===", categorySlot.category.name()));
             docWriter.newLine();
-            docWriter.append(String.format("''%s''", categorySlot.getMetadata().iterator().next().tooltip));
+            docWriter.append(String.format("==%s==", categorySlot.name.replace("Preset 1", "Preset (1 and 2)")));
+            docWriter.newLine();
+            docWriter.append(String.format("''%s''", categorySlot.getMetadata().iterator().next().tooltip.replace("Preset 1", "Preset (1 and 2)")));
             docWriter.newLine();
             docWriter.newLine();
         }
@@ -417,18 +431,52 @@ public class OptionSlotFactory
         }
     }
 
-    static void doc(SlotMetadata slotMetadata)
+    static void docTable(boolean start)
     {
-        ensureDocFile();
-
         try
         {
-            docWriter.append(String.format(";%s", slotMetadata.getName()));
+            if (start)
+            {
+                docWriter.append("{| class=\"wikitable\" style=\"cellpadding=\"4\"");
+                docWriter.newLine();
+                docWriter.append("! scope=\"col\" | Option");
+                docWriter.newLine();
+                docWriter.append("! scope=\"col\" | Purpose");
+                docWriter.newLine();
+                docWriter.append("! scope=\"col\" | Range / Default Value");
+                docWriter.newLine();
+                docWriter.append("|-");
+                docWriter.newLine();
+            }
+            else
+            {
+                docWriter.append("|}");
+                docWriter.newLine();
+            }
+
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void doc(SlotMetadata slotMetadata, boolean advanced)
+    {
+        try
+        {
+            String color = advanced ? "red" : "black";
+            docWriter.append(String.format("| style=\"text-align:right; white-space: nowrap; font-weight:bold; padding:6px; color:%s\" | %s", color, slotMetadata.getName()));
             docWriter.newLine();
-            docWriter.append(String.format(":: %s", slotMetadata.tooltip));
+            docWriter.append(String.format("| %s ", slotMetadata.tooltip));
+            if (slotMetadata.getValueList() != null)
+            {
+                docWriter.append(String.format("<br/><em>Choices available:</em> <code>%s</code>", Joiner.on(", ").join(slotMetadata.getValueList())));
+            }
             docWriter.newLine();
-            docWriter.append(String.format(":: <code>%s</code>", slotMetadata.range.replace("[", "").replace("]", "").trim()));
+            docWriter.append(String.format("| <code>%s</code>", slotMetadata.range.replace("[", "").replace("]", "").trim()));
             docWriter.newLine();
+            docWriter.append("|-");
             docWriter.newLine();
         }
         catch (IOException e)

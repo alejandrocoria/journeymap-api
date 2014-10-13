@@ -24,6 +24,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
     protected final boolean advanced;
     protected final ValueType valueType;
     protected String[] tooltipLines;
+    protected List valueList;
     protected boolean master;
     protected int order;
 
@@ -133,6 +134,16 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
     public void setOrder(int order)
     {
         this.order = order;
+    }
+
+    public List getValueList()
+    {
+        return valueList;
+    }
+
+    public void setValueList(List valueList)
+    {
+        this.valueList = valueList;
     }
 
     public String[] getTooltip()
