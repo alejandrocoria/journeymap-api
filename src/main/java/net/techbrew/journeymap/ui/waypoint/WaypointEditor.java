@@ -16,6 +16,7 @@ import net.minecraft.world.WorldProvider;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WorldData;
+import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.FullMapProperties;
@@ -165,7 +166,15 @@ public class WaypointEditor extends JmUI
                 for (WorldProvider provider : WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions()))
                 {
                     int dim = provider.dimensionId;
-                    String dimName = provider.getDimensionName();
+                    String dimName = Integer.toString(dim);
+                    try
+                    {
+                        dimName = provider.getDimensionName();
+                    }
+                    catch (Exception e)
+                    {
+                        JMLogger.logOnce("Can't get dimension name from provider: ", e);
+                    }
                     dimButtonList.add(new DimensionButton(0, dim, dimName, wpDims.contains(dim)));
                 }
 
