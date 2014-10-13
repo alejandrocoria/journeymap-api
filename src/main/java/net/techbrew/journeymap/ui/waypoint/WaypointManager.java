@@ -67,7 +67,7 @@ public class WaypointManager extends JmUI
 
     public WaypointManager(Waypoint focusWaypoint, JmUI returnDisplay)
     {
-        super("JourneyMap " + Constants.getString("jm.waypoint.manage_title"), returnDisplay);
+        super(Constants.getString("jm.waypoint.manage_title"), returnDisplay);
         this.focusWaypoint = focusWaypoint;
     }
 
@@ -87,8 +87,8 @@ public class WaypointManager extends JmUI
                 String distanceLabel = Constants.getString("jm.waypoint.distance");
                 buttonSortDistance = new SortButton(distanceLabel, distanceSort);
                 buttonSortDistance.setTextOnly(fr);
-                String tooltip = Constants.getString("jm.waypoint.distance.tooltip");
-                buttonSortDistance.setTooltip(tooltip);
+//                String tooltip = Constants.getString("jm.waypoint.distance.tooltip");
+//                buttonSortDistance.setTooltip(tooltip);
             }
             buttonList.add(buttonSortDistance);
 
@@ -97,8 +97,8 @@ public class WaypointManager extends JmUI
                 WaypointManagerItem.Sort nameSort = new WaypointManagerItem.NameComparator(true);
                 buttonSortName = new SortButton(Constants.getString("jm.waypoint.name"), nameSort);
                 buttonSortName.setTextOnly(fr);
-                String tooltip = Constants.getString("jm.waypoint.name.tooltip");
-                buttonSortName.setTooltip(tooltip);
+//                String tooltip = Constants.getString("jm.waypoint.name.tooltip");
+//                buttonSortName.setTooltip(tooltip);
             }
             buttonList.add(buttonSortName);
 
@@ -108,8 +108,8 @@ public class WaypointManager extends JmUI
                 String enableOff = Constants.getString("jm.waypoint.enable_all", "", off);
                 buttonToggleAll = new OnOffButton(enableOff, enableOn, true);
                 buttonToggleAll.setTextOnly(getFontRenderer());
-                String tooltip = Constants.getString("jm.waypoint.enable_all.tooltip");
-                buttonToggleAll.setTooltip(tooltip);
+//                String tooltip = Constants.getString("jm.waypoint.enable_all.tooltip");
+//                buttonToggleAll.setTooltip(tooltip);
             }
             buttonList.add(buttonToggleAll);
 
@@ -124,24 +124,24 @@ public class WaypointManager extends JmUI
                 buttonAdd = new Button(Constants.getString("jm.waypoint.new"));
                 buttonAdd.fitWidth(getFontRenderer());
                 buttonAdd.setWidth(buttonAdd.getWidth() * 2);
-                String tooltip = Constants.getString("jm.waypoint.new.tooltip");
-                buttonAdd.setTooltip(tooltip);
+//                String tooltip = Constants.getString("jm.waypoint.new.tooltip");
+//                buttonAdd.setTooltip(tooltip);
             }
 
             if (buttonHelp == null)
             {
                 buttonHelp = new Button(Constants.getString("jm.common.help"));
                 buttonHelp.fitWidth(getFontRenderer());
-                String tooltip = Constants.getString("jm.waypoint.help.tooltip");
-                buttonHelp.setTooltip(tooltip);
+//                String tooltip = Constants.getString("jm.waypoint.help.tooltip");
+//                buttonHelp.setTooltip(tooltip);
             }
 
             if (buttonOptions == null)
             {
                 buttonOptions = new Button(Constants.getString("jm.common.options_button"));
                 buttonOptions.fitWidth(getFontRenderer());
-                String tooltip = Constants.getString("jm.waypoint.help.tooltip");
-                buttonOptions.setTooltip(tooltip);
+//                String tooltip = Constants.getString("jm.waypoint.help.tooltip");
+//                buttonOptions.setTooltip(tooltip);
             }
 
             buttonClose = new Button(Constants.getString("jm.common.close"));
@@ -377,7 +377,7 @@ public class WaypointManager extends JmUI
         }
         if (guibutton == buttonOptions)
         {
-            UIManager.getInstance().openMasterOptions(this, Config.Category.Waypoint, Config.Category.WaypointBeacon);
+            UIManager.getInstance().openOptionsManager(this, Config.Category.Waypoint, Config.Category.WaypointBeacon);
             return;
         }
     }

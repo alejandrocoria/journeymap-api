@@ -136,7 +136,7 @@ public class Fullscreen extends JmUI
         // Check for first-time use
         if (!JourneyMap.getCoreProperties().optionsManagerUsed.get())
         {
-            UIManager.getInstance().openMasterOptions(this, Config.Category.MiniMap1, Config.Category.FullMap);
+            UIManager.getInstance().openOptionsManager(this, Config.Category.MiniMap1, Config.Category.FullMap);
         }
     }
 

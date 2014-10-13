@@ -201,7 +201,7 @@ public class UIManager
         open(OptionsManager.class);
     }
 
-    public void openMasterOptions(JmUI returnDisplay, Config.Category... initialCategories)
+    public void openOptionsManager(JmUI returnDisplay, Config.Category... initialCategories)
     {
         try
         {
