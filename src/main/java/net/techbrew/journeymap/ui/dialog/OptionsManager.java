@@ -351,12 +351,14 @@ public class OptionsManager extends JmUI
             {
                 minimap2PreviewButton.setToggled(false);
                 UIManager.getInstance().switchMiniMapPreset(1);
+                UIManager.getInstance().getMiniMap().resetInitTime();
             }
 
             if (slotMetadata.getButton() == minimap2PreviewButton)
             {
                 minimap1PreviewButton.setToggled(false);
                 UIManager.getInstance().switchMiniMapPreset(2);
+                UIManager.getInstance().getMiniMap().resetInitTime();
             }
 
             if (slotMetadata.getButton() == minimap1KeysButton || slotMetadata.getButton() == minimap2KeysButton)

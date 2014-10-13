@@ -93,6 +93,10 @@ public class MiniMap
         gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
         state.requireRefresh();
         state.refresh(mc, player, miniMapProperties);
+    }
+
+    public void resetInitTime()
+    {
         initTime = System.currentTimeMillis();
     }
 

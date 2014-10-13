@@ -12,6 +12,9 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Options Manager - Minimap preview label wasn't hiding after 2 seconds
+
+## Changelog for JourneyMap 5.0.0b2:
 - Bugfix: NPE thrown by Waypoint Manager will crash game
 - Change: Added some code to generate a wiki doc for 5.0.0 options, resulting in http://journeymap.techbrew.net/help/wiki/JourneyMap_5.0.0_Options
 - Change: colorpalette.json file now includes a link to the wiki page: http://journeymap.techbrew.net/help/wiki/Color_Palette
