@@ -167,11 +167,6 @@ public class JMLogger
         props.put("Version", JourneyMap.MOD_NAME + ", built with Forge " + JourneyMap.FORGE_VERSION);
         props.put("Forge", ForgeVersion.getVersion());
 
-        // Memory
-        long totalMB = Runtime.getRuntime().totalMemory() / 1024 / 1024;
-        long freeMB = Runtime.getRuntime().freeMemory() / 1024 / 1024;
-        props.put("Memory", String.format("%sMB total, %sMB free", totalMB, freeMB));
-
         // Environment
         List<String> envProps = Arrays.asList("os.name, os.arch, java.version, user.country, user.language");
         StringBuilder sb = new StringBuilder();

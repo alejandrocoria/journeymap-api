@@ -407,7 +407,13 @@ public class JourneyMap
             taskController = new TaskController();
             taskController.enableTasks();
 
-            logger.info(String.format("Mapping started in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, mc.theWorld.provider.dimensionId)); //$NON-NLS-1$
+            long totalMB = Runtime.getRuntime().totalMemory() / 1024 / 1024;
+            long freeMB = Runtime.getRuntime().freeMemory() / 1024 / 1024;
+            String memory = String.format("Memory: %sMB total, %sMB free", totalMB, freeMB);
+            logger.info(String.format("Mapping started in %s%sDIM%s, %s: ", FileHandler.getJMWorldDir(mc, currentWorldId),
+                    File.separator,
+                    mc.theWorld.provider.dimensionId,
+                    memory)); //$NON-NLS-1$
         }
     }
 
