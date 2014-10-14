@@ -215,6 +215,11 @@ public class ColorPalette
         {
             GameRegistry.UniqueIdentifier uid = new GameRegistry.UniqueIdentifier(blockColor.uid);
             Block block = GameRegistry.findBlock(uid.modId, uid.name);
+            if (block == null)
+            {
+                JourneyMap.getLogger().warn("Block referenced in Color Palette is not registered: " + uid);
+                continue;
+            }
             BlockMD blockMD = DataCache.instance().getBlockMD(block, blockColor.meta);
             if (blockMD.hasFlag(BlockMD.Flag.Transparency))
             {

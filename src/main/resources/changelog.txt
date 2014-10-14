@@ -12,6 +12,7 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: NPE when ColorPalette loading from file encountered Blocks which are no longer in the game registry
 - Change: Radar-related caches are purged after Options Manager is closed whenever Minimap/Fullscreen Map options are changed. Makes changed options immediate without waiting for cache timeouts.
 
 ## Changelog for JourneyMap 5.0.0b3:
