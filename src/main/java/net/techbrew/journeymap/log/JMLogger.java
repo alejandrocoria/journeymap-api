@@ -104,7 +104,7 @@ public class JMLogger
 
             LoggerConfig loggerConfig = config.getLoggerConfig(logger.getName());
             loggerConfig.setLevel(Level.INFO);
-            loggerConfig.addAppender(fileAppender, Level.ALL, null);
+            loggerConfig.addAppender(fileAppender, Level.INFO, null);
             context.updateLoggers();
 
             if (!fileAppender.isStarted())
