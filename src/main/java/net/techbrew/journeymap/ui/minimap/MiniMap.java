@@ -174,7 +174,8 @@ public class MiniMap
             updateDisplayVars(false);
 
             // Update labels if needed
-            if (System.currentTimeMillis() - lastLabelRefresh > labelRefreshRate)
+            long now = System.currentTimeMillis();
+            if (now - lastLabelRefresh > labelRefreshRate)
             {
                 updateLabels();
             }
@@ -249,13 +250,13 @@ public class MiniMap
                 }
 
                 // Draw Minimap Id
-                if (preview && System.currentTimeMillis() - initTime <= 2000)
+                if (now - initTime <= 1000)
                 {
                     if (!unicodeForced)
                     {
                         DrawUtil.startUnicode(mc.fontRenderer, true);
                     }
-                    int alpha = (int) Math.min(255, Math.max(0, 2100 - (System.currentTimeMillis() - initTime)));
+                    int alpha = (int) Math.min(255, Math.max(0, 1100 - (now - initTime)));
                     DrawUtil.drawLabel(Integer.toString(miniMapProperties.getId()), centerPoint.getX(), centerPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, Math.max(0, alpha - 100), Color.white, alpha, 8, false, rotation);
                     if (!unicodeForced)
                     {
@@ -537,6 +538,7 @@ public class MiniMap
 
     public void reset()
     {
+        initTime = System.currentTimeMillis();
         initGridRenderer();
         updateDisplayVars(miniMapProperties.shape.get(), miniMapProperties.position.get(), true);
         MiniMapOverlayHandler.checkEventConfig();

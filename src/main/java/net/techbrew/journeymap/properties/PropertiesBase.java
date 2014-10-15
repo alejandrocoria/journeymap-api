@@ -32,10 +32,13 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public abstract class PropertiesBase
 {
+    // GSON charset
     protected static final Charset UTF8 = Charset.forName("UTF-8");
+
     // Flag the serializers can use to signal the file format needs to be updated
     protected static transient final AtomicBoolean configFormatChanged = new AtomicBoolean(false);
 
+    // Headers to output before file
     private static final String[] HEADERS = {
             "// " + Constants.getString("jm.config.file_header_1"),
             "// " + Constants.getString("jm.config.file_header_2", Constants.CONFIG_DIR),
@@ -43,6 +46,7 @@ public abstract class PropertiesBase
             "// " + Constants.getString("jm.config.file_header_4"),
             "// " + Constants.getString("jm.config.file_header_5", "http://journeymap.techbrew.net/help/wiki/Configuration_Files")
     };
+
     // Gson for file persistence
     protected transient final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
