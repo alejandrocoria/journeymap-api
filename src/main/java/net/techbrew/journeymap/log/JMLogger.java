@@ -21,10 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.MarkerManager;
 import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.RandomAccessFileAppender;
-import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.impl.Log4jLogEvent;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.message.SimpleMessage;
@@ -81,9 +78,6 @@ public class JMLogger
                 logFile.getParentFile().mkdirs();
             }
 
-            LoggerContext context = (LoggerContext) LogManager.getContext(false);
-            Configuration config = context.getConfiguration();
-
             PatternLayout layout = PatternLayout.createLayout(
                     "[%d{HH:mm:ss}] [%t/%level] [%C{1}] %msg%n", null,
                     null, "UTF-8", "true");
@@ -96,17 +90,13 @@ public class JMLogger
                             "true",// immediateFlush
                             "true",// ignoreExceptions
                             layout,
-                            null,// filter
+                            null,
                             "false",// advertise
                             null,// advertiseURI
                             null// config
                     );
 
-            LoggerConfig loggerConfig = config.getLoggerConfig(logger.getName());
-            loggerConfig.setLevel(Level.INFO);
-            loggerConfig.addAppender(fileAppender, Level.INFO, null);
-            context.updateLoggers();
-
+            ((org.apache.logging.log4j.core.Logger) logger).addAppender(fileAppender);
             if (!fileAppender.isStarted())
             {
                 fileAppender.start();
@@ -132,11 +122,7 @@ public class JMLogger
         try
         {
             final Logger logger = LogManager.getLogger(JourneyMap.MOD_ID);
-            LoggerContext context = (LoggerContext) LogManager.getContext(false);
-            Configuration config = context.getConfiguration();
-            LoggerConfig loggerConfig = config.getLoggerConfig(logger.getName());
-            Level logLevel = Level.toLevel(JourneyMap.getCoreProperties().logLevel.get(), Level.INFO);
-            loggerConfig.setLevel(logLevel);
+            ((org.apache.logging.log4j.core.Logger) logger).setLevel(Level.toLevel(JourneyMap.getCoreProperties().logLevel.get(), Level.INFO));
         }
         catch (Throwable t)
         {

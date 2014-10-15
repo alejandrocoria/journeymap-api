@@ -143,7 +143,7 @@ public class JourneyMap
      */
     public static Logger getLogger()
     {
-        return INSTANCE.logger == null ? LogManager.getLogger(JourneyMap.MOD_ID) : INSTANCE.logger;
+        return LogManager.getLogger(JourneyMap.MOD_ID);
     }
 
     public static CoreProperties getCoreProperties()
