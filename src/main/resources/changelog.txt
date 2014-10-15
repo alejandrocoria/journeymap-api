@@ -15,6 +15,7 @@ http://journeymap.techbrew.net
 - Bugfix: NPE when ColorPalette loading from file encountered Blocks which are no longer in the game registry
 - Bugfix: Logfile config wasn't correctly set to just get JourneyMap log messages, and also messed with FML's root logger when unnecessary
 - Change: Radar-related caches are purged after Options Manager is closed whenever Minimap/Fullscreen Map options are changed. Makes changed options immediate without waiting for cache timeouts.
+- Change: MiniMap Preset ID now shown when you switch in-game
 - Change: Memory usage logging moved to start of mapping rather than during init.
 
 ## Changelog for JourneyMap 5.0.0b3:
