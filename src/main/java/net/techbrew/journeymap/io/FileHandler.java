@@ -40,6 +40,8 @@ public class FileHandler
     public static final String ASSETS_JOURNEYMAP = "/assets/journeymap";
     public static final String ASSETS_JOURNEYMAP_WEB = "/assets/journeymap/web";
 
+    private static final File MinecraftDirectory = FMLClientHandler.instance().getClient().mcDataDir;
+    private static final File JourneyMapDirectory = new File(MinecraftDirectory, Constants.JOURNEYMAP_DIR);
 
     public static File getMCWorldDir(Minecraft minecraft)
     {
@@ -111,9 +113,47 @@ public class FileHandler
         }
     }
 
+    public static void migrateJourneyMapDir()
+    {
+        try
+        {
+
+            File[] files = MinecraftDirectory.listFiles();
+            if (files != null)
+            {
+                for (File legacyDir : files)
+                {
+                    if (legacyDir.isDirectory() && legacyDir.getName().equals(Constants.JOURNEYMAP_DIR_LEGACY))
+                    {
+
+                        try
+                        {
+                            JourneyMap.getLogger().info(String.format("Renaming \"%s\" to \"%s\".",
+                                    legacyDir, JourneyMapDirectory));
+                            File backupDir = new File(MinecraftDirectory, Constants.JOURNEYMAP_DIR_BACKUP);
+                            legacyDir.renameTo(backupDir);
+                            backupDir.renameTo(JourneyMapDirectory);
+                        }
+                        catch (Throwable t)
+                        {
+                            JMLogger.logOnce(String.format("Could not rename \"%s\" to \"%s\" ! Please shut down and rename it manually.",
+                                    legacyDir, JourneyMapDirectory), t);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            JMLogger.logOnce(String.format("Could not rename old directory to \"%s\" ! Please shut down and rename it manually.",
+                    JourneyMapDirectory), t);
+        }
+    }
+
     public static File getJourneyMapDir()
     {
-        return new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.JOURNEYMAP_DIR);
+        return JourneyMapDirectory;
     }
 
 
@@ -141,8 +181,6 @@ public class FileHandler
             return null;
         }
 
-        File mcDir = minecraft.mcDataDir;
-
         File worldDir = null;
 
         try
@@ -150,14 +188,14 @@ public class FileHandler
             if (!minecraft.isSingleplayer())
             {
                 String legacyWorldName = WorldData.getWorldName(minecraft, true);
-                File legacyWorldDir = new File(mcDir, Constants.MP_DATA_DIR + legacyWorldName + "_0"); //$NON-NLS-1$
+                File legacyWorldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + legacyWorldName + "_0"); //$NON-NLS-1$
 
                 String suffix = "";
                 if (worldUid != null)
                 {
                     suffix = "_" + worldUid;
                 }
-                worldDir = new File(mcDir, Constants.MP_DATA_DIR + WorldData.getWorldName(minecraft, false) + suffix); //$NON-NLS-1$
+                worldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + WorldData.getWorldName(minecraft, false) + suffix); //$NON-NLS-1$
 
                 if (legacyWorldDir.exists())
                 {
@@ -166,8 +204,8 @@ public class FileHandler
             }
             else
             {
-                File legacyWorldDir = new File(mcDir, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, true));
-                worldDir = new File(mcDir, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, false));
+                File legacyWorldDir = new File(MinecraftDirectory, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, true));
+                worldDir = new File(MinecraftDirectory, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, false));
 
                 if (!legacyWorldDir.getName().equals(worldDir.getName()))
                 {
@@ -397,7 +435,6 @@ public class FileHandler
             {
                 JourneyMap.getLogger().error("Could not open path with /usr/bin/open: " + path + " : " + LogFormatter.toString(e));
             }
-
         }
         else
         {
@@ -430,82 +467,6 @@ public class FileHandler
             Sys.openURL("file://" + path);
         }
     }
-
-//    public static boolean serializeCache(String name, Serializable cache)
-//    {
-//        try
-//        {
-//            File cacheDir = getCacheDir();
-//            if (!cacheDir.exists())
-//            {
-//                cacheDir.mkdirs();
-//            }
-//
-//            File cacheFile = new File(cacheDir, name);
-//
-//            FileOutputStream fileOut = new FileOutputStream(cacheFile);
-//            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-//            out.writeObject(cache);
-//            out.close();
-//            fileOut.close();
-//            return true;
-//        }
-//        catch (IOException e)
-//        {
-//            JourneyMap.getLogger().error("Could not serialize cache: " + name + " : " + LogFormatter.toString(e));
-//            return false;
-//        }
-//    }
-//
-//    public static boolean writeDebugFile(String name, String contents)
-//    {
-//        try
-//        {
-//            File debugFile = new File(getJourneyMapDir(), "DEBUG-" + name);
-//            FileWriter writer = new FileWriter(debugFile, false);
-//            writer.write(contents);
-//            writer.flush();
-//            writer.close();
-//            return true;
-//        }
-//        catch (IOException e)
-//        {
-//            JourneyMap.getLogger().error("Could not write debug file: " + name + " : " + LogFormatter.toString(e));
-//            return false;
-//        }
-//    }
-
-//    public static <C extends Serializable> C deserializeCache(String name, Class<C> cacheClass)
-//    {
-//
-//        File cacheFile = new File(getCacheDir(), name);
-//        if (!cacheFile.exists())
-//        {
-//            return null;
-//        }
-//        try
-//        {
-//            FileInputStream fileIn = new FileInputStream(cacheFile);
-//            ObjectInputStream in = new ObjectInputStream(fileIn);
-//            C cache = (C) in.readObject();
-//            in.close();
-//            fileIn.close();
-//            if (cache.getClass() != cacheClass)
-//            {
-//                throw new ClassCastException(cache.getClass() + " can't be cast to " + cacheClass);
-//            }
-//            return cache;
-//        }
-//        catch (Exception e)
-//        {
-//            JourneyMap.getLogger().warn("Could not deserialize cache: " + name + " : " + e);
-//            if (cacheFile.exists())
-//            {
-//                cacheFile.delete();
-//            }
-//            return null;
-//        }
-//    }
 
     public static void copyResources(File targetDirectory, String assetsPath, String setName, boolean overwrite)
     {

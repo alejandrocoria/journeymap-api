@@ -29,18 +29,19 @@ public class Constants
 {
     public static final Ordering<String> CASE_INSENSITIVE_NULL_SAFE_ORDER = Ordering.from(String.CASE_INSENSITIVE_ORDER).nullsLast(); // or nullsFirst()
     public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
-    public static String JOURNEYMAP_DIR = "journeyMap" + File.separator; //$NON-NLS-1$
-    public static String CONFIG_DIR = JOURNEYMAP_DIR + "config" + File.separator; //$NON-NLS-1$
-    @Deprecated
-    public static String CUSTOM_DIR = JOURNEYMAP_DIR + "custom" + File.separator; //$NON-NLS-1$
-    public static String ICON_DIR = JOURNEYMAP_DIR + "icon" + File.separator; //$NON-NLS-1$
-    public static String ENTITY_ICON_DIR = ICON_DIR + File.separator + "entity" + File.separator; //$NON-NLS-1$
-    public static String WAYPOINT_ICON_DIR = ICON_DIR + File.separator + "waypoint" + File.separator; //$NON-NLS-1$
-    public static String THEME_ICON_DIR = ICON_DIR + File.separator + "theme" + File.separator; //$NON-NLS-1$
-    public static String CACHE_DIR = JOURNEYMAP_DIR + "cache" + File.separator; //$NON-NLS-1$
-    public static String DATA_DIR = JOURNEYMAP_DIR + "data" + File.separator; //$NON-NLS-1$
-    public static String SP_DATA_DIR = DATA_DIR + WorldType.sp + File.separator;
-    public static String MP_DATA_DIR = DATA_DIR + WorldType.mp + File.separator;
+    private static final String END = null;
+    public static String JOURNEYMAP_DIR_LEGACY = "journeyMap";
+    public static String JOURNEYMAP_DIR_BACKUP = "journeymap_bak";
+    public static String JOURNEYMAP_DIR = "journeymap";
+    public static String CONFIG_DIR = pathJoiner.join(JOURNEYMAP_DIR, "config", END);
+    public static String ICON_DIR = pathJoiner.join(JOURNEYMAP_DIR, "icon", END);
+    public static String ENTITY_ICON_DIR = pathJoiner.join(ICON_DIR, "entity", END);
+    public static String WAYPOINT_ICON_DIR = pathJoiner.join(ICON_DIR, "waypoint", END);
+    public static String THEME_ICON_DIR = pathJoiner.join(ICON_DIR, "theme", END);
+    public static String CACHE_DIR = pathJoiner.join(JOURNEYMAP_DIR, "cache", END);
+    public static String DATA_DIR = pathJoiner.join(JOURNEYMAP_DIR, "data", END);
+    public static String SP_DATA_DIR = pathJoiner.join(DATA_DIR, WorldType.sp, END);
+    public static String MP_DATA_DIR = pathJoiner.join(DATA_DIR, WorldType.mp, END);
     public static String RESOURCE_PACKS_DEFAULT = "Default";
     public static String CONTROL_KEYNAME_COMBO;
     public static String KEYBINDING_CATEGORY;
@@ -51,10 +52,11 @@ public class Constants
     public static KeyBinding KB_MAP_NIGHT;
     public static KeyBinding KB_MINIMAP_PRESET;
     public static KeyBinding KB_WAYPOINT;
+    private static Joiner pathJoiner = Joiner.on(File.separator).useForNull(File.separator);
 
     public static List<KeyBinding> initKeybindings()
     {
-        CONTROL_KEYNAME_COMBO = "Ctrl+";
+        CONTROL_KEYNAME_COMBO = "Ctrl,";
         KEYBINDING_CATEGORY = Constants.getString("jm.common.hotkeys_keybinding_category", CONTROL_KEYNAME_COMBO);
         KB_MAP = new KeyBinding("key.journeymap.map_toggle", Keyboard.KEY_J, KEYBINDING_CATEGORY);
         KB_MAP_ZOOMIN = new KeyBinding("key.journeymap.zoom_in", Keyboard.KEY_EQUALS, KEYBINDING_CATEGORY);
@@ -76,7 +78,7 @@ public class Constants
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn("Couldn't determine locale from game settings, defaulting to " + locale);
+            JourneyMap.getLogger().warn("Couldn't determine locale from game settings, defaulting to ", locale);
         }
         return locale;
     }
@@ -86,7 +88,7 @@ public class Constants
         String result = I18n.format(key);
         if (result.equals(key))
         {
-            JourneyMap.getLogger().warn("Message key not found: " + key);
+            JourneyMap.getLogger().warn("Message key not found: ", key);
         }
         return result;
     }
@@ -96,7 +98,7 @@ public class Constants
         String result = I18n.format(key, params);
         if (result.equals(key))
         {
-            JourneyMap.getLogger().warn("Message key not found: " + key);
+            JourneyMap.getLogger().warn("Message key not found: ", key);
         }
         return result;
     }

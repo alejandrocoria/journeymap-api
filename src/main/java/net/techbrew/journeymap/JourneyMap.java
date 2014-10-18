@@ -254,6 +254,9 @@ public class JourneyMap
         {
             timer = StatTimer.getDisposable("elapsed").start();
 
+            // Migrate legacy directory
+            FileHandler.migrateJourneyMapDir();
+
             // Ensure logger inits
             logger = JMLogger.init();
             logger.info("ensureCurrent ENTER");
