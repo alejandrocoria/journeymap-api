@@ -50,7 +50,7 @@ public class MapState
     private long lastRefresh = 0;
     private Integer vSlice = null;
     private boolean underground = false;
-    private int dimension = Integer.MIN_VALUE;
+    private Integer dimension = null;
     private boolean caveMappingAllowed = false;
     private List<DrawStep> drawStepList = new ArrayList<DrawStep>();
     private List<DrawWayPointStep> drawWaypointStepList = new ArrayList<DrawWayPointStep>();

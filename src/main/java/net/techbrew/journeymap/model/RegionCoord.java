@@ -24,7 +24,7 @@ public class RegionCoord implements Comparable<RegionCoord>
     public final int regionX;
     public final int regionZ;
     public final Integer vSlice;
-    public final int dimension;
+    public final Integer dimension;
 
     public RegionCoord(File worldDir, int regionX, Integer vSlice, int regionZ, int dimension)
     {

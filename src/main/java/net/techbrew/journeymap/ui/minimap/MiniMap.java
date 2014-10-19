@@ -85,14 +85,20 @@ public class MiniMap
 
     private void initGridRenderer()
     {
+        state.requireRefresh();
+        if (player == null || player.isDead)
+        {
+            return;
+        }
+
+        state.refresh(mc, player, miniMapProperties);
         int gridSize = miniMapProperties.getSize() <= 768 ? 3 : 5;
         gridRenderer.setGridSize(gridSize);
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
         gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
         boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || miniMapProperties.showCaves.get());
         gridRenderer.updateTextures(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
-        state.requireRefresh();
-        state.refresh(mc, player, miniMapProperties);
+
     }
 
     public void resetInitTime()
@@ -132,7 +138,7 @@ public class MiniMap
         {
             // Check player status
             player = mc.thePlayer;
-            if (player == null)
+            if (player == null || player.isDead)
             {
                 return;
             }
