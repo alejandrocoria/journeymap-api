@@ -8,6 +8,7 @@
 
 package net.techbrew.journeymap.properties;
 
+import com.google.common.base.Objects;
 import net.techbrew.journeymap.properties.config.Config;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,8 +22,6 @@ import static net.techbrew.journeymap.properties.config.Config.Category.Waypoint
  */
 public class WaypointProperties extends PropertiesBase implements Comparable<WaypointProperties>
 {
-    protected transient static final int CODE_REVISION = 4;
-
     @Config(category = Waypoint, master = true, key = "jm.waypoint.enable_manager")
     public final AtomicBoolean managerEnabled = new AtomicBoolean(true);
 
@@ -74,12 +73,6 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     }
 
     @Override
-    public int getCodeRevision()
-    {
-        return CODE_REVISION;
-    }
-
-    @Override
     public boolean equals(Object o)
     {
         if (this == o)
@@ -98,9 +91,7 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     @Override
     public int hashCode()
     {
-        int result = name.hashCode();
-        result = 31 * result + fileRevision;
-        result = 31 * result + managerEnabled.hashCode();
+        int result = managerEnabled.hashCode();
         result = 31 * result + beaconEnabled.hashCode();
         result = 31 * result + showTexture.hashCode();
         result = 31 * result + showStaticBeam.hashCode();
@@ -113,7 +104,31 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
         result = 31 * result + fontSmall.hashCode();
         result = 31 * result + textureSmall.hashCode();
         result = 31 * result + maxDistance.hashCode();
+        result = 31 * result + createDeathpoints.hashCode();
+        result = 31 * result + name.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        return Objects.toStringHelper(this)
+                .add("autoHideLabel", autoHideLabel)
+                .add("beaconEnabled", beaconEnabled)
+                .add("boldLabel", boldLabel)
+                .add("createDeathpoints", createDeathpoints)
+                .add("fontSmall", fontSmall)
+                .add("forceUnicode", forceUnicode)
+                .add("managerEnabled", managerEnabled)
+                .add("maxDistance", maxDistance)
+                .add("name", name)
+                .add("showDistance", showDistance)
+                .add("showName", showName)
+                .add("showRotatingBeam", showRotatingBeam)
+                .add("showStaticBeam", showStaticBeam)
+                .add("showTexture", showTexture)
+                .add("textureSmall", textureSmall)
+                .toString();
     }
 
     @Override
@@ -122,23 +137,4 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
         return Integer.valueOf(this.hashCode()).compareTo(other.hashCode());
     }
 
-    @Override
-    public String toString()
-    {
-        return "WaypointProperties: " +
-                "fileRevision=" + fileRevision +
-                ", managerEnabled=" + managerEnabled +
-                ", beaconEnabled=" + beaconEnabled +
-                ", showTexture=" + showTexture +
-                ", showStaticBeam=" + showStaticBeam +
-                ", showRotatingBeam=" + showRotatingBeam +
-                ", showName=" + showName +
-                ", showDistance=" + showDistance +
-                ", autoHideLabel=" + autoHideLabel +
-                ", boldLabel=" + boldLabel +
-                ", forceUnicode=" + forceUnicode +
-                ", fontSmall=" + fontSmall +
-                ", textureSmall=" + textureSmall +
-                ", maxDistance=" + maxDistance;
-    }
 }

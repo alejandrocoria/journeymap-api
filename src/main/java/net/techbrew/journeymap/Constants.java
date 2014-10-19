@@ -29,19 +29,21 @@ public class Constants
 {
     public static final Ordering<String> CASE_INSENSITIVE_NULL_SAFE_ORDER = Ordering.from(String.CASE_INSENSITIVE_ORDER).nullsLast(); // or nullsFirst()
     public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
+    private static final Joiner path = Joiner.on(File.separator).useForNull("");
     private static final String END = null;
     public static String JOURNEYMAP_DIR_LEGACY = "journeyMap";
     public static String JOURNEYMAP_DIR_BACKUP = "journeymap_bak";
     public static String JOURNEYMAP_DIR = "journeymap";
-    public static String CONFIG_DIR = pathJoiner.join(JOURNEYMAP_DIR, "config", END);
-    public static String ICON_DIR = pathJoiner.join(JOURNEYMAP_DIR, "icon", END);
-    public static String ENTITY_ICON_DIR = pathJoiner.join(ICON_DIR, "entity", END);
-    public static String WAYPOINT_ICON_DIR = pathJoiner.join(ICON_DIR, "waypoint", END);
-    public static String THEME_ICON_DIR = pathJoiner.join(ICON_DIR, "theme", END);
-    public static String CACHE_DIR = pathJoiner.join(JOURNEYMAP_DIR, "cache", END);
-    public static String DATA_DIR = pathJoiner.join(JOURNEYMAP_DIR, "data", END);
-    public static String SP_DATA_DIR = pathJoiner.join(DATA_DIR, WorldType.sp, END);
-    public static String MP_DATA_DIR = pathJoiner.join(DATA_DIR, WorldType.mp, END);
+    public static String CONFIG_DIR_LEGACY = path.join(JOURNEYMAP_DIR, "config");
+    public static String CONFIG_DIR = path.join(JOURNEYMAP_DIR, "config", JourneyMap.JM_VERSION.toMajorMinorString(), END);
+    private static String ICON_DIR = path.join(JOURNEYMAP_DIR, "icon");
+    public static String ENTITY_ICON_DIR = path.join(ICON_DIR, "entity", END);
+    public static String WAYPOINT_ICON_DIR = path.join(ICON_DIR, "waypoint", END);
+    public static String THEME_ICON_DIR = path.join(ICON_DIR, "theme", END);
+    public static String CACHE_DIR = path.join(JOURNEYMAP_DIR, "cache", END);
+    public static String DATA_DIR = path.join(JOURNEYMAP_DIR, "data");
+    public static String SP_DATA_DIR = path.join(DATA_DIR, WorldType.sp, END);
+    public static String MP_DATA_DIR = path.join(DATA_DIR, WorldType.mp, END);
     public static String RESOURCE_PACKS_DEFAULT = "Default";
     public static String CONTROL_KEYNAME_COMBO;
     public static String KEYBINDING_CATEGORY;
@@ -52,7 +54,6 @@ public class Constants
     public static KeyBinding KB_MAP_NIGHT;
     public static KeyBinding KB_MINIMAP_PRESET;
     public static KeyBinding KB_WAYPOINT;
-    private static Joiner pathJoiner = Joiner.on(File.separator).useForNull(File.separator);
 
     public static List<KeyBinding> initKeybindings()
     {

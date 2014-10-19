@@ -286,7 +286,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         features = FeatureManager.getAllowedFeatures();
 
         mod_name = JourneyMap.MOD_NAME;
-        jm_version = JourneyMap.JM_VERSION;
+        jm_version = JourneyMap.JM_VERSION.toString();
         latest_journeymap_version = VersionCheck.getVersionAvailable();
         mc_version = Display.getTitle().split("\\s(?=\\d)")[1];
         browser_poll = Math.max(1000, JourneyMap.getCoreProperties().browserPoll.get());

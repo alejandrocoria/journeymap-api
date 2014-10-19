@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap.properties;
 
-import com.google.common.base.Objects;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.properties.config.Config;
@@ -28,8 +27,6 @@ import static net.techbrew.journeymap.properties.config.Config.Category.Inherit;
  */
 public class MiniMapProperties extends InGameMapProperties
 {
-    protected transient static final int CODE_REVISION = 9;
-
     @Config(category = Inherit, master = true, key = "jm.minimap.enable_minimap")
     public final AtomicBoolean enabled = new AtomicBoolean(true);
 
@@ -102,12 +99,6 @@ public class MiniMapProperties extends InGameMapProperties
     public String getName()
     {
         return name;
-    }
-
-    @Override
-    public int getCodeRevision()
-    {
-        return CODE_REVISION;
     }
 
     public boolean isActive()
@@ -190,25 +181,26 @@ public class MiniMapProperties extends InGameMapProperties
     @Override
     public String toString()
     {
-        return Objects.toStringHelper(this)
-                .add("enabled", enabled)
-                .add("shape", shape)
-                .add("position", position)
-                .add("showFps", showFps)
-                .add("showBiome", showBiome)
-                .add("showLocation", showLocation)
-                .add("showWaypointLabels", showWaypointLabels)
-                .add("sizePercent", sizePercent)
-                .add("frameAlpha", frameAlpha)
-                .add("terrainAlpha", terrainAlpha)
-                .add("orientation", orientation)
+        return super.toStringHelper(this)
+                .add("active", active)
                 .add("compassFontSmall", compassFontSmall)
-                .add("showCompass", showCompass)
-                .add("showReticle", showReticle)
-                .add("reticleOrientation", reticleOrientation)
-                .add("preferredMapType", preferredMapType)
+                .add("enabled", enabled)
+                .add("frameAlpha", frameAlpha)
                 .add("name", name)
-                .add("id", getId())
+                .add("orientation", orientation)
+                .add("position", position)
+                .add("preferredMapType", preferredMapType)
+                .add("reticleOrientation", reticleOrientation)
+                .add("shape", shape)
+                .add("showBiome", showBiome)
+                .add("showCompass", showCompass)
+                .add("showFps", showFps)
+                .add("showLocation", showLocation)
+                .add("showReticle", showReticle)
+                .add("sizePercent", sizePercent)
+                .add("terrainAlpha", terrainAlpha)
                 .toString();
     }
+
+
 }

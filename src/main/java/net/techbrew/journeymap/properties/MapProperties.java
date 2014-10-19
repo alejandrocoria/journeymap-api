@@ -8,6 +8,7 @@
 
 package net.techbrew.journeymap.properties;
 
+import com.google.common.base.Objects;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.properties.config.Config;
@@ -92,4 +93,20 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
     {
         return Integer.valueOf(this.hashCode()).compareTo(other.hashCode());
     }
+
+    protected Objects.ToStringHelper toStringHelper(MapProperties me)
+    {
+        return Objects.toStringHelper(me)
+                .add("entityIconSetName", entityIconSetName)
+                .add("showAnimals", showAnimals)
+                .add("showMobs", showMobs)
+                .add("showPets", showPets)
+                .add("showPlayers", showPlayers)
+                .add("showSelf", showSelf)
+                .add("showVillagers", showVillagers)
+                .add("showWaypoints", showWaypoints)
+                .add("zoomLevel", zoomLevel);
+    }
+
+
 }

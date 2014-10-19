@@ -18,8 +18,6 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class FullMapProperties extends InGameMapProperties
 {
-    protected transient static final int CODE_REVISION = 4;
-
     public final AtomicBoolean showGrid = new AtomicBoolean(true);
     public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
 
@@ -45,12 +43,6 @@ public class FullMapProperties extends InGameMapProperties
     public String getName()
     {
         return name;
-    }
-
-    @Override
-    public int getCodeRevision()
-    {
-        return CODE_REVISION;
     }
 
     @Override
@@ -80,26 +72,16 @@ public class FullMapProperties extends InGameMapProperties
         result = 31 * result + showGrid.hashCode();
         result = 31 * result + showCaves.hashCode();
         result = 31 * result + name.hashCode();
-        result = 31 * result + fileRevision;
         return result;
     }
 
     @Override
     public String toString()
     {
-        return "FullMapProperties: " +
-                "fileRevision=" + fileRevision +
-                ", showCaves=" + showCaves +
-                ", showMobs=" + showMobs +
-                ", showAnimals=" + showAnimals +
-                ", showVillagers=" + showVillagers +
-                ", showPets=" + showPets +
-                ", showPlayers=" + showPlayers +
-                ", showWaypoints=" + showWaypoints +
-                ", showGrid=" + showGrid +
-                ", forceUnicode=" + forceUnicode +
-                ", fontSmall=" + fontSmall +
-                ", textureSmall=" + textureSmall +
-                ", entityIconSetName=" + entityIconSetName;
+        return super.toStringHelper(this)
+                .add("preferredMapType", preferredMapType)
+                .add("showGrid", showGrid)
+                .toString();
     }
+
 }

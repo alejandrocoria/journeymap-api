@@ -12,8 +12,10 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: @FORGEVERSION@ not replaced in source code by build script
 - Change: .minecraft/journeyMap directory now named .minecraft/journeymap. Pre-existing directories will be renamed at startup.
--
+- Change: .minecraft/config/ files will now be in .minecraft/config/5.0/ . OLD CONFIG FILES WILL NOT BE MIGRATED, but they will be put in a backup folder. This ensures a clean start for the 5.0 experience.
+- Change: Internal stuff for versioning config files and having a generic "migration task" concept for future requirements.
 
 ## Changelog for JourneyMap 5.0.0b4:
 - Bugfix: NPE when ColorPalette loading from file encountered Blocks which are no longer in the game registry

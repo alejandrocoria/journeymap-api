@@ -15,6 +15,7 @@ import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.Util;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -40,8 +41,12 @@ public class FileHandler
     public static final String ASSETS_JOURNEYMAP = "/assets/journeymap";
     public static final String ASSETS_JOURNEYMAP_WEB = "/assets/journeymap/web";
 
-    private static final File MinecraftDirectory = FMLClientHandler.instance().getClient().mcDataDir;
-    private static final File JourneyMapDirectory = new File(MinecraftDirectory, Constants.JOURNEYMAP_DIR);
+    public static final File MinecraftDirectory = FMLClientHandler.instance().getClient().mcDataDir;
+    public static final File JourneyMapDirectory = new File(MinecraftDirectory, Constants.JOURNEYMAP_DIR);
+    public static final File StandardConfigDirectory = new File(MinecraftDirectory, Constants.CONFIG_DIR);
+
+    private static WorldClient theLastWorld;
+    private static File WorldDirectory;
 
     public static File getMCWorldDir(Minecraft minecraft)
     {
@@ -113,44 +118,6 @@ public class FileHandler
         }
     }
 
-    public static void migrateJourneyMapDir()
-    {
-        try
-        {
-
-            File[] files = MinecraftDirectory.listFiles();
-            if (files != null)
-            {
-                for (File legacyDir : files)
-                {
-                    if (legacyDir.isDirectory() && legacyDir.getName().equals(Constants.JOURNEYMAP_DIR_LEGACY))
-                    {
-
-                        try
-                        {
-                            JourneyMap.getLogger().info(String.format("Renaming \"%s\" to \"%s\".",
-                                    legacyDir, JourneyMapDirectory));
-                            File backupDir = new File(MinecraftDirectory, Constants.JOURNEYMAP_DIR_BACKUP);
-                            legacyDir.renameTo(backupDir);
-                            backupDir.renameTo(JourneyMapDirectory);
-                        }
-                        catch (Throwable t)
-                        {
-                            JMLogger.logOnce(String.format("Could not rename \"%s\" to \"%s\" ! Please shut down and rename it manually.",
-                                    legacyDir, JourneyMapDirectory), t);
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        catch (Throwable t)
-        {
-            JMLogger.logOnce(String.format("Could not rename old directory to \"%s\" ! Please shut down and rename it manually.",
-                    JourneyMapDirectory), t);
-        }
-    }
-
     public static File getJourneyMapDir()
     {
         return JourneyMapDirectory;
@@ -178,10 +145,15 @@ public class FileHandler
     {
         if (minecraft.theWorld == null)
         {
+            theLastWorld = null;
+            WorldDirectory = null;
             return null;
         }
 
-        File worldDir = null;
+        if (WorldDirectory != null && minecraft.theWorld == theLastWorld)
+        {
+            return WorldDirectory;
+        }
 
         try
         {
@@ -195,33 +167,33 @@ public class FileHandler
                 {
                     suffix = "_" + worldUid;
                 }
-                worldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + WorldData.getWorldName(minecraft, false) + suffix); //$NON-NLS-1$
+                WorldDirectory = new File(MinecraftDirectory, Constants.MP_DATA_DIR + WorldData.getWorldName(minecraft, false) + suffix); //$NON-NLS-1$
 
                 if (legacyWorldDir.exists())
                 {
-                    migrateLegacyFolderName(legacyWorldDir, worldDir);
+                    migrateLegacyFolderName(legacyWorldDir, WorldDirectory);
                 }
             }
             else
             {
                 File legacyWorldDir = new File(MinecraftDirectory, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, true));
-                worldDir = new File(MinecraftDirectory, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, false));
+                WorldDirectory = new File(MinecraftDirectory, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, false));
 
-                if (!legacyWorldDir.getName().equals(worldDir.getName()))
+                if (!legacyWorldDir.getName().equals(WorldDirectory.getName()))
                 {
-                    if (legacyWorldDir.exists() && worldDir.exists())
+                    if (legacyWorldDir.exists() && WorldDirectory.exists())
                     {
-                        JMLogger.logOnce(String.format("Found two directories that might be in conflict. Using:  %s , Ignoring: %s", worldDir, legacyWorldDir), null);
+                        JMLogger.logOnce(String.format("Found two directories that might be in conflict. Using:  %s , Ignoring: %s", WorldDirectory, legacyWorldDir), null);
                     }
                 }
 
-                if (legacyWorldDir.exists() && !worldDir.exists())
+                if (legacyWorldDir.exists() && !WorldDirectory.exists())
                 {
-                    migrateLegacyFolderName(legacyWorldDir, worldDir);
+                    migrateLegacyFolderName(legacyWorldDir, WorldDirectory);
                 }
             }
 
-            worldDir.mkdirs();
+            WorldDirectory.mkdirs();
         }
         catch (Exception e)
         {
@@ -229,7 +201,8 @@ public class FileHandler
             throw new RuntimeException(e);
         }
 
-        return worldDir;
+        theLastWorld = minecraft.theWorld;
+        return WorldDirectory;
     }
 
     private static void migrateLegacyFolderName(File legacyWorldDir, File worldDir)
@@ -281,19 +254,6 @@ public class FileHandler
             waypointDir.mkdirs();
         }
         return waypointDir;
-    }
-
-
-    public static File getAnvilRegionDirectory(File worldDirectory, int dimension)
-    {
-        if (dimension == 0)
-        {
-            return new File(worldDirectory, "region"); //$NON-NLS-1$
-        }
-        else
-        {
-            return new File(worldDirectory, "DIM" + dimension); //$NON-NLS-1$
-        }
     }
 
     public static BufferedImage getWebImage(String fileName)
@@ -354,19 +314,8 @@ public class FileHandler
             }
         }
 
-        return fallbackToStandardConfigDir ? getStandardConfigDir() : null;
+        return fallbackToStandardConfigDir ? StandardConfigDirectory : null;
     }
-
-    public static File getStandardConfigDir()
-    {
-        return new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.CONFIG_DIR);
-    }
-
-//    public static File getCacheDir()
-//    {
-//        return new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.CACHE_DIR);
-//    }
-
 
     public static BufferedImage getImage(File imageFile)
     {

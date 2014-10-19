@@ -25,8 +25,6 @@ import static net.techbrew.journeymap.properties.config.Config.Category.*;
  */
 public class CoreProperties extends PropertiesBase implements Comparable<CoreProperties>
 {
-    protected transient static final int CODE_REVISION = 4;
-
     @Config(category = Advanced, key = "jm.advanced.loglevel", stringListProvider = JMLogger.LogLevelStringProvider.class)
     public final AtomicReference<String> logLevel = new AtomicReference<String>("INFO");
 
@@ -134,12 +132,6 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     }
 
     @Override
-    public int getCodeRevision()
-    {
-        return CODE_REVISION;
-    }
-
-    @Override
     public int compareTo(CoreProperties other)
     {
         return Integer.valueOf(this.hashCode()).compareTo(other.hashCode());
@@ -205,44 +197,45 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
         return result;
     }
 
-
     @Override
     public String toString()
     {
         return Objects.toStringHelper(this)
-                .add("logLevel", logLevel)
-                .add("chunkOffset", chunkOffset)
-                .add("chunkPoll", chunkPoll)
+                .add("announceMod", announceMod)
                 .add("autoMapPoll", autoMapPoll)
+                .add("browserPoll", browserPoll)
                 .add("cacheAnimalsData", cacheAnimalsData)
                 .add("cacheMobsData", cacheMobsData)
                 .add("cachePlayerData", cachePlayerData)
                 .add("cachePlayersData", cachePlayersData)
                 .add("cacheVillagersData", cacheVillagersData)
-                .add("announceMod", announceMod)
-                .add("checkUpdates", checkUpdates)
-                .add("recordCacheStats", recordCacheStats)
-                .add("browserPoll", browserPoll)
-                .add("themeName", themeName)
                 .add("caveIgnoreGlass", caveIgnoreGlass)
-                .add("mapBathymetry", mapBathymetry)
-                .add("mapTransparency", mapTransparency)
-                .add("mapCaveLighting", mapCaveLighting)
+                .add("checkUpdates", checkUpdates)
+                .add("chunkOffset", chunkOffset)
+                .add("chunkPoll", chunkPoll)
+                .add("hideSneakingEntities", hideSneakingEntities)
+                .add("logLevel", logLevel)
                 .add("mapAntialiasing", mapAntialiasing)
-                .add("mapPlantShadows", mapPlantShadows)
-                .add("mapPlants", mapPlants)
+                .add("mapBathymetry", mapBathymetry)
+                .add("mapCaveLighting", mapCaveLighting)
                 .add("mapCrops", mapCrops)
+                .add("mapPlants", mapPlants)
+                .add("mapPlantShadows", mapPlantShadows)
                 .add("mapSurfaceAboveCaves", mapSurfaceAboveCaves)
+                .add("mapTransparency", mapTransparency)
                 .add("maxAnimalsData", maxAnimalsData)
                 .add("maxMobsData", maxMobsData)
                 .add("maxPlayersData", maxPlayersData)
                 .add("maxVillagersData", maxVillagersData)
-                .add("hideSneakingEntities", hideSneakingEntities)
+                .add("optionsManagerUsed", optionsManagerUsed)
                 .add("radarLateralDistance", radarLateralDistance)
                 .add("radarVerticalDistance", radarVerticalDistance)
+                .add("recordCacheStats", recordCacheStats)
                 .add("renderOverlayEventTypeName", renderOverlayEventTypeName)
                 .add("renderOverlayPreEvent", renderOverlayPreEvent)
-                .add("name", name)
+                .add("themeName", themeName)
                 .toString();
     }
+
+
 }

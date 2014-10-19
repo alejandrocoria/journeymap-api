@@ -27,8 +27,8 @@ import net.techbrew.journeymap.forgehandler.EventHandlerManager;
 import net.techbrew.journeymap.forgehandler.MiniMapOverlayHandler;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
-import net.techbrew.journeymap.io.PropertyManager;
 import net.techbrew.journeymap.io.ThemeFileHandler;
+import net.techbrew.journeymap.io.migrate.Migration;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -59,11 +59,12 @@ import java.io.File;
  * @author Mark Woodman
  */
 @SideOnly(Side.CLIENT)
-@Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = JourneyMap.JM_VERSION)
+@Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = "@JMVERSION@")
 public class JourneyMap
 {
     public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-    public static final String JM_VERSION = "@JMVERSION@"; //$NON-NLS-1$
+    public static final Version JM_VERSION = Version.from(
+            "@MAJOR@", "@MINOR@", "@MICRO@", "@PATCH@", new Version(5, 0, 0, "dev"));
     public static final String FORGE_VERSION = "@FORGEVERSION@"; //$NON-NLS-1$
     public static final String EDITION = getEdition();
     public static final String MOD_ID = "journeymap";
@@ -109,21 +110,6 @@ public class JourneyMap
     }
 
     private static String getEdition()
-    {
-        String ed = null;
-        try
-        {
-            ed = JM_VERSION + " " + FeatureManager.getPolicySetName();
-        }
-        catch (Throwable t)
-        {
-            ed = JM_VERSION + " ?";
-            t.printStackTrace(System.err);
-        }
-        return ed;
-    }
-
-    private static String getVersion()
     {
         String ed = null;
         try
@@ -254,8 +240,8 @@ public class JourneyMap
         {
             timer = StatTimer.getDisposable("elapsed").start();
 
-            // Migrate legacy directory
-            FileHandler.migrateJourneyMapDir();
+            // Migrate tasks
+            boolean migrationOk = new Migration().performTasks();
 
             // Ensure logger inits
             logger = JMLogger.init();
@@ -275,7 +261,6 @@ public class JourneyMap
 
             // Load properties
             loadConfigProperties();
-            PropertyManager.getInstance().migrateLegacyProperties();
 
             // Log properties
             JMLogger.logProperties();

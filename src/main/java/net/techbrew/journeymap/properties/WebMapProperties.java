@@ -22,8 +22,6 @@ import static net.techbrew.journeymap.properties.config.Config.Category.WebMap;
  */
 public class WebMapProperties extends MapProperties
 {
-    protected transient static final int CODE_REVISION = 4;
-
     @Config(category = WebMap, master = true, key = "jm.webmap.enable")
     public final AtomicBoolean enabled = new AtomicBoolean(true);
 
@@ -56,12 +54,6 @@ public class WebMapProperties extends MapProperties
     }
 
     @Override
-    public int getCodeRevision()
-    {
-        return CODE_REVISION;
-    }
-
-    @Override
     public boolean equals(Object o)
     {
         if (this == o)
@@ -86,7 +78,6 @@ public class WebMapProperties extends MapProperties
     {
         int result = super.hashCode();
         result = 31 * result + name.hashCode();
-        result = 31 * result + fileRevision;
         result = 31 * result + port.hashCode();
         result = 31 * result + enabled.hashCode();
         return result;
@@ -96,7 +87,6 @@ public class WebMapProperties extends MapProperties
     public String toString()
     {
         return "WebMapProperties: " +
-                "fileRevision=" + fileRevision +
                 ", enabled=" + enabled +
                 ", port=" + port +
                 ", showMobs=" + showMobs +

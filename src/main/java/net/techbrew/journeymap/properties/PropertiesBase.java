@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.Version;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.properties.config.AtomicBooleanSerializer;
@@ -42,9 +43,9 @@ public abstract class PropertiesBase
     private static final String[] HEADERS = {
             "// " + Constants.getString("jm.config.file_header_1"),
             "// " + Constants.getString("jm.config.file_header_2", Constants.CONFIG_DIR),
-            "// " + Constants.getString("jm.config.file_header_3", Constants.DATA_DIR + "**" + File.separator),
-            "// " + Constants.getString("jm.config.file_header_4"),
-            "// " + Constants.getString("jm.config.file_header_5", "http://journeymap.techbrew.net/help/wiki/Configuration_Files")
+            // "// " + Constants.getString("jm.config.file_header_3", Constants.DATA_DIR + File.separator + "**" + File.separator),
+            // "// " + Constants.getString("jm.config.file_header_4"),
+            "// " + Constants.getString("jm.config.file_header_5", "http://journeymap.techbrew.net/help/wiki/Options_Manager")
     };
 
     // Gson for file persistence
@@ -56,10 +57,10 @@ public abstract class PropertiesBase
             .create();
     // Whether it's disabled
     protected final AtomicBoolean disabled = new AtomicBoolean(false);
+    // Version used to create config
+    protected Version configVersion = null;
     // Current file reference
     protected transient File sourceFile = null;
-    // Set by subclass
-    protected int fileRevision;
 
     /**
      * Default constructor.
@@ -101,13 +102,6 @@ public abstract class PropertiesBase
     public abstract String getName();
 
     /**
-     * Code base fileRevision of props class
-     *
-     * @return rev
-     */
-    public abstract int getCodeRevision();
-
-    /**
      * Gets the property file, looking first in the world config dir,
      * then falling back to look in the standard config dir.
      *
@@ -120,7 +114,7 @@ public abstract class PropertiesBase
             sourceFile = new File(FileHandler.getWorldConfigDir(false), getFileName());
             if (!sourceFile.canRead())
             {
-                sourceFile = new File(FileHandler.getStandardConfigDir(), getFileName());
+                sourceFile = new File(FileHandler.StandardConfigDirectory, getFileName());
             }
         }
         return sourceFile;
@@ -220,7 +214,7 @@ public abstract class PropertiesBase
             try
             {
                 save();
-                File standardConfig = new File(FileHandler.getStandardConfigDir(), getFileName());
+                File standardConfig = new File(FileHandler.StandardConfigDirectory, getFileName());
                 Files.copy(sourceFile, standardConfig);
                 return standardConfig.canRead();
             }
@@ -237,14 +231,13 @@ public abstract class PropertiesBase
     }
 
     /**
-     * Whether the code base fileRevision of the properties
-     * matches that loaded from the file.
+     * Whether the file has the same config version as the current JourneyMap version
      *
      * @return true if current
      */
     public boolean isCurrent()
     {
-        return getCodeRevision() == fileRevision;
+        return JourneyMap.JM_VERSION.equals(configVersion);
     }
 
     /**
@@ -254,8 +247,6 @@ public abstract class PropertiesBase
      */
     public boolean save()
     {
-        fileRevision = getCodeRevision();
-
         synchronized (gson)
         {
             File propFile = null;
@@ -271,6 +262,11 @@ public abstract class PropertiesBase
                     {
                         propFile.getParentFile().mkdirs();
                     }
+                }
+                else if (!isCurrent())
+                {
+                    JourneyMap.getLogger().info(String.format("Updating config file from version \"%s\" to \"%s\": %s", configVersion, JourneyMap.JM_VERSION, propFile));
+                    configVersion = JourneyMap.JM_VERSION;
                 }
 
                 // Header
@@ -332,7 +328,6 @@ public abstract class PropertiesBase
             }
             else
             {
-                JourneyMap.getLogger().info(String.format("Config file not found: %s", propFile));
                 instance.newFileInit();
             }
         }

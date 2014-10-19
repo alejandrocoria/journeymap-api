@@ -104,7 +104,7 @@ public class VersionCheck
                                 if (Loader.MC_VERSION.equals(versionLine.minecraft))
                                 {
                                     versionAvailable = versionLine.journeymap;
-                                    versionIsCurrent = isCurrent(JourneyMap.JM_VERSION, versionAvailable);
+                                    versionIsCurrent = isCurrent(JourneyMap.JM_VERSION.toString(), versionAvailable);
                                     versionIsChecked = true;
                                     break;
                                 }

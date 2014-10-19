@@ -60,6 +60,11 @@ public class ConfigValidation
             {
                 Config config = field.getAnnotation(Config.class);
                 Class<?> fieldType = field.getType();
+                if (field.get(instance) == null)
+                {
+                    saveNeeded = true;
+                    continue;
+                }
 
                 if (fieldType.equals(AtomicBoolean.class))
                 {

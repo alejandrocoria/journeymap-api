@@ -8,6 +8,7 @@
 
 package net.techbrew.journeymap.properties;
 
+import com.google.common.base.Objects;
 import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.ui.option.LocationFormat;
 
@@ -70,5 +71,18 @@ public abstract class InGameMapProperties extends MapProperties
         result = 31 * result + fontSmall.hashCode();
         result = 31 * result + textureSmall.hashCode();
         return result;
+    }
+
+    @Override
+    protected Objects.ToStringHelper toStringHelper(MapProperties me)
+    {
+        return super.toStringHelper(me)
+                .add("fontSmall", fontSmall)
+                .add("forceUnicode", forceUnicode)
+                .add("locationFormat", locationFormat)
+                .add("locationFormatVerbose", locationFormatVerbose)
+                .add("showCaves", showCaves)
+                .add("showWaypointLabels", showWaypointLabels)
+                .add("textureSmall", textureSmall);
     }
 }
