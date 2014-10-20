@@ -164,7 +164,10 @@ public class Waypoint implements Serializable
         String name;
         if (type == Type.Death)
         {
-            name = String.format("%s %s", Constants.getString("jm.waypoint.deathpoint"), DateFormat.getTimeInstance().format(new Date()));
+            Date now = new Date();
+            name = String.format("%s %s %s", Constants.getString("jm.waypoint.deathpoint"),
+                    DateFormat.getTimeInstance().format(now),
+                    DateFormat.getDateInstance(DateFormat.SHORT).format(now));
         }
         else
         {

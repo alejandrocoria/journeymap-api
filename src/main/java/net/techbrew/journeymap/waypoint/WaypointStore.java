@@ -64,6 +64,14 @@ public class WaypointStore
         return cache.asMap().values();
     }
 
+    public void add(Waypoint waypoint)
+    {
+        if (cache.getIfPresent(waypoint.getId()) == null)
+        {
+            cache.put(waypoint.getId(), waypoint);
+        }
+    }
+
     public void save(Waypoint waypoint)
     {
         cache.put(waypoint.getId(), waypoint);
