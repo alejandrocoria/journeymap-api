@@ -92,15 +92,27 @@ public class MapPlayerTask extends BaseMapTask
 
         if (FeatureManager.isAllowed(Feature.MapCaves))
         {
-            int mapY = alreadyUnderground ? player.chunkCoordY - 1 : player.chunkCoordY;
-
-            while (mapY > 0 && tasks.size() < 2)
+            if (alreadyUnderground)
             {
-                ArrayList<ChunkCoordIntPair> list = new ArrayList<ChunkCoordIntPair>(1);
-                list.add(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ));
-                tasks.add(new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, true, mapY, list));
+                // above
+                if ((player.chunkCoordY << 4) + 1 < player.worldObj.provider.getActualHeight())
+                {
+                    tasks.add(new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, true, player.chunkCoordY + 1,
+                            new ArrayList<ChunkCoordIntPair>(Arrays.asList(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ)))));
+                }
+            }
 
-                mapY--;
+            // below
+            if ((player.chunkCoordY << 4) - 1 > 0)
+            {
+                tasks.add(new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, true, player.chunkCoordY - 1,
+                        new ArrayList<ChunkCoordIntPair>(Arrays.asList(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ)))));
+            }
+
+            if ((player.chunkCoordY << 4) - 2 > 0)
+            {
+                tasks.add(new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, true, player.chunkCoordY - 2,
+                        new ArrayList<ChunkCoordIntPair>(Arrays.asList(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ)))));
             }
         }
 
@@ -112,7 +124,7 @@ public class MapPlayerTask extends BaseMapTask
         final ChunkCoordinates playerPos = new ChunkCoordinates(player.chunkCoordX, player.chunkCoordY, player.chunkCoordZ);
         boolean underground = player.worldObj.provider.hasNoSky || (DataCache.getPlayer().underground && JourneyMap.getFullMapProperties().showCaves.get());
 
-        if(underground && !FeatureManager.isAllowed(Feature.MapCaves))
+        if (underground && !FeatureManager.isAllowed(Feature.MapCaves))
         {
             if (player.worldObj.provider.hasNoSky)
             {
@@ -123,7 +135,7 @@ public class MapPlayerTask extends BaseMapTask
 
         // Should we force the chunks around the player to be rendered?
         boolean sliceChanged = false;
-        if(lastUnderground==null || lastUnderground!=underground)
+        if (lastUnderground == null || lastUnderground != underground)
         {
             sliceChanged = true;
         }
@@ -158,22 +170,22 @@ public class MapPlayerTask extends BaseMapTask
         final long maxStale = 200;
         long now = System.currentTimeMillis();
         Set<ChunkCoordIntPair> allCachedCoords = DataCache.instance().getCachedChunkCoordinates();
-        for(ChunkCoordIntPair coord : allCachedCoords)
+        for (ChunkCoordIntPair coord : allCachedCoords)
         {
-            if(!queuedCoords.contains(coord))
+            if (!queuedCoords.contains(coord))
             {
                 ChunkMD chunkMD = dataCache.getChunkMD(coord, false);
                 if (chunkMD != null)
                 {
                     long lastRendered = chunkMD.getLastRendered();
-                    if( now - lastRendered > expiryLength)
+                    if (now - lastRendered > expiryLength)
                     {
-                        if(lastRendered==0L)
+                        if (lastRendered == 0L)
                         {
                             queuedCoords.add(coord);
                             neverRendered++;
                         }
-                        else if(stale<maxStale)
+                        else if (stale < maxStale)
                         {
                             queuedCoords.add(coord);
                             stale++;
@@ -184,7 +196,7 @@ public class MapPlayerTask extends BaseMapTask
         }
 
         int forced = 0;
-        if(sliceChanged)
+        if (sliceChanged)
         {
             // Add peripheral coords around player
             final int offset = JourneyMap.getCoreProperties().chunkOffset.get();
@@ -225,7 +237,7 @@ public class MapPlayerTask extends BaseMapTask
             }
         }
 
-        if(renderCoords.size()==0)
+        if (renderCoords.size() == 0)
         {
             return null;
         }
