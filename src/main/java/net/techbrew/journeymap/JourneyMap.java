@@ -34,7 +34,6 @@ import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.RegionImageCache;
-import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.*;
 import net.techbrew.journeymap.render.map.TileCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
@@ -492,15 +491,7 @@ public class JourneyMap
 //            }
 
             final boolean isDead = mc.currentScreen != null && mc.currentScreen instanceof GuiGameOver;
-            if (mc.thePlayer != null && isDead && isMapping())
-            {
-                stopMapping();
-                if (waypointProperties.managerEnabled.get() && waypointProperties.createDeathpoints.get())
-                {
-                    WaypointStore.instance().save(Waypoint.deathOf(mc.thePlayer));
-                }
-                return;
-            }
+
 
             if (mc.theWorld == null)
             {
