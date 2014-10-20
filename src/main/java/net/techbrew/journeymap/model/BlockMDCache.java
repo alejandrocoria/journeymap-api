@@ -20,6 +20,7 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 
@@ -34,6 +35,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
     public final BlockMD VOIDBLOCK;
     private final HashMap<Block, EnumSet<BlockMD.Flag>> blockFlags;
     private final HashMap<Block, Float> blockAlphas;
+    private final SpecialBlockHandler specialBlockHandler = new SpecialBlockHandler();
 
     public BlockMDCache()
     {
@@ -108,11 +110,18 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         setFlags(Blocks.water, NoShadow, BiomeColor);
         setFlags(Blocks.web, OpenToSky, Side2Texture);
 
+        // Mod block ids which get specific flags
+        HashMap<GameRegistry.UniqueIdentifier, Collection<BlockMD.Flag>> modBlockUIDs = new HashMap<GameRegistry.UniqueIdentifier, Collection<BlockMD.Flag>>();
+        for (GameRegistry.UniqueIdentifier specialUid : SpecialBlockHandler.Blocks)
+        {
+            modBlockUIDs.put(specialUid, EnumSet.of(BlockMD.Flag.SpecialHandling));
+        }
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("TConstruct:decoration.stonetorch"), EnumSet.of(HasAir, NoShadow));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("Mariculture:kelp"), EnumSet.of(Side2Texture, Plant));
+
         // Set flags based on inheritance
         for (Block block : GameData.getBlockRegistry().typeSafeIterable())
         {
-            //blockUids.put(block, new GameRegistry.UniqueIdentifier(GameData.getBlockRegistry().getNameForObject(block)));
-
             if (block.getMaterial() == Material.air)
             {
                 setFlags(block, HasAir, OpenToSky, NoShadow);
@@ -152,6 +161,12 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
             if (block instanceof BlockRailBase)
             {
                 setFlags(block, NoShadow);
+            }
+
+            GameRegistry.UniqueIdentifier uid = findUniqueIdentifierFor(block);
+            if (modBlockUIDs.containsKey(uid))
+            {
+                setFlags(block, modBlockUIDs.get(uid));
             }
         }
 
@@ -195,7 +210,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
                 else
                 {
                     int meta = chunkMd.getChunk().getBlockMetadata(x, y, z);
-                    return getBlockMD(cache, block, meta);
+                    return getBlockMD(cache, chunkMd, block, meta, x, y, z);
                 }
             }
             else
@@ -212,6 +227,20 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
     /**
      * Produces a BlockMD instance from chunk-local coords.
+     * Handles blocks with SpecialBlockHandler as needed.
+     */
+    public BlockMD getBlockMD(LoadingCache<Block, HashMap<Integer, BlockMD>> cache, ChunkMD chunkMD, Block block, int meta, int x, int y, int z)
+    {
+        BlockMD blockMD = getBlockMD(cache, block, meta);
+        if (blockMD.hasFlag(SpecialHandling))
+        {
+            specialBlockHandler.handleBlock(chunkMD, blockMD, x, y, z);
+        }
+        return blockMD;
+    }
+
+    /**
+     * Produces a BlockMD instance from Block and Meta
      */
     public BlockMD getBlockMD(LoadingCache<Block, HashMap<Integer, BlockMD>> cache, Block block, int meta)
     {
@@ -254,8 +283,13 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
     public void setFlags(Block block, BlockMD.Flag... flags)
     {
+        setFlags(block, Arrays.asList(flags));
+    }
+
+    public void setFlags(Block block, Collection<BlockMD.Flag> flags)
+    {
         EnumSet<BlockMD.Flag> eset = getFlags(block);
-        eset.addAll(Arrays.asList(flags));
+        eset.addAll(flags);
         blockFlags.put(block, eset);
         JourneyMap.getLogger().debug(block.getUnlocalizedName() + " flags set: " + eset);
     }

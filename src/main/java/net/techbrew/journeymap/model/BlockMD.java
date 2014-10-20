@@ -456,7 +456,12 @@ public class BlockMD
         /**
          * Block is a tile entity
          */
-        TileEntity
+        TileEntity,
+
+        /**
+         * Block has special handling considerations
+         */
+        SpecialHandling
     }
 
 
