@@ -25,7 +25,6 @@ import net.techbrew.journeymap.model.ChunkMD;
 public class NetherRenderer extends CaveRenderer implements IChunkRenderer
 {
     // Taken from WorldProviderHell.getFogColor(): {0.20000000298023224f, 0.029999999329447746f, 0.029999999329447746f};
-
     public NetherRenderer()
     {
         super(null);
@@ -62,10 +61,10 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
 
         try
         {
-            y = sliceMaxY - 1;
+            y = sliceMaxY;
 
             BlockMD blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
-            BlockMD blockMDAbove = dataCache.getBlockMD(chunkMd, x, y + 1, z);
+            BlockMD blockMDAbove = dataCache.getBlockMD(chunkMd, x, Math.min(y + 1, sliceMaxY), z);
 
             while (y > 0)
             {
@@ -76,10 +75,15 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
 
                 if (blockMDAbove.isAir() || blockMDAbove.hasTranparency() || blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky))
                 {
-                    if (!blockMD.isAir())
+                    if (!blockMD.isAir() && !blockMD.hasTranparency() && !blockMD.hasFlag(BlockMD.Flag.OpenToSky))
                     {
                         break;
                     }
+                }
+                else if (y == sliceMinY)
+                {
+                    y = sliceMaxY;
+                    break;
                 }
 
                 y--;
@@ -113,7 +117,21 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
     @Override
     protected int getSliceLightLevel(ChunkMD chunkMd, int x, int y, int z, boolean adjusted)
     {
-        return Math.max(adjusted ? 2 : 0, chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z));
+        if (y + 1 >= chunkMd.getWorldActualHeight())
+        {
+            return 0;
+        }
+        int actualLight = chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z);
+        if (actualLight > 0)
+        {
+            return actualLight;
+        }
+        else
+        {
+            //System.out.print(y + "  ");
+            return Math.max(adjusted ? 2 : 0, actualLight);
+        }
+
     }
 
     @Override

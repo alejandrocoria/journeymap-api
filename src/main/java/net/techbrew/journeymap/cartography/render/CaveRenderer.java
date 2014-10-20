@@ -30,18 +30,14 @@ import java.awt.*;
  */
 public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 {
+    private final Object chunkLock = new Object();
+    private final HeightsCache[] chunkSliceHeights = new HeightsCache[16];
+    private final SlopesCache[] chunkSliceSlopes = new SlopesCache[16];
     protected CoreProperties coreProperties;
     protected SurfaceRenderer surfaceRenderer;
     protected StatTimer renderCaveTimer = StatTimer.get("CaveRenderer.render");
-
     protected Strata strata = new Strata("Cave", 40, 8, true);
     protected float defaultDim = .8f;
-
-    private final Object chunkLock = new Object();
-
-    private final HeightsCache[] chunkSliceHeights = new HeightsCache[16];
-    private final SlopesCache[] chunkSliceSlopes = new SlopesCache[16];
-
     protected boolean mapSurfaceAboveCaves;
 
     /**
@@ -109,13 +105,21 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             {
                 chunkSliceHeights[vSlice] = new HeightsCache(String.format("%sHeights_%d", cachePrefix, vSlice));
             }
+            else
+            {
+                chunkSliceHeights[vSlice].invalidateAll();
+            }
 
             // Init slopes within slice
             if (chunkSliceSlopes[vSlice] == null)
             {
                 chunkSliceSlopes[vSlice] = new SlopesCache(String.format("%sSlopes_%d", cachePrefix, vSlice));
-                populateSlopes(chunkMd, vSlice, chunkSliceHeights[vSlice], chunkSliceSlopes[vSlice]);
             }
+            else
+            {
+                chunkSliceSlopes[vSlice].invalidateAll();
+            }
+            populateSlopes(chunkMd, vSlice, chunkSliceHeights[vSlice], chunkSliceSlopes[vSlice]);
 
             // Render that lovely cave action
             ok = renderUnderground(g2D, chunkMd, vSlice, chunkSliceHeights[vSlice], chunkSliceSlopes[vSlice]);
@@ -261,7 +265,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         try
         {
             int lightLevel;
-            int y = topY;
+            int y = getSliceBlockHeight(chunkMd, x, topY >> 4, z, minY, topY, chunkHeights);
 
             while (y > 0)
             {
