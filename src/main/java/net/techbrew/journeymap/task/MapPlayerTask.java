@@ -95,7 +95,7 @@ public class MapPlayerTask extends BaseMapTask
             if (alreadyUnderground)
             {
                 // above
-                if ((player.chunkCoordY << 4) + 1 < player.worldObj.provider.getActualHeight())
+                if (player.chunkCoordY + 1 <= (player.worldObj.provider.getActualHeight()-1>>4))
                 {
                     tasks.add(new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, true, player.chunkCoordY + 1,
                             new ArrayList<ChunkCoordIntPair>(Arrays.asList(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ)))));
@@ -103,13 +103,13 @@ public class MapPlayerTask extends BaseMapTask
             }
 
             // below
-            if ((player.chunkCoordY << 4) - 1 > 0)
+            if (player.chunkCoordY - 1 >= 0)
             {
                 tasks.add(new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, true, player.chunkCoordY - 1,
                         new ArrayList<ChunkCoordIntPair>(Arrays.asList(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ)))));
             }
 
-            if ((player.chunkCoordY << 4) - 2 > 0)
+            if (player.chunkCoordY - 2 >= 0)
             {
                 tasks.add(new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, true, player.chunkCoordY - 2,
                         new ArrayList<ChunkCoordIntPair>(Arrays.asList(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ)))));

@@ -13,10 +13,13 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
@@ -30,8 +33,6 @@ import java.util.EnumSet;
 @SideOnly(Side.CLIENT)
 public class PlayerDeathEvent implements EventHandlerManager.EventHandler
 {
-    final Minecraft mc = FMLClientHandler.instance().getClient();
-
     @Override
     public EnumSet<EventHandlerManager.BusType> getBus()
     {
@@ -42,25 +43,34 @@ public class PlayerDeathEvent implements EventHandlerManager.EventHandler
     @SubscribeEvent
     public void onLivingDeath(LivingDeathEvent event)
     {
-        if (mc.thePlayer == null)
+        onDeath(event.entityLiving);
+    }
+
+    public static void onDeath(final EntityLivingBase entity)
+    {
+        if(entity==null)
         {
             return;
         }
 
         try
         {
-            final EntityLivingBase entity = event.entityLiving;
-            if (!(entity instanceof EntityPlayer) || entity instanceof FakePlayer)
+            if (!(entity instanceof EntityPlayer))
             {
                 return;
             }
 
             EntityPlayer player = (EntityPlayer) entity;
+            JourneyMap.getLogger().info(String.format("%s died at %s,%s,%s",player.getCommandSenderName(),
+                    MathHelper.floor_double(player.posX),
+                    MathHelper.floor_double(player.posY),
+                    MathHelper.floor_double(player.posZ)));
 
-            if (player.getCommandSenderName().equals(mc.thePlayer.getCommandSenderName()))
+            if (player.getCommandSenderName().equals(JourneyMap.getInstance().getPlayerName()))
             {
                 if (JourneyMap.getWaypointProperties().managerEnabled.get() && JourneyMap.getWaypointProperties().createDeathpoints.get())
                 {
+
                     WaypointStore.instance().save(Waypoint.deathOf(player));
                 }
             }

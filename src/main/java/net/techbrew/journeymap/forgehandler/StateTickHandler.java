@@ -14,6 +14,7 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGameOver;
 import net.techbrew.journeymap.JourneyMap;
 
 import java.util.EnumSet;
@@ -27,6 +28,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
 
     Minecraft mc = FMLClientHandler.instance().getClient();
     int counter = 0;
+    private boolean handleDeathpoint;
 
     @Override
     public EnumSet<EventHandlerManager.BusType> getBus()
@@ -44,6 +46,20 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         }
 
         mc.mcProfiler.startSection("journeymap");
+
+        final boolean isDead = mc.currentScreen != null && mc.currentScreen instanceof GuiGameOver;
+        if(isDead)
+        {
+            if(!handleDeathpoint)
+            {
+                handleDeathpoint = true;
+                PlayerDeathEvent.onDeath(mc.thePlayer);
+            }
+        }
+        else
+        {
+            handleDeathpoint = false;
+        }
 
         try
         {

@@ -99,6 +99,14 @@ public class TextureCache
                 if (chunksImage == null)
                 {
                     chunksImage = RegionImageHandler.createBlankImage(imageWidth, imageHeight);
+                    final Graphics2D g2D = chunksImage.createGraphics();
+                    g2D.setColor(Color.black);
+                    if(mapType != Constants.MapType.underground)
+                    {
+                        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .5f));
+                    }
+                    g2D.fillRect(0, 0, imageWidth, imageHeight);
+                    g2D.dispose();
                 }
                 else if (alpha < 1f)
                 {

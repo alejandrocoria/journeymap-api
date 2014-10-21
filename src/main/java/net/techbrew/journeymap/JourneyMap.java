@@ -85,6 +85,7 @@ public class JourneyMap
     private volatile String currentWorldId = null;
     private Logger logger;
     private boolean threadLogging = false;
+    private String playerName;
 
     // Task controller for issuing tasks in executor
     private TaskController taskController;
@@ -397,7 +398,7 @@ public class JourneyMap
             long totalMB = Runtime.getRuntime().totalMemory() / 1024 / 1024;
             long freeMB = Runtime.getRuntime().freeMemory() / 1024 / 1024;
             String memory = String.format("Memory: %sMB total, %sMB free", totalMB, freeMB);
-            logger.info(String.format("Mapping started in %s%sDIM%s, %s: ", FileHandler.getJMWorldDir(mc, currentWorldId),
+            logger.info(String.format("Mapping started in %s%sDIM%s. %s ", FileHandler.getJMWorldDir(mc, currentWorldId),
                     File.separator,
                     mc.theWorld.provider.dimensionId,
                     memory)); //$NON-NLS-1$
@@ -434,6 +435,11 @@ public class JourneyMap
 
     private void reset()
     {
+        if(mc!=null && mc.thePlayer!=null)
+        {
+            playerName = mc.thePlayer.getCommandSenderName();
+        }
+
         loadConfigProperties();
         DataCache.instance().purge();
         chunkRenderController = new ChunkRenderController();
@@ -613,5 +619,10 @@ public class JourneyMap
         {
             startMapping();
         }
+    }
+
+    public String getPlayerName()
+    {
+        return playerName;
     }
 }
