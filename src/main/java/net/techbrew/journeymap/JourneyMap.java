@@ -428,8 +428,6 @@ public class JourneyMap
                 taskController.clear();
                 taskController = null;
             }
-
-            currentWorldId = null;
         }
     }
 
@@ -451,11 +449,6 @@ public class JourneyMap
         RegionImageCache.getInstance().clear();
         UIManager.getInstance().reset();
         WaypointStore.instance().reset();
-
-        if (waypointProperties.managerEnabled.get())
-        {
-            WaypointStore.instance().load();
-        }
     }
 
     public void softReset()
@@ -469,11 +462,6 @@ public class JourneyMap
         UIManager.getInstance().reset();
         WaypointStore.instance().reset();
         MiniMapOverlayHandler.checkEventConfig();
-
-        if (waypointProperties.managerEnabled.get())
-        {
-            WaypointStore.instance().load();
-        }
         ThemeFileHandler.getCurrentTheme(true);
         UIManager.getInstance().getMiniMap().updateDisplayVars(true);
     }
@@ -498,13 +486,25 @@ public class JourneyMap
 
             final boolean isDead = mc.currentScreen != null && mc.currentScreen instanceof GuiGameOver;
 
-
             if (mc.theWorld == null)
             {
                 if (isMapping())
                 {
                     stopMapping();
                 }
+
+                GuiScreen guiScreen = mc.currentScreen;
+                if (guiScreen instanceof GuiMainMenu ||
+                        guiScreen instanceof GuiSelectWorld ||
+                        guiScreen instanceof GuiMultiplayer)
+                {
+                    if (currentWorldId != null)
+                    {
+                        JourneyMap.getLogger().info("World ID has been reset.");
+                        currentWorldId = null;
+                    }
+                }
+
                 return;
             }
             else
@@ -522,16 +522,6 @@ public class JourneyMap
 
                 if (!isMapping())
                 {
-                    return;
-                }
-
-                // TODO: Does this happen ever?
-                GuiScreen guiScreen = mc.currentScreen;
-                if (guiScreen instanceof GuiMainMenu ||
-                        guiScreen instanceof GuiSelectWorld ||
-                        guiScreen instanceof GuiMultiplayer)
-                {
-                    stopMapping();
                     return;
                 }
             }
@@ -599,23 +589,29 @@ public class JourneyMap
 
     public void setCurrentWorldId(String worldId)
     {
-        boolean unchanged = Constants.safeEqual(worldId, currentWorldId);
-        if (unchanged)
+        File currentWorldDirectory = FileHandler.getWorldDirectory();
+        File newWorldDirectory = FileHandler.getJMWorldDirForWorldId(mc, worldId);
+
+        boolean worldIdUnchanged = Constants.safeEqual(worldId, currentWorldId);
+        boolean directoryUnchanged = currentWorldDirectory != null && currentWorldDirectory.getPath().equals(newWorldDirectory.getPath());
+
+        if (worldIdUnchanged && directoryUnchanged && worldId != null)
         {
             getLogger().info("World UID hasn't changed: " + worldId);
             return;
         }
 
-        boolean restartMapping = isMapping();
-
-        if (restartMapping)
+        boolean wasMapping = isMapping();
+        if (wasMapping)
         {
             stopMapping();
         }
 
         this.currentWorldId = worldId;
+        getLogger().info("World UID is set to: " + worldId);
+        reset();
 
-        if (restartMapping)
+        if (wasMapping)
         {
             startMapping();
         }
