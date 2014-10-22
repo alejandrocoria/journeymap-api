@@ -15,6 +15,8 @@ http://journeymap.techbrew.net
 - Change: REQUIRES Forge Recommended Build 10.13.2.1230
 - Bugfix: When near bottom of world, errors in chat appear: JourneyMap.performTasks()
 - Bugfix: Deathpoints not created in some Multiplayer server environments
+- Bugfix: Waypoint Manager NPE if no waypoints in current dimension selection
+- Bugfix: Waypoint Manager Layout doesn't update when Dimensions button pushed
 
 ## Changelog for JourneyMap 5.0.0b5:
 - Bugfix: Nether mapping had multiple issues, including useless results when near the top of the Nether.

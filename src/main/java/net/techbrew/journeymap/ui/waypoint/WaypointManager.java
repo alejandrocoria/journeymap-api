@@ -190,7 +190,10 @@ public class WaypointManager extends JmUI
 
             // Update slots
             itemScrollPane.setSlots(items);
-            itemScrollPane.scrollTo(items.get(0));
+            if (!items.isEmpty())
+            {
+                itemScrollPane.scrollTo(items.get(0));
+            }
 
         }
         catch (Throwable t)
@@ -354,6 +357,7 @@ public class WaypointManager extends JmUI
         {
             buttonDimensions.nextValue();
             updateItems();
+            buttonList.clear();
             return;
         }
         if (guibutton == buttonAdd)
@@ -372,7 +376,7 @@ public class WaypointManager extends JmUI
             boolean state = buttonToggleAll.getToggled();
             state = toggleItems(state);
             buttonToggleAll.setToggled(state);
-            //buttonList.clear(); // todo no hack
+            buttonList.clear(); // todo no hack
             return;
         }
         if (guibutton == buttonOptions)
