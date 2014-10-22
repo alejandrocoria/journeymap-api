@@ -9,10 +9,13 @@
 package net.techbrew.journeymap.forgehandler;
 
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.network.*;
-import cpw.mods.fml.common.network.simpleimpl.*;
+import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
@@ -42,12 +45,10 @@ public class WorldInfoHandler
 
     // Timestamp in millis of the last response from server
     private static long lastResponse;
-
-    // Network wrapper of the channel for requests/response
-    private SimpleNetworkWrapper channel;
-
     // Handle to Minecraft client
     Minecraft mc = FMLClientHandler.instance().getClient();
+    // Network wrapper of the channel for requests/response
+    private SimpleNetworkWrapper channel;
 
     /**
      * Default constructor.
@@ -60,13 +61,13 @@ public class WorldInfoHandler
             if (channel != null)
             {
                 channel.registerMessage(WorldIdListener.class, WorldIdMessage.class, PACKET_WORLDID, Side.CLIENT);
-                FMLLog.info("Registered channel: %s", CHANNEL_NAME);
+                JourneyMap.getLogger().info(String.format("Registered channel: %s", CHANNEL_NAME));
                 MinecraftForge.EVENT_BUS.register(this);
             }
         }
         catch(Throwable t)
         {
-            FMLLog.severe("Failed to register channel %s: %s", CHANNEL_NAME, t);
+            JourneyMap.getLogger().error(String.format("Failed to register channel %s: %s", CHANNEL_NAME, t));
         }
     }
 
@@ -78,7 +79,7 @@ public class WorldInfoHandler
         long now = System.currentTimeMillis();
         if(lastRequest + MIN_DELAY_MS < now && lastResponse + MIN_DELAY_MS < now)
         {
-            FMLLog.info("Requesting World ID");
+            JourneyMap.getLogger().info("Requesting World ID");
             channel.sendToServer(new WorldIdMessage());
             lastRequest = System.currentTimeMillis();
         }
@@ -126,7 +127,7 @@ public class WorldInfoHandler
         public IMessage onMessage(WorldIdMessage message, MessageContext ctx)
         {
             lastResponse = System.currentTimeMillis();
-            FMLLog.info("Got the worldUid from server: %s" , message.worldUid);
+            JourneyMap.getLogger().info(String.format("Got the worldUid from server: %s", message.worldUid));
             JourneyMap.getInstance().setCurrentWorldId(message.worldUid);
             return null;
         }
@@ -158,7 +159,7 @@ public class WorldInfoHandler
             }
             catch(Throwable t)
             {
-                FMLLog.severe("Failed to read message: %s", t);
+                JourneyMap.getLogger().error(String.format("Failed to read message: %s", t));
             }
         }
 
@@ -174,7 +175,7 @@ public class WorldInfoHandler
             }
             catch(Throwable t)
             {
-                FMLLog.severe("Failed to read message: %s", t);
+                JourneyMap.getLogger().error(String.format("Failed to read message: %s", t));
             }
         }
     }
