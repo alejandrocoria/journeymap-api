@@ -31,8 +31,8 @@ import java.util.*;
  */
 public class WaypointManager extends JmUI
 {
-    final static String ASCEND = Constants.getString("jm.common.char_uparrow");
-    final static String DESCEND = Constants.getString("jm.common.char_downarrow");
+    final static String ASCEND = "\u25B2";
+    final static String DESCEND = "\u25BC";
     final static int COLWAYPOINT = 0;
     protected int colWaypoint = COLWAYPOINT;
     final static int COLLOCATION = 20;
@@ -226,6 +226,11 @@ public class WaypointManager extends JmUI
         if (mc == null)
         {
             return;
+        }
+
+        if (buttonList.isEmpty() || itemScrollPane == null)
+        {
+            initGui();
         }
 
         try

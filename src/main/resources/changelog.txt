@@ -16,8 +16,9 @@ http://journeymap.techbrew.net
 - Bugfix: When near bottom of world, errors in chat appear: JourneyMap.performTasks()
 - Bugfix: Deathpoints not created in some Multiplayer server environments
 - Bugfix: Waypoint Manager NPE if no waypoints in current dimension selection
-- Bugfix: Waypoint Manager Layout doesn't update when Dimensions button pushed
+- Bugfix: Waypoint Manager Layout didnt't update when Dimensions button pushed or sometimes flickered at beginning of layout
 - Bugfix: Waypoints weren't consistently loaded after cache reset by dimension switches, deaths, etc.
+- Change: Waypoint Manager column headers now use up/down glyphs to show sort direction instead of < and >
 
 ## Changelog for JourneyMap 5.0.0b5:
 - Bugfix: Nether mapping had multiple issues, including useless results when near the top of the Nether.
