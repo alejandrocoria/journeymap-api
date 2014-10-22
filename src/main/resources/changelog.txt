@@ -19,6 +19,7 @@ http://journeymap.techbrew.net
 - Bugfix: Waypoint Manager Layout didnt't update when Dimensions button pushed or sometimes flickered at beginning of layout
 - Bugfix: Waypoints weren't consistently loaded after cache reset by dimension switches, deaths, etc.
 - Change: Waypoint Manager column headers now use up/down glyphs to show sort direction instead of < and >
+- Change: Minimap Preset ID now renders before player icon so your current heading isn't obscured.
 
 ## Changelog for JourneyMap 5.0.0b5:
 - Bugfix: Nether mapping had multiple issues, including useless results when near the top of the Nether.

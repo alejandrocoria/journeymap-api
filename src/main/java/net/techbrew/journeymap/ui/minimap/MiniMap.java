@@ -246,16 +246,7 @@ public class MiniMap
                 // Draw waypoints
                 drawOnMapWaypoints(rotation);
 
-                // Draw player
-                if (miniMapProperties.showSelf.get())
-                {
-                    if (centerPoint != null)
-                    {
-                        DrawUtil.drawEntity(centerPoint.getX(), centerPoint.getY(), mc.thePlayer.rotationYawHead, false, playerLocatorTex, dv.drawScale, rotation);
-                    }
-                }
-
-                // Draw Minimap Id
+                // Draw Minimap Preset Id
                 if (now - initTime <= 1000)
                 {
                     if (!unicodeForced)
@@ -267,6 +258,15 @@ public class MiniMap
                     if (!unicodeForced)
                     {
                         DrawUtil.stopUnicode(mc.fontRenderer);
+                    }
+                }
+
+                // Draw player
+                if (miniMapProperties.showSelf.get())
+                {
+                    if (centerPoint != null)
+                    {
+                        DrawUtil.drawEntity(centerPoint.getX(), centerPoint.getY(), mc.thePlayer.rotationYawHead, false, playerLocatorTex, dv.drawScale, rotation);
                     }
                 }
 
