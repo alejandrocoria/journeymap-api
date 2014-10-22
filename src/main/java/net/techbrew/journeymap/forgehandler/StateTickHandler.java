@@ -31,21 +31,21 @@ import java.util.EnumSet;
 @SideOnly(Side.CLIENT)
 public class StateTickHandler implements EventHandlerManager.EventHandler
 {
-
     Minecraft mc = FMLClientHandler.instance().getClient();
     int counter = 0;
     private boolean deathpointCreated;
 
+    @SideOnly(Side.CLIENT)
     @Override
     public EnumSet<EventHandlerManager.BusType> getBus()
     {
         return EnumSet.of(EventHandlerManager.BusType.FMLCommonHandlerBus);
     }
 
+    @SideOnly(Side.CLIENT)
     @SubscribeEvent()
     public void onClientTick(TickEvent.ClientTickEvent event)
     {
-
         if (event.phase == TickEvent.Phase.END)
         {
             return;

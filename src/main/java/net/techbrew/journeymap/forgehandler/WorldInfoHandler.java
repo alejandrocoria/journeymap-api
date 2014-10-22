@@ -74,7 +74,7 @@ public class WorldInfoHandler
     /**
      * Request a World ID from the server by sending a blank WorldUidMessage.
      */
-    private void requestWorldUid()
+    private void requestWorldID()
     {
         long now = System.currentTimeMillis();
         if(lastRequest + MIN_DELAY_MS < now && lastResponse + MIN_DELAY_MS < now)
@@ -93,9 +93,9 @@ public class WorldInfoHandler
     @SubscribeEvent
     public void on(WorldEvent.Load event)
     {
-        if(!mc.isSingleplayer() && mc.thePlayer!=null)
+        if (!mc.isSingleplayer())
         {
-            requestWorldUid();
+            requestWorldID();
         }
     }
 
@@ -112,7 +112,7 @@ public class WorldInfoHandler
         {
             if(event.entity.getUniqueID().equals(mc.thePlayer.getUniqueID()))
             {
-                requestWorldUid();
+                requestWorldID();
             }
         }
     }
@@ -127,7 +127,7 @@ public class WorldInfoHandler
         public IMessage onMessage(WorldIdMessage message, MessageContext ctx)
         {
             lastResponse = System.currentTimeMillis();
-            JourneyMap.getLogger().info(String.format("Got the worldUid from server: %s", message.worldUid));
+            JourneyMap.getLogger().info(String.format("Got the World ID from server: %s", message.worldUid));
             JourneyMap.getInstance().setCurrentWorldId(message.worldUid);
             return null;
         }

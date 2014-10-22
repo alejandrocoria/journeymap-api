@@ -36,7 +36,6 @@ public class EventHandlerManager
         register(new WorldEventHandler());
         register(new ChunkUpdateHandler());
         register(new WaypointBeaconHandler());
-        register(new PlayerDeathEvent());
         worldInfoHandler = new WorldInfoHandler();
         resourceManagerHandler = new ResourceManagerHandler();
         ColorCache.instance();
