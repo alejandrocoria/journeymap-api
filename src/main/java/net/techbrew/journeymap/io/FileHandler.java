@@ -123,6 +123,11 @@ public class FileHandler
         return JourneyMapDirectory;
     }
 
+    public static File getWorldDirectory()
+    {
+        return WorldDirectory;
+    }
+
 
     public static File getJMWorldDir(Minecraft minecraft)
     {
@@ -141,7 +146,7 @@ public class FileHandler
         }
     }
 
-    public static File getJMWorldDir(Minecraft minecraft, String worldUid)
+    public static File getJMWorldDir(Minecraft minecraft, String worldId)
     {
         if (minecraft.theWorld == null)
         {
@@ -157,18 +162,13 @@ public class FileHandler
 
         try
         {
+            WorldDirectory = getJMWorldDirForWorldId(minecraft, worldId);
+            WorldDirectory.mkdirs();
+
             if (!minecraft.isSingleplayer())
             {
                 String legacyWorldName = WorldData.getWorldName(minecraft, true);
                 File legacyWorldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + legacyWorldName + "_0"); //$NON-NLS-1$
-
-                String suffix = "";
-                if (worldUid != null)
-                {
-                    suffix = "_" + worldUid;
-                }
-                WorldDirectory = new File(MinecraftDirectory, Constants.MP_DATA_DIR + WorldData.getWorldName(minecraft, false) + suffix); //$NON-NLS-1$
-
                 if (legacyWorldDir.exists())
                 {
                     migrateLegacyFolderName(legacyWorldDir, WorldDirectory);
@@ -177,8 +177,6 @@ public class FileHandler
             else
             {
                 File legacyWorldDir = new File(MinecraftDirectory, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, true));
-                WorldDirectory = new File(MinecraftDirectory, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, false));
-
                 if (!legacyWorldDir.getName().equals(WorldDirectory.getName()))
                 {
                     if (legacyWorldDir.exists() && WorldDirectory.exists())
@@ -193,7 +191,6 @@ public class FileHandler
                 }
             }
 
-            WorldDirectory.mkdirs();
         }
         catch (Exception e)
         {
@@ -203,6 +200,28 @@ public class FileHandler
 
         theLastWorld = minecraft.theWorld;
         return WorldDirectory;
+    }
+
+    public static File getJMWorldDirForWorldId(Minecraft minecraft, String worldId)
+    {
+        File testWorldDirectory = null;
+        try
+        {
+            if (!minecraft.isSingleplayer())
+            {
+                String suffix = (worldId != null) ? ("_" + worldId) : "";
+                testWorldDirectory = new File(MinecraftDirectory, Constants.MP_DATA_DIR + WorldData.getWorldName(minecraft, false) + suffix); //$NON-NLS-1$
+            }
+            else
+            {
+                testWorldDirectory = new File(MinecraftDirectory, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, false));
+            }
+        }
+        catch (Exception e)
+        {
+            JourneyMap.getLogger().log(Level.ERROR, LogFormatter.toString(e));
+        }
+        return testWorldDirectory;
     }
 
     private static void migrateLegacyFolderName(File legacyWorldDir, File worldDir)
