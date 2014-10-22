@@ -881,7 +881,6 @@ public class Fullscreen extends JmUI
         }
 
         gridRenderer.updateGL(0);
-        boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, fullMapProperties.forceUnicode.get());
         float drawScale = fullMapProperties.textureSmall.get() ? 1f : 2f;
 
         if (state.follow.get())
@@ -907,11 +906,6 @@ public class Fullscreen extends JmUI
         DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above,
                 statusBackgroundColor, statusBackgroundAlpha, statusForegroundColor, statusForegroundAlpha, getMapFontScale(), true);
 
-        if (unicodeForced)
-        {
-            DrawUtil.stopUnicode(mc.fontRenderer);
-        }
-
         drawLogo();
 
         sizeDisplay(true);
@@ -921,7 +915,7 @@ public class Fullscreen extends JmUI
 
     private int getMapFontScale()
     {
-        return (fullMapProperties.fontSmall.get() ? 1 : 2) * (fullMapProperties.forceUnicode.get() ? 2 : 1);
+        return (fullMapProperties.fontScale.get());
     }
 
     public void centerOn(Waypoint waypoint)

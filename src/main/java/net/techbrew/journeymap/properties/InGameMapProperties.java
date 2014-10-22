@@ -13,6 +13,7 @@ import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.ui.option.LocationFormat;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static net.techbrew.journeymap.properties.config.Config.Category.Inherit;
@@ -25,11 +26,8 @@ public abstract class InGameMapProperties extends MapProperties
     @Config(category = Inherit, key = "jm.common.show_caves", defaultBoolean = true)
     public final AtomicBoolean showCaves = new AtomicBoolean(true);
 
-    @Config(category = Inherit, key = "jm.minimap.force_unicode", defaultBoolean = false)
-    public final AtomicBoolean forceUnicode = new AtomicBoolean(false);
-
-    @Config(category = Inherit, key = "jm.common.font")
-    public final AtomicBoolean fontSmall = new AtomicBoolean(true);
+    @Config(category = Inherit, key = "jm.common.font_scale", minValue = 1, maxValue = 3, defaultValue = 1)
+    public final AtomicInteger fontScale = new AtomicInteger(1);
 
     @Config(category = Inherit, key = "jm.minimap.texture_size")
     public final AtomicBoolean textureSmall = new AtomicBoolean(true);
@@ -67,8 +65,7 @@ public abstract class InGameMapProperties extends MapProperties
     public int hashCode()
     {
         int result = super.hashCode();
-        result = 31 * result + forceUnicode.hashCode();
-        result = 31 * result + fontSmall.hashCode();
+        result = 31 * result + fontScale.hashCode();
         result = 31 * result + textureSmall.hashCode();
         return result;
     }
@@ -77,8 +74,7 @@ public abstract class InGameMapProperties extends MapProperties
     protected Objects.ToStringHelper toStringHelper(MapProperties me)
     {
         return super.toStringHelper(me)
-                .add("fontSmall", fontSmall)
-                .add("forceUnicode", forceUnicode)
+                .add("fontScale", fontScale)
                 .add("locationFormat", locationFormat)
                 .add("locationFormatVerbose", locationFormatVerbose)
                 .add("showCaves", showCaves)

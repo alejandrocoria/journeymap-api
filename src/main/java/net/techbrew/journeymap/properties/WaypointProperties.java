@@ -49,11 +49,8 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     @Config(category = WaypointBeacon, key = "jm.waypoint.bold_label", defaultBoolean = false)
     public final AtomicBoolean boldLabel = new AtomicBoolean(false);
 
-    @Config(category = WaypointBeacon, key = "jm.waypoint.force_unicode", defaultBoolean = false)
-    public final AtomicBoolean forceUnicode = new AtomicBoolean(false);
-
-    @Config(category = WaypointBeacon, key = "jm.common.font")
-    public final AtomicBoolean fontSmall = new AtomicBoolean(true);
+    @Config(category = WaypointBeacon, key = "jm.waypoint.font_scale", minValue = 1, maxValue = 3, defaultValue = 1)
+    public final AtomicInteger fontScale = new AtomicInteger(1);
 
     @Config(category = WaypointBeacon, key = "jm.waypoint.texture_size")
     public final AtomicBoolean textureSmall = new AtomicBoolean(true);
@@ -100,8 +97,7 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
         result = 31 * result + showDistance.hashCode();
         result = 31 * result + autoHideLabel.hashCode();
         result = 31 * result + boldLabel.hashCode();
-        result = 31 * result + forceUnicode.hashCode();
-        result = 31 * result + fontSmall.hashCode();
+        result = 31 * result + fontScale.hashCode();
         result = 31 * result + textureSmall.hashCode();
         result = 31 * result + maxDistance.hashCode();
         result = 31 * result + createDeathpoints.hashCode();
@@ -117,8 +113,7 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
                 .add("beaconEnabled", beaconEnabled)
                 .add("boldLabel", boldLabel)
                 .add("createDeathpoints", createDeathpoints)
-                .add("fontSmall", fontSmall)
-                .add("forceUnicode", forceUnicode)
+                .add("fontScale", fontScale)
                 .add("managerEnabled", managerEnabled)
                 .add("maxDistance", maxDistance)
                 .add("name", name)

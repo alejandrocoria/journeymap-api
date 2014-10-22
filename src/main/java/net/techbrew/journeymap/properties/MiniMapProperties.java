@@ -45,8 +45,8 @@ public class MiniMapProperties extends InGameMapProperties
     @Config(category = Inherit, key = "jm.minimap.show_location")
     public final AtomicBoolean showLocation = new AtomicBoolean(true);
 
-    @Config(category = Inherit, key = "jm.minimap.size", minValue = 1, maxValue = 100, defaultValue = 20)
-    public final AtomicInteger sizePercent = new AtomicInteger(20);
+    @Config(category = Inherit, key = "jm.minimap.size", minValue = 1, maxValue = 100, defaultValue = 30)
+    public final AtomicInteger sizePercent = new AtomicInteger(30);
 
     @Config(category = Inherit, key = "jm.minimap.frame_alpha", minValue = 0, maxValue = 100, defaultValue = 100)
     public final AtomicInteger frameAlpha = new AtomicInteger(100);
@@ -54,11 +54,11 @@ public class MiniMapProperties extends InGameMapProperties
     @Config(category = Inherit, key = "jm.minimap.terrain_alpha", minValue = 0, maxValue = 100, defaultValue = 100)
     public final AtomicInteger terrainAlpha = new AtomicInteger(100);
 
-    @Config(category = Inherit, key = "jm.minimap.orientation.button", defaultEnum = "North")
-    public final AtomicReference<Orientation> orientation = new AtomicReference<Orientation>(Orientation.North);
+    @Config(category = Inherit, key = "jm.minimap.orientation.button", defaultEnum = "PlayerHeading")
+    public final AtomicReference<Orientation> orientation = new AtomicReference<Orientation>(Orientation.PlayerHeading);
 
-    @Config(category = Inherit, key = "jm.minimap.compass_font", defaultBoolean = true)
-    public final AtomicBoolean compassFontSmall = new AtomicBoolean(true);
+    @Config(category = Inherit, key = "jm.minimap.compass_font_scale", minValue = 1, maxValue = 3, defaultValue = 1)
+    public final AtomicInteger compassFontScale = new AtomicInteger(1);
 
     @Config(category = Inherit, key = "jm.minimap.show_compass")
     public final AtomicBoolean showCompass = new AtomicBoolean(true);
@@ -168,7 +168,7 @@ public class MiniMapProperties extends InGameMapProperties
         result = 31 * result + frameAlpha.hashCode();
         result = 31 * result + terrainAlpha.hashCode();
         result = 31 * result + orientation.hashCode();
-        result = 31 * result + compassFontSmall.hashCode();
+        result = 31 * result + compassFontScale.hashCode();
         result = 31 * result + showCompass.hashCode();
         result = 31 * result + showReticle.hashCode();
         result = 31 * result + reticleOrientation.hashCode();
@@ -183,7 +183,7 @@ public class MiniMapProperties extends InGameMapProperties
     {
         return super.toStringHelper(this)
                 .add("active", active)
-                .add("compassFontSmall", compassFontSmall)
+                .add("compassFontScale", compassFontScale)
                 .add("enabled", enabled)
                 .add("frameAlpha", frameAlpha)
                 .add("name", name)

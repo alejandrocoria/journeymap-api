@@ -25,7 +25,6 @@ import java.awt.*;
  */
 public class DrawUtil
 {
-
     public static double zLevel = 0;
 
     /**
@@ -137,7 +136,7 @@ public class DrawUtil
                 }
                 case Center:
                 {
-                    textX = x - (width / 2);
+                    textX = x - (width / 2) + (fontScale > 1 ? .5 : 0);
                     break;
                 }
                 case Right:
@@ -159,7 +158,7 @@ public class DrawUtil
                 }
                 case Middle:
                 {
-                    rectY = y - (height / 2);
+                    rectY = y - (height / 2) + (fontScale > 1 ? .5 : 0);
                     textY = rectY + vpad;
                     break;
                 }
@@ -420,27 +419,6 @@ public class DrawUtil
         }
     }
 
-    public static boolean startUnicode(FontRenderer fr, boolean force)
-    {
-        if (!force)
-        {
-            return false;
-        }
-
-        boolean isUnicode = fr.getUnicodeFlag();
-        if (!isUnicode)
-        {
-            fr.setUnicodeFlag(true);
-            return true;
-        }
-        return false;
-    }
-
-    public static void stopUnicode(FontRenderer fr)
-    {
-        fr.setUnicodeFlag(false);
-    }
-
     public static void sizeDisplay(double width, double height)
     {
 
@@ -462,5 +440,6 @@ public class DrawUtil
     {
         Above, Middle, Below
     }
+
 
 }

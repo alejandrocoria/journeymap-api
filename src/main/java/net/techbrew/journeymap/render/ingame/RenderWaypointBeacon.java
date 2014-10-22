@@ -230,9 +230,7 @@ public class RenderWaypointBeacon
                     GL11.glDepthMask(true);
                     GL11.glEnable(GL11.GL_DEPTH_TEST);
 
-                    final int fontScale = waypointProperties.fontSmall.get() ? 2 : 4;
-
-                    boolean forced = DrawUtil.startUnicode(fr, waypointProperties.forceUnicode.get());
+                    final int fontScale = waypointProperties.fontScale.get();
 
                     // Adjust above icon
                     double labelY = (0 - halfTexHeight) - 8;
@@ -245,10 +243,6 @@ public class RenderWaypointBeacon
 
                     // Front label
                     DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 100, waypoint.getSafeColor(), 255, fontScale, false);
-                    if (forced)
-                    {
-                        DrawUtil.stopUnicode(fr);
-                    }
 
                     GL11.glPopMatrix();
                 }

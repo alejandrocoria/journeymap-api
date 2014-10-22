@@ -197,7 +197,6 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Double
         {
             return;
         }
-        property.set(value);
-        properties.save();
+        setValue(value);
     }
 }

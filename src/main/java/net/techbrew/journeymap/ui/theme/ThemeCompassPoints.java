@@ -41,7 +41,7 @@ public class ThemeCompassPoints
     private double x;
     private double y;
 
-    public ThemeCompassPoints(int x, int y, int halfWidth, int halfHeight, Theme.Minimap.MinimapSpec minimapSpec, MiniMapProperties miniMapProperties, TextureImpl compassPointTex, boolean useUnicode, int labelHeight)
+    public ThemeCompassPoints(int x, int y, int halfWidth, int halfHeight, Theme.Minimap.MinimapSpec minimapSpec, MiniMapProperties miniMapProperties, TextureImpl compassPointTex, int labelHeight)
     {
         this.x = x;
         this.y = y;
@@ -50,7 +50,7 @@ public class ThemeCompassPoints
         pointSouth = new Point2D.Double(x + halfWidth, y + halfHeight + halfHeight);
         pointWest = new Point2D.Double(x, y + halfHeight);
         pointEast = new Point2D.Double(x + halfWidth + halfWidth, y + halfHeight);
-        this.fontScale = (miniMapProperties.compassFontSmall.get() ? 1 : 2) * (useUnicode ? 2 : 1);
+        this.fontScale = miniMapProperties.compassFontScale.get();
         this.compassLabelHeight = labelHeight;
 
         bgAlpha = minimapSpec.compassLabel.backgroundAlpha;

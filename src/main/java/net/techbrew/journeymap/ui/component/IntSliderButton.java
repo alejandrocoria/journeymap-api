@@ -203,7 +203,6 @@ public class IntSliderButton extends Button implements IPropertyHolder<Integer>
         {
             return;
         }
-        property.set(value);
-        properties.save();
+        setValue(value);
     }
 }

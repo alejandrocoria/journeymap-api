@@ -75,13 +75,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
                 info = Constants.getString("jm.common.location_xz_verbose", blockCoord.x, blockCoord.z);
             }
 
-            boolean unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, fullMapProperties.forceUnicode.get());
             double infoHeight = DrawUtil.getLabelHeight(mc.fontRenderer, true) * getMapFontScale();
-            if (unicodeForced)
-            {
-                DrawUtil.stopUnicode(mc.fontRenderer);
-            }
-
             blockInfoStep.update(info, gridWidth / 2, gridHeight - infoHeight);
         }
         else
@@ -94,8 +88,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
 
     private double getMapFontScale()
     {
-        FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
-        return (fullMapProperties.fontSmall.get() ? 1 : 2) * (fullMapProperties.forceUnicode.get() ? 2 : 1);
+        return JourneyMap.getFullMapProperties().fontScale.get();
     }
 
     @Override

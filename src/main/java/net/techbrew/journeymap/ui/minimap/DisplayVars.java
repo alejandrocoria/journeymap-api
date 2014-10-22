@@ -9,6 +9,7 @@
 package net.techbrew.journeymap.ui.minimap;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.properties.MiniMapProperties;
@@ -64,23 +65,20 @@ public class DisplayVars
     /**
      * Constructor.
      *
-     * @param mc             Minecraft
-     * @param shape          Desired shape
-     * @param position       Desired position
-     * @param labelFontScale Font scale for labels
+     * @param mc                Minecraft
+     * @param miniMapProperties
      */
-    DisplayVars(Minecraft mc, Shape shape, Position position, double labelFontScale, final MiniMapProperties miniMapProperties)
+    DisplayVars(Minecraft mc, final MiniMapProperties miniMapProperties)
     {
         // Immutable member and local vars
         this.scaledResolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
-        this.forceUnicode = miniMapProperties.forceUnicode.get();
         this.showFps = miniMapProperties.showFps.get();
         this.showBiome = miniMapProperties.showBiome.get();
         this.showLocation = miniMapProperties.showLocation.get();
         this.showCompass = miniMapProperties.showCompass.get();
         this.showReticle = miniMapProperties.showReticle.get();
-        this.shape = shape;
-        this.position = position;
+        this.shape = miniMapProperties.shape.get();
+        this.position = miniMapProperties.position.get();
         this.orientation = miniMapProperties.orientation.get();
         this.displayWidth = mc.displayWidth;
         this.displayHeight = mc.displayHeight;
@@ -120,18 +118,17 @@ public class DisplayVars
             }
         }
 
-        final boolean wasUnicode = mc.fontRenderer.getUnicodeFlag();
-        final boolean useUnicode = (forceUnicode || wasUnicode);
-        this.fontScale = labelFontScale * (useUnicode ? 2 : 1);
+        this.fontScale = miniMapProperties.fontScale.get();
 
-        fpsLabelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, minimapSpec.fpsLabel.shadow) * (useUnicode ? .7 : 1) * this.fontScale);
-        locationLabelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, minimapSpec.locationLabel.shadow) * (useUnicode ? .7 : 1) * this.fontScale);
+        FontRenderer fontRenderer = mc.fontRenderer;
+        fpsLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.fpsLabel.shadow) * this.fontScale);
+        locationLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.locationLabel.shadow) * this.fontScale);
 
-        int compassFontScale = (miniMapProperties.compassFontSmall.get() ? 1 : 2) * (useUnicode ? 2 : 1);
+        int compassFontScale = miniMapProperties.compassFontScale.get();
         int compassLabelHeight = 0;
         if (showCompass)
         {
-            compassLabelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, minimapSpec.compassLabel.shadow) * (useUnicode ? .7 : 1) * compassFontScale);
+            compassLabelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, minimapSpec.compassLabel.shadow) * compassFontScale);
         }
 
         drawScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);
@@ -251,7 +248,7 @@ public class DisplayVars
 
         // Set up compass poionts
         this.minimapCompassPoints = new ThemeCompassPoints(textureX, textureY, halfWidth, halfHeight, minimapSpec,
-                miniMapProperties, this.minimapFrame.getCompassPoint(), useUnicode, compassLabelHeight);
+                miniMapProperties, this.minimapFrame.getCompassPoint(), compassLabelHeight);
 
         // Set up key positions
         double centerX = Math.floor(textureX + (minimapWidth / 2));

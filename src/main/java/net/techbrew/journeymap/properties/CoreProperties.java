@@ -85,8 +85,8 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Cartography, key = "jm.common.map_style_plantshadows", defaultBoolean = false)
     public final AtomicBoolean mapPlantShadows = new AtomicBoolean(false);
 
-    @Config(category = Cartography, key = "jm.common.map_style_plants", defaultBoolean = true)
-    public final AtomicBoolean mapPlants = new AtomicBoolean(true);
+    @Config(category = Cartography, key = "jm.common.map_style_plants", defaultBoolean = false)
+    public final AtomicBoolean mapPlants = new AtomicBoolean(false);
 
     @Config(category = Cartography, key = "jm.common.map_style_crops", defaultBoolean = true)
     public final AtomicBoolean mapCrops = new AtomicBoolean(true);

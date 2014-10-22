@@ -222,8 +222,6 @@ public class MiniMap
                 }
             }
 
-            unicodeForced = DrawUtil.startUnicode(mc.fontRenderer, dv.forceUnicode);
-
             /***** BEGIN MATRIX: ROTATION *****/
             startMapRotation(rotation);
 
@@ -249,16 +247,9 @@ public class MiniMap
                 // Draw Minimap Preset Id
                 if (now - initTime <= 1000)
                 {
-                    if (!unicodeForced)
-                    {
-                        DrawUtil.startUnicode(mc.fontRenderer, true);
-                    }
                     int alpha = (int) Math.min(255, Math.max(0, 1100 - (now - initTime)));
-                    DrawUtil.drawLabel(Integer.toString(miniMapProperties.getId()), centerPoint.getX(), centerPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, Math.max(0, alpha - 100), Color.white, alpha, 8, false, rotation);
-                    if (!unicodeForced)
-                    {
-                        DrawUtil.stopUnicode(mc.fontRenderer);
-                    }
+                    int scale = 8;
+                    DrawUtil.drawLabel(Integer.toString(miniMapProperties.getId()), centerPoint.getX(), centerPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 0, Color.white, alpha, scale, true, rotation);
                 }
 
                 // Draw player
@@ -366,10 +357,6 @@ public class MiniMap
         }
         finally
         {
-            if (unicodeForced)
-            {
-                DrawUtil.stopUnicode(mc.fontRenderer);
-            }
             cleanup();
             timer.stop();
         }
@@ -567,8 +554,7 @@ public class MiniMap
                 && mc.displayWidth == dv.displayWidth
                 && this.dv.shape == shape
                 && this.dv.position == position
-                && this.dv.forceUnicode == miniMapProperties.forceUnicode.get()
-                && this.dv.fontScale == (miniMapProperties.fontSmall.get() ? 1 : 2))
+                && this.dv.fontScale == miniMapProperties.fontScale.get())
         {
             return;
         }
@@ -586,13 +572,14 @@ public class MiniMap
         miniMapProperties.save();
 
         DisplayVars oldDv = this.dv;
-        this.dv = new DisplayVars(mc, shape, position, miniMapProperties.fontSmall.get() ? 1 : 2, miniMapProperties);
+        this.dv = new DisplayVars(mc, miniMapProperties);
 
         if (oldDv == null || oldDv.shape != this.dv.shape)
         {
-            this.drawTimer = StatTimer.get("MiniMap1." + shape.name(), 500);
+            String timerName = String.format("MiniMap%s.%s", miniMapProperties.getId(), shape.name());
+            this.drawTimer = StatTimer.get(timerName, 100);
             this.drawTimer.reset();
-            this.refreshStateTimer = StatTimer.get("MiniMap1." + shape.name() + "+refreshState", 5);
+            this.refreshStateTimer = StatTimer.get(timerName + "+refreshState", 5);
             this.refreshStateTimer.reset();
         }
 
@@ -636,5 +623,7 @@ public class MiniMap
         // Update timestamp
         lastLabelRefresh = System.currentTimeMillis();
     }
+
+
 }
 

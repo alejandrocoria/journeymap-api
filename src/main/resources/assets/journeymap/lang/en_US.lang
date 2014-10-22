@@ -1,4 +1,4 @@
-### JourneyMap 5.0.0a10 Resource Bundle - en_US
+### JourneyMap 5.0.0b7 Resource Bundle - en_US
 ### Notes for translators:
 ### Do not translate or alter the codes used for color changes (§b, §e, §f, etc.)
 ### Positional parameters (%1$s, %2$s, %3$s, etc.) may be reordered to suit your language's sentence structure
@@ -61,13 +61,8 @@ jm.common.disabled_feature=Feature not available
 jm.common.enable=Enabled
 jm.common.file_updates=Files are being updated (%1$s). Mapping suspended.
 jm.common.file_updates_complete=File updates complete. Mapping resumed.
-jm.common.font=Small Font
-jm.common.font.tooltip=Use a small font size for labels and text
-jm.common.font_large=Large
-jm.common.font_small=Small
-jm.common.general_display=General Display
-jm.common.general_display_button=General Display...
-jm.common.general_display_title=General Display Options
+jm.common.font_scale=Font Scale
+jm.common.font_scale.tooltip=The font scale for labels and text
 jm.common.help=Help...
 jm.common.hide_buttons=Hide Buttons
 jm.common.hotkeys=Hot Keys...
@@ -218,12 +213,10 @@ jm.minimap.compass.e=E
 jm.minimap.compass.n=N
 jm.minimap.compass.s=S
 jm.minimap.compass.w=W
-jm.minimap.compass_font=Small Compass Font
-jm.minimap.compass_font.tooltip=Use a small font size for compass points
+jm.minimap.compass_font_scale=Compass Font Scale
+jm.minimap.compass_font_scale.tooltip=The font scale used for compass point labels
 jm.minimap.enable_minimap=Enable MiniMap
 jm.minimap.enable_minimap.tooltip=Display the MiniMap in-game
-jm.minimap.force_unicode=Force Unicode
-jm.minimap.force_unicode.tooltip=Use the Unicode font for MiniMap labels and text
 jm.minimap.frame_alpha=Frame Opacity
 jm.minimap.frame_alpha.tooltip=Adjust how opaque the MiniMap frame is (as a percentage)
 jm.minimap.hotkeys=Enable MiniMap Hot Keys
@@ -300,9 +293,8 @@ jm.waypoint.enable_beacons.tooltip=Show in-game beacons of your waypoints
 jm.waypoint.enable_manager=Enable Waypoint Manager
 jm.waypoint.enable_manager.tooltip=Enable the Waypoint Manager. If you use another mod to manage waypoints, you should disable this.
 jm.waypoint.find=Find
-jm.waypoint.font_size=Small Font
-jm.waypoint.force_unicode=Force Unicode
-jm.waypoint.force_unicode.tooltip=Use the Unicode font for displaying waypoint labels
+jm.waypoint.font_scale=Font Scale
+jm.waypoint.font_scale.tooltip=The font scale used to display waypoint labels in-game.
 jm.waypoint.green_abbreviated=G
 jm.waypoint.help_create_ingame=Create/Edit Waypoint (in game)
 jm.waypoint.help_create_inmap=Create/Edit Waypoint (in map)
@@ -348,7 +340,7 @@ jm.waypoint.show_texture=Show Icon
 jm.waypoint.show_texture.tooltip=Show the icon of a waypoint with its beacon
 jm.waypoint.teleport=Teleport
 jm.waypoint.texture_size=Small Icon
-jm.waypoint.texture_size.tooltip=Use a small icon for the waypoint beacons.
+jm.waypoint.texture_size.tooltip=Use a small icon for the waypoint beacons
 jm.waypoint.waypoints=Waypoints
 jm.waypoint.x=X
 jm.waypoint.y=Y

@@ -16,10 +16,16 @@ http://journeymap.techbrew.net
 - Bugfix: When near bottom of world, errors in chat appear: JourneyMap.performTasks()
 - Bugfix: Deathpoints not created in some Multiplayer server environments
 - Bugfix: Waypoint Manager NPE if no waypoints in current dimension selection
-- Bugfix: Waypoint Manager Layout didnt't update when Dimensions button pushed or sometimes flickered at beginning of layout
+- Bugfix: Waypoint Manager Layout didn't update when Dimensions button pushed or sometimes flickered at beginning of layout
 - Bugfix: Waypoints weren't consistently loaded after cache reset by dimension switches, deaths, etc.
+- Bugfix: World ID messages not always handled correctly, led to multiple world folders
+- Bugfix: Options Manager slider control labels didn't update when Reset button used
 - Change: Waypoint Manager column headers now use up/down glyphs to show sort direction instead of < and >
 - Change: Minimap Preset ID now renders before player icon so your current heading isn't obscured.
+- Change: "Force Unicode" options removed because they caused significant CPU overhead.
+- Change: "Small Font" options replaced with "Font Scale" options letting you choose a scale of 1-3, with 1 as the default.
+- Change: Default minimap size increased to 30%, default heading changed to My Heading
+- Change: Cartography "Show Plants" option is now false by default
 
 ## Changelog for JourneyMap 5.0.0b5:
 - Bugfix: Nether mapping had multiple issues, including useless results when near the top of the Nether.

@@ -59,7 +59,7 @@ public class MiniMapProperties2 extends MiniMapProperties
                 .add("frameAlpha", frameAlpha)
                 .add("terrainAlpha", terrainAlpha)
                 .add("orientation", orientation)
-                .add("compassFontSmall", compassFontSmall)
+                .add("compassFontScale", compassFontScale)
                 .add("showCompass", showCompass)
                 .add("showReticle", showReticle)
                 .add("reticleOrientation", reticleOrientation)
