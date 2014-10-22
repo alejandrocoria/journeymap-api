@@ -14,8 +14,14 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGameOver;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.model.Waypoint;
+import net.techbrew.journeymap.properties.WaypointProperties;
+import net.techbrew.journeymap.waypoint.WaypointStore;
 
 import java.util.EnumSet;
 
@@ -28,7 +34,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
 
     Minecraft mc = FMLClientHandler.instance().getClient();
     int counter = 0;
-    private boolean handleDeathpoint;
+    private boolean deathpointCreated;
 
     @Override
     public EnumSet<EventHandlerManager.BusType> getBus()
@@ -47,18 +53,17 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
 
         mc.mcProfiler.startSection("journeymap");
 
-        final boolean isDead = mc.currentScreen != null && mc.currentScreen instanceof GuiGameOver;
-        if(isDead)
+        if (mc.thePlayer != null && mc.thePlayer.isDead)
         {
-            if(!handleDeathpoint)
+            if (!deathpointCreated)
             {
-                handleDeathpoint = true;
-                PlayerDeathEvent.onDeath(mc.thePlayer);
+                deathpointCreated = true;
+                createDeathpoint();
             }
         }
         else
         {
-            handleDeathpoint = false;
+            deathpointCreated = false;
         }
 
         try
@@ -93,6 +98,40 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         finally
         {
             mc.mcProfiler.endSection();
+        }
+    }
+
+    private void createDeathpoint()
+    {
+        try
+        {
+            EntityPlayer player = mc.thePlayer;
+            if (player == null)
+            {
+                JourneyMap.getLogger().error("Lost reference to player before Deathpoint could be created");
+                return;
+            }
+
+            WaypointProperties waypointProperties = JourneyMap.getWaypointProperties();
+            boolean doCreate = waypointProperties.managerEnabled.get() && waypointProperties.createDeathpoints.get();
+
+            if (doCreate)
+            {
+                ChunkCoordinates cc = new ChunkCoordinates(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
+                Waypoint deathpoint = Waypoint.at(cc, Waypoint.Type.Death, player.worldObj.provider.dimensionId);
+                WaypointStore.instance().save(deathpoint);
+            }
+
+            JourneyMap.getLogger().info(String.format("%s died at x:%s, y:%s, z:%s. Deathpoint created: %s", player.getCommandSenderName(),
+                    MathHelper.floor_double(player.posX),
+                    MathHelper.floor_double(player.posY),
+                    MathHelper.floor_double(player.posZ),
+                    doCreate));
+
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().error("Unexpected Error in createDeathpoint(): " + LogFormatter.toString(t));
         }
     }
 }

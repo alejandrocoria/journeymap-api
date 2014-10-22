@@ -13,7 +13,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
@@ -145,12 +144,6 @@ public class Waypoint implements Serializable
                 break;
             }
         }
-    }
-
-    public static Waypoint deathOf(Entity player)
-    {
-        ChunkCoordinates cc = new ChunkCoordinates(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
-        return at(cc, Type.Death, player.worldObj.provider.dimensionId);
     }
 
     public static Waypoint of(EntityPlayer player)
@@ -330,7 +323,7 @@ public class Waypoint implements Serializable
 
     public double getBlockCenteredY()
     {
-        return getY() +.5d;
+        return getY() + .5d;
     }
 
     public int getZ()
