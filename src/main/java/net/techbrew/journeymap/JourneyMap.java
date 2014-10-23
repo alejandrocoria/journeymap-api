@@ -25,6 +25,7 @@ import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.forgehandler.EventHandlerManager;
 import net.techbrew.journeymap.forgehandler.MiniMapOverlayHandler;
+import net.techbrew.journeymap.forgehandler.WorldInfoHandler;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
@@ -438,6 +439,11 @@ public class JourneyMap
             playerName = mc.thePlayer.getCommandSenderName();
         }
 
+        if (!mc.isSingleplayer() && currentWorldId == null)
+        {
+            WorldInfoHandler.requestWorldID();
+        }
+
         loadConfigProperties();
         DataCache.instance().purge();
         chunkRenderController = new ChunkRenderController();
@@ -589,7 +595,7 @@ public class JourneyMap
 
     public void setCurrentWorldId(String worldId)
     {
-        File currentWorldDirectory = FileHandler.getWorldDirectory();
+        File currentWorldDirectory = FileHandler.getJMWorldDir(mc, currentWorldId);
         File newWorldDirectory = FileHandler.getJMWorldDirForWorldId(mc, worldId);
 
         boolean worldIdUnchanged = Constants.safeEqual(worldId, currentWorldId);

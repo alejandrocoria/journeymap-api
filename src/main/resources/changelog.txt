@@ -13,6 +13,7 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 - Bugfix: Defensive code added to gracefully fail when MultiWorld mod throws exceptions when trying to get a dimension provider name.
+- Change: World ID request added before mapping starts.  Bugfix retention of JM World Directory.
 
 ## Changelog for JourneyMap 5.0.0b7:
 - Bugfix: Waypoint Manager NPE if no waypoints in current dimension selection

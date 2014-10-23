@@ -45,10 +45,10 @@ public class WorldInfoHandler
 
     // Timestamp in millis of the last response from server
     private static long lastResponse;
+    // Network wrapper of the channel for requests/response
+    private static SimpleNetworkWrapper channel;
     // Handle to Minecraft client
     Minecraft mc = FMLClientHandler.instance().getClient();
-    // Network wrapper of the channel for requests/response
-    private SimpleNetworkWrapper channel;
 
     /**
      * Default constructor.
@@ -74,14 +74,17 @@ public class WorldInfoHandler
     /**
      * Request a World ID from the server by sending a blank WorldUidMessage.
      */
-    private void requestWorldID()
+    public static void requestWorldID()
     {
-        long now = System.currentTimeMillis();
-        if(lastRequest + MIN_DELAY_MS < now && lastResponse + MIN_DELAY_MS < now)
+        if (channel != null)
         {
-            JourneyMap.getLogger().info("Requesting World ID");
-            channel.sendToServer(new WorldIdMessage());
-            lastRequest = System.currentTimeMillis();
+            long now = System.currentTimeMillis();
+            if (lastRequest + MIN_DELAY_MS < now && lastResponse + MIN_DELAY_MS < now)
+            {
+                JourneyMap.getLogger().info("Requesting World ID");
+                channel.sendToServer(new WorldIdMessage());
+                lastRequest = System.currentTimeMillis();
+            }
         }
     }
 
@@ -108,9 +111,9 @@ public class WorldInfoHandler
     @SubscribeEvent
     public void on(EntityJoinWorldEvent event)
     {
-        if(!mc.isSingleplayer() && mc.thePlayer!=null && !mc.thePlayer.isDead)
+        if (!mc.isSingleplayer() && mc.thePlayer != null)
         {
-            if(event.entity.getUniqueID().equals(mc.thePlayer.getUniqueID()))
+            if (event.entity.getCommandSenderName().equals(mc.thePlayer.getCommandSenderName()))
             {
                 requestWorldID();
             }
