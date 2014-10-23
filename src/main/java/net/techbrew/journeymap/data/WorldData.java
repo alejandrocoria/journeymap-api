@@ -16,6 +16,7 @@ import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.RealmsHelper;
+import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.Display;
@@ -183,90 +184,117 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
     public static List<WorldProvider> getDimensionProviders(List<Integer> requiredDimensionList)
     {
-        HashSet<Integer> requiredDims = new HashSet<Integer>(requiredDimensionList);
-        HashMap<Integer, WorldProvider> dimProviders = new HashMap<Integer, WorldProvider>();
-
-        Level logLevel = Level.DEBUG;
-        JourneyMap.getLogger().log(logLevel, String.format("Required dimensions from waypoints: %s", requiredDimensionList));
-
-        // DimensionIDs works for local servers
-        Integer[] dims = DimensionManager.getIDs();
-        JourneyMap.getLogger().log(logLevel, String.format("DimensionManager has dims: %s", Arrays.asList(dims)));
-        requiredDims.addAll(Arrays.asList(dims));
-
-        // StaticDimensionIDs works for remote servers
-        dims = DimensionManager.getStaticDimensionIDs();
-        JourneyMap.getLogger().log(logLevel, String.format("DimensionManager has static dims: %s", Arrays.asList(dims)));
-        requiredDims.addAll(Arrays.asList(dims));
-
-        // Use the player's provider
-        WorldProvider playerProvider = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider;
-        dimProviders.put(playerProvider.dimensionId, playerProvider);
-        requiredDims.remove(playerProvider.dimensionId);
-        JourneyMap.getLogger().log(logLevel, String.format("Using player's provider for dim %s: %s", playerProvider.dimensionId, playerProvider.getDimensionName()));
-
-        // Get a provider for the rest
-        for (int dim : requiredDims)
+        try
         {
-            if (!dimProviders.containsKey(dim))
+            HashSet<Integer> requiredDims = new HashSet<Integer>(requiredDimensionList);
+            HashMap<Integer, WorldProvider> dimProviders = new HashMap<Integer, WorldProvider>();
+
+            Level logLevel = Level.DEBUG;
+            JourneyMap.getLogger().log(logLevel, String.format("Required dimensions from waypoints: %s", requiredDimensionList));
+
+            // DimensionIDs works for local servers
+            Integer[] dims = DimensionManager.getIDs();
+            JourneyMap.getLogger().log(logLevel, String.format("DimensionManager has dims: %s", Arrays.asList(dims)));
+            requiredDims.addAll(Arrays.asList(dims));
+
+            // StaticDimensionIDs works for remote servers
+            dims = DimensionManager.getStaticDimensionIDs();
+            JourneyMap.getLogger().log(logLevel, String.format("DimensionManager has static dims: %s", Arrays.asList(dims)));
+            requiredDims.addAll(Arrays.asList(dims));
+
+            // Use the player's provider
+            WorldProvider playerProvider = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider;
+            dimProviders.put(playerProvider.dimensionId, playerProvider);
+            requiredDims.remove(playerProvider.dimensionId);
+            JourneyMap.getLogger().log(logLevel, String.format("Using player's provider for dim %s: %s", playerProvider.dimensionId, getSafeDimensionName(playerProvider)));
+
+            // Get a provider for the rest
+            for (int dim : requiredDims)
             {
-                if (DimensionManager.getWorld(dim) != null)
+                if (!dimProviders.containsKey(dim))
                 {
-                    try
+                    if (DimensionManager.getWorld(dim) != null)
                     {
-                        WorldProvider dimProvider = DimensionManager.getProvider(dim);
-                        dimProviders.put(dim, dimProvider);
-                        JourneyMap.getLogger().log(logLevel, String.format("DimensionManager.getProvider(%s): %s", dim, dimProvider.getDimensionName()));
+                        try
+                        {
+                            WorldProvider dimProvider = DimensionManager.getProvider(dim);
+                            dimProvider.getDimensionName(); // Force the name error
+                            dimProviders.put(dim, dimProvider);
+                            JourneyMap.getLogger().log(logLevel, String.format("DimensionManager.getProvider(%s): %s", dim, getSafeDimensionName(dimProvider)));
+                        }
+                        catch (Throwable t)
+                        {
+                            JMLogger.logOnce(String.format("Couldn't DimensionManager.getProvider(%s) because of error: %s", dim, t), t);
+                        }
                     }
-                    catch (Throwable t)
+                    else
                     {
-                        JourneyMap.getLogger().warn(String.format("Couldn't DimensionManager.getProvider(%s) because of error: %s", dim, t.getMessage()));
+                        WorldProvider provider;
+                        try
+                        {
+                            provider = DimensionManager.createProviderFor(dim);
+                            provider.getDimensionName(); // Force the name error
+                            provider.dimensionId = dim;
+                            dimProviders.put(dim, provider);
+                            JourneyMap.getLogger().log(logLevel, String.format("DimensionManager.createProviderFor(%s): %s", dim, getSafeDimensionName(playerProvider)));
+                        }
+                        catch (Throwable t)
+                        {
+                            JMLogger.logOnce(String.format("Couldn't DimensionManager.createProviderFor(%s) because of error: %s", dim, t), t);
+                        }
                     }
                 }
-                else
+            }
+
+            // Remove required dims that have been found
+            requiredDims.removeAll(dimProviders.keySet());
+
+            // Make sure required dimensions are added. Since we got this far without finding providers for them, use fake providers.
+            for (int dim : requiredDims)
+            {
+                if (!dimProviders.containsKey(dim))
                 {
-                    WorldProvider provider;
-                    try
-                    {
-                        provider = DimensionManager.createProviderFor(dim);
-                        provider.dimensionId = dim;
-                        dimProviders.put(dim, provider);
-                        JourneyMap.getLogger().log(logLevel, String.format("DimensionManager.createProviderFor(%s): %s", dim, provider.getDimensionName()));
-                    }
-                    catch (Throwable t)
-                    {
-                        JourneyMap.getLogger().warn(String.format("Couldn't DimensionManager.createProviderFor(%s) because of error: %s", dim, t.getMessage()));
-                    }
+                    WorldProvider provider = new FakeDimensionProvider(dim);
+                    dimProviders.put(dim, provider);
+                    JourneyMap.getLogger().warn(String.format("Used FakeDimensionProvider for required dim: %s", dim));
                 }
             }
+
+            // Sort by dim and return
+            ArrayList<WorldProvider> providerList = new ArrayList<WorldProvider>(dimProviders.values());
+            Collections.sort(providerList, new Comparator<WorldProvider>()
+            {
+                @Override
+                public int compare(WorldProvider o1, WorldProvider o2)
+                {
+                    return Integer.valueOf(o1.dimensionId).compareTo(o2.dimensionId);
+                }
+            });
+
+            return providerList;
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().error("Unexpected error in WorldData.getDimensionProviders(): ", t);
+            return Collections.emptyList();
+        }
+    }
+
+    public static String getSafeDimensionName(WorldProvider worldProvider)
+    {
+        if (worldProvider == null)
+        {
+            return null;
         }
 
-        // Remove required dims that have been found
-        requiredDims.removeAll(dimProviders.keySet());
-
-        // Make sure required dimensions are added. Since we got this far without finding providers for them, use fake providers.
-        for (int dim : requiredDims)
+        try
         {
-            if (!dimProviders.containsKey(dim))
-            {
-                WorldProvider provider = new FakeDimensionProvider(dim);
-                dimProviders.put(dim, provider);
-                JourneyMap.getLogger().warn(String.format("Used fake provider for required dim: %s", dim));
-            }
+            return worldProvider.getDimensionName();
         }
-
-        // Sort by dim and return
-        ArrayList<WorldProvider> providerList = new ArrayList<WorldProvider>(dimProviders.values());
-        Collections.sort(providerList, new Comparator<WorldProvider>()
+        catch (Exception e)
         {
-            @Override
-            public int compare(WorldProvider o1, WorldProvider o2)
-            {
-                return Integer.valueOf(o1.dimensionId).compareTo(o2.dimensionId);
-            }
-        });
-
-        return providerList;
+            return Constants.getString("jm.common.dimension", worldProvider.dimensionId);
+        }
     }
 
     @Override

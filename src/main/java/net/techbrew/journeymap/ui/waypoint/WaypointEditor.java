@@ -169,7 +169,7 @@ public class WaypointEditor extends JmUI
                     String dimName = Integer.toString(dim);
                     try
                     {
-                        dimName = provider.getDimensionName();
+                        dimName = WorldData.getSafeDimensionName(provider);
                     }
                     catch (Exception e)
                     {

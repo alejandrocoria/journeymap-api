@@ -142,7 +142,7 @@ public class MapSaver
             final boolean isUnderground = mapType.equals(Constants.MapType.underground);
             final StringBuilder sb = new StringBuilder(date).append("_");
             sb.append(WorldData.getWorldName(mc)).append("_");
-            sb.append(mc.theWorld.provider.getDimensionName()).append("_");
+            sb.append(WorldData.getSafeDimensionName(mc.theWorld.provider)).append("_");
             if (isUnderground)
             {
                 sb.append("slice").append(vSlice);
