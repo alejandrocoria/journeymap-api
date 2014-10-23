@@ -49,8 +49,8 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     @Config(category = WaypointBeacon, key = "jm.waypoint.bold_label", defaultBoolean = false)
     public final AtomicBoolean boldLabel = new AtomicBoolean(false);
 
-    @Config(category = WaypointBeacon, key = "jm.waypoint.font_scale", minValue = 1, maxValue = 3, defaultValue = 1)
-    public final AtomicInteger fontScale = new AtomicInteger(1);
+    @Config(category = WaypointBeacon, key = "jm.waypoint.font_scale", minValue = 1, maxValue = 3, defaultValue = 2)
+    public final AtomicInteger fontScale = new AtomicInteger(2);
 
     @Config(category = WaypointBeacon, key = "jm.waypoint.texture_size")
     public final AtomicBoolean textureSmall = new AtomicBoolean(true);

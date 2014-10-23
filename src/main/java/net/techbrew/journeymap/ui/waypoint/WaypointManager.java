@@ -23,6 +23,7 @@ import net.techbrew.journeymap.ui.option.CategorySlot;
 import net.techbrew.journeymap.ui.option.SlotMetadata;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import java.util.*;
 
@@ -321,6 +322,31 @@ public class WaypointManager extends JmUI
         checkPressedButton();
     }
 
+    @Override
+    /**
+     * Handles mouse input.
+     */
+    public void handleMouseInput()
+    {
+        super.handleMouseInput();
+        int i = Mouse.getEventDWheel();
+
+        if (i != 0)
+        {
+            if (i > 1)
+            {
+                i = 1;
+            }
+
+            if (i < -1)
+            {
+                i = -1;
+            }
+
+            this.itemScrollPane.scrollBy(this.rowHeight * i);
+        }
+    }
+
     /**
      * Check the pressed button in the scroll pane and determine if something needs to be updated or refreshed
      */
@@ -406,7 +432,17 @@ public class WaypointManager extends JmUI
         boolean keyUsed = itemScrollPane.keyTyped(c, i);
         if (keyUsed)
         {
-            // TODO
+            return;
+        }
+
+        if (i == Keyboard.KEY_HOME)
+        {
+            this.itemScrollPane.scrollBy(-this.itemScrollPane.getAmountScrolled());
+        }
+
+        if (i == Keyboard.KEY_END)
+        {
+            this.itemScrollPane.scrollBy(items.size() * rowHeight);
         }
     }
 
