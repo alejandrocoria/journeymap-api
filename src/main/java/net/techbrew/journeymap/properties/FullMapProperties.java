@@ -8,6 +8,7 @@
 
 package net.techbrew.journeymap.properties;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.techbrew.journeymap.Constants;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -25,6 +26,15 @@ public class FullMapProperties extends InGameMapProperties
 
     public FullMapProperties()
     {
+    }
+
+    @Override
+    public void newFileInit()
+    {
+        if (FMLClientHandler.instance().getClient().fontRenderer.getUnicodeFlag())
+        {
+            super.fontScale.set(2);
+        }
     }
 
     @Override

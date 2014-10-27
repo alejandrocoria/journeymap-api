@@ -131,6 +131,11 @@ public class MiniMapProperties extends InGameMapProperties
     public void newFileInit()
     {
         this.setActive(true);
+        if (FMLClientHandler.instance().getClient().fontRenderer.getUnicodeFlag())
+        {
+            super.fontScale.set(2);
+            compassFontScale.set(2);
+        }
     }
 
     @Override
