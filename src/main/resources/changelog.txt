@@ -15,6 +15,7 @@ http://journeymap.techbrew.net
 - New translation: Chinese,Simplified (zh_CN)
 - New translation: Spanish (es_ES)
 - New temporary translation: Russian (ru_RU)
+- New temporary translation: Norwegian (nb_NO)
 - Minor updates to the Swedish translation (sv_SE)
 - New config files will now default to Font Scale 2 if the Minecraft font is based on Unicode.  This should make things easier to read.
 - See: http://journeymap.techbrew.net/release-notes/ for the full list of 5.0.0 changes
