@@ -1,5 +1,5 @@
 ### JourneyMap 5.0.0RC2 Resource Bundle - ar_SA
-### Notes for translators:
+### Notes for translators : 
 ### Do not translate or alter the codes used for color changes (§b, §e, §f, etc.)
 ### Positional parameters (%1$s, %2$s, %3$s, etc.) may be reordered to suit your language's sentence structure
 jm.advanced.announcemod=تعلن وزارة الدفاع
@@ -32,11 +32,11 @@ jm.advanced.recordcachestats=سجل الاحصائيات الكاش
 jm.advanced.recordcachestats.tooltip=سواء لتمكين مخابئ لتسجيل الإحصاءات الخاصة بهم. قد تؤذي قليلا الأداء إذا تمكين. إلا إذا كنت بيتا اختبار أو قد صدرت تعليمات للقيام بذلك، وترك تشغيله.
 jm.colorpalette.basic_colors=الألوان الأساسية
 jm.colorpalette.biome_colors=الوحدة الأحيائية الألوان
-jm.colorpalette.file_error=الملف وحة الألوان لديه أخطاء، ولا يمكن أن تستخدم: %1$s
+jm.colorpalette.file_error=الملف وحة الألوان لديه أخطاء، ولا يمكن أن تستخدم : %1$s
 jm.colorpalette.file_header_1=يمكن استخدام هذا الملف للحفاظ على خريطة ألوان متناسقة عند تغيير حزم الموارد.
 jm.colorpalette.file_header_2=تعديل على مسؤوليتك الخاصة. يمكنك مشاهدته باستخدام %1$s الملف.
-jm.colorpalette.file_header_3=لاستخدام هذه اللوحة مع عالم واحد، ومكان %1$s في: %2$s
-jm.colorpalette.file_header_4=لاستخدام هذه اللوحة مع كل العوالم وتحرير وضبط "دائمة": صحيح، ثم مكان %1$s في: %2$s
+jm.colorpalette.file_header_3=لاستخدام هذه اللوحة مع عالم واحد، ومكان %1$s في : %2$s
+jm.colorpalette.file_header_4=لاستخدام هذه اللوحة مع كل العوالم وتحرير وضبط "دائمة" : صحيح، ثم مكان %1$s في : %2$s
 jm.colorpalette.file_missing_data=وضع هذا الملف في نفس الدليل ك %1$s لعرض لوحة الألوان.
 jm.colorpalette.file_title=JourneyMap لوحة الألوان
 jm.colorpalette.resource_packs=حزم الموارد
@@ -52,7 +52,7 @@ jm.common.automap_status=السطح التلقائي رسم الخرائط (%1$s
 jm.common.automap_status_underground=شريحة السيارات الخرائط %1$s (%2$s).
 jm.common.automap_text=تلقائيا خريطة المناطق (لاعب واحد)
 jm.common.automap_title=تلقائي للخرائط ...
-jm.common.chat_announcement=§eJourneyMap: §f %1$s
+jm.common.chat_announcement=§eJourneyMap : §f %1$s
 jm.common.close=إغلاق
 jm.common.day=يوم
 jm.common.dimension=البعد %1$s
@@ -68,26 +68,26 @@ jm.common.hotkeys=مفاتيح الساخن ...
 jm.common.hotkeys.tooltip=عرض المفاتيح الساخنة التي يمكن استخدامها مع هذه الخريطة
 jm.common.hotkeys_keybinding_category=JourneyMap
 jm.common.location_format=الموقع
-jm.common.location_format.tooltip=تنسيق للكيفية التي يتم عرض إحداثيات الموقع. ملاحظة: 'V' لتقف على شريحة عمودية (عمودية أو قطعة).
+jm.common.location_format.tooltip=تنسيق للكيفية التي يتم عرض إحداثيات الموقع. ملاحظة : 'V' لتقف على شريحة عمودية (عمودية أو قطعة).
 jm.common.location_format_verbose=مطول الموقع
 jm.common.location_format_verbose.tooltip=الموقع يظهر تنسيق أسماء (X، Y، Z) مع الأرقام
 jm.common.location_xyvz_label=س، ص (ت)، ض
 jm.common.location_xyvz_plain=%1$s، %3$s (%4$s)، %2$s
-jm.common.location_xyvz_verbose=س: %1$s، ص: %3$s (%4$s)، ض: %2$s
+jm.common.location_xyvz_verbose=س : %1$s، ص : %3$s (%4$s)، ض : %2$s
 jm.common.location_xyz_label=X، Y، Z
 jm.common.location_xyz_plain=%1$s، %3$s، %2$s
-jm.common.location_xyz_verbose=س: %1$s، ص: %3$s، ض: %2$s
+jm.common.location_xyz_verbose=س : %1$s، ص : %3$s، ض : %2$s
 jm.common.location_xz_label=خ، ض
 jm.common.location_xz_plain=%1$s، %2$s
-jm.common.location_xz_verbose=س: %1$s، ض: %2$s
+jm.common.location_xz_verbose=س : %1$s، ض : %2$s
 jm.common.location_xzy_label=خ، ض، ذ
 jm.common.location_xzy_plain=%1$s، %2$s، %3$s
-jm.common.location_xzy_verbose=س: %1$s، ض: %2$s، ص: %3$s
+jm.common.location_xzy_verbose=س : %1$s، ض : %2$s، ص : %3$s
 jm.common.location_xzyv_label=خ، ض، ص (V)
 jm.common.location_xzyv_plain=%1$s، %2$s، %3$s (%4$s)
-jm.common.location_xzyv_verbose=س: %1$s، ض: %2$s، ص: %3$s (%4$s)
+jm.common.location_xzyv_verbose=س : %1$s، ض : %2$s، ص : %3$s (%4$s)
 jm.common.log_warning=مستوى الدخول %1$s سوف تبطئ اللعبة. لا تستخدم لهذه اللعبة طبيعي!
-jm.common.map_saved=خريطة المحفوظة: %1$s
+jm.common.map_saved=خريطة المحفوظة : %1$s
 jm.common.map_style_antialiasing=استخدام الحواف
 jm.common.map_style_antialiasing.tooltip=يعزز تأثير التظليل المستخدمة لإظهار التغييرات الارتفاع. تعطيل قد يحسن الأداء.
 jm.common.map_style_bathymetry=عرض قياس الأعماق
@@ -109,10 +109,10 @@ jm.common.map_style_title=نمط الخريطة
 jm.common.map_style_transparency=استخدام الشفافية
 jm.common.map_style_transparency.tooltip=كتل شفافة تكشف ما تحتها
 jm.common.mapgui_only_ready=صحافة [§b %1$s §f]. (خادم الويب تعطيل).
-jm.common.memory_warning=ماين كرافت نفاد الذاكرة: %1$s
+jm.common.memory_warning=ماين كرافت نفاد الذاكرة : %1$s
 jm.common.mob_icon_set=الغوغاء الأيقونات
 jm.common.mob_icon_set.tooltip=ومجموعة الرموز المستخدمة لعرض الغوغاء على الرادار
-jm.common.new_version_available=أحدث إصدار متوفر: %1$s
+jm.common.new_version_available=أحدث إصدار متوفر : %1$s
 jm.common.night=ليلة
 jm.common.off=معطلة
 jm.common.on=تشغيل
@@ -133,7 +133,7 @@ jm.common.radar_max_villagers.tooltip=عرض أقصى عدد من سكان ال�
 jm.common.radar_vertical_distance=الرادار المدى العمودي
 jm.common.radar_vertical_distance.tooltip=المسافة الرأسية (في كتل) للبحث عن والكيانات عرض على الرادار. قد يسبب أعداد أكبر تأخر كبير.
 jm.common.ready=§e %1$s جاهزة.
-jm.common.save_filename=خريطة إنقاذ لقطات: %1$s
+jm.common.save_filename=خريطة إنقاذ لقطات : %1$s
 jm.common.save_map=حفظ خريطة
 jm.common.saving_map_to_file=التوفير %1$s الخريطة لملف ...
 jm.common.show_animals=مشاهدة الحيوانات
@@ -156,14 +156,14 @@ jm.common.show_waypoints=إظهار نقاط الطريق
 jm.common.show_waypoints.tooltip=نقاط الطريق القريبة على خريطة
 jm.common.ui_theme=UI الموضوع
 jm.common.ui_theme.tooltip=الموضوع المستخدم لعرض الضوابط واجهة المستخدم في ملء الشاشة خريطة وأسلوب المصغرة
-jm.common.ui_theme_author=الكاتب: §b %1$s §f
-jm.common.ui_theme_name=الاسم: §b %1$s §f
+jm.common.ui_theme_author=الكاتب : §b %1$s §f
+jm.common.ui_theme_name=الاسم : §b %1$s §f
 jm.common.update_available=تحديث متوفر!
 jm.common.update_check=التحقق من وجود تحديث
 jm.common.use_browser=استخدام متصفح
 jm.common.webserver_and_mapgui_disabled=JourneyMap بواسطة ملف jm.common.properties
-jm.common.webserver_and_mapgui_ready=صحافة [§b %1$s §f] أو المتصفح المفتوحة to§b HTTP: // المضيف المحلي %2$s §f
-jm.common.webserver_only_ready=افتح متصفح to§b HTTP: // المضيف المحلي %1$s §f. (في لعبة خريطة معطل)
+
+
 jm.config.category.advanced=خيارات متقدمة
 jm.config.category.advanced.tooltip=الحذر! يمكن تغيير بعض من هذه القيم يسبب مشاكل كبيرة و / أو تعطل.
 jm.config.category.cartography=رسم الخرائط
@@ -181,13 +181,13 @@ jm.config.category.waypoint_beacons.tooltip=تكوين كيف منارات إح�
 jm.config.category.webmap=خريطة الويب
 jm.config.category.webmap.tooltip=تكوين ظهور خريطة الويب
 jm.config.control_arrowkeys=يمكن تعديل هذه القيمة مع مفاتيح الأسهم للسيطرة الدقيقة
-jm.config.default=[الافتراضي: %1$s]
-jm.config.default_numeric=[المدى: {_1 _2} ~ {}، رد: {} _3]
+jm.config.default=[الافتراضي : %1$s]
+
 jm.config.file_header_1=JourneyMap ملف التكوين. تعديل على مسؤوليتك الخاصة!
-jm.config.file_header_2=لاستخدامها في جميع العالمين، ضع هنا: %1$s
-jm.config.file_header_3=لتجاوز التكوين لعالم واحد، ضع هنا: %1$s (اسم العالم)
+jm.config.file_header_2=لاستخدامها في جميع العالمين، ضع هنا : %1$s
+jm.config.file_header_3=لتجاوز التكوين لعالم واحد، ضع هنا : %1$s (اسم العالم)
 jm.config.file_header_4=لاستعادة الإعدادات الافتراضية، ببساطة حذف هذا الملف قبل البدء في ماين كرافت
-jm.config.file_header_5=لمزيد من المعلومات، انتقل إلى: %1$s
+jm.config.file_header_5=لمزيد من المعلومات، انتقل إلى : %1$s
 jm.config.reset=إعادة تعيين
 jm.config.reset.tooltip=إعادة تعيين كافة الخيارات في هذا القسم إلى قيمها الافتراضية
 jm.error.compatability=Incompatability خطأ تشغيل %1$s لفورج %2$s. ضمان إصدار فورج متوافق.
@@ -224,7 +224,7 @@ jm.minimap.hotkeys_title=المصغرة هوت كيز
 jm.minimap.hotkeys_toggle=تبديل المصغرة
 jm.minimap.options=خيارات المصغرة
 jm.minimap.orientation.button=خريطة العنوان
-jm.minimap.orientation.button.tooltip=التوجه (دوران) من مصغرة. ملاحظة: فقط دائرة يدعم "بلدي عنوان" خريطة العنوان.
+jm.minimap.orientation.button.tooltip=التوجه (دوران) من مصغرة. ملاحظة : فقط دائرة يدعم "بلدي عنوان" خريطة العنوان.
 jm.minimap.orientation.compass=البوصلة
 jm.minimap.orientation.north=الشمالية
 jm.minimap.orientation.oldnorth=شمال قديم
@@ -243,7 +243,7 @@ jm.minimap.reticle_orientation=شبكاني العنوان
 jm.minimap.reticle_orientation.tooltip=التوجه (دوران) من الشبيكة على المصغرة
 jm.minimap.return_to_game=عودة إلى لعبة
 jm.minimap.shape=الشكل
-jm.minimap.shape.tooltip=شكل من مصغرة. ملاحظة: فقط دائرة يدعم "بلدي عنوان" خريطة العنوان.
+jm.minimap.shape.tooltip=شكل من مصغرة. ملاحظة : فقط دائرة يدعم "بلدي عنوان" خريطة العنوان.
 jm.minimap.shape_circle=الدائرة
 jm.minimap.shape_rectangle=مستطيل
 jm.minimap.shape_square=سكوير
@@ -275,9 +275,9 @@ jm.waypoint.cancel=الغاء
 jm.waypoint.color=اللون
 jm.waypoint.create_deathpoints=إنشاء Deathpoints
 jm.waypoint.create_deathpoints.tooltip=تلقائيا إنشاء إحداثية في البقعة حيث تموت
-jm.waypoint.current_location=المكان الحالي: %1$s
+jm.waypoint.current_location=المكان الحالي : %1$s
 jm.waypoint.deathpoint=الموت
-jm.waypoint.dimension=البعد: %1$s
+jm.waypoint.dimension=البعد : %1$s
 jm.waypoint.dimension_all=جميع
 jm.waypoint.dimensions=الأبعاد
 jm.waypoint.display_management=نقطة الطريق في لعبة العرض والإدارة
@@ -285,8 +285,8 @@ jm.waypoint.distance=القطر
 jm.waypoint.distance_meters=(%1$s م)
 jm.waypoint.edit=تحرير
 jm.waypoint.edit_title=تحرير إحداثية
-jm.waypoint.enable=ممكن: %1$s
-jm.waypoint.enable_all=جميع %1$s: %2$s
+jm.waypoint.enable=ممكن : %1$s
+jm.waypoint.enable_all=جميع %1$s : %2$s
 jm.waypoint.enable_beacons=تمكين إحداثية منارات
 jm.waypoint.enable_beacons.tooltip=إظهار منارات في اللعبة من نقاط الطريق الخاص بك
 jm.waypoint.enable_manager=تمكين إحداثية مدير
@@ -305,14 +305,14 @@ jm.waypoint.help_manage_ingame=مدير إحداثية (في اللعبة)
 jm.waypoint.help_title=إحداثية مساعدة
 jm.waypoint.import_rei_errors=المستوردة %1$s من نقاط الطريق مصغره ري مع %1$s أخطاء. رؤية jm.common.log لمزيد من التفاصيل.
 jm.waypoint.import_rei_failure=تم استيرادها نقاط الطريق مصغره لا ري ل. رؤية jm.common.log لمزيد من التفاصيل.
-jm.waypoint.import_rei_file_error=تعذر استيراد ملف مصغره إحداثية ري ل: %1$s
+jm.waypoint.import_rei_file_error=تعذر استيراد ملف مصغره إحداثية ري ل : %1$s
 jm.waypoint.import_rei_success=المستوردة %1$s من نقاط الطريق المصغرة من ري و.
 jm.waypoint.import_rei_version=لا يتم اعتماد إصدار مصغره ري ل.
 jm.waypoint.import_vox_errors=المستوردة %1$s نقاط الطرق من VoxelMap مع %1$s أخطاء. رؤية jm.common.log لمزيد من التفاصيل.
 jm.waypoint.import_vox_failure=تم استيرادها نقاط الطريق لا VoxelMap. رؤية jm.common.log لمزيد من التفاصيل.
-jm.waypoint.import_vox_file_error=تعذر استيراد ملف VoxelMap إحداثية: %1$s
+jm.waypoint.import_vox_file_error=تعذر استيراد ملف VoxelMap إحداثية : %1$s
 jm.waypoint.import_vox_success=المستوردة %1$s نقاط الطرق من VoxelMap.
-jm.waypoint.import_vox_version=لا يتم اعتماد إصدار VoxelMap. يرجى تحديث إلى:
+jm.waypoint.import_vox_version=لا يتم اعتماد إصدار VoxelMap. يرجى تحديث إلى : 
 jm.waypoint.location=الموقع
 jm.waypoint.manage_title=إدارة نقاط الطريق
 jm.waypoint.manager=مدير إحداثية
@@ -358,14 +358,14 @@ jm.webmap.automap_dialog_text=الخريطة تلقائيا جميع المنا�
 jm.webmap.automap_started=التلقائي رسم الخرائط. تحقق عبة دردشة للتقدم.
 jm.webmap.automap_text=تلقائي للخرائط ...
 jm.webmap.automap_title=تلقائيا خريطة المناطق غير المستكشفة (لاعب واحد)
-jm.webmap.biome_text=الوحدة الأحيائية:
+jm.webmap.biome_text=الوحدة الأحيائية : 
 jm.webmap.caves_menu_item_text=كهوف
 jm.webmap.caves_menu_item_title=مشاهدة الكهف / خريطة الداخلية عندما لا تكون تحت السماء.
 jm.webmap.day_button_text=يوم
 jm.webmap.day_button_title=خريطة العالم كما يظهر في وضح النهار.
 jm.webmap.donate_text=تبرع لJourneyMap
 jm.webmap.donate_title=تبرع لJourneyMap التطوير باستخدام باي بال
-jm.webmap.elevation_text=الارتفاع:
+jm.webmap.elevation_text=الارتفاع : 
 jm.webmap.email_sub_text=JourneyMap الأخبار البريد الإلكتروني
 jm.webmap.email_sub_title=الاشتراك في JourneyMap الأخبار عبر البريد الإلكتروني
 jm.webmap.enable=تمكين خريطة الويب
@@ -378,7 +378,7 @@ jm.webmap.forum_link_text=minecraftforum.net
 jm.webmap.forum_link_title=JourneyMap منتدى حول minecraftforum.net
 jm.webmap.grid_menu_item_text=الشبكة
 jm.webmap.grid_menu_item_title=عرض قطعة الشبكة
-jm.webmap.location_text=الموقع:
+jm.webmap.location_text=الموقع : 
 jm.webmap.mobs_menu_item_text=الغوغاء
 jm.webmap.mobs_menu_item_title=إظهار الغوغاء قريب
 jm.webmap.night_button_text=ليلة
@@ -391,19 +391,19 @@ jm.webmap.rss_feed_text=JourneyMap الأخبار RSS
 jm.webmap.rss_feed_title=الاشتراك في JourneyMap الأخبار عن طريق آر إس إس
 jm.webmap.save_button_text=حفظ خريطة
 jm.webmap.save_button_title=حفظ خريطة استكشافها لتقديم
-jm.webmap.save_filename=خريطة إنقاذ لقطات: %1$s
+jm.webmap.save_filename=خريطة إنقاذ لقطات : %1$s
 jm.webmap.show_menu_text=إظهار ...
-jm.webmap.slice_text=عمودي شريحة:
+jm.webmap.slice_text=عمودي شريحة : 
 jm.webmap.title=خريطة الويب
-jm.webmap.update_button_title=تحديث المتوفرة: JourneyMap %1$s لماين كرافت %2$s
+jm.webmap.update_button_title=تحديث المتوفرة : JourneyMap %1$s لماين كرافت %2$s
 jm.webmap.villagers_menu_item_text=القرويون
 jm.webmap.villagers_menu_item_title=إظهار القرى المجاورة
 jm.webmap.waypoints_menu_item_text=نقاط الطريق
 jm.webmap.waypoints_menu_item_title=إظهار نقاط الطريق
 jm.webmap.web_link_text=journeymap.techbrew.net
 jm.webmap.web_link_title=JourneyMap صفحتك الرئيسية
-jm.webmap.worldname_text=اسم العالم:
-jm.webmap.worldtime_text=التوقيت العالمي:
+jm.webmap.worldname_text=اسم العالم : 
+jm.webmap.worldtime_text=التوقيت العالمي : 
 jm.webmap.zoom_slider_name=التكبير
 key.journeymap.create_waypoint=إنشاء إحداثية
 key.journeymap.day=عرض خريطة يوم

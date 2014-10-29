@@ -23,9 +23,12 @@ import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.ui.UIManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public abstract class JmUI extends GuiScreen
@@ -236,6 +239,92 @@ public abstract class JmUI extends GuiScreen
     @Override
     protected void drawHoveringText(java.util.List tooltip, int mouseX, int mouseY, FontRenderer fontRenderer)
     {
-        super.drawHoveringText(tooltip, mouseX, mouseY, fontRenderer);
+        // Had to override here because GuiScreen doesn't right-justify bidi text, nor does it calculate mixed string widths correctly
+        if (!tooltip.isEmpty())
+        {
+            GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+            RenderHelper.disableStandardItemLighting();
+            GL11.glDisable(GL11.GL_LIGHTING);
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            int maxLineWidth = 0;
+            Iterator iterator = tooltip.iterator();
+
+            while (iterator.hasNext())
+            {
+                String line = (String) iterator.next();
+                int lineWidth = fontRenderer.getStringWidth(line);
+                if (fontRenderer.getBidiFlag())
+                {
+                    lineWidth = (int) Math.ceil(lineWidth * 1.25);
+                }
+
+                if (lineWidth > maxLineWidth)
+                {
+                    maxLineWidth = lineWidth;
+                }
+            }
+
+            int drawX = mouseX + 12;
+            int drawY = mouseY - 12;
+            int boxHeight = 8;
+
+            if (tooltip.size() > 1)
+            {
+                boxHeight += 2 + (tooltip.size() - 1) * 10;
+            }
+
+            if (drawX + maxLineWidth > this.width)
+            {
+                drawX -= 28 + maxLineWidth;
+            }
+
+            if (drawY + boxHeight + 6 > this.height)
+            {
+                drawY = this.height - boxHeight - 6;
+            }
+
+            this.zLevel = 300.0F;
+            itemRender.zLevel = 300.0F;
+            int j1 = -267386864;
+            this.drawGradientRect(drawX - 3, drawY - 4, drawX + maxLineWidth + 3, drawY - 3, j1, j1);
+            this.drawGradientRect(drawX - 3, drawY + boxHeight + 3, drawX + maxLineWidth + 3, drawY + boxHeight + 4, j1, j1);
+            this.drawGradientRect(drawX - 3, drawY - 3, drawX + maxLineWidth + 3, drawY + boxHeight + 3, j1, j1);
+            this.drawGradientRect(drawX - 4, drawY - 3, drawX - 3, drawY + boxHeight + 3, j1, j1);
+            this.drawGradientRect(drawX + maxLineWidth + 3, drawY - 3, drawX + maxLineWidth + 4, drawY + boxHeight + 3, j1, j1);
+            int k1 = 1347420415;
+            int l1 = (k1 & 16711422) >> 1 | k1 & -16777216;
+            this.drawGradientRect(drawX - 3, drawY - 3 + 1, drawX - 3 + 1, drawY + boxHeight + 3 - 1, k1, l1);
+            this.drawGradientRect(drawX + maxLineWidth + 2, drawY - 3 + 1, drawX + maxLineWidth + 3, drawY + boxHeight + 3 - 1, k1, l1);
+            this.drawGradientRect(drawX - 3, drawY - 3, drawX + maxLineWidth + 3, drawY - 3 + 1, k1, k1);
+            this.drawGradientRect(drawX - 3, drawY + boxHeight + 2, drawX + maxLineWidth + 3, drawY + boxHeight + 3, l1, l1);
+
+            for (int i2 = 0; i2 < tooltip.size(); ++i2)
+            {
+                String line = (String) tooltip.get(i2);
+                if (fontRenderer.getBidiFlag())
+                {
+                    int lineWidth = (int) Math.ceil(fontRenderer.getStringWidth(line) * 1.1);
+                    fontRenderer.drawStringWithShadow(line, (drawX + maxLineWidth) - lineWidth, drawY, -1);
+                }
+                else
+                {
+                    fontRenderer.drawStringWithShadow(line, drawX, drawY, -1);
+                }
+
+                if (i2 == 0)
+                {
+                    drawY += 2;
+                }
+
+                drawY += 10;
+            }
+
+            this.zLevel = 0.0F;
+            itemRender.zLevel = 0.0F;
+            GL11.glEnable(GL11.GL_LIGHTING);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            RenderHelper.enableStandardItemLighting();
+            GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        }
     }
 }

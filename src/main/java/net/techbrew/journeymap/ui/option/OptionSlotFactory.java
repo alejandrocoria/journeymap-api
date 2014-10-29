@@ -266,7 +266,7 @@ public class OptionSlotFactory
             String defaultTip = Constants.getString("jm.config.default_numeric", (int) annotation.minValue(), (int) annotation.maxValue(), (int) annotation.defaultValue());
             boolean advanced = annotation.category() == Config.Category.Advanced;
 
-            IntSliderButton button = new IntSliderButton(properties, property, name + ": ", "", (int) annotation.minValue(), (int) annotation.maxValue(), true);
+            IntSliderButton button = new IntSliderButton(properties, property, name + " : ", "", (int) annotation.minValue(), (int) annotation.maxValue(), true);
             button.setDefaultStyle(false);
             button.setDrawBackground(false);
             SlotMetadata<Integer> slotMetadata = new SlotMetadata<Integer>(button, name, tooltip, defaultTip, (int) annotation.defaultValue(), advanced);
@@ -297,7 +297,7 @@ public class OptionSlotFactory
             String defaultTip = Constants.getString("jm.config.default_numeric", annotation.minValue(), annotation.maxValue(), annotation.defaultValue());
             boolean advanced = annotation.category() == Config.Category.Advanced;
 
-            DoubleSliderButton button = new DoubleSliderButton(properties, property, name + ": ", "", (double) annotation.minValue(), (double) annotation.maxValue(), true);
+            DoubleSliderButton button = new DoubleSliderButton(properties, property, name + " : ", "", (double) annotation.minValue(), (double) annotation.maxValue(), true);
             button.setDefaultStyle(false);
             button.setDrawBackground(false);
             SlotMetadata<Double> slotMetadata = new SlotMetadata<Double>(button, name, tooltip, defaultTip, (double) annotation.defaultValue(), advanced);

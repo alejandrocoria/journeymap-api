@@ -21,7 +21,7 @@ public class ListPropertyButton<T> extends Button implements IPropertyHolder<T>
     protected final List<T> values;
     protected final String baseLabel;
     protected final String glyph = "\u21D5";
-    protected final String labelPattern = "%1$s:  %2$s %3$s %2$s";
+    protected final String labelPattern = "%1$s : %2$s %3$s %2$s";
 
     public ListPropertyButton(Collection<T> values, String label, PropertiesBase properties, AtomicReference<T> valueHolder)
     {

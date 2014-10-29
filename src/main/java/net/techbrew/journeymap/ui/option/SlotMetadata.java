@@ -2,6 +2,7 @@ package net.techbrew.journeymap.ui.option;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.ui.component.Button;
@@ -148,13 +149,16 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
 
     public String[] getTooltip()
     {
+        FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
+        String bidiColor = fontRenderer.getBidiFlag() ? "%2$s%1$s" : "%1$s%2$s";
+
         if (tooltipLines == null)
         {
-            ArrayList<String> lines = new ArrayList<String>(4);
+            ArrayList<ChatComponentTranslation> lines = new ArrayList<ChatComponentTranslation>(4);
             if (this.tooltip != null || this.range != null || this.defaultValue != null || advanced)
             {
                 EnumChatFormatting nameColor = isToolbar() ? EnumChatFormatting.GREEN : (advanced ? EnumChatFormatting.RED : EnumChatFormatting.AQUA);
-                lines.add(nameColor + this.name);
+                lines.add(new ChatComponentTranslation("jm.config.tooltip_format", nameColor, this.name));
                 if (this.tooltip != null)
                 {
                     lines.addAll(getWordWrappedLines(EnumChatFormatting.YELLOW.toString(), this.tooltip));
@@ -162,32 +166,38 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
 
                 if (button instanceof IntSliderButton)
                 {
-                    lines.addAll(getWordWrappedLines(EnumChatFormatting.GRAY.toString() + EnumChatFormatting.ITALIC,
+                    lines.addAll(getWordWrappedLines(EnumChatFormatting.GRAY.toString() + EnumChatFormatting.ITALIC.toString(),
                             Constants.getString("jm.config.control_arrowkeys")));
                 }
 
                 if (this.range != null)
                 {
-                    lines.add(EnumChatFormatting.WHITE + this.range);
+                    lines.add(new ChatComponentTranslation("jm.config.tooltip_format", EnumChatFormatting.WHITE, this.range));
                 }
             }
 
             if (!lines.isEmpty())
             {
-                tooltipLines = lines.toArray(new String[lines.size()]);
+                ArrayList<String> stringLines = new ArrayList<String>();
+                for (ChatComponentTranslation line : lines)
+                {
+                    stringLines.add(line.getUnformattedText().trim());
+                }
+                tooltipLines = stringLines.toArray(new String[stringLines.size()]);
             }
         }
         return tooltipLines;
     }
 
-    protected List<String> getWordWrappedLines(String color, String original)
+    protected List<ChatComponentTranslation> getWordWrappedLines(String color, String original)
     {
         FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
-        List<String> list = new ArrayList<String>();
+        List<ChatComponentTranslation> list = new ArrayList<ChatComponentTranslation>();
 
-        for (Object line : fontRenderer.listFormattedStringToWidth(original, 250))
+        int max = fontRenderer.getBidiFlag() ? 170 : 250;
+        for (Object line : fontRenderer.listFormattedStringToWidth(original, max))
         {
-            list.add(color + line);
+            list.add(new ChatComponentTranslation("jm.config.tooltip_format", color, line));
         }
         return list;
     }
