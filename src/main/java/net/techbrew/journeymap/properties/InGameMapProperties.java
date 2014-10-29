@@ -26,7 +26,7 @@ public abstract class InGameMapProperties extends MapProperties
     @Config(category = Inherit, key = "jm.common.show_caves", defaultBoolean = true)
     public final AtomicBoolean showCaves = new AtomicBoolean(true);
 
-    @Config(category = Inherit, key = "jm.common.font_scale", minValue = 1, maxValue = 3, defaultValue = 1)
+    @Config(category = Inherit, key = "jm.common.font_scale", minValue = 1, maxValue = 4, defaultValue = 1)
     public final AtomicInteger fontScale = new AtomicInteger(1);
 
     @Config(category = Inherit, key = "jm.minimap.texture_size")

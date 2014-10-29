@@ -12,6 +12,8 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Compass point labels are now centered better with Unicode fonts
+- Font Scale options can now be 1-4 instead of 1-3
 - New translation: Arabic (ar_SA)
 - New translation: Chinese, Simplified (zh_CN)
 - New temporary translation: Dutch (nl_NL)

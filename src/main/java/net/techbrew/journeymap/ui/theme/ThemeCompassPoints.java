@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.ui.theme;
 
+import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -38,6 +39,7 @@ public class ThemeCompassPoints
     final int yOffset;
     final double shiftVert;
     final double shiftHorz;
+    final int labelShiftVert;
     private double x;
     private double y;
 
@@ -88,6 +90,8 @@ public class ThemeCompassPoints
             shiftVert = 0;
         }
 
+        labelShiftVert = Minecraft.getMinecraft().fontRenderer.getUnicodeFlag() ? (int) fontScale : 0;
+
         showNorth = minimapSpec.compassShowNorth;
         showSouth = minimapSpec.compassShowSouth;
         showEast = minimapSpec.compassShowEast;
@@ -133,24 +137,25 @@ public class ThemeCompassPoints
 
     public void drawLabels(double rotation)
     {
+
         if (showNorth)
         {
-            DrawUtil.drawLabel(textNorth, pointNorth.getX(), pointNorth.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
+            DrawUtil.drawLabel(textNorth, pointNorth.getX(), pointNorth.getY() + labelShiftVert, DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
         }
 
         if (showSouth)
         {
-            DrawUtil.drawLabel(textSouth, pointSouth.getX(), pointSouth.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
+            DrawUtil.drawLabel(textSouth, pointSouth.getX(), pointSouth.getY() + labelShiftVert, DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
         }
 
         if (showWest)
         {
-            DrawUtil.drawLabel(textWest, pointWest.getX(), pointWest.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
+            DrawUtil.drawLabel(textWest, pointWest.getX(), pointWest.getY() + labelShiftVert, DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
         }
 
         if (showEast)
         {
-            DrawUtil.drawLabel(textEast, pointEast.getX(), pointEast.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
+            DrawUtil.drawLabel(textEast, pointEast.getX(), pointEast.getY() + labelShiftVert, DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, bgColor, bgAlpha, fgColor, fgAlpha, fontScale, true, rotation);
         }
     }
 }
