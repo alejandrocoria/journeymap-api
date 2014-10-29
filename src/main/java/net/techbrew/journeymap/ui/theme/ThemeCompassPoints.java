@@ -1,6 +1,5 @@
 package net.techbrew.journeymap.ui.theme;
 
-import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -90,7 +89,7 @@ public class ThemeCompassPoints
             shiftVert = 0;
         }
 
-        labelShiftVert = Minecraft.getMinecraft().fontRenderer.getUnicodeFlag() ? (int) fontScale : 0;
+        labelShiftVert = 0;//Minecraft.getMinecraft().fontRenderer.getUnicodeFlag() ? (int) fontScale : 0;
 
         showNorth = minimapSpec.compassShowNorth;
         showSouth = minimapSpec.compassShowSouth;

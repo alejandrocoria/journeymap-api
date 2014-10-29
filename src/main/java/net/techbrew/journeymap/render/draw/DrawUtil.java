@@ -109,7 +109,12 @@ public class DrawUtil
         final FontRenderer fontRenderer = mc.fontRenderer;
         final boolean drawRect = (bgColor != null && alpha > 0);
         final int width = fontRenderer.getStringWidth(text);
-        final int height = drawRect ? getLabelHeight(fontRenderer, fontShadow) : fontRenderer.FONT_HEIGHT;
+        int height = drawRect ? getLabelHeight(fontRenderer, fontShadow) : fontRenderer.FONT_HEIGHT;
+
+        if (!drawRect && fontRenderer.getUnicodeFlag())
+        {
+            height--;
+        }
 
         GL11.glPushMatrix();
 

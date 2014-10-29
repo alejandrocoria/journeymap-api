@@ -365,13 +365,22 @@ public class OptionSlotFactory
             String tooltip = getTooltip(annotation);
             Class<? extends Enum> enumClass = property.get().getClass();
             ArrayList<Enum> enumSet = new ArrayList<Enum>(EnumSet.allOf(enumClass));
-            String defaultTip = Constants.getString("jm.config.default", Enum.valueOf(enumClass, annotation.defaultEnum()));
+            Enum defaultEnumValue = enumSet.get(0);
+            try
+            {
+                defaultEnumValue = Enum.valueOf(enumClass, annotation.defaultEnum());
+            }
+            catch (Exception e)
+            {
+                JourneyMap.getLogger().warn("Bad enumeration value for " + name + " default: " + annotation.defaultEnum());
+            }
+            String defaultTip = Constants.getString("jm.config.default", defaultEnumValue);
             boolean advanced = annotation.category() == Config.Category.Advanced;
 
             ListPropertyButton<Enum> button = new ListPropertyButton<Enum>(enumSet, name, properties, property);
             button.setDefaultStyle(false);
             button.setDrawBackground(false);
-            SlotMetadata<Enum> slotMetadata = new SlotMetadata<Enum>(button, name, tooltip, defaultTip, property.get(), advanced);
+            SlotMetadata<Enum> slotMetadata = new SlotMetadata<Enum>(button, name, tooltip, defaultTip, defaultEnumValue, advanced);
             slotMetadata.setValueList(enumSet);
             return slotMetadata;
         }

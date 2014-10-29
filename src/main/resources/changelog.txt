@@ -12,8 +12,9 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
-- Bugfixes to correct display of Right-to-Left languages
-- Compass point labels are now centered better with Unicode fonts
+- Bugfixes to correct display of right-to-left languages
+- Bugfix: Some options in Options Manager didn't reset via the Reset button
+- Bugfix: Waypoint label backgrounds on maps were opaque
 - Font Scale options can now be 1-4 instead of 1-3
 - New translation: Arabic (ar_SA)
 - New translation: Chinese, Simplified (zh_CN)
@@ -23,8 +24,9 @@ http://journeymap.techbrew.net
 - New translation: Spanish (es_ES)
 - Minor updates to the Swedish translation (sv_SE)
 - New config files will now default to Font Scale 2 if the Minecraft font is based on Unicode.  This should make things easier to read.
-- See: http://journeymap.techbrew.net/release-notes/ for the full list of 5.0.0 changes
-- Can you help with translations?  See http://journeymap.techbrew.net/help/wiki/Translate_JourneyMap_For_Your_Language
 
 ## Changelog for JourneyMap 5.0.0RC1
 - New translation: Swedish (sv_SE)
+
+See http://journeymap.techbrew.net/release-notes/ for the full list of 5.0.0 changes
+Can you help with translations?  See http://journeymap.techbrew.net/help/wiki/Translate_JourneyMap_For_Your_Language

@@ -78,31 +78,31 @@ public class DrawWayPointStep implements DrawStep
             if (showLabel)
             {
                 Point2D labelPoint = gridRenderer.shiftWindowPosition(pixel.getX(), pixel.getY(), 0, rotation == 0 ? -texture.height : texture.height);
-                DrawUtil.drawLabel(waypoint.getName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 255, fontColor, 255, fontScale, false, rotation);
+                DrawUtil.drawLabel(waypoint.getName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 180, fontColor, 255, fontScale, false, rotation);
             }
             if (isEdit)
             {
                 TextureImpl editTex = TextureCache.instance().getWaypointEdit();
                 DrawUtil.drawColoredImage(editTex, 255, color, pixel.getX() - (editTex.width / 2), pixel.getY() - editTex.height / 2, -rotation);
             }
-            DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - (texture.height/2), -rotation);
+            DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - (texture.height / 2), -rotation);
         }
         else if (!isEdit)
         {
             gridRenderer.ensureOnScreen(pixel);
             //DrawUtil.drawColoredImage(offscreenTexture, 255, color, pixel.getX() - (offscreenTexture.width / 2), pixel.getY() - (offscreenTexture.height / 2));
-            DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - (texture.height/2), -rotation);
+            DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - (texture.height / 2), -rotation);
         }
     }
 
     public void drawOffscreen(Point2D pixel, double rotation)
     {
-        DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - (texture.height/2), -rotation);
+        DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.width / 2), pixel.getY() - (texture.height / 2), -rotation);
     }
 
     public Point2D.Double getPosition(double xOffset, double yOffset, GridRenderer gridRenderer, boolean forceUpdate)
     {
-        if(!forceUpdate && lastPosition!=null)
+        if (!forceUpdate && lastPosition != null)
         {
             return lastPosition;
         }
