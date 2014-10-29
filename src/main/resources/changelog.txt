@@ -12,6 +12,7 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New translation: Arabic (ar_SA)
 - New translation: Chinese, Simplified (zh_CN)
 - New temporary translation: Dutch (nl_NL)
 - New temporary translation: Norwegian (nb_NO)
