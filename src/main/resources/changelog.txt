@@ -16,13 +16,12 @@ http://journeymap.techbrew.net
 - Bugfix: Some options in Options Manager didn't reset via the Reset button
 - Bugfix: Waypoint label backgrounds on maps were opaque
 - Font Scale options can now be 1-4 instead of 1-3
-- New translation: Arabic (ar_SA)
-- New translation: Chinese, Simplified (zh_CN)
-- New temporary translation: Dutch (nl_NL)
-- New temporary translation: Norwegian (nb_NO)
-- New temporary translation: Russian (ru_RU)
-- New translation: Spanish (es_ES)
-- Minor updates to the Swedish translation (sv_SE)
+- New translation for Arabic (ar_SA)
+- New translation for Chinese, Simplified (zh_CN)
+- New translation for Hungarian (hu_HU)
+- New translation for Dutch (nl_NL)
+- New translation for Spanish (es_ES)
+- Updated translation for Swedish (sv_SE)
 - New config files will now default to Font Scale 2 if the Minecraft font is based on Unicode.  This should make things easier to read.
 
 ## Changelog for JourneyMap 5.0.0RC1
