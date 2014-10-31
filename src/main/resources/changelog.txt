@@ -15,11 +15,13 @@ http://journeymap.techbrew.net
 - Bugfixes to correct display of right-to-left languages
 - Bugfix: Some options in Options Manager didn't reset via the Reset button
 - Bugfix: Waypoint label backgrounds on maps were opaque
+- Bugfix: Shortened label for the Fullscreen Map keybinding
 - Font Scale options can now be 1-4 instead of 1-3
 - New translation for Arabic (ar_SA)
 - New translation for Chinese, Simplified (zh_CN)
-- New translation for Hungarian (hu_HU)
 - New translation for Dutch (nl_NL)
+- New translation for Hungarian (hu_HU)
+- New translation for Korean (ko_KR)
 - New translation for Spanish (es_ES)
 - Updated translation for Swedish (sv_SE)
 - New config files will now default to Font Scale 2 if the Minecraft font is based on Unicode.  This should make things easier to read.

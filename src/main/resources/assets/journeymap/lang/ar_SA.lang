@@ -1,7 +1,4 @@
 ### JourneyMap 5.0.0RC2 Resource Bundle - ar_SA
-### Notes for translators : 
-### Do not translate or alter the codes used for color changes (§b, §e, §f, etc.)
-### Positional parameters (%1$s, %2$s, %3$s, etc.) may be reordered to suit your language's sentence structure
 jm.advanced.announcemod=تعلن وزارة الدفاع
 jm.advanced.announcemod.tooltip=تعلن في نافذة الدردشة التي JourneyMap جاهز.
 jm.advanced.automappoll=التردد AutoMap الإستطلاع
@@ -407,7 +404,7 @@ jm.webmap.worldtime_text=التوقيت العالمي :
 jm.webmap.zoom_slider_name=التكبير
 key.journeymap.create_waypoint=إنشاء إحداثية
 key.journeymap.day=عرض خريطة يوم
-key.journeymap.map_toggle=ملء الشاشة خريطة (CTRL + تبديل المصغرة)
+key.journeymap.map_toggle=ملء الشاشة خريطة
 key.journeymap.map_toggle_alt=إظهار / إخفاء ملء الشاشة خريطة
 key.journeymap.minimap_preset=التبديل المصغرة مسبقا
 key.journeymap.night=عرض ليلة خريطة
