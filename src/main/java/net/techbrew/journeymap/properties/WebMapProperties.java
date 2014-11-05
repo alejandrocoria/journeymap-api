@@ -10,6 +10,7 @@ package net.techbrew.journeymap.properties;
 
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.properties.config.Config;
+import net.techbrew.journeymap.server.MapApiService;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,6 +28,9 @@ public class WebMapProperties extends MapProperties
 
     @Config(category = WebMap, key = "jm.advanced.port", minValue = 80, maxValue = 10000, defaultValue = 8080)
     public final AtomicInteger port = new AtomicInteger(8080);
+
+    @Config(category = WebMap, key = "jm.webmap.google_domain", stringListProvider = MapApiService.TopLevelDomains.class)
+    public final AtomicReference<String> googleMapApiDomain = new AtomicReference<String>(".com");
 
     public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
     protected transient final String name = "webmap";
@@ -97,4 +101,6 @@ public class WebMapProperties extends MapProperties
                 ", showWaypoints=" + showWaypoints +
                 ", entityIconSetName=" + getEntityIconSetName();
     }
+
+
 }

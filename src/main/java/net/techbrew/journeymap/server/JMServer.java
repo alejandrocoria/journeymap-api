@@ -215,6 +215,7 @@ public class JMServer
         rupy.add(new FileService());
         rupy.add(new PropertyService());
         rupy.add(new DebugService());
+        rupy.add(new MapApiService());
 
         // Initialize daemon
         rupy.init();

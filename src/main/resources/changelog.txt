@@ -12,6 +12,11 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Web Map options didn't take immediate effect
+- Bugfix: Dead Bushes shown on maps even if Cartography > Show Plants was off
+- New option: Web Map > "Google Maps API Domain" lets you change the google domain if your country blocks maps.google.com
+
+## Changelog for JourneyMap 5.0.0RC1
 - Bugfixes to correct display of right-to-left languages
 - Bugfix: Some options in Options Manager didn't reset via the Reset button
 - Bugfix: Waypoint label backgrounds on maps were opaque
