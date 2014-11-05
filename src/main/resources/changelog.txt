@@ -16,6 +16,7 @@ http://journeymap.techbrew.net
 - Bugfix: Web Map options didn't take immediate effect
 - Bugfix: Dead Bushes shown on maps even if Cartography > Show Plants was off
 - Bugfix: Waypoint Manager "Dimension: <name>" button width didn't fit text.
+- Bugfix: Announcement of Web Map URL had derpy underlining.  Underline removed, hover added.
 
 
 ## Changelog for JourneyMap 5.0.0RC1

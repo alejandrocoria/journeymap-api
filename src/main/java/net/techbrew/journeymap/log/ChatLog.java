@@ -10,6 +10,7 @@ package net.techbrew.journeymap.log;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.event.ClickEvent;
+import net.minecraft.event.HoverEvent;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
@@ -56,7 +57,8 @@ public class ChatLog
     {
         ChatComponentText chat = new ChatComponentText(message);
         chat.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
-        chat.getChatStyle().setUnderlined(Boolean.valueOf(true));
+        chat.getChatStyle().setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(url)));
+        //chat.getChatStyle().setUnderlined(false);
         queueAnnouncement(chat);
     }
 
@@ -151,7 +153,7 @@ public class ChatLog
     {
         if (enableAnnounceMod)
         {
-            ChatLog.announceI18N("jm.common.ready", JourneyMap.MOD_NAME); //$NON-NLS-1$
+            //ChatLog.announceI18N("jm.common.ready", JourneyMap.MOD_NAME); //$NON-NLS-1$
             if (JourneyMap.getWebMapProperties().enabled.get())
             {
                 try
