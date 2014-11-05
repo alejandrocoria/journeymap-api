@@ -141,7 +141,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
                     setFlags(block, NoShadow);
                 }
             }
-            else if (block instanceof BlockBush)
+            else if (block instanceof BlockBush || block instanceof BlockCactus || block instanceof BlockDeadBush)
             {
                 setFlags(block, Side2Texture, Plant);
                 if (!JourneyMap.getCoreProperties().mapPlantShadows.get())
@@ -149,16 +149,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
                     setFlags(block, NoShadow);
                 }
             }
-            else if (block instanceof BlockCactus)
-            {
-                setFlags(block, Side2Texture, Plant);
-                if (!JourneyMap.getCoreProperties().mapPlantShadows.get())
-                {
-                    setFlags(block, NoShadow);
-                }
-            }
-
-            if (block instanceof BlockRailBase)
+            else if (block instanceof BlockRailBase)
             {
                 setFlags(block, NoShadow);
             }
