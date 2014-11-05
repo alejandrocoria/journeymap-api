@@ -55,7 +55,7 @@ class DimensionsButton extends Button
         int maxWidth = 0;
         for (WorldProvider worldProvider : worldProviders)
         {
-            String name = WorldData.getSafeDimensionName(worldProvider);
+            String name = Constants.getString("jm.waypoint.dimension", WorldData.getSafeDimensionName(worldProvider));
             maxWidth = Math.max(maxWidth, FMLClientHandler.instance().getClient().fontRenderer.getStringWidth(name));
         }
         return maxWidth + 12;
