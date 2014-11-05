@@ -538,6 +538,7 @@ public class OptionsManager extends JmUI
                 case WebMap:
                 {
                     DataCache.instance().resetRadarCaches();
+                    JourneyMap.getInstance().toggleWebserver(JourneyMap.getWebMapProperties().enabled.get(), true);
                     break;
                 }
                 case Waypoint:
@@ -557,6 +558,7 @@ public class OptionsManager extends JmUI
                 case Advanced:
                 {
                     JourneyMap.getInstance().softReset();
+                    JourneyMap.getInstance().toggleWebserver(JourneyMap.getWebMapProperties().enabled.get(), false);
                     break;
                 }
             }
