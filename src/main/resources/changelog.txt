@@ -13,6 +13,7 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 - New option: Web Map > "Google Maps API Domain" lets you change the google domain if your country blocks maps.google.com
+- Change: Version no longer announced in chat when Minecraft first started. Version can now be seen in Options Manager title.
 - Bugfix: Web Map options didn't take immediate effect
 - Bugfix: Dead Bushes shown on maps even if Cartography > Show Plants was off
 - Bugfix: Waypoint Manager "Dimension: <name>" button width didn't fit text.

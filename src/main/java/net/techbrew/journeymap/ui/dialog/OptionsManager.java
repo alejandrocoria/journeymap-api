@@ -63,7 +63,7 @@ public class OptionsManager extends JmUI
 
     public OptionsManager(JmUI returnDisplay, Config.Category... initialCategories)
     {
-        super("JourneyMap " + Constants.getString("jm.common.options"), returnDisplay);
+        super(String.format("JourneyMap %s %s", JourneyMap.JM_VERSION, Constants.getString("jm.common.options")), returnDisplay);
         this.initialCategories = initialCategories;
         this.inGameMinimapId = JourneyMap.getActiveMinimapId();
     }
