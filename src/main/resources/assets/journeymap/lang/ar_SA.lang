@@ -159,8 +159,8 @@ jm.common.update_available=تحديث متوفر!
 jm.common.update_check=التحقق من وجود تحديث
 jm.common.use_browser=استخدام متصفح
 jm.common.webserver_and_mapgui_disabled=JourneyMap بواسطة ملف jm.common.properties
-
-
+jm.common.webserver_and_mapgui_ready=اضغط [§b%1$s§f] او افتح المتصفح على§b http://localhost%2$s §f
+jm.common.webserver_only_ready=افتح المتصفح على§b http://localhost%1$s §f. (الخريطة فى اللعبة معطلة)
 jm.config.category.advanced=خيارات متقدمة
 jm.config.category.advanced.tooltip=الحذر! يمكن تغيير بعض من هذه القيم يسبب مشاكل كبيرة و / أو تعطل.
 jm.config.category.cartography=رسم الخرائط
@@ -178,8 +178,8 @@ jm.config.category.waypoint_beacons.tooltip=تكوين كيف منارات إح�
 jm.config.category.webmap=خريطة الويب
 jm.config.category.webmap.tooltip=تكوين ظهور خريطة الويب
 jm.config.control_arrowkeys=يمكن تعديل هذه القيمة مع مفاتيح الأسهم للسيطرة الدقيقة
-jm.config.default=[الافتراضي : %1$s]
-
+jm.config.default=[ الافتراضي : %1$s ]
+jm.config.default_numeric=[ المدى: %1$d ~ %2$d , الافتراضى: %3$d ]
 jm.config.file_header_1=JourneyMap ملف التكوين. تعديل على مسؤوليتك الخاصة!
 jm.config.file_header_2=لاستخدامها في جميع العالمين، ضع هنا : %1$s
 jm.config.file_header_3=لتجاوز التكوين لعالم واحد، ضع هنا : %1$s (اسم العالم)
@@ -187,7 +187,7 @@ jm.config.file_header_4=لاستعادة الإعدادات الافتراضية
 jm.config.file_header_5=لمزيد من المعلومات، انتقل إلى : %1$s
 jm.config.reset=إعادة تعيين
 jm.config.reset.tooltip=إعادة تعيين كافة الخيارات في هذا القسم إلى قيمها الافتراضية
-jm.error.compatability=Incompatability خطأ تشغيل %1$s لفورج %2$s. ضمان إصدار فورج متوافق.
+jm.error.compatability=خطأ عدم التوافق مشغل %1$s للفورج %2$s. تأكد من ان نسختك من الفورج متوافقة
 jm.feature.fairplay=الفيربلاى
 jm.feature.unlimited=غير محدود
 jm.fullscreen.follow=متابعة
@@ -265,7 +265,7 @@ jm.minimap.texture_size.tooltip=استخدام أيقونات صغيرة على 
 jm.minimap.title=خريطة مصغرة
 jm.waypoint.auto_hide_label=صناعة السيارات في إخفاء التسمية
 jm.waypoint.auto_hide_label.tooltip=إخفاء إحداثية تسميات عندما كنت لا تبحث نحوهم
-jm.waypoint.blue_abbreviated=B
+jm.waypoint.blue_abbreviated=ازرق
 jm.waypoint.bold_label=جريئة تسمية
 jm.waypoint.bold_label.tooltip=استخدام العلامات إحداثية جريئا على منارات
 jm.waypoint.cancel=الغاء
@@ -291,7 +291,7 @@ jm.waypoint.enable_manager.tooltip=تمكين مدير نقطة الطريق. إ
 jm.waypoint.find=البحث
 jm.waypoint.font_scale=مقياس الخط
 jm.waypoint.font_scale.tooltip=إن حجم الخط المستخدم لعرض الملصقات إحداثية في اللعبة.
-jm.waypoint.green_abbreviated=G
+jm.waypoint.green_abbreviated=اخضر
 jm.waypoint.help_create_ingame=إنشاء / تحرير نقطة الطريق (في اللعبة)
 jm.waypoint.help_create_inmap=إنشاء / تحرير نقطة الطريق (في خريطة)
 jm.waypoint.help_import_rei=أو نسخ §b %1$s §f ل§b %2$s §f وإعادة تشغيل ماين كرافت.
@@ -320,7 +320,7 @@ jm.waypoint.new=الجديد ...
 jm.waypoint.new_title=نيو إحداثية
 jm.waypoint.options=خيارات إحداثية (في لعبة العرض)
 jm.waypoint.randomize=لون عشوائي
-jm.waypoint.red_abbreviated=R
+jm.waypoint.red_abbreviated=احمر
 jm.waypoint.remove=إزالة
 jm.waypoint.reset=إعادة تعيين
 jm.waypoint.save=حفظ
