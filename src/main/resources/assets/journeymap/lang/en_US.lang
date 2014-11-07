@@ -1,4 +1,4 @@
-### JourneyMap 5.0.0RC2 Resource Bundle - en_US
+### JourneyMap 5.0.0RC4 Resource Bundle - en_US
 ### Notes for translators:
 ### Do not translate or alter the codes used for color changes (§b, §e, §f, etc.)
 ### Positional parameters (%1$s, %2$s, %3$s, etc.) may be reordered to suit your language's sentence structure
@@ -365,7 +365,7 @@ jm.webmap.caves_menu_item_title=Show cave/interior map when you are not under sk
 jm.webmap.day_button_text=Day
 jm.webmap.day_button_title=The world map as it appears in daylight.
 jm.webmap.donate_text=Donate to JourneyMap
-jm.webmap.donate_title=Donate to JourneyMap development using PayPal
+jm.webmap.donate_title=Donate to JourneyMap development using Patreon
 jm.webmap.elevation_text=Elevation:
 jm.webmap.email_sub_text=JourneyMap news Email
 jm.webmap.email_sub_title=Subscribe to JourneyMap news by Email

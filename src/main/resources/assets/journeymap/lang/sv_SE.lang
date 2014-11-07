@@ -1,4 +1,4 @@
-﻿### JourneyMap 5.0.0RC2 Resource Bundle - sv_SE
+﻿### JourneyMap 5.0.0RC4 Resource Bundle - sv_SE
 jm.advanced.announcemod=Meddelanden om modden
 jm.advanced.announcemod.tooltip=Meddelar i chattfönstret att JourneyMap är redo.
 jm.advanced.automappoll=Automap pollningsfrekvens
@@ -363,7 +363,7 @@ jm.webmap.caves_menu_item_title=Visa grott-/insideskartan när du inte är under
 jm.webmap.day_button_text=Dag
 jm.webmap.day_button_title=Världskartan som den ser ut i dagsljus.
 jm.webmap.donate_text=Donera till JourneyMap
-jm.webmap.donate_title=Donera till utvecklingen av JourneyMap med hjälp av PayPal
+jm.webmap.donate_title=Donera till utvecklingen av JourneyMap med hjälp av Patreon
 jm.webmap.elevation_text=Höjd:
 jm.webmap.email_sub_text=JourneyMap nyhets e-post
 jm.webmap.email_sub_title=Prenumerera på JourneyMap nyheter via e-post

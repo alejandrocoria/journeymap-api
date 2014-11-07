@@ -18,6 +18,9 @@ import net.techbrew.journeymap.io.MapSaver;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.MapState;
+import net.techbrew.journeymap.render.draw.DrawUtil;
+import net.techbrew.journeymap.render.texture.TextureCache;
+import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.task.MapRegionTask;
 import net.techbrew.journeymap.task.SaveMapTask;
 import net.techbrew.journeymap.ui.UIManager;
@@ -33,8 +36,9 @@ import java.io.IOException;
 
 public class FullscreenActions extends JmUI
 {
+    protected TextureImpl patreonLogo = TextureCache.instance().getPatreonLogo();
 
-    Button buttonAutomap, buttonSave, buttonClose, buttonBrowser, buttonCheck;
+    Button buttonAutomap, buttonSave, buttonClose, buttonBrowser, buttonCheck, buttonDonate;
 
     public FullscreenActions()
     {
@@ -44,6 +48,19 @@ public class FullscreenActions extends JmUI
     public static void launchLocalhost()
     {
         String url = "http://localhost:" + JourneyMap.getWebMapProperties().port.get(); //$NON-NLS-1$
+        try
+        {
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+        }
+        catch (IOException e)
+        {
+            JourneyMap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e)); //$NON-NLS-1$
+        }
+    }
+
+    public static void launchPatreon()
+    {
+        String url = "http://patreon.com/techbrew";
         try
         {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
@@ -73,11 +90,18 @@ public class FullscreenActions extends JmUI
         buttonAutomap = new Button(Constants.getString("jm.common.automap_title"));
         buttonAutomap.setEnabled(FMLClientHandler.instance().getClient().isSingleplayer());
 
+
+        buttonDonate = new Button(Constants.getString("jm.webmap.donate_text"));
+        buttonDonate.setDefaultStyle(false);
+        buttonDonate.setDrawBackground(false);
+        buttonDonate.setDrawFrame(false);
+
         buttonCheck = new Button(Constants.getString("jm.common.update_check")); //$NON-NLS-1$
 
         buttonList.add(buttonAutomap);
         buttonList.add(buttonSave);
         buttonList.add(buttonCheck);
+        buttonList.add(buttonDonate);
         buttonList.add(buttonBrowser);
 
         new ButtonList(buttonList).equalizeWidths(getFontRenderer());
@@ -110,7 +134,13 @@ public class FullscreenActions extends JmUI
         buttonBrowser.rightOf(buttonAutomap, hgap).setY(by);
         buttonSave.below(buttonAutomap, vgap).leftOf(bx - 2);
         buttonCheck.below(buttonBrowser, vgap).rightOf(buttonSave, hgap);
-        buttonClose.below(buttonSave, vgap * 4).centerHorizontalOn(bx);
+
+        int patreonX = bx - 8;
+        int patreonY = buttonBrowser.getBottomY() + 32;
+        DrawUtil.drawImage(patreonLogo, patreonX, patreonY, false, .5f, 0);
+
+        buttonDonate.centerHorizontalOn(bx).setY(patreonY + 16);
+        buttonClose.below(buttonDonate, vgap * 4).centerHorizontalOn(bx);
     }
 
     @Override
@@ -131,6 +161,12 @@ public class FullscreenActions extends JmUI
         if (guibutton == buttonBrowser)
         {
             launchLocalhost();
+            UIManager.getInstance().openFullscreenMap();
+            return;
+        }
+        if (guibutton == buttonDonate)
+        {
+            launchPatreon();
             UIManager.getInstance().openFullscreenMap();
             return;
         }

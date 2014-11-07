@@ -152,8 +152,26 @@ public class FileHandler
 
         try
         {
+            File defaultWorldDirectory = FileHandler.getJMWorldDirForWorldId(minecraft, null);
             worldDirectory = getJMWorldDirForWorldId(minecraft, worldId);
-            worldDirectory.mkdirs();
+
+            if (worldId != null && !worldDirectory.exists() && defaultWorldDirectory.exists())
+            {
+                JourneyMap.getLogger().log(Level.INFO, "Moving default directory to " + worldDirectory);
+                try
+                {
+                    Files.move(defaultWorldDirectory, worldDirectory);
+                }
+                catch (Exception e)
+                {
+                    JourneyMap.getLogger().log(Level.ERROR, LogFormatter.toString(e));
+                }
+            }
+
+            if (!worldDirectory.exists())
+            {
+                worldDirectory.mkdirs();
+            }
 
             if (!minecraft.isSingleplayer())
             {

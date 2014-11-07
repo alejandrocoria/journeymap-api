@@ -95,11 +95,12 @@ label span {
 #worldInfo {
     padding:6px;
     display:inline-block;
+    font-weight: bold;
 }
 
 #worldInfo .infoTitle  {
     font-style:italic;
-    font-weight: bold;
+    font-weight:normal;
     text-align:right;
     padding-left:4px;
     padding-right:4px;

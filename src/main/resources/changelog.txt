@@ -12,6 +12,11 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Change: Web Map jquery library references moved off of googleapis.com because the domain is blocked in China
+- Change: Paypal references updated to Patreon
+- Change: Waypoints and map images are migrated to the new directory when a world ID is first sent by JourneyMap Server.
+
+## Changelog for JourneyMap 5.0.0RC3
 - New option: Web Map > "Google Maps API Domain" lets you change the google domain if your country blocks maps.google.com
 - Change: Version no longer announced in chat when Minecraft first started. Version can now be seen in Options Manager title.
 - Bugfix: Web Map options didn't take immediate effect
@@ -20,7 +25,7 @@ http://journeymap.techbrew.net
 - Bugfix: Announcement of Web Map URL had derpy underlining.  Underline removed, hover added.
 - Updated translation for Arabic (ar_SA)
 
-## Changelog for JourneyMap 5.0.0RC1
+## Changelog for JourneyMap 5.0.0RC2
 - Bugfixes to correct display of right-to-left languages
 - Bugfix: Some options in Options Manager didn't reset via the Reset button
 - Bugfix: Waypoint label backgrounds on maps were opaque

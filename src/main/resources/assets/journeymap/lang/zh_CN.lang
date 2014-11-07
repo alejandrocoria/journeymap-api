@@ -1,4 +1,4 @@
-### JourneyMap 5.0.0RC2 Resource Bundle - zh_CN
+### JourneyMap 5.0.0RC4 Resource Bundle - zh_CN
 jm.advanced.announcemod.tooltip=在聊天窗口中声明JourneyMap已经就绪.
 jm.advanced.announcemod=声明Mod
 jm.advanced.automappoll.tooltip=多个自动绘制区域地图的独立任务间的延迟(单位为毫秒). 较低的值将会降低自动绘图的耗时, 但会影响性能.
@@ -361,7 +361,7 @@ jm.webmap.caves_menu_item_title=当你不在室外时显示洞穴或室内地图
 jm.webmap.day_button_text=白天
 jm.webmap.day_button_title=显示该游戏世界地图在白天时的样子.
 jm.webmap.donate_text=对JourneyMap进行捐赠
-jm.webmap.donate_title=使用PayPal对JourneyMap的开发进行捐赠
+jm.webmap.donate_title=使用Patreon对JourneyMap的开发进行捐赠
 jm.webmap.elevation_text=海拔高度:
 jm.webmap.email_sub_text=JourneyMap新闻Email
 jm.webmap.email_sub_title=通过Email订阅JourneyMap新闻

@@ -8,7 +8,8 @@
         <meta name="description" content="">
         <meta name="author" content="Mark Woodman - Techbrew.net">
         <link href="http://feeds.feedburner.com/JourneyMap" id="rssfeed" rel="alternate" type="application/rss+xml" />
-        <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/dark-hive/jquery-ui.min.css" rel="stylesheet" type="text/css" />
+        <link href="http://code.jquery.com/ui/1.11.2/themes/ui-darkness/jquery-ui.min.css" rel="stylesheet"
+              type="text/css"/>
         <link href="css/journeymap.css?v=@JMVERSION@" rel="stylesheet" type="text/css" />
         <link rel="shortcut icon" href="favicon.ico">
         <link rel="apple-touch-icon-precomposed" href="img/ico/journeymap144.png">
@@ -20,9 +21,10 @@
 
         <div id="nav-holder" style="display:none">
             <span id="jm-logo-span">
-                <img src="img/ico/journeymap144.png" alt="JourneyMap" id="jm-logo" class="nav">
+                <img src="img/ico/journeymap60.png" alt="JourneyMap" id="jm-logo" class="nav">
             </span>
-            <div id="jm-toolbar" class="nav">
+
+            <div id="jm-toolbar" class="nav" style="padding-top:9px;">
                 <button id="jm-button" class="nav-button"><div id="version">JourneyMap</div></button>
                 <ul id="jm-menu">
                     <li><a target="_blank" id="webLink" title="http://journeymap.techbrew.net" href="http://journeymap.techbrew.net?original_referer=ingame"><img src="img/browser.png" width="16" alt=""><span id="webLinkText">http://journeymap.techbrew.net</span></a></li>
@@ -30,7 +32,9 @@
                     <li><a target="_blank" id="rssLink" title="" href="http://feeds.feedburner.com/JourneyMap"><img src="img/feed-icon16x16.png" alt=""><span id="rssLinkText">JourneyMap news RSS</span></a></li>
                     <li><a target="_blank" id="emailLink" title="" href="http://feedburner.google.com/fb/a/mailverify?uri=Journeymap"><img src="img/email.png" alt=""><span id="emailLinkText">JourneyMap news Email</span></a></li>
                     <li><a target="_blank" id="twitterLink" title="" href="https://twitter.com/intent/follow?original_referer=localhost&amp;region=follow_link&amp;screen_name=JourneyMapMod&amp;source=followbutton&amp;variant=2.0"><img src="img/twitter.png" alt=""><span id="twitterLinkText">Follow JourneyMapMod on Twitter</span></a></li>
-                    <li><a target="_blank" id="donateLink" title="" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=D5KK9FRAQG6DE"><img src="img/paypal.png" alt=""><span id="donateLinkText">Donate to JourneyMap</span></a></li>
+                    <li><a target="_blank" id="donateLink" title="" href="http://www.patreon.com/techbrew"><img
+                            src="img/patreon.png" height=16 alt=""><span id="donateLinkText">Donate to JourneyMap</span></a>
+                    </li>
                 </ul>
             </div>
             <div id="jm-toggles" class="nav">
@@ -59,8 +63,8 @@
 	                <li><a href="#" id="saveButton"><img src="/theme/icon/savemap.png"><span id="saveButtonText">[Save Map]</span></a></li>
 	            </ul>
             </div>
-            <div id="worldInfo" class="nav ui-state-highlight ui-corner-all">
-                <span class="infoTitle" id="worldNameLabel"></span>
+            <div id="worldInfo" class="nav ui-widget ui-widget-content ui-corner-all">
+            <span class="infoTitle" id="worldNameLabel"></span>
                 <span id="worldName"></span>
                 <span class="infoTitle" id="worldTimeLabel"></span>
                 <span id="worldTime"></span>

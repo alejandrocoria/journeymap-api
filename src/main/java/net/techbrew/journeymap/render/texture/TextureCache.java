@@ -279,6 +279,11 @@ public class TextureCache
         return getNamedTexture(Name.Logo, "ico/journeymap60.png", false); //$NON-NLS-1$
     }
 
+    public TextureImpl getPatreonLogo()
+    {
+        return getNamedTexture(Name.Patreon, "patreon.png", false); //$NON-NLS-1$
+    }
+
     public TextureImpl getHostileLocator()
     {
         return getNamedTexture(Name.LocatorHostile, "locator-hostile.png", false); //$NON-NLS-1$
@@ -524,7 +529,7 @@ public class TextureCache
 
     public static enum Name
     {
-        MinimapSmallSquare, MinimapMediumSquare, MinimapLargeSquare, MinimapCustomSquare, MinimapSmallCircle, MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, LocatorHostile, LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, ColorPicker, UnknownEntity
+        MinimapSmallSquare, MinimapMediumSquare, MinimapLargeSquare, MinimapCustomSquare, MinimapSmallCircle, MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, Patreon, LocatorHostile, LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, ColorPicker, UnknownEntity
     }
 
     private static class Holder

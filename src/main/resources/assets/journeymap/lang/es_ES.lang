@@ -1,4 +1,4 @@
-### JourneyMap 5.0.0RC2 Resource Bundle - es_ES
+### JourneyMap 5.0.0RC4 Resource Bundle - es_ES
 jm.advanced.announcemod=Anuncios del Mod
 jm.advanced.announcemod.tooltip=Anuncia en la ventana del chat cuando el JourneyMap esta listo.
 jm.advanced.automappoll=Frecuencia del Mapa Automatico
@@ -361,7 +361,7 @@ jm.webmap.caves_menu_item_title=Mostrar cuevas/interiores cuando no esta debajo 
 jm.webmap.day_button_text=Dia
 jm.webmap.day_button_title=El mapa del mundo aparece en luz de dia.
 jm.webmap.donate_text=Donar a JourneyMap
-jm.webmap.donate_title=Donar al desarrollo de JourneyMap usando PayPal
+jm.webmap.donate_title=Donar al desarrollo de JourneyMap usando Patreon
 jm.webmap.elevation_text=Altura:
 jm.webmap.email_sub_text=Noticias por mail del JourneyMap
 jm.webmap.email_sub_title=Suscribirse a las noticias de JourneyMap por mail

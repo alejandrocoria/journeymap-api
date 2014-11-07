@@ -1,4 +1,4 @@
-﻿### JourneyMap 5.0.0RC2 Resource Bundle - hu_HU
+﻿### JourneyMap 5.0.0RC4 Resource Bundle - hu_HU
 jm.advanced.announcemod=Hirdető mod
 jm.advanced.announcemod.tooltip=Kihirdető a chat ablakban amikor JourneyMap készen áll.
 jm.advanced.automappoll=AutoMap lekérés frekvencia
@@ -361,7 +361,7 @@ jm.webmap.caves_menu_item_title=Barlang/benti térkép mutatása amikor nem az �
 jm.webmap.day_button_text=Nappal
 jm.webmap.day_button_title=A térkép nappali képben nézz ki.
 jm.webmap.donate_text=Adományozz JourneyMap-nek.
-jm.webmap.donate_title=Adományozz JourneyMap fejlesztésének PayPal-al.
+jm.webmap.donate_title=Adományozz JourneyMap fejlesztésének Patreon-al.
 jm.webmap.elevation_text=Maggaság:
 jm.webmap.email_sub_text=JourneyMap hírlevél
 jm.webmap.email_sub_title=Iratkozz fel JourneyMap hírlevelére

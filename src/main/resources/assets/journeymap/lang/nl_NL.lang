@@ -1,4 +1,4 @@
-### JourneyMap 5.0.0RC2 Resource Bundle - nl_NL
+### JourneyMap 5.0.0RC4 Resource Bundle - nl_NL
 jm.advanced.announcemod.tooltip=Meldt in het chatvenster dat JourneyMap klaar is.
 jm.advanced.announcemod=Melding Mod
 jm.advanced.automappoll.tooltip=Vertraging (in milliseconden) tussen AutoMap regiotaken. Lagere waarden zullen de tijd voor AutoMap uitvoering verkleinen, maar kunnen performantie schaden.
@@ -361,7 +361,7 @@ jm.webmap.caves_menu_item_title=Toon grot/interieur kaart wanneer je niet in ope
 jm.webmap.day_button_text=Dag
 jm.webmap.day_button_title=De wereldkaart zoals zichtbaar in daglicht.
 jm.webmap.donate_text=Doneer aan JourneyMap
-jm.webmap.donate_title=Doneer aan JourneyMap ontwikkeling met PayPal
+jm.webmap.donate_title=Doneer aan JourneyMap ontwikkeling met Patreon
 jm.webmap.elevation_text=Hoogte:
 jm.webmap.email_sub_text=JourneyMap nieuws e-mail
 jm.webmap.email_sub_title=Abonneer op JourneyMap nieuws via e-mail

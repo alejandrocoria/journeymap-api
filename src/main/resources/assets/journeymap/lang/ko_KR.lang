@@ -1,4 +1,4 @@
-### JourneyMap 5.0.0RC2 Resource Bundle - ko_KR
+### JourneyMap 5.0.0RC4 Resource Bundle - ko_KR
 ### Translation by: ENlGMA a.k.a. 이니그마
 jm.advanced.announcemod.tooltip=JourneyMap이 준비되었다는 것을 채팅창에 알립니다.
 jm.advanced.announcemod=모드 알림
@@ -362,7 +362,7 @@ jm.webmap.caves_menu_item_title=하늘 아래에 있지 않을경우 동굴/내�
 jm.webmap.day_button_text=낮
 jm.webmap.day_button_title=햇빛에 비춰진듯한 월드맵.
 jm.webmap.donate_text=JourneyMap에 후원하기
-jm.webmap.donate_title=PayPal을 사용하여 JourneyMap 개발팀 후원하기
+jm.webmap.donate_title=Patreon을 사용하여 JourneyMap 개발팀 후원하기
 jm.webmap.elevation_text=고도:
 jm.webmap.email_sub_text=JourneyMap 이메일 소식
 jm.webmap.email_sub_title=이메일을 통해 JourneyMap에 관한 소식 구독하기
