@@ -21,10 +21,8 @@ import net.techbrew.journeymap.log.LogFormatter;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.Display;
 
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -123,17 +121,6 @@ public class WorldData extends CacheLoader<Class, WorldData>
      * @param mc
      * @return
      */
-    public static String getWorldName(Minecraft mc)
-    {
-        return getWorldName(mc, false);
-    }
-
-    /**
-     * Get the current world name.
-     *
-     * @param mc
-     * @return
-     */
     public static String getWorldName(Minecraft mc, boolean useLegacyName)
     {
         // Get the name
@@ -169,16 +156,6 @@ public class WorldData extends CacheLoader<Class, WorldData>
             }
         }
 
-        // Clean it up for display
-        try
-        {
-            worldName = URLEncoder.encode(worldName, "UTF-8").replaceAll("\\+", " "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            // Shouldn't happen
-            worldName = "Minecraft";    //$NON-NLS-1$
-        }
         return worldName;
     }
 
@@ -306,7 +283,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         IntegratedServer server = mc.getIntegratedServer();
         boolean multiplayer = server == null || server.getPublic();
 
-        name = getWorldName(mc);
+        name = getWorldName(mc, false);
         dimension = mc.theWorld.provider.dimensionId;
         hardcore = worldInfo.isHardcoreModeEnabled();
         singlePlayer = !multiplayer;

@@ -141,7 +141,7 @@ public class MapSaver
             final String date = dateFormat.format(new Date());
             final boolean isUnderground = mapType.equals(Constants.MapType.underground);
             final StringBuilder sb = new StringBuilder(date).append("_");
-            sb.append(WorldData.getWorldName(mc)).append("_");
+            sb.append(WorldData.getWorldName(mc, false)).append("_");
             sb.append(WorldData.getSafeDimensionName(mc.theWorld.provider)).append("_");
             if (isUnderground)
             {
