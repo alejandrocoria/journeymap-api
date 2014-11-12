@@ -126,10 +126,11 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             {
                 alpha -= 1; // Fade
             }
-            if (alpha > 0 && text != null)
+            if (alpha > 10 && text != null)
             {
                 DrawUtil.drawLabel(text, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, bgColor, Math.max(0, alpha), fgColor, Math.max(0, alpha), getMapFontScale(), fontShadow);
             }
+
         }
     }
 }

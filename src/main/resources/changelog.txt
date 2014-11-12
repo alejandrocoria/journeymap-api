@@ -16,6 +16,7 @@ http://journeymap.techbrew.net
 - Bugfix: Data folders weren't migrated when World ID first received by JourneyMap Server mod.
 - Bugfix: Supressed unnecessary chat warning about an incompatible version of Rei's Minimap when closing Waypoint Manager's Help dialog
 - Bugfix: Chat announcement of saved map had derpy underlining.  Underline removed, hover added.
+- Bugfix: Fullscreen map coordinates under mouse would blink right before fading out
 
 ## Changelog for JourneyMap 5.0.0RC4
 - Change: Web Map jquery library references moved off of googleapis.com because the domain is blocked in China
