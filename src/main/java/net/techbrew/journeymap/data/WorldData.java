@@ -82,6 +82,10 @@ public class WorldData extends CacheLoader<Class, WorldData>
                     serverName = serverData.serverName;
                     if (serverName != null)
                     {
+                        if (Strings.isNullOrEmpty(serverName.trim()))
+                        {
+                            serverName = serverData.serverIP;
+                        }
                         return serverName;
                     }
                 }
