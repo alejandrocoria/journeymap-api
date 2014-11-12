@@ -168,11 +168,6 @@ public class FileHandler
                 }
             }
 
-            if (!worldDirectory.exists())
-            {
-                worldDirectory.mkdirs();
-            }
-
             if (!minecraft.isSingleplayer())
             {
                 String legacyWorldName = WorldData.getWorldName(minecraft, true);
@@ -197,6 +192,11 @@ public class FileHandler
                 {
                     migrateLegacyFolderName(legacyWorldDir, worldDirectory);
                 }
+            }
+
+            if (!worldDirectory.exists())
+            {
+                worldDirectory.mkdirs();
             }
 
         }

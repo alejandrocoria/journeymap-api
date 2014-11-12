@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.data;
 
+import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
@@ -21,8 +22,10 @@ import net.techbrew.journeymap.log.LogFormatter;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.Display;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -143,7 +146,6 @@ public class WorldData extends CacheLoader<Class, WorldData>
                 return "offline";
             }
             worldName = mc.theWorld.getWorldInfo().getWorldName();
-
             String serverName = useLegacyName ? getLegacyServerName() : getServerName();
 
             if (!"MpServer".equals(worldName))
@@ -156,7 +158,29 @@ public class WorldData extends CacheLoader<Class, WorldData>
             }
         }
 
+        if (useLegacyName)
+        {
+            worldName = getLegacyUrlEncodedWorldName(worldName);
+        }
+
+        if (Strings.isNullOrEmpty(worldName.trim()))
+        {
+            worldName = "unnamed";
+        }
+
         return worldName;
+    }
+
+    private static String getLegacyUrlEncodedWorldName(String worldName)
+    {
+        try
+        {
+            return URLEncoder.encode(worldName, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            return worldName;
+        }
     }
 
     public static List<WorldProvider> getDimensionProviders(List<Integer> requiredDimensionList)
