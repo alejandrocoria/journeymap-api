@@ -58,8 +58,11 @@ public class VoxelReader
         catch (Throwable e)
         {
             JourneyMap.getLogger().warn("Incompatible version of VoxelMap. Tried com.thevoxelbox.voxelmap.VoxelMap.instance.waypointManager.wayPts: " + e);
-            ChatLog.announceI18N("jm.waypoint.import_vox_version");
-            ChatLog.announceURL(VOXEL_JAR_NAME, VOXEL_JAR_URL);
+            if (!(e instanceof ClassNotFoundException))
+            {
+                ChatLog.announceI18N("jm.waypoint.import_vox_version");
+                ChatLog.announceURL(VOXEL_JAR_NAME, VOXEL_JAR_URL);
+            }
             modLoaded = false;
         }
 

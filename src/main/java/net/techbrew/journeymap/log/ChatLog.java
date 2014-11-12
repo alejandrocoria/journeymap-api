@@ -74,7 +74,7 @@ public class ChatLog
         try
         {
             chat.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getCanonicalPath()));
-            chat.getChatStyle().setUnderlined(Boolean.valueOf(true));
+            chat.getChatStyle().setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(file.getCanonicalPath())));
         }
         catch (Exception e)
         {

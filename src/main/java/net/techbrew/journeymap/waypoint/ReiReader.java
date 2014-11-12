@@ -82,7 +82,10 @@ public class ReiReader
         catch (Throwable e)
         {
             JourneyMap.getLogger().warn("Incompatible version of Reijm.minimap. Tried reifnsk.jm.minimap.Reijm.minimap.instance.getWaypoints(): " + e);
-            ChatLog.announceI18N("jm.waypoint.import_rei_version");
+            if (!(e instanceof ClassNotFoundException))
+            {
+                ChatLog.announceI18N("jm.waypoint.import_rei_version");
+            }
             modLoaded = false;
             return Collections.EMPTY_LIST;
         }

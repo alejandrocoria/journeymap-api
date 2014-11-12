@@ -12,6 +12,12 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Data folder names with UTF-8 characters were being URL encoded. They should be migrated to the correct names, but you may need to do so manually.
+- Bugfix: Data folders weren't migrated when World ID first received by JourneyMap Server mod.
+- Bugfix: Supressed unnecessary chat warning about an incompatible version of Rei's Minimap when closing Waypoint Manager's Help dialog
+- Bugfix: Chat announcement of saved map had derpy underlining.  Underline removed, hover added.
+
+## Changelog for JourneyMap 5.0.0RC4
 - Change: Web Map jquery library references moved off of googleapis.com because the domain is blocked in China
 - Change: Paypal references updated to Patreon
 - Change: Waypoints and map images are migrated to the new directory when a world ID is first sent by JourneyMap Server.
