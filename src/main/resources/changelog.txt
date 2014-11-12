@@ -19,6 +19,7 @@ http://journeymap.techbrew.net
 - Bugfix: Chat announcement of saved map had derpy underlining.  Underline removed, hover added.
 - Bugfix: Fullscreen map coordinates under mouse would blink right before fading out
 - Bugfix: Client spams server with world id requests while Death UI displayed
+- Bugfix: Waypoint files were not written with UTF-8 encoding, which could lead to corrupted waypoint names after the files were reloaded
 - Change: VoxelMap color codes used to disable caves/radar now recognized with or without spaces in between color codes
 
 ## Changelog for JourneyMap 5.0.0RC4

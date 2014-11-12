@@ -10,6 +10,7 @@ package net.techbrew.journeymap.waypoint;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.techbrew.journeymap.JourneyMap;
@@ -18,7 +19,7 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -46,10 +47,7 @@ public class WaypointStore
         {
             // Write to file
             waypointFile = new File(FileHandler.getWaypointDir(), waypoint.getFileName());
-            FileWriter fw = new FileWriter(waypointFile);
-            fw.write(gson.toJson(waypoint));
-            fw.flush();
-            fw.close();
+            Files.write(gson.toJson(waypoint), waypointFile, Charset.forName("UTF-8"));
             return true;
         }
         catch (Exception e)
