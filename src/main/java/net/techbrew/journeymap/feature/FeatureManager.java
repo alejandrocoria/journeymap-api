@@ -35,9 +35,74 @@ public class FeatureManager
     private FeatureManager()
     {
         disableControlCodes.put("\u00a73 \u00a76 \u00a73 \u00a76 \u00a73 \u00a76 \u00a7e", Feature.radar());
+        disableControlCodes.put("\u00a73\u00a76\u00a73\u00a76\u00a73\u00a76\u00a7e", Feature.radar());
         disableControlCodes.put("\u00a73 \u00a76 \u00a73 \u00a76 \u00a73 \u00a76 \u00a7d", EnumSet.of(Feature.MapCaves));
+        disableControlCodes.put("\u00a73\u00a76\u00a73\u00a76\u00a73\u00a76\u00a7d", EnumSet.of(Feature.MapCaves));
         policySet = locatePolicySet();
         reset();
+    }
+
+    /**
+     * Gets a detailed description of all policies.
+     */
+    public static String getPolicyDetails()
+    {
+        StringBuilder sb = new StringBuilder(String.format("%s Features: ", getPolicySetName()));
+        for (Feature feature : Feature.values())
+        {
+            boolean single = false;
+            boolean multi = false;
+            if (Holder.INSTANCE.policyMap.containsKey(feature))
+            {
+                single = Holder.INSTANCE.policyMap.get(feature).allowInSingleplayer;
+                multi = Holder.INSTANCE.policyMap.get(feature).allowInMultiplayer;
+            }
+
+            sb.append(String.format("\n\t%s : singleplayer = %s , multiplayer = %s", feature.name(), single, multi));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Gets the singleton.
+     */
+    public static FeatureManager instance()
+    {
+        return Holder.INSTANCE;
+    }
+
+    /**
+     * Whether the specified feature is currently permitted.
+     * @param feature the feature to check
+     * @return true if permitted
+     */
+    public static boolean isAllowed(Feature feature)
+    {
+        Policy policy = Holder.INSTANCE.policyMap.get(feature);
+        return (policy != null) && policy.isCurrentlyAllowed();
+    }
+
+    /**
+     * Returns a map of all features and whether they are currently permitted.
+     * @return
+     */
+    public static Map<Feature, Boolean> getAllowedFeatures()
+    {
+        Map<Feature, Boolean> map = new HashMap<Feature, Boolean>(Feature.values().length * 2);
+        for (Feature feature : Feature.values())
+        {
+            map.put(feature, isAllowed(feature));
+        }
+        return map;
+    }
+
+    /**
+     * Gets the name of the PolicySet.
+     * @return
+     */
+    public static String getPolicySetName()
+    {
+        return instance().policySet.getName();
     }
 
     public Set<String> getControlCodes()
@@ -80,70 +145,6 @@ public class FeatureManager
             }
         }
     }
-
-    /**
-     * Gets a detailed description of all policies.
-     */
-    public static String getPolicyDetails()
-    {
-        StringBuilder sb = new StringBuilder(String.format("%s Features: ", getPolicySetName()));
-        for (Feature feature : Feature.values())
-        {
-            boolean single = false;
-            boolean multi = false;
-            if(Holder.INSTANCE.policyMap.containsKey(feature))
-            {
-                single = Holder.INSTANCE.policyMap.get(feature).allowInSingleplayer;
-                multi = Holder.INSTANCE.policyMap.get(feature).allowInMultiplayer;
-            }
-
-            sb.append(String.format("\n\t%s : singleplayer = %s , multiplayer = %s", feature.name(), single, multi));
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Gets the singleton.
-     */
-    public static FeatureManager instance()
-    {
-        return Holder.INSTANCE;
-    }
-
-    /**
-     * Whether the specified feature is currently permitted.
-     * @param feature the feature to check
-     * @return  true if permitted
-     */
-    public static boolean isAllowed(Feature feature)
-    {
-        Policy policy = Holder.INSTANCE.policyMap.get(feature);
-        return (policy != null) && policy.isCurrentlyAllowed();
-    }
-
-    /**
-     * Returns a map of all features and whether they are currently permitted.
-     * @return
-     */
-    public static Map<Feature, Boolean> getAllowedFeatures()
-    {
-        Map<Feature, Boolean> map = new HashMap<Feature, Boolean>(Feature.values().length * 2);
-        for (Feature feature : Feature.values())
-        {
-            map.put(feature, isAllowed(feature));
-        }
-        return map;
-    }
-
-    /**
-     * Gets the name of the PolicySet.
-     * @return
-     */
-    public static String getPolicySetName()
-    {
-        return instance().policySet.getName();
-    }
-
 
     /**
      * Finds the FeatureSet via reflection.

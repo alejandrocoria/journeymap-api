@@ -111,7 +111,7 @@ public class WorldInfoHandler
     @SubscribeEvent
     public void on(EntityJoinWorldEvent event)
     {
-        if (!mc.isSingleplayer() && mc.thePlayer != null)
+        if (!mc.isSingleplayer() && mc.thePlayer != null && !mc.thePlayer.isDead)
         {
             if (event.entity.getCommandSenderName().equals(mc.thePlayer.getCommandSenderName()))
             {

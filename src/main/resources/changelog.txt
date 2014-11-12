@@ -18,6 +18,8 @@ http://journeymap.techbrew.net
 - Bugfix: Supressed unnecessary chat warning about an incompatible version of Rei's Minimap when closing Waypoint Manager's Help dialog
 - Bugfix: Chat announcement of saved map had derpy underlining.  Underline removed, hover added.
 - Bugfix: Fullscreen map coordinates under mouse would blink right before fading out
+- Bugfix: Client spams server with world id requests while Death UI displayed
+- Change: VoxelMap color codes used to disable caves/radar now recognized with or without spaces in between color codes
 
 ## Changelog for JourneyMap 5.0.0RC4
 - Change: Web Map jquery library references moved off of googleapis.com because the domain is blocked in China
