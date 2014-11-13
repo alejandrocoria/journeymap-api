@@ -22,6 +22,7 @@ http://journeymap.techbrew.net
 - Bugfix: Client spams server with world id requests while Death UI displayed
 - Bugfix: Waypoint files were not written with UTF-8 encoding, which could lead to corrupted waypoint names after the files were reloaded
 - Bugfix: NullPointerException (missing file) caused crash when image file couldn't be written to disk
+- Bugfix: (Experimental fix for a rare issue with some GPUs) Minimap's map tiles would alternate between blurry and clear depending on your position on any given block
 - Change: VoxelMap color codes used to disable caves/radar now recognized with or without spaces in between color codes
 
 ## Changelog for JourneyMap 5.0.0RC4

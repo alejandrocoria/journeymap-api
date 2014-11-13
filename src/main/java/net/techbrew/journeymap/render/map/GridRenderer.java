@@ -11,7 +11,6 @@ package net.techbrew.journeymap.render.map;
 import com.google.common.cache.Cache;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
@@ -21,7 +20,6 @@ import net.techbrew.journeymap.render.draw.DrawUtil;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 import org.lwjgl.util.glu.GLU;
 
 import java.awt.*;
@@ -50,8 +48,8 @@ public class GridRenderer
     private final Logger logger = JourneyMap.getLogger();
     private final boolean debug = logger.isTraceEnabled();
     private final TreeMap<TilePos, Integer> grid = new TreeMap<TilePos, Integer>();
-    private final Color bgColor = new Color(0x22, 0x22, 0x22);
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
+    private final Color bgColor = new Color(0x22, 0x22, 0x22);
     private int gridSize; // 5 = 2560px.
     private double srcSize;
     private Rectangle2D.Double viewPort = null;
@@ -357,82 +355,25 @@ public class GridRenderer
     {
         if (!grid.isEmpty())
         {
-
             double centerX = offsetX + centerPixelOffset.x;
             double centerZ = offsetZ + centerPixelOffset.y;
             final Cache<Integer, Tile> tc = TileCache.instance();
 
-            int index = 0;
-
             for (Map.Entry<TilePos, Integer> entry : grid.entrySet())
             {
-                index++;
                 TilePos pos = entry.getKey();
                 Tile tile = tc.getIfPresent(entry.getValue());
-                drawTile(pos, tile, centerX, centerZ, alpha);
+                if (tile == null || !tile.hasTexture())
+                {
+                    final double startX = offsetX + pos.startX;
+                    final double startZ = offsetZ + pos.startZ;
+                    DrawUtil.drawRectangle(startX, startZ, Tile.TILESIZE, Tile.TILESIZE, bgColor, 255);
+                }
+                else
+                {
+                    tile.draw(pos, centerX, centerZ, alpha);
+                }
             }
-        }
-    }
-
-    private void drawTile(final TilePos pos, final Tile tile, final double offsetX, final double offsetZ, float alpha)
-    {
-        final double startX = offsetX + pos.startX;
-        final double startZ = offsetZ + pos.startZ;
-        final double endX = offsetX + pos.endX;
-        final double endZ = offsetZ + pos.endZ;
-
-        //if (isOnScreen(startX, startZ, Tile.TILESIZE, Tile.TILESIZE))
-        {
-            boolean missingTex = tile == null || !tile.hasTexture();
-
-            if (missingTex)
-            {
-                DrawUtil.drawRectangle(startX, startZ, Tile.TILESIZE, Tile.TILESIZE, bgColor, 255);
-            }
-            else
-            {
-                //GL11.glDisable(GL11.GL_DEPTH_TEST);
-                //GL11.glDepthMask(false);
-
-                GL11.glEnable(GL11.GL_BLEND);
-                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-                GL11.glEnable(GL11.GL_TEXTURE_2D);
-                GL11.glBindTexture(GL11.GL_TEXTURE_2D, tile.getTexture().getGlTextureId());
-
-                GL11.glColor4f(1, 1, 1, alpha);
-
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
-
-                Tessellator tessellator = Tessellator.instance;
-                tessellator.startDrawingQuads();
-                tessellator.addVertexWithUV(startX, endZ, 0.0D, 0, 1);
-                tessellator.addVertexWithUV(endX, endZ, 0.0D, 1, 1);
-                tessellator.addVertexWithUV(endX, startZ, 0.0D, 1, 0);
-                tessellator.addVertexWithUV(startX, startZ, 0.0D, 0, 0);
-                tessellator.draw();
-
-                //GL11.glDepthMask(true);
-                //GL11.glEnable(GL11.GL_DEPTH_TEST);
-            }
-        }
-
-        if (debug)
-        {
-            Color color = tile == null ? Color.RED : Color.BLUE;
-            DrawUtil.drawLabel(pos.toString(), startX + (Tile.TILESIZE / 2), startZ + (Tile.TILESIZE / 2), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.WHITE, 255, color, 255, 1.0, false);
-
-//            int pad = 3;
-//            DrawUtil.drawLabel(String.format("TL %.0f, %.0f", startX, startZ), startX + pad, startZ + pad, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, color, 255, 1.0, false);
-//            DrawUtil.drawLabel(String.format("BR %.0f, %.0f", endX, endZ), endX - pad, endZ - pad, DrawUtil.HAlign.Left, DrawUtil.VAlign.Above, Color.WHITE, 255, color, 255, 1.0, false);
-
-            DrawUtil.drawRectangle(startX, startZ, Tile.TILESIZE, 1, Color.white, 200);
-            DrawUtil.drawRectangle(startX, startZ, 1, Tile.TILESIZE, Color.white, 200);
-            DrawUtil.drawRectangle(startX, startZ + Tile.TILESIZE, Tile.TILESIZE, 1, Color.gray, 200);
-            DrawUtil.drawRectangle(startX + Tile.TILESIZE, startZ, 1, Tile.TILESIZE, Color.gray, 200);
         }
     }
 
