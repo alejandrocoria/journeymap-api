@@ -170,11 +170,42 @@ public class FileHandler
 
             if (!minecraft.isSingleplayer())
             {
-                String legacyWorldName = WorldData.getWorldName(minecraft, true);
-                File legacyWorldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + legacyWorldName + "_0"); //$NON-NLS-1$
-                if (legacyWorldDir.exists())
+                String legacyWorldName;
+                File legacyWorldDir;
+
+                boolean migrated = false;
+
+                if (worldId != null)
                 {
-                    migrateLegacyFolderName(legacyWorldDir, worldDirectory);
+                    // Newer URL-encoded use of MP server entry provided by user, with world id
+                    legacyWorldName = WorldData.getWorldName(minecraft, true) + "_" + worldId;
+                    legacyWorldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + legacyWorldName);
+                    if (legacyWorldDir.exists())
+                    {
+                        migrateLegacyFolderName(legacyWorldDir, worldDirectory);
+                        migrated = true;
+                    }
+                }
+
+                if (!migrated)
+                {
+                    // Newer URL-encoded use of MP server entry provided by user, no world id
+                    legacyWorldName = WorldData.getWorldName(minecraft, true);
+                    legacyWorldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + legacyWorldName);
+                    if (legacyWorldDir.exists())
+                    {
+                        migrateLegacyFolderName(legacyWorldDir, worldDirectory);
+                    }
+                    else
+                    {
+                        // Older use of MP server's socket IP/hostname
+                        legacyWorldName = WorldData.getLegacyServerName() + "_0";
+                        legacyWorldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + legacyWorldName);
+                        if (legacyWorldDir.exists())
+                        {
+                            migrateLegacyFolderName(legacyWorldDir, worldDirectory);
+                        }
+                    }
                 }
             }
             else

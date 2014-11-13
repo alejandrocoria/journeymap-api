@@ -100,7 +100,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         return getLegacyServerName();
     }
 
-    private static String getLegacyServerName()
+    public static String getLegacyServerName()
     {
         try
         {
@@ -150,7 +150,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                 return "offline";
             }
             worldName = mc.theWorld.getWorldInfo().getWorldName();
-            String serverName = useLegacyName ? getLegacyServerName() : getServerName();
+            String serverName = getServerName();
 
             if (!"MpServer".equals(worldName))
             {
@@ -183,7 +183,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
     {
         try
         {
-            return URLEncoder.encode(worldName, "UTF-8");
+            return URLEncoder.encode(worldName, "UTF-8").replace("+", " ");
         }
         catch (UnsupportedEncodingException e)
         {
