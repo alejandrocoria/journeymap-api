@@ -166,6 +166,10 @@ public class WorldData extends CacheLoader<Class, WorldData>
         {
             worldName = getLegacyUrlEncodedWorldName(worldName);
         }
+        else
+        {
+            worldName = worldName.trim();
+        }
 
         if (Strings.isNullOrEmpty(worldName.trim()))
         {

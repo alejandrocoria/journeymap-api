@@ -118,6 +118,16 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         }
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("TConstruct:decoration.stonetorch"), EnumSet.of(HasAir, NoShadow));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("Mariculture:kelp"), EnumSet.of(Side2Texture, Plant));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:LooseRock"), EnumSet.of(HasAir, NoShadow));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:Grass"), EnumSet.of(BiomeColor));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:ClayGrass"), EnumSet.of(BiomeColor));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:ClayGrass2"), EnumSet.of(BiomeColor));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:DryGrass"), EnumSet.of(BiomeColor));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:DryGrass2"), EnumSet.of(BiomeColor));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:DryGrass2"), EnumSet.of(BiomeColor));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:PeatGrass"), EnumSet.of(BiomeColor));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:SeaGrassStill"), EnumSet.of(BiomeColor));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:TallGrass"), EnumSet.of(BiomeColor));
 
         // Set flags based on inheritance
         for (Block block : GameData.getBlockRegistry().typeSafeIterable())

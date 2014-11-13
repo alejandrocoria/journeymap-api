@@ -287,7 +287,7 @@ public abstract class ImageSet
             {
                 String error = "Unexpected error writing to disk: " + imageFile + ": " + LogFormatter.toString(e);
                 JourneyMap.getLogger().error(error);
-                throw new RuntimeException(e);
+                //throw new RuntimeException(e);
             }
         }
 
