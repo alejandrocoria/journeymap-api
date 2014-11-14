@@ -12,6 +12,9 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Change: Webmap now disabled by default
+
+## Changelog for JourneyMap 5.0.0RC5
 - New translation for Catalan (ca_ES)
 - Bugfix: Multiplayer servers assigned a blank name resulted in an unusable JourneyMap data folder. The folder name will now default to the host name or IP address.
 - Bugfix: Multiplayer servers assigned a name with whitespace at the beginning/end resulted in an unusable JourneyMap data folder.

@@ -23,8 +23,8 @@ import static net.techbrew.journeymap.properties.config.Config.Category.WebMap;
  */
 public class WebMapProperties extends MapProperties
 {
-    @Config(category = WebMap, master = true, key = "jm.webmap.enable")
-    public final AtomicBoolean enabled = new AtomicBoolean(true);
+    @Config(category = WebMap, master = true, key = "jm.webmap.enable", defaultBoolean = false)
+    public final AtomicBoolean enabled = new AtomicBoolean(false);
 
     @Config(category = WebMap, key = "jm.advanced.port", minValue = 80, maxValue = 10000, defaultValue = 8080)
     public final AtomicInteger port = new AtomicInteger(8080);
