@@ -29,7 +29,6 @@ import java.util.concurrent.Future;
 
 public class Tile
 {
-
     public final static int TILESIZE = 512;
     public final static int LOAD_RADIUS = (int) (TILESIZE * 1.5);
 
@@ -248,8 +247,8 @@ public class Tile
 
         GL11.glColor4f(1, 1, 1, alpha);
 
-        //GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        //GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL14.GL_MIRRORED_REPEAT); // was GL12.GL_CLAMP_TO_EDGE
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL14.GL_MIRRORED_REPEAT); // was GL12.GL_CLAMP_TO_EDGE
 
