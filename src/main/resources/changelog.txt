@@ -13,6 +13,9 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 - Change: Webmap now disabled by default
+- Bugfix: Minimap jitter introduced in RC5
+- Bugfix: Circle minimap mask didn't work when shaders enabled
+- Bugfix: "Failed to migrate legacy folder" error spam in the log file
 
 ## Changelog for JourneyMap 5.0.0RC5
 - New translation for Catalan (ca_ES)

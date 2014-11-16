@@ -353,7 +353,7 @@ public class MiniMap
         }
         catch (Throwable t)
         {
-            JMLogger.logOnce("Error during MiniMap1.drawMap(): " + t.getMessage(), t);
+            JMLogger.logOnce("Error during MiniMap.drawMap(): " + t.getMessage(), t);
         }
         finally
         {
@@ -478,21 +478,20 @@ public class MiniMap
     {
         try
         {
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
-            GL11.glColorMask(false, false, false, false);
-            GL11.glDepthMask(true);
-            GL11.glDepthFunc(GL11.GL_ALWAYS);
-            GL11.glColor4f(1, 1, 1, 1);
+            cleanup();
+
+            //GL11.glClearColor(1,1,1, 1f);
+            //GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+
             DrawUtil.zLevel = 1000;
             dv.minimapFrame.drawMask();
             DrawUtil.zLevel = 0;
-            GL11.glColorMask(true, true, true, true);
-            GL11.glDepthMask(false);
-            GL11.glDepthFunc(GL11.GL_GREATER);
+            GL11.glDepthMask(false); // otherwise entities and reticle not shown
+            GL11.glDepthFunc(GL11.GL_GREATER); // otherwise circle doesn't mask map tiles
         }
         catch (Throwable t)
         {
-            JMLogger.logOnce("Error during MiniMap1.beginStencil()", t);
+            JMLogger.logOnce("Error during MiniMap.beginStencil()", t);
         }
 
     }
@@ -501,14 +500,14 @@ public class MiniMap
     {
         try
         {
-            GL11.glDepthMask(false);
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
-            GL11.glDepthFunc(GL11.GL_LEQUAL);
-            GL11.glColor4f(1, 1, 1, 1);
+            //GL11.glDepthMask(false); // doesn't seem to matter
+            GL11.glDisable(GL11.GL_DEPTH_TEST); // otherwise minimap frame not shown
+            //GL11.glDepthFunc(GL11.GL_LEQUAL);
+            //GL11.glColor4f(1, 1, 1, 1);
         }
         catch (Throwable t)
         {
-            JMLogger.logOnce("Error during MiniMap1.endStencil()", t);
+            JMLogger.logOnce("Error during MiniMap.endStencil()", t);
         }
     }
 
@@ -516,16 +515,19 @@ public class MiniMap
     {
         try
         {
-            DrawUtil.zLevel = 0;
-            GL11.glDepthFunc(GL11.GL_LEQUAL);
-            GL11.glDepthMask(true);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
-            GL11.glEnable(GL11.GL_ALPHA_TEST);
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            DrawUtil.zLevel = 0; // default
+
+            GL11.glDepthMask(true); // default
+            GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT); // defensive
+            GL11.glEnable(GL11.GL_DEPTH_TEST); // default
+            GL11.glDepthFunc(GL11.GL_LEQUAL); // not default, but required by toolbar
+            GL11.glEnable(GL11.GL_ALPHA_TEST); // default
+            GL11.glColor4f(1, 1, 1, 1); // default
+            GL11.glClearColor(1, 1, 1, 1f); // defensive against shaders
         }
         catch (Throwable t)
         {
-            JMLogger.logOnce("Error during MiniMap1.cleanup()", t);
+            JMLogger.logOnce("Error during MiniMap.cleanup()", t);
         }
     }
 
