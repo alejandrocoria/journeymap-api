@@ -180,7 +180,7 @@ public class FileHandler
                     // Newer URL-encoded use of MP server entry provided by user, with world id
                     legacyWorldName = WorldData.getWorldName(minecraft, true) + "_" + worldId;
                     legacyWorldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + legacyWorldName);
-                    if (legacyWorldDir.exists())
+                    if (legacyWorldDir.exists() && !legacyWorldDir.getName().equals(worldDirectory.getName()))
                     {
                         migrateLegacyFolderName(legacyWorldDir, worldDirectory);
                         migrated = true;
@@ -192,7 +192,7 @@ public class FileHandler
                     // Newer URL-encoded use of MP server entry provided by user, no world id
                     legacyWorldName = WorldData.getWorldName(minecraft, true);
                     legacyWorldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + legacyWorldName);
-                    if (legacyWorldDir.exists())
+                    if (legacyWorldDir.exists() && !legacyWorldDir.getName().equals(worldDirectory.getName()))
                     {
                         migrateLegacyFolderName(legacyWorldDir, worldDirectory);
                     }
@@ -201,7 +201,7 @@ public class FileHandler
                         // Older use of MP server's socket IP/hostname
                         legacyWorldName = WorldData.getLegacyServerName() + "_0";
                         legacyWorldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + legacyWorldName);
-                        if (legacyWorldDir.exists())
+                        if (legacyWorldDir.exists() && !legacyWorldDir.getName().equals(worldDirectory.getName()))
                         {
                             migrateLegacyFolderName(legacyWorldDir, worldDirectory);
                         }
@@ -219,7 +219,7 @@ public class FileHandler
                     }
                 }
 
-                if (legacyWorldDir.exists() && !worldDirectory.exists())
+                if (legacyWorldDir.exists() && !worldDirectory.exists() && !legacyWorldDir.getName().equals(worldDirectory.getName()))
                 {
                     migrateLegacyFolderName(legacyWorldDir, worldDirectory);
                 }
@@ -265,6 +265,11 @@ public class FileHandler
 
     private static void migrateLegacyFolderName(File legacyWorldDir, File worldDir)
     {
+        if (legacyWorldDir.getPath().equals(worldDir.getPath()))
+        {
+            return;
+        }
+
         boolean success = false;
         try
         {
@@ -277,7 +282,7 @@ public class FileHandler
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn(String.format("Failed to migrate legacy folder from %s to %s", legacyWorldDir.getName(), worldDir.getName()));
+            JMLogger.logOnce(String.format("Failed to migrate legacy folder from %s to %s", legacyWorldDir.getName(), worldDir.getName()), e);
 
             String tempName = worldDir.getName() + "__OLD";
             try
@@ -290,7 +295,7 @@ public class FileHandler
             }
             if (!success)
             {
-                JourneyMap.getLogger().warn(String.format("Failed to even rename legacy folder from %s to %s", legacyWorldDir.getName(), tempName));
+                JMLogger.logOnce(String.format("Failed to even rename legacy folder from %s to %s", legacyWorldDir.getName(), tempName), e);
             }
         }
     }
