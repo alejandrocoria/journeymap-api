@@ -27,6 +27,7 @@ import net.techbrew.journeymap.JourneyMap;
 
 /**
  * Sample Forge Client class for handling World Info custom packets.
+ *
  * @author techbrew
  */
 public class WorldInfoHandler
@@ -65,7 +66,7 @@ public class WorldInfoHandler
                 MinecraftForge.EVENT_BUS.register(this);
             }
         }
-        catch(Throwable t)
+        catch (Throwable t)
         {
             JourneyMap.getLogger().error(String.format("Failed to register channel %s: %s", CHANNEL_NAME, t));
         }
@@ -90,6 +91,7 @@ public class WorldInfoHandler
 
     /**
      * Use the world Load event as a trigger to request the World ID.
+     *
      * @param event
      */
     @SideOnly(Side.CLIENT)
@@ -98,7 +100,7 @@ public class WorldInfoHandler
     {
         if (!mc.isSingleplayer())
         {
-            requestWorldID();
+            //requestWorldID();
         }
     }
 
@@ -115,7 +117,7 @@ public class WorldInfoHandler
         {
             if (event.entity.getCommandSenderName().equals(mc.thePlayer.getCommandSenderName()))
             {
-                requestWorldID();
+                //requestWorldID();
             }
         }
     }
@@ -160,7 +162,7 @@ public class WorldInfoHandler
             {
                 worldUid = ByteBufUtils.readUTF8String(buf);
             }
-            catch(Throwable t)
+            catch (Throwable t)
             {
                 JourneyMap.getLogger().error(String.format("Failed to read message: %s", t));
             }
@@ -171,12 +173,12 @@ public class WorldInfoHandler
         {
             try
             {
-                if(worldUid!=null)
+                if (worldUid != null)
                 {
                     ByteBufUtils.writeUTF8String(buf, worldUid);
                 }
             }
-            catch(Throwable t)
+            catch (Throwable t)
             {
                 JourneyMap.getLogger().error(String.format("Failed to read message: %s", t));
             }
