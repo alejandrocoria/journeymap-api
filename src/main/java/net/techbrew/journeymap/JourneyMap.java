@@ -390,6 +390,17 @@ public class JourneyMap
                 //lastModInfoKeepAlive = System.currentTimeMillis();
             }
 
+            File worldDir = FileHandler.getJMWorldDir(mc, currentWorldId);
+            if (!worldDir.exists())
+            {
+                boolean created = worldDir.mkdirs();
+                if (!created)
+                {
+                    JMLogger.logOnce("CANNOT CREATE DATA DIRECTORY FOR WORLD: " + worldDir.getPath(), null);
+                    return;
+                }
+            }
+
             this.reset();
             ColorCache.instance().ensureCurrent();
 

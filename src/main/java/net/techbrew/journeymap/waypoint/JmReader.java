@@ -36,6 +36,11 @@ public class JmReader
             }
         });
 
+        if (files == null || files.length == 0)
+        {
+            return waypoints;
+        }
+
         ArrayList<File> obsoleteFiles = new ArrayList<File>();
 
         for (File waypointFile : files)

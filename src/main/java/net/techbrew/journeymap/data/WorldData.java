@@ -176,7 +176,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
             worldName = "unnamed";
         }
 
-        return worldName;
+        return worldName.replaceAll("\\W+", "~");
     }
 
     private static String getLegacyUrlEncodedWorldName(String worldName)

@@ -248,6 +248,10 @@ public class FileHandler
         {
             if (!minecraft.isSingleplayer())
             {
+                if (worldId != null)
+                {
+                    worldId = worldId.replaceAll("\\W+", "~");
+                }
                 String suffix = (worldId != null) ? ("_" + worldId) : "";
                 testWorldDirectory = new File(MinecraftDirectory, Constants.MP_DATA_DIR + WorldData.getWorldName(minecraft, false) + suffix); //$NON-NLS-1$
             }
@@ -260,6 +264,7 @@ public class FileHandler
         {
             JourneyMap.getLogger().log(Level.ERROR, LogFormatter.toString(e));
         }
+
         return testWorldDirectory;
     }
 
