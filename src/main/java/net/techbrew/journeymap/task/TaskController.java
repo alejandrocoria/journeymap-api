@@ -36,7 +36,6 @@ public class TaskController
 
     public TaskController()
     {
-        managers.add(new LegacyMigrationTask.Manager());
         managers.add(new MapRegionTask.Manager());
         managers.add(new SaveMapTask.Manager());
         managers.add(new MapPlayerTask.Manager());
@@ -256,7 +255,7 @@ public class TaskController
             }
         }
 
-       profiler.endSection();
+        profiler.endSection();
     }
 
     private ITaskManager getNextManager(final Minecraft minecraft)
