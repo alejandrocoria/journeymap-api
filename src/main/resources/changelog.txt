@@ -12,8 +12,12 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- New Option: Show Mob Heading (for MiniMap Presets and Fullscreen Map)
+- New Option: Show Player Heading (for MiniMap Presets and Fullscreen Map)
+- New Option: Advanced > Map Tile Render Type (useful if your graphics card makes the Minimap tiles blurry)
 - Change: Webmap now disabled by default
 - Change: World id requests to JourneyMap Server now reduced to work in conjunction with Server 1.0RC4
+- Change: Tweaks added for more TerraFirmaCraft grass types
 - Bugfix: Minimap jitter introduced in RC5
 - Bugfix: Circle minimap mask didn't work when shaders enabled
 - Bugfix: Multiplayer data folders couldn't be created if server entry name or world id wasn't usable in a folder name

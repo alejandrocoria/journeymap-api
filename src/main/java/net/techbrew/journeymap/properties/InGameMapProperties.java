@@ -41,6 +41,12 @@ public abstract class InGameMapProperties extends MapProperties
     @Config(category = Inherit, key = "jm.common.location_format", stringListProvider = LocationFormat.IdProvider.class)
     public final AtomicReference<String> locationFormat = new AtomicReference<String>(new LocationFormat.IdProvider().getDefaultString());
 
+    @Config(category = Inherit, key = "jm.minimap.mob_heading")
+    public final AtomicBoolean showMobHeading = new AtomicBoolean(true);
+
+    @Config(category = Inherit, key = "jm.minimap.player_heading")
+    public final AtomicBoolean showPlayerHeading = new AtomicBoolean(true);
+
     protected InGameMapProperties()
     {
     }
@@ -65,8 +71,14 @@ public abstract class InGameMapProperties extends MapProperties
     public int hashCode()
     {
         int result = super.hashCode();
+        result = 31 * result + showCaves.hashCode();
         result = 31 * result + fontScale.hashCode();
         result = 31 * result + textureSmall.hashCode();
+        result = 31 * result + showWaypointLabels.hashCode();
+        result = 31 * result + locationFormatVerbose.hashCode();
+        result = 31 * result + locationFormat.hashCode();
+        result = 31 * result + showMobHeading.hashCode();
+        result = 31 * result + showPlayerHeading.hashCode();
         return result;
     }
 
@@ -79,6 +91,8 @@ public abstract class InGameMapProperties extends MapProperties
                 .add("locationFormatVerbose", locationFormatVerbose)
                 .add("showCaves", showCaves)
                 .add("showWaypointLabels", showWaypointLabels)
+                .add("showMobHeading", showMobHeading)
+                .add("showPlayerHeading", showPlayerHeading)
                 .add("textureSmall", textureSmall);
     }
 }

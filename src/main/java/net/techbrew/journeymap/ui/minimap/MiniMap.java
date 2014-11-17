@@ -480,11 +480,12 @@ public class MiniMap
         {
             cleanup();
 
-            //GL11.glClearColor(1,1,1, 1f);
-            //GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
-
             DrawUtil.zLevel = 1000;
+
+            GL11.glColorMask(false, false, false, false); // allows map tiles to be partially opaque
             dv.minimapFrame.drawMask();
+            GL11.glColorMask(true, true, true, true);
+
             DrawUtil.zLevel = 0;
             GL11.glDepthMask(false); // otherwise entities and reticle not shown
             GL11.glDepthFunc(GL11.GL_GREATER); // otherwise circle doesn't mask map tiles
@@ -524,6 +525,7 @@ public class MiniMap
             GL11.glEnable(GL11.GL_ALPHA_TEST); // default
             GL11.glColor4f(1, 1, 1, 1); // default
             GL11.glClearColor(1, 1, 1, 1f); // defensive against shaders
+
         }
         catch (Throwable t)
         {

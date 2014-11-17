@@ -19,6 +19,7 @@ import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL14;
 
 import java.awt.*;
@@ -48,6 +49,9 @@ public class Tile
     MapType lastMapType;
     Future<DelayedTexture> futureTex;
     TextureImpl textureImpl;
+    int renderType = 0;
+    int textureFilter = 0;
+    int textureWrap = 0;
 
     public Tile(final File worldDir, final MapType mapType, final int tileX, final int tileZ, final int zoom, final int dimension)
     {
@@ -62,6 +66,7 @@ public class Tile
         lrChunk = new ChunkCoordIntPair(ulChunk.chunkXPos + distance - 1, ulChunk.chunkZPos + distance - 1);
         ulBlock = new Point(ulChunk.chunkXPos * 16, ulChunk.chunkZPos * 16);
         lrBlock = new Point((lrChunk.chunkXPos * 16) + 15, (lrChunk.chunkZPos * 16) + 15);
+        updateRenderType();
     }
 
     public static int blockPosToTile(int b, int zoom)
@@ -100,6 +105,8 @@ public class Tile
         {
             return false;
         }
+
+        updateRenderType();
 
         lastMapType = mapType;
         lastVSlice = vSlice;
@@ -185,6 +192,38 @@ public class Tile
         }
     }
 
+    private void updateRenderType()
+    {
+        this.renderType = JourneyMap.getCoreProperties().tileRenderType.get();
+        switch (renderType)
+        {
+            case (4):
+            {
+                textureFilter = GL11.GL_NEAREST;
+                textureWrap = GL12.GL_CLAMP_TO_EDGE;
+                break;
+            }
+            case (3):
+            {
+                textureFilter = GL11.GL_NEAREST;
+                textureWrap = GL14.GL_MIRRORED_REPEAT;
+                break;
+            }
+            case (2):
+            {
+                textureFilter = GL11.GL_LINEAR;
+                textureWrap = GL12.GL_CLAMP_TO_EDGE;
+                break;
+            }
+            case (1):
+            default:
+            {
+                textureFilter = GL11.GL_LINEAR;
+                textureWrap = GL14.GL_MIRRORED_REPEAT;
+            }
+        }
+    }
+
     @Override
     public String toString()
     {
@@ -247,10 +286,10 @@ public class Tile
 
         GL11.glColor4f(1, 1, 1, alpha);
 
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL14.GL_MIRRORED_REPEAT); // was GL12.GL_CLAMP_TO_EDGE
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL14.GL_MIRRORED_REPEAT); // was GL12.GL_CLAMP_TO_EDGE
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, textureFilter);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, textureFilter);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
 
         final double startX = offsetX + pos.startX;
         final double startZ = offsetZ + pos.startZ;

@@ -115,6 +115,9 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Advanced, key = "jm.common.radar_vertical_distance", minValue = 8, maxValue = 256, defaultValue = 16)
     public final AtomicInteger radarVerticalDistance = new AtomicInteger(16);
 
+    @Config(category = Advanced, key = "jm.advanced.tile_render_type", minValue = 1, maxValue = 4, defaultValue = 1)
+    public final AtomicInteger tileRenderType = new AtomicInteger(1);
+
     public final AtomicReference<String> renderOverlayEventTypeName = new AtomicReference<String>(RenderGameOverlayEvent.ElementType.ALL.name());
     public final AtomicBoolean renderOverlayPreEvent = new AtomicBoolean(true);
     public final AtomicBoolean optionsManagerUsed = new AtomicBoolean(false);

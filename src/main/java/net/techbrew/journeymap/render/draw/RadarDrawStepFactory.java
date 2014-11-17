@@ -7,7 +7,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.EntityDTO;
-import net.techbrew.journeymap.properties.MapProperties;
+import net.techbrew.journeymap.properties.InGameMapProperties;
 import net.techbrew.journeymap.render.map.GridRenderer;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -23,10 +23,12 @@ import java.util.List;
 public class RadarDrawStepFactory
 {
 
-    public List<DrawStep> prepareSteps(List<EntityDTO> entityDTOs, GridRenderer grid, float drawScale, MapProperties mapProperties)
+    public List<DrawStep> prepareSteps(List<EntityDTO> entityDTOs, GridRenderer grid, float drawScale, InGameMapProperties mapProperties)
     {
         final boolean showAnimals = mapProperties.showAnimals.get();
         final boolean showPets = mapProperties.showPets.get();
+        final boolean showMobHeading = mapProperties.showMobHeading.get();
+        final boolean showPlayerHeading = mapProperties.showPlayerHeading.get();
         final List<DrawStep> drawStepList = new ArrayList<DrawStep>();
 
         try
@@ -90,7 +92,7 @@ public class RadarDrawStepFactory
                         {
                             entityIcon = tc.getPlayerSkin(dto.username);
                             DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(dto);
-                            drawStep.update(false, locatorImg, entityIcon);
+                            drawStep.update(false, locatorImg, entityIcon, showPlayerHeading);
                             drawStepList.add(drawStep);
                         }
                         else
@@ -99,7 +101,7 @@ public class RadarDrawStepFactory
                             if (entityIcon != null)
                             {
                                 DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(dto);
-                                drawStep.update(false, locatorImg, entityIcon);
+                                drawStep.update(false, locatorImg, entityIcon, showMobHeading);
                                 drawStepList.add(drawStep);
                             }
                         }

@@ -28,6 +28,7 @@ public class DrawEntityStep implements DrawStep
     static final Color labelFg = Color.white;
     static final int labelFgAlpha = 225;
     boolean hideSneaks = JourneyMap.getCoreProperties().hideSneakingEntities.get();
+    boolean showHeading = true;
 
     EntityDTO entityDTO;
     TextureImpl texture;
@@ -40,11 +41,12 @@ public class DrawEntityStep implements DrawStep
         this.entityDTO = entityDTO;
     }
 
-    public void update(boolean flip, TextureImpl locatorTexture, TextureImpl texture)
+    public void update(boolean flip, TextureImpl locatorTexture, TextureImpl texture, boolean showHeading)
     {
         this.locatorTexture = locatorTexture;
         this.texture = texture;
         this.flip = flip;
+        this.showHeading = showHeading;
     }
 
     @Override
@@ -78,6 +80,11 @@ public class DrawEntityStep implements DrawStep
 
     private void drawPlayer(double drawX, double drawY, GridRenderer gridRenderer, double heading, float drawScale, double fontScale, double rotation)
     {
+        if (locatorTexture != null && showHeading)
+        {
+            DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, drawScale, rotation);
+        }
+
         if (texture != null)
         {
             DrawUtil.drawEntity(drawX, drawY, heading, true, texture, drawScale * .75f, rotation);
@@ -91,7 +98,7 @@ public class DrawEntityStep implements DrawStep
 
     private void drawCreature(double drawX, double drawY, GridRenderer gridRenderer, double heading, float drawScale, double fontScale, double rotation)
     {
-        if (locatorTexture != null)
+        if (locatorTexture != null && showHeading)
         {
             DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, drawScale, rotation);
         }
