@@ -1,5 +1,5 @@
 ### JourneyMap 5.0.0RC6 Resource Bundle - es_ES
-### Translation by: thekazador
+### Translation by: thekazador and Abel
 jm.advanced.announcemod=Anuncios del Mod
 jm.advanced.announcemod.tooltip=Anuncia en la ventana del chat cuando el JourneyMap esta listo.
 jm.advanced.automappoll=Frecuencia del Mapa Automatico
@@ -28,8 +28,8 @@ jm.advanced.port=Puerto del servidor Web
 jm.advanced.port.tooltip=El puerto por defecto usado para mostrar el mapa web en su navegador. Si el puerto ya se encuentra en uso, JourneyMap intentara encontrar otro libre incrementandolo por 10.
 jm.advanced.recordcachestats=Registro de Estadisticas del Cache
 jm.advanced.recordcachestats.tooltip=Habilita los registros de las estadisticas del cache. Podria ligeramente perder rendimiento si se habilita. A no ser que sea beta-tester o tenga instrucciones, mantengalo deshabilitado.
-# jm.advanced.tile_render_type=???
-# jm.advanced.tile_render_type.tooltip=???
+jm.advanced.tile_render_type=Tipo de Render para los fragmentos de Mapa
+jm.advanced.tile_render_type.tooltip=Optimiza los fragmentos de mapa para tu tarjeta de vídeo si se ven borrosos. Los valores ajustan el filtro de textura + tipo de envoltura: 1=Linear+Espejo, 2=Linear+Empalmado, 3=Más próximo+Espejo, 4=Más próximo+Empalmado.
 jm.colorpalette.basic_colors=Colores Basicos
 jm.colorpalette.biome_colors=Colores de Biomas
 jm.colorpalette.file_error=El archivo de la paleta de colores contiene errores y no puede ser usada: %1$s
@@ -223,8 +223,8 @@ jm.minimap.hotkeys=Habilitar Teclas Rapidas en el Mini Mapa
 jm.minimap.hotkeys.tooltip=Habilitar en el juego el control de teclas rapidas en el Mini Mapa
 jm.minimap.hotkeys_title=Teclas rapidas del Mini Mapa
 jm.minimap.hotkeys_toggle=Cambiar el Mini Mapa
-# jm.minimap.mob_heading=???
-# jm.minimap.mob_heading.tooltip=???
+jm.minimap.mob_heading=Mostrar Orientación de los Monstruos
+jm.minimap.mob_heading.tooltip=Mostrar la Dirección a la que miran los Monstruos
 jm.minimap.options=Opciones del Mini Mapa
 jm.minimap.orientation.button=Orientacion del Mapa
 jm.minimap.orientation.button.tooltip=La orientacion (rotacion) del Mini Mapa. Nota: Solo soportado en modo Circulo.
@@ -232,8 +232,8 @@ jm.minimap.orientation.compass=Compas
 jm.minimap.orientation.north=Norte
 jm.minimap.orientation.oldnorth=Viejo Norte
 jm.minimap.orientation.playerheading=Mi Orientacion
-# jm.minimap.player_heading=???
-# jm.minimap.player_heading.tooltip=???
+jm.minimap.player_heading=Mostrar Orientación de los Jugadores
+jm.minimap.player_heading.tooltip=Mostrar la Dirección a la que estan mirando otros jugadores
 jm.minimap.position=Posicion
 jm.minimap.position.tooltip=Cambia la posicion del Mini Mapa en la pantalla
 jm.minimap.position_bottomleft=Inferior Izquierda
@@ -381,8 +381,8 @@ jm.webmap.follow_twitter_text=Seguir a JourneyMapMod en Twitter
 jm.webmap.follow_twitter_title=Seguir a JourneyMapMod en Twitter
 jm.webmap.forum_link_text=minecraftforum.net
 jm.webmap.forum_link_title=JourneyMap foro en minecraftforum.net
-# jm.webmap.google_domain=???
-# jm.webmap.google_domain_tooltip=???
+jm.webmap.google_domain=Dominio API Google Maps
+jm.webmap.google_domain_tooltip=Si tu país bloquea maps.google.com, selecciona un dominio diferente para la API Google Maps.
 jm.webmap.grid_menu_item_text=Grilla
 jm.webmap.grid_menu_item_title=Mostrar la Grilla de chunk
 jm.webmap.location_text=Ubicacion:
