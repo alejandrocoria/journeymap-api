@@ -13,7 +13,11 @@ http://journeymap.techbrew.net
 
 ## Changelog for JourneyMap @JMVERSION@:
 - Bugfix: Defensive code added to prevent NPE+crash when another mod causes "/help" chat text to evaluate as null
+- Updated translation for Catalan (ca_ES)
 - Updated translation for Chinese, Simplified (zh_CN)
+- Updated translation for Dutch (nl_NL)
+- Updated translation for Spanish (es_ES)
+- Updated translation for Swedish (sv_SE)
 
 ## Changelog for JourneyMap 5.0.0RC6
 - New Option: Show Mob Heading (for MiniMap Presets and Fullscreen Map)
