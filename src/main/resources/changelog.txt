@@ -12,6 +12,9 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@:
+- Bugfix: Defensive code added to prevent NPE+crash when another mod causes "/help" chat text to evaluate as null
+
+## Changelog for JourneyMap 5.0.0RC6
 - New Option: Show Mob Heading (for MiniMap Presets and Fullscreen Map)
 - New Option: Show Player Heading (for MiniMap Presets and Fullscreen Map)
 - New Option: Advanced > Map Tile Render Type (useful if your graphics card makes the Minimap tiles blurry)

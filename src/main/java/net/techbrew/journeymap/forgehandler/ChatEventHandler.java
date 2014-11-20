@@ -1,12 +1,15 @@
 package net.techbrew.journeymap.forgehandler;
 
+import com.google.common.base.Strings;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.ui.UIManager;
 
 import java.util.EnumSet;
@@ -33,7 +36,18 @@ public class ChatEventHandler implements EventHandlerManager.EventHandler
     {
         if (event.message != null)
         {
-            checkForControlCode(event.message.getFormattedText().replaceAll(EnumChatFormatting.RESET.toString(), ""));
+            try
+            {
+                String text = event.message.getFormattedText();
+                if (!Strings.isNullOrEmpty(text))
+                {
+                    checkForControlCode(text.replaceAll(EnumChatFormatting.RESET.toString(), ""));
+                }
+            }
+            catch (Exception e)
+            {
+                JourneyMap.getLogger().warn("Unexpected exception on ClientChatReceivedEvent: " + LogFormatter.toString(e));
+            }
         }
     }
 
