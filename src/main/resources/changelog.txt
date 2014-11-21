@@ -20,6 +20,7 @@ http://journeymap.techbrew.net
 - Updated translation for Chinese, Simplified (zh_CN)
 - Updated translation for Dutch (nl_NL)
 - Updated translation for Korean (ko_KR)
+- Added translation for Norwegian (no_NO)
 - Updated translation for Spanish (es_ES)
 - Updated translation for Swedish (sv_SE)
 - Change: World id request made on EntityJoinWorldEvent
