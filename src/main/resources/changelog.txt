@@ -11,11 +11,15 @@ http://journeymap.techbrew.net
 - Minecraft @MCVERSION@
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
-## Changelog for JourneyMap @JMVERSION@:
-- Bugfix: Defensive code added to prevent NPE+crash when another mod causes "/help" chat text to evaluate as null
+## Changelog for JourneyMap @JMVERSION@ (final):
+- Bugfix: Defensive code added to prevent NPE+crash when another mod causes "/help" chat formatted text to evaluate as null
+- Bugfix: Folder migration attempts needed to be simplified
+- Bugfix: "Tile wasn't cleared before finalize() called" in log fixed in most cases
+- Updated translation for Arabic (ar_SA)
 - Updated translation for Catalan (ca_ES)
 - Updated translation for Chinese, Simplified (zh_CN)
 - Updated translation for Dutch (nl_NL)
+- Updated translation for Korean (ko_KR)
 - Updated translation for Spanish (es_ES)
 - Updated translation for Swedish (sv_SE)
 - Change: World id request made on EntityJoinWorldEvent
