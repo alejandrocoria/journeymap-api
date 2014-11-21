@@ -1,12 +1,12 @@
-JourneyMap mod for Minecraft
-Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
-This mod may not be altered, file-hosted, re-packaged, or distributed
-in part or in whole without express written permission by Mark Woodman.
-------------------------------------------------------------------------------------------
+JourneyMap @JMVERSION@ for Minecraft @MCVERSION@ (@DATE@)
+http://journeymap.techbrew.net/
+Copyright (C) 2011-2014 Mark Woodman (techbrew).  All Rights Reserved.
 
-Feed The Beast (http://feed-the-beast.com/) has been granted limited rights to bundle
-"JourneyMap @JMVERSION@ for Minecraft @MCVERSION@ (@DATE@)" in one or more ModPacks.
-These rights are not extended to any other parties, hosting sites, or mod pack providers.
+This mod may not be altered, file-hosted, re-packaged, reverse-engineered, or distributed
+in part or in whole without express written permission by Mark Woodman (techbrew).
+
+JourneyMap may only be distributed in a Modpack if the qualifications and conditions have
+been met according to: http://journeymap.techbrew.net/help/modpacks/
 
 JourneyMap includes and/or makes use of the following software under their respective licenses:
 

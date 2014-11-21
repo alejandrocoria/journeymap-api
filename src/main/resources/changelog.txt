@@ -23,6 +23,8 @@ http://journeymap.techbrew.net
 - Updated translation for Spanish (es_ES)
 - Updated translation for Swedish (sv_SE)
 - Change: World id request made on EntityJoinWorldEvent
+- Change: changelog.txt removed from mod jar.
+- Change: mcmod.info now uses correct path to logo
 
 ## Changelog for JourneyMap 5.0.0RC6
 - New Option: Show Mob Heading (for MiniMap Presets and Fullscreen Map)

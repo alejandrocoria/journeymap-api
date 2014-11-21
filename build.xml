@@ -32,7 +32,7 @@
         <format property="TODAY" pattern="yyyy-MM-dd.HHMM"/>
     </tstamp>
 
-    <target name="all" description="All" depends="init, build-unlimited, build-fairplay, build-noradar">
+    <target name="all" description="All" depends="init, build-unlimited, build-fairplay">
     </target>
 
     <target name="build-unlimited" description="Build Unlimited Edition" depends="init">
@@ -126,7 +126,7 @@
 
             <!-- Copy resources -->
             <copy todir="${forge.resources.dir}" failonerror="true">
-                <fileset dir="${resources.dir}"/>
+                <fileset dir="${resources.dir}" excludes="changelog.txt"/>
             </copy>
 
             <!-- Replace tokens in resources -->

@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.DelayedTexture;
@@ -360,14 +361,13 @@ public class Tile
     @Override
     protected void finalize()
     {
-
         try
         {
             if (JourneyMap.getInstance().isMapping())
             {
                 if (textureImpl != null)
                 {
-                    logger.warn("Tile wasn't cleared before finalize() called: " + this);
+                    logger.debug("Tile wasn't cleared before finalize() called: " + this);
                     clear();
                 }
             }
@@ -378,7 +378,7 @@ public class Tile
         }
         catch (Throwable t)
         {
-            logger.error(t.getMessage());
+            JMLogger.logOnce("Tile improperly disposed: " + t.getMessage(), null);
         }
     }
 }

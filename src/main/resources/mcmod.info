@@ -9,7 +9,7 @@
     "url": "http://journeymap.techbrew.net",
     "updateUrl": "",
     "authorList": ["techbrew"],
-    "logoFile": "/assets/journeymap/web/img/ico/journeymap144.png",
+    "logoFile": "assets/journeymap/web/img/ico/journeymap144.png",
     "screenshots": [],
     "dependants":[],
     "dependencies": ["Forge@[@FORGEVERSION@,)"],
