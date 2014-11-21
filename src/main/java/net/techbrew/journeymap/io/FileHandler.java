@@ -139,7 +139,7 @@ public class FileHandler
         }
     }
 
-    public static File getJMWorldDir(Minecraft minecraft, String worldId)
+    public static synchronized File getJMWorldDir(Minecraft minecraft, String worldId)
     {
         if (minecraft.theWorld == null)
         {
@@ -152,15 +152,23 @@ public class FileHandler
 
         try
         {
-            File defaultWorldDirectory = FileHandler.getJMWorldDirForWorldId(minecraft, null);
+
             worldDirectory = getJMWorldDirForWorldId(minecraft, worldId);
 
-            if (worldId != null && !worldDirectory.exists() && defaultWorldDirectory.exists())
+            if (worldDirectory.exists())
+            {
+                return worldDirectory;
+            }
+
+            File defaultWorldDirectory = FileHandler.getJMWorldDirForWorldId(minecraft, null);
+
+            if (worldId != null && defaultWorldDirectory.exists() && !worldDirectory.exists())
             {
                 JourneyMap.getLogger().log(Level.INFO, "Moving default directory to " + worldDirectory);
                 try
                 {
-                    Files.move(defaultWorldDirectory, worldDirectory);
+                    migrateLegacyFolderName(defaultWorldDirectory, worldDirectory);
+                    return worldDirectory;
                 }
                 catch (Exception e)
                 {
@@ -175,36 +183,27 @@ public class FileHandler
 
                 boolean migrated = false;
 
+                // Older use of MP server's socket IP/hostname
+                legacyWorldName = WorldData.getLegacyServerName() + "_0";
+                legacyWorldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + legacyWorldName);
+                if (legacyWorldDir.exists()
+                        && !legacyWorldDir.getName().equals(defaultWorldDirectory.getName())
+                        && !legacyWorldDir.getName().equals(worldDirectory.getName()))
+                {
+                    migrateLegacyFolderName(legacyWorldDir, worldDirectory);
+                    migrated = true;
+                }
+
                 if (worldId != null)
                 {
                     // Newer URL-encoded use of MP server entry provided by user, with world id
                     legacyWorldName = WorldData.getWorldName(minecraft, true) + "_" + worldId;
                     legacyWorldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + legacyWorldName);
-                    if (legacyWorldDir.exists() && !legacyWorldDir.getName().equals(worldDirectory.getName()))
+                    if (legacyWorldDir.exists()
+                            && !legacyWorldDir.getName().equals(worldDirectory.getName()))
                     {
                         migrateLegacyFolderName(legacyWorldDir, worldDirectory);
                         migrated = true;
-                    }
-                }
-
-                if (!migrated)
-                {
-                    // Newer URL-encoded use of MP server entry provided by user, no world id
-                    legacyWorldName = WorldData.getWorldName(minecraft, true);
-                    legacyWorldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + legacyWorldName);
-                    if (legacyWorldDir.exists() && !legacyWorldDir.getName().equals(worldDirectory.getName()))
-                    {
-                        migrateLegacyFolderName(legacyWorldDir, worldDirectory);
-                    }
-                    else
-                    {
-                        // Older use of MP server's socket IP/hostname
-                        legacyWorldName = WorldData.getLegacyServerName() + "_0";
-                        legacyWorldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + legacyWorldName);
-                        if (legacyWorldDir.exists() && !legacyWorldDir.getName().equals(worldDirectory.getName()))
-                        {
-                            migrateLegacyFolderName(legacyWorldDir, worldDirectory);
-                        }
                     }
                 }
             }
@@ -227,7 +226,10 @@ public class FileHandler
 
             if (!worldDirectory.exists())
             {
-                worldDirectory.mkdirs();
+                if (!(worldId != null && worldDirectory.getName().equals(defaultWorldDirectory.getName())))
+                {
+                    worldDirectory.mkdirs();
+                }
             }
 
         }
@@ -372,8 +374,8 @@ public class FileHandler
 
     public static File getWorldConfigDir(boolean fallbackToStandardConfigDir)
     {
-        File worldDir = getJMWorldDir(FMLClientHandler.instance().getClient(), null); // always use the "base" folder for multiplayer
-        if (worldDir != null)
+        File worldDir = getJMWorldDirForWorldId(FMLClientHandler.instance().getClient(), null); // always use the "base" folder for multiplayer
+        if (worldDir != null && worldDir.exists())
         {
             File worldConfigDir = new File(worldDir, "config");
             if (worldConfigDir.exists())

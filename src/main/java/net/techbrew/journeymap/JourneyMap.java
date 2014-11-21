@@ -606,31 +606,34 @@ public class JourneyMap
 
     public void setCurrentWorldId(String worldId)
     {
-        File currentWorldDirectory = FileHandler.getJMWorldDir(mc, currentWorldId);
-        File newWorldDirectory = FileHandler.getJMWorldDirForWorldId(mc, worldId);
-
-        boolean worldIdUnchanged = Constants.safeEqual(worldId, currentWorldId);
-        boolean directoryUnchanged = currentWorldDirectory != null && currentWorldDirectory.getPath().equals(newWorldDirectory.getPath());
-
-        if (worldIdUnchanged && directoryUnchanged && worldId != null)
+        synchronized (this)
         {
-            getLogger().info("World UID hasn't changed: " + worldId);
-            return;
-        }
+            File currentWorldDirectory = FileHandler.getJMWorldDirForWorldId(mc, currentWorldId);
+            File newWorldDirectory = FileHandler.getJMWorldDir(mc, worldId);
 
-        boolean wasMapping = isMapping();
-        if (wasMapping)
-        {
-            stopMapping();
-        }
+            boolean worldIdUnchanged = Constants.safeEqual(worldId, currentWorldId);
+            boolean directoryUnchanged = currentWorldDirectory != null && currentWorldDirectory.getPath().equals(newWorldDirectory.getPath());
 
-        this.currentWorldId = worldId;
-        getLogger().info("World UID is set to: " + worldId);
-        reset();
+            if (worldIdUnchanged && directoryUnchanged && worldId != null)
+            {
+                getLogger().info("World UID hasn't changed: " + worldId);
+                return;
+            }
 
-        if (wasMapping)
-        {
-            startMapping();
+            boolean wasMapping = isMapping();
+            if (wasMapping)
+            {
+                stopMapping();
+            }
+
+            this.currentWorldId = worldId;
+            getLogger().info("World UID is set to: " + worldId);
+            reset();
+
+            if (wasMapping)
+            {
+                startMapping();
+            }
         }
     }
 

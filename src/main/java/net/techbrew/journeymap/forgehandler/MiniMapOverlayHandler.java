@@ -53,25 +53,28 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
         {
             if (event.type == EVENT_TYPE && (event.isCancelable() == EVENT_PRE))
             {
-                mc.mcProfiler.startSection("journeymap");
-
-                mc.mcProfiler.startSection("tileCache");
-                final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof Fullscreen);
-                if (isGamePaused)
+                if (JourneyMap.getInstance().isMapping())
                 {
-                    TileCache.pause();
+                    mc.mcProfiler.startSection("journeymap");
+
+                    mc.mcProfiler.startSection("tileCache");
+                    final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof Fullscreen);
+                    if (isGamePaused)
+                    {
+                        TileCache.pause();
+                    }
+                    else
+                    {
+                        TileCache.resume();
+                    }
+                    mc.mcProfiler.endStartSection("minimap"); // tileCache
+
+                    UIManager.getInstance().drawMiniMap();
+
+                    mc.mcProfiler.endSection(); // minimap
+
+                    mc.mcProfiler.endSection(); // journeymap
                 }
-                else
-                {
-                    TileCache.resume();
-                }
-                mc.mcProfiler.endStartSection("minimap"); // tileCache
-
-                UIManager.getInstance().drawMiniMap();
-
-                mc.mcProfiler.endSection(); // minimap
-
-                mc.mcProfiler.endSection(); // journeymap
             }
         }
         catch (Throwable t)
