@@ -461,7 +461,6 @@ public class JourneyMap
         Fullscreen.state().follow.set(true);
         StatTimer.resetAll();
         TextureCache.instance().purge();
-        TileCache.instance().invalidateAll();
         RegionImageCache.getInstance().flushToDisk();
         RegionImageCache.getInstance().clear();
         UIManager.getInstance().reset();
@@ -503,6 +502,12 @@ public class JourneyMap
 
             final boolean isDead = mc.currentScreen != null && mc.currentScreen instanceof GuiGameOver;
 
+            if (!isMapping())
+            {
+                TileCache.instance().invalidateAll();
+                TileCache.instance().cleanUp();
+            }
+
             if (mc.theWorld == null)
             {
                 if (isMapping())
@@ -541,10 +546,6 @@ public class JourneyMap
                 {
                     return;
                 }
-            }
-            else
-            {
-                TileCache.resume();
             }
 
             TileCache.resume();

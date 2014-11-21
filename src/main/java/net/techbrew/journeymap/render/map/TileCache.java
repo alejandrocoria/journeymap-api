@@ -52,11 +52,13 @@ public class TileCache implements RemovalListener<Integer, Tile>
     public static void pause()
     {
         Holder.INSTANCE.retainTiles();
+        //JourneyMap.getLogger().info("PAUSE TILECACHE");
     }
 
     public static void resume()
     {
         Holder.INSTANCE.restoreExpired();
+        //JourneyMap.getLogger().info("RESUME TILECACHE");
     }
 
     public static synchronized Tile getOrCreate(final File worldDir, Constants.MapType mapType, final int tileX, final int tileZ, final int zoom, final int dimension)
@@ -112,11 +114,13 @@ public class TileCache implements RemovalListener<Integer, Tile>
             {
                 logger.debug("Expired:" + notification.getValue() + " because: " + notification.getCause() + ". Size now: " + cache.size());
             }
+            //JourneyMap.getLogger().info("onRemoval TILECACHE");
             if (oldTile != null)
             {
                 oldTile.clear();
             }
         }
+        //logger.info("onRemoval:" + notification.getValue() + " because: " + notification.getCause() + ". Size now: " + cache.size());
     }
 
     private static class Holder
