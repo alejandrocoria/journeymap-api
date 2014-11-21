@@ -117,7 +117,7 @@ public class WorldInfoHandler
         {
             if (event.entity.getCommandSenderName().equals(mc.thePlayer.getCommandSenderName()))
             {
-                //requestWorldID();
+                requestWorldID();
             }
         }
     }
