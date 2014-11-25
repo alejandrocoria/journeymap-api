@@ -10,7 +10,9 @@ package net.techbrew.journeymap.cartography.render;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.RemovalNotification;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.World;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.IChunkRenderer;
 import net.techbrew.journeymap.cartography.RGB;
@@ -29,62 +31,86 @@ import java.util.ArrayList;
 public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 {
     protected final Object chunkLock = new Object();
+    final Integer[] waterPalette;
+    final Integer[] landPalette;
     private final HeightsCache chunkSurfaceHeights;
     private final SlopesCache chunkSurfaceSlopes;
+    private final int waterPaletteRange;
+    private final int landPaletteRange;
     protected StatTimer renderTopoTimer = StatTimer.get("TopoRenderer.renderSurface");
-    ArrayList<Color> water = new ArrayList<Color>(32);
-    ArrayList<Color> land = new ArrayList<Color>(32);
     private int lightGray = Color.lightGray.getRGB();
     private int darkGray = Color.darkGray.getRGB();
+    private int orthoRange;
+    private int orthoStep;
 
     public TopoRenderer()
     {
-        water.add(new Color(31, 40, 79));
-        water.add(new Color(38, 60, 106));
-        water.add(new Color(46, 80, 133));
-        water.add(new Color(53, 99, 160));
-        water.add(new Color(60, 119, 188));
-        water.add(new Color(72, 151, 211));
-        water.add(new Color(90, 185, 233));
-        water.add(new Color(95, 198, 242));
-        water.add(new Color(114, 202, 238));
-        water.add(new Color(141, 210, 239));
+        ArrayList<Integer> water = new ArrayList<Integer>(32);
+        water.add(new Color(31, 40, 79).getRGB());
+        water.add(new Color(31, 40, 79).getRGB());
+        water.add(new Color(31, 40, 79).getRGB());
+        water.add(new Color(31, 40, 79).getRGB());
+        water.add(new Color(31, 40, 79).getRGB());
+        water.add(new Color(38, 60, 106).getRGB());
+        water.add(new Color(46, 80, 133).getRGB());
+        water.add(new Color(53, 99, 160).getRGB());
+        water.add(new Color(60, 119, 188).getRGB());
+        water.add(new Color(72, 151, 211).getRGB());
+        water.add(new Color(90, 185, 233).getRGB());
+        water.add(new Color(95, 198, 242).getRGB());
+        water.add(new Color(114, 202, 238).getRGB());
+        water.add(new Color(141, 210, 239).getRGB());
+        waterPaletteRange = water.size() - 1;
+        waterPalette = water.toArray(new Integer[0]);
 
+        ArrayList<Integer> land = new ArrayList<Integer>(32);
+        land.add(new Color(10, 70, 90).getRGB());
+        land.add(new Color(20, 80, 90).getRGB());
+        land.add(new Color(30, 90, 100).getRGB());
+        land.add(new Color(40, 100, 100).getRGB());
+        land.add(new Color(50, 110, 100).getRGB());
+        land.add(new Color(60, 120, 100).getRGB());
+        land.add(new Color(70, 130, 100).getRGB());
+        land.add(new Color(80, 140, 100).getRGB());
+        land.add(new Color(90, 150, 100).getRGB());
+        land.add(new Color(100, 167, 107).getRGB());
+        land.add(new Color(172, 208, 165).getRGB());
+        land.add(new Color(148, 191, 139).getRGB());
+        land.add(new Color(168, 198, 143).getRGB());
+        land.add(new Color(189, 204, 150).getRGB());
+        land.add(new Color(209, 215, 171).getRGB());
+        land.add(new Color(225, 228, 181).getRGB());
+        land.add(new Color(239, 235, 192).getRGB());
+        land.add(new Color(232, 225, 182).getRGB());
+        land.add(new Color(222, 214, 163).getRGB());
+        land.add(new Color(211, 202, 157).getRGB());
+        land.add(new Color(202, 185, 130).getRGB());
+        land.add(new Color(195, 167, 107).getRGB());
+        land.add(new Color(185, 152, 90).getRGB());
+        land.add(new Color(170, 135, 83).getRGB());
+        land.add(new Color(172, 154, 124).getRGB());
+        land.add(new Color(186, 174, 154).getRGB());
+        land.add(new Color(202, 195, 184).getRGB());
+        land.add(new Color(224, 222, 216).getRGB());
+        land.add(new Color(245, 244, 242).getRGB());
+        land.add(new Color(255, 255, 255).getRGB());
+        landPaletteRange = land.size() - 1;
+        landPalette = land.toArray(new Integer[0]);
 
-        land.add(new Color(113, 171, 216));
-        land.add(new Color(121, 178, 222));
-        land.add(new Color(132, 185, 227));
-        land.add(new Color(141, 193, 234));
-        land.add(new Color(150, 201, 240));
-        land.add(new Color(161, 210, 247));
-        land.add(new Color(172, 219, 251));
-        land.add(new Color(185, 227, 255));
-        land.add(new Color(198, 236, 255));
-        land.add(new Color(216, 242, 254));
-        land.add(new Color(172, 208, 165));
-        land.add(new Color(148, 191, 139));
-        land.add(new Color(168, 198, 143));
-        land.add(new Color(189, 204, 150));
-        land.add(new Color(209, 215, 171));
-        land.add(new Color(225, 228, 181));
-        land.add(new Color(239, 235, 192));
-        land.add(new Color(232, 225, 182));
-        land.add(new Color(222, 214, 163));
-        land.add(new Color(211, 202, 157));
-        land.add(new Color(202, 185, 130));
-        land.add(new Color(195, 167, 107));
-        land.add(new Color(185, 152, 90));
-        land.add(new Color(170, 135, 83));
-        land.add(new Color(172, 154, 124));
-        land.add(new Color(186, 174, 154));
-        land.add(new Color(202, 195, 184));
-        land.add(new Color(224, 222, 216));
-        land.add(new Color(245, 244, 242));
-        land.add(new Color(255, 255, 255));
-
-        chunkSurfaceHeights = new HeightsCache("TopoHeights");
-        chunkSurfaceSlopes = new SlopesCache("TopoSlopes");
+        // TODO: Write the caches to disk and we'll have some useful data available.
+        this.cachePrefix = "Topo";
+        columnPropertiesCache = new BlockColumnPropertiesCache(cachePrefix + "ColumnProps");
+        chunkSurfaceHeights = new HeightsCache(cachePrefix + "Heights");
+        chunkSurfaceSlopes = new SlopesCache(cachePrefix + "Slopes");
         DataCache.instance().addChunkMDListener(this);
+    }
+
+    protected void updateOptions()
+    {
+        World world = FMLClientHandler.instance().getClient().theWorld;
+        int seaLevel = world.getActualHeight() / 2;
+        orthoStep = 3;
+        orthoRange = world.getActualHeight() >> orthoStep;
     }
 
     /**
@@ -277,32 +303,41 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         BlockCoordIntPair offsetE = new BlockCoordIntPair(1, 0);
 
         Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
-        int h;
-        float slope, hN, hW, hE, hS;
+        float h;
+        Float slope;
+        float hN, hW, hE, hS;
+        float nearZero = 0.0001f;
         for (int z = 0; z < 16; z++)
         {
             for (int x = 0; x < 16; x++)
             {
                 h = getSurfaceBlockHeight(chunkMd, x, z, chunkHeights);
-                hN = getSurfaceBlockHeight(chunkMd, x, z, offsetN, h, chunkHeights);
-                hW = getSurfaceBlockHeight(chunkMd, x, z, offsetW, h, chunkHeights);
-                hS = getSurfaceBlockHeight(chunkMd, x, z, offsetS, h, chunkHeights);
-                hE = getSurfaceBlockHeight(chunkMd, x, z, offsetE, h, chunkHeights);
+                hN = getSurfaceBlockHeight(chunkMd, x, z, offsetN, (int) h, chunkHeights);
+                hW = getSurfaceBlockHeight(chunkMd, x, z, offsetW, (int) h, chunkHeights);
+                hS = getSurfaceBlockHeight(chunkMd, x, z, offsetS, (int) h, chunkHeights);
+                hE = getSurfaceBlockHeight(chunkMd, x, z, offsetE, (int) h, chunkHeights);
 
-                h = h >> 3;
-                hN = (int) hN >> 3;
-                hW = (int) hW >> 3;
-                hE = (int) hE >> 3;
-                hS = (int) hS >> 3;
+                h = Math.max(nearZero, (int) h >> 3);
+                hN = Math.max(nearZero, (int) hN >> 3);
+                hW = Math.max(nearZero, (int) hW >> 3);
+                hE = Math.max(nearZero, (int) hE >> 3);
+                hS = Math.max(nearZero, (int) hS >> 3);
 
                 if (h != hN && (hN == hW && hN == hE && hN == hS))
                 {
-                    slope = 1; // lets ignore one-block elevation changes
+                    slope = 1f; // lets ignore one-block elevation changes
                 }
                 else
                 {
                     slope = ((h / hN) + (h / hW) + (h / hE) + (h / hS)) / 4f;
                 }
+
+                if (slope == null || slope.isNaN() || slope.isInfinite())
+                {
+                    JourneyMap.getLogger().warn(String.format("Bad topo slope for %s at %s,%s: %s", chunkMd, x, z, slope));
+                    slope = 1f;
+                }
+
                 slopes[x][z] = slope;
             }
         }
@@ -318,7 +353,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         if (slope < 1)
         {
             color = getBaseBlockColor(topBlockMd, x, y, z);
-            color = RGB.darken(color, .9f);
+            color = RGB.darken(color, slope);
         }
         else if (slope > 1)
         {
@@ -339,30 +374,18 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
      */
     protected int getBaseBlockColor(final BlockMD blockMD, int x, int y, int z)
     {
-        float orthoY = y >> 3;
+        float orthoY = y >> orthoStep;
         if (blockMD.isWater())
         {
-            float saturation = orthoY == 0 ? 0 : (orthoY / 32f);
-            return RGB.toInteger(saturation, saturation, 1);
+            int index = (int) Math.floor(orthoY / (orthoRange * 1f / waterPaletteRange));
+
+            return waterPalette[index];
         }
         else
         {
-            int index = 0;
-            if (orthoY > 0 && y <= 63)
-            {
-                // At or below sea level: Use values 1-9 in land
-                index = (int) Math.floor(orthoY / (15f / 9)); // 15 orthos in range across 10 values
-            }
-            else
-            {
-                // Above sea level: Use last 20 values in land
-                index = 2 + (int) orthoY;
-            }
+            int index = (int) Math.floor(orthoY / (orthoRange * 1f / landPaletteRange));
 
-            //index = (int) Math.floor((orthoY/20)*(land.size()-1));
-            index = Math.min(index, land.size() - 1);
-
-            return land.get(index).getRGB();
+            return landPalette[index];
         }
     }
 

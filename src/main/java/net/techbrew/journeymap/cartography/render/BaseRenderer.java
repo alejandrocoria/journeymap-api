@@ -275,11 +275,6 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                     y = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, chunkHeights);
                 }
 
-                if(Blocks.glowstone==DataCache.instance().getBlockMD(chunkMd, x, y, z).getBlock())
-                {
-                    slope = 0f;
-                }
-
                 // Calculate primary slope
                 primarySlope = calculateSlope(chunkMd, primarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY, chunkHeights);
 
@@ -432,7 +427,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         Float slope = slopes[x][z];
         if(slope==null || slope.isNaN())
         {
-            JourneyMap.getLogger().warn("No slope for " + chunkMd + " at " + x + "," + z);
+            JourneyMap.getLogger().warn(String.format("Bad slope for %s at %s,%s: %s", chunkMd, x, z, slope));
             slope = 1f;
         }
         return slope;
