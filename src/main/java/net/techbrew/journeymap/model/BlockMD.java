@@ -149,6 +149,24 @@ public class BlockMD
     }
 
     /**
+     * Whether BlockMD has any flag.
+     *
+     * @param checkFlags the flags to check for
+     * @return true if found
+     */
+    public boolean hasAnyFlag(Flag... checkFlags)
+    {
+        for (Flag flag : checkFlags)
+        {
+            if (flags.contains(flag))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Add flags.
      *
      * @param addFlags the add flags
@@ -461,7 +479,12 @@ public class BlockMD
         /**
          * Block has special handling considerations
          */
-        SpecialHandling
+        SpecialHandling,
+
+        /**
+         * Block should be ignored in topological maps
+         */
+        NoTopo
     }
 
 

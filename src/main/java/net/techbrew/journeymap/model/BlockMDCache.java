@@ -96,9 +96,12 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         setFlags(Blocks.iron_bars, TransparentRoof);
         setFlags(Blocks.ladder, OpenToSky);
         setFlags(Blocks.lava, NoShadow);
-        setFlags(Blocks.leaves, OpenToSky, BiomeColor);
-        setFlags(Blocks.leaves2, OpenToSky, BiomeColor);
+        setFlags(Blocks.leaves, OpenToSky, BiomeColor, NoTopo);
+        setFlags(Blocks.leaves2, OpenToSky, BiomeColor, NoTopo);
+        setFlags(Blocks.log, OpenToSky, BiomeColor, NoTopo);
+        setFlags(Blocks.log2, OpenToSky, BiomeColor, NoTopo);
         setFlags(Blocks.redstone_torch, HasAir);
+        setFlags(Blocks.snow_layer, NoTopo);
         setFlags(Blocks.stained_glass, TransparentRoof, Transparency);
         setFlags(Blocks.stained_glass_pane, TransparentRoof, Transparency);
         setFlags(Blocks.tallgrass, BiomeColor);
@@ -138,14 +141,19 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
                 continue;
             }
 
-            if (block instanceof BlockLeavesBase || block instanceof BlockGrass || block instanceof BlockVine || block instanceof BlockLilyPad)
+            if (block instanceof BlockGrass)
             {
                 setFlags(block, BiomeColor);
             }
 
+            if (block instanceof BlockLeavesBase || block instanceof BlockVine || block instanceof BlockLilyPad)
+            {
+                setFlags(block, BiomeColor, NoTopo);
+            }
+
             if (block instanceof BlockCrops)
             {
-                setFlags(block, Side2Texture, Crop);
+                setFlags(block, Side2Texture, Crop, NoTopo);
                 if (!JourneyMap.getCoreProperties().mapPlantShadows.get())
                 {
                     setFlags(block, NoShadow);
@@ -153,7 +161,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
             }
             else if (block instanceof BlockBush || block instanceof BlockCactus || block instanceof BlockDeadBush)
             {
-                setFlags(block, Side2Texture, Plant);
+                setFlags(block, Side2Texture, Plant, NoTopo);
                 if (!JourneyMap.getCoreProperties().mapPlantShadows.get())
                 {
                     setFlags(block, NoShadow);
@@ -161,7 +169,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
             }
             else if (block instanceof BlockRailBase)
             {
-                setFlags(block, NoShadow);
+                setFlags(block, NoShadow, NoTopo);
             }
 
             GameRegistry.UniqueIdentifier uid = findUniqueIdentifierFor(block);

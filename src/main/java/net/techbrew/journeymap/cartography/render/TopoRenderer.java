@@ -8,26 +8,34 @@
 
 package net.techbrew.journeymap.cartography.render;
 
+import com.google.common.base.Optional;
+import com.google.common.cache.RemovalNotification;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.IChunkRenderer;
 import net.techbrew.journeymap.cartography.RGB;
+import net.techbrew.journeymap.cartography.Strata;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
+import org.apache.logging.log4j.Level;
 
 import java.awt.*;
 import java.util.ArrayList;
 
-public class TopoRenderer extends SurfaceRenderer implements IChunkRenderer
+public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 {
-    protected StatTimer renderTopoTimer = StatTimer.get("TopoRenderer.renderSurface");
-
-    ArrayList<Color> water = new ArrayList<Color>(32);
-    ArrayList<Color> land = new ArrayList<Color>(32);
-
+    protected final Object chunkLock = new Object();
     private final HeightsCache chunkSurfaceHeights;
     private final SlopesCache chunkSurfaceSlopes;
+    protected StatTimer renderTopoTimer = StatTimer.get("TopoRenderer.renderSurface");
+    ArrayList<Color> water = new ArrayList<Color>(32);
+    ArrayList<Color> land = new ArrayList<Color>(32);
+    private int lightGray = Color.lightGray.getRGB();
+    private int darkGray = Color.darkGray.getRGB();
 
     public TopoRenderer()
     {
@@ -109,9 +117,151 @@ public class TopoRenderer extends SurfaceRenderer implements IChunkRenderer
         }
         finally
         {
-            strata.reset();
+            //strata.reset();
             timer.stop();
         }
+    }
+
+    /**
+     * Render blocks in the chunk for the surface.
+     */
+    protected boolean renderSurface(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
+    {
+        boolean chunkOk = false;
+
+        try
+        {
+            g2D.setComposite(ALPHA_OPAQUE);
+            int sliceMaxY = 0;
+
+            for (int x = 0; x < 16; x++)
+            {
+                blockLoop:
+                for (int z = 0; z < 16; z++)
+                {
+                    BlockMD topBlockMd = null;
+
+                    int standardY = Math.max(0, getSurfaceBlockHeight(chunkMd, x, z, chunkSurfaceHeights));
+
+                    int roofY = 0;
+                    int y = standardY;
+
+                    roofY = Math.max(0, chunkMd.getAbsoluteHeightValue(x, z));
+                    if (standardY < roofY)
+                    {
+                        // Is transparent roof above standard height?
+                        int checkY = roofY;
+                        while (checkY > standardY)
+                        {
+                            topBlockMd = dataCache.getBlockMD(chunkMd, x, checkY, z);
+                            if (topBlockMd.isTransparentRoof())
+                            {
+                                y = Math.max(standardY, checkY);
+                                break;
+                            }
+                            else
+                            {
+                                checkY--;
+                            }
+                        }
+                    }
+
+                    if (roofY == 0 || standardY == 0)
+                    {
+                        paintVoidBlock(x, z, g2D);
+                        chunkOk = true;
+                        continue blockLoop;
+                    }
+
+                    // Bathymetry - need to use water height instead of standardY, so we get the color blend
+                    if (mapBathymetry)
+                    {
+                        standardY = getColumnProperty(PROP_WATER_HEIGHT, standardY, chunkMd, x, z);
+                    }
+
+                    topBlockMd = chunkMd.getTopBlockMD(x, standardY, z);
+
+                    if (topBlockMd == null)
+                    {
+                        paintBadBlock(x, standardY, z, g2D);
+                        continue blockLoop;
+                    }
+
+                    chunkOk = paintStrata(null, g2D, chunkMd, topBlockMd, vSlice, x, standardY, z, cavePrePass) || chunkOk;
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().log(Level.WARN, LogFormatter.toString(t));
+        }
+        finally
+        {
+
+        }
+        return true;  // todo: return chunkok
+    }
+
+    public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, final HeightsCache chunkHeights)
+    {
+        Integer[][] heights = chunkHeights.getUnchecked(chunkMd.getCoord());
+        if (heights == null)
+        {
+            // Not in cache anymore
+            return null;
+        }
+        Integer y;
+
+        y = heights[x][z];
+
+        if (y != null)
+        {
+            // Already set
+            return y;
+        }
+
+        // Find the height.
+        // TODO: This doesn't catch glass or all that anymore, does it?  Use precip height?
+        y = Math.max(0, chunkMd.getChunk().getHeightValue(x, z));
+
+        try
+        {
+            BlockMD blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
+            boolean propUnsetWaterHeight = true;
+
+            while (y > 0)
+            {
+                if (blockMD.isWater())
+                {
+                    if (!mapBathymetry)
+                    {
+                        break;
+                    }
+                    else if (propUnsetWaterHeight)
+                    {
+                        setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, x, z);
+                        propUnsetWaterHeight = false;
+                    }
+                }
+                else if (!blockMD.isAir() && !blockMD.hasFlag(BlockMD.Flag.NoTopo))
+                {
+                    break;
+                }
+                y--;
+                blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
+            }
+        }
+        catch (Exception e)
+        {
+            JourneyMap.getLogger().warn("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
+        }
+
+        //why is height 4 set on a chunk to the left?
+        y = Math.max(0, y);
+
+        heights[x][z] = y;
+
+        return y;
     }
 
     /**
@@ -145,17 +295,49 @@ public class TopoRenderer extends SurfaceRenderer implements IChunkRenderer
                 hE = (int) hE >> 3;
                 hS = (int) hS >> 3;
 
-                slope = ((h / hN) + (h / hW) + (h / hE) + (h / hS)) / 4f;
+                if (h != hN && (hN == hW && hN == hE && hN == hS))
+                {
+                    slope = 1; // lets ignore one-block elevation changes
+                }
+                else
+                {
+                    slope = ((h / hN) + (h / hW) + (h / hE) + (h / hS)) / 4f;
+                }
                 slopes[x][z] = slope;
             }
         }
         return slopes;
     }
 
+    protected boolean paintStrata(final Strata strata, final Graphics2D g2D, final ChunkMD chunkMd, final BlockMD topBlockMd, final Integer vSlice, final int x, final int y, final int z, final boolean cavePrePass)
+    {
+
+        int color = 0;
+        float slope = getSlope(chunkMd, topBlockMd, x, null, z, chunkSurfaceHeights, chunkSurfaceSlopes);
+
+        if (slope < 1)
+        {
+            color = getBaseBlockColor(topBlockMd, x, y, z);
+            color = RGB.darken(color, .9f);
+        }
+        else if (slope > 1)
+        {
+            color = darkGray;
+        }
+        else
+        {
+            color = getBaseBlockColor(topBlockMd, x, y, z);
+        }
+
+        paintBlock(x, z, color, g2D, true);
+
+        return true;
+    }
+
     /**
-     * Get the color for a block based on its location, neighbor slopes.
+     * Get the color for a block based on topological height
      */
-    protected int getBaseBlockColor(final ChunkMD chunkMd, final BlockMD blockMD, int x, int y, int z)
+    protected int getBaseBlockColor(final BlockMD blockMD, int x, int y, int z)
     {
         float orthoY = y >> 3;
         if (blockMD.isWater())
@@ -184,64 +366,14 @@ public class TopoRenderer extends SurfaceRenderer implements IChunkRenderer
         }
     }
 
-    protected int paintSurfaceAlpha(final Graphics2D g2D, final ChunkMD chunkMd, final BlockMD blockMD, int x, int y, int z)
+    @Override
+    public void onRemoval(RemovalNotification<ChunkCoordIntPair, Optional<ChunkMD>> notification)
     {
-
-        int color = getBaseBlockColor(chunkMd, blockMD, x, y, z);
-
-        // Paint depth layers
-        getDepthColor(chunkMd, blockMD, x, y, z, g2D, false);
-
-        return color;
-    }
-
-//    protected int surfaceSlopeColor(final int color, final ChunkMD chunkMd, final BlockMD blockMD, final ChunkMD.Set neighbors, int x, int ignored, int z)
-//    {
-//        float slope = chunkMd.surfaceSlopes[x][z];
-//        if (slope < 1)
-//        {
-//            return Color.lightGray.getRGB();
-//        }
-//        else if (slope > 1)
-//        {
-//            return Color.darkGray.getRGB();
-//        }
-//        return color;
-//    }
-
-    protected void getDepthColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, final Graphics2D g2D, final boolean caveLighting)
-    {
-
-        // See how deep the alpha goes
-
-//        Stack<BlockMD> stack = new Stack<BlockMD>();
-//        stack.push(blockMD);
-        int maxDepth = 256;
-        int down = y;
-        while (down > 0)
+        synchronized (chunkLock)
         {
-            down--;
-            BlockMD lowerBlock = dataCache.getBlockMD(chunkMd, x, down, z);
-            if (lowerBlock != null)
-            {
-                //stack.push(lowerBlock);
-
-                if (lowerBlock.getAlpha() == 1f || y - down > maxDepth)
-                {
-                    break;
-                }
-
-            }
-            else
-            {
-                break;
-            }
+            ChunkCoordIntPair coord = notification.getKey();
+            chunkSurfaceHeights.invalidate(coord);
+            chunkSurfaceSlopes.invalidate(coord);
         }
-
-        int color = getBaseBlockColor(chunkMd, blockMD, x, down, z);
-
-        g2D.setComposite(ALPHA_OPAQUE);
-        g2D.setPaint(RGB.paintOf(color));
-        g2D.fillRect(x, z, 1, 1);
     }
 }
