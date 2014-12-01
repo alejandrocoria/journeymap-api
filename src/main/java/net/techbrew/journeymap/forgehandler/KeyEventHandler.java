@@ -40,7 +40,10 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
         HashSet<String> keyDescs = new HashSet<String>();
         for (KeyBinding existing : Minecraft.getMinecraft().gameSettings.keyBindings)
         {
-            keyDescs.add(existing.getKeyDescription());
+            if (existing != null && existing.getKeyDescription() != null)
+            {
+                keyDescs.add(existing.getKeyDescription());
+            }
         }
 
         for (KeyBinding kb : Constants.initKeybindings())
