@@ -193,7 +193,10 @@ public class MiniMap
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightmapS, lightmapT);
 
             // Ensure colors and alpha reset
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ZERO);
             GL11.glColor4f(1, 1, 1, 1);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
 
             // Mask the stencil
             beginStencil();
