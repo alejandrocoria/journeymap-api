@@ -82,7 +82,9 @@ public class WorldData extends CacheLoader<Class, WorldData>
                     serverName = serverData.serverName;
                     if (serverName != null)
                     {
-                        if (Strings.isNullOrEmpty(serverName.trim()))
+                        serverName = serverName.replaceAll("\\W+", "~").trim();
+
+                        if (Strings.isNullOrEmpty(serverName.replaceAll("~", "")))
                         {
                             serverName = serverData.serverIP;
                         }
@@ -140,7 +142,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
             }
             else
             {
-                worldName = mc.getIntegratedServer().getFolderName();
+                return mc.getIntegratedServer().getFolderName();
             }
         }
         else
@@ -176,7 +178,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
             worldName = "unnamed";
         }
 
-        return worldName.replaceAll("\\W+", "~");
+        return worldName;
     }
 
     private static String getLegacyUrlEncodedWorldName(String worldName)
