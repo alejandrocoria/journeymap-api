@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap;
 
-import com.google.common.base.Strings;
 import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -115,7 +113,7 @@ public class VersionCheck
                             JourneyMap.getLogger().warn("Version URL had no data!"); //$NON-NLS-1$
                         }
 
-                        JourneyMap.getLogger().info("For Minecraft " + Loader.MC_VERSION + ", JourneyMap version available online: " + versionAvailable); //$NON-NLS-1$
+                        JourneyMap.getLogger().info(String.format("Current version online: JourneyMap %s for Minecraft %s on %s", versionAvailable, Loader.MC_VERSION, JourneyMap.DOWNLOAD_URL));
                     }
                     catch (Throwable e)
                     {
@@ -139,72 +137,24 @@ public class VersionCheck
                     // Log newer version
                     if (!versionIsCurrent)
                     {
-                        JourneyMap.getLogger().warn(Constants.getString("JourneyMap.new_version_available", versionAvailable) + "\n" + JourneyMap.WEBSITE_URL);
+                        // TODO show once in chat when fullscreen map opened?
                     }
                 }
             });
         }
     }
 
-    private static boolean isCurrent(String thisVersion, String availableVersion)
+    private static boolean isCurrent(String thisVersionStr, String availableVersionStr)
     {
-        if (thisVersion.startsWith("@"))
-        {
-            thisVersion = availableVersion + "dev";
-        }
-
-        if (thisVersion.equals(availableVersion))
+        if (thisVersionStr.equals(availableVersionStr))
         {
             return true;
         }
 
-        int[] thisVersionArr = toVersionArray(thisVersion);
-        int[] availableVersionArr = toVersionArray(availableVersion);
-        for (int i = 0; i < availableVersionArr.length; i++)
-        {
-            if (thisVersionArr[i] < availableVersionArr[i])
-            {
-                return false;
-            }
-            if (thisVersionArr[i] > availableVersionArr[i])
-            {
-                return true;
-            }
-        }
-        return true;
-    }
+        Version thisVersion = Version.from(thisVersionStr, null);
+        Version availableVersion = Version.from(availableVersionStr, null);
 
-    private static int[] toVersionArray(String versionString)
-    {
-        String[] strings = versionString.trim().split("\\D+"); // split on all non-numerics
-        int[] ints = new int[strings.length];
-        boolean errorsFound = false;
-        for (int i = 0; i < strings.length; i++)
-        {
-            try
-            {
-                if (Strings.isNullOrEmpty(strings[i]))
-                {
-                    ints[i] = 0;
-                    errorsFound = true;
-                }
-                else
-                {
-                    ints[i] = Integer.parseInt(strings[i]);
-                }
-            }
-            catch (NumberFormatException e)
-            {
-                ints[i] = 0;
-                errorsFound = true;
-            }
-        }
-
-        if (errorsFound)
-        {
-            JourneyMap.getLogger().warn(String.format("Version had problems when parsed. In: %s , Out: %s", versionString, Arrays.toString(ints))); //$NON-NLS-1$
-        }
-        return ints;
+        return !availableVersion.isNewerThan(thisVersion);
     }
 
     private static String createUserAgent()
@@ -271,7 +221,7 @@ public class VersionCheck
 
     public static void launchWebsite()
     {
-        String url = JourneyMap.WEBSITE_URL;
+        String url = JourneyMap.DOWNLOAD_URL;
         try
         {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));

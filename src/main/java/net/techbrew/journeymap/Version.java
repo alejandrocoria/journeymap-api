@@ -2,6 +2,8 @@ package net.techbrew.journeymap;
 
 import com.google.common.base.Joiner;
 
+import java.util.Arrays;
+
 /**
  * Created by Mark on 10/18/2014.
  */
@@ -29,12 +31,50 @@ public class Version implements Comparable<Version>
     {
         try
         {
-            return new Version(Integer.parseInt(major), Integer.parseInt(minor), Integer.parseInt(micro), patch);
+            return new Version(parseInt(major), parseInt(minor), parseInt(micro), patch);
         }
         catch (Exception e)
         {
+            JourneyMap.getLogger().warn(String.format("Version had problems when parsed: %s, %s, %s, %s", major, minor, micro, patch));
+            if (defaultVersion == null)
+            {
+                defaultVersion = new Version(0, 0, 0);
+            }
             return defaultVersion;
         }
+    }
+
+    public static Version from(String versionString, Version defaultVersion)
+    {
+        try
+        {
+            String[] strings = versionString.split("(?<=\\d)(?=\\p{L})");
+            String[] majorMinorMicro = strings[0].split("\\.");
+            String patch = strings.length == 2 ? strings[1] : "";
+            if (majorMinorMicro.length < 3)
+            {
+                majorMinorMicro = Arrays.copyOf(strings, 3);
+            }
+            return Version.from(majorMinorMicro[0], majorMinorMicro[1], majorMinorMicro[2], patch, defaultVersion);
+        }
+        catch (Exception e)
+        {
+            JourneyMap.getLogger().warn(String.format("Version had problems when parsed: %s", versionString));
+            if (defaultVersion == null)
+            {
+                defaultVersion = new Version(0, 0, 0);
+            }
+            return defaultVersion;
+        }
+    }
+
+    private static int parseInt(String number)
+    {
+        if (number == null)
+        {
+            return 0;
+        }
+        return Integer.parseInt(number);
     }
 
     @Override
@@ -92,7 +132,7 @@ public class Version implements Comparable<Version>
         return result;
     }
 
-    public boolean isAfter(Version other)
+    public boolean isNewerThan(Version other)
     {
         return compareTo(other) > 0;
     }
@@ -101,24 +141,27 @@ public class Version implements Comparable<Version>
     public int compareTo(Version other)
     {
         int result = Integer.compare(major, other.major);
-        if (result != 0)
+        if (result == 0)
         {
             result = Integer.compare(minor, other.minor);
         }
-        if (result != 0)
+        if (result == 0)
         {
             result = Integer.compare(micro, other.micro);
         }
-        if (result != 0)
+        if (result == 0)
         {
-            if (patch.length() == 0 || other.patch.length() == 0)
+            result = patch.compareToIgnoreCase(other.patch);
+            if (result != 0)
             {
-                // TODO test this
-                result = Integer.compare(other.patch.length(), patch.length());
-            }
-            else
-            {
-                result = patch.compareTo(other.patch);
+                if (patch.equals(""))
+                {
+                    result = 1;
+                }
+                if (other.patch.equals(""))
+                {
+                    result = -1;
+                }
             }
         }
         return result;
