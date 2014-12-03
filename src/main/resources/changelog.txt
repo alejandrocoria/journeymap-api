@@ -12,4 +12,8 @@ http://journeymap.techbrew.net
 - Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
 
 ## Changelog for JourneyMap @JMVERSION@ (final):
-- Bugfix: Defensive code added to prevent problems with adding keybindings when another mod has registered a null keybinding
+- Bugfix: Defensive code added to ensure keybindings are still registered when another mod has registered a null keybinding
+- Bugfix: Experimental code to correct dark minimap issues on some graphics cards.
+- Bugfix: Version check didn't show update available button in Fullscreen Map when user version contained "RC"
+- Change: Victorian UI Theme > Ridge around minimap compass point is slightly thicker
+- Hungarian translation updated (hu_HU)

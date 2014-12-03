@@ -79,7 +79,7 @@ public class Constants
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn("Couldn't determine locale from game settings, defaulting to ", locale);
+            JourneyMap.getLogger().warn("Couldn't determine locale from game settings, defaulting to " + locale);
         }
         return locale;
     }
@@ -89,7 +89,7 @@ public class Constants
         String result = I18n.format(key);
         if (result.equals(key))
         {
-            JourneyMap.getLogger().warn("Message key not found: ", key);
+            JourneyMap.getLogger().warn("Message key not found: " + key);
         }
         return result;
     }
@@ -99,7 +99,7 @@ public class Constants
         String result = I18n.format(key, params);
         if (result.equals(key))
         {
-            JourneyMap.getLogger().warn("Message key not found: ", key);
+            JourneyMap.getLogger().warn("Message key not found: " + key);
         }
         return result;
     }
