@@ -16,6 +16,11 @@ public class ThemeToggle extends ThemeButton
         super(theme, Constants.getString(rawlabel), Constants.getString(rawlabel), iconName, null, null);
     }
 
+    public ThemeToggle(Theme theme, String labelOn, String labelOff, String iconName)
+    {
+        super(theme, labelOn, labelOff, iconName, null, null);
+    }
+
     public ThemeToggle(Theme theme, String rawlabel, String iconName, PropertiesBase properties, AtomicBoolean property)
     {
         super(theme, Constants.getString(rawlabel), Constants.getString(rawlabel), iconName, properties, property);

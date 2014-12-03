@@ -429,8 +429,9 @@ public class Fullscreen extends JmUI
                 }
             });
 
-            // Alert
-            buttonAlert = new ThemeToggle(theme, "jm.common.update_available", "alert");
+            // Version Check Alert
+            String versionAvailable = Constants.getString("jm.common.new_version_available", VersionCheck.getVersionAvailable());
+            buttonAlert = new ThemeToggle(theme, versionAvailable, versionAvailable, "alert");
             buttonAlert.setDrawButton(VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent());
             buttonAlert.setToggled(true);
             buttonAlert.addToggleListener(new OnOffButton.ToggleListener()
