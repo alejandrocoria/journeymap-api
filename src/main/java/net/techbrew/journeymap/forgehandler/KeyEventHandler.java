@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
@@ -40,21 +41,35 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
         HashSet<String> keyDescs = new HashSet<String>();
         for (KeyBinding existing : Minecraft.getMinecraft().gameSettings.keyBindings)
         {
-            if (existing != null && existing.getKeyDescription() != null)
+            try
             {
-                keyDescs.add(existing.getKeyDescription());
+                if (existing != null && existing.getKeyDescription() != null)
+                {
+                    keyDescs.add(existing.getKeyDescription());
+                }
+            }
+            catch (Throwable t)
+            {
+                JourneyMap.getLogger().error("Unexpected error when checking existing keybinding : " + existing);
             }
         }
 
         for (KeyBinding kb : Constants.initKeybindings())
         {
-            if (!keyDescs.contains(kb.getKeyDescription()))
+            try
             {
-                ClientRegistry.registerKeyBinding(kb);
+                if (!keyDescs.contains(kb.getKeyDescription()))
+                {
+                    ClientRegistry.registerKeyBinding(kb);
+                }
+                else
+                {
+                    JourneyMap.getLogger().warn("Avoided duplicate keybinding that was already registered: " + kb.getKeyDescription());
+                }
             }
-            else
+            catch (Throwable t)
             {
-                JourneyMap.getLogger().warn("Avoided duplicate keybinding that was already registered: " + kb.getKeyDescription());
+                ChatLog.announceError("Unexpected error when registering keybinding : " + kb);
             }
         }
     }
