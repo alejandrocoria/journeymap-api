@@ -1,21 +1,2 @@
-# JourneyMap @JMVERSION@ for Minecraft @MCVERSION@ (@DATE@)
-
-Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
-This mod may not be altered, file-hosted, or distributed without 
-express written permission by Mark Woodman.
-
-http://journeymap.techbrew.net
-
-## Requirements:
-
-- Minecraft @MCVERSION@
-- Forge-@FORGEVERSION@ or later (http://files.minecraftforge.net/)
-
-## Changelog for JourneyMap @JMVERSION@ (final):
-- Bugfix: Defensive code added to ensure keybindings are still registered when another mod has registered a null keybinding
-- Bugfix: Experimental code to correct dark minimap issues on some graphics cards.
-- Bugfix: Version check didn't show update available button in Fullscreen Map when user version contained "RC"
-- Bugfix: Missing tooltip for option: Advanced > Google Maps API Domain
-- Change: Data folder name scheme slightly changed to handle international characters that aren't OS-safe. If your maps/waypoints are missing after the update, look in minecraft/journeymap/data/*/ and move the old folder contents to the new one.
-- Change: Victorian UI Theme > Ridge around minimap compass point is slightly thicker
-- Hungarian translation updated (hu_HU)
+CHANGELOG: 5.0.2
+*

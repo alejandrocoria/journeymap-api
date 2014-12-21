@@ -8,10 +8,12 @@
 
 package net.techbrew.journeymap.render.map;
 
+import com.google.common.base.Objects;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -27,6 +29,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.Future;
 
 public class Tile
@@ -53,6 +56,7 @@ public class Tile
     int renderType = 0;
     int textureFilter = 0;
     int textureWrap = 0;
+    List<TileDrawStep> drawSteps;
 
     public Tile(final File worldDir, final MapType mapType, final int tileX, final int tileZ, final int zoom, final int dimension)
     {
@@ -94,7 +98,7 @@ public class Tile
 
     public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice)
     {
-        boolean forceReset = (lastMapType != mapType || lastVSlice != vSlice);
+        boolean forceReset = (lastMapType != mapType || !Objects.equal(lastVSlice, vSlice));
 
         if (futureTex != null && forceReset)
         {
@@ -122,6 +126,16 @@ public class Tile
         }
         boolean showGrid = JourneyMap.getFullMapProperties().showGrid.get();
         futureTex = TextureCache.instance().prepareImage(glId, image, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE, showGrid, 1f);
+
+        if (forceReset || this.drawSteps == null || this.drawSteps.isEmpty())
+        {
+            this.drawSteps = RegionImageHandler.getTileDrawSteps(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, true, showGrid);
+        }
+
+        for (TileDrawStep tileDrawStep : drawSteps)
+        {
+            tileDrawStep.updateTexture(mapType, vSlice, forceReset);
+        }
 
         return true;
     }
@@ -305,16 +319,24 @@ public class Tile
         tessellator.addVertexWithUV(startX, startZ, 0.0D, 0, 0);
         tessellator.draw();
 
+        for (TileDrawStep tileDrawStep : drawSteps)
+        {
+            if (tileDrawStep.hasTexture())
+            {
+                tileDrawStep.draw(pos, offsetX, offsetZ, 1f, textureFilter, textureWrap);
+            }
+        }
+
         if (debug)
         {
-            DrawUtil.drawLabel(pos.toString(), startX + (Tile.TILESIZE / 2), startZ + (Tile.TILESIZE / 2), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
+            DrawUtil.drawLabel(pos.toString(), startX + (Tile.TILESIZE / 2), startZ + (Tile.TILESIZE / 2), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.YELLOW, 255, Color.BLUE, 255, 1.0, false);
 
 //            int pad = 3;
 //            DrawUtil.drawLabel(String.format("TL %.0f, %.0f", startX, startZ), startX + pad, startZ + pad, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, color, 255, 1.0, false);
 //            DrawUtil.drawLabel(String.format("BR %.0f, %.0f", endX, endZ), endX - pad, endZ - pad, DrawUtil.HAlign.Left, DrawUtil.VAlign.Above, Color.WHITE, 255, color, 255, 1.0, false);
 
-            DrawUtil.drawRectangle(startX - 1, startZ - 1, Tile.TILESIZE, 1, Color.white, 200);
-            DrawUtil.drawRectangle(startX - 1, startZ - 1, 1, Tile.TILESIZE, Color.red, 200);
+            DrawUtil.drawRectangle(startX - 1, startZ - 1, Tile.TILESIZE, 1, Color.yellow, 200);
+            DrawUtil.drawRectangle(startX - 1, startZ - 1, 1, Tile.TILESIZE, Color.yellow, 200);
 
         }
     }

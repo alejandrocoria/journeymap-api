@@ -16,6 +16,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageCache;
+import net.techbrew.journeymap.render.map.TileDrawStep;
 import org.apache.logging.log4j.Level;
 
 import javax.imageio.ImageIO;
@@ -25,6 +26,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RegionImageHandler
 {
@@ -340,19 +343,20 @@ public class RegionImageHandler
      * @param mapType
      * @param vSlice
      * @param dimension
-     * @param since
+     * @param useCache
+     * @param imageWidth
+     * @param imageHeight
+     * @param allowNullImage
      * @return
      */
-    public static synchronized boolean hasImageChanged(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType, Integer vSlice, final int dimension, final long since)
+    public static synchronized List<TileDrawStep> getTileDrawSteps(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType,
+                                                                   Integer vSlice, final int dimension, final Boolean useCache, final boolean allowNullImage, boolean showGrid)
     {
-
         boolean isUnderground = mapType.equals(Constants.MapType.underground);
         if (!isUnderground)
         {
             vSlice = null;
         }
-
-        final RegionImageCache cache = RegionImageCache.getInstance();
 
         RegionCoord rc = null;
 
@@ -361,6 +365,8 @@ public class RegionImageHandler
         final int rz1 = RegionCoord.getRegionPos(startCoord.chunkZPos);
         final int rz2 = RegionCoord.getRegionPos(endCoord.chunkZPos);
 
+        List<TileDrawStep> drawSteps = new ArrayList<TileDrawStep>();
+
         int rminCx, rminCz, rmaxCx, rmaxCz, sx1, sy1, sx2, sy2, dx1, dx2, dy1, dy2;
 
         for (int rx = rx1; rx <= rx2; rx++)
@@ -368,25 +374,34 @@ public class RegionImageHandler
             for (int rz = rz1; rz <= rz2; rz++)
             {
                 rc = new RegionCoord(worldDir, rx, vSlice, rz, dimension);
-                if (cache.contains(rc))
-                {
-                    if (cache.isDirtySince(rc, mapType, since))
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    File file = RegionImageHandler.getRegionImageFile(rc, mapType, false);
-                    if (file.canRead() && file.lastModified() > since)
-                    {
-                        return true;
-                    }
-                }
+                rminCx = Math.max(rc.getMinChunkX(), startCoord.chunkXPos);
+                rminCz = Math.max(rc.getMinChunkZ(), startCoord.chunkZPos);
+                rmaxCx = Math.min(rc.getMaxChunkX(), endCoord.chunkXPos);
+                rmaxCz = Math.min(rc.getMaxChunkZ(), endCoord.chunkZPos);
+
+                int xoffset = rc.getMinChunkX() * 16;
+                int yoffset = rc.getMinChunkZ() * 16;
+                sx1 = (rminCx * 16) - xoffset;
+                sy1 = (rminCz * 16) - yoffset;
+                sx2 = sx1 + ((rmaxCx - rminCx + 1) * 16);
+                sy2 = sy1 + ((rmaxCz - rminCz + 1) * 16);
+
+                xoffset = startCoord.chunkXPos * 16;
+                yoffset = startCoord.chunkZPos * 16;
+                dx1 = (startCoord.chunkXPos * 16) - xoffset;
+                dy1 = (startCoord.chunkZPos * 16) - yoffset;
+                dx2 = dx1 + ((endCoord.chunkXPos - startCoord.chunkXPos + 1) * 16);
+                dy2 = dy1 + ((endCoord.chunkZPos - startCoord.chunkZPos + 1) * 16);
+
+                // TODO: Pool these?
+                TileDrawStep drawStep = new TileDrawStep(rc);
+                drawStep.setContext(vSlice, dimension, useCache, allowNullImage, showGrid);
+                drawStep.setCoordinates(dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2);
+                drawSteps.add(drawStep);
             }
         }
 
-        return false;
+        return drawSteps;
     }
 
     public static File getBlank512x512ImageFile()

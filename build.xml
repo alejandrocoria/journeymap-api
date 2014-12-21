@@ -4,11 +4,11 @@
     <!-- Update when new version is going to be released -->
     <property name="jm_major" value="5"/>
     <property name="jm_minor" value="0"/>
-    <property name="jm_micro" value="1"/>
-    <property name="jm_patch" value=""/>
+    <property name="jm_micro" value="2"/>
+    <property name="jm_patch" value="a1"/>
     <property name="jmversion" value="${jm_major}.${jm_minor}.${jm_micro}${jm_patch}"/>
     <property name="mcversion" value="1.7.10"/>
-    <property name="forgeversion" value="10.13.0.1208"/>
+    <property name="forgeversion" value="10.13.0.1230"/>
     <property name="unlimited" value="Unlimited"/>
     <property name="fairplay" value="FairPlay"/>
     <property name="noradar" value="NoRadar"/>

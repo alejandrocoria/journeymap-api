@@ -128,24 +128,18 @@ public class TextureCache
 //        return updateImage(texture.getGlTextureId(), texture.getImage(), imageWidth, imageHeight, alpha);
 //    }
 //
-//    public Future<DelayedTexture> updateImage(final Integer glId, final BufferedImage image, final Integer imageWidth, final Integer imageHeight, final float alpha)
-//    {
-//        Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>()
-//        {
-//            @Override
-//            public DelayedTexture call() throws Exception
-//            {
-//                BufferedImage updatedImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
-//                Graphics2D g = (Graphics2D) updatedImage.getGraphics();
-//                g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-//                g.drawImage(image, 0, 0, imageWidth, imageHeight, null);
-//                g.dispose();
-//
-//                return new DelayedTexture(glId, updatedImage, null);
-//            }
-//        });
-//        return future;
-//    }
+public Future<DelayedTexture> prepareImage(final Integer glId, final BufferedImage image)
+{
+    Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>()
+    {
+        @Override
+        public DelayedTexture call() throws Exception
+        {
+            return new DelayedTexture(glId, image, null);
+        }
+    });
+    return future;
+}
 
     /**
      * *********************************************
