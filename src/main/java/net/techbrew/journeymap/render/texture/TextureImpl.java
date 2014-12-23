@@ -37,13 +37,12 @@ public class TextureImpl extends AbstractTexture
      * keep image with object
      */
     public final boolean retainImage;
+    public float alpha;
     /**
      * optionally-retained image *
      */
     protected BufferedImage image;
     protected volatile boolean unbound;
-
-    public float alpha;
 
     public TextureImpl(BufferedImage image)
     {
@@ -58,10 +57,10 @@ public class TextureImpl extends AbstractTexture
         updateTexture(image, true);
     }
 
-    TextureImpl(int glId, BufferedImage image)
+    TextureImpl(int glId, BufferedImage image, boolean retainImage)
     {
         this.glTextureId = glId;
-        this.retainImage = true;
+        this.retainImage = retainImage;
         this.image = image;
         this.width = image.getWidth();
         this.height = image.getHeight();

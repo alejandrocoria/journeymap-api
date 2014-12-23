@@ -36,9 +36,9 @@ public class TileCache implements RemovalListener<Integer, Tile>
     private TileCache()
     {
         this.cache = CacheBuilder.newBuilder()
-                .concurrencyLevel(1)
+                //.concurrencyLevel(1)
                 .maximumSize(50)
-                .expireAfterAccess(5, TimeUnit.SECONDS)
+                .expireAfterAccess(20, TimeUnit.SECONDS)
                 .removalListener(this)
                 .build();
         this.retained = new HashMap<Integer, Tile>();

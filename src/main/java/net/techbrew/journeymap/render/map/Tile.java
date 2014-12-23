@@ -9,17 +9,10 @@
 package net.techbrew.journeymap.render.map;
 
 import com.google.common.base.Objects;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
-import net.techbrew.journeymap.log.JMLogger;
-import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.render.draw.DrawUtil;
-import net.techbrew.journeymap.render.texture.DelayedTexture;
-import net.techbrew.journeymap.render.texture.TextureCache;
-import net.techbrew.journeymap.render.texture.TextureImpl;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -27,10 +20,9 @@ import org.lwjgl.opengl.GL14;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Future;
 
 public class Tile
 {
@@ -46,20 +38,21 @@ public class Tile
     final ChunkCoordIntPair lrChunk;
     final Point ulBlock;
     final Point lrBlock;
+    final List<TileDrawStep> drawSteps = new ArrayList<TileDrawStep>();
     private final Logger logger = JourneyMap.getLogger();
     private final boolean debug = logger.isTraceEnabled();
     long lastImageTime = 0;
     Integer lastVSlice;
     MapType lastMapType;
-    Future<DelayedTexture> futureTex;
-    TextureImpl textureImpl;
+    //    Future<DelayedTexture> futureTex;
+//    TextureImpl textureImpl;
     int renderType = 0;
     int textureFilter = 0;
     int textureWrap = 0;
-    List<TileDrawStep> drawSteps;
 
     public Tile(final File worldDir, final MapType mapType, final int tileX, final int tileZ, final int zoom, final int dimension)
     {
+        //System.out.println("NEW TILE");
         this.worldDir = worldDir;
         this.lastMapType = mapType;
         this.tileX = tileX;
@@ -98,43 +91,33 @@ public class Tile
 
     public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice)
     {
-        boolean forceReset = (lastMapType != mapType || !Objects.equal(lastVSlice, vSlice));
+        boolean forceReset = (lastMapType != mapType) || !Objects.equal(lastVSlice, vSlice);
+        lastMapType = mapType;
+        lastVSlice = vSlice;
 
-        if (futureTex != null && forceReset)
+        if (forceReset)
         {
-            futureTex.cancel(true);
-            futureTex = null;
-        }
-
-        if (futureTex != null)
-        {
-            return false;
+            drawSteps.clear();
         }
 
         updateRenderType();
 
-        lastMapType = mapType;
-        lastVSlice = vSlice;
-
-        Integer glId = null;
-        BufferedImage image = null;
-        if (textureImpl != null)
+        if (drawSteps.isEmpty())
         {
-            // Reuse existing buffered image and glId
-            glId = textureImpl.getGlTextureId();
-            image = textureImpl.getImage();
+            this.drawSteps.addAll(RegionImageHandler.getTileDrawSteps(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension));
         }
-        boolean showGrid = JourneyMap.getFullMapProperties().showGrid.get();
-        futureTex = TextureCache.instance().prepareImage(glId, image, worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, TILESIZE, TILESIZE, showGrid, 1f);
-
-        if (forceReset || this.drawSteps == null || this.drawSteps.isEmpty())
+        else
         {
-            this.drawSteps = RegionImageHandler.getTileDrawSteps(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension, true, true, showGrid);
+            for (TileDrawStep tileDrawStep : drawSteps)
+            {
+                tileDrawStep.refreshIfDirty(lastImageTime);
+            }
         }
+        lastImageTime = System.currentTimeMillis();
 
-        for (TileDrawStep tileDrawStep : drawSteps)
+        if (drawSteps.size() > 1)
         {
-            tileDrawStep.updateTexture(mapType, vSlice, forceReset);
+            return true;
         }
 
         return true;
@@ -142,69 +125,19 @@ public class Tile
 
     public boolean hasTexture()
     {
-        if (textureImpl != null)
+        for (TileDrawStep tileDrawStep : drawSteps)
         {
-            return true;
-        }
-        if (futureTex != null && futureTex.isDone())
-        {
-            try
+            if (tileDrawStep.hasTexture())
             {
-                if (futureTex.get() == null)
-                {
-                    futureTex = null;
-                    lastImageTime = 0;
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            catch (Throwable e)
-            {
-                logger.error(LogFormatter.toString(e));
+                return true;
             }
         }
         return false;
     }
 
-    public TextureImpl getTexture()
-    {
-
-        if (futureTex != null && futureTex.isDone())
-        {
-            try
-            {
-                DelayedTexture dt = futureTex.get();
-                if (dt != null)
-                {
-                    TextureImpl texture = dt.bindTexture();
-                    if (textureImpl == null)
-                    { // new
-                        textureImpl = texture;
-                    }
-                }
-                futureTex = null;
-                //lastImageTime = new Date().getTime();
-                //logger.info("FutureTex bound for " + this);
-            }
-            catch (Throwable e)
-            {
-                logger.error(LogFormatter.toString(e));
-            }
-        }
-
-        return textureImpl;
-    }
-
     public void clear()
     {
-        if (textureImpl != null)
-        {
-            textureImpl.deleteTexture();
-            textureImpl = null;
-        }
+        drawSteps.clear();
     }
 
     private void updateRenderType()
@@ -293,51 +226,14 @@ public class Tile
 
     void draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha)
     {
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.getTexture().getGlTextureId());
-
-        GL11.glColor4f(1, 1, 1, alpha);
-
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, textureFilter);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, textureFilter);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
-
-        final double startX = offsetX + pos.startX;
-        final double startZ = offsetZ + pos.startZ;
-        final double endX = offsetX + pos.endX;
-        final double endZ = offsetZ + pos.endZ;
-
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(startX, endZ, 0.0D, 0, 1);
-        tessellator.addVertexWithUV(endX, endZ, 0.0D, 1, 1);
-        tessellator.addVertexWithUV(endX, startZ, 0.0D, 1, 0);
-        tessellator.addVertexWithUV(startX, startZ, 0.0D, 0, 0);
-        tessellator.draw();
+        boolean showGrid = JourneyMap.getFullMapProperties().showGrid.get();
 
         for (TileDrawStep tileDrawStep : drawSteps)
         {
-            if (tileDrawStep.hasTexture())
-            {
-                tileDrawStep.draw(pos, offsetX, offsetZ, 1f, textureFilter, textureWrap);
-            }
-        }
+            //tileDrawStep.draw(pos, offsetX, offsetZ, 1f, GL11.GL_LINEAR, GL12.GL_CLAMP_TO_EDGE, showGrid);
+            //tileDrawStep.draw(pos, offsetX, offsetZ, 1f, GL11.GL_NEAREST, GL12.GL_CLAMP_TO_EDGE, showGrid);
 
-        if (debug)
-        {
-            DrawUtil.drawLabel(pos.toString(), startX + (Tile.TILESIZE / 2), startZ + (Tile.TILESIZE / 2), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.YELLOW, 255, Color.BLUE, 255, 1.0, false);
-
-//            int pad = 3;
-//            DrawUtil.drawLabel(String.format("TL %.0f, %.0f", startX, startZ), startX + pad, startZ + pad, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, color, 255, 1.0, false);
-//            DrawUtil.drawLabel(String.format("BR %.0f, %.0f", endX, endZ), endX - pad, endZ - pad, DrawUtil.HAlign.Left, DrawUtil.VAlign.Above, Color.WHITE, 255, color, 255, 1.0, false);
-
-            DrawUtil.drawRectangle(startX - 1, startZ - 1, Tile.TILESIZE, 1, Color.yellow, 200);
-            DrawUtil.drawRectangle(startX - 1, startZ - 1, 1, Tile.TILESIZE, Color.yellow, 200);
-
+            tileDrawStep.draw(pos, offsetX, offsetZ, alpha, textureFilter, textureWrap, showGrid); // TODO
         }
     }
 
@@ -378,29 +274,5 @@ public class Tile
             return false;
         }
         return true;
-    }
-
-    @Override
-    protected void finalize()
-    {
-        try
-        {
-            if (JourneyMap.getInstance().isMapping())
-            {
-                if (textureImpl != null)
-                {
-                    logger.debug("Tile wasn't cleared before finalize() called: " + this);
-                    clear();
-                }
-            }
-        }
-        catch (NullPointerException e)
-        {
-            // Forced shutdown, JM instance already GC'd
-        }
-        catch (Throwable t)
-        {
-            JMLogger.logOnce("Tile improperly disposed: " + t.getMessage(), null);
-        }
     }
 }

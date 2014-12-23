@@ -184,19 +184,7 @@ public class RegionImageHandler
     }
 
     /**
-     * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2)
-     *
-     * @param worldDir
-     * @param startCoord
-     * @param endCoord
-     * @param mapType
-     * @param vSlice
-     * @param dimension
-     * @param useCache
-     * @param imageWidth
-     * @param imageHeight
-     * @param allowNullImage
-     * @return
+     * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2).
      */
     public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType, Integer vSlice, final int dimension, final Boolean useCache, BufferedImage image, final Integer imageWidth, final Integer imageHeight, final boolean allowNullImage, boolean showGrid)
     {
@@ -335,30 +323,17 @@ public class RegionImageHandler
     }
 
     /**
-     * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2)
-     *
-     * @param worldDir
-     * @param startCoord
-     * @param endCoord
-     * @param mapType
-     * @param vSlice
-     * @param dimension
-     * @param useCache
-     * @param imageWidth
-     * @param imageHeight
-     * @param allowNullImage
-     * @return
+     * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2).
      */
-    public static synchronized List<TileDrawStep> getTileDrawSteps(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType,
-                                                                   Integer vSlice, final int dimension, final Boolean useCache, final boolean allowNullImage, boolean showGrid)
+    public static synchronized List<TileDrawStep> getTileDrawSteps(final File worldDir, final ChunkCoordIntPair startCoord,
+                                                                   final ChunkCoordIntPair endCoord, final Constants.MapType mapType,
+                                                                   Integer vSlice, final int dimension)
     {
         boolean isUnderground = mapType.equals(Constants.MapType.underground);
         if (!isUnderground)
         {
             vSlice = null;
         }
-
-        RegionCoord rc = null;
 
         final int rx1 = RegionCoord.getRegionPos(startCoord.chunkXPos);
         final int rx2 = RegionCoord.getRegionPos(endCoord.chunkXPos);
@@ -367,6 +342,7 @@ public class RegionImageHandler
 
         List<TileDrawStep> drawSteps = new ArrayList<TileDrawStep>();
 
+        RegionCoord rc;
         int rminCx, rminCz, rmaxCx, rmaxCz, sx1, sy1, sx2, sy2, dx1, dx2, dy1, dy2;
 
         for (int rx = rx1; rx <= rx2; rx++)
@@ -394,8 +370,8 @@ public class RegionImageHandler
                 dy2 = dy1 + ((endCoord.chunkZPos - startCoord.chunkZPos + 1) * 16);
 
                 // TODO: Pool these?
-                TileDrawStep drawStep = new TileDrawStep(rc);
-                drawStep.setContext(vSlice, dimension, useCache, allowNullImage, showGrid);
+                TileDrawStep drawStep = new TileDrawStep();
+                drawStep.setContext(mapType, rc, false);
                 drawStep.setCoordinates(dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2);
                 drawSteps.add(drawStep);
             }

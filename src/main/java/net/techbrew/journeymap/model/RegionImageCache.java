@@ -12,6 +12,8 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
+import net.techbrew.journeymap.render.texture.TextureCache;
+import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import org.apache.logging.log4j.Level;
 
@@ -89,6 +91,19 @@ public class RegionImageCache
         synchronized (lock)
         {
             return new ArrayList<RegionCoord>(imageSets.keySet());
+        }
+    }
+
+    public TextureImpl getRegionTexture(RegionCoord rCoord, Constants.MapType mapType, boolean forceRefresh)
+    {
+        TextureCache tc = TextureCache.instance();
+        if (!tc.hasRegionTexture(rCoord, mapType) || forceRefresh)
+        {
+            return tc.getRegionTexture(rCoord, mapType, forceRefresh, getGuaranteedImage(rCoord, mapType));
+        }
+        else
+        {
+            return tc.getRegionTexture(rCoord, mapType, false, null);
         }
     }
 

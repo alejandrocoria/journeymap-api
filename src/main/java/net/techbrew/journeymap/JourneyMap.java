@@ -65,7 +65,7 @@ public class JourneyMap
     public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
     public static final String DOWNLOAD_URL = WEBSITE_URL + "download"; //$NON-NLS-1$
     public static final Version JM_VERSION = Version.from(
-            "@MAJOR@", "@MINOR@", "@MICRO@", "@PATCH@", new Version(5, 0, 1, "dev"));
+            "@MAJOR@", "@MINOR@", "@MICRO@", "@PATCH@", new Version(5, 0, 2, "dev"));
     public static final String FORGE_VERSION = "@FORGEVERSION@"; //$NON-NLS-1$
     public static final String EDITION = getEdition();
     public static final String MOD_ID = "journeymap";

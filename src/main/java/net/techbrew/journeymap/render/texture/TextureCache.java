@@ -15,6 +15,7 @@ import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
+import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import net.techbrew.journeymap.ui.theme.Theme;
 
@@ -23,9 +24,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -45,6 +44,8 @@ public class TextureCache
     private final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<String, TextureImpl> entityIcons = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
+    private final Map<String, Future<DelayedTexture>> regionImages = Collections.synchronizedMap(new HashMap<String, Future<DelayedTexture>>());
+    private final Set<Integer> regionGlIDs = new HashSet<Integer>();
     private ThreadPoolExecutor texExec = (ThreadPoolExecutor) Executors.newFixedThreadPool(3, new JMThreadFactory("texture"));
 
     private TextureCache()
@@ -101,7 +102,7 @@ public class TextureCache
                     chunksImage = RegionImageHandler.createBlankImage(imageWidth, imageHeight);
                     final Graphics2D g2D = chunksImage.createGraphics();
                     g2D.setColor(Color.black);
-                    if(mapType != Constants.MapType.underground)
+                    if (mapType != Constants.MapType.underground)
                     {
                         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .5f));
                     }
@@ -123,23 +124,23 @@ public class TextureCache
         return future;
     }
 
-//    public Future<DelayedTexture> updateTexture(TextureImpl texture, final Integer imageWidth, final Integer imageHeight, final float alpha)
+    //    public Future<DelayedTexture> updateTexture(TextureImpl texture, final Integer imageWidth, final Integer imageHeight, final float alpha)
 //    {
 //        return updateImage(texture.getGlTextureId(), texture.getImage(), imageWidth, imageHeight, alpha);
 //    }
 //
-public Future<DelayedTexture> prepareImage(final Integer glId, final BufferedImage image)
-{
-    Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>()
+    public Future<DelayedTexture> prepareImage(final Integer glId, final BufferedImage image)
     {
-        @Override
-        public DelayedTexture call() throws Exception
+        Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>()
         {
-            return new DelayedTexture(glId, image, null);
-        }
-    });
-    return future;
-}
+            @Override
+            public DelayedTexture call() throws Exception
+            {
+                return new DelayedTexture(glId, image, null);
+            }
+        });
+        return future;
+    }
 
     /**
      * *********************************************
@@ -230,22 +231,6 @@ public Future<DelayedTexture> prepareImage(final Integer glId, final BufferedIma
         tex = new TextureImpl(resizedImg, false);
         namedTextures.put(Name.MinimapCustomSquare, tex);
         return tex;
-    }
-
-    public TextureImpl bindMinimapCustomSquare(Future<DelayedTexture> delayedCustomTex)
-    {
-        if (delayedCustomTex.isDone())
-        {
-            try
-            {
-                return delayedCustomTex.get().bindTexture();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        return null;
     }
 
     public TextureImpl getWaypoint()
@@ -437,6 +422,87 @@ public Future<DelayedTexture> prepareImage(final Integer glId, final BufferedIma
             }
             return tex;
         }
+    }
+
+    /**
+     * *************************************************
+     */
+
+    public boolean hasRegionTexture(RegionCoord regionCoord, Constants.MapType mapType)
+    {
+        synchronized (regionImages)
+        {
+            return regionImages.containsKey(mapType.name() + regionCoord.hashCode());
+        }
+    }
+
+    public TextureImpl getRegionTexture(RegionCoord regionCoord, Constants.MapType mapType, boolean forceRefresh, BufferedImage img)
+    {
+        String texName = mapType.name() + regionCoord.hashCode();
+        Future<DelayedTexture> future = null;
+        TextureImpl regionTexture = null;
+
+        synchronized (regionImages)
+        {
+            future = regionImages.get(texName);
+
+            if (img != null)
+            {
+                if (future == null)
+                {
+                    future = prepareImage(null, img);
+                    regionImages.put(texName, future);
+                }
+                else if (forceRefresh)
+                {
+                    try
+                    {
+                        DelayedTexture delayedTex = future.get();
+                        if (delayedTex.glId != null)
+                        {
+                            regionGlIDs.add(delayedTex.glId);
+                            future = prepareImage(delayedTex.glId, img);
+                            regionImages.put(texName, future);
+                        }
+                        else
+                        {
+                            future = prepareImage(null, img);
+                            regionImages.put(texName, future);
+                        }
+                    }
+                    catch (Throwable e)
+                    {
+                        JourneyMap.getLogger().warn(String.format("Error getting region texture during forceRefresh for %s %s: %s", mapType, regionCoord, e));
+                    }
+                }
+            }
+            else
+            {
+                JourneyMap.getLogger().info(String.format("No image provided for missing texture for %s %s", mapType, regionCoord));
+            }
+        }
+
+        if (future == null)
+        {
+            JourneyMap.getLogger().info(String.format("Error getting future for %s %s", mapType, regionCoord));
+        }
+        else //if(future.isDone())
+        {
+            try
+            {
+                regionTexture = future.get().bindTexture(false);
+            }
+            catch (Exception e)
+            {
+                JourneyMap.getLogger().warn(String.format("Can't bind region texture for %s %s: %s", mapType, regionCoord, e));
+            }
+        }
+//        else
+//        {
+//            JourneyMap.getLogger().info(String.format("Waiting for %s %s", mapType, regionCoord));
+//        }
+
+        return regionTexture;
     }
 
     /**

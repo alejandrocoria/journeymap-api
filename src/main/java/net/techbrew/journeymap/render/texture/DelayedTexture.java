@@ -10,6 +10,7 @@ package net.techbrew.journeymap.render.texture;
 
 
 import net.minecraft.client.renderer.texture.TextureUtil;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -23,52 +24,62 @@ import java.nio.ByteBuffer;
  */
 public class DelayedTexture
 {
-    final int width;
-    final int height;
-    final ByteBuffer buffer;
+    private final Object lock = new Object();
+    int width;
+    int height;
+    ByteBuffer buffer;
     Integer glId;
     BufferedImage image;
+    TextureImpl result;
 
     /**
      * Can be safely called without the OpenGL Context.
-     *
-     * @param glId
-     * @param image
      */
     public DelayedTexture(Integer glId, BufferedImage image, String debugString)
     {
         this.glId = glId;
-        this.image = image;
-        width = image.getWidth();
-        height = image.getHeight();
+        setImage(image);
 
         if (debugString != null)
         {
             Graphics2D g = RegionImageHandler.initRenderingHints(image.createGraphics());
             g.setPaint(Color.WHITE);
             g.setStroke(new BasicStroke(3));
-            g.drawRect(0, 0, image.getWidth(), image.getHeight());
+            g.drawRect(0, 0, width, height);
             final Font labelFont = new Font("Arial", Font.BOLD, 16);
             g.setFont(labelFont); //$NON-NLS-1$
             g.drawString(debugString, 16, 16);
             g.dispose();
         }
+    }
 
-        int[] pixels = new int[width * height];
-        image.getRGB(0, 0, width, height, pixels, 0, width);
-        buffer = BufferUtils.createByteBuffer(width * height * 4);
-        for (int y = 0; y < height; y++)
+    /**
+     * Can be safely called without the OpenGL Context.
+     */
+    public void setImage(BufferedImage image)
+    {
+        synchronized (lock)
         {
-            for (int x = 0; x < width; x++)
+            this.image = image;
+            width = image.getWidth();
+            height = image.getHeight();
+
+            int[] pixels = new int[width * height];
+            image.getRGB(0, 0, width, height, pixels, 0, width);
+            buffer = BufferUtils.createByteBuffer(width * height * 4);
+            for (int y = 0; y < height; y++)
             {
-                int pixel = pixels[y * width + x];
-                buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red component
-                buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green component
-                buffer.put((byte) (pixel & 0xFF));             // Blue component
-                buffer.put((byte) ((pixel >> 24) & 0xFF));     // Alpha component
+                for (int x = 0; x < width; x++)
+                {
+                    int pixel = pixels[y * width + x];
+                    buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red component
+                    buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green component
+                    buffer.put((byte) (pixel & 0xFF));             // Blue component
+                    buffer.put((byte) ((pixel >> 24) & 0xFF));     // Alpha component
+                }
             }
+            buffer.flip();
         }
-        buffer.flip();
     }
 
     /**
@@ -76,68 +87,61 @@ public class DelayedTexture
      *
      * @return
      */
-    public TextureImpl bindTexture()
+    public TextureImpl bindTexture(BufferedImage image)
     {
-        if (glId == null)
+        setImage(image);
+        synchronized (lock)
         {
-            glId = TextureUtil.glGenTextures();
+            if (result != null)
+            {
+                result.updateTexture(image);
+                return result;
+            }
+            else
+            {
+                return bindTexture(false);
+            }
         }
-
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, glId);
-
-        // Setup wrap mode
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
-
-        //Setup texture scaling filtering
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-
-        //Send texel data to OpenGL
-        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, image.getWidth(), image.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-
-        return new TextureImpl(glId, image);
     }
 
-//    private static void setTextureClamped(boolean par0)
-//    {
-//        if (par0)
-//        {
-//            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
-//            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP);
-//        }
-//        else
-//        {
-//            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-//            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
-//        }
-//    }
-//
-//    private static void setTextureBlurred(boolean par0)
-//    {
-//        if (par0)
-//        {
-//            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-//            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-//        }
-//        else
-//        {
-//            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-//            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-//        }
-//    }
-//
-//    class Stripe {
-//        int yOffset;
-//        int width;
-//        int height;
-//        IntBuffer data;
-//
-//        Stripe(int yOffset, int width, int height, IntBuffer data) {
-//            this.yOffset = yOffset;
-//            this.width = width;
-//            this.height = height;
-//            this.data = data;
-//        }
-//    }
+    /**
+     * Must be called on same thread as OpenGL Context
+     *
+     * @return
+     */
+    public synchronized TextureImpl bindTexture(boolean retainImage)
+    {
+        if (result == null)
+        {
+            if (glId == null)
+            {
+                glId = TextureUtil.glGenTextures();
+            }
+
+            try
+            {
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, glId);
+
+                // TODO: Use render settings?
+                // Setup wrap mode
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+
+                //Setup texture scaling filtering
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+
+                //Send texel data to OpenGL
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, image.getWidth(), image.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+
+                result = new TextureImpl(glId, image, retainImage);
+            }
+            catch (Throwable t)
+            {
+                JourneyMap.getLogger().warn("Can't bind texture: " + t);
+            }
+        }
+
+        return result;
+    }
 }
