@@ -14,7 +14,9 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.JourneyMap;
@@ -31,9 +33,11 @@ import java.util.EnumSet;
 @SideOnly(Side.CLIENT)
 public class StateTickHandler implements EventHandlerManager.EventHandler
 {
+    static boolean javaChecked = false;
     Minecraft mc = FMLClientHandler.instance().getClient();
     int counter = 0;
     private boolean deathpointCreated;
+
 
     @SideOnly(Side.CLIENT)
     @Override
@@ -64,6 +68,11 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         else
         {
             deathpointCreated = false;
+        }
+
+        if (!javaChecked && mc.thePlayer != null && !mc.thePlayer.isDead)
+        {
+            checkJava();
         }
 
         try
@@ -132,6 +141,30 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         catch (Throwable t)
         {
             JourneyMap.getLogger().error("Unexpected Error in createDeathpoint(): " + LogFormatter.toString(t));
+        }
+    }
+
+    private void checkJava()
+    {
+        // Ensure Java 7
+        javaChecked = true;
+        try
+        {
+            Class.forName("java.util.Objects");
+        }
+        catch (ClassNotFoundException e)
+        {
+            try
+            {
+                String error = I18n.format("jm.error.java6");
+                FMLClientHandler.instance().getClient().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(error));
+                JourneyMap.getLogger().fatal("JourneyMap requires Java 7 or Java 8. Update your launcher profile to use a newer version of Java.");
+            }
+            catch (Exception e2)
+            {
+                e2.printStackTrace();
+            }
+            JourneyMap.disable();
         }
     }
 }

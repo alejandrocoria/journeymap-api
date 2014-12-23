@@ -194,6 +194,7 @@ jm.config.reset=Reset
 jm.config.reset.tooltip=Reset all options in this section back to their default values
 jm.config.tooltip_format=%1$s%2$s
 jm.error.compatability=Incompatability error running %1$s for Forge %2$s. Ensure your version of Forge is compatible.
+jm.error.java6=JourneyMap requires Java 7 or Java 8. Update your launcher profile to use a newer version of Java.
 jm.feature.fairplay=FairPlay
 jm.feature.unlimited=Unlimited
 jm.fullscreen.follow=Follow

@@ -59,7 +59,7 @@ import java.io.File;
  * @author Mark Woodman
  */
 @SideOnly(Side.CLIENT)
-@Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = "@JMVERSION@")
+@Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = "@JMVERSION@", canBeDeactivated = true)
 public class JourneyMap
 {
     public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
@@ -144,6 +144,14 @@ public class JourneyMap
         return INSTANCE.fullMapProperties;
     }
 
+    public static void disable()
+    {
+        INSTANCE.initialized = false;
+        EventHandlerManager.unregisterAll();
+        INSTANCE.stopMapping();
+        DataCache.instance().purge();
+    }
+
 //    public static MiniMapProperties getMiniMapProperties()
 //    {
 //        if (INSTANCE.miniMapProperties1.isActive())
@@ -226,7 +234,7 @@ public class JourneyMap
 
     public Boolean isMapping()
     {
-        return taskController != null && taskController.isMapping();
+        return initialized && taskController != null && taskController.isMapping();
     }
 
     public Boolean isThreadLogging()
@@ -380,7 +388,7 @@ public class JourneyMap
     {
         synchronized (this)
         {
-            if (mc == null || mc.theWorld == null)
+            if (mc == null || mc.theWorld == null || !initialized)
             {
                 return;
             }
@@ -487,6 +495,11 @@ public class JourneyMap
     {
         try
         {
+            if (!initialized)
+            {
+                return;
+            }
+
             if (mc == null)
             {
                 mc = FMLClientHandler.instance().getClient();
