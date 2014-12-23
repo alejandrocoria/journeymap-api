@@ -18,13 +18,16 @@ import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import net.techbrew.journeymap.ui.theme.Theme;
+import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -41,7 +44,7 @@ public class TextureCache
     private final Map<String, TextureImpl> entityIcons = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<String, Future<DelayedTexture>> regionImages = Collections.synchronizedMap(new HashMap<String, Future<DelayedTexture>>());
-    private final Set<Integer> regionGlIDs = new HashSet<Integer>();
+    private final Map<String, Long> regionImageUpdates = Collections.synchronizedMap(new HashMap<String, Long>());
     private ThreadPoolExecutor texExec = new ThreadPoolExecutor(0, 3, 30L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new JMThreadFactory("texture"));
 
     private TextureCache()
@@ -446,24 +449,20 @@ public class TextureCache
             {
                 if (future == null)
                 {
-                    future = prepareImage(null, img);
-                    regionImages.put(texName, future);
+                    future = cacheRegionTexture(texName, img);
                 }
                 else if (forceRefresh)
                 {
                     try
                     {
-                        DelayedTexture delayedTex = future.get();
-                        if (delayedTex.glId != null)
+                        if (future.isDone())
                         {
-                            regionGlIDs.add(delayedTex.glId);
-                            future = prepareImage(delayedTex.glId, img);
-                            regionImages.put(texName, future);
-                        }
-                        else
-                        {
-                            future = prepareImage(null, img);
-                            regionImages.put(texName, future);
+                            DelayedTexture delayedTex = future.get();
+                            Long lastUpdate = regionImageUpdates.get(texName);
+                            if (lastUpdate == null || System.currentTimeMillis() - 1000 > lastUpdate)
+                            {
+                                future = cacheRegionTexture(texName, img);
+                            }
                         }
                     }
                     catch (Throwable e)
@@ -499,6 +498,14 @@ public class TextureCache
 //        }
 
         return regionTexture;
+    }
+
+    private Future<DelayedTexture> cacheRegionTexture(String texName, BufferedImage img)
+    {
+        Future<DelayedTexture> future = prepareImage(null, img);
+        regionImages.put(texName, future);
+        regionImageUpdates.put(texName, System.currentTimeMillis());
+        return future;
     }
 
     /**
@@ -568,7 +575,26 @@ public class TextureCache
 
     public void purge()
     {
+        for (Future<DelayedTexture> future : regionImages.values())
+        {
+            if (future.isDone())
+            {
+                try
+                {
+                    Integer glId = future.get().glId;
+                    if (glId != null)
+                    {
+                        GL11.glDeleteTextures(glId);
+                    }
+                }
+                catch (Throwable e)
+                {
+                    JourneyMap.getLogger().warn("Can't delete region image texture: " + e);
+                }
+            }
+        }
 
+        regionImageUpdates.clear();
     }
 
     public void purgeThemeImages()
