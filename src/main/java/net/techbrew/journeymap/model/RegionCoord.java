@@ -176,10 +176,6 @@ public class RegionCoord implements Comparable<RegionCoord>
 
         RegionCoord that = (RegionCoord) o;
 
-        if (dimension != that.dimension)
-        {
-            return false;
-        }
         if (regionX != that.regionX)
         {
             return false;
@@ -188,11 +184,15 @@ public class RegionCoord implements Comparable<RegionCoord>
         {
             return false;
         }
+        if (!dimension.equals(that.dimension))
+        {
+            return false;
+        }
         if (vSlice != null ? !vSlice.equals(that.vSlice) : that.vSlice != null)
         {
             return false;
         }
-        if (worldDir != null ? !worldDir.equals(that.worldDir) : that.worldDir != null)
+        if (!worldDir.equals(that.worldDir))
         {
             return false;
         }
@@ -203,11 +203,11 @@ public class RegionCoord implements Comparable<RegionCoord>
     @Override
     public int hashCode()
     {
-        int result = worldDir != null ? worldDir.hashCode() : 0;
+        int result = worldDir.hashCode();
         result = 31 * result + regionX;
         result = 31 * result + regionZ;
         result = 31 * result + (vSlice != null ? vSlice.hashCode() : 0);
-        result = 31 * result + dimension;
+        result = 31 * result + dimension.hashCode();
         return result;
     }
 
