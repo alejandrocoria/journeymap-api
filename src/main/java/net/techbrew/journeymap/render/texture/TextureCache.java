@@ -25,10 +25,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 
 /**
  * TODO:  Make this actually act like a cache.
@@ -38,7 +35,6 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class TextureCache
 {
-
     private final Map<Name, TextureImpl> namedTextures = Collections.synchronizedMap(new HashMap<Name, TextureImpl>(Name.values().length + (Name.values().length / 2) + 1));
     //private final Map<String, TextureImpl> customTextures = Collections.synchronizedMap(new HashMap<String, TextureImpl>(3));
     private final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
@@ -46,7 +42,7 @@ public class TextureCache
     private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<String, Future<DelayedTexture>> regionImages = Collections.synchronizedMap(new HashMap<String, Future<DelayedTexture>>());
     private final Set<Integer> regionGlIDs = new HashSet<Integer>();
-    private ThreadPoolExecutor texExec = (ThreadPoolExecutor) Executors.newFixedThreadPool(3, new JMThreadFactory("texture"));
+    private ThreadPoolExecutor texExec = new ThreadPoolExecutor(0, 3, 30L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new JMThreadFactory("texture"));
 
     private TextureCache()
     {

@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 
 public class VersionCheck
 {
-    private static ExecutorService executorService;
+    private static volatile ExecutorService executorService;
     private static volatile Boolean updateCheckEnabled = JourneyMap.getCoreProperties().checkUpdates.get();
     private static volatile Boolean versionIsCurrent = true;
     private static volatile Boolean versionIsChecked;
@@ -127,6 +127,8 @@ public class VersionCheck
                             try
                             {
                                 in.close();
+                                executorService.shutdown();
+                                executorService = null;
                             }
                             catch (IOException e)
                             {

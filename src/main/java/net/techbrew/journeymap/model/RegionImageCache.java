@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 
 public class RegionImageCache
 {
-
     private static final int SIZE = 25;
     private static final long flushInterval = TimeUnit.SECONDS.toMillis(30);
     //private volatile Set<RegionCoord> dirty;
@@ -40,11 +39,8 @@ public class RegionImageCache
         //dirty = Collections.synchronizedSet(new HashSet<RegionCoord>(SIZE));
         lastFlush = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);
 
-        // Init thread factory
-        JMThreadFactory tf = new JMThreadFactory("rcache");
-
         // Add shutdown hook to flush cache to disk
-        Runtime.getRuntime().addShutdownHook(tf.newThread(new Runnable()
+        Runtime.getRuntime().addShutdownHook(new JMThreadFactory("rcache").newThread(new Runnable()
         {
             @Override
             public void run()
@@ -122,7 +118,7 @@ public class RegionImageCache
             {
                 final RegionCoord rCoord = cis.getCCoord().getRegionCoord();
                 final RegionImageSet ris = getRegionImageSet(rCoord);
-                ris.insertChunk(cis, forceFlush);
+                ris.insertChunk(cis);
             }
             if (forceFlush)
             {
