@@ -14,7 +14,6 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.StatTimer;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL30;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -66,13 +65,26 @@ public class DelayedTexture
             this.image = image;
             width = image.getWidth();
             height = image.getHeight();
-
             buffer = ByteBuffer.allocateDirect(width * height * 4);
-            byte data[] = (byte[]) image.getRaster().getDataElements(0, 0, width, height, null);
             buffer.clear();
-            buffer.put(data);
-            buffer.rewind();
 
+            int[] pixels = new int[width * height];
+            image.getRGB(0, 0, width, height, pixels, 0, width);
+            int pixel;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    pixel = pixels[y * width + x];
+                    buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red component
+                    buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green component
+                    buffer.put((byte) (pixel & 0xFF));             // Blue component
+                    buffer.put((byte) ((pixel >> 24) & 0xFF));     // Alpha component
+                }
+            }
+            buffer.flip();
+
+            buffer.rewind();
             timer.stop();
         }
     }
@@ -123,12 +135,12 @@ public class DelayedTexture
                 GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
 
                 //Setup texture scaling filtering
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_NEAREST);
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
                 GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 
                 //Send texel data to OpenGL
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, image.getWidth(), image.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-                GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
+                //GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
 
                 result = new TextureImpl(glId, image, retainImage);
             }

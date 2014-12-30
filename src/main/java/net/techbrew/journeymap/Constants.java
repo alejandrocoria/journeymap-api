@@ -200,4 +200,9 @@ public class Constants
         mp, sp
     }
 
+    public enum MapTileQuality
+    {
+        Low, High
+    }
+
 }

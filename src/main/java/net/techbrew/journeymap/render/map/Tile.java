@@ -10,6 +10,7 @@ package net.techbrew.journeymap.render.map;
 
 import com.google.common.base.Objects;
 import net.minecraft.world.ChunkCoordIntPair;
+import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
@@ -39,6 +40,7 @@ public class Tile
     final Point ulBlock;
     final Point lrBlock;
     final List<TileDrawStep> drawSteps = new ArrayList<TileDrawStep>();
+
     private final Logger logger = JourneyMap.getLogger();
     private final boolean debug = logger.isTraceEnabled();
     long lastImageTime = 0;
@@ -89,7 +91,7 @@ public class Tile
         return result;
     }
 
-    public boolean updateTexture(final TilePos pos, final MapType mapType, final Integer vSlice)
+    public boolean updateTexture(final TilePos pos, final MapType mapType, Constants.MapTileQuality quality, final Integer vSlice)
     {
         boolean forceReset = (lastMapType != mapType) || !Objects.equal(lastVSlice, vSlice);
         lastMapType = mapType;
@@ -104,7 +106,7 @@ public class Tile
 
         if (drawSteps.isEmpty())
         {
-            this.drawSteps.addAll(RegionImageHandler.getTileDrawSteps(worldDir, ulChunk, lrChunk, mapType, vSlice, dimension));
+            this.drawSteps.addAll(RegionImageHandler.getTileDrawSteps(worldDir, ulChunk, lrChunk, mapType, zoom, quality, vSlice, dimension));
         }
         else
         {

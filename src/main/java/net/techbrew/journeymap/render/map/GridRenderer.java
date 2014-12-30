@@ -12,6 +12,7 @@ import com.google.common.cache.Cache;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.MathHelper;
+import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
@@ -257,6 +258,7 @@ public class GridRenderer
         Integer hashCode;
 
         // Get tiles
+        Constants.MapTileQuality quality = JourneyMap.getCoreProperties().mapTileQuality.get();
         for (Map.Entry<TilePos, Integer> entry : grid.entrySet())
         {
             pos = entry.getKey();
@@ -273,7 +275,7 @@ public class GridRenderer
             // Update texture only if on-screen
             if (isOnScreen(pos))
             {
-                if (tile != null && tile.updateTexture(pos, this.mapType, vSlice))
+                if (tile != null && tile.updateTexture(pos, this.mapType, quality, vSlice))
                 {
                     updated = true;
                 }

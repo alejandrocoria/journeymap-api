@@ -16,13 +16,14 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageCache;
+import net.techbrew.journeymap.render.map.Tile;
 import net.techbrew.journeymap.render.map.TileDrawStep;
+import net.techbrew.journeymap.render.texture.TextureCache;
 import org.apache.logging.log4j.Level;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -130,12 +131,16 @@ public class RegionImageHandler
     public static BufferedImage createBlankImage(int width, int height)
     {
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics2D = img.createGraphics();
+        graphics2D.setFont(new Font("Arial", Font.BOLD, 18));
+        graphics2D.setBackground(Color.black);
+        graphics2D.setColor(Color.yellow);
+        graphics2D.drawString("BLANK", 0, 0);
         return img;
     }
 
-    public static BufferedImage readRegionImage(File regionFile, RegionCoord rCoord, int sampling, boolean legacy, boolean returnNull)
+    public static BufferedImage readRegionImage(File regionFile, boolean returnNull)
     {
-
         FileInputStream fis = null;
         BufferedImage image = null;
 
@@ -143,7 +148,7 @@ public class RegionImageHandler
         {
             try
             {
-                image = ImageIO.read(new BufferedInputStream(new FileInputStream(regionFile)));
+                image = ImageIO.read(regionFile);
             }
             catch (Exception e)
             {
@@ -156,14 +161,7 @@ public class RegionImageHandler
         {
             if (!returnNull)
             {
-                if (legacy)
-                {
-                    image = createBlankImage(1024, 512);
-                }
-                else
-                {
-                    image = createBlankImage(512, 512);
-                }
+                image = createBlankImage(512, 512);
             }
         }
         return image;
@@ -232,7 +230,7 @@ public class RegionImageHandler
                 }
                 else
                 {
-                    regionImage = RegionImageHandler.readRegionImage(RegionImageHandler.getRegionImageFile(rc, mapType, false), rc, 1, false, true);
+                    regionImage = RegionImageHandler.readRegionImage(RegionImageHandler.getRegionImageFile(rc, mapType, false), false);
                 }
 
                 if (regionImage == null)
@@ -322,18 +320,87 @@ public class RegionImageHandler
 
     }
 
+    public static BufferedImage getScaledRegionArea(final RegionCoord rCoord, final MapType mapType, final int zoom, Constants.MapTileQuality quality, int x1, int y1)
+    {
+        RegionImageCache cache = RegionImageCache.getInstance();
+        BufferedImage regionImage = null;
+
+        if (cache.contains(rCoord))
+        {
+            regionImage = cache.getGuaranteedImage(rCoord, mapType);
+        }
+        else
+        {
+            File regionFile = RegionImageHandler.getRegionImageFile(rCoord, mapType, false);
+            if (regionFile.canRead())
+            {
+                regionImage = RegionImageHandler.readRegionImage(regionFile, true);
+            }
+        }
+
+        if (regionImage == null)
+        {
+            return null;
+        }
+
+        if (zoom == 0) // TODO: When min zoom changes, this needs to change too
+        {
+            return regionImage;
+        }
+
+        if (quality == Constants.MapTileQuality.Low)
+        {
+            return regionImage;
+        }
+
+        int scale = (int) Math.pow(2, zoom);
+        BufferedImage scaledImage = null;
+        int scaledSize = Tile.TILESIZE / scale;
+
+        try
+        {
+            BufferedImage subImage = regionImage.getSubimage(x1, y1, scaledSize, scaledSize);
+            scaledImage = new BufferedImage(Tile.TILESIZE, Tile.TILESIZE, BufferedImage.TYPE_INT_ARGB);
+            final Graphics2D g = initRenderingHints(scaledImage.createGraphics());
+            g.drawImage(subImage, 0, 0, Tile.TILESIZE, Tile.TILESIZE, null);
+            g.dispose();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            boolean good = false;
+        }
+        return scaledImage;
+
+        /**
+         BufferedImage image = new BufferedImage(regionImage.getWidth(), regionImage.getHeight(), regionImage.getType());
+         final Graphics2D g2D = initRenderingHints(image.createGraphics());
+
+
+         g2D.drawImage(regionImage, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
+         //g2D.drawImage(regionImage, 0, 0, 512, 512, sx1, sy1, sx2, sy2, Color.yellow, null);
+         g2D.drawImage(regionImage, sx1, sy1, sx2-sx1, sy2-sy1,null);
+         g2D.dispose();
+
+         return image;
+         */
+    }
+
+
     /**
      * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2).
      */
     public static synchronized List<TileDrawStep> getTileDrawSteps(final File worldDir, final ChunkCoordIntPair startCoord,
                                                                    final ChunkCoordIntPair endCoord, final Constants.MapType mapType,
-                                                                   Integer vSlice, final int dimension)
+                                                                   Integer zoom, Constants.MapTileQuality quality, Integer vSlice, final int dimension)
     {
         boolean isUnderground = mapType.equals(Constants.MapType.underground);
         if (!isUnderground)
         {
             vSlice = null;
         }
+
+        TextureCache tc = TextureCache.instance();
 
         final int rx1 = RegionCoord.getRegionPos(startCoord.chunkXPos);
         final int rx2 = RegionCoord.getRegionPos(endCoord.chunkXPos);
@@ -364,15 +431,23 @@ public class RegionImageHandler
 
                 xoffset = startCoord.chunkXPos * 16;
                 yoffset = startCoord.chunkZPos * 16;
-                dx1 = (startCoord.chunkXPos * 16) - xoffset;
-                dy1 = (startCoord.chunkZPos * 16) - yoffset;
-                dx2 = dx1 + ((endCoord.chunkXPos - startCoord.chunkXPos + 1) * 16);
-                dy2 = dy1 + ((endCoord.chunkZPos - startCoord.chunkZPos + 1) * 16);
+//                dx1 = (startCoord.chunkXPos * 16) - xoffset;
+//                dy1 = (startCoord.chunkZPos * 16) - yoffset;
+//                dx2 = dx1 + ((endCoord.chunkXPos - startCoord.chunkXPos + 1) * 16);
+//                dy2 = dy1 + ((endCoord.chunkZPos - startCoord.chunkZPos + 1) * 16);
 
                 // TODO: Pool these?
                 TileDrawStep drawStep = new TileDrawStep();
-                drawStep.setContext(mapType, rc, false);
-                drawStep.setCoordinates(dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2);
+                drawStep.setContext(mapType, rc, zoom, false);
+                drawStep.setCoordinates(sx1, sy1, sx2, sy2);
+
+                BufferedImage image = null;
+                String hash = TextureCache.getScaledRegionAreaHash(rc, mapType, zoom, quality, sx1, sy1);
+                if (!tc.hasRegionTexture(hash))
+                {
+                    image = RegionImageHandler.getScaledRegionArea(rc, mapType, zoom, quality, sx1, sy1);
+                }
+                drawStep.setTexture(tc.getRegionTexture(hash, false, image));
                 drawSteps.add(drawStep);
             }
         }

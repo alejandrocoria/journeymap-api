@@ -54,7 +54,7 @@ public class RegionImageSet extends ImageSet
             // Check for new region file
             imageFile = RegionImageHandler.getRegionImageFile(rCoord, mapType, false);
             boolean useLegacy = !imageFile.exists();
-            image = RegionImageHandler.readRegionImage(imageFile, rCoord, 1, false, false);
+            image = RegionImageHandler.readRegionImage(imageFile, false);
 
             // Add wrapper
             wrapper = addWrapper(mapType, imageFile, image);
@@ -69,7 +69,7 @@ public class RegionImageSet extends ImageSet
             {
 
                 // Get image for wrapper from legacy
-                BufferedImage legacyImage = RegionImageHandler.readRegionImage(legacyFile, rCoord, 1, true, false);
+                BufferedImage legacyImage = RegionImageHandler.readRegionImage(legacyFile, false);
                 wrapper.setImage(getSubimage(rCoord, mapType, legacyImage));
 
                 // Add other wrappers for day/night

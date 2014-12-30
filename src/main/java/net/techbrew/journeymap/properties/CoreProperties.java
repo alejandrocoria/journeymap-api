@@ -10,6 +10,7 @@ package net.techbrew.journeymap.properties;
 
 import com.google.common.base.Objects;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.properties.config.Config;
@@ -117,6 +118,9 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
 
     @Config(category = Advanced, key = "jm.advanced.tile_render_type", minValue = 1, maxValue = 4, defaultValue = 1)
     public final AtomicInteger tileRenderType = new AtomicInteger(1);
+
+    @Config(category = Advanced, key = "jm.advanced.tile_render_quality", defaultEnum = "High")
+    public final AtomicReference<Constants.MapTileQuality> mapTileQuality = new AtomicReference<Constants.MapTileQuality>(Constants.MapTileQuality.High);
 
     public final AtomicReference<String> renderOverlayEventTypeName = new AtomicReference<String>(RenderGameOverlayEvent.ElementType.ALL.name());
     public final AtomicBoolean renderOverlayPreEvent = new AtomicBoolean(true);

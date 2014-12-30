@@ -84,6 +84,15 @@ public class TextureCache
 //    }
 
     /**
+     * *************************************************
+     */
+
+    public static String getScaledRegionAreaHash(final RegionCoord rCoord, final Constants.MapType mapType, final int zoom, Constants.MapTileQuality quality, int sx1, int sy1)
+    {
+        return String.format("%s%s/%s_%s/%s,%s", rCoord, mapType, zoom, quality, sx1, sy1);
+    }
+
+    /**
      * *********************************************
      */
 
@@ -423,65 +432,53 @@ public class TextureCache
         }
     }
 
-    /**
-     * *************************************************
-     */
-
     public boolean hasRegionTexture(RegionCoord regionCoord, Constants.MapType mapType)
+    {
+        return hasRegionTexture(getScaledRegionAreaHash(regionCoord, mapType, 0, Constants.MapTileQuality.High, 0, 0));
+    }
+
+    public boolean hasRegionTexture(String hash)
     {
         synchronized (regionImages)
         {
-            return regionImages.containsKey(mapType.name() + regionCoord.hashCode());
+            return regionImages.containsKey(hash);
         }
     }
 
-    public TextureImpl getRegionTexture(RegionCoord regionCoord, Constants.MapType mapType, boolean forceRefresh, BufferedImage img)
+    public TextureImpl getRegionTexture(String hash, boolean forceRefresh, BufferedImage img)
     {
-        String texName = mapType.name() + regionCoord.hashCode();
         Future<DelayedTexture> future = null;
         TextureImpl regionTexture = null;
 
         synchronized (regionImages)
         {
-            future = regionImages.get(texName);
+            future = regionImages.get(hash);
 
-            if (img != null)
+            if (future == null && img != null)
             {
-                if (future == null)
+                future = cacheRegionTexture(null, hash, img);
+            }
+            else if (future != null && forceRefresh)
+            {
+                try
                 {
-                    future = cacheRegionTexture(texName, img);
-                }
-                else if (forceRefresh)
-                {
-                    try
+                    if (future.isDone())
                     {
-                        if (future.isDone())
+                        Long lastUpdate = regionImageUpdates.get(hash);
+                        if (lastUpdate == null || System.currentTimeMillis() - 1000 > lastUpdate)
                         {
-                            DelayedTexture delayedTex = future.get();
-                            Long lastUpdate = regionImageUpdates.get(texName);
-                            if (lastUpdate == null || System.currentTimeMillis() - 1000 > lastUpdate)
-                            {
-                                future = cacheRegionTexture(texName, img);
-                            }
+                            future = cacheRegionTexture(future.get().glId, hash, img);
                         }
                     }
-                    catch (Throwable e)
-                    {
-                        JourneyMap.getLogger().warn(String.format("Error getting region texture during forceRefresh for %s %s: %s", mapType, regionCoord, e));
-                    }
                 }
-            }
-            else
-            {
-                JourneyMap.getLogger().info(String.format("No image provided for missing texture for %s %s", mapType, regionCoord));
+                catch (Throwable e)
+                {
+                    JourneyMap.getLogger().warn(String.format("Error getting scaled region texture during forceRefresh (%s): %s", hash, e));
+                }
             }
         }
 
-        if (future == null)
-        {
-            JourneyMap.getLogger().info(String.format("Error getting future for %s %s", mapType, regionCoord));
-        }
-        else //if(future.isDone())
+        if (future != null)
         {
             try
             {
@@ -489,7 +486,7 @@ public class TextureCache
             }
             catch (Exception e)
             {
-                JourneyMap.getLogger().warn(String.format("Can't bind region texture for %s %s: %s", mapType, regionCoord, e));
+                JourneyMap.getLogger().warn(String.format("Can't bind scaled region texture during forceRefresh (%s): %s", hash, e));
             }
         }
 //        else
@@ -500,9 +497,9 @@ public class TextureCache
         return regionTexture;
     }
 
-    private Future<DelayedTexture> cacheRegionTexture(String texName, BufferedImage img)
+    private Future<DelayedTexture> cacheRegionTexture(Integer glId, String texName, BufferedImage img)
     {
-        Future<DelayedTexture> future = prepareImage(null, img);
+        Future<DelayedTexture> future = prepareImage(glId, img);
         regionImages.put(texName, future);
         regionImageUpdates.put(texName, System.currentTimeMillis());
         return future;

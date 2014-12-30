@@ -60,6 +60,26 @@ public class RegionImageCache
         return Holder.INSTANCE;
     }
 
+    public static TextureImpl getRegionTexture(RegionCoord rCoord, Constants.MapType mapType, Integer zoom, Constants.MapTileQuality quality, int sx1, int sy1, boolean forceRefresh)
+    {
+        TextureCache tc = TextureCache.instance();
+        String hash = TextureCache.getScaledRegionAreaHash(rCoord, mapType, zoom, quality, sx1, sy1);
+        if (forceRefresh || !tc.hasRegionTexture(hash))
+        {
+            BufferedImage image = RegionImageHandler.getScaledRegionArea(rCoord, mapType, zoom, quality, sx1, sy1);
+            if (image == null)
+            {
+                return null;
+            }
+            return tc.getRegionTexture(hash, true, image);
+
+        }
+        else
+        {
+            return tc.getRegionTexture(hash, false, null);
+        }
+    }
+
     private RegionImageSet getRegionImageSet(RegionCoord rCoord)
     {
         synchronized (lock)
@@ -90,19 +110,6 @@ public class RegionImageCache
         }
     }
 
-    public TextureImpl getRegionTexture(RegionCoord rCoord, Constants.MapType mapType, boolean forceRefresh)
-    {
-        TextureCache tc = TextureCache.instance();
-        if (!tc.hasRegionTexture(rCoord, mapType) || forceRefresh)
-        {
-            return tc.getRegionTexture(rCoord, mapType, forceRefresh, getGuaranteedImage(rCoord, mapType));
-        }
-        else
-        {
-            return tc.getRegionTexture(rCoord, mapType, false, null);
-        }
-    }
-
     public BufferedImage getGuaranteedImage(RegionCoord rCoord, Constants.MapType mapType)
     {
         RegionImageSet ris = getRegionImageSet(rCoord);
@@ -111,7 +118,6 @@ public class RegionImageCache
 
     public void putAll(final Collection<ChunkImageSet> chunkImageSets, boolean forceFlush)
     {
-        final RegionImageHandler rfh = RegionImageHandler.getInstance();
         synchronized (lock)
         {
             for (ChunkImageSet cis : chunkImageSets)
@@ -148,7 +154,6 @@ public class RegionImageCache
 
     public void flushToDisk()
     {
-        RegionImageHandler rfh = RegionImageHandler.getInstance();
         synchronized (lock)
         {
             for (RegionImageSet ris : imageSets.values())
