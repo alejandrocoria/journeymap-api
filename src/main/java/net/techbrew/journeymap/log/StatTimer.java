@@ -53,8 +53,8 @@ public class StatTimer
         this.name = name;
         this.warmupCount = warmupCount;
         this.disposable = disposable;
-        this.doWarmup = warmupCount>0;
-        this.warmup = warmupCount>0;
+        this.doWarmup = warmupCount > 0;
+        this.warmup = warmupCount > 0;
     }
 
     /**
@@ -335,14 +335,14 @@ public class StatTimer
                 final StringBuilder sb = new StringBuilder(name).append(" ");
                 if (count > 1)
                 {
-                    sb.append("count: ").append(count);
+                    sb.append("count: ").append(count).append(", ");
                 }
                 sb.append("time: ").append(df.format(total) + "ms");
                 if (count > 1)
                 {
-                    sb.append("min: ").append(df.format(min) + "ms");
-                    sb.append("max: ").append(df.format(max) + "ms");
-                    sb.append("avg: ").append(df.format(avg) + "ms");
+                    sb.append(", min: ").append(df.format(min) + "ms");
+                    sb.append(", max: ").append(df.format(max) + "ms");
+                    sb.append(", avg: ").append(df.format(avg) + "ms");
                 }
                 if (maxed)
                 {
@@ -355,5 +355,10 @@ public class StatTimer
         {
             return String.format("StatTimer '%s' encountered an error getting its simple report: %s", name, t);
         }
+    }
+
+    public String getName()
+    {
+        return name;
     }
 }
