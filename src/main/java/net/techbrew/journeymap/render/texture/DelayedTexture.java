@@ -9,130 +9,34 @@
 package net.techbrew.journeymap.render.texture;
 
 
-import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.log.LogFormatter;
-import org.lwjgl.opengl.GL11;
-
 import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
 
 /**
- * Created by mwoodman on 12/22/13.
+ * Supports deferred bindings.
  */
 public class DelayedTexture extends TextureImpl
 {
-    private final Object lock = new Object();
-    private ByteBuffer buffer = ByteBuffer.allocateDirect(512 * 512 * 4);
-
-    private boolean rebindNeeded;
-
     /**
-     * Can be safely called without the OpenGL Context.
+     * Safe to call on non-GL Context thread, but bindTexture() must be called later.
      */
     public DelayedTexture()
     {
+        super(null, null, false, false);
     }
 
     /**
-     * Can be safely called without the OpenGL Context.
+     * Safe to call on non-GL Context thread, but bindTexture() must be called later.
      */
-    public DelayedTexture(Integer glId, BufferedImage image)
+    public DelayedTexture(BufferedImage image)
     {
-        super(glId, image, true);
-        setImage(image);
+        super(null, image, false, false);
     }
 
     /**
-     * Can be safely called without the OpenGL Context.
+     * Safe to call on non-GL Context thread, but bindTexture() must be called later.
      */
-    public void setImage(BufferedImage image)
+    public DelayedTexture(Integer glID, BufferedImage image)
     {
-        synchronized (lock)
-        {
-            this.image = image;
-            width = image.getWidth();
-            height = image.getHeight();
-            if (buffer.capacity() < (width * height * 4))
-            {
-                buffer = ByteBuffer.allocateDirect(width * height * 4);
-            }
-            buffer.clear();
-
-            int[] pixels = new int[width * height];
-            image.getRGB(0, 0, width, height, pixels, 0, width);
-            int pixel;
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    pixel = pixels[y * width + x];
-                    buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red component
-                    buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green component
-                    buffer.put((byte) (pixel & 0xFF));             // Blue component
-                    buffer.put((byte) ((pixel >> 24) & 0xFF));     // Alpha component
-                }
-            }
-            buffer.flip();
-            buffer.rewind();
-            rebindNeeded = true;
-        }
+        super(glID, image, false, false);
     }
-
-    @Override
-    public boolean isBound()
-    {
-        return glTextureId != -1;
-    }
-
-    public boolean isRebindNeeded()
-    {
-        return rebindNeeded;
-    }
-
-    /**
-     * Must be called on same thread as OpenGL Context
-     *
-     * @return
-     */
-    public void bindTexture()
-    {
-        synchronized (lock)
-        {
-            if (rebindNeeded)
-            {
-                try
-                {
-                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, getGlTextureId());
-
-                    //Send texel data to OpenGL
-
-                    // Setup wrap mode
-                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
-
-                    //Setup texture scaling filtering
-                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-
-                    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-
-                    int glErr = GL11.glGetError();
-                    if (glErr != GL11.GL_NO_ERROR)
-                    {
-                        JourneyMap.getLogger().warn("GL Error in DelayedTexture after glTexImage2D: " + glErr);
-                    }
-                    else
-                    {
-                        rebindNeeded = false;
-                    }
-                }
-                catch (Throwable t)
-                {
-                    JourneyMap.getLogger().warn("Can't bind texture: " + LogFormatter.toString(t));
-                }
-            }
-        }
-    }
-
-
 }

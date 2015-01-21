@@ -212,7 +212,7 @@ public class GridRenderer
         return true;
     }
 
-    public boolean updateTiles(MapType mapType, Integer vSlice, int width, int height, boolean fullUpdate, double xOffset, double yOffset, boolean async)
+    public boolean updateTiles(MapType mapType, Integer vSlice, int width, int height, boolean fullUpdate, double xOffset, double yOffset)
     {
         // Update screen dimensions
         updateBounds(width, height);
@@ -289,7 +289,7 @@ public class GridRenderer
             // Update texture only if on-screen
             if (isOnScreen(pos))
             {
-                if (tile != null && tile.updateTexture(pos, this.mapType, quality, vSlice, async))
+                if (tile != null && tile.updateTexture(pos, this.mapType, quality, vSlice))
                 {
                     updated = true;
                 }

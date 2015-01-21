@@ -38,7 +38,6 @@ public class TileDrawStep
     private Integer zoom;
     private Constants.MapTileQuality quality;
     private StatTimer drawTimer;
-    private boolean async = false;
 
     public TileDrawStep(RegionCoord regionCoord, final Constants.MapType mapType, Integer zoom, int sx1, int sy1, int sx2, int sy2)
     {
@@ -50,7 +49,7 @@ public class TileDrawStep
         this.sy1 = sy1;
         this.sy2 = sy2;
         this.size = sx2 - sx1;
-        updateTexture(async);
+        updateTexture();
     }
 
     public static int toHashCode(RegionCoord regionCoord, final Constants.MapType mapType, Integer zoom, int sx1, int sy1, int sx2, int sy2)
@@ -58,10 +57,8 @@ public class TileDrawStep
         return Objects.hashCode(regionCoord, mapType, zoom, sx1, sy1, sx2, sy2);
     }
 
-    void updateTexture(boolean async)
+    void updateTexture()
     {
-        this.async = async;
-
         Constants.MapTileQuality newQuality = JourneyMap.getCoreProperties().mapTileQuality.get();
         if (newQuality != this.quality)
         {
@@ -86,34 +83,16 @@ public class TileDrawStep
             regionTextureId = regionTexture.getGlTextureId();
         }
 
-        if (async)
+        try
         {
-            try
+            if (quality == Constants.MapTileQuality.High && (zoom != 0)) // todo change when zoom can be < zero or 0 no longer 1:1
             {
-                if (quality == Constants.MapTileQuality.High && (zoom != 0)) // todo change when zoom can be < zero or 0 no longer 1:1
-                {
-                    pendingScaledTexture = TextureCache.instance().scheduleTextureTask(createDelayedScaledTexture());
-                }
-            }
-            catch (Exception e)
-            {
-                JourneyMap.getLogger().warn(String.format("Con't get sync texture for %s : %s", this, e));
+                pendingScaledTexture = TextureCache.instance().scheduleTextureTask(createDelayedScaledTexture());
             }
         }
-        else
+        catch (Exception e)
         {
-            try
-            {
-                if (quality == Constants.MapTileQuality.High && (zoom != 0)) // todo change when zoom can be < zero or 0 no longer 1:1
-                {
-                    scaledTexture = createDelayedScaledTexture().call();
-                    scaledTexture.bindTexture();
-                }
-            }
-            catch (Exception e)
-            {
-                JourneyMap.getLogger().warn(String.format("Con't get sync texture for %s : %s", this, e));
-            }
+            JourneyMap.getLogger().warn(String.format("Con't get sync texture for %s : %s", this, e));
         }
     }
 
@@ -210,7 +189,7 @@ public class TileDrawStep
             tessellator.draw();
         }
 
-        if (true) // todo
+        if (debug) // todo
         {
             DrawUtil.drawRectangle(startX, startY, 2, endV * 512, Color.green, 200);
             DrawUtil.drawRectangle(startX, startY, endU * 512, 2, Color.red, 200);
@@ -261,12 +240,11 @@ public class TileDrawStep
         }
     }
 
-    public void refreshIfDirty(boolean async)
+    public void refreshIfDirty()
     {
         if (scaledTexture == null || RegionImageCache.getInstance().isDirtySince(regionCoord, mapType, scaledTexture.getLastUpdated()))
         {
-            this.async = async;
-            updateTexture(async);
+            updateTexture();
         }
     }
 

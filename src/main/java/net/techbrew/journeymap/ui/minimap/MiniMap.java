@@ -66,7 +66,6 @@ public class MiniMap
     private Rectangle2D.Double centerRect;
 
     private long initTime;
-    private boolean asyncTileRefresh = true;
 
     /**
      * Default constructor
@@ -98,7 +97,7 @@ public class MiniMap
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
         gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
         boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || miniMapProperties.showCaves.get());
-        gridRenderer.updateTiles(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0, asyncTileRefresh);
+        gridRenderer.updateTiles(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 
     }
 
@@ -167,7 +166,7 @@ public class MiniMap
             if (moved || doStateRefresh)
             {
                 boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || miniMapProperties.showCaves.get());
-                gridRenderer.updateTiles(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh || preview, 0, 0, asyncTileRefresh);
+                gridRenderer.updateTiles(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, doStateRefresh || preview, 0, 0);
             }
 
             if (doStateRefresh)

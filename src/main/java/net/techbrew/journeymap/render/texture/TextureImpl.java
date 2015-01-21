@@ -10,11 +10,9 @@ package net.techbrew.journeymap.render.texture;
 
 import com.google.common.base.Objects;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.log.StatTimer;
-import org.lwjgl.BufferUtils;
+import net.techbrew.journeymap.log.LogFormatter;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.image.BufferedImage;
@@ -22,127 +20,157 @@ import java.nio.ByteBuffer;
 
 public class TextureImpl extends AbstractTexture
 {
-
-    //private static final IntBuffer dataBuffer = GLAllocation.createDirectIntBuffer(4194304);
-
+    protected final Object lock = new Object();
+    protected BufferedImage image;
+    protected boolean retainImage;
     protected int width;
     protected int height;
-    protected boolean retainImage;
     protected float alpha;
+    protected long lastUpdated;
+    protected String description;
+
+    protected ByteBuffer buffer;
+    protected boolean bindNeeded;
+
     /**
-     * optionally-retained image *
+     * Must be called on thread with OpenGL Context.  Texture is immediately bound.
      */
-    protected BufferedImage image;
-    protected volatile boolean unbound;
-
-    private long lastUpdated;
-    private String description;
-
-    protected TextureImpl()
-    {
-    }
-
     public TextureImpl(BufferedImage image)
     {
-        this(image, false);
+        this(null, image, false, true);
     }
 
+    /**
+     * Must be called on thread with OpenGL Context.  Texture is immediately bound.
+     */
     public TextureImpl(BufferedImage image, boolean retainImage)
     {
-        this.retainImage = retainImage;
-        this.width = image.getWidth();
-        this.height = image.getHeight();
-        updateTexture(image, true);
+        this(null, image, retainImage, true);
     }
 
-    TextureImpl(Integer glId, BufferedImage image, boolean retainImage)
+    /**
+     * If bindImmediately, must be called on thread with OpenGL Context.
+     */
+    public TextureImpl(Integer glId, BufferedImage image, boolean retainImage)
+    {
+        this(glId, image, retainImage, true);
+    }
+
+    /**
+     * If bindImmediately, must be called on thread with OpenGL Context.
+     */
+    protected TextureImpl(Integer glId, BufferedImage image, boolean retainImage, boolean bindImmediately)
     {
         if (glId != null)
         {
             this.glTextureId = glId;
         }
-        this.retainImage = retainImage;
-        this.image = image;
-        this.width = image.getWidth();
-        this.height = image.getHeight();
+
+        if (image != null)
+        {
+            setImage(image, retainImage);
+        }
+
+        if (bindImmediately)
+        {
+            bindTexture();
+            buffer = null;
+        }
     }
 
-    private static void uploadTextureImageSubImpl(BufferedImage image, int par1, int par2, boolean par3, boolean par4)
+    /**
+     * Can be safely called without the OpenGL Context.
+     */
+    public void setImage(BufferedImage bufferedImage, boolean retainImage)
     {
-        int var5 = image.getWidth();
-        int var6 = image.getHeight();
-        int var7 = 4194304 / var5;
-        int[] var8 = new int[var7 * var5];
-
-
-        int[] pixels = new int[image.getWidth() * image.getHeight()];
-        image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
-
-        ByteBuffer buffer = BufferUtils.createByteBuffer(image.getWidth() * image.getHeight() * 4); //4 for RGBA, 3 for RGB
-
-        for (int y = 0; y < image.getHeight(); y++)
+        synchronized (lock)
         {
-            for (int x = 0; x < image.getWidth(); x++)
+            this.retainImage = retainImage;
+            if (retainImage)
             {
-                int pixel = pixels[y * image.getWidth() + x];
-                buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red component
-                buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green component
-                buffer.put((byte) (pixel & 0xFF));               // Blue component
-                buffer.put((byte) ((pixel >> 24) & 0xFF));    // Alpha component. Only for RGBA
+                this.image = bufferedImage;
+            }
+
+            this.width = bufferedImage.getWidth();
+            this.height = bufferedImage.getHeight();
+            int bufferSize = width * height * 4; // RGBA
+
+            if (buffer == null || (buffer.capacity() != bufferSize))
+            {
+                buffer = ByteBuffer.allocateDirect(bufferSize);
+            }
+            buffer.clear();
+
+            int[] pixels = new int[width * height];
+            bufferedImage.getRGB(0, 0, width, height, pixels, 0, width);
+            int pixel;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    pixel = pixels[y * width + x];
+                    buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red
+                    buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green
+                    buffer.put((byte) ((pixel & 0xFF)));           // Blue
+                    buffer.put((byte) ((pixel >> 24) & 0xFF));     // Alpha
+                }
+            }
+            buffer.flip();
+            buffer.rewind();
+            bindNeeded = true;
+        }
+    }
+
+    /**
+     * Must be called on same thread as OpenGL Context
+     *
+     * @return
+     */
+    public void bindTexture()
+    {
+        synchronized (lock)
+        {
+            if (bindNeeded)
+            {
+                try
+                {
+                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, getGlTextureId());
+
+                    //Send texel data to OpenGL
+
+                    // Setup wrap mode
+                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+
+                    //Setup texture scaling filtering
+                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+
+                    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+
+                    int glErr = GL11.glGetError();
+                    if (glErr != GL11.GL_NO_ERROR)
+                    {
+                        JourneyMap.getLogger().warn("GL Error in TextureImpl after glTexImage2D: " + glErr);
+                    }
+                    else
+                    {
+                        bindNeeded = false;
+                        setLastUpdated(System.currentTimeMillis());
+                    }
+                }
+                catch (Throwable t)
+                {
+                    JourneyMap.getLogger().warn("Can't bind texture: " + LogFormatter.toString(t));
+                }
             }
         }
-
-        buffer.flip(); //FOR THE LOVE OF GOD DO NOT FORGET THIS
-
-        setTextureBlurred(par3);
-        setTextureClamped(par4);
-        StatTimer timer = StatTimer.get("TextureImpl.updateTexture.bind");
-        timer.start();
-        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, image.getWidth(), image.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-        timer.stop();
     }
 
-    private static void setTextureClamped(boolean par0)
+    public boolean isBindNeeded()
     {
-        if (par0)
-        {
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP);
-        }
-        else
-        {
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
-        }
+        return bindNeeded;
     }
-
-    private static void setTextureBlurred(boolean par0)
-    {
-        if (par0)
-        {
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-        }
-        else
-        {
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-        }
-    }
-
-//    private static void copyToBuffer(int[] par0ArrayOfInteger, int par1)
-//    {
-//        copyToBufferPos(par0ArrayOfInteger, 0, par1);
-//    }
-//
-//    private static void copyToBufferPos(int[] par0ArrayOfInteger, int par1, int par2)
-//    {
-//        int[] var3 = par0ArrayOfInteger;
-//
-//        dataBuffer.clear();
-//        dataBuffer.put(var3, par1, par2);
-//        dataBuffer.position(0).limit(par2);
-//    }
 
     public String getDescription()
     {
@@ -154,71 +182,33 @@ public class TextureImpl extends AbstractTexture
         this.description = description;
     }
 
-    protected void updateTexture(BufferedImage updatedImage, boolean allocateMemory)
-    {
-        if (updatedImage.getWidth() != width || updatedImage.getHeight() != height)
-        {
-            throw new IllegalArgumentException("Image dimensions don't match");
-        }
-        if (retainImage)
-        {
-            this.image = updatedImage;
-        }
-        try
-        {
-            int glId = getGlTextureId();
-            if (allocateMemory)
-            {
-                TextureUtil.uploadTextureImage(glId, updatedImage);
-            }
-            else
-            {
-                GL11.glBindTexture(GL11.GL_TEXTURE_2D, glId);
-                uploadTextureImageSubImpl(updatedImage, 0, 0, false, false);
-            }
-            lastUpdated = System.currentTimeMillis();
-        }
-        catch (RuntimeException e)
-        {
-            if (e.getMessage().startsWith("No OpenGL context"))
-            {
-                this.unbound = true;
-            }
-            else
-            {
-                JourneyMap.getLogger().error("Failed to upload/bind texture: " + e.getMessage());
-            }
-        }
-    }
-
+    /**
+     * Must be called on same thread as OpenGL Context
+     */
     public void updateTexture(BufferedImage image)
     {
         updateTexture(image, retainImage);
     }
 
-    @Override
-    public int getGlTextureId()
+    /**
+     * Must be called on same thread as OpenGL Context
+     */
+    public void updateTexture(BufferedImage image, boolean retainImage)
     {
-        int glId = super.getGlTextureId();
-        if (unbound && image != null)
-        {
-            try
-            {
-                TextureUtil.uploadTextureImage(glId, image);
-                unbound = false;
-            }
-            catch (Exception e)
-            {
-                JourneyMap.getLogger().error("Couldn't use deferred binding: " + e.getMessage());
-            }
-        }
-        return glId;
+        setImage(image, retainImage);
+        bindTexture();
     }
 
-    public boolean isBound()
-    {
-        return !unbound;
-    }
+//    @Override
+//    public int getGlTextureId()
+//    {
+//        int glId = super.getGlTextureId();
+//        if (bindNeeded)
+//        {
+//            bindTexture();
+//        }
+//        return glId;
+//    }
 
     public boolean hasImage()
     {
@@ -230,13 +220,33 @@ public class TextureImpl extends AbstractTexture
         return image;
     }
 
+    public boolean isUnused()
+    {
+        return this.glTextureId == -1 && lastUpdated == 0;
+    }
+
+    /**
+     * Does not delete GLID - use with caution
+     */
     public void clear()
     {
         this.image = null;
-        this.unbound = true;
+        this.buffer = null;
+        this.bindNeeded = true;
         this.glTextureId = -1;
     }
 
+    /**
+     * May be called without GL Context on current thread.
+     */
+    public int getSafeGlTextureId()
+    {
+        return this.glTextureId;
+    }
+
+    /**
+     * Must be called on same thread as OpenGL Context
+     */
     public boolean deleteTexture()
     {
         if (this.glTextureId != -1)
@@ -274,11 +284,11 @@ public class TextureImpl extends AbstractTexture
     {
     }
 
-
     @Override
     public String toString()
     {
         return Objects.toStringHelper(this)
+                .add("glid", glTextureId)
                 .add("description", description)
                 .add("lastUpdated", lastUpdated)
                 .toString();
@@ -323,19 +333,6 @@ public class TextureImpl extends AbstractTexture
     public void setHeight(int height)
     {
         this.height = height;
-    }
-
-    /**
-     * keep image with object
-     */
-    public boolean isRetainImage()
-    {
-        return retainImage;
-    }
-
-    public void setRetainImage(boolean retainImage)
-    {
-        this.retainImage = retainImage;
     }
 
     public float getAlpha()

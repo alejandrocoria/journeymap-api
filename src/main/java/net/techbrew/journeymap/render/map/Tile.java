@@ -85,7 +85,7 @@ public class Tile
         return Objects.hashCode(tileX, tileZ, zoom, dimension);
     }
 
-    public boolean updateTexture(final TilePos pos, final MapType mapType, Constants.MapTileQuality quality, final Integer vSlice, boolean async)
+    public boolean updateTexture(final TilePos pos, final MapType mapType, Constants.MapTileQuality quality, final Integer vSlice)
     {
         boolean forceReset = (lastMapType != mapType) || !Objects.equal(lastVSlice, vSlice);
         lastMapType = mapType;
@@ -103,7 +103,7 @@ public class Tile
 
         for (TileDrawStep tileDrawStep : drawSteps)
         {
-            tileDrawStep.refreshIfDirty(async);
+            tileDrawStep.refreshIfDirty();
         }
 
         return drawSteps.size() > 1;
