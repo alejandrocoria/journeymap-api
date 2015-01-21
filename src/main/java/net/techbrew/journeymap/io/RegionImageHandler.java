@@ -18,7 +18,7 @@ import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.render.map.Tile;
 import net.techbrew.journeymap.render.map.TileDrawStep;
-import net.techbrew.journeymap.render.texture.TextureCache;
+import net.techbrew.journeymap.render.map.TileDrawStepCache;
 import org.apache.logging.log4j.Level;
 
 import javax.imageio.ImageIO;
@@ -323,34 +323,11 @@ public class RegionImageHandler
     public static BufferedImage getScaledRegionArea(final RegionCoord rCoord, final MapType mapType, final int zoom, Constants.MapTileQuality quality, int x1, int y1)
     {
         RegionImageCache cache = RegionImageCache.getInstance();
-        BufferedImage regionImage = null;
-
-        if (cache.contains(rCoord))
-        {
-            regionImage = cache.getGuaranteedImage(rCoord, mapType);
-        }
-        else
-        {
-            File regionFile = RegionImageHandler.getRegionImageFile(rCoord, mapType, false);
-            if (regionFile.canRead())
-            {
-                regionImage = RegionImageHandler.readRegionImage(regionFile, true);
-            }
-        }
+        BufferedImage regionImage = cache.getGuaranteedImage(rCoord, mapType);
 
         if (regionImage == null)
         {
             return null;
-        }
-
-        if (zoom == 0) // TODO: When min zoom changes, this needs to change too
-        {
-            return regionImage;
-        }
-
-        if (quality == Constants.MapTileQuality.Low)
-        {
-            return regionImage;
         }
 
         int scale = (int) Math.pow(2, zoom);
@@ -400,8 +377,6 @@ public class RegionImageHandler
             vSlice = null;
         }
 
-        TextureCache tc = TextureCache.instance();
-
         final int rx1 = RegionCoord.getRegionPos(startCoord.chunkXPos);
         final int rx2 = RegionCoord.getRegionPos(endCoord.chunkXPos);
         final int rz1 = RegionCoord.getRegionPos(startCoord.chunkZPos);
@@ -429,26 +404,7 @@ public class RegionImageHandler
                 sx2 = sx1 + ((rmaxCx - rminCx + 1) * 16);
                 sy2 = sy1 + ((rmaxCz - rminCz + 1) * 16);
 
-                xoffset = startCoord.chunkXPos * 16;
-                yoffset = startCoord.chunkZPos * 16;
-//                dx1 = (startCoord.chunkXPos * 16) - xoffset;
-//                dy1 = (startCoord.chunkZPos * 16) - yoffset;
-//                dx2 = dx1 + ((endCoord.chunkXPos - startCoord.chunkXPos + 1) * 16);
-//                dy2 = dy1 + ((endCoord.chunkZPos - startCoord.chunkZPos + 1) * 16);
-
-                // TODO: Pool these?
-                TileDrawStep drawStep = new TileDrawStep();
-                drawStep.setContext(mapType, rc, zoom, false);
-                drawStep.setCoordinates(sx1, sy1, sx2, sy2);
-
-                BufferedImage image = null;
-                String hash = TextureCache.getScaledRegionAreaHash(rc, mapType, zoom, quality, sx1, sy1);
-                if (!tc.hasRegionTexture(hash))
-                {
-                    image = RegionImageHandler.getScaledRegionArea(rc, mapType, zoom, quality, sx1, sy1);
-                }
-                drawStep.setTexture(tc.getRegionTexture(hash, false, image));
-                drawSteps.add(drawStep);
+                drawSteps.add(TileDrawStepCache.getOrCreate(mapType, rc, zoom, sx1, sy1, sx2, sy2));
             }
         }
 

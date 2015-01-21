@@ -27,11 +27,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class TileCache implements RemovalListener<Integer, Tile>
 {
-
     private final Logger logger = JourneyMap.getLogger();
     private final Cache<Integer, Tile> cache;
     private final Map<Integer, Tile> retained;
     private boolean paused;
+
+    private File lastWorldDir;
 
     private TileCache()
     {
@@ -63,6 +64,8 @@ public class TileCache implements RemovalListener<Integer, Tile>
 
     public static synchronized Tile getOrCreate(final File worldDir, Constants.MapType mapType, final int tileX, final int tileZ, final int zoom, final int dimension)
     {
+        Holder.INSTANCE.checkWorldChange(worldDir);
+
         final int hash = Tile.toHashCode(tileX, tileZ, zoom, dimension);
         TileCache tc = Holder.INSTANCE;
         synchronized (tc.cache)
@@ -74,6 +77,15 @@ public class TileCache implements RemovalListener<Integer, Tile>
                 tc.cache.put(hash, tile);
             }
             return tile;
+        }
+    }
+
+    private void checkWorldChange(File worldDir)
+    {
+        if (!(worldDir.equals(lastWorldDir)))
+        {
+            lastWorldDir = worldDir;
+            cache.invalidateAll();
         }
     }
 

@@ -371,7 +371,7 @@ public class DrawUtil
 
     public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float scale, double rotation)
     {
-        drawQuad(texture, x, y, (texture.width * scale), (texture.height * scale), flip, rotation);
+        drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), flip, rotation);
     }
 
     public static void drawClampedImage(TextureImpl texture, double x, double y, float scale, double rotation)
@@ -381,17 +381,17 @@ public class DrawUtil
 
     public static void drawClampedImage(TextureImpl texture, Color color, double x, double y, float scale, float alpha, double rotation)
     {
-        drawQuad(texture, x, y, (texture.width * scale), (texture.height * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
+        drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
     }
 
     public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y, float scale, double rotation)
     {
-        drawQuad(texture, x, y, (texture.width * scale), (texture.height * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+        drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }
 
     public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y, double rotation)
     {
-        drawQuad(texture, x, y, texture.width, texture.height, rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+        drawQuad(texture, x, y, texture.getWidth(), texture.getHeight(), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }
 
     /**
@@ -407,8 +407,8 @@ public class DrawUtil
     public static void drawEntity(double x, double y, double heading, boolean flipInsteadOfRotate, TextureImpl texture, float scale, double rotation)
     {
         // Adjust to scale
-        double width = (texture.width * scale);
-        double height = (texture.height * scale);
+        double width = (texture.getWidth() * scale);
+        double height = (texture.getHeight() * scale);
         double drawX = x - (width / 2);
         double drawY = y - (height / 2);
 

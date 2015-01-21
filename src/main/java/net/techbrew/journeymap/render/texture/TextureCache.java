@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap.render.texture;
 
-import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
@@ -18,7 +17,6 @@ import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import net.techbrew.journeymap.ui.theme.Theme;
-import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -28,6 +26,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.*;
 
 /**
@@ -43,9 +42,8 @@ public class TextureCache
     private final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<String, TextureImpl> entityIcons = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
-    private final Map<String, Future<DelayedTexture>> regionImages = Collections.synchronizedMap(new HashMap<String, Future<DelayedTexture>>());
-    private final Map<String, Long> regionImageUpdates = Collections.synchronizedMap(new HashMap<String, Long>());
-    private ThreadPoolExecutor texExec = new ThreadPoolExecutor(0, 3, 30L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new JMThreadFactory("texture"));
+    private final Map<Integer, TextureImpl> regionImages = Collections.synchronizedMap(new HashMap<Integer, TextureImpl>());
+    private ThreadPoolExecutor texExec = new ThreadPoolExecutor(1, 4, 15L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(64), new JMThreadFactory("texture"));
 
     private TextureCache()
     {
@@ -83,71 +81,68 @@ public class TextureCache
 //        return texture;
 //    }
 
-    /**
-     * *************************************************
-     */
-
-    public static String getScaledRegionAreaHash(final RegionCoord rCoord, final Constants.MapType mapType, final int zoom, Constants.MapTileQuality quality, int sx1, int sy1)
-    {
-        return String.format("%s%s/%s_%s/%s,%s", rCoord, mapType, zoom, quality, sx1, sy1);
-    }
 
     /**
      * *********************************************
      */
 
-    public Future<DelayedTexture> prepareImage(final Integer glId, final BufferedImage image, final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType,
-                                               final Integer vSlice, final int dimension, final Boolean useCache, final Integer imageWidth, final Integer imageHeight, final boolean showGrid, final float alpha)
-    {
-        Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>()
-        {
-            @Override
-            public DelayedTexture call() throws Exception
-            {
-                BufferedImage chunksImage = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, useCache, image, imageWidth, imageHeight, true, showGrid);
-                if (chunksImage == null)
-                {
-                    chunksImage = RegionImageHandler.createBlankImage(imageWidth, imageHeight);
-                    final Graphics2D g2D = chunksImage.createGraphics();
-                    g2D.setColor(Color.black);
-                    if (mapType != Constants.MapType.underground)
-                    {
-                        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .5f));
-                    }
-                    g2D.fillRect(0, 0, imageWidth, imageHeight);
-                    g2D.dispose();
-                }
-                else if (alpha < 1f)
-                {
-                    BufferedImage temp = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
-                    Graphics2D g = (Graphics2D) temp.getGraphics();
-                    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-                    g.drawImage(chunksImage, 0, 0, imageWidth, imageHeight, null);
-                    chunksImage = temp;
-                    g.dispose();
-                }
-                return new DelayedTexture(glId, chunksImage, null);
-            }
-        });
-        return future;
-    }
+//    public Future<DelayedTexture> prepareImage(final Integer glId, final BufferedImage image, final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType,
+//                                               final Integer vSlice, final int dimension, final Boolean useCache, final Integer imageWidth, final Integer imageHeight, final boolean showGrid, final float alpha)
+//    {
+//        Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>()
+//        {
+//            @Override
+//            public DelayedTexture call() throws Exception
+//            {
+//                BufferedImage chunksImage = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, useCache, image, imageWidth, imageHeight, true, showGrid);
+//                if (chunksImage == null)
+//                {
+//                    chunksImage = RegionImageHandler.createBlankImage(imageWidth, imageHeight);
+//                    final Graphics2D g2D = chunksImage.createGraphics();
+//                    g2D.setColor(Color.black);
+//                    if (mapType != Constants.MapType.underground)
+//                    {
+//                        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .5f));
+//                    }
+//                    g2D.fillRect(0, 0, imageWidth, imageHeight);
+//                    g2D.dispose();
+//                }
+//                else if (alpha < 1f)
+//                {
+//                    BufferedImage temp = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
+//                    Graphics2D g = (Graphics2D) temp.getGraphics();
+//                    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+//                    g.drawImage(chunksImage, 0, 0, imageWidth, imageHeight, null);
+//                    chunksImage = temp;
+//                    g.dispose();
+//                }
+//                return new DelayedTexture(glId, chunksImage);
+//            }
+//        });
+//        return future;
+//    }
 
     //    public Future<DelayedTexture> updateTexture(TextureImpl texture, final Integer imageWidth, final Integer imageHeight, final float alpha)
 //    {
 //        return updateImage(texture.getGlTextureId(), texture.getImage(), imageWidth, imageHeight, alpha);
 //    }
 //
-    public Future<DelayedTexture> prepareImage(final Integer glId, final BufferedImage image)
+//    public Future<DelayedTexture> prepareImage(final Integer glId, final BufferedImage image)
+//    {
+//        Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>()
+//        {
+//            @Override
+//            public DelayedTexture call() throws Exception
+//            {
+//                return new DelayedTexture(glId, image);
+//            }
+//        });
+//        return future;
+//    }
+    public Future<DelayedTexture> scheduleTextureTask(Callable<DelayedTexture> textureTask)
     {
-        Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>()
-        {
-            @Override
-            public DelayedTexture call() throws Exception
-            {
-                return new DelayedTexture(glId, image, null);
-            }
-        });
-        return future;
+        //JourneyMap.getLogger().info("TextureCache.scheduleTextureTask()");
+        return texExec.submit(textureTask);
     }
 
     /**
@@ -432,77 +427,27 @@ public class TextureCache
         }
     }
 
-    public boolean hasRegionTexture(RegionCoord regionCoord, Constants.MapType mapType)
-    {
-        return hasRegionTexture(getScaledRegionAreaHash(regionCoord, mapType, 0, Constants.MapTileQuality.High, 0, 0));
-    }
-
-    public boolean hasRegionTexture(String hash)
-    {
-        synchronized (regionImages)
-        {
-            return regionImages.containsKey(hash);
-        }
-    }
-
-    public TextureImpl getRegionTexture(String hash, boolean forceRefresh, BufferedImage img)
-    {
-        Future<DelayedTexture> future = null;
-        TextureImpl regionTexture = null;
-
-        synchronized (regionImages)
-        {
-            future = regionImages.get(hash);
-
-            if (future == null && img != null)
-            {
-                future = cacheRegionTexture(null, hash, img);
-            }
-            else if (future != null && forceRefresh)
-            {
-                try
-                {
-                    if (future.isDone())
-                    {
-                        Long lastUpdate = regionImageUpdates.get(hash);
-                        if (lastUpdate == null || System.currentTimeMillis() - 1000 > lastUpdate)
-                        {
-                            future = cacheRegionTexture(future.get().glId, hash, img);
-                        }
-                    }
-                }
-                catch (Throwable e)
-                {
-                    JourneyMap.getLogger().warn(String.format("Error getting scaled region texture during forceRefresh (%s): %s", hash, e));
-                }
-            }
-        }
-
-        if (future != null)
-        {
-            try
-            {
-                regionTexture = future.get().bindTexture(false);
-            }
-            catch (Exception e)
-            {
-                JourneyMap.getLogger().warn(String.format("Can't bind scaled region texture during forceRefresh (%s): %s", hash, e));
-            }
-        }
-//        else
+//    public boolean hasRegionTexture(RegionCoord regionCoord, Constants.MapType mapType)
+//    {
+//        synchronized (regionImages)
 //        {
-//            JourneyMap.getLogger().info(String.format("Waiting for %s %s", mapType, regionCoord));
+//            return regionImages.containsKey(Objects.hash(regionCoord, mapType));
 //        }
+//    }
+//
 
-        return regionTexture;
-    }
-
-    private Future<DelayedTexture> cacheRegionTexture(Integer glId, String texName, BufferedImage img)
+    public TextureImpl getRegionTexture(RegionCoord regionCoord, Constants.MapType mapType)
     {
-        Future<DelayedTexture> future = prepareImage(glId, img);
-        regionImages.put(texName, future);
-        regionImageUpdates.put(texName, System.currentTimeMillis());
-        return future;
+        final int hash = Objects.hash(regionCoord, mapType);
+        TextureImpl texture = regionImages.get(hash);
+
+        if (texture == null)
+        {
+            texture = new TextureImpl(null);
+            regionImages.put(hash, texture);
+        }
+
+        return texture;
     }
 
     /**
@@ -572,26 +517,23 @@ public class TextureCache
 
     public void purge()
     {
-        for (Future<DelayedTexture> future : regionImages.values())
+        for (TextureImpl texture : namedTextures.values())
         {
-            if (future.isDone())
-            {
-                try
-                {
-                    Integer glId = future.get().glId;
-                    if (glId != null)
-                    {
-                        GL11.glDeleteTextures(glId);
-                    }
-                }
-                catch (Throwable e)
-                {
-                    JourneyMap.getLogger().warn("Can't delete region image texture: " + e);
-                }
-            }
+            texture.deleteTexture();
         }
+        namedTextures.clear();
 
-        regionImageUpdates.clear();
+        for (TextureImpl texture : entityIcons.values())
+        {
+            texture.deleteTexture();
+        }
+        entityIcons.clear();
+
+        for (TextureImpl texture : regionImages.values())
+        {
+            texture.deleteTexture();
+        }
+        regionImages.clear();
     }
 
     public void purgeThemeImages()

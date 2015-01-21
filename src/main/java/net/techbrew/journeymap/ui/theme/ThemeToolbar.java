@@ -177,9 +177,9 @@ public class ThemeToolbar extends Button
             float scale = 1f;
 
             // Draw Begin
-            if (toolbarSpec.begin.width != textureBegin.width)
+            if (toolbarSpec.begin.width != textureBegin.getWidth())
             {
-                scale = (1f * toolbarSpec.begin.width / textureBegin.width);
+                scale = (1f * toolbarSpec.begin.width / textureBegin.getWidth());
             }
             DrawUtil.drawClampedImage(textureBegin, drawX, drawY, scale, 0);
 
@@ -194,9 +194,9 @@ public class ThemeToolbar extends Button
 
             // Draw Inner
             scale = 1f;
-            if (toolbarSpec.inner.width != textureInner.width)
+            if (toolbarSpec.inner.width != textureInner.getWidth())
             {
-                scale = (1f * toolbarSpec.inner.width / textureInner.width);
+                scale = (1f * toolbarSpec.inner.width / textureInner.getWidth());
             }
             for (Button button : buttonList)
             {
@@ -216,9 +216,9 @@ public class ThemeToolbar extends Button
 
             // Draw End
             scale = 1f;
-            if (toolbarSpec.end.width != textureEnd.width)
+            if (toolbarSpec.end.width != textureEnd.getWidth())
             {
-                scale = (1f * toolbarSpec.end.width / textureEnd.width);
+                scale = (1f * toolbarSpec.end.width / textureEnd.getWidth());
             }
             DrawUtil.drawClampedImage(textureEnd, drawX, drawY, scale, 0);
         }

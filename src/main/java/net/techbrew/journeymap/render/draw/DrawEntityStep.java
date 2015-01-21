@@ -52,7 +52,7 @@ public class DrawEntityStep implements DrawStep
     @Override
     public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
-        if (entityDTO.entityLiving==null || entityDTO.entityLiving.isDead || !entityDTO.entityLiving.addedToChunk || (hideSneaks &&entityDTO.entityLiving.isSneaking()))
+        if (entityDTO.entityLiving == null || entityDTO.entityLiving.isDead || !entityDTO.entityLiving.addedToChunk || (hideSneaks && entityDTO.entityLiving.isSneaking()))
         {
             return;
         }
@@ -67,7 +67,7 @@ public class DrawEntityStep implements DrawStep
             if (entityDTO.entityLiving instanceof EntityPlayer)
             {
                 int blockSize = (int) Math.pow(2, gridRenderer.getZoom());
-                float labelOffset = texture != null ? texture.height / blockSize : 0;
+                float labelOffset = texture != null ? texture.getHeight() / blockSize : 0;
                 drawPlayer(drawX, drawY, gridRenderer, heading, drawScale, fontScale, rotation);
 
             }
@@ -89,7 +89,7 @@ public class DrawEntityStep implements DrawStep
         {
             DrawUtil.drawEntity(drawX, drawY, heading, true, texture, drawScale * .75f, rotation);
         }
-        int labelOffset = texture == null ? 0 : rotation==0 ? -texture.height/2 : texture.height/2;
+        int labelOffset = texture == null ? 0 : rotation == 0 ? -texture.getHeight() / 2 : texture.getHeight() / 2;
         Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, -labelOffset);
 
         DrawUtil.drawLabel(entityDTO.entityLiving.getCommandSenderName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 205, Color.green, 255, fontScale, false, rotation);
@@ -108,7 +108,7 @@ public class DrawEntityStep implements DrawStep
             DrawUtil.drawEntity(drawX, drawY, heading, true, texture, drawScale, rotation);
         }
 
-        int labelOffset = texture == null ? 8 : rotation==0 ? texture.height : -texture.height;
+        int labelOffset = texture == null ? 8 : rotation == 0 ? texture.getHeight() : -texture.getHeight();
         if (entityDTO.customName != null)
         {
             Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, labelOffset);

@@ -9,49 +9,37 @@
 package net.techbrew.journeymap.render.texture;
 
 
-import net.minecraft.client.renderer.texture.TextureUtil;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.io.RegionImageHandler;
-import net.techbrew.journeymap.log.StatTimer;
+import net.techbrew.journeymap.log.LogFormatter;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
 /**
  * Created by mwoodman on 12/22/13.
  */
-public class DelayedTexture
+public class DelayedTexture extends TextureImpl
 {
-    static StatTimer timer = StatTimer.get("DelayedTexture.setImage");
     private final Object lock = new Object();
-    int width;
-    int height;
-    ByteBuffer buffer;
-    Integer glId;
-    BufferedImage image;
-    TextureImpl result;
+    private ByteBuffer buffer = ByteBuffer.allocateDirect(512 * 512 * 4);
+
+    private boolean rebindNeeded;
 
     /**
      * Can be safely called without the OpenGL Context.
      */
-    public DelayedTexture(Integer glId, BufferedImage image, String debugString)
+    public DelayedTexture()
     {
-        this.glId = glId;
-        setImage(image);
+    }
 
-        if (debugString != null)
-        {
-            Graphics2D g = RegionImageHandler.initRenderingHints(image.createGraphics());
-            g.setPaint(Color.WHITE);
-            g.setStroke(new BasicStroke(3));
-            g.drawRect(0, 0, width, height);
-            final Font labelFont = new Font("Arial", Font.BOLD, 16);
-            g.setFont(labelFont); //$NON-NLS-1$
-            g.drawString(debugString, 16, 16);
-            g.dispose();
-        }
+    /**
+     * Can be safely called without the OpenGL Context.
+     */
+    public DelayedTexture(Integer glId, BufferedImage image)
+    {
+        super(glId, image, true);
+        setImage(image);
     }
 
     /**
@@ -61,11 +49,13 @@ public class DelayedTexture
     {
         synchronized (lock)
         {
-            timer.start();
             this.image = image;
             width = image.getWidth();
             height = image.getHeight();
-            buffer = ByteBuffer.allocateDirect(width * height * 4);
+            if (buffer.capacity() < (width * height * 4))
+            {
+                buffer = ByteBuffer.allocateDirect(width * height * 4);
+            }
             buffer.clear();
 
             int[] pixels = new int[width * height];
@@ -83,10 +73,20 @@ public class DelayedTexture
                 }
             }
             buffer.flip();
-
             buffer.rewind();
-            timer.stop();
+            rebindNeeded = true;
         }
+    }
+
+    @Override
+    public boolean isBound()
+    {
+        return glTextureId != -1;
+    }
+
+    public boolean isRebindNeeded()
+    {
+        return rebindNeeded;
     }
 
     /**
@@ -94,62 +94,45 @@ public class DelayedTexture
      *
      * @return
      */
-    public TextureImpl bindTexture(BufferedImage image)
+    public void bindTexture()
     {
-        setImage(image);
         synchronized (lock)
         {
-            if (result != null)
+            if (rebindNeeded)
             {
-                result.updateTexture(image);
-                return result;
-            }
-            else
-            {
-                return bindTexture(false);
+                try
+                {
+                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, getGlTextureId());
+
+                    //Send texel data to OpenGL
+
+                    // Setup wrap mode
+                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+
+                    //Setup texture scaling filtering
+                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+
+                    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+
+                    int glErr = GL11.glGetError();
+                    if (glErr != GL11.GL_NO_ERROR)
+                    {
+                        JourneyMap.getLogger().warn("GL Error in DelayedTexture after glTexImage2D: " + glErr);
+                    }
+                    else
+                    {
+                        rebindNeeded = false;
+                    }
+                }
+                catch (Throwable t)
+                {
+                    JourneyMap.getLogger().warn("Can't bind texture: " + LogFormatter.toString(t));
+                }
             }
         }
     }
 
-    /**
-     * Must be called on same thread as OpenGL Context
-     *
-     * @return
-     */
-    public synchronized TextureImpl bindTexture(boolean retainImage)
-    {
-        if (result == null)
-        {
-            if (glId == null)
-            {
-                glId = TextureUtil.glGenTextures();
-            }
 
-            try
-            {
-                GL11.glBindTexture(GL11.GL_TEXTURE_2D, glId);
-
-                // TODO: Use render settings?
-                // Setup wrap mode
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
-
-                //Setup texture scaling filtering
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-
-                //Send texel data to OpenGL
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, image.getWidth(), image.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-                //GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
-
-                result = new TextureImpl(glId, image, retainImage);
-            }
-            catch (Throwable t)
-            {
-                JourneyMap.getLogger().warn("Can't bind texture: " + t);
-            }
-        }
-
-        return result;
-    }
 }

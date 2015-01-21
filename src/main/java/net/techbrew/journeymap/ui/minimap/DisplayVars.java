@@ -147,7 +147,7 @@ public class DisplayVars
             {
                 TextureImpl compassPointTex = this.minimapFrame.getCompassPoint();
                 float compassPointScale = ThemeCompassPoints.getCompassPointScale(compassLabelHeight, minimapSpec, compassPointTex);
-                compassPointMargin = compassPointTex.width / 2 * compassPointScale;
+                compassPointMargin = compassPointTex.getWidth() / 2 * compassPointScale;
             }
             else
             {

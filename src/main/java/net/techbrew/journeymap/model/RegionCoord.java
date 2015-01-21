@@ -13,6 +13,7 @@ import net.minecraft.world.ChunkCoordIntPair;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class RegionCoord implements Comparable<RegionCoord>
 {
@@ -63,6 +64,11 @@ public class RegionCoord implements Comparable<RegionCoord>
     public static int getRegionPos(int chunkPos)
     {
         return chunkPos >> SIZE;
+    }
+
+    public static int toHash(RegionCoord regionCoord)
+    {
+        return Objects.hash(regionCoord.regionX, regionCoord.regionZ, regionCoord.vSlice, regionCoord.dimension, regionCoord.worldDir);
     }
 
     public int getXOffset(int chunkX)
@@ -203,12 +209,7 @@ public class RegionCoord implements Comparable<RegionCoord>
     @Override
     public int hashCode()
     {
-        int result = worldDir.hashCode();
-        result = 31 * result + regionX;
-        result = 31 * result + regionZ;
-        result = 31 * result + (vSlice != null ? vSlice.hashCode() : 0);
-        result = 31 * result + dimension.hashCode();
-        return result;
+        return toHash(this);
     }
 
     @Override

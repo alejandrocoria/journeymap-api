@@ -23,9 +23,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class StatTimer
 {
 
+    public static final double NS = 1000000D;
     private static final int WARMUP_COUNT_DEFAULT = 10;
     private static final int MAX_COUNT = 1000000;
-    private static final double NS = 1000000D;
     private static Map<String, StatTimer> timers = Collections.synchronizedMap(new HashMap<String, StatTimer>());
     private final Logger logger = JourneyMap.getLogger();
     private final int warmupCount;

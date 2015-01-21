@@ -8,18 +8,24 @@
 
 package net.techbrew.journeymap.model;
 
+import com.google.common.cache.*;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
+import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.render.texture.DelayedTexture;
 import net.techbrew.journeymap.render.texture.TextureCache;
-import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import org.apache.logging.log4j.Level;
 
 import java.awt.image.BufferedImage;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class RegionImageCache
@@ -28,8 +34,13 @@ public class RegionImageCache
     private static final long flushInterval = TimeUnit.SECONDS.toMillis(30);
     //private volatile Set<RegionCoord> dirty;
     private final Object lock = new Object();
+
+    private final Cache<Integer, Future<DelayedTexture>> futureTextureCache;
+    private final LoadingCache<Integer, DelayedTexture> regionTextureCache;
+
     private volatile Map<RegionCoord, RegionImageSet> imageSets;
     private volatile long lastFlush;
+    private boolean logCacheActions = true; // TODO set false when done debugging
 
     // Private constructor
     private RegionImageCache()
@@ -38,6 +49,38 @@ public class RegionImageCache
 
         //dirty = Collections.synchronizedSet(new HashSet<RegionCoord>(SIZE));
         lastFlush = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);
+
+        this.futureTextureCache = CacheBuilder.newBuilder()
+                .expireAfterAccess(10, TimeUnit.SECONDS)
+                .build();
+
+        this.regionTextureCache = CacheBuilder.newBuilder()
+                .removalListener(new RemovalListener<Integer, DelayedTexture>()
+                {
+                    @Override
+                    public void onRemoval(RemovalNotification<Integer, DelayedTexture> notification)
+                    {
+                        if (notification != null)
+                        {
+                            if (logCacheActions)
+                            {
+                                JourneyMap.getLogger().info(String.format("RegionImageCache: Recycling %s", notification.getValue()));
+                            }
+                            notification.getValue().deleteTexture();
+                        }
+                    }
+                })
+                .build(new CacheLoader<Integer, DelayedTexture>()
+                {
+                    @Override
+                    public DelayedTexture load(Integer key) throws Exception
+                    {
+                        DelayedTexture texture = new DelayedTexture(null, RegionImageHandler.createBlankImage(512, 512));
+                        texture.setLastUpdated(0);
+                        texture.bindTexture();
+                        return texture;
+                    }
+                });
 
         // Add shutdown hook to flush cache to disk
         Runtime.getRuntime().addShutdownHook(new JMThreadFactory("rcache").newThread(new Runnable()
@@ -60,24 +103,212 @@ public class RegionImageCache
         return Holder.INSTANCE;
     }
 
-    public static TextureImpl getRegionTexture(RegionCoord rCoord, Constants.MapType mapType, Integer zoom, Constants.MapTileQuality quality, int sx1, int sy1, boolean forceRefresh)
-    {
-        TextureCache tc = TextureCache.instance();
-        String hash = TextureCache.getScaledRegionAreaHash(rCoord, mapType, zoom, quality, sx1, sy1);
-        if (forceRefresh || !tc.hasRegionTexture(hash))
-        {
-            BufferedImage image = RegionImageHandler.getScaledRegionArea(rCoord, mapType, zoom, quality, sx1, sy1);
-            if (image == null)
-            {
-                return null;
-            }
-            return tc.getRegionTexture(hash, true, image);
+//    public TextureImpl putRegionTexture(RegionCoord rCoord, Constants.MapType mapType, DelayedTexture delayedTexture)
+//    {
+//        TextureImpl oldRegionTexture = getRegionTexture(rCoord, mapType, false);
+//        if(oldRegionTexture!=null)
+//        {
+//            delayedTexture.bindTexture(oldRegionTexture, true);
+//            if (logCacheActions)
+//            {
+//                logCacheAction("UPDATE ASYNC", delayedTexture);
+//            }
+//        }
+//        else
+//        {
+//            Integer hash = toHash(rCoord, mapType);
+//            futureTextureCache.put(hash, delayedTexture);
+//            if (logCacheActions)
+//            {
+//                logCacheAction("PUT ASYNC", delayedTexture);
+//            }
+//        }
+//        return delayedTexture.getTexture();
+//    }
 
+//    private TextureImpl putRegionTexture(RegionCoord rCoord, Constants.MapType mapType, BufferedImage regionImage)
+//    {
+//        Integer hash = toHash(rCoord, mapType);
+//        TextureImpl texture = new TextureImpl(regionImage, true);
+//        texture.setLastUpdated(System.currentTimeMillis());
+//        texture.setDescription(String.format("%s %s", rCoord, mapType));
+//        futureTextureCache.put(hash, texture);
+//        if(logCacheActions)
+//        {
+//            logCacheAction("PUT", texture);
+//        }
+//        return texture;
+//    }
+
+//    public Future<DelayedTexture> getRegionTextureAsync(final RegionCoord rCoord, final Constants.MapType mapType)
+//    {
+//        //System.out.println("getRegionTextureAsync");
+//        synchronized (asyncTextureCache)
+//        {
+//            Integer hash = toHash(rCoord, mapType);
+//            Future<DelayedTexture> future = asyncTextureCache.getIfPresent(hash);
+//            boolean createFuture = (future==null);
+//            if(!createFuture)
+//            {
+//                try
+//                {
+//                    createFuture = future.isDone() && isDirtySince(rCoord, mapType, future.get().getTexture().getLastUpdated());
+//                }
+//                catch (Exception e)
+//                {
+//                    JourneyMap.getLogger().error("Region must be fetched once on the GL thread.");
+//                }
+//            }
+//
+//            if(createFuture)
+//            {
+//                future = TextureCache.instance().scheduleTextureProviderTask(new Callable<DelayedTexture>()
+//                {
+//                    @Override
+//                    public DelayedTexture call() throws Exception
+//                    {
+//                        // Use from cache if already bound
+//                        TextureImpl texture = getRegionTexture(rCoord, mapType, false);
+//                        if (texture != null && !isDirtySince(rCoord, mapType, texture.getLastUpdated()))
+//                        {
+//                            if (logCacheActions)
+//                            {
+//                                logCacheAction("ASYNC FETCH", texture);
+//                            }
+//                            return texture;
+//                        }
+//
+//                        Integer glId = (texture==null) ? null : texture.getGlTextureId();
+//
+//                        DelayedTexture pending = new DelayedTexture(glId, getRegionImageSet(rCoord).getWrapper(mapType).getImage());
+//                        if (logCacheActions)
+//                        {
+//                            logCacheAction("ASYNC DELAYED", texture);
+//                        }
+//                        return pending;
+//                    }
+//                });
+//                asyncTextureCache.put(hash, future);
+//            }
+//
+//            return future;
+//        }
+//    }
+
+    public static int toHash(RegionCoord regionCoord, MapType mapType)
+    {
+        return Objects.hash(regionCoord, mapType);
+    }
+
+    private void updateRegionTexture(final RegionCoord rCoord, final Constants.MapType mapType)
+    {
+        final int hash = Objects.hash(rCoord, mapType);
+        final DelayedTexture existing = getRegionTexture(hash);
+
+        if (existing == null)
+        {
+            JourneyMap.getLogger().error(String.format("RegionImageCache error during updateRegionTexture(): No existing texture for %s %s", rCoord, mapType));
+            return;
+        }
+
+        synchronized (futureTextureCache)
+        {
+            Future<DelayedTexture> future = futureTextureCache.getIfPresent(hash);
+            if (future != null)
+            {
+                if (!future.isDone())
+                {
+                    if (logCacheActions)
+                    {
+                        //logCacheAction("ASYNC UPDATE PENDING", existing);
+                    }
+                    return;
+                }
+            }
+
+            long imageTime = getRegionImageSet(rCoord).getWrapper(mapType).getTimestamp();
+            if (existing.getLastUpdated() >= imageTime)
+            {
+                if (logCacheActions)
+                {
+                    logCacheAction("ASYNC UPDATE UNNECESSARY", existing);
+                }
+                return;
+            }
+
+            futureTextureCache.put(hash,
+                    TextureCache.instance().scheduleTextureTask(new Callable<DelayedTexture>()
+                    {
+                        @Override
+                        public DelayedTexture call() throws Exception
+                        {
+                            try
+                            {
+                                ImageSet.Wrapper wrapper = getRegionImageSet(rCoord).getWrapper(mapType);
+                                existing.setDescription(String.format("%s %s", rCoord, mapType));
+                                existing.setImage(wrapper.getImage());
+                                existing.setLastUpdated(wrapper.getTimestamp());
+
+                                if (logCacheActions)
+                                {
+                                    logCacheAction("ASYNC UPDATE DONE", existing);
+                                }
+                                return existing;
+                            }
+                            catch (Exception e)
+                            {
+                                JourneyMap.getLogger().error(String.format("RegionImageCache error during updateRegionTexture() texture for %s %s: %s", rCoord, mapType,
+                                        LogFormatter.toString(e)));
+                                return null;
+                            }
+                        }
+                    })
+            );
+        }
+    }
+
+    private DelayedTexture getRegionTexture(int hash)
+    {
+        try
+        {
+            return regionTextureCache.get(hash);
+        }
+        catch (ExecutionException e)
+        {
+            JourneyMap.getLogger().error(String.format("RegionImageCache error in getRegionTexture(): %s", LogFormatter.toString(e)));
+            return null;
+        }
+    }
+
+    /**
+     * Must be called on GL Context thread.
+     */
+    public DelayedTexture getRegionTexture(RegionCoord rCoord, Constants.MapType mapType)
+    {
+        int hash = Objects.hash(rCoord, mapType);
+        DelayedTexture texture = getRegionTexture(hash);
+
+        if (texture != null)
+        {
+            if (getRegionImageSet(rCoord).updatedSince(mapType, texture.getLastUpdated()))
+            {
+                updateRegionTexture(rCoord, mapType);
+//                if (logCacheActions)
+//                {
+//                    logCacheAction("HIT AUTOUPDATE", texture);
+//                }
+            }
         }
         else
         {
-            return tc.getRegionTexture(hash, false, null);
+            if (logCacheActions)
+            {
+                JourneyMap.getLogger().info(String.format("RegionImageCache: %s %s (GLID %s) on %s",
+                        "ERROR MISSING", String.format("%s %s", rCoord, mapType), "?", "?"));
+            }
         }
+
+        return texture;
     }
 
     private RegionImageSet getRegionImageSet(RegionCoord rCoord)
@@ -120,12 +351,31 @@ public class RegionImageCache
     {
         synchronized (lock)
         {
+            HashSet<RegionImageSet> regions = new HashSet<RegionImageSet>();
             for (ChunkImageSet cis : chunkImageSets)
             {
                 final RegionCoord rCoord = cis.getCCoord().getRegionCoord();
                 final RegionImageSet ris = getRegionImageSet(rCoord);
                 ris.insertChunk(cis);
+                regions.add(ris);
             }
+
+//            if (futureTextureCache.size() > 0)
+//            {
+//                for (RegionImageSet ris : regions)
+//                {
+//                    for (RegionImageSet.Wrapper risWrapper : ris.imageWrappers.values())
+//                    {
+//                        TextureImpl texture = futureTextureCache.getIfPresent(ris.rCoord.toString() + risWrapper.mapType);
+//                        if (texture != null)
+//                        {
+//                            texture.updateTexture(risWrapper.getImage());
+//                            JourneyMap.getLogger().info("Updated region texture for " + ris.rCoord.toString() + risWrapper.mapType + ": " + new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(texture.getLastUpdated())) ); // TODO remove
+//                        }
+//                    }
+//                }
+//            }
+
             if (forceFlush)
             {
                 flushToDisk();
@@ -231,6 +481,19 @@ public class RegionImageCache
             }
             imageSets.clear();
         }
+
+        futureTextureCache.invalidateAll();
+        futureTextureCache.cleanUp();
+
+        regionTextureCache.invalidateAll();
+        regionTextureCache.cleanUp();
+    }
+
+    private void logCacheAction(String action, DelayedTexture delayedTexture)
+    {
+        JourneyMap.getLogger().info(String.format("RegionImageCache: %s %s (GLID %s) on %s",
+                action, delayedTexture.getDescription(), delayedTexture.getGlTextureId(),
+                new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(delayedTexture.getLastUpdated()))));
     }
 
     // On-demand-holder for instance
@@ -275,5 +538,4 @@ public class RegionImageCache
             return remove;
         }
     }
-
 }

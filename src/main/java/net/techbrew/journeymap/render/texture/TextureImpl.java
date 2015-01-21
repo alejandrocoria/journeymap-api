@@ -8,7 +8,7 @@
 
 package net.techbrew.journeymap.render.texture;
 
-import net.minecraft.client.renderer.GLAllocation;
+import com.google.common.base.Objects;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
@@ -19,37 +19,35 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 
 public class TextureImpl extends AbstractTexture
 {
 
-    private static final IntBuffer dataBuffer = GLAllocation.createDirectIntBuffer(4194304);
-    /**
-     * width of this icon in pixels
-     */
-    public final int width;
-    /**
-     * height of this icon in pixels
-     */
-    public final int height;
-    /**
-     * keep image with object
-     */
-    public final boolean retainImage;
-    public float alpha;
+    //private static final IntBuffer dataBuffer = GLAllocation.createDirectIntBuffer(4194304);
+
+    protected int width;
+    protected int height;
+    protected boolean retainImage;
+    protected float alpha;
     /**
      * optionally-retained image *
      */
     protected BufferedImage image;
     protected volatile boolean unbound;
 
+    private long lastUpdated;
+    private String description;
+
+    protected TextureImpl()
+    {
+    }
+
     public TextureImpl(BufferedImage image)
     {
         this(image, false);
     }
 
-    TextureImpl(BufferedImage image, boolean retainImage)
+    public TextureImpl(BufferedImage image, boolean retainImage)
     {
         this.retainImage = retainImage;
         this.width = image.getWidth();
@@ -57,9 +55,12 @@ public class TextureImpl extends AbstractTexture
         updateTexture(image, true);
     }
 
-    TextureImpl(int glId, BufferedImage image, boolean retainImage)
+    TextureImpl(Integer glId, BufferedImage image, boolean retainImage)
     {
-        this.glTextureId = glId;
+        if (glId != null)
+        {
+            this.glTextureId = glId;
+        }
         this.retainImage = retainImage;
         this.image = image;
         this.width = image.getWidth();
@@ -101,20 +102,6 @@ public class TextureImpl extends AbstractTexture
         timer.stop();
     }
 
-    private static void copyToBuffer(int[] par0ArrayOfInteger, int par1)
-    {
-        copyToBufferPos(par0ArrayOfInteger, 0, par1);
-    }
-
-    private static void copyToBufferPos(int[] par0ArrayOfInteger, int par1, int par2)
-    {
-        int[] var3 = par0ArrayOfInteger;
-
-        dataBuffer.clear();
-        dataBuffer.put(var3, par1, par2);
-        dataBuffer.position(0).limit(par2);
-    }
-
     private static void setTextureClamped(boolean par0)
     {
         if (par0)
@@ -143,28 +130,53 @@ public class TextureImpl extends AbstractTexture
         }
     }
 
-    protected void updateTexture(BufferedImage image, boolean allocateMemory)
+//    private static void copyToBuffer(int[] par0ArrayOfInteger, int par1)
+//    {
+//        copyToBufferPos(par0ArrayOfInteger, 0, par1);
+//    }
+//
+//    private static void copyToBufferPos(int[] par0ArrayOfInteger, int par1, int par2)
+//    {
+//        int[] var3 = par0ArrayOfInteger;
+//
+//        dataBuffer.clear();
+//        dataBuffer.put(var3, par1, par2);
+//        dataBuffer.position(0).limit(par2);
+//    }
+
+    public String getDescription()
     {
-        if (image.getWidth() != width || image.getHeight() != height)
+        return description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
+
+    protected void updateTexture(BufferedImage updatedImage, boolean allocateMemory)
+    {
+        if (updatedImage.getWidth() != width || updatedImage.getHeight() != height)
         {
             throw new IllegalArgumentException("Image dimensions don't match");
         }
         if (retainImage)
         {
-            this.image = image;
+            this.image = updatedImage;
         }
         try
         {
             int glId = getGlTextureId();
             if (allocateMemory)
             {
-                TextureUtil.uploadTextureImage(glId, image);
+                TextureUtil.uploadTextureImage(glId, updatedImage);
             }
             else
             {
                 GL11.glBindTexture(GL11.GL_TEXTURE_2D, glId);
-                uploadTextureImageSubImpl(image, 0, 0, false, false);
+                uploadTextureImageSubImpl(updatedImage, 0, 0, false, false);
             }
+            lastUpdated = System.currentTimeMillis();
         }
         catch (RuntimeException e)
         {
@@ -181,15 +193,14 @@ public class TextureImpl extends AbstractTexture
 
     public void updateTexture(BufferedImage image)
     {
-        updateTexture(image, false);
+        updateTexture(image, retainImage);
     }
 
     @Override
     public int getGlTextureId()
     {
-
         int glId = super.getGlTextureId();
-        if (unbound)
+        if (unbound && image != null)
         {
             try
             {
@@ -204,6 +215,11 @@ public class TextureImpl extends AbstractTexture
         return glId;
     }
 
+    public boolean isBound()
+    {
+        return !unbound;
+    }
+
     public boolean hasImage()
     {
         return image != null;
@@ -214,20 +230,121 @@ public class TextureImpl extends AbstractTexture
         return image;
     }
 
-    public void deleteTexture()
+    public void clear()
+    {
+        this.image = null;
+        this.unbound = true;
+        this.glTextureId = -1;
+    }
+
+    public boolean deleteTexture()
     {
         if (this.glTextureId != -1)
         {
-            GL11.glDeleteTextures(this.getGlTextureId());
+            try
+            {
+                GL11.glDeleteTextures(this.getGlTextureId());
+                this.glTextureId = -1;
+            }
+            catch (Throwable t)
+            {
+                JourneyMap.getLogger().warn("Couldn't delete texture: " + t);
+                return false;
+            }
         }
         if (this.image != null)
         {
             this.image = null;
         }
+        return true;
+    }
+
+    public long getLastUpdated()
+    {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(long time)
+    {
+        lastUpdated = time;
     }
 
     @Override
     public void loadTexture(IResourceManager par1ResourceManager)
     {
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return Objects.toStringHelper(this)
+                .add("description", description)
+                .add("lastUpdated", lastUpdated)
+                .toString();
+    }
+
+    public void finalize()
+    {
+        if (this.glTextureId != -1)
+        {
+            if (!deleteTexture())
+            {
+                JourneyMap.getLogger().error("TextureImpl disposed without deleting texture glID: " + this.glTextureId);
+            }
+            else
+            {
+                JourneyMap.getLogger().warn("TextureImpl hadn't deleted texture glID before disposed of properly.");
+            }
+        }
+    }
+
+    /**
+     * width of this icon in pixels
+     */
+    public int getWidth()
+    {
+        return width;
+    }
+
+    public void setWidth(int width)
+    {
+        this.width = width;
+    }
+
+    /**
+     * height of this icon in pixels
+     */
+    public int getHeight()
+    {
+        return height;
+    }
+
+    public void setHeight(int height)
+    {
+        this.height = height;
+    }
+
+    /**
+     * keep image with object
+     */
+    public boolean isRetainImage()
+    {
+        return retainImage;
+    }
+
+    public void setRetainImage(boolean retainImage)
+    {
+        this.retainImage = retainImage;
+    }
+
+    public float getAlpha()
+    {
+        return alpha;
+    }
+
+    public void setAlpha(float alpha)
+    {
+        this.alpha = alpha;
     }
 }

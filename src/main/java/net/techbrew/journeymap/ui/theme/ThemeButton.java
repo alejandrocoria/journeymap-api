@@ -150,9 +150,9 @@ public class ThemeButton extends BooleanPropertyButton
         if (buttonSpec.useThemeImages)
         {
             float buttonScale = 1f;
-            if (buttonSpec.width != activeTexture.width)
+            if (buttonSpec.width != activeTexture.getWidth())
             {
-                buttonScale = (1f * buttonSpec.width / activeTexture.width);
+                buttonScale = (1f * buttonSpec.width / activeTexture.getWidth());
             }
 
             // Theme Button Background
@@ -166,9 +166,9 @@ public class ThemeButton extends BooleanPropertyButton
 
         // Icon
         float iconScale = 1f;
-        if (theme.icon.width != textureIcon.width)
+        if (theme.icon.width != textureIcon.getWidth())
         {
-            iconScale = (1f * theme.icon.width / textureIcon.width);
+            iconScale = (1f * theme.icon.width / textureIcon.getWidth());
         }
 
         //drawX += (((width - textureIcon.width)/2));

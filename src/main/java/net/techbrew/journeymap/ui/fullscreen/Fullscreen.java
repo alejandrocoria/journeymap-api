@@ -35,6 +35,7 @@ import net.techbrew.journeymap.render.draw.RadarDrawStepFactory;
 import net.techbrew.journeymap.render.draw.WaypointDrawStepFactory;
 import net.techbrew.journeymap.render.map.GridRenderer;
 import net.techbrew.journeymap.render.map.TileCache;
+import net.techbrew.journeymap.render.map.TileDrawStepCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
@@ -87,10 +88,11 @@ public class Fullscreen extends JmUI
     int statusForegroundAlpha;
     int statusBackgroundAlpha;
     StatTimer drawScreenTimer = StatTimer.get("MapOverlay.drawScreen");
-    StatTimer drawMapTimer = StatTimer.get("MapOverlay.drawScreen.drawMap");
-    StatTimer drawMapTimerWithRefresh = StatTimer.get("MapOverlay.drawMap+refreshState");
+    StatTimer drawMapTimer = StatTimer.get("MapOverlay.drawScreen.drawMap", 50);
+    StatTimer drawMapTimerWithRefresh = StatTimer.get("MapOverlay.drawMap+refreshState", 5);
     LocationFormat locationFormat = new LocationFormat();
 
+    boolean asyncTileRefresh = true;
     int lastWidth;
 
     /**
@@ -656,7 +658,7 @@ public class Fullscreen extends JmUI
                 try
                 {
                     gridRenderer.move(-mouseDragX, -mouseDragY);
-                    gridRenderer.updateTextures(state.getCurrentMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
+                    gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0, asyncTileRefresh);
                     gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
                 }
                 catch (Exception e)
@@ -888,7 +890,7 @@ public class Fullscreen extends JmUI
         {
             gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
         }
-        gridRenderer.updateTextures(state.getCurrentMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
+        gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0, asyncTileRefresh);
         gridRenderer.draw(1f, xOffset, yOffset);
         gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
         gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
@@ -912,6 +914,10 @@ public class Fullscreen extends JmUI
         sizeDisplay(true);
 
         timer.stop();
+
+        //GridRenderer.addDebugMessage(timer.getName(), timer.getSimpleReportString());
+        //GridRenderer.addDebugMessage(StatTimer.get("GridRenderer.center").getName(), StatTimer.get("GridRenderer.center").getSimpleReportString());
+
     }
 
     private int getMapFontScale()
@@ -968,7 +974,11 @@ public class Fullscreen extends JmUI
             gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
         }
 
-        gridRenderer.updateTextures(state.getCurrentMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+        // Update tiles
+        gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0, asyncTileRefresh);
+
+        // Purge expired TileDrawSteps
+        TileDrawStepCache.cleanUp();
 
         // Build list of drawSteps
         state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, 1f, false);
@@ -1033,7 +1043,7 @@ public class Fullscreen extends JmUI
     {
         refreshState();
         gridRenderer.move(deltaBlockX, deltaBlockz);
-        gridRenderer.updateTextures(state.getCurrentMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+        gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0, asyncTileRefresh);
         setFollow(false);
     }
 

@@ -183,7 +183,7 @@ public class RenderWaypointBeacon
             FontRenderer fr = renderManager.getFontRenderer();
 
             final TextureImpl texture = waypoint.getTexture();
-            double halfTexHeight = texture.height / 2;
+            double halfTexHeight = texture.getHeight() / 2;
 
             // Depth-masked and non-masked label
             final boolean showName = waypointProperties.showName.get() && label != null && label.length() > 0;
@@ -270,7 +270,7 @@ public class RenderWaypointBeacon
                 GL11.glNormal3d(0, 0, -1.0F * scale);
 
                 // The .5 and .2 below centers the waypoint diamond icon
-                DrawUtil.drawColoredImage(texture, 255, waypoint.getColor(), 0 - (texture.width / 2) + .5, 0 - halfTexHeight + .2, 0);
+                DrawUtil.drawColoredImage(texture, 255, waypoint.getColor(), 0 - (texture.getWidth() / 2) + .5, 0 - halfTexHeight + .2, 0);
 
                 GL11.glPopMatrix();
             }

@@ -181,7 +181,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     protected void drawWaypoint(int x, int y)
     {
         TextureImpl wpTexture = waypoint.getTexture();
-        DrawUtil.drawColoredImage(wpTexture, 255, waypoint.getColor(), x, y - (wpTexture.height / 2), 0);
+        DrawUtil.drawColoredImage(wpTexture, 255, waypoint.getColor(), x, y - (wpTexture.getHeight() / 2), 0);
     }
 
     protected void enableWaypoint(boolean enable)

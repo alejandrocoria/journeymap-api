@@ -48,6 +48,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 /**
@@ -493,6 +495,7 @@ public class JourneyMap
 
     public void updateState()
     {
+        long start = System.nanoTime();
         try
         {
             if (!initialized)
@@ -579,6 +582,16 @@ public class JourneyMap
         catch (Throwable t)
         {
             logger.error("Error in JourneyMap.updateState(): " + LogFormatter.toString(t));
+        }
+        finally
+        {
+            final double elapsedMs = (System.nanoTime() - start) / StatTimer.NS;
+            if (elapsedMs > 10)
+            {
+                // TODO remove
+                ChatLog.announceError(String.format("[%s] JourneyMap.updateState() too slow: %sms",
+                        new SimpleDateFormat("HH:mm:ss.SSS").format(new Date()), elapsedMs));
+            }
         }
     }
 

@@ -191,15 +191,15 @@ public class ThemeMinimapFrame
         {
             if (isSquare)
             {
-                DrawUtil.drawClampedImage(textureTop, frameColor, x + (textureTopLeft.width / 2D), y - (textureTop.height / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureLeft, frameColor, x - (textureLeft.width / 2D), y + (textureTopLeft.height / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.width / 2D), y - (textureTopLeft.height / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureBottom, frameColor, x + (textureBottomLeft.width / 2D), y + height - (textureBottom.height / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureRight, frameColor, x + width - (textureRight.width / 2D), y + (textureTopRight.height / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.width / 2D), y - (textureTopLeft.height / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureTopRight, frameColor, x + width - (textureTopRight.width / 2D), y - (textureTopRight.height / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureBottomLeft, frameColor, x - (textureBottomLeft.width / 2D), y + height - (textureBottomLeft.height / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureBottomRight, frameColor, x + width - (textureBottomRight.width / 2D), y + height - (textureBottomRight.height / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureTop, frameColor, x + (textureTopLeft.getWidth() / 2D), y - (textureTop.getHeight() / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureLeft, frameColor, x - (textureLeft.getWidth() / 2D), y + (textureTopLeft.getHeight() / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.getWidth() / 2D), y - (textureTopLeft.getHeight() / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureBottom, frameColor, x + (textureBottomLeft.getWidth() / 2D), y + height - (textureBottom.getHeight() / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureRight, frameColor, x + width - (textureRight.getWidth() / 2D), y + (textureTopRight.getHeight() / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.getWidth() / 2D), y - (textureTopLeft.getHeight() / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureTopRight, frameColor, x + width - (textureTopRight.getWidth() / 2D), y - (textureTopRight.getHeight() / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureBottomLeft, frameColor, x - (textureBottomLeft.getWidth() / 2D), y + height - (textureBottomLeft.getHeight() / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureBottomRight, frameColor, x + width - (textureBottomRight.getWidth() / 2D), y + height - (textureBottomRight.getHeight() / 2D), 1, frameAlpha, 0);
             }
             else
             {

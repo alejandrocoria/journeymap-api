@@ -76,8 +76,8 @@ public class ThemeCompassPoints
             pointWest.setLocation(pointWest.getX() - shiftHorz, pointWest.getY());
             pointEast.setLocation(pointEast.getX() + shiftHorz, pointEast.getY());
 
-            xOffset = (int) (((compassPointTex.width * compassPointScale) / 2));
-            yOffset = (int) (((compassPointTex.height * compassPointScale) / 2));
+            xOffset = (int) (((compassPointTex.getWidth() * compassPointScale) / 2));
+            yOffset = (int) (((compassPointTex.getHeight() * compassPointScale) / 2));
 
         }
         else
@@ -99,7 +99,7 @@ public class ThemeCompassPoints
 
     public static float getCompassPointScale(int compassLabelHeight, Theme.Minimap.MinimapSpec minimapSpec, TextureImpl compassPointTex)
     {
-        return (compassLabelHeight + minimapSpec.compassPointLabelPad) / (compassPointTex.height * 1f);
+        return (compassLabelHeight + minimapSpec.compassPointLabelPad) / (compassPointTex.getHeight() * 1f);
     }
 
     public void setPosition(final double x, final double y)

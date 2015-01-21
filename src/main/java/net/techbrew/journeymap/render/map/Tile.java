@@ -23,7 +23,6 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Tile
 {
@@ -39,11 +38,12 @@ public class Tile
     final ChunkCoordIntPair lrChunk;
     final Point ulBlock;
     final Point lrBlock;
-    final List<TileDrawStep> drawSteps = new ArrayList<TileDrawStep>();
+    final ArrayList<TileDrawStep> drawSteps = new ArrayList<TileDrawStep>();
 
     private final Logger logger = JourneyMap.getLogger();
     private final boolean debug = logger.isTraceEnabled();
-    long lastImageTime = 0;
+    //private final boolean async;
+    //long lastImageTime = 0;
     Integer lastVSlice;
     MapType lastMapType;
     //    Future<DelayedTexture> futureTex;
@@ -82,16 +82,10 @@ public class Tile
 
     public static int toHashCode(final int tileX, final int tileZ, final int zoom, final int dimension)
     {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + tileX;
-        result = prime * result + tileZ;
-        result = prime * result + zoom;
-        result = prime * result + dimension;
-        return result;
+        return Objects.hashCode(tileX, tileZ, zoom, dimension);
     }
 
-    public boolean updateTexture(final TilePos pos, final MapType mapType, Constants.MapTileQuality quality, final Integer vSlice)
+    public boolean updateTexture(final TilePos pos, final MapType mapType, Constants.MapTileQuality quality, final Integer vSlice, boolean async)
     {
         boolean forceReset = (lastMapType != mapType) || !Objects.equal(lastVSlice, vSlice);
         lastMapType = mapType;
@@ -99,42 +93,25 @@ public class Tile
 
         if (forceReset)
         {
-            drawSteps.clear();
+            clear();
         }
 
         updateRenderType();
 
-        if (drawSteps.isEmpty())
-        {
-            this.drawSteps.addAll(RegionImageHandler.getTileDrawSteps(worldDir, ulChunk, lrChunk, mapType, zoom, quality, vSlice, dimension));
-        }
-        else
-        {
-            for (TileDrawStep tileDrawStep : drawSteps)
-            {
-                tileDrawStep.refreshIfDirty(lastImageTime);
-            }
-        }
-        lastImageTime = System.currentTimeMillis();
+        drawSteps.clear();
+        drawSteps.addAll(RegionImageHandler.getTileDrawSteps(worldDir, ulChunk, lrChunk, mapType, zoom, quality, vSlice, dimension));
 
-        if (drawSteps.size() > 1)
+        for (TileDrawStep tileDrawStep : drawSteps)
         {
-            return true;
+            tileDrawStep.refreshIfDirty(async);
         }
 
-        return true;
+        return drawSteps.size() > 1;
     }
 
     public boolean hasTexture()
     {
-        for (TileDrawStep tileDrawStep : drawSteps)
-        {
-            if (tileDrawStep.hasTexture())
-            {
-                return true;
-            }
-        }
-        return false;
+        return !drawSteps.isEmpty();
     }
 
     public void clear()
@@ -232,49 +209,45 @@ public class Tile
 
         for (TileDrawStep tileDrawStep : drawSteps)
         {
-            //tileDrawStep.draw(pos, offsetX, offsetZ, 1f, GL11.GL_LINEAR, GL12.GL_CLAMP_TO_EDGE, showGrid);
-            //tileDrawStep.draw(pos, offsetX, offsetZ, 1f, GL11.GL_NEAREST, GL12.GL_CLAMP_TO_EDGE, showGrid);
-
-            tileDrawStep.draw(pos, offsetX, offsetZ, alpha, textureFilter, textureWrap, showGrid); // TODO
+            tileDrawStep.draw(pos, offsetX, offsetZ, alpha, textureFilter, textureWrap, showGrid);
         }
     }
 
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object o)
     {
-        if (this == obj)
+        if (this == o)
         {
             return true;
         }
-        if (obj == null)
+        if (o == null || getClass() != o.getClass())
         {
             return false;
         }
-        if (getClass() != obj.getClass())
+
+        Tile tile = (Tile) o;
+
+        if (dimension != tile.dimension)
         {
             return false;
         }
-        Tile other = (Tile) obj;
-        if (tileX != other.tileX)
+        if (tileX != tile.tileX)
         {
             return false;
         }
-        if (tileZ != other.tileZ)
+        if (tileZ != tile.tileZ)
         {
             return false;
         }
-        if (zoom != other.zoom)
+        if (zoom != tile.zoom)
         {
             return false;
         }
-        if (dimension != other.dimension)
+        if (worldDir != null ? !worldDir.equals(tile.worldDir) : tile.worldDir != null)
         {
             return false;
         }
-        if (!worldDir.equals(other.worldDir))
-        {
-            return false;
-        }
+
         return true;
     }
 }

@@ -30,6 +30,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -43,6 +44,7 @@ import java.util.TreeMap;
 public class GridRenderer
 {
 
+    private static HashMap<String, String> messages = new HashMap<String, String>();
     // Update pixel offsets for center
     private final Cache<Integer, Tile> tc = TileCache.instance();
     private final TilePos centerPos = new TilePos(0, 0);
@@ -64,7 +66,6 @@ public class GridRenderer
     private double centerBlockZ;
     private Integer dimension;
     private File worldDir;
-
     private double currentRotation;
     private IntBuffer viewportBuf;
     private FloatBuffer modelMatrixBuf;
@@ -80,6 +81,21 @@ public class GridRenderer
         winPosBuf = BufferUtils.createFloatBuffer(16);
         objPosBuf = BufferUtils.createFloatBuffer(16);
         setGridSize(gridSize);
+    }
+
+    public static void addDebugMessage(String key, String message)
+    {
+        messages.put(key, message);
+    }
+
+    public static void removeDebugMessage(String key, String message)
+    {
+        messages.remove(key);
+    }
+
+    public static void clearDebugMessages()
+    {
+        messages.clear();
     }
 
     public void setViewPort(Rectangle2D.Double viewPort)
@@ -156,7 +172,6 @@ public class GridRenderer
 
     public boolean center(final double blockX, final double blockZ, final int zoom)
     {
-
         if (blockX == centerBlockX && blockZ == centerBlockZ && zoom == this.zoom && !grid.isEmpty())
         {
             return false;
@@ -197,9 +212,8 @@ public class GridRenderer
         return true;
     }
 
-    public boolean updateTextures(MapType mapType, Integer vSlice, int width, int height, boolean fullUpdate, double xOffset, double yOffset)
+    public boolean updateTiles(MapType mapType, Integer vSlice, int width, int height, boolean fullUpdate, double xOffset, double yOffset, boolean async)
     {
-
         // Update screen dimensions
         updateBounds(width, height);
 
@@ -275,7 +289,7 @@ public class GridRenderer
             // Update texture only if on-screen
             if (isOnScreen(pos))
             {
-                if (tile != null && tile.updateTexture(pos, this.mapType, quality, vSlice))
+                if (tile != null && tile.updateTexture(pos, this.mapType, quality, vSlice, async))
                 {
                     updated = true;
                 }
@@ -369,7 +383,7 @@ public class GridRenderer
                 {
                     final double startX = offsetX + pos.startX;
                     final double startZ = offsetZ + pos.startZ;
-                    DrawUtil.drawRectangle(startX, startZ, Tile.TILESIZE, Tile.TILESIZE, bgColor, 255);
+                    DrawUtil.drawRectangle(startX, startZ, Tile.TILESIZE, Tile.TILESIZE, bgColor, 200);
                 }
                 else
                 {
@@ -377,6 +391,19 @@ public class GridRenderer
                 }
             }
         }
+
+        // Draw debug messages
+        if (!messages.isEmpty())
+        {
+            double centerX = offsetX + centerPixelOffset.x + (centerPos.endX - centerPos.startX) / 2;
+            double centerZ = offsetZ + centerPixelOffset.y + ((centerPos.endZ - centerPos.startZ) / 2) - 60;
+
+            for (String message : messages.values())
+            {
+                DrawUtil.drawLabel(message, centerX, centerZ += 20, DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 255, Color.white, 255, 1, true);
+            }
+        }
+
     }
 
     /**
@@ -617,6 +644,7 @@ public class GridRenderer
     public void clear()
     {
         grid.clear();
+        messages.clear();
     }
 
     public int getWidth()

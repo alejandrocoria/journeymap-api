@@ -89,7 +89,7 @@ public class WaypointEditor extends JmUI
         this.isNew = isNew;
         this.wpTexture = waypoint.getTexture();
         this.colorPickTexture = TextureCache.instance().getColorPicker();
-        this.colorPickRect = new Rectangle2D.Double(0, 0, colorPickTexture.width, colorPickTexture.height);
+        this.colorPickRect = new Rectangle2D.Double(0, 0, colorPickTexture.getWidth(), colorPickTexture.getHeight());
         this.colorPickImg = colorPickTexture.getImage();
         Keyboard.enableRepeatEvents(true);
     }
@@ -297,7 +297,7 @@ public class WaypointEditor extends JmUI
         drawColorPicker(cpX, cpY, cpSize);
 
         // WP icon
-        int iconX = cpHAreaX + ((cpX - cpHAreaX) / 2) - (wpTexture.width / 2) + 1;
+        int iconX = cpHAreaX + ((cpX - cpHAreaX) / 2) - (wpTexture.getWidth() / 2) + 1;
         int iconY = buttonRandomize.getY() - vpad / 2;
         drawWaypoint(iconX, iconY);
 
@@ -354,7 +354,7 @@ public class WaypointEditor extends JmUI
 
     protected void drawWaypoint(int x, int y)
     {
-        DrawUtil.drawColoredImage(wpTexture, 255, currentColor, x, y - (wpTexture.height / 2), 0);
+        DrawUtil.drawColoredImage(wpTexture, 255, currentColor, x, y - (wpTexture.getHeight() / 2), 0);
     }
 
     protected void drawColorPicker(int x, int y, float size)
@@ -373,7 +373,7 @@ public class WaypointEditor extends JmUI
             g.dispose();
         }
         colorPickRect.setRect(x, y, size, size);
-        float scale = size / colorPickTexture.width;
+        float scale = size / colorPickTexture.getWidth();
         DrawUtil.drawImage(colorPickTexture, x, y, false, scale, 0);
 
 
