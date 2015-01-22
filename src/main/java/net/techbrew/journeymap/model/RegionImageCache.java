@@ -35,6 +35,7 @@ public class RegionImageCache
 
     private final Cache<Integer, Future<DelayedTexture>> futureTextureCache;
     private final LoadingCache<Integer, DelayedTexture> regionTextureCache;
+    private final List<DelayedTexture> expiredTextures;
 
     private volatile Map<RegionCoord, RegionImageSet> imageSets;
     private volatile long lastFlush;
@@ -50,23 +51,26 @@ public class RegionImageCache
         //dirty = Collections.synchronizedSet(new HashSet<RegionCoord>(SIZE));
         lastFlush = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);
 
+        this.expiredTextures = Collections.synchronizedList(new ArrayList<DelayedTexture>());
+
         this.futureTextureCache = CacheBuilder.newBuilder()
                 .expireAfterAccess(10, TimeUnit.SECONDS)
                 .build();
 
         this.regionTextureCache = CacheBuilder.newBuilder()
+                .expireAfterAccess(15, TimeUnit.SECONDS)
                 .removalListener(new RemovalListener<Integer, DelayedTexture>()
                 {
                     @Override
                     public void onRemoval(RemovalNotification<Integer, DelayedTexture> notification)
                     {
-                        if (notification != null)
+                        if (notification != null && notification.getValue() != null)
                         {
                             //if (logCacheActions)
                             {
                                 JourneyMap.getLogger().info(String.format("RegionImageCache: Recycling %s", notification.getValue()));
                             }
-                            notification.getValue().deleteTexture();
+                            expiredTextures.add(notification.getValue());
                         }
                     }
                 })
@@ -171,6 +175,9 @@ public class RegionImageCache
         }
     }
 
+    /**
+     * Must be called on GL Context thread.
+     */
     private DelayedTexture getRegionTexture(int hash)
     {
         try
@@ -215,6 +222,8 @@ public class RegionImageCache
                         "ERROR MISSING", String.format("%s %s", rCoord, mapType), "?", "?"));
             }
         }
+
+        clearExpiredTextures();
 
         return texture;
     }
@@ -277,7 +286,7 @@ public class RegionImageCache
                 }
                 if (logCacheActions)
                 {
-                    logCacheAction("PUT AUTOUPDATE", getRegionTexture(hash));
+                    logCacheAction("PUT AUTO-UPDATE", getRegionTexture(hash));
                 }
                 updateRegionTexture(rCoord, lastRequestedMapType);
             }
@@ -393,6 +402,21 @@ public class RegionImageCache
 
         regionTextureCache.invalidateAll();
         regionTextureCache.cleanUp();
+
+        clearExpiredTextures();
+    }
+
+    public void clearExpiredTextures()
+    {
+        for (DelayedTexture expired : expiredTextures)
+        {
+            if (logCacheActions)
+            {
+                logCacheAction("DELETE", expired);
+            }
+            expired.deleteTexture();
+        }
+        expiredTextures.clear();
     }
 
     private void logCacheAction(String action, DelayedTexture delayedTexture)
