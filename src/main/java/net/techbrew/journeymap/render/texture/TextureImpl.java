@@ -195,8 +195,11 @@ public class TextureImpl extends AbstractTexture
      */
     public void updateTexture(BufferedImage image, boolean retainImage)
     {
-        setImage(image, retainImage);
-        bindTexture();
+        synchronized (lock)
+        {
+            setImage(image, retainImage);
+            bindTexture();
+        }
     }
 
 //    @Override
@@ -230,18 +233,23 @@ public class TextureImpl extends AbstractTexture
      */
     public void clear()
     {
-        this.image = null;
-        this.buffer = null;
-        this.bindNeeded = true;
-        this.glTextureId = -1;
+        synchronized (lock)
+        {
+            this.image = null;
+            this.buffer = null;
+            this.bindNeeded = false;
+            this.lastUpdated = 0;
+            this.glTextureId = -1;
+        }
     }
 
     /**
      * May be called without GL Context on current thread.
+     * Returns null if unbound (-1)
      */
-    public int getSafeGlTextureId()
+    public Integer getSafeGlTextureId()
     {
-        return this.glTextureId;
+        return this.glTextureId == -1 ? null : this.glTextureId;
     }
 
     /**
@@ -249,24 +257,24 @@ public class TextureImpl extends AbstractTexture
      */
     public boolean deleteTexture()
     {
-        if (this.glTextureId != -1)
+        synchronized (lock)
         {
-            try
+            if (this.glTextureId != -1)
             {
-                GL11.glDeleteTextures(this.getGlTextureId());
-                this.glTextureId = -1;
+                try
+                {
+                    GL11.glDeleteTextures(this.getGlTextureId());
+                    this.glTextureId = -1;
+                }
+                catch (Throwable t)
+                {
+                    JourneyMap.getLogger().warn("Couldn't delete texture: " + t);
+                    return false;
+                }
             }
-            catch (Throwable t)
-            {
-                JourneyMap.getLogger().warn("Couldn't delete texture: " + t);
-                return false;
-            }
+            clear();
+            return true;
         }
-        if (this.image != null)
-        {
-            this.image = null;
-        }
-        return true;
     }
 
     public long getLastUpdated()

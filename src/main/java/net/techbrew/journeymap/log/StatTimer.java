@@ -227,6 +227,11 @@ public class StatTimer
                     max = elapsedMs;
                 }
                 started = null;
+
+                if (!warmup && elapsedMs > 500)
+                {
+                    logger.warn(this.getName() + " running slow: " + elapsedMs);
+                }
                 return elapsedMs;
             }
             catch (Throwable t)

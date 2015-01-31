@@ -234,7 +234,7 @@ public class MiniMap
                 GL11.glTranslated(dv.translateX, dv.translateY, 0);
 
                 // Draw grid
-                gridRenderer.draw(dv.terrainAlpha, 0, 0);
+                gridRenderer.draw(dv.terrainAlpha, 0, 0, miniMapProperties.showGrid.get());
 
                 // Draw entities, etc
 

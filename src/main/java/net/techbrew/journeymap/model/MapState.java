@@ -18,6 +18,7 @@ import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.FileHandler;
+import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.properties.InGameMapProperties;
 import net.techbrew.journeymap.properties.MapProperties;
@@ -43,7 +44,8 @@ public class MapState
     public AtomicBoolean follow = new AtomicBoolean(true);
 
     public String playerLastPos = "0,0"; //$NON-NLS-1$
-
+    StatTimer refreshTimer = StatTimer.get("MapState.refresh");
+    StatTimer generateDrawStepsTimer = StatTimer.get("MapState.generateDrawSteps");
     // These must be internally managed
     private Constants.MapType preferredMapType;
     private File worldDir = null;
@@ -69,6 +71,8 @@ public class MapState
 
     public void refresh(Minecraft mc, EntityClientPlayerMP player, MapProperties mapProperties)
     {
+        refreshTimer.start();
+
         boolean showCaves = JourneyMap.getFullMapProperties().showCaves.get();
         final MapType lastMapType = getMapType(showCaves);
         lastMapProperties = mapProperties;
@@ -105,6 +109,8 @@ public class MapState
         playerBiome = DataCache.getPlayer().biome;//+ (DataCache.getPlayer().underground ? " Underground" : " Surface");
 
         updateLastRefresh();
+
+        refreshTimer.stop();
     }
 
     public void setMapType(MapType mapType)
@@ -178,6 +184,7 @@ public class MapState
 
     public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, WaypointDrawStepFactory waypointRenderer, RadarDrawStepFactory radarRenderer, InGameMapProperties mapProperties, float drawScale, boolean checkWaypointDistance)
     {
+        generateDrawStepsTimer.start();
         lastMapProperties = mapProperties;
 
         drawStepList.clear();
@@ -232,6 +239,8 @@ public class MapState
             boolean showLabel = mapProperties.showWaypointLabels.get();
             drawWaypointStepList.addAll(waypointRenderer.prepareSteps(DataCache.instance().getWaypoints(false), gridRenderer, checkWaypointDistance, showLabel));
         }
+
+        generateDrawStepsTimer.stop();
     }
 
     public boolean zoomIn()

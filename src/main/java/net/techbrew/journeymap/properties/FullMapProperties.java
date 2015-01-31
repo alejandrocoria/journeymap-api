@@ -11,7 +11,6 @@ package net.techbrew.journeymap.properties;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.techbrew.journeymap.Constants;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -19,7 +18,6 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class FullMapProperties extends InGameMapProperties
 {
-    public final AtomicBoolean showGrid = new AtomicBoolean(true);
     public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
 
     protected transient final String name = "fullmap";

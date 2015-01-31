@@ -43,7 +43,8 @@ public class TextureCache
     private final Map<String, TextureImpl> entityIcons = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<Integer, TextureImpl> regionImages = Collections.synchronizedMap(new HashMap<Integer, TextureImpl>());
-    private ThreadPoolExecutor texExec = new ThreadPoolExecutor(1, 4, 15L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(64), new JMThreadFactory("texture"));
+    private ThreadPoolExecutor texExec = new ThreadPoolExecutor(2, 4, 15L, TimeUnit.SECONDS,
+            new ArrayBlockingQueue<Runnable>(64), new JMThreadFactory("texture"), new ThreadPoolExecutor.CallerRunsPolicy());
 
     private TextureCache()
     {
@@ -54,91 +55,6 @@ public class TextureCache
         return Holder.INSTANCE;
     }
 
-//    public static DynamicTexture newTexture(String path)
-//    {
-//        ResourceLocation loc = new ResourceLocation(path);
-//        DynamicTexture texture = null;
-//        InputStream is = null;
-//        try
-//        {
-//            is = JourneyMap.class.getResourceAsStream(path);
-//            texture = new DynamicTexture(ImageIO.read(is));
-//        }
-//        catch (Exception e)
-//        {
-//            JourneyMap.getLogger().error("Can't get icon for " + loc + ": " + LogFormatter.toString(e));
-//            if (is != null)
-//            {
-//                try
-//                {
-//                    is.close();
-//                }
-//                catch (IOException e1)
-//                {
-//                }
-//            }
-//        }
-//        return texture;
-//    }
-
-
-    /**
-     * *********************************************
-     */
-
-//    public Future<DelayedTexture> prepareImage(final Integer glId, final BufferedImage image, final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType,
-//                                               final Integer vSlice, final int dimension, final Boolean useCache, final Integer imageWidth, final Integer imageHeight, final boolean showGrid, final float alpha)
-//    {
-//        Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>()
-//        {
-//            @Override
-//            public DelayedTexture call() throws Exception
-//            {
-//                BufferedImage chunksImage = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, useCache, image, imageWidth, imageHeight, true, showGrid);
-//                if (chunksImage == null)
-//                {
-//                    chunksImage = RegionImageHandler.createBlankImage(imageWidth, imageHeight);
-//                    final Graphics2D g2D = chunksImage.createGraphics();
-//                    g2D.setColor(Color.black);
-//                    if (mapType != Constants.MapType.underground)
-//                    {
-//                        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .5f));
-//                    }
-//                    g2D.fillRect(0, 0, imageWidth, imageHeight);
-//                    g2D.dispose();
-//                }
-//                else if (alpha < 1f)
-//                {
-//                    BufferedImage temp = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
-//                    Graphics2D g = (Graphics2D) temp.getGraphics();
-//                    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-//                    g.drawImage(chunksImage, 0, 0, imageWidth, imageHeight, null);
-//                    chunksImage = temp;
-//                    g.dispose();
-//                }
-//                return new DelayedTexture(glId, chunksImage);
-//            }
-//        });
-//        return future;
-//    }
-
-    //    public Future<DelayedTexture> updateTexture(TextureImpl texture, final Integer imageWidth, final Integer imageHeight, final float alpha)
-//    {
-//        return updateImage(texture.getGlTextureId(), texture.getImage(), imageWidth, imageHeight, alpha);
-//    }
-//
-//    public Future<DelayedTexture> prepareImage(final Integer glId, final BufferedImage image)
-//    {
-//        Future<DelayedTexture> future = texExec.submit(new Callable<DelayedTexture>()
-//        {
-//            @Override
-//            public DelayedTexture call() throws Exception
-//            {
-//                return new DelayedTexture(glId, image);
-//            }
-//        });
-//        return future;
-//    }
     public Future<DelayedTexture> scheduleTextureTask(Callable<DelayedTexture> textureTask)
     {
         //JourneyMap.getLogger().info("TextureCache.scheduleTextureTask()");
@@ -306,13 +222,25 @@ public class TextureCache
         return getNamedTexture(Name.UnknownEntity, "unknown.png", true); //$NON-NLS-1$
     }
 
+    public TextureImpl getGrid(Name name)
+    {
+        switch (name)
+        {
+            case GridCheckers:
+                return getNamedTexture(Name.GridCheckers, "gridcheckers.png", true);
+            case GridDots:
+                return getNamedTexture(Name.GridDots, "griddots.png", true);
+            default:
+                return getNamedTexture(Name.GridSquares, "grid.png", true);
+        }
+    }
+
     /**
      * *************************************************
      */
 
     public TextureImpl getEntityIconTexture(String setName, String iconPath)
     {
-
         String texName = String.format("%s/%s", setName, iconPath);
         synchronized (entityIcons)
         {
@@ -550,7 +478,10 @@ public class TextureCache
 
     public static enum Name
     {
-        MinimapSmallSquare, MinimapMediumSquare, MinimapLargeSquare, MinimapCustomSquare, MinimapSmallCircle, MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, Patreon, LocatorHostile, LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, ColorPicker, UnknownEntity
+        MinimapSmallSquare, MinimapMediumSquare, MinimapLargeSquare, MinimapCustomSquare, MinimapSmallCircle,
+        MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, Patreon, LocatorHostile,
+        LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, ColorPicker, UnknownEntity,
+        GridSquares, GridDots, GridCheckers
     }
 
     private static class Holder

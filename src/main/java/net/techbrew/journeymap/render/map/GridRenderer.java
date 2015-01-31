@@ -15,7 +15,10 @@ import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
+import net.techbrew.journeymap.model.GridSpec;
+import net.techbrew.journeymap.model.GridSpecs;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import org.apache.logging.log4j.Logger;
@@ -53,6 +56,9 @@ public class GridRenderer
     private final TreeMap<TilePos, Integer> grid = new TreeMap<TilePos, Integer>();
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
     private final Color bgColor = new Color(0x22, 0x22, 0x22);
+    StatTimer updateTilesTimer1 = StatTimer.get("GridRenderer.updateTiles(1)", 5);
+    StatTimer updateTilesTimer2 = StatTimer.get("GridRenderer.updateTiles(2)", 5);
+    private GridSpecs gridSpecs = new GridSpecs();
     private int gridSize; // 5 = 2560px.
     private double srcSize;
     private Rectangle2D.Double viewPort = null;
@@ -212,8 +218,10 @@ public class GridRenderer
         return true;
     }
 
-    public boolean updateTiles(MapType mapType, Integer vSlice, int width, int height, boolean fullUpdate, double xOffset, double yOffset)
+    public void updateTiles(MapType mapType, Integer vSlice, int width, int height, boolean fullUpdate, double xOffset, double yOffset)
     {
+        updateTilesTimer1.start();
+
         // Update screen dimensions
         updateBounds(width, height);
 
@@ -222,7 +230,8 @@ public class GridRenderer
         Integer centerHash = grid.get(centerPos);
         if (centerHash == null)
         {
-            return false;
+            updateTilesTimer1.stop();
+            return;
         }
 
         // Corner case where center tile is here but not in cache, not sure why
@@ -261,12 +270,14 @@ public class GridRenderer
 
         centerPixelOffset.setLocation(displayOffsetX + blockPixelOffset.getX(), displayOffsetY + blockPixelOffset.getY());
 
+        updateTilesTimer1.stop();
         if (!fullUpdate)
         {
-            return false;
+            return;
         }
 
-        boolean updated = false;
+        updateTilesTimer2.start();
+
         TilePos pos;
         Tile tile;
         Integer hashCode;
@@ -287,16 +298,17 @@ public class GridRenderer
             }
 
             // Update texture only if on-screen
-            if (isOnScreen(pos))
+            //if (isOnScreen(pos))
             {
-                if (tile != null && tile.updateTexture(pos, this.mapType, quality, vSlice))
+                if (tile != null && !tile.hasTexture())
                 {
-                    updated = true;
+                    tile.updateTexture(pos, this.mapType, quality, vSlice);
                 }
             }
         }
 
-        return updated;
+        updateTilesTimer2.stop();
+        return;
     }
 
     public Point2D.Double getCenterPixelOffset()
@@ -367,13 +379,14 @@ public class GridRenderer
 //        GL11.glEnable(GL11.GL_DEPTH_TEST);
     }
 
-    public void draw(final float alpha, final double offsetX, final double offsetZ)
+    public void draw(final float alpha, final double offsetX, final double offsetZ, boolean showGrid)
     {
         if (!grid.isEmpty())
         {
             double centerX = offsetX + centerPixelOffset.x;
             double centerZ = offsetZ + centerPixelOffset.y;
             final Cache<Integer, Tile> tc = TileCache.instance();
+            GridSpec gridSpec = showGrid ? gridSpecs.getSpec(mapType) : null;
 
             for (Map.Entry<TilePos, Integer> entry : grid.entrySet())
             {
@@ -387,7 +400,7 @@ public class GridRenderer
                 }
                 else
                 {
-                    tile.draw(pos, centerX, centerZ, alpha);
+                    tile.draw(pos, centerX, centerZ, alpha, gridSpec);
                 }
             }
         }

@@ -6,6 +6,7 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.StatTimer;
+import net.techbrew.journeymap.model.GridSpec;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -31,7 +32,6 @@ public class TileDrawStep
     private int sx1, sy1, sx2, sy2;
     private int size;
     private DelayedTexture scaledTexture;
-    private Integer regionTextureId;
     private Future<DelayedTexture> pendingScaledTexture;
     private RegionCoord regionCoord;
     private Constants.MapType mapType;
@@ -76,12 +76,7 @@ public class TileDrawStep
             pendingScaledTexture = null;
         }
 
-        DelayedTexture regionTexture = RegionImageCache.getInstance().getRegionTexture(regionCoord, mapType);
-        if (regionTexture != null)
-        {
-            regionTexture.bindTexture();
-            regionTextureId = regionTexture.getGlTextureId();
-        }
+        RegionImageCache.getInstance().getRegionTexture(regionCoord, mapType);
 
         try
         {
@@ -120,13 +115,10 @@ public class TileDrawStep
         }
     }
 
-    void draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, int textureFilter, int textureWrap, boolean showGrid)
+    void draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, int textureFilter, int textureWrap, GridSpec gridSpec)
     {
         // Bind pending textures if needed
-        if (pendingScaledTexture != null)
-        {
-            bindPendingTextures();
-        }
+        bindPendingTextures();
 
         Integer textureId = null;
         boolean fullSize = false;
@@ -138,9 +130,9 @@ public class TileDrawStep
             imageTimestamp = scaledTexture.getLastUpdated();
             fullSize = true;
         }
-        else if (regionTextureId != null)
+        else
         {
-            textureId = regionTextureId;
+            textureId = RegionImageCache.getInstance().getBoundRegionTextureId(regionCoord, mapType);
         }
 
         // Draw already!
@@ -161,7 +153,7 @@ public class TileDrawStep
         final double endU = fullSize ? 1D : sx2 / size;
         final double endV = fullSize ? 1D : sy2 / size;
 
-        if (textureId != null)
+        if (textureId != null && textureId != -1)
         {
             GL11.glEnable(GL11.GL_TEXTURE_2D);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
@@ -189,6 +181,23 @@ public class TileDrawStep
             tessellator.draw();
         }
 
+        if (gridSpec != null)
+        {
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, gridSpec.glTextureId);
+            GL11.glColor4f(gridSpec.red, gridSpec.green, gridSpec.blue, gridSpec.alpha);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
+            Tessellator tessellator = Tessellator.instance;
+            tessellator.startDrawingQuads();
+            tessellator.addVertexWithUV(startX, endY, z, startU, endV);
+            tessellator.addVertexWithUV(endX, endY, z, endU, endV);
+            tessellator.addVertexWithUV(endX, startY, z, endU, startV);
+            tessellator.addVertexWithUV(startX, startY, z, startU, startV);
+            tessellator.draw();
+        }
+
         if (debug) // todo
         {
             DrawUtil.drawRectangle(startX, startY, 2, endV * 512, Color.green, 200);
@@ -199,11 +208,6 @@ public class TileDrawStep
             {
                 DrawUtil.drawLabel(new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(imageTimestamp)), startX + 5, startY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
             }
-        }
-
-        if (showGrid)
-        {
-            // TODO
         }
 
         drawTimer.stop();
@@ -218,7 +222,7 @@ public class TileDrawStep
 
     public boolean hasTexture()
     {
-        return regionTextureId != null || scaledTexture != null;
+        return scaledTexture != null || RegionImageCache.getInstance().getBoundRegionTextureId(regionCoord, mapType) != null;
     }
 
 //    public boolean isDirtySince(long time)
@@ -228,7 +232,6 @@ public class TileDrawStep
 
     public boolean clearTexture()
     {
-        regionTextureId = null;
         pendingScaledTexture = null;
         if (scaledTexture != null)
         {
@@ -242,7 +245,9 @@ public class TileDrawStep
 
     public void refreshIfDirty()
     {
-        if (scaledTexture == null || RegionImageCache.getInstance().isDirtySince(regionCoord, mapType, scaledTexture.getLastUpdated()))
+        if (RegionImageCache.getInstance().textureNeedsUpdate(regionCoord, mapType)
+                || (quality == Constants.MapTileQuality.High && scaledTexture == null)
+                || (scaledTexture != null && RegionImageCache.getInstance().isDirtySince(regionCoord, mapType, scaledTexture.getLastUpdated())))
         {
             updateTexture();
         }

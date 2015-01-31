@@ -87,9 +87,9 @@ public class Fullscreen extends JmUI
     Color statusBackgroundColor;
     int statusForegroundAlpha;
     int statusBackgroundAlpha;
-    StatTimer drawScreenTimer = StatTimer.get("MapOverlay.drawScreen");
-    StatTimer drawMapTimer = StatTimer.get("MapOverlay.drawScreen.drawMap", 50);
-    StatTimer drawMapTimerWithRefresh = StatTimer.get("MapOverlay.drawMap+refreshState", 5);
+    StatTimer drawScreenTimer = StatTimer.get("Fullscreen.drawScreen");
+    StatTimer drawMapTimer = StatTimer.get("Fullscreen.drawScreen.drawMap", 50);
+    StatTimer drawMapTimerWithRefresh = StatTimer.get("Fullscreen.drawMap+refreshState", 5);
     LocationFormat locationFormat = new LocationFormat();
 
     /**
@@ -144,9 +144,10 @@ public class Fullscreen extends JmUI
     {
         try
         {
-            drawScreenTimer.start();
             drawBackground(0); // drawBackground
             drawMap();
+
+            drawScreenTimer.start();
 
             layoutButtons();
 
@@ -888,7 +889,7 @@ public class Fullscreen extends JmUI
             gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
         }
         gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), mc.displayWidth, mc.displayHeight, false, 0, 0);
-        gridRenderer.draw(1f, xOffset, yOffset);
+        gridRenderer.draw(1f, xOffset, yOffset, fullMapProperties.showGrid.get());
         gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
         gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
 
@@ -950,6 +951,9 @@ public class Fullscreen extends JmUI
             return;
         }
 
+        StatTimer timer = StatTimer.get("Fullscreen.refreshState");
+        timer.start();
+
         // Update the state first
         fullMapProperties = JourneyMap.getFullMapProperties();
         state.refresh(mc, player, fullMapProperties);
@@ -993,6 +997,8 @@ public class Fullscreen extends JmUI
 
         // Clean up expired tiles
         TileCache.instance().cleanUp();
+
+        timer.stop();
     }
 
     void openChat(String defaultText)

@@ -14,6 +14,7 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
+import net.techbrew.journeymap.model.GridSpec;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -203,13 +204,11 @@ public class Tile
         return new Point2D.Double(pixelOffsetX, pixelOffsetZ);
     }
 
-    void draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha)
+    void draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, GridSpec gridSpec)
     {
-        boolean showGrid = JourneyMap.getFullMapProperties().showGrid.get();
-
         for (TileDrawStep tileDrawStep : drawSteps)
         {
-            tileDrawStep.draw(pos, offsetX, offsetZ, alpha, textureFilter, textureWrap, showGrid);
+            tileDrawStep.draw(pos, offsetX, offsetZ, alpha, textureFilter, textureWrap, gridSpec);
         }
     }
 
