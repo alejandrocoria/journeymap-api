@@ -228,7 +228,7 @@ public class StatTimer
                 }
                 started = null;
 
-                if (!warmup && elapsedMs > 500)
+                if (!warmup && elapsedMs >= 1000)
                 {
                     logger.warn(this.getName() + " running slow: " + elapsedMs);
                 }
@@ -240,6 +240,22 @@ public class StatTimer
                 reset();
                 return 0;
             }
+        }
+    }
+
+    /**
+     * Returns elapsed time in milliseconds.
+     */
+    public double elapsed()
+    {
+        synchronized (counter)
+        {
+            if (maxed || started == null)
+            {
+                return 0;
+            }
+
+            return (System.nanoTime() - started) / NS;
         }
     }
 

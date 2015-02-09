@@ -76,7 +76,7 @@ public class TileDrawStep
             pendingScaledTexture = null;
         }
 
-        RegionImageCache.getInstance().getRegionTexture(regionCoord, mapType);
+        RegionImageCache.instance().getRegionTexture(regionCoord, mapType);
 
         try
         {
@@ -132,7 +132,7 @@ public class TileDrawStep
         }
         else
         {
-            textureId = RegionImageCache.getInstance().getBoundRegionTextureId(regionCoord, mapType);
+            textureId = RegionImageCache.instance().getBoundRegionTextureId(regionCoord, mapType);
         }
 
         // Draw already!
@@ -168,34 +168,15 @@ public class TileDrawStep
 
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, textureFilter); // GL11.GL_LINEAR_MIPMAP_NEAREST
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, textureFilter); // GL11.GL_NEAREST
-
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
-
-            Tessellator tessellator = Tessellator.instance;
-            tessellator.startDrawingQuads();
-            tessellator.addVertexWithUV(startX, endY, z, startU, endV);
-            tessellator.addVertexWithUV(endX, endY, z, endU, endV);
-            tessellator.addVertexWithUV(endX, startY, z, endU, startV);
-            tessellator.addVertexWithUV(startX, startY, z, startU, startV);
-            tessellator.draw();
+            drawBoundTexture(startU, startV, startX, startY, z, endU, endV, endX, endY);
         }
 
         if (gridSpec != null)
         {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, gridSpec.glTextureId);
-            GL11.glColor4f(gridSpec.red, gridSpec.green, gridSpec.blue, gridSpec.alpha);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
-            Tessellator tessellator = Tessellator.instance;
-            tessellator.startDrawingQuads();
-            tessellator.addVertexWithUV(startX, endY, z, startU, endV);
-            tessellator.addVertexWithUV(endX, endY, z, endU, endV);
-            tessellator.addVertexWithUV(endX, startY, z, endU, startV);
-            tessellator.addVertexWithUV(startX, startY, z, startU, startV);
-            tessellator.draw();
+            gridSpec.bindTexture(textureWrap);
+            drawBoundTexture(startU, startV, startX, startY, z, endU, endV, endX, endY);
         }
 
         if (debug) // todo
@@ -220,14 +201,25 @@ public class TileDrawStep
         }
     }
 
+    private void drawBoundTexture(double startU, double startV, double startX, double startY, double z, double endU, double endV, double endX, double endY)
+    {
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawingQuads();
+        tessellator.addVertexWithUV(startX, endY, z, startU, endV);
+        tessellator.addVertexWithUV(endX, endY, z, endU, endV);
+        tessellator.addVertexWithUV(endX, startY, z, endU, startV);
+        tessellator.addVertexWithUV(startX, startY, z, startU, startV);
+        tessellator.draw();
+    }
+
     public boolean hasTexture()
     {
-        return scaledTexture != null || RegionImageCache.getInstance().getBoundRegionTextureId(regionCoord, mapType) != null;
+        return scaledTexture != null || RegionImageCache.instance().getBoundRegionTextureId(regionCoord, mapType) != null;
     }
 
 //    public boolean isDirtySince(long time)
 //    {
-//        return RegionImageCache.getInstance().isDirtySince(regionCoord, mapType, time);
+//        return RegionImageCache.instance().isDirtySince(regionCoord, mapType, time);
 //    }
 
     public boolean clearTexture()
@@ -245,9 +237,9 @@ public class TileDrawStep
 
     public void refreshIfDirty()
     {
-        if (RegionImageCache.getInstance().textureNeedsUpdate(regionCoord, mapType)
+        if (RegionImageCache.instance().textureNeedsUpdate(regionCoord, mapType)
                 || (quality == Constants.MapTileQuality.High && scaledTexture == null)
-                || (scaledTexture != null && RegionImageCache.getInstance().isDirtySince(regionCoord, mapType, scaledTexture.getLastUpdated())))
+                || (scaledTexture != null && RegionImageCache.instance().isDirtySince(regionCoord, mapType, scaledTexture.getLastUpdated())))
         {
             updateTexture();
         }

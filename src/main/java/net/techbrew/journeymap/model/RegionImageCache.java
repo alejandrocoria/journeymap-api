@@ -12,6 +12,8 @@ import com.google.common.cache.*;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.io.FileHandler;
+import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.texture.DelayedTexture;
 import net.techbrew.journeymap.render.texture.TextureCache;
@@ -19,6 +21,8 @@ import net.techbrew.journeymap.thread.JMThreadFactory;
 import org.apache.logging.log4j.Level;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
@@ -99,7 +103,7 @@ public class RegionImageCache
     }
 
     // Get singleton instance.  Concurrency-safe.
-    public static RegionImageCache getInstance()
+    public static RegionImageCache instance()
     {
         return Holder.INSTANCE;
     }
@@ -252,8 +256,6 @@ public class RegionImageCache
                         "ERROR MISSING", String.format("%s %s", rCoord, mapType), "?", "?"));
             }
         }
-
-        clearExpiredTextures();
 
         return texture;
     }
@@ -428,28 +430,82 @@ public class RegionImageCache
                 imageSet.clear();
             }
             imageSets.clear();
+
+            futureTextureCache.invalidateAll();
+            futureTextureCache.cleanUp();
+
+            regionTextureCache.invalidateAll();
+            regionTextureCache.cleanUp();
+
+            lastFlush = System.currentTimeMillis();
         }
-
-        futureTextureCache.invalidateAll();
-        futureTextureCache.cleanUp();
-
-        regionTextureCache.invalidateAll();
-        regionTextureCache.cleanUp();
-
-        clearExpiredTextures();
     }
 
-    public void clearExpiredTextures()
+    public void deleteMap(MapState state, boolean allDims)
     {
-        for (DelayedTexture expired : expiredTextures)
+        RegionCoord fakeRc = new RegionCoord(state.getWorldDir(), 0, null, 0, state.getDimension());
+        File imageDir = RegionImageHandler.getImageDir(fakeRc, MapType.day).getParentFile();
+        if (!imageDir.getName().startsWith("DIM"))
         {
+            JourneyMap.getLogger().error("Expected DIM directory, got " + imageDir);
+            return;
+        }
+
+        File[] dirs;
+        if (allDims)
+        {
+            dirs = imageDir.getParentFile().listFiles(new FilenameFilter()
+            {
+                @Override
+                public boolean accept(File dir, String name)
+                {
+                    return dir.isDirectory() && name.startsWith("DIM");
+                }
+            });
+        }
+        else
+        {
+            dirs = new File[]{imageDir};
+        }
+
+        if (dirs != null && dirs.length > 0)
+        {
+            synchronized (lock)
+            {
+                // Clear cache
+                this.clear();
+
+                // Remove directories
+                for (File dir : dirs)
+                {
+                    FileHandler.delete(dir);
+                    JourneyMap.getLogger().info(String.format("Deleted image directory %s: %s", dir, !dir.exists()));
+                }
+
+                JourneyMap.getLogger().info("Done deleting directories");
+            }
+        }
+        else
+        {
+            JourneyMap.getLogger().warn("Found no DIM directories in " + imageDir);
+        }
+    }
+
+    /**
+     * Must be called on OpenGL context thread.
+     * Removes expired textures.
+     */
+    public void onClientTick()
+    {
+        while (!expiredTextures.isEmpty())
+        {
+            DelayedTexture expired = expiredTextures.remove(0);
             if (logCacheActions)
             {
                 logCacheAction("DELETE", expired);
             }
             expired.deleteTexture();
         }
-        expiredTextures.clear();
     }
 
     private void logCacheAction(String action, DelayedTexture delayedTexture)

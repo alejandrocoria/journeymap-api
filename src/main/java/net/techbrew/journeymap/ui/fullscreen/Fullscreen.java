@@ -1053,6 +1053,10 @@ public class Fullscreen extends JmUI
     @Override
     protected void drawLogo()
     {
+        if (logo.isUnused())
+        {
+            logo = TextureCache.instance().getLogo();
+        }
         DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
         DrawUtil.drawImage(logo, 8, 8, false, 1, 0);
         DrawUtil.sizeDisplay(width, height);

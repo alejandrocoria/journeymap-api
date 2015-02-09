@@ -8,25 +8,22 @@
 
 package net.techbrew.journeymap.render.texture;
 
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
-import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import net.techbrew.journeymap.ui.theme.Theme;
+import org.lwjgl.opengl.Display;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.List;
 import java.util.concurrent.*;
 
 /**
@@ -42,7 +39,7 @@ public class TextureCache
     private final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<String, TextureImpl> entityIcons = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
-    private final Map<Integer, TextureImpl> regionImages = Collections.synchronizedMap(new HashMap<Integer, TextureImpl>());
+    private final List<TextureImpl> expiredTextures = Collections.synchronizedList(new ArrayList<TextureImpl>());
     private ThreadPoolExecutor texExec = new ThreadPoolExecutor(2, 4, 15L, TimeUnit.SECONDS,
             new ArrayBlockingQueue<Runnable>(64), new JMThreadFactory("texture"), new ThreadPoolExecutor.CallerRunsPolicy());
 
@@ -364,20 +361,6 @@ public class TextureCache
 //    }
 //
 
-    public TextureImpl getRegionTexture(RegionCoord regionCoord, Constants.MapType mapType)
-    {
-        final int hash = Objects.hash(regionCoord, mapType);
-        TextureImpl texture = regionImages.get(hash);
-
-        if (texture == null)
-        {
-            texture = new TextureImpl(null);
-            regionImages.put(hash, texture);
-        }
-
-        return texture;
-    }
-
     /**
      * *************************************************
      */
@@ -445,34 +428,49 @@ public class TextureCache
 
     public void purge()
     {
-        for (TextureImpl texture : namedTextures.values())
+        synchronized (namedTextures)
         {
-            texture.deleteTexture();
+            expiredTextures.addAll(namedTextures.values());
+            namedTextures.clear();
         }
-        namedTextures.clear();
 
-        for (TextureImpl texture : entityIcons.values())
+        synchronized (entityIcons)
         {
-            texture.deleteTexture();
+            expiredTextures.addAll(entityIcons.values());
+            entityIcons.clear();
         }
-        entityIcons.clear();
 
-        for (TextureImpl texture : regionImages.values())
-        {
-            texture.deleteTexture();
-        }
-        regionImages.clear();
+        onClientTick();
     }
 
     public void purgeThemeImages()
     {
         synchronized (themeImages)
         {
-            for (TextureImpl texture : themeImages.values())
-            {
-                texture.deleteTexture();
-            }
+            expiredTextures.addAll(themeImages.values());
             themeImages.clear();
+        }
+    }
+
+    /**
+     * Must be called on OpenGL context thread.
+     * Removes expired textures.
+     */
+    public void onClientTick()
+    {
+        try
+        {
+            if (Display.isCurrent())
+            {
+                while (!expiredTextures.isEmpty())
+                {
+                    TextureImpl expired = expiredTextures.remove(0);
+                    expired.deleteTexture();
+                }
+            }
+        }
+        catch (Throwable t)
+        {
         }
     }
 

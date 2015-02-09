@@ -79,8 +79,8 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         {
             if (counter == 20)
             {
-                mc.mcProfiler.startSection("updateState");
-                JourneyMap.getInstance().updateState();
+                mc.mcProfiler.startSection("onClientTick");
+                JourneyMap.getInstance().onClientTick();
                 counter = 0;
                 mc.mcProfiler.endSection();
             }
@@ -100,7 +100,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             }
 
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             JourneyMap.getLogger().warn("Error during onClientTick: " + e);
         }

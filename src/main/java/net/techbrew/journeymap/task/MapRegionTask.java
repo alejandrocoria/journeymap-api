@@ -115,7 +115,7 @@ public class MapRegionTask extends BaseMapTask
     protected void complete(boolean cancelled, boolean hadError)
     {
         lastTaskCompleted = System.currentTimeMillis();
-        RegionImageCache.getInstance().flushToDisk();
+        RegionImageCache.instance().flushToDisk();
         DataCache.instance().invalidateChunkMDCache();
         if (hadError || cancelled)
         {
@@ -229,8 +229,8 @@ public class MapRegionTask extends BaseMapTask
 
             if (regionLoader != null)
             {
-                RegionImageCache.getInstance().flushToDisk();
-                RegionImageCache.getInstance().clear();
+                RegionImageCache.instance().flushToDisk();
+                RegionImageCache.instance().clear();
                 regionLoader.getRegions().clear();
                 regionLoader = null;
             }

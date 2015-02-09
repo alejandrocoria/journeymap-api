@@ -2,6 +2,8 @@ package net.techbrew.journeymap.model;
 
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.render.texture.TextureCache;
+import net.techbrew.journeymap.render.texture.TextureImpl;
+import org.lwjgl.opengl.GL11;
 
 /**
  * Provides encapsulation of how to render the grid overlay in a Tile.
@@ -9,20 +11,33 @@ import net.techbrew.journeymap.render.texture.TextureCache;
 public class GridSpec
 {
     public final Style style;
-    public final transient int glTextureId;
     public final float red;
     public final float green;
     public final float blue;
     public final float alpha;
+    private TextureImpl texture = null;
 
     public GridSpec(Style style, float red, float green, float blue, float alpha)
     {
         this.style = style;
-        this.glTextureId = TextureCache.instance().getGrid(style.textureName).getGlTextureId();
         this.red = red;
         this.green = green;
         this.blue = blue;
         this.alpha = alpha;
+    }
+
+    public void bindTexture(int textureWrap)
+    {
+        if (texture == null || texture.isUnused())
+        {
+            texture = TextureCache.instance().getGrid(style.textureName);
+        }
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
+        GL11.glColor4f(red, green, blue, alpha);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
     }
 
     public enum Style

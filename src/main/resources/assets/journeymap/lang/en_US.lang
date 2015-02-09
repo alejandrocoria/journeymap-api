@@ -59,6 +59,17 @@ jm.common.automap_title=Auto-Map...
 jm.common.chat_announcement=§eJourneyMap:§f %1$s
 jm.common.close=Close
 jm.common.day=Day
+
+jm.common.deletemap_dialog=Delete Map
+jm.common.deletemap_dialog_all=All Dimensions
+jm.common.deletemap_dialog_this=This Dimension
+jm.common.deletemap_dialog_none=None
+jm.common.deletemap_dialog_text=Delete map in all dimensions or just this dimension?
+jm.common.deletemap_status=Auto-mapping surface (%1$s).
+jm.common.deletemap_status_underground=Auto-mapping slice %1$s (%2$s).
+jm.common.deletemap_text=Delete map in one or more dimensions
+jm.common.deletemap_title=Delete Map...
+
 jm.common.dimension=Dimension %1$s
 jm.common.disabled_feature=Feature not available
 jm.common.enable=Enabled

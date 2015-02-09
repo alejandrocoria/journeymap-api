@@ -90,7 +90,7 @@ public class RegionLoader
         final RegionImageHandler rfh = RegionImageHandler.getInstance();
         final Stack<RegionCoord> stack = new Stack<RegionCoord>();
 
-        RegionImageCache.getInstance().clear();
+        RegionImageCache.instance().clear();
 
         AnvilChunkLoader anvilChunkLoader = ChunkLoader.getAnvilChunkLoader(mc);
 

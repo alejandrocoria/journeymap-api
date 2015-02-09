@@ -18,6 +18,7 @@ import net.techbrew.journeymap.io.MapSaver;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.MapState;
+import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -38,7 +39,7 @@ public class FullscreenActions extends JmUI
 {
     protected TextureImpl patreonLogo = TextureCache.instance().getPatreonLogo();
 
-    Button buttonAutomap, buttonSave, buttonClose, buttonBrowser, buttonCheck, buttonDonate;
+    Button buttonAutomap, buttonSave, buttonClose, buttonBrowser, buttonCheck, buttonDonate, buttonDeleteMap;
 
     public FullscreenActions()
     {
@@ -90,6 +91,7 @@ public class FullscreenActions extends JmUI
         buttonAutomap = new Button(Constants.getString("jm.common.automap_title"));
         buttonAutomap.setEnabled(FMLClientHandler.instance().getClient().isSingleplayer());
 
+        buttonDeleteMap = new Button(Constants.getString("jm.common.deletemap_title"));
 
         buttonDonate = new Button(Constants.getString("jm.webmap.donate_text"));
         buttonDonate.setDefaultStyle(false);
@@ -103,6 +105,7 @@ public class FullscreenActions extends JmUI
         buttonList.add(buttonCheck);
         buttonList.add(buttonDonate);
         buttonList.add(buttonBrowser);
+        buttonList.add(buttonDeleteMap);
 
         new ButtonList(buttonList).equalizeWidths(getFontRenderer());
 
@@ -131,9 +134,12 @@ public class FullscreenActions extends JmUI
         final int by = this.height / 4;
 
         buttonAutomap.leftOf(bx - 2).setY(by);
-        buttonBrowser.rightOf(buttonAutomap, hgap).setY(by);
-        buttonSave.below(buttonAutomap, vgap).leftOf(bx - 2);
-        buttonCheck.below(buttonBrowser, vgap).rightOf(buttonSave, hgap);
+        buttonDeleteMap.rightOf(buttonAutomap, hgap).setY(by);
+
+        buttonSave.below(buttonAutomap, vgap).centerHorizontalOn(bx);
+
+        buttonBrowser.below(buttonSave, vgap).leftOf(bx - 2);
+        buttonCheck.below(buttonSave, vgap).rightOf(buttonBrowser, hgap);
 
         int patreonX = bx - 8;
         int patreonY = buttonBrowser.getBottomY() + 32;
@@ -175,6 +181,13 @@ public class FullscreenActions extends JmUI
             UIManager.getInstance().open(AutoMapConfirmation.class);
             return;
         }
+        if (guibutton == buttonDeleteMap)
+        {
+            RegionImageCache.instance().deleteMap(Fullscreen.state(), false);
+            JourneyMap.getInstance().stopMapping();
+            UIManager.getInstance().openFullscreenMap();
+            return;
+        }
         if (guibutton == buttonCheck)
         {
             VersionCheck.launchWebsite();
@@ -198,6 +211,7 @@ public class FullscreenActions extends JmUI
         }
         close();
     }
+
 
     @Override
     protected void keyTyped(char c, int i)

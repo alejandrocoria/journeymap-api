@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.resources.IResourceManager;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.image.BufferedImage;
@@ -257,24 +258,34 @@ public class TextureImpl extends AbstractTexture
      */
     public boolean deleteTexture()
     {
+        boolean success = false;
         synchronized (lock)
         {
             if (this.glTextureId != -1)
             {
                 try
                 {
-                    GL11.glDeleteTextures(this.getGlTextureId());
-                    this.glTextureId = -1;
+                    if (Display.isCurrent())
+                    {
+                        GL11.glDeleteTextures(this.getGlTextureId());
+                        this.glTextureId = -1;
+                        clear();
+                        success = true;
+                    }
                 }
                 catch (Throwable t)
                 {
                     JourneyMap.getLogger().warn("Couldn't delete texture: " + t);
-                    return false;
+                    success = false;
                 }
             }
-            clear();
-            return true;
+            else
+            {
+                clear();
+                success = true;
+            }
         }
+        return success;
     }
 
     public long getLastUpdated()

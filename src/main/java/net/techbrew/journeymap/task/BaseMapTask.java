@@ -94,6 +94,7 @@ public abstract class BaseMapTask implements ITask
             }
 
             // Map the chunks
+            int count = 0;
             while (chunkIter.hasNext())
             {
                 if (!jm.isMapping())
@@ -145,9 +146,13 @@ public abstract class BaseMapTask implements ITask
                         logger.info(e.getMessage());
                     }
                 }
-                else
+
+                count++;
+
+                //if(timer.elapsed()>2000)
                 {
-                    //logger.info(String.format("Chunk not available: %s", coord));
+                    //logger.warn(String.format("Task taking too long. Chunks handled: %s/%s", count, chunkCoords.size()));
+                    //break;
                 }
             }
 
@@ -169,7 +174,7 @@ public abstract class BaseMapTask implements ITask
 
             // Push chunk cache to region cache
             int chunks = chunkImageCache.size();
-            RegionImageCache.getInstance().putAll(chunkImageCache.values(), flushCacheWhenDone);
+            RegionImageCache.instance().putAll(chunkImageCache.values(), flushCacheWhenDone);
 
             if (threadLogging)
             {

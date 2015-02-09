@@ -20,6 +20,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 
@@ -41,15 +42,6 @@ public abstract class ImageSet
     }
 
     protected abstract Wrapper getWrapper(Constants.MapType mapType);
-
-    public boolean hasLegacy()
-    {
-        synchronized (lock)
-        {
-            Wrapper wrapper = imageWrappers.get(MapType.OBSOLETE);
-            return wrapper != null;
-        }
-    }
 
     public BufferedImage getImage(Constants.MapType mapType)
     {
@@ -163,6 +155,10 @@ public abstract class ImageSet
 
     public void clear()
     {
+        for (ImageSet.Wrapper wrapper : imageWrappers.values())
+        {
+            wrapper.clear();
+        }
         imageWrappers.clear();
     }
 
@@ -193,8 +189,7 @@ public abstract class ImageSet
     {
         final static String delim = " : ";
         final Constants.MapType mapType;
-        final File imageFile;
-
+        Path imagePath;
         BufferedImage _image = null;
         boolean _dirty = true;
         long timestamp = System.currentTimeMillis();
@@ -202,7 +197,10 @@ public abstract class ImageSet
         Wrapper(Constants.MapType mapType, File imageFile, BufferedImage image)
         {
             this.mapType = mapType;
-            this.imageFile = imageFile;
+            if (imageFile != null)
+            {
+                this.imagePath = imageFile.toPath();
+            }
             setImage(image);
             if (mapType == MapType.OBSOLETE)
             {
@@ -212,7 +210,7 @@ public abstract class ImageSet
 
         File getFile()
         {
-            return imageFile;
+            return imagePath == null ? null : imagePath.toFile();
         }
 
         Constants.MapType getMapType()
@@ -253,8 +251,10 @@ public abstract class ImageSet
 
         protected void writeToDisk()
         {
+            File imageFile = null;
             try
             {
+                imageFile = getFile();
                 if (mapType == Constants.MapType.OBSOLETE)
                 {
                     if (imageFile.exists())
@@ -294,9 +294,15 @@ public abstract class ImageSet
         @Override
         public String toString()
         {
+            File imageFile = getFile();
             return mapType.name() + delim + (imageFile != null ? imageFile.getPath() : "") + delim + "image=" + (_image == null ? "null" : "ok") + ", dirty=" + _dirty;
         }
 
+        public void clear()
+        {
+            imagePath = null;
+            _image = null;
+        }
     }
 
     class WrapperComparator implements Comparator<Wrapper>

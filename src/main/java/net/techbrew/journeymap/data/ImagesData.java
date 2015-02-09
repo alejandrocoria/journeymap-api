@@ -40,7 +40,7 @@ public class ImagesData
         this.queryTime = now;
 
         List<Object[]> coords = null;
-        List<RegionCoord> regions = RegionImageCache.getInstance().getDirtySince(null, this.since);
+        List<RegionCoord> regions = RegionImageCache.instance().getDirtySince(null, this.since);
         if (regions.isEmpty())
         {
             this.regions = Collections.EMPTY_LIST;

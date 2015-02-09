@@ -51,7 +51,7 @@ public class MiniMap
     private final Minecraft mc = FMLClientHandler.instance().getClient();
     private final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
     private final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
-    private final TextureImpl playerLocatorTex;
+    private TextureImpl playerLocatorTex;
     private MiniMapProperties miniMapProperties;
     private EntityClientPlayerMP player;
     private StatTimer drawTimer;
@@ -74,7 +74,6 @@ public class MiniMap
     {
         initTime = System.currentTimeMillis();
         player = mc.thePlayer;
-        playerLocatorTex = TextureCache.instance().getPlayerLocatorSmall();
         setMiniMapProperties(miniMapProperties);
     }
 
@@ -98,7 +97,6 @@ public class MiniMap
         gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
         boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || miniMapProperties.showCaves.get());
         gridRenderer.updateTiles(state.getMapType(showCaves), state.getVSlice(), mc.displayWidth, mc.displayHeight, true, 0, 0);
-
     }
 
     public void resetInitTime()
@@ -256,7 +254,7 @@ public class MiniMap
                 }
 
                 // Draw player
-                if (miniMapProperties.showSelf.get())
+                if (miniMapProperties.showSelf.get() && playerLocatorTex != null)
                 {
                     if (centerPoint != null)
                     {
@@ -543,6 +541,7 @@ public class MiniMap
         updateDisplayVars(miniMapProperties.shape.get(), miniMapProperties.position.get(), true);
         MiniMapOverlayHandler.checkEventConfig();
         GridRenderer.clearDebugMessages();
+        playerLocatorTex = TextureCache.instance().getPlayerLocatorSmall();
     }
 
 

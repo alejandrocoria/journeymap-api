@@ -37,6 +37,7 @@ import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.properties.*;
 import net.techbrew.journeymap.render.map.TileCache;
+import net.techbrew.journeymap.render.map.TileDrawStepCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.server.JMServer;
 import net.techbrew.journeymap.task.ITaskManager;
@@ -356,10 +357,6 @@ public class JourneyMap
         {
             taskController.toggleTask(managerClass, enable, params);
         }
-        else
-        {
-            logger.warn("taskController not available");
-        }
     }
 
     /**
@@ -376,7 +373,6 @@ public class JourneyMap
         }
         else
         {
-            logger.warn("taskController not available");
             return false;
         }
     }
@@ -470,8 +466,8 @@ public class JourneyMap
         Fullscreen.state().follow.set(true);
         StatTimer.resetAll();
         TextureCache.instance().purge();
-        RegionImageCache.getInstance().flushToDisk();
-        RegionImageCache.getInstance().clear();
+        RegionImageCache.instance().flushToDisk();
+        RegionImageCache.instance().clear();
         UIManager.getInstance().reset();
         WaypointStore.instance().reset();
     }
@@ -482,8 +478,10 @@ public class JourneyMap
         JMLogger.setLevelFromProperties();
         DataCache.instance().purge();
         DataCache.instance().resetBlockMetadata();
-        RegionImageCache.getInstance().flushToDisk();
-        RegionImageCache.getInstance().clear();
+        TileCache.instance().invalidateAll();
+        TileDrawStepCache.instance().invalidateAll();
+        RegionImageCache.instance().flushToDisk();
+        RegionImageCache.instance().clear();
         UIManager.getInstance().reset();
         WaypointStore.instance().reset();
         MiniMapOverlayHandler.checkEventConfig();
@@ -491,7 +489,7 @@ public class JourneyMap
         UIManager.getInstance().getMiniMap().updateDisplayVars(true);
     }
 
-    public void updateState()
+    public void onClientTick()
     {
         //long start = System.nanoTime();
         try
@@ -571,7 +569,11 @@ public class JourneyMap
                 ChatLog.showChatAnnouncements(mc);
             }
 
-            // We got this far
+            // Clear expired textures
+            RegionImageCache.instance().onClientTick();
+            TextureCache.instance().onClientTick();
+
+            // Start Mapping
             if (!isMapping())
             {
                 startMapping();
@@ -579,7 +581,7 @@ public class JourneyMap
         }
         catch (Throwable t)
         {
-            logger.error("Error in JourneyMap.updateState(): " + LogFormatter.toString(t));
+            logger.error("Error in JourneyMap.onClientTick(): " + LogFormatter.toString(t));
         }
         finally
         {
@@ -587,7 +589,7 @@ public class JourneyMap
 //            if (elapsedMs > 10)
 //            {
 //                // TODO remove
-//                ChatLog.announceError(String.format("[%s] JourneyMap.updateState() too slow: %sms",
+//                ChatLog.announceError(String.format("[%s] JourneyMap.onClientTick() too slow: %sms",
 //                        new SimpleDateFormat("HH:mm:ss.SSS").format(new Date()), elapsedMs));
 //            }
         }
