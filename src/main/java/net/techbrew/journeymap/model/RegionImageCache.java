@@ -70,7 +70,7 @@ public class RegionImageCache
                     {
                         if (notification != null && notification.getValue() != null)
                         {
-                            //if (logCacheActions)
+                            if (logCacheActions)
                             {
                                 JourneyMap.getLogger().info(String.format("RegionImageCache: Recycling %s", notification.getValue()));
                             }

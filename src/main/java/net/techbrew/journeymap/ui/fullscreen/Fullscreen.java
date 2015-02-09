@@ -27,6 +27,7 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.MapState;
+import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.properties.config.Config;
@@ -997,6 +998,9 @@ public class Fullscreen extends JmUI
 
         // Clean up expired tiles
         TileCache.instance().cleanUp();
+
+        // Ensure expired Region images are taken care of
+        RegionImageCache.instance().onClientTick();
 
         timer.stop();
     }

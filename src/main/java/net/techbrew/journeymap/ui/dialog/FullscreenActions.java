@@ -184,7 +184,8 @@ public class FullscreenActions extends JmUI
         if (guibutton == buttonDeleteMap)
         {
             RegionImageCache.instance().deleteMap(Fullscreen.state(), false);
-            JourneyMap.getInstance().stopMapping();
+            //JourneyMap.getInstance().stopMapping();
+            Fullscreen.reset();
             UIManager.getInstance().openFullscreenMap();
             return;
         }

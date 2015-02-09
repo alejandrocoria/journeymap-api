@@ -586,13 +586,19 @@ public class FileHandler
         }
     }
 
-    public static void delete(File file)
+    public static boolean delete(File file)
     {
         if (!file.exists())
         {
-            return;
+            return true;
         }
 
+        if (file.isFile())
+        {
+            return file.delete();
+        }
+
+        String[] cmd = null;
         String path = file.getAbsolutePath();
         Util.EnumOS os = Util.getOSType();
 
@@ -600,47 +606,34 @@ public class FileHandler
         {
             case WINDOWS:
             {
-                try
-                {
-                    String cmd = String.format("cmd.exe /C RD /S /Q \"%s\"", path);
-                    JourneyMap.getLogger().info(cmd);
-
-                    ProcessBuilder pb = new ProcessBuilder(cmd);
-                    pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-                    pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-                    Process p = pb.start();
-                    p.waitFor();
-                }
-                catch (Throwable e)
-                {
-                    JourneyMap.getLogger().error("Could not delete with cmd.exe: " + path + " : " + LogFormatter.toString(e));
-                }
+                cmd = new String[]{String.format("cmd.exe /C RD /S /Q \"%s\"", path)};
                 break;
             }
             case OSX:
             {
-                try
-                {
-                    Runtime.getRuntime().exec(new String[]{"/usr/bin/rm", "-rf", path});
-                    break;
-                }
-                catch (Throwable e)
-                {
-                    JourneyMap.getLogger().error("Could not delete with /usr/bin/rm -rf: " + path + " : " + LogFormatter.toString(e));
-                }
+                cmd = new String[]{"rm", "-rf", path};
+                break;
             }
             default:
             {
-                try
-                {
-                    Runtime.getRuntime().exec(new String[]{"/usr/rm", "-rf", path});
-                }
-                catch (Throwable e)
-                {
-                    JourneyMap.getLogger().error("Could not delete with /usr/rm -rf: " + path + " : " + LogFormatter.toString(e));
-                }
+                cmd = new String[]{"rm", "-rf", path};
+                break;
             }
         }
+
+        try
+        {
+            ProcessBuilder pb = new ProcessBuilder(cmd);
+            pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+            Process p = pb.start();
+            p.waitFor();
+        }
+        catch (Throwable e)
+        {
+            JourneyMap.getLogger().error(String.format("Could not delete using: %s : %s", Joiner.on(" ").join(cmd), LogFormatter.toString(e)));
+        }
+        return file.exists();
     }
 
     public static BufferedImage getIconFromFile(File parentdir, String assetsPath, String setName, String iconPath, BufferedImage defaultImg)
