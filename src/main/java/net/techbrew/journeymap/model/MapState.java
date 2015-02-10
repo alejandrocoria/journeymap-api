@@ -272,6 +272,11 @@ public class MapState
         return true;
     }
 
+    public int getZoom()
+    {
+        return lastMapProperties.zoomLevel.get();
+    }
+
     public void requireRefresh()
     {
         this.lastRefresh = 0;

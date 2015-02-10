@@ -17,9 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.JMLogger;
-import net.techbrew.journeymap.render.map.TileCache;
 import net.techbrew.journeymap.ui.UIManager;
-import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 
 import java.util.EnumSet;
 
@@ -57,17 +55,15 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
                 {
                     mc.mcProfiler.startSection("journeymap");
 
-                    mc.mcProfiler.startSection("tileCache");
-                    final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof Fullscreen);
-                    if (isGamePaused)
-                    {
-                        TileCache.pause();
-                    }
-                    else
-                    {
-                        TileCache.resume();
-                    }
-                    mc.mcProfiler.endStartSection("minimap"); // tileCache
+//                    mc.mcProfiler.startSection("tileCache");
+//                    final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof Fullscreen);
+//                    if (isGamePaused)
+//                    {
+//                        // TODO: Any caches need to have expiration timers reset?
+//                    }
+//                    mc.mcProfiler.endStartSection("minimap"); // tileCache
+
+                    mc.mcProfiler.startSection("minimap");
 
                     UIManager.getInstance().drawMiniMap();
 

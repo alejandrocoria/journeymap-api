@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap.render.map;
 
-import com.google.common.cache.Cache;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.MathHelper;
@@ -49,11 +48,10 @@ public class GridRenderer
 
     private static HashMap<String, String> messages = new HashMap<String, String>();
     // Update pixel offsets for center
-    private final Cache<Integer, Tile> tc = TileCache.instance();
     private final TilePos centerPos = new TilePos(0, 0);
     private final Logger logger = JourneyMap.getLogger();
     private final boolean debug = logger.isTraceEnabled();
-    private final TreeMap<TilePos, Integer> grid = new TreeMap<TilePos, Integer>();
+    private final TreeMap<TilePos, Tile> grid = new TreeMap<TilePos, Tile>();
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
     private final Color bgColor = new Color(0x22, 0x22, 0x22);
     StatTimer updateTilesTimer1 = StatTimer.get("GridRenderer.updateTiles(1)", 5);
@@ -118,15 +116,13 @@ public class GridRenderer
         final int endCol = (gridSize - 1) / 2;
         final int startRow = -endRow;
         final int startCol = -endCol;
-        Cache<Integer, Tile> tc = TileCache.instance();
-
         for (int z = startRow; z <= endRow; z++)
         {
             for (int x = startCol; x <= endCol; x++)
             {
                 TilePos pos = new TilePos(x, z);
                 Tile tile = findNeighbor(centerTile, pos);
-                grid.put(pos, tile.hashCode());
+                grid.put(pos, tile);
             }
         }
 
@@ -162,11 +158,11 @@ public class GridRenderer
     public boolean hasUnloadedTile(boolean preview)
     {
         Tile tile;
-        for (Map.Entry<TilePos, Integer> entry : grid.entrySet())
+        for (Map.Entry<TilePos, Tile> entry : grid.entrySet())
         {
             if (isOnScreen(entry.getKey()))
             {
-                tile = tc.getIfPresent(entry.getValue());
+                tile = entry.getValue();
                 if (tile == null || (!preview && !tile.hasTexture()))
                 {
                     return true;
@@ -180,6 +176,7 @@ public class GridRenderer
     {
         if (blockX == centerBlockX && blockZ == centerBlockZ && zoom == this.zoom && !grid.isEmpty())
         {
+            // Nothing needs to change
             return false;
         }
 
@@ -198,9 +195,8 @@ public class GridRenderer
 
         if (centerTileChanged || grid.isEmpty())
         {
-
             // Center on tile
-            Tile newCenterTile = findTile(tileX, tileZ);
+            Tile newCenterTile = findTile(tileX, tileZ, zoom);
             populateGrid(newCenterTile);
 
             if (debug)
@@ -218,33 +214,22 @@ public class GridRenderer
         return true;
     }
 
-    public void updateTiles(MapType mapType, Integer vSlice, int width, int height, boolean fullUpdate, double xOffset, double yOffset)
+    public void updateTiles(MapType mapType, Integer vSlice, int zoom, int width, int height, boolean fullUpdate, double xOffset, double yOffset)
     {
         updateTilesTimer1.start();
+        this.mapType = mapType;
+        this.zoom = zoom;
 
         // Update screen dimensions
         updateBounds(width, height);
 
-        // Get center tile
-        this.mapType = mapType;
-
-        // Ensure tiles up to date
-        TileCache.checkStateChange(worldDir, dimension, mapType);
-
-        Integer centerHash = grid.get(centerPos);
-        if (centerHash == null)
-        {
-            updateTilesTimer1.stop();
-            return;
-        }
-
-        // Corner case where center tile is here but not in cache, not sure why
-        Tile centerTile = tc.getIfPresent(centerHash);
-        if (centerTile == null)
+        // Get center tile, check if present and current
+        Tile centerTile = grid.get(centerPos);
+        if (centerTile == null || centerTile.zoom != this.zoom)
         {
             final int tileX = Tile.blockPosToTile((int) Math.floor(centerBlockX), this.zoom);
             final int tileZ = Tile.blockPosToTile((int) Math.floor(centerBlockZ), this.zoom);
-            centerTile = findTile(tileX, tileZ);
+            centerTile = findTile(tileX, tileZ, this.zoom);
             populateGrid(centerTile);
         }
 
@@ -288,17 +273,16 @@ public class GridRenderer
 
         // Get tiles
         Constants.MapTileQuality quality = JourneyMap.getCoreProperties().mapTileQuality.get();
-        for (Map.Entry<TilePos, Integer> entry : grid.entrySet())
+        for (Map.Entry<TilePos, Tile> entry : grid.entrySet())
         {
             pos = entry.getKey();
-            hashCode = entry.getValue();
-            tile = tc.getIfPresent(hashCode);
+            tile = entry.getValue();
 
             // Ensure grid populated
             if (tile == null)
             {
                 tile = findNeighbor(centerTile, pos);
-                grid.put(pos, hashCode);
+                grid.put(pos, tile);
             }
 
             // Update texture only if on-screen
@@ -389,13 +373,12 @@ public class GridRenderer
         {
             double centerX = offsetX + centerPixelOffset.x;
             double centerZ = offsetZ + centerPixelOffset.y;
-            final Cache<Integer, Tile> tc = TileCache.instance();
             GridSpec gridSpec = showGrid ? gridSpecs.getSpec(mapType) : null;
 
-            for (Map.Entry<TilePos, Integer> entry : grid.entrySet())
+            for (Map.Entry<TilePos, Tile> entry : grid.entrySet())
             {
                 TilePos pos = entry.getKey();
-                Tile tile = tc.getIfPresent(entry.getValue());
+                Tile tile = entry.getValue();
                 if (tile == null || !tile.hasTexture())
                 {
                     final double startX = offsetX + pos.startX;
@@ -568,12 +551,12 @@ public class GridRenderer
         {
             return tile;
         }
-        return findTile(tile.tileX + pos.deltaX, tile.tileZ + pos.deltaZ);
+        return findTile(tile.tileX + pos.deltaX, tile.tileZ + pos.deltaZ, tile.zoom);
     }
 
-    private Tile findTile(final int tileX, final int tileZ)
+    private Tile findTile(final int tileX, final int tileZ, final int zoom)
     {
-        return TileCache.getOrCreate(worldDir, mapType, tileX, tileZ, zoom, dimension);
+        return new Tile(tileX, tileZ, zoom);
     }
 
     public void setContext(File worldDir, int dimension)

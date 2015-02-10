@@ -92,9 +92,10 @@ public abstract class ImageSet
                     wrapper.writeToDisk();
                 }
             }
-            imageWrappers.remove(MapType.OBSOLETE);
+            //imageWrappers.remove(MapType.OBSOLETE);
         }
         timer.stop();
+
     }
 
     public boolean isDirty()

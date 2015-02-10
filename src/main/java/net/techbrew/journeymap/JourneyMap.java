@@ -36,7 +36,6 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.properties.*;
-import net.techbrew.journeymap.render.map.TileCache;
 import net.techbrew.journeymap.render.map.TileDrawStepCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.server.JMServer;
@@ -478,7 +477,6 @@ public class JourneyMap
         JMLogger.setLevelFromProperties();
         DataCache.instance().purge();
         DataCache.instance().resetBlockMetadata();
-        TileCache.instance().invalidateAll();
         TileDrawStepCache.instance().invalidateAll();
         RegionImageCache.instance().flushToDisk();
         RegionImageCache.instance().clear();
@@ -515,12 +513,6 @@ public class JourneyMap
 
             final boolean isDead = mc.currentScreen != null && mc.currentScreen instanceof GuiGameOver;
 
-            if (!isMapping())
-            {
-                TileCache.instance().invalidateAll();
-                TileCache.instance().cleanUp();
-            }
-
             if (mc.theWorld == null)
             {
                 if (isMapping())
@@ -553,15 +545,11 @@ public class JourneyMap
             final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof Fullscreen);
             if (isGamePaused)
             {
-                TileCache.pause();
-
                 if (!isMapping())
                 {
                     return;
                 }
             }
-
-            TileCache.resume();
 
             // Show announcements
             if (!isGamePaused)

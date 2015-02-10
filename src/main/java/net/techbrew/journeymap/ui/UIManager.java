@@ -19,7 +19,6 @@ import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.config.Config;
-import net.techbrew.journeymap.render.map.TileCache;
 import net.techbrew.journeymap.ui.component.JmUI;
 import net.techbrew.journeymap.ui.dialog.FullscreenActions;
 import net.techbrew.journeymap.ui.dialog.FullscreenHotkeysHelp;
@@ -55,8 +54,6 @@ public class UIManager
         closeCurrent();
         minecraft.displayGuiScreen(null);
         minecraft.setIngameFocus();
-        //miniMap.setVisible(true);
-        TileCache.instance().cleanUp();
     }
 
     public void closeCurrent()
@@ -258,8 +255,6 @@ public class UIManager
     public void reset()
     {
         Fullscreen.reset();
-        TileCache.instance().invalidateAll();
-        TileCache.instance().cleanUp();
         miniMap.reset();
     }
 
