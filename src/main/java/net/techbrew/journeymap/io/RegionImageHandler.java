@@ -78,54 +78,7 @@ public class RegionImageHandler
         sb.append(rCoord.regionX).append(",").append(rCoord.regionZ).append(".png"); //$NON-NLS-1$ //$NON-NLS-2$
         File regionFile = new File(getImageDir(rCoord, mapType), sb.toString());
 
-        if (allowLegacy && !regionFile.exists())
-        {
-            File oldRegionFile = getRegionImageFileLegacy(rCoord);
-            if (oldRegionFile.exists())
-            {
-                regionFile = oldRegionFile;
-            }
-        }
         return regionFile;
-    }
-
-    @Deprecated
-    public static File getRegionImageFileLegacy(RegionCoord rCoord)
-    {
-        StringBuffer sb = new StringBuffer();
-        sb.append(rCoord.regionX).append(",").append(rCoord.regionZ); //$NON-NLS-1$
-        Constants.CoordType cType = Constants.CoordType.convert(rCoord.dimension);
-        if (cType != Constants.CoordType.Normal)
-        {
-            sb.append(",").append(rCoord.getVerticalSlice()); //$NON-NLS-1$
-        }
-        sb.append(getRegionFileSuffix(cType));
-        File regionFile = new File(rCoord.worldDir, sb.toString());
-        return regionFile;
-    }
-
-    @Deprecated
-    static String getRegionFileSuffix(final Constants.CoordType cType)
-    {
-        StringBuffer sb = new StringBuffer("_"); //$NON-NLS-1$
-        sb.append(cType.name());
-        sb.append(".region.png"); //$NON-NLS-1$
-        return sb.toString();
-    }
-
-    public static boolean isBlank(BufferedImage img)
-    {
-        int[] pixels = img.getRaster().getPixels(0, 0, img.getWidth() - 1, img.getHeight() - 1, (int[]) null);
-        boolean isBlank = true;
-        for (int pixel : pixels)
-        {
-            if (pixel != 0)
-            {
-                isBlank = false;
-                break;
-            }
-        }
-        return isBlank;
     }
 
     public static BufferedImage createBlankImage(int width, int height)

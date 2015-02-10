@@ -53,39 +53,10 @@ public class RegionImageSet extends ImageSet
 
             // Check for new region file
             imageFile = RegionImageHandler.getRegionImageFile(rCoord, mapType, false);
-            boolean useLegacy = !imageFile.exists();
             image = RegionImageHandler.readRegionImage(imageFile, false);
 
             // Add wrapper
             wrapper = addWrapper(mapType, imageFile, image);
-            if (!useLegacy)
-            {
-                return wrapper;
-            }
-
-            // Fallback check for legacy (nightAndDay) region file
-            File legacyFile = RegionImageHandler.getRegionImageFileLegacy(rCoord);
-            if (legacyFile.exists())
-            {
-
-                // Get image for wrapper from legacy
-                BufferedImage legacyImage = RegionImageHandler.readRegionImage(legacyFile, false);
-                wrapper.setImage(getSubimage(rCoord, mapType, legacyImage));
-
-                // Add other wrappers for day/night
-                if (mapType == Constants.MapType.day)
-                {
-                    addWrapperFromLegacy(Constants.MapType.night, legacyImage);
-                }
-                else if (mapType == Constants.MapType.night)
-                {
-                    addWrapperFromLegacy(Constants.MapType.day, legacyImage);
-                }
-
-                // Add legacy wrapper
-                addWrapper(Constants.MapType.OBSOLETE, legacyFile, null);
-
-            }
             return wrapper;
         }
     }
@@ -154,12 +125,6 @@ public class RegionImageSet extends ImageSet
                 return copyImage(image.getSubimage(0, 0, 512, 512));
             }
         }
-    }
-
-    protected Wrapper addWrapperFromLegacy(Constants.MapType mapType, BufferedImage legacyImage)
-    {
-        BufferedImage image = getSubimage(rCoord, mapType, legacyImage);
-        return addWrapper(mapType, image);
     }
 
     @Override

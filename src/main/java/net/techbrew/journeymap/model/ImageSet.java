@@ -35,6 +35,7 @@ public abstract class ImageSet
     protected final Map<Constants.MapType, Wrapper> imageWrappers;
 
     protected final Object lock = new Object();
+    protected StatTimer writeToDiskTimer = StatTimer.get("ImageSet.writeToDisk", 2, 1000);
 
     public ImageSet()
     {
@@ -80,11 +81,12 @@ public abstract class ImageSet
 
     public void writeToDisk(boolean force)
     {
-        StatTimer timer = StatTimer.get("ImageSet.writeToDisk").start();
+
+        List<Wrapper> list = new ArrayList<Wrapper>(imageWrappers.values());
+        Collections.sort(list, new WrapperComparator());
         synchronized (lock)
         {
-            List<Wrapper> list = new ArrayList<Wrapper>(imageWrappers.values());
-            Collections.sort(list, new WrapperComparator());
+            writeToDiskTimer.start();
             for (Wrapper wrapper : list)
             {
                 if (force || wrapper.isDirty())
@@ -92,10 +94,16 @@ public abstract class ImageSet
                     wrapper.writeToDisk();
                 }
             }
-            //imageWrappers.remove(MapType.OBSOLETE);
+            writeToDiskTimer.stop();
         }
-        timer.stop();
 
+        if (writeToDiskTimer.hasReachedElapsedLimit() && writeToDiskTimer.getElapsedLimitWarningsRemaining() > 0)
+        {
+            for (Wrapper wrapper : list)
+            {
+                JourneyMap.getLogger().warn("Image in set: " + wrapper);
+            }
+        }
     }
 
     public boolean isDirty()
@@ -203,10 +211,6 @@ public abstract class ImageSet
                 this.imagePath = imageFile.toPath();
             }
             setImage(image);
-            if (mapType == MapType.OBSOLETE)
-            {
-                _dirty = false;
-            }
         }
 
         File getFile()
@@ -256,15 +260,6 @@ public abstract class ImageSet
             try
             {
                 imageFile = getFile();
-                if (mapType == Constants.MapType.OBSOLETE)
-                {
-                    if (imageFile.exists())
-                    {
-                        imageFile.delete();
-                    }
-                    return;
-                }
-
                 if (_image == null)
                 {
                     JourneyMap.getLogger().warn("Null image for " + this);

@@ -146,53 +146,7 @@ public class Constants
 
     public enum MapType
     {
-        day(0), night(16), underground(0),
-
-        @Deprecated
-        OBSOLETE(-1);
-        private final int _offset;
-
-        MapType(int offset)
-        {
-            _offset = offset;
-        }
-
-        public int offset()
-        {
-            return _offset;
-        }
-    }
-
-    @Deprecated
-    public enum CoordType
-    {
-        Normal, Cave, Nether, End, Other, OtherCave;
-
-        public static CoordType convert(int dimension)
-        {
-            return convert(false, dimension);
-        }
-
-        public static CoordType convert(MapType mapType, int dimension)
-        {
-            return convert(mapType.equals(MapType.underground), dimension);
-        }
-
-        public static CoordType convert(Boolean underground, int dimension)
-        {
-            switch (dimension)
-            {
-                case 0:
-                {
-                    return underground ? Cave : Normal;
-                }
-                case -1:
-                    return Nether;
-                case 1:
-                    return End;
-            }
-            return underground ? Cave : Normal;
-        }
+        day, night, underground;
     }
 
     public enum WorldType
