@@ -134,7 +134,7 @@ public class RegionImageCache
             long imageTime = getRegionImageSet(rCoord).getWrapper(mapType).getTimestamp();
             if (existing.getLastUpdated() >= imageTime)
             {
-                //if (logCacheActions)
+                if (logCacheActions)
                 {
                     logCacheAction("ASYNC UPDATE UNNECESSARY", existing);
                 }
@@ -334,10 +334,8 @@ public class RegionImageCache
                     JourneyMap.getLogger().info("MAP TASK UPDATE for " + rCoord + " " + lastRequestedMapType);
                 }
                 updateRegionTexture(rCoord, lastRequestedMapType, true);
-                continue;
             }
         }
-
 
     }
 
