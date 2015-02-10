@@ -13,6 +13,7 @@ import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
+import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import net.techbrew.journeymap.ui.theme.Theme;
 import org.lwjgl.opengl.Display;
@@ -453,6 +454,18 @@ public class TextureCache
     }
 
     /**
+     * Convenient way to pass off unused textures
+     * @param texture
+     */
+    public void expireTexture(TextureImpl texture)
+    {
+        if (texture != null)
+        {
+            expiredTextures.add(texture);
+        }
+    }
+
+    /**
      * Must be called on OpenGL context thread.
      * Removes expired textures.
      */
@@ -471,6 +484,7 @@ public class TextureCache
         }
         catch (Throwable t)
         {
+            JourneyMap.getLogger().warn("TextureCache.onClientTick() unexpected error: " + LogFormatter.toString(t));
         }
     }
 

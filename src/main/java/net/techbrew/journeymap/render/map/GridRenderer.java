@@ -54,8 +54,8 @@ public class GridRenderer
     private final TreeMap<TilePos, Tile> grid = new TreeMap<TilePos, Tile>();
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
     private final Color bgColor = new Color(0x22, 0x22, 0x22);
-    StatTimer updateTilesTimer1 = StatTimer.get("GridRenderer.updateTiles(1)", 5);
-    StatTimer updateTilesTimer2 = StatTimer.get("GridRenderer.updateTiles(2)", 5);
+    StatTimer updateTilesTimer1 = StatTimer.get("GridRenderer.updateTiles(1)", 5, 500);
+    StatTimer updateTilesTimer2 = StatTimer.get("GridRenderer.updateTiles(2)", 5, 500);
     private GridSpecs gridSpecs = new GridSpecs();
     private int gridSize; // 5 = 2560px.
     private double srcSize;
@@ -288,7 +288,7 @@ public class GridRenderer
             // Update texture only if on-screen
             //if (isOnScreen(pos))
             {
-                if (!tile.hasTexture())
+                if (!tile.hasTexture() || tile.drawSteps.get(0).getMapType() != this.mapType)
                 {
                     tile.updateTexture(worldDir, this.mapType, quality, vSlice, dimension);
                 }

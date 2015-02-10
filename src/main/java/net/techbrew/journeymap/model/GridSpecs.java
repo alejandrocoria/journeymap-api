@@ -14,7 +14,7 @@ public class GridSpecs
     public GridSpecs()
     {
         this(new GridSpec(GridSpec.Style.Squares, .5f, .5f, .5f, .5f),
-                new GridSpec(GridSpec.Style.Squares, 1f, 1f, 1f, .5f),
+                new GridSpec(GridSpec.Style.Squares, 0f, 0f, 1f, .5f),
                 new GridSpec(GridSpec.Style.Squares, 0f, 0f, 1f, .5f));
     }
 

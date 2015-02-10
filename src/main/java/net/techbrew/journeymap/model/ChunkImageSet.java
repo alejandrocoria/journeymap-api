@@ -37,7 +37,7 @@ public class ChunkImageSet extends ImageSet
     @Override
     protected Wrapper getWrapper(Constants.MapType mapType)
     {
-        synchronized (lock)
+        synchronized (imageWrappers)
         {
             Wrapper wrapper = imageWrappers.get(mapType);
             if (wrapper == null)

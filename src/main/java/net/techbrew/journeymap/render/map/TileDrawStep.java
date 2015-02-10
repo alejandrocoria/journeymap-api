@@ -76,7 +76,11 @@ public class TileDrawStep
             pendingScaledTexture = null;
         }
 
-        RegionImageCache.instance().getRegionTexture(regionCoord, mapType);
+        RegionImageCache ric = RegionImageCache.instance();
+        if (ric.textureNeedsUpdate(regionCoord, mapType))
+        {
+            ric.updateRegionTexture(regionCoord, mapType, true);
+        }
 
         try
         {
@@ -222,17 +226,15 @@ public class TileDrawStep
 //        return RegionImageCache.instance().isDirtySince(regionCoord, mapType, time);
 //    }
 
-    public boolean clearTexture()
+    public void clearTexture()
     {
         pendingScaledTexture = null;
         if (scaledTexture != null)
         {
-            return scaledTexture.deleteTexture();
+            TextureCache.instance().expireTexture(scaledTexture);
+            scaledTexture = null;
         }
-        else
-        {
-            return false;
-        }
+        pendingScaledTexture = null;
     }
 
     public void refreshIfDirty()
@@ -243,6 +245,21 @@ public class TileDrawStep
         {
             updateTexture();
         }
+    }
+
+    public RegionCoord getRegionCoord()
+    {
+        return regionCoord;
+    }
+
+    public Constants.MapType getMapType()
+    {
+        return mapType;
+    }
+
+    public Integer getZoom()
+    {
+        return zoom;
     }
 
     public int hashCode()

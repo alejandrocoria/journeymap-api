@@ -27,7 +27,6 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.MapState;
-import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.properties.config.Config;
@@ -35,7 +34,6 @@ import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.draw.RadarDrawStepFactory;
 import net.techbrew.journeymap.render.draw.WaypointDrawStepFactory;
 import net.techbrew.journeymap.render.map.GridRenderer;
-import net.techbrew.journeymap.render.map.TileDrawStepCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
@@ -976,9 +974,6 @@ public class Fullscreen extends JmUI
         // Update tiles
         gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), state.getZoom(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 
-        // Purge expired TileDrawSteps
-        TileDrawStepCache.cleanUp();
-
         // Build list of drawSteps
         state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, 1f, false);
 
@@ -994,7 +989,7 @@ public class Fullscreen extends JmUI
         state.updateLastRefresh();
 
         // Ensure expired Region images are taken care of
-        RegionImageCache.instance().onClientTick();
+        TextureCache.instance().onClientTick();
 
         timer.stop();
     }

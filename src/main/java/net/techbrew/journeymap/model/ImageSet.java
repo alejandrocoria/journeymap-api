@@ -16,13 +16,12 @@ import net.techbrew.journeymap.log.StatTimer;
 import org.apache.logging.log4j.Level;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.List;
 
 /**
  * An ImageSet contains one or more Wrappers of image, file, and maptype.
@@ -31,11 +30,8 @@ import java.util.List;
  */
 public abstract class ImageSet
 {
-
     protected final Map<Constants.MapType, Wrapper> imageWrappers;
-
-    protected final Object lock = new Object();
-    protected StatTimer writeToDiskTimer = StatTimer.get("ImageSet.writeToDisk", 2, 1000);
+    protected StatTimer writeToDiskTimer = StatTimer.get("ImageSet.writeToDisk", 2, 500);
 
     public ImageSet()
     {
@@ -49,73 +45,15 @@ public abstract class ImageSet
         return getWrapper(mapType).getImage();
     }
 
-    public File getFile(Constants.MapType mapType)
-    {
-        return getWrapper(mapType).getFile();
-    }
-
-    public void setImage(Constants.MapType mapType, BufferedImage image)
-    {
-        synchronized (lock)
-        {
-            Wrapper wrapper = imageWrappers.get(mapType);
-            if (wrapper != null)
-            {
-                wrapper.setImage(image);
-            }
-            else
-            {
-                addWrapper(mapType, image);
-            }
-        }
-    }
-
-    public void setDirtyFor(Constants.MapType mapType)
-    {
-        Wrapper wrapper = imageWrappers.get(mapType);
-        if (wrapper != null)
-        {
-            wrapper.setDirty();
-        }
-    }
-
     public void writeToDisk(boolean force)
-    {
-
-        List<Wrapper> list = new ArrayList<Wrapper>(imageWrappers.values());
-        Collections.sort(list, new WrapperComparator());
-        synchronized (lock)
-        {
-            writeToDiskTimer.start();
-            for (Wrapper wrapper : list)
-            {
-                if (force || wrapper.isDirty())
-                {
-                    wrapper.writeToDisk();
-                }
-            }
-            writeToDiskTimer.stop();
-        }
-
-        if (writeToDiskTimer.hasReachedElapsedLimit() && writeToDiskTimer.getElapsedLimitWarningsRemaining() > 0)
-        {
-            for (Wrapper wrapper : list)
-            {
-                JourneyMap.getLogger().warn("Image in set: " + wrapper);
-            }
-        }
-    }
-
-    public boolean isDirty()
     {
         for (Wrapper wrapper : imageWrappers.values())
         {
-            if (wrapper.isDirty())
+            if (force || wrapper.isDirty())
             {
-                return true;
+                wrapper.writeToDisk();
             }
         }
-        return false;
     }
 
     public boolean updatedSince(MapType mapType, long time)
@@ -135,15 +73,6 @@ public abstract class ImageSet
             }
         }
         return false;
-    }
-
-    protected BufferedImage copyImage(BufferedImage image)
-    {
-        BufferedImage copy = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-        Graphics g = copy.getGraphics();
-        g.drawImage(image, 0, 0, null);
-        g.dispose();
-        return copy;
     }
 
     @Override
@@ -256,22 +185,29 @@ public abstract class ImageSet
 
         protected void writeToDisk()
         {
-            File imageFile = null;
+            writeToDiskTimer.start();
             try
             {
-                imageFile = getFile();
                 if (_image == null)
                 {
                     JourneyMap.getLogger().warn("Null image for " + this);
                 }
+                else if (imagePath == null)
+                {
+                    JourneyMap.getLogger().warn("Null path for " + this);
+                }
                 else
                 {
-                    File dir = imageFile.getParentFile();
-                    if (!dir.exists())
+                    File imageFile = imagePath.toFile();
+                    if (!imageFile.exists())
                     {
-                        dir.mkdirs();
+                        imageFile.getParentFile().mkdirs();
                     }
-                    ImageIO.write(_image, "png", new FileOutputStream(imageFile));
+
+                    BufferedOutputStream imageOutputStream = new BufferedOutputStream(new FileOutputStream(imageFile));
+                    ImageIO.write(_image, "PNG", imageOutputStream);
+                    imageOutputStream.close();
+
                     if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
                     {
                         JourneyMap.getLogger().debug("Wrote to disk: " + imageFile); //$NON-NLS-1$
@@ -281,9 +217,14 @@ public abstract class ImageSet
             }
             catch (Throwable e)
             {
-                String error = "Unexpected error writing to disk: " + imageFile + ": " + LogFormatter.toString(e);
+                String error = "Unexpected error writing to disk: " + this + ": " + LogFormatter.toString(e);
                 JourneyMap.getLogger().error(error);
                 //throw new RuntimeException(e);
+            }
+            writeToDiskTimer.stop();
+            if (writeToDiskTimer.hasReachedElapsedLimit() && writeToDiskTimer.getElapsedLimitWarningsRemaining() > 0)
+            {
+                JourneyMap.getLogger().warn("Image that took too long: " + this);
             }
         }
 
@@ -300,14 +241,4 @@ public abstract class ImageSet
             _image = null;
         }
     }
-
-    class WrapperComparator implements Comparator<Wrapper>
-    {
-        @Override
-        public int compare(Wrapper o1, Wrapper o2)
-        {
-            return o1.mapType.compareTo(o2.mapType);
-        }
-    }
-
 }

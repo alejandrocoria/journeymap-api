@@ -28,7 +28,7 @@ public class StatTimer
     private static final int MAX_COUNT = 1000000;
     private static final int MAX_ELAPSED_LIMIT_WARNINGS = 25;
     private int elapsedLimitWarnings = MAX_ELAPSED_LIMIT_WARNINGS;
-    private static final int ELAPSED_LIMIT_DEFAULT = 2000;
+    private static final int ELAPSED_LIMIT_DEFAULT = 1000;
     private static Map<String, StatTimer> timers = Collections.synchronizedMap(new HashMap<String, StatTimer>());
     private final Logger logger = JourneyMap.getLogger();
     private final int warmupCount;

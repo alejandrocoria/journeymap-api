@@ -188,74 +188,81 @@ public class TaskController
     {
         Profiler profiler = FMLClientHandler.instance().getClient().mcProfiler;
         profiler.startSection("journeymapTask");
+        StatTimer totalTimer = StatTimer.get("TaskController.performTasks", 1, 1000).start();
 
-        synchronized (queue)
+        try
         {
-            if (!queue.isEmpty())
+            synchronized (queue)
             {
-                if (queue.peek().isDone())
+                if (!queue.isEmpty())
                 {
-                    try
+                    if (queue.peek().isDone())
                     {
-                        queue.take();
-                    }
-                    catch (InterruptedException e)
-                    {
-                        logger.warn(e.getMessage());
-                    }
-                }
-            }
-
-            if (queue.isEmpty())
-            {
-                ITask task = null;
-                ITaskManager manager = getNextManager(minecraft);
-                if (manager == null)
-                {
-                    logger.warn("No task managers enabled!");
-                    return;
-                }
-                boolean accepted = false;
-
-                StatTimer timer = StatTimer.get(manager.getTaskClass().getSimpleName() + ".Manager.getTask").start();
-                task = manager.getTask(minecraft);
-
-                if (task == null)
-                {
-                    timer.cancel();
-                }
-                else
-                {
-                    timer.stop();
-
-                    ensureExecutor();
-
-                    if (taskExecutor != null && !taskExecutor.isShutdown())
-                    {
-                        // Create the runnable wrapper
-                        final RunnableTask runnableTask = new RunnableTask(taskExecutor, task);
-
-                        // Start the task
-                        Future future = taskExecutor.submit(runnableTask);
-                        queue.add(future);
-                        accepted = true;
-
-                        if (logger.isTraceEnabled())
+                        try
                         {
-                            logger.debug("Scheduled " + manager.getTaskClass().getSimpleName());
+                            queue.take();
                         }
+                        catch (InterruptedException e)
+                        {
+                            logger.warn(e.getMessage());
+                        }
+                    }
+                }
+
+                if (queue.isEmpty())
+                {
+                    ITask task = null;
+                    ITaskManager manager = getNextManager(minecraft);
+                    if (manager == null)
+                    {
+                        logger.warn("No task managers enabled!");
+                        return;
+                    }
+                    boolean accepted = false;
+
+                    StatTimer timer = StatTimer.get(manager.getTaskClass().getSimpleName() + ".Manager.getTask").start();
+                    task = manager.getTask(minecraft);
+
+                    if (task == null)
+                    {
+                        timer.cancel();
                     }
                     else
                     {
-                        logger.warn("TaskExecutor isn't running");
-                    }
+                        timer.stop();
 
-                    manager.taskAccepted(task, accepted);
+                        ensureExecutor();
+
+                        if (taskExecutor != null && !taskExecutor.isShutdown())
+                        {
+                            // Create the runnable wrapper
+                            final RunnableTask runnableTask = new RunnableTask(taskExecutor, task);
+
+                            // Start the task
+                            Future future = taskExecutor.submit(runnableTask);
+                            queue.add(future);
+                            accepted = true;
+
+                            if (logger.isTraceEnabled())
+                            {
+                                logger.debug("Scheduled " + manager.getTaskClass().getSimpleName());
+                            }
+                        }
+                        else
+                        {
+                            logger.warn("TaskExecutor isn't running");
+                        }
+
+                        manager.taskAccepted(task, accepted);
+                    }
                 }
             }
         }
-
-        profiler.endSection();
+        finally
+        {
+            totalTimer.stop();
+            profiler.endSection();
+        }
     }
 
     private ITaskManager getNextManager(final Minecraft minecraft)

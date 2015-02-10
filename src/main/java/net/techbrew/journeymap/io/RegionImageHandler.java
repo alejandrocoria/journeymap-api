@@ -44,7 +44,7 @@ public class RegionImageHandler
 
     public static File getImageDir(RegionCoord rCoord, MapType mapType)
     {
-        File dimDir = new File(rCoord.worldDir, "DIM" + rCoord.dimension); //$NON-NLS-1$
+        File dimDir = rCoord.dimDir.toFile();
         File subDir = null;
         if (rCoord.isUnderground())
         {

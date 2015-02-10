@@ -489,6 +489,7 @@ public class JourneyMap
 
     public void onClientTick()
     {
+        StatTimer timer = StatTimer.getDisposable("JourneyMap.onClientTick", 200).start();
         //long start = System.nanoTime();
         try
         {
@@ -558,7 +559,6 @@ public class JourneyMap
             }
 
             // Clear expired textures
-            RegionImageCache.instance().onClientTick();
             TextureCache.instance().onClientTick();
 
             // Start Mapping
@@ -573,6 +573,7 @@ public class JourneyMap
         }
         finally
         {
+            timer.stop();
 //            final double elapsedMs = (System.nanoTime() - start) / StatTimer.NS;
 //            if (elapsedMs > 10)
 //            {

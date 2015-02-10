@@ -11,6 +11,7 @@ package net.techbrew.journeymap.model;
 import net.minecraft.world.ChunkCoordIntPair;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +23,7 @@ public class RegionCoord implements Comparable<RegionCoord>
     private transient static final int chunkSqRt = (int) Math.pow(2, SIZE);
     // TODO: worldDir should serialize as a relative path to allow data files to be usable after being moved
     public final File worldDir;
+    public final Path dimDir;
     public final int regionX;
     public final int regionZ;
     public final Integer vSlice;
@@ -30,6 +32,7 @@ public class RegionCoord implements Comparable<RegionCoord>
     public RegionCoord(File worldDir, int regionX, Integer vSlice, int regionZ, int dimension)
     {
         this.worldDir = worldDir;
+        this.dimDir = new File(worldDir, "DIM" + dimension).toPath();
         this.regionX = regionX;
         this.regionZ = regionZ;
         this.vSlice = vSlice;

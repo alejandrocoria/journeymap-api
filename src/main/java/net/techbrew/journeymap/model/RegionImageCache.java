@@ -17,6 +17,7 @@ import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.render.texture.DelayedTexture;
 import net.techbrew.journeymap.render.texture.TextureCache;
+import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import org.apache.logging.log4j.Level;
 
@@ -38,7 +39,6 @@ public class RegionImageCache
 
     private final Cache<Integer, Future<DelayedTexture>> futureTextureCache;
     private final LoadingCache<Integer, DelayedTexture> regionTextureCache;
-    private final List<DelayedTexture> expiredTextures;
 
     private volatile Map<RegionCoord, RegionImageSet> imageSets;
     private volatile long lastFlush;
@@ -53,8 +53,6 @@ public class RegionImageCache
 
         //dirty = Collections.synchronizedSet(new HashSet<RegionCoord>(SIZE));
         lastFlush = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);
-
-        this.expiredTextures = Collections.synchronizedList(new ArrayList<DelayedTexture>());
 
         this.futureTextureCache = CacheBuilder.newBuilder()
                 .expireAfterAccess(10, TimeUnit.SECONDS)
@@ -71,9 +69,9 @@ public class RegionImageCache
                         {
                             if (logCacheActions)
                             {
-                                JourneyMap.getLogger().info(String.format("RegionImageCache: Recycling %s", notification.getValue()));
+                                logCacheAction("REMOVE", notification.getValue());
                             }
-                            expiredTextures.add(notification.getValue());
+                            TextureCache.instance().expireTexture(notification.getValue());
                         }
                     }
                 })
@@ -107,7 +105,7 @@ public class RegionImageCache
         return Holder.INSTANCE;
     }
 
-    private void updateRegionTexture(final RegionCoord rCoord, final Constants.MapType mapType, boolean aSync)
+    public void updateRegionTexture(final RegionCoord rCoord, final Constants.MapType mapType, boolean aSync)
     {
         final int hash = Objects.hash(rCoord, mapType);
         final DelayedTexture existing = getRegionTextureByHash(hash);
@@ -522,30 +520,13 @@ public class RegionImageCache
         }
     }
 
-    /**
-     * Must be called on OpenGL context thread.
-     * Removes expired textures.
-     */
-    public void onClientTick()
+    private void logCacheAction(String action, TextureImpl texture)
     {
-        while (!expiredTextures.isEmpty())
+        if (texture != null)
         {
-            DelayedTexture expired = expiredTextures.remove(0);
-            if (logCacheActions)
-            {
-                logCacheAction("DELETE", expired);
-            }
-            expired.deleteTexture();
-        }
-    }
-
-    private void logCacheAction(String action, DelayedTexture delayedTexture)
-    {
-        if (delayedTexture != null)
-        {
-            String time = delayedTexture.getLastUpdated() == 0 ? "Never" : new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(delayedTexture.getLastUpdated()));
+            String time = texture.getLastUpdated() == 0 ? "Never" : new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(texture.getLastUpdated()));
             JourneyMap.getLogger().info(String.format("RegionImageCache: %s %s (GLID %s) on %s",
-                    action, delayedTexture.getDescription(), delayedTexture.getSafeGlTextureId(), time));
+                    action, texture.getDescription(), texture.getSafeGlTextureId(), time));
         }
         else
         {

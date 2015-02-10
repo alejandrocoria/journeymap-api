@@ -10,9 +10,7 @@ package net.techbrew.journeymap.model;
 
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
-import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
-import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -25,9 +23,7 @@ import java.io.File;
  */
 public class RegionImageSet extends ImageSet
 {
-
     protected final RegionCoord rCoord;
-    Logger logger = JourneyMap.getLogger();
 
     public RegionImageSet(RegionCoord rCoord)
     {
@@ -38,7 +34,7 @@ public class RegionImageSet extends ImageSet
     @Override
     protected Wrapper getWrapper(Constants.MapType mapType)
     {
-        synchronized (lock)
+        synchronized (imageWrappers)
         {
             // Check wrappers
             Wrapper wrapper = imageWrappers.get(mapType);
@@ -63,12 +59,9 @@ public class RegionImageSet extends ImageSet
 
     public void insertChunk(final ChunkImageSet cis)
     {
-        synchronized (lock)
+        for (ChunkImageSet.Wrapper cisWrapper : cis.imageWrappers.values())
         {
-            for (ChunkImageSet.Wrapper cisWrapper : cis.imageWrappers.values())
-            {
-                insertChunk(cis.getCCoord(), cisWrapper.getImage(), cisWrapper.getMapType());
-            }
+            insertChunk(cis.getCCoord(), cisWrapper.getImage(), cisWrapper.getMapType());
         }
     }
 
@@ -106,25 +99,6 @@ public class RegionImageSet extends ImageSet
             return false;
         }
         return rCoord.equals(((RegionImageSet) obj).rCoord);
-    }
-
-    protected BufferedImage getSubimage(RegionCoord rCoord, MapType mapType, BufferedImage image)
-    {
-        if (image == null)
-        {
-            return null;
-        }
-        switch (mapType)
-        {
-            case night:
-            {
-                return copyImage(image.getSubimage(512, 0, 512, 512));
-            }
-            default:
-            {
-                return copyImage(image.getSubimage(0, 0, 512, 512));
-            }
-        }
     }
 
     @Override

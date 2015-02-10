@@ -82,10 +82,10 @@ public class Tile
         drawSteps.clear();
         drawSteps.addAll(RegionImageHandler.getTileDrawSteps(worldDir, ulChunk, lrChunk, mapType, zoom, quality, vSlice, dimension));
 
-        for (TileDrawStep tileDrawStep : drawSteps)
-        {
-            tileDrawStep.refreshIfDirty();
-        }
+//        for (TileDrawStep tileDrawStep : drawSteps)
+//        {
+//            tileDrawStep.refreshIfDirty();
+//        }
 
         return drawSteps.size() > 1;
     }
@@ -135,23 +135,13 @@ public class Tile
     @Override
     public String toString()
     {
-        return "Tile [ " + tileX + "," + tileZ + " (zoom " + zoom + ") ]";
+        return "Tile [ r" + tileX + ", r" + tileZ + " (zoom " + zoom + ") ]";
     }
 
     @Override
     public int hashCode()
     {
         return toHashCode(tileX, tileZ, zoom);
-    }
-
-    private String blockBounds()
-    {
-        return ulBlock.x + "," + ulBlock.y + " - " + lrBlock.x + "," + lrBlock.y;
-    }
-
-    private int tileToBlock(int t)
-    {
-        return t << (9 - zoom);
     }
 
     public Point2D blockPixelOffsetInTile(double x, double z)
