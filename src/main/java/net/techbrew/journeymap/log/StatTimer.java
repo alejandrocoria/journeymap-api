@@ -26,18 +26,23 @@ public class StatTimer
     public static final double NS = 1000000D;
     private static final int WARMUP_COUNT_DEFAULT = 10;
     private static final int MAX_COUNT = 1000000;
+    private static final int MAX_ELAPSED_LIMIT_WARNINGS = 25;
+    private int elapsedLimitWarnings = MAX_ELAPSED_LIMIT_WARNINGS;
+    private static final int ELAPSED_LIMIT_DEFAULT = 2000;
     private static Map<String, StatTimer> timers = Collections.synchronizedMap(new HashMap<String, StatTimer>());
     private final Logger logger = JourneyMap.getLogger();
     private final int warmupCount;
+    private final int elapsedLimit;
     private final AtomicLong counter = new AtomicLong();
     private final AtomicLong cancelCounter = new AtomicLong();
     private final AtomicDouble totalTime = new AtomicDouble();
     private final String name;
     private final boolean disposable;
-
     private final boolean doWarmup;
     private boolean warmup = true;
     private boolean maxed = false;
+    private boolean ranTooLong = true;
+    private int ranTooLongCount;
     private Long started;
     private double max = 0;
     private double min = Double.MAX_VALUE;
@@ -48,10 +53,11 @@ public class StatTimer
      * @param name
      * @param warmupCount
      */
-    private StatTimer(String name, int warmupCount, boolean disposable)
+    private StatTimer(String name, int warmupCount, int elapsedLimit, boolean disposable)
     {
         this.name = name;
         this.warmupCount = warmupCount;
+        this.elapsedLimit = elapsedLimit;
         this.disposable = disposable;
         this.doWarmup = warmupCount > 0;
         this.warmup = warmupCount > 0;
@@ -84,7 +90,30 @@ public class StatTimer
         StatTimer timer = timers.get(name);
         if (timer == null)
         {
-            timer = new StatTimer(name, warmupCount, false);
+            timer = new StatTimer(name, warmupCount, ELAPSED_LIMIT_DEFAULT, false);
+            timers.put(name, timer);
+        }
+        return timer;
+    }
+
+    /**
+     * Get a timer by name.  If it hasn't been created, it will have the warmupCount and elapsedLimit value provided.
+     *
+     * @param name
+     * @param warmupCount
+     * @param warmupCount
+     * @return
+     */
+    public synchronized static StatTimer get(String name, int warmupCount, int elapsedLimit)
+    {
+        if (name == null)
+        {
+            throw new IllegalArgumentException("StatTimer name required");
+        }
+        StatTimer timer = timers.get(name);
+        if (timer == null)
+        {
+            timer = new StatTimer(name, warmupCount, elapsedLimit, false);
             timers.put(name, timer);
         }
         return timer;
@@ -98,7 +127,18 @@ public class StatTimer
      */
     public static StatTimer getDisposable(String name)
     {
-        return new StatTimer(name, 0, true);
+        return new StatTimer(name, 0, ELAPSED_LIMIT_DEFAULT, true);
+    }
+
+    /**
+     * Create a disposable timer with a warmupCount of 0.
+     *
+     * @param name
+     * @return
+     */
+    public static StatTimer getDisposable(String name, int elapsedLimit)
+    {
+        return new StatTimer(name, 0, elapsedLimit, true);
     }
 
     /**
@@ -169,6 +209,8 @@ public class StatTimer
                 this.cancel();
             }
 
+            ranTooLong = false;
+
             if (counter.get() == MAX_COUNT)
             {
                 maxed = true;
@@ -228,9 +270,19 @@ public class StatTimer
                 }
                 started = null;
 
-                if (!warmup && elapsedMs >= 1000)
+                if (!warmup && elapsedMs >= elapsedLimit)
                 {
-                    logger.warn(this.getName() + " running slow: " + elapsedMs);
+                    ranTooLong = true;
+                    ranTooLongCount++;
+                    if (elapsedLimitWarnings > 0)
+                    {
+                        String msg = this.getName() + " was slow: " + elapsedMs;
+                        if (--elapsedLimitWarnings == 0)
+                        {
+                            msg += " (last warning)";
+                        }
+                        logger.warn(msg);
+                    }
                 }
                 return elapsedMs;
             }
@@ -257,6 +309,25 @@ public class StatTimer
 
             return (System.nanoTime() - started) / NS;
         }
+    }
+
+    /**
+     * Only useful after stop();
+     * @return
+     */
+    public boolean hasReachedElapsedLimit()
+    {
+        return ranTooLong;
+    }
+
+    public int getElapsedLimitReachedCount()
+    {
+        return ranTooLongCount;
+    }
+
+    public int getElapsedLimitWarningsRemaining()
+    {
+        return elapsedLimitWarnings;
     }
 
     /**
@@ -321,8 +392,8 @@ public class StatTimer
             final double avg = total / count;
             final long cancels = cancelCounter.get();
 
-            String report = String.format("<b>%40s:</b> Avg: %8sms, Min: %8sms, Max: %10sms, Total: %10s sec, Count: %8s, Canceled: %8s,",
-                    name, df.format(avg), df.format(min), df.format(max), TimeUnit.MILLISECONDS.toSeconds((long) total), count, cancels);
+            String report = String.format("<b>%40s:</b> Avg: %8sms, Min: %8sms, Max: %10sms, Total: %10s sec, Count: %8s, Canceled: %8s, Slow: %8s",
+                    name, df.format(avg), df.format(min), df.format(max), TimeUnit.MILLISECONDS.toSeconds((long) total), count, cancels, ranTooLongCount);
 
             if (warmup)
             {
@@ -364,6 +435,7 @@ public class StatTimer
                     sb.append(", min: ").append(df.format(min) + "ms");
                     sb.append(", max: ").append(df.format(max) + "ms");
                     sb.append(", avg: ").append(df.format(avg) + "ms");
+                    sb.append(", slow: ").append(ranTooLongCount);
                 }
                 if (maxed)
                 {
