@@ -192,7 +192,7 @@ public class GridRenderer
         final int tileZ = Tile.blockPosToTile((int) Math.floor(centerBlockZ), this.zoom);
 
         // Chech hash of tile coords
-        final int newCenterHash = Tile.toHashCode(tileX, tileZ, zoom, dimension);
+        final int newCenterHash = Tile.toHashCode(tileX, tileZ, zoom);
         final boolean centerTileChanged = newCenterHash != centerTileHash;
         centerTileHash = newCenterHash;
 
@@ -227,6 +227,10 @@ public class GridRenderer
 
         // Get center tile
         this.mapType = mapType;
+
+        // Ensure tiles up to date
+        TileCache.checkStateChange(worldDir, dimension, mapType);
+
         Integer centerHash = grid.get(centerPos);
         if (centerHash == null)
         {
@@ -300,9 +304,9 @@ public class GridRenderer
             // Update texture only if on-screen
             //if (isOnScreen(pos))
             {
-                if (tile != null && !tile.hasTexture())
+                if (!tile.hasTexture())
                 {
-                    tile.updateTexture(pos, this.mapType, quality, vSlice);
+                    tile.updateTexture(worldDir, this.mapType, quality, vSlice, dimension);
                 }
             }
         }

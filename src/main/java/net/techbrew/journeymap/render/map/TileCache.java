@@ -33,6 +33,8 @@ public class TileCache implements RemovalListener<Integer, Tile>
     private boolean paused;
 
     private File lastWorldDir;
+    private int lastDimension;
+    private Constants.MapType lastMapType;
 
     private TileCache()
     {
@@ -64,27 +66,34 @@ public class TileCache implements RemovalListener<Integer, Tile>
 
     public static synchronized Tile getOrCreate(final File worldDir, Constants.MapType mapType, final int tileX, final int tileZ, final int zoom, final int dimension)
     {
-        Holder.INSTANCE.checkWorldChange(worldDir);
+        Holder.INSTANCE.checkWorldChange(worldDir, dimension, mapType);
 
-        final int hash = Tile.toHashCode(tileX, tileZ, zoom, dimension);
+        final int hash = Tile.toHashCode(tileX, tileZ, zoom);
         TileCache tc = Holder.INSTANCE;
         synchronized (tc.cache)
         {
             Tile tile = tc.cache.getIfPresent(hash);
             if (tile == null)
             {
-                tile = new Tile(worldDir, mapType, tileX, tileZ, zoom, dimension);
+                tile = new Tile(tileX, tileZ, zoom);
                 tc.cache.put(hash, tile);
             }
             return tile;
         }
     }
 
-    private void checkWorldChange(File worldDir)
+    public static void checkStateChange(File worldDir, int dimension, Constants.MapType mapType)
     {
-        if (!(worldDir.equals(lastWorldDir)))
+        Holder.INSTANCE.checkWorldChange(worldDir, dimension, mapType);
+    }
+
+    public void checkWorldChange(File worldDir, int dimension, Constants.MapType mapType)
+    {
+        if (!(worldDir.equals(lastWorldDir) && dimension == lastDimension && mapType == lastMapType))
         {
             lastWorldDir = worldDir;
+            lastDimension = dimension;
+            lastMapType = mapType;
             cache.invalidateAll();
         }
     }

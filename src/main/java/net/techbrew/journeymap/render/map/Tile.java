@@ -30,11 +30,9 @@ public class Tile
     public final static int TILESIZE = 512;
     public final static int LOAD_RADIUS = (int) (TILESIZE * 1.5);
 
-    final int dimension;
     final int zoom;
     final int tileX;
     final int tileZ;
-    final File worldDir;
     final ChunkCoordIntPair ulChunk;
     final ChunkCoordIntPair lrChunk;
     final Point ulBlock;
@@ -43,25 +41,16 @@ public class Tile
 
     private final Logger logger = JourneyMap.getLogger();
     private final boolean debug = logger.isTraceEnabled();
-    //private final boolean async;
-    //long lastImageTime = 0;
-    Integer lastVSlice;
-    MapType lastMapType;
-    //    Future<DelayedTexture> futureTex;
-//    TextureImpl textureImpl;
+
     int renderType = 0;
     int textureFilter = 0;
     int textureWrap = 0;
 
-    public Tile(final File worldDir, final MapType mapType, final int tileX, final int tileZ, final int zoom, final int dimension)
+    public Tile(final int tileX, final int tileZ, final int zoom)
     {
-        //System.out.println("NEW TILE");
-        this.worldDir = worldDir;
-        this.lastMapType = mapType;
         this.tileX = tileX;
         this.tileZ = tileZ;
         this.zoom = zoom;
-        this.dimension = dimension;
         final int distance = 32 / (int) Math.pow(2, zoom);
         ulChunk = new ChunkCoordIntPair(tileX * distance, tileZ * distance);
         lrChunk = new ChunkCoordIntPair(ulChunk.chunkXPos + distance - 1, ulChunk.chunkZPos + distance - 1);
@@ -81,22 +70,13 @@ public class Tile
         return t << (9 - zoom);
     }
 
-    public static int toHashCode(final int tileX, final int tileZ, final int zoom, final int dimension)
+    public static int toHashCode(final int tileX, final int tileZ, final int zoom)
     {
-        return Objects.hashCode(tileX, tileZ, zoom, dimension);
+        return Objects.hashCode(tileX, tileZ, zoom);
     }
 
-    public boolean updateTexture(final TilePos pos, final MapType mapType, Constants.MapTileQuality quality, final Integer vSlice)
+    public boolean updateTexture(File worldDir, final MapType mapType, Constants.MapTileQuality quality, final Integer vSlice, int dimension)
     {
-        boolean forceReset = (lastMapType != mapType) || !Objects.equal(lastVSlice, vSlice);
-        lastMapType = mapType;
-        lastVSlice = vSlice;
-
-        if (forceReset)
-        {
-            clear();
-        }
-
         updateRenderType();
 
         drawSteps.clear();
@@ -161,7 +141,7 @@ public class Tile
     @Override
     public int hashCode()
     {
-        return toHashCode(tileX, tileZ, zoom, dimension);
+        return toHashCode(tileX, tileZ, zoom);
     }
 
     private String blockBounds()
@@ -226,10 +206,6 @@ public class Tile
 
         Tile tile = (Tile) o;
 
-        if (dimension != tile.dimension)
-        {
-            return false;
-        }
         if (tileX != tile.tileX)
         {
             return false;
@@ -239,10 +215,6 @@ public class Tile
             return false;
         }
         if (zoom != tile.zoom)
-        {
-            return false;
-        }
-        if (worldDir != null ? !worldDir.equals(tile.worldDir) : tile.worldDir != null)
         {
             return false;
         }
