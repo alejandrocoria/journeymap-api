@@ -57,7 +57,6 @@ public class Tile
         ulBlock = new Point(ulChunk.chunkXPos * 16, ulChunk.chunkZPos * 16);
         lrBlock = new Point((lrChunk.chunkXPos * 16) + 15, (lrChunk.chunkZPos * 16) + 15);
         updateRenderType();
-        System.out.println("Tile CTOR");
     }
 
     public static int blockPosToTile(int b, int zoom)
