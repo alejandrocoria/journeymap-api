@@ -24,7 +24,6 @@ import java.util.*;
 
 public class MapPlayerTask extends BaseMapTask
 {
-    private static final HashSet<ChunkCoordIntPair> queuedChunks = new HashSet<ChunkCoordIntPair>();
     private static volatile long lastTaskCompleted;
     private static Comparator<ChunkCoordIntPair> chunkDistanceComparator = getDistanceComparator();
     private static ChunkCoordinates lastPlayerPos;
@@ -45,24 +44,6 @@ public class MapPlayerTask extends BaseMapTask
             DataCache.instance().invalidateChunkMDCache();
             lastPlayerPos = null;
         }
-    }
-
-    public static boolean queueChunk(ChunkCoordIntPair chunkCoords)
-    {
-        synchronized (queuedChunks)
-        {
-            return false;//queuedChunks.add(chunkCoords);
-        }
-    }
-
-    public static void dequeueChunk(ChunkCoordIntPair chunkCoords)
-    {
-        synchronized (queuedChunks)
-        {
-            queuedChunks.remove(chunkCoords);
-        }
-
-        dataCache.invalidateChunkMD(chunkCoords);
     }
 
     private static Comparator<ChunkCoordIntPair> getDistanceComparator()
@@ -104,7 +85,7 @@ public class MapPlayerTask extends BaseMapTask
             if (alreadyUnderground)
             {
                 // above
-                if (player.chunkCoordY + 1 <= (player.worldObj.provider.getActualHeight()-1>>4))
+                if (player.chunkCoordY + 1 <= (player.worldObj.provider.getActualHeight() - 1 >> 4))
                 {
                     tasks.add(new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, true, player.chunkCoordY + 1,
                             new ArrayList<ChunkCoordIntPair>(Arrays.asList(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ)))));
