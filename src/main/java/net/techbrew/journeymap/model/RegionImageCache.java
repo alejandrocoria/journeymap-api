@@ -9,6 +9,8 @@
 package net.techbrew.journeymap.model;
 
 import com.google.common.cache.*;
+import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.SetMultimap;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
@@ -35,6 +37,7 @@ public class RegionImageCache
 {
     private static final int SIZE = 25;
     private static final long flushInterval = TimeUnit.SECONDS.toMillis(30);
+    private static final long regionCacheAge = TimeUnit.SECONDS.toMillis(15);
     private final Object lock = new Object();
 
     private final Cache<Integer, Future<DelayedTexture>> futureTextureCache;
@@ -55,11 +58,11 @@ public class RegionImageCache
         lastFlush = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);
 
         this.futureTextureCache = CacheBuilder.newBuilder()
-                .expireAfterAccess(10, TimeUnit.SECONDS)
+                .expireAfterAccess(regionCacheAge, TimeUnit.MILLISECONDS)
                 .build();
 
         this.regionTextureCache = CacheBuilder.newBuilder()
-                .expireAfterAccess(15, TimeUnit.SECONDS)
+                .expireAfterAccess(regionCacheAge, TimeUnit.MILLISECONDS)
                 .removalListener(new RemovalListener<Integer, DelayedTexture>()
                 {
                     @Override
@@ -143,7 +146,7 @@ public class RegionImageCache
 
             if (existing.getDescription() == null)
             {
-                existing.setDescription(String.format("%s %s", rCoord, mapType));
+                existing.setDescription(String.format("%s (%s) %s", rCoord, rCoord.vSlice, mapType));
             }
 
             if (aSync)
@@ -244,7 +247,7 @@ public class RegionImageCache
             lastRequestedMapType = mapType;
         }
 
-        if (texture == null || textureNeedsUpdate(rCoord, mapType))
+        if (texture == null || textureNeedsUpdate(rCoord, mapType, 0))
         {
             updateRegionTexture(rCoord, mapType, true);
             if (logCacheActions)
@@ -302,18 +305,22 @@ public class RegionImageCache
 
     public void putAll(final Collection<ChunkImageSet> chunkImageSets, boolean forceFlush)
     {
-        HashSet<RegionCoord> regions = new HashSet<RegionCoord>();
-
-        synchronized (lock)
+        //synchronized (lock)
         {
+            SetMultimap<RegionCoord, MapType> updates = MultimapBuilder.hashKeys().hashSetValues().build();
+
+            // Merge chunk images into region images
             for (ChunkImageSet cis : chunkImageSets)
             {
                 final RegionCoord rCoord = cis.getCCoord().getRegionCoord();
-                final RegionImageSet ris = getRegionImageSet(rCoord);
-                ris.insertChunk(cis);
-                regions.add(rCoord);
+                getRegionImageSet(rCoord).insertChunk(cis);
+                for (ImageSet.Wrapper wrapper : cis.imageWrappers.values())
+                {
+                    updates.put(rCoord, wrapper.mapType);
+                }
             }
 
+            // Write to disk if needed
             if (forceFlush)
             {
                 flushToDisk();
@@ -322,21 +329,31 @@ public class RegionImageCache
             {
                 autoFlush();
             }
-        }
 
-        for (RegionCoord rCoord : regions)
-        {
-            Long texTime = getRegionTextureLastUpdatedIfExists(rCoord, lastRequestedMapType);
-            if (texTime != null && getRegionImageSet(rCoord).updatedSince(lastRequestedMapType, texTime))
+            // Update textures
+            for (RegionCoord rCoord : updates.keySet())
             {
-                if (logCacheActions)
+                for (MapType mapType : updates.get(rCoord))
                 {
-                    JourneyMap.getLogger().info("MAP TASK UPDATE for " + rCoord + " " + lastRequestedMapType);
+                    int marginOfError = (mapType == lastRequestedMapType) ? 100 : (int) regionCacheAge / 2;
+                    if (textureNeedsUpdate(rCoord, mapType, marginOfError))
+                    {
+                        updateRegionTexture(rCoord, mapType, true);
+                        if (logCacheActions)
+                        {
+                            JourneyMap.getLogger().info("MAPTASK UPDATE " + rCoord + " " + mapType);
+                        }
+                    }
+                    else
+                    {
+                        if (logCacheActions)
+                        {
+                            JourneyMap.getLogger().info("MAPTASK SKIP " + rCoord + " " + mapType);
+                        }
+                    }
                 }
-                updateRegionTexture(rCoord, lastRequestedMapType, true);
             }
         }
-
     }
 
     private void autoFlush()
@@ -407,7 +424,7 @@ public class RegionImageCache
     /**
      * Check whether a given Region's Texture needs to be updated
      */
-    public boolean textureNeedsUpdate(final RegionCoord rCoord, final MapType mapType)
+    public boolean textureNeedsUpdate(final RegionCoord rCoord, final MapType mapType, int marginOfError)
     {
         DelayedTexture texture = getRegionTextureByHash(Objects.hash(rCoord, mapType));
         if (texture != null)
@@ -416,7 +433,7 @@ public class RegionImageCache
             {
                 return true;
             }
-            if (getRegionImageSet(rCoord).updatedSince(mapType, texture.getLastUpdated()))
+            if (getRegionImageSet(rCoord).updatedSince(mapType, texture.getLastUpdated() + marginOfError))
             {
                 return true;
             }

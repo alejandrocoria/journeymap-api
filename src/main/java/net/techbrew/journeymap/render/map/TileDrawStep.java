@@ -77,7 +77,7 @@ public class TileDrawStep
         }
 
         RegionImageCache ric = RegionImageCache.instance();
-        if (ric.textureNeedsUpdate(regionCoord, mapType))
+        if (ric.textureNeedsUpdate(regionCoord, mapType, 0))
         {
             ric.updateRegionTexture(regionCoord, mapType, true);
         }
@@ -183,7 +183,7 @@ public class TileDrawStep
             drawBoundTexture(startU, startV, startX, startY, z, endU, endV, endX, endY);
         }
 
-        if (debug) // todo
+        if (debug)
         {
             DrawUtil.drawRectangle(startX, startY, 2, endV * 512, Color.green, 200);
             DrawUtil.drawRectangle(startX, startY, endU * 512, 2, Color.red, 200);
@@ -239,7 +239,7 @@ public class TileDrawStep
 
     public void refreshIfDirty()
     {
-        if (RegionImageCache.instance().textureNeedsUpdate(regionCoord, mapType)
+        if (RegionImageCache.instance().textureNeedsUpdate(regionCoord, mapType, 0)
                 || (quality == Constants.MapTileQuality.High && scaledTexture == null)
                 || (scaledTexture != null && RegionImageCache.instance().isDirtySince(regionCoord, mapType, scaledTexture.getLastUpdated())))
         {

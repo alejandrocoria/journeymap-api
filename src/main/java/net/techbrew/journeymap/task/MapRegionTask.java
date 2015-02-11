@@ -44,7 +44,7 @@ public class MapRegionTask extends BaseMapTask
 
     private MapRegionTask(ChunkRenderController renderController, World world, int dimension, boolean underground, Integer chunkY, Collection<ChunkCoordIntPair> chunkCoords, Collection<ChunkCoordIntPair> retainCoords)
     {
-        super(renderController, world, dimension, underground, chunkY, chunkCoords, true);
+        super(renderController, world, dimension, underground, chunkY, chunkCoords, true, 5000);
         this.retainedCoords = retainCoords;
     }
 

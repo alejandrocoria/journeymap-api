@@ -23,6 +23,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class TaskController
 {
@@ -30,6 +31,7 @@ public class TaskController
     final ArrayBlockingQueue<Future> queue = new ArrayBlockingQueue<Future>(1);
     final List<ITaskManager> managers = new LinkedList<ITaskManager>();
     final Minecraft minecraft = FMLClientHandler.instance().getClient();
+    final ReentrantLock lock = new ReentrantLock();
 
     // Executor for task threads
     private volatile ScheduledExecutorService taskExecutor;
@@ -188,11 +190,11 @@ public class TaskController
     {
         Profiler profiler = FMLClientHandler.instance().getClient().mcProfiler;
         profiler.startSection("journeymapTask");
-        StatTimer totalTimer = StatTimer.get("TaskController.performTasks", 1, 1000).start();
+        StatTimer totalTimer = StatTimer.get("TaskController.performTasks", 1, 500).start();
 
         try
         {
-            synchronized (queue)
+            if (lock.tryLock())
             {
                 if (!queue.isEmpty())
                 {
@@ -237,10 +239,7 @@ public class TaskController
                         {
                             // Create the runnable wrapper
                             final RunnableTask runnableTask = new RunnableTask(taskExecutor, task);
-
-                            // Start the task
-                            Future future = taskExecutor.submit(runnableTask);
-                            queue.add(future);
+                            queue.add(taskExecutor.submit(runnableTask));
                             accepted = true;
 
                             if (logger.isTraceEnabled())
@@ -256,6 +255,11 @@ public class TaskController
                         manager.taskAccepted(task, accepted);
                     }
                 }
+                lock.unlock();
+            }
+            else
+            {
+                logger.warn("TaskController appears to have multiple threads trying to use it");
             }
         }
         finally
@@ -267,7 +271,6 @@ public class TaskController
 
     private ITaskManager getNextManager(final Minecraft minecraft)
     {
-
         for (ITaskManager manager : managers)
         {
             if (manager.isEnabled(minecraft))
@@ -276,6 +279,5 @@ public class TaskController
             }
         }
         return null;
-
     }
 }

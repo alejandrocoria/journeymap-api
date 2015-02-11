@@ -42,8 +42,9 @@ public abstract class BaseMapTask implements ITask
     final Collection<ChunkCoordIntPair> chunkCoords;
     final boolean flushCacheWhenDone;
     final ChunkRenderController renderController;
+    final int elapsedLimit;
 
-    public BaseMapTask(ChunkRenderController renderController, World world, int dimension, boolean underground, Integer vSlice, Collection<ChunkCoordIntPair> chunkCoords, boolean flushCacheWhenDone)
+    public BaseMapTask(ChunkRenderController renderController, World world, int dimension, boolean underground, Integer vSlice, Collection<ChunkCoordIntPair> chunkCoords, boolean flushCacheWhenDone, int elapsedLimit)
     {
         this.renderController = renderController;
         this.world = world;
@@ -60,12 +61,13 @@ public abstract class BaseMapTask implements ITask
         }
         this.chunkCoords = chunkCoords;
         this.flushCacheWhenDone = flushCacheWhenDone;
+        this.elapsedLimit = elapsedLimit;
     }
 
     @Override
     public void performTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
-        StatTimer timer = StatTimer.get(getClass().getSimpleName() + ".performTask").start();
+        StatTimer timer = StatTimer.get(getClass().getSimpleName() + ".performTask", 5, elapsedLimit).start();
 
         try
         {

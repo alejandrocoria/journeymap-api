@@ -366,6 +366,9 @@ public class StatTimer
             counter.set(0);
             cancelCounter.set(0);
             totalTime.set(0);
+            elapsedLimitWarnings = MAX_ELAPSED_LIMIT_WARNINGS;
+            ranTooLong = false;
+            ranTooLongCount = 0;
         }
     }
 

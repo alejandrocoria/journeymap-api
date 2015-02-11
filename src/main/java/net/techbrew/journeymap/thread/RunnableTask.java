@@ -17,16 +17,16 @@ import net.techbrew.journeymap.task.ITask;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ExecutorService;
 
 public class RunnableTask implements Runnable
 {
-    private final ScheduledExecutorService taskExecutor;
+    private final ExecutorService taskExecutor;
     private final Runnable innerRunnable;
     private final ITask task;
     private final int timeout;
 
-    public RunnableTask(final ScheduledExecutorService taskExecutor, ITask task)
+    public RunnableTask(final ExecutorService taskExecutor, ITask task)
     {
         this.taskExecutor = taskExecutor;
         this.task = task;
