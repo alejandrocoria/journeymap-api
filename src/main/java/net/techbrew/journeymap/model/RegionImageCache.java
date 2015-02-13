@@ -335,10 +335,10 @@ public class RegionImageCache
             {
                 for (MapType mapType : updates.get(rCoord))
                 {
-                    int marginOfError = (mapType == lastRequestedMapType) ? 100 : (int) regionCacheAge / 2;
+                    int marginOfError = (mapType == lastRequestedMapType) ? 0 : (int) regionCacheAge / 2;
                     if (textureNeedsUpdate(rCoord, mapType, marginOfError))
                     {
-                        updateRegionTexture(rCoord, mapType, true);
+                        updateRegionTexture(rCoord, mapType, mapType == lastRequestedMapType);
                         if (logCacheActions)
                         {
                             JourneyMap.getLogger().info("MAPTASK UPDATE " + rCoord + " " + mapType);

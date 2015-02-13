@@ -22,6 +22,7 @@ import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
+import net.techbrew.journeymap.task.MapPlayerTask;
 import net.techbrew.journeymap.task.MapRegionTask;
 import net.techbrew.journeymap.task.SaveMapTask;
 import net.techbrew.journeymap.ui.UIManager;
@@ -184,6 +185,7 @@ public class FullscreenActions extends JmUI
         if (guibutton == buttonDeleteMap)
         {
             RegionImageCache.instance().deleteMap(Fullscreen.state(), false);
+            MapPlayerTask.forceNearbyRemap();
             //JourneyMap.getInstance().stopMapping();
             Fullscreen.reset();
             UIManager.getInstance().openFullscreenMap();

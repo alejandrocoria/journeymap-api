@@ -8,6 +8,7 @@
 
 package net.techbrew.journeymap.task;
 
+import com.google.common.collect.TreeMultimap;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,6 +20,7 @@ import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.model.ChunkMD;
 
 import java.util.*;
 
@@ -29,6 +31,8 @@ public class MapPlayerTask extends BaseMapTask
     private static ChunkCoordinates lastPlayerPos;
     private static Boolean lastUnderground;
     private static DataCache dataCache = DataCache.instance();
+    private static int lastChunkOffset;
+    private static HashSet<ChunkCoordIntPair> reservedPeripheralCoordsSet = new HashSet<ChunkCoordIntPair>();
 
     private final int maxRuntime = JourneyMap.getCoreProperties().chunkPoll.get() * 3;
 
@@ -55,7 +59,7 @@ public class MapPlayerTask extends BaseMapTask
             @Override
             public int compare(ChunkCoordIntPair o1, ChunkCoordIntPair o2)
             {
-                int comp = distanceToPlayer(o1).compareTo(distanceToPlayer(o2));
+                int comp = distanceToPlayer(minecraft, o1).compareTo(distanceToPlayer(minecraft, o2));
                 if (comp == 0)
                 {
                     comp = Integer.compare(o1.chunkXPos, o2.chunkXPos);
@@ -66,14 +70,51 @@ public class MapPlayerTask extends BaseMapTask
                 }
                 return comp;
             }
+        };
+    }
 
-            Float distanceToPlayer(ChunkCoordIntPair coord)
+    private static Comparator<ChunkCoordIntPair> getStaleComparator()
+    {
+        return new Comparator<ChunkCoordIntPair>()
+        {
+            long now = System.currentTimeMillis();
+
+            @Override
+            public int compare(ChunkCoordIntPair o1, ChunkCoordIntPair o2)
             {
-                float x = coord.chunkXPos - minecraft.thePlayer.chunkCoordX;
-                float z = coord.chunkZPos - minecraft.thePlayer.chunkCoordZ;
-                return (x * x) + (z * z);
+                return Long.compare(getAge(o2), getAge(o1));
+            }
+
+            private Long getAge(ChunkCoordIntPair coord)
+            {
+                ChunkMD chunkMD = dataCache.getChunkMD(coord, false);
+                if (chunkMD == null)
+                {
+                    return 0L;
+                }
+                return now - chunkMD.getLastRendered();
             }
         };
+    }
+
+    private static Float distanceToPlayer(Minecraft minecraft, ChunkCoordIntPair coord)
+    {
+        float x = coord.chunkXPos - minecraft.thePlayer.chunkCoordX;
+        float z = coord.chunkZPos - minecraft.thePlayer.chunkCoordZ;
+        return (x * x) + (z * z);
+    }
+
+    private static boolean inRange(Minecraft minecraft, ChunkCoordIntPair coord, int offset)
+    {
+        float x = Math.abs(minecraft.thePlayer.chunkCoordX - coord.chunkXPos);
+        float z = Math.abs(minecraft.thePlayer.chunkCoordZ - coord.chunkZPos);
+        return x <= offset && z <= offset;
+    }
+
+    private static int countChunksInArea(int offset)
+    {
+        int side = offset + 1 + offset;
+        return side * side;
     }
 
     public static Collection<BaseMapTask> createCavesBelow(ChunkRenderController chunkRenderController, EntityPlayer player, boolean alreadyUnderground)
@@ -111,6 +152,7 @@ public class MapPlayerTask extends BaseMapTask
 
     public static BaseMapTask create(ChunkRenderController chunkRenderController, final EntityPlayer player)
     {
+        final int offset = JourneyMap.getCoreProperties().chunkOffset.get();
         final ChunkCoordinates playerPos = new ChunkCoordinates(player.chunkCoordX, player.chunkCoordY, player.chunkCoordZ);
         boolean underground = player.worldObj.provider.hasNoSky || (DataCache.getPlayer().underground && JourneyMap.getFullMapProperties().showCaves.get());
 
@@ -123,52 +165,96 @@ public class MapPlayerTask extends BaseMapTask
             underground = false;
         }
 
+        boolean recalcPeripheralChunks = lastPlayerPos == null
+                || lastPlayerPos.posX != playerPos.posX
+                || lastPlayerPos.posZ != playerPos.posZ
+                || lastChunkOffset != offset
+                || reservedPeripheralCoordsSet.isEmpty();
+
         synchronized (MapPlayerTask.class)
         {
             // Update last values
             lastPlayerPos = playerPos;
             lastUnderground = underground;
+            lastChunkOffset = offset;
         }
 
+        final int maxFinalChunks = Math.max(9, countChunksInArea((int) Math.ceil(offset * 1.0 / 1.0)));
+        final int reservedPeripheralChunks = Math.max(9, maxFinalChunks / 2);
+        final int maxStaleChunks = (maxFinalChunks - reservedPeripheralChunks) / 2;
 
-        // Add peripheral coords around player
-        final int offset = JourneyMap.getCoreProperties().chunkOffset.get();
-
-        int chunkRowLength = (offset * 2) + 1;
-
-        List<ChunkCoordIntPair> renderCoords = new ArrayList<ChunkCoordIntPair>(chunkRowLength * chunkRowLength);
-        for (int x = (player.chunkCoordX - offset); x <= (player.chunkCoordX + offset); x++)
+        if (recalcPeripheralChunks)
         {
-            for (int z = (player.chunkCoordZ - offset); z <= (player.chunkCoordZ + offset); z++)
+            // Add peripheral coords around player
+            List<ChunkCoordIntPair> peripheralCoords = new ArrayList<ChunkCoordIntPair>(maxFinalChunks);
+            for (int x = (player.chunkCoordX - offset); x <= (player.chunkCoordX + offset); x++)
             {
-                renderCoords.add(new ChunkCoordIntPair(x, z));
+                for (int z = (player.chunkCoordZ - offset); z <= (player.chunkCoordZ + offset); z++)
+                {
+                    ChunkCoordIntPair coord = new ChunkCoordIntPair(x, z);
+                    if (dataCache.getChunkMD(coord, true) != null)
+                    {
+                        peripheralCoords.add(new ChunkCoordIntPair(x, z));
+                    }
+                }
+            }
+
+            // Sort by distance and truncate to those reserved
+            Collections.sort(peripheralCoords, chunkDistanceComparator);
+            reservedPeripheralCoordsSet.clear();
+            reservedPeripheralCoordsSet.addAll(peripheralCoords.subList(0, Math.min(peripheralCoords.size(), reservedPeripheralChunks)));
+        }
+
+        // Get cached coords and sort by how stale they are, oldest first
+        final long now = System.currentTimeMillis();
+        final long minAge = JourneyMap.getCoreProperties().chunkPoll.get();
+        Minecraft minecraft = FMLClientHandler.instance().getClient();
+
+        TreeMultimap<Long, ChunkCoordIntPair> staleCoordsMM = TreeMultimap.create(new Comparator<Long>()
+        {
+            public int compare(Long o1, Long o2)
+            {
+                return o2.compareTo(o1);
+            }
+        }, chunkDistanceComparator);
+
+        for (ChunkCoordIntPair coord : DataCache.instance().getCachedChunkCoordinates())
+        {
+            if (!reservedPeripheralCoordsSet.contains(coord))
+            {
+                ChunkMD chunkMD = dataCache.getChunkMD(coord, false);
+                if (chunkMD != null)
+                {
+                    long age = now - chunkMD.getLastRendered();
+                    if (age > minAge)
+                    {
+                        if (inRange(minecraft, coord, offset))
+                        {
+                            staleCoordsMM.put(age, coord);
+                        }
+                    }
+                }
             }
         }
 
-        Collections.sort(renderCoords, chunkDistanceComparator);
+        // Now limit how many stale coords we'll map this round
+        List<ChunkCoordIntPair> staleCoords = new ArrayList<ChunkCoordIntPair>(staleCoordsMM.values()).subList(0, Math.min(staleCoordsMM.size(), maxStaleChunks));
 
-        Iterator<ChunkCoordIntPair> iter = renderCoords.iterator();
-        while (iter.hasNext())
-        {
-            ChunkCoordIntPair coord = iter.next();
-            if (dataCache.getChunkMD(coord, true) == null)
-            {
-                iter.remove();
-            }
-        }
+        List<ChunkCoordIntPair> finalList = new ArrayList<ChunkCoordIntPair>(reservedPeripheralCoordsSet);
+        finalList.addAll(staleCoords);
 
-        if (renderCoords.size() == 0)
+        if (finalList.size() == 0)
         {
             return null;
         }
-
+        else
         {
             // TODO: log fine or some kinda cool stat
-            System.out.println(String.format("Chunks to Render: %d (Missed: %d)", renderCoords.size(), (chunkRowLength * chunkRowLength) - renderCoords.size()));
+            //System.out.println(String.format("Chunks to Render: %d (Peripheral: %d, Stale: %d / %d)", finalList.size(), reservedPeripheralCoordsSet.size(), staleCoords.size(), staleCoordsMM.size()));
 
             // TODO: Always map surface
             final Integer vSlice = underground ? lastPlayerPos.posY : null;
-            return new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, underground, vSlice, renderCoords);
+            return new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, underground, vSlice, finalList);
         }
     }
 
