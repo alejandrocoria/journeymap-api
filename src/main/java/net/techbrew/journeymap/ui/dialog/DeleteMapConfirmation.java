@@ -21,7 +21,7 @@ import org.lwjgl.input.Keyboard;
 public class DeleteMapConfirmation extends JmUI
 {
 
-    Button buttonAll, buttonCurrent, buttonNone, buttonClose;
+    Button buttonAll, buttonCurrent, buttonClose;
 
     public DeleteMapConfirmation()
     {
@@ -38,12 +38,12 @@ public class DeleteMapConfirmation extends JmUI
 
         buttonAll = new Button(Constants.getString("jm.common.deletemap_dialog_all"));
         buttonCurrent = new Button(Constants.getString("jm.common.deletemap_dialog_this"));
-        buttonNone = new Button(Constants.getString("jm.common.deletemap_dialog_none"));
-        buttonClose = new Button(Constants.getString("jm.common.close"));
+
+        buttonClose = new Button(Constants.getString("jm.waypoint.cancel"));
 
         buttonList.add(buttonAll);
         buttonList.add(buttonCurrent);
-        buttonList.add(buttonNone);
+
         buttonList.add(buttonClose);
     }
 
@@ -64,8 +64,7 @@ public class DeleteMapConfirmation extends JmUI
 
         buttonAll.centerHorizontalOn(x).setY(y + 18);
         buttonCurrent.centerHorizontalOn(x).below(buttonAll, vgap);
-        buttonNone.centerHorizontalOn(x).below(buttonCurrent, vgap);
-        buttonClose.centerHorizontalOn(x).below(buttonNone, vgap * 4);
+        buttonClose.centerHorizontalOn(x).below(buttonCurrent, vgap * 4);
     }
 
     @Override
@@ -80,7 +79,7 @@ public class DeleteMapConfirmation extends JmUI
             return;
         }
 
-        if (guibutton == buttonNone || guibutton == buttonClose)
+        if (guibutton == buttonClose)
         {
             UIManager.getInstance().openMapActions();
             return;
