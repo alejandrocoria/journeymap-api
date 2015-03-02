@@ -232,7 +232,7 @@ public class ScrollListPane extends GuiSlot
     @Override
     protected void drawContainerBackground(Tessellator tessellator)
     {
-        parent.drawGradientRect(0, top, this.width, this.height - top, -1072689136, -804253680);
+        parent.drawGradientRect(0, top, this.width, top + this.height, -1072689136, -804253680);
     }
 
     public interface ISlot

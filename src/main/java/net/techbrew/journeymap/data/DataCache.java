@@ -44,14 +44,12 @@ public class DataCache
     final LoadingCache<EntityDTO, DrawEntityStep> entityDrawSteps;
     final LoadingCache<Waypoint, DrawWayPointStep> waypointDrawSteps;
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
-    final LoadingCache<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadata;
     final LoadingCache<Block, HashMap<Integer, BlockMD>> blockMetadata;
     final BlockMDCache blockMetadataLoader;
-
     final ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadataRemovalListener;
-
     final HashMap<Cache, String> managedCaches = new HashMap<Cache, String>();
     final WeakHashMap<Cache, String> privateCaches = new WeakHashMap<Cache, String>();
+    LoadingCache<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadata;
 
     // Private constructor
     private DataCache()
@@ -102,9 +100,7 @@ public class DataCache
         managedCaches.put(entityDTOs, "EntityDTO");
 
         chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>>();
-        long chunkTimeout = JourneyMap.getCoreProperties().chunkPoll.get() * 3;
-        chunkMetadata = getCacheBuilder().removalListener(chunkMetadataRemovalListener).expireAfterAccess(chunkTimeout, TimeUnit.MILLISECONDS).build(new ChunkMD.SimpleCacheLoader());
-        //chunkMetadata = getCacheBuilder().removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
+        chunkMetadata = getCacheBuilder().expireAfterAccess(30, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
         managedCaches.put(chunkMetadata, "ChunkMD");
 
         blockMetadataLoader = new BlockMDCache();
@@ -400,22 +396,12 @@ public class DataCache
 
     public ChunkMD getChunkMD(ChunkCoordIntPair coord)
     {
-        return getChunkMD(coord, false);
-    }
-
-    public ChunkMD getChunkMD(ChunkCoordIntPair coord, boolean ensureCurrent)
-    {
         synchronized (chunkMetadata)
         {
             ChunkMD chunkMD = null;
 
             try
             {
-                if(ensureCurrent)
-                {
-                    chunkMetadata.refresh(coord);
-                }
-
                 Optional<ChunkMD> optional = chunkMetadata.get(coord);
                 if (optional.isPresent())
                 {
@@ -430,11 +416,6 @@ public class DataCache
             {
                 JourneyMap.getLogger().warn("Unexpected error getting ChunkMD from cache: " + e);
             }
-
-//            if (ensureCurrent && chunkMD != null)
-//            {
-//                chunkMD = ChunkLoader.refreshChunkMdFromMemory(chunkMD);
-//            }
 
             return chunkMD;
         }

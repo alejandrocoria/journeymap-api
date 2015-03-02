@@ -105,7 +105,7 @@ public class AllData extends CacheLoader<Long, Map>
      */
     public long getTTL()
     {
-        return JourneyMap.getCoreProperties().chunkPoll.get();
+        return JourneyMap.getCoreProperties().renderFrequency.get() * 2000;
     }
 
     public static enum Key

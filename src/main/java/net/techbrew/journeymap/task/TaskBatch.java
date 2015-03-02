@@ -23,6 +23,8 @@ public class TaskBatch implements ITask
 {
     final List<ITask> taskList;
     final int timeout;
+    protected long startNs;
+    protected long elapsedNs;
 
     public TaskBatch(List<ITask> tasks)
     {
@@ -44,6 +46,8 @@ public class TaskBatch implements ITask
     @Override
     public void performTask(final Minecraft mc, final JourneyMap jm, final File jmWorldDir, final boolean threadLogging) throws InterruptedException
     {
+        startNs = System.nanoTime();
+
         if (threadLogging)
         {
             JourneyMap.getLogger().debug("START batching tasks");
@@ -53,7 +57,7 @@ public class TaskBatch implements ITask
         {
             if (Thread.interrupted())
             {
-                JourneyMap.getLogger().warn("BastTask thread interrupted: " + this);
+                JourneyMap.getLogger().warn("TaskBatch thread interrupted: " + this);
                 throw new InterruptedException();
             }
 
@@ -80,5 +84,7 @@ public class TaskBatch implements ITask
         {
             JourneyMap.getLogger().debug("DONE batching tasks");
         }
+
+        elapsedNs = System.nanoTime() - startNs;
     }
 }

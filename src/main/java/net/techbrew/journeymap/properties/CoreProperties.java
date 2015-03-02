@@ -14,6 +14,7 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.properties.config.Config;
+import net.techbrew.journeymap.task.RenderSpec;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,12 +29,6 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
 {
     @Config(category = Advanced, key = "jm.advanced.loglevel", stringListProvider = JMLogger.LogLevelStringProvider.class)
     public final AtomicReference<String> logLevel = new AtomicReference<String>("INFO");
-
-    @Config(category = Advanced, key = "jm.advanced.chunkoffset", minValue = 1, maxValue = 20, defaultValue = 8)
-    public final AtomicInteger chunkOffset = new AtomicInteger(8);
-
-    @Config(category = Advanced, key = "jm.advanced.chunkpoll", minValue = 1000, maxValue = 10000, defaultValue = 2000)
-    public final AtomicInteger chunkPoll = new AtomicInteger(2000);
 
     @Config(category = Advanced, key = "jm.advanced.automappoll", minValue = 500, maxValue = 10000, defaultValue = 2000)
     public final AtomicInteger autoMapPoll = new AtomicInteger(2000);
@@ -94,6 +89,27 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
 
     @Config(category = Cartography, key = "jm.common.map_style_caveshowsurface", defaultBoolean = true)
     public final AtomicBoolean mapSurfaceAboveCaves = new AtomicBoolean(true);
+
+    @Config(category = Cartography, key = "jm.common.renderdistance_cave", minValue = 1, maxValue = 20, defaultValue = 3)
+    public final AtomicInteger renderDistanceCave = new AtomicInteger(3);
+
+    @Config(category = Cartography, key = "jm.common.renderdistance_surface", minValue = 1, maxValue = 20, defaultValue = 6)
+    public final AtomicInteger renderDistanceSurface = new AtomicInteger(6);
+
+    @Config(category = Cartography, key = "jm.common.renderfreq", minValue = 1, maxValue = 10, defaultValue = 2)
+    public final AtomicInteger renderFrequency = new AtomicInteger(2);
+
+    @Config(category = Cartography, key = "jm.common.renderPasses", minValue = 1, maxValue = 3, defaultValue = 3)
+    public final AtomicInteger renderPasses = new AtomicInteger(3);
+
+    @Config(category = Cartography, key = "jm.common.revealshape", defaultEnum = "Circle")
+    public final AtomicReference<RenderSpec.RevealShape> revealShape = new AtomicReference<RenderSpec.RevealShape>(RenderSpec.RevealShape.Circle);
+
+    @Config(category = Cartography, key = "jm.common.alwaysmapcaves", defaultBoolean = false)
+    public final AtomicBoolean alwaysMapCaves = new AtomicBoolean();
+
+    @Config(category = Cartography, key = "jm.common.alwaysmapsurface", defaultBoolean = false)
+    public final AtomicBoolean alwaysMapSurface = new AtomicBoolean();
 
     @Config(category = Advanced, key = "jm.common.radar_max_animals", minValue = 1, maxValue = 128, defaultValue = 32)
     public final AtomicInteger maxAnimalsData = new AtomicInteger(32);
@@ -168,40 +184,12 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Override
     public int hashCode()
     {
-        int result = logLevel.hashCode();
-        result = 31 * result + chunkOffset.hashCode();
-        result = 31 * result + chunkPoll.hashCode();
-        result = 31 * result + autoMapPoll.hashCode();
-        result = 31 * result + cacheAnimalsData.hashCode();
-        result = 31 * result + cacheMobsData.hashCode();
-        result = 31 * result + cachePlayerData.hashCode();
-        result = 31 * result + cachePlayersData.hashCode();
-        result = 31 * result + cacheVillagersData.hashCode();
-        result = 31 * result + announceMod.hashCode();
-        result = 31 * result + checkUpdates.hashCode();
-        result = 31 * result + recordCacheStats.hashCode();
-        result = 31 * result + browserPoll.hashCode();
-        result = 31 * result + themeName.hashCode();
-        result = 31 * result + caveIgnoreGlass.hashCode();
-        result = 31 * result + mapBathymetry.hashCode();
-        result = 31 * result + mapTransparency.hashCode();
-        result = 31 * result + mapCaveLighting.hashCode();
-        result = 31 * result + mapAntialiasing.hashCode();
-        result = 31 * result + mapPlantShadows.hashCode();
-        result = 31 * result + mapPlants.hashCode();
-        result = 31 * result + mapCrops.hashCode();
-        result = 31 * result + mapSurfaceAboveCaves.hashCode();
-        result = 31 * result + maxAnimalsData.hashCode();
-        result = 31 * result + maxMobsData.hashCode();
-        result = 31 * result + maxPlayersData.hashCode();
-        result = 31 * result + maxVillagersData.hashCode();
-        result = 31 * result + hideSneakingEntities.hashCode();
-        result = 31 * result + radarLateralDistance.hashCode();
-        result = 31 * result + radarVerticalDistance.hashCode();
-        result = 31 * result + renderOverlayEventTypeName.hashCode();
-        result = 31 * result + renderOverlayPreEvent.hashCode();
-        result = 31 * result + name.hashCode();
-        return result;
+        return Objects.hashCode(announceMod, autoMapPoll, browserPoll, cacheAnimalsData, cacheMobsData, cachePlayerData,
+                cachePlayersData, cacheVillagersData, caveIgnoreGlass, checkUpdates, renderFrequency, hideSneakingEntities,
+                logLevel, mapAntialiasing, mapBathymetry, mapCaveLighting, mapCrops, mapPlants, mapPlantShadows,
+                mapSurfaceAboveCaves, mapTransparency, maxAnimalsData, maxMobsData, maxPlayersData, maxVillagersData,
+                name, radarLateralDistance, radarVerticalDistance, recordCacheStats, renderOverlayEventTypeName,
+                renderOverlayPreEvent, renderDistanceCave, renderDistanceSurface, revealShape, themeName);
     }
 
     @Override
@@ -218,8 +206,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 .add("cacheVillagersData", cacheVillagersData)
                 .add("caveIgnoreGlass", caveIgnoreGlass)
                 .add("checkUpdates", checkUpdates)
-                .add("chunkOffset", chunkOffset)
-                .add("chunkPoll", chunkPoll)
+                .add("renderFrequency", renderFrequency)
                 .add("hideSneakingEntities", hideSneakingEntities)
                 .add("logLevel", logLevel)
                 .add("mapAntialiasing", mapAntialiasing)
@@ -229,6 +216,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 .add("mapPlants", mapPlants)
                 .add("mapPlantShadows", mapPlantShadows)
                 .add("mapSurfaceAboveCaves", mapSurfaceAboveCaves)
+                .add("mapTileQuality", mapTileQuality)
                 .add("mapTransparency", mapTransparency)
                 .add("maxAnimalsData", maxAnimalsData)
                 .add("maxMobsData", maxMobsData)
@@ -240,7 +228,11 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 .add("recordCacheStats", recordCacheStats)
                 .add("renderOverlayEventTypeName", renderOverlayEventTypeName)
                 .add("renderOverlayPreEvent", renderOverlayPreEvent)
+                .add("renderDistanceCave", renderDistanceCave)
+                .add("renderDistanceSurface", renderDistanceSurface)
+                .add("revealShape", revealShape)
                 .add("themeName", themeName)
+                .add("tileRenderType", tileRenderType)
                 .toString();
     }
 

@@ -39,7 +39,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
 
         final int posX = MathHelper.floor_double(player.posX);
         final int posY = MathHelper.floor_double(player.boundingBox.minY);
-        final int posZ =  MathHelper.floor_double(player.posZ);
+        final int posZ = MathHelper.floor_double(player.posZ);
         final int offset = 1;
 
         boolean isUnderground = true;
@@ -58,7 +58,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
                 {
                     y = posY + 1;
 
-                    ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(x >> 4, z >> 4), true);
+                    ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(x >> 4, z >> 4));
                     if (chunkMD != null)
                     {
                         if (chunkMD.ceiling(x & 15, z & 15) <= y)

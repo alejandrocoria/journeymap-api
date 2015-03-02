@@ -18,16 +18,32 @@ import java.util.List;
 public class SlotMetadata<T> implements Comparable<SlotMetadata>
 {
     protected final Button button;
-    protected final String name;
-    protected final String tooltip;
     protected final String range;
     protected final T defaultValue;
-    protected final boolean advanced;
     protected final ValueType valueType;
+    protected String name;
+    protected String tooltip;
+    protected boolean advanced;
     protected String[] tooltipLines;
     protected List valueList;
     protected boolean master;
     protected int order;
+
+    public SlotMetadata(Button button)
+    {
+        this(button, false);
+    }
+
+    public SlotMetadata(Button button, int order)
+    {
+        this(button, false);
+        this.order = order;
+    }
+
+    public SlotMetadata(Button button, boolean advanced)
+    {
+        this(button, button.displayString, button.getUnformattedTooltip(), null, null, advanced);
+    }
 
     public SlotMetadata(Button button, String name, String tooltip, boolean advanced)
     {
@@ -102,6 +118,11 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         return advanced;
     }
 
+    public void setAdvanced(boolean advanced)
+    {
+        this.advanced = advanced;
+    }
+
     public ValueType getValueType()
     {
         return valueType;
@@ -147,6 +168,16 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         this.valueList = valueList;
     }
 
+    public void updateFromButton()
+    {
+        if (button != null)
+        {
+            name = button.displayString;
+            tooltip = button.getUnformattedTooltip();
+            tooltipLines = null;
+        }
+    }
+
     public String[] getTooltip()
     {
         FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
@@ -164,7 +195,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
                     lines.addAll(getWordWrappedLines(EnumChatFormatting.YELLOW.toString(), this.tooltip));
                 }
 
-                if (button instanceof IntSliderButton)
+                if (button != null && button instanceof IntSliderButton)
                 {
                     lines.addAll(getWordWrappedLines(EnumChatFormatting.GRAY.toString() + EnumChatFormatting.ITALIC.toString(),
                             Constants.getString("jm.config.control_arrowkeys")));
@@ -204,7 +235,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
 
     public void resetToDefaultValue()
     {
-        if (button instanceof IPropertyHolder)
+        if (button != null && button instanceof IPropertyHolder)
         {
             ((IPropertyHolder) button).setPropertyValue(defaultValue);
         }

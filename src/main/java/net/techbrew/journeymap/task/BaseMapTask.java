@@ -64,10 +64,19 @@ public abstract class BaseMapTask implements ITask
         this.elapsedLimit = elapsedLimit;
     }
 
+    public void initTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
+    {
+
+    }
+
     @Override
     public void performTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
         StatTimer timer = StatTimer.get(getClass().getSimpleName() + ".performTask", 5, elapsedLimit).start();
+
+        initTask(mc, jm, jmWorldDir, threadLogging);
+
+        int count = 0;
 
         try
         {
@@ -96,7 +105,6 @@ public abstract class BaseMapTask implements ITask
             }
 
             // Map the chunks
-            int count = 0;
             while (chunkIter.hasNext())
             {
                 if (!jm.isMapping())
@@ -171,6 +179,7 @@ public abstract class BaseMapTask implements ITask
 
             if (Thread.interrupted())
             {
+                timer.cancel();
                 throw new InterruptedException();
             }
 
@@ -186,11 +195,12 @@ public abstract class BaseMapTask implements ITask
             chunkCoords.clear();
             chunkImageCache.clear();
             this.complete(false, false);
-
+            timer.stop();
         }
         catch (InterruptedException t)
         {
             JourneyMap.getLogger().warn("Task thread interrupted: " + this);
+            timer.cancel();
             throw t;
         }
         catch (Throwable t)
@@ -198,11 +208,10 @@ public abstract class BaseMapTask implements ITask
             String error = "Unexpected error in BaseMapTask: " + (LogFormatter.toString(t));
             JourneyMap.getLogger().error(error);
             this.complete(false, true);
+            timer.cancel();
         }
         finally
         {
-            timer.stop();
-
             if (threadLogging)
             {
                 timer.report();

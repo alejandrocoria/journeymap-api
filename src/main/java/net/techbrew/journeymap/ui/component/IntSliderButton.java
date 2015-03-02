@@ -2,6 +2,7 @@ package net.techbrew.journeymap.ui.component;
 
 import cpw.mods.fml.client.config.GuiUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.techbrew.journeymap.properties.PropertiesBase;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -150,6 +151,14 @@ public class IntSliderButton extends Button implements IPropertyHolder<Integer>
                 properties.save();
             }
         }
+    }
+
+    @Override
+    public int getFitWidth(FontRenderer fr)
+    {
+        int max = fr.getStringWidth(prefix + minValue + suffix);
+        max = Math.max(max, fr.getStringWidth(prefix + maxValue + suffix));
+        return max + WIDTH_PAD;
     }
 
     public boolean keyTyped(char c, int i)

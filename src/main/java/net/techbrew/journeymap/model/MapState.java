@@ -27,6 +27,7 @@ import net.techbrew.journeymap.render.draw.DrawWayPointStep;
 import net.techbrew.journeymap.render.draw.RadarDrawStepFactory;
 import net.techbrew.journeymap.render.draw.WaypointDrawStepFactory;
 import net.techbrew.journeymap.render.map.GridRenderer;
+import net.techbrew.journeymap.task.MapPlayerTask;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -115,9 +116,9 @@ public class MapState
 
     public void setMapType(MapType mapType)
     {
-        if(mapType != getCurrentMapType())
+        if (mapType != getCurrentMapType())
         {
-            if (mapType!=MapType.underground)
+            if (mapType != MapType.underground)
             {
                 lastMapProperties.getPreferredMapType().set(mapType);
                 lastMapProperties.save();
@@ -291,7 +292,7 @@ public class MapState
     {
         EntityDTO player = DataCache.getPlayer();
 
-        if (System.currentTimeMillis() > (lastRefresh + 500 + coreProperties.chunkPoll.get()))
+        if (System.currentTimeMillis() > (lastRefresh + MapPlayerTask.getLastChunkStatsTime() + 500))
         {
             return true;
         }
