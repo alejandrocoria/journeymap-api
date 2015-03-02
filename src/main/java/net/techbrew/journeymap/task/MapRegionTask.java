@@ -115,7 +115,10 @@ public class MapRegionTask extends BaseMapTask
     protected void complete(boolean cancelled, boolean hadError)
     {
         lastTaskCompleted = System.currentTimeMillis();
-        RegionImageCache.instance().flushToDisk();
+        if (!cancelled)
+        {
+            RegionImageCache.instance().flushToDisk();
+        }
         DataCache.instance().invalidateChunkMDCache();
         if (hadError || cancelled)
         {

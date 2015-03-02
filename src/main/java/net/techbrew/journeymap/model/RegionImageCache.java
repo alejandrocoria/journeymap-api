@@ -485,14 +485,14 @@ public class RegionImageCache
         }
     }
 
-    public void deleteMap(MapState state, boolean allDims)
+    public boolean deleteMap(MapState state, boolean allDims)
     {
         RegionCoord fakeRc = new RegionCoord(state.getWorldDir(), 0, null, 0, state.getDimension());
         File imageDir = RegionImageHandler.getImageDir(fakeRc, MapType.day).getParentFile();
         if (!imageDir.getName().startsWith("DIM"))
         {
             JourneyMap.getLogger().error("Expected DIM directory, got " + imageDir);
-            return;
+            return false;
         }
 
         File[] dirs;
@@ -520,18 +520,25 @@ public class RegionImageCache
                 this.clear();
 
                 // Remove directories
+                boolean result = true;
                 for (File dir : dirs)
                 {
                     FileHandler.delete(dir);
                     JourneyMap.getLogger().info(String.format("Deleted image directory %s: %s", dir, !dir.exists()));
+                    if (dir.exists())
+                    {
+                        result = false;
+                    }
                 }
 
                 JourneyMap.getLogger().info("Done deleting directories");
+                return result;
             }
         }
         else
         {
-            JourneyMap.getLogger().warn("Found no DIM directories in " + imageDir);
+            JourneyMap.getLogger().info("Found no DIM directories in " + imageDir);
+            return true;
         }
     }
 

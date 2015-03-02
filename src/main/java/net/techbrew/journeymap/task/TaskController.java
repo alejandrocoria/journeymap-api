@@ -40,6 +40,7 @@ public class TaskController
     {
         managers.add(new MapRegionTask.Manager());
         managers.add(new SaveMapTask.Manager());
+        managers.add(new DeleteMapTask.Manager());
         managers.add(new MapPlayerTask.Manager());
     }
 

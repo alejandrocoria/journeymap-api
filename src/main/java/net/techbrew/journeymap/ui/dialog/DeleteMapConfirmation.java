@@ -10,12 +10,12 @@ package net.techbrew.journeymap.ui.dialog;
 
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.model.RegionImageCache;
-import net.techbrew.journeymap.task.MapPlayerTask;
+import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.task.DeleteMapTask;
+import net.techbrew.journeymap.task.MapRegionTask;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.JmUI;
-import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import org.lwjgl.input.Keyboard;
 
 public class DeleteMapConfirmation extends JmUI
@@ -72,9 +72,8 @@ public class DeleteMapConfirmation extends JmUI
     {
         if (guibutton == buttonAll || guibutton == buttonCurrent)
         {
-            RegionImageCache.instance().deleteMap(Fullscreen.state(), guibutton == buttonAll);
-            MapPlayerTask.forceNearbyRemap();
-            Fullscreen.reset();
+            JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, false, false);
+            JourneyMap.getInstance().toggleTask(DeleteMapTask.Manager.class, true, guibutton == buttonAll);
             UIManager.getInstance().openFullscreenMap();
             return;
         }
