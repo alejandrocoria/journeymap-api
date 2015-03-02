@@ -18,11 +18,9 @@ import net.techbrew.journeymap.io.MapSaver;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.MapState;
-import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
-import net.techbrew.journeymap.task.MapPlayerTask;
 import net.techbrew.journeymap.task.MapRegionTask;
 import net.techbrew.journeymap.task.SaveMapTask;
 import net.techbrew.journeymap.ui.UIManager;
@@ -90,9 +88,11 @@ public class FullscreenActions extends JmUI
         buttonBrowser.setEnabled(JourneyMap.getWebMapProperties().enabled.get());
 
         buttonAutomap = new Button(Constants.getString("jm.common.automap_title"));
+        buttonAutomap.setTooltip(Constants.getString("jm.common.automap_text"));
         buttonAutomap.setEnabled(FMLClientHandler.instance().getClient().isSingleplayer());
 
         buttonDeleteMap = new Button(Constants.getString("jm.common.deletemap_title"));
+        buttonDeleteMap.setTooltip(Constants.getString("jm.common.deletemap_text"));
 
         buttonDonate = new Button(Constants.getString("jm.webmap.donate_text"));
         buttonDonate.setDefaultStyle(false);
@@ -184,11 +184,7 @@ public class FullscreenActions extends JmUI
         }
         if (guibutton == buttonDeleteMap)
         {
-            RegionImageCache.instance().deleteMap(Fullscreen.state(), false);
-            MapPlayerTask.forceNearbyRemap();
-            //JourneyMap.getInstance().stopMapping();
-            Fullscreen.reset();
-            UIManager.getInstance().openFullscreenMap();
+            UIManager.getInstance().open(DeleteMapConfirmation.class);
             return;
         }
         if (guibutton == buttonCheck)
