@@ -161,6 +161,7 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
         {
             if (slot.button.keyTyped(c, i))
             {
+                lastPressed = slot;
                 return true;
             }
         }
