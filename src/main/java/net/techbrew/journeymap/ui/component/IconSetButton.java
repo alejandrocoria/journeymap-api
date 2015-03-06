@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Created by mwoodman on 6/24/2014.
  */
-public class IconSetButton extends Button implements IPropertyHolder<String>
+public class IconSetButton extends Button implements IPropertyHolder<AtomicReference<String>, String>
 {
     final String messageKey;
     final PropertiesBase baseProperties;
@@ -87,6 +87,12 @@ public class IconSetButton extends Button implements IPropertyHolder<String>
         baseProperties.save();
 
         updateLabel();
+    }
+
+    @Override
+    public AtomicReference<String> getProperty()
+    {
+        return valueHolder;
     }
 
     @Override

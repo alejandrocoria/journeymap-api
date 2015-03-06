@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap.task;
 
-import com.google.common.collect.TreeMultimap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -18,15 +17,15 @@ import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
-import net.techbrew.journeymap.model.ChunkMD;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MapPlayerTask extends BaseMapTask
 {
-    private static final DataCache dataCache = DataCache.instance();
     private static volatile long lastTaskCompleted;
     private static volatile int lastChunkStats;
     private static volatile long lastChunkStatsTime;
@@ -126,50 +125,7 @@ public class MapPlayerTask extends BaseMapTask
             }
         }
 
-        Set<ChunkCoordIntPair> renderAreaCoords = renderSpec.getRenderAreaCoords();
-        chunkCoords.addAll(renderAreaCoords);
-
-        // Add stale chunks in remaining space
-        if (renderSpec.getRenderPasses() > 1)
-        {
-            int maxStaleChunks = renderSpec.getSecondaryAreaSize();
-
-            // Get cached coords and sort by how stale they are, oldest first
-            final long now = System.currentTimeMillis();
-            final long minAge = JourneyMap.getCoreProperties().renderFrequency.get() * 1000;
-
-            TreeMultimap<Long, ChunkCoordIntPair> staleCoordsMM = TreeMultimap.create(new Comparator<Long>()
-            {
-                public int compare(Long o1, Long o2)
-                {
-                    return o2.compareTo(o1);
-                }
-            }, renderSpec.getDistanceComparator());
-
-            ChunkCoordIntPair playerCoord = new ChunkCoordIntPair(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
-            for (ChunkCoordIntPair coord : DataCache.instance().getCachedChunkCoordinates())
-            {
-                if (!renderAreaCoords.contains(coord))
-                {
-                    ChunkMD chunkMD = dataCache.getChunkMD(coord);
-                    if (chunkMD != null)
-                    {
-                        long age = now - chunkMD.getLastRendered();
-                        if (age > minAge)
-                        {
-                            if (renderSpec.inRange(playerCoord, coord, renderSpec.getRenderOffset(), renderSpec.getRevealShape()))
-                            {
-                                staleCoordsMM.put(age, coord);
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Now limit how many stale coords we'll map this round
-            List<ChunkCoordIntPair> staleCoords = new ArrayList<ChunkCoordIntPair>(staleCoordsMM.values()).subList(0, Math.min(staleCoordsMM.size(), maxStaleChunks));
-            chunkCoords.addAll(staleCoords);
-        }
+        chunkCoords.addAll(renderSpec.getRenderAreaCoords());
         this.scheduledChunks = chunkCoords.size();
     }
 

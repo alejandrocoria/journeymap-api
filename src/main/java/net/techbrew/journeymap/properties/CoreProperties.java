@@ -90,17 +90,20 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Cartography, key = "jm.common.map_style_caveshowsurface", defaultBoolean = true)
     public final AtomicBoolean mapSurfaceAboveCaves = new AtomicBoolean(true);
 
-    @Config(category = Cartography, key = "jm.common.renderdistance_cave", minValue = 1, maxValue = 20, defaultValue = 3)
-    public final AtomicInteger renderDistanceCave = new AtomicInteger(3);
+    @Config(category = Cartography, key = "jm.common.renderdistance_cave_min", minValue = 1, maxValue = 20, defaultValue = 3, sortOrder = 101)
+    public final AtomicInteger renderDistanceCaveMin = new AtomicInteger(3);
 
-    @Config(category = Cartography, key = "jm.common.renderdistance_surface", minValue = 1, maxValue = 20, defaultValue = 6)
-    public final AtomicInteger renderDistanceSurface = new AtomicInteger(6);
+    @Config(category = Cartography, key = "jm.common.renderdistance_cave_max", minValue = 1, maxValue = 20, defaultValue = 3, sortOrder = 102)
+    public final AtomicInteger renderDistanceCaveMax = new AtomicInteger(3);
+
+    @Config(category = Cartography, key = "jm.common.renderdistance_surface_min", minValue = 1, maxValue = 20, defaultValue = 4, sortOrder = 103)
+    public final AtomicInteger renderDistanceSurfaceMin = new AtomicInteger(4);
+
+    @Config(category = Cartography, key = "jm.common.renderdistance_surface_max", minValue = 1, maxValue = 20, defaultValue = 6, sortOrder = 104)
+    public final AtomicInteger renderDistanceSurfaceMax = new AtomicInteger(6);
 
     @Config(category = Cartography, key = "jm.common.renderfreq", minValue = 1, maxValue = 10, defaultValue = 2)
     public final AtomicInteger renderFrequency = new AtomicInteger(2);
-
-    @Config(category = Cartography, key = "jm.common.renderPasses", minValue = 1, maxValue = 3, defaultValue = 3)
-    public final AtomicInteger renderPasses = new AtomicInteger(3);
 
     @Config(category = Cartography, key = "jm.common.revealshape", defaultEnum = "Circle")
     public final AtomicReference<RenderSpec.RevealShape> revealShape = new AtomicReference<RenderSpec.RevealShape>(RenderSpec.RevealShape.Circle);
@@ -165,6 +168,41 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
         return Enum.valueOf(RenderGameOverlayEvent.ElementType.class, renderOverlayEventTypeName.get());
     }
 
+    /**
+     * Should return true if save needed after validation.
+     *
+     * @return
+     */
+    @Override
+    protected boolean validate()
+    {
+        boolean saveNeeded = super.validate();
+
+        if (renderDistanceCaveMax.get() < renderDistanceCaveMin.get())
+        {
+            renderDistanceCaveMax.set(renderDistanceCaveMin.get());
+            saveNeeded = true;
+        }
+
+        if (renderDistanceSurfaceMax.get() < renderDistanceSurfaceMin.get())
+        {
+            renderDistanceSurfaceMax.set(renderDistanceSurfaceMin.get());
+            saveNeeded = true;
+        }
+
+        return saveNeeded;
+    }
+
+    public boolean hasValidCaveRenderDistances()
+    {
+        return renderDistanceCaveMax.get() >= renderDistanceCaveMin.get();
+    }
+
+    public boolean hasValidSurfaceRenderDistances()
+    {
+        return renderDistanceSurfaceMax.get() >= renderDistanceSurfaceMin.get();
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -189,7 +227,8 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 logLevel, mapAntialiasing, mapBathymetry, mapCaveLighting, mapCrops, mapPlants, mapPlantShadows,
                 mapSurfaceAboveCaves, mapTransparency, maxAnimalsData, maxMobsData, maxPlayersData, maxVillagersData,
                 name, radarLateralDistance, radarVerticalDistance, recordCacheStats, renderOverlayEventTypeName,
-                renderOverlayPreEvent, renderDistanceCave, renderDistanceSurface, revealShape, themeName);
+                renderOverlayPreEvent, renderDistanceCaveMin, renderDistanceCaveMax, renderDistanceSurfaceMin,
+                renderDistanceSurfaceMax, revealShape, themeName);
     }
 
     @Override
@@ -228,8 +267,10 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 .add("recordCacheStats", recordCacheStats)
                 .add("renderOverlayEventTypeName", renderOverlayEventTypeName)
                 .add("renderOverlayPreEvent", renderOverlayPreEvent)
-                .add("renderDistanceCave", renderDistanceCave)
-                .add("renderDistanceSurface", renderDistanceSurface)
+                .add("renderDistanceCaveMin", renderDistanceCaveMin)
+                .add("renderDistanceCaveMax", renderDistanceCaveMax)
+                .add("renderDistanceSurfaceMin", renderDistanceSurfaceMin)
+                .add("renderDistanceSurfaceMax", renderDistanceSurfaceMax)
                 .add("revealShape", revealShape)
                 .add("themeName", themeName)
                 .add("tileRenderType", tileRenderType)

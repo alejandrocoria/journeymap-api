@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by Mark on 9/29/2014.
  */
-public class IntSliderButton extends Button implements IPropertyHolder<Integer>
+public class IntSliderButton extends Button implements IPropertyHolder<AtomicInteger, Integer>
 {
     public String prefix = "";
     /**
@@ -197,6 +197,12 @@ public class IntSliderButton extends Button implements IPropertyHolder<Integer>
             }
         }
         updateLabel();
+    }
+
+    @Override
+    public AtomicInteger getProperty()
+    {
+        return property;
     }
 
     @Override

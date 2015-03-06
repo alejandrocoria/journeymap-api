@@ -217,6 +217,9 @@ public class ScrollListPane extends GuiSlot
         {
             if (this.getSlot(slotIndex).keyTyped(c, i))
             {
+                lastClickedIndex = slotIndex;
+                lastPressed = this.getSlot(slotIndex).getLastPressed();
+                updateSlots();
                 return true;
             }
         }

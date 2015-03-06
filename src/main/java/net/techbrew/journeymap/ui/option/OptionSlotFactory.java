@@ -167,6 +167,10 @@ public class OptionSlotFactory
 
                 if (slotMetadata != null)
                 {
+                    // Set sort order
+                    slotMetadata.setOrder(config.sortOrder());
+
+                    // Determine category
                     Config.Category category = config.category();
                     if (category == Config.Category.Inherit)
                     {

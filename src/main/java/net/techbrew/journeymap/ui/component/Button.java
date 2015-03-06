@@ -27,12 +27,13 @@ import java.util.List;
  */
 public class Button extends GuiButton implements ScrollPane.Scrollable
 {
-    protected static Color smallFrameColorLight = new Color(160, 160, 160);
-    protected static Color smallFrameColorDark = new Color(120, 120, 120);
-    protected static Color smallBgColor = new Color(100, 100, 100);
-    protected static Color smallBgHoverColor = new Color(125, 135, 190);
-    protected static Color smallBgHoverColor2 = new Color(100, 100, 100);
+    protected Color smallFrameColorLight = new Color(160, 160, 160);
+    protected Color smallFrameColorDark = new Color(120, 120, 120);
+    protected Color smallBgColor = new Color(100, 100, 100);
+    protected Color smallBgHoverColor = new Color(125, 135, 190);
+    protected Color smallBgHoverColor2 = new Color(100, 100, 100);
 
+    protected Color overrideLabelColor;
     protected Color disabledBgColor = Color.darkGray;
     protected Color disabledLabelColor = Color.lightGray;
 
@@ -160,7 +161,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             }
 
             this.mouseDragged(minecraft, mouseX, mouseY);
-            int labelColor = 14737632;
+            int labelColor = overrideLabelColor == null ? 14737632 : overrideLabelColor.getRGB();
 
             if (!this.isEnabled())
             {
@@ -177,7 +178,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             {
                 if (this.field_146123_n)
                 {
-                    labelColor = 16777120;
+                    labelColor = overrideLabelColor == null ? 16777120 : overrideLabelColor.getRGB();
                 }
                 else if (packedFGColour != 0)
                 {
@@ -193,7 +194,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     {
         if (isDrawButton())
         {
-            DrawUtil.drawRectangle(xPosition, yPosition + height, width, 1, Button.smallFrameColorDark, 255);
+            DrawUtil.drawRectangle(xPosition, yPosition + height, width, 1, smallFrameColorDark, 255);
         }
     }
 
@@ -202,6 +203,11 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
      */
     public void secondaryDrawButton()
     {
+    }
+
+    public void setOverrideLabelColor(Color color)
+    {
+        overrideLabelColor = color;
     }
 
     @Override

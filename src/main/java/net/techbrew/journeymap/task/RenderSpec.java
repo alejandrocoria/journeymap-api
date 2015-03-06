@@ -1,16 +1,22 @@
 package net.techbrew.journeymap.task;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ListMultimap;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.ui.option.KeyedEnum;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by Mark on 2/27/2015.
@@ -19,30 +25,42 @@ public class RenderSpec
 {
     private final Minecraft minecraft;
     private final EntityPlayer player;
-    private final ChunkCoordinates playerPos;
     private final Boolean underground;
-    private final int renderOffset;
-    private final int renderPasses;
+    private final int renderDistanceMin;
+    private final int renderDistanceMax;
     private final RevealShape revealShape;
-    private final int minAreaSize = 9;
-    private Set<ChunkCoordIntPair> renderAreaCoords;
+
+    private ListMultimap<Integer, Offset> offsets = null;
+    private ArrayList<ChunkCoordIntPair> primaryRenderCoords;
     private Comparator<ChunkCoordIntPair> comparator;
-    private int reservedAreaSize;
-    private int maxAreaSize;
-    private int secondaryAreaSize;
+    private int lastSecondaryRenderDistance;
+    private int lastRenderAreaSize;
+
+    private ChunkCoordIntPair lastPlayerCoord;
 
     RenderSpec(Minecraft minecraft, boolean underground)
     {
         this.minecraft = minecraft;
         this.player = minecraft.thePlayer;
+        final CoreProperties props = JourneyMap.getCoreProperties();
         final int gameRenderDistance = Math.max(1, minecraft.gameSettings.renderDistanceChunks - 1);
-        final int mapRenderDistance = underground ? JourneyMap.getCoreProperties().renderDistanceCave.get() : JourneyMap.getCoreProperties().renderDistanceSurface.get();
+        final int mapRenderDistanceMin = underground ? props.renderDistanceCaveMin.get() : props.renderDistanceSurfaceMin.get();
+        final int mapRenderDistanceMax = underground ? props.renderDistanceCaveMax.get() : props.renderDistanceSurfaceMax.get();
 
-        this.playerPos = new ChunkCoordinates(player.chunkCoordX, player.chunkCoordY, player.chunkCoordZ);
         this.underground = underground;
-        this.renderOffset = Math.min(gameRenderDistance, mapRenderDistance);
-        this.renderPasses = JourneyMap.getCoreProperties().renderPasses.get();
+        int rdMin = Math.min(gameRenderDistance, mapRenderDistanceMin);
+        int rdMax = Math.min(gameRenderDistance, Math.max(rdMin, mapRenderDistanceMax));
+        if (rdMin + 1 == rdMax)
+        {
+            rdMin++; // No need to do a separate secondary pass for just one offset
+        }
+
+        this.renderDistanceMin = rdMin;
+        this.renderDistanceMax = rdMax;
         this.revealShape = JourneyMap.getCoreProperties().revealShape.get();
+
+        lastPlayerCoord = new ChunkCoordIntPair(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
+        lastSecondaryRenderDistance = this.renderDistanceMin;
     }
 
     private static Double blockDistance(ChunkCoordIntPair playerCoord, ChunkCoordIntPair coord)
@@ -59,77 +77,7 @@ public class RenderSpec
         return Math.sqrt(x * x + z * z);
     }
 
-    public static Comparator<ChunkCoordIntPair> getChunkDistanceComparator()
-    {
-        return new Comparator<ChunkCoordIntPair>()
-        {
-            Minecraft minecraft = FMLClientHandler.instance().getClient();
-            ChunkCoordIntPair playerCoord = new ChunkCoordIntPair(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
-
-            @Override
-            public int compare(ChunkCoordIntPair o1, ChunkCoordIntPair o2)
-            {
-                int comp = blockDistance(playerCoord, o1).compareTo(blockDistance(playerCoord, o2));
-                if (comp == 0)
-                {
-                    comp = Integer.compare(o1.chunkXPos, o2.chunkXPos);
-                }
-                if (comp == 0)
-                {
-                    comp = Integer.compare(o1.chunkZPos, o2.chunkZPos);
-                }
-                return comp;
-            }
-        };
-    }
-
-    protected Set<ChunkCoordIntPair> getRenderAreaCoords()
-    {
-        // Add peripheral coords around player
-        if (renderAreaCoords == null || renderAreaCoords.isEmpty())
-        {
-            DataCache dataCache = DataCache.instance();
-            ChunkCoordIntPair playerCoord = new ChunkCoordIntPair(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
-            List<ChunkCoordIntPair> peripheralCoords = new ArrayList<ChunkCoordIntPair>((int) Math.pow(renderOffset * 2 + 1, 2));
-            for (int x = (player.chunkCoordX - renderOffset); x <= (player.chunkCoordX + renderOffset); x++)
-            {
-                for (int z = (player.chunkCoordZ - renderOffset); z <= (player.chunkCoordZ + renderOffset); z++)
-                {
-                    ChunkCoordIntPair coord = new ChunkCoordIntPair(x, z);
-                    if (inRange(playerCoord, coord, renderOffset, revealShape))
-                    {
-                        peripheralCoords.add(coord);
-                        dataCache.getChunkMD(coord);
-                    }
-                }
-            }
-
-            maxAreaSize = peripheralCoords.size();
-            if (renderPasses == 1)
-            {
-                reservedAreaSize = maxAreaSize;
-            }
-            else if (renderPasses == 2)
-            {
-                reservedAreaSize = Math.max(minAreaSize, (int) Math.ceil(maxAreaSize / 2.0));
-                secondaryAreaSize = reservedAreaSize / 2;
-            }
-            else
-            {
-                reservedAreaSize = Math.max(minAreaSize, (int) Math.ceil(maxAreaSize / 4.0));
-                secondaryAreaSize = reservedAreaSize;
-            }
-
-            // Sort by distance
-            Collections.sort(peripheralCoords, getDistanceComparator());
-
-            // Truncate to reserved area
-            this.renderAreaCoords = Collections.unmodifiableSet(new HashSet<ChunkCoordIntPair>(peripheralCoords.subList(0, Math.min(peripheralCoords.size(), reservedAreaSize))));
-        }
-        return renderAreaCoords;
-    }
-
-    boolean inRange(ChunkCoordIntPair playerCoord, ChunkCoordIntPair coord, int renderDistance, RenderSpec.RevealShape revealShape)
+    static boolean inRange(ChunkCoordIntPair playerCoord, ChunkCoordIntPair coord, int renderDistance, RenderSpec.RevealShape revealShape)
     {
         if (revealShape == RenderSpec.RevealShape.Circle)
         {
@@ -145,9 +93,99 @@ public class RenderSpec
         }
     }
 
-    public ChunkCoordinates getPlayerPos()
+    private static ListMultimap<Integer, Offset> calculateOffsets(int minOffset, int maxOffset, RevealShape revealShape)
     {
-        return playerPos;
+        ListMultimap<Integer, Offset> multimap = ArrayListMultimap.create();
+
+        int offset = maxOffset;
+        final int baseX = 0;
+        final int baseZ = 0;
+        final ChunkCoordIntPair baseCoord = new ChunkCoordIntPair(baseX, baseZ);
+        while (offset >= minOffset)
+        {
+            for (int x = (baseX - offset); x <= (baseX + offset); x++)
+            {
+                for (int z = (baseZ - offset); z <= (baseZ + offset); z++)
+                {
+                    ChunkCoordIntPair coord = new ChunkCoordIntPair(x, z);
+                    if (revealShape == RevealShape.Square || inRange(baseCoord, coord, offset, revealShape))
+                    {
+                        multimap.put(offset, new Offset(coord.chunkXPos, coord.chunkZPos));
+                    }
+                }
+            }
+
+            if (offset < maxOffset)
+            {
+                List<Offset> oneUp = multimap.get(offset + 1);
+                oneUp.removeAll(multimap.get(offset));
+            }
+
+            offset--;
+        }
+
+        return new ImmutableListMultimap.Builder<Integer, Offset>().putAll(multimap).build();
+    }
+
+    protected Collection<ChunkCoordIntPair> getRenderAreaCoords()
+    {
+        // Lazy load offsets on first use
+        if (offsets == null)
+        {
+            offsets = calculateOffsets(renderDistanceMin, renderDistanceMax, revealShape);
+        }
+
+        DataCache dataCache = DataCache.instance();
+
+        // Reset coords if player moved
+        if(lastPlayerCoord==null || lastPlayerCoord.chunkXPos!=player.chunkCoordX || lastPlayerCoord.chunkZPos!=player.chunkCoordZ)
+        {
+            primaryRenderCoords = null;
+        }
+        lastPlayerCoord= new ChunkCoordIntPair(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
+
+        // Add min distance coords around player
+        if (primaryRenderCoords == null || primaryRenderCoords.isEmpty())
+        {
+            List<Offset> primaryOffsets = offsets.get(renderDistanceMin);
+            primaryRenderCoords = new ArrayList<ChunkCoordIntPair>(primaryOffsets.size());
+            for (Offset offset : primaryOffsets)
+            {
+                ChunkCoordIntPair primaryCoord = offset.from(lastPlayerCoord);
+                primaryRenderCoords.add(primaryCoord);
+                dataCache.getChunkMD(primaryCoord);
+            }
+        }
+
+        if (renderDistanceMax == renderDistanceMin)
+        {
+            lastRenderAreaSize = primaryRenderCoords.size();
+            // Someday it may be necessary to return an immutable list if these will be consumed elsewhere
+            return primaryRenderCoords;
+        }
+        else
+        {
+            if (lastSecondaryRenderDistance == renderDistanceMax)
+            {
+                lastSecondaryRenderDistance = renderDistanceMin;
+            }
+            lastSecondaryRenderDistance++;
+
+            List<Offset> secondaryOffsets = offsets.get(lastSecondaryRenderDistance);
+
+            ArrayList<ChunkCoordIntPair> renderCoords = new ArrayList<ChunkCoordIntPair>(primaryRenderCoords.size() + secondaryOffsets.size());
+            renderCoords.addAll(primaryRenderCoords);
+
+            for (Offset offset : secondaryOffsets)
+            {
+                ChunkCoordIntPair secondaryCoord = offset.from(lastPlayerCoord);
+                renderCoords.add(secondaryCoord);
+                dataCache.getChunkMD(secondaryCoord);
+            }
+
+            lastRenderAreaSize = renderCoords.size();
+            return renderCoords;
+        }
     }
 
     public Boolean getUnderground()
@@ -155,14 +193,19 @@ public class RenderSpec
         return underground;
     }
 
-    public int getRenderOffset()
+    public int getRenderDistanceMin()
     {
-        return renderOffset;
+        return renderDistanceMin;
     }
 
-    public int getRenderPasses()
+    public int getRenderDistanceMax()
     {
-        return renderPasses;
+        return renderDistanceMax;
+    }
+
+    public int getLastSecondaryRenderDistance()
+    {
+        return lastSecondaryRenderDistance;
     }
 
     public RevealShape getRevealShape()
@@ -170,24 +213,9 @@ public class RenderSpec
         return revealShape;
     }
 
-    public int getMinAreaSize()
+    public int getLastRenderAreaSize()
     {
-        return minAreaSize;
-    }
-
-    public int getReservedAreaSize()
-    {
-        return reservedAreaSize;
-    }
-
-    public int getMaxAreaSize()
-    {
-        return maxAreaSize;
-    }
-
-    public int getSecondaryAreaSize()
-    {
-        return secondaryAreaSize;
+        return lastRenderAreaSize;
     }
 
     public Comparator<ChunkCoordIntPair> getDistanceComparator()
@@ -245,16 +273,32 @@ public class RenderSpec
 
         RenderSpec that = (RenderSpec) o;
 
-        return that.hashCode() == this.hashCode();
+        if (renderDistanceMax != that.renderDistanceMax)
+        {
+            return false;
+        }
+        if (renderDistanceMin != that.renderDistanceMin)
+        {
+            return false;
+        }
+        if (revealShape != that.revealShape)
+        {
+            return false;
+        }
+        if (!underground.equals(that.underground))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
     public int hashCode()
     {
-        int result = playerPos.hashCode();
-        result = 31 * result + underground.hashCode();
-        result = 31 * result + renderOffset;
-        result = 31 * result + renderPasses;
+        int result = underground.hashCode();
+        result = 31 * result + renderDistanceMin;
+        result = 31 * result + renderDistanceMax;
         result = 31 * result + revealShape.hashCode();
         return result;
     }
@@ -280,6 +324,57 @@ public class RenderSpec
         public String toString()
         {
             return Constants.getString(this.key);
+        }
+    }
+
+    private static class Offset
+    {
+        final int x;
+        final int z;
+
+        private Offset(int x, int z)
+        {
+            this.x = x;
+            this.z = z;
+        }
+
+        ChunkCoordIntPair from(ChunkCoordIntPair coord)
+        {
+            return new ChunkCoordIntPair(coord.chunkXPos + x, coord.chunkZPos + z);
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o)
+            {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass())
+            {
+                return false;
+            }
+
+            Offset offset = (Offset) o;
+
+            if (x != offset.x)
+            {
+                return false;
+            }
+            if (z != offset.z)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            int result = x;
+            result = 31 * result + z;
+            return result;
         }
     }
 }

@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL11;
 /**
  * Created by Mark on 9/29/2014.
  */
-public class DoubleSliderButton extends Button implements IPropertyHolder<Double>
+public class DoubleSliderButton extends Button implements IPropertyHolder<AtomicDouble, Double>
 {
     public String prefix = "";
     /**
@@ -182,6 +182,12 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Double
             }
         }
         updateLabel();
+    }
+
+    @Override
+    public AtomicDouble getProperty()
+    {
+        return property;
     }
 
     @Override

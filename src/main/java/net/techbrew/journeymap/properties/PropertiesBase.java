@@ -414,4 +414,10 @@ public abstract class PropertiesBase
     {
         return ConfigValidation.validateConfigs(this);
     }
+
+    public void ensureValid()
+    {
+        validate();
+        save();
+    }
 }

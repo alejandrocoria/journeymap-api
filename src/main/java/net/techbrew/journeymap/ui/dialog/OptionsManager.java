@@ -18,6 +18,7 @@ import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.forgehandler.KeyEventHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
+import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.task.MapPlayerTask;
 import net.techbrew.journeymap.ui.UIManager;
@@ -261,6 +262,39 @@ public class OptionsManager extends JmUI
                 }
             }
 
+            // Show validation on render distances
+            // TODO: Hashmap properties to buttons somewhere for easier lookup?
+            for (ScrollListPane.ISlot rootSlot : optionsListPane.getRootSlots())
+            {
+                if (rootSlot instanceof CategorySlot)
+                {
+                    CategorySlot categorySlot = (CategorySlot) rootSlot;
+                    if (categorySlot.getCategory() == Config.Category.Cartography)
+                    {
+                        CoreProperties coreProperties = JourneyMap.getCoreProperties();
+                        for (SlotMetadata slotMetadata : categorySlot.getAllChildMetadata())
+                        {
+                            if (slotMetadata.getButton() instanceof IPropertyHolder)
+                            {
+                                Button button = slotMetadata.getButton();
+                                Object property = ((IPropertyHolder) button).getProperty();
+
+                                if (property == coreProperties.renderDistanceCaveMax)
+                                {
+                                    boolean valid = JourneyMap.getCoreProperties().hasValidCaveRenderDistances();
+                                    button.setOverrideLabelColor(valid ? null : Color.red);
+                                }
+                                else if (property == coreProperties.renderDistanceSurfaceMax)
+                                {
+                                    boolean valid = JourneyMap.getCoreProperties().hasValidSurfaceRenderDistances();
+                                    button.setOverrideLabelColor(valid ? null : Color.red);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             renderStatsButton.displayString = Constants.getString("jm.common.renderstats",
                     MapPlayerTask.getLastChunkStats(),
                     MapPlayerTask.getLastChunkStatsTime(),
@@ -392,12 +426,18 @@ public class OptionsManager extends JmUI
             Config.Category category = categorySlot.getCategory();
             changedCategories.add(category);
 
-            // If the button is MiniMap1-related, force it to update
+            // If the button is MiniMap-related, force it to update
             if (category == Config.Category.MiniMap1 || category == Config.Category.MiniMap2)
             {
                 refreshMinimapOptions();
                 DataCache.instance().resetRadarCaches();
                 UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+            }
+
+            // If the button is Cartography-related, ensure valid
+            if (category == Config.Category.Cartography)
+            {
+                JourneyMap.getCoreProperties().save();
             }
         }
     }
@@ -509,12 +549,12 @@ public class OptionsManager extends JmUI
         JourneyMap.getCoreProperties().optionsManagerUsed.set(true);
 
         // Just in case a property changed but wasn't saved.
-        JourneyMap.getCoreProperties().save();
-        JourneyMap.getWebMapProperties().save();
-        JourneyMap.getFullMapProperties().save();
-        JourneyMap.getMiniMapProperties1().save();
-        JourneyMap.getMiniMapProperties2().save();
-        JourneyMap.getWaypointProperties().save();
+        JourneyMap.getCoreProperties().ensureValid();
+        JourneyMap.getWebMapProperties().ensureValid();
+        JourneyMap.getFullMapProperties().ensureValid();
+        JourneyMap.getMiniMapProperties1().ensureValid();
+        JourneyMap.getMiniMapProperties2().ensureValid();
+        JourneyMap.getWaypointProperties().ensureValid();
 
         // Ensure minimap is back to the one used before this opened
         UIManager.getInstance().getMiniMap().setMiniMapProperties(JourneyMap.getMiniMapProperties(this.inGameMinimapId));
