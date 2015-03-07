@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Adapted from GuiListExtended
  */
-public class ScrollListPane extends GuiSlot
+public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
 {
     final JmUI parent;
     public SlotMetadata lastTooltipMetadata;
@@ -21,7 +21,7 @@ public class ScrollListPane extends GuiSlot
     public long lastTooltipTime;
     public long hoverDelay = 800;
     int hpad = 12;
-    List<? extends ISlot> rootSlots;
+    List<T> rootSlots;
     List<ISlot> currentSlots = new ArrayList<ISlot>(0);
     SlotMetadata lastPressed;
     int lastClickedIndex;
@@ -48,13 +48,13 @@ public class ScrollListPane extends GuiSlot
         return this.currentSlots == null ? 0 : currentSlots.size();
     }
 
-    public void setSlots(List<? extends ISlot> slots)
+    public void setSlots(List<T> slots)
     {
         this.rootSlots = slots;
         updateSlots();
     }
 
-    public List<? extends ISlot> getRootSlots()
+    public List<T> getRootSlots()
     {
         return rootSlots;
     }

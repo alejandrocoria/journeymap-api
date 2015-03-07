@@ -21,6 +21,7 @@ import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.task.MapPlayerTask;
+import net.techbrew.journeymap.task.RenderSpec;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.*;
@@ -42,6 +43,8 @@ import java.util.List;
  */
 public class OptionsManager extends JmUI
 {
+    protected static EnumSet<Config.Category> openCategories = EnumSet.noneOf(Config.Category.class);
+
     protected final int inGameMinimapId;
     protected Config.Category[] initialCategories;
     protected CheckBox minimap1PreviewButton;
@@ -52,10 +55,11 @@ public class OptionsManager extends JmUI
     protected Button renderStatsButton;
     protected SlotMetadata renderStatsSlotMetadata;
     protected CategorySlot cartographyCategorySlot;
-    protected ScrollListPane optionsListPane;
+    protected ScrollListPane<CategorySlot> optionsListPane;
     protected Map<Config.Category, List<SlotMetadata>> toolbars;
     protected EnumSet<Config.Category> changedCategories = EnumSet.noneOf(Config.Category.class);
     protected boolean forceMinimapUpdate;
+
 
     public OptionsManager()
     {
@@ -64,7 +68,7 @@ public class OptionsManager extends JmUI
 
     public OptionsManager(JmUI returnDisplay)
     {
-        this(returnDisplay, null, null);
+        this(returnDisplay, openCategories.toArray(new Config.Category[0]));
     }
 
     public OptionsManager(JmUI returnDisplay, Config.Category... initialCategories)
@@ -133,18 +137,18 @@ public class OptionsManager extends JmUI
             if (optionsListPane == null)
             {
                 List<ScrollListPane.ISlot> categorySlots = new ArrayList<ScrollListPane.ISlot>();
-                optionsListPane = new ScrollListPane(this, mc, this.width, this.height, this.headerHeight, this.height - 30, 20);
+                optionsListPane = new ScrollListPane<CategorySlot>(this, mc, this.width, this.height, this.headerHeight, this.height - 30, 20);
                 optionsListPane.setSlots(OptionSlotFactory.getSlots(getToolbars()));
                 if (initialCategories != null)
                 {
                     for (Config.Category initialCategory : initialCategories)
                     {
-                        for (ScrollListPane.ISlot slot : optionsListPane.getRootSlots())
+                        for (CategorySlot categorySlot : optionsListPane.getRootSlots())
                         {
-                            if (slot instanceof CategorySlot && ((CategorySlot) slot).getCategory() == initialCategory)
+                            if (categorySlot.getCategory() == initialCategory)
                             {
-                                ((CategorySlot) slot).setSelected(true);
-                                categorySlots.add(slot);
+                                categorySlot.setSelected(true);
+                                categorySlots.add(categorySlot);
                             }
                         }
                     }
@@ -262,44 +266,7 @@ public class OptionsManager extends JmUI
                 }
             }
 
-            // Show validation on render distances
-            // TODO: Hashmap properties to buttons somewhere for easier lookup?
-            for (ScrollListPane.ISlot rootSlot : optionsListPane.getRootSlots())
-            {
-                if (rootSlot instanceof CategorySlot)
-                {
-                    CategorySlot categorySlot = (CategorySlot) rootSlot;
-                    if (categorySlot.getCategory() == Config.Category.Cartography)
-                    {
-                        CoreProperties coreProperties = JourneyMap.getCoreProperties();
-                        for (SlotMetadata slotMetadata : categorySlot.getAllChildMetadata())
-                        {
-                            if (slotMetadata.getButton() instanceof IPropertyHolder)
-                            {
-                                Button button = slotMetadata.getButton();
-                                Object property = ((IPropertyHolder) button).getProperty();
-
-                                if (property == coreProperties.renderDistanceCaveMax)
-                                {
-                                    boolean valid = JourneyMap.getCoreProperties().hasValidCaveRenderDistances();
-                                    button.setOverrideLabelColor(valid ? null : Color.red);
-                                }
-                                else if (property == coreProperties.renderDistanceSurfaceMax)
-                                {
-                                    boolean valid = JourneyMap.getCoreProperties().hasValidSurfaceRenderDistances();
-                                    button.setOverrideLabelColor(valid ? null : Color.red);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            renderStatsButton.displayString = Constants.getString("jm.common.renderstats",
-                    MapPlayerTask.getLastChunkStats(),
-                    MapPlayerTask.getLastChunkStatsTime(),
-                    new DecimalFormat("##.#").format(MapPlayerTask.getLastChunkStatsAvg()));
-            renderStatsButton.setWidth(cartographyCategorySlot.getCurrentColumnWidth());
+            updateRenderStats();
 
             String[] lastTooltip = optionsListPane.lastTooltip;
             long lastTooltipTime = optionsListPane.lastTooltipTime;
@@ -331,6 +298,74 @@ public class OptionsManager extends JmUI
         {
             JMLogger.logOnce("Error in OptionsManager.drawScreen(): " + t, t);
         }
+    }
+
+    private void updateRenderStats()
+    {
+        // Show validation on render distances
+        // TODO: Hashmap properties to buttons somewhere for easier lookup?
+        for (ScrollListPane.ISlot rootSlot : optionsListPane.getRootSlots())
+        {
+            if (rootSlot instanceof CategorySlot)
+            {
+                CategorySlot categorySlot = (CategorySlot) rootSlot;
+                if (categorySlot.getCategory() == Config.Category.Cartography)
+                {
+                    CoreProperties coreProperties = JourneyMap.getCoreProperties();
+                    for (SlotMetadata slotMetadata : categorySlot.getAllChildMetadata())
+                    {
+                        if (slotMetadata.getButton() instanceof IPropertyHolder)
+                        {
+                            Button button = slotMetadata.getButton();
+                            Object property = ((IPropertyHolder) button).getProperty();
+
+                            if (property == coreProperties.renderDistanceCaveMax)
+                            {
+                                boolean valid = JourneyMap.getCoreProperties().hasValidCaveRenderDistances();
+                                button.setOverrideLabelColor(valid ? null : Color.red);
+                            }
+                            else if (property == coreProperties.renderDistanceSurfaceMax)
+                            {
+                                boolean valid = JourneyMap.getCoreProperties().hasValidSurfaceRenderDistances();
+                                button.setOverrideLabelColor(valid ? null : Color.red);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        int primaryRenderSize = 0;
+        int secondaryRenderSize = 0;
+
+        if (DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapCaves.get())
+        {
+            RenderSpec spec = MapPlayerTask.getLastCaveRenderSpec();
+            if (spec != null)
+            {
+                primaryRenderSize += spec.getPrimaryRenderSize();
+                secondaryRenderSize += spec.getLastSecondaryRenderSize();
+            }
+        }
+
+        if (!DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapSurface.get())
+        {
+            RenderSpec spec = MapPlayerTask.getLastSurfaceRenderSpec();
+            if (spec != null)
+            {
+                primaryRenderSize += spec.getPrimaryRenderSize();
+                secondaryRenderSize += spec.getLastSecondaryRenderSize();
+            }
+        }
+
+        renderStatsButton.displayString = Constants.getString("jm.common.renderstats",
+                MapPlayerTask.getLastChunkStats(),
+                primaryRenderSize,
+                secondaryRenderSize,
+                MapPlayerTask.getLastChunkStatsTime(),
+                new DecimalFormat("##.#").format(MapPlayerTask.getLastChunkStatsAvg()));
+
+        renderStatsButton.setWidth(cartographyCategorySlot.getCurrentColumnWidth());
     }
 
     @Override
@@ -503,19 +538,16 @@ public class OptionsManager extends JmUI
 
     protected void resetOptions(Config.Category category)
     {
-        for (ScrollListPane.ISlot slot : optionsListPane.getRootSlots())
+        for (CategorySlot categorySlot : optionsListPane.getRootSlots())
         {
-            if (slot instanceof CategorySlot)
+            if (category.equals(categorySlot.getCategory()))
             {
-                if (category.equals(((CategorySlot) slot).getCategory()))
+                for (SlotMetadata slotMetadata : categorySlot.getAllChildMetadata())
                 {
-                    for (SlotMetadata slotMetadata : ((CategorySlot) slot).getAllChildMetadata())
-                    {
-                        slotMetadata.resetToDefaultValue();
-                        slotMetadata.getButton().refresh(); // TODO move into reset
-                    }
-                    break;
+                    slotMetadata.resetToDefaultValue();
+                    slotMetadata.getButton().refresh(); // TODO move into reset
                 }
+                break;
             }
         }
     }
@@ -528,16 +560,13 @@ public class OptionsManager extends JmUI
     protected void refreshMinimapOptions()
     {
         EnumSet cats = EnumSet.of(Config.Category.MiniMap1, Config.Category.MiniMap2);
-        for (ScrollListPane.ISlot slot : optionsListPane.getRootSlots())
+        for (CategorySlot categorySlot : optionsListPane.getRootSlots())
         {
-            if (slot instanceof CategorySlot)
+            if (cats.contains(categorySlot.getCategory()))
             {
-                if (cats.contains(((CategorySlot) slot).getCategory()))
+                for (SlotMetadata slotMetadata : categorySlot.getAllChildMetadata())
                 {
-                    for (SlotMetadata slotMetadata : ((CategorySlot) slot).getAllChildMetadata())
-                    {
-                        slotMetadata.getButton().refresh();
-                    }
+                    slotMetadata.getButton().refresh();
                 }
             }
         }
@@ -546,7 +575,7 @@ public class OptionsManager extends JmUI
     @Override
     protected void closeAndReturn()
     {
-        JourneyMap.getCoreProperties().optionsManagerUsed.set(true);
+        JourneyMap.getCoreProperties().optionsManagerViewed.set(JourneyMap.JM_VERSION.toString());
 
         // Just in case a property changed but wasn't saved.
         JourneyMap.getCoreProperties().ensureValid();
@@ -608,6 +637,15 @@ public class OptionsManager extends JmUI
                     JourneyMap.getInstance().toggleWebserver(JourneyMap.getWebMapProperties().enabled.get(), false);
                     break;
                 }
+            }
+        }
+
+        OptionsManager.openCategories.clear();
+        for (CategorySlot categorySlot : optionsListPane.getRootSlots())
+        {
+            if (categorySlot.isSelected())
+            {
+                OptionsManager.openCategories.add(categorySlot.getCategory());
             }
         }
 

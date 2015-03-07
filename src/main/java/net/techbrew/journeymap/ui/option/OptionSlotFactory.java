@@ -31,7 +31,7 @@ public class OptionSlotFactory
     protected static File docFile;
     protected static boolean generateDocs = false;
 
-    public static List<ScrollListPane.ISlot> getSlots(Map<Config.Category, List<SlotMetadata>> toolbars)
+    public static List<CategorySlot> getSlots(Map<Config.Category, List<SlotMetadata>> toolbars)
     {
         HashMap<Config.Category, List<SlotMetadata>> mergedMap = new HashMap<Config.Category, List<SlotMetadata>>();
 
@@ -99,7 +99,7 @@ public class OptionSlotFactory
             endDoc();
         }
 
-        return new ArrayList<ScrollListPane.ISlot>(categories);
+        return categories;
     }
 
     protected static void addSlots(HashMap<Config.Category, List<SlotMetadata>> mergedMap, Config.Category inheritedCategory, PropertiesBase properties)

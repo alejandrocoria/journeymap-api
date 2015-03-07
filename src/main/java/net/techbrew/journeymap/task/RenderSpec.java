@@ -26,15 +26,14 @@ public class RenderSpec
     private final Minecraft minecraft;
     private final EntityPlayer player;
     private final Boolean underground;
-    private final int renderDistanceMin;
-    private final int renderDistanceMax;
+    private final int primaryRenderDistance;
+    private final int maxSecondaryRenderDistance;
     private final RevealShape revealShape;
 
     private ListMultimap<Integer, Offset> offsets = null;
     private ArrayList<ChunkCoordIntPair> primaryRenderCoords;
     private Comparator<ChunkCoordIntPair> comparator;
     private int lastSecondaryRenderDistance;
-    private int lastRenderAreaSize;
 
     private ChunkCoordIntPair lastPlayerCoord;
 
@@ -52,15 +51,15 @@ public class RenderSpec
         int rdMax = Math.min(gameRenderDistance, Math.max(rdMin, mapRenderDistanceMax));
         if (rdMin + 1 == rdMax)
         {
-            rdMin++; // No need to do a separate secondary pass for just one offset
+            rdMin++;
         }
 
-        this.renderDistanceMin = rdMin;
-        this.renderDistanceMax = rdMax;
+        this.primaryRenderDistance = rdMin;
+        this.maxSecondaryRenderDistance = rdMax;
         this.revealShape = JourneyMap.getCoreProperties().revealShape.get();
 
         lastPlayerCoord = new ChunkCoordIntPair(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
-        lastSecondaryRenderDistance = this.renderDistanceMin;
+        lastSecondaryRenderDistance = this.primaryRenderDistance;
     }
 
     private static Double blockDistance(ChunkCoordIntPair playerCoord, ChunkCoordIntPair coord)
@@ -132,7 +131,7 @@ public class RenderSpec
         // Lazy load offsets on first use
         if (offsets == null)
         {
-            offsets = calculateOffsets(renderDistanceMin, renderDistanceMax, revealShape);
+            offsets = calculateOffsets(primaryRenderDistance, maxSecondaryRenderDistance, revealShape);
         }
 
         DataCache dataCache = DataCache.instance();
@@ -141,13 +140,14 @@ public class RenderSpec
         if(lastPlayerCoord==null || lastPlayerCoord.chunkXPos!=player.chunkCoordX || lastPlayerCoord.chunkZPos!=player.chunkCoordZ)
         {
             primaryRenderCoords = null;
+            lastSecondaryRenderDistance = primaryRenderDistance;
         }
         lastPlayerCoord= new ChunkCoordIntPair(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
 
         // Add min distance coords around player
         if (primaryRenderCoords == null || primaryRenderCoords.isEmpty())
         {
-            List<Offset> primaryOffsets = offsets.get(renderDistanceMin);
+            List<Offset> primaryOffsets = offsets.get(primaryRenderDistance);
             primaryRenderCoords = new ArrayList<ChunkCoordIntPair>(primaryOffsets.size());
             for (Offset offset : primaryOffsets)
             {
@@ -157,17 +157,16 @@ public class RenderSpec
             }
         }
 
-        if (renderDistanceMax == renderDistanceMin)
+        if (maxSecondaryRenderDistance == primaryRenderDistance)
         {
-            lastRenderAreaSize = primaryRenderCoords.size();
             // Someday it may be necessary to return an immutable list if these will be consumed elsewhere
             return primaryRenderCoords;
         }
         else
         {
-            if (lastSecondaryRenderDistance == renderDistanceMax)
+            if (lastSecondaryRenderDistance == maxSecondaryRenderDistance)
             {
-                lastSecondaryRenderDistance = renderDistanceMin;
+                lastSecondaryRenderDistance = primaryRenderDistance;
             }
             lastSecondaryRenderDistance++;
 
@@ -183,7 +182,6 @@ public class RenderSpec
                 dataCache.getChunkMD(secondaryCoord);
             }
 
-            lastRenderAreaSize = renderCoords.size();
             return renderCoords;
         }
     }
@@ -193,14 +191,14 @@ public class RenderSpec
         return underground;
     }
 
-    public int getRenderDistanceMin()
+    public int getPrimaryRenderDistance()
     {
-        return renderDistanceMin;
+        return primaryRenderDistance;
     }
 
-    public int getRenderDistanceMax()
+    public int getMaxSecondaryRenderDistance()
     {
-        return renderDistanceMax;
+        return maxSecondaryRenderDistance;
     }
 
     public int getLastSecondaryRenderDistance()
@@ -213,9 +211,14 @@ public class RenderSpec
         return revealShape;
     }
 
-    public int getLastRenderAreaSize()
+    public int getLastSecondaryRenderSize()
     {
-        return lastRenderAreaSize;
+        return offsets == null ? 0 : offsets.get(lastSecondaryRenderDistance).size();
+    }
+
+    public int getPrimaryRenderSize()
+    {
+        return offsets == null ? 0 : offsets.get(primaryRenderDistance).size();
     }
 
     public Comparator<ChunkCoordIntPair> getDistanceComparator()
@@ -273,11 +276,11 @@ public class RenderSpec
 
         RenderSpec that = (RenderSpec) o;
 
-        if (renderDistanceMax != that.renderDistanceMax)
+        if (maxSecondaryRenderDistance != that.maxSecondaryRenderDistance)
         {
             return false;
         }
-        if (renderDistanceMin != that.renderDistanceMin)
+        if (primaryRenderDistance != that.primaryRenderDistance)
         {
             return false;
         }
@@ -297,8 +300,8 @@ public class RenderSpec
     public int hashCode()
     {
         int result = underground.hashCode();
-        result = 31 * result + renderDistanceMin;
-        result = 31 * result + renderDistanceMax;
+        result = 31 * result + primaryRenderDistance;
+        result = 31 * result + maxSecondaryRenderDistance;
         result = 31 * result + revealShape.hashCode();
         return result;
     }

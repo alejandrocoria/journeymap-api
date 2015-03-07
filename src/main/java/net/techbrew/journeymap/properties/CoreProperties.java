@@ -102,8 +102,8 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Cartography, key = "jm.common.renderdistance_surface_max", minValue = 1, maxValue = 20, defaultValue = 6, sortOrder = 104)
     public final AtomicInteger renderDistanceSurfaceMax = new AtomicInteger(6);
 
-    @Config(category = Cartography, key = "jm.common.renderfreq", minValue = 1, maxValue = 10, defaultValue = 2)
-    public final AtomicInteger renderFrequency = new AtomicInteger(2);
+    @Config(category = Cartography, key = "jm.common.renderdelay", minValue = 0, maxValue = 10, defaultValue = 2)
+    public final AtomicInteger renderDelay = new AtomicInteger(2);
 
     @Config(category = Cartography, key = "jm.common.revealshape", defaultEnum = "Circle")
     public final AtomicReference<RenderSpec.RevealShape> revealShape = new AtomicReference<RenderSpec.RevealShape>(RenderSpec.RevealShape.Circle);
@@ -143,7 +143,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
 
     public final AtomicReference<String> renderOverlayEventTypeName = new AtomicReference<String>(RenderGameOverlayEvent.ElementType.ALL.name());
     public final AtomicBoolean renderOverlayPreEvent = new AtomicBoolean(true);
-    public final AtomicBoolean optionsManagerUsed = new AtomicBoolean(false);
+    public final AtomicReference<String> optionsManagerViewed = new AtomicReference<String>("");
 
     protected transient final String name = "core";
 
@@ -223,7 +223,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public int hashCode()
     {
         return Objects.hashCode(announceMod, autoMapPoll, browserPoll, cacheAnimalsData, cacheMobsData, cachePlayerData,
-                cachePlayersData, cacheVillagersData, caveIgnoreGlass, checkUpdates, renderFrequency, hideSneakingEntities,
+                cachePlayersData, cacheVillagersData, caveIgnoreGlass, checkUpdates, renderDelay, hideSneakingEntities,
                 logLevel, mapAntialiasing, mapBathymetry, mapCaveLighting, mapCrops, mapPlants, mapPlantShadows,
                 mapSurfaceAboveCaves, mapTransparency, maxAnimalsData, maxMobsData, maxPlayersData, maxVillagersData,
                 name, radarLateralDistance, radarVerticalDistance, recordCacheStats, renderOverlayEventTypeName,
@@ -245,7 +245,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 .add("cacheVillagersData", cacheVillagersData)
                 .add("caveIgnoreGlass", caveIgnoreGlass)
                 .add("checkUpdates", checkUpdates)
-                .add("renderFrequency", renderFrequency)
+                .add("renderDelay", renderDelay)
                 .add("hideSneakingEntities", hideSneakingEntities)
                 .add("logLevel", logLevel)
                 .add("mapAntialiasing", mapAntialiasing)
@@ -261,7 +261,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 .add("maxMobsData", maxMobsData)
                 .add("maxPlayersData", maxPlayersData)
                 .add("maxVillagersData", maxVillagersData)
-                .add("optionsManagerUsed", optionsManagerUsed)
+                .add("optionsManagerViewed", optionsManagerViewed)
                 .add("radarLateralDistance", radarLateralDistance)
                 .add("radarVerticalDistance", radarVerticalDistance)
                 .add("recordCacheStats", recordCacheStats)

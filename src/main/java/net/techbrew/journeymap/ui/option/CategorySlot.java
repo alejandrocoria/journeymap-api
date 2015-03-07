@@ -208,6 +208,11 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         this.button.displayString = String.format("%1$s  %2$s  %1$s", glyph, name);
     }
 
+    public boolean isSelected()
+    {
+        return this.selected;
+    }
+
     public void setSelected(boolean selected)
     {
         this.selected = selected;

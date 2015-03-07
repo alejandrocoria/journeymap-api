@@ -32,7 +32,7 @@ public class MapPlayerTask extends BaseMapTask
     private static volatile double lastChunkStatsAverage;
     private static volatile RenderSpec lastSurfaceRenderSpec;
     private static volatile RenderSpec lastUndergroundRenderSpec;
-    private final int maxRuntime = JourneyMap.getCoreProperties().renderFrequency.get() * 3000;
+    private final int maxRuntime = JourneyMap.getCoreProperties().renderDelay.get() * 3000;
     private int scheduledChunks = 0;
 
     private MapPlayerTask(ChunkRenderController chunkRenderController, World world, int dimension, boolean underground, Integer chunkY, Collection<ChunkCoordIntPair> chunkCoords)
@@ -104,6 +104,16 @@ public class MapPlayerTask extends BaseMapTask
         return lastChunkStatsAverage;
     }
 
+    public static RenderSpec getLastSurfaceRenderSpec()
+    {
+        return lastSurfaceRenderSpec;
+    }
+
+    public static RenderSpec getLastCaveRenderSpec()
+    {
+        return lastUndergroundRenderSpec;
+    }
+
     @Override
     public void initTask(Minecraft minecraft, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
@@ -150,7 +160,7 @@ public class MapPlayerTask extends BaseMapTask
      */
     public static class Manager implements ITaskManager
     {
-        final int mapTaskDelay = JourneyMap.getCoreProperties().renderFrequency.get() * 1000;
+        final int mapTaskDelay = JourneyMap.getCoreProperties().renderDelay.get() * 1000;
 
         boolean enabled;
 
