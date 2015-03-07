@@ -225,9 +225,9 @@ public class TextureCache
         switch (name)
         {
             case GridCheckers:
-                return getNamedTexture(Name.GridCheckers, "gridcheckers.png", true);
+                return getNamedTexture(Name.GridCheckers, "grid-checkers.png", true);
             case GridDots:
-                return getNamedTexture(Name.GridDots, "griddots.png", true);
+                return getNamedTexture(Name.GridDots, "grid-dots.png", true);
             default:
                 return getNamedTexture(Name.GridSquares, "grid.png", true);
         }
