@@ -146,17 +146,12 @@ public class Constants
 
     public enum MapType
     {
-        day, night, underground;
+        day, night, underground
     }
 
     public enum WorldType
     {
         mp, sp
-    }
-
-    public enum MapTileQuality
-    {
-        Low, High
     }
 
 }

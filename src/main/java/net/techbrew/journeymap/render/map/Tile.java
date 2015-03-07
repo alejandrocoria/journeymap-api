@@ -10,7 +10,6 @@ package net.techbrew.journeymap.render.map;
 
 import com.google.common.base.Objects;
 import net.minecraft.world.ChunkCoordIntPair;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
@@ -75,12 +74,12 @@ public class Tile
         return Objects.hashCode(tileX, tileZ, zoom);
     }
 
-    public boolean updateTexture(File worldDir, final MapType mapType, Constants.MapTileQuality quality, final Integer vSlice, int dimension)
+    public boolean updateTexture(File worldDir, final MapType mapType, boolean highQuality, final Integer vSlice, int dimension)
     {
         updateRenderType();
 
         drawSteps.clear();
-        drawSteps.addAll(RegionImageHandler.getTileDrawSteps(worldDir, ulChunk, lrChunk, mapType, zoom, quality, vSlice, dimension));
+        drawSteps.addAll(RegionImageHandler.getTileDrawSteps(worldDir, ulChunk, lrChunk, mapType, zoom, highQuality, vSlice, dimension));
 
 //        for (TileDrawStep tileDrawStep : drawSteps)
 //        {

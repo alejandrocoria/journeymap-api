@@ -39,6 +39,8 @@ jm.common.renderdelay=Render Delay
 jm.common.renderdelay.tooltip=Time (in seconds) between Render Passes. Higher values can improve performance, but may result in missed chunks while travelling.
 jm.common.revealshape=Reveal Shape
 jm.common.revealshape.tooltip=Shape of the map area revealed around you. Circle reveals fewer chunks than Square and will improve performance.
+jm.common.tile_display_quality=High Display Quality
+jm.common.tile_display_quality.tooltip=Leave unchecked to improve performance and memory usage, but is not recommended for Minimaps with "My Heading" rotation. This option does not effect actual image quality.
 jm.advanced.loglevel=Logging Level
 jm.advanced.loglevel.tooltip=Caution! Some logging levels will hurt performance. Keep the default unless otherwise instructed.
 jm.advanced.port=Web Server Port
@@ -47,8 +49,6 @@ jm.advanced.recordcachestats=Record Cache Statistics
 jm.advanced.recordcachestats.tooltip=Whether to enable caches to record their statistics. May slightly hurt performance if enabled. Unless you're a beta-tester or have been instructed to do so, leave it off.
 jm.advanced.tile_render_type=Map Tile Render Type
 jm.advanced.tile_render_type.tooltip=Optimize map tile rendering for your video card if they become blurry. Values adjust texture filter + wrap type: 1=Linear+Mirrored, 2=Linear+Clamped, 3=Nearest+Mirrored, 4=Nearest+Clamped.
-jm.advanced.tile_render_quality=Map Tile Render Quality
-jm.advanced.tile_render_quality.tooltip=Low Quality may improve performance on slower computers. High Quality is the default rendering used in previous versions of JourneyMap.
 jm.colorpalette.basic_colors=Basic Colors
 jm.colorpalette.biome_colors=Biome Colors
 jm.colorpalette.file_error=The color palette file has errors and cannot be used: %1$s

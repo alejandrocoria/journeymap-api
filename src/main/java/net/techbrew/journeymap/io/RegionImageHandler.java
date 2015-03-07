@@ -273,7 +273,7 @@ public class RegionImageHandler
 
     }
 
-    public static BufferedImage getScaledRegionArea(final RegionCoord rCoord, final MapType mapType, final int zoom, Constants.MapTileQuality quality, int x1, int y1)
+    public static BufferedImage getScaledRegionArea(final RegionCoord rCoord, final MapType mapType, final int zoom, boolean highQuality, int x1, int y1)
     {
         RegionImageCache cache = RegionImageCache.instance();
         BufferedImage regionImage = cache.getGuaranteedImage(rCoord, mapType);
@@ -322,7 +322,7 @@ public class RegionImageHandler
      */
     public static synchronized List<TileDrawStep> getTileDrawSteps(final File worldDir, final ChunkCoordIntPair startCoord,
                                                                    final ChunkCoordIntPair endCoord, final Constants.MapType mapType,
-                                                                   Integer zoom, Constants.MapTileQuality quality, Integer vSlice, final int dimension)
+                                                                   Integer zoom, boolean highQuality, Integer vSlice, final int dimension)
     {
         boolean isUnderground = mapType.equals(Constants.MapType.underground);
         if (!isUnderground)

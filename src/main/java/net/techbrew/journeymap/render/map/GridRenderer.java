@@ -11,7 +11,6 @@ package net.techbrew.journeymap.render.map;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.MathHelper;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.StatTimer;
@@ -272,7 +271,7 @@ public class GridRenderer
         Integer hashCode;
 
         // Get tiles
-        Constants.MapTileQuality quality = JourneyMap.getCoreProperties().mapTileQuality.get();
+        boolean highQuality = JourneyMap.getCoreProperties().tileHighDisplayQuality.get();
         for (Map.Entry<TilePos, Tile> entry : grid.entrySet())
         {
             pos = entry.getKey();
@@ -290,7 +289,7 @@ public class GridRenderer
             {
                 if (!tile.hasTexture() || tile.drawSteps.get(0).getMapType() != this.mapType)
                 {
-                    tile.updateTexture(worldDir, this.mapType, quality, vSlice, dimension);
+                    tile.updateTexture(worldDir, this.mapType, highQuality, vSlice, dimension);
                 }
             }
         }

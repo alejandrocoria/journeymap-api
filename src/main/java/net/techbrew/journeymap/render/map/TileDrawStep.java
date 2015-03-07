@@ -36,7 +36,7 @@ public class TileDrawStep
     private RegionCoord regionCoord;
     private Constants.MapType mapType;
     private Integer zoom;
-    private Constants.MapTileQuality quality;
+    private boolean highQuality;
     private StatTimer drawTimer;
 
     public TileDrawStep(RegionCoord regionCoord, final Constants.MapType mapType, Integer zoom, int sx1, int sy1, int sx2, int sy2)
@@ -59,12 +59,12 @@ public class TileDrawStep
 
     void updateTexture()
     {
-        Constants.MapTileQuality newQuality = JourneyMap.getCoreProperties().mapTileQuality.get();
-        if (newQuality != this.quality)
+        boolean newQuality = JourneyMap.getCoreProperties().tileHighDisplayQuality.get();
+        if (newQuality != this.highQuality || drawTimer == null)
         {
-            this.quality = newQuality;
-            drawTimer = (this.quality == Constants.MapTileQuality.High) ? StatTimer.get("TileDrawStep.draw(high)") : StatTimer.get("TileDrawStep.draw(low)");
-            //updateTextureTimer = (this.quality==Constants.MapTileQuality.High) ? StatTimer.get("TileDrawStep.updateTexture(high)") : StatTimer.get("TileDrawStep.updateTexture(low)");
+            this.highQuality = newQuality;
+            drawTimer = (this.highQuality) ? StatTimer.get("TileDrawStep.draw(high)") : StatTimer.get("TileDrawStep.draw(low)");
+            //updateTextureTimer = (this.highQuality==Constants.MapTileQuality.High) ? StatTimer.get("TileDrawStep.updateTexture(high)") : StatTimer.get("TileDrawStep.updateTexture(low)");
         }
 
         //updateTextureTimer.start();
@@ -84,7 +84,7 @@ public class TileDrawStep
 
         try
         {
-            if (quality == Constants.MapTileQuality.High && (zoom != 0)) // todo change when zoom can be < zero or 0 no longer 1:1
+            if (highQuality && (zoom != 0)) // todo change when zoom can be < zero or 0 no longer 1:1
             {
                 pendingScaledTexture = TextureCache.instance().scheduleTextureTask(createDelayedScaledTexture());
             }
@@ -244,7 +244,7 @@ public class TileDrawStep
     public void refreshIfDirty()
     {
         if (RegionImageCache.instance().textureNeedsUpdate(regionCoord, mapType, 0)
-                || (quality == Constants.MapTileQuality.High && scaledTexture == null)
+                || (highQuality && scaledTexture == null)
                 || (scaledTexture != null && RegionImageCache.instance().isDirtySince(regionCoord, mapType, scaledTexture.getLastUpdated())))
         {
             updateTexture();
@@ -277,7 +277,7 @@ public class TileDrawStep
         return Objects.toStringHelper(this)
                 .add("rc", regionCoord)
                 .add("type", mapType)
-                .add("q", quality)
+                .add("q", highQuality)
                 .add("zoom", zoom)
                 .add("sx1", sx1)
                 .add("sy1", sy1)
@@ -287,7 +287,7 @@ public class TileDrawStep
 
     private Callable<DelayedTexture> createDelayedScaledTexture()
     {
-        if (quality == Constants.MapTileQuality.Low || zoom == 0) // todo change when zoom can be < zero or 0 no longer 1:1
+        if (highQuality || zoom == 0) // todo change when zoom can be < zero or 0 no longer 1:1
         {
             return null;
         }
@@ -297,7 +297,7 @@ public class TileDrawStep
             @Override
             public DelayedTexture call() throws Exception
             {
-                BufferedImage image = RegionImageHandler.getScaledRegionArea(regionCoord, mapType, zoom, quality, sx1, sy1);
+                BufferedImage image = RegionImageHandler.getScaledRegionArea(regionCoord, mapType, zoom, highQuality, sx1, sy1);
                 if (image == null)
                 {
                     return null;

@@ -10,7 +10,6 @@ package net.techbrew.journeymap.properties;
 
 import com.google.common.base.Objects;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.properties.config.Config;
@@ -114,6 +113,9 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Cartography, key = "jm.common.alwaysmapsurface", defaultBoolean = false)
     public final AtomicBoolean alwaysMapSurface = new AtomicBoolean();
 
+    @Config(category = Cartography, key = "jm.common.tile_display_quality", defaultBoolean = false)
+    public final AtomicBoolean tileHighDisplayQuality = new AtomicBoolean(false);
+
     @Config(category = Advanced, key = "jm.common.radar_max_animals", minValue = 1, maxValue = 128, defaultValue = 32)
     public final AtomicInteger maxAnimalsData = new AtomicInteger(32);
 
@@ -137,9 +139,6 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
 
     @Config(category = Advanced, key = "jm.advanced.tile_render_type", minValue = 1, maxValue = 4, defaultValue = 1)
     public final AtomicInteger tileRenderType = new AtomicInteger(1);
-
-    @Config(category = Advanced, key = "jm.advanced.tile_render_quality", defaultEnum = "High")
-    public final AtomicReference<Constants.MapTileQuality> mapTileQuality = new AtomicReference<Constants.MapTileQuality>(Constants.MapTileQuality.High);
 
     public final AtomicReference<String> renderOverlayEventTypeName = new AtomicReference<String>(RenderGameOverlayEvent.ElementType.ALL.name());
     public final AtomicBoolean renderOverlayPreEvent = new AtomicBoolean(true);
@@ -255,7 +254,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 .add("mapPlants", mapPlants)
                 .add("mapPlantShadows", mapPlantShadows)
                 .add("mapSurfaceAboveCaves", mapSurfaceAboveCaves)
-                .add("mapTileQuality", mapTileQuality)
+                .add("tileHighDisplayQuality", tileHighDisplayQuality)
                 .add("mapTransparency", mapTransparency)
                 .add("maxAnimalsData", maxAnimalsData)
                 .add("maxMobsData", maxMobsData)
