@@ -3,7 +3,6 @@ package net.techbrew.journeymap.task;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -13,16 +12,20 @@ import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.ui.option.KeyedEnum;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Mark on 2/27/2015.
  */
 public class RenderSpec
 {
+    private static DecimalFormat decFormat = new DecimalFormat("##.#");
+
     private final Minecraft minecraft;
     private final EntityPlayer player;
     private final Boolean underground;
@@ -34,8 +37,10 @@ public class RenderSpec
     private ArrayList<ChunkCoordIntPair> primaryRenderCoords;
     private Comparator<ChunkCoordIntPair> comparator;
     private int lastSecondaryRenderDistance;
-
     private ChunkCoordIntPair lastPlayerCoord;
+    private long lastTaskTime;
+    private int lastTaskChunks;
+    private double lastTaskAvgChunkTime;
 
     RenderSpec(Minecraft minecraft, boolean underground)
     {
@@ -213,6 +218,10 @@ public class RenderSpec
 
     public int getLastSecondaryRenderSize()
     {
+        if (primaryRenderDistance == maxSecondaryRenderDistance)
+        {
+            return 0;
+        }
         return offsets == null ? 0 : offsets.get(lastSecondaryRenderDistance).size();
     }
 
@@ -221,45 +230,36 @@ public class RenderSpec
         return offsets == null ? 0 : offsets.get(primaryRenderDistance).size();
     }
 
-    public Comparator<ChunkCoordIntPair> getDistanceComparator()
+    public void setLastTaskInfo(int chunks, long elapsedNs)
     {
-        if (comparator == null)
-        {
-            comparator = new Comparator<ChunkCoordIntPair>()
-            {
-                boolean useBlockDistance = revealShape == RevealShape.Circle;
-                Minecraft minecraft = FMLClientHandler.instance().getClient();
-                ChunkCoordIntPair playerCoord = new ChunkCoordIntPair(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
+        lastTaskChunks = chunks;
+        lastTaskTime = TimeUnit.NANOSECONDS.toMillis(elapsedNs);
+        lastTaskAvgChunkTime = elapsedNs / Math.max(1, chunks) / 1000000D;
+    }
 
-                @Override
-                public int compare(ChunkCoordIntPair o1, ChunkCoordIntPair o2)
-                {
-                    int comp = 0;
-                    if (o1 == o2 || o1.equals(o2))
-                    {
-                        return 0;
-                    }
-                    if (useBlockDistance)
-                    {
-                        comp = blockDistance(playerCoord, o1).compareTo(blockDistance(playerCoord, o2));
-                    }
-                    else
-                    {
-                        comp = chunkDistance(playerCoord, o1).compareTo(chunkDistance(playerCoord, o2));
-                    }
-                    if (comp == 0)
-                    {
-                        comp = Integer.compare(o1.chunkXPos, o2.chunkXPos);
-                    }
-                    if (comp == 0)
-                    {
-                        comp = Integer.compare(o1.chunkZPos, o2.chunkZPos);
-                    }
-                    return comp;
-                }
-            };
-        }
-        return comparator;
+    public int getLastTaskChunks()
+    {
+        return lastTaskChunks;
+    }
+
+    public void copyLastStatsFrom(RenderSpec other)
+    {
+        lastTaskChunks = other.lastTaskChunks;
+        lastTaskTime = other.lastTaskTime;
+        lastTaskAvgChunkTime = other.lastTaskAvgChunkTime;
+    }
+
+    public String getDebugStats()
+    {
+        String debugString = underground ? "jm.common.renderstats_debug_cave" : "jm.common.renderstats_debug_surface";
+
+        // Cave Distance Min/Max: %1$s/%2$s, Chunks: %3$s/%4$s, Total Chunks: %5$s in %6$sms (avg %7$sms)
+        return Constants.getString(debugString,
+                primaryRenderDistance, getLastSecondaryRenderDistance(),
+                getPrimaryRenderSize(), getLastSecondaryRenderSize(),
+                lastTaskChunks,
+                lastTaskTime,
+                decFormat.format(lastTaskAvgChunkTime));
     }
 
     @Override

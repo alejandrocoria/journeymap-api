@@ -98,8 +98,8 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Cartography, key = "jm.common.renderdistance_surface_min", minValue = 1, maxValue = 20, defaultValue = 4, sortOrder = 103)
     public final AtomicInteger renderDistanceSurfaceMin = new AtomicInteger(4);
 
-    @Config(category = Cartography, key = "jm.common.renderdistance_surface_max", minValue = 1, maxValue = 20, defaultValue = 6, sortOrder = 104)
-    public final AtomicInteger renderDistanceSurfaceMax = new AtomicInteger(6);
+    @Config(category = Cartography, key = "jm.common.renderdistance_surface_max", minValue = 1, maxValue = 20, defaultValue = 7, sortOrder = 104)
+    public final AtomicInteger renderDistanceSurfaceMax = new AtomicInteger(7);
 
     @Config(category = Cartography, key = "jm.common.renderdelay", minValue = 0, maxValue = 10, defaultValue = 2)
     public final AtomicInteger renderDelay = new AtomicInteger(2);

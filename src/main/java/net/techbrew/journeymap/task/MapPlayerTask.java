@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
+import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.data.DataCache;
@@ -19,6 +20,7 @@ import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,14 +28,16 @@ import java.util.concurrent.TimeUnit;
 
 public class MapPlayerTask extends BaseMapTask
 {
+    private static DecimalFormat decFormat = new DecimalFormat("##.#");
     private static volatile long lastTaskCompleted;
-    private static volatile int lastChunkStats;
-    private static volatile long lastChunkStatsTime;
-    private static volatile double lastChunkStatsAverage;
+    private static long lastTaskTime;
+    private static double lastTaskAvgChunkTime;
     private static volatile RenderSpec lastSurfaceRenderSpec;
     private static volatile RenderSpec lastUndergroundRenderSpec;
     private final int maxRuntime = JourneyMap.getCoreProperties().renderDelay.get() * 3000;
     private int scheduledChunks = 0;
+    private long startNs;
+    private long elapsedNs;
 
     private MapPlayerTask(ChunkRenderController chunkRenderController, World world, int dimension, boolean underground, Integer chunkY, Collection<ChunkCoordIntPair> chunkCoords)
     {
@@ -89,21 +93,6 @@ public class MapPlayerTask extends BaseMapTask
         return new MapPlayerTaskBatch(tasks);
     }
 
-    public static int getLastChunkStats()
-    {
-        return lastChunkStats;
-    }
-
-    public static long getLastChunkStatsTime()
-    {
-        return lastChunkStatsTime;
-    }
-
-    public static double getLastChunkStatsAvg()
-    {
-        return lastChunkStatsAverage;
-    }
-
     public static RenderSpec getLastSurfaceRenderSpec()
     {
         return lastSurfaceRenderSpec;
@@ -114,9 +103,88 @@ public class MapPlayerTask extends BaseMapTask
         return lastUndergroundRenderSpec;
     }
 
+    public static String[] getDebugStats()
+    {
+        List<String> lines = new ArrayList<String>(0);
+
+        boolean showLastUnderground = false;
+        boolean showLastSurface = false;
+
+        if (DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapCaves.get())
+        {
+            showLastUnderground = lastUndergroundRenderSpec != null;
+        }
+
+        if (!DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapSurface.get())
+        {
+            showLastSurface = lastSurfaceRenderSpec != null;
+        }
+
+        if (!showLastSurface && !showLastUnderground)
+        {
+            return null;
+        }
+
+        if (showLastSurface != showLastUnderground)
+        {
+            if (showLastSurface)
+            {
+                return new String[]{lastSurfaceRenderSpec.getDebugStats()};
+            }
+            return new String[]{lastUndergroundRenderSpec.getDebugStats()};
+        }
+        else
+        {
+            return new String[]{lastSurfaceRenderSpec.getDebugStats(), lastUndergroundRenderSpec.getDebugStats()};
+        }
+    }
+
+    public static String getSimpleStats()
+    {
+        int primaryRenderSize = 0;
+        int secondaryRenderSize = 0;
+        int totalChunks = 0;
+
+        if (DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapCaves.get())
+        {
+            RenderSpec spec = MapPlayerTask.getLastCaveRenderSpec();
+            if (spec != null)
+            {
+                primaryRenderSize += spec.getPrimaryRenderSize();
+                secondaryRenderSize += spec.getLastSecondaryRenderSize();
+                totalChunks += spec.getLastTaskChunks();
+            }
+        }
+
+        if (!DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapSurface.get())
+        {
+            RenderSpec spec = MapPlayerTask.getLastSurfaceRenderSpec();
+            if (spec != null)
+            {
+                primaryRenderSize += spec.getPrimaryRenderSize();
+                secondaryRenderSize += spec.getLastSecondaryRenderSize();
+                totalChunks += spec.getLastTaskChunks();
+            }
+        }
+
+        return Constants.getString("jm.common.renderstats",
+                totalChunks,
+                primaryRenderSize,
+                secondaryRenderSize,
+                lastTaskTime,
+                decFormat.format(lastTaskAvgChunkTime));
+    }
+
+    public static long getlastTaskCompleted()
+    {
+        return lastTaskCompleted;
+    }
+
     @Override
     public void initTask(Minecraft minecraft, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
+        startNs = System.nanoTime();
+
         final RenderSpec lastRenderSpec = underground ? lastUndergroundRenderSpec : lastSurfaceRenderSpec;
         RenderSpec renderSpec = new RenderSpec(minecraft, this.underground);
         if (renderSpec.equals(lastRenderSpec))
@@ -125,6 +193,10 @@ public class MapPlayerTask extends BaseMapTask
         }
         else
         {
+            if (lastRenderSpec != null)
+            {
+                renderSpec.copyLastStatsFrom(lastRenderSpec);
+            }
             if (underground)
             {
                 lastUndergroundRenderSpec = renderSpec;
@@ -141,10 +213,7 @@ public class MapPlayerTask extends BaseMapTask
 
     protected void complete(boolean cancelled, boolean hadError)
     {
-        if (!cancelled)
-        {
-            lastTaskCompleted = System.currentTimeMillis();
-        }
+        elapsedNs = System.nanoTime() - startNs;
     }
 
     @Override
@@ -231,12 +300,24 @@ public class MapPlayerTask extends BaseMapTask
             {
                 if (task instanceof MapPlayerTask)
                 {
-                    chunkCount += ((MapPlayerTask) task).scheduledChunks;
+                    MapPlayerTask mapPlayerTask = (MapPlayerTask) task;
+                    chunkCount += mapPlayerTask.scheduledChunks;
+                    if (mapPlayerTask.underground && lastUndergroundRenderSpec != null)
+                    {
+                        lastUndergroundRenderSpec.setLastTaskInfo(mapPlayerTask.scheduledChunks, mapPlayerTask.elapsedNs);
+                    }
+                    else if (lastSurfaceRenderSpec != null)
+                    {
+                        lastSurfaceRenderSpec.setLastTaskInfo(mapPlayerTask.scheduledChunks, mapPlayerTask.elapsedNs);
+                    }
                 }
             }
-            lastChunkStats = chunkCount;
-            lastChunkStatsTime = TimeUnit.NANOSECONDS.toMillis(this.elapsedNs);
-            lastChunkStatsAverage = this.elapsedNs / Math.max(1, chunkCount) / 1000000D;
+
+            elapsedNs = System.nanoTime() - startNs;
+            lastTaskTime = TimeUnit.NANOSECONDS.toMillis(elapsedNs);
+            lastTaskAvgChunkTime = elapsedNs / Math.max(1, chunkCount) / 1000000D;
+
+            lastTaskCompleted = System.currentTimeMillis();
         }
     }
 

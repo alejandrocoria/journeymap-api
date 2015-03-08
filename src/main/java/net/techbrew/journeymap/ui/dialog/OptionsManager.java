@@ -21,7 +21,6 @@ import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.task.MapPlayerTask;
-import net.techbrew.journeymap.task.RenderSpec;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.*;
@@ -33,7 +32,6 @@ import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
 
@@ -335,36 +333,7 @@ public class OptionsManager extends JmUI
             }
         }
 
-        int primaryRenderSize = 0;
-        int secondaryRenderSize = 0;
-
-        if (DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapCaves.get())
-        {
-            RenderSpec spec = MapPlayerTask.getLastCaveRenderSpec();
-            if (spec != null)
-            {
-                primaryRenderSize += spec.getPrimaryRenderSize();
-                secondaryRenderSize += spec.getLastSecondaryRenderSize();
-            }
-        }
-
-        if (!DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapSurface.get())
-        {
-            RenderSpec spec = MapPlayerTask.getLastSurfaceRenderSpec();
-            if (spec != null)
-            {
-                primaryRenderSize += spec.getPrimaryRenderSize();
-                secondaryRenderSize += spec.getLastSecondaryRenderSize();
-            }
-        }
-
-        renderStatsButton.displayString = Constants.getString("jm.common.renderstats",
-                MapPlayerTask.getLastChunkStats(),
-                primaryRenderSize,
-                secondaryRenderSize,
-                MapPlayerTask.getLastChunkStatsTime(),
-                new DecimalFormat("##.#").format(MapPlayerTask.getLastChunkStatsAvg()));
-
+        renderStatsButton.displayString = MapPlayerTask.getSimpleStats();
         renderStatsButton.setWidth(cartographyCategorySlot.getCurrentColumnWidth());
     }
 
