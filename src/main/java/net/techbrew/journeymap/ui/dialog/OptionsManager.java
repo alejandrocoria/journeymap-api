@@ -328,6 +328,14 @@ public class OptionsManager extends JmUI
                                 limitButtonRange = true;
                                 slotMetadata.getButton().setOverrideLabelColor(valid ? null : Color.red);
                             }
+                            else if (property == coreProperties.renderDistanceCaveMin)
+                            {
+                                limitButtonRange = true;
+                            }
+                            else if (property == coreProperties.renderDistanceSurfaceMin)
+                            {
+                                limitButtonRange = true;
+                            }
 
                             if (limitButtonRange)
                             {

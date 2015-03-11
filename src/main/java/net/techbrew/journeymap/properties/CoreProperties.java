@@ -91,7 +91,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Cartography, key = "jm.common.map_style_caveshowsurface", defaultBoolean = true)
     public final AtomicBoolean mapSurfaceAboveCaves = new AtomicBoolean(true);
 
-    @Config(category = Cartography, key = "jm.common.renderdistance_cave_min", minValue = 1, maxValue = 20, defaultValue = 3, sortOrder = 101)
+    @Config(category = Cartography, key = "jm.common.renderdistance_cave_min", minValue = 1, maxValue = 32, defaultValue = 3, sortOrder = 101)
     public final AtomicInteger renderDistanceCaveMin = new AtomicInteger(3);
 
     @Config(category = Cartography, key = "jm.common.renderdistance_cave_max", minValue = 1, maxValue = 32, defaultValue = 3, sortOrder = 102)
@@ -100,7 +100,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Cartography, key = "jm.common.renderdistance_surface_min", minValue = 1, maxValue = 32, defaultValue = 4, sortOrder = 103)
     public final AtomicInteger renderDistanceSurfaceMin = new AtomicInteger(4);
 
-    @Config(category = Cartography, key = "jm.common.renderdistance_surface_max", minValue = 1, maxValue = 20, defaultValue = 7, sortOrder = 104)
+    @Config(category = Cartography, key = "jm.common.renderdistance_surface_max", minValue = 1, maxValue = 32, defaultValue = 7, sortOrder = 104)
     public final AtomicInteger renderDistanceSurfaceMax = new AtomicInteger(7);
 
     @Config(category = Cartography, key = "jm.common.renderdelay", minValue = 0, maxValue = 10, defaultValue = 2)
