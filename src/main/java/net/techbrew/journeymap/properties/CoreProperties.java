@@ -9,12 +9,14 @@
 package net.techbrew.journeymap.properties;
 
 import com.google.common.base.Objects;
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.task.RenderSpec;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -92,10 +94,10 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Cartography, key = "jm.common.renderdistance_cave_min", minValue = 1, maxValue = 20, defaultValue = 3, sortOrder = 101)
     public final AtomicInteger renderDistanceCaveMin = new AtomicInteger(3);
 
-    @Config(category = Cartography, key = "jm.common.renderdistance_cave_max", minValue = 1, maxValue = 20, defaultValue = 3, sortOrder = 102)
+    @Config(category = Cartography, key = "jm.common.renderdistance_cave_max", minValue = 1, maxValue = 32, defaultValue = 3, sortOrder = 102)
     public final AtomicInteger renderDistanceCaveMax = new AtomicInteger(3);
 
-    @Config(category = Cartography, key = "jm.common.renderdistance_surface_min", minValue = 1, maxValue = 20, defaultValue = 4, sortOrder = 103)
+    @Config(category = Cartography, key = "jm.common.renderdistance_surface_min", minValue = 1, maxValue = 32, defaultValue = 4, sortOrder = 103)
     public final AtomicInteger renderDistanceSurfaceMin = new AtomicInteger(4);
 
     @Config(category = Cartography, key = "jm.common.renderdistance_surface_max", minValue = 1, maxValue = 20, defaultValue = 7, sortOrder = 104)
@@ -187,6 +189,16 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
         {
             renderDistanceSurfaceMax.set(renderDistanceSurfaceMin.get());
             saveNeeded = true;
+        }
+
+        int gameRenderDistance = FMLClientHandler.instance().getClient().gameSettings.renderDistanceChunks;
+        for (AtomicInteger prop : Arrays.asList(renderDistanceCaveMin, renderDistanceCaveMax, renderDistanceSurfaceMin, renderDistanceSurfaceMax))
+        {
+            if (prop.get() > gameRenderDistance)
+            {
+                prop.set(gameRenderDistance);
+                saveNeeded = true;
+            }
         }
 
         return saveNeeded;

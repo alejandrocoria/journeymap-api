@@ -314,18 +314,29 @@ public class OptionsManager extends JmUI
                     {
                         if (slotMetadata.getButton() instanceof IPropertyHolder)
                         {
-                            Button button = slotMetadata.getButton();
-                            Object property = ((IPropertyHolder) button).getProperty();
-
+                            Object property = ((IPropertyHolder) slotMetadata.getButton()).getProperty();
+                            boolean limitButtonRange = false;
                             if (property == coreProperties.renderDistanceCaveMax)
                             {
                                 boolean valid = JourneyMap.getCoreProperties().hasValidCaveRenderDistances();
-                                button.setOverrideLabelColor(valid ? null : Color.red);
+                                limitButtonRange = true;
+                                slotMetadata.getButton().setOverrideLabelColor(valid ? null : Color.red);
                             }
                             else if (property == coreProperties.renderDistanceSurfaceMax)
                             {
                                 boolean valid = JourneyMap.getCoreProperties().hasValidSurfaceRenderDistances();
-                                button.setOverrideLabelColor(valid ? null : Color.red);
+                                limitButtonRange = true;
+                                slotMetadata.getButton().setOverrideLabelColor(valid ? null : Color.red);
+                            }
+
+                            if (limitButtonRange)
+                            {
+                                IntSliderButton button = (IntSliderButton) slotMetadata.getButton();
+                                button.maxValue = mc.gameSettings.renderDistanceChunks;
+                                if (button.getValue() > mc.gameSettings.renderDistanceChunks)
+                                {
+                                    button.setValue(mc.gameSettings.renderDistanceChunks);
+                                }
                             }
                         }
                     }
@@ -596,7 +607,6 @@ public class OptionsManager extends JmUI
                 }
                 case Cartography:
                 {
-                    JourneyMap.getInstance().softReset();
                     MapPlayerTask.forceNearbyRemap();
                     break;
                 }
