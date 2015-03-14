@@ -18,7 +18,6 @@ import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.ChunkCoord;
-import net.techbrew.journeymap.model.ChunkImageCache;
 import net.techbrew.journeymap.model.ChunkMD;
 import net.techbrew.journeymap.model.RegionImageCache;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +27,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.concurrent.TimeUnit;
 
 public abstract class BaseMapTask implements ITask
 {
@@ -88,7 +86,7 @@ public abstract class BaseMapTask implements ITask
 
             final long start = System.nanoTime();
             final Iterator<ChunkCoordIntPair> chunkIter = chunkCoords.iterator();
-            final ChunkImageCache chunkImageCache = new ChunkImageCache();
+            final RegionImageCache regionImageCache = RegionImageCache.instance();
             final Logger logger = JourneyMap.getLogger();
 
             // Check the dimension
@@ -142,14 +140,13 @@ public abstract class BaseMapTask implements ITask
 
                         if (underground)
                         {
-                            chunkImageCache.put(cCoord, Constants.MapType.underground, chunkImage);
+                            regionImageCache.putChunkImage(cCoord, Constants.MapType.underground, chunkImage);
                         }
                         else
                         {
-                            chunkImageCache.put(cCoord, Constants.MapType.day, getSubimage(Constants.MapType.day, chunkImage));
-                            chunkImageCache.put(cCoord, Constants.MapType.night, getSubimage(Constants.MapType.night, chunkImage));
+                            regionImageCache.putChunkImage(cCoord, Constants.MapType.day, getSubimage(Constants.MapType.day, chunkImage));
+                            regionImageCache.putChunkImage(cCoord, Constants.MapType.night, getSubimage(Constants.MapType.night, chunkImage));
                         }
-
                     }
                     catch (ChunkMD.ChunkMissingException e)
                     {
@@ -184,16 +181,8 @@ public abstract class BaseMapTask implements ITask
             }
 
             // Push chunk cache to region cache
-            int chunks = chunkImageCache.size();
-            RegionImageCache.instance().putAll(chunkImageCache.values(), flushCacheWhenDone);
-
-            if (threadLogging)
-            {
-                logger.debug(getClass().getSimpleName() + " mapped " + chunks + " chunks in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start) + "ms with flush:" + flushCacheWhenDone); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-
+            regionImageCache.updateTextures(flushCacheWhenDone);
             chunkCoords.clear();
-            chunkImageCache.clear();
             this.complete(false, false);
             timer.stop();
         }

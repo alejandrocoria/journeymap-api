@@ -15,6 +15,7 @@ import net.techbrew.journeymap.io.RegionImageHandler;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Map;
 
 /**
  * A RegionImageSet contains one or more Wrappers of image, file, and maptype.
@@ -55,6 +56,11 @@ public class RegionImageSet extends ImageSet
             wrapper = addWrapper(mapType, imageFile, image);
             return wrapper;
         }
+    }
+
+    public Map<MapType, Wrapper> getWrappers()
+    {
+        return imageWrappers;
     }
 
     public void insertChunk(final ChunkImageSet cis)

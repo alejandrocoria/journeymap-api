@@ -80,7 +80,7 @@ public class ChunkImageSet extends ImageSet
     }
 
     @Override
-    public void writeToDisk(boolean force)
+    public boolean writeToDisk(boolean force)
     {
         throw new RuntimeException(new OperationNotSupportedException());
     }

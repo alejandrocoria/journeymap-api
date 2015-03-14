@@ -45,15 +45,18 @@ public abstract class ImageSet
         return getWrapper(mapType).getImage();
     }
 
-    public void writeToDisk(boolean force)
+    public boolean writeToDisk(boolean force)
     {
+        boolean updated = false;
         for (Wrapper wrapper : imageWrappers.values())
         {
             if (force || wrapper.isDirty())
             {
                 wrapper.writeToDisk();
+                updated = true;
             }
         }
+        return updated;
     }
 
     public boolean updatedSince(MapType mapType, long time)

@@ -303,57 +303,56 @@ public class RegionImageCache
         return ris.getImage(mapType);
     }
 
-    public void putAll(final Collection<ChunkImageSet> chunkImageSets, boolean forceFlush)
+    public void putChunkImage(ChunkCoord cCoord, MapType mapType, BufferedImage chunkImage)
     {
-        //synchronized (lock)
+        getRegionImageSet(cCoord.getRegionCoord()).insertChunk(cCoord, chunkImage, mapType);
+    }
+
+    public void updateTextures(boolean forceFlush)
+    {
+        SetMultimap<RegionCoord, MapType> updates = MultimapBuilder.hashKeys().hashSetValues().build();
+        for (RegionImageSet ris : imageSets.values())
         {
-            SetMultimap<RegionCoord, MapType> updates = MultimapBuilder.hashKeys().hashSetValues().build();
-
-            // Merge chunk images into region images
-            for (ChunkImageSet cis : chunkImageSets)
+            for (ImageSet.Wrapper wrapper : ris.getWrappers().values())
             {
-                final RegionCoord rCoord = cis.getCCoord().getRegionCoord();
-                getRegionImageSet(rCoord).insertChunk(cis);
-                for (ImageSet.Wrapper wrapper : cis.imageWrappers.values())
+                updates.put(ris.rCoord, wrapper.mapType);
+            }
+        }
+
+        // Write to disk if needed
+        if (forceFlush)
+        {
+            flushToDisk();
+        }
+        else
+        {
+            autoFlush();
+        }
+
+        // Update textures
+        for (RegionCoord rCoord : updates.keySet())
+        {
+            for (MapType mapType : updates.get(rCoord))
+            {
+                int marginOfError = (mapType == lastRequestedMapType) ? 0 : (int) regionCacheAge / 2;
+                if (textureNeedsUpdate(rCoord, mapType, marginOfError))
                 {
-                    updates.put(rCoord, wrapper.mapType);
-                }
-            }
-
-            // Write to disk if needed
-            if (forceFlush)
-            {
-                flushToDisk();
-            }
-            else
-            {
-                autoFlush();
-            }
-
-            // Update textures
-            for (RegionCoord rCoord : updates.keySet())
-            {
-                for (MapType mapType : updates.get(rCoord))
-                {
-                    int marginOfError = (mapType == lastRequestedMapType) ? 0 : (int) regionCacheAge / 2;
-                    if (textureNeedsUpdate(rCoord, mapType, marginOfError))
+                    updateRegionTexture(rCoord, mapType, mapType == lastRequestedMapType);
+                    if (logCacheActions)
                     {
-                        updateRegionTexture(rCoord, mapType, mapType == lastRequestedMapType);
-                        if (logCacheActions)
-                        {
-                            JourneyMap.getLogger().info("MAPTASK UPDATE " + rCoord + " " + mapType);
-                        }
+                        JourneyMap.getLogger().info("MAPTASK UPDATE " + rCoord + " " + mapType);
                     }
-                    else
+                }
+                else
+                {
+                    if (logCacheActions)
                     {
-                        if (logCacheActions)
-                        {
-                            JourneyMap.getLogger().info("MAPTASK SKIP " + rCoord + " " + mapType);
-                        }
+                        JourneyMap.getLogger().info("MAPTASK SKIP " + rCoord + " " + mapType);
                     }
                 }
             }
         }
+
     }
 
     private void autoFlush()
