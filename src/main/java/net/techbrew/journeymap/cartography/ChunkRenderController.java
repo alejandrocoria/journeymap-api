@@ -8,18 +8,17 @@
 
 package net.techbrew.journeymap.cartography;
 
+import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.render.CaveRenderer;
 import net.techbrew.journeymap.cartography.render.EndRenderer;
 import net.techbrew.journeymap.cartography.render.NetherRenderer;
 import net.techbrew.journeymap.cartography.render.SurfaceRenderer;
-import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.model.ChunkMD;
+import net.techbrew.journeymap.model.*;
 import org.apache.logging.log4j.Level;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -36,7 +35,7 @@ public class ChunkRenderController
     final boolean fineLogging = JourneyMap.getLogger().isDebugEnabled();
     private final IChunkRenderer netherRenderer;
     private final IChunkRenderer endRenderer;
-    private final IChunkRenderer overWorldSurfaceRenderer;
+    private final SurfaceRenderer overWorldSurfaceRenderer;
     private final IChunkRenderer overWorldCaveRenderer;
 
 
@@ -50,66 +49,70 @@ public class ChunkRenderController
         //standardRenderer = new ChunkTopoRenderer();
     }
 
-    public BufferedImage getChunkImage(ChunkMD chunkMd, Integer vSlice)
+    public boolean renderChunk(ChunkCoord cCoord, ChunkMD chunkMd, boolean underground, Integer vSlice)
     {
-        boolean underground = vSlice != null;
-
-        // Initialize image for the chunk
-        BufferedImage chunkImage = new BufferedImage(underground ? 16 : 32, 16, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2D = RegionImageHandler.initRenderingHints(chunkImage.createGraphics());
-
-        int dimension = chunkMd.getWorldObj().provider.dimensionId;
+        long start = System.nanoTime();
+        Graphics2D g2D1 = null;
+        Graphics2D g2D2 = null;
         boolean renderOkay = false;
 
-        long start = System.nanoTime();
         try
         {
-            switch (dimension)
+            final RegionCoord rCoord = cCoord.getRegionCoord();
+
+            RegionImageSet regionImageSet = RegionImageCache.instance().getRegionImageSet(rCoord);
+            if (underground)
             {
-                case -1:
+                g2D1 = regionImageSet.getChunkImage(cCoord, Constants.MapType.underground);
+                if (g2D1 != null)
                 {
-                    if (!underground || vSlice == null)
+                    switch (rCoord.dimension)
                     {
-                        JourneyMap.getLogger().warn("Map task isn't underground, can't perform in Nether.");
-                        renderOkay = false;
+                        case -1:
+                        {
+                            renderOkay = netherRenderer.render(g2D1, chunkMd, vSlice);
+                            break;
+                        }
+                        case 1:
+                        {
+                            renderOkay = endRenderer.render(g2D1, chunkMd, vSlice);
+                            break;
+                        }
+                        default:
+                        {
+                            renderOkay = overWorldCaveRenderer.render(g2D1, chunkMd, vSlice);
+
+                        }
                     }
-                    else
+
+                    if (renderOkay)
                     {
-                        renderOkay = netherRenderer.render(g2D, chunkMd, vSlice);
-                    }
-                    break;
-                }
-                case 1:
-                {
-                    if (!underground || vSlice == null)
-                    {
-                        JourneyMap.getLogger().warn("Map task isn't underground, can't perform in End.");
-                        renderOkay = false;
-                    }
-                    else
-                    {
-                        renderOkay = endRenderer.render(g2D, chunkMd, vSlice);
-                    }
-                    break;
-                }
-                default:
-                {
-                    if (!underground || vSlice == null || vSlice == -1)
-                    {
-                        renderOkay = overWorldSurfaceRenderer.render(g2D, chunkMd, null);
-                    }
-                    else
-                    {
-                        renderOkay = overWorldCaveRenderer.render(g2D, chunkMd, vSlice);
+                        regionImageSet.setDirty(Constants.MapType.night);
                     }
                 }
             }
+            else
+            {
+                g2D1 = regionImageSet.getChunkImage(cCoord, Constants.MapType.day);
+                g2D2 = regionImageSet.getChunkImage(cCoord, Constants.MapType.night);
 
+                renderOkay = g2D1 != null && g2D2 != null && overWorldSurfaceRenderer.render(g2D1, g2D2, chunkMd);
+                if (renderOkay)
+                {
+                    regionImageSet.setDirty(Constants.MapType.day);
+                    regionImageSet.setDirty(Constants.MapType.night);
+                }
+            }
+
+            if (renderOkay)
+            {
+                chunkMd.setRendered();
+            }
         }
         catch (ArrayIndexOutOfBoundsException e)
         {
             JourneyMap.getLogger().log(Level.WARN, LogFormatter.toString(e));
-            return null; // Can happen when server isn't connected, just wait for next tick
+            return false; // Can happen when server isn't connected, just wait for next tick
         }
         catch (Throwable t)
         {
@@ -117,7 +120,14 @@ public class ChunkRenderController
         }
         finally
         {
-            g2D.dispose();
+            if (g2D1 != null)
+            {
+                g2D1.dispose();
+            }
+            if (g2D2 != null)
+            {
+                g2D2.dispose();
+            }
         }
 
         long stop = System.nanoTime();
@@ -132,10 +142,8 @@ public class ChunkRenderController
         {
             if (fineLogging)
             {
-                JourneyMap.getLogger().log(Level.WARN, "Chunk didn't render for dimension " + dimension + ": " + chunkMd);
+                JourneyMap.getLogger().log(Level.WARN, "Chunk didn't render for " + cCoord + " vSlice " + vSlice);
             }
-            // Use blank
-            // chunkImage = underground ? getBlankChunkImageUnderground() : getBlankChunkImage();
         }
 
         if (fineLogging)
@@ -153,8 +161,6 @@ public class ChunkRenderController
             }
         }
 
-
-        return chunkImage;
-
+        return renderOkay;
     }
 }

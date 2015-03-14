@@ -88,7 +88,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         {
             if (!chunkMd.getHasNoSky() && surfaceRenderer != null)
             {
-                ok = surfaceRenderer.render(g2D, chunkMd, vSlice, true);
+                ok = surfaceRenderer.render(g2D, null, chunkMd, vSlice, true);
                 if (!ok)
                 {
                     JourneyMap.getLogger().debug("The surface chunk didn't paint: " + chunkMd.toString());

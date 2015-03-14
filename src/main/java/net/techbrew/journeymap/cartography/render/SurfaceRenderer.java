@@ -58,18 +58,26 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
     }
 
     /**
-     * Render blocks in the chunk for the standard world.
+     * Render blocks in the chunk for the standard world, day only
      */
     @Override
-    public boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice)
+    public boolean render(final Graphics2D dayG2d, final ChunkMD chunkMd, final Integer ignored)
     {
-        return render(g2D, chunkMd, null, false);
+        return render(dayG2d, null, chunkMd, null, false);
+    }
+
+    /**
+     * Render blocks in the chunk for the standard world
+     */
+    public boolean render(final Graphics2D dayG2d, final Graphics2D nightG2d, final ChunkMD chunkMd)
+    {
+        return render(dayG2d, nightG2d, chunkMd, null, false);
     }
 
     /**
      * Render blocks in the chunk for the standard world.
      */
-    public synchronized boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
+    public synchronized boolean render(final Graphics2D dayG2d, final Graphics2D nightG2d, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
     {
         StatTimer timer = cavePrePass ? renderSurfacePrepassTimer : renderSurfaceTimer;
 
@@ -86,7 +94,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
             }
 
             // Render the chunk image
-            return renderSurface(g2D, chunkMd, vSlice, cavePrePass);
+            return renderSurface(dayG2d, nightG2d, chunkMd, vSlice, cavePrePass);
         }
         catch (Throwable e)
         {
@@ -104,13 +112,17 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
     /**
      * Render blocks in the chunk for the surface.
      */
-    protected boolean renderSurface(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
+    protected boolean renderSurface(final Graphics2D dayG2d, final Graphics2D nightG2d, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
     {
         boolean chunkOk = false;
 
         try
         {
-            g2D.setComposite(ALPHA_OPAQUE);
+            dayG2d.setComposite(ALPHA_OPAQUE);
+            if (nightG2d != null)
+            {
+                nightG2d.setComposite(ALPHA_OPAQUE);
+            }
             int sliceMaxY = 0;
 
             if (cavePrePass)
@@ -133,7 +145,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                     if (cavePrePass && (standardY > sliceMaxY && (standardY - sliceMaxY) > maxDepth))
                     {
                         chunkOk = true;
-                        paintBlackBlock(x, z, g2D);
+                        paintBlackBlock(x, z, dayG2d);
                         continue;
                     }
 
@@ -162,7 +174,8 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 
                     if (roofY == 0 || standardY == 0)
                     {
-                        paintVoidBlock(x, z, g2D);
+                        paintVoidBlock(x, z, dayG2d);
+                        paintVoidBlock(x, z, nightG2d);
                         chunkOk = true;
                         continue blockLoop;
                     }
@@ -177,7 +190,8 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 
                     if (topBlockMd == null)
                     {
-                        paintBadBlock(x, standardY, z, g2D);
+                        paintBadBlock(x, standardY, z, dayG2d);
+                        paintBadBlock(x, standardY, z, nightG2d);
                         continue blockLoop;
                     }
 
@@ -195,7 +209,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                     // Start using BlockColors stack
                     buildStrata(strata, roofY, chunkMd, x, standardY, z);
 
-                    chunkOk = paintStrata(strata, g2D, chunkMd, topBlockMd, vSlice, x, y, z, cavePrePass) || chunkOk;
+                    chunkOk = paintStrata(strata, dayG2d, nightG2d, chunkMd, topBlockMd, vSlice, x, y, z, cavePrePass) || chunkOk;
                 }
             }
         }
@@ -261,11 +275,12 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
     /**
      * Paint the image with the color derived from a BlockStack
      */
-    protected boolean paintStrata(final Strata strata, final Graphics2D g2D, final ChunkMD chunkMd, final BlockMD topBlockMd, final Integer vSlice, final int x, final int y, final int z, final boolean cavePrePass)
+    protected boolean paintStrata(final Strata strata, final Graphics2D dayG2d, final Graphics2D nightG2d, final ChunkMD chunkMd, final BlockMD topBlockMd, final Integer vSlice, final int x, final int y, final int z, final boolean cavePrePass)
     {
         if (strata.isEmpty())
         {
-            paintBadBlock(x, y, z, g2D);
+            paintBadBlock(x, y, z, dayG2d);
+            paintBadBlock(x, y, z, nightG2d);
             return false;
         }
 
@@ -299,16 +314,17 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
             // Shouldn't happen
             if (strata.getRenderDayColor() == null)
             {
-                paintBadBlock(x, y, z, g2D);
+                paintBadBlock(x, y, z, dayG2d);
+                paintBadBlock(x, y, z, nightG2d);
                 return false;
             }
 
-            if (!cavePrePass)
+            if (nightG2d != null)
             {
                 // Shouldn't happen
                 if (strata.getRenderNightColor() == null)
                 {
-                    paintBadBlock(x + 16, y, z, g2D);
+                    paintBadBlock(x, y, z, nightG2d);
                     return false;
                 }
             }
@@ -330,14 +346,14 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
             if (chunkMd.getHasNoSky())
             {
                 // End: Only use night color
-                paintBlock(x, z, strata.getRenderNightColor(), g2D, false);
+                paintBlock(x, z, strata.getRenderNightColor(), dayG2d);
             }
             else
             {
-                paintBlock(x, z, strata.getRenderDayColor(), g2D, false);
-                if (!cavePrePass)
+                paintBlock(x, z, strata.getRenderDayColor(), dayG2d);
+                if (nightG2d != null)
                 {
-                    paintBlock(x + 16, z, strata.getRenderNightColor(), g2D, false);
+                    paintBlock(x, z, strata.getRenderNightColor(), nightG2d);
                 }
             }
         }

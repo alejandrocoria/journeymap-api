@@ -63,24 +63,23 @@ public class RegionImageSet extends ImageSet
         return imageWrappers;
     }
 
-    public void insertChunk(final ChunkImageSet cis)
+    public void setDirty(MapType mapType)
     {
-        for (ChunkImageSet.Wrapper cisWrapper : cis.imageWrappers.values())
-        {
-            insertChunk(cis.getCCoord(), cisWrapper.getImage(), cisWrapper.getMapType());
-        }
+        getWrapper(mapType).setDirty();
     }
 
-    protected void insertChunk(ChunkCoord cCoord, BufferedImage chunkImage, MapType mapType)
+    public Graphics2D getChunkImage(ChunkCoord cCoord, MapType mapType)
     {
-        final Wrapper wrapper = getWrapper(mapType);
-        final int x = rCoord.getXOffset(cCoord.chunkX);
-        final int z = rCoord.getZOffset(cCoord.chunkZ);
-        final BufferedImage subRegion = wrapper.getImage().getSubimage(x, z, 16, 16);
-        final Graphics2D g2d = subRegion.createGraphics();
-        g2d.drawImage(chunkImage, 0, 0, null);
-        g2d.dispose();
-        wrapper.setDirty();
+        BufferedImage regionImage = getWrapper(mapType).getImage();
+        if (regionImage == null)
+        {
+            return null;
+        }
+        return RegionImageHandler.initRenderingHints(
+                regionImage.getSubimage(
+                        rCoord.getXOffset(cCoord.chunkX),
+                        rCoord.getZOffset(cCoord.chunkZ), 16, 16)
+                        .createGraphics());
     }
 
     @Override

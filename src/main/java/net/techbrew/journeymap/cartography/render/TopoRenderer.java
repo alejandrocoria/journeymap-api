@@ -364,7 +364,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             color = getBaseBlockColor(topBlockMd, x, y, z);
         }
 
-        paintBlock(x, z, color, g2D, true);
+        paintBlock(x, z, color, g2D);
 
         return true;
     }

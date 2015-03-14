@@ -126,7 +126,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         mapCrops = coreProperties.mapCrops.get();
 
         // Subclasses should override
-        this.ambientColor = new float[]{0,0,0};
+        this.ambientColor = new float[]{0, 0, 0};
     }
 
     @Override
@@ -208,15 +208,11 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      * Paint the block.
      */
     public void paintBlock(final int x, final int z, final int color,
-                           final Graphics2D g2D, boolean alsoPaintNight)
+                           final Graphics2D g2D)
     {
         g2D.setComposite(ALPHA_OPAQUE);
         g2D.setPaint(RGB.paintOf(color));
         g2D.fillRect(x, z, 1, 1);
-        if(alsoPaintNight)
-        {
-            g2D.fillRect(x + 16, z, 1, 1);
-        }
     }
 
     /**
@@ -224,7 +220,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      */
     public void paintVoidBlock(final int x, final int z, final Graphics2D g2D)
     {
-        paintBlock(x, z, COLOR_VOID, g2D, true);
+        paintBlock(x, z, COLOR_VOID, g2D);
 
     }
 
@@ -290,7 +286,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                 }
 
                 // Calculate secondary slope
-                if (mapAntialiasing && primarySlope==1f )
+                if (mapAntialiasing && primarySlope == 1f)
                 {
                     secondarySlope = calculateSlope(chunkMd, secondarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY, chunkHeights);
 
@@ -305,7 +301,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                 }
 
                 // Set that slope.  Set it good.  Aw yeah.
-                if(slope.isNaN())
+                if (slope.isNaN())
                 {
                     slope = 1f;
                 }
@@ -322,7 +318,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      * Get block height within slice.  Should lazy-populate sliceHeights. Can return null.
      */
     protected Integer getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY,
-                                      final HeightsCache chunkHeights)
+                                          final HeightsCache chunkHeights)
     {
         throw new NotImplementedException();
     }
@@ -339,7 +335,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         final ChunkCoordIntPair targetCoord = new ChunkCoordIntPair(blockX >> 4, blockZ >> 4);
         ChunkMD targetChunkMd = null;
 
-        if(targetCoord.equals(chunkMd.getCoord()))
+        if (targetCoord.equals(chunkMd.getCoord()))
         {
             targetChunkMd = chunkMd;
         }
@@ -362,7 +358,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                                    Integer vSlice, int sliceMinY, int sliceMaxY,
                                    final HeightsCache chunkHeights)
     {
-        if(y<=0)
+        if (y <= 0)
         {
             // Flat
             return 1f;
@@ -385,8 +381,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
             }
             slopeSum += ((y * 1f) / offsetHeight);
         }
-        Float slope =  slopeSum / offsets.size();
-        if(slope.isNaN())
+        Float slope = slopeSum / offsets.size();
+        if (slope.isNaN())
         {
             slope = 1f;
         }
@@ -419,13 +415,13 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     {
         Float[][] slopes = chunkSlopes.getIfPresent(chunkMd.getCoord());
 
-        if (slopes == null || slopes[x][z]==null)
+        if (slopes == null || slopes[x][z] == null)
         {
             slopes = populateSlopes(chunkMd, vSlice, chunkHeights, chunkSlopes);
         }
 
         Float slope = slopes[x][z];
-        if(slope==null || slope.isNaN())
+        if (slope == null || slope.isNaN())
         {
             JourneyMap.getLogger().warn(String.format("Bad slope for %s at %s,%s: %s", chunkMd, x, z, slope));
             slope = 1f;
@@ -460,7 +456,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, final HeightsCache chunkHeights)
     {
         Integer[][] heights = chunkHeights.getUnchecked(chunkMd.getCoord());
-        if(heights==null)
+        if (heights == null)
         {
             // Not in cache anymore
             return null;
@@ -486,35 +482,35 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 
             while (y > 0)
             {
-                if(blockMD.isWater())
+                if (blockMD.isWater())
                 {
-                    if(!mapBathymetry)
+                    if (!mapBathymetry)
                     {
                         break;
                     }
-                    else if(propUnsetWaterHeight)
+                    else if (propUnsetWaterHeight)
                     {
                         setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, x, z);
                         propUnsetWaterHeight = false;
                     }
                 }
-                else if(!blockMD.isAir())// && !blockMD.hasFlag(BlockMD.Flag.NoShadow))
+                else if (!blockMD.isAir())// && !blockMD.hasFlag(BlockMD.Flag.NoShadow))
                 {
-                    if(mapPlants && blockMD.hasFlag(BlockMD.Flag.Plant))
+                    if (mapPlants && blockMD.hasFlag(BlockMD.Flag.Plant))
                     {
-                        if(!mapPlantShadows)
+                        if (!mapPlantShadows)
                         {
                             y--;
                         }
                     }
-                    else if(mapCrops && blockMD.hasFlag(BlockMD.Flag.Crop))
+                    else if (mapCrops && blockMD.hasFlag(BlockMD.Flag.Crop))
                     {
-                        if(!mapPlantShadows)
+                        if (!mapPlantShadows)
                         {
                             y--;
                         }
                     }
-                    else if(!blockMD.isLava() && blockMD.hasFlag(BlockMD.Flag.NoShadow))
+                    else if (!blockMD.isLava() && blockMD.hasFlag(BlockMD.Flag.NoShadow))
                     {
                         y--;
                     }
@@ -549,7 +545,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         final ChunkCoordIntPair targetCoord = new ChunkCoordIntPair(blockX >> 4, blockZ >> 4);
         ChunkMD targetChunkMd = null;
 
-        if(targetCoord.equals(chunkMd.getCoord()))
+        if (targetCoord.equals(chunkMd.getCoord()))
         {
             targetChunkMd = chunkMd;
         }
@@ -561,7 +557,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         if (targetChunkMd != null)
         {
             Integer height = getSurfaceBlockHeight(targetChunkMd, blockX & 15, blockZ & 15, chunkHeights);
-            if(height==null)
+            if (height == null)
             {
                 return defaultVal;
             }
@@ -691,16 +687,16 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     /**
      * Cache for storing block properties in a 2-dimensional array, keyed to chunk coordinates.
      */
-    public class BlockColumnPropertiesCache extends ForwardingLoadingCache<ChunkCoordIntPair, HashMap<String,Serializable>[][]>
+    public class BlockColumnPropertiesCache extends ForwardingLoadingCache<ChunkCoordIntPair, HashMap<String, Serializable>[][]>
     {
-        final LoadingCache<ChunkCoordIntPair, HashMap<String,Serializable>[][]> internal;
+        final LoadingCache<ChunkCoordIntPair, HashMap<String, Serializable>[][]> internal;
 
         protected BlockColumnPropertiesCache(String name)
         {
-            this.internal = getCacheBuilder().build(new CacheLoader<ChunkCoordIntPair, HashMap<String,Serializable>[][]>()
+            this.internal = getCacheBuilder().build(new CacheLoader<ChunkCoordIntPair, HashMap<String, Serializable>[][]>()
             {
                 @Override
-                public HashMap<String,Serializable>[][] load(ChunkCoordIntPair key) throws Exception
+                public HashMap<String, Serializable>[][] load(ChunkCoordIntPair key) throws Exception
                 {
                     //JourneyMap.getLogger().info("Initialized column properties for chunk " + key);
                     return new HashMap[16][16];
@@ -710,7 +706,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
 
         @Override
-        protected LoadingCache<ChunkCoordIntPair, HashMap<String,Serializable>[][]> delegate()
+        protected LoadingCache<ChunkCoordIntPair, HashMap<String, Serializable>[][]> delegate()
         {
             return internal;
         }

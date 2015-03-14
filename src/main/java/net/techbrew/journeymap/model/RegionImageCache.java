@@ -267,7 +267,7 @@ public class RegionImageCache
         return texture;
     }
 
-    private RegionImageSet getRegionImageSet(RegionCoord rCoord)
+    public RegionImageSet getRegionImageSet(RegionCoord rCoord)
     {
         synchronized (lock)
         {
@@ -301,11 +301,6 @@ public class RegionImageCache
     {
         RegionImageSet ris = getRegionImageSet(rCoord);
         return ris.getImage(mapType);
-    }
-
-    public void putChunkImage(ChunkCoord cCoord, MapType mapType, BufferedImage chunkImage)
-    {
-        getRegionImageSet(cCoord.getRegionCoord()).insertChunk(cCoord, chunkImage, mapType);
     }
 
     public void updateTextures(boolean forceFlush)

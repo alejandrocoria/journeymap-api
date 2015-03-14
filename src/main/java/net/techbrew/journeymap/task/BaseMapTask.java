@@ -128,38 +128,13 @@ public abstract class BaseMapTask implements ITask
                     try
                     {
                         ChunkCoord cCoord = ChunkCoord.fromChunkMD(jmWorldDir, chunkMd, vSlice, dimension);
-                        BufferedImage chunkImage = renderController.getChunkImage(chunkMd, vSlice);
-                        if (chunkImage != null)
-                        {
-                            chunkMd.setRendered();
-                        }
-                        else
-                        {
-                            chunkImage = underground ? getBlankChunkImageUnderground() : getBlankChunkImage();
-                        }
-
-                        if (underground)
-                        {
-                            regionImageCache.putChunkImage(cCoord, Constants.MapType.underground, chunkImage);
-                        }
-                        else
-                        {
-                            regionImageCache.putChunkImage(cCoord, Constants.MapType.day, getSubimage(Constants.MapType.day, chunkImage));
-                            regionImageCache.putChunkImage(cCoord, Constants.MapType.night, getSubimage(Constants.MapType.night, chunkImage));
-                        }
+                        renderController.renderChunk(cCoord, chunkMd, underground, vSlice);
+                        count++;
                     }
                     catch (ChunkMD.ChunkMissingException e)
                     {
                         logger.info(e.getMessage());
                     }
-                }
-
-                count++;
-
-                //if(timer.elapsed()>2000)
-                {
-                    //logger.warn(String.format("Task taking too long. Chunks handled: %s/%s", count, chunkCoords.size()));
-                    //break;
                 }
             }
 
