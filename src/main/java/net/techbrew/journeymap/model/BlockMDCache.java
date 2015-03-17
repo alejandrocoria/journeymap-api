@@ -19,10 +19,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashMap;
+import java.util.*;
 
 import static net.techbrew.journeymap.model.BlockMD.Flag.*;
 
@@ -119,7 +116,23 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         {
             modBlockUIDs.put(specialUid, EnumSet.of(BlockMD.Flag.SpecialHandling));
         }
-        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("TConstruct:decoration.stonetorch"), EnumSet.of(HasAir, NoShadow));
+
+        // Torches from mods shouldn't cast block-sized shadows
+        List<String> torches = Arrays.asList("TConstruct:decoration.stonetorch",
+                "CarpentersBlocks:blockCarpentersTorch",
+                "ExtraUtilities:magnumTorch",
+                "appliedenergistics2:tile.BlockQuartzTorch");
+        for (int i = 1; i <= 10; i++)
+        {
+            torches.add("chisel:torch" + i);
+        }
+
+        for (String torch : torches)
+        {
+            modBlockUIDs.put(new GameRegistry.UniqueIdentifier(torch), EnumSet.of(HasAir, NoShadow));
+        }
+
+        // More mod-specific overrides
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("Mariculture:kelp"), EnumSet.of(Side2Texture, Plant));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:LooseRock"), EnumSet.of(HasAir, NoShadow));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:Grass"), EnumSet.of(BiomeColor));
@@ -131,6 +144,8 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:PeatGrass"), EnumSet.of(BiomeColor));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:TallGrass"), EnumSet.of(BiomeColor));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:SeaGrassStill"), EnumSet.of(Side2Texture));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("Thaumcraft:blockMagicalLeaves"), EnumSet.of(BiomeColor)); // Thaumcraft:blockMagicalLeaves Greatwood Leaves #2C6F0E
+
 
         // Set flags based on inheritance
         for (Block block : GameData.getBlockRegistry().typeSafeIterable())
