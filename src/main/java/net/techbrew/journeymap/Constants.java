@@ -14,16 +14,15 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.input.Keyboard;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 
 public class Constants
 {
@@ -142,6 +141,20 @@ public class Constants
             packs = RESOURCE_PACKS_DEFAULT;
         }
         return packs;
+    }
+
+    public static String getModNames()
+    {
+        ArrayList<String> list = new ArrayList<String>();
+        for (ModContainer mod : Loader.instance().getModList())
+        {
+            if (Loader.isModLoaded(mod.getModId()))
+            {
+                list.add(String.format("%s:%s", mod.getName(), mod.getVersion()));
+            }
+        }
+        Collections.sort(list);
+        return Joiner.on(", ").join(list);
     }
 
     public enum MapType

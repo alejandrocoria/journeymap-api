@@ -62,6 +62,7 @@ jm.colorpalette.file_header_3=To use this palette with a single world, place %1$
 jm.colorpalette.file_header_4=To use this palette with all worlds, edit and set "permanent": true, then place %1$s in: %2$s
 jm.colorpalette.file_missing_data=Put this file in the same directory as %1$s to view the color palette.
 jm.colorpalette.file_title=JourneyMap Color Palette
+jm.colorpalette.mods=Mods
 jm.colorpalette.resource_packs=Resource Packs
 jm.common.actions=Actions
 jm.common.automap_complete=Auto-mapping of surface has stopped.

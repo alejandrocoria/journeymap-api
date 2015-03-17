@@ -40,16 +40,25 @@
 <div id="description">$jm.colorpalette.file_missing_data$</div>
 
 <div id="contents">
+
+    <h2>$jm.colorpalette.mods$:</h2>
+
+    <div id="modNames"></div>
+
     <h2>$jm.colorpalette.resource_packs$:</h2>
 
     <div id="resourcePacks"></div>
 
+    <hr/>
+
     <h2>$jm.colorpalette.basic_colors$:</h2>
+
     <div id="basicColors"></div>
 
     <hr/>
 
     <h2>$jm.colorpalette.biome_colors$</h2>
+
     <div id="biomeColors"></div>
 </div>
 
@@ -86,6 +95,7 @@ function readData() {
     } else {
         document.getElementById("description").innerHTML = colorpalette.description.join("<br/>");
         document.getElementById("resourcePacks").innerHTML = colorpalette.resourcePacks;
+        document.getElementById("modNames").innerHTML = colorpalette.modNames;
         document.getElementById("generated").innerHTML = colorpalette.generated;
     
         var basicColorsDiv = document.getElementById("basicColors");
@@ -103,6 +113,7 @@ function readData() {
 }
 
 readData();
+
 
 </script>
 

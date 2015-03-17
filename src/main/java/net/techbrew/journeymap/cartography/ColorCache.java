@@ -41,7 +41,8 @@ public class ColorCache
     private final HashMap<String, HashMap<BlockMD, Color>> biomeColors = new HashMap<String, HashMap<BlockMD, Color>>(32);
     private volatile IconLoader iconLoader;
     private volatile ColorPalette currentPalette;
-    private String lastResourcePack;
+    private String lastResourcePackNames;
+    private String lastModNames;
 
     private ColorCache()
     {
@@ -65,31 +66,40 @@ public class ColorCache
         }
         else
         {
-            String currentPack = Constants.getResourcePackNames();
-            if (currentPack.equals(lastResourcePack) && iconLoader != null)
-            {
-                JourneyMap.getLogger().debug("Resource Pack(s) unchanged: " + currentPack);
-            }
-            else
-            {
-                // Remap if pack changed while playing
-                boolean forceRemap = (lastResourcePack != null && JourneyMap.getInstance().isMapping());
+            String currentResourcePackNames = Constants.getResourcePackNames();
+            String currentModNames = Constants.getModNames();
 
+            boolean resourcePackSame = false;
+            boolean modPackSame = false;
+
+            if (currentResourcePackNames.equals(lastResourcePackNames) && iconLoader != null)
+            {
+                JourneyMap.getLogger().debug("Resource Pack(s) unchanged: " + currentResourcePackNames);
+                resourcePackSame = true;
+            }
+
+            if (currentModNames.equals(lastModNames))
+            {
+                JourneyMap.getLogger().debug("Mod Pack(s) unchanged: " + currentModNames);
+                modPackSame = true;
+            }
+
+            if (!resourcePackSame || !modPackSame)
+            {
                 reset();
-                lastResourcePack = currentPack;
+
+                lastResourcePackNames = currentResourcePackNames;
+                lastModNames = currentModNames;
 
                 // Make sure block metadata is reset
                 DataCache.instance().resetBlockMetadata();
 
                 // Load the cache from a color palette
-                JourneyMap.getLogger().info(String.format("Getting color palette for Resource Pack(s): %s", currentPack));
+                JourneyMap.getLogger().info(String.format("Getting color palette for Resource Pack(s): %s", currentResourcePackNames));
                 loadColorPalette();
 
-                // Remap around player?
-                if (forceRemap)
-                {
-                    MapPlayerTask.forceNearbyRemap();
-                }
+                // Remap around player
+                MapPlayerTask.forceNearbyRemap();
             }
         }
     }
@@ -141,7 +151,8 @@ public class ColorCache
         try
         {
             String resourcePackNames = Constants.getResourcePackNames();
-            palette = new ColorPalette(resourcePackNames, baseColors, biomeColors);
+            String modPackNames = Constants.getModNames();
+            palette = new ColorPalette(resourcePackNames, modPackNames, baseColors, biomeColors);
             palette.setPermanent(permanent);
             palette.writeToFile(standard);
             long elapsed = System.currentTimeMillis() - start;
@@ -485,7 +496,7 @@ public class ColorCache
     {
         StringBuilder sb = new StringBuilder();
         sb.append(LogFormatter.LINEBREAK).append("<!-- color cache --><div>");
-        sb.append(LogFormatter.LINEBREAK).append("<b>Current Resource Packs: </b>").append(lastResourcePack);
+        sb.append(LogFormatter.LINEBREAK).append("<b>Current Resource Packs: </b>").append(lastResourcePackNames);
 
         sb.append(LogFormatter.LINEBREAK).append("<table><tr valign='top'><td width='50%'>");
         sb.append(debugCache(DataCache.instance().getBlockMetadata().getAlphaMap(), "Block Transparency"));

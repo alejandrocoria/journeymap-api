@@ -45,7 +45,7 @@ public class ColorPalette
     public static final String VARIABLE = "var colorpalette=";
     public static final Charset UTF8 = Charset.forName("UTF-8");
 
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).setPrettyPrinting().create();
 
     @Since(1)
@@ -63,6 +63,9 @@ public class ColorPalette
     @Since(1)
     String resourcePacks;
 
+    @Since(2)
+    String modNames;
+
     @Since(1)
     ArrayList<BlockColor> basicColors = new ArrayList<BlockColor>(0);
 
@@ -75,11 +78,12 @@ public class ColorPalette
     {
     }
 
-    ColorPalette(String resourcePacks, HashMap<BlockMD, Color> basicColorMap, HashMap<String, HashMap<BlockMD, Color>> biomeColorMap)
+    ColorPalette(String resourcePacks, String modNames, HashMap<BlockMD, Color> basicColorMap, HashMap<String, HashMap<BlockMD, Color>> biomeColorMap)
     {
         this.name = Constants.getString("jm.colorpalette.file_title");
         this.generated = String.format("Generated using %s for %s on %s", JourneyMap.MOD_NAME, Loader.MC_VERSION, new Date());
         this.resourcePacks = resourcePacks;
+        this.modNames = modNames;
 
         ArrayList<String> lines = new ArrayList<String>();
         lines.add(Constants.getString("jm.colorpalette.file_header_1"));
@@ -103,6 +107,7 @@ public class ColorPalette
     public static ColorPalette getActiveColorPalette()
     {
         String resourcePackNames = Constants.getResourcePackNames();
+        String modPackNames = Constants.getModNames();
 
         File worldPaletteFile = ColorPalette.getWorldPaletteFile();
         if (worldPaletteFile.canRead())
@@ -120,7 +125,7 @@ public class ColorPalette
             ColorPalette palette = ColorPalette.loadFromFile(standardPaletteFile);
             if (palette != null)
             {
-                if (palette.isPermanent() || resourcePackNames.equals(palette.resourcePacks))
+                if (palette.isPermanent() || (resourcePackNames.equals(palette.resourcePacks) && modPackNames.equals(palette.modNames)))
                 {
                     return palette;
                 }
@@ -272,6 +277,7 @@ public class ColorPalette
                 htmlString = substituteValueInContents(htmlString, "jm.colorpalette.file_title");
                 htmlString = substituteValueInContents(htmlString, "jm.colorpalette.file_missing_data", JSON_FILENAME);
                 htmlString = substituteValueInContents(htmlString, "jm.colorpalette.resource_packs");
+                htmlString = substituteValueInContents(htmlString, "jm.colorpalette.mods");
                 htmlString = substituteValueInContents(htmlString, "jm.colorpalette.basic_colors");
                 htmlString = substituteValueInContents(htmlString, "jm.colorpalette.biome_colors");
                 Files.write(htmlString, htmlFile, UTF8);
