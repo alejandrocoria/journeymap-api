@@ -8,7 +8,9 @@
 
 package net.techbrew.journeymap.model;
 
+import com.google.common.cache.Cache;
 import net.minecraft.world.ChunkCoordIntPair;
+import net.techbrew.journeymap.data.DataCache;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -21,6 +23,7 @@ public class RegionCoord implements Comparable<RegionCoord>
 
     public transient static final int SIZE = 5;
     private transient static final int chunkSqRt = (int) Math.pow(2, SIZE);
+    private static final Cache<Integer, RegionCoord> cache = DataCache.instance().getRegionCoords();
     // TODO: worldDir should serialize as a relative path to allow data files to be usable after being moved
     public final File worldDir;
     public final Path dimDir;
@@ -41,7 +44,18 @@ public class RegionCoord implements Comparable<RegionCoord>
 
     public static RegionCoord fromChunkPos(File worldDir, int chunkX, Integer vSlice, int chunkZ, int dimension)
     {
-        return new RegionCoord(worldDir, getRegionPos(chunkX), vSlice, getRegionPos(chunkZ), dimension);
+        final int regionX = getRegionPos(chunkX);
+        final int regionZ = getRegionPos(chunkZ);
+
+        // There's no real need to synchronize this, it's harmless if there are occasional duplicate puts.  It's primarily
+        // just used to reduce heap thrash.
+        RegionCoord regionCoord = cache.getIfPresent(toHash(worldDir, regionX, vSlice, regionZ, dimension));
+        if (regionCoord == null)
+        {
+            regionCoord = new RegionCoord(worldDir, regionX, vSlice, regionZ, dimension);
+            cache.put(regionCoord.hashCode(), regionCoord);
+        }
+        return regionCoord;
     }
 
     public static int getMinChunkX(int rX)
@@ -71,7 +85,12 @@ public class RegionCoord implements Comparable<RegionCoord>
 
     public static int toHash(RegionCoord regionCoord)
     {
-        return Objects.hash(regionCoord.regionX, regionCoord.regionZ, regionCoord.vSlice, regionCoord.dimension, regionCoord.worldDir);
+        return Objects.hash(regionCoord.worldDir, regionCoord.regionX, regionCoord.vSlice, regionCoord.regionZ, regionCoord.dimension);
+    }
+
+    public static int toHash(File worldDir, int regionX, Integer vSlice, int regionZ, int dimension)
+    {
+        return Objects.hash(worldDir, regionX, vSlice, regionZ, dimension);
     }
 
     public int getXOffset(int chunkX)

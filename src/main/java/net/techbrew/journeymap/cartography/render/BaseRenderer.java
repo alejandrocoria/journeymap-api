@@ -198,10 +198,13 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      */
     protected void paintDimOverlay(int x, int z, float alpha, final Graphics2D g2D)
     {
-        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-        g2D.setPaint(RGB.paintOf(COLOR_BLACK));
-        g2D.fillRect(x, z, 1, 1);
-        g2D.setComposite(ALPHA_OPAQUE);
+        if (g2D != null)
+        {
+            g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+            g2D.setPaint(RGB.paintOf(COLOR_BLACK));
+            g2D.fillRect(x, z, 1, 1);
+            g2D.setComposite(ALPHA_OPAQUE);
+        }
     }
 
     /**
@@ -210,9 +213,16 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     public void paintBlock(final int x, final int z, final int color,
                            final Graphics2D g2D)
     {
-        g2D.setComposite(ALPHA_OPAQUE);
-        g2D.setPaint(RGB.paintOf(color));
-        g2D.fillRect(x, z, 1, 1);
+        if (g2D != null)
+        {
+            g2D.setComposite(ALPHA_OPAQUE);
+            g2D.setPaint(RGB.paintOf(color));
+            g2D.fillRect(x, z, 1, 1);
+        }
+        else
+        {
+            JourneyMap.getLogger().warn("Graphics2D unavailable");
+        }
     }
 
     /**
@@ -221,7 +231,6 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     public void paintVoidBlock(final int x, final int z, final Graphics2D g2D)
     {
         paintBlock(x, z, COLOR_VOID, g2D);
-
     }
 
     /**
@@ -229,9 +238,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      */
     public void paintBlackBlock(final int x, final int z, final Graphics2D g2D)
     {
-        g2D.setComposite(ALPHA_OPAQUE);
-        g2D.setPaint(RGB.paintOf(COLOR_BLACK));
-        g2D.fillRect(x, z, 1, 1);
+        paintBlock(x, z, COLOR_BLACK, g2D);
     }
 
 

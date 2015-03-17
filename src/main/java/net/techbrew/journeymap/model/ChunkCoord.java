@@ -8,18 +8,22 @@
 
 package net.techbrew.journeymap.model;
 
+import com.google.common.cache.Cache;
+import net.techbrew.journeymap.data.DataCache;
+
 import java.io.File;
+import java.util.Objects;
 
 public class ChunkCoord
 {
 
+    private static final Cache<Integer, ChunkCoord> cache = DataCache.instance().getChunkCoords();
     // TODO: worldDir should serialize as a relative path to allow data files to be usable after being moved
     public final File worldDir;
     public final int chunkX;
     public final int chunkZ;
     public final Integer vSlice;
     public final int dimension;
-
     private RegionCoord rCoord = null;
 
     private ChunkCoord(File worldDir, int chunkX, Integer vSlice, int chunkZ, int dimension)
@@ -40,9 +44,22 @@ public class ChunkCoord
         return ChunkCoord.fromChunkPos(worldDir, chunkMd.getCoord().chunkXPos, vSlice, chunkMd.getCoord().chunkZPos, dimension);
     }
 
-    public static ChunkCoord fromChunkPos(File worldDir, int xPosition, Integer vSlice, int zPosition, int dimension)
+    public static ChunkCoord fromChunkPos(final File worldDir, final int chunkX, final Integer vSlice, final int chunkZ, final int dimension)
     {
-        return new ChunkCoord(worldDir, xPosition, vSlice, zPosition, dimension);
+        // There's no real need to synchronize this, it's harmless if there are occasional duplicate puts.  It's primarily
+        // just used to reduce heap thrash.
+        ChunkCoord chunkCoord = cache.getIfPresent(toHash(worldDir, chunkX, vSlice, chunkZ, dimension));
+        if (chunkCoord == null)
+        {
+            chunkCoord = new ChunkCoord(worldDir, chunkX, vSlice, chunkZ, dimension);
+            cache.put(chunkCoord.hashCode(), chunkCoord);
+        }
+        return chunkCoord;
+    }
+
+    public static int toHash(File worldDir, int chunkX, Integer vSlice, int chunkZ, int dimension)
+    {
+        return Objects.hash(worldDir, chunkX, vSlice, chunkZ, dimension);
     }
 
     public RegionCoord getRegionCoord()
@@ -74,15 +91,7 @@ public class ChunkCoord
     @Override
     public int hashCode()
     {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + getVerticalSlice();
-        result = prime * result + chunkX;
-        result = prime * result + chunkZ;
-        result = prime * result
-                + ((worldDir == null) ? 0 : worldDir.hashCode());
-        result = prime * result + dimension;
-        return result;
+        return toHash(worldDir, chunkX, vSlice, chunkZ, dimension);
     }
 
     @Override
@@ -147,5 +156,4 @@ public class ChunkCoord
 //		builder.append("]");
         return "ChunkCoord [" + chunkX + "," + chunkZ + "]";
     }
-
 }

@@ -73,13 +73,12 @@ public class RegionImageCache
 
     public static Cache<Integer, Future<DelayedTexture>> initFutureTextureCache(CacheBuilder<Object, Object> builder)
     {
-        return builder.concurrencyLevel(1).expireAfterAccess(regionCacheAge, TimeUnit.MILLISECONDS).build();
+        return builder.expireAfterAccess(regionCacheAge, TimeUnit.MILLISECONDS).build();
     }
 
     public static LoadingCache<Integer, DelayedTexture> initRegionTextureCache(CacheBuilder<Object, Object> builder)
     {
         return builder
-                .concurrencyLevel(1)
                 .expireAfterAccess(regionCacheAge, TimeUnit.MILLISECONDS)
                 .removalListener(new RemovalListener<Integer, DelayedTexture>()
                 {
@@ -111,7 +110,6 @@ public class RegionImageCache
     public static LoadingCache<RegionCoord, RegionImageSet> initRegionImageSetsCache(CacheBuilder<Object, Object> builder)
     {
         return builder
-                .concurrencyLevel(1)
                 .expireAfterAccess(regionCacheAge, TimeUnit.MILLISECONDS)
                 .removalListener(new RemovalListener<RegionCoord, RegionImageSet>()
                 {

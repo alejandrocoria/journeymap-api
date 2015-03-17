@@ -49,12 +49,16 @@ public class DataCache
     final LoadingCache<EntityDTO, DrawEntityStep> entityDrawSteps;
     final LoadingCache<Waypoint, DrawWayPointStep> waypointDrawSteps;
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
+    final Cache<Integer, ChunkCoord> chunkCoords;
+    final Cache<Integer, RegionCoord> regionCoords;
     final LoadingCache<Block, HashMap<Integer, BlockMD>> blockMetadata;
     final BlockMDCache blockMetadataLoader;
     final RegionImageCache regionImageCache;
     final ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadataRemovalListener;
     final HashMap<Cache, String> managedCaches = new HashMap<Cache, String>();
     final WeakHashMap<Cache, String> privateCaches = new WeakHashMap<Cache, String>();
+    private final int chunkCacheExpireSeconds = 30;
+    private final int defaultConcurrencyLevel = 1;
     LoadingCache<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadata;
 
     // Private constructor
@@ -106,20 +110,27 @@ public class DataCache
         managedCaches.put(entityDTOs, "EntityDTO");
 
         futureTextureCache = RegionImageCache.initFutureTextureCache(getCacheBuilder());
-        regionTextureCache = RegionImageCache.initRegionTextureCache(getCacheBuilder());
-        regionImageSetsCache = RegionImageCache.initRegionImageSetsCache(getCacheBuilder());
-        regionImageCache = new RegionImageCache(futureTextureCache, regionTextureCache, regionImageSetsCache);
         managedCaches.put(futureTextureCache, "RegionFutureTexture");
+
+        regionTextureCache = RegionImageCache.initRegionTextureCache(getCacheBuilder());
         managedCaches.put(regionTextureCache, "RegionTexture");
+        regionImageSetsCache = RegionImageCache.initRegionImageSetsCache(getCacheBuilder());
         managedCaches.put(regionImageSetsCache, "RegionImageSet");
+        regionImageCache = new RegionImageCache(futureTextureCache, regionTextureCache, regionImageSetsCache);
 
         chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>>();
-        chunkMetadata = getCacheBuilder().expireAfterAccess(30, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
+        chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
         managedCaches.put(chunkMetadata, "ChunkMD");
 
         blockMetadataLoader = new BlockMDCache();
         blockMetadata = getCacheBuilder().initialCapacity(GameData.getBlockRegistry().getKeys().size()).build(blockMetadataLoader);
         managedCaches.put(blockMetadata, "BlockMD");
+
+        chunkCoords = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).build();
+        managedCaches.put(chunkCoords, "ChunkCoord");
+
+        regionCoords = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).build();
+        managedCaches.put(regionCoords, "RegionCoord");
     }
 
     // Get singleton instance.  Concurrency-safe.
@@ -141,6 +152,7 @@ public class DataCache
     private CacheBuilder<Object, Object> getCacheBuilder()
     {
         CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
+        builder.concurrencyLevel(defaultConcurrencyLevel);
         if (JourneyMap.getCoreProperties().recordCacheStats.get())
         {
             builder.recordStats();
@@ -505,6 +517,16 @@ public class DataCache
     public RegionImageCache getRegionImageCache()
     {
         return regionImageCache;
+    }
+
+    public Cache<Integer, ChunkCoord> getChunkCoords()
+    {
+        return chunkCoords;
+    }
+
+    public Cache<Integer, RegionCoord> getRegionCoords()
+    {
+        return regionCoords;
     }
 
     /**

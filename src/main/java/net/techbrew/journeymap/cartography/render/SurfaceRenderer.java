@@ -175,7 +175,10 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                     if (roofY == 0 || standardY == 0)
                     {
                         paintVoidBlock(x, z, dayG2d);
-                        paintVoidBlock(x, z, nightG2d);
+                        if (!cavePrePass && nightG2d != null)
+                        {
+                            paintVoidBlock(x, z, nightG2d);
+                        }
                         chunkOk = true;
                         continue blockLoop;
                     }
