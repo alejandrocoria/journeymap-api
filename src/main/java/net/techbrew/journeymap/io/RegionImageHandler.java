@@ -13,6 +13,7 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageCache;
@@ -159,7 +160,7 @@ public class RegionImageHandler
         final Graphics2D g2D = initRenderingHints(image.createGraphics());
         g2D.clearRect(0, 0, imageWidth, imageHeight);
 
-        final RegionImageCache cache = RegionImageCache.instance();
+        final RegionImageCache cache = DataCache.instance().getRegionImageCache();
 
         RegionCoord rc = null;
         BufferedImage regionImage = null;
@@ -275,7 +276,7 @@ public class RegionImageHandler
 
     public static BufferedImage getScaledRegionArea(final RegionCoord rCoord, final MapType mapType, final int zoom, boolean highQuality, int x1, int y1)
     {
-        RegionImageCache cache = RegionImageCache.instance();
+        RegionImageCache cache = DataCache.instance().getRegionImageCache();
         BufferedImage regionImage = cache.getGuaranteedImage(rCoord, mapType);
 
         if (regionImage == null)
@@ -397,7 +398,7 @@ public class RegionImageHandler
 
     public BufferedImage getCachedRegionImage(RegionCoord rCoord, MapType mapType)
     {
-        return RegionImageCache.instance().getGuaranteedImage(rCoord, mapType);
+        return DataCache.instance().getRegionImageCache().getGuaranteedImage(rCoord, mapType);
     }
 
     // On-demand-holder for instance

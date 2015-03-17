@@ -13,12 +13,12 @@ import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.RegionCoord;
-import net.techbrew.journeymap.model.RegionImageCache;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -77,7 +77,7 @@ public class MapSaver
             }
 
             // Ensure latest regions are flushed to disk
-            RegionImageCache.instance().flushToDisk();
+            DataCache.instance().getRegionImageCache().flushToDisk();
 
             timer.start();
 
@@ -164,7 +164,7 @@ public class MapSaver
             saveFile = new File(screenshotsDir, sb.toString());
 
             // Ensure latest regions are flushed to disk
-            RegionImageCache.instance().flushToDisk();
+            DataCache.instance().getRegionImageCache().flushToDisk();
 
             // Look for pngs
             File imageDir = getImageDir();

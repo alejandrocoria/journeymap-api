@@ -14,8 +14,12 @@ import net.techbrew.journeymap.cartography.render.CaveRenderer;
 import net.techbrew.journeymap.cartography.render.EndRenderer;
 import net.techbrew.journeymap.cartography.render.NetherRenderer;
 import net.techbrew.journeymap.cartography.render.SurfaceRenderer;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.model.*;
+import net.techbrew.journeymap.model.ChunkCoord;
+import net.techbrew.journeymap.model.ChunkMD;
+import net.techbrew.journeymap.model.RegionCoord;
+import net.techbrew.journeymap.model.RegionImageSet;
 import org.apache.logging.log4j.Level;
 
 import java.awt.*;
@@ -60,7 +64,7 @@ public class ChunkRenderController
         {
             final RegionCoord rCoord = cCoord.getRegionCoord();
 
-            RegionImageSet regionImageSet = RegionImageCache.instance().getRegionImageSet(rCoord);
+            RegionImageSet regionImageSet = DataCache.instance().getRegionImageCache().getRegionImageSet(rCoord);
             if (underground)
             {
                 g2D1 = regionImageSet.getChunkImage(cCoord, Constants.MapType.underground);

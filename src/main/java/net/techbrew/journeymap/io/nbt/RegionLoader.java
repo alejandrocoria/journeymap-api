@@ -13,11 +13,11 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.model.ChunkCoord;
 import net.techbrew.journeymap.model.RegionCoord;
-import net.techbrew.journeymap.model.RegionImageCache;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -90,7 +90,7 @@ public class RegionLoader
         final RegionImageHandler rfh = RegionImageHandler.getInstance();
         final Stack<RegionCoord> stack = new Stack<RegionCoord>();
 
-        RegionImageCache.instance().clear();
+        DataCache.instance().getRegionImageCache().clear();
 
         AnvilChunkLoader anvilChunkLoader = ChunkLoader.getAnvilChunkLoader(mc);
 

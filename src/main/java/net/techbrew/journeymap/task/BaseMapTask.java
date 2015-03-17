@@ -26,6 +26,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Iterator;
 
 public abstract class BaseMapTask implements ITask
@@ -67,6 +68,11 @@ public abstract class BaseMapTask implements ITask
 
     }
 
+    protected EnumSet<Constants.MapType> getMapTypes()
+    {
+        return underground ? EnumSet.of(Constants.MapType.underground) : EnumSet.of(Constants.MapType.day, Constants.MapType.night);
+    }
+
     @Override
     public void performTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
@@ -86,7 +92,7 @@ public abstract class BaseMapTask implements ITask
 
             final long start = System.nanoTime();
             final Iterator<ChunkCoordIntPair> chunkIter = chunkCoords.iterator();
-            final RegionImageCache regionImageCache = RegionImageCache.instance();
+            final RegionImageCache regionImageCache = DataCache.instance().getRegionImageCache();
             final Logger logger = JourneyMap.getLogger();
 
             // Check the dimension
@@ -156,7 +162,7 @@ public abstract class BaseMapTask implements ITask
             }
 
             // Push chunk cache to region cache
-            regionImageCache.updateTextures(flushCacheWhenDone);
+            regionImageCache.updateTextures(flushCacheWhenDone, getMapTypes());
             chunkCoords.clear();
             this.complete(false, false);
             timer.stop();

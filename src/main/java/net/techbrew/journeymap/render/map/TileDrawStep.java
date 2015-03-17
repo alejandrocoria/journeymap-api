@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.GridSpec;
@@ -27,6 +28,8 @@ import java.util.concurrent.Future;
  */
 public class TileDrawStep
 {
+    private static final Color bgColor = new Color(0x22, 0x22, 0x22);
+
     private final Logger logger = JourneyMap.getLogger();
     private final boolean debug = logger.isTraceEnabled();
     private int sx1, sy1, sx2, sy2;
@@ -76,7 +79,7 @@ public class TileDrawStep
             pendingScaledTexture = null;
         }
 
-        RegionImageCache ric = RegionImageCache.instance();
+        RegionImageCache ric = DataCache.instance().getRegionImageCache();
         if (ric.textureNeedsUpdate(regionCoord, mapType, 0))
         {
             ric.updateRegionTexture(regionCoord, mapType, true);
@@ -136,7 +139,7 @@ public class TileDrawStep
         }
         else
         {
-            textureId = RegionImageCache.instance().getBoundRegionTextureId(regionCoord, mapType);
+            textureId = DataCache.instance().getRegionImageCache().getBoundRegionTextureId(regionCoord, mapType);
         }
 
         // Draw already!
@@ -157,6 +160,10 @@ public class TileDrawStep
         final double endU = fullSize ? 1D : sx2 / size;
         final double endV = fullSize ? 1D : sy2 / size;
 
+        // Background
+        DrawUtil.drawRectangle(startX, startY, endX - startX, endY - startY, bgColor, 200);
+
+        // Tile
         if (textureId != null && textureId != -1)
         {
             GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -176,7 +183,12 @@ public class TileDrawStep
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
             drawBoundTexture(startU, startV, startX, startY, z, endU, endV, endX, endY);
         }
+        else
+        {
+            //System.out.println("Missing texture: " + this);
+        }
 
+        // Grid
         if (gridSpec != null)
         {
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, textureFilter); // GL11.GL_LINEAR_MIPMAP_NEAREST
@@ -189,13 +201,15 @@ public class TileDrawStep
 
         if (debug)
         {
-            DrawUtil.drawRectangle(startX, startY, 2, endV * 512, Color.green, 200);
-            DrawUtil.drawRectangle(startX, startY, endU * 512, 2, Color.red, 200);
-            DrawUtil.drawLabel(this.toString(), startX + 5, startY + 10, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
-            DrawUtil.drawLabel(String.format("Full size: %s", fullSize), startX + 5, startY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
+            int debugX = (int) startX;
+            int debugY = (int) startY;
+            DrawUtil.drawRectangle(debugX, debugY, 3, endV * 512, Color.green, 200);
+            DrawUtil.drawRectangle(debugX, debugY, endU * 512, 3, Color.red, 200);
+            DrawUtil.drawLabel(this.toString(), debugX + 5, debugY + 10, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
+            DrawUtil.drawLabel(String.format("Full size: %s", fullSize), debugX + 5, debugY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
             if (hasTexture())
             {
-                DrawUtil.drawLabel(new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(imageTimestamp)), startX + 5, startY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
+                DrawUtil.drawLabel(new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(imageTimestamp)), debugX + 5, debugY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
             }
         }
 
@@ -222,12 +236,12 @@ public class TileDrawStep
 
     public boolean hasTexture()
     {
-        return scaledTexture != null || RegionImageCache.instance().getBoundRegionTextureId(regionCoord, mapType) != null;
+        return scaledTexture != null || DataCache.instance().getRegionImageCache().getBoundRegionTextureId(regionCoord, mapType) != null;
     }
 
 //    public boolean isDirtySince(long time)
 //    {
-//        return RegionImageCache.instance().isDirtySince(regionCoord, mapType, time);
+//        return DataCache.instance().getRegionImageCache().isDirtySince(regionCoord, mapType, time);
 //    }
 
     public void clearTexture()
@@ -243,9 +257,9 @@ public class TileDrawStep
 
     public void refreshIfDirty()
     {
-        if (RegionImageCache.instance().textureNeedsUpdate(regionCoord, mapType, 0)
+        if (DataCache.instance().getRegionImageCache().textureNeedsUpdate(regionCoord, mapType, 0)
                 || (highQuality && scaledTexture == null)
-                || (scaledTexture != null && RegionImageCache.instance().isDirtySince(regionCoord, mapType, scaledTexture.getLastUpdated())))
+                || (scaledTexture != null && DataCache.instance().getRegionImageCache().isDirtySince(regionCoord, mapType, scaledTexture.getLastUpdated())))
         {
             updateTexture();
         }

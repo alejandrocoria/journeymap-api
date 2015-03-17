@@ -31,14 +31,27 @@ import java.util.*;
 public abstract class ImageSet
 {
     protected final Map<Constants.MapType, Wrapper> imageWrappers;
+    protected long lastTouched;
     protected StatTimer writeToDiskTimer = StatTimer.get("ImageSet.writeToDisk", 2, 500);
 
     public ImageSet()
     {
         imageWrappers = Collections.synchronizedMap(new HashMap<Constants.MapType, Wrapper>(3));
+        touch();
     }
 
     protected abstract Wrapper getWrapper(Constants.MapType mapType);
+
+    public <T extends ImageSet> T touch()
+    {
+        lastTouched = System.currentTimeMillis();
+        return (T) this;
+    }
+
+    public long getLastTouched()
+    {
+        return lastTouched;
+    }
 
     public BufferedImage getImage(Constants.MapType mapType)
     {

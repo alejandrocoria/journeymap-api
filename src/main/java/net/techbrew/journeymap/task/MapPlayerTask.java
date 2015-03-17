@@ -211,6 +211,7 @@ public class MapPlayerTask extends BaseMapTask
         this.scheduledChunks = chunkCoords.size();
     }
 
+    @Override
     protected void complete(boolean cancelled, boolean hadError)
     {
         elapsedNs = System.nanoTime() - startNs;

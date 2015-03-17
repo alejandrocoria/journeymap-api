@@ -52,7 +52,7 @@ public class GridRenderer
     private final boolean debug = logger.isTraceEnabled();
     private final TreeMap<TilePos, Tile> grid = new TreeMap<TilePos, Tile>();
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
-    private final Color bgColor = new Color(0x22, 0x22, 0x22);
+
     StatTimer updateTilesTimer1 = StatTimer.get("GridRenderer.updateTiles(1)", 5, 500);
     StatTimer updateTilesTimer2 = StatTimer.get("GridRenderer.updateTiles(2)", 5, 500);
     private GridSpecs gridSpecs = new GridSpecs();
@@ -64,6 +64,7 @@ public class GridRenderer
     private int lastWidth = -1;
     private MapType mapType = MapType.day;
     private int centerTileHash = Integer.MIN_VALUE;
+    private Integer vSlice;
     private int zoom;
     private double centerBlockX;
     private double centerBlockZ;
@@ -110,11 +111,11 @@ public class GridRenderer
 
     private void populateGrid(Tile centerTile)
     {
-
         final int endRow = (gridSize - 1) / 2;
         final int endCol = (gridSize - 1) / 2;
         final int startRow = -endRow;
         final int startCol = -endCol;
+
         for (int z = startRow; z <= endRow; z++)
         {
             for (int x = startCol; x <= endCol; x++)
@@ -218,6 +219,7 @@ public class GridRenderer
         updateTilesTimer1.start();
         this.mapType = mapType;
         this.zoom = zoom;
+        this.vSlice = vSlice;
 
         // Update screen dimensions
         updateBounds(width, height);
@@ -378,11 +380,10 @@ public class GridRenderer
             {
                 TilePos pos = entry.getKey();
                 Tile tile = entry.getValue();
-                if (tile == null || !tile.hasTexture())
+
+                if (tile == null)
                 {
-                    final double startX = offsetX + pos.startX;
-                    final double startZ = offsetZ + pos.startZ;
-                    DrawUtil.drawRectangle(startX, startZ, Tile.TILESIZE, Tile.TILESIZE, bgColor, 200);
+                    continue;
                 }
                 else
                 {
@@ -555,7 +556,7 @@ public class GridRenderer
 
     private Tile findTile(final int tileX, final int tileZ, final int zoom)
     {
-        return new Tile(tileX, tileZ, zoom);
+        return Tile.create(tileX, tileZ, zoom, worldDir, mapType, JourneyMap.getCoreProperties().tileHighDisplayQuality.get(), vSlice, dimension);
     }
 
     public void setContext(File worldDir, int dimension)

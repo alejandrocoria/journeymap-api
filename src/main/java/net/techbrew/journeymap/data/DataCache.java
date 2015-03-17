@@ -19,10 +19,12 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.*;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
 import net.techbrew.journeymap.render.draw.DrawWayPointStep;
+import net.techbrew.journeymap.render.texture.DelayedTexture;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,12 +42,16 @@ public class DataCache
     final LoadingCache<Class, Collection<Waypoint>> waypoints;
     final LoadingCache<Class, EntityDTO> player;
     final LoadingCache<Class, WorldData> world;
+    final Cache<Integer, Future<DelayedTexture>> futureTextureCache;
+    final LoadingCache<Integer, DelayedTexture> regionTextureCache;
+    final LoadingCache<RegionCoord, RegionImageSet> regionImageSetsCache;
     final LoadingCache<Class, Map<String, Object>> messages;
     final LoadingCache<EntityDTO, DrawEntityStep> entityDrawSteps;
     final LoadingCache<Waypoint, DrawWayPointStep> waypointDrawSteps;
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
     final LoadingCache<Block, HashMap<Integer, BlockMD>> blockMetadata;
     final BlockMDCache blockMetadataLoader;
+    final RegionImageCache regionImageCache;
     final ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadataRemovalListener;
     final HashMap<Cache, String> managedCaches = new HashMap<Cache, String>();
     final WeakHashMap<Cache, String> privateCaches = new WeakHashMap<Cache, String>();
@@ -99,6 +105,14 @@ public class DataCache
         entityDTOs = getCacheBuilder().weakKeys().build(new EntityDTO.SimpleCacheLoader());
         managedCaches.put(entityDTOs, "EntityDTO");
 
+        futureTextureCache = RegionImageCache.initFutureTextureCache(getCacheBuilder());
+        regionTextureCache = RegionImageCache.initRegionTextureCache(getCacheBuilder());
+        regionImageSetsCache = RegionImageCache.initRegionImageSetsCache(getCacheBuilder());
+        regionImageCache = new RegionImageCache(futureTextureCache, regionTextureCache, regionImageSetsCache);
+        managedCaches.put(futureTextureCache, "RegionFutureTexture");
+        managedCaches.put(regionTextureCache, "RegionTexture");
+        managedCaches.put(regionImageSetsCache, "RegionImageSet");
+
         chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>>();
         chunkMetadata = getCacheBuilder().expireAfterAccess(30, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
         managedCaches.put(chunkMetadata, "ChunkMD");
@@ -136,7 +150,7 @@ public class DataCache
 
     public void addPrivateCache(String name, Cache cache)
     {
-        if(privateCaches.containsValue(name))
+        if (privateCaches.containsValue(name))
         {
             JourneyMap.getLogger().warn("Overriding private cache: " + name);
         }
@@ -145,9 +159,9 @@ public class DataCache
 
     public Cache getPrivateCache(String name)
     {
-        for(Map.Entry<Cache, String> entry : privateCaches.entrySet())
+        for (Map.Entry<Cache, String> entry : privateCaches.entrySet())
         {
-            if(entry.getValue().equals(name))
+            if (entry.getValue().equals(name))
             {
                 return entry.getKey();
             }
@@ -488,14 +502,21 @@ public class DataCache
         return blockMetadataLoader.getBlockMD(blockMetadata, block, meta);
     }
 
+    public RegionImageCache getRegionImageCache()
+    {
+        return regionImageCache;
+    }
+
     /**
      * Empties the cache
      */
     public void purge()
     {
+        regionImageCache.flushToDisk();
+
         synchronized (managedCaches)
         {
-            for(Cache cache : managedCaches.keySet())
+            for (Cache cache : managedCaches.keySet())
             {
                 try
                 {
@@ -510,7 +531,7 @@ public class DataCache
 
         synchronized (privateCaches)
         {
-            for(Cache cache : privateCaches.keySet())
+            for (Cache cache : privateCaches.keySet())
             {
                 try
                 {
@@ -555,7 +576,7 @@ public class DataCache
 
         sb.append("<b>").append(name).append(":</b>");
         sb.append("<pre>");
-        for(Map.Entry<Cache, String> entry : list)
+        for (Map.Entry<Cache, String> entry : list)
         {
             sb.append(toString(entry.getValue(), entry.getKey()));
         }

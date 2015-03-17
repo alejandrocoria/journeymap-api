@@ -34,7 +34,6 @@ import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
-import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.properties.*;
 import net.techbrew.journeymap.render.map.TileDrawStepCache;
 import net.techbrew.journeymap.render.texture.TextureCache;
@@ -464,9 +463,8 @@ public class JourneyMap
         chunkRenderController = new ChunkRenderController();
         Fullscreen.state().follow.set(true);
         StatTimer.resetAll();
-        TextureCache.instance().purge();
-        RegionImageCache.instance().flushToDisk();
-        RegionImageCache.instance().clear();
+        //TextureCache.instance().purge();
+
         UIManager.getInstance().reset();
         WaypointStore.instance().reset();
     }
@@ -478,8 +476,6 @@ public class JourneyMap
         DataCache.instance().purge();
         DataCache.instance().resetBlockMetadata();
         TileDrawStepCache.instance().invalidateAll();
-        RegionImageCache.instance().flushToDisk();
-        RegionImageCache.instance().clear();
         UIManager.getInstance().reset();
         WaypointStore.instance().reset();
         MiniMapOverlayHandler.checkEventConfig();

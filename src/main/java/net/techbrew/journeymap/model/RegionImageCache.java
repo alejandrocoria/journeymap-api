@@ -9,8 +9,6 @@
 package net.techbrew.journeymap.model;
 
 import com.google.common.cache.*;
-import com.google.common.collect.MultimapBuilder;
-import com.google.common.collect.SetMultimap;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
@@ -23,6 +21,7 @@ import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import org.apache.logging.log4j.Level;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -35,57 +34,27 @@ import java.util.concurrent.TimeUnit;
 
 public class RegionImageCache
 {
-    private static final int SIZE = 25;
-    private static final long flushInterval = TimeUnit.SECONDS.toMillis(30);
-    private static final long regionCacheAge = TimeUnit.SECONDS.toMillis(15);
-    private final Object lock = new Object();
-
-    private final Cache<Integer, Future<DelayedTexture>> futureTextureCache;
-    private final LoadingCache<Integer, DelayedTexture> regionTextureCache;
-
-    private volatile Map<RegionCoord, RegionImageSet> imageSets;
+    public static final long flushInterval = TimeUnit.SECONDS.toMillis(30);
+    public static final long regionCacheAge = flushInterval / 2;
+    private static boolean logCacheActions = false;
+    final Cache<Integer, Future<DelayedTexture>> futureTextureCache;
+    final LoadingCache<Integer, DelayedTexture> regionTextureCache;
+    final LoadingCache<RegionCoord, RegionImageSet> regionImageSetsCache;
     private volatile long lastFlush;
-    private boolean logCacheActions = false;
-
     private MapType lastRequestedMapType = MapType.day;
 
-    // Private constructor
-    private RegionImageCache()
+    /**
+     * Underlying caches are to be managed by the DataCache.
+     */
+    public RegionImageCache(final Cache<Integer, Future<DelayedTexture>> futureTextureCache,
+                            final LoadingCache<Integer, DelayedTexture> regionTextureCache,
+                            final LoadingCache<RegionCoord, RegionImageSet> regionImageSetsCache)
     {
-        imageSets = Collections.synchronizedMap(new CacheMap(SIZE));
+        this.futureTextureCache = futureTextureCache;
+        this.regionTextureCache = regionTextureCache;
+        this.regionImageSetsCache = regionImageSetsCache;
 
-        //dirty = Collections.synchronizedSet(new HashSet<RegionCoord>(SIZE));
         lastFlush = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);
-
-        this.futureTextureCache = CacheBuilder.newBuilder()
-                .expireAfterAccess(regionCacheAge, TimeUnit.MILLISECONDS)
-                .build();
-
-        this.regionTextureCache = CacheBuilder.newBuilder()
-                .expireAfterAccess(regionCacheAge, TimeUnit.MILLISECONDS)
-                .removalListener(new RemovalListener<Integer, DelayedTexture>()
-                {
-                    @Override
-                    public void onRemoval(RemovalNotification<Integer, DelayedTexture> notification)
-                    {
-                        if (notification != null && notification.getValue() != null)
-                        {
-                            if (logCacheActions)
-                            {
-                                logCacheAction("REMOVE", notification.getValue());
-                            }
-                            TextureCache.instance().expireTexture(notification.getValue());
-                        }
-                    }
-                })
-                .build(new CacheLoader<Integer, DelayedTexture>()
-                {
-                    @Override
-                    public DelayedTexture load(Integer key) throws Exception
-                    {
-                        return new DelayedTexture();
-                    }
-                });
 
         // Add shutdown hook to flush cache to disk
         Runtime.getRuntime().addShutdownHook(new JMThreadFactory("rcache").newThread(new Runnable()
@@ -102,10 +71,83 @@ public class RegionImageCache
         }));
     }
 
-    // Get singleton instance.  Concurrency-safe.
-    public static RegionImageCache instance()
+    public static Cache<Integer, Future<DelayedTexture>> initFutureTextureCache(CacheBuilder<Object, Object> builder)
     {
-        return Holder.INSTANCE;
+        return builder.concurrencyLevel(1).expireAfterAccess(regionCacheAge, TimeUnit.MILLISECONDS).build();
+    }
+
+    public static LoadingCache<Integer, DelayedTexture> initRegionTextureCache(CacheBuilder<Object, Object> builder)
+    {
+        return builder
+                .concurrencyLevel(1)
+                .expireAfterAccess(regionCacheAge, TimeUnit.MILLISECONDS)
+                .removalListener(new RemovalListener<Integer, DelayedTexture>()
+                {
+                    @Override
+                    @ParametersAreNonnullByDefault
+                    public void onRemoval(RemovalNotification<Integer, DelayedTexture> notification)
+                    {
+                        if (notification != null && notification.getValue() != null)
+                        {
+                            if (logCacheActions)
+                            {
+                                logCacheAction("REMOVE", notification.getValue());
+                            }
+                            TextureCache.instance().expireTexture(notification.getValue());
+                        }
+                    }
+                })
+                .build(new CacheLoader<Integer, DelayedTexture>()
+                {
+                    @Override
+                    @ParametersAreNonnullByDefault
+                    public DelayedTexture load(Integer key) throws Exception
+                    {
+                        return new DelayedTexture();
+                    }
+                });
+    }
+
+    public static LoadingCache<RegionCoord, RegionImageSet> initRegionImageSetsCache(CacheBuilder<Object, Object> builder)
+    {
+        return builder
+                .concurrencyLevel(1)
+                .expireAfterAccess(regionCacheAge, TimeUnit.MILLISECONDS)
+                .removalListener(new RemovalListener<RegionCoord, RegionImageSet>()
+                {
+                    @Override
+                    @ParametersAreNonnullByDefault
+                    public void onRemoval(RemovalNotification<RegionCoord, RegionImageSet> notification)
+                    {
+                        if (notification.getValue() != null)
+                        {
+                            notification.getValue().writeToDisk(false);
+                            //System.out.println(notification.getKey() + " last touched: " + (System.currentTimeMillis() - notification.getValue().getLastTouched()));
+                        }
+                    }
+                }).build(new CacheLoader<RegionCoord, RegionImageSet>()
+                {
+                    @Override
+                    @ParametersAreNonnullByDefault
+                    public RegionImageSet load(RegionCoord key) throws Exception
+                    {
+                        return new RegionImageSet(key);
+                    }
+                });
+    }
+
+    private static void logCacheAction(String action, TextureImpl texture)
+    {
+        if (texture != null)
+        {
+            String time = texture.getLastUpdated() == 0 ? "Never" : new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(texture.getLastUpdated()));
+            JourneyMap.getLogger().info(String.format("RegionImageCache: %s %s (GLID %s) on %s",
+                    action, texture.getDescription(), texture.getSafeGlTextureId(), time));
+        }
+        else
+        {
+            JourneyMap.getLogger().info(String.format("RegionImageCache: %s on NULL?", action));
+        }
     }
 
     public void updateRegionTexture(final RegionCoord rCoord, final Constants.MapType mapType, boolean aSync)
@@ -134,7 +176,7 @@ public class RegionImageCache
                 }
             }
 
-            long imageTime = getRegionImageSet(rCoord).getWrapper(mapType).getTimestamp();
+            long imageTime = getRegionImageSet(rCoord).touch().getWrapper(mapType).getTimestamp();
             if (existing.getLastUpdated() >= imageTime)
             {
                 if (logCacheActions)
@@ -193,14 +235,6 @@ public class RegionImageCache
         }
     }
 
-
-    private Long getRegionTextureLastUpdatedIfExists(RegionCoord rCoord, MapType mapType)
-    {
-        final int hash = Objects.hash(rCoord, mapType);
-        DelayedTexture texture = regionTextureCache.getIfPresent(hash);
-        return texture == null ? null : texture.getLastUpdated();
-    }
-
     private DelayedTexture getRegionTextureByHash(int hash)
     {
         try
@@ -230,7 +264,7 @@ public class RegionImageCache
             updateRegionTexture(rCoord, mapType, true);
             return null;
         }
-
+        getRegionImageSet(rCoord).touch(); // touch
         texture.bindTexture();
         return texture.getSafeGlTextureId();
     }
@@ -269,48 +303,50 @@ public class RegionImageCache
 
     public RegionImageSet getRegionImageSet(RegionCoord rCoord)
     {
-        synchronized (lock)
-        {
-            RegionImageSet ris = imageSets.get(rCoord);
-            if (ris == null)
-            {
-                ris = new RegionImageSet(rCoord);
-                imageSets.put(rCoord, ris);
-            }
-            return ris;
-        }
+        return regionImageSetsCache.getUnchecked(rCoord);
     }
 
     public boolean contains(RegionCoord rCoord)
     {
-        synchronized (lock)
-        {
-            return imageSets.containsKey(rCoord);
-        }
-    }
-
-    public List<RegionCoord> getRegions()
-    {
-        synchronized (lock)
-        {
-            return new ArrayList<RegionCoord>(imageSets.keySet());
-        }
+        return regionImageSetsCache.getIfPresent(rCoord) != null;
     }
 
     public BufferedImage getGuaranteedImage(RegionCoord rCoord, Constants.MapType mapType)
     {
-        RegionImageSet ris = getRegionImageSet(rCoord);
+        RegionImageSet ris = getRegionImageSet(rCoord).touch();
         return ris.getImage(mapType);
     }
 
-    public void updateTextures(boolean forceFlush)
+    // Doesn't trigger access on cache
+    private Set<Entry<RegionCoord, RegionImageSet>> getRegionImageSets()
     {
-        SetMultimap<RegionCoord, MapType> updates = MultimapBuilder.hashKeys().hashSetValues().build();
-        for (RegionImageSet ris : imageSets.values())
+        return regionImageSetsCache.asMap().entrySet();
+    }
+
+    public void updateTextures(boolean forceFlush, EnumSet<MapType> mapTypes)
+    {
+        for (Map.Entry<RegionCoord, RegionImageSet> entry : getRegionImageSets())
         {
-            for (ImageSet.Wrapper wrapper : ris.getWrappers().values())
+            RegionImageSet ris = entry.getValue();
+            for (MapType mapType : mapTypes)
             {
-                updates.put(ris.rCoord, wrapper.mapType);
+                ImageSet.Wrapper wrapper = ris.getWrapper(mapType);
+                if (textureNeedsUpdate(ris.rCoord, wrapper.mapType, 0))
+                {
+                    updateRegionTexture(ris.rCoord, wrapper.mapType, wrapper.mapType == lastRequestedMapType);
+                    if (logCacheActions)
+                    {
+                        JourneyMap.getLogger().info("MAPTASK UPDATE " + ris.rCoord + " " + wrapper.mapType);
+                    }
+                }
+                else
+                {
+                    checkExpired(ris);
+                    if (logCacheActions)
+                    {
+                        JourneyMap.getLogger().info("MAPTASK SKIP " + ris.rCoord + " " + wrapper.mapType);
+                    }
+                }
             }
         }
 
@@ -323,58 +359,36 @@ public class RegionImageCache
         {
             autoFlush();
         }
+    }
 
-        // Update textures
-        for (RegionCoord rCoord : updates.keySet())
+    private void checkExpired(RegionImageSet regionImageSet)
+    {
+        if (System.currentTimeMillis() - regionImageSet.getLastTouched() > regionCacheAge)
         {
-            for (MapType mapType : updates.get(rCoord))
-            {
-                int marginOfError = (mapType == lastRequestedMapType) ? 0 : (int) regionCacheAge / 2;
-                if (textureNeedsUpdate(rCoord, mapType, marginOfError))
-                {
-                    updateRegionTexture(rCoord, mapType, mapType == lastRequestedMapType);
-                    if (logCacheActions)
-                    {
-                        JourneyMap.getLogger().info("MAPTASK UPDATE " + rCoord + " " + mapType);
-                    }
-                }
-                else
-                {
-                    if (logCacheActions)
-                    {
-                        JourneyMap.getLogger().info("MAPTASK SKIP " + rCoord + " " + mapType);
-                    }
-                }
-            }
+            regionImageSetsCache.invalidate(regionImageSet.rCoord);
         }
-
+        //System.out.println(System.currentTimeMillis() - regionImageSet.getLastTouched());
     }
 
     private void autoFlush()
     {
-        synchronized (lock)
+        if (lastFlush + flushInterval < System.currentTimeMillis())
         {
-            if (lastFlush + flushInterval < System.currentTimeMillis())
+            if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
             {
-                if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
-                {
-                    JourneyMap.getLogger().debug("RegionImageCache auto-flushing"); //$NON-NLS-1$
-                }
-                flushToDisk();
+                JourneyMap.getLogger().debug("RegionImageCache auto-flushing"); //$NON-NLS-1$
             }
+            flushToDisk();
         }
     }
 
     public void flushToDisk()
     {
-        synchronized (lock)
+        for (Map.Entry<RegionCoord, RegionImageSet> entry : getRegionImageSets())
         {
-            for (RegionImageSet ris : imageSets.values())
-            {
-                ris.writeToDisk(false);
-            }
-            lastFlush = System.currentTimeMillis();
+            entry.getValue().writeToDisk(false);
         }
+        lastFlush = System.currentTimeMillis();
     }
 
     /**
@@ -396,20 +410,18 @@ public class RegionImageCache
         }
         else
         {
-            ArrayList<RegionCoord> list = new ArrayList<RegionCoord>(imageSets.size());
-            synchronized (lock)
+            ArrayList<RegionCoord> list = new ArrayList<RegionCoord>();
+            for (Map.Entry<RegionCoord, RegionImageSet> entry : getRegionImageSets())
             {
-                for (Entry<RegionCoord, RegionImageSet> entry : imageSets.entrySet())
+                RegionImageSet regionImageSet = entry.getValue();
+                if (regionImageSet.updatedSince(mapType, time))
                 {
-                    if (entry.getValue().updatedSince(mapType, time))
-                    {
-                        list.add(entry.getKey());
-                    }
+                    list.add(regionImageSet.rCoord);
                 }
-                if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
-                {
-                    JourneyMap.getLogger().debug("Dirty regions: " + list.size() + " of " + imageSets.size());
-                }
+            }
+            if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
+            {
+                JourneyMap.getLogger().debug("Dirty regions: " + list.size() + " of " + regionImageSetsCache.size());
             }
             return list;
         }
@@ -439,7 +451,6 @@ public class RegionImageCache
         return false;
     }
 
-
     /**
      * Check whether a given RegionCoord is dirty since a given time
      *
@@ -461,22 +472,14 @@ public class RegionImageCache
 
     public void clear()
     {
-        synchronized (lock)
-        {
-            for (ImageSet imageSet : imageSets.values())
-            {
-                imageSet.clear();
-            }
-            imageSets.clear();
+        regionImageSetsCache.invalidateAll();
+        regionImageSetsCache.cleanUp();
 
-            futureTextureCache.invalidateAll();
-            futureTextureCache.cleanUp();
+        futureTextureCache.invalidateAll();
+        futureTextureCache.cleanUp();
 
-            regionTextureCache.invalidateAll();
-            regionTextureCache.cleanUp();
-
-            lastFlush = System.currentTimeMillis();
-        }
+        regionTextureCache.invalidateAll();
+        regionTextureCache.cleanUp();
     }
 
     public boolean deleteMap(MapState state, boolean allDims)
@@ -508,88 +511,28 @@ public class RegionImageCache
 
         if (dirs != null && dirs.length > 0)
         {
-            synchronized (lock)
+            // Clear cache
+            this.clear();
+
+            // Remove directories
+            boolean result = true;
+            for (File dir : dirs)
             {
-                // Clear cache
-                this.clear();
-
-                // Remove directories
-                boolean result = true;
-                for (File dir : dirs)
+                FileHandler.delete(dir);
+                JourneyMap.getLogger().info(String.format("Deleted image directory %s: %s", dir, !dir.exists()));
+                if (dir.exists())
                 {
-                    FileHandler.delete(dir);
-                    JourneyMap.getLogger().info(String.format("Deleted image directory %s: %s", dir, !dir.exists()));
-                    if (dir.exists())
-                    {
-                        result = false;
-                    }
+                    result = false;
                 }
-
-                JourneyMap.getLogger().info("Done deleting directories");
-                return result;
             }
+
+            JourneyMap.getLogger().info("Done deleting directories");
+            return result;
         }
         else
         {
             JourneyMap.getLogger().info("Found no DIM directories in " + imageDir);
             return true;
-        }
-    }
-
-    private void logCacheAction(String action, TextureImpl texture)
-    {
-        if (texture != null)
-        {
-            String time = texture.getLastUpdated() == 0 ? "Never" : new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(texture.getLastUpdated()));
-            JourneyMap.getLogger().info(String.format("RegionImageCache: %s %s (GLID %s) on %s",
-                    action, texture.getDescription(), texture.getSafeGlTextureId(), time));
-        }
-        else
-        {
-            JourneyMap.getLogger().info(String.format("RegionImageCache: %s on NULL?", action));
-        }
-    }
-
-    // On-demand-holder for instance
-    private static class Holder
-    {
-        private static final RegionImageCache INSTANCE = new RegionImageCache();
-    }
-
-    /**
-     * LinkedHashMap serves as a LRU cache that can write a RIS to disk
-     * when it's removed.
-     *
-     * @author mwoodman
-     */
-    class CacheMap extends LinkedHashMap<RegionCoord, RegionImageSet>
-    {
-
-        private final int capacity;
-
-        CacheMap(int capacity)
-        {
-            super(capacity + 1, 1.1f, true);
-            this.capacity = capacity;
-        }
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<RegionCoord, RegionImageSet> entry)
-        {
-            Boolean remove = size() > capacity;
-            if (remove)
-            {
-                if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
-                {
-                    JourneyMap.getLogger().debug("RegionImageCache purging " + entry.getKey()); //$NON-NLS-1$
-                }
-                entry.getValue().writeToDisk(false);
-            }
-            if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
-            {
-                JourneyMap.getLogger().debug("RegionImageCache size: " + (this.size() - 1)); //$NON-NLS-1$
-            }
-            return remove;
         }
     }
 }

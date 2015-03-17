@@ -25,7 +25,6 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.ChunkMD;
 import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.model.RegionCoord;
-import net.techbrew.journeymap.model.RegionImageCache;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -117,7 +116,7 @@ public class MapRegionTask extends BaseMapTask
         lastTaskCompleted = System.currentTimeMillis();
         if (!cancelled)
         {
-            RegionImageCache.instance().flushToDisk();
+            DataCache.instance().getRegionImageCache().flushToDisk();
         }
         DataCache.instance().invalidateChunkMDCache();
         if (hadError || cancelled)
@@ -232,8 +231,8 @@ public class MapRegionTask extends BaseMapTask
 
             if (regionLoader != null)
             {
-                RegionImageCache.instance().flushToDisk();
-                RegionImageCache.instance().clear();
+                DataCache.instance().getRegionImageCache().flushToDisk();
+                DataCache.instance().getRegionImageCache().clear();
                 regionLoader.getRegions().clear();
                 regionLoader = null;
             }

@@ -45,7 +45,7 @@ public class Tile
     int textureFilter = 0;
     int textureWrap = 0;
 
-    public Tile(final int tileX, final int tileZ, final int zoom)
+    private Tile(final int tileX, final int tileZ, final int zoom)
     {
         this.tileX = tileX;
         this.tileZ = tileZ;
@@ -56,6 +56,13 @@ public class Tile
         ulBlock = new Point(ulChunk.chunkXPos * 16, ulChunk.chunkZPos * 16);
         lrBlock = new Point((lrChunk.chunkXPos * 16) + 15, (lrChunk.chunkZPos * 16) + 15);
         updateRenderType();
+    }
+
+    public static Tile create(final int tileX, final int tileZ, final int zoom, File worldDir, final MapType mapType, boolean highQuality, final Integer vSlice, int dimension)
+    {
+        Tile tile = new Tile(tileX, tileZ, zoom);
+        tile.updateTexture(worldDir, mapType, highQuality, vSlice, dimension);
+        return tile;
     }
 
     public static int blockPosToTile(int b, int zoom)
