@@ -118,10 +118,10 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         }
 
         // Torches from mods shouldn't cast block-sized shadows
-        List<String> torches = Arrays.asList("TConstruct:decoration.stonetorch",
+        List<String> torches = new ArrayList<String>(Arrays.asList("TConstruct:decoration.stonetorch",
                 "CarpentersBlocks:blockCarpentersTorch",
                 "ExtraUtilities:magnumTorch",
-                "appliedenergistics2:tile.BlockQuartzTorch");
+                "appliedenergistics2:tile.BlockQuartzTorch"));
         for (int i = 1; i <= 10; i++)
         {
             torches.add("chisel:torch" + i);
