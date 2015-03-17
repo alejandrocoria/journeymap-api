@@ -19,12 +19,10 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.*;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
 import net.techbrew.journeymap.render.draw.DrawWayPointStep;
-import net.techbrew.journeymap.render.texture.DelayedTexture;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,9 +40,7 @@ public class DataCache
     final LoadingCache<Class, Collection<Waypoint>> waypoints;
     final LoadingCache<Class, EntityDTO> player;
     final LoadingCache<Class, WorldData> world;
-    final Cache<Integer, Future<DelayedTexture>> futureTextureCache;
-    final LoadingCache<Integer, DelayedTexture> regionTextureCache;
-    final LoadingCache<RegionCoord, RegionImageSet> regionImageSetsCache;
+    final LoadingCache<RegionCoord, RegionImageSet> regionImageSets;
     final LoadingCache<Class, Map<String, Object>> messages;
     final LoadingCache<EntityDTO, DrawEntityStep> entityDrawSteps;
     final LoadingCache<Waypoint, DrawWayPointStep> waypointDrawSteps;
@@ -53,7 +49,6 @@ public class DataCache
     final Cache<Integer, RegionCoord> regionCoords;
     final LoadingCache<Block, HashMap<Integer, BlockMD>> blockMetadata;
     final BlockMDCache blockMetadataLoader;
-    final RegionImageCache regionImageCache;
     final ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadataRemovalListener;
     final HashMap<Cache, String> managedCaches = new HashMap<Cache, String>();
     final WeakHashMap<Cache, String> privateCaches = new WeakHashMap<Cache, String>();
@@ -109,14 +104,8 @@ public class DataCache
         entityDTOs = getCacheBuilder().weakKeys().build(new EntityDTO.SimpleCacheLoader());
         managedCaches.put(entityDTOs, "EntityDTO");
 
-        futureTextureCache = RegionImageCache.initFutureTextureCache(getCacheBuilder());
-        managedCaches.put(futureTextureCache, "RegionFutureTexture");
-
-        regionTextureCache = RegionImageCache.initRegionTextureCache(getCacheBuilder());
-        managedCaches.put(regionTextureCache, "RegionTexture");
-        regionImageSetsCache = RegionImageCache.initRegionImageSetsCache(getCacheBuilder());
-        managedCaches.put(regionImageSetsCache, "RegionImageSet");
-        regionImageCache = new RegionImageCache(futureTextureCache, regionTextureCache, regionImageSetsCache);
+        regionImageSets = RegionImageCache.initRegionImageSetsCache(getCacheBuilder());
+        managedCaches.put(regionImageSets, "RegionImageSet");
 
         chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>>();
         chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
@@ -514,9 +503,9 @@ public class DataCache
         return blockMetadataLoader.getBlockMD(blockMetadata, block, meta);
     }
 
-    public RegionImageCache getRegionImageCache()
+    public LoadingCache<RegionCoord, RegionImageSet> getRegionImageSets()
     {
-        return regionImageCache;
+        return regionImageSets;
     }
 
     public Cache<Integer, ChunkCoord> getChunkCoords()
@@ -534,7 +523,7 @@ public class DataCache
      */
     public void purge()
     {
-        regionImageCache.flushToDisk();
+        RegionImageCache.instance().flushToDisk();
 
         synchronized (managedCaches)
         {

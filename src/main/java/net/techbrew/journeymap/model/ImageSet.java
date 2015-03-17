@@ -10,37 +10,31 @@ package net.techbrew.journeymap.model;
 
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
-import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.log.StatTimer;
-import org.apache.logging.log4j.Level;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.nio.file.Path;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
- * An ImageSet contains one or more Wrappers of image, file, and maptype.
+ * An ImageSet contains one or more ImageHolders
  *
  * @author mwoodman
  */
 public abstract class ImageSet
 {
-    protected final Map<Constants.MapType, Wrapper> imageWrappers;
+    protected final Map<Constants.MapType, ImageHolder> imageHolders;
     protected long lastTouched;
-    protected StatTimer writeToDiskTimer = StatTimer.get("ImageSet.writeToDisk", 2, 500);
 
     public ImageSet()
     {
-        imageWrappers = Collections.synchronizedMap(new HashMap<Constants.MapType, Wrapper>(3));
+        imageHolders = Collections.synchronizedMap(new HashMap<Constants.MapType, ImageHolder>(3));
         touch();
     }
 
-    protected abstract Wrapper getWrapper(Constants.MapType mapType);
+    protected abstract ImageHolder getHolder(Constants.MapType mapType);
 
     public <T extends ImageSet> T touch()
     {
@@ -55,17 +49,17 @@ public abstract class ImageSet
 
     public BufferedImage getImage(Constants.MapType mapType)
     {
-        return getWrapper(mapType).getImage();
+        return getHolder(mapType).getImage();
     }
 
     public boolean writeToDisk(boolean force)
     {
         boolean updated = false;
-        for (Wrapper wrapper : imageWrappers.values())
+        for (ImageHolder imageHolder : imageHolders.values())
         {
-            if (force || wrapper.isDirty())
+            if (force || imageHolder.isDirty())
             {
-                wrapper.writeToDisk();
+                imageHolder.writeToDisk();
                 updated = true;
             }
         }
@@ -74,16 +68,16 @@ public abstract class ImageSet
 
     public boolean updatedSince(MapType mapType, long time)
     {
-        for (Wrapper wrapper : imageWrappers.values())
+        for (ImageHolder imageHolder : imageHolders.values())
         {
             if (mapType != null)
             {
-                if (wrapper.getMapType() == mapType && wrapper.getTimestamp() > time)
+                if (imageHolder.getMapType() == mapType && imageHolder.getImageTimestamp() > time)
                 {
                     return true;
                 }
             }
-            else if (wrapper.getTimestamp() > time)
+            else if (imageHolder.getImageTimestamp() > time)
             {
                 return true;
             }
@@ -95,7 +89,7 @@ public abstract class ImageSet
     public String toString()
     {
         StringBuffer sb = new StringBuffer(getClass().getSimpleName()).append("[ ");
-        Iterator<Wrapper> iter = imageWrappers.values().iterator();
+        Iterator<ImageHolder> iter = imageHolders.values().iterator();
         while (iter.hasNext())
         {
             sb.append(iter.next().toString());
@@ -109,11 +103,11 @@ public abstract class ImageSet
 
     public void clear()
     {
-        for (ImageSet.Wrapper wrapper : imageWrappers.values())
+        for (ImageHolder imageHolder : imageHolders.values())
         {
-            wrapper.clear();
+            imageHolder.clear();
         }
-        imageWrappers.clear();
+        imageHolders.clear();
     }
 
     @Override
@@ -126,135 +120,17 @@ public abstract class ImageSet
      * ************************
      */
 
-    protected abstract Wrapper addWrapper(Constants.MapType mapType, BufferedImage image);
+    protected abstract ImageHolder addHolder(Constants.MapType mapType, BufferedImage image);
 
-    protected Wrapper addWrapper(Constants.MapType mapType, File imageFile, BufferedImage image)
+    protected ImageHolder addHolder(Constants.MapType mapType, File imageFile, BufferedImage image)
     {
-        return addWrapper(new Wrapper(mapType, imageFile, image));
+        return addHolder(new ImageHolder(mapType, imageFile, image));
     }
 
-    protected Wrapper addWrapper(Wrapper wrapper)
+    protected ImageHolder addHolder(ImageHolder imageHolder)
     {
-        imageWrappers.put(wrapper.mapType, wrapper);
-        return wrapper;
+        imageHolders.put(imageHolder.mapType, imageHolder);
+        return imageHolder;
     }
 
-    class Wrapper
-    {
-        final static String delim = " : ";
-        final Constants.MapType mapType;
-        Path imagePath;
-        BufferedImage _image = null;
-        boolean _dirty = true;
-        long timestamp = System.currentTimeMillis();
-
-        Wrapper(Constants.MapType mapType, File imageFile, BufferedImage image)
-        {
-            this.mapType = mapType;
-            if (imageFile != null)
-            {
-                this.imagePath = imageFile.toPath();
-            }
-            setImage(image);
-        }
-
-        File getFile()
-        {
-            return imagePath == null ? null : imagePath.toFile();
-        }
-
-        Constants.MapType getMapType()
-        {
-            return mapType;
-        }
-
-        BufferedImage getImage()
-        {
-            return _image;
-        }
-
-        void setImage(BufferedImage image)
-        {
-            if (image != _image)
-            {
-                setDirty();
-            }
-            _image = image;
-
-        }
-
-        void setDirty()
-        {
-            _dirty = true;
-            timestamp = new Date().getTime();
-        }
-
-        long getTimestamp()
-        {
-            return timestamp;
-        }
-
-        boolean isDirty()
-        {
-            return _dirty;
-        }
-
-        protected void writeToDisk()
-        {
-            writeToDiskTimer.start();
-            try
-            {
-                if (_image == null)
-                {
-                    JourneyMap.getLogger().warn("Null image for " + this);
-                }
-                else if (imagePath == null)
-                {
-                    JourneyMap.getLogger().warn("Null path for " + this);
-                }
-                else
-                {
-                    File imageFile = imagePath.toFile();
-                    if (!imageFile.exists())
-                    {
-                        imageFile.getParentFile().mkdirs();
-                    }
-
-                    BufferedOutputStream imageOutputStream = new BufferedOutputStream(new FileOutputStream(imageFile));
-                    ImageIO.write(_image, "PNG", imageOutputStream);
-                    imageOutputStream.close();
-
-                    if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
-                    {
-                        JourneyMap.getLogger().debug("Wrote to disk: " + imageFile); //$NON-NLS-1$
-                    }
-                    _dirty = false;
-                }
-            }
-            catch (Throwable e)
-            {
-                String error = "Unexpected error writing to disk: " + this + ": " + LogFormatter.toString(e);
-                JourneyMap.getLogger().error(error);
-                //throw new RuntimeException(e);
-            }
-            writeToDiskTimer.stop();
-            if (writeToDiskTimer.hasReachedElapsedLimit() && writeToDiskTimer.getElapsedLimitWarningsRemaining() > 0)
-            {
-                JourneyMap.getLogger().warn("Image that took too long: " + this);
-            }
-        }
-
-        @Override
-        public String toString()
-        {
-            File imageFile = getFile();
-            return mapType.name() + delim + (imageFile != null ? imageFile.getPath() : "") + delim + "image=" + (_image == null ? "null" : "ok") + ", dirty=" + _dirty;
-        }
-
-        public void clear()
-        {
-            imagePath = null;
-            _image = null;
-        }
-    }
 }

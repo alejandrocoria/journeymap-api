@@ -92,7 +92,6 @@ public abstract class BaseMapTask implements ITask
 
             final long start = System.nanoTime();
             final Iterator<ChunkCoordIntPair> chunkIter = chunkCoords.iterator();
-            final RegionImageCache regionImageCache = DataCache.instance().getRegionImageCache();
             final Logger logger = JourneyMap.getLogger();
 
             // Check the dimension
@@ -162,7 +161,7 @@ public abstract class BaseMapTask implements ITask
             }
 
             // Push chunk cache to region cache
-            regionImageCache.updateTextures(flushCacheWhenDone, getMapTypes());
+            RegionImageCache.instance().updateTextures(flushCacheWhenDone, getMapTypes());
             chunkCoords.clear();
             this.complete(false, false);
             timer.stop();

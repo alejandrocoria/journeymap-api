@@ -15,10 +15,9 @@ import net.techbrew.journeymap.io.RegionImageHandler;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Map;
 
 /**
- * A RegionImageSet contains one or more Wrappers of image, file, and maptype.
+ * A RegionImageSet contains one or more ImageHolders for Region images
  *
  * @author mwoodman
  */
@@ -33,15 +32,15 @@ public class RegionImageSet extends ImageSet
     }
 
     @Override
-    protected Wrapper getWrapper(Constants.MapType mapType)
+    public ImageHolder getHolder(Constants.MapType mapType)
     {
-        synchronized (imageWrappers)
+        synchronized (imageHolders)
         {
-            // Check wrappers
-            Wrapper wrapper = imageWrappers.get(mapType);
-            if (wrapper != null)
+            // Check holder
+            ImageHolder imageHolder = imageHolders.get(mapType);
+            if (imageHolder != null)
             {
-                return wrapper;
+                return imageHolder;
             }
 
             // Prepare to find image in file
@@ -52,25 +51,20 @@ public class RegionImageSet extends ImageSet
             imageFile = RegionImageHandler.getRegionImageFile(rCoord, mapType, false);
             image = RegionImageHandler.readRegionImage(imageFile, false);
 
-            // Add wrapper
-            wrapper = addWrapper(mapType, imageFile, image);
-            return wrapper;
+            // Add holder
+            imageHolder = addHolder(mapType, imageFile, image);
+            return imageHolder;
         }
-    }
-
-    public Map<MapType, Wrapper> getWrappers()
-    {
-        return imageWrappers;
     }
 
     public void setDirty(MapType mapType)
     {
-        getWrapper(mapType).setDirty();
+        getHolder(mapType).setDirty();
     }
 
     public Graphics2D getChunkImage(ChunkCoord cCoord, MapType mapType)
     {
-        BufferedImage regionImage = getWrapper(mapType).getImage();
+        BufferedImage regionImage = getHolder(mapType).getImage();
         if (regionImage == null)
         {
             return null;
@@ -107,8 +101,8 @@ public class RegionImageSet extends ImageSet
     }
 
     @Override
-    protected Wrapper addWrapper(Constants.MapType mapType, BufferedImage image)
+    protected ImageHolder addHolder(Constants.MapType mapType, BufferedImage image)
     {
-        return addWrapper(new Wrapper(mapType, RegionImageHandler.getRegionImageFile(rCoord, mapType, false), image));
+        return addHolder(new ImageHolder(mapType, RegionImageHandler.getRegionImageFile(rCoord, mapType, false), image));
     }
 }

@@ -87,7 +87,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             else if (counter == 10)
             {
                 mc.mcProfiler.startSection("performTasks");
-                if (JourneyMap.getInstance().isMapping() && mc.theWorld != null && !mc.isGamePaused())
+                if (JourneyMap.getInstance().isMapping() && mc.theWorld != null)
                 {
                     JourneyMap.getInstance().performTasks();
                 }

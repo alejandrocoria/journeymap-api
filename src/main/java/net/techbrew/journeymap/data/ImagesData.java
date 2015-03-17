@@ -9,6 +9,7 @@
 package net.techbrew.journeymap.data;
 
 import net.techbrew.journeymap.model.RegionCoord;
+import net.techbrew.journeymap.model.RegionImageCache;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +40,7 @@ public class ImagesData
         this.queryTime = now;
 
         List<Object[]> coords = null;
-        List<RegionCoord> regions = DataCache.instance().getRegionImageCache().getDirtySince(null, this.since);
+        List<RegionCoord> regions = RegionImageCache.instance().getDirtySince(null, this.since);
         if (regions.isEmpty())
         {
             this.regions = Collections.EMPTY_LIST;

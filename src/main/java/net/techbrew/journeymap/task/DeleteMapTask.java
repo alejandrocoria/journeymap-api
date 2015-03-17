@@ -10,8 +10,8 @@ package net.techbrew.journeymap.task;
 
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.ChatLog;
+import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import org.apache.logging.log4j.Logger;
 
@@ -33,7 +33,7 @@ public class DeleteMapTask implements ITask
     {
         try
         {
-            boolean ok = DataCache.instance().getRegionImageCache().deleteMap(Fullscreen.state(), allDims);
+            boolean ok = RegionImageCache.instance().deleteMap(Fullscreen.state(), allDims);
             if (ok)
             {
                 ChatLog.announceI18N("jm.common.deletemap_status_done");

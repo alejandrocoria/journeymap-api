@@ -4,7 +4,6 @@ import com.google.common.base.Objects;
 import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.GridSpec;
@@ -79,11 +78,7 @@ public class TileDrawStep
             pendingScaledTexture = null;
         }
 
-        RegionImageCache ric = DataCache.instance().getRegionImageCache();
-        if (ric.textureNeedsUpdate(regionCoord, mapType, 0))
-        {
-            ric.updateRegionTexture(regionCoord, mapType, true);
-        }
+        RegionImageCache.instance().getRegionImageSet(regionCoord).getHolder(mapType).updateTexture();
 
         try
         {
@@ -139,7 +134,7 @@ public class TileDrawStep
         }
         else
         {
-            textureId = DataCache.instance().getRegionImageCache().getBoundRegionTextureId(regionCoord, mapType);
+            textureId = RegionImageCache.instance().getBoundRegionTextureId(regionCoord, mapType);
         }
 
         // Draw already!
@@ -236,12 +231,12 @@ public class TileDrawStep
 
     public boolean hasTexture()
     {
-        return scaledTexture != null || DataCache.instance().getRegionImageCache().getBoundRegionTextureId(regionCoord, mapType) != null;
+        return scaledTexture != null || RegionImageCache.instance().getBoundRegionTextureId(regionCoord, mapType) != null;
     }
 
 //    public boolean isDirtySince(long time)
 //    {
-//        return DataCache.instance().getRegionImageCache().isDirtySince(regionCoord, mapType, time);
+//        return RegionImageCache.instance().isDirtySince(regionCoord, mapType, time);
 //    }
 
     public void clearTexture()
@@ -253,16 +248,6 @@ public class TileDrawStep
             scaledTexture = null;
         }
         pendingScaledTexture = null;
-    }
-
-    public void refreshIfDirty()
-    {
-        if (DataCache.instance().getRegionImageCache().textureNeedsUpdate(regionCoord, mapType, 0)
-                || (highQuality && scaledTexture == null)
-                || (scaledTexture != null && DataCache.instance().getRegionImageCache().isDirtySince(regionCoord, mapType, scaledTexture.getLastUpdated())))
-        {
-            updateTexture();
-        }
     }
 
     public RegionCoord getRegionCoord()
