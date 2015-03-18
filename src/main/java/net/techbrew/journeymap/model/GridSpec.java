@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.model;
 
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -15,7 +16,7 @@ public class GridSpec
     public final float green;
     public final float blue;
     public final float alpha;
-    private TextureImpl texture = null;
+    private transient TextureImpl texture = null;
 
     public GridSpec(Style style, float red, float green, float blue, float alpha)
     {
@@ -29,18 +30,28 @@ public class GridSpec
     /**
      * MUST CALL GL11.glColor4f(1, 1, 1, alpha); when done
      */
-    public void bindTexture(int textureWrap, float mapAlpha)
+    public void beginTexture(int textureWrap, float mapAlpha)
     {
         if (texture == null || texture.isUnused())
         {
             texture = TextureCache.instance().getGrid(style.textureName);
         }
+        GL11.glEnable(GL11.GL_BLEND);
+        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
         GL11.glColor4f(red, green, blue, alpha * mapAlpha);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
+    }
+
+    public void finishTexture()
+    {
+        GL11.glColor4f(1, 1, 1, 1);
+        GL11.glClearColor(1, 1, 1, 1f); // defensive against shaders
     }
 
     public enum Style

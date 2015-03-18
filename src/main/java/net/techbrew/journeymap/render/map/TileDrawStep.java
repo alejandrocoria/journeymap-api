@@ -186,9 +186,9 @@ public class TileDrawStep
         // Grid
         if (gridSpec != null)
         {
-            gridSpec.bindTexture(textureWrap, alpha);
+            gridSpec.beginTexture(textureWrap, alpha);
             drawBoundTexture(sx1 / size, sy1 / size, startX, startY, z, sx2 / size, sy2 / size, endX, endY);
-            GL11.glColor4f(1, 1, 1, alpha);
+            gridSpec.finishTexture();
         }
 
         if (debug)

@@ -7,22 +7,22 @@ import net.techbrew.journeymap.Constants;
  */
 public class GridSpecs
 {
-    private GridSpec dayGridSpec;
-    private GridSpec nightGridSpec;
-    private GridSpec undergroundGridSpec;
+    private GridSpec day;
+    private GridSpec night;
+    private GridSpec underground;
 
     public GridSpecs()
     {
         this(new GridSpec(GridSpec.Style.Squares, .5f, .5f, .5f, .5f), // day
                 new GridSpec(GridSpec.Style.Squares, 0f, 0f, 1f, .3f), // night
-                new GridSpec(GridSpec.Style.Squares, .5f, .5f, .5f, .3f)); // underground
+                new GridSpec(GridSpec.Style.Squares, 1f, 1f, 1f, .3f)); // underground
     }
 
-    public GridSpecs(GridSpec dayGridSpec, GridSpec nightGridSpec, GridSpec undergroundGridSpec)
+    public GridSpecs(GridSpec day, GridSpec night, GridSpec underground)
     {
-        this.dayGridSpec = dayGridSpec;
-        this.nightGridSpec = nightGridSpec;
-        this.undergroundGridSpec = undergroundGridSpec;
+        this.day = day;
+        this.night = night;
+        this.underground = underground;
     }
 
     public GridSpec getSpec(Constants.MapType mapType)
@@ -30,13 +30,13 @@ public class GridSpecs
         switch (mapType)
         {
             case day:
-                return dayGridSpec;
+                return day;
             case night:
-                return nightGridSpec;
+                return night;
             case underground:
-                return undergroundGridSpec;
+                return underground;
             default:
-                return dayGridSpec;
+                return day;
         }
     }
 }
