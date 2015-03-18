@@ -44,7 +44,7 @@ import java.util.TreeMap;
  */
 public class GridRenderer
 {
-
+    private static boolean enabled = true;
     private static HashMap<String, String> messages = new HashMap<String, String>();
     // Update pixel offsets for center
     private final TilePos centerPos = new TilePos(0, 0);
@@ -100,6 +100,11 @@ public class GridRenderer
     public static void clearDebugMessages()
     {
         messages.clear();
+    }
+
+    public static void setEnabled(boolean enabled)
+    {
+        GridRenderer.enabled = enabled;
     }
 
     public void setViewPort(Rectangle2D.Double viewPort)
@@ -342,7 +347,7 @@ public class GridRenderer
      */
     public void draw(final List<? extends DrawStep> drawStepList, double xOffset, double yOffset, float drawScale, double fontScale, double rotation)
     {
-        if (drawStepList == null || drawStepList.isEmpty())
+        if (!enabled || drawStepList == null || drawStepList.isEmpty())
         {
             return;
         }
@@ -354,23 +359,18 @@ public class GridRenderer
      */
     public void draw(double xOffset, double yOffset, float drawScale, double fontScale, double rotation, DrawStep... drawSteps)
     {
-
-//        GL11.glDisable(GL11.GL_DEPTH_TEST);
-//        GL11.glDepthMask(false);
-//        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-        for (DrawStep drawStep : drawSteps)
+        if (enabled)
         {
-            drawStep.draw(xOffset, yOffset, this, drawScale, fontScale, rotation);
+            for (DrawStep drawStep : drawSteps)
+            {
+                drawStep.draw(xOffset, yOffset, this, drawScale, fontScale, rotation);
+            }
         }
-
-//        GL11.glDepthMask(true);
-//        GL11.glEnable(GL11.GL_DEPTH_TEST);
     }
 
     public void draw(final float alpha, final double offsetX, final double offsetZ, boolean showGrid)
     {
-        if (!grid.isEmpty())
+        if (enabled && !grid.isEmpty())
         {
             double centerX = offsetX + centerPixelOffset.x;
             double centerZ = offsetZ + centerPixelOffset.y;

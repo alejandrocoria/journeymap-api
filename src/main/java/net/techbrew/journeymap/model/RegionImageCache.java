@@ -310,6 +310,13 @@ public class RegionImageCache
 
         if (dirs != null && dirs.length > 0)
         {
+            // Toss all images and textures without flushing to disk
+            for (Map.Entry<RegionCoord, RegionImageSet> entry : getRegionImageSets())
+            {
+                RegionImageSet regionImageSet = entry.getValue();
+                regionImageSet.clear();
+            }
+
             // Clear cache
             this.clear();
 

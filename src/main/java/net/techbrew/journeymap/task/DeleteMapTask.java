@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.model.RegionImageCache;
+import net.techbrew.journeymap.render.map.GridRenderer;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import org.apache.logging.log4j.Logger;
 
@@ -33,6 +34,9 @@ public class DeleteMapTask implements ITask
     {
         try
         {
+            jm.toggleTask(MapPlayerTask.Manager.class, false, false);
+            jm.toggleTask(MapRegionTask.Manager.class, false, false);
+            GridRenderer.setEnabled(false);
             boolean ok = RegionImageCache.instance().deleteMap(Fullscreen.state(), allDims);
             if (ok)
             {
@@ -47,7 +51,9 @@ public class DeleteMapTask implements ITask
         }
         finally
         {
+            GridRenderer.setEnabled(true);
             jm.toggleTask(DeleteMapTask.Manager.class, false, false);
+            jm.toggleTask(MapPlayerTask.Manager.class, true, true);
         }
     }
 
