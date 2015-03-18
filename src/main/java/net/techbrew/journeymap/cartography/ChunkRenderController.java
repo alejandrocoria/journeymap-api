@@ -86,7 +86,7 @@ public class ChunkRenderController
 
                     if (renderOkay)
                     {
-                        regionImageSet.setDirty(Constants.MapType.night);
+                        regionImageSet.setDirty(Constants.MapType.underground);
                     }
                 }
             }
