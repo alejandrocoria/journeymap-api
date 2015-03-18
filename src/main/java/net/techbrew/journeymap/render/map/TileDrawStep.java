@@ -10,8 +10,8 @@ import net.techbrew.journeymap.model.GridSpec;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.render.draw.DrawUtil;
-import net.techbrew.journeymap.render.texture.DelayedTexture;
 import net.techbrew.journeymap.render.texture.TextureCache;
+import net.techbrew.journeymap.render.texture.TextureImpl;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
@@ -33,8 +33,8 @@ public class TileDrawStep
     private final boolean debug = logger.isTraceEnabled();
     private int sx1, sy1, sx2, sy2;
     private int size;
-    private DelayedTexture scaledTexture;
-    private Future<DelayedTexture> pendingScaledTexture;
+    private TextureImpl scaledTexture;
+    private Future<TextureImpl> pendingScaledTexture;
     private RegionCoord regionCoord;
     private Constants.MapType mapType;
     private Integer zoom;
@@ -284,17 +284,17 @@ public class TileDrawStep
     }
 
 
-    private Callable<DelayedTexture> createDelayedScaledTexture()
+    private Callable<TextureImpl> createDelayedScaledTexture()
     {
         if (highQuality || zoom == 0) // todo change when zoom can be < zero or 0 no longer 1:1
         {
             return null;
         }
 
-        return new Callable<DelayedTexture>()
+        return new Callable<TextureImpl>()
         {
             @Override
-            public DelayedTexture call() throws Exception
+            public TextureImpl call() throws Exception
             {
                 BufferedImage image = RegionImageHandler.getScaledRegionArea(regionCoord, mapType, zoom, highQuality, sx1, sy1);
                 if (image == null)
@@ -303,7 +303,7 @@ public class TileDrawStep
                 }
                 else
                 {
-                    return new DelayedTexture(null, image);
+                    return new TextureImpl(null, image, false, false);
                 }
             }
         };

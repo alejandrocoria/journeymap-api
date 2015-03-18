@@ -53,7 +53,7 @@ public class TextureCache
         return Holder.INSTANCE;
     }
 
-    public Future<DelayedTexture> scheduleTextureTask(Callable<DelayedTexture> textureTask)
+    public Future<TextureImpl> scheduleTextureTask(Callable<TextureImpl> textureTask)
     {
         //JourneyMap.getLogger().info("TextureCache.scheduleTextureTask()");
         return texExec.submit(textureTask);

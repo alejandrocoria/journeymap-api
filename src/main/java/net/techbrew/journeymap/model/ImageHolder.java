@@ -4,8 +4,8 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
-import net.techbrew.journeymap.render.texture.DelayedTexture;
 import net.techbrew.journeymap.render.texture.TextureCache;
+import net.techbrew.journeymap.render.texture.TextureImpl;
 import org.apache.logging.log4j.Level;
 
 import javax.imageio.ImageIO;
@@ -24,10 +24,10 @@ public class ImageHolder
     final Constants.MapType mapType;
     Path imagePath;
     BufferedImage image = null;
-    DelayedTexture texture;
+    TextureImpl texture;
     boolean dirty = true;
     long imageTimestamp = System.currentTimeMillis();
-    StatTimer writeToDiskTimer = StatTimer.get("ImageSet.writeToDisk", 2, 1000);
+    StatTimer writeToDiskTimer = StatTimer.get("ImageHolder.writeToDisk", 2, 1000);
 
     ImageHolder(Constants.MapType mapType, File imageFile, BufferedImage image)
     {
@@ -65,11 +65,11 @@ public class ImageHolder
 
     }
 
-    DelayedTexture getTexture()
+    TextureImpl getTexture()
     {
         if (texture == null)
         {
-            texture = new DelayedTexture(image);
+            texture = new TextureImpl(null, image, false, false);
         }
         return texture;
     }

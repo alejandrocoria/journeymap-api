@@ -17,7 +17,6 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
-import net.techbrew.journeymap.render.texture.DelayedTexture;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import org.apache.logging.log4j.Level;
@@ -122,7 +121,7 @@ public class RegionImageCache
         {
             lastRequestedMapType = mapType;
         }
-        DelayedTexture texture = getRegionImageSet(rCoord).touch().getHolder(mapType).getTexture();
+        TextureImpl texture = getRegionImageSet(rCoord).touch().getHolder(mapType).getTexture();
         texture.bindTexture();
         return texture.getSafeGlTextureId();
     }

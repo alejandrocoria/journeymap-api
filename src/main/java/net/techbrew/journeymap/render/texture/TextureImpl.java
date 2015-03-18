@@ -21,7 +21,6 @@ import java.nio.ByteBuffer;
 
 public class TextureImpl extends AbstractTexture
 {
-    protected final Object lock = new Object();
     protected BufferedImage image;
     protected boolean retainImage;
     protected int width;
@@ -60,7 +59,7 @@ public class TextureImpl extends AbstractTexture
     /**
      * If bindImmediately, must be called on thread with OpenGL Context.
      */
-    protected TextureImpl(Integer glId, BufferedImage image, boolean retainImage, boolean bindImmediately)
+    public TextureImpl(Integer glId, BufferedImage image, boolean retainImage, boolean bindImmediately)
     {
         if (glId != null)
         {
@@ -84,42 +83,41 @@ public class TextureImpl extends AbstractTexture
      */
     public void setImage(BufferedImage bufferedImage, boolean retainImage)
     {
-        synchronized (lock)
+
+        this.retainImage = retainImage;
+        if (retainImage)
         {
-            this.retainImage = retainImage;
-            if (retainImage)
-            {
-                this.image = bufferedImage;
-            }
-
-            this.width = bufferedImage.getWidth();
-            this.height = bufferedImage.getHeight();
-            int bufferSize = width * height * 4; // RGBA
-
-            if (buffer == null || (buffer.capacity() != bufferSize))
-            {
-                buffer = ByteBuffer.allocateDirect(bufferSize);
-            }
-            buffer.clear();
-
-            int[] pixels = new int[width * height];
-            bufferedImage.getRGB(0, 0, width, height, pixels, 0, width);
-            int pixel;
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    pixel = pixels[y * width + x];
-                    buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red
-                    buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green
-                    buffer.put((byte) ((pixel & 0xFF)));           // Blue
-                    buffer.put((byte) ((pixel >> 24) & 0xFF));     // Alpha
-                }
-            }
-            buffer.flip();
-            buffer.rewind();
-            bindNeeded = true;
+            this.image = bufferedImage;
         }
+
+        this.width = bufferedImage.getWidth();
+        this.height = bufferedImage.getHeight();
+        int bufferSize = width * height * 4; // RGBA
+
+        if (buffer == null || (buffer.capacity() != bufferSize))
+        {
+            buffer = ByteBuffer.allocateDirect(bufferSize);
+        }
+        buffer.clear();
+
+        int[] pixels = new int[width * height];
+        bufferedImage.getRGB(0, 0, width, height, pixels, 0, width);
+        int pixel;
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                pixel = pixels[y * width + x];
+                buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red
+                buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green
+                buffer.put((byte) ((pixel & 0xFF)));           // Blue
+                buffer.put((byte) ((pixel >> 24) & 0xFF));     // Alpha
+            }
+        }
+        buffer.flip();
+        buffer.rewind();
+        bindNeeded = true;
+
     }
 
     /**
@@ -129,43 +127,42 @@ public class TextureImpl extends AbstractTexture
      */
     public void bindTexture()
     {
-        synchronized (lock)
+
+        if (bindNeeded)
         {
-            if (bindNeeded)
+            try
             {
-                try
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, getGlTextureId());
+
+                //Send texel data to OpenGL
+
+                // Setup wrap mode
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+
+                //Setup texture scaling filtering
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+
+                int glErr = GL11.glGetError();
+                if (glErr != GL11.GL_NO_ERROR)
                 {
-                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, getGlTextureId());
-
-                    //Send texel data to OpenGL
-
-                    // Setup wrap mode
-                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
-
-                    //Setup texture scaling filtering
-                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-
-                    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-
-                    int glErr = GL11.glGetError();
-                    if (glErr != GL11.GL_NO_ERROR)
-                    {
-                        JourneyMap.getLogger().warn("GL Error in TextureImpl after glTexImage2D: " + glErr);
-                    }
-                    else
-                    {
-                        bindNeeded = false;
-                        setLastUpdated(System.currentTimeMillis());
-                    }
+                    JourneyMap.getLogger().warn("GL Error in TextureImpl after glTexImage2D: " + glErr);
                 }
-                catch (Throwable t)
+                else
                 {
-                    JourneyMap.getLogger().warn("Can't bind texture: " + LogFormatter.toString(t));
+                    bindNeeded = false;
+                    setLastUpdated(System.currentTimeMillis());
                 }
             }
+            catch (Throwable t)
+            {
+                JourneyMap.getLogger().warn("Can't bind texture: " + LogFormatter.toString(t));
+            }
         }
+
     }
 
     public boolean isBindNeeded()
@@ -196,11 +193,9 @@ public class TextureImpl extends AbstractTexture
      */
     public void updateTexture(BufferedImage image, boolean retainImage)
     {
-        synchronized (lock)
-        {
-            setImage(image, retainImage);
-            bindTexture();
-        }
+        setImage(image, retainImage);
+        bindTexture();
+
     }
 
 //    @Override
@@ -234,14 +229,13 @@ public class TextureImpl extends AbstractTexture
      */
     public void clear()
     {
-        synchronized (lock)
-        {
-            this.image = null;
-            this.buffer = null;
-            this.bindNeeded = false;
-            this.lastUpdated = 0;
-            this.glTextureId = -1;
-        }
+
+        this.image = null;
+        this.buffer = null;
+        this.bindNeeded = false;
+        this.lastUpdated = 0;
+        this.glTextureId = -1;
+
     }
 
     /**
@@ -259,32 +253,31 @@ public class TextureImpl extends AbstractTexture
     public boolean deleteTexture()
     {
         boolean success = false;
-        synchronized (lock)
+
+        if (this.glTextureId != -1)
         {
-            if (this.glTextureId != -1)
+            try
             {
-                try
+                if (Display.isCurrent())
                 {
-                    if (Display.isCurrent())
-                    {
-                        GL11.glDeleteTextures(this.getGlTextureId());
-                        this.glTextureId = -1;
-                        clear();
-                        success = true;
-                    }
-                }
-                catch (Throwable t)
-                {
-                    JourneyMap.getLogger().warn("Couldn't delete texture: " + t);
-                    success = false;
+                    GL11.glDeleteTextures(this.getGlTextureId());
+                    this.glTextureId = -1;
+                    clear();
+                    success = true;
                 }
             }
-            else
+            catch (Throwable t)
             {
-                clear();
-                success = true;
+                JourneyMap.getLogger().warn("Couldn't delete texture: " + t);
+                success = false;
             }
         }
+        else
+        {
+            clear();
+            success = true;
+        }
+
         return success;
     }
 
