@@ -26,14 +26,17 @@ public class GridSpec
         this.alpha = alpha;
     }
 
-    public void bindTexture(int textureWrap)
+    /**
+     * MUST CALL GL11.glColor4f(1, 1, 1, alpha); when done
+     */
+    public void bindTexture(int textureWrap, float mapAlpha)
     {
         if (texture == null || texture.isUnused())
         {
             texture = TextureCache.instance().getGrid(style.textureName);
         }
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
-        GL11.glColor4f(red, green, blue, alpha);
+        GL11.glColor4f(red, green, blue, alpha * mapAlpha);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
