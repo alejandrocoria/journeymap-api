@@ -22,6 +22,7 @@ public class ImageHolder
 {
     final static String delim = " : ";
     final Constants.MapType mapType;
+    final Object writeLock = new Object();
     Path imagePath;
     BufferedImage image = null;
     TextureImpl texture;
@@ -58,7 +59,10 @@ public class ImageHolder
     {
         if (image != this.image)
         {
-            this.image = image;
+            synchronized (writeLock)
+            {
+                this.image = image;
+            }
             setDirty();
             updateTexture();
         }
@@ -113,31 +117,34 @@ public class ImageHolder
         writeToDiskTimer.start();
         try
         {
-            if (image == null)
+            synchronized (writeLock)
             {
-                JourneyMap.getLogger().warn("Null image for " + this);
-            }
-            else if (imagePath == null)
-            {
-                JourneyMap.getLogger().warn("Null path for " + this);
-            }
-            else
-            {
-                File imageFile = imagePath.toFile();
-                if (!imageFile.exists())
+                if (image == null)
                 {
-                    imageFile.getParentFile().mkdirs();
+                    JourneyMap.getLogger().warn("Null image for " + this);
                 }
-
-                BufferedOutputStream imageOutputStream = new BufferedOutputStream(new FileOutputStream(imageFile));
-                ImageIO.write(image, "PNG", imageOutputStream);
-                imageOutputStream.close();
-
-                if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
+                else if (imagePath == null)
                 {
-                    JourneyMap.getLogger().debug("Wrote to disk: " + imageFile); //$NON-NLS-1$
+                    JourneyMap.getLogger().warn("Null path for " + this);
                 }
-                dirty = false;
+                else
+                {
+                    File imageFile = imagePath.toFile();
+                    if (!imageFile.exists())
+                    {
+                        imageFile.getParentFile().mkdirs();
+                    }
+
+                    BufferedOutputStream imageOutputStream = new BufferedOutputStream(new FileOutputStream(imageFile));
+                    ImageIO.write(image, "PNG", imageOutputStream);
+                    imageOutputStream.close();
+
+                    if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
+                    {
+                        JourneyMap.getLogger().debug("Wrote to disk: " + imageFile); //$NON-NLS-1$
+                    }
+                    dirty = false;
+                }
             }
         }
         catch (Throwable e)
@@ -162,11 +169,15 @@ public class ImageHolder
 
     public void clear()
     {
-        imagePath = null;
-        image = null;
-        if (texture != null)
+        synchronized (writeLock)
         {
-            TextureCache.instance().expireTexture(texture);
+            imagePath = null;
+            image = null;
+            if (texture != null)
+            {
+                TextureCache.instance().expireTexture(texture);
+                texture = null;
+            }
         }
     }
 }
