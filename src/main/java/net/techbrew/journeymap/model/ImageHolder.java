@@ -7,6 +7,7 @@ import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -20,6 +21,7 @@ import java.nio.file.Path;
  */
 public class ImageHolder
 {
+    final static Logger logger = JourneyMap.getLogger();
     final static String delim = " : ";
     final Constants.MapType mapType;
     final Object writeLock = new Object();
@@ -121,11 +123,11 @@ public class ImageHolder
             {
                 if (image == null)
                 {
-                    JourneyMap.getLogger().warn("Null image for " + this);
+                    logger.warn("Null image for " + this);
                 }
                 else if (imagePath == null)
                 {
-                    JourneyMap.getLogger().warn("Null path for " + this);
+                    logger.warn("Null path for " + this);
                 }
                 else
                 {
@@ -139,9 +141,9 @@ public class ImageHolder
                     ImageIO.write(image, "PNG", imageOutputStream);
                     imageOutputStream.close();
 
-                    if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
+                    if (logger.isEnabled(Level.DEBUG))
                     {
-                        JourneyMap.getLogger().debug("Wrote to disk: " + imageFile); //$NON-NLS-1$
+                        logger.debug("Wrote to disk: " + imageFile); //$NON-NLS-1$
                     }
                     dirty = false;
                 }
@@ -150,13 +152,13 @@ public class ImageHolder
         catch (Throwable e)
         {
             String error = "Unexpected error writing to disk: " + this + ": " + LogFormatter.toString(e);
-            JourneyMap.getLogger().error(error);
+            logger.error(error);
             //throw new RuntimeException(e);
         }
         writeToDiskTimer.stop();
 //        if (writeToDiskTimer.hasReachedElapsedLimit() && writeToDiskTimer.getElapsedLimitWarningsRemaining() > 0)
 //        {
-//            JourneyMap.getLogger().warn("Image that took too long: " + this);
+//            logger.warn("Image that took too long: " + this);
 //        }
     }
 

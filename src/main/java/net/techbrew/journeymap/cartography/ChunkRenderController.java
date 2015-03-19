@@ -10,15 +10,14 @@ package net.techbrew.journeymap.cartography;
 
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.cartography.render.CaveRenderer;
-import net.techbrew.journeymap.cartography.render.EndRenderer;
-import net.techbrew.journeymap.cartography.render.NetherRenderer;
-import net.techbrew.journeymap.cartography.render.SurfaceRenderer;
+import net.techbrew.journeymap.cartography.render.*;
+import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.*;
 import org.apache.logging.log4j.Level;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -52,8 +51,9 @@ public class ChunkRenderController
     public boolean renderChunk(ChunkCoord cCoord, ChunkMD chunkMd, boolean underground, Integer vSlice)
     {
         long start = System.nanoTime();
-        Graphics2D g2D1 = null;
-        Graphics2D g2D2 = null;
+        Graphics2D undergroundG2D = null;
+        Graphics2D dayG2D = null;
+        Graphics2D nightG2D = null;
         boolean renderOkay = false;
 
         try
@@ -62,44 +62,58 @@ public class ChunkRenderController
             RegionImageSet regionImageSet = RegionImageCache.instance().getRegionImageSet(rCoord);
             if (underground)
             {
-                g2D1 = regionImageSet.getChunkImage(cCoord, Constants.MapType.underground);
-                if (g2D1 != null)
+                BufferedImage image = regionImageSet.getChunkImage(cCoord, Constants.MapType.underground);
+                if (image != null)
                 {
+                    undergroundG2D = RegionImageHandler.initRenderingHints(image.createGraphics());
+                    undergroundG2D.setComposite(BaseRenderer.ALPHA_OPAQUE);
                     switch (rCoord.dimension)
                     {
                         case -1:
                         {
-                            renderOkay = netherRenderer.render(g2D1, chunkMd, vSlice);
+                            renderOkay = netherRenderer.render(undergroundG2D, chunkMd, vSlice);
                             break;
                         }
                         case 1:
                         {
-                            renderOkay = endRenderer.render(g2D1, chunkMd, vSlice);
+                            renderOkay = endRenderer.render(undergroundG2D, chunkMd, vSlice);
                             break;
                         }
                         default:
                         {
-                            renderOkay = overWorldCaveRenderer.render(g2D1, chunkMd, vSlice);
-
+                            renderOkay = overWorldCaveRenderer.render(undergroundG2D, chunkMd, vSlice);
                         }
                     }
 
                     if (renderOkay)
                     {
-                        regionImageSet.setDirty(Constants.MapType.underground);
+                        regionImageSet.setChunkImage(cCoord, Constants.MapType.underground, image);
                     }
                 }
             }
             else
             {
-                g2D1 = regionImageSet.getChunkImage(cCoord, Constants.MapType.day);
-                g2D2 = regionImageSet.getChunkImage(cCoord, Constants.MapType.night);
+                BufferedImage imageDay = regionImageSet.getChunkImage(cCoord, Constants.MapType.day);
+                BufferedImage imageNight = regionImageSet.getChunkImage(cCoord, Constants.MapType.night);
 
-                renderOkay = g2D1 != null && g2D2 != null && overWorldSurfaceRenderer.render(g2D1, g2D2, chunkMd);
+                if (imageDay != null)
+                {
+                    dayG2D = RegionImageHandler.initRenderingHints(imageDay.createGraphics());
+                    dayG2D.setComposite(BaseRenderer.ALPHA_OPAQUE);
+                }
+
+                if (imageNight != null)
+                {
+                    nightG2D = RegionImageHandler.initRenderingHints(imageNight.createGraphics());
+                    nightG2D.setComposite(BaseRenderer.ALPHA_OPAQUE);
+                }
+
+                renderOkay = dayG2D != null && overWorldSurfaceRenderer.render(dayG2D, nightG2D, chunkMd);
+
                 if (renderOkay)
                 {
-                    regionImageSet.setDirty(Constants.MapType.day);
-                    regionImageSet.setDirty(Constants.MapType.night);
+                    regionImageSet.setChunkImage(cCoord, Constants.MapType.day, imageDay);
+                    regionImageSet.setChunkImage(cCoord, Constants.MapType.night, imageNight);
                 }
             }
 
@@ -119,13 +133,17 @@ public class ChunkRenderController
         }
         finally
         {
-            if (g2D1 != null)
+            if (dayG2D != null)
             {
-                g2D1.dispose();
+                dayG2D.dispose();
             }
-            if (g2D2 != null)
+            if (nightG2D != null)
             {
-                g2D2.dispose();
+                nightG2D.dispose();
+            }
+            if (undergroundG2D != null)
+            {
+                undergroundG2D.dispose();
             }
         }
 

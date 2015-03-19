@@ -89,7 +89,7 @@ public class TileDrawStep
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn(String.format("Con't get sync texture for %s : %s", this, e));
+            JourneyMap.getLogger().warn(String.format("Can't get sync texture for %s : %s", this, e));
         }
     }
 
@@ -283,11 +283,6 @@ public class TileDrawStep
 
     private Callable<TextureImpl> createDelayedScaledTexture()
     {
-        if (highQuality || zoom == 0) // todo change when zoom can be < zero or 0 no longer 1:1
-        {
-            return null;
-        }
-
         return new Callable<TextureImpl>()
         {
             @Override

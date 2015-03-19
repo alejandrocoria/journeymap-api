@@ -20,6 +20,7 @@ import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.awt.image.BufferedImage;
@@ -34,6 +35,7 @@ public class RegionImageCache
 {
     public static final long flushInterval = TimeUnit.SECONDS.toMillis(30);
     public static final long regionCacheAge = flushInterval / 2;
+    static final Logger logger = JourneyMap.getLogger();
     private static boolean logCacheActions = false;
     final LoadingCache<RegionCoord, RegionImageSet> regionImageSetsCache;
     private volatile long lastFlush;
@@ -55,9 +57,9 @@ public class RegionImageCache
             public void run()
             {
                 flushToDisk();
-                if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
+                if (logger.isEnabled(Level.DEBUG))
                 {
-                    JourneyMap.getLogger().debug("RegionImageCache flushing to disk on shutdown"); //$NON-NLS-1$
+                    logger.debug("RegionImageCache flushing to disk on shutdown"); //$NON-NLS-1$
                 }
             }
         }));
@@ -103,12 +105,12 @@ public class RegionImageCache
         if (texture != null)
         {
             String time = texture.getLastUpdated() == 0 ? "Never" : new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(texture.getLastUpdated()));
-            JourneyMap.getLogger().info(String.format("RegionImageCache: %s %s (GLID %s) on %s",
+            logger.info(String.format("RegionImageCache: %s %s (GLID %s) on %s",
                     action, texture.getDescription(), texture.getSafeGlTextureId(), time));
         }
         else
         {
-            JourneyMap.getLogger().info(String.format("RegionImageCache: %s on NULL?", action));
+            logger.info(String.format("RegionImageCache: %s on NULL?", action));
         }
     }
 
@@ -158,7 +160,7 @@ public class RegionImageCache
             {
                 if (logCacheActions)
                 {
-                    JourneyMap.getLogger().info("MAPTASK UPDATE " + regionImageSet.rCoord + " " + imageHolder.mapType);
+                    logger.info("MAPTASK UPDATE " + regionImageSet.rCoord + " " + imageHolder.mapType);
                 }
             }
             else
@@ -166,7 +168,7 @@ public class RegionImageCache
                 checkExpired(regionImageSet);
                 if (logCacheActions)
                 {
-                    JourneyMap.getLogger().info("MAPTASK SKIP " + regionImageSet.rCoord + " " + imageHolder.mapType);
+                    logger.info("MAPTASK SKIP " + regionImageSet.rCoord + " " + imageHolder.mapType);
                 }
             }
         }
@@ -203,9 +205,9 @@ public class RegionImageCache
     {
         if (lastFlush + flushInterval < System.currentTimeMillis())
         {
-            if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
+            if (logger.isEnabled(Level.DEBUG))
             {
-                JourneyMap.getLogger().debug("RegionImageCache auto-flushing"); //$NON-NLS-1$
+                logger.debug("RegionImageCache auto-flushing"); //$NON-NLS-1$
             }
             flushToDisk();
         }
@@ -231,9 +233,9 @@ public class RegionImageCache
     {
         if (time <= lastFlush)
         {
-            if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
+            if (logger.isEnabled(Level.DEBUG))
             {
-                JourneyMap.getLogger().debug("Nothing dirty, last flush was " + (time - lastFlush) + "ms before " + time);
+                logger.debug("Nothing dirty, last flush was " + (time - lastFlush) + "ms before " + time);
             }
             return Collections.EMPTY_LIST;
         }
@@ -248,9 +250,9 @@ public class RegionImageCache
                     list.add(regionImageSet.rCoord);
                 }
             }
-            if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
+            if (logger.isEnabled(Level.DEBUG))
             {
-                JourneyMap.getLogger().debug("Dirty regions: " + list.size() + " of " + regionImageSetsCache.size());
+                logger.debug("Dirty regions: " + list.size() + " of " + regionImageSetsCache.size());
             }
             return list;
         }
@@ -287,7 +289,7 @@ public class RegionImageCache
         File imageDir = RegionImageHandler.getImageDir(fakeRc, MapType.day).getParentFile();
         if (!imageDir.getName().startsWith("DIM"))
         {
-            JourneyMap.getLogger().error("Expected DIM directory, got " + imageDir);
+            logger.error("Expected DIM directory, got " + imageDir);
             return false;
         }
 
@@ -325,19 +327,19 @@ public class RegionImageCache
             for (File dir : dirs)
             {
                 FileHandler.delete(dir);
-                JourneyMap.getLogger().info(String.format("Deleted image directory %s: %s", dir, !dir.exists()));
+                logger.info(String.format("Deleted image directory %s: %s", dir, !dir.exists()));
                 if (dir.exists())
                 {
                     result = false;
                 }
             }
 
-            JourneyMap.getLogger().info("Done deleting directories");
+            logger.info("Done deleting directories");
             return result;
         }
         else
         {
-            JourneyMap.getLogger().info("Found no DIM directories in " + imageDir);
+            logger.info("Found no DIM directories in " + imageDir);
             return true;
         }
     }

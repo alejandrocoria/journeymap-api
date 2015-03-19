@@ -62,18 +62,43 @@ public class RegionImageSet extends ImageSet
         getHolder(mapType).setDirty();
     }
 
-    public Graphics2D getChunkImage(ChunkCoord cCoord, MapType mapType)
+    public BufferedImage getChunkImage(ChunkCoord cCoord, MapType mapType)
     {
         BufferedImage regionImage = getHolder(mapType).getImage();
         if (regionImage == null)
         {
             return null;
         }
-        return RegionImageHandler.initRenderingHints(
-                regionImage.getSubimage(
-                        rCoord.getXOffset(cCoord.chunkX),
-                        rCoord.getZOffset(cCoord.chunkZ), 16, 16)
-                        .createGraphics());
+
+        BufferedImage current = regionImage.getSubimage(
+                rCoord.getXOffset(cCoord.chunkX),
+                rCoord.getZOffset(cCoord.chunkZ),
+                16, 16);
+
+        //BufferedImage copy = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        //Graphics g2D = RegionImageHandler.initRenderingHints(copy.createGraphics());
+        //g2D.drawImage(current, 0, 0, null);
+        //g2D.dispose();
+        //return copy;
+        return current;
+    }
+
+    public void setChunkImage(ChunkCoord cCoord, MapType mapType, Image image)
+    {
+        ImageHolder holder = getHolder(mapType);
+//        BufferedImage regionImage = holder.getImage();
+//        if (regionImage == null)
+//        {
+//            return;
+//        }
+//        Graphics2D g2D = RegionImageHandler.initRenderingHints(
+//                regionImage.getSubimage(
+//                rCoord.getXOffset(cCoord.chunkX),
+//                rCoord.getZOffset(cCoord.chunkZ), 16, 16)
+//                .createGraphics());
+//        g2D.drawImage(image, 0, 0, null);
+//        g2D.dispose();
+        holder.setDirty();
     }
 
     @Override

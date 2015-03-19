@@ -21,10 +21,16 @@ import java.util.concurrent.ExecutorService;
 
 public class RunnableTask implements Runnable
 {
+    static final JourneyMap jm = JourneyMap.getInstance();
+    static final Logger logger = JourneyMap.getLogger();
+    static final Minecraft mc = FMLClientHandler.instance().getClient();
+    static final boolean threadLogging = jm.isThreadLogging();
+
     private final ExecutorService taskExecutor;
     private final Runnable innerRunnable;
     private final ITask task;
     private final int timeout;
+
 
     public RunnableTask(final ExecutorService taskExecutor, ITask task)
     {
@@ -50,10 +56,7 @@ public class RunnableTask implements Runnable
 
     class Inner implements Runnable
     {
-        final JourneyMap jm = JourneyMap.getInstance();
-        final Logger logger = JourneyMap.getLogger();
-        final Minecraft mc = FMLClientHandler.instance().getClient();
-        final boolean threadLogging = jm.isThreadLogging();
+
 
         @Override
         public final void run()

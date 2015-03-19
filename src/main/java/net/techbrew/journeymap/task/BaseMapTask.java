@@ -31,6 +31,7 @@ import java.util.Iterator;
 
 public abstract class BaseMapTask implements ITask
 {
+    static final Logger logger = JourneyMap.getLogger();
     protected static ChunkCoordIntPair[] keepAliveOffsets = new ChunkCoordIntPair[]{new ChunkCoordIntPair(0, -1), new ChunkCoordIntPair(-1, 0), new ChunkCoordIntPair(-1, -1)};
     private static BufferedImage blankChunkImage = null;
     private static BufferedImage blankChunkImageUnderground = null;
@@ -92,7 +93,7 @@ public abstract class BaseMapTask implements ITask
 
             final long start = System.nanoTime();
             final Iterator<ChunkCoordIntPair> chunkIter = chunkCoords.iterator();
-            final Logger logger = JourneyMap.getLogger();
+
 
             // Check the dimension
             int currentDimension = mc.theWorld.provider.dimensionId;

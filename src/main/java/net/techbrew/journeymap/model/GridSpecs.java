@@ -14,8 +14,8 @@ public class GridSpecs
     public GridSpecs()
     {
         this(new GridSpec(GridSpec.Style.Squares, .5f, .5f, .5f, .5f), // day
-                new GridSpec(GridSpec.Style.Squares, 0f, 0f, 1f, .3f), // night
-                new GridSpec(GridSpec.Style.Squares, 1f, 1f, 1f, .3f)); // underground
+                new GridSpec(GridSpec.Style.Squares, .5f, .5f, 1f, .3f), // night
+                new GridSpec(GridSpec.Style.Squares, .5f, .5f, .5f, .3f)); // underground
     }
 
     public GridSpecs(GridSpec day, GridSpec night, GridSpec underground)

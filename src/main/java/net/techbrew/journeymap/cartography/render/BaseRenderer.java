@@ -39,9 +39,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<ChunkCoordIntPair, Optional<ChunkMD>>
 {
     public static final String PROP_WATER_HEIGHT = "waterHeight";
+    public static final AlphaComposite ALPHA_OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
     protected static final int COLOR_BLACK = Color.black.getRGB();
     protected static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
-    protected static final AlphaComposite ALPHA_OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
     protected static final float[] DEFAULT_FOG = new float[]{0, 0, .1f};
     protected final DataCache dataCache = DataCache.instance();
     protected CoreProperties coreProperties;
@@ -201,8 +201,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         if (g2D != null)
         {
             g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-            g2D.setPaint(RGB.paintOf(COLOR_BLACK));
-            g2D.fillRect(x, z, 1, 1);
+            paintBlock(x, z, COLOR_BLACK, g2D);
             g2D.setComposite(ALPHA_OPAQUE);
         }
     }
@@ -213,16 +212,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     public void paintBlock(final int x, final int z, final int color,
                            final Graphics2D g2D)
     {
-        if (g2D != null)
-        {
-            g2D.setComposite(ALPHA_OPAQUE);
-            g2D.setPaint(RGB.paintOf(color));
-            g2D.fillRect(x, z, 1, 1);
-        }
-        else
-        {
-            JourneyMap.getLogger().warn("Graphics2D unavailable");
-        }
+        g2D.setPaint(RGB.paintOf(color));
+        g2D.drawLine(x, z, x, z);
     }
 
     /**

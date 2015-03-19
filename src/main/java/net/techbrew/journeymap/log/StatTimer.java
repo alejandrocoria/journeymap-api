@@ -22,15 +22,14 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class StatTimer
 {
-
     public static final double NS = 1000000D;
     private static final int WARMUP_COUNT_DEFAULT = 10;
     private static final int MAX_COUNT = 1000000;
     private static final int MAX_ELAPSED_LIMIT_WARNINGS = 25;
     private int elapsedLimitWarnings = MAX_ELAPSED_LIMIT_WARNINGS;
     private static final int ELAPSED_LIMIT_DEFAULT = 1000;
+    private static final Logger logger = JourneyMap.getLogger();
     private static Map<String, StatTimer> timers = Collections.synchronizedMap(new HashMap<String, StatTimer>());
-    private final Logger logger = JourneyMap.getLogger();
     private final int warmupCount;
     private final int elapsedLimit;
     private final AtomicLong counter = new AtomicLong();
@@ -313,6 +312,7 @@ public class StatTimer
 
     /**
      * Only useful after stop();
+     *
      * @return
      */
     public boolean hasReachedElapsedLimit()
