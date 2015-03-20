@@ -1,5 +1,6 @@
 package net.techbrew.journeymap.model;
 
+import com.google.common.base.Objects;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -10,6 +11,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -22,29 +24,38 @@ import java.nio.file.Path;
 public class ImageHolder
 {
     final static Logger logger = JourneyMap.getLogger();
-    final static String delim = " : ";
     final Constants.MapType mapType;
     final Object writeLock = new Object();
-    Path imagePath;
-    BufferedImage image = null;
-    TextureImpl texture;
+    final Path imagePath;
+    final TextureImpl texture;
     boolean dirty = true;
-    long imageTimestamp = System.currentTimeMillis();
+    boolean partialUpdate;
+
     StatTimer writeToDiskTimer = StatTimer.get("ImageHolder.writeToDisk", 2, 1000);
 
-    ImageHolder(Constants.MapType mapType, File imageFile, BufferedImage image)
+    ImageHolder(Constants.MapType mapType, File imageFile, BufferedImage image, int imageSize)
     {
         this.mapType = mapType;
-        if (imageFile != null)
+        this.imagePath = imageFile.toPath();
+        if (image == null || image.getWidth() != imageSize || image.getHeight() != imageSize)
         {
-            this.imagePath = imageFile.toPath();
+            image = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
         }
-        setImage(image);
+        this.texture = new TextureImpl(null, image, true, false);
+        texture.setDescription(imagePath.toString());
+    }
+
+    public static Graphics2D initRenderingHints(Graphics2D g)
+    {
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        return g;
     }
 
     File getFile()
     {
-        return imagePath == null ? null : imagePath.toFile();
+        return imagePath.toFile();
     }
 
     Constants.MapType getMapType()
@@ -54,59 +65,52 @@ public class ImageHolder
 
     BufferedImage getImage()
     {
-        return image;
+        return texture.getImage();
     }
 
     void setImage(BufferedImage image)
     {
-        if (image != this.image)
+        synchronized (writeLock)
         {
-            synchronized (writeLock)
-            {
-                this.image = image;
-            }
+            texture.setImage(image, true);
             setDirty();
-            updateTexture();
         }
-
     }
 
-    TextureImpl getTexture()
+    void partialImageUpdate(BufferedImage imagePart, int x, int y)
     {
-        if (texture == null)
+        synchronized (writeLock)
         {
-            texture = new TextureImpl(null, image, false, false);
+            BufferedImage textureImage = texture.getImage();
+            Graphics2D g2D = initRenderingHints(textureImage.createGraphics());
+            g2D.drawImage(imagePart, x, y, null);
+            g2D.dispose();
+            partialUpdate = true;
         }
+    }
+
+    void finishPartialImageUpdates()
+    {
+        synchronized (writeLock)
+        {
+            if (partialUpdate)
+            {
+                BufferedImage textureImage = texture.getImage();
+                texture.setImage(textureImage, true);
+                setDirty();
+                partialUpdate = false;
+            }
+        }
+    }
+
+    public TextureImpl getTexture()
+    {
         return texture;
     }
 
-    public boolean updateTexture()
-    {
-        if (image != null && texture != null)
-        {
-            if (texture.getLastUpdated() < imageTimestamp)
-            {
-                texture.setImage(image, true);
-                texture.setLastUpdated(imageTimestamp);
-                if (imagePath != null)
-                {
-                    texture.setDescription(imagePath.toString());
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    void setDirty()
+    private void setDirty()
     {
         dirty = true;
-        imageTimestamp = System.currentTimeMillis();
-    }
-
-    long getImageTimestamp()
-    {
-        return imageTimestamp;
     }
 
     boolean isDirty()
@@ -121,32 +125,21 @@ public class ImageHolder
         {
             synchronized (writeLock)
             {
-                if (image == null)
+                File imageFile = imagePath.toFile();
+                if (!imageFile.exists())
                 {
-                    logger.warn("Null image for " + this);
+                    imageFile.getParentFile().mkdirs();
                 }
-                else if (imagePath == null)
-                {
-                    logger.warn("Null path for " + this);
-                }
-                else
-                {
-                    File imageFile = imagePath.toFile();
-                    if (!imageFile.exists())
-                    {
-                        imageFile.getParentFile().mkdirs();
-                    }
 
-                    BufferedOutputStream imageOutputStream = new BufferedOutputStream(new FileOutputStream(imageFile));
-                    ImageIO.write(image, "PNG", imageOutputStream);
-                    imageOutputStream.close();
+                BufferedOutputStream imageOutputStream = new BufferedOutputStream(new FileOutputStream(imageFile));
+                ImageIO.write(texture.getImage(), "PNG", imageOutputStream);
+                imageOutputStream.close();
 
-                    if (logger.isEnabled(Level.DEBUG))
-                    {
-                        logger.debug("Wrote to disk: " + imageFile); //$NON-NLS-1$
-                    }
-                    dirty = false;
+                if (logger.isEnabled(Level.DEBUG))
+                {
+                    logger.debug("Wrote to disk: " + imageFile); //$NON-NLS-1$
                 }
+                dirty = false;
             }
         }
         catch (Throwable e)
@@ -165,21 +158,24 @@ public class ImageHolder
     @Override
     public String toString()
     {
-        File imageFile = getFile();
-        return mapType.name() + delim + (imageFile != null ? imageFile.getPath() : "") + delim + "image=" + (image == null ? "null" : "ok") + ", dirty=" + dirty;
+        return Objects.toStringHelper(this)
+                .add("imagePath", imagePath)
+                .add("mapType", mapType)
+                .add("texture", texture)
+                .add("dirty", dirty)
+                .toString();
     }
 
     public void clear()
     {
         synchronized (writeLock)
         {
-            imagePath = null;
-            image = null;
-            if (texture != null)
-            {
-                TextureCache.instance().expireTexture(texture);
-                texture = null;
-            }
+            TextureCache.instance().expireTexture(texture);
         }
+    }
+
+    public long getImageTimestamp()
+    {
+        return texture.getLastImageUpdate();
     }
 }

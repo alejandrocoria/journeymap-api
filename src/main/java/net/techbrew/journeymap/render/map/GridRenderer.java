@@ -105,6 +105,10 @@ public class GridRenderer
     public static void setEnabled(boolean enabled)
     {
         GridRenderer.enabled = enabled;
+        if (!enabled)
+        {
+            TileDrawStepCache.clear();
+        }
     }
 
     public void setViewPort(Rectangle2D.Double viewPort)

@@ -58,6 +58,11 @@ public class TileDrawStepCache
         return Holder.INSTANCE._getOrCreate(mapType, regionCoord, zoom, sx1, sy1, sx2, sy2);
     }
 
+    public static void clear()
+    {
+        instance().invalidateAll();
+    }
+
     private TileDrawStep _getOrCreate(final Constants.MapType mapType, RegionCoord regionCoord, Integer zoom, int sx1, int sy1, int sx2, int sy2)
     {
         checkWorldChange(regionCoord);

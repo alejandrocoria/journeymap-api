@@ -418,7 +418,7 @@ public class TextureCache
                     final Graphics2D g = RegionImageHandler.initRenderingHints(scaledImage.createGraphics());
                     g.drawImage(img, 0, 0, 24, 24, null);
                     g.dispose();
-                    playerSkinTex.updateTexture(scaledImage);
+                    playerSkinTex.updateAndBind(scaledImage);
                 }
                 return null;
             }
@@ -455,6 +455,7 @@ public class TextureCache
 
     /**
      * Convenient way to pass off unused textures
+     *
      * @param texture
      */
     public void expireTexture(TextureImpl texture)

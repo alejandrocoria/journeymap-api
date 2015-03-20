@@ -122,9 +122,11 @@ public abstract class ImageSet
 
     protected abstract ImageHolder addHolder(Constants.MapType mapType, BufferedImage image);
 
+    protected abstract int getImageSize();
+
     protected ImageHolder addHolder(Constants.MapType mapType, File imageFile, BufferedImage image)
     {
-        return addHolder(new ImageHolder(mapType, imageFile, image));
+        return addHolder(new ImageHolder(mapType, imageFile, image, getImageSize()));
     }
 
     protected ImageHolder addHolder(ImageHolder imageHolder)

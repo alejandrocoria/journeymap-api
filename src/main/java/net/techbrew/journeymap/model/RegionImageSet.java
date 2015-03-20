@@ -11,8 +11,8 @@ package net.techbrew.journeymap.model;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.io.RegionImageHandler;
+import net.techbrew.journeymap.render.map.Tile;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -57,19 +57,9 @@ public class RegionImageSet extends ImageSet
         }
     }
 
-    public void setDirty(MapType mapType)
-    {
-        getHolder(mapType).setDirty();
-    }
-
     public BufferedImage getChunkImage(ChunkCoord cCoord, MapType mapType)
     {
         BufferedImage regionImage = getHolder(mapType).getImage();
-        if (regionImage == null)
-        {
-            return null;
-        }
-
         BufferedImage current = regionImage.getSubimage(
                 rCoord.getXOffset(cCoord.chunkX),
                 rCoord.getZOffset(cCoord.chunkZ),
@@ -83,22 +73,30 @@ public class RegionImageSet extends ImageSet
         return current;
     }
 
-    public void setChunkImage(ChunkCoord cCoord, MapType mapType, Image image)
+    public void setChunkImage(ChunkCoord cCoord, MapType mapType, BufferedImage chunkImage)
     {
         ImageHolder holder = getHolder(mapType);
-//        BufferedImage regionImage = holder.getImage();
-//        if (regionImage == null)
-//        {
-//            return;
-//        }
-//        Graphics2D g2D = RegionImageHandler.initRenderingHints(
-//                regionImage.getSubimage(
-//                rCoord.getXOffset(cCoord.chunkX),
-//                rCoord.getZOffset(cCoord.chunkZ), 16, 16)
-//                .createGraphics());
-//        g2D.drawImage(image, 0, 0, null);
-//        g2D.dispose();
-        holder.setDirty();
+        holder.partialImageUpdate(chunkImage, rCoord.getXOffset(cCoord.chunkX), rCoord.getZOffset(cCoord.chunkZ));
+    }
+
+    public boolean hasChunkUpdates()
+    {
+        for (ImageHolder holder : this.imageHolders.values())
+        {
+            if (holder.partialUpdate)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void finishChunkUpdates()
+    {
+        for (ImageHolder holder : this.imageHolders.values())
+        {
+            holder.finishPartialImageUpdates();
+        }
     }
 
     @Override
@@ -128,6 +126,12 @@ public class RegionImageSet extends ImageSet
     @Override
     protected ImageHolder addHolder(Constants.MapType mapType, BufferedImage image)
     {
-        return addHolder(new ImageHolder(mapType, RegionImageHandler.getRegionImageFile(rCoord, mapType, false), image));
+        return addHolder(new ImageHolder(mapType, RegionImageHandler.getRegionImageFile(rCoord, mapType, false), image, getImageSize()));
+    }
+
+    @Override
+    protected int getImageSize()
+    {
+        return Tile.TILESIZE;
     }
 }

@@ -17,7 +17,6 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
-import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
@@ -26,7 +25,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -36,10 +34,8 @@ public class RegionImageCache
     public static final long flushInterval = TimeUnit.SECONDS.toMillis(30);
     public static final long regionCacheAge = flushInterval / 2;
     static final Logger logger = JourneyMap.getLogger();
-    private static boolean logCacheActions = false;
     final LoadingCache<RegionCoord, RegionImageSet> regionImageSetsCache;
     private volatile long lastFlush;
-    private MapType lastRequestedMapType = MapType.day;
     private Minecraft minecraft = FMLClientHandler.instance().getClient();
 
     /**
@@ -100,34 +96,6 @@ public class RegionImageCache
                 });
     }
 
-    private static void logCacheAction(String action, TextureImpl texture)
-    {
-        if (texture != null)
-        {
-            String time = texture.getLastUpdated() == 0 ? "Never" : new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(texture.getLastUpdated()));
-            logger.info(String.format("RegionImageCache: %s %s (GLID %s) on %s",
-                    action, texture.getDescription(), texture.getSafeGlTextureId(), time));
-        }
-        else
-        {
-            logger.info(String.format("RegionImageCache: %s on NULL?", action));
-        }
-    }
-
-    /**
-     * Must be called on GL Context thread.
-     */
-    public Integer getBoundRegionTextureId(RegionCoord rCoord, Constants.MapType mapType)
-    {
-        if (lastRequestedMapType != mapType)
-        {
-            lastRequestedMapType = mapType;
-        }
-        TextureImpl texture = getRegionImageSet(rCoord).touch().getHolder(mapType).getTexture();
-        texture.bindTexture();
-        return texture.getSafeGlTextureId();
-    }
-
     public RegionImageSet getRegionImageSet(RegionCoord rCoord)
     {
         return regionImageSetsCache.getUnchecked(rCoord);
@@ -150,26 +118,18 @@ public class RegionImageCache
         return regionImageSetsCache.asMap().entrySet();
     }
 
-    public void updateTextures(boolean forceFlush, EnumSet<MapType> mapTypes)
+    public void updateTextures(boolean forceFlush)
     {
         for (Map.Entry<RegionCoord, RegionImageSet> entry : getRegionImageSets())
         {
             RegionImageSet regionImageSet = entry.getValue();
-            ImageHolder imageHolder = regionImageSet.getHolder(lastRequestedMapType);
-            if (imageHolder.updateTexture())
+            if (regionImageSet.hasChunkUpdates())
             {
-                if (logCacheActions)
-                {
-                    logger.info("MAPTASK UPDATE " + regionImageSet.rCoord + " " + imageHolder.mapType);
-                }
+                regionImageSet.finishChunkUpdates();
             }
             else
             {
                 checkExpired(regionImageSet);
-                if (logCacheActions)
-                {
-                    logger.info("MAPTASK SKIP " + regionImageSet.rCoord + " " + imageHolder.mapType);
-                }
             }
         }
 

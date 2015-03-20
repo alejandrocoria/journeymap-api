@@ -84,15 +84,8 @@ public class Tile
     public boolean updateTexture(File worldDir, final MapType mapType, boolean highQuality, final Integer vSlice, int dimension)
     {
         updateRenderType();
-
         drawSteps.clear();
         drawSteps.addAll(RegionImageHandler.getTileDrawSteps(worldDir, ulChunk, lrChunk, mapType, zoom, highQuality, vSlice, dimension));
-
-//        for (TileDrawStep tileDrawStep : drawSteps)
-//        {
-//            tileDrawStep.refreshIfDirty();
-//        }
-
         return drawSteps.size() > 1;
     }
 

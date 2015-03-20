@@ -589,13 +589,11 @@ public class OptionsManager extends JmUI
                 case MiniMap2:
                 {
                     DataCache.instance().resetRadarCaches();
-                    UIManager.getInstance().getMiniMap().reset();
                     break;
                 }
                 case FullMap:
                 {
                     DataCache.instance().resetRadarCaches();
-                    Fullscreen.reset();
                     ThemeFileHandler.getCurrentTheme(true);
                     break;
                 }
@@ -626,6 +624,9 @@ public class OptionsManager extends JmUI
                 }
             }
         }
+
+        UIManager.getInstance().getMiniMap().reset();
+        Fullscreen.reset();
 
         OptionsManager.openCategories.clear();
         for (CategorySlot categorySlot : optionsListPane.getRootSlots())

@@ -162,7 +162,7 @@ public abstract class BaseMapTask implements ITask
             }
 
             // Push chunk cache to region cache
-            RegionImageCache.instance().updateTextures(flushCacheWhenDone, getMapTypes());
+            RegionImageCache.instance().updateTextures(flushCacheWhenDone);
             chunkCoords.clear();
             this.complete(false, false);
             timer.stop();

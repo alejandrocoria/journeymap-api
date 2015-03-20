@@ -12,7 +12,6 @@ import com.google.common.base.Objects;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.resources.IResourceManager;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.log.LogFormatter;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
@@ -21,12 +20,14 @@ import java.nio.ByteBuffer;
 
 public class TextureImpl extends AbstractTexture
 {
+    private final Object bufferLock = new Object();
     protected BufferedImage image;
     protected boolean retainImage;
     protected int width;
     protected int height;
     protected float alpha;
-    protected long lastUpdated;
+    protected long lastImageUpdate;
+    protected long lastBound;
     protected String description;
 
     protected ByteBuffer buffer;
@@ -83,7 +84,6 @@ public class TextureImpl extends AbstractTexture
      */
     public void setImage(BufferedImage bufferedImage, boolean retainImage)
     {
-
         this.retainImage = retainImage;
         if (retainImage)
         {
@@ -94,30 +94,33 @@ public class TextureImpl extends AbstractTexture
         this.height = bufferedImage.getHeight();
         int bufferSize = width * height * 4; // RGBA
 
-        if (buffer == null || (buffer.capacity() != bufferSize))
+        synchronized (bufferLock)
         {
-            buffer = ByteBuffer.allocateDirect(bufferSize);
-        }
-        buffer.clear();
-
-        int[] pixels = new int[width * height];
-        bufferedImage.getRGB(0, 0, width, height, pixels, 0, width);
-        int pixel;
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
+            if (buffer == null || (buffer.capacity() != bufferSize))
             {
-                pixel = pixels[y * width + x];
-                buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red
-                buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green
-                buffer.put((byte) ((pixel & 0xFF)));           // Blue
-                buffer.put((byte) ((pixel >> 24) & 0xFF));     // Alpha
+                buffer = ByteBuffer.allocateDirect(bufferSize);
             }
-        }
-        buffer.flip();
-        buffer.rewind();
-        bindNeeded = true;
+            buffer.clear();
 
+            int[] pixels = new int[width * height];
+            bufferedImage.getRGB(0, 0, width, height, pixels, 0, width);
+            int pixel;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    pixel = pixels[y * width + x];
+                    buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red
+                    buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green
+                    buffer.put((byte) ((pixel & 0xFF)));           // Blue
+                    buffer.put((byte) ((pixel >> 24) & 0xFF));     // Alpha
+                }
+            }
+            buffer.flip();
+            buffer.rewind();
+            bindNeeded = true;
+        }
+        this.lastImageUpdate = System.currentTimeMillis();
     }
 
     /**
@@ -127,42 +130,44 @@ public class TextureImpl extends AbstractTexture
      */
     public void bindTexture()
     {
-
         if (bindNeeded)
         {
-            try
+            synchronized (bufferLock)
             {
-                GL11.glBindTexture(GL11.GL_TEXTURE_2D, getGlTextureId());
-
-                //Send texel data to OpenGL
-
-                // Setup wrap mode
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
-
-                //Setup texture scaling filtering
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-
-                int glErr = GL11.glGetError();
-                if (glErr != GL11.GL_NO_ERROR)
+                try
                 {
-                    JourneyMap.getLogger().warn("GL Error in TextureImpl after glTexImage2D: " + glErr);
+                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, super.getGlTextureId());
+
+                    //Send texel data to OpenGL
+
+                    // Setup wrap mode
+                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+
+                    //Setup texture scaling filtering
+                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+
+                    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+
+                    int glErr = GL11.glGetError();
+                    if (glErr != GL11.GL_NO_ERROR)
+                    {
+                        JourneyMap.getLogger().warn("GL Error in TextureImpl after glTexImage2D: " + glErr);
+                    }
+                    else
+                    {
+                        bindNeeded = false;
+                        lastBound = System.currentTimeMillis();
+                    }
                 }
-                else
+                catch (Throwable t)
                 {
-                    bindNeeded = false;
-                    setLastUpdated(System.currentTimeMillis());
+                    JourneyMap.getLogger().warn("Can't bind texture: " + t);
+                    buffer = null;
                 }
-            }
-            catch (Throwable t)
-            {
-                JourneyMap.getLogger().warn("Can't bind texture: " + LogFormatter.toString(t));
             }
         }
-
     }
 
     public boolean isBindNeeded()
@@ -183,15 +188,15 @@ public class TextureImpl extends AbstractTexture
     /**
      * Must be called on same thread as OpenGL Context
      */
-    public void updateTexture(BufferedImage image)
+    public void updateAndBind(BufferedImage image)
     {
-        updateTexture(image, retainImage);
+        updateAndBind(image, retainImage);
     }
 
     /**
      * Must be called on same thread as OpenGL Context
      */
-    public void updateTexture(BufferedImage image, boolean retainImage)
+    public void updateAndBind(BufferedImage image, boolean retainImage)
     {
         setImage(image, retainImage);
         bindTexture();
@@ -221,30 +226,36 @@ public class TextureImpl extends AbstractTexture
 
     public boolean isUnused()
     {
-        return this.glTextureId == -1 && lastUpdated == 0;
+        return this.glTextureId == -1 && image == null && buffer == null;
+    }
+
+    /**
+     * Must be called with GL Context on current thread.
+     */
+    @Override
+    public int getGlTextureId()
+    {
+        if (bindNeeded)
+        {
+            bindTexture();
+        }
+        return super.getGlTextureId();
     }
 
     /**
      * Does not delete GLID - use with caution
      */
-    public void clear()
+    private void clear()
     {
-
+        synchronized (bufferLock)
+        {
+            this.buffer = null;
+        }
         this.image = null;
-        this.buffer = null;
         this.bindNeeded = false;
-        this.lastUpdated = 0;
+        this.lastImageUpdate = 0;
+        this.lastBound = 0;
         this.glTextureId = -1;
-
-    }
-
-    /**
-     * May be called without GL Context on current thread.
-     * Returns null if unbound (-1)
-     */
-    public Integer getSafeGlTextureId()
-    {
-        return this.glTextureId == -1 ? null : this.glTextureId;
     }
 
     /**
@@ -281,14 +292,14 @@ public class TextureImpl extends AbstractTexture
         return success;
     }
 
-    public long getLastUpdated()
+    public long getLastImageUpdate()
     {
-        return lastUpdated;
+        return lastImageUpdate;
     }
 
-    public void setLastUpdated(long time)
+    public long getLastBound()
     {
-        lastUpdated = time;
+        return lastBound;
     }
 
     @Override
@@ -302,7 +313,8 @@ public class TextureImpl extends AbstractTexture
         return Objects.toStringHelper(this)
                 .add("glid", glTextureId)
                 .add("description", description)
-                .add("lastUpdated", lastUpdated)
+                .add("lastImageUpdate", lastImageUpdate)
+                .add("lastBound", lastBound)
                 .toString();
     }
 

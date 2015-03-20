@@ -9,6 +9,7 @@ import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.GridSpec;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageCache;
+import net.techbrew.journeymap.model.RegionImageSet;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -19,8 +20,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 /**
  *
@@ -31,15 +30,17 @@ public class TileDrawStep
 
     private final Logger logger = JourneyMap.getLogger();
     private final boolean debug = logger.isTraceEnabled();
+    private final RegionCoord regionCoord;
+    private final Constants.MapType mapType;
+    private final Integer zoom;
+    private final boolean highQuality;
+    private final StatTimer drawTimer;
+    private final RegionImageSet regionImageSet;
     private int sx1, sy1, sx2, sy2;
     private int size;
+    private long lastTouch;
     private TextureImpl scaledTexture;
-    private Future<TextureImpl> pendingScaledTexture;
-    private RegionCoord regionCoord;
-    private Constants.MapType mapType;
-    private Integer zoom;
-    private boolean highQuality;
-    private StatTimer drawTimer;
+    private TextureImpl regionTexture;
 
     public TileDrawStep(RegionCoord regionCoord, final Constants.MapType mapType, Integer zoom, int sx1, int sy1, int sx2, int sy2)
     {
@@ -51,7 +52,16 @@ public class TileDrawStep
         this.sy1 = sy1;
         this.sy2 = sy2;
         this.size = sx2 - sx1;
-        updateTexture();
+        this.highQuality = JourneyMap.getCoreProperties().tileHighDisplayQuality.get() && zoom != 0; // todo change when zoom can be < zero or 0 no longer 1:1
+        this.drawTimer = (this.highQuality) ? StatTimer.get("TileDrawStep.draw(high)") : StatTimer.get("TileDrawStep.draw(low)");
+
+        this.regionImageSet = RegionImageCache.instance().getRegionImageSet(regionCoord);
+        this.regionTexture = regionImageSet.getHolder(mapType).getTexture();
+
+        if (highQuality)
+        {
+            updateScaledTexture();
+        }
     }
 
     public static int toHashCode(RegionCoord regionCoord, final Constants.MapType mapType, Integer zoom, int sx1, int sy1, int sx2, int sy2)
@@ -59,83 +69,24 @@ public class TileDrawStep
         return Objects.hashCode(regionCoord, mapType, zoom, sx1, sy1, sx2, sy2);
     }
 
-    void updateTexture()
-    {
-        boolean newQuality = JourneyMap.getCoreProperties().tileHighDisplayQuality.get();
-        if (newQuality != this.highQuality || drawTimer == null)
-        {
-            this.highQuality = newQuality;
-            drawTimer = (this.highQuality) ? StatTimer.get("TileDrawStep.draw(high)") : StatTimer.get("TileDrawStep.draw(low)");
-            //updateTextureTimer = (this.highQuality==Constants.MapTileQuality.High) ? StatTimer.get("TileDrawStep.updateTexture(high)") : StatTimer.get("TileDrawStep.updateTexture(low)");
-        }
-
-        //updateTextureTimer.start();
-
-        // Cancel pending textures if any
-        if (pendingScaledTexture != null && !pendingScaledTexture.isDone())
-        {
-            pendingScaledTexture.cancel(false);
-            pendingScaledTexture = null;
-        }
-
-        RegionImageCache.instance().getRegionImageSet(regionCoord).getHolder(mapType).updateTexture();
-
-        try
-        {
-            if (highQuality && (zoom != 0)) // todo change when zoom can be < zero or 0 no longer 1:1
-            {
-                pendingScaledTexture = TextureCache.instance().scheduleTextureTask(createDelayedScaledTexture());
-            }
-        }
-        catch (Exception e)
-        {
-            JourneyMap.getLogger().warn(String.format("Can't get sync texture for %s : %s", this, e));
-        }
-    }
-
-    void bindPendingTextures()
-    {
-        if (pendingScaledTexture != null && pendingScaledTexture.isDone())
-        {
-            try
-            {
-                this.scaledTexture = pendingScaledTexture.get();
-                if (this.scaledTexture != null)
-                {
-                    this.scaledTexture.bindTexture();
-                }
-                else
-                {
-                    JourneyMap.getLogger().warn(String.format("TileDrawStep couldn't get async scaled texture for %s : %s", this, null));
-                }
-            }
-            catch (Throwable t)
-            {
-                JourneyMap.getLogger().warn(String.format("TileDrawStep couldn't bind async scaled texture for %s : %s", this, t));
-            }
-            this.pendingScaledTexture = null;
-        }
-    }
-
     void draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, int textureFilter, int textureWrap, GridSpec gridSpec)
     {
+        // Keep regionImageSet in cache
+        long now = System.currentTimeMillis();
+        if (now - lastTouch > 5000)
+        {
+            regionImageSet.touch();
+            lastTouch = now;
+        }
+
         // Bind pending textures if needed
-        bindPendingTextures();
-
-        Integer textureId = null;
-        boolean fullSize = false;
-        long imageTimestamp = 0;
-
-        if (scaledTexture != null)
+        regionTexture.bindTexture();
+        if (highQuality && scaledTexture.getLastBound() < regionTexture.getLastBound())
         {
-            textureId = scaledTexture.getGlTextureId();
-            imageTimestamp = scaledTexture.getLastUpdated();
-            fullSize = true;
+            updateScaledTexture();
         }
-        else
-        {
-            textureId = RegionImageCache.instance().getBoundRegionTextureId(regionCoord, mapType);
-        }
+
+        Integer textureId = highQuality ? scaledTexture.getGlTextureId() : regionTexture.getGlTextureId();
 
         // Draw already!
         drawTimer.start();
@@ -150,10 +101,10 @@ public class TileDrawStep
 
         final double size = Tile.TILESIZE;
 
-        final double startU = fullSize ? 0D : sx1 / size;
-        final double startV = fullSize ? 0D : sy1 / size;
-        final double endU = fullSize ? 1D : sx2 / size;
-        final double endV = fullSize ? 1D : sy2 / size;
+        final double startU = highQuality ? 0D : sx1 / size;
+        final double startV = highQuality ? 0D : sy1 / size;
+        final double endU = highQuality ? 1D : sx2 / size;
+        final double endV = highQuality ? 1D : sy2 / size;
 
         // Background
         DrawUtil.drawRectangle(startX, startY, endX - startX, endY - startY, bgColor, 200);
@@ -167,7 +118,7 @@ public class TileDrawStep
             GL11.glColor4f(1, 1, 1, alpha);
 
             // http://gregs-blog.com/2008/01/17/opengl-texture-filter-parameters-explained/
-            if (!fullSize && zoom > 0)
+            if (!highQuality)
             {
                 textureFilter = GL11.GL_NEAREST;
             }
@@ -198,11 +149,9 @@ public class TileDrawStep
             DrawUtil.drawRectangle(debugX, debugY, 3, endV * 512, Color.green, 200);
             DrawUtil.drawRectangle(debugX, debugY, endU * 512, 3, Color.red, 200);
             DrawUtil.drawLabel(this.toString(), debugX + 5, debugY + 10, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
-            DrawUtil.drawLabel(String.format("Full size: %s", fullSize), debugX + 5, debugY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
-            if (hasTexture())
-            {
-                DrawUtil.drawLabel(new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(imageTimestamp)), debugX + 5, debugY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
-            }
+            DrawUtil.drawLabel(String.format("Full size: %s", highQuality), debugX + 5, debugY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
+            long imageTimestamp = highQuality ? scaledTexture.getLastBound() : regionTexture.getLastBound();
+            DrawUtil.drawLabel(new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(imageTimestamp)), debugX + 5, debugY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
         }
 
         drawTimer.stop();
@@ -226,30 +175,10 @@ public class TileDrawStep
         tessellator.draw();
     }
 
-    public boolean hasTexture()
-    {
-        return scaledTexture != null || RegionImageCache.instance().getBoundRegionTextureId(regionCoord, mapType) != null;
-    }
-
-//    public boolean isDirtySince(long time)
-//    {
-//        return RegionImageCache.instance().isDirtySince(regionCoord, mapType, time);
-//    }
-
     public void clearTexture()
     {
-        pendingScaledTexture = null;
-        if (scaledTexture != null)
-        {
-            TextureCache.instance().expireTexture(scaledTexture);
-            scaledTexture = null;
-        }
-        pendingScaledTexture = null;
-    }
-
-    public RegionCoord getRegionCoord()
-    {
-        return regionCoord;
+        TextureCache.instance().expireTexture(scaledTexture);
+        scaledTexture = null;
     }
 
     public Constants.MapType getMapType()
@@ -280,24 +209,22 @@ public class TileDrawStep
                 .toString();
     }
 
-
-    private Callable<TextureImpl> createDelayedScaledTexture()
+    private void updateScaledTexture()
     {
-        return new Callable<TextureImpl>()
+        BufferedImage image = RegionImageHandler.getScaledRegionArea(regionCoord, mapType, zoom, highQuality, sx1, sy1);
+        if (image == null)
         {
-            @Override
-            public TextureImpl call() throws Exception
-            {
-                BufferedImage image = RegionImageHandler.getScaledRegionArea(regionCoord, mapType, zoom, highQuality, sx1, sy1);
-                if (image == null)
-                {
-                    return null;
-                }
-                else
-                {
-                    return new TextureImpl(null, image, false, false);
-                }
-            }
-        };
+            return;
+        }
+        if (scaledTexture == null)
+        {
+            scaledTexture = new TextureImpl(null, image, false, false);
+            scaledTexture.setDescription("scaled");
+        }
+        else
+        {
+            scaledTexture.updateAndBind(image, false);
+        }
+        scaledTexture.bindTexture();
     }
 }

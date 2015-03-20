@@ -213,7 +213,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                            final Graphics2D g2D)
     {
         g2D.setPaint(RGB.paintOf(color));
-        g2D.drawLine(x, z, x, z);
+        g2D.fillRect(x, z, 1, 1);
     }
 
     /**
