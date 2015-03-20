@@ -62,6 +62,7 @@ public class MapState
     private List<EntityDTO> entityList = new ArrayList<EntityDTO>(32);
     private int lastPlayerChunkX = 0;
     private int lastPlayerChunkZ = 0;
+    private boolean highQuality;
 
     /**
      * Default constructor
@@ -87,6 +88,7 @@ public class MapState
 
         lastPlayerChunkX = player.chunkCoordX;
         lastPlayerChunkZ = player.chunkCoordZ;
+        highQuality = JourneyMap.getCoreProperties().tileHighDisplayQuality.get();
 
         if (player.dimension != this.dimension)
         {
@@ -333,6 +335,11 @@ public class MapState
         lastPlayerChunkZ = player.chunkCoordZ;
 
         return false;
+    }
+
+    public boolean isHighQuality()
+    {
+        return highQuality;
     }
 
     public boolean isCaveMappingAllowed()

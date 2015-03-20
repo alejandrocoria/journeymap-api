@@ -233,7 +233,7 @@ public class GridRenderer
         return true;
     }
 
-    public void updateTiles(MapType mapType, Integer vSlice, int zoom, int width, int height, boolean fullUpdate, double xOffset, double yOffset)
+    public void updateTiles(MapType mapType, Integer vSlice, int zoom, boolean highQuality, int width, int height, boolean fullUpdate, double xOffset, double yOffset)
     {
         updateTilesTimer1.start();
         this.mapType = mapType;
@@ -292,7 +292,6 @@ public class GridRenderer
         Integer hashCode;
 
         // Get tiles
-        boolean highQuality = JourneyMap.getCoreProperties().tileHighDisplayQuality.get();
         for (Map.Entry<TilePos, Tile> entry : grid.entrySet())
         {
             pos = entry.getKey();

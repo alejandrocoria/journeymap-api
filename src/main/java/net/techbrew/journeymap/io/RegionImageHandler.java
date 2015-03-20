@@ -338,7 +338,7 @@ public class RegionImageHandler
         List<TileDrawStep> drawSteps = new ArrayList<TileDrawStep>();
 
         RegionCoord rc;
-        int rminCx, rminCz, rmaxCx, rmaxCz, sx1, sy1, sx2, sy2, dx1, dx2, dy1, dy2;
+        int rminCx, rminCz, rmaxCx, rmaxCz, sx1, sy1, sx2, sy2;
 
         for (int rx = rx1; rx <= rx2; rx++)
         {
@@ -357,7 +357,7 @@ public class RegionImageHandler
                 sx2 = sx1 + ((rmaxCx - rminCx + 1) * 16);
                 sy2 = sy1 + ((rmaxCz - rminCz + 1) * 16);
 
-                drawSteps.add(TileDrawStepCache.getOrCreate(mapType, rc, zoom, sx1, sy1, sx2, sy2));
+                drawSteps.add(TileDrawStepCache.getOrCreate(mapType, rc, zoom, highQuality, sx1, sy1, sx2, sy2));
             }
         }
 

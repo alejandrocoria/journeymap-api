@@ -53,9 +53,9 @@ public class TileDrawStepCache
         return Holder.INSTANCE.drawStepCache;
     }
 
-    public static TileDrawStep getOrCreate(final Constants.MapType mapType, RegionCoord regionCoord, Integer zoom, int sx1, int sy1, int sx2, int sy2)
+    public static TileDrawStep getOrCreate(final Constants.MapType mapType, RegionCoord regionCoord, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
     {
-        return Holder.INSTANCE._getOrCreate(mapType, regionCoord, zoom, sx1, sy1, sx2, sy2);
+        return Holder.INSTANCE._getOrCreate(mapType, regionCoord, zoom, highQuality, sx1, sy1, sx2, sy2);
     }
 
     public static void clear()
@@ -63,7 +63,7 @@ public class TileDrawStepCache
         instance().invalidateAll();
     }
 
-    private TileDrawStep _getOrCreate(final Constants.MapType mapType, RegionCoord regionCoord, Integer zoom, int sx1, int sy1, int sx2, int sy2)
+    private TileDrawStep _getOrCreate(final Constants.MapType mapType, RegionCoord regionCoord, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
     {
         checkWorldChange(regionCoord);
 
@@ -71,7 +71,7 @@ public class TileDrawStepCache
         TileDrawStep tileDrawStep = drawStepCache.getIfPresent(hash);
         if (tileDrawStep == null)
         {
-            tileDrawStep = new TileDrawStep(regionCoord, mapType, zoom, sx1, sy1, sx2, sy2);
+            tileDrawStep = new TileDrawStep(regionCoord, mapType, zoom, highQuality, sx1, sy1, sx2, sy2);
             drawStepCache.put(hash, tileDrawStep);
         }
         return tileDrawStep;

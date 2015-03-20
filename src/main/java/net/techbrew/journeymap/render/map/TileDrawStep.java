@@ -1,6 +1,8 @@
 package net.techbrew.journeymap.render.map;
 
 import com.google.common.base.Objects;
+import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -30,6 +32,7 @@ public class TileDrawStep
 
     private final Logger logger = JourneyMap.getLogger();
     private final boolean debug = logger.isTraceEnabled();
+    private final Minecraft minecraft = FMLClientHandler.instance().getClient();
     private final RegionCoord regionCoord;
     private final Constants.MapType mapType;
     private final Integer zoom;
@@ -42,7 +45,7 @@ public class TileDrawStep
     private TextureImpl scaledTexture;
     private TextureImpl regionTexture;
 
-    public TileDrawStep(RegionCoord regionCoord, final Constants.MapType mapType, Integer zoom, int sx1, int sy1, int sx2, int sy2)
+    public TileDrawStep(RegionCoord regionCoord, final Constants.MapType mapType, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
     {
         this.mapType = mapType;
         this.regionCoord = regionCoord;
@@ -52,7 +55,7 @@ public class TileDrawStep
         this.sy1 = sy1;
         this.sy2 = sy2;
         this.size = sx2 - sx1;
-        this.highQuality = JourneyMap.getCoreProperties().tileHighDisplayQuality.get() && zoom != 0; // todo change when zoom can be < zero or 0 no longer 1:1
+        this.highQuality = highQuality && zoom != 0; // todo change when zoom can be < zero or 0 no longer 1:1
         this.drawTimer = (this.highQuality) ? StatTimer.get("TileDrawStep.draw(high)") : StatTimer.get("TileDrawStep.draw(low)");
 
         this.regionImageSet = RegionImageCache.instance().getRegionImageSet(regionCoord);
