@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.GridSpec;
@@ -31,10 +32,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Contains a set of 9 tiles organized along compass Point2D.Doubles.
@@ -140,12 +139,12 @@ public class GridRenderer
 
     public void move(final int deltaBlockX, final int deltaBlockZ)
     {
-        center(centerBlockX + deltaBlockX, centerBlockZ + deltaBlockZ, zoom);
+        center(centerBlockX + deltaBlockX, vSlice, centerBlockZ + deltaBlockZ, zoom);
     }
 
     public boolean center()
     {
-        return center(centerBlockX, centerBlockZ, zoom);
+        return center(centerBlockX, vSlice, centerBlockZ, zoom);
     }
 
     public boolean hasUnloadedTile()
@@ -181,9 +180,19 @@ public class GridRenderer
         return false;
     }
 
-    public boolean center(final double blockX, final double blockZ, final int zoom)
+
+    // todo    REGION IMAGE SET HOLD MULTIPLE SLICES??  NO, BUT SLOW?
+
+    public boolean center(final double blockX, Integer vSlice, final double blockZ, final int zoom)
     {
-        if (blockX == centerBlockX && blockZ == centerBlockZ && zoom == this.zoom && !grid.isEmpty())
+        if (!DataCache.getPlayer().underground)
+        {
+            vSlice = null;
+        }
+
+        boolean vSliceChanged = !Objects.equals(vSlice, this.vSlice);
+
+        if ((blockX == centerBlockX) && (blockZ == centerBlockZ) && (zoom == this.zoom) && !vSliceChanged && !grid.isEmpty())
         {
             // Nothing needs to change
             return false;
@@ -191,6 +200,7 @@ public class GridRenderer
 
         centerBlockX = blockX;
         centerBlockZ = blockZ;
+        this.vSlice = vSlice;
         this.zoom = zoom;
 
         // Get zoomed tile coords
@@ -202,7 +212,7 @@ public class GridRenderer
         final boolean centerTileChanged = newCenterHash != centerTileHash;
         centerTileHash = newCenterHash;
 
-        if (centerTileChanged || grid.isEmpty())
+        if (vSliceChanged || centerTileChanged || grid.isEmpty())
         {
             // Center on tile
             Tile newCenterTile = findTile(tileX, tileZ, zoom);
@@ -637,7 +647,7 @@ public class GridRenderer
 
     public boolean setZoom(int zoom)
     {
-        return center(centerBlockX, centerBlockZ, zoom);
+        return center(centerBlockX, vSlice, centerBlockZ, zoom);
     }
 
     public int getRenderSize()

@@ -96,7 +96,7 @@ public class MiniMap
         int gridSize = miniMapProperties.getSize() <= 768 ? 3 : 5;
         gridRenderer.setGridSize(gridSize);
         gridRenderer.setContext(state.getWorldDir(), state.getDimension());
-        gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
+        gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.chunkCoordY, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
         boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || miniMapProperties.showCaves.get());
         gridRenderer.updateTiles(state.getMapType(showCaves), state.getVSlice(), state.getZoom(), mc.displayWidth, mc.displayHeight, true, 0, 0);
     }
@@ -162,7 +162,7 @@ public class MiniMap
             }
 
             // Update the grid
-            boolean moved = gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
+            boolean moved = gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.chunkCoordY, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
             if (moved || doStateRefresh)
             {
                 boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || miniMapProperties.showCaves.get());
