@@ -112,6 +112,7 @@ public class Fullscreen extends JmUI
     {
         state.requireRefresh();
         gridRenderer.clear();
+        new Fullscreen(); // preloads theme textures
     }
 
     @Override
