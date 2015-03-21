@@ -29,7 +29,7 @@ import net.techbrew.journeymap.render.draw.WaypointDrawStepFactory;
 import net.techbrew.journeymap.render.map.GridRenderer;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
-import net.techbrew.journeymap.task.MapPlayerTask;
+import net.techbrew.journeymap.task.multi.MapPlayerTask;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 

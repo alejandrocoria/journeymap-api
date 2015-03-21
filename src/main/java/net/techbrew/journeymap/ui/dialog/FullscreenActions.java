@@ -21,8 +21,8 @@ import net.techbrew.journeymap.model.MapState;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
-import net.techbrew.journeymap.task.MapRegionTask;
-import net.techbrew.journeymap.task.SaveMapTask;
+import net.techbrew.journeymap.task.multi.MapRegionTask;
+import net.techbrew.journeymap.task.multi.SaveMapTask;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.BooleanPropertyButton;
 import net.techbrew.journeymap.ui.component.Button;
@@ -49,14 +49,14 @@ public class FullscreenActions extends JmUI
 
     public static void launchLocalhost()
     {
-        String url = "http://localhost:" + JourneyMap.getWebMapProperties().port.get(); 
+        String url = "http://localhost:" + JourneyMap.getWebMapProperties().port.get();
         try
         {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
         }
         catch (IOException e)
         {
-            JourneyMap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e)); 
+            JourneyMap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e));
         }
     }
 
@@ -69,7 +69,7 @@ public class FullscreenActions extends JmUI
         }
         catch (IOException e)
         {
-            JourneyMap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e)); 
+            JourneyMap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e));
         }
     }
 
@@ -86,7 +86,7 @@ public class FullscreenActions extends JmUI
 
         buttonSave = new Button(Constants.getString("jm.common.save_map"));
         buttonClose = new Button(Constants.getString("jm.common.close"));
-        buttonBrowser = new Button(Constants.getString("jm.common.use_browser")); 
+        buttonBrowser = new Button(Constants.getString("jm.common.use_browser"));
         buttonBrowser.setEnabled(JourneyMap.getWebMapProperties().enabled.get());
 
         buttonAutomap = new Button(Constants.getString("jm.common.automap_title"));
@@ -231,7 +231,7 @@ public class FullscreenActions extends JmUI
         if (mapSaver.isValid())
         {
             JourneyMap.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
-            ChatLog.announceI18N("jm.common.save_filename", mapSaver.getSaveFileName()); 
+            ChatLog.announceI18N("jm.common.save_filename", mapSaver.getSaveFileName());
         }
         close();
     }

@@ -60,11 +60,7 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
                 {
                     mc.mcProfiler.startSection("journeymap");
 
-                    mc.mcProfiler.startSection("minimap");
-
                     UIManager.getInstance().drawMiniMap();
-
-                    mc.mcProfiler.endSection(); // minimap
 
                     mc.mcProfiler.endSection(); // journeymap
                 }

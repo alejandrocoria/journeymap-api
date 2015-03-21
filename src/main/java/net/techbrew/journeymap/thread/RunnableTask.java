@@ -13,7 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.task.ITask;
+import net.techbrew.journeymap.task.multi.ITask;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;

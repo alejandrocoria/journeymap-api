@@ -12,7 +12,7 @@ import com.google.common.base.Objects;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.resources.IResourceManager;
 import net.techbrew.journeymap.JourneyMap;
-import org.lwjgl.opengl.Display;
+import net.techbrew.journeymap.task.main.ExpireTextureTask;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.image.BufferedImage;
@@ -192,6 +192,11 @@ public class TextureImpl extends AbstractTexture
         return bindNeeded;
     }
 
+    public boolean isBound()
+    {
+        return glTextureId != -1;
+    }
+
     public String getDescription()
     {
         return description;
@@ -241,7 +246,7 @@ public class TextureImpl extends AbstractTexture
         return image;
     }
 
-    public boolean isUnused()
+    public boolean isDefunct()
     {
         return this.glTextureId == -1 && image == null && buffer == null;
     }
@@ -262,7 +267,7 @@ public class TextureImpl extends AbstractTexture
     /**
      * Does not delete GLID - use with caution
      */
-    private void clear()
+    public void clear()
     {
         bufferLock.lock();
         this.buffer = null;
@@ -277,35 +282,9 @@ public class TextureImpl extends AbstractTexture
     /**
      * Must be called on same thread as OpenGL Context
      */
-    public boolean deleteTexture()
+    public void queueForDeletion()
     {
-        boolean success = false;
-
-        if (this.glTextureId != -1)
-        {
-            try
-            {
-                if (Display.isCurrent())
-                {
-                    GL11.glDeleteTextures(this.getGlTextureId());
-                    this.glTextureId = -1;
-                    clear();
-                    success = true;
-                }
-            }
-            catch (Throwable t)
-            {
-                JourneyMap.getLogger().warn("Couldn't delete texture: " + t);
-                success = false;
-            }
-        }
-        else
-        {
-            clear();
-            success = true;
-        }
-
-        return success;
+        ExpireTextureTask.queue(this);
     }
 
     public long getLastImageUpdate()
@@ -336,16 +315,9 @@ public class TextureImpl extends AbstractTexture
 
     public void finalize()
     {
-        if (this.glTextureId != -1)
+        if (isBound())
         {
-            if (!deleteTexture())
-            {
-                JourneyMap.getLogger().error("TextureImpl disposed without deleting texture glID: " + this.glTextureId);
-            }
-            else
-            {
-                JourneyMap.getLogger().warn("TextureImpl hadn't deleted texture glID before disposed of properly.");
-            }
+            JourneyMap.getLogger().error("TextureImpl disposed without deleting texture glID: " + this);
         }
     }
 

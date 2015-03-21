@@ -121,7 +121,7 @@ public abstract class JmUI extends GuiScreen
 
     protected void drawLogo()
     {
-        if (logo.isUnused())
+        if (logo.isDefunct())
         {
             logo = TextureCache.instance().getLogo();
         }

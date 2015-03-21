@@ -6,7 +6,7 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
  */
 
-package net.techbrew.journeymap.task;
+package net.techbrew.journeymap.task.multi;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
@@ -40,7 +40,6 @@ public class TaskController
     {
         managers.add(new MapRegionTask.Manager());
         managers.add(new SaveMapTask.Manager());
-        managers.add(new DeleteMapTask.Manager());
         managers.add(new MapPlayerTask.Manager());
     }
 
@@ -191,7 +190,7 @@ public class TaskController
     {
         Profiler profiler = FMLClientHandler.instance().getClient().mcProfiler;
         profiler.startSection("journeymapTask");
-        StatTimer totalTimer = StatTimer.get("TaskController.performTasks", 1, 500).start();
+        StatTimer totalTimer = StatTimer.get("TaskController.performMultithreadTasks", 1, 500).start();
 
         try
         {

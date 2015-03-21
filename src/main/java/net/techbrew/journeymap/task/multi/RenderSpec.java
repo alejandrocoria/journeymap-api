@@ -1,4 +1,4 @@
-package net.techbrew.journeymap.task;
+package net.techbrew.journeymap.task.multi;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
@@ -142,12 +142,12 @@ public class RenderSpec
         DataCache dataCache = DataCache.instance();
 
         // Reset coords if player moved
-        if(lastPlayerCoord==null || lastPlayerCoord.chunkXPos!=player.chunkCoordX || lastPlayerCoord.chunkZPos!=player.chunkCoordZ)
+        if (lastPlayerCoord == null || lastPlayerCoord.chunkXPos != player.chunkCoordX || lastPlayerCoord.chunkZPos != player.chunkCoordZ)
         {
             primaryRenderCoords = null;
             lastSecondaryRenderDistance = primaryRenderDistance;
         }
-        lastPlayerCoord= new ChunkCoordIntPair(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
+        lastPlayerCoord = new ChunkCoordIntPair(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
 
         // Add min distance coords around player
         if (primaryRenderCoords == null || primaryRenderCoords.isEmpty())

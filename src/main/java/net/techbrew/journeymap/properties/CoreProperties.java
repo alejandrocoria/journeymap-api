@@ -14,7 +14,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.properties.config.Config;
-import net.techbrew.journeymap.task.RenderSpec;
+import net.techbrew.journeymap.task.multi.RenderSpec;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;

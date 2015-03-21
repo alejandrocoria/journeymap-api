@@ -79,17 +79,17 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         {
             if (counter == 20)
             {
-                mc.mcProfiler.startSection("onClientTick");
-                JourneyMap.getInstance().onClientTick();
+                mc.mcProfiler.startSection("mainTasks");
+                JourneyMap.getInstance().performMainThreadTasks();
                 counter = 0;
                 mc.mcProfiler.endSection();
             }
             else if (counter == 10)
             {
-                mc.mcProfiler.startSection("performTasks");
+                mc.mcProfiler.startSection("multithreadTasks");
                 if (JourneyMap.getInstance().isMapping() && mc.theWorld != null)
                 {
-                    JourneyMap.getInstance().performTasks();
+                    JourneyMap.getInstance().performMultithreadTasks();
                 }
                 counter++;
                 mc.mcProfiler.endSection();
@@ -98,11 +98,10 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             {
                 counter++;
             }
-
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn("Error during onClientTick: " + e);
+            JourneyMap.getLogger().warn("Error during performMainThreadTasks: " + e);
         }
         finally
         {

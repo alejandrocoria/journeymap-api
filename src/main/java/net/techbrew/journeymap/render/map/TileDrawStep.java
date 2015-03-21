@@ -13,8 +13,8 @@ import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.model.RegionImageSet;
 import net.techbrew.journeymap.render.draw.DrawUtil;
-import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
+import net.techbrew.journeymap.task.main.ExpireTextureTask;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
@@ -183,7 +183,7 @@ public class TileDrawStep
 
     public void clearTexture()
     {
-        TextureCache.instance().expireTexture(scaledTexture);
+        ExpireTextureTask.queue(scaledTexture);
         scaledTexture = null;
     }
 

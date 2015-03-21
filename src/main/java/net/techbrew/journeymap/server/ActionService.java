@@ -17,8 +17,8 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.MapSaver;
 import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.task.MapRegionTask;
-import net.techbrew.journeymap.task.SaveMapTask;
+import net.techbrew.journeymap.task.multi.MapRegionTask;
+import net.techbrew.journeymap.task.multi.SaveMapTask;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 

@@ -24,7 +24,7 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
-import net.techbrew.journeymap.task.MapPlayerTask;
+import net.techbrew.journeymap.task.multi.MapPlayerTask;
 
 import java.awt.*;
 import java.util.*;

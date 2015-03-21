@@ -17,14 +17,12 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.*;
 import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.cartography.ColorCache;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.forgehandler.EventHandlerManager;
-import net.techbrew.journeymap.forgehandler.MiniMapOverlayHandler;
 import net.techbrew.journeymap.forgehandler.WorldInfoHandler;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
@@ -36,10 +34,12 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.properties.*;
 import net.techbrew.journeymap.render.map.TileDrawStepCache;
-import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.server.JMServer;
-import net.techbrew.journeymap.task.ITaskManager;
-import net.techbrew.journeymap.task.TaskController;
+import net.techbrew.journeymap.task.main.IMainThreadTask;
+import net.techbrew.journeymap.task.main.MainTaskController;
+import net.techbrew.journeymap.task.main.MappingMonitorTask;
+import net.techbrew.journeymap.task.multi.ITaskManager;
+import net.techbrew.journeymap.task.multi.TaskController;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import net.techbrew.journeymap.waypoint.WaypointStore;
@@ -61,11 +61,11 @@ import java.io.File;
 @Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = "@JMVERSION@", canBeDeactivated = true)
 public class JourneyMap
 {
-    public static final String WEBSITE_URL = "http://journeymap.techbrew.net/"; //$NON-NLS-1$
-    public static final String DOWNLOAD_URL = WEBSITE_URL + "download"; //$NON-NLS-1$
+    public static final String WEBSITE_URL = "http://journeymap.techbrew.net/";
+    public static final String DOWNLOAD_URL = WEBSITE_URL + "download";
     public static final Version JM_VERSION = Version.from(
             "@MAJOR@", "@MINOR@", "@MICRO@", "@PATCH@", new Version(5, 1, 0, "dev"));
-    public static final String FORGE_VERSION = "@FORGEVERSION@"; //$NON-NLS-1$
+    public static final String FORGE_VERSION = "@FORGEVERSION@";
     public static final String EDITION = getEdition();
     public static final String MOD_ID = "journeymap";
     public static final String SHORT_MOD_NAME = "JourneyMap";
@@ -89,9 +89,13 @@ public class JourneyMap
     private String playerName;
 
     // Task controller for issuing tasks in executor
-    private TaskController taskController;
+    private TaskController multithreadTaskController;
     private ChunkRenderController chunkRenderController;
-    private Minecraft mc;
+
+    // Controller for tasks that have to be done on the main thread
+    private volatile MainTaskController mainThreadTaskController;
+
+    private volatile Minecraft mc;
 
     /**
      * Constructor.
@@ -233,7 +237,7 @@ public class JourneyMap
 
     public Boolean isMapping()
     {
-        return initialized && taskController != null && taskController.isMapping();
+        return initialized && multithreadTaskController != null && multithreadTaskController.isMapping();
     }
 
     public Boolean isThreadLogging()
@@ -299,6 +303,13 @@ public class JourneyMap
             logger.info("postInitialize ENTER");
             timer = StatTimer.getDisposable("elapsed").start();
 
+            // Get ref to Minecraft
+            mc = FMLClientHandler.instance().getClient();
+
+            // Main thread task controller
+            mainThreadTaskController = new MainTaskController(mc, this);
+            mainThreadTaskController.addTask(new MappingMonitorTask());
+
             // Register general event handlers
             EventHandlerManager.registerGeneralHandlers();
             EventHandlerManager.registerGuiHandlers();
@@ -339,11 +350,6 @@ public class JourneyMap
         return JMServer.getInstance();
     }
 
-    public void toggleWebserver(boolean enable, boolean announce)
-    {
-        JMServer.setEnabled(enable, announce);
-    }
-
     /**
      * Toggles automapping
      *
@@ -351,9 +357,9 @@ public class JourneyMap
      */
     public void toggleTask(Class<? extends ITaskManager> managerClass, boolean enable, Object params)
     {
-        if (taskController != null)
+        if (multithreadTaskController != null)
         {
-            taskController.toggleTask(managerClass, enable, params);
+            multithreadTaskController.toggleTask(managerClass, enable, params);
         }
     }
 
@@ -365,9 +371,9 @@ public class JourneyMap
      */
     public boolean isTaskManagerEnabled(Class<? extends ITaskManager> managerClass)
     {
-        if (taskController != null)
+        if (multithreadTaskController != null)
         {
-            return taskController.isTaskManagerEnabled(managerClass);
+            return multithreadTaskController.isTaskManagerEnabled(managerClass);
         }
         else
         {
@@ -407,8 +413,8 @@ public class JourneyMap
             this.reset();
             ColorCache.instance().ensureCurrent();
 
-            taskController = new TaskController();
-            taskController.enableTasks();
+            multithreadTaskController = new TaskController();
+            multithreadTaskController.enableTasks();
 
             long totalMB = Runtime.getRuntime().totalMemory() / 1024 / 1024;
             long freeMB = Runtime.getRuntime().freeMemory() / 1024 / 1024;
@@ -416,7 +422,7 @@ public class JourneyMap
             logger.info(String.format("Mapping started in %s%sDIM%s. %s ", FileHandler.getJMWorldDir(mc, currentWorldId),
                     File.separator,
                     mc.theWorld.provider.dimensionId,
-                    memory)); //$NON-NLS-1$
+                    memory));
         }
     }
 
@@ -432,16 +438,16 @@ public class JourneyMap
                 String dim = ".";
                 if (mc.theWorld != null && mc.theWorld.provider != null)
                 {
-                    dim = " dimension " + mc.theWorld.provider.dimensionId + "."; //$NON-NLS-1$ //$NON-NLS-2$
+                    dim = " dimension " + mc.theWorld.provider.dimensionId + ".";
                 }
-                logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, mc.theWorld.provider.dimensionId)); //$NON-NLS-1$
+                logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, mc.theWorld.provider.dimensionId));
             }
 
-            if (taskController != null)
+            if (multithreadTaskController != null)
             {
-                taskController.disableTasks();
-                taskController.clear();
-                taskController = null;
+                multithreadTaskController.disableTasks();
+                multithreadTaskController.clear();
+                multithreadTaskController = null;
             }
         }
     }
@@ -470,129 +476,37 @@ public class JourneyMap
         WaypointStore.instance().reset();
     }
 
-    public void softReset()
+    public void queueMainThreadTask(IMainThreadTask task)
     {
-        loadConfigProperties();
-        JMLogger.setLevelFromProperties();
-        DataCache.instance().purge();
-        DataCache.instance().resetBlockMetadata();
-        TileDrawStepCache.instance().invalidateAll();
-        UIManager.getInstance().reset();
-        WaypointStore.instance().reset();
-        MiniMapOverlayHandler.checkEventConfig();
-        ThemeFileHandler.getCurrentTheme(true);
-        UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+        mainThreadTaskController.addTask(task);
     }
 
-    public void onClientTick()
+    public void performMainThreadTasks()
     {
-        StatTimer timer = StatTimer.getDisposable("JourneyMap.onClientTick", 200).start();
-        //long start = System.nanoTime();
         try
         {
-            if (!initialized)
-            {
-                return;
-            }
-
-            if (mc == null)
-            {
-                mc = FMLClientHandler.instance().getClient();
-            }
-
-//            if (modInfo != null)
-//            {
-//                if (System.currentTimeMillis() - lastModInfoKeepAlive > 600000) // 10 minutes
-//                {
-//                    lastModInfoKeepAlive = System.currentTimeMillis();
-//                    modInfo.keepAlive();
-//                }
-//            }
-
-            final boolean isDead = mc.currentScreen != null && mc.currentScreen instanceof GuiGameOver;
-
-            if (mc.theWorld == null)
-            {
-                if (isMapping())
-                {
-                    stopMapping();
-                }
-
-                GuiScreen guiScreen = mc.currentScreen;
-                if (guiScreen instanceof GuiMainMenu ||
-                        guiScreen instanceof GuiSelectWorld ||
-                        guiScreen instanceof GuiMultiplayer)
-                {
-                    if (currentWorldId != null)
-                    {
-                        JourneyMap.getLogger().info("World ID has been reset.");
-                        currentWorldId = null;
-                    }
-                }
-
-                return;
-            }
-            else
-            {
-                if (!isMapping() && !isDead && coreProperties.mappingEnabled.get())
-                {
-                    startMapping();
-                }
-            }
-
-            final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof Fullscreen);
-            if (isGamePaused)
-            {
-                if (!isMapping())
-                {
-                    return;
-                }
-            }
-
-            // Show announcements
-            if (!isGamePaused)
-            {
-                ChatLog.showChatAnnouncements(mc);
-            }
-
-            // Clear expired textures
-            TextureCache.instance().onClientTick();
-
-            // Start Mapping
-            if (!isMapping() && coreProperties.mappingEnabled.get())
-            {
-                startMapping();
-            }
+            mainThreadTaskController.performTasks();
         }
         catch (Throwable t)
         {
-            logger.error("Error in JourneyMap.onClientTick(): " + LogFormatter.toString(t));
-        }
-        finally
-        {
-            timer.stop();
-//            final double elapsedMs = (System.nanoTime() - start) / StatTimer.NS;
-//            if (elapsedMs > 10)
-//            {
-//                // TODO remove
-//                ChatLog.announceError(String.format("[%s] JourneyMap.onClientTick() too slow: %sms",
-//                        new SimpleDateFormat("HH:mm:ss.SSS").format(new Date()), elapsedMs));
-//            }
+            String error = "Error in JourneyMap.performMainThreadTasks(): " + t.getMessage();
+            ChatLog.announceError(error);
+            logger.error(LogFormatter.toString(t));
         }
     }
 
-    public void performTasks()
+    public void performMultithreadTasks()
     {
         try
         {
             if (isMapping())
             {
-                taskController.performTasks();
+                multithreadTaskController.performTasks();
             }
         }
         catch (Throwable t)
         {
-            String error = "Error in JourneyMap.performTasks(): " + t.getMessage(); //$NON-NLS-1$
+            String error = "Error in JourneyMap.performMultithreadTasks(): " + t.getMessage();
             ChatLog.announceError(error);
             logger.error(LogFormatter.toString(t));
         }
@@ -603,7 +517,7 @@ public class JourneyMap
         return chunkRenderController;
     }
 
-    private void loadConfigProperties()
+    public void loadConfigProperties()
     {
         coreProperties = PropertiesBase.reload(coreProperties, CoreProperties.class);
         fullMapProperties = PropertiesBase.reload(fullMapProperties, FullMapProperties.class);
@@ -642,12 +556,6 @@ public class JourneyMap
 
             this.currentWorldId = worldId;
             getLogger().info("World UID is set to: " + worldId);
-            reset();
-
-            if (wasMapping)
-            {
-                startMapping();
-            }
         }
     }
 

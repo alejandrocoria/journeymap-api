@@ -987,10 +987,6 @@ public class Fullscreen extends JmUI
 
         // Reset timer
         state.updateLastRefresh();
-
-        // Ensure expired Region images are taken care of
-        TextureCache.instance().onClientTick();
-
         timer.stop();
     }
 
@@ -1046,7 +1042,7 @@ public class Fullscreen extends JmUI
     @Override
     protected void drawLogo()
     {
-        if (logo.isUnused())
+        if (logo.isDefunct())
         {
             logo = TextureCache.instance().getLogo();
         }

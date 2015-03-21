@@ -13,18 +13,18 @@ import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
-import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.task.main.ExpireTextureTask;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import net.techbrew.journeymap.ui.theme.Theme;
-import org.lwjgl.opengl.Display;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
-import java.util.*;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -40,7 +40,7 @@ public class TextureCache
     private final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<String, TextureImpl> entityIcons = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
-    private final List<TextureImpl> expiredTextures = Collections.synchronizedList(new ArrayList<TextureImpl>());
+
     private ThreadPoolExecutor texExec = new ThreadPoolExecutor(2, 4, 15L, TimeUnit.SECONDS,
             new ArrayBlockingQueue<Runnable>(64), new JMThreadFactory("texture"), new ThreadPoolExecutor.CallerRunsPolicy());
 
@@ -74,7 +74,7 @@ public class TextureCache
 //                }
 //                if(img!=null){
 //                    if(tex!=null){
-//                        tex.deleteTexture();
+//                        tex.queueForDeletion();
 //                    }
 //                    tex = new TextureImpl(img, retain);
 //                    customTextures.put(filename, tex);
@@ -99,7 +99,7 @@ public class TextureCache
                 {
                     if (tex != null)
                     {
-                        tex.deleteTexture();
+                        tex.queueForDeletion();
                     }
                     tex = new TextureImpl(img, retain);
                     namedTextures.put(name, tex);
@@ -142,7 +142,7 @@ public class TextureCache
         TextureImpl tex = namedTextures.get(Name.MinimapCustomSquare);
         if (tex != null)
         {
-            tex.deleteTexture();
+            tex.queueForDeletion();
         }
 
         tex = new TextureImpl(resizedImg, false);
@@ -252,7 +252,7 @@ public class TextureCache
                 {
                     if (tex != null)
                     {
-                        tex.deleteTexture();
+                        tex.queueForDeletion();
                     }
                     tex = new TextureImpl(img);
                     entityIcons.put(texName, tex);
@@ -297,7 +297,7 @@ public class TextureCache
 
                     if (tex != null)
                     {
-                        tex.deleteTexture();
+                        tex.queueForDeletion();
                     }
                     tex = new TextureImpl(img, retainImage);
                     tex.alpha = alpha;
@@ -337,7 +337,7 @@ public class TextureCache
 
                     if (tex != null)
                     {
-                        tex.deleteTexture();
+                        tex.queueForDeletion();
                     }
                     tex = new TextureImpl(img);
                     tex.alpha = alpha;
@@ -431,61 +431,29 @@ public class TextureCache
     {
         synchronized (namedTextures)
         {
-            expiredTextures.addAll(namedTextures.values());
+            ExpireTextureTask.queue(namedTextures.values());
             namedTextures.clear();
         }
 
         synchronized (entityIcons)
         {
-            expiredTextures.addAll(entityIcons.values());
+            ExpireTextureTask.queue(entityIcons.values());
             entityIcons.clear();
         }
 
-        onClientTick();
+        synchronized (themeImages)
+        {
+            ExpireTextureTask.queue(themeImages.values());
+            themeImages.clear();
+        }
     }
 
     public void purgeThemeImages()
     {
         synchronized (themeImages)
         {
-            expiredTextures.addAll(themeImages.values());
+            ExpireTextureTask.queue(themeImages.values());
             themeImages.clear();
-        }
-    }
-
-    /**
-     * Convenient way to pass off unused textures
-     *
-     * @param texture
-     */
-    public void expireTexture(TextureImpl texture)
-    {
-        if (texture != null)
-        {
-            expiredTextures.add(texture);
-        }
-    }
-
-    /**
-     * Must be called on OpenGL context thread.
-     * Removes expired textures.
-     */
-    public void onClientTick()
-    {
-        try
-        {
-            if (Display.isCurrent())
-            {
-                while (!expiredTextures.isEmpty())
-                {
-                    TextureImpl expired = expiredTextures.remove(0);
-                    expired.deleteTexture();
-                }
-            }
-        }
-        catch (Throwable t)
-        {
-            JourneyMap.getLogger().warn("TextureCache.onClientTick() unexpected error: " + LogFormatter.toString(t));
         }
     }
 

@@ -27,7 +27,7 @@ import net.techbrew.journeymap.render.draw.DrawWayPointStep;
 import net.techbrew.journeymap.render.draw.RadarDrawStepFactory;
 import net.techbrew.journeymap.render.draw.WaypointDrawStepFactory;
 import net.techbrew.journeymap.render.map.GridRenderer;
-import net.techbrew.journeymap.task.MapPlayerTask;
+import net.techbrew.journeymap.task.multi.MapPlayerTask;
 
 import java.io.File;
 import java.util.ArrayList;

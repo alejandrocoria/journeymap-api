@@ -11,7 +11,7 @@ package net.techbrew.journeymap.ui.dialog;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.task.MapRegionTask;
+import net.techbrew.journeymap.task.multi.MapRegionTask;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.JmUI;

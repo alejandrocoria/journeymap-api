@@ -6,7 +6,7 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
  */
 
-package net.techbrew.journeymap.task;
+package net.techbrew.journeymap.task.multi;
 
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;

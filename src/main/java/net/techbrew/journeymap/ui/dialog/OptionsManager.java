@@ -20,7 +20,9 @@ import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.properties.config.Config;
-import net.techbrew.journeymap.task.MapPlayerTask;
+import net.techbrew.journeymap.server.JMServer;
+import net.techbrew.journeymap.task.main.SoftResetTask;
+import net.techbrew.journeymap.task.multi.MapPlayerTask;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.*;
@@ -603,7 +605,7 @@ public class OptionsManager extends JmUI
                 case WebMap:
                 {
                     DataCache.instance().resetRadarCaches();
-                    JourneyMap.getInstance().toggleWebserver(JourneyMap.getWebMapProperties().enabled.get(), true);
+                    JMServer.setEnabled(JourneyMap.getWebMapProperties().enabled.get(), true);
                     break;
                 }
                 case Waypoint:
@@ -621,8 +623,8 @@ public class OptionsManager extends JmUI
                 }
                 case Advanced:
                 {
-                    JourneyMap.getInstance().softReset();
-                    JourneyMap.getInstance().toggleWebserver(JourneyMap.getWebMapProperties().enabled.get(), false);
+                    SoftResetTask.queue();
+                    JMServer.setEnabled(JourneyMap.getWebMapProperties().enabled.get(), false);
                     break;
                 }
             }

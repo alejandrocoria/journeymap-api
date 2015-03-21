@@ -5,8 +5,8 @@ import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
-import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
+import net.techbrew.journeymap.task.main.ExpireTextureTask;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
@@ -28,11 +28,10 @@ public class ImageHolder
     final Constants.MapType mapType;
     final ReentrantLock writeLock = new ReentrantLock();
     final Path imagePath;
-    final TextureImpl texture;
     boolean dirty = true;
     boolean partialUpdate;
-
     StatTimer writeToDiskTimer = StatTimer.get("ImageHolder.writeToDisk", 2, 1000);
+    private volatile TextureImpl texture;
 
     ImageHolder(Constants.MapType mapType, File imageFile, BufferedImage image, int imageSize)
     {
@@ -186,13 +185,18 @@ public class ImageHolder
     public void clear()
     {
         writeLock.lock();
-        TextureCache.instance().expireTexture(texture);
+        ExpireTextureTask.queue(texture);
+        texture = null;
         writeLock.unlock();
     }
 
     public void finalize()
     {
-        clear();
+        if (texture != null)
+        {
+            // This shouldn't have happened
+            clear();
+        }
     }
 
     public long getImageTimestamp()

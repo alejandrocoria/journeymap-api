@@ -101,6 +101,11 @@ public class GridRenderer
         messages.clear();
     }
 
+    /**
+     * Be sure this is called on the main thread only
+     *
+     * @param enabled
+     */
     public static void setEnabled(boolean enabled)
     {
         GridRenderer.enabled = enabled;

@@ -32,7 +32,7 @@ public class GridSpec
      */
     public void beginTexture(int textureWrap, float mapAlpha)
     {
-        if (texture == null || texture.isUnused())
+        if (texture == null || texture.isDefunct())
         {
             texture = TextureCache.instance().getGrid(style.textureName);
         }
