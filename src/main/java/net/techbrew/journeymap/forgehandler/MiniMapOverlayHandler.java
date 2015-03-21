@@ -31,6 +31,7 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
     private static boolean EVENT_PRE = true;
 
     private final Minecraft mc = FMLClientHandler.instance().getClient();
+    private JourneyMap jm;
 
     public static void checkEventConfig()
     {
@@ -51,17 +52,13 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
         {
             if (event.type == EVENT_TYPE && (event.isCancelable() == EVENT_PRE))
             {
-                if (JourneyMap.getInstance().isMapping())
+                if (jm == null)
+                {
+                    jm = JourneyMap.getInstance();
+                }
+                if (jm.isMapping() || !JourneyMap.getCoreProperties().mappingEnabled.get())
                 {
                     mc.mcProfiler.startSection("journeymap");
-
-//                    mc.mcProfiler.startSection("tileCache");
-//                    final boolean isGamePaused = mc.currentScreen != null && !(mc.currentScreen instanceof Fullscreen);
-//                    if (isGamePaused)
-//                    {
-//                        // TODO: Any caches need to have expiration timers reset?
-//                    }
-//                    mc.mcProfiler.endStartSection("minimap"); // tileCache
 
                     mc.mcProfiler.startSection("minimap");
 

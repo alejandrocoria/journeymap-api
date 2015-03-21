@@ -84,9 +84,12 @@ public class TileDrawStep
 
         // Bind pending textures if needed
         regionTexture.bindTexture();
-        if (highQuality && scaledTexture.getLastBound() < regionTexture.getLastBound())
+        if (highQuality)
         {
-            updateScaledTexture();
+            if (scaledTexture == null || scaledTexture.getLastBound() < regionTexture.getLastBound())
+            {
+                updateScaledTexture();
+            }
         }
 
         Integer textureId = highQuality ? scaledTexture.getGlTextureId() : regionTexture.getGlTextureId();
@@ -223,11 +226,12 @@ public class TileDrawStep
         {
             scaledTexture = new TextureImpl(null, image, false, false);
             scaledTexture.setDescription("scaled");
+            scaledTexture.bindTexture();
         }
         else
         {
             scaledTexture.updateAndBind(image, false);
         }
-        scaledTexture.bindTexture();
+
     }
 }

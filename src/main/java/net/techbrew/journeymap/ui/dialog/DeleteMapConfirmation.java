@@ -11,6 +11,8 @@ package net.techbrew.journeymap.ui.dialog;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.io.FileHandler;
+import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.task.DeleteMapTask;
 import net.techbrew.journeymap.task.MapRegionTask;
 import net.techbrew.journeymap.ui.UIManager;
@@ -72,8 +74,24 @@ public class DeleteMapConfirmation extends JmUI
     {
         if (guibutton == buttonAll || guibutton == buttonCurrent)
         {
-            JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, false, false);
-            JourneyMap.getInstance().toggleTask(DeleteMapTask.Manager.class, true, guibutton == buttonAll);
+            JourneyMap jm = JourneyMap.getInstance();
+            if (jm.isMapping())
+            {
+                jm.toggleTask(MapRegionTask.Manager.class, false, false);
+                jm.toggleTask(DeleteMapTask.Manager.class, true, guibutton == buttonAll);
+            }
+            else
+            {
+                try
+                {
+                    new DeleteMapTask(guibutton == buttonAll).performTask(mc, jm, FileHandler.getJMWorldDir(mc), false);
+                }
+                catch (InterruptedException e)
+                {
+                    JourneyMap.getLogger().error(LogFormatter.toString(e));
+                }
+            }
+
             UIManager.getInstance().openFullscreenMap();
             return;
         }

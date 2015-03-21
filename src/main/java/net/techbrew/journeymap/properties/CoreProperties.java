@@ -142,6 +142,8 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Advanced, key = "jm.advanced.tile_render_type", minValue = 1, maxValue = 4, defaultValue = 1)
     public final AtomicInteger tileRenderType = new AtomicInteger(1);
 
+    public final AtomicBoolean mappingEnabled = new AtomicBoolean(true);
+
     public final AtomicReference<String> renderOverlayEventTypeName = new AtomicReference<String>(RenderGameOverlayEvent.ElementType.ALL.name());
     public final AtomicBoolean renderOverlayPreEvent = new AtomicBoolean(true);
     public final AtomicReference<String> optionsManagerViewed = new AtomicReference<String>("");

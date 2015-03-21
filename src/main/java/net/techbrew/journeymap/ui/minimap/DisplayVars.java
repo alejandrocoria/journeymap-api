@@ -177,7 +177,7 @@ public class DisplayVars
                 translateX = (mc.displayWidth / 2) - halfWidth - marginX;
                 translateY = (mc.displayHeight / 2) - halfHeight - marginY;
                 debugLabelAlign = DrawUtil.HAlign.Left;
-                debugLabelX = mc.displayWidth - marginX;
+                debugLabelX = mc.displayWidth - marginX - 20;
                 break;
             }
             case TopLeft:
@@ -250,7 +250,7 @@ public class DisplayVars
                 translateX = (mc.displayWidth / 2) - halfWidth - marginX;
                 translateY = -(mc.displayHeight / 2) + halfHeight + marginY;
                 debugLabelAlign = DrawUtil.HAlign.Left;
-                debugLabelX = mc.displayWidth - marginX;
+                debugLabelX = mc.displayWidth - marginX - 20;
                 break;
             }
         }

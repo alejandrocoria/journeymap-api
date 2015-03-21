@@ -164,7 +164,7 @@ public class ChatLog
                     String message = Constants.getString("jm.common.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
                     ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
                 }
-                catch(Throwable t)
+                catch (Throwable t)
                 {
                     JourneyMap.getLogger().error("Couldn't check webserver: " + LogFormatter.toString(t));
                 }
@@ -173,6 +173,11 @@ public class ChatLog
             {
                 String keyName = Constants.getKeyName(Constants.KB_MAP); // Should be KeyCode
                 ChatLog.announceI18N("jm.common.mapgui_only_ready", keyName); //$NON-NLS-1$
+            }
+
+            if (!JourneyMap.getCoreProperties().mappingEnabled.get())
+            {
+                ChatLog.announceI18N("jm.common.enable_mapping_false_text");
             }
             enableAnnounceMod = false; // Only queueAnnouncement mod once per runtime
         }

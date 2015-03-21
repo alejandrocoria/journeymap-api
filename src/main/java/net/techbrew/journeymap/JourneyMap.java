@@ -382,7 +382,7 @@ public class JourneyMap
     {
         synchronized (this)
         {
-            if (mc == null || mc.theWorld == null || !initialized)
+            if (mc == null || mc.theWorld == null || !initialized || !coreProperties.mappingEnabled.get())
             {
                 return;
             }
@@ -461,10 +461,11 @@ public class JourneyMap
         loadConfigProperties();
         DataCache.instance().purge();
         chunkRenderController = new ChunkRenderController();
+        Fullscreen.reset();
         Fullscreen.state().follow.set(true);
         StatTimer.resetAll();
-        //TextureCache.instance().purge();
-
+        TileDrawStepCache.clear();
+        UIManager.getInstance().getMiniMap().reset();
         UIManager.getInstance().reset();
         WaypointStore.instance().reset();
     }
@@ -533,7 +534,7 @@ public class JourneyMap
             }
             else
             {
-                if (!isMapping() && !isDead)
+                if (!isMapping() && !isDead && coreProperties.mappingEnabled.get())
                 {
                     startMapping();
                 }
@@ -558,7 +559,7 @@ public class JourneyMap
             TextureCache.instance().onClientTick();
 
             // Start Mapping
-            if (!isMapping())
+            if (!isMapping() && coreProperties.mappingEnabled.get())
             {
                 startMapping();
             }

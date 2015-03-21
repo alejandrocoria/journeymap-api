@@ -17,6 +17,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Path;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Formerly ImageSet.Wrapper
@@ -25,7 +26,7 @@ public class ImageHolder
 {
     final static Logger logger = JourneyMap.getLogger();
     final Constants.MapType mapType;
-    final Object writeLock = new Object();
+    final ReentrantLock writeLock = new ReentrantLock();
     final Path imagePath;
     final TextureImpl texture;
     boolean dirty = true;
@@ -70,16 +71,14 @@ public class ImageHolder
 
     void setImage(BufferedImage image)
     {
-        synchronized (writeLock)
-        {
-            texture.setImage(image, true);
-            setDirty();
-        }
+        texture.setImage(image, true);
+        setDirty();
     }
 
     void partialImageUpdate(BufferedImage imagePart, int x, int y)
     {
-        synchronized (writeLock)
+        writeLock.lock();
+        try
         {
             BufferedImage textureImage = texture.getImage();
             Graphics2D g2D = initRenderingHints(textureImage.createGraphics());
@@ -87,11 +86,16 @@ public class ImageHolder
             g2D.dispose();
             partialUpdate = true;
         }
+        finally
+        {
+            writeLock.unlock();
+        }
     }
 
     void finishPartialImageUpdates()
     {
-        synchronized (writeLock)
+        writeLock.lock();
+        try
         {
             if (partialUpdate)
             {
@@ -100,6 +104,10 @@ public class ImageHolder
                 setDirty();
                 partialUpdate = false;
             }
+        }
+        finally
+        {
+            writeLock.unlock();
         }
     }
 
@@ -121,9 +129,9 @@ public class ImageHolder
     protected void writeToDisk()
     {
         writeToDiskTimer.start();
-        try
+        if (writeLock.tryLock())
         {
-            synchronized (writeLock)
+            try
             {
                 File imageFile = imagePath.toFile();
                 if (!imageFile.exists())
@@ -141,13 +149,22 @@ public class ImageHolder
                 }
                 dirty = false;
             }
+            catch (Throwable e)
+            {
+                String error = "Unexpected error writing to disk: " + this + ": " + LogFormatter.toString(e);
+                logger.error(error);
+                //throw new RuntimeException(e);
+            }
+            finally
+            {
+                writeLock.unlock();
+            }
         }
-        catch (Throwable e)
+        else
         {
-            String error = "Unexpected error writing to disk: " + this + ": " + LogFormatter.toString(e);
-            logger.error(error);
-            //throw new RuntimeException(e);
+            logger.warn("Couldn't get write lock to write to disk: " + this);
         }
+
         writeToDiskTimer.stop();
 //        if (writeToDiskTimer.hasReachedElapsedLimit() && writeToDiskTimer.getElapsedLimitWarningsRemaining() > 0)
 //        {
@@ -168,10 +185,14 @@ public class ImageHolder
 
     public void clear()
     {
-        synchronized (writeLock)
-        {
-            TextureCache.instance().expireTexture(texture);
-        }
+        writeLock.lock();
+        TextureCache.instance().expireTexture(texture);
+        writeLock.unlock();
+    }
+
+    public void finalize()
+    {
+        clear();
     }
 
     public long getImageTimestamp()

@@ -20,7 +20,7 @@ public class BooleanPropertyButton extends OnOffButton implements IPropertyHolde
     final PropertiesBase properties;
     final AtomicBoolean valueHolder;
 
-    protected BooleanPropertyButton(String labelOn, String labelOff, PropertiesBase properties, AtomicBoolean valueHolderParam)
+    public BooleanPropertyButton(String labelOn, String labelOff, PropertiesBase properties, AtomicBoolean valueHolderParam)
     {
         super(labelOn, labelOff, (valueHolderParam != null) && valueHolderParam.get());
         this.valueHolder = valueHolderParam;

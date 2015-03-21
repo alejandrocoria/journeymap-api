@@ -352,7 +352,10 @@ public class OptionsManager extends JmUI
             }
         }
 
-        renderStatsButton.displayString = MapPlayerTask.getSimpleStats();
+        renderStatsButton.displayString = JourneyMap.getCoreProperties().mappingEnabled.get()
+                ? MapPlayerTask.getSimpleStats()
+                : Constants.getString("jm.common.enable_mapping_false_text");
+
         renderStatsButton.setWidth(cartographyCategorySlot.getCurrentColumnWidth());
     }
 

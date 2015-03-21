@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.MathHelper;
+import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
@@ -650,7 +651,14 @@ public class MiniMap
         // Debug info
         if (this.mc.gameSettings.showDebugInfo)
         {
-            debugLabelText = MapPlayerTask.getDebugStats();
+            if (JourneyMap.getCoreProperties().mappingEnabled.get())
+            {
+                debugLabelText = MapPlayerTask.getDebugStats();
+            }
+            else
+            {
+                debugLabelText = new String[]{Constants.getString("jm.common.enable_mapping_false_text")};
+            }
         }
 
         // Update timestamp

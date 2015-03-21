@@ -17,10 +17,11 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class TextureImpl extends AbstractTexture
 {
-    private final Object bufferLock = new Object();
+    private final ReentrantLock bufferLock = new ReentrantLock();
     protected BufferedImage image;
     protected boolean retainImage;
     protected int width;
@@ -84,18 +85,20 @@ public class TextureImpl extends AbstractTexture
      */
     public void setImage(BufferedImage bufferedImage, boolean retainImage)
     {
-        this.retainImage = retainImage;
-        if (retainImage)
+        try
         {
-            this.image = bufferedImage;
-        }
+            bufferLock.lock();
 
-        this.width = bufferedImage.getWidth();
-        this.height = bufferedImage.getHeight();
-        int bufferSize = width * height * 4; // RGBA
+            this.retainImage = retainImage;
+            if (retainImage)
+            {
+                this.image = bufferedImage;
+            }
 
-        synchronized (bufferLock)
-        {
+            this.width = bufferedImage.getWidth();
+            this.height = bufferedImage.getHeight();
+            int bufferSize = width * height * 4; // RGBA
+
             if (buffer == null || (buffer.capacity() != bufferSize))
             {
                 buffer = ByteBuffer.allocateDirect(bufferSize);
@@ -120,6 +123,10 @@ public class TextureImpl extends AbstractTexture
             buffer.rewind();
             bindNeeded = true;
         }
+        finally
+        {
+            bufferLock.unlock();
+        }
         this.lastImageUpdate = System.currentTimeMillis();
     }
 
@@ -130,43 +137,53 @@ public class TextureImpl extends AbstractTexture
      */
     public void bindTexture()
     {
-        if (bindNeeded)
+        if (!bindNeeded)
         {
-            synchronized (bufferLock)
+            return;
+        }
+
+        if (bufferLock.tryLock())
+        {
+            try
             {
-                try
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, super.getGlTextureId());
+
+                //Send texel data to OpenGL
+
+                // Setup wrap mode
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+
+                //Setup texture scaling filtering
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+
+                int glErr = GL11.glGetError();
+                if (glErr != GL11.GL_NO_ERROR)
                 {
-                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, super.getGlTextureId());
-
-                    //Send texel data to OpenGL
-
-                    // Setup wrap mode
-                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
-
-                    //Setup texture scaling filtering
-                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-
-                    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-
-                    int glErr = GL11.glGetError();
-                    if (glErr != GL11.GL_NO_ERROR)
-                    {
-                        JourneyMap.getLogger().warn("GL Error in TextureImpl after glTexImage2D: " + glErr);
-                    }
-                    else
-                    {
-                        bindNeeded = false;
-                        lastBound = System.currentTimeMillis();
-                    }
+                    JourneyMap.getLogger().warn("GL Error in TextureImpl after glTexImage2D: " + glErr);
                 }
-                catch (Throwable t)
+                else
                 {
-                    JourneyMap.getLogger().warn("Can't bind texture: " + t);
-                    buffer = null;
+                    bindNeeded = false;
+                    lastBound = System.currentTimeMillis();
                 }
             }
+            catch (Throwable t)
+            {
+                JourneyMap.getLogger().warn("Can't bind texture: " + t);
+                buffer = null;
+            }
+            finally
+            {
+                bufferLock.unlock();
+            }
+        }
+        else
+        {
+            System.out.println("Missed binding, will try later");
         }
     }
 
@@ -247,10 +264,9 @@ public class TextureImpl extends AbstractTexture
      */
     private void clear()
     {
-        synchronized (bufferLock)
-        {
-            this.buffer = null;
-        }
+        bufferLock.lock();
+        this.buffer = null;
+        bufferLock.unlock();
         this.image = null;
         this.bindNeeded = false;
         this.lastImageUpdate = 0;

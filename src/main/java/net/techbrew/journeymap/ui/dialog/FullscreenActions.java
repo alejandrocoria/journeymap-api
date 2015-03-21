@@ -24,6 +24,7 @@ import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.task.MapRegionTask;
 import net.techbrew.journeymap.task.SaveMapTask;
 import net.techbrew.journeymap.ui.UIManager;
+import net.techbrew.journeymap.ui.component.BooleanPropertyButton;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.ButtonList;
 import net.techbrew.journeymap.ui.component.JmUI;
@@ -39,6 +40,7 @@ public class FullscreenActions extends JmUI
     protected TextureImpl patreonLogo = TextureCache.instance().getPatreonLogo();
 
     Button buttonAutomap, buttonSave, buttonClose, buttonBrowser, buttonCheck, buttonDonate, buttonDeleteMap;
+    BooleanPropertyButton buttonEnableMapping;
 
     public FullscreenActions()
     {
@@ -47,14 +49,14 @@ public class FullscreenActions extends JmUI
 
     public static void launchLocalhost()
     {
-        String url = "http://localhost:" + JourneyMap.getWebMapProperties().port.get(); //$NON-NLS-1$
+        String url = "http://localhost:" + JourneyMap.getWebMapProperties().port.get(); 
         try
         {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
         }
         catch (IOException e)
         {
-            JourneyMap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e)); //$NON-NLS-1$
+            JourneyMap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e)); 
         }
     }
 
@@ -67,7 +69,7 @@ public class FullscreenActions extends JmUI
         }
         catch (IOException e)
         {
-            JourneyMap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e)); //$NON-NLS-1$
+            JourneyMap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e)); 
         }
     }
 
@@ -82,14 +84,14 @@ public class FullscreenActions extends JmUI
         String on = Constants.getString("jm.common.on");
         String off = Constants.getString("jm.common.off");
 
-        buttonSave = new Button(Constants.getString("jm.common.save_map")); //$NON-NLS-1$
-        buttonClose = new Button(Constants.getString("jm.common.close")); //$NON-NLS-1$
-        buttonBrowser = new Button(Constants.getString("jm.common.use_browser")); //$NON-NLS-1$
+        buttonSave = new Button(Constants.getString("jm.common.save_map"));
+        buttonClose = new Button(Constants.getString("jm.common.close"));
+        buttonBrowser = new Button(Constants.getString("jm.common.use_browser")); 
         buttonBrowser.setEnabled(JourneyMap.getWebMapProperties().enabled.get());
 
         buttonAutomap = new Button(Constants.getString("jm.common.automap_title"));
         buttonAutomap.setTooltip(Constants.getString("jm.common.automap_text"));
-        buttonAutomap.setEnabled(FMLClientHandler.instance().getClient().isSingleplayer());
+        buttonAutomap.setEnabled(FMLClientHandler.instance().getClient().isSingleplayer() && JourneyMap.getCoreProperties().mappingEnabled.get());
 
         buttonDeleteMap = new Button(Constants.getString("jm.common.deletemap_title"));
         buttonDeleteMap.setTooltip(Constants.getString("jm.common.deletemap_text"));
@@ -99,7 +101,12 @@ public class FullscreenActions extends JmUI
         buttonDonate.setDrawBackground(false);
         buttonDonate.setDrawFrame(false);
 
-        buttonCheck = new Button(Constants.getString("jm.common.update_check")); //$NON-NLS-1$
+        buttonCheck = new Button(Constants.getString("jm.common.update_check"));
+
+        buttonEnableMapping = new BooleanPropertyButton(Constants.getString("jm.common.enable_mapping_false"),
+                Constants.getString("jm.common.enable_mapping_true"),
+                JourneyMap.getCoreProperties(),
+                JourneyMap.getCoreProperties().mappingEnabled);
 
         buttonList.add(buttonAutomap);
         buttonList.add(buttonSave);
@@ -107,6 +114,7 @@ public class FullscreenActions extends JmUI
         buttonList.add(buttonDonate);
         buttonList.add(buttonBrowser);
         buttonList.add(buttonDeleteMap);
+        buttonList.add(buttonEnableMapping);
 
         new ButtonList(buttonList).equalizeWidths(getFontRenderer());
 
@@ -134,16 +142,16 @@ public class FullscreenActions extends JmUI
         final int bx = (this.width) / 2;
         final int by = this.height / 4;
 
-        buttonAutomap.leftOf(bx - 2).setY(by);
-        buttonDeleteMap.rightOf(buttonAutomap, hgap).setY(by);
+        ButtonList row1 = new ButtonList(buttonAutomap, buttonEnableMapping);
+        ButtonList row2 = new ButtonList(buttonSave, buttonDeleteMap);
+        ButtonList row3 = new ButtonList(buttonBrowser, buttonCheck);
 
-        buttonSave.below(buttonAutomap, vgap).centerHorizontalOn(bx);
-
-        buttonBrowser.below(buttonSave, vgap).leftOf(bx - 2);
-        buttonCheck.below(buttonSave, vgap).rightOf(buttonBrowser, hgap);
+        row1.layoutCenteredHorizontal(bx, by, true, hgap);
+        row2.layoutCenteredHorizontal(bx, row1.getBottomY() + vgap, true, hgap);
+        row3.layoutCenteredHorizontal(bx, row2.getBottomY() + vgap, true, hgap);
 
         int patreonX = bx - 8;
-        int patreonY = buttonBrowser.getBottomY() + 32;
+        int patreonY = row2.getBottomY() + 32;
         DrawUtil.drawImage(patreonLogo, patreonX, patreonY, false, .5f, 0);
 
         buttonDonate.centerHorizontalOn(bx).setY(patreonY + 16);
@@ -193,6 +201,23 @@ public class FullscreenActions extends JmUI
             UIManager.getInstance().openFullscreenMap();
             return;
         }
+        if (guibutton == buttonEnableMapping)
+        {
+            buttonEnableMapping.toggle();
+            if (JourneyMap.getCoreProperties().mappingEnabled.get())
+            {
+                UIManager.getInstance().openFullscreenMap();
+                ChatLog.announceI18N("jm.common.enable_mapping_true_text");
+                return;
+            }
+            else
+            {
+                JourneyMap.getInstance().stopMapping();
+                ChatLog.announceI18N("jm.common.enable_mapping_false_text");
+                UIManager.getInstance().openFullscreenMap();
+                return;
+            }
+        }
 
     }
 
@@ -206,7 +231,7 @@ public class FullscreenActions extends JmUI
         if (mapSaver.isValid())
         {
             JourneyMap.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
-            ChatLog.announceI18N("jm.common.save_filename", mapSaver.getSaveFileName()); //$NON-NLS-1$
+            ChatLog.announceI18N("jm.common.save_filename", mapSaver.getSaveFileName()); 
         }
         close();
     }
