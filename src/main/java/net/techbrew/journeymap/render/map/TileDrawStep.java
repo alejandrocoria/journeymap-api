@@ -67,9 +67,9 @@ public class TileDrawStep
         }
     }
 
-    public static int toHashCode(RegionCoord regionCoord, final Constants.MapType mapType, Integer zoom, int sx1, int sy1, int sx2, int sy2)
+    public static int toHashCode(RegionCoord regionCoord, final Constants.MapType mapType, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
     {
-        return Objects.hashCode(regionCoord, mapType, zoom, sx1, sy1, sx2, sy2);
+        return Objects.hashCode(regionCoord, mapType, zoom, highQuality, sx1, sy1, sx2, sy2);
     }
 
     void draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, int textureFilter, int textureWrap, GridSpec gridSpec)
@@ -83,8 +83,12 @@ public class TileDrawStep
         }
 
         // Bind pending textures if needed
-        regionTexture.bindTexture();
-        if (highQuality)
+        boolean regionBindNeeded = regionTexture.isBindNeeded();
+        if (regionBindNeeded)
+        {
+            regionTexture.bindTexture();
+        }
+        else if (highQuality)
         {
             if (scaledTexture == null || scaledTexture.getLastBound() < regionTexture.getLastBound())
             {
@@ -92,7 +96,9 @@ public class TileDrawStep
             }
         }
 
-        Integer textureId = highQuality ? scaledTexture.getGlTextureId() : regionTexture.getGlTextureId();
+        boolean useScaled = !regionBindNeeded && highQuality;
+
+        Integer textureId = useScaled ? scaledTexture.getGlTextureId() : regionTexture.getGlTextureId();
 
         // Draw already!
         drawTimer.start();
@@ -107,10 +113,10 @@ public class TileDrawStep
 
         final double size = Tile.TILESIZE;
 
-        final double startU = highQuality ? 0D : sx1 / size;
-        final double startV = highQuality ? 0D : sy1 / size;
-        final double endU = highQuality ? 1D : sx2 / size;
-        final double endV = highQuality ? 1D : sy2 / size;
+        final double startU = useScaled ? 0D : sx1 / size;
+        final double startV = useScaled ? 0D : sy1 / size;
+        final double endU = useScaled ? 1D : sx2 / size;
+        final double endV = useScaled ? 1D : sy2 / size;
 
         // Background
         DrawUtil.drawRectangle(startX, startY, endX - startX, endY - startY, bgColor, 200);
@@ -124,7 +130,7 @@ public class TileDrawStep
             GL11.glColor4f(1, 1, 1, alpha);
 
             // http://gregs-blog.com/2008/01/17/opengl-texture-filter-parameters-explained/
-            if (!highQuality)
+            if (!useScaled)
             {
                 textureFilter = GL11.GL_NEAREST;
             }
@@ -137,7 +143,7 @@ public class TileDrawStep
         }
         else
         {
-            //System.out.println("Missing texture: " + this);
+            System.out.println("Missing texture: " + this);
         }
 
         // Grid
@@ -155,8 +161,8 @@ public class TileDrawStep
             DrawUtil.drawRectangle(debugX, debugY, 3, endV * 512, Color.green, 200);
             DrawUtil.drawRectangle(debugX, debugY, endU * 512, 3, Color.red, 200);
             DrawUtil.drawLabel(this.toString(), debugX + 5, debugY + 10, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
-            DrawUtil.drawLabel(String.format("Full size: %s", highQuality), debugX + 5, debugY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
-            long imageTimestamp = highQuality ? scaledTexture.getLastBound() : regionTexture.getLastBound();
+            DrawUtil.drawLabel(String.format("Full size: %s", useScaled), debugX + 5, debugY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
+            long imageTimestamp = useScaled ? scaledTexture.getLastBound() : regionTexture.getLastBound();
             DrawUtil.drawLabel(new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(imageTimestamp)), debugX + 5, debugY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
         }
 
@@ -199,7 +205,7 @@ public class TileDrawStep
 
     public int hashCode()
     {
-        return toHashCode(regionCoord, mapType, zoom, sx1, sy1, sx2, sy2);
+        return toHashCode(regionCoord, mapType, zoom, highQuality, sx1, sy1, sx2, sy2);
     }
 
     @Override
