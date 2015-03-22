@@ -67,7 +67,7 @@ public class TileDrawStepCache
     {
         checkWorldChange(regionCoord);
 
-        final int hash = TileDrawStep.toHashCode(regionCoord, mapType, zoom, sx1, sy1, sx2, sy2);
+        final int hash = TileDrawStep.toHashCode(regionCoord, mapType, zoom, highQuality, sx1, sy1, sx2, sy2);
         TileDrawStep tileDrawStep = drawStepCache.getIfPresent(hash);
         if (tileDrawStep == null)
         {
