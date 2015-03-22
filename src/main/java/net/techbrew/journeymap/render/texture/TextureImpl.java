@@ -264,6 +264,18 @@ public class TextureImpl extends AbstractTexture
         return super.getGlTextureId();
     }
 
+    public int getGlTextureId(boolean forceBind)
+    {
+        if (forceBind || glTextureId == -1)
+        {
+            return getGlTextureId();
+        }
+        else
+        {
+            return glTextureId;
+        }
+    }
+
     /**
      * Does not delete GLID - use with caution
      */
@@ -317,7 +329,8 @@ public class TextureImpl extends AbstractTexture
     {
         if (isBound())
         {
-            JourneyMap.getLogger().error("TextureImpl disposed without deleting texture glID: " + this);
+            JourneyMap.getLogger().warn("TextureImpl disposed without deleting texture glID: " + this);
+            ExpireTextureTask.queue(this.glTextureId);
         }
     }
 

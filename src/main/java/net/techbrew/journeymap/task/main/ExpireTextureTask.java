@@ -22,17 +22,34 @@ public class ExpireTextureTask implements IMainThreadTask
     private static String NAME = "Tick." + MappingMonitorTask.class.getSimpleName();
     private static Logger LOGGER = JourneyMap.getLogger();
     private final List<TextureImpl> textures;
+    private final int textureId;
     private volatile int fails;
+
+    private ExpireTextureTask(int textureId)
+    {
+        textures = null;
+        this.textureId = textureId;
+    }
 
     private ExpireTextureTask(TextureImpl texture)
     {
         textures = new ArrayList<TextureImpl>();
         textures.add(texture);
+        this.textureId = -1;
     }
 
     private ExpireTextureTask(Collection<TextureImpl> textureCollection)
     {
         this.textures = new ArrayList<TextureImpl>(textureCollection);
+        this.textureId = -1;
+    }
+
+    public static void queue(int textureId)
+    {
+        if (textureId != -1)
+        {
+            JourneyMap.getInstance().queueMainThreadTask(new ExpireTextureTask(textureId));
+        }
     }
 
     public static void queue(TextureImpl texture)
@@ -48,11 +65,11 @@ public class ExpireTextureTask implements IMainThreadTask
     @Override
     public IMainThreadTask perform(Minecraft mc, JourneyMap jm)
     {
-        deleteTextures();
-        if (!textures.isEmpty())
+        boolean success = deleteTextures();
+        if (!success && textures != null && !textures.isEmpty())
         {
             fails++;
-            LOGGER.warn("ExpireTextureTask.perform() couldn't delete textures: " + textures.toArray() + ", fails: " + fails);
+            LOGGER.warn("ExpireTextureTask.perform() couldn't delete textures: " + textures + ", fails: " + fails);
             if (fails <= MAX_FAILS)
             {
                 return this;
@@ -66,20 +83,32 @@ public class ExpireTextureTask implements IMainThreadTask
      */
     private boolean deleteTextures()
     {
-        Iterator<TextureImpl> iter = textures.listIterator();
-        while (iter.hasNext())
+        if (textureId != -1)
         {
-            TextureImpl texture = iter.next();
-            if (deleteTexture(texture))
-            {
-                iter.remove();
-            }
-            else
-            {
-                break;
-            }
+            return deleteTexture(textureId);
         }
-        return textures.isEmpty();
+        else
+        {
+            Iterator<TextureImpl> iter = textures.listIterator();
+            while (iter.hasNext())
+            {
+                TextureImpl texture = iter.next();
+                if (texture == null)
+                {
+                    iter.remove();
+                    continue;
+                }
+                if (deleteTexture(texture))
+                {
+                    iter.remove();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return textures.isEmpty();
+        }
     }
 
     private boolean deleteTexture(TextureImpl texture)
@@ -99,7 +128,7 @@ public class ExpireTextureTask implements IMainThreadTask
             }
             catch (LWJGLException t)
             {
-                LOGGER.warn("Couldn't delete texture " + this + ": " + t);
+                LOGGER.warn("Couldn't delete texture " + texture + ": " + t);
                 success = false;
             }
         }
@@ -110,6 +139,23 @@ public class ExpireTextureTask implements IMainThreadTask
         }
 
         return success;
+    }
+
+    private boolean deleteTexture(int textureId)
+    {
+        try
+        {
+            if (Display.isCurrent())
+            {
+                GL11.glDeleteTextures(textureId);
+                return true;
+            }
+        }
+        catch (LWJGLException t)
+        {
+            LOGGER.warn("Couldn't delete textureId " + textureId + ": " + t);
+        }
+        return false;
     }
 
     @Override
