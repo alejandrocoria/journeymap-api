@@ -8,6 +8,7 @@
 
 package net.techbrew.journeymap.model;
 
+import com.google.common.base.Objects;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.io.RegionImageHandler;
@@ -23,46 +24,52 @@ import java.io.File;
  */
 public class RegionImageSet extends ImageSet
 {
-    protected final RegionCoord rCoord;
+    protected final Key key;
 
-    public RegionImageSet(RegionCoord rCoord)
+    public RegionImageSet(Key key)
     {
         super();
-        this.rCoord = rCoord;
+        this.key = key;
     }
 
     @Override
-    public ImageHolder getHolder(Constants.MapType mapType)
+    public ImageHolder getHolder(Constants.MapType mapType, Integer vSlice)
     {
+        if (vSlice != null)
+        {
+            assert (mapType == MapType.underground);
+        }
+        else
+        {
+            assert (mapType != MapType.underground);
+        }
+
         synchronized (imageHolders)
         {
-            // Check holder
-            ImageHolder imageHolder = imageHolders.get(mapType);
-            if (imageHolder != null)
+            for (ImageHolder holder : imageHolders.get(mapType))
             {
-                return imageHolder;
+                if (Objects.equal(vSlice, holder.vSlice))
+                {
+                    return holder;
+                }
             }
 
             // Prepare to find image in file
-            BufferedImage image = null;
-            File imageFile = null;
-
-            // Check for new region file
-            imageFile = RegionImageHandler.getRegionImageFile(rCoord, mapType, false);
-            image = RegionImageHandler.readRegionImage(imageFile, false);
+            File imageFile = RegionImageHandler.getRegionImageFile(getRegionCoord(vSlice), mapType, false);
 
             // Add holder
-            imageHolder = addHolder(mapType, imageFile, image);
+            ImageHolder imageHolder = addHolder(mapType, vSlice, imageFile);
             return imageHolder;
         }
     }
 
     public BufferedImage getChunkImage(ChunkCoord cCoord, MapType mapType)
     {
-        BufferedImage regionImage = getHolder(mapType).getImage();
+        BufferedImage regionImage = getHolder(mapType, cCoord.vSlice).getImage();
+        RegionCoord regionCoord = getRegionCoord(cCoord.vSlice);
         BufferedImage current = regionImage.getSubimage(
-                rCoord.getXOffset(cCoord.chunkX),
-                rCoord.getZOffset(cCoord.chunkZ),
+                regionCoord.getXOffset(cCoord.chunkX),
+                regionCoord.getZOffset(cCoord.chunkZ),
                 16, 16);
 
         //BufferedImage copy = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -75,8 +82,9 @@ public class RegionImageSet extends ImageSet
 
     public void setChunkImage(ChunkCoord cCoord, MapType mapType, BufferedImage chunkImage)
     {
-        ImageHolder holder = getHolder(mapType);
-        holder.partialImageUpdate(chunkImage, rCoord.getXOffset(cCoord.chunkX), rCoord.getZOffset(cCoord.chunkZ));
+        ImageHolder holder = getHolder(mapType, cCoord.vSlice);
+        RegionCoord regionCoord = getRegionCoord(cCoord.vSlice);
+        holder.partialImageUpdate(chunkImage, regionCoord.getXOffset(cCoord.chunkX), regionCoord.getZOffset(cCoord.chunkZ));
     }
 
     public boolean hasChunkUpdates()
@@ -99,10 +107,21 @@ public class RegionImageSet extends ImageSet
         }
     }
 
+    public RegionCoord getRegionCoordFor(ImageHolder imageHolder)
+    {
+        return getRegionCoord(imageHolder.vSlice);
+    }
+
+
+    public RegionCoord getRegionCoord(Integer vSlice)
+    {
+        return RegionCoord.fromRegionPos(key.worldDir, key.regionX, vSlice, key.regionZ, key.dimension);
+    }
+
     @Override
     public int hashCode()
     {
-        return 31 * rCoord.hashCode();
+        return key.hashCode();
     }
 
     @Override
@@ -120,18 +139,77 @@ public class RegionImageSet extends ImageSet
         {
             return false;
         }
-        return rCoord.equals(((RegionImageSet) obj).rCoord);
-    }
-
-    @Override
-    protected ImageHolder addHolder(Constants.MapType mapType, BufferedImage image)
-    {
-        return addHolder(new ImageHolder(mapType, RegionImageHandler.getRegionImageFile(rCoord, mapType, false), image, getImageSize()));
+        return key.equals(((RegionImageSet) obj).key);
     }
 
     @Override
     protected int getImageSize()
     {
         return Tile.TILESIZE;
+    }
+
+    public static class Key
+    {
+        private final File worldDir;
+        private final int regionX;
+        private final int regionZ;
+        private final int dimension;
+
+        private Key(File worldDir, int regionX, int regionZ, int dimension)
+        {
+            this.worldDir = worldDir;
+            this.regionX = regionX;
+            this.regionZ = regionZ;
+            this.dimension = dimension;
+        }
+
+        public static Key from(RegionCoord rCoord)
+        {
+            return new Key(rCoord.worldDir, rCoord.regionX, rCoord.regionZ, rCoord.dimension);
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o)
+            {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass())
+            {
+                return false;
+            }
+
+            Key key = (Key) o;
+
+            if (dimension != key.dimension)
+            {
+                return false;
+            }
+            if (regionX != key.regionX)
+            {
+                return false;
+            }
+            if (regionZ != key.regionZ)
+            {
+                return false;
+            }
+            if (!worldDir.equals(key.worldDir))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            int result = worldDir.hashCode();
+            result = 31 * result + regionX;
+            result = 31 * result + regionZ;
+            result = 31 * result + dimension;
+            return result;
+        }
     }
 }

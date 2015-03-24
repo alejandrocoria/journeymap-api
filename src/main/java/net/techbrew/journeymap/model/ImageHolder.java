@@ -3,6 +3,7 @@ package net.techbrew.journeymap.model;
 import com.google.common.base.Objects;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -26,23 +27,22 @@ public class ImageHolder
 {
     final static Logger logger = JourneyMap.getLogger();
     final Constants.MapType mapType;
+    final Integer vSlice;
     final ReentrantLock writeLock = new ReentrantLock();
     final Path imagePath;
+    final int imageSize;
     boolean dirty = true;
     boolean partialUpdate;
     StatTimer writeToDiskTimer = StatTimer.get("ImageHolder.writeToDisk", 2, 1000);
     private volatile TextureImpl texture;
 
-    ImageHolder(Constants.MapType mapType, File imageFile, BufferedImage image, int imageSize)
+    ImageHolder(Constants.MapType mapType, Integer vSlice, File imageFile, int imageSize)
     {
         this.mapType = mapType;
+        this.vSlice = vSlice;
         this.imagePath = imageFile.toPath();
-        if (image == null || image.getWidth() != imageSize || image.getHeight() != imageSize)
-        {
-            image = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
-        }
-        this.texture = new TextureImpl(null, image, true, false);
-        texture.setDescription(imagePath.toString());
+        this.imageSize = imageSize;
+        getTexture();
     }
 
     public static Graphics2D initRenderingHints(Graphics2D g)
@@ -61,6 +61,11 @@ public class ImageHolder
     Constants.MapType getMapType()
     {
         return mapType;
+    }
+
+    Integer getvSlice()
+    {
+        return vSlice;
     }
 
     BufferedImage getImage()
@@ -112,6 +117,16 @@ public class ImageHolder
 
     public TextureImpl getTexture()
     {
+        if (texture == null || texture.isDefunct())
+        {
+            BufferedImage image = RegionImageHandler.readRegionImage(imagePath.toFile(), false);
+            if (image == null || image.getWidth() != imageSize || image.getHeight() != imageSize)
+            {
+                image = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
+            }
+            this.texture = new TextureImpl(null, image, true, false);
+            texture.setDescription(imagePath.toString());
+        }
         return texture;
     }
 
@@ -175,10 +190,11 @@ public class ImageHolder
     public String toString()
     {
         return Objects.toStringHelper(this)
-                .add("imagePath", imagePath)
                 .add("mapType", mapType)
-                .add("texture", texture)
+                .add("vSlice", vSlice)
+                .add("textureId", texture == null ? null : texture.isBound() ? texture.getGlTextureId(false) : -1)
                 .add("dirty", dirty)
+                .add("imagePath", imagePath)
                 .toString();
     }
 

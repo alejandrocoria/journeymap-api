@@ -8,15 +8,15 @@
 
 package net.techbrew.journeymap.model;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.Multimaps;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * An ImageSet contains one or more ImageHolders
@@ -25,31 +25,26 @@ import java.util.Map;
  */
 public abstract class ImageSet
 {
-    protected final Map<Constants.MapType, ImageHolder> imageHolders;
-    protected long lastTouched;
+    protected final ListMultimap<MapType, ImageHolder> imageHolders;
 
     public ImageSet()
     {
-        imageHolders = Collections.synchronizedMap(new HashMap<Constants.MapType, ImageHolder>(3));
-        touch();
+        ListMultimap<MapType, ImageHolder> lmm = MultimapBuilder.enumKeys(MapType.class).arrayListValues(8).build();
+        imageHolders = Multimaps.synchronizedListMultimap(lmm);
     }
 
-    protected abstract ImageHolder getHolder(Constants.MapType mapType);
+    protected abstract ImageHolder getHolder(Constants.MapType mapType, Integer vSlice);
 
-    public <T extends ImageSet> T touch()
-    {
-        lastTouched = System.currentTimeMillis();
-        return (T) this;
-    }
+    @Override
+    public abstract int hashCode();
 
-    public long getLastTouched()
-    {
-        return lastTouched;
-    }
+    @Override
+    public abstract boolean equals(Object obj);
 
-    public BufferedImage getImage(Constants.MapType mapType)
+
+    public BufferedImage getImage(Constants.MapType mapType, Integer vSlice)
     {
-        return getHolder(mapType).getImage();
+        return getHolder(mapType, vSlice).getImage();
     }
 
     public boolean writeToDisk(boolean force)
@@ -85,22 +80,6 @@ public abstract class ImageSet
         return false;
     }
 
-    @Override
-    public String toString()
-    {
-        StringBuffer sb = new StringBuffer(getClass().getSimpleName()).append("[ ");
-        Iterator<ImageHolder> iter = imageHolders.values().iterator();
-        while (iter.hasNext())
-        {
-            sb.append(iter.next().toString());
-            if (iter.hasNext())
-            {
-                sb.append(", ");
-            }
-        }
-        return sb.append(" ]").toString();
-    }
-
     public void clear()
     {
         for (ImageHolder imageHolder : imageHolders.values())
@@ -111,22 +90,22 @@ public abstract class ImageSet
     }
 
     @Override
-    public abstract int hashCode();
-
-    @Override
-    public abstract boolean equals(Object obj);
+    public String toString()
+    {
+        return Objects.toStringHelper(this)
+                .add("imageHolders", imageHolders.asMap().entrySet())
+                .toString();
+    }
 
     /**
      * ************************
      */
 
-    protected abstract ImageHolder addHolder(Constants.MapType mapType, BufferedImage image);
-
     protected abstract int getImageSize();
 
-    protected ImageHolder addHolder(Constants.MapType mapType, File imageFile, BufferedImage image)
+    protected ImageHolder addHolder(Constants.MapType mapType, Integer vSlice, File imageFile)
     {
-        return addHolder(new ImageHolder(mapType, imageFile, image, getImageSize()));
+        return addHolder(new ImageHolder(mapType, vSlice, imageFile, getImageSize()));
     }
 
     protected ImageHolder addHolder(ImageHolder imageHolder)

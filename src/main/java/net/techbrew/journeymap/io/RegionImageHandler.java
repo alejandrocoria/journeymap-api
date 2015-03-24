@@ -177,14 +177,7 @@ public class RegionImageHandler
             for (int rz = rz1; rz <= rz2; rz++)
             {
                 rc = new RegionCoord(worldDir, rx, vSlice, rz, dimension);
-                if (cache.contains(rc))
-                {
-                    regionImage = cache.getGuaranteedImage(rc, mapType);
-                }
-                else
-                {
-                    regionImage = RegionImageHandler.readRegionImage(RegionImageHandler.getRegionImageFile(rc, mapType, false), false);
-                }
+                regionImage = cache.getRegionImageSet(rc).getImage(mapType, rc.vSlice);
 
                 if (regionImage == null)
                 {
@@ -275,8 +268,7 @@ public class RegionImageHandler
 
     public static BufferedImage getScaledRegionArea(final RegionCoord rCoord, final MapType mapType, final int zoom, boolean highQuality, int x1, int y1)
     {
-        RegionImageCache cache = RegionImageCache.instance();
-        BufferedImage regionImage = cache.getGuaranteedImage(rCoord, mapType);
+        BufferedImage regionImage = RegionImageCache.instance().getRegionImageSet(rCoord).getImage(mapType, rCoord.vSlice);
 
         if (regionImage == null)
         {
@@ -393,11 +385,6 @@ public class RegionImageHandler
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         return g;
-    }
-
-    public BufferedImage getCachedRegionImage(RegionCoord rCoord, MapType mapType)
-    {
-        return RegionImageCache.instance().getGuaranteedImage(rCoord, mapType);
     }
 
     // On-demand-holder for instance

@@ -40,7 +40,7 @@ public class DataCache
     final LoadingCache<Class, Collection<Waypoint>> waypoints;
     final LoadingCache<Class, EntityDTO> player;
     final LoadingCache<Class, WorldData> world;
-    final LoadingCache<RegionCoord, RegionImageSet> regionImageSets;
+    final LoadingCache<RegionImageSet.Key, RegionImageSet> regionImageSets;
     final LoadingCache<Class, Map<String, Object>> messages;
     final LoadingCache<EntityDTO, DrawEntityStep> entityDrawSteps;
     final LoadingCache<Waypoint, DrawWayPointStep> waypointDrawSteps;
@@ -503,7 +503,7 @@ public class DataCache
         return blockMetadataLoader.getBlockMD(blockMetadata, block, meta);
     }
 
-    public LoadingCache<RegionCoord, RegionImageSet> getRegionImageSets()
+    public LoadingCache<RegionImageSet.Key, RegionImageSet> getRegionImageSets()
     {
         return regionImageSets;
     }

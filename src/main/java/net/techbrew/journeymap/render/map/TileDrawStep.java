@@ -1,17 +1,12 @@
 package net.techbrew.journeymap.render.map;
 
 import com.google.common.base.Objects;
-import cpw.mods.fml.client.FMLClientHandler;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.StatTimer;
-import net.techbrew.journeymap.model.GridSpec;
-import net.techbrew.journeymap.model.RegionCoord;
-import net.techbrew.journeymap.model.RegionImageCache;
-import net.techbrew.journeymap.model.RegionImageSet;
+import net.techbrew.journeymap.model.*;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.task.main.ExpireTextureTask;
@@ -32,7 +27,6 @@ public class TileDrawStep
 
     private final Logger logger = JourneyMap.getLogger();
     private final boolean debug = logger.isTraceEnabled();
-    private final Minecraft minecraft = FMLClientHandler.instance().getClient();
     private final RegionCoord regionCoord;
     private final Constants.MapType mapType;
     private final Integer zoom;
@@ -40,10 +34,8 @@ public class TileDrawStep
     private final StatTimer drawTimer;
     private final RegionImageSet regionImageSet;
     private int sx1, sy1, sx2, sy2;
-    private int size;
-    private long lastTouch;
     private TextureImpl scaledTexture;
-    private TextureImpl regionTexture;
+    private ImageHolder regionTextureHolder;
 
     public TileDrawStep(RegionCoord regionCoord, final Constants.MapType mapType, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
     {
@@ -54,12 +46,11 @@ public class TileDrawStep
         this.sx2 = sx2;
         this.sy1 = sy1;
         this.sy2 = sy2;
-        this.size = sx2 - sx1;
         this.highQuality = highQuality && zoom != 0; // todo change when zoom can be < zero or 0 no longer 1:1
         this.drawTimer = (this.highQuality) ? StatTimer.get("TileDrawStep.draw(high)") : StatTimer.get("TileDrawStep.draw(low)");
 
         this.regionImageSet = RegionImageCache.instance().getRegionImageSet(regionCoord);
-        this.regionTexture = regionImageSet.getHolder(mapType).getTexture();
+        this.regionTextureHolder = regionImageSet.getHolder(mapType, regionCoord.vSlice);
 
         if (highQuality)
         {
@@ -74,15 +65,8 @@ public class TileDrawStep
 
     void draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, int textureFilter, int textureWrap, GridSpec gridSpec)
     {
-        // Keep regionImageSet in cache
-        long now = System.currentTimeMillis();
-        if (now - lastTouch > 5000)
-        {
-            regionImageSet.touch();
-            lastTouch = now;
-        }
-
         // Bind pending textures if needed
+        TextureImpl regionTexture = regionTextureHolder.getTexture();
         boolean regionBindNeeded = regionTexture.isBindNeeded();
         if (regionBindNeeded)
         {
@@ -231,7 +215,7 @@ public class TileDrawStep
         if (scaledTexture == null)
         {
             scaledTexture = new TextureImpl(null, image, false, false);
-            scaledTexture.setDescription("scaled");
+            scaledTexture.setDescription("scaled for " + this);
             scaledTexture.bindTexture();
         }
         else

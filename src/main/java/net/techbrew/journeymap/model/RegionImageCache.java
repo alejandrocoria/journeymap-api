@@ -11,7 +11,6 @@ package net.techbrew.journeymap.model;
 import com.google.common.cache.*;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
@@ -22,11 +21,12 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class RegionImageCache
@@ -34,7 +34,7 @@ public class RegionImageCache
     public static final long flushInterval = TimeUnit.SECONDS.toMillis(30);
     public static final long regionCacheAge = flushInterval / 2;
     static final Logger logger = JourneyMap.getLogger();
-    final LoadingCache<RegionCoord, RegionImageSet> regionImageSetsCache;
+    final LoadingCache<RegionImageSet.Key, RegionImageSet> regionImageSetsCache;
     private volatile long lastFlush;
     private Minecraft minecraft = FMLClientHandler.instance().getClient();
 
@@ -69,14 +69,15 @@ public class RegionImageCache
         return Holder.INSTANCE;
     }
 
-    public static LoadingCache<RegionCoord, RegionImageSet> initRegionImageSetsCache(CacheBuilder<Object, Object> builder)
+    public static LoadingCache<RegionImageSet.Key, RegionImageSet> initRegionImageSetsCache(CacheBuilder<Object, Object> builder)
     {
         return builder
-                .removalListener(new RemovalListener<RegionCoord, RegionImageSet>()
+                .expireAfterAccess(regionCacheAge, TimeUnit.SECONDS)
+                .removalListener(new RemovalListener<RegionImageSet.Key, RegionImageSet>()
                 {
                     @Override
                     @ParametersAreNonnullByDefault
-                    public void onRemoval(RemovalNotification<RegionCoord, RegionImageSet> notification)
+                    public void onRemoval(RemovalNotification<RegionImageSet.Key, RegionImageSet> notification)
                     {
                         RegionImageSet regionImageSet = notification.getValue();
                         if (regionImageSet != null)
@@ -85,11 +86,11 @@ public class RegionImageCache
                             regionImageSet.clear();
                         }
                     }
-                }).build(new CacheLoader<RegionCoord, RegionImageSet>()
+                }).build(new CacheLoader<RegionImageSet.Key, RegionImageSet>()
                 {
                     @Override
                     @ParametersAreNonnullByDefault
-                    public RegionImageSet load(RegionCoord key) throws Exception
+                    public RegionImageSet load(RegionImageSet.Key key) throws Exception
                     {
                         return new RegionImageSet(key);
                     }
@@ -98,38 +99,27 @@ public class RegionImageCache
 
     public RegionImageSet getRegionImageSet(RegionCoord rCoord)
     {
-        return regionImageSetsCache.getUnchecked(rCoord);
-    }
-
-    public boolean contains(RegionCoord rCoord)
-    {
-        return regionImageSetsCache.getIfPresent(rCoord) != null;
-    }
-
-    public BufferedImage getGuaranteedImage(RegionCoord rCoord, Constants.MapType mapType)
-    {
-        RegionImageSet ris = getRegionImageSet(rCoord).touch();
-        return ris.getImage(mapType);
+        return regionImageSetsCache.getUnchecked(RegionImageSet.Key.from(rCoord));
     }
 
     // Doesn't trigger access on cache
-    private Set<Entry<RegionCoord, RegionImageSet>> getRegionImageSets()
+    private Collection<RegionImageSet> getRegionImageSets()
     {
-        return regionImageSetsCache.asMap().entrySet();
+        return regionImageSetsCache.asMap().values();
     }
 
     public void updateTextures(boolean forceFlush)
     {
-        for (Map.Entry<RegionCoord, RegionImageSet> entry : getRegionImageSets())
+        for (RegionImageSet regionImageSet : getRegionImageSets())
         {
-            RegionImageSet regionImageSet = entry.getValue();
             if (regionImageSet.hasChunkUpdates())
             {
                 regionImageSet.finishChunkUpdates();
+                //System.out.println("UPDATED: " + regionImageSet.simpleRCoord.full);
             }
             else
             {
-                checkExpired(regionImageSet);
+                //System.out.println("Should expire eventually: " + regionImageSet.simpleRCoord.full);
             }
         }
 
@@ -142,23 +132,6 @@ public class RegionImageCache
         {
             autoFlush();
         }
-    }
-
-    private void checkExpired(RegionImageSet regionImageSet)
-    {
-        if (System.currentTimeMillis() - regionImageSet.getLastTouched() > regionCacheAge)
-        {
-            if (minecraft.isGamePaused())
-            {
-                // Keep alive
-                regionImageSet.touch();
-            }
-            else
-            {
-                regionImageSetsCache.invalidate(regionImageSet.rCoord);
-            }
-        }
-        //System.out.println(System.currentTimeMillis() - regionImageSet.getLastTouched());
     }
 
     private void autoFlush()
@@ -175,9 +148,9 @@ public class RegionImageCache
 
     public void flushToDisk()
     {
-        for (Map.Entry<RegionCoord, RegionImageSet> entry : getRegionImageSets())
+        for (RegionImageSet regionImageSet : getRegionImageSets())
         {
-            entry.getValue().writeToDisk(false);
+            regionImageSet.writeToDisk(false);
         }
         lastFlush = System.currentTimeMillis();
     }
@@ -202,12 +175,14 @@ public class RegionImageCache
         else
         {
             ArrayList<RegionCoord> list = new ArrayList<RegionCoord>();
-            for (Map.Entry<RegionCoord, RegionImageSet> entry : getRegionImageSets())
+            for (RegionImageSet regionImageSet : getRegionImageSets())
             {
-                RegionImageSet regionImageSet = entry.getValue();
-                if (regionImageSet.updatedSince(mapType, time))
+                for (ImageHolder imageHolder : regionImageSet.imageHolders.get(mapType))
                 {
-                    list.add(regionImageSet.rCoord);
+                    if (imageHolder.getImageTimestamp() > time)
+                    {
+                        list.add(regionImageSet.getRegionCoordFor(imageHolder));
+                    }
                 }
             }
             if (logger.isEnabled(Level.DEBUG))
@@ -273,9 +248,8 @@ public class RegionImageCache
         if (dirs != null && dirs.length > 0)
         {
             // Toss all images and textures without flushing to disk
-            for (Map.Entry<RegionCoord, RegionImageSet> entry : getRegionImageSets())
+            for (RegionImageSet regionImageSet : getRegionImageSets())
             {
-                RegionImageSet regionImageSet = entry.getValue();
                 regionImageSet.clear();
             }
 

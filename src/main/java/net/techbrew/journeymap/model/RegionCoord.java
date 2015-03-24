@@ -16,11 +16,9 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class RegionCoord implements Comparable<RegionCoord>
 {
-
     public transient static final int SIZE = 5;
     private transient static final int chunkSqRt = (int) Math.pow(2, SIZE);
     private static final Cache<Integer, RegionCoord> cache = DataCache.instance().getRegionCoords();
@@ -30,12 +28,12 @@ public class RegionCoord implements Comparable<RegionCoord>
     public final int regionX;
     public final int regionZ;
     public final Integer vSlice;
-    public final Integer dimension;
+    public final int dimension;
 
     public RegionCoord(File worldDir, int regionX, Integer vSlice, int regionZ, int dimension)
     {
         this.worldDir = worldDir;
-        this.dimDir = new File(worldDir, "DIM" + dimension).toPath();
+        this.dimDir = getDimPath(worldDir, dimension);
         this.regionX = regionX;
         this.regionZ = regionZ;
         this.vSlice = vSlice;
@@ -47,15 +45,25 @@ public class RegionCoord implements Comparable<RegionCoord>
         final int regionX = getRegionPos(chunkX);
         final int regionZ = getRegionPos(chunkZ);
 
+        return fromRegionPos(worldDir, regionX, vSlice, regionZ, dimension);
+    }
+
+    public static RegionCoord fromRegionPos(File worldDir, int regionX, Integer vSlice, int regionZ, int dimension)
+    {
         // There's no real need to synchronize this, it's harmless if there are occasional duplicate puts.  It's primarily
         // just used to reduce heap thrash.
-        RegionCoord regionCoord = cache.getIfPresent(toHash(worldDir, regionX, vSlice, regionZ, dimension));
+        RegionCoord regionCoord = cache.getIfPresent(toHash(getDimPath(worldDir, dimension), regionX, vSlice, regionZ));
         if (regionCoord == null)
         {
             regionCoord = new RegionCoord(worldDir, regionX, vSlice, regionZ, dimension);
             cache.put(regionCoord.hashCode(), regionCoord);
         }
         return regionCoord;
+    }
+
+    public static Path getDimPath(File worldDir, int dimension)
+    {
+        return new File(worldDir, "DIM" + dimension).toPath();
     }
 
     public static int getMinChunkX(int rX)
@@ -85,12 +93,16 @@ public class RegionCoord implements Comparable<RegionCoord>
 
     public static int toHash(RegionCoord regionCoord)
     {
-        return Objects.hash(regionCoord.worldDir, regionCoord.regionX, regionCoord.vSlice, regionCoord.regionZ, regionCoord.dimension);
+        return toHash(regionCoord.dimDir, regionCoord.regionX, regionCoord.vSlice, regionCoord.regionZ);
     }
 
-    public static int toHash(File worldDir, int regionX, Integer vSlice, int regionZ, int dimension)
+    public static int toHash(Path dimDir, int regionX, Integer vSlice, int regionZ)
     {
-        return Objects.hash(worldDir, regionX, vSlice, regionZ, dimension);
+        int result = dimDir.hashCode();
+        result = 31 * result + regionX;
+        result = 31 * result + regionZ;
+        result = 31 * result + (vSlice != null ? vSlice.hashCode() : 0);
+        return result;
     }
 
     public int getXOffset(int chunkX)
@@ -212,15 +224,15 @@ public class RegionCoord implements Comparable<RegionCoord>
         {
             return false;
         }
-        if (!dimension.equals(that.dimension))
+        if (!dimDir.equals(that.dimDir))
+        {
+            return false;
+        }
+        if (dimension != that.dimension)
         {
             return false;
         }
         if (vSlice != null ? !vSlice.equals(that.vSlice) : that.vSlice != null)
-        {
-            return false;
-        }
-        if (!worldDir.equals(that.worldDir))
         {
             return false;
         }
@@ -231,7 +243,7 @@ public class RegionCoord implements Comparable<RegionCoord>
     @Override
     public int hashCode()
     {
-        return toHash(this);
+        return toHash(dimDir, regionX, vSlice, regionZ);
     }
 
     @Override
