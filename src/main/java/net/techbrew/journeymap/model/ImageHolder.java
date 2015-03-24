@@ -84,11 +84,14 @@ public class ImageHolder
         writeLock.lock();
         try
         {
-            BufferedImage textureImage = texture.getImage();
-            Graphics2D g2D = initRenderingHints(textureImage.createGraphics());
-            g2D.drawImage(imagePart, x, y, null);
-            g2D.dispose();
-            partialUpdate = true;
+            if (texture != null)
+            {
+                BufferedImage textureImage = texture.getImage();
+                Graphics2D g2D = initRenderingHints(textureImage.createGraphics());
+                g2D.drawImage(imagePart, x, y, null);
+                g2D.dispose();
+                partialUpdate = true;
+            }
         }
         finally
         {
@@ -115,9 +118,14 @@ public class ImageHolder
         }
     }
 
+    public boolean hasTexture()
+    {
+        return texture != null && !texture.isDefunct();
+    }
+
     public TextureImpl getTexture()
     {
-        if (texture == null || texture.isDefunct())
+        if (!hasTexture())
         {
             BufferedImage image = RegionImageHandler.readRegionImage(imagePath.toFile(), false);
             if (image == null || image.getWidth() != imageSize || image.getHeight() != imageSize)

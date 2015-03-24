@@ -85,6 +85,11 @@ public class TextureImpl extends AbstractTexture
      */
     public void setImage(BufferedImage bufferedImage, boolean retainImage)
     {
+        if (bufferedImage == null)
+        {
+            return;
+        }
+
         try
         {
             bufferLock.lock();

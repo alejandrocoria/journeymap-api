@@ -1,6 +1,7 @@
 package net.techbrew.journeymap.render.map;
 
 import com.google.common.base.Objects;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -8,6 +9,7 @@ import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.*;
 import net.techbrew.journeymap.render.draw.DrawUtil;
+import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.task.main.ExpireTextureTask;
 import org.apache.logging.log4j.Logger;
@@ -17,6 +19,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 /**
  *
@@ -25,7 +29,7 @@ public class TileDrawStep
 {
     private static final Color bgColor = new Color(0x22, 0x22, 0x22);
 
-    private final Logger logger = JourneyMap.getLogger();
+    private static final Logger logger = JourneyMap.getLogger();
     private final boolean debug = logger.isTraceEnabled();
     private final RegionCoord regionCoord;
     private final Constants.MapType mapType;
@@ -33,9 +37,14 @@ public class TileDrawStep
     private final boolean highQuality;
     private final StatTimer drawTimer;
     private final RegionImageSet regionImageSet;
+    private final StatTimer updateRegionTimer = StatTimer.get("TileDrawStep.updateRegionTexture", 5, 50);
+    private final StatTimer updateScaledTimer = StatTimer.get("TileDrawStep.updateScaledTexture", 5, 50);
     private int sx1, sy1, sx2, sy2;
-    private TextureImpl scaledTexture;
-    private ImageHolder regionTextureHolder;
+    private volatile TextureImpl scaledTexture;
+    private volatile Future<TextureImpl> regionFuture;
+    private volatile Future<TextureImpl> scaledFuture;
+    private volatile ImageHolder regionTextureHolder;
+
 
     public TileDrawStep(RegionCoord regionCoord, final Constants.MapType mapType, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
     {
@@ -52,6 +61,7 @@ public class TileDrawStep
         this.regionImageSet = RegionImageCache.instance().getRegionImageSet(regionCoord);
         this.regionTextureHolder = regionImageSet.getHolder(mapType, regionCoord.vSlice);
 
+        updateRegionTexture();
         if (highQuality)
         {
             updateScaledTexture();
@@ -65,29 +75,28 @@ public class TileDrawStep
 
     void draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, int textureFilter, int textureWrap, GridSpec gridSpec)
     {
-        // Bind pending textures if needed
-        TextureImpl regionTexture = regionTextureHolder.getTexture();
-        boolean regionBindNeeded = regionTexture.isBindNeeded();
-        if (regionBindNeeded)
-        {
-            regionTexture.bindTexture();
-        }
-        else if (highQuality)
-        {
-            if (scaledTexture == null || scaledTexture.getLastBound() < regionTexture.getLastBound())
-            {
-                updateScaledTexture();
-            }
-        }
 
-        boolean useScaled = !regionBindNeeded && highQuality;
+        boolean regionUpdatePending = updateRegionTexture();
+        boolean scaledUpdatePending = !regionUpdatePending && highQuality && updateScaledTexture();
+        Integer textureId = -1;
+        boolean useScaled = false;
 
-        Integer textureId = useScaled ? scaledTexture.getGlTextureId() : regionTexture.getGlTextureId();
+        if (highQuality && !scaledUpdatePending && scaledTexture.hasImage())
+        {
+            textureId = scaledTexture.getGlTextureId();
+            useScaled = true;
+        }
+        else if (!regionUpdatePending)
+        {
+            textureId = regionTextureHolder.getTexture().getGlTextureId();
+        }
+        else
+        {
+            textureId = -1;
+        }
 
         // Draw already!
         drawTimer.start();
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         final double startX = offsetX + pos.startX;
         final double startY = offsetZ + pos.startZ;
@@ -105,12 +114,14 @@ public class TileDrawStep
         // Background
         DrawUtil.drawRectangle(startX, startY, endX - startX, endY - startY, bgColor, 200);
 
-        // Tile
-        if (textureId != null && textureId != -1)
-        {
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
+        GL11.glEnable(GL11.GL_BLEND);
+        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
 
+        // Tile
+        if (textureId != -1)
+        {
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
             GL11.glColor4f(1, 1, 1, alpha);
 
             // http://gregs-blog.com/2008/01/17/opengl-texture-filter-parameters-explained/
@@ -125,17 +136,12 @@ public class TileDrawStep
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
             drawBoundTexture(startU, startV, startX, startY, z, endU, endV, endX, endY);
         }
-        else
-        {
-            System.out.println("Missing texture: " + this);
-        }
 
         // Grid
         if (gridSpec != null)
         {
             gridSpec.beginTexture(textureWrap, alpha);
             drawBoundTexture(sx1 / size, sy1 / size, startX, startY, z, sx2 / size, sy2 / size, endX, endY);
-            gridSpec.finishTexture();
         }
 
         if (debug)
@@ -146,9 +152,12 @@ public class TileDrawStep
             DrawUtil.drawRectangle(debugX, debugY, endU * 512, 3, Color.red, 200);
             DrawUtil.drawLabel(this.toString(), debugX + 5, debugY + 10, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
             DrawUtil.drawLabel(String.format("Full size: %s", useScaled), debugX + 5, debugY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
-            long imageTimestamp = useScaled ? scaledTexture.getLastBound() : regionTexture.getLastBound();
+            long imageTimestamp = useScaled ? scaledTexture.getLastImageUpdate() : regionTextureHolder.getImageTimestamp();
             DrawUtil.drawLabel(new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(imageTimestamp)), debugX + 5, debugY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
         }
+
+        GL11.glColor4f(1, 1, 1, 1);
+        GL11.glClearColor(1, 1, 1, 1f); // defensive against shaders
 
         drawTimer.stop();
 
@@ -175,6 +184,16 @@ public class TileDrawStep
     {
         ExpireTextureTask.queue(scaledTexture);
         scaledTexture = null;
+        if (scaledFuture != null && !scaledFuture.isDone())
+        {
+            scaledFuture.cancel(true);
+        }
+        scaledFuture = null;
+        if (regionFuture != null && !regionFuture.isDone())
+        {
+            regionFuture.cancel(true);
+        }
+        regionFuture = null;
     }
 
     public Constants.MapType getMapType()
@@ -205,23 +224,131 @@ public class TileDrawStep
                 .toString();
     }
 
-    private void updateScaledTexture()
+    private boolean updateRegionTexture()
     {
-        BufferedImage image = RegionImageHandler.getScaledRegionArea(regionCoord, mapType, zoom, highQuality, sx1, sy1);
-        if (image == null)
+        updateRegionTimer.start();
+
+        if (regionFuture != null)
         {
-            return;
+            if (!regionFuture.isDone())
+            {
+                updateRegionTimer.stop();
+                return true;
+            }
+            regionFuture = null;
         }
+
+        if (regionTextureHolder.hasTexture())
+        {
+            if (regionTextureHolder.getTexture().isBindNeeded())
+            {
+                regionTextureHolder.getTexture().bindTexture();
+            }
+            updateRegionTimer.stop();
+            return false;
+        }
+
+        regionFuture = TextureCache.instance().scheduleTextureTask(new Callable<TextureImpl>()
+        {
+            @Override
+            public TextureImpl call() throws Exception
+            {
+                return regionTextureHolder.getTexture();
+            }
+        });
+
+        updateRegionTimer.stop();
+
+        return true;
+    }
+
+    private boolean updateScaledTexture()
+    {
+        updateScaledTimer.start();
+
+        if (scaledFuture != null)
+        {
+            if (!scaledFuture.isDone())
+            {
+                updateScaledTimer.stop();
+                return true;
+            }
+            try
+            {
+                scaledTexture = scaledFuture.get();
+                scaledTexture.bindTexture();
+            }
+            catch (Throwable e)
+            {
+                logger.error(e);
+            }
+            scaledFuture = null;
+            updateScaledTimer.stop();
+            return false;
+        }
+
         if (scaledTexture == null)
         {
-            scaledTexture = new TextureImpl(null, image, false, false);
-            scaledTexture.setDescription("scaled for " + this);
-            scaledTexture.bindTexture();
+            scaledFuture = TextureCache.instance().scheduleTextureTask(new Callable<TextureImpl>()
+            {
+                @Override
+                public TextureImpl call() throws Exception
+                {
+                    TextureImpl temp = new TextureImpl(null, getScaledRegionArea(), false, false);
+                    temp.setDescription("scaled for " + this);
+                    return temp;
+                }
+            });
         }
         else
         {
-            scaledTexture.updateAndBind(image, false);
+            final TextureImpl temp = scaledTexture;
+            scaledFuture = TextureCache.instance().scheduleTextureTask(new Callable<TextureImpl>()
+            {
+                @Override
+                public TextureImpl call() throws Exception
+                {
+                    temp.setImage(getScaledRegionArea(), false);
+                    return temp;
+                }
+            });
+        }
+        updateScaledTimer.stop();
+        return true;
+    }
+
+    public BufferedImage getScaledRegionArea()
+    {
+        int scale = (int) Math.pow(2, zoom);
+        int scaledSize = Tile.TILESIZE / scale;
+
+        try
+        {
+            BufferedImage subImage = this.regionTextureHolder.getTexture().getImage().getSubimage(sx1, sy1, scaledSize, scaledSize);
+            BufferedImage scaledImage = new BufferedImage(Tile.TILESIZE, Tile.TILESIZE, BufferedImage.TYPE_INT_ARGB);
+            final Graphics2D g = RegionImageHandler.initRenderingHints(scaledImage.createGraphics());
+            g.drawImage(subImage, 0, 0, Tile.TILESIZE, Tile.TILESIZE, null);
+            g.dispose();
+            return scaledImage;
+        }
+        catch (Throwable e)
+        {
+            logger.error(e);
+            return null;
         }
 
+
+        /**
+         BufferedImage image = new BufferedImage(regionImage.getWidth(), regionImage.getHeight(), regionImage.getType());
+         final Graphics2D g2D = initRenderingHints(image.createGraphics());
+
+
+         g2D.drawImage(regionImage, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
+         //g2D.drawImage(regionImage, 0, 0, 512, 512, sx1, sy1, sx2, sy2, Color.yellow, null);
+         g2D.drawImage(regionImage, sx1, sy1, sx2-sx1, sy2-sy1,null);
+         g2D.dispose();
+
+         return image;
+         */
     }
 }

@@ -16,7 +16,6 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageCache;
-import net.techbrew.journeymap.render.map.Tile;
 import net.techbrew.journeymap.render.map.TileDrawStep;
 import net.techbrew.journeymap.render.map.TileDrawStepCache;
 import org.apache.logging.log4j.Level;
@@ -263,51 +262,7 @@ public class RegionImageHandler
         {
             return image;
         }
-
     }
-
-    public static BufferedImage getScaledRegionArea(final RegionCoord rCoord, final MapType mapType, final int zoom, boolean highQuality, int x1, int y1)
-    {
-        BufferedImage regionImage = RegionImageCache.instance().getRegionImageSet(rCoord).getImage(mapType, rCoord.vSlice);
-
-        if (regionImage == null)
-        {
-            return null;
-        }
-
-        int scale = (int) Math.pow(2, zoom);
-        BufferedImage scaledImage = null;
-        int scaledSize = Tile.TILESIZE / scale;
-
-        try
-        {
-            BufferedImage subImage = regionImage.getSubimage(x1, y1, scaledSize, scaledSize);
-            scaledImage = new BufferedImage(Tile.TILESIZE, Tile.TILESIZE, BufferedImage.TYPE_INT_ARGB);
-            final Graphics2D g = initRenderingHints(scaledImage.createGraphics());
-            g.drawImage(subImage, 0, 0, Tile.TILESIZE, Tile.TILESIZE, null);
-            g.dispose();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            boolean good = false;
-        }
-        return scaledImage;
-
-        /**
-         BufferedImage image = new BufferedImage(regionImage.getWidth(), regionImage.getHeight(), regionImage.getType());
-         final Graphics2D g2D = initRenderingHints(image.createGraphics());
-
-
-         g2D.drawImage(regionImage, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
-         //g2D.drawImage(regionImage, 0, 0, 512, 512, sx1, sy1, sx2, sy2, Color.yellow, null);
-         g2D.drawImage(regionImage, sx1, sy1, sx2-sx1, sy2-sy1,null);
-         g2D.dispose();
-
-         return image;
-         */
-    }
-
 
     /**
      * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2).

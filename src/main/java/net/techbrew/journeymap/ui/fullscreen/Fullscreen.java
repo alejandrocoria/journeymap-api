@@ -653,7 +653,7 @@ public class Fullscreen extends JmUI
                 try
                 {
                     gridRenderer.move(-mouseDragX, -mouseDragY);
-                    gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), state.getZoom(), false, mc.displayWidth, mc.displayHeight, false, 0, 0);
+                    gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
                     gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
                 }
                 catch (Exception e)
@@ -885,7 +885,7 @@ public class Fullscreen extends JmUI
         {
             gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.chunkCoordY, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
         }
-        gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), state.getZoom(), false, mc.displayWidth, mc.displayHeight, false, 0, 0);
+        gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
         gridRenderer.draw(1f, xOffset, yOffset, fullMapProperties.showGrid.get());
         gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
         gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
@@ -973,7 +973,7 @@ public class Fullscreen extends JmUI
         }
 
         // Update tiles
-        gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), state.getZoom(), false, mc.displayWidth, mc.displayHeight, true, 0, 0);
+        gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 
         // Build list of drawSteps
         state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, 1f, false);
@@ -1036,7 +1036,7 @@ public class Fullscreen extends JmUI
     {
         refreshState();
         gridRenderer.move(deltaBlockX, deltaBlockz);
-        gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), state.getZoom(), false, mc.displayWidth, mc.displayHeight, true, 0, 0);
+        gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, true, 0, 0);
         setFollow(false);
     }
 

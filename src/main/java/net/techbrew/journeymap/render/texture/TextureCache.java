@@ -42,7 +42,7 @@ public class TextureCache
     private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
 
     private ThreadPoolExecutor texExec = new ThreadPoolExecutor(2, 4, 15L, TimeUnit.SECONDS,
-            new ArrayBlockingQueue<Runnable>(64), new JMThreadFactory("texture"), new ThreadPoolExecutor.CallerRunsPolicy());
+            new ArrayBlockingQueue<Runnable>(8), new JMThreadFactory("texture"), new ThreadPoolExecutor.CallerRunsPolicy());
 
     private TextureCache()
     {
