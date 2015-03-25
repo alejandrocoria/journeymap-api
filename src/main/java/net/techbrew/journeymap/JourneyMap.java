@@ -540,7 +540,7 @@ public class JourneyMap
             File newWorldDirectory = FileHandler.getJMWorldDir(mc, worldId);
 
             boolean worldIdUnchanged = Constants.safeEqual(worldId, currentWorldId);
-            boolean directoryUnchanged = currentWorldDirectory != null && currentWorldDirectory.getPath().equals(newWorldDirectory.getPath());
+            boolean directoryUnchanged = currentWorldDirectory != null && newWorldDirectory != null && currentWorldDirectory.getPath().equals(newWorldDirectory.getPath());
 
             if (worldIdUnchanged && directoryUnchanged && worldId != null)
             {
