@@ -13,7 +13,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.MathHelper;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
@@ -29,7 +28,6 @@ import net.techbrew.journeymap.render.draw.WaypointDrawStepFactory;
 import net.techbrew.journeymap.render.map.GridRenderer;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
-import net.techbrew.journeymap.task.multi.MapPlayerTask;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
@@ -63,7 +61,6 @@ public class MiniMap
     private String fpsLabelText;
     private String locationLabelText;
     private String biomeLabelText;
-    private String[] debugLabelText;
 
     private Point2D.Double centerPoint;
     private Rectangle2D.Double centerRect;
@@ -352,18 +349,6 @@ public class MiniMap
             {
                 dv.labelBiome.draw(biomeLabelText);
             }
-            if (this.mc.gameSettings.showDebugInfo && debugLabelText != null)
-            {
-                if (debugLabelText.length == 1)
-                {
-                    dv.labelDebug1.draw(debugLabelText[0]);
-                }
-                else if (debugLabelText.length == 2)
-                {
-                    dv.labelDebug1.draw(debugLabelText[0]);
-                    dv.labelDebug2.draw(debugLabelText[1]);
-                }
-            }
 
             // Return resolution to how it is normally scaled
             DrawUtil.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
@@ -646,19 +631,6 @@ public class MiniMap
         if (dv.showBiome)
         {
             biomeLabelText = state.getPlayerBiome();
-        }
-
-        // Debug info
-        if (this.mc.gameSettings.showDebugInfo)
-        {
-            if (JourneyMap.getCoreProperties().mappingEnabled.get())
-            {
-                debugLabelText = MapPlayerTask.getDebugStats();
-            }
-            else
-            {
-                debugLabelText = new String[]{Constants.getString("jm.common.enable_mapping_false_text")};
-            }
         }
 
         // Update timestamp

@@ -255,7 +255,7 @@ public class RenderSpec
 
         if (primaryRenderDistance != maxSecondaryRenderDistance)
         {
-            // Cave Distance Min/Max: %1$s/%2$s, Chunks: %3$s/%4$s, Total Chunks: %5$s in %6$sms (avg %7$sms)
+            // Caves: %1$s (%2$s) + %3$s (%4$s) = %5$s chunks in %6$sms (avg %7$sms)
             debugString = underground ? "jm.common.renderstats_debug_cave" : "jm.common.renderstats_debug_surface";
 
             String avg = decFormat.format(lastTaskAvgChunkTime);
@@ -265,15 +265,15 @@ public class RenderSpec
             }
 
             return Constants.getString(debugString,
-                    primaryRenderDistance, getLastSecondaryRenderDistance(),
-                    getPrimaryRenderSize(), getLastSecondaryRenderSize(),
+                    primaryRenderDistance, getPrimaryRenderSize(),
+                    getLastSecondaryRenderDistance(), getLastSecondaryRenderSize(),
                     lastTaskChunks,
                     lastTaskTime,
                     avg);
         }
         else
         {
-            // Cave Distance: %1$s, Chunks: %2$s in %3$sms (avg %4$sms)
+            // Caves: %1$s = %2$s chunks in %3$sms (avg %4$sms)
             debugString = underground ? "jm.common.renderstats_debug_cave_simple" : "jm.common.renderstats_debug_surface_simple";
             return Constants.getString(debugString,
                     primaryRenderDistance,

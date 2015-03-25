@@ -9,6 +9,7 @@
 package net.techbrew.journeymap.log;
 
 import com.google.common.util.concurrent.AtomicDouble;
+import net.minecraft.util.EnumChatFormatting;
 import net.techbrew.journeymap.JourneyMap;
 import org.apache.logging.log4j.Logger;
 
@@ -174,6 +175,36 @@ public class StatTimer
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Report all timers sorted by most time consumed
+     */
+    public synchronized static List<String> getReportByTotalTime(String prefix, String suffix)
+    {
+        List<StatTimer> list = new ArrayList<StatTimer>(timers.values());
+        Collections.sort(list, new Comparator<StatTimer>()
+        {
+            @Override
+            public int compare(StatTimer o1, StatTimer o2)
+            {
+                return Double.compare(o2.totalTime.get(), o1.totalTime.get());
+            }
+        });
+        ArrayList<String> strings = new ArrayList<String>();
+        for (StatTimer timer : list)
+        {
+            if (timer.counter.get() > 0)
+            {
+                strings.add(prefix + timer.getSimpleReportString() + suffix);
+            }
+
+            if (strings.size() >= 30)
+            {
+                break;
+            }
+        }
+        return strings;
     }
 
     /**
@@ -427,19 +458,20 @@ public class StatTimer
                 final double total = totalTime.get();
                 final double avg = total / count;
 
-                final StringBuilder sb = new StringBuilder(name).append(" ");
-                if (count > 1)
+                final StringBuilder sb = new StringBuilder(name);
+                sb.append(EnumChatFormatting.DARK_GRAY);
+                sb.append(" count ").append(EnumChatFormatting.RESET);
+                sb.append(count);
+                sb.append(EnumChatFormatting.DARK_GRAY);
+                sb.append(" avg ").append(EnumChatFormatting.RESET);
+                if (ranTooLongCount > 0)
                 {
-                    sb.append("count: ").append(count).append(", ");
+                    sb.append(EnumChatFormatting.RESET);
                 }
-                sb.append("time: ").append(df.format(total) + "ms");
-                if (count > 1)
-                {
-                    sb.append(", min: ").append(df.format(min) + "ms");
-                    sb.append(", max: ").append(df.format(max) + "ms");
-                    sb.append(", avg: ").append(df.format(avg) + "ms");
-                    sb.append(", slow: ").append(ranTooLongCount);
-                }
+                sb.append(df.format(avg));
+                sb.append(EnumChatFormatting.DARK_GRAY);
+                sb.append("ms");
+                sb.append(EnumChatFormatting.RESET);
                 if (maxed)
                 {
                     sb.append("(MAXED)");
