@@ -224,6 +224,18 @@ public class TileDrawStep
                 .toString();
     }
 
+    boolean hasTexture()
+    {
+        if (highQuality)
+        {
+            return scaledTexture != null && scaledTexture.isBound();
+        }
+        else
+        {
+            return regionTextureHolder.getTexture().isBound();
+        }
+    }
+
     private boolean updateRegionTexture()
     {
         updateRegionTimer.start();

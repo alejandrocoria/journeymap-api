@@ -176,7 +176,7 @@ public class GridRenderer
             if (isOnScreen(entry.getKey()))
             {
                 tile = entry.getValue();
-                if (tile == null || (!preview && !tile.hasTexture()))
+                if (tile == null || !tile.hasTexture())
                 {
                     return true;
                 }

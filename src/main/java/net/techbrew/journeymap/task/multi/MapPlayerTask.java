@@ -105,37 +105,45 @@ public class MapPlayerTask extends BaseMapTask
 
     public static String[] getDebugStats()
     {
-        List<String> lines = new ArrayList<String>(0);
-
-        boolean showLastUnderground = false;
-        boolean showLastSurface = false;
-
-        if (DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapCaves.get())
+        try
         {
-            showLastUnderground = lastUndergroundRenderSpec != null;
-        }
+            List<String> lines = new ArrayList<String>(0);
 
-        if (!DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapSurface.get())
-        {
-            showLastSurface = lastSurfaceRenderSpec != null;
-        }
+            boolean showLastUnderground = false;
+            boolean showLastSurface = false;
 
-        if (!showLastSurface && !showLastUnderground)
-        {
-            return null;
-        }
-
-        if (showLastSurface != showLastUnderground)
-        {
-            if (showLastSurface)
+            if (DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapCaves.get())
             {
-                return new String[]{lastSurfaceRenderSpec.getDebugStats()};
+                showLastUnderground = lastUndergroundRenderSpec != null;
             }
-            return new String[]{lastUndergroundRenderSpec.getDebugStats()};
+
+            if (!DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapSurface.get())
+            {
+                showLastSurface = lastSurfaceRenderSpec != null;
+            }
+
+            if (!showLastSurface && !showLastUnderground)
+            {
+                return null;
+            }
+
+            if (showLastSurface != showLastUnderground)
+            {
+                if (showLastSurface)
+                {
+                    return new String[]{lastSurfaceRenderSpec.getDebugStats()};
+                }
+                return new String[]{lastUndergroundRenderSpec.getDebugStats()};
+            }
+            else
+            {
+                return new String[]{lastSurfaceRenderSpec.getDebugStats(), lastUndergroundRenderSpec.getDebugStats()};
+            }
         }
-        else
+        catch (Throwable t)
         {
-            return new String[]{lastSurfaceRenderSpec.getDebugStats(), lastUndergroundRenderSpec.getDebugStats()};
+            logger.error(t);
+            return new String[]{"Error"};
         }
     }
 

@@ -91,7 +91,18 @@ public class Tile
 
     public boolean hasTexture()
     {
-        return !drawSteps.isEmpty();
+        if (drawSteps.isEmpty())
+        {
+            return false;
+        }
+        for (TileDrawStep tileDrawStep : drawSteps)
+        {
+            if (!tileDrawStep.hasTexture())
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void clear()
