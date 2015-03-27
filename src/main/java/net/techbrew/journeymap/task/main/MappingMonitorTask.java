@@ -5,7 +5,6 @@ import net.minecraft.client.gui.*;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import org.apache.logging.log4j.Logger;
 
@@ -20,7 +19,6 @@ public class MappingMonitorTask implements IMainThreadTask
     @Override
     public IMainThreadTask perform(Minecraft mc, JourneyMap jm)
     {
-        StatTimer timer = StatTimer.getDisposable("JourneyMap.performMainThreadTasks", 200).start();
         //long start = System.nanoTime();
         try
         {
@@ -84,17 +82,6 @@ public class MappingMonitorTask implements IMainThreadTask
         catch (Throwable t)
         {
             logger.error("Error in JourneyMap.performMainThreadTasks(): " + LogFormatter.toString(t));
-        }
-        finally
-        {
-            timer.stop();
-//            final double elapsedMs = (System.nanoTime() - start) / StatTimer.NS;
-//            if (elapsedMs > 10)
-//            {
-//                // TODO remove
-//                ChatLog.announceError(String.format("[%s] JourneyMap.performMainThreadTasks() too slow: %sms",
-//                        new SimpleDateFormat("HH:mm:ss.SSS").format(new Date()), elapsedMs));
-//            }
         }
         return this;
     }

@@ -188,7 +188,7 @@ public class TextureImpl extends AbstractTexture
         }
         else
         {
-            System.out.println("Missed binding, will try later");
+            //System.out.println("Missed binding, will try later");
         }
     }
 

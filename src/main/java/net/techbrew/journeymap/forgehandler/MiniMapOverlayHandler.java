@@ -57,36 +57,43 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onRenderOverlayDebug(RenderGameOverlayEvent.Text event)
     {
-        if (mc.gameSettings.showDebugInfo)
+        try
         {
-            event.left.add(null);
-            if (JourneyMap.getCoreProperties().mappingEnabled.get())
+            if (mc.gameSettings.showDebugInfo)
             {
-                for (String line : MapPlayerTask.getDebugStats())
-                {
-                    event.left.add(DEBUG_PREFIX + line + DEBUG_SUFFIX);
-                }
-            }
-            else
-            {
-                event.left.add(Constants.getString("jm.common.enable_mapping_false_text") + DEBUG_SUFFIX);
-            }
-
-            if (mc.gameSettings.showDebugProfilerChart)
-            {
-                if (System.currentTimeMillis() - statTimerCheck > 3000)
-                {
-                    statTimerReport = StatTimer.getReportByTotalTime(DEBUG_PREFIX, DEBUG_SUFFIX);
-                    statTimerCheck = System.currentTimeMillis();
-                }
-
                 event.left.add(null);
-
-                for (String line : statTimerReport)
+                if (JourneyMap.getCoreProperties().mappingEnabled.get())
                 {
-                    event.left.add(line);
+                    for (String line : MapPlayerTask.getDebugStats())
+                    {
+                        event.left.add(DEBUG_PREFIX + line + DEBUG_SUFFIX);
+                    }
+                }
+                else
+                {
+                    event.left.add(Constants.getString("jm.common.enable_mapping_false_text") + DEBUG_SUFFIX);
+                }
+
+                if (mc.gameSettings.showDebugProfilerChart)
+                {
+                    if (System.currentTimeMillis() - statTimerCheck > 3000)
+                    {
+                        statTimerReport = StatTimer.getReportByTotalTime(DEBUG_PREFIX, DEBUG_SUFFIX);
+                        statTimerCheck = System.currentTimeMillis();
+                    }
+
+                    event.left.add(null);
+
+                    for (String line : statTimerReport)
+                    {
+                        event.left.add(line);
+                    }
                 }
             }
+        }
+        catch (Throwable t)
+        {
+            JMLogger.logOnce("Unexpected error during onRenderOverlayEarly: " + t, t);
         }
     }
 
