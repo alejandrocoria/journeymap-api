@@ -3,7 +3,7 @@ package net.techbrew.journeymap.model;
 import net.techbrew.journeymap.Constants;
 
 /**
- * Created by Mark on 1/23/2015.
+ * Model describing Grid appearance for day/night/caves
  */
 public class GridSpecs
 {
@@ -38,5 +38,43 @@ public class GridSpecs
             default:
                 return day;
         }
+    }
+
+    public void setSpec(Constants.MapType mapType, GridSpec newSpec)
+    {
+        switch (mapType)
+        {
+            case day:
+            {
+                day = newSpec.clone();
+                return;
+            }
+            case night:
+            {
+                night = newSpec.clone();
+                return;
+            }
+            case underground:
+            {
+                underground = newSpec.clone();
+                return;
+            }
+            default:
+            {
+                day = newSpec.clone();
+            }
+        }
+    }
+
+    public GridSpecs clone()
+    {
+        return new GridSpecs(day.clone(), night.clone(), underground.clone());
+    }
+
+    public void updateFrom(GridSpecs other)
+    {
+        day = other.day.clone();
+        night = other.night.clone();
+        underground = other.underground.clone();
     }
 }

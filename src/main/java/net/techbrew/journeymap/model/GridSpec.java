@@ -2,9 +2,12 @@ package net.techbrew.journeymap.model;
 
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.cartography.RGB;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
 
 /**
  * Provides encapsulation of how to render the grid overlay in a Tile.
@@ -17,6 +20,16 @@ public class GridSpec
     public final float blue;
     public final float alpha;
     private transient TextureImpl texture = null;
+
+    public GridSpec(Style style, Color color, float alpha)
+    {
+        this.style = style;
+        float[] rgb = RGB.floats(color.getRGB());
+        this.red = rgb[0];
+        this.green = rgb[1];
+        this.blue = rgb[2];
+        this.alpha = alpha;
+    }
 
     public GridSpec(Style style, float red, float green, float blue, float alpha)
     {
@@ -46,6 +59,11 @@ public class GridSpec
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
+    }
+
+    public GridSpec clone()
+    {
+        return new GridSpec(style, red, green, blue, alpha);
     }
 
     public void finishTexture()

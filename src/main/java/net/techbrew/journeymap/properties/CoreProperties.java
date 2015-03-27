@@ -13,6 +13,7 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
+import net.techbrew.journeymap.model.GridSpecs;
 import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.task.multi.RenderSpec;
 
@@ -142,8 +143,8 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Advanced, key = "jm.advanced.tile_render_type", minValue = 1, maxValue = 4, defaultValue = 1)
     public final AtomicInteger tileRenderType = new AtomicInteger(1);
 
+    public final GridSpecs gridSpecs = new GridSpecs();
     public final AtomicBoolean mappingEnabled = new AtomicBoolean(true);
-
     public final AtomicReference<String> renderOverlayEventTypeName = new AtomicReference<String>(RenderGameOverlayEvent.ElementType.ALL.name());
     public final AtomicBoolean renderOverlayPreEvent = new AtomicBoolean(true);
     public final AtomicReference<String> optionsManagerViewed = new AtomicReference<String>("");
