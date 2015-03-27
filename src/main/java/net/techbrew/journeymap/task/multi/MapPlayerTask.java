@@ -124,7 +124,7 @@ public class MapPlayerTask extends BaseMapTask
 
             if (!showLastSurface && !showLastUnderground)
             {
-                return null;
+                return new String[0];
             }
 
             if (showLastSurface != showLastUnderground)
@@ -143,7 +143,7 @@ public class MapPlayerTask extends BaseMapTask
         catch (Throwable t)
         {
             logger.error(t);
-            return new String[]{"Error"};
+            return new String[0];
         }
     }
 
