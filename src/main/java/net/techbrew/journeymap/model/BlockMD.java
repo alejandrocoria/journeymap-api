@@ -48,6 +48,7 @@ public class BlockMD
     private transient Block block;
     private Integer color;
     private float alpha;
+    private String iconName;
 
     /**
      * Instantiates a new BlockMD.
@@ -207,6 +208,16 @@ public class BlockMD
 
             return color;
         }
+    }
+
+    public String getIconName()
+    {
+        return iconName == null ? "" : iconName;
+    }
+
+    public void setIconName(String iconName)
+    {
+        this.iconName = iconName;
     }
 
     /**

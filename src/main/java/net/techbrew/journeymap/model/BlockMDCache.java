@@ -10,6 +10,8 @@ package net.techbrew.journeymap.model;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.*;
@@ -18,6 +20,7 @@ import net.minecraft.init.Blocks;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
+import net.techbrew.journeymap.model.mod.ModBlockDelegate;
 
 import java.util.*;
 
@@ -32,7 +35,8 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
     public final BlockMD VOIDBLOCK;
     private final HashMap<Block, EnumSet<BlockMD.Flag>> blockFlags;
     private final HashMap<Block, Float> blockAlphas;
-    private final SpecialBlockHandler specialBlockHandler = new SpecialBlockHandler();
+    private final Multimap<String, Block> blocksForIconName = MultimapBuilder.ListMultimapBuilder.hashKeys().arrayListValues().build();
+    private final ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
 
     public BlockMDCache()
     {
@@ -112,7 +116,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
         // Mod block ids which get specific flags
         HashMap<GameRegistry.UniqueIdentifier, Collection<BlockMD.Flag>> modBlockUIDs = new HashMap<GameRegistry.UniqueIdentifier, Collection<BlockMD.Flag>>();
-        for (GameRegistry.UniqueIdentifier specialUid : SpecialBlockHandler.Blocks)
+        for (GameRegistry.UniqueIdentifier specialUid : ModBlockDelegate.Blocks.keySet())
         {
             modBlockUIDs.put(specialUid, EnumSet.of(BlockMD.Flag.SpecialHandling));
         }
@@ -145,7 +149,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:TallGrass"), EnumSet.of(BiomeColor));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:SeaGrassStill"), EnumSet.of(Side2Texture));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("Thaumcraft:blockMagicalLeaves"), EnumSet.of(BiomeColor)); // Thaumcraft:blockMagicalLeaves Greatwood Leaves #2C6F0E
-
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("CarpentersBlocks:blockCarpentersLadder"), EnumSet.of(OpenToSky));
 
         // Set flags based on inheritance
         for (Block block : GameData.getBlockRegistry().typeSafeIterable())
@@ -258,7 +262,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         BlockMD blockMD = getBlockMD(cache, block, meta);
         if (blockMD.hasFlag(SpecialHandling))
         {
-            specialBlockHandler.handleBlock(chunkMD, blockMD, x, y, z);
+            blockMD = modBlockDelegate.handleBlock(chunkMD, blockMD, x, y, z);
         }
         return blockMD;
     }

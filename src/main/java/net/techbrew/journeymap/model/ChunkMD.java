@@ -261,6 +261,16 @@ public class ChunkMD
         return now;
     }
 
+    public int toBlockX(int localX)
+    {
+        return coord.chunkXPos << 4 + localX;
+    }
+
+    public int toBlockZ(int localZ)
+    {
+        return coord.chunkZPos << 4 + localZ;
+    }
+
     @Override
     public String toString()
     {

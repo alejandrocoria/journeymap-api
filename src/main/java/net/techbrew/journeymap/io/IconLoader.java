@@ -275,7 +275,7 @@ public class IconLoader
             }
             dataCache.getBlockMetadata().setAlpha(block, blockAlpha);
             blockMD.setAlpha(blockAlpha);
-
+            blockMD.setIconName(icon.getIconName());
         }
         catch (Throwable e1)
         {
