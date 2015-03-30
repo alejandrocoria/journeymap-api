@@ -263,12 +263,12 @@ public class ChunkMD
 
     public int toBlockX(int localX)
     {
-        return coord.chunkXPos << 4 + localX;
+        return (coord.chunkXPos << 4) + localX;
     }
 
     public int toBlockZ(int localZ)
     {
-        return coord.chunkZPos << 4 + localZ;
+        return (coord.chunkZPos << 4) + localZ;
     }
 
     @Override
