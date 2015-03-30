@@ -56,28 +56,30 @@ public class CarpentersBlocks
         {
             final int blockX = chunkMD.toBlockX(localX);
             final int blockZ = chunkMD.toBlockZ(localZ);
-
             final TileEntity tileEntity = chunkMD.getWorldObj().getTileEntity(blockX, y, blockZ);
-            final NBTTagCompound tag = new NBTTagCompound();
-            tileEntity.writeToNBT(tag);
-
-            if (!tag.hasNoTags())
+            if (tileEntity != null)
             {
-                int id;
-                int meta = 1;
-                NBTTagList attrs = tag.getTagList(TAG_ATTR_LIST, 10);
-                String idString = attrs.getCompoundTagAt(0).getString(TAG_ID);
+                final NBTTagCompound tag = new NBTTagCompound();
+                tileEntity.writeToNBT(tag);
 
-                if (idString.length() > 0)
+                if (!tag.hasNoTags())
                 {
-                    id = Integer.parseInt(idString);
-                    String idMeta = attrs.getCompoundTagAt(0).getString(TAG_DAMAGE);
-                    if (idMeta.length() > 0)
+                    int id;
+                    int meta = 0;
+                    NBTTagList attrs = tag.getTagList(TAG_ATTR_LIST, 10);
+                    String idString = attrs.getCompoundTagAt(0).getString(TAG_ID);
+
+                    if (idString.length() > 0)
                     {
-                        meta = Integer.parseInt(idMeta);
+                        id = Integer.parseInt(idString.substring(0, idString.length() - 1));
+                        String idMeta = attrs.getCompoundTagAt(0).getString(TAG_DAMAGE);
+                        if (idMeta.length() > 0)
+                        {
+                            meta = Integer.parseInt(idMeta.substring(0, idMeta.length() - 1));
+                        }
+                        Block block = GameData.getBlockRegistry().getObjectById(id);
+                        blockMD = DataCache.instance().getBlockMD(block, meta);
                     }
-                    Block block = GameData.getBlockRegistry().getObjectById(id);
-                    return DataCache.instance().getBlockMD(block, meta);
                 }
             }
             return blockMD;

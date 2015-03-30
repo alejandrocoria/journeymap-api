@@ -37,26 +37,30 @@ public class OpenBlocks
             int blockZ = chunkMD.toBlockZ(localZ);
             //String name = I18n.format("tile.openblocks.grave.name");
             TileEntity tileEntity = chunkMD.getWorldObj().getTileEntity(blockX, y, blockZ);
-            NBTTagCompound tag = new NBTTagCompound();
-            tileEntity.writeToNBT(tag);
 
-            String playerName = null;
-            if (tag.hasNoTags())
+            if (tileEntity != null)
             {
-                playerName = "?";
-            }
-            else
-            {
-                playerName = tag.getString(TAG_PLAYERNAME);
-            }
+                NBTTagCompound tag = new NBTTagCompound();
+                tileEntity.writeToNBT(tag);
 
-            if (playerName == null)
-            {
-                playerName = "";
-            }
+                String playerName = null;
+                if (tag.hasNoTags())
+                {
+                    playerName = "?";
+                }
+                else
+                {
+                    playerName = tag.getString(TAG_PLAYERNAME);
+                }
 
-            Waypoint waypoint = new Waypoint(playerName + " " + blockMD.getName(), new ChunkCoordinates(blockX, y, blockZ), Color.red, Waypoint.Type.Death, chunkMD.getWorldObj().provider.dimensionId);
-            WaypointStore.instance().add(waypoint);
+                if (playerName == null)
+                {
+                    playerName = "";
+                }
+
+                Waypoint waypoint = new Waypoint(playerName + " " + blockMD.getName(), new ChunkCoordinates(blockX, y, blockZ), Color.red, Waypoint.Type.Death, chunkMD.getWorldObj().provider.dimensionId);
+                WaypointStore.instance().add(waypoint);
+            }
 
             return blockMD;
         }
