@@ -5,7 +5,7 @@
     <property name="jm_major" value="5"/>
     <property name="jm_minor" value="1"/>
     <property name="jm_micro" value="0"/>
-    <property name="jm_patch" value="a4"/>
+    <property name="jm_patch" value="a5"/>
     <property name="jmversion" value="${jm_major}.${jm_minor}.${jm_micro}${jm_patch}"/>
     <property name="mcversion" value="1.7.10"/>
     <property name="forgeversion" value="10.13.2.1291"/>
