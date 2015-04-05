@@ -31,6 +31,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 
@@ -250,6 +251,11 @@ public class EntityHelper
 
         // Non-horse mobs
         ResourceLocation loc = RenderFacade.getEntityTexture(entityRender, entity);
+        if (loc == null)
+        {
+            JMLogger.logOnce("Can't get entityTexture for " + entity.getClass() + " via " + entityRender.getClass(), null);
+            return null;
+        }
         if (loc.getResourceDomain().equals("minecraft"))
         {
             String tex = loc.getResourcePath();
