@@ -294,7 +294,7 @@ public class MapState
     {
         EntityDTO player = DataCache.getPlayer();
 
-        if (System.currentTimeMillis() > (lastRefresh + MapPlayerTask.getlastTaskCompleted() + 500))
+        if (MapPlayerTask.getlastTaskCompleted() - lastRefresh > 500)
         {
             return true;
         }
