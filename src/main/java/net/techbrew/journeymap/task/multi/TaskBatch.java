@@ -46,7 +46,10 @@ public class TaskBatch implements ITask
     @Override
     public void performTask(final Minecraft mc, final JourneyMap jm, final File jmWorldDir, final boolean threadLogging) throws InterruptedException
     {
-        startNs = System.nanoTime();
+        if (startNs == 0)
+        {
+            startNs = System.nanoTime();
+        }
 
         if (threadLogging)
         {

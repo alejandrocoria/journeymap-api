@@ -301,9 +301,17 @@ public class MapPlayerTask extends BaseMapTask
         @Override
         public void performTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
         {
+            startNs = System.nanoTime();
             List<ITask> tasks = new ArrayList<ITask>(taskList);
+            DataCache.instance().invalidateChunkMDCache();
+
             super.performTask(mc, jm, jmWorldDir, threadLogging);
 
+            elapsedNs = System.nanoTime() - startNs;
+            lastTaskTime = TimeUnit.NANOSECONDS.toMillis(elapsedNs);
+            lastTaskCompleted = System.currentTimeMillis();
+
+            // Report on timing
             int chunkCount = 0;
             for (ITask task : tasks)
             {
@@ -321,12 +329,7 @@ public class MapPlayerTask extends BaseMapTask
                     }
                 }
             }
-
-            elapsedNs = System.nanoTime() - startNs;
-            lastTaskTime = TimeUnit.NANOSECONDS.toMillis(elapsedNs);
             lastTaskAvgChunkTime = elapsedNs / Math.max(1, chunkCount) / 1000000D;
-
-            lastTaskCompleted = System.currentTimeMillis();
         }
     }
 
