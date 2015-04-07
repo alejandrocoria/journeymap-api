@@ -364,6 +364,9 @@ public class ColorCache
         WorldClient world = FMLClientHandler.instance().getClient().theWorld;
         try
         {
+            // TODO: Defer calls to colorMultiplier to main thread only,
+            // since some mods like Forestry mess up TileEntities when this is called
+            // from a worker thread
             return blockMD.getBlock().colorMultiplier(world, x, 78, z) | 0xFF000000;
         }
         catch (NullPointerException e)
