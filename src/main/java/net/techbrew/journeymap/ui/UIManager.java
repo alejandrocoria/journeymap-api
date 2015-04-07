@@ -22,6 +22,7 @@ import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.ui.component.JmUI;
 import net.techbrew.journeymap.ui.dialog.FullscreenActions;
 import net.techbrew.journeymap.ui.dialog.FullscreenHotkeysHelp;
+import net.techbrew.journeymap.ui.dialog.GridEditor;
 import net.techbrew.journeymap.ui.dialog.OptionsManager;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import net.techbrew.journeymap.ui.minimap.MiniMap;
@@ -249,6 +250,19 @@ public class UIManager
             {
                 JourneyMap.getLogger().error("Error opening waypoint editor: " + LogFormatter.toString(e));
             }
+        }
+    }
+
+    public void openGridEditor(JmUI returnDisplay)
+    {
+        try
+        {
+            GridEditor editor = new GridEditor(returnDisplay);
+            open(editor);
+        }
+        catch (Throwable e)
+        {
+            JourneyMap.getLogger().error("Error opening grid editor: " + LogFormatter.toString(e));
         }
     }
 
