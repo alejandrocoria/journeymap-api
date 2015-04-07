@@ -133,7 +133,7 @@ public class RenderSpec
 
     protected Collection<ChunkCoordIntPair> getRenderAreaCoords()
     {
-        // Lazy load offsets on first use
+        // Lazy init offsets on first use
         if (offsets == null)
         {
             offsets = calculateOffsets(primaryRenderDistance, maxSecondaryRenderDistance, revealShape);

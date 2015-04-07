@@ -6,7 +6,7 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
  */
 
-package net.techbrew.journeymap.forgehandler;
+package net.techbrew.journeymap.forge.event;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.ClientRegistry;

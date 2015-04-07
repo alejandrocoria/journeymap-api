@@ -3,7 +3,7 @@ package net.techbrew.journeymap.task.main;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
-import net.techbrew.journeymap.forgehandler.MiniMapOverlayHandler;
+import net.techbrew.journeymap.forge.event.MiniMapOverlayHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.render.map.TileDrawStepCache;

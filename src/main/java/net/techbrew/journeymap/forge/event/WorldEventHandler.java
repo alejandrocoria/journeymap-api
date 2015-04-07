@@ -6,25 +6,25 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
  */
 
-package net.techbrew.journeymap.forgehandler;
+package net.techbrew.journeymap.forge.event;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraftforge.event.world.ChunkEvent;
-import net.techbrew.journeymap.data.DataCache;
+import net.minecraftforge.event.world.WorldEvent;
+import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.feature.FeatureManager;
 
 import java.util.EnumSet;
 
 /**
- * Listen for events which are likely to need the map to be updated.
+ * Created by mwoodman on 1/29/14.
  */
-public class ChunkUpdateHandler implements EventHandlerManager.EventHandler
+@SideOnly(Side.CLIENT)
+public class WorldEventHandler implements EventHandlerManager.EventHandler
 {
-    public ChunkUpdateHandler()
-    {
-    }
+
+    String playerName;
 
     @Override
     public EnumSet<EventHandlerManager.BusType> getBus()
@@ -34,9 +34,9 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public void onChunkEvent(ChunkEvent.Unload event)
+    public void invoke(WorldEvent.Unload event)
     {
-        ChunkCoordIntPair coord = event.getChunk().getChunkCoordIntPair();
-        DataCache.instance().invalidateChunkMD(coord);
+        JourneyMap.getInstance().stopMapping();
+        FeatureManager.instance().reset();
     }
 }

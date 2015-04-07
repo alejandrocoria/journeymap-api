@@ -9,7 +9,6 @@
 package net.techbrew.journeymap;
 
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.registry.EntityRegistry;
@@ -19,11 +18,12 @@ import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.cartography.ColorCache;
+import net.techbrew.journeymap.common.CommonProxy;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.feature.FeatureManager;
-import net.techbrew.journeymap.forgehandler.EventHandlerManager;
-import net.techbrew.journeymap.forgehandler.WorldInfoHandler;
+import net.techbrew.journeymap.forge.event.EventHandlerManager;
+import net.techbrew.journeymap.forge.event.WorldInfoHandler;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
@@ -58,19 +58,17 @@ import java.io.File;
  * @author Mark Woodman
  */
 @SideOnly(Side.CLIENT)
-@Mod(modid = JourneyMap.MOD_ID, name = JourneyMap.SHORT_MOD_NAME, version = "@JMVERSION@", canBeDeactivated = true)
-public class JourneyMap
+public class JourneyMap implements CommonProxy
 {
     public static final String WEBSITE_URL = "http://journeymap.techbrew.net/";
     public static final String DOWNLOAD_URL = WEBSITE_URL + "download";
-    public static final Version JM_VERSION = Version.from(
-            "@MAJOR@", "@MINOR@", "@MICRO@", "@PATCH@", new Version(5, 1, 0, "dev"));
+    public static final Version JM_VERSION = Version.from("@MAJOR@", "@MINOR@", "@MICRO@", "@PATCH@", new Version(5, 1, 0, "dev"));
     public static final String FORGE_VERSION = "@FORGEVERSION@";
     public static final String EDITION = getEdition();
-    public static final String MOD_ID = "journeymap";
-    public static final String SHORT_MOD_NAME = "JourneyMap";
-    public static final String MOD_NAME = SHORT_MOD_NAME + " " + EDITION;
+
+    public static final String MOD_NAME = CommonProxy.SHORT_MOD_NAME + " " + EDITION;
     public static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-versions.json";
+
     private static JourneyMap INSTANCE;
 
     public ModInfo modInfo;
@@ -155,30 +153,6 @@ public class JourneyMap
         DataCache.instance().purge();
     }
 
-//    public static MiniMapProperties getMiniMapProperties()
-//    {
-//        if (INSTANCE.miniMapProperties1.isActive())
-//        {
-//            return INSTANCE.miniMapProperties1;
-//        }
-//        else
-//        {
-//            return INSTANCE.miniMapProperties2;
-//        }
-//    }
-//
-//    public static void toggleMiniMapPreset()
-//    {
-//        if (INSTANCE.miniMapProperties1.isActive())
-//        {
-//            toggleMiniMapPreset(2);
-//        }
-//        else
-//        {
-//            toggleMiniMapPreset(1);
-//        }
-//    }
-
     public static MiniMapProperties getMiniMapProperties(int which)
     {
         switch (which)
@@ -245,7 +219,8 @@ public class JourneyMap
         return threadLogging;
     }
 
-    @Mod.EventHandler
+    @SideOnly(Side.CLIENT)
+    @Override
     public void initialize(FMLInitializationEvent event) throws Throwable
     {
         StatTimer timer = null;
@@ -294,7 +269,8 @@ public class JourneyMap
         }
     }
 
-    @Mod.EventHandler
+    @SideOnly(Side.CLIENT)
+    @Override
     public void postInitialize(FMLPostInitializationEvent event)
     {
         StatTimer timer = null;

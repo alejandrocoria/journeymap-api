@@ -15,7 +15,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
-import net.techbrew.journeymap.forgehandler.KeyEventHandler;
+import net.techbrew.journeymap.forge.event.KeyEventHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.properties.CoreProperties;

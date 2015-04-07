@@ -1,4 +1,4 @@
-package net.techbrew.journeymap.forgehandler;
+package net.techbrew.journeymap.forge.event;
 
 import com.google.common.base.Strings;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;

@@ -6,11 +6,12 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
  */
 
-package net.techbrew.journeymap.forgehandler;
+package net.techbrew.journeymap.forge.event;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
@@ -22,7 +23,6 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.world.WorldEvent;
 import net.techbrew.journeymap.JourneyMap;
 
 /**
@@ -89,19 +89,10 @@ public class WorldInfoHandler
         }
     }
 
-    /**
-     * Use the world Load event as a trigger to request the World ID.
-     *
-     * @param event
-     */
-    @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public void on(WorldEvent.Load event)
+    public void onConnected(FMLNetworkEvent.ClientConnectedToServerEvent event)
     {
-        if (!mc.isSingleplayer())
-        {
-            //requestWorldID();
-        }
+        // TODO: Check the timing on this?
     }
 
     /**

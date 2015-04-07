@@ -10,7 +10,7 @@ package net.techbrew.journeymap.ui.minimap;
 
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.forgehandler.KeyEventHandler;
+import net.techbrew.journeymap.forge.event.KeyEventHandler;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.JmUI;
 

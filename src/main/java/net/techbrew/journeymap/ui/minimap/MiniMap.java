@@ -16,7 +16,7 @@ import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
-import net.techbrew.journeymap.forgehandler.MiniMapOverlayHandler;
+import net.techbrew.journeymap.forge.event.MiniMapOverlayHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.MapState;

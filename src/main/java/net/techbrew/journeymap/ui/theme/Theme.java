@@ -711,7 +711,7 @@ public class Theme implements Comparable<Theme>
 
     /**
      * The basis of default.theme.json, which
-     * is used to load a specific theme as the default.
+     * is used to init a specific theme as the default.
      */
     public static class DefaultPointer
     {
