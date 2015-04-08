@@ -39,7 +39,10 @@ public class ListPropertyButton<T> extends Button implements IPropertyHolder<Ato
         if (!valueHolder.get().equals(value))
         {
             valueHolder.set(value);
-            properties.save();
+            if (properties != null)
+            {
+                properties.save();
+            }
         }
         displayString = getFormattedLabel(value.toString());
     }
@@ -140,6 +143,9 @@ public class ListPropertyButton<T> extends Button implements IPropertyHolder<Ato
             return;
         }
         valueHolder.set(value);
-        properties.save();
+        if (properties != null)
+        {
+            properties.save();
+        }
     }
 }

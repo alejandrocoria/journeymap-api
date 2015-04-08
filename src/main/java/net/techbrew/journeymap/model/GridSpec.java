@@ -72,6 +72,11 @@ public class GridSpec
         GL11.glClearColor(1, 1, 1, 1f); // defensive against shaders
     }
 
+    public Color getColor()
+    {
+        return new Color(red, green, blue);
+    }
+
     public enum Style
     {
         Squares("jm.common.grid_style_squares", TextureCache.Name.GridSquares),

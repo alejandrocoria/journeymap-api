@@ -142,7 +142,10 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Atomic
         if (this.dragging)
         {
             this.dragging = false;
-            properties.save();
+            if (properties != null)
+            {
+                properties.save();
+            }
         }
     }
 
@@ -178,7 +181,10 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Atomic
             property.set(value);
             if (!dragging)
             {
-                properties.save();
+                if (properties != null)
+                {
+                    properties.save();
+                }
             }
         }
         updateLabel();

@@ -145,55 +145,75 @@ public class GridEditor extends JmUI
     @Override
     protected void layoutButtons()
     {
-        // Buttons
-        initGui();
+        try
+        {
+            // Buttons
+            initGui();
 
-        final FontRenderer fr = getFontRenderer();
+            final FontRenderer fr = getFontRenderer();
 
-        // Margins
-        final int vpad = 5;
-        final int hgap = fr.getStringWidth("X") * 3;
-        final int vgap = 5;
-        final int startY = Math.max(30, (this.height - 200) / 2);
-        final int centerX = this.width / 2;
-        final int tileSize = 512;
+            // Margins
+            final int vpad = 5;
+            final int hgap = 6;
+            final int vgap = 6;
+            final int startY = 40; //Math.max(40, (this.height - 200) / 2);
+            final int centerX = this.width / 2;
+            final int tileSize = 256;
 
-        // Color picker and top buttons
-        int cpSize = topButtons.getHeight(vgap);
-        topButtons.layoutVertical(centerX + ((cpSize + hgap) / 2), startY, true, vgap);
-        drawColorPicker(topButtons.getLeftX() - (hgap / 2), topButtons.getTopY(), cpSize);
+            // Color picker and top buttons
+            int cpSize = topButtons.getHeight(vgap);
+            int topRowWidth = hgap + cpSize + topButtons.get(0).getWidth();
+            int topRowLeft = centerX - (topRowWidth / 2);
+            topButtons.layoutVertical(topRowLeft + hgap + cpSize, startY, true, vgap);
+            drawColorPicker(topRowLeft, topButtons.getTopY(), cpSize);
 
-        // Sum Width of Left controls and Map Tile
-        int middleWidth = checkDay.getWidth() + hgap + buttonDay.getWidth() + hgap + tileSize;
+            // Sum Width of Left controls and Map Tile
+            //int middleWidth = checkDay.getWidth() + hgap + buttonDay.getWidth() + hgap + tileSize;
+            int tileX = centerX - (tileSize / 2);
+            int tileY = topButtons.getBottomY() + (vgap * 3);
 
-        // Left Buttons
-        leftButtons.layoutVertical(centerX - (middleWidth / 2), topButtons.getBottomY() + vgap, true, vgap);
+            // Map Tile
+            drawMapTile(tileX, tileY, tileSize);
 
-        // Left Checks
-        leftChecks.layoutVertical(leftButtons.getLeftX() - checkDay.getWidth() - hgap, topButtons.getBottomY() + vgap, true, vgap);
+            // Left Buttons
+            leftButtons.layoutVertical(tileX + hgap, tileY + vgap, true, vgap);
 
-        // Map Tile
-        drawMapTile(leftButtons.getRightX() + hgap, leftButtons.getTopY(), tileSize);
+            // Left Checks
+            leftChecks.setHeights(leftButtons.get(0).getHeight());
+            leftChecks.layoutVertical(leftButtons.getLeftX() - checkDay.getWidth(), leftButtons.getTopY(), true, vgap);
 
-        // Bottom Buttons
-        bottomButtons.layoutCenteredHorizontal(centerX, leftButtons.getBottomY() + (vgap * 3), true, hgap);
+            // Bottom Buttons
+            int bottomY = Math.min(tileY + tileSize + (vgap * 3), height - 10 - buttonClose.getHeight());
+            bottomButtons.layoutCenteredHorizontal(centerX, bottomY, true, hgap);
+        }
+        catch (Throwable t)
+        {
+            logger.error("Error in GridEditor.layoutButtons: " + LogFormatter.toString(t));
+        }
     }
 
     @Override
     public void drawScreen(int x, int y, float par3)
     {
-        drawBackground(0);
-
-        layoutButtons();
-
-        for (int k = 0; k < this.buttonList.size(); ++k)
+        try
         {
-            GuiButton guibutton = (GuiButton) this.buttonList.get(k);
-            guibutton.drawButton(this.mc, x, y);
-        }
+            drawBackground(0);
 
-        drawTitle();
-        drawLogo();
+            layoutButtons();
+
+            for (int k = 0; k < this.buttonList.size(); ++k)
+            {
+                GuiButton guibutton = (GuiButton) this.buttonList.get(k);
+                guibutton.drawButton(this.mc, x, y);
+            }
+
+            drawTitle();
+            drawLogo();
+        }
+        catch (Throwable t)
+        {
+            logger.error("Error in GridEditor.drawScreen: " + LogFormatter.toString(t));
+        }
     }
 
     protected void drawColorPicker(int x, int y, float size)
@@ -230,30 +250,51 @@ public class GridEditor extends JmUI
 
     protected void keyTyped(char par1, int par2)
     {
-        switch (par2)
+        try
         {
-            case Keyboard.KEY_ESCAPE:
-                closeAndReturn();
-                return;
-            case Keyboard.KEY_RETURN:
-                saveAndClose();
-                return;
-            default:
-                break;
+            switch (par2)
+            {
+                case Keyboard.KEY_ESCAPE:
+                    closeAndReturn();
+                    return;
+                case Keyboard.KEY_RETURN:
+                    saveAndClose();
+                    return;
+                default:
+                    break;
+            }
+        }
+        catch (Throwable t)
+        {
+            logger.error("Error in GridEditor.keyTyped: " + LogFormatter.toString(t));
         }
     }
 
     @Override
     protected void mouseClickMove(int par1, int par2, int par3, long par4)
     {
-        checkColorPicker(par1, par2);
+        try
+        {
+            checkColorPicker(par1, par2);
+        }
+        catch (Throwable t)
+        {
+            logger.error("Error in GridEditor.mouseClickMove: " + LogFormatter.toString(t));
+        }
     }
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton)
     {
-        super.mouseClicked(mouseX, mouseY, mouseButton);
-        checkColorPicker(mouseX, mouseY);
+        try
+        {
+            super.mouseClicked(mouseX, mouseY, mouseButton);
+            checkColorPicker(mouseX, mouseY);
+        }
+        catch (Throwable t)
+        {
+            logger.error("Error in GridEditor.mouseClicked: " + LogFormatter.toString(t));
+        }
     }
 
     protected void checkColorPicker(int mouseX, int mouseY)
@@ -270,42 +311,49 @@ public class GridEditor extends JmUI
     @Override
     protected void actionPerformed(GuiButton guibutton)
     {
-        if (guibutton instanceof CheckBox)
+        try
         {
-            ((CheckBox) guibutton).toggle();
-            updateGridSpecs();
-            return;
+            if (guibutton instanceof CheckBox)
+            {
+                ((CheckBox) guibutton).toggle();
+                updateGridSpecs();
+                return;
+            }
+            if (guibutton == buttonDay)
+            {
+                updatePreview(Constants.MapType.day);
+                return;
+            }
+            if (guibutton == buttonNight)
+            {
+                updatePreview(Constants.MapType.night);
+                return;
+            }
+            if (guibutton == buttonUnderground)
+            {
+                updatePreview(Constants.MapType.underground);
+                return;
+            }
+            if (guibutton == buttonReset)
+            {
+                resetGridSpecs();
+                return;
+            }
+            if (guibutton == buttonCancel)
+            {
+                resetGridSpecs();
+                closeAndReturn();
+                return;
+            }
+            if (guibutton == buttonClose)
+            {
+                saveAndClose();
+                return;
+            }
         }
-        if (guibutton == buttonDay)
+        catch (Throwable t)
         {
-            updatePreview(Constants.MapType.day);
-            return;
-        }
-        if (guibutton == buttonNight)
-        {
-            updatePreview(Constants.MapType.night);
-            return;
-        }
-        if (guibutton == buttonUnderground)
-        {
-            updatePreview(Constants.MapType.underground);
-            return;
-        }
-        if (guibutton == buttonReset)
-        {
-            resetGridSpecs();
-            return;
-        }
-        if (guibutton == buttonCancel)
-        {
-            resetGridSpecs();
-            closeAndReturn();
-            return;
-        }
-        if (guibutton == buttonClose)
-        {
-            saveAndClose();
-            return;
+            logger.error("Error in GridEditor.actionPerformed: " + LogFormatter.toString(t));
         }
     }
 
@@ -319,15 +367,24 @@ public class GridEditor extends JmUI
 
     protected void updateGridSpecs()
     {
+        if (activeColor == null)
+        {
+            activeColor = this.gridSpecs.getSpec(Constants.MapType.day).getColor();
+        }
+
         GridSpec activeSpec = new GridSpec(activeStyle.get(), activeColor, activeOpacity.floatValue());
+
         if (checkDay.getToggled())
         {
+
             this.gridSpecs.setSpec(Constants.MapType.day, activeSpec);
         }
+
         if (checkNight.getToggled())
         {
             this.gridSpecs.setSpec(Constants.MapType.night, activeSpec);
         }
+
         if (checkUnderground.getToggled())
         {
             this.gridSpecs.setSpec(Constants.MapType.underground, activeSpec);
