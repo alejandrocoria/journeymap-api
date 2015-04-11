@@ -15,6 +15,7 @@ public class MappingMonitorTask implements IMainThreadTask
 {
     private static String NAME = "Tick." + MappingMonitorTask.class.getSimpleName();
     Logger logger = JourneyMap.getLogger();
+    private int lastDimension = 0;
 
     @Override
     public IMainThreadTask perform(Minecraft mc, JourneyMap jm)
@@ -49,6 +50,14 @@ public class MappingMonitorTask implements IMainThreadTask
                 }
 
                 return this;
+            }
+            else if (lastDimension != mc.thePlayer.dimension)
+            {
+                lastDimension = mc.thePlayer.dimension;
+                if (jm.isMapping())
+                {
+                    jm.stopMapping();
+                }
             }
             else
             {
