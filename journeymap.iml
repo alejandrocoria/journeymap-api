@@ -45,7 +45,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="main" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
-

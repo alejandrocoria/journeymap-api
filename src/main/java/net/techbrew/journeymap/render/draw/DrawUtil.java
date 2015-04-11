@@ -369,6 +369,17 @@ public class DrawUtil
         GL11.glDisable(GL11.GL_BLEND);
     }
 
+    public static void drawBoundTexture(double startU, double startV, double startX, double startY, double z, double endU, double endV, double endX, double endY)
+    {
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawingQuads();
+        tessellator.addVertexWithUV(startX, endY, z, startU, endV);
+        tessellator.addVertexWithUV(endX, endY, z, endU, endV);
+        tessellator.addVertexWithUV(endX, startY, z, endU, startV);
+        tessellator.addVertexWithUV(startX, startY, z, startU, startV);
+        tessellator.draw();
+    }
+
     public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float scale, double rotation)
     {
         drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), flip, rotation);

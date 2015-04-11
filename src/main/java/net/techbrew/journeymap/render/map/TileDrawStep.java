@@ -2,7 +2,6 @@ package net.techbrew.journeymap.render.map;
 
 import com.google.common.base.Objects;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
@@ -134,14 +133,15 @@ public class TileDrawStep
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, textureFilter); // GL11.GL_NEAREST
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
-            drawBoundTexture(startU, startV, startX, startY, z, endU, endV, endX, endY);
+            DrawUtil.drawBoundTexture(startU, startV, startX, startY, z, endU, endV, endX, endY);
         }
 
         // Grid
         if (gridSpec != null)
         {
             gridSpec.beginTexture(textureWrap, alpha);
-            drawBoundTexture(sx1 / size, sy1 / size, startX, startY, z, sx2 / size, sy2 / size, endX, endY);
+            DrawUtil.drawBoundTexture(sx1 / size, sy1 / size, startX, startY, z, sx2 / size, sy2 / size, endX, endY);
+            gridSpec.finishTexture();
         }
 
         if (debug)
@@ -169,16 +169,6 @@ public class TileDrawStep
         }
     }
 
-    private void drawBoundTexture(double startU, double startV, double startX, double startY, double z, double endU, double endV, double endX, double endY)
-    {
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(startX, endY, z, startU, endV);
-        tessellator.addVertexWithUV(endX, endY, z, endU, endV);
-        tessellator.addVertexWithUV(endX, startY, z, endU, startV);
-        tessellator.addVertexWithUV(startX, startY, z, startU, startV);
-        tessellator.draw();
-    }
 
     public void clearTexture()
     {

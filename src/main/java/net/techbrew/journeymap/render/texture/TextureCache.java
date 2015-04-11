@@ -8,6 +8,7 @@
 
 package net.techbrew.journeymap.render.texture;
 
+import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
@@ -102,6 +103,7 @@ public class TextureCache
                         tex.queueForDeletion();
                     }
                     tex = new TextureImpl(img, retain);
+                    tex.setDescription(String.format("%s (%s)", name, filename));
                     namedTextures.put(name, tex);
                 }
             }
@@ -231,6 +233,34 @@ public class TextureCache
             default:
                 return getNamedTexture(Name.GridSquares, "grid.png", true);
         }
+    }
+
+    public TextureImpl getTileSample(Constants.MapType mapType)
+    {
+        switch (mapType)
+        {
+            case night:
+                return getTileSampleNight();
+            case underground:
+                return getTileSampleUnderground();
+            default:
+                return getTileSampleDay();
+        }
+    }
+
+    public TextureImpl getTileSampleDay()
+    {
+        return getNamedTexture(Name.TileSampleDay, "tile-sample-day.png", true); //$NON-NLS-1$
+    }
+
+    public TextureImpl getTileSampleNight()
+    {
+        return getNamedTexture(Name.TileSampleNight, "tile-sample-night.png", true); //$NON-NLS-1$
+    }
+
+    public TextureImpl getTileSampleUnderground()
+    {
+        return getNamedTexture(Name.TileSampleUnderground, "tile-sample-underground.png", true); //$NON-NLS-1$
     }
 
     /**
@@ -462,7 +492,8 @@ public class TextureCache
         MinimapSmallSquare, MinimapMediumSquare, MinimapLargeSquare, MinimapCustomSquare, MinimapSmallCircle,
         MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, Patreon, LocatorHostile,
         LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, ColorPicker, UnknownEntity,
-        GridSquares, GridDots, GridCheckers
+        GridSquares, GridDots, GridCheckers,
+        TileSampleDay, TileSampleNight, TileSampleUnderground
     }
 
     private static class Holder
