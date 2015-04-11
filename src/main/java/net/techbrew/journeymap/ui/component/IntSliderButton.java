@@ -191,7 +191,7 @@ public class IntSliderButton extends Button implements IPropertyHolder<AtomicInt
         if (property.get() != value)
         {
             property.set(value);
-            if (!dragging)
+            if (!dragging && properties != null)
             {
                 properties.save();
             }

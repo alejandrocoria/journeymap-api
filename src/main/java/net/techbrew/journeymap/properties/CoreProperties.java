@@ -242,7 +242,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 mapSurfaceAboveCaves, mapTransparency, maxAnimalsData, maxMobsData, maxPlayersData, maxVillagersData,
                 name, radarLateralDistance, radarVerticalDistance, recordCacheStats, renderOverlayEventTypeName,
                 renderOverlayPreEvent, renderDistanceCaveMin, renderDistanceCaveMax, renderDistanceSurfaceMin,
-                renderDistanceSurfaceMax, revealShape, themeName);
+                renderDistanceSurfaceMax, revealShape, themeName, gridSpecs);
     }
 
     @Override
@@ -290,6 +290,4 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 .add("tileRenderType", tileRenderType)
                 .toString();
     }
-
-
 }

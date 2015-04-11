@@ -53,12 +53,16 @@ public class OptionsManager extends JmUI
     protected Button fullscreenKeysButton;
     protected Button buttonClose;
     protected Button renderStatsButton;
+    protected Button editGridMinimap1Button;
+    protected Button editGridMinimap2Button;
+    protected Button editGridFullscreenButton;
     protected SlotMetadata renderStatsSlotMetadata;
     protected CategorySlot cartographyCategorySlot;
     protected ScrollListPane<CategorySlot> optionsListPane;
     protected Map<Config.Category, List<SlotMetadata>> toolbars;
     protected EnumSet<Config.Category> changedCategories = EnumSet.noneOf(Config.Category.class);
     protected boolean forceMinimapUpdate;
+    protected ButtonList editGridButtons = new ButtonList();
 
 
     public OptionsManager()
@@ -84,6 +88,22 @@ public class OptionsManager extends JmUI
         try
         {
             buttonList.clear();
+
+            if (editGridMinimap1Button == null)
+            {
+                String name = Constants.getString("jm.common.grid_edit");
+                String tooltip = Constants.getString("jm.common.grid_edit.tooltip");
+                editGridMinimap1Button = new Button(name);
+                editGridMinimap1Button.setTooltip(tooltip);
+                editGridMinimap1Button.setDrawBackground(false);
+                editGridMinimap2Button = new Button(name);
+                editGridMinimap2Button.setTooltip(tooltip);
+                editGridMinimap2Button.setDrawBackground(false);
+                editGridFullscreenButton = new Button(name);
+                editGridFullscreenButton.setTooltip(tooltip);
+                editGridFullscreenButton.setDrawBackground(false);
+                editGridButtons = new ButtonList(editGridMinimap1Button, editGridMinimap2Button, editGridFullscreenButton);
+            }
 
             if (minimap1PreviewButton == null)
             {
@@ -170,20 +190,23 @@ public class OptionsManager extends JmUI
                         {
                             case MiniMap1:
                             {
-                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1PreviewButton, 3));
+                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1PreviewButton, 4));
+                                categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap1Button, 3));
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1KeysButton, 2));
                                 categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                                 break;
                             }
                             case MiniMap2:
                             {
-                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2PreviewButton, 3));
+                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2PreviewButton, 4));
+                                categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2KeysButton, 2));
                                 categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                                 break;
                             }
                             case FullMap:
                             {
+                                categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(fullscreenKeysButton, 2));
                                 categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                                 break;
@@ -205,7 +228,6 @@ public class OptionsManager extends JmUI
                         }
                     }
                 }
-
 
                 // Update slots
                 optionsListPane.updateSlots();
@@ -415,6 +437,13 @@ public class OptionsManager extends JmUI
                 {
                     UIManager.getInstance().getMiniMap().updateDisplayVars(true);
                 }
+            }
+
+            // Grid edit buttons
+            if (editGridButtons.contains(slotMetadata.getButton()))
+            {
+                UIManager.getInstance().openGridEditor(this);
+                return;
             }
 
             // Minimap buttons:  Force minimap toggles

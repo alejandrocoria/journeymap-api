@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap.ui.dialog;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
@@ -31,11 +30,11 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.EnumSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class GridEditor extends JmUI
 {
-
     private final TextureImpl colorPickTexture;
 
     private final int tileSize = 128;
@@ -43,12 +42,11 @@ public class GridEditor extends JmUI
 
     private GridSpecs gridSpecs;
     private ListPropertyButton<GridSpec.Style> buttonStyle;
-    private DoubleSliderButton buttonOpacity;
+    private IntSliderButton buttonOpacity;
     private CheckBox checkDay, checkNight, checkUnderground;
     private ThemeToggle buttonDay, buttonNight, buttonUnderground;
     private Color activeColor;
     private Constants.MapType activeMapType;
-    private GridSpec activeSpec;
 
     private Button buttonReset;
     private Button buttonCancel;
@@ -95,7 +93,7 @@ public class GridEditor extends JmUI
                         Constants.getString("jm.common.grid_style"),
                         null, new AtomicReference<GridSpec.Style>(spec.style));
 
-                buttonOpacity = new DoubleSliderButton(null, new AtomicDouble(spec.alpha), Constants.getString("jm.common.grid_opacity") + " : ", "", 0, 100, true);
+                buttonOpacity = new IntSliderButton(null, new AtomicInteger((int) Math.ceil(spec.alpha * 100)), Constants.getString("jm.common.grid_opacity") + " : ", "", 0, 100, true);
                 topButtons = new ButtonList(buttonStyle, buttonOpacity);
                 topButtons.equalizeWidths(getFontRenderer());
 
@@ -129,6 +127,8 @@ public class GridEditor extends JmUI
                 buttonList.addAll(leftChecks);
                 buttonList.addAll(leftButtons);
                 buttonList.addAll(bottomButtons);
+
+                updatePreview(activeMapType);
             }
         }
         catch (Throwable t)
@@ -180,6 +180,7 @@ public class GridEditor extends JmUI
 
             // Bottom Buttons
             int bottomY = Math.min(tileY + sampleTextureSize + (vgap * 2), height - 10 - buttonClose.getHeight());
+            bottomButtons.equalizeWidths(getFontRenderer(), hgap, topButtons.get(0).getRightX() - topRowLeft);
             bottomButtons.layoutCenteredHorizontal(centerX, bottomY, true, hgap);
         }
         catch (Throwable t)
@@ -231,18 +232,16 @@ public class GridEditor extends JmUI
         float scale = size / colorPickTexture.getWidth();
         DrawUtil.drawImage(colorPickTexture, x, y, false, scale, 0);
 
-        if (activeSpec != null)
+        GridSpec activeSpec = gridSpecs.getSpec(activeMapType);
+        int colorX = activeSpec.getColorX();
+        int colorY = activeSpec.getColorY();
+        if (colorX > 0 && colorY > 0)
         {
-            int colorX = activeSpec.getColorX();
-            int colorY = activeSpec.getColorY();
-            if (colorX > -1 && colorY > -1)
-            {
-                colorX += x;
-                colorY += y;
-                DrawUtil.drawRectangle(colorX - 2, colorY - 2, 5, 5, Color.black, 100);
-                DrawUtil.drawRectangle(colorX - 1, colorY, 3, 1, activeColor, 255);
-                DrawUtil.drawRectangle(colorX, colorY - 1, 1, 3, activeColor, 255);
-            }
+            colorX += x;
+            colorY += y;
+            DrawUtil.drawRectangle(colorX - 2, colorY - 2, 5, 5, Color.darkGray, 200);
+            DrawUtil.drawRectangle(colorX - 1, colorY, 3, 1, activeColor, 255);
+            DrawUtil.drawRectangle(colorX, colorY - 1, 1, 3, activeColor, 255);
         }
     }
 
@@ -335,10 +334,8 @@ public class GridEditor extends JmUI
             int x = mouseX - (int) colorPickRect.x;
             int y = mouseY - (int) colorPickRect.y;
             activeColor = (new Color(colorPickImg.getRGB(x, y)));
-            if (activeSpec != null)
-            {
-                activeSpec.setColorCoords(x, y);
-            }
+            GridSpec activeSpec = gridSpecs.getSpec(activeMapType);
+            activeSpec.setColorCoords(x, y);
             updateGridSpecs();
         }
     }
@@ -389,7 +386,11 @@ public class GridEditor extends JmUI
     protected void updatePreview(Constants.MapType mapType)
     {
         activeMapType = mapType;
-        activeSpec = gridSpecs.getSpec(activeMapType);
+        GridSpec activeSpec = gridSpecs.getSpec(activeMapType);
+        activeColor = activeSpec.getColor();
+        buttonOpacity.setValue((int) (activeSpec.alpha * 100));
+        buttonStyle.setValue(activeSpec.style);
+
         checkDay.setToggled(mapType == Constants.MapType.day);
         checkNight.setToggled(mapType == Constants.MapType.night);
         checkUnderground.setToggled(mapType == Constants.MapType.underground);
@@ -400,28 +401,25 @@ public class GridEditor extends JmUI
 
     protected void updateGridSpecs()
     {
-        int colorX = -1;
-        int colorY = -1;
-        if (activeSpec != null)
-        {
-            colorX = activeSpec.getColorX();
-            colorY = activeSpec.getColorY();
-        }
-        activeSpec = new GridSpec(buttonStyle.getValueHolder().get(), activeColor, (float) buttonOpacity.getValue()).setColorCoords(colorX, colorY);
+        GridSpec activeSpec = gridSpecs.getSpec(activeMapType);
+        int colorX = activeSpec.getColorX();
+        int colorY = activeSpec.getColorY();
+
+        GridSpec newSpec = new GridSpec(buttonStyle.getValueHolder().get(), activeColor, (float) buttonOpacity.getValue() / 100f).setColorCoords(colorX, colorY);
 
         if (checkDay.getToggled())
         {
-            this.gridSpecs.setSpec(Constants.MapType.day, activeSpec);
+            this.gridSpecs.setSpec(Constants.MapType.day, newSpec);
         }
 
         if (checkNight.getToggled())
         {
-            this.gridSpecs.setSpec(Constants.MapType.night, activeSpec);
+            this.gridSpecs.setSpec(Constants.MapType.night, newSpec);
         }
 
         if (checkUnderground.getToggled())
         {
-            this.gridSpecs.setSpec(Constants.MapType.underground, activeSpec);
+            this.gridSpecs.setSpec(Constants.MapType.underground, newSpec);
         }
     }
 
@@ -429,6 +427,7 @@ public class GridEditor extends JmUI
     {
         updateGridSpecs();
         JourneyMap.getCoreProperties().gridSpecs.updateFrom(this.gridSpecs);
+        JourneyMap.getCoreProperties().save();
         closeAndReturn();
     }
 

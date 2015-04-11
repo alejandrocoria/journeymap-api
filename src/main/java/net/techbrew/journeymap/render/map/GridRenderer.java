@@ -51,10 +51,11 @@ public class GridRenderer
     private final boolean debug = logger.isTraceEnabled();
     private final TreeMap<TilePos, Tile> grid = new TreeMap<TilePos, Tile>();
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
+    private final GridSpecs gridSpecs = JourneyMap.getCoreProperties().gridSpecs;
 
     StatTimer updateTilesTimer1 = StatTimer.get("GridRenderer.updateTiles(1)", 5, 500);
     StatTimer updateTilesTimer2 = StatTimer.get("GridRenderer.updateTiles(2)", 5, 500);
-    private GridSpecs gridSpecs = new GridSpecs();
+
     private int gridSize; // 5 = 2560px.
     private double srcSize;
     private Rectangle2D.Double viewPort = null;

@@ -212,13 +212,6 @@ public class Fullscreen extends JmUI
             ((OnOffButton) guibutton).toggle();
         }
 
-        // TODO: Temporary
-        if (guibutton == buttonGrid)
-        {
-            UIManager.getInstance().openGridEditor(this);
-            return;
-        }
-
         if (optionsToolbar.contains(guibutton))
         {
             refreshState();
