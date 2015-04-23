@@ -23,6 +23,7 @@ import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.server.JMServer;
 import net.techbrew.journeymap.task.main.SoftResetTask;
 import net.techbrew.journeymap.task.multi.MapPlayerTask;
+import net.techbrew.journeymap.task.multi.RenderSpec;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.*;
@@ -324,6 +325,9 @@ public class OptionsManager extends JmUI
 
     private void updateRenderStats()
     {
+        RenderSpec.getSurfaceSpec();
+        RenderSpec.getUndergroundSpec();
+
         // Show validation on render distances
         // TODO: Hashmap properties to buttons somewhere for easier lookup?
         for (ScrollListPane.ISlot rootSlot : optionsListPane.getRootSlots())

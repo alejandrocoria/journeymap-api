@@ -11,12 +11,11 @@ package net.techbrew.journeymap.server;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
-import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.MapSaver;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.task.multi.MapRegionTask;
 import net.techbrew.journeymap.task.multi.SaveMapTask;
 import se.rupy.http.Event;
@@ -118,18 +117,19 @@ public class ActionService extends BaseService
 
             Integer vSlice = getParameter(query, "depth", (Integer) null); //$NON-NLS-1$
             final int dimension = getParameter(query, "dim", 0);  //$NON-NLS-1$
-            final String mapTypeString = getParameter(query, "mapType", Constants.MapType.day.name()); //$NON-NLS-1$
-            Constants.MapType mapType = null;
+            final String mapTypeString = getParameter(query, "mapType", MapType.Name.day.name()); //$NON-NLS-1$
+            MapType mapType = null;
+            MapType.Name mapTypeName = null;
             try
             {
-                mapType = Constants.MapType.valueOf(mapTypeString);
+                mapTypeName = MapType.Name.valueOf(mapTypeString);
             }
             catch (Exception e)
             {
                 String error = "Bad request: mapType=" + mapTypeString; //$NON-NLS-1$
                 throwEventException(400, error, event, true);
             }
-            if (mapType != MapType.underground)
+            if (mapTypeName != MapType.Name.underground)
             {
                 vSlice = null;
             }
@@ -137,14 +137,14 @@ public class ActionService extends BaseService
             // Validate cave mapping allowed
             // Check for hardcore
             Boolean hardcore = theWorld.getWorldInfo().isHardcoreModeEnabled();
-            if (mapType.equals(Constants.MapType.underground) && hardcore)
+            if (mapType.isUnderground() && hardcore)
             {
                 String error = "Cave mapping on hardcore servers is not allowed"; //$NON-NLS-1$
                 throwEventException(403, error, event, true);
             }
 
             // Check estimated file size
-            MapSaver mapSaver = new MapSaver(worldDir, mapType, vSlice, dimension);
+            MapSaver mapSaver = new MapSaver(worldDir, mapType);
             if (!mapSaver.isValid())
             {
                 throwEventException(403, "No image files to save.", event, true);

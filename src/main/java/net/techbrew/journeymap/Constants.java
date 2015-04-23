@@ -35,10 +35,6 @@ public class Constants
     public static String JOURNEYMAP_DIR = "journeymap";
     public static String CONFIG_DIR_LEGACY = path.join(JOURNEYMAP_DIR, "config");
     public static String CONFIG_DIR = path.join(JOURNEYMAP_DIR, "config", JourneyMap.JM_VERSION.toMajorMinorString(), END);
-    private static String ICON_DIR = path.join(JOURNEYMAP_DIR, "icon");
-    public static String ENTITY_ICON_DIR = path.join(ICON_DIR, "entity", END);
-    public static String WAYPOINT_ICON_DIR = path.join(ICON_DIR, "waypoint", END);
-    public static String THEME_ICON_DIR = path.join(ICON_DIR, "theme", END);
     public static String CACHE_DIR = path.join(JOURNEYMAP_DIR, "cache", END);
     public static String DATA_DIR = path.join(JOURNEYMAP_DIR, "data");
     public static String SP_DATA_DIR = path.join(DATA_DIR, WorldType.sp, END);
@@ -53,6 +49,10 @@ public class Constants
     public static KeyBinding KB_MAP_NIGHT;
     public static KeyBinding KB_MINIMAP_PRESET;
     public static KeyBinding KB_WAYPOINT;
+    private static String ICON_DIR = path.join(JOURNEYMAP_DIR, "icon");
+    public static String ENTITY_ICON_DIR = path.join(ICON_DIR, "entity", END);
+    public static String WAYPOINT_ICON_DIR = path.join(ICON_DIR, "waypoint", END);
+    public static String THEME_ICON_DIR = path.join(ICON_DIR, "theme", END);
 
     public static List<KeyBinding> initKeybindings()
     {
@@ -155,11 +155,6 @@ public class Constants
         }
         Collections.sort(list);
         return Joiner.on(", ").join(list);
-    }
-
-    public enum MapType
-    {
-        day, night, underground
     }
 
     public enum WorldType

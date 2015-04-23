@@ -1,8 +1,8 @@
 package net.techbrew.journeymap.model;
 
 import com.google.common.base.Objects;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.cartography.render.BaseRenderer;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
@@ -26,8 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ImageHolder
 {
     final static Logger logger = JourneyMap.getLogger();
-    final Constants.MapType mapType;
-    final Integer vSlice;
+    final MapType mapType;
     final ReentrantLock writeLock = new ReentrantLock();
     final Path imagePath;
     final int imageSize;
@@ -36,10 +35,9 @@ public class ImageHolder
     StatTimer writeToDiskTimer = StatTimer.get("ImageHolder.writeToDisk", 2, 1000);
     private volatile TextureImpl texture;
 
-    ImageHolder(Constants.MapType mapType, Integer vSlice, File imageFile, int imageSize)
+    ImageHolder(MapType mapType, File imageFile, int imageSize)
     {
         this.mapType = mapType;
-        this.vSlice = vSlice;
         this.imagePath = imageFile.toPath();
         this.imageSize = imageSize;
         getTexture();
@@ -58,14 +56,9 @@ public class ImageHolder
         return imagePath.toFile();
     }
 
-    Constants.MapType getMapType()
+    MapType getMapType()
     {
         return mapType;
-    }
-
-    Integer getvSlice()
-    {
-        return vSlice;
     }
 
     BufferedImage getImage()
@@ -88,9 +81,14 @@ public class ImageHolder
             {
                 BufferedImage textureImage = texture.getImage();
                 Graphics2D g2D = initRenderingHints(textureImage.createGraphics());
+                g2D.setComposite(BaseRenderer.ALPHA_OPAQUE);
                 g2D.drawImage(imagePart, x, y, null);
                 g2D.dispose();
                 partialUpdate = true;
+            }
+            else
+            {
+                logger.warn(this + " can't partialImageUpdate without a texture.");
             }
         }
         finally
@@ -110,6 +108,7 @@ public class ImageHolder
                 texture.setImage(textureImage, true);
                 setDirty();
                 partialUpdate = false;
+                //System.out.println("Finished image updates on " + this);
             }
         }
         finally
@@ -199,7 +198,6 @@ public class ImageHolder
     {
         return Objects.toStringHelper(this)
                 .add("mapType", mapType)
-                .add("vSlice", vSlice)
                 .add("textureId", texture == null ? null : texture.isBound() ? texture.getGlTextureId(false) : -1)
                 .add("dirty", dirty)
                 .add("imagePath", imagePath)

@@ -8,7 +8,7 @@
 
 package net.techbrew.journeymap.properties;
 
-import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.server.MapApiService;
 
@@ -32,7 +32,7 @@ public class WebMapProperties extends MapProperties
     @Config(category = WebMap, key = "jm.webmap.google_domain", stringListProvider = MapApiService.TopLevelDomains.class)
     public final AtomicReference<String> googleMapApiDomain = new AtomicReference<String>(".com");
 
-    public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
+    public final AtomicReference<MapType.Name> preferredMapType = new AtomicReference<MapType.Name>(MapType.Name.day);
     protected transient final String name = "webmap";
 
     public WebMapProperties()
@@ -46,7 +46,7 @@ public class WebMapProperties extends MapProperties
     }
 
     @Override
-    public AtomicReference<Constants.MapType> getPreferredMapType()
+    public AtomicReference<MapType.Name> getPreferredMapType()
     {
         return preferredMapType;
     }

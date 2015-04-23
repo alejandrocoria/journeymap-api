@@ -11,11 +11,11 @@ package net.techbrew.journeymap.io.nbt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
-import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.model.ChunkCoord;
+import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageCache;
 import org.apache.logging.log4j.Logger;
@@ -34,19 +34,13 @@ public class RegionLoader
     final Logger logger = JourneyMap.getLogger();
 
     final MapType mapType;
-    final Integer vSlice;
     final Stack<RegionCoord> regions;
     final int regionsFound;
 
-    public RegionLoader(final Minecraft minecraft, final int dimension, final MapType mapType, final Integer vSlice, boolean all) throws IOException
+    public RegionLoader(final Minecraft minecraft, final MapType mapType, boolean all) throws IOException
     {
         this.mapType = mapType;
-        this.vSlice = vSlice;
-        if (mapType == MapType.underground && (vSlice == null || vSlice == -1))
-        {
-            throw new IllegalArgumentException("Underground map requires vSlice");
-        }
-        this.regions = findRegions(minecraft, vSlice, dimension, all);
+        this.regions = findRegions(minecraft, mapType, all);
         this.regionsFound = regions.size();
     }
 
@@ -67,18 +61,18 @@ public class RegionLoader
 
     public boolean isUnderground()
     {
-        return mapType == MapType.underground;
+        return mapType.isUnderground();
     }
 
     public Integer getVSlice()
     {
-        return vSlice;
+        return mapType.vSlice;
     }
 
-    Stack<RegionCoord> findRegions(final Minecraft mc, final Integer vSlice, final int dimension, boolean all)
+    Stack<RegionCoord> findRegions(final Minecraft mc, final MapType mapType, boolean all)
     {
 
-        final File mcWorldDir = FileHandler.getMCWorldDir(mc, dimension);
+        final File mcWorldDir = FileHandler.getMCWorldDir(mc, mapType.dimension);
         final File regionDir = new File(mcWorldDir, "region");
         if (!regionDir.exists() || regionDir.isFile())
         {
@@ -107,7 +101,7 @@ public class RegionLoader
                 String z = matcher.group(2);
                 if (x != null && z != null)
                 {
-                    RegionCoord rc = new RegionCoord(jmImageWorldDir, Integer.parseInt(x), vSlice, Integer.parseInt(z), dimension);
+                    RegionCoord rc = new RegionCoord(jmImageWorldDir, Integer.parseInt(x), Integer.parseInt(z), mapType.dimension);
                     if (all)
                     {
                         stack.add(rc);
@@ -116,7 +110,7 @@ public class RegionLoader
                     {
                         if (!RegionImageHandler.getRegionImageFile(rc, mapType, false).exists())
                         {
-                            List<ChunkCoordIntPair> chunkCoords = rc.getChunkCoordsInRegion();
+                            List<ChunkCoordIntPair> chunkCoords = rc.getChunkCoordsInRegion(mapType.vSlice);
                             for (ChunkCoordIntPair coord : chunkCoords)
                             {
                                 if (anvilChunkLoader.chunkExists(mc.theWorld, coord.chunkXPos, coord.chunkZPos))
@@ -140,7 +134,7 @@ public class RegionLoader
         }
 
         // Add player's current region
-        ChunkCoord cc = ChunkCoord.fromChunkPos(jmImageWorldDir, mc.thePlayer.chunkCoordX, vSlice, mc.thePlayer.chunkCoordZ, dimension);
+        ChunkCoord cc = ChunkCoord.fromChunkPos(jmImageWorldDir, mapType, mc.thePlayer.chunkCoordX, mc.thePlayer.chunkCoordZ);
         final RegionCoord playerRc = cc.getRegionCoord();
         if (stack.contains(playerRc))
         {

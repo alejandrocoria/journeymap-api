@@ -12,7 +12,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
-import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.data.DataCache;
@@ -22,10 +21,7 @@ import net.techbrew.journeymap.io.nbt.ChunkLoader;
 import net.techbrew.journeymap.io.nbt.RegionLoader;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.model.ChunkMD;
-import net.techbrew.journeymap.model.EntityDTO;
-import net.techbrew.journeymap.model.RegionCoord;
-import net.techbrew.journeymap.model.RegionImageCache;
+import net.techbrew.journeymap.model.*;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -42,20 +38,20 @@ public class MapRegionTask extends BaseMapTask
 
     final Collection<ChunkCoordIntPair> retainedCoords;
 
-    private MapRegionTask(ChunkRenderController renderController, World world, int dimension, boolean underground, Integer chunkY, Collection<ChunkCoordIntPair> chunkCoords, Collection<ChunkCoordIntPair> retainCoords)
+    private MapRegionTask(ChunkRenderController renderController, World world, int dimension, Integer vSlice, Collection<ChunkCoordIntPair> chunkCoords, Collection<ChunkCoordIntPair> retainCoords)
     {
-        super(renderController, world, dimension, underground, chunkY, chunkCoords, true, 5000);
+        super(renderController, world, dimension, vSlice != null, vSlice, chunkCoords, true, 5000);
         this.retainedCoords = retainCoords;
     }
 
-    public static BaseMapTask create(ChunkRenderController renderController, RegionCoord rCoord, Minecraft minecraft)
+    public static BaseMapTask create(ChunkRenderController renderController, RegionCoord rCoord, Integer vSlice, Minecraft minecraft)
     {
 
         int missing = 0;
 
         final World world = minecraft.theWorld;
 
-        final List<ChunkCoordIntPair> renderCoords = rCoord.getChunkCoordsInRegion();
+        final List<ChunkCoordIntPair> renderCoords = rCoord.getChunkCoordsInRegion(vSlice);
         final List<ChunkCoordIntPair> retainedCoords = new ArrayList<ChunkCoordIntPair>(renderCoords.size());
 
         // Ensure chunks north, west, nw are kept alive for slope calculations
@@ -71,7 +67,7 @@ public class MapRegionTask extends BaseMapTask
             }
         }
 
-        return new MapRegionTask(renderController, world, rCoord.dimension, rCoord.isUnderground(), rCoord.getVerticalSlice(), renderCoords, retainedCoords);
+        return new MapRegionTask(renderController, world, rCoord.dimension, vSlice, renderCoords, retainedCoords);
 
     }
 
@@ -174,21 +170,19 @@ public class MapRegionTask extends BaseMapTask
                     final int dimension = player.dimension;
                     final boolean underground = player.underground && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getFullMapProperties().showCaves.get();
                     MapType mapType;
-                    Integer vSlice = null;
                     if (underground)
                     {
-                        mapType = MapType.underground;
-                        vSlice = player.chunkCoordY;
+                        mapType = MapType.underground(player);
                     }
                     else
                     {
                         final long time = minecraft.theWorld.getWorldInfo().getWorldTime() % 24000L;
-                        mapType = (time < 13800) ? MapType.day : MapType.night;
+                        mapType = (time < 13800) ? MapType.day(player) : MapType.night(player);
                     }
 
                     Boolean mapAll = params == null ? false : (Boolean) params;
 
-                    regionLoader = new RegionLoader(minecraft, dimension, mapType, vSlice, mapAll);
+                    regionLoader = new RegionLoader(minecraft, mapType, mapAll);
                     if (regionLoader.getRegionsFound() == 0)
                     {
                         disableTask(minecraft);
@@ -257,7 +251,7 @@ public class MapRegionTask extends BaseMapTask
 
             RegionCoord rCoord = regionLoader.getRegions().peek();
             ChunkRenderController chunkRenderController = JourneyMap.getInstance().getChunkRenderController();
-            BaseMapTask baseMapTask = MapRegionTask.create(chunkRenderController, rCoord, minecraft);
+            BaseMapTask baseMapTask = MapRegionTask.create(chunkRenderController, rCoord, minecraft.thePlayer.chunkCoordY, minecraft);
             return baseMapTask;
         }
 

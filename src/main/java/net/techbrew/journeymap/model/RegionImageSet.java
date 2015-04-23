@@ -8,9 +8,6 @@
 
 package net.techbrew.journeymap.model;
 
-import com.google.common.base.Objects;
-import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.render.map.Tile;
 
@@ -33,57 +30,44 @@ public class RegionImageSet extends ImageSet
     }
 
     @Override
-    public ImageHolder getHolder(Constants.MapType mapType, Integer vSlice)
+    public ImageHolder getHolder(MapType mapType)
     {
-        if (vSlice != null)
-        {
-            assert (mapType == MapType.underground);
-        }
-        else
-        {
-            assert (mapType != MapType.underground);
-        }
-
         synchronized (imageHolders)
         {
-            for (ImageHolder holder : imageHolders.get(mapType))
+            ImageHolder imageHolder = imageHolders.get(mapType);
+            if (imageHolder == null)
             {
-                if (Objects.equal(vSlice, holder.vSlice))
-                {
-                    return holder;
-                }
+                // Prepare to find image in file
+                File imageFile = RegionImageHandler.getRegionImageFile(getRegionCoord(), mapType, false);
+
+                // Add holder
+                imageHolder = addHolder(mapType, imageFile);
             }
-
-            // Prepare to find image in file
-            File imageFile = RegionImageHandler.getRegionImageFile(getRegionCoord(vSlice), mapType, false);
-
-            // Add holder
-            ImageHolder imageHolder = addHolder(mapType, vSlice, imageFile);
             return imageHolder;
         }
     }
 
     public BufferedImage getChunkImage(ChunkCoord cCoord, MapType mapType)
     {
-        BufferedImage regionImage = getHolder(mapType, cCoord.vSlice).getImage();
-        RegionCoord regionCoord = getRegionCoord(cCoord.vSlice);
+        BufferedImage regionImage = getHolder(mapType).getImage();
+        RegionCoord regionCoord = getRegionCoord();
         BufferedImage current = regionImage.getSubimage(
                 regionCoord.getXOffset(cCoord.chunkX),
                 regionCoord.getZOffset(cCoord.chunkZ),
                 16, 16);
 
-        //BufferedImage copy = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-        //Graphics g2D = RegionImageHandler.initRenderingHints(copy.createGraphics());
-        //g2D.drawImage(current, 0, 0, null);
-        //g2D.dispose();
-        //return copy;
+//        BufferedImage copy = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+//        Graphics g2D = RegionImageHandler.initRenderingHints(copy.createGraphics());
+//        g2D.drawImage(current, 0, 0, null);
+//        g2D.dispose();
+//        return copy;
         return current;
     }
 
     public void setChunkImage(ChunkCoord cCoord, MapType mapType, BufferedImage chunkImage)
     {
-        ImageHolder holder = getHolder(mapType, cCoord.vSlice);
-        RegionCoord regionCoord = getRegionCoord(cCoord.vSlice);
+        ImageHolder holder = getHolder(mapType);
+        RegionCoord regionCoord = getRegionCoord();
         holder.partialImageUpdate(chunkImage, regionCoord.getXOffset(cCoord.chunkX), regionCoord.getZOffset(cCoord.chunkZ));
     }
 
@@ -107,15 +91,9 @@ public class RegionImageSet extends ImageSet
         }
     }
 
-    public RegionCoord getRegionCoordFor(ImageHolder imageHolder)
+    public RegionCoord getRegionCoord()
     {
-        return getRegionCoord(imageHolder.vSlice);
-    }
-
-
-    public RegionCoord getRegionCoord(Integer vSlice)
-    {
-        return RegionCoord.fromRegionPos(key.worldDir, key.regionX, vSlice, key.regionZ, key.dimension);
+        return RegionCoord.fromRegionPos(key.worldDir, key.regionX, key.regionZ, key.dimension);
     }
 
     @Override

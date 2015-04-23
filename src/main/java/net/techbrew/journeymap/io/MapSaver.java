@@ -11,12 +11,12 @@ package net.techbrew.journeymap.io;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
+import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageCache;
 import org.apache.logging.log4j.Level;
@@ -40,21 +40,17 @@ public class MapSaver
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
 
     final File worldDir;
-    final Constants.MapType mapType;
-    final Integer vSlice;
-    final int dimension;
+    final MapType mapType;
     File saveFile;
     int outputColumns;
     int outputRows;
     ArrayList<File> files;
 
-    public MapSaver(File worldDir, MapType mapType, Integer vSlice, int dimension)
+    public MapSaver(File worldDir, MapType mapType)
     {
         super();
         this.worldDir = worldDir;
         this.mapType = mapType;
-        this.vSlice = vSlice;
-        this.dimension = dimension;
 
         prepareFiles();
     }
@@ -123,7 +119,7 @@ public class MapSaver
     private File getImageDir()
     {
         // Fake coord gets us to the image directory
-        RegionCoord fakeRc = new RegionCoord(worldDir, 0, vSlice, 0, dimension);
+        RegionCoord fakeRc = new RegionCoord(worldDir, 0, 0, mapType.dimension);
         return RegionImageHandler.getImageDir(fakeRc, mapType);
     }
 
@@ -139,13 +135,13 @@ public class MapSaver
             // Build save file name
             final Minecraft mc = FMLClientHandler.instance().getClient();
             final String date = dateFormat.format(new Date());
-            final boolean isUnderground = mapType.equals(Constants.MapType.underground);
+            final boolean isUnderground = mapType.isUnderground();
             final StringBuilder sb = new StringBuilder(date).append("_");
             sb.append(WorldData.getWorldName(mc, false)).append("_");
             sb.append(WorldData.getSafeDimensionName(mc.theWorld.provider)).append("_");
             if (isUnderground)
             {
-                sb.append("slice").append(vSlice);
+                sb.append("slice").append(mapType.dimension);
             }
             else
             {
@@ -218,7 +214,7 @@ public class MapSaver
             {
                 for (int rx = minX; rx <= maxX; rx++)
                 {
-                    rc = new RegionCoord(worldDir, rx, vSlice, rz, dimension);
+                    rc = new RegionCoord(worldDir, rx, rz, mapType.dimension);
                     rfile = RegionImageHandler.getRegionImageFile(rc, mapType, true);
                     if (rfile.canRead())
                     {

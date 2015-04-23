@@ -47,6 +47,7 @@ public class DataCache
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
     final Cache<Integer, ChunkCoord> chunkCoords;
     final Cache<Integer, RegionCoord> regionCoords;
+    final Cache<Integer, MapType> mapTypes;
     final LoadingCache<Block, HashMap<Integer, BlockMD>> blockMetadata;
     final BlockMDCache blockMetadataLoader;
     final ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadataRemovalListener;
@@ -120,6 +121,9 @@ public class DataCache
 
         regionCoords = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).build();
         managedCaches.put(regionCoords, "RegionCoord");
+
+        mapTypes = getCacheBuilder().build();
+        managedCaches.put(mapTypes, "MapType");
     }
 
     // Get singleton instance.  Concurrency-safe.
@@ -284,6 +288,17 @@ public class DataCache
                 return Collections.EMPTY_MAP;
             }
         }
+    }
+
+    public MapType getMapType(MapType.Name name, Integer vSlice, int dimension)
+    {
+        MapType mapType = mapTypes.getIfPresent(MapType.toHash(name, vSlice, dimension));
+        if (mapType == null)
+        {
+            mapType = new MapType(name, vSlice, dimension);
+            mapTypes.put(mapType.hashCode(), mapType);
+        }
+        return mapType;
     }
 
     public Collection<Waypoint> getWaypoints(boolean forceRefresh)

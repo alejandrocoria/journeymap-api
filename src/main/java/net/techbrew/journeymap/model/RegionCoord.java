@@ -16,6 +16,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class RegionCoord implements Comparable<RegionCoord>
 {
@@ -27,35 +28,33 @@ public class RegionCoord implements Comparable<RegionCoord>
     public final Path dimDir;
     public final int regionX;
     public final int regionZ;
-    public final Integer vSlice;
     public final int dimension;
 
-    public RegionCoord(File worldDir, int regionX, Integer vSlice, int regionZ, int dimension)
+    public RegionCoord(File worldDir, int regionX, int regionZ, int dimension)
     {
         this.worldDir = worldDir;
         this.dimDir = getDimPath(worldDir, dimension);
         this.regionX = regionX;
         this.regionZ = regionZ;
-        this.vSlice = vSlice;
         this.dimension = dimension;
     }
 
-    public static RegionCoord fromChunkPos(File worldDir, int chunkX, Integer vSlice, int chunkZ, int dimension)
+    public static RegionCoord fromChunkPos(File worldDir, MapType mapType, int chunkX, int chunkZ)
     {
         final int regionX = getRegionPos(chunkX);
         final int regionZ = getRegionPos(chunkZ);
 
-        return fromRegionPos(worldDir, regionX, vSlice, regionZ, dimension);
+        return fromRegionPos(worldDir, regionX, regionZ, mapType.dimension);
     }
 
-    public static RegionCoord fromRegionPos(File worldDir, int regionX, Integer vSlice, int regionZ, int dimension)
+    public static RegionCoord fromRegionPos(File worldDir, int regionX, int regionZ, int dimension)
     {
         // There's no real need to synchronize this, it's harmless if there are occasional duplicate puts.  It's primarily
         // just used to reduce heap thrash.
-        RegionCoord regionCoord = cache.getIfPresent(toHash(getDimPath(worldDir, dimension), regionX, vSlice, regionZ));
+        RegionCoord regionCoord = cache.getIfPresent(toHash(getDimPath(worldDir, dimension), regionX, regionZ));
         if (regionCoord == null)
         {
-            regionCoord = new RegionCoord(worldDir, regionX, vSlice, regionZ, dimension);
+            regionCoord = new RegionCoord(worldDir, regionX, regionZ, dimension);
             cache.put(regionCoord.hashCode(), regionCoord);
         }
         return regionCoord;
@@ -93,16 +92,12 @@ public class RegionCoord implements Comparable<RegionCoord>
 
     public static int toHash(RegionCoord regionCoord)
     {
-        return toHash(regionCoord.dimDir, regionCoord.regionX, regionCoord.vSlice, regionCoord.regionZ);
+        return toHash(regionCoord.dimDir, regionCoord.regionX, regionCoord.regionZ);
     }
 
-    public static int toHash(Path dimDir, int regionX, Integer vSlice, int regionZ)
+    public static int toHash(Path dimDir, int regionX, int regionZ)
     {
-        int result = dimDir.hashCode();
-        result = 31 * result + regionX;
-        result = 31 * result + regionZ;
-        result = 31 * result + (vSlice != null ? vSlice.hashCode() : 0);
-        return result;
+        return Objects.hash(dimDir, regionX, regionZ);
     }
 
     public int getXOffset(int chunkX)
@@ -153,21 +148,21 @@ public class RegionCoord implements Comparable<RegionCoord>
         return getMaxChunkZ(regionZ);
     }
 
-    public ChunkCoord getMinChunkCoord()
+    public ChunkCoord getMinChunkCoord(Integer vSlice)
     {
-        return ChunkCoord.fromChunkPos(worldDir, getMinChunkX(), vSlice, getMinChunkZ(), dimension);
+        return ChunkCoord.fromChunkPos(worldDir, MapType.from(vSlice, dimension), getMinChunkX(), getMinChunkZ());
     }
 
-    public ChunkCoord getMaxChunkCoord()
+    public ChunkCoord getMaxChunkCoord(Integer vSlice)
     {
-        return ChunkCoord.fromChunkPos(worldDir, getMaxChunkX(), vSlice, getMaxChunkZ(), dimension);
+        return ChunkCoord.fromChunkPos(worldDir, MapType.from(vSlice, dimension), getMaxChunkX(), getMaxChunkZ());
     }
 
-    public List<ChunkCoordIntPair> getChunkCoordsInRegion()
+    public List<ChunkCoordIntPair> getChunkCoordsInRegion(Integer vSlice)
     {
         final List<ChunkCoordIntPair> list = new ArrayList<ChunkCoordIntPair>(1024);
-        final ChunkCoord min = getMinChunkCoord();
-        final ChunkCoord max = getMaxChunkCoord();
+        final ChunkCoord min = getMinChunkCoord(vSlice);
+        final ChunkCoord max = getMaxChunkCoord(vSlice);
 
         for (int x = min.chunkX; x <= max.chunkX; x++)
         {
@@ -180,11 +175,6 @@ public class RegionCoord implements Comparable<RegionCoord>
         return list;
     }
 
-    public Boolean isUnderground()
-    {
-        return vSlice != null ? vSlice != -1 : false;
-    }
-
     @Override
     public String toString()
     {
@@ -195,11 +185,6 @@ public class RegionCoord implements Comparable<RegionCoord>
         builder.append(regionZ);
         builder.append("]"); //$NON-NLS-1$
         return builder.toString();
-    }
-
-    public Integer getVerticalSlice()
-    {
-        return vSlice;
     }
 
     @Override
@@ -232,10 +217,6 @@ public class RegionCoord implements Comparable<RegionCoord>
         {
             return false;
         }
-        if (vSlice != null ? !vSlice.equals(that.vSlice) : that.vSlice != null)
-        {
-            return false;
-        }
 
         return true;
     }
@@ -243,7 +224,7 @@ public class RegionCoord implements Comparable<RegionCoord>
     @Override
     public int hashCode()
     {
-        return toHash(dimDir, regionX, vSlice, regionZ);
+        return toHash(dimDir, regionX, regionZ);
     }
 
     @Override

@@ -22,76 +22,67 @@ public class ChunkCoord
     public final File worldDir;
     public final int chunkX;
     public final int chunkZ;
-    public final Integer vSlice;
-    public final int dimension;
+    public final MapType mapType;
     private RegionCoord rCoord = null;
 
     private ChunkCoord(File worldDir, int chunkX, Integer vSlice, int chunkZ, int dimension)
     {
         this.worldDir = worldDir;
         this.chunkX = chunkX;
-        if (vSlice != null && vSlice > 16)
-        {
-            throw new IllegalArgumentException("Need the vSlice, not a y"); //$NON-NLS-1$
-        }
-        this.vSlice = vSlice;
+        this.mapType = MapType.from(vSlice, dimension);
         this.chunkZ = chunkZ;
-        this.dimension = dimension;
     }
 
-    public static ChunkCoord fromChunkMD(File worldDir, ChunkMD chunkMd, Integer vSlice, int dimension)
+    public static ChunkCoord fromChunkMD(File worldDir, MapType mapType, ChunkMD chunkMd)
     {
-        return ChunkCoord.fromChunkPos(worldDir, chunkMd.getCoord().chunkXPos, vSlice, chunkMd.getCoord().chunkZPos, dimension);
+        return ChunkCoord.fromChunkPos(worldDir, mapType, chunkMd.getCoord().chunkXPos, chunkMd.getCoord().chunkZPos);
     }
 
-    public static ChunkCoord fromChunkPos(final File worldDir, final int chunkX, final Integer vSlice, final int chunkZ, final int dimension)
+    public static ChunkCoord fromChunkPos(final File worldDir, final MapType mapType, final int chunkX, final int chunkZ)
     {
         // There's no real need to synchronize this, it's harmless if there are occasional duplicate puts.  It's primarily
         // just used to reduce heap thrash.
-        ChunkCoord chunkCoord = cache.getIfPresent(toHash(worldDir, chunkX, vSlice, chunkZ, dimension));
+        ChunkCoord chunkCoord = cache.getIfPresent(toHash(worldDir, mapType, chunkX, chunkZ));
         if (chunkCoord == null)
         {
-            chunkCoord = new ChunkCoord(worldDir, chunkX, vSlice, chunkZ, dimension);
+            chunkCoord = new ChunkCoord(worldDir, mapType.vSlice, mapType.dimension, chunkX, chunkZ);
             cache.put(chunkCoord.hashCode(), chunkCoord);
+        }
+        if (!chunkCoord.mapType.vSlice.equals(mapType.vSlice))
+        {
+            throw new IllegalStateException("ChunkCoord vSlice doesn't match");
         }
         return chunkCoord;
     }
 
-    public static int toHash(File worldDir, int chunkX, Integer vSlice, int chunkZ, int dimension)
+    public static int toHash(File worldDir, final MapType mapType, int chunkX, int chunkZ)
     {
-        return Objects.hash(worldDir, chunkX, vSlice, chunkZ, dimension);
+        return Objects.hash(worldDir, mapType, chunkX, chunkZ);
     }
 
     public RegionCoord getRegionCoord()
     {
         if (rCoord == null)
         {
-            rCoord = RegionCoord.fromChunkPos(worldDir, chunkX, vSlice, chunkZ, dimension);
+            rCoord = RegionCoord.fromChunkPos(worldDir, mapType, chunkX, chunkZ);
         }
         return rCoord;
     }
 
     public Boolean isUnderground()
     {
-        return vSlice != null ? vSlice != -1 : false;
+        return mapType.isUnderground();
     }
 
     public int getVerticalSlice()
     {
-        if (vSlice == null)
-        {
-            return -1;
-        }
-        else
-        {
-            return vSlice;
-        }
+        return isUnderground() ? mapType.vSlice : -1;
     }
 
     @Override
     public int hashCode()
     {
-        return toHash(worldDir, chunkX, vSlice, chunkZ, dimension);
+        return toHash(worldDir, mapType, chunkX, chunkZ);
     }
 
     @Override
@@ -110,7 +101,7 @@ public class ChunkCoord
             return false;
         }
         ChunkCoord other = (ChunkCoord) obj;
-        if (dimension != other.dimension)
+        if (!mapType.equals(other.mapType))
         {
             return false;
         }
@@ -119,10 +110,6 @@ public class ChunkCoord
             return false;
         }
         if (chunkZ != other.chunkZ)
-        {
-            return false;
-        }
-        if (other.getVerticalSlice() != getVerticalSlice())
         {
             return false;
         }

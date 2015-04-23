@@ -10,10 +10,10 @@ package net.techbrew.journeymap.render.map;
 
 import com.google.common.base.Objects;
 import net.minecraft.world.ChunkCoordIntPair;
-import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.model.GridSpec;
+import net.techbrew.journeymap.model.MapType;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -58,10 +58,10 @@ public class Tile
         updateRenderType();
     }
 
-    public static Tile create(final int tileX, final int tileZ, final int zoom, File worldDir, final MapType mapType, boolean highQuality, final Integer vSlice, int dimension)
+    public static Tile create(final int tileX, final int tileZ, final int zoom, File worldDir, final MapType mapType, boolean highQuality)
     {
         Tile tile = new Tile(tileX, tileZ, zoom);
-        tile.updateTexture(worldDir, mapType, highQuality, vSlice, dimension);
+        tile.updateTexture(worldDir, mapType, highQuality);
         return tile;
     }
 
@@ -81,11 +81,11 @@ public class Tile
         return Objects.hashCode(tileX, tileZ, zoom);
     }
 
-    public boolean updateTexture(File worldDir, final MapType mapType, boolean highQuality, final Integer vSlice, int dimension)
+    public boolean updateTexture(File worldDir, final MapType mapType, boolean highQuality)
     {
         updateRenderType();
         drawSteps.clear();
-        drawSteps.addAll(RegionImageHandler.getTileDrawSteps(worldDir, ulChunk, lrChunk, mapType, zoom, highQuality, vSlice, dimension));
+        drawSteps.addAll(RegionImageHandler.getTileDrawSteps(worldDir, ulChunk, lrChunk, mapType, zoom, highQuality));
         return drawSteps.size() > 1;
     }
 
@@ -184,12 +184,18 @@ public class Tile
         return new Point2D.Double(pixelOffsetX, pixelOffsetZ);
     }
 
-    void draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, GridSpec gridSpec)
+    boolean draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, GridSpec gridSpec)
     {
+        boolean somethingDrew = false;
         for (TileDrawStep tileDrawStep : drawSteps)
         {
-            tileDrawStep.draw(pos, offsetX, offsetZ, alpha, textureFilter, textureWrap, gridSpec);
+            boolean ok = tileDrawStep.draw(pos, offsetX, offsetZ, alpha, textureFilter, textureWrap, gridSpec);
+            if (ok)
+            {
+                somethingDrew = true;
+            }
         }
+        return somethingDrew;
     }
 
     @Override

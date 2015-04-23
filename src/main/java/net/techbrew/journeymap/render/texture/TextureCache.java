@@ -8,12 +8,12 @@
 
 package net.techbrew.journeymap.render.texture;
 
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
+import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.task.main.ExpireTextureTask;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import net.techbrew.journeymap.ui.theme.Theme;
@@ -235,16 +235,19 @@ public class TextureCache
         }
     }
 
-    public TextureImpl getTileSample(Constants.MapType mapType)
+    public TextureImpl getTileSample(MapType mapType)
     {
-        switch (mapType)
+        if (mapType.isNight())
         {
-            case night:
-                return getTileSampleNight();
-            case underground:
-                return getTileSampleUnderground();
-            default:
-                return getTileSampleDay();
+            return getTileSampleNight();
+        }
+        else if (mapType.isUnderground())
+        {
+            return getTileSampleUnderground();
+        }
+        else
+        {
+            return getTileSampleDay();
         }
     }
 
@@ -383,7 +386,7 @@ public class TextureCache
         }
     }
 
-//    public boolean hasRegionTexture(RegionCoord regionCoord, Constants.MapType mapType)
+//    public boolean hasRegionTexture(RegionCoord regionCoord, MapType mapType)
 //    {
 //        synchronized (regionImages)
 //        {

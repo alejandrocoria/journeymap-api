@@ -1,7 +1,5 @@
 package net.techbrew.journeymap.model;
 
-import net.techbrew.journeymap.Constants;
-
 /**
  * Model describing Grid appearance for day/night/caves
  */
@@ -25,9 +23,9 @@ public class GridSpecs
         this.underground = underground;
     }
 
-    public GridSpec getSpec(Constants.MapType mapType)
+    public GridSpec getSpec(MapType mapType)
     {
-        switch (mapType)
+        switch (mapType.name)
         {
             case day:
                 return day;
@@ -40,9 +38,9 @@ public class GridSpecs
         }
     }
 
-    public void setSpec(Constants.MapType mapType, GridSpec newSpec)
+    public void setSpec(MapType mapType, GridSpec newSpec)
     {
-        switch (mapType)
+        switch (mapType.name)
         {
             case day:
             {

@@ -9,7 +9,7 @@
 package net.techbrew.journeymap.properties;
 
 import cpw.mods.fml.client.FMLClientHandler;
-import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.ui.minimap.Orientation;
 import net.techbrew.journeymap.ui.minimap.Position;
@@ -69,7 +69,7 @@ public class MiniMapProperties extends InGameMapProperties
     @Config(category = Inherit, key = "jm.minimap.reticle_orientation", defaultEnum = "Compass")
     public final AtomicReference<ReticleOrientation> reticleOrientation = new AtomicReference<ReticleOrientation>(ReticleOrientation.Compass);
 
-    public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
+    public final AtomicReference<MapType.Name> preferredMapType = new AtomicReference<MapType.Name>(MapType.Name.day);
     protected transient final String name;
     protected boolean active = false;
 
@@ -90,7 +90,7 @@ public class MiniMapProperties extends InGameMapProperties
     }
 
     @Override
-    public AtomicReference<Constants.MapType> getPreferredMapType()
+    public AtomicReference<MapType.Name> getPreferredMapType()
     {
         return preferredMapType;
     }

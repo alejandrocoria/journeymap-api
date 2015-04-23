@@ -15,6 +15,7 @@ import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.GridSpec;
 import net.techbrew.journeymap.model.GridSpecs;
+import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -46,7 +47,7 @@ public class GridEditor extends JmUI
     private CheckBox checkDay, checkNight, checkUnderground;
     private ThemeToggle buttonDay, buttonNight, buttonUnderground;
     private Color activeColor;
-    private Constants.MapType activeMapType;
+    private MapType activeMapType;
 
     private Button buttonReset;
     private Button buttonCancel;
@@ -69,7 +70,7 @@ public class GridEditor extends JmUI
 
         this.gridSpecs = JourneyMap.getCoreProperties().gridSpecs.clone();
 
-        Constants.MapType mapType = Constants.MapType.day;
+        MapType mapType = MapType.day(0);
         activeMapType = mapType;
         this.activeColor = this.gridSpecs.getSpec(activeMapType).getColor();
 
@@ -98,21 +99,21 @@ public class GridEditor extends JmUI
                 topButtons.equalizeWidths(getFontRenderer());
 
                 // Left Checks
-                checkDay = new CheckBox("", activeMapType == Constants.MapType.day);
-                checkNight = new CheckBox("", activeMapType == Constants.MapType.night);
-                checkUnderground = new CheckBox("", activeMapType == Constants.MapType.underground);
+                checkDay = new CheckBox("", activeMapType == MapType.day(0));
+                checkNight = new CheckBox("", activeMapType == MapType.night(0));
+                checkUnderground = new CheckBox("", activeMapType.isUnderground());
                 leftChecks = new ButtonList(checkDay, checkNight, checkUnderground);
 
                 // Left Buttons
                 Theme theme = ThemeFileHandler.getCurrentTheme();
                 buttonDay = new ThemeToggle(theme, "jm.fullscreen.map_day", "day");
-                buttonDay.setToggled(activeMapType == Constants.MapType.day, false);
+                buttonDay.setToggled(activeMapType == MapType.day(0), false);
 
                 buttonNight = new ThemeToggle(theme, "jm.fullscreen.map_night", "night");
-                buttonNight.setToggled(activeMapType == Constants.MapType.night, false);
+                buttonNight.setToggled(activeMapType == MapType.night(0), false);
 
                 buttonUnderground = new ThemeToggle(theme, "jm.fullscreen.map_caves", "caves");
-                buttonUnderground.setToggled(activeMapType == Constants.MapType.underground, false);
+                buttonUnderground.setToggled(activeMapType.isUnderground(), false);
 
                 leftButtons = new ButtonList(buttonDay, buttonNight, buttonUnderground);
 
@@ -347,15 +348,15 @@ public class GridEditor extends JmUI
         {
             if (guibutton == buttonDay)
             {
-                updatePreview(Constants.MapType.day);
+                updatePreview(MapType.day(0));
             }
             else if (guibutton == buttonNight)
             {
-                updatePreview(Constants.MapType.night);
+                updatePreview(MapType.night(0));
             }
             else if (guibutton == buttonUnderground)
             {
-                updatePreview(Constants.MapType.underground);
+                updatePreview(MapType.underground(0, 0));
             }
 
             updateGridSpecs();
@@ -383,7 +384,7 @@ public class GridEditor extends JmUI
         }
     }
 
-    protected void updatePreview(Constants.MapType mapType)
+    protected void updatePreview(MapType mapType)
     {
         activeMapType = mapType;
         GridSpec activeSpec = gridSpecs.getSpec(activeMapType);
@@ -391,12 +392,12 @@ public class GridEditor extends JmUI
         buttonOpacity.setValue((int) (activeSpec.alpha * 100));
         buttonStyle.setValue(activeSpec.style);
 
-        checkDay.setToggled(mapType == Constants.MapType.day);
-        checkNight.setToggled(mapType == Constants.MapType.night);
-        checkUnderground.setToggled(mapType == Constants.MapType.underground);
-        buttonDay.setToggled(mapType == Constants.MapType.day);
-        buttonNight.setToggled(mapType == Constants.MapType.night);
-        buttonUnderground.setToggled(mapType == Constants.MapType.underground);
+        checkDay.setToggled(mapType.isDay());
+        checkNight.setToggled(mapType.isNight());
+        checkUnderground.setToggled(mapType.isUnderground());
+        buttonDay.setToggled(mapType.isDay());
+        buttonNight.setToggled(mapType.isNight());
+        buttonUnderground.setToggled(mapType.isUnderground());
     }
 
     protected void updateGridSpecs()
@@ -409,17 +410,17 @@ public class GridEditor extends JmUI
 
         if (checkDay.getToggled())
         {
-            this.gridSpecs.setSpec(Constants.MapType.day, newSpec);
+            this.gridSpecs.setSpec(MapType.day(0), newSpec);
         }
 
         if (checkNight.getToggled())
         {
-            this.gridSpecs.setSpec(Constants.MapType.night, newSpec);
+            this.gridSpecs.setSpec(MapType.night(0), newSpec);
         }
 
         if (checkUnderground.getToggled())
         {
-            this.gridSpecs.setSpec(Constants.MapType.underground, newSpec);
+            this.gridSpecs.setSpec(MapType.underground(0, 0), newSpec);
         }
     }
 
@@ -436,15 +437,15 @@ public class GridEditor extends JmUI
         GridSpecs temp = JourneyMap.getCoreProperties().gridSpecs.clone();
         if (checkDay.getToggled())
         {
-            this.gridSpecs.setSpec(Constants.MapType.day, temp.getSpec(Constants.MapType.day));
+            this.gridSpecs.setSpec(MapType.day(0), temp.getSpec(MapType.day(0)));
         }
         if (checkNight.getToggled())
         {
-            this.gridSpecs.setSpec(Constants.MapType.night, temp.getSpec(Constants.MapType.night));
+            this.gridSpecs.setSpec(MapType.night(0), temp.getSpec(MapType.night(0)));
         }
         if (checkUnderground.getToggled())
         {
-            this.gridSpecs.setSpec(Constants.MapType.underground, temp.getSpec(Constants.MapType.underground));
+            this.gridSpecs.setSpec(MapType.underground(0, 0), temp.getSpec(MapType.underground(0, 0)));
         }
         buttonList.clear();
         initGui();

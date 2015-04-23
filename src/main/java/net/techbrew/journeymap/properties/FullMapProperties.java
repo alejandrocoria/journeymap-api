@@ -9,7 +9,7 @@
 package net.techbrew.journeymap.properties;
 
 import cpw.mods.fml.client.FMLClientHandler;
-import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.model.MapType;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class FullMapProperties extends InGameMapProperties
 {
-    public final AtomicReference<Constants.MapType> preferredMapType = new AtomicReference<Constants.MapType>(Constants.MapType.day);
+    public final AtomicReference<MapType.Name> preferredMapType = new AtomicReference<MapType.Name>(MapType.Name.day);
 
     protected transient final String name = "fullmap";
 
@@ -42,7 +42,7 @@ public class FullMapProperties extends InGameMapProperties
     }
 
     @Override
-    public AtomicReference<Constants.MapType> getPreferredMapType()
+    public AtomicReference<MapType.Name> getPreferredMapType()
     {
         return preferredMapType;
     }

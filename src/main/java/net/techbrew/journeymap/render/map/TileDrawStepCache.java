@@ -12,8 +12,8 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.model.RegionCoord;
 import org.apache.logging.log4j.Logger;
 
@@ -53,7 +53,7 @@ public class TileDrawStepCache
         return Holder.INSTANCE.drawStepCache;
     }
 
-    public static TileDrawStep getOrCreate(final Constants.MapType mapType, RegionCoord regionCoord, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
+    public static TileDrawStep getOrCreate(final MapType mapType, RegionCoord regionCoord, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
     {
         return Holder.INSTANCE._getOrCreate(mapType, regionCoord, zoom, highQuality, sx1, sy1, sx2, sy2);
     }
@@ -63,7 +63,7 @@ public class TileDrawStepCache
         instance().invalidateAll();
     }
 
-    private TileDrawStep _getOrCreate(final Constants.MapType mapType, RegionCoord regionCoord, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
+    private TileDrawStep _getOrCreate(final MapType mapType, RegionCoord regionCoord, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
     {
         checkWorldChange(regionCoord);
 

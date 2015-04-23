@@ -27,6 +27,7 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.MapState;
+import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.properties.config.Config;
@@ -99,7 +100,8 @@ public class Fullscreen extends JmUI
         mc = FMLClientHandler.instance().getClient();
         fullMapProperties = JourneyMap.getFullMapProperties();
         state.refresh(mc, mc.thePlayer, fullMapProperties);
-        gridRenderer.setContext(state.getWorldDir(), state.getDimension());
+        boolean showCaves = state.isCaveMappingAllowed() && fullMapProperties.showCaves.get();
+        gridRenderer.setContext(state.getWorldDir(), state.getMapType(showCaves));
         gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
     }
 
@@ -122,7 +124,7 @@ public class Fullscreen extends JmUI
         Keyboard.enableRepeatEvents(true);
 
         // When switching dimensions, reset grid
-        if (state.getDimension() != mc.thePlayer.dimension)
+        if (state.getCurrentMapType().dimension != mc.thePlayer.dimension)
         {
             gridRenderer.clear();
         }
@@ -248,7 +250,7 @@ public class Fullscreen extends JmUI
             firstLayoutPass = true;
             hideOptionsToolbar = false;
             Theme theme = ThemeFileHandler.getCurrentTheme();
-            Constants.MapType mapType = state.getCurrentMapType();
+            MapType mapType = state.getCurrentMapType();
             int id = 0;
 
             // UI Colors
@@ -260,7 +262,7 @@ public class Fullscreen extends JmUI
 
             // Day Toggle
             buttonDay = new ThemeToggle(theme, "jm.fullscreen.map_day", "day", null, null);
-            buttonDay.setToggled(mapType == Constants.MapType.day, false);
+            buttonDay.setToggled(mapType.isDay(), false);
             buttonDay.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
@@ -268,7 +270,7 @@ public class Fullscreen extends JmUI
                 {
                     if (toggled)
                     {
-                        state.setMapType(Constants.MapType.day);
+                        state.setMapType(MapType.Name.day);
                         buttonNight.setToggled(false);
                         if (state.isUnderground())
                         {
@@ -276,7 +278,7 @@ public class Fullscreen extends JmUI
                         }
                         state.requireRefresh();
                     }
-                    else if (state.getCurrentMapType() == Constants.MapType.day)
+                    else if (state.getCurrentMapType().isDay())
                     {
                         return false;
                     }
@@ -286,7 +288,7 @@ public class Fullscreen extends JmUI
 
             // Night Toggle
             buttonNight = new ThemeToggle(theme, "jm.fullscreen.map_night", "night");
-            buttonNight.setToggled(mapType == Constants.MapType.night, false);
+            buttonNight.setToggled(mapType.isNight(), false);
             buttonNight.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
@@ -294,7 +296,7 @@ public class Fullscreen extends JmUI
                 {
                     if (toggled)
                     {
-                        state.setMapType(Constants.MapType.night);
+                        state.setMapType(MapType.night(state.getCurrentMapType().dimension));
                         buttonDay.setToggled(false);
                         if (state.isUnderground())
                         {
@@ -302,7 +304,7 @@ public class Fullscreen extends JmUI
                         }
                         state.requireRefresh();
                     }
-                    else if (state.getCurrentMapType() == Constants.MapType.night)
+                    else if (state.getCurrentMapType().isNight())
                     {
                         return false;
                     }
@@ -653,7 +655,7 @@ public class Fullscreen extends JmUI
                 try
                 {
                     gridRenderer.move(-mouseDragX, -mouseDragY);
-                    gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
+                    gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
                     gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
                 }
                 catch (Exception e)
@@ -751,14 +753,14 @@ public class Fullscreen extends JmUI
                 {
                     if (Constants.isPressed(Constants.KB_MAP_DAY))
                     {
-                        state.setMapType(Constants.MapType.day);
+                        state.setMapType(MapType.Name.day);
                         return;
                     }
                     else
                     {
                         if (Constants.isPressed(Constants.KB_MAP_NIGHT))
                         {
-                            state.setMapType(Constants.MapType.night);
+                            state.setMapType(MapType.Name.night);
                             return;
                         }
                         else
@@ -874,7 +876,7 @@ public class Fullscreen extends JmUI
             }
             else
             {
-                gridRenderer.setContext(state.getWorldDir(), state.getDimension());
+                gridRenderer.setContext(state.getWorldDir(), state.getCurrentMapType());
             }
         }
 
@@ -883,9 +885,9 @@ public class Fullscreen extends JmUI
 
         if (state.follow.get())
         {
-            gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.chunkCoordY, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
+            gridRenderer.center(state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
         }
-        gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
+        gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
         gridRenderer.draw(1f, xOffset, yOffset, fullMapProperties.showGrid.get());
         gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
         gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
@@ -929,7 +931,7 @@ public class Fullscreen extends JmUI
             int x = waypoint.getX();
             int z = waypoint.getZ();
 
-            gridRenderer.center(x, mc.thePlayer.chunkCoordY, z, fullMapProperties.zoomLevel.get());
+            gridRenderer.center(state.getCurrentMapType(), x, z, fullMapProperties.zoomLevel.get());
             refreshState();
             updateScreen();
         }
@@ -955,17 +957,17 @@ public class Fullscreen extends JmUI
         fullMapProperties = JourneyMap.getFullMapProperties();
         state.refresh(mc, player, fullMapProperties);
 
-        if (state.getDimension() != gridRenderer.getDimension())
+        if (state.getCurrentMapType().dimension != mc.thePlayer.dimension)
         {
             setFollow(true);
         }
 
-        gridRenderer.setContext(state.getWorldDir(), state.getDimension());
+        gridRenderer.setContext(state.getWorldDir(), state.getCurrentMapType());
 
         // Center core renderer
         if (state.follow.get())
         {
-            gridRenderer.center(mc.thePlayer.posX, mc.thePlayer.chunkCoordY, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
+            gridRenderer.center(state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
         }
         else
         {
@@ -973,7 +975,7 @@ public class Fullscreen extends JmUI
         }
 
         // Update tiles
-        gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+        gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 
         // Build list of drawSteps
         state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, 1f, false);
@@ -1036,7 +1038,7 @@ public class Fullscreen extends JmUI
     {
         refreshState();
         gridRenderer.move(deltaBlockX, deltaBlockz);
-        gridRenderer.updateTiles(state.getCurrentMapType(), state.getVSlice(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+        gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, true, 0, 0);
         setFollow(false);
     }
 

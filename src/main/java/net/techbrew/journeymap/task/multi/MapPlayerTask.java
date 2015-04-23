@@ -32,8 +32,6 @@ public class MapPlayerTask extends BaseMapTask
     private static volatile long lastTaskCompleted;
     private static long lastTaskTime;
     private static double lastTaskAvgChunkTime;
-    private static volatile RenderSpec lastSurfaceRenderSpec;
-    private static volatile RenderSpec lastUndergroundRenderSpec;
     private final int maxRuntime = JourneyMap.getCoreProperties().renderDelay.get() * 3000;
     private int scheduledChunks = 0;
     private long startNs;
@@ -49,8 +47,6 @@ public class MapPlayerTask extends BaseMapTask
         synchronized (MapPlayerTask.class)
         {
             DataCache.instance().invalidateChunkMDCache();
-            lastSurfaceRenderSpec = null;
-            lastUndergroundRenderSpec = null;
         }
     }
 
@@ -93,33 +89,21 @@ public class MapPlayerTask extends BaseMapTask
         return new MapPlayerTaskBatch(tasks);
     }
 
-    public static RenderSpec getLastSurfaceRenderSpec()
-    {
-        return lastSurfaceRenderSpec;
-    }
-
-    public static RenderSpec getLastCaveRenderSpec()
-    {
-        return lastUndergroundRenderSpec;
-    }
-
     public static String[] getDebugStats()
     {
         try
         {
-            List<String> lines = new ArrayList<String>(0);
-
             boolean showLastUnderground = false;
             boolean showLastSurface = false;
 
             if (DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapCaves.get())
             {
-                showLastUnderground = lastUndergroundRenderSpec != null;
+                showLastUnderground = true;
             }
 
             if (!DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapSurface.get())
             {
-                showLastSurface = lastSurfaceRenderSpec != null;
+                showLastSurface = true;
             }
 
             if (!showLastSurface && !showLastUnderground)
@@ -131,13 +115,13 @@ public class MapPlayerTask extends BaseMapTask
             {
                 if (showLastSurface)
                 {
-                    return new String[]{lastSurfaceRenderSpec.getDebugStats()};
+                    return new String[]{RenderSpec.getSurfaceSpec().getDebugStats()};
                 }
-                return new String[]{lastUndergroundRenderSpec.getDebugStats()};
+                return new String[]{RenderSpec.getUndergroundSpec().getDebugStats()};
             }
             else
             {
-                return new String[]{lastSurfaceRenderSpec.getDebugStats(), lastUndergroundRenderSpec.getDebugStats()};
+                return new String[]{RenderSpec.getSurfaceSpec().getDebugStats(), RenderSpec.getUndergroundSpec().getDebugStats()};
             }
         }
         catch (Throwable t)
@@ -155,7 +139,7 @@ public class MapPlayerTask extends BaseMapTask
 
         if (DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapCaves.get())
         {
-            RenderSpec spec = MapPlayerTask.getLastCaveRenderSpec();
+            RenderSpec spec = RenderSpec.getUndergroundSpec();
             if (spec != null)
             {
                 primaryRenderSize += spec.getPrimaryRenderSize();
@@ -166,7 +150,7 @@ public class MapPlayerTask extends BaseMapTask
 
         if (!DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapSurface.get())
         {
-            RenderSpec spec = MapPlayerTask.getLastSurfaceRenderSpec();
+            RenderSpec spec = RenderSpec.getSurfaceSpec();
             if (spec != null)
             {
                 primaryRenderSize += spec.getPrimaryRenderSize();
@@ -193,28 +177,7 @@ public class MapPlayerTask extends BaseMapTask
     {
         startNs = System.nanoTime();
 
-        final RenderSpec lastRenderSpec = underground ? lastUndergroundRenderSpec : lastSurfaceRenderSpec;
-        RenderSpec renderSpec = new RenderSpec(minecraft, this.underground);
-        if (renderSpec.equals(lastRenderSpec))
-        {
-            renderSpec = lastRenderSpec;
-        }
-        else
-        {
-            if (lastRenderSpec != null)
-            {
-                renderSpec.copyLastStatsFrom(lastRenderSpec);
-            }
-            if (underground)
-            {
-                lastUndergroundRenderSpec = renderSpec;
-            }
-            else
-            {
-                lastSurfaceRenderSpec = renderSpec;
-            }
-        }
-
+        final RenderSpec renderSpec = underground ? RenderSpec.getUndergroundSpec() : RenderSpec.getSurfaceSpec();
         chunkCoords.addAll(renderSpec.getRenderAreaCoords());
         this.scheduledChunks = chunkCoords.size();
     }
@@ -319,13 +282,13 @@ public class MapPlayerTask extends BaseMapTask
                 {
                     MapPlayerTask mapPlayerTask = (MapPlayerTask) task;
                     chunkCount += mapPlayerTask.scheduledChunks;
-                    if (mapPlayerTask.underground && lastUndergroundRenderSpec != null)
+                    if (mapPlayerTask.underground)
                     {
-                        lastUndergroundRenderSpec.setLastTaskInfo(mapPlayerTask.scheduledChunks, mapPlayerTask.elapsedNs);
+                        RenderSpec.getUndergroundSpec().setLastTaskInfo(mapPlayerTask.scheduledChunks, mapPlayerTask.elapsedNs);
                     }
-                    else if (lastSurfaceRenderSpec != null)
+                    else
                     {
-                        lastSurfaceRenderSpec.setLastTaskInfo(mapPlayerTask.scheduledChunks, mapPlayerTask.elapsedNs);
+                        RenderSpec.getSurfaceSpec().setLastTaskInfo(mapPlayerTask.scheduledChunks, mapPlayerTask.elapsedNs);
                     }
                 }
             }

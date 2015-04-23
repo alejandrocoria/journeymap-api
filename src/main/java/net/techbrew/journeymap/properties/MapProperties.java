@@ -9,8 +9,8 @@
 package net.techbrew.journeymap.properties;
 
 import com.google.common.base.Objects;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.io.IconSetFileHandler;
+import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.properties.config.Config;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -59,7 +59,7 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
 
     public abstract AtomicReference<String> getEntityIconSetName();
 
-    public abstract AtomicReference<Constants.MapType> getPreferredMapType();
+    public abstract AtomicReference<MapType.Name> getPreferredMapType();
 
     @Override
     public boolean equals(Object o)

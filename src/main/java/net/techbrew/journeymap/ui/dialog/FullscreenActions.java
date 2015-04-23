@@ -11,13 +11,13 @@ package net.techbrew.journeymap.ui.dialog;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.io.MapSaver;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.MapState;
+import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -226,8 +226,7 @@ public class FullscreenActions extends JmUI
         final MapState state = Fullscreen.state();
         boolean showCaves = JourneyMap.getFullMapProperties().showCaves.get();
         final MapType mapType = state.getMapType(showCaves);
-        final Integer vSlice = state.getMapType(showCaves) == MapType.underground ? state.getVSlice() : null;
-        final MapSaver mapSaver = new MapSaver(state.getWorldDir(), mapType, vSlice, state.getDimension());
+        final MapSaver mapSaver = new MapSaver(state.getWorldDir(), mapType);
         if (mapSaver.isValid())
         {
             JourneyMap.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);

@@ -2,7 +2,6 @@ package net.techbrew.journeymap.render.map;
 
 import com.google.common.base.Objects;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.log.StatTimer;
@@ -16,8 +15,6 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -29,9 +26,9 @@ public class TileDrawStep
     private static final Color bgColor = new Color(0x22, 0x22, 0x22);
 
     private static final Logger logger = JourneyMap.getLogger();
-    private final boolean debug = logger.isTraceEnabled();
+    private final boolean debug = true || logger.isTraceEnabled();
     private final RegionCoord regionCoord;
-    private final Constants.MapType mapType;
+    private final MapType mapType;
     private final Integer zoom;
     private final boolean highQuality;
     private final StatTimer drawTimer;
@@ -45,7 +42,7 @@ public class TileDrawStep
     private volatile ImageHolder regionTextureHolder;
 
 
-    public TileDrawStep(RegionCoord regionCoord, final Constants.MapType mapType, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
+    public TileDrawStep(RegionCoord regionCoord, final MapType mapType, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
     {
         this.mapType = mapType;
         this.regionCoord = regionCoord;
@@ -58,7 +55,7 @@ public class TileDrawStep
         this.drawTimer = (this.highQuality) ? StatTimer.get("TileDrawStep.draw(high)") : StatTimer.get("TileDrawStep.draw(low)");
 
         this.regionImageSet = RegionImageCache.instance().getRegionImageSet(regionCoord);
-        this.regionTextureHolder = regionImageSet.getHolder(mapType, regionCoord.vSlice);
+        this.regionTextureHolder = regionImageSet.getHolder(mapType);
 
         updateRegionTexture();
         if (highQuality)
@@ -67,14 +64,13 @@ public class TileDrawStep
         }
     }
 
-    public static int toHashCode(RegionCoord regionCoord, final Constants.MapType mapType, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
+    public static int toHashCode(RegionCoord regionCoord, final MapType mapType, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
     {
         return Objects.hashCode(regionCoord, mapType, zoom, highQuality, sx1, sy1, sx2, sy2);
     }
 
-    void draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, int textureFilter, int textureWrap, GridSpec gridSpec)
+    boolean draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, int textureFilter, int textureWrap, GridSpec gridSpec)
     {
-
         boolean regionUpdatePending = updateRegionTexture();
         boolean scaledUpdatePending = !regionUpdatePending && highQuality && updateScaledTexture();
         Integer textureId = -1;
@@ -153,7 +149,8 @@ public class TileDrawStep
             DrawUtil.drawLabel(this.toString(), debugX + 5, debugY + 10, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
             DrawUtil.drawLabel(String.format("Full size: %s", useScaled), debugX + 5, debugY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
             long imageTimestamp = useScaled ? scaledTexture.getLastImageUpdate() : regionTextureHolder.getImageTimestamp();
-            DrawUtil.drawLabel(new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(imageTimestamp)), debugX + 5, debugY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
+            long age = (System.currentTimeMillis() - imageTimestamp) / 1000;
+            DrawUtil.drawLabel("Age: " + age + " seconds old", debugX + 5, debugY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
         }
 
         GL11.glColor4f(1, 1, 1, 1);
@@ -167,6 +164,8 @@ public class TileDrawStep
             JourneyMap.getLogger().warn("GL Error in TileDrawStep: " + glErr);
             clearTexture();
         }
+
+        return textureId != 1;
     }
 
 
@@ -186,7 +185,7 @@ public class TileDrawStep
         regionFuture = null;
     }
 
-    public Constants.MapType getMapType()
+    public MapType getMapType()
     {
         return mapType;
     }

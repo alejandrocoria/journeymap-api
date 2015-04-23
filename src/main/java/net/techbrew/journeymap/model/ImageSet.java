@@ -9,14 +9,12 @@
 package net.techbrew.journeymap.model;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.MultimapBuilder;
-import com.google.common.collect.Multimaps;
-import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.Constants.MapType;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * An ImageSet contains one or more ImageHolders
@@ -25,15 +23,14 @@ import java.io.File;
  */
 public abstract class ImageSet
 {
-    protected final ListMultimap<MapType, ImageHolder> imageHolders;
+    protected final Map<MapType, ImageHolder> imageHolders;
 
     public ImageSet()
     {
-        ListMultimap<MapType, ImageHolder> lmm = MultimapBuilder.enumKeys(MapType.class).arrayListValues(8).build();
-        imageHolders = Multimaps.synchronizedListMultimap(lmm);
+        imageHolders = Collections.synchronizedMap(new HashMap<MapType, ImageHolder>(8));
     }
 
-    protected abstract ImageHolder getHolder(Constants.MapType mapType, Integer vSlice);
+    protected abstract ImageHolder getHolder(MapType mapType);
 
     @Override
     public abstract int hashCode();
@@ -42,9 +39,9 @@ public abstract class ImageSet
     public abstract boolean equals(Object obj);
 
 
-    public BufferedImage getImage(Constants.MapType mapType, Integer vSlice)
+    public BufferedImage getImage(MapType mapType)
     {
-        return getHolder(mapType, vSlice).getImage();
+        return getHolder(mapType).getImage();
     }
 
     public boolean writeToDisk(boolean force)
@@ -93,7 +90,7 @@ public abstract class ImageSet
     public String toString()
     {
         return Objects.toStringHelper(this)
-                .add("imageHolders", imageHolders.asMap().entrySet())
+                .add("imageHolders", imageHolders.entrySet())
                 .toString();
     }
 
@@ -103,9 +100,9 @@ public abstract class ImageSet
 
     protected abstract int getImageSize();
 
-    protected ImageHolder addHolder(Constants.MapType mapType, Integer vSlice, File imageFile)
+    protected ImageHolder addHolder(MapType mapType, File imageFile)
     {
-        return addHolder(new ImageHolder(mapType, vSlice, imageFile, getImageSize()));
+        return addHolder(new ImageHolder(mapType, imageFile, getImageSize()));
     }
 
     protected ImageHolder addHolder(ImageHolder imageHolder)

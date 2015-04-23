@@ -11,13 +11,9 @@ package net.techbrew.journeymap.render.map;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.MathHelper;
-import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.log.StatTimer;
-import net.techbrew.journeymap.model.BlockCoordIntPair;
-import net.techbrew.journeymap.model.GridSpec;
-import net.techbrew.journeymap.model.GridSpecs;
+import net.techbrew.journeymap.model.*;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import org.apache.logging.log4j.Logger;
@@ -62,13 +58,11 @@ public class GridRenderer
     private Rectangle2D.Double screenBounds = null;
     private int lastHeight = -1;
     private int lastWidth = -1;
-    private MapType mapType = MapType.day;
+    private MapType mapType;
     private int centerTileHash = Integer.MIN_VALUE;
-    private Integer vSlice;
     private int zoom;
     private double centerBlockX;
     private double centerBlockZ;
-    private Integer dimension;
     private File worldDir;
     private double currentRotation;
     private IntBuffer viewportBuf;
@@ -145,12 +139,12 @@ public class GridRenderer
 
     public void move(final int deltaBlockX, final int deltaBlockZ)
     {
-        center(centerBlockX + deltaBlockX, vSlice, centerBlockZ + deltaBlockZ, zoom);
+        center(mapType, centerBlockX + deltaBlockX, centerBlockZ + deltaBlockZ, zoom);
     }
 
     public boolean center()
     {
-        return center(centerBlockX, vSlice, centerBlockZ, zoom);
+        return center(mapType, centerBlockX, centerBlockZ, zoom);
     }
 
     public boolean hasUnloadedTile()
@@ -186,19 +180,11 @@ public class GridRenderer
         return false;
     }
 
-
-    // todo    REGION IMAGE SET HOLD MULTIPLE SLICES??  NO, BUT SLOW?
-
-    public boolean center(final double blockX, Integer vSlice, final double blockZ, final int zoom)
+    public boolean center(MapType mapType, final double blockX, final double blockZ, final int zoom)
     {
-        if (!DataCache.getPlayer().underground)
-        {
-            vSlice = null;
-        }
+        boolean mapTypeChanged = !Objects.equals(mapType, this.mapType);
 
-        boolean vSliceChanged = !Objects.equals(vSlice, this.vSlice);
-
-        if ((blockX == centerBlockX) && (blockZ == centerBlockZ) && (zoom == this.zoom) && !vSliceChanged && !grid.isEmpty())
+        if ((blockX == centerBlockX) && (blockZ == centerBlockZ) && (zoom == this.zoom) && !mapTypeChanged && !grid.isEmpty())
         {
             // Nothing needs to change
             return false;
@@ -206,7 +192,6 @@ public class GridRenderer
 
         centerBlockX = blockX;
         centerBlockZ = blockZ;
-        this.vSlice = vSlice;
         this.zoom = zoom;
 
         // Get zoomed tile coords
@@ -218,7 +203,7 @@ public class GridRenderer
         final boolean centerTileChanged = newCenterHash != centerTileHash;
         centerTileHash = newCenterHash;
 
-        if (vSliceChanged || centerTileChanged || grid.isEmpty())
+        if (mapTypeChanged || centerTileChanged || grid.isEmpty())
         {
             // Center on tile
             Tile newCenterTile = findTile(tileX, tileZ, zoom);
@@ -239,12 +224,11 @@ public class GridRenderer
         return true;
     }
 
-    public void updateTiles(MapType mapType, Integer vSlice, int zoom, boolean highQuality, int width, int height, boolean fullUpdate, double xOffset, double yOffset)
+    public void updateTiles(MapType mapType, int zoom, boolean highQuality, int width, int height, boolean fullUpdate, double xOffset, double yOffset)
     {
         updateTilesTimer1.start();
         this.mapType = mapType;
         this.zoom = zoom;
-        this.vSlice = vSlice;
 
         // Update screen dimensions
         updateBounds(width, height);
@@ -313,9 +297,9 @@ public class GridRenderer
             // Update texture only if on-screen
             //if (isOnScreen(pos))
             {
-                if (!tile.hasTexture() || tile.drawSteps.get(0).getMapType() != this.mapType)
+                if (!tile.hasTexture() || tile.drawSteps.get(0).getMapType().equals(this.mapType))
                 {
-                    tile.updateTexture(worldDir, this.mapType, highQuality, vSlice, dimension);
+                    tile.updateTexture(worldDir, this.mapType, highQuality);
                 }
             }
         }
@@ -395,6 +379,7 @@ public class GridRenderer
             double centerZ = offsetZ + centerPixelOffset.y;
             GridSpec gridSpec = showGrid ? gridSpecs.getSpec(mapType) : null;
 
+            boolean somethingDrew = false;
             for (Map.Entry<TilePos, Tile> entry : grid.entrySet())
             {
                 TilePos pos = entry.getKey();
@@ -406,8 +391,16 @@ public class GridRenderer
                 }
                 else
                 {
-                    tile.draw(pos, centerX, centerZ, alpha, gridSpec);
+                    if (tile.draw(pos, centerX, centerZ, alpha, gridSpec))
+                    {
+                        somethingDrew = true;
+                    }
                 }
+            }
+
+            if (!somethingDrew)
+            {
+                RegionImageCache.instance().clear();
             }
         }
 
@@ -575,13 +568,13 @@ public class GridRenderer
 
     private Tile findTile(final int tileX, final int tileZ, final int zoom)
     {
-        return Tile.create(tileX, tileZ, zoom, worldDir, mapType, JourneyMap.getCoreProperties().tileHighDisplayQuality.get(), vSlice, dimension);
+        return Tile.create(tileX, tileZ, zoom, worldDir, mapType, JourneyMap.getCoreProperties().tileHighDisplayQuality.get());
     }
 
-    public void setContext(File worldDir, int dimension)
+    public void setContext(File worldDir, MapType mapType)
     {
         this.worldDir = worldDir;
-        this.dimension = dimension;
+        this.mapType = mapType;
     }
 
     public void updateGL(double rotation)
@@ -640,9 +633,9 @@ public class GridRenderer
         return worldDir;
     }
 
-    public int getDimension()
+    public MapType getMapType()
     {
-        return dimension;
+        return mapType;
     }
 
     public int getZoom()
@@ -652,7 +645,7 @@ public class GridRenderer
 
     public boolean setZoom(int zoom)
     {
-        return center(centerBlockX, vSlice, centerBlockZ, zoom);
+        return center(mapType, centerBlockX, centerBlockZ, zoom);
     }
 
     public int getRenderSize()

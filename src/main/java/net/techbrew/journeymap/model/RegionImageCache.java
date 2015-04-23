@@ -11,7 +11,6 @@ package net.techbrew.journeymap.model;
 import com.google.common.cache.*;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
-import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.io.FileHandler;
@@ -177,12 +176,10 @@ public class RegionImageCache
             ArrayList<RegionCoord> list = new ArrayList<RegionCoord>();
             for (RegionImageSet regionImageSet : getRegionImageSets())
             {
-                for (ImageHolder imageHolder : regionImageSet.imageHolders.get(mapType))
+                ImageHolder imageHolder = regionImageSet.imageHolders.get(mapType);
+                if (imageHolder.getImageTimestamp() > time)
                 {
-                    if (imageHolder.getImageTimestamp() > time)
-                    {
-                        list.add(regionImageSet.getRegionCoordFor(imageHolder));
-                    }
+                    list.add(regionImageSet.getRegionCoord());
                 }
             }
             if (logger.isEnabled(Level.DEBUG))
@@ -220,8 +217,8 @@ public class RegionImageCache
 
     public boolean deleteMap(MapState state, boolean allDims)
     {
-        RegionCoord fakeRc = new RegionCoord(state.getWorldDir(), 0, null, 0, state.getDimension());
-        File imageDir = RegionImageHandler.getImageDir(fakeRc, MapType.day).getParentFile();
+        RegionCoord fakeRc = new RegionCoord(state.getWorldDir(), 0, 0, state.getDimension());
+        File imageDir = RegionImageHandler.getImageDir(fakeRc, MapType.day(state.getDimension())).getParentFile();
         if (!imageDir.getName().startsWith("DIM"))
         {
             logger.error("Expected DIM directory, got " + imageDir);

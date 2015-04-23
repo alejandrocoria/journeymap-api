@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap.cartography;
 
-import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.render.*;
 import net.techbrew.journeymap.io.RegionImageHandler;
@@ -62,11 +61,12 @@ public class ChunkRenderController
             RegionImageSet regionImageSet = RegionImageCache.instance().getRegionImageSet(rCoord);
             if (underground)
             {
-                BufferedImage image = regionImageSet.getChunkImage(cCoord, Constants.MapType.underground);
+                MapType mapType = MapType.underground(vSlice, rCoord.dimension);
+                BufferedImage image = regionImageSet.getChunkImage(cCoord, mapType);
                 if (image != null)
                 {
                     undergroundG2D = RegionImageHandler.initRenderingHints(image.createGraphics());
-                    undergroundG2D.setComposite(BaseRenderer.ALPHA_OPAQUE);
+                    //undergroundG2D.setComposite(BaseRenderer.ALPHA_OPAQUE);
                     switch (rCoord.dimension)
                     {
                         case -1:
@@ -87,14 +87,14 @@ public class ChunkRenderController
 
                     if (renderOkay)
                     {
-                        regionImageSet.setChunkImage(cCoord, Constants.MapType.underground, image);
+                        regionImageSet.setChunkImage(cCoord, mapType, image);
                     }
                 }
             }
             else
             {
-                BufferedImage imageDay = regionImageSet.getChunkImage(cCoord, Constants.MapType.day);
-                BufferedImage imageNight = regionImageSet.getChunkImage(cCoord, Constants.MapType.night);
+                BufferedImage imageDay = regionImageSet.getChunkImage(cCoord, MapType.day(rCoord.dimension));
+                BufferedImage imageNight = regionImageSet.getChunkImage(cCoord, MapType.night(rCoord.dimension));
 
                 if (imageDay != null)
                 {
@@ -112,8 +112,8 @@ public class ChunkRenderController
 
                 if (renderOkay)
                 {
-                    regionImageSet.setChunkImage(cCoord, Constants.MapType.day, imageDay);
-                    regionImageSet.setChunkImage(cCoord, Constants.MapType.night, imageNight);
+                    regionImageSet.setChunkImage(cCoord, MapType.day(rCoord.dimension), imageDay);
+                    regionImageSet.setChunkImage(cCoord, MapType.night(rCoord.dimension), imageNight);
                 }
             }
 

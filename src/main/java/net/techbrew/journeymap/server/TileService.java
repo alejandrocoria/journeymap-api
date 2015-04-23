@@ -12,12 +12,11 @@ import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
-import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WorldData;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
+import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.render.map.Tile;
 import org.apache.logging.log4j.Level;
 import se.rupy.http.Event;
@@ -94,23 +93,23 @@ public class TileService extends FileService
             final int dimension = getParameter(query, "dim", 0);  //$NON-NLS-1$
 
             // Map type
-            final String mapTypeString = getParameter(query, "mapType", Constants.MapType.day.name()); //$NON-NLS-1$
-            Constants.MapType mapType = null;
+            final String mapTypeString = getParameter(query, "mapType", MapType.Name.day.name()); //$NON-NLS-1$
+            MapType.Name mapTypeName = null;
             try
             {
-                mapType = Constants.MapType.valueOf(mapTypeString);
+                mapTypeName = MapType.Name.valueOf(mapTypeString);
             }
             catch (Exception e)
             {
                 String error = "Bad request: mapType=" + mapTypeString; //$NON-NLS-1$
                 throwEventException(400, error, event, true);
             }
-            if (mapType != MapType.underground)
+            if (mapTypeName != MapType.Name.underground)
             {
                 vSlice = null;
             }
 
-            if (mapType == MapType.underground && WorldData.isHardcoreAndMultiplayer())
+            if (mapTypeName == MapType.Name.underground && WorldData.isHardcoreAndMultiplayer())
             {
                 ResponseHeader.on(event).contentType(ContentType.png).noCache();
                 serveFile(RegionImageHandler.getBlank512x512ImageFile(), event);
@@ -132,7 +131,8 @@ public class TileService extends FileService
                 final ChunkCoordIntPair endCoord = new ChunkCoordIntPair(maxChunkX, maxChunkZ);
 
                 boolean showGrid = JourneyMap.getFullMapProperties().showGrid.get();
-                final BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, vSlice, dimension, true, null, Tile.TILESIZE, Tile.TILESIZE, false, showGrid);
+                MapType mapType = new MapType(mapTypeName, vSlice, dimension);
+                final BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, true, null, Tile.TILESIZE, Tile.TILESIZE, false, showGrid);
 
                 ResponseHeader.on(event).contentType(ContentType.png).noCache();
                 serveImage(event, img);

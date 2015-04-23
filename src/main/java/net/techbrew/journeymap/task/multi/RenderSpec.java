@@ -25,14 +25,14 @@ import java.util.concurrent.TimeUnit;
 public class RenderSpec
 {
     private static DecimalFormat decFormat = new DecimalFormat("##.#");
-
-    private final Minecraft minecraft;
+    private static volatile RenderSpec lastSurfaceRenderSpec;
+    private static volatile RenderSpec lastUndergroundRenderSpec;
+    private static Minecraft minecraft = Minecraft.getMinecraft();
     private final EntityPlayer player;
     private final Boolean underground;
     private final int primaryRenderDistance;
     private final int maxSecondaryRenderDistance;
     private final RevealShape revealShape;
-
     private ListMultimap<Integer, Offset> offsets = null;
     private ArrayList<ChunkCoordIntPair> primaryRenderCoords;
     private Comparator<ChunkCoordIntPair> comparator;
@@ -42,9 +42,8 @@ public class RenderSpec
     private int lastTaskChunks;
     private double lastTaskAvgChunkTime;
 
-    RenderSpec(Minecraft minecraft, boolean underground)
+    private RenderSpec(Minecraft minecraft, boolean underground)
     {
-        this.minecraft = minecraft;
         this.player = minecraft.thePlayer;
         final CoreProperties props = JourneyMap.getCoreProperties();
         final int gameRenderDistance = Math.max(1, minecraft.gameSettings.renderDistanceChunks - 1);
@@ -129,6 +128,28 @@ public class RenderSpec
         }
 
         return new ImmutableListMultimap.Builder<Integer, Offset>().putAll(multimap).build();
+    }
+
+    public static RenderSpec getSurfaceSpec()
+    {
+        if (lastSurfaceRenderSpec == null
+                || lastSurfaceRenderSpec.lastPlayerCoord.chunkXPos != minecraft.thePlayer.chunkCoordX
+                || lastSurfaceRenderSpec.lastPlayerCoord.chunkZPos != minecraft.thePlayer.chunkCoordZ)
+        {
+            lastSurfaceRenderSpec = new RenderSpec(minecraft, false);
+        }
+        return lastSurfaceRenderSpec;
+    }
+
+    public static RenderSpec getUndergroundSpec()
+    {
+        if (lastUndergroundRenderSpec == null
+                || lastUndergroundRenderSpec.lastPlayerCoord.chunkXPos != minecraft.thePlayer.chunkCoordX
+                || lastUndergroundRenderSpec.lastPlayerCoord.chunkZPos != minecraft.thePlayer.chunkCoordZ)
+        {
+            lastUndergroundRenderSpec = new RenderSpec(minecraft, true);
+        }
+        return lastUndergroundRenderSpec;
     }
 
     protected Collection<ChunkCoordIntPair> getRenderAreaCoords()
@@ -325,6 +346,12 @@ public class RenderSpec
         result = 31 * result + maxSecondaryRenderDistance;
         result = 31 * result + revealShape.hashCode();
         return result;
+    }
+
+    public void resetRenderSpecs()
+    {
+        lastUndergroundRenderSpec = null;
+        lastSurfaceRenderSpec = null;
     }
 
     public enum RevealShape implements KeyedEnum

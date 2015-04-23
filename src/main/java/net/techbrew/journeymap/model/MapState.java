@@ -11,8 +11,6 @@ package net.techbrew.journeymap.model;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.Feature;
@@ -48,12 +46,12 @@ public class MapState
     StatTimer refreshTimer = StatTimer.get("MapState.refresh");
     StatTimer generateDrawStepsTimer = StatTimer.get("MapState.generateDrawSteps");
     // These must be internally managed
-    private Constants.MapType preferredMapType;
+    private MapType preferredMapType;
     private File worldDir = null;
     private long lastRefresh = 0;
-    private Integer vSlice = null;
+
     private boolean underground = false;
-    private Integer dimension = null;
+
     private boolean caveMappingAllowed = false;
     private List<DrawStep> drawStepList = new ArrayList<DrawStep>();
     private List<DrawWayPointStep> drawWaypointStepList = new ArrayList<DrawWayPointStep>();
@@ -79,18 +77,18 @@ public class MapState
         final MapType lastMapType = getMapType(showCaves);
         lastMapProperties = mapProperties;
 
-        this.preferredMapType = mapProperties.getPreferredMapType().get();
-        this.caveMappingAllowed = FeatureManager.isAllowed(Feature.MapCaves);
-        this.dimension = player.dimension;
         this.underground = DataCache.getPlayer().underground;
-        this.vSlice = this.underground ? player.chunkCoordY : null;
+        Integer vSlice = this.underground ? player.chunkCoordY : null;
+        this.preferredMapType = new MapType(mapProperties.getPreferredMapType().get(), vSlice, player.dimension);
+        this.caveMappingAllowed = FeatureManager.isAllowed(Feature.MapCaves);
+
         this.worldDir = FileHandler.getJMWorldDir(mc);
 
         lastPlayerChunkX = player.chunkCoordX;
         lastPlayerChunkZ = player.chunkCoordZ;
         highQuality = JourneyMap.getCoreProperties().tileHighDisplayQuality.get();
 
-        if (player.dimension != this.dimension)
+        if (player.dimension != this.getCurrentMapType().dimension)
         {
             follow.set(true);
         }
@@ -102,7 +100,7 @@ public class MapState
             }
             else
             {
-                if (getMapType(showCaves) == MapType.underground && lastMapType != MapType.underground)
+                if (lastMapType == null || getMapType(showCaves).isUnderground() != lastMapType.isUnderground())
                 {
                     follow.set(true);
                 }
@@ -116,18 +114,22 @@ public class MapState
         refreshTimer.stop();
     }
 
+    public void setMapType(MapType.Name mapTypeName)
+    {
+        setMapType(MapType.from(mapTypeName, DataCache.getPlayer()));
+    }
+
     public void setMapType(MapType mapType)
     {
-        if (mapType != getCurrentMapType())
+        if (!mapType.equals(getCurrentMapType()))
         {
-            if (mapType != MapType.underground)
+            if (!mapType.isUnderground())
             {
-                lastMapProperties.getPreferredMapType().set(mapType);
+                lastMapProperties.getPreferredMapType().set(mapType.name);
                 lastMapProperties.save();
                 preferredMapType = mapType;
             }
         }
-
 
         requireRefresh();
     }
@@ -142,7 +144,7 @@ public class MapState
     {
         if (underground && caveMappingAllowed && showCaves)
         {
-            return MapType.underground;
+            return MapType.underground(DataCache.getPlayer());
         }
         else
         {
@@ -150,19 +152,10 @@ public class MapState
         }
     }
 
-    public Integer getVSlice()
-    {
-        return vSlice;
-    }
 
     public boolean isUnderground()
     {
         return underground;
-    }
-
-    public int getDimension()
-    {
-        return dimension;
     }
 
     public File getWorldDir()
@@ -299,7 +292,7 @@ public class MapState
             return true;
         }
 
-        if (this.dimension != mc.theWorld.provider.dimensionId)
+        if (this.getCurrentMapType().dimension != player.dimension)
         {
             return true;
         }
@@ -309,7 +302,7 @@ public class MapState
             return true;
         }
 
-        if (this.vSlice != null && (!player.underground || this.vSlice != player.chunkCoordY))
+        if (this.getCurrentMapType().vSlice != null && (!player.underground || this.getCurrentMapType().vSlice != player.chunkCoordY))
         {
             return true;
         }
@@ -345,5 +338,10 @@ public class MapState
     public boolean isCaveMappingAllowed()
     {
         return caveMappingAllowed;
+    }
+
+    public int getDimension()
+    {
+        return getCurrentMapType().dimension;
     }
 }

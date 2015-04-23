@@ -17,6 +17,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.ChatLog;
+import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
@@ -38,8 +39,9 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
 
     public static void initKeyBindings()
     {
+        Minecraft minecraft = Minecraft.getMinecraft();
         HashSet<String> keyDescs = new HashSet<String>();
-        for (KeyBinding existing : Minecraft.getMinecraft().gameSettings.keyBindings)
+        for (KeyBinding existing : minecraft.gameSettings.keyBindings)
         {
             try
             {
@@ -76,6 +78,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
 
     public static boolean onKeypress(boolean minimapOnly)
     {
+        Minecraft minecraft = Minecraft.getMinecraft();
         final int i = Keyboard.getEventKey();
 
         try
@@ -101,12 +104,12 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             }
             else if (Constants.isPressed(Constants.KB_MAP_DAY))
             {
-                MiniMap.state().setMapType(Constants.MapType.day);
+                MiniMap.state().setMapType(MapType.day(minecraft.thePlayer.dimension));
                 return true;
             }
             else if (Constants.isPressed(Constants.KB_MAP_NIGHT))
             {
-                MiniMap.state().setMapType(Constants.MapType.night);
+                MiniMap.state().setMapType(MapType.night(minecraft.thePlayer.dimension));
                 return true;
             }
             else if (Constants.isPressed(Constants.KB_MINIMAP_PRESET))

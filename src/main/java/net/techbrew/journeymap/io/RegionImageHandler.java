@@ -11,9 +11,9 @@ package net.techbrew.journeymap.io;
 
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.Constants;
-import net.techbrew.journeymap.Constants.MapType;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
+import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.model.RegionCoord;
 import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.render.map.TileDrawStep;
@@ -45,9 +45,9 @@ public class RegionImageHandler
     {
         File dimDir = rCoord.dimDir.toFile();
         File subDir = null;
-        if (rCoord.isUnderground())
+        if (mapType.isUnderground())
         {
-            subDir = new File(dimDir, Integer.toString(rCoord.getVerticalSlice()));
+            subDir = new File(dimDir, Integer.toString(mapType.vSlice));
         }
         else
         {
@@ -71,7 +71,7 @@ public class RegionImageHandler
         return dimDir;
     }
 
-    public static File getRegionImageFile(RegionCoord rCoord, Constants.MapType mapType, boolean allowLegacy)
+    public static File getRegionImageFile(RegionCoord rCoord, MapType mapType, boolean allowLegacy)
     {
         StringBuffer sb = new StringBuffer();
         sb.append(rCoord.regionX).append(",").append(rCoord.regionZ).append(".png"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -136,17 +136,12 @@ public class RegionImageHandler
     /**
      * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2).
      */
-    public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final Constants.MapType mapType, Integer vSlice, final int dimension, final Boolean useCache, BufferedImage image, final Integer imageWidth, final Integer imageHeight, final boolean allowNullImage, boolean showGrid)
+    public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final MapType mapType,
+                                                             final Boolean useCache, BufferedImage image, final Integer imageWidth, final Integer imageHeight,
+                                                             final boolean allowNullImage, boolean showGrid)
     {
-
         long start = 0, stop = 0;
         start = System.currentTimeMillis();
-
-        boolean isUnderground = mapType.equals(Constants.MapType.underground);
-        if (!isUnderground)
-        {
-            vSlice = null;
-        }
 
         final int initialWidth = (endCoord.chunkXPos - startCoord.chunkXPos + 1) * 16;
         final int initialHeight = (endCoord.chunkZPos - startCoord.chunkZPos + 1) * 16;
@@ -175,8 +170,8 @@ public class RegionImageHandler
         {
             for (int rz = rz1; rz <= rz2; rz++)
             {
-                rc = new RegionCoord(worldDir, rx, vSlice, rz, dimension);
-                regionImage = cache.getRegionImageSet(rc).getImage(mapType, rc.vSlice);
+                rc = new RegionCoord(worldDir, rx, rz, mapType.dimension);
+                regionImage = cache.getRegionImageSet(rc).getImage(mapType);
 
                 if (regionImage == null)
                 {
@@ -213,7 +208,7 @@ public class RegionImageHandler
             if (showGrid)
             {
 
-                if (mapType == MapType.day)
+                if (mapType.isDay())
                 {
                     g2D.setColor(Color.black);
                     g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.25F));
@@ -268,14 +263,10 @@ public class RegionImageHandler
      * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2).
      */
     public static synchronized List<TileDrawStep> getTileDrawSteps(final File worldDir, final ChunkCoordIntPair startCoord,
-                                                                   final ChunkCoordIntPair endCoord, final Constants.MapType mapType,
-                                                                   Integer zoom, boolean highQuality, Integer vSlice, final int dimension)
+                                                                   final ChunkCoordIntPair endCoord, final MapType mapType,
+                                                                   Integer zoom, boolean highQuality)
     {
-        boolean isUnderground = mapType.equals(Constants.MapType.underground);
-        if (!isUnderground)
-        {
-            vSlice = null;
-        }
+        boolean isUnderground = mapType.isUnderground();
 
         final int rx1 = RegionCoord.getRegionPos(startCoord.chunkXPos);
         final int rx2 = RegionCoord.getRegionPos(endCoord.chunkXPos);
@@ -291,7 +282,7 @@ public class RegionImageHandler
         {
             for (int rz = rz1; rz <= rz2; rz++)
             {
-                rc = new RegionCoord(worldDir, rx, vSlice, rz, dimension);
+                rc = new RegionCoord(worldDir, rx, rz, mapType.dimension);
                 rminCx = Math.max(rc.getMinChunkX(), startCoord.chunkXPos);
                 rminCz = Math.max(rc.getMinChunkZ(), startCoord.chunkZPos);
                 rmaxCx = Math.min(rc.getMaxChunkX(), endCoord.chunkXPos);
