@@ -171,7 +171,7 @@ public class GridRenderer
             if (isOnScreen(entry.getKey()))
             {
                 tile = entry.getValue();
-                if (tile == null || !tile.hasTexture())
+                if (tile == null || !tile.hasTexture(this.mapType))
                 {
                     return true;
                 }
@@ -297,7 +297,7 @@ public class GridRenderer
             // Update texture only if on-screen
             //if (isOnScreen(pos))
             {
-                if (!tile.hasTexture() || tile.drawSteps.get(0).getMapType().equals(this.mapType))
+                if (!tile.hasTexture(this.mapType))
                 {
                     tile.updateTexture(worldDir, this.mapType, highQuality);
                 }

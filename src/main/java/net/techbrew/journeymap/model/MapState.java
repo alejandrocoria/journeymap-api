@@ -72,14 +72,13 @@ public class MapState
     public void refresh(Minecraft mc, EntityClientPlayerMP player, MapProperties mapProperties)
     {
         refreshTimer.start();
-
+        lastMapProperties = mapProperties;
         boolean showCaves = JourneyMap.getFullMapProperties().showCaves.get();
         final MapType lastMapType = getMapType(showCaves);
-        lastMapProperties = mapProperties;
 
         this.underground = DataCache.getPlayer().underground;
         Integer vSlice = this.underground ? player.chunkCoordY : null;
-        this.preferredMapType = new MapType(mapProperties.getPreferredMapType().get(), vSlice, player.dimension);
+        this.preferredMapType = MapType.from(mapProperties.getPreferredMapType().get(), vSlice, player.dimension);
         this.caveMappingAllowed = FeatureManager.isAllowed(Feature.MapCaves);
 
         this.worldDir = FileHandler.getJMWorldDir(mc);
@@ -148,6 +147,10 @@ public class MapState
         }
         else
         {
+            if (preferredMapType == null)
+            {
+                this.preferredMapType = MapType.from(lastMapProperties.getPreferredMapType().get(), DataCache.getPlayer());
+            }
             return preferredMapType;
         }
     }

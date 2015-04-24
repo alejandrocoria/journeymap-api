@@ -89,7 +89,7 @@ public class Tile
         return drawSteps.size() > 1;
     }
 
-    public boolean hasTexture()
+    public boolean hasTexture(MapType mapType)
     {
         if (drawSteps.isEmpty())
         {
@@ -97,7 +97,7 @@ public class Tile
         }
         for (TileDrawStep tileDrawStep : drawSteps)
         {
-            if (!tileDrawStep.hasTexture())
+            if (!tileDrawStep.hasTexture(mapType))
             {
                 return false;
             }

@@ -92,8 +92,10 @@ public class MiniMap
         }
 
         boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || miniMapProperties.showCaves.get());
-        MapType mapType = state.getMapType(showCaves);
         state.refresh(mc, player, miniMapProperties);
+
+        MapType mapType = state.getMapType(showCaves);
+
         int gridSize = miniMapProperties.getSize() <= 768 ? 3 : 5;
         gridRenderer.setGridSize(gridSize);
         gridRenderer.setContext(state.getWorldDir(), mapType);

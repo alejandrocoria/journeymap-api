@@ -42,13 +42,14 @@ public class ChunkCoord
     {
         // There's no real need to synchronize this, it's harmless if there are occasional duplicate puts.  It's primarily
         // just used to reduce heap thrash.
-        ChunkCoord chunkCoord = cache.getIfPresent(toHash(worldDir, mapType, chunkX, chunkZ));
+        int hash = toHash(worldDir, mapType, chunkX, chunkZ);
+        ChunkCoord chunkCoord = cache.getIfPresent(hash);
         if (chunkCoord == null)
         {
-            chunkCoord = new ChunkCoord(worldDir, mapType.vSlice, mapType.dimension, chunkX, chunkZ);
-            cache.put(chunkCoord.hashCode(), chunkCoord);
+            chunkCoord = new ChunkCoord(worldDir, chunkX, mapType.vSlice, chunkZ, mapType.dimension);
+            cache.put(hash, chunkCoord);
         }
-        if (!chunkCoord.mapType.vSlice.equals(mapType.vSlice))
+        if (!Objects.equals(chunkCoord.mapType.vSlice, mapType.vSlice))
         {
             throw new IllegalStateException("ChunkCoord vSlice doesn't match");
         }

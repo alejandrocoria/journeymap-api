@@ -213,8 +213,12 @@ public class TileDrawStep
                 .toString();
     }
 
-    boolean hasTexture()
+    boolean hasTexture(MapType mapType)
     {
+        if (!Objects.equal(this.mapType, mapType))
+        {
+            return false;
+        }
         if (highQuality)
         {
             return scaledTexture != null && scaledTexture.isBound();
