@@ -136,7 +136,9 @@ public class RenderSpec
                 || lastSurfaceRenderSpec.lastPlayerCoord.chunkXPos != minecraft.thePlayer.chunkCoordX
                 || lastSurfaceRenderSpec.lastPlayerCoord.chunkZPos != minecraft.thePlayer.chunkCoordZ)
         {
-            lastSurfaceRenderSpec = new RenderSpec(minecraft, false);
+            RenderSpec newSpec = new RenderSpec(minecraft, false);
+            newSpec.copyLastStatsFrom(lastSurfaceRenderSpec);
+            lastSurfaceRenderSpec = newSpec;
         }
         return lastSurfaceRenderSpec;
     }
@@ -147,9 +149,17 @@ public class RenderSpec
                 || lastUndergroundRenderSpec.lastPlayerCoord.chunkXPos != minecraft.thePlayer.chunkCoordX
                 || lastUndergroundRenderSpec.lastPlayerCoord.chunkZPos != minecraft.thePlayer.chunkCoordZ)
         {
-            lastUndergroundRenderSpec = new RenderSpec(minecraft, true);
+            RenderSpec newSpec = new RenderSpec(minecraft, true);
+            newSpec.copyLastStatsFrom(lastUndergroundRenderSpec);
+            lastUndergroundRenderSpec = newSpec;
         }
         return lastUndergroundRenderSpec;
+    }
+
+    public static void resetRenderSpecs()
+    {
+        lastUndergroundRenderSpec = null;
+        lastSurfaceRenderSpec = null;
     }
 
     protected Collection<ChunkCoordIntPair> getRenderAreaCoords()
@@ -265,9 +275,12 @@ public class RenderSpec
 
     public void copyLastStatsFrom(RenderSpec other)
     {
-        lastTaskChunks = other.lastTaskChunks;
-        lastTaskTime = other.lastTaskTime;
-        lastTaskAvgChunkTime = other.lastTaskAvgChunkTime;
+        if (other != null)
+        {
+            lastTaskChunks = other.lastTaskChunks;
+            lastTaskTime = other.lastTaskTime;
+            lastTaskAvgChunkTime = other.lastTaskAvgChunkTime;
+        }
     }
 
     public String getDebugStats()
@@ -346,12 +359,6 @@ public class RenderSpec
         result = 31 * result + maxSecondaryRenderDistance;
         result = 31 * result + revealShape.hashCode();
         return result;
-    }
-
-    public void resetRenderSpecs()
-    {
-        lastUndergroundRenderSpec = null;
-        lastSurfaceRenderSpec = null;
     }
 
     public enum RevealShape implements KeyedEnum

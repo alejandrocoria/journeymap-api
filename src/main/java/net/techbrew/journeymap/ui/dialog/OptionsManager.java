@@ -499,6 +499,7 @@ public class OptionsManager extends JmUI
             if (category == Config.Category.Cartography)
             {
                 JourneyMap.getCoreProperties().save();
+                RenderSpec.resetRenderSpecs();
             }
         }
     }
@@ -576,6 +577,8 @@ public class OptionsManager extends JmUI
                 break;
             }
         }
+        // todo: move this to something specific for cartography
+        RenderSpec.resetRenderSpecs();
     }
 
     protected boolean previewMiniMap()
@@ -651,6 +654,7 @@ public class OptionsManager extends JmUI
                 }
                 case Cartography:
                 {
+                    RenderSpec.resetRenderSpecs();
                     MapPlayerTask.forceNearbyRemap();
                     break;
                 }
