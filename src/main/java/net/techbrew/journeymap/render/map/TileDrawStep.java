@@ -26,7 +26,7 @@ public class TileDrawStep
     private static final Color bgColor = new Color(0x22, 0x22, 0x22);
 
     private static final Logger logger = JourneyMap.getLogger();
-    private final boolean debug = true || logger.isTraceEnabled();
+    private final boolean debug = logger.isTraceEnabled();
     private final RegionCoord regionCoord;
     private final MapType mapType;
     private final Integer zoom;
