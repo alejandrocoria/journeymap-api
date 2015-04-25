@@ -330,7 +330,6 @@ public class FileService extends BaseService
         {
             event.reply().code("404 Not Found");
         }
-
     }
 
     /**

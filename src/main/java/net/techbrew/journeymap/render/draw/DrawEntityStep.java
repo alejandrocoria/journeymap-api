@@ -9,7 +9,11 @@
 package net.techbrew.journeymap.render.draw;
 
 import com.google.common.cache.CacheLoader;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.scoreboard.ScorePlayerTeam;
+import net.minecraft.scoreboard.Team;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.render.map.GridRenderer;
@@ -23,22 +27,24 @@ import java.awt.geom.Point2D;
  */
 public class DrawEntityStep implements DrawStep
 {
-    static final Color labelBg = Color.darkGray.darker();
-    static final int labelBgAlpha = 205;
+    static final Color labelBg = Color.black;
+    static final int labelBgAlpha = 180;
     static final Color labelFg = Color.white;
     static final int labelFgAlpha = 225;
     boolean hideSneaks = JourneyMap.getCoreProperties().hideSneakingEntities.get();
     boolean showHeading = true;
-
+    Minecraft minecraft = Minecraft.getMinecraft();
     EntityDTO entityDTO;
     TextureImpl texture;
     TextureImpl locatorTexture;
+    EntityLivingBase entityLiving;
     boolean flip;
 
     private DrawEntityStep(EntityDTO entityDTO)
     {
         super();
         this.entityDTO = entityDTO;
+        this.entityLiving = entityDTO.entityLiving;
     }
 
     public void update(boolean flip, TextureImpl locatorTexture, TextureImpl texture, boolean showHeading)
@@ -52,7 +58,9 @@ public class DrawEntityStep implements DrawStep
     @Override
     public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
-        if (entityDTO.entityLiving == null || entityDTO.entityLiving.isDead || !entityDTO.entityLiving.addedToChunk || (hideSneaks && entityDTO.entityLiving.isSneaking()))
+
+        if (entityLiving == null || entityLiving.isDead || entityLiving.isInvisibleToPlayer(minecraft.thePlayer)
+                || !entityLiving.addedToChunk || (hideSneaks && entityLiving.isSneaking()))
         {
             return;
         }
@@ -64,55 +72,72 @@ public class DrawEntityStep implements DrawStep
             double drawX = pixel.getX() + xOffset;
             double drawY = pixel.getY() + yOffset;
 
+            float alpha = 1f;
+            if (entityLiving.posY > minecraft.thePlayer.posY)
+            {
+                alpha = 1f - Math.max(.1f, (float) ((entityLiving.posY - minecraft.thePlayer.posY) / 32f));
+            }
+
             if (entityDTO.entityLiving instanceof EntityPlayer)
             {
                 int blockSize = (int) Math.pow(2, gridRenderer.getZoom());
                 float labelOffset = texture != null ? texture.getHeight() / blockSize : 0;
-                drawPlayer(drawX, drawY, gridRenderer, heading, drawScale, fontScale, rotation);
+                drawPlayer(drawX, drawY, gridRenderer, alpha, heading, drawScale, fontScale, rotation);
 
             }
             else
             {
-                drawCreature(drawX, drawY, gridRenderer, heading, drawScale, fontScale, rotation);
+                drawCreature(drawX, drawY, gridRenderer, alpha, heading, drawScale, fontScale, rotation);
             }
         }
     }
 
-    private void drawPlayer(double drawX, double drawY, GridRenderer gridRenderer, double heading, float drawScale, double fontScale, double rotation)
+    private void drawPlayer(double drawX, double drawY, GridRenderer gridRenderer, float alpha, double heading, float drawScale, double fontScale, double rotation)
     {
         if (locatorTexture != null && showHeading)
         {
-            DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, drawScale, rotation);
+            DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, alpha, drawScale, rotation);
         }
 
         if (texture != null)
         {
-            DrawUtil.drawEntity(drawX, drawY, heading, true, texture, drawScale * .75f, rotation);
+            DrawUtil.drawEntity(drawX, drawY, heading, true, texture, alpha, drawScale * .75f, rotation);
         }
         int labelOffset = texture == null ? 0 : rotation == 0 ? -texture.getHeight() / 2 : texture.getHeight() / 2;
         Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, -labelOffset);
 
-        DrawUtil.drawLabel(entityDTO.entityLiving.getCommandSenderName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 205, Color.green, 255, fontScale, false, rotation);
-        //DrawUtil.drawCenteredLabel(entityDTO.entityLiving.getCommandSenderName(), drawX, drawY - labelOffset, Color.black, 205, Color.green, 255, fontScale, rotation);
+        Team team = entityLiving.getTeam();
+        if (team == null || !(entityLiving instanceof EntityPlayer))
+        {
+            DrawUtil.drawLabel(entityDTO.entityLiving.getCommandSenderName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 205, Color.green, 255, fontScale, false, rotation);
+        }
+        else
+        {
+            String playerName = ScorePlayerTeam.formatPlayerName(entityLiving.getTeam(), ((EntityPlayer) entityLiving).getDisplayName());
+            DrawUtil.drawLabel(playerName, labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 205, Color.white, 255, fontScale, false, rotation);
+        }
     }
 
-    private void drawCreature(double drawX, double drawY, GridRenderer gridRenderer, double heading, float drawScale, double fontScale, double rotation)
+    private void drawCreature(double drawX, double drawY, GridRenderer gridRenderer, float alpha, double heading, float drawScale, double fontScale, double rotation)
     {
+        Math.min(1f, Math.max(0f, (float) (16 - (entityLiving.posY - minecraft.thePlayer.posY))));
+
         if (locatorTexture != null && showHeading)
         {
-            DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, drawScale, rotation);
+            DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, alpha, drawScale, rotation);
+        }
+
+        int labelOffset = texture == null ? 8 : rotation == 0 ? texture.getHeight() : -texture.getHeight();
+        //entityDTO.customName = EnumChatFormatting.LIGHT_PURPLE  + entityDTO.entityLiving.getCommandSenderName(); // TODO REMOVE
+        if (entityDTO.customName != null)
+        {
+            Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, labelOffset);
+            DrawUtil.drawCenteredLabel(entityDTO.customName, labelPoint.getX(), labelPoint.getY(), labelBg, labelBgAlpha, Color.white, labelFgAlpha, fontScale, rotation);
         }
 
         if (texture != null)
         {
-            DrawUtil.drawEntity(drawX, drawY, heading, true, texture, drawScale, rotation);
-        }
-
-        int labelOffset = texture == null ? 8 : rotation == 0 ? texture.getHeight() : -texture.getHeight();
-        if (entityDTO.customName != null)
-        {
-            Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, labelOffset);
-            DrawUtil.drawCenteredLabel(entityDTO.customName, labelPoint.getX(), labelPoint.getY(), labelBg, labelBgAlpha, labelFg, labelFgAlpha, fontScale, rotation);
+            DrawUtil.drawEntity(drawX, drawY, heading, true, texture, alpha, drawScale, rotation);
         }
     }
 

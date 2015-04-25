@@ -90,7 +90,7 @@ public class RadarDrawStepFactory
                         // Draw entity icon and label
                         if (isPlayer)
                         {
-                            entityIcon = tc.getPlayerSkin(dto.username);
+                            entityIcon = tc.getPlayerSkin(dto.entityLiving.getCommandSenderName());
                             DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(dto);
                             drawStep.update(false, locatorImg, entityIcon, showPlayerHeading);
                             drawStepList.add(drawStep);

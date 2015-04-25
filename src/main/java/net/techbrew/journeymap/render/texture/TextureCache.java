@@ -8,6 +8,8 @@
 
 package net.techbrew.journeymap.render.texture;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.StringUtils;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
@@ -22,6 +24,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -413,7 +416,7 @@ public class TextureCache
             {
                 // Create blank to return immediately
                 BufferedImage blank = new BufferedImage(24, 24, BufferedImage.TYPE_INT_ARGB);
-                tex = new TextureImpl(blank, true);
+                tex = new TextureImpl(null, blank, true, false);
                 playerSkins.put(username, tex);
             }
         }
@@ -426,38 +429,66 @@ public class TextureCache
             @Override
             public Void call() throws Exception
             {
-                BufferedImage img = null;
-                try
-                {
-                    URL url = new URL("http://s3.amazonaws.com/MinecraftSkins/" + username + ".png");
-                    img = ImageIO.read(url).getSubimage(8, 8, 8, 8);
-                }
-                catch (Throwable e)
-                {
-                    try
-                    {
-                        URL url = new URL("http://s3.amazonaws.com/MinecraftSkins/char.png");
-                        img = ImageIO.read(url).getSubimage(8, 8, 8, 8);
-                    }
-                    catch (Throwable e2)
-                    {
-                        JourneyMap.getLogger().warn("Can't get skin image for " + username + ": " + e2.getMessage());
-                    }
-                }
-
+                BufferedImage img = downloadSkin(username);
                 if (img != null)
                 {
                     final BufferedImage scaledImage = new BufferedImage(24, 24, img.getType());
                     final Graphics2D g = RegionImageHandler.initRenderingHints(scaledImage.createGraphics());
                     g.drawImage(img, 0, 0, 24, 24, null);
                     g.dispose();
-                    playerSkinTex.updateAndBind(scaledImage);
+                    playerSkinTex.setImage(scaledImage, true);
                 }
                 return null;
             }
         });
 
         return playerSkinTex;
+    }
+
+    /**
+     * Blocks.  Use this in a thread.
+     */
+    protected BufferedImage downloadSkin(String username)
+    {
+        BufferedImage img = null;
+        HttpURLConnection conn = null;
+        try
+        {
+
+            String skinPath = String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", StringUtils.stripControlCodes(username));
+            URL url = new URL(skinPath);
+            conn = (HttpURLConnection) url.openConnection(Minecraft.getMinecraft().getProxy());
+            HttpURLConnection.setFollowRedirects(true);
+            conn.setInstanceFollowRedirects(true);
+            conn.setDoInput(true);
+            conn.setDoOutput(false);
+            conn.connect();
+            if (conn.getResponseCode() / 100 == 2) // can't get input stream before response code available
+            {
+                img = ImageIO.read(conn.getInputStream()).getSubimage(8, 8, 8, 8);
+            }
+            else if (conn.getResponseCode() != 404)
+            {
+                JourneyMap.getLogger().warn("Bad Response getting skin image for " + username + ": " + conn.getResponseCode());
+            }
+        }
+        catch (Throwable e)
+        {
+            JourneyMap.getLogger().warn("Error getting skin image for " + username + ": " + e.getMessage());
+        }
+        finally
+        {
+            if (conn != null)
+            {
+                conn.disconnect();
+            }
+        }
+
+        if (img == null && !username.equals("char"))
+        {
+            return downloadSkin("char"); // Steve
+        }
+        return img;
     }
 
     public void purge()

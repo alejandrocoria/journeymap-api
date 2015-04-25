@@ -81,7 +81,7 @@ public class EntityDTO implements Serializable
         // Player check
         if (entity instanceof EntityPlayer)
         {
-            this.filename = "/skin/" + ((EntityPlayer) entity).getDisplayName();
+            this.filename = "/skin/" + StringUtils.stripControlCodes(entity.getCommandSenderName());
             this.username = ((EntityPlayer) entity).getDisplayName();
         }
         else

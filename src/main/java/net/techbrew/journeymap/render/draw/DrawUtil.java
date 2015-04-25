@@ -232,6 +232,11 @@ public class DrawUtil
         return fr.FONT_HEIGHT + (2 * vpad);
     }
 
+    private static void drawQuad(TextureImpl texture, float alpha, final double x, final double y, final double width, final double height, boolean flip, double rotation)
+    {
+        drawQuad(texture, x, y, width, height, rotation, null, alpha, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+    }
+
     private static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, boolean flip, double rotation)
     {
         drawQuad(texture, x, y, width, height, rotation, null, 1f, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
@@ -380,6 +385,11 @@ public class DrawUtil
         tessellator.draw();
     }
 
+    public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float alpha, float scale, double rotation)
+    {
+        drawQuad(texture, alpha, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), flip, rotation);
+    }
+
     public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float scale, double rotation)
     {
         drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), flip, rotation);
@@ -417,6 +427,21 @@ public class DrawUtil
      */
     public static void drawEntity(double x, double y, double heading, boolean flipInsteadOfRotate, TextureImpl texture, float scale, double rotation)
     {
+        drawEntity(x, y, heading, flipInsteadOfRotate, texture, 1f, scale, rotation);
+    }
+
+    /**
+     * Draw the entity's location and heading on the overlay image
+     * using the provided icon.
+     *
+     * @param x
+     * @param y
+     * @param heading
+     * @param flipInsteadOfRotate
+     * @param texture
+     */
+    public static void drawEntity(double x, double y, double heading, boolean flipInsteadOfRotate, TextureImpl texture, float alpha, float scale, double rotation)
+    {
         // Adjust to scale
         double width = (texture.getWidth() * scale);
         double height = (texture.getHeight() * scale);
@@ -426,18 +451,17 @@ public class DrawUtil
         if (flipInsteadOfRotate)
         {
             boolean flip = (heading % 180) < 90;
-            drawImage(texture, drawX, drawY, flip, scale, -rotation);
+            drawImage(texture, drawX, drawY, flip, alpha, scale, -rotation);
         }
         else
         {
             // Draw texture in rotated position
-            drawImage(texture, drawX, drawY, false, scale, heading);
+            drawImage(texture, drawX, drawY, false, alpha, scale, heading);
         }
     }
 
     public static void sizeDisplay(double width, double height)
     {
-
         GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
