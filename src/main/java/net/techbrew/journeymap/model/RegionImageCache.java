@@ -177,7 +177,7 @@ public class RegionImageCache
             for (RegionImageSet regionImageSet : getRegionImageSets())
             {
                 ImageHolder imageHolder = regionImageSet.imageHolders.get(mapType);
-                if (imageHolder.getImageTimestamp() > time)
+                if (imageHolder != null && imageHolder.getImageTimestamp() > time)
                 {
                     list.add(regionImageSet.getRegionCoord());
                 }
