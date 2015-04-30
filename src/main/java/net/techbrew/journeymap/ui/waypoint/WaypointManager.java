@@ -35,16 +35,16 @@ public class WaypointManager extends JmUI
     final static String ASCEND = "\u25B2";
     final static String DESCEND = "\u25BC";
     final static int COLWAYPOINT = 0;
-    protected int colWaypoint = COLWAYPOINT;
     final static int COLLOCATION = 20;
-    protected int colLocation = COLLOCATION;
     final static int COLNAME = 60;
-    protected int colName = COLNAME;
     final static int DEFAULT_ITEMWIDTH = 460;
-    protected int itemWidth = DEFAULT_ITEMWIDTH;
     private static WaypointManagerItem.Sort currentSort;
     private final String on = Constants.getString("jm.common.on");
     private final String off = Constants.getString("jm.common.off");
+    protected int colWaypoint = COLWAYPOINT;
+    protected int colLocation = COLLOCATION;
+    protected int colName = COLNAME;
+    protected int itemWidth = DEFAULT_ITEMWIDTH;
     protected ScrollListPane itemScrollPane;
     protected int rowHeight = 16;
     Boolean canUserTeleport;
@@ -570,16 +570,17 @@ public class WaypointManager extends JmUI
 
     protected void refreshAndClose()
     {
-        bottomButtons.setEnabled(false);
-        WaypointStore.instance().bulkSave();
-        //DataCache.instance().getWaypoints(true);
-        Fullscreen.state().requireRefresh();
         closeAndReturn();
     }
 
     @Override
     protected void closeAndReturn()
     {
+        bottomButtons.setEnabled(false);
+        WaypointStore.instance().bulkSave();
+        Fullscreen.state().requireRefresh();
+        bottomButtons.setEnabled(true);
+
         if (returnDisplay == null)
         {
             UIManager.getInstance().closeAll();
