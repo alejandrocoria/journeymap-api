@@ -190,6 +190,7 @@ jm.common.show_caves=Show Caves
 jm.common.show_caves.tooltip=Show cave maps when underground or indoors
 jm.common.show_grid=Show Grid
 jm.common.show_grid.tooltip=Show a grid of chunk boundaries on the map
+jm.common.show_grid_shift.tooltip=Hold Shift to edit
 jm.common.show_mobs=Show Mobs
 jm.common.show_mobs.tooltip=Nearby hostile mobs are shown on the map
 jm.common.show_pets=Show Pets

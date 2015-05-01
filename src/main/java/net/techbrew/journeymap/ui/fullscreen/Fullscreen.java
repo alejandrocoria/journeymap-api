@@ -472,6 +472,22 @@ public class Fullscreen extends JmUI
             buttonPlayers.setDrawButton(!mc.isSingleplayer() && FeatureManager.isAllowed(Feature.RadarPlayers));
 
             buttonGrid = new ThemeToggle(theme, "jm.common.show_grid", "grid", fullMapProperties, fullMapProperties.showGrid);
+            buttonGrid.setTooltip(EnumChatFormatting.GRAY.toString() + Constants.getString("jm.common.show_grid_shift.tooltip"));
+            buttonGrid.addToggleListener(new OnOffButton.ToggleListener()
+            {
+                @Override
+                public boolean onToggle(OnOffButton button, boolean toggled)
+                {
+                    boolean shiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
+                    if (shiftDown)
+                    {
+                        UIManager.getInstance().openGridEditor(Fullscreen.this);
+                        buttonGrid.setPropertyValue(true);
+                        return false;
+                    }
+                    return true;
+                }
+            });
 
             // Toolbars
             mapTypeToolbar = new ThemeToolbar(theme, buttonCaves, buttonNight, buttonDay);
