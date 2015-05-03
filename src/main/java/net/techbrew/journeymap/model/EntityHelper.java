@@ -19,7 +19,6 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.INpc;
 import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.EntityAnimal;
@@ -107,7 +106,7 @@ public class EntityHelper
         return getEntitiesNearby("getAnimalsNearby", JourneyMap.getCoreProperties().maxAnimalsData.get(), false, EntityAnimal.class, EntityGolem.class, EntityWaterMob.class);
     }
 
-    public static boolean isPassiveAnimal(EntityLiving entityLiving)
+    public static boolean isPassive(EntityLiving entityLiving)
     {
         if (entityLiving == null)
         {
@@ -115,11 +114,6 @@ public class EntityHelper
         }
 
         if (entityLiving instanceof IMob)
-        {
-            return false;
-        }
-
-        if (entityLiving instanceof INpc)
         {
             return false;
         }

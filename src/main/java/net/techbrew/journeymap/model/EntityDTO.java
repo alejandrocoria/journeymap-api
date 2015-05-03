@@ -154,7 +154,7 @@ public class EntityDTO implements Serializable
 
             // Passive check
 
-            if (EntityHelper.isPassiveAnimal((EntityLiving) entity))
+            if (EntityHelper.isPassive((EntityLiving) entity))
             {
                 passive = true;
             }
