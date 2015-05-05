@@ -120,7 +120,17 @@ public class IconLoader
             BlockDoublePlant blockDoublePlant = ((BlockDoublePlant) blockMD.getBlock());
 
             // Get the top icon
-            blockIcon = blockDoublePlant.func_149888_a(true, blockMD.meta & BlockDoublePlant.field_149892_a.length);
+            try
+            {
+                blockIcon = blockDoublePlant.func_149888_a(true, blockMD.meta & BlockDoublePlant.field_149892_a.length);
+            }
+            catch (Throwable t)
+            {
+                logger.warn(blockMD + " trying BlockDoublePlant.func_149888_a(true, " + (blockMD.meta & BlockDoublePlant.field_149892_a.length) + " throws exception: " + t);
+                int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
+                blockIcon = blockDoublePlant.getIcon(side, blockMD.meta);
+            }
+
             if (blockIcon.getIconName().contains("sunflower"))
             {
                 // Sunflower front
