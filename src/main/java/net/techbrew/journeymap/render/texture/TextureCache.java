@@ -225,6 +225,11 @@ public class TextureCache
         return getNamedTexture(Name.UnknownEntity, "unknown.png", true); //$NON-NLS-1$
     }
 
+    public TextureImpl getBrick()
+    {
+        return getNamedTexture(Name.Brick, "brick.png", true); //$NON-NLS-1$
+    }
+
     public TextureImpl getGrid(Name name)
     {
         switch (name)
@@ -526,7 +531,7 @@ public class TextureCache
         MinimapSmallSquare, MinimapMediumSquare, MinimapLargeSquare, MinimapCustomSquare, MinimapSmallCircle,
         MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, Patreon, LocatorHostile,
         LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, ColorPicker, UnknownEntity,
-        GridSquares, GridDots, GridCheckers,
+        GridSquares, GridDots, GridCheckers, Brick,
         TileSampleDay, TileSampleNight, TileSampleUnderground
     }
 

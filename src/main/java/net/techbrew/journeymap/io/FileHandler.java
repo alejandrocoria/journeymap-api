@@ -13,6 +13,7 @@ import com.google.common.base.Joiner;
 import com.google.common.io.ByteSink;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
+import com.google.gson.GsonBuilder;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -370,6 +371,37 @@ public class FileHandler
             JourneyMap.getLogger().error(error);
             return null;
         }
+    }
+
+    public static <M> M getMessageModel(Class<M> model, String filePrefix)
+    {
+        try
+        {
+            String lang = Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode();
+            InputStream is = getMessageModelInputStream(filePrefix, lang);
+            if (is == null && !lang.equals("en_US"))
+            {
+                is = getMessageModelInputStream(filePrefix, "en_US");
+            }
+            if (is == null)
+            {
+                JourneyMap.getLogger().warn("Message file not found: " + filePrefix);
+                return null;
+            }
+            return new GsonBuilder().create().fromJson(new InputStreamReader(is), model);
+        }
+        catch (Throwable e)
+        {
+            String error = "Could not get Message model " + filePrefix + ": " + (e.getMessage());
+            JourneyMap.getLogger().error(error);
+            return null;
+        }
+    }
+
+    public static InputStream getMessageModelInputStream(String filePrefix, String lang)
+    {
+        String file = String.format("/assets/journeymap/lang/message/%s-%s.json", filePrefix, lang);
+        return JourneyMap.class.getResourceAsStream(file);
     }
 
     public static File getWorldConfigDir(boolean fallbackToStandardConfigDir)

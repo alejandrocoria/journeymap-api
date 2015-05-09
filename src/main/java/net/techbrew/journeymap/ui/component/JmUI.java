@@ -37,7 +37,7 @@ public abstract class JmUI extends GuiScreen
     protected final String title;
     protected final int headerHeight = 35;
     protected final Logger logger = JourneyMap.getLogger();
-    protected final JmUI returnDisplay;
+    protected JmUI returnDisplay;
     protected int scaleFactor = 1;
     protected TextureImpl logo = TextureCache.instance().getLogo();
 
@@ -133,7 +133,8 @@ public abstract class JmUI extends GuiScreen
     protected void drawTitle()
     {
         DrawUtil.drawRectangle(0, 0, this.width, headerHeight, Color.black, 100);
-        DrawUtil.drawCenteredLabel(this.title, this.width / 2, 12, Color.black, 0, Color.CYAN, 255, 1, 0);
+        DrawUtil.drawLabel(this.title, this.width / 2, headerHeight / 2, DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle,
+                Color.black, 0, Color.CYAN, 255, 1, true, 0);
     }
 
     @Override
@@ -212,9 +213,11 @@ public abstract class JmUI extends GuiScreen
 
     protected void closeAndReturn()
     {
+        JourneyMap.getCoreProperties().splashViewed.set(JourneyMap.JM_VERSION.toString());
+
         if (returnDisplay == null)
         {
-            UIManager.getInstance().openOptionsManager();
+            UIManager.getInstance().openFullscreenMap();
         }
         else
         {
