@@ -28,3 +28,6 @@ src/minecraft/paulscode/
 !src/minecraft/net/techbrew/
 
 /temp/
+.gradle/
+gradle/
+tmp/

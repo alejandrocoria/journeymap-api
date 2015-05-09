@@ -3,17 +3,17 @@
   "modList": [{
     "modid": "journeymap",
     "name": "JourneyMap",
-    "description": "JourneyMap @EDITION@ Edition: Real-time map in-game or in a web browser as you explore.",
-    "version": "@JMVERSION@",
-    "mcversion": "@MCVERSION@",
+    "description": "JourneyMap ${jmedition} Edition: Real-time map in-game or in a web browser as you explore.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
     "url": "http://journeymap.techbrew.net",
     "updateUrl": "",
     "authorList": ["techbrew"],
     "logoFile": "assets/journeymap/web/img/ico/journeymap144.png",
     "screenshots": [],
     "dependants":[],
-    "dependencies": ["Forge@[@FORGEVERSION@,)"],
-    "requiredMods": ["Forge@[@FORGEVERSION@,)"],
+    "dependencies": ["Forge@[${forgeversion},)"],
+    "requiredMods": ["Forge@[${forgeversion},)"],
     "useDependencyInformation": true
   }]
 }

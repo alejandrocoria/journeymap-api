@@ -16,48 +16,155 @@ buildscript {
 }
 
 apply plugin: 'forge'
+apply plugin: 'java'
 
-version = "@JMVERSION@"
-group = "net.techbrew.journeymap" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "journeymap"
+ext {
+    configFile = file "project.properties"
+    jsSourceDir = "src/main/resources/assets/journeymap/web/js"
+    cssSourceDir = "src/main/resources/assets/journeymap/web/css"
+}
+
+configFile.withReader {
+    def prop = new Properties()
+    prop.load(it)
+    project.ext.config = new ConfigSlurper().parse prop
+}
+
+version = "${config.jm_major}.${config.jm_minor}.${config.jm_micro}${config.jm_patch}"
+group = "${config.group_id}"
+archivesBaseName = "${config.mod_id}"
 
 minecraft {
-    version = "@MCVERSION@-@FORGEVERSION@"
+    version = "${config.minecraft_version}-${config.forge_version}"
     runDir = "eclipse"
+
+    replace "@JMVERSION@", version
+    replace "@MCVERSION@", config.minecraft_version
+    replace "@FORGEVERSION@", config.forge_version
+    replace "@MAJOR@", config.jm_major
+    replace "@MINOR@", config.jm_minor
+    replace "@MICRO@", config.jm_micro
+    replace "@PATCH@", config.jm_patch
 }
 
 dependencies {
-    // you may put jars on which you depend on in ./libs
-    // or you may define them like so..
-    //compile "some.group:artifact:version:classifier"
-    //compile "some.group:artifact:version"
-
-    // real examples
-    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
-    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
-
-    // for more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
-
+    compile files('lib/[1.7.2]ReiMinimap_v3.4_03beta.zip')
+    compile files('lib/voxelmap-1.7.2-1.0.jar')
 }
 
-processResources
-        {
-            // this will ensure that this task is redone when the versions change.
-            inputs.property "version", project.version
-            inputs.property "mcversion", project.minecraft.version
+processResources {
+        // this will ensure that this task is redone when the versions change.
+        inputs.property "version", project.version
+        inputs.property "mcversion", project.minecraft.version
 
-            // replace stuff in mcmod.info, nothing else
-            from(sourceSets.main.resources.srcDirs) {
-                include 'mcmod.info'
-
-                // replace version and mcversion
-                expand 'version': project.version, 'mcversion': project.minecraft.version
-            }
-
-            // copy everything else, thats not the mcmod.info
-            from(sourceSets.main.resources.srcDirs) {
-                exclude 'mcmod.info'
-            }
+        from(sourceSets.main.resources.srcDirs) {
+            include 'license.txt'
+            expand 'version': project.version, 'mcversion': project.minecraft.version, 'date' : getDate()
         }
+        // copy everything else, thats not the mcmod.info
+        from(sourceSets.main.resources.srcDirs) {
+            exclude 'mcmod.info'
+            exclude 'license.txt'
+        }
+}
+
+task copyJs(type: Copy) {
+    from 'tmp'
+    into 'build/resources/main/assets/journeymap/web/css'
+    include 'journeymap.css' 
+}
+
+task copyCss(type: Copy, dependsOn: copyJs) {
+    from 'tmp'
+    into 'build/resources/main/assets/journeymap/web/js'
+    include 'journeymap.js'
+}
+
+task filter() {
+    def subdir = new File("tmp")
+
+    if( !subdir.exists() ) {
+        subdir.mkdirs()
+    }
+}
+
+task minifyJs(type: JavaExec, dependsOn: filter) { 
+    ant.java(jar:"lib/yuicompressor-2.4.7.jar",fork:true) 
+    {
+        arg(value: "${jsSourceDir}/journeymap.js")
+        arg(value: "-o")
+        arg(value: "tmp/journeymap.js")
+    }
+}
+
+task minifyCss(type: JavaExec, dependsOn: filter) {
+    ant.java(jar:"lib/yuicompressor-2.4.7.jar",fork:true) 
+    {
+        arg(value: "${cssSourceDir}/journeymap.css")
+        arg(value: "-o")
+        arg(value: "tmp/journeymap.css")
+    }
+}
+
+
+
+
+task unlimitedJar(type: Jar, dependsOn: copyCss) {
+    baseName = archivesBaseName + version + "_${config.unlimited}_" + config.minecraft_version
+    version = ""
+    from(sourceSets.main.output) {
+        exclude("net/techbrew/journeymap/feature/impl/NoRadar.class")
+    }
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion' : config.forge_version, jmedition : config.unlimited
+    }
+}
+
+task noRadarJar(type: Jar, dependsOn: copyCss) {
+    baseName = archivesBaseName + version + "_${config.noRadar}_" + config.minecraft_version
+    version = ""
+    from(sourceSets.main.output) { 
+        exclude("net/techbrew/journeymap/feature/impl/Unlimited.class")
+    }
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion' : config.forge_version, jmedition : config.noRadar
+    }
+}
+
+task fairPlayJar(type: Jar, dependsOn: copyCss) {
+    baseName = archivesBaseName + version + "_${config.fairPlay}_" + config.minecraft_version
+    version = ""
+    from(sourceSets.main.output) {
+        exclude("net/techbrew/journeymap/feature/impl/Unlimited.class")
+        exclude("net/techbrew/journeymap/feature/impl/NoRadar.class")
+    }
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion' : config.forge_version, jmedition : config.fairPlay
+
+    }
+}
+
+reobf { 
+    reobf noRadarJar
+    reobf unlimitedJar
+    reobf fairPlayJar
+}
+
+task makePretty(type: Delete) {
+
+    def defaultArtifact = "build/libs/${config.mod_id}-${config.jm_major}.${config.jm_minor}.${config.jm_micro}${config.jm_patch}.jar"
+
+    if (file(defaultArtifact).exists() ) {
+        delete defaultArtifact
+    }
+   
+}
+
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyyy-MM-dd-HH:mm:ss')
+    return formattedDate
+}
