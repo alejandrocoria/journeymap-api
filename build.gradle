@@ -19,9 +19,9 @@ apply plugin: 'forge'
 apply plugin: 'java'
 
 ext {
-    configFile = file "project.properties"
-    jsSourceDir = "src/main/resources/assets/journeymap/web/js"
-    cssSourceDir = "src/main/resources/assets/journeymap/web/css"
+    configFile = file "project.properties/"
+    srcWebDir = "src/main/resources/assets/journeymap/web/"
+    implSrc = "build/resources/java/net/techbrew/journeymap/feature/impl/"
 }
 
 configFile.withReader {
@@ -30,9 +30,9 @@ configFile.withReader {
     project.ext.config = new ConfigSlurper().parse prop
 }
 
-version = "${config.jm_major}.${config.jm_minor}.${config.jm_micro}${config.jm_patch}"
+version = "${config.minecraft_version}-${config.jm_major}.${config.jm_minor}.${config.jm_micro}${config.jm_patch}"
 group = "${config.group_id}"
-archivesBaseName = "${config.mod_id}"
+archivesBaseName = "${config.mod_id}".toLowerCase()
 
 minecraft {
     version = "${config.minecraft_version}-${config.forge_version}"
@@ -64,6 +64,7 @@ processResources {
         // copy everything else, thats not the mcmod.info
         from(sourceSets.main.resources.srcDirs) {
             exclude 'mcmod.info'
+            exclude 'license.txt'
         }
 }
 
@@ -90,7 +91,7 @@ task filter() {
 task minifyJs(type: JavaExec, dependsOn: filter) { 
     ant.java(jar:"lib/yuicompressor-2.4.7.jar",fork:true) 
     {
-        arg(value: "${jsSourceDir}/journeymap.js")
+        arg(value: "${srcWebDir}js/journeymap.js")
         arg(value: "-o")
         arg(value: "tmp/journeymap.js")
     }
@@ -99,23 +100,22 @@ task minifyJs(type: JavaExec, dependsOn: filter) {
 task minifyCss(type: JavaExec, dependsOn: filter) {
     ant.java(jar:"lib/yuicompressor-2.4.7.jar",fork:true) 
     {
-        arg(value: "${cssSourceDir}/journeymap.css")
+        arg(value: "${srcWebDir}css/journeymap.css")
         arg(value: "-o")
         arg(value: "tmp/journeymap.css")
     }
 }
 
 task deleteNoRadar(type: Delete) {
-    delete 'build/resources/java/net/techbrew/journeymap/feature/impl/NoRadar.java'
+    delete '${implSrc}NoRadar.java'
 }
 
 task deleteUnlimited(type: Delete) {
-    delete 'build/resources/java/net/techbrew/journeymap/feature/impl/Unlimited.java'
+    delete '${implSrc}Unlimited.java'
 }
 
 task unlimitedJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar']) {
-    baseName = archivesBaseName + version + "_${config.unlimited}_" + config.minecraft_version
-    version = ""
+    version = "${version}-${config.unlimited}".toLowerCase()
 
     from(sourceSets.main.output) {
         exclude("net/techbrew/journeymap/feature/impl/NoRadar.class")
@@ -126,21 +126,8 @@ task unlimitedJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar']) {
     }
 }
 
-// task noRadarJar(type: Jar, dependsOn: copyCss) {
-//     baseName = archivesBaseName + version + "_${config.noRadar}_" + config.minecraft_version
-//     version = ""
-//     from(sourceSets.main.output) { 
-//         exclude("net/techbrew/journeymap/feature/impl/Unlimited.class")
-//     }
-//     from(sourceSets.main.resources.srcDirs) {
-//         include 'mcmod.info'
-//         expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion' : config.forge_version, jmedition : config.noRadar
-//     }
-// }
-
 task fairPlayJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar', 'deleteUnlimited']) {
-    baseName = archivesBaseName + version + "_${config.fairPlay}_" + config.minecraft_version
-    version = ""
+    version = "${version}-${config.fairPlay}".toLowerCase()
     from(sourceSets.main.output) {
         exclude("net/techbrew/journeymap/feature/impl/Unlimited.class")
         exclude("net/techbrew/ourneymap/feature/impl/NoRadar.class")
@@ -152,7 +139,6 @@ task fairPlayJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar', 'deleteUnlim
     }
 }
 
-
 reobf { 
     reobf (unlimitedJar) { spec ->
         spec.classpath = sourceSets.main.compileClasspath;
@@ -163,13 +149,8 @@ reobf {
 }
 
 task makePretty(type: Delete) {
-
-    def defaultArtifact = "build/libs/${config.mod_id}-${config.jm_major}.${config.jm_minor}.${config.jm_micro}${config.jm_patch}.jar"
-
-    if (file(defaultArtifact).exists() ) {
-        delete defaultArtifact
-    }
-   
+    delete "build/libs/${archivesBaseName}-${version}.jar"
+    delete '/tmp/'
 }
 
 def getDate() {
