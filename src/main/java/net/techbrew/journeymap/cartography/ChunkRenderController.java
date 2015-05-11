@@ -30,7 +30,7 @@ public class ChunkRenderController
 {
     private static AtomicInteger updateCounter = new AtomicInteger(0);
     private static AtomicLong updateTime = new AtomicLong(0);
-    final boolean fineLogging = JourneyMap.getLogger().isDebugEnabled();
+    final boolean fineLogging = JourneyMap.getLogger().isTraceEnabled();
     private final IChunkRenderer netherRenderer;
     private final IChunkRenderer endRenderer;
     private final SurfaceRenderer overWorldSurfaceRenderer;
