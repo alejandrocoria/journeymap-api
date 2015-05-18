@@ -16,7 +16,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class RegionCoord implements Comparable<RegionCoord>
 {
@@ -49,10 +48,10 @@ public class RegionCoord implements Comparable<RegionCoord>
 
     public static RegionCoord fromRegionPos(File worldDir, int regionX, int regionZ, int dimension)
     {
-        // There's no real need to synchronize this, it's harmless if there are occasional duplicate puts.  It's primarily
-        // just used to reduce heap thrash.
+        // The cache is primarily just used to reduce heap thrash.  Hashing on x,z has a lot of collisions,
+        // unfortunately, so there's no reliable key.  If there's a collision, we put in a new one.
         RegionCoord regionCoord = cache.getIfPresent(toHash(getDimPath(worldDir, dimension), regionX, regionZ));
-        if (regionCoord == null)
+        if (regionCoord == null || regionX != regionCoord.regionX || regionZ != regionCoord.regionZ || dimension != regionCoord.dimension)
         {
             regionCoord = new RegionCoord(worldDir, regionX, regionZ, dimension);
             cache.put(regionCoord.hashCode(), regionCoord);
@@ -90,14 +89,15 @@ public class RegionCoord implements Comparable<RegionCoord>
         return chunkPos >> SIZE;
     }
 
-    public static int toHash(RegionCoord regionCoord)
-    {
-        return toHash(regionCoord.dimDir, regionCoord.regionX, regionCoord.regionZ);
-    }
-
+    /**
+     * This has a high collision rate thanks to negative coordinates.
+     */
     public static int toHash(Path dimDir, int regionX, int regionZ)
     {
-        return Objects.hash(dimDir, regionX, regionZ);
+        int result = dimDir.hashCode();
+        result = 31 * result + regionX;
+        result = 31 * result + regionZ;
+        return result;
     }
 
     public int getXOffset(int chunkX)
@@ -201,6 +201,10 @@ public class RegionCoord implements Comparable<RegionCoord>
 
         RegionCoord that = (RegionCoord) o;
 
+        if (dimension != that.dimension)
+        {
+            return false;
+        }
         if (regionX != that.regionX)
         {
             return false;
@@ -213,7 +217,7 @@ public class RegionCoord implements Comparable<RegionCoord>
         {
             return false;
         }
-        if (dimension != that.dimension)
+        if (!worldDir.equals(that.worldDir))
         {
             return false;
         }
