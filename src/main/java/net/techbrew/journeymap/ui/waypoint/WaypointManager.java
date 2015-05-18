@@ -335,12 +335,12 @@ public class WaypointManager extends JmUI
         {
             if (i > 1)
             {
-                i = 1;
+                i = -1;
             }
 
             if (i < -1)
             {
-                i = -1;
+                i = 1;
             }
 
             this.itemScrollPane.scrollBy(this.rowHeight * i);
