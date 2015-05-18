@@ -101,14 +101,10 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 MiniMap.state().zoomOut();
                 return true;
             }
-            else if (Constants.isPressed(Constants.KB_MAP_DAY))
+            else if (Constants.isPressed(Constants.KB_MAP_DAY) || Constants.isPressed(Constants.KB_MAP_NIGHT))
             {
                 MiniMap.state().toggleMapType();
-                return true;
-            }
-            else if (Constants.isPressed(Constants.KB_MAP_NIGHT))
-            {
-                MiniMap.state().toggleMapType();
+                KeyBinding.unPressAllKeys();
                 return true;
             }
             else if (Constants.isPressed(Constants.KB_MINIMAP_PRESET))

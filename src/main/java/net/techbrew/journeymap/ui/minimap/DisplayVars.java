@@ -11,7 +11,6 @@ package net.techbrew.journeymap.ui.minimap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
-import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.properties.MiniMapProperties;
@@ -363,7 +362,7 @@ public class DisplayVars
         {
             this.miniMapId = miniMapId;
             this.mapType = mapType;
-            this.color = JourneyMap.getCoreProperties().gridSpecs.getSpec(mapType).getColor();
+            this.color = Color.white;
             this.name = Integer.toString(miniMapId);
         }
 
@@ -394,8 +393,8 @@ public class DisplayVars
             this.mapType = mapType;
             name = mapType.isUnderground() ? "caves" : mapType.name();
             tex = TextureCache.instance().getThemeTexture(theme, String.format("icon/%s.png", name));
-            color = JourneyMap.getCoreProperties().gridSpecs.getSpec(mapType).getColor();
-            opposite = new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue());
+            color = Color.white;
+            opposite = Color.darkGray;
             bgScale = 1.15f;
             scaleHeightOffset = ((tex.getHeight() * bgScale) - tex.getHeight()) / 2;
         }

@@ -168,6 +168,7 @@ public class MapState
             }
         }
         lastMapProperties.save();
+        lastMapTypeChange = System.currentTimeMillis();
         requireRefresh();
     }
 
