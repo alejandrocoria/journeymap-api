@@ -477,6 +477,7 @@ key.journeymap.day=Show Day Map
 key.journeymap.map_toggle=Fullscreen Map
 key.journeymap.map_toggle_alt=Show / Hide Fullscreen Map
 key.journeymap.minimap_preset=Switch MiniMap Preset
+key.journeymap.minimap_type=Switch between Day/Night/Caves
 key.journeymap.night=Show Night Map
 key.journeymap.zoom_in=Zoom In
 key.journeymap.zoom_out=Zoom Out

@@ -11,15 +11,19 @@ package net.techbrew.journeymap.ui.minimap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.ThemeFileHandler;
+import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.properties.MiniMapProperties;
 import net.techbrew.journeymap.render.draw.DrawUtil;
+import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import net.techbrew.journeymap.ui.option.LocationFormat;
 import net.techbrew.journeymap.ui.theme.Theme;
 import net.techbrew.journeymap.ui.theme.ThemeCompassPoints;
 import net.techbrew.journeymap.ui.theme.ThemeMinimapFrame;
 
+import java.awt.*;
 import java.awt.geom.Point2D;
 
 /**
@@ -54,6 +58,7 @@ public class DisplayVars
     final boolean showCompass;
     final boolean showReticle;
     final LabelVars labelFps, labelLocation, labelBiome, labelDebug1, labelDebug2;
+    final Theme theme;
     final ThemeMinimapFrame minimapFrame;
     final ThemeCompassPoints minimapCompassPoints;
     final Theme.Minimap.MinimapSpec minimapSpec;
@@ -61,6 +66,8 @@ public class DisplayVars
     final boolean locationFormatVerbose;
     int marginX, marginY;
     boolean forceUnicode;
+    MapTypeStatus mapTypeStatus;
+    MapPresetStatus mapPresetStatus;
 
     /**
      * Constructor.
@@ -85,7 +92,7 @@ public class DisplayVars
         this.terrainAlpha = Math.max(0f, Math.min(1f, miniMapProperties.terrainAlpha.get() / 100f));
         this.locationFormatKeys = new LocationFormat().getFormatKeys(miniMapProperties.locationFormat.get());
         this.locationFormatVerbose = miniMapProperties.locationFormatVerbose.get();
-        Theme theme = ThemeFileHandler.getCurrentTheme();
+        this.theme = ThemeFileHandler.getCurrentTheme();
 
         // Assign shape
         switch (shape)
@@ -316,5 +323,90 @@ public class DisplayVars
         labelDebug2 = new LabelVars(this, debugLabelX, bottomY + yOffset, debugLabelAlign, vAlign, fontScale, new Theme.LabelSpec());
     }
 
+    /**
+     * Get or create a MapPresetStatus instance
+     *
+     * @param mapType
+     * @param miniMapId
+     * @return
+     */
+    MapPresetStatus getMapPresetStatus(MapType mapType, int miniMapId)
+    {
+        if (this.mapPresetStatus == null || !mapType.equals(this.mapPresetStatus.mapType) || miniMapId != this.mapPresetStatus.miniMapId)
+        {
+            this.mapPresetStatus = new MapPresetStatus(mapType, miniMapId);
+        }
+        return mapPresetStatus;
+    }
+
+    MapTypeStatus getMapTypeStatus(MapType mapType)
+    {
+        if (this.mapTypeStatus == null || !mapType.equals(this.mapTypeStatus.mapType))
+        {
+            this.mapTypeStatus = new MapTypeStatus(mapType);
+        }
+        return mapTypeStatus;
+    }
+
+    /**
+     * Provides a one-time calculation of vars needed to show the MapPreset ID on the minimap
+     */
+    class MapPresetStatus
+    {
+        private int miniMapId;
+        private int scale = 4;
+        private MapType mapType;
+        private String name;
+        private Color color;
+
+        MapPresetStatus(MapType mapType, int miniMapId)
+        {
+            this.miniMapId = miniMapId;
+            this.mapType = mapType;
+            this.color = JourneyMap.getCoreProperties().gridSpecs.getSpec(mapType).getColor();
+            this.name = Integer.toString(miniMapId);
+        }
+
+        void draw(Point2D.Double mapCenter, int alpha)
+        {
+            DrawUtil.drawLabel(name, mapCenter.getX(), mapCenter.getY() + 8, DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, color, alpha, scale, true, 0);
+        }
+
+    }
+
+    /**
+     * Provides a one-time calculation of vars needed to show the Map Type on the minimap
+     */
+    class MapTypeStatus
+    {
+        private MapType mapType;
+        private String name;
+        private TextureImpl tex;
+        private Color color;
+        private Color opposite;
+        private double x;
+        private double y;
+        private float bgScale;
+        private float scaleHeightOffset;
+
+        MapTypeStatus(MapType mapType)
+        {
+            this.mapType = mapType;
+            name = mapType.isUnderground() ? "caves" : mapType.name();
+            tex = TextureCache.instance().getThemeTexture(theme, String.format("icon/%s.png", name));
+            color = JourneyMap.getCoreProperties().gridSpecs.getSpec(mapType).getColor();
+            opposite = new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue());
+            bgScale = 1.15f;
+            scaleHeightOffset = ((tex.getHeight() * bgScale) - tex.getHeight()) / 2;
+        }
+
+        void draw(Point2D.Double mapCenter, int alpha)
+        {
+            x = mapCenter.getX() - (tex.getWidth() / 2);
+            y = mapCenter.getY() - tex.getHeight() - 8;
+            DrawUtil.drawColoredImage(tex, alpha, opposite, mapCenter.getX() - ((tex.getWidth() * bgScale) / 2), mapCenter.getY() - (tex.getHeight() * bgScale) + scaleHeightOffset - 8, bgScale, 0);
+            DrawUtil.drawColoredImage(tex, alpha, color, x, y, 1, 0);
+        }
+    }
 
 }

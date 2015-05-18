@@ -32,7 +32,6 @@ import net.techbrew.journeymap.render.texture.TextureImpl;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -251,14 +250,6 @@ public class MiniMap
                 // Draw waypoints
                 drawOnMapWaypoints(rotation);
 
-                // Draw Minimap Preset Id
-                if (now - initTime <= 1000)
-                {
-                    int alpha = (int) Math.min(255, Math.max(0, 1100 - (now - initTime)));
-                    int scale = 8;
-                    DrawUtil.drawLabel(Integer.toString(miniMapProperties.getId()), centerPoint.getX(), centerPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 0, Color.white, alpha, scale, true, rotation);
-                }
-
                 // Draw player
                 if (miniMapProperties.showSelf.get() && playerLocatorTex != null)
                 {
@@ -288,6 +279,25 @@ public class MiniMap
                         /***** END MATRIX: ROTATION *****/
                         stopMapRotation(player.rotationYawHead);
                     }
+                }
+
+                // Draw Map Type icon
+                long lastMapChangeTime = state.getLastMapTypeChange();
+                if (now - lastMapChangeTime <= 1000)
+                {
+                    GL11.glTranslated(dv.translateX, dv.translateY, 0);
+                    int alpha = (int) Math.min(255, Math.max(0, 1100 - (now - lastMapChangeTime)));
+                    dv.getMapTypeStatus(state.getCurrentMapType()).draw(centerPoint, alpha);
+                    GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
+                }
+
+                // Draw Minimap Preset Id
+                if (now - initTime <= 1000)
+                {
+                    GL11.glTranslated(dv.translateX, dv.translateY, 0);
+                    int alpha = (int) Math.min(255, Math.max(0, 1100 - (now - initTime)));
+                    dv.getMapPresetStatus(state.getCurrentMapType(), miniMapProperties.getId()).draw(centerPoint, alpha);
+                    GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
                 }
 
                 // Finish stencil

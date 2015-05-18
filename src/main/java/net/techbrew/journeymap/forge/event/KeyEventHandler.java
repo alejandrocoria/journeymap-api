@@ -17,7 +17,6 @@ import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.ChatLog;
-import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
@@ -104,12 +103,12 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             }
             else if (Constants.isPressed(Constants.KB_MAP_DAY))
             {
-                MiniMap.state().setMapType(MapType.day(minecraft.thePlayer.dimension));
+                MiniMap.state().toggleMapType();
                 return true;
             }
             else if (Constants.isPressed(Constants.KB_MAP_NIGHT))
             {
-                MiniMap.state().setMapType(MapType.night(minecraft.thePlayer.dimension));
+                MiniMap.state().toggleMapType();
                 return true;
             }
             else if (Constants.isPressed(Constants.KB_MINIMAP_PRESET))

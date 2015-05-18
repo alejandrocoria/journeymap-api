@@ -9,6 +9,7 @@
 package net.techbrew.journeymap.model;
 
 
+import com.google.common.base.Objects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.techbrew.journeymap.JourneyMap;
@@ -17,7 +18,6 @@ import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.StatTimer;
-import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.properties.InGameMapProperties;
 import net.techbrew.journeymap.properties.MapProperties;
 import net.techbrew.journeymap.render.draw.DrawStep;
@@ -37,18 +37,20 @@ public class MapState
 {
     public final int minZoom = 0;
     public final int maxZoom = 5;
-    // One-time setup
-    final CoreProperties coreProperties = JourneyMap.getCoreProperties();
+
     // These can be safely changed at will
     public AtomicBoolean follow = new AtomicBoolean(true);
 
     public String playerLastPos = "0,0"; //$NON-NLS-1$
     StatTimer refreshTimer = StatTimer.get("MapState.refresh");
     StatTimer generateDrawStepsTimer = StatTimer.get("MapState.generateDrawSteps");
+
     // These must be internally managed
     private MapType preferredMapType;
+    private MapType lastMapType;
     private File worldDir = null;
     private long lastRefresh = 0;
+    private long lastMapTypeChange = 0;
 
     private boolean underground = false;
 
@@ -56,7 +58,7 @@ public class MapState
     private List<DrawStep> drawStepList = new ArrayList<DrawStep>();
     private List<DrawWayPointStep> drawWaypointStepList = new ArrayList<DrawWayPointStep>();
     private String playerBiome = "";
-    private MapProperties lastMapProperties = null;
+    private InGameMapProperties lastMapProperties = null;
     private List<EntityDTO> entityList = new ArrayList<EntityDTO>(32);
     private int lastPlayerChunkX = 0;
     private int lastPlayerChunkZ = 0;
@@ -69,18 +71,20 @@ public class MapState
     {
     }
 
-    public void refresh(Minecraft mc, EntityClientPlayerMP player, MapProperties mapProperties)
+    public void refresh(Minecraft mc, EntityClientPlayerMP player, InGameMapProperties mapProperties)
     {
         refreshTimer.start();
         lastMapProperties = mapProperties;
-        boolean showCaves = JourneyMap.getFullMapProperties().showCaves.get();
-        final MapType lastMapType = getMapType(showCaves);
+        boolean showCaves = mapProperties.showCaves.get();
+        if (lastMapType == null)
+        {
+            lastMapType = getMapType(showCaves);
+        }
 
         this.underground = DataCache.getPlayer().underground;
         Integer vSlice = this.underground ? player.chunkCoordY : null;
         this.preferredMapType = MapType.from(mapProperties.getPreferredMapType().get(), vSlice, player.dimension);
         this.caveMappingAllowed = FeatureManager.isAllowed(Feature.MapCaves);
-
         this.worldDir = FileHandler.getJMWorldDir(mc);
 
         lastPlayerChunkX = player.chunkCoordX;
@@ -106,7 +110,7 @@ public class MapState
             }
         }
 
-        playerBiome = DataCache.getPlayer().biome;//+ (DataCache.getPlayer().underground ? " Underground" : " Surface");
+        playerBiome = DataCache.getPlayer().biome;
 
         updateLastRefresh();
 
@@ -118,6 +122,41 @@ public class MapState
         setMapType(MapType.from(mapTypeName, DataCache.getPlayer()));
     }
 
+    public void toggleMapType()
+    {
+        EntityDTO player = DataCache.getPlayer();
+        MapType currentMapType = getCurrentMapType();
+        if (currentMapType.isUnderground())
+        {
+            if (!player.entityLiving.worldObj.provider.hasNoSky)
+            {
+                lastMapProperties.showCaves.set(false);
+                setMapType(MapType.day(player));
+            }
+            else
+            {
+                setMapType(MapType.underground(player));
+            }
+        }
+        else if (currentMapType.isDay())
+        {
+            setMapType(MapType.night(player));
+        }
+        else if (currentMapType.isNight())
+        {
+            if (underground && caveMappingAllowed)
+            {
+                lastMapProperties.showCaves.set(true);
+                setMapType(MapType.underground(player));
+            }
+            else
+            {
+                setMapType(MapType.day(player));
+            }
+        }
+        lastMapTypeChange = System.currentTimeMillis();
+    }
+
     public void setMapType(MapType mapType)
     {
         if (!mapType.equals(getCurrentMapType()))
@@ -125,25 +164,30 @@ public class MapState
             if (!mapType.isUnderground())
             {
                 lastMapProperties.getPreferredMapType().set(mapType.name);
-                lastMapProperties.save();
                 preferredMapType = mapType;
             }
         }
-
+        lastMapProperties.save();
         requireRefresh();
     }
 
     public MapType getCurrentMapType()
     {
-        boolean showCaves = JourneyMap.getFullMapProperties().showCaves.get();
+        boolean showCaves = lastMapProperties.showCaves.get();
         return getMapType(showCaves);
     }
 
     public MapType getMapType(boolean showCaves)
     {
-        if (underground && caveMappingAllowed && showCaves)
+        MapType mapType = null;
+
+        if (DataCache.getPlayer().entityLiving.worldObj.provider.hasNoSky)
         {
-            return MapType.underground(DataCache.getPlayer());
+            mapType = MapType.underground(DataCache.getPlayer());
+        }
+        else if (underground && caveMappingAllowed && showCaves)
+        {
+            mapType = MapType.underground(DataCache.getPlayer());
         }
         else
         {
@@ -151,10 +195,22 @@ public class MapState
             {
                 this.preferredMapType = MapType.from(lastMapProperties.getPreferredMapType().get(), DataCache.getPlayer());
             }
-            return preferredMapType;
+            mapType = preferredMapType;
         }
+
+        if (!Objects.equal(mapType, lastMapType))
+        {
+            lastMapType = mapType;
+            lastMapTypeChange = System.currentTimeMillis();
+        }
+
+        return mapType;
     }
 
+    public long getLastMapTypeChange()
+    {
+        return lastMapTypeChange;
+    }
 
     public boolean isUnderground()
     {
