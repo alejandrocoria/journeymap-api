@@ -1,0 +1,29 @@
+/* JourneyMap 5.1.0 Splash/About Dialog - fi_FI  */
+{
+  "lines": [
+    {
+      "label": "Useita suorituskyvyn parannuksia",
+      "action": ""
+    },
+    {
+      "label": "Uusi ominaisuus: Ruudukko editori muokkaa chunk-ruudukkoa",
+      "action": "GridEditor"
+    },
+    {
+      "label": "Uusi ominaisuus: Toiminto > Poista kartta",
+      "action": "FullscreenActions"
+    },
+    {
+      "label": "Uusi ominaisuus: Toiminto > Poista kartoitus käytöstä",
+      "action": "FullscreenActions"
+    },
+    {
+      "label": "Uusia omnaisuuksia Asetukset > Kartografia",
+      "action": "OptionsManager#Cartography"
+    },
+    {
+      "label": "F3 ja Shift-F3 näyttääksesi JourneyMap suorituskykydatan",
+      "action": ""
+    }
+  ]
+}
