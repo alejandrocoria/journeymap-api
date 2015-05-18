@@ -5,7 +5,7 @@
     <property name="jm_major" value="5"/>
     <property name="jm_minor" value="1"/>
     <property name="jm_micro" value="0"/>
-    <property name="jm_patch" value="b3"/>
+    <property name="jm_patch" value="b4"/>
     <property name="jmversion" value="${jm_major}.${jm_minor}.${jm_micro}${jm_patch}"/>
     <property name="mcversion" value="1.7.10"/>
     <property name="forgeversion" value="10.13.2.1291"/>
@@ -151,7 +151,7 @@
 
     <macrodef name="dist">
         <attribute name="edition"/>
-        <attribute name="jarfile" default="JourneyMap${jmversion}_@{edition}_MC${mcversion}.jar"/>
+        <attribute name="jarfile" default="journeymap-${mcversion}-${jmversion}-@{edition}.jar"/>
         <sequential>
 
             <exec executable="${gradle}" dir="${forge.dir}">
