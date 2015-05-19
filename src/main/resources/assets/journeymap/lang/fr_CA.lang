@@ -1,4 +1,4 @@
-### JourneyMap 5.1 Resource Bundle - fr_FR
+### JourneyMap 5.1.0b5 Resource Bundle - fr_FR
 jm.advanced.announcemod=Annoncer le mod
 jm.advanced.announcemod.tooltip=Annoncer dans le chat que JourneyMap est disponible.
 jm.advanced.automappoll=Fréquence de rafraîchissement de cartographie
@@ -469,7 +469,7 @@ key.journeymap.day=Affiche la Carte de Jour
 key.journeymap.map_toggle=Carte Plein-Écran
 key.journeymap.map_toggle_alt=Affiche / Cache la Carte Plein-Écran
 key.journeymap.minimap_preset=Alterne les Sets de Mini-Carte
-key.journeymap.minimap_type=Switch between Day/Night/Caves
+key.journeymap.minimap_type=Permuter entre Jour/Nuit/Grottes
 key.journeymap.night=Affiche la Carte de Nuit
 key.journeymap.zoom_in=Zoom Avant
 key.journeymap.zoom_out=Zoom Arrière
