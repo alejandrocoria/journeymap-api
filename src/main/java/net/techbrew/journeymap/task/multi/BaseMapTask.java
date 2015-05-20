@@ -34,29 +34,17 @@ public abstract class BaseMapTask implements ITask
     private static BufferedImage blankChunkImage = null;
     private static BufferedImage blankChunkImageUnderground = null;
     final World world;
-    final int dimension;
-    final boolean underground;
-    final Integer vSlice;
     final Collection<ChunkCoordIntPair> chunkCoords;
     final boolean flushCacheWhenDone;
     final ChunkRenderController renderController;
     final int elapsedLimit;
+    final MapType mapType;
 
-    public BaseMapTask(ChunkRenderController renderController, World world, int dimension, boolean underground, Integer vSlice, Collection<ChunkCoordIntPair> chunkCoords, boolean flushCacheWhenDone, int elapsedLimit)
+    public BaseMapTask(ChunkRenderController renderController, World world, MapType mapType, Collection<ChunkCoordIntPair> chunkCoords, boolean flushCacheWhenDone, int elapsedLimit)
     {
         this.renderController = renderController;
         this.world = world;
-        this.dimension = dimension;
-        this.underground = underground;
-        this.vSlice = vSlice;
-        if (vSlice != null && vSlice == -1)
-        {
-            vSlice = null;
-        }
-        if ((vSlice == null) && underground)
-        {
-            throw new IllegalStateException("vSlice can't be null (-1) and task be underground");
-        }
+        this.mapType = mapType;
         this.chunkCoords = chunkCoords;
         this.flushCacheWhenDone = flushCacheWhenDone;
         this.elapsedLimit = elapsedLimit;
@@ -91,7 +79,7 @@ public abstract class BaseMapTask implements ITask
 
             // Check the dimension
             int currentDimension = mc.theWorld.provider.dimensionId;
-            if (currentDimension != dimension)
+            if (currentDimension != mapType.dimension)
             {
                 if (threadLogging)
                 {
@@ -121,7 +109,6 @@ public abstract class BaseMapTask implements ITask
                     throw new InterruptedException();
                 }
 
-                MapType mapType = MapType.from(vSlice, dimension);
                 ChunkCoordIntPair coord = chunkIter.next();
                 ChunkMD chunkMd = DataCache.instance().getChunkMD(coord);
                 if (chunkMd != null && chunkMd.hasChunk())
@@ -129,7 +116,7 @@ public abstract class BaseMapTask implements ITask
                     try
                     {
                         ChunkCoord cCoord = ChunkCoord.fromChunkMD(jmWorldDir, mapType, chunkMd);
-                        renderController.renderChunk(cCoord, chunkMd, underground, vSlice);
+                        renderController.renderChunk(cCoord, chunkMd, mapType);
                         count++;
                     }
                     catch (ChunkMD.ChunkMissingException e)
@@ -191,9 +178,7 @@ public abstract class BaseMapTask implements ITask
     {
         return getClass().getSimpleName() + "{" +
                 "world=" + world +
-                ", dimension=" + dimension +
-                ", underground=" + underground +
-                ", vSlice=" + vSlice +
+                ", mapType=" + mapType +
                 ", chunkCoords=" + chunkCoords +
                 ", flushCacheWhenDone=" + flushCacheWhenDone +
                 '}';

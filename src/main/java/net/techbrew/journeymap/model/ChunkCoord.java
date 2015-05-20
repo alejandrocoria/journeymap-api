@@ -72,9 +72,9 @@ public class ChunkCoord
         return mapType.isUnderground();
     }
 
-    public int getVerticalSlice()
+    public Integer getVerticalSlice()
     {
-        return isUnderground() ? mapType.vSlice : -1;
+        return mapType.vSlice;
     }
 
     @Override

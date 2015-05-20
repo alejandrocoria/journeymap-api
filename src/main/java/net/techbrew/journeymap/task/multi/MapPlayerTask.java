@@ -9,7 +9,6 @@
 package net.techbrew.journeymap.task.multi;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.techbrew.journeymap.Constants;
@@ -18,6 +17,8 @@ import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.model.EntityDTO;
+import net.techbrew.journeymap.model.MapType;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -37,9 +38,9 @@ public class MapPlayerTask extends BaseMapTask
     private long startNs;
     private long elapsedNs;
 
-    private MapPlayerTask(ChunkRenderController chunkRenderController, World world, int dimension, boolean underground, Integer chunkY, Collection<ChunkCoordIntPair> chunkCoords)
+    private MapPlayerTask(ChunkRenderController chunkRenderController, World world, MapType mapType, Collection<ChunkCoordIntPair> chunkCoords)
     {
-        super(chunkRenderController, world, dimension, underground, chunkY, chunkCoords, false, 10000);
+        super(chunkRenderController, world, mapType, chunkCoords, false, 10000);
     }
 
     public static void forceNearbyRemap()
@@ -50,11 +51,11 @@ public class MapPlayerTask extends BaseMapTask
         }
     }
 
-    public static MapPlayerTaskBatch create(ChunkRenderController chunkRenderController, final EntityPlayer player)
+    public static MapPlayerTaskBatch create(ChunkRenderController chunkRenderController, final EntityDTO player)
     {
         final boolean cavesAllowed = FeatureManager.isAllowed(Feature.MapCaves);
-        final boolean worldHasSky = !player.worldObj.provider.hasNoSky;
-        boolean underground = player.worldObj.provider.hasNoSky || DataCache.getPlayer().underground;
+        final boolean worldHasSky = !player.entityLiving.worldObj.provider.hasNoSky;
+        boolean underground = player.entityLiving.worldObj.provider.hasNoSky || DataCache.getPlayer().underground;
 
         if (underground && !cavesAllowed)
         {
@@ -68,21 +69,32 @@ public class MapPlayerTask extends BaseMapTask
             }
         }
 
+        MapType mapType;
+        if (underground)
+        {
+            mapType = MapType.underground(player);
+        }
+        else
+        {
+            final long time = player.entityLiving.worldObj.getWorldInfo().getWorldTime() % 24000L;
+            mapType = (time < 13800) ? MapType.day(player) : MapType.night(player);
+        }
+
         List<ITask> tasks = new ArrayList<ITask>(2);
-        tasks.add(new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, underground, underground ? player.chunkCoordY : null, new ArrayList<ChunkCoordIntPair>()));
+        tasks.add(new MapPlayerTask(chunkRenderController, player.entityLiving.worldObj, mapType, new ArrayList<ChunkCoordIntPair>()));
 
         if (underground)
         {
             if (worldHasSky && JourneyMap.getCoreProperties().alwaysMapSurface.get())
             {
-                tasks.add(new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, false, null, new ArrayList<ChunkCoordIntPair>()));
+                tasks.add(new MapPlayerTask(chunkRenderController, player.entityLiving.worldObj, mapType, new ArrayList<ChunkCoordIntPair>()));
             }
         }
         else
         {
             if (cavesAllowed && JourneyMap.getCoreProperties().alwaysMapCaves.get())
             {
-                tasks.add(new MapPlayerTask(chunkRenderController, player.worldObj, player.dimension, true, player.chunkCoordY, new ArrayList<ChunkCoordIntPair>()));
+                tasks.add(new MapPlayerTask(chunkRenderController, player.entityLiving.worldObj, mapType, new ArrayList<ChunkCoordIntPair>()));
             }
         }
 
@@ -177,7 +189,7 @@ public class MapPlayerTask extends BaseMapTask
     {
         startNs = System.nanoTime();
 
-        final RenderSpec renderSpec = underground ? RenderSpec.getUndergroundSpec() : RenderSpec.getSurfaceSpec();
+        final RenderSpec renderSpec = mapType.isUnderground() ? RenderSpec.getUndergroundSpec() : RenderSpec.getSurfaceSpec();
         chunkCoords.addAll(renderSpec.getRenderAreaCoords());
         this.scheduledChunks = chunkCoords.size();
     }
@@ -239,7 +251,7 @@ public class MapPlayerTask extends BaseMapTask
                 if ((System.currentTimeMillis() - lastTaskCompleted) >= mapTaskDelay)
                 {
                     ChunkRenderController chunkRenderController = JourneyMap.getInstance().getChunkRenderController();
-                    return MapPlayerTask.create(chunkRenderController, minecraft.thePlayer);
+                    return MapPlayerTask.create(chunkRenderController, DataCache.getPlayer());
                 }
             }
 
@@ -282,7 +294,7 @@ public class MapPlayerTask extends BaseMapTask
                 {
                     MapPlayerTask mapPlayerTask = (MapPlayerTask) task;
                     chunkCount += mapPlayerTask.scheduledChunks;
-                    if (mapPlayerTask.underground)
+                    if (mapPlayerTask.mapType.isUnderground())
                     {
                         RenderSpec.getUndergroundSpec().setLastTaskInfo(mapPlayerTask.scheduledChunks, mapPlayerTask.elapsedNs);
                     }

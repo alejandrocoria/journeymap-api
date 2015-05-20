@@ -36,22 +36,24 @@ public class MapRegionTask extends BaseMapTask
     private static final Logger logger = JourneyMap.getLogger();
     private static volatile long lastTaskCompleted;
 
+    final RegionCoord rCoord;
     final Collection<ChunkCoordIntPair> retainedCoords;
 
-    private MapRegionTask(ChunkRenderController renderController, World world, int dimension, Integer vSlice, Collection<ChunkCoordIntPair> chunkCoords, Collection<ChunkCoordIntPair> retainCoords)
+    private MapRegionTask(ChunkRenderController renderController, World world, MapType mapType, RegionCoord rCoord, Collection<ChunkCoordIntPair> chunkCoords, Collection<ChunkCoordIntPair> retainCoords)
     {
-        super(renderController, world, dimension, vSlice != null, vSlice, chunkCoords, true, 5000);
+        super(renderController, world, mapType, chunkCoords, true, 5000);
+        this.rCoord = rCoord;
         this.retainedCoords = retainCoords;
     }
 
-    public static BaseMapTask create(ChunkRenderController renderController, RegionCoord rCoord, Integer vSlice, Minecraft minecraft)
+    public static BaseMapTask create(ChunkRenderController renderController, RegionCoord rCoord, MapType mapType, Minecraft minecraft)
     {
 
         int missing = 0;
 
         final World world = minecraft.theWorld;
 
-        final List<ChunkCoordIntPair> renderCoords = rCoord.getChunkCoordsInRegion(vSlice);
+        final List<ChunkCoordIntPair> renderCoords = rCoord.getChunkCoordsInRegion(mapType.vSlice);
         final List<ChunkCoordIntPair> retainedCoords = new ArrayList<ChunkCoordIntPair>(renderCoords.size());
 
         // Ensure chunks north, west, nw are kept alive for slope calculations
@@ -67,7 +69,7 @@ public class MapRegionTask extends BaseMapTask
             }
         }
 
-        return new MapRegionTask(renderController, world, rCoord.dimension, vSlice, renderCoords, retainedCoords);
+        return new MapRegionTask(renderController, world, mapType, rCoord, renderCoords, retainedCoords);
 
     }
 
@@ -99,11 +101,15 @@ public class MapRegionTask extends BaseMapTask
             }
         }
 
-        logger.debug("Chunks: " + missing + " missing out of " + chunkCoords.size());
+        logger.info(String.format("Chunks found in %s: %s/%s", rCoord, chunkCoords.size() - missing, chunkCoords.size()));
 
-        if (chunkCoords.size() > missing)
+        if (chunkCoords.size() - missing >= 16)
         {
             super.performTask(mc, jm, jmWorldDir, threadLogging);
+        }
+        else
+        {
+            logger.info("Skipping underpopulated region: " + rCoord);
         }
     }
 
@@ -149,6 +155,23 @@ public class MapRegionTask extends BaseMapTask
         @Override
         public boolean enableTask(Minecraft minecraft, Object params)
         {
+            EntityDTO player = DataCache.getPlayer();
+            final boolean cavesAllowed = FeatureManager.isAllowed(Feature.MapCaves);
+            final boolean worldHasSky = !player.entityLiving.worldObj.provider.hasNoSky;
+            boolean underground = player.entityLiving.worldObj.provider.hasNoSky || player.underground;
+
+            if (underground && !cavesAllowed)
+            {
+                if (worldHasSky)
+                {
+                    underground = false;
+                }
+                else
+                {
+                    logger.info("Cave mapping not permitted.");
+                    return false;
+                }
+            }
 
             enabled = (params != null);
             if (!enabled)
@@ -166,9 +189,6 @@ public class MapRegionTask extends BaseMapTask
             {
                 try
                 {
-                    EntityDTO player = DataCache.getPlayer();
-                    final int dimension = player.dimension;
-                    final boolean underground = player.underground && FeatureManager.isAllowed(Feature.MapCaves) && JourneyMap.getFullMapProperties().showCaves.get();
                     MapType mapType;
                     if (underground)
                     {
@@ -251,7 +271,7 @@ public class MapRegionTask extends BaseMapTask
 
             RegionCoord rCoord = regionLoader.getRegions().peek();
             ChunkRenderController chunkRenderController = JourneyMap.getInstance().getChunkRenderController();
-            BaseMapTask baseMapTask = MapRegionTask.create(chunkRenderController, rCoord, minecraft.thePlayer.chunkCoordY, minecraft);
+            BaseMapTask baseMapTask = MapRegionTask.create(chunkRenderController, rCoord, regionLoader.getMapType(), minecraft);
             return baseMapTask;
         }
 
