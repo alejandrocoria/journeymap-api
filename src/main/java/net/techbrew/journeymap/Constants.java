@@ -10,8 +10,6 @@ package net.techbrew.journeymap;
 
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.Loader;
@@ -19,6 +17,7 @@ import cpw.mods.fml.common.ModContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.client.settings.KeyBinding;
+import net.techbrew.journeymap.log.LogFormatter;
 import org.lwjgl.input.Keyboard;
 
 import java.io.File;
@@ -134,11 +133,32 @@ public class Constants
 
     public static String getResourcePackNames()
     {
-        ResourcePackRepository resourcepackrepository = FMLClientHandler.instance().getClient().getResourcePackRepository();
-        String packs = Joiner.on(", ").join(Lists.reverse(resourcepackrepository.getRepositoryEntries()));
-        if (Strings.isNullOrEmpty(packs))
+        ArrayList<ResourcePackRepository.Entry> entries = new ArrayList<ResourcePackRepository.Entry>();
+
+        try
+        {
+            ResourcePackRepository resourcepackrepository = FMLClientHandler.instance().getClient().getResourcePackRepository();
+            entries.addAll(resourcepackrepository.getRepositoryEntries());
+        }
+        catch (Throwable t)
+        {
+            JourneyMap.getLogger().error(String.format("Can't get resource pack names: %s", LogFormatter.toString(t)));
+        }
+
+        String packs;
+        if (entries.isEmpty())
         {
             packs = RESOURCE_PACKS_DEFAULT;
+        }
+        else
+        {
+            ArrayList<String> entryStrings = new ArrayList<String>(entries.size());
+            for (ResourcePackRepository.Entry entry : entries)
+            {
+                entryStrings.add(entry.toString());
+            }
+            Collections.sort(entryStrings);
+            packs = Joiner.on(", ").join(entryStrings);
         }
         return packs;
     }
