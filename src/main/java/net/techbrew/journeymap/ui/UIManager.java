@@ -270,7 +270,7 @@ public class UIManager
 
     public void reset()
     {
-        Fullscreen.reset();
+        Fullscreen.state().requireRefresh();
         miniMap.reset();
     }
 

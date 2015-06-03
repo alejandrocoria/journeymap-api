@@ -443,7 +443,7 @@ public class JourneyMap implements CommonProxy
         loadConfigProperties();
         DataCache.instance().purge();
         chunkRenderController = new ChunkRenderController();
-        Fullscreen.reset();
+        Fullscreen.state().requireRefresh();
         Fullscreen.state().follow.set(true);
         StatTimer.resetAll();
         TileDrawStepCache.clear();

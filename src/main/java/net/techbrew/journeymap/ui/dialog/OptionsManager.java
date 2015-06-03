@@ -20,6 +20,7 @@ import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.properties.config.Config;
+import net.techbrew.journeymap.render.map.TileDrawStepCache;
 import net.techbrew.journeymap.server.JMServer;
 import net.techbrew.journeymap.task.main.SoftResetTask;
 import net.techbrew.journeymap.task.multi.MapPlayerTask;
@@ -28,6 +29,7 @@ import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.*;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
+import net.techbrew.journeymap.ui.minimap.MiniMap;
 import net.techbrew.journeymap.ui.option.CategorySlot;
 import net.techbrew.journeymap.ui.option.OptionSlotFactory;
 import net.techbrew.journeymap.ui.option.SlotMetadata;
@@ -662,6 +664,9 @@ public class OptionsManager extends JmUI
                 case Cartography:
                 {
                     RenderSpec.resetRenderSpecs();
+                    TileDrawStepCache.instance().invalidateAll();
+                    MiniMap.state().requireRefresh();
+                    Fullscreen.state().requireRefresh();
                     MapPlayerTask.forceNearbyRemap();
                     break;
                 }
@@ -675,7 +680,10 @@ public class OptionsManager extends JmUI
         }
 
         UIManager.getInstance().getMiniMap().reset();
-        Fullscreen.reset();
+        if (this.returnDisplay instanceof Fullscreen)
+        {
+            ((Fullscreen) returnDisplay).reset();
+        }
 
         OptionsManager.openCategories.clear();
         for (CategorySlot categorySlot : optionsListPane.getRootSlots())

@@ -480,6 +480,4 @@ public class DrawUtil
     {
         Above, Middle, Below
     }
-
-
 }
