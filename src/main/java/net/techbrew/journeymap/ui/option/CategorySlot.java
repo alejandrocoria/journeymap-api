@@ -29,8 +29,8 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     SlotMetadata masterSlot;
     LinkedList<SlotMetadata> childMetadataList = new LinkedList<SlotMetadata>();
     List<ScrollListPane.ISlot> childSlots = new ArrayList<ScrollListPane.ISlot>();
-    String glyphDown = "\u25BC";
-    String glyphUp = "\u25B2";
+    String glyphClosed = "\u25B6";
+    String glyphOpen = "\u25BC";
     private boolean selected;
 
     public CategorySlot(Config.Category category)
@@ -204,7 +204,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
 
     private void updateButtonLabel()
     {
-        String glyph = selected ? glyphUp : glyphDown;
+        String glyph = selected ? glyphOpen : glyphClosed;
         this.button.displayString = String.format("%1$s  %2$s  %1$s", glyph, name);
     }
 
