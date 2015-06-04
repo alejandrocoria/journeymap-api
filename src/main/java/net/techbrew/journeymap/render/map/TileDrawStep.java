@@ -78,7 +78,7 @@ public class TileDrawStep
         Integer textureId = -1;
         boolean useScaled = false;
 
-        if (highQuality && !scaledUpdatePending && scaledTexture.hasImage())
+        if (highQuality && !scaledUpdatePending && scaledTexture != null)
         {
             textureId = scaledTexture.getGlTextureId();
             useScaled = true;
@@ -160,7 +160,7 @@ public class TileDrawStep
             DrawUtil.drawRectangle(debugX, debugY, 3, endV * 512, Color.green, 200);
             DrawUtil.drawRectangle(debugX, debugY, endU * 512, 3, Color.red, 200);
             DrawUtil.drawLabel(this.toString(), debugX + 5, debugY + 10, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
-            DrawUtil.drawLabel(String.format("Tile Render Type: %s, Full size: %s", Tile.debugGlSettings, useScaled), debugX + 5, debugY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
+            DrawUtil.drawLabel(String.format("Tile Render Type: %s, Scaled: %s", Tile.debugGlSettings, useScaled), debugX + 5, debugY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
             long imageTimestamp = useScaled ? scaledTexture.getLastImageUpdate() : regionTextureHolder.getImageTimestamp();
             long age = (System.currentTimeMillis() - imageTimestamp) / 1000;
             DrawUtil.drawLabel("Age: " + age + " seconds old", debugX + 5, debugY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
@@ -318,8 +318,9 @@ public class TileDrawStep
                 }
             });
         }
-        else
+        else if (scaledTexture.getLastImageUpdate() < regionTextureHolder.getImageTimestamp())
         {
+            System.out.println("Scaled updated " + this);
             final TextureImpl temp = scaledTexture;
             scaledFuture = TextureCache.instance().scheduleTextureTask(new Callable<TextureImpl>()
             {
