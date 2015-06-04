@@ -1,4 +1,4 @@
-### JourneyMap 5.0.0RC6 Resource Bundle - es_ES
+### JourneyMap 5.1.0 Resource Bundle - es_ES
 ### Translation by: thekazador and Abel
 jm.advanced.announcemod=Anuncios del Mod
 jm.advanced.announcemod.tooltip=Anuncia en la ventana del chat cuando el JourneyMap esta listo.
@@ -306,13 +306,13 @@ jm.waypoint.help_import_voxel=O copiar §b%1$s§f a §b%2$s§f y reinicie el Min
 jm.waypoint.help_import_voxel_title=Importar VoxelMap Waypoints
 jm.waypoint.help_manage_ingame=Manejar los Waypoint (en el juego)
 jm.waypoint.help_title=Ayuda de Waypoint
-jm.waypoint.import_rei_errors=Importados %1$s waypoints desde Rei's MiniMap con %1$s errores. Mire el jm.common.log para detalles.
-jm.waypoint.import_rei_failure=No se importaron waypoints del Rei's MiniMap. Mire jm.common.log para detalles.
-jm.waypoint.import_rei_file_error=No se pudo importar el archivo de waypoint: %1$s de Rei's MiniMap
+jm.waypoint.import_rei_errors=Importados %1$s waypoints desde Rei's MiniMap con %2$s errores. Mire el journeymap.log para detalles.
+jm.waypoint.import_rei_failure=No se importaron waypoints del Rei's MiniMap. Mire journeymap.log para detalles.
+jm.waypoint.import_rei_file_error=No se pudo importar el archivo de waypoint: %2$s de Rei's MiniMap
 jm.waypoint.import_rei_success=Importados %1$s waypoints del Rei's Minimap.
 jm.waypoint.import_rei_version=Su version de Rei's MiniMap no es soportada.
-jm.waypoint.import_vox_errors=Importados %1$s waypoints del VoxelMap con %1$s errores. Mire jm.common.log para detalles.
-jm.waypoint.import_vox_failure=No se importaron waypoints del VoxelMap. Mire jm.common.log para detalles.
+jm.waypoint.import_vox_errors=Importados %1$s waypoints del VoxelMap con %1$s errores. Mire journeymap.log para detalles.
+jm.waypoint.import_vox_failure=No se importaron waypoints del VoxelMap. Mire journeymap.log para detalles.
 jm.waypoint.import_vox_file_error=Nose pudo importar el archivo de waypoint: %1$s de VoxelMap
 jm.waypoint.import_vox_success=Importados %1$s waypoints del VoxelMap.
 jm.waypoint.import_vox_version=Su version de VoxelMap no es soportada. Por favor actualize a:

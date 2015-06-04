@@ -1,4 +1,4 @@
-﻿### JourneyMap 5.0.0RC6 Resource Bundle - hu_HU
+﻿### JourneyMap 5.0.1 Resource Bundle - hu_HU
 ### Translation by: Tudi20
 jm.advanced.announcemod=Hirdető mod
 jm.advanced.announcemod.tooltip=Kihirdető a chat ablakban amikor JourneyMap készen áll.
@@ -306,13 +306,13 @@ jm.waypoint.help_import_voxel=Vagy másold §b%1$s§f fájlt §b%2$s§f-ba és i
 jm.waypoint.help_import_voxel_title=Import VoxelMap fordulópontjait
 jm.waypoint.help_manage_ingame=Fordulópont kezelő (játékban)
 jm.waypoint.help_title=Fordulópont segítség
-jm.waypoint.import_rei_errors=Importolva %1$s fordulópontok Rei's MiniMap-ból következő hibákkal: %1$s . Lásd jm.common.log részletekkért.
-jm.waypoint.import_rei_failure=Nem lett Rei's MiniMap fordulópontok importálva. Lásd jm.common.log részletekért.
+jm.waypoint.import_rei_errors=Importolva %1$s fordulópontok Rei's MiniMap-ból következő hibákkal: %2$s . Lásd journeymap.log részletekkért.
+jm.waypoint.import_rei_failure=Nem lett Rei's MiniMap fordulópontok importálva. Lásd journeymap.log részletekért.
 jm.waypoint.import_rei_file_error=Nem lehet importálni Rei's MiniMap fordulópont fájt: %1$s
 jm.waypoint.import_rei_success=Importálva lett %1$s fordulópontok Rei's Minimap-ból.
 jm.waypoint.import_rei_version=A verziód Rei's MiniMap-ból nincs támogatva.
-jm.waypoint.import_vox_errors=Importolva %1$s fordulópontok VoxelMap-ből következő hibákkal: %1$s . Lásd jm.common.log részletekkért.
-jm.waypoint.import_vox_failure=Nem lett VoxelMap fordulópontok importálva. Lásd jm.common.log részletekért.
+jm.waypoint.import_vox_errors=Importolva %1$s fordulópontok VoxelMap-ből következő hibákkal: %2$s . Lásd journeymap.log részletekkért.
+jm.waypoint.import_vox_failure=Nem lett VoxelMap fordulópontok importálva. Lásd journeymap.log részletekért.
 jm.waypoint.import_vox_file_error=Nem lehet importálni VoxelMap fordulópont fájt: %1$s
 jm.waypoint.import_vox_success=Importálva lett %1$s fordulópontok VoxelMap-ből.
 jm.waypoint.import_vox_version=A verziód VoxelMap-ből nincs támogatva. Kérlek fríssisd:

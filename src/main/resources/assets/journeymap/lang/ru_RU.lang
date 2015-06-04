@@ -1,4 +1,4 @@
-### JourneyMap 5.1.0b4 Resource Bundle - ru_RU
+### JourneyMap 5.1.0 Resource Bundle - ru_RU
 ### Прмечания переводчикам:
 ### Не переводите и не меняйте обозначения смены цвета (§b, §e, §f, etc.)
 ### Позиционные параметры (%1$s, %2$s, %3$s, etc.) могут быть переставлены для созхранения структуры предложений
@@ -368,13 +368,13 @@ jm.waypoint.help_import_voxel=Or copy §b%1$s§f to §b%2$s§f and restart Minec
 jm.waypoint.help_import_voxel_title=Import VoxelMap Waypoints
 jm.waypoint.help_manage_ingame=Waypoint Manager (in game)
 jm.waypoint.help_title=Waypoint Help
-jm.waypoint.import_rei_errors=Imported %1$s waypoints from Rei's MiniMap with %1$s errors. See jm.common.log for details.
-jm.waypoint.import_rei_failure=No Rei's MiniMap waypoints were imported. See jm.common.log for details.
+jm.waypoint.import_rei_errors=Imported %1$s waypoints from Rei's MiniMap with %2$s errors. See journeymap.log for details.
+jm.waypoint.import_rei_failure=No Rei's MiniMap waypoints were imported. See journeymap.log for details.
 jm.waypoint.import_rei_file_error=Could not import Rei's MiniMap waypoint file: %1$s
 jm.waypoint.import_rei_success=Imported %1$s waypoints from of Rei's Minimap.
 jm.waypoint.import_rei_version=Your version of Rei's MiniMap is not supported.
-jm.waypoint.import_vox_errors=Imported %1$s waypoints from VoxelMap with %1$s errors. See jm.common.log for details.
-jm.waypoint.import_vox_failure=No VoxelMap waypoints were imported. See jm.common.log for details.
+jm.waypoint.import_vox_errors=Imported %1$s waypoints from VoxelMap with %2$s errors. See journeymap.log for details.
+jm.waypoint.import_vox_failure=No VoxelMap waypoints were imported. See journeymap.log for details.
 jm.waypoint.import_vox_file_error=Could not import VoxelMap waypoint file: %1$s
 jm.waypoint.import_vox_success=Imported %1$s waypoints from VoxelMap.
 jm.waypoint.import_vox_version=Your version of VoxelMap is not supported. Please update to:

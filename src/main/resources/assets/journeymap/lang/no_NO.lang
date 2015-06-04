@@ -1,4 +1,4 @@
-﻿### JourneyMap 5.0.0 Resource Bundle - no_NO
+﻿### JourneyMap 5.1.0 Resource Bundle - no_NO
 ### Translation by: Sindre Sandhaaland and Somonekilledme
 jm.advanced.announcemod=Kunngjør Mod
 jm.advanced.announcemod.tooltip=Kunngjør i chatten at JourneyMap er klar.
@@ -306,13 +306,13 @@ jm.waypoint.help_import_voxel=Eller kopier §b%1$s§f til §b%2$s§f og start Mi
 jm.waypoint.help_import_voxel_title=Importer VoxelMap Veipunkter
 jm.waypoint.help_manage_ingame=Veipunkt organiserer (i spill)
 jm.waypoint.help_title=Veipunkt Hjelp
-jm.waypoint.import_rei_errors=Importerte %1$s veipunkter fra Rei's MiniMap med %1$s feil. Se jm.common.log for flere detaljer.
-jm.waypoint.import_rei_failure=Ingen Rei's MiniMap veipunkter ble importert. Se jm.common.log for flere detaljer.
+jm.waypoint.import_rei_errors=Importerte %1$s veipunkter fra Rei's MiniMap med %2$s feil. Se journeymap.log for flere detaljer.
+jm.waypoint.import_rei_failure=Ingen Rei's MiniMap veipunkter ble importert. Se journeymap.log for flere detaljer.
 jm.waypoint.import_rei_file_error=Kunne ikke importere Rei's MiniMap veipunkt fil: %1$s
 jm.waypoint.import_rei_success=Importerte %1$s veipunkter fra Rei's Minimap.
 jm.waypoint.import_rei_version=Din versjon av Rei's MiniMap Støttes ikke.
-jm.waypoint.import_vox_errors=Importerte %1$s veipunkter fra VoxelMap med %1$s feil. Se jm.common.log for flere detaljer.
-jm.waypoint.import_vox_failure=Ingen VoxelMap veipunkt ble importert. Se jm.common.log for flere detaljer.
+jm.waypoint.import_vox_errors=Importerte %1$s veipunkter fra VoxelMap med %2$s feil. Se journeymap.log for flere detaljer.
+jm.waypoint.import_vox_failure=Ingen VoxelMap veipunkt ble importert. Se journeymap.log for flere detaljer.
 jm.waypoint.import_vox_file_error=Kunne ikke importere VoxelMap veipunkt fil: %1$s
 jm.waypoint.import_vox_success=Importerte %1$s veipunkter fra VoxelMap.
 jm.waypoint.import_vox_version=Din versjon av VoxelMap støttes ikke. Venligst oppdater til:

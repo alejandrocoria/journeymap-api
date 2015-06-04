@@ -1,5 +1,5 @@
 ### JourneyMap 5.1.0 Resource Bundle - fi_FI
-### JourneyMap Finnish translation version 1.1.0 (13.5.2015) by Appelsiini1
+### JourneyMap Finnish translation version 1.1.1 (5.6.2015) by techbrew, 1.1.0 by Appelsiini1
 jm.advanced.announcemod=Ilmoita modi
 jm.advanced.announcemod.tooltip=Ilmoittaa keskusteluikkunassa, että JourneyMap on valmiina.
 jm.advanced.automappoll=AutoMap kyselytaajuus
@@ -366,13 +366,13 @@ jm.waypoint.help_import_voxel=Tai kopioi §b%1$s§f tänne: §b%2$s§f a käynni
 jm.waypoint.help_import_voxel_title=Tuo VoxelMap reittipisteet
 jm.waypoint.help_manage_ingame=Reittipisteiden hallinta(pelissä)
 jm.waypoint.help_title=Reittipiste apu
-jm.waypoint.import_rei_errors=Tuotu %1$s reittipistettä Rei's MiniMap:ista %1$s virheellä. Katso lisätietoja "jm.common.log".
-jm.waypoint.import_rei_failure=Yhtään Rei's MiniMap -reittipistettä ei tuotu. Katso lisätietoja "jm.common.log".
+jm.waypoint.import_rei_errors=Tuotu %1$s reittipistettä Rei's MiniMap:ista %2$s virheellä. Katso lisätietoja journeymap.log.
+jm.waypoint.import_rei_failure=Yhtään Rei's MiniMap -reittipistettä ei tuotu. Katso lisätietoja journeymap.log.
 jm.waypoint.import_rei_file_error=Yhtään reittipistettä ei voitu tuoda Rei's MiniMap reittipistetiedostosta: %1$s
 jm.waypoint.import_rei_success=Tuotu %1$s reittipistettä Rei's MiniMap:ista.
 jm.waypoint.import_rei_version=Versiosi Rei's MiniMap:ista ei ole tuettu.
-jm.waypoint.import_vox_errors=Tuotu %1$s reittipistettä VoxelMap:ista %1$s virheellä. Katso lisätietoja "jm.common.log".
-jm.waypoint.import_vox_failure=Yhtään VoxelMap -reittipistettä ei tuotu. Katso lisätietoja "jm.common.log".
+jm.waypoint.import_vox_errors=Tuotu %1$s reittipistettä VoxelMap:ista %2$s virheellä. Katso lisätietoja journeymap.log.
+jm.waypoint.import_vox_failure=Yhtään VoxelMap -reittipistettä ei tuotu. Katso lisätietoja journeymap.log.
 jm.waypoint.import_vox_file_error=Yhtään reittipistettä ei voitu tuoda VoxelMap reittipistetiedostosta: %1$s
 jm.waypoint.import_vox_success=Tuotu %1$s reittipistettä VoxelMap:ista.
 jm.waypoint.import_vox_version=Versiosi VoxelMap:ista ei ole tuettu. Päivitä versioon:

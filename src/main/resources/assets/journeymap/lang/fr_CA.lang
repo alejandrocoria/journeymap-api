@@ -1,4 +1,4 @@
-### JourneyMap 5.1.0b5 Resource Bundle - fr_FR
+### JourneyMap 5.1 Resource Bundle - fr_FR
 jm.advanced.announcemod=Annoncer le mod
 jm.advanced.announcemod.tooltip=Annoncer dans le chat que JourneyMap est disponible.
 jm.advanced.automappoll=Fréquence de rafraîchissement de cartographie
@@ -360,13 +360,13 @@ jm.waypoint.help_import_voxel=Ou copier §b%1$s§f dans §b%2$s§f et redémarre
 jm.waypoint.help_import_voxel_title=Importer les Marqueurs de VoxelMap
 jm.waypoint.help_manage_ingame=Gestionnaire de Marqueurs(en jeu)
 jm.waypoint.help_title=Aide sur les Marqueurs
-jm.waypoint.import_rei_errors=Importé les Marqueurs %1$s de Rei's MiniMap avec cette erreur %1$s . Voir jm.common.log pour plus de détails.
-jm.waypoint.import_rei_failure=Marqueurs de Rei's MiniMap ont été importés. Voir jm.common.log pour plus de détails.
+jm.waypoint.import_rei_errors=Importé les Marqueurs %1$s de Rei's MiniMap avec cette erreur %2$s . Voir journeymap.log pour plus de détails.
+jm.waypoint.import_rei_failure=Marqueurs de Rei's MiniMap ont été importés. Voir journeymap.log pour plus de détails.
 jm.waypoint.import_rei_file_error=Impossible d'importer le fichier de Marqueurs de Rei's MiniMap: %1$s
 jm.waypoint.import_rei_success=Importé %1$s Marqueurs de Rei's Minimap avec succès.
 jm.waypoint.import_rei_version=Votre version de Rei's MiniMap n'est pas supportée.
-jm.waypoint.import_vox_errors=Importé %1$s Marqueurs de VoxelMap avec ces erreurs: %1$s . Voir jm.common.log pour plus de détails.
-jm.waypoint.import_vox_failure=Aucun Marqueurs de VoxelMap n'ont été importé. Voir jm.common.log pour plus de détails.
+jm.waypoint.import_vox_errors=Importé %1$s Marqueurs de VoxelMap avec ces erreurs: %2$s . Voir journeymap.log pour plus de détails.
+jm.waypoint.import_vox_failure=Aucun Marqueurs de VoxelMap n'ont été importé. Voir journeymap.log pour plus de détails.
 jm.waypoint.import_vox_file_error=Impossible d'importer le fichier de Marqueurs de VoxelMap: %1$s
 jm.waypoint.import_vox_success=Importé %1$s Marqueurs de VoxelMap avec succès.
 jm.waypoint.import_vox_version=Votre version de VoxelMap n'est pas supportée. Mettez le à jour en version:

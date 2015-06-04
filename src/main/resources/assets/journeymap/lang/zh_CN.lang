@@ -1,4 +1,4 @@
-### JourneyMap 5.0.0 Resource Bundle - zh_CN
+### JourneyMap 5.1.0 Resource Bundle - zh_CN
 ### Translation by: NightSharp
 jm.advanced.announcemod=声明Mod
 jm.advanced.announcemod.tooltip=在聊天窗口中声明JourneyMap已经就绪.
@@ -306,13 +306,13 @@ jm.waypoint.help_import_voxel=或者复制§b%1$s§f 到§b%2$s§f 并重新启�
 jm.waypoint.help_import_voxel_title=导入VoxelMap的导航点
 jm.waypoint.help_manage_ingame=导航点管理器(游戏内)
 jm.waypoint.help_title=导航点帮助
-jm.waypoint.import_rei_errors=已从Rei's MiniMap导入了 %1$s 个导航点但产生了 %1$s 个错误. 查看jm.common.log以了解具体细节.
-jm.waypoint.import_rei_failure=没有Rei's MiniMap的导航点被导入. 查看jm.common.log以了解具体细节.
+jm.waypoint.import_rei_errors=已从Rei's MiniMap导入了 %1$s 个导航点但产生了 %2$s 个错误. 查看journeymap.log以了解具体细节.
+jm.waypoint.import_rei_failure=没有Rei's MiniMap的导航点被导入. 查看journeymap.log以了解具体细节.
 jm.waypoint.import_rei_file_error=无法导入Rei's MiniMap的导航点文件: %1$s
 jm.waypoint.import_rei_success=已从Rei's MiniMap导入了 %1$s 个导航点.
 jm.waypoint.import_rei_version=你的Rei's MiniMap版本不被支持
-jm.waypoint.import_vox_errors=已从VoxelMap导入了 %1$s 个导航点但产生了 %1$s 个错误. 查看jm.common.log以了解具体细节.
-jm.waypoint.import_vox_failure=没有VoxelMap的导航点被导入. 查看jm.common.log以了解具体细节.
+jm.waypoint.import_vox_errors=已从VoxelMap导入了 %1$s 个导航点但产生了 %2$s 个错误. 查看journeymap.log以了解具体细节.
+jm.waypoint.import_vox_failure=没有VoxelMap的导航点被导入. 查看journeymap.log以了解具体细节.
 jm.waypoint.import_vox_file_error=无法导入VoxelMap的导航点文件: %1$s
 jm.waypoint.import_vox_success=已从VoxelMap导入了 %1$s 个导航点.
 jm.waypoint.import_vox_version=你的VoxelMap版本不不被支持. 请更新至:

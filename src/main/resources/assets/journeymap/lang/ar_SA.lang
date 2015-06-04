@@ -1,4 +1,4 @@
-### JourneyMap 5.0.0RC6 Resource Bundle - ar_SA
+### JourneyMap 5.1.0 Resource Bundle - ar_SA
 ### Translation by: HosCraft
 jm.advanced.announcemod=تعلن وزارة الدفاع
 jm.advanced.announcemod.tooltip=تعلن في نافذة الدردشة التي JourneyMap جاهز.
@@ -306,13 +306,13 @@ jm.waypoint.help_import_voxel=أو نسخ §b %1$s §f ل§b %2$s §f وإعاد
 jm.waypoint.help_import_voxel_title=استيراد VoxelMap نقاط الطريق
 jm.waypoint.help_manage_ingame=مدير إحداثية (في اللعبة)
 jm.waypoint.help_title=إحداثية مساعدة
-jm.waypoint.import_rei_errors=المستوردة %1$s من نقاط الطريق مصغره ري مع %1$s أخطاء. رؤية jm.common.log لمزيد من التفاصيل.
-jm.waypoint.import_rei_failure=تم استيرادها نقاط الطريق مصغره لا ري ل. رؤية jm.common.log لمزيد من التفاصيل.
+jm.waypoint.import_rei_errors=المستوردة %2$s من نقاط الطريق مصغره ري مع %1$s أخطاء. رؤية journeymap.log لمزيد من التفاصيل.
+jm.waypoint.import_rei_failure=تم استيرادها نقاط الطريق مصغره لا ري ل. رؤية journeymap.log لمزيد من التفاصيل.
 jm.waypoint.import_rei_file_error=تعذر استيراد ملف مصغره إحداثية ري ل : %1$s
 jm.waypoint.import_rei_success=المستوردة %1$s من نقاط الطريق المصغرة من ري و.
 jm.waypoint.import_rei_version=لا يتم اعتماد إصدار مصغره ري ل.
-jm.waypoint.import_vox_errors=المستوردة %1$s نقاط الطرق من VoxelMap مع %1$s أخطاء. رؤية jm.common.log لمزيد من التفاصيل.
-jm.waypoint.import_vox_failure=تم استيرادها نقاط الطريق لا VoxelMap. رؤية jm.common.log لمزيد من التفاصيل.
+jm.waypoint.import_vox_errors=المستوردة %2$s نقاط الطرق من VoxelMap مع %1$s أخطاء. رؤية journeymap.log لمزيد من التفاصيل.
+jm.waypoint.import_vox_failure=تم استيرادها نقاط الطريق لا VoxelMap. رؤية journeymap.log لمزيد من التفاصيل.
 jm.waypoint.import_vox_file_error=تعذر استيراد ملف VoxelMap إحداثية : %1$s
 jm.waypoint.import_vox_success=المستوردة %1$s نقاط الطرق من VoxelMap.
 jm.waypoint.import_vox_version=لا يتم اعتماد إصدار VoxelMap. يرجى تحديث إلى : 
