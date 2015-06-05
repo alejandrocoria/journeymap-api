@@ -36,6 +36,7 @@ import net.techbrew.journeymap.ui.option.OptionSlotFactory;
 import net.techbrew.journeymap.ui.option.SlotMetadata;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.util.*;
@@ -163,6 +164,7 @@ public class OptionsManager extends JmUI
             {
                 List<ScrollListPane.ISlot> categorySlots = new ArrayList<ScrollListPane.ISlot>();
                 optionsListPane = new ScrollListPane<CategorySlot>(this, mc, this.width, this.height, this.headerHeight, this.height - 30, 20);
+                optionsListPane.setAlignTop(true);
                 optionsListPane.setSlots(OptionSlotFactory.getSlots(getToolbars()));
                 if (initialCategories != null)
                 {
@@ -298,6 +300,22 @@ public class OptionsManager extends JmUI
             String[] lastTooltip = optionsListPane.lastTooltip;
             long lastTooltipTime = optionsListPane.lastTooltipTime;
             optionsListPane.lastTooltip = null;
+
+            // Pre-scroll options list pane so we can double the distance covered
+            if (!(Mouse.isButtonDown(0) && optionsListPane.func_148125_i()))
+            {
+                for (; !this.mc.gameSettings.touchscreen && Mouse.next(); this.mc.currentScreen.handleMouseInput())
+                {
+                    int j1 = Mouse.getEventDWheel();
+
+                    if (j1 != 0)
+                    {
+                        j1 = (j1 > 0) ? -2 : 2;
+                        optionsListPane.scrollBy(j1 * optionsListPane.slotHeight);
+                    }
+                }
+            }
+
             optionsListPane.drawScreen(x, y, par3);
 
             super.drawScreen(x, y, par3);
