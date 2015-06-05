@@ -320,7 +320,6 @@ public class TileDrawStep
         }
         else if (scaledTexture.getLastImageUpdate() < regionTextureHolder.getImageTimestamp())
         {
-            System.out.println("Scaled updated " + this);
             final TextureImpl temp = scaledTexture;
             scaledFuture = TextureCache.instance().scheduleTextureTask(new Callable<TextureImpl>()
             {
