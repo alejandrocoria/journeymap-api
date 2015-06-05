@@ -754,6 +754,8 @@ public class OptionsManager extends JmUI
 
     public static class LabelButton extends Button
     {
+        DrawUtil.HAlign hAlign = DrawUtil.HAlign.Left;
+
         public LabelButton(int width, String key, Object... labelArgs)
         {
             super(Constants.getString(key, labelArgs));
@@ -776,10 +778,34 @@ public class OptionsManager extends JmUI
         {
         }
 
+        public void setHAlign(DrawUtil.HAlign hAlign)
+        {
+            this.hAlign = hAlign;
+        }
+
         @Override
         public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
         {
-            DrawUtil.drawCenteredLabel(this.displayString, this.getCenterX(), this.getMiddleY(), null, 0, labelColor, 255, 1, drawLabelShadow);
+            int labelX;
+            switch (hAlign)
+            {
+                case Left:
+                {
+                    labelX = this.getRightX();
+                    break;
+                }
+                case Right:
+                {
+                    labelX = this.getX();
+                    break;
+                }
+                default:
+                {
+                    labelX = this.getCenterX();
+                }
+            }
+
+            DrawUtil.drawLabel(this.displayString, labelX, this.getMiddleY(), hAlign, DrawUtil.VAlign.Middle, null, 0, labelColor, 255, 1, drawLabelShadow);
         }
     }
 }
