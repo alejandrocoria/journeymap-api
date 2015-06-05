@@ -20,6 +20,7 @@ import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.properties.config.Config;
+import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.map.TileDrawStepCache;
 import net.techbrew.journeymap.server.JMServer;
 import net.techbrew.journeymap.task.main.SoftResetTask;
@@ -351,13 +352,27 @@ public class OptionsManager extends JmUI
                             {
                                 boolean valid = JourneyMap.getCoreProperties().hasValidCaveRenderDistances();
                                 limitButtonRange = true;
-                                slotMetadata.getButton().setOverrideLabelColor(valid ? null : Color.red);
+                                if (valid)
+                                {
+                                    slotMetadata.getButton().resetLabelColors();
+                                }
+                                else
+                                {
+                                    slotMetadata.getButton().setLabelColors(Color.red, Color.red, null);
+                                }
                             }
                             else if (property == coreProperties.renderDistanceSurfaceMax)
                             {
                                 boolean valid = JourneyMap.getCoreProperties().hasValidSurfaceRenderDistances();
                                 limitButtonRange = true;
-                                slotMetadata.getButton().setOverrideLabelColor(valid ? null : Color.red);
+                                if (valid)
+                                {
+                                    slotMetadata.getButton().resetLabelColors();
+                                }
+                                else
+                                {
+                                    slotMetadata.getButton().setLabelColors(Color.red, Color.red, null);
+                                }
                             }
                             else if (property == coreProperties.renderDistanceCaveMin)
                             {
@@ -733,7 +748,7 @@ public class OptionsManager extends JmUI
             this.category = category;
             setTooltip(Constants.getString("jm.config.reset.tooltip"));
             setDrawBackground(false);
-            packedFGColour = Color.red.getRGB();
+            setLabelColors(Color.red, Color.red, null);
         }
     }
 
@@ -746,7 +761,7 @@ public class OptionsManager extends JmUI
             setDrawBackground(false);
             setDrawFrame(false);
             setEnabled(false);
-            packedFGColour = Color.lightGray.getRGB();
+            setLabelColors(Color.lightGray, Color.lightGray, Color.lightGray);
             this.width = width;
         }
 
@@ -764,8 +779,7 @@ public class OptionsManager extends JmUI
         @Override
         public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
         {
-            int labelWidth = super.getFitWidth(minecraft.fontRenderer);
-            this.drawString(minecraft.fontRenderer, this.displayString, this.xPosition + this.width - labelWidth, this.yPosition + (this.height - 8) / 2, packedFGColour);
+            DrawUtil.drawCenteredLabel(this.displayString, this.getCenterX(), this.getMiddleY(), null, 0, labelColor, 255, 1, drawLabelShadow);
         }
     }
 }

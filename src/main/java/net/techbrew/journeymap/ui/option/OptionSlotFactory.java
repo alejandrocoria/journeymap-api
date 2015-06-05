@@ -241,7 +241,7 @@ public class OptionSlotFactory
             slotMetadata.setMasterPropertyForCategory(annotation.master());
             if (annotation.master())
             {
-                button.packedFGColour = Color.cyan.getRGB();
+                button.setLabelColors(Color.cyan, null, null);
             }
             return slotMetadata;
         }

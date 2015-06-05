@@ -33,13 +33,16 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected Color smallBgHoverColor = new Color(125, 135, 190);
     protected Color smallBgHoverColor2 = new Color(100, 100, 100);
 
-    protected Color overrideLabelColor;
+    protected Color labelColor;
+    protected Color hoverLabelColor;
+    protected Color disabledLabelColor;
+
     protected Color disabledBgColor = Color.darkGray;
-    protected Color disabledLabelColor = Color.lightGray;
 
     //protected boolean enabled;
     protected boolean drawFrame;
     protected boolean drawBackground;
+    protected boolean drawLabelShadow = true;
     protected boolean showDisabledHoverText;
     protected boolean defaultStyle = true;
     protected int WIDTH_PAD = 12;
@@ -48,12 +51,20 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public Button(String label)
     {
         this(0, 0, label);
+        resetLabelColors();
     }
 
     public Button(int width, int height, String label)
     {
         super(0, 0, 0, width, height, label);
         finishInit();
+    }
+
+    public void resetLabelColors()
+    {
+        labelColor = new Color(14737632);
+        hoverLabelColor = new Color(16777120);
+        disabledLabelColor = Color.lightGray;
     }
 
     protected void finishInit()
@@ -161,11 +172,11 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             }
 
             this.mouseDragged(minecraft, mouseX, mouseY);
-            int labelColor = overrideLabelColor == null ? 14737632 : overrideLabelColor.getRGB();
+            Color varLabelColor = labelColor;
 
             if (!this.isEnabled())
             {
-                labelColor = disabledLabelColor.getRGB();
+                varLabelColor = disabledLabelColor;
 
                 if (drawBackground)
                 {
@@ -178,16 +189,28 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             {
                 if (this.field_146123_n)
                 {
-                    labelColor = overrideLabelColor == null ? 16777120 : overrideLabelColor.getRGB();
+                    varLabelColor = hoverLabelColor;
+                }
+                else if (labelColor != null)
+                {
+                    varLabelColor = labelColor;
                 }
                 else if (packedFGColour != 0)
                 {
-                    labelColor = packedFGColour;
+                    varLabelColor = new Color(packedFGColour);
                 }
             }
 
-            this.drawCenteredString(fontrenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, labelColor);
+            DrawUtil.drawCenteredLabel(this.displayString, this.getCenterX(), this.getMiddleY(), null, 0, varLabelColor, 255, 1, drawLabelShadow);
         }
+    }
+
+    /**
+     * Renders the specified text to the screen, center-aligned.
+     */
+    public void drawCenteredString(FontRenderer p_73732_1_, String p_73732_2_, int p_73732_3_, int p_73732_4_, int p_73732_5_)
+    {
+        p_73732_1_.drawStringWithShadow(p_73732_2_, p_73732_3_ - p_73732_1_.getStringWidth(p_73732_2_) / 2, p_73732_4_, p_73732_5_);
     }
 
     public void drawUnderline()
@@ -203,11 +226,6 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
      */
     public void secondaryDrawButton()
     {
-    }
-
-    public void setOverrideLabelColor(Color color)
-    {
-        overrideLabelColor = color;
     }
 
     @Override
@@ -520,7 +538,38 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return false;
     }
 
+    public void setBackgroundColors(Color smallBgColor, Color smallBgHoverColor, Color smallBgHoverColor2)
+    {
+        this.smallBgColor = smallBgColor;
+        this.smallBgHoverColor = smallBgHoverColor;
+        this.smallBgHoverColor2 = smallBgHoverColor2;
+    }
+
+    public void setDrawLabelShadow(boolean draw)
+    {
+        this.drawLabelShadow = draw;
+    }
+
+    public void setLabelColors(Color labelColor, Color hoverLabelColor, Color disabledLabelColor)
+    {
+        this.labelColor = labelColor;
+        packedFGColour = labelColor.getRGB();
+        if (hoverLabelColor != null)
+        {
+            this.hoverLabelColor = hoverLabelColor;
+        }
+        if (disabledLabelColor != null)
+        {
+            this.disabledLabelColor = disabledLabelColor;
+        }
+    }
+
     public void refresh()
     {
+    }
+
+    public Color getLabelColor()
+    {
+        return labelColor;
     }
 }

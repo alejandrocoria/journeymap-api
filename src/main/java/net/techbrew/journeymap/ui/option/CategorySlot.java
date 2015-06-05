@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.properties.config.Config;
+import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.ScrollListPane;
 
@@ -42,7 +43,15 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
 
         button = new Button(name);
         button.setDefaultStyle(false);
-        button.packedFGColour = Color.white.getRGB();
+        button.setDrawLabelShadow(false);
+        button.setLabelColors(new Color(10, 10, 100), new Color(10, 10, 100), null);
+
+        Color smallBgColor = new Color(220, 220, 250);
+        Color smallBgHoverColor = new Color(235, 235, 255);
+        Color smallBgHoverColor2 = new Color(100, 100, 100);
+
+        button.setBackgroundColors(smallBgColor, smallBgHoverColor, smallBgHoverColor2);
+
         metadata = new SlotMetadata(button, name, tooltip, advanced);
         updateButtonLabel();
     }
@@ -186,6 +195,9 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         button.setHeight(slotHeight);
         button.drawButton(mc, mouseX, mouseY);
 
+        DrawUtil.drawRectangle(button.getX() + 4, button.getMiddleY() - 5, 11, 10, Color.black, 50);
+        DrawUtil.drawLabel(selected ? glyphOpen : glyphClosed, button.getX() + 12, button.getMiddleY(), DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, Color.black, 0, button.getLabelColor(), 255, 1, true);
+
         if (masterSlot != null && selected)
         {
             boolean enabled = masterSlot.button.isActive();
@@ -204,8 +216,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
 
     private void updateButtonLabel()
     {
-        String glyph = selected ? glyphOpen : glyphClosed;
-        this.button.displayString = String.format("%1$s  %2$s  %1$s", glyph, name);
+        this.button.displayString = name;
     }
 
     public boolean isSelected()
