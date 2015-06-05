@@ -74,11 +74,16 @@ public class TileDrawStep
     boolean draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, int textureFilter, int textureWrap, GridSpec gridSpec)
     {
         boolean regionUpdatePending = updateRegionTexture();
-        boolean scaledUpdatePending = !regionUpdatePending && highQuality && updateScaledTexture();
+        if (highQuality)
+        {
+            updateScaledTexture();
+        }
+
+        //boolean scaledUpdatePending = !regionUpdatePending && highQuality && updateScaledTexture();
         Integer textureId = -1;
         boolean useScaled = false;
 
-        if (highQuality && !scaledUpdatePending && scaledTexture != null)
+        if (highQuality && scaledTexture != null)
         {
             textureId = scaledTexture.getGlTextureId();
             useScaled = true;
@@ -313,7 +318,7 @@ public class TileDrawStep
                 public TextureImpl call() throws Exception
                 {
                     TextureImpl temp = new TextureImpl(null, getScaledRegionArea(), false, false);
-                    temp.setDescription("scaled for " + this);
+                    temp.setDescription("scaled for " + TileDrawStep.this);
                     return temp;
                 }
             });
