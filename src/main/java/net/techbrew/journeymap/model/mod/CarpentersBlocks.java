@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIcon;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
@@ -83,6 +84,13 @@ public class CarpentersBlocks
                 }
             }
             return blockMD;
+        }
+
+        @Override
+        public IIcon getIcon(BlockMD blockMD)
+        {
+            // com.carpentersblocks.util.BlockProperties.MASK_DEFAULT_ICON = 16;
+            return blockMD.getBlock().getIcon(1, 16);
         }
     }
 }

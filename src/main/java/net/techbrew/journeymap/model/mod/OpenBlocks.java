@@ -4,6 +4,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.IIcon;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 import net.techbrew.journeymap.model.Waypoint;
@@ -28,6 +29,12 @@ public class OpenBlocks
         public Collection<GameRegistry.UniqueIdentifier> getBlockUids()
         {
             return Arrays.asList(UID);
+        }
+
+        @Override
+        public IIcon getIcon(BlockMD blockMD)
+        {
+            return null;
         }
 
         @Override

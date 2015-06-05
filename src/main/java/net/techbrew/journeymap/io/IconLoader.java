@@ -139,17 +139,24 @@ public class IconLoader
         }
         else
         {
-            int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
-            while (blockIcon == null && side >= 0)
+            if (blockMD.hasFlag(BlockMD.Flag.SpecialHandling))
             {
-                blockIcon = blockMD.getBlock().getIcon(side, blockMD.meta);
-                side--;
+                blockIcon = DataCache.instance().getModBlockDelegate().getIcon(blockMD);
+            }
+
+            if (blockIcon == null)
+            {
+                int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
+                while (blockIcon == null && side >= 0)
+                {
+                    blockIcon = blockMD.getBlock().getIcon(side, blockMD.meta);
+                    side--;
+                }
             }
         }
 
         return blockIcon;
     }
-
 
     Color getColorForIcon(BlockMD blockMD, IIcon icon)
     {

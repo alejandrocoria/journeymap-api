@@ -2,6 +2,7 @@ package net.techbrew.journeymap.model.mod;
 
 import com.google.common.base.Joiner;
 import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraft.util.IIcon;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.BlockMD;
@@ -14,7 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
+/**
+ * Delegates the handling of some mods' blocks to a special handler.  The handling may or may not be related
+ * to how the blocks are colored on the map.  For example, a certain block might trigger creation of a waypoint.
+ */
 public class ModBlockDelegate
 {
     // TODO: Move special block handling (torches, biomes) in BlockRegistry here
@@ -27,6 +31,11 @@ public class ModBlockDelegate
     private static final int ERROR_LIMIT = 25;
     private static Logger logger = JourneyMap.getLogger();
 
+    /**
+     * Register a special block handler.
+     *
+     * @param handler
+     */
     private static void register(IModBlockHandler handler)
     {
         try
@@ -56,6 +65,12 @@ public class ModBlockDelegate
         }
     }
 
+    /**
+     * Register a special block handler and a block UID to be handled by it.
+     * @param handler
+     * @param uid
+     * @return
+     */
     private static boolean register(IModBlockHandler handler, GameRegistry.UniqueIdentifier uid)
     {
         if (uid == null)
@@ -71,11 +86,28 @@ public class ModBlockDelegate
         return true;
     }
 
+    /**
+     * Whether a block can get special handling.
+     *
+     * @param blockMD
+     * @return
+     */
     public boolean canHandle(BlockMD blockMD)
     {
         return Blocks.containsKey(blockMD.uid);
     }
 
+    /**
+     * Provide special handling of a block in-situ when encountered during a mapping task.
+     * The block returned will be used to color that spot on the map.
+     *
+     * @param chunkMD
+     * @param blockMD
+     * @param localX
+     * @param y
+     * @param localZ
+     * @return
+     */
     public BlockMD handleBlock(ChunkMD chunkMD, final BlockMD blockMD, int localX, int y, int localZ)
     {
         BlockMD delegatedBlockMD = null;
@@ -105,13 +137,69 @@ public class ModBlockDelegate
         return delegatedBlockMD;
     }
 
+    /**
+     * Provide special handling of getting a block icon.  Return nulls if not necessary,
+     *
+     * @param blockMD
+     * @return
+     */
+    public IIcon getIcon(BlockMD blockMD)
+    {
+        try
+        {
+            IModBlockHandler handler = Blocks.get(blockMD.uid);
+            if (handler != null)
+            {
+                return handler.getIcon(blockMD);
+            }
+        }
+        catch (Throwable t)
+        {
+            int count = Errors.get(blockMD.uid).incrementAndGet();
+            String message = String.format("Error (%s) from getIcon() on block '%s': %s", count, blockMD.uid, LogFormatter.toString(t));
+            logger.error(message);
+            if (count >= ERROR_LIMIT)
+            {
+                logger.warn(String.format("Deregistering problematic IModBlockHandler for '%s'.", blockMD.uid));
+                Blocks.remove(blockMD.uid);
+            }
+        }
+
+        return null;
+    }
+
     public static interface IModBlockHandler
     {
+        /**
+         * Provide Block UIDs that will be registered with as needing a special handler.
+         * @return
+         */
         public Collection<GameRegistry.UniqueIdentifier> getBlockUids();
 
+        /**
+         * Provide special handling of getting a block icon.  Return null if not necessary,
+         *
+         * @param blockMD
+         * @return
+         */
+        public IIcon getIcon(BlockMD blockMD);
+
+        /**
+         * Provide special handling of a block in-situ when encountered during a mapping task.
+         * The block returned will be used to color that spot on the map.
+         * @param chunkMD
+         * @param blockMD
+         * @param localX
+         * @param y
+         * @param localZ
+         * @return
+         */
         public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ);
     }
 
+    /**
+     * Register special block handlers when this class is first loaded.
+     */
     static
     {
         // register(new OpenBlocks.GraveHandler());
