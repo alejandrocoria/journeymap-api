@@ -1,0 +1,29 @@
+/* JourneyMap 5.1.0 Splash/About Dialog - fr_FR  et fr_CA */
+{
+  "lines": [
+    {
+      "label": "Amélioration des performances",
+      "action": ""
+    },
+    {
+      "label": "Nouvelle fonctionnalité: L'Éditeur de grille pour personnaliser La grille de chunk",
+      "action": "GridEditor"
+    },
+    {
+      "label": "Nouvelle fonctionnalité: Action > Effacer Carte",
+      "action": "FullscreenActions"
+    },
+    {
+      "label": "Nouvelle fonctionnalité:  Action > Désactiver Cartographie",
+      "action": "FullscreenActions"
+    },
+    {
+      "label": "Nouveau paramétres dans les Options > Cartographie",
+      "action": "OptionsManager#Cartography"
+    },
+    {
+      "label": "F3 et Maj-F3 affiche les données de performances de JourneyMap",
+      "action": ""
+    }
+  ]
+}
