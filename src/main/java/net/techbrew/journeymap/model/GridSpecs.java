@@ -5,15 +5,17 @@ package net.techbrew.journeymap.model;
  */
 public class GridSpecs
 {
+    public static final GridSpec DEFAULT_DAY = new GridSpec(GridSpec.Style.Squares, .5f, .5f, .5f, .5f);
+    public static final GridSpec DEFAULT_NIGHT = new GridSpec(GridSpec.Style.Squares, .5f, .5f, 1f, .3f);
+    public static final GridSpec DEFAULT_UNDERGROUND = new GridSpec(GridSpec.Style.Squares, .5f, .5f, .5f, .3f);
+
     private GridSpec day;
     private GridSpec night;
     private GridSpec underground;
 
     public GridSpecs()
     {
-        this(new GridSpec(GridSpec.Style.Squares, .5f, .5f, .5f, .5f), // day
-                new GridSpec(GridSpec.Style.Squares, .5f, .5f, 1f, .3f), // night
-                new GridSpec(GridSpec.Style.Squares, .5f, .5f, .5f, .3f)); // underground
+        this(DEFAULT_DAY.clone(), DEFAULT_NIGHT.clone(), DEFAULT_UNDERGROUND.clone()); // underground
     }
 
     public GridSpecs(GridSpec day, GridSpec night, GridSpec underground)
