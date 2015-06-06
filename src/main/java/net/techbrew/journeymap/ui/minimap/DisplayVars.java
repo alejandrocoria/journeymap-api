@@ -366,9 +366,9 @@ public class DisplayVars
             this.name = Integer.toString(miniMapId);
         }
 
-        void draw(Point2D.Double mapCenter, int alpha)
+        void draw(Point2D.Double mapCenter, int alpha, double rotation)
         {
-            DrawUtil.drawLabel(name, mapCenter.getX(), mapCenter.getY() + 8, DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, color, alpha, scale, true, 0);
+            DrawUtil.drawLabel(name, mapCenter.getX(), mapCenter.getY() + 8, DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, color, alpha, scale, true, rotation);
         }
 
     }
@@ -399,11 +399,11 @@ public class DisplayVars
             scaleHeightOffset = ((tex.getHeight() * bgScale) - tex.getHeight()) / 2;
         }
 
-        void draw(Point2D.Double mapCenter, int alpha)
+        void draw(Point2D.Double mapCenter, int alpha, double rotation)
         {
             x = mapCenter.getX() - (tex.getWidth() / 2);
             y = mapCenter.getY() - tex.getHeight() - 8;
-            DrawUtil.drawColoredImage(tex, alpha, opposite, mapCenter.getX() - ((tex.getWidth() * bgScale) / 2), mapCenter.getY() - (tex.getHeight() * bgScale) + scaleHeightOffset - 8, bgScale, 0);
+            DrawUtil.drawColoredImage(tex, alpha, opposite, mapCenter.getX() - ((tex.getWidth() * bgScale) / 2), mapCenter.getY() - (tex.getHeight() * bgScale) + scaleHeightOffset - 8, bgScale, rotation);
             DrawUtil.drawColoredImage(tex, alpha, color, x, y, 1, 0);
         }
     }
