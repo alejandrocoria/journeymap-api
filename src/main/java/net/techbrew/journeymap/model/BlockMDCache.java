@@ -147,6 +147,8 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:DryGrass2"), EnumSet.of(BiomeColor));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:PeatGrass"), EnumSet.of(BiomeColor));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:TallGrass"), EnumSet.of(BiomeColor));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:SaltWater"), EnumSet.of(BiomeColor));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:SaltWaterStationary"), EnumSet.of(BiomeColor));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:SeaGrassStill"), EnumSet.of(Side2Texture));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("Thaumcraft:blockMagicalLeaves"), EnumSet.of(BiomeColor)); // Thaumcraft:blockMagicalLeaves Greatwood Leaves #2C6F0E
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("CarpentersBlocks:blockCarpentersLadder"), EnumSet.of(OpenToSky));

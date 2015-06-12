@@ -39,13 +39,19 @@ public class FullscreenActions extends JmUI
 {
     protected TextureImpl patreonLogo = TextureCache.instance().getPatreonLogo();
 
-    Button buttonAutomap, buttonSave, buttonClose, buttonBrowser, buttonCheck, buttonDonate, buttonDeleteMap;
+    Button buttonAutomap, buttonSave, buttonAbout, buttonClose, buttonBrowser, buttonCheck, buttonDonate, buttonDeleteMap;
     BooleanPropertyButton buttonEnableMapping;
 
     public FullscreenActions()
     {
         super(Constants.getString("jm.common.actions"));
     }
+
+    public FullscreenActions(JmUI returnDisplay)
+    {
+        super(Constants.getString("jm.common.actions"), returnDisplay);
+    }
+
 
     public static void launchLocalhost()
     {
@@ -81,9 +87,7 @@ public class FullscreenActions extends JmUI
     {
         this.buttonList.clear();
 
-        String on = Constants.getString("jm.common.on");
-        String off = Constants.getString("jm.common.off");
-
+        buttonAbout = new Button(Constants.getString("jm.common.splash_about"));
         buttonSave = new Button(Constants.getString("jm.common.save_map"));
         buttonClose = new Button(Constants.getString("jm.common.close"));
         buttonBrowser = new Button(Constants.getString("jm.common.use_browser"));
@@ -108,6 +112,7 @@ public class FullscreenActions extends JmUI
                 JourneyMap.getCoreProperties(),
                 JourneyMap.getCoreProperties().mappingEnabled);
 
+        buttonList.add(buttonAbout);
         buttonList.add(buttonAutomap);
         buttonList.add(buttonSave);
         buttonList.add(buttonCheck);
@@ -140,7 +145,10 @@ public class FullscreenActions extends JmUI
         final int hgap = 4;
         final int vgap = 3;
         final int bx = (this.width) / 2;
-        final int by = this.height / 4;
+        int by = this.height / 4;
+
+        buttonAbout.centerHorizontalOn(bx).setY(by);
+        by = buttonAbout.getBottomY() + vgap;
 
         ButtonList row1 = new ButtonList(buttonAutomap, buttonEnableMapping);
         ButtonList row2 = new ButtonList(buttonSave, buttonDeleteMap);
@@ -201,6 +209,11 @@ public class FullscreenActions extends JmUI
             UIManager.getInstance().openFullscreenMap();
             return;
         }
+        if (guibutton == buttonAbout)
+        {
+            UIManager.getInstance().openSplash(this);
+            return;
+        }
         if (guibutton == buttonEnableMapping)
         {
             buttonEnableMapping.toggle();
@@ -232,7 +245,7 @@ public class FullscreenActions extends JmUI
             JourneyMap.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
             ChatLog.announceI18N("jm.common.save_filename", mapSaver.getSaveFileName());
         }
-        close();
+        closeAndReturn();
     }
 
 
@@ -243,7 +256,7 @@ public class FullscreenActions extends JmUI
         {
             case Keyboard.KEY_ESCAPE:
             {
-                UIManager.getInstance().openFullscreenMap();
+                closeAndReturn();
                 break;
             }
         }

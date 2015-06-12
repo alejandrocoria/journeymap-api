@@ -148,6 +148,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     public final AtomicReference<String> renderOverlayEventTypeName = new AtomicReference<String>(RenderGameOverlayEvent.ElementType.ALL.name());
     public final AtomicBoolean renderOverlayPreEvent = new AtomicBoolean(true);
     public final AtomicReference<String> optionsManagerViewed = new AtomicReference<String>("");
+    public final AtomicReference<String> splashViewed = new AtomicReference<String>("");
 
     protected transient final String name = "core";
 

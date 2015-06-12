@@ -20,10 +20,7 @@ import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.ui.component.JmUI;
-import net.techbrew.journeymap.ui.dialog.FullscreenActions;
-import net.techbrew.journeymap.ui.dialog.FullscreenHotkeysHelp;
-import net.techbrew.journeymap.ui.dialog.GridEditor;
-import net.techbrew.journeymap.ui.dialog.OptionsManager;
+import net.techbrew.journeymap.ui.dialog.*;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import net.techbrew.journeymap.ui.minimap.MiniMap;
 import net.techbrew.journeymap.ui.minimap.MiniMapHotkeysHelp;
@@ -214,6 +211,11 @@ public class UIManager
     public void openMapActions()
     {
         open(FullscreenActions.class);
+    }
+
+    public void openSplash(JmUI returnDisplay)
+    {
+        open(Splash.class, returnDisplay);
     }
 
     public void openWaypointHelp(JmUI returnDisplay)

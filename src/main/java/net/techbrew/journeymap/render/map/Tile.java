@@ -39,7 +39,6 @@ public class Tile
     final ArrayList<TileDrawStep> drawSteps = new ArrayList<TileDrawStep>();
 
     private final Logger logger = JourneyMap.getLogger();
-    private final boolean debug = logger.isTraceEnabled();
 
     int renderType = 0;
     int textureFilter = 0;

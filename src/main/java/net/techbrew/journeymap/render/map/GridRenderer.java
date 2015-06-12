@@ -44,7 +44,7 @@ public class GridRenderer
     // Update pixel offsets for center
     private final TilePos centerPos = new TilePos(0, 0);
     private final Logger logger = JourneyMap.getLogger();
-    private final boolean debug = logger.isTraceEnabled();
+    private final boolean debug = logger.isDebugEnabled();
     private final TreeMap<TilePos, Tile> grid = new TreeMap<TilePos, Tile>();
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
     private final GridSpecs gridSpecs = JourneyMap.getCoreProperties().gridSpecs;

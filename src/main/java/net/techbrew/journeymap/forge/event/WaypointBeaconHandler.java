@@ -42,11 +42,14 @@ public class WaypointBeaconHandler implements EventHandlerManager.EventHandler
     {
         if (mc.thePlayer != null && JourneyMap.getWaypointProperties().beaconEnabled.get())
         {
-            mc.mcProfiler.startSection("journeymap");
-            mc.mcProfiler.startSection("beacons");
-            RenderWaypointBeacon.renderAll();
-            mc.mcProfiler.endSection();
-            mc.mcProfiler.endSection();
+            if (!this.mc.gameSettings.hideGUI)
+            {
+                mc.mcProfiler.startSection("journeymap");
+                mc.mcProfiler.startSection("beacons");
+                RenderWaypointBeacon.renderAll();
+                mc.mcProfiler.endSection();
+                mc.mcProfiler.endSection();
+            }
         }
     }
 }

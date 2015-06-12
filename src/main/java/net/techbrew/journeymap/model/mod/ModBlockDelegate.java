@@ -114,7 +114,7 @@ public class ModBlockDelegate
 
     static
     {
-        register(new OpenBlocks.GraveHandler());
+        // register(new OpenBlocks.GraveHandler());
         register(new CarpentersBlocks.CommonHandler());
     }
 }

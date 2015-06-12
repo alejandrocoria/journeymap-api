@@ -53,6 +53,7 @@ public class OptionsManager extends JmUI
     protected Button minimap1KeysButton, minimap2KeysButton;
     protected Button fullscreenKeysButton;
     protected Button buttonClose;
+    protected Button buttonAbout;
     protected Button renderStatsButton;
     protected Button editGridMinimap1Button;
     protected Button editGridMinimap2Button;
@@ -246,15 +247,15 @@ public class OptionsManager extends JmUI
             }
 
             buttonClose = new Button(Constants.getString("jm.common.close"));
-            buttonClose.setWidth(150);
 
-            buttonList.add(buttonClose);
+            buttonAbout = new Button(Constants.getString("jm.common.splash_about"));
 
-            ButtonList bottomRow = new ButtonList(buttonList);
-            //bottomRow.equalizeWidths(getFontRenderer());
-
+            ButtonList bottomRow = new ButtonList(buttonAbout, buttonClose);
+            bottomRow.equalizeWidths(getFontRenderer());
+            bottomRow.setWidths(Math.max(150, buttonAbout.getWidth()));
             bottomRow.layoutCenteredHorizontal(width / 2, height - 25, true, 4);
 
+            buttonList.addAll(bottomRow);
         }
         catch (Throwable t)
         {
@@ -510,6 +511,12 @@ public class OptionsManager extends JmUI
         if (button == buttonClose)
         {
             closeAndReturn();
+            return;
+        }
+
+        if (button == buttonAbout)
+        {
+            UIManager.getInstance().openSplash(this);
             return;
         }
 

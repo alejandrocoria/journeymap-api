@@ -1,0 +1,28 @@
+{
+  "lines": [
+    {
+      "label": "Many performance improvements",
+      "action": ""
+    },
+    {
+      "label": "New Feature: Grid Editor customizes the chunk grid",
+      "action": "GridEditor"
+    },
+    {
+      "label": "New Feature: Action > Delete Map",
+      "action": "FullscreenActions"
+    },
+    {
+      "label": "New Feature: Action > Disable Mapping",
+      "action": "FullscreenActions"
+    },
+    {
+      "label": "New settings in Options > Cartography",
+      "action": "OptionsManager#Cartography"
+    },
+    {
+      "label": "F3 and Shift-F3 show JourneyMap performance data",
+      "action": ""
+    }
+  ]
+}
