@@ -154,7 +154,6 @@ public class MapState
                 setMapType(MapType.day(player));
             }
         }
-        lastMapTypeChange = System.currentTimeMillis();
     }
 
     public void setMapType(MapType mapType)
@@ -168,7 +167,7 @@ public class MapState
             }
         }
         lastMapProperties.save();
-        lastMapTypeChange = System.currentTimeMillis();
+        setLastMapTypeChange(mapType);
         requireRefresh();
     }
 
@@ -201,8 +200,7 @@ public class MapState
 
         if (!Objects.equal(mapType, lastMapType))
         {
-            lastMapType = mapType;
-            lastMapTypeChange = System.currentTimeMillis();
+            setLastMapTypeChange(mapType);
         }
 
         return mapType;
@@ -211,6 +209,15 @@ public class MapState
     public long getLastMapTypeChange()
     {
         return lastMapTypeChange;
+    }
+
+    private void setLastMapTypeChange(MapType mapType)
+    {
+        if (lastMapType != null && !(mapType.isUnderground() && lastMapType.isUnderground()))
+        {
+            lastMapTypeChange = System.currentTimeMillis();
+        }
+        this.lastMapType = mapType;
     }
 
     public boolean isUnderground()
