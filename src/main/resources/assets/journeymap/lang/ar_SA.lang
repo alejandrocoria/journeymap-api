@@ -106,7 +106,7 @@ jm.common.map_style_plantshadows.tooltip=النباتات والمحاصيل و�
 jm.common.map_style_title=نمط الخريطة
 jm.common.map_style_transparency=استخدام الشفافية
 jm.common.map_style_transparency.tooltip=كتل شفافة تكشف ما تحتها
-jm.common.mapgui_only_ready=صحافة [§b %1$s §f]. (خادم الويب تعطيل).
+jm.common.mapgui_only_ready=صحافة [§b %1$s §f]
 jm.common.memory_warning=ماين كرافت نفاد الذاكرة : %1$s
 jm.common.mob_icon_set=الغوغاء الأيقونات
 jm.common.mob_icon_set.tooltip=ومجموعة الرموز المستخدمة لعرض الغوغاء على الرادار
