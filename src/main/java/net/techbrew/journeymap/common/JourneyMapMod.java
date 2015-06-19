@@ -18,7 +18,7 @@ public class JourneyMapMod
     @Mod.Instance(CommonProxy.MOD_ID)
     public static JourneyMapMod instance;
 
-    @SidedProxy(clientSide = "net.techbrew.journeymap.JourneyMap", serverSide = "net.techbrew.journeymap.common.CommonProxy.NoOp")
+    @SidedProxy(clientSide = "net.techbrew.journeymap.JourneyMap", serverSide = "net.techbrew.journeymap.common.NoOp")
     public static CommonProxy proxy;
 
     @NetworkCheckHandler
