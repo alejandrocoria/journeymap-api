@@ -671,11 +671,18 @@ public class FileHandler
     public static BufferedImage getIconFromFile(File parentdir, String assetsPath, String setName, String iconPath, BufferedImage defaultImg)
     {
         BufferedImage img = null;
+        if (iconPath == null)
+        {
+            // Will make error messages easier to interpret.
+            iconPath = "null";
+        }
+
+        File iconFile = null;
 
         try
         {
             String filePath = Joiner.on(File.separatorChar).join(setName, iconPath.replace('/', File.separatorChar));
-            File iconFile = new File(parentdir, filePath);
+            iconFile = new File(parentdir, filePath);
 
 
             if (iconFile.exists())
@@ -711,7 +718,7 @@ public class FileHandler
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().error("Couldn't load iconset file: " + LogFormatter.toString(e));
+            JMLogger.logOnce("Couldn't load iconset file: " + iconFile, e);
         }
 
         return img;
