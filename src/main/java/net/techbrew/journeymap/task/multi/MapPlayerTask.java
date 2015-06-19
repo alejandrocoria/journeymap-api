@@ -87,14 +87,14 @@ public class MapPlayerTask extends BaseMapTask
         {
             if (worldHasSky && JourneyMap.getCoreProperties().alwaysMapSurface.get())
             {
-                tasks.add(new MapPlayerTask(chunkRenderController, player.entityLiving.worldObj, mapType, new ArrayList<ChunkCoordIntPair>()));
+                tasks.add(new MapPlayerTask(chunkRenderController, player.entityLiving.worldObj, MapType.day(player), new ArrayList<ChunkCoordIntPair>()));
             }
         }
         else
         {
             if (cavesAllowed && JourneyMap.getCoreProperties().alwaysMapCaves.get())
             {
-                tasks.add(new MapPlayerTask(chunkRenderController, player.entityLiving.worldObj, mapType, new ArrayList<ChunkCoordIntPair>()));
+                tasks.add(new MapPlayerTask(chunkRenderController, player.entityLiving.worldObj, MapType.underground(player), new ArrayList<ChunkCoordIntPair>()));
             }
         }
 
@@ -302,6 +302,10 @@ public class MapPlayerTask extends BaseMapTask
                     {
                         RenderSpec.getSurfaceSpec().setLastTaskInfo(mapPlayerTask.scheduledChunks, mapPlayerTask.elapsedNs);
                     }
+                }
+                else
+                {
+                    JourneyMap.getLogger().warn("Unexpected task in batch: " + task);
                 }
             }
             lastTaskAvgChunkTime = elapsedNs / Math.max(1, chunkCount) / 1000000D;
