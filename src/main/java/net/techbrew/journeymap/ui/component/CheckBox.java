@@ -66,6 +66,10 @@ public class CheckBox extends BooleanPropertyButton
             {
                 color = Color.DARK_GRAY.getRGB();
             }
+            else if (labelColor != null)
+            {
+                color = labelColor.getRGB();
+            }
             else if (packedFGColour != 0)
             {
                 color = packedFGColour;

@@ -434,18 +434,17 @@ public class GridEditor extends JmUI
 
     protected void resetGridSpecs()
     {
-        GridSpecs temp = JourneyMap.getCoreProperties().gridSpecs.clone();
         if (checkDay.getToggled())
         {
-            this.gridSpecs.setSpec(MapType.day(0), temp.getSpec(MapType.day(0)));
+            this.gridSpecs.setSpec(MapType.day(0), GridSpecs.DEFAULT_DAY.clone());
         }
         if (checkNight.getToggled())
         {
-            this.gridSpecs.setSpec(MapType.night(0), temp.getSpec(MapType.night(0)));
+            this.gridSpecs.setSpec(MapType.night(0), GridSpecs.DEFAULT_NIGHT.clone());
         }
         if (checkUnderground.getToggled())
         {
-            this.gridSpecs.setSpec(MapType.underground(0, 0), temp.getSpec(MapType.underground(0, 0)));
+            this.gridSpecs.setSpec(MapType.underground(0, 0), GridSpecs.DEFAULT_UNDERGROUND.clone());
         }
         buttonList.clear();
         initGui();

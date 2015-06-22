@@ -40,6 +40,8 @@ public class TileDrawStep
     private volatile Future<TextureImpl> regionFuture;
     private volatile Future<TextureImpl> scaledFuture;
     private volatile ImageHolder regionTextureHolder;
+    private int lastTextureFilter;
+    private int lastTextureWrap;
 
 
     public TileDrawStep(RegionCoord regionCoord, final MapType mapType, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
@@ -72,11 +74,16 @@ public class TileDrawStep
     boolean draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, int textureFilter, int textureWrap, GridSpec gridSpec)
     {
         boolean regionUpdatePending = updateRegionTexture();
-        boolean scaledUpdatePending = !regionUpdatePending && highQuality && updateScaledTexture();
+        if (highQuality)
+        {
+            updateScaledTexture();
+        }
+
+        //boolean scaledUpdatePending = !regionUpdatePending && highQuality && updateScaledTexture();
         Integer textureId = -1;
         boolean useScaled = false;
 
-        if (highQuality && !scaledUpdatePending && scaledTexture.hasImage())
+        if (highQuality && scaledTexture != null)
         {
             textureId = scaledTexture.getGlTextureId();
             useScaled = true;
@@ -88,6 +95,16 @@ public class TileDrawStep
         else
         {
             textureId = -1;
+        }
+
+        if (textureFilter != lastTextureFilter)
+        {
+            lastTextureFilter = textureFilter;
+        }
+
+        if (textureWrap != lastTextureWrap)
+        {
+            lastTextureWrap = textureWrap;
         }
 
         // Draw already!
@@ -122,7 +139,8 @@ public class TileDrawStep
             // http://gregs-blog.com/2008/01/17/opengl-texture-filter-parameters-explained/
             if (!useScaled)
             {
-                textureFilter = GL11.GL_NEAREST;
+                // TODO: Does this help?
+                //textureFilter = GL11.GL_NEAREST;
             }
 
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, textureFilter); // GL11.GL_LINEAR_MIPMAP_NEAREST
@@ -147,7 +165,7 @@ public class TileDrawStep
             DrawUtil.drawRectangle(debugX, debugY, 3, endV * 512, Color.green, 200);
             DrawUtil.drawRectangle(debugX, debugY, endU * 512, 3, Color.red, 200);
             DrawUtil.drawLabel(this.toString(), debugX + 5, debugY + 10, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
-            DrawUtil.drawLabel(String.format("Full size: %s", useScaled), debugX + 5, debugY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
+            DrawUtil.drawLabel(String.format("Tile Render Type: %s, Scaled: %s", Tile.debugGlSettings, useScaled), debugX + 5, debugY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
             long imageTimestamp = useScaled ? scaledTexture.getLastImageUpdate() : regionTextureHolder.getImageTimestamp();
             long age = (System.currentTimeMillis() - imageTimestamp) / 1000;
             DrawUtil.drawLabel("Age: " + age + " seconds old", debugX + 5, debugY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
@@ -206,7 +224,7 @@ public class TileDrawStep
         return Objects.toStringHelper(this)
                 .add("rc", regionCoord)
                 .add("type", mapType)
-                .add("q", highQuality)
+                .add("high", highQuality)
                 .add("zoom", zoom)
                 .add("sx1", sx1)
                 .add("sy1", sy1)
@@ -300,12 +318,12 @@ public class TileDrawStep
                 public TextureImpl call() throws Exception
                 {
                     TextureImpl temp = new TextureImpl(null, getScaledRegionArea(), false, false);
-                    temp.setDescription("scaled for " + this);
+                    temp.setDescription("scaled for " + TileDrawStep.this);
                     return temp;
                 }
             });
         }
-        else
+        else if (scaledTexture.getLastImageUpdate() < regionTextureHolder.getImageTimestamp())
         {
             final TextureImpl temp = scaledTexture;
             scaledFuture = TextureCache.instance().scheduleTextureTask(new Callable<TextureImpl>()

@@ -51,6 +51,12 @@ public abstract class JmUI extends GuiScreen
         super();
         this.title = title;
         this.returnDisplay = returnDisplay;
+        if (this.returnDisplay != null && this.returnDisplay.returnDisplay != null)
+        {
+            // Prevent users from getting into a stupid chain
+            // Reallly should use a stack and prevent dups, but whatever.
+            this.returnDisplay.returnDisplay = null;
+        }
     }
 
 
@@ -241,6 +247,11 @@ public abstract class JmUI extends GuiScreen
     public void drawHoveringText(String[] tooltip, int mouseX, int mouseY)
     {
         drawHoveringText(Arrays.asList(tooltip), mouseX, mouseY, getFontRenderer());
+    }
+
+    public JmUI getReturnDisplay()
+    {
+        return returnDisplay;
     }
 
     @Override

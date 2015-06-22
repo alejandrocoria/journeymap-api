@@ -119,7 +119,7 @@ public class ColorCache
                 this.baseColors.putAll(colorPalette.getBasicColorMap());
                 this.biomeColors.putAll(colorPalette.getBiomeColorMap());
                 long elapsed = System.currentTimeMillis() - start;
-                JourneyMap.getLogger().info(String.format("Color palette loaded %d colors in %dms from file: %s", colorPalette.size(), elapsed, colorPalette.getOrigin()));
+                JourneyMap.getLogger().info(String.format("Existing color palette loaded %d colors in %dms from file: %s", colorPalette.size(), elapsed, colorPalette.getOrigin()));
             }
         }
         catch (Exception e)
@@ -156,7 +156,7 @@ public class ColorCache
             palette.setPermanent(permanent);
             palette.writeToFile(standard);
             long elapsed = System.currentTimeMillis() - start;
-            JourneyMap.getLogger().info(String.format("Color palette generated with %d colors in %dms for: %s", palette.size(), elapsed, palette.getOrigin()));
+            JourneyMap.getLogger().info(String.format("New color palette generated with %d colors in %dms for: %s", palette.size(), elapsed, palette.getOrigin()));
             return palette;
         }
         catch (Exception e)

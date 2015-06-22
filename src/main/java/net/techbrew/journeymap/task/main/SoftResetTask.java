@@ -8,6 +8,8 @@ import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.render.map.TileDrawStepCache;
 import net.techbrew.journeymap.ui.UIManager;
+import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
+import net.techbrew.journeymap.ui.minimap.MiniMap;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.apache.logging.log4j.Logger;
 
@@ -40,6 +42,8 @@ public class SoftResetTask implements IMainThreadTask
         WaypointStore.instance().reset();
         MiniMapOverlayHandler.checkEventConfig();
         ThemeFileHandler.getCurrentTheme(true);
+        MiniMap.state().requireRefresh();
+        Fullscreen.state().requireRefresh();
         UIManager.getInstance().getMiniMap().updateDisplayVars(true);
         return null;
     }

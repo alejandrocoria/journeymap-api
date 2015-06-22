@@ -136,8 +136,10 @@ public class EntityDTO implements Serializable
         boolean passive = false;
         if (entity instanceof EntityLiving)
         {
+            EntityLiving entityLiving = (EntityLiving) entity;
+
             // CustomName
-            if (((EntityLiving) entity).hasCustomNameTag())
+            if (entityLiving.hasCustomNameTag() && entityLiving.getAlwaysRenderNameTag())
             {
                 customName = StringUtils.stripControlCodes(((EntityLiving) entity).getCustomNameTag());
             }

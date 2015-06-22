@@ -17,8 +17,8 @@ import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.ChatLog;
-import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.model.Waypoint;
+import net.techbrew.journeymap.render.map.Tile;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
 import net.techbrew.journeymap.ui.minimap.MiniMap;
@@ -92,6 +92,16 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 UIManager.getInstance().toggleMinimap();
                 return true;
             }
+            else if (controlDown && Constants.isPressed(Constants.KB_MAP_ZOOMIN))
+            {
+                Tile.switchTileRenderType();
+                return true;
+            }
+            else if (controlDown && Constants.isPressed(Constants.KB_MAP_ZOOMOUT))
+            {
+                Tile.switchTileDisplayQuality();
+                return true;
+            }
             else if (Constants.isPressed(Constants.KB_MAP_ZOOMIN))
             {
                 MiniMap.state().zoomIn();
@@ -102,14 +112,10 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 MiniMap.state().zoomOut();
                 return true;
             }
-            else if (Constants.isPressed(Constants.KB_MAP_DAY))
+            else if (Constants.isPressed(Constants.KB_MAP_DAY) || Constants.isPressed(Constants.KB_MAP_NIGHT))
             {
-                MiniMap.state().setMapType(MapType.day(minecraft.thePlayer.dimension));
-                return true;
-            }
-            else if (Constants.isPressed(Constants.KB_MAP_NIGHT))
-            {
-                MiniMap.state().setMapType(MapType.night(minecraft.thePlayer.dimension));
+                MiniMap.state().toggleMapType();
+                KeyBinding.unPressAllKeys();
                 return true;
             }
             else if (Constants.isPressed(Constants.KB_MINIMAP_PRESET))
@@ -119,6 +125,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             }
             else if (controlDown && Constants.isPressed(Constants.KB_WAYPOINT))
             {
+                KeyBinding.unPressAllKeys();
                 UIManager.getInstance().openWaypointManager(null, null);
                 return true;
             }

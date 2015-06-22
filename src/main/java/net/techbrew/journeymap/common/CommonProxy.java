@@ -15,20 +15,4 @@ public interface CommonProxy
 
     public void postInitialize(FMLPostInitializationEvent event) throws Throwable;
 
-    public static class NoOp implements CommonProxy
-    {
-        public NoOp()
-        {
-        }
-
-        @Override
-        public void initialize(FMLInitializationEvent event)
-        {
-        }
-
-        @Override
-        public void postInitialize(FMLPostInitializationEvent event)
-        {
-        }
-    }
 }

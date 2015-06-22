@@ -1,0 +1,29 @@
+/* JourneyMap 5.1.0 Splash/About Dialog - de_DE  */
+{
+  "lines": [
+    {
+      "label": "Viele Leistungsverbesserungen",
+      "action": ""
+    },
+    {
+      "label": "Neue Funktion: Gitter-Editor verändert das Chunk-Gitter",
+      "action": "GridEditor"
+    },
+    {
+      "label": "New Feature: Aktionen > Karte löschen",
+      "action": "FullscreenActions"
+    },
+    {
+      "label": "Neue Funktion: Aktionen > Mapping deaktivieren",
+      "action": "FullscreenActions"
+    },
+    {
+      "label": "Neue Einstellungen in Optionen > Kartographie",
+      "action": "OptionsManager#Cartography"
+    },
+    {
+      "label": "F3 und Shift-F3 zeigt auch die Leistung der MiniMap",
+      "action": ""
+    }
+  ]
+}

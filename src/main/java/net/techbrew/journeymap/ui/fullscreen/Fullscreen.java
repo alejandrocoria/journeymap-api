@@ -14,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.Constants;
@@ -35,6 +36,7 @@ import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.draw.RadarDrawStepFactory;
 import net.techbrew.journeymap.render.draw.WaypointDrawStepFactory;
 import net.techbrew.journeymap.render.map.GridRenderer;
+import net.techbrew.journeymap.render.map.Tile;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
@@ -110,11 +112,11 @@ public class Fullscreen extends JmUI
         return state;
     }
 
-    public static void reset()
+    public void reset()
     {
         state.requireRefresh();
         gridRenderer.clear();
-        new Fullscreen(); // preloads theme textures
+        buttonList.clear();
     }
 
     @Override
@@ -521,6 +523,12 @@ public class Fullscreen extends JmUI
     @Override
     protected void layoutButtons()
     {
+        // Check to see whether theme button texture ids still valid
+        if (!buttonDay.hasValidTextures())
+        {
+            buttonList.clear();
+        }
+
         if (buttonList.isEmpty())
         {
             initButtons();
@@ -544,7 +552,6 @@ public class Fullscreen extends JmUI
         layoutToolbars(margin, topY, padding, hideOptionsToolbar);
         buttonClose.leftOf(width - zoomToolbar.getHMargin()).below(mapTypeToolbar.getVMargin());
         buttonAlert.leftOf(width - zoomToolbar.getHMargin()).below(buttonClose, padding);
-
 
         if (!hideOptionsToolbar)
         {
@@ -757,46 +764,52 @@ public class Fullscreen extends JmUI
             UIManager.getInstance().closeAll();
             return;
         }
-        else
+        boolean controlDown = Keyboard.isKeyDown(29) || Keyboard.isKeyDown(157);
+
+        if (Constants.isPressed(Constants.KB_MAP_ZOOMIN))
         {
-            if (Constants.isPressed(Constants.KB_MAP_ZOOMIN))
+            if (controlDown)
             {
-                zoomIn();
-                return;
+                Tile.switchTileRenderType();
             }
             else
             {
-                if (Constants.isPressed(Constants.KB_MAP_ZOOMOUT))
-                {
-                    zoomOut();
-                    return;
-                }
-                else
-                {
-                    if (Constants.isPressed(Constants.KB_MAP_DAY))
-                    {
-                        state.setMapType(MapType.Name.day);
-                        return;
-                    }
-                    else
-                    {
-                        if (Constants.isPressed(Constants.KB_MAP_NIGHT))
-                        {
-                            state.setMapType(MapType.Name.night);
-                            return;
-                        }
-                        else
-                        {
-                            if (Constants.isPressed(Constants.KB_WAYPOINT))
-                            {
-                                Waypoint waypoint = Waypoint.of(mc.thePlayer);
-                                UIManager.getInstance().openWaypointEditor(waypoint, true, null);
-                                return;
-                            }
-                        }
-                    }
-                }
+                zoomIn();
             }
+            return;
+        }
+
+        if (Constants.isPressed(Constants.KB_MAP_ZOOMOUT))
+        {
+            if (controlDown)
+            {
+                Tile.switchTileDisplayQuality();
+            }
+            else
+            {
+                zoomOut();
+            }
+            return;
+        }
+
+        if (Constants.isPressed(Constants.KB_MAP_DAY) || Constants.isPressed(Constants.KB_MAP_NIGHT))
+        {
+            state.toggleMapType();
+            KeyBinding.unPressAllKeys();
+            return;
+        }
+
+        if (Constants.isPressed(Constants.KB_MAP_NIGHT))
+        {
+            state.setMapType(MapType.Name.night);
+            return;
+        }
+
+        if (Constants.isPressed(Constants.KB_WAYPOINT))
+        {
+            Waypoint waypoint = Waypoint.of(mc.thePlayer);
+            UIManager.getInstance().openWaypointEditor(waypoint, true, null);
+            return;
         }
 
         // North
@@ -1081,6 +1094,5 @@ public class Fullscreen extends JmUI
     {
         return false;
     }
-
 }
 

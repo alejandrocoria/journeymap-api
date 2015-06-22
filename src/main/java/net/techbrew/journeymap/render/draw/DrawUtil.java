@@ -46,6 +46,15 @@ public class DrawUtil
     /**
      * Draw a text key, centered on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
+     */
+    public static void drawCenteredLabel(final String text, double x, double y, Color bgColor, int bgAlpha, Color color, int alpha, double fontScale, boolean fontShadow)
+    {
+        drawLabel(text, x, y, HAlign.Center, VAlign.Middle, bgColor, bgAlpha, color, alpha, fontScale, fontShadow, 0);
+    }
+
+    /**
+     * Draw a text key, centered on x,z.  If bgColor not null,
+     * a rectangle will be drawn behind the text.
      *
      * @param text
      * @param x
@@ -480,6 +489,4 @@ public class DrawUtil
     {
         Above, Middle, Below
     }
-
-
 }

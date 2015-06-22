@@ -8,6 +8,7 @@
 
 package net.techbrew.journeymap.cartography;
 
+import com.google.common.base.Objects;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.render.*;
 import net.techbrew.journeymap.io.RegionImageHandler;
@@ -17,9 +18,6 @@ import org.apache.logging.log4j.Level;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Delegates rendering job to one or more renderer.
@@ -28,14 +26,10 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class ChunkRenderController
 {
-    private static AtomicInteger updateCounter = new AtomicInteger(0);
-    private static AtomicLong updateTime = new AtomicLong(0);
-    final boolean fineLogging = JourneyMap.getLogger().isTraceEnabled();
     private final IChunkRenderer netherRenderer;
     private final IChunkRenderer endRenderer;
     private final SurfaceRenderer overWorldSurfaceRenderer;
     private final IChunkRenderer overWorldCaveRenderer;
-
 
     public ChunkRenderController()
     {
@@ -47,41 +41,45 @@ public class ChunkRenderController
         //standardRenderer = new ChunkTopoRenderer();
     }
 
-    public boolean renderChunk(ChunkCoord cCoord, ChunkMD chunkMd, boolean underground, Integer vSlice)
+    public boolean renderChunk(ChunkCoord cCoord, ChunkMD chunkMd, MapType mapType)
     {
         long start = System.nanoTime();
         Graphics2D undergroundG2D = null;
         Graphics2D dayG2D = null;
         Graphics2D nightG2D = null;
         boolean renderOkay = false;
+        final RegionCoord rCoord = cCoord.getRegionCoord();
+
+        if (cCoord.isUnderground() != mapType.isUnderground() || !Objects.equal(cCoord.getVerticalSlice(), mapType.vSlice) || chunkMd.getWorldObj().provider.dimensionId != mapType.dimension)
+        {
+            JourneyMap.getLogger().error(String.format("Bad data; Coordinates not compatible with MapType: %s, %s, %s ", cCoord, chunkMd, mapType));
+            return false;
+        }
 
         try
         {
-            final RegionCoord rCoord = cCoord.getRegionCoord();
             RegionImageSet regionImageSet = RegionImageCache.instance().getRegionImageSet(rCoord);
-            if (underground)
+            if (mapType.isUnderground())
             {
-                MapType mapType = MapType.underground(vSlice, rCoord.dimension);
                 BufferedImage image = regionImageSet.getChunkImage(cCoord, mapType);
                 if (image != null)
                 {
                     undergroundG2D = RegionImageHandler.initRenderingHints(image.createGraphics());
-                    //undergroundG2D.setComposite(BaseRenderer.ALPHA_OPAQUE);
                     switch (rCoord.dimension)
                     {
                         case -1:
                         {
-                            renderOkay = netherRenderer.render(undergroundG2D, chunkMd, vSlice);
+                            renderOkay = netherRenderer.render(undergroundG2D, chunkMd, mapType.vSlice);
                             break;
                         }
                         case 1:
                         {
-                            renderOkay = endRenderer.render(undergroundG2D, chunkMd, vSlice);
+                            renderOkay = endRenderer.render(undergroundG2D, chunkMd, mapType.vSlice);
                             break;
                         }
                         default:
                         {
-                            renderOkay = overWorldCaveRenderer.render(undergroundG2D, chunkMd, vSlice);
+                            renderOkay = overWorldCaveRenderer.render(undergroundG2D, chunkMd, mapType.vSlice);
                         }
                     }
 
@@ -147,34 +145,11 @@ public class ChunkRenderController
             }
         }
 
-        long stop = System.nanoTime();
-
-        if (fineLogging)
-        {
-            updateCounter.incrementAndGet();
-            updateTime.addAndGet(stop - start);
-        }
-
         if (!renderOkay)
         {
-            if (fineLogging)
+            if (JourneyMap.getLogger().isDebugEnabled())
             {
-                JourneyMap.getLogger().log(Level.WARN, "Chunk didn't render for " + cCoord + " vSlice " + vSlice);
-            }
-        }
-
-        if (fineLogging)
-        {
-            double counter = updateCounter.get();
-            if (counter >= 1000)
-            {
-                double time = TimeUnit.NANOSECONDS.toMillis(updateTime.get());
-                double avg = time / counter;
-
-                JourneyMap.getLogger().info("*** Chunks rendered: " + (int) counter + " in avg " + avg + " ms");
-
-                updateCounter.set(0);
-                updateTime.set(0);
+                JourneyMap.getLogger().debug("Chunk render failed: %s %s %s", rCoord, cCoord, mapType);
             }
         }
 

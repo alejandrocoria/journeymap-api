@@ -89,6 +89,19 @@ public class ThemeButton extends BooleanPropertyButton
         setToggled(false, false);
     }
 
+    public boolean hasValidTextures()
+    {
+        if (buttonSpec.useThemeImages)
+        {
+            return GL11.glIsTexture(textureOn.getGlTextureId(false))
+                    && GL11.glIsTexture(textureOff.getGlTextureId(false));
+        }
+        else
+        {
+            return true;
+        }
+    }
+
     protected String getPathPattern()
     {
         return "control/%sbutton_%s.png";

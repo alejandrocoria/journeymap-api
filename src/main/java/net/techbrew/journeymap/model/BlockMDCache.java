@@ -10,8 +10,6 @@ package net.techbrew.journeymap.model;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.*;
@@ -35,7 +33,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
     public final BlockMD VOIDBLOCK;
     private final HashMap<Block, EnumSet<BlockMD.Flag>> blockFlags;
     private final HashMap<Block, Float> blockAlphas;
-    private final Multimap<String, Block> blocksForIconName = MultimapBuilder.ListMultimapBuilder.hashKeys().arrayListValues().build();
+    //private final Multimap<String, Block> blocksForIconName = MultimapBuilder.ListMultimapBuilder.hashKeys().arrayListValues().build();
     private final ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
 
     public BlockMDCache()
@@ -371,5 +369,10 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
     public HashMap getAlphaMap()
     {
         return blockAlphas;
+    }
+
+    public ModBlockDelegate getModBlockDelegate()
+    {
+        return modBlockDelegate;
     }
 }

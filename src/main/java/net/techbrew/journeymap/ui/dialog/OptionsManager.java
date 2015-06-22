@@ -20,6 +20,8 @@ import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.properties.CoreProperties;
 import net.techbrew.journeymap.properties.config.Config;
+import net.techbrew.journeymap.render.draw.DrawUtil;
+import net.techbrew.journeymap.render.map.TileDrawStepCache;
 import net.techbrew.journeymap.server.JMServer;
 import net.techbrew.journeymap.task.main.SoftResetTask;
 import net.techbrew.journeymap.task.multi.MapPlayerTask;
@@ -28,11 +30,13 @@ import net.techbrew.journeymap.ui.UIManager;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.*;
 import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
+import net.techbrew.journeymap.ui.minimap.MiniMap;
 import net.techbrew.journeymap.ui.option.CategorySlot;
 import net.techbrew.journeymap.ui.option.OptionSlotFactory;
 import net.techbrew.journeymap.ui.option.SlotMetadata;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.util.*;
@@ -160,6 +164,7 @@ public class OptionsManager extends JmUI
             {
                 List<ScrollListPane.ISlot> categorySlots = new ArrayList<ScrollListPane.ISlot>();
                 optionsListPane = new ScrollListPane<CategorySlot>(this, mc, this.width, this.height, this.headerHeight, this.height - 30, 20);
+                optionsListPane.setAlignTop(true);
                 optionsListPane.setSlots(OptionSlotFactory.getSlots(getToolbars()));
                 if (initialCategories != null)
                 {
@@ -295,6 +300,22 @@ public class OptionsManager extends JmUI
             String[] lastTooltip = optionsListPane.lastTooltip;
             long lastTooltipTime = optionsListPane.lastTooltipTime;
             optionsListPane.lastTooltip = null;
+
+            // Pre-scroll options list pane so we can double the distance covered
+            if (!(Mouse.isButtonDown(0) && optionsListPane.func_148125_i()))
+            {
+                for (; !this.mc.gameSettings.touchscreen && Mouse.next(); this.mc.currentScreen.handleMouseInput())
+                {
+                    int j1 = Mouse.getEventDWheel();
+
+                    if (j1 != 0)
+                    {
+                        j1 = (j1 > 0) ? -2 : 2;
+                        optionsListPane.scrollBy(j1 * optionsListPane.slotHeight);
+                    }
+                }
+            }
+
             optionsListPane.drawScreen(x, y, par3);
 
             super.drawScreen(x, y, par3);
@@ -349,13 +370,27 @@ public class OptionsManager extends JmUI
                             {
                                 boolean valid = JourneyMap.getCoreProperties().hasValidCaveRenderDistances();
                                 limitButtonRange = true;
-                                slotMetadata.getButton().setOverrideLabelColor(valid ? null : Color.red);
+                                if (valid)
+                                {
+                                    slotMetadata.getButton().resetLabelColors();
+                                }
+                                else
+                                {
+                                    slotMetadata.getButton().setLabelColors(Color.red, Color.red, null);
+                                }
                             }
                             else if (property == coreProperties.renderDistanceSurfaceMax)
                             {
                                 boolean valid = JourneyMap.getCoreProperties().hasValidSurfaceRenderDistances();
                                 limitButtonRange = true;
-                                slotMetadata.getButton().setOverrideLabelColor(valid ? null : Color.red);
+                                if (valid)
+                                {
+                                    slotMetadata.getButton().resetLabelColors();
+                                }
+                                else
+                                {
+                                    slotMetadata.getButton().setLabelColors(Color.red, Color.red, null);
+                                }
                             }
                             else if (property == coreProperties.renderDistanceCaveMin)
                             {
@@ -662,6 +697,9 @@ public class OptionsManager extends JmUI
                 case Cartography:
                 {
                     RenderSpec.resetRenderSpecs();
+                    TileDrawStepCache.instance().invalidateAll();
+                    MiniMap.state().requireRefresh();
+                    Fullscreen.state().requireRefresh();
                     MapPlayerTask.forceNearbyRemap();
                     break;
                 }
@@ -675,7 +713,10 @@ public class OptionsManager extends JmUI
         }
 
         UIManager.getInstance().getMiniMap().reset();
-        Fullscreen.reset();
+        if (this.returnDisplay instanceof Fullscreen)
+        {
+            ((Fullscreen) returnDisplay).reset();
+        }
 
         OptionsManager.openCategories.clear();
         for (CategorySlot categorySlot : optionsListPane.getRootSlots())
@@ -725,12 +766,14 @@ public class OptionsManager extends JmUI
             this.category = category;
             setTooltip(Constants.getString("jm.config.reset.tooltip"));
             setDrawBackground(false);
-            packedFGColour = Color.red.getRGB();
+            setLabelColors(Color.red, Color.red, null);
         }
     }
 
     public static class LabelButton extends Button
     {
+        DrawUtil.HAlign hAlign = DrawUtil.HAlign.Left;
+
         public LabelButton(int width, String key, Object... labelArgs)
         {
             super(Constants.getString(key, labelArgs));
@@ -738,7 +781,7 @@ public class OptionsManager extends JmUI
             setDrawBackground(false);
             setDrawFrame(false);
             setEnabled(false);
-            packedFGColour = Color.lightGray.getRGB();
+            setLabelColors(Color.lightGray, Color.lightGray, Color.lightGray);
             this.width = width;
         }
 
@@ -753,11 +796,34 @@ public class OptionsManager extends JmUI
         {
         }
 
+        public void setHAlign(DrawUtil.HAlign hAlign)
+        {
+            this.hAlign = hAlign;
+        }
+
         @Override
         public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
         {
-            int labelWidth = super.getFitWidth(minecraft.fontRenderer);
-            this.drawString(minecraft.fontRenderer, this.displayString, this.xPosition + this.width - labelWidth, this.yPosition + (this.height - 8) / 2, packedFGColour);
+            int labelX;
+            switch (hAlign)
+            {
+                case Left:
+                {
+                    labelX = this.getRightX();
+                    break;
+                }
+                case Right:
+                {
+                    labelX = this.getX();
+                    break;
+                }
+                default:
+                {
+                    labelX = this.getCenterX();
+                }
+            }
+
+            DrawUtil.drawLabel(this.displayString, labelX, this.getMiddleY(), hAlign, DrawUtil.VAlign.Middle, null, 0, labelColor, 255, 1, drawLabelShadow);
         }
     }
 }

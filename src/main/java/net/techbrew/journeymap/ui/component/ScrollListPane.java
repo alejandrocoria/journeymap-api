@@ -27,6 +27,7 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
     int lastClickedIndex;
     int scrollbarX;
     int listWidth;
+    boolean alignTop;
 
     public ScrollListPane(JmUI parent, Minecraft mc, int width, int height, int top, int bottom, int slotHeight)
     {
@@ -237,6 +238,23 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
     {
         parent.drawGradientRect(0, top, this.width, top + this.height, -1072689136, -804253680);
     }
+
+    @Override
+    protected int getContentHeight()
+    {
+        int contentHeight = super.getContentHeight();
+        if (alignTop)
+        {
+            contentHeight = Math.max((this.bottom - this.top) - 4, contentHeight);
+        }
+        return contentHeight;
+    }
+
+    public void setAlignTop(boolean alignTop)
+    {
+        this.alignTop = alignTop;
+    }
+
 
     public interface ISlot
     {

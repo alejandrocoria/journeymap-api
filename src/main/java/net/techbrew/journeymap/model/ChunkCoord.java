@@ -23,13 +23,13 @@ public class ChunkCoord
     public final int chunkX;
     public final int chunkZ;
     public final MapType mapType;
-    private RegionCoord rCoord = null;
+    //private RegionCoord rCoord = null;
 
-    private ChunkCoord(File worldDir, int chunkX, Integer vSlice, int chunkZ, int dimension)
+    private ChunkCoord(File worldDir, final MapType mapType, int chunkX, int chunkZ)
     {
         this.worldDir = worldDir;
+        this.mapType = mapType;
         this.chunkX = chunkX;
-        this.mapType = MapType.from(vSlice, dimension);
         this.chunkZ = chunkZ;
     }
 
@@ -40,34 +40,31 @@ public class ChunkCoord
 
     public static ChunkCoord fromChunkPos(final File worldDir, final MapType mapType, final int chunkX, final int chunkZ)
     {
-        // There's no real need to synchronize this, it's harmless if there are occasional duplicate puts.  It's primarily
-        // just used to reduce heap thrash.
+        // The cache is primarily just used to reduce heap thrash.  Hashing on x,z has a lot of collisions,
+        // unfortunately, so there's no reliable key.  If there's a collision, we put in a new one.
         int hash = toHash(worldDir, mapType, chunkX, chunkZ);
         ChunkCoord chunkCoord = cache.getIfPresent(hash);
-        if (chunkCoord == null)
+        if (chunkCoord == null || chunkCoord.chunkX != chunkX || chunkCoord.chunkZ != chunkZ || !Objects.equals(chunkCoord.mapType, mapType))
         {
-            chunkCoord = new ChunkCoord(worldDir, chunkX, mapType.vSlice, chunkZ, mapType.dimension);
+            //JourneyMap.getLogger().info("ChunkCoord from cache had hash collision: " + chunkCoord + " vs " + mapType + ", chunkX:" + chunkX + ", chunkZ:" + chunkZ);
+            chunkCoord = new ChunkCoord(worldDir, mapType, chunkX, chunkZ);
             cache.put(hash, chunkCoord);
-        }
-        if (!Objects.equals(chunkCoord.mapType.vSlice, mapType.vSlice))
-        {
-            throw new IllegalStateException("ChunkCoord vSlice doesn't match");
         }
         return chunkCoord;
     }
 
     public static int toHash(File worldDir, final MapType mapType, int chunkX, int chunkZ)
     {
-        return Objects.hash(worldDir, mapType, chunkX, chunkZ);
+        int result = worldDir.hashCode();
+        result = 31 * result + mapType.hashCode();
+        result = 31 * result + chunkX;
+        result = 31 * result + chunkZ;
+        return result;
     }
 
     public RegionCoord getRegionCoord()
     {
-        if (rCoord == null)
-        {
-            rCoord = RegionCoord.fromChunkPos(worldDir, mapType, chunkX, chunkZ);
-        }
-        return rCoord;
+        return RegionCoord.fromChunkPos(worldDir, mapType, chunkX, chunkZ);
     }
 
     public Boolean isUnderground()
@@ -75,57 +72,49 @@ public class ChunkCoord
         return mapType.isUnderground();
     }
 
-    public int getVerticalSlice()
+    public Integer getVerticalSlice()
     {
-        return isUnderground() ? mapType.vSlice : -1;
+        return mapType.vSlice;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        ChunkCoord that = (ChunkCoord) o;
+
+        if (chunkX != that.chunkX)
+        {
+            return false;
+        }
+        if (chunkZ != that.chunkZ)
+        {
+            return false;
+        }
+        if (!mapType.equals(that.mapType))
+        {
+            return false;
+        }
+        if (!worldDir.equals(that.worldDir))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
     public int hashCode()
     {
         return toHash(worldDir, mapType, chunkX, chunkZ);
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-        {
-            return true;
-        }
-        if (obj == null)
-        {
-            return false;
-        }
-        if (getClass() != obj.getClass())
-        {
-            return false;
-        }
-        ChunkCoord other = (ChunkCoord) obj;
-        if (!mapType.equals(other.mapType))
-        {
-            return false;
-        }
-        if (chunkX != other.chunkX)
-        {
-            return false;
-        }
-        if (chunkZ != other.chunkZ)
-        {
-            return false;
-        }
-        if (worldDir == null)
-        {
-            if (other.worldDir != null)
-            {
-                return false;
-            }
-        }
-        else if (!worldDir.equals(other.worldDir))
-        {
-            return false;
-        }
-        return true;
     }
 
     @Override

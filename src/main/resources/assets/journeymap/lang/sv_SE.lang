@@ -1,4 +1,4 @@
-﻿### JourneyMap 5.0.0RC6 Resource Bundle - sv_SE
+﻿### JourneyMap 5.1.0 Resource Bundle - sv_SE
 ### Translation by: Peter Hansson
 jm.advanced.announcemod=Meddelanden om modden
 jm.advanced.announcemod.tooltip=Meddelar i chattfönstret att JourneyMap är redo.
@@ -106,7 +106,7 @@ jm.common.map_style_plantshadows.tooltip=Växter och grödor kommer att kasta sk
 jm.common.map_style_title=Kartval
 jm.common.map_style_transparency=Använd genomskinlighet
 jm.common.map_style_transparency.tooltip=Genomskinliga block kommer att avslöja vad som finns under dem
-jm.common.mapgui_only_ready=Tryck [§b %1$s§f]. (Websbervern är inaktiverad.)
+jm.common.mapgui_only_ready=Tryck [§b %1$s§f]
 jm.common.memory_warning=Minecraft har slut på minne: %1$s
 jm.common.mob_icon_set=Fiendeikoner
 jm.common.mob_icon_set.tooltip=Dessa ikoner används för att visa fiender på radarn
@@ -307,13 +307,13 @@ jm.waypoint.help_import_voxel=Eller kopiera §b %1$s§f till §b %2$s§f och sta
 jm.waypoint.help_import_voxel_title=Importera VoxelMap vägpunkter
 jm.waypoint.help_manage_ingame=vägpunktshanterare (i spelet)
 jm.waypoint.help_title=Vägpunktshjälp
-jm.waypoint.import_rei_errors=Importerade %1$s vägpunkter från Reis minikarta med %1$s fel. Se jm.common.log för detaljer.
-jm.waypoint.import_rei_failure=Inga vägpunkter från Reis minkarta importerades. Se jm.common.log för detaljer.
+jm.waypoint.import_rei_errors=Importerade %1$s vägpunkter från Reis minikarta med %2$s fel. Se journeymap.log för detaljer.
+jm.waypoint.import_rei_failure=Inga vägpunkter från Reis minkarta importerades. Se journeymap.log för detaljer.
 jm.waypoint.import_rei_file_error=Kunde inte importera vägpunktsfilen för Reis minikarta: %1$s
 jm.waypoint.import_rei_success=Importerade %1$s vägpunkter från av Reis minikarta.
 jm.waypoint.import_rei_version=Din version av Reis minikarta stöds inte.
-jm.waypoint.import_vox_errors=Importerade %1$s vägpunkter från VoxelMap med %1$s fel. Se jm.common.log för detaljer.
-jm.waypoint.import_vox_failure=Inga vägpunkter från VoxelMap importerades. Se jm.common.log för detaljer.
+jm.waypoint.import_vox_errors=Importerade %1$s vägpunkter från VoxelMap med %2$s fel. Se journeymap.log för detaljer.
+jm.waypoint.import_vox_failure=Inga vägpunkter från VoxelMap importerades. Se journeymap.log för detaljer.
 jm.waypoint.import_vox_file_error=Kunde inte importera vägpunktsfilen för VoxelMap: %1$s
 jm.waypoint.import_vox_success=Importerade %1$s vägpunkter från VoxelMap.
 jm.waypoint.import_vox_version=Din version av VoxelMap stöds inte. Uppdatera till:

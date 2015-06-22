@@ -52,7 +52,7 @@ public class DeleteMapTask implements IMainThreadTask
                 ChatLog.announceI18N("jm.common.deletemap_status_error");
             }
             MapPlayerTask.forceNearbyRemap();
-            Fullscreen.reset();
+            Fullscreen.state().requireRefresh();
         }
         finally
         {

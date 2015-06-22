@@ -116,8 +116,8 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
     @Config(category = Cartography, key = "jm.common.alwaysmapsurface", defaultBoolean = false)
     public final AtomicBoolean alwaysMapSurface = new AtomicBoolean();
 
-    @Config(category = Cartography, key = "jm.common.tile_display_quality", defaultBoolean = false)
-    public final AtomicBoolean tileHighDisplayQuality = new AtomicBoolean(false);
+    @Config(category = Cartography, key = "jm.common.tile_display_quality", defaultBoolean = true)
+    public final AtomicBoolean tileHighDisplayQuality = new AtomicBoolean(true);
 
     @Config(category = Advanced, key = "jm.common.radar_max_animals", minValue = 1, maxValue = 128, defaultValue = 32)
     public final AtomicInteger maxAnimalsData = new AtomicInteger(32);

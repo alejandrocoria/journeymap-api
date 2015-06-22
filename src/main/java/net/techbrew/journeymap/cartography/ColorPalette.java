@@ -106,8 +106,8 @@ public class ColorPalette
 
     public static ColorPalette getActiveColorPalette()
     {
-        String resourcePackNames = Constants.getResourcePackNames();
-        String modPackNames = Constants.getModNames();
+        String resourcePacks = Constants.getResourcePackNames();
+        String modNames = Constants.getModNames();
 
         File worldPaletteFile = ColorPalette.getWorldPaletteFile();
         if (worldPaletteFile.canRead())
@@ -125,9 +125,29 @@ public class ColorPalette
             ColorPalette palette = ColorPalette.loadFromFile(standardPaletteFile);
             if (palette != null)
             {
-                if (palette.isPermanent() || (resourcePackNames.equals(palette.resourcePacks) && modPackNames.equals(palette.modNames)))
+                if (palette.isPermanent())
                 {
+                    JourneyMap.getLogger().info("Existing color palette is set to be permanent.");
                     return palette;
+                }
+
+                if (resourcePacks.equals(palette.resourcePacks))
+                {
+                    if (modNames.equals(palette.modNames))
+                    {
+                        JourneyMap.getLogger().info("Existing color palette's resource packs and mod names match current loadout.");
+                        return palette;
+                    }
+                    else
+                    {
+                        JourneyMap.getLogger().warn("Existing color palette's mods no longer match current loadout.");
+                        JourneyMap.getLogger().info(String.format("WAS: %s\nNOW: %s", palette.modNames, modNames));
+                    }
+                }
+                else
+                {
+                    JourneyMap.getLogger().warn("Existing color palette's resource packs no longer match current loadout.");
+                    JourneyMap.getLogger().info(String.format("WAS: %s\nNOW: %s", palette.resourcePacks, resourcePacks));
                 }
             }
         }

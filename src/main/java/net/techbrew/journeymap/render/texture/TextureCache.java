@@ -394,19 +394,9 @@ public class TextureCache
         }
     }
 
-//    public boolean hasRegionTexture(RegionCoord regionCoord, MapType mapType)
-//    {
-//        synchronized (regionImages)
-//        {
-//            return regionImages.containsKey(Objects.hash(regionCoord, mapType));
-//        }
-//    }
-//
-
     /**
-     * *************************************************
+     * Get the head portion of a player's skin, scaled to 24x24 pixels.
      */
-
     public TextureImpl getPlayerSkin(final String username)
     {
         TextureImpl tex = null;

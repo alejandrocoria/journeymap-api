@@ -10,10 +10,16 @@ package net.techbrew.journeymap.render.map;
 
 import com.google.common.base.Objects;
 import net.minecraft.world.ChunkCoordIntPair;
+import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.io.RegionImageHandler;
+import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.model.GridSpec;
 import net.techbrew.journeymap.model.MapType;
+import net.techbrew.journeymap.model.RegionImageCache;
+import net.techbrew.journeymap.properties.CoreProperties;
+import net.techbrew.journeymap.ui.fullscreen.Fullscreen;
+import net.techbrew.journeymap.ui.minimap.MiniMap;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -28,7 +34,7 @@ public class Tile
 {
     public final static int TILESIZE = 512;
     public final static int LOAD_RADIUS = (int) (TILESIZE * 1.5);
-
+    static String debugGlSettings = "";
     final int zoom;
     final int tileX;
     final int tileZ;
@@ -37,9 +43,7 @@ public class Tile
     final Point ulBlock;
     final Point lrBlock;
     final ArrayList<TileDrawStep> drawSteps = new ArrayList<TileDrawStep>();
-
     private final Logger logger = JourneyMap.getLogger();
-
     int renderType = 0;
     int textureFilter = 0;
     int textureWrap = 0;
@@ -80,6 +84,40 @@ public class Tile
         return Objects.hashCode(tileX, tileZ, zoom);
     }
 
+    public static void switchTileRenderType()
+    {
+        // Switch Tile Render Type
+        CoreProperties coreProperties = JourneyMap.getCoreProperties();
+        int type = coreProperties.tileRenderType.incrementAndGet();
+        if (type > 4)
+        {
+            type = 1;
+            coreProperties.tileRenderType.set(type);
+        }
+        coreProperties.save();
+        String msg = String.format("%s: %s (%s)", Constants.getString("jm.advanced.tile_render_type"), type, Tile.debugGlSettings);
+        ChatLog.announceError(msg);
+        resetTileDisplay();
+    }
+
+    public static void switchTileDisplayQuality()
+    {
+        CoreProperties coreProperties = JourneyMap.getCoreProperties();
+        boolean high = !coreProperties.tileHighDisplayQuality.get();
+        coreProperties.tileHighDisplayQuality.set(high);
+        coreProperties.save();
+        ChatLog.announceError(Constants.getString("jm.common.tile_display_quality") + ": " + (high ? Constants.getString("jm.common.on") : Constants.getString("jm.common.off")));
+        resetTileDisplay();
+    }
+
+    private static void resetTileDisplay()
+    {
+        TileDrawStepCache.instance().invalidateAll();
+        RegionImageCache.instance().clear();
+        MiniMap.state().requireRefresh();
+        Fullscreen.state().requireRefresh();
+    }
+
     public boolean updateTexture(File worldDir, final MapType mapType, boolean highQuality)
     {
         updateRenderType();
@@ -118,18 +156,21 @@ public class Tile
             {
                 textureFilter = GL11.GL_NEAREST;
                 textureWrap = GL12.GL_CLAMP_TO_EDGE;
+                debugGlSettings = "GL_NEAREST, GL_CLAMP_TO_EDGE";
                 break;
             }
             case (3):
             {
                 textureFilter = GL11.GL_NEAREST;
                 textureWrap = GL14.GL_MIRRORED_REPEAT;
+                debugGlSettings = "GL_NEAREST, GL_MIRRORED_REPEAT";
                 break;
             }
             case (2):
             {
                 textureFilter = GL11.GL_LINEAR;
                 textureWrap = GL12.GL_CLAMP_TO_EDGE;
+                debugGlSettings = "GL_LINEAR, GL_CLAMP_TO_EDGE";
                 break;
             }
             case (1):
@@ -137,6 +178,7 @@ public class Tile
             {
                 textureFilter = GL11.GL_LINEAR;
                 textureWrap = GL14.GL_MIRRORED_REPEAT;
+                debugGlSettings = "GL_LINEAR, GL_MIRRORED_REPEAT";
             }
         }
     }

@@ -143,7 +143,6 @@ public class RegionLoader
 
         Collections.sort(stack, new Comparator<RegionCoord>()
         {
-
             @Override
             public int compare(RegionCoord o1, RegionCoord o2)
             {
@@ -169,4 +168,8 @@ public class RegionLoader
         return stack;
     }
 
+    public MapType getMapType()
+    {
+        return mapType;
+    }
 }

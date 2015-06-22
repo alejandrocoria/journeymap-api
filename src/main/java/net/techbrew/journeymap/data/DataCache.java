@@ -17,6 +17,7 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.*;
+import net.techbrew.journeymap.model.mod.ModBlockDelegate;
 import net.techbrew.journeymap.render.draw.DrawEntityStep;
 import net.techbrew.journeymap.render.draw.DrawWayPointStep;
 import net.techbrew.journeymap.waypoint.WaypointStore;
@@ -516,6 +517,14 @@ public class DataCache
     public BlockMD getBlockMD(Block block, int meta)
     {
         return blockMetadataLoader.getBlockMD(blockMetadata, block, meta);
+    }
+
+    /**
+     * Produces a BlockMD instance from chunk-local coords.
+     */
+    public ModBlockDelegate getModBlockDelegate()
+    {
+        return blockMetadataLoader.getModBlockDelegate();
     }
 
     public LoadingCache<RegionImageSet.Key, RegionImageSet> getRegionImageSets()

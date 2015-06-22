@@ -1,4 +1,4 @@
-### JourneyMap 5.0.0RC6 Resource Bundle - nl_NL
+### JourneyMap 5.1.0 Resource Bundle - nl_NL
 ### Translation by: Lewis_McReu
 jm.advanced.announcemod=Melding Mod
 jm.advanced.announcemod.tooltip=Meldt in het chatvenster dat JourneyMap klaar is.
@@ -106,7 +106,7 @@ jm.common.map_style_plantshadows.tooltip=Planten en gewassen werpen een schaduw 
 jm.common.map_style_title=Kaart Stijl Opties
 jm.common.map_style_transparency=Gebruik Doorzichtigheid
 jm.common.map_style_transparency.tooltip=Doorzichtige blokken zullen tonen wat zich onder hen bevindt
-jm.common.mapgui_only_ready=Klik op [§b%1$s§f]. (Webserver uitgeschakeld.)
+jm.common.mapgui_only_ready=Klik op [§b%1$s§f]
 jm.common.memory_warning=Minecraft komt geheugen te kort: %1$s
 jm.common.mob_icon_set=Mob Iconen
 jm.common.mob_icon_set.tooltip=De iconen gebruikt om mobs op de radar te tonen
@@ -306,12 +306,12 @@ jm.waypoint.help_import_voxel=Of kopieer §b%1$s§f naar §b%2$s§f en herstart 
 jm.waypoint.help_import_voxel_title=Importeer VoxelMap Merkpunten
 jm.waypoint.help_manage_ingame=Merkpunt Beheerder (in game)
 jm.waypoint.help_title=Merkpunt Help
-jm.waypoint.import_rei_errors=Importeerde %1$s merkpunten van Rei's MiniMap met %1$s fouten. Bekijk jm.common.log voor details.
-jm.waypoint.import_rei_failure=Geen Rei's MiniMap merkpunten zijn geïmporteerd. Bekijk jm.common.log voor details.
+jm.waypoint.import_rei_errors=Importeerde %1$s merkpunten van Rei's MiniMap met %2$s fouten. Bekijk journeymap.log voor details.
+jm.waypoint.import_rei_failure=Geen Rei's MiniMap merkpunten zijn geïmporteerd. Bekijk journeymap.log voor details.
 jm.waypoint.import_rei_file_error=Kon Rei's MiniMap merkpunt bestand niet importeren: %1$s
 jm.waypoint.import_rei_success=Importeerde %1$s merkpunten van Rei's Minimap.
 jm.waypoint.import_rei_version=Jouw versie van Rei's MiniMap wordt niet ondersteund.
-jm.waypoint.import_vox_errors=Importeerde %1$s merkpunten van VoxelMap met %1$s fouten. Bekijk jm.common.log voor details.
+jm.waypoint.import_vox_errors=Importeerde %1$s merkpunten van VoxelMap met %2$s fouten. Bekijk journeymap.log voor details.
 jm.waypoint.import_vox_failure=Geen VoxelMap merkpunten zijn geïmporteerd. Bekijk jm.common.log voor details.
 jm.waypoint.import_vox_file_error=Kon VoxelMap merkpunt bestand niet importeren: %1$s
 jm.waypoint.import_vox_success=Importeerde %1$s merkpunten van VoxelMap.

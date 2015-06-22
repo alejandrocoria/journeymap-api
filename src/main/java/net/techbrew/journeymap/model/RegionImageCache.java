@@ -257,11 +257,14 @@ public class RegionImageCache
             boolean result = true;
             for (File dir : dirs)
             {
-                FileHandler.delete(dir);
-                logger.info(String.format("Deleted image directory %s: %s", dir, !dir.exists()));
                 if (dir.exists())
                 {
-                    result = false;
+                    FileHandler.delete(dir);
+                    logger.info(String.format("Deleted image directory %s: %s", dir, !dir.exists()));
+                    if (dir.exists())
+                    {
+                        result = false;
+                    }
                 }
             }
 

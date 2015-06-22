@@ -1,4 +1,4 @@
-﻿### JourneyMap 5.0.0RC6 Resource Bundle - ca_ES
+﻿### JourneyMap 5.1.0 Resource Bundle - ca_ES
 ### Translation by: Abel
 jm.advanced.announcemod=Anuncis del Mod
 jm.advanced.announcemod.tooltip=Anuncia a la finestra de xat quan JourneyMap estigui llest.
@@ -106,7 +106,7 @@ jm.common.map_style_plantshadows.tooltip=Plantes i collites projecten ombres al 
 jm.common.map_style_title=Opcions de l'estil de Mapa
 jm.common.map_style_transparency=Utilitzar Transparència
 jm.common.map_style_transparency.tooltip=Els blocs transparents mostren que hi ha sota d'ells
-jm.common.mapgui_only_ready=Presioni [§b%1$s§f]. (Servidor d'Internet deshabilitat.)
+jm.common.mapgui_only_ready=Presioni [§b%1$s§f]
 jm.common.memory_warning=Minecraft s'esta quedant sense memòria: %1$s
 jm.common.mob_icon_set=Icones de Mobs
 jm.common.mob_icon_set.tooltip=El conjunt d'icones utilitzat per mostrar mobs en el radar
@@ -306,13 +306,13 @@ jm.waypoint.help_import_voxel=O copiar §b%1$s§f a §b%2$s§f i reinicii Minecr
 jm.waypoint.help_import_voxel_title=Importar VoxelMap Waypoints
 jm.waypoint.help_manage_ingame=Gestionar Waypoints (al joc)
 jm.waypoint.help_title=Ajuda de Waypoint
-jm.waypoint.import_rei_errors=Importats %1$s waypoints des de Rei's MiniMap amb %1$s errors.Miri jm.common.log para detalles.
-jm.waypoint.import_rei_failure=No s'han importat waypoints del Rei's MiniMap. Miri jm.common.log para detalles.
+jm.waypoint.import_rei_errors=Importats %1$s waypoints des de Rei's MiniMap amb %2$s errors.Miri journeymap.log para detalles.
+jm.waypoint.import_rei_failure=No s'han importat waypoints del Rei's MiniMap. Miri journeymap.log para detalles.
 jm.waypoint.import_rei_file_error=No s'ha pogut importar l'arxiu de waypoint: %1$s de Rei's MiniMap
 jm.waypoint.import_rei_success=Importats %1$s waypoints del Rei's Minimap.
 jm.waypoint.import_rei_version=La seva versió de Rei's MiniMap no es suportada.
-jm.waypoint.import_vox_errors=Importats %1$s waypoints del VoxelMap amb %1$s errors. Miri jm.common.log per detalls.
-jm.waypoint.import_vox_failure=No s'han importat waypoints del VoxelMap. Miri jm.common.log per detalles.
+jm.waypoint.import_vox_errors=Importats %1$s waypoints del VoxelMap amb %2$s errors. Miri journeymap.log per detalls.
+jm.waypoint.import_vox_failure=No s'han importat waypoints del VoxelMap. Miri journeymap.log per detalles.
 jm.waypoint.import_vox_file_error=No s'ha pogut importat l'arxiu de waypoints: %1$s de VoxelMap
 jm.waypoint.import_vox_success=Importats %1$s waypoints de VoxelMap.
 jm.waypoint.import_vox_version=La seva versió de VoxelMap no es soportada. Si us plau actualitzi a:
