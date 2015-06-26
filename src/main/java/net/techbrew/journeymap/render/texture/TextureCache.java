@@ -433,6 +433,10 @@ public class TextureCache
                     g.dispose();
                     playerSkinTex.setImage(scaledImage, true);
                 }
+                else
+                {
+                    JourneyMap.getLogger().warn("Couldn't get a skin at all for " + username);
+                }
                 return null;
             }
         });
@@ -449,10 +453,27 @@ public class TextureCache
         HttpURLConnection conn = null;
         try
         {
-
             String skinPath = String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", StringUtils.stripControlCodes(username));
-            URL url = new URL(skinPath);
-            conn = (HttpURLConnection) url.openConnection(Minecraft.getMinecraft().getProxy());
+            img = downloadImage(new URL(skinPath));
+            if (img == null)
+            {
+                img = downloadImage(new URL("https://minecraft.net/images/steve.png"));
+            }
+        }
+        catch (Throwable e)
+        {
+            JourneyMap.getLogger().warn("Error getting skin image for " + username + ": " + e.getMessage());
+        }
+        return img;
+    }
+
+    private BufferedImage downloadImage(URL imageURL)
+    {
+        BufferedImage img = null;
+        HttpURLConnection conn = null;
+        try
+        {
+            conn = (HttpURLConnection) imageURL.openConnection(Minecraft.getMinecraft().getProxy());
             HttpURLConnection.setFollowRedirects(true);
             conn.setInstanceFollowRedirects(true);
             conn.setDoInput(true);
@@ -462,14 +483,14 @@ public class TextureCache
             {
                 img = ImageIO.read(conn.getInputStream()).getSubimage(8, 8, 8, 8);
             }
-            else if (conn.getResponseCode() != 404)
+            else
             {
-                JourneyMap.getLogger().warn("Bad Response getting skin image for " + username + ": " + conn.getResponseCode());
+                JourneyMap.getLogger().warn("Bad Response getting image: " + imageURL + " : " + conn.getResponseCode());
             }
         }
         catch (Throwable e)
         {
-            JourneyMap.getLogger().warn("Error getting skin image for " + username + ": " + e.getMessage());
+            JourneyMap.getLogger().warn("Error getting skin image: " + imageURL + " : " + e.getMessage());
         }
         finally
         {
@@ -479,10 +500,6 @@ public class TextureCache
             }
         }
 
-        if (img == null && !username.equals("char"))
-        {
-            return downloadSkin("char"); // Steve
-        }
         return img;
     }
 
