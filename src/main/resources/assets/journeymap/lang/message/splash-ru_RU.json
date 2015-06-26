@@ -1,0 +1,30 @@
+/* JourneyMap 5.1.0 Splash/About Dialog - ru_RU  */
+/* Only translate label values. Do not translate action values. */
+{
+  "lines": [
+    {
+      "label": "Много улучшений производительности",
+      "action": ""
+    },
+    {
+      "label": "Новая функция: Редактор Сетки: настраивает чанк-сетку",
+      "action": "GridEditor"
+    },
+    {
+      "label": "Новая функция: Действия > Удалить карту",
+      "action": "FullscreenActions"
+    },
+    {
+      "label": "Новая функция: Действия > Отключение зарисовки карты",
+      "action": "FullscreenActions"
+    },
+    {
+      "label": "Новые настройки в опциях > Картография",
+      "action": "OptionsManager#Cartography"
+    },
+    {
+      "label": "F3 и Shift-F3 покажут данные о производительности JourneyMap в отладочной информации",
+      "action": ""
+    }
+  ]
+}
