@@ -168,7 +168,7 @@ public class TileDrawStep
             DrawUtil.drawLabel(String.format("Tile Render Type: %s, Scaled: %s", Tile.debugGlSettings, useScaled), debugX + 5, debugY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
             long imageTimestamp = useScaled ? scaledTexture.getLastImageUpdate() : regionTextureHolder.getImageTimestamp();
             long age = (System.currentTimeMillis() - imageTimestamp) / 1000;
-            DrawUtil.drawLabel("Age: " + age + " seconds old", debugX + 5, debugY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
+            DrawUtil.drawLabel(mapType + " tile age: " + age + " seconds old", debugX + 5, debugY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
         }
 
         GL11.glColor4f(1, 1, 1, 1);
