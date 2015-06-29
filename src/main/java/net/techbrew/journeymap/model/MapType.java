@@ -17,6 +17,8 @@ public class MapType
 
     public MapType(Name name, Integer vSlice, int dimension)
     {
+        // Guarantee surface types don't use a slice
+        vSlice = (name != Name.underground) ? null : vSlice;
         this.name = name;
         this.vSlice = vSlice;
         this.dimension = dimension;

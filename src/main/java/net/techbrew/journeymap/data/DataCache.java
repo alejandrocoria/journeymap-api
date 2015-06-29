@@ -293,6 +293,9 @@ public class DataCache
 
     public MapType getMapType(MapType.Name name, Integer vSlice, int dimension)
     {
+        // Guarantee surface types don't use a slice
+        vSlice = (name != MapType.Name.underground) ? null : vSlice;
+
         MapType mapType = mapTypes.getIfPresent(MapType.toHash(name, vSlice, dimension));
         if (mapType == null)
         {

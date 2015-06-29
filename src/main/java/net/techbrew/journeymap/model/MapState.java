@@ -80,12 +80,12 @@ public class MapState
         {
             lastMapType = getMapType(showCaves);
         }
-
-        this.underground = DataCache.getPlayer().underground;
-        Integer vSlice = this.underground ? player.chunkCoordY : null;
-        this.preferredMapType = MapType.from(mapProperties.getPreferredMapType().get(), vSlice, player.dimension);
         this.caveMappingAllowed = FeatureManager.isAllowed(Feature.MapCaves);
         this.worldDir = FileHandler.getJMWorldDir(mc);
+
+        this.underground = DataCache.getPlayer().underground;
+        Integer vSlice = this.underground && showCaves ? player.chunkCoordY : null;
+        this.preferredMapType = MapType.from(mapProperties.getPreferredMapType().get(), vSlice, player.dimension);
 
         lastPlayerChunkX = player.chunkCoordX;
         lastPlayerChunkZ = player.chunkCoordZ;
