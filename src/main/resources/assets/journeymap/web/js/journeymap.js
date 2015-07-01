@@ -1,9 +1,7 @@
 "use strict";
 /**
- * JourneyMap web client 
- * http://journeymap.techbrew.net 
- * Copyright (C) 2011-2013.
- * Mark Woodman / TechBrew.net All rights reserved. 
+ * JourneyMap web client - http://journeymap.info
+ * Copyright (C) 2011-2015. Mark Woodman (journeymap.info) All rights reserved.
  * May not be modified or distributed without express written consent.
  */
 var JourneyMap = (function() {

@@ -6,7 +6,7 @@
     "description": "JourneyMap @EDITION@ Edition: Real-time map in-game or in a web browser as you explore.",
     "version": "@JMVERSION@",
     "mcversion": "@MCVERSION@",
-    "url": "http://journeymap.techbrew.net",
+    "url": "http://journeymap.info",
     "updateUrl": "",
     "authorList": ["techbrew"],
     "logoFile": "assets/journeymap/web/img/ico/journeymap144.png",
