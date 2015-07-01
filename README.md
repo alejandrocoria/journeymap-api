@@ -1,6 +1,6 @@
 # [JourneyMap for Minecraft][1]
 
-Source code and build resources for [JourneyMap][2] ([http://journeymap.techbrew.net][2])
+Source code and build resources for [JourneyMap][2] ([http://journeymap.info][2])
 
 ## Requirements
 
@@ -57,7 +57,7 @@ Using IDEA, run the build.xml script. It will invoke the gradle scripts and do t
 
 The end result will be in `journeymap/dist/JourneyMap*.zip`
 
-[1]: https://bitbucket.org/mwoodman/journeymap
-[2]: http://journeymap.techbrew.net
+[1]: https://bitbucket.org/TeamJM/journeymap
+[2]: http://journeymap.info
 [3]: http://files.minecraftforge.net/
 
