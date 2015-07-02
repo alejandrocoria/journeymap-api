@@ -60,7 +60,7 @@ import java.io.File;
 @SideOnly(Side.CLIENT)
 public class JourneyMap implements CommonProxy
 {
-    public static final String WEBSITE_URL = "http://journeymap.techbrew.net/";
+    public static final String WEBSITE_URL = "http://journeymap.info/";
     public static final String DOWNLOAD_URL = WEBSITE_URL + "download";
     public static final Version JM_VERSION = Version.from("@MAJOR@", "@MINOR@", "@MICRO@", "@PATCH@", new Version(5, 1, 1, "dev"));
     public static final String FORGE_VERSION = "@FORGEVERSION@";

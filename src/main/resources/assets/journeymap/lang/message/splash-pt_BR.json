@@ -1,0 +1,30 @@
+/* JourneyMap 5.1.0 Splash/About Dialog - pt_BR  */
+/* Only translate label values. Do not translate action values. */
+{
+  "lines": [
+    {
+      "label": "Muitas melhoras de performance",
+      "action": ""
+    },
+    {
+      "label": "Nova característica: Editor de Grade personaliza a grade de chunk",
+      "action": "GridEditor"
+    },
+    {
+      "label": "Nova característica: Açõ > Apagar mapa",
+      "action": "FullscreenActions"
+    },
+    {
+      "label": "Nova característica: Açõ > Disabilitar Mapeamento",
+      "action": "FullscreenActions"
+    },
+    {
+      "label": "Novas definições nas Opções > Cartografia",
+      "action": "OptionsManager#Cartography"
+    },
+    {
+      "label": "F3 e Shift-F3 mostram os dados de performance do JourneyMap",
+      "action": ""
+    }
+  ]
+}

@@ -13,7 +13,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.StatTimer;
-import net.techbrew.journeymap.model.*;
+import net.techbrew.journeymap.model.BlockCoordIntPair;
+import net.techbrew.journeymap.model.GridSpec;
+import net.techbrew.journeymap.model.MapType;
+import net.techbrew.journeymap.model.RegionImageCache;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +50,6 @@ public class GridRenderer
     private final boolean debug = logger.isDebugEnabled();
     private final TreeMap<TilePos, Tile> grid = new TreeMap<TilePos, Tile>();
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
-    private final GridSpecs gridSpecs = JourneyMap.getCoreProperties().gridSpecs;
 
     StatTimer updateTilesTimer1 = StatTimer.get("GridRenderer.updateTiles(1)", 5, 500);
     StatTimer updateTilesTimer2 = StatTimer.get("GridRenderer.updateTiles(2)", 5, 500);
@@ -377,7 +379,7 @@ public class GridRenderer
         {
             double centerX = offsetX + centerPixelOffset.x;
             double centerZ = offsetZ + centerPixelOffset.y;
-            GridSpec gridSpec = showGrid ? gridSpecs.getSpec(mapType) : null;
+            GridSpec gridSpec = showGrid ? JourneyMap.getCoreProperties().gridSpecs.getSpec(mapType) : null;
 
             boolean somethingDrew = false;
             for (Map.Entry<TilePos, Tile> entry : grid.entrySet())

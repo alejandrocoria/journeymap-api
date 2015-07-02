@@ -5,7 +5,7 @@
     <property name="jm_major" value="5"/>
     <property name="jm_minor" value="1"/>
     <property name="jm_micro" value="0"/>
-    <property name="jm_patch" value="RC4"/>
+    <property name="jm_patch" value="RC5"/>
     <property name="jmversion" value="${jm_major}.${jm_minor}.${jm_micro}${jm_patch}"/>
     <property name="mcversion" value="1.7.10"/>
     <property name="forgeversion" value="10.13.2.1291"/>
@@ -173,9 +173,9 @@
 
             <jar update="true" file="${dist.dir}/@{jarfile}" index="true" manifestencoding="UTF-8">
                 <manifest>
-                    <attribute name="Built-By" value="techbrew (Mark Woodman)"/>
+                    <attribute name="Built-By" value="TeamJM"/>
                     <attribute name="Built-Date" value="${TODAY}"/>
-                    <attribute name="Implementation-Vendor" value="journeymap.techbrew.net"/>
+                    <attribute name="Implementation-Vendor" value="journeymap.info"/>
                     <attribute name="Implementation-Title" value="JourneyMap"/>
                     <attribute name="Implementation-Version" value="${jmversion} @{edition} Edition"/>
                 </manifest>

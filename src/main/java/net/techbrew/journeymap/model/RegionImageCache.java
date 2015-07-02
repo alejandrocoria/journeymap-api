@@ -114,11 +114,11 @@ public class RegionImageCache
             if (regionImageSet.hasChunkUpdates())
             {
                 regionImageSet.finishChunkUpdates();
-                //System.out.println("UPDATED: " + regionImageSet.simpleRCoord.full);
+                //logger.info("UPDATED: " + regionImageSet);
             }
             else
             {
-                //System.out.println("Should expire eventually: " + regionImageSet.simpleRCoord.full);
+                //logger.info("Should expire eventually: " + regionImageSet);
             }
         }
 

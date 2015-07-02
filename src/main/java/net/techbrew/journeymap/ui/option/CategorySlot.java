@@ -42,15 +42,15 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         boolean advanced = category == Config.Category.Advanced;
 
         button = new Button(name);
-        button.setDefaultStyle(false);
-        button.setDrawLabelShadow(false);
-        button.setLabelColors(new Color(10, 10, 100), new Color(10, 10, 100), null);
-
-        Color smallBgColor = new Color(220, 220, 250);
-        Color smallBgHoverColor = new Color(235, 235, 255);
-        Color smallBgHoverColor2 = new Color(100, 100, 100);
-
-        button.setBackgroundColors(smallBgColor, smallBgHoverColor, smallBgHoverColor2);
+//        button.setDefaultStyle(false);
+//        button.setDrawLabelShadow(false);
+//        button.setLabelColors(new Color(10, 10, 100), new Color(10, 10, 100), null);
+//
+//        Color smallBgColor = new Color(220, 220, 250);
+//        Color smallBgHoverColor = new Color(235, 235, 255);
+//        Color smallBgHoverColor2 = new Color(100, 100, 100);
+//
+//        button.setBackgroundColors(smallBgColor, smallBgHoverColor, smallBgHoverColor2);
 
         metadata = new SlotMetadata(button, name, tooltip, advanced);
         updateButtonLabel();
