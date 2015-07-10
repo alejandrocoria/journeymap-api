@@ -67,7 +67,7 @@ public class OnOffButton extends Button
     @Override
     public boolean isActive()
     {
-        return enabled && toggled;
+        return isEnabled() && toggled;
     }
 
     public Boolean getToggled()
@@ -82,7 +82,7 @@ public class OnOffButton extends Button
 
     public void setToggled(Boolean toggled, boolean notifyToggleListener)
     {
-        if (this.toggled == toggled || !this.enabled || !this.visible)
+        if (this.toggled == toggled || !this.isEnabled() || !this.visible)
         {
             return;
         }

@@ -8,13 +8,13 @@
 
 package net.techbrew.journeymap.ui.component;
 
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.EnumChatFormatting;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import org.lwjgl.opengl.GL11;
 
@@ -47,6 +47,9 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected boolean defaultStyle = true;
     protected int WIDTH_PAD = 12;
     protected String[] tooltip;
+
+    FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
+    private boolean enabled;
 
     public Button(String label)
     {
@@ -117,12 +120,12 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     }
 
     @Override
-    public void func_146113_a(SoundHandler soundHandler)
+    public void playPressSound(SoundHandler soundHandler)
     {
         // Play button click
         if (isEnabled())
         {
-            super.func_146113_a(soundHandler);
+            super.playPressSound(soundHandler);
         }
     }
 
@@ -146,10 +149,9 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         else
         {
             // Use small button colors
-            FontRenderer fontrenderer = minecraft.fontRenderer;
             minecraft.getTextureManager().bindTexture(buttonTextures);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            this.enabled = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
 
             if (isDrawFrame())
             {
@@ -160,13 +162,13 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
                 DrawUtil.drawRectangle(xPosition + width - 1, yPosition + 1, 1, height - 1, smallFrameColorDark, 255); // Right
             }
 
-            int k = this.getHoverState(this.field_146123_n);
+            int k = this.getHoverState(this.enabled);
 
             if (isDrawBackground())
             {
                 DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, k == 2 ? smallBgHoverColor : smallBgColor, 255);
             }
-            else if (this.field_146123_n && enabled)
+            else if (this.enabled && enabled)
             {
                 DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, smallBgHoverColor2, 128);
             }
@@ -187,7 +189,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             }
             else
             {
-                if (this.field_146123_n)
+                if (this.enabled)
                 {
                     varLabelColor = hoverLabelColor;
                 }
@@ -251,7 +253,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         {
             for (String line : tooltip)
             {
-                list.addAll(FMLClientHandler.instance().getClient().fontRenderer.listFormattedStringToWidth(line, 200));
+                list.addAll(fontRenderer.listFormattedStringToWidth(line, 200));
             }
             return list;
         }

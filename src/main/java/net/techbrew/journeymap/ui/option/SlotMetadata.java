@@ -1,10 +1,11 @@
 package net.techbrew.journeymap.ui.option;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.IPropertyHolder;
 import net.techbrew.journeymap.ui.component.IntSliderButton;
@@ -180,7 +181,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
 
     public String[] getTooltip()
     {
-        FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
+        FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
         String bidiColor = fontRenderer.getBidiFlag() ? "%2$s%1$s" : "%1$s%2$s";
 
         if (tooltipLines == null)
@@ -222,7 +223,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
 
     protected List<ChatComponentTranslation> getWordWrappedLines(String color, String original)
     {
-        FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
+        FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
         List<ChatComponentTranslation> list = new ArrayList<ChatComponentTranslation>();
 
         int max = fontRenderer.getBidiFlag() ? 170 : 250;

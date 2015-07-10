@@ -8,22 +8,23 @@
 
 package net.techbrew.journeymap.forge.event;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.common.network.FMLNetworkEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 
 /**
  * Sample Forge Client class for handling World Info custom packets.
@@ -49,7 +50,7 @@ public class WorldInfoHandler
     // Network wrapper of the channel for requests/response
     private static SimpleNetworkWrapper channel;
     // Handle to Minecraft client
-    Minecraft mc = FMLClientHandler.instance().getClient();
+    Minecraft mc = ForgeHelper.INSTANCE.getClient();
 
     /**
      * Default constructor.
@@ -106,7 +107,7 @@ public class WorldInfoHandler
     {
         if (!mc.isSingleplayer() && mc.thePlayer != null && !mc.thePlayer.isDead)
         {
-            if (event.entity.getCommandSenderName().equals(mc.thePlayer.getCommandSenderName()))
+            if (ForgeHelper.INSTANCE.getEntityName(event.entity).equals(ForgeHelper.INSTANCE.getEntityName(mc.thePlayer)))
             {
                 requestWorldID();
             }

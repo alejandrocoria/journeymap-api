@@ -10,7 +10,7 @@ package net.techbrew.journeymap.cartography.render;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.RemovalNotification;
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.techbrew.journeymap.JourneyMap;
@@ -18,6 +18,7 @@ import net.techbrew.journeymap.cartography.IChunkRenderer;
 import net.techbrew.journeymap.cartography.RGB;
 import net.techbrew.journeymap.cartography.Strata;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
@@ -107,7 +108,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
     protected void updateOptions()
     {
-        World world = FMLClientHandler.instance().getClient().theWorld;
+        World world = ForgeHelper.INSTANCE.getClient().theWorld;
         int seaLevel = world.getActualHeight() / 2;
         orthoStep = 3;
         orthoRange = world.getActualHeight() >> orthoStep;
@@ -248,7 +249,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
         // Find the height.
         // TODO: This doesn't catch glass or all that anymore, does it?  Use precip height?
-        y = Math.max(0, chunkMd.getChunk().getHeightValue(x, z));
+        y = Math.max(0, chunkMd.getHeightValue(x, z));
 
         try
         {

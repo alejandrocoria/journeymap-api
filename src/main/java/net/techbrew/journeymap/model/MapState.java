@@ -11,11 +11,12 @@ package net.techbrew.journeymap.model;
 
 import com.google.common.base.Objects;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.properties.InGameMapProperties;
@@ -71,7 +72,7 @@ public class MapState
     {
     }
 
-    public void refresh(Minecraft mc, EntityClientPlayerMP player, InGameMapProperties mapProperties)
+    public void refresh(Minecraft mc, EntityPlayer player, InGameMapProperties mapProperties)
     {
         refreshTimer.start();
         lastMapProperties = mapProperties;
@@ -128,7 +129,7 @@ public class MapState
         MapType currentMapType = getCurrentMapType();
         if (currentMapType.isUnderground())
         {
-            if (!player.entityLiving.worldObj.provider.hasNoSky)
+            if (!ForgeHelper.INSTANCE.hasNoSky(player.entityLiving))
             {
                 lastMapProperties.showCaves.set(false);
                 setMapType(MapType.day(player));
@@ -181,9 +182,10 @@ public class MapState
     {
         MapType mapType = null;
 
-        if (DataCache.getPlayer().entityLiving.worldObj.provider.hasNoSky)
+        EntityDTO player = DataCache.getPlayer();
+        if (ForgeHelper.INSTANCE.hasNoSky(player.entityLiving))
         {
-            mapType = MapType.underground(DataCache.getPlayer());
+            mapType = MapType.underground(player);
         }
         else if (underground && caveMappingAllowed && showCaves)
         {

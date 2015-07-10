@@ -8,14 +8,15 @@
 
 package net.techbrew.journeymap.forge.event;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.InputEvent;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.map.Tile;
@@ -134,13 +135,13 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             {
                 if (Constants.KB_MAP.isPressed())
                 {
-                    if (FMLClientHandler.instance().getClient().currentScreen == null)
+                    if (ForgeHelper.INSTANCE.getClient().currentScreen == null)
                     {
                         UIManager.getInstance().openFullscreenMap();
                     }
                     else
                     {
-                        if (FMLClientHandler.instance().getClient().currentScreen instanceof Fullscreen)
+                        if (ForgeHelper.INSTANCE.getClient().currentScreen instanceof Fullscreen)
                         {
                             UIManager.getInstance().closeAll();
                         }
@@ -151,9 +152,9 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 {
                     if (Constants.KB_WAYPOINT.isPressed())
                     {
-                        if (FMLClientHandler.instance().getClient().currentScreen == null)
+                        if (ForgeHelper.INSTANCE.getClient().currentScreen == null)
                         {
-                            Minecraft mc = FMLClientHandler.instance().getClient();
+                            Minecraft mc = ForgeHelper.INSTANCE.getClient();
                             Waypoint waypoint = Waypoint.of(mc.thePlayer);
                             UIManager.getInstance().openWaypointEditor(waypoint, true, null);
                         }

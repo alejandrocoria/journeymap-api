@@ -10,10 +10,10 @@ package net.techbrew.journeymap.data;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.*;
-import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraftforge.fml.common.registry.GameData;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.*;

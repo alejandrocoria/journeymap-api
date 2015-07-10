@@ -8,7 +8,7 @@
 
 package net.techbrew.journeymap.render.ingame;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderHelper;
@@ -20,6 +20,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.WaypointProperties;
@@ -40,8 +41,8 @@ public class RenderWaypointBeacon
     static final ResourceLocation beam = new ResourceLocation("textures/entity/beacon_beam.png");
     //    static StatTimer timer = StatTimer.get("WaypointBeacon.doRender", 100);
 //    static StatTimer allTimer = StatTimer.get("WaypointBeacon.renderAll", 100);
-    static Minecraft mc = FMLClientHandler.instance().getClient();
-    static RenderManager renderManager = RenderManager.instance;
+    static Minecraft mc = ForgeHelper.INSTANCE.getClient();
+    static RenderManager renderManager = ForgeHelper.INSTANCE.getRenderManager();
     static String distanceLabel = Constants.getString("jm.waypoint.distance_meters", "%1.0f");
     static WaypointProperties waypointProperties;
 
@@ -102,11 +103,10 @@ public class RenderWaypointBeacon
             final int dimension = renderManager.livingPlayer.dimension;
 
             // Player coords
-            Vec3 playerVec = renderManager.livingPlayer.getPosition(1);
+            Vec3 playerVec = ForgeHelper.INSTANCE.getEntityPositionVector(renderManager.livingPlayer);
 
-            // Get waypoint coords for dimension
-            Vec3 waypointVec = waypoint.getPosition();
-            waypointVec.yCoord += .118; // puts icon at eye level
+            // Get waypoint coords for dimension, raise Y to eye level for icon
+            Vec3 waypointVec = waypoint.getPosition().add(new Vec3(0, .118, 0));
 
             // Get view distance from waypoint
             final double actualDistance = playerVec.distanceTo(waypointVec);

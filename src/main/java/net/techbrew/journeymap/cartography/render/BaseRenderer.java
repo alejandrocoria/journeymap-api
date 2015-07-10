@@ -18,6 +18,7 @@ import net.techbrew.journeymap.cartography.IChunkRenderer;
 import net.techbrew.journeymap.cartography.RGB;
 import net.techbrew.journeymap.cartography.Stratum;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
@@ -398,7 +399,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 
         final int sliceMinY = Math.max((vSlice << 4), 0);
         final int hardSliceMaxY = ((vSlice + 1) << 4) - 1;
-        int sliceMaxY = Math.min(hardSliceMaxY, chunkMd.getWorldObj().getActualHeight());
+        int sliceMaxY = Math.min(hardSliceMaxY, chunkMd.getWorld().getActualHeight());
         if (sliceMinY >= sliceMaxY)
         {
             sliceMaxY = sliceMinY + 2;
@@ -447,7 +448,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 //    }
 
     /**
-     * Added because getHeightValue() sometimes returns an air block.
+     * Added because getHeight() sometimes returns an air block.
      * Returns the value in the height map at this x, z coordinate in the chunk, disregarding
      * blocks that shouldn't be used as the top block.
      */
@@ -471,7 +472,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 
         // Find the height.
         // TODO: This doesn't catch glass or all that anymore, does it?  Use precip height?
-        y = Math.max(0, chunkMd.getChunk().getHeightValue(x, z));
+
+        y = Math.max(0, ForgeHelper.INSTANCE.getHeightValue(chunkMd.getChunk(), x, z));
 
         try
         {

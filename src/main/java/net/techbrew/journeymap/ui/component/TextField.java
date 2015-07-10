@@ -8,9 +8,9 @@
 
 package net.techbrew.journeymap.ui.component;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.awt.*;
 
@@ -39,7 +39,8 @@ public class TextField extends GuiTextField
 
     public TextField(Object text, FontRenderer fontRenderer, int width, int height, boolean isNumeric, boolean negative)
     {
-        super(fontRenderer, 0, 0, width, height);
+        // 1.8 adds an (id?) to the first constructor param
+        super(0, fontRenderer, 0, 0, width, height);
         setText(text.toString());
         numeric = isNumeric;
         allowNegative = negative;

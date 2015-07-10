@@ -10,13 +10,13 @@ package net.techbrew.journeymap.data;
 
 
 import com.google.common.cache.CacheLoader;
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.model.ChunkMD;
 import net.techbrew.journeymap.model.EntityDTO;
 
@@ -28,17 +28,18 @@ import net.techbrew.journeymap.model.EntityDTO;
 public class PlayerData extends CacheLoader<Class, EntityDTO>
 {
     /**
-     * Check whether player isn't under sky
+     * "Underground" means the player isn't under sky (within a 1 block radius),
+     * or is under a block that should be treated as potential sky like glass or ladders.
      */
     public static boolean playerIsUnderground(Minecraft mc, EntityPlayer player)
     {
-        if (player.worldObj.provider.hasNoSky)
+        if (ForgeHelper.INSTANCE.hasNoSky(player.getEntityWorld()))
         {
             return true;
         }
 
         final int posX = MathHelper.floor_double(player.posX);
-        final int posY = MathHelper.floor_double(player.boundingBox.minY);
+        final int posY = MathHelper.floor_double(ForgeHelper.INSTANCE.getEntityBoundingBox(player).minY);
         final int posZ = MathHelper.floor_double(player.posZ);
         final int offset = 1;
 
@@ -77,12 +78,12 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
     @Override
     public EntityDTO load(Class aClass) throws Exception
     {
-        Minecraft mc = FMLClientHandler.instance().getClient();
-        EntityClientPlayerMP player = mc.thePlayer;
+        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        EntityPlayer player = mc.thePlayer;
 
         EntityDTO dto = DataCache.instance().getEntityDTO(player);
         dto.update(player, false);
-        dto.biome = getPlayerBiome(mc, player);
+        dto.biome = getPlayerBiome(player);
         dto.underground = playerIsUnderground(mc, player);
         return dto;
     }
@@ -90,7 +91,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
     /**
      * Get the biome name where the player is standing.
      */
-    private String getPlayerBiome(Minecraft mc, EntityClientPlayerMP player)
+    private String getPlayerBiome(EntityPlayer player)
     {
         int x = (MathHelper.floor_double(player.posX) >> 4) & 15;
         int z = (MathHelper.floor_double(player.posZ) >> 4) & 15;
@@ -98,7 +99,8 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
         ChunkMD playerChunk = DataCache.instance().getChunkMD(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ));
         if (playerChunk != null)
         {
-            return playerChunk.getChunk().getBiomeGenForWorldCoords(x, z, mc.theWorld.getWorldChunkManager()).biomeName;
+            return ForgeHelper.INSTANCE.getBiome(playerChunk.getWorld(), MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ)).biomeName;
+            //return playerChunk.getBiome(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ)).biomeName;
         }
         else
         {

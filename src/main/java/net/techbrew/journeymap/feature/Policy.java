@@ -8,9 +8,10 @@
 
 package net.techbrew.journeymap.feature;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -21,7 +22,7 @@ import java.util.Set;
  */
 public class Policy
 {
-    static Minecraft mc = FMLClientHandler.instance().getClient();
+    static Minecraft mc = ForgeHelper.INSTANCE.getClient();
     final Feature feature;
     final boolean allowInSingleplayer;
     final boolean allowInMultiplayer;

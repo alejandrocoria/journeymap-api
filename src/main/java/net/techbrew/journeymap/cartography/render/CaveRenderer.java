@@ -11,12 +11,12 @@ package net.techbrew.journeymap.cartography.render;
 import com.google.common.base.Optional;
 import com.google.common.cache.RemovalNotification;
 import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.IChunkRenderer;
 import net.techbrew.journeymap.cartography.RGB;
 import net.techbrew.journeymap.cartography.Strata;
 import net.techbrew.journeymap.cartography.Stratum;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockMD;
@@ -284,7 +284,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
                     if (blockAboveMD.isAir() || blockAboveMD.hasFlag(BlockMD.Flag.OpenToSky))
                     {
-                        if (chunkMd.getHasNoSky() || !chunkMd.getChunk().canBlockSeeTheSky(x, y + 1, z))
+                        if (chunkMd.getHasNoSky() || !chunkMd.canBlockSeeTheSky(x, y + 1, z))
                         {
                             lightLevel = getSliceLightLevel(chunkMd, x, y, z, true);
 
@@ -462,7 +462,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
      */
     protected int getSliceLightLevel(ChunkMD chunkMd, int x, int y, int z, boolean adjusted)
     {
-        return mapCaveLighting ? chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z) : 15;
+        return mapCaveLighting ? chunkMd.getSavedLightValue(x, y + 1, z) : 15;
     }
 
     @Override

@@ -33,12 +33,14 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
     {
         super(mc, width, height, top, bottom, slotHeight);
         this.parent = parent;
-        func_148122_a(width, height, top, bottom);
+        setDimensions(width, height, top, bottom);
     }
 
-    public void func_148122_a(int width, int height, int top, int bottom)
+    // 1.7 func_148122_a
+    // 1.8 setDimensions
+    public void setDimensions(int width, int height, int top, int bottom)
     {
-        super.func_148122_a(width, height, top, bottom);
+        super.setDimensions(width, height, top, bottom);
         scrollbarX = this.width - (hpad);
         listWidth = this.width - (hpad * 4);
     }
@@ -114,10 +116,11 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
 
     }
 
-    protected void drawSlot(int slotIndex, int x, int y, int slotHeight, Tessellator tessellator, int mouseX, int mouseY)
+    // 1.7 protected void drawSlot(int slotIndex, int x, int y, int slotHeight, Tessellator tessellator, int mouseX, int mouseY)
+    protected void drawSlot(int slotIndex, int x, int y, int slotHeight, int mouseX, int mouseY)
     {
-        SlotMetadata tooltipMetadata = this.getSlot(slotIndex).drawSlot(slotIndex, x, y, this.getListWidth(), slotHeight, tessellator, mouseX, mouseY,
-                this.func_148124_c(mouseX, mouseY) == slotIndex); // getSlotIndexFromScreenCoords
+        SlotMetadata tooltipMetadata = this.getSlot(slotIndex).drawSlot(slotIndex, x, y, this.getListWidth(), slotHeight, mouseX, mouseY,
+                this.getSlotIndexFromScreenCoords(mouseX, mouseY) == slotIndex); // (func_148124_c in 1.7)
 
         if (tooltipMetadata != null && !Arrays.equals(tooltipMetadata.getTooltip(), lastTooltip))
         {
@@ -137,9 +140,9 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
 
     public boolean mousePressed(int mouseX, int mouseY, int mouseEvent)
     {
-        if (this.func_148141_e(mouseY)) // isMouseYWithinSlotBounds
+        if (this.isMouseYWithinSlotBounds(mouseY)) // isMouseYWithinSlotBounds // 1.7 func_148141_e
         {
-            int slotIndex = this.func_148124_c(mouseX, mouseY); // getSlotIndexFromScreenCoords
+            int slotIndex = this.getSlotIndexFromScreenCoords(mouseX, mouseY); // getSlotIndexFromScreenCoords // 1.7 func_148124_c
 
             if (slotIndex >= 0)
             {
@@ -150,7 +153,7 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
                 lastClickedIndex = -1;
                 if (this.getSlot(slotIndex).mousePressed(slotIndex, mouseX, mouseY, mouseEvent, relativeX, relativeY))
                 {
-                    this.func_148143_b(false); // setEnabled
+                    this.setEnabled(false); // setEnabled // 1.7 func_148143_b
                     lastClickedIndex = slotIndex;
                     lastPressed = this.getSlot(slotIndex).getLastPressed();
                     updateSlots();
@@ -174,7 +177,7 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
             this.getSlot(slotIndex).mouseReleased(slotIndex, x, y, mouseEvent, relativeX, relativeY);
         }
 
-        this.func_148143_b(true); // setEnabled
+        this.setEnabled(true); // setEnabled // 1.7 func_148143_b
         lastPressed = null;
         return false;
     }
@@ -263,7 +266,8 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
         /**
          * Returns SlotMetadata of item hovered, if any.
          */
-        SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected);
+        // 1.7 SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected);
+        SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected);
 
         /**
          * Returns true if the mouse has been pressed on a control in this slot.

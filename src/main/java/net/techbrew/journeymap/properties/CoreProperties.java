@@ -9,8 +9,9 @@
 package net.techbrew.journeymap.properties;
 
 import com.google.common.base.Objects;
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.model.GridSpecs;
@@ -195,7 +196,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
             saveNeeded = true;
         }
 
-        int gameRenderDistance = FMLClientHandler.instance().getClient().gameSettings.renderDistanceChunks;
+        int gameRenderDistance = ForgeHelper.INSTANCE.getClient().gameSettings.renderDistanceChunks;
         for (AtomicInteger prop : Arrays.asList(renderDistanceCaveMin, renderDistanceCaveMax, renderDistanceSurfaceMin, renderDistanceSurfaceMax))
         {
             if (prop.get() > gameRenderDistance)

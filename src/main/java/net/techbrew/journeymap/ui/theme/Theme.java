@@ -2,7 +2,7 @@ package net.techbrew.journeymap.ui.theme;
 
 import com.google.common.base.Strings;
 import com.google.gson.annotations.Since;
-import cpw.mods.fml.common.FMLLog;
+import net.minecraftforge.fml.common.FMLLog;
 
 import java.awt.*;
 

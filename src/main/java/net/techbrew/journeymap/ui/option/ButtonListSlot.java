@@ -1,10 +1,11 @@
 package net.techbrew.journeymap.ui.option;
 
 import com.google.common.base.Strings;
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.ui.component.ButtonList;
@@ -22,8 +23,8 @@ import java.util.List;
 public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonListSlot>
 {
     static int hgap = 8;
-    Minecraft mc = FMLClientHandler.instance().getClient();
-    FontRenderer fontRenderer = mc.fontRenderer;
+    Minecraft mc = ForgeHelper.INSTANCE.getClient();
+    FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
     ButtonList buttons = new ButtonList();
     HashMap<Button, SlotMetadata> buttonOptionMetadata = new HashMap<Button, SlotMetadata>();
     CategorySlot parent;
@@ -74,7 +75,8 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     }
 
     @Override
-    public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
+    // public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
+    public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
     {
         int margin = 0;
         if (parent.getCurrentColumnWidth() > 0)

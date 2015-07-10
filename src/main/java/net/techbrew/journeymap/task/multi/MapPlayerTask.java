@@ -17,6 +17,7 @@ import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.model.MapType;
 
@@ -54,8 +55,8 @@ public class MapPlayerTask extends BaseMapTask
     public static MapPlayerTaskBatch create(ChunkRenderController chunkRenderController, final EntityDTO player)
     {
         final boolean cavesAllowed = FeatureManager.isAllowed(Feature.MapCaves);
-        final boolean worldHasSky = !player.entityLiving.worldObj.provider.hasNoSky;
-        boolean underground = player.entityLiving.worldObj.provider.hasNoSky || DataCache.getPlayer().underground;
+        final boolean worldHasSky = !ForgeHelper.INSTANCE.hasNoSky(player.entityLiving);
+        boolean underground = ForgeHelper.INSTANCE.hasNoSky(player.entityLiving) || player.underground;
 
         if (underground && !cavesAllowed)
         {

@@ -11,12 +11,12 @@ package net.techbrew.journeymap;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Ordering;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.ModContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModContainer;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.LogFormatter;
 import org.lwjgl.input.Keyboard;
 
@@ -72,7 +72,7 @@ public class Constants
         Locale locale = Locale.getDefault();
         try
         {
-            String lang = FMLClientHandler.instance().getClient().getLanguageManager().getCurrentLanguage().getLanguageCode();
+            String lang = ForgeHelper.INSTANCE.getClient().getLanguageManager().getCurrentLanguage().getLanguageCode();
             locale = new Locale(lang);
         }
         catch (Exception e)
@@ -137,7 +137,7 @@ public class Constants
 
         try
         {
-            ResourcePackRepository resourcepackrepository = FMLClientHandler.instance().getClient().getResourcePackRepository();
+            ResourcePackRepository resourcepackrepository = ForgeHelper.INSTANCE.getClient().getResourcePackRepository();
             entries.addAll(resourcepackrepository.getRepositoryEntries());
         }
         catch (Throwable t)

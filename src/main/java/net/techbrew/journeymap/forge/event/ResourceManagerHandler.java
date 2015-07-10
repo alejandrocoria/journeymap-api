@@ -8,15 +8,15 @@
 
 package net.techbrew.journeymap.forge.event;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.ColorCache;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 
 /**
  * Handle reloads/changes to resource packs.
@@ -24,11 +24,11 @@ import net.techbrew.journeymap.cartography.ColorCache;
 @SideOnly(Side.CLIENT)
 public class ResourceManagerHandler implements IResourceManagerReloadListener
 {
-    private Minecraft mc = FMLClientHandler.instance().getClient();
+    private Minecraft mc = ForgeHelper.INSTANCE.getClient();
 
     public ResourceManagerHandler()
     {
-        IResourceManager rm = FMLClientHandler.instance().getClient().getResourceManager();
+        IResourceManager rm = ForgeHelper.INSTANCE.getClient().getResourceManager();
         if (rm instanceof IReloadableResourceManager)
         {
             ((IReloadableResourceManager) rm).registerReloadListener(this);

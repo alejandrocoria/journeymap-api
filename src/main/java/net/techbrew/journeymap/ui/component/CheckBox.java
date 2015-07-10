@@ -1,9 +1,8 @@
 package net.techbrew.journeymap.ui.component;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.client.config.GuiUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraftforge.fml.client.config.GuiUtils;
 import net.techbrew.journeymap.properties.PropertiesBase;
 import org.lwjgl.input.Keyboard;
 
@@ -31,9 +30,9 @@ public class CheckBox extends BooleanPropertyButton
         super(displayString, displayString, properties, property);
         this.property = property;
         this.properties = properties;
-        FontRenderer fr = FMLClientHandler.instance().getClient().fontRenderer;
-        this.height = fr.FONT_HEIGHT + 2;
-        this.width = getFitWidth(fr);
+
+        this.height = fontRenderer.FONT_HEIGHT + 2;
+        this.width = getFitWidth(fontRenderer);
     }
 
     @Override
@@ -51,18 +50,18 @@ public class CheckBox extends BooleanPropertyButton
         if (this.visible)
         {
 
-            this.field_146123_n = enabled && mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            this.setEnabled(isEnabled() && mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height);
 
             int yoffset = (this.height - this.boxWidth) / 2;
             GuiUtils.drawContinuousTexturedBox(buttonTextures, this.xPosition, this.yPosition + yoffset, 0, 46, this.boxWidth, this.boxWidth, 200, 20, 2, 3, 2, 2, this.zLevel);
             this.mouseDragged(mc, mouseX, mouseY);
             int color = 14737632;
 
-            if (this.field_146123_n)
+            if (this.isEnabled())
             {
                 color = 16777120;
             }
-            else if (!enabled)
+            else if (!isEnabled())
             {
                 color = Color.DARK_GRAY.getRGB();
             }
@@ -79,10 +78,10 @@ public class CheckBox extends BooleanPropertyButton
 
             if (this.toggled)
             {
-                this.drawCenteredString(mc.fontRenderer, glyph, this.xPosition + this.boxWidth / 2 + 1, this.yPosition + 1 + yoffset, color);
+                this.drawCenteredString(mc.fontRendererObj, glyph, this.xPosition + this.boxWidth / 2 + 1, this.yPosition + 1 + yoffset, color);
             }
 
-            this.drawString(mc.fontRenderer, displayString, xPosition + this.boxWidth + labelPad, yPosition + 2 + yoffset, color);
+            this.drawString(mc.fontRendererObj, displayString, xPosition + this.boxWidth + labelPad, yPosition + 2 + yoffset, color);
         }
     }
 
@@ -93,7 +92,7 @@ public class CheckBox extends BooleanPropertyButton
     @Override
     public boolean mousePressed(Minecraft p_146116_1_, int p_146116_2_, int p_146116_3_)
     {
-        if (this.enabled && this.visible && p_146116_2_ >= this.xPosition && p_146116_3_ >= this.yPosition && p_146116_2_ < this.xPosition + this.width && p_146116_3_ < this.yPosition + this.height)
+        if (this.isEnabled() && this.visible && p_146116_2_ >= this.xPosition && p_146116_3_ >= this.yPosition && p_146116_2_ < this.xPosition + this.width && p_146116_3_ < this.yPosition + this.height)
         {
             toggle();
             if (property != null)
@@ -112,7 +111,7 @@ public class CheckBox extends BooleanPropertyButton
 
     public boolean keyTyped(char c, int i)
     {
-        if (this.field_146123_n)
+        if (this.isEnabled())
         {
             if (i == Keyboard.KEY_SPACE)
             {

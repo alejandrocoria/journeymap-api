@@ -8,11 +8,6 @@
 
 package net.techbrew.journeymap.waypoint;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ChatAllowedCharacters;
-import net.minecraft.util.ChunkCoordinates;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.ChatLog;
@@ -24,13 +19,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
-import java.net.SocketAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Read Rei's waypoint files and return a collection of the results.
@@ -50,33 +41,32 @@ public class ReiReader
      */
     public static java.util.List<Waypoint> loadWaypoints()
     {
+        ArrayList<Waypoint> converted = new ArrayList<Waypoint>();
         try
         {
-            Class.forName("reifnsk.minimap.ReiMinimap").getDeclaredField("instance");
-            reifnsk.minimap.ReiMinimap reiMinimap = reifnsk.minimap.ReiMinimap.instance;
-            java.util.List<reifnsk.minimap.Waypoint> reiWaypoints = reiMinimap.getWaypoints();
-            if (reiWaypoints == null || reiWaypoints.isEmpty())
-            {
-                return Collections.EMPTY_LIST;
-            }
-
-            EntityPlayer player = FMLClientHandler.instance().getClient().thePlayer;
-            int dimension = player != null ? player.dimension : 0;
-
-            ArrayList<Waypoint> converted = new ArrayList<Waypoint>(reiWaypoints.size());
-            for (reifnsk.minimap.Waypoint reiWp : reiWaypoints)
-            {
-                Waypoint jmWp = new Waypoint(reiWp.name, reiWp.x, reiWp.y, reiWp.z, reiWp.enable,
-                        (int) (reiWp.red * 255.0F) & 255,
-                        (int) (reiWp.green * 255.0F) & 255,
-                        (int) (reiWp.blue * 255.0F) & 255,
-                        reiWp.type == 1 ? Waypoint.Type.Death : Waypoint.Type.Normal,
-                        Waypoint.Origin.ReiMinimap,
-                        dimension,
-                        Arrays.asList(dimension));
-                jmWp.setReadOnly(true);
-                converted.add(jmWp);
-            }
+//            Class.forName("reifnsk.minimap.ReiMinimap").getDeclaredField("instance");
+//            reifnsk.minimap.ReiMinimap reiMinimap = reifnsk.minimap.ReiMinimap.instance;
+//            java.util.List<reifnsk.minimap.Waypoint> reiWaypoints = reiMinimap.getWaypoints();
+//            if (reiWaypoints == null || reiWaypoints.isEmpty())
+//            {
+//                return Collections.EMPTY_LIST;
+//            }
+//
+//            EntityPlayer player = ForgeHelper.INSTANCE.getClient().thePlayer;
+//            int dimension = player != null ? player.dimension : 0;
+//            for (reifnsk.minimap.Waypoint reiWp : reiWaypoints)
+//            {
+//                Waypoint jmWp = new Waypoint(reiWp.name, reiWp.x, reiWp.y, reiWp.z, reiWp.enable,
+//                        (int) (reiWp.red * 255.0F) & 255,
+//                        (int) (reiWp.green * 255.0F) & 255,
+//                        (int) (reiWp.blue * 255.0F) & 255,
+//                        reiWp.type == 1 ? Waypoint.Type.Death : Waypoint.Type.Normal,
+//                        Waypoint.Origin.ReiMinimap,
+//                        dimension,
+//                        Arrays.asList(dimension));
+//                jmWp.setReadOnly(true);
+//                converted.add(jmWp);
+//            }
             return converted;
         }
         catch (Throwable e)
@@ -96,30 +86,30 @@ public class ReiReader
         String worldName = null;
         try
         {
-            NetHandlerPlayClient sendQueue = FMLClientHandler.instance().getClient().getNetHandler();
-            SocketAddress addr = sendQueue.getNetworkManager().getSocketAddress();
-            String addrStr = addr.toString().replaceAll("[\r\n]", "");
-            Matcher matcher = Pattern.compile("(.*)/(.*):([0-9]+)").matcher(addrStr);
-            if (matcher.matches())
-            {
-                worldName = matcher.group(1);
-                if (worldName.isEmpty())
-                {
-                    worldName = matcher.group(2);
-                }
-                if (!matcher.group(3).equals("25565"))
-                {
-                    worldName = (new StringBuilder()).append(worldName).append("[").append(matcher.group(3)).append("]").toString();
-                }
-
-                char arr$[] = ChatAllowedCharacters.allowedCharacters;
-                int len$ = arr$.length;
-                for (int i$ = 0; i$ < len$; i$++)
-                {
-                    char c = arr$[i$];
-                    worldName = worldName.replace(c, '_');
-                }
-            }
+//            NetHandlerPlayClient sendQueue = ForgeHelper.INSTANCE.getClient().getNetHandler();
+//            SocketAddress addr = sendQueue.getNetworkManager().getSocketAddress();
+//            String addrStr = addr.toString().replaceAll("[\r\n]", "");
+//            Matcher matcher = Pattern.compile("(.*)/(.*):([0-9]+)").matcher(addrStr);
+//            if (matcher.matches())
+//            {
+//                worldName = matcher.group(1);
+//                if (worldName.isEmpty())
+//                {
+//                    worldName = matcher.group(2);
+//                }
+//                if (!matcher.group(3).equals("25565"))
+//                {
+//                    worldName = (new StringBuilder()).append(worldName).append("[").append(matcher.group(3)).append("]").toString();
+//                }
+//
+//                char arr$[] = ChatAllowedCharacters.allowedCharacters;
+//                int len$ = arr$.length;
+//                for (int i$ = 0; i$ < len$; i$++)
+//                {
+//                    char c = arr$[i$];
+//                    worldName = worldName.replace(c, '_');
+//                }
+//            }
         }
         catch (Exception e)
         {
@@ -248,7 +238,7 @@ public class ReiReader
             boolean enable = Boolean.parseBoolean(v[++i]);
             Color color = new Color(Integer.parseInt(v[++i], 16));
 
-            Waypoint waypoint = new Waypoint(name, new ChunkCoordinates(x, y, z), color, Waypoint.Type.Normal, dimension);
+            Waypoint waypoint = new Waypoint(name, x, y, z, color, Waypoint.Type.Normal, dimension);
             waypoint.setEnable(enable);
             waypoint.setOrigin(Waypoint.Origin.ReiMinimap);
             waypoint.setDirty(true);

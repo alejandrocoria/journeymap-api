@@ -8,10 +8,11 @@
 
 package net.techbrew.journeymap.render.map;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.GridSpec;
@@ -214,7 +215,7 @@ public class GridRenderer
             if (debug)
             {
                 logger.debug("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
-                Minecraft mc = FMLClientHandler.instance().getClient();
+                Minecraft mc = ForgeHelper.INSTANCE.getClient();
                 BufferedImage tmp = new BufferedImage(mc.displayWidth, mc.displayHeight, BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g = tmp.createGraphics();
                 g.setStroke(new BasicStroke(1));

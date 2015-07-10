@@ -10,8 +10,9 @@ package net.techbrew.journeymap.data;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.ImmutableMap;
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.io.FileHandler;
 
 import java.util.Enumeration;
@@ -42,7 +43,7 @@ public class MessagesData extends CacheLoader<Class, Map<String, Object>>
     {
         HashMap<String, Object> props = new HashMap<String, Object>();
         props.put("locale", Constants.getLocale());
-        props.put("lang", FMLClientHandler.instance().getClient().gameSettings.language);
+        props.put("lang", ForgeHelper.INSTANCE.getClient().gameSettings.language);
 
         Properties properties = FileHandler.getLangFile("en_US.lang");
         Enumeration<Object> allKeys = properties.keys();

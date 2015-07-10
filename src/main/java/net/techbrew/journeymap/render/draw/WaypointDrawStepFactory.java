@@ -8,12 +8,13 @@
 
 package net.techbrew.journeymap.render.draw;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Vec3;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.map.GridRenderer;
@@ -33,12 +34,12 @@ public class WaypointDrawStepFactory
 
     public List<DrawWayPointStep> prepareSteps(Collection<Waypoint> waypoints, GridRenderer grid, boolean checkDistance, boolean showLabel)
     {
-        Minecraft mc = FMLClientHandler.instance().getClient();
+        Minecraft mc = ForgeHelper.INSTANCE.getClient();
         EntityPlayer player = mc.thePlayer;
         int dimension = player.dimension;
         int maxDistance = JourneyMap.getWaypointProperties().maxDistance.get();
         checkDistance = checkDistance && maxDistance > 0;
-        Vec3 playerVec = checkDistance ? player.getPosition(1) : null;
+        Vec3 playerVec = checkDistance ? ForgeHelper.INSTANCE.getEntityPositionVector(player) : null;
         drawStepList.clear();
 
         try

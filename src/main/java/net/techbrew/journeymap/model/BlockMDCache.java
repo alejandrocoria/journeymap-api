@@ -10,11 +10,13 @@ package net.techbrew.journeymap.model;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import cpw.mods.fml.common.registry.GameData;
-import cpw.mods.fml.common.registry.GameRegistry;
+
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraftforge.fml.common.registry.GameData;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
@@ -60,8 +62,8 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
         // Set alphas
         setAlpha(Blocks.air, 0F);
-        setAlpha(Blocks.fence, .4F);
-        setAlpha(Blocks.fence_gate, .4F);
+//        setAlpha(Blocks.fence, .4F);
+//        setAlpha(Blocks.fence_gate, .4F);
         setAlpha(Blocks.flowing_water, .3F);
         setAlpha(Blocks.glass, .3F);
         setAlpha(Blocks.glass_pane, .3F);
@@ -86,7 +88,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         // Set manual flags
         setFlags(Blocks.air, HasAir, OpenToSky, NoShadow, OpenToSky);
         setFlags(Blocks.double_plant, BiomeColor);
-        setFlags(Blocks.fence, TransparentRoof);
+//        setFlags(Blocks.fence, TransparentRoof);
         setFlags(Blocks.fire, NoShadow, Side2Texture);
         setFlags(Blocks.flowing_water, BiomeColor);
         setFlags(Blocks.glass, TransparentRoof);
@@ -143,6 +145,8 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:ClayGrass2"), EnumSet.of(BiomeColor));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:DryGrass"), EnumSet.of(BiomeColor));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:DryGrass2"), EnumSet.of(BiomeColor));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:FreshWater"), EnumSet.of(BiomeColor));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:FreshWaterStationary"), EnumSet.of(BiomeColor));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:PeatGrass"), EnumSet.of(BiomeColor));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:TallGrass"), EnumSet.of(BiomeColor));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:SaltWater"), EnumSet.of(BiomeColor));
@@ -158,6 +162,11 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
             {
                 setFlags(block, HasAir, OpenToSky, NoShadow);
                 continue;
+            }
+
+            if(block instanceof BlockFence || block instanceof BlockFenceGate) {
+                setAlpha(block, .4F);
+                setFlags(block, TransparentRoof);
             }
 
             if (block instanceof BlockGrass)
@@ -237,7 +246,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
                 }
                 else
                 {
-                    int meta = chunkMd.getChunk().getBlockMetadata(x, y, z);
+                    int meta = chunkMd.getBlockMeta(x, y, z);
                     return getBlockMD(cache, chunkMd, block, meta, x, y, z);
                 }
             }

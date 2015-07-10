@@ -8,7 +8,7 @@
 
 package net.techbrew.journeymap.cartography;
 
-import net.minecraft.world.EnumSkyBlock;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
@@ -62,7 +62,7 @@ public class Stratum
             }
             else
             {
-                this.setLightLevel((lightLevel != null) ? lightLevel : chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z));
+                this.setLightLevel((lightLevel != null) ? lightLevel : chunkMd.getSavedLightValue(x, y + 1, z));
             }
             this.setLightOpacity(chunkMd.getLightOpacity(blockMD, x, y, z));
             setDayColor(null);

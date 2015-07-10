@@ -8,16 +8,17 @@
 
 package net.techbrew.journeymap.forge.event;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.task.multi.MapPlayerTask;
@@ -37,7 +38,7 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
     private static final String DEBUG_SUFFIX = "";
     private static RenderGameOverlayEvent.ElementType EVENT_TYPE = RenderGameOverlayEvent.ElementType.ALL;
     private static boolean EVENT_PRE = true;
-    private final Minecraft mc = FMLClientHandler.instance().getClient();
+    private final Minecraft mc = ForgeHelper.INSTANCE.getClient();
     private JourneyMap jm;
     private long statTimerCheck;
     private List<String> statTimerReport = Collections.EMPTY_LIST;

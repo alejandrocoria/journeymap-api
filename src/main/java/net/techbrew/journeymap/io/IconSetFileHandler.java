@@ -8,9 +8,10 @@
 
 package net.techbrew.journeymap.io;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.ui.option.StringListProvider;
 
@@ -43,7 +44,7 @@ public class IconSetFileHandler
 
     public static File getEntityIconDir()
     {
-        File dir = new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.ENTITY_ICON_DIR);
+        File dir = new File(ForgeHelper.INSTANCE.getClient().mcDataDir, Constants.ENTITY_ICON_DIR);
         if (!dir.exists())
         {
             dir.mkdirs();

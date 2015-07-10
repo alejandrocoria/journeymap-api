@@ -14,6 +14,7 @@ import net.minecraft.world.World;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.ChunkCoord;
@@ -78,7 +79,7 @@ public abstract class BaseMapTask implements ITask
 
 
             // Check the dimension
-            int currentDimension = mc.theWorld.provider.dimensionId;
+            int currentDimension = ForgeHelper.INSTANCE.getPlayerDimension();
             if (currentDimension != mapType.dimension)
             {
                 if (threadLogging)

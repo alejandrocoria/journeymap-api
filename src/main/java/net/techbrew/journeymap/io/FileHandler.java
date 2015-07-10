@@ -14,13 +14,14 @@ import com.google.common.io.ByteSink;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import com.google.gson.GsonBuilder;
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.Util;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WorldData;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
 import org.apache.logging.log4j.Level;
@@ -42,7 +43,7 @@ public class FileHandler
     public static final String ASSETS_JOURNEYMAP = "/assets/journeymap";
     public static final String ASSETS_JOURNEYMAP_WEB = "/assets/journeymap/web";
 
-    public static final File MinecraftDirectory = FMLClientHandler.instance().getClient().mcDataDir;
+    public static final File MinecraftDirectory = ForgeHelper.INSTANCE.getClient().mcDataDir;
     public static final File JourneyMapDirectory = new File(MinecraftDirectory, Constants.JOURNEYMAP_DIR);
     public static final File StandardConfigDirectory = new File(MinecraftDirectory, Constants.CONFIG_DIR);
 
@@ -310,7 +311,7 @@ public class FileHandler
 
     public static File getWaypointDir()
     {
-        return getWaypointDir(getJMWorldDir(FMLClientHandler.instance().getClient()));
+        return getWaypointDir(getJMWorldDir(ForgeHelper.INSTANCE.getClient()));
     }
 
     public static File getWaypointDir(File jmWorldDir)
@@ -406,7 +407,7 @@ public class FileHandler
 
     public static File getWorldConfigDir(boolean fallbackToStandardConfigDir)
     {
-        File worldDir = getJMWorldDirForWorldId(FMLClientHandler.instance().getClient(), null); // always use the "base" folder for multiplayer
+        File worldDir = getJMWorldDirForWorldId(ForgeHelper.INSTANCE.getClient(), null); // always use the "base" folder for multiplayer
         if (worldDir != null && worldDir.exists())
         {
             File worldConfigDir = new File(worldDir, "config");

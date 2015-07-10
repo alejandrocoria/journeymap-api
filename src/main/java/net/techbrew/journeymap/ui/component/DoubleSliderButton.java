@@ -1,8 +1,8 @@
 package net.techbrew.journeymap.ui.component;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import cpw.mods.fml.client.config.GuiUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.client.config.GuiUtils;
 import net.techbrew.journeymap.properties.PropertiesBase;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -64,9 +64,9 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Atomic
                 setSliderValue((par2 - (this.xPosition + 4)) / (float) (this.width - 8));
             }
 
-            int k = this.getHoverState(this.field_146123_n);
+            int k = this.getHoverState(isMouseOver());
 
-            if (this.field_146123_n || this.dragging)
+            if (this.isMouseOver() || this.dragging)
             {
 
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -151,7 +151,7 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Atomic
 
     public boolean keyTyped(char c, int i)
     {
-        if (this.field_146123_n)
+        if (this.isMouseOver())
         {
             if (i == Keyboard.KEY_LEFT || i == Keyboard.KEY_DOWN || i == Keyboard.KEY_SUBTRACT)
             {

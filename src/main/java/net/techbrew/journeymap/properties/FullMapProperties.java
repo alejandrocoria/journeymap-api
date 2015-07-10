@@ -1,14 +1,14 @@
 /*
  * JourneyMap mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (C) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
  */
 
 package net.techbrew.journeymap.properties;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.model.MapType;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -29,7 +29,7 @@ public class FullMapProperties extends InGameMapProperties
     @Override
     public void newFileInit()
     {
-        if (FMLClientHandler.instance().getClient().fontRenderer.getUnicodeFlag())
+        if (ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
         {
             super.fontScale.set(2);
         }

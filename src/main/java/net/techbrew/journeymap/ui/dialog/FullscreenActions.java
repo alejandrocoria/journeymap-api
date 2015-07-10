@@ -8,11 +8,12 @@
 
 package net.techbrew.journeymap.ui.dialog;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.io.MapSaver;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -95,7 +96,7 @@ public class FullscreenActions extends JmUI
 
         buttonAutomap = new Button(Constants.getString("jm.common.automap_title"));
         buttonAutomap.setTooltip(Constants.getString("jm.common.automap_text"));
-        buttonAutomap.setEnabled(FMLClientHandler.instance().getClient().isSingleplayer() && JourneyMap.getCoreProperties().mappingEnabled.get());
+        buttonAutomap.setEnabled(ForgeHelper.INSTANCE.getClient().isSingleplayer() && JourneyMap.getCoreProperties().mappingEnabled.get());
 
         buttonDeleteMap = new Button(Constants.getString("jm.common.deletemap_title"));
         buttonDeleteMap.setTooltip(Constants.getString("jm.common.deletemap_text"));

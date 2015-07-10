@@ -8,13 +8,14 @@
 
 package net.techbrew.journeymap.forge.event;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.render.ingame.RenderWaypointBeacon;
 
 import java.util.EnumSet;
@@ -24,7 +25,7 @@ import java.util.EnumSet;
  */
 public class WaypointBeaconHandler implements EventHandlerManager.EventHandler
 {
-    final Minecraft mc = FMLClientHandler.instance().getClient();
+    final Minecraft mc = ForgeHelper.INSTANCE.getClient();
 
     public WaypointBeaconHandler()
     {

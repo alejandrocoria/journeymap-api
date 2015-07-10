@@ -8,10 +8,11 @@
 
 package net.techbrew.journeymap.waypoint;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WorldData;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
@@ -48,67 +49,68 @@ public class VoxelReader
      */
     public static java.util.List<Waypoint> loadWaypoints()
     {
-        java.util.List voxelWaypoints = new ArrayList(0);
-
-        try
-        {
-            voxelWaypoints.addAll(com.thevoxelbox.voxelmap.VoxelMap.getInstance().getWaypointManager().getWaypoints());
-            modLoaded = true;
-        }
-        catch (Throwable e)
-        {
-            JourneyMap.getLogger().warn("Incompatible version of VoxelMap. Tried com.thevoxelbox.voxelmap.VoxelMap.instance.waypointManager.wayPts: " + e);
-            if (!(e instanceof ClassNotFoundException))
-            {
-                ChatLog.announceI18N("jm.waypoint.import_vox_version");
-                ChatLog.announceURL(VOXEL_JAR_NAME, VOXEL_JAR_URL);
-            }
-            modLoaded = false;
-        }
-
-        if (voxelWaypoints.isEmpty())
-        {
-            return Collections.EMPTY_LIST;
-        }
-
-        try
-        {
-            ArrayList<Waypoint> converted = new ArrayList<Waypoint>(voxelWaypoints.size());
-            for (Object wpObj : voxelWaypoints)
-            {
-                com.thevoxelbox.voxelmap.util.Waypoint voxWp = (com.thevoxelbox.voxelmap.util.Waypoint) wpObj;
-
-                String name = voxWp.name.replaceAll("~comma~", ",");
-                int x = voxWp.x;
-                int y = voxWp.y;
-                int z = voxWp.z;
-                boolean enabled = voxWp.enabled;
-                int r = (int) (voxWp.red * 255.0F) & 255;
-                int g = (int) (voxWp.green * 255.0F) & 255;
-                int b = (int) (voxWp.blue * 255.0F) & 255;
-                Waypoint.Type type = ("skull".equals(voxWp.imageSuffix)) ? Waypoint.Type.Death : Waypoint.Type.Normal;
-
-                Waypoint jmWp = new net.techbrew.journeymap.model.Waypoint(name, x, y, z, enabled, r, g, b, type,
-                        Waypoint.Origin.VoxelMap, 0, voxWp.dimensions);
-
-                jmWp.setReadOnly(true);
-
-                converted.add(jmWp);
-            }
-            return converted;
-
-        }
-        catch (Throwable e)
-        {
-            JourneyMap.getLogger().error("Exception getting VoxelMap waypoints: " + LogFormatter.toString(e));
-            modLoaded = false;
-            return Collections.EMPTY_LIST;
-        }
+//        java.util.List voxelWaypoints = new ArrayList(0);
+//        ArrayList<Waypoint> converted = null;
+//        try
+//        {
+//            voxelWaypoints.addAll(com.thevoxelbox.voxelmap.VoxelMap.getInstance().getWaypointManager().getWaypoints());
+//            modLoaded = true;
+//        }
+//        catch (Throwable e)
+//        {
+//            JourneyMap.getLogger().warn("Incompatible version of VoxelMap. Tried com.thevoxelbox.voxelmap.VoxelMap.instance.waypointManager.wayPts: " + e);
+//            if (!(e instanceof ClassNotFoundException))
+//            {
+//                ChatLog.announceI18N("jm.waypoint.import_vox_version");
+//                ChatLog.announceURL(VOXEL_JAR_NAME, VOXEL_JAR_URL);
+//            }
+//            modLoaded = false;
+//        }
+//
+//        if (voxelWaypoints.isEmpty())
+//        {
+//            return Collections.EMPTY_LIST;
+//        }
+//
+//        try
+//        {
+//            ArrayList<Waypoint> converted = new ArrayList<Waypoint>(voxelWaypoints.size());
+//            for (Object wpObj : voxelWaypoints)
+//            {
+//                com.thevoxelbox.voxelmap.util.Waypoint voxWp = (com.thevoxelbox.voxelmap.util.Waypoint) wpObj;
+//
+//                String name = voxWp.name.replaceAll("~comma~", ",");
+//                int x = voxWp.x;
+//                int y = voxWp.y;
+//                int z = voxWp.z;
+//                boolean enabled = voxWp.enabled;
+//                int r = (int) (voxWp.red * 255.0F) & 255;
+//                int g = (int) (voxWp.green * 255.0F) & 255;
+//                int b = (int) (voxWp.blue * 255.0F) & 255;
+//                Waypoint.Type type = ("skull".equals(voxWp.imageSuffix)) ? Waypoint.Type.Death : Waypoint.Type.Normal;
+//
+//                Waypoint jmWp = new net.techbrew.journeymap.model.Waypoint(name, x, y, z, enabled, r, g, b, type,
+//                        Waypoint.Origin.VoxelMap, 0, voxWp.dimensions);
+//
+//                jmWp.setReadOnly(true);
+//
+//                converted.add(jmWp);
+//            }
+//            return converted;
+//
+//        }
+//        catch (Throwable e)
+//        {
+//            JourneyMap.getLogger().error("Exception getting VoxelMap waypoints: " + LogFormatter.toString(e));
+//            modLoaded = false;
+//            return Collections.EMPTY_LIST;
+//        }
+        return Collections.EMPTY_LIST;
     }
 
     public static String getPointsFilename()
     {
-        String worldName = WorldData.getWorldName(FMLClientHandler.instance().getClient(), true);
+        String worldName = WorldData.getWorldName(ForgeHelper.INSTANCE.getClient(), true);
         return String.format("mods\\VoxelMods\\voxelMap\\%s.points", worldName);
     }
 

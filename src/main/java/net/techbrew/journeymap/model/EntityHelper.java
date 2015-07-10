@@ -9,13 +9,12 @@
 package net.techbrew.journeymap.model;
 
 import com.google.common.collect.ImmutableSortedMap;
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderFacade;
 import net.minecraft.client.renderer.entity.RenderHorse;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -30,6 +29,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
@@ -48,7 +48,7 @@ public class EntityHelper
         StatTimer timer = StatTimer.get("EntityHelper." + timerName);
         timer.start();
 
-        Minecraft mc = FMLClientHandler.instance().getClient();
+        Minecraft mc = ForgeHelper.INSTANCE.getClient();
         List<EntityDTO> list = new ArrayList();
 
         List<Entity> allEntities = new ArrayList<Entity>(mc.theWorld.loadedEntityList);
@@ -58,7 +58,7 @@ public class EntityHelper
         {
             for (Entity entity : allEntities)
             {
-                if (entity instanceof EntityLivingBase && !entity.isDead && entity.addedToChunk && bb.intersectsWith(entity.boundingBox))
+                if (entity instanceof EntityLivingBase && !entity.isDead && entity.addedToChunk && bb.intersectsWith(ForgeHelper.INSTANCE.getEntityBoundingBox((EntityLivingBase) entity)))
                 {
                     for (Class entityClass : entityClasses)
                     {
@@ -136,7 +136,7 @@ public class EntityHelper
         StatTimer timer = StatTimer.get("EntityHelper.getPlayersNearby");
         timer.start();
 
-        Minecraft mc = FMLClientHandler.instance().getClient();
+        Minecraft mc = ForgeHelper.INSTANCE.getClient();
         List<EntityPlayer> allPlayers = new ArrayList<EntityPlayer>(mc.theWorld.playerEntities);
         allPlayers.remove(mc.thePlayer);
 
@@ -160,6 +160,8 @@ public class EntityHelper
         return playerDTOs;
     }
 
+
+
     /**
      * Get a boundingbox to search nearby player.
      *
@@ -170,7 +172,7 @@ public class EntityHelper
     {
         int lateralDistance = JourneyMap.getCoreProperties().radarLateralDistance.get();
         int verticalDistance = JourneyMap.getCoreProperties().radarVerticalDistance.get();
-        return AxisAlignedBB.getBoundingBox(player.posX, player.posY, player.posZ, player.posX, player.posY, player.posZ).expand(lateralDistance, verticalDistance, lateralDistance);
+        return ForgeHelper.INSTANCE.getBoundingBox(player, lateralDistance, verticalDistance);
     }
 
     /**
@@ -210,7 +212,7 @@ public class EntityHelper
     public static String getFileName(Entity entity)
     {
 
-        Render entityRender = RenderManager.instance.getEntityRenderObject(entity);
+        Render entityRender = ForgeHelper.INSTANCE.getRenderManager().getEntityRenderObject(entity);
 
         // Manually handle horses
         if (entityRender instanceof RenderHorse)

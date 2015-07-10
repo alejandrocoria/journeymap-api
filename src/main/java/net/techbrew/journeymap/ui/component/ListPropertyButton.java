@@ -101,7 +101,7 @@ public class ListPropertyButton<T> extends Button implements IPropertyHolder<Ato
 
     public boolean keyTyped(char c, int i)
     {
-        if (this.field_146123_n)
+        if (this.isMouseOver())
         {
             if (i == Keyboard.KEY_LEFT || i == Keyboard.KEY_DOWN || i == Keyboard.KEY_SUBTRACT)
             {

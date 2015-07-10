@@ -8,7 +8,7 @@
 
 package net.techbrew.journeymap.ui;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
@@ -16,6 +16,7 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.settings.KeyBinding;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WaypointsData;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.config.Config;
@@ -34,7 +35,7 @@ public class UIManager
 {
     private final Logger logger = JourneyMap.getLogger();
     private final MiniMap miniMap;
-    Minecraft minecraft = FMLClientHandler.instance().getClient();
+    Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
 
     private UIManager()
     {

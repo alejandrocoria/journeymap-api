@@ -17,6 +17,7 @@ import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.io.nbt.ChunkLoader;
 import net.techbrew.journeymap.io.nbt.RegionLoader;
 import net.techbrew.journeymap.log.ChatLog;
@@ -157,8 +158,8 @@ public class MapRegionTask extends BaseMapTask
         {
             EntityDTO player = DataCache.getPlayer();
             final boolean cavesAllowed = FeatureManager.isAllowed(Feature.MapCaves);
-            final boolean worldHasSky = !player.entityLiving.worldObj.provider.hasNoSky;
-            boolean underground = player.entityLiving.worldObj.provider.hasNoSky || player.underground;
+            final boolean worldHasSky = !ForgeHelper.INSTANCE.hasNoSky(player.entityLiving);
+            boolean underground = ForgeHelper.INSTANCE.hasNoSky(player.entityLiving) || player.underground;
 
             if (underground && !cavesAllowed)
             {

@@ -1,8 +1,8 @@
 package net.techbrew.journeymap.ui.component;
 
-import cpw.mods.fml.client.config.GuiUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraftforge.fml.client.config.GuiUtils;
 import net.techbrew.journeymap.properties.PropertiesBase;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -61,16 +61,16 @@ public class IntSliderButton extends Button implements IPropertyHolder<AtomicInt
      */
     protected void mouseDragged(Minecraft par1Minecraft, int par2, int par3)
     {
-        if (this.visible && this.enabled)
+        if (this.visible && this.isEnabled())
         {
             if (this.dragging)
             {
                 setSliderValue((par2 - (this.xPosition + 4)) / (float) (this.width - 8));
             }
 
-            int k = this.getHoverState(this.field_146123_n);
+            int k = this.getHoverState(this.isEnabled());
 
-            if (this.field_146123_n || this.dragging)
+            if (this.isEnabled() || this.dragging)
             {
 
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -163,7 +163,7 @@ public class IntSliderButton extends Button implements IPropertyHolder<AtomicInt
 
     public boolean keyTyped(char c, int i)
     {
-        if (this.field_146123_n)
+        if (this.isEnabled())
         {
             if (i == Keyboard.KEY_LEFT || i == Keyboard.KEY_DOWN || i == Keyboard.KEY_SUBTRACT)
             {

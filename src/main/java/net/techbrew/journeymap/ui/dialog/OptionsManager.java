@@ -39,6 +39,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
@@ -247,7 +248,8 @@ public class OptionsManager extends JmUI
             }
             else
             {
-                optionsListPane.func_148122_a(width, height, headerHeight, this.height - 30);
+                // 1.7 func_148122_a
+                optionsListPane.setDimensions(width, height, headerHeight, this.height - 30);
                 optionsListPane.updateSlots();
             }
 
@@ -302,7 +304,7 @@ public class OptionsManager extends JmUI
             optionsListPane.lastTooltip = null;
 
             // Pre-scroll options list pane so we can double the distance covered
-            if (!(Mouse.isButtonDown(0) && optionsListPane.func_148125_i()))
+            if (!(Mouse.isButtonDown(0) && optionsListPane.getEnabled())) // 1.7 func_148125_i
             {
                 for (; !this.mc.gameSettings.touchscreen && Mouse.next(); this.mc.currentScreen.handleMouseInput())
                 {
@@ -430,7 +432,7 @@ public class OptionsManager extends JmUI
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseEvent)
+    protected void mouseClicked(int mouseX, int mouseY, int mouseEvent) throws IOException
     {
         super.mouseClicked(mouseX, mouseY, mouseEvent);
         boolean pressed = optionsListPane.mousePressed(mouseX, mouseY, mouseEvent);
@@ -441,9 +443,10 @@ public class OptionsManager extends JmUI
     }
 
     @Override
-    protected void mouseMovedOrUp(int mouseX, int mouseY, int mouseEvent)
+    // 1.7 mouseMovedOrUp
+    protected void mouseReleased(int mouseX, int mouseY, int mouseEvent)
     {
-        super.mouseMovedOrUp(mouseX, mouseY, mouseEvent);
+        super.mouseReleased(mouseX, mouseY, mouseEvent);
         optionsListPane.mouseReleased(mouseX, mouseY, mouseEvent);
 
     }

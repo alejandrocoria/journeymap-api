@@ -10,7 +10,7 @@ package net.techbrew.journeymap.model;
 
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -20,6 +20,7 @@ import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.StringUtils;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -59,7 +60,7 @@ public class EntityDTO implements Serializable
 
     public void update(EntityLivingBase entity, boolean hostile)
     {
-        EntityPlayer currentPlayer = FMLClientHandler.instance().getClient().thePlayer;
+        EntityPlayer currentPlayer = ForgeHelper.INSTANCE.getClient().thePlayer;
         this.dimension = entity.dimension;
         this.posX = entity.posX;
         this.posY = entity.posY;
@@ -81,8 +82,9 @@ public class EntityDTO implements Serializable
         // Player check
         if (entity instanceof EntityPlayer)
         {
-            this.filename = "/skin/" + StringUtils.stripControlCodes(entity.getCommandSenderName());
-            this.username = ((EntityPlayer) entity).getDisplayName();
+            String name = StringUtils.stripControlCodes(ForgeHelper.INSTANCE.getEntityName(entity));
+            this.filename = "/skin/" + name;
+            this.username = name;
         }
         else
         {
@@ -97,7 +99,7 @@ public class EntityDTO implements Serializable
             Entity ownerEntity = ((EntityTameable) entity).getOwner();
             if (ownerEntity != null)
             {
-                owner = ownerEntity.getCommandSenderName();
+                owner = ForgeHelper.INSTANCE.getEntityName(ownerEntity);
             }
         }
         else if (entity instanceof IEntityOwnable)
@@ -105,7 +107,7 @@ public class EntityDTO implements Serializable
             Entity ownerEntity = ((IEntityOwnable) entity).getOwner();
             if (ownerEntity != null)
             {
-                owner = ownerEntity.getCommandSenderName();
+                owner = ForgeHelper.INSTANCE.getEntityName(ownerEntity);
             }
         }
         else if (entity instanceof EntityHorse)
@@ -118,7 +120,7 @@ public class EntityDTO implements Serializable
                 {
                     if (currentPlayer.getUniqueID().equals(UUID.fromString(ownerUuidString)))
                     {
-                        owner = currentPlayer.getCommandSenderName();
+                        owner = ForgeHelper.INSTANCE.getEntityName(currentPlayer);
                     }
                 }
                 catch (Throwable t)
@@ -139,7 +141,7 @@ public class EntityDTO implements Serializable
             EntityLiving entityLiving = (EntityLiving) entity;
 
             // CustomName
-            if (entityLiving.hasCustomNameTag() && entityLiving.getAlwaysRenderNameTag())
+            if (ForgeHelper.INSTANCE.hasCustomName(entity) && entityLiving.getAlwaysRenderNameTag())
             {
                 customName = StringUtils.stripControlCodes(((EntityLiving) entity).getCustomNameTag());
             }

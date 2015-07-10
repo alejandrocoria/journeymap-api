@@ -1,9 +1,8 @@
 package net.techbrew.journeymap.ui.option;
 
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.ui.component.Button;
@@ -19,7 +18,7 @@ import java.util.List;
 public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySlot>
 {
     final String name;
-    Minecraft mc = FMLClientHandler.instance().getClient();
+    Minecraft mc = ForgeHelper.INSTANCE.getClient();
     SlotMetadata metadata;
     Config.Category category;
     int currentSlotIndex;
@@ -187,7 +186,8 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     }
 
     @Override
-    public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
+    // 1.7 public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
+    public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
     {
         currentSlotIndex = slotIndex;
         button.setWidth(listWidth);

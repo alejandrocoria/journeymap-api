@@ -2,7 +2,7 @@ package net.techbrew.journeymap.data;
 
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
-import cpw.mods.fml.client.FMLClientHandler;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.NetworkManager;
@@ -10,13 +10,14 @@ import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.io.IconSetFileHandler;
-import net.techbrew.journeymap.io.RealmsHelper;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
 import org.apache.logging.log4j.Level;
@@ -66,7 +67,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
     {
         try
         {
-            String serverName = RealmsHelper.getRealmsServerName();
+            String serverName = ForgeHelper.INSTANCE.getRealmsServerName();
 
             if (serverName != null)
             {
@@ -74,8 +75,8 @@ public class WorldData extends CacheLoader<Class, WorldData>
             }
             else
             {
-                Minecraft mc = FMLClientHandler.instance().getClient();
-                ServerData serverData = mc.func_147104_D(); // getServerData()
+                Minecraft mc = ForgeHelper.INSTANCE.getClient();
+                ServerData serverData = mc.getCurrentServerData(); // func_147104_D()
 
                 if (serverData != null)
                 {
@@ -109,7 +110,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
             NetworkManager netManager = FMLClientHandler.instance().getClientToServerNetworkManager();
             if (netManager != null)
             {
-                SocketAddress socketAddress = netManager.getSocketAddress();
+                SocketAddress socketAddress = netManager.getRemoteAddress(); // getSocketAddress
                 if ((socketAddress != null && socketAddress instanceof InetSocketAddress))
                 {
                     InetSocketAddress inetAddr = (InetSocketAddress) socketAddress;
@@ -214,10 +215,11 @@ public class WorldData extends CacheLoader<Class, WorldData>
             requiredDims.addAll(Arrays.asList(dims));
 
             // Use the player's provider
-            WorldProvider playerProvider = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider;
-            dimProviders.put(playerProvider.dimensionId, playerProvider);
-            requiredDims.remove(playerProvider.dimensionId);
-            JourneyMap.getLogger().log(logLevel, String.format("Using player's provider for dim %s: %s", playerProvider.dimensionId, getSafeDimensionName(playerProvider)));
+            WorldProvider playerProvider = ForgeHelper.INSTANCE.getClient().thePlayer.worldObj.provider;
+            int dimId = playerProvider.getDimensionId();
+            dimProviders.put(dimId, playerProvider);
+            requiredDims.remove(dimId);
+            JourneyMap.getLogger().log(logLevel, String.format("Using player's provider for dim %s: %s", dimId, getSafeDimensionName(playerProvider)));
 
             // Get a provider for the rest
             for (int dim : requiredDims)
@@ -245,7 +247,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                         {
                             provider = DimensionManager.createProviderFor(dim);
                             provider.getDimensionName(); // Force the name error
-                            provider.dimensionId = dim;
+                            provider.setDimension(dim);
                             dimProviders.put(dim, provider);
                             JourneyMap.getLogger().log(logLevel, String.format("DimensionManager.createProviderFor(%s): %s", dim, getSafeDimensionName(playerProvider)));
                         }
@@ -278,7 +280,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                 @Override
                 public int compare(WorldProvider o1, WorldProvider o2)
                 {
-                    return Integer.valueOf(o1.dimensionId).compareTo(o2.dimensionId);
+                    return Integer.valueOf(o1.getDimensionId()).compareTo(o2.getDimensionId());
                 }
             });
 
@@ -304,21 +306,21 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
         catch (Exception e)
         {
-            return Constants.getString("jm.common.dimension", worldProvider.dimensionId);
+            return Constants.getString("jm.common.dimension", worldProvider.getDimensionId());
         }
     }
 
     @Override
     public WorldData load(Class aClass) throws Exception
     {
-        Minecraft mc = FMLClientHandler.instance().getClient();
+        Minecraft mc = ForgeHelper.INSTANCE.getClient();
         WorldInfo worldInfo = mc.theWorld.getWorldInfo();
 
         IntegratedServer server = mc.getIntegratedServer();
         boolean multiplayer = server == null || server.getPublic();
 
         name = getWorldName(mc, false);
-        dimension = mc.theWorld.provider.dimensionId;
+        dimension = mc.theWorld.provider.getDimensionId();
         hardcore = worldInfo.isHardcoreModeEnabled();
         singlePlayer = !multiplayer;
         time = mc.theWorld.getWorldTime() % 24000L;
@@ -358,6 +360,12 @@ public class WorldData extends CacheLoader<Class, WorldData>
         public String getDimensionName()
         {
             return Constants.getString("jm.common.dimension", this.dimensionId);
+        }
+
+        @Override
+        public String getInternalNameSuffix()
+        {
+            return "fake";
         }
     }
 }

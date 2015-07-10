@@ -16,6 +16,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.model.ChunkMD;
 import org.apache.logging.log4j.Logger;
 
@@ -63,7 +64,8 @@ public class ChunkLoader
             Chunk chunk = loader.loadChunk(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
             if (chunk != null)
             {
-                chunk.generateHeightMap();
+                // 1.8 TODO:  Can this be safely left commented out?
+                // chunk.generateHeightMap();
                 chunk.generateSkylightMap();
                 chunkMD = new ChunkMD(chunk);
             }
@@ -129,7 +131,7 @@ public class ChunkLoader
             Chunk theChunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
             if (!(theChunk instanceof EmptyChunk))
             {
-                if (theChunk.isChunkLoaded && !theChunk.isEmpty())
+                if (ForgeHelper.INSTANCE.hasChunkData(theChunk))
                 {
                     result = theChunk;
                 }

@@ -9,11 +9,11 @@
 package net.techbrew.journeymap.command;
 
 import com.mojang.authlib.GameProfile;
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 
@@ -22,7 +22,7 @@ import net.techbrew.journeymap.model.Waypoint;
  */
 public class CmdTeleportWaypoint
 {
-    final Minecraft mc = FMLClientHandler.instance().getClient();
+    final Minecraft mc = ForgeHelper.INSTANCE.getClient();
     final Waypoint waypoint;
 
     public CmdTeleportWaypoint(Waypoint waypoint)
@@ -39,9 +39,9 @@ public class CmdTeleportWaypoint
             GameProfile profile = null;
             try
             {
-                profile = new GameProfile(mc.thePlayer.getUniqueID(), mc.thePlayer.getCommandSenderName());
+                profile = new GameProfile(mc.thePlayer.getUniqueID(), ForgeHelper.INSTANCE.getEntityName(mc.thePlayer));
                 configurationManager = mcServer.getConfigurationManager();
-                return configurationManager.func_152596_g(profile);
+                return configurationManager.canSendCommands(profile); // 1.7 func_152596_g
             }
             catch (Exception e)
             {
@@ -71,6 +71,6 @@ public class CmdTeleportWaypoint
 
     public void run()
     {
-        mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", mc.thePlayer.getCommandSenderName(), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
+        mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", ForgeHelper.INSTANCE.getEntityName(mc.thePlayer), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
     }
 }

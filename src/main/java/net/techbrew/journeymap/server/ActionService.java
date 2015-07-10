@@ -8,10 +8,10 @@
 
 package net.techbrew.journeymap.server;
 
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.MapSaver;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -58,7 +58,7 @@ public class ActionService extends BaseService
         query.parse();
 
         // Check world
-        Minecraft minecraft = FMLClientHandler.instance().getClient();
+        Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
         World theWorld = minecraft.theWorld;
         if (theWorld == null)
         {
@@ -101,7 +101,7 @@ public class ActionService extends BaseService
 
         Query query = event.query();
 
-        Minecraft minecraft = FMLClientHandler.instance().getClient();
+        Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
         World theWorld = minecraft.theWorld;
 
 

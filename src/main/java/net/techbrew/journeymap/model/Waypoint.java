@@ -11,14 +11,15 @@ package net.techbrew.journeymap.model;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ChunkCoordinates;
+
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.techbrew.journeymap.Constants;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.render.texture.TextureCache;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 
@@ -82,7 +83,7 @@ public class Waypoint implements Serializable
 
     protected transient boolean readOnly;
     protected transient boolean dirty;
-    protected transient Minecraft mc = FMLClientHandler.instance().getClient();
+    protected transient Minecraft mc = ForgeHelper.INSTANCE.getClient();
 
     /**
      * Default constructor Required by GSON
@@ -99,9 +100,9 @@ public class Waypoint implements Serializable
         this.z = original.z;
     }
 
-    public Waypoint(String name, ChunkCoordinates location, Color color, Type type, Integer currentDimension)
+    public Waypoint(String name, int posX, int posY, int posZ, Color color, Type type, Integer currentDimension)
     {
-        this(name, location.posX, location.posY, location.posZ, true, color.getRed(), color.getGreen(), color.getBlue(), type, Origin.JourneyMap, currentDimension, Arrays.asList(currentDimension));
+        this(name, posX, posY, posZ, true, color.getRed(), color.getGreen(), color.getBlue(), type, Origin.JourneyMap, currentDimension, Arrays.asList(currentDimension));
     }
 
     /**
@@ -116,7 +117,7 @@ public class Waypoint implements Serializable
         if (dimensions == null || dimensions.size() == 0)
         {
             dimensions = new TreeSet<Integer>();
-            dimensions.add(mc.thePlayer.worldObj.provider.dimensionId);
+            dimensions.add(ForgeHelper.INSTANCE.getPlayerDimension());
         }
         this.dimensions = new TreeSet<Integer>(dimensions);
         this.dimensions.add(currentDimension);
@@ -148,11 +149,10 @@ public class Waypoint implements Serializable
 
     public static Waypoint of(EntityPlayer player)
     {
-        ChunkCoordinates cc = new ChunkCoordinates(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
-        return at(cc, Type.Normal, player.worldObj.provider.dimensionId);
+        return at(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ), Type.Normal, ForgeHelper.INSTANCE.getPlayerDimension());
     }
 
-    public static Waypoint at(ChunkCoordinates cc, Type type, int dimension)
+    public static Waypoint at(int posX, int posY, int posZ, Type type, int dimension)
     {
         String name;
         if (type == Type.Death)
@@ -164,9 +164,9 @@ public class Waypoint implements Serializable
         }
         else
         {
-            name = createName(cc.posX, cc.posZ);
+            name = createName(posX, posZ);
         }
-        Waypoint waypoint = new Waypoint(name, cc, Color.white, type, dimension);
+        Waypoint waypoint = new Waypoint(name, posX, posY, posZ, Color.white, type, dimension);
         waypoint.setRandomColor();
         return waypoint;
     }
@@ -277,8 +277,7 @@ public class Waypoint implements Serializable
 
     public boolean isInPlayerDimension()
     {
-        Minecraft mc = FMLClientHandler.instance().getClient();
-        return dimensions.contains(mc.thePlayer.worldObj.provider.dimensionId);
+        return dimensions.contains(ForgeHelper.INSTANCE.getPlayerDimension());
     }
 
     public String getId()
@@ -338,7 +337,11 @@ public class Waypoint implements Serializable
 
     public Vec3 getPosition()
     {
-        return Vec3.createVectorHelper(getBlockCenteredX(), getBlockCenteredY(), getBlockCenteredZ());
+        // 1.7
+        // return Vec3.createVectorHelper(getBlockCenteredX(), getBlockCenteredY(), getBlockCenteredZ());
+
+        // 1.8
+        return new Vec3(getBlockCenteredX(), getBlockCenteredY(), getBlockCenteredZ());
     }
 
     public int getR()

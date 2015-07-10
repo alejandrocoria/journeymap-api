@@ -50,7 +50,7 @@ public class ChunkRenderController
         boolean renderOkay = false;
         final RegionCoord rCoord = cCoord.getRegionCoord();
 
-        if (cCoord.isUnderground() != mapType.isUnderground() || !Objects.equal(cCoord.getVerticalSlice(), mapType.vSlice) || chunkMd.getWorldObj().provider.dimensionId != mapType.dimension)
+        if (cCoord.isUnderground() != mapType.isUnderground() || !Objects.equal(cCoord.getVerticalSlice(), mapType.vSlice) || chunkMd.getDimension() != mapType.dimension)
         {
             JourneyMap.getLogger().error(String.format("Bad data; Coordinates not compatible with MapType: %s, %s, %s ", cCoord, chunkMd, mapType));
             return false;

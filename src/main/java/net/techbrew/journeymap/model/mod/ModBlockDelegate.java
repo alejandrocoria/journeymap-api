@@ -1,8 +1,8 @@
 package net.techbrew.journeymap.model.mod;
 
 import com.google.common.base.Joiner;
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.util.IIcon;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.BlockMD;

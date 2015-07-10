@@ -14,6 +14,7 @@ import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.IChunkRenderer;
 import net.techbrew.journeymap.cartography.RGB;
 import net.techbrew.journeymap.cartography.Strata;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
@@ -121,7 +122,9 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
         {
             return 0;
         }
-        int actualLight = chunkMd.getSavedLightValue(EnumSkyBlock.Block, x, y + 1, z);
+
+        int actualLight = chunkMd.getSavedLightValue(x, y + 1, z);
+
         if (actualLight > 0)
         {
             return actualLight;

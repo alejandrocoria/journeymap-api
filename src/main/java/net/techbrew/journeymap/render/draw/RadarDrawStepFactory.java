@@ -1,10 +1,10 @@
 package net.techbrew.journeymap.render.draw;
 
 import com.google.common.base.Strings;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.EntityDTO;
 import net.techbrew.journeymap.properties.InGameMapProperties;
@@ -36,7 +36,7 @@ public class RadarDrawStepFactory
             TextureImpl entityIcon, locatorImg;
             boolean isPlayer, isPet;
 
-            String playername = Minecraft.getMinecraft().thePlayer.getDisplayName();
+            String playername = ForgeHelper.INSTANCE.getEntityName(ForgeHelper.INSTANCE.getClient().thePlayer);
             TextureCache tc = TextureCache.instance();
             String iconSetName = mapProperties.getEntityIconSetName().get();
 
@@ -90,7 +90,7 @@ public class RadarDrawStepFactory
                         // Draw entity icon and label
                         if (isPlayer)
                         {
-                            entityIcon = tc.getPlayerSkin(dto.entityLiving.getCommandSenderName());
+                            entityIcon = tc.getPlayerSkin(ForgeHelper.INSTANCE.getEntityName(dto.entityLiving));
                             DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(dto);
                             drawStep.update(false, locatorImg, entityIcon, showPlayerHeading);
                             drawStepList.add(drawStep);

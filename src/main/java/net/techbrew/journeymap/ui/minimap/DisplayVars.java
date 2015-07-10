@@ -11,6 +11,7 @@ package net.techbrew.journeymap.ui.minimap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.properties.MiniMapProperties;
@@ -126,7 +127,7 @@ public class DisplayVars
 
         this.fontScale = miniMapProperties.fontScale.get();
 
-        FontRenderer fontRenderer = mc.fontRenderer;
+        FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
         fpsLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.fpsLabel.shadow) * this.fontScale);
         locationLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.locationLabel.shadow) * this.fontScale);
 
@@ -134,7 +135,7 @@ public class DisplayVars
         int compassLabelHeight = 0;
         if (showCompass)
         {
-            compassLabelHeight = (int) (DrawUtil.getLabelHeight(mc.fontRenderer, minimapSpec.compassLabel.shadow) * compassFontScale);
+            compassLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.compassLabel.shadow) * compassFontScale);
         }
 
         drawScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);

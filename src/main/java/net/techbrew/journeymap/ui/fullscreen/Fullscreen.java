@@ -9,9 +9,9 @@
 package net.techbrew.journeymap.ui.fullscreen;
 
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.settings.KeyBinding;
@@ -23,6 +23,7 @@ import net.techbrew.journeymap.VersionCheck;
 import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.io.ThemeFileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
@@ -56,6 +57,7 @@ import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -99,7 +101,7 @@ public class Fullscreen extends JmUI
     public Fullscreen()
     {
         super(null);
-        mc = FMLClientHandler.instance().getClient();
+        mc = ForgeHelper.INSTANCE.getClient();
         fullMapProperties = JourneyMap.getFullMapProperties();
         state.refresh(mc, mc.thePlayer, fullMapProperties);
         boolean showCaves = state.isCaveMappingAllowed() && fullMapProperties.showCaves.get();
@@ -535,7 +537,7 @@ public class Fullscreen extends JmUI
         }
 
         // Update toggles
-        boolean isSky = !mc.theWorld.provider.hasNoSky;
+        boolean isSky = !ForgeHelper.INSTANCE.hasNoSky(mc.theWorld);
         buttonDay.setEnabled(isSky);
         buttonNight.setEnabled(isSky);
         buttonCaves.setEnabled(isSky && state.isUnderground() && state.isCaveMappingAllowed());
@@ -594,7 +596,7 @@ public class Fullscreen extends JmUI
     }
 
     @Override
-    public void handleMouseInput()
+    public void handleMouseInput() throws IOException
     { // handleMouseInput
 
         if (chat != null && !chat.isHidden())
@@ -626,14 +628,14 @@ public class Fullscreen extends JmUI
                 }
                 else
                 {
-                    mouseMovedOrUp(mx, my, Mouse.getEventButton());
+                    mouseReleased(mx, my, Mouse.getEventButton());
                 }
             }
         }
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton)
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
         if (chat != null && !chat.isHidden())
         {
@@ -654,9 +656,10 @@ public class Fullscreen extends JmUI
     }
 
     @Override
-    protected void mouseMovedOrUp(int mouseX, int mouseY, int which)
+    // 1.7 mouseMovedOrUp
+    protected void mouseReleased(int mouseX, int mouseY, int which)
     {
-        super.mouseMovedOrUp(mouseX, mouseY, which);
+        super.mouseReleased(mouseX, mouseY, which);
 
         if (isMouseOverButton(mouseX, mouseY))
         {
@@ -978,7 +981,7 @@ public class Fullscreen extends JmUI
     void refreshState()
     {
         // Check player status
-        EntityClientPlayerMP player = mc.thePlayer;
+        EntityPlayer player = mc.thePlayer;
         if (player == null)
         {
             logger.warn("Could not get player");
@@ -1020,7 +1023,7 @@ public class Fullscreen extends JmUI
         state.playerLastPos = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
                 MathHelper.floor_double(mc.thePlayer.posX),
                 MathHelper.floor_double(mc.thePlayer.posZ),
-                MathHelper.floor_double(mc.thePlayer.boundingBox.minY),
+                MathHelper.floor_double(ForgeHelper.INSTANCE.getEntityBoundingBox(mc.thePlayer).minY),
                 mc.thePlayer.chunkCoordY) + " " + state.getPlayerBiome();
 
         // Reset timer

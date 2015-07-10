@@ -1,10 +1,11 @@
 package net.techbrew.journeymap.ui.waypoint;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.world.WorldProvider;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.data.WorldData;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.ui.component.Button;
 import net.techbrew.journeymap.waypoint.WaypointStore;
 
@@ -25,13 +26,13 @@ class DimensionsButton extends Button
 
         if (needInit || currentWorldProvider != null)
         {
-            currentWorldProvider = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider;
+            currentWorldProvider = ForgeHelper.INSTANCE.getClient().thePlayer.worldObj.provider;
             needInit = false;
         }
         updateLabel();
 
         // Determine width
-        fitWidth(FMLClientHandler.instance().getClient().fontRenderer);
+        fitWidth(ForgeHelper.INSTANCE.getFontRenderer());
     }
 
     protected void updateLabel()
@@ -56,7 +57,7 @@ class DimensionsButton extends Button
         for (WorldProvider worldProvider : worldProviders)
         {
             String name = Constants.getString("jm.waypoint.dimension", WorldData.getSafeDimensionName(worldProvider));
-            maxWidth = Math.max(maxWidth, FMLClientHandler.instance().getClient().fontRenderer.getStringWidth(name));
+            maxWidth = Math.max(maxWidth, ForgeHelper.INSTANCE.getFontRenderer().getStringWidth(name));
         }
         return maxWidth + 12;
     }
@@ -74,9 +75,11 @@ class DimensionsButton extends Button
         {
             index = -1;
 
+            int currentDimension = ForgeHelper.INSTANCE.getDimension(currentWorldProvider);
+
             for (WorldProvider worldProvider : worldProviders)
             {
-                if (worldProvider.dimensionId == currentWorldProvider.dimensionId)
+                if (currentDimension == ForgeHelper.INSTANCE.getDimension(worldProvider))
                 {
                     index = worldProviders.indexOf(worldProvider) + 1;
                     break;

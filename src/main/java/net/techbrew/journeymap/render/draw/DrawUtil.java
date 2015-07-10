@@ -9,11 +9,11 @@
 package net.techbrew.journeymap.render.draw;
 
 
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -114,8 +114,8 @@ public class DrawUtil
             return;
         }
 
-        Minecraft mc = FMLClientHandler.instance().getClient();
-        final FontRenderer fontRenderer = mc.fontRenderer;
+        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        final FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
         final boolean drawRect = (bgColor != null && alpha > 0);
         final int width = fontRenderer.getStringWidth(text);
         int height = drawRect ? getLabelHeight(fontRenderer, fontShadow) : fontRenderer.FONT_HEIGHT;
@@ -313,7 +313,7 @@ public class DrawUtil
 
         final int direction = flip ? -1 : 1;
 
-        Tessellator tessellator = Tessellator.instance;
+        Tessellator tessellator = ForgeHelper.INSTANCE.getTessellator();
         tessellator.startDrawingQuads();
         tessellator.addVertexWithUV(x, height + y, zLevel, 0, 1);
         tessellator.addVertexWithUV(x + width, height + y, zLevel, direction, 1);

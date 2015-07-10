@@ -8,9 +8,10 @@
 
 package net.techbrew.journeymap.thread;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.task.multi.ITask;
@@ -23,7 +24,7 @@ public class RunnableTask implements Runnable
 {
     static final JourneyMap jm = JourneyMap.getInstance();
     static final Logger logger = JourneyMap.getLogger();
-    static final Minecraft mc = FMLClientHandler.instance().getClient();
+    static final Minecraft mc = ForgeHelper.INSTANCE.getClient();
     static final boolean threadLogging = jm.isThreadLogging();
 
     private final ExecutorService taskExecutor;

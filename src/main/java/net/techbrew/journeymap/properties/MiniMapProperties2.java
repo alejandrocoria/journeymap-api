@@ -9,7 +9,7 @@
 package net.techbrew.journeymap.properties;
 
 import com.google.common.base.Objects;
-import cpw.mods.fml.client.FMLClientHandler;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.ui.minimap.Orientation;
 import net.techbrew.journeymap.ui.minimap.Position;
 import net.techbrew.journeymap.ui.minimap.ReticleOrientation;
@@ -36,7 +36,7 @@ public class MiniMapProperties2 extends MiniMapProperties
         this.orientation.set(Orientation.PlayerHeading);
         this.reticleOrientation.set(ReticleOrientation.Compass);
         this.sizePercent.set(30);
-        if (FMLClientHandler.instance().getClient().fontRenderer.getUnicodeFlag())
+        if (ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
         {
             super.fontScale.set(2);
             compassFontScale.set(2);

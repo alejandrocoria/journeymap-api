@@ -8,10 +8,10 @@
 
 package net.techbrew.journeymap.server;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.registry.GameData;
+import net.minecraftforge.fml.common.registry.GameData;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.*;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
 import se.rupy.http.Event;
@@ -96,7 +96,7 @@ public class DataService extends BaseService
                 }
                 else
                 {
-                    if (FMLClientHandler.instance().getClient().theWorld == null)
+                    if (ForgeHelper.INSTANCE.getClient().theWorld == null)
                     {
                         throwEventException(503, "World not connected", event, false);
                     }

@@ -8,7 +8,6 @@
 
 package net.techbrew.journeymap.io;
 
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.ITileEntityProvider;
@@ -31,7 +30,6 @@ import java.util.HashSet;
 
 public class IconLoader
 {
-
     final BufferedImage blocksTexture;
     Logger logger = JourneyMap.getLogger();
     DataCache dataCache = DataCache.instance();
@@ -286,7 +284,7 @@ public class IconLoader
                     blockAlpha = a * 1.0f / 255; // try to use texture alpha
                     if (blockAlpha == 1f)
                     { // try to use light opacity
-                        blockAlpha = block.getLightOpacity(FMLClientHandler.instance().getClient().theWorld, 0, 65, 0) / 255f;
+                        blockAlpha = block.getLightOpacity(ForgeHelper.INSTANCE.getClient().theWorld, 0, 65, 0) / 255f;
                     }
                 }
             }
@@ -320,7 +318,7 @@ public class IconLoader
 
         try
         {
-            int glid = FMLClientHandler.instance().getClient().getTextureManager().getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
+            int glid = ForgeHelper.INSTANCE.getClient().getTextureManager().getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
             GL11.glBindTexture(3553, glid);
             int width = GL11.glGetTexLevelParameteri(3553, 0, 4096);
             int height = GL11.glGetTexLevelParameteri(3553, 0, 4097);

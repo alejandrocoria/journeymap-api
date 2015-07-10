@@ -8,7 +8,7 @@
 
 package net.techbrew.journeymap.ui.component;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.properties.PropertiesBase;
@@ -37,7 +37,7 @@ public class IconSetButton extends Button implements IPropertyHolder<AtomicRefer
         updateLabel();
 
         // Determine width
-        fitWidth(FMLClientHandler.instance().getClient().fontRenderer);
+        fitWidth(fontRenderer);
     }
 
     protected void updateLabel()
@@ -69,7 +69,7 @@ public class IconSetButton extends Button implements IPropertyHolder<AtomicRefer
         for (Object iconSetName : validNames)
         {
             String name = getSafeLabel(iconSetName.toString());
-            maxWidth = Math.max(maxWidth, FMLClientHandler.instance().getClient().fontRenderer.getStringWidth(name));
+            maxWidth = Math.max(maxWidth, fontRenderer.getStringWidth(name));
         }
         return maxWidth + 12;
     }

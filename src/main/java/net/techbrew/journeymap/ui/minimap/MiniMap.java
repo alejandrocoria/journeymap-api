@@ -8,15 +8,17 @@
 
 package net.techbrew.journeymap.ui.minimap;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.Feature;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.forge.event.MiniMapOverlayHandler;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
+import net.techbrew.journeymap.forge.helper.IForgeHelper;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.model.MapState;
@@ -46,14 +48,15 @@ public class MiniMap
     private static final float lightmapS = (float) (15728880 % 65536) / 1f;
     private static final float lightmapT = (float) (15728880 / 65536) / 1f;
     private static final long labelRefreshRate = 400;
+    private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
     private final static GridRenderer gridRenderer = new GridRenderer(3);
     private final Logger logger = JourneyMap.getLogger();
-    private final Minecraft mc = FMLClientHandler.instance().getClient();
+    private final Minecraft mc = ForgeHelper.INSTANCE.getClient();
     private final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
     private final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
     private TextureImpl playerLocatorTex;
     private MiniMapProperties miniMapProperties;
-    private EntityClientPlayerMP player;
+    private EntityPlayer player;
     private StatTimer drawTimer;
     private StatTimer refreshStateTimer;
     private DisplayVars dv;
@@ -90,7 +93,7 @@ public class MiniMap
             return;
         }
 
-        boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || miniMapProperties.showCaves.get());
+        boolean showCaves = shouldShowCaves();
         state.refresh(mc, player, miniMapProperties);
 
         MapType mapType = state.getMapType(showCaves);
@@ -126,6 +129,11 @@ public class MiniMap
     public void drawMap()
     {
         drawMap(false);
+    }
+
+    private boolean shouldShowCaves()
+    {
+        return FeatureManager.isAllowed(Feature.MapCaves) && (forgeHelper.hasNoSky(player) || miniMapProperties.showCaves.get());
     }
 
     /**
@@ -168,7 +176,7 @@ public class MiniMap
             boolean moved = gridRenderer.center(state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
             if (moved || doStateRefresh)
             {
-                boolean showCaves = FeatureManager.isAllowed(Feature.MapCaves) && (player.worldObj.provider.hasNoSky || miniMapProperties.showCaves.get());
+                boolean showCaves = shouldShowCaves();
                 gridRenderer.updateTiles(state.getMapType(showCaves), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, doStateRefresh || preview, 0, 0);
             }
 
@@ -644,7 +652,7 @@ public class MiniMap
         {
             final int playerX = MathHelper.floor_double(player.posX);
             final int playerZ = MathHelper.floor_double(player.posZ);
-            final int playerY = MathHelper.floor_double(player.boundingBox.minY);
+            final int playerY = MathHelper.floor_double(forgeHelper.getEntityBoundingBox(player).minY);
             locationLabelText = dv.locationFormatKeys.format(dv.locationFormatVerbose, playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
         }
 

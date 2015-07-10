@@ -16,6 +16,7 @@ import net.minecraft.world.WorldProvider;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WorldData;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.Waypoint;
@@ -36,6 +37,7 @@ import org.lwjgl.input.Keyboard;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -110,7 +112,7 @@ public class WaypointEditor extends JmUI
             String pos = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
                     MathHelper.floor_double(mc.thePlayer.posX),
                     MathHelper.floor_double(mc.thePlayer.posZ),
-                    MathHelper.floor_double(mc.thePlayer.boundingBox.minY),
+                    MathHelper.floor_double(ForgeHelper.INSTANCE.getEntityBoundingBox(mc.thePlayer).minY),
                     MathHelper.floor_double(mc.thePlayer.chunkCoordY));
             currentLocation = Constants.getString("jm.waypoint.current_location", " " + pos);
 
@@ -165,7 +167,7 @@ public class WaypointEditor extends JmUI
 
                 for (WorldProvider provider : WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions()))
                 {
-                    int dim = provider.dimensionId;
+                    int dim = ForgeHelper.INSTANCE.getDimension(provider);
                     String dimName = Integer.toString(dim);
                     try
                     {
@@ -433,7 +435,7 @@ public class WaypointEditor extends JmUI
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton)
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         for (GuiTextField field : fieldList)

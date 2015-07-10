@@ -8,7 +8,8 @@
 
 package net.techbrew.journeymap.properties;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.model.MapType;
 import net.techbrew.journeymap.properties.config.Config;
 import net.techbrew.journeymap.ui.minimap.Orientation;
@@ -124,14 +125,14 @@ public class MiniMapProperties extends InGameMapProperties
      */
     public int getSize()
     {
-        return (int) Math.max(128, Math.floor((sizePercent.get() / 100.0) * FMLClientHandler.instance().getClient().displayHeight));
+        return (int) Math.max(128, Math.floor((sizePercent.get() / 100.0) * ForgeHelper.INSTANCE.getClient().displayHeight));
     }
 
     @Override
     public void newFileInit()
     {
         this.setActive(true);
-        if (FMLClientHandler.instance().getClient().fontRenderer.getUnicodeFlag())
+        if (ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
         {
             super.fontScale.set(2);
             compassFontScale.set(2);

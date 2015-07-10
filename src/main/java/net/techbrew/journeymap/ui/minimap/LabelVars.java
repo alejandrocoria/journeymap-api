@@ -1,7 +1,8 @@
 package net.techbrew.journeymap.ui.minimap;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.gui.FontRenderer;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.ui.theme.Theme;
 
@@ -12,7 +13,6 @@ import java.awt.*;
  */
 class LabelVars
 {
-    private DisplayVars displayVars;
     final double x;
     final double y;
     final double fontScale;
@@ -22,6 +22,7 @@ class LabelVars
     Color bgColor;
     int bgAlpha;
     Color fgColor;
+    private DisplayVars displayVars;
 
     LabelVars(DisplayVars displayVars, double x, double y, DrawUtil.HAlign hAlign, DrawUtil.VAlign vAlign, double fontScale, Theme.LabelSpec labelSpec)
     {
@@ -43,7 +44,7 @@ class LabelVars
         FontRenderer fontRenderer = null;
         if (displayVars.forceUnicode)
         {
-            fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
+            fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
             isUnicode = fontRenderer.getUnicodeFlag();
             if (!isUnicode)
             {

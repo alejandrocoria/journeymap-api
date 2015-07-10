@@ -15,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.command.CmdTeleportWaypoint;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.render.texture.TextureImpl;
@@ -171,11 +172,13 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
             color = waypointValid ? waypoint.getSafeColor() : Color.GRAY;
         }
 
-        int yOffset = 1 + (this.manager.rowHeight - mc.fontRenderer.FONT_HEIGHT) / 2;
-        mc.fontRenderer.drawStringWithShadow(String.format("%sm", getDistance()), x + manager.colLocation, y + yOffset, color.getRGB());
+        FontRenderer fr = ForgeHelper.INSTANCE.getFontRenderer();
+
+        int yOffset = 1 + (this.manager.rowHeight - fr.FONT_HEIGHT) / 2;
+        fr.drawStringWithShadow(String.format("%sm", getDistance()), x + manager.colLocation, y + yOffset, color.getRGB());
 
         String name = waypointValid ? waypoint.getName() : EnumChatFormatting.STRIKETHROUGH + waypoint.getName();
-        mc.fontRenderer.drawStringWithShadow(name, manager.colName, y + yOffset, color.getRGB());
+        fr.drawStringWithShadow(name, manager.colName, y + yOffset, color.getRGB());
     }
 
     protected void drawWaypoint(int x, int y)
@@ -275,7 +278,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     {
         if (distance == null)
         {
-            distance = (int) player.getPosition(1).distanceTo(waypoint.getPosition());
+            distance = (int) ForgeHelper.INSTANCE.getEntityPositionVector(player).distanceTo(waypoint.getPosition());
         }
         return distance;
     }
@@ -287,7 +290,8 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     }
 
     @Override
-    public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
+    // 1.7 public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
+    public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
     {
         Minecraft mc = manager.getMinecraft();
         this.width = listWidth;

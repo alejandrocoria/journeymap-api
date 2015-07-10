@@ -8,12 +8,13 @@
 
 package net.techbrew.journeymap.server;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.WorldData;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.model.MapType;
@@ -62,7 +63,7 @@ public class TileService extends FileService
         Query query = event.query();
         query.parse();
 
-        Minecraft minecraft = FMLClientHandler.instance().getClient();
+        Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
         World theWorld = minecraft.theWorld;
         if (theWorld == null)
         {

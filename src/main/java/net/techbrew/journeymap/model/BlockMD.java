@@ -9,17 +9,19 @@
 package net.techbrew.journeymap.model;
 
 import com.google.common.base.Strings;
-import cpw.mods.fml.common.registry.GameRegistry;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.ColorCache;
 import net.techbrew.journeymap.cartography.RGB;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -110,21 +112,7 @@ public class BlockMD
         String name = block.getUnlocalizedName();
         try
         {
-            // Gotta love this.
-            Item item = Item.getItemFromBlock(block);
-            if (item == null)
-            {
-                item = block.getItemDropped(0, new Random(), 0);
-            }
-            if (item != null)
-            {
-                ItemStack stack = new ItemStack(item, 1, block.damageDropped(meta));
-                String displayName = stack.getDisplayName();
-                if (!Strings.isNullOrEmpty(displayName))
-                {
-                    name = displayName;
-                }
-            }
+            name = ForgeHelper.INSTANCE.getBlockName(block, meta);
         }
         catch (Throwable t)
         {

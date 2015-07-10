@@ -9,10 +9,11 @@
 package net.techbrew.journeymap.model;
 
 import com.google.common.cache.*;
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.RegionImageHandler;
 import net.techbrew.journeymap.thread.JMThreadFactory;
@@ -35,7 +36,7 @@ public class RegionImageCache
     static final Logger logger = JourneyMap.getLogger();
     final LoadingCache<RegionImageSet.Key, RegionImageSet> regionImageSetsCache;
     private volatile long lastFlush;
-    private Minecraft minecraft = FMLClientHandler.instance().getClient();
+    private Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
 
     /**
      * Underlying caches are to be managed by the DataCache.

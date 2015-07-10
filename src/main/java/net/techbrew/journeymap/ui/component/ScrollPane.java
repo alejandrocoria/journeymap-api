@@ -66,7 +66,11 @@ public class ScrollPane extends GuiSlot
 
     public void position(int width, int height, int marginTop, int marginBottom, int x, int y)
     {
-        super.func_148122_a(width, height, marginTop, height - marginBottom);
+        // 1.7
+        // super.func_148122_a(width, height, marginTop, height - marginBottom);
+
+        // 1.8
+        super.setDimensions(width, height, marginTop, height - marginBottom);
         paneWidth = width;
         paneHeight = height;
         origin.setLocation(x, y);
@@ -165,8 +169,16 @@ public class ScrollPane extends GuiSlot
         GL11.glPopMatrix();
     }
 
-    @Override
+    // 1.7
+    // @Override
     protected void drawSlot(int index, int xPosition, int yPosition, int l, Tessellator tessellator, int var6, int var7)
+    {
+        drawSlot(index, xPosition, yPosition, l, null, var6, var7);
+    }
+
+    // 1.8
+    @Override
+    protected void drawSlot(int index, int xPosition, int yPosition, int l, int var6, int var7)
     {
         if (firstVisibleIndex == -1)
         {

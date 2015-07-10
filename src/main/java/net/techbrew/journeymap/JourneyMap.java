@@ -8,12 +8,12 @@
 
 package net.techbrew.journeymap;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.registry.EntityRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.cartography.ChunkRenderController;
@@ -24,6 +24,7 @@ import net.techbrew.journeymap.data.WaypointsData;
 import net.techbrew.journeymap.feature.FeatureManager;
 import net.techbrew.journeymap.forge.event.EventHandlerManager;
 import net.techbrew.journeymap.forge.event.WorldInfoHandler;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.io.IconSetFileHandler;
 import net.techbrew.journeymap.io.ThemeFileHandler;
@@ -280,7 +281,7 @@ public class JourneyMap implements CommonProxy
             timer = StatTimer.getDisposable("elapsed").start();
 
             // Get ref to Minecraft
-            mc = FMLClientHandler.instance().getClient();
+            mc = ForgeHelper.INSTANCE.getClient();
 
             // Main thread task controller
             mainThreadTaskController = new MainTaskController(mc, this);
@@ -397,7 +398,7 @@ public class JourneyMap implements CommonProxy
             String memory = String.format("Memory: %sMB total, %sMB free", totalMB, freeMB);
             logger.info(String.format("Mapping started in %s%sDIM%s. %s ", FileHandler.getJMWorldDir(mc, currentWorldId),
                     File.separator,
-                    mc.theWorld.provider.dimensionId,
+                    mc.theWorld.provider.getDimensionId(),
                     memory));
         }
     }
@@ -414,9 +415,9 @@ public class JourneyMap implements CommonProxy
                 String dim = ".";
                 if (mc.theWorld != null && mc.theWorld.provider != null)
                 {
-                    dim = " dimension " + mc.theWorld.provider.dimensionId + ".";
+                    dim = " dimension " + mc.theWorld.provider.getDimensionId() + ".";
                 }
-                logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, mc.theWorld.provider.dimensionId));
+                logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, mc.theWorld.provider.getDimensionId()));
             }
 
             if (multithreadTaskController != null)
@@ -432,7 +433,7 @@ public class JourneyMap implements CommonProxy
     {
         if (mc != null && mc.thePlayer != null)
         {
-            playerName = mc.thePlayer.getCommandSenderName();
+            playerName = mc.thePlayer.getName();
         }
 
         if (!mc.isSingleplayer() && currentWorldId == null)

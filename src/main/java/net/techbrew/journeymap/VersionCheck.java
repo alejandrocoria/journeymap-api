@@ -11,8 +11,8 @@ package net.techbrew.journeymap;
 import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.Loader;
+import net.minecraftforge.fml.common.Loader;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 
@@ -191,7 +191,7 @@ public class VersionCheck
             String lang = String.format("%s_%s", System.getProperty("user.language"), System.getProperty("user.country"));
             if (lang.contains("null"))
             {
-                lang = FMLClientHandler.instance().getCurrentLanguage();
+                lang = ForgeHelper.INSTANCE.getClient().getLanguageManager().getCurrentLanguage().getLanguageCode();
             }
 
             // Build user agent string

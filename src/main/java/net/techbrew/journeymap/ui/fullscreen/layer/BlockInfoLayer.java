@@ -9,10 +9,14 @@
 package net.techbrew.journeymap.ui.fullscreen.layer;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
+import net.techbrew.journeymap.model.ChunkMD;
 import net.techbrew.journeymap.properties.FullMapProperties;
 import net.techbrew.journeymap.render.draw.DrawStep;
 import net.techbrew.journeymap.render.draw.DrawUtil;
@@ -37,6 +41,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     int lastMouseX;
     int lastMouseY;
     BlockInfoStep blockInfoStep;
+    FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
 
     public BlockInfoLayer()
     {
@@ -61,8 +66,9 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             Integer blockY = null;
             if (!chunk.isEmpty())
             {
-                blockY = Math.max(chunk.getHeightValue(blockCoord.x & 15, blockCoord.z & 15), chunk.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15));
-                String biome = mc.theWorld.getBiomeGenForCoords(blockCoord.x, blockCoord.z).biomeName;
+                ChunkMD chunkMD = DataCache.instance().getChunkMD(chunk.getChunkCoordIntPair());
+                blockY = Math.max(chunkMD.getHeightValue(blockCoord.x & 15, blockCoord.z & 15), chunkMD.getAbsoluteHeightValue(blockCoord.x & 15, blockCoord.z & 15));
+                String biome = ForgeHelper.INSTANCE.getBiome(chunkMD.getWorld(), blockCoord.x, blockY, blockCoord.z).biomeName;
 
                 info = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
                         blockCoord.x,
@@ -75,7 +81,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
                 info = Constants.getString("jm.common.location_xz_verbose", blockCoord.x, blockCoord.z);
             }
 
-            double infoHeight = DrawUtil.getLabelHeight(mc.fontRenderer, true) * getMapFontScale();
+            double infoHeight = DrawUtil.getLabelHeight(fontRenderer, true) * getMapFontScale();
             blockInfoStep.update(info, gridWidth / 2, gridHeight - infoHeight);
         }
         else

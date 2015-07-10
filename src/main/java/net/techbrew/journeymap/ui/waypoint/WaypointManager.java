@@ -8,11 +8,11 @@
 
 package net.techbrew.journeymap.ui.waypoint;
 
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.command.CmdTeleportWaypoint;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.JMLogger;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.config.Config;
@@ -25,6 +25,7 @@ import net.techbrew.journeymap.waypoint.WaypointStore;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -84,7 +85,7 @@ public class WaypointManager extends JmUI
 
             if (buttonSortDistance == null)
             {
-                WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(FMLClientHandler.instance().getClient().thePlayer, true);
+                WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(ForgeHelper.INSTANCE.getClient().thePlayer, true);
                 String distanceLabel = Constants.getString("jm.waypoint.distance");
                 buttonSortDistance = new SortButton(distanceLabel, distanceSort);
                 buttonSortDistance.setTextOnly(fr);
@@ -185,7 +186,7 @@ public class WaypointManager extends JmUI
             }
             else
             {
-                itemScrollPane.func_148122_a(width, height, headerHeight, this.height - 30);
+                itemScrollPane.setDimensions(width, height, headerHeight, this.height - 30); // 1.7 func_148122_a
                 itemScrollPane.updateSlots();
             }
 
@@ -236,7 +237,7 @@ public class WaypointManager extends JmUI
 
         try
         {
-            itemScrollPane.func_148122_a(width, height, headerHeight, this.height - 30);
+            itemScrollPane.setDimensions(width, height, headerHeight, this.height - 30); // 1.7 func_148122_a
             String[] lastTooltip = itemScrollPane.lastTooltip;
             long lastTooltipTime = itemScrollPane.lastTooltipTime;
             itemScrollPane.lastTooltip = null;
@@ -297,7 +298,7 @@ public class WaypointManager extends JmUI
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseEvent)
+    protected void mouseClicked(int mouseX, int mouseY, int mouseEvent) throws IOException
     {
         super.mouseClicked(mouseX, mouseY, mouseEvent);
         boolean pressed = itemScrollPane.mousePressed(mouseX, mouseY, mouseEvent);
@@ -308,11 +309,11 @@ public class WaypointManager extends JmUI
     }
 
     @Override
-    protected void mouseMovedOrUp(int mouseX, int mouseY, int mouseEvent)
+    // 1.7 mouseMovedOrUp
+    protected void mouseReleased(int mouseX, int mouseY, int state)
     {
-        super.mouseMovedOrUp(mouseX, mouseY, mouseEvent);
-        itemScrollPane.mouseReleased(mouseX, mouseY, mouseEvent);
-
+        super.mouseReleased(mouseX, mouseY, state);
+        itemScrollPane.mouseReleased(mouseX, mouseY, state);
     }
 
     @Override
@@ -326,7 +327,7 @@ public class WaypointManager extends JmUI
     /**
      * Handles mouse input.
      */
-    public void handleMouseInput()
+    public void handleMouseInput() throws IOException
     {
         super.handleMouseInput();
         int i = Mouse.getEventDWheel();
@@ -469,7 +470,7 @@ public class WaypointManager extends JmUI
     protected void updateItems()
     {
         items.clear();
-        Integer currentDim = DimensionsButton.currentWorldProvider == null ? null : DimensionsButton.currentWorldProvider.dimensionId;
+        Integer currentDim = DimensionsButton.currentWorldProvider == null ? null : ForgeHelper.INSTANCE.getDimension(DimensionsButton.currentWorldProvider);
         FontRenderer fr = getFontRenderer();
         itemWidth = 0;
 

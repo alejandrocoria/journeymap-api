@@ -8,8 +8,11 @@
 
 package net.techbrew.journeymap.cartography;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.registry.GameData;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -19,6 +22,8 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
+import net.techbrew.journeymap.forge.helper.IForgeHelper;
 import net.techbrew.journeymap.io.IconLoader;
 import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.log.StatTimer;
@@ -39,6 +44,7 @@ public class ColorCache
 {
     private final HashMap<BlockMD, Color> baseColors = new HashMap<BlockMD, Color>(256);
     private final HashMap<String, HashMap<BlockMD, Color>> biomeColors = new HashMap<String, HashMap<BlockMD, Color>>(32);
+    private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
     private volatile IconLoader iconLoader;
     private volatile ColorPalette currentPalette;
     private String lastResourcePackNames;
@@ -58,7 +64,7 @@ public class ColorCache
      */
     public void ensureCurrent()
     {
-        if (FMLClientHandler.instance().getClient().theWorld == null)
+        if (forgeHelper.getClient().theWorld == null)
         {
             // Can happen when resource packs are changed after quitting out of world.
             // This ensures on next world load
@@ -254,7 +260,7 @@ public class ColorCache
 
     private Color getBiomeBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
     {
-        BiomeGenBase biome = chunkMd.getChunk().getBiomeGenForWorldCoords(x, z, chunkMd.getWorldObj().getWorldChunkManager());
+        BiomeGenBase biome = forgeHelper.getBiome(chunkMd.getWorld(), x, y, z);
         return getBiomeBlockColor(biome, blockMD, x, y, z);
     }
 
@@ -307,11 +313,11 @@ public class ColorCache
         Color color = getBiomeColor(blockMD, biome);
         if (color == null)
         {
-            int leafColor = blockMD.getBlock().getRenderColor(blockMD.meta); // getRenderColor()
-            int biomeColor = BiomeGenBase.plains.getBiomeFoliageColor(x, y, z); // Default
+            int leafColor = forgeHelper.getRenderColor(blockMD);
+            int biomeColor = forgeHelper.getFoliageColor(BiomeGenBase.plains, x, y, z); // TODO: also use modded foliage color?
             try
             {
-                biomeColor = biome.getBiomeFoliageColor(x, y, z);
+                biomeColor = forgeHelper.getFoliageColor(biome, x, y, z);
             }
             catch (Throwable t)
             {
@@ -332,10 +338,10 @@ public class ColorCache
         if (color == null)
         {
             Color baseColor = getBaseColor(blockMD, x, y, z);
-            int biomeColor = BiomeGenBase.plains.getBiomeGrassColor(x, y, z); // Default
+            int biomeColor = forgeHelper.getGrassColor(BiomeGenBase.plains, x, y, z); // Default
             try
             {
-                biomeColor = biome.getBiomeGrassColor(x, y, z);
+                biomeColor = forgeHelper.getGrassColor(biome, x, y, z);
             }
             catch (Throwable t)
             {
@@ -361,13 +367,13 @@ public class ColorCache
 
     private int getBiomeColorMultiplier(BlockMD blockMD, int x, int y, int z)
     {
-        WorldClient world = FMLClientHandler.instance().getClient().theWorld;
+        WorldClient world = forgeHelper.getClient().theWorld;
         try
         {
             // TODO: Defer calls to colorMultiplier to main thread only,
             // since some mods like Forestry mess up TileEntities when this is called
             // from a worker thread
-            return blockMD.getBlock().colorMultiplier(world, x, 78, z) | 0xFF000000;
+            return forgeHelper.getColorMultiplier(world, blockMD.getBlock(), x, 78, z) | 0xFF000000;
         }
         catch (NullPointerException e)
         {
@@ -459,7 +465,7 @@ public class ColorCache
                 else
                 {
                     // Check for render color
-                    int renderColor = blockMD.getBlock().getRenderColor(blockMD.meta & 0xf); // getRenderColor()
+                    int renderColor = forgeHelper.getRenderColor(blockMD) & 0xf;
                     if (renderColor != 0xffffff && renderColor != 0xffffffff)
                     { // white without alpha or white with alpha
                         baseColor = colorMultiplier(baseColor, 0xff000000 | renderColor); // Force opaque render color

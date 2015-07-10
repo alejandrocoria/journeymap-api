@@ -10,16 +10,16 @@ package net.techbrew.journeymap.model;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.CacheLoader;
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.io.nbt.ChunkLoader;
 
 import java.io.Serializable;
@@ -66,9 +66,9 @@ public class ChunkMD
     /**
      * Added to do a safety check on the world height value
      */
-    public int getSavedLightValue(EnumSkyBlock par1EnumSkyBlock, int x, int y, int z)
+    public int getSavedLightValue(int x, int y, int z)
     {
-        return getChunk().getSavedLightValue(par1EnumSkyBlock, x, Math.min(y, getWorldActualHeight() - 1), z);
+        return ForgeHelper.INSTANCE.getSavedLightValue(getChunk(), x, y, z);
     }
 
     /**
@@ -102,6 +102,14 @@ public class ChunkMD
     }
 
     /**
+     * Get the block meta from the chunk-local coords.
+     */
+    public int getBlockMeta(final int x, int y, final int z)
+    {
+        return ForgeHelper.INSTANCE.getBlockMeta(getChunk(), x, y, z);
+    }
+
+    /**
      * Finds the top sky-obscuring block in the column.
      */
     public int ceiling(final int x, final int z)
@@ -125,7 +133,7 @@ public class ChunkMD
                 {
                     y--;
                 }
-                else if (getChunk().canBlockSeeTheSky(x, y, z))
+                else if (ForgeHelper.INSTANCE.canBlockSeeTheSky(getChunk(), x, y, z))
                 {
                     y--;
                 }
@@ -150,17 +158,17 @@ public class ChunkMD
 
     public int getHeightValue(int x, int z)
     {
-        return getChunk().getHeightValue(x, z);
+        return ForgeHelper.INSTANCE.getHeightValue(getChunk(), x, z);
     }
 
     public int getAbsoluteHeightValue(int x, int z)
     {
-        return getChunk().getPrecipitationHeight(x, z);
+        return ForgeHelper.INSTANCE.getAbsoluteHeightValue(getChunk(), x, z);
     }
 
     public int getLightOpacity(BlockMD blockMD, int localX, int y, int localZ)
     {
-        return blockMD.getBlock().getLightOpacity(this.getWorldObj(), (this.getCoord().chunkXPos << 4) + localX, y, (this.getCoord().chunkZPos << 4) + localZ);
+        return ForgeHelper.INSTANCE.getLightOpacity(getWorld(), blockMD, localX, y, localZ);
     }
 
     public Serializable getProperty(String name)
@@ -219,19 +227,24 @@ public class ChunkMD
         return chunk;
     }
 
-    public World getWorldObj()
+    public World getWorld()
     {
-        return getChunk().worldObj;
+        return ForgeHelper.INSTANCE.getWorld(getChunk());
     }
 
     public int getWorldActualHeight()
     {
-        return getChunk().worldObj.getActualHeight();
+        return getWorld().getActualHeight();
     }
 
     public Boolean getHasNoSky()
     {
-        return getChunk().worldObj.provider.hasNoSky;
+        return ForgeHelper.INSTANCE.hasNoSky(getWorld());
+    }
+
+    public boolean canBlockSeeTheSky(int x, int y, int z)
+    {
+        return ForgeHelper.INSTANCE.canBlockSeeTheSky(getChunk(), x, y, z);
     }
 
     public ChunkCoordIntPair getCoord()
@@ -280,6 +293,11 @@ public class ChunkMD
                 '}';
     }
 
+    public int getDimension()
+    {
+        return ForgeHelper.INSTANCE.getDimension(getWorld());
+    }
+
     public static class ChunkMissingException extends RuntimeException
     {
         ChunkMissingException(ChunkCoordIntPair coord)
@@ -290,7 +308,7 @@ public class ChunkMD
 
     public static class SimpleCacheLoader extends CacheLoader<ChunkCoordIntPair, Optional<ChunkMD>>
     {
-        Minecraft mc = FMLClientHandler.instance().getClient();
+        Minecraft mc = ForgeHelper.INSTANCE.getClient();
 
         @Override
         public Optional<ChunkMD> load(ChunkCoordIntPair coord) throws Exception

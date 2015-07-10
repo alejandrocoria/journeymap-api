@@ -1,13 +1,14 @@
 package net.techbrew.journeymap.model.mod;
 
-import cpw.mods.fml.common.registry.GameData;
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.GameData;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
@@ -57,7 +58,7 @@ public class CarpentersBlocks
         {
             final int blockX = chunkMD.toBlockX(localX);
             final int blockZ = chunkMD.toBlockZ(localZ);
-            final TileEntity tileEntity = chunkMD.getWorldObj().getTileEntity(blockX, y, blockZ);
+            final TileEntity tileEntity = ForgeHelper.INSTANCE.getTileEntity(chunkMD.getWorld(), blockX, y, blockZ);
             if (tileEntity != null)
             {
                 final NBTTagCompound tag = new NBTTagCompound();

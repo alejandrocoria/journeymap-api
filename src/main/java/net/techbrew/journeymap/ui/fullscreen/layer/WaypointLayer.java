@@ -10,12 +10,12 @@ package net.techbrew.journeymap.ui.fullscreen.layer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.data.WaypointsData;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.model.BlockCoordIntPair;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.FullMapProperties;
@@ -79,12 +79,13 @@ public class WaypointLayer implements LayerDelegate.Layer
 
         // Get search area
         int proximity = getProximity();
-        AxisAlignedBB area = AxisAlignedBB.getBoundingBox(blockCoord.x - proximity, -1, blockCoord.z - proximity,
+
+        AxisAlignedBB area = new AxisAlignedBB(blockCoord.x - proximity, -1, blockCoord.z - proximity,
                 blockCoord.x + proximity, mc.theWorld.getActualHeight() + 1, blockCoord.z + proximity);
 
         if (!lastCoord.equals(blockCoord))
         {
-            if (!area.isVecInside(Vec3.createVectorHelper(lastCoord.x, 1, lastCoord.z)))
+            if (!area.isVecInside(new Vec3(lastCoord.x, 1, lastCoord.z)))
             {
                 selected = null;
                 lastCoord = blockCoord;
@@ -115,7 +116,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         {
             if (!waypoint.isReadOnly() && waypoint.isEnable() && waypoint.isInPlayerDimension())
             {
-                if (area.isVecInside(Vec3.createVectorHelper(waypoint.getX(), waypoint.getY(), waypoint.getZ())))
+                if (area.isVecInside(new Vec3(waypoint.getX(), waypoint.getY(), waypoint.getZ())))
                 {
                     proximal.add(waypoint);
                 }
@@ -170,12 +171,11 @@ public class WaypointLayer implements LayerDelegate.Layer
         int y = -1;
         if (!chunk.isEmpty())
         {
-            y = Math.max(1, chunk.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15));
+            y = Math.max(1, ForgeHelper.INSTANCE.getPrecipitationHeight(chunk, blockCoord.x & 15, blockCoord.z & 15));
         }
 
         // Create waypoint
-        ChunkCoordinates cc = new ChunkCoordinates(blockCoord.x, y, blockCoord.z);
-        Waypoint waypoint = Waypoint.at(cc, Waypoint.Type.Normal, mc.thePlayer.dimension);
+        Waypoint waypoint = Waypoint.at(blockCoord.x, y, blockCoord.z, Waypoint.Type.Normal, mc.thePlayer.dimension);
         UIManager.getInstance().openWaypointEditor(waypoint, true, new Fullscreen()); // TODO: This could be a problem
 
         return drawStepList;

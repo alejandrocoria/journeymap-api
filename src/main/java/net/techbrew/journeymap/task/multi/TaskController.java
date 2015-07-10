@@ -8,10 +8,11 @@
 
 package net.techbrew.journeymap.task.multi;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.profiler.Profiler;
 import net.techbrew.journeymap.JourneyMap;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.StatTimer;
 import net.techbrew.journeymap.thread.JMThreadFactory;
 import net.techbrew.journeymap.thread.RunnableTask;
@@ -30,7 +31,7 @@ public class TaskController
     final static Logger logger = JourneyMap.getLogger();
     final ArrayBlockingQueue<Future> queue = new ArrayBlockingQueue<Future>(1);
     final List<ITaskManager> managers = new LinkedList<ITaskManager>();
-    final Minecraft minecraft = FMLClientHandler.instance().getClient();
+    final Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
     final ReentrantLock lock = new ReentrantLock();
 
     // Executor for task threads
@@ -109,7 +110,7 @@ public class TaskController
         ITaskManager taskManager = getManager(managerClass);
         if (taskManager != null)
         {
-            return taskManager.isEnabled(FMLClientHandler.instance().getClient());
+            return taskManager.isEnabled(ForgeHelper.INSTANCE.getClient());
         }
         else
         {
@@ -142,7 +143,7 @@ public class TaskController
 
     private void toggleTask(ITaskManager manager, boolean enable, Object params)
     {
-        Minecraft minecraft = FMLClientHandler.instance().getClient();
+        Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
         if (manager.isEnabled(minecraft))
         {
             if (!enable)
@@ -188,7 +189,7 @@ public class TaskController
 
     public void performTasks()
     {
-        Profiler profiler = FMLClientHandler.instance().getClient().mcProfiler;
+        Profiler profiler = ForgeHelper.INSTANCE.getClient().mcProfiler;
         profiler.startSection("journeymapTask");
         StatTimer totalTimer = StatTimer.get("TaskController.performMultithreadTasks", 1, 500).start();
 

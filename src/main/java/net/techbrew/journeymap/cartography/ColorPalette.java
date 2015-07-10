@@ -12,15 +12,17 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.registry.GameData;
-import cpw.mods.fml.common.registry.GameRegistry;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.registry.GameData;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.techbrew.journeymap.Constants;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
+import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.io.FileHandler;
 import net.techbrew.journeymap.log.ChatLog;
 import net.techbrew.journeymap.log.LogFormatter;
@@ -157,7 +159,7 @@ public class ColorPalette
 
     static File getWorldPaletteFile()
     {
-        Minecraft mc = FMLClientHandler.instance().getClient();
+        Minecraft mc = ForgeHelper.INSTANCE.getClient();
         return new File(FileHandler.getJMWorldDir(mc), JSON_FILENAME);
     }
 
@@ -364,7 +366,8 @@ public class ColorPalette
         BlockColor(BlockMD blockMD, Color awtColor)
         {
             this.name = blockMD.getName();
-            this.uid = GameData.getBlockRegistry().getNameForObject(blockMD.getBlock());
+            // 1.8 needs the cast
+            this.uid = (String) GameData.getBlockRegistry().getNameForObject(blockMD.getBlock());
             this.meta = blockMD.meta;
             this.color = String.format("#%02x%02x%02x", awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue());
             if (blockMD.getAlpha() < 1f)
