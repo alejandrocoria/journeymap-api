@@ -158,7 +158,7 @@ public class ThemeButton extends BooleanPropertyButton
 
         // Check hover
         boolean hover = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
-        this.hovered = hover; // 1.7.10 field_146123_n
+        setMouseOver(hover);
 
         // Returns 0 if the button is disabled, 1 if the mouse is NOT hovering over this button and 2 if it IS hovering over
         int hoverState = this.getHoverState(hover);
@@ -211,7 +211,7 @@ public class ThemeButton extends BooleanPropertyButton
         int magic = 20;
         minecraft.getTextureManager().bindTexture(buttonTextures);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        int k = this.getHoverState(this.hovered); // 1.7.10 field_146123_n
+        int k = this.getHoverState(isMouseOver());
         GL11.glEnable(GL11.GL_BLEND);
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
