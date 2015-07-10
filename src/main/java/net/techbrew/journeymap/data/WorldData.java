@@ -11,7 +11,6 @@ package net.techbrew.journeymap.data;
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.world.WorldProvider;
@@ -35,6 +34,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URLEncoder;
 import java.util.*;
+
 
 /**
  * Provides world properties
@@ -74,40 +74,14 @@ public class WorldData extends CacheLoader<Class, WorldData>
     {
         try
         {
-            String serverName = ForgeHelper.INSTANCE.getRealmsServerName();
-
-            if (serverName != null)
-            {
-                return serverName;
-            }
-            else
-            {
-                Minecraft mc = ForgeHelper.INSTANCE.getClient();
-                ServerData serverData = mc.getCurrentServerData(); // func_147104_D()
-
-                if (serverData != null)
-                {
-                    serverName = serverData.serverName;
-                    if (serverName != null)
-                    {
-                        serverName = serverName.replaceAll("\\W+", "~").trim();
-
-                        if (Strings.isNullOrEmpty(serverName.replaceAll("~", "")))
-                        {
-                            serverName = serverData.serverIP;
-                        }
-                        return serverName;
-                    }
-                }
-            }
+            return ForgeHelper.INSTANCE.getRealmsServerName();
         }
         catch (Throwable t)
         {
             JourneyMap.getLogger().error("Couldn't get server name: " + LogFormatter.toString(t));
+            // Fallback
+            return getLegacyServerName();
         }
-
-        // Fallback
-        return getLegacyServerName();
     }
 
     public static String getLegacyServerName()
@@ -117,7 +91,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
             NetworkManager netManager = FMLClientHandler.instance().getClientToServerNetworkManager();
             if (netManager != null)
             {
-                SocketAddress socketAddress = netManager.getRemoteAddress(); // getSocketAddress
+                SocketAddress socketAddress = ForgeHelper.INSTANCE.getSocketAddress(netManager);
                 if ((socketAddress != null && socketAddress instanceof InetSocketAddress))
                 {
                     InetSocketAddress inetAddr = (InetSocketAddress) socketAddress;
@@ -223,7 +197,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
             // Use the player's provider
             WorldProvider playerProvider = ForgeHelper.INSTANCE.getClient().thePlayer.worldObj.provider;
-            int dimId = playerProvider.getDimensionId();
+            int dimId = ForgeHelper.INSTANCE.getDimension(playerProvider);
             dimProviders.put(dimId, playerProvider);
             requiredDims.remove(dimId);
             JourneyMap.getLogger().log(logLevel, String.format("Using player's provider for dim %s: %s", dimId, getSafeDimensionName(playerProvider)));
@@ -287,7 +261,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                 @Override
                 public int compare(WorldProvider o1, WorldProvider o2)
                 {
-                    return Integer.valueOf(o1.getDimensionId()).compareTo(o2.getDimensionId());
+                    return Integer.valueOf(ForgeHelper.INSTANCE.getDimension(o1)).compareTo(ForgeHelper.INSTANCE.getDimension(o2));
                 }
             });
 
@@ -313,7 +287,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
         catch (Exception e)
         {
-            return Constants.getString("jm.common.dimension", worldProvider.getDimensionId());
+            return Constants.getString("jm.common.dimension", ForgeHelper.INSTANCE.getDimension(worldProvider));
         }
     }
 
@@ -327,7 +301,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         boolean multiplayer = server == null || server.getPublic();
 
         name = getWorldName(mc, false);
-        dimension = mc.theWorld.provider.getDimensionId();
+        dimension = ForgeHelper.INSTANCE.getDimension(mc.theWorld.provider);
         hardcore = worldInfo.isHardcoreModeEnabled();
         singlePlayer = !multiplayer;
         time = mc.theWorld.getWorldTime() % 24000L;
@@ -369,7 +343,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
             return Constants.getString("jm.common.dimension", this.dimensionId);
         }
 
-        @Override
+        // New in 1.8, unused in 1.7
         public String getInternalNameSuffix()
         {
             return "fake";

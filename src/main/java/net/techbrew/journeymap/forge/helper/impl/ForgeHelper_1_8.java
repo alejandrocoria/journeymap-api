@@ -20,6 +20,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -34,6 +35,7 @@ import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.forge.helper.IForgeHelper;
 import net.techbrew.journeymap.model.BlockMD;
 
+import java.net.SocketAddress;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -98,6 +100,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return chunk.getWorld();
     }
 
+    @Override
     public int getLightOpacity(World world, BlockMD blockMD, int blockX, int blockY, int blockZ)
     {
         // 1.7
@@ -107,6 +110,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return blockMD.getBlock().getLightOpacity(world, new BlockPos(blockX, blockY, blockZ));
     }
 
+    @Override
     public int getDimension(World world)
     {
         // 1.7
@@ -221,6 +225,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
     public String getRealmsServerName()
     {
         // 1.7
+        String serverName = null;
 //        Minecraft mc = ForgeHelper.INSTANCE.getClient();
 //        if(!mc.isSingleplayer())
 //        {
@@ -241,7 +246,8 @@ public class ForgeHelper_1_8 implements IForgeHelper
 //                        {
 //                            if (mcoServer.id == selectedServerId)
 //                            {
-//                                return mcoServer.name;
+//                                serverName = mcoServer.name;
+//                                break;
 //                            }
 //                        }
 //                    }
@@ -253,12 +259,36 @@ public class ForgeHelper_1_8 implements IForgeHelper
 //            }
 //        }
 //
-//        return null;
+//        if (serverName != null)
+//        {
+//            return serverName;
+//        }
+//        else
+//        {
+//            Minecraft mc = ForgeHelper.INSTANCE.getClient();
+//            ServerData serverData = mc.func_147104_D(); // 1.8 getServerData()
+//
+//            if (serverData != null)
+//            {
+//                serverName = serverData.serverName;
+//                if (serverName != null)
+//                {
+//                    serverName = serverName.replaceAll("\\W+", "~").trim();
+//
+//                    if (Strings.isNullOrEmpty(serverName.replaceAll("~", "")))
+//                    {
+//                        serverName = serverData.serverIP;
+//                    }
+//                    return serverName;
+//                }
+//            }
+//        }
 
         // 1.8 TODO
         return null;
     }
 
+    @Override
     public Vec3 getEntityPositionVector(Entity entity)
     {
         // 1.7
@@ -278,6 +308,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return Tessellator.getInstance();
     }
 
+    @Override
     public boolean canBlockSeeTheSky(Chunk chunk, int x, int y, int z)
     {
         // 1.7
@@ -287,6 +318,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return chunk.canSeeSky(new BlockPos(x, y, z));
     }
 
+    @Override
     public int getHeightValue(Chunk chunk, int x, int z)
     {
         // 1.7
@@ -296,6 +328,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return chunk.getHeight(x, z);
     }
 
+    @Override
     public int getAbsoluteHeightValue(Chunk chunk, int x, int z)
     {
         // 1.7
@@ -305,6 +338,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return chunk.getPrecipitationHeight(new BlockPos((chunk.xPosition << 4) + x, 0, (chunk.zPosition << 4) + z)).getY();
     }
 
+    @Override
     public int getPrecipitationHeight(Chunk chunk, int x, int z)
     {
         // 1.7
@@ -314,6 +348,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return chunk.getPrecipitationHeight(new BlockPos((chunk.xPosition << 4) + x, 0, (chunk.zPosition << 4) + z)).getY();
     }
 
+    @Override
     public int getLightOpacity(Chunk chunk, Block block, int localX, int y, int localZ)
     {
         // 1.7
@@ -323,6 +358,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return block.getLightOpacity(chunk.getWorld(), new BlockPos((chunk.xPosition << 4) + localX, y, (chunk.zPosition << 4) + localZ));
     }
 
+    @Override
     public TileEntity getTileEntity(World world, int blockX, int y, int blockZ)
     {
         // 1.7
@@ -332,6 +368,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return world.getTileEntity(new BlockPos(blockX, y, blockZ));
     }
 
+    @Override
     public String getBlockName(Block block, int meta)
     {
         // Gotta love this.
@@ -361,6 +398,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return null;
     }
 
+    @Override
     public BiomeGenBase getBiome(World world, int x, int y, int z)
     {
         // 1.7
@@ -370,7 +408,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return world.getBiomeGenForCoords(new BlockPos(x, y, z));
     }
 
-
+    @Override
     public int getBlockMeta(Chunk chunk, final int x, int y, final int z)
     {
         // 1.7
@@ -390,6 +428,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return hasNoSky(entity.getEntityWorld());
     }
 
+    @Override
     public int getFoliageColor(BiomeGenBase biome, int x, int y, int z)
     {
         // 1.7
@@ -399,6 +438,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return biome.getFoliageColorAtPos(new BlockPos(x, y, z));
     }
 
+    @Override
     public int getGrassColor(BiomeGenBase biome, int x, int y, int z)
     {
         // 1.7
@@ -408,6 +448,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return biome.getGrassColorAtPos(new BlockPos(x, y, z));
     }
 
+    @Override
     public int getColorMultiplier(World world, Block block, int x, int y, int z)
     {
         // 1.7
@@ -417,6 +458,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return block.colorMultiplier(world, new BlockPos(x, y, z));
     }
 
+    @Override
     public int getRenderColor(BlockMD blockMD)
     {
         // 1.7
@@ -428,6 +470,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return block.getRenderColor(blockState);
     }
 
+    @Override
     public boolean hasChunkData(Chunk chunk)
     {
         // 1.7
@@ -442,5 +485,15 @@ public class ForgeHelper_1_8 implements IForgeHelper
     {
         // package change
         return GameData.getBlockRegistry().iterator();
+    }
+
+    @Override
+    public SocketAddress getSocketAddress(NetworkManager netManager)
+    {
+        // 1.7
+        // return netManager.getSocketAddress();
+
+        // 1.8
+        return netManager.getRemoteAddress();
     }
 }

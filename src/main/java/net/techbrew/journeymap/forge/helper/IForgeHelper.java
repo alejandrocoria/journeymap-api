@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
@@ -26,6 +27,7 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.model.BlockMD;
 
+import java.net.SocketAddress;
 import java.util.Iterator;
 
 /**
@@ -59,7 +61,7 @@ public interface IForgeHelper
 
     public AxisAlignedBB getBoundingBox(int x1, int y1, int z1, int x2, int y2, int z2);
 
-    public Vec3 newVec3(double x, double y, double z)
+    public Vec3 newVec3(double x, double y, double z);
 
     public Vec3 getEntityPositionVector(Entity entity);
 
@@ -104,4 +106,6 @@ public interface IForgeHelper
     public boolean hasChunkData(Chunk chunk);
 
     public Iterator<Block> getRegisteredBlocks();
+
+    public SocketAddress getSocketAddress(NetworkManager netManager);
 }
