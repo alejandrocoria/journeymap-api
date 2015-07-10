@@ -129,11 +129,18 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     }
 
     @Override
+    // 1.7
+    //public void func_146113_a(SoundHandler soundHandler)
+    // 1.8
     public void playPressSound(SoundHandler soundHandler)
     {
         // Play button click
         if (isEnabled())
         {
+            // 1.7
+            //super.func_146113_a(soundHandler);
+
+            // 1.8
             super.playPressSound(soundHandler);
         }
     }
