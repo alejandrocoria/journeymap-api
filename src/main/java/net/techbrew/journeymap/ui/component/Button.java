@@ -122,10 +122,19 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public boolean isMouseOver()
     {
         // 1.7
-        //return field_146123_n;
+        //return getHoverState();
 
         // 1.8
         return super.isMouseOver();
+    }
+
+    public void setMouseOver(boolean hover)
+    {
+        // 1.7.10
+        // field_146123_n = hover;
+
+        // 1.8
+        this.hovered = hover;
     }
 
     @Override
