@@ -26,6 +26,8 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.model.BlockMD;
 
+import java.util.Iterator;
+
 /**
  * Interface used to encapsulate compile-time differences between Minecraft/Forge versions.
  */
@@ -54,6 +56,10 @@ public interface IForgeHelper
     public AxisAlignedBB getBoundingBox(EntityPlayer player, double lateralDistance, double verticalDistance);
 
     public AxisAlignedBB getEntityBoundingBox(EntityLivingBase entity);
+
+    public AxisAlignedBB getBoundingBox(int x1, int y1, int z1, int x2, int y2, int z2);
+
+    public Vec3 newVec3(double x, double y, double z)
 
     public Vec3 getEntityPositionVector(Entity entity);
 
@@ -96,4 +102,6 @@ public interface IForgeHelper
     public int getRenderColor(BlockMD blockMD);
 
     public boolean hasChunkData(Chunk chunk);
+
+    public Iterator<Block> getRegisteredBlocks();
 }

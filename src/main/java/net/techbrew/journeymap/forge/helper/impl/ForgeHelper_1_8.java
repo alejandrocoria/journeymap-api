@@ -29,10 +29,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.fml.common.registry.GameData;
 import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.forge.helper.IForgeHelper;
 import net.techbrew.journeymap.model.BlockMD;
 
+import java.util.Iterator;
 import java.util.Random;
 
 /**
@@ -170,6 +172,16 @@ public class ForgeHelper_1_8 implements IForgeHelper
     }
 
     @Override
+    public AxisAlignedBB getBoundingBox(int x1, int y1, int z1, int x2, int y2, int z2)
+    {
+        // 1.7
+        // return AxisAlignedBB.getBoundingBox(x1, y1, z1, x2, y2, z2);
+
+        // 1.8
+        return new AxisAlignedBB(x1, y1, z1, x2, y2, z2);
+    }
+
+    @Override
     public AxisAlignedBB getBoundingBox(EntityPlayer player, double lateralDistance, double verticalDistance)
     {
         // 1.7
@@ -177,6 +189,16 @@ public class ForgeHelper_1_8 implements IForgeHelper
 
         // 1.8
         return new AxisAlignedBB(player.posX, player.posY, player.posZ, player.posX, player.posY, player.posZ).expand(lateralDistance, verticalDistance, lateralDistance);
+    }
+
+    @Override
+    public Vec3 newVec3(double x, double y, double z)
+    {
+        // 1.7
+        // return Vec3.createVectorHelper(x, y, z);
+
+        // 1.8
+        return new Vec3(x, y, z);
     }
 
     /**
@@ -413,5 +435,12 @@ public class ForgeHelper_1_8 implements IForgeHelper
 
         // 1.8
         return (chunk.isLoaded() && !chunk.isEmpty());
+    }
+
+    @Override
+    public Iterator<Block> getRegisteredBlocks()
+    {
+        // package change
+        return GameData.getBlockRegistry().iterator();
     }
 }

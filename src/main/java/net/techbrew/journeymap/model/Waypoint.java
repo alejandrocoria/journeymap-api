@@ -335,11 +335,7 @@ public class Waypoint implements Serializable
 
     public Vec3 getPosition()
     {
-        // 1.7
-        // return Vec3.createVectorHelper(getBlockCenteredX(), getBlockCenteredY(), getBlockCenteredZ());
-
-        // 1.8
-        return new Vec3(getBlockCenteredX(), getBlockCenteredY(), getBlockCenteredZ());
+        return ForgeHelper.INSTANCE.newVec3(getBlockCenteredX(), getBlockCenteredY(), getBlockCenteredZ());
     }
 
     public int getR()

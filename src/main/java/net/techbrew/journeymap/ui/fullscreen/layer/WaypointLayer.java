@@ -10,7 +10,6 @@ package net.techbrew.journeymap.ui.fullscreen.layer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
@@ -80,12 +79,12 @@ public class WaypointLayer implements LayerDelegate.Layer
         // Get search area
         int proximity = getProximity();
 
-        AxisAlignedBB area = new AxisAlignedBB(blockCoord.x - proximity, -1, blockCoord.z - proximity,
+        AxisAlignedBB area = ForgeHelper.INSTANCE.getBoundingBox(blockCoord.x - proximity, -1, blockCoord.z - proximity,
                 blockCoord.x + proximity, mc.theWorld.getActualHeight() + 1, blockCoord.z + proximity);
 
         if (!lastCoord.equals(blockCoord))
         {
-            if (!area.isVecInside(new Vec3(lastCoord.x, 1, lastCoord.z)))
+            if (!area.isVecInside(ForgeHelper.INSTANCE.newVec3(lastCoord.x, 1, lastCoord.z)))
             {
                 selected = null;
                 lastCoord = blockCoord;
@@ -116,7 +115,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         {
             if (!waypoint.isReadOnly() && waypoint.isEnable() && waypoint.isInPlayerDimension())
             {
-                if (area.isVecInside(new Vec3(waypoint.getX(), waypoint.getY(), waypoint.getZ())))
+                if (area.isVecInside(ForgeHelper.INSTANCE.newVec3(waypoint.getX(), waypoint.getY(), waypoint.getZ())))
                 {
                     proximal.add(waypoint);
                 }
