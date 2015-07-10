@@ -86,10 +86,10 @@ public class CheckBox extends BooleanPropertyButton
 
             if (this.toggled)
             {
-                this.drawCenteredString(mc.fontRendererObj, glyph, this.xPosition + this.boxWidth / 2 + 1, this.yPosition + 1 + yoffset, color);
+                this.drawCenteredString(fontRenderer, glyph, this.xPosition + this.boxWidth / 2 + 1, this.yPosition + 1 + yoffset, color);
             }
 
-            this.drawString(mc.fontRendererObj, displayString, xPosition + this.boxWidth + labelPad, yPosition + 2 + yoffset, color);
+            this.drawString(fontRenderer, displayString, xPosition + this.boxWidth + labelPad, yPosition + 2 + yoffset, color);
         }
     }
 
