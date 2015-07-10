@@ -1,9 +1,9 @@
 /*
- * JourneyMap mod for Minecraft
+ * JourneyMap : A mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package net.techbrew.journeymap.feature.impl;
@@ -16,8 +16,8 @@ import java.util.Set;
 
 /**
  * Unlimited features.
- * @author mwoodman
  *
+ * @author mwoodman
  */
 public class Unlimited implements FeatureManager.PolicySet
 {
@@ -25,19 +25,21 @@ public class Unlimited implements FeatureManager.PolicySet
     private final Set<Policy> policies;
     private final String name = "Unlimited";
 
-	public Unlimited() {
+    public Unlimited()
+    {
         policies = Collections.unmodifiableSet(Policy.bulkCreate(true, true));
     }
-	
-	@Override
+
+    @Override
     public Set<Policy> getPolicies()
     {
         return policies;
     }
-	
-	@Override
-	public String getName() {
-		return name;
-	}
+
+    @Override
+    public String getName()
+    {
+        return name;
+    }
 
 }

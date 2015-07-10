@@ -1,10 +1,16 @@
+/*
+ * JourneyMap : A mod for Minecraft
+ *
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ */
+
 package net.techbrew.journeymap.ui.option;
 
 import com.google.common.base.Strings;
-import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.Tessellator;
 import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.render.draw.DrawUtil;
 import net.techbrew.journeymap.ui.component.Button;

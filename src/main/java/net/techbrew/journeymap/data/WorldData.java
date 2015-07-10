@@ -1,8 +1,15 @@
+/*
+ * JourneyMap : A mod for Minecraft
+ *
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ */
+
 package net.techbrew.journeymap.data;
 
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.NetworkManager;

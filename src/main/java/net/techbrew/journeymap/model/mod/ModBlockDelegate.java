@@ -1,3 +1,11 @@
+/*
+ * JourneyMap : A mod for Minecraft
+ *
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ */
+
 package net.techbrew.journeymap.model.mod;
 
 import com.google.common.base.Joiner;
@@ -67,6 +75,7 @@ public class ModBlockDelegate
 
     /**
      * Register a special block handler and a block UID to be handled by it.
+     *
      * @param handler
      * @param uid
      * @return
@@ -172,6 +181,7 @@ public class ModBlockDelegate
     {
         /**
          * Provide Block UIDs that will be registered with as needing a special handler.
+         *
          * @return
          */
         public Collection<GameRegistry.UniqueIdentifier> getBlockUids();
@@ -187,6 +197,7 @@ public class ModBlockDelegate
         /**
          * Provide special handling of a block in-situ when encountered during a mapping task.
          * The block returned will be used to color that spot on the map.
+         *
          * @param chunkMD
          * @param blockMD
          * @param localX

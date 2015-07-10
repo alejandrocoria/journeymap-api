@@ -1,9 +1,9 @@
 /*
- * JourneyMap mod for Minecraft
+ * JourneyMap : A mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package net.techbrew.journeymap.forge.event;
@@ -12,7 +12,6 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;

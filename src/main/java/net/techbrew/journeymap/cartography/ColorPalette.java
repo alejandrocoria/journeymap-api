@@ -1,9 +1,9 @@
 /*
- * JourneyMap mod for Minecraft
+ * JourneyMap : A mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package net.techbrew.journeymap.cartography;
@@ -12,10 +12,8 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;

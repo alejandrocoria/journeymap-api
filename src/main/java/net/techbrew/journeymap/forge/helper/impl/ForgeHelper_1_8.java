@@ -1,14 +1,18 @@
+/*
+ * JourneyMap : A mod for Minecraft
+ *
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ */
+
 package net.techbrew.journeymap.forge.helper.impl;
 
 import com.google.common.base.Strings;
-import com.mojang.realmsclient.RealmsMainScreen;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiScreenRealmsProxy;
-import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
@@ -16,29 +20,19 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.realms.RealmsScreen;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
-import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.techbrew.journeymap.JourneyMap;
-import net.techbrew.journeymap.data.DataCache;
 import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.forge.helper.IForgeHelper;
-import net.techbrew.journeymap.log.LogFormatter;
 import net.techbrew.journeymap.model.BlockMD;
-import net.techbrew.journeymap.model.ChunkMD;
 
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -151,6 +145,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
 
     /**
      * Gets the entity's name (player name) / command sender name.
+     *
      * @param entity
      * @return
      */
@@ -267,7 +262,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         // return chunk.canBlockSeeTheSky(x, y, z);
 
         // 1.8
-        return chunk.canSeeSky(new BlockPos(x,y,z));
+        return chunk.canSeeSky(new BlockPos(x, y, z));
     }
 
     public int getHeightValue(Chunk chunk, int x, int z)
@@ -360,7 +355,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         // return chunk.getBlockMetadata(x,y,z);
 
         // 1.8
-        return chunk.getBlockMetadata(new BlockPos(x,y,z));
+        return chunk.getBlockMetadata(new BlockPos(x, y, z));
     }
 
     @Override

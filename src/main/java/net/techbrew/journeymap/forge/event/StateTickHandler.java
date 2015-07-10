@@ -1,27 +1,25 @@
 /*
- * JourneyMap mod for Minecraft
+ * JourneyMap : A mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package net.techbrew.journeymap.forge.event;
 
-import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.MathHelper;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.log.LogFormatter;
-import net.techbrew.journeymap.model.EntityHelper;
 import net.techbrew.journeymap.model.Waypoint;
 import net.techbrew.journeymap.properties.WaypointProperties;
 import net.techbrew.journeymap.waypoint.WaypointStore;

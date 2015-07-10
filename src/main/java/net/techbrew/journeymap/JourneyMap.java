@@ -1,21 +1,20 @@
 /*
- * JourneyMap mod for Minecraft
+ * JourneyMap : A mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package net.techbrew.journeymap;
 
-import net.minecraftforge.fml.client.FMLClientHandler;
+import modinfo.ModInfo;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import modinfo.ModInfo;
-import net.minecraft.client.Minecraft;
 import net.techbrew.journeymap.cartography.ChunkRenderController;
 import net.techbrew.journeymap.cartography.ColorCache;
 import net.techbrew.journeymap.common.CommonProxy;
@@ -50,14 +49,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 
 
-/**
- * This software is copyright (C) Mark Woodman (mwoodman@techbrew.net) and is
- * provided as-is with no warrantee whatsoever.
- * <p/>
- * Central class for the JourneyMap mod.
- *
- * @author Mark Woodman
- */
 @SideOnly(Side.CLIENT)
 public class JourneyMap implements CommonProxy
 {

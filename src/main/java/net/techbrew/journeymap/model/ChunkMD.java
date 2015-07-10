@@ -1,9 +1,9 @@
 /*
- * JourneyMap mod for Minecraft
+ * JourneyMap : A mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package net.techbrew.journeymap.model;
@@ -15,7 +15,6 @@ import net.minecraft.block.BlockAir;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.data.DataCache;
@@ -44,7 +43,7 @@ public class ChunkMD
 
     public ChunkMD(Chunk chunk)
     {
-        if(chunk==null)
+        if (chunk == null)
         {
             throw new IllegalArgumentException("Chunk can't be null");
         }
@@ -153,7 +152,7 @@ public class ChunkMD
 
     public boolean hasChunk()
     {
-        return chunkReference.get()!=null;
+        return chunkReference.get() != null;
     }
 
     public int getHeightValue(int x, int z)
@@ -179,7 +178,7 @@ public class ChunkMD
     public Serializable getProperty(String name, Serializable defaultValue)
     {
         Serializable currentValue = getProperty(name);
-        if(currentValue==null)
+        if (currentValue == null)
         {
             setProperty(name, defaultValue);
             currentValue = defaultValue;
@@ -220,7 +219,7 @@ public class ChunkMD
     public Chunk getChunk()
     {
         Chunk chunk = chunkReference.get();
-        if(chunk==null)
+        if (chunk == null)
         {
             throw new ChunkMissingException(getCoord());
         }

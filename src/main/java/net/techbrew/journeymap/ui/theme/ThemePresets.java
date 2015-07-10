@@ -1,3 +1,11 @@
+/*
+ * JourneyMap : A mod for Minecraft
+ *
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ */
+
 package net.techbrew.journeymap.ui.theme;
 
 import net.minecraft.util.EnumChatFormatting;
@@ -28,7 +36,7 @@ public class ThemePresets
 
         String vicRed = "#A56B46";
         String controlColor = Theme.toHexColor(new Color(132, 125, 102));
-        String veryDarkGray = Theme.toHexColor(new Color(34,34,34));
+        String veryDarkGray = Theme.toHexColor(new Color(34, 34, 34));
 
         Theme.ImageSpec icon = theme.icon;
         icon.height = 24;
@@ -123,7 +131,7 @@ public class ThemePresets
             minimapSquare.locationLabel = commonLabel;
             minimapSquare.biomeLabel = commonLabel;
             minimapSquare.compassLabel = compassLabel;
-            minimapSquare.compassPoint = new Theme.ImageSpec(28,28);
+            minimapSquare.compassPoint = new Theme.ImageSpec(28, 28);
             minimapSquare.compassPointLabelPad = 6;
             minimapSquare.compassPointColor = Theme.toHexColor(Color.white);
             minimapSquare.reticleThickness = 2;
@@ -144,7 +152,7 @@ public class ThemePresets
             minimapCircle.biomeLabel = commonLabel;
             minimapCircle.compassLabel = compassLabel;
             minimapCircle.compassPointOffset = -3;
-            minimapCircle.compassPoint = new Theme.ImageSpec(28,28);
+            minimapCircle.compassPoint = new Theme.ImageSpec(28, 28);
             minimapCircle.compassPointLabelPad = 3;
             minimapCircle.compassPointColor = Theme.toHexColor(Color.white);
             minimapCircle.reticleColor = vicRed;
@@ -164,7 +172,7 @@ public class ThemePresets
         theme.author = "techbrew";
         theme.directory = "Victorian";
 
-        String veryDarkGray = Theme.toHexColor(new Color(34,34,34));
+        String veryDarkGray = Theme.toHexColor(new Color(34, 34, 34));
 
         Theme.LabelSpec commonLabel = new Theme.LabelSpec();
         commonLabel.backgroundAlpha = 200;

@@ -1,14 +1,13 @@
 /*
- * JourneyMap mod for Minecraft
+ * JourneyMap : A mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package net.techbrew.journeymap.cartography;
 
-import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
@@ -44,7 +43,7 @@ public class Stratum
 
     Stratum set(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, Integer lightLevel)
     {
-        if(chunkMd==null || blockMD==null)
+        if (chunkMd == null || blockMD == null)
         {
             throw new IllegalStateException(String.format("Can't have nulls: %s, %s", chunkMd, blockMD));
         }
@@ -56,7 +55,7 @@ public class Stratum
             this.setY(y);
             this.setZ(z);
             this.setWater(blockMD.isWater());
-            if(blockMD.isLava())
+            if (blockMD.isLava())
             {
                 this.setLightLevel(14);
             }
@@ -70,9 +69,9 @@ public class Stratum
             setCaveColor(null);
             this.uninitialized = false;
 
-           // System.out.println("    SET " + this);
+            // System.out.println("    SET " + this);
         }
-        catch(RuntimeException t)
+        catch (RuntimeException t)
         {
             throw t;
         }
@@ -116,20 +115,20 @@ public class Stratum
     @Override
     public String toString()
     {
-        String common = "Stratum{" + "id=" + id +", uninitialized=" + uninitialized + "%s}";
+        String common = "Stratum{" + "id=" + id + ", uninitialized=" + uninitialized + "%s}";
 
-        if(!uninitialized)
+        if (!uninitialized)
         {
             return String.format(common,
                     ", x=" + getX() +
-                    ", y=" + getY() +
-                    ", z=" + getZ() +
-                    ", lightLevel=" + getLightLevel() +
-                    ", lightOpacity=" + getLightOpacity() +
-                    ", isWater=" + isWater() +
-                    ", dayColor=" + (getDayColor() == null ? null : new Color(getDayColor())) +
-                    ", nightColor=" + (getNightColor() == null ? null : new Color(getNightColor())) +
-                    ", caveColor=" + (getCaveColor() == null ? null : new Color(getCaveColor())) );
+                            ", y=" + getY() +
+                            ", z=" + getZ() +
+                            ", lightLevel=" + getLightLevel() +
+                            ", lightOpacity=" + getLightOpacity() +
+                            ", isWater=" + isWater() +
+                            ", dayColor=" + (getDayColor() == null ? null : new Color(getDayColor())) +
+                            ", nightColor=" + (getNightColor() == null ? null : new Color(getNightColor())) +
+                            ", caveColor=" + (getCaveColor() == null ? null : new Color(getCaveColor())));
         }
         else
         {
@@ -268,6 +267,6 @@ public class Stratum
         setCaveColor(null);
 
         // TODO REMOVE
-       // System.out.println("CLEARED " + this);
+        // System.out.println("CLEARED " + this);
     }
 }

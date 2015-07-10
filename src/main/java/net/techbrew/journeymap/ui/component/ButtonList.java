@@ -1,9 +1,9 @@
 /*
- * JourneyMap mod for Minecraft
+ * JourneyMap : A mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package net.techbrew.journeymap.ui.component;
@@ -21,22 +21,9 @@ import java.util.List;
  */
 public class ButtonList extends ArrayList<Button>
 {
-    public enum Layout
-    {
-        Horizontal, Vertical, CenteredHorizontal, CenteredVertical, DistributedHorizontal, FilledHorizontal
-    }
-
-    public enum Direction
-    {
-        LeftToRight, RightToLeft
-    }
-
-
     private Layout layout = Layout.Horizontal;
     private Direction direction = Direction.LeftToRight;
-
     private String label;
-
     public ButtonList()
     {
 
@@ -507,5 +494,15 @@ public class ButtonList extends ArrayList<Button>
     {
         Collections.reverse(this);
         return this;
+    }
+
+    public enum Layout
+    {
+        Horizontal, Vertical, CenteredHorizontal, CenteredVertical, DistributedHorizontal, FilledHorizontal
+    }
+
+    public enum Direction
+    {
+        LeftToRight, RightToLeft
     }
 }

@@ -1,9 +1,9 @@
 /*
- * JourneyMap mod for Minecraft
+ * JourneyMap : A mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package net.techbrew.journeymap.feature;
@@ -73,6 +73,7 @@ public class FeatureManager
 
     /**
      * Whether the specified feature is currently permitted.
+     *
      * @param feature the feature to check
      * @return true if permitted
      */
@@ -84,6 +85,7 @@ public class FeatureManager
 
     /**
      * Returns a map of all features and whether they are currently permitted.
+     *
      * @return
      */
     public static Map<Feature, Boolean> getAllowedFeatures()
@@ -98,6 +100,7 @@ public class FeatureManager
 
     /**
      * Gets the name of the PolicySet.
+     *
      * @return
      */
     public static String getPolicySetName()
@@ -148,6 +151,7 @@ public class FeatureManager
 
     /**
      * Finds the FeatureSet via reflection.
+     *
      * @return
      */
     private PolicySet locatePolicySet()
@@ -192,6 +196,7 @@ public class FeatureManager
 
     /**
      * Generates a FeatureSet that disables all features in multiplayer.
+     *
      * @return
      */
     private PolicySet createFairPlay()

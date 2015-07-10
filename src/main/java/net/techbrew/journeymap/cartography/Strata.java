@@ -1,9 +1,9 @@
 /*
- * JourneyMap mod for Minecraft
+ * JourneyMap : A mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package net.techbrew.journeymap.cartography;
@@ -22,14 +22,12 @@ import java.util.Stack;
 public class Strata
 {
     final DataCache dataCache = DataCache.instance();
-    private boolean mapCaveLighting = JourneyMap.getCoreProperties().mapCaveLighting.get();
-    private boolean mapBathymetry = JourneyMap.getCoreProperties().mapBathymetry.get();
     final String name;
-
     final int initialPoolSize;
     final int poolGrowthIncrement;
-
     private final boolean underground;
+    private boolean mapCaveLighting = JourneyMap.getCoreProperties().mapCaveLighting.get();
+    private boolean mapBathymetry = JourneyMap.getCoreProperties().mapBathymetry.get();
     private Integer topY = null;
     private Integer bottomY = null;
     private Integer topWaterY = null;
@@ -99,7 +97,7 @@ public class Strata
 
     public void release(Stratum stratum)
     {
-        if(stratum==null)
+        if (stratum == null)
         {
             JourneyMap.getLogger().warn("Null stratum in pool.");
             return;
@@ -107,7 +105,7 @@ public class Strata
         else
         {
             stratum.clear();
-            unusedStack.add(0,stack.pop());
+            unusedStack.add(0, stack.pop());
         }
     }
 
@@ -148,7 +146,7 @@ public class Strata
             //timer.stop();
             return stratum;
         }
-        catch(ChunkMD.ChunkMissingException e)
+        catch (ChunkMD.ChunkMissingException e)
         {
             throw e;
         }
@@ -182,7 +180,7 @@ public class Strata
             renderer.setStratumColors(stratum, getLightAttenuation(), getWaterColor(), isWaterAbove(stratum), isUnderground(), isMapCaveLighting());
             return stratum;
         }
-        catch(RuntimeException t)
+        catch (RuntimeException t)
         {
             throw t;
         }
@@ -326,6 +324,11 @@ public class Strata
         return waterColor;
     }
 
+    public void setWaterColor(Integer waterColor)
+    {
+        this.waterColor = waterColor;
+    }
+
     public void determineWaterColor(ChunkMD chunkMD, int x, int y, int z)
     {
         setWaterColor(getAverageWaterColor((chunkMD.getCoord().chunkXPos << 4) + x, y, (chunkMD.getCoord().chunkZPos << 4) + z));
@@ -336,11 +339,6 @@ public class Strata
         }
 
         setWaterColor(RGB.darken(getWaterColor(), .85f)); // magic # to match how it looks in game
-    }
-
-    public void setWaterColor(Integer waterColor)
-    {
-        this.waterColor = waterColor;
     }
 
     public Integer getRenderDayColor()

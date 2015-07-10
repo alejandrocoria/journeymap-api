@@ -1,9 +1,9 @@
 /*
- * JourneyMap mod for Minecraft
+ * JourneyMap : A mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package net.techbrew.journeymap.log;
@@ -27,7 +27,6 @@ public class StatTimer
     private static final int WARMUP_COUNT_DEFAULT = 10;
     private static final int MAX_COUNT = 1000000;
     private static final int MAX_ELAPSED_LIMIT_WARNINGS = 25;
-    private int elapsedLimitWarnings = MAX_ELAPSED_LIMIT_WARNINGS;
     private static final int ELAPSED_LIMIT_DEFAULT = 1000;
     private static final Logger logger = JourneyMap.getLogger();
     private static Map<String, StatTimer> timers = Collections.synchronizedMap(new HashMap<String, StatTimer>());
@@ -39,6 +38,7 @@ public class StatTimer
     private final String name;
     private final boolean disposable;
     private final boolean doWarmup;
+    private int elapsedLimitWarnings = MAX_ELAPSED_LIMIT_WARNINGS;
     private boolean warmup = true;
     private boolean maxed = false;
     private boolean ranTooLong = true;

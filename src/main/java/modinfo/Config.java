@@ -1,3 +1,11 @@
+/*
+ * JourneyMap : A mod for Minecraft
+ *
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ */
+
 package modinfo;
 
 import com.google.gson.Gson;
@@ -12,12 +20,13 @@ import java.util.UUID;
 /**
  * Created by mwoodman on 2/20/14.
  */
-public class Config implements Serializable {
+public class Config implements Serializable
+{
 
     private static final String[] HEADERS = {
-        "// ModInfo v%s - Configuration file for %s",
-        "// ModInfo is a simple utility which helps the Mod developer support their mod.",
-        "// For more information: https://github.com/MCModInfo/modinfo/blob/master/README.md"
+            "// ModInfo v%s - Configuration file for %s",
+            "// ModInfo is a simple utility which helps the Mod developer support their mod.",
+            "// For more information: https://github.com/MCModInfo/modinfo/blob/master/README.md"
     };
     private static final String PARENT_DIR = "config";
     private static final String FILE_PATTERN = "%s_ModInfo.cfg";
@@ -30,28 +39,32 @@ public class Config implements Serializable {
     private String status;
     private Boolean verbose;
 
+    private Config()
+    {
+    }
+
     public static synchronized Config getInstance(String modId)
     {
         Config config = null;
         File configFile = getFile(modId);
-        if(configFile.exists())
+        if (configFile.exists())
         {
             try
             {
                 Gson gson = new Gson();
                 config = gson.fromJson(new FileReader(configFile), Config.class);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 ModInfo.LOGGER.log(Level.ERROR, "Can't read file " + configFile, e.getMessage());
-                if(configFile.exists())
+                if (configFile.exists())
                 {
                     configFile.delete();
                 }
             }
         }
 
-        if(config==null)
+        if (config == null)
         {
             config = new Config();
         }
@@ -61,39 +74,63 @@ public class Config implements Serializable {
         return config;
     }
 
-    private Config()
+    static boolean isConfirmedDisabled(Config config)
     {
+        return config.enable == false && generateStatusString(config).equals(config.status);
+    }
+
+    static String generateStatusString(Config config)
+    {
+        return generateStatusString(config.modId, config.enable);
+    }
+
+    static String generateStatusString(String modId, Boolean enable)
+    {
+        UUID uuid = ModInfo.createUUID(modId, enable.toString());
+        String pattern = enable ? ENABLED_STATUS_PATTERN : DISABLED_STATUS_PATTERN;
+        return String.format(pattern, uuid.toString());
+    }
+
+    private static File getFile(String modId)
+    {
+        Minecraft minecraft = FMLClientHandler.instance().getClient();
+        File dir = new File(minecraft.mcDataDir, PARENT_DIR);
+        if (!dir.exists())
+        {
+            dir.mkdirs();
+        }
+        return new File(dir, String.format(FILE_PATTERN, modId.replaceAll("%", "_")));
     }
 
     private void validate(String modId)
     {
         boolean dirty = false;
 
-        if(!modId.equals(this.modId))
+        if (!modId.equals(this.modId))
         {
             this.modId = modId;
             dirty = true;
         }
 
-        if(enable==null)
+        if (enable == null)
         {
             this.enable = Boolean.TRUE;
             dirty = true;
         }
 
-        if(salt==null)
+        if (salt == null)
         {
             salt = Long.toHexString(System.currentTimeMillis());
             dirty = true;
         }
 
-        if(verbose==null)
+        if (verbose == null)
         {
             this.verbose = Boolean.FALSE;
             dirty = true;
         }
 
-        if(dirty)
+        if (dirty)
         {
             save();
         }
@@ -107,7 +144,7 @@ public class Config implements Serializable {
             // Header
             String lineEnding = System.getProperty("line.separator");
             StringBuilder sb = new StringBuilder();
-            for(String line : HEADERS)
+            for (String line : HEADERS)
             {
                 sb.append(line).append(lineEnding);
             }
@@ -131,57 +168,39 @@ public class Config implements Serializable {
         }
     }
 
-    public String getSalt() {
+    public String getSalt()
+    {
         return salt;
     }
 
-    public String getModId() {
+    public String getModId()
+    {
         return modId;
     }
 
-    public Boolean isEnabled() {
+    public Boolean isEnabled()
+    {
         return enable;
     }
 
-    public Boolean isVerbose() {
+    public Boolean isVerbose()
+    {
         return verbose;
     }
 
-    public String getStatus() {
+    public String getStatus()
+    {
         return status;
     }
 
-    public void confirmStatus() {
+    public void confirmStatus()
+    {
         String newStatus = generateStatusString(this);
-        if(!newStatus.equals(status))
+        if (!newStatus.equals(status))
         {
             status = newStatus;
             save();
         }
-    }
-
-    static boolean isConfirmedDisabled(Config config) {
-        return config.enable == false && generateStatusString(config).equals(config.status);
-    }
-
-    static String generateStatusString(Config config) {
-        return generateStatusString(config.modId, config.enable);
-    }
-
-    static String generateStatusString(String modId, Boolean enable) {
-        UUID uuid = ModInfo.createUUID(modId, enable.toString());
-        String pattern = enable ? ENABLED_STATUS_PATTERN : DISABLED_STATUS_PATTERN;
-        return String.format(pattern, uuid.toString());
-    }
-
-    private static File getFile(String modId)
-    {
-        Minecraft minecraft = FMLClientHandler.instance().getClient();
-        File dir = new File(minecraft.mcDataDir, PARENT_DIR);
-        if(!dir.exists()) {
-            dir.mkdirs();
-        }
-        return new File(dir, String.format(FILE_PATTERN, modId.replaceAll("%","_")));
     }
 
 }

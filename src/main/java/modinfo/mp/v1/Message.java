@@ -1,3 +1,11 @@
+/*
+ * JourneyMap : A mod for Minecraft
+ *
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ */
+
 package modinfo.mp.v1;
 
 import modinfo.ModInfo;
@@ -33,7 +41,6 @@ public class Message implements Callable<Object>
     }
 
 
-
     @Override
     public Object call()
     {
@@ -42,13 +49,14 @@ public class Message implements Callable<Object>
 
         Exception exception = null;
         Integer responseCode = null;
-        while(responseCode==null && remainingRetries>0)
+        while (responseCode == null && remainingRetries > 0)
         {
-            try {
+            try
+            {
                 String payloadString = payload.toUrlEncodedString();
 
                 URL url = new URL(endpoint);
-                HttpURLConnection con = (HttpURLConnection ) url.openConnection();
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("POST");
                 con.setRequestProperty("User-Agent", userAgent);
                 con.setConnectTimeout(connectionTimeout);
@@ -80,16 +88,16 @@ public class Message implements Callable<Object>
             }
         }
 
-        if(defaultAgent!=null && defaultAgent.length()>0)
+        if (defaultAgent != null && defaultAgent.length() > 0)
         {
             System.setProperty("http.agent", defaultAgent);
         }
 
-        if(responseCode!=null)
+        if (responseCode != null)
         {
             return Boolean.TRUE;
         }
-        else if(exception == null)
+        else if (exception == null)
         {
             exception = new Exception("ModInfo got a null response from endpoint");
         }

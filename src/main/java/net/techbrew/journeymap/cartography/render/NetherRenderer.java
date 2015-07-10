@@ -1,20 +1,18 @@
 /*
- * JourneyMap mod for Minecraft
+ * JourneyMap : A mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package net.techbrew.journeymap.cartography.render;
 
 
-import net.minecraft.world.EnumSkyBlock;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.cartography.IChunkRenderer;
 import net.techbrew.journeymap.cartography.RGB;
 import net.techbrew.journeymap.cartography.Strata;
-import net.techbrew.journeymap.forge.helper.ForgeHelper;
 import net.techbrew.journeymap.model.BlockMD;
 import net.techbrew.journeymap.model.ChunkMD;
 
@@ -48,7 +46,7 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
                                           final HeightsCache chunkHeights)
     {
         Integer[][] blockSliceHeights = chunkHeights.getUnchecked(chunkMd.getCoord());
-        if(blockSliceHeights==null)
+        if (blockSliceHeights == null)
         {
             return null;
         }
@@ -112,6 +110,7 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
     {
         super.buildStrata(strata, minY, chunkMd, x, topY, z, chunkHeights, chunkSlopes);
     }
+
     /**
      * Get the light level for the block in the slice.  Can be overridden to provide an ambient light minimum.
      */

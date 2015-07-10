@@ -1,9 +1,9 @@
 /*
- * JourneyMap mod for Minecraft
+ * JourneyMap : A mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package net.minecraft.client.renderer.entity;
@@ -17,18 +17,18 @@ import net.minecraft.util.ResourceLocation;
 public class RenderFacade extends Render
 {
     /**
+     * Unused.
+     */
+    public RenderFacade(Render render)
+    {
+    }
+
+    /**
      * It's a cheat, but it works.   RenderFacade.getEntityTexture(render,entity)
      */
     public static ResourceLocation getEntityTexture(Render render, Entity entity)
     {
         return render.getEntityTexture(entity);
-    }
-
-    /**
-     * Unused.
-     */
-    public RenderFacade(Render render)
-    {
     }
 
     /**

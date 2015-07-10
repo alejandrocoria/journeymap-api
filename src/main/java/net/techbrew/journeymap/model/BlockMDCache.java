@@ -1,19 +1,17 @@
 /*
- * JourneyMap mod for Minecraft
+ * JourneyMap : A mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package net.techbrew.journeymap.model;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -164,7 +162,8 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
                 continue;
             }
 
-            if(block instanceof BlockFence || block instanceof BlockFenceGate) {
+            if (block instanceof BlockFence || block instanceof BlockFenceGate)
+            {
                 setAlpha(block, .4F);
                 setFlags(block, TransparentRoof);
             }

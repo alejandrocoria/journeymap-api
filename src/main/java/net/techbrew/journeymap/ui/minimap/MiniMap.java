@@ -1,17 +1,16 @@
 /*
- * JourneyMap mod for Minecraft
+ * JourneyMap : A mod for Minecraft
  *
- * Copyright (C) 2011-2014 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>.
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package net.techbrew.journeymap.ui.minimap;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import net.techbrew.journeymap.JourneyMap;
 import net.techbrew.journeymap.feature.Feature;
@@ -48,8 +47,8 @@ public class MiniMap
     private static final float lightmapS = (float) (15728880 % 65536) / 1f;
     private static final float lightmapT = (float) (15728880 / 65536) / 1f;
     private static final long labelRefreshRate = 400;
-    private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
     private final static GridRenderer gridRenderer = new GridRenderer(3);
+    private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
     private final Logger logger = JourneyMap.getLogger();
     private final Minecraft mc = ForgeHelper.INSTANCE.getClient();
     private final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
