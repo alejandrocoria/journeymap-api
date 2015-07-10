@@ -389,7 +389,7 @@ public class JourneyMap implements CommonProxy
             String memory = String.format("Memory: %sMB total, %sMB free", totalMB, freeMB);
             logger.info(String.format("Mapping started in %s%sDIM%s. %s ", FileHandler.getJMWorldDir(mc, currentWorldId),
                     File.separator,
-                    mc.theWorld.provider.getDimensionId(),
+                    ForgeHelper.INSTANCE.getDimension(mc.theWorld),
                     memory));
         }
     }
@@ -406,9 +406,9 @@ public class JourneyMap implements CommonProxy
                 String dim = ".";
                 if (mc.theWorld != null && mc.theWorld.provider != null)
                 {
-                    dim = " dimension " + mc.theWorld.provider.getDimensionId() + ".";
+                    dim = " dimension " + ForgeHelper.INSTANCE.getDimension(mc.theWorld) + ".";
                 }
-                logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, mc.theWorld.provider.getDimensionId()));
+                logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, ForgeHelper.INSTANCE.getDimension(mc.theWorld)));
             }
 
             if (multithreadTaskController != null)
